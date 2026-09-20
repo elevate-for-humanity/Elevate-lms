@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Globe2, Loader2, Sparkles, WandSparkles } from 'lucide-react';
+import { ArrowLeft, FileUp, Globe2, Loader2, Sparkles, WandSparkles } from 'lucide-react';
 
 type ImportResult = {
   originalUrl: string;
@@ -17,9 +17,12 @@ type ImportResult = {
 };
 
 type ImportMode = 'preserve' | 'modernize' | 'rebuild';
+type ImportSource = 'url' | 'file';
 
 export default function WebsiteImportClient() {
   const [url, setUrl] = useState('');
+  const [source, setSource] = useState<ImportSource>('url');
+  const [importFile, setImportFile] = useState<File | null>(null);
   const [result, setResult] = useState<ImportResult | null>(null);
   const [mode, setMode] = useState<ImportMode>('modernize');
   const [busy, setBusy] = useState(false);
@@ -31,10 +34,12 @@ export default function WebsiteImportClient() {
     setError('');
     setResult(null);
     try {
-      const response = await fetch('/api/apps/website-builder/import', {
+      const isFile = source === 'file';
+      const content = isFile && importFile ? await importFile.text() : undefined;
+      const response = await fetch(isFile ? '/api/apps/website-builder/import-data' : '/api/apps/website-builder/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify(isFile ? { fileName: importFile?.name, content } : { url }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not import website');
@@ -56,14 +61,14 @@ export default function WebsiteImportClient() {
         meta: {
           ...(result.config?.meta || {}),
           importMode: mode,
-          sourceUrl: result.originalUrl,
+          sourceUrl: result.originalUrl || undefined,
         },
       };
       const response = await fetch('/api/apps/website-builder/sites', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          siteName: result.extracted.title || new URL(result.originalUrl).hostname,
+          siteName: result.extracted.title || (result.originalUrl ? new URL(result.originalUrl).hostname : 'Imported Website'),
           siteConfig: importedConfig,
         }),
       });
@@ -100,14 +105,27 @@ export default function WebsiteImportClient() {
             </div>
           </div>
 
-          <div className="mt-8 rounded-2xl bg-white p-3 text-slate-950 sm:flex">
-            <input type="url" value={url} onChange={(event) => setUrl(event.target.value)} placeholder="https://yourbusiness.com" className="min-w-0 flex-1 rounded-xl px-4 py-3 outline-none" />
-            <button type="button" onClick={analyze} disabled={busy || !url.trim()} className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white disabled:opacity-50 sm:mt-0">
+          <div className="mt-8 flex gap-2" role="tablist" aria-label="Import source">
+            <button type="button" role="tab" aria-selected={source === 'url'} onClick={() => { setSource('url'); setResult(null); setError(''); }} className={`rounded-xl px-4 py-2 text-sm font-black ${source === 'url' ? 'bg-white text-slate-950' : 'bg-white/10 text-white'}`}><Globe2 className="mr-2 inline h-4 w-4" />Public URL</button>
+            <button type="button" role="tab" aria-selected={source === 'file'} onClick={() => { setSource('file'); setResult(null); setError(''); }} className={`rounded-xl px-4 py-2 text-sm font-black ${source === 'file' ? 'bg-white text-slate-950' : 'bg-white/10 text-white'}`}><FileUp className="mr-2 inline h-4 w-4" />JSON or CSV</button>
+          </div>
+
+          <div className="mt-3 rounded-2xl bg-white p-3 text-slate-950 sm:flex">
+            {source === 'url' ? (
+              <input type="url" value={url} onChange={(event) => setUrl(event.target.value)} placeholder="https://yourbusiness.com" className="min-w-0 flex-1 rounded-xl px-4 py-3 outline-none" />
+            ) : (
+              <label className="flex min-w-0 flex-1 cursor-pointer items-center rounded-xl px-4 py-3">
+                <FileUp className="mr-3 h-5 w-5 text-slate-500" />
+                <span className="truncate">{importFile?.name || 'Choose a JSON or CSV export'}</span>
+                <input type="file" accept=".json,.csv,application/json,text/csv" className="sr-only" onChange={(event) => setImportFile(event.target.files?.[0] || null)} />
+              </label>
+            )}
+            <button type="button" onClick={analyze} disabled={busy || (source === 'url' ? !url.trim() : !importFile)} className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white disabled:opacity-50 sm:mt-0">
               {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
               {busy ? 'Analyzing…' : 'Analyze with AI'}
             </button>
           </div>
-          <p className="mt-3 text-xs text-slate-400">Available during the 14-day Website Builder trial. Only public pages are read. Nothing is published until you review it.</p>
+          <p className="mt-3 text-xs text-slate-400">Import a public site through the URL API or upload a JSON/CSV export. Nothing is published until you review it.</p>
         </section>
 
         {error && <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm font-semibold text-red-800">{error}</div>}

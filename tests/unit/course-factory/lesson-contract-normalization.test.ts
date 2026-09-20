@@ -81,7 +81,7 @@ describe('lesson contract normalization', () => {
     expect(normalized.visualPrompt).toBeUndefined();
     expect(normalized.instructionalTimeline).toBeUndefined();
     expect(normalized.experience.visualPrompt.length).toBeGreaterThanOrEqual(40);
-    expect(normalized.experience.visualPrompt).toContain('safe client preparation');
+    expect(normalized.experience.visualPrompt).toContain('Prepare the workstation before service.');
     expect(normalized.experience.instructionalTimeline.version).toBe(1);
   });
 

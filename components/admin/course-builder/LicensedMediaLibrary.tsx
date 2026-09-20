@@ -40,6 +40,7 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
   const [busy, setBusy] = useState('');
   const [message, setMessage] = useState('');
   const [connected, setConnected] = useState<boolean | null>(null);
+  const [marketplaceAccount, setMarketplaceAccount] = useState('');
   const [manualUploadOpen, setManualUploadOpen] = useState(false);
 
   const load = useCallback(async () => {
@@ -58,6 +59,7 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
       if (!purchaseResponse.ok)
         throw new Error(purchaseData.error || 'Unable to load purchased media');
       setConnected(Boolean(purchaseData.connected));
+      setMarketplaceAccount(purchaseData.username ?? '');
       setPurchases(purchaseData.purchases ?? []);
       if (recommendationResponse.ok) setRecommendations(recommendationData.recommendations ?? []);
     } catch (error) {
@@ -90,6 +92,7 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Unable to sync purchased media');
       setConnected(true);
+      setMarketplaceAccount(data.username ?? '');
       setPurchases(data.purchases ?? []);
       setRecommendations(data.recommendations ?? []);
       setMessage(`Synced ${data.entitlements} licensed purchases and matched them to this course.`);
@@ -162,6 +165,13 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
             Only assets already present in the connected paid account appear here. Download URLs are
             generated on demand and never stored.
           </p>
+          {connected ? (
+            <p className="mt-2 text-sm text-emerald-300">
+              Envato Market connected{marketplaceAccount ? ` as ${marketplaceAccount}` : ''}. Market
+              purchases sync automatically; Envato Elements subscription downloads must be
+              downloaded from Elements and added with Upload purchased file.
+            </p>
+          ) : null}
         </div>
         <button
           type="button"
@@ -176,6 +186,15 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
           )}{' '}
           Sync purchases + match lessons
         </button>
+        <a
+          href="https://elements.envato.com/"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2 rounded-xl border border-amber-300 px-4 py-3 font-black text-amber-200"
+        >
+          <ExternalLink className="h-4 w-4" />
+          Browse Envato Elements
+        </a>
         <button
           type="button"
           onClick={() => setManualUploadOpen((value) => !value)}
@@ -238,7 +257,7 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
             {!busy && !filtered.length ? (
               <p className="p-4 text-sm text-slate-500">
                 {connected
-                  ? 'The connected marketplace account returned no purchased items. You can still download from the paid marketplace and use Upload purchased file.'
+                  ? `The connected Envato Market account${marketplaceAccount ? ` (${marketplaceAccount})` : ''} has no Market purchases. If your paid library is Envato Elements, download the asset there and use Upload purchased file.`
                   : 'Marketplace connection unavailable. Verify ENVATO_API_TOKEN in Studio Secrets, then sync again.'}
               </p>
             ) : null}

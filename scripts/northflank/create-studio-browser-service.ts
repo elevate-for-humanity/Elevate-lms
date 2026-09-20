@@ -34,7 +34,7 @@ const payload = {
   deployment: {
     instances: 1,
     docker: { configType: 'default' },
-    storage: { ephemeralStorage: { storageSize: 2048 } },
+    storage: { ephemeralStorage: { storageSize: 4096 } },
   },
   ports: [{ name: 'browser', internalPort: 3100, public: true, protocol: 'HTTP' }],
   buildSource: 'git',
@@ -56,8 +56,8 @@ const payload = {
     PORT: '3100',
     STUDIO_BROWSER_SECRET: secret,
     STUDIO_BROWSER_ADMIN_ORIGIN: 'https://admin.elevateforhumanity.org',
-    STUDIO_BROWSER_ALLOWED_DOMAINS: 'elevateforhumanity.org',
-    STUDIO_BROWSER_SESSION_TTL_MS: '900000',
+    STUDIO_BROWSER_ALLOWED_DOMAINS: 'elevateforhumanity.org,envato.com',
+    STUDIO_BROWSER_SESSION_TTL_MS: '7200000',
     STUDIO_BROWSER_MAX_SESSIONS: '4',
   },
   healthChecks: [

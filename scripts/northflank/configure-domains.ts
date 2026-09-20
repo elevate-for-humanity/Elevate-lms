@@ -68,7 +68,7 @@ async function verifySubdomain(
   const teamId = resolveTeamId();
   if (!teamId) return { verified: false };
 
-  for (let attempt = 1; attempt <= 36; attempt += 1) {
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
     try {
       await nfFetch(
         `/teams/${teamId}/domains/${encodeURIComponent(domain)}/subdomains/@/verify`,
@@ -87,7 +87,7 @@ async function verifySubdomain(
       // Retry: the subdomain record can be temporarily unavailable after registration.
     }
 
-    console.log(`  Waiting for Northflank subdomain verification (${attempt}/36)...`);
+    console.log(`  Waiting for Northflank subdomain verification (${attempt}/6)...`);
     await new Promise((resolve) => setTimeout(resolve, 10_000));
   }
 
@@ -112,6 +112,13 @@ async function assignDomainToService(
   ({ verified, content } = await verifySubdomain(domain));
   console.log(`  Subdomain verified: ${verified}`);
   if (!verified) {
+    if (domain === 'elevateforhumanity.org' && process.env.RESTORE_APEX_NORTHFLANK === 'true') {
+      // Apex DNS uses an A record rather than Northflank's CNAME target. Keep
+      // restoring the service port mapping; Northflank can route the shared
+      // ingress once the verified team-domain is attached to the port.
+      console.warn('  Apex @ verification is not exposed as verified; continuing with port restoration.');
+      return;
+    }
     throw new Error(`${domain} did not verify as a Northflank @ subdomain`);
   }
 

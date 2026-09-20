@@ -17,7 +17,83 @@ const PROVIDER_SECRET_KEYS = [
   'CLOUDFLARE_ACCOUNT_ID',
   'CLOUDFLARE_AI_API_TOKEN',
   'CLOUDFLARE_API_TOKEN',
+  'CLOUDFLARE_AI_MODEL',
 ] as const;
+
+export type CloudflareAIProbe = {
+  configured: boolean;
+  reachable: boolean;
+  status: 'not_configured' | 'reachable' | 'authentication_failed' | 'unreachable';
+  detail: string;
+  checkedAt: string;
+};
+
+/**
+ * Validate the exact Cloudflare account/token/model used by inference without
+ * spending inference tokens. The model catalogue endpoint proves account scope
+ * and authentication; checking strings alone produced false-green Studio UI.
+ */
+export async function probeCloudflareWorkersAI(): Promise<CloudflareAIProbe> {
+  await hydrateProcessEnv();
+  const secrets = await getSecrets([...PROVIDER_SECRET_KEYS]);
+  const accountId = secrets.CLOUDFLARE_ACCOUNT_ID?.trim();
+  const token = (
+    secrets.CLOUDFLARE_AI_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN
+  )?.trim();
+  const model = secrets.CLOUDFLARE_AI_MODEL?.trim();
+  const checkedAt = new Date().toISOString();
+  const configured = Boolean(accountId && token && model?.startsWith('@cf/'));
+
+  if (!configured) {
+    return {
+      configured: false,
+      reachable: false,
+      status: 'not_configured',
+      detail: 'Cloudflare account, AI token, or Workers AI model is missing.',
+      checkedAt,
+    };
+  }
+
+  try {
+    const query = new URLSearchParams({ search: model!, per_page: '1' });
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/models/search?${query}`,
+      {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(10_000),
+      },
+    );
+    if (response.ok) {
+      return {
+        configured: true,
+        reachable: true,
+        status: 'reachable',
+        detail: `Cloudflare Workers AI authenticated for ${model}.`,
+        checkedAt,
+      };
+    }
+    return {
+      configured: true,
+      reachable: false,
+      status: response.status === 401 || response.status === 403
+        ? 'authentication_failed'
+        : 'unreachable',
+      detail: `Cloudflare Workers AI probe returned HTTP ${response.status}.`,
+      checkedAt,
+    };
+  } catch (error) {
+    return {
+      configured: true,
+      reachable: false,
+      status: 'unreachable',
+      detail: error instanceof Error
+        ? `Cloudflare Workers AI probe failed: ${error.message}`
+        : 'Cloudflare Workers AI probe failed.',
+      checkedAt,
+    };
+  }
+}
 
 export type AIRuntimeState = Awaited<ReturnType<typeof resolveAIRuntimeState>>;
 
@@ -43,7 +119,8 @@ export async function resolveAIRuntimeState() {
     anthropic: present('ANTHROPIC_API_KEY', 'CLAUDE_API_KEY', 'ANTHROPIC_API_TOKEN'),
     cloudflare:
       present('CLOUDFLARE_ACCOUNT_ID') &&
-      present('CLOUDFLARE_AI_API_TOKEN', 'CLOUDFLARE_API_TOKEN'),
+      present('CLOUDFLARE_AI_API_TOKEN', 'CLOUDFLARE_API_TOKEN') &&
+      present('CLOUDFLARE_AI_MODEL'),
   };
   const activeProvider = getActiveProviderName();
 

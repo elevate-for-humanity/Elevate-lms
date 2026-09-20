@@ -40,7 +40,14 @@ const slides = [
   },
 ] as const;
 
-export default function NailDesignShowcase({\n  asHero = false,\n  program = 'cosmetology',\n}: {\n  asHero?: boolean;\n  program?: 'cosmetology' | 'nail-technician';\n}) {\n  const isNailProgram = program === 'nail-technician';
+export default function NailDesignShowcase({
+  asHero = false,
+  program = 'cosmetology',
+}: {
+  asHero?: boolean;
+  program?: 'cosmetology' | 'nail-technician';
+}) {
+  const isNailProgram = program === 'nail-technician';
   const [active, setActive] = useState(0);
 
   useEffect(() => {

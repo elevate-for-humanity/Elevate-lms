@@ -11,7 +11,7 @@
  *
  * Nail Technician Apprenticeship — Indiana Board of Cosmetology and Barbering aligned.
  * SOC: 39-5092.00
- * Indiana requires 600 hours of training for nail technician license.
+ * Indiana requires 2,000 OJL hours of training for nail technician license.
  *
  * Blueprint aligns to IPLA (Indiana Professional Licensing Agency) nail technology standards.
  */

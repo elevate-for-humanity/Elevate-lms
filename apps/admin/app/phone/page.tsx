@@ -15,6 +15,11 @@ import {
   dismissCommunicationsAnnouncement,
   setDefaultDestination,
   toggleDestination,
+  removeDestination,
+  removeExternalNumber,
+  removeMenuOption,
+  testDestination,
+  toggleExtension,
   assignPhoneNumber,
   saveProgramHolderExtension,
 } from './actions';
@@ -152,6 +157,23 @@ export default async function PhonePage() {
     (number: any) => number.source === 'provider' && number.status === 'active',
   );
   const meetingReady = workspaceResult.data?.status === 'active';
+  const primaryNumber = numbers.find(
+    (number: any) => number.source === 'provider' && number.status === 'active' && number.is_primary,
+  );
+  const routingReady =
+    system?.routing_mode === 'direct_forward'
+      ? Boolean(system?.default_destination_id)
+      : system?.routing_mode === 'ai_receptionist'
+        ? Boolean(system?.ai_enabled)
+        : menuOptions.some((option: any) => option.enabled && option.destination_id);
+  const setupSteps = [
+    { label: 'Add team cell phones', complete: destinations.some((item: any) => item.enabled) },
+    { label: 'Choose call routing', complete: routingReady },
+    { label: 'Create extensions', complete: extensions.some((item: any) => item.enabled) },
+    { label: 'Test before activation', complete: (callsResult.count ?? 0) > 0 },
+  ];
+  const phoneReady =
+    Boolean(primaryNumber) && setupSteps.every((step) => step.complete) && carrierReady;
   const { data: onboarding } = workspaceResult.data?.id
     ? await db
         .from('communication_onboarding_progress')
@@ -191,7 +213,10 @@ export default async function PhonePage() {
         </div>
       </div>
       {!onboarding?.announcement_seen_at ? (
-        <NewSystemNotice dismissAction={dismissCommunicationsAnnouncement} />
+        <NewSystemNotice
+          dismissAction={dismissCommunicationsAnnouncement}
+          steps={setupSteps}
+        />
       ) : null}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map(([label, value, Icon]) => (
@@ -208,11 +233,13 @@ export default async function PhonePage() {
         >
           <div className="flex items-center gap-2 font-black">
             <Radio className="h-4 w-4" />
-            Phone network: {carrierReady ? 'Connected' : 'Setup required'}
+            Phone network: {phoneReady ? 'Ready' : carrierReady ? 'Connected — setup incomplete' : 'Setup required'}
           </div>
           <p className="mt-1">
-            {carrierReady
-              ? 'A carrier number is active for this organization.'
+            {phoneReady
+              ? 'The carrier, primary number, routing, extensions, team phones, and call testing are complete.'
+              : carrierReady
+                ? 'The carrier is connected, but one or more routing, extension, destination, or testing steps are incomplete.'
               : 'Dashboard configuration is available, but live calls require a verified carrier number and connection.'}
           </p>
         </div>
@@ -292,6 +319,14 @@ export default async function PhonePage() {
                       Assign
                     </button>
                   </form>
+                  {item.source === 'external_forwarding' && !item.is_primary ? (
+                    <form action={removeExternalNumber}>
+                      <input type="hidden" name="phoneNumberId" value={item.id} />
+                      <button className="rounded-lg border border-rose-300 px-2 py-1 text-xs font-bold text-rose-700">
+                        Remove
+                      </button>
+                    </form>
+                  ) : null}
                 </li>
               ))}
             </ul>
@@ -335,6 +370,18 @@ export default async function PhonePage() {
                         {item.enabled ? 'Pause' : 'Enable'}
                       </button>
                     </form>
+                    <form action={testDestination}>
+                      <input type="hidden" name="destinationId" value={item.id} />
+                      <button className="rounded-lg border border-indigo-300 px-2 py-1 text-xs font-bold text-indigo-700">
+                        Test call
+                      </button>
+                    </form>
+                    <form action={removeDestination}>
+                      <input type="hidden" name="destinationId" value={item.id} />
+                      <button className="rounded-lg border border-rose-300 px-2 py-1 text-xs font-bold text-rose-700">
+                        Remove
+                      </button>
+                    </form>
                   </div>
                 </li>
               ))}
@@ -367,6 +414,12 @@ export default async function PhonePage() {
                     Keywords: {item.spoken_keywords.join(', ')}
                   </p>
                 ) : null}
+                <form action={removeMenuOption} className="mt-3">
+                  <input type="hidden" name="menuOptionId" value={item.id} />
+                  <button className="rounded-lg border border-rose-300 px-2 py-1 text-xs font-bold text-rose-700">
+                    Remove route
+                  </button>
+                </form>
               </div>
             ))}
           </div>
@@ -437,7 +490,16 @@ export default async function PhonePage() {
                       <td className="px-3 py-2">{entry.department || '—'}</td>
                       <td className="px-3 py-2">{entry.extension}</td>
                       <td className="px-3 py-2">{formatUsPhone((assigned || primary)?.e164)}</td>
-                      <td className="px-3 py-2">{entry.enabled ? 'Active' : 'Paused'}</td>
+                      <td className="px-3 py-2">
+                        <form action={toggleExtension} className="flex items-center gap-2">
+                          <input type="hidden" name="extensionId" value={entry.id} />
+                          <input type="hidden" name="enabled" value={String(!entry.enabled)} />
+                          <span>{entry.enabled ? 'Active' : 'Paused'}</span>
+                          <button className="rounded border px-2 py-1 text-xs font-bold">
+                            {entry.enabled ? 'Pause' : 'Enable'}
+                          </button>
+                        </form>
+                      </td>
                     </tr>
                   );
                 })}
@@ -449,8 +511,8 @@ export default async function PhonePage() {
         )}
       </section>
       <aside className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-950">
-        <b>Number protection:</b> external numbers such as 317-314-3757 remain with their current
-        provider. Elevate records them as forwarding-only and never treats them as ported numbers.
+        <b>Number protection:</b> external numbers remain with their current provider. Elevate only
+        stores an external number after an administrator intentionally adds it as forwarding-only.
       </aside>
     </main>
   );

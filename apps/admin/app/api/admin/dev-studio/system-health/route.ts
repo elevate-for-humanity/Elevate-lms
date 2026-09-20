@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getDecryptedPlatformSecret, hydrateNorthflankEnv } from '@/lib/secrets';
-import { resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
+import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -45,8 +45,12 @@ export async function GET(request: NextRequest) {
     ),
   ) as Record<(typeof keys)[number], string | undefined>;
   await hydrateNorthflankEnv().catch(() => undefined);
-  const ai = await resolveAIRuntimeState();
-  const { xai: hasXAI, groq: hasGroq, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic, cloudflare: hasCloudflare } = ai.providers;
+  const [ai, cloudflareProbe] = await Promise.all([
+    resolveAIRuntimeState(),
+    probeCloudflareWorkersAI(),
+  ]);
+  const { xai: hasXAI, groq: hasGroq, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic } = ai.providers;
+  const hasCloudflare = cloudflareProbe.reachable;
   const hasOpenHands = Boolean(selectedSecrets.OPENHANDS_API_KEY || process.env.OPENHANDS_API_KEY);
   const dbGitHub = Boolean(selectedSecrets.GITHUB_TOKEN);
 
@@ -110,6 +114,16 @@ export async function GET(request: NextRequest) {
     detail: hasAnyAI
       ? `active: ${aiProviders}`
       : 'no AI provider keys configured — chat and code AI will not work',
+  });
+
+  checks.push({
+    name: 'Cloudflare Workers AI',
+    status: cloudflareProbe.reachable
+      ? 'ok'
+      : cloudflareProbe.configured
+        ? 'fail'
+        : 'warn',
+    detail: cloudflareProbe.detail,
   });
 
   checks.push({

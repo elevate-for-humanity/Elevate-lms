@@ -37,11 +37,13 @@ export default function CloudBrowserWorkspace({
   conversationId = null,
   autoStart = false,
   initialTarget = '',
+  initialTask = '',
 }: {
   unifiedTask?: OrchestratedPlanCheckpoint | null;
   conversationId?: string | null;
   autoStart?: boolean;
   initialTarget?: string;
+  initialTask?: string;
 }) {
   const [target, setTarget] = useState(initialTarget);
   const [session, setSession] = useState<Session | null>(null);
@@ -50,7 +52,7 @@ export default function CloudBrowserWorkspace({
   const [error, setError] = useState('');
   const [events, setEvents] = useState<BrowserEvent[]>([]);
   const [typedText, setTypedText] = useState('');
-  const [agentTask, setAgentTask] = useState('');
+  const [agentTask, setAgentTask] = useState(initialTask);
   const [agentResult, setAgentResult] = useState('');
   const [agentRunning, setAgentRunning] = useState(false);
   const [approvalRequested, setApprovalRequested] = useState(false);
@@ -60,6 +62,7 @@ export default function CloudBrowserWorkspace({
   const secureInputRef = useRef<HTMLInputElement>(null);
   const targetEditedRef = useRef(Boolean(initialTarget));
   const autoStartedRef = useRef(false);
+  const autoRanTaskRef = useRef('');
 
   const endpoint = session ? `${session.publicUrl}/sessions/${session.id}` : '';
   const authHeaders = session ? { Authorization: `Bearer ${session.token}` } : {};
@@ -71,6 +74,13 @@ export default function CloudBrowserWorkspace({
     autoStartedRef.current = false;
     setTarget(requestedTarget);
   }, [initialTarget]);
+
+  useEffect(() => {
+    const requestedTask = initialTask.trim();
+    if (!requestedTask) return;
+    setAgentTask(requestedTask);
+    if (autoRanTaskRef.current !== requestedTask) autoRanTaskRef.current = '';
+  }, [initialTask]);
 
   useEffect(() => {
     let cancelled = false;
@@ -179,7 +189,13 @@ export default function CloudBrowserWorkspace({
   }
 
   useEffect(() => {
-    if (!autoStart || runtimeReady !== true || !target.trim() || session || autoStartedRef.current) {
+    if (
+      !autoStart ||
+      runtimeReady !== true ||
+      !target.trim() ||
+      session ||
+      autoStartedRef.current
+    ) {
       return;
     }
     autoStartedRef.current = true;
@@ -286,6 +302,18 @@ export default function CloudBrowserWorkspace({
       setAgentRunning(false);
     }
   }
+
+  useEffect(() => {
+    const requestedTask = initialTask.trim();
+    if (!autoStart || !session || !requestedTask || agentRunning) return;
+    if (autoRanTaskRef.current === requestedTask) return;
+    autoRanTaskRef.current = requestedTask;
+    void runAgent().catch(() => {
+      autoRanTaskRef.current = '';
+    });
+    // runAgent consumes the session and task captured by this render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart, session?.id, initialTask]);
 
   async function approveAndResume() {
     if (!activeTaskId) return;

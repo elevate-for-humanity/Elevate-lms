@@ -73,10 +73,29 @@ export default function StudioCommandWorkspace({
   );
   const [previewUrl, setPreviewUrl] = useState('');
   const [browserTarget, setBrowserTarget] = useState('');
+  const [browserTask, setBrowserTask] = useState('');
   const [activeTask, setActiveTask] = useState<OrchestratedPlanCheckpoint | null>(null);
   const [activeCapability, setActiveCapability] = useState<string | null>(initialWorkspace ?? null);
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+
+  // Restore the operator's single Studio workspace after navigation or a PWA
+  // restart. Conversation/task persistence remains server-owned; this only
+  // restores the visible capability inside the canonical shell.
+  useEffect(() => {
+    if (initialWorkspace) return;
+    const saved = window.localStorage.getItem('elevate:studio:active-capability');
+    if (saved && workspaces.some((workspace) => workspace.id === saved)) {
+      setActiveCapability(saved);
+      setSurface('capability');
+    }
+  }, [initialWorkspace, workspaces]);
+
+  useEffect(() => {
+    if (activeCapability) {
+      window.localStorage.setItem('elevate:studio:active-capability', activeCapability);
+    }
+  }, [activeCapability]);
 
   const courseBuilderUrl = useMemo(
     () =>
@@ -127,6 +146,7 @@ export default function StudioCommandWorkspace({
   };
   const handleCommandStart = (command: string) => {
     setActiveCapability(null);
+    setBrowserTask(command);
     const explicitUrl = command.match(/https?:\/\/[^\s"'<>]+/i)?.[0]?.replace(/[),.;]+$/, '') ?? '';
     setBrowserTarget(explicitUrl);
     setSurface(
@@ -154,13 +174,27 @@ export default function StudioCommandWorkspace({
     setSurface('capability');
   };
 
+  const selectWorkspace = (id: string) => {
+    if (id === 'commands') {
+      setActiveCapability(null);
+      setSurface('commands');
+      return;
+    }
+    if (id === 'course') {
+      setActiveCapability(null);
+      setSurface('course');
+      return;
+    }
+    openCapability(id);
+  };
+
   return (
     <div
       data-studio-root="unified"
       className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white"
     >
       <header className="shrink-0 border-b-4 border-brand-red-600 bg-brand-blue-700 text-white shadow-sm">
-        <div className="flex min-h-14 min-w-0 items-center gap-2 px-3 sm:px-5">
+        <div className="flex min-h-14 min-w-0 flex-wrap items-center gap-2 px-3 py-2 sm:flex-nowrap sm:px-5 sm:py-0">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25">
             <Bot className="h-5 w-5" aria-hidden="true" />
           </span>
@@ -201,7 +235,8 @@ export default function StudioCommandWorkspace({
             }}
             className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-white/20 px-2.5 text-xs font-bold hover:bg-white/10 sm:px-3"
           >
-            <Plus className="h-4 w-4" aria-hidden="true" /> New task
+            <Plus className="h-4 w-4" aria-hidden="true" />{' '}
+            <span className="hidden sm:inline">New task</span>
           </button>
           <div className="hidden rounded-lg bg-white/10 px-3 py-2 text-xs font-black text-white sm:block">
             Automated workflow
@@ -222,6 +257,31 @@ export default function StudioCommandWorkspace({
           >
             <MessageSquare className="h-4 w-4" aria-hidden="true" /> Commands
           </button>
+          <label className="shrink-0">
+            <span className="sr-only">Open a Studio capability</span>
+            <select
+              aria-label="Studio capabilities"
+              value={
+                surface === 'capability'
+                  ? (activeCapability ?? '')
+                  : surface === 'course'
+                    ? 'course'
+                    : surface === 'commands'
+                      ? 'commands'
+                      : ''
+              }
+              onChange={(event) => selectWorkspace(event.target.value)}
+              className="min-h-9 max-w-[11rem] rounded-lg border border-white/20 bg-brand-blue-800 px-2 text-xs font-bold text-white outline-none focus:ring-2 focus:ring-white sm:max-w-none"
+            >
+              <option value="commands">AI Commands</option>
+              <option value="course">Course Builder</option>
+              {workspaces.map((workspace) => (
+                <option key={workspace.id} value={workspace.id}>
+                  {workspace.label}
+                </option>
+              ))}
+            </select>
+          </label>
           <button
             type="button"
             onClick={() => {
@@ -333,6 +393,7 @@ export default function StudioCommandWorkspace({
                 conversationId={activeConversationId}
                 autoStart={surface === 'capability' && activeCapability === 'browser'}
                 initialTarget={browserTarget}
+                initialTask={browserTask}
               />
             </div>
             <div
@@ -382,6 +443,7 @@ export default function StudioCommandWorkspace({
                 conversationId={activeConversationId}
                 autoStart={surface === 'browser'}
                 initialTarget={browserTarget}
+                initialTask={browserTask}
               />
             </div>
           </div>

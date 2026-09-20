@@ -50,6 +50,18 @@ describe('OpenHands engineering delegation', () => {
     expect(planned?.name).toBe('browser.execute');
   });
 
+  it.each([
+    'Complete a workforce complaint for me',
+    'Fill out the grievance form and finish it',
+    'File this complaint through the website',
+  ])('routes interactive complaint workflows to the browser agent: %s', (command) => {
+    const planned = planAIToolFromCommand(command);
+    expect(planned).toEqual({
+      name: 'browser.execute',
+      input: { task: command },
+    });
+  });
+
   it('routes a commercial request to the canonical Media Studio renderer', () => {
     const planned = planAIToolFromCommand(
       'Create a 30-second 16:9 commercial video for the Store demos and show the real workflow',

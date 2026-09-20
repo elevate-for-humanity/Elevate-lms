@@ -55,8 +55,8 @@ export function barberFullOnboardingEmail(data: BarberFullOnboardingData) {
         <tr><td style="padding:8px 0;font-weight:600;width:40%;">Program</td><td style="padding:8px 0;">DOL Registered Barber Apprenticeship</td></tr>
         <tr style="background:#f1f5f9;"><td style="padding:8px;font-weight:600;">Duration</td><td style="padding:8px;">12 months (52 weeks)</td></tr>
         <tr><td style="padding:8px 0;font-weight:600;">Total Hours Required</td><td style="padding:8px 0;">2,000 hours (Indiana requirement)</td></tr>
-        <tr style="background:#f1f5f9;"><td style="padding:8px;font-weight:600;">On-the-Job Training (OJT)</td><td style="padding:8px;">1,500 hours at a licensed barbershop</td></tr>
-        <tr><td style="padding:8px 0;font-weight:600;">Related Technical Instruction (RTI)</td><td style="padding:8px 0;">500 hours (online via Elevate LMS)</td></tr>
+        <tr style="background:#f1f5f9;"><td style="padding:8px;font-weight:600;">Supervised Host-Shop Training</td><td style="padding:8px;">1,740 hours at an approved barbershop</td></tr>
+        <tr><td style="padding:8px 0;font-weight:600;">Related Technical Instruction (RTI)</td><td style="padding:8px 0;">260 hours through the approved curriculum</td></tr>
         <tr style="background:#f1f5f9;"><td style="padding:8px;font-weight:600;">Schedule</td><td style="padding:8px;">15–20 hours/week (flexible with shop)</td></tr>
         <tr><td style="padding:8px 0;font-weight:600;">Delivery</td><td style="padding:8px 0;">Hybrid — OJT at shop + theory online</td></tr>
         <tr style="background:#f1f5f9;"><td style="padding:8px;font-weight:600;">Location</td><td style="padding:8px;">Indianapolis / Marion County area</td></tr>

@@ -233,12 +233,14 @@ export async function processCourseAgenticTask(input: {
             ...module,
             lessons: (module.lessons ?? []).slice(0, 1),
           }))
-        : registeredModules.slice(0, buildIntent.moduleCount ?? registeredModules.length).map((module) => ({
-            ...module,
-            lessons: buildIntent.lessonsPerModule
-              ? (module.lessons ?? []).slice(0, buildIntent.lessonsPerModule)
-              : module.lessons,
-          }));
+        : registeredModules
+            .slice(0, buildIntent.moduleCount ?? registeredModules.length)
+            .map((module) => ({
+              ...module,
+              lessons: buildIntent.lessonsPerModule
+                ? (module.lessons ?? []).slice(0, buildIntent.lessonsPerModule)
+                : module.lessons,
+            }));
     const lessonCount = modules.reduce((sum, module) => sum + (module.lessons?.length ?? 0), 0);
     await updateTask(
       task,
@@ -478,10 +480,10 @@ export async function processCourseAgenticTask(input: {
       );
       return;
     }
-    const humanReviewOnly = health.blocking_issues.every(
+    const signoffConfigurationOnly = health.blocking_issues.every(
       (issue) => issue.includes('human sign-off') || issue.includes('human-approved'),
     );
-    if (humanReviewOnly) {
+    if (signoffConfigurationOnly) {
       await updateTask(
         task,
         project,
@@ -493,7 +495,7 @@ export async function processCourseAgenticTask(input: {
           blocking_issues: health.blocking_issues,
           repairs: health.repairs,
         },
-        'Automated QA passed; publication is waiting for authorized human course and lesson review.',
+        'Automated QA is waiting for required practical-signoff configuration to be repaired.',
       );
       return;
     }
@@ -532,7 +534,7 @@ export async function processCourseAgenticTask(input: {
         media,
         published: true,
       },
-      'Canonical course publication completed after deterministic checks and authorized human approval.',
+      'Canonical course publication completed after every deterministic checklist gate passed.',
     );
     await db
       .from('agentic_build_runs')

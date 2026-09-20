@@ -3,7 +3,8 @@ export const APPRENTICESHIP = {
   IN: {
     enabled: true,
     state: 'Indiana',
-    sponsorName: '2Exclusive LLC-S (DBA ' + PLATFORM_DEFAULTS.orgName + ' Career & Technical Institute)',
+    sponsorName:
+      '2Exclusive LLC-S (DBA ' + PLATFORM_DEFAULTS.orgName + ' Career & Technical Institute)',
     system: 'U.S. Department of Labor Registered Apprenticeship (RAPIDS)',
     programName: 'Barber Apprenticeship',
     earnAndLearn: true,
@@ -18,8 +19,11 @@ export type ApprenticeshipState = keyof typeof APPRENTICESHIP;
 export const APPRENTICESHIP_REQUIRED_HOURS: Record<string, number> = {
   'barber-apprenticeship': 2000,
   'cosmetology-apprenticeship': 2000,
-  'nail-tech-apprenticeship': 450,
-  'nail-technician-apprenticeship': 450,
+  'esthetician-apprenticeship': 2000,
+  'esthetics-apprenticeship': 2000,
+  'nail-tech-apprenticeship': 2000,
+  'nail-technician-apprenticeship': 2000,
+  'manicurist-apprenticeship': 2000,
 };
 
 export function getApprenticeshipRequiredHours(programSlug: string | null | undefined) {

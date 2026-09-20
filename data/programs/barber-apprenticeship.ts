@@ -39,7 +39,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   hoursPerWeekMax: 40,
   hoursBreakdown: {
     onlineInstruction: RTI_HOURS,
-    handsOnLab: STATE_LICENSURE_HOURS,
+    handsOnLab: STATE_LICENSURE_HOURS - RTI_HOURS,
     examPrep: 0,
     careerPlacement: 0,
   },
@@ -54,31 +54,60 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     {
       name: 'Indiana Barber License',
       issuer: 'Indiana State Board of Cosmetology and Barber Examiners',
-      description: 'State licensure is issued only after the applicant satisfies Indiana licensing requirements, including accepted education/apprenticeship documentation and the required examination.',
+      description:
+        'State licensure is issued only after the applicant satisfies Indiana licensing requirements, including accepted education/apprenticeship documentation and the required examination.',
       validity: 'Subject to Indiana renewal requirements',
     },
     {
       name: 'DOL Registered Apprenticeship Certificate',
       issuer: 'U.S. Department of Labor',
-      description: 'Certificate of Completion for successful completion of the registered apprenticeship requirements.',
+      description:
+        'Certificate of Completion for successful completion of the registered apprenticeship requirements.',
       validity: 'Completion credential',
     },
     {
       name: 'Barbershop Business Management Certificate',
       issuer: 'Elevate for Humanity',
-      description: 'Business fundamentals for barbers including client management, booking, pricing, and shop operations.',
+      description:
+        'Business fundamentals for barbers including client management, booking, pricing, and shop operations.',
     },
   ],
 
   outcomes: [
-    { statement: 'Perform standard haircut styles under qualified supervision and documented competency review', assessedAt: 'During supervised work' },
-    { statement: 'Execute shaving and facial-hair services using required sanitation and safety procedures', assessedAt: 'During supervised work' },
-    { statement: 'Recognize common hair/scalp conditions and know when referral is appropriate', assessedAt: 'During RTI/work' },
-    { statement: 'Demonstrate required sanitation, disinfection, and workstation procedures', assessedAt: 'Beginning and throughout program' },
-    { statement: `Complete all ${COMPETENCY_COUNT} registered Appendix A competencies`, assessedAt: 'Program completion' },
-    { statement: `Complete ${RTI_HOURS} verified hours of Related Technical Instruction`, assessedAt: 'Program completion' },
-    { statement: 'Maintain required supervised-work, wage, placement, and state-licensing evidence', assessedAt: 'Throughout program' },
-    { statement: 'Prepare for the Indiana barber licensing examination', assessedAt: 'End of program' },
+    {
+      statement:
+        'Perform standard haircut styles under qualified supervision and documented competency review',
+      assessedAt: 'During supervised work',
+    },
+    {
+      statement:
+        'Execute shaving and facial-hair services using required sanitation and safety procedures',
+      assessedAt: 'During supervised work',
+    },
+    {
+      statement: 'Recognize common hair/scalp conditions and know when referral is appropriate',
+      assessedAt: 'During RTI/work',
+    },
+    {
+      statement: 'Demonstrate required sanitation, disinfection, and workstation procedures',
+      assessedAt: 'Beginning and throughout program',
+    },
+    {
+      statement: `Complete all ${COMPETENCY_COUNT} registered Appendix A competencies`,
+      assessedAt: 'Program completion',
+    },
+    {
+      statement: `Complete ${RTI_HOURS} verified hours of Related Technical Instruction`,
+      assessedAt: 'Program completion',
+    },
+    {
+      statement: 'Maintain required supervised-work, wage, placement, and state-licensing evidence',
+      assessedAt: 'Throughout program',
+    },
+    {
+      statement: 'Prepare for the Indiana barber licensing examination',
+      assessedAt: 'End of program',
+    },
   ],
 
   careerPathway: [
@@ -109,48 +138,134 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
 
   weeklySchedule: [
-    { week: 'Phase 1', title: 'Foundations & Sanitation', competencyMilestone: 'Demonstrate sanitation, tool identification, disinfection, and safe workstation procedures.' },
-    { week: 'Phase 2', title: 'Basic Cutting Techniques', competencyMilestone: 'Begin supervised cutting services and documented skill repetitions.' },
-    { week: 'Phase 3', title: 'Shaving & Facial Hair', competencyMilestone: 'Demonstrate safe shaving, beard shaping, and client-preparation procedures.' },
-    { week: 'Phase 4', title: 'Intermediate Cutting', competencyMilestone: 'Demonstrate fades, tapers, scissor-over-comb, and shape-up techniques under supervision.' },
-    { week: 'Phase 5', title: 'Advanced Techniques', competencyMilestone: 'Progress through advanced services and registered competency verification.' },
-    { week: 'Phase 6', title: 'Business & Client Management', competencyMilestone: 'Apply booking, pricing, client-service, and business fundamentals.' },
-    { week: 'Phase 7', title: 'License Exam Preparation', competencyMilestone: 'Complete exam-preparation activities and required program documentation.' },
-    { week: 'Phase 8', title: 'Completion', competencyMilestone: `Verify all ${COMPETENCY_COUNT} registered competencies, ${RTI_HOURS} RTI hours, required work/wage evidence, and completion documentation.` },
+    {
+      week: 'Phase 1',
+      title: 'Foundations & Sanitation',
+      competencyMilestone:
+        'Demonstrate sanitation, tool identification, disinfection, and safe workstation procedures.',
+    },
+    {
+      week: 'Phase 2',
+      title: 'Basic Cutting Techniques',
+      competencyMilestone: 'Begin supervised cutting services and documented skill repetitions.',
+    },
+    {
+      week: 'Phase 3',
+      title: 'Shaving & Facial Hair',
+      competencyMilestone:
+        'Demonstrate safe shaving, beard shaping, and client-preparation procedures.',
+    },
+    {
+      week: 'Phase 4',
+      title: 'Intermediate Cutting',
+      competencyMilestone:
+        'Demonstrate fades, tapers, scissor-over-comb, and shape-up techniques under supervision.',
+    },
+    {
+      week: 'Phase 5',
+      title: 'Advanced Techniques',
+      competencyMilestone:
+        'Progress through advanced services and registered competency verification.',
+    },
+    {
+      week: 'Phase 6',
+      title: 'Business & Client Management',
+      competencyMilestone: 'Apply booking, pricing, client-service, and business fundamentals.',
+    },
+    {
+      week: 'Phase 7',
+      title: 'License Exam Preparation',
+      competencyMilestone:
+        'Complete exam-preparation activities and required program documentation.',
+    },
+    {
+      week: 'Phase 8',
+      title: 'Completion',
+      competencyMilestone: `Verify all ${COMPETENCY_COUNT} registered competencies, ${RTI_HOURS} RTI hours, required work/wage evidence, and completion documentation.`,
+    },
   ],
 
   curriculum: [
     {
       title: 'Barbering Foundations',
-      topics: ['Barbering profession and standards', 'Indiana licensing and professional requirements', 'Sanitation, disinfection, and infection control', 'Tool identification and maintenance', 'Client consultation and communication'],
+      topics: [
+        'Barbering profession and standards',
+        'Indiana licensing and professional requirements',
+        'Sanitation, disinfection, and infection control',
+        'Tool identification and maintenance',
+        'Client consultation and communication',
+      ],
     },
     {
       title: 'Hair Cutting Techniques',
-      topics: ['Clipper techniques', 'Scissor-over-comb and shear work', 'Shape-ups and edge work', 'Specialty cuts', 'Hair texturizing and layering'],
+      topics: [
+        'Clipper techniques',
+        'Scissor-over-comb and shear work',
+        'Shape-ups and edge work',
+        'Specialty cuts',
+        'Hair texturizing and layering',
+      ],
     },
     {
       title: 'Shaving & Facial Hair',
-      topics: ['Straight razor safety', 'Beard shaping and design', 'Hot towel procedures', 'Facial skin care', 'Mustache trimming and styling'],
+      topics: [
+        'Straight razor safety',
+        'Beard shaping and design',
+        'Hot towel procedures',
+        'Facial skin care',
+        'Mustache trimming and styling',
+      ],
     },
     {
       title: 'Scalp & Hair Science',
-      topics: ['Hair and scalp anatomy', 'Common scalp conditions', 'Product selection', 'Chemical-service safety', 'Contraindications and referral'],
+      topics: [
+        'Hair and scalp anatomy',
+        'Common scalp conditions',
+        'Product selection',
+        'Chemical-service safety',
+        'Contraindications and referral',
+      ],
     },
     {
       title: 'Business Management',
-      topics: ['Shop operations', 'Client booking and scheduling', 'Pricing fundamentals', 'Marketing fundamentals', 'Income and expense tracking'],
+      topics: [
+        'Shop operations',
+        'Client booking and scheduling',
+        'Pricing fundamentals',
+        'Marketing fundamentals',
+        'Income and expense tracking',
+      ],
     },
     {
       title: 'License Exam Prep & Career Launch',
-      topics: ['Indiana examination review', 'Practical-skill review', 'Portfolio documentation', 'Career preparation', 'Entrepreneurship fundamentals'],
+      topics: [
+        'Indiana examination review',
+        'Practical-skill review',
+        'Portfolio documentation',
+        'Career preparation',
+        'Entrepreneurship fundamentals',
+      ],
     },
   ],
 
   complianceAlignment: [
-    { standard: 'DOL Registered Apprenticeship', description: `RAPIDS ${STANDARD.rapidsCode} is competency-based: ${COMPETENCY_COUNT} verified competencies plus ${RTI_HOURS} verified RTI hours. Supervised work hours are maintained as evidence and are not a fixed DOL completion denominator.` },
-    { standard: 'RAPIDS Program Registration', description: `Sponsor of Record: ${RAPIDS_CONFIG.sponsorOfRecord}; registration ID ${RAPIDS_CONFIG.registrationId}.` },
-    { standard: 'Indiana Professional Licensing Agency', description: `Indiana licensing/training evidence is tracked separately from the registered completion basis. The current generic state-tracking value in this program record is ${STATE_LICENSURE_HOURS.toLocaleString()} hours and must not be represented as the DOL completion requirement.` },
-    { standard: 'Indiana State Board of Cosmetology and Barber Examiners', description: 'Licensure remains subject to current state application, examination, documentation, and other requirements.' },
+    {
+      standard: 'DOL Registered Apprenticeship',
+      description: `RAPIDS ${STANDARD.rapidsCode} is competency-based: ${COMPETENCY_COUNT} verified competencies plus ${RTI_HOURS} verified RTI hours. Supervised work hours are maintained as evidence and are not a fixed DOL completion denominator.`,
+    },
+    {
+      standard: 'RAPIDS Program Registration',
+      description: `Sponsor of Record: ${RAPIDS_CONFIG.sponsorOfRecord}; registration ID ${RAPIDS_CONFIG.registrationId}.`,
+    },
+    {
+      standard: 'Indiana Professional Licensing Agency',
+      description: `Indiana licensing/training evidence is tracked separately from the registered completion basis. The current generic state-tracking value in this program record is ${STATE_LICENSURE_HOURS.toLocaleString()} hours and must not be represented as the DOL completion requirement.`,
+    },
+    {
+      standard: 'Indiana State Board of Cosmetology and Barber Examiners',
+      description:
+        'Licensure remains subject to current state application, examination, documentation, and other requirements.',
+    },
   ],
 
   trainingPhases: [
@@ -158,7 +273,8 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       phase: 1,
       title: 'Foundations & Sanitation',
       weeks: 'Early program',
-      focus: 'Professional requirements, sanitation/infection control, hair/scalp fundamentals, and tool proficiency.',
+      focus:
+        'Professional requirements, sanitation/infection control, hair/scalp fundamentals, and tool proficiency.',
       labCompetencies: [
         'Sanitize and disinfect tools and work surfaces correctly',
         'Identify conditions that require referral',
@@ -195,7 +311,8 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       phase: 4,
       title: 'Completion & Exam Preparation',
       weeks: 'Final program phase',
-      focus: 'Completion of registered competencies, verified RTI, required evidence, documentation, and licensing preparation.',
+      focus:
+        'Completion of registered competencies, verified RTI, required evidence, documentation, and licensing preparation.',
       labCompetencies: [
         `Complete all ${COMPETENCY_COUNT} registered competency verifications`,
         `Complete ${RTI_HOURS} verified RTI hours`,
@@ -254,10 +371,13 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     'Be assigned to or approved with a participating host shop before supervised work begins',
     'Provide required identity, employment, and program documentation',
   ],
-  equipmentIncluded: 'Program-provided items are governed by the current enrollment agreement and program cost disclosure.',
-  modality: 'Hybrid — Related Technical Instruction through the LMS and supervised work at an approved host shop',
+  equipmentIncluded:
+    'Program-provided items are governed by the current enrollment agreement and program cost disclosure.',
+  modality:
+    'Hybrid — Related Technical Instruction through the LMS and supervised work at an approved host shop',
   facilityInfo: 'Approved participating host shops',
-  bilingualSupport: 'Support availability may vary; contact admissions for current language-support options.',
+  bilingualSupport:
+    'Support availability may vary; contact admissions for current language-support options.',
   employerPartners: ['Approved participating host shops'],
   pricingIncludes: [
     `${RTI_HOURS} hours of required Related Technical Instruction`,
@@ -288,7 +408,8 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       credentialIssued: `RTI completion (${RTI_HOURS} verified hours)`,
       duration: `${RTI_HOURS} hours RTI`,
       required: true,
-      enrollmentUrl: 'https://app.elevateforhumanity.org/lms/courses/3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
+      enrollmentUrl:
+        'https://app.elevateforhumanity.org/lms/courses/3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
     },
   ],
   microCourses: [
@@ -304,10 +425,24 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
 
   faqs: [
-    { question: 'How much does the program cost?', answer: `Current self-pay tuition is ${TUITION_LABEL}. Payment plan and eligible BNPL options are available. Public funding eligibility is determined separately.` },
-    { question: 'How long is the program?', answer: `This is a competency-based registered occupation. Completion requires all ${COMPETENCY_COUNT} competencies plus ${RTI_HOURS} verified RTI hours and the required placement, supervision, wage, work-evidence, and sponsor records. Calendar duration depends on competency progression, RTI completion, work schedule, transfer decisions, and applicable state licensing requirements.` },
-    { question: 'Do I need my own barbershop?', answer: 'No. Applicants without a host shop can request placement assistance. Supervised work can begin only at an approved participating host shop.' },
-    { question: 'What credential do I earn?', answer: 'Successful registered-program completers receive the Registered Apprenticeship completion credential. Indiana barber licensure is a separate state process and requires satisfaction of current licensing and examination requirements.' },
+    {
+      question: 'How much does the program cost?',
+      answer: `Current self-pay tuition is ${TUITION_LABEL}. Payment plan and eligible BNPL options are available. Public funding eligibility is determined separately.`,
+    },
+    {
+      question: 'How long is the program?',
+      answer: `This is a competency-based registered occupation. Completion requires all ${COMPETENCY_COUNT} competencies plus ${RTI_HOURS} verified RTI hours and the required placement, supervision, wage, work-evidence, and sponsor records. Calendar duration depends on competency progression, RTI completion, work schedule, transfer decisions, and applicable state licensing requirements.`,
+    },
+    {
+      question: 'Do I need my own barbershop?',
+      answer:
+        'No. Applicants without a host shop can request placement assistance. Supervised work can begin only at an approved participating host shop.',
+    },
+    {
+      question: 'What credential do I earn?',
+      answer:
+        'Successful registered-program completers receive the Registered Apprenticeship completion credential. Indiana barber licensure is a separate state process and requires satisfaction of current licensing and examination requirements.',
+    },
   ],
 
   breadcrumbs: [

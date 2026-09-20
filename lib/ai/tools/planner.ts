@@ -101,6 +101,10 @@ function isEngineeringExecutionCommand(lower: string): boolean {
 }
 
 function isLiveBrowserWork(lower: string): boolean {
+  const interactiveFormTask =
+    /\b(complete|fill(?: out)?|file|submit|finish)\b.*\b(complaint|grievance|form)\b/.test(lower) ||
+    /\b(complaint|grievance|form)\b.*\b(complete|fill(?: out)?|file|submit|finish)\b/.test(lower);
+  if (interactiveFormTask) return true;
   const browserTarget =
     /\b(live (site|website|page|homepage|dashboard)|cloud browser|browser|production (site|website|page|homepage|dashboard)|host shop dashboard)\b/.test(
       lower,

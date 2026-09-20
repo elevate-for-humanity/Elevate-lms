@@ -189,11 +189,7 @@
       "href": "/inquiry?program=building-services-technician",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "DOL Registered",
-      "Paid OJT",
-      "Employer-connected"
-    ],
+    "trustIndicators": ["DOL Registered", "Paid OJT", "Employer-connected"],
     "transcript": "Building Services Technician apprenticeship combines paid work experience with structured training and a nationally recognized pathway.",
     "analyticsName": "building-services-technician",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hvac-hero-final.mp4",
@@ -213,11 +209,7 @@
       "href": "/apply",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "WIOA aligned",
-      "ETPL pathways",
-      "No-cost options"
-    ],
+    "trustIndicators": ["WIOA aligned", "ETPL pathways", "No-cost options"],
     "transcript": "Federal-funded programs connect eligible learners to workforce training at little or no upfront cost.",
     "analyticsName": "federal-funded",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
@@ -237,11 +229,7 @@
       "href": "/programs",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "Short duration",
-      "Industry-recognized",
-      "Career-ready"
-    ],
+    "trustIndicators": ["Short duration", "Industry-recognized", "Career-ready"],
     "transcript": "Micro programs are designed for quick credential attainment and rapid workforce entry.",
     "analyticsName": "micro-programs",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
@@ -844,10 +832,10 @@
     "voiceoverSrc": "/audio/heroes/nail-tech.mp3",
     "microLabel": "DOL Registered Apprenticeship",
     "credentialLabel": "Indiana Nail Technician License",
-    "durationLabel": "600 hours",
+    "durationLabel": "2,000 hours",
     "salaryRangeLabel": "$24,000 to $42,000",
     "belowHeroHeadline": "Earn your Indiana Nail Technician License while getting paid.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. 600 hours of supervised training in a licensed salon. Manicure, pedicure, acrylics, and gel nails. Earn wages from day one.",
+    "belowHeroSubheadline": "DOL Registered Apprenticeship. 2,000-hour training plan in an approved salon, including 19 verified competencies and 210 hours of related instruction. Earn wages from day one.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/programs/nail-technician-apprenticeship/apply"
@@ -861,9 +849,9 @@
       "DOL Registered Apprenticeship",
       "Earn wages from day one",
       "Indiana Nail Technician License",
-      "600 hours — fastest path"
+      "2,000-hour apprenticeship plan"
     ],
-    "transcript": "Earn Indiana Nail Technician License through a DOL Registered Apprenticeship of 600 hours — the fastest path to an Indiana nail license. Training covers manicure, pedicure, acrylics, and gel nails in a licensed salon. Nail technicians commonly earn $24,000 to $42,000. Wages begin on day one.",
+    "transcript": "Earn toward the Indiana Nail Technician License through a 2,000-hour DOL Registered Manicurist Apprenticeship training plan, including 19 verified occupational competencies and 210 hours of related instruction. Training covers manicure, pedicure, acrylics, gel nails, sanitation, and client service in an approved salon. Wages begin on day one under the host-site employment agreement.",
     "analyticsName": "nail-technician-apprenticeship",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/nail-tech-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/nail-tech-hero.mp4",
@@ -1436,11 +1424,7 @@
       "label": "Check Eligibility",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "CompTIA Authorized",
-      "WIOA Approved",
-      "Indianapolis, Indiana"
-    ],
+    "trustIndicators": ["CompTIA Authorized", "WIOA Approved", "Indianapolis, Indiana"],
     "analyticsName": "technology",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/it-technology.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
@@ -1509,11 +1493,7 @@
       "href": "/partners/mou",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "DOL Registered Apprenticeship Sponsor",
-      "ETPL approved",
-      "WIOA partner"
-    ],
+    "trustIndicators": ["DOL Registered Apprenticeship Sponsor", "ETPL approved", "WIOA partner"],
     "transcript": "Elevate partners with workforce agencies, employers, and community organizations to build training pathways that work. Join us.",
     "analyticsName": "partners",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
@@ -1534,11 +1514,7 @@
       "href": "/login",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "Industry credentials",
-      "Self-paced learning",
-      "Instructor support"
-    ],
+    "trustIndicators": ["Industry credentials", "Self-paced learning", "Instructor support"],
     "transcript": "The Elevate student portal gives you access to career training programs, lesson content, and credential pathways — all in one place.",
     "analyticsName": "lms",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/lms-learning.mp4",
@@ -1582,11 +1558,7 @@
       "href": "/jri#programs",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "WIOA eligible",
-      "Reentry-focused employers",
-      "Record-friendly programs"
-    ],
+    "trustIndicators": ["WIOA eligible", "Reentry-focused employers", "Record-friendly programs"],
     "transcript": "Elevate for Humanity provides career training and employer connections specifically designed for justice-involved individuals re-entering the workforce.",
     "analyticsName": "jri",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
@@ -1606,11 +1578,7 @@
       "href": "/mission",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "Indiana-based",
-      "Community-driven",
-      "ETPL Certified"
-    ],
+    "trustIndicators": ["Indiana-based", "Community-driven", "ETPL Certified"],
     "transcript": "Meet the team behind Elevate for Humanity — workforce professionals and educators committed to expanding access to career training.",
     "analyticsName": "about-team",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
@@ -1630,11 +1598,7 @@
       "href": "/partners",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "WIOA Partners",
-      "Employer Network",
-      "Community Orgs"
-    ],
+    "trustIndicators": ["WIOA Partners", "Employer Network", "Community Orgs"],
     "transcript": "Elevate for Humanity partners with employers, workforce agencies, and community organizations to connect Hoosiers to real careers.",
     "analyticsName": "about-partners",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
@@ -1649,11 +1613,7 @@
       "label": "Browse Articles",
       "href": "/blog"
     },
-    "trustIndicators": [
-      "Student Stories",
-      "Program Updates",
-      "Career Tips"
-    ],
+    "trustIndicators": ["Student Stories", "Program Updates", "Career Tips"],
     "transcript": "Stay current with workforce training news, student success stories, and career development insights from Elevate for Humanity.",
     "analyticsName": "blog",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
@@ -1673,11 +1633,7 @@
       "href": "/programs",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "Job Placement Support",
-      "Resume Coaching",
-      "Employer Network"
-    ],
+    "trustIndicators": ["Job Placement Support", "Resume Coaching", "Employer Network"],
     "transcript": "Elevate for Humanity provides career services from resume building and interview prep to job placement and ongoing support for every graduate.",
     "analyticsName": "career-services",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/career-services-hero.mp4",
@@ -1697,11 +1653,7 @@
       "href": "/mission",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "Mission-driven",
-      "Competitive pay",
-      "Remote-friendly roles"
-    ],
+    "trustIndicators": ["Mission-driven", "Competitive pay", "Remote-friendly roles"],
     "transcript": "Join the Elevate for Humanity team and help expand access to workforce training across Indiana.",
     "analyticsName": "careers",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/career-services-hero.mp4",
@@ -1721,11 +1673,7 @@
       "href": "/check-eligibility",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "WIOA Eligible",
-      "Indiana State Board",
-      "Employer Connections"
-    ],
+    "trustIndicators": ["WIOA Eligible", "Indiana State Board", "Employer Connections"],
     "transcript": "Indiana CNA certification training is opening soon at Elevate for Humanity. Join the waitlist to be notified when enrollment opens.",
     "analyticsName": "cna-waitlist",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
@@ -1745,11 +1693,7 @@
       "href": "tel:+13178889999",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "1-business-day response",
-      "Indiana-based team",
-      "Free consultations"
-    ],
+    "trustIndicators": ["1-business-day response", "Indiana-based team", "Free consultations"],
     "transcript": "Contact Elevate for Humanity with questions about programs, funding, enrollment, or partnerships. We respond within one business day.",
     "analyticsName": "contact",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
@@ -1769,11 +1713,7 @@
       "href": "/impact",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "501(c)(3) Nonprofit",
-      "Tax-deductible",
-      "100% to programs"
-    ],
+    "trustIndicators": ["501(c)(3) Nonprofit", "Tax-deductible", "100% to programs"],
     "transcript": "Your donation to Elevate for Humanity funds free and low-cost workforce training for Hoosiers who need it most.",
     "analyticsName": "donate",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
@@ -1793,11 +1733,7 @@
       "href": "/apply",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "Free to attend",
-      "Employer hiring events",
-      "Graduation ceremonies"
-    ],
+    "trustIndicators": ["Free to attend", "Employer hiring events", "Graduation ceremonies"],
     "transcript": "Elevate for Humanity hosts orientation sessions, employer hiring events, graduation ceremonies, and community workshops — all free to attend.",
     "analyticsName": "events",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
@@ -1817,11 +1753,7 @@
       "href": "/partners",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "WIOA Compliant",
-      "RAPIDS Tracked",
-      "ETPL Certified"
-    ],
+    "trustIndicators": ["WIOA Compliant", "RAPIDS Tracked", "ETPL Certified"],
     "transcript": "Partner with Elevate for Humanity to connect your clients to real career training. We are WIOA compliant, RAPIDS tracked, and ETPL certified.",
     "analyticsName": "for-partners",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
@@ -1865,11 +1797,7 @@
       "href": "/programs",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "Indiana-based",
-      "Community-driven",
-      "ETPL Certified"
-    ],
+    "trustIndicators": ["Indiana-based", "Community-driven", "ETPL Certified"],
     "transcript": "Learn about the vision and values behind Elevate for Humanity and the founder's commitment to workforce equity in Indiana.",
     "analyticsName": "founder",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
@@ -1889,11 +1817,7 @@
       "href": "/programs",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "WIOA Approved",
-      "Next Level Jobs",
-      "Workforce Ready Grant"
-    ],
+    "trustIndicators": ["WIOA Approved", "Next Level Jobs", "Workforce Ready Grant"],
     "transcript": "Elevate for Humanity programs are funded through WIOA, Workforce Ready Grant, Next Level Jobs, and other sources for eligible Indiana residents.",
     "analyticsName": "funding",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
@@ -1908,11 +1832,7 @@
       "label": "Read Latest",
       "href": "/news#articles"
     },
-    "trustIndicators": [
-      "Program Updates",
-      "Student Stories",
-      "Partnership News"
-    ],
+    "trustIndicators": ["Program Updates", "Student Stories", "Partnership News"],
     "transcript": "Stay current with the latest news from Elevate for Humanity — program announcements, partnerships, and student success stories.",
     "analyticsName": "news",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
@@ -1932,11 +1852,7 @@
       "href": "/apply",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "5 career sectors",
-      "Employer-aligned credentials",
-      "WIOA funded"
-    ],
+    "trustIndicators": ["5 career sectors", "Employer-aligned credentials", "WIOA funded"],
     "transcript": "Explore career pathways at Elevate for Humanity in healthcare, skilled trades, technology, beauty, and business — all designed for Indiana's job market.",
     "analyticsName": "pathways",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
@@ -1980,11 +1896,7 @@
       "href": "/programs",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "Free for eligible students",
-      "Payment plans available",
-      "No hidden fees"
-    ],
+    "trustIndicators": ["Free for eligible students", "Payment plans available", "No hidden fees"],
     "transcript": "Elevate for Humanity offers transparent pricing. Most programs are free for eligible Indiana residents, with self-pay and payment plan options for others.",
     "analyticsName": "pricing",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/store-marketplace.mp4",
@@ -2004,11 +1916,7 @@
       "href": "/mission",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "Flexible hours",
-      "Remote options",
-      "Community impact"
-    ],
+    "trustIndicators": ["Flexible hours", "Remote options", "Community impact"],
     "transcript": "Volunteer with Elevate for Humanity as a mentor, mock interviewer, guest speaker, or event helper. Every hour makes a difference.",
     "analyticsName": "volunteer",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
@@ -2028,11 +1936,7 @@
       "href": "/apply",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "ETPL Certified",
-      "DOL Registered",
-      "RAPIDS Tracked"
-    ],
+    "trustIndicators": ["ETPL Certified", "DOL Registered", "RAPIDS Tracked"],
     "transcript": "Elevate for Humanity provides credential-bearing career training, employer connections, and funding navigation for Indiana residents.",
     "analyticsName": "what-we-do",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
@@ -2052,11 +1956,7 @@
       "href": "/workone-partner-packet",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "WIOA Compliant",
-      "RAPIDS Tracked",
-      "ETPL Certified"
-    ],
+    "trustIndicators": ["WIOA Compliant", "RAPIDS Tracked", "ETPL Certified"],
     "transcript": "Elevate for Humanity partners with WorkOne, FSSA, employers, and community organizations to deliver WIOA-compliant workforce training at scale.",
     "analyticsName": "workforce-partners",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/employer-hero.mp4",
@@ -2076,11 +1976,7 @@
       "href": "/partners",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "ETPL Certified",
-      "DOL Registered",
-      "RAPIDS Tracked"
-    ],
+    "trustIndicators": ["ETPL Certified", "DOL Registered", "RAPIDS Tracked"],
     "transcript": "Elevate for Humanity measures every outcome — credentials earned, jobs placed, and wages increased. Our programs are ETPL certified, DOL registered, and RAPIDS tracked.",
     "analyticsName": "impact",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/graduation-success.mp4",
@@ -2124,11 +2020,7 @@
       "href": "/programs",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "WIOA & state funding",
-      "Career coaching included",
-      "Employer network"
-    ],
+    "trustIndicators": ["WIOA & state funding", "Career coaching included", "Employer network"],
     "transcript": "Elevate provides end-to-end workforce services — training, credential preparation, career coaching, and employer connections — all coordinated in one system.",
     "analyticsName": "services",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
@@ -2324,11 +2216,7 @@
       "href": "/contact",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "Free for eligible students",
-      "WIOA & state funding",
-      "No hidden fees"
-    ],
+    "trustIndicators": ["Free for eligible students", "WIOA & state funding", "No hidden fees"],
     "transcript": "Find answers to common questions about Elevate programs, funding eligibility, enrollment, and credentials.",
     "analyticsName": "faq",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
@@ -2348,12 +2236,7 @@
       "href": "/apply",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "WIOA funding",
-      "Next Level Jobs",
-      "DOL grants",
-      "No upfront cost"
-    ],
+    "trustIndicators": ["WIOA funding", "Next Level Jobs", "DOL grants", "No upfront cost"],
     "transcript": "Most Elevate programs are available at no cost to eligible Indiana residents through WIOA, Next Level Jobs, and DOL funding. Check your eligibility today.",
     "analyticsName": "financial-aid",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
@@ -2473,11 +2356,7 @@
       "href": "/programs",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "Free for eligible students",
-      "Fast enrollment",
-      "Funding pre-checked"
-    ],
+    "trustIndicators": ["Free for eligible students", "Fast enrollment", "Funding pre-checked"],
     "transcript": "Start your career training journey at Elevate. Tell us about yourself and we will match you with the right program and funding pathway.",
     "analyticsName": "start",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4",
@@ -2506,7 +2385,7 @@
       "Indiana Esthetician License",
       "Licensed salon training"
     ],
-    "transcript": "Train for the Indiana Esthetician License through a DOL Registered Apprenticeship of 1,500 hours at a licensed salon. Apprentices earn wages while completing supervised skin care, sanitation, client service, and exam preparation. Licensed estheticians commonly earn $32,000 to $52,000.",
+    "transcript": "Train toward the Indiana Esthetician License through a 2,000-hour DOL Registered Apprenticeship training plan, including 20 verified occupational competencies and 300 hours of related instruction. Apprentices earn wages while completing supervised skin care, sanitation, client service, and exam preparation at an approved host site.",
     "analyticsName": "esthetician-apprenticeship",
     "_pexelsVideoId": 7423537,
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/esthetician-hero.mp4",
@@ -2555,11 +2434,7 @@
       "label": "Check Eligibility",
       "variant": "secondary"
     },
-    "trustIndicators": [
-      "ServSafe Certified",
-      "WIOA Approved",
-      "Indianapolis, Indiana"
-    ],
+    "trustIndicators": ["ServSafe Certified", "WIOA Approved", "Indianapolis, Indiana"],
     "analyticsName": "hospitality",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",

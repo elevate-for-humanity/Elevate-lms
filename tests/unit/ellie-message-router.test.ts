@@ -48,6 +48,7 @@ describe('shouldOrchestrateMessage', () => {
     expect(shouldOrchestrateMessage('Fix QuickBooks and verify the connection')).toBe(true);
     expect(shouldOrchestrateMessage('Audit the live admin dashboard')).toBe(true);
     expect(shouldOrchestrateMessage('Deploy the approved build')).toBe(true);
+    expect(shouldOrchestrateMessage('Complete a workforce complaint for me')).toBe(true);
   });
 
   it('keeps informational questions conversational', () => {

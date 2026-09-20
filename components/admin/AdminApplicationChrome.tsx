@@ -16,7 +16,7 @@ export function AdminApplicationChrome({
   // Only the conversation workspace owns the viewport. Tool pages such as
   // Course Builder are ordinary documents and must retain the Admin header and
   // browser scrolling.
-  const studioOwnsViewport = pathname === '/studio';
+  const studioOwnsViewport = pathname === '/studio' || pathname.startsWith('/studio/');
 
   return (
     <div
@@ -38,7 +38,7 @@ export function AdminApplicationChrome({
       >
         {children}
       </main>
-      <AdminMobileDock />
+      {!studioOwnsViewport ? <AdminMobileDock /> : null}
     </div>
   );
 }

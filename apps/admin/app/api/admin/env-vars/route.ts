@@ -141,32 +141,30 @@ export async function POST(req: NextRequest) {
       updated_at: new Date().toISOString(),
       updated_by: auth.id,
     }));
-  const secretRows = body.entries
-    .filter((entry) => isSecret(entry.key!.trim()))
-    .map((entry) => ({
-      key: entry.key!.trim(),
-      value_enc: entry.value!,
-      scope: 'runtime',
-      category: 'integrations',
-      is_sensitive: true,
-      updated_at: new Date().toISOString(),
-      updated_by: auth.id,
-    }));
+  const secretEntries = body.entries.filter((entry) => isSecret(entry.key!.trim()));
 
   const db = await requireAdminClient();
   if (settingRows.length) {
     const { error } = await db.from('platform_settings').upsert(settingRows, { onConflict: 'key' });
     if (error) return safeDbError(error, 'Failed to save settings');
   }
-  if (secretRows.length) {
-    const { error } = await db.from('platform_secrets').upsert(secretRows, { onConflict: 'key' });
-    if (error) return safeDbError(error, 'Failed to save encrypted secrets');
+  if (secretEntries.length) {
+    for (const entry of secretEntries) {
+      const key = entry.key!.trim();
+      const { error } = await db.rpc('set_platform_secret', {
+        p_key: key,
+        p_value: entry.value!,
+        p_description: `Updated through Admin Environment Manager by ${auth.id}`,
+        p_category: 'integrations',
+      });
+      if (error) return safeDbError(error, `Failed to save encrypted secret ${key}`);
+    }
     await refreshSecrets();
   }
 
   const keys = body.entries.map((entry) => entry.key!.trim());
   await auditWrite(auth.id, 'upsert', keys);
-  return NextResponse.json({ saved: keys.length, encrypted: secretRows.length });
+  return NextResponse.json({ saved: keys.length, encrypted: secretEntries.length });
 }
 
 export async function DELETE(req: NextRequest) {

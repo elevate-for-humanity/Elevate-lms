@@ -236,7 +236,9 @@ export default function HostShopShowcase({
       data-narration-src={enableNarration ? narrationSrc : undefined}
       data-narration={
         enableNarration
-          ? (narration ??
+          ? (tourScripts?.[image.src] ??
+            image.script ??
+            narration ??
             'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.')
           : undefined
       }

@@ -64,6 +64,9 @@ export async function POST(req: Request) {
   }
 
   const magicLink = link.properties.action_link;
+  const permanentLoginUrl = destination.startsWith('/host-shop')
+    ? `${appOrigin}/host-shop/login`
+    : `${appOrigin}/login?redirect=${encodeURIComponent(destination)}`;
   const firstName = email.split('@')[0];
 
   const sgKey = process.env.SENDGRID_API_KEY;
@@ -98,7 +101,9 @@ export async function POST(req: Request) {
       Sign In Now
     </a>
   </div>
-  <p style="color:#94a3b8;font-size:13px;">This link expires in 1 hour. If you didn't request this, you can safely ignore it.</p>
+  <p style="color:#64748b;font-size:13px;line-height:1.6;">The secure sign-in button expires. Your regular portal address never expires:</p>
+  <p style="margin:16px 0;"><a href="${permanentLoginUrl}" style="color:#1d4ed8;font-weight:bold;">Permanent Portal Login</a></p>
+  <p style="color:#94a3b8;font-size:13px;">Bookmark the permanent login page and use your password there. If you didn't request this, you can safely ignore it.</p>
   <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;" />
   <p style="color:#94a3b8;font-size:12px;">Elevate for Humanity · Indianapolis, IN</p>
 </div>`,

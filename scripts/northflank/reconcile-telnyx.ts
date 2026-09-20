@@ -11,7 +11,8 @@ import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 
 const secretGroupId = process.env.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env';
 const numberId = process.env.TELNYX_PHONE_NUMBER_ID || '3050756061020554451';
-const connectionId = process.env.TELNYX_CONNECTION_ID || '3051039365166794471';
+const configuredConnectionId = process.env.TELNYX_CONNECTION_ID || '3051039365166794471';
+let connectionId = configuredConnectionId;
 const expectedNumber = process.env.TELNYX_PHONE_NUMBER || '+13179999620';
 const webhookUrl =
   process.env.TELNYX_WEBHOOK_URL ||
@@ -245,6 +246,60 @@ async function main() {
     apiKey,
     `/call_control_applications/${connectionId}`,
   );
+  // One-time carrier recovery: the existing connection is correctly configured
+  // but Telnyx is returning a fast busy before emitting an inbound webhook.
+  // Provisioning a fresh Call Control connection replaces the defective
+  // carrier-side route without changing the public number or application URL.
+  const replacement = await telnyx<Json>(apiKey, '/call_control_applications', {
+    method: 'POST',
+    body: JSON.stringify({
+      application_name: 'Elevate Communications Production',
+      webhook_event_url: webhookUrl,
+      webhook_event_failover_url:
+        appBefore.data?.webhook_event_failover_url || `${webhookUrl}/failover`,
+      webhook_api_version: '2',
+      active: true,
+      anchorsite_override: appBefore.data?.anchorsite_override || 'Latency',
+      dtmf_type: appBefore.data?.dtmf_type || 'RFC 2833',
+      first_command_timeout: true,
+      first_command_timeout_secs: 15,
+      inbound: appBefore.data?.inbound,
+      outbound: { outbound_voice_profile_id: outboundProfileId },
+    }),
+  });
+  const replacementConnectionId = String(replacement.data?.id || '');
+  if (!replacementConnectionId) {
+    throw new Error('Telnyx did not return the replacement Call Control connection ID');
+  }
+  connectionId = replacementConnectionId;
+  await telnyx(apiKey, `/phone_numbers/${numberId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      connection_id: connectionId,
+      call_forwarding_enabled: false,
+      number_level_routing: 'disabled',
+    }),
+  });
+
+  const variables = secretGroup.secrets?.variables;
+  if (!variables || Array.isArray(variables) || typeof variables !== 'object') {
+    throw new Error('Northflank secret group variables have an unsupported shape');
+  }
+  await nfFetch(projectApiPath(projectId, `/secrets/${secretGroupId}`), {
+    method: 'POST',
+    body: JSON.stringify({
+      name: secretGroup.name || secretGroupId,
+      description: secretGroup.description || 'Elevate shared production secrets/config',
+      priority: secretGroup.priority ?? 10,
+      type: secretGroup.type || 'secret',
+      secretType: secretGroup.secretType || 'environment',
+      restrictions: secretGroup.restrictions,
+      secrets: {
+        variables: { ...variables, TELNYX_CONNECTION_ID: connectionId },
+      },
+    }),
+  });
+  console.log(`TELNYX REPLACEMENT CONNECTION: ${connectionId}`);
   const outboundBefore = String(
     appBefore.data?.outbound?.outbound_voice_profile_id || '',
   );

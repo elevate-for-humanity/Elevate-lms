@@ -70,6 +70,13 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      # sync-env validates the complete shared runtime before it writes. Admin
+      # must supply the same critical credentials as the full production
+      # workflow instead of depending on a partially readable secret-group
+      # response from Northflank.
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
       TELNYX_API_KEY: ${{ secrets.TELNYX_API_KEY }}
       TELNYX_PUBLIC_KEY: ${{ secrets.TELNYX_PUBLIC_KEY }}

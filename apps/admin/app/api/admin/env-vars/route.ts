@@ -16,6 +16,11 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { refreshSecrets } from '@/lib/secrets';
+import {
+  getNorthflankProjectId,
+  isNorthflankReady,
+  upsertNorthflankServiceSecretVariable,
+} from '@/lib/northflank/runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -37,7 +42,11 @@ const SECRET_PATTERNS = [
 ];
 
 function isSecret(key: string): boolean {
-  return SECRET_PATTERNS.some((pattern) => pattern.test(key));
+  // Keep the complete Agent Memory connection tuple together in Vault. The
+  // URL and store id are not credentials by themselves, but treating all
+  // three values as one encrypted unit prevents configuration drift between
+  // Supabase and the service-scoped Northflank runtime.
+  return key.startsWith('AGENT_MEMORY_') || SECRET_PATTERNS.some((pattern) => pattern.test(key));
 }
 
 function maskValue(key: string, value: string): string {
@@ -162,9 +171,41 @@ export async function POST(req: NextRequest) {
     await refreshSecrets();
   }
 
+  const agentMemoryEntries = body.entries.filter((entry) =>
+    entry.key!.trim().startsWith('AGENT_MEMORY_'),
+  );
+  let runtimeSync: 'not-requested' | 'admin' = 'not-requested';
+  if (agentMemoryEntries.length) {
+    const projectId = getNorthflankProjectId();
+    if (!projectId || !isNorthflankReady()) {
+      return NextResponse.json(
+        {
+          error: 'Iris settings were encrypted in Supabase Vault, but Northflank control-plane access is not configured.',
+          vaultSaved: true,
+          runtimeSynced: false,
+        },
+        { status: 503 },
+      );
+    }
+
+    for (const entry of agentMemoryEntries) {
+      await upsertNorthflankServiceSecretVariable(
+        projectId,
+        'admin',
+        entry.key!.trim(),
+        entry.value!,
+      );
+    }
+    runtimeSync = 'admin';
+  }
+
   const keys = body.entries.map((entry) => entry.key!.trim());
   await auditWrite(auth.id, 'upsert', keys);
-  return NextResponse.json({ saved: keys.length, encrypted: secretEntries.length });
+  return NextResponse.json({
+    saved: keys.length,
+    encrypted: secretEntries.length,
+    runtimeSync,
+  });
 }
 
 export async function DELETE(req: NextRequest) {

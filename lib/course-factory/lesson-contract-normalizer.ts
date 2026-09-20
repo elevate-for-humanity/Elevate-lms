@@ -5,9 +5,11 @@
  * normalization contract can be tested before a paid Course Builder run.
  */
 
+import { normalizeProviderJson } from './provider-json-normalizer';
+
 export function normalizeLessonContract(raw: string): string {
   try {
-    const parsed = JSON.parse(raw) as Record<string, any>;
+    const parsed = JSON.parse(normalizeProviderJson(raw)) as Record<string, any>;
     const experience =
       parsed.experience &&
       typeof parsed.experience === 'object' &&
@@ -19,7 +21,29 @@ export function normalizeLessonContract(raw: string): string {
     // Some otherwise-valid provider responses place nested experience fields
     // at the root. Normalize their location before strict validation rather
     // than paying for another complete generation.
-    for (const key of ['resources', 'glossary', 'remediation', 'readiness'] as const) {
+    for (const key of [
+      'readingGuide',
+      'narrationScript',
+      'visualPrompt',
+      'flashcards',
+      'quickClips',
+      'knowledgeChecks',
+      'scenario',
+      'caseStudy',
+      'exercises',
+      'practicalTask',
+      'resources',
+      'glossary',
+      'remediation',
+      'readiness',
+      'hotspots',
+      'dragDrop',
+      'matching',
+      'simulation',
+      'decisionTree',
+      'interactiveVideo',
+      'instructionalTimeline',
+    ] as const) {
       if (experience[key] == null && parsed[key] != null) {
         experience[key] = parsed[key];
         delete parsed[key];
@@ -89,6 +113,12 @@ export function normalizeLessonContract(raw: string): string {
       }
       experience.readingGuide.keyTakeaways = takeaways;
     }
+
+    experience.visualPrompt = expandToMinimum(
+      experience.visualPrompt,
+      40,
+      `Show the people, workplace setting, observable action, evidence, and verified outcome for ${lessonFocus}.`,
+    );
 
     experience.narrationScript = expandToMinimum(
       experience.narrationScript,

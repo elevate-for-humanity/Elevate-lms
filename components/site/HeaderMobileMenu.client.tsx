@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronDown, Menu, X, Lock, Phone, GraduationCap, Building2, Landmark, FlaskConical } from 'lucide-react';
+import { ChevronDown, Menu, X, Lock, Phone, GraduationCap, Building2, FlaskConical } from 'lucide-react';
 import SearchModal from './SearchModal.client';
 import LanguageSwitcher from './LanguageSwitcher.client';
 import {

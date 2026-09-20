@@ -52,7 +52,7 @@ export default function FeaturedHostPartners({
     const pathway = programLabel(programSlug ?? 'beauty-apprenticeship');
     const image =
       programSlug === 'esthetician-apprenticeship'
-        ? '/images/beauty/esthetics-hero.webp'
+        ? '/images/pexels/esthetician.webp'
         : '/images/pages/nail-tech-hero.webp';
     return (
       <section

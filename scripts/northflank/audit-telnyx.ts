@@ -4,7 +4,7 @@ import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 type Json = Record<string, any>;
 const groupId = process.env.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env';
 const numberId = process.env.TELNYX_PHONE_NUMBER_ID || '3050756061020554451';
-const connectionId = process.env.TELNYX_CONNECTION_ID || '3051039365166794471';
+const connectionId = process.env.TELNYX_CONNECTION_ID || '3053364749187155214';
 const expectedNumber = process.env.TELNYX_PHONE_NUMBER || '+13179999620';
 const webhook = process.env.TELNYX_WEBHOOK_URL || 'https://admin.elevateforhumanity.org/api/webhooks/telnyx';
 

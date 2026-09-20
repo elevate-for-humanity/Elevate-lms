@@ -26,15 +26,31 @@ type SignInApiResponse = {
 };
 
 async function serverSignIn(email: string, password: string): Promise<string> {
-  const response = await fetch('/api/auth/signin', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    cache: 'no-store',
-    body: JSON.stringify({ email: email.trim(), password }),
-  });
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 20_000);
+  let response: Response;
+
+  try {
+    response = await fetch('/api/auth/signin', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+      signal: controller.signal,
+      body: JSON.stringify({ email: email.trim(), password }),
+    });
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error(
+        'The sign-in service took too long to respond. Your internet may be working; please retry once or use password reset.',
+      );
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
 
   const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
   if (!contentType.includes('application/json')) {
@@ -63,6 +79,7 @@ export default function LoginPage() {
   const safeRedirect = validateRedirect(requestedRedirect, '');
   const isProgramHolderLogin = safeRedirect.startsWith('/program-holder');
   const reason = searchParams.get('reason');
+  const callbackError = searchParams.get('error');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -72,6 +89,14 @@ export default function LoginPage() {
   useEffect(() => {
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (callbackError === 'magic_link_expired') {
+      setError('That secure sign-in link has expired. Request a new link or sign in with your password.');
+    } else if (callbackError === 'magic_link_failed') {
+      setError('That secure sign-in link is invalid. Request a new link or sign in with your password.');
+    }
+  }, [callbackError]);
 
   // An idle-timeout redirect must actually clear the Supabase browser session
   // before the user signs in again.

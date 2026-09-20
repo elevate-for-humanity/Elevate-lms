@@ -3,6 +3,8 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { getDecryptedPlatformSecret, hydrateNorthflankEnv, refreshSecrets } from '@/lib/secrets';
+import { resetProviders } from '@/lib/ai/ai-service';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import {
   getNorthflankProjectId,
   isNorthflankReady,
@@ -75,12 +77,27 @@ export async function POST(request: NextRequest) {
       );
     }
     const synced = await upsertNorthflankSecretVariable(projectId, config.key, secret);
+    await upsertNorthflankSecretVariable(projectId, 'AI_PROVIDER', provider);
+
+    // The validated provider becomes the single canonical runtime authority.
+    // Persisting this alongside the credential keeps Admin, Course Builder,
+    // Studio, and future Northflank deployments on the same provider.
+    const db = await requireAdminClient();
+    const { error: activationError } = await db.rpc('set_platform_secret', {
+      p_key: 'AI_PROVIDER',
+      p_value: provider,
+      p_scope: 'runtime',
+    });
+    if (activationError) throw activationError;
+    await refreshSecrets();
+    resetProviders();
 
     return NextResponse.json({
       success: true,
       provider,
       key: config.key,
       valid: true,
+      active: true,
       northflank: { synchronized: true, secretGroup: synced.groupId },
       checkedAt: new Date().toISOString(),
     });

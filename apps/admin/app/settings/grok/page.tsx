@@ -5,7 +5,7 @@ import GrokSettingsClient from './GrokSettingsClient';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Grok Setup | Elevate Admin',
+  title: 'AI Provider Keys | Elevate Admin',
   robots: { index: false, follow: false },
 };
 

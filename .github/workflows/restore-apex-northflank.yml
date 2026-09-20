@@ -11,7 +11,7 @@ on:
 
 concurrency:
   group: restore-northflank-apex
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   restore:

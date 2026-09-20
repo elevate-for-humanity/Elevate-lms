@@ -203,6 +203,10 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     keys: ['UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN', 'REDIS_URL'],
   },
   {
+    label: 'Redis Agent Memory — Iris',
+    keys: ['AGENT_MEMORY_BASE_URL', 'AGENT_MEMORY_STORE_ID', 'AGENT_MEMORY_API_KEY'],
+  },
+  {
     label: 'Video — D-ID',
     keys: ['DID_API_KEY'],
   },

@@ -76,6 +76,7 @@ async function main() {
   const profiles = list(byName.outbound_profiles);
   const verified = list(byName.verified_numbers);
   const deliveries = list(byName.webhook_deliveries);
+  const balance = byName.balance?.value?.data || {};
   const deliverySummary = deliveries.reduce((summary: Record<string, number>, delivery: Json) => {
     const key = String(delivery.status || delivery.response_status_code || delivery.http_status_code || 'unknown');
     summary[key] = (summary[key] || 0) + 1;
@@ -139,8 +140,19 @@ async function main() {
       status: number?.status || null,
       connection_id: number?.connection_id || null,
       features: number?.features || null,
+      number_type: number?.phone_number_type || number?.number_type || null,
+      requirements_status: number?.requirements_status || null,
+      activation_status: number?.activation_status || null,
+      connection_name: number?.connection_name || null,
+      record_fields: number ? Object.keys(number).sort() : [],
       call_forwarding: number?.call_forwarding || null,
       inbound_call_screening: number?.inbound_call_screening || null,
+    },
+    account: {
+      balance: balance?.balance ?? null,
+      credit_limit: balance?.credit_limit ?? null,
+      available_credit: balance?.available_credit ?? null,
+      currency: balance?.currency ?? null,
     },
     application: {
       active: app?.active ?? null,

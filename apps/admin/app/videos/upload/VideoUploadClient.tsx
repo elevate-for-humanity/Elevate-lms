@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { Upload, X, CheckCircle, Loader2, Film } from 'lucide-react';
 import { createBrowserClient } from '@/lib/supabase/client';
 
@@ -13,6 +13,8 @@ type UploadResponse = {
   video?: { id?: string; title?: string };
   error?: string;
 };
+
+type CourseLessonOption = { id: string; title: string };
 
 export default function VideoUploadClient({
   initialCourseId = '',
@@ -33,10 +35,42 @@ export default function VideoUploadClient({
   const [category, setCategory] = useState('Training');
   const [courseId, setCourseId] = useState(initialCourseId);
   const [lessonId, setLessonId] = useState(initialLessonId);
-  const [assetRole, setAssetRole] = useState<'source_broll' | 'course_preroll' | 'lesson_preroll' | 'lesson_outro' | 'reference'>('source_broll');
+  const [lessonOptions, setLessonOptions] = useState<CourseLessonOption[]>([]);
+  const [lessonsLoading, setLessonsLoading] = useState(false);
+  const [assetRole, setAssetRole] = useState<
+    'source_broll' | 'course_preroll' | 'lesson_preroll' | 'lesson_outro' | 'reference'
+  >('source_broll');
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!courseId.trim()) {
+      setLessonOptions([]);
+      return;
+    }
+    const controller = new AbortController();
+    setLessonsLoading(true);
+    fetch(`/api/admin/courses/lessons?courseId=${encodeURIComponent(courseId.trim())}`, {
+      cache: 'no-store',
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || 'Unable to load course lessons');
+        return (payload.data ?? []) as CourseLessonOption[];
+      })
+      .then((rows) => {
+        setLessonOptions(rows.filter((row) => row.id && row.title));
+        if (rows.length === 1) setLessonId((current) => current || rows[0].id);
+      })
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        setError(error instanceof Error ? error.message : 'Unable to load course lessons');
+      })
+      .finally(() => setLessonsLoading(false));
+    return () => controller.abort();
+  }, [courseId]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -213,12 +247,30 @@ export default function VideoUploadClient({
             />
           </label>
           <label className="text-sm font-bold text-slate-700">
-            Lesson ID (optional UUID)
-            <input
-              value={lessonId}
-              onChange={(e) => setLessonId(e.target.value)}
-              className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 font-mono text-sm text-slate-950"
-            />
+            Course lesson
+            {courseId.trim() && lessonOptions.length ? (
+              <select
+                value={lessonId}
+                onChange={(e) => setLessonId(e.target.value)}
+                disabled={lessonsLoading}
+                className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-950"
+              >
+                <option value="">Select the lesson for this scene</option>
+                {lessonOptions.map((lesson) => (
+                  <option key={lesson.id} value={lesson.id}>
+                    {lesson.title}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                value={lessonId}
+                onChange={(e) => setLessonId(e.target.value)}
+                placeholder={lessonsLoading ? 'Loading lessons…' : 'Lesson UUID (optional)'}
+                disabled={lessonsLoading}
+                className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 font-mono text-sm text-slate-950"
+              />
+            )}
           </label>
           {courseId.trim() && lessonId.trim() && !licensedMatchId ? (
             <label className="text-sm font-bold text-slate-700 sm:col-span-2">

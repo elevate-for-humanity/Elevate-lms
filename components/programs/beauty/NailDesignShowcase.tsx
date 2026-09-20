@@ -9,34 +9,34 @@ const slides = [
   {
     src: '/images/programs/cosmetology/nail-art-bedazzled.webp',
     alt: 'Long coffin nails with crystal accents and fine black line art',
-    eyebrow: 'Creative nail artistry',
-    title: 'Learn statement designs that stand out',
+    eyebrow: 'Learn new designs',
+    title: 'Turn creative ideas into polished nail art',
     description:
-      'Build the control and confidence to combine clean shaping, fine line work, encapsulated details, and crystal placement.',
+      'Explore current design techniques including clean shaping, fine line work, encapsulated details, crystal placement, and balanced finishing.'
   },
   {
     src: '/images/programs/cosmetology/nail-art-gemstone.webp',
     alt: 'Short sculpted nails with colorful line art and gemstone accents',
-    eyebrow: 'Design for every client',
-    title: 'Create custom looks on any nail length',
+    eyebrow: '14 years of teaching experience',
+    title: 'Learn with JoZanna',
     description:
-      'Practice balanced layouts, color planning, gem placement, and durable finishing for expressive salon-ready sets.',
+      'JoZanna brings 14 years of experience teaching nail techniques and design, helping students understand each step and build skills with confidence.'
   },
   {
     src: '/images/programs/cosmetology/nail-art-crystal-lines.webp',
     alt: 'Crystal-covered and line-art coffin nails in a coordinated set',
-    eyebrow: 'Technique meets precision',
-    title: 'Turn inspiration into repeatable technique',
+    eyebrow: 'Technique meets creativity',
+    title: 'Learn the “why” behind every design',
     description:
-      'Learn how preparation, product control, symmetry, and safe application come together in polished professional work.',
+      'JoZanna connects inspiration to repeatable technique—from preparation and product control to symmetry, safe application, and professional finishing.'
   },
   {
     src: '/images/programs/cosmetology/nail-art-gold.webp',
     alt: 'Long neutral nails decorated with gold leaf and iridescent crystals',
-    eyebrow: 'Grow with every set',
-    title: 'Practice. Improve. Build your portfolio.',
+    eyebrow: 'Build your confidence',
+    title: 'Practice new looks and develop your own style',
     description:
-      'Develop your eye for detail while building the practical skills, sanitation habits, and client experience employers expect.',
+      'Strengthen your eye for detail while building a portfolio, safe sanitation habits, and the client-service skills expected in a professional salon.'
   },
 ] as const;
 
@@ -72,15 +72,15 @@ export default function NailDesignShowcase({ asHero = false }: { asHero?: boolea
             </h2>
           )}
           <p className="mt-4 text-base font-medium leading-7 text-slate-700 sm:text-lg">
-            Build hair, nail, sanitation, client-service, and professional salon skills through
-            related instruction and paid, supervised training at an approved Host Salon.
+            Learn new nail designs and professional techniques with guidance shaped by JoZanna’s
+            14 years of teaching experience, plus paid, supervised practice at an approved Host Salon.
           </p>
         </div>
 
         <div
           className="relative mx-auto max-w-5xl overflow-hidden rounded-3xl border border-rose-200 bg-slate-950 shadow-2xl"
           aria-roledescription="carousel"
-          aria-label="Cosmetology nail design showcase"
+          aria-label="Nail design learning showcase"
         >
           <div className="grid min-w-0 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
             <div className="relative aspect-[2/3] min-h-[28rem] w-full bg-slate-900 lg:min-h-[38rem]">

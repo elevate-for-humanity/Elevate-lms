@@ -10,7 +10,7 @@ import {
 } from '@/lib/northflank/runtime';
 import { hydrateNorthflankEnv } from '@/lib/secrets';
 import { getGitHubToken } from '@/lib/devstudio/github-token';
-import { resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
+import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 
 /**
  * Canonical Admin-owned Dev Studio health implementation.
@@ -23,12 +23,22 @@ export async function handleDevStudioHealth(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
 
-  const ai = await resolveAIRuntimeState().catch(() => ({
+  const [ai, cloudflareProbe] = await Promise.all([
+    resolveAIRuntimeState().catch(() => ({
     providers: { groq: false, xai: false, gemini: false, openai: false, anthropic: false, cloudflare: false },
     activeProvider: 'none', elevate: false, anyConfigured: false,
-  }));
+    })),
+    probeCloudflareWorkersAI().catch(() => ({
+      configured: false,
+      reachable: false,
+      status: 'unreachable' as const,
+      detail: 'Cloudflare Workers AI live probe failed.',
+      checkedAt: new Date().toISOString(),
+    })),
+  ]);
   await hydrateNorthflankEnv().catch(() => undefined);
-  const { groq: hasGroq, xai: hasXAI, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic, cloudflare: hasCloudflare } = ai.providers;
+  const { groq: hasGroq, xai: hasXAI, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic } = ai.providers;
+  const hasCloudflare = cloudflareProbe.reachable;
   const githubToken = await getGitHubToken();
   const hasGitHub = Boolean(githubToken);
   let githubTokenValid = false;
@@ -72,6 +82,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
     hasAnthropic,
     hasElevate,
     hasCloudflare,
+    cloudflare: cloudflareProbe,
     activeProvider,
     hasGitHub,
     githubTokenValid,

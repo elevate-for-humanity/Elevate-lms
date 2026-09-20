@@ -26,11 +26,19 @@ export default async function PhonePage() {
   const auth = await requireRole(PHONE_MANAGER_ROLES);
   const db = await requireAdminClient();
   const tenantId = auth.profile.tenant_id ?? auth.profile.organization_id ?? null;
+  const platformAdmin = auth.effectiveRoles.some(
+    (role) => role === 'admin' || role === 'super_admin',
+  );
   let systemQuery = db.from('phone_systems').select('*').limit(1);
   systemQuery = tenantId
     ? systemQuery.eq('tenant_id', tenantId)
     : systemQuery.is('tenant_id', null);
-  const { data: system } = await systemQuery.maybeSingle();
+  const { data: tenantSystem } = await systemQuery.maybeSingle();
+  const { data: platformSystem } =
+    !tenantSystem && platformAdmin && tenantId
+      ? await db.from('phone_systems').select('*').is('tenant_id', null).limit(1).maybeSingle()
+      : { data: null };
+  const system = tenantSystem ?? platformSystem;
   const systemId = system?.id as string | undefined;
 
   const [

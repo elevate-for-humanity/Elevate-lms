@@ -6,24 +6,28 @@ import { CheckCircle, Eye, EyeOff, KeyRound, Loader2, XCircle } from 'lucide-rea
 type ProviderKey = 'XAI_API_KEY' | 'ANTHROPIC_API_KEY';
 type SecretStatus = { set?: boolean; masked?: string };
 type ProviderStatus = { keys?: Partial<Record<ProviderKey, SecretStatus>> };
+type ProviderId = 'xai' | 'anthropic';
 
 const PROVIDERS: Array<{
   key: ProviderKey;
   title: string;
   description: string;
   placeholder: string;
+  provider: ProviderId;
 }> = [
   {
     key: 'XAI_API_KEY',
     title: 'Grok / xAI',
     description: 'Used by Course Builder and Admin Studio when xAI is selected.',
     placeholder: 'Paste your xAI API key',
+    provider: 'xai',
   },
   {
     key: 'ANTHROPIC_API_KEY',
     title: 'Anthropic / Claude',
     description: 'Used as the Claude provider credential and AI fallback.',
     placeholder: 'Paste your Anthropic API key',
+    provider: 'anthropic',
   },
 ];
 
@@ -71,17 +75,27 @@ export default function GrokSettingsClient() {
       if (!response.ok) throw new Error(data.error || 'Unable to save the provider key');
       setValues((current) => ({ ...current, [providerKey]: '' }));
       setVisible((current) => ({ ...current, [providerKey]: false }));
+      const provider = PROVIDERS.find((candidate) => candidate.key === providerKey)!;
       const currentStatus = await checkStatus();
       if (!currentStatus[providerKey]?.set)
         throw new Error('The key was saved but the AI runtime did not activate');
-      setMessage(
-        `${providerKey === 'XAI_API_KEY' ? 'Grok' : 'Anthropic'} is configured and available.`,
-      );
+      await testAndSync(provider.provider, provider.title);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Unable to configure the AI provider');
     } finally {
       setBusy(null);
     }
+  }
+
+  async function testAndSync(provider: ProviderId, title: string) {
+    const response = await fetch('/api/admin/ai-provider-status/test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || `${title} validation failed`);
+    setMessage(`${title} is valid, active, and synchronized to Northflank.`);
   }
 
   return (
@@ -164,6 +178,27 @@ export default function GrokSettingsClient() {
                 >
                   {isBusy ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Save & activate'}
                 </button>
+                {configured && !values[provider.key].trim() ? (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setBusy(provider.key);
+                      setMessage('');
+                      setError('');
+                      try {
+                        await testAndSync(provider.provider, provider.title);
+                      } catch (reason) {
+                        setError(reason instanceof Error ? reason.message : 'Validation failed');
+                      } finally {
+                        setBusy(null);
+                      }
+                    }}
+                    disabled={busy !== null}
+                    className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 font-black text-slate-950 disabled:opacity-40 sm:col-start-2"
+                  >
+                    {isBusy ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Test & sync'}
+                  </button>
+                ) : null}
               </div>
             </div>
           );

@@ -5,11 +5,13 @@ import path from 'node:path';
 import http from 'node:http';
 import dns from 'node:dns/promises';
 import net from 'node:net';
+import { execFile, spawn } from 'node:child_process';
 import { pipeline } from 'node:stream/promises';
 import { pathToFileURL } from 'node:url';
+import { promisify } from 'node:util';
 import { chromium } from 'playwright-core';
-import { Upload } from 'tus-js-client';
-import unzipper from 'unzipper';
+
+const execFileAsync = promisify(execFile);
 
 const port = Number(process.env.PORT || 3100);
 const sharedSecret = process.env.STUDIO_BROWSER_SECRET || '';
@@ -333,22 +335,96 @@ function videoContentType(fileName) {
 
 async function normalizeDownloadedVideo(item) {
   if (path.extname(item.fileName).toLowerCase() !== '.zip') return item;
-  const archive = await unzipper.Open.file(item.filePath);
-  const videoEntries = archive.files
-    .filter((entry) => entry.type === 'File' && /\.(mp4|mov|m4v|webm)$/i.test(entry.path))
-    .sort(
-      (left, right) => Number(right.uncompressedSize || 0) - Number(left.uncompressedSize || 0),
-    );
-  const selected = videoEntries[0];
+  const { stdout } = await execFileAsync('unzip', ['-l', item.filePath], {
+    maxBuffer: 4 * 1024 * 1024,
+  });
+  const selected = stdout
+    .split('\n')
+    .map((line) => line.match(/^\s*(\d+)\s+\S+\s+\S+\s+(.+\.(?:mp4|mov|m4v|webm))\s*$/i))
+    .filter(Boolean)
+    .map((match) => ({ size: Number(match[1]), name: match[2] }))
+    .sort((left, right) => right.size - left.size)[0];
   if (!selected) throw new Error('Envato archive did not contain a supported video file');
-  const fileName = safeFileName(path.basename(selected.path));
+  const fileName = safeFileName(path.basename(selected.name));
   const extractedPath = path.join(path.dirname(item.filePath), `${item.id}-${fileName}`);
-  await pipeline(selected.stream(), fs.createWriteStream(extractedPath, { flags: 'wx' }));
+  const unzip = spawn('unzip', ['-p', item.filePath, selected.name], {
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  let unzipError = '';
+  unzip.stderr.on('data', (chunk) => {
+    unzipError += chunk.toString();
+  });
+  await pipeline(unzip.stdout, fs.createWriteStream(extractedPath, { flags: 'wx' }));
+  const unzipExit = await new Promise((resolve) => unzip.once('close', resolve));
+  if (unzipExit !== 0) throw new Error(unzipError || 'Could not extract Envato video archive');
   await fs.promises.rm(item.filePath, { force: true });
   item.fileName = fileName;
   item.filePath = extractedPath;
   item.contentType = videoContentType(fileName);
   return item;
+}
+
+function tusMetadata(values) {
+  return Object.entries(values)
+    .map(([key, value]) => `${key} ${Buffer.from(String(value)).toString('base64')}`)
+    .join(',');
+}
+
+async function resumableSignedUpload({
+  endpoint,
+  filePath,
+  size,
+  token,
+  bucketName,
+  objectName,
+  contentType,
+  onProgress,
+}) {
+  const created = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Tus-Resumable': '1.0.0',
+      'Upload-Length': String(size),
+      'Upload-Metadata': tusMetadata({
+        bucketName,
+        objectName,
+        contentType,
+        cacheControl: '31536000',
+      }),
+      'x-signature': token,
+    },
+  });
+  if (!created.ok) throw new Error(`Supabase upload initialization failed (${created.status})`);
+  const location = created.headers.get('location');
+  if (!location) throw new Error('Supabase upload location was not returned');
+  const uploadUrl = new URL(location, endpoint);
+  const handle = await fs.promises.open(filePath, 'r');
+  let offset = 0;
+  const chunkSize = 6 * 1024 * 1024;
+  try {
+    while (offset < size) {
+      const length = Math.min(chunkSize, size - offset);
+      const chunk = Buffer.allocUnsafe(length);
+      const { bytesRead } = await handle.read(chunk, 0, length, offset);
+      if (!bytesRead) throw new Error('Downloaded media ended before upload completed');
+      const response = await fetch(uploadUrl, {
+        method: 'PATCH',
+        headers: {
+          'Tus-Resumable': '1.0.0',
+          'Upload-Offset': String(offset),
+          'Content-Type': 'application/offset+octet-stream',
+          'Content-Length': String(bytesRead),
+          'x-signature': token,
+        },
+        body: chunk.subarray(0, bytesRead),
+      });
+      if (!response.ok) throw new Error(`Supabase upload chunk failed (${response.status})`);
+      offset = Number(response.headers.get('upload-offset') || offset + bytesRead);
+      onProgress(offset, size);
+    }
+  } finally {
+    await handle.close();
+  }
 }
 
 async function uploadDownloadToSignedStorage(session, body) {
@@ -373,39 +449,29 @@ async function uploadDownloadToSignedStorage(session, body) {
   )
     throw new BrowserServiceError('invalid_upload_target', 400);
   download.status = 'uploading';
-  return new Promise((resolve, reject) => {
-    const upload = new Upload(fs.createReadStream(download.filePath), {
+  try {
+    await resumableSignedUpload({
       endpoint: endpoint.toString(),
-      uploadSize: download.size,
-      chunkSize: 6 * 1024 * 1024,
-      retryDelays: [0, 3000, 5000, 10000, 20000],
-      headers: { 'x-signature': token },
-      uploadDataDuringCreation: true,
-      removeFingerprintOnSuccess: true,
-      metadata: {
-        bucketName,
-        objectName,
-        contentType: download.contentType,
-        cacheControl: '31536000',
-      },
+      filePath: download.filePath,
+      size: download.size,
+      token,
+      bucketName,
+      objectName,
+      contentType: download.contentType,
       onProgress(bytesUploaded, bytesTotal) {
         download.bytesUploaded = bytesUploaded;
         download.uploadProgress = bytesTotal ? Math.round((bytesUploaded / bytesTotal) * 100) : 0;
       },
-      async onSuccess() {
-        download.status = 'stored';
-        download.uploadProgress = 100;
-        await fs.promises.rm(download.filePath, { force: true }).catch(() => undefined);
-        resolve({ ok: true, downloadId: download.id, size: download.size });
-      },
-      onError(error) {
-        download.status = 'ready';
-        download.error = sanitizeReason(error);
-        reject(new BrowserServiceError('storage_upload_failed', 502, { cause: error }));
-      },
     });
-    upload.start();
-  });
+    download.status = 'stored';
+    download.uploadProgress = 100;
+    await fs.promises.rm(download.filePath, { force: true }).catch(() => undefined);
+    return { ok: true, downloadId: download.id, size: download.size };
+  } catch (error) {
+    download.status = 'ready';
+    download.error = sanitizeReason(error);
+    throw new BrowserServiceError('storage_upload_failed', 502, { cause: error });
+  }
 }
 
 const browserManager = createBrowserLifecycleManager({

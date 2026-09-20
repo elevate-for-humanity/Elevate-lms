@@ -1,9 +1,15 @@
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import http from 'node:http';
 import dns from 'node:dns/promises';
 import net from 'node:net';
+import { pipeline } from 'node:stream/promises';
 import { pathToFileURL } from 'node:url';
 import { chromium } from 'playwright-core';
+import { Upload } from 'tus-js-client';
+import unzipper from 'unzipper';
 
 const port = Number(process.env.PORT || 3100);
 const sharedSecret = process.env.STUDIO_BROWSER_SECRET || '';
@@ -27,7 +33,9 @@ const frameQuality = Math.min(
   80,
   Math.max(35, Number(process.env.STUDIO_BROWSER_FRAME_QUALITY || 60)),
 );
-const allowedDomains = (process.env.STUDIO_BROWSER_ALLOWED_DOMAINS || 'elevateforhumanity.org')
+const allowedDomains = (
+  process.env.STUDIO_BROWSER_ALLOWED_DOMAINS || 'elevateforhumanity.org,envato.com'
+)
   .split(',')
   .map((value) => value.trim().toLowerCase())
   .filter(Boolean);
@@ -72,7 +80,10 @@ async function withTimeout(promise, timeoutMs, code = 'browser_unavailable') {
   }
 }
 
-export function createBrowserLifecycleManager({ launch = (options) => chromium.launch(options), onUnavailable = async () => {} } = {}) {
+export function createBrowserLifecycleManager({
+  launch = (options) => chromium.launch(options),
+  onUnavailable = async () => {},
+} = {}) {
   const lifecycle = {
     state: 'cold',
     generation: 0,
@@ -259,7 +270,11 @@ export function isPrivateAddress(address) {
 
 async function validateTarget(input) {
   let url;
-  try { url = new URL(input); } catch { throw new BrowserServiceError('invalid_target', 400); }
+  try {
+    url = new URL(input);
+  } catch {
+    throw new BrowserServiceError('invalid_target', 400);
+  }
   if (!['http:', 'https:'].includes(url.protocol))
     throw new BrowserServiceError('invalid_target', 400);
   if (url.username || url.password) throw new BrowserServiceError('invalid_target', 400);
@@ -294,6 +309,103 @@ async function destroySession(id) {
   if (session.frameTimer) clearTimeout(session.frameTimer);
   for (const stream of session.streams) stream.end();
   await session.context.close().catch(() => undefined);
+  await fs.promises
+    .rm(session.downloadDir, { recursive: true, force: true })
+    .catch(() => undefined);
+}
+
+function safeFileName(value) {
+  return (
+    String(value || 'download.bin')
+      .replace(/[^a-zA-Z0-9._-]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 180) || 'download.bin'
+  );
+}
+
+function videoContentType(fileName) {
+  const extension = path.extname(fileName).toLowerCase();
+  if (extension === '.mov' || extension === '.qt') return 'video/quicktime';
+  if (extension === '.webm') return 'video/webm';
+  if (extension === '.mp4' || extension === '.m4v') return 'video/mp4';
+  return 'application/octet-stream';
+}
+
+async function normalizeDownloadedVideo(item) {
+  if (path.extname(item.fileName).toLowerCase() !== '.zip') return item;
+  const archive = await unzipper.Open.file(item.filePath);
+  const videoEntries = archive.files
+    .filter((entry) => entry.type === 'File' && /\.(mp4|mov|m4v|webm)$/i.test(entry.path))
+    .sort(
+      (left, right) => Number(right.uncompressedSize || 0) - Number(left.uncompressedSize || 0),
+    );
+  const selected = videoEntries[0];
+  if (!selected) throw new Error('Envato archive did not contain a supported video file');
+  const fileName = safeFileName(path.basename(selected.path));
+  const extractedPath = path.join(path.dirname(item.filePath), `${item.id}-${fileName}`);
+  await pipeline(selected.stream(), fs.createWriteStream(extractedPath, { flags: 'wx' }));
+  await fs.promises.rm(item.filePath, { force: true });
+  item.fileName = fileName;
+  item.filePath = extractedPath;
+  item.contentType = videoContentType(fileName);
+  return item;
+}
+
+async function uploadDownloadToSignedStorage(session, body) {
+  const download = session.downloads.get(String(body.downloadId || ''));
+  if (!download || download.status !== 'ready')
+    throw new BrowserServiceError('download_not_ready', 409);
+  const endpoint = new URL(String(body.endpoint || ''));
+  if (
+    endpoint.protocol !== 'https:' ||
+    !endpoint.hostname.endsWith('.storage.supabase.co') ||
+    endpoint.pathname !== '/storage/v1/upload/resumable'
+  )
+    throw new BrowserServiceError('invalid_upload_target', 400);
+  const bucketName = String(body.bucket || '');
+  const objectName = String(body.storagePath || '');
+  const token = String(body.token || '');
+  if (
+    bucketName !== 'course_videos' ||
+    !objectName.startsWith('licensed-library/envato/') ||
+    !token ||
+    token.length > 4096
+  )
+    throw new BrowserServiceError('invalid_upload_target', 400);
+  download.status = 'uploading';
+  return new Promise((resolve, reject) => {
+    const upload = new Upload(fs.createReadStream(download.filePath), {
+      endpoint: endpoint.toString(),
+      uploadSize: download.size,
+      chunkSize: 6 * 1024 * 1024,
+      retryDelays: [0, 3000, 5000, 10000, 20000],
+      headers: { 'x-signature': token },
+      uploadDataDuringCreation: true,
+      removeFingerprintOnSuccess: true,
+      metadata: {
+        bucketName,
+        objectName,
+        contentType: download.contentType,
+        cacheControl: '31536000',
+      },
+      onProgress(bytesUploaded, bytesTotal) {
+        download.bytesUploaded = bytesUploaded;
+        download.uploadProgress = bytesTotal ? Math.round((bytesUploaded / bytesTotal) * 100) : 0;
+      },
+      async onSuccess() {
+        download.status = 'stored';
+        download.uploadProgress = 100;
+        await fs.promises.rm(download.filePath, { force: true }).catch(() => undefined);
+        resolve({ ok: true, downloadId: download.id, size: download.size });
+      },
+      onError(error) {
+        download.status = 'ready';
+        download.error = sanitizeReason(error);
+        reject(new BrowserServiceError('storage_upload_failed', 502, { cause: error }));
+      },
+    });
+    upload.start();
+  });
 }
 
 const browserManager = createBrowserLifecycleManager({
@@ -337,49 +449,89 @@ async function createSession(target, viewport, authCookies = []) {
     let page;
     try {
       const browser = await browserManager.getBrowser();
-      context = await browser.newContext({ viewport, ignoreHTTPSErrors: false, acceptDownloads: false });
+      context = await browser.newContext({
+        viewport,
+        ignoreHTTPSErrors: false,
+        acceptDownloads: true,
+      });
       if (
         safeAuthCookies.length &&
         (targetUrl.hostname === 'elevateforhumanity.org' ||
           targetUrl.hostname.endsWith('.elevateforhumanity.org'))
-      ) await context.addCookies(safeAuthCookies);
+      )
+        await context.addCookies(safeAuthCookies);
       page = await context.newPage();
       await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30_000 });
       const id = crypto.randomUUID();
       const token = crypto.randomBytes(32).toString('base64url');
+      const downloadDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'studio-browser-'));
       const session = {
-    id,
-    token,
-    context,
-    page,
-    target,
-    createdAt: Date.now(),
-    lastSeen: Date.now(),
-    streams: new Set(),
-    frameTimer: undefined,
-    frameInFlight: false,
-    framesSent: 0,
-    framesDropped: 0,
-    events: [],
+        id,
+        token,
+        context,
+        page,
+        target,
+        createdAt: Date.now(),
+        lastSeen: Date.now(),
+        streams: new Set(),
+        frameTimer: undefined,
+        frameInFlight: false,
+        framesSent: 0,
+        framesDropped: 0,
+        events: [],
+        downloads: new Map(),
+        downloadDir,
       };
       const record = (type, data) => {
-    session.events.push({ type, at: new Date().toISOString(), ...data });
-    if (session.events.length > 500) session.events.shift();
+        session.events.push({ type, at: new Date().toISOString(), ...data });
+        if (session.events.length > 500) session.events.shift();
       };
       page.on('console', (message) =>
-    record('console', { level: message.type(), text: message.text().slice(0, 2000) }),
-  );
-  page.on('pageerror', (error) => record('pageerror', { text: error.message.slice(0, 2000) }));
-  page.on('requestfailed', (request) =>
-    record('requestfailed', {
-      url: request.url(),
-      error: request.failure()?.errorText || 'failed',
-    }),
-  );
-  page.on('response', (response) => {
-    if (response.status() >= 400)
-      record('response', { url: response.url(), status: response.status() });
-  });
+        record('console', { level: message.type(), text: message.text().slice(0, 2000) }),
+      );
+      page.on('pageerror', (error) => record('pageerror', { text: error.message.slice(0, 2000) }));
+      page.on('requestfailed', (request) =>
+        record('requestfailed', {
+          url: request.url(),
+          error: request.failure()?.errorText || 'failed',
+        }),
+      );
+      page.on('response', (response) => {
+        if (response.status() >= 400)
+          record('response', { url: response.url(), status: response.status() });
+      });
+      page.on('download', (download) => {
+        const id = crypto.randomUUID();
+        const fileName = safeFileName(download.suggestedFilename());
+        const filePath = path.join(downloadDir, `${id}-${fileName}`);
+        const item = {
+          id,
+          fileName,
+          filePath,
+          contentType: videoContentType(fileName),
+          size: 0,
+          status: 'downloading',
+          uploadProgress: 0,
+          createdAt: new Date().toISOString(),
+          sourceUrl: page.url(),
+        };
+        session.downloads.set(id, item);
+        record('download', { downloadId: id, fileName, status: 'downloading' });
+        void download
+          .saveAs(filePath)
+          .then(async () => {
+            await normalizeDownloadedVideo(item);
+            const stat = await fs.promises.stat(item.filePath);
+            item.size = stat.size;
+            item.status = 'ready';
+            record('download', { downloadId: id, fileName, size: stat.size, status: 'ready' });
+          })
+          .catch((error) => {
+            item.status = 'failed';
+            item.error = sanitizeReason(error);
+            record('download', { downloadId: id, fileName, status: 'failed', error: item.error });
+          });
+      });
       sessions.set(id, session);
       return session;
     } catch (error) {
@@ -687,7 +839,10 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
     if (req.method === 'GET' && url.pathname === '/health') {
       const lifecycle = browserManager.health();
-      const ready = lifecycle.browserState === 'ready' && lifecycle.browserConnected && sessions.size < maxSessions;
+      const ready =
+        lifecycle.browserState === 'ready' &&
+        lifecycle.browserConnected &&
+        sessions.size < maxSessions;
       return json(res, ready ? 200 : 503, {
         ok: ready,
         service: 'studio-browser',
@@ -707,8 +862,14 @@ const server = http.createServer(async (req, res) => {
         return json(res, 202, { status: 'running', browserGeneration: before.browserGeneration });
       const body = await readBody(req);
       const correlationId = String(body.correlationId || crypto.randomUUID()).slice(0, 100);
-      void browserManager.recycleBrowser(String(body.reason || 'administrative_recycle').slice(0, 120));
-      return json(res, 202, { status: 'queued', correlationId, browserGeneration: before.browserGeneration });
+      void browserManager.recycleBrowser(
+        String(body.reason || 'administrative_recycle').slice(0, 120),
+      );
+      return json(res, 202, {
+        status: 'queued',
+        correlationId,
+        browserGeneration: before.browserGeneration,
+      });
     }
     if (req.method === 'POST' && url.pathname === '/sessions') {
       if (!sharedSecret || req.headers['x-studio-browser-secret'] !== sharedSecret)
@@ -727,7 +888,7 @@ const server = http.createServer(async (req, res) => {
       });
     }
     const match = url.pathname.match(
-      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit))?$/,
+      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit|downloads|imports))?$/,
     );
     if (!match) return json(res, 404, { error: 'Not found' });
     const session = sessions.get(match[1]);
@@ -750,6 +911,10 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'GET' && match[2] === 'events')
       return json(res, 200, { events: session.events, url: session.page.url() });
+    if (req.method === 'GET' && match[2] === 'downloads')
+      return json(res, 200, {
+        downloads: [...session.downloads.values()].map(({ filePath, ...download }) => download),
+      });
     if (req.method === 'GET' && match[2] === 'snapshot')
       return json(res, 200, await snapshotPage(session));
     if (req.method === 'GET' && match[2] === 'audit')
@@ -758,6 +923,8 @@ const server = http.createServer(async (req, res) => {
       const metrics = await runActions(session, await readBody(req));
       return json(res, 200, { ok: true, url: session.page.url(), ...metrics });
     }
+    if (req.method === 'POST' && match[2] === 'imports')
+      return json(res, 200, await uploadDownloadToSignedStorage(session, await readBody(req)));
     if (req.method === 'DELETE' && !match[2]) {
       await destroySession(session.id);
       return json(res, 200, { ok: true });
@@ -797,11 +964,13 @@ process.on('SIGINT', shutdown);
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   server.listen(port, '0.0.0.0', () => {
     console.info(`Studio browser listening on ${port}`);
-    void browserManager.getBrowser().catch((error) =>
-      console.error(
-        'Studio browser pre-warm failed',
-        error instanceof Error ? error.message : error,
-      ),
-    );
+    void browserManager
+      .getBrowser()
+      .catch((error) =>
+        console.error(
+          'Studio browser pre-warm failed',
+          error instanceof Error ? error.message : error,
+        ),
+      );
   });
 }

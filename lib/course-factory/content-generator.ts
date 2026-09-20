@@ -24,6 +24,7 @@ import {
 } from './generation-checkpoints';
 import type { BlueprintLessonRef, QuizQuestion } from './types';
 import { normalizeLessonContract } from './lesson-contract-normalizer';
+import { normalizeProviderJson } from './provider-json-normalizer';
 
 export interface GeneratedLessonContent {
   objective: string;
@@ -402,7 +403,7 @@ type ProviderQuestion = {
  * invalid and are retried by the bounded generator loop.
  */
 export function normalizeFourOptionQuestions(raw: string): string {
-  const parsed = JSON.parse(raw) as {
+  const parsed = JSON.parse(normalizeProviderJson(raw)) as {
     questions?: ProviderQuestion[];
     quiz_questions?: ProviderQuestion[];
     experience?: { knowledgeChecks?: ProviderQuestion[] };

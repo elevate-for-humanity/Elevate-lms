@@ -230,6 +230,7 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Integrations', href: '/integrations' },
       { label: 'Integrations — Stripe', href: '/integrations/stripe' },
       { label: 'Environment Settings', href: '/settings/integrations' },
+      { label: 'Grok / xAI Setup', href: '/settings/grok' },
       { label: 'Integrations — Google Classroom', href: '/integrations/google-classroom' },
       { label: 'Migrations', href: '/migrations' },
       { label: 'System Jobs', href: '/system/jobs' },

@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { Upload, X, CheckCircle, Loader2, Film } from 'lucide-react';
 import { createBrowserClient } from '@/lib/supabase/client';
 
-const MAX_FILE_SIZE = 500 * 1024 * 1024;
+const MAX_FILE_SIZE = 1024 * 1024 * 1024;
 const ACCEPTED_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
 
 type UploadResponse = {
@@ -98,7 +98,7 @@ export default function VideoUploadClient({
       return;
     }
     if (file.size <= 0 || file.size > MAX_FILE_SIZE) {
-      setError('Video must be 500 MB or smaller.');
+      setError('Video must be 1 GB or smaller.');
       return;
     }
     if (licensedLibrary && !providerItemId.trim()) {

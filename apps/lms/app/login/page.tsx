@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
 import { resolveRoleCompatiblePostLoginUrl } from '@/lib/auth/post-login-redirect';
-import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import { siteUrls } from '@/lib/utils/site-urls';
 import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
 import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
@@ -74,7 +73,7 @@ async function serverSignIn(email: string, password: string): Promise<string> {
 }
 
 export default function LoginPage() {
-  const searchParams = useSafeSearchParams();
+  const [searchParams, setSearchParams] = useState(() => new URLSearchParams());
   const requestedRedirect = searchParams.get('next') || searchParams.get('redirect') || '';
   const safeRedirect = validateRedirect(requestedRedirect, '');
   const isProgramHolderLogin = safeRedirect.startsWith('/program-holder');
@@ -87,6 +86,7 @@ export default function LoginPage() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    setSearchParams(new URLSearchParams(window.location.search));
     setHydrated(true);
   }, []);
 

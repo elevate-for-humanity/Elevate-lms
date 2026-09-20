@@ -188,6 +188,8 @@ async function main() {
       translated_number: voiceNumber.translated_number || null,
       tech_prefix_enabled: voiceNumber.tech_prefix_enabled ?? null,
       usage_payment_method: voiceNumber.usage_payment_method || null,
+      origination_verification_status: voiceNumber.origination_verification_status || null,
+      origination_verification_status_updated_at: voiceNumber.origination_verification_status_updated_at || null,
       media_features: voiceNumber.media_features || null,
       record_fields: Object.keys(voiceNumber).sort(),
     } : null,

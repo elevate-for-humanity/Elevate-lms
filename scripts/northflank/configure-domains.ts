@@ -62,21 +62,58 @@ async function getSubdomainCname(domain: string): Promise<{ verified: boolean; c
   return { verified: registered?.status === 'verified' };
 }
 
+async function verifySubdomain(
+  domain: string,
+): Promise<{ verified: boolean; content?: string }> {
+  const teamId = resolveTeamId();
+  if (!teamId) return { verified: false };
+
+  for (let attempt = 1; attempt <= 36; attempt += 1) {
+    try {
+      await nfFetch(
+        `/teams/${teamId}/domains/${encodeURIComponent(domain)}/subdomains/@/verify`,
+        { method: 'POST', body: JSON.stringify({}) },
+      );
+    } catch {
+      // Northflank may reject verification while DNS and certificate state propagates.
+    }
+
+    try {
+      const row = await nfFetch<{ verified?: boolean; content?: string }>(
+        `/teams/${teamId}/domains/${encodeURIComponent(domain)}/subdomains/@`,
+      );
+      if (row.verified) return { verified: true, content: row.content };
+    } catch {
+      // Retry: the subdomain record can be temporarily unavailable after registration.
+    }
+
+    console.log(`  Waiting for Northflank subdomain verification (${attempt}/36)...`);
+    await new Promise((resolve) => setTimeout(resolve, 10_000));
+  }
+
+  return { verified: false };
+}
+
 async function assignDomainToService(
   domain: string,
   projectId: string,
   serviceId: string,
   dryRun: boolean,
 ) {
-  const { verified, content } = await getSubdomainCname(domain);
+  let { verified, content } = await getSubdomainCname(domain);
   console.log(`\nDomain ${domain} -> service ${serviceId}`);
   console.log(`  CNAME target: ${content ?? '(see print-cname-targets.ts)'}`);
-  console.log(`  CNAME verified: ${verified}`);
-  if (!verified) {
-    console.warn('  CNAME not verified — assignment skipped. Correct DNS before deployment verification.');
-    return;
-  }
+  console.log(`  Registry verified: ${verified}`);
   if (dryRun) return;
+
+  // Northflank tracks the team-domain registry and the @ subdomain separately.
+  // Assignment requires the latter to be verified even when the registry already
+  // reports this domain as verified.
+  ({ verified, content } = await verifySubdomain(domain));
+  console.log(`  Subdomain verified: ${verified}`);
+  if (!verified) {
+    throw new Error(`${domain} did not verify as a Northflank @ subdomain`);
+  }
 
   const teamId = resolveTeamId();
   const pathEnc = encodeURIComponent('/');

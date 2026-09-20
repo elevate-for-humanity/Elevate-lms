@@ -73,6 +73,14 @@ jobs:
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
       TELNYX_API_KEY: ${{ secrets.TELNYX_API_KEY }}
       TELNYX_PUBLIC_KEY: ${{ secrets.TELNYX_PUBLIC_KEY }}
+      XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+      XAI_API_TOKEN: ${{ secrets.XAI_API_TOKEN }}
+      GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+      GROK_API_TOKEN: ${{ secrets.GROK_API_TOKEN }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_API_TOKEN: ${{ secrets.ANTHROPIC_API_TOKEN }}
+      CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+      ENVATO_API_TOKEN: ${{ secrets.ENVATO_API_TOKEN }}
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
@@ -123,6 +131,8 @@ jobs:
         run: node scripts/verify-portal-production-contracts.mjs
       - name: Reconcile canonical Admin database binding
         run: pnpm tsx scripts/northflank/sync-admin-database-env.ts
+      - name: Merge provider and marketplace secrets into the shared runtime
+        run: pnpm tsx scripts/northflank/sync-env.ts --execute
       - name: Enforce canonical Northflank Admin runtime configuration
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
       - name: Enforce canonical Admin domain assignment

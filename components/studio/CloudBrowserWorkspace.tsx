@@ -49,11 +49,15 @@ export default function CloudBrowserWorkspace({
   conversationId = null,
   autoStart = false,
   initialTarget = '',
+  initialTask = '',
+  autoRunTask = false,
 }: {
   unifiedTask?: OrchestratedPlanCheckpoint | null;
   conversationId?: string | null;
   autoStart?: boolean;
   initialTarget?: string;
+  initialTask?: string;
+  autoRunTask?: boolean;
 }) {
   const [target, setTarget] = useState(initialTarget);
   const [session, setSession] = useState<Session | null>(null);
@@ -79,6 +83,7 @@ export default function CloudBrowserWorkspace({
   const secureInputRef = useRef<HTMLInputElement>(null);
   const targetEditedRef = useRef(Boolean(initialTarget));
   const autoStartedRef = useRef(false);
+  const autoRunCommandRef = useRef('');
 
   const endpoint = session ? `${session.publicUrl}/sessions/${session.id}` : '';
   const authHeaders = session ? { Authorization: `Bearer ${session.token}` } : {};
@@ -90,6 +95,13 @@ export default function CloudBrowserWorkspace({
     autoStartedRef.current = false;
     setTarget(requestedTarget);
   }, [initialTarget]);
+
+  useEffect(() => {
+    const requestedTask = initialTask.trim();
+    if (!requestedTask) return;
+    setAgentTask(requestedTask);
+    if (autoRunCommandRef.current !== requestedTask) autoRunCommandRef.current = '';
+  }, [initialTask]);
 
   useEffect(() => {
     let cancelled = false;
@@ -323,8 +335,9 @@ export default function CloudBrowserWorkspace({
     setActiveTaskId('');
   }
 
-  async function runAgent(taskId = '') {
-    if (!session || !agentTask.trim()) return;
+  async function runAgent(taskId = '', taskOverride = '') {
+    const command = taskOverride.trim() || agentTask.trim();
+    if (!session || !command) return;
     if (!taskId) setActiveTaskId('');
     setAgentRunning(true);
     setAgentResult('');
@@ -335,7 +348,7 @@ export default function CloudBrowserWorkspace({
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          task: agentTask,
+          task: command,
           sessionId: session.id,
           sessionToken: session.token,
           taskId: taskId || undefined,
@@ -410,6 +423,23 @@ export default function CloudBrowserWorkspace({
     setAgentRunning(false);
     await runAgent(activeTaskId);
   }
+
+  useEffect(() => {
+    const requestedTask = initialTask.trim();
+    if (
+      !autoRunTask ||
+      !session ||
+      !requestedTask ||
+      agentRunning ||
+      autoRunCommandRef.current === requestedTask
+    )
+      return;
+    autoRunCommandRef.current = requestedTask;
+    setAgentTask(requestedTask);
+    void runAgent('', requestedTask);
+    // runAgent uses the current isolated session and exact command supplied by Studio chat.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRunTask, session, initialTask]);
 
   useEffect(() => {
     const receiveApproval = (event: Event) => {

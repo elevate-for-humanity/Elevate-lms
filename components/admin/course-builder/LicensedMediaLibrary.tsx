@@ -19,13 +19,31 @@ type Recommendation = {
   status: 'suggested' | 'approved' | 'rejected' | 'attached' | 'failed';
   course_lessons: { title: string } | Array<{ title: string }>;
   licensed_media_entitlements:
-    | { title: string; provider_item_id: string; thumbnail_url?: string; purchase_code?: string }
-    | Array<{
+    | {
+        id: string;
         title: string;
         provider_item_id: string;
         thumbnail_url?: string;
         purchase_code?: string;
+        license_type?: string;
+        metadata?: Record<string, unknown>;
+      }
+    | Array<{
+        id: string;
+        title: string;
+        provider_item_id: string;
+        thumbnail_url?: string;
+        purchase_code?: string;
+        license_type?: string;
+        metadata?: Record<string, unknown>;
       }>;
+};
+type LibraryAsset = {
+  id: string;
+  title: string;
+  provider_item_id: string;
+  license_type?: string;
+  metadata?: Record<string, unknown>;
 };
 
 function one<T>(value: T | T[]): T {
@@ -35,6 +53,7 @@ function one<T>(value: T | T[]): T {
 export default function LicensedMediaLibrary({ courseId }: { courseId: string }) {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [libraryAssets, setLibraryAssets] = useState<LibraryAsset[]>([]);
   const [selected, setSelected] = useState<Recommendation | null>(null);
   const [query, setQuery] = useState('');
   const [busy, setBusy] = useState('');
@@ -47,21 +66,24 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
     setBusy('load');
     setMessage('');
     try {
-      const [purchaseResponse, recommendationResponse] = await Promise.all([
+      const [purchaseResponse, recommendationResponse, libraryResponse] = await Promise.all([
         fetch('/api/admin/integrations/envato?action=purchases', { cache: 'no-store' }),
         fetch(
           `/api/admin/integrations/envato?action=recommendations&courseId=${encodeURIComponent(courseId)}`,
           { cache: 'no-store' },
         ),
+        fetch('/api/admin/integrations/envato?action=library', { cache: 'no-store' }),
       ]);
       const purchaseData = await purchaseResponse.json();
       const recommendationData = await recommendationResponse.json();
+      const libraryData = await libraryResponse.json();
       if (!purchaseResponse.ok)
         throw new Error(purchaseData.error || 'Unable to load purchased media');
       setConnected(Boolean(purchaseData.connected));
       setMarketplaceAccount(purchaseData.username ?? '');
       setPurchases(purchaseData.purchases ?? []);
       if (recommendationResponse.ok) setRecommendations(recommendationData.recommendations ?? []);
+      if (libraryResponse.ok) setLibraryAssets(libraryData.assets ?? []);
     } catch (error) {
       setConnected(false);
       setMessage(error instanceof Error ? error.message : 'Unable to load licensed media');
@@ -118,9 +140,39 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
       setRecommendations((rows) =>
         rows.map((row) => (row.id === match.id ? { ...row, status: data.match.status } : row)),
       );
-      if (action === 'approve') setSelected({ ...match, status: 'approved' });
+      if (
+        action === 'approve' &&
+        !(one(match.licensed_media_entitlements)?.metadata?.storage_bucket === 'course_videos')
+      ) {
+        setSelected({ ...match, status: 'approved' });
+      }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : `Unable to ${action} selection`);
+    } finally {
+      setBusy('');
+    }
+  }
+
+  async function attachStored(match: Recommendation) {
+    setBusy(match.id);
+    setMessage('');
+    try {
+      const response = await fetch('/api/admin/integrations/envato', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'attach',
+          matchId: match.id,
+          courseId,
+          lessonId: match.lesson_id,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to attach stored media');
+      setMessage('Stored licensed footage attached and the lesson render was queued.');
+      await load();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Unable to attach stored media');
     } finally {
       setBusy('');
     }
@@ -311,13 +363,25 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
                       </button>
                     ) : null}
                     {match.status === 'approved' ? (
-                      <button
-                        type="button"
-                        onClick={() => setSelected(match)}
-                        className="rounded-lg bg-amber-400 px-3 py-2 text-xs font-black"
-                      >
-                        Attach upload
-                      </button>
+                      asset?.metadata?.storage_bucket === 'course_videos' &&
+                      typeof asset?.metadata?.storage_path === 'string' ? (
+                        <button
+                          type="button"
+                          onClick={() => void attachStored(match)}
+                          disabled={Boolean(busy)}
+                          className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-black text-white"
+                        >
+                          Attach stored file
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setSelected(match)}
+                          className="rounded-lg bg-amber-400 px-3 py-2 text-xs font-black"
+                        >
+                          Upload and attach
+                        </button>
+                      )
                     ) : null}
                   </div>
                 </div>
@@ -329,6 +393,26 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
               </p>
             ) : null}
           </div>
+        </div>
+      </div>
+      <div className="mt-5 rounded-2xl border border-emerald-800 bg-emerald-950/40 p-4">
+        <h3 className="font-black text-emerald-200">Secure licensed course library</h3>
+        <p className="mt-1 text-sm text-emerald-100/80">
+          Stored once in private Supabase storage and reusable by Course Builder across courses.
+        </p>
+        <div className="mt-3 grid gap-2 md:grid-cols-2">
+          {libraryAssets.map((asset) => (
+            <div key={asset.id} className="rounded-xl border border-emerald-800 bg-slate-950 p-3">
+              <p className="font-bold">{asset.title}</p>
+              <p className="text-xs text-slate-400">
+                Envato {asset.provider_item_id} ·{' '}
+                {String(asset.metadata?.resolution ?? 'source quality')}
+              </p>
+            </div>
+          ))}
+          {!libraryAssets.length ? (
+            <p className="text-sm text-emerald-100/70">No securely stored licensed assets yet.</p>
+          ) : null}
         </div>
       </div>
       {manualUploadOpen ? (
@@ -351,8 +435,8 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
             </button>
           </div>
           <VideoUploadClient
-            key={`manual-${courseId}`}
-            initialCourseId={courseId}
+            key="licensed-library-upload"
+            licensedLibrary
             embedded
             onUploaded={() => {
               setManualUploadOpen(false);

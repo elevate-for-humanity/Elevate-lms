@@ -258,6 +258,10 @@ async function main() {
     // The user explicitly approved replacing this defective, single allowed
     // Call Control application after carrier reprovisioning still returned a
     // fast busy and emitted no inbound webhook.
+    await telnyx(apiKey, `/phone_numbers/${numberId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ connection_id: null }),
+    });
     await telnyx(apiKey, `/call_control_applications/${connectionId}`, {
       method: 'DELETE',
     });

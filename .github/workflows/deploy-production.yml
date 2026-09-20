@@ -45,6 +45,14 @@ jobs:
       QB_CLIENT_ID: ${{ secrets.QB_CLIENT_ID }}
       QB_CLIENT_SECRET: ${{ secrets.QB_CLIENT_SECRET }}
       QB_REDIRECT_URI: https://www.elevateforhumanity.org/api/auth/quickbooks/callback
+      XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+      XAI_API_TOKEN: ${{ secrets.XAI_API_TOKEN }}
+      GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+      GROK_API_TOKEN: ${{ secrets.GROK_API_TOKEN }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_API_TOKEN: ${{ secrets.ANTHROPIC_API_TOKEN }}
+      CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+      ENVATO_API_TOKEN: ${{ secrets.ENVATO_API_TOKEN }}
 
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_PUBLIC_SITE_URL: https://www.elevateforhumanity.org

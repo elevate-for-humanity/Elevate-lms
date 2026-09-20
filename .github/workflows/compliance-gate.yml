@@ -185,7 +185,15 @@ jobs:
           echo '::error::Marketing server did not become ready within 120 seconds.'
           exit 1
       - name: Run accessibility tests
-        run: pnpm exec playwright test tests/e2e/accessibility.spec.ts --config playwright.config.ts
+        run: |
+          # Run Axe coverage on Chromium device profiles. Axe's injected
+          # evaluator crashes the hosted WebKit process, so WebKit runs the
+          # browser-native keyboard, semantics, labeling, and motion checks.
+          for project in desktop-chrome laptop-chrome tablet-chrome android-chrome iphone-webkit; do
+            pnpm exec playwright test tests/e2e/accessibility.spec.ts \
+              --config playwright.config.ts \
+              --project="$project"
+          done
       - name: Homepage config leak smoke
         run: pnpm exec playwright test tests/e2e/home-config-leaks.spec.ts --config playwright.config.ts
       - name: Upload test results

@@ -172,45 +172,6 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           .order('updated_at', { ascending: false })
       : Promise.resolve({ data: [] }),
     db
-      .from('program_enrollments')
-      .select(
-        `id,user_id,full_name,status,enrollment_state,program_id,program_slug,enrolled_at,progress_percent,at_risk,next_required_action,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified,funding_verified,voucher_issued_date,voucher_paid_date,payment_status,amount_paid_cents,completed_at,completion_date${enrollmentContactColumns}`,
-      )
-      .eq('program_holder_id', holderId)
-      .in('status', [
-        'active',
-        'enrolled',
-        'in_progress',
-        'pending',
-        'applied',
-        'approved',
-        'scheduled',
-        'ready',
-        'funded',
-        'completed',
-        'graduated',
-      ])
-      .order('enrolled_at', { ascending: false }),
-    db
-      .from('program_enrollments')
-      .select(
-        `id,user_id,full_name,status,enrollment_state,program_id,program_slug,training_start_date,training_end_date,student_start_date,expected_end_date,start_date${enrollmentContactColumns}`,
-      )
-      .eq('program_holder_id', holderId)
-      .in('status', ['active', 'enrolled', 'pending', 'approved', 'scheduled', 'ready', 'funded'])
-      .order('training_start_date', { ascending: true, nullsFirst: false }),
-    allApplicantAccess
-      ? applicantsQuery
-      : applicantsQuery.eq('program_holder_id', holderId),
-    db
-      .from('program_holder_students')
-      .select(
-        `id,user_id,enrollment_id,applicant_name,status,application_status,program_id,label,call_notes,call_date,call_outcome,work_start_date,completion_date,work_progress,hours_taught,hours_required,work_site,expected_payout_cents,expected_payout_status,updated_at${applicantContactColumns}`,
-      )
-      .eq('program_holder_id', holderId)
-      .in('status', ['active', 'enrolled', 'in_progress'])
-      .order('updated_at', { ascending: false }),
-    db
       .from('hour_entries')
       .select(
         'id,user_id,status,approval_status,hours,hours_claimed,work_date,program_slug,category,notes,created_at',
@@ -346,13 +307,11 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       })
     : applicantRows;
 
-  const canonicalEnrollmentIds = new Set(
-    (enrollmentsRes.data ?? []).map((row: any) => row.id).filter(Boolean),
-  );
+  const canonicalEnrollmentIds = new Set(enrolledRoster.map((row: any) => row.id).filter(Boolean));
   const canonicalEnrollmentUserIds = new Set(
-    (enrollmentsRes.data ?? []).map((row: any) => row.user_id).filter(Boolean),
+    enrolledRoster.map((row: any) => row.user_id).filter(Boolean),
   );
-  const deduplicatedConvertedStudents = (convertedStudentsRes.data ?? []).filter(
+  const deduplicatedConvertedStudents = convertedRoster.filter(
     (row: any) =>
       !(row.enrollment_id && canonicalEnrollmentIds.has(row.enrollment_id)) &&
       !(row.user_id && canonicalEnrollmentUserIds.has(row.user_id)),
@@ -365,10 +324,6 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     programs: programsRes.data ?? [],
     enrollments: enrolledRoster,
     upcomingEnrollments: upcomingRoster,
-    applicants: applicantsRes.data ?? [],
-    convertedStudents: convertedRoster.map((row: any) => ({
-    enrollments: enrollmentsRes.data ?? [],
-    upcomingEnrollments: upcomingRes.data ?? [],
     applicants: deduplicatedApplicants,
     convertedStudents: deduplicatedConvertedStudents.map((row: any) => ({
       ...row,

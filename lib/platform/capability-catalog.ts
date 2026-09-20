@@ -165,7 +165,7 @@ export const CAPABILITY_CATALOG: PlatformCapability[] = [
     description: 'Create and manage course structures, curriculum and learning content.',
     status: 'sell_now',
     appHref: '/builder',
-    adminHref: '/curriculum',
+    adminHref: '/studio/courses',
     marketingHref: '/course-factory',
     keywords: ['course builder', 'curriculum', 'lessons', 'education'],
     upsells: [PlatformFeature.COURSE_FACTORY, PlatformFeature.AI_ELLIE, PlatformFeature.MEDIA_STUDIO],
@@ -272,7 +272,7 @@ export const CAPABILITY_CATALOG: PlatformCapability[] = [
     category: 'enterprise',
     description: 'AI-assisted platform engineering, diagnostics and controlled execution workflows.',
     status: 'enterprise',
-    adminHref: '/admin/dev-studio',
+    adminHref: '/studio',
     keywords: ['dev studio', 'developer', 'diagnostics', 'execution'],
   },
   {

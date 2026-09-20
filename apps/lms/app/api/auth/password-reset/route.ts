@@ -51,16 +51,21 @@ export async function POST(request: NextRequest) {
     recoveryUrl.searchParams.set('type', 'recovery');
     recoveryUrl.searchParams.set('next', resetPath);
     const recoveryLink = recoveryUrl.toString();
+    const permanentLoginUrl = programHolder
+      ? new URL('/login?redirect=/program-holder/onboarding', siteUrls.app).toString()
+      : new URL('/login', siteUrls.app).toString();
 
     const delivery = await sendEmail({
       to: email,
       subject: `Reset your password — ${PLATFORM_DEFAULTS.orgName}`,
-      text: `Use this secure link to reset your password: ${recoveryLink}\n\nThis link expires. If you did not request it, ignore this email.`,
+      text: `Use this secure link to reset your password: ${recoveryLink}\n\nThis secure reset link expires. Your permanent login page does not expire: ${permanentLoginUrl}\n\nIf you did not request it, ignore this email.`,
       html: `<div style="max-width:600px;margin:0 auto;padding:32px;font-family:Arial,sans-serif;color:#0f172a">
         <h1 style="font-size:24px;margin:0 0 16px">Reset your password</h1>
         <p style="line-height:1.6">Use the secure button below to choose a new password for your ${programHolder ? 'Program Holder' : 'Elevate'} account.</p>
         <p style="margin:28px 0"><a href="${recoveryLink}" style="display:inline-block;padding:14px 24px;background:#1d4ed8;color:#fff;text-decoration:none;border-radius:6px;font-weight:700">Reset Password</a></p>
-        <p style="font-size:13px;color:#64748b;line-height:1.6">This link expires. If you did not request a password reset, you can ignore this email.</p>
+        <p style="font-size:13px;color:#64748b;line-height:1.6">The secure reset button expires. Your regular portal address never expires:</p>
+        <p style="margin:16px 0"><a href="${permanentLoginUrl}" style="color:#1d4ed8;font-weight:700">Permanent Portal Login</a></p>
+        <p style="font-size:13px;color:#64748b;line-height:1.6">Bookmark the permanent login page and use your password there. If you did not request a password reset, you can ignore this email.</p>
       </div>`,
     });
 

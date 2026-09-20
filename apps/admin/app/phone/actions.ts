@@ -26,17 +26,28 @@ async function requirePhoneContext() {
   );
   if (!tenantId && !platformAdmin)
     throw new Error('Your account is not attached to an organization.');
-  return { db, tenantId };
+  return { db, tenantId, platformAdmin };
 }
 
 async function requireSystemId() {
-  const { db, tenantId } = await requirePhoneContext();
-  const { data: existing, error } = await scopeSystemQuery(
+  const { db, tenantId, platformAdmin } = await requirePhoneContext();
+  const { data: tenantSystem, error } = await scopeSystemQuery(
     db.from('phone_systems').select('id').limit(1),
     tenantId,
   ).maybeSingle();
   if (error) throw new Error(`Unable to load phone system: ${error.message}`);
-  if (existing?.id) return { db, id: existing.id as string };
+  if (tenantSystem?.id) return { db, id: tenantSystem.id as string };
+  if (platformAdmin && tenantId) {
+    const { data: platformSystem, error: platformError } = await db
+      .from('phone_systems')
+      .select('id')
+      .is('tenant_id', null)
+      .limit(1)
+      .maybeSingle();
+    if (platformError)
+      throw new Error(`Unable to load platform phone system: ${platformError.message}`);
+    if (platformSystem?.id) return { db, id: platformSystem.id as string };
+  }
   const { data, error: insertError } = await db
     .from('phone_systems')
     .insert({ name: 'Elevate Communications', tenant_id: tenantId })
@@ -47,13 +58,23 @@ async function requireSystemId() {
 }
 
 async function requireWorkspace() {
-  const { db, tenantId } = await requirePhoneContext();
+  const { db, tenantId, platformAdmin } = await requirePhoneContext();
   const { id: phoneSystemId } = await requireSystemId();
   let query = db.from('communication_workspaces').select('*').limit(1);
   query = tenantId ? query.eq('tenant_id', tenantId) : query.is('tenant_id', null);
-  const { data: existing, error } = await query.maybeSingle();
+  const { data: tenantWorkspace, error } = await query.maybeSingle();
   if (error) throw new Error(error.message);
-  if (existing) return { db, workspace: existing };
+  if (tenantWorkspace) return { db, workspace: tenantWorkspace };
+  if (platformAdmin && tenantId) {
+    const { data: platformWorkspace, error: platformError } = await db
+      .from('communication_workspaces')
+      .select('*')
+      .eq('phone_system_id', phoneSystemId)
+      .limit(1)
+      .maybeSingle();
+    if (platformError) throw new Error(platformError.message);
+    if (platformWorkspace) return { db, workspace: platformWorkspace };
+  }
   const readiness = liveKitReadiness();
   const { data, error: createError } = await db
     .from('communication_workspaces')

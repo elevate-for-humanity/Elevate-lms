@@ -6,6 +6,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { businessHoursFromForm, normalizeUsPhone, validMenuDigit } from '@/lib/phone/config';
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
+import { telnyxClient } from '@/lib/phone/telnyx';
 
 export type PhoneActionState = { ok: boolean; message: string };
 
@@ -243,6 +244,23 @@ export async function addExternalNumber(
   }
 }
 
+export async function removeExternalNumber(formData: FormData): Promise<void> {
+  const { db, id } = await requireSystemId();
+  const numberId = String(formData.get('phoneNumberId') ?? '');
+  const { data: number } = await db
+    .from('phone_numbers')
+    .select('id,source,is_primary')
+    .eq('id', numberId)
+    .eq('phone_system_id', id)
+    .maybeSingle();
+  if (!number || number.source !== 'external_forwarding' || number.is_primary) {
+    throw new Error('Only a non-primary external forwarding record can be removed here.');
+  }
+  const { error } = await db.from('phone_numbers').delete().eq('id', number.id);
+  if (error) throw new Error(error.message);
+  revalidatePath('/phone');
+}
+
 export async function addDestination(
   _state: PhoneActionState,
   formData: FormData,
@@ -352,6 +370,78 @@ export async function toggleDestination(formData: FormData): Promise<void> {
   revalidatePath('/phone');
 }
 
+export async function removeDestination(formData: FormData): Promise<void> {
+  const { db, id } = await requireSystemId();
+  const destinationId = String(formData.get('destinationId') ?? '');
+  const [{ data: system }, { count: routes }] = await Promise.all([
+    db.from('phone_systems').select('default_destination_id').eq('id', id).single(),
+    db
+      .from('phone_menu_options')
+      .select('id', { count: 'exact', head: true })
+      .eq('phone_system_id', id)
+      .eq('destination_id', destinationId),
+  ]);
+  if (system?.default_destination_id === destinationId || (routes ?? 0) > 0) {
+    throw new Error('Reassign the default destination and menu routes before removing this phone.');
+  }
+  const { error } = await db
+    .from('phone_destinations')
+    .delete()
+    .eq('id', destinationId)
+    .eq('phone_system_id', id);
+  if (error) throw new Error(error.message);
+  revalidatePath('/phone');
+}
+
+export async function testDestination(formData: FormData): Promise<void> {
+  const { db, id } = await requireSystemId();
+  const destinationId = String(formData.get('destinationId') ?? '');
+  const [{ data: destination }, { data: number }] = await Promise.all([
+    db
+      .from('phone_destinations')
+      .select('destination,enabled')
+      .eq('id', destinationId)
+      .eq('phone_system_id', id)
+      .maybeSingle(),
+    db
+      .from('phone_numbers')
+      .select('e164')
+      .eq('phone_system_id', id)
+      .eq('source', 'provider')
+      .eq('status', 'active')
+      .eq('is_primary', true)
+      .maybeSingle(),
+  ]);
+  if (!destination?.enabled || !destination.destination || !number?.e164) {
+    throw new Error('An active primary number and enabled team phone are required for a test call.');
+  }
+  const connectionId = process.env.TELNYX_CONNECTION_ID;
+  if (!connectionId) throw new Error('TELNYX_CONNECTION_ID is not configured.');
+  await telnyxClient().calls.dial({
+    connection_id: connectionId,
+    from: number.e164,
+    to: destination.destination,
+    timeout_secs: 25,
+    answering_machine_detection: 'disabled',
+    client_state: Buffer.from(
+      JSON.stringify({ systemId: id, destinationId, purpose: 'admin_test' }),
+    ).toString('base64'),
+  });
+  revalidatePath('/phone');
+}
+
+export async function removeMenuOption(formData: FormData): Promise<void> {
+  const { db, id } = await requireSystemId();
+  const optionId = String(formData.get('menuOptionId') ?? '');
+  const { error } = await db
+    .from('phone_menu_options')
+    .delete()
+    .eq('id', optionId)
+    .eq('phone_system_id', id);
+  if (error) throw new Error(error.message);
+  revalidatePath('/phone');
+}
+
 export async function assignPhoneNumber(formData: FormData): Promise<void> {
   const { db, id } = await requireSystemId();
   const phoneNumberId = String(formData.get('phoneNumberId') ?? '');
@@ -409,4 +499,18 @@ export async function saveProgramHolderExtension(formData: FormData): Promise<vo
   if (error) throw new Error(error.message);
   revalidatePath('/phone');
   revalidatePath('/program-holder/dashboard');
+}
+
+export async function toggleExtension(formData: FormData): Promise<void> {
+  const { db, workspace } = await requireWorkspace();
+  const { error } = await db
+    .from('communication_extensions')
+    .update({
+      enabled: String(formData.get('enabled')) === 'true',
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', String(formData.get('extensionId') ?? ''))
+    .eq('workspace_id', workspace.id);
+  if (error) throw new Error(error.message);
+  revalidatePath('/phone');
 }

@@ -112,7 +112,7 @@ export default async function BarberApprenticeshipPage() {
           analyticsName="barber-apprenticeship"
           heightClassName="h-[clamp(520px,72svh,860px)]"
           mediaFit="cover"
-          overlayMode="dark"
+          overlayMode="default"
           ctas={[heroBanner.primaryCta, heroBanner.secondaryCta].filter(Boolean) as any}
           trustIndicators={heroBanner.trustIndicators}
           belowHeroHeadline={heroBanner.belowHeroHeadline}

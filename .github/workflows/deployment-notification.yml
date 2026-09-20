@@ -36,7 +36,18 @@ jobs:
         id: deployment
         run: |
           echo "environment=${{ github.event.deployment.environment }}" >> $GITHUB_OUTPUT
-          echo "url=${{ github.event.deployment_status.target_url }}" >> $GITHUB_OUTPUT
+          RAW_URL="${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}"
+          case "$RAW_URL" in
+            https://www.elevateforhumanity.org*|https://app.elevateforhumanity.org*|https://admin.elevateforhumanity.org*)
+              BASE_URL="${RAW_URL%%\?*}"
+              BASE_URL="${BASE_URL%/}"
+              ;;
+            *)
+              echo "::error::Deployment status did not provide an approved production service URL: $RAW_URL"
+              exit 1
+              ;;
+          esac
+          echo "url=$BASE_URL" >> $GITHUB_OUTPUT
           echo "state=${{ github.event.deployment_status.state }}" >> $GITHUB_OUTPUT
           echo "commit=${{ github.event.deployment.sha }}" >> $GITHUB_OUTPUT
 
@@ -47,15 +58,16 @@ jobs:
           HEALTH_URL="${{ steps.deployment.outputs.url }}/api/health"
           echo "Checking: $HEALTH_URL"
 
-          response=$(curl -s -w "\n%{http_code}" "$HEALTH_URL" || echo "000")
-          status_code=$(echo "$response" | tail -n1)
+          status_code=$(curl --fail-with-body --silent --show-error --max-time 20 \
+            --output /tmp/deployment-health.json --write-out "%{http_code}" "$HEALTH_URL" || true)
+          echo "status=${status_code:-000}" >> $GITHUB_OUTPUT
 
-          echo "status=$status_code" >> $GITHUB_OUTPUT
-
-          if [ "$status_code" = "200" ] || [ "$status_code" = "503" ]; then
+          if [ "$status_code" = "200" ] && grep -Eq '"(healthy|ready|ok)"[[:space:]]*:[[:space:]]*true' /tmp/deployment-health.json; then
             echo "result=✅ HEALTHY" >> $GITHUB_OUTPUT
           else
             echo "result=❌ UNHEALTHY" >> $GITHUB_OUTPUT
+            cat /tmp/deployment-health.json 2>/dev/null || true
+            exit 1
           fi
 
       - name: Create deployment summary

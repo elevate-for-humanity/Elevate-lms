@@ -80,10 +80,20 @@ interface ChatMessage {
   actionOutcome?: { status: 'executed' | 'rejected' | 'failed'; message: string };
 }
 
-type StudioProvider = 'auto' | 'xai' | 'openai' | 'anthropic' | 'gemini' | 'groq';
+type StudioProvider =
+  | 'auto'
+  | 'elevate'
+  | 'cloudflare'
+  | 'xai'
+  | 'openai'
+  | 'anthropic'
+  | 'gemini'
+  | 'groq';
 
 const STUDIO_PROVIDER_LABELS: Record<StudioProvider, string> = {
   auto: 'Best available',
+  elevate: 'Elevate AI',
+  cloudflare: 'Cloudflare AI',
   xai: 'Grok / xAI',
   openai: 'ChatGPT',
   anthropic: 'Claude',

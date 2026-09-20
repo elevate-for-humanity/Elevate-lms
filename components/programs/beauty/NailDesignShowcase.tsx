@@ -40,7 +40,7 @@ const slides = [
   },
 ] as const;
 
-export default function NailDesignShowcase({ asHero = false }: { asHero?: boolean }) {
+export default function NailDesignShowcase({\n  asHero = false,\n  program = 'cosmetology',\n}: {\n  asHero?: boolean;\n  program?: 'cosmetology' | 'nail-technician';\n}) {\n  const isNailProgram = program === 'nail-technician';
   const [active, setActive] = useState(0);
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export default function NailDesignShowcase({ asHero = false }: { asHero?: boolea
             </h1>
           ) : (
             <h2 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
-              Learn nail design, artistry, and more
+              {isNailProgram ? 'Nail Technician Apprenticeship: learn design, safety, and salon-ready technique' : 'Learn nail design, artistry, and more'}
             </h2>
           )}
           <p className="mt-4 text-base font-medium leading-7 text-slate-700 sm:text-lg">
@@ -117,16 +117,16 @@ export default function NailDesignShowcase({ asHero = false }: { asHero?: boolea
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/programs/cosmetology-apprenticeship/apply"
+                  href={isNailProgram ? '/programs/nail-technician-apprenticeship/apply' : '/programs/cosmetology-apprenticeship/apply'}
                   className="inline-flex min-h-12 items-center justify-center rounded-xl bg-rose-600 px-6 py-3 font-black text-white transition hover:bg-rose-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
-                  Apply for Cosmetology
+                  {isNailProgram ? 'Apply for Nail Technician' : 'Apply for Cosmetology'}
                 </Link>
                 <Link
-                  href="/programs/nail-technician-apprenticeship"
+                  href={isNailProgram ? '/programs/nail-technician-apprenticeship#program-details' : '/programs/nail-technician-apprenticeship'}
                   className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-400 px-6 py-3 font-black text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
-                  Explore Nail Technician
+                  {isNailProgram ? 'Review Program Details' : 'Explore Nail Technician'}
                 </Link>
               </div>
             </div>

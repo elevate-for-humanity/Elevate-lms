@@ -56,7 +56,7 @@ export default function FinancialLiteracyPage() {
           slug: PROGRAM.slug,
           description: PROGRAM.description,
           category: PROGRAM.category,
-          funding_eligible: false,
+          funding_eligible: true,
         }}
       />
 
@@ -185,14 +185,12 @@ export default function FinancialLiteracyPage() {
 
           <aside className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
             <ShieldCheck className="h-8 w-8 text-slate-700" aria-hidden="true" />
-            <h2 className="mt-4 text-2xl font-black text-slate-950">Current funding disclosure</h2>
+            <h2 className="mt-4 text-2xl font-black text-slate-950">FREE to those who qualify</h2>
             <p className="mt-3 leading-7 text-slate-700">
-              Elevate is not publishing Financial Literacy as a verified WIOA or Workforce Ready
-              Grant program in its current public funding registry.
+              Financial Literacy is delivered within Elevate&apos;s funded Bookkeeping and Financial Empowerment pathway. Eligible participants may receive workforce funding for approved training costs.
             </p>
             <p className="mt-3 text-sm leading-6 text-slate-700">
-              Treat this as a self-pay program unless a responsible agency provides written,
-              program-specific authorization that applies to your enrollment.
+              Funding is not automatic. Participant eligibility and program authorization are determined by the responsible workforce agency. Self-pay and payment options remain available for participants who do not qualify.
             </p>
           </aside>
         </div>

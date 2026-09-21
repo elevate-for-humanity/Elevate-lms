@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
-import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
+
+import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import BeautyApprenticeshipAuthority, {
   buildBeautyProgramStructuredData,
 } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
@@ -45,6 +46,7 @@ export default async function CosmetologyApprenticeshipPage() {
           __html: JSON.stringify(structuredData).replace(/</g, '\\u003c'),
         }}
       />
+      <BeautyEnrollmentPromotion />
       <ProgramDetailPage
         program={program}
         banner={banner}

@@ -11,7 +11,8 @@ import { NextRequest } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { decomposePlan, canExecuteStep, type Plan } from '@/lib/platform/planner';
+import { canExecuteStep, type Plan } from '@/lib/platform/planner';
+import { prepareMasterStudioPlan } from '@/lib/studio/master-runtime';
 import { emitEvent } from '@/lib/platform/events';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createAiTask, runTaskExecution } from '@/lib/devstudio/os/task-runner';
@@ -220,7 +221,7 @@ export async function POST(req: NextRequest) {
       try {
         let plan = resumePlanId ? await loadPlan(db, resumePlanId, auth.id) : null;
         if (!plan) {
-          plan = decomposePlan(effectiveGoal, params);
+          plan = prepareMasterStudioPlan(effectiveGoal, params);
           const shared = await loadSharedContext({
             goal: effectiveGoal,
             tenantId,

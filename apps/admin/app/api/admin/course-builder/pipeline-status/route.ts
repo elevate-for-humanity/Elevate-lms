@@ -72,6 +72,7 @@ export async function GET(request: NextRequest) {
     let videosPending = 0;
     let videosFailed = 0;
     let videosMissing = 0;
+    const mediaOrigins: Record<string, number> = {};
     const mediaGaps: Array<{
       lessonId: string;
       title: string;
@@ -105,6 +106,8 @@ export async function GET(request: NextRequest) {
       if (hasObjective) lessonsWithObjective += 1;
 
       const state = String(lesson.video_status ?? '').toLowerCase();
+      const origin = String(lesson.media_origin ?? 'none').toLowerCase();
+      mediaOrigins[origin] = (mediaOrigins[origin] ?? 0) + 1;
       const hasVideoUrl = typeof lesson.video_url === 'string' && lesson.video_url.trim().length > 0;
 
       // Completion is based on playable, quality-approved media, not on who produced it.
@@ -202,6 +205,7 @@ export async function GET(request: NextRequest) {
         storageFailures,
         retryBudgetExhausted,
         deadLetterJobs,
+        mediaOrigins,
       },
       mediaGaps: mediaGaps.sort((a, b) => a.orderIndex - b.orderIndex),
       nextAction: isComplete

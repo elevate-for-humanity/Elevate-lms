@@ -69,6 +69,16 @@ const browserRuntime = read('services/studio-browser/server.mjs');
 if (!browserRuntime.includes('process.env.STUDIO_BROWSER_EXECUTABLE_PATH')) {
   fail('Studio browser runtime does not use its configured system Chromium executable');
 }
+for (const unifiedRuntimeInvariant of [
+  '/workspace/files',
+  '/workspace/file',
+  '/workspace/exec',
+  'allowedExecCommands',
+  'workspaceRoot',
+]) {
+  if (!browserRuntime.includes(unifiedRuntimeInvariant))
+    fail(`Unified Studio runtime is missing inherited execution capability: ${unifiedRuntimeInvariant}`);
+}
 for (const forbiddenProviderBypass of [
   'getOpenAIClient',
   'OPENAI_COMPUTER_MODEL',

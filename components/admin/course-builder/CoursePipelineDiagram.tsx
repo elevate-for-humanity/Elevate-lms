@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Brain, CheckCircle2, Clock3, Cpu, Database, FileText, GitBranch, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, Brain, CheckCircle2, Clock3, Cpu, Database, FileText, GitBranch, PackageOpen, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
 
 type Overlay = 'critical' | 'storage' | 'stale' | 'retry';
 type PipelineSummary = {
@@ -19,13 +19,14 @@ type PipelineSummary = {
 };
 
 const layers = [
-  { name: 'Input', icon: FileText, nodes: ['Requirements', 'Evidence', 'Domain profile'] },
-  { name: 'Intelligence', icon: Brain, nodes: ['Canonical RAG', 'Configured AI', 'Scene plan'] },
-  { name: 'Rendering', icon: Cpu, nodes: ['Atomic queue', 'GPU scenes', 'Remotion compositor', 'Resumable upload'] },
-  { name: 'Quality', icon: ShieldCheck, nodes: ['Media decode', 'Narration/STT', 'Visual evidence', 'Safety & access'] },
-  { name: 'Promotion', icon: Rocket, nodes: ['Automated decision', 'Immutable version', 'Learner URL'] },
-  { name: 'State', icon: GitBranch, nodes: ['Lease', 'Heartbeat', 'Checkpoint', 'Completion'] },
-  { name: 'Error', icon: AlertTriangle, nodes: ['Classification', 'Backoff', 'Stale recovery', 'Dead letter'] },
+  { name: 'Research', icon: FileText, nodes: ['Requirements', 'Workforce evidence', 'Domain profile'] },
+  { name: 'Standards', icon: Brain, nodes: ['Credential objectives', 'State requirements', 'Canonical RAG'] },
+  { name: 'Curriculum', icon: GitBranch, nodes: ['Modules', 'Lessons', 'Assessments'] },
+  { name: 'Media Needed', icon: Database, nodes: ['Scene plan', 'Gap manifest', 'Asset roles'] },
+  { name: 'Envato Assets', icon: PackageOpen, nodes: ['Licensed search', 'Provenance', 'Lesson matching'] },
+  { name: 'Production', icon: Cpu, nodes: ['Narration', 'Captions', 'Remotion render'] },
+  { name: 'QA', icon: ShieldCheck, nodes: ['Media decode', 'Narration/STT', 'Visual evidence'] },
+  { name: 'Review + Publish', icon: Rocket, nodes: ['Human review', 'Immutable version', 'Learner URL'] },
 ] as const;
 
 export default function CoursePipelineDiagram({ courseId }: { courseId: string }) {
@@ -86,7 +87,7 @@ export default function CoursePipelineDiagram({ courseId }: { courseId: string }
         ))}
       </div>
 
-      <div className="mt-5 grid gap-3 xl:grid-cols-7">
+      <div className="mt-5 grid gap-3 xl:grid-cols-8">
         {layers.map((layer, index) => {
           const Icon = layer.icon;
           return <div key={layer.name} className={`relative rounded-xl border p-3 ${layer.name === 'Error' && alerts.length ? 'border-red-700 bg-red-950/30' : 'border-slate-700 bg-slate-950'}`}>

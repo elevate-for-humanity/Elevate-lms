@@ -97,8 +97,10 @@ export async function GET(request: NextRequest) {
       const state = String(lesson.video_status ?? '').toLowerCase();
       const hasVideoUrl = typeof lesson.video_url === 'string' && lesson.video_url.trim().length > 0;
 
-      const generatedAndApproved = lesson.media_origin === 'generated' && lesson.media_quality_status === 'approved';
-      if (VIDEO_COMPLETE_STATES.has(state) && hasVideoUrl && generatedAndApproved) {
+      // Completion is based on playable, quality-approved media, not on who produced it.
+      // Generated, uploaded, and licensed/assisted assets all use the same QA gate.
+      const qualityApproved = lesson.media_quality_status === 'approved';
+      if (VIDEO_COMPLETE_STATES.has(state) && hasVideoUrl && qualityApproved) {
         videosComplete += 1;
       } else if (VIDEO_PENDING_STATES.has(state)) {
         videosPending += 1;
@@ -178,7 +180,9 @@ export async function GET(request: NextRequest) {
         : mediaReady
           ? 'Course content is ready. Verify learner-facing pages and publish status.'
           : buildReady
-            ? 'Course content is ready. Continue polling until media jobs complete.'
+            ? videosMissing > 0
+              ? `Course content is ready. ${videosMissing} lesson${videosMissing === 1 ? '' : 's'} still need approved playable media.`
+              : 'Course content is ready. Media production or QA is still in progress.'
             : 'Course content generation is still in progress or has gaps to resolve.',
       checkedAt: new Date().toISOString(),
     });

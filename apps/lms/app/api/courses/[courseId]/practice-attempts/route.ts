@@ -17,9 +17,9 @@ const CompleteAttemptSchema = z.object({
 
 async function ensureEnrollment(db: Awaited<ReturnType<typeof createClient>>, userId: string, courseId: string) {
   const { data, error } = await db
-    .from('course_enrollments')
+    .from('enrollments')
     .select('id')
-    .eq('student_id', userId)
+    .eq('user_id', userId)
     .eq('course_id', courseId)
     .eq('status', 'active')
     .maybeSingle();

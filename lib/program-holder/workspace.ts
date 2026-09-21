@@ -138,7 +138,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       ? db
           .from('applications')
           .select('id,user_id,full_name,first_name,last_name,email,phone,city,zip,zip_code,program_id,program_slug,program_interest,status,created_at')
-          .in('city', garyRegionalCities.flatMap((city) => [city, city.replace(/\b\w/g, (letter) => letter.toUpperCase())]))
+          .or(garyRegionalCities.map((city) => `city.ilike.${city}`).join(','))
           .in('status', ['submitted', 'under_review', 'pending', 'applied'])
           .order('created_at', { ascending: false })
       : Promise.resolve({ data: [] }),

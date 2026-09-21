@@ -87,9 +87,10 @@ export async function GET(request: Request) {
       configured: Boolean(sentryDsn),
       environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || 'unknown',
     },
-    shell: health.shell ?? {
-      STUDIO_SHELL_WS_URL: process.env.STUDIO_SHELL_WS_URL ? 'configured' : 'MISSING',
-      STUDIO_SHELL_SECRET: process.env.STUDIO_SHELL_SECRET ? 'configured' : 'MISSING',
+    studio: {
+      canonical: '/studio',
+      browser: health.browser ?? health.studioBrowser ?? 'See /api/admin/dev-studio/browser/session',
+      execution: 'admin-owned',
     },
     intake: {
       idempotencyTtlSeconds: Number(process.env.APPLICATION_INTAKE_IDEMPOTENCY_TTL_SECONDS || '86400'),

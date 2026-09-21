@@ -15,7 +15,7 @@ export function AcknowledgeHandbookButton() {
       const res = await fetch('/api/apprentice/handbook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'acknowledge', handbookVersion: '2025.1' }),
+        body: JSON.stringify({ action: 'acknowledge', handbookVersion: '2026.2' }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {

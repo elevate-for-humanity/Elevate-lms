@@ -518,6 +518,26 @@ async function resumableSignedUpload({
   }
 }
 
+async function batchUploadDownloadsToSignedStorage(session, body) {
+  const items = Array.isArray(body.items) ? body.items.slice(0, 100) : [];
+  const results = [];
+  for (const item of items) {
+    try {
+      const result = await uploadDownloadToSignedStorage(session, item);
+      results.push({ downloadId: item.downloadId, ok: true, ...result });
+    } catch (error) {
+      results.push({ downloadId: item.downloadId, ok: false, error: sanitizeReason(error) });
+    }
+  }
+  return {
+    ok: results.every((item) => item.ok),
+    total: results.length,
+    stored: results.filter((item) => item.ok).length,
+    failed: results.filter((item) => !item.ok).length,
+    results,
+  };
+}
+
 async function uploadDownloadToSignedStorage(session, body) {
   const download = session.downloads.get(String(body.downloadId || ''));
   if (!download || download.status !== 'ready')
@@ -1104,7 +1124,7 @@ const server = http.createServer(async (req, res) => {
       });
     }
     const match = url.pathname.match(
-      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit|downloads|imports))?$/,
+      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit|downloads|imports|batch-imports))?$/,
     );
     if (!match) return json(res, 404, { error: 'Not found' });
     const session = sessions.get(match[1]);
@@ -1141,6 +1161,8 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'POST' && match[2] === 'imports')
       return json(res, 200, await uploadDownloadToSignedStorage(session, await readBody(req)));
+    if (req.method === 'POST' && match[2] === 'batch-imports')
+      return json(res, 200, await batchUploadDownloadsToSignedStorage(session, await readBody(req)));
     if (req.method === 'DELETE' && !match[2]) {
       await destroySession(session.id);
       return json(res, 200, { ok: true });

@@ -336,8 +336,15 @@ export async function executeRegisteredAITool(
         // their route-level guard even though the executor already approved it.
         init.body = JSON.stringify(
           typeof context.confirmationText === 'string'
-            ? { ...input, confirmationText: context.confirmationText }
-            : input,
+            ? {
+                ...input,
+                confirmationText: context.confirmationText,
+                studioRunId: context.correlationId?.startsWith('studio-run:') ? context.correlationId.slice('studio-run:'.length) : undefined,
+              }
+            : {
+                ...input,
+                studioRunId: context.correlationId?.startsWith('studio-run:') ? context.correlationId.slice('studio-run:'.length) : undefined,
+              },
         );
       }
       const response = await dispatchToolRequest(tool, url, init);

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Activity, Award, BookOpen, Bot, Boxes, Loader2, RefreshCw, Sparkles, Video } from 'lucide-react';
 import CourseInstructorMediaPanel from '@/components/admin/course-builder/CourseInstructorMediaPanel';
 import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
+import CoursePipelineDiagram from '@/components/admin/course-builder/CoursePipelineDiagram';
 import { runCourseFactoryPipeline } from '@/components/admin/course-builder/runCourseFactoryPipeline';
 import { courseBuilderJsonHeaders } from '@/components/admin/course-builder/request';
 
@@ -13,7 +14,7 @@ const AutomaticCourseBuilder = dynamic(() => import('@/components/course/Automat
   ssr: false,
 });
 
-type Tab = 'courses' | 'ai' | 'blueprints' | 'media' | 'registry';
+type Tab = 'courses' | 'ai' | 'blueprints' | 'media' | 'monitor' | 'registry';
 type CourseRow = {
   id: string;
   title: string;
@@ -65,6 +66,7 @@ const TABS: Array<{ id: Tab; label: string; icon: any }> = [
   { id: 'ai', label: 'Talk to Course Builder', icon: Sparkles },
   { id: 'blueprints', label: 'Blueprints', icon: Boxes },
   { id: 'media', label: 'Media Library', icon: Video },
+  { id: 'monitor', label: 'Build Monitor', icon: Activity },
   { id: 'registry', label: 'Credential Registry', icon: Award },
 ];
 
@@ -269,6 +271,11 @@ export default function UnifiedCourseBuilder() {
           />
         )}
         {tab === 'media' && <CourseInstructorMediaPanel courseId={courseId} />}
+        {tab === 'monitor' && (
+          courseId
+            ? <CoursePipelineDiagram courseId={courseId} />
+            : <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-400">Select a course to watch its live build pipeline.</div>
+        )}
         {tab === 'registry' && <CredentialRegistryPanel course={selectedCourse} />}
       </main>
     </div>

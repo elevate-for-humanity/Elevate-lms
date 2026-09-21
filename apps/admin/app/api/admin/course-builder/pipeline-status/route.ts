@@ -21,18 +21,16 @@ export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
     const courseId = url.searchParams.get('courseId')?.trim();
+    const courseSlug = url.searchParams.get('slug')?.trim();
 
-    if (!courseId) {
-      return safeError('courseId query param is required', 400);
+    if (!courseId && !courseSlug) {
+      return safeError('courseId or slug query param is required', 400);
     }
 
     const db = await requireAdminClient();
-
-    const { data: course, error: courseErr } = await db
-      .from('courses')
-      .select('id, title, status, created_at, updated_at')
-      .eq('id', courseId)
-      .maybeSingle();
+    let courseQuery = db.from('courses').select('id, slug, title, status, created_at, updated_at');
+    courseQuery = courseId ? courseQuery.eq('id', courseId) : courseQuery.eq('slug', courseSlug!);
+    const { data: course, error: courseErr } = await courseQuery.maybeSingle();
 
     if (courseErr) {
       return safeInternalError(courseErr, 'Failed to load course');
@@ -43,12 +41,12 @@ export async function GET(request: NextRequest) {
     }
 
     const [modulesRes, lessonsRes, jobsRes] = await Promise.all([
-      db.from('course_modules').select('id', { count: 'exact', head: true }).eq('course_id', courseId),
+      db.from('course_modules').select('id', { count: 'exact', head: true }).eq('course_id', course.id),
       db
         .from('course_lessons')
         .select('id, content, learning_objectives, video_status, video_url, media_origin, media_quality_status')
-        .eq('course_id', courseId),
-      db.from('video_jobs').select('id, status, review_status, retry_count, failure_class, error_message, lease_expires_at, dead_lettered_at').eq('course_id', courseId),
+        .eq('course_id', course.id),
+      db.from('video_jobs').select('id, status, review_status, retry_count, failure_class, error_message, lease_expires_at, dead_lettered_at').eq('course_id', course.id),
     ]);
 
     if (modulesRes.error) {

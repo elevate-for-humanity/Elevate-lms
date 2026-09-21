@@ -42,7 +42,50 @@ const allowedDomains = (
   .map((value) => value.trim().toLowerCase())
   .filter(Boolean);
 const sessions = new Map();
+const workspaceRoot = process.env.STUDIO_WORKSPACE_ROOT || '/workspace/project';
+const allowedExecCommands = new Set(['git', 'node', 'npm', 'npx', 'pnpm', 'python3', 'bash', 'ls', 'cat', 'grep', 'find', 'pwd']);
 let shuttingDown = false;
+
+function authorizedService(req) {
+  const supplied = String(req.headers['x-studio-browser-secret'] || '');
+  if (!sharedSecret || !supplied) return false;
+  const a = Buffer.from(supplied);
+  const b = Buffer.from(sharedSecret);
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+function safeWorkspacePath(relative = '') {
+  const clean = String(relative || '').replace(/^\/+/, '');
+  const resolved = path.resolve(workspaceRoot, clean);
+  if (resolved !== workspaceRoot && !resolved.startsWith(workspaceRoot + path.sep))
+    throw new BrowserServiceError('invalid_workspace_path', 400);
+  return resolved;
+}
+
+async function listWorkspace(relative = '') {
+  const dir = safeWorkspacePath(relative);
+  const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+  return Promise.all(entries.filter((entry) => entry.name !== 'node_modules' && entry.name !== '.git').slice(0, 500).map(async (entry) => {
+    const full = path.join(dir, entry.name);
+    const stat = await fs.promises.stat(full);
+    return { name: entry.name, type: entry.isDirectory() ? 'directory' : 'file', size: stat.size, modifiedAt: stat.mtime.toISOString() };
+  }));
+}
+
+async function executeWorkspaceCommand(body) {
+  const command = String(body.command || '').trim();
+  if (!command) throw new BrowserServiceError('command_required', 400);
+  const [binary, ...args] = Array.isArray(body.args) ? [command, ...body.args.map(String)] : command.split(/\s+/);
+  if (!allowedExecCommands.has(binary)) throw new BrowserServiceError('command_not_allowed', 400);
+  const cwd = safeWorkspacePath(String(body.cwd || ''));
+  const result = await execFileAsync(binary, args, {
+    cwd,
+    timeout: Math.min(120_000, Math.max(1_000, Number(body.timeoutMs || 30_000))),
+    maxBuffer: 10 * 1024 * 1024,
+    env: { ...process.env, HOME: '/home/studio' },
+  });
+  return { stdout: result.stdout, stderr: result.stderr, exitCode: 0 };
+}
 
 export class BrowserServiceError extends Error {
   constructor(code, status, options = {}) {
@@ -233,7 +276,7 @@ function corsHeaders() {
   return {
     'access-control-allow-origin': adminOrigin,
     'access-control-allow-headers': 'authorization,content-type,x-studio-browser-secret',
-    'access-control-allow-methods': 'GET,POST,DELETE,OPTIONS',
+    'access-control-allow-methods': 'GET,POST,PUT,DELETE,OPTIONS',
     'cache-control': 'no-store',
     'x-content-type-options': 'nosniff',
   };
@@ -919,6 +962,36 @@ const server = http.createServer(async (req, res) => {
         maxSessions,
         ready,
       });
+    }
+    if (url.pathname === '/workspace/files' && req.method === 'GET') {
+      if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
+      return json(res, 200, { root: workspaceRoot, entries: await listWorkspace(url.searchParams.get('path') || '') });
+    }
+    if (url.pathname === '/workspace/file' && req.method === 'GET') {
+      if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
+      const filePath = safeWorkspacePath(url.searchParams.get('path') || '');
+      const stat = await fs.promises.stat(filePath);
+      if (!stat.isFile() || stat.size > 10 * 1024 * 1024) throw new BrowserServiceError('invalid_workspace_file', 400);
+      return json(res, 200, { content: await fs.promises.readFile(filePath, 'utf8'), size: stat.size });
+    }
+    if (url.pathname === '/workspace/file' && req.method === 'PUT') {
+      if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
+      const body = await readBody(req);
+      const filePath = safeWorkspacePath(body.path || '');
+      const content = String(body.content ?? '');
+      if (Buffer.byteLength(content) > 10 * 1024 * 1024) throw new BrowserServiceError('workspace_file_too_large', 413);
+      await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+      await fs.promises.writeFile(filePath, content, 'utf8');
+      return json(res, 200, { ok: true });
+    }
+    if (url.pathname === '/workspace/exec' && req.method === 'POST') {
+      if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
+      try {
+        return json(res, 200, await executeWorkspaceCommand(await readBody(req)));
+      } catch (error) {
+        if (error instanceof BrowserServiceError) throw error;
+        return json(res, 200, { stdout: error?.stdout || '', stderr: error?.stderr || sanitizeReason(error), exitCode: Number(error?.code) || 1 });
+      }
     }
     if (req.method === 'POST' && url.pathname === '/admin/recycle') {
       if (!sharedSecret || req.headers['x-studio-browser-secret'] !== sharedSecret)

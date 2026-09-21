@@ -72,6 +72,54 @@ async function listWorkspace(relative = '') {
   }));
 }
 
+const terminalSessions = new Map();
+
+function shellSession(id) {
+  const session = terminalSessions.get(id);
+  if (!session) throw new BrowserServiceError('terminal_session_not_found', 404);
+  session.lastSeen = Date.now();
+  return session;
+}
+
+function createTerminalSession() {
+  const id = crypto.randomUUID();
+  const shell = spawn('/bin/bash', ['--noprofile', '--norc'], {
+    cwd: workspaceRoot,
+    env: { ...process.env, HOME: '/home/studio', TERM: 'xterm-256color' },
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+  const session = { id, shell, output: [], cursor: 0, lastSeen: Date.now(), exitCode: null };
+  const record = (stream, chunk) => {
+    const entry = { seq: ++session.cursor, stream, data: chunk.toString('utf8'), at: new Date().toISOString() };
+    session.output.push(entry);
+    if (session.output.length > 2000) session.output.shift();
+  };
+  shell.stdout.on('data', (chunk) => record('stdout', chunk));
+  shell.stderr.on('data', (chunk) => record('stderr', chunk));
+  shell.on('close', (code) => { session.exitCode = code ?? 0; record('system', Buffer.from(`\n[process exited ${session.exitCode}]\n`)); });
+  terminalSessions.set(id, session);
+  return session;
+}
+
+async function ensureRepository(body = {}) {
+  const repoUrl = String(body.repoUrl || process.env.STUDIO_REPOSITORY_URL || '');
+  const branch = String(body.branch || process.env.STUDIO_REPOSITORY_BRANCH || 'main');
+  if (!repoUrl) throw new BrowserServiceError('repository_not_configured', 503);
+  await fs.promises.mkdir(workspaceRoot, { recursive: true });
+  const gitDir = path.join(workspaceRoot, '.git');
+  if (!fs.existsSync(gitDir)) {
+    const entries = await fs.promises.readdir(workspaceRoot);
+    if (entries.length) throw new BrowserServiceError('workspace_not_empty', 409);
+    await execFileAsync('git', ['clone', '--depth', '1', '--branch', branch, repoUrl, workspaceRoot], { timeout: 120_000, maxBuffer: 10 * 1024 * 1024 });
+  } else {
+    await execFileAsync('git', ['fetch', 'origin', branch, '--prune'], { cwd: workspaceRoot, timeout: 60_000, maxBuffer: 10 * 1024 * 1024 });
+    await execFileAsync('git', ['checkout', branch], { cwd: workspaceRoot, timeout: 30_000, maxBuffer: 10 * 1024 * 1024 });
+    await execFileAsync('git', ['pull', '--ff-only', 'origin', branch], { cwd: workspaceRoot, timeout: 60_000, maxBuffer: 10 * 1024 * 1024 });
+  }
+  const { stdout } = await execFileAsync('git', ['rev-parse', 'HEAD'], { cwd: workspaceRoot });
+  return { ok: true, branch, sha: stdout.trim() };
+}
+
 async function executeWorkspaceCommand(body) {
   const command = String(body.command || '').trim();
   if (!command) throw new BrowserServiceError('command_required', 400);
@@ -963,6 +1011,35 @@ const server = http.createServer(async (req, res) => {
         ready,
       });
     }
+    if (url.pathname === '/workspace/repository/sync' && req.method === 'POST') {
+      if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
+      return json(res, 200, await ensureRepository(await readBody(req)));
+    }
+    if (url.pathname === '/workspace/terminal' && req.method === 'POST') {
+      if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
+      const session = createTerminalSession();
+      return json(res, 201, { id: session.id, cwd: workspaceRoot });
+    }
+    const terminalMatch = url.pathname.match(/^\/workspace\/terminal\/([^/]+)(?:\/(input|output))?$/);
+    if (terminalMatch) {
+      if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
+      const session = shellSession(terminalMatch[1]);
+      if (req.method === 'POST' && terminalMatch[2] === 'input') {
+        const body = await readBody(req);
+        const data = String(body.data || '').slice(0, 16000);
+        session.shell.stdin.write(data);
+        return json(res, 200, { ok: true });
+      }
+      if (req.method === 'GET' && terminalMatch[2] === 'output') {
+        const after = Number(url.searchParams.get('after') || 0);
+        return json(res, 200, { output: session.output.filter((item) => item.seq > after), cursor: session.cursor, exitCode: session.exitCode });
+      }
+      if (req.method === 'DELETE' && !terminalMatch[2]) {
+        session.shell.kill('SIGTERM');
+        terminalSessions.delete(session.id);
+        return json(res, 200, { ok: true });
+      }
+    }
     if (url.pathname === '/workspace/files' && req.method === 'GET') {
       if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
       return json(res, 200, { root: workspaceRoot, entries: await listWorkspace(url.searchParams.get('path') || '') });
@@ -1091,6 +1168,8 @@ async function shutdown() {
   shuttingDown = true;
   clearInterval(cleanupTimer);
   clearInterval(heartbeatTimer);
+  for (const session of terminalSessions.values()) session.shell.kill('SIGTERM');
+  terminalSessions.clear();
   await withTimeout(
     Promise.all([...sessions.keys()].map(destroySession)).then(() => browserManager.shutdown()),
     10_000,

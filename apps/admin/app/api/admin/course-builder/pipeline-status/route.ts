@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       db.from('course_modules').select('id', { count: 'exact', head: true }).eq('course_id', course.id),
       db
         .from('course_lessons')
-        .select('id, content, learning_objectives, video_status, video_url, media_origin, media_quality_status')
+        .select('id, title, slug, order_index, content, learning_objectives, video_status, video_url, media_origin, media_quality_status')
         .eq('course_id', course.id),
       db.from('video_jobs').select('id, status, review_status, retry_count, failure_class, error_message, lease_expires_at, dead_lettered_at').eq('course_id', course.id),
     ]);
@@ -72,6 +72,16 @@ export async function GET(request: NextRequest) {
     let videosPending = 0;
     let videosFailed = 0;
     let videosMissing = 0;
+    const mediaGaps: Array<{
+      lessonId: string;
+      title: string;
+      slug: string;
+      orderIndex: number;
+      videoStatus: string;
+      mediaOrigin: string | null;
+      qualityStatus: string | null;
+      reason: 'missing' | 'pending' | 'failed' | 'qa_pending';
+    }> = [];
 
     for (const lesson of lessons) {
       const hasContent =
@@ -102,12 +112,30 @@ export async function GET(request: NextRequest) {
       const qualityApproved = lesson.media_quality_status === 'approved';
       if (VIDEO_COMPLETE_STATES.has(state) && hasVideoUrl && qualityApproved) {
         videosComplete += 1;
-      } else if (VIDEO_PENDING_STATES.has(state)) {
-        videosPending += 1;
-      } else if (VIDEO_FAILED_STATES.has(state)) {
-        videosFailed += 1;
       } else {
-        videosMissing += 1;
+        let reason: 'missing' | 'pending' | 'failed' | 'qa_pending' = 'missing';
+        if (VIDEO_PENDING_STATES.has(state)) {
+          videosPending += 1;
+          reason = 'pending';
+        } else if (VIDEO_FAILED_STATES.has(state)) {
+          videosFailed += 1;
+          reason = 'failed';
+        } else if (hasVideoUrl && !qualityApproved) {
+          videosMissing += 1;
+          reason = 'qa_pending';
+        } else {
+          videosMissing += 1;
+        }
+        mediaGaps.push({
+          lessonId: lesson.id,
+          title: lesson.title ?? 'Untitled lesson',
+          slug: lesson.slug ?? '',
+          orderIndex: Number(lesson.order_index ?? 0),
+          videoStatus: state || 'missing',
+          mediaOrigin: lesson.media_origin ?? null,
+          qualityStatus: lesson.media_quality_status ?? null,
+          reason,
+        });
       }
     }
 
@@ -175,6 +203,7 @@ export async function GET(request: NextRequest) {
         retryBudgetExhausted,
         deadLetterJobs,
       },
+      mediaGaps: mediaGaps.sort((a, b) => a.orderIndex - b.orderIndex),
       nextAction: isComplete
         ? 'Course generation pipeline complete.'
         : mediaReady

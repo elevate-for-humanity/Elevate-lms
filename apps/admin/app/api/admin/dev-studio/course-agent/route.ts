@@ -14,6 +14,7 @@ import {
 import { startAgenticRun } from '@/lib/agentic/orchestrator';
 import { runAgenticExecutorOnce } from '@/lib/agentic/executor';
 import { runPersistedCourseProcurementHealthCheckWithClient } from '@/lib/course-builder/persisted-publish-service';
+import { recordMasterStudioArtifact } from '@/lib/studio/master-runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -84,6 +85,8 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => ({}));
   const action = text(body.action) ?? 'start';
+  const studioRunId = text(body.studioRunId);
+  const studioRunStepId = text(body.studioRunStepId);
 
   if (action === 'resume-after-review') {
     const projectId = text(body.projectId);
@@ -258,6 +261,12 @@ export async function POST(req: NextRequest) {
           inputMode: 'text',
         });
         await runAgenticExecutorOnce({ runId: existingRun.id });
+        if (studioRunId) await recordMasterStudioArtifact(db, {
+          runId: studioRunId, stepId: studioRunStepId ?? undefined,
+          type: 'course-build', name: `Course build ${existingRun.id}`,
+          status: 'generated', metadata: { agentic_project_id: existingProject.id, agentic_run_id: existingRun.id, course_id: courseId, reused: true },
+          evidence: [{ source: 'course-agent', captured_at: new Date().toISOString() }],
+        }).catch(() => undefined);
         return NextResponse.json({
           ok: true,
           reused: true,
@@ -309,6 +318,12 @@ export async function POST(req: NextRequest) {
 
   // Wake the durable executor immediately; its claim is atomic and safe alongside the background poller.
   await runAgenticExecutorOnce({ runId: started.run.id });
+  if (studioRunId) await recordMasterStudioArtifact(db, {
+    runId: studioRunId, stepId: studioRunStepId ?? undefined,
+    type: 'course-build', name: `Course build ${started.run.id}`,
+    status: 'generated', metadata: { agentic_project_id: created.project.id, agentic_run_id: started.run.id, course_id: courseId, program_id: programId },
+    evidence: [{ source: 'course-agent', captured_at: new Date().toISOString() }],
+  }).catch(() => undefined);
 
   return NextResponse.json({
     ok: true,

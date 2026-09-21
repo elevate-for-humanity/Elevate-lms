@@ -40,7 +40,7 @@ export async function checkBarberSuspension(
 ): Promise<NextResponse | null> {
   const { data: sub } = await db
     .from('barber_subscriptions')
-    .select('payment_status, suspension_deadline')
+    .select('payment_status, suspension_deadline, billing_exception_until')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(1)
@@ -50,6 +50,13 @@ export async function checkBarberSuspension(
   if (!sub) return null;
 
   const status = sub.payment_status as string | null;
+  const exceptionUntil = sub.billing_exception_until
+    ? new Date(sub.billing_exception_until as string)
+    : null;
+
+  // Sponsor-approved temporary billing exceptions preserve clock/hour access
+  // only through the recorded expiration. After expiration, normal enforcement applies.
+  if (exceptionUntil && exceptionUntil >= new Date()) return null;
 
   if (status === 'suspended') {
     return NextResponse.json(

@@ -132,7 +132,7 @@ export default function StudioCommandWorkspace({
     const browserIntent =
       Boolean(explicitUrl) || /\b(envato|browser|website|download|sign[ -]?in)\b/i.test(command);
     setBrowserTarget(
-      explicitUrl || (/\benvato\b/i.test(command) ? 'https://elements.envato.com' : ''),
+      explicitUrl || (/\benvato\b/i.test(command) ? 'https://app.envato.com' : ''),
     );
     setBrowserCommand(browserIntent ? command : '');
     setSurface(

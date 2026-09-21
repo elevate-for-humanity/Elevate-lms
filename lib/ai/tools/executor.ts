@@ -339,7 +339,8 @@ export async function executeRegisteredAITool(
             ? {
                 ...input,
                 confirmationText: context.confirmationText,
-                studioRunId: context.correlationId?.startsWith('studio-run:') ? context.correlationId.slice('studio-run:'.length) : undefined,
+                studioRunId: input.studioRunId ?? (context.correlationId?.startsWith('studio-run:') ? context.correlationId.slice('studio-run:'.length) : undefined),
+                studioRunStepId: input.studioRunStepId,
               }
             : {
                 ...input,

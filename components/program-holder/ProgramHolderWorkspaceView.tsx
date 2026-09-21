@@ -309,6 +309,9 @@ export async function ProgramHolderWorkspaceView({
           <p className="mt-2 text-sm text-slate-700">
             Territory: <strong>{String(regionalAssignment.scope || 'Assigned region')}</strong>. Your dashboard is linked to the Gary regional team while preserving your individual login and audit history.
           </p>
+          <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
+            <strong>Applicant routing:</strong> Your Gary regional queue includes applicants across all Elevate programs whose residence is within the assigned 30-mile Gary service area when no local Program Holder controls that applicant/program. Applicants outside your regional territory must not be worked from this dashboard. When an approved local Program Holder is assigned, Elevate may transfer the program-specific applicant to that holder while preserving the regional audit history.
+          </div>
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             <div className="rounded-xl border border-slate-200 bg-white p-4">
               <h3 className="font-black text-slate-950">How the role works</h3>

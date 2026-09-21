@@ -27,7 +27,8 @@ function normalizeAdminTarget(url: string, adminUrl: string): string {
   if (!url.startsWith(adminUrl)) return url;
   return url
     .replace(`${adminUrl}/admin/studio`, `${adminUrl}/studio`)
-    .replace(`${adminUrl}/admin/course-builder`, `${adminUrl}/course-builder`)
+    .replace(`${adminUrl}/admin/course-builder`, `${adminUrl}/studio/courses`)
+    .replace(`${adminUrl}/course-builder`, `${adminUrl}/studio/courses`)
     .replace(`${adminUrl}/admin`, `${adminUrl}/dashboard`);
 }
 
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
       { label: 'Programs', url: `${siteUrl}/programs` },
       { label: 'Apply', url: `${siteUrl}/apply` },
       { label: 'Admin Dashboard', url: `${adminUrl}/dashboard` },
-      { label: 'Course Builder', url: `${adminUrl}/course-builder` },
+      { label: 'Master Course Builder', url: `${adminUrl}/studio/courses` },
       { label: 'Dev Studio', url: `${adminUrl}/studio` },
       { label: 'LMS', url: process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org' },
     ],

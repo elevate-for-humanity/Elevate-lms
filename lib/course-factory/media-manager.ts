@@ -266,7 +266,7 @@ async function verifyPlayableRows(rows: VideoJob[]) {
 export async function getCourseMediaState(courseId: string, options: { verifyUrls?: boolean } = {}): Promise<CourseMediaState> {
   const db = await requireAdminClient();
   const [{ data: lessons, error: lessonError }, { data: jobs, error: jobError }] = await Promise.all([
-    db.from('course_lessons').select('id,content_json,video_config,video_status,video_url,video_job_id,generation_status').eq('course_id', courseId),
+    db.from('course_lessons').select('id,content_json,video_config,video_status,video_url,video_job_id,generation_status,media_origin,media_quality_status').eq('course_id', courseId),
     db.from('video_jobs').select('*').eq('course_id', courseId),
   ]);
   if (lessonError) throw lessonError;
@@ -288,12 +288,20 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
     const lessonJob = lessonJobs.get(lesson.id);
     const lessonUrl = typeof lesson.video_url === 'string' ? lesson.video_url.trim() : '';
     const jobUrl = typeof lessonJob?.video_url === 'string' ? lessonJob.video_url.trim() : '';
+    const approvedExternalMedia =
+      lesson.media_origin === 'uploaded' &&
+      lesson.media_quality_status === 'approved' &&
+      ['complete', 'completed'].includes(String(lesson.video_status ?? '').toLowerCase()) &&
+      Boolean(lessonUrl);
     if (
-      !lessonJob ||
-      lesson.generation_status !== 'generated' ||
-      lesson.video_job_id !== lessonJob.id ||
-      lesson.video_status !== lessonJob.status ||
-      (lessonJob.status === 'complete' && lessonUrl !== jobUrl)
+      !approvedExternalMedia &&
+      (
+        !lessonJob ||
+        lesson.generation_status !== 'generated' ||
+        lesson.video_job_id !== lessonJob.id ||
+        lesson.video_status !== lessonJob.status ||
+        (lessonJob.status === 'complete' && lessonUrl !== jobUrl)
+      )
     ) {
       lessonStateMismatches += 1;
     }

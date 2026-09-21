@@ -267,19 +267,6 @@ async function _POST(req: Request) {
     }
 
     const fingerprint = `${String(body.email || '').toLowerCase().trim()}|${program}|${normalizedPhone}`;
-    if (idempotencyKey) {
-      const claim = await claimIdempotencyKey(idempotencyKey, fingerprint);
-      if (claim.duplicate) {
-        return NextResponse.json(
-          {
-            error: claim.samePayload
-              ? 'Duplicate submission detected. Your application is already being processed.'
-              : 'Idempotency key has already been used with a different payload.',
-          },
-          { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
-        );
-      }
-    }
 
     const supabase = await getAdminClient();
 
@@ -416,6 +403,24 @@ async function _POST(req: Request) {
       );
     }
 
+    // Claim idempotency only after validation and existing-application checks.
+    // Claiming earlier made a transient database or dependency failure reserve
+    // the browser's key for 24 hours, so every retry was rejected even though
+    // no application had been created.
+    if (idempotencyKey) {
+      const claim = await claimIdempotencyKey(idempotencyKey, fingerprint);
+      if (claim.duplicate) {
+        return NextResponse.json(
+          {
+            error: claim.samePayload
+              ? 'Duplicate submission detected. Your application is already being processed.'
+              : 'Idempotency key has already been used with a different payload.',
+          },
+          { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+        );
+      }
+    }
+
     // Generate reference number
     const referenceNumber = `EFH-${Date.now().toString(36).toUpperCase()}`;
 
@@ -511,11 +516,56 @@ async function _POST(req: Request) {
       modality_preference: modalityPreference,
     };
 
-    let { data, error }: any = await supabase
-      .from('applications')
-      .insert(corePayload)
-      .select()
-      .maybeSingle();
+    let data: any = null;
+    let error: any = null;
+
+    // PostgREST or the database can briefly be unavailable during a deployment
+    // or connection-pool rotation. Retry only transport/server failures; never
+    // retry validation, constraint, or authorization failures here.
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      const result = await supabase
+        .from('applications')
+        .insert(corePayload)
+        .select()
+        .maybeSingle();
+      data = result.data;
+      error = result.error;
+      if (!error || data) break;
+
+      const status = Number((error as any)?.status || (error as any)?.statusCode || 0);
+      const message = String((error as any)?.message || '').toLowerCase();
+      const transient =
+        status === 408 ||
+        status === 429 ||
+        status >= 500 ||
+        message.includes('timeout') ||
+        message.includes('timed out') ||
+        message.includes('connection') ||
+        message.includes('fetch failed') ||
+        message.includes('temporarily unavailable');
+      if (!transient || attempt === 3) break;
+
+      // A connection can fail after Postgres commits but before PostgREST
+      // returns the row. Recover that exact submission before retrying so a
+      // transport failure cannot create a duplicate application.
+      const recovery = await supabase
+        .from('applications')
+        .select('*')
+        .eq('reference_number', referenceNumber)
+        .maybeSingle();
+      if (!recovery.error && recovery.data) {
+        data = recovery.data;
+        error = null;
+        break;
+      }
+
+      logger.warn('[api/applications] transient insert failure; retrying', {
+        attempt,
+        status,
+        code: (error as any)?.code,
+      });
+      await new Promise((resolve) => setTimeout(resolve, attempt * 250));
+    }
 
     // Three-tier retry - each tier strips more columns to handle DB environments
     // where migrations haven't been applied yet.

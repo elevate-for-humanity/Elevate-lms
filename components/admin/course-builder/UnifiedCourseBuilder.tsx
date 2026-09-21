@@ -58,7 +58,7 @@ const TABS: Array<{ id: Tab; label: string; icon: any }> = [
   { id: 'courses', label: 'Courses', icon: BookOpen },
   { id: 'ai', label: 'Talk to Course Builder', icon: Sparkles },
   { id: 'blueprints', label: 'Blueprints', icon: Boxes },
-  { id: 'media', label: 'Video + Audio', icon: Video },
+  { id: 'media', label: 'Media Library', icon: Video },
   { id: 'registry', label: 'Credential Registry', icon: Award },
 ];
 

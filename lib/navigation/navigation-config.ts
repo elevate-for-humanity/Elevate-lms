@@ -166,6 +166,12 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
         { id: 'hours', label: 'Work Hours', href: p('apprentice', 'hours'), icon: Clock },
         { id: 'timeclock', label: 'Timeclock', href: p('apprentice', 'timeclock'), icon: Clock },
         {
+          id: 'timeclock-policy',
+          label: 'Clock & Geofence Rules',
+          href: p('apprentice', 'policies/timeclock'),
+          icon: Shield,
+        },
+        {
           id: 'competencies',
           label: 'Competencies',
           href: p('apprentice', 'competencies'),
@@ -177,6 +183,12 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
           label: 'Billing & Payments',
           href: p('apprentice', 'billing'),
           icon: ClipboardCheck,
+        },
+        {
+          id: 'payment-policy',
+          label: 'Payment Rules',
+          href: p('apprentice', 'policies/payments'),
+          icon: Shield,
         },
         { id: 'rti', label: 'RTI', href: p('apprentice', 'rti'), icon: BookOpen },
         {

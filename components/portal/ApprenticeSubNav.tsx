@@ -9,10 +9,7 @@ import {
   apprenticeshipOrientationPath,
   apprenticeshipRtiLabel,
 } from '@/lib/portal/program-portal-paths';
-import {
-  BARBER_STUDENT_APP_HOME,
-  BARBER_STUDENT_APP_SHORT_LABEL,
-} from '@/lib/barber/student-app';
+import { BARBER_STUDENT_APP_HOME, BARBER_STUDENT_APP_SHORT_LABEL } from '@/lib/barber/student-app';
 
 function isActive(pathname: string, href: string, tabId: string): boolean {
   if (tabId === 'dashboard') return pathname === '/apprentice';
@@ -43,9 +40,11 @@ export function ApprenticeSubNav({
     ...(lmsCourseHref ? [{ id: 'course', label: rtiCourseLabelShort, href: lmsCourseHref }] : []),
     { id: 'hours', label: 'Hours', href: '/apprentice/hours' },
     { id: 'timeclock', label: 'Timeclock', href: APPRENTICE_TIMECLOCK_URL },
+    { id: 'timeclock-policy', label: 'Clock Rules', href: '/apprentice/policies/timeclock' },
     { id: 'competencies', label: 'Competencies', href: '/apprentice/competencies' },
     { id: 'documents', label: 'Documents', href: documentsHref },
     { id: 'billing', label: 'Billing', href: '/apprentice/billing' },
+    { id: 'payment-policy', label: 'Payment Rules', href: '/apprentice/policies/payments' },
     { id: 'handbook', label: 'Handbook', href: '/apprentice/handbook' },
     ...(programSlug === 'barber-apprenticeship'
       ? [{ id: 'mobile-app', label: BARBER_STUDENT_APP_SHORT_LABEL, href: BARBER_STUDENT_APP_HOME }]

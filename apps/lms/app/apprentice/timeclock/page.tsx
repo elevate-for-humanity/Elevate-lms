@@ -257,7 +257,11 @@ export default function TimeclockPage() {
         });
       }
     } catch (err) {
-      logger.error('Heartbeat failed', normalizeError(err, 'Heartbeat failed'), getErrorContext(err));
+      logger.error(
+        'Heartbeat failed',
+        normalizeError(err, 'Heartbeat failed'),
+        getErrorContext(err),
+      );
     }
   }, [shift.entryId, getLocation]);
 
@@ -470,6 +474,26 @@ export default function TimeclockPage() {
           </h1>
           <p className="text-sm text-slate-700 mb-6">{context.programName}</p>
 
+          <div className="mb-6 rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
+            <div className="flex gap-3">
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-800" />
+              <div>
+                <p className="font-black text-amber-950">Clock out before leaving the shop</p>
+                <p className="mt-1 text-sm font-semibold leading-6 text-amber-900">
+                  Clock in only after arriving inside the approved site radius. If you leave the
+                  geofence for {context.outsideGeofenceGraceMinutes} continuous minutes, the system
+                  may clock you out and no later time is accepted.
+                </p>
+                <Link
+                  href="/apprentice/policies/timeclock"
+                  className="mt-2 inline-flex text-sm font-black text-amber-950 underline"
+                >
+                  Read and sign the complete clocking policy
+                </Link>
+              </div>
+            </div>
+          </div>
+
           {/* Hours Progress */}
           <div className="mb-6 p-3 bg-brand-blue-50 rounded-lg">
             <div className="flex justify-between text-sm mb-1">
@@ -489,16 +513,25 @@ export default function TimeclockPage() {
           </div>
 
           {/* Weekly limits and attendance rules */}
-          <section className="mb-6 rounded-lg border border-brand-blue-200 bg-brand-blue-50 p-4" aria-labelledby="timeclock-rules-heading">
-            <h2 id="timeclock-rules-heading" className="font-bold text-slate-900">Weekly hours and timeclock rules</h2>
+          <section
+            className="mb-6 rounded-lg border border-brand-blue-200 bg-brand-blue-50 p-4"
+            aria-labelledby="timeclock-rules-heading"
+          >
+            <h2 id="timeclock-rules-heading" className="font-bold text-slate-900">
+              Weekly hours and timeclock rules
+            </h2>
             <div className="mt-3 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
               <div className="rounded-md bg-white p-3">
                 <p className="font-semibold text-slate-900">OJL this week</p>
-                <p className="text-brand-blue-700">{context.weeklyOjlHours} / {context.weeklyOjlMaxHours} hours</p>
+                <p className="text-brand-blue-700">
+                  {context.weeklyOjlHours} / {context.weeklyOjlMaxHours} hours
+                </p>
               </div>
               <div className="rounded-md bg-white p-3">
                 <p className="font-semibold text-slate-900">Recorded theory</p>
-                <p className="text-brand-blue-700">{context.weeklyTheoryRecordedHours} / {context.weeklyTheoryMaxHours} hours</p>
+                <p className="text-brand-blue-700">
+                  {context.weeklyTheoryRecordedHours} / {context.weeklyTheoryMaxHours} hours
+                </p>
               </div>
               <div className="rounded-md bg-white p-3">
                 <p className="font-semibold text-slate-900">Verified RTI</p>
@@ -507,12 +540,27 @@ export default function TimeclockPage() {
             </div>
             <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-800">
               <li>Do not exceed {context.weeklyOjlMaxHours} OJL/work hours in one week.</li>
-              <li>Complete at least {context.weeklyTheoryTargetHours} theory hours weekly; no more than {context.weeklyTheoryMaxHours} may be credited.</li>
-              <li>Combined OJL and theory may not exceed {context.weeklyCombinedMaxHours} hours per week.</li>
-              <li>Theory and workplace hours cannot overlap. Clock out before starting an online lesson.</li>
+              <li>
+                Complete at least {context.weeklyTheoryTargetHours} theory hours weekly; no more
+                than {context.weeklyTheoryMaxHours} may be credited.
+              </li>
+              <li>
+                Combined OJL and theory may not exceed {context.weeklyCombinedMaxHours} hours per
+                week.
+              </li>
+              <li>
+                Theory and workplace hours cannot overlap. Clock out before starting an online
+                lesson.
+              </li>
               <li>Clock in and out only at your approved Host Shop with location enabled.</li>
-              <li>Leaving the geofence continuously for {context.outsideGeofenceGraceMinutes} minutes automatically clocks you out.</li>
-              <li>Login alone does not earn theory credit. Active lesson time is recorded automatically, then reviewed before it becomes verified RTI.</li>
+              <li>
+                Leaving the geofence continuously for {context.outsideGeofenceGraceMinutes} minutes
+                automatically clocks you out.
+              </li>
+              <li>
+                Login alone does not earn theory credit. Active lesson time is recorded
+                automatically, then reviewed before it becomes verified RTI.
+              </li>
             </ul>
           </section>
 
@@ -547,7 +595,8 @@ export default function TimeclockPage() {
               <div className="flex items-center">
                 <AlertTriangle className="w-5 h-5 mr-2 text-yellow-600" />
                 <span className="text-sm text-yellow-700">
-                  {context.configurationMessage || 'No verified work site is assigned. Please contact your program coordinator.'}
+                  {context.configurationMessage ||
+                    'No verified work site is assigned. Please contact your program coordinator.'}
                 </span>
               </div>
             </div>
@@ -563,7 +612,10 @@ export default function TimeclockPage() {
                     {context.configurationMessage || 'Clock-in is not available for this account.'}
                   </p>
                   {context.configurationMessage?.includes('ID and selfie') && (
-                    <Link href="/verify-identity" className="mt-2 inline-flex text-sm font-bold text-brand-blue-700 hover:underline">
+                    <Link
+                      href="/verify-identity"
+                      className="mt-2 inline-flex text-sm font-bold text-brand-blue-700 hover:underline"
+                    >
                       Complete identity verification
                     </Link>
                   )}
@@ -664,7 +716,9 @@ export default function TimeclockPage() {
             {!isClockedIn ? (
               <button
                 onClick={() => handleAction('clock_in')}
-                disabled={actionLoading !== null || location.loading || !selectedSiteId || !context.canClock}
+                disabled={
+                  actionLoading !== null || location.loading || !selectedSiteId || !context.canClock
+                }
                 className="w-full flex items-center justify-center px-6 py-4 bg-brand-green-600 hover:bg-brand-green-700 disabled:bg-slate-400 text-white font-bold rounded-lg transition-colors"
               >
                 {actionLoading === 'clock_in' ? (
@@ -758,7 +812,10 @@ export default function TimeclockPage() {
                         {s.auto_clocked_out ? (
                           <XCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
                         ) : s.clock_out_at ? (
-                          <span className="w-4 h-4 rounded-full bg-brand-green-500 inline-block flex-shrink-0" aria-hidden="true" />
+                          <span
+                            className="w-4 h-4 rounded-full bg-brand-green-500 inline-block flex-shrink-0"
+                            aria-hidden="true"
+                          />
                         ) : (
                           <Clock className="w-4 h-4 text-brand-blue-500 flex-shrink-0 animate-pulse" />
                         )}

@@ -112,7 +112,7 @@ export default function CoursePipelineDiagram({ courseId }: { courseId: string }
       <div className="mt-5 grid gap-3 xl:grid-cols-8">
         {layers.map((layer, index) => {
           const Icon = layer.icon;
-          return <div key={layer.name} className={`relative rounded-xl border p-3 ${layer.name === 'Error' && alerts.length ? 'border-red-700 bg-red-950/30' : 'border-slate-700 bg-slate-950'}`}>
+          return <div key={layer.name} className={`relative rounded-xl border p-3 ${layer.name === 'Production' && alerts.length ? 'border-red-700 bg-red-950/30' : 'border-slate-700 bg-slate-950'}`}>
             <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-slate-300"><Icon className="h-4 w-4 text-cyan-400" />{layer.name}</div>
             <div className="mt-3 space-y-2">{layer.nodes.map((node) => <div key={node} className="rounded-lg border border-slate-800 bg-slate-900 px-2 py-2 text-xs text-slate-300">{node}</div>)}</div>
             {index < layers.length - 1 && <span className="absolute -right-2 top-1/2 z-10 hidden text-cyan-500 xl:block" aria-hidden>→</span>}

@@ -343,7 +343,7 @@ export default async function StudentDashboard() {
       href: '/lms/resume-builder',
       label: 'Resume Builder',
       text: 'Create, update, and save your professional resume.',
-      image: '/images/pages/career-counseling.jpg',
+      image: '/images/pages/career-services-page-5.webp',
     },
     {
       href: '/lms/calendar',

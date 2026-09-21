@@ -31,6 +31,10 @@ import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-progr
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 // Keep shared and preview navigation on the canonical LMS host.
 import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
+import {
+  APPRENTICE_POLICY_KEYS,
+  APPRENTICE_POLICY_VERSION,
+} from '@/lib/apprenticeship/apprentice-policy';
 
 export const metadata: Metadata = {
   title: 'Apprentice Dashboard',
@@ -166,6 +170,7 @@ export default async function ApprenticePortalPage() {
     { data: handbookAcceptance },
     { data: cosmetologyBilling },
     { data: theorySchedule },
+    { data: policyAcceptances },
   ] = await Promise.all([
     db
       .from('profiles')
@@ -192,9 +197,13 @@ export default async function ApprenticePortalPage() {
       .eq('handbook_version', '2026.2')
       .limit(1)
       .maybeSingle(),
-    programSlug === 'cosmetology-apprenticeship'
+    programSlug === 'cosmetology-apprenticeship' || programSlug === 'barber-apprenticeship'
       ? db
-          .from('cosmetology_subscriptions')
+          .from(
+            programSlug === 'barber-apprenticeship'
+              ? 'barber_subscriptions'
+              : 'cosmetology_subscriptions',
+          )
           .select('stripe_subscription_id,payment_status,setup_fee_paid,fully_paid')
           .eq('user_id', subject.userId)
           .order('created_at', { ascending: false })
@@ -211,6 +220,12 @@ export default async function ApprenticePortalPage() {
       .eq('active', true)
       .limit(1)
       .maybeSingle(),
+    db
+      .from('agreement_acceptances')
+      .select('agreement_key,agreement_version')
+      .eq('subject_type', 'apprentice')
+      .eq('subject_id', subject.userId)
+      .in('agreement_key', Object.values(APPRENTICE_POLICY_KEYS)),
   ]);
 
   const firstName = profile?.first_name || profile?.full_name?.split(' ')[0] || 'Apprentice';
@@ -320,6 +335,66 @@ export default async function ApprenticePortalPage() {
     },
   ] as const;
 
+  const acceptedPolicyKeys = new Set(
+    (policyAcceptances || [])
+      .filter((acceptance) => acceptance.agreement_version === APPRENTICE_POLICY_VERSION)
+      .map((acceptance) => acceptance.agreement_key),
+  );
+  const timeclockPolicyAccepted = acceptedPolicyKeys.has(APPRENTICE_POLICY_KEYS.timeclock);
+  const paymentPolicyAccepted = acceptedPolicyKeys.has(APPRENTICE_POLICY_KEYS.payment);
+  const paymentStatus = String(cosmetologyBilling?.payment_status || '').toLowerCase();
+  const paymentNeedsAction =
+    !cosmetologyBilling?.fully_paid &&
+    (paymentStatus === 'past_due' ||
+      paymentStatus === 'unpaid' ||
+      paymentStatus === 'incomplete' ||
+      paymentStatus === 'incomplete_expired');
+  const requiredPolicyPanel = (
+    <section className="rounded-3xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-6 shadow-sm sm:p-8">
+      <div className="flex gap-3">
+        <AlertCircle className="mt-1 h-6 w-6 shrink-0 text-amber-800" />
+        <div className="w-full">
+          <h2 className="text-xl font-black text-amber-950">Required apprentice policies</h2>
+          <p className="mt-1 text-sm font-semibold leading-6 text-amber-900">
+            Every apprentice must read and sign both policies. These pages remain in every new
+            apprentice dashboard.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Link
+              href="/apprentice/policies/timeclock"
+              className="rounded-2xl border border-amber-300 bg-white p-4 transition hover:shadow-md"
+            >
+              <p className="font-black text-slate-950">Timeclock & geofence</p>
+              <p className="mt-1 text-sm text-slate-700">
+                When and where to clock in and out, weekly limits, and automatic clock-out.
+              </p>
+              <p
+                className={`mt-3 text-xs font-black uppercase ${timeclockPolicyAccepted ? 'text-green-700' : 'text-red-700'}`}
+              >
+                {timeclockPolicyAccepted ? '✓ Signed' : 'Signature required'}
+              </p>
+            </Link>
+            <Link
+              href="/apprentice/policies/payments"
+              className="rounded-2xl border border-amber-300 bg-white p-4 transition hover:shadow-md"
+            >
+              <p className="font-black text-slate-950">Payments & communication</p>
+              <p className="mt-1 text-sm text-slate-700">
+                Call before the due date if there is a problem; nonpayment without communication is
+                enforced.
+              </p>
+              <p
+                className={`mt-3 text-xs font-black uppercase ${paymentPolicyAccepted ? 'text-green-700' : 'text-red-700'}`}
+              >
+                {paymentPolicyAccepted ? '✓ Signed' : 'Signature required'}
+              </p>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+
   if (!runtime.contract) {
     const billingConfigured = Boolean(
       cosmetologyBilling?.fully_paid || cosmetologyBilling?.stripe_subscription_id,
@@ -342,6 +417,18 @@ export default async function ApprenticePortalPage() {
         done: Boolean(handbookAcceptance?.id),
         href: '/apprentice/handbook',
         icon: ShieldCheck,
+      },
+      {
+        label: 'Read and sign the timeclock and geofence policy',
+        done: timeclockPolicyAccepted,
+        href: '/apprentice/policies/timeclock',
+        icon: Clock3,
+      },
+      {
+        label: 'Read and sign the payment and communication policy',
+        done: paymentPolicyAccepted,
+        href: '/apprentice/policies/payments',
+        icon: CreditCard,
       },
       {
         label: `Complete required documents${missingDocumentCount ? ` (${missingDocumentCount} remaining)` : ''}`,
@@ -444,6 +531,38 @@ export default async function ApprenticePortalPage() {
             </div>
           </div>
         </section>
+        {paymentNeedsAction ? (
+          <section className="rounded-3xl border-2 border-red-400 bg-red-50 p-6 shadow-sm">
+            <div className="flex gap-3">
+              <AlertCircle className="mt-1 h-6 w-6 shrink-0 text-red-700" />
+              <div>
+                <h2 className="text-xl font-black text-red-950">Payment action required</h2>
+                <p className="mt-2 font-semibold leading-7 text-red-900">
+                  Your account shows a payment problem. Call Elevate immediately, explain why the
+                  payment cannot be made, and keep communicating until an arrangement is confirmed.
+                  Do not ignore notices or simply stop paying. The signed agreement will be
+                  enforced, and continued nonpayment without communication may result in exit from
+                  the program.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Link
+                    href="/apprentice/billing"
+                    className="rounded-xl bg-red-800 px-4 py-3 font-black text-white"
+                  >
+                    Review billing
+                  </Link>
+                  <Link
+                    href="/contact?topic=billing"
+                    className="rounded-xl border border-red-300 bg-white px-4 py-3 font-black text-red-900"
+                  >
+                    Contact Elevate
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : null}
+        {requiredPolicyPanel}
         <section className="grid gap-4 sm:grid-cols-3">
           <Metric
             label={beautyProgram?.hostLabel || 'Host Shop'}
@@ -617,26 +736,78 @@ export default async function ApprenticePortalPage() {
         </div>
       </section>
 
+      {paymentNeedsAction ? (
+        <section className="rounded-3xl border-2 border-red-400 bg-red-50 p-6 shadow-sm">
+          <div className="flex gap-3">
+            <AlertCircle className="mt-1 h-6 w-6 shrink-0 text-red-700" />
+            <div>
+              <h2 className="text-xl font-black text-red-950">Payment action required</h2>
+              <p className="mt-2 font-semibold leading-7 text-red-900">
+                Your account shows a payment problem. Call Elevate immediately, explain why the
+                payment cannot be made, and keep communicating until an arrangement is confirmed. Do
+                not ignore notices or simply stop paying. The signed agreement will be enforced, and
+                continued nonpayment without communication may result in exit from the program.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Link
+                  href="/apprentice/billing"
+                  className="rounded-xl bg-red-800 px-4 py-3 font-black text-white"
+                >
+                  Review billing
+                </Link>
+                <Link
+                  href="/contact?topic=billing"
+                  className="rounded-xl border border-red-300 bg-white px-4 py-3 font-black text-red-900"
+                >
+                  Contact Elevate
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {requiredPolicyPanel}
+
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">Your employer placement</p>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
+              Your employer placement
+            </p>
             <h2 className="mt-2 text-2xl font-black text-slate-950">{shopName}</h2>
-            <p className="mt-2 text-sm font-semibold text-slate-700">Supervisor: {supervisorName}</p>
+            <p className="mt-2 text-sm font-semibold text-slate-700">
+              Supervisor: {supervisorName}
+            </p>
             {runtime.shop ? (
               <p className="mt-1 text-sm text-slate-600">
-                {[runtime.shop.address1, runtime.shop.address2, runtime.shop.city, runtime.shop.state, runtime.shop.zip].filter(Boolean).join(', ')}
+                {[
+                  runtime.shop.address1,
+                  runtime.shop.address2,
+                  runtime.shop.city,
+                  runtime.shop.state,
+                  runtime.shop.zip,
+                ]
+                  .filter(Boolean)
+                  .join(', ')}
               </p>
             ) : (
-              <p className="mt-1 text-sm font-bold text-amber-800">An employer or Host Shop has not been assigned yet.</p>
+              <p className="mt-1 text-sm font-bold text-amber-800">
+                An employer or Host Shop has not been assigned yet.
+              </p>
             )}
           </div>
-          <Link href="/apprentice/documents" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">
+          <Link
+            href="/apprentice/documents"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white"
+          >
             Open my forms and documents
           </Link>
         </div>
         <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm font-medium leading-6 text-slate-700">
-          Your enrollment agreement, student MOU, apprenticeship agreement, and acknowledgments are provided in your dashboard for electronic completion. Upload only your supporting evidence. Employer agreements and employer MOUs stay in the employer workspace.
+          Your enrollment agreement, student MOU, apprenticeship agreement, and acknowledgments are
+          provided in your dashboard for electronic completion. Upload only your supporting
+          evidence. Employer agreements and employer MOUs stay in the employer workspace.
         </p>
       </section>
 

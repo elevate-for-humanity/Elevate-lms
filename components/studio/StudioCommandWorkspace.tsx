@@ -73,6 +73,7 @@ export default function StudioCommandWorkspace({
   );
   const [previewUrl, setPreviewUrl] = useState('');
   const [browserTarget, setBrowserTarget] = useState('');
+  const [browserCommand, setBrowserCommand] = useState('');
   const [activeTask, setActiveTask] = useState<OrchestratedPlanCheckpoint | null>(null);
   const [activeCapability, setActiveCapability] = useState<string | null>(initialWorkspace ?? null);
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
@@ -128,11 +129,18 @@ export default function StudioCommandWorkspace({
   const handleCommandStart = (command: string) => {
     setActiveCapability(null);
     const explicitUrl = command.match(/https?:\/\/[^\s"'<>]+/i)?.[0]?.replace(/[),.;]+$/, '') ?? '';
-    setBrowserTarget(explicitUrl);
+    const browserIntent =
+      Boolean(explicitUrl) || /\b(envato|browser|website|download|sign[ -]?in)\b/i.test(command);
+    setBrowserTarget(
+      explicitUrl || (/\benvato\b/i.test(command) ? 'https://elements.envato.com' : ''),
+    );
+    setBrowserCommand(browserIntent ? command : '');
     setSurface(
-      /\b(course|lesson|curriculum|quiz|assessment|learning object|media)\b/i.test(command)
-        ? 'course'
-        : 'browser',
+      browserIntent
+        ? 'browser'
+        : /\b(course|lesson|curriculum|quiz|assessment|learning object|media)\b/i.test(command)
+          ? 'course'
+          : 'browser',
     );
   };
 
@@ -333,6 +341,8 @@ export default function StudioCommandWorkspace({
                 conversationId={activeConversationId}
                 autoStart={surface === 'capability' && activeCapability === 'browser'}
                 initialTarget={browserTarget}
+                initialTask={browserCommand}
+                autoRunTask={surface === 'capability' && activeCapability === 'browser'}
               />
             </div>
             <div
@@ -382,6 +392,8 @@ export default function StudioCommandWorkspace({
                 conversationId={activeConversationId}
                 autoStart={surface === 'browser'}
                 initialTarget={browserTarget}
+                initialTask={browserCommand}
+                autoRunTask={surface === 'browser'}
               />
             </div>
           </div>

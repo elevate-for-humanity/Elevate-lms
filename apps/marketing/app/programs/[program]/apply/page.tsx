@@ -35,6 +35,7 @@ export default function BeautyApplyPage() {
   const [eligibilityStatus, setEligibilityStatus] = useState<EligibilityStatus | null>(null);
   const [paymentPlan, setPaymentPlan] = useState<'full' | 'deposit'>('deposit');
   const [turnstileToken, setTurnstileToken] = useState('');
+  const [promoCode, setPromoCode] = useState('');
 
   // Redirects must run in useEffect — router.replace during render throws on SSR (location is not defined).
   useEffect(() => {
@@ -95,6 +96,22 @@ export default function BeautyApplyPage() {
 
     const form = e.currentTarget;
     const email = (form.elements.namedItem('email') as HTMLInputElement).value;
+    const normalizedPromoCode = promoCode.trim().toUpperCase();
+    if (normalizedPromoCode && !['OCT300', 'PAYFULL600'].includes(normalizedPromoCode)) {
+      setError('That coupon code is not valid. Use OCT300 for the deposit promotion or PAYFULL600 for the pay-in-full promotion.');
+      setLoading(false);
+      return;
+    }
+    if (normalizedPromoCode === 'OCT300' && paymentPlan === 'full') {
+      setError('OCT300 applies to the starting deposit only. Select the deposit payment option or use PAYFULL600 for pay in full.');
+      setLoading(false);
+      return;
+    }
+    if (normalizedPromoCode === 'PAYFULL600' && paymentPlan !== 'full') {
+      setError('PAYFULL600 applies only when paying tuition in full.');
+      setLoading(false);
+      return;
+    }
 
     const data = {
       firstName: (form.elements.namedItem('firstName') as HTMLInputElement).value,
@@ -106,6 +123,9 @@ export default function BeautyApplyPage() {
       programSlug: cfg.slug,
       programName: cfg.title,
       fundingType,
+      paymentPlan,
+      promoCode: normalizedPromoCode || null,
+      promotionDiscount: normalizedPromoCode === 'OCT300' ? 300 : normalizedPromoCode === 'PAYFULL600' ? 600 : 0,
       source: 'program-page',
       turnstileToken,
     };
@@ -214,6 +234,16 @@ export default function BeautyApplyPage() {
                 />
               </div>
             ))}
+
+            <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
+              <label className="block text-xs font-black uppercase tracking-wider text-amber-900 mb-2" htmlFor="promoCode">Promo / Coupon Code</label>
+              <input id="promoCode" name="promoCode" type="text" value={promoCode} onChange={(e) => setPromoCode(e.target.value.toUpperCase())} placeholder="Enter OCT300 or PAYFULL600" className="w-full rounded-lg border border-amber-300 bg-white px-3 py-2.5 text-sm font-bold uppercase focus:outline-none focus:ring-2 focus:ring-amber-500" />
+              <div className="mt-3 space-y-1 text-xs font-semibold text-slate-700">
+                <p><strong>OCT300:</strong> $300 off the regular $600 deposit — $300 to start through October 31, 2026.</p>
+                <p><strong>PAYFULL600:</strong> $600 off $6,000 tuition — $5,400 when paid in full.</p>
+                <p>First come, first served. Offers cannot be combined.</p>
+              </div>
+            </div>
 
             {/* Funding type */}
             <div>

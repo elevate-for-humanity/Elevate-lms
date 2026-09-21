@@ -175,6 +175,15 @@ const masterRuntime = read('lib/studio/master-runtime.ts');
 for (const invariant of ['ensureCanonicalStudioRun', 'prepareMasterStudioPlan', 'selectMasterStudioSpecialist', 'recordMasterStudioArtifact']) {
   if (!masterRuntime.includes(invariant)) fail(`Master Studio orchestration facade missing: ${invariant}`);
 }
+const workflowEngine = read('lib/workflows/engine.ts');
+if (!workflowEngine.includes('recordMasterStudioArtifact')) fail('Workflow engine is not linked to Master Studio evidence');
+const deploymentShell = read('apps/admin/app/api/admin/dev-studio/shell/route.ts');
+if (!deploymentShell.includes('recordMasterStudioArtifact')) fail('Deployment dispatch is not linked to Master Studio evidence');
+const courseAgent = read('apps/admin/app/api/admin/dev-studio/course-agent/route.ts');
+if (!courseAgent.includes('recordMasterStudioArtifact')) fail('Course agent is not linked to Master Studio evidence');
+const envatoRoute = read('apps/admin/app/api/admin/integrations/envato/route.ts');
+if (!envatoRoute.includes('upsertEnvatoWorkspaceManifest')) fail('Envato workspace batching is not linked to Master Studio');
+
 const capabilityAdapters = read('lib/studio/capability-adapters.ts');
 for (const capability of ['course','website','media','workflow','repository','browser','runtime','deployment','data','evaluation','memory','engineering']) {
   if (!capabilityAdapters.includes(`id: '${capability}'`)) fail(`Master Studio capability adapter missing: ${capability}`);

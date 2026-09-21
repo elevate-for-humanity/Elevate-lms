@@ -54,6 +54,17 @@ export function HomeBeautyPriority() {
           </p>
         </div>
 
+        <div className="mt-7 rounded-3xl border-2 border-amber-300 bg-amber-50 px-5 py-5 shadow-sm sm:px-7">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-amber-900">Limited-time enrollment offer</p>
+          <h3 className="mt-2 text-2xl font-black text-slate-950 sm:text-3xl">$300 off the deposit to start</h3>
+          <p className="mt-2 max-w-4xl text-base font-semibold leading-7 text-slate-800">
+            Barber, Cosmetology, Nail Technician, and Esthetician programs usually require $600 to get started. For a limited time, qualified applicants can receive $300 off the starting deposit.
+          </p>
+          <p className="mt-2 text-xs font-semibold text-slate-600">
+            Offer is subject to qualification and enrollment requirements. Program tuition and other charges are separate from this limited-time deposit offer.
+          </p>
+        </div>
+
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           {FEATURED_TRACKS.map(({ title, hours, focus, image, href, icon: Icon }) => (
             <article key={title} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">

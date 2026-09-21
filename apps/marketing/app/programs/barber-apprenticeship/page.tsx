@@ -22,6 +22,7 @@ import BeautyApprenticeshipAuthority, {
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 import heroBanners from '@/content/heroBanners';
 
+import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
@@ -89,6 +90,7 @@ export default async function BarberApprenticeshipPage() {
 
   return (
     <main className="min-h-screen bg-white text-slate-950">
+      <BeautyEnrollmentPromotion />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

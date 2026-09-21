@@ -279,6 +279,7 @@
     "audit:app-routes": "node scripts/audit-program-application-routes.mjs",
     "verify:system": "tsx scripts/verify-system.ts",
     "link:hvac-videos": "tsx scripts/link-hvac-videos.ts",
+    "build:retail-course": "tsx scripts/course-factory/build-retail-industry-fundamentals.ts",
     "verify": "pnpm typecheck && pnpm lint && pnpm build && pnpm smoke",
     "smoke": "node -e \"require('fs').access('.next', err => { if (err) { console.error('❌ .next not found — run pnpm build first'); process.exit(1); } else console.log('✅ Build OK'); })\"",
     "clean:full": "rimraf node_modules dist .vite .turbo .next out && pnpm store prune",

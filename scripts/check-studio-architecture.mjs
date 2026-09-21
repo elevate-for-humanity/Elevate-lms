@@ -172,7 +172,7 @@ for (const standaloneNavigation of ['<aside', 'fixed inset-y-0', 'lg:sticky']) {
 }
 
 const masterRuntime = read('lib/studio/master-runtime.ts');
-for (const invariant of ['ensureCanonicalStudioRun', 'prepareMasterStudioPlan', 'selectMasterStudioSpecialist']) {
+for (const invariant of ['ensureCanonicalStudioRun', 'prepareMasterStudioPlan', 'selectMasterStudioSpecialist', 'recordMasterStudioArtifact']) {
   if (!masterRuntime.includes(invariant)) fail(`Master Studio orchestration facade missing: ${invariant}`);
 }
 const capabilityAdapters = read('lib/studio/capability-adapters.ts');

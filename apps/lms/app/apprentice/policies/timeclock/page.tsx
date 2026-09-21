@@ -35,7 +35,7 @@ export default async function TimeclockPolicyPage() {
       </Link>
       <section className="relative min-h-[300px] overflow-hidden rounded-3xl shadow-xl">
         <Image
-          src="/images/pages/apprenticeship-structure.webp"
+          src="/images/pages/mentorship-page-3.webp"
           alt="Apprentice training at an approved work site"
           fill
           priority

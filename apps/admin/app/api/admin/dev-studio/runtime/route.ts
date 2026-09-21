@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { recordMasterStudioArtifact } from '@/lib/studio/master-runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -71,5 +73,23 @@ export async function POST(request: NextRequest) {
     signal: AbortSignal.timeout(120_000),
   });
   const payload = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
+  const runId = typeof body.studioRunId === 'string' ? body.studioRunId : '';
+  const stepId = typeof body.studioRunStepId === 'string' ? body.studioRunStepId : undefined;
+  if (response.ok && runId) {
+    const db = await requireAdminClient();
+    await recordMasterStudioArtifact(db, {
+      runId,
+      stepId,
+      type: operation === 'repository-sync' ? 'repository-checkpoint' : operation.startsWith('terminal') ? 'terminal-checkpoint' : 'runtime-execution',
+      name: operation,
+      status: 'verified',
+      metadata: {
+        operation,
+        command: operation === 'exec' ? command : undefined,
+        result: payload,
+      },
+      evidence: [{ source: 'master-studio-runtime', captured_at: new Date().toISOString() }],
+    }).catch(() => undefined);
+  }
   return NextResponse.json(payload, { status: response.status });
 }

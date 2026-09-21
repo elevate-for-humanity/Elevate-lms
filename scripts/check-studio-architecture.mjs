@@ -67,6 +67,18 @@ for (const invariant of [
 
 const browserAgentRoute = read('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
 const browserPlanner = read('lib/devstudio/browser-planner.ts');
+for (const retired of [
+  'fly-containers/server.js',
+  'fly-containers/package.json',
+  'fly-containers/fly.toml',
+  'fly-containers/Dockerfile',
+  'cloudflare-workers/studio-ide/setup.sh',
+  'cloudflare-workers/studio-ide/package.json',
+  'cloudflare-workers/studio-ide/wrangler.toml',
+]) {
+  if (fs.existsSync(path.join(root, retired))) fail(`Retired competing Studio runtime returned: ${retired}`);
+}
+
 const browserRuntime = read('services/studio-browser/server.mjs');
 if (!browserRuntime.includes('process.env.STUDIO_BROWSER_EXECUTABLE_PATH')) {
   fail('Studio browser runtime does not use its configured system Chromium executable');

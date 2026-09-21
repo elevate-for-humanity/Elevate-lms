@@ -22,6 +22,8 @@ for (const file of [
   'components/studio/StudioCommandWorkspace.tsx',
   'lib/devstudio/workspace-registry.ts',
   'lib/devstudio/ellie-message-router.ts',
+  'lib/studio/master-runtime.ts',
+  'lib/studio/capability-adapters.ts',
   'lib/devstudio/course-builder-controller.ts',
   'lib/course-builder/orchestrator.ts',
   'Dockerfile.studio-browser',
@@ -163,6 +165,15 @@ const studioNavigation = read('apps/admin/app/studio/StudioNavigation.client.tsx
 for (const standaloneNavigation of ['<aside', 'fixed inset-y-0', 'lg:sticky']) {
   if (studioNavigation.includes(standaloneNavigation))
     fail(`Studio navigation reintroduced a standalone sidebar: ${standaloneNavigation}`);
+}
+
+const masterRuntime = read('lib/studio/master-runtime.ts');
+for (const invariant of ['ensureCanonicalStudioRun', 'prepareMasterStudioPlan', 'selectMasterStudioSpecialist']) {
+  if (!masterRuntime.includes(invariant)) fail(`Master Studio orchestration facade missing: ${invariant}`);
+}
+const capabilityAdapters = read('lib/studio/capability-adapters.ts');
+for (const capability of ['course','website','media','workflow','repository','browser','runtime','deployment','data','evaluation','memory','engineering']) {
+  if (!capabilityAdapters.includes(`id: '${capability}'`)) fail(`Master Studio capability adapter missing: ${capability}`);
 }
 
 const studioRoot = read('apps/admin/app/studio/page.tsx');

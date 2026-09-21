@@ -1,10 +1,9 @@
 /**
  * POST /api/admin/courses/ai-builder/chat
  *
- * Streaming AI chat for the course builder. The AI acts as an instructional
- * designer — it asks clarifying questions, then when it has enough context,
- * it generates a complete course draft and returns it as structured JSON
- * embedded in the stream.
+ * Streaming AI chat for the Course Builder. This endpoint is a paid-inference
+ * consumer, so every provider call must pass through the durable authorization
+ * gateway before the provider is invoked.
  *
  * Body: { messages: { role: 'user'|'assistant', content: string }[] }
  *
@@ -15,12 +14,18 @@
  */
 
 import { NextRequest } from 'next/server';
-import { getOpenAIClient } from '@/lib/ai/openai-client';
-import { getGroqClient } from '@/lib/ai/groq-client';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { refreshSecrets } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import {
+  executePaidInference,
+  paidArtifactFingerprint,
+  reservePaidInference,
+} from '@/lib/ai/paid-inference-gateway';
+import { getCourseBuilderCreditOwner } from '@/lib/course-builder/credits';
+import { aiChat } from '@/lib/ai/ai-service';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -90,115 +95,207 @@ RULES:
 - Always generate at least 2 modules.
 - After outputting the JSON, add a brief friendly summary of what you built.`;
 
+type CourseBuilderMessage = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
+function sendSse(controller: ReadableStreamDefaultController<Uint8Array>, encoder: TextEncoder, data: object) {
+  controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\\n\\n`));
+}
+
+function extractCourse(text: string): unknown | null {
+  const jsonMatch = text.match(/<<<COURSE_JSON>>>([\\s\\S]*?)<<<END_COURSE_JSON>>>/);
+  if (!jsonMatch) return null;
+  return JSON.parse(jsonMatch[1].trim());
+}
+
 export async function POST(request: NextRequest) {
-  try { await refreshSecrets(); } catch { /* non-fatal */ }
+  try {
+    try {
+      await refreshSecrets();
+    } catch {
+      // Secret hydration is best-effort; provider availability is checked below.
+    }
 
-  const rateLimited = await applyRateLimit(request, 'api');
-  if (rateLimited) return rateLimited;
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
 
-  const auth = await apiRequireAdmin(request);
-  if (auth.error) return auth.error;
+    const auth = await apiRequireAdmin(request);
+    if (auth.error) return auth.error;
 
-  const { messages } = (await request.json()) as {
-    messages: { role: 'user' | 'assistant'; content: string }[];
-  };
+    const body = (await request.json()) as {
+      messages: CourseBuilderMessage[];
+    };
 
-  if (!messages?.length) {
-    return new Response(JSON.stringify({ error: 'messages required' }), { status: 400 });
-  }
+    if (!Array.isArray(body.messages) || body.messages.length === 0) {
+      return new Response(JSON.stringify({ error: 'messages required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
-  // Prefer Groq (fast, free tier) — fall back to OpenAI
-  const useGroq = !!process.env.GROQ_API_KEY;
-  const useOpenAI = !!process.env.OPENAI_API_KEY;
+    const messages = body.messages
+      .filter(
+        (message): message is CourseBuilderMessage =>
+          (message?.role === 'user' || message?.role === 'assistant') &&
+          typeof message.content === 'string',
+      )
+      .map((message) => ({
+        role: message.role,
+        content: message.content.trim(),
+      }))
+      .filter((message) => message.content.length > 0);
 
-  if (!useGroq && !useOpenAI) {
-    return new Response(
-      JSON.stringify({ error: 'No AI provider configured. Add GROQ_API_KEY or OPENAI_API_KEY in Dev Studio → Secrets.' }),
-      { status: 503 }
+    if (!messages.length) {
+      return new Response(JSON.stringify({ error: 'messages required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const db = await requireAdminClient();
+    const creditOwner = await getCourseBuilderCreditOwner({
+      db,
+      userId: auth.id,
+      effectiveRoles: auth.effectiveRoles,
+    });
+    const tenantId = creditOwner.tenantId ?? null;
+    const scopeKey = tenantId ? `tenant:${tenantId}` : 'platform';
+
+    const artifactFingerprint = paidArtifactFingerprint({
+      operation: 'course-builder-chat',
+      systemPrompt: SYSTEM_PROMPT,
+      messages,
+    });
+    const paidProvider = process.env.AI_PROVIDER?.trim() || 'configured';
+    const paidModel =
+      process.env.AI_MODEL?.trim() ||
+      process.env.GROQ_MODEL?.trim() ||
+      process.env.COURSE_BUILDER_MODEL?.trim() ||
+      'configured';
+    const projectedCostMicros = Math.max(
+      0,
+      Number(process.env.COURSE_BUILDER_CHAT_PROJECTED_COST_MICROS ?? '100000'),
     );
-  }
 
-  const encoder = new TextEncoder();
+    const paidAuthorization = await reservePaidInference(db, {
+      scopeKey,
+      tenantId,
+      actorId: auth.id,
+      artifactFingerprint,
+      idempotencyKey: `course-builder-chat:${artifactFingerprint}`,
+      provider: paidProvider,
+      model: paidModel,
+      operation: 'course-builder-chat',
+      projectedCostMicros,
+    });
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      const send = (data: object) => {
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
-      };
+    if (paidAuthorization.decision !== 'approved' || !paidAuthorization.requestId) {
+      const message =
+        paidAuthorization.decision === 'approval_required'
+          ? 'Course Builder AI needs approval before this paid generation can run.'
+          : 'Course Builder AI is not authorized to run right now.';
+      return new Response(
+        JSON.stringify({
+          error: message,
+          decision: paidAuthorization.decision,
+          requestId: paidAuthorization.requestId,
+        }),
+        {
+          status: paidAuthorization.decision === 'budget_exceeded' ? 402 : 409,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
+    }
 
-      try {
-        const allMessages = [{ role: 'system' as const, content: SYSTEM_PROMPT }, ...messages];
+    const encoder = new TextEncoder();
 
-        let completion: AsyncIterable<any>;
-
-        if (useGroq) {
-          const groq = getGroqClient();
-          completion = await groq.chat.completions.create({
-            model: 'llama-3.3-70b-versatile',
-            messages: allMessages,
-            temperature: 0.4,
-            max_tokens: 8000,
-            stream: true,
+    const stream = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        try {
+          const paidExecution = await executePaidInference({
+            db,
+            authorize: async () => paidAuthorization,
+            dispatch: () =>
+              aiChat({
+                messages: [
+                  { role: 'system', content: SYSTEM_PROMPT },
+                  ...messages,
+                ],
+                temperature: 0.4,
+                maxTokens: 8000,
+              }),
           });
-        } else {
-          const openai = getOpenAIClient();
-          completion = await openai.chat.completions.create({
-            model: 'gpt-4.1',
-            messages: allMessages,
-            temperature: 0.4,
-            max_tokens: 8000,
-            stream: true,
-          });
-        }
 
-        let fullText = '';
-
-        for await (const chunk of completion) {
-          const delta = chunk.choices[0]?.delta?.content ?? '';
-          if (!delta) continue;
-          fullText += delta;
-
-          // Stream text to client, but hold back the JSON block
-          if (!fullText.includes('<<<COURSE_JSON>>>')) {
-            send({ type: 'text', content: delta });
-          } else {
-            // We're inside or past the JSON block — only stream text after it
-            const afterJson = fullText.split('<<<END_COURSE_JSON>>>')[1] ?? '';
-            if (afterJson && delta) {
-              send({ type: 'text', content: delta });
-            }
+          if (!paidExecution.value) {
+            throw new Error('Course Builder AI completed without a response.');
           }
-        }
 
-        // Extract course JSON if present
-        const jsonMatch = fullText.match(/<<<COURSE_JSON>>>([\s\S]*?)<<<END_COURSE_JSON>>>/);
-        if (jsonMatch) {
-          try {
-            const course = JSON.parse(jsonMatch[1].trim());
-            send({ type: 'course_ready', course });
-          } catch {
-            send({
+          const fullText = paidExecution.value.content ?? '';
+          if (!fullText.trim()) {
+            throw new Error('Course Builder AI returned an empty response.');
+          }
+
+          // Preserve the existing streaming UI contract even though the
+          // authorization gateway executes one durable, reconciled request.
+          const chunkSize = 240;
+          const jsonStart = fullText.indexOf('<<<COURSE_JSON>>>');
+          const textBeforeJson = jsonStart >= 0 ? fullText.slice(0, jsonStart) : fullText;
+          for (let index = 0; index < textBeforeJson.length; index += chunkSize) {
+            sendSse(controller, encoder, {
               type: 'text',
-              content: '\n\n⚠️ Course generation produced invalid JSON. Please try again.',
+              content: textBeforeJson.slice(index, index + chunkSize),
             });
           }
+
+          const course = extractCourse(fullText);
+          if (course) {
+            sendSse(controller, encoder, { type: 'course_ready', course });
+            const jsonEndMarker = '<<<END_COURSE_JSON>>>';
+            const jsonEnd = fullText.indexOf(jsonEndMarker);
+            const afterJson = jsonEnd >= 0 ? fullText.slice(jsonEnd + jsonEndMarker.length) : '';
+            for (let index = 0; index < afterJson.length; index += chunkSize) {
+              sendSse(controller, encoder, {
+                type: 'text',
+                content: afterJson.slice(index, index + chunkSize),
+              });
+            }
+          } else if (jsonStart < 0) {
+            // No structured draft yet: return the complete conversational answer.
+          } else {
+            sendSse(controller, encoder, {
+              type: 'text',
+              content: '\\n\\nCourse generation produced an invalid structured draft. Please try again.',
+            });
+          }
+
+          sendSse(controller, encoder, { type: 'done' });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          sendSse(controller, encoder, {
+            type: 'error',
+            message,
+          });
+        } finally {
+          controller.close();
         }
+      },
+    });
 
-        send({ type: 'done' });
-      } catch (err: any) {
-        send({ type: 'error', message: err.message });
-      } finally {
-        controller.close();
-      }
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache, no-store',
-      Connection: 'keep-alive',
-      'X-Accel-Buffering': 'no',
-    },
-  });
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-store',
+        Connection: 'keep-alive',
+        'X-Accel-Buffering': 'no',
+      },
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ error: message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 }

@@ -6,7 +6,7 @@ const HOME_VIDEO =
   'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4';
 
 const HOME_NARRATION =
-  "Welcome to Elevate for Humanity. You're in the right place to turn a career goal into a clear next step. If you want to earn while you learn, begin with our Barber or Cosmetology apprenticeships. You'll learn the skills, practice them with supervision at an approved Host Site, and track your progress along the way. Looking for career training instead? Explore HVAC, CDL, Bookkeeping, or Business. And here is the important part: your training may be free if you qualify for workforce funding. Approval is not automatic, but we will show you what to do. When you reach Paying for Training, choose Schedule WorkOne Orientation. Complete that appointment, then come back and select Start Elevate Funding Intake. Take your time as you explore. When you find the path that feels right, use the application link to get started.";
+  "Welcome to Elevate for Humanity. You're in the right place to turn a career goal into a clear next step. If you want to earn while you learn, begin with our Barber or Cosmetology apprenticeships. You'll learn the skills, practice them with supervision at an approved Host Site, and track your progress along the way. Looking for career training instead? Explore HVAC, CDL, Bookkeeping, or Business. And here is the important part: your training may be free to those who qualify for workforce funding. Approval is not automatic, but we will show you what to do. When you reach Paying for Training, choose Schedule WorkOne Orientation. Complete that appointment, then come back and select Start Elevate Funding Intake. Take your time as you explore. When you find the path that feels right, use the application link to get started.";
 
 const PROOF = [
   { icon: GraduationCap, label: 'Hands-on training' },
@@ -38,6 +38,12 @@ export function PlatformHubHero() {
               Learn, operate programs, coordinate employers, document compliance, and move people
               from application to credential in one connected system.
             </p>
+            <div className="mt-5 rounded-2xl border-2 border-emerald-300 bg-emerald-50 px-5 py-4">
+              <p className="text-xl font-black text-emerald-950">Training may be FREE to those who qualify.</p>
+              <p className="mt-1 text-sm font-semibold leading-6 text-emerald-900">
+                Workforce funding is available for eligible participants and approved programs. Eligibility and funding approval are not automatic.
+              </p>
+            </div>
             <div className="mt-7 grid gap-3 sm:grid-cols-3">
               <Link href="/programs" className="group rounded-2xl bg-brand-red-700 p-4 text-white no-underline hover:bg-brand-red-800 hover:no-underline">
                 <GraduationCap className="h-6 w-6" aria-hidden="true" />

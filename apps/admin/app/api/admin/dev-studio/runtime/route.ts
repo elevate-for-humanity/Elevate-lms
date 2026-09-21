@@ -24,9 +24,11 @@ export async function GET(request: NextRequest) {
   const { url, secret } = await runtimeConfig();
   const target = operation === 'files'
     ? `${url}/workspace/files?path=${encodeURIComponent(request.nextUrl.searchParams.get('path') || '')}`
-    : `${url}/health`;
+    : operation === 'terminal-output'
+      ? `${url}/workspace/terminal/${encodeURIComponent(request.nextUrl.searchParams.get('sessionId') || '')}/output?after=${encodeURIComponent(request.nextUrl.searchParams.get('after') || '0')}`
+      : `${url}/health`;
   const response = await fetch(target, {
-    headers: operation === 'files' ? { 'x-studio-browser-secret': secret } : {},
+    headers: operation === 'files' || operation === 'terminal-output' ? { 'x-studio-browser-secret': secret } : {},
     cache: 'no-store',
     signal: AbortSignal.timeout(20_000),
   });
@@ -40,18 +42,32 @@ export async function POST(request: NextRequest) {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
   const body = await request.json().catch(() => ({}));
+  const operation = String(body.operation || 'exec');
   const command = String(body.command || '').trim();
-  if (!command) return NextResponse.json({ error: 'command is required' }, { status: 400 });
+  if (operation === 'exec' && !command) return NextResponse.json({ error: 'command is required' }, { status: 400 });
   const { url, secret } = await runtimeConfig();
-  const response = await fetch(`${url}/workspace/exec`, {
+  const target = operation === 'repository-sync'
+    ? `${url}/workspace/repository/sync`
+    : operation === 'terminal-create'
+      ? `${url}/workspace/terminal`
+      : operation === 'terminal-input'
+        ? `${url}/workspace/terminal/${encodeURIComponent(String(body.sessionId || ''))}/input`
+        : `${url}/workspace/exec`;
+  const response = await fetch(target, {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-studio-browser-secret': secret },
-    body: JSON.stringify({
-      command,
-      args: Array.isArray(body.args) ? body.args : undefined,
-      cwd: typeof body.cwd === 'string' ? body.cwd : '',
-      timeoutMs: Number(body.timeoutMs || 30_000),
-    }),
+    body: JSON.stringify(operation === 'repository-sync'
+      ? { repoUrl: body.repoUrl, branch: body.branch }
+      : operation === 'terminal-input'
+        ? { data: body.data }
+        : operation === 'terminal-create'
+          ? {}
+          : {
+              command,
+              args: Array.isArray(body.args) ? body.args : undefined,
+              cwd: typeof body.cwd === 'string' ? body.cwd : '',
+              timeoutMs: Number(body.timeoutMs || 30_000),
+            }),
     signal: AbortSignal.timeout(120_000),
   });
   const payload = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));

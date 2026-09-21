@@ -31,6 +31,14 @@ export const retailIndustryFundamentalsBlueprint: CredentialBlueprint = {
   sourceAuthority: 'Elevate for Humanity',
   sourceReference:
     'Original Elevate retail-workforce competency framework aligned to publicly described retail industry fundamentals and customer-service competencies. NRF Foundation RISE Up testing remains external.',
+  alignmentAuthority: 'NRF Foundation RISE Up',
+  alignmentCredential: 'Retail Industry Fundamentals',
+  contentAuthorship: 'Elevate for Humanity',
+  externalAssessment: {
+    provider: 'NRF Foundation',
+    credential: 'RISE Up Retail Industry Fundamentals',
+    relationship: 'alignment-only',
+  },
   effectiveDate: '2026-09-21',
   expectedModuleCount: 5,
   expectedLessonCount: 30,

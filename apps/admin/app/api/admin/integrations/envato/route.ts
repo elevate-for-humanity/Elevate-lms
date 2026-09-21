@@ -12,6 +12,7 @@ import {
   type LicensedPurchase,
 } from '@/lib/course-builder/licensed-media';
 import { queueCourseLessonVideos } from '@/lib/course-factory/media-service';
+import { upsertEnvatoWorkspaceManifest, type EnvatoWorkspaceManifestItem } from '@/lib/course-builder/envato-workspace';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -204,8 +205,26 @@ const _POST = withAuth(
         courseId?: string;
         matchId?: string;
         lessonId?: string;
+        runId?: string;
+        workspaceName?: string;
+        envatoWorkspaceUrl?: string;
+        items?: EnvatoWorkspaceManifestItem[];
       };
       const db = await requireAdminClient();
+      if (input.action === 'workspace-manifest') {
+        if (!input.runId || !input.courseId || !input.workspaceName)
+          return NextResponse.json({ error: 'runId, courseId, and workspaceName are required' }, { status: 400 });
+        await courseOrg(db, input.courseId);
+        const manifest = await upsertEnvatoWorkspaceManifest({
+          db,
+          runId: input.runId,
+          courseId: input.courseId,
+          workspaceName: input.workspaceName,
+          envatoWorkspaceUrl: input.envatoWorkspaceUrl,
+          items: Array.isArray(input.items) ? input.items : [],
+        });
+        return NextResponse.json({ ok: true, manifest });
+      }
       if (input.action === 'sync') {
         if (!input.courseId)
           return NextResponse.json({ error: 'courseId is required' }, { status: 400 });

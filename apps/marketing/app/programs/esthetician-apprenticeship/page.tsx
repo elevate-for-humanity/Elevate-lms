@@ -1,5 +1,6 @@
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
-import { normalizePublicProgram } from '@/data/programs';
+
+import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';import { normalizePublicProgram } from '@/data/programs';
 import { ESTHETICIAN_APPRENTICESHIP } from '@/data/programs/esthetician-apprenticeship';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
@@ -107,6 +108,7 @@ export default async function EstheticianApprenticeshipPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
       />
+      <BeautyEnrollmentPromotion />
       <ProgramDetailPage
         program={program}
         banner={safeBanner}

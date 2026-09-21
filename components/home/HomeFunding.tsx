@@ -24,6 +24,7 @@ export function HomeFunding() {
           <h2 id="funding-heading" className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
             Not sure how you will pay? Start here.
           </h2>
+          <div className="mt-5 inline-flex rounded-full bg-emerald-100 px-5 py-2 text-sm font-black uppercase tracking-wide text-emerald-900">FREE to those who qualify</div>
           <p className="mt-4 text-lg leading-8 text-slate-700">
             Some students may qualify for workforce funding, employer-supported training, grants, or other assistance. Others choose self-pay. We help you understand which route may fit before you commit to a program.
           </p>

@@ -224,18 +224,25 @@ async function generateLocalNarration(text: string): Promise<Buffer> {
   });
 }
 
-async function generateGeminiNarration(text: string): Promise<Buffer> {
+async function generateGeminiNarration(text: string, instructorVoice: EdgeTTSVoice): Promise<Buffer> {
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new Error('GEMINI_API_KEY not configured');
   const model = process.env.GEMINI_TTS_MODEL?.trim() || DEFAULT_GEMINI_TTS_MODEL;
-  const voiceName = process.env.GEMINI_TTS_VOICE?.trim() || 'Kore';
+  const geminiVoiceByInstructor: Record<EdgeTTSVoice, string> = {
+    [EDGE_TTS_VOICES.marcus]: 'Charon',
+    [EDGE_TTS_VOICES.female]: 'Aoede',
+    [EDGE_TTS_VOICES.neutral]: 'Kore',
+    [EDGE_TTS_VOICES.british]: 'Algenib',
+    [EDGE_TTS_VOICES.warm]: 'Achird',
+  };
+  const voiceName = process.env.GEMINI_TTS_VOICE?.trim() || geminiVoiceByInstructor[instructorVoice];
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
     {
       method: 'POST',
       headers: { 'x-goog-api-key': apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text }] }],
+        contents: [{ parts: [{ text: `Speak as a real workforce instructor teaching one learner. Sound conversational, warm, confident, and human. Vary cadence naturally, pause at sentence and paragraph boundaries, emphasize important safety and technical terms, and avoid a flat announcer or robotic delivery. Do not read punctuation or formatting aloud.\n\n${text}` }] }],
         generationConfig: {
           responseModalities: ['AUDIO'],
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } },
@@ -267,6 +274,12 @@ async function generateElevenLabsNarration(text: string): Promise<Buffer> {
       body: JSON.stringify({
         text,
         model_id: process.env.ELEVENLABS_MODEL_ID?.trim() || 'eleven_multilingual_v2',
+        voice_settings: {
+          stability: 0.42,
+          similarity_boost: 0.78,
+          style: 0.35,
+          use_speaker_boost: true,
+        },
       }),
     },
   );
@@ -425,7 +438,7 @@ async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promi
       voice: mappedVoice,
       input: text,
       instructions:
-        'Speak as a clear, professional workforce instructor. Use a natural teaching pace, warm confidence, and precise pronunciation.',
+        'Speak as a real workforce instructor teaching one learner, not as an announcer. Sound conversational, warm, confident, and human. Vary cadence naturally, use brief pauses between ideas, emphasize important safety and technical terms, and pronounce trade vocabulary precisely. Never sound robotic or read punctuation aloud.',
       response_format: 'mp3',
     });
     return Buffer.from(await response.arrayBuffer());
@@ -461,7 +474,7 @@ export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}
     if (provider === 'cloudflare')
       return await generateCloudflareNarration(normalizedText, voice);
     if (provider === 'elevenlabs') return await generateElevenLabsNarration(normalizedText);
-    if (provider === 'gemini') return await generateGeminiNarration(normalizedText);
+    if (provider === 'gemini') return await generateGeminiNarration(normalizedText, voice);
     if (provider === 'openai') return await generateOpenAINarration(normalizedText, voice);
     if (provider === 'edge') {
       const audio = await tts(normalizedText, { voice, rate, pitch, volume });

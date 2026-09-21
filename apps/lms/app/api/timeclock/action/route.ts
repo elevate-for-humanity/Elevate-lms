@@ -295,13 +295,77 @@ async function _POST(request: NextRequest) {
         radiusM,
         accepted: false,
       });
-      sendEmail({
-        to: ADMIN_EMAIL,
-        subject: `Geofence violation: ${site.name ?? site_id}`,
-        text: `Blocked ${action}: apprentice ${apprentice.id} was ${distanceM}m from the approved site (allowed ${radiusM}m).`,
-        html: `<p>Blocked <strong>${action}</strong> for apprentice ${apprentice.id}.</p><p>Distance: ${distanceM}m; allowed radius: ${radiusM}m.</p><p>No time was accepted for this action.</p>`,
-      }).catch((error) => logger.warn('[Timeclock] geofence email failed', error));
-      return NextResponse.json({ error: 'Outside geofence', distance_m: distanceM, radius_m: radiusM }, { status: 403 });
+      const actionLabel: Record<TimeclockAction, string> = {
+        clock_in: 'clock in',
+        lunch_start: 'start lunch',
+        lunch_end: 'end lunch',
+        clock_out: 'clock out',
+      };
+      const siteLabel = site.name ?? 'your approved work site';
+      const studentGuidance =
+        action === 'clock_out'
+          ? 'You must clock out before leaving the shop radius. Return to the approved radius and try again.'
+          : action === 'clock_in'
+            ? 'You must be inside the shop radius to clock in. Enter the approved radius and try again.'
+            : 'You must be inside the shop radius to record this timeclock action. Return to the approved radius and try again.';
+      const studentSubject = `Timeclock ${actionLabel[action]} blocked — outside shop radius`;
+      const studentText = `Your attempt to ${actionLabel[action]} at ${siteLabel} was blocked because you were ${distanceM} meters from the shop. The allowed radius is ${radiusM} meters. No time was recorded. ${studentGuidance}`;
+      const studentHtml = `<p>Your attempt to <strong>${actionLabel[action]}</strong> at <strong>${siteLabel}</strong> was blocked because you were outside the approved shop radius.</p><p>Your distance from the shop: <strong>${distanceM} meters</strong><br />Allowed radius: <strong>${radiusM} meters</strong></p><p><strong>No time was recorded for this action.</strong></p><p>${studentGuidance}</p>`;
+
+      await db
+        .from('notifications')
+        .insert({
+          user_id: user.id,
+          type: 'timeclock',
+          title: studentSubject,
+          message: studentText,
+          action_label: 'Open timeclock',
+          action_url: APPRENTICE_TIMECLOCK_URL,
+          link: APPRENTICE_TIMECLOCK_URL,
+          read: false,
+          metadata: details,
+          idempotency_key: `timeclock-geofence-${user.id}-${action}-${details.timestamp}`,
+        })
+        .then(
+          () => {},
+          (error: unknown) => logger.warn('[Timeclock] student geofence notification failed', error),
+        );
+
+      const emailJobs = [
+        sendEmail({
+          to: ADMIN_EMAIL,
+          subject: `Geofence violation: ${site.name ?? site_id}`,
+          text: `Blocked ${action}: apprentice ${apprentice.id} was ${distanceM}m from the approved site (allowed ${radiusM}m).`,
+          html: `<p>Blocked <strong>${action}</strong> for apprentice ${apprentice.id}.</p><p>Distance: ${distanceM}m; allowed radius: ${radiusM}m.</p><p>No time was accepted for this action.</p>`,
+        }),
+      ];
+      if (user.email && user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+        emailJobs.push(
+          sendEmail({
+            to: user.email,
+            subject: studentSubject,
+            text: studentText,
+            html: studentHtml,
+          }),
+        );
+      }
+      await Promise.allSettled(emailJobs).then((results) => {
+        results.forEach((result) => {
+          if (result.status === 'rejected') {
+            logger.warn('[Timeclock] geofence email failed', result.reason);
+          }
+        });
+      });
+      return NextResponse.json(
+        {
+          error: 'Outside geofence',
+          message: studentText,
+          action,
+          distance_m: distanceM,
+          radius_m: radiusM,
+        },
+        { status: 403 },
+      );
     }
 
     const now = new Date();

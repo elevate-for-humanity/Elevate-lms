@@ -33,12 +33,12 @@ function canonicalPath(oldPath) {
   if (oldPath === '/admin' || oldPath === '/admin/') return '/dashboard';
 
   const mappings = [
-    ['/admin/studio/courses/create', '/course-builder'],
-    ['/admin/studio/courses/generate', '/course-builder'],
-    ['/admin/studio/courses', '/course-builder'],
-    ['/admin/studio/courseId', '/course-builder'],
-    ['/admin/course-builder', '/course-builder'],
-    ['/admin/quiz-builder', '/course-builder'],
+    ['/admin/studio/courses/create', '/studio/courses'],
+    ['/admin/studio/courses/generate', '/studio/courses'],
+    ['/admin/studio/courses', '/studio/courses'],
+    ['/admin/studio/courseId', '/studio/courses'],
+    ['/admin/course-builder', '/studio/courses'],
+    ['/admin/quiz-builder', '/studio/courses'],
     ['/admin/studio/workflows', '/studio/workflows'],
     ['/admin/studio', '/studio'],
     ['/admin/dashboard', '/dashboard'],

@@ -5,7 +5,7 @@
  * lesson_type and structured content. No inference from video_url presence.
  *
  * The lesson page imports this and routes rendering entirely off the result.
- * Legacy HVAC fallback logic is isolated behind the 'legacy_hvac' mode.
+ * HVAC uses the same canonical lesson renderer as every other course.
  */
 
 import { normalizeLessonType, type LessonType } from '@/lib/curriculum/lesson-types';
@@ -13,7 +13,6 @@ import {
   normalizeLessonContent,
   type LessonContent,
 } from '@/lib/curriculum/normalize-lesson-content';
-import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
 
 // ─── Render modes ─────────────────────────────────────────────────────────────
 
@@ -31,8 +30,7 @@ export type LessonRenderMode =
   | 'observation' // observation log + evidence
   | 'final_exam' // final exam player
   | 'capstone' // project instructions + rubric + evidence + evaluator review
-  | 'certification' // completion/certificate screen
-  | 'legacy_hvac'; // HVAC legacy path — isolated adapter
+  | 'certification'; // completion/certificate screen
 
 export interface LessonRenderConfig {
   mode: LessonRenderMode;
@@ -61,15 +59,6 @@ export interface LessonRenderConfig {
 export function getLessonRenderMode(lesson: Record<string, unknown>): LessonRenderConfig {
   const rawType = (lesson.lesson_type ?? lesson.step_type ?? lesson.content_type) as string;
   const lessonType = normalizeLessonType(rawType);
-
-  // HVAC legacy adapter — isolate before canonical path
-  const isHvacLegacy =
-    lesson.lesson_source === 'training' ||
-    (lesson.course_id === HVAC_COURSE_ID && !lesson.content_structured && lessonType === 'reading');
-
-  if (isHvacLegacy) {
-    return buildConfig('legacy_hvac', lessonType, lesson, false, false, false);
-  }
 
   // Canonical path — route entirely by lesson type
   const content = normalizeLessonContent(lesson.content_structured ?? lesson.content);

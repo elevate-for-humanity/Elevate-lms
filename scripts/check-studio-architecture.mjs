@@ -77,6 +77,10 @@ for (const unifiedRuntimeInvariant of [
   '/workspace/exec',
   'allowedExecCommands',
   'workspaceRoot',
+  '/workspace/terminal',
+  '/workspace/repository/sync',
+  'createTerminalSession',
+  'ensureRepository',
 ]) {
   if (!browserRuntime.includes(unifiedRuntimeInvariant))
     fail(`Unified Studio runtime is missing inherited execution capability: ${unifiedRuntimeInvariant}`);

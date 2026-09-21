@@ -29,6 +29,38 @@ export function prepareMasterStudioPlan(goal: string, params: Record<string, str
   };
 }
 
+export async function recordMasterStudioArtifact(
+  db: SupabaseClient,
+  input: {
+    runId: string;
+    stepId?: string;
+    type: string;
+    name: string;
+    uri?: string;
+    status?: 'draft' | 'generated' | 'validating' | 'verified' | 'failed' | 'published';
+    metadata?: Record<string, unknown>;
+    evidence?: Array<Record<string, unknown>>;
+  },
+) {
+  const { data, error } = await db.from('studio_run_artifacts').insert({
+    run_id: input.runId,
+    step_id: input.stepId ?? null,
+    artifact_type: input.type,
+    name: input.name,
+    uri: input.uri ?? null,
+    status: input.status ?? 'generated',
+    metadata: input.metadata ?? {},
+    evidence: input.evidence ?? [],
+  }).select('id').single();
+  if (error) throw error;
+  await appendStudioRunEvent(db, input.runId, 'artifact.recorded', input.name, {
+    artifact_id: data.id,
+    artifact_type: input.type,
+    status: input.status ?? 'generated',
+  }, input.stepId);
+  return data.id as string;
+}
+
 export async function createMasterStudioRun(
   db: SupabaseClient,
   input: {

@@ -11,6 +11,7 @@ import { emitEvent } from '@/lib/platform/events';
 import { sendEmail } from '@/lib/email/service';
 import { aiChat } from '@/lib/ai/ai-service';
 import { logger } from '@/lib/logger';
+import { recordMasterStudioArtifact } from '@/lib/studio/master-runtime';
 import {
   getWorkflowToolDefinition,
   isWorkflowMutationTableAllowed,
@@ -420,6 +421,7 @@ export async function executeWorkflow(
   triggerId?: string,
   traceId?: string,
   tenantId?: string,
+  studioContext?: { runId?: string; stepId?: string },
 ): Promise<{ runId: string; status: RunStatus; stepsRun: number; error?: string }> {
   const runStart = Date.now();
   const db = await requireAdminClient();
@@ -455,6 +457,18 @@ export async function executeWorkflow(
     })
     .select('id')
     .single();
+
+  if (studioContext?.runId && run) {
+    await recordMasterStudioArtifact(db, {
+      runId: studioContext.runId,
+      stepId: studioContext.stepId,
+      type: 'workflow-run',
+      name: `Workflow run ${run.id}`,
+      status: 'generated',
+      metadata: { workflow_id: workflowId, workflow_run_id: run.id, triggered_by: triggeredBy, trace_id: trace },
+      evidence: [{ source: 'workflow-engine', captured_at: new Date().toISOString() }],
+    }).catch(() => undefined);
+  }
 
   if (runErr || !run) {
     const err = runErr ? new Error(runErr.message) : new Error('Failed to create run record');

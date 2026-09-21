@@ -14,6 +14,16 @@ export default async function CdlTrainingPage() {
   return (
     <>
       <ProgramDetailPage program={p} banner={banner} />
+      <section className="border-b border-emerald-200 bg-emerald-50 px-4 py-8">
+        <div className="mx-auto max-w-6xl rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm sm:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Workforce-funded training</p>
+          <h2 className="mt-2 text-3xl font-black text-slate-950">FREE to those who qualify</h2>
+          <p className="mt-3 max-w-4xl leading-7 text-slate-700">Eligible Indiana participants may receive WIOA/workforce funding for approved CDL training costs. Funding requires participant eligibility and authorization by the responsible workforce agency.</p>
+          <p className="mt-3 text-sm font-semibold text-slate-600">If you do not qualify for funding, the published self-pay tuition is {p.selfPayCost || '$5,000'}. Ask admissions about available payment options.</p>
+          <Link href="/check-eligibility" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-5 py-3 text-sm font-black text-white hover:bg-emerald-800">Check Funding Eligibility</Link>
+        </div>
+      </section>
+
       <section className="border-t border-slate-200 bg-slate-950 px-4 py-12 text-white">
         <div className="mx-auto flex max-w-6xl flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>

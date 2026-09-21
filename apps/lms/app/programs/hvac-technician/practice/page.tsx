@@ -19,10 +19,10 @@ export default async function EPA608PracticePage() {
   if (!course) notFound();
 
   const { data: enrollment } = await db
-    .from('course_enrollments')
+    .from('enrollments')
     .select('id')
     .eq('course_id', course.id)
-    .eq('student_id', user.id)
+    .eq('user_id', user.id)
     .eq('status', 'active')
     .maybeSingle();
   if (!enrollment) redirect('/lms/dashboard');

@@ -101,11 +101,11 @@ type CourseBuilderMessage = {
 };
 
 function sendSse(controller: ReadableStreamDefaultController<Uint8Array>, encoder: TextEncoder, data: object) {
-  controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\\n\\n`));
+  controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
 }
 
 function extractCourse(text: string): unknown | null {
-  const jsonMatch = text.match(/<<<COURSE_JSON>>>([\\s\\S]*?)<<<END_COURSE_JSON>>>/);
+  const jsonMatch = text.match(/<<<COURSE_JSON>>>([\s\S]*?)<<<END_COURSE_JSON>>>/);
   if (!jsonMatch) return null;
   return JSON.parse(jsonMatch[1].trim());
 }
@@ -266,7 +266,7 @@ export async function POST(request: NextRequest) {
           } else {
             sendSse(controller, encoder, {
               type: 'text',
-              content: '\\n\\nCourse generation produced an invalid structured draft. Please try again.',
+              content: '\n\nCourse generation produced an invalid structured draft. Please try again.',
             });
           }
 

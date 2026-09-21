@@ -16,6 +16,18 @@ type PipelineSummary = {
   storageFailures: number;
   retryBudgetExhausted: number;
   deadLetterJobs: number;
+  videosMissing: number;
+  videosPending: number;
+  videosFailed: number;
+};
+type MediaGap = {
+  lessonId: string;
+  title: string;
+  orderIndex: number;
+  videoStatus: string;
+  mediaOrigin: string | null;
+  qualityStatus: string | null;
+  reason: 'missing' | 'pending' | 'failed' | 'qa_pending';
 };
 
 const layers = [
@@ -32,6 +44,7 @@ const layers = [
 export default function CoursePipelineDiagram({ courseId }: { courseId: string }) {
   const [overlays, setOverlays] = useState<Overlay[]>(['critical', 'storage', 'stale', 'retry']);
   const [summary, setSummary] = useState<PipelineSummary | null>(null);
+  const [mediaGaps, setMediaGaps] = useState<MediaGap[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -44,6 +57,7 @@ export default function CoursePipelineDiagram({ courseId }: { courseId: string }
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || 'Unable to load pipeline status');
       setSummary(payload.summary);
+      setMediaGaps(Array.isArray(payload.mediaGaps) ? payload.mediaGaps : []);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Unable to load pipeline status');
     } finally {
@@ -115,6 +129,23 @@ export default function CoursePipelineDiagram({ courseId }: { courseId: string }
         <Metric label="Failed" value={summary.failedJobs} />
         <Metric label="Approved" value={summary.approvedJobs} />
         <Metric label="Dead letter" value={summary.deadLetterJobs} />
+      </div>}
+      {mediaGaps.length > 0 && <div className="mt-4 rounded-xl border border-amber-800 bg-amber-950/20 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 className="font-bold text-amber-100">Lesson media gaps</h3>
+            <p className="text-xs text-amber-200/70">Exact lessons still waiting for media, rendering, or QA approval.</p>
+          </div>
+          <span className="rounded-full bg-amber-900/60 px-2.5 py-1 text-xs font-bold text-amber-100">{mediaGaps.length} open</span>
+        </div>
+        <div className="mt-3 max-h-72 overflow-y-auto">
+          {mediaGaps.map((gap) => (
+            <div key={gap.lessonId} className="flex flex-wrap items-center justify-between gap-2 border-t border-amber-900/50 py-2 text-sm first:border-t-0">
+              <span className="text-slate-200">{gap.orderIndex}. {gap.title}</span>
+              <span className="text-xs font-bold uppercase tracking-wide text-amber-300">{gap.reason.replace('_', ' ')}</span>
+            </div>
+          ))}
+        </div>
       </div>}
       <div className={`mt-4 flex items-start gap-2 rounded-lg border p-3 text-sm ${alerts.length ? 'border-amber-700 bg-amber-950/30 text-amber-100' : 'border-emerald-800 bg-emerald-950/30 text-emerald-100'}`}>
         {alerts.length ? <Clock3 className="mt-0.5 h-4 w-4 shrink-0" /> : <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />}

@@ -148,6 +148,12 @@ export async function ProgramHolderWorkspaceView({
       owner: 'Program Holder',
     },
     {
+      label: 'Non-disclosure and confidentiality agreement',
+      complete: data.acknowledgements.some((item) => ['nda', 'non_disclosure', 'confidentiality'].includes(item.document_type)),
+      required: true,
+      owner: 'Program Holder',
+    },
+    {
       label: 'Non-compete agreement',
       complete: data.acknowledgements.some((item) => item.document_type === 'non_compete'),
       required: true,

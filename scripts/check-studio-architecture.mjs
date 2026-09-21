@@ -184,6 +184,17 @@ if (!courseAgent.includes('recordMasterStudioArtifact')) fail('Course agent is n
 const envatoRoute = read('apps/admin/app/api/admin/integrations/envato/route.ts');
 if (!envatoRoute.includes('upsertEnvatoWorkspaceManifest')) fail('Envato workspace batching is not linked to Master Studio');
 
+const toolRegistry = read('lib/ai/tools/registry.ts');
+for (const tool of ['courses.generate', 'browser.execute', 'studio.runtime.exec', 'video.generate', 'workflows.buildCourses', 'deployments.autopilot']) {
+  if (!toolRegistry.includes(`name: '${tool}'`)) fail(`Master Studio canonical tool missing: ${tool}`);
+}
+const canonicalPlan = read('apps/admin/app/api/admin/dev-studio/plan/route.ts');
+if (!canonicalPlan.includes('prepareMasterStudioPlan')) fail('Governed planner bypasses Master Studio planner');
+const taskRunner = read('lib/devstudio/os/task-runner.ts');
+for (const identity of ['studio_run_id', 'studio_run_step_id']) {
+  if (!taskRunner.includes(identity)) fail(`Canonical task runtime drops Master Studio identity: ${identity}`);
+}
+
 const capabilityAdapters = read('lib/studio/capability-adapters.ts');
 for (const capability of ['course','website','media','workflow','repository','browser','runtime','deployment','data','evaluation','memory','engineering']) {
   if (!capabilityAdapters.includes(`id: '${capability}'`)) fail(`Master Studio capability adapter missing: ${capability}`);

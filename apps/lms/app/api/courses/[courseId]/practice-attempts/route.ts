@@ -12,7 +12,7 @@ const CompleteAttemptSchema = z.object({
   correctAnswers: z.number().int().nonnegative().max(500),
   domainScores: z.record(z.string(), z.number().min(0).max(100)).default({}),
   timeSpentSeconds: z.number().int().nonnegative().max(86_400).optional(),
-  sectionKey: z.enum(['core', 'type-i', 'type-ii', 'type-iii', 'universal']),
+  sectionKey: z.string().trim().min(1).max(80).regex(/^[a-z0-9][a-z0-9-]*$/),
 });
 
 async function ensureEnrollment(db: Awaited<ReturnType<typeof createClient>>, userId: string, courseId: string) {

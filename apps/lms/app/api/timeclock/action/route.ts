@@ -31,6 +31,15 @@ type ActionPayload = {
   accuracy_m?: number;
 };
 
+function escapeHtml(value: string) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
 function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number) {
   const earthRadiusM = 6371000;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -309,8 +318,9 @@ async function _POST(request: NextRequest) {
             ? 'You must be inside the shop radius to clock in. Enter the approved radius and try again.'
             : 'You must be inside the shop radius to record this timeclock action. Return to the approved radius and try again.';
       const studentSubject = `Timeclock ${actionLabel[action]} blocked — outside shop radius`;
+      const escapedSiteLabel = escapeHtml(siteLabel);
       const studentText = `Your attempt to ${actionLabel[action]} at ${siteLabel} was blocked because you were ${distanceM} meters from the shop. The allowed radius is ${radiusM} meters. No time was recorded. ${studentGuidance}`;
-      const studentHtml = `<p>Your attempt to <strong>${actionLabel[action]}</strong> at <strong>${siteLabel}</strong> was blocked because you were outside the approved shop radius.</p><p>Your distance from the shop: <strong>${distanceM} meters</strong><br />Allowed radius: <strong>${radiusM} meters</strong></p><p><strong>No time was recorded for this action.</strong></p><p>${studentGuidance}</p>`;
+      const studentHtml = `<p>Your attempt to <strong>${actionLabel[action]}</strong> at <strong>${escapedSiteLabel}</strong> was blocked because you were outside the approved shop radius.</p><p>Your distance from the shop: <strong>${distanceM} meters</strong><br />Allowed radius: <strong>${radiusM} meters</strong></p><p><strong>No time was recorded for this action.</strong></p><p>${studentGuidance}</p>`;
 
       await db
         .from('notifications')

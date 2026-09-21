@@ -186,10 +186,10 @@ export default async function ApprenticePortalPage() {
       .eq('program_slug', programSlug)
       .eq('is_required', true),
     db
-      .from('license_agreement_acceptances')
+      .from('handbook_acknowledgments')
       .select('id')
       .eq('user_id', subject.userId)
-      .eq('agreement_type', 'handbook')
+      .eq('handbook_version', '2026.2')
       .limit(1)
       .maybeSingle(),
     programSlug === 'cosmetology-apprenticeship'

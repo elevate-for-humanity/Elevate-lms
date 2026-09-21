@@ -50,6 +50,15 @@ describe('timeclock clock-in persistence contract', () => {
     expect(route).toContain('already_clocked_in: true');
   });
 
+  it('notifies the apprentice when a geofence blocks a timeclock action', () => {
+    expect(route).toContain("to: user.email");
+    expect(route).toContain("Timeclock ${actionLabel[action]} blocked");
+    expect(route).toContain('You must clock out before leaving the shop radius');
+    expect(route).toContain('No time was recorded');
+    expect(route).toContain("type: 'timeclock'");
+    expect(route).toContain("message: studentText");
+  });
+
   it('shows and enforces the weekly apprenticeship time policy', () => {
     expect(policy).toContain('weeklyOjlMaxHours: 40');
     expect(policy).toContain('weeklyTheoryTargetHours: 3');

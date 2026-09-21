@@ -399,7 +399,11 @@ export async function runTaskExecution(
       approvalGranted: runtime.approvalGranted === true,
       commandContext: {
         toolName: task.tool_name ?? undefined,
-        toolInput: task.tool_input ?? undefined,
+        toolInput: {
+          ...((task.tool_input && typeof task.tool_input === 'object') ? task.tool_input : {}),
+          studioRunId: task.studio_run_id ?? undefined,
+          studioRunStepId: task.studio_run_step_id ?? undefined,
+        },
       },
     });
 

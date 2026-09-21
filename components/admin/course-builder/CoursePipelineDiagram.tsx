@@ -19,6 +19,7 @@ type PipelineSummary = {
   videosMissing: number;
   videosPending: number;
   videosFailed: number;
+  mediaOrigins?: Record<string, number>;
 };
 type MediaGap = {
   lessonId: string;
@@ -129,6 +130,13 @@ export default function CoursePipelineDiagram({ courseId }: { courseId: string }
         <Metric label="Failed" value={summary.failedJobs} />
         <Metric label="Approved" value={summary.approvedJobs} />
         <Metric label="Dead letter" value={summary.deadLetterJobs} />
+      </div>}
+      {summary?.mediaOrigins && Object.keys(summary.mediaOrigins).length > 0 && <div className="mt-4 flex flex-wrap gap-2">
+        {Object.entries(summary.mediaOrigins).sort(([a], [b]) => a.localeCompare(b)).map(([origin, count]) => (
+          <span key={origin} className="rounded-full border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs font-semibold text-slate-300">
+            {origin}: {count}
+          </span>
+        ))}
       </div>}
       {mediaGaps.length > 0 && <div className="mt-4 rounded-xl border border-amber-800 bg-amber-950/20 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">

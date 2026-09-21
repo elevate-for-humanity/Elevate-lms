@@ -275,6 +275,16 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
   const rows = (jobs ?? []) as VideoJob[];
   const lessonJobs = new Map<string, VideoJob>();
   const microJobs = new Map<string, VideoJob>();
+  const approvedExternalLessonIds = new Set(
+    (lessons ?? [])
+      .filter((lesson) =>
+        lesson.media_origin === 'uploaded' &&
+        lesson.media_quality_status === 'approved' &&
+        ['complete', 'completed'].includes(String(lesson.video_status ?? '').toLowerCase()) &&
+        Boolean(typeof lesson.video_url === 'string' && lesson.video_url.trim()),
+      )
+      .map((lesson) => lesson.id),
+  );
   for (const row of rows) {
     if ((row.asset_kind ?? 'lesson') === 'lesson') lessonJobs.set(row.lesson_id, row);
     else microJobs.set(`${row.lesson_id}:${row.asset_key ?? ''}`, row);
@@ -344,7 +354,7 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
   // contract unless the lesson explicitly opts in. They must not block a new
   // primary lesson package or consume its readiness counts.
   const canonicalRows = rows.filter((row) =>
-    (row.asset_kind ?? 'lesson') === 'lesson' ||
+    ((row.asset_kind ?? 'lesson') === 'lesson' && !approvedExternalLessonIds.has(row.lesson_id)) ||
     requiredMicroclipIdentities.has(`${row.lesson_id}:${row.asset_key ?? ''}`),
   );
   const canonicalIdentities = new Set<string>();
@@ -356,6 +366,8 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
   }
 
   const requiredLessonVideos = lessons?.length ?? 0;
+  const approvedExternalLessons = approvedExternalLessonIds.size;
+  const expectedJobTotal = Math.max(0, requiredLessonVideos - approvedExternalLessons) + requiredMicroclips;
   const expectedTotal = requiredLessonVideos + requiredMicroclips;
   const now = Date.now();
   const staleRendering = canonicalRows.filter(
@@ -369,19 +381,19 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
   const invalidQualityEvidence = completeRows.filter((row) =>
     row.review_status !== 'approved' || !hasCanonicalMediaQualityEvidence(row.quality_evidence),
   ).length;
-  let playable = options.verifyUrls ? 0 : completeRows.length;
+  let playable = options.verifyUrls ? 0 : completeRows.length + approvedExternalLessons;
   let unreachable: Array<{ jobId: string; url: string; reason: string }> = [];
 
   if (options.verifyUrls) {
     const verified = await verifyPlayableRows(completeRows);
-    playable = verified.playable;
+    playable = verified.playable + approvedExternalLessons;
     unreachable = verified.unreachable;
   }
 
   const queued = canonicalRows.filter((row) => row.status === 'queued').length;
   const rendering = canonicalRows.filter((row) => row.status === 'rendering').length;
   const failed = canonicalRows.filter((row) => row.status === 'failed').length;
-  const complete = completeRows.length;
+  const complete = completeRows.length + approvedExternalLessons;
   return {
     courseId,
     requiredLessonVideos,
@@ -400,7 +412,7 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
     microclipStateMismatches,
     invalidQualityEvidence,
     completePackage:
-      canonicalRows.length === expectedTotal &&
+      canonicalRows.length === expectedJobTotal &&
       duplicates === 0 &&
       queued === 0 && rendering === 0 && failed === 0 && staleRendering === 0 &&
       lessonStateMismatches === 0 && microclipStateMismatches === 0 &&

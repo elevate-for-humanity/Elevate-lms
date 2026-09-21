@@ -165,6 +165,35 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    if (action === 'media-library') {
+      const courseId = req.nextUrl.searchParams.get('courseId');
+      if (!courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+      const db = await requireAdminClient();
+      const course = await loadCourse(courseId);
+      if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+
+      const { data: videos, error } = await db
+        .from('course_videos')
+        .select('id,title,lesson_id,storage_path,status,asset_role,created_at')
+        .eq('course_id', courseId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+
+      const rows = await Promise.all(
+        (videos ?? []).map(async (video) => {
+          const { data: signed } = await db.storage
+            .from('course_videos')
+            .createSignedUrl(video.storage_path, 60 * 60);
+          return {
+            ...video,
+            playbackUrl: signed?.signedUrl ?? null,
+          };
+        }),
+      );
+
+      return NextResponse.json({ ok: true, course, videos: rows });
+    }
+
     if (action === 'instructor-media') {
       const courseId = req.nextUrl.searchParams.get('courseId');
       if (!courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });

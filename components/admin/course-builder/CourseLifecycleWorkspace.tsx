@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, GitBranch, Loader2, PackageOpen, RefreshCw, RotateCcw, Send, ShieldCheck } from 'lucide-react';
 import CoursePipelineDiagram from './CoursePipelineDiagram';
 
@@ -40,6 +41,8 @@ function rowsFrom(payload: any): Course[] {
 }
 
 export default function CourseLifecycleWorkspace() {
+  const searchParams = useSearchParams();
+  const requestedCourse = searchParams.get('course')?.trim() ?? '';
   const [courses, setCourses] = useState<Course[]>([]);
   const [courseId, setCourseId] = useState('');
   const [course, setCourse] = useState<Course | null>(null);
@@ -58,7 +61,13 @@ export default function CourseLifecycleWorkspace() {
     const payload = await response.json().catch(() => []);
     const rows = rowsFrom(payload);
     setCourses(rows);
-    if (!courseId && rows[0]?.id) setCourseId(rows[0].id);
+    if (!courseId) {
+      const requested = requestedCourse
+        ? rows.find((row) => row.id === requestedCourse || row.slug === requestedCourse)
+        : undefined;
+      if (requested?.id) setCourseId(requested.id);
+      else if (rows[0]?.id) setCourseId(rows[0].id);
+    }
   }
 
   async function loadCourse(id = courseId) {

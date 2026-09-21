@@ -106,10 +106,9 @@ export function assertNarrationProviderConfigured(env: NodeJS.ProcessEnv = proce
   if (provider === 'openai' && !env.OPENAI_API_KEY?.trim()) {
     throw new Error('OpenAI narration route is selected but OPENAI_API_KEY is not configured');
   }
-  // Edge neural voices are the repository's zero-credit instructor voices and
-  // the safe default. The local espeak route remains available only when it is
-  // selected explicitly because its synthetic delivery is not acceptable for
-  // learner-facing course media.
+  // Edge/local remain diagnostic-only in production. Paid/managed narration
+  // routes are required for learner-facing media so synthetic fallback speech
+  // can never be silently published.
 }
 
 function narrationFailureDetail(error: unknown): string {

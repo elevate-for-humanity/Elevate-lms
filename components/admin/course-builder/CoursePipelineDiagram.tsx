@@ -51,7 +51,14 @@ export default function CoursePipelineDiagram({ courseId }: { courseId: string }
     }
   }
 
-  useEffect(() => { void load(); }, [courseId]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    void load();
+    if (!courseId) return;
+    const interval = window.setInterval(() => {
+      void load();
+    }, 15000);
+    return () => window.clearInterval(interval);
+  }, [courseId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function toggle(value: Overlay) {
     setOverlays((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value]);
@@ -69,7 +76,7 @@ export default function CoursePipelineDiagram({ courseId }: { courseId: string }
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2"><Database className="h-5 w-5 text-cyan-400" /><h2 id="course-pipeline-title" className="text-lg font-bold">Course and video pipeline</h2></div>
-          <p className="mt-1 text-sm text-slate-400">Seven-layer production path with live course-specific failure overlays.</p>
+          <p className="mt-1 text-sm text-slate-400">Live production path with course-specific failure overlays. Auto-refreshes every 15 seconds.</p>
         </div>
         <button onClick={() => void load()} disabled={loading} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-bold hover:bg-slate-800 disabled:opacity-50">
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh

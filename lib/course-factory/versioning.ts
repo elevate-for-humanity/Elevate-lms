@@ -49,6 +49,17 @@ function readinessBlockers(snapshot: CourseSnapshot): string[] {
   if (lessons.some((lesson) => !Array.isArray(lesson.learning_objectives) || lesson.learning_objectives.length === 0)) {
     blockers.push('One or more lessons are missing learning objectives.');
   }
+  const mediaLessons = lessons.filter((lesson) => !['quiz', 'checkpoint', 'exam'].includes(lesson.lesson_type ?? ''));
+  if (
+    mediaLessons.some(
+      (lesson) =>
+        !['complete', 'completed'].includes(String(lesson.video_status ?? '').toLowerCase()) ||
+        !String(lesson.video_url ?? '').trim() ||
+        lesson.media_quality_status !== 'approved',
+    )
+  ) {
+    blockers.push('One or more instructional lessons are missing approved playable media.');
+  }
   const assessments = lessons.filter((lesson) => ['quiz', 'checkpoint', 'exam'].includes(lesson.lesson_type ?? ''));
   if (assessments.some((lesson) => lesson.passing_score == null)) {
     blockers.push('One or more assessments are missing passing scores.');

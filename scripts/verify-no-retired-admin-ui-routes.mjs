@@ -51,6 +51,22 @@ for (const configPath of [
 
 // Central route constants are not allowed to reintroduce the old namespace.
 const canonicalRoutes = read('lib/routes/canonical-routes.ts');
+const adminNav = read('lib/admin/nav-config.ts');
+if (!adminNav.includes("href: '/studio/courses'")) {
+  violations.push('lib/admin/nav-config.ts must expose the canonical Master Course Builder at /studio/courses');
+}
+for (const retiredBuilderHref of [
+  "href: '/admin/course-builder'",
+  "href: '/course-builder'",
+  "href: '/admin/courses/builder'",
+  "href: '/admin/course-generator'",
+  "href: '/admin/quiz-builder'",
+  "href: '/admin/quizzes'",
+]) {
+  if (adminNav.includes(retiredBuilderHref)) {
+    violations.push(`lib/admin/nav-config.ts contains retired Course Builder navigation ${retiredBuilderHref}`);
+  }
+}
 for (const forbidden of [
   "'/admin/dashboard'",
   "'/admin/studio'",

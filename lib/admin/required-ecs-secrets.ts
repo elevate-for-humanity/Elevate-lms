@@ -1,6 +1,7 @@
 /**
- * Canonical secret names injected into the admin ECS task from SSM (/elevate/*).
- * Source of truth: aws/ecs-task-admin.json — keep in sync when task def changes.
+ * Historical Admin secret inventory. Studio execution is now Admin-owned with the
+ * isolated Northflank Studio Browser; retired STUDIO_SHELL_* ECS secrets must not
+ * be reintroduced here.
  */
 export const ADMIN_ECS_SECRET_KEYS = [
   'NEXT_PUBLIC_SUPABASE_URL',
@@ -25,13 +26,9 @@ export const ADMIN_ECS_SECRET_KEYS = [
   'SENTRY_DSN',
   'NEXT_PUBLIC_SENTRY_DSN',
   'SUPABASE_URL',
-  'STUDIO_SHELL_WS_URL',
-  'STUDIO_SHELL_SECRET',
   'GITHUB_REPO',
   'INTERNAL_API_KEY',
   'REDIS_URL',
-  'STUDIO_SHELL_WS_URL_PUBLIC',
-  'STUDIO_TOKEN_SECRET',
 ] as const;
 
 /** Keys the devcontainer setup script expects from SSM (via .env.local). */

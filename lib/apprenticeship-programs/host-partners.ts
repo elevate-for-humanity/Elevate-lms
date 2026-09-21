@@ -85,8 +85,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       "An Elkhart barbershop offering fades, shape ups, beard trims, children's haircuts, shear cuts, and supervised barber apprenticeship experience.",
     media: [
       {
-        src: 'https://d2ugbn5gb88fyp.cloudfront.net/1265883/0_0.jpg',
-        alt: 'Top Shelf Barber Lounge barber providing a haircut',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade.jpg',
+        alt: 'Top Shelf Barber Lounge precision fade and professional barbering work',
         kind: 'photo',
       },
       {
@@ -110,8 +110,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         kind: 'photo',
       },
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade.jpg',
-        alt: 'Top Shelf Barber Lounge precision fade and lineup',
+        src: 'https://d2ugbn5gb88fyp.cloudfront.net/1265883/0_0.jpg',
+        alt: 'Top Shelf Barber Lounge barber providing a haircut',
         kind: 'photo',
       },
       {
@@ -234,8 +234,13 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'A community salon and barber shop in downtown Sullivan offering hair services and traditional barbering in a local, client-focused setting.',
     media: [
       {
-        src: '/images/partners/style-and-scissor-salon/contact-card.webp',
-        alt: 'Style and Scissor Salon contact card for owner Cori Meid',
+        src: '/images/partners/style-and-scissor-salon/pink-nail-work.webp',
+        alt: 'Professional pink nail designs completed at Style and Scissor Salon',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp',
+        alt: 'Professional nail art portfolio from Style and Scissor Salon',
         kind: 'photo',
       },
       {
@@ -244,13 +249,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         kind: 'photo',
       },
       {
-        src: '/images/partners/style-and-scissor-salon/pink-nail-work.webp',
-        alt: 'Pink nail designs completed at Style and Scissor Salon',
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp',
-        alt: 'Nail art portfolio from Style and Scissor Salon',
+        src: '/images/partners/style-and-scissor-salon/contact-card.webp',
+        alt: 'Style and Scissor Salon contact card for owner Cori Meid',
         kind: 'photo',
       },
       {

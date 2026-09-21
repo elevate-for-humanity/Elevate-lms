@@ -34,7 +34,10 @@ const payload = {
   deployment: {
     instances: 1,
     docker: { configType: 'default' },
-    storage: { ephemeralStorage: { storageSize: 4096 } },
+    // The project allowance for this compute plan is 2 GB. Downloads are
+    // uploaded to private Supabase storage and removed immediately, so the
+    // browser runtime must stay within that bounded scratch allocation.
+    storage: { ephemeralStorage: { storageSize: 2048 } },
   },
   ports: [{ name: 'browser', internalPort: 3100, public: true, protocol: 'HTTP' }],
   buildSource: 'git',

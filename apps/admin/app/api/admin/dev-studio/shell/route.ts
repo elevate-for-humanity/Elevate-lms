@@ -24,6 +24,7 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireTypedConfirmation } from '@/lib/security/require-confirmation';
+import { recordMasterStudioArtifact } from '@/lib/studio/master-runtime';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -156,6 +157,8 @@ export async function POST(request: NextRequest) {
   // Accept either a workflow filename (e.g. "deploy-lms.yml") or bare name ("deploy-lms")
   const workflowRaw: string = body?.workflow ?? '';
   const inputs: Record<string, string> = body?.inputs ?? {};
+  const studioRunId: string = typeof body?.studioRunId === 'string' ? body.studioRunId : '';
+  const studioRunStepId: string | undefined = typeof body?.studioRunStepId === 'string' ? body.studioRunStepId : undefined;
 
   if (!workflowRaw) return safeError('workflow is required', 400);
 
@@ -217,6 +220,17 @@ export async function POST(request: NextRequest) {
       const runsData = runsRes.ok ? await runsRes.json() : null;
       const latestRun = runsData?.workflow_runs?.[0];
 
+      if (studioRunId) {
+        const db = await requireAdminClient();
+        await recordMasterStudioArtifact(db, {
+          runId: studioRunId, stepId: studioRunStepId,
+          type: 'deployment-run', name: `GitHub workflow ${workflowFile}`,
+          uri: latestRun?.html_url ?? `https://github.com/${repo()}/actions`,
+          status: 'generated',
+          metadata: { workflow: workflowFile, github_run_id: latestRun?.id ?? null, status: latestRun?.status ?? 'queued' },
+          evidence: [{ source: 'github-actions', captured_at: new Date().toISOString() }],
+        }).catch(() => undefined);
+      }
       return NextResponse.json({
         ok: true,
         workflow: workflowFile,

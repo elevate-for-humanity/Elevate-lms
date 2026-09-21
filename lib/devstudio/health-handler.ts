@@ -15,7 +15,7 @@ import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provid
 /**
  * Canonical Admin-owned Dev Studio health implementation.
  *
- * Dev Studio execution is admin-native. The legacy Studio Shell was removed and
+ * Master Studio execution uses the Admin control plane and the unified Northflank Studio runtime. The legacy Studio Shell was removed and
  * is explicitly forbidden by scripts/verify-no-studio-shell.mjs, so health must
  * never require STUDIO_SHELL_* variables or advertise a separate shell service.
  */
@@ -108,7 +108,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
       pushScript: 'pnpm run git:push-main',
     },
     execution: {
-      mode: 'admin-native',
+      mode: 'master-studio',
       ready: true,
       repositoryWritesReady: githubTokenValid,
       legacyShellRemoved: true,

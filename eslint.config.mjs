@@ -115,7 +115,6 @@ export default tseslint.config(
       'eslint-rules/**',
       'legal/**',
       'tests/**',
-      'fly-containers/**',
       'courses/**/scripts/**',
       'check-migrations-status.mjs',
       'test-env.js',

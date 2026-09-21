@@ -75,6 +75,13 @@ async function dispatchToolRequest(
   // self-call creates a false dependency on ingress, DNS, and loopback routing.
   // Invoke the canonical route in-process while preserving its auth, rate-limit,
   // validation, approval, audit, and response contract.
+  if (tool.name === 'studio.runtime.files' || tool.name === 'studio.runtime.exec') {
+    const route = await import(
+      '@/apps/admin/app/api/admin/dev-studio/runtime/route'
+    );
+    const request = new NextRequest(url, init);
+    return tool.method === 'GET' ? route.GET(request) : route.POST(request);
+  }
   if (tool.name === 'courses.generate') {
     const { POST } = await import(
       '@/apps/admin/app/api/admin/dev-studio/course-agent/route'

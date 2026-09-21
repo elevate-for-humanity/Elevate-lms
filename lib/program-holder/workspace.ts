@@ -90,6 +90,19 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const enrollmentContactColumns = contactAccessGranted ? ',email,phone' : '';
   const applicantContactColumns = contactAccessGranted ? ',applicant_email,applicant_phone' : '';
   const allApplicantAccess = holderRes.data?.features?.all_applicant_access === true;
+  const regionalAssignment =
+    holderRes.data?.features?.regional_assignment &&
+    typeof holderRes.data.features.regional_assignment === 'object'
+      ? holderRes.data.features.regional_assignment
+      : null;
+  const isGaryRegionalCoordinator =
+    holderRes.data?.features?.approved_role === 'Gary Regional Site Coordinator' &&
+    regionalAssignment?.shared_team_key === 'gary-indiana-regional-team' &&
+    regionalAssignment?.all_programs_in_region === true;
+  const garyRegionalCities = [
+    'gary', 'hammond', 'merrillville', 'griffith', 'highland', 'munster',
+    'east chicago', 'lake station', 'hobart', 'crown point', 'schererville', 'portage',
+  ];
   const applicantsQuery = db
     .from('program_holder_students')
     .select(
@@ -99,6 +112,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     .order('created_at', { ascending: false });
   const [
     programsRes,
+    regionalApplicantsRes,
     enrollmentsRes,
     upcomingRes,
     applicantsRes,
@@ -119,6 +133,14 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           .select('id,name,title,slug,status,is_active,credential_name,total_hours')
           .in('id', programIds)
           .order('title')
+      : Promise.resolve({ data: [] }),
+    isGaryRegionalCoordinator
+      ? db
+          .from('applications')
+          .select('id,user_id,full_name,first_name,last_name,email,phone,city,zip,zip_code,program_id,program_slug,program_interest,status,created_at')
+          .in('city', garyRegionalCities.flatMap((city) => [city, city.replace(/\b\w/g, (letter) => letter.toUpperCase())]))
+          .in('status', ['submitted', 'under_review', 'pending', 'applied'])
+          .order('created_at', { ascending: false })
       : Promise.resolve({ data: [] }),
     programIds.length
       ? db
@@ -286,8 +308,32 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     phoneLine = { ...phoneLine, extension };
   }
 
-  const applicantRows = applicantsRes.data ?? [];
-  const deduplicatedApplicants = allApplicantAccess
+  const holderApplicantRows = applicantsRes.data ?? [];
+  const regionalApplicantRows = isGaryRegionalCoordinator
+    ? (regionalApplicantsRes.data ?? []).map((row: any) => ({
+        id: row.id,
+        application_id: row.id,
+        user_id: row.user_id,
+        enrollment_id: null,
+        applicant_name: row.full_name || [row.first_name, row.last_name].filter(Boolean).join(' ') || 'Applicant',
+        applicant_email: contactAccessGranted ? row.email : undefined,
+        applicant_phone: contactAccessGranted ? row.phone : undefined,
+        status: 'applied',
+        application_status: row.status,
+        program_id: row.program_id,
+        program_slug: row.program_slug || row.program_interest,
+        created_at: row.created_at,
+        label: 'Gary regional applicant',
+        call_notes: null,
+        call_date: null,
+        call_outcome: null,
+        next_follow_up: null,
+        work_start_date: null,
+        work_site: row.city,
+      }))
+    : [];
+  const applicantRows = [...holderApplicantRows, ...regionalApplicantRows];
+  const deduplicatedApplicants = (allApplicantAccess || isGaryRegionalCoordinator)
     ? applicantRows.filter((row: any, index: number, rows: any[]) => {
         const key =
           row.application_id ||

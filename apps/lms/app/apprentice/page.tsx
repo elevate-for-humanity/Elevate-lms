@@ -338,7 +338,7 @@ export default async function ApprenticePortalPage() {
         icon: BookOpen,
       },
       {
-        label: 'Read and acknowledge the student handbook',
+        label: 'Read and acknowledge timeclock and weekly-hours handbook rules',
         done: Boolean(handbookAcceptance?.id),
         href: '/apprentice/handbook',
         icon: ShieldCheck,

@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { Award, BookOpen, Bot, Boxes, Loader2, RefreshCw, Sparkles, Video } from 'lucide-react';
+import { Activity, Award, BookOpen, Bot, Boxes, Loader2, RefreshCw, Sparkles, Video } from 'lucide-react';
 import CourseInstructorMediaPanel from '@/components/admin/course-builder/CourseInstructorMediaPanel';
 import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
 import { runCourseFactoryPipeline } from '@/components/admin/course-builder/runCourseFactoryPipeline';
@@ -53,6 +53,12 @@ type HealthState = {
   }>;
   checkedAt: string;
 };
+
+const PRIORITY_COURSES = [
+  { label: 'Barber', slug: 'barber-apprenticeship' },
+  { label: 'Cosmetology', slug: 'cosmetology-apprenticeship' },
+  { label: 'HVAC', slug: 'hvac-technician' },
+] as const;
 
 const TABS: Array<{ id: Tab; label: string; icon: any }> = [
   { id: 'courses', label: 'Courses', icon: BookOpen },
@@ -136,6 +142,15 @@ export default function UnifiedCourseBuilder() {
             ) : null}
           </div>
           <div className="flex min-w-0 flex-wrap items-center gap-2">
+            {PRIORITY_COURSES.map((priority) => (
+              <Link
+                key={priority.slug}
+                href={`/studio/courses/lifecycle?course=${encodeURIComponent(priority.slug)}`}
+                className="inline-flex items-center gap-2 rounded-lg border border-cyan-800 bg-cyan-950/30 px-3 py-2 text-sm font-semibold text-cyan-200 hover:border-cyan-500"
+              >
+                <Activity className="h-4 w-4" /> {priority.label} Monitor
+              </Link>
+            ))}
             <button
               type="button"
               onClick={() => void loadCourses()}

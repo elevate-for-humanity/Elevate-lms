@@ -85,6 +85,11 @@ describe('Admin UI route consolidation', () => {
     expect(previewRoute).not.toContain('<!doctype html>');
     expect(lmsPreviewRoute).toContain(".not('video_url', 'is', null)");
     expect(lmsPreviewRoute).toContain('/lessons/${openingLesson.id}');
+    expect(lmsPreviewRoute).toContain(
+      "process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhumanity.org'",
+    );
+    expect(lmsPreviewRoute).toContain('new URL(destination, LMS_URL)');
+    expect(lmsPreviewRoute).not.toContain('new URL(destination, request.url)');
   });
 
   it('routes direct course and lifecycle URLs back into the master builder', () => {

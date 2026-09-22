@@ -1,4 +1,5 @@
 import CanonicalLearnerWorkspaceLayout from '@/components/lms/LearnerWorkspaceLayout';
+import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
@@ -18,13 +19,14 @@ export default async function LearnerCoursesLayout({ children }: { children: Rea
 
   if (user) {
     const db = await requireAdminClient();
-    const [{ data: actor }, subject] = await Promise.all([
+    const [{ data: actor }, subject, coursePreview] = await Promise.all([
       db.from('profiles').select('role').eq('id', user.id).maybeSingle(),
       resolvePortalPreviewSubject(db, user.id),
+      resolveCoursePreview(),
     ]);
     const isAdmin = ['admin', 'super_admin'].includes(String(actor?.role || ''));
 
-    if (isAdmin) {
+    if (isAdmin && !coursePreview.active) {
       return (
         <CanonicalLearnerWorkspaceLayout>
           <main className="mx-auto max-w-5xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">

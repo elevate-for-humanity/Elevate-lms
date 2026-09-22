@@ -72,6 +72,10 @@ describe('Admin UI route consolidation', () => {
       path.join(root, 'apps/lms/app/api/admin/course-preview/route.ts'),
       'utf8',
     );
+    const lmsCoursesLayout = readFileSync(
+      path.join(root, 'apps/lms/app/lms/courses/layout.tsx'),
+      'utf8',
+    );
     expect(unified).toContain("id: 'workspace'");
     expect(unified).toContain('<CourseProvider');
     expect(unified).toContain('<CourseStudioApplication embedded>');
@@ -90,6 +94,8 @@ describe('Admin UI route consolidation', () => {
     );
     expect(lmsPreviewRoute).toContain('new URL(destination, LMS_URL)');
     expect(lmsPreviewRoute).not.toContain('new URL(destination, request.url)');
+    expect(lmsCoursesLayout).toContain('resolveCoursePreview()');
+    expect(lmsCoursesLayout).toContain('if (isAdmin && !coursePreview.active)');
   });
 
   it('routes direct course and lifecycle URLs back into the master builder', () => {

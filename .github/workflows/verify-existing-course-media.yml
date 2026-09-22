@@ -20,6 +20,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 concurrency:
   group: verify-existing-course-media-${{ inputs.job_id || github.event.issue.number }}
@@ -89,7 +90,24 @@ jobs:
           NODE_OPTIONS=--conditions=react-server pnpm exec tsx \
             scripts/course-builder/verify-existing-video-candidate.ts \
             --course-id '${{ steps.request.outputs.course_id }}' \
-            --job-id '${{ steps.request.outputs.job_id }}'
+            --job-id '${{ steps.request.outputs.job_id }}' 2>&1 | tee /tmp/verify-media.log
+
+      - name: Report bounded verification failure
+        if: ${{ failure() && github.event_name == 'issues' }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo 'Canonical media verification failed before promotion.'
+            echo
+            echo '```text'
+            tail -n 40 /tmp/verify-media.log 2>/dev/null || echo 'No verifier output was captured.'
+            echo '```'
+          } > /tmp/verify-comment.md
+          gh issue comment '${{ github.event.issue.number }}' \
+            --repo '${{ github.repository }}' \
+            --body-file /tmp/verify-comment.md
 
       - name: Verification summary
         run: |

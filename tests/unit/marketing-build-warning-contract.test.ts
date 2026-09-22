@@ -21,4 +21,9 @@ describe('marketing build warning boundary', () => {
     expect(config).toContain('if (!dev) config.cache = false');
     expect(config).not.toContain('config.ignoreWarnings');
   });
+
+  it('keeps the Next server-minification workaround that protects static metadata builds', () => {
+    const config = read('apps/marketing/next.config.mjs');
+    expect(config).toContain('serverMinification: false');
+  });
 });

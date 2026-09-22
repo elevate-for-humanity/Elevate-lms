@@ -111,6 +111,11 @@ const nextConfig = {
     scrollRestoration: false,
     workerThreads: false,
     cpus: 1,
+    // Next 15.5.25 server minification can break the AsyncLocalStorage context
+    // used by static metadata generation, surfacing a false workUnitAsyncStorage
+    // invariant for otherwise valid pages. Keep client minification enabled and
+    // preserve static output; only the server bundle skips this transformation.
+    serverMinification: false,
   },
 
   webpack: (config, { dev, isServer }) => {

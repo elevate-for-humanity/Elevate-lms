@@ -82,6 +82,10 @@ export default function StudioCommandWorkspace({
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [focusMode, setFocusMode] = useState(false);
 
+  useEffect(() => {
+    if (surface === 'course') setFocusMode(true);
+  }, [surface]);
+
   const courseBuilderUrl = useMemo(
     () =>
       `https://admin.elevateforhumanity.org${buildConversationWorkspaceUrl('/studio/courses', activeConversationId, activeTask?.taskId ?? null)}`,

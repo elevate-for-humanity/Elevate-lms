@@ -1,4 +1,5 @@
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
 
 export type ProgramHolderWorkspace = {
   mode: 'admin' | 'holder';
@@ -99,10 +100,8 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     holderRes.data?.features?.approved_role === 'Gary Regional Site Coordinator' &&
     regionalAssignment?.shared_team_key === 'gary-indiana-regional-team' &&
     regionalAssignment?.all_programs_in_region === true;
-  const garyRegionalCities = [
-    'gary', 'hammond', 'merrillville', 'griffith', 'highland',
-    'east chicago', 'lake station', 'hobart',
-  ];
+  const garyHub = { latitude: 41.5863, longitude: -87.3510 };
+  const garyRadiusMiles = Number(regionalAssignment?.radius_miles || 20);
   const applicantsQuery = db
     .from('program_holder_students')
     .select(
@@ -137,8 +136,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     isGaryRegionalCoordinator
       ? db
           .from('applications')
-          .select('id,user_id,full_name,first_name,last_name,email,phone,city,zip,zip_code,program_id,program_slug,program_interest,status,created_at')
-          .or(garyRegionalCities.map((city) => `city.ilike.${city}`).join(','))
+          .select('id,user_id,full_name,first_name,last_name,email,phone,address,city,state,zip,zip_code,program_id,program_slug,program_interest,status,created_at')
           .in('status', ['submitted', 'under_review', 'pending', 'applied'])
           .order('created_at', { ascending: false })
       : Promise.resolve({ data: [] }),
@@ -309,8 +307,25 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   }
 
   const holderApplicantRows = applicantsRes.data ?? [];
+  const distanceCheckedRegionalApplicants = isGaryRegionalCoordinator
+    ? (await Promise.all((regionalApplicantsRes.data ?? []).map(async (row: any) => {
+        const address = [row.address, row.city, row.state || 'IN', row.zip_code || row.zip]
+          .filter(Boolean)
+          .join(', ');
+        if (!address) return null;
+        const location = await geocodeAddress(address);
+        if (!isGeocodingResult(location)) return null;
+        const distanceMiles = calculateDistanceMiles(
+          garyHub.latitude,
+          garyHub.longitude,
+          location.latitude,
+          location.longitude,
+        );
+        return distanceMiles <= garyRadiusMiles ? { ...row, distanceMiles } : null;
+      }))).filter(Boolean)
+    : [];
   const regionalApplicantRows = isGaryRegionalCoordinator
-    ? (regionalApplicantsRes.data ?? []).map((row: any) => ({
+    ? distanceCheckedRegionalApplicants.map((row: any) => ({
         id: row.id,
         application_id: row.id,
         user_id: row.user_id,
@@ -323,7 +338,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         program_id: row.program_id,
         program_slug: row.program_slug || row.program_interest,
         created_at: row.created_at,
-        label: 'Gary regional applicant',
+        label: `Gary regional applicant · ${row.distanceMiles.toFixed(1)} mi`,
         call_notes: null,
         call_date: null,
         call_outcome: null,

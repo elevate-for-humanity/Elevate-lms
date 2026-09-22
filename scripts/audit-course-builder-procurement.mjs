@@ -54,12 +54,11 @@ if (failures.length === 0) {
   }
 
   const persistedPublish = read('lib/course-builder/persisted-publish-service.ts');
+  const assessmentValidation = read('lib/course-builder/assessment-validation.ts');
   for (const invariant of [
     'review_status',
     'governing_standard_version',
     'AUTOMATED_COURSE_GATE_VERSION',
-    'rationale missing',
-    'standards/competency mapping missing',
     'canonical interactive lesson experience missing',
     'mastery remediation plan missing',
     'record_course_automated_approval',
@@ -68,6 +67,11 @@ if (failures.length === 0) {
     'module_completion_rules',
     'publishCourse',
   ]) if (!persistedPublish.includes(invariant)) fail(`persisted Course Builder publish gate missing: ${invariant}`);
+  for (const invariant of ['rationale missing', 'standards/competency mapping missing']) {
+    if (!assessmentValidation.includes(invariant) || !persistedPublish.includes('assessmentQuestionIssues')) {
+      fail(`persisted Course Builder publish gate missing: ${invariant}`);
+    }
+  }
 
   for (const retiredPath of [
     'apps/admin/app/api/admin/course-builder/publish/route.ts',
@@ -92,8 +96,11 @@ if (failures.length === 0) {
   }
 
   const governance = read('lib/course-factory/post-generation-governance.ts');
-  for (const invariant of ['competency_checks', 'competencyKeys', "source: 'course_factory'", 'update.approved = false']) {
+  for (const invariant of ['competency_checks', 'competencyKeys', "source: 'course_factory'", "generation_status: 'generated'"]) {
     if (!governance.includes(invariant)) fail(`post-generation governance missing: ${invariant}`);
+  }
+  if (governance.includes('update.approved = false')) {
+    fail('post-generation governance still requires human course-content approval');
   }
 
   const tutor = read('apps/lms/app/api/courses/[courseId]/tutor/route.ts');

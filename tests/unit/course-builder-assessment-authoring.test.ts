@@ -112,9 +112,15 @@ describe('canonical Course Builder assessment authoring', () => {
     const publishPanel = read('components/studio/panels/PublishPanel.tsx');
     const agentPanel = read('components/studio/AgenticCourseRunPanel.tsx');
     const gate = read('lib/course-builder/persisted-publish-service.ts');
+    const governance = read('lib/course-factory/post-generation-governance.ts');
+    const architectureAudit = read('scripts/audit-course-builder-procurement.mjs');
     expect(publishPanel).toContain('no human course-content review required');
     expect(publishPanel).not.toContain('Submit course for review');
     expect(agentPanel).toContain('publishes without waiting for human course-content review');
     expect(gate).toContain('authorized human sign-off missing for practical competency');
+    expect(governance).not.toContain('update.approved = false');
+    expect(architectureAudit).toContain(
+      'post-generation governance still requires human course-content approval',
+    );
   });
 });

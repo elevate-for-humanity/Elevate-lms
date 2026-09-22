@@ -1,4 +1,4 @@
-import { Composition } from 'remotion';
+import { AbsoluteFill, Composition } from 'remotion';
 import { ElevateLesson, type ElevateLessonProps } from './compositions/ElevateLesson';
 import {
   SlideLesson,
@@ -22,6 +22,82 @@ function CanonicalElevateLesson(props: ElevateLessonProps & Record<string, unkno
     ? CANONICAL_INSTRUCTOR_IMAGE_URL
     : props.instructorImageSrc;
   return <ElevateLesson {...props} instructorImageSrc={instructorImageSrc} />;
+}
+
+/**
+ * Keep a governed completion surface behind SlideLesson for the entire encoded
+ * composition. The renderer reserves a five-second branded intro/outro budget.
+ * After the delivery frame rate moved from 15fps to 30fps, legacy intro/outro
+ * frame constants can leave the final 75 frames transparent. H.264 renders
+ * transparency as black, which correctly fails the media quality gate. This
+ * backing surface makes that reserved completion time intentional and visible
+ * instead of learner-facing black footage while the scene composition remains
+ * the canonical authority for lesson content, narration, captions, and motion.
+ */
+function CanonicalSlideLesson(props: SlideLessonProps & Record<string, unknown>) {
+  return (
+    <AbsoluteFill style={{ background: '#f8fafc' }}>
+      <AbsoluteFill
+        style={{
+          background: 'linear-gradient(135deg, #f8fafc 0%, #dbeafe 100%)',
+          justifyContent: 'center',
+          alignItems: 'center',
+          fontFamily: 'sans-serif',
+          textAlign: 'center',
+          padding: '0 120px',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 6,
+            background: props.primaryColor,
+          }}
+        />
+        <div
+          style={{
+            color: props.accentColor,
+            fontSize: 20,
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: 3,
+            marginBottom: 24,
+          }}
+        >
+          Lesson Complete
+        </div>
+        <div
+          style={{
+            color: '#0f172a',
+            fontSize: 44,
+            fontWeight: 900,
+            lineHeight: 1.2,
+            maxWidth: 1100,
+          }}
+        >
+          {props.lessonTitle}
+        </div>
+        <div
+          style={{
+            marginTop: 34,
+            padding: '16px 28px',
+            borderRadius: 16,
+            border: `1px solid ${props.accentColor}55`,
+            background: `${props.accentColor}22`,
+            color: '#0f172a',
+            fontSize: 22,
+            fontWeight: 700,
+          }}
+        >
+          Complete the knowledge check to continue
+        </div>
+      </AbsoluteFill>
+      <SlideLesson {...props} />
+    </AbsoluteFill>
+  );
 }
 
 // Default props for Remotion Studio preview
@@ -115,7 +191,7 @@ export function RemotionRoot() {
       />
       <Composition
         id="SlideLesson"
-        component={SlideLesson}
+        component={CanonicalSlideLesson}
         durationInFrames={slideTotalFrames}
         fps={30}
         width={1920}

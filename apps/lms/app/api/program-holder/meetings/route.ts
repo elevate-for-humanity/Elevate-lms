@@ -10,7 +10,36 @@ export const dynamic = 'force-dynamic';
 async function holderWorkspace(ctx: Awaited<ReturnType<typeof requireProgramHolder>>) {
   let query = ctx.db.from('communication_workspaces').select('id,phone_system_id,status').limit(1);
   query = ctx.tenantId ? query.eq('tenant_id', ctx.tenantId) : query.is('tenant_id', null);
-  return query.maybeSingle();
+  const tenantResult = await query.maybeSingle();
+  if (tenantResult.data || tenantResult.error || !ctx.tenantId) return tenantResult;
+
+  const { data: platformWorkspace, error: platformError } = await ctx.db
+    .from('communication_workspaces')
+    .select('phone_system_id')
+    .is('tenant_id', null)
+    .limit(1)
+    .maybeSingle();
+  if (platformError) return { data: null, error: platformError };
+
+  const created = await ctx.db
+    .from('communication_workspaces')
+    .insert({
+      tenant_id: ctx.tenantId,
+      phone_system_id: platformWorkspace?.phone_system_id ?? null,
+      name: 'Elevate Communications',
+      status: liveKitReadiness().ready ? 'active' : 'setup',
+    })
+    .select('id,phone_system_id,status')
+    .single();
+  if (!created.error) return created;
+
+  // A concurrent first meeting may have created the unique tenant workspace.
+  return ctx.db
+    .from('communication_workspaces')
+    .select('id,phone_system_id,status')
+    .eq('tenant_id', ctx.tenantId)
+    .limit(1)
+    .maybeSingle();
 }
 
 export async function GET() {

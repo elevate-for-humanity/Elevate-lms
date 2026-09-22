@@ -32,10 +32,13 @@ export async function POST(_request: Request, { params }: { params: Promise<{ ro
     : (room as any)?.communication_workspaces;
   const tenantId = profile.tenant_id ?? profile.organization_id ?? null;
   const platformAdmin = ['admin', 'super_admin'].includes(String(profile.role || '').toLowerCase());
+  const workspaceTenantId = workspace?.tenant_id ?? null;
+  const canAccessWorkspace =
+    Boolean(tenantId || platformAdmin) &&
+    (workspaceTenantId === tenantId || (platformAdmin && workspaceTenantId === null));
   if (
     !room ||
-    workspace?.tenant_id !== tenantId ||
-    (!tenantId && !platformAdmin) ||
+    !canAccessWorkspace ||
     workspace?.status !== 'active' ||
     room.status === 'cancelled'
   ) {

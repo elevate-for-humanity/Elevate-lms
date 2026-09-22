@@ -14,6 +14,9 @@ export default async function MeetingsPage() {
   const auth = await requireRole(PHONE_MANAGER_ROLES);
   const db = await requireAdminClient();
   const tenantId = auth.profile.tenant_id ?? auth.profile.organization_id ?? null;
+  const platformAdmin = auth.effectiveRoles.some(
+    (role) => role === 'admin' || role === 'super_admin',
+  );
   let workspaceQuery = db
     .from('communication_workspaces')
     .select('id,status,name,meeting_provider')
@@ -21,7 +24,17 @@ export default async function MeetingsPage() {
   workspaceQuery = tenantId
     ? workspaceQuery.eq('tenant_id', tenantId)
     : workspaceQuery.is('tenant_id', null);
-  const { data: workspace } = await workspaceQuery.maybeSingle();
+  const { data: tenantWorkspace } = await workspaceQuery.maybeSingle();
+  const { data: platformWorkspace } =
+    !tenantWorkspace && platformAdmin && tenantId
+      ? await db
+          .from('communication_workspaces')
+          .select('id,status,name,meeting_provider')
+          .is('tenant_id', null)
+          .limit(1)
+          .maybeSingle()
+      : { data: null };
+  const workspace = tenantWorkspace ?? platformWorkspace;
   const { data: rooms } = workspace?.id
     ? await db
         .from('communication_rooms')

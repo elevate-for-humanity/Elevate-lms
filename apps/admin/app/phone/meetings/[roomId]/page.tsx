@@ -23,13 +23,11 @@ export default async function MeetingRoomPage({ params }: { params: Promise<{ ro
   const platformAdmin = auth.effectiveRoles.some(
     (role) => role === 'admin' || role === 'super_admin',
   );
-  if (
-    !room ||
-    (workspace?.tenant_id ?? null) !== tenantId ||
-    (!tenantId && !platformAdmin) ||
-    room.status === 'cancelled'
-  )
-    notFound();
+  const workspaceTenantId = workspace?.tenant_id ?? null;
+  const canAccessWorkspace =
+    Boolean(tenantId || platformAdmin) &&
+    (workspaceTenantId === tenantId || (platformAdmin && workspaceTenantId === null));
+  if (!room || !canAccessWorkspace || room.status === 'cancelled') notFound();
 
   return (
     <main className="space-y-4 bg-slate-50 p-4 sm:p-6">

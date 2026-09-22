@@ -1,4 +1,4 @@
-name: Repair and verify apex routing
+name: Verify Durable apex routing
 
 on:
   push:
@@ -11,116 +11,14 @@ permissions:
   contents: read
 
 concurrency:
-  group: cloudflare-apex-routing
+  group: durable-apex-routing
   cancel-in-progress: false
 
 jobs:
-  repair:
-    name: Repair elevateforhumanity.org redirect
+  verify:
+    name: Verify elevateforhumanity.org redirect
     runs-on: ubuntu-latest
-    environment: production
-    env:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      APEX_DOMAIN: elevateforhumanity.org
     steps:
-      - name: Require Cloudflare authorization
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -n "${CLOUDFLARE_API_TOKEN:-}" || {
-            echo "::error::CLOUDFLARE_API_TOKEN is not configured in the production environment"
-            exit 1
-          }
-
-      - name: Ensure permanent apex-to-www redirect
-        shell: bash
-        run: |
-          set -euo pipefail
-          node <<'NODE'
-          const token = process.env.CLOUDFLARE_API_TOKEN;
-          const domain = process.env.APEX_DOMAIN;
-          const api = 'https://api.cloudflare.com/client/v4';
-
-          async function request(path, init = {}) {
-            const response = await fetch(api + path, {
-              ...init,
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                ...(init.headers || {}),
-              },
-            });
-            const body = await response.json().catch(() => ({}));
-            if (!response.ok || body.success === false) {
-              const details = body.errors?.map((item) => item.message).join('; ') || `HTTP ${response.status}`;
-              const error = new Error(details);
-              error.status = response.status;
-              throw error;
-            }
-            return body.result;
-          }
-
-          const zones = await request(`/zones?name=${encodeURIComponent(domain)}&status=active&per_page=1`);
-          if (!zones.length) throw new Error(`Active Cloudflare zone not found: ${domain}`);
-          const zone = zones[0];
-
-          let ruleset = null;
-          try {
-            ruleset = await request(`/zones/${zone.id}/rulesets/phases/http_request_dynamic_redirect/entrypoint`);
-          } catch (error) {
-            if (error.status !== 404) throw error;
-          }
-
-          const rule = {
-            ref: 'elevate-apex-to-www',
-            description: 'Redirect apex to canonical www origin',
-            expression: `(http.host eq "${domain}")`,
-            action: 'redirect',
-            action_parameters: {
-              from_value: {
-                status_code: 301,
-                preserve_query_string: true,
-                target_url: {
-                  expression: `concat("https://www.${domain}", http.request.uri.path)`,
-                },
-              },
-            },
-            enabled: true,
-          };
-
-          if (!ruleset) {
-            await request(`/zones/${zone.id}/rulesets`, {
-              method: 'POST',
-              body: JSON.stringify({
-                name: 'Canonical hostname redirects',
-                kind: 'zone',
-                phase: 'http_request_dynamic_redirect',
-                rules: [rule],
-              }),
-            });
-            console.log('Created canonical apex redirect ruleset.');
-          } else {
-            const rules = [...(ruleset.rules || [])];
-            const index = rules.findIndex((candidate) =>
-              candidate.ref === rule.ref ||
-              candidate.expression?.includes(`http.host eq "${domain}"`)
-            );
-            if (index >= 0) rules[index] = { ...rules[index], ...rule };
-            else rules.push(rule);
-            await request(`/zones/${zone.id}/rulesets/${ruleset.id}`, {
-              method: 'PUT',
-              body: JSON.stringify({
-                name: ruleset.name,
-                description: ruleset.description || '',
-                kind: ruleset.kind,
-                phase: ruleset.phase,
-                rules,
-              }),
-            });
-            console.log(index >= 0 ? 'Updated canonical apex redirect.' : 'Added canonical apex redirect.');
-          }
-          NODE
-
       - name: Verify apex and canonical production host
         shell: bash
         run: |
@@ -139,5 +37,5 @@ jobs:
             fi
             sleep 10
           done
-          echo "::error::Apex routing failed to converge to a permanent www redirect"
+          echo "::error::Durable must forward elevateforhumanity.org to https://www.elevateforhumanity.org with a permanent redirect"
           exit 1

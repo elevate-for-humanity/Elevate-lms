@@ -382,7 +382,29 @@ export async function markCandidate(
   if (leaseToken) candidateQuery = candidateQuery.eq('lease_token', leaseToken);
   const { data: candidate, error } = await candidateQuery.select('id').maybeSingle();
   if (error) throw error;
-  if (!candidate) throw new Error(`VIDEO_JOB_LEASE_LOST:${jobId}`);
+  if (!candidate) {
+    // A long-running renderer can cross an infrastructure response boundary
+    // after PostgREST committed the candidate write. Reconcile the durable row
+    // before declaring the lease lost so a successful upload is not discarded
+    // merely because the update representation was empty.
+    const { data: persisted, error: persistedError } = await db()
+      .from('video_jobs')
+      .select('id,status,lease_token,video_url')
+      .eq('id', jobId)
+      .maybeSingle();
+    if (persistedError) throw persistedError;
+    const sameLease = !leaseToken || persisted?.lease_token === leaseToken;
+    if (
+      persisted?.status !== 'rendering' ||
+      !sameLease ||
+      persisted.video_url !== result.video_url
+    ) {
+      throw new Error(`VIDEO_JOB_LEASE_LOST:${jobId}`);
+    }
+    logger.warn('[VideoJob] Reconciled committed candidate after an empty update response', {
+      jobId,
+    });
+  }
   logger.info(`[VideoJob] Candidate persisted before quality review: ${jobId}`);
 }
 
@@ -438,11 +460,34 @@ export async function markComplete(
     .eq('id', jobId)
     .eq('status', 'rendering');
   if (leaseToken) completionQuery = completionQuery.eq('lease_token', leaseToken);
-  const { data: job, error: completionError } = await completionQuery
+  let { data: job, error: completionError } = await completionQuery
     .select('course_id, lesson_id, asset_kind, asset_key, script')
     .maybeSingle();
   if (completionError) throw completionError;
-  if (!job) throw new Error(`VIDEO_JOB_LEASE_LOST:${jobId}`);
+  if (!job) {
+    // Completion is idempotent. If the guarded write committed but its
+    // representation was lost at the request boundary, continue from the
+    // durable complete row instead of overwriting it with a failure.
+    const { data: persisted, error: persistedError } = await supabase
+      .from('video_jobs')
+      .select(
+        'course_id, lesson_id, asset_kind, asset_key, script, status, video_url, review_status',
+      )
+      .eq('id', jobId)
+      .maybeSingle();
+    if (persistedError) throw persistedError;
+    if (
+      persisted?.status !== 'complete' ||
+      persisted.review_status !== 'approved' ||
+      persisted.video_url !== result.video_url
+    ) {
+      throw new Error(`VIDEO_JOB_LEASE_LOST:${jobId}`);
+    }
+    job = persisted;
+    logger.warn('[VideoJob] Reconciled committed completion after an empty update response', {
+      jobId,
+    });
+  }
 
   if (job?.lesson_id && job.asset_kind === 'lesson') {
     const { data: lesson } = await supabase
@@ -532,11 +577,22 @@ export async function markFailed(
   const supabase = db();
   const now = new Date().toISOString();
   const failureClass = classifyVideoFailure(errorMessage);
-  const { data: current } = await supabase
+  const { data: current, error: currentError } = await supabase
     .from('video_jobs')
-    .select('retry_count')
+    .select('retry_count,status,lease_token')
     .eq('id', jobId)
     .maybeSingle();
+  if (currentError) throw currentError;
+  if (current?.status === 'complete') {
+    logger.warn('[VideoJob] Ignored late failure for an already completed job', { jobId });
+    return;
+  }
+  if (leaseToken && (current?.status !== 'rendering' || current.lease_token !== leaseToken)) {
+    logger.warn('[VideoJob] Ignored failure from a worker that no longer owns the lease', {
+      jobId,
+    });
+    return;
+  }
   const retryCount = Number(current?.retry_count ?? 0);
   const terminalFailure =
     retryCount >= 3 ||
@@ -544,7 +600,7 @@ export async function markFailed(
   const nextRetryAt = terminalFailure
     ? null
     : new Date(Date.now() + Math.min(60_000 * 2 ** retryCount, 15 * 60_000)).toISOString();
-  const { data: job } = await supabase
+  let failureQuery = supabase
     .from('video_jobs')
     .update({
       status: 'failed',
@@ -562,8 +618,16 @@ export async function markFailed(
       dead_lettered_at: terminalFailure ? now : null,
     })
     .eq('id', jobId)
+    .eq('status', 'rendering');
+  if (leaseToken) failureQuery = failureQuery.eq('lease_token', leaseToken);
+  const { data: job, error: failureError } = await failureQuery
     .select('lesson_id, asset_kind, asset_key')
-    .single();
+    .maybeSingle();
+  if (failureError) throw failureError;
+  if (!job) {
+    logger.warn('[VideoJob] Failure transition skipped because the lease changed', { jobId });
+    return;
+  }
 
   if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
     await updateMicroclipExperience(job.lesson_id, job.asset_key, {

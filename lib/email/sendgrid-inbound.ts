@@ -22,6 +22,46 @@ export interface ParsedInboundEmail {
   text: string;
   replyTo: string;
   eventId: string; // SHA-256 of from+to+subject+timestamp for dedup
+  envelopeRecipients: string[];
+  attachments: File[];
+}
+
+export function parseEnvelopeAddresses(value: unknown): string[] {
+  let source = String(value || '');
+  try {
+    const parsed = JSON.parse(source) as { to?: unknown };
+    source = Array.isArray(parsed?.to) ? parsed.to.join(',') : source;
+  } catch {
+    // SendGrid may omit the envelope field. The visible To header is the fallback.
+  }
+  const matches = source.match(/[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) ?? [];
+  return Array.from(new Set(matches.map((address) => address.toLowerCase())));
+}
+
+export function safeAttachmentName(value: unknown): string {
+  const leaf =
+    String(value || 'attachment')
+      .split(/[\\/]/)
+      .pop() || 'attachment';
+  return (
+    Array.from(leaf)
+      .filter((character) => {
+        const code = character.charCodeAt(0);
+        return code >= 32 && code !== 127;
+      })
+      .join('')
+      .replace(/[<>:"|?*]/g, '')
+      .replace(/^\.+/, '')
+      .trim()
+      .slice(0, 180) || 'attachment'
+  );
+}
+
+export function inboundAttachmentEntries(formData: FormData): File[] {
+  return Array.from(formData.entries())
+    .filter(([key, value]) => key.toLowerCase().startsWith('attachment') && value instanceof File)
+    .map(([, value]) => value as File)
+    .slice(0, 10);
 }
 
 export async function parseInboundEmail(request: Request): Promise<ParsedInboundEmail | null> {
@@ -35,6 +75,8 @@ export async function parseInboundEmail(request: Request): Promise<ParsedInbound
     const text = String(formData.get('text') ?? '');
     const replyTo = String(formData.get('reply-to') ?? from);
     const timestamp = String(formData.get('timestamp') ?? Date.now());
+    const envelopeRecipients = parseEnvelopeAddresses(formData.get('envelope') ?? to);
+    const attachments = inboundAttachmentEntries(formData);
 
     // Stable dedup key — SendGrid doesn't provide a unique event ID in Inbound Parse
     const { createHash } = await import('crypto');
@@ -43,7 +85,7 @@ export async function parseInboundEmail(request: Request): Promise<ParsedInbound
       .digest('hex')
       .slice(0, 32);
 
-    return { from, to, subject, html, text, replyTo, eventId };
+    return { from, to, subject, html, text, replyTo, eventId, envelopeRecipients, attachments };
   } catch (err) {
     logger.error('[SendGrid Inbound] Failed to parse form data:', err);
     return null;

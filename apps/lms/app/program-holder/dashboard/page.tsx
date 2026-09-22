@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ProgramHolderWorkspaceView } from '@/components/program-holder/ProgramHolderWorkspaceView';
 import { PayoutAccessPanel } from '@/components/program-holder/PayoutAccessPanel';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { EmailAccountNotice } from '@/components/communications/EmailAccountNotice';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Program Holder Dashboard',
@@ -14,10 +15,15 @@ export default async function Page() {
   const context = await requireProgramHolder();
   if (context.mode === 'admin') return <AdminProgramHolderPreview />;
   return (
-    <ProgramHolderWorkspaceView
-      section="dashboard"
-      payoutPanel={context.mode === 'holder' ? <PayoutAccessPanel /> : undefined}
-    />
+    <>
+      <div className="px-4 pt-5 sm:px-6">
+        <EmailAccountNotice href="/program-holder/email" />
+      </div>
+      <ProgramHolderWorkspaceView
+        section="dashboard"
+        payoutPanel={context.mode === 'holder' ? <PayoutAccessPanel /> : undefined}
+      />
+    </>
   );
 }
 

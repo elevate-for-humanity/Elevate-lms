@@ -204,6 +204,12 @@ export default async function PhonePage() {
         </div>
         <div className="flex gap-2">
           <Link
+            href="/phone/email"
+            className="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-black text-white"
+          >
+            Email
+          </Link>
+          <Link
             href="/phone/meetings"
             className="inline-flex items-center gap-2 rounded-xl bg-indigo-700 px-4 py-2.5 text-sm font-black text-white"
           >

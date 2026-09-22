@@ -8,6 +8,7 @@ import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tr
 import { parseInboundEmail, resolveForwardTarget } from '@/lib/email/sendgrid-inbound';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { storeInboundCommunicationEmail } from '@/lib/email/communication-inbound';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -53,8 +54,22 @@ async function _POST(request: NextRequest) {
     }
 
     if (!confident) {
-      logger.error('[SendGrid Inbound] Cannot verify idempotency — rejecting for retry', undefined, { eventId });
+      logger.error(
+        '[SendGrid Inbound] Cannot verify idempotency — rejecting for retry',
+        undefined,
+        { eventId },
+      );
       return NextResponse.json({ error: 'Temporary processing error' }, { status: 503 });
+    }
+
+    const workspaceDelivery = await storeInboundCommunicationEmail(parsed);
+    if (workspaceDelivery.stored) {
+      await finalizeWebhookEvent('sendgrid-inbound', eventId, 'processed');
+      logger.info('[SendGrid Inbound] Stored in Elevate Email', {
+        eventId,
+        mailboxCount: workspaceDelivery.mailboxCount,
+      });
+      return NextResponse.json({ ok: true, stored: true });
     }
 
     const forwardTo = resolveForwardTarget(to);
@@ -72,18 +87,15 @@ async function _POST(request: NextRequest) {
 
     if (!result.success) {
       logger.error('[SendGrid Inbound] Forward failed:', result.error);
-      await finalizeWebhookEvent(
-        'sendgrid-inbound',
-        eventId,
-        'errored',
-        String(result.error),
-      );
+      await finalizeWebhookEvent('sendgrid-inbound', eventId, 'errored', String(result.error));
       return NextResponse.json({ ok: false, error: 'Forward failed' }, { status: 500 });
     }
 
     // PARIS handles genuine applicant replies after the staff copy succeeds.
     // Never feed Elevate's own automated messages back into the responder.
-    const senderEmail = (replyTo || from).match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0]?.toLowerCase();
+    const senderEmail = (replyTo || from)
+      .match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0]
+      ?.toLowerCase();
     const isElevateSender = senderEmail?.endsWith('@elevateforhumanity.org');
     if (senderEmail && !isElevateSender) {
       await hydrateProcessEnv();
@@ -96,7 +108,10 @@ async function _POST(request: NextRequest) {
           body: JSON.stringify({ email: senderEmail, text: text || '', reply_subject: subject }),
         });
         if (!parisResponse.ok && parisResponse.status !== 404) {
-          logger.error('[SendGrid Inbound] PARIS response failed', undefined, { status: parisResponse.status, eventId });
+          logger.error('[SendGrid Inbound] PARIS response failed', undefined, {
+            status: parisResponse.status,
+            eventId,
+          });
         }
       }
     }
@@ -105,7 +120,11 @@ async function _POST(request: NextRequest) {
     logger.info('[SendGrid Inbound] Forwarded successfully', { forwardTo, subject });
     return NextResponse.json({ ok: true });
   } catch (err) {
-    logger.error('[SendGrid Inbound] Webhook error', normalizeError(err, 'SendGrid webhook error'), getErrorContext(err));
+    logger.error(
+      '[SendGrid Inbound] Webhook error',
+      normalizeError(err, 'SendGrid webhook error'),
+      getErrorContext(err),
+    );
     return NextResponse.json({ ok: false, error: 'Internal error' }, { status: 500 });
   }
 }

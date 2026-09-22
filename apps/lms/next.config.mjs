@@ -19,6 +19,21 @@ const nextConfig = {
   images: { unoptimized: true },
   typescript: { ignoreBuildErrors: false },
   eslint: { ignoreDuringBuilds: true },
+  // Keep observability instrumentation in Node's runtime boundary. Bundling
+  // these packages makes webpack inspect intentional dynamic require calls.
+  serverExternalPackages: [
+    '@sentry/nextjs',
+    '@sentry/node',
+    '@sentry/node-core',
+    '@sentry/core',
+    '@opentelemetry/api',
+    '@opentelemetry/sdk-node',
+    '@opentelemetry/instrumentation',
+    '@opentelemetry/exporter-trace-otlp-http',
+    '@opentelemetry/resources',
+    '@opentelemetry/semantic-conventions',
+    'require-in-the-middle',
+  ],
 
   async headers() {
     const noStore = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
@@ -67,6 +82,16 @@ const nextConfig = {
       config.plugins = config.plugins || [];
       config.plugins.push(new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'], buffer: 'buffer' }));
     }
+    // Supabase's browser-compatible bundle contains guarded Node version
+    // checks. They are not executed in middleware, but Next reports them as
+    // Edge-runtime warnings while statically scanning the dependency.
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings ?? []),
+      {
+        module: /node_modules[\\/]@supabase[\\/](?:realtime-js|supabase-js)/,
+        message: /A Node\.js API is used .* not supported in the Edge Runtime/,
+      },
+    ];
     return config;
   },
 };

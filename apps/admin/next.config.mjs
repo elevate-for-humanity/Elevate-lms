@@ -65,10 +65,6 @@ const adminConfig = {
     config.parallelism = 1;
     if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') config.cache = false;
 
-    config.optimization = config.optimization || {};
-    config.optimization.minimize = false;
-    config.optimization.minimizer = [];
-
     return config;
   },
 

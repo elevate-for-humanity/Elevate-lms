@@ -3,6 +3,7 @@ import { getAdminDashboardData } from '@/lib/admin/get-admin-dashboard-data';
 import { normalizeAdminDashboardData } from '@/lib/admin/normalize-dashboard-data';
 import { AdminDashboardContent } from '@/components/admin/dashboard/DashboardShell';
 import { requireRole } from '@/lib/auth/require-role';
+import { EmailAccountNotice } from '@/components/communications/EmailAccountNotice';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,11 +29,16 @@ export default async function AdminDashboardPage() {
     'advisor',
     'staff',
   ]);
-  const canAccessDevStudio = effectiveRoles.some((role) =>
-    ['super_admin', 'admin'].includes(role),
-  );
+  const canAccessDevStudio = effectiveRoles.some((role) => ['super_admin', 'admin'].includes(role));
 
   const data = normalizeAdminDashboardData(await getAdminDashboardData());
 
-  return <AdminDashboardContent data={data} canAccessDevStudio={canAccessDevStudio} />;
+  return (
+    <>
+      <div className="px-3 pt-4 sm:px-5 lg:px-6">
+        <EmailAccountNotice href="/phone/email" />
+      </div>
+      <AdminDashboardContent data={data} canAccessDevStudio={canAccessDevStudio} />
+    </>
+  );
 }

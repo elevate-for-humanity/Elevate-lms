@@ -100,6 +100,11 @@ function OperationalShortcuts() {
       href: '/phone',
     },
     {
+      title: 'Elevate Email',
+      description: 'Open staff, department, Program Holder, and Host Shop mailboxes.',
+      href: '/phone/email',
+    },
+    {
       title: 'Host Shops',
       description: 'Manage host shops, apprentices, verification, and compliance.',
       href: '/partners',

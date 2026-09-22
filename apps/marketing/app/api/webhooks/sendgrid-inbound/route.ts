@@ -6,6 +6,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
 import { parseInboundEmail, resolveForwardTarget } from '@/lib/email/sendgrid-inbound';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { storeInboundCommunicationEmail } from '@/lib/email/communication-inbound';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -57,6 +58,16 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Temporary processing error' }, { status: 503 });
     }
 
+    const workspaceDelivery = await storeInboundCommunicationEmail(parsed);
+    if (workspaceDelivery.stored) {
+      await finalizeWebhookEvent('sendgrid-inbound', eventId, 'processed');
+      logger.info('[SendGrid Inbound] Stored in Elevate Email', {
+        eventId,
+        mailboxCount: workspaceDelivery.mailboxCount,
+      });
+      return NextResponse.json({ ok: true, stored: true });
+    }
+
     const forwardTo = resolveForwardTarget(to);
 
     logger.info('[SendGrid Inbound] Forwarding', { from, to, forwardTo, subject });
@@ -72,12 +83,7 @@ async function _POST(request: NextRequest) {
 
     if (!result.success) {
       logger.error('[SendGrid Inbound] Forward failed:', result.error);
-      await finalizeWebhookEvent(
-        'sendgrid-inbound',
-        eventId,
-        'errored',
-        String(result.error),
-      );
+      await finalizeWebhookEvent('sendgrid-inbound', eventId, 'errored', String(result.error));
       return NextResponse.json({ ok: false, error: 'Forward failed' }, { status: 500 });
     }
 

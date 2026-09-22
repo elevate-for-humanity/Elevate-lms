@@ -10,6 +10,7 @@ import { provisionPartnerFromBarberApplication } from '@/lib/partners/provision-
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
 import { resolveHostShopAdminPreview } from '@/lib/admin/host-shop-preview';
+import { EmailAccountNotice } from '@/components/communications/EmailAccountNotice';
 
 async function clearAdminPartner() {
   'use server';
@@ -240,6 +241,12 @@ export default async function HostShopDashboardView() {
   ];
   const toolCards: PortalCard[] = [
     {
+      href: '/host-shop/email',
+      title: 'Host Shop email',
+      detail: 'Open the shop inbox, compose official email, reply, and share attachments.',
+      image: '/images/pages/admin-employers-hero.webp',
+    },
+    {
       href: '/host-shop/dashboard/resources',
       title: 'Guides, handbook & MOU',
       detail:
@@ -380,6 +387,11 @@ export default async function HostShopDashboardView() {
           className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-800 px-5 py-3 text-sm font-black text-white hover:bg-blue-900"
         />
       </section>
+      {!isPlatformAdmin ? (
+        <div className="mb-5">
+          <EmailAccountNotice href="/host-shop/email" />
+        </div>
+      ) : null}
       <section className="mb-6 overflow-hidden rounded-2xl border border-fuchsia-300 bg-gradient-to-r from-slate-950 via-blue-950 to-fuchsia-950 p-5 text-white shadow-lg sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-3xl">

@@ -60,9 +60,27 @@ function cookieOptions(name: string, options: Record<string, unknown> | undefine
   };
 }
 
+function normalizeHost(value: string | null | undefined) {
+  return (value || '').split(',')[0].trim().split(':')[0].toLowerCase();
+}
+
 function requestHost(req: NextRequest) {
-  const forwarded = req.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
-  return (forwarded || req.headers.get('host') || '').split(':')[0].toLowerCase();
+  const direct = normalizeHost(req.headers.get('host'));
+  const forwarded = normalizeHost(req.headers.get('x-forwarded-host'));
+
+  // Prefer an explicitly recognized Elevate public host from either header.
+  // Enterprise proxies and multi-hop CDNs can rewrite X-Forwarded-Host; treating
+  // that rewritten value as a customer custom domain can incorrectly send a
+  // normal www request through tenant routing and produce intermittent 404s.
+  if (ELEVATE_PUBLIC_HOSTS.has(direct)) return direct;
+  if (ELEVATE_PUBLIC_HOSTS.has(forwarded)) return forwarded;
+
+  // Northflank/deployment hosts remain operational surfaces and should not be
+  // mistaken for tenant custom domains when a proxy supplies both headers.
+  if (isDeploymentHost(direct)) return direct;
+  if (isDeploymentHost(forwarded)) return forwarded;
+
+  return forwarded || direct;
 }
 
 function isStaticRequest(pathname: string) {

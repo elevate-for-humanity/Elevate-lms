@@ -10,6 +10,8 @@ import {
   LayoutDashboard,
   MessageSquare,
   PanelRightOpen,
+  Maximize2,
+  Minimize2,
   Phone,
   Plus,
 } from 'lucide-react';
@@ -78,6 +80,7 @@ export default function StudioCommandWorkspace({
   const [activeCapability, setActiveCapability] = useState<string | null>(initialWorkspace ?? null);
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [focusMode, setFocusMode] = useState(false);
 
   const courseBuilderUrl = useMemo(
     () =>
@@ -165,7 +168,7 @@ export default function StudioCommandWorkspace({
   return (
     <div
       data-studio-root="unified"
-      className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white"
+      className={`flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white ${focusMode ? 'fixed inset-0 z-[100] h-[100dvh] w-screen' : ''}`}
     >
       <header className="shrink-0 border-b-4 border-brand-red-600 bg-brand-blue-700 text-white shadow-sm">
         <div className="flex min-h-14 min-w-0 items-center gap-2 px-3 sm:px-5">
@@ -301,13 +304,22 @@ export default function StudioCommandWorkspace({
             </button>
             <button
               type="button"
+              onClick={() => setFocusMode((value) => !value)}
+              className="inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800"
+              aria-label={focusMode ? 'Exit full screen workspace' : 'Expand workspace to full screen'}
+            >
+              {focusMode ? <Minimize2 className="h-4 w-4" aria-hidden="true" /> : <Maximize2 className="h-4 w-4" aria-hidden="true" />}
+              {focusMode ? 'Exit full screen' : 'Full screen'}
+            </button>
+            <button
+              type="button"
               onClick={() => setSurface('commands')}
               className="shrink-0 rounded-md px-3 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800"
             >
               Commands
             </button>
           </header>
-          <div className="min-h-0 min-w-0 flex-1 overflow-hidden p-0 sm:p-2">
+          <div className={`min-h-0 min-w-0 flex-1 overflow-hidden ${focusMode ? 'p-0' : 'p-0 sm:p-2'}`}>
             <div
               className={
                 surface === 'capability' && activeCapability === 'workflows' ? 'h-full' : 'hidden'

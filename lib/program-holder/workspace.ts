@@ -100,8 +100,8 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     regionalAssignment?.shared_team_key === 'gary-indiana-regional-team' &&
     regionalAssignment?.all_programs_in_region === true;
   const garyRegionalCities = [
-    'gary', 'hammond', 'merrillville', 'griffith', 'highland', 'munster',
-    'east chicago', 'lake station', 'hobart', 'crown point', 'schererville', 'portage',
+    'gary', 'hammond', 'merrillville', 'griffith', 'highland',
+    'east chicago', 'lake station', 'hobart',
   ];
   const applicantsQuery = db
     .from('program_holder_students')

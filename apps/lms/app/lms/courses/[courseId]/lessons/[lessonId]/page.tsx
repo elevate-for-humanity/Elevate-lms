@@ -159,7 +159,7 @@ export default async function LessonPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Resolve a signed administrator preview before enforcing learner login.
+  // Resolve a signed administrator preview before enforcing learner login. Deployment checkpoint: preview handoff fix.
   // Course Builder preview handoffs are read-only and already validate the
   // issuing admin/staff actor, so forcing them through learner authentication
   // defeats the preview flow and causes the redirect loop.

@@ -19,6 +19,7 @@ import type { ProgramBuilderTemplate } from './schema';
 import { adaptProgramTemplateToBlueprint } from './publish-adapter';
 import { requireAdminClient } from '../supabase/admin';
 import { assertCourseBuilderGenerationEnabled } from './generation-control';
+import { evaluatePersistedCourseReadiness } from '../course-package/persisted-readiness';
 
 const courseProgramConfigSchema = z.object({
   id: z.string().uuid().optional(),
@@ -141,7 +142,17 @@ export async function courseFactory(
     }
     progress?.('resolve', 'Loading the identified persisted authored curriculum.', 10);
     const upgraded = await upgradePersistedAuthoredCourse(input.courseId);
-    progress?.('validate', 'All lessons passed the universal interactive contract.', 85);
+    progress?.('validate', 'Validating the canonical credential-course contract.', 85);
+    const readiness = await evaluatePersistedCourseReadiness(upgraded.courseId);
+    if (!readiness.pass) {
+      return {
+        ok: false,
+        courseId: upgraded.courseId,
+        courseSlug: upgraded.courseSlug,
+        errors: readiness.findings.map((finding) => `${finding.gate}: ${finding.message}`),
+        videosQueued: 0,
+      };
+    }
     const result: FactoryOutput = {
       ok: true,
       courseId: upgraded.courseId,

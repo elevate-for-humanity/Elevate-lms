@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { createPortalPreviewHandoff } from '@/lib/admin/portal-preview-handoff';
+import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -33,10 +34,8 @@ export async function GET(request: NextRequest) {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json(
-      { error: 'Unable to open learner preview', details: error.message },
-      { status: 500 },
-    );
+    logger.error('Course Builder learner preview lookup failed', error);
+    return NextResponse.json({ error: 'Unable to open learner preview' }, { status: 500 });
   }
   if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
 

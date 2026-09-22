@@ -79,6 +79,17 @@ const adminConfig = {
         ],
       },
       {
+        // The master Course Builder embeds the authenticated LMS lesson player.
+        // This later, narrower rule overrides Studio's worker isolation header;
+        // COEP credentialless blocks the first-party cross-subdomain iframe.
+        source: '/studio/courses/:path*',
+        headers: [
+          { key: 'Cross-Origin-Embedder-Policy', value: 'unsafe-none' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+        ],
+      },
+      {
         source: '/sw-admin.js',
         headers: [
           { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' },

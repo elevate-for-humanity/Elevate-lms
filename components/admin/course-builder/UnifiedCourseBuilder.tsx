@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { Activity, Award, BookOpen, Bot, Boxes, Loader2, RefreshCw, Sparkles, Video } from 'lucide-react';
+import { Activity, Award, BookOpen, Bot, Boxes, Loader2, Monitor, RefreshCw, Sparkles, Video } from 'lucide-react';
 import CourseInstructorMediaPanel from '@/components/admin/course-builder/CourseInstructorMediaPanel';
 import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
 import CoursePipelineDiagram from '@/components/admin/course-builder/CoursePipelineDiagram';
@@ -14,7 +14,7 @@ const AutomaticCourseBuilder = dynamic(() => import('@/components/course/Automat
   ssr: false,
 });
 
-type Tab = 'courses' | 'ai' | 'blueprints' | 'media' | 'monitor' | 'registry';
+type Tab = 'courses' | 'ai' | 'blueprints' | 'media' | 'monitor' | 'preview' | 'registry';
 type CourseRow = {
   id: string;
   title: string;
@@ -67,6 +67,7 @@ const TABS: Array<{ id: Tab; label: string; icon: any }> = [
   { id: 'blueprints', label: 'Blueprints', icon: Boxes },
   { id: 'media', label: 'Media Library', icon: Video },
   { id: 'monitor', label: 'Build Monitor', icon: Activity },
+  { id: 'preview', label: 'Live Learner Browser', icon: Monitor },
   { id: 'registry', label: 'Credential Registry', icon: Award },
 ];
 
@@ -275,6 +276,27 @@ export default function UnifiedCourseBuilder() {
           courseId
             ? <CoursePipelineDiagram courseId={courseId} />
             : <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-400">Select a course to watch its live build pipeline.</div>
+        )}
+        {tab === 'preview' && (
+          courseId ? (
+            <section className="overflow-hidden rounded-2xl border border-slate-700 bg-white">
+              <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 text-slate-900">
+                <div>
+                  <h2 className="font-bold">Live learner browser</h2>
+                  <p className="text-xs text-slate-600">Canonical learner preview for the selected course.</p>
+                </div>
+                {selectedCourse ? <span className="text-xs font-semibold text-slate-500">{selectedCourse.title}</span> : null}
+              </div>
+              <iframe
+                key={courseId}
+                src={`/api/admin/course-builder/preview?courseId=${encodeURIComponent(courseId)}`}
+                title="Live learner browser"
+                className="h-[72vh] w-full bg-white"
+              />
+            </section>
+          ) : (
+            <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-400">Select a course to open its live learner browser.</div>
+          )
         )}
         {tab === 'registry' && <CredentialRegistryPanel course={selectedCourse} />}
       </main>

@@ -3,6 +3,13 @@ import { CourseExperienceSchema, publicationRequirements } from './experience-co
 import { LearningIntelligenceSchema } from './learning-intelligence';
 import { REQUIRED_COURSE_GATES } from '@/lib/course-package/readiness';
 
+const RequiredCourseGateSchema = z.enum([
+  'credential_alignment','learning_objectives','instructional_content','demonstration','storyboard','technical_review','interactive_practice','knowledge_checks','module_assessments','practice_exam','narration','visual_alignment','captions','transcript','accessibility','learner_preview','progress_tracking','resume_tracking',
+]);
+const PublicationRequirementSchema = z.enum([
+  'credential_alignment','learning_objectives','instructional_content','demonstration','interactive_practice','knowledge_checks','module_assessments','practice_exam','narration','captions','transcript','accessibility','learner_preview','progress_tracking','resume_tracking',
+]);
+
 /**
  * Sole Course Builder credential-course contract.
  * Existing schemas are composed here; callers must not invent parallel completion contracts.
@@ -90,8 +97,8 @@ export const CanonicalCredentialCourseContractSchema = z.object({
     altText: z.literal(true),
   }),
   publication: z.object({
-    requiredGates: z.array(z.enum(REQUIRED_COURSE_GATES as unknown as [string, ...string[]])).length(REQUIRED_COURSE_GATES.length),
-    requirements: z.array(z.enum(publicationRequirements as unknown as [string, ...string[]])).length(publicationRequirements.length),
+    requiredGates: z.array(RequiredCourseGateSchema).length(REQUIRED_COURSE_GATES.length),
+    requirements: z.array(PublicationRequirementSchema).length(publicationRequirements.length),
     learnerPreviewRequired: z.literal(true),
     canonicalPersistenceRequired: z.literal(true),
     lmsVerificationRequired: z.literal(true),

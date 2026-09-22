@@ -2,15 +2,18 @@
   "name": "Elevate for Humanity",
   "short_name": "Elevate",
   "description": "Workforce education and career development programs",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
   "scope": "/",
-  "display": "browser",
+  "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "lang": "en-US",
   "dir": "ltr",
-  "categories": ["education", "business"],
+  "categories": [
+    "education",
+    "business"
+  ],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -40,5 +43,11 @@
   "screenshots": [],
   "launch_handler": {
     "client_mode": "navigate-existing"
-  }
+  },
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "id": "/"
 }

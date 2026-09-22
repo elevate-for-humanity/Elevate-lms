@@ -1,0 +1,174 @@
+name: Recover Existing Course Media
+
+on:
+  workflow_dispatch:
+    inputs:
+      course:
+        description: 'Canonical existing course to recover'
+        required: true
+        type: choice
+        options:
+          - barber-apprenticeship
+          - cosmetology-apprenticeship
+          - hvac-technician
+      mode:
+        description: 'Render one canary first or the full recoverable queue'
+        required: true
+        type: choice
+        default: canary
+        options:
+          - canary
+          - full
+      confirm:
+        description: 'Type RECOVER_MEDIA to authorize paid narration recovery'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: recover-existing-course-media-${{ inputs.course }}
+  cancel-in-progress: false
+
+jobs:
+  recover-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 720
+    environment: production
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      ADMIN_URL: ${{ secrets.ADMIN_URL }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+    steps:
+      - name: Validate bounded recovery request
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ inputs.confirm }}" = "RECOVER_MEDIA" || { echo '::error::confirm must equal RECOVER_MEDIA'; exit 1; }
+          case "${{ inputs.course }}" in
+            barber-apprenticeship|cosmetology-apprenticeship|hvac-technician) ;;
+            *) echo '::error::Unsupported course'; exit 1 ;;
+          esac
+          for key in NEXT_PUBLIC_SUPABASE_URL SUPABASE_SERVICE_ROLE_KEY CRON_SECRET; do
+            test -n "${!key:-}" || { echo "::error::$key is required"; exit 1; }
+          done
+          if [ -z "${ADMIN_URL:-}" ]; then
+            echo 'ADMIN_URL=https://admin.elevateforhumanity.org' >> "$GITHUB_ENV"
+          fi
+
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Requeue only failed narration-authority jobs
+        id: recovery
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--course "${{ inputs.course }}")
+          if [ "${{ inputs.mode }}" = "canary" ]; then
+            args+=(--limit 1)
+          fi
+          NODE_OPTIONS=--conditions=react-server pnpm exec tsx \
+            scripts/course-builder/recover-paid-narration-media.ts "${args[@]}" | tee /tmp/recovery.log
+          tail -n 1 /tmp/recovery.log > /tmp/recovery.json
+          course_id="$(jq -r '.courseId' /tmp/recovery.json)"
+          first_job_id="$(jq -r '.recoveredJobIds[0] // empty' /tmp/recovery.json)"
+          recovered="$(jq -r '.recovered' /tmp/recovery.json)"
+          test "$recovered" -gt 0 || { echo '::error::No matching failed jobs were recovered'; exit 1; }
+          test -n "$course_id" || { echo '::error::Recovery did not return a course ID'; exit 1; }
+          echo "course_id=$course_id" >> "$GITHUB_OUTPUT"
+          echo "first_job_id=$first_job_id" >> "$GITHUB_OUTPUT"
+          echo "recovered=$recovered" >> "$GITHUB_OUTPUT"
+
+      - name: Render and verify one canary lesson
+        if: ${{ inputs.mode == 'canary' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          course_id="${{ steps.recovery.outputs.course_id }}"
+          job_id="${{ steps.recovery.outputs.first_job_id }}"
+          test -n "$job_id" || { echo '::error::Canary recovery did not return a job ID'; exit 1; }
+          payload="$(jq -cn --arg courseId "$course_id" --arg jobId "$job_id" \
+            '{courseId:$courseId,jobId:$jobId,maxJobs:1,queueOneDraft:true}')"
+          status="$(curl -sS --connect-timeout 30 --max-time 1800 \
+            -o /tmp/video-worker.json -w '%{http_code}' \
+            -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H 'Content-Type: application/json' \
+            --data "$payload" || true)"
+          cat /tmp/video-worker.json 2>/dev/null || true
+          case "$status" in 200|202) ;; *) echo "::error::Video worker returned HTTP $status"; exit 1 ;; esac
+          jq -e '.ok == true and .started == 1' /tmp/video-worker.json >/dev/null || {
+            echo '::error::Canary video worker did not start exactly one job'
+            exit 1
+          }
+          NODE_OPTIONS=--conditions=react-server pnpm exec tsx \
+            scripts/course-builder/wait-for-media-job.ts \
+            --course-id "$course_id" --job-id "$job_id" --timeout-minutes 45
+
+      - name: Drain recovered course queue
+        if: ${{ inputs.mode == 'full' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          course_id="${{ steps.recovery.outputs.course_id }}"
+          while true; do
+            payload="$(jq -cn --arg courseId "$course_id" '{courseId:$courseId,maxJobs:2}')"
+            status="$(curl -sS --connect-timeout 30 --max-time 1800 \
+              -o /tmp/video-worker.json -w '%{http_code}' \
+              -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              -H 'Content-Type: application/json' \
+              --data "$payload" || true)"
+            cat /tmp/video-worker.json 2>/dev/null || true
+            case "$status" in 200|202) ;; *) echo "::error::Video worker returned HTTP $status"; exit 1 ;; esac
+            jq -e '.ok == true' /tmp/video-worker.json >/dev/null
+            started="$(jq -r '.started // 0' /tmp/video-worker.json)"
+            reason="$(jq -r '.reason // empty' /tmp/video-worker.json)"
+            if [ "$started" -gt 0 ]; then
+              sleep 15
+              continue
+            fi
+            if [ "$reason" = "render-capacity-full" ]; then
+              sleep 30
+              continue
+            fi
+            if [ "$reason" = "queue-empty" ]; then
+              break
+            fi
+            echo "::error::Course media drain stopped unexpectedly: ${reason:-unknown}"
+            exit 1
+          done
+
+      - name: Verify full canonical media package
+        if: ${{ inputs.mode == 'full' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          NODE_OPTIONS=--conditions=react-server pnpm exec tsx \
+            scripts/course-factory/verify-course-media.ts \
+            --course-id "${{ steps.recovery.outputs.course_id }}"
+
+      - name: Recovery summary
+        run: |
+          echo "Recovered ${{ steps.recovery.outputs.recovered }} failed media jobs for ${{ inputs.course }} in ${{ inputs.mode }} mode."
+          echo 'No course was published by this workflow.'

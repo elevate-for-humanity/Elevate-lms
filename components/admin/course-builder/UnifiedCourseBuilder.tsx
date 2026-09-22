@@ -14,7 +14,7 @@ const AutomaticCourseBuilder = dynamic(() => import('@/components/course/Automat
   ssr: false,
 });
 
-type Tab = 'courses' | 'ai' | 'blueprints' | 'media' | 'monitor' | 'preview' | 'registry';
+type Tab = 'courses' | 'workspace' | 'ai' | 'blueprints' | 'media' | 'monitor' | 'preview' | 'registry';
 type CourseRow = {
   id: string;
   title: string;
@@ -63,6 +63,7 @@ const PRIORITY_COURSES = [
 
 const TABS: Array<{ id: Tab; label: string; icon: any }> = [
   { id: 'courses', label: 'Courses', icon: BookOpen },
+  { id: 'workspace', label: 'Build · Lessons · Quizzes · Publish', icon: Boxes },
   { id: 'ai', label: 'Talk to Course Builder', icon: Sparkles },
   { id: 'blueprints', label: 'Blueprints', icon: Boxes },
   { id: 'media', label: 'Media Library', icon: Video },
@@ -255,6 +256,27 @@ export default function UnifiedCourseBuilder() {
           />
         )}
 
+        {tab === 'workspace' && (
+          courseId ? (
+            <section className="overflow-hidden rounded-2xl border border-slate-700 bg-white">
+              <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 text-slate-900">
+                <div>
+                  <h2 className="font-bold">Unified course workspace</h2>
+                  <p className="text-xs text-slate-600">Curriculum · quizzes · assessments · media · interactions · compliance · publish · learner preview</p>
+                </div>
+                {selectedCourse ? <span className="text-xs font-semibold text-slate-500">{selectedCourse.title}</span> : null}
+              </div>
+              <iframe
+                key={`workspace:${courseId}`}
+                src={`/studio/courses/${encodeURIComponent(courseId)}`}
+                title="Unified course workspace"
+                className="h-[78vh] w-full bg-white"
+              />
+            </section>
+          ) : (
+            <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-400">Select a course to open its unified workspace.</div>
+          )
+        )}
         {tab === 'ai' && (
           <div className="rounded-2xl bg-white p-6 text-slate-900">
             <AutomaticCourseBuilder />

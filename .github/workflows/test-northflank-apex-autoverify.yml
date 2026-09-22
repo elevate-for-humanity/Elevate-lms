@@ -1,4 +1,4 @@
-name: Test Northflank apex auto-verification
+name: Test Northflank apex verification
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
     steps:
-      - name: Request apex auto-verification
+      - name: Ask Northflank to verify apex
         shell: bash
         run: |
           set -euo pipefail
@@ -31,7 +31,7 @@ jobs:
           const domain = 'elevateforhumanity.org';
           const root = `/teams/${team}/domains/${encodeURIComponent(domain)}/subdomains`;
 
-          async function request(path, init = {}) {
+          async function request(label, path, init = {}) {
             const response = await fetch(base + path, {
               ...init,
               headers: {
@@ -47,27 +47,17 @@ jobs:
             } catch {
               body = { raw: text.slice(0, 500) };
             }
-            console.log(JSON.stringify({ status: response.status, body }, null, 2));
-            if (!response.ok) {
-              throw new Error(`Northflank ${response.status}: ${JSON.stringify(body)}`);
-            }
-            return body.data ?? body;
+            console.log(label, JSON.stringify({ status: response.status, body }, null, 2));
+            return { ok: response.ok, status: response.status, body };
           }
 
-          const current = await request(`${root}/%40`);
-          const updated = await request(root, {
-            method: 'PUT',
-            body: JSON.stringify({
-              name: '@',
-              options: {
-                tlsMode: current.options?.tlsMode ?? 'default',
-                autoVerify: true,
-              },
-            }),
-          });
-          console.log(JSON.stringify({
-            fullName: updated.fullName,
-            verified: updated.verified,
-            options: updated.options,
-          }, null, 2));
+          await request('before', `${root}/%40`);
+          const verify = await request('verify', `${root}/%40/verify`, { method: 'POST' });
+          const after = await request('after', `${root}/%40`);
+          const data = after.body?.data ?? after.body;
+          if (!verify.ok || data.verified !== true) {
+            throw new Error(
+              `Apex remains unverified (verify HTTP ${verify.status}; verified=${data.verified})`,
+            );
+          }
           NODE

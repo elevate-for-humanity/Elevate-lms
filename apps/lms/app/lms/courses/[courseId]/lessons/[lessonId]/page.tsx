@@ -159,11 +159,15 @@ export default async function LessonPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user)
+  // Resolve a signed administrator preview before enforcing learner login.
+  // Course Builder preview handoffs are read-only and already validate the
+  // issuing admin/staff actor, so forcing them through learner authentication
+  // defeats the preview flow and causes the redirect loop.
+  const preview = await resolveCoursePreview(courseId);
+  if (!user && !preview.active)
     redirect(
       `/login?redirect=${encodeURIComponent(`/lms/courses/${courseId}/lessons/${lessonId}`)}`,
     );
-  const preview = await resolveCoursePreview(courseId);
   const db = preview.active ? preview.db : supabase;
 
   let courseQuery = db

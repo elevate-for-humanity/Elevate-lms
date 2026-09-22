@@ -53,6 +53,7 @@ import {
   paidArtifactFingerprint,
   reservePaidInference,
 } from '@/lib/ai/paid-inference-gateway';
+import { loadCourseSession } from '@/lib/studio/course-session';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -139,6 +140,14 @@ export async function GET(req: NextRequest) {
 
   const action = req.nextUrl.searchParams.get('action') || 'blueprints';
   try {
+    if (action === 'session') {
+      const courseId = req.nextUrl.searchParams.get('courseId')?.trim() || '';
+      if (!courseId) {
+        return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+      }
+      return NextResponse.json({ session: await loadCourseSession(courseId) });
+    }
+
     if (action === 'blueprints') {
       const id = req.nextUrl.searchParams.get('id');
       const registry = await loadAllBlueprints();

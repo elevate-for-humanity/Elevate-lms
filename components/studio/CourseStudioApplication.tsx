@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   BookOpen,
@@ -22,6 +22,7 @@ import {
   Menu,
   X,
   Eye,
+  RefreshCw,
 } from 'lucide-react';
 import { useCourse, type StudioPanel } from './CourseProvider';
 
@@ -90,22 +91,30 @@ function AutosaveIndicator() {
 function StudioTopbar({
   previewOpen,
   onTogglePreview,
+  embedded,
 }: {
   previewOpen: boolean;
   onTogglePreview: () => void;
+  embedded: boolean;
 }) {
   const { state, save, setPanel } = useCourse();
   const { course, publishState } = state;
 
   return (
     <header className="h-14 border-b border-slate-200 bg-white flex items-center gap-3 px-4 shrink-0">
-      <Link
-        href="/courses"
-        className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800 transition shrink-0"
-      >
-        <ChevronLeft className="w-4 h-4" />
-        <span className="hidden sm:inline">Courses</span>
-      </Link>
+      {embedded ? (
+        <span className="hidden text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700 sm:inline">
+          Course workspace
+        </span>
+      ) : (
+        <Link
+          href="/studio/courses"
+          className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800 transition shrink-0"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span className="hidden sm:inline">Course Builder</span>
+        </Link>
+      )}
       <div className="w-px h-5 bg-slate-200 shrink-0" />
       <h1 className="text-sm font-semibold text-slate-900 truncate flex-1 min-w-0">
         {course.title}
@@ -229,77 +238,73 @@ function PublishProgress() {
   );
 }
 
-export function CourseStudioApplication({ children }: { children: React.ReactNode }) {
+export function CourseStudioApplication({
+  children,
+  embedded = false,
+}: {
+  children: React.ReactNode;
+  embedded?: boolean;
+}) {
   const [previewOpen, setPreviewOpen] = useState(true);
-  const [previewHtml, setPreviewHtml] = useState('');
-  const [previewError, setPreviewError] = useState('');
+  const [previewRevision, setPreviewRevision] = useState(0);
   const { state } = useCourse();
   const previewUrl = `/api/admin/course-builder/preview?courseId=${encodeURIComponent(state.course.id)}`;
 
-  useEffect(() => {
-    if (!previewOpen) return;
-    const controller = new AbortController();
-    setPreviewError('');
-    fetch(previewUrl, {
-      credentials: 'same-origin',
-      cache: 'no-store',
-      headers: { Accept: 'text/html' },
-      signal: controller.signal,
-    })
-      .then(async (response) => {
-        if (!response.ok) throw new Error(`Preview returned HTTP ${response.status}`);
-        const contentType = response.headers.get('content-type') || '';
-        if (!contentType.includes('text/html')) throw new Error('Preview authentication expired');
-        return response.text();
-      })
-      .then(setPreviewHtml)
-      .catch((error) => {
-        if (error instanceof DOMException && error.name === 'AbortError') return;
-        setPreviewError(error instanceof Error ? error.message : 'Preview unavailable');
-      });
-    return () => controller.abort();
-  }, [previewOpen, previewUrl, state.autosave.lastSavedAt]);
-
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-slate-50">
+    <div
+      className={
+        embedded
+          ? 'flex min-h-[calc(100vh-10rem)] flex-col bg-slate-50'
+          : 'flex h-screen flex-col overflow-hidden bg-slate-50'
+      }
+    >
       <StudioTopbar
         previewOpen={previewOpen}
         onTogglePreview={() => setPreviewOpen((value) => !value)}
+        embedded={embedded}
       />
       <PublishProgress />
       <div
-        className={`grid min-h-0 flex-1 overflow-hidden ${previewOpen ? 'lg:grid-cols-[minmax(0,1fr)_minmax(420px,46vw)]' : 'grid-cols-1'}`}
+        className={`grid flex-1 ${embedded ? 'items-start overflow-visible' : 'min-h-0 overflow-hidden'} ${previewOpen ? 'lg:grid-cols-[minmax(0,1fr)_minmax(420px,46vw)]' : 'grid-cols-1'}`}
       >
-        <main className="min-h-0 overflow-y-auto">{children}</main>
+        <main className={embedded ? 'min-w-0 overflow-visible' : 'min-h-0 overflow-y-auto'}>
+          {children}
+        </main>
         {previewOpen && (
           <aside
-            className="min-h-[45vh] overflow-hidden border-l border-slate-200 bg-white lg:min-h-0"
+            className={
+              embedded
+                ? 'min-h-[42rem] overflow-hidden border-l border-slate-200 bg-white lg:sticky lg:top-0 lg:h-[calc(100vh-1rem)]'
+                : 'min-h-[45vh] overflow-hidden border-l border-slate-200 bg-white lg:min-h-0'
+            }
             aria-label="Live learner browser"
           >
             <div className="flex h-10 items-center justify-between border-b border-slate-200 bg-slate-950 px-3 text-xs text-white">
-              <span className="font-semibold">Live learner view</span>
-              <span className="text-slate-300">Updates after save</span>
-            </div>
-            {previewError ? (
-              <div
-                className="m-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
-                role="alert"
+              <div className="min-w-0">
+                <span className="font-semibold">Live LMS browser</span>
+                <span className="ml-2 hidden truncate text-slate-400 sm:inline">
+                  Real learner course and lesson player
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewRevision((value) => value + 1)}
+                className="inline-flex items-center gap-1 rounded px-2 py-1 font-semibold text-slate-200 hover:bg-slate-800"
               >
-                Learner preview could not load: {previewError}
-              </div>
-            ) : previewHtml ? (
-              <iframe
-                key={`${previewUrl}-${state.autosave.lastSavedAt ?? 'initial'}`}
-                srcDoc={previewHtml}
-                sandbox="allow-same-origin"
-                title="Live learner course preview"
-                className="h-[calc(100%-2.5rem)] min-h-[40vh] w-full bg-white"
-              />
-            ) : (
-              <div className="p-4 text-sm text-slate-500" role="status">
-                Loading learner preview…
-              </div>
-            )}
+                <RefreshCw className="h-3.5 w-3.5" /> Refresh
+              </button>
+            </div>
+            <iframe
+              key={`${previewUrl}-${state.autosave.lastSavedAt ?? 'initial'}-${previewRevision}`}
+              src={previewUrl}
+              title="Live learner course preview"
+              allow="autoplay; fullscreen"
+              className={
+                embedded
+                  ? 'h-[calc(100vh-3.5rem)] min-h-[39rem] w-full bg-white'
+                  : 'h-[calc(100%-2.5rem)] min-h-[40vh] w-full bg-white'
+              }
+            />
           </aside>
         )}
       </div>

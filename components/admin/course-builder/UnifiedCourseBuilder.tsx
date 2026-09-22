@@ -2,19 +2,23 @@
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
-import { Activity, Award, BookOpen, Bot, Boxes, Loader2, Monitor, RefreshCw, Sparkles, Video } from 'lucide-react';
+import { Activity, Award, BookOpen, Bot, Boxes, Loader2, RefreshCw, ShieldCheck, Sparkles, Video } from 'lucide-react';
 import CourseInstructorMediaPanel from '@/components/admin/course-builder/CourseInstructorMediaPanel';
+import CourseLifecycleWorkspace from '@/components/admin/course-builder/CourseLifecycleWorkspace';
 import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
 import CoursePipelineDiagram from '@/components/admin/course-builder/CoursePipelineDiagram';
 import { runCourseFactoryPipeline } from '@/components/admin/course-builder/runCourseFactoryPipeline';
 import { courseBuilderJsonHeaders } from '@/components/admin/course-builder/request';
+import { CourseProvider } from '@/components/studio/CourseProvider';
+import { CourseStudioApplication } from '@/components/studio/CourseStudioApplication';
+import { StudioWorkspace } from '@/components/studio/StudioWorkspace';
+import type { CourseSession } from '@/lib/studio/course-session';
 
 const AutomaticCourseBuilder = dynamic(() => import('@/components/course/AutomaticCourseBuilder'), {
   ssr: false,
 });
 
-type Tab = 'courses' | 'workspace' | 'ai' | 'blueprints' | 'media' | 'monitor' | 'preview' | 'registry';
+type Tab = 'courses' | 'workspace' | 'ai' | 'blueprints' | 'media' | 'monitor' | 'governance' | 'registry';
 type CourseRow = {
   id: string;
   title: string;
@@ -55,29 +59,33 @@ type HealthState = {
   checkedAt: string;
 };
 
-const PRIORITY_COURSES = [
-  { label: 'Barber', slug: 'barber-apprenticeship' },
-  { label: 'Cosmetology', slug: 'cosmetology-apprenticeship' },
-  { label: 'HVAC', slug: 'hvac-technician' },
-] as const;
-
 const TABS: Array<{ id: Tab; label: string; icon: any }> = [
   { id: 'courses', label: 'Courses', icon: BookOpen },
-  { id: 'workspace', label: 'Build · Lessons · Quizzes · Publish', icon: Boxes },
+  { id: 'workspace', label: 'Build · Lessons · LMS Browser', icon: Boxes },
   { id: 'ai', label: 'Talk to Course Builder', icon: Sparkles },
   { id: 'blueprints', label: 'Blueprints', icon: Boxes },
   { id: 'media', label: 'Media Library', icon: Video },
   { id: 'monitor', label: 'Build Monitor', icon: Activity },
-  { id: 'preview', label: 'Live Learner Browser', icon: Monitor },
+  { id: 'governance', label: 'Governance · Publish · SCORM', icon: ShieldCheck },
   { id: 'registry', label: 'Credential Registry', icon: Award },
 ];
 
-export default function UnifiedCourseBuilder() {
-  const [tab, setTab] = useState<Tab>('ai');
+export default function UnifiedCourseBuilder({
+  initialCourseId = '',
+  initialTab = 'workspace',
+}: {
+  initialCourseId?: string;
+  initialTab?: Tab;
+}) {
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [courses, setCourses] = useState<CourseRow[]>([]);
   const [programs, setPrograms] = useState<ProgramRow[]>([]);
-  const [courseId, setCourseId] = useState('');
+  const [courseId, setCourseId] = useState(initialCourseId);
   const [blueprints, setBlueprints] = useState<BlueprintRow[]>([]);
+  const [courseSession, setCourseSession] = useState<CourseSession | null>(null);
+  const [workspaceLoading, setWorkspaceLoading] = useState(false);
+  const [workspaceError, setWorkspaceError] = useState('');
+  const [workspaceRevision, setWorkspaceRevision] = useState(0);
   const [creditState, setCreditState] = useState<CreditState | null>(null);
   const [health, setHealth] = useState<HealthState | null>(null);
   const [inventoryLoading, setInventoryLoading] = useState(true);
@@ -95,9 +103,17 @@ export default function UnifiedCourseBuilder() {
       const res = await fetch('/api/admin/courses', { cache: 'no-store' });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.error ?? `Course inventory failed (${res.status})`);
-      const rows = Array.isArray(data) ? data : Array.isArray(data?.courses) ? data.courses : [];
+      const rows: CourseRow[] = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.courses)
+          ? data.courses
+          : [];
       setCourses(rows);
-      if (!courseId && rows[0]?.id) setCourseId(rows[0].id);
+      const requestedCourse = courseId
+        ? rows.find((course) => course.id === courseId || course.slug === courseId)
+        : null;
+      if (requestedCourse?.id && requestedCourse.id !== courseId) selectCourse(requestedCourse.id);
+      else if (!requestedCourse && rows[0]?.id) selectCourse(rows[0].id);
     } catch (error) {
       setInventoryError(error instanceof Error ? error.message : 'Unable to load course inventory');
     } finally { setInventoryLoading(false); }
@@ -126,6 +142,58 @@ export default function UnifiedCourseBuilder() {
       .catch(() => setBlueprints([]));
   }, [tab, blueprints.length]);
 
+  useEffect(() => {
+    if (tab !== 'workspace' || !courseId) return;
+    const controller = new AbortController();
+    setWorkspaceLoading(true);
+    setWorkspaceError('');
+    setCourseSession(null);
+    fetch(
+      `/api/admin/course-builder?action=session&courseId=${encodeURIComponent(courseId)}`,
+      { cache: 'no-store', signal: controller.signal },
+    )
+      .then(async (response) => {
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload?.session) {
+          throw new Error(payload?.error || `Course workspace failed (${response.status})`);
+        }
+        return payload.session as CourseSession;
+      })
+      .then(setCourseSession)
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        setWorkspaceError(error instanceof Error ? error.message : 'Unable to load course workspace');
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setWorkspaceLoading(false);
+      });
+    return () => controller.abort();
+  }, [courseId, tab, workspaceRevision]);
+
+  function syncLocation(nextCourseId: string, nextTab: Tab) {
+    const params = new URLSearchParams(window.location.search);
+    if (nextCourseId) params.set('courseId', nextCourseId);
+    else params.delete('courseId');
+    params.set('tab', nextTab);
+    window.history.replaceState(null, '', `/studio/courses?${params.toString()}`);
+  }
+
+  function selectCourse(id: string) {
+    setCourseId(id);
+    syncLocation(id, tab);
+  }
+
+  function selectTab(nextTab: Tab) {
+    setTab(nextTab);
+    syncLocation(courseId, nextTab);
+  }
+
+  function openWorkspace(id: string) {
+    setCourseId(id);
+    setTab('workspace');
+    syncLocation(id, 'workspace');
+  }
+
   return (
     <div className="min-h-screen min-w-0 w-full overflow-x-clip bg-slate-950 text-slate-100">
       <div className="border-b border-slate-800 bg-slate-900 px-5 py-4">
@@ -146,15 +214,20 @@ export default function UnifiedCourseBuilder() {
             ) : null}
           </div>
           <div className="flex min-w-0 flex-wrap items-center gap-2">
-            {PRIORITY_COURSES.map((priority) => (
-              <Link
-                key={priority.slug}
-                href={`/studio/courses/lifecycle?course=${encodeURIComponent(priority.slug)}`}
-                className="inline-flex items-center gap-2 rounded-lg border border-cyan-800 bg-cyan-950/30 px-3 py-2 text-sm font-semibold text-cyan-200 hover:border-cyan-500"
-              >
-                <Activity className="h-4 w-4" /> {priority.label} Monitor
-              </Link>
-            ))}
+            <label className="sr-only" htmlFor="master-course-selector">Selected course</label>
+            <select
+              id="master-course-selector"
+              value={courseId}
+              onChange={(event) => selectCourse(event.target.value)}
+              className="min-h-10 max-w-full rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm font-semibold text-white sm:min-w-80"
+            >
+              <option value="">Select a course…</option>
+              {courses.map((course) => (
+                <option key={course.id} value={course.id}>
+                  {course.title} — {course.status ?? 'draft'}
+                </option>
+              ))}
+            </select>
             <button
               type="button"
               onClick={() => void loadCourses()}
@@ -163,12 +236,13 @@ export default function UnifiedCourseBuilder() {
               <RefreshCw className="h-4 w-4" /> Refresh
             </button>
             {selectedCourse ? (
-              <Link
-                href={`/studio/courses/${selectedCourse.id}`}
+              <button
+                type="button"
+                onClick={() => selectTab('workspace')}
                 className="max-w-full truncate rounded-lg bg-cyan-500 px-3 py-2 text-sm font-bold text-slate-950 hover:bg-cyan-400"
               >
-                Open {selectedCourse.title}
-              </Link>
+                Open workspace
+              </button>
             ) : null}
           </div>
         </div>
@@ -179,7 +253,7 @@ export default function UnifiedCourseBuilder() {
           {TABS.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
-              onClick={() => setTab(id)}
+              onClick={() => selectTab(id)}
               className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${tab === id ? 'bg-cyan-500 text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}
             >
               <Icon className="h-4 w-4" />
@@ -223,12 +297,13 @@ export default function UnifiedCourseBuilder() {
                     <ul className="mt-2 space-y-2 border-t border-slate-800 pt-2">
                       {check.issues.map((issue) => (
                         <li key={issue.courseId}>
-                          <Link
-                            href={`/studio/courses/${issue.courseId}`}
+                          <button
+                            type="button"
+                            onClick={() => openWorkspace(issue.courseId)}
                             className="font-semibold text-cyan-300 hover:text-cyan-200"
                           >
                             Open {issue.title}
-                          </Link>
+                          </button>
                           <span className="block text-xs text-slate-400">
                             {issue.issues.join(' · ')}
                           </span>
@@ -249,9 +324,10 @@ export default function UnifiedCourseBuilder() {
             inventoryError={inventoryError}
             programError={programError}
             onChanged={loadCourses}
+            onOpen={openWorkspace}
             onCreated={async (id) => {
               await loadCourses();
-              setCourseId(id);
+              openWorkspace(id);
             }}
           />
         )}
@@ -266,12 +342,22 @@ export default function UnifiedCourseBuilder() {
                 </div>
                 {selectedCourse ? <span className="text-xs font-semibold text-slate-500">{selectedCourse.title}</span> : null}
               </div>
-              <iframe
-                key={`workspace:${courseId}`}
-                src={`/studio/courses/${encodeURIComponent(courseId)}`}
-                title="Unified course workspace"
-                className="h-[78vh] w-full bg-white"
-              />
+              {workspaceError ? (
+                <div className="m-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
+                  {workspaceError}
+                  <button type="button" onClick={() => setWorkspaceRevision((value) => value + 1)} className="ml-2 font-bold underline">Retry</button>
+                </div>
+              ) : workspaceLoading || !courseSession ? (
+                <div className="flex min-h-[32rem] items-center justify-center gap-3 text-sm font-semibold text-slate-600" role="status">
+                  <Loader2 className="h-5 w-5 animate-spin" /> Loading the course workspace and LMS browser…
+                </div>
+              ) : (
+                <CourseProvider key={courseSession.loadedAt} session={courseSession}>
+                  <CourseStudioApplication embedded>
+                    <StudioWorkspace />
+                  </CourseStudioApplication>
+                </CourseProvider>
+              )}
             </section>
           ) : (
             <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-400">Select a course to open its unified workspace.</div>
@@ -288,8 +374,7 @@ export default function UnifiedCourseBuilder() {
             selectedCourse={selectedCourse}
             onGenerated={async (id) => {
               await loadCourses();
-              setCourseId(id);
-              setTab('courses');
+              openWorkspace(id);
             }}
           />
         )}
@@ -299,27 +384,7 @@ export default function UnifiedCourseBuilder() {
             ? <CoursePipelineDiagram courseId={courseId} />
             : <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-400">Select a course to watch its live build pipeline.</div>
         )}
-        {tab === 'preview' && (
-          courseId ? (
-            <section className="overflow-hidden rounded-2xl border border-slate-700 bg-white">
-              <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3 text-slate-900">
-                <div>
-                  <h2 className="font-bold">Live learner browser</h2>
-                  <p className="text-xs text-slate-600">Canonical learner preview for the selected course.</p>
-                </div>
-                {selectedCourse ? <span className="text-xs font-semibold text-slate-500">{selectedCourse.title}</span> : null}
-              </div>
-              <iframe
-                key={courseId}
-                src={`/api/admin/course-builder/preview?courseId=${encodeURIComponent(courseId)}`}
-                title="Live learner browser"
-                className="h-[72vh] w-full bg-white"
-              />
-            </section>
-          ) : (
-            <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-400">Select a course to open its live learner browser.</div>
-          )
-        )}
+        {tab === 'governance' && <CourseLifecycleWorkspace selectedCourseId={courseId} embedded />}
         {tab === 'registry' && <CredentialRegistryPanel course={selectedCourse} />}
       </main>
     </div>
@@ -333,6 +398,7 @@ function CourseCatalog({
   inventoryError,
   programError,
   onChanged,
+  onOpen,
   onCreated,
 }: {
   courses: CourseRow[];
@@ -341,6 +407,7 @@ function CourseCatalog({
   inventoryError: string;
   programError: string;
   onChanged: () => void | Promise<void>;
+  onOpen: (id: string) => void;
   onCreated: (id: string) => void | Promise<void>;
 }) {
   const [busyId, setBusyId] = useState('');
@@ -400,12 +467,12 @@ function CourseCatalog({
               key={course.id}
               className="min-w-0 rounded-xl border border-slate-700 bg-slate-950 p-4 hover:border-cyan-500"
             >
-              <Link href={`/studio/courses/${course.id}`} className="break-words font-bold text-white hover:text-cyan-300">{course.title}</Link>
+              <button type="button" onClick={() => onOpen(course.id)} className="break-words text-left font-bold text-white hover:text-cyan-300">{course.title}</button>
               <div className="mt-1 text-xs text-slate-400">
                 {course.status ?? 'draft'} · {course.duration_hours ?? '—'} hours
               </div>
               <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold">
-                <Link href={`/studio/courses/${course.id}`} className="rounded-md bg-cyan-500 px-2.5 py-1.5 text-slate-950">Open</Link>
+                <button type="button" onClick={() => onOpen(course.id)} className="rounded-md bg-cyan-500 px-2.5 py-1.5 text-slate-950">Open</button>
                 <button disabled={busyId === course.id} onClick={() => void mutate(course, course.status === 'published' ? 'unpublish' : 'publish')} className="rounded-md border border-slate-600 px-2.5 py-1.5 text-slate-200 disabled:opacity-50">
                   {course.status === 'published' ? 'Unpublish' : 'Publish'}
                 </button>

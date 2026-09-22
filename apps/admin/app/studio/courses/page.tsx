@@ -5,7 +5,39 @@ import UnifiedCourseBuilder from '@/components/admin/course-builder/UnifiedCours
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-export default function StudioCoursesPage() {
+type CourseBuilderTab =
+  | 'courses'
+  | 'workspace'
+  | 'ai'
+  | 'blueprints'
+  | 'media'
+  | 'monitor'
+  | 'governance'
+  | 'registry';
+
+const COURSE_BUILDER_TABS: ReadonlySet<string> = new Set([
+  'courses',
+  'workspace',
+  'ai',
+  'blueprints',
+  'media',
+  'monitor',
+  'governance',
+  'registry',
+] as const);
+
+function isCourseBuilderTab(value: string | undefined): value is CourseBuilderTab {
+  return Boolean(value && COURSE_BUILDER_TABS.has(value));
+}
+
+export default async function StudioCoursesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ courseId?: string; tab?: string }>;
+}) {
+  const params = await searchParams;
+  const initialTab = isCourseBuilderTab(params.tab) ? params.tab : 'workspace';
+
   return (
     <main className="min-h-screen bg-white text-slate-950">
       <header className="border-b border-slate-200 bg-white px-5 py-4">
@@ -19,24 +51,10 @@ export default function StudioCoursesPage() {
               Create, govern, review, and publish courses through the canonical Course Factory.
             </p>
           </div>
-          <nav className="flex flex-wrap gap-2" aria-label="Course Builder tools">
-            <Link
-              href="/studio/courses/bulk-operations"
-              className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 shadow-sm hover:bg-slate-50"
-            >
-              Bulk Operations
-            </Link>
-            <Link
-              href="/studio/courses/lifecycle"
-              className="rounded-xl bg-slate-950 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-slate-800"
-            >
-              Governance · Versions · SCORM
-            </Link>
-          </nav>
         </div>
       </header>
       <section>
-        <UnifiedCourseBuilder />
+        <UnifiedCourseBuilder initialCourseId={params.courseId?.trim() || ''} initialTab={initialTab} />
       </section>
     </main>
   );

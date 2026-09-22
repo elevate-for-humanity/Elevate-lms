@@ -60,10 +60,44 @@ describe('Admin UI route consolidation', () => {
       path.join(root, 'components/admin/course-builder/UnifiedCourseBuilder.tsx'),
       'utf8',
     );
+    const studioApplication = readFileSync(
+      path.join(root, 'components/studio/CourseStudioApplication.tsx'),
+      'utf8',
+    );
+    const previewRoute = readFileSync(
+      path.join(root, 'apps/admin/app/api/admin/course-builder/preview/route.ts'),
+      'utf8',
+    );
+    const lmsPreviewRoute = readFileSync(
+      path.join(root, 'apps/lms/app/api/admin/course-preview/route.ts'),
+      'utf8',
+    );
     expect(unified).toContain("id: 'workspace'");
-    expect(unified).toContain('/studio/courses/');
+    expect(unified).toContain('<CourseProvider');
+    expect(unified).toContain('<CourseStudioApplication embedded>');
+    expect(unified).not.toContain('src={`/studio/courses/');
     expect(unified).toContain('Unified course workspace');
-    expect(unified).toContain('Live learner browser');
+    expect(studioApplication).toContain('Live LMS browser');
+    expect(studioApplication).toContain('src={previewUrl}');
+    expect(studioApplication).not.toContain('srcDoc=');
+    expect(previewRoute).toContain('createPortalPreviewHandoff');
+    expect(previewRoute).toContain("new URL('/api/admin/course-preview', LMS_URL)");
+    expect(previewRoute).not.toContain('<!doctype html>');
+    expect(lmsPreviewRoute).toContain(".not('video_url', 'is', null)");
+    expect(lmsPreviewRoute).toContain('/lessons/${openingLesson.id}');
+  });
+
+  it('routes direct course and lifecycle URLs back into the master builder', () => {
+    const directCourse = readFileSync(
+      path.join(root, 'apps/admin/app/studio/courses/[courseId]/page.tsx'),
+      'utf8',
+    );
+    const lifecycle = readFileSync(
+      path.join(root, 'apps/admin/app/studio/courses/lifecycle/page.tsx'),
+      'utf8',
+    );
+    expect(directCourse).toContain("tab=workspace");
+    expect(lifecycle).toContain("tab: 'governance'");
   });
 
   it('declares one Course Builder authority and routes generated courses into it', () => {
@@ -85,7 +119,7 @@ describe('Admin UI route consolidation', () => {
     );
     expect(catalog).toContain("adminHref: '/studio/courses'");
     expect(catalog).not.toContain("adminHref: '/admin/dev-studio'");
-    expect(automaticBuilder).toContain('`/studio/courses/${result.course_id}`');
+    expect(automaticBuilder).toContain('`/studio/courses?courseId=${encodeURIComponent(result.course_id)}&tab=workspace`');
     expect(automaticBuilder).not.toContain('`/curriculum/${result.course_id}`');
   });
 

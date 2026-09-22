@@ -1,0 +1,97 @@
+name: Verify Existing Course Media
+
+on:
+  workflow_dispatch:
+    inputs:
+      course_id:
+        description: 'Canonical course UUID'
+        required: true
+        type: string
+      job_id:
+        description: 'Existing completed video job UUID'
+        required: true
+        type: string
+      confirm:
+        description: 'Type VERIFY_MEDIA to run canonical audiovisual QA'
+        required: true
+        type: string
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-existing-course-media-${{ inputs.job_id || github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  verify-media:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) &&
+        github.event.issue.title == 'VERIFY EXISTING COURSE MEDIA'
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: production
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+    steps:
+      - name: Validate bounded verification request
+        id: request
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'workflow_dispatch' ]; then
+            course_id='${{ inputs.course_id }}'
+            job_id='${{ inputs.job_id }}'
+            confirm='${{ inputs.confirm }}'
+          else
+            course_id="$(jq -r '.issue.body | capture("course_id=(?<value>[0-9a-fA-F-]{36})").value // empty' "$GITHUB_EVENT_PATH")"
+            job_id="$(jq -r '.issue.body | capture("job_id=(?<value>[0-9a-fA-F-]{36})").value // empty' "$GITHUB_EVENT_PATH")"
+            confirm="$(jq -r '.issue.body | capture("confirm=(?<value>[A-Z_]+)").value // empty' "$GITHUB_EVENT_PATH")"
+          fi
+          test "$confirm" = 'VERIFY_MEDIA' || { echo '::error::confirm must equal VERIFY_MEDIA'; exit 1; }
+          [[ "$course_id" =~ ^[0-9a-fA-F-]{36}$ ]] || { echo '::error::Invalid course UUID'; exit 1; }
+          [[ "$job_id" =~ ^[0-9a-fA-F-]{36}$ ]] || { echo '::error::Invalid job UUID'; exit 1; }
+          test -n "${NEXT_PUBLIC_SUPABASE_URL:-}" || { echo '::error::NEXT_PUBLIC_SUPABASE_URL is required'; exit 1; }
+          test -n "${SUPABASE_SERVICE_ROLE_KEY:-}" || { echo '::error::SUPABASE_SERVICE_ROLE_KEY is required'; exit 1; }
+          echo "course_id=$course_id" >> "$GITHUB_OUTPUT"
+          echo "job_id=$job_id" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run canonical audiovisual QA and promote only on pass
+        shell: bash
+        run: |
+          set -euo pipefail
+          NODE_OPTIONS=--conditions=react-server pnpm exec tsx \
+            scripts/course-builder/verify-existing-video-candidate.ts \
+            --course-id '${{ steps.request.outputs.course_id }}' \
+            --job-id '${{ steps.request.outputs.job_id }}'
+
+      - name: Verification summary
+        run: |
+          echo 'Existing rendered candidate passed canonical audiovisual QA.'
+          echo 'No course was published by this workflow.'

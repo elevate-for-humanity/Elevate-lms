@@ -19,6 +19,7 @@ import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import { FirstPartyTraffic } from '@/components/analytics/FirstPartyTraffic';
 import { SkipToContent } from '@/components/accessibility/SkipToContent';
 import { AssociateFormLabels } from '@/components/accessibility/AssociateFormLabels';
+import SpeechCanceller from '@/components/ui/SpeechCanceller';
 import CookieConsent from '@/components/CookieConsent';
 import FacebookPixel from '@/components/FacebookPixel';
 import { ScrollNarrator } from '@/components/home/ScrollNarrator';
@@ -135,6 +136,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <FacebookPixel />
         <FirstPartyTraffic />
         <AssociateFormLabels />
+        <SpeechCanceller />
         <I18nProvider>
           <MarketingChromeBoundary>{children}</MarketingChromeBoundary>
         </I18nProvider>

@@ -12,8 +12,14 @@ export const metadata: Metadata = {
   description: 'Upload verified production video content for the public library or course lessons.',
 };
 
-export default async function UploadVideosPage() {
+export default async function UploadVideosPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ mode?: string }>;
+}) {
   await requireRole(['admin']);
+  const params = await searchParams;
+  const licensedLibrary = params.mode === 'licensed-library';
 
   return (
     <div className="min-h-screen bg-white">
@@ -31,19 +37,31 @@ export default async function UploadVideosPage() {
         <div className="mb-8">
           <nav className="mb-4 text-sm">
             <ol className="flex items-center space-x-2 text-slate-700">
-              <li><Link href="/" className="hover:text-primary">Admin</Link></li>
+              <li>
+                <Link href="/" className="hover:text-primary">
+                  Admin
+                </Link>
+              </li>
               <li>/</li>
-              <li><Link href="/videos" className="hover:text-primary">Videos</Link></li>
+              <li>
+                <Link href="/videos" className="hover:text-primary">
+                  Videos
+                </Link>
+              </li>
               <li>/</li>
               <li className="font-medium text-slate-900">Upload</li>
             </ol>
           </nav>
-          <h1 className="text-3xl font-bold text-slate-900">Upload Production Video</h1>
+          <h1 className="text-3xl font-bold text-slate-900">
+            {licensedLibrary ? 'Upload Licensed Course Media' : 'Upload Production Video'}
+          </h1>
           <p className="mt-2 text-slate-700">
-            Public videos are published only after a real playable file is stored. Course and lesson videos are stored privately and returned through signed playback URLs.
+            {licensedLibrary
+              ? 'Store each licensed Envato master once with its item ID, source URL, and course tags so Course Builder can attach it without duplicating the file.'
+              : 'Public videos are published only after a real playable file is stored. Course and lesson videos are stored privately and returned through signed playback URLs.'}
           </p>
         </div>
-        <VideoUploadClient />
+        <VideoUploadClient licensedLibrary={licensedLibrary} embedded={licensedLibrary} />
       </div>
     </div>
   );

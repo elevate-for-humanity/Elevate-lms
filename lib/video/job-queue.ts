@@ -460,7 +460,7 @@ export async function markComplete(
     .eq('id', jobId)
     .eq('status', 'rendering');
   if (leaseToken) completionQuery = completionQuery.eq('lease_token', leaseToken);
-  let { data: job, error: completionError } = await completionQuery
+  const { data: job, error: completionError } = await completionQuery
     .select('course_id, lesson_id, asset_kind, asset_key, script')
     .maybeSingle();
   if (completionError) throw completionError;

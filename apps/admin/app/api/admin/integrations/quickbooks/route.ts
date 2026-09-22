@@ -21,6 +21,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { createQuickBooksOAuthState } from '@/lib/integrations/quickbooks-oauth-state';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -34,6 +35,11 @@ const QB_TOKEN_URL = 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer'
 const SCOPES = 'com.intuit.quickbooks.accounting';
 
 async function getQuickBooksConfig() {
+  // QuickBooks application credentials are stored in the canonical runtime
+  // secret store. Hydrate them before checking connection status or building
+  // an authorization URL so the Admin integration page can reconnect an
+  // expired company authorization without duplicating secrets in app_settings.
+  await hydrateProcessEnv();
   const db = await requireAdminClient();
   const { data } = await db
     .from('app_settings')

@@ -92,8 +92,16 @@ describe('course media paid-inference recovery', () => {
 
   it('requires full-package verification and never publishes a course', () => {
     expect(workflow).toContain('verify-course-media.ts');
-    expect(workflow).toContain("inputs.mode == 'full'");
+    expect(workflow).toContain("env.RECOVERY_MODE == 'full'");
     expect(workflow).not.toMatch(/publish[-_: ]course/i);
     expect(workflow).toContain('No course was published by this workflow.');
+  });
+
+  it('accepts only exact trusted issue commands as plugin triggers', () => {
+    expect(workflow).toContain('types: [opened]');
+    expect(workflow).toContain('["OWNER","MEMBER","COLLABORATOR"]');
+    expect(workflow).toContain('RUN COURSE MEDIA CANARY: barber-apprenticeship');
+    expect(workflow).toContain('RUN COURSE MEDIA FULL: hvac-technician');
+    expect(workflow).toContain('github.event.issue.title\n        )');
   });
 });

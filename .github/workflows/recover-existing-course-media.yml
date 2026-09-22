@@ -23,16 +23,27 @@ on:
         description: 'Type RECOVER_MEDIA to authorize paid narration recovery'
         required: true
         type: string
+  issues:
+    types: [opened]
 
 permissions:
   contents: read
 
 concurrency:
-  group: recover-existing-course-media-${{ inputs.course }}
+  group: recover-existing-course-media-${{ inputs.course || github.event.issue.number }}
   cancel-in-progress: false
 
 jobs:
   recover-media:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) &&
+        contains(
+          fromJSON('["RUN COURSE MEDIA CANARY: barber-apprenticeship","RUN COURSE MEDIA FULL: barber-apprenticeship","RUN COURSE MEDIA CANARY: cosmetology-apprenticeship","RUN COURSE MEDIA FULL: cosmetology-apprenticeship","RUN COURSE MEDIA CANARY: hvac-technician","RUN COURSE MEDIA FULL: hvac-technician"]'),
+          github.event.issue.title
+        )
+      )
     runs-on: ubuntu-latest
     timeout-minutes: 720
     environment: production
@@ -41,14 +52,23 @@ jobs:
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       ADMIN_URL: ${{ secrets.ADMIN_URL }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      RECOVERY_COURSE: >-
+        ${{ inputs.course ||
+          (endsWith(github.event.issue.title, 'barber-apprenticeship') && 'barber-apprenticeship') ||
+          (endsWith(github.event.issue.title, 'cosmetology-apprenticeship') && 'cosmetology-apprenticeship') ||
+          (endsWith(github.event.issue.title, 'hvac-technician') && 'hvac-technician') }}
+      RECOVERY_MODE: >-
+        ${{ inputs.mode || (contains(github.event.issue.title, ' CANARY: ') && 'canary') || 'full' }}
+      RECOVERY_CONFIRM: >-
+        ${{ inputs.confirm || (github.event_name == 'issues' && 'RECOVER_MEDIA') }}
 
     steps:
       - name: Validate bounded recovery request
         shell: bash
         run: |
           set -euo pipefail
-          test "${{ inputs.confirm }}" = "RECOVER_MEDIA" || { echo '::error::confirm must equal RECOVER_MEDIA'; exit 1; }
-          case "${{ inputs.course }}" in
+          test "$RECOVERY_CONFIRM" = "RECOVER_MEDIA" || { echo '::error::confirm must equal RECOVER_MEDIA'; exit 1; }
+          case "$RECOVERY_COURSE" in
             barber-apprenticeship|cosmetology-apprenticeship|hvac-technician) ;;
             *) echo '::error::Unsupported course'; exit 1 ;;
           esac
@@ -83,8 +103,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          args=(--course "${{ inputs.course }}")
-          if [ "${{ inputs.mode }}" = "canary" ]; then
+          args=(--course "$RECOVERY_COURSE")
+          if [ "$RECOVERY_MODE" = "canary" ]; then
             args+=(--limit 1)
           fi
           NODE_OPTIONS=--conditions=react-server pnpm exec tsx \
@@ -100,7 +120,7 @@ jobs:
           echo "recovered=$recovered" >> "$GITHUB_OUTPUT"
 
       - name: Render and verify one canary lesson
-        if: ${{ inputs.mode == 'canary' }}
+        if: ${{ env.RECOVERY_MODE == 'canary' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -126,7 +146,7 @@ jobs:
             --course-id "$course_id" --job-id "$job_id" --timeout-minutes 45
 
       - name: Drain recovered course queue
-        if: ${{ inputs.mode == 'full' }}
+        if: ${{ env.RECOVERY_MODE == 'full' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -160,7 +180,7 @@ jobs:
           done
 
       - name: Verify full canonical media package
-        if: ${{ inputs.mode == 'full' }}
+        if: ${{ env.RECOVERY_MODE == 'full' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -170,5 +190,5 @@ jobs:
 
       - name: Recovery summary
         run: |
-          echo "Recovered ${{ steps.recovery.outputs.recovered }} failed media jobs for ${{ inputs.course }} in ${{ inputs.mode }} mode."
+          echo "Recovered ${{ steps.recovery.outputs.recovered }} failed media jobs for $RECOVERY_COURSE in $RECOVERY_MODE mode."
           echo 'No course was published by this workflow.'

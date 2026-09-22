@@ -55,6 +55,10 @@ jobs:
             `/teams/${team}/domains/${encodeURIComponent(domain)}/subdomains/%40`,
           );
           await inspect(
+            'www namespace apex subdomain',
+            `/teams/${team}/domains/${encodeURIComponent('www.elevateforhumanity.org')}/subdomains/%40`,
+          );
+          await inspect(
             'domain subdomains',
             `/teams/${team}/domains/${encodeURIComponent(domain)}/subdomains`,
           );

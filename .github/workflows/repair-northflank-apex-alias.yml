@@ -1,0 +1,92 @@
+name: Repair Northflank apex alias
+
+on:
+  push:
+    branches:
+      - diagnose/northflank-apex-20260922
+    paths:
+      - '.github/workflows/repair-northflank-apex-alias.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+    steps:
+      - name: Add apex alias to verified www hostname
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$NORTHFLANK_API_TOKEN"
+          node <<'NODE'
+          const base = 'https://api.northflank.com/v1';
+          const token = process.env.NORTHFLANK_API_TOKEN;
+          const team = process.env.NORTHFLANK_TEAM_ID;
+          const domain = 'www.elevateforhumanity.org';
+          const alias = 'elevateforhumanity.org';
+          const root = `/teams/${team}/domains/${encodeURIComponent(domain)}/subdomains`;
+
+          async function request(path, init = {}) {
+            const response = await fetch(base + path, {
+              ...init,
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                ...(init.headers || {}),
+              },
+            });
+            const text = await response.text();
+            let body;
+            try {
+              body = text ? JSON.parse(text) : {};
+            } catch {
+              body = { raw: text.slice(0, 500) };
+            }
+            if (!response.ok) {
+              throw new Error(`Northflank ${response.status}: ${JSON.stringify(body)}`);
+            }
+            return body.data ?? body;
+          }
+
+          const current = await request(`${root}/%40`);
+          const aliases = [...new Set([...(current.options?.aliasDomains ?? []), alias])];
+          const updated = await request(root, {
+            method: 'PUT',
+            body: JSON.stringify({
+              name: '@',
+              options: {
+                tlsMode: current.options?.tlsMode ?? 'default',
+                aliasDomains: aliases,
+              },
+            }),
+          });
+          console.log(JSON.stringify({
+            fullName: updated.fullName,
+            verified: updated.verified,
+            aliases: updated.options?.aliasDomains ?? aliases,
+          }, null, 2));
+          NODE
+
+      - name: Verify live apex redirect
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in {1..30}; do
+            result="$(curl -sS -o /dev/null -w '%{http_code}|%{redirect_url}' --max-time 20 https://elevateforhumanity.org/ || true)"
+            code="${result%%|*}"
+            target="${result#*|}"
+            echo "Attempt ${attempt}: ${result}"
+            if { [ "$code" = "301" ] || [ "$code" = "308" ]; } &&
+               [[ "$target" == https://www.elevateforhumanity.org/* ]]; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Apex did not begin redirecting to www"
+          exit 1

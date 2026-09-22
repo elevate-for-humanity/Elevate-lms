@@ -460,10 +460,11 @@ export async function markComplete(
     .eq('id', jobId)
     .eq('status', 'rendering');
   if (leaseToken) completionQuery = completionQuery.eq('lease_token', leaseToken);
-  const { data: job, error: completionError } = await completionQuery
+  const { data: initialJob, error: completionError } = await completionQuery
     .select('course_id, lesson_id, asset_kind, asset_key, script')
     .maybeSingle();
   if (completionError) throw completionError;
+  let job = initialJob;
   if (!job) {
     // Completion is idempotent. If the guarded write committed but its
     // representation was lost at the request boundary, continue from the

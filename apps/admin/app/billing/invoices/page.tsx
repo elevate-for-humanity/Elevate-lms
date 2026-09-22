@@ -15,7 +15,7 @@ export default async function AdminBillingInvoicesPage() {
       db
         .from('billing_invoices')
         .select(
-          'id,provider,invoice_number,customer_external_key,total_cents,status,due_at,paid_at,payment_url,created_at',
+          'id,provider,invoice_number,customer_external_key,customer_email,total_cents,status,due_at,paid_at,payment_url,created_at',
         )
         .order('created_at', { ascending: false })
         .limit(250),
@@ -30,7 +30,7 @@ export default async function AdminBillingInvoicesPage() {
   const invoices = [
     ...(current || []).map((row: any) => ({
       ...row,
-      user_id: row.customer_external_key,
+      user_id: row.customer_email || row.customer_external_key,
       total: Number(row.total_cents) / 100,
       due_date: row.due_at,
     })),
@@ -78,7 +78,9 @@ export default async function AdminBillingInvoicesPage() {
               <th className="px-4 py-3">Provider</th>
               <th className="px-4 py-3">Customer</th>
               <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Due</th>
               <th className="px-4 py-3 text-right">Amount</th>
+              <th className="px-4 py-3 text-right">Payment</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -101,7 +103,22 @@ export default async function AdminBillingInvoicesPage() {
                 <td className="px-4 py-3 capitalize">{row.provider}</td>
                 <td className="px-4 py-3 text-xs">{row.user_id || 'Unassigned'}</td>
                 <td className="px-4 py-3 capitalize">{row.status}</td>
+                <td className="px-4 py-3">{row.due_date || '—'}</td>
                 <td className="px-4 py-3 text-right font-bold">{money(row.total ?? row.amount)}</td>
+                <td className="px-4 py-3 text-right">
+                  {row.payment_url ? (
+                    <a
+                      href={row.payment_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex rounded-lg bg-slate-950 px-3 py-2 text-xs font-bold text-white"
+                    >
+                      Pay now
+                    </a>
+                  ) : (
+                    '—'
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

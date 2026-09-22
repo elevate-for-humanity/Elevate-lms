@@ -3,6 +3,8 @@ import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { getApprenticeBillingAccess } from '@/lib/billing/apprentice-invoice-batch';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,6 +28,14 @@ export default async function LearnerCoursesLayout({ children }: { children: Rea
     ]);
     const isAdmin = ['admin', 'super_admin'].includes(String(actor?.role || ''));
 
+    if (!isAdmin && !subject.previewing) {
+      const billingAccess = await getApprenticeBillingAccess(db, user.id);
+      if (billingAccess.suspended) {
+        await userDb.auth.signOut();
+        redirect('/login?reason=billing_past_due');
+      }
+    }
+
     if (isAdmin && !coursePreview.active) {
       return (
         <CanonicalLearnerWorkspaceLayout>
@@ -40,15 +50,24 @@ export default async function LearnerCoursesLayout({ children }: { children: Rea
                 : 'This Student Portal module is operational. No learner identity, enrollment, course, or progress record is attached to the administrator session.'}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href="https://admin.elevateforhumanity.org/students" className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">
+              <a
+                href="https://admin.elevateforhumanity.org/students"
+                className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white"
+              >
                 Select or manage a learner
               </a>
               {subject.previewing ? (
-                <a href="/api/admin/preview?end=1" className="rounded-xl border border-amber-400 bg-amber-50 px-5 py-3 text-sm font-black text-amber-950">
+                <a
+                  href="/api/admin/preview?end=1"
+                  className="rounded-xl border border-amber-400 bg-amber-50 px-5 py-3 text-sm font-black text-amber-950"
+                >
                   Exit learner preview
                 </a>
               ) : null}
-              <a href="/lms/dashboard" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-950">
+              <a
+                href="/lms/dashboard"
+                className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-950"
+              >
                 Student PWA overview
               </a>
             </div>

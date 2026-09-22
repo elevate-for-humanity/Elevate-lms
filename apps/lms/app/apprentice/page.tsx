@@ -35,6 +35,7 @@ import {
   APPRENTICE_POLICY_KEYS,
   APPRENTICE_POLICY_VERSION,
 } from '@/lib/apprenticeship/apprentice-policy';
+import { getApprenticeBillingAccess } from '@/lib/billing/apprentice-invoice-batch';
 
 export const metadata: Metadata = {
   title: 'Apprentice Dashboard',
@@ -88,6 +89,7 @@ export default async function ApprenticePortalPage() {
   const db = await requireAdminClient();
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) redirect('/login?redirect=/apprentice');
+  const invoiceAccess = await getApprenticeBillingAccess(db, subject.userId);
   const { data: subjectProfile } = await db
     .from('profiles')
     .select('role')
@@ -360,15 +362,20 @@ export default async function ApprenticePortalPage() {
   const paymentStatus = String(automaticBillingSchedule?.provider_status || '').toLowerCase();
   const automaticBillingActive = Boolean(
     automaticBillingSchedule?.status === 'active' &&
-      automaticBillingSchedule?.provider_status === 'active' &&
-      automaticBillingSchedule?.provider_subscription_id,
+    automaticBillingSchedule?.provider_status === 'active' &&
+    automaticBillingSchedule?.provider_subscription_id,
   );
   const paymentNeedsAction =
     !cosmetologyBilling?.fully_paid &&
-    (!automaticBillingActive ||
+    (invoiceAccess.openInvoices.length > 0 ||
+      !automaticBillingActive ||
       paymentStatus === 'suspended' ||
       paymentStatus === 'failed' ||
       paymentStatus === 'expired');
+  const openInvoiceTotal = invoiceAccess.openInvoices.reduce(
+    (sum, invoice) => sum + invoice.amountCents,
+    0,
+  );
   const requiredPolicyPanel = (
     <section className="rounded-3xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-6 shadow-sm sm:p-8">
       <div className="flex gap-3">
@@ -556,18 +563,19 @@ export default async function ApprenticePortalPage() {
               <div>
                 <h2 className="text-xl font-black text-red-950">Payment action required</h2>
                 <p className="mt-2 font-semibold leading-7 text-red-900">
-                  Your account shows a payment problem. Call Elevate immediately, explain why the
-                  payment cannot be made, and keep communicating until an arrangement is confirmed.
-                  Do not ignore notices or simply stop paying. The signed agreement will be
-                  enforced, and continued nonpayment without communication may result in exit from
-                  the program.
+                  {invoiceAccess.openInvoices.length
+                    ? `${invoiceAccess.openInvoices.length} invoice${invoiceAccess.openInvoices.length === 1 ? '' : 's'} totaling $${(openInvoiceTotal / 100).toFixed(2)} ${invoiceAccess.openInvoices.length === 1 ? 'is' : 'are'} due. Open Billing to see each due date and Pay Now link. `
+                    : 'Your account shows a payment problem. '}
+                  If an invoice remains unpaid after its due date, your course account will be
+                  suspended, active sessions will be signed out, and you will not be able to sign in
+                  again until every past-due invoice is paid.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <Link
                     href="/apprentice/billing"
                     className="rounded-xl bg-red-800 px-4 py-3 font-black text-white"
                   >
-                    Review billing
+                    Review invoices and Pay Now links
                   </Link>
                   <Link
                     href="/contact?topic=billing"
@@ -761,17 +769,19 @@ export default async function ApprenticePortalPage() {
             <div>
               <h2 className="text-xl font-black text-red-950">Payment action required</h2>
               <p className="mt-2 font-semibold leading-7 text-red-900">
-                Your account shows a payment problem. Call Elevate immediately, explain why the
-                payment cannot be made, and keep communicating until an arrangement is confirmed. Do
-                not ignore notices or simply stop paying. The signed agreement will be enforced, and
-                continued nonpayment without communication may result in exit from the program.
+                {invoiceAccess.openInvoices.length
+                  ? `${invoiceAccess.openInvoices.length} invoice${invoiceAccess.openInvoices.length === 1 ? '' : 's'} totaling $${(openInvoiceTotal / 100).toFixed(2)} ${invoiceAccess.openInvoices.length === 1 ? 'is' : 'are'} due. Open Billing to see each due date and Pay Now link. `
+                  : 'Your account shows a payment problem. '}
+                If an invoice remains unpaid after its due date, your course account will be
+                suspended, active sessions will be signed out, and you will not be able to sign in
+                again until every past-due invoice is paid.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <Link
                   href="/apprentice/billing"
                   className="rounded-xl bg-red-800 px-4 py-3 font-black text-white"
                 >
-                  Review billing
+                  Review invoices and Pay Now links
                 </Link>
                 <Link
                   href="/contact?topic=billing"

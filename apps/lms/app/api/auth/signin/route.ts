@@ -17,6 +17,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { emailService } from '@/lib/notifications/email';
 import { isQaE2EIdentity } from '@/lib/qa/is-qa-e2e-identity';
+import { getApprenticeBillingAccess } from '@/lib/billing/apprentice-invoice-batch';
 
 const OWNER_ALERT_PROFILE_ID = '964dc85a-bce8-4e67-92eb-198ffafb2384';
 
@@ -67,6 +68,29 @@ const _POST = withErrorHandling(async (request: NextRequest) => {
     throw APIErrors.internal('Authentication failed');
   }
 
+  // Past-due apprentice tuition is an account-level access hold. Check it
+  // after credential verification but before returning a usable session so a
+  // suspended learner cannot bypass the hold with a fresh login.
+  try {
+    const billingDb = await requireAdminClient();
+    const billingAccess = await getApprenticeBillingAccess(billingDb, data.user.id);
+    if (billingAccess.suspended) {
+      await supabase.auth.signOut();
+      return NextResponse.json(
+        {
+          error:
+            'Your course account is suspended because tuition is past due. Use the Pay Now links in your invoice email. Access is restored after every past-due invoice is paid.',
+          code: 'BILLING_PAST_DUE',
+        },
+        { status: 403, headers: { 'Cache-Control': 'no-store' } },
+      );
+    }
+  } catch {
+    // Do not turn a transient billing-ledger outage into a platform-wide login
+    // outage. Confirmed past-due accounts are blocked; unknown state is logged
+    // by the normal authentication audit path and retried on the next request.
+  }
+
   // Notify the platform owner when a real apprentice or Host Shop user signs in.
   // Alert delivery is isolated so a mail-provider failure never blocks authentication.
   try {
@@ -85,21 +109,42 @@ const _POST = withErrorHandling(async (request: NextRequest) => {
       );
     }
     const db = await requireAdminClient();
-    const [{ data: profile }, { data: apprentice }, { data: partnerLinks }, { data: owner }] = await Promise.all([
-      db.from('profiles').select('full_name,email').eq('id', data.user.id).maybeSingle(),
-      db.from('apprentices').select('id').eq('user_id', data.user.id).eq('status', 'active').maybeSingle(),
-      db.from('partner_users').select('partner_id,status,partners(name,shop_name,status,approval_status,is_active,partner_type)').eq('user_id', data.user.id).in('status', ['active','approved']),
-      db.from('profiles').select('email').eq('id', OWNER_ALERT_PROFILE_ID).maybeSingle(),
-    ]);
+    const [{ data: profile }, { data: apprentice }, { data: partnerLinks }, { data: owner }] =
+      await Promise.all([
+        db.from('profiles').select('full_name,email').eq('id', data.user.id).maybeSingle(),
+        db
+          .from('apprentices')
+          .select('id')
+          .eq('user_id', data.user.id)
+          .eq('status', 'active')
+          .maybeSingle(),
+        db
+          .from('partner_users')
+          .select(
+            'partner_id,status,partners(name,shop_name,status,approval_status,is_active,partner_type)',
+          )
+          .eq('user_id', data.user.id)
+          .in('status', ['active', 'approved']),
+        db.from('profiles').select('email').eq('id', OWNER_ALERT_PROFILE_ID).maybeSingle(),
+      ]);
     const activeHostLink = (partnerLinks ?? []).find((link: any) => {
       const partner = link.partners;
-      return partner && partner.status === 'active' && partner.approval_status === 'approved' && partner.is_active !== false &&
-        ['host_shop','barber','training_site','cosmetology_school','salon'].includes(String(partner.partner_type || ''));
+      return (
+        partner &&
+        partner.status === 'active' &&
+        partner.approval_status === 'approved' &&
+        partner.is_active !== false &&
+        ['host_shop', 'barber', 'training_site', 'cosmetology_school', 'salon'].includes(
+          String(partner.partner_type || ''),
+        )
+      );
     });
     const portalKind = apprentice ? 'Apprentice' : activeHostLink ? 'Host Shop' : null;
     if (portalKind && owner?.email) {
       const displayName = profile?.full_name || profile?.email || data.user.email || 'Portal user';
-      const shopName = activeHostLink ? ((activeHostLink as any).partners?.shop_name || (activeHostLink as any).partners?.name) : null;
+      const shopName = activeHostLink
+        ? (activeHostLink as any).partners?.shop_name || (activeHostLink as any).partners?.name
+        : null;
       const signedInAt = new Date().toISOString();
       await emailService.send({
         to: owner.email,

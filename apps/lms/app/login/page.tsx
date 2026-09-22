@@ -93,16 +93,20 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (callbackError === 'magic_link_expired') {
-      setError('That secure sign-in link has expired. Request a new link or sign in with your password.');
+      setError(
+        'That secure sign-in link has expired. Request a new link or sign in with your password.',
+      );
     } else if (callbackError === 'magic_link_failed') {
-      setError('That secure sign-in link is invalid. Request a new link or sign in with your password.');
+      setError(
+        'That secure sign-in link is invalid. Request a new link or sign in with your password.',
+      );
     }
   }, [callbackError]);
 
   // An idle-timeout redirect must actually clear the Supabase browser session
   // before the user signs in again.
   useEffect(() => {
-    if (reason !== 'idle') return;
+    if (reason !== 'idle' && reason !== 'billing_past_due') return;
     const supabase = createClient();
     void supabase.auth.signOut();
   }, [reason]);
@@ -159,8 +163,9 @@ export default function LoginPage() {
       const requestedDestination = safeRedirect
         ? resolveRoleCompatiblePostLoginUrl(safeRedirect, profile.role, effectiveRoles)
         : '';
-      const isStoreReturn =
-        requestedDestination.startsWith('https://store.elevateforhumanity.org/store');
+      const isStoreReturn = requestedDestination.startsWith(
+        'https://store.elevateforhumanity.org/store',
+      );
 
       let destination: string;
 
@@ -223,6 +228,23 @@ export default function LoginPage() {
             className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900"
           >
             Your session expired due to inactivity. Please sign in again.
+          </div>
+        ) : null}
+
+        {reason === 'billing_past_due' && !error ? (
+          <div
+            role="alert"
+            className="mb-5 rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-900"
+          >
+            <p className="font-bold">Course account suspended for past-due tuition.</p>
+            <p className="mt-1">
+              Use the Pay Now links in your invoice email. You will be able to sign in again after
+              every past-due invoice is paid. Contact{' '}
+              <a className="font-semibold underline" href="mailto:billing@elevateforhumanity.org">
+                billing@elevateforhumanity.org
+              </a>{' '}
+              if you need help.
+            </p>
           </div>
         ) : null}
 

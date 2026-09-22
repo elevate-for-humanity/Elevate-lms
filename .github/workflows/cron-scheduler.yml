@@ -50,6 +50,7 @@ on:
           - payment-monitoring
           - payout-deadline-alert
           - reconcile-apprentice-payments
+          - generate-apprentice-invoices
           - webhook-health-check
           - trial-lifecycle
           - autopilot-tick
@@ -437,11 +438,19 @@ jobs:
          || github.event.inputs.job == 'barber-reinstate'
          || github.event.inputs.job == 'payout-deadline-alert'
          || github.event.inputs.job == 'reconcile-apprentice-payments'
+         || github.event.inputs.job == 'generate-apprentice-invoices'
          || github.event.inputs.job == 'school-application-followup'
          || github.event.inputs.job == 'dropout-score'
          || github.event.inputs.job == 'lesson-pace-check'
       ))
     steps:
+      - name: Generate and email apprentice invoice fallback batch
+        run: |
+          curl -sf -X POST "$ADMIN_URL/api/cron/generate-apprentice-invoices" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --max-time 180
+
       - name: Reconcile apprentice automatic payments
         run: |
           curl -sf -X POST "$ADMIN_URL/api/cron/reconcile-apprentice-payments" \

@@ -90,8 +90,8 @@ export const CanonicalCredentialCourseContractSchema = z.object({
     altText: z.literal(true),
   }),
   publication: z.object({
-    requiredGates: z.array(z.enum(REQUIRED_COURSE_GATES)).length(REQUIRED_COURSE_GATES.length),
-    requirements: z.array(z.enum(publicationRequirements)).length(publicationRequirements.length),
+    requiredGates: z.array(z.enum(REQUIRED_COURSE_GATES as unknown as [string, ...string[]])).length(REQUIRED_COURSE_GATES.length),
+    requirements: z.array(z.enum(publicationRequirements as unknown as [string, ...string[]])).length(publicationRequirements.length),
     learnerPreviewRequired: z.literal(true),
     canonicalPersistenceRequired: z.literal(true),
     lmsVerificationRequired: z.literal(true),

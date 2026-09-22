@@ -126,3 +126,60 @@ body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+
+/* Public marketing mobile hardening.
+ * Preserve deliberate horizontal scrollers, but prevent desktop-first grids,
+ * fixed widths, media, and CTA rows from escaping a phone viewport. */
+@media (max-width: 767px) {
+  body {
+    width: 100%;
+    min-width: 0;
+  }
+
+  main :where(section, article, aside, form) {
+    max-width: 100%;
+  }
+
+  main :where([class*='max-w-']) {
+    width: 100%;
+  }
+
+  main :where([class*='grid-cols-2'], [class*='grid-cols-3'], [class*='grid-cols-4'], [class*='grid-cols-5'], [class*='grid-cols-6']) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  main :where([class*='w-['], [class*='min-w-[']) {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  main :where(img, video, iframe, canvas) {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+  }
+
+  main :where(.flex) {
+    min-width: 0;
+  }
+
+  main :where(a, button) {
+    touch-action: manipulation;
+  }
+
+  main :where(a[class*='px-'], button[class*='px-']) {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 390px) {
+  main :where([class*='px-8'], [class*='px-10'], [class*='px-12']) {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  main :where([class*='gap-8'], [class*='gap-10'], [class*='gap-12']) {
+    gap: 1.25rem;
+  }
+}

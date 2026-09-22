@@ -424,18 +424,22 @@ if (
 )
   fail('pre-auth registry contains retired legacy Studio tables');
 
-const courseApplication = read('apps/admin/app/studio/courses/[courseId]/page.tsx');
-for (const dependency of [
-  'CourseProvider',
-  'CourseStudioApplication',
-  'StudioWorkspace',
-  'loadCourseSession',
-]) {
-  if (!courseApplication.includes(dependency))
-    fail(`complete course application is missing ${dependency}`);
-}
-
 const courseCatalog = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+for (const dependency of ['CourseProvider', 'CourseStudioApplication', 'StudioWorkspace']) {
+  if (!courseCatalog.includes(dependency))
+    fail(`master Course Builder application is missing ${dependency}`);
+}
+const courseBuilderApi = read('apps/admin/app/api/admin/course-builder/route.ts');
+if (!courseBuilderApi.includes('loadCourseSession')) {
+  fail('master Course Builder API is missing loadCourseSession');
+}
+const legacyCourseApplication = read('apps/admin/app/studio/courses/[courseId]/page.tsx');
+if (
+  !legacyCourseApplication.includes('redirect(') ||
+  !legacyCourseApplication.includes('/studio/courses?courseId=')
+) {
+  fail('legacy per-course builder route does not redirect to the master Course Builder');
+}
 for (const forbiddenDependency of [
   '/api/admin/course-builder/course',
   'LiveCourseBuilder',

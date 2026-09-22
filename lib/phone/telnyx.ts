@@ -16,7 +16,11 @@ export type TelnyxCallEvent = {
       direction?: string;
       client_state?: string;
       digits?: string;
-      result?: string;
+      result?: string | Record<string, unknown>;
+      status?: string;
+      hangup_cause?: string;
+      hangup_source?: string;
+      message_history?: Array<{ role?: string; content?: string }>;
       recording_urls?: { mp3?: string; wav?: string };
       recording_id?: string;
       transcription_text?: string;
@@ -55,6 +59,10 @@ export function decodeCallState(value?: string): Record<string, string> {
   } catch {
     return {};
   }
+}
+
+export function publicPhoneNumber() {
+  return process.env.TELNYX_PHONE_NUMBER || '+13179999620';
 }
 
 export function menuPrompt(greeting: string, options: Array<{ digit: number; label: string }>) {

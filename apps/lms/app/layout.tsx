@@ -44,8 +44,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <LmsPwaRegistration />
         <ClientProviders>{children}</ClientProviders>
         <PwaInstallBanner
-          message="Install the Elevate dashboard for faster access to courses, hours, documents, and progress."
-          storageKey="lms-pwa-install-banner-dismissed"
+          message="New: Install the Elevate dashboard for live Program Holder phone calls, PARIS messages, courses, hours, and documents."
+          storageKey="lms-pwa-phone-install-banner-v1"
         />
       </body>
     </html>

@@ -7,13 +7,18 @@ import {
   BadgeCheck,
   BarChart2,
   BookOpen,
+  CalendarDays,
   CheckCircle,
   Clock,
   CreditCard,
   ExternalLink,
   GraduationCap,
+  MessageSquare,
   Play,
+  Trophy,
   Upload,
+  Users,
+  Video,
 } from 'lucide-react';
 import { generateInternalMetadata } from '@/lib/seo/metadata';
 import { createClient } from '@/lib/supabase/server';
@@ -87,6 +92,23 @@ export default async function StudentDashboard() {
     : { data: profile };
   const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
   const careerJobs = await getActiveJobs({ limit: 4 });
+  const { data: holderStudentRows } = await db
+    .from('program_holder_students')
+    .select('id')
+    .eq('user_id', subjectId);
+  const holderStudentIds = (holderStudentRows ?? []).map((row) => row.id);
+  const { data: meetingRows } = holderStudentIds.length
+    ? await db
+        .from('program_holder_meetings')
+        .select('id,title,starts_at,duration_minutes,communication_room_id,status')
+        .in('program_holder_student_id', holderStudentIds)
+        .eq('meeting_method', 'video')
+        .in('status', ['scheduled'])
+        .gte('starts_at', new Date(Date.now() - 15 * 60 * 1000).toISOString())
+        .order('starts_at', { ascending: true })
+        .limit(3)
+    : { data: [] };
+  const videoMeetings = (meetingRows ?? []).filter((meeting) => meeting.communication_room_id);
 
   const [
     certificationsRes,
@@ -319,6 +341,11 @@ export default async function StudentDashboard() {
     subjectProfile?.email?.split('@')[0] ||
     (!subject.previewing ? user.email?.split('@')[0] : '') ||
     'there';
+  const studentHeroImage = activeWorkspaceEnrollment?.program_slug
+    ? getProgramCardImage(activeWorkspaceEnrollment.program_slug)
+    : programEnrollments[0]?.programs?.slug
+      ? getProgramCardImage(programEnrollments[0].programs.slug)
+      : '/images/pages/for-students-hero.webp';
 
   const learningTools = [
     {
@@ -422,8 +449,17 @@ export default async function StudentDashboard() {
           </section>
         ) : null}
         {activeCourseEnrollment && activeCourseId ? (
-          <section className="overflow-hidden rounded-3xl bg-slate-950 text-white">
-            <div className="p-6 sm:p-8">
+          <section className="relative isolate min-h-[360px] overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
+            <Image
+              src={studentHeroImage}
+              alt="Students building career skills in class"
+              fill
+              priority
+              sizes="100vw"
+              className="-z-20 object-cover object-center"
+            />
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/35" />
+            <div className="p-6 sm:p-8 lg:max-w-[70%] lg:p-10">
               <p className="text-xs font-black uppercase tracking-[0.15em] text-blue-300">
                 {activeCourse?.title ?? 'Active Course'}
               </p>
@@ -500,14 +536,23 @@ export default async function StudentDashboard() {
             </div>
           </section>
         ) : (
-          <section className="rounded-3xl border border-blue-300 bg-blue-50 p-7 sm:p-9">
-            <p className="text-xs font-black uppercase tracking-[0.15em] text-blue-900">
+          <section className="relative isolate min-h-[340px] overflow-hidden rounded-3xl bg-slate-950 p-7 text-white shadow-xl sm:p-9 lg:p-10">
+            <Image
+              src="/images/pages/for-students-hero.webp"
+              alt="Elevate students learning together"
+              fill
+              priority
+              sizes="100vw"
+              className="-z-20 object-cover object-center"
+            />
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/30" />
+            <p className="text-xs font-black uppercase tracking-[0.15em] text-blue-200">
               Welcome, {firstName}
             </p>
-            <h1 className="mt-2 text-3xl font-black text-slate-950">
+            <h1 className="mt-2 max-w-2xl text-3xl font-black text-white sm:text-4xl">
               Choose your next training step
             </h1>
-            <p className="mt-3 max-w-2xl font-medium text-slate-700">
+            <p className="mt-3 max-w-2xl font-medium leading-7 text-slate-100">
               You do not currently have an active course enrollment. Review your programs,
               application status, and funding options before starting training.
             </p>
@@ -520,7 +565,7 @@ export default async function StudentDashboard() {
               </Link>
               <Link
                 href="/lms/apply/status"
-                className="rounded-xl border border-blue-400 bg-white px-5 py-3 font-bold text-blue-950 hover:bg-blue-100"
+                className="rounded-xl border border-white/60 bg-white/10 px-5 py-3 font-bold text-white backdrop-blur hover:bg-white/20"
               >
                 Application Status
               </Link>
@@ -534,6 +579,49 @@ export default async function StudentDashboard() {
             fundingSource={workoneApp?.requested_funding_source ?? undefined}
           />
         )}
+
+        {videoMeetings.length > 0 ? (
+          <section className="overflow-hidden rounded-2xl border border-indigo-200 bg-indigo-50 p-5 shadow-sm sm:p-6">
+            <div className="flex items-start gap-3">
+              <span className="rounded-xl bg-indigo-700 p-3 text-white">
+                <Video className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest text-indigo-700">
+                  Upcoming video meeting
+                </p>
+                <h2 className="mt-1 text-xl font-black text-slate-950">
+                  Meet from your Student Dashboard
+                </h2>
+                <p className="mt-1 text-sm text-slate-700">
+                  Camera, microphone, room chat, and screen sharing open securely inside Elevate.
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-3">
+              {videoMeetings.map((meeting) => (
+                <article
+                  key={meeting.id}
+                  className="flex flex-col gap-3 rounded-xl border border-indigo-100 bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p className="font-black text-slate-950">{meeting.title}</p>
+                    <p className="mt-1 text-sm text-slate-600">
+                      {new Date(meeting.starts_at).toLocaleString()} · {meeting.duration_minutes}{' '}
+                      minutes
+                    </p>
+                  </div>
+                  <Link
+                    href={`/lms/meetings/${meeting.communication_room_id}`}
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-indigo-700 px-4 py-2 text-sm font-black text-white"
+                  >
+                    <Video className="h-4 w-4" aria-hidden="true" /> Join room
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5">
           <div className="flex items-center justify-between gap-4">
@@ -561,6 +649,77 @@ export default async function StudentDashboard() {
               </p>
             </div>
           )}
+        </section>
+
+        <section className="overflow-hidden rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-violet-50 shadow-sm">
+          <div className="grid lg:grid-cols-[0.8fr_1.2fr]">
+            <div className="relative min-h-64 overflow-hidden lg:min-h-full">
+              <Image
+                src="/images/pages/community-page-2.webp"
+                alt="Elevate school community members collaborating"
+                fill
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-200">
+                  School &amp; Community Hub
+                </p>
+                <h2 className="mt-2 text-2xl font-black">You belong here</h2>
+                <p className="mt-2 max-w-lg text-sm font-medium leading-6 text-slate-100">
+                  Connect with classmates, career circles, school events, and people who can help
+                  you move forward.
+                </p>
+              </div>
+            </div>
+            <div className="grid gap-3 p-5 sm:grid-cols-2 sm:p-6">
+              {[
+                {
+                  href: '/lms/community',
+                  label: 'Community Feed',
+                  detail: 'Join conversations and see what is happening across Elevate.',
+                  icon: MessageSquare,
+                  tone: 'bg-blue-100 text-blue-800',
+                },
+                {
+                  href: '/lms/groups',
+                  label: 'Groups & Career Circles',
+                  detail: 'Find study groups, cohorts, and professional interests.',
+                  icon: Users,
+                  tone: 'bg-violet-100 text-violet-800',
+                },
+                {
+                  href: '/lms/events',
+                  label: 'School Events',
+                  detail: 'See workshops, networking events, and upcoming activities.',
+                  icon: CalendarDays,
+                  tone: 'bg-emerald-100 text-emerald-800',
+                },
+                {
+                  href: '/lms/leaderboard',
+                  label: 'Achievements',
+                  detail: 'Celebrate participation, progress, and community milestones.',
+                  icon: Trophy,
+                  tone: 'bg-amber-100 text-amber-800',
+                },
+              ].map(({ href, label, detail, icon: Icon, tone }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="group rounded-2xl border border-white bg-white/90 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  <span className={`inline-flex rounded-xl p-2.5 ${tone}`}>
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <h3 className="mt-3 font-black text-slate-950 group-hover:text-blue-800">
+                    {label}
+                  </h3>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">{detail}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
         </section>
 
         <div className="grid gap-6 lg:grid-cols-3">

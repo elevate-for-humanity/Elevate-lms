@@ -78,6 +78,30 @@ export class PushNotificationService {
     }
     return successCount;
   }
+
+  /** Send through an already-authorized server database client (for signed webhooks). */
+  async sendToUserWithDatabase(
+    database: any,
+    userId: string,
+    notification: PushNotification,
+  ): Promise<number> {
+    if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) return 0;
+    const { data, error } = await database
+      .from('push_subscriptions')
+      .select('endpoint,p256dh,auth')
+      .eq('user_id', userId);
+    if (error || !data?.length) return 0;
+    let sent = 0;
+    for (const row of data) {
+      if (!row.endpoint || !row.p256dh || !row.auth) continue;
+      const ok = await this.sendToSubscription(
+        { endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } },
+        notification,
+      );
+      if (ok) sent += 1;
+    }
+    return sent;
+  }
   /**
    * Send push notification to multiple users
    */
@@ -115,7 +139,13 @@ export class PushNotificationService {
         // Error: $1
         return [];
       }
-      return data || [];
+      return (data || []).map((row: any) => ({
+        ...row,
+        subscription: {
+          endpoint: row.endpoint,
+          keys: { p256dh: row.p256dh, auth: row.auth },
+        },
+      }));
     } catch (error) {
       // Error: $1
       return [];
@@ -132,7 +162,13 @@ export class PushNotificationService {
         // Error: $1
         return [];
       }
-      return data || [];
+      return (data || []).map((row: any) => ({
+        ...row,
+        subscription: {
+          endpoint: row.endpoint,
+          keys: { p256dh: row.p256dh, auth: row.auth },
+        },
+      }));
     } catch (error) {
       // Error: $1
       return [];
@@ -146,7 +182,10 @@ export class PushNotificationService {
       const supabase = await createClient();
       await supabase.from('push_subscriptions').delete().eq('endpoint', endpoint);
     } catch (error) {
-      logger.error('[PushService] Failed to remove expired subscription', { endpoint, error: String(error) });
+      logger.error('[PushService] Failed to remove expired subscription', {
+        endpoint,
+        error: String(error),
+      });
     }
   }
   /**

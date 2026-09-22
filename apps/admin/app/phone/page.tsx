@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Bot, Phone, PhoneForwarded, Radio, Users, Video, Voicemail, Workflow } from 'lucide-react';
+import { Bot, Phone, PhoneForwarded, Radio, Video, Voicemail, Workflow } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { formatUsPhone, parseBusinessHours } from '@/lib/phone/config';
@@ -15,7 +15,6 @@ import {
   dismissCommunicationsAnnouncement,
   setDefaultDestination,
   toggleDestination,
-  removeDestination,
   removeExternalNumber,
   removeMenuOption,
   testDestination,
@@ -55,6 +54,7 @@ export default async function PhonePage() {
     workspaceResult,
     programHoldersResult,
     extensionsResult,
+    devicesResult,
   ] = systemId
     ? await Promise.all([
         db.from('phone_numbers').select('*').eq('phone_system_id', systemId).order('created_at'),
@@ -96,6 +96,11 @@ export default async function PhonePage() {
           )
           .eq('workspace.phone_system_id', systemId)
           .order('extension'),
+        db
+          .from('phone_webrtc_devices')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'active')
+          .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString()),
       ])
     : ([
         { data: [] },
@@ -106,6 +111,7 @@ export default async function PhonePage() {
         { data: null },
         { data: [] },
         { data: [] },
+        { count: 0 },
       ] as any);
 
   const numbers = numbersResult.data ?? [];
@@ -120,7 +126,7 @@ export default async function PhonePage() {
     afterHours:
       system?.after_hours_message ??
       'Our office is currently closed. Please leave a message and we will return your call.',
-    routingMode: system?.routing_mode ?? 'menu',
+    routingMode: system?.routing_mode === 'ai_receptionist' ? 'ai_receptionist' : 'menu',
     timezone: system?.timezone ?? 'America/Indiana/Indianapolis',
     businessHours: parseBusinessHours(
       system?.business_hours ?? {
@@ -149,7 +155,7 @@ export default async function PhonePage() {
 
   const cards = [
     ['Business numbers', numbers.length, Phone],
-    ['Team phones', destinations.length, PhoneForwarded],
+    ['PWA routes', destinations.length, PhoneForwarded],
     ['Calls', callsResult.count ?? 0, Workflow],
     ['New voicemail', voicemailResult.count ?? 0, Voicemail],
   ] as const;
@@ -158,18 +164,18 @@ export default async function PhonePage() {
   );
   const meetingReady = workspaceResult.data?.status === 'active';
   const primaryNumber = numbers.find(
-    (number: any) => number.source === 'provider' && number.status === 'active' && number.is_primary,
+    (number: any) =>
+      number.source === 'provider' && number.status === 'active' && number.is_primary,
   );
   const routingReady =
-    system?.routing_mode === 'direct_forward'
-      ? Boolean(system?.default_destination_id)
-      : system?.routing_mode === 'ai_receptionist'
-        ? Boolean(system?.ai_enabled)
-        : menuOptions.some((option: any) => option.enabled && option.destination_id);
+    system?.routing_mode === 'ai_receptionist'
+      ? Boolean(system?.ai_enabled)
+      : menuOptions.some((option: any) => option.enabled && option.destination_id);
   const setupSteps = [
-    { label: 'Add team cell phones', complete: destinations.some((item: any) => item.enabled) },
+    { label: 'Assign PWA extensions', complete: destinations.some((item: any) => item.enabled) },
     { label: 'Choose call routing', complete: routingReady },
     { label: 'Create extensions', complete: extensions.some((item: any) => item.enabled) },
+    { label: 'Connect one PWA phone', complete: (devicesResult.count ?? 0) > 0 },
     { label: 'Test before activation', complete: (callsResult.count ?? 0) > 0 },
   ];
   const phoneReady =
@@ -192,8 +198,8 @@ export default async function PhonePage() {
           </p>
           <h1 className="mt-1 text-3xl font-black text-slate-950">Elevate Communications Hub</h1>
           <p className="mt-1 max-w-3xl text-sm text-slate-600">
-            Manage business numbers, team cell phones, extensions, call routing, AI reception, video
-            meetings, screen sharing, and communication history.
+            Manage business numbers, PWA extensions, call routing, AI reception, video meetings,
+            screen sharing, and communication history.
           </p>
         </div>
         <div className="flex gap-2">
@@ -213,10 +219,7 @@ export default async function PhonePage() {
         </div>
       </div>
       {!onboarding?.announcement_seen_at ? (
-        <NewSystemNotice
-          dismissAction={dismissCommunicationsAnnouncement}
-          steps={setupSteps}
-        />
+        <NewSystemNotice dismissAction={dismissCommunicationsAnnouncement} steps={setupSteps} />
       ) : null}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map(([label, value, Icon]) => (
@@ -233,14 +236,19 @@ export default async function PhonePage() {
         >
           <div className="flex items-center gap-2 font-black">
             <Radio className="h-4 w-4" />
-            Phone network: {phoneReady ? 'Ready' : carrierReady ? 'Connected — setup incomplete' : 'Setup required'}
+            Phone network:{' '}
+            {phoneReady
+              ? 'Ready'
+              : carrierReady
+                ? 'Connected — setup incomplete'
+                : 'Setup required'}
           </div>
           <p className="mt-1">
             {phoneReady
-              ? 'The carrier, primary number, routing, extensions, team phones, and call testing are complete.'
+              ? 'The carrier, primary number, routing, PWA extensions, and call testing are complete.'
               : carrierReady
                 ? 'The carrier is connected, but one or more routing, extension, destination, or testing steps are incomplete.'
-              : 'Dashboard configuration is available, but live calls require a verified carrier number and connection.'}
+                : 'Dashboard configuration is available, but live calls require a verified carrier number and connection.'}
           </p>
         </div>
         <div
@@ -335,7 +343,7 @@ export default async function PhonePage() {
           )}
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="font-black">Team cell phones</h2>
+          <h2 className="font-black">PWA call routes</h2>
           {destinations.length ? (
             <ul className="mt-3 divide-y divide-slate-100">
               {destinations.map((item: any) => (
@@ -347,7 +355,12 @@ export default async function PhonePage() {
                     ) : null}
                     <br />
                     <span className="text-slate-600">
-                      {formatUsPhone(item.destination)} · rings {item.ring_seconds}s
+                      {item.destination_type === 'webrtc'
+                        ? `PWA extension ${extensions.find((extension: any) => extension.id === item.extension_id)?.extension ?? 'unassigned'}`
+                        : item.destination_type === 'phone'
+                          ? `Administrator fallback · ${formatUsPhone(item.destination)}`
+                          : 'PARIS / voicemail route'}{' '}
+                      · rings {item.ring_seconds}s
                     </span>
                   </span>
                   <div className="flex gap-2">
@@ -376,19 +389,13 @@ export default async function PhonePage() {
                         Test call
                       </button>
                     </form>
-                    <form action={removeDestination}>
-                      <input type="hidden" name="destinationId" value={item.id} />
-                      <button className="rounded-lg border border-rose-300 px-2 py-1 text-xs font-bold text-rose-700">
-                        Remove
-                      </button>
-                    </form>
                   </div>
                 </li>
               ))}
             </ul>
           ) : (
             <p className="mt-3 text-sm text-slate-600">
-              Add the first team cell phone that should receive business calls.
+              Assign a Program Holder extension to create the first PWA call route.
             </p>
           )}
         </div>

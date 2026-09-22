@@ -164,7 +164,7 @@ export async function savePhoneSettings(
     const routingMode = String(formData.get('routingMode') ?? 'menu');
     const maxQueueSeconds = boundedInteger(formData.get('maxQueueSeconds'), 15, 600);
     if (!greeting || !afterHours) return { ok: false, message: 'Enter both greeting messages.' };
-    if (!['menu', 'ai_receptionist', 'direct_forward'].includes(routingMode)) {
+    if (!['menu', 'ai_receptionist'].includes(routingMode)) {
       return { ok: false, message: 'Choose a valid call-routing mode.' };
     }
     if (!maxQueueSeconds)
@@ -263,34 +263,13 @@ export async function removeExternalNumber(formData: FormData): Promise<void> {
 
 export async function addDestination(
   _state: PhoneActionState,
-  formData: FormData,
+  _formData: FormData,
 ): Promise<PhoneActionState> {
-  try {
-    const { db, id } = await requireSystemId();
-    const name = String(formData.get('name') ?? '').trim();
-    const destination = normalizeUsPhone(formData.get('destination'));
-    const ringSeconds = boundedInteger(formData.get('ringSeconds'), 5, 120);
-    if (!name || !destination || !ringSeconds) {
-      return {
-        ok: false,
-        message: 'Enter a name, valid cell phone, and ring time from 5 to 120 seconds.',
-      };
-    }
-    const { error } = await db.from('phone_destinations').insert({
-      phone_system_id: id,
-      name,
-      department: String(formData.get('department') ?? '').trim() || null,
-      destination_type: 'phone',
-      destination,
-      ring_seconds: ringSeconds,
-      fallback_to_voicemail: checked(formData, 'fallbackToVoicemail'),
-    });
-    if (error) return { ok: false, message: error.message };
-    revalidatePath('/phone');
-    return { ok: true, message: `${name} is now available as a cell-phone ring destination.` };
-  } catch (error) {
-    return failure(error, 'Unable to add the destination.');
-  }
+  return {
+    ok: false,
+    message:
+      'Employee personal-number forwarding is disabled. Assign a Program Holder extension so calls ring in the PWA.',
+  };
 }
 
 export async function saveMenuOption(
@@ -373,14 +352,25 @@ export async function toggleDestination(formData: FormData): Promise<void> {
 export async function removeDestination(formData: FormData): Promise<void> {
   const { db, id } = await requireSystemId();
   const destinationId = String(formData.get('destinationId') ?? '');
-  const [{ data: system }, { count: routes }] = await Promise.all([
+  const [{ data: system }, { data: destination }, { count: routes }] = await Promise.all([
     db.from('phone_systems').select('default_destination_id').eq('id', id).single(),
+    db
+      .from('phone_destinations')
+      .select('destination_type')
+      .eq('id', destinationId)
+      .eq('phone_system_id', id)
+      .maybeSingle(),
     db
       .from('phone_menu_options')
       .select('id', { count: 'exact', head: true })
       .eq('phone_system_id', id)
       .eq('destination_id', destinationId),
   ]);
+  if (destination?.destination_type === 'webrtc') {
+    throw new Error(
+      'PWA routes are managed through Program Holder extensions and cannot be removed.',
+    );
+  }
   if (system?.default_destination_id === destinationId || (routes ?? 0) > 0) {
     throw new Error('Reassign the default destination and menu routes before removing this phone.');
   }
@@ -399,7 +389,7 @@ export async function testDestination(formData: FormData): Promise<void> {
   const [{ data: destination }, { data: number }] = await Promise.all([
     db
       .from('phone_destinations')
-      .select('destination,enabled')
+      .select('destination,enabled,destination_type,extension_id')
       .eq('id', destinationId)
       .eq('phone_system_id', id)
       .maybeSingle(),
@@ -412,15 +402,33 @@ export async function testDestination(formData: FormData): Promise<void> {
       .eq('is_primary', true)
       .maybeSingle(),
   ]);
-  if (!destination?.enabled || !destination.destination || !number?.e164) {
-    throw new Error('An active primary number and enabled team phone are required for a test call.');
+  if (!destination?.enabled || !number?.e164) {
+    throw new Error('An active primary number and enabled PWA route are required for a test call.');
   }
+  let target = destination.destination as string | null;
+  if (destination.destination_type === 'webrtc') {
+    if (!destination.extension_id) throw new Error('This PWA route has no assigned extension.');
+    const { data: device } = await db
+      .from('phone_webrtc_devices')
+      .select('sip_username')
+      .eq('extension_id', destination.extension_id)
+      .eq('status', 'active')
+      .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString())
+      .order('last_seen_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (!device?.sip_username) {
+      throw new Error('That Program Holder must connect Phone in the PWA before a test call.');
+    }
+    target = `sip:${device.sip_username}@sip.telnyx.com;secure=srtp`;
+  }
+  if (!target) throw new Error('This route has no callable PWA device.');
   const connectionId = process.env.TELNYX_CONNECTION_ID;
   if (!connectionId) throw new Error('TELNYX_CONNECTION_ID is not configured.');
   await telnyxClient().calls.dial({
     connection_id: connectionId,
     from: number.e164,
-    to: destination.destination,
+    to: target,
     timeout_secs: 25,
     answering_machine_detection: 'disabled',
     client_state: Buffer.from(
@@ -484,19 +492,60 @@ export async function saveProgramHolderExtension(formData: FormData): Promise<vo
     .in('role', ['program_holder', 'programholder'])
     .maybeSingle();
   if (!profile) throw new Error('Select a valid Program Holder account.');
-  const { error } = await db.from('communication_extensions').upsert(
-    {
-      workspace_id: workspace.id,
-      profile_id: profile.id,
-      extension,
-      display_name: profile.full_name || profile.email || 'Program Holder',
-      department,
-      enabled: true,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'workspace_id,profile_id' },
-  );
+  const { data: savedExtension, error } = await db
+    .from('communication_extensions')
+    .upsert(
+      {
+        workspace_id: workspace.id,
+        profile_id: profile.id,
+        extension,
+        display_name: profile.full_name || profile.email || 'Program Holder',
+        department,
+        enabled: true,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'workspace_id,profile_id' },
+    )
+    .select('id,display_name,department,extension,destination_id')
+    .single();
   if (error) throw new Error(error.message);
+  if (!workspace.phone_system_id)
+    throw new Error('The communications workspace has no phone system.');
+  const { data: existingDestination } = await db
+    .from('phone_destinations')
+    .select('id')
+    .eq('phone_system_id', workspace.phone_system_id)
+    .eq('extension_id', savedExtension.id)
+    .order('created_at')
+    .limit(1)
+    .maybeSingle();
+  const destinationValues = {
+    phone_system_id: workspace.phone_system_id,
+    extension_id: savedExtension.id,
+    name: savedExtension.display_name,
+    department: savedExtension.department,
+    destination_type: 'webrtc',
+    destination: null,
+    ring_seconds: 20,
+    fallback_to_voicemail: true,
+    enabled: true,
+    updated_at: new Date().toISOString(),
+  };
+  const destinationResult = existingDestination
+    ? await db
+        .from('phone_destinations')
+        .update(destinationValues)
+        .eq('id', existingDestination.id)
+        .select('id')
+        .single()
+    : await db.from('phone_destinations').insert(destinationValues).select('id').single();
+  if (destinationResult.error) throw new Error(destinationResult.error.message);
+  const { error: linkError } = await db
+    .from('communication_extensions')
+    .update({ destination_id: destinationResult.data.id, updated_at: new Date().toISOString() })
+    .eq('id', savedExtension.id)
+    .eq('workspace_id', workspace.id);
+  if (linkError) throw new Error(linkError.message);
   revalidatePath('/phone');
   revalidatePath('/program-holder/dashboard');
 }

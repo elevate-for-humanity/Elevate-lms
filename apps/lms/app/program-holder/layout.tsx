@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { PROGRAM_HOLDER_ROLES } from '@/lib/rbac/role-matrix';
 import Link from 'next/link';
+import { ProgramHolderPhoneReceiver } from '@/components/program-holder/ProgramHolderPhoneReceiver';
 
 const PORTAL_LINKS = [
   ['Dashboard', '/program-holder/dashboard'],
@@ -10,6 +11,9 @@ const PORTAL_LINKS = [
   ['Programs', '/program-holder/programs'],
   ['Hours', '/program-holder/hours'],
   ['Meetings', '/program-holder/meetings'],
+  ['Phone · New', '/program-holder/phone'],
+  ['Community', '/lms/community'],
+  ['Career Feed', '/lms/career'],
   ['Office Mail', '/program-holder/inbox'],
   ['Documents', '/program-holder/documents'],
   ['Compliance', '/program-holder/compliance'],
@@ -50,12 +54,17 @@ export default async function ProgramHolderPortalLayout({
       >
         <div className="mx-auto flex min-w-max max-w-[1600px] items-center gap-2">
           {PORTAL_LINKS.map(([label, href]) => (
-            <Link key={href} href={href} className="inline-flex min-h-10 items-center rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-800">
+            <Link
+              key={href}
+              href={href}
+              className="inline-flex min-h-10 items-center rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-800"
+            >
               {label}
             </Link>
           ))}
         </div>
       </nav>
+      <ProgramHolderPhoneReceiver />
       {children}
     </>
   );

@@ -19,6 +19,7 @@ import type { ProgramBuilderTemplate } from './schema';
 import { adaptProgramTemplateToBlueprint } from './publish-adapter';
 import { requireAdminClient } from '../supabase/admin';
 import { assertCourseBuilderGenerationEnabled } from './generation-control';
+import { evaluatePersistedCredentialCourse } from '../course-factory/canonical-course-gate';
 import { evaluatePersistedCourseReadiness } from '../course-package/persisted-readiness';
 
 const courseProgramConfigSchema = z.object({

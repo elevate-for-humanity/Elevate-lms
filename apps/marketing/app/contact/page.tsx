@@ -3,7 +3,7 @@ import { Phone, Mail, MapPin, Clock, MessageSquare, Users, Building2 } from 'luc
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Contact Elevate for Humanity | Workforce Development & Apprenticeship Programs',
+  title: 'Contact | Workforce Development & Apprenticeship Programs',
   description: 'Get in touch with our workforce development team. We help job seekers, employers, and training partners connect to funded career programs in Indianapolis and across Indiana.',
 };
 
@@ -297,7 +297,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
             <div className="bg-slate-50 rounded-xl p-6">
               <h3 className="font-bold text-slate-900 mb-2">What programs do you offer?</h3>
               <p className="text-slate-600 text-sm">
-                We offer DOL-registered apprenticeships in barbering and cosmetology, plus workforce training programs in healthcare, skilled trades, technology, and more.
+                We offer registered apprenticeship and workforce-training pathways across barbering, beauty, healthcare, skilled trades, technology, and other career fields. Registration status is program-specific; confirm the current public apprenticeship record before relying on a federal registration claim.
               </p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">
@@ -309,7 +309,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
             <div className="bg-slate-50 rounded-xl p-6">
               <h3 className="font-bold text-slate-900 mb-2">How do apprenticeships work?</h3>
               <p className="text-slate-600 text-sm">
-                You earn while you learn — working at a host shop while completing related instruction. Most programs take 1-2 years to complete.
+                Registered apprenticeships combine paid on-the-job learning with related instruction. Program length, competencies, and hour requirements vary by occupation and the applicable registered standards.
               </p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">

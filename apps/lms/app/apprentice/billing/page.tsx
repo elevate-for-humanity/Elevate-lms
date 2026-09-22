@@ -37,6 +37,7 @@ type ScheduleRow = {
   status: string;
   provider_status: string;
   provider_subscription_id: string | null;
+  provider_approval_url: string | null;
 };
 
 function summary(
@@ -153,12 +154,14 @@ function SubscriptionBilling({
   billing,
   portalPath,
   needsBillingAgreement,
+  billingApprovalUrl,
   previewing,
   invoices,
 }: {
   billing: BillingSummary;
   portalPath: string;
   needsBillingAgreement: boolean;
+  billingApprovalUrl?: string | null;
   previewing: boolean;
   invoices: ApprenticeDashboardInvoice[];
 }) {
@@ -179,6 +182,16 @@ function SubscriptionBilling({
               Complete the recurring-payment release and approve the PayPal billing agreement to
               keep the tuition account current.
             </p>
+            {billingApprovalUrl ? (
+              <a
+                href={billingApprovalUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex rounded-lg bg-[#0070ba] px-4 py-2 font-bold text-white"
+              >
+                Approve PayPal billing
+              </a>
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -211,7 +224,7 @@ export default async function ApprenticeBillingPage() {
     ? await db
         .from('billing_schedules')
         .select(
-          'amount_cents,cadence,next_invoice_date,status,provider_status,provider_subscription_id',
+          'amount_cents,cadence,next_invoice_date,status,provider_status,provider_subscription_id,provider_approval_url',
         )
         .eq('id', billingAuthorization.billing_schedule_id)
         .maybeSingle()
@@ -242,6 +255,7 @@ export default async function ApprenticeBillingPage() {
         billing={billing}
         portalPath={portalPath}
         needsBillingAgreement={!billing.fullyPaid && !billing.hasSubscription}
+        billingApprovalUrl={schedule?.provider_approval_url}
         previewing={subject.previewing}
         invoices={billingAccess.invoices}
       />
@@ -266,6 +280,7 @@ export default async function ApprenticeBillingPage() {
           billing={billing}
           portalPath={portalPath}
           needsBillingAgreement={!billing.fullyPaid && !billing.hasSubscription}
+          billingApprovalUrl={schedule?.provider_approval_url}
           previewing={subject.previewing}
           invoices={billingAccess.invoices}
         />

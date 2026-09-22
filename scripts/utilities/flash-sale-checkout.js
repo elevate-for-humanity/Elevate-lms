@@ -78,7 +78,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
             product_data: {
               name: `🔥 FLASH SALE: ${package.name}`,
               description: `Emergency Sale - ${Math.round(((package.originalPrice - package.price) / package.originalPrice) * 100)}% OFF!`,
-              images: ['https://elevateforhumanity.org/images/flash-sale-banner.png'],
+              images: ['https://www.elevateforhumanity.org/images/flash-sale-banner.png'],
             },
             unit_amount: package.price * 100,
           },
@@ -161,8 +161,8 @@ async function sendFlashSaleLicense(email, packageId, licenseKey, certificatePat
     Your License Key: ${licenseKey}
 
     IMMEDIATE ACCESS:
-    • Download your files: https://elevateforhumanity.org/download/${licenseKey}
-    • License Dashboard: https://elevateforhumanity.org/license-dashboard.html
+    • Download your files: https://www.elevateforhumanity.org/download/${licenseKey}
+    • License Dashboard: https://www.elevateforhumanity.org/license-dashboard.html
     • Certificate: Attached PDF
 
     WHAT'S INCLUDED:

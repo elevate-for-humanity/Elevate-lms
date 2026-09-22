@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://elevateforhumanity.org/schemas/lesson-contract.json",
+  "$id": "https://www.elevateforhumanity.org/schemas/lesson-contract.json",
   "title": "LessonContract",
   "description": "Schema for a curriculum lesson as it flows through the generator → validator → publish pipeline.",
   "type": "object",

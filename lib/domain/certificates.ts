@@ -68,7 +68,7 @@ function normalizeCertStatus(raw: string | null): CertificateStatus {
 
 function buildVerificationUrl(certId: string, existing: string | null): string {
   if (existing?.startsWith('http')) return existing;
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://elevateforhumanity.org';
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
   return `${base}/verify/${certId}`;
 }
 

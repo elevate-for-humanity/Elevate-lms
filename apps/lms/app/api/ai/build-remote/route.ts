@@ -11,7 +11,7 @@ import { PLATFORM_DEFAULTS } from "@/lib/config/platform-config";
 
 export const dynamic = "force-dynamic";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elevateforhumanity.org';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
 function generateEmbedScript(siteId: string, apiKey: string, features: string[]): string {
   return `<!-- ${PLATFORM_DEFAULTS.orgName} LMS Integration -->

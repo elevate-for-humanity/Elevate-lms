@@ -13,7 +13,7 @@ export interface CourseEmailData {
   purchaseDate: string;
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elevateforhumanity.org';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 
 // Maps program slug → LMS course UUID for direct deep-linking.
 // Add new programs here as they are seeded.

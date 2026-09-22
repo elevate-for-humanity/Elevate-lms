@@ -233,9 +233,9 @@ DOL Registered Apprenticeship Sponsor | ETPL Listed
 //   lastName: 'Smith',
 //   email: 'john@example.com',
 //   program: 'Barber Apprenticeship',
-//   dashboardUrl: 'https://elevateforhumanity.org/dashboard',
-//   orientationUrl: 'https://elevateforhumanity.org/orientation-video',
-//   handbookUrl: 'https://elevateforhumanity.org/handbook',
+//   dashboardUrl: 'https://www.elevateforhumanity.org/dashboard',
+//   orientationUrl: 'https://www.elevateforhumanity.org/orientation-video',
+//   handbookUrl: 'https://www.elevateforhumanity.org/handbook',
 //   supportEmail: 'support@elevateforhumanity.org',
 //   supportPhone: '(317) 314-3757'
 // });

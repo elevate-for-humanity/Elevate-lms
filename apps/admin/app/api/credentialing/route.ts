@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     organization: {
       name: 'Elevate for Humanity',
       id: '34772',
-      website: 'https://elevateforhumanity.org',
+      website: 'https://www.elevateforhumanity.org',
       description: 'CREDENTILING STATE WORKFORCE PROGRAMS',
       ctid: 'ce-6e3defc7-c349-4d16-aadb-35f02c998758',
     },

@@ -1,3 +1,4 @@
+-- Production migration version: 20260922021235.
 -- Recover course-scoped Cloudflare narration reservations after a renderer
 -- lease dies. A stranded paid-inference row must not block every later lesson
 -- in the same course, but ambiguous provider outcomes remain fail-closed for

@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 const root = process.cwd();
 const read = (relative: string) => fs.readFileSync(path.join(root, relative), 'utf8');
 const migration = read(
-  'supabase/migrations/20260922020014_recover_course_media_paid_inference.sql',
+  'supabase/migrations/20260922021235_recover_course_media_paid_inference.sql',
 );
 const recovery = read('scripts/course-builder/recover-paid-narration-media.ts');
 const workflow = read('.github/workflows/recover-existing-course-media.yml');

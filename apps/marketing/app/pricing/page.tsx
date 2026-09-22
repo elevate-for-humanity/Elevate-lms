@@ -105,7 +105,7 @@ export default async function PricingPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Program Tuition</h2>
-            <p className="text-lg text-slate-600">Prices shown before funding. Most students pay $0 out of pocket.</p>
+            <p className="text-lg text-slate-600">Prices shown before any approved assistance. Funding is program- and participant-specific and requires written authorization from the responsible agency.</p>
             {programs.length > 0 ? (
               <p className="text-sm text-green-600 mt-2">{programs.length} programs with published pricing</p>
             ) : (
@@ -140,7 +140,7 @@ export default async function PricingPage() {
                   <span className="text-slate-500 ml-2">full tuition</span>
                 </div>
                 <div className="text-sm text-slate-600 mb-4 space-y-1">
-                  <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> Funding options may be available</p>
+                  <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> See the program page for verified funding records</p>
                   <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> Payment plan from $50/week</p>
                   <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> Employer sponsorship</p>
                 </div>
@@ -285,7 +285,7 @@ export default async function PricingPage() {
               <div className="space-y-4">
                 <div className="bg-slate-800 rounded-lg p-4">
                   <h3 className="font-semibold mb-2">Workforce Funding</h3>
-                  <p className="text-slate-300 text-sm">WIOA, Indiana Workforce Ready Grant, and other programs may help cover tuition for eligible participants in approved programs. Contact admissions or your local WorkOne office to confirm options.</p>
+                  <p className="text-slate-300 text-sm">Public workforce funding is program- and participant-specific. Review the verified funding registry and obtain written authorization from the responsible agency before relying on funding.</p>
                   <Link href="/check-eligibility" className="text-green-400 font-semibold text-sm hover:underline mt-2 inline-block">Check eligibility</Link>
                 </div>
                 <div className="bg-slate-800 rounded-lg p-4">

@@ -304,9 +304,11 @@ export async function enforceMediaQuality(input: {
     const evidenceScenes = input.sceneData.scenes.filter((scene) =>
       Boolean(scene.requiredVisualEvidence),
     );
+    // A moving source is the delivered visual for a scene. Audit it before the
+    // still fallback so different thumbnails cannot hide one repeated clip.
     const visualKeys = input.sceneData.scenes.map(
       (scene) =>
-        scene.referenceImageUrl || scene.sourceVideoUrl || scene.action.trim().toLowerCase(),
+        scene.sourceVideoUrl || scene.referenceImageUrl || scene.action.trim().toLowerCase(),
     );
     const counts = new Map<string, number>();
     visualKeys.forEach((key) => counts.set(key, (counts.get(key) ?? 0) + 1));

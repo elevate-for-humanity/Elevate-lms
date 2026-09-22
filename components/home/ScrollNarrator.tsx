@@ -11,7 +11,8 @@ import {
 // Version the preference after restoring prerecorded scroll narration. This
 // clears stale "off" state left by the previously silent implementation while
 // preserving every new choice the visitor makes from this release onward.
-const NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration:v2';
+const NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration';
+const LEGACY_NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration:v2';
 
 function narrationFor(section: HTMLElement) {
   return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 900) ?? '';
@@ -130,7 +131,9 @@ export function ScrollNarrator() {
   }, []);
 
   useEffect(() => {
-    const preference = window.localStorage.getItem(NARRATION_PREFERENCE_KEY);
+    const preference =
+      window.localStorage.getItem(NARRATION_PREFERENCE_KEY) ??
+      window.localStorage.getItem(LEGACY_NARRATION_PREFERENCE_KEY);
     if (preference === 'off') setEnabled(false);
   }, []);
 
@@ -203,7 +206,8 @@ export function ScrollNarrator() {
       timer = window.setTimeout(() => {
         const current = lastNarrationRef.current?.section;
         const visible = mostVisiblePageSection();
-        if (!visible || visible === current) return;
+        if (visible === current) return;
+        if (!visible) return;
         void narrateVisibleSection();
       }, 850);
     };

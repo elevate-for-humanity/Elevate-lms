@@ -142,7 +142,6 @@ export default async function ParisStudentApplicationPage({
               <PaymentPlanCalculator
                 programSlug={initialProgram}
                 initialPaymentMode={paymentPreference}
-                successUrl={`/apply/student/interview?program=${encodeURIComponent(initialProgram)}&intent=enrollment`}
               />
             </section>
           )}

@@ -67,10 +67,7 @@ export default async function StandardStudentApplicationPage({
             <h2 id="standard-application-payment" className="mb-4 text-2xl font-black text-slate-950">
               Required payment verification
             </h2>
-            <PaymentPlanCalculator
-              programSlug={initialProgram}
-              successUrl={`/apply/student/form?program=${encodeURIComponent(initialProgram)}&intent=enrollment`}
-            />
+            <PaymentPlanCalculator programSlug={initialProgram} />
           </section>
         ) : null}
       </div>

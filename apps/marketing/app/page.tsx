@@ -91,21 +91,6 @@ export default function HomePage() {
       <StructuredData />
       <main className="[&_a]:no-underline [&_a:hover]:no-underline">
         <PlatformHubHero />
-        {/* Put funded career training and the WorkOne action path before apprenticeships. */}
-        <div
-          data-scroll-narration
-          data-narration-src="/audio/narration/career-pathways.mp3"
-          data-narration="Explore career pathways in HVAC, commercial driving, bookkeeping, and business. Training may be available at no cost for people who qualify through an approved workforce funding source."
-        >
-          <HomeCareerPathways />
-        </div>
-        <div
-          data-scroll-narration
-          data-narration-src="/audio/narration/funding.mp3"
-          data-narration="Not sure how you will pay for training? Start here. Review workforce funding, employer-supported training, grants, and self-pay options. If you are using WorkOne, schedule your official orientation and then complete Elevate's funding intake."
-        >
-          <HomeFunding />
-        </div>
         <div
           data-scroll-narration
           data-narration-src="/audio/narration/apprenticeship.mp3"
@@ -122,9 +107,23 @@ export default function HomePage() {
         </div>
         <div
           data-scroll-narration
+          data-narration-src="/audio/narration/career-pathways.mp3"
+          data-narration="Explore career pathways in HVAC, commercial driving, bookkeeping, and business. Training may be available at no cost for people who qualify through an approved workforce funding source."
+        >
+          <HomeCareerPathways />
+        </div>
+        <div
+          data-scroll-narration
           data-narration="Employers can hire credentialed graduates, become an apprenticeship Host Site, or work with Elevate to design a training cohort around their workforce needs."
         >
           <HomeEmployerStrip />
+        </div>
+        <div
+          data-scroll-narration
+          data-narration-src="/audio/narration/funding.mp3"
+          data-narration="Not sure how you will pay for training? Start here. Review workforce funding, employer-supported training, grants, and self-pay options. If you are using WorkOne, schedule your official orientation and then complete Elevate's funding intake."
+        >
+          <HomeFunding />
         </div>
         <div
           data-scroll-narration

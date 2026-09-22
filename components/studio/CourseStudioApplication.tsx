@@ -225,9 +225,14 @@ function StudioSidebar({
 
 function PublishProgress() {
   const { state } = useCourse();
-  const { totalLessons, approvedLessons } = state.publishState;
+  const { totalLessons } = state.publishState;
   if (totalLessons === 0) return null;
-  const pct = Math.round((approvedLessons / totalLessons) * 100);
+  const generatedLessons = state.lessons.filter((lesson) =>
+    ['generated', 'complete', 'completed', 'verification_ready', 'certificate_ready', 'published'].includes(
+      String(lesson.generation_status ?? ''),
+    ),
+  ).length;
+  const pct = Math.round((generatedLessons / totalLessons) * 100);
   return (
     <div className="h-1 bg-slate-100 shrink-0">
       <div

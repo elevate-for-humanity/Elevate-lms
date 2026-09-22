@@ -44,8 +44,6 @@ export default function KountryKutzTourSlideshow() {
     <section
       className="border-b border-slate-200 bg-slate-950 px-4 py-10 text-white sm:px-6 sm:py-14"
       aria-labelledby="kountry-kutz-tour-heading"
-      data-scroll-narration
-      data-narration="Tour Kountry Kutz Barbershop in New Palestine, Indiana. This slideshow shows the professional stations, working shop environment, and approved Host Shop where eligible apprentices may build supervised barbering skills."
       data-narration-rate="0.95"
       data-narration-style="instructor"
     >

@@ -49,6 +49,7 @@ on:
           - weekly-verdicts
           - payment-monitoring
           - payout-deadline-alert
+          - reconcile-apprentice-payments
           - webhook-health-check
           - trial-lifecycle
           - autopilot-tick
@@ -435,11 +436,19 @@ jobs:
          || github.event.inputs.job == 'career-course-emails'
          || github.event.inputs.job == 'barber-reinstate'
          || github.event.inputs.job == 'payout-deadline-alert'
+         || github.event.inputs.job == 'reconcile-apprentice-payments'
          || github.event.inputs.job == 'school-application-followup'
          || github.event.inputs.job == 'dropout-score'
          || github.event.inputs.job == 'lesson-pace-check'
       ))
     steps:
+      - name: Reconcile apprentice automatic payments
+        run: |
+          curl -sf -X POST "$ADMIN_URL/api/cron/reconcile-apprentice-payments" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --max-time 180
+
       - name: Weekly reminders
         run: |
           curl -sf -X GET "$ADMIN_URL/api/cron/weekly-reminders" \

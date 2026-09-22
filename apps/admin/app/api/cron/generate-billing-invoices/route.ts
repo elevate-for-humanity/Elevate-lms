@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
     .from('billing_schedules')
     .select('*')
     .eq('provider', 'quickbooks')
+    .eq('collection_mode', 'manual_invoice')
     .eq('status', 'active')
     .lte('next_invoice_date', today)
     .limit(100);

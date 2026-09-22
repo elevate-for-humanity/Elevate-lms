@@ -10,7 +10,6 @@
  */
 
 import type { SupabaseClient } from '@/lib/supabase';
-import type { QuizQuestion } from './schema';
 import { logger } from '@/lib/logger';
 import { aiChat } from '@/lib/ai/ai-service';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -60,6 +59,34 @@ export type AssessmentGeneratorResult = {
   errors: string[];
 };
 
+export type LearnerQuizQuestion = {
+  id: string;
+  question: string;
+  prompt: string;
+  type: 'multiple_choice' | 'true_false';
+  options: string[];
+  correctAnswer: number;
+  explanation?: string;
+  domainKey?: string;
+  competencyKeys?: string[];
+};
+
+export type ManualAssessmentQuestion = {
+  id?: string;
+  type?: 'multiple_choice' | 'true_false';
+  questionType?: 'multiple_choice' | 'true_false';
+  prompt?: string;
+  question?: string;
+  options?: string[];
+  choices?: string[];
+  correctAnswer: number | boolean | string;
+  explanation?: string;
+  competencyKey?: string;
+  competencyKeys?: string[];
+  difficulty?: Difficulty;
+  domainKey?: string;
+};
+
 const AIQuestionSchema = z.object({
   questionType: z.enum(['multiple_choice', 'true_false']),
   prompt: z.string().min(20).max(1000),
@@ -73,6 +100,22 @@ const AIQuestionSchema = z.object({
 
 const AIQuestionSetSchema = z.object({
   questions: z.array(AIQuestionSchema),
+});
+
+const ManualAssessmentQuestionSchema = z.object({
+  id: z.string().min(1).optional(),
+  type: z.enum(['multiple_choice', 'true_false']).optional(),
+  questionType: z.enum(['multiple_choice', 'true_false']).optional(),
+  prompt: z.string().optional(),
+  question: z.string().optional(),
+  options: z.array(z.string()).min(2).max(6).optional(),
+  choices: z.array(z.string()).min(2).max(6).optional(),
+  correctAnswer: z.union([z.number().int(), z.boolean(), z.string()]),
+  explanation: z.string().optional(),
+  competencyKey: z.string().optional(),
+  competencyKeys: z.array(z.string()).optional(),
+  difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
+  domainKey: z.string().optional(),
 });
 
 type AIQuestion = z.infer<typeof AIQuestionSchema>;
@@ -210,21 +253,25 @@ export function generateFinalExam(spec: FinalExamSpec): GeneratedQuestion[] {
   }));
 }
 
-function toLegacyQuizQuestion(question: GeneratedQuestion): QuizQuestion | null {
+export function toQuizQuestion(question: GeneratedQuestion): LearnerQuizQuestion | null {
   if (question.questionType !== 'multiple_choice' && question.questionType !== 'true_false') return null;
   const options = question.choices ?? ['True', 'False'];
-  let correctAnswer: string | string[] | undefined;
+  let correctAnswer: number | undefined;
 
   if (typeof question.correctAnswer === 'number') {
-    correctAnswer = options[question.correctAnswer] ?? options[0] ?? '';
-  } else if (typeof question.correctAnswer === 'boolean') {
-    correctAnswer = question.correctAnswer ? 'True' : 'False';
-  } else if (typeof question.correctAnswer === 'string') {
     correctAnswer = question.correctAnswer;
+  } else if (typeof question.correctAnswer === 'boolean') {
+    correctAnswer = question.correctAnswer ? 0 : 1;
+  } else if (typeof question.correctAnswer === 'string') {
+    const answerIndex = options.findIndex((option) => option === question.correctAnswer);
+    correctAnswer = answerIndex >= 0 ? answerIndex : undefined;
   }
+
+  if (correctAnswer === undefined || correctAnswer < 0 || correctAnswer >= options.length) return null;
 
   return {
     id: question.id,
+    question: question.prompt,
     prompt: question.prompt,
     type: question.questionType,
     options,
@@ -235,32 +282,99 @@ function toLegacyQuizQuestion(question: GeneratedQuestion): QuizQuestion | null 
   };
 }
 
+export function normalizeManualAssessmentQuestions(
+  lessonId: string,
+  input: unknown,
+  fallback: { domainKey?: string; competencyKeys?: string[] } = {},
+): GeneratedQuestion[] {
+  const parsed = z.array(ManualAssessmentQuestionSchema).min(1).max(100).parse(input);
+  const fallbackCompetencyKeys = fallback.competencyKeys ?? [];
+
+  return parsed.map((raw, index) => {
+    const questionType = raw.questionType ?? raw.type ?? 'multiple_choice';
+    const prompt = (raw.prompt ?? raw.question ?? '').trim();
+    if (!prompt) throw new Error(`Question ${index + 1} is missing its prompt`);
+
+    const rawOptions = raw.options ?? raw.choices;
+    const choices = questionType === 'true_false'
+      ? ['True', 'False']
+      : (rawOptions ?? []).map((option) => option.trim());
+    if (questionType === 'multiple_choice' && choices.length < 2) {
+      throw new Error(`Question ${index + 1} must have at least two answer options`);
+    }
+    if (choices.some((option) => !option)) {
+      throw new Error(`Question ${index + 1} has a blank answer option`);
+    }
+    if (new Set(choices.map((option) => option.toLocaleLowerCase())).size !== choices.length) {
+      throw new Error(`Question ${index + 1} has duplicate answer options`);
+    }
+
+    let correctAnswer: number | boolean;
+    if (questionType === 'true_false') {
+      if (typeof raw.correctAnswer === 'boolean') correctAnswer = raw.correctAnswer;
+      else if (typeof raw.correctAnswer === 'number' && [0, 1].includes(raw.correctAnswer)) {
+        correctAnswer = raw.correctAnswer === 0;
+      } else if (typeof raw.correctAnswer === 'string' && /^(true|false)$/i.test(raw.correctAnswer.trim())) {
+        correctAnswer = raw.correctAnswer.trim().toLocaleLowerCase() === 'true';
+      } else {
+        throw new Error(`Question ${index + 1} has an invalid true/false answer`);
+      }
+    } else if (typeof raw.correctAnswer === 'number') {
+      if (raw.correctAnswer < 0 || raw.correctAnswer >= choices.length) {
+        throw new Error(`Question ${index + 1} has an answer outside its option range`);
+      }
+      correctAnswer = raw.correctAnswer;
+    } else if (typeof raw.correctAnswer === 'string') {
+      const normalizedCorrectAnswer = raw.correctAnswer.toLocaleLowerCase().trim();
+      const answerIndex = choices.findIndex(
+        (option) => option.toLocaleLowerCase() === normalizedCorrectAnswer,
+      );
+      if (answerIndex < 0) {
+        throw new Error(`Question ${index + 1} correct answer does not match an option`);
+      }
+      correctAnswer = answerIndex;
+    } else {
+      throw new Error(`Question ${index + 1} has an invalid multiple-choice answer`);
+    }
+
+    return {
+      id: raw.id ?? `manual-${lessonId}-${index + 1}`,
+      questionType,
+      prompt,
+      choices,
+      correctAnswer,
+      explanation: raw.explanation?.trim(),
+      competencyKey:
+        raw.competencyKey ?? raw.competencyKeys?.[0] ?? fallbackCompetencyKeys[index % Math.max(1, fallbackCompetencyKeys.length)],
+      difficulty: raw.difficulty ?? 'medium',
+      domainKey: raw.domainKey ?? fallback.domainKey,
+      sortOrder: index,
+      isPlaceholder: false,
+    };
+  });
+}
+
 export async function persistAssessmentQuestions(
   db: SupabaseClient,
   lessonId: string,
   questions: GeneratedQuestion[],
-  opts: { replaceExisting?: boolean } = {},
+  opts: { replaceExisting?: boolean; passingScore?: number } = {},
 ): Promise<AssessmentGeneratorResult> {
   const errors: string[] = [];
 
   if (!questions.length) {
     return { lessonId, questions, writtenToDb: 0, errors: ['No assessment questions were generated'] };
   }
-  if (questions.some((question) => question.isPlaceholder || /\[Placeholder/i.test(question.prompt))) {
+  if (questions.some((question) => question.isPlaceholder || /\b(?:placeholder|todo|tbd)\b/i.test(question.prompt))) {
     return { lessonId, questions, writtenToDb: 0, errors: ['Placeholder assessment questions cannot be persisted'] };
-  }
-
-  if (opts.replaceExisting) {
-    const { error } = await db.from('assessment_questions').delete().eq('lesson_id', lessonId);
-    if (error) return { lessonId, questions, writtenToDb: 0, errors: [`Failed to clear existing questions: ${error.message}`] };
   }
 
   const rows = questions.map((question) => ({
     lesson_id: lessonId,
     question_type: question.questionType,
     prompt: question.prompt,
-    choices: question.choices ? JSON.stringify(question.choices) : null,
-    correct_answer: question.correctAnswer !== undefined ? JSON.stringify(question.correctAnswer) : null,
+    choices: question.choices ?? null,
+    correct_answer: question.correctAnswer ?? null,
     explanation: question.explanation ?? null,
     competency_key: question.competencyKey ?? null,
     difficulty: question.difficulty,
@@ -268,27 +382,31 @@ export async function persistAssessmentQuestions(
     sort_order: question.sortOrder,
   }));
 
-  const { error: insertError } = await db.from('assessment_questions').insert(rows);
-  if (insertError) {
-    return { lessonId, questions, writtenToDb: 0, errors: [`Failed to insert questions: ${insertError.message}`] };
-  }
-
   const quizQuestionsJsonb = questions
-    .map(toLegacyQuizQuestion)
-    .filter((question): question is QuizQuestion => question !== null);
-
-  const { error: updateError } = await db
-    .from('course_lessons')
-    .update({ quiz_questions: quizQuestionsJsonb })
-    .eq('id', lessonId);
-  if (updateError) {
-    logger.warn('[assessment-generator] Failed to sync legacy quiz_questions projection', {
-      lessonId,
-      error: updateError.message,
-    });
+    .map(toQuizQuestion)
+    .filter((question): question is LearnerQuizQuestion => question !== null);
+  if (quizQuestionsJsonb.length !== rows.length) {
+    return { lessonId, questions, writtenToDb: 0, errors: ['Only multiple-choice and true/false questions can be published'] };
   }
 
-  return { lessonId, questions, writtenToDb: rows.length, errors };
+  const { data: writtenToDb, error: replaceError } = await db.rpc(
+    'replace_lesson_assessment_questions',
+    {
+      p_lesson_id: lessonId,
+      p_questions: rows,
+      p_quiz_questions: quizQuestionsJsonb,
+      p_passing_score: Math.min(100, Math.max(1, Math.round(opts.passingScore ?? 70))),
+    },
+  );
+  if (replaceError) {
+    logger.warn('[assessment-generator] Atomic assessment replacement failed', {
+      lessonId,
+      error: replaceError.message,
+    });
+    return { lessonId, questions, writtenToDb: 0, errors: [`Failed to replace questions: ${replaceError.message}`] };
+  }
+
+  return { lessonId, questions, writtenToDb: Number(writtenToDb ?? rows.length), errors };
 }
 
 export async function generateAndPersistModuleQuiz(
@@ -303,7 +421,10 @@ export async function generateAndPersistModuleQuiz(
     competencyKeys: spec.competencyKeys,
     idPrefix: `module-${spec.lessonId}`,
   });
-  return persistAssessmentQuestions(db, spec.lessonId, questions, { replaceExisting: true });
+  return persistAssessmentQuestions(db, spec.lessonId, questions, {
+    replaceExisting: true,
+    passingScore: spec.passingScore,
+  });
 }
 
 export async function generateAndPersistFinalExam(
@@ -339,5 +460,8 @@ export async function generateAndPersistFinalExam(
   if (normalized.length !== count) {
     return { lessonId: spec.lessonId, questions: normalized, writtenToDb: 0, errors: [`Generated ${normalized.length} final-exam questions; expected ${count}`] };
   }
-  return persistAssessmentQuestions(db, spec.lessonId, normalized, { replaceExisting: true });
+  return persistAssessmentQuestions(db, spec.lessonId, normalized, {
+    replaceExisting: true,
+    passingScore: spec.passingScore,
+  });
 }

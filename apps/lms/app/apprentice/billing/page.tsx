@@ -9,7 +9,7 @@ import { APPRENTICE_PORTAL_CONFIGS } from '@/components/portal/ApprenticePortalS
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { AlertTriangle, ArrowLeft, ChevronRight, CreditCard, DollarSign } from 'lucide-react';
 
-export const metadata: Metadata = { title: 'Billing | Apprentice Portal', description: 'Update your payment method and view tuition status.' };
+export const metadata: Metadata = { title: 'Billing | Apprentice Portal', description: 'Review your tuition schedule, PayPal agreement, and payment status.' };
 export const dynamic = 'force-dynamic';
 
 type SubscriptionRow = {
@@ -21,22 +21,40 @@ type SubscriptionRow = {
   next_payment_date?: string | null;
   fully_paid?: boolean | null;
   setup_fee_paid?: boolean | null;
-  stripe_subscription_id?: string | null;
 };
 
-function summary(program: 'barber' | 'cosmetology', sub: SubscriptionRow): BillingSummary {
-  const hasSubscription = !!sub.stripe_subscription_id;
+type ScheduleRow = {
+  amount_cents: number;
+  cadence: string;
+  next_invoice_date: string;
+  status: string;
+  provider_status: string;
+  provider_subscription_id: string | null;
+};
+
+function summary(
+  program: 'barber' | 'cosmetology',
+  sub: SubscriptionRow,
+  schedule: ScheduleRow | null,
+): BillingSummary {
+  const hasSubscription =
+    schedule?.status === 'active' &&
+    schedule.provider_status === 'active' &&
+    Boolean(schedule.provider_subscription_id);
   return {
     program,
     paymentStatus:
       !sub.fully_paid && !hasSubscription
         ? 'pending_payment_method'
-        : sub.payment_status ?? 'pending_payment_method',
-    weeklyPaymentCents: sub.weekly_payment_cents ?? null,
+        : schedule?.status === 'active'
+          ? 'active'
+          : sub.payment_status ?? 'pending_payment_method',
+    weeklyPaymentCents:
+      schedule?.cadence === 'weekly' ? Number(schedule.amount_cents) : sub.weekly_payment_cents ?? null,
     remainingBalance: sub.remaining_balance ?? null,
     fullTuitionAmount: sub.full_tuition_amount ?? null,
     amountPaidAtCheckout: sub.amount_paid_at_checkout ?? null,
-    nextPaymentDate: sub.next_payment_date ?? null,
+    nextPaymentDate: schedule?.next_invoice_date ?? sub.next_payment_date ?? null,
     fullyPaid: sub.fully_paid ?? false,
     setupFeePaid: sub.setup_fee_paid ?? false,
     hasSubscription,
@@ -55,14 +73,14 @@ function BillingFallback({ portalPath, message }: { portalPath: string; message:
   );
 }
 
-function SubscriptionBilling({ billing, portalPath, needsPaymentMethod, previewing }: { billing: BillingSummary; portalPath: string; needsPaymentMethod: boolean; previewing: boolean }) {
+function SubscriptionBilling({ billing, portalPath, needsBillingAgreement, previewing }: { billing: BillingSummary; portalPath: string; needsBillingAgreement: boolean; previewing: boolean }) {
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 py-8">
       <Link href={portalPath} className="inline-flex items-center gap-2 text-sm text-slate-700 hover:text-slate-950"><ArrowLeft className="h-4 w-4" /> Back to dashboard</Link>
-      {needsPaymentMethod ? (
+      {needsBillingAgreement ? (
         <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
-          <div className="text-sm text-red-800"><p className="mb-1 font-semibold">Payment method required</p><p>Add or update your payment method to keep the tuition account current.</p></div>
+          <div className="text-sm text-red-800"><p className="mb-1 font-semibold">PayPal approval required</p><p>Complete the recurring-payment release and approve the PayPal billing agreement to keep the tuition account current.</p></div>
         </div>
       ) : null}
       <BillingCard billing={billing} readOnly={previewing} />
@@ -78,30 +96,49 @@ export default async function ApprenticeBillingPage() {
   if (!subject.userId) redirect('/login?redirect=/apprentice/billing');
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
   const portalPath = (programSlug && APPRENTICE_PORTAL_CONFIGS[programSlug]?.portalPath) || '/apprentice';
+  const { data: billingAuthorization } = await db
+    .from('billing_migration_authorizations')
+    .select('billing_schedule_id')
+    .eq('user_id', subject.userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const { data: automaticSchedule } = billingAuthorization?.billing_schedule_id
+    ? await db
+        .from('billing_schedules')
+        .select('amount_cents,cadence,next_invoice_date,status,provider_status,provider_subscription_id')
+        .eq('id', billingAuthorization.billing_schedule_id)
+        .maybeSingle()
+    : { data: null };
+  const schedule = automaticSchedule as ScheduleRow | null;
 
   if (programSlug === 'barber-apprenticeship') {
     const { data } = await db
       .from('barber_subscriptions')
-      .select('payment_status,weekly_payment_cents,remaining_balance,full_tuition_amount,amount_paid_at_checkout,next_payment_date,fully_paid,setup_fee_paid,stripe_subscription_id')
+      .select('payment_status,weekly_payment_cents,remaining_balance,full_tuition_amount,amount_paid_at_checkout,next_payment_date,fully_paid,setup_fee_paid')
       .eq('user_id', subject.userId)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
     const sub = data as SubscriptionRow | null;
-    if (!sub) return <BillingFallback portalPath={portalPath} message="No barber tuition account was found. Contact support if you recently enrolled." />;
-    return <SubscriptionBilling billing={summary('barber', sub)} portalPath={portalPath} needsPaymentMethod={!sub.fully_paid && !sub.stripe_subscription_id} previewing={subject.previewing} />;
+    if (!sub && !schedule) return <BillingFallback portalPath={portalPath} message="No barber tuition account was found. Contact support if you recently enrolled." />;
+    const billing = summary('barber', sub || {}, schedule);
+    return <SubscriptionBilling billing={billing} portalPath={portalPath} needsBillingAgreement={!billing.fullyPaid && !billing.hasSubscription} previewing={subject.previewing} />;
   }
 
   if (programSlug === 'cosmetology-apprenticeship') {
     const { data } = await db
       .from('cosmetology_subscriptions')
-      .select('payment_status,weekly_payment_cents,remaining_balance,full_tuition_amount,amount_paid_at_checkout,next_payment_date,fully_paid,setup_fee_paid,stripe_subscription_id')
+      .select('payment_status,weekly_payment_cents,remaining_balance,full_tuition_amount,amount_paid_at_checkout,next_payment_date,fully_paid,setup_fee_paid')
       .eq('user_id', subject.userId)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
     const sub = data as SubscriptionRow | null;
-    if (sub) return <SubscriptionBilling billing={summary('cosmetology', sub)} portalPath={portalPath} needsPaymentMethod={!sub.fully_paid && !sub.stripe_subscription_id} previewing={subject.previewing} />;
+    if (sub || schedule) {
+      const billing = summary('cosmetology', sub || {}, schedule);
+      return <SubscriptionBilling billing={billing} portalPath={portalPath} needsBillingAgreement={!billing.fullyPaid && !billing.hasSubscription} previewing={subject.previewing} />;
+    }
   }
 
   return (
@@ -117,10 +154,10 @@ function StudentPaymentCard() {
     <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
       <div className="flex items-center gap-2 border-b border-slate-200 p-5"><CreditCard className="h-5 w-5 text-brand-blue-600" /><h2 className="font-semibold text-slate-950">Payment & Billing</h2></div>
       <div className="space-y-3 p-5">
-        <p className="text-sm text-slate-700">Manage tuition payments and view your billing history.</p>
-        <Link href="/account/payment-methods" className="flex items-center justify-between rounded-lg bg-brand-blue-50 p-4 hover:bg-brand-blue-100"><span className="flex items-center gap-3"><CreditCard className="h-5 w-5 text-brand-blue-700" /><span><span className="block font-medium text-slate-950">Add or replace card</span><span className="text-xs text-slate-600">Open secure card setup for your signed-in account only</span></span></span><ChevronRight className="h-5 w-5 text-slate-400" /></Link>
+        <p className="text-sm text-slate-700">Manage the recurring-payment release, PayPal agreement, and payment history.</p>
+        <Link href="/lms/documents" className="flex items-center justify-between rounded-lg bg-brand-blue-50 p-4 hover:bg-brand-blue-100"><span className="flex items-center gap-3"><CreditCard className="h-5 w-5 text-brand-blue-700" /><span><span className="block font-medium text-slate-950">PayPal billing agreement</span><span className="text-xs text-slate-600">Complete the signed release and provider approval steps</span></span></span><ChevronRight className="h-5 w-5 text-slate-400" /></Link>
         <Link href="/billing" className="flex items-center justify-between rounded-lg bg-slate-50 p-4 hover:bg-slate-100"><span className="flex items-center gap-3"><DollarSign className="h-5 w-5" /><span><span className="block font-medium text-slate-950">Payment History</span><span className="text-xs text-slate-600">View payments and receipts</span></span></span><ChevronRight className="h-5 w-5 text-slate-400" /></Link>
-        <Link href="/enrollment" className="flex items-center justify-between rounded-lg bg-brand-blue-50 p-4 hover:bg-brand-blue-100"><span className="flex items-center gap-3"><CreditCard className="h-5 w-5 text-brand-blue-700" /><span><span className="block font-medium text-slate-950">Make a Payment</span><span className="text-xs text-slate-600">Review tuition and payment options</span></span></span><ChevronRight className="h-5 w-5 text-slate-400" /></Link>
+        <Link href="/lms/documents" className="flex items-center justify-between rounded-lg bg-brand-blue-50 p-4 hover:bg-brand-blue-100"><span className="flex items-center gap-3"><CreditCard className="h-5 w-5 text-brand-blue-700" /><span><span className="block font-medium text-slate-950">Billing documents</span><span className="text-xs text-slate-600">Review authorization status and required action</span></span></span><ChevronRight className="h-5 w-5 text-slate-400" /></Link>
       </div>
     </div>
   );

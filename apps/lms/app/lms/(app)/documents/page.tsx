@@ -12,10 +12,20 @@ export default async function LearnerDocumentsPage() {
   const db = await createClient();
   const { data: billingAuthorizations } = await db
     .from('billing_migration_authorizations')
-    .select('id,product_name,amount_cents,cadence,status,document_name,rejection_reason')
+    .select('id,billing_schedule_id,product_name,amount_cents,cadence,status,document_name,rejection_reason')
     .eq('user_id', user.id)
-    .in('status', ['requested', 'submitted', 'rejected'])
+    .in('status', ['requested', 'submitted', 'approved', 'rejected'])
     .order('created_at', { ascending: false });
+  const scheduleIds = (billingAuthorizations || [])
+    .map((authorization) => authorization.billing_schedule_id)
+    .filter(Boolean) as string[];
+  const { data: billingSchedules } = scheduleIds.length
+    ? await db
+        .from('billing_schedules')
+        .select('id,provider_status,provider_approval_url')
+        .in('id', scheduleIds)
+    : { data: [] };
+  const scheduleById = new Map((billingSchedules || []).map((schedule) => [schedule.id, schedule]));
   return (
     <div className="mx-auto max-w-5xl">
       <h1 className="text-3xl font-black">Documents & Records</h1>
@@ -46,13 +56,13 @@ export default async function LearnerDocumentsPage() {
             Action required: new subscription authorization
           </h2>
           <p className="mt-2 font-semibold text-red-900">
-            Stripe is being retired. Upload the signed authorization for{' '}
+            Upload the signed recurring-payment release for{' '}
             {authorization.product_name}:{' '}
             {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
               Number(authorization.amount_cents) / 100,
             )}{' '}
-            {authorization.cadence}. Elevate will review it before the QuickBooks schedule replaces
-            the Stripe subscription.
+            {authorization.cadence}. Once approved, connect the PayPal billing agreement once;
+            future payments run automatically and are recorded in QuickBooks.
           </p>
           <p className="mt-2 text-sm font-bold capitalize text-red-950">
             Status: {authorization.status.replace('_', ' ')}
@@ -65,7 +75,20 @@ export default async function LearnerDocumentsPage() {
               Correction needed: {authorization.rejection_reason}
             </p>
           ) : null}
-          {authorization.status !== 'submitted' ? (
+          {authorization.status === 'approved' &&
+          scheduleById.get(authorization.billing_schedule_id || '')?.provider_status === 'active' ? (
+            <p className="mt-3 text-sm font-bold text-emerald-800">
+              Automatic weekly payments are active. You do not need to pay individual invoices.
+            </p>
+          ) : authorization.status === 'approved' &&
+            scheduleById.get(authorization.billing_schedule_id || '')?.provider_approval_url ? (
+            <a
+              href={scheduleById.get(authorization.billing_schedule_id || '')?.provider_approval_url || '#'}
+              className="mt-4 inline-flex rounded-xl bg-blue-700 px-5 py-3 font-black text-white"
+            >
+              Approve automatic payments in PayPal
+            </a>
+          ) : authorization.status !== 'submitted' && authorization.status !== 'approved' ? (
             <BillingAuthorizationUpload authorizationId={authorization.id} />
           ) : (
             <p className="mt-3 text-sm font-semibold text-red-900">

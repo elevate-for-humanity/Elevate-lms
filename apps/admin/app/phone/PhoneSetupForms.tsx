@@ -376,7 +376,7 @@ export function PhoneSetupForms({
           <p className="mt-1 text-sm text-slate-600">
             Map a keypad digit or spoken department to a PWA extension.
           </p>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <label className="mt-4 block text-sm font-bold">
               Digit
               <select name="digit" className={field}>

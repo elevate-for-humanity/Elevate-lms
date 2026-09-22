@@ -11,6 +11,8 @@ interface SafeHeroVideoProps {
   showPosterBeforePlayback?: boolean;
   /** Repeat the visual continuously. Audio/narration is controlled separately. */
   loop?: boolean;
+  /** Prioritize the visible poster and video metadata for above-the-fold heroes. */
+  priority?: boolean;
 }
 
 type NetworkInformationLike = {
@@ -50,6 +52,7 @@ export function SafeHeroVideo({
   ariaLabel = 'Hero video',
   showPosterBeforePlayback = true,
   loop = false,
+  priority = false,
 }: SafeHeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -100,7 +103,7 @@ export function SafeHeroVideo({
           aria-hidden="true"
           className={`${className} z-0`}
           decoding="async"
-          fetchPriority={showPosterBeforePlayback ? 'high' : 'auto'}
+          fetchPriority={priority || showPosterBeforePlayback ? 'high' : 'auto'}
         />
       ) : null}
       {!hasFailed && !avoidAutoplay ? (
@@ -110,7 +113,7 @@ export function SafeHeroVideo({
           loop={loop}
           muted
           playsInline
-          preload="metadata"
+          preload={priority ? 'auto' : 'metadata'}
           poster={showPosterBeforePlayback ? poster : undefined}
           aria-label={ariaLabel}
           onCanPlay={() => {

@@ -9,27 +9,31 @@
 import { useState } from 'react';
 import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 
-export interface QuizQuestion {
+export interface EditableQuizQuestion {
   id: string;
-  question: string;
-  options: [string, string, string, string];
-  correctAnswer: number; // 0-based
+  prompt: string;
+  type: 'multiple_choice' | 'true_false';
+  options: string[];
+  correctAnswer: string;
   explanation: string;
+  domainKey?: string;
+  competencyKeys?: string[];
 }
 
 interface Props {
-  questions: QuizQuestion[];
+  questions: EditableQuizQuestion[];
   passingScore: number;
-  onChange: (questions: QuizQuestion[]) => void;
+  onChange: (questions: EditableQuizQuestion[]) => void;
   onScoreChange: (score: number) => void;
 }
 
-function emptyQuestion(): QuizQuestion {
+function emptyQuestion(): EditableQuizQuestion {
   return {
     id: crypto.randomUUID(),
-    question: '',
+    prompt: '',
+    type: 'multiple_choice',
     options: ['', '', '', ''],
-    correctAnswer: 0,
+    correctAnswer: '',
     explanation: '',
   };
 }
@@ -50,16 +54,23 @@ export default function LessonAssessmentEditor({
 
   const remove = (id: string) => onChange(questions.filter((q) => q.id !== id));
 
-  const update = (id: string, patch: Partial<QuizQuestion>) => {
+  const update = (id: string, patch: Partial<EditableQuizQuestion>) => {
     onChange(questions.map((q) => (q.id === id ? { ...q, ...patch } : q)));
   };
 
   const updateOption = (id: string, optIdx: number, val: string) => {
     const q = questions.find((q) => q.id === id);
     if (!q) return;
-    const options = [...q.options] as [string, string, string, string];
+    const options = [...q.options];
+    const previous = options[optIdx];
     options[optIdx] = val;
-    update(id, { options });
+    update(id, { options, correctAnswer: q.correctAnswer === previous ? val : q.correctAnswer });
+  };
+
+  const updateType = (id: string, type: EditableQuizQuestion['type']) => {
+    update(id, type === 'true_false'
+      ? { type, options: ['True', 'False'], correctAnswer: 'True' }
+      : { type, options: ['', '', '', ''], correctAnswer: '' });
   };
 
   return (
@@ -119,16 +130,16 @@ export default function LessonAssessmentEditor({
               >
                 <span className="text-xs font-mono text-slate-400 w-6">Q{qi + 1}</span>
                 <span className="flex-1 text-sm text-slate-700 truncate">
-                  {q.question || <span className="text-slate-400 italic">Untitled question</span>}
+                  {q.prompt || <span className="text-slate-400 italic">Untitled question</span>}
                 </span>
                 <span
                   className={`text-xs px-1.5 py-0.5 rounded font-semibold ${
-                    q.options.every((o) => o.trim()) && q.question.trim()
+                    q.options.every((o) => o.trim()) && q.prompt.trim() && q.options.includes(q.correctAnswer)
                       ? 'bg-brand-green-100 text-brand-green-700'
                       : 'bg-amber-100 text-amber-700'
                   }`}
                 >
-                  {q.options.every((o) => o.trim()) && q.question.trim()
+                  {q.options.every((o) => o.trim()) && q.prompt.trim() && q.options.includes(q.correctAnswer)
                     ? 'Complete'
                     : 'Incomplete'}
                 </span>
@@ -152,14 +163,28 @@ export default function LessonAssessmentEditor({
               {/* Body */}
               {isOpen && (
                 <div className="p-4 space-y-3 border-t border-slate-100">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1">
+                      Question Type *
+                    </label>
+                    <select
+                      value={q.type}
+                      onChange={(e) => updateType(q.id, e.target.value as EditableQuizQuestion['type'])}
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
+                    >
+                      <option value="multiple_choice">Multiple choice</option>
+                      <option value="true_false">True / false</option>
+                    </select>
+                  </div>
+
                   {/* Question text */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-600 mb-1">
                       Question Text *
                     </label>
                     <textarea
-                      value={q.question}
-                      onChange={(e) => update(q.id, { question: e.target.value })}
+                      value={q.prompt}
+                      onChange={(e) => update(q.id, { prompt: e.target.value })}
                       rows={2}
                       placeholder="Enter the question..."
                       className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 resize-none"
@@ -178,8 +203,8 @@ export default function LessonAssessmentEditor({
                           <input
                             type="radio"
                             name={`correct-${q.id}`}
-                            checked={q.correctAnswer === oi}
-                            onChange={() => update(q.id, { correctAnswer: oi })}
+                            checked={Boolean(opt) && q.correctAnswer === opt}
+                            onChange={() => update(q.id, { correctAnswer: opt })}
                             className="accent-brand-green-600 flex-shrink-0"
                             title="Mark as correct answer"
                           />
@@ -192,7 +217,7 @@ export default function LessonAssessmentEditor({
                             onChange={(e) => updateOption(q.id, oi, e.target.value)}
                             placeholder={`Option ${String.fromCharCode(65 + oi)}`}
                             className={`flex-1 border rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 ${
-                              q.correctAnswer === oi
+                              opt && q.correctAnswer === opt
                                 ? 'border-brand-green-300 bg-brand-green-50'
                                 : 'border-slate-200'
                             }`}

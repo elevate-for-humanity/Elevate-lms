@@ -97,7 +97,7 @@ async function _POST(request: NextRequest) {
         request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
         request.headers.get('x-real-ip') ||
         '0.0.0.0';
-      const version = String(handbookVersion || '2025.1');
+      const version = String(handbookVersion || '2026.2');
       const { data: existing } = await db
         .from('handbook_acknowledgments')
         .select('id')

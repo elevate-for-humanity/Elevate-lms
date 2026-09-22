@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ArrowRight, BadgeDollarSign, CalendarDays } from 'lucide-react';
 
 const PROGRAMS = [
@@ -59,14 +59,6 @@ const PROGRAMS = [
 export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
   const [active, setActive] = useState(0);
 
-  useEffect(() => {
-    const timer = window.setInterval(
-      () => setActive((current) => (current + 1) % PROGRAMS.length),
-      6500,
-    );
-    return () => window.clearInterval(timer);
-  }, []);
-
   const program = PROGRAMS[active];
   const Heading = asHero ? 'h1' : 'h2';
 
@@ -79,7 +71,7 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
             Train for an in-demand career. Funding may cover your cost.
           </Heading>
           <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">
-            Explore HVAC, CDL, business, bookkeeping, technology, healthcare, and more. Eligible participants may receive workforce funding after the responsible agency approves the participant, program, and covered costs in writing.
+            Explore HVAC, CDL, business, bookkeeping, technology, healthcare, and more. Funding is limited and is never guaranteed. Eligible participants may receive workforce funding only after the responsible agency approves the participant, program, and covered costs in writing.
           </p>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-blue-200 bg-white p-4">

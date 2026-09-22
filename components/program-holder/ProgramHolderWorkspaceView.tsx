@@ -141,15 +141,10 @@ export async function ProgramHolderWorkspaceView({
       required: true,
       owner: 'Shared',
     },
-    ...(isHvac
-      ? [
-          {
-            label: 'HVAC program assignment',
-            complete: true,
-            required: true,
-            owner: 'Elevate' as const,
-          },
-        ]
+    ...(isHvac ? [{ label: 'HVAC program assignment', complete: true,
+          required: true,
+          owner: 'Elevate' as const,
+        }]
       : []),
     ...(isHvac
       ? [

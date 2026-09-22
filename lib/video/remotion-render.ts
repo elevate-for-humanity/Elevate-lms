@@ -74,7 +74,7 @@ export interface RemotionRenderResult {
   sceneData?: MediaStoryboard;
 }
 
-const STORYBOARD_RENDER_FPS = 15;
+const STORYBOARD_RENDER_FPS = 30;
 const execFileAsync = promisify(execFile);
 const EXACT_INSTRUCTIONAL_SCENE_TYPES = new Set([
   'equipment_closeup',

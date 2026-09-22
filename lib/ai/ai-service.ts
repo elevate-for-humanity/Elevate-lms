@@ -146,6 +146,12 @@ function resolveConfiguredChatProvider(options: ChatCompletionOptions): AIProvid
   }
   const requested = options.provider?.trim().toLowerCase();
   if (requested && requested !== 'none' && requested !== 'auto') {
+    const configured = configuredDefaultProvider();
+    if (requested !== configured) {
+      throw new Error(
+        `Provider override "${requested}" is not allowed; the configured provider is "${configured}"`,
+      );
+    }
     const createProvider = chatProviders[requested];
     if (!createProvider) throw new Error(`Unknown AI chat provider: ${requested}`);
     if (disabledChatProviders.has(requested)) {

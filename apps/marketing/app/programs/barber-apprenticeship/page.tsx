@@ -30,6 +30,8 @@ export const fetchCache = 'force-no-store';
 const BARBER_HERO_IMAGE =
   'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/barber-hero-new.webp';
 const BARBER_RTI_HOURS = 260;
+const KOUNTRY_KUTZ_HERO_TRANSCRIPT =
+  'Welcome to Kountry Kutz Barbershop in New Palestine, Indiana. As the video moves through the shop, notice the professional stations, working barbershop environment, and approved Host Shop where eligible apprentices may build supervised barbering skills.';
 const FLOW = [
   {
     icon: BookOpen,
@@ -122,7 +124,9 @@ export default async function BarberApprenticeshipPage() {
         />
       </section>
 
-      <KountryKutzTourSlideshow />
+      <div data-scroll-narration data-narration={KOUNTRY_KUTZ_HERO_TRANSCRIPT}>
+        <KountryKutzTourSlideshow />
+      </div>
 
       <section
         data-scroll-narration

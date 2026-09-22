@@ -265,7 +265,7 @@ export default function DevContainerPanel() {
       <header className="border-b border-slate-200 bg-white px-4 py-4 text-slate-950">
         <div className="flex flex-wrap items-center gap-3">
           <div className="mr-auto">
-            <h2 className="font-bold">Container Control Plane</h2>
+            <h2 className="font-bold">Container configuration & deployments</h2>
             <p className="mt-1 text-xs text-slate-500">
               Canonical Admin APIs only · GitHub configuration · platform_secrets · Northflank sync
             </p>
@@ -298,6 +298,9 @@ export default function DevContainerPanel() {
           >
             <KeyRound className="h-4 w-4" /> Environment
           </button>
+        </div>
+        <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
+          This panel edits and commits <code>.devcontainer/devcontainer.json</code> and manages deployment environment keys. It does not provision an isolated workspace or start an interactive container session. Use Services to inspect builds and deployments.
         </div>
       </header>
 

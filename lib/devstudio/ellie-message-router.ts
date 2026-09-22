@@ -65,16 +65,10 @@ export function shouldOrchestrateMessage(message: string): boolean {
 /** All requests enter one orchestrator. The coordinator assigns the lead
  * specialist from intent while the durable plan may hand work to every agent.
  * Users never need to choose a persona or move between separate products. */
-export function selectStudioAgent(message: string): StudioSpecialist {
-  if (/\b(?:course|curriculum|lesson|learning|assessment|quiz|instruction|coach|student support)\b/i.test(message)) {
-    return 'ELLIE';
-  }
-  if (/\b(?:website|marketing|admissions|career|pathway|recruit|outreach|social)\b/i.test(message)) {
-    return 'PARIS';
-  }
-  if (/\b(?:compliance|audit|evidence|accessibility|standard|quality|policy|regulat|credential)\b/i.test(message)) {
-    return 'ZORA';
-  }
+export function selectStudioAgent(_message: string): StudioSpecialist {
+  // LIZZY is the single user-facing coordinator. Specialist capabilities are
+  // assigned inside the durable plan instead of making the conversation jump
+  // personas as the user moves between course, compliance, and website work.
   return 'LIZZY';
 }
 

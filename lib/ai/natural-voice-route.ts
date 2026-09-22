@@ -1,21 +1,6 @@
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { generateCloudflareNaturalVoice } from '@/lib/ai/cloudflare-natural-voice';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { getOpenAIClient } from '@/lib/ai/openai-client';
-
-async function generateOpenAINaturalVoice(text: string): Promise<ArrayBuffer> {
-  if (!process.env.OPENAI_API_KEY) throw new Error('OpenAI voice is not configured');
-  const response = await getOpenAIClient().audio.speech.create({
-    model: 'gpt-4o-mini-tts',
-    voice: 'nova',
-    input: text,
-    speed: 1.08,
-    instructions:
-      'Speak clearly, confidently, and conversationally at a brisk natural pace. Use crisp diction, short pauses, and no drawn-out or slurred words.',
-    response_format: 'mp3',
-  });
-  return response.arrayBuffer();
-}
 
 export async function handleNaturalVoiceRequest(request: Request) {
   const limited = await applyRateLimit(request, 'public');
@@ -31,9 +16,7 @@ export async function handleNaturalVoiceRequest(request: Request) {
   await hydrateProcessEnv();
 
   try {
-    const audio = await generateOpenAINaturalVoice(text).catch(() =>
-      generateCloudflareNaturalVoice(text),
-    );
+    const audio = await generateCloudflareNaturalVoice(text);
     return new Response(audio, {
       headers: {
         'Content-Type': 'audio/mpeg',

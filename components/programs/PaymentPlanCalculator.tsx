@@ -12,9 +12,6 @@ interface ProgramPricing {
 
 interface Props {
   programSlug: string;
-  stripeDepositUrl?: string;
-  stripeFullUrl?: string;
-  successUrl?: string;
   initialPaymentMode?: 'full' | 'plan' | 'bnpl';
 }
 
@@ -103,7 +100,20 @@ export default function PaymentPlanCalculator({
   }
 
   const installmentCents = Math.ceil(pricing.tuition_cents / 4);
-  const selectedPlan = initialPaymentMode === 'full' ? 'full' : initialPaymentMode ? 'installments' : null;
+  const selectedPlan =
+    initialPaymentMode === 'full'
+      ? 'full'
+      : initialPaymentMode === 'plan'
+        ? 'installments'
+        : null;
+  const selectedPathLabel =
+    initialPaymentMode === 'full'
+      ? 'Pay in full'
+      : initialPaymentMode === 'plan'
+        ? 'Four installments'
+        : initialPaymentMode === 'bnpl'
+          ? 'Buy Now, Pay Later (provider approval required)'
+          : null;
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -114,6 +124,11 @@ export default function PaymentPlanCalculator({
       </div>
 
       <div className="space-y-5 p-5 sm:p-6">
+        {selectedPathLabel ? (
+          <p className="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm font-bold text-blue-950">
+            Your selected path: {selectedPathLabel}
+          </p>
+        ) : null}
         <div className="grid gap-3 sm:grid-cols-2">
           <button
             type="button"
@@ -163,6 +178,7 @@ export default function PaymentPlanCalculator({
         <p className="text-sm leading-6 text-slate-600">
           Secure enrollment uses QuickBooks. Online card or ACH availability is shown on the invoice.
           The installment option is Elevate&apos;s four-invoice plan; it is not third-party BNPL.
+          BNPL appears only when an enabled provider is configured and separately approves the applicant.
         </p>
 
         {checkoutLoading ? (

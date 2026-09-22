@@ -1,10 +1,7 @@
 name: Upgrade Authored Course Experience
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/course-media-trigger'
+  workflow_dispatch:
 
 permissions:
   contents: read

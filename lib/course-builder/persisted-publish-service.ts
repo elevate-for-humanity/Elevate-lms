@@ -5,6 +5,7 @@ import { publishCourse } from '../lms/course-service';
 import { logAdminAudit, AdminAction } from '../admin/audit-log';
 import { normalizeGeneratedCourseForGovernance } from '../course-factory/post-generation-governance';
 import { publicationRequirements, type PublicationRequirement } from '../course-factory/experience-contract';
+import { assessmentQuestionIssues } from './assessment-validation';
 
 const ASSESSMENT_TYPES = new Set(['quiz', 'checkpoint', 'exam', 'final_exam']);
 const PRACTICAL_TYPES = new Set(['practical', 'lab', 'fieldwork', 'observation', 'practicum']);
@@ -165,6 +166,7 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
           'verification_ready',
           'certificate_ready',
           'published',
+          'complete',
           'completed',
           'generated',
         ].includes(lesson.generation_status)
@@ -174,10 +176,7 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
         if (questions.length === 0) issues.push('assessment has no questions');
         if (lesson.passing_score == null) issues.push('assessment passing score missing');
         questions.forEach((question: any, qi: number) => {
-          if (!String(question?.explanation ?? '').trim())
-            issues.push(`question ${qi + 1} rationale missing`);
-          if (!question?.domainKey && asArray(question?.competencyKeys).length === 0)
-            issues.push(`question ${qi + 1} standards/competency mapping missing`);
+          issues.push(...assessmentQuestionIssues(question, qi));
         });
       } else {
         if (

@@ -68,7 +68,7 @@ describe('single Course Builder authority', () => {
     ];
     for (const boundary of boundaries) {
       expect(read(boundary), boundary).toMatch(
-        /CourseBuilderGenerationPaused|CourseBuilderGenerationEnabled/,
+        /CourseBuilderGenerationPaused|CourseBuilderGenerationEnabled|getCourseBuilderGenerationControl/,
       );
     }
   });
@@ -127,13 +127,12 @@ describe('single Course Builder authority', () => {
     }
   });
 
-  it('allows only the configured proof course while the global pause remains closed', () => {
+  it('allows only explicitly allowlisted courses while the global pause remains closed', () => {
     const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
-    expect(worker).toContain("'course_builder_proof_course_id'");
-    expect(worker).toContain('queueOneDraft && courseId && maxJobs === 1');
-    expect(worker).toContain('!courseId && !jobId && !queueOneDraft && proofCourseId');
-    expect(worker).toContain('courseId = proofCourseId');
-    expect(worker).toContain('maxJobs = 1');
-    expect(worker).toContain('globallyPaused && !authorizedProof');
+    expect(worker).toContain('getCourseBuilderGenerationControl');
+    expect(worker).toContain('new Set(generationControl.allowedCourseIds)');
+    expect(worker).toContain('globallyPaused && courseId && !allowedCourseIds.has(courseId)');
+    expect(worker).toContain('generationControl.allowedCourseIds.length === 0');
+    expect(worker).toContain("reason: 'course-builder-generation-paused'");
   });
 });

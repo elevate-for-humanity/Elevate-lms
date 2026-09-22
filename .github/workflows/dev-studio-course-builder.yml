@@ -8,9 +8,6 @@ on:
         required: true
         type: string
         default: business-administration
-  issues:
-    types: [opened, reopened]
-
 permissions:
   contents: read
   issues: write
@@ -37,18 +34,10 @@ env:
 
 jobs:
   dev-studio-course-builder:
-    if: >-
-      github.event_name != 'issues' ||
-      github.event.issue.title == 'RUN BUSINESS COURSE BUILDER ACCEPTANCE' ||
-      github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE' ||
-      github.event.issue.title == 'RUN HVAC COURSE BUILDER ACCEPTANCE' ||
-      github.event.issue.title == 'RUN BARBER COURSE BUILDER ACCEPTANCE' ||
-      github.event.issue.title == 'RUN COSMETOLOGY COURSE BUILDER ACCEPTANCE' ||
-      github.event.issue.title == 'RUN COSMETOLOGY UNIFIED COURSE REBUILD'
     runs-on: ubuntu-latest
     timeout-minutes: 180
     concurrency:
-      group: dev-studio-course-builder-${{ github.event_name == 'workflow_dispatch' && inputs.program || github.event.issue.title || 'push' }}
+      group: dev-studio-course-builder-${{ inputs.program }}
       cancel-in-progress: true
 
     steps:
@@ -63,20 +52,6 @@ jobs:
         run: |
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           test -f lib/devstudio/course-builder-controller.ts
-
-      - name: Post Dev Studio start evidence
-        if: github.event_name == 'issues'
-        uses: actions/github-script@v7
-        env:
-          TESTED_SHA: ${{ steps.tested.outputs.sha }}
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `DEV STUDIO -> COURSE BUILDER STARTED\n\nExact checked-out main SHA: ${process.env.TESTED_SHA}`,
-            });
 
       - uses: pnpm/action-setup@v4
         with:
@@ -116,25 +91,8 @@ jobs:
         id: target
         shell: bash
         run: |
-          target="business-administration"
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            target="${{ inputs.program }}"
-          elif [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN ESB COURSE BUILDER ACCEPTANCE" ]; then
-            target="esb"
-          fi
-          if [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN HVAC COURSE BUILDER ACCEPTANCE" ]; then
-            target="hvac-technician"
-          elif [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN BARBER COURSE BUILDER ACCEPTANCE" ]; then
-            target="barber-apprenticeship"
-          elif [ "${{ github.event_name }}" = "issues" ] && { [ "${{ github.event.issue.title }}" = "RUN COSMETOLOGY COURSE BUILDER ACCEPTANCE" ] || [ "${{ github.event.issue.title }}" = "RUN COSMETOLOGY UNIFIED COURSE REBUILD" ]; }; then
-            target="cosmetology-apprenticeship"
-          fi
+          target="${{ inputs.program }}"
           echo "program=$target" >> "$GITHUB_OUTPUT"
-
-      - name: Authorize one-time ESB media run for issue 923
-        if: github.event_name == 'issues' && github.event.issue.number == 923 && github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE'
-        shell: bash
-        run: rm -f .github/COURSE_MEDIA_PAUSED
 
       - name: Build through canonical Dev Studio controlled Course Builder
         env:
@@ -152,11 +110,7 @@ jobs:
           elif [ "${{ steps.target.outputs.program }}" = "business-administration" ]; then
             pnpm tsx scripts/course-factory/build-business-program.ts
           else
-            if [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.number }}" = "1030" ] && [ "${{ steps.target.outputs.program }}" = "cosmetology-apprenticeship" ]; then
-              pnpm tsx scripts/course-builder/requeue-course-media.ts --course cosmetology-apprenticeship
-            else
-              pnpm tsx scripts/course-builder/run.ts --course "${{ steps.target.outputs.program }}" --mode refresh --authorize-paid-inference
-            fi
+            pnpm tsx scripts/course-builder/run.ts --course "${{ steps.target.outputs.program }}" --mode refresh --authorize-paid-inference
           fi
 
       - name: Verify Admin and LMS consumers after governed publication
@@ -164,19 +118,3 @@ jobs:
           pnpm exec eslint apps/admin/app/api/admin/course-builder apps/lms/app/lms/courses apps/lms/app/api/learner/interactions --quiet
           pnpm build:admin
           pnpm build:lms
-
-      - name: Post Dev Studio completion evidence
-        if: always() && github.event_name == 'issues'
-        uses: actions/github-script@v7
-        env:
-          JOB_STATUS: ${{ job.status }}
-          TESTED_SHA: ${{ steps.tested.outputs.sha }}
-          PROGRAM: ${{ steps.target.outputs.program }}
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `DEV STUDIO -> COURSE BUILDER ${process.env.JOB_STATUS === 'success' ? 'PASS' : 'FAIL'}\n\nProgram: ${process.env.PROGRAM || 'unresolved'}\nTested main SHA: ${process.env.TESTED_SHA || 'unknown'}`,
-            });

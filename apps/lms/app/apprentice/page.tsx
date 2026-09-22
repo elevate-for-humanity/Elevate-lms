@@ -169,6 +169,7 @@ export default async function ApprenticePortalPage() {
     { data: documentRequirements },
     { data: handbookAcceptance },
     { data: cosmetologyBilling },
+    { data: billingAuthorization },
     { data: theorySchedule },
     { data: policyAcceptances },
   ] = await Promise.all([
@@ -204,12 +205,19 @@ export default async function ApprenticePortalPage() {
               ? 'barber_subscriptions'
               : 'cosmetology_subscriptions',
           )
-          .select('stripe_subscription_id,payment_status,setup_fee_paid,fully_paid')
+          .select('payment_status,setup_fee_paid,fully_paid')
           .eq('user_id', subject.userId)
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle()
       : Promise.resolve({ data: null }),
+    db
+      .from('billing_migration_authorizations')
+      .select('billing_schedule_id,status')
+      .eq('user_id', subject.userId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
     (db as any)
       .from('apprenticeship_theory_schedules')
       .select(
@@ -227,6 +235,13 @@ export default async function ApprenticePortalPage() {
       .eq('subject_id', subject.userId)
       .in('agreement_key', Object.values(APPRENTICE_POLICY_KEYS)),
   ]);
+  const { data: automaticBillingSchedule } = billingAuthorization?.billing_schedule_id
+    ? await db
+        .from('billing_schedules')
+        .select('status,provider_status,provider_subscription_id')
+        .eq('id', billingAuthorization.billing_schedule_id)
+        .maybeSingle()
+    : { data: null };
 
   const firstName = profile?.first_name || profile?.full_name?.split(' ')[0] || 'Apprentice';
   const displayProgram =
@@ -342,13 +357,18 @@ export default async function ApprenticePortalPage() {
   );
   const timeclockPolicyAccepted = acceptedPolicyKeys.has(APPRENTICE_POLICY_KEYS.timeclock);
   const paymentPolicyAccepted = acceptedPolicyKeys.has(APPRENTICE_POLICY_KEYS.payment);
-  const paymentStatus = String(cosmetologyBilling?.payment_status || '').toLowerCase();
+  const paymentStatus = String(automaticBillingSchedule?.provider_status || '').toLowerCase();
+  const automaticBillingActive = Boolean(
+    automaticBillingSchedule?.status === 'active' &&
+      automaticBillingSchedule?.provider_status === 'active' &&
+      automaticBillingSchedule?.provider_subscription_id,
+  );
   const paymentNeedsAction =
     !cosmetologyBilling?.fully_paid &&
-    (paymentStatus === 'past_due' ||
-      paymentStatus === 'unpaid' ||
-      paymentStatus === 'incomplete' ||
-      paymentStatus === 'incomplete_expired');
+    (!automaticBillingActive ||
+      paymentStatus === 'suspended' ||
+      paymentStatus === 'failed' ||
+      paymentStatus === 'expired');
   const requiredPolicyPanel = (
     <section className="rounded-3xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-6 shadow-sm sm:p-8">
       <div className="flex gap-3">
@@ -396,12 +416,10 @@ export default async function ApprenticePortalPage() {
   );
 
   if (!runtime.contract) {
-    const billingConfigured = Boolean(
-      cosmetologyBilling?.fully_paid || cosmetologyBilling?.stripe_subscription_id,
-    );
+    const billingConfigured = Boolean(cosmetologyBilling?.fully_paid || automaticBillingActive);
     const todoItems = [
       {
-        label: 'Authorize automatic tuition payments and save a card',
+        label: 'Complete the payment release and approve PayPal billing',
         done: billingConfigured,
         href: '/apprentice/billing',
         icon: CreditCard,

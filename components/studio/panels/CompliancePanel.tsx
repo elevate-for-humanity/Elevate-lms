@@ -20,7 +20,7 @@ export function CompliancePanel() {
   const targetHours = state.modules.reduce((sum, module) => sum + Number(module.target_hours ?? 0), 0);
   const signoffs = state.lessons.filter((lesson) => lesson.requires_instructor_signoff).length;
   const missingObjectives = state.lessons.filter((lesson) => !Array.isArray(lesson.learning_objectives) || lesson.learning_objectives.length === 0).length;
-  const unapproved = state.lessons.filter((lesson) => !lesson.approved).length;
+  const pendingAcceptance = state.lessons.filter((lesson) => !lesson.approved).length;
 
   async function loadAudit() {
     setLoading(true);
@@ -48,7 +48,7 @@ export function CompliancePanel() {
     ['Module target hours', targetHours.toFixed(2)],
     ['Instructor sign-offs', String(signoffs)],
     ['Missing objectives', String(missingObjectives)],
-    ['Lessons awaiting approval', String(unapproved)],
+    ['Pending automated acceptance', String(pendingAcceptance)],
   ];
 
   return (

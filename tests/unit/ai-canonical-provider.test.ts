@@ -23,7 +23,8 @@ describe('canonical AI provider authority', () => {
     vi.stubGlobal('fetch', request);
 
     const { aiChat } = await import('@/lib/ai/ai-service');
-    await expect(aiChat({ messages: [{ role: 'user', content: 'test' }] })).rejects.toThrow(
+    const { runWithPaidInferenceContext } = await import('@/lib/ai/paid-inference-context');
+    await expect(runWithPaidInferenceContext('test-provider-failure', () => aiChat({ messages: [{ role: 'user', content: 'test' }] }))).rejects.toThrow(
       'Configured AI provider "elevate" failed',
     );
 
@@ -40,12 +41,13 @@ describe('canonical AI provider authority', () => {
     vi.stubEnv('ELEVATE_LLM_URL', 'https://configured-provider.test');
     vi.stubEnv('ELEVATE_LLM_SECRET', 'test-secret');
     const { aiChat } = await import('@/lib/ai/ai-service');
+    const { runWithPaidInferenceContext } = await import('@/lib/ai/paid-inference-context');
 
     await expect(
-      aiChat({
+      runWithPaidInferenceContext('test-provider-override', () => aiChat({
         provider: 'openai',
         messages: [{ role: 'user', content: 'test' }],
-      }),
+      })),
     ).rejects.toThrow('Provider override "openai" is not allowed');
   });
 
@@ -66,11 +68,12 @@ describe('canonical AI provider authority', () => {
     );
     vi.stubGlobal('fetch', request);
     const { aiChat } = await import('@/lib/ai/ai-service');
+    const { runWithPaidInferenceContext } = await import('@/lib/ai/paid-inference-context');
 
-    const result = await aiChat({
+    const result = await runWithPaidInferenceContext('test-owned-provider', () => aiChat({
       providerPolicy: 'owned-only',
       messages: [{ role: 'user', content: 'test' }],
-    });
+    }));
 
     expect(result.provider).toBe('elevate');
     expect(request).toHaveBeenCalledTimes(1);
@@ -85,12 +88,13 @@ describe('canonical AI provider authority', () => {
     const request = vi.fn();
     vi.stubGlobal('fetch', request);
     const { aiChat } = await import('@/lib/ai/ai-service');
+    const { runWithPaidInferenceContext } = await import('@/lib/ai/paid-inference-context');
 
     await expect(
-      aiChat({
+      runWithPaidInferenceContext('test-owned-unavailable', () => aiChat({
         providerPolicy: 'owned-only',
         messages: [{ role: 'user', content: 'test' }],
-      }),
+      })),
     ).rejects.toThrow('Elevate-owned AI is unavailable');
     expect(request).not.toHaveBeenCalled();
   });

@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 const QB_BASE = 'https://quickbooks.api.intuit.com/v3/company';
 const QB_TOKEN_URL = 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer';
 type Database = any;
@@ -13,6 +15,9 @@ export interface QuickBooksConfig {
 }
 
 export async function loadQuickBooksConfig(db: Database): Promise<QuickBooksConfig> {
+  // Static OAuth credentials live in the canonical Vault-backed secret store;
+  // refreshed access/refresh tokens remain in app_settings because they rotate.
+  await hydrateProcessEnv();
   const keys = ['QB_CLIENT_ID', 'QB_CLIENT_SECRET', 'QB_ACCESS_TOKEN', 'QB_REFRESH_TOKEN', 'QB_REALM_ID'];
   const { data } = await db.from('app_settings').select('key,value').in('key', keys);
   const stored = Object.fromEntries((data || []).map((row: any) => [row.key, row.value]));

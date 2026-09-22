@@ -4,7 +4,7 @@ import nextDynamic from 'next/dynamic';
 
 const DevContainerPanel = nextDynamic(() => import('@/components/studio/DevContainerPanel'), {
   ssr: false,
-  loading: () => <div className="flex min-h-[50vh] items-center justify-center bg-white text-slate-600">Loading container runtime…</div>,
+  loading: () => <div className="flex min-h-[50vh] items-center justify-center bg-white text-slate-600">Loading container control plane…</div>,
 });
 
 const ServicesPanel = nextDynamic(() => import('@/components/studio/ServicesPanel'), {

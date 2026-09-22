@@ -184,7 +184,7 @@ I'll ask a few focused questions, recommend the smallest setup that fits, explai
 function portalGreeting(portalRole?: string | null, personName?: string | null): Message {
   const role = portalRole?.replaceAll('_', ' ') || 'authenticated portal';
   const displayName = personName?.trim() || '';
-  const honorificName = /^(dr\.|doctor)\s/i.test(displayName)
+  const firstName = /^(dr\.|doctor)\s/i.test(displayName)
     ? displayName
     : displayName.split(/\s+/)[0];
   const ownerPrompt = /program holder|host shop/i.test(role)
@@ -192,7 +192,7 @@ function portalGreeting(portalRole?: string | null, personName?: string | null):
     : '\n\nWhat would you like to complete first?';
   return {
     role: 'assistant',
-    content: `Hi${honorificName ? ` ${honorificName}` : ''} — I'm PARIS, your authenticated portal assistant for the ${role} workspace.
+    content: `Hi${firstName ? ` ${firstName}` : ''} — I'm PARIS, your authenticated portal assistant for the ${role} workspace.
 
 I can help you understand red to-dos, interview applicants, draft student notes and outreach, organize onboarding, and explain where to upload documents or record progress. I can prefill drafts, but you must review and submit official hours, milestones, compliance records, agreements, and messages.${ownerPrompt}`,
   };

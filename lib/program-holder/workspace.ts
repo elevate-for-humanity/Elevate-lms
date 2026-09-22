@@ -148,14 +148,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           )
           .eq('program_holder_id', holderId)
           .in('program_id', programIds)
-          .in('status', [
-            'active',
-            'enrolled',
-            'in_progress',
-            'funded',
-            'completed',
-            'graduated',
-          ])
+          .in('status', ['active', 'enrolled', 'completed', 'graduated'])
           .order('enrolled_at', { ascending: false })
       : Promise.resolve({ data: [] }),
     programIds.length
@@ -188,7 +181,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           )
           .eq('program_holder_id', holderId)
           .in('program_id', programIds)
-          .in('status', ['active', 'enrolled'])
+          .eq('status', 'enrolled')
           .order('updated_at', { ascending: false })
       : Promise.resolve({ data: [] }),
     db

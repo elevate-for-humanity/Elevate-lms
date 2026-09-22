@@ -3,14 +3,21 @@ import { randomUUID } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
-import { HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS } from '@/lib/program-holder/onboarding-readiness';
+import {
+  CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS,
+  HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS,
+} from '@/lib/program-holder/onboarding-readiness';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 const MAX_BYTES = 10 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 const MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'video/mp4']);
-const DOCUMENT_TYPES = new Set(HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type));
+const DOCUMENT_TYPES = new Set([
+  ...CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type),
+  ...HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type),
+  'company_logo',
+]);
 
 export async function POST(request: NextRequest) {
   const limited = await applyRateLimit(request, 'strict');

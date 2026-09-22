@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { provisionPayPalSubscription } from '@/lib/billing/providers/paypal-subscriptions';
 
 const Input = z.discriminatedUnion('action', [
   z.object({ action: z.literal('approve') }),
@@ -49,10 +50,27 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (approved.error || !approved.data) {
       return NextResponse.json({ error: 'Authorization could not be approved.' }, { status: 500 });
     }
-    // Keep the replacement paused until the legacy Stripe subscription has
-    // been cancelled and its final paid-through date has been verified. This
-    // prevents the two providers from billing the learner for the same period.
-    return NextResponse.json({ ok: true, status: 'approved', cutoverReady: true });
+    const schedule = await db
+      .from('billing_schedules')
+      .select('*')
+      .eq('id', authorization.billing_schedule_id)
+      .single();
+    if (schedule.error) {
+      return NextResponse.json({ ok: true, status: 'approved', setupPending: true });
+    }
+    try {
+      const paypal = await provisionPayPalSubscription(db, schedule.data);
+      return NextResponse.json({
+        ok: true,
+        status: 'approved',
+        setupPending: paypal.status !== 'active',
+        approvalUrl: paypal.approvalUrl,
+      });
+    } catch {
+      // The signed release stays approved. Admin can retry provider setup
+      // without asking the learner to upload the same legal evidence again.
+      return NextResponse.json({ ok: true, status: 'approved', setupPending: true });
+    }
   }
   if (authorization.billing_schedule_id)
     await db

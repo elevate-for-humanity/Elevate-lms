@@ -17,6 +17,14 @@ import {
 
 type Database = any;
 
+export interface ExternalPaymentInput {
+  idempotencyKey: string;
+  billingScheduleId: string;
+  collectionProvider: 'paypal';
+  providerPaymentId: string;
+  paidAt: string;
+}
+
 async function ensureCustomer(db: Database, input: BillingCustomerInput) {
   const config = await loadQuickBooksConfig(db);
   const query = encodeURIComponent(
@@ -202,5 +210,88 @@ export function createQuickBooksBillingProvider(db: Database): BillingProviderAd
         throw cause;
       }
     },
+  };
+}
+
+/**
+ * Record a provider-confirmed payment against its matching QuickBooks invoice.
+ * The provider payment ID and the QuickBooks Request-Id make webhook retries
+ * idempotent. Raw payment credentials never enter this service or database.
+ */
+export async function recordQuickBooksExternalPayment(
+  db: Database,
+  input: ExternalPaymentInput,
+): Promise<{ providerPaymentId: string; quickBooksPaymentId?: string }> {
+  const existing = await db
+    .from('billing_invoices')
+    .select(
+      'id,provider_invoice_id,provider_payload,provider_payment_id,provider_payment_status,status',
+    )
+    .eq('idempotency_key', input.idempotencyKey)
+    .maybeSingle();
+  if (existing.error || !existing.data?.provider_invoice_id) {
+    throw new Error(
+      existing.error?.message || 'QuickBooks invoice must exist before its payment can be recorded.',
+    );
+  }
+  if (
+    existing.data.provider_payment_id === input.providerPaymentId &&
+    existing.data.provider_payment_status === 'recorded'
+  ) {
+    return {
+      providerPaymentId: input.providerPaymentId,
+      quickBooksPaymentId: existing.data.provider_payload?.externalPayment?.Id,
+    };
+  }
+
+  const invoice = existing.data.provider_payload;
+  const customerId = invoice?.CustomerRef?.value;
+  if (!customerId) throw new Error('QuickBooks invoice is missing its customer reference.');
+
+  const config = await loadQuickBooksConfig(db);
+  const paymentResult = await quickBooksRequest<any>(db, config, 'payment', {
+    method: 'POST',
+    headers: {
+      'Request-Id': createHash('sha256')
+        .update(`paypal-payment:${input.providerPaymentId}`)
+        .digest('hex')
+        .slice(0, 50),
+    },
+    body: JSON.stringify({
+      CustomerRef: { value: customerId },
+      TotalAmt: Number(existing.data.provider_payload?.TotalAmt || 0),
+      TxnDate: input.paidAt.slice(0, 10),
+      PaymentRefNum: `PayPal ${input.providerPaymentId}`.slice(0, 21),
+      PrivateNote: `PayPal automatic tuition payment ${input.providerPaymentId}`,
+      Line: [
+        {
+          Amount: Number(existing.data.provider_payload?.TotalAmt || 0),
+          LinkedTxn: [{ TxnId: existing.data.provider_invoice_id, TxnType: 'Invoice' }],
+        },
+      ],
+    }),
+  });
+  const updatedPayload = { ...invoice, externalPayment: paymentResult.Payment };
+  const saved = await db
+    .from('billing_invoices')
+    .update({
+      billing_schedule_id: input.billingScheduleId,
+      collection_provider: input.collectionProvider,
+      provider_payment_id: input.providerPaymentId,
+      provider_payment_status: 'recorded',
+      status: 'paid',
+      paid_at: input.paidAt,
+      provider_payload: updatedPayload,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', existing.data.id);
+  if (saved.error) {
+    throw new Error(
+      `Payment was recorded in QuickBooks but the local ledger update failed: ${saved.error.message}`,
+    );
+  }
+  return {
+    providerPaymentId: input.providerPaymentId,
+    quickBooksPaymentId: paymentResult.Payment?.Id,
   };
 }

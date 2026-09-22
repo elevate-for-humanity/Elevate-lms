@@ -5,6 +5,9 @@ export const HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS = [
   { type: 'epa_608', label: 'EPA Section 608 technician certification' },
   { type: 'w9', label: 'Completed IRS Form W-9' },
   { type: 'hvac_training_plan', label: 'Approved HVAC syllabus and training plan' },
+  { type: 'profile_photo', label: 'Program Holder profile picture' },
+  { type: 'student_photo', label: 'Student training photo' },
+  { type: 'student_video', label: 'Student training video' },
 ] as const;
 
 export const CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS = [
@@ -147,6 +150,7 @@ export async function getProgramHolderPaymentReadiness(
     ...(!handbookAcknowledged ? ['Program Holder handbook acknowledgement'] : []),
     ...(!rightsAcknowledged ? ['Rights and responsibilities acknowledgement'] : []),
     ...required.filter((item) => !approvedTypes.has(item.type)).map((item) => item.label),
+    ...(!approvedTypes.has('company_logo') ? ['Program Holder company logo'] : []),
     ...(requiresMediaRelease && !imageRelease ? ['Signed image release'] : []),
     ...(payoutProvider === 'quickbooks' && !['active', 'connected', 'synced', 'complete'].includes(
       String(payoutProfile?.quickbooks_sync_status || '').toLowerCase(),

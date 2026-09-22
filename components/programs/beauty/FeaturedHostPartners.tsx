@@ -7,6 +7,8 @@ import {
   type FeaturedHostPartnerMedia,
 } from '@/lib/apprenticeship-programs/host-partners';
 
+const RAZORS_VIDEO_HEADING = "Welcome to Razor's Image Barbershop";
+
 function programLabel(program: string) {
   return program
     .replace(/-apprenticeship$/, '')
@@ -162,6 +164,11 @@ export default function FeaturedHostPartners({
                     key={shop.slug}
                     className={`overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm ${shop.slug === 'razors-image-barbershop' ? 'lg:col-span-2' : ''}`}
                   >
+                    {shop.slug === 'razors-image-barbershop' ? (
+                      <p className="bg-slate-950 px-6 py-4 text-lg font-black text-white">
+                        {RAZORS_VIDEO_HEADING}
+                      </p>
+                    ) : null}
                     {video ? (
                       <div
                         className="bg-slate-950 px-4 py-5 sm:px-6"
@@ -229,7 +236,9 @@ export default function FeaturedHostPartners({
                         {video.script ? (
                           <details className="mx-auto mt-4 max-w-xl rounded-xl border border-white/20 bg-slate-950/30 p-4 text-white">
                             <summary className="cursor-pointer text-sm font-black">
-                              Read the {shop.dba ?? shop.name} video script
+                              {shop.dba === 'Salon Saloon'
+                                ? 'Read the Salon Saloon video script'
+                                : `Read the ${shop.dba ?? shop.name} video script`}
                             </summary>
                             <p className="mt-3 text-sm font-medium leading-6 text-slate-100">
                               {video.script}

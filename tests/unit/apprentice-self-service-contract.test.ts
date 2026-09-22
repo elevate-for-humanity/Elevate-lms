@@ -9,7 +9,7 @@ describe('apprentice self-service portal contracts', () => {
   it('sends the handbook action accepted by the API', () => {
     const client = source('apps/lms/app/apprentice/handbook/AcknowledgeHandbookButton.tsx');
     expect(client).toContain("action: 'acknowledge'");
-    expect(client).toContain("handbookVersion: '2025.1'");
+    expect(client).toContain("handbookVersion: '2026.2'");
   });
 
   it('reads protected document configuration through the authenticated server route', () => {
@@ -30,21 +30,34 @@ describe('apprentice self-service portal contracts', () => {
     expect(migration).not.toContain('document_type IN (');
   });
 
-  it('resolves billing ownership through either canonical learner identity column', () => {
-    for (const path of [
-      'apps/lms/app/api/billing/setup/route.ts',
-      'apps/lms/app/api/billing/portal/route.ts',
-    ]) {
-      expect(source(path)).toContain('.or(`user_id.eq.${user.id},student_id.eq.${user.id}`)');
-    }
+  it('retires Stripe setup while keeping the authenticated legacy portal lookup fail-safe', () => {
+    const setup = source('apps/lms/app/api/billing/setup/route.ts');
+    const portal = source('apps/lms/app/api/billing/portal/route.ts');
+    expect(setup).toContain('retiredStripeCheckout');
+    expect(setup).toContain('PayPal automatic billing and QuickBooks accounting');
+    expect(portal).toContain('.or(`user_id.eq.${user.id},student_id.eq.${user.id}`)');
   });
 
-  it('synchronizes a recovered Stripe customer across enrollment and tuition billing', () => {
-    const route = source('apps/lms/app/api/billing/setup/route.ts');
-    expect(route).toContain('const subscriptionTable = SUPPORTED_TABLES[enrollment.program_slug]');
-    expect(route).toContain(".from('program_enrollments')");
-    expect(route).toContain('.from(subscriptionTable)');
-    expect(route).toContain(".is('stripe_subscription_id', null)");
-    expect(route).toContain('enrollmentSync.error || billingSync.error');
+  it('collects automatically through PayPal and mirrors completed payments to QuickBooks', () => {
+    const paypal = source('lib/billing/providers/paypal-subscriptions.ts');
+    const sync = source('lib/billing/paypal-payment-sync.ts');
+    const webhook = source('apps/marketing/app/api/webhooks/paypal-billing/route.ts');
+    expect(paypal).toContain("interval_unit: 'WEEK'");
+    expect(paypal).toContain("user_action: 'SUBSCRIBE_NOW'");
+    expect(sync).toContain('createQuickBooksBillingProvider(db).createManualInvoice');
+    expect(sync).toContain('recordQuickBooksExternalPayment');
+    expect(webhook).toContain("event.event_type === 'PAYMENT.SALE.COMPLETED'");
+  });
+
+  it('uses PayPal rather than legacy Stripe state on active apprentice billing screens', () => {
+    const billingPage = source('apps/lms/app/apprentice/billing/page.tsx');
+    const billingCard = source('components/learner/BillingCard.tsx');
+    const apprenticeDashboard = source('apps/lms/app/apprentice/page.tsx');
+    expect(billingPage).toContain(".from('billing_schedules')");
+    expect(billingPage).toContain('provider_subscription_id');
+    expect(billingCard).toContain('Complete PayPal Authorization');
+    expect(apprenticeDashboard).toContain('approve PayPal billing');
+    expect(billingCard).not.toContain('Stripe');
+    expect(apprenticeDashboard).not.toContain('stripe_subscription_id');
   });
 });

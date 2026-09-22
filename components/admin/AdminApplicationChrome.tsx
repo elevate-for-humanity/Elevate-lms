@@ -32,7 +32,7 @@ export function AdminApplicationChrome({
         data-elevate-dashboard-content
         className={
           studioOwnsViewport
-            ? 'admin-studio-viewport h-[calc(100dvh-4rem)] min-w-0 overflow-hidden lg:h-full'
+            ? 'admin-studio-viewport h-full min-w-0 overflow-hidden'
             : 'min-w-0 overflow-x-clip pb-16 lg:pb-0'
         }
       >

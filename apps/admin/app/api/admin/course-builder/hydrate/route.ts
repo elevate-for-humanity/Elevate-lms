@@ -7,6 +7,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import {
   generateAndPersistModuleQuiz,
   generateAndPersistFinalExam,
+  toQuizQuestion,
 } from '@/lib/course-builder/assessment-generator';
 import {
   courseBuilderCreditErrorResponse,
@@ -46,6 +47,36 @@ export async function POST(request: NextRequest) {
   const db = await requireAdminClient();
   let reservation: CreditReservation | null = null;
   try {
+    const { data: lesson, error: lessonError } = await db
+      .from('course_lessons')
+      .select('id,module_id,domain_key,competency_checks')
+      .eq('id', body.lessonId)
+      .maybeSingle();
+    if (lessonError) throw lessonError;
+    if (!lesson) return safeError('Assessment lesson not found', 404);
+
+    let moduleDomainKey: string | undefined;
+    if (lesson.module_id) {
+      const { data: courseModule, error: moduleError } = await db
+        .from('course_modules')
+        .select('domain_key')
+        .eq('id', lesson.module_id)
+        .maybeSingle();
+      if (moduleError) throw moduleError;
+      moduleDomainKey = courseModule?.domain_key ?? undefined;
+    }
+    const lessonCompetencyKeys = Array.isArray(lesson.competency_checks)
+      ? lesson.competency_checks
+          .map((item: unknown) => {
+            if (typeof item === 'string') return item;
+            if (item && typeof item === 'object' && 'key' in item) return String(item.key);
+            return '';
+          })
+          .filter(Boolean)
+      : [];
+    const domainKey = lesson.domain_key ?? moduleDomainKey ?? body.domainKey;
+    const competencyKeys = lessonCompetencyKeys.length ? lessonCompetencyKeys : body.competencyKeys;
+
     reservation = await reserveCourseBuilderRequestCredits({
       request,
       userId: auth.id,
@@ -62,13 +93,14 @@ export async function POST(request: NextRequest) {
             questionCount: body.questionCount ?? 50,
             passingScore: body.passingScore ?? 80,
             domainDistribution: body.domainDistribution,
+            allDomainKeys: domainKey ? [domainKey] : undefined,
           })
         : await generateAndPersistModuleQuiz(db, {
             lessonId: body.lessonId,
             lessonSlug: body.lessonId,
             moduleTitle: body.moduleTitle ?? 'Module',
-            domainKey: body.domainKey,
-            competencyKeys: body.competencyKeys,
+            domainKey,
+            competencyKeys,
             questionCount: body.questionCount ?? 10,
             passingScore: body.passingScore ?? 70,
           });
@@ -79,9 +111,11 @@ export async function POST(request: NextRequest) {
         lessonId: result.lessonId,
         writtenToDb: result.writtenToDb,
         questionCount: result.questions.length,
+        questions: result.questions.map(toQuizQuestion).filter(Boolean),
+        passingScore: body.passingScore ?? (body.lessonType === 'exam' ? 80 : 70),
         errors: result.errors,
       },
-      { status: result.errors.length ? 207 : 200 },
+      { status: result.errors.length ? 422 : 200 },
     );
   } catch (err) {
     await refundCourseBuilderRequestCredits(

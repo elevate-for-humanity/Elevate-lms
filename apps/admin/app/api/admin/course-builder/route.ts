@@ -29,6 +29,11 @@ import {
 } from '@/lib/course-builder/edit-service';
 import { publishPersistedCourse } from '@/lib/course-builder/persisted-publish-service';
 import { reviewCanonicalCourse, reviewCanonicalLessons } from '@/lib/course-builder/review-service';
+import {
+  normalizeManualAssessmentQuestions,
+  persistAssessmentQuestions,
+  toQuizQuestion,
+} from '@/lib/course-builder/assessment-generator';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
@@ -80,6 +85,7 @@ type CourseBuilderAction =
   | 'delete-lesson'
   | 'reorder-lessons'
   | 'link-scorm'
+  | 'save-assessment'
   | 'review-course'
   | 'review-lessons'
   | 'audit'
@@ -523,6 +529,78 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { ok: false, error: 'Failed to link SCORM package' },
         { status: 400 },
+      );
+    }
+  }
+  if (action === 'save-assessment') {
+    const lessonId = typeof body.lessonId === 'string' ? body.lessonId.trim() : '';
+    const passingScore = Number(body.passingScore);
+    if (!lessonId) {
+      return NextResponse.json({ ok: false, error: 'lessonId is required' }, { status: 400 });
+    }
+    if (!Number.isInteger(passingScore) || passingScore < 1 || passingScore > 100) {
+      return NextResponse.json(
+        { ok: false, error: 'passingScore must be an integer between 1 and 100' },
+        { status: 400 },
+      );
+    }
+    try {
+      const db = await requireAdminClient();
+      const { data: lesson, error: lessonError } = await db
+        .from('course_lessons')
+        .select('id,module_id,domain_key,competency_checks')
+        .eq('id', lessonId)
+        .maybeSingle();
+      if (lessonError) throw lessonError;
+      if (!lesson) {
+        return NextResponse.json({ ok: false, error: 'Assessment lesson not found' }, { status: 404 });
+      }
+
+      let moduleDomainKey: string | undefined;
+      if (lesson.module_id) {
+        const { data: courseModule, error: moduleError } = await db
+          .from('course_modules')
+          .select('domain_key')
+          .eq('id', lesson.module_id)
+          .maybeSingle();
+        if (moduleError) throw moduleError;
+        moduleDomainKey = courseModule?.domain_key ?? undefined;
+      }
+      const competencyKeys = Array.isArray(lesson.competency_checks)
+        ? lesson.competency_checks
+            .map((item: unknown) => {
+              if (typeof item === 'string') return item;
+              if (item && typeof item === 'object' && 'key' in item) return String(item.key);
+              return '';
+            })
+            .filter(Boolean)
+        : [];
+      const questions = normalizeManualAssessmentQuestions(lessonId, body.questions, {
+        domainKey: lesson.domain_key ?? moduleDomainKey,
+        competencyKeys,
+      });
+      const result = await persistAssessmentQuestions(db, lessonId, questions, {
+        replaceExisting: true,
+        passingScore,
+      });
+      if (result.errors.length) {
+        return NextResponse.json(
+          { ok: false, error: result.errors.join('; '), errors: result.errors },
+          { status: 422 },
+        );
+      }
+      return NextResponse.json({
+        ok: true,
+        lessonId,
+        writtenToDb: result.writtenToDb,
+        questions: result.questions.map(toQuizQuestion).filter(Boolean),
+        passingScore,
+      });
+    } catch (error) {
+      logger.error('[course-builder] Assessment save failed', error);
+      return NextResponse.json(
+        { ok: false, error: error instanceof Error ? error.message : 'Failed to save assessment' },
+        { status: 422 },
       );
     }
   }

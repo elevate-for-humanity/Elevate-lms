@@ -124,6 +124,8 @@ export async function GET(req: NextRequest) {
         githubConfigured: true,
         localWritable: false,
         canCommit: true,
+        canProvisionWorkspace: false,
+        canStartInteractiveSession: false,
       },
     });
   } catch (error) {

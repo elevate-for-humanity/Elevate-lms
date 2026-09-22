@@ -35,13 +35,15 @@ type Port = {
 };
 
 const SERVICE_DOMAINS = {
-  marketing:
-    process.env.RESTORE_APEX_NORTHFLANK === 'true'
-      ? ['www.elevateforhumanity.org', 'elevateforhumanity.org']
-      : ['www.elevateforhumanity.org'],
+  marketing: ['www.elevateforhumanity.org'],
   lms: ['app.elevateforhumanity.org'],
   admin: ['admin.elevateforhumanity.org'],
 } as const;
+
+// Durable owns the apex URL forward. It must never be attached to a Northflank
+// application port because Durable cannot CNAME-flatten the zone apex to the
+// Northflank ingress. Keeping it here also removes any stale historical binding.
+const EXTERNALLY_ROUTED_DOMAINS = new Set(['elevateforhumanity.org']);
 
 async function getSubdomainCname(domain: string): Promise<{ verified: boolean; content?: string }> {
   const teamId = resolveTeamId();
@@ -62,18 +64,16 @@ async function getSubdomainCname(domain: string): Promise<{ verified: boolean; c
   return { verified: registered?.status === 'verified' };
 }
 
-async function verifySubdomain(
-  domain: string,
-): Promise<{ verified: boolean; content?: string }> {
+async function verifySubdomain(domain: string): Promise<{ verified: boolean; content?: string }> {
   const teamId = resolveTeamId();
   if (!teamId) return { verified: false };
 
   for (let attempt = 1; attempt <= 6; attempt += 1) {
     try {
-      await nfFetch(
-        `/teams/${teamId}/domains/${encodeURIComponent(domain)}/subdomains/@/verify`,
-        { method: 'POST', body: JSON.stringify({}) },
-      );
+      await nfFetch(`/teams/${teamId}/domains/${encodeURIComponent(domain)}/subdomains/@/verify`, {
+        method: 'POST',
+        body: JSON.stringify({}),
+      });
     } catch {
       // Northflank may reject verification while DNS and certificate state propagates.
     }
@@ -112,13 +112,6 @@ async function assignDomainToService(
   ({ verified, content } = await verifySubdomain(domain));
   console.log(`  Subdomain verified: ${verified}`);
   if (!verified) {
-    if (domain === 'elevateforhumanity.org' && process.env.RESTORE_APEX_NORTHFLANK === 'true') {
-      // Apex DNS uses an A record rather than Northflank's CNAME target. Keep
-      // restoring the service port mapping; Northflank can route the shared
-      // ingress once the verified team-domain is attached to the port.
-      console.warn('  Apex @ verification is not exposed as verified; continuing with port restoration.');
-      return;
-    }
     throw new Error(`${domain} did not verify as a Northflank @ subdomain`);
   }
 
@@ -156,7 +149,7 @@ async function updateServiceDomains(
   // of only appending the new correct hostname.
   const existing = (httpPort.domains ?? [])
     .map((domain) => domain.name)
-    .filter((domain) => !forbiddenDomains.has(domain));
+    .filter((domain) => !forbiddenDomains.has(domain) && !EXTERNALLY_ROUTED_DOMAINS.has(domain));
   const merged = [...new Set([...existing, ...domainNames])];
 
   console.log(`\nService ${serviceId} port ${httpPort.name} (${httpPort.id})`);
@@ -243,7 +236,7 @@ async function main() {
 www.elevateforhumanity.org   -> Marketing service
 app.elevateforhumanity.org   -> LMS service
 admin.elevateforhumanity.org -> Admin service
-elevateforhumanity.org       -> permanent redirect to https://www.elevateforhumanity.org
+elevateforhumanity.org       -> Durable permanent redirect to https://www.elevateforhumanity.org
 
 After DNS verification, TLS certificates provision automatically in Northflank.
 `);

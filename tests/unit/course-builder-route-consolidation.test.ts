@@ -55,6 +55,17 @@ describe('Admin UI route consolidation', () => {
     expect(studioAlias).toContain("redirect('/studio/courses')");
   });
 
+  it('surfaces the complete per-course Studio workspace inside the canonical builder shell', () => {
+    const unified = readFileSync(
+      path.join(root, 'components/admin/course-builder/UnifiedCourseBuilder.tsx'),
+      'utf8',
+    );
+    expect(unified).toContain("id: 'workspace'");
+    expect(unified).toContain('/studio/courses/');
+    expect(unified).toContain('Unified course workspace');
+    expect(unified).toContain('Live learner browser');
+  });
+
   it('declares one Course Builder authority and routes generated courses into it', () => {
     const contracts = JSON.parse(
       readFileSync(path.join(root, 'lib/routes/platform-surface-contracts.json'), 'utf8'),

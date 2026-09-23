@@ -420,6 +420,30 @@ async function _POST(request: NextRequest) {
         (sum: number, row: any) => sum + Number(row.hours_worked || 0),
         0,
       );
+      const weekStart = new Date(`${weekEnding}T12:00:00Z`);
+      weekStart.setUTCDate(weekStart.getUTCDate() - 6);
+      const weekStartDate = weekStart.toISOString().slice(0, 10);
+      const { data: weeklyTheoryEntries } = await db
+        .from('apprenticeship_rti_entries')
+        .select('minutes_verified')
+        .eq('user_id', user.id)
+        .eq('status', 'verified')
+        .gte('instruction_date', weekStartDate)
+        .lte('instruction_date', weekEnding);
+      const weeklyTheoryHours = (weeklyTheoryEntries || []).reduce(
+        (sum: number, row: any) => sum + Number(row.minutes_verified || 0) / 60,
+        0,
+      );
+      if (weeklyOjlHours + weeklyTheoryHours >= APPRENTICE_TIME_POLICY.weeklyCombinedMaxHours) {
+        return NextResponse.json(
+          {
+            error: `The ${APPRENTICE_TIME_POLICY.weeklyCombinedMaxHours}-hour combined weekly OJL and RTI limit has been reached. Clock-in is disabled until the next work week.`,
+            code: 'WEEKLY_COMBINED_LIMIT_REACHED',
+          },
+          { status: 409 },
+        );
+      }
+
       if (weeklyOjlHours >= APPRENTICE_TIME_POLICY.weeklyOjlMaxHours) {
         return NextResponse.json(
           {

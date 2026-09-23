@@ -30,6 +30,7 @@ import {
 } from '@/lib/ai/paid-inference-gateway';
 import { getRAGContext } from '@/lib/platform/rag';
 import { getAiCharterContext } from '@/lib/devstudio/platform-control-plane';
+import { createMasterStudioRun } from '@/lib/studio/master-runtime';
 import { runStudioBrowserAudit } from '@/lib/devstudio/browser-audit';
 import { ROUTE_DEPENDENCIES, lookupRoute, lookupTable } from '@/lib/platform/knowledge-graph';
 import { PROGRAM_REGISTRY, getProgramBySlug } from '@/lib/platform/system-registry';
@@ -112,6 +113,11 @@ function unifiedCapabilities(message: string, toolCalls: ToolCallRecord[]): stri
     if (rule.pattern.test(evidence)) rule.slugs.forEach((slug) => selected.add(slug));
   }
   return [...selected];
+}
+
+async function ensureUnifiedStudioExecution(db: Awaited<ReturnType<typeof requireAdminClient>>, actorId: string, command: string) {
+  const { run, plan } = await createMasterStudioRun(db, { actorId, goal: command });
+  return { studioRunId: run.id, planId: plan.id, steps: plan.steps.length };
 }
 
 async function recordUnifiedCapabilityUse(

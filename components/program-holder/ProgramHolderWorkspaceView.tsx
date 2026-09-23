@@ -30,6 +30,7 @@ import { CallListPanel } from './CallListPanel';
 import { StudentReadyForTestingButton } from './StudentReadyForTestingButton';
 import { getActiveJobs } from '@/lib/data/jobs';
 import JobCard from '@/components/jobs/JobCard';
+import { TexasCoordinatorLaunchKit } from './TexasCoordinatorLaunchKit';
 
 function resolveDashboardHero(
   avatarUrl: string | null | undefined,
@@ -62,7 +63,11 @@ export async function ProgramHolderWorkspaceView({
   payoutPanel?: React.ReactNode;
 }) {
   const data = await getProgramHolderWorkspace();
+  const isTexasStateCoordinator = data.mode === 'holder' && data.holder?.features?.approved_role === 'Texas State Site Coordinator';
   if (data.mode === 'admin') return <AdminBoundary />;
+  if (section === 'dashboard' && isTexasStateCoordinator) {
+    return <div className="space-y-6"><TexasCoordinatorLaunchKit /></div>;
+  }
   const careerJobs = section === 'dashboard' ? await getActiveJobs({ limit: 2 }) : [];
 
   const active = data.enrollments.filter((row) =>

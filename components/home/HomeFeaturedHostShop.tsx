@@ -13,6 +13,24 @@ const FEATURED_SHOPS = [
     programHref: '/programs/cosmetology-apprenticeship',
   },
   {
+    name: 'Top Shelf Barber Lounge',
+    program: 'Barber Apprenticeship',
+    image: '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade.jpg',
+    imageAlt: 'Precision barber work from Top Shelf Barber Lounge in Elkhart, Indiana',
+    address: '1600 E Bristol St, Elkhart, Indiana',
+    shopHref: '/host-shops/top-shelf-barber-lounge',
+    programHref: '/programs/barber-apprenticeship',
+  },
+  {
+    name: "Razor's Image Barbershop",
+    program: 'Barber Apprenticeship • Accepting Apprentices',
+    image: '/images/partners/razors-image-storefront-2026.jpg',
+    imageAlt: "Razor's Image Barbershop apprenticeship journey in Bloomington, Indiana",
+    address: '155 S Kingston Dr, Bloomington, Indiana',
+    shopHref: '/host-shops/razors-image-barbershop',
+    programHref: '/programs/barber-apprenticeship',
+  },
+  {
     name: 'Kountry Kutz Barbershop',
     program: 'Barber Apprenticeship',
     image: '/images/partners/kountry-kutz/interior-active.webp',
@@ -28,12 +46,12 @@ export function HomeFeaturedHostShop() {
     <section className="border-y border-slate-200 bg-slate-950 px-4 py-12 text-white" aria-labelledby="featured-host-shop-heading">
       <div className="mx-auto max-w-6xl">
         <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">Featured apprenticeship shops</p>
-        <h2 id="featured-host-shop-heading" className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">See where cosmetology and barber apprentices train.</h2>
-        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <h2 id="featured-host-shop-heading" className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Meet the shops, see the work, and follow real apprenticeship journeys.</h2>
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
           {FEATURED_SHOPS.map((shop) => (
             <article key={shop.name} className="overflow-hidden rounded-3xl border border-white/15 bg-slate-900">
               <div className="relative min-h-[280px] sm:min-h-[340px]">
-                <Image src={shop.image} alt={shop.imageAlt} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+                <Image src={shop.image} alt={shop.imageAlt} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 to-transparent p-6 pt-20">
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-red-300">{shop.program}</p>
                   <h3 className="mt-2 text-2xl font-black">{shop.name}</h3>

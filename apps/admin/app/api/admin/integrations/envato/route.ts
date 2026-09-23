@@ -11,7 +11,7 @@ import {
   syncLicensedPurchases,
   type LicensedPurchase,
 } from '@/lib/course-builder/licensed-media';
-import { queueCourseLessonVideos } from '@/lib/course-factory/media-service';
+import { queueCourseMedia } from '@/lib/course-builder/orchestrator';
 import { upsertEnvatoWorkspaceManifest, type EnvatoWorkspaceManifestItem } from '@/lib/course-builder/envato-workspace';
 
 export const runtime = 'nodejs';
@@ -308,7 +308,7 @@ const _POST = withAuth(
           .eq('id', input.lessonId)
           .eq('course_id', input.courseId);
         if (lessonError) throw lessonError;
-        const queued = await queueCourseLessonVideos({
+        const queued = await queueCourseMedia({
           courseId: input.courseId,
           lessonId: input.lessonId,
           onlyMissing: false,

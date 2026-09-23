@@ -1531,6 +1531,10 @@ async function _POST(req: NextRequest) {
     const providerPreference = normalizeProvider(rawProvider);
     const lastUserMessage =
       messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
+    const masterDb = await requireAdminClient();
+    const masterExecution = lastUserMessage.trim()
+      ? await ensureUnifiedStudioExecution(masterDb, auth.userId, lastUserMessage)
+      : null;
 
     const [ragContext, automaticEvidence] = await Promise.all([
       getRAGContext(lastUserMessage),
@@ -1580,7 +1584,7 @@ async function _POST(req: NextRequest) {
             const execResults = await Promise.all(
               toolCallRequests.map(async (tc) => {
                 const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
-                const result = await execTool(tc.function.name, args, auth.userId);
+                const result = await execTool(tc.function.name, { ...args, studio_run_id: masterExecution?.studioRunId }, auth.userId);
                 toolCalls.push({ tool: tc.function.name, args, result });
                 return {
                   role: 'tool' as const,
@@ -1870,6 +1874,7 @@ async function _POST(req: NextRequest) {
               },
               toolCalls,
               capabilitiesUsed,
+              studioRun: masterExecution,
             })}\n\n`,
           ),
         );

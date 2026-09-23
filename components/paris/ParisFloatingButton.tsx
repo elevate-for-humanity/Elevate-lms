@@ -63,19 +63,7 @@ export function ParisFloatingButton({
     return () => window.removeEventListener(PARIS_PORTAL_ISSUE_EVENT, handleIssue);
   }, []);
 
-  useEffect(() => {
-    if (surface !== 'public' || pathname !== '/') {
-      setShowWelcome(false);
-      return;
-    }
-    try {
-      if (window.sessionStorage.getItem('paris-home-welcome-seen') !== 'true') {
-        setShowWelcome(true);
-      }
-    } catch {
-      setShowWelcome(true);
-    }
-  }, [pathname, surface]);
+  useEffect(() => { setShowWelcome(false); }, [pathname, surface]);
 
   const dismissWelcome = useCallback(() => {
     setShowWelcome(false);

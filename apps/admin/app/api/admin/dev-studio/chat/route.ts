@@ -1282,14 +1282,21 @@ async function execTool(
         .in('status', ['queued', 'running'])
         .maybeSingle();
       if (existing) {
+        after(async () => {
+          const secret = process.env.CRON_SECRET;
+          if (!secret) {
+            logger.error('[devstudio/chat] Course Builder cannot auto-start: CRON_SECRET is missing');
+            return;
+          }
+          const baseUrl = process.env.ADMIN_URL || process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org';
+          await fetch(`${baseUrl}/api/cron/process-course-builder-jobs`, {
+            headers: { authorization: `Bearer ${secret}` }, cache: 'no-store',
+          }).catch((error) => logger.warn('[devstudio/chat] existing Course Builder wake-up failed', normalizeError(error)));
+        });
         return JSON.stringify({
-          __type: 'course_build_queued',
-          success: true,
-          jobId: existing.id,
-          status: existing.status,
-          stage: existing.stage,
-          progress: existing.progress,
-          message: `This canonical course already has an active build. Resuming job ${existing.id}.`,
+          __type: 'course_build_queued', success: true, jobId: existing.id,
+          status: existing.status, stage: existing.stage, progress: existing.progress,
+          message: `This canonical course already has an active build. Worker wake requested for job ${existing.id}.`,
         });
       }
 

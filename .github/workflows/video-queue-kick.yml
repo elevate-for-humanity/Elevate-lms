@@ -53,14 +53,46 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Keep this path set aligned with deploy-admin.yml. The media worker
+          # must wait for the newest revision that can actually trigger an Admin
+          # deployment, not an unrelated shared component change.
           required_admin_sha=$(git log -1 --format=%H -- \
             apps/admin \
-            components \
             lib \
             remotion-src \
-            server \
+            packages \
+            components/admin \
+            components/studio \
+            components/pwa \
+            public/manifest-admin.json \
+            public/sw-admin.js \
+            public/offline.html \
+            'public/icon-*.png' \
+            'public/icon-*.webp' \
+            public/logo.svg \
+            public/logo.png \
+            public/logo.webp \
+            'public/logo-*.png' \
+            'public/logo-*.svg' \
+            'public/logo-*.webp' \
+            public/fonts \
+            scripts/northflank \
+            scripts/course-factory \
+            scripts/verify-admin-instrumentation-boundary.mjs \
+            scripts/guard-admin-routes.sh \
+            instrumentation.ts \
+            scripts/verify-no-retired-admin-ui-routes.mjs \
+            scripts/verify-portal-production-contracts.mjs \
+            next.config.mjs \
+            tailwind.config.js \
+            tsconfig.json \
+            proxy.ts \
+            Dockerfile.admin \
+            Dockerfile.northflank-admin \
+            pnpm-lock.yaml \
             package.json \
-            pnpm-lock.yaml)
+            pnpm-workspace.yaml \
+            .github/workflows/deploy-admin.yml)
           test -n "$required_admin_sha"
           echo "REQUIRED_ADMIN_SHA=$required_admin_sha" >> "$GITHUB_ENV"
           echo "Waiting for Admin runtime revision $required_admin_sha"

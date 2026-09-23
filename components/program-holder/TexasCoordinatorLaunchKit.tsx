@@ -56,6 +56,50 @@ Elevate for Humanity
 346-295-4481
 topacesolutions@gmail.com`}</div>
       </article>
+      <div className="grid gap-5 lg:grid-cols-2">
+        <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 className="text-xl font-black">Your first 30 days</h3>
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-slate-700">
+            <li>Days 1–3: introduce yourself to ApprenticeshipTexas/TWC and Workforce Solutions Capital Area; request employer-services and apprenticeship meetings.</li>
+            <li>Days 1–7: obtain the local ITA cap, OJT policy, ETPL/RAP procedure, supportive-service rules, target occupations, grant contacts, and current employer priorities in writing.</li>
+            <li>Week 2: build at least 20 qualified employer prospects across HVAC/skilled trades, healthcare, transportation/logistics, and other approved occupations.</li>
+            <li>Week 2–3: hold employer discovery meetings. Capture vacancies, wages, minimum qualifications, supervisors, apprentice capacity, worksite, and hiring timeline.</li>
+            <li>Week 3: identify the best first employer cohort and submit the employer/workforce documentation to Elevate for sponsor review.</li>
+            <li>Week 4: schedule the San Antonio workforce-board introduction while continuing Austin employer development. Do not abandon Austin before the first pipeline is repeatable.</li>
+          </ul>
+        </article>
+        <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 className="text-xl font-black">Questions to ask every Workforce Board</h3>
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-slate-700">
+            <li>What is your current ITA tuition cap and maximum training duration?</li>
+            <li>How does your Board fund DOL Registered Apprenticeship RTI?</li>
+            <li>What OJT reimbursement percentage and duration do you currently authorize?</li>
+            <li>Which occupations and industries are priorities right now?</li>
+            <li>Which participant populations are you actively trying to serve?</li>
+            <li>What supportive services can eligible participants receive?</li>
+            <li>What documentation must Elevate and the employer submit before training or work begins?</li>
+            <li>Who owns employer services, apprenticeship, ETPL, WIOA training authorization, and grants?</li>
+            <li>Are there current Texas Industry Partnership, High Demand Job Training, Skills Development, or other funding opportunities relevant to this project?</li>
+            <li>What is the next concrete step, responsible person, and deadline?</li>
+          </ul>
+        </article>
+      </div>
+      <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 className="text-xl font-black">Employer meeting script</h3>
+        <p className="mt-3 whitespace-pre-line rounded-xl bg-slate-50 p-5 text-sm leading-6 text-slate-800">{`I represent Elevate for Humanity's Texas workforce expansion. Elevate operates workforce training and Registered Apprenticeship initiatives. I am here to learn your hiring problem first — not sell you a promise.
+
+Which positions are hardest to fill? How many people do you expect to hire? What starting wage do you pay? What skills must a new hire have on day one? Who can supervise structured on-the-job learning? Would you consider developing qualified candidates through a registered apprenticeship or workforce-supported training model?
+
+I will document the opportunity and take it through Elevate's sponsor review. Any workforce reimbursement, grant, participant eligibility, or apprenticeship approval must be confirmed before we represent it as available.`}</p>
+      </article>
+      <article className="rounded-2xl border border-red-200 bg-red-50 p-6">
+        <h3 className="text-xl font-black text-red-950">Authority: what you may and may not do</h3>
+        <div className="mt-4 grid gap-5 md:grid-cols-2 text-sm leading-6 text-red-950"><div><p className="font-black">You MAY</p><p>Represent Elevate in introductory meetings; distribute approved materials; gather requirements; recruit employer prospects; request meetings; collect letters of interest; document workforce opportunities; coordinate follow-ups; and submit proposed partnerships for sponsor review.</p></div><div><p className="font-black">You MAY NOT</p><p>Sign contracts for Elizabeth or Elevate unless separately authorized in writing; promise grant/WIOA money; guarantee enrollment or placement; change tuition; change apprenticeship standards; activate an employer as a RAP site; represent a pending Texas registration as approved; or share protected participant data outside authorized systems.</p></div></div>
+      </article>
+      <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h3 className="text-xl font-black">End every meeting with these five things</h3>
+        <p className="mt-3 text-sm leading-6 text-slate-700">1) named decision-maker, 2) exact next action, 3) documents they need from Elevate, 4) documents/commitment we need from them, and 5) a follow-up date. Enter all five in the dashboard the same day. A meeting without a next action is not a completed outreach task.</p>
+      </article>
       <div className="flex flex-wrap gap-3">
         <Link href="/program-holder/documents" className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">Open Approval & Document Packet</Link>
         <a href="https://www.twc.texas.gov/programs/texas-industry-partnership" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-950">Texas Industry Partnership</a>

@@ -9,6 +9,7 @@ import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
 import { HomeBeautyPriority } from '@/components/home/HomeBeautyPriority';
 import { HomePlatformOverview } from '@/components/home/HomePlatformOverview';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
+import { HomeNetworks } from '@/components/home/HomeNetworks';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 
@@ -104,6 +105,12 @@ export default function HomePage() {
           data-narration="Meet featured Host Shops where apprentices build real skills under qualified supervision. Businesses can also apply to become an approved apprenticeship Host Site."
         >
           <HomeFeaturedHostShop />
+        </div>
+        <div
+          data-scroll-narration
+          data-narration="Join Elevate's professional networks. The Barber and Beauty Network helps shops and professionals showcase their work and connect with apprentices and customers. Business owners can also explore employer resources and optional business tools in the Elevate Store."
+        >
+          <HomeNetworks />
         </div>
         <div
           data-scroll-narration

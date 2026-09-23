@@ -170,7 +170,7 @@ export async function queueCourseLessonVideos(
   let lessonQuery = db
     .from('course_lessons')
     .select(
-      'id, module_id, title, content, rendered_html, script, bullet_points, scene_data, content_json, video_config, video_url, video_status, media_origin, media_quality_status, order_index',
+      'id, module_id, title, content, rendered_html, script, bullet_points, learning_objectives, scene_data, content_json, video_config, video_url, video_status, media_origin, media_quality_status, order_index',
     )
     .eq('course_id', input.courseId);
   if (input.lessonId) lessonQuery = lessonQuery.eq('id', input.lessonId);
@@ -279,10 +279,20 @@ export async function queueCourseLessonVideos(
       if (!sourceFingerprint) {
         throw new Error(`Lesson "${lesson.title}" has no locked unified-media fingerprint`);
       }
+      const canonicalObjectives =
+        Array.isArray(lesson.learning_objectives) && lesson.learning_objectives.length
+          ? (lesson.learning_objectives as string[]).filter(
+              (value) => typeof value === 'string' && value.trim().length > 0,
+            )
+          : Array.isArray(lesson.bullet_points)
+            ? (lesson.bullet_points as string[]).filter(
+                (value) => typeof value === 'string' && value.trim().length > 0,
+              )
+            : [];
       const canonicalScript = [
         lesson.id === firstLesson?.id ? generateInstructorIntro(instructor, course.title) : '',
-        Array.isArray(lesson.bullet_points) && lesson.bullet_points.length
-          ? `By the end of this lesson, you will be able to: ${lesson.bullet_points.join('. ')}.`
+        canonicalObjectives.length
+          ? `By the end of this lesson, you will be able to: ${canonicalObjectives.join('. ')}.`
           : '',
         lessonNarration,
       ]
@@ -335,9 +345,7 @@ export async function queueCourseLessonVideos(
               course_id: input.courseId,
               lesson_title: lesson.title,
               script: canonicalScript,
-              bullet_points: Array.isArray(lesson.bullet_points)
-                ? (lesson.bullet_points as string[])
-                : [],
+              bullet_points: canonicalObjectives,
               // A refreshed full narration requires a fresh storyboard. Reusing
               // lesson.scene_data from an older teaser causes visual/narration drift.
               scene_data: {

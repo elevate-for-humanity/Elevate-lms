@@ -183,9 +183,16 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
       scene.dialogue ? normalizedTeachingSegments(scene.dialogue) : [],
     ),
   );
+  // Inspect both the canonical script and the exact scene dialogue that will be
+  // sent to production TTS. Legacy timeline/LMS control tokens are a hard
+  // failure even when ordinary prose around them would otherwise pass.
+  const narrationSurface = [
+    input.script,
+    ...input.storyboard.scenes.map((scene) => scene.dialogue ?? ''),
+  ].join('\n');
   const instructionLeakageDetected =
-    /\b(the narration should|the script should|apply this to .{0,160} by identifying|end with the action the learner|as an ai|return (?:valid )?json|prompt engineering)\b/i.test(
-      input.script,
+    /\b(the narration should|the script should|apply this to .{0,160} by identifying|end with the action the learner|as an ai|return (?:valid )?json|prompt engineering|knowledge-check-\d+|repository_blueprint|course_lessons|readingGuide\.summary|learning_objectives|preAssessment|video_url|knowledgeChecks|practicalTask|quiz_questions|pre_assessment|review_exam|original_capture|licensed_demonstration|animated-text|technical-diagram|equipment-image|screen-demonstration|instructor objective|instructor and lesson roadmap|approved lesson source|three sourced teaching points|labeled sequence diagram|decision and evidence checklist)\b/i.test(
+      narrationSurface,
     );
   const lessonKind =
     `${input.lessonType ?? ''} ${input.evidenceType ?? ''} ${input.lessonTitle}`.toLowerCase();
@@ -208,7 +215,7 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
     );
   }
   if (instructionLeakageDetected)
-    failures.push('narration contains internal generation instructions');
+    failures.push('narration contains internal generation instructions or authoring metadata');
   if (repeatedNarrationSegments > 0)
     failures.push(`narration repeats ${repeatedNarrationSegments} substantial teaching segment(s)`);
   if (repeatedSceneDialogues > 0)

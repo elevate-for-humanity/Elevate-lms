@@ -291,6 +291,18 @@ export default function TimeclockPage() {
     return () => stopHeartbeat();
   }, [stopHeartbeat]);
 
+  // Start or restore heartbeat whenever an open shift exists. This is critical
+  // after a page refresh/PWA restart: context restores the shift asynchronously,
+  // so the clock must not rely only on the original clock-in click to start polling.
+  useEffect(() => {
+    if (shift.entryId && shift.clockInAt && !shift.clockOutAt) {
+      startHeartbeat();
+      return () => stopHeartbeat();
+    }
+    stopHeartbeat();
+    return undefined;
+  }, [shift.entryId, shift.clockInAt, shift.clockOutAt, startHeartbeat, stopHeartbeat]);
+
   // Resume heartbeat on visibility change
   useEffect(() => {
     const handleVisibilityChange = () => {

@@ -117,6 +117,7 @@ jobs:
         run: |
           set -euo pipefail
           test -n "$CRON_SECRET"
+          transient_errors=0
           while true; do
             status=$(curl -sS --connect-timeout 30 --max-time 1800 \
               -o /tmp/video-worker.json -w '%{http_code}' \
@@ -126,8 +127,23 @@ jobs:
               --data "{\"courseId\":\"$COURSE_ID\",\"maxJobs\":2}")
             cat /tmp/video-worker.json
             case "$status" in
-              200|202) ;;
-              *) echo "::error::Video worker returned HTTP $status"; exit 1 ;;
+              200|202)
+                transient_errors=0
+                ;;
+              500|502|503|504)
+                transient_errors=$((transient_errors + 1))
+                echo "::warning::Transient video worker HTTP $status ($transient_errors/10); retrying"
+                if [ "$transient_errors" -ge 10 ]; then
+                  echo "::error::Video worker returned 10 consecutive transient server errors"
+                  exit 1
+                fi
+                sleep 30
+                continue
+                ;;
+              *)
+                echo "::error::Video worker returned HTTP $status"
+                exit 1
+                ;;
             esac
             started=$(node -e "const p=require('/tmp/video-worker.json'); if(p.ok!==true) process.exit(1); process.stdout.write(String(p.started||0))")
             reason=$(node -e "const p=require('/tmp/video-worker.json'); process.stdout.write(String(p.reason||''))")

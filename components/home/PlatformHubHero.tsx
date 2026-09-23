@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, BriefcaseBusiness, GraduationCap, Store } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
 
 const HOME_VIDEO =
@@ -7,12 +7,6 @@ const HOME_VIDEO =
 
 const HOME_NARRATION =
   "Welcome to Elevate for Humanity. You're in the right place to turn a career goal into a clear next step. If you want to earn while you learn, begin with our Barber and Cosmetology apprenticeship programs. You'll learn the skills, practice them with supervision at an approved Host Site, and track your progress along the way. Looking for career training instead? Explore HVAC, CDL, Bookkeeping, or Business. Training may be free if you qualify for workforce funding. Approval is not automatic, but we will show you what to do. When you reach Paying for Training, press the orange Schedule WorkOne Orientation button. Complete that appointment, then come back and press Start Elevate Funding Intake. Take your time as you explore. When you find the path that feels right, use the application link to get started.";
-
-const PROOF = [
-  { icon: GraduationCap, label: 'Hands-on training' },
-  { icon: BriefcaseBusiness, label: 'Employer-connected pathways' },
-  { icon: BadgeCheck, label: 'Funding guidance' },
-] as const;
 
 export function PlatformHubHero() {
   return (
@@ -38,42 +32,13 @@ export function PlatformHubHero() {
               Cosmetology apprenticeship programs, or use the same connected system to operate a
               workforce program.
             </p>
-            <div className="mt-5 rounded-2xl border-2 border-emerald-300 bg-emerald-50 px-5 py-4">
-              <p className="text-xl font-black text-emerald-950">
-                Training may be free if you qualify for workforce funding.
-              </p>
-              <p className="mt-1 text-sm font-semibold leading-6 text-emerald-900">
-                Workforce funding is available for eligible participants and approved programs. Eligibility and funding approval are not automatic.
-              </p>
-            </div>
-            <div className="mt-7 grid gap-3 sm:grid-cols-3">
-              <Link href="/programs" className="group rounded-2xl bg-brand-red-700 p-4 text-white no-underline hover:bg-brand-red-800 hover:no-underline">
-                <GraduationCap className="h-6 w-6" aria-hidden="true" />
-                <span className="mt-3 block font-black">I want career training</span>
-                <span className="mt-1 block text-sm font-semibold text-white/85">Compare programs and apply.</span>
-              </Link>
-              <Link href="/partners/host-shops" className="group rounded-2xl border-2 border-slate-900 bg-white p-4 text-slate-950 no-underline hover:bg-slate-50 hover:no-underline">
-                <Store className="h-6 w-6" aria-hidden="true" />
-                <span className="mt-3 block font-black">I am a Host Shop</span>
-                <span className="mt-1 block text-sm font-semibold text-slate-600">Employ and train apprentices.</span>
-              </Link>
-              <Link href="/apply/program-holder" className="group rounded-2xl border-2 border-slate-900 bg-white p-4 text-slate-950 no-underline hover:bg-slate-50 hover:no-underline">
-                <BriefcaseBusiness className="h-6 w-6" aria-hidden="true" />
-                <span className="mt-3 block font-black">I run a program</span>
-                <span className="mt-1 block text-sm font-semibold text-slate-600">Use Elevate to deliver it.</span>
-              </Link>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link href="/programs" className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800">Explore Programs <ArrowRight className="h-5 w-5" /></Link>
+              <Link href="/barber-and-beauty-apprenticeships" className="inline-flex min-h-12 items-center rounded-xl border-2 border-slate-950 bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-50">Explore Apprenticeships</Link>
             </div>
             <Link href="/check-eligibility" className="mt-4 inline-flex items-center gap-2 font-black text-brand-blue-800 no-underline hover:no-underline">
               Not sure where to start? Check your options <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>
-            <div className="mt-8 grid gap-3 border-t border-slate-200 pt-6 sm:grid-cols-3">
-              {PROOF.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2 text-sm font-bold text-slate-700">
-                  <Icon className="h-5 w-5 shrink-0 text-brand-red-700" aria-hidden="true" />
-                  <span>{label}</span>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
         <div className="relative order-2 min-h-[clamp(340px,58svh,560px)] overflow-hidden bg-slate-950 lg:min-h-[720px]">

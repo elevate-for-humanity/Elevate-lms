@@ -218,3 +218,89 @@ export async function saveCourseProgramConfiguration(input: unknown) {
   if (error) throw error;
   return data;
 }
+
+export function auditCourseGovernance(template: ProgramBuilderTemplate) {
+  const audit = auditCourseTemplate(template);
+  const procurement = runGovernmentProcurementGate(template);
+  return { ok: audit.ok && procurement.ok, audit, procurement };
+}
+
+export async function publishGovernedCourse(
+  template: ProgramBuilderTemplate,
+  progress?: ProgressCallback,
+) {
+  const gate = auditCourseGovernance(template);
+  if (!gate.ok) {
+    return {
+      ok: false,
+      error: 'Publication blocked by course governance gate',
+      ...gate,
+      result: null,
+      governance: null,
+    };
+  }
+
+  const blueprint = adaptProgramTemplateToBlueprint(template);
+  const result = await courseFactory(
+    {
+      programId: template.programId,
+      programSlug: template.programId ? undefined : template.slug,
+      blueprint,
+      mode: 'refresh',
+      contentSource: 'ai',
+      videoMode: 'queue',
+    },
+    progress,
+  );
+
+  const governance =
+    result.ok && result.courseId
+      ? await normalizeGeneratedCourseForGovernance(result.courseId)
+      : null;
+
+  return { ...gate, ok: gate.ok && result.ok, result, governance };
+}
+
+export async function repairCanonicalCourse(courseId: string, progress?: ProgressCallback) {
+  const db = await requireAdminClient();
+  const { data: course, error } = await db
+    .from('courses')
+    .select('id,slug,title,program_id')
+    .eq('id', courseId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!course) throw new Error('Course not found');
+
+  const result = await courseFactory(
+    {
+      courseId,
+      programId: course.program_id ?? undefined,
+      programSlug: course.slug,
+      mode: 'missing-only',
+      contentSource: 'curriculum_lessons',
+      videoMode: 'queue',
+    },
+    progress,
+  );
+
+  const governance =
+    result.ok && result.courseId
+      ? await normalizeGeneratedCourseForGovernance(result.courseId)
+      : null;
+
+  return { ...result, governance, repairedCourseId: courseId, programSlug: course.slug };
+}
+
+export async function queueCourseMedia(input: {
+  courseId: string;
+  lessonId?: string | null;
+  onlyMissing?: boolean;
+  force?: boolean;
+  limit?: number | null;
+  validateOnly?: boolean;
+}) {
+  return queueCourseLessonVideos(input);
+}
+
+export { normalizeGeneratedCourseForGovernance } from '../course-factory/post-generation-governance';

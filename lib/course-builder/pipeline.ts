@@ -12,7 +12,7 @@ import type { CourseTemplate } from './schema';
 import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 import { validateCourseTemplate, type CourseValidationResult } from './validate';
 import { adaptCourseTemplateToBlueprint } from './publish-adapter';
-import { courseFactory } from '@/lib/course-factory';
+import { courseFactory } from '@/lib/course-builder/orchestrator';
 import { logger } from '@/lib/logger';
 
 export function generateCourseCode(slug: string): string {

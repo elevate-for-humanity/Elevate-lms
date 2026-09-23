@@ -97,6 +97,31 @@ describe('instructional quality gate', () => {
     expect(result.failures.some((failure) => failure.includes('claims a visual demonstration'))).toBe(false);
   });
 
+  it('does not require a practical demonstration scene for a beauty final exam', () => {
+    const examStoryboard = storyboard(false);
+    examStoryboard.title = 'Cosmetology Final Examination';
+    examStoryboard.scenes = examStoryboard.scenes.map((scene, index) => ({
+      ...scene,
+      id: `exam-scene-${index + 1}`,
+      subject: 'Cosmetology Final Examination',
+      action: `Review cumulative assessment evidence for licensing readiness section ${index + 1}.`,
+      dialogue: `Review cumulative assessment evidence for licensing readiness section ${index + 1}.`,
+      requiredVisualEvidence: `Assessment evidence section ${index + 1}`,
+      sceneType: index === 0 ? 'problem_hook' : index === 3 ? 'knowledge_check' : undefined,
+      procedurePhase: undefined,
+    }));
+    const result = instructionalQualityFailures({
+      courseTitle: 'Cosmetology Apprenticeship',
+      lessonTitle: 'Cosmetology Final Examination',
+      lessonType: 'exam',
+      evidenceType: 'assessment',
+      script: `${longInstruction} Apply practical decisions from the course while completing the cumulative exam. Cosmetology final examination licensing readiness.`,
+      instructor,
+      storyboard: examStoryboard,
+    });
+    expect(result.failures.some((failure) => failure.includes('practical beauty instruction'))).toBe(false);
+  });
+
   it('requires a complete intelligence arc for HVAC lessons', () => {
     const dry = storyboard();
     dry.title = 'EPA 608 Refrigeration Cycle';

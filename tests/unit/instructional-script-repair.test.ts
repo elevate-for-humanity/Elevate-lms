@@ -58,6 +58,27 @@ describe('instructional script repair', () => {
     expect(result.script.match(/Sanitize the workstation/g)).toHaveLength(1);
   });
 
+  it('keeps complete sentence boundaries when long narration is bounded', () => {
+    const teaching = Array.from(
+      { length: 82 },
+      (_, index) =>
+        `Step ${index + 1} explains a safe service decision using sanitation, client assessment, correct tools, and observable evidence.`,
+    ).join(' ');
+    const baseScript = `${teaching} Immediately rinse the product completely using cool water and apply soothing aloe vera gel or chamomile. Finish by documenting the client response and reviewing the home-care plan.`;
+    const result = repairInstructionalScript({
+      lessonTitle: 'Scalp Treatments',
+      lessonType: 'lesson',
+      baseScript,
+      content: {},
+      contentJson: {},
+    });
+
+    expect(result.repaired).toBe(true);
+    expect(result.script).toMatch(/[.!?] Now, connect those steps to the lesson objective/);
+    expect(result.script).not.toMatch(/\b(?:gel|chamomile) Now, connect/);
+    expect(result.script).toContain('Finish by documenting the client response');
+  });
+
   it('does not rewrite narration that already satisfies the minimum', () => {
     const baseScript = 'topic '.repeat(190);
     const result = repairInstructionalScript({

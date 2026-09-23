@@ -66,21 +66,11 @@ async function emailContext(
         ...(userRoleRows ?? []).map((row: any) => row.roles?.name),
       ]);
       if (effectiveRoles.some((role) => role === 'admin' || role === 'super_admin')) {
-        const { data, error: mailboxError } = await db
-          .from('communication_email_mailboxes')
-          .select('id,address,display_name,mailbox_kind,active')
-          .eq('active', true)
-          .order('address');
-        if (mailboxError) throw mailboxError;
-        const mailboxes: ActorMailbox[] = (data ?? []).map((mailbox: any) => ({
-          id: String(mailbox.id),
-          address: String(mailbox.address),
-          displayName: String(mailbox.display_name),
-          mailboxKind: mailbox.mailbox_kind,
-          active: true,
-          accessLevel: 'manager',
-        }));
-        return { user: { id: user.id, email: user.email }, db, mailboxes };
+        // Admin oversight is read-only across other actors' mailboxes. Sending must
+        // always use a mailbox explicitly assigned to the authenticated admin so the
+        // Admin composer can never impersonate a Program Holder or Host Shop.
+        const actorMailboxes = await ensureActorMailboxes(db, user.id);
+        return { user: { id: user.id, email: user.email }, db, mailboxes: actorMailboxes };
       }
     }
     const mailboxes = await ensureActorMailboxes(db, user.id);

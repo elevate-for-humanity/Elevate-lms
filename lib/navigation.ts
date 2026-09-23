@@ -101,6 +101,19 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
   {
+    id: 'barber-beauty-network',
+    name: 'Barber & Beauty Network',
+    href: '/partners/host-shops',
+    subItems: [
+      { name: 'Explore the Network', href: '/partners/host-shops', isSectionLink: true },
+      { name: 'Join & Showcase Your Work', href: '/host-shop/apply', isSectionLink: true },
+      { name: 'Barber Apprenticeship', href: ROUTES.programsBarber, isSectionLink: true },
+      { name: 'Cosmetology', href: ROUTES.programsCosmetology, isSectionLink: true },
+      { name: 'Esthetics', href: ROUTES.programsEsthetician, isSectionLink: true },
+      { name: 'Nail Technician', href: ROUTES.programsNailTech, isSectionLink: true },
+    ],
+  },
+  {
     id: 'funding',
     name: 'Funding',
     href: ROUTES.funding,

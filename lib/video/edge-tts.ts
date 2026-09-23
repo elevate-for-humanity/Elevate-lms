@@ -373,8 +373,7 @@ function cloudflareNarrationChunks(text: string): string[] {
   return chunks;
 }
 
-async function normalizeCloudflareMp3Segments(segments: Buffer[]): Promise<Buffer> {
-  if (segments.length === 1) return segments[0];
+async function decodeCloudflareMp3Segment(segment: Buffer): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const ffmpeg = spawn('ffmpeg', [
       '-hide_banner',
@@ -384,12 +383,15 @@ async function normalizeCloudflareMp3Segments(segments: Buffer[]): Promise<Buffe
       'mp3',
       '-i',
       'pipe:0',
+      '-vn',
+      '-ac',
+      '1',
+      '-ar',
+      '24000',
       '-codec:a',
-      'libmp3lame',
-      '-b:a',
-      '128k',
+      'pcm_s16le',
       '-f',
-      'mp3',
+      's16le',
       'pipe:1',
     ]);
     const output: Buffer[] = [];
@@ -402,15 +404,27 @@ async function normalizeCloudflareMp3Segments(segments: Buffer[]): Promise<Buffe
       if (code !== 0 || !result.length) {
         reject(
           new Error(
-            `Cloudflare narration segment composition failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 400)}`,
+            `Cloudflare narration chunk decode failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 400)}`,
           ),
         );
       } else {
         resolve(result);
       }
     });
-    ffmpeg.stdin.end(Buffer.concat(segments));
+    ffmpeg.stdin.end(segment);
   });
+}
+
+async function normalizeCloudflareMp3Segments(segments: Buffer[]): Promise<Buffer> {
+  if (segments.length === 1) return segments[0];
+  // Each Cloudflare request returns an independent MP3 stream. Byte-concatenating
+  // those streams and presenting them to ffmpeg as one MP3 can stop decoding at
+  // an embedded stream boundary, truncating long lesson narration. Decode each
+  // chunk independently to one PCM format, concatenate the PCM in narration order,
+  // then encode a single learner-facing MP3.
+  const pcmSegments: Buffer[] = [];
+  for (const segment of segments) pcmSegments.push(await decodeCloudflareMp3Segment(segment));
+  return pcm16MonoToMp3(Buffer.concat(pcmSegments));
 }
 
 async function generateCloudflareNarration(

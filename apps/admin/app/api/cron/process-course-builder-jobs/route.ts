@@ -148,3 +148,4 @@ async function _GET(request: Request) {
 }
 
 export const GET = withRuntime(withApiAudit('/api/cron/process-course-builder-jobs', _GET));
+export const POST = GET;

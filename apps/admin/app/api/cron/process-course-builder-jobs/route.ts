@@ -39,7 +39,7 @@ async function _GET(request: Request) {
   const { count: eligibleBefore, error: eligibleError } = await db
     .from('devstudio_jobs')
     .select('id', { count: 'exact', head: true })
-    .eq('tool_name', 'build_course')
+    .in('tool_name', ['build_course', 'course_build'])
     .eq('status', 'queued')
     .lte('run_at', now);
   if (eligibleError) {
@@ -67,7 +67,7 @@ async function _GET(request: Request) {
       const { data: candidate, error: candidateError } = await db
         .from('devstudio_jobs')
         .select('id, attempts, progress')
-        .eq('tool_name', 'build_course')
+        .in('tool_name', ['build_course', 'course_build'])
         .eq('status', 'queued')
         .lte('run_at', now)
         .order('run_at', { ascending: true })

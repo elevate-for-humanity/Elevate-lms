@@ -157,7 +157,7 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
         db,
         authorize: () =>
           reservePaidInference(db, {
-            scopeKey: 'platform',
+            scopeKey: `job:${job.id}`,
             actorId: job.user_id ?? null,
             jobId: job.id,
             artifactFingerprint,

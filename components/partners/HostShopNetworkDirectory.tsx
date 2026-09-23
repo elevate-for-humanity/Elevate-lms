@@ -8,11 +8,6 @@ import { PROGRAM_LABELS } from '@/lib/programs/host-shops';
 
 type Props = { shops: HostShopNetworkEntry[] };
 
-function shouldHideShopImage(shop: HostShopNetworkEntry) {
-  const name = shop.name.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-  return name.includes('top shelf') || name.includes('mesmerized by beauty');
-}
-
 function representativeShopImage(shop: HostShopNetworkEntry) {
   return shop.programs.includes('barber-apprenticeship')
     ? '/images/pages/barber-shop-interior.webp'
@@ -72,15 +67,12 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
 
       {visible.length ? (
         <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {visible.map((shop) => {
-            const hideImage = shouldHideShopImage(shop);
-            return (
+          {visible.map((shop) => (
             <article
               key={shop.id}
               className="group flex h-full min-h-0 flex-col overflow-visible rounded-2xl border border-white/15 bg-white text-slate-950 shadow-xl"
             >
-              {!hideImage ? (
-                <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-slate-950">
+              {                <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-slate-950">
                   <img
                     src={shop.image ?? representativeShopImage(shop)}
                     alt={
@@ -100,18 +92,7 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
                       : 'Published Network Partner'}
                   </span>
                 </div>
-              ) : (
-                <div className="rounded-t-2xl border-b border-slate-200 bg-slate-100 px-5 py-4">
-                  <span
-                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black ${shop.approval === 'approved' ? 'bg-emerald-100 text-emerald-950' : 'bg-blue-100 text-blue-950'}`}
-                  >
-                    <ShieldCheck className="h-4 w-4" />{' '}
-                    {shop.approval === 'approved'
-                      ? 'Approved Host Site'
-                      : 'Published Network Partner'}
-                  </span>
-                </div>
-              )}
+              }
               <div className="flex flex-1 flex-col p-5">
                 <p className="flex items-start gap-2 text-sm font-bold text-slate-600">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-red-700" /> {shop.city},{' '}
@@ -141,8 +122,7 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
                 </Link>
               </div>
             </article>
-            );
-          })}
+            ))}
         </div>
       ) : (
         <div className="mt-5 rounded-2xl border border-white/15 bg-white/5 p-8 text-center text-slate-200">

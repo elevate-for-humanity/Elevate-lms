@@ -37,12 +37,52 @@ function decodeHtml(value: string): string {
 }
 
 /**
+ * Legacy authored-course payloads sometimes flattened storyboard/LMS control
+ * metadata into the narration string. Those tokens are useful to builders but
+ * must never be spoken to learners. Only activate this cleanup when an
+ * unmistakable control marker is present so normal instructional words such as
+ * "diagram", "practice", or "summary" remain untouched in ordinary lessons.
+ */
+function stripLegacyAuthoringMetadata(value: string): string {
+  const hasLegacyMarkers =
+    /\b(?:knowledge-check-\d+|repository_blueprint|course_lessons|readingGuide\.summary|learning_objectives|preAssessment|video_url|knowledgeChecks|practicalTask|quiz_questions|pre_assessment|review_exam|original_capture|licensed_demonstration)\b/i.test(
+      value,
+    );
+  if (!hasLegacyMarkers) return value;
+
+  return value
+    // A flattened LMS step map is pure navigation metadata and is always a
+    // tail artifact, never part of the lesson's teaching script.
+    .replace(/\bIntroduction\s+readingGuide\.summary\b[\s\S]*$/gi, ' ')
+    .replace(/\bknowledge-check-\d+\b/gi, ' ')
+    .replace(/\b(?:repository_blueprint|course_lessons)\b/gi, ' ')
+    .replace(/\b(?:animated-text|technical-diagram|equipment-image|screen-demonstration)\b/gi, ' ')
+    .replace(/\bInstructor\s+Objective\b/gi, ' ')
+    .replace(/\bInstructor and lesson roadmap\b/gi, ' ')
+    .replace(/\bapproved lesson source\b/gi, ' ')
+    .replace(/\bThree sourced teaching points\b/gi, ' ')
+    .replace(/\bKey concept\b/gi, ' ')
+    .replace(/\bCorrect sequence\b/gi, ' ')
+    .replace(/\bLabeled sequence diagram\b/gi, ' ')
+    .replace(/\bCorrect\s+Needs correction\b/gi, ' ')
+    .replace(/\bSide-by-side correct and incorrect examples\b/gi, ' ')
+    .replace(/\bYour turn\b/gi, ' ')
+    .replace(/\bDecision and evidence checklist\b/gi, ' ')
+    .replace(/\bLesson recap\s+Three takeaways and completed-work evidence\b/gi, ' ')
+    // These are scene-purpose labels from the same flattened timeline. Restrict
+    // removal to cases where the next token begins a learner-facing sentence.
+    .replace(/\b(?:introduction|explanation|diagram|demonstration|practice|summary)\b(?=\s+[A-Z])/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
  * Removes Course Builder production directions that may exist in legacy
  * reading guides or job payloads. These are authoring metadata, never learner
  * narration. The quality gate remains the final fail-closed boundary.
  */
 function sanitizeInternalInstructions(value: string): string {
-  return value
+  return stripLegacyAuthoringMetadata(value)
     .replace(
       /\bApply this to\b[\s\S]{0,1200}?\bchecking the result against the stated objective\.\s*/gi,
       ' ',

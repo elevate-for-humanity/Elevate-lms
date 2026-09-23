@@ -26,6 +26,8 @@ export const metadata: Metadata = {
 const HOST_SITE_APPLY_HREF = '/host-shop/apply';
 
 const HOST_SHOP_HERO_ORDER = [
+  'razors-image-barbershop',
+  'top-shelf-barber-lounge',
   'salon-saloon',
   'kountry-kutz-barbershop',
   'cals-kutz-studio',
@@ -193,6 +195,25 @@ export default async function HostShopsPage() {
               <h2 className="mt-2 text-3xl font-black">From application to apprentice placement</h2>
               <div className="mt-6 space-y-4">{APPROVAL_STEPS.map(([title, detail], index) => <div key={title} className="flex gap-4 rounded-2xl border border-slate-200 p-5"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-950 font-black text-white">{index + 1}</span><div><h3 className="font-black">{title}</h3><p className="mt-1 text-sm leading-6 text-slate-600">{detail}</p></div></div>)}</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-slate-200 bg-gradient-to-br from-sky-50 via-white to-amber-50 px-4 py-14">
+        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Grow beyond the directory</p>
+            <h2 className="mt-2 text-3xl font-black sm:text-4xl">Your network profile is free. Your next business tools are optional.</h2>
+            <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-700">Showcase your work and connect through the Barber & Beauty Network at no listing fee. When you are ready to grow, Elevate Store offers business tools including the AI Website Builder and additional subscription products. A Store purchase is never required to remain listed in the network.</p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link href="/store/apps/website-builder" className="rounded-xl bg-slate-950 px-6 py-3 text-center font-black text-white hover:bg-brand-red-700">Build Your Business Website</Link>
+              <Link href="/store#marketplace" className="rounded-xl border-2 border-slate-950 bg-white px-6 py-3 text-center font-black text-slate-950 hover:bg-slate-50">Explore Business Tools</Link>
+            </div>
+          </div>
+          <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-xl">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-blue-800">Free network membership</p>
+            <h3 className="mt-2 text-2xl font-black">Get discovered first.</h3>
+            <p className="mt-3 leading-7 text-slate-700">Build a public profile, share portfolio work, link your booking and social channels, and tell visitors whether you are accepting clients or apprentices. Use the Store only when a paid business tool makes sense for you.</p>
           </div>
         </div>
       </section>

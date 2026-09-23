@@ -191,6 +191,7 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
     `${input.lessonType ?? ''} ${input.evidenceType ?? ''} ${input.lessonTitle}`.toLowerCase();
   const isAssessment = /\b(checkpoint|quiz|exam|assessment|review)\b/.test(lessonKind);
   const practicalBeautyLesson =
+    !isAssessment &&
     (courseDomain === 'cosmetology' || courseDomain === 'barbering') &&
     /\b(cut|clipper|shear|razor|shav|fade|style|color|chemical|relax|perm|sanit|disinfect|drape|facial|manicur|nail|procedure|practical|hands-on|demonstrat)\b/i.test(
       `${input.lessonTitle} ${input.script}`,

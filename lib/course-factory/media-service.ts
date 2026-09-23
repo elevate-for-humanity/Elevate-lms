@@ -115,11 +115,11 @@ function collectInstructionalText(value: unknown, key = '', seen = new Set<strin
 }
 
 function canonicalLessonNarration(lesson: Record<string, any>): string {
-  // Persisted lessons contain both a short display HTML fragment and the full
-  // structured lesson experience. Narration must be derived from the richest
-  // canonical source so readings, procedures, activities, knowledge checks,
-  // explanations, and remediation stay synchronized with the video.
-  const sources = [lesson.rendered_html, lesson.content, lesson.content_json]
+  // Persisted `content` contains the authored lesson experience and display HTML.
+  // `content_json` also carries LMS orchestration metadata (learning_objects and
+  // learning_experience). Narrating that metadata leaks internal field names and
+  // workflow tokens into learner audio, so it must never be a narration source.
+  const sources = [lesson.rendered_html, lesson.content]
     .map((source) => collectInstructionalText(source).join(' '))
     .map((source) => source.replace(/\s+/g, ' ').trim())
     .filter(Boolean);

@@ -137,15 +137,58 @@ function maximumWords(input: InstructionalScriptRepairInput): number {
 }
 
 function boundNarration(value: string, maximumWordCount: number): string {
-  const tokens = value.split(/\s+/).filter(Boolean);
-  if (tokens.length <= maximumWordCount) return value;
-  const recapWords = Math.min(120, Math.floor(maximumWordCount * 0.2));
-  const teachingWords = maximumWordCount - recapWords;
+  if (words(value).length <= maximumWordCount) return value;
+
+  // Never trim learner narration at an arbitrary token boundary. The previous
+  // word-slice implementation could cut a sentence in half and then splice the
+  // recap bridge directly into the fragment (for example, "apply soothing aloe
+  // vera gel or chamomile Now, connect..."). Keep only complete sentences so
+  // production TTS, captions, and storyboard dialogue remain grammatical.
+  const sentences = value
+    .split(/(?<=[.!?])\s+|\n+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+
+  if (sentences.length < 2) {
+    const clipped = value.split(/\s+/).filter(Boolean).slice(0, maximumWordCount).join(' ').trim();
+    return /[.!?]$/.test(clipped) ? clipped : `${clipped}.`;
+  }
+
+  const recapBudget = Math.min(120, Math.floor(maximumWordCount * 0.2));
+  const teachingBudget = maximumWordCount - recapBudget;
+  const teaching: string[] = [];
+  let teachingWords = 0;
+  let cursor = 0;
+
+  for (; cursor < sentences.length; cursor += 1) {
+    const sentence = sentences[cursor];
+    const sentenceWords = words(sentence).length;
+    if (teaching.length > 0 && teachingWords + sentenceWords > teachingBudget) break;
+    teaching.push(sentence);
+    teachingWords += sentenceWords;
+    if (teachingWords >= teachingBudget) {
+      cursor += 1;
+      break;
+    }
+  }
+
+  const recap: string[] = [];
+  let recapWords = 0;
+  for (let index = sentences.length - 1; index >= cursor; index -= 1) {
+    const sentence = sentences[index];
+    const sentenceWords = words(sentence).length;
+    if (recap.length > 0 && recapWords + sentenceWords > recapBudget) break;
+    recap.unshift(sentence);
+    recapWords += sentenceWords;
+    if (recapWords >= recapBudget) break;
+  }
+
+  if (!recap.length) return teaching.join(' ').trim();
   return [
-    tokens.slice(0, teachingWords).join(' '),
+    teaching.join(' '),
     'Now, connect those steps to the lesson objective and check your understanding.',
-    tokens.slice(-recapWords).join(' '),
-  ].join(' ');
+    recap.join(' '),
+  ].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 }
 
 function readingGuideParts(contentJson: Record<string, unknown>): string[] {

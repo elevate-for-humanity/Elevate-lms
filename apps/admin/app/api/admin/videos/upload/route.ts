@@ -5,7 +5,7 @@ import { toErrorMessage } from '@/lib/safe';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { queueCourseLessonVideos } from '@/lib/course-factory/media-service';
+import { queueCourseMedia } from '@/lib/course-builder/orchestrator';
 import { attachLicensedMediaUpload } from '@/lib/course-builder/licensed-media';
 
 export const runtime = 'nodejs';
@@ -97,7 +97,7 @@ async function queueLicensedLessonRender(courseId: string, lessonId: string) {
   // Always pass through Course Factory. It refreshes the canonical job's
   // locked narration policy as well as requeueing it; directly resetting a
   // legacy job can preserve the obsolete Edge route that now returns 403.
-  const queued = await queueCourseLessonVideos({
+  const queued = await queueCourseMedia({
     courseId,
     lessonId,
     onlyMissing: false,

@@ -26,7 +26,7 @@ export default async function AdminBillingSubscriptionsPage() {
     db
       .from('billing_schedules')
       .select(
-        'id,customer_name,product_name,status,cadence,next_invoice_date,collection_mode,collection_provider,provider_status,provider_approval_url,legacy_stripe_subscription_id',
+        'id,customer_name,product_name,status,cadence,next_invoice_date,provider,collection_mode,collection_provider,provider_status,provider_approval_url',
       )
       .order('created_at', { ascending: false })
       .limit(250),
@@ -46,7 +46,7 @@ export default async function AdminBillingSubscriptionsPage() {
     db
       .from('organization_subscriptions')
       .select(
-        'status,billing_interval,current_period_end,stripe_subscription_id,tenants(name,slug),subscription_plans(name,slug)',
+        'status,billing_interval,current_period_end,billing_provider,provider_subscription_id,tenants(name,slug),subscription_plans(name,slug)',
       )
       .order('created_at', { ascending: false })
       .limit(100),
@@ -184,7 +184,7 @@ export default async function AdminBillingSubscriptionsPage() {
         </table>
       </section>
       <section className="overflow-x-auto rounded-xl border bg-white">
-        <h2 className="border-b px-4 py-3 font-bold">Retired provider history (read-only)</h2>
+        <h2 className="border-b px-4 py-3 font-bold">Organization subscription history</h2>
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left">
             <tr>

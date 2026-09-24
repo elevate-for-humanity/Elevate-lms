@@ -1,6 +1,6 @@
 // pre-auth-registry: exempt - requireProgramHolder verifies the authenticated holder and every query is profile-scoped.
 import { NextResponse } from 'next/server';
-import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { requireCommunicationActor } from '@/lib/communications/actor';
 import {
   DEFAULT_AVAILABILITY_SCHEDULE,
   type AvailabilitySchedule,
@@ -18,8 +18,7 @@ const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DEVICE_ID = /^[A-Za-z0-9_-]{16,100}$/;
 
 async function phoneContext() {
-  const ctx = await requireProgramHolder();
-  if (ctx.mode !== 'holder') return { ctx, extension: null, system: null };
+  const ctx = await requireCommunicationActor();
   const { data: extension } = await ctx.db
     .from('communication_extensions')
     .select('*,communication_workspaces!inner(id,phone_system_id)')
@@ -59,9 +58,6 @@ function safeSchedule(value: unknown): AvailabilitySchedule | null {
 
 export async function GET() {
   const { ctx, extension, system } = await phoneContext();
-  if (ctx.mode !== 'holder') {
-    return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
-  }
   if (!extension || !system) {
     return NextResponse.json(
       { error: 'An administrator has not assigned a phone extension to this account.' },

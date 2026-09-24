@@ -16,11 +16,6 @@ const nextConfig = {
   outputFileTracingRoot: path.join(__dirname, '../..'),
   poweredByHeader: false,
   reactStrictMode: true,
-  // Marketing must render request-time metadata under Next 15.5 without the
-  // static-export AsyncLocalStorage invariant seen on the generated 404 route.
-  // Standalone Node output remains cacheable at the CDN/origin layer.
-  experimental: undefined,
-
   generateBuildId: async () => {
     const sha = resolveCommitSha(process.env);
     return sha === 'local-development' ? 'local-dev' : sha.slice(0, 7);

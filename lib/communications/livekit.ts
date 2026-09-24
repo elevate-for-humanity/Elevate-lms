@@ -66,7 +66,10 @@ export async function createMeetingToken(input: {
     room: input.roomName,
     canSubscribe: true,
     canPublish: input.canPublish,
-    canPublishData: input.canShare,
+    canPublishData: true,
+    canPublishSources: input.canShare
+      ? ['camera', 'microphone', 'screen_share', 'screen_share_audio']
+      : ['camera', 'microphone'],
   });
   return { token: await token.toJwt(), serverUrl: config.url };
 }

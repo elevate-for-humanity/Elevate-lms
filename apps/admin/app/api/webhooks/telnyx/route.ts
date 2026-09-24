@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
 import { PushNotificationService } from '@/lib/notifications/push-service';
+import { sendSMS } from '@/lib/notifications/sms';
 import { isExtensionReachable } from '@/lib/phone/availability';
 import {
   decodeCallState,
@@ -113,10 +114,17 @@ async function notifyAssignee(
     db.from('profiles').select('email,full_name').eq('id', input.profileId).maybeSingle(),
     db
       .from('notification_preferences')
-      .select('email_missed_calls')
+      .select('email_missed_calls,sms_missed_calls,sms_phone')
       .eq('user_id', input.profileId)
       .maybeSingle(),
   ]);
+  if (preferences?.sms_missed_calls === true && preferences?.sms_phone) {
+    const smsResult = await sendSMS(
+      preferences.sms_phone,
+      `${input.urgency === 'urgent' ? 'URGENT: ' : ''}${input.caller} left details with PARIS. Open your secure Elevate Phone inbox: ${url}`,
+    );
+    if (!smsResult.success) console.error('Missed-call SMS delivery failed:', smsResult.error);
+  }
   if (!profile?.email || preferences?.email_missed_calls === false) return;
   try {
     await resend.emails.send({

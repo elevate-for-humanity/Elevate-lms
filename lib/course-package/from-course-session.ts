@@ -101,9 +101,10 @@ export function coursePackageFromSession(session: CourseSession): CoursePackage 
                           narrationCueIds: [String(item.id ?? `${lesson.slug}-audio-${index + 1}`)],
                           teachingPurpose: String(item.purpose ?? ''),
                           searchTerms: [],
-                          source: 'diagram',
-                          licenseStatus: 'owned',
-                          matchScore: 1,
+                          // Do not synthesize provenance, licensing, or match
+                          // scores from an authored storyboard. Those fields
+                          // are production evidence and must come from the
+                          // rendered-media pipeline.
                           visualType: item.visualType === 'technical-diagram' ? 'diagram' : 'video',
                         };
                       })

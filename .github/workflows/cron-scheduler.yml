@@ -136,12 +136,17 @@ jobs:
             -H "Content-Type: application/json" \
             --max-time 30 || echo "::warning::process-provisioning-jobs failed"
 
-      - name: Process canonical durable Course Builder job
+      - name: Drain canonical durable Course Builder jobs
         run: |
-          curl -sf -X GET "$ADMIN_URL/api/cron/process-course-builder-jobs" \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            -H "Content-Type: application/json" \
-            --max-time 3600
+          set -euo pipefail
+          for i in $(seq 1 10); do
+            body=$(curl -sf -X GET "$ADMIN_URL/api/cron/process-course-builder-jobs" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              -H "Content-Type: application/json" \
+              --max-time 3600)
+            echo "$body"
+            if echo "$body" | grep -q '"processed":0'; then break; fi
+          done
 
       - name: Dispatch platform events to workflow engine
         run: |

@@ -62,7 +62,9 @@ export function decodeCallState(value?: string): Record<string, string> {
 }
 
 export function publicPhoneNumber() {
-  return process.env.TELNYX_PHONE_NUMBER || '+13179999620';
+  const number = process.env.TELNYX_PHONE_NUMBER?.trim();
+  if (!number) throw new Error('TELNYX_PHONE_NUMBER is not configured');
+  return number;
 }
 
 export function menuPrompt(greeting: string, options: Array<{ digit: number; label: string }>) {

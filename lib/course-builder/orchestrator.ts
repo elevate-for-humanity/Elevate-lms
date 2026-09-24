@@ -163,7 +163,10 @@ export async function courseFactory(
     }
     progress?.('resolve', 'Loading the identified persisted authored curriculum.', 10);
     const upgraded = await upgradePersistedAuthoredCourse(input.courseId);
-    progress?.('validate', 'Validating the canonical credential-course contract.', 85);
+    // Blueprint selective repair is iterative: normalize/upgrade the persisted
+    // authored components, then validate. Gate failures remain component repair
+    // targets rather than triggering a destructive full-course refresh.
+    progress?.('validate', 'Validating repaired components against the Course Builder Blueprint.', 85);
     const readiness = await evaluatePersistedCredentialCourse(upgraded.courseId);
     if (!readiness.pass) {
       return {
@@ -172,6 +175,7 @@ export async function courseFactory(
         courseSlug: upgraded.courseSlug,
         errors: readiness.findings.map((finding) => `${finding.gate}: ${finding.message}`),
         videosQueued: 0,
+        warnings: readiness.findings.map((finding) => `repair_required:${finding.gate}:${finding.message}`),
       };
     }
     const result: FactoryOutput = {

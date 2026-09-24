@@ -201,10 +201,12 @@ function BookingForm() {
       .finally(() => setSlotsLoading(false));
   }, [selectedProvider]);
 
-  // Detect return from Stripe and unlock Google Calendar only after payment verification.
+  // Detect return from payment checkout and unlock Google Calendar only after fulfillment verification.
   useEffect(() => {
-    const sessionId = searchParams.get('session_id');
-    if (!sessionId) return;
+    let invoiceId = searchParams.get('invoice_id') || '';
+    let checkoutEmail = '';
+    try { const savedCheckout = sessionStorage.getItem('testingCheckout'); if (savedCheckout) { const parsed = JSON.parse(savedCheckout); invoiceId = invoiceId || parsed.invoiceId || ''; checkoutEmail = parsed.email || ''; } } catch { /* ignore */ }
+    if (!invoiceId && !checkoutEmail) return;
     setPaymentVerificationError('');
 
     // Restore form state from sessionStorage so the slot picker works
@@ -227,18 +229,19 @@ function BookingForm() {
       /* ignore */
     }
 
-    // Retries up to 5× with 2s backoff — the webhook may not have created the booking yet.
+    // Retries up to 5× with 2s backoff — provider confirmation may still be creating the booking.
     let attempts = 0;
     const maxAttempts = 5;
     setCalendarLoading(true);
 
     const poll = async () => {
       try {
-        const res = await fetch(`/api/testing/booking-status?session_id=${encodeURIComponent(sessionId)}`);
+        const params = new URLSearchParams(); if (invoiceId) params.set('invoice_id', invoiceId); if (checkoutEmail) params.set('email', checkoutEmail);
+        const res = await fetch(`/api/testing/booking-status?${params.toString()}`);
         const data = await res.json();
         if (data.found) {
           setPaid(true);
-          setPaidSessionId(sessionId);
+          setPaidSessionId(invoiceId);
           setGoogleCalendarUrl(data.googleCalendarUrl ?? null);
           if (data.examName) setPaidExamName(data.examName);
           if (data.confirmationCode) setPaidConfirmationCode(data.confirmationCode);
@@ -262,7 +265,7 @@ function BookingForm() {
     poll();
   }, [searchParams]);
 
-  const checkoutSessionId = searchParams.get('session_id');
+  const checkoutSessionId = searchParams.get('invoice_id') || (typeof window !== 'undefined' ? (() => { try { const v=sessionStorage.getItem('testingCheckout'); return v ? JSON.parse(v).invoiceId || 'pending' : ''; } catch { return ''; } })() : '');
 
   if (!checkoutSessionId) {
     return (
@@ -271,7 +274,7 @@ function BookingForm() {
           <CreditCard className="mx-auto h-12 w-12 text-brand-red-600" />
           <h1 className="mt-4 text-3xl font-extrabold text-slate-950">Payment required before scheduling</h1>
           <p className="mt-3 text-base leading-relaxed text-slate-600">
-            Choose your exact exam and complete secure checkout first. Your scheduling link unlocks only after Stripe confirms payment.
+            Choose your exact exam and complete secure checkout first. Your appointment confirmation unlocks after the payment provider confirms payment.
           </p>
           <Link
             href="/testing/checkout"
@@ -293,7 +296,7 @@ function BookingForm() {
             {paymentVerificationError ? 'Scheduling locked' : 'Verifying payment'}
           </h1>
           <p className="mt-3 text-base leading-relaxed text-slate-600">
-            {paymentVerificationError || 'Please wait while we confirm your completed Stripe Checkout session.'}
+            {paymentVerificationError || 'Please wait while we confirm your completed payment and create the testing booking.'}
           </p>
           {paymentVerificationError && (
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -344,7 +347,7 @@ function BookingForm() {
     const qty = parseInt(participantCount, 10) || 1;
 
     try {
-      // All bookings with a fee go through Stripe — individuals and orgs alike.
+      // All paid bookings use the current provider-neutral checkout — individuals and orgs alike.
       // Orgs pay qty × per-seat fee. No booking is confirmed without payment.
       const fee = selectedProvider.fees?.[0];
       if (fee) {

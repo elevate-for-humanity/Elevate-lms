@@ -86,7 +86,7 @@ export default async function PhonePage() {
         db
           .from('profiles')
           .select('id,full_name,email,role,program_holder_id')
-          .in('role', ['program_holder', 'programholder'])
+          .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder'])
           .not('program_holder_id', 'is', null)
           .order('full_name'),
         db
@@ -121,8 +121,9 @@ export default async function PhonePage() {
     (profile: any) => !String(profile.email || '').endsWith('@qa.invalid'),
   );
   const extensions = extensionsResult.data ?? [];
+  const directoryEntries = extensions.filter((entry: any) => entry.enabled);
   const settings: PhoneSettings = {
-    greeting: system?.greeting ?? 'Thank you for calling Elevate for Humanity.',
+    greeting: system?.greeting ?? 'Thank you for calling Elevate for Humanity. This is PARIS. How may I help you today?',
     afterHours:
       system?.after_hours_message ??
       'Our office is currently closed. Please leave a message and we will return your call.',
@@ -143,12 +144,12 @@ export default async function PhonePage() {
     recordingDisclosure: system?.recording_disclosure ?? '',
     maxQueueSeconds: system?.max_queue_seconds ?? 90,
     aiEnabled: system?.ai_enabled ?? false,
-    aiName: system?.ai_name ?? 'Elevate Assistant',
+    aiName: system?.ai_name ?? 'PARIS',
     aiVoice: system?.ai_voice ?? 'natural',
     aiLanguage: system?.ai_language ?? 'en-US',
     aiInstructions:
       system?.ai_instructions ??
-      'Answer questions about Elevate for Humanity, collect caller information, and transfer to a person when requested or uncertain.',
+      'Identify yourself as PARIS with Elevate for Humanity. Answer ordinary caller questions first using verified Elevate website and platform knowledge. Use the live enabled extension directory when the caller asks for a person or department or needs a human. Name the staff member and extension before offering the transfer. Never identify an individual staff member as the administrator unless their live role says so. Never guess unverified program, funding, enrollment, licensing, payment, or compliance information; offer a human transfer when uncertain.',
     aiAllowInterruptions: system?.ai_allow_interruptions ?? true,
     aiHumanHandoffEnabled: system?.ai_human_handoff_enabled ?? true,
   };
@@ -202,7 +203,7 @@ export default async function PhonePage() {
             screen sharing, and communication history.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link
             href="/phone/email"
             className="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-black text-white"
@@ -288,7 +289,7 @@ export default async function PhonePage() {
           {numbers.length ? (
             <ul className="mt-3 divide-y divide-slate-100">
               {numbers.map((item: any) => (
-                <li key={item.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+                <li key={item.id} className="grid gap-3 py-3 text-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
                   <span>
                     <b>{item.label}</b>
                     <br />
@@ -304,7 +305,7 @@ export default async function PhonePage() {
                   </span>
                   <form
                     action={assignPhoneNumber}
-                    className="grid min-w-64 gap-2 sm:grid-cols-[1fr_5rem_auto]"
+                    className="grid w-full min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_5rem_auto] md:col-span-2"
                   >
                     <input type="hidden" name="phoneNumberId" value={item.id} />
                     <select
@@ -353,7 +354,7 @@ export default async function PhonePage() {
           {destinations.length ? (
             <ul className="mt-3 divide-y divide-slate-100">
               {destinations.map((item: any) => (
-                <li key={item.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+                <li key={item.id} className="grid gap-3 py-3 text-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
                   <span>
                     <b>{item.name}</b>
                     {item.department ? (
@@ -479,7 +480,7 @@ export default async function PhonePage() {
             Save extension
           </button>
         </form>
-        {extensions.length ? (
+        {directoryEntries.length ? (
           <div className="mt-4 overflow-x-auto">
             <table className="min-w-full text-left text-sm">
               <thead className="bg-slate-950 text-white">
@@ -492,7 +493,7 @@ export default async function PhonePage() {
                 </tr>
               </thead>
               <tbody>
-                {extensions.map((entry: any) => {
+                {directoryEntries.map((entry: any) => {
                   const assigned = numbers.find(
                     (number: any) => number.assigned_profile_id === entry.profile_id,
                   );

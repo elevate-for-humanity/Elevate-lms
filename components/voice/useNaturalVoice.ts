@@ -21,9 +21,9 @@ const NATURAL_VOICE_STOP_EVENT = 'elevate:natural-voice-stop';
 
 const DELIVERY_RATE_BY_STYLE: Record<NaturalVoiceStyle, number> = {
   default: 0.88,
-  assistant: 0.88,
+  assistant: 0.94,
   instructor: 0.84,
-  commercial: 0.9,
+  commercial: 0.96,
 };
 
 /**
@@ -40,7 +40,7 @@ export function narrationPlaybackRate(options: PlayOptions = {}) {
   const style = options.style || 'default';
   const baseline = DELIVERY_RATE_BY_STYLE[style];
   return Number.isFinite(requested)
-    ? Math.min(0.92, Math.max(0.75, requested))
+    ? Math.min(1, Math.max(0.8, requested))
     : baseline;
 }
 
@@ -144,7 +144,7 @@ function browserFallback(text: string, options: PlayOptions): SpeechSynthesisUtt
   if (browserVoice) utterance.voice = browserVoice;
   utterance.lang = browserVoice?.lang || 'en-US';
   utterance.rate = narrationPlaybackRate(options);
-  utterance.pitch = options.style === 'commercial' || options.style === 'assistant' ? 1.02 : 1;
+  utterance.pitch = options.style === 'commercial' ? 1.03 : options.style === 'assistant' ? 1.01 : 1;
   utterance.volume = 1;
   window.speechSynthesis.speak(utterance);
   return utterance;

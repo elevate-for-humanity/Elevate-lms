@@ -1,7 +1,6 @@
 // lib/partners/base.ts
 // Shared types + abstract base for all partner LMS APIs
 export type PartnerType =
-  | 'hsi'
   | 'certiport'
   | 'careersafe'
   // "milady" removed — theory delivered via Elevate LMS
@@ -60,7 +59,7 @@ export interface PartnerHttpClient {
 }
 
 /**
- * Abstract class – each real partner (HSI, Certiport, etc.)
+ * Abstract class – each real partner (Certiport, CareerSafe, etc.)
  * will implement these methods using THEIR official API docs.
  */
 export class BasePartnerAPI {

@@ -196,7 +196,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
             {/* Resources dropdown — student-facing links that don't belong on the marketing site */}
             <div className="relative group">
               <button
-                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-slate-900/90 hover:bg-white/10 transition-all"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-white/90 hover:bg-white/10 transition-all"
                 aria-haspopup="true"
               >
                 <BookMarked className="w-4 h-4" />
@@ -224,7 +224,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
             {/* Search */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2 hover:bg-white/10 rounded-lg transition text-slate-900"
+              className="p-2 hover:bg-white/10 rounded-lg transition text-white"
               aria-label="Search"
             >
               <Search className="w-5 h-5" />
@@ -236,7 +236,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
             {/* Settings - Desktop */}
             <Link
               href="/lms/settings"
-              className="hidden md:flex p-2 hover:bg-white/10 rounded-lg transition text-slate-900"
+              className="hidden md:flex p-2 hover:bg-white/10 rounded-lg transition text-white"
               aria-label="Settings"
             >
               <Settings className="w-5 h-5" />
@@ -264,7 +264,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition text-slate-900"
+              className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition text-white"
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -335,7 +335,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2 text-slate-900/80 hover:bg-white/10 rounded-lg text-sm"
+                  className="flex items-center gap-3 px-4 py-2 text-white/80 hover:bg-white/10 rounded-lg text-sm"
                 >
                   {item.label}
                 </Link>
@@ -366,7 +366,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                 <Link
                   href="/lms/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2 text-slate-900 hover:bg-white/10 rounded-lg"
+                  className="flex items-center gap-3 px-4 py-2 text-white hover:bg-white/10 rounded-lg"
                 >
                   <User className="w-5 h-5" />
                   Profile
@@ -374,7 +374,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                 <Link
                   href="/lms/settings"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2 text-slate-900 hover:bg-white/10 rounded-lg"
+                  className="flex items-center gap-3 px-4 py-2 text-white hover:bg-white/10 rounded-lg"
                 >
                   <Settings className="w-5 h-5" />
                   Settings

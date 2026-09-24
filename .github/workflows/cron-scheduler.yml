@@ -66,6 +66,7 @@ on:
           - ops-scan
           - qa-scan
           - video-render-queue
+          - course-builder-queue
           - portal-completion-reminders
 
   # ── Daily jobs — 8 AM UTC ──────────────────────────────────────────────────
@@ -110,6 +111,7 @@ jobs:
          || github.event.inputs.job == 'workflow-schedule-processor'
          || github.event.inputs.job == 'ai-operator'
          || github.event.inputs.job == 'video-render-queue'
+         || github.event.inputs.job == 'course-builder-queue'
          || github.event.inputs.job == 'program-holder-payouts'
          ))
     steps:

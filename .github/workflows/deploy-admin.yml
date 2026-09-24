@@ -224,6 +224,18 @@ jobs:
           worker=$(curl -fsSL --max-time 20 https://admin.elevateforhumanity.org/sw-admin.js)
           echo "$worker" | grep -q 'Service Worker — Admin Domain' || { echo '::error::Admin service worker is not the canonical worker'; exit 1; }
 
+      - name: Kick canonical Course Builder worker after deploy
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 10); do
+            body=$(curl -sf -X POST "https://admin.elevateforhumanity.org/api/cron/process-course-builder-jobs" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              -H "Content-Type: application/json" \
+              --max-time 3600)
+            echo "$body"
+            if echo "$body" | grep -q '"processed":0'; then break; fi
+          done
+
       - name: Generate this week's apprentice invoice fallback batch
         run: |
           curl -sf -X POST "https://admin.elevateforhumanity.org/api/cron/generate-apprentice-invoices" \

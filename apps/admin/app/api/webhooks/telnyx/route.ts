@@ -360,11 +360,17 @@ async function startParis(
             type: 'boolean',
             description: 'Whether the caller says help is immediately needed',
           },
+          caller_type: { type: 'string', description: 'Prospective student, current learner/apprentice, employer, Host Shop, Program Holder, parent/family, workforce partner, or other' },
+          program_interest: { type: 'string', description: 'Program or career-training area the caller is interested in' },
+          program_questions: { type: 'string', description: 'Questions the caller has about the program' },
+          funding_preference: { type: 'string', enum: ['funded','self_pay','unsure'], description: 'Whether the caller is seeking workforce-funded training, self-pay training, or is unsure' },
+          workone_contacted: { type: 'boolean', description: 'Whether the caller has contacted or visited WorkOne' },
+          workone_orientation_status: { type: 'string', enum: ['scheduled','attended','not_scheduled','unsure'], description: 'Status of the caller WorkOne orientation appointment' },
         },
-        required: ['caller_name', 'callback_number', 'reason', 'urgency'],
+        required: ['caller_name', 'callback_number', 'reason', 'urgency', 'program_interest', 'funding_preference', 'workone_contacted', 'workone_orientation_status'],
       },
       assistant: {
-        instructions: `${system.ai_instructions} You are PARIS, the Elevate for Humanity telephone attendant. Be warm and concise. Tell callers to call 911 for an emergency. You may answer only these approved general facts: Elevate offers workforce and career training; program availability and funding eligibility vary; callers may apply through elevateforhumanity.org. Do not invent dates, prices, eligibility, approvals, or application status. Never request a Social Security number, payment card, password, medical details, or other highly sensitive data. When uncertain, say the assigned person will return the call. Collect every required field conversationally and read the callback number back for confirmation.`,
+        instructions: `${system.ai_instructions} You are PARIS, the Elevate for Humanity telephone attendant. Be warm and concise. Tell callers to call 911 for an emergency. Use Elevate's current public website/program information as the authority for general program descriptions and published next steps. Ask what program the caller is interested in and whether they have questions about it. Ask whether they are looking for workforce-funded training, self-pay training, or are unsure. Ask whether they have contacted or visited WorkOne and whether their WorkOne orientation appointment is scheduled, already attended, not yet scheduled, or they are unsure. If they have not scheduled the WorkOne orientation, direct them to the WorkOne orientation scheduling option published from the Elevate website/homepage. Explain published program and funding information accurately, but never promise funding or eligibility: WorkOne/workforce agencies make funding determinations. Do not invent dates, prices, funded-program status, eligibility, approvals, or application status. If current published information does not establish an answer, say so and route the question to an administrator. Never request a Social Security number, payment card, password, medical details, or other highly sensitive data. When uncertain, say the assigned person will return the call. Collect every required field conversationally and read the callback number back for confirmation.`,
       },
       greeting: `${greeting} I am PARIS, the Elevate automated attendant. This call may be recorded and transcribed. I can take your callback details and answer general questions. If this is an emergency, hang up and call 911. What is your name?`,
       gather_ended_speech:
@@ -827,7 +833,16 @@ async function handleEvent(
       String(result.reason || '')
         .trim()
         .slice(0, 4000) || null;
-    const summary = [callerName || 'Caller', reason || 'requested a callback']
+    const intakeContext = [
+      result.caller_type ? `Caller type: ${String(result.caller_type)}` : '',
+      result.program_interest ? `Program: ${String(result.program_interest)}` : '',
+      result.funding_preference ? `Funding: ${String(result.funding_preference)}` : '',
+      typeof result.workone_contacted === 'boolean' ? `WorkOne contacted: ${result.workone_contacted ? 'yes' : 'no'}` : '',
+      result.workone_orientation_status ? `WorkOne orientation: ${String(result.workone_orientation_status)}` : '',
+      result.program_questions ? `Program questions: ${String(result.program_questions)}` : '',
+    ].filter(Boolean).join(' · ');
+    const summary = [callerName || 'Caller', reason || 'requested assistance', intakeContext]
+      .filter(Boolean)
       .join(': ')
       .slice(0, 1000);
     await db
@@ -837,7 +852,7 @@ async function handleEvent(
         callback_number: callbackNumber,
         reason,
         program_or_department:
-          String(result.program_or_department || '')
+          String(result.program_interest || result.program_or_department || '')
             .trim()
             .slice(0, 300) || null,
         urgency,

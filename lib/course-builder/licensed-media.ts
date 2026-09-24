@@ -2,6 +2,15 @@ import 'server-only';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+export const ENVATO_COURSE_MEDIA_POLICY = {
+  provider: 'envato',
+  accessModel: 'subscription-licensed-library',
+  builderUsageCap: null,
+  priority: 'licensed-first',
+  requireEntitlementEvidence: true,
+  requireStoredAsset: true,
+} as const;
+
 export type LicensedPurchase = {
   itemId: string;
   title: string;

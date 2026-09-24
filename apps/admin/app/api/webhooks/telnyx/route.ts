@@ -95,11 +95,17 @@ async function notifyAssignee(
     taskId: string;
     caller: string;
     urgency: string;
+    extension?: string;
+    program?: string;
+    reason?: string;
+    summary?: string;
+    transcript?: string;
+    callbackNumber?: string;
+    preferredCallbackTime?: string;
   },
 ) {
-  if (!input.profileId) return;
-  const url = appUrl('/program-holder/phone');
-  await push.sendToUserWithDatabase(db, input.profileId, {
+  const url = input.profileId ? appUrl('/program-holder/phone') : appUrl('/phone/inbox');
+  if (input.profileId) await push.sendToUserWithDatabase(db, input.profileId, {
     title: input.urgency === 'urgent' ? 'Urgent call for your extension' : 'New call to return',
     body: `${input.caller} left details with PARIS. Open your secure phone inbox.`,
     icon: '/icon-192x192.png',
@@ -110,18 +116,27 @@ async function notifyAssignee(
     vibrate: [200, 100, 200],
   });
 
-  const [{ data: profile }, { data: preferences }] = await Promise.all([
-    db.from('profiles').select('email,full_name').eq('id', input.profileId).maybeSingle(),
-    db
-      .from('notification_preferences')
-      .select('email_missed_calls,sms_missed_calls,sms_phone')
-      .eq('user_id', input.profileId)
-      .maybeSingle(),
-  ]);
+  const [{ data: profile }, { data: preferences }] = input.profileId
+    ? await Promise.all([
+        db.from('profiles').select('email,full_name').eq('id', input.profileId).maybeSingle(),
+        db.from('notification_preferences').select('email_missed_calls,sms_missed_calls,sms_phone').eq('user_id', input.profileId).maybeSingle(),
+      ])
+    : [{ data: null }, { data: null }];
+  const detailLines = [
+    `Caller: ${input.caller}`,
+    input.callbackNumber ? `Callback: ${input.callbackNumber}` : '',
+    input.extension ? `Extension attempted: ${input.extension}` : '',
+    input.program ? `Program/department: ${input.program}` : '',
+    input.reason ? `Reason: ${input.reason}` : '',
+    input.preferredCallbackTime ? `Preferred callback: ${input.preferredCallbackTime}` : '',
+    input.summary ? `PARIS summary: ${input.summary}` : '',
+    input.transcript ? `Transcript: ${input.transcript}` : '',
+  ].filter(Boolean);
+  const readableDetails = detailLines.join('\n');
   if (preferences?.sms_missed_calls === true && preferences?.sms_phone) {
     const smsResult = await sendSMS(
       preferences.sms_phone,
-      `${input.urgency === 'urgent' ? 'URGENT: ' : ''}${input.caller} left details with PARIS. Open your secure Elevate Phone inbox: ${url}`,
+      `${input.urgency === 'urgent' ? 'URGENT: ' : ''}${input.caller}${input.callbackNumber ? ` (${input.callbackNumber})` : ''}${input.program ? ` — ${input.program}` : ''}${input.reason ? `: ${input.reason}` : ' left details with PARIS.'} ${url}`.slice(0, 1200),
     );
     if (!smsResult.success) console.error('Missed-call SMS delivery failed:', smsResult.error);
   }
@@ -134,8 +149,8 @@ async function notifyAssignee(
         input.urgency === 'urgent'
           ? 'Urgent call requires follow-up'
           : 'New call in your Elevate Phone inbox',
-      text: `${input.caller} left details with PARIS. Sign in to your secure phone inbox: ${url}`,
-      html: `<p><strong>${escapeHtml(input.caller)}</strong> left details with PARIS.</p><p><a href="${escapeHtml(url)}">Open your secure phone inbox</a> to review the summary and return the call.</p><p>For privacy, caller details and recordings are not included in this email.</p>`,
+      text: `${readableDetails}\n\nFull call record: ${url}`,
+      html: `<p><strong>Call details</strong></p><pre style="white-space:pre-wrap;font-family:Arial,sans-serif">${escapeHtml(readableDetails)}</pre><p><a href="${escapeHtml(url)}">Open the full call record</a></p>`,
     });
   } catch (error) {
     console.error('Missed-call email delivery failed:', error);
@@ -190,7 +205,7 @@ async function defaultAdminRoute(db: any, system: System) {
     .from('communication_extensions')
     .select('id,profile_id')
     .eq('workspace_id', workspace.id)
-    .eq('extension', system.admin_extension || '100')
+    .eq('extension', system.admin_extension || '0')
     .eq('enabled', true)
     .maybeSingle();
   return extension
@@ -523,7 +538,7 @@ async function routeAdmin(
         .from('communication_extensions')
         .select('id')
         .eq('workspace_id', workspace.id)
-        .eq('extension', system.admin_extension || '100')
+        .eq('extension', system.admin_extension || '0')
         .eq('enabled', true)
         .maybeSingle()
     : { data: null };
@@ -859,10 +874,25 @@ async function handleEvent(
         updated_at: new Date().toISOString(),
       })
       .eq('id', state.taskId);
+    const { data: attemptedExtension } = state.extensionId
+      ? await db.from('communication_extensions').select('extension').eq('id', state.extensionId).maybeSingle()
+      : { data: null };
+    const { data: savedTask } = await db
+      .from('phone_callback_tasks')
+      .select('transcript')
+      .eq('id', state.taskId)
+      .maybeSingle();
     await notifyAssignee(db, {
       profileId: state.profileId,
       taskId: state.taskId,
       caller: callerName || callbackNumber || 'A caller',
+      callbackNumber: callbackNumber || undefined,
+      extension: attemptedExtension?.extension || undefined,
+      program: String(result.program_interest || result.program_or_department || '').trim() || undefined,
+      reason: reason || undefined,
+      summary,
+      transcript: savedTask?.transcript || undefined,
+      preferredCallbackTime: String(result.preferred_callback_time || '').trim() || undefined,
       urgency,
     });
     try {

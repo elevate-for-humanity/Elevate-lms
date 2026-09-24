@@ -13,6 +13,7 @@ type PlayOptions = {
   userControlledRate?: boolean;
   onEnded?: () => void;
   onError?: () => void;
+  /** Deprecated: production narration never switches to a device voice. */
   allowBrowserFallback?: boolean;
 };
 
@@ -59,20 +60,6 @@ function naturalVoiceCacheKey(text: string, options: PlayOptions) {
     narrationPlaybackRate(options),
     options.src || '',
   ]);
-}
-
-function chooseBrowserVoice(): SpeechSynthesisVoice | null {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
-  const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return null;
-
-  return (
-    voices.find((voice) => /natural|neural|premium|enhanced/i.test(voice.name) && /^en(-|_)/i.test(voice.lang)) ||
-    voices.find((voice) => /^en-US$/i.test(voice.lang)) ||
-    voices.find((voice) => /^en(-|_)/i.test(voice.lang)) ||
-    voices[0] ||
-    null
-  );
 }
 
 async function requestNaturalVoiceBlob(text: string, options: PlayOptions): Promise<Blob> {
@@ -131,28 +118,9 @@ async function requestNaturalVoice(text: string, options: PlayOptions): Promise<
   return audio;
 }
 
-function browserFallback(text: string, options: PlayOptions): SpeechSynthesisUtterance | null {
-  if (
-    typeof window === 'undefined' ||
-    !('speechSynthesis' in window) ||
-    typeof SpeechSynthesisUtterance === 'undefined'
-  ) return null;
-
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  const browserVoice = chooseBrowserVoice();
-  if (browserVoice) utterance.voice = browserVoice;
-  utterance.lang = browserVoice?.lang || 'en-US';
-  utterance.rate = narrationPlaybackRate(options);
-  utterance.pitch = options.style === 'commercial' ? 1.03 : options.style === 'assistant' ? 1.01 : 1;
-  utterance.volume = 1;
-  window.speechSynthesis.speak(utterance);
-  return utterance;
-}
-
 /**
  * Natural-TTS-first compatibility helper for non-hook callers.
- * Browser speech is used only when the shared natural voice endpoint is unavailable.
+ * The shared natural voice endpoint is authoritative; device/browser voices are never substituted.
  */
 export async function speakNaturalVoice(text: string, options: PlayOptions = {}): Promise<boolean> {
   const clean = text.trim().slice(0, 2400);
@@ -163,9 +131,7 @@ export async function speakNaturalVoice(text: string, options: PlayOptions = {})
     await audio.play();
     return true;
   } catch {
-    if (options.allowBrowserFallback === false) return false;
-    const utterance = browserFallback(clean, options);
-    return Boolean(utterance);
+    return false;
   }
 }
 
@@ -234,43 +200,12 @@ export function useNaturalVoice() {
       return true;
     } catch {
       if (playbackToken !== playbackTokenRef.current) return false;
-      if (options.allowBrowserFallback === false) {
-        setIsLoading(false);
-        setError('Natural voice is temporarily unavailable.');
-        options.onError?.();
-        return false;
-      }
-      const utterance = browserFallback(clean, options);
-      if (!utterance) {
-        setIsLoading(false);
-        setError('Voice playback is not supported in this browser.');
-        options.onError?.();
-        return false;
-      }
-
-      utteranceRef.current = utterance;
-      utterance.onstart = () => {
-        setIsLoading(false);
-        setIsPlaying(true);
-        setIsPaused(false);
-        setError(null);
-      };
-      utterance.onend = () => {
-        utteranceRef.current = null;
-        setIsPlaying(false);
-        setIsPaused(false);
-        setIsLoading(false);
-        options.onEnded?.();
-      };
-      utterance.onerror = () => {
-        utteranceRef.current = null;
-        setIsPlaying(false);
-        setIsPaused(false);
-        setIsLoading(false);
-        setError('Voice playback failed.');
-        options.onError?.();
-      };
-      return true;
+      setIsLoading(false);
+      setIsPlaying(false);
+      setIsPaused(false);
+      setError('Natural voice is temporarily unavailable.');
+      options.onError?.();
+      return false;
     }
   }, [stop]);
 
@@ -318,7 +253,6 @@ export function useNaturalVoice() {
   useEffect(() => {
     const handleGlobalStop = () => stop();
     window.addEventListener(NATURAL_VOICE_STOP_EVENT, handleGlobalStop);
-    if ('speechSynthesis' in window) window.speechSynthesis.getVoices();
     return () => {
       window.removeEventListener(NATURAL_VOICE_STOP_EVENT, handleGlobalStop);
       stop();

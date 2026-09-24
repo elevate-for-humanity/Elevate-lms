@@ -833,7 +833,16 @@ async function handleEvent(
       String(result.reason || '')
         .trim()
         .slice(0, 4000) || null;
-    const summary = [callerName || 'Caller', reason || 'requested a callback']
+    const intakeContext = [
+      result.caller_type ? `Caller type: ${String(result.caller_type)}` : '',
+      result.program_interest ? `Program: ${String(result.program_interest)}` : '',
+      result.funding_preference ? `Funding: ${String(result.funding_preference)}` : '',
+      typeof result.workone_contacted === 'boolean' ? `WorkOne contacted: ${result.workone_contacted ? 'yes' : 'no'}` : '',
+      result.workone_orientation_status ? `WorkOne orientation: ${String(result.workone_orientation_status)}` : '',
+      result.program_questions ? `Program questions: ${String(result.program_questions)}` : '',
+    ].filter(Boolean).join(' · ');
+    const summary = [callerName || 'Caller', reason || 'requested assistance', intakeContext]
+      .filter(Boolean)
       .join(': ')
       .slice(0, 1000);
     await db
@@ -843,7 +852,7 @@ async function handleEvent(
         callback_number: callbackNumber,
         reason,
         program_or_department:
-          String(result.program_or_department || '')
+          String(result.program_interest || result.program_or_department || '')
             .trim()
             .slice(0, 300) || null,
         urgency,

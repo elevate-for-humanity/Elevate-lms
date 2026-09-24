@@ -767,22 +767,7 @@ async function handleEvent(
       return;
     }
     if (digits === '9') {
-      await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
-        payload: 'Please enter the three-digit program holder extension.',
-        voice: 'Telnyx.KokoroTTS.af',
-        minimum_digits: 3,
-        maximum_digits: 3,
-        valid_digits: '0123456789',
-        maximum_tries: 2,
-        timeout_millis: 9000,
-        command_id: `${eventId}-extension-menu`,
-        client_state: encodeCallState({
-          systemId: system.id,
-          callId: call.id,
-          parentCallControlId: payload.call_control_id,
-          phase: 'extension_menu',
-        }),
-      });
+      await startParis(db, system, call, payload.call_control_id, eventId);
       return;
     }
     if (digits === '0') {

@@ -74,7 +74,48 @@ export function coursePackageFromSession(session: CourseSession): CoursePackage 
             : Array.isArray(videoConfig?.scenes)
               ? videoConfig.scenes
               : [];
-          const timeline = record(videoConfig?.timeline);
+          const experienceTimeline = record(experience?.instructionalTimeline);
+          const timeline = record(videoConfig?.timeline) ?? (
+            experienceTimeline
+              ? {
+                  durationSeconds: experienceTimeline.durationSeconds,
+                  audio: Array.isArray(experienceTimeline.scenes)
+                    ? experienceTimeline.scenes.map((scene, index) => {
+                        const item = record(scene) ?? {};
+                        return {
+                          id: String(item.id ?? `${lesson.slug}-audio-${index + 1}`),
+                          start: Number(item.startTime ?? 0),
+                          end: Number(item.endTime ?? 0),
+                          narration: String(item.narration ?? ''),
+                        };
+                      })
+                    : [],
+                  visuals: Array.isArray(experienceTimeline.scenes)
+                    ? experienceTimeline.scenes.map((scene, index) => {
+                        const item = record(scene) ?? {};
+                        return {
+                          id: String(item.id ?? `${lesson.slug}-visual-${index + 1}`),
+                          start: Number(item.startTime ?? 0),
+                          end: Number(item.endTime ?? 0),
+                          direction: String(item.visualDirection ?? ''),
+                          narrationCueIds: [String(item.id ?? `${lesson.slug}-audio-${index + 1}`)],
+                          teachingPurpose: String(item.purpose ?? ''),
+                          searchTerms: [],
+                          source: 'diagram',
+                          licenseStatus: 'owned',
+                          matchScore: 1,
+                          visualType: item.visualType === 'technical-diagram' ? 'diagram' : 'video',
+                        };
+                      })
+                    : [],
+                  captions: Array.isArray(experienceTimeline.captions)
+                    ? experienceTimeline.captions
+                    : [],
+                  interactions: [],
+                  checkpoints: [],
+                }
+              : null
+          );
           const requiredInteractionIds = [
             ...(Array.isArray(experience?.knowledgeChecks) ? [`${lesson.slug}-kc`] : []),
             ...(experience?.scenario ? [`${lesson.slug}-scenario`] : []),

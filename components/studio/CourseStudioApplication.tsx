@@ -270,7 +270,7 @@ export function CourseStudioApplication({
       />
       <PublishProgress />
       <div
-        className={`grid flex-1 ${embedded ? 'items-start overflow-visible' : 'min-h-0 overflow-hidden'} ${previewOpen ? 'lg:grid-cols-[minmax(0,1fr)_minmax(420px,46vw)]' : 'grid-cols-1'}`}
+        className={`grid flex-1 ${embedded ? 'items-start overflow-visible' : 'min-h-0 overflow-hidden'} ${previewOpen ? 'xl:grid-cols-[minmax(0,1fr)_minmax(520px,46vw)]' : 'grid-cols-1'}`}
       >
         <main className={embedded ? 'min-w-0 overflow-visible' : 'min-h-0 overflow-y-auto'}>
           {children}
@@ -279,7 +279,7 @@ export function CourseStudioApplication({
           <aside
             className={
               embedded
-                ? 'min-h-[42rem] overflow-hidden border-l border-slate-200 bg-white lg:sticky lg:top-0 lg:h-[calc(100vh-1rem)]'
+                ? 'min-h-[42rem] overflow-hidden border-t border-slate-200 bg-white xl:sticky xl:top-0 xl:h-[calc(100vh-1rem)] xl:border-l xl:border-t-0'
                 : 'min-h-[45vh] overflow-hidden border-l border-slate-200 bg-white lg:min-h-0'
             }
             aria-label="Live learner browser"
@@ -303,10 +303,10 @@ export function CourseStudioApplication({
               key={`${previewUrl}-${state.autosave.lastSavedAt ?? 'initial'}-${previewRevision}`}
               src={previewUrl}
               title="Live learner course preview"
-              allow="autoplay; fullscreen"
+              allow="autoplay; fullscreen; microphone; camera"
               className={
                 embedded
-                  ? 'h-[calc(100vh-3.5rem)] min-h-[39rem] w-full bg-white'
+                  ? 'h-[70vh] min-h-[42rem] w-full bg-white xl:h-[calc(100vh-3.5rem)]'
                   : 'h-[calc(100%-2.5rem)] min-h-[40vh] w-full bg-white'
               }
             />

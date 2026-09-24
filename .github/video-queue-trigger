@@ -2,5 +2,5 @@ Controlled Barbering + Cosmetology media queue retry
 Course IDs:
 - 3fb5ce19-1cde-434c-a8c6-f138d7d7aa17
 - 9ca9fb50-7119-46ea-ab81-9b0193c29c31
-Reason: canonical production runs are media_pending; trigger approved video queue drain without creating duplicate courses or lessons.
-Triggered: 2026-09-24T07:33:00Z
+Reason: recovered orphaned rendering leases, capped future leases at ten minutes, and restart the same canonical media queues without creating duplicate courses or lessons.
+Triggered: 2026-09-24T15:35:00Z

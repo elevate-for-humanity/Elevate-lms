@@ -196,6 +196,11 @@ function SubscriptionBilling({
         </div>
       ) : null}
       <BillingCard billing={billing} readOnly={previewing} />
+      <section className="rounded-xl border border-indigo-200 bg-indigo-50 p-5">
+        <h2 className="font-black text-slate-950">Installment financing</h2>
+        <p className="mt-1 text-sm leading-6 text-slate-700">Choose an available provider at checkout. Affirm and Sezzle are separate financing integrations. Afterpay is provided through the platform checkout and is shown only when the payment amount is within its configured eligibility range. Provider approval and terms apply.</p>
+        <Link href={`/programs/${billing.program === 'barber' ? 'barber-apprenticeship' : 'cosmetology-apprenticeship'}/payment/bnpl`} className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-indigo-700 px-5 py-3 text-sm font-black text-white">Open Affirm, Sezzle & eligible Afterpay</Link>
+      </section>
       <InvoiceLedger invoices={invoices} />
     </div>
   );

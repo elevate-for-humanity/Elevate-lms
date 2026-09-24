@@ -131,7 +131,16 @@ export default async function HostShopDashboardView() {
     ) {
       return (
         <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-          <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+          {!publicProfile?.logo_url ? (
+        <section className="mb-6 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-amber-800">Required shop-profile to-do</p>
+          <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div><h2 className="text-lg font-black text-amber-950">Upload your Host Shop logo</h2><p className="mt-1 text-sm font-medium text-amber-900">Add the official shop logo and approved shop photos. Your uploaded shop media is used to personalize this dashboard and your public Host Shop profile.</p></div>
+            <Link href="/host-shop/dashboard/profile" className="inline-flex min-h-11 flex-shrink-0 items-center justify-center rounded-xl bg-amber-900 px-5 py-3 text-sm font-black text-white">Upload shop logo</Link>
+          </div>
+        </section>
+      ) : null}
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <div className="relative h-52 w-full">
               <Image
                 src="/images/pages/barber-gallery-1.webp"
@@ -371,7 +380,7 @@ export default async function HostShopDashboardView() {
   const { data: publicProfile } = partnerName
     ? await db
         .from('public_host_shops')
-        .select('media_gallery,video_url')
+        .select('media_gallery,video_url,logo_url,flyer_url')
         .ilike('display_name', `%${partnerName}%`)
         .limit(1)
         .maybeSingle()
@@ -379,9 +388,7 @@ export default async function HostShopDashboardView() {
   const publicMedia = Array.isArray(publicProfile?.media_gallery)
     ? publicProfile.media_gallery.filter((item: any) => item && typeof item.url === 'string')
     : [];
-  const heroImage = /salon saloon/i.test(partnerName)
-    ? '/images/partners/salon-saloon/team-interior.webp'
-    : '/images/pages/workforce-board-page-7.webp';
+  const heroImage = publicMedia[0]?.url || publicProfile?.logo_url || publicProfile?.flyer_url || (/salon saloon/i.test(partnerName) ? '/images/partners/salon-saloon/team-interior.webp' : '/images/pages/workforce-board-page-7.webp');
 
   return (
     <main className="w-full max-w-none px-4 py-8 sm:px-6">

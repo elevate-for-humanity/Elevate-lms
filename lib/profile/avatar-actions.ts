@@ -37,7 +37,10 @@ export async function uploadProfileAvatar(file: File) {
     const input = Buffer.from(await file.arrayBuffer());
     const metadata = await sharp(input, { limitInputPixels: MAX_AVATAR_PIXELS }).metadata();
     if (!metadata.width || !metadata.height || !metadata.format) {
-      return { error: 'That file is not a readable image.' };
+      return { error: 'Image was not approved: that file is not a readable image.' };
+    }
+    if (metadata.width < 300 || metadata.height < 300) {
+      return { error: 'Image was not approved: profile photos must be at least 300×300 pixels so authorized staff can identify you clearly.' };
     }
     normalized = await sharp(input, { limitInputPixels: MAX_AVATAR_PIXELS })
       .rotate()
@@ -48,7 +51,7 @@ export async function uploadProfileAvatar(file: File) {
   } catch {
     return {
       error:
-        'That image format could not be decoded. Try exporting it as JPG, PNG, WebP, GIF, AVIF, TIFF, or HEIC.',
+        'Image was not approved: that format could not be decoded. Export it as JPG, PNG, WebP, GIF, AVIF, TIFF, or HEIC and try again.',
     };
   }
 

@@ -42,6 +42,23 @@ export async function POST(request: NextRequest) {
   }
 
   const db = await requireAdminClient();
+  if (!isVideo) {
+    try {
+      const sharp = (await import('sharp')).default;
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const metadata = await sharp(buffer, { limitInputPixels: 40_000_000 }).metadata();
+      if (!metadata.width || !metadata.height) {
+        return NextResponse.json({ ok: false, error: 'Image was not approved: the file is not a readable image.' }, { status: 400 });
+      }
+      const minWidth = kind === 'logo' ? 240 : 800;
+      const minHeight = kind === 'logo' ? 120 : 450;
+      if (metadata.width < minWidth || metadata.height < minHeight) {
+        return NextResponse.json({ ok: false, error: `Image was not approved: ${kind === 'logo' ? 'logo' : 'shop image'} resolution is too small. Minimum ${minWidth}×${minHeight}px.` }, { status: 400 });
+      }
+    } catch {
+      return NextResponse.json({ ok: false, error: 'Image was not approved: the image could not be decoded. Export it as JPG, PNG, WebP, or GIF and try again.' }, { status: 400 });
+    }
+  }
   const path = `host-shops/${partnerId}/${kind}-${Date.now()}.${ext(file)}`;
   const { error: uploadError } = await db.storage.from('website-assets').upload(path, file, {
     contentType: file.type,
@@ -65,5 +82,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: `Profile update failed: ${updateError.message}` }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, kind, url: publicUrl, publicProfile: board.partner?.approval_status === 'approved' ? `/host-shops/${(board.partner as any).public_slug || ''}` : null });
+  return NextResponse.json({ ok: true, kind, url: publicUrl, validation: isVideo ? 'accepted' : 'automatically_approved', reason: isVideo ? 'Supported video type and file size.' : 'Readable supported image with sufficient resolution.', publicProfile: board.partner?.approval_status === 'approved' ? `/host-shops/${(board.partner as any).public_slug || ''}` : null });
 }

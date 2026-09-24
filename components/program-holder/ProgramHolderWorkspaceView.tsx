@@ -205,7 +205,7 @@ export async function ProgramHolderWorkspaceView({
       complete:
         Boolean(data.profile?.avatar_url) ||
         data.documents.some((row) => row.document_type === 'profile_photo'),
-      required: false,
+      required: true,
       owner: 'Program Holder',
     },
     ...(requiresImageRelease
@@ -221,7 +221,7 @@ export async function ProgramHolderWorkspaceView({
     {
       label: 'Company logo upload',
       complete: data.documents.some((row) => row.document_type === 'company_logo'),
-      required: false,
+      required: true,
       owner: 'Program Holder',
     },
     ...(selectedPayoutProvider === 'quickbooks'

@@ -16,7 +16,7 @@ function BillingRequiredContent() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/barber/update-payment', { method: 'POST' });
+      const res = await fetch('/api/store/billing-portal', { method: 'POST' });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || 'Something went wrong. Please try again.');
@@ -41,8 +41,7 @@ function BillingRequiredContent() {
             </div>
             <h1 className="text-2xl font-black text-slate-900 mb-2">Payment Method Updated</h1>
             <p className="text-slate-600 mb-6">
-              Your payment method has been updated. Access is restored after the past-due balance is
-              successfully processed.
+              Your billing account has been updated. Access is restored after the past-due balance is confirmed.
             </p>
             <a
               href="https://app.elevateforhumanity.org/lms/dashboard"
@@ -92,12 +91,12 @@ function BillingRequiredContent() {
                     Opening payment portal…
                   </>
                 ) : (
-                  'Update Payment Method'
+                  'Open Billing'
                 )}
               </button>
 
               <p className="text-xs text-slate-500 text-center">
-                You will be redirected to Stripe's secure payment portal.
+                You will continue to the Elevate billing center.
               </p>
 
               <div className="border-t pt-4 space-y-2">

@@ -236,7 +236,7 @@ export default function TestingCheckoutClient({
         <div className="flex items-end justify-between gap-3"><span className="text-lg font-bold text-slate-800">Total</span><span className="text-3xl font-black text-slate-950">{checkoutReady ? money(total) : '—'}</span></div>
 
         <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4">
-          <div className="flex gap-2"><Tag className="mt-0.5 h-4 w-4 shrink-0 text-blue-700" /><p className="text-sm leading-relaxed text-blue-900"><strong>Promotion code:</strong> enter any active Elevate code in the Stripe Checkout coupon box.</p></div>
+          <div className="flex gap-2"><Tag className="mt-0.5 h-4 w-4 shrink-0 text-blue-700" /><p className="text-sm leading-relaxed text-blue-900"><strong>Promotion code:</strong> enter any active Elevate code when the current payment checkout supports promotion codes.</p></div>
         </div>
 
         <button
@@ -250,7 +250,7 @@ export default function TestingCheckoutClient({
         </button>
         {!checkoutReady ? <p className="mt-3 text-sm text-amber-700">Select a priced exam and an available appointment before checkout.</p> : null}
         {error ? <p className="mt-3 text-sm font-semibold text-red-700">{error}</p> : null}
-        <p className="mt-4 text-sm leading-relaxed text-slate-500">Eligible installment options are displayed by Stripe at checkout when available for the purchase amount and customer. Approval and terms are determined by the payment provider.</p>
+        <p className="mt-4 text-sm leading-relaxed text-slate-500">Eligible payment or installment options are shown by the current payment provider when available. Approval and terms are determined by that provider.</p>
       </aside>
     </div>
   );

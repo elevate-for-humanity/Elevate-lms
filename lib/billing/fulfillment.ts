@@ -261,7 +261,12 @@ export async function fulfillPaidBillingInvoice(
       provider_invoice_id: job.billing_invoice_id,
     });
     if (result.error) throw new Error(result.error.message);
-    if (payload.slot_id) await db.rpc('increment_slot_booked_count', { slot_id: payload.slot_id });
+    if (payload.slot_id) {
+      for (let seat = 0; seat < Number(payload.participant_count || 1); seat += 1) {
+        const increment = await db.rpc('increment_slot_booked_count', { slot_id: payload.slot_id });
+        if (increment.error) throw new Error(increment.error.message);
+      }
+    }
     return;
   }
 

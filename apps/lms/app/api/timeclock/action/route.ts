@@ -484,6 +484,14 @@ async function _POST(request: NextRequest) {
         resolvedPartnerId = shop?.partner_id ?? null;
       }
       if (!resolvedPartnerId) {
+        await writeComplianceAlert(db, 'timeclock_configuration_error', {
+          apprentice_id: apprentice.id,
+          site_id,
+          shop_id: site.shop_id,
+          reason: 'partner_not_resolved',
+          action,
+          timestamp: serverNow,
+        });
         logger.warn('[Timeclock] no partner configured for apprentice site', {
           apprentice_id: apprentice.id,
           site_id,
@@ -539,6 +547,15 @@ async function _POST(request: NextRequest) {
         .single();
 
       if (insertError || !newEntry) {
+        await writeComplianceAlert(db, 'timeclock_persistence_error', {
+          apprentice_id: apprentice.id,
+          site_id,
+          program_id: resolvedProgramId,
+          partner_id: resolvedPartnerId,
+          action,
+          database_error: insertError?.message || 'unknown insert failure',
+          timestamp: serverNow,
+        });
         logger.error('[Timeclock] clock_in insert failed', insertError);
         return NextResponse.json({ error: 'Failed to clock in' }, { status: 500 });
       }

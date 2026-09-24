@@ -202,7 +202,7 @@ export default async function PhonePage() {
             screen sharing, and communication history.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link
             href="/phone/email"
             className="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-black text-white"
@@ -288,7 +288,7 @@ export default async function PhonePage() {
           {numbers.length ? (
             <ul className="mt-3 divide-y divide-slate-100">
               {numbers.map((item: any) => (
-                <li key={item.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+                <li key={item.id} className="grid gap-3 py-3 text-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
                   <span>
                     <b>{item.label}</b>
                     <br />
@@ -304,7 +304,7 @@ export default async function PhonePage() {
                   </span>
                   <form
                     action={assignPhoneNumber}
-                    className="grid min-w-64 gap-2 sm:grid-cols-[1fr_5rem_auto]"
+                    className="grid w-full min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_5rem_auto] md:col-span-2"
                   >
                     <input type="hidden" name="phoneNumberId" value={item.id} />
                     <select
@@ -353,7 +353,7 @@ export default async function PhonePage() {
           {destinations.length ? (
             <ul className="mt-3 divide-y divide-slate-100">
               {destinations.map((item: any) => (
-                <li key={item.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+                <li key={item.id} className="grid gap-3 py-3 text-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
                   <span>
                     <b>{item.name}</b>
                     {item.department ? (

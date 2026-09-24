@@ -116,11 +116,11 @@ export default function CloudBrowserWorkspace({
         if (cancelled || targetEditedRef.current) return;
         const configuredTarget =
           typeof payload.defaultPreviewUrl === 'string' ? payload.defaultPreviewUrl.trim() : '';
-        setTarget(configuredTarget || `${window.location.origin}/dashboard`);
+        setTarget(configuredTarget || '');
       })
       .catch(() => {
         if (!cancelled && !targetEditedRef.current) {
-          setTarget(`${window.location.origin}/dashboard`);
+          setTarget('');
         }
       });
     return () => {

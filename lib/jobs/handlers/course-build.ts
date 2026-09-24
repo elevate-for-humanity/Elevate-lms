@@ -153,28 +153,39 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
         jobId: job.id,
         toolArgs: job.tool_args,
       });
-      const paidExecution = await executePaidInference({
-        db,
-        authorize: () =>
-          reservePaidInference(db, {
-            scopeKey: `job:${job.id}`,
-            actorId: job.user_id ?? null,
-            jobId: job.id,
-            artifactFingerprint,
-            idempotencyKey: `course-builder-job:${job.id}`,
-            provider: process.env.AI_PROVIDER?.trim() || 'configured',
-            model: process.env.AI_MODEL?.trim() || 'course-factory-router',
-            operation: 'course-builder-generate',
-            projectedCostMicros,
-          }),
-        dispatch: () => courseFactory(job.tool_args, progress),
-      });
-      if (paidExecution.decision !== 'approved' || !paidExecution.value) {
-        throw new Error(
-          `PAID_INFERENCE_${paidExecution.decision.toUpperCase()}:course-build`,
-        );
+      const isSelectiveRepair =
+        job.tool_args.mode === 'missing-only' &&
+        job.tool_args.contentSource === 'curriculum_lessons' &&
+        Boolean(job.tool_args.courseId);
+      if (isSelectiveRepair) {
+        // Existing authored courses must enter the Blueprint repair/validation
+        // path directly. Paid inference is authorized later only for the exact
+        // failed component that truly needs provider work.
+        result = await courseFactory(job.tool_args, progress);
+      } else {
+        const paidExecution = await executePaidInference({
+          db,
+          authorize: () =>
+            reservePaidInference(db, {
+              scopeKey: `job:${job.id}`,
+              actorId: job.user_id ?? null,
+              jobId: job.id,
+              artifactFingerprint,
+              idempotencyKey: `course-builder-job:${job.id}`,
+              provider: process.env.AI_PROVIDER?.trim() || 'configured',
+              model: process.env.AI_MODEL?.trim() || 'course-factory-router',
+              operation: 'course-builder-generate',
+              projectedCostMicros,
+            }),
+          dispatch: () => courseFactory(job.tool_args, progress),
+        });
+        if (paidExecution.decision !== 'approved' || !paidExecution.value) {
+          throw new Error(
+            `PAID_INFERENCE_${paidExecution.decision.toUpperCase()}:course-build`,
+          );
+        }
+        result = paidExecution.value;
       }
-      result = paidExecution.value;
     } finally {
       clearInterval(heartbeat);
       await Promise.allSettled(progressWrites);

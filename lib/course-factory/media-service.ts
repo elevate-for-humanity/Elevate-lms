@@ -11,6 +11,7 @@ import {
   getInstructorById,
   getInstructorForCourse,
 } from '@/lib/ai-instructors';
+import { recommendLicensedMediaForCourse } from '@/lib/course-builder/licensed-media';
 
 export interface QueueCourseLessonVideosInput {
   courseId: string;
@@ -190,6 +191,13 @@ export async function queueCourseLessonVideos(
     .eq('course_id', input.courseId);
   if (jobsError) throw new Error(`Failed to load existing video jobs: ${jobsError.message}`);
 
+  // Refresh Envato/licensed-library recommendations before queueing. The
+  // renderer consumes only stored/attached source_broll; recommendations do
+  // not invent media or silently invoke a generation provider.
+  if (!input.validateOnly) {
+    await recommendLicensedMediaForCourse({ db, courseId: input.courseId });
+  }
+
   const existingByAsset = new Map<string, VideoJob>();
   for (const job of (existingJobs ?? []) as VideoJob[]) {
     existingByAsset.set(
@@ -365,8 +373,8 @@ export async function queueCourseLessonVideos(
                     ...(allowPaidNarration ? { provider: 'cloudflare' } : {}),
                   },
                   visuals: {
-                    strategy: 'licensed_envato_then_existing_then_generated',
-                    generated_only_for_exact_instructional_evidence: true,
+                    strategy: 'licensed_envato_then_existing',
+                    generated_only_for_exact_instructional_evidence: false,
                   },
                 },
               },

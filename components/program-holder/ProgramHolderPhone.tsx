@@ -41,7 +41,7 @@ type InboxItem = {
 type PhoneData = {
   phoneNumber: string;
   system: { name: string; timezone: string; status: string };
-  notifications: { emailMissedCalls: boolean };
+  notifications: { emailMissedCalls: boolean; smsMissedCalls: boolean; smsPhone: string };
   extension: {
     id: string;
     extension: string;
@@ -276,6 +276,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
         ringSeconds: data.extension.ringSeconds,
         voicemailGreeting: data.extension.voicemailGreeting,
         emailMissedCalls: data.notifications.emailMissedCalls,
+          smsMissedCalls: data.notifications.smsMissedCalls,
       }),
     });
     const result = await response.json().catch(() => ({}));
@@ -673,6 +674,20 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
             <span>
               Email me a privacy-safe alert when PARIS takes a call. Caller details stay inside the
               secure dashboard.
+            </span>
+          </label>
+          <label className="mt-3 flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-800">
+            <input
+              type="checkbox"
+              checked={data.notifications.smsMissedCalls}
+              disabled={!data.notifications.smsPhone}
+              onChange={(event) =>
+                setData((current) => current ? { ...current, notifications: { ...current.notifications, smsMissedCalls: event.target.checked } } : current)
+              }
+              className="mt-0.5 h-5 w-5 shrink-0 accent-blue-700"
+            />
+            <span>
+              Text me a privacy-safe alert when PARIS takes a call{data.notifications.smsPhone ? ` at ${friendlyNumber(data.notifications.smsPhone)}` : '. Add an SMS phone number in notification settings first'}.
             </span>
           </label>
           <p className="mt-4 text-xs leading-5 text-slate-500">

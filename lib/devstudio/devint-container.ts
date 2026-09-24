@@ -120,6 +120,12 @@ export const AI_STUDIO_DEVINT_CONTAINER = {
         'No undefined .map()',
         'No direct provider calls',
         'All saves transactional',
+        'Course Builder Blueprint is the sole curriculum generation source of logic',
+        'Dev Studio commands Course Builder; it never generates curriculum in parallel',
+        'Existing courses use Blueprint selective repair: preserve passing components and regenerate only failed or missing components',
+        'Every Blueprint gate must validate before publication',
+        'Narration must use a verified professional provider and robotic/diagnostic narration must fail',
+        'Licensed Envato media is evaluated before replacement generation and every scene must teach the mapped narration cue',
       ],
       stabilization: [
         'Defensive DTO normalization',

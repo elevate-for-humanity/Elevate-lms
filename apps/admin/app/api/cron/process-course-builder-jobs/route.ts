@@ -117,6 +117,7 @@ async function _GET(request: Request) {
     after(async () => {
       const url = new URL('/api/cron/process-course-builder-jobs', request.url);
       await fetch(url, {
+        method: 'POST',
         headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
         cache: 'no-store',
       }).catch((cause) =>

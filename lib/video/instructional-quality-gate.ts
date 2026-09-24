@@ -197,15 +197,14 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
   const lessonKind =
     `${input.lessonType ?? ''} ${input.evidenceType ?? ''} ${input.lessonTitle}`.toLowerCase();
   const isAssessment = /\b(checkpoint|quiz|exam|assessment|review)\b/.test(lessonKind);
-  // Keep the practical safety contract tied to actual service procedures. Broad
-  // words such as "style" and "demonstrate" also occur in retail, consultation,
-  // and business lessons and previously misclassified those non-procedural
-  // lessons as hands-on beauty services.
+  // Keep the practical safety contract tied to the lesson identity, not incidental
+  // words in learner narration. Theory lessons can legitimately mention a
+  // practical exam or styling products without becoming hands-on procedures.
   const practicalBeautyLesson =
     !isAssessment &&
     (courseDomain === 'cosmetology' || courseDomain === 'barbering') &&
-    /\b(cut|cutting|clipper|shear|razor|shav|fade|styling|updo|blow[- ]?dry|thermal|curling|flat iron|color(?:ing)?|chemical|relax|perm|sanit|disinfect|drape|facial|manicur|nail|procedure|practical|hands-on)\b/i.test(
-      `${input.lessonTitle} ${input.script}`,
+    /\b(cut|cutting|clipper|shear|razor|shav|fade|styling|updo|blow[- ]?dry|thermal|curling|flat iron|color(?:ing)?|chemical|relax|perm|sanit|disinfect|drape|facial|manicur|pedicur|nail|shampoo|scalp massage|scalp treatment|wax|thread|braid|twist|procedure|practical|hands-on)\b/i.test(
+      lessonKind,
     );
 
   if (scriptWords.length < minimumWordCount) {

@@ -94,8 +94,8 @@ export function NewSystemNotice({
 }) {
   return (
     <section className="rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50 to-blue-50 p-5 shadow-sm">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex gap-3">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 gap-3">
           <span className="rounded-xl bg-indigo-700 p-2 text-white">
             <Sparkles className="h-5 w-5" />
           </span>
@@ -114,12 +114,12 @@ export function NewSystemNotice({
           </div>
         </div>
         <form action={dismissAction}>
-          <button className="rounded-lg border border-indigo-200 bg-white px-3 py-1.5 text-xs font-bold text-indigo-800">
+          <button className="w-full rounded-lg border border-indigo-200 bg-white px-3 py-2 text-sm font-bold text-indigo-800 sm:w-auto sm:py-1.5 sm:text-xs">
             Dismiss
           </button>
         </form>
       </div>
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
         {steps.map((item, index) => (
           <div
             key={item.label}

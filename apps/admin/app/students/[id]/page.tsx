@@ -42,11 +42,11 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
     .maybeSingle();
   if (!student) notFound();
 
-  const [enrollmentsRes, applicationsRes, progressRes, barberSubRes] = await Promise.all([
+  const [enrollmentsRes, applicationsRes, progressRes, billingRes] = await Promise.all([
     db.from('program_enrollments').select('id,status,enrolled_at,payment_status,amount_paid_cents,program_id,program_slug,program_holder_id,student_start_date,voucher_issued_date,voucher_paid_date,payout_due_date,payout_status,payout_paid_date,payout_notes').eq('user_id', id).order('enrolled_at', { ascending: false }),
     db.from('applications').select('id,email,status,program_interest,program_slug,created_at,submitted_at,reviewed_at,review_notes,funding_type').eq('user_id', id).order('created_at', { ascending: false }),
     db.from('lesson_progress').select('id', { count: 'exact', head: true }).eq('user_id', id).eq('completed', true),
-    db.from('barber_subscriptions').select('id,status,payment_status,weekly_payment_cents,weeks_remaining,remaining_balance,full_tuition_amount,amount_paid_at_checkout,stripe_customer_id,stripe_subscription_id,failed_payment_at,suspension_deadline,suspended_at,welcome_email_sent_at,dashboard_invite_sent_at,created_at').eq('user_id', id).maybeSingle(),
+    db.from('billing_invoices').select('id,provider,provider_invoice_id,invoice_number,total_cents,status,due_at,paid_at,created_at,fulfillment_type,fulfillment_payload').eq('customer_external_key', `user:${id}`).order('created_at', { ascending: false }).limit(20),
   ]);
 
   if (enrollmentsRes.error) logger.error('[student-detail] enrollments query failed', enrollmentsRes.error);
@@ -54,7 +54,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
 
   const enrollments = enrollmentsRes.data ?? [];
   const applications = applicationsRes.data ?? [];
-  const barberSub = barberSubRes.data;
+  const billingInvoices = billingRes.data ?? [];
   const programIds = [...new Set(enrollments.map((row) => row.program_id).filter((value): value is string => Boolean(value)))];
   const programNames: Record<string, string> = {};
   if (programIds.length) {
@@ -133,7 +133,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
 
           {voucherPanels.map(({ enrollment, auditLog }) => <EnrollmentVoucherPanel key={enrollment.id} data={{ enrollment_id: enrollment.id, student_name: name, program_name: programNames[enrollment.program_id || ''] || enrollment.program_slug || 'Program', partner_name: enrollment.program_holder_id ? programHolders[enrollment.program_holder_id] || null : null, student_start_date: enrollment.student_start_date, voucher_issued_date: enrollment.voucher_issued_date, voucher_paid_date: enrollment.voucher_paid_date, payout_due_date: enrollment.payout_due_date, payout_status: (enrollment.payout_status as 'not_triggered' | 'pending' | 'due' | 'overdue' | 'paid') || 'not_triggered', payout_paid_date: enrollment.payout_paid_date, payout_paid_by_name: null, payout_notes: enrollment.payout_notes, audit_log: auditLog }} />)}
 
-          {barberSub && <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between gap-3"><h2 className="flex items-center gap-2 font-black text-slate-950"><CreditCard className="h-4 w-4" />Barber Apprenticeship Billing</h2><Badge status={barberSub.payment_status || barberSub.status} /></div><div className="mt-3"><InfoRow label="Weekly Payment" value={barberSub.weekly_payment_cents ? `${fmtUsd(barberSub.weekly_payment_cents)} / week` : '—'} /><InfoRow label="Weeks Remaining" value={barberSub.weeks_remaining != null ? `${barberSub.weeks_remaining} weeks` : '—'} /><InfoRow label="Remaining Balance" value={barberSub.remaining_balance != null ? `$${Number(barberSub.remaining_balance).toLocaleString()}` : '—'} /><InfoRow label="Stripe Customer" value={barberSub.stripe_customer_id || '—'} /><InfoRow label="Stripe Subscription" value={barberSub.stripe_subscription_id || 'Not created'} /><InfoRow label="Suspension Deadline" value={fmtDate(barberSub.suspension_deadline)} /></div></section>}
+          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between gap-3"><h2 className="flex items-center gap-2 font-black text-slate-950"><CreditCard className="h-4 w-4" />Billing</h2><span className="text-xs font-bold text-slate-500">{billingInvoices.length} recent invoice{billingInvoices.length === 1 ? '' : 's'}</span></div>{billingInvoices.length ? <div className="mt-3 divide-y divide-slate-100">{billingInvoices.map((invoice:any)=><div key={invoice.id} className="py-3"><div className="flex items-center justify-between gap-3"><div><p className="font-bold capitalize text-slate-900">{invoice.provider || 'Elevate'} {invoice.invoice_number ? `#${invoice.invoice_number}` : 'invoice'}</p><p className="text-xs text-slate-500">{invoice.fulfillment_type?.replaceAll('_',' ') || 'billing'} · {fmtDate(invoice.paid_at || invoice.due_at || invoice.created_at)}</p></div><div className="text-right"><p className="font-black text-slate-900">{fmtUsd(invoice.total_cents)}</p><Badge status={invoice.status} /></div></div></div>)}</div>:<p className="mt-3 text-sm text-slate-500">No billing invoices recorded.</p>}</section>
 
           <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="border-b border-slate-100 px-5 py-4"><h2 className="flex items-center gap-2 font-black text-slate-950"><FileText className="h-4 w-4" />Applications</h2></div>{applications.length ? <div className="divide-y divide-slate-100">{applications.map((application) => {
             const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(application.id);

@@ -149,7 +149,7 @@ export default async function PhonePage() {
     aiLanguage: system?.ai_language ?? 'en-US',
     aiInstructions:
       system?.ai_instructions ??
-      'Identify yourself as PARIS with Elevate for Humanity. Use the live enabled extension directory to name staff and their extensions, then offer to transfer the caller. Never identify an individual staff member as the administrator unless their live role says so. Collect caller information when needed and transfer to a person when requested or uncertain.',
+      'Identify yourself as PARIS with Elevate for Humanity. Answer ordinary caller questions first using verified Elevate website and platform knowledge. Use the live enabled extension directory when the caller asks for a person or department or needs a human. Name the staff member and extension before offering the transfer. Never identify an individual staff member as the administrator unless their live role says so. Never guess unverified program, funding, enrollment, licensing, payment, or compliance information; offer a human transfer when uncertain.',
     aiAllowInterruptions: system?.ai_allow_interruptions ?? true,
     aiHumanHandoffEnabled: system?.ai_human_handoff_enabled ?? true,
   };

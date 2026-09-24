@@ -123,10 +123,22 @@ export async function recommendLicensedMediaForCourse(input: {
 
   const suggestions: Array<Record<string, unknown>> = [];
   for (const lesson of lessons ?? []) {
+    // Licensed media is selected against the actual teaching/narration context,
+    // not merely the lesson title. This lets Envato assets follow the spoken
+    // instruction and prevents generic decorative footage from winning.
+    const content = lesson.content && typeof lesson.content === 'object'
+      ? (lesson.content as Record<string, unknown>)
+      : {};
+    const experience = content.experience && typeof content.experience === 'object'
+      ? (content.experience as Record<string, unknown>)
+      : {};
     const lessonText = [
       lesson.title,
-      lesson.content,
+      typeof lesson.content === 'string' ? lesson.content : JSON.stringify(lesson.content ?? {}),
       JSON.stringify(lesson.learning_objectives ?? []),
+      typeof experience.narrationScript === 'string' ? experience.narrationScript : '',
+      typeof experience.visualPrompt === 'string' ? experience.visualPrompt : '',
+      JSON.stringify(experience.instructionalTimeline ?? {}),
     ]
       .filter(Boolean)
       .join(' ');
@@ -135,7 +147,7 @@ export async function recommendLicensedMediaForCourse(input: {
         entitlement,
         ...scoreLicensedMediaMatch(lessonText, entitlement.title),
       }))
-      .filter((match) => match.score > 0)
+      .filter((match) => match.score >= 0.15)
       .sort((a, b) => b.score - a.score)
       .slice(0, 3);
     for (const match of ranked) {

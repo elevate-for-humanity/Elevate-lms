@@ -51,10 +51,10 @@ permissions:
 
 concurrency:
   group: northflank-admin-deploy
-  # Only the newest main-branch admin release is authoritative. Cancel an
-  # obsolete run so a stuck Northflank build cannot block an urgent production
-  # repair from reaching the live service.
-  cancel-in-progress: true
+  # Serialize production deployments. Once a verified build has been handed to
+  # Northflank, a newer push must wait rather than cancel deployment
+  # verification and waste the completed build.
+  cancel-in-progress: false
 
 jobs:
   deploy-admin:
@@ -237,6 +237,7 @@ jobs:
           done
 
       - name: Generate this week's apprentice invoice fallback batch
+        continue-on-error: true
         run: |
           curl -sf -X POST "https://admin.elevateforhumanity.org/api/cron/generate-apprentice-invoices" \
             -H "Authorization: Bearer $CRON_SECRET" \

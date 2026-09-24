@@ -57,6 +57,8 @@ export default function TestingCheckoutClient({
   const [slots, setSlots] = useState<TestingSlot[]>([]);
   const [slotId, setSlotId] = useState('');
   const [slotsLoading, setSlotsLoading] = useState(false);
+  const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
 
   const provider = useMemo(() => providers.find((p) => p.key === providerKey) ?? null, [providers, providerKey]);
   const exam = useMemo(
@@ -99,7 +101,7 @@ export default function TestingCheckoutClient({
   const examSubtotal = (exam?.amountCents ?? 0) * quantity;
   const addOnAmount = addOn && provider?.addOn ? provider.addOn.amountCents : 0;
   const total = examSubtotal + addOnAmount;
-  const checkoutReady = Boolean(provider && exam && exam.amountCents && exam.amountCents > 0 && slotId);
+  const checkoutReady = Boolean(provider && exam && exam.amountCents && exam.amountCents > 0 && slotId && customerName.trim() && customerEmail.trim());
 
   async function checkout() {
     if (!provider || !exam || !checkoutReady || loading) return;
@@ -116,6 +118,8 @@ export default function TestingCheckoutClient({
           participantCount: quantity,
           addOn,
           slotId,
+          name: customerName.trim(),
+          email: customerEmail.trim(),
         }),
       });
       const data = await response.json();
@@ -162,6 +166,17 @@ export default function TestingCheckoutClient({
               </button>
             );
           })}
+        </div>
+
+        <div className="mt-7 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="testing-customer-name" className="block text-base font-bold text-slate-800">Full name</label>
+            <input id="testing-customer-name" type="text" autoComplete="name" value={customerName} onChange={(event) => setCustomerName(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-base" placeholder="Test taker or contact name" />
+          </div>
+          <div>
+            <label htmlFor="testing-customer-email" className="block text-base font-bold text-slate-800">Email</label>
+            <input id="testing-customer-email" type="email" autoComplete="email" value={customerEmail} onChange={(event) => setCustomerEmail(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-base" placeholder="name@example.com" />
+          </div>
         </div>
 
         <div className="mt-7">
@@ -248,7 +263,7 @@ export default function TestingCheckoutClient({
           {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <CreditCard className="h-5 w-5" />}
           {loading ? 'Opening Checkout…' : 'Continue to Secure Checkout'}
         </button>
-        {!checkoutReady ? <p className="mt-3 text-sm text-amber-700">Select a priced exam and an available appointment before checkout.</p> : null}
+        {!checkoutReady ? <p className="mt-3 text-sm text-amber-700">Enter your name and email, then select a priced exam and an available appointment before checkout.</p> : null}
         {error ? <p className="mt-3 text-sm font-semibold text-red-700">{error}</p> : null}
         <p className="mt-4 text-sm leading-relaxed text-slate-500">Eligible payment or installment options are shown by the current payment provider when available. Approval and terms are determined by that provider.</p>
       </aside>

@@ -95,10 +95,10 @@ export const CAPABILITY_CATALOG: PlatformCapability[] = [
     key: PlatformFeature.INVOICING,
     name: 'Invoicing & Payments',
     category: 'business',
-    description: 'Invoices, payment records and Stripe-backed commerce workflows.',
+    description: 'Invoices, payment records and connected commerce workflows.',
     status: 'sell_now',
     adminHref: '/billing/invoices',
-    keywords: ['invoice', 'payments', 'stripe', 'billing'],
+    keywords: ['invoice', 'payments', 'billing', 'quickbooks', 'paypal'],
   },
   {
     key: PlatformFeature.SEO_AUTOPILOT,

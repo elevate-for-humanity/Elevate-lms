@@ -136,7 +136,6 @@ export async function speakNaturalVoice(text: string, options: PlayOptions = {})
 }
 
 export function useNaturalVoice() {
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const playbackTokenRef = useRef(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -151,10 +150,6 @@ export function useNaturalVoice() {
       audioRef.current.currentTime = 0;
       audioRef.current = null;
     }
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
-    utteranceRef.current = null;
     setIsPlaying(false);
     setIsPaused(false);
     setIsLoading(false);
@@ -226,11 +221,6 @@ export function useNaturalVoice() {
       setIsPlaying(false);
       setIsPaused(true);
       return;
-    }
-    if (utteranceRef.current && typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.pause();
-      setIsPlaying(false);
-      setIsPaused(true);
     }
   }, []);
 

@@ -16,7 +16,6 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { adminUrl } from '@/lib/utils/url-factory';
 import { organization } from '@/lib/config/organization';
 import { normalizeApplicationModalityPreference } from '@/lib/applications/modality-preference';
-import { getStripe } from '@/lib/stripe/client';
 // approveApplication is called by /api/admin/applications/[id]/approve - not here
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -282,26 +281,22 @@ async function _POST(req: Request) {
 
     const applicationIntent = body.applicationIntent === 'enrollment' ? 'enrollment' : 'inquiry';
     if (applicationIntent === 'enrollment' && PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS.has(program)) {
-      const paymentSessionId = String(body.paymentSessionId || '').trim();
-      if (!paymentSessionId) {
+      const billingInvoiceId = String(body.billingInvoiceId || body.billing_invoice_id || '').trim();
+      if (!billingInvoiceId) {
         return NextResponse.json(
           { error: 'Verified payment is required before this enrollment application can be submitted.' },
           { status: 402, headers: corsHeadersForOrigin(origin, allowedOrigins) },
         );
       }
-      const stripe = getStripe();
-      if (!stripe) {
-        return NextResponse.json(
-          { error: 'Payment verification is temporarily unavailable.' },
-          { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) },
-        );
-      }
-      const paymentSession = await stripe.checkout.sessions.retrieve(paymentSessionId);
-      const paid = ['paid', 'no_payment_required'].includes(paymentSession.payment_status || '');
-      const paidProgram = paymentSession.metadata?.program_slug || '';
-      const paidEmail = (paymentSession.customer_details?.email || paymentSession.customer_email || '').toLowerCase().trim();
+      const { data: paidInvoice } = await supabase
+        .from('billing_invoices')
+        .select('id,status,customer_email,fulfillment_type,fulfillment_payload')
+        .eq('id', billingInvoiceId)
+        .eq('status', 'paid')
+        .maybeSingle();
+      const paidProgram = String((paidInvoice?.fulfillment_payload as any)?.program_slug || '');
       const applicantEmail = String(body.email || '').toLowerCase().trim();
-      if (!paid || paidProgram !== program || (paidEmail && paidEmail !== applicantEmail)) {
+      if (!paidInvoice || paidInvoice.fulfillment_type !== 'program_enrollment' || (paidProgram && paidProgram !== program) || String(paidInvoice.customer_email || '').toLowerCase().trim() !== applicantEmail) {
         return NextResponse.json(
           { error: 'Payment could not be verified for this applicant and program.' },
           { status: 402, headers: corsHeadersForOrigin(origin, allowedOrigins) },

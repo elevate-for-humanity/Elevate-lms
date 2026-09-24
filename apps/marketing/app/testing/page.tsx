@@ -99,6 +99,18 @@ export default function TestingPage() {
             exact exam you need before continuing to secure checkout.
           </p>
 
+          <div className="mt-7 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:flex-wrap">
+            <Link href="/testing/book" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">
+              <CalendarDays className="h-5 w-5" /> Book a testing appointment
+            </Link>
+            <Link href="#providers" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-6 py-3 font-black text-slate-900 hover:bg-slate-50">
+              Browse exams & prices
+            </Link>
+            <Link href="/testing/for-employers" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-brand-blue-200 bg-brand-blue-50 px-6 py-3 font-black text-brand-blue-900">
+              Employer / group testing
+            </Link>
+          </div>
+
           <div className="mt-7 grid gap-3 sm:grid-cols-3">
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <ShieldCheck className="h-5 w-5 text-emerald-600" />
@@ -125,7 +137,7 @@ export default function TestingPage() {
         </div>
       </section>
 
-      <section className="py-14">
+      <section id="providers" className="scroll-mt-24 py-14">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mb-8 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>

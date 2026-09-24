@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import Link from 'next/link';
 import {
@@ -25,6 +26,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { useCourse, type StudioPanel } from './CourseProvider';
+
+const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), { ssr: false });
 
 const PANELS: Array<{
   id: StudioPanel;
@@ -252,6 +255,7 @@ export function CourseStudioApplication({
 }) {
   const [previewOpen, setPreviewOpen] = useState(true);
   const [previewRevision, setPreviewRevision] = useState(0);
+  const [cloudBrowserOpen, setCloudBrowserOpen] = useState(false);
   const { state } = useCourse();
   const previewUrl = `/api/admin/course-builder/preview?courseId=${encodeURIComponent(state.course.id)}`;
 
@@ -269,6 +273,16 @@ export function CourseStudioApplication({
         embedded={embedded}
       />
       <PublishProgress />
+      <div className="border-b border-slate-200 bg-slate-950 px-3 py-2 text-white">
+        <button type="button" onClick={() => setCloudBrowserOpen((value) => !value)} className="rounded-lg border border-cyan-500/50 px-3 py-1.5 text-xs font-bold text-cyan-200 hover:bg-cyan-500/10">
+          {cloudBrowserOpen ? 'Hide Cloud Studio browser' : 'Open Cloud Studio browser'}
+        </button>
+      </div>
+      {cloudBrowserOpen ? (
+        <div className="h-[52vh] min-h-[34rem] border-b border-slate-700 bg-slate-950">
+          <CloudBrowserWorkspace autoStart initialTarget={typeof window !== 'undefined' ? window.location.href : ''} />
+        </div>
+      ) : null}
       <div
         className={`grid flex-1 ${embedded ? 'items-start overflow-visible' : 'min-h-0 overflow-hidden'} ${previewOpen ? 'xl:grid-cols-[minmax(0,1fr)_minmax(520px,46vw)]' : 'grid-cols-1'}`}
       >

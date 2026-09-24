@@ -10,36 +10,11 @@ const money = (value: unknown) =>
 export default async function AdminBillingInvoicesPage() {
   await requireRole(['admin']);
   const db = await requireAdminClient();
-  const [{ data: current, error: currentError }, { data: history, error: historyError }] =
-    await Promise.all([
-      db
-        .from('billing_invoices')
-        .select(
-          'id,provider,invoice_number,customer_external_key,customer_email,total_cents,status,due_at,paid_at,payment_url,created_at',
-        )
-        .order('created_at', { ascending: false })
-        .limit(250),
-      db
-        .from('invoices')
-        .select(
-          'id,user_id,invoice_number,amount,total,currency,status,due_date,paid_at,created_at',
-        )
-        .order('created_at', { ascending: false })
-        .limit(250),
-    ]);
-  const invoices = [
-    ...(current || []).map((row: any) => ({
-      ...row,
-      user_id: row.customer_email || row.customer_external_key,
-      total: Number(row.total_cents) / 100,
-      due_date: row.due_at,
-    })),
-    ...(history || []).map((row: any) => ({
-      ...row,
-      provider: 'stripe history',
-      payment_url: null,
-    })),
-  ].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+  const { data: current, error: currentError } = await db
+    .from('billing_invoices')
+    .select('id,provider,invoice_number,customer_external_key,customer_email,total_cents,status,due_at,paid_at,payment_url,created_at')
+    .order('created_at', { ascending: false }).limit(500);
+  const invoices = (current || []).map((row:any)=>({ ...row, user_id: row.customer_email || row.customer_external_key, total:Number(row.total_cents)/100, due_date:row.due_at }));
   const open = invoices.filter((row) =>
     ['pending', 'open', 'unpaid', 'overdue', 'past_due'].includes(String(row.status).toLowerCase()),
   );
@@ -50,7 +25,7 @@ export default async function AdminBillingInvoicesPage() {
         <div>
           <h1 className="text-2xl font-bold">All invoices</h1>
           <p className="text-sm text-slate-600">
-            QuickBooks activity and preserved Stripe history in one ledger.
+            Current provider invoices from the canonical Elevate billing ledger.
           </p>
         </div>
         <CreateQuickBooksInvoice />
@@ -65,7 +40,7 @@ export default async function AdminBillingInvoicesPage() {
           <p className="text-2xl font-bold">{open.length}</p>
         </div>
       </div>
-      {currentError || historyError ? (
+      {currentError ? (
         <p className="rounded-xl border border-amber-200 bg-amber-50 p-4">
           Some invoice history could not be loaded.
         </p>
@@ -125,7 +100,7 @@ export default async function AdminBillingInvoicesPage() {
         </table>
       </div>
       <p className="text-xs text-slate-500">
-        New invoices are created in QuickBooks. Stripe is archive-only.{' '}
+        New invoices are created through the current Elevate billing system.{' '}
         <Link href="/settings/payments" className="underline">
           Payment settings
         </Link>

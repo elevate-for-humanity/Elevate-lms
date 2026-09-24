@@ -247,6 +247,18 @@ export default async function HostShopDashboardView() {
       image: '/images/pages/admin-employers-hero.webp',
     },
     {
+      href: '/host-shop/phone',
+      title: 'Host Shop phone',
+      detail: 'Connect the assigned Elevate extension, receive routed calls, and review PARIS callback intake.',
+      image: '/images/pages/program-holder-page-1.webp',
+    },
+    {
+      href: '/host-shop/meetings',
+      title: 'Meetings & screen share',
+      detail: 'Join secure browser meetings with camera, microphone, chat, and screen sharing when enabled.',
+      image: '/images/heroes/lms-analytics.webp',
+    },
+    {
       href: '/host-shop/dashboard/resources',
       title: 'Guides, handbook & MOU',
       detail:

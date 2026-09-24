@@ -1148,12 +1148,21 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         await markAwaitingPaidApproval(job);
         return;
       }
+      // Provider availability must not strand an otherwise renderable lesson.
+      // Full lesson jobs fall back to the deterministic CPU/Remotion path;
+      // only explicitly paid microclips remain blocked by paid-provider outages.
+      if (job.asset_kind !== 'microclip') {
+        logger.warn('[video-worker] Paid provider unavailable; using deterministic lesson renderer', {
+          jobId: job.id,
+          decision: authorization.decision,
+        });
+        await runClaimedVideoJob(job);
+        return;
+      }
       await markFailed(
         job.id,
         `Paid media authorization blocked: ${authorization.decision}`,
-        {
-          provider: 'paid-inference-gateway',
-        },
+        { provider: 'paid-inference-gateway' },
         job.lease_token,
       );
       return;

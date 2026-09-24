@@ -203,7 +203,7 @@ export default async function PhonePage() {
             screen sharing, and communication history.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto sm:flex-wrap">
           <Link
             href="/phone/email"
             className="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-black text-white"
@@ -289,7 +289,7 @@ export default async function PhonePage() {
           {numbers.length ? (
             <ul className="mt-3 divide-y divide-slate-100">
               {numbers.map((item: any) => (
-                <li key={item.id} className="grid gap-3 py-3 text-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+                <li key={item.id} className="grid min-w-0 gap-3 py-4 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
                   <span>
                     <b>{item.label}</b>
                     <br />
@@ -300,12 +300,12 @@ export default async function PhonePage() {
                         : 'workspace number'}
                     </span>
                   </span>
-                  <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800">
+                  <span className="w-fit rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800">
                     {item.status}
                   </span>
                   <form
                     action={assignPhoneNumber}
-                    className="grid w-full min-w-0 gap-2 sm:grid-cols-[minmax(0,1fr)_5rem_auto] md:col-span-2"
+                    className="grid w-full min-w-0 gap-2 sm:col-span-2 sm:grid-cols-[minmax(0,1fr)_5rem_auto]"
                   >
                     <input type="hidden" name="phoneNumberId" value={item.id} />
                     <select
@@ -365,7 +365,7 @@ export default async function PhonePage() {
                       {item.destination_type === 'webrtc'
                         ? `PWA extension ${extensions.find((extension: any) => extension.id === item.extension_id)?.extension ?? 'unassigned'}`
                         : item.destination_type === 'phone'
-                          ? `Administrator fallback · ${formatUsPhone(item.destination)}`
+                          ? `Main Office fallback · ${formatUsPhone(item.destination)}`
                           : 'PARIS / voicemail route'}{' '}
                       · rings {item.ring_seconds}s
                     </span>
@@ -374,7 +374,7 @@ export default async function PhonePage() {
                     {system?.default_destination_id !== item.id ? (
                       <form action={setDefaultDestination}>
                         <input type="hidden" name="destinationId" value={item.id} />
-                        <button className="rounded-lg border px-2 py-1 text-xs font-bold">
+                        <button className="min-h-11 rounded-lg border px-3 py-2 text-xs font-bold leading-tight">
                           Make default
                         </button>
                       </form>
@@ -392,7 +392,7 @@ export default async function PhonePage() {
                     </form>
                     <form action={testDestination}>
                       <input type="hidden" name="destinationId" value={item.id} />
-                      <button className="rounded-lg border border-indigo-300 px-2 py-1 text-xs font-bold text-indigo-700">
+                      <button className="min-h-11 rounded-lg border border-indigo-300 px-3 py-2 text-xs font-bold leading-tight text-indigo-700">
                         Test call
                       </button>
                     </form>

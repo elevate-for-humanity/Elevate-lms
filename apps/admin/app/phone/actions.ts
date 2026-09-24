@@ -463,9 +463,9 @@ export async function assignPhoneNumber(formData: FormData): Promise<void> {
       .from('profiles')
       .select('id,role')
       .eq('id', profileId)
-      .in('role', ['program_holder', 'programholder'])
+      .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder'])
       .maybeSingle();
-    if (!profile) throw new Error('Select a valid Program Holder account.');
+    if (!profile) throw new Error('Select a valid staff or Program Holder account.');
   }
   const { error } = await db
     .from('phone_numbers')
@@ -483,15 +483,15 @@ export async function saveProgramHolderExtension(formData: FormData): Promise<vo
   const extension = String(formData.get('extension') ?? '').trim();
   const department = String(formData.get('department') ?? '').trim() || null;
   if (!profileId || !/^\d{2,6}$/.test(extension)) {
-    throw new Error('Select a Program Holder and enter a 2 to 6 digit extension.');
+    throw new Error('Select a staff member or Program Holder and enter a 2 to 6 digit extension.');
   }
   const { data: profile } = await db
     .from('profiles')
     .select('id,full_name,email,role')
     .eq('id', profileId)
-    .in('role', ['program_holder', 'programholder'])
+    .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder'])
     .maybeSingle();
-  if (!profile) throw new Error('Select a valid Program Holder account.');
+  if (!profile) throw new Error('Select a valid staff or Program Holder account.');
   const { data: savedExtension, error } = await db
     .from('communication_extensions')
     .upsert(
@@ -499,7 +499,7 @@ export async function saveProgramHolderExtension(formData: FormData): Promise<vo
         workspace_id: workspace.id,
         profile_id: profile.id,
         extension,
-        display_name: profile.full_name || profile.email || 'Program Holder',
+        display_name: profile.full_name || profile.email || 'Team member',
         department,
         enabled: true,
         updated_at: new Date().toISOString(),

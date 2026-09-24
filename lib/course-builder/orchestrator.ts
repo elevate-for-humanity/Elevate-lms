@@ -241,8 +241,6 @@ export async function publishGovernedCourse(
   }
 
   const blueprint = adaptProgramTemplateToBlueprint(template);
-  progress?.('contract', 'Walking the canonical course contract before repair.', 5);
-  const before = await validateCourseAgainstContract(courseId);
   const result = await courseFactory(
     {
       programId: template.programId,
@@ -262,7 +260,6 @@ export async function publishGovernedCourse(
 
   return { ...gate, ok: gate.ok && result.ok, result, governance };
 }
-
 
 export type ContractWalkthroughStep = {
   order: number;
@@ -300,6 +297,8 @@ export async function repairCanonicalCourse(courseId: string, progress?: Progres
   if (error) throw error;
   if (!course) throw new Error('Course not found');
 
+  progress?.('contract', 'Walking the canonical course contract before repair.', 5);
+  const before = await validateCourseAgainstContract(courseId);
   const result = await courseFactory(
     {
       courseId,

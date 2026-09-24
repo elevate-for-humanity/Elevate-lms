@@ -20,6 +20,27 @@ import { adaptProgramTemplateToBlueprint } from './publish-adapter';
 import { requireAdminClient } from '../supabase/admin';
 import { assertCourseBuilderGenerationEnabled } from './generation-control';
 import { evaluatePersistedCredentialCourse } from '../course-factory/canonical-course-gate';
+import { REQUIRED_COURSE_GATES, type CourseGate } from '../course-package/readiness';
+
+export const COURSE_BUILDER_BLUEPRINT_STEPS = REQUIRED_COURSE_GATES.map((gate, index) => ({
+  order: index + 1,
+  gate,
+  repairScope: gate === 'narration' ? ['narration','audio','captions','transcript','storyboard_timing'] :
+    gate === 'visual_alignment' ? ['visuals','storyboard','media_provenance'] :
+    gate === 'knowledge_checks' ? ['knowledge_checks','remediation'] :
+    gate === 'interactive_practice' ? ['scenario','case_study','exercises','practical_task','interactives'] :
+    gate === 'learning_objectives' ? ['objectives','competency_mapping'] : [gate],
+})) as ReadonlyArray<{order:number;gate:CourseGate;repairScope:readonly string[]}>;
+
+export async function walkCourseBuilderBlueprint(courseId: string) {
+  const readiness = await evaluatePersistedCredentialCourse(courseId);
+  return COURSE_BUILDER_BLUEPRINT_STEPS.map((step) => ({
+    ...step,
+    pass: readiness.gates[step.gate],
+    findings: readiness.findings.filter((finding) => finding.gate === step.gate),
+    action: readiness.gates[step.gate] ? 'preserve' : 'repair_component',
+  }));
+}
 
 const courseProgramConfigSchema = z.object({
   id: z.string().uuid().optional(),

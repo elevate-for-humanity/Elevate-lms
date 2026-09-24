@@ -154,7 +154,7 @@ class AutomatedEnrollmentSystem {
 
       // Access Information
       access: {
-        elevate_portal_url: `https://elevateforhumanity.org/student-portal/${this.generateAccessToken()}`,
+        elevate_portal_url: `https://www.elevateforhumanity.org/student-portal/${this.generateAccessToken()}`,
         partner_course_url: null, // Will be set after partner integration
         login_credentials: null, // Will be generated
       },
@@ -214,7 +214,7 @@ class AutomatedEnrollmentSystem {
     const accessToken = this.generateAccessToken();
     const credentials = {
       elevate_portal: {
-        url: `https://elevateforhumanity.org/student-portal`,
+        url: `https://www.elevateforhumanity.org/student-portal`,
         username: enrollment.student.email,
         access_token: accessToken,
         enrollment_id: enrollment.id,
@@ -224,7 +224,7 @@ class AutomatedEnrollmentSystem {
         credentials: enrollment.access.login_credentials,
       },
       mobile_app: {
-        download_url: 'https://elevateforhumanity.org/mobile-app',
+        download_url: 'https://www.elevateforhumanity.org/mobile-app',
         login_code: this.generateMobileLoginCode(enrollment.id),
       },
     };
@@ -362,8 +362,8 @@ class AutomatedEnrollmentSystem {
         issued_by: 'Elevate for Humanity',
         issued_to: `${enrollment.student.firstName} ${enrollment.student.lastName}`,
         issued_date: new Date().toISOString(),
-        verification_url: `https://elevateforhumanity.org/verify/${enrollment.id}`,
-        pdf_url: `https://elevateforhumanity.org/certificates/${enrollment.id}/elevate.pdf`,
+        verification_url: `https://www.elevateforhumanity.org/verify/${enrollment.id}`,
+        pdf_url: `https://www.elevateforhumanity.org/certificates/${enrollment.id}/elevate.pdf`,
       },
       partner_certificate: {
         id: certificationData.partner_cert_id,

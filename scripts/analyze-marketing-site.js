@@ -13,7 +13,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 const path = require('path');
 
-const MARKETING_SITE = 'https://elevateforhumanity.org';
+const MARKETING_SITE = 'https://www.elevateforhumanity.org';
 const OUTPUT_DIR = './analysis';
 
 async function analyzeSite() {
@@ -365,9 +365,9 @@ async function analyzeSite() {
         instructions: [
           'Go to Pages → Homepage',
           'Add CTA button: "Enroll Now"',
-          'Link to: https://elevateforhumanity.org/signup',
+          'Link to: https://www.elevateforhumanity.org/signup',
           'Add "Student Login" button',
-          'Link to: https://elevateforhumanity.org/login',
+          'Link to: https://www.elevateforhumanity.org/login',
           'Add to navigation menu: "Student Portal"',
         ],
       },

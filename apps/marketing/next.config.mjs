@@ -111,6 +111,9 @@ const nextConfig = {
     scrollRestoration: false,
     workerThreads: false,
     cpus: 1,
+    // Large static builds can intermittently lose Next's async render context
+    // under CI contention. Retry the affected page instead of failing the release.
+    staticGenerationRetryCount: 3,
     // Next 15.5.25 server minification can break the AsyncLocalStorage context
     // used by static metadata generation, surfacing a false workUnitAsyncStorage
     // invariant for otherwise valid pages. Keep client minification enabled and

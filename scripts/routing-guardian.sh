@@ -206,7 +206,7 @@ mkdir -p "$SITEMAP_DIR"
   
   for route in "${ROUTES_MAP[@]}"; do
     echo "  <url>"
-    echo "    <loc>https://elevateforhumanity.org$route</loc>"
+    echo "    <loc>https://www.elevateforhumanity.org$route</loc>"
     echo "    <lastmod>$(date +%Y-%m-%d)</lastmod>"
     echo "    <changefreq>weekly</changefreq>"
     echo "    <priority>0.8</priority>"

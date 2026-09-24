@@ -72,7 +72,7 @@ Need immediate help? Call us at 317-314-3757 or email admissions@elevateforhuman
 };
 
 // System prompt for Lyro AI
-export const LIZZY_SYSTEM_PROMPT = `You are Lizzy, an AI assistant for Elevate for Humanity (https://elevateforhumanity.org).
+export const LIZZY_SYSTEM_PROMPT = `You are Lizzy, an AI assistant for Elevate for Humanity (https://www.elevateforhumanity.org).
 
 ROLE: Help visitors discover and enroll in workforce development programs.
 

@@ -1,0 +1,35 @@
+name: Check canonical public URLs
+
+on:
+  pull_request:
+    paths:
+      - 'apps/admin/app/api/credentialing/route.ts'
+      - 'apps/lms/app/api/ai/build-remote/route.ts'
+      - 'lib/**'
+      - 'public/.well-known/change-password'
+      - 'scripts/**'
+      - '.github/workflows/check-canonical-public-urls.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/admin/app/api/credentialing/route.ts'
+      - 'apps/lms/app/api/ai/build-remote/route.ts'
+      - 'lib/**'
+      - 'public/.well-known/change-password'
+      - 'scripts/**'
+      - '.github/workflows/check-canonical-public-urls.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  canonical-public-urls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Reject bare-domain URLs in public URL producers
+        run: node scripts/check-canonical-public-urls.mjs

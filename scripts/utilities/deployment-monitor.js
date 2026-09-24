@@ -3,7 +3,7 @@
 // Simple deployment monitor to check when flash sale goes live
 const https = require('https');
 
-const SITE_URL = 'https://elevateforhumanity.org';
+const SITE_URL = 'https://www.elevateforhumanity.org';
 const CHECK_PATHS = [
   '/flash-sale-store.html',
   '/license-dashboard.html',

@@ -219,27 +219,8 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
   },
 
   // ─── Content model ──────────────────────────────────────────────
-  deliveryModel: 'partner',
-  partnerCourses: [
-    {
-      courseId: 'hsi-cpr-aed',
-      label: 'CPR/AED Certification',
-      partnerName: 'Health & Safety Institute / AHA',
-      credentialIssued: 'AHA BLS CPR/AED Certificate',
-      duration: '4 hours',
-      required: true,
-      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
-    },
-    {
-      courseId: 'hsi-first-aid',
-      label: 'First Aid Certification',
-      partnerName: 'Health & Safety Institute / AHA',
-      credentialIssued: 'AHA Heartsaver First Aid Certificate',
-      duration: '4 hours',
-      required: true,
-      enrollmentUrl: 'https://www.hsi.com/courses/first-aid',
-    },
-  ],
+  deliveryModel: 'hybrid',
+  partnerCourses: [],
   microCourses: [
     {
       courseId: 'careersafe-osha10-general',

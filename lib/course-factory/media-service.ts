@@ -261,7 +261,7 @@ export async function queueCourseLessonVideos(
         lesson.video_config && typeof lesson.video_config === 'object'
           ? (lesson.video_config as Record<string, unknown>)
           : {};
-      const allowPaidNarration = videoConfig.allow_paid_narration === true;
+      const allowPaidNarration = false;
       const instructorId =
         [videoConfig.instructorId, videoConfig.instructor_id]
           .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
@@ -361,8 +361,8 @@ export async function queueCourseLessonVideos(
                     strategy: 'repository_voice',
                     instructor_id: instructor.id,
                     voice: instructor.voice,
-                    allow_paid_provider: allowPaidNarration,
-                    ...(allowPaidNarration ? { provider: 'cloudflare' } : {}),
+                    allow_paid_provider: false,
+                    provider: 'repository_voice',
                   },
                   visuals: {
                     strategy: 'licensed_envato_then_existing_then_generated',

@@ -86,7 +86,7 @@ export default async function PhonePage() {
         db
           .from('profiles')
           .select('id,full_name,email,role,program_holder_id')
-          .in('role', ['program_holder', 'programholder'])
+          .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder'])
           .not('program_holder_id', 'is', null)
           .order('full_name'),
         db
@@ -121,6 +121,7 @@ export default async function PhonePage() {
     (profile: any) => !String(profile.email || '').endsWith('@qa.invalid'),
   );
   const extensions = extensionsResult.data ?? [];
+  const directoryEntries = extensions.filter((entry: any) => entry.enabled);
   const settings: PhoneSettings = {
     greeting: system?.greeting ?? 'Thank you for calling Elevate for Humanity.',
     afterHours:
@@ -479,7 +480,7 @@ export default async function PhonePage() {
             Save extension
           </button>
         </form>
-        {extensions.length ? (
+        {directoryEntries.length ? (
           <div className="mt-4 overflow-x-auto">
             <table className="min-w-full text-left text-sm">
               <thead className="bg-slate-950 text-white">
@@ -492,7 +493,7 @@ export default async function PhonePage() {
                 </tr>
               </thead>
               <tbody>
-                {extensions.map((entry: any) => {
+                {directoryEntries.map((entry: any) => {
                   const assigned = numbers.find(
                     (number: any) => number.assigned_profile_id === entry.profile_id,
                   );

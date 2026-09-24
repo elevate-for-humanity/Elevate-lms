@@ -4,13 +4,10 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /**
- * Retired legacy testing-payment webhook.
- * Current testing payments are confirmed by /api/webhooks/quickbooks and
- * fulfilled through billing_fulfillment_jobs.
+ * Removed payment endpoint.
+ * Testing payments are handled only by the canonical QuickBooks billing flow.
+ * This route performs no forwarding, redirecting, or payment processing.
  */
 export async function POST() {
-  return NextResponse.json(
-    { received: false, retired: true, replacement: '/api/webhooks/quickbooks' },
-    { status: 410 },
-  );
+  return NextResponse.json({ error: 'Endpoint removed.' }, { status: 410 });
 }

@@ -16,7 +16,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
  * Funding guard (exam fee path):
  *   funding_source != self_pay AND funding_status = approved → block checkout, show sponsor message
  *   funding_source != self_pay AND funding_status = pending  → block checkout, show review message
- *   everything else → proceed to Stripe checkout
+ *   everything else → proceed to canonical checkout
  */
 
 function CheckoutContent() {
@@ -75,7 +75,7 @@ function CheckoutContent() {
         return;
       }
 
-      // Self-pay or unresolved → Stripe checkout
+      // Self-pay or unresolved → canonical checkout
       const res = await fetch('/api/credentials/exam-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -96,31 +96,7 @@ function CheckoutContent() {
   // ── Legacy enrollment checkout ──────────────────────────────────────
   const handleLegacySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsProcessing(true);
-    try {
-      const res = await fetch('/api/enroll/payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: parseInt(amount),
-          program,
-          paymentType: type,
-          description: `${programNames[program] || program} - ${type === 'down-payment' ? 'Down Payment' : 'Full Payment'}`,
-          successUrl: `${window.location.origin}/lms/payments/success?program=${program}&type=${type}`,
-          cancelUrl: `${window.location.origin}/programs/${program}-certification/enroll`,
-        }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error(data.error || 'Failed to create checkout session');
-      }
-    } catch {
-      setError('Payment processing failed. Please try again.');
-      setIsProcessing(false);
-    }
+    window.location.href = `/programs/${program}`;
   };
 
   // ── Blocked (sponsored or pending) ─────────────────────────────────
@@ -174,7 +150,7 @@ function CheckoutContent() {
             )}
             <div className="bg-white rounded-xl p-4 mb-6 text-sm text-slate-600 flex items-start gap-2">
               <Lock className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-              <span>Secured by Stripe. Your card details are never stored on our servers.</span>
+              <span>Secure payment is handled by the current billing provider. Elevate does not collect card details on this page.</span>
             </div>
             <button
               onClick={handleExamFeeCheckout}
@@ -275,7 +251,7 @@ function CheckoutContent() {
             </div>
             <div className="flex items-center gap-2 text-xs text-slate-700">
               <Lock className="w-3 h-3" />
-              <span>Secured by Stripe. Your card details are never stored on our servers.</span>
+              <span>Secure payment is handled by the current billing provider. Elevate does not collect card details on this page.</span>
             </div>
             <button
               type="submit"

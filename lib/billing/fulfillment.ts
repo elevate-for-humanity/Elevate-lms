@@ -366,6 +366,29 @@ export async function fulfillPaidBillingInvoice(
     return;
   }
 
+  if (job.fulfillment_type === 'individual_app_subscription') {
+    const now = new Date();
+    const periodEnd = new Date(now);
+    periodEnd.setUTCMonth(periodEnd.getUTCMonth() + 1);
+    const result = await db.from('user_app_subscriptions').upsert(
+      {
+        user_id: payload.user_id,
+        app_slug: payload.app_slug,
+        plan: payload.plan_id,
+        status: 'active',
+        trial_ends_at: null,
+        current_period_start: now.toISOString(),
+        current_period_end: periodEnd.toISOString(),
+        stripe_subscription_id: null,
+        stripe_customer_id: null,
+        updated_at: now.toISOString(),
+      },
+      { onConflict: 'user_id,app_slug' },
+    );
+    if (result.error) throw new Error(result.error.message);
+    return;
+  }
+
   if (job.fulfillment_type === 'platform_subscription') {
     const now = new Date();
     const interval = payload.billing_interval as BillingInterval;

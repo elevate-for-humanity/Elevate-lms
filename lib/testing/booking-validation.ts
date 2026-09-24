@@ -28,7 +28,7 @@ export interface BookingInput {
   addOn?: boolean;
   slotId?: string | null;
   paymentStatus?: string | null;
-  stripeSessionId?: string | null;
+  billingInvoiceId?: string | null;
 }
 
 export interface ValidationError {
@@ -159,7 +159,7 @@ export function validateBookingInput(body: Record<string, unknown>): ValidationR
       addOn: body.addOn === true,
       slotId: normalizeString(body.slotId),
       paymentStatus: normalizeString(body.paymentStatus),
-      stripeSessionId: normalizeString(body.stripeSessionId),
+      billingInvoiceId: normalizeString(body.billingInvoiceId),
     },
   };
 }

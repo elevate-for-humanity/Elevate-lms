@@ -4,8 +4,7 @@ export type PartnerSystem =
   | 'RISE'
   | 'CERTIPORT'
   | 'NATIONAL_DRUG'
-  | 'JRI'
-  | 'HSI';
+  | 'JRI';
 
 export interface PartnerCourse {
   id: string; // internal ID

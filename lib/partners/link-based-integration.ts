@@ -1,5 +1,5 @@
 // lib/partners/link-based-integration.ts
-// Link-based partner integration — HSI and NRF/ServSafe only
+// Link-based partner integration — NRF/ServSafe and JRI
 //
 // CareerSafe (OSHA) removed — no reseller authorization.
 //
@@ -37,64 +37,6 @@ export interface PartnerEnrollment {
   completedAt?: Date;
   certificateUrl?: string;
 }
-
-// HSI (Health & Safety Institute) — authorized reseller
-export const HSI_COURSES: PartnerCourse[] = [
-  {
-    id: 'hsi-cpr-aed',
-    partnerId: 'hsi',
-    partnerName: 'Health & Safety Institute',
-    title: 'CPR/AED Certification',
-    description: 'American Heart Association CPR and AED certification training',
-    category: 'Healthcare',
-    duration: '4 hours',
-    vendorCost: 18,
-    retailPrice: 27, // $18 × 1.5 = $27
-    stripePriceId: 'price_1TL8hrH4a2yrVOt5ElYR7I96',
-    paymentLink: 'https://buy.stripe.com/6oU6oHdzycjka8jbbzgIo0v',
-    enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
-    loginUrl: 'https://www.hsi.com/login',
-    supportUrl: 'https://www.hsi.com/support',
-    certificationType: 'CPR/AED Certification',
-    isActive: true,
-  },
-  {
-    id: 'hsi-first-aid',
-    partnerId: 'hsi',
-    partnerName: 'Health & Safety Institute',
-    title: 'First Aid Certification',
-    description: 'Comprehensive first aid training and certification',
-    category: 'Healthcare',
-    duration: '4 hours',
-    vendorCost: 18,
-    retailPrice: 27, // $18 × 1.5 = $27
-    stripePriceId: 'price_1TL8hsH4a2yrVOt57ehb2iDo',
-    paymentLink: 'https://buy.stripe.com/3cIeVd2UUersbcn5RfgIo0w',
-    enrollmentUrl: 'https://www.hsi.com/courses/first-aid',
-    loginUrl: 'https://www.hsi.com/login',
-    supportUrl: 'https://www.hsi.com/support',
-    certificationType: 'First Aid Certification',
-    isActive: true,
-  },
-  {
-    id: 'hsi-bloodborne-pathogens',
-    partnerId: 'hsi',
-    partnerName: 'Health & Safety Institute',
-    title: 'Bloodborne Pathogens Training',
-    description: 'OSHA-compliant bloodborne pathogens training',
-    category: 'Healthcare',
-    duration: '2 hours',
-    vendorCost: 12,
-    retailPrice: 18, // $12 × 1.5 = $18
-    stripePriceId: 'price_1TL8hsH4a2yrVOt56ipM5Rns',
-    paymentLink: 'https://buy.stripe.com/8x2cN5eDC6Z02FR7ZngIo0x',
-    enrollmentUrl: 'https://www.hsi.com/courses/bloodborne-pathogens',
-    loginUrl: 'https://www.hsi.com/login',
-    supportUrl: 'https://www.hsi.com/support',
-    certificationType: 'Bloodborne Pathogens Certificate',
-    isActive: true,
-  },
-];
 
 // NRF (National Restaurant Foundation / ServSafe) — authorized training partner
 // vendorCost from servsafe-programs.ts vendorBase
@@ -216,7 +158,6 @@ export const JRI_COURSES: PartnerCourse[] = [
 // CareerSafe removed — no reseller authorization to sell OSHA courses
 
 export const ALL_PARTNER_COURSES: PartnerCourse[] = [
-  ...HSI_COURSES,
   ...NRF_COURSES,
   ...JRI_COURSES,
 ];

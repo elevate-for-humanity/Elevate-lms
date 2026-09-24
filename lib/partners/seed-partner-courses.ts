@@ -16,7 +16,6 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import type { SupabaseClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import {
-  HSI_COURSES,
   NRF_COURSES,
   JRI_COURSES,
   type PartnerCourse,
@@ -34,14 +33,6 @@ interface ProviderDef {
 }
 
 const PROVIDERS: ProviderDef[] = [
-  {
-    slug: 'hsi',
-    name: 'Health & Safety Institute',
-    type: 'certification_body',
-    websiteUrl: 'https://www.hsi.com',
-    supportEmail: 'support@hsi.com',
-    courses: HSI_COURSES,
-  },
   {
     slug: 'nrf',
     name: 'National Restaurant Foundation',
@@ -64,9 +55,6 @@ const PROVIDERS: ProviderDef[] = [
 // ── Micro-course IDs (short certifications, not full partner programs) ────────
 
 const MICRO_COURSE_IDS = new Set([
-  'hsi-cpr-aed',
-  'hsi-first-aid',
-  'hsi-bloodborne-pathogens',
   'careersafe-osha10-general',
   'careersafe-osha10-construction',
   'careersafe-bloodborne-pathogens',

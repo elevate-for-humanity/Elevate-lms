@@ -3,17 +3,7 @@ import type { PartnerCourse } from '@/types/partnerCourse';
 // Example partner course definitions.
 // Replace baseCost & descriptions with your real data from your repository.
 
-export const partnerCourses: PartnerCourse[] = [
-  // CNA
-  {
-    id: 'hsi-cna-main',
-    partnerSystem: 'HSI',
-    partnerCode: 'HSI-CNA-CORE',
-    title: 'HSI / Choice Medical CNA Core Training',
-    description: 'Core CNA theory and skills preparation aligned to Indiana CNA exam.',
-    hours: 80,
-    baseCost: 300,
-  },
+export const partnerCourses: PartnerCourse[] = [  // CNA
   {
     id: 'nationaldrug-basic',
     partnerSystem: 'NATIONAL_DRUG',

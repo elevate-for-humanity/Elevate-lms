@@ -3,6 +3,8 @@ import { randomBytes } from 'node:crypto';
 import { getOrganizationFeatures } from '@/lib/platform/organization-features';
 import { syncLicenseFromSaasEntitlements } from '@/lib/platform/sync-license-from-saas';
 import type { BasePlanId, BillingInterval } from '@/lib/store/platform-pricing';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { TESTING_CENTER } from '@/lib/testing/testing-config';
 
 type Database = any;
 
@@ -253,6 +255,7 @@ export async function fulfillPaidBillingInvoice(
       .split(/\s+/);
     const firstName = names.shift() || 'Customer';
     const lastName = names.join(' ');
+    const code = confirmationCode();
     const result = await db.from('exam_bookings').insert({
       exam_type: payload.exam_type,
       exam_name: payload.exam_name,
@@ -264,7 +267,7 @@ export async function fulfillPaidBillingInvoice(
       status: 'pending',
       payment_status: 'paid',
       fee_cents: payload.amount_cents,
-      confirmation_code: confirmationCode(),
+      confirmation_code: code,
       add_on: Boolean(payload.add_on),
       add_on_paid: Boolean(payload.add_on),
       slot_id: payload.slot_id,
@@ -278,6 +281,14 @@ export async function fulfillPaidBillingInvoice(
         const increment = await db.rpc('increment_slot_booked_count', { slot_id: payload.slot_id });
         if (increment.error) throw new Error(increment.error.message);
       }
+    }
+    if (payload.customer_email) {
+      await sendEmail({
+        to: payload.customer_email,
+        from: 'Elevate Testing Center <testing@elevateforhumanity.org>',
+        subject: `Exam Booking Confirmed — ${code} | Elevate Testing Center`,
+        html: `<p>Hi ${firstName}, your paid testing appointment for <strong>${payload.exam_name}</strong> is confirmed.</p><p>Confirmation code: <strong>${code}</strong></p><p>Testing Center: ${TESTING_CENTER.address}</p><p>Questions: ${TESTING_CENTER.phone}</p>`,
+      }).catch(() => undefined);
     }
     return;
   }

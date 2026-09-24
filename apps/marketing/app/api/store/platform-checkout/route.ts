@@ -76,25 +76,26 @@ export async function POST(request: NextRequest) {
   const { data: existing } = await admin
     .from('organization_subscriptions')
     .select(
-      'status,stripe_subscription_id,billing_provider,provider_subscription_id,current_period_end',
+      'status,billing_provider,provider_subscription_id,current_period_end',
     )
     .eq('organization_id', billingOrganizationId)
     .maybeSingle();
   if (
-    existing?.stripe_subscription_id &&
+    existing?.provider_subscription_id &&
     ['active', 'trialing'].includes(existing.status || '') &&
+    existing.billing_provider &&
     existing.billing_provider !== 'quickbooks'
   ) {
     return NextResponse.json(
       {
-        error:
-          'This organization still has an active Stripe subscription. Its QuickBooks schedule was not started, preventing duplicate billing.',
+        error: 'This organization already has an active subscription with another billing provider. Duplicate billing was prevented.',
         cutoverRequired: true,
         currentPeriodEnd: existing.current_period_end,
       },
       { status: 409 },
     );
   }
+
 
   const baseAmount = priceCents(plan, interval);
   const addonLines = addons.filter(Boolean).map((addon) => ({

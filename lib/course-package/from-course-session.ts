@@ -1,5 +1,7 @@
 import { CoursePackageSchema, type CoursePackage } from './contract';
 import type { CourseSession, StudioLesson } from '@/lib/studio/course-session';
+import { hasCanonicalMediaQualityEvidence } from '@/lib/course-factory/media-manager';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 function record(value: unknown): Record<string, unknown> | null {
   return value && typeof value === 'object' && !Array.isArray(value)
@@ -51,7 +53,15 @@ function normalizeQuestions(lesson: StudioLesson, domainKey: string | null) {
   });
 }
 
-export function coursePackageFromSession(session: CourseSession): CoursePackage {
+export type CoursePackageEvidence = {
+  accessibility: CoursePackage['evidence']['accessibility'];
+  learnerPreview: CoursePackage['evidence']['learnerPreview'];
+};
+
+export function coursePackageFromSession(
+  session: CourseSession,
+  evidence: CoursePackageEvidence = { accessibility: null, learnerPreview: null },
+): CoursePackage {
   const modules = [...session.modules]
     .sort((a, b) => a.order_index - b.order_index)
     .map((module) => ({
@@ -188,8 +198,64 @@ export function coursePackageFromSession(session: CourseSession): CoursePackage 
       governingBody: session.course.governing_body,
       standardVersion: session.course.governing_standard_version,
     },
-    evidence: { accessibility: null, learnerPreview: null },
+    evidence,
     modules,
     generatedAt: new Date().toISOString(),
   });
+}
+
+
+/**
+ * Persisted production evidence is derived only from completed canonical media
+ * jobs and explicit course review. Authored metadata cannot manufacture these
+ * approvals.
+ */
+export async function loadPersistedCoursePackageEvidence(
+  courseId: string,
+): Promise<CoursePackageEvidence> {
+  const db = await requireAdminClient();
+  const [{ data: jobs, error: jobsError }, { data: course, error: courseError }] =
+    await Promise.all([
+      db
+        .from('video_jobs')
+        .select('quality_evidence,status,review_status')
+        .eq('course_id', courseId)
+        .eq('asset_kind', 'lesson'),
+      db
+        .from('courses')
+        .select('review_status,reviewed_at,reviewed_by,version')
+        .eq('id', courseId)
+        .maybeSingle(),
+    ]);
+  if (jobsError) throw jobsError;
+  if (courseError) throw courseError;
+
+  const lessonJobs = jobs ?? [];
+  const accessibilityApproved =
+    lessonJobs.length > 0 &&
+    lessonJobs.every(
+      (job) =>
+        job.status === 'complete' &&
+        job.review_status === 'approved' &&
+        hasCanonicalMediaQualityEvidence(job.quality_evidence),
+    );
+  const accessibility = accessibilityApproved
+    ? {
+        approved: true,
+        checkedAt: new Date().toISOString(),
+        findings: [],
+      }
+    : null;
+
+  const learnerPreview =
+    course?.review_status === 'approved' && course.reviewed_at && course.reviewed_by
+      ? {
+          approved: true,
+          checkedAt: course.reviewed_at,
+          reviewerId: course.reviewed_by,
+          version: Math.max(1, Number(course.version ?? 1)),
+        }
+      : null;
+
+  return { accessibility, learnerPreview };
 }

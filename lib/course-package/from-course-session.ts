@@ -56,6 +56,12 @@ function normalizeQuestions(lesson: StudioLesson, domainKey: string | null) {
 export type CoursePackageEvidence = {
   accessibility: CoursePackage['evidence']['accessibility'];
   learnerPreview: CoursePackage['evidence']['learnerPreview'];
+  mediaByLesson?: Map<string, {
+    source: 'owned';
+    licenseStatus: 'owned';
+    licenseEvidenceUrl?: string;
+    matchScore: number;
+  }>;
 };
 
 export function coursePackageFromSession(
@@ -111,10 +117,9 @@ export function coursePackageFromSession(
                           narrationCueIds: [String(item.id ?? `${lesson.slug}-audio-${index + 1}`)],
                           teachingPurpose: String(item.purpose ?? ''),
                           searchTerms: [],
-                          // Do not synthesize provenance, licensing, or match
-                          // scores from an authored storyboard. Those fields
-                          // are production evidence and must come from the
-                          // rendered-media pipeline.
+                          // Production evidence is attached only after the
+                          // canonical media job has passed quality review.
+                          ...(evidence.mediaByLesson?.get(lesson.id) ?? {}),
                           visualType: item.visualType === 'technical-diagram' ? 'diagram' : 'video',
                         };
                       })
@@ -218,7 +223,7 @@ export async function loadPersistedCoursePackageEvidence(
     await Promise.all([
       db
         .from('video_jobs')
-        .select('quality_evidence,status,review_status')
+        .select('lesson_id,quality_evidence,status,review_status,video_url')
         .eq('course_id', courseId)
         .eq('asset_kind', 'lesson'),
       db
@@ -257,5 +262,36 @@ export async function loadPersistedCoursePackageEvidence(
         }
       : null;
 
-  return { accessibility, learnerPreview };
+  const mediaByLesson = new Map<string, {
+    source: 'owned';
+    licenseStatus: 'owned';
+    licenseEvidenceUrl?: string;
+    matchScore: number;
+  }>();
+  for (const job of lessonJobs) {
+    if (
+      job.status !== 'complete' ||
+      job.review_status !== 'approved' ||
+      !hasCanonicalMediaQualityEvidence(job.quality_evidence)
+    ) continue;
+    const quality = job.quality_evidence as {
+      visualEvidenceCoverage?: number;
+      sourceEvidenceCoverage?: number;
+    };
+    mediaByLesson.set(job.lesson_id, {
+      source: 'owned',
+      licenseStatus: 'owned',
+      ...(typeof job.video_url === 'string' && job.video_url ? { licenseEvidenceUrl: job.video_url } : {}),
+      matchScore: Math.min(
+        1,
+        Math.max(
+          0,
+          Number(quality.visualEvidenceCoverage ?? 0),
+          Number(quality.sourceEvidenceCoverage ?? 0),
+        ),
+      ),
+    });
+  }
+
+  return { accessibility, learnerPreview, mediaByLesson };
 }

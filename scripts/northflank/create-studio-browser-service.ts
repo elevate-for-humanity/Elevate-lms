@@ -59,7 +59,7 @@ const payload = {
     PORT: '3100',
     STUDIO_BROWSER_SECRET: secret,
     STUDIO_BROWSER_ADMIN_ORIGIN: 'https://admin.elevateforhumanity.org',
-    STUDIO_BROWSER_ALLOWED_DOMAINS: 'elevateforhumanity.org,envato.com',
+    STUDIO_BROWSER_ALLOWED_DOMAINS: 'elevateforhumanity.org,envato.com,github.com,supabase.com,northflank.com',
     STUDIO_BROWSER_SESSION_TTL_MS: '7200000',
     STUDIO_BROWSER_MAX_SESSIONS: '4',
   },

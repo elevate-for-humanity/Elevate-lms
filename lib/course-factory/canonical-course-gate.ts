@@ -1,5 +1,8 @@
 import { loadCourseSession } from '@/lib/studio/course-session';
-import { coursePackageFromSession } from '@/lib/course-package/from-course-session';
+import {
+  coursePackageFromSession,
+  loadPersistedCoursePackageEvidence,
+} from '@/lib/course-package/from-course-session';
 import {
   evaluateCourseReadiness,
   REQUIRED_COURSE_GATES,
@@ -52,7 +55,8 @@ export async function evaluatePersistedCredentialCourse(courseId: string) {
 
   let coursePackage;
   try {
-    coursePackage = coursePackageFromSession(session);
+    const evidence = await loadPersistedCoursePackageEvidence(courseId);
+    coursePackage = coursePackageFromSession(session, evidence);
   } catch (error) {
     return {
       pass: false,

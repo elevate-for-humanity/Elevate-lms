@@ -84,7 +84,6 @@ class PendingPartnerAPI extends BasePartnerAPI {
 
 export function getPartnerClient(partner: PartnerType): BasePartnerAPI {
   // Later: you can switch specific partners to real client classes
-  // e.g. if (partner === "hsi") return new HsiApi(configFromEnv);
   const config: PartnerAPIConfig = {
     baseUrl: process.env.PARTNER_API_BASE_URL,
   };

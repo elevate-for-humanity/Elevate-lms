@@ -1,18 +1,16 @@
 import type { SupabaseClient } from '@/lib/supabase';
 
 export interface SubscriptionPayload {
-  stripeCustomerId: string;
-  stripeSubscriptionId?: string;
+  billingProvider: string;
+  providerCustomerId?: string | null;
+  providerSubscriptionId?: string | null;
+  providerPaymentId?: string | null;
   plan: string;
   status: string;
   seats?: number;
   periodEnd?: string;
 }
 
-/**
- * Upsert organization subscription from Stripe webhook
- * Call this from existing Stripe webhook handlers
- */
 export async function upsertOrgSubscription(
   supabase: SupabaseClient,
   orgId: string,
@@ -21,19 +19,16 @@ export async function upsertOrgSubscription(
   const { error } = await supabase.from('organization_subscriptions').upsert(
     {
       organization_id: orgId,
-      stripe_customer_id: payload.stripeCustomerId,
-      stripe_subscription_id: payload.stripeSubscriptionId,
+      billing_provider: payload.billingProvider,
+      provider_customer_id: payload.providerCustomerId ?? null,
+      provider_subscription_id: payload.providerSubscriptionId ?? null,
+      provider_payment_id: payload.providerPaymentId ?? null,
       plan: payload.plan,
       status: payload.status,
       seats: payload.seats,
       current_period_end: payload.periodEnd,
     },
-    {
-      onConflict: 'organization_id',
-    },
+    { onConflict: 'organization_id' },
   );
-
-  if (error) {
-    throw new Error(`Failed to upsert subscription`);
-  }
+  if (error) throw new Error('Failed to upsert subscription');
 }

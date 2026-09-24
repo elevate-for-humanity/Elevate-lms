@@ -8,7 +8,6 @@ import {
   DollarSign,
   Download,
   Plus,
-  Trash2,
   AlertCircle,
   Loader2,
   ExternalLink,
@@ -71,10 +70,10 @@ export default function BillingSettingsPage() {
 
       // Fetch invoices from database
       const { data: invoiceData, error: invoicesError } = await supabase
-        .from('invoices')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false })
+        .from('billing_invoices')
+        .select('id,total_cents,status,created_at,due_at,paid_at,payment_url,provider,invoice_number')
+        .eq('customer_external_key', `user:${user.id}`)
+        .order('created_at', { ascending: false })
         .limit(10);
 
       if (invoicesError && invoicesError.code !== 'PGRST116') {
@@ -89,7 +88,7 @@ export default function BillingSettingsPage() {
         .maybeSingle();
 
       setPaymentMethods(methods || []);
-      setInvoices(invoiceData || []);
+      setInvoices((invoiceData || []).map((row:any)=>({ id:row.id, amount:Number(row.total_cents||0)/100, status:row.status === 'open' ? 'pending' : row.status, date:row.paid_at||row.due_at||row.created_at, description:`${row.provider || 'Elevate'} invoice${row.invoice_number ? ` #${row.invoice_number}` : ''}`, invoice_url:row.payment_url||undefined })));
       setBalance(profile?.account_balance || 0);
     } catch (err) {
       logger.error('Error loading billing data', normalizeError(err, 'Failed to load billing data'), getErrorContext(err));
@@ -292,7 +291,7 @@ export default function BillingSettingsPage() {
             Manage Billing
             <ExternalLink className="w-4 h-4" />
           </button>
-          <p className="text-xs text-slate-700 mt-2">Opens Stripe billing portal</p>
+          <p className="text-xs text-slate-700 mt-2">Opens the Elevate billing center</p>
         </div>
       </div>
     </div>

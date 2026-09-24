@@ -110,7 +110,7 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   const { ctx, extension } = await phoneContext();
-  if (ctx.mode !== 'holder') {
+  if (!ctx.roles.some((role) => role === 'program_holder' || role === 'programholder')) {
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
   }
   if (!extension) {

@@ -7,7 +7,7 @@ import TestingCheckoutClient from './TestingCheckoutClient';
 export const metadata: Metadata = {
   title: 'Choose Exam & Checkout | Elevate Testing Center',
   description:
-    'Select an available exam, review the exact configured retail total, and continue to secure Stripe Checkout.',
+    'Select an available exam, review the exact configured retail total, and continue to secure checkout.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/checkout' },
 };
 
@@ -74,7 +74,7 @@ export default async function TestingCheckoutPage({
               </h1>
               <p className="mt-3 max-w-3xl text-lg leading-relaxed text-slate-600">
                 Every exam shown here has a positive configured retail amount in the canonical testing registry.
-                The server re-resolves that amount before it creates Stripe Checkout, so the browser cannot set the price.
+                The server re-resolves that amount before it creates the payment invoice, so the browser cannot set the price.
               </p>
             </div>
           </div>

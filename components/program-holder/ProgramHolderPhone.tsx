@@ -93,7 +93,7 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-export function ProgramHolderPhone({ apiBase = apiBase, roleLabel = 'Program Holder' }: { apiBase?: string; roleLabel?: string } = {}) {
+export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', roleLabel = 'Program Holder' }: { apiBase?: string; roleLabel?: string } = {}) {
   const [data, setData] = useState<PhoneData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

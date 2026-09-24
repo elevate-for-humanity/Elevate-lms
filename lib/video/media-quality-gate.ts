@@ -10,7 +10,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import type { MediaStoryboard } from './media-director';
 import type { InstructionalQualityEvidence } from './instructional-quality-gate';
 
-export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v4';
+export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v5';
 
 const execFileAsync = promisify(execFile);
 const MIN_BYTES = 100_000;
@@ -47,6 +47,7 @@ export interface MediaQualityEvidence {
   sourceEvidenceCoverage: number;
   exactVisualSourceCoverage: number;
   instructionalQuality: InstructionalQualityEvidence;
+  narrationProviderClass?: 'professional' | 'diagnostic' | 'unknown';
 }
 
 export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
@@ -96,6 +97,7 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
   if (!evidence.transcriptUrl) failures.push('transcript URL is missing');
   if (!evidence.provider) failures.push('provider evidence is missing');
   if (!evidence.providerModel) failures.push('provider model evidence is missing');
+  if (evidence.narrationProviderClass !== 'professional') failures.push('narration uses a robotic/diagnostic or unverified voice provider');
   if (evidence.narrationCoverage < MIN_ASR_NARRATION_COVERAGE)
     failures.push(
       `narration coverage ${(evidence.narrationCoverage * 100).toFixed(1)}% is below ${(MIN_ASR_NARRATION_COVERAGE * 100).toFixed(0)}%`,
@@ -273,6 +275,7 @@ export async function enforceMediaQuality(input: {
   providerModel?: string;
   expectedScript: string;
   instructionalQuality: InstructionalQualityEvidence;
+  narrationProviderClass?: 'professional' | 'diagnostic' | 'unknown';
 }): Promise<MediaQualityEvidence> {
   const response = await fetch(input.videoUrl, { signal: AbortSignal.timeout(60_000) });
   if (!response.ok) throw new Error(`MP4 returned HTTP ${response.status}`);
@@ -430,6 +433,7 @@ export async function enforceMediaQuality(input: {
         ? verifiedExactScenes.length / exactScenes.length
         : 1,
       instructionalQuality: input.instructionalQuality,
+      narrationProviderClass: input.narrationProviderClass ?? 'unknown',
     };
     const failures = mediaQualityFailures(evidence);
     if (failures.length) throw new Error(`Media quality gate failed: ${failures.join('; ')}`);

@@ -54,26 +54,13 @@ const previewStyles: Record<CapabilityCategory, string> = {
   enterprise: 'from-slate-600 via-slate-800 to-slate-950',
 };
 
-function interactiveDemoHref(capability: PlatformCapability): string {
-  if (capability.demoHref) return capability.demoHref;
-
-  if (capability.key === 'crm' || capability.category === 'business') {
-    return '/store/demo/crm';
-  }
-  if (capability.category === 'ai') return '/store/demo/ai-studio';
-  if (capability.key === 'employer_portal' || capability.key === 'apprenticeship') {
-    return '/store/demo/employer';
-  }
-  if (capability.category === 'workforce') return '/store/demo/institutional';
-  if (capability.category === 'education') return '/store/demo/lms';
-  if (capability.category === 'compliance') return '/store/demo/institutional';
-  if (capability.category === 'apps') return '/store/demo/admin';
-  return '/store/demo/enterprise';
+function interactiveDemoHref(capability: PlatformCapability): string | null {
+  return capability.demoHref?.trim() || null;
 }
 
 function ProductPreview({ capability, name }: { capability: PlatformCapability; name: string }) {
   const cues = capability.keywords.filter((word) => word.length > 2).slice(0, 3);
-  const isInteractive = true;
+  const isInteractive = Boolean(interactiveDemoHref(capability));
   return (
     <div
       className={`group relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br ${previewStyles[capability.category]} p-5 text-white`}
@@ -84,7 +71,7 @@ function ProductPreview({ capability, name }: { capability: PlatformCapability; 
         <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.16em]">
           <span>{categoryMeta[capability.category].label}</span>
           <span className="rounded-full bg-emerald-300 px-2 py-1 text-emerald-950">
-            {isInteractive ? 'Interactive demo' : 'Guided tour'}
+            {isInteractive ? 'Interactive demo' : 'Product preview'}
           </span>
         </div>
         <p className="mt-3 line-clamp-2 text-xl font-black leading-tight">{name}</p>
@@ -297,12 +284,14 @@ export function UnifiedSalesMarketplace() {
                     >
                       {action.label}
                     </Link>
-                    <Link
-                      href={interactiveDemoHref(capability)}
-                      className="inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-4 py-3 text-sm font-black text-slate-950 hover:border-brand-red-400 hover:bg-slate-50 sm:flex-none"
-                    >
-                      Open Actual Demo
-                    </Link>
+                    {interactiveDemoHref(capability) ? (
+                      <Link
+                        href={interactiveDemoHref(capability)!}
+                        className="inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-4 py-3 text-sm font-black text-slate-950 hover:border-brand-red-400 hover:bg-slate-50 sm:flex-none"
+                      >
+                        Open Live Demo
+                      </Link>
+                    ) : null}
                   </div>
                 </div>
               </article>

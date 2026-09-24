@@ -1323,6 +1323,9 @@ async function execTool(
           `Unable to queue Course Builder: ${enqueueError?.message ?? 'no job returned'}`,
         );
 
+      // Start immediately. The durable row remains the recovery checkpoint, but
+      // accepting a Studio command must actively wake the worker rather than
+      // leaving new work parked until a later scheduler tick.
       after(async () => {
         const secret = process.env.CRON_SECRET;
         if (!secret) return;
@@ -1349,7 +1352,7 @@ async function execTool(
           stage: 'queued',
           progress: 0,
           url: requestedCourseId ? `/studio/courses/${requestedCourseId}` : null,
-          message: `Course "${title}" is queued for durable generation, validation, governance normalization, and automated publishing. You can leave or reload Studio without losing the run.`,
+          message: `Course "${title}" was accepted and an immediate Course Builder worker wake was requested. The durable job remains the recovery checkpoint if the worker restarts.`,
         },
         null,
         2,

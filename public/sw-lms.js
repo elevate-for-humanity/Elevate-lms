@@ -156,7 +156,45 @@ self.addEventListener('message', (event) => {
 
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-hours') event.waitUntil(syncHoursData());
+  if (event.tag === 'sync-lesson') event.waitUntil(syncQueuedRequests('lesson'));
+  if (event.tag === 'sync-other') event.waitUntil(syncQueuedRequests('other'));
 });
+
+async function syncQueuedRequests(type) {
+  const db = await openPendingRequestDB();
+  const tx = db.transaction('pending-requests', 'readwrite');
+  const store = tx.objectStore('pending-requests');
+  const requests = await getAllFromStore(store);
+  for (const req of requests.filter((item) => item.type === type)) {
+    try {
+      const response = await fetch(req.url, {
+        method: req.method || 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: req.body,
+      });
+      if (response.ok) store.delete(req.id);
+    } catch (error) {
+      console.warn('[SW-lms] queued request sync deferred:', error?.message || String(error));
+    }
+  }
+}
+
+function openPendingRequestDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('elevate-offline-queue', 1);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('pending-requests')) {
+        const store = db.createObjectStore('pending-requests', { keyPath: 'id', autoIncrement: true });
+        store.createIndex('type', 'type', { unique: false });
+        store.createIndex('timestamp', 'timestamp', { unique: false });
+      }
+    };
+  });
+}
 
 async function syncHoursData() {
   const db = await openOfflineDB();

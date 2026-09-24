@@ -316,7 +316,7 @@ export default function ApprenticeForm({
         has_host_shop: formData.hasHostShop,
         host_shop_name: formData.hostShopName,
         hours_per_week: 40,
-        success_url: `${window.location.origin}/programs/barber-apprenticeship/apply/success?session_id={CHECKOUT_SESSION_ID}&redirect=/apply/confirmation?program=barber-apprenticeship`,
+        success_url: `${window.location.origin}/programs/barber-apprenticeship/apply/success`,
         cancel_url: `${window.location.origin}/programs/barber-apprenticeship/apply`,
       };
 
@@ -1240,8 +1240,7 @@ export default function ApprenticeForm({
 
                     {isSelfPay && (
                       <p className="text-center text-sm text-black mt-4">
-                        Secure payment via Stripe. Card, Apple Pay, Google Pay, PayPal, Venmo, Cash
-                        App accepted.
+                        Secure payment through Elevate billing. Available payment methods are shown during checkout.
                       </p>
                     )}
                   </>

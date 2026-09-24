@@ -30,9 +30,9 @@ export default async function PaymentsPage() {
   if (!user) redirect('/login?redirect=/lms/payments');
 
   const [{ data: paymentLogs }, { data: enrollments }, { data: invoices }] = await Promise.all([
-    supabase.from('payment_logs').select('id, amount, currency, status, payment_option, stripe_payment_intent_id, completed_at, created_at, metadata').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
-    supabase.from('program_enrollments').select('id, amount_paid_cents, funding_source, stripe_payment_intent_id, status, enrolled_at, programs ( id, title )').eq('user_id', user.id).order('enrolled_at', { ascending: false }).limit(50),
-    supabase.from('invoices').select('id, invoice_number, amount, total, status, due_date, paid_at, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
+    supabase.from('payment_logs').select('id, amount, currency, status, payment_option, billing_provider, billing_invoice_id, completed_at, created_at, metadata').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
+    supabase.from('program_enrollments').select('id, amount_paid_cents, funding_source, billing_provider, status, enrolled_at, programs ( id, title )').eq('user_id', user.id).order('enrolled_at', { ascending: false }).limit(50),
+    supabase.from('billing_invoices').select('id, invoice_number, total_cents, status, due_at, paid_at, created_at, provider').eq('customer_external_key', `user:${user.id}`).order('created_at', { ascending: false }).limit(50),
   ]);
 
   const openInvoices = (invoices ?? []).filter((invoice: any) =>
@@ -42,7 +42,7 @@ export default async function PaymentsPage() {
     new Date(a.due_date || a.created_at).getTime() - new Date(b.due_date || b.created_at).getTime(),
   )[0] as any;
   const amountDue = openInvoices.reduce(
-    (sum: number, invoice: any) => sum + Number(invoice.total ?? invoice.amount ?? 0),
+    (sum: number, invoice: any) => sum + Number(Number(invoice.total_cents ?? 0) / 100),
     0,
   );
 
@@ -52,7 +52,7 @@ export default async function PaymentsPage() {
     status: row.status ?? 'unknown',
     description: (row.metadata as Record<string, string> | null)?.description ?? 'Payment',
     method: row.payment_option ?? null,
-    stripe_pi: row.stripe_payment_intent_id ?? null,
+    billing_ref: row.billing_invoice_id ?? null,
     date: row.completed_at ?? row.created_at,
   }));
 
@@ -66,7 +66,7 @@ export default async function PaymentsPage() {
         status: row.status === 'active' || row.status === 'enrolled' ? 'completed' : (row.status ?? 'unknown'),
         description: title ? `Enrollment — ${title}` : 'Program Enrollment',
         method: row.funding_source ?? null,
-        stripe_pi: row.stripe_payment_intent_id ?? null,
+        billing_ref: null,
         date: row.enrolled_at,
       };
     });
@@ -76,9 +76,9 @@ export default async function PaymentsPage() {
     .filter((payment) => Boolean(payment.date))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .filter((payment) => {
-      if (!payment.stripe_pi) return true;
-      if (seen.has(payment.stripe_pi)) return false;
-      seen.add(payment.stripe_pi);
+      if (!payment.billing_ref) return true;
+      if (seen.has(payment.billing_ref)) return false;
+      seen.add(payment.billing_ref);
       return true;
     });
 
@@ -86,8 +86,8 @@ export default async function PaymentsPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-3"><CreditCard className="h-6 w-6 text-slate-700" /><h1 className="text-2xl font-bold text-slate-950">Payments & Billing</h1></div><Link href="/lms/settings/billing" className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">Update card <ExternalLink className="h-4 w-4" /></Link></div>
-      {openInvoices.length ? <div className="mb-8 rounded-xl border border-amber-200 bg-amber-50 p-5"><div className="flex flex-wrap items-center justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-wide text-amber-800">Payment due</p><p className="mt-1 text-2xl font-bold text-slate-950">${amountDue.toFixed(2)}</p><p className="mt-1 text-sm text-slate-700">{nextInvoice?.due_date ? `Next due ${fmtDate(nextInvoice.due_date)}` : 'Open invoice — payment required'}</p></div><Link href="/lms/settings/billing" className="rounded-lg bg-slate-950 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-800">Pay now or update card</Link></div><p className="mt-3 text-xs text-amber-900">Past-due accounts may be placed on a temporary course-access hold. Your completed work and records are preserved.</p></div> : null}
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-3"><CreditCard className="h-6 w-6 text-slate-700" /><h1 className="text-2xl font-bold text-slate-950">Payments & Billing</h1></div><Link href="/lms/settings/billing" className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">Manage billing <ExternalLink className="h-4 w-4" /></Link></div>
+      {openInvoices.length ? <div className="mb-8 rounded-xl border border-amber-200 bg-amber-50 p-5"><div className="flex flex-wrap items-center justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-wide text-amber-800">Payment due</p><p className="mt-1 text-2xl font-bold text-slate-950">${amountDue.toFixed(2)}</p><p className="mt-1 text-sm text-slate-700">{nextInvoice?.due_date ? `Next due ${fmtDate(nextInvoice.due_date)}` : 'Open invoice — payment required'}</p></div><Link href="/lms/settings/billing" className="rounded-lg bg-slate-950 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-800">Open billing</Link></div><p className="mt-3 text-xs text-amber-900">Past-due accounts may be placed on a temporary course-access hold. Your completed work and records are preserved.</p></div> : null}
       {payments.length ? <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3"><div className="rounded-xl border bg-white p-4"><p className="text-xs text-slate-500">Total Paid</p><p className="text-xl font-bold">{fmt(totalPaid)}</p></div><div className="rounded-xl border bg-white p-4"><p className="text-xs text-slate-500">Transactions</p><p className="text-xl font-bold">{payments.length}</p></div><div className="col-span-2 rounded-xl border bg-white p-4 sm:col-span-1"><p className="text-xs text-slate-500">Last Payment</p><p className="text-xl font-bold">{payments[0] ? fmtDate(payments[0].date) : '—'}</p></div></div> : null}
       {!payments.length ? (
         <div className="rounded-xl border border-slate-200 bg-white p-10 text-center"><DollarSign className="mx-auto mb-3 h-10 w-10 text-slate-300" /><p className="font-medium text-slate-600">No payment records yet.</p><Link href="/lms/courses" className="mt-6 inline-block rounded-lg bg-brand-blue-600 px-5 py-2.5 text-sm font-semibold text-white">View My Programs</Link></div>

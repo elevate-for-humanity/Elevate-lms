@@ -93,7 +93,7 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-export function ProgramHolderPhone() {
+export function ProgramHolderPhone({ apiBase = apiBase, roleLabel = 'Program Holder' }: { apiBase?: string; roleLabel?: string } = {}) {
   const [data, setData] = useState<PhoneData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -119,7 +119,7 @@ export function ProgramHolderPhone() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const response = await fetch('/api/program-holder/phone', { cache: 'no-store' });
+    const response = await fetch(apiBase, { cache: 'no-store' });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) setError(result.error || 'The phone could not be loaded.');
     else {
@@ -142,7 +142,7 @@ export function ProgramHolderPhone() {
   }, [load]);
 
   const heartbeat = useCallback(async () => {
-    await fetch('/api/program-holder/phone', {
+    await fetch(apiBase, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'heartbeat', deviceId: deviceId() }),
@@ -157,7 +157,7 @@ export function ProgramHolderPhone() {
     } catch {
       // The presence timeout is the fallback when a socket has already closed.
     }
-    await fetch('/api/program-holder/phone', {
+    await fetch(apiBase, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'disconnect', deviceId: deviceId() }),
@@ -266,7 +266,7 @@ export function ProgramHolderPhone() {
     if (!data) return;
     setSaving(true);
     setMessage('');
-    const response = await fetch('/api/program-holder/phone', {
+    const response = await fetch(apiBase, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -360,7 +360,7 @@ export function ProgramHolderPhone() {
   }
 
   async function setTaskStatus(id: string, status: InboxItem['status']) {
-    const response = await fetch(`/api/program-holder/phone/inbox/${id}`, {
+    const response = await fetch(`${apiBase}/inbox/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
@@ -409,7 +409,7 @@ export function ProgramHolderPhone() {
             </p>
             <h1 className="mt-2 text-3xl font-black">{data.extension.displayName}</h1>
             <p className="mt-2 text-blue-100">
-              Extension {data.extension.extension} · {data.extension.department || 'Program Holder'}
+              Extension {data.extension.extension} · {data.extension.department || roleLabel}
             </p>
             <p className="mt-1 text-lg font-bold">
               Business caller ID {friendlyNumber(data.phoneNumber)}

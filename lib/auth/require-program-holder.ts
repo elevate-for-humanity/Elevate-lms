@@ -166,6 +166,18 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     .eq('program_holder_id', holderId)
     .eq('status', 'active');
 
+  let programIds = (associations || []).map((a: { program_id: string }) => a.program_id);
+  const { data: holderFeatures } = await db.from('program_holders').select('features').eq('id', holderId).maybeSingle();
+  const regional = holderFeatures?.features?.regional_assignment;
+  if (regional?.all_programs_in_region === true) {
+    const { data: regionalPrograms } = await db
+      .from('programs')
+      .select('id')
+      .eq('is_active', true)
+      .eq('status', 'active');
+    programIds = (regionalPrograms || []).map((row: { id: string }) => row.id);
+  }
+
   return {
     mode: 'holder',
     isPlatformAdmin: false,
@@ -173,7 +185,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     profile,
     holderId,
     tenantId: profile.tenant_id ?? null,
-    programIds: (associations || []).map((a: { program_id: string }) => a.program_id),
+    programIds,
     db,
   };
 }

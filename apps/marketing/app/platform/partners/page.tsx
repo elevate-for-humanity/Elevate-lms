@@ -69,11 +69,6 @@ const credentialPartners = [
     description: 'OSHA safety training and certification programs.',
     type: 'Safety Training',
   },
-  {
-    name: 'Health & Safety Institute (HSI)',
-    description: 'CPR, First Aid, and healthcare safety certifications.',
-    type: 'Healthcare Training',
-  },
 ];
 
 const industryPartners = [

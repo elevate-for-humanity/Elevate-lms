@@ -33,7 +33,7 @@ function lessonIdFromPath(
  * against a smaller validator than the production package actually requires.
  */
 export async function evaluatePersistedCredentialCourse(courseId: string) {
-  const session = await loadCourseSession(courseId);
+  const session = await loadCourseSession(courseId, { system: true });
 
   if (!session.course.program_id) {
     return {

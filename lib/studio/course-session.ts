@@ -177,11 +177,15 @@ export interface CourseSession {
 
 // ─── Loader ───────────────────────────────────────────────────────────────────
 
-export async function loadCourseSession(courseId: string): Promise<CourseSession> {
+export async function loadCourseSession(
+  courseId: string,
+  options?: { system?: boolean },
+): Promise<CourseSession> {
   const warnings: string[] = [];
 
-  // Auth — admin, super_admin, or staff only
-  await requireRole(['admin', 'super_admin', 'staff']);
+  // Interactive Studio callers require role authorization. Internal Course
+  // Builder workers use the service client and must not depend on request auth.
+  if (!options?.system) await requireRole(['admin', 'super_admin', 'staff']);
 
   const db = await createClient();
   const adminDb = await requireAdminClient();

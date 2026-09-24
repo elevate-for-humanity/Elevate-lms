@@ -22,14 +22,45 @@ import { assertCourseBuilderGenerationEnabled } from './generation-control';
 import { evaluatePersistedCredentialCourse } from '../course-factory/canonical-course-gate';
 import { REQUIRED_COURSE_GATES, type CourseGate } from '../course-package/readiness';
 
+export const COURSE_BUILDER_GATE_REPAIR_POLICY: Record<CourseGate, {
+  phase: 'authoring' | 'media' | 'review';
+  automatic: boolean;
+  repairScope: readonly string[];
+}> = {
+  credential_alignment: { phase: 'authoring', automatic: false, repairScope: ['credential_metadata','competency_mapping'] },
+  learning_objectives: { phase: 'authoring', automatic: true, repairScope: ['objectives','competency_mapping'] },
+  instructional_content: { phase: 'authoring', automatic: true, repairScope: ['content','reading_guide','resources'] },
+  demonstration: { phase: 'media', automatic: true, repairScope: ['storyboard','lesson_video','demonstration'] },
+  storyboard: { phase: 'authoring', automatic: true, repairScope: ['instructional_timeline','storyboard'] },
+  technical_review: { phase: 'review', automatic: false, repairScope: ['technical_review'] },
+  interactive_practice: { phase: 'authoring', automatic: true, repairScope: ['scenario','case_study','exercises','practical_task','interactives'] },
+  knowledge_checks: { phase: 'authoring', automatic: true, repairScope: ['knowledge_checks','remediation'] },
+  module_assessments: { phase: 'authoring', automatic: false, repairScope: ['module_assessments'] },
+  practice_exam: { phase: 'authoring', automatic: false, repairScope: ['practice_exam'] },
+  narration: { phase: 'authoring', automatic: true, repairScope: ['narration','transcript'] },
+  visual_alignment: { phase: 'media', automatic: true, repairScope: ['visuals','storyboard','media_provenance'] },
+  captions: { phase: 'media', automatic: true, repairScope: ['captions'] },
+  transcript: { phase: 'authoring', automatic: true, repairScope: ['transcript','narration'] },
+  accessibility: { phase: 'review', automatic: false, repairScope: ['accessibility_review'] },
+  learner_preview: { phase: 'review', automatic: false, repairScope: ['learner_preview'] },
+  progress_tracking: { phase: 'media', automatic: true, repairScope: ['timeline','completion_rules'] },
+  resume_tracking: { phase: 'media', automatic: true, repairScope: ['timeline','resume_state'] },
+};
+
+const AUTHORING_AUTOMATIC_GATES = new Set<CourseGate>(
+  REQUIRED_COURSE_GATES.filter((gate) => {
+    const policy = COURSE_BUILDER_GATE_REPAIR_POLICY[gate];
+    return policy.phase === 'authoring' && policy.automatic;
+  }),
+);
+const POST_AUTHORING_GATES = new Set<CourseGate>(
+  REQUIRED_COURSE_GATES.filter((gate) => COURSE_BUILDER_GATE_REPAIR_POLICY[gate].phase !== 'authoring'),
+);
+
 export const COURSE_BUILDER_BLUEPRINT_STEPS = REQUIRED_COURSE_GATES.map((gate, index) => ({
   order: index + 1,
   gate,
-  repairScope: gate === 'narration' ? ['narration','audio','captions','transcript','storyboard_timing'] :
-    gate === 'visual_alignment' ? ['visuals','storyboard','media_provenance'] :
-    gate === 'knowledge_checks' ? ['knowledge_checks','remediation'] :
-    gate === 'interactive_practice' ? ['scenario','case_study','exercises','practical_task','interactives'] :
-    gate === 'learning_objectives' ? ['objectives','competency_mapping'] : [gate],
+  repairScope: COURSE_BUILDER_GATE_REPAIR_POLICY[gate].repairScope,
 })) as ReadonlyArray<{order:number;gate:CourseGate;repairScope:readonly string[]}>;
 
 export async function walkCourseBuilderBlueprint(courseId: string) {
@@ -166,13 +197,16 @@ export async function courseFactory(
     const failedLessonIds = [
       ...new Set(
         beforeRepair.findings
+          .filter((finding) =>
+            finding.gate !== 'identity' &&
+            AUTHORING_AUTOMATIC_GATES.has(finding.gate as CourseGate),
+          )
           .map((finding) => finding.lessonId)
           .filter((lessonId): lessonId is string => Boolean(lessonId)),
       ),
     ];
-    const hasCourseLevelFailures = beforeRepair.findings.some((finding) => !finding.lessonId);
     const upgraded =
-      beforeRepair.pass || (failedLessonIds.length === 0 && hasCourseLevelFailures)
+      failedLessonIds.length === 0
         ? {
             ok: true as const,
             courseId: input.courseId,
@@ -190,12 +224,16 @@ export async function courseFactory(
     // gates are recompiled. Passing lessons and learner state are preserved.
     progress?.('validate', 'Validating repaired components against the Course Builder Blueprint.', 85);
     const readiness = await evaluatePersistedCredentialCourse(upgraded.courseId);
-    if (!readiness.pass) {
+    const authoringBlockers = readiness.findings.filter((finding) => {
+      if (finding.gate === 'identity') return true;
+      return !POST_AUTHORING_GATES.has(finding.gate as CourseGate);
+    });
+    if (authoringBlockers.length > 0) {
       return {
         ok: false,
         courseId: upgraded.courseId,
         courseSlug: upgraded.courseSlug,
-        errors: readiness.findings.map((finding) => `${finding.gate}: ${finding.message}`),
+        errors: authoringBlockers.map((finding) => `${finding.gate}: ${finding.message}`),
         videosQueued: 0,
         warnings: readiness.findings.map((finding) => `repair_required:${finding.gate}:${finding.message}`),
       };
@@ -210,8 +248,22 @@ export async function courseFactory(
       videosQueued: 0,
     };
     const withMedia = await queueUpgradedMediaIfRequested(input, result);
-    progress?.('complete', 'Authored course upgrade completed.', 100);
-    return withMedia;
+    const remaining = await evaluatePersistedCredentialCourse(upgraded.courseId);
+    const remainingWarnings = remaining.findings.map(
+      (finding) => `repair_required:${finding.gate}:${finding.message}`,
+    );
+    progress?.(
+      remaining.pass ? 'complete' : 'media',
+      remaining.pass
+        ? 'Authored course upgrade completed against the full contract.'
+        : 'Authoring contract passed; media/review gates remain in the production pipeline.',
+      remaining.pass ? 100 : 95,
+    );
+    return {
+      ...withMedia,
+      completionState: remaining.pass ? 'ready_for_review' : 'media_pending',
+      warnings: [...(withMedia.warnings ?? []), ...remainingWarnings],
+    };
   }
 
   const registeredBlueprint = await resolveRegisteredBlueprint(input);

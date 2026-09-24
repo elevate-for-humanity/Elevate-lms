@@ -9,6 +9,7 @@ import { promisify } from 'node:util';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { MediaStoryboard } from './media-director';
 import type { InstructionalQualityEvidence } from './instructional-quality-gate';
+import { configuredNarrationProvider } from './edge-tts';
 
 export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v5';
 
@@ -433,7 +434,9 @@ export async function enforceMediaQuality(input: {
         ? verifiedExactScenes.length / exactScenes.length
         : 1,
       instructionalQuality: input.instructionalQuality,
-      narrationProviderClass: input.narrationProviderClass ?? 'unknown',
+      narrationProviderClass:
+        input.narrationProviderClass ??
+        (['edge', 'local'].includes(configuredNarrationProvider()) ? 'diagnostic' : 'professional'),
     };
     const failures = mediaQualityFailures(evidence);
     if (failures.length) throw new Error(`Media quality gate failed: ${failures.join('; ')}`);

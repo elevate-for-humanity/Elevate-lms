@@ -274,10 +274,11 @@ export function repairInstructionalScript(
     ...(isCheckpoint ? checkpointParts(contentJson) : []),
   ]);
 
-  // Bound repaired narration while retaining enough governed instruction to
-  // satisfy the quality contract and produce a useful lesson-sized video.
-  const repairedWords = words(parts.join(' ')).slice(0, Math.max(minimumWordCount + 80, 500));
-  const script = dedupeTeachingSegments(repairedWords.join(' '));
+  // Preserve learner-facing punctuation while expanding undersized narration.
+  // Converting the governed parts to bare word tokens here destroys sentence
+  // boundaries, which can create malformed recap splices and truncated TTS.
+  // boundNarration already enforces the maximum at complete sentence edges.
+  const script = dedupeTeachingSegments(parts.join(' '));
   const boundedScript = boundNarration(script, maximumWordCount);
   const wordCount = words(boundedScript).length;
   return {

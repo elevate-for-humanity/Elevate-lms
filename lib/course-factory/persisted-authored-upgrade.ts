@@ -78,7 +78,11 @@ function specificSource(
   };
 }
 
-export async function upgradePersistedAuthoredCourse(courseId: string, client?: SupabaseClient) {
+export async function upgradePersistedAuthoredCourse(
+  courseId: string,
+  client?: SupabaseClient,
+  options?: { lessonIds?: readonly string[] },
+) {
   const db = client ?? (await requireAdminClient());
   const { data: course, error: courseError } = await db
     .from('courses')
@@ -125,9 +129,23 @@ export async function upgradePersistedAuthoredCourse(courseId: string, client?: 
   const curriculumBySlug = new Map((curriculumRows ?? []).map((item) => [item.lesson_slug, item]));
   const modulesById = new Map((modules ?? []).map((item) => [item.id, item]));
 
-  // Compile every lesson before the transaction. One invalid lesson blocks the
-  // entire course, so a repair can never leave a half-upgraded publication.
-  const payload = lessons.map((lesson) => {
+  const requestedLessonIds = options?.lessonIds?.length
+    ? new Set(options.lessonIds)
+    : null;
+  const lessonsToUpgrade = requestedLessonIds
+    ? lessons.filter((lesson) => requestedLessonIds.has(lesson.id))
+    : lessons;
+
+  if (requestedLessonIds && lessonsToUpgrade.length !== requestedLessonIds.size) {
+    const found = new Set(lessonsToUpgrade.map((lesson) => lesson.id));
+    const missing = [...requestedLessonIds].filter((lessonId) => !found.has(lessonId));
+    throw new Error(`Selective authored repair referenced missing lesson(s): ${missing.join(', ')}`);
+  }
+
+  // Compile only the requested failed lesson components before the transaction.
+  // A normal authored upgrade still compiles the complete course, while repair
+  // callers can preserve every passing lesson byte-for-byte.
+  const payload = lessonsToUpgrade.map((lesson) => {
     const module = modulesById.get(lesson.module_id);
     if (!module) throw new Error(`${lesson.title}: module is missing`);
     const source = specificSource(
@@ -226,7 +244,8 @@ export async function upgradePersistedAuthoredCourse(courseId: string, client?: 
     courseId,
     courseSlug: course.slug,
     moduleCount: modules?.length ?? 0,
-    lessonCount: payload.length,
+    lessonCount: lessons?.length ?? 0,
+    repairedLessonCount: payload.length,
     result: data,
   };
 }

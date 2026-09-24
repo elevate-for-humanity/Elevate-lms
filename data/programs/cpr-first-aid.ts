@@ -180,7 +180,7 @@ export const CPR_FIRST_AID: ProgramSchema = {
   paymentTerms: 'Included free with any Elevate program enrollment. Stand-alone: $130.',
   // ─── Content model ──────────────────────────────────────────────
   deliveryModel: 'internal',
-  deliveryModelDetail: 'instructor_led',
+  deliveryModelDetail: 'internal_lms',
   fundingOptions: ['self_pay'],
   enrollmentType: 'internal',
   partnerCourses: [],

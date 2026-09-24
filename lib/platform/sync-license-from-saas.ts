@@ -15,8 +15,9 @@ export async function syncLicenseFromSaasEntitlements(
   opts: {
     planSlug: BasePlanId;
     billingInterval: BillingInterval;
-    stripeSubscriptionId?: string;
-    stripeCustomerId?: string;
+    billingProvider?: string;
+    providerSubscriptionId?: string;
+    providerCustomerId?: string;
     active?: boolean;
   },
 ): Promise<void> {
@@ -29,8 +30,9 @@ export async function syncLicenseFromSaasEntitlements(
     status: active ? 'active' : 'suspended',
     features,
     max_users: active ? entitlements.limits.users ?? 1 : 0,
-    stripe_subscription_id: opts.stripeSubscriptionId ?? null,
-    stripe_customer_id: opts.stripeCustomerId ?? null,
+    billing_provider: opts.billingProvider ?? 'elevate',
+    provider_subscription_id: opts.providerSubscriptionId ?? null,
+    provider_customer_id: opts.providerCustomerId ?? null,
     metadata: {
       saas_plan_slug: opts.planSlug,
       limits: active ? entitlements.limits : { users: 0 },

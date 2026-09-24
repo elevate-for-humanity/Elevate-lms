@@ -231,12 +231,6 @@ export function useNaturalVoice() {
       setIsPaused(false);
       return true;
     }
-    if (utteranceRef.current && typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.resume();
-      setIsPlaying(true);
-      setIsPaused(false);
-      return true;
-    }
     return false;
   }, []);
 

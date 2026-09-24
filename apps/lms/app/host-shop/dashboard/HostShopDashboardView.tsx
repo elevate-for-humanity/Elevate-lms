@@ -131,15 +131,6 @@ export default async function HostShopDashboardView() {
     ) {
       return (
         <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-          {!publicProfile?.logo_url ? (
-        <section className="mb-6 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
-          <p className="text-xs font-black uppercase tracking-[0.14em] text-amber-800">Required shop-profile to-do</p>
-          <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div><h2 className="text-lg font-black text-amber-950">Upload your Host Shop logo</h2><p className="mt-1 text-sm font-medium text-amber-900">Add the official shop logo and approved shop photos. Your uploaded shop media is used to personalize this dashboard and your public Host Shop profile.</p></div>
-            <Link href="/host-shop/dashboard/profile" className="inline-flex min-h-11 flex-shrink-0 items-center justify-center rounded-xl bg-amber-900 px-5 py-3 text-sm font-black text-white">Upload shop logo</Link>
-          </div>
-        </section>
-      ) : null}
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <div className="relative h-52 w-full">
               <Image

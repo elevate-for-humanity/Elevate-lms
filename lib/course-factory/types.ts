@@ -87,6 +87,7 @@ export type FactoryStage =
   | 'enrich'
   | 'assess'
   | 'validate'
+  | 'contract'
   | 'generating_assets'
   | 'generating_narration'
   | 'publish'

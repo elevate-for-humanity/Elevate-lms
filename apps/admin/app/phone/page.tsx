@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Bot, Phone, PhoneForwarded, Radio, Video, Voicemail, Workflow } from 'lucide-react';
+import { Bot, Mail, MessageSquareText, Phone, PhoneForwarded, Radio, Video, Voicemail, Workflow } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { formatUsPhone, parseBusinessHours } from '@/lib/phone/config';
@@ -217,13 +217,30 @@ export default async function PhonePage() {
             Meetings
           </Link>
           <Link
-            href="/inbox"
+            href="/phone/inbox"
             className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-800"
           >
             Inbox
           </Link>
         </div>
       </div>
+      <section className="grid gap-3 sm:grid-cols-3">
+        <Link href="/phone/inbox" className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <MessageSquareText className="h-5 w-5 text-indigo-700" />
+          <p className="mt-2 font-black text-slate-950">Phone inbox & texts</p>
+          <p className="mt-1 text-sm text-slate-600">Missed calls, voicemail, callback interviews, SMS conversations, and call notes.</p>
+        </Link>
+        <Link href="/phone/email" className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <Mail className="h-5 w-5 text-orange-600" />
+          <p className="mt-2 font-black text-slate-950">Email</p>
+          <p className="mt-1 text-sm text-slate-600">Read, reply, compose, and manage Elevate office email from the Communications Hub.</p>
+        </Link>
+        <Link href="/phone/meetings" className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <Video className="h-5 w-5 text-cyan-700" />
+          <p className="mt-2 font-black text-slate-950">Meetings</p>
+          <p className="mt-1 text-sm text-slate-600">Video meetings, microphone, chat, and screen sharing.</p>
+        </Link>
+      </section>
       {!onboarding?.announcement_seen_at ? (
         <NewSystemNotice dismissAction={dismissCommunicationsAnnouncement} steps={setupSteps} />
       ) : null}

@@ -72,7 +72,7 @@ const INITIAL_SITE: BuilderState = {
 };
 
 const EXAMPLE_PROMPT =
-  'Build a premium black-and-gold commerce website for MERI-GOLD-ROUND Multi-Zone Oil by Curvature Body Sculpting. Use the real product images and customer-care email curvaturebodysculpting@gmail.com. Include benefits, ingredients, quantity selection, cart, secure Stripe checkout, shipping, policies, SEO, mobile preview, and persuasive reasons to buy.';
+  'Build a premium black-and-gold commerce website for MERI-GOLD-ROUND Multi-Zone Oil by Curvature Body Sculpting. Use the real product images and customer-care email curvaturebodysculpting@gmail.com. Include benefits, ingredients, quantity selection, cart, secure checkout, shipping, policies, SEO, mobile preview, and persuasive reasons to buy.';
 
 const INTERVIEW_QUESTIONS = [
   'Are you building a new website or importing an existing one? If importing, include the current website URL.',

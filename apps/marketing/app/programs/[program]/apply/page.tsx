@@ -141,12 +141,10 @@ export default function BeautyApplyPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            programSlug: cfg.slug,
-            email,
-            name: `${data.firstName} ${data.lastName}`.trim(),
-            applicationId: json.id || null,
-            paymentOption: paymentPlan,
-            promoCode: normalizedPromoCode || null,
+            program_id: json.programId || json.program_id,
+            funding_source: 'self_pay',
+            payment_plan: paymentPlan === 'full' ? 'full' : 'installments',
+            coupon_code: normalizedPromoCode || '',
           }),
         });
         const checkoutData = await checkout.json().catch(() => ({}));

@@ -15,8 +15,10 @@ export interface PlatformSaasCheckoutMetadata {
   plan_id: BasePlanId;
   billing_interval: BillingInterval;
   addon_slugs?: string;
-  stripe_subscription_id?: string;
-  stripe_customer_id?: string;
+  billing_provider?: string;
+  provider_subscription_id?: string;
+  provider_customer_id?: string;
+  provider_payment_id?: string;
   current_period_start?: string;
   current_period_end?: string;
 }
@@ -70,8 +72,10 @@ export async function fulfillPlatformSaasSubscription(
       organization_id: billingOrganizationId,
       plan_id: planRow.id,
       plan_type: planRow.slug,
-      stripe_subscription_id: meta.stripe_subscription_id ?? null,
-      stripe_customer_id: meta.stripe_customer_id ?? null,
+      billing_provider: meta.billing_provider ?? 'elevate',
+      provider_subscription_id: meta.provider_subscription_id ?? null,
+      provider_customer_id: meta.provider_customer_id ?? null,
+      provider_payment_id: meta.provider_payment_id ?? null,
       billing_interval: databaseBillingInterval(meta.billing_interval),
       status: 'active',
       current_period_start: meta.current_period_start ?? null,
@@ -131,12 +135,13 @@ export async function fulfillPlatformSaasSubscription(
   await syncLicenseFromSaasEntitlements(adminSupabase, tenantId, entitlements, {
     planSlug: meta.plan_id,
     billingInterval: meta.billing_interval,
-    stripeSubscriptionId: meta.stripe_subscription_id,
-    stripeCustomerId: meta.stripe_customer_id,
+    billingProvider: meta.billing_provider ?? 'elevate',
+    providerSubscriptionId: meta.provider_subscription_id,
+    providerCustomerId: meta.provider_customer_id,
     active: true,
   });
 
-  if (meta.stripe_subscription_id) {
+  if (meta.provider_subscription_id) {
     await emitPlatformEvent(adminSupabase, {
       eventType: PlatformEventType.ENTITLEMENT_REFRESHED,
       category: 'entitlement',
@@ -146,8 +151,8 @@ export async function fulfillPlatformSaasSubscription(
       tenantId,
       subjectType: 'tenant',
       subjectId: tenantId,
-      correlationId: meta.stripe_subscription_id,
-      idempotencyKey: `platform-checkout-entitlement:${meta.stripe_subscription_id}:${meta.plan_id}:${addonSlugs.join(',')}`,
+      correlationId: meta.provider_subscription_id,
+      idempotencyKey: `platform-checkout-entitlement:${meta.provider_subscription_id}/:${meta.plan_id}:${addonSlugs.join(',')}`,
       payload: { plan_slug: meta.plan_id, addon_codes: addonSlugs, features: entitlements.features },
     });
   }

@@ -162,10 +162,32 @@ export async function courseFactory(
       };
     }
     progress?.('resolve', 'Loading the identified persisted authored curriculum.', 10);
-    const upgraded = await upgradePersistedAuthoredCourse(input.courseId);
-    // Blueprint selective repair is iterative: normalize/upgrade the persisted
-    // authored components, then validate. Gate failures remain component repair
-    // targets rather than triggering a destructive full-course refresh.
+    const beforeRepair = await evaluatePersistedCredentialCourse(input.courseId);
+    const failedLessonIds = [
+      ...new Set(
+        beforeRepair.findings
+          .map((finding) => finding.lessonId)
+          .filter((lessonId): lessonId is string => Boolean(lessonId)),
+      ),
+    ];
+    const hasCourseLevelFailures = beforeRepair.findings.some((finding) => !finding.lessonId);
+    const upgraded =
+      beforeRepair.pass || (failedLessonIds.length === 0 && hasCourseLevelFailures)
+        ? {
+            ok: true as const,
+            courseId: input.courseId,
+            courseSlug: input.programSlug,
+            moduleCount: undefined,
+            lessonCount: undefined,
+            repairedLessonCount: 0,
+          }
+        : await upgradePersistedAuthoredCourse(
+            input.courseId,
+            undefined,
+            { lessonIds: failedLessonIds },
+          );
+    // Blueprint selective repair is iterative: only lessons named by failed
+    // gates are recompiled. Passing lessons and learner state are preserved.
     progress?.('validate', 'Validating repaired components against the Course Builder Blueprint.', 85);
     const readiness = await evaluatePersistedCredentialCourse(upgraded.courseId);
     if (!readiness.pass) {

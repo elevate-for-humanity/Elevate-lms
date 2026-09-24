@@ -259,6 +259,7 @@ export async function fulfillPaidBillingInvoice(
       slot_id: payload.slot_id,
       provider: 'quickbooks',
       provider_invoice_id: job.billing_invoice_id,
+      billing_invoice_id: job.billing_invoice_id,
     });
     if (result.error) throw new Error(result.error.message);
     if (payload.slot_id) {

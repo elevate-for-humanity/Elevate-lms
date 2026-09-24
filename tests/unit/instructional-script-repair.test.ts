@@ -43,6 +43,28 @@ describe('instructional script repair', () => {
     expect(result.script).toContain('The correct response is Sanitize the station');
   });
 
+  it('keeps sentence punctuation while expanding undersized narration', () => {
+    const result = repairInstructionalScript({
+      lessonTitle: 'Scalp Treatments',
+      lessonType: 'lesson',
+      baseScript: 'Assess the scalp before service.',
+      content: {
+        html: Array.from(
+          { length: 90 },
+          (_, index) =>
+            `<p>Step ${index + 1} checks scalp condition, sanitation, client comfort, product choice, and observable service evidence.</p>`,
+        ).join(''),
+      },
+      contentJson: {},
+    });
+
+    expect(result.repaired).toBe(true);
+    expect(result.wordCount).toBeGreaterThanOrEqual(180);
+    expect(result.script).toMatch(/[.!?] Now, connect those steps to the lesson objective/);
+    expect(result.script).not.toMatch(/\b(?:condition|sanitation|comfort|choice|evidence) Now, connect/);
+    expect(result.script).toContain('Assess the scalp before service.');
+  });
+
   it('removes repeated teaching sentences from otherwise complete narration', () => {
     const repeated = 'Sanitize the workstation before preparing the client for service.';
     const baseScript = `${'topic instruction '.repeat(180)}. ${repeated} ${repeated}`;

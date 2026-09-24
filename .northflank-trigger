@@ -1,4 +1,4 @@
-merge_sha=21220cf956ccd653b0cd9180522b3420a5716dab
+merge_sha=76a1b0e7b5bc6101de1c4363b018fcb0ecd462ae
 services=lms
-requested_at=2026-09-18T16:08:00.000Z
-reason=Deploy Top Shelf Android PWA false-offline recovery
+requested_at=2026-09-24T21:20:00.000Z
+reason=Deploy current LMS main including timeclock persistence repair 73da1408

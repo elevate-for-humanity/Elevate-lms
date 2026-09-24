@@ -21,17 +21,15 @@ export default async function SubscriptionPage() {
 
   const { data: subscriptions, error } = shopIds.length
     ? await db
-        .from('host_shop_subscriptions')
-        .select('id, host_shop_id, plan, status, started_at, expires_at, created_at')
+        .from('host_shop_partnerships')
+        .select('id, host_shop_id, status, billing_provider, provider_subscription_id, created_at, updated_at')
         .in('host_shop_id', shopIds)
         .order('created_at', { ascending: false })
         .limit(10)
     : { data: [], error: null };
 
   const rows = subscriptions ?? [];
-  const current = rows.find((subscription) =>
-    ['active', 'trialing', 'past_due'].includes(String(subscription.status || '').toLowerCase()),
-  ) ?? rows[0] ?? null;
+  const current = rows.find((subscription) => ['active','approved','past_due'].includes(String(subscription.status || '').toLowerCase())) ?? rows[0] ?? null;
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
@@ -49,13 +47,13 @@ export default async function SubscriptionPage() {
       {current ? (
         <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-7 sm:p-9">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div><div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-blue-50 text-brand-blue-700"><CreditCard className="h-6 w-6" /></div><h2 className="mt-5 text-2xl font-black capitalize text-slate-950">{current.plan || 'Host Shop Plan'}</h2><p className="mt-1 text-sm text-slate-600">Subscription record {current.id}</p></div>
+            <div><div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-blue-50 text-brand-blue-700"><CreditCard className="h-6 w-6" /></div><h2 className="mt-5 text-2xl font-black capitalize text-slate-950">Host Shop Partnership</h2><p className="mt-1 text-sm text-slate-600">Billing provider: <span className="font-bold capitalize">{current.billing_provider || 'Elevate'}</span></p></div>
             <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-black capitalize text-slate-800">{current.status || 'unknown'}</span>
           </div>
 
           <dl className="mt-7 grid gap-5 sm:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 p-5"><dt className="flex items-center gap-2 text-sm font-bold text-slate-600"><Calendar className="h-4 w-4" /> Started</dt><dd className="mt-2 font-black text-slate-950">{current.started_at ? new Date(current.started_at).toLocaleString() : 'Not recorded'}</dd></div>
-            <div className="rounded-2xl border border-slate-200 p-5"><dt className="flex items-center gap-2 text-sm font-bold text-slate-600"><Calendar className="h-4 w-4" /> Expires / renews</dt><dd className="mt-2 font-black text-slate-950">{current.expires_at ? new Date(current.expires_at).toLocaleString() : 'Not recorded'}</dd></div>
+            <div className="rounded-2xl border border-slate-200 p-5"><dt className="flex items-center gap-2 text-sm font-bold text-slate-600"><Calendar className="h-4 w-4" /> Started</dt><dd className="mt-2 font-black text-slate-950">{current.created_at ? new Date(current.created_at).toLocaleString() : 'Not recorded'}</dd></div>
+            <div className="rounded-2xl border border-slate-200 p-5"><dt className="flex items-center gap-2 text-sm font-bold text-slate-600"><Calendar className="h-4 w-4" /> Expires / renews</dt><dd className="mt-2 font-black text-slate-950">{current.updated_at ? new Date(current.updated_at).toLocaleString() : 'Managed by current billing schedule'}</dd></div>
           </dl>
         </section>
       ) : (

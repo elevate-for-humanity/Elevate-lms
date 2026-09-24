@@ -236,6 +236,17 @@ export async function fulfillPaidBillingInvoice(
     return;
   }
 
+  if (job.fulfillment_type === 'testing_enforcement') {
+    const result = await db.from('testing_enforcement').update({
+      fee_paid: true,
+      paid_at: new Date().toISOString(),
+      payment_provider: 'quickbooks',
+      provider_invoice_id: job.billing_invoice_id,
+    }).eq('id', payload.enforcement_id).eq('email', payload.email).eq('fee_paid', false);
+    if (result.error) throw new Error(result.error.message);
+    return;
+  }
+
   if (job.fulfillment_type === 'testing_booking') {
     const names = String(payload.customer_name || 'Customer')
       .trim()

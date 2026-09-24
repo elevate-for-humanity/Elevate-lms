@@ -75,7 +75,7 @@ export async function GET() {
       .limit(100),
     ctx.db
       .from('notification_preferences')
-      .select('email_missed_calls')
+      .select('email_missed_calls,sms_missed_calls,sms_phone')
       .eq('user_id', ctx.user.id)
       .maybeSingle(),
   ]);
@@ -84,7 +84,11 @@ export async function GET() {
   return NextResponse.json({
     phoneNumber: publicPhoneNumber(),
     system: { name: system.name, timezone: system.timezone, status: system.status },
-    notifications: { emailMissedCalls: notificationPreferences?.email_missed_calls !== false },
+    notifications: {
+      emailMissedCalls: notificationPreferences?.email_missed_calls !== false,
+      smsMissedCalls: notificationPreferences?.sms_missed_calls === true,
+      smsPhone: notificationPreferences?.sms_phone || '',
+    },
     extension: {
       id: extension.id,
       extension: extension.extension,
@@ -188,11 +192,12 @@ export async function PATCH(request: Request) {
       presence_status: ['do_not_disturb', 'offline'].includes(ringMode) ? ringMode : 'available',
       last_presence_at: new Date().toISOString(),
     });
-    if (typeof body.emailMissedCalls === 'boolean') {
+    if (typeof body.emailMissedCalls === 'boolean' || typeof body.smsMissedCalls === 'boolean') {
       const { error: preferenceError } = await ctx.db.from('notification_preferences').upsert(
         {
           user_id: ctx.user.id,
-          email_missed_calls: body.emailMissedCalls,
+          ...(typeof body.emailMissedCalls === 'boolean' ? { email_missed_calls: body.emailMissedCalls } : {}),
+          ...(typeof body.smsMissedCalls === 'boolean' ? { sms_missed_calls: body.smsMissedCalls } : {}),
           updated_at: new Date().toISOString(),
         },
         { onConflict: 'user_id' },

@@ -241,6 +241,8 @@ export async function publishGovernedCourse(
   }
 
   const blueprint = adaptProgramTemplateToBlueprint(template);
+  progress?.('contract', 'Walking the canonical course contract before repair.', 5);
+  const before = await validateCourseAgainstContract(courseId);
   const result = await courseFactory(
     {
       programId: template.programId,
@@ -259,6 +261,32 @@ export async function publishGovernedCourse(
       : null;
 
   return { ...gate, ok: gate.ok && result.ok, result, governance };
+}
+
+
+export type ContractWalkthroughStep = {
+  order: number;
+  gate: string;
+  pass: boolean;
+  message: string;
+};
+
+/** Walk the persisted course against the canonical contract in required gate order.
+ * This is the single validation trace used by generation, repair, review, and publication. */
+export async function validateCourseAgainstContract(courseId: string) {
+  const readiness = await evaluatePersistedCredentialCourse(courseId);
+  const steps: ContractWalkthroughStep[] = readiness.findings.map((finding, index) => ({
+    order: index + 1,
+    gate: finding.gate,
+    pass: finding.pass !== false,
+    message: finding.message,
+  }));
+  return {
+    courseId,
+    pass: readiness.pass,
+    steps,
+    failedGates: steps.filter((step) => !step.pass).map((step) => step.gate),
+  };
 }
 
 export async function repairCanonicalCourse(courseId: string, progress?: ProgressCallback) {
@@ -289,7 +317,8 @@ export async function repairCanonicalCourse(courseId: string, progress?: Progres
       ? await normalizeGeneratedCourseForGovernance(result.courseId)
       : null;
 
-  return { ...result, governance, repairedCourseId: courseId, programSlug: course.slug };
+  const after = await validateCourseAgainstContract(courseId);
+  return { ...result, governance, repairedCourseId: courseId, programSlug: course.slug, contractValidation: { before, after } };
 }
 
 export async function queueCourseMedia(input: {

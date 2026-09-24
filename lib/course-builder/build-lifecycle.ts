@@ -2,6 +2,7 @@ import 'server-only';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getCourseMediaState } from '@/lib/course-factory/media-manager';
+import { evaluatePersistedCredentialCourse } from '@/lib/course-factory/canonical-course-gate';
 
 /** Course build completion is separate from publication. */
 export async function markCourseMediaPendingWithClient(input: {
@@ -36,6 +37,36 @@ export async function finalizeUnifiedCourseBuildWithClient(input: {
   if (!media.completePackage) {
     await markCourseMediaPendingWithClient(input);
     return { ok: false as const, state: 'media_pending' as const, media };
+  }
+
+  // Media completion is necessary but not sufficient. Re-run the same full
+  // CoursePackage contract used by authoring before a build can enter review.
+  const contract = await evaluatePersistedCredentialCourse(input.courseId);
+  if (!contract.pass) {
+    const mediaGates = new Set([
+      'demonstration',
+      'visual_alignment',
+      'captions',
+      'transcript',
+      'progress_tracking',
+      'resume_tracking',
+    ]);
+    const mediaFailures = contract.findings.filter((finding) => mediaGates.has(finding.gate));
+    if (mediaFailures.length) {
+      await markCourseMediaPendingWithClient(input);
+      return {
+        ok: false as const,
+        state: 'media_pending' as const,
+        media,
+        contract,
+      };
+    }
+    return {
+      ok: false as const,
+      state: 'review_pending' as const,
+      media,
+      contract,
+    };
   }
 
   const now = new Date().toISOString();

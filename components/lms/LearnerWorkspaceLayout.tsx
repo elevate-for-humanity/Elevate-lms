@@ -31,6 +31,15 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
           </div>
         </div>
       ) : null}
+      <div className="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6">
+        <section className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:p-5">
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-indigo-700">New payment options</p>
+          <div className="mt-2 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0"><h2 className="text-lg font-black text-slate-950">Affirm and installment payment options are available</h2><p className="mt-1 text-sm leading-6 text-slate-700">Open Billing to view your current balance and eligible payment choices. Affirm and Sezzle use separate financing checkout services. Afterpay is offered through the platform payment checkout when the amount is within Afterpay eligibility limits. Approval and financing terms are determined by each provider.</p></div>
+            <Link href="/apprentice/billing" className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-indigo-700 px-5 py-3 text-sm font-black text-white">View payment options</Link>
+          </div>
+        </section>
+      </div>
       {children}
     </PlatformShell>
   );

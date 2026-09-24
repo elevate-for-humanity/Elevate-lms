@@ -263,11 +263,6 @@ export const headerNavigation: NavGroup[] = [
         description: 'CareerSafe OSHA training',
       },
       {
-        label: 'HSI Partners',
-        href: '/partners/hsi',
-        description: 'HSI training partnership',
-      },
-      {
         label: 'JRI Partners',
         href: '/partners/jri',
         description: 'Job Ready Indy',

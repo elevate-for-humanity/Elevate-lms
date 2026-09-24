@@ -5,7 +5,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Clock, Award, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 import {
-  HSI_COURSES,
   NRF_COURSES,
   type PartnerCourse,
 } from '@/lib/partners/link-based-integration';
@@ -14,19 +13,13 @@ import { canonicalRoutes } from '@/lib/routes/canonical-routes';
 export const metadata: Metadata = {
   title: 'Microclasses | Elevate for Humanity',
   description:
-    'Job-ready certifications in hours. CPR, First Aid, ServSafe and more. Free with WIOA or pay as low as $18.',
+    'Job-ready certifications in hours. ServSafe and other short-form credentials with available funding options.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/microclasses',
   },
 };
 
 const SECTIONS = [
-  {
-    id: 'healthcare',
-    label: 'Healthcare',
-    partner: 'Health & Safety Institute',
-    courses: HSI_COURSES,
-  },
   {
     id: 'food',
     label: 'Food Service',
@@ -107,8 +100,7 @@ export default function MicroclassesPage() {
           </span>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Microclasses</h1>
           <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-8">
-            Job-ready certifications in hours, not months. Free through WIOA for eligible Indiana
-            residents — or pay as low as $18 out of pocket.
+            Job-ready certifications in hours, not months, with available funding and self-pay options.
           </p>
           <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-300">
             <div className="flex items-center gap-2">
@@ -133,8 +125,7 @@ export default function MicroclassesPage() {
           <div className="flex items-center gap-3">
             <ShieldCheck className="w-5 h-5 text-green-600 shrink-0" />
             <p className="text-sm text-green-900 font-medium">
-              All courses are <strong>free for eligible Indiana residents</strong> through WIOA /
-              WorkOne funding.
+              Eligible programs may qualify for workforce funding through WorkOne.
             </p>
           </div>
           <Link

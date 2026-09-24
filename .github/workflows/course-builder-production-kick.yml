@@ -1,4 +1,4 @@
-# Canonical production recovery: Barber + Cosmetology media checkpoints — pass 2
+# Canonical production continuation: Barber + Cosmetology media checkpoints
 name: Course Builder Production Kick
 
 on:
@@ -17,9 +17,9 @@ concurrency:
 
 jobs:
   kick-canonical-runs:
-    name: Start Barber and Cosmetology canonical workers
+    name: Keep Barber and Cosmetology canonical media workers active
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 75
     env:
       ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
@@ -31,40 +31,27 @@ jobs:
           test -n "$CRON_SECRET"
           test -n "$ADMIN_URL"
 
-      - name: Start first canonical Course Builder run
+      - name: Continue canonical media workers for one hour
         shell: bash
         run: |
           set -euo pipefail
-          curl -fsS -X GET "$ADMIN_URL/api/cron/process-course-builder-jobs" \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            -H "Content-Type: application/json" \
-            --max-time 3600 | tee /tmp/course-builder-1.json
-
-      - name: Start second canonical Course Builder run
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl -fsS -X GET "$ADMIN_URL/api/cron/process-course-builder-jobs" \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            -H "Content-Type: application/json" \
-            --max-time 3600 | tee /tmp/course-builder-2.json
-
-      - name: Continue Barber media worker
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl -fsS -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            -H "Content-Type: application/json" \
-            --data '{"courseId":"3fb5ce19-1cde-434c-a8c6-f138d7d7aa17","maxJobs":1}' \
-            --max-time 1800 | tee /tmp/barber-media.json
-
-      - name: Continue Cosmetology media worker
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl -fsS -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            -H "Content-Type: application/json" \
-            --data '{"courseId":"9ca9fb50-7119-46ea-ab81-9b0193c29c31","maxJobs":1}' \
-            --max-time 1800 | tee /tmp/cosmetology-media.json
+          for pass in $(seq 1 12); do
+            echo "=== media continuation pass $pass/12 ==="
+            echo "Barber:"
+            curl -fsS -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              -H "Content-Type: application/json" \
+              --data '{"courseId":"3fb5ce19-1cde-434c-a8c6-f138d7d7aa17","maxJobs":1}' \
+              --max-time 60 || echo '{"ok":false,"reason":"barber-worker-request-failed"}'
+            echo
+            echo "Cosmetology:"
+            curl -fsS -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              -H "Content-Type: application/json" \
+              --data '{"courseId":"9ca9fb50-7119-46ea-ab81-9b0193c29c31","maxJobs":1}' \
+              --max-time 60 || echo '{"ok":false,"reason":"cosmetology-worker-request-failed"}'
+            echo
+            if [ "$pass" -lt 12 ]; then
+              sleep 300
+            fi
+          done

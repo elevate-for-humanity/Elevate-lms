@@ -16,6 +16,10 @@ const nextConfig = {
   outputFileTracingRoot: path.join(__dirname, '../..'),
   poweredByHeader: false,
   reactStrictMode: true,
+  // Marketing must render request-time metadata under Next 15.5 without the
+  // static-export AsyncLocalStorage invariant seen on the generated 404 route.
+  // Standalone Node output remains cacheable at the CDN/origin layer.
+  experimental: undefined,
 
   generateBuildId: async () => {
     const sha = resolveCommitSha(process.env);
@@ -105,19 +109,6 @@ const nextConfig = {
     ];
   },
 
-  experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', '@supabase/supabase-js'],
-    optimizeCss: false,
-    scrollRestoration: false,
-    workerThreads: false,
-    cpus: 1,
-    // Next 15.5.25 server minification can break the AsyncLocalStorage context
-    // used by static metadata generation, surfacing a false workUnitAsyncStorage
-    // invariant for otherwise valid pages. Keep client minification enabled and
-    // preserve static output; only the server bundle skips this transformation.
-    serverMinification: false,
-    ppr: false,
-  },
 
   webpack: (config, { dev, isServer }) => {
     config.parallelism = 1;

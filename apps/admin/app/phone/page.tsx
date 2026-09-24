@@ -87,7 +87,6 @@ export default async function PhonePage() {
           .from('profiles')
           .select('id,full_name,email,role,program_holder_id')
           .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder'])
-          .not('program_holder_id', 'is', null)
           .order('full_name'),
         db
           .from('communication_extensions')

@@ -116,6 +116,7 @@ const nextConfig = {
     // invariant for otherwise valid pages. Keep client minification enabled and
     // preserve static output; only the server bundle skips this transformation.
     serverMinification: false,
+    ppr: false,
   },
 
   webpack: (config, { dev, isServer }) => {

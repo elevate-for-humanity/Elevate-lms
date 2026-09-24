@@ -13,7 +13,10 @@ permissions:
 
 concurrency:
   group: course-builder-production-kick
-  cancel-in-progress: false
+  # A workflow-file repair must replace the older continuation loop immediately.
+  # The actual render stays owned by the Admin worker/database lease, so cancelling
+  # this HTTP-kick loop does not terminate an in-flight canonical render.
+  cancel-in-progress: true
 
 jobs:
   kick-canonical-runs:
@@ -35,22 +38,36 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
+          BARBER_ID='3fb5ce19-1cde-434c-a8c6-f138d7d7aa17'
+          COSMETOLOGY_ID='9ca9fb50-7119-46ea-ab81-9b0193c29c31'
+
+          kick_course() {
+            local label="$1"
+            local course_id="$2"
+            local failure_reason="$3"
+            echo "$label:"
+            curl -fsS -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              -H "Content-Type: application/json" \
+              --data "{\"courseId\":\"${course_id}\",\"maxJobs\":1}" \
+              --max-time 60 || echo "{\"ok\":false,\"reason\":\"${failure_reason}\"}"
+            echo
+          }
+
           for pass in $(seq 1 12); do
             echo "=== media continuation pass $pass/12 ==="
-            echo "Barber:"
-            curl -fsS -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
-              -H "Authorization: Bearer $CRON_SECRET" \
-              -H "Content-Type: application/json" \
-              --data '{"courseId":"3fb5ce19-1cde-434c-a8c6-f138d7d7aa17","maxJobs":1}' \
-              --max-time 60 || echo '{"ok":false,"reason":"barber-worker-request-failed"}'
-            echo
-            echo "Cosmetology:"
-            curl -fsS -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
-              -H "Authorization: Bearer $CRON_SECRET" \
-              -H "Content-Type: application/json" \
-              --data '{"courseId":"9ca9fb50-7119-46ea-ab81-9b0193c29c31","maxJobs":1}' \
-              --max-time 60 || echo '{"ok":false,"reason":"cosmetology-worker-request-failed"}'
-            echo
+            # The Admin renderer intentionally allows one local Chromium job at a
+            # time. Always calling Barber first starved Cosmetology whenever
+            # Barber still had backlog. Alternate the first claim so both canonical
+            # courses get a fair chance at the next available local render slot.
+            if [ $((pass % 2)) -eq 1 ]; then
+              kick_course "Cosmetology" "$COSMETOLOGY_ID" "cosmetology-worker-request-failed"
+              kick_course "Barber" "$BARBER_ID" "barber-worker-request-failed"
+            else
+              kick_course "Barber" "$BARBER_ID" "barber-worker-request-failed"
+              kick_course "Cosmetology" "$COSMETOLOGY_ID" "cosmetology-worker-request-failed"
+            fi
             if [ "$pass" -lt 12 ]; then
               sleep 300
             fi

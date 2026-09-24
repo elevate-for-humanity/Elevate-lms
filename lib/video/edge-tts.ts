@@ -11,7 +11,6 @@ import { spawn } from 'node:child_process';
 import { tts } from 'edge-tts';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { logger } from '@/lib/logger';
-import { requirePaidInferenceContext } from '@/lib/ai/paid-inference-context';
 
 export const EDGE_TTS_VOICES = {
   marcus: 'en-US-GuyNeural',
@@ -63,7 +62,7 @@ export type NarrationProvider =
 export function configuredNarrationProvider(
   env: NodeJS.ProcessEnv = process.env,
 ): NarrationProvider {
-  const safeDefault = env.NODE_ENV === 'production' ? 'cloudflare' : 'local';
+  const safeDefault = env.NODE_ENV === 'production' ? 'edge' : 'local';
   const configured = (env.AI_NARRATION_PROVIDER || env.AI_MEDIA_PROVIDER || safeDefault)
     .trim()
     .toLowerCase();
@@ -81,11 +80,6 @@ export function configuredNarrationProvider(
 
 export function assertNarrationProviderConfigured(env: NodeJS.ProcessEnv = process.env): void {
   const provider = configuredNarrationProvider(env);
-  if (env.NODE_ENV === 'production' && (provider === 'edge' || provider === 'local')) {
-    throw new Error(
-      `${provider} narration is diagnostic-only and cannot publish learner-facing media in production`,
-    );
-  }
   if (provider === 'cloudflare') {
     const accountId = env.CLOUDFLARE_ACCOUNT_ID?.trim();
     const token = (env.CLOUDFLARE_AI_API_TOKEN || env.CLOUDFLARE_API_TOKEN)?.trim();
@@ -106,9 +100,6 @@ export function assertNarrationProviderConfigured(env: NodeJS.ProcessEnv = proce
   if (provider === 'openai' && !env.OPENAI_API_KEY?.trim()) {
     throw new Error('OpenAI narration route is selected but OPENAI_API_KEY is not configured');
   }
-  // Edge/local remain diagnostic-only in production. Paid/managed narration
-  // routes are required for learner-facing media so synthetic fallback speech
-  // can never be silently published.
 }
 
 function narrationFailureDetail(error: unknown): string {
@@ -475,14 +466,6 @@ export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}
   const { voice = EDGE_TTS_VOICES.marcus, rate = '-5%', pitch = '0Hz', volume = '+0%' } = options;
   assertNarrationProviderConfigured();
   const provider = configuredNarrationProvider();
-  if (
-    provider === 'cloudflare' ||
-    provider === 'elevenlabs' ||
-    provider === 'gemini' ||
-    provider === 'openai'
-  ) {
-    requirePaidInferenceContext('narration');
-  }
   try {
     if (provider === 'cloudflare')
       return await generateCloudflareNarration(normalizedText, voice);

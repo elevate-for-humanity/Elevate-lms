@@ -1267,7 +1267,10 @@ async function execTool(
         moduleCount,
         lessonsPerModule,
         contentSource: 'ai',
-        mode: 'refresh',
+        // Dev Studio never bypasses Course Builder. Existing canonical courses
+        // are repaired component-by-component against the embedded Blueprint;
+        // new courses are generated through the same Blueprint gates.
+        mode: requestedCourseId ? 'missing-only' : 'refresh',
         videoMode: 'queue',
         dryRun: false,
       };
@@ -1304,14 +1307,14 @@ async function execTool(
         .from('devstudio_jobs')
         .insert({
           user_id: actorUserId,
-          command: `Build canonical course: ${title}`,
+          command: `${requestedCourseId ? 'Repair' : 'Build'} canonical course through Course Builder Blueprint: ${title}`,
           status: 'queued',
           stage: 'queued',
           progress: 0,
           tool_name: 'build_course',
           tool_args: factoryInput,
           idempotency_key: idempotencyKey,
-          log_lines: ['Course build accepted and queued.'],
+          log_lines: ['Dev Studio command accepted.', 'Course Builder Blueprint is the source of logic.', 'Passing components will be preserved; only failed or missing Blueprint components may regenerate.'],
         })
         .select('id')
         .single();

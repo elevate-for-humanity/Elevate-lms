@@ -27,6 +27,30 @@ export async function register() {
       console.warn('[instrumentation] hydrateProcessEnv failed (server will still start):', err instanceof Error ? err.message : err);
     }
 
+    // The Admin service owns the durable Course Builder worker. A production
+    // boot must wake eligible work so jobs do not depend on a later scheduler
+    // tick. The database claim is atomic, and the worker wakes the next job
+    // after each completion, so multiple Admin replicas remain safe.
+    if (
+      process.env.NODE_ENV === 'production' &&
+      process.env.SERVICE_ROLE === 'admin' &&
+      process.env.CRON_SECRET
+    ) {
+      const timer = setTimeout(() => {
+        const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org';
+        void fetch(new URL('/api/cron/process-course-builder-jobs', adminUrl), {
+          headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+          cache: 'no-store',
+        }).catch((err) => {
+          console.warn(
+            '[instrumentation] Course Builder startup wake failed:',
+            err instanceof Error ? err.message : String(err),
+          );
+        });
+      }, 5_000);
+      timer.unref?.();
+    }
+
     if (process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN) {
       await import('./sentry.server.config');
     }

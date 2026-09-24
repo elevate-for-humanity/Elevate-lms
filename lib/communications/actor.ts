@@ -22,7 +22,7 @@ export async function requireCommunicationActor() {
   const roles = normalizeRoles([
     profile?.role,
     ...(roleRows ?? []).map((row: any) => row?.roles?.name),
-  ]);
+  ]).filter((role): role is string => Boolean(role));
   if (!roles.some((role) => COMMUNICATION_ROLES.has(role))) throw new Error('COMMUNICATIONS_FORBIDDEN');
 
   const { data: extension } = await db

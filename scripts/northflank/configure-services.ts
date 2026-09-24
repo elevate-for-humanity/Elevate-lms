@@ -34,10 +34,9 @@ type ServiceConfig = {
 type RolloutMode = 'custom' | 'rollout-steady' | 'recreate';
 
 const RUNTIME_PORT = 3000;
-const DESIRED_INSTANCES = Number(
-  process.env.NORTHFLANK_DESIRED_INSTANCES ||
-    (['admin', 'lms', 'marketing'].includes(process.env.NORTHFLANK_TARGET_SERVICE || '') ? 2 : 2),
-);
+// Two steady-state replicas prevent a single container failure from taking the
+// public website, learner LMS, or Admin offline. Override only intentionally.
+const DESIRED_INSTANCES = Number(process.env.NORTHFLANK_DESIRED_INSTANCES || 2);
 const BUILDKIT_CACHE_MB = 32768;
 
 export const NORTHFLANK_SERVICE_CONFIGS: ServiceConfig[] = [

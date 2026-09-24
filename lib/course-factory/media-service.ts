@@ -365,7 +365,7 @@ export async function queueCourseLessonVideos(
                     ...(allowPaidNarration ? { provider: 'cloudflare' } : {}),
                   },
                   visuals: {
-                    strategy: 'existing_then_pexels',
+                    strategy: 'licensed_envato_then_existing_then_generated',
                     generated_only_for_exact_instructional_evidence: true,
                   },
                 },
@@ -429,7 +429,7 @@ export async function queueCourseLessonVideos(
                   ...(allowPaidNarration ? { provider: 'cloudflare' } : {}),
                 },
                 visuals: {
-                  strategy: 'existing_then_pexels',
+                  strategy: 'licensed_envato_then_existing_then_generated',
                   generated_only_for_exact_instructional_evidence: true,
                 },
               },

@@ -178,7 +178,7 @@ export function UnifiedSalesMarketplace() {
 
   return (
     <section
-      className="border-y border-cyan-100 bg-gradient-to-b from-white via-cyan-50/50 to-rose-50 py-10 font-medium text-slate-950 sm:py-16"
+      className="border-y border-cyan-100 bg-gradient-to-b from-white via-cyan-50/50 to-rose-50 py-8 font-sans font-medium text-slate-950 sm:py-16"
       id="marketplace"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -280,8 +280,8 @@ export function UnifiedSalesMarketplace() {
                       {availabilityLabel(availability)}
                     </span>
                   </div>
-                  <h3 className="mt-4 text-xl font-black text-slate-950">{capabilityName}</h3>
-                  <p className="mt-2 flex-1 text-sm font-semibold leading-6 text-slate-700">
+                  <h3 className="mt-3 text-xl font-black tracking-tight text-slate-950 sm:mt-4 sm:text-2xl">{capabilityName}</h3>
+                  <p className="mt-2 flex-1 text-sm font-medium leading-6 text-slate-700">
                     {capabilityDescription}
                   </p>
                   <p className="mt-4 text-sm font-black text-slate-950">{priceFor(capability)}</p>
@@ -293,13 +293,13 @@ export function UnifiedSalesMarketplace() {
                   <div data-paris-tour="product-actions" className="mt-5 flex flex-wrap gap-2">
                     <Link
                       href={action.href}
-                      className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-4 py-2.5 text-sm font-black text-slate-950 hover:bg-brand-red-500"
+                      className="inline-flex min-h-12 flex-1 items-center justify-center rounded-xl bg-brand-red-700 px-4 py-3 text-sm font-black text-white hover:bg-brand-red-800 sm:flex-none"
                     >
                       {action.label}
                     </Link>
                     <Link
                       href={interactiveDemoHref(capability)}
-                      className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-950 hover:border-brand-red-400 hover:bg-slate-50"
+                      className="inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-4 py-3 text-sm font-black text-slate-950 hover:border-brand-red-400 hover:bg-slate-50 sm:flex-none"
                     >
                       Open Actual Demo
                     </Link>

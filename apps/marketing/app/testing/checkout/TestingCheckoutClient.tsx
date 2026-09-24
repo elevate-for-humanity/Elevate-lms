@@ -124,6 +124,7 @@ export default function TestingCheckoutClient({
       });
       const data = await response.json();
       if (!response.ok || !data.url) throw new Error(data.error || 'Unable to start checkout.');
+      sessionStorage.setItem('testingCheckout', JSON.stringify({ invoiceId: data.invoiceId, email: customerEmail.trim() }));
       window.location.href = data.url;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to start checkout.');

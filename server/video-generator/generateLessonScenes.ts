@@ -50,12 +50,30 @@ function isPracticalBeautyInstruction(input: {
   if (!['barbering', 'cosmetology', 'esthetics', 'nail_technology'].includes(input.domainKey)) {
     return false;
   }
-  if (/\b(checkpoint|quiz|exam|assessment|review)\b/i.test(`${input.lessonType ?? ''} ${input.title}`)) {
+  const lessonIdentity = `${input.lessonType ?? ''} ${input.title}`;
+  if (/\b(checkpoint|quiz|exam|assessment|review)\b/i.test(lessonIdentity)) {
     return false;
   }
-  return /\b(cut|cutting|clipper|shear|razor|shav|fade|styling|updo|blow[- ]?dry|thermal|curling|flat iron|color(?:ing)?|chemical|relax|perm|sanit|disinfect|drape|facial|manicur|nail|procedure|practical|hands-on)\b/i.test(
-    `${input.title} ${input.content}`,
+  // Practical classification must come from the lesson identity rather than
+  // incidental words in explanatory narration. A licensing lesson may mention
+  // a practical exam, and a retail lesson may mention styling products, without
+  // becoming a hands-on service procedure.
+  return /\b(cut|cutting|clipper|shear|razor|shav|fade|styling|updo|blow[- ]?dry|thermal|curling|flat iron|color(?:ing)?|chemical|relax|perm|sanit|disinfect|drape|facial|manicur|pedicur|nail|shampoo|scalp massage|scalp treatment|wax|thread|braid|twist|procedure|practical|hands-on)\b/i.test(
+    lessonIdentity,
   );
+}
+
+function sceneSafetyText(scene: LessonRenderPlanDraft['scenes'][number]): string {
+  return [
+    scene.instructionalObjective,
+    scene.demonstrationStep,
+    scene.evidenceExpectation,
+    scene.narration,
+    scene.videoQuery,
+    scene.visualFocus,
+  ]
+    .filter((value): value is string => typeof value === 'string')
+    .join(' ');
 }
 
 /**
@@ -71,10 +89,21 @@ function normalizePracticalBeautyPlan(
   if (!practicalBeautyInstruction) return plan;
 
   let closeupAssigned = false;
+  let safetyAssigned = false;
   return {
     ...plan,
     scenes: plan.scenes.map((scene) => {
       const sanitationScene = scene.sceneType === 'sanitation_check';
+      const authoredSafetyScene = scene.sceneType === 'safety_warning';
+      const safetyBearing =
+        sanitationScene ||
+        authoredSafetyScene ||
+        /\b(sanit|disinfect|infection|safety|ppe|protective equipment|glove|patch test|strand test|allerg|contraindicat|burn|irritat|chemical exposure|cross[- ]?contamin)\b/i.test(
+          sceneSafetyText(scene),
+        );
+      const safetyScene = !safetyAssigned && safetyBearing;
+      if (safetyScene) safetyAssigned = true;
+
       const criticalCloseup = scene.sceneType === 'critical_closeup';
       const procedureCloseup = !closeupAssigned && scene.sceneType === 'procedure_step';
       if (criticalCloseup || procedureCloseup) closeupAssigned = true;
@@ -82,8 +111,10 @@ function normalizePracticalBeautyPlan(
       return {
         ...scene,
         // MediaDirector understands safety_warning/equipment_closeup and the
-        // quality gate consumes those exact semantic scene types.
-        sceneType: sanitationScene
+        // quality gate consumes those exact semantic scene types. Existing
+        // safety-bearing narration may be retagged, but no safety content is
+        // invented merely to satisfy the gate.
+        sceneType: safetyScene
           ? 'safety_warning'
           : criticalCloseup
             ? 'equipment_closeup'

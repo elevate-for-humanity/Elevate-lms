@@ -1,6 +1,6 @@
 // pre-auth-registry: exempt - requireProgramHolder verifies the holder before a scoped Telnyx token is minted.
 import { NextResponse } from 'next/server';
-import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { requireCommunicationActor } from '@/lib/communications/actor';
 import { publicPhoneNumber } from '@/lib/phone/telnyx';
 import { ensureDeviceCredential } from '@/lib/phone/webrtc';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -11,10 +11,7 @@ export const dynamic = 'force-dynamic';
 const DEVICE_ID = /^[A-Za-z0-9_-]{16,100}$/;
 
 export async function POST(request: Request) {
-  const ctx = await requireProgramHolder();
-  if (ctx.mode !== 'holder') {
-    return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
-  }
+  const ctx = await requireCommunicationActor();
   const body = await request.json().catch(() => ({}));
   const deviceId = String(body.deviceId || '');
   if (!DEVICE_ID.test(deviceId)) {

@@ -404,10 +404,6 @@ const SERVICE_GROUPS: ServiceGroup[] = [
       'NRF_API_SECRET',
       'NRF_API_BASE_URL',
       'NRF_ORGANIZATION_ID',
-      'HSI_API_KEY',
-      'HSI_API_SECRET',
-      'HSI_API_BASE_URL',
-      'HSI_ORGANIZATION_ID',
     ],
   },
   {

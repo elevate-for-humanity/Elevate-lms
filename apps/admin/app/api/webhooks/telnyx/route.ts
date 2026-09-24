@@ -365,14 +365,22 @@ async function startParis(
           program_questions: { type: 'string', description: 'Questions the caller has about the program' },
           funding_preference: { type: 'string', enum: ['funded','self_pay','unsure'], description: 'Whether the caller is seeking workforce-funded training, self-pay training, or is unsure' },
           workone_contacted: { type: 'boolean', description: 'Whether the caller has contacted or visited WorkOne' },
-          workone_orientation_status: { type: 'string', enum: ['scheduled','attended','not_scheduled','unsure'], description: 'Status of the caller WorkOne orientation appointment' },
+          website_orientation_completed: { type: 'boolean', description: 'Whether a caller seeking workforce-funded training completed the funded-program orientation linked from the Elevate homepage' },
         },
-        required: ['caller_name', 'callback_number', 'reason', 'urgency', 'program_interest', 'funding_preference', 'workone_contacted', 'workone_orientation_status'],
+        required: ['caller_name', 'callback_number', 'reason', 'urgency', 'program_interest', 'funding_preference', 'workone_contacted', 'website_orientation_completed'],
       },
       assistant: {
-        instructions: `${system.ai_instructions} You are PARIS, the Elevate for Humanity telephone attendant. Be warm and concise. Tell callers to call 911 for an emergency. Use Elevate's current public website/program information as the authority for general program descriptions and published next steps. Ask what program the caller is interested in and whether they have questions about it. Ask whether they are looking for workforce-funded training, self-pay training, or are unsure. Ask whether they have contacted or visited WorkOne and whether their WorkOne orientation appointment is scheduled, already attended, not yet scheduled, or they are unsure. If they have not scheduled the WorkOne orientation, direct them to the WorkOne orientation scheduling option published from the Elevate website/homepage. Explain published program and funding information accurately, but never promise funding or eligibility: WorkOne/workforce agencies make funding determinations. Do not invent dates, prices, funded-program status, eligibility, approvals, or application status. If current published information does not establish an answer, say so and route the question to an administrator. Never request a Social Security number, payment card, password, medical details, or other highly sensitive data. When uncertain, say the assigned person will return the call. Collect every required field conversationally and read the callback number back for confirmation.`,
+        instructions: `${system.ai_instructions} You are PARIS, the Elevate for Humanity telephone career and admissions assistant. Be warm, concise, and conversational. Tell callers to call 911 for an emergency. Start with a brief overview: Elevate provides career and technical training, Registered Apprenticeship support, industry credentials, and workforce pathways. Explain that some training can be workforce-funded for eligible participants and other training is self-pay.
+
+For this intake, the currently designated workforce-funded program group is HVAC, CDL, Bookkeeping, and Business. Do not describe other programs as workforce-funded unless approved system data is updated. Other programs are self-pay. For self-pay programs, explain that Elevate has payment arrangements and financing/payment options that may help; mention only providers enabled by the current Elevate payment configuration and make clear that approval and terms are determined by the payment provider.
+
+Conduct a real two-way interview, not a field-reading script. Ask what program the caller is interested in. Then explicitly ask, "What questions can I answer for you about that program?" Listen and answer from current approved Elevate website/program information before asking the next relevant question. Invite a follow-up if useful. Do not just record their question for someone else when you have an approved answer.
+
+Ask whether they are seeking workforce-funded training, self-pay training, or are unsure. If they are seeking workforce-funded training, ask whether they have gone to the Elevate website homepage, scrolled to the funded-program orientation section, and completed that orientation. This is an Elevate website orientation for the funded-program process; do not call it a WorkOne orientation and do not ask whether they scheduled a WorkOne orientation. You may separately ask whether they have contacted or visited WorkOne. If they are pursuing a self-pay program, do not require the funded-program website orientation.
+
+Do not repeat the extension directory or tell the caller again to enter an extension during the PARIS interview; they already heard routing instructions before reaching you. Do not invent dates, prices, eligibility, approvals, financing approval, or application status. WorkOne/workforce agencies determine workforce-funding eligibility. If approved information does not establish an answer, say you do not want to give incorrect information and route the question to an administrator. Never request a Social Security number, payment card, password, medical details, or other highly sensitive data. Collect the required intake details naturally and confirm the callback number.`,
       },
-      greeting: `${greeting} I am PARIS, the Elevate automated attendant. This call may be recorded and transcribed. I can take your callback details and answer general questions. If this is an emergency, hang up and call 911. What is your name?`,
+      greeting: `Welcome to Elevate for Humanity. We provide career and technical training, Registered Apprenticeship support, industry credentials, and workforce pathways. Some programs may be workforce-funded for eligible participants, while other programs are self-pay with payment and financing options that may be available. I am PARIS, your career and admissions assistant. This call may be recorded and transcribed. I can answer questions about our programs and help you figure out your next step. If this is an emergency, hang up and call 911. May I have your name, and what program or service are you calling about today?`,
       gather_ended_speech:
         'Thank you. I saved your message securely and someone will get back to you as soon as possible.',
       language: 'en',
@@ -712,7 +720,7 @@ async function handleEvent(
         new Set([...options.map((option: any) => String(option.digit)), '9', '0']),
       ).join('');
       await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
-        payload: `${menuPrompt(system.greeting, options)} Press 9 if you know your program holder's three-digit extension. Press 0 for immediate administrator assistance.`,
+        payload: `${menuPrompt(system.greeting, options)} Press 0 for immediate assistance or for questions not covered by the directory.`,
         voice: 'Telnyx.KokoroTTS.af',
         minimum_digits: 1,
         maximum_digits: 1,
@@ -767,22 +775,7 @@ async function handleEvent(
       return;
     }
     if (digits === '9') {
-      await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
-        payload: 'Please enter the three-digit program holder extension.',
-        voice: 'Telnyx.KokoroTTS.af',
-        minimum_digits: 3,
-        maximum_digits: 3,
-        valid_digits: '0123456789',
-        maximum_tries: 2,
-        timeout_millis: 9000,
-        command_id: `${eventId}-extension-menu`,
-        client_state: encodeCallState({
-          systemId: system.id,
-          callId: call.id,
-          parentCallControlId: payload.call_control_id,
-          phase: 'extension_menu',
-        }),
-      });
+      await startParis(db, system, call, payload.call_control_id, eventId);
       return;
     }
     if (digits === '0') {
@@ -838,7 +831,7 @@ async function handleEvent(
       result.program_interest ? `Program: ${String(result.program_interest)}` : '',
       result.funding_preference ? `Funding: ${String(result.funding_preference)}` : '',
       typeof result.workone_contacted === 'boolean' ? `WorkOne contacted: ${result.workone_contacted ? 'yes' : 'no'}` : '',
-      result.workone_orientation_status ? `WorkOne orientation: ${String(result.workone_orientation_status)}` : '',
+      typeof result.website_orientation_completed === 'boolean' ? `Elevate funded-program orientation completed: ${result.website_orientation_completed ? 'yes' : 'no'}` : '',
       result.program_questions ? `Program questions: ${String(result.program_questions)}` : '',
     ].filter(Boolean).join(' · ');
     const summary = [callerName || 'Caller', reason || 'requested assistance', intakeContext]

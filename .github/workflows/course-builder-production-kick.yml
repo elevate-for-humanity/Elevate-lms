@@ -1,0 +1,69 @@
+name: Course Builder Production Kick
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/course-builder-production-kick.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: course-builder-production-kick
+  cancel-in-progress: false
+
+jobs:
+  kick-canonical-runs:
+    name: Start Barber and Cosmetology canonical workers
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+    steps:
+      - name: Require production worker credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CRON_SECRET"
+          test -n "$ADMIN_URL"
+
+      - name: Start first canonical Course Builder run
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS -X GET "$ADMIN_URL/api/cron/process-course-builder-jobs" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --max-time 3600 | tee /tmp/course-builder-1.json
+
+      - name: Start second canonical Course Builder run
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS -X GET "$ADMIN_URL/api/cron/process-course-builder-jobs" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --max-time 3600 | tee /tmp/course-builder-2.json
+
+      - name: Continue Barber media worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --data '{"courseId":"3fb5ce19-1cde-434c-a8c6-f138d7d7aa17","maxJobs":1}' \
+            --max-time 1800 | tee /tmp/barber-media.json
+
+      - name: Continue Cosmetology media worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --data '{"courseId":"9ca9fb50-7119-46ea-ab81-9b0193c29c31","maxJobs":1}' \
+            --max-time 1800 | tee /tmp/cosmetology-media.json

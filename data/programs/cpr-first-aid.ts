@@ -179,31 +179,11 @@ export const CPR_FIRST_AID: ProgramSchema = {
   ],
   paymentTerms: 'Included free with any Elevate program enrollment. Stand-alone: $130.',
   // ─── Content model ──────────────────────────────────────────────
-  deliveryModel: 'partner',
-  deliveryModelDetail: 'partner_scorm',
-  partnerProvider: 'hsi',
+  deliveryModel: 'internal',
+  deliveryModelDetail: 'instructor_led',
   fundingOptions: ['self_pay'],
   enrollmentType: 'internal',
-  partnerCourses: [
-    {
-      courseId: 'hsi-cpr-aed',
-      label: 'CPR/AED Certification',
-      partnerName: 'Authorized Certification Provider',
-      credentialIssued: 'AHA BLS / Heartsaver CPR/AED',
-      duration: '4 hours',
-      required: true,
-      enrollmentUrl: '/contact',
-    },
-    {
-      courseId: 'hsi-first-aid',
-      label: 'First Aid Certification',
-      partnerName: 'Authorized Certification Provider',
-      credentialIssued: 'AHA Heartsaver First Aid',
-      duration: '4 hours',
-      required: true,
-      enrollmentUrl: '/contact',
-    },
-  ],
+  partnerCourses: [],
 
   faqs: [
     {

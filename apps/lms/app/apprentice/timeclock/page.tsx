@@ -1,5 +1,7 @@
 'use client';
 
+import { offlineQueue } from '@/lib/pwa/offline-queue';
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -391,7 +393,37 @@ export default function TimeclockPage() {
           break;
       }
     } catch (err) {
-      setError('An error occurred');
+      // Preserve a timestamped, geolocated attendance intent when the LMS
+      // origin is temporarily unreachable. It will sync when service returns.
+      // Server-side validation remains authoritative; queued events are not
+      // treated as approved hours until accepted by the canonical API.
+      try {
+        const position = location.lat != null && location.lng != null
+          ? { lat: location.lat, lng: location.lng, accuracy: location.accuracy }
+          : null;
+        await offlineQueue.add({
+          url: '/api/timeclock/action',
+          method: 'POST',
+          body: JSON.stringify({
+            action,
+            apprentice_id: context.apprenticeId,
+            partner_id: context.partnerId,
+            program_id: context.programId,
+            site_id: selectedSiteId,
+            progress_entry_id: shift.entryId,
+            lat: position?.lat,
+            lng: position?.lng,
+            accuracy_m: position?.accuracy,
+            client_recorded_at: new Date().toISOString(),
+            offline_submission: true,
+          }),
+          timestamp: Date.now(),
+          type: 'hours',
+        });
+        setError('Connection unavailable. Your clock action was saved on this device and will be submitted for validation when service returns.');
+      } catch {
+        setError('Connection unavailable and the clock action could not be saved. Do not leave this page; retry when service returns.');
+      }
     } finally {
       setActionLoading(null);
     }

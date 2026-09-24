@@ -123,7 +123,7 @@ export default async function PhonePage() {
   const extensions = extensionsResult.data ?? [];
   const directoryEntries = extensions.filter((entry: any) => entry.enabled);
   const settings: PhoneSettings = {
-    greeting: system?.greeting ?? 'Thank you for calling Elevate for Humanity.',
+    greeting: system?.greeting ?? 'Thank you for calling Elevate for Humanity. This is PARIS. How may I help you today?',
     afterHours:
       system?.after_hours_message ??
       'Our office is currently closed. Please leave a message and we will return your call.',
@@ -144,12 +144,12 @@ export default async function PhonePage() {
     recordingDisclosure: system?.recording_disclosure ?? '',
     maxQueueSeconds: system?.max_queue_seconds ?? 90,
     aiEnabled: system?.ai_enabled ?? false,
-    aiName: system?.ai_name ?? 'Elevate Assistant',
+    aiName: system?.ai_name ?? 'PARIS',
     aiVoice: system?.ai_voice ?? 'natural',
     aiLanguage: system?.ai_language ?? 'en-US',
     aiInstructions:
       system?.ai_instructions ??
-      'Answer questions about Elevate for Humanity, collect caller information, and transfer to a person when requested or uncertain.',
+      'Identify yourself as PARIS with Elevate for Humanity. Use the live enabled extension directory to name staff and their extensions, then offer to transfer the caller. Never identify an individual staff member as the administrator unless their live role says so. Collect caller information when needed and transfer to a person when requested or uncertain.',
     aiAllowInterruptions: system?.ai_allow_interruptions ?? true,
     aiHumanHandoffEnabled: system?.ai_human_handoff_enabled ?? true,
   };

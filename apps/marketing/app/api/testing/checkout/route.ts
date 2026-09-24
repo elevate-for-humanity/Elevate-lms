@@ -119,10 +119,10 @@ export async function POST(request: NextRequest) {
     slotError ||
     !slot ||
     (slot.exam_type !== providerKey && slot.exam_type !== 'all') ||
-    slot.booked_count >= slot.capacity
+    slot.booked_count + participantCount > slot.capacity
   ) {
     return NextResponse.json(
-      { error: 'That appointment is unavailable or does not meet the 24-hour notice requirement.' },
+      { error: 'That appointment does not have enough remaining seats or does not meet the 24-hour notice requirement.' },
       { status: 409 },
     );
   }

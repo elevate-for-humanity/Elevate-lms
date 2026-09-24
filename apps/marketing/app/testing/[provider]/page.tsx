@@ -194,7 +194,7 @@ export default async function ProviderPage({ params }: Props) {
           <section className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
             <h2 className="text-2xl font-black text-slate-950">Testing cart</h2>
             <p className="mt-2 mb-5 text-sm text-slate-600">
-              Add one exam, then pay the server-verified retail total. Scheduling stays locked until Stripe confirms payment.
+              Add one exam, then pay the server-verified retail total. Scheduling stays locked until the payment provider confirms payment.
             </p>
             <TestingCart />
           </section>

@@ -50,7 +50,7 @@ export default async function PhoneInboxPage() {
       <section className="grid gap-5 lg:grid-cols-3">
         <div className="rounded-2xl border bg-white p-4">
           <h2 className="font-black">Callback inbox</h2>
-          <div className="mt-3 space-y-3">{callbacks.length ? callbacks.map((item:any) => <article key={item.id} className="rounded-xl bg-slate-50 p-3 text-sm"><p className="font-bold">{item.caller_name || item.phone_number || 'Caller'}</p><p className="mt-1 break-words text-slate-600">{item.reason || item.summary || item.status || 'Callback requested'}</p></article>) : <p className="text-sm text-slate-500">No callback items.</p>}</div>
+          <div className="mt-3 space-y-3">{callbacks.length ? callbacks.map((item:any) => <article key={item.id} className="rounded-xl bg-slate-50 p-3 text-sm"><p className="font-bold">{item.caller_name || item.phone_number || 'Caller'}</p><p className="mt-1 break-words text-slate-600">{item.summary || item.reason || item.status || 'Callback requested'}{item.transcript ? <details className="mt-2 rounded-lg border border-slate-200 bg-white p-2"><summary className="cursor-pointer font-bold text-indigo-700">Read PARIS interview</summary><p className="mt-2 whitespace-pre-wrap break-words text-slate-700">{item.transcript}</p></details> : null}</p></article>) : <p className="text-sm text-slate-500">No callback items.</p>}</div>
         </div>
         <div className="rounded-2xl border bg-white p-4">
           <h2 className="font-black">Voicemail</h2>

@@ -2,19 +2,12 @@ import 'server-only';
 
 import { getInstructorById, getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
-import { recordPlatformUsage } from '@/lib/platform/usage-metering';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
   executePaidInference,
   paidArtifactFingerprint,
   reservePaidInference,
 } from '@/lib/ai/paid-inference-gateway';
-import {
-  deleteGpuVideoAsset,
-  downloadGpuVideoAsset,
-  generateGpuVideo,
-  gpuVideoAvailable,
-} from './gpu-video-client';
 import {
   heartbeatJob,
   markAwaitingPaidApproval,
@@ -30,7 +23,6 @@ import {
   compactLegacySceneData,
   directMedia,
   MAX_LESSON_VIDEO_SCENES,
-  scenePrompt,
   type MediaCharacterReference,
   type MediaStoryboard,
 } from './media-director';
@@ -692,191 +684,10 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
     const primaryScene = storyboard.scenes[0];
     if (!primaryScene) throw new Error('MEDIA_STORYBOARD_EMPTY');
 
-    // A single GPU clip is a valid terminal asset only for a single-scene plan.
-    // Multi-scene instructional clips must continue to the compositor so the
-    // remaining objective-aligned scenes are not discarded.
-    // Direct GPU microclips do not currently produce the captions, transcript,
-    // or multi-scene evidence required by the canonical quality gate. Keep this
-    // expensive path opt-in until it can satisfy that same completion contract.
-    if (
-      isMicroclip &&
-      !cpuOnlyCourseMedia() &&
-      storyboard.scenes.length === 1 &&
-      (await gpuVideoAvailable())
-    ) {
-      const scene = primaryScene;
-      const requestedDuration = Math.min(15, Math.max(1, scene.durationSeconds));
-      const gpuStartedAt = Date.now();
-      let generated: Awaited<ReturnType<typeof generateGpuVideo>> = null;
-      try {
-        generated = await generateGpuVideo({
-          prompt: scenePrompt(scene, storyboard.characters),
-          operation: scene.operation,
-          width: storyboard.width,
-          height: storyboard.height,
-          durationSeconds: requestedDuration,
-          ...(scene.seed !== undefined ? { seed: scene.seed } : {}),
-          ...(scene.referenceImageUrl ? { imageUrl: scene.referenceImageUrl } : {}),
-          ...(scene.sourceVideoUrl ? { sourceVideoUrl: scene.sourceVideoUrl } : {}),
-          ...(scene.negativePrompt ? { negativePrompt: scene.negativePrompt } : {}),
-        });
-        if (generated) {
-          const buffer = await downloadGpuVideoAsset(generated);
-          const videoUrl = await uploadLessonMediaBuffer(buffer, renderId, 'mp4');
-          const renderSeconds = Math.max(0, (Date.now() - gpuStartedAt) / 1000);
-          const outputSeconds = generated.durationSeconds ?? requestedDuration;
-          const model = generated.provider === 'wan' ? 'Wan2.2-TI2V-5B' : 'LTX-Video';
-
-          try {
-            await Promise.all([
-              recordPlatformUsage(db, {
-                tenantId,
-                source: 'video.gpu-worker',
-                metric: 'video_generation_attempt',
-                quantity: 1,
-                unit: 'attempt',
-                externalRef: job.id,
-                idempotencyKey: `gpu-attempt:${job.id}:success`,
-                metadata: {
-                  provider: generated.provider,
-                  operation: scene.operation,
-                  success: true,
-                  course_id: job.course_id,
-                  lesson_id: job.lesson_id,
-                  storyboard_hash: storyboard.promptHash,
-                },
-              }),
-              recordPlatformUsage(db, {
-                tenantId,
-                source: 'video.gpu-worker',
-                metric: 'gpu_video_seconds',
-                quantity: outputSeconds,
-                unit: 'second',
-                externalRef: job.id,
-                idempotencyKey: `gpu-video-seconds:${job.id}`,
-                metadata: {
-                  provider: generated.provider,
-                  operation: scene.operation,
-                  course_id: job.course_id,
-                  lesson_id: job.lesson_id,
-                },
-              }),
-              recordPlatformUsage(db, {
-                tenantId,
-                source: 'video.gpu-worker',
-                metric: 'gpu_render_seconds',
-                quantity: renderSeconds,
-                unit: 'second',
-                externalRef: job.id,
-                idempotencyKey: `gpu-render-seconds:${job.id}`,
-                metadata: {
-                  provider: generated.provider,
-                  operation: scene.operation,
-                  course_id: job.course_id,
-                  lesson_id: job.lesson_id,
-                },
-              }),
-              recordPlatformUsage(db, {
-                tenantId,
-                source: 'video.gpu-worker',
-                metric: 'gpu_output_bytes',
-                quantity: buffer.length,
-                unit: 'byte',
-                externalRef: job.id,
-                idempotencyKey: `gpu-output-bytes:${job.id}`,
-                metadata: {
-                  provider: generated.provider,
-                  operation: scene.operation,
-                  course_id: job.course_id,
-                  lesson_id: job.lesson_id,
-                },
-              }),
-              recordMediaProvenance(db, {
-                tenantId,
-                courseId: job.course_id,
-                lessonId: job.lesson_id,
-                videoJobId: job.id,
-                storyboard,
-                scene,
-                provider: generated.provider,
-                model,
-                operation: scene.operation,
-                referenceUrls: [scene.referenceImageUrl, scene.sourceVideoUrl].filter(
-                  (value): value is string => Boolean(value),
-                ),
-                likenessConsentRecordIds: storyboard.characters
-                  .map((character) => character.consentRecordId)
-                  .filter((value): value is string => Boolean(value)),
-                moderationDecision: 'approved',
-                generatedAssetUrl: videoUrl,
-                generatedBytes: buffer.length,
-              }),
-            ]);
-          } catch (meterError) {
-            logger.error(
-              '[video-worker] GPU output succeeded but usage/provenance recording failed',
-              meterError,
-              {
-                jobId: job.id,
-                tenantId,
-              },
-            );
-          }
-
-          // The GPU clip is a scene candidate, not a terminal lesson asset.
-          // Feed it through the compositor below so captions, transcript,
-          // compression, and final quality evidence are always produced.
-          Object.assign(scene, {
-            sourceVideoUrl: videoUrl,
-            resolvedProvider: generated.provider,
-            resolvedModel: model,
-          });
-        }
-      } catch (gpuError) {
-        const gpuMessage = gpuError instanceof Error ? gpuError.message : String(gpuError);
-        await db
-          .from('video_jobs')
-          .update({
-            last_provider: 'gpu',
-            last_provider_model: null,
-            last_failure_at: new Date().toISOString(),
-            error_message: `GPU fallback: ${gpuMessage}`.slice(0, 2000),
-          })
-          .eq('id', job.id);
-        try {
-          await recordPlatformUsage(db, {
-            tenantId,
-            source: 'video.gpu-worker',
-            metric: 'video_generation_attempt',
-            quantity: 1,
-            unit: 'attempt',
-            externalRef: job.id,
-            idempotencyKey: `gpu-attempt:${job.id}:failed`,
-            metadata: {
-              success: false,
-              operation: scene.operation,
-              storyboard_hash: storyboard.promptHash,
-              course_id: job.course_id,
-              lesson_id: job.lesson_id,
-              elapsed_seconds: Math.max(0, (Date.now() - gpuStartedAt) / 1000),
-              error: gpuMessage.slice(0, 500),
-            },
-          });
-        } catch (meterError) {
-          logger.warn('[video-worker] Unable to meter failed GPU attempt', {
-            jobId: job.id,
-            error: meterError instanceof Error ? meterError.message : String(meterError),
-          });
-        }
-        logger.warn('[video-worker] GPU scene failed; falling back to Remotion', {
-          jobId: job.id,
-          operation: scene.operation,
-          error: gpuMessage,
-        });
-      } finally {
-        if (generated) await deleteGpuVideoAsset(generated);
-      }
-    }
+    // Paid GPU generation is archived from the active Course Builder route.
+    // Licensed/downloaded Envato assets and deterministic repository rendering
+    // remain the production media path. GPU code is retained in its dedicated
+    // module for future reactivation, but this worker never dispatches to it.
 
     const result = await renderStoryboardVideo({
       lessonId: renderId,

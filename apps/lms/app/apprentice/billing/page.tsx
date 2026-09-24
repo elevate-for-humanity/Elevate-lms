@@ -197,9 +197,13 @@ function SubscriptionBilling({
       ) : null}
       <BillingCard billing={billing} readOnly={previewing} />
       <section className="rounded-xl border border-indigo-200 bg-indigo-50 p-5">
-        <h2 className="font-black text-slate-950">Installment financing</h2>
-        <p className="mt-1 text-sm leading-6 text-slate-700">Choose an available provider at checkout. Affirm and Sezzle are separate financing integrations. Afterpay is provided through the platform checkout and is shown only when the payment amount is within its configured eligibility range. Provider approval and terms apply.</p>
-        <Link href={`/programs/${billing.program === 'barber' ? 'barber-apprenticeship' : 'cosmetology-apprenticeship'}/payment/bnpl`} className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-indigo-700 px-5 py-3 text-sm font-black text-white">Open Affirm, Sezzle & eligible Afterpay</Link>
+        <h2 className="font-black text-slate-950">Affirm financing</h2>
+        <p className="mt-1 text-sm leading-6 text-slate-700">If Affirm is offered on your QuickBooks invoice, select Affirm from the invoice payment screen to check eligibility and apply. Approval, available plans, and terms are determined by Affirm. Checking the invoice does not change the amount you owe Elevate.</p>
+        {invoices.some((invoice) => invoice.paymentUrl) ? (
+          <a href={invoices.find((invoice) => invoice.paymentUrl)?.paymentUrl || '#'} target="_blank" rel="noreferrer" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-indigo-700 px-5 py-3 text-sm font-black text-white">Open invoice & check Affirm eligibility</a>
+        ) : (
+          <p className="mt-3 text-xs font-semibold text-slate-600">Your invoice payment link will appear here after QuickBooks synchronization.</p>
+        )}
       </section>
       <InvoiceLedger invoices={invoices} />
     </div>

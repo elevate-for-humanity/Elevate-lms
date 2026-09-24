@@ -1,4 +1,4 @@
-merge_sha=76a1b0e7b5bc6101de1c4363b018fcb0ecd462ae
+merge_sha=f149a49da105b77f0838622a32f229a43ac06538
 services=lms
-requested_at=2026-09-24T21:20:00.000Z
-reason=Deploy current LMS main including timeclock persistence repair 73da1408
+requested_at=2026-09-24T21:50:00.000Z
+reason=Redeploy LMS after fixing CPR DeliveryModel type failure; includes timeclock repair

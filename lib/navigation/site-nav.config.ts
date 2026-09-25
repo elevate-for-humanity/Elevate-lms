@@ -190,7 +190,7 @@ export const headerNavigation: NavGroup[] = [
       {
         label: '🔥 License Platform',
         href: '/platform',
-        description: 'Use our $650K in government approvals - $2K-$200K/mo',
+        description: 'Platform licensing and workforce infrastructure',
       },
       {
         label: 'Apprenticeship Licensing',

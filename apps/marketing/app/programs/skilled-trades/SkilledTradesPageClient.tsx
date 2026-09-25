@@ -334,7 +334,7 @@ export default function SkilledTradesPageClient({ programs }: { programs: Progra
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your Trades Career?</h2>
           <p className="text-orange-100 mb-8">
-            Free training available for eligible Indiana residents.
+            Review each program for current tuition and verified funding status. Funding requires program and participant eligibility plus agency authorization.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link

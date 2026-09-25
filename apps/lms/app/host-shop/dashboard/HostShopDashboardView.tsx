@@ -244,7 +244,7 @@ export default async function HostShopDashboardView() {
       href: '/host-shop/email',
       title: 'Host Shop email',
       detail: 'Open the shop inbox, compose official email, reply, and share attachments.',
-      image: '/images/pages/admin-employers-hero.webp',
+      image: '/images/pages/student-support-page-1.webp',
     },
     {
       href: '/host-shop/dashboard/communications',
@@ -282,7 +282,7 @@ export default async function HostShopDashboardView() {
       href: '/host-shop/dashboard/attendance/record',
       title: 'Record attendance',
       detail: 'Record attendance against the active apprentice placement.',
-      image: '/images/pages/program-holder-page-1.webp',
+      image: '/images/pages/orientation-page-1.webp',
     },
     {
       href: '/host-shop/dashboard/wages',
@@ -295,7 +295,7 @@ export default async function HostShopDashboardView() {
       href: '/host-shop/dashboard/reports',
       title: 'Reporting center',
       detail: 'Review documented work, competencies, attendance, RTI, and compliance records.',
-      image: '/images/heroes/lms-analytics.webp',
+      image: '/images/pages/career-services-page-7.webp',
     },
     {
       href: '/host-shop/dashboard/profile',

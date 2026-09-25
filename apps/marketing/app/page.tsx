@@ -6,7 +6,6 @@ import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
-import { HomeBeautyPriority } from '@/components/home/HomeBeautyPriority';
 import { HomePlatformOverview } from '@/components/home/HomePlatformOverview';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { HomeNetworks } from '@/components/home/HomeNetworks';
@@ -92,13 +91,6 @@ export default function HomePage() {
       <StructuredData />
       <main className="[&_a]:no-underline [&_a:hover]:no-underline">
         <PlatformHubHero />
-        <div
-          data-scroll-narration
-          data-narration-src="/audio/narration/apprenticeship.mp3"
-          data-narration="Explore Barber, Cosmetology, Esthetics, and Nail Technician registered apprenticeship pathways. Apprentices combine structured instruction with supervised hands-on training at an approved Host Site."
-        >
-          <HomeBeautyPriority />
-        </div>
         <div
           data-scroll-narration
           data-narration-src="/audio/narration/host-shop.mp3"

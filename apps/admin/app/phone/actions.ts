@@ -463,7 +463,7 @@ export async function assignPhoneNumber(formData: FormData): Promise<void> {
       .from('profiles')
       .select('id,role')
       .eq('id', profileId)
-      .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder'])
+      .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder', 'site_coordinator'])
       .maybeSingle();
     if (!profile) throw new Error('Select a valid staff or Program Holder account.');
   }

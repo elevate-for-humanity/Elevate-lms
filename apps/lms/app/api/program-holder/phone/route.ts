@@ -64,7 +64,7 @@ export async function GET() {
       { status: 404 },
     );
   }
-  const [{ data: inbox, error }, { data: notificationPreferences }] = await Promise.all([
+  const [{ data: inbox, error: inboxError }, { data: notificationPreferences, error: preferencesError }] = await Promise.all([
     ctx.db
       .from('phone_callback_tasks')
       .select(
@@ -79,9 +79,19 @@ export async function GET() {
       .eq('user_id', ctx.user.id)
       .maybeSingle(),
   ]);
-  if (error)
-    return NextResponse.json({ error: 'Phone inbox could not be loaded.' }, { status: 500 });
+  // The phone itself must remain usable if callback history or notification
+  // preferences are temporarily unavailable. Those are secondary features.
+  const warnings: string[] = [];
+  if (inboxError) {
+    console.error('[program-holder/phone] callback inbox query failed', inboxError);
+    warnings.push('Callback history is temporarily unavailable.');
+  }
+  if (preferencesError) {
+    console.error('[program-holder/phone] notification preferences query failed', preferencesError);
+    warnings.push('Notification preferences are temporarily unavailable.');
+  }
   return NextResponse.json({
+    warnings,
     phoneNumber: publicPhoneNumber(),
     system: { name: system.name, timezone: system.timezone, status: system.status },
     notifications: {

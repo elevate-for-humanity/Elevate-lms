@@ -9,8 +9,8 @@
 export const COSMETOLOGY_PROGRAM_ID = '0661bc6d-c748-4655-b11b-6d418a4ace4a';
 export const COSMETOLOGY_COURSE_ID = '9ca9fb50-7119-46ea-ab81-9b0193c29c31';
 
-export const TUITION_CENTS = 498000;
-export const TUITION_DOLLARS = 4980;
+export const TUITION_CENTS = 600000;
+export const TUITION_DOLLARS = 6000;
 
 export const PAYMENT_TERM_WEEKS = 29;
 export const TOTAL_HOURS_REQUIRED = 1500;

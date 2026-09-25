@@ -500,7 +500,9 @@ export async function runTaskExecution(
           updated_at: new Date().toISOString(),
         })
         .eq('id', taskId);
-      await setAgentStatus(db, task.agent_id, 'error');
+      // A failed task is task state, not agent health. Return the worker to
+      // idle so future repair work can still be assigned.
+      await setAgentStatus(db, task.agent_id, 'idle');
       await appendTaskLog(
         db,
         taskId,
@@ -697,7 +699,7 @@ export async function runTaskExecution(
         updated_at: new Date().toISOString(),
       })
       .eq('id', taskId);
-    await setAgentStatus(db, task.agent_id, capabilityBlocked ? 'idle' : 'error');
+    await setAgentStatus(db, task.agent_id, 'idle');
     await appendTaskLog(
       db,
       taskId,

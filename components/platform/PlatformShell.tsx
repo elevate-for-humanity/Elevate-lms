@@ -63,7 +63,7 @@ export function PlatformShell({ user, role, actions = [], children, paris, showL
 
   const baseSections = getNavigationForRole(role);
   const sections =
-    role === 'program_holder'
+    ['program_holder', 'site_coordinator'].includes(role)
       ? baseSections.map((section) => ({
           ...section,
           items: [

@@ -63,7 +63,7 @@ export default function BeautyApplyPage() {
   const monthlyDollars = (remainingCents / 6 / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
   const FUNDING_OPTIONS: { value: FundingType; label: string; desc: string; badge?: string }[] = [
-    { value: 'wioa', label: 'WIOA / WorkOne', desc: 'Free for eligible unemployed or underemployed Indiana residents.', badge: 'Most common' },
+    { value: 'wioa', label: 'WIOA / WorkOne', desc: 'Possible workforce funding; WorkOne determines participant and program eligibility and must authorize payment.', badge: 'Most common' },
     { value: 'employer', label: 'Employer Sponsored', desc: 'Your employer or a workforce grant covers your tuition.' },
     {
       value: 'self_pay',

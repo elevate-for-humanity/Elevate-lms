@@ -22,25 +22,42 @@ export async function GET(request: NextRequest) {
   if (auth.error) return auth.error;
 
   const courseId = request.nextUrl.searchParams.get('courseId')?.trim() || '';
+  const lessonId = request.nextUrl.searchParams.get('lessonId')?.trim() || '';
   if (!UUID.test(courseId)) {
     return NextResponse.json({ error: 'Valid courseId required' }, { status: 400 });
   }
+  if (lessonId && !UUID.test(lessonId)) {
+    return NextResponse.json({ error: 'Valid lessonId required' }, { status: 400 });
+  }
 
   const db = await requireAdminClient();
-  const { data: course, error } = await db
-    .from('courses')
-    .select('id')
-    .eq('id', courseId)
-    .maybeSingle();
+  const [{ data: course, error }, { data: lesson, error: lessonError }] = await Promise.all([
+    db
+      .from('courses')
+      .select('id')
+      .eq('id', courseId)
+      .maybeSingle(),
+    lessonId
+      ? db
+          .from('course_lessons')
+          .select('id')
+          .eq('id', lessonId)
+          .eq('course_id', courseId)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+  ]);
 
-  if (error) {
-    logger.error('Course Builder learner preview lookup failed', error);
+  if (error || lessonError) {
+    logger.error('Course Builder learner preview lookup failed', error ?? lessonError);
     return NextResponse.json({ error: 'Unable to open learner preview' }, { status: 500 });
   }
   if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+  if (lessonId && !lesson)
+    return NextResponse.json({ error: 'Lesson not found in selected course' }, { status: 404 });
 
   const previewUrl = new URL('/api/admin/course-preview', LMS_URL);
   previewUrl.searchParams.set('handoff', createPortalPreviewHandoff(auth.id, course.id));
+  if (lessonId) previewUrl.searchParams.set('lessonId', lessonId);
 
   const response = NextResponse.redirect(previewUrl);
   response.headers.set('Cache-Control', 'private, no-store, max-age=0');

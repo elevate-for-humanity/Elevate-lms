@@ -88,7 +88,12 @@ export async function loadLearnerWorkspace(userId: string, role = 'student'): Pr
     signed: signed.has(`${agreement.type}:${agreement.version}`),
     acceptedAt: signed.get(`${agreement.type}:${agreement.version}`) ?? null,
   }));
-  const requirements = (requirementResult.data ?? []) as LearnerRequirement[];
+  // Funding authorization is an agency/admin record, never a learner upload.
+  // Keep it out of learner onboarding so WIOA/ITA amounts and funding evidence
+  // cannot be exposed or used as a learner-facing completion blocker.
+  const requirements = ((requirementResult.data ?? []) as LearnerRequirement[]).filter(
+    (row) => !['funding', 'wioa_funding', 'ita_funding'].includes(String(row.requirement_type || '').toLowerCase()),
+  );
   const missingRequirements = requirements.filter((row) =>
     !['completed', 'verified', 'not_applicable'].includes(row.status),
   );

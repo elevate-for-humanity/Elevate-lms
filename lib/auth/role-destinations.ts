@@ -53,6 +53,7 @@ export const ROLE_PORTAL_ASSIGNMENTS: Readonly<Record<string, RolePortalAssignme
   parent: { portalKey: 'parent', label: 'Parent' },
   creator: { portalKey: 'creator', label: 'Creator' },
   program_holder: { portalKey: 'programholder', label: 'Program Holder' },
+  site_coordinator: { portalKey: 'programholder', label: 'Site Coordinator' },
 
   case_manager: { portalKey: 'casemanager', label: 'Case Manager' },
   workforce_board: { portalKey: 'workforceboard', label: 'Workforce Board' },

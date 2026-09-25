@@ -1,4 +1,5 @@
 import { loadCourseSession } from '@/lib/studio/course-session';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import {
   coursePackageFromSession,
   loadPersistedCoursePackageEvidence,
@@ -55,7 +56,7 @@ function gateForCredentialLessonPath(path: PropertyKey[]): CourseGate {
   return 'instructional_content';
 }
 
-function strictCredentialLessonFindings(
+export function strictCredentialLessonFindings(
   lesson: Awaited<ReturnType<typeof loadCourseSession>>['lessons'][number],
 ): CanonicalGateFinding[] {
   const contentJson = record(lesson.content_json);
@@ -149,6 +150,44 @@ function strictCredentialLessonFindings(
     pass: false,
     message: `Credential lesson contract: ${issue.message}`,
   }));
+}
+
+export async function evaluatePersistedCredentialLesson(lessonId: string) {
+  const db = await requireAdminClient();
+  const { data: row, error } = await db
+    .from('course_lessons')
+    .select('id,course_id')
+    .eq('id', lessonId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!row) {
+    return {
+      pass: false as const,
+      findings: [{
+        gate: 'instructional_content' as CourseGate,
+        lessonId,
+        path: 'lesson',
+        pass: false,
+        message: 'Credential lesson not found.',
+      }],
+    };
+  }
+  const session = await loadCourseSession(row.course_id, { system: true });
+  const lesson = session.lessons.find((item) => item.id === lessonId);
+  if (!lesson) {
+    return {
+      pass: false as const,
+      findings: [{
+        gate: 'instructional_content' as CourseGate,
+        lessonId,
+        path: 'lesson',
+        pass: false,
+        message: 'Credential lesson is not present in the canonical course session.',
+      }],
+    };
+  }
+  const findings = strictCredentialLessonFindings(lesson);
+  return { pass: findings.length === 0, findings };
 }
 
 /**

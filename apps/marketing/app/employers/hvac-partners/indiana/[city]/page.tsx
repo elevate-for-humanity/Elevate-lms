@@ -9,15 +9,6 @@ import { HVAC_EMPLOYER_REGIONS, getHvacEmployerRegion } from '@/lib/marketing/hv
 const SITE_URL = 'https://www.elevateforhumanity.org';
 type Props = { params: Promise<{ city: string }> };
 
-export function generateStaticParams() { return HVAC_EMPLOYER_REGIONS.map(({ slug }) => ({ city: slug })); }
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const region = getHvacEmployerRegion((await params).city);
-  if (!region) return {};
-  const title = `HVAC Hiring & OJT Partners in ${region.city}, Indiana`;
-  const description = `HVAC contractors in ${region.city} and ${region.county} can request trained candidates, post jobs, and explore eligible OJT partnerships through Elevate.`;
-  return { title, description, alternates: { canonical: `${SITE_URL}/employers/hvac-partners/indiana/${region.slug}` }, robots: { index: true, follow: true }, openGraph: { title, description, url: `${SITE_URL}/employers/hvac-partners/indiana/${region.slug}`, type: 'website' } };
-}
 
 export default async function RegionalHvacEmployerPage({ params }: Props) {
   const region = getHvacEmployerRegion((await params).city);

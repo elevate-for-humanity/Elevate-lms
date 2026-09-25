@@ -1,8 +1,8 @@
 import Link from 'next/link';
 
 export const BEAUTY_PROMOTION = {
-  standardTuition: 6000,
-  payInFullPrice: 5400,
+  standardTuition: 4980,
+  payInFullPrice: 4380,
   payInFullSavings: 600,
   standardDeposit: 600,
   promotionalDeposit: 300,

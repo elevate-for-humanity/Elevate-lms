@@ -77,7 +77,6 @@ jobs:
       # workflow instead of depending on a partially readable secret-group
       # response from Northflank.
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
       SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
       TELNYX_API_KEY: ${{ secrets.TELNYX_API_KEY }}
@@ -97,6 +96,12 @@ jobs:
       ANTHROPIC_API_TOKEN: ${{ secrets.ANTHROPIC_API_TOKEN }}
       CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
       ENVATO_API_TOKEN: ${{ secrets.ENVATO_API_TOKEN }}
+      ONET_API_KEY: ${{ secrets.ONET_API_KEY }}
+      USAJOBS_API_KEY: ${{ secrets.USAJOBS_API_KEY }}
+      USAJOBS_USER_AGENT_EMAIL: ${{ secrets.USAJOBS_USER_AGENT_EMAIL }}
+      CAREERONESTOP_USER_ID: ${{ secrets.CAREERONESTOP_USER_ID }}
+      CAREERONESTOP_TOKEN: ${{ secrets.CAREERONESTOP_TOKEN }}
+      CAREERONESTOP_API_KEY: ${{ secrets.CAREERONESTOP_API_KEY || secrets.CAREERONESTOP_TOKEN }}
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org

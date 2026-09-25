@@ -373,7 +373,7 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       .maybeSingle();
     const { data: licensedLessonVideos, error: licensedVideoError } = await db
       .from('course_videos')
-      .select('id,storage_path,title,created_at,asset_role,sequence_index')
+      .select('id,storage_path,title,created_at,asset_role,sequence_index,entitlement_id,media_asset_id')
       .eq('course_id', job.course_id)
       .eq('lesson_id', job.lesson_id)
       .eq('asset_role', 'source_broll')
@@ -386,6 +386,17 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       throw new Error(`LICENSED_MEDIA_LOOKUP_FAILED:${licensedVideoError.message}`);
     }
     const licensedLessonVideo = licensedLessonVideos?.[0] ?? null;
+    const { data: licensedEntitlement, error: licensedEntitlementError } =
+      licensedLessonVideo?.entitlement_id
+        ? await db
+            .from('licensed_media_entitlements')
+            .select('id,provider,provider_item_id,item_url,license_document_url,purchase_code,license_type')
+            .eq('id', licensedLessonVideo.entitlement_id)
+            .maybeSingle()
+        : { data: null, error: null };
+    if (licensedEntitlementError) {
+      throw new Error(`LICENSED_MEDIA_ENTITLEMENT_LOOKUP_FAILED:${licensedEntitlementError.message}`);
+    }
     let licensedSourceVideoUrl: string | null = null;
     if (licensedLessonVideo?.storage_path) {
       const { data: signedLicensedVideo, error: signedLicensedVideoError } = await db.storage
@@ -599,8 +610,16 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
           ...sceneData,
           licensed_media: {
             course_video_id: licensedLessonVideo?.id,
+            media_asset_id: licensedLessonVideo?.media_asset_id,
+            entitlement_id: licensedLessonVideo?.entitlement_id,
             title: licensedLessonVideo?.title,
             storage_path: licensedLessonVideo?.storage_path,
+            provider: licensedEntitlement?.provider ?? null,
+            provider_item_id: licensedEntitlement?.provider_item_id ?? null,
+            item_url: licensedEntitlement?.item_url ?? null,
+            license_document_url: licensedEntitlement?.license_document_url ?? null,
+            purchase_code: licensedEntitlement?.purchase_code ?? null,
+            license_type: licensedEntitlement?.license_type ?? null,
           },
           scenes: plannedScenes.map((scene, index) =>
             index === 0
@@ -608,6 +627,17 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
                   ...scene,
                   source_video_url: licensedSourceVideoUrl,
                   media_source: 'elevate-owned',
+                  resolved_provider: licensedEntitlement?.provider ?? 'licensed',
+                  resolved_model:
+                    licensedEntitlement?.provider_item_id ??
+                    licensedLessonVideo?.id ??
+                    'licensed-source',
+                  source_provider_item_id:
+                    licensedEntitlement?.provider_item_id ?? licensedLessonVideo?.id,
+                  source_license_evidence_url:
+                    licensedEntitlement?.license_document_url ??
+                    licensedEntitlement?.item_url ??
+                    undefined,
                   operation: 'videoToVideo',
                 }
               : scene,
@@ -620,8 +650,16 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
           media_source: 'elevate-owned',
           licensed_media: {
             course_video_id: licensedLessonVideo?.id,
+            media_asset_id: licensedLessonVideo?.media_asset_id,
+            entitlement_id: licensedLessonVideo?.entitlement_id,
             title: licensedLessonVideo?.title,
             storage_path: licensedLessonVideo?.storage_path,
+            provider: licensedEntitlement?.provider ?? null,
+            provider_item_id: licensedEntitlement?.provider_item_id ?? null,
+            item_url: licensedEntitlement?.item_url ?? null,
+            license_document_url: licensedEntitlement?.license_document_url ?? null,
+            purchase_code: licensedEntitlement?.purchase_code ?? null,
+            license_type: licensedEntitlement?.license_type ?? null,
           },
         };
       }

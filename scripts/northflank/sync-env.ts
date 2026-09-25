@@ -178,7 +178,6 @@ async function main() {
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
     'SUPABASE_SERVICE_ROLE_KEY',
     'NEXTAUTH_SECRET',
-    'STRIPE_SECRET_KEY',
     'SENDGRID_API_KEY',
   ].filter((k) => !variables[k]?.trim());
   if (missingCritical.length) {

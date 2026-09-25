@@ -4,7 +4,7 @@ import { CAPABILITY_CATALOG } from '@/lib/platform/capability-catalog';
 import { ADD_ON_MARKETPLACE, BASE_PLANS } from '@/lib/store/platform-pricing';
 import { INDIVIDUAL_APP_CATALOG } from '@/lib/apps/individual-app-plans';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 const CATEGORY_LABELS: Record<string, string> = {
   business: 'Business Growth',
@@ -70,11 +70,6 @@ function subscriptionSnapshot(key: string) {
   };
 }
 
-export function generateStaticParams() {
-  return CAPABILITY_CATALOG.filter((capability) => capability.status !== 'internal').map((capability) => ({
-    key: String(capability.key),
-  }));
-}
 
 export default async function CapabilityDemoPage({ params }: { params: Promise<{ key: string }> }) {
   const { key } = await params;

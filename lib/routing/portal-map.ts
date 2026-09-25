@@ -100,7 +100,7 @@ export const PORTAL_MAP = {
     subdomain: 'app', basePath: '/program-holder', host: LMS_HOST, defaultPath: '/program-holder/dashboard',
     label: 'Program Holder Portal', description: 'Programs, students, training hours, documents and program-holder compliance responsibilities.',
     colorClass: 'bg-cyan-600', iconName: 'ClipboardList',
-    destinationRoles: ['program_holder'], accessRoles: PROGRAM_HOLDER_ROLES,
+    destinationRoles: ['program_holder', 'site_coordinator'], accessRoles: PROGRAM_HOLDER_ROLES,
     authSurface: 'lms', tenantScope: 'organization', pwaManifest: '/manifest-program-holder.json', pwaScope: '/program-holder/',
   },
   creator: {

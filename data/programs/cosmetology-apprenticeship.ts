@@ -300,7 +300,7 @@ export const COSMETOLOGY: ProgramSchema = {
     {
       courseId: 'hsi-cpr-aed',
       label: 'CPR/AED Certification',
-      partnerName: 'Health & Safety Institute',
+      partnerName: 'Approved CPR/AED credential provider',
       credentialIssued: 'CPR/AED Certification',
       duration: '4 hours',
       required: true,

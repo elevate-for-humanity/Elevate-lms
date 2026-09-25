@@ -67,9 +67,7 @@ export async function ProgramHolderWorkspaceView({
   const isTexasStateCoordinator = coordinatorRole === 'Texas State Site Coordinator';
   const isGaryRegionalCoordinator = coordinatorRole === 'Gary Regional Site Coordinator';
   if (data.mode === 'admin') return <AdminBoundary />;
-  if (section === 'dashboard' && isTexasStateCoordinator) {
-    return <div className="space-y-6"><TexasCoordinatorLaunchKit /></div>;
-  }
+  const texasLaunchKit = section === 'dashboard' && isTexasStateCoordinator ? <TexasCoordinatorLaunchKit /> : null;
   const careerJobs = section === 'dashboard' ? await getActiveJobs({ limit: 2 }) : [];
 
   const active = data.enrollments.filter((row) =>
@@ -351,6 +349,7 @@ export async function ProgramHolderWorkspaceView({
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      {texasLaunchKit}
       {regionalAssignment && customMou ? (
         <section className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm sm:p-6">
           <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
@@ -366,7 +365,7 @@ export async function ProgramHolderWorkspaceView({
           </p>
           <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
             <strong>Applicant routing:</strong> Your Gary regional queue includes applicants across
-            all Elevate programs whose residence is within the assigned 30-mile Gary service area
+            all Elevate programs whose residence is within the assigned regional service area
             when no local Program Holder controls that applicant/program. Applicants outside your
             regional territory must not be worked from this dashboard. When an approved local
             Program Holder is assigned, Elevate may transfer the program-specific applicant to that

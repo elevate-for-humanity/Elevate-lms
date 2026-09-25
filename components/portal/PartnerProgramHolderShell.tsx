@@ -36,7 +36,7 @@ interface NavItem {
   section: string;
 }
 
-const PH = ['program_holder', 'admin', 'staff', 'org_admin'];
+const PH = ['program_holder', 'site_coordinator', 'admin', 'staff', 'org_admin'];
 const PA = ['partner', 'admin', 'staff', 'org_admin'];
 
 const NAV: NavItem[] = [
@@ -276,7 +276,11 @@ export function PartnerProgramHolderShell({
     : visibleNav;
 
   const isPartner = role === 'partner';
-  const portalName = isPartner ? 'Host Site Portal' : 'Program Holder Portal';
+  const portalName = isPartner
+    ? 'Host Site Portal'
+    : role === 'site_coordinator'
+      ? 'Site Coordinator Portal'
+      : 'Program Holder Portal';
   const homeHref = isPartner ? '/partner/dashboard' : '/program-holder/dashboard';
 
   return (

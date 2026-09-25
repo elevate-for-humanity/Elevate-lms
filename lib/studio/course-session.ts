@@ -18,6 +18,11 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import { logger } from '@/lib/logger';
+import {
+  coursePackageFromSession,
+  loadPersistedCoursePackageEvidence,
+} from '@/lib/course-package/from-course-session';
+import { evaluateCourseReadiness } from '@/lib/course-package/readiness';
 
 // ─── DTOs ─────────────────────────────────────────────────────────────────────
 
@@ -300,30 +305,8 @@ export async function loadCourseSession(
       String(lesson.generation_status ?? ''),
     ),
   ).length;
-  const readyToPublish =
-    lessons.length > 0 &&
-    generatedLessons === lessons.length &&
-    lessons.every((lesson) =>
-      lesson.approved === true &&
-      lesson.video_status === 'complete' &&
-      lesson.media_quality_status === 'approved' &&
-      Boolean(lesson.video_url),
-    ) &&
-    course.review_status !== 'rejected';
-
-  const publishState: StudioPublishState = {
-    isPublished: course.status === 'published',
-    publishedAt: course.published_at,
-    reviewStatus: course.review_status,
-    generationStatus: course.generation_status,
-    generationProgress: course.generation_progress,
-    totalLessons: lessons.length,
-    publishedLessons,
-    approvedLessons,
-    readyToPublish,
-  };
-
-  return {
+  const loadedAt = new Date().toISOString();
+  const baseSession: CourseSession = {
     course: course as StudioCourse,
     modules,
     lessons,
@@ -331,8 +314,41 @@ export async function loadCourseSession(
     videos,
     automationRules,
     workflows,
-    publishState,
+    publishState: {
+      isPublished: course.status === 'published',
+      publishedAt: course.published_at,
+      reviewStatus: course.review_status,
+      generationStatus: course.generation_status,
+      generationProgress: course.generation_progress,
+      totalLessons: lessons.length,
+      publishedLessons,
+      approvedLessons,
+      readyToPublish: false,
+    },
     warnings,
-    loadedAt: new Date().toISOString(),
+    loadedAt,
+  };
+
+  let readyToPublish = false;
+  try {
+    const evidence = await loadPersistedCoursePackageEvidence(courseId);
+    readyToPublish = evaluateCourseReadiness(
+      coursePackageFromSession(baseSession, evidence),
+    ).pass;
+  } catch (readinessError) {
+    warnings.push('canonical readiness evaluation failed');
+    logger.warn('[studio] canonical readiness evaluation failed', {
+      courseId,
+      message:
+        readinessError instanceof Error ? readinessError.message : String(readinessError),
+    });
+  }
+
+  return {
+    ...baseSession,
+    publishState: {
+      ...baseSession.publishState,
+      readyToPublish,
+    },
   };
 }

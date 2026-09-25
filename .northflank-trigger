@@ -1,3 +1,4 @@
-merge_sha=f453e29c27defd10310878413140e3ab349a10cc
-services=admin
-reason=retry stalled admin production deployment
+merge_sha=7b79d94e18316a7102848e4df0c12571f87dc26f
+services=lms
+requested_at=2026-09-25T02:55:00.000Z
+reason=Deploy apprentice dashboard sponsor-access consistency repair

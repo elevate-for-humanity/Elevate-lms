@@ -9,6 +9,32 @@ function record(value: unknown): Record<string, unknown> | null {
     : null;
 }
 
+function canonicalVideoUrl(value: unknown): string | null {
+  const raw = typeof value === 'string' ? value.trim() : '';
+  if (!raw) return null;
+  try {
+    const url = new URL(raw);
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeTimelineCaptions(
+  value: Record<string, unknown> | null,
+  lessonSlug: string,
+): Record<string, unknown> | null {
+  if (!value || !Array.isArray(value.captions)) return value;
+  return {
+    ...value,
+    captions: value.captions.map((caption, index) => {
+      const item = record(caption);
+      if (!item) return caption;
+      return { ...item, id: String(item.id ?? `${lessonSlug}-caption-${index + 1}`) };
+    }),
+  };
+}
+
 function lessonHtml(lesson: StudioLesson): string {
   if (lesson.rendered_html?.trim()) return lesson.rendered_html;
   if (typeof lesson.content === 'string') return lesson.content;
@@ -91,7 +117,8 @@ export function coursePackageFromSession(
               ? videoConfig.scenes
               : [];
           const experienceTimeline = record(experience?.instructionalTimeline);
-          const timeline = record(videoConfig?.timeline) ?? (
+          const timeline = normalizeTimelineCaptions(
+            record(videoConfig?.timeline) ?? (
             experienceTimeline
               ? {
                   durationSeconds: experienceTimeline.durationSeconds,
@@ -131,6 +158,8 @@ export function coursePackageFromSession(
                   checkpoints: [],
                 }
               : null
+            ),
+            lesson.slug,
           );
           const requiredInteractionIds = [
             ...(Array.isArray(experience?.knowledgeChecks) ? [`${lesson.slug}-kc`] : []),
@@ -170,7 +199,7 @@ export function coursePackageFromSession(
                 })
               : [],
             html: lessonHtml(lesson),
-            videoUrl: lesson.video_url,
+            videoUrl: canonicalVideoUrl(lesson.video_url),
             experience,
             storyboard,
             timeline,

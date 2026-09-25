@@ -196,14 +196,25 @@ export async function recoverCourseMediaJobs(input: { courseId?: string | null; 
       ? new Date(row.started_at).getTime() < staleBefore
       : false;
     const stale = leaseExpired || legacyStale;
-    // A failed render must remain failed until an operator has corrected the
-    // underlying source or renderer and explicitly requests recovery. Time
-    // passing alone is not authority to repeat an identical expensive render.
-    const eligibleFailed =
-      input.force === true &&
+    const narrationAuthorizationSourceRepaired =
       row.status === 'failed' &&
-      isCourseMediaFailureRetryable(row.error_message) &&
-      retryBackoffElapsed(row, now);
+      (row.asset_kind ?? 'lesson') === 'lesson' &&
+      (
+        row.error_message === 'PAID_INFERENCE_AUTHORIZATION_REQUIRED:narration' ||
+        row.error_message === 'MEDIA_NARRATION_AUTHORIZATION_REQUIRED'
+      );
+    // The canonical renderer no longer routes lesson narration through the paid
+    // inference approval gateway. Those historical authorization failures are
+    // therefore source-repaired and should be resumed automatically exactly once
+    // with a fresh bounded retry budget.
+    const eligibleFailed =
+      narrationAuthorizationSourceRepaired ||
+      (
+        input.force === true &&
+        row.status === 'failed' &&
+        isCourseMediaFailureRetryable(row.error_message) &&
+        retryBackoffElapsed(row, now)
+      );
     if (!stale && !eligibleFailed) continue;
     try {
       await resetCanonicalMediaJob(
@@ -214,10 +225,13 @@ export async function recoverCourseMediaJobs(input: { courseId?: string | null; 
           assetKey: row.asset_key,
         },
         {
-          force: input.force,
+          force: input.force || narrationAuthorizationSourceRepaired,
+          sourceRepaired: narrationAuthorizationSourceRepaired,
           reason: stale
             ? 'Recovered stale rendering job through Course Factory policy'
-            : row.error_message ?? 'Retrying failed media job',
+            : narrationAuthorizationSourceRepaired
+              ? 'Recovered after canonical narration authorization removal'
+              : row.error_message ?? 'Retrying failed media job',
         },
       );
       recovered.push(row.id);

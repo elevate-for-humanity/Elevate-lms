@@ -32,7 +32,7 @@ export const COURSE_BUILDER_GATE_REPAIR_POLICY: Record<CourseGate, {
   instructional_content: { phase: 'authoring', automatic: true, repairScope: ['content','reading_guide','resources'] },
   demonstration: { phase: 'media', automatic: true, repairScope: ['storyboard','lesson_video','demonstration'] },
   storyboard: { phase: 'authoring', automatic: true, repairScope: ['instructional_timeline','storyboard'] },
-  technical_review: { phase: 'review', automatic: false, repairScope: ['technical_review'] },
+  technical_review: { phase: 'media', automatic: true, repairScope: ['technical_review','media_quality_evidence'] },
   interactive_practice: { phase: 'authoring', automatic: true, repairScope: ['scenario','case_study','exercises','practical_task','interactives'] },
   knowledge_checks: { phase: 'authoring', automatic: true, repairScope: ['knowledge_checks','remediation'] },
   module_assessments: { phase: 'authoring', automatic: false, repairScope: ['module_assessments'] },

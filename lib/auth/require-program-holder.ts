@@ -71,7 +71,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
       .select('id,role,full_name,email,program_holder_id,tenant_id,avatar_url')
       .eq('id', handoffPreview.userId)
       .maybeSingle();
-    if (targetProfile?.program_holder_id && ['program_holder', 'programholder'].includes(targetProfile.role)) {
+    if (targetProfile?.program_holder_id && ['program_holder', 'programholder', 'site_coordinator'].includes(targetProfile.role)) {
       const { data: associations } = await db
         .from('program_holder_programs')
         .select('program_id')
@@ -100,7 +100,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
         .select('id,role,full_name,email,program_holder_id,tenant_id,avatar_url')
         .eq('id', preview.userId)
         .maybeSingle();
-      if (targetProfile?.program_holder_id && targetProfile.role === 'program_holder') {
+      if (targetProfile?.program_holder_id && ['program_holder', 'site_coordinator'].includes(targetProfile.role)) {
         const { data: associations } = await db
           .from('program_holder_programs')
           .select('program_id')

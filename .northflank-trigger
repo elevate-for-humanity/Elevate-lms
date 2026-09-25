@@ -1,4 +1,4 @@
-merge_sha=f149a49da105b77f0838622a32f229a43ac06538
-services=lms
-requested_at=2026-09-24T21:50:00.000Z
-reason=Redeploy LMS after fixing CPR DeliveryModel type failure; includes timeclock repair
+merge_sha=9fc846f4ed01e49529bc59fd1d925fcc039052b5
+services=admin
+requested_at=2026-09-25T00:36:00.000Z
+reason=Deploy current Admin production revision

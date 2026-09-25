@@ -18,7 +18,7 @@ export const PROJECT_MANAGEMENT: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 40, handsOnLab: 40, examPrep: 10, careerPlacement: 10 },
   schedule: 'Mon/Wed/Fri, 9:00 AM–12:00 PM',
   cohortSize: '12–18 participants per cohort',
-  fundingStatement: '$0 with WIOA or Next Level Jobs funding',
+  fundingStatement: 'Workforce funding may apply only with program and participant eligibility plus written agency authorization.',
   selfPayCost: '$2,000',
   fundingOptions: ['wioa', 'impact', 'self_pay'],
   badge: 'Funding Available',

@@ -1,6 +1,6 @@
 name: Deploy Admin
 
-# Deployment checkpoint: full-stack production parity release
+# Deployment checkpoint: instructional Course Builder acceptance release
 
 on:
   push:

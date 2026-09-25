@@ -288,7 +288,25 @@ export function buildAtomicPayload(
                   }
                 : (extra.videoConfig ?? null),
               learning_objectives: learningObjectives.length ? learningObjectives : null,
-              competency_checks: lesson.competencyChecks ?? experience?.knowledgeChecks ?? null,
+              competency_checks:
+                Array.isArray(lesson.competencyChecks) && lesson.competencyChecks.length
+                  ? lesson.competencyChecks
+                  : Array.isArray(lesson.competencyKeys) && lesson.competencyKeys.length
+                    ? lesson.competencyKeys.map((competencyKey) => ({
+                        id: competencyKey,
+                        domainKey: lesson.domainKey ?? courseModule.domainKey ?? courseModule.slug,
+                        objective:
+                          learningObjectives[0] ??
+                          `Demonstrate ${lesson.title} according to the mapped credential standard.`,
+                        requiredKnowledge: learningObjectives.length
+                          ? learningObjectives
+                          : [`Explain and perform ${lesson.title}.`],
+                        assessmentStandard:
+                          governedPractical
+                            ? 'Demonstrate the mapped competency through observed practical evidence and required instructor sign-off.'
+                            : 'Demonstrate mastery through the configured lesson assessment.',
+                      }))
+                    : null,
               instructor_notes: instructorNotes,
               practical_required: governedPractical,
               required_artifacts: Array.isArray(extra.requiredArtifacts)

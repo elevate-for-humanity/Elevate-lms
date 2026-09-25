@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
       db
         .from('government_job_feed')
         .select('id,source')
-        .order('created_at', { ascending: false })
+        .order('imported_at', { ascending: false })
         .limit(500),
     ]);
 

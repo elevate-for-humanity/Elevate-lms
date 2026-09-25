@@ -30,6 +30,13 @@ function escapeHtml(value: unknown) {
     .replaceAll("'", '&#039;');
 }
 
+function accountRoleForApprovedRole(
+  value: unknown,
+): 'program_holder' | 'site_coordinator' {
+  const normalized = String(value ?? '').trim().toLowerCase();
+  return normalized.includes('site coordinator') ? 'site_coordinator' : 'program_holder';
+}
+
 async function requireAdminActor() {
   const auth = await createClient();
   const db = await requireAdminClient();
@@ -51,6 +58,7 @@ async function findOrCreateUser(
   db: Awaited<ReturnType<typeof requireAdminClient>>,
   email: string,
   fullName: string,
+  accountRole: 'program_holder' | 'site_coordinator',
 ) {
   const normalizedEmail = email.toLowerCase().trim();
   const { data: existingProfile } = await db
@@ -80,7 +88,7 @@ async function findOrCreateUser(
     email: normalizedEmail,
     password: tempPassword,
     email_confirm: true,
-    user_metadata: { full_name: fullName, role: 'program_holder' },
+    user_metadata: { full_name: fullName, role: accountRole },
   });
   if (error || !data.user?.id) {
     throw new Error(error?.message || 'Unable to create Program Holder account.');
@@ -157,7 +165,12 @@ export async function POST(
     const contactName = String(application.contact_name || application.organization_name || 'Program Holder').trim();
     if (!email) return NextResponse.json({ error: 'Application has no email address.' }, { status: 400 });
 
-    const identity = await findOrCreateUser(db, email, contactName);
+    const existingData =
+      application.data && typeof application.data === 'object' && !Array.isArray(application.data)
+        ? (application.data as Record<string, unknown>)
+        : {};
+    const accountRole = accountRoleForApprovedRole(existingData.approved_role);
+    const identity = await findOrCreateUser(db, email, contactName, accountRole);
     const { data: priorMou } = await db
       .from('license_agreement_acceptances')
       .select('accepted_at')
@@ -174,9 +187,6 @@ export async function POST(
       .limit(1)
       .maybeSingle();
 
-    const existingData = application.data && typeof application.data === 'object' && !Array.isArray(application.data)
-      ? application.data as Record<string, unknown>
-      : {};
     const now = new Date().toISOString();
     const alreadySigned = Boolean(existingHolder?.mou_signed || priorMou?.accepted_at);
     const holderPayload = {
@@ -201,7 +211,7 @@ export async function POST(
         training_required: existingData.training_required === true,
         training_topics: Array.isArray(existingData.training_topics) ? existingData.training_topics : [],
         payout_provider: 'quickbooks',
-        onboarding_contract_version: '2026-09-gary-site-coordinator',
+        onboarding_contract_version: '2026-09-role-scoped-program-holder',
       },
     };
 
@@ -228,7 +238,7 @@ export async function POST(
         .from('profiles')
         .update({
           program_holder_id: holderId,
-          ...(privilegedRole ? {} : { role: 'program_holder' }),
+          ...(privilegedRole ? {} : { role: accountRole }),
         })
         .eq('id', identity.userId);
       if (error) throw error;
@@ -240,7 +250,7 @@ export async function POST(
         first_name: firstName,
         last_name: lastName,
         phone: application.phone || null,
-        role: 'program_holder',
+        role: accountRole,
         program_holder_id: holderId,
         tenant_id: application.tenant_id || null,
       });

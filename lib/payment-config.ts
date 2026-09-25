@@ -154,7 +154,7 @@ export const PROGRAM_PAYMENTS: ProgramPaymentConfig[] = [
     id: 'esthetician',
     label: 'Registered Esthetician Apprenticeship',
     slug: 'esthetician-apprenticeship',
-    price: 6000,
+    price: 4980,
     isFlatFee: true,
     vendorName: 'none',
     vendorCost: 250,

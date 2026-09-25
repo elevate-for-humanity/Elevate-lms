@@ -37,4 +37,16 @@ describe('site coordinator role contract', () => {
     expect(texas).not.toContain('topacesolutions@gmail.com');
     expect(texas).not.toContain('346-295-4481');
   });
+  it('provisions coordinator applications with the canonical profile role', () => {
+    const approval = source(
+      'apps/admin/app/api/program-holder/applications/[id]/approve/route.ts',
+    );
+    expect(approval).toContain('accountRoleForApprovedRole');
+    expect(approval).toContain("normalized.includes('site coordinator')");
+    expect(approval).toContain('findOrCreateUser(db, email, contactName, accountRole)');
+    expect(approval).toContain("role: accountRole");
+    expect(approval).toContain("...(privilegedRole ? {} : { role: accountRole })");
+    expect(approval).not.toContain("onboarding_contract_version: '2026-09-gary-site-coordinator'");
+  });
+
 });

@@ -27,8 +27,8 @@ type AgentAction =
 function jsonObject(content: string): Record<string, unknown> {
   const cleaned = content
     .trim()
-    .replace(/^\`\`\`(?:json)?\s*/i, '')
-    .replace(/\s*\`\`\`$/, '');
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/, '');
   const parsed = JSON.parse(cleaned);
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
     throw new Error('Internal engineering planner returned a non-object response.');

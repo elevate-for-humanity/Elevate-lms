@@ -456,6 +456,10 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
             stringValue(raw.negative_prompt ?? raw.negativePrompt),
           ) || undefined,
         seed: Number.isFinite(Number(scene.seed)) ? Number(scene.seed) : undefined,
+        resolvedProvider:
+          stringValue(scene.resolved_provider ?? scene.resolvedProvider) || undefined,
+        resolvedModel:
+          stringValue(scene.resolved_model ?? scene.resolvedModel) || undefined,
         sourceProviderItemId:
           stringValue(scene.source_provider_item_id ?? scene.sourceProviderItemId) || undefined,
         sourceLicenseEvidenceUrl:

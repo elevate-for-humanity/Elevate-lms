@@ -61,9 +61,8 @@ function hasDurableToolEvidence(tool: string, result: unknown): string | null {
   if (tool === 'studio.engineering.execute') {
     const branch = asRecord(record.branch);
     const pullRequest = asRecord(record.pull_request ?? record.pullRequest);
-    const changedFiles = Array.isArray(record.changed_files ?? record.changedFiles)
-      ? (record.changed_files ?? record.changedFiles as unknown[])
-      : [];
+    const rawChangedFiles = record.changed_files ?? record.changedFiles;
+    const changedFiles = Array.isArray(rawChangedFiles) ? rawChangedFiles : [];
     const repositoryEvidence = Boolean(
       changedFiles.length > 0 &&
       typeof branch?.sha === 'string' &&

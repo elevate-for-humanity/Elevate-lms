@@ -11,7 +11,7 @@ import type { MediaStoryboard } from './media-director';
 import type { InstructionalQualityEvidence } from './instructional-quality-gate';
 import { configuredNarrationProvider } from './edge-tts';
 
-export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v5';
+export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v6';
 
 const execFileAsync = promisify(execFile);
 const MIN_BYTES = 100_000;
@@ -43,6 +43,8 @@ export interface MediaQualityEvidence {
   narrationCoverage: number;
   visualEvidenceCoverage: number;
   repeatedVisualMaximum: number;
+  backwardTimelineJumpDetected: boolean;
+  repeatedTemporalSequenceCount: number;
   requiredProcedurePhases: string[];
   deliveredProcedurePhases: string[];
   sourceEvidenceCoverage: number;
@@ -109,6 +111,10 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
     );
   if (evidence.repeatedVisualMaximum > 3)
     failures.push(`one visual is repeated across ${evidence.repeatedVisualMaximum} scenes`);
+  if (evidence.backwardTimelineJumpDetected)
+    failures.push(
+      `rendered video repeats ${evidence.repeatedTemporalSequenceCount} earlier moving sequence(s), indicating a backward timeline jump or replay`,
+    );
   if (evidence.sourceEvidenceCoverage < 1)
     failures.push('one or more scenes have no persisted visual-source evidence');
   if (evidence.exactVisualSourceCoverage < 1)
@@ -145,6 +151,85 @@ function longestMetric(output: string, key: 'freeze_duration' | 'black_duration'
     0,
   );
 }
+
+function frameDifference(a: Buffer, b: Buffer): number {
+  const length = Math.min(a.length, b.length);
+  if (!length) return Number.POSITIVE_INFINITY;
+  let total = 0;
+  for (let index = 0; index < length; index += 1) total += Math.abs(a[index] - b[index]);
+  return total / length;
+}
+
+async function detectBackwardTimelineReplay(
+  videoPath: string,
+  workDir: string,
+): Promise<{ backwardTimelineJumpDetected: boolean; repeatedTemporalSequenceCount: number }> {
+  const width = 32;
+  const height = 18;
+  const frameSize = width * height;
+  const samplePath = join(workDir, 'temporal-audit-gray.raw');
+  await execFileAsync(
+    'ffmpeg',
+    [
+      '-hide_banner',
+      '-loglevel',
+      'error',
+      '-y',
+      '-i',
+      videoPath,
+      '-vf',
+      `fps=1,scale=${width}:${height}:flags=area,format=gray`,
+      '-an',
+      '-f',
+      'rawvideo',
+      samplePath,
+    ],
+    { timeout: 180_000, maxBuffer: 2_000_000 },
+  );
+  const raw = await readFile(samplePath);
+  const frames: Buffer[] = [];
+  for (let offset = 0; offset + frameSize <= raw.length; offset += frameSize) {
+    frames.push(raw.subarray(offset, offset + frameSize));
+  }
+  if (frames.length < 12) {
+    return { backwardTimelineJumpDetected: false, repeatedTemporalSequenceCount: 0 };
+  }
+
+  const sequenceLength = 4;
+  const minimumGap = 8;
+  const similarityThreshold = 3.5;
+  const minimumMotion = 4;
+  let repeatedTemporalSequenceCount = 0;
+
+  for (let current = minimumGap; current <= frames.length - sequenceLength; current += 1) {
+    for (let prior = 0; prior <= current - minimumGap; prior += 1) {
+      let matches = true;
+      for (let step = 0; step < sequenceLength; step += 1) {
+        if (frameDifference(frames[prior + step], frames[current + step]) > similarityThreshold) {
+          matches = false;
+          break;
+        }
+      }
+      if (!matches) continue;
+
+      let motion = 0;
+      for (let step = 0; step < sequenceLength - 1; step += 1) {
+        motion = Math.max(motion, frameDifference(frames[prior + step], frames[prior + step + 1]));
+      }
+      if (motion < minimumMotion) continue;
+
+      repeatedTemporalSequenceCount += 1;
+      current += sequenceLength - 1;
+      break;
+    }
+  }
+
+  return {
+    backwardTimelineJumpDetected: repeatedTemporalSequenceCount > 0,
+    repeatedTemporalSequenceCount,
+  };
+}
+
 
 async function requireTextAsset(url: string, label: string): Promise<string> {
   const response = await fetch(url, { signal: AbortSignal.timeout(15_000) });
@@ -400,6 +485,8 @@ export async function enforceMediaQuality(input: {
       ],
       { timeout: analysisTimeoutMs, maxBuffer: 64_000_000 },
     );
+    const temporalReplay = await detectBackwardTimelineReplay(videoPath, workDir);
+
 
     const evidence: MediaQualityEvidence = {
       gateVersion: MEDIA_QUALITY_GATE_VERSION,
@@ -425,6 +512,8 @@ export async function enforceMediaQuality(input: {
         ? evidenceScenes.length / input.sceneData.scenes.length
         : 0,
       repeatedVisualMaximum: Math.max(0, ...counts.values()),
+      backwardTimelineJumpDetected: temporalReplay.backwardTimelineJumpDetected,
+      repeatedTemporalSequenceCount: temporalReplay.repeatedTemporalSequenceCount,
       requiredProcedurePhases,
       deliveredProcedurePhases,
       sourceEvidenceCoverage: input.sceneData.scenes.length

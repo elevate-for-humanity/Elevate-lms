@@ -31,7 +31,7 @@ export default async function OnboardingPage() {
       .eq('id', user.id)
       .maybeSingle();
     if (data?.role === 'student') redirect('/onboarding/learner');
-    else if (data?.role === 'program_holder') redirect('https://app.elevateforhumanity.org/program-holder/onboarding');
+    else if (['program_holder', 'site_coordinator'].includes(String(data?.role || ''))) redirect('https://app.elevateforhumanity.org/program-holder/onboarding');
     else if (data?.role === 'admin' || data?.role === 'super_admin')
       redirect('https://admin.elevateforhumanity.org/dashboard');
   }

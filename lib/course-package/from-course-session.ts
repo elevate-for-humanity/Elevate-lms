@@ -128,8 +128,9 @@ export function coursePackageFromSession(
           const sceneTimeline =
             sceneData && Array.isArray(sceneData.scenes)
               ? {
-                  durationSeconds: (sceneData.scenes as unknown[]).reduce(
-                    (total, value) => total + Math.max(0, Number((record(value) ?? {}).duration_seconds ?? 0)),
+                  durationSeconds: (sceneData.scenes as unknown[]).reduce<number>(
+                    (total, value) =>
+                      total + Math.max(0, Number((record(value) ?? {}).duration_seconds ?? 0)),
                     0,
                   ),
                   scenes: sceneData.scenes,

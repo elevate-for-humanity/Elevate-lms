@@ -115,7 +115,7 @@ forbidText('.github/workflows/consolidation-gate.yml', 'consolidation/unified-pl
 requireText('.github/workflows/integrity-gate.yml', 'Platform media duplicate advisory', 'Visual duplicate checking must remain advisory.');
 requireText('.github/workflows/integrity-gate.yml', 'LMS course integrity check', 'LMS integrity must remain independently evaluated.');
 requireText('.github/workflows/integrity-gate.yml', 'Store product integrity check', 'Store integrity must remain independently evaluated.');
-requireText('.github/workflows/integrity-gate.yml', 'Stripe route and webhook integrity check', 'Stripe integrity must remain independently evaluated.');
+requireText('.github/workflows/integrity-gate.yml', 'Legacy Stripe compatibility integrity check', 'Legacy Stripe compatibility integrity must remain independently evaluated.');
 
 requireText('.github/workflows/apply-platform-media-dedupe.yml', 'contents: read', 'Media dedupe workflow must remain read-only during recovery.');
 forbidText('.github/workflows/apply-platform-media-dedupe.yml', 'git push', 'Media dedupe workflow must not push a competing repair branch.');
@@ -157,8 +157,11 @@ forbidText('scripts/check-stripe-integrity.mjs', 'Warn only for now', 'Stripe ga
 requireText('scripts/audit-auth-gaps.sh', '--strict', 'Auth audit strict mode must remain available.');
 requireText('scripts/audit-auth-gaps.sh', 'is_production_file', 'Auth strict mode must distinguish deployed roots from detached legacy roots.');
 requireText('scripts/production-readiness-gate.sh', 'audit-auth-gaps.sh --strict', 'Production readiness must enforce strict auth auditing.');
-requireText('scripts/production-readiness-gate.sh', 'Stripe Secret Key is required for production readiness', 'Missing Stripe production configuration must remain blocking.');
-requireText('scripts/production-readiness-gate.sh', 'Stripe Webhook Secret is required for production readiness', 'Missing Stripe webhook configuration must remain blocking.');
+requireText('scripts/production-readiness-gate.sh', 'Canonical payment lifecycle', 'Production readiness must enforce the canonical payment lifecycle.');
+requireText('scripts/production-readiness-gate.sh', 'verify-payment-lifecycle-contract.mjs', 'Production readiness must execute the provider-neutral payment contract.');
+requireText('scripts/production-readiness-gate.sh', 'Legacy Stripe compatibility integrity', 'Legacy Stripe code must remain isolated behind its compatibility integrity check.');
+forbidText('scripts/production-readiness-gate.sh', 'Stripe Secret Key is required for production readiness', 'Stripe credentials must not be reintroduced as a production-readiness requirement.');
+forbidText('scripts/production-readiness-gate.sh', 'Stripe Webhook Secret is required for production readiness', 'Stripe webhook credentials must not be reintroduced as a production-readiness requirement.');
 
 requireText('scripts/check-analytics-integrity.mjs', 'result.status === 1', 'Analytics audit must distinguish no-match from execution failure.');
 requireText('scripts/audit-migration-discipline.mjs', 'scripts/lint-migrations.cjs', 'Migration discipline command must remain wired to blocking migration lint.');

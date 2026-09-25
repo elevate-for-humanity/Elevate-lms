@@ -33,6 +33,9 @@ const nextConfig = {
     '@opentelemetry/resources',
     '@opentelemetry/semantic-conventions',
     'require-in-the-middle',
+    // edge-tts ships TypeScript source in its package. Keep it outside the
+    // Next/Webpack bundle so Node loads it through the server runtime path.
+    'edge-tts',
   ],
 
   async headers() {

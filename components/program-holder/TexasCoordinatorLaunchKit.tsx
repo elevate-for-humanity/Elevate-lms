@@ -1,11 +1,33 @@
 import Link from 'next/link';
 
-export function TexasCoordinatorLaunchKit() {
+export function TexasCoordinatorLaunchKit({
+  coordinatorName,
+  coordinatorPhone,
+  coordinatorEmail,
+}: {
+  coordinatorName?: string;
+  coordinatorPhone?: string;
+  coordinatorEmail?: string;
+}) {
+  const displayName = coordinatorName?.trim() || 'Texas State Site Coordinator';
+  const introduction = coordinatorName?.trim()
+    ? `My name is ${coordinatorName.trim()}, and I serve as the Texas State Site Coordinator for Elevate for Humanity.`
+    : 'I serve as the Texas State Site Coordinator for Elevate for Humanity.';
+  const signature = [
+    coordinatorName?.trim() || null,
+    'Texas State Site Coordinator',
+    'Elevate for Humanity',
+    coordinatorPhone?.trim() || null,
+    coordinatorEmail?.trim() || null,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
   return (
     <section className="space-y-6">
       <div className="rounded-3xl border border-blue-200 bg-white p-6 shadow-sm sm:p-8">
         <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-800">Texas State Launch Playbook</p>
-        <h2 className="mt-2 text-3xl font-black text-slate-950">Amir: start here before making Texas commitments.</h2>
+        <h2 className="mt-2 text-3xl font-black text-slate-950">{displayName}: start here before making Texas commitments.</h2>
         <p className="mt-3 max-w-4xl leading-7 text-slate-700">Your role is to build relationships, document opportunities, recruit qualified employers, and bring proposed partnerships back to Elevate for sponsor approval. Do not promise funding, participant eligibility, grant awards, or changes to registered apprenticeship standards.</p>
       </div>
       <div className="grid gap-5 lg:grid-cols-2">
@@ -39,7 +61,7 @@ export function TexasCoordinatorLaunchKit() {
         <h3 className="text-xl font-black">Board meeting letter — ready to print</h3>
         <div className="mt-4 whitespace-pre-line rounded-xl bg-slate-50 p-5 text-sm leading-6 text-slate-800">{`Dear Workforce Development Leadership,
 
-My name is Amir Naseen, and I serve as the Texas State Site Coordinator for Elevate for Humanity. I am reaching out on behalf of Elizabeth Greene and Elevate's workforce and Registered Apprenticeship initiatives.
+${introduction} I am reaching out on behalf of Elevate's workforce and Registered Apprenticeship initiatives.
 
 Elevate is developing employer partnerships in Texas and would like to coordinate with your Board before launching participant activity in your workforce area. Our goal is to understand your current high-demand occupations, employer needs, WIOA training policies, Individual Training Account limits, OJT opportunities, supportive services, and the process for coordinating eligible Registered Apprenticeship programs.
 
@@ -50,11 +72,7 @@ At this stage, I am requesting coordination and information. I am not representi
 Thank you for the opportunity to coordinate. I look forward to learning your local priorities and identifying where Elevate can support Texas employers and job seekers.
 
 Sincerely,
-Amir Naseen
-Texas State Site Coordinator
-Elevate for Humanity
-346-295-4481
-topacesolutions@gmail.com`}</div>
+${signature}`}</div>
       </article>
       <div className="grid gap-5 lg:grid-cols-2">
         <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

@@ -240,8 +240,7 @@ export default function StudentSupportPage() {
             Ready to Start Your Career?
           </h2>
           <p className="text-white text-lg mb-8">
-            Check your eligibility for funded career training programs. Most students pay $0 out of
-            pocket.
+            Review possible funding pathways for your selected program. Funding is program- and participant-specific and requires approval from the responsible source.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

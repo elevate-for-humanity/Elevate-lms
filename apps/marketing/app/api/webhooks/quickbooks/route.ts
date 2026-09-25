@@ -57,7 +57,10 @@ export async function POST(request: NextRequest) {
           {
             billing_invoice_id: update.data.id,
             fulfillment_type: update.data.fulfillment_type,
-            payload: update.data.fulfillment_payload || {},
+            payload: {
+              ...((update.data.fulfillment_payload as Record<string, unknown> | null) ?? {}),
+              provider: 'quickbooks',
+            },
             status: 'pending',
             updated_at: new Date().toISOString(),
           },

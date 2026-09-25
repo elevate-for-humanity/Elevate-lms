@@ -127,8 +127,8 @@ function email72h(firstName: string, programLabel: string): { subject: string; h
           <div style="display:flex;align-items:flex-start;gap:12px;padding:14px;background:#faf5ff;border-radius:10px">
             <span style="font-size:20px;flex-shrink:0">📋</span>
             <div>
-              <p style="margin:0 0 4px;font-weight:700;color:#1e293b;font-size:14px">Most students pay $0 in tuition</p>
-              <p style="margin:0;color:#475569;font-size:13px">WIOA workforce funding covers program costs for most eligible applicants. We walk you through the application — it takes about 30 minutes.</p>
+              <p style="margin:0 0 4px;font-weight:700;color:#1e293b;font-size:14px">Funding may be available for approved programs and participants</p>
+              <p style="margin:0;color:#475569;font-size:13px">Workforce funding requires program and participant eligibility plus authorization from the responsible agency. We can help you identify the correct next step without representing funding as guaranteed.</p>
             </div>
           </div>
         </div>

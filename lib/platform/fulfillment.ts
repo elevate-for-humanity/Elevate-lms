@@ -75,7 +75,6 @@ export async function fulfillPlatformSaasSubscription(
       billing_provider: meta.billing_provider ?? 'elevate',
       provider_subscription_id: meta.provider_subscription_id ?? null,
       provider_customer_id: meta.provider_customer_id ?? null,
-      provider_payment_id: meta.provider_payment_id ?? null,
       billing_interval: databaseBillingInterval(meta.billing_interval),
       status: 'active',
       current_period_start: meta.current_period_start ?? null,

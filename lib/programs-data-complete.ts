@@ -471,7 +471,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     name: 'CPR & First Aid (HSI)',
     tagline: 'Life-saving skills for healthcare and safety careers',
     description:
-      'The CPR & First Aid program through Health & Safety Institute (HSI) provides essential emergency response training. Students learn CPR for adults, children, and infants, AED operation, choking relief, and basic first aid. This certification is required for many healthcare, childcare, and safety positions. The course includes hands-on practice with manikins and AED trainers.',
+      'The CPR & First Aid program through approved CPR/First Aid credential provider provides essential emergency response training. Students learn CPR for adults, children, and infants, AED operation, choking relief, and basic first aid. This certification is required for many healthcare, childcare, and safety positions. The course includes hands-on practice with manikins and AED trainers.',
     summary:
       'Earn HSI CPR and First Aid certifications required for healthcare and safety careers.',
     bullets: [
@@ -490,7 +490,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     duration: '1 Day • 4-8 Hours',
     image: '/images/pages/comp-pathway-healthcare.webp',
     etplApproved: true,
-    partnerName: 'Health & Safety Institute (HSI)',
+    partnerName: 'approved CPR/First Aid credential provider',
     partnerUrl: 'https://hsi.com',
     partnerLoginUrl:
       'https://hsi.com/solutions/cpr-aed-first-aid-training/elevate-for-humanity-career-training-org-nts-class-sign-up',

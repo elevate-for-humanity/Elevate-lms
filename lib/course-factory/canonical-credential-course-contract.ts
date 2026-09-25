@@ -50,7 +50,15 @@ export const CanonicalCredentialLessonSchema = z.object({
   experience: CourseExperienceSchema,
   intelligence: LearningIntelligenceSchema,
   media: z.object({
+    // A credential lesson and its media are one version-locked package.
+    // The primary media job must be created in the same transaction as the
+    // lesson; the lesson cannot become complete until that job renders and
+    // passes the production media gate.
+    createdWithLessonRequired: z.literal(true),
+    primaryVideoJobRequired: z.literal(true),
+    sourceFingerprintRequired: z.literal(true),
     storyboardRequired: z.literal(true),
+    minimumStoryboardScenes: z.literal(6),
     licensedWorkspaceRequired: z.literal(true),
     provenanceRequired: z.literal(true),
     professionalNarrationRequired: z.literal(true),
@@ -59,7 +67,10 @@ export const CanonicalCredentialLessonSchema = z.object({
     transcriptRequired: z.literal(true),
     noLoopingNarration: z.literal(true),
     noRepeatedFillerVisuals: z.literal(true),
+    noBackwardTimelineJumps: z.literal(true),
     narrationVisualAlignmentRequired: z.literal(true),
+    qualityApprovalRequired: z.literal(true),
+    learnerPlaybackVerificationRequired: z.literal(true),
   }),
   learnerExperience: z.object({
     demonstrationRequired: z.literal(true),
@@ -71,6 +82,7 @@ export const CanonicalCredentialLessonSchema = z.object({
     remediationRequired: z.literal(true),
     progressTrackingRequired: z.literal(true),
     resumeTrackingRequired: z.literal(true),
+    mediaCompletionRequiredForLessonCompletion: z.literal(true),
   }),
 });
 

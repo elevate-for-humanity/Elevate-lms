@@ -115,7 +115,7 @@ export const headerNavigation: NavGroup[] = [
       {
         label: 'Funding & Support',
         href: '/funding',
-        description: 'Free training and financial aid',
+        description: 'Funding pathways and participant support',
       },
       {
         label: 'Career Services',

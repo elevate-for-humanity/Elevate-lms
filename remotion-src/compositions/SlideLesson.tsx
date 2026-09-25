@@ -449,7 +449,14 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
     extrapolateLeft: 'clamp',
     extrapolateRight: 'clamp',
   });
-  const mediaTransform = `scale(${1.035 + sceneProgress * 0.055}) translate(${(scene.scene_number % 2 ? 1 : -1) * sceneProgress * 1.4}%, ${sceneProgress * -0.8}%)`;
+  // Keep photographic/still media measurably alive throughout long narration.
+  // A one-way Ken Burns move becomes sub-threshold on long scenes and can be
+  // misclassified by ffmpeg freezedetect. Oscillation maintains visible,
+  // professional motion without cutting away from the teaching visual.
+  const motionX = Math.sin(frame / Math.max(1, fps * 1.35)) * 2.4;
+  const motionY = Math.cos(frame / Math.max(1, fps * 1.8)) * 1.4;
+  const motionScale = 1.065 + Math.sin(frame / Math.max(1, fps * 2.2)) * 0.018;
+  const mediaTransform = `scale(${motionScale}) translate(${motionX}%, ${motionY}%)`;
 
   return (
     <AbsoluteFill

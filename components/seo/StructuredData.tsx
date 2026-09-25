@@ -147,7 +147,7 @@ export function ProgramStructuredData({
       price: tuition,
       priceCurrency: 'USD',
       availability: 'https://schema.org/InStock',
-      category: 'WIOA Eligible - May be free for qualifying students',
+      category: 'Funding status is program-specific; agency authorization required',
     },
     ...(salaryRange && {
       salaryUponCompletion: {

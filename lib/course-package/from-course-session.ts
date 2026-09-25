@@ -85,18 +85,50 @@ export function coursePackageFromSession(
           const experience = lessonExperience(lesson);
           const interactiveVideo = record(experience?.interactiveVideo);
           const videoConfig = record(lesson.video_config);
-          const storyboard = Array.isArray(videoConfig?.storyboard)
-            ? videoConfig.storyboard
-            : Array.isArray(videoConfig?.scenes)
-              ? videoConfig.scenes
-              : [];
+          const sceneData = record(lesson.scene_data);
+          const rawStoryboard = Array.isArray(sceneData?.scenes)
+            ? sceneData.scenes
+            : Array.isArray(videoConfig?.storyboard)
+              ? videoConfig.storyboard
+              : Array.isArray(videoConfig?.scenes)
+                ? videoConfig.scenes
+                : [];
+          const storyboard = rawStoryboard.map((value, index) => {
+            const scene = record(value) ?? {};
+            return {
+              objectiveId: String(scene.objectiveId ?? scene.objective_id ?? `${lesson.slug}-objective-${index + 1}`),
+              sceneNumber: Number(scene.sceneNumber ?? scene.scene_number ?? index + 1),
+              narration: String(scene.narration ?? scene.dialogue ?? ''),
+              visualDirection: String(scene.visualDirection ?? scene.visual_style ?? scene.action ?? ''),
+              onScreenText: Array.isArray(scene.onScreenText ?? scene.on_screen_text)
+                ? (scene.onScreenText ?? scene.on_screen_text as unknown[]).map(String)
+                : [],
+              ...(scene.demonstration ? { demonstration: String(scene.demonstration) } : {}),
+              durationSeconds: Math.max(1, Number(scene.durationSeconds ?? scene.duration_seconds ?? 1)),
+              ...(scene.interactionAfterScene ?? scene.interaction_after_scene
+                ? { interactionAfterScene: String(scene.interactionAfterScene ?? scene.interaction_after_scene) }
+                : {}),
+            };
+          });
           const experienceTimeline = record(experience?.instructionalTimeline);
-          const timeline = record(videoConfig?.timeline) ?? (
-            experienceTimeline
+          const sceneTimeline =
+            sceneData && Array.isArray(sceneData.scenes)
               ? {
-                  durationSeconds: experienceTimeline.durationSeconds,
-                  audio: Array.isArray(experienceTimeline.scenes)
-                    ? experienceTimeline.scenes.map((scene, index) => {
+                  durationSeconds: (sceneData.scenes as unknown[]).reduce(
+                    (total, value) => total + Math.max(0, Number((record(value) ?? {}).duration_seconds ?? 0)),
+                    0,
+                  ),
+                  scenes: sceneData.scenes,
+                  captions: Array.isArray(sceneData.captions) ? sceneData.captions : [],
+                }
+              : null;
+          const effectiveTimeline = experienceTimeline ?? sceneTimeline;
+          const timeline = record(videoConfig?.timeline) ?? (
+            effectiveTimeline
+              ? {
+                  durationSeconds: effectiveTimeline.durationSeconds,
+                  audio: Array.isArray(effectiveTimeline.scenes)
+                    ? effectiveTimeline.scenes.map((scene, index) => {
                         const item = record(scene) ?? {};
                         return {
                           id: String(item.id ?? `${lesson.slug}-audio-${index + 1}`),
@@ -106,8 +138,8 @@ export function coursePackageFromSession(
                         };
                       })
                     : [],
-                  visuals: Array.isArray(experienceTimeline.scenes)
-                    ? experienceTimeline.scenes.map((scene, index) => {
+                  visuals: Array.isArray(effectiveTimeline.scenes)
+                    ? effectiveTimeline.scenes.map((scene, index) => {
                         const item = record(scene) ?? {};
                         return {
                           id: String(item.id ?? `${lesson.slug}-visual-${index + 1}`),
@@ -124,8 +156,8 @@ export function coursePackageFromSession(
                         };
                       })
                     : [],
-                  captions: Array.isArray(experienceTimeline.captions)
-                    ? experienceTimeline.captions
+                  captions: Array.isArray(effectiveTimeline.captions)
+                    ? effectiveTimeline.captions
                     : [],
                   interactions: [],
                   checkpoints: [],
@@ -168,10 +200,26 @@ export function coursePackageFromSession(
                     assessmentStandard: String(check.assessmentStandard ?? check.standard ?? 'Demonstrate mastery through the configured lesson assessment.'),
                   }];
                 })
-              : [],
+              : Array.isArray((record(experience?.intelligence)?.skills as unknown[] | undefined))
+                ? ((record(experience?.intelligence)?.skills as unknown[]) ?? []).flatMap((value, index) => {
+                    const skill = record(value);
+                    if (!skill) return [];
+                    const objective = String(skill.label ?? skill.key ?? '').trim();
+                    if (!objective) return [];
+                    return [{
+                      id: String(skill.key ?? `${lesson.slug}-competency-${index + 1}`),
+                      domain: String(lesson.domain_key ?? module.domain_key ?? 'general'),
+                      objective,
+                      requiredKnowledge: [objective],
+                      assessmentStandard: 'Demonstrate mastery through the configured lesson assessment and practical evidence.',
+                    }];
+                  })
+                : [],
             html: lessonHtml(lesson),
             videoUrl: lesson.video_url,
             experience,
+            practicalRequired: lesson.practical_required === true,
+            requiredArtifacts: Array.isArray(lesson.required_artifacts) ? lesson.required_artifacts.map(String).filter(Boolean) : [],
             storyboard,
             timeline,
             questions: normalizeQuestions(lesson, module.domain_key),

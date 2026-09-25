@@ -90,7 +90,7 @@ export const PROGRAM_PAYMENTS: ProgramPaymentConfig[] = [
     id: 'barber',
     label: 'Registered Barber Apprenticeship',
     slug: 'barber-apprenticeship',
-    price: 4980,
+    price: 6000,
     isFlatFee: true,
     vendorName: 'none',
     vendorCost: 386,

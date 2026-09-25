@@ -423,10 +423,10 @@ export default async function ApprenticePortalPage() {
   );
 
   if (!runtime.contract) {
-    const billingConfigured = Boolean(cosmetologyBilling?.fully_paid || automaticBillingActive);
+    const billingConfigured = Boolean(cosmetologyBilling?.fully_paid || automaticBillingActive || invoiceAccess.accessExemptUntil);
     const todoItems = [
       {
-        label: 'Complete the payment release and approve PayPal billing',
+        label: invoiceAccess.accessExemptUntil ? 'Billing access approved by sponsor' : 'Choose a payment method or financing option',
         done: billingConfigured,
         href: '/apprentice/billing',
         icon: CreditCard,

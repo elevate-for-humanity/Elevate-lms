@@ -144,27 +144,42 @@ async function resolveRegisteredBlueprint(input: FactoryInput) {
   return loaded?.blueprint ?? null;
 }
 
-async function queueUpgradedMediaIfRequested(
+async function verifyUpgradedMediaBoundToLessons(
   input: FactoryInput,
   result: FactoryOutput,
 ): Promise<FactoryOutput> {
   if (input.videoMode !== 'queue' || !result.courseId || input.dryRun) return result;
-  const media = await queueCourseLessonVideos({
-    courseId: result.courseId,
-    onlyMissing: true,
-    limit: input.videoQueueLimit ?? null,
-  });
+  const db = await requireAdminClient();
+  const [{ data: lessons, error: lessonError }, { data: jobs, error: jobError }] =
+    await Promise.all([
+      db.from('course_lessons').select('id').eq('course_id', result.courseId),
+      db
+        .from('video_jobs')
+        .select('id,lesson_id,status')
+        .eq('course_id', result.courseId)
+        .eq('asset_kind', 'lesson'),
+    ]);
+  if (lessonError) throw lessonError;
+  if (jobError) throw jobError;
+  const lessonIds = new Set((lessons ?? []).map((lesson) => lesson.id));
+  const jobLessonIds = new Set((jobs ?? []).map((job) => job.lesson_id));
+  const missing = [...lessonIds].filter((lessonId) => !jobLessonIds.has(lessonId));
+  if (missing.length) {
+    return {
+      ...result,
+      ok: false,
+      errors: [
+        ...(result.errors ?? []),
+        `Atomic lesson/media contract failed: ${missing.length} lesson(s) have no canonical primary media job.`,
+      ],
+    };
+  }
   return {
     ...result,
-    videosQueued: media.queued + media.microclipsQueued,
-    lessonVideosQueued: media.queued,
-    microclipsQueued: media.microclipsQueued,
-    warnings: [
-      ...(result.warnings ?? []),
-      ...(media.failed > 0
-        ? [`${media.failed} media enqueue attempt(s) failed and remain retryable.`]
-        : []),
-    ],
+    videosQueued: (jobs ?? []).filter((job) =>
+      ['queued', 'rendering', 'complete'].includes(String(job.status)),
+    ).length,
+    lessonVideosQueued: (jobs ?? []).length,
   };
 }
 
@@ -247,7 +262,7 @@ export async function courseFactory(
       assessmentsGenerated: 0,
       videosQueued: 0,
     };
-    const withMedia = await queueUpgradedMediaIfRequested(input, result);
+    const withMedia = await verifyUpgradedMediaBoundToLessons(input, result);
     const remaining = await evaluatePersistedCredentialCourse(upgraded.courseId);
     const remainingWarnings = remaining.findings.map(
       (finding) => `repair_required:${finding.gate}:${finding.message}`,

@@ -1,4 +1,4 @@
 merge_sha=1d70d1bba38a6db2f7caa3da8f9dcbb51d6b97e0
 services=lms
-requested_at=2026-09-25T11:40:00.000Z
-reason=Deploy coordinator dashboard operational-access repair
+requested_at=2026-09-25T11:45:00.000Z
+reason=Retry coordinator dashboard production deployment after cancelled run

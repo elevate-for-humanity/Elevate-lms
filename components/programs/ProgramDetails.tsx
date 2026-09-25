@@ -73,7 +73,7 @@ export function ProgramDetails({ program }: { program: Program }) {
               </div>
             </div>
 
-            <p className="text-xs text-slate-500 italic">*No cost for most eligible students</p>
+            <p className="text-xs text-slate-500 italic">*Funding, when available, is program- and participant-specific and requires authorization.</p>
 
             {isBarberProgram && (
               <div className="bg-brand-green-50 border border-brand-green-200 rounded-lg p-3 mt-4">

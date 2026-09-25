@@ -489,7 +489,7 @@ export async function saveProgramHolderExtension(formData: FormData): Promise<vo
     .from('profiles')
     .select('id,full_name,email,role')
     .eq('id', profileId)
-    .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder'])
+    .in('role', ['admin', 'super_admin', 'staff', 'program_holder', 'programholder', 'site_coordinator'])
     .maybeSingle();
   if (!profile) throw new Error('Select a valid staff or Program Holder account.');
   const { data: savedExtension, error } = await db

@@ -42,7 +42,7 @@ export async function submitVerificationDecision(
   const { data: holder, error: holderError } = await db
     .from('program_holders')
     .select(
-      'id, user_id, status, primary_program_id, contact_email, organization_name, contact_name',
+      'id, user_id, status, primary_program_id, contact_email, organization_name, contact_name, features',
     )
     .eq('id', holderId)
     .maybeSingle();
@@ -76,11 +76,18 @@ export async function submitVerificationDecision(
     notes: notes ?? null,
   });
 
-  // ── 7. ROLE PROMOTION — use holder.user_id from DB, never caller ──
+  // ── 7. ROLE PROMOTION — use holder.user_id and approved role from DB ──
   if (decision === 'approved' && holder.user_id) {
+    const approvedRole =
+      holder.features && typeof holder.features === 'object'
+        ? String((holder.features as Record<string, unknown>).approved_role || '')
+        : '';
+    const accountRole = approvedRole.toLowerCase().includes('site coordinator')
+      ? 'site_coordinator'
+      : 'program_holder';
     const { error: roleError } = await db
       .from('profiles')
-      .update({ role: 'program_holder', updated_at: new Date().toISOString() })
+      .update({ role: accountRole, updated_at: new Date().toISOString() })
       .eq('id', holder.user_id);
 
     if (roleError) {

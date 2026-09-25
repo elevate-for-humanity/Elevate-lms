@@ -93,10 +93,8 @@ export async function GET(request: NextRequest) {
       browserDetail = browserResponse.ok
         ? 'isolated Studio browser runtime is reachable'
         : `isolated Studio browser returned HTTP ${browserResponse.status}`;
-    } catch (error) {
-      browserDetail = `isolated Studio browser is unreachable: ${
-        error instanceof Error ? error.message : String(error)
-      }`;
+    } catch {
+      browserDetail = 'isolated Studio browser is unreachable';
     }
   }
 

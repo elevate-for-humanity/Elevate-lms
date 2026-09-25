@@ -141,7 +141,7 @@ export default async function PricingPage() {
                 </div>
                 <div className="text-sm text-slate-600 mb-4 space-y-1">
                   <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> See the program page for verified funding records</p>
-                  <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> Payment plan from $50/week</p>
+                  <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> Installment options shown before enrollment</p>
                   <p className="flex items-center gap-1"><Check className="w-3 h-3 text-green-600" /> Employer sponsorship</p>
                 </div>
                 <Link href={`/programs/${program.slug}`} className="text-green-600 font-semibold text-sm flex items-center gap-1 hover:underline">

@@ -4,7 +4,6 @@ export interface SubscriptionPayload {
   billingProvider: string;
   providerCustomerId?: string | null;
   providerSubscriptionId?: string | null;
-  providerPaymentId?: string | null;
   plan: string;
   status: string;
   seats?: number;
@@ -22,7 +21,6 @@ export async function upsertOrgSubscription(
       billing_provider: payload.billingProvider,
       provider_customer_id: payload.providerCustomerId ?? null,
       provider_subscription_id: payload.providerSubscriptionId ?? null,
-      provider_payment_id: payload.providerPaymentId ?? null,
       plan: payload.plan,
       status: payload.status,
       seats: payload.seats,

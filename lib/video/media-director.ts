@@ -77,6 +77,8 @@ export interface MediaScene {
   /** Persisted evidence of the source selected for this rendered scene. */
   resolvedProvider?: string;
   resolvedModel?: string;
+  sourceProviderItemId?: string;
+  sourceLicenseEvidenceUrl?: string;
   /** Instructional phase and the exact action the picture must prove. */
   procedurePhase?: string;
   requiredVisualEvidence?: string;
@@ -454,6 +456,10 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
             stringValue(raw.negative_prompt ?? raw.negativePrompt),
           ) || undefined,
         seed: Number.isFinite(Number(scene.seed)) ? Number(scene.seed) : undefined,
+        sourceProviderItemId:
+          stringValue(scene.source_provider_item_id ?? scene.sourceProviderItemId) || undefined,
+        sourceLicenseEvidenceUrl:
+          stringValue(scene.source_license_evidence_url ?? scene.sourceLicenseEvidenceUrl) || undefined,
         procedurePhase:
           stringValue(scene.procedure_phase ?? scene.procedurePhase) || undefined,
         requiredVisualEvidence:

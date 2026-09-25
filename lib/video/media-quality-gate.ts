@@ -49,6 +49,9 @@ export interface MediaQualityEvidence {
   deliveredProcedurePhases: string[];
   sourceEvidenceCoverage: number;
   exactVisualSourceCoverage: number;
+  licenseEvidenceCoverage: number;
+  sourceProviders: string[];
+  licenseEvidenceUrls: string[];
   instructionalQuality: InstructionalQualityEvidence;
   narrationProviderClass?: 'professional' | 'diagnostic' | 'unknown';
 }
@@ -119,6 +122,8 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
     failures.push('one or more scenes have no persisted visual-source evidence');
   if (evidence.exactVisualSourceCoverage < 1)
     failures.push('one or more demonstration scenes use unverified stock imagery');
+  if (evidence.licenseEvidenceCoverage < 1)
+    failures.push('one or more licensed third-party scenes are missing entitlement/license evidence');
   if (evidence.instructionalQuality.instructionLeakageDetected)
     failures.push('narration contains internal generation instructions');
   if (evidence.instructionalQuality.objectiveCoverage < 1)
@@ -419,6 +424,29 @@ export async function enforceMediaQuality(input: {
     const sourcedScenes = input.sceneData.scenes.filter((scene) =>
       Boolean(scene.resolvedProvider && scene.resolvedModel),
     );
+    const licensedScenes = input.sceneData.scenes.filter((scene) =>
+      Boolean(
+        scene.resolvedProvider &&
+        !['remotion', 'elevate-owned', 'elevate-motion'].includes(scene.resolvedProvider),
+      ),
+    );
+    const licensedScenesWithEvidence = licensedScenes.filter((scene) =>
+      Boolean(scene.sourceLicenseEvidenceUrl),
+    );
+    const sourceProviders = [
+      ...new Set(
+        input.sceneData.scenes
+          .map((scene) => scene.resolvedProvider)
+          .filter((value): value is string => Boolean(value)),
+      ),
+    ];
+    const licenseEvidenceUrls = [
+      ...new Set(
+        input.sceneData.scenes
+          .map((scene) => scene.sourceLicenseEvidenceUrl)
+          .filter((value): value is string => Boolean(value)),
+      ),
+    ];
     const exactSceneTypes = new Set([
       'equipment_closeup',
       'worked_example',
@@ -428,9 +456,11 @@ export async function enforceMediaQuality(input: {
     const exactScenes = input.sceneData.scenes.filter(
       (scene) => scene.sceneType && exactSceneTypes.has(scene.sceneType),
     );
-    const verifiedExactScenes = exactScenes.filter((scene) =>
-      ['wan', 'ltx', 'remotion'].includes(scene.resolvedProvider ?? ''),
-    );
+    const verifiedExactScenes = exactScenes.filter((scene) => {
+      const provider = scene.resolvedProvider ?? '';
+      if (['wan', 'ltx', 'remotion'].includes(provider)) return true;
+      return Boolean(provider && scene.sourceLicenseEvidenceUrl);
+    });
 
     const actualDurationSeconds = Number(probe.format?.duration ?? 0);
     // Full-frame audits are CPU-bound. Running three decoders concurrently
@@ -522,6 +552,11 @@ export async function enforceMediaQuality(input: {
       exactVisualSourceCoverage: exactScenes.length
         ? verifiedExactScenes.length / exactScenes.length
         : 1,
+      licenseEvidenceCoverage: licensedScenes.length
+        ? licensedScenesWithEvidence.length / licensedScenes.length
+        : 1,
+      sourceProviders,
+      licenseEvidenceUrls,
       instructionalQuality: input.instructionalQuality,
       narrationProviderClass:
         input.narrationProviderClass ??

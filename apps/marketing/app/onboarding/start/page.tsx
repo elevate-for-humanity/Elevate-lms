@@ -66,7 +66,7 @@ export default async function OnboardingStartPage() {
     const roleAliases: Record<string, string> = {
       PROGRAM_HOLDER: 'program_holder',
       WORKSITE_ONLY: 'partner',
-      SITE_COORDINATOR: 'partner',
+      SITE_COORDINATOR: 'site_coordinator',
     };
     const normalizedRole = roleAliases[profile.role] ?? profile.role;
     redirect(getRoleDestination(normalizedRole));

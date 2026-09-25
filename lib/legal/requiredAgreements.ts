@@ -226,7 +226,7 @@ export const PROTECTED_ROUTES: Record<string, UserRole[]> = {
   '/lms': ['student', 'instructor', 'admin', 'staff', 'super_admin'],
   '/student-portal': ['student'],
   '/lms/dashboard': ['student'],
-  '/program-holder': ['program_holder'],
+  '/program-holder': ['program_holder', 'site_coordinator'],
   '/employer': ['employer'],
   '/admin/staff-portal': ['staff', 'admin', 'super_admin'],
   '/admin': ['admin', 'super_admin'],

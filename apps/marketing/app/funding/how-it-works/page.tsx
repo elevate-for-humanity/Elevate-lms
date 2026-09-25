@@ -18,19 +18,19 @@ const STEPS = [
   {
     step: '1',
     title: 'Check Eligibility',
-    desc: 'Attend an orientation session or contact us to determine if you qualify for funded training through WIOA, DOL apprenticeship, or state grant programs.',
+    desc: 'Complete the preliminary intake and, when applicable, attend the responsible agency's orientation. The agency—not Elevate—determines funding eligibility.',
     icon: HelpCircle,
   },
   {
     step: '2',
     title: 'Get Approved',
-    desc: 'Work with your enrollment advisor to complete the application. If you qualify, your funding source is identified and your training costs may be covered.',
+    desc: 'Complete the application and agency process. Do not treat training as funded until the responsible source identifies the approved program, covered costs, and written authorization.',
     icon: FileCheck,
   },
   {
     step: '3',
     title: 'Start Training',
-    desc: 'Enroll in your chosen program and begin classes. Funding is applied directly — you do not pay out of pocket if approved.',
+    desc: 'Enroll under the payment path documented for your program. When an agency authorizes funding, the written authorization controls the approved amount and covered costs.',
     icon: GraduationCap,
   },
   {
@@ -44,7 +44,7 @@ const STEPS = [
 const FUNDING_SOURCES = [
   {
     name: 'WIOA (Workforce Innovation and Opportunity Act)',
-    desc: 'Federal funding administered through local WorkOne offices. Covers tuition, books, supplies, and supportive services for eligible adults and dislocated workers.',
+    desc: 'Federal funding administered through local WorkOne offices. May authorize allowable training or supportive-service costs for eligible participants; the workforce agency determines what is covered.',
     href: '/funding/federal-programs',
   },
   {
@@ -54,7 +54,7 @@ const FUNDING_SOURCES = [
   },
   {
     name: 'State Grant Programs',
-    desc: 'Indiana state workforce development grants including Next Level Jobs Workforce Ready Grant and employer training grants.',
+    desc: 'Indiana workforce programs may apply only to specific approved programs and eligible participants; current registry evidence controls public labels.',
     href: '/funding/state-programs',
   },
   {

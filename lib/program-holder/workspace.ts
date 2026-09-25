@@ -120,6 +120,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     documentsRes,
     reportsRes,
     coursesRes,
+    progressEntriesRes,
     payoutRes,
     schedulesRes,
     notificationRes,
@@ -210,6 +211,12 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       )
       .eq('program_holder_id', holderId),
     db
+      .from('progress_entries')
+      .select('apprentice_id,hours_worked,work_date,clock_in_at,clock_out_at')
+      .not('apprentice_id', 'is', null)
+      .order('work_date', { ascending: false })
+      .limit(5000),
+    db
       .from('program_holder_payouts')
       .select(
         'payout_provider,provider_recipient_id,payouts_enabled,transfers_enabled,instant_payouts_enabled,verification_status,quickbooks_sync_status,last_provider_sync_at',
@@ -267,21 +274,26 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .map((row: any) => row.id),
   );
   const verifiedHoursByUser = new Map<string, number>();
+  const firstClockDateByUser = new Map<string, string>();
   for (const entry of hoursRes.data ?? []) {
     if (!entry.user_id || !['approved', 'verified', 'complete', 'completed'].includes(String(entry.approval_status || entry.status || '').toLowerCase())) continue;
-    verifiedHoursByUser.set(
-      entry.user_id,
-      (verifiedHoursByUser.get(entry.user_id) ?? 0) + Number(entry.hours_claimed ?? entry.hours ?? 0),
-    );
+    verifiedHoursByUser.set(entry.user_id, (verifiedHoursByUser.get(entry.user_id) ?? 0) + Number(entry.hours_claimed ?? entry.hours ?? 0));
+  }
+  for (const entry of progressEntriesRes.data ?? []) {
+    if (!entry.apprentice_id) continue;
+    const hours = Number(entry.hours_worked || 0);
+    if (hours > 0) verifiedHoursByUser.set(entry.apprentice_id, Math.max(verifiedHoursByUser.get(entry.apprentice_id) ?? 0, (verifiedHoursByUser.get(entry.apprentice_id) ?? 0) + hours));
+    if (entry.work_date) {
+      const existing = firstClockDateByUser.get(entry.apprentice_id);
+      if (!existing || entry.work_date < existing) firstClockDateByUser.set(entry.apprentice_id, entry.work_date);
+    }
   }
   const enrolledRoster = (enrollmentsRes.data ?? [])
     .filter((row: any) => eligibleRosterUserIds.has(row.user_id))
     .map((row: any) => ({
       ...row,
-      total_hours_completed: Math.max(
-        Number(row.total_hours_completed || 0),
-        verifiedHoursByUser.get(row.user_id) ?? 0,
-      ),
+      total_hours_completed: Math.max(Number(row.total_hours_completed || 0), verifiedHoursByUser.get(row.user_id) ?? 0),
+      training_start_date: row.training_start_date || firstClockDateByUser.get(row.user_id) || null,
     }));
   const upcomingRoster = (upcomingRes.data ?? []).filter((row: any) =>
     eligibleRosterUserIds.has(row.user_id),

@@ -216,7 +216,12 @@ export function coursePackageFromSession(
                   })
                 : [],
             html: lessonHtml(lesson),
-            videoUrl: lesson.video_url,
+            videoUrl:
+              lesson.video_status === 'complete' &&
+              lesson.media_quality_status === 'approved' &&
+              lesson.video_url
+                ? lesson.video_url
+                : null,
             experience,
             practicalRequired: lesson.practical_required === true,
             requiredArtifacts: Array.isArray(lesson.required_artifacts) ? lesson.required_artifacts.map(String).filter(Boolean) : [],

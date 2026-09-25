@@ -242,8 +242,8 @@ export async function fulfillPaidBillingInvoice(
     const result = await db.from('testing_enforcement').update({
       fee_paid: true,
       paid_at: new Date().toISOString(),
-      payment_provider: 'quickbooks',
-      provider_invoice_id: job.billing_invoice_id,
+      billing_provider: 'quickbooks',
+      billing_invoice_id: job.billing_invoice_id,
     }).eq('id', payload.enforcement_id).eq('email', payload.email).eq('fee_paid', false);
     if (result.error) throw new Error(result.error.message);
     return;
@@ -273,7 +273,6 @@ export async function fulfillPaidBillingInvoice(
       slot_id: payload.slot_id,
       provider: 'quickbooks',
       provider_invoice_id: job.billing_invoice_id,
-      billing_invoice_id: job.billing_invoice_id,
     });
     if (result.error) throw new Error(result.error.message);
     if (payload.slot_id) {
@@ -409,7 +408,6 @@ export async function fulfillPaidBillingInvoice(
         current_period_end: periodEnd.toISOString(),
         billing_provider: 'quickbooks',
         provider_subscription_id: `schedule:user:${payload.user_id}:individual-app-${payload.app_slug}`,
-        provider_payment_id: job.billing_invoice_id,
         updated_at: now.toISOString(),
       },
       { onConflict: 'user_id,app_slug' },

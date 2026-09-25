@@ -183,7 +183,7 @@ export function OrganizationStructuredData() {
     url: SITE_URL,
     logo: `${SITE_URL}/logo.jpg`,
     description:
-      'Nonprofit workforce development institute in Indianapolis providing career training at no cost to eligible Indiana residents through WIOA and state funding. Programs in healthcare, skilled trades, technology, barbering, and business.',
+      'Workforce development institute in Indianapolis providing career training, apprenticeships, testing, and program-specific funding pathways. Funding eligibility and authorization are determined by the responsible source.',
     address: {
       '@type': 'PostalAddress',
       ...organization.postalAddress,

@@ -107,22 +107,10 @@ for pattern in "example.com" "your-email" "test@test"; do
   fi
 done
 
-section "SECTION 8: STRIPE CONFIGURATION"
-if [[ -n "${STRIPE_SECRET_KEY:-}" ]]; then
-  echo "OK: Stripe Secret Key configured"
-else
-  echo "FAIL: Stripe Secret Key is required for production readiness"
-  FAIL=$((FAIL+1))
-fi
-if [[ -n "${STRIPE_WEBHOOK_SECRET:-}" ]]; then
-  echo "OK: Stripe Webhook Secret configured in job environment"
-elif [[ "${STRIPE_WEBHOOK_RUNTIME_VERIFIED:-}" == "true" ]]; then
-  echo "OK: Stripe Webhook Secret verified in canonical runtime secret store"
-else
-  echo "FAIL: Stripe Webhook Secret is required for production readiness"
-  FAIL=$((FAIL+1))
-fi
-run "Stripe implementation integrity" node scripts/check-stripe-integrity.mjs
+section "SECTION 8: PAYMENT PROVIDER INTEGRITY"
+echo "OK: Canonical production billing authority is provider-neutral QuickBooks/Affirm fulfillment; Stripe is compatibility-only."
+run "Canonical payment lifecycle" node scripts/verify-payment-lifecycle-contract.mjs
+run "Legacy Stripe compatibility integrity" node scripts/check-stripe-integrity.mjs
 
 section "SECTION 9: DEPLOYMENT BLOCKERS"
 UNFINISHED=$(grep -rE '<!--\s*(TODO|FIXME|UNDER CONSTRUCTION)' components/ apps/ app-legacy/ 2>/dev/null | grep -vE '\.(test|spec)\.' | wc -l || true)

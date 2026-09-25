@@ -197,7 +197,7 @@ const envatoRoute = read('apps/admin/app/api/admin/integrations/envato/route.ts'
 if (!envatoRoute.includes('upsertEnvatoWorkspaceManifest')) fail('Envato workspace batching is not linked to Master Studio');
 
 const toolRegistry = read('lib/ai/tools/registry.ts');
-for (const tool of ['courses.generate', 'browser.execute', 'studio.runtime.exec', 'video.generate', 'workflows.runTests', 'deployments.autopilot']) {
+for (const tool of ['courses.generate', 'browser.execute', 'studio.runtime.exec', 'studio.engineering.execute', 'video.generate', 'workflows.runTests', 'deployments.autopilot']) {
   if (!toolRegistry.includes(`name: '${tool}'`)) fail(`Master Studio canonical tool missing: ${tool}`);
 }
 const canonicalPlan = read('apps/admin/app/api/admin/dev-studio/plan/route.ts');

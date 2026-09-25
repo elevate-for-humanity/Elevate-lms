@@ -65,9 +65,15 @@ export async function ProgramHolderWorkspaceView({
   const data = await getProgramHolderWorkspace();
   const coordinatorRole = data.mode === 'holder' ? String(data.holder?.features?.approved_role || '') : '';
   const isTexasStateCoordinator = coordinatorRole === 'Texas State Site Coordinator';
-  const isGaryRegionalCoordinator = coordinatorRole === 'Gary Regional Site Coordinator';
   if (data.mode === 'admin') return <AdminBoundary />;
-  const texasLaunchKit = section === 'dashboard' && isTexasStateCoordinator ? <TexasCoordinatorLaunchKit /> : null;
+  const texasLaunchKit =
+    section === 'dashboard' && isTexasStateCoordinator ? (
+      <TexasCoordinatorLaunchKit
+        coordinatorName={data.profile?.full_name || undefined}
+        coordinatorPhone={data.profile?.phone || data.holder?.contact_phone || undefined}
+        coordinatorEmail={data.profile?.email || data.holder?.contact_email || undefined}
+      />
+    ) : null;
   const careerJobs = section === 'dashboard' ? await getActiveJobs({ limit: 2 }) : [];
 
   const active = data.enrollments.filter((row) =>
@@ -360,11 +366,11 @@ export async function ProgramHolderWorkspaceView({
           </h2>
           <p className="mt-2 text-sm text-slate-700">
             Territory: <strong>{String(regionalAssignment.scope || 'Assigned region')}</strong>.
-            Your dashboard is linked to the Gary regional team while preserving your individual
+            Your dashboard is linked to the assigned regional team while preserving your individual
             login and audit history.
           </p>
           <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
-            <strong>Applicant routing:</strong> Your Gary regional queue includes applicants across
+            <strong>Applicant routing:</strong> Your regional queue includes applicants across
             all Elevate programs whose residence is within the assigned regional service area
             when no local Program Holder controls that applicant/program. Applicants outside your
             regional territory must not be worked from this dashboard. When an approved local
@@ -389,14 +395,22 @@ export async function ProgramHolderWorkspaceView({
             <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
               <h3 className="font-black text-emerald-950">Compensation</h3>
               <p className="mt-2 text-sm text-emerald-950">
-                <strong>
-                  {formatUsd(Number(customMou.compensation_per_eligible_enrollment || 1000))}
-                </strong>{' '}
-                per eligible, verified enrollment:{' '}
-                {formatUsd(Number(customMou.initial_payment || 500))} after verified enrollment,
-                documentation, and funding authorization;{' '}
-                {formatUsd(Number(customMou.completion_payment || 500))} after verified completion
-                and closeout.
+                {Number(customMou.compensation_per_eligible_enrollment) > 0 ? (
+                  <>
+                    <strong>
+                      {formatUsd(Number(customMou.compensation_per_eligible_enrollment))}
+                    </strong>{' '}
+                    per eligible, verified enrollment.
+                    {Number(customMou.initial_payment) > 0 ? (
+                      <> {formatUsd(Number(customMou.initial_payment))} after the configured enrollment milestone.</>
+                    ) : null}
+                    {Number(customMou.completion_payment) > 0 ? (
+                      <> {formatUsd(Number(customMou.completion_payment))} after the configured completion/closeout milestone.</>
+                    ) : null}
+                  </>
+                ) : (
+                  <strong>Compensation follows the signed coordinator MOU on file.</strong>
+                )}
               </p>
               <p className="mt-2 text-xs text-emerald-900">
                 A lead, incomplete application, unverified enrollment, or unverified completion does

@@ -21,6 +21,7 @@ import { requireAdminClient } from '../supabase/admin';
 import { assertCourseBuilderGenerationEnabled } from './generation-control';
 import { evaluatePersistedCredentialCourse } from '../course-factory/canonical-course-gate';
 import { REQUIRED_COURSE_GATES, type CourseGate } from '../course-package/readiness';
+import { instructionalLessonSteps, assertInstructionalLessonPipeline, type InstructionalLessonStep } from './instructional-lesson-pipeline';
 
 export const COURSE_BUILDER_GATE_REPAIR_POLICY: Record<CourseGate, {
   phase: 'authoring' | 'media' | 'review';
@@ -432,6 +433,17 @@ export async function repairCanonicalCourse(courseId: string, progress?: Progres
 
   const after = await validateCourseAgainstContract(courseId);
   return { ...result, governance, repairedCourseId: courseId, programSlug: course.slug, contractValidation: { before, after } };
+}
+
+export function getInstructionalLessonBuildSteps() {
+  return instructionalLessonSteps();
+}
+
+export function requireInstructionalLessonStage(
+  evidence: Partial<Record<InstructionalLessonStep, boolean>>,
+  through: InstructionalLessonStep,
+) {
+  assertInstructionalLessonPipeline(evidence, through);
 }
 
 export async function queueCourseMedia(input: {

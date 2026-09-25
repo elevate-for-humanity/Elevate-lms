@@ -66,7 +66,7 @@ export default function EnrollmentPage() {
               Start Your Training Journey
             </h1>
             <p className="text-slate-200 max-w-xl">
-              Complete your enrollment in 4 simple steps. Most eligible students pay $0 in tuition.
+              Complete your enrollment in 4 simple steps. Workforce funding may apply only when the participant and selected program are approved by the responsible agency in writing.
             </p>
           </div>
         </div>

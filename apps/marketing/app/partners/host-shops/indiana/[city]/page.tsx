@@ -4,13 +4,11 @@ import { notFound } from 'next/navigation';
 import WageReimbursementEstimator from '@/components/partners/WageReimbursementEstimator';
 import { getApprovedShops } from '@/lib/programs/host-shops';
 import { getHostShopRegion, HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
+export const dynamic = 'force-dynamic';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 type PageProps = { params: Promise<{ city: string }> };
 
-export function generateStaticParams() {
-  return HOST_SHOP_REGIONS.map((region) => ({ city: region.slug }));
-}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const region = getHostShopRegion((await params).city);

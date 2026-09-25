@@ -751,7 +751,9 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
     const completedStoryboard: MediaStoryboard & { source_contract: unknown } = {
       ...renderedStoryboard,
       scenes: renderedStoryboard.scenes.map((scene) =>
-        scene.sceneType && exactInstructionalSceneTypes.has(scene.sceneType)
+        scene.sceneType &&
+        exactInstructionalSceneTypes.has(scene.sceneType) &&
+        !scene.sourceVideoUrl
           ? {
               ...scene,
               mediaSource: 'elevate-motion' as const,

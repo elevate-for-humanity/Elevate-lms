@@ -290,7 +290,7 @@ export default async function PricingPage() {
                 </div>
                 <div className="bg-slate-800 rounded-lg p-4">
                   <h3 className="font-semibold mb-2">Payment Plans</h3>
-                  <p className="text-slate-300 text-sm">Weekly payments from $50/week. No credit check.</p>
+                  <p className="text-slate-300 text-sm">Installment or third-party payment options may be available. Review the exact terms for your selected program before enrolling.</p>
                 </div>
               </div>
             </div>

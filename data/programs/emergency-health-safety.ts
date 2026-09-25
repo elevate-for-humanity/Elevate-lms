@@ -19,7 +19,7 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 30, handsOnLab: 40, examPrep: 8, careerPlacement: 2 },
   schedule: 'Monthly cohorts — full-time intensive, day or evening options',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement: '$0 with WIOA or Workforce Ready Grant. Self-pay: $4,950.',
+  fundingStatement: 'Self-pay: $4,950. Workforce funding may apply only with program and participant eligibility plus written agency authorization.',
   selfPayCost: '$4,950',
   badge: 'ETPL Approved',
   badgeColor: 'green',

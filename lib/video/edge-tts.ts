@@ -62,7 +62,7 @@ export type NarrationProvider =
 export function configuredNarrationProvider(
   env: NodeJS.ProcessEnv = process.env,
 ): NarrationProvider {
-  const safeDefault = env.NODE_ENV === 'production' ? 'edge' : 'local';
+  const safeDefault = env.NODE_ENV === 'production' ? 'cloudflare' : 'local';
   const configured = (env.AI_NARRATION_PROVIDER || env.AI_MEDIA_PROVIDER || safeDefault)
     .trim()
     .toLowerCase();

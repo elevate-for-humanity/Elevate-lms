@@ -8,6 +8,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { MediaQualityEvidence } from './media-quality-gate';
+import { evaluatePersistedCredentialLesson } from '@/lib/course-factory/canonical-course-gate';
 
 export type VideoJobStatus = 'draft' | 'queued' | 'rendering' | 'complete' | 'failed';
 export type VideoAssetKind = 'lesson' | 'microclip';
@@ -566,16 +567,38 @@ export async function markComplete(
         media_quality_status: 'approved',
         media_quality_evidence: result.quality_evidence ?? {},
         media_verified_at: now,
-        // This is the only transition that completes a unified lesson build.
-        // The video has already passed narration, visual, caption, and media
-        // quality gates and still matches the locked source fingerprint.
-        generation_status: 'generated',
+        // Media completion is necessary but not sufficient for credential
+        // lesson completion. The strict persisted lesson contract runs below
+        // before generation_status may advance to generated.
+        generation_status: 'generating',
         scene_data: result.scene_data ?? null,
         duration_seconds: result.duration_seconds ?? null,
         updated_at: now,
       })
       .eq('id', job.lesson_id);
     if (lessonPromotionError) throw lessonPromotionError;
+
+    const lessonContract = await evaluatePersistedCredentialLesson(job.lesson_id);
+    if (lessonContract.pass) {
+      const { error: lessonCompletionError } = await supabase
+        .from('course_lessons')
+        .update({
+          generation_status: 'generated',
+          updated_at: now,
+        })
+        .eq('id', job.lesson_id);
+      if (lessonCompletionError) throw lessonCompletionError;
+    } else {
+      logger.warn('[VideoJob] Media approved but credential lesson contract remains incomplete', {
+        jobId,
+        lessonId: job.lesson_id,
+        findings: lessonContract.findings.map((finding) => ({
+          gate: finding.gate,
+          path: finding.path,
+          message: finding.message,
+        })),
+      });
+    }
   } else if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
     await updateMicroclipExperience(job.lesson_id, job.asset_key, {
       status: 'approved',

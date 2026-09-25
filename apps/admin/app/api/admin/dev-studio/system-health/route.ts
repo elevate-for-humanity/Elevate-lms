@@ -38,6 +38,11 @@ export async function GET(request: NextRequest) {
   const keys = [
     'OPENHANDS_API_KEY',
     'GITHUB_TOKEN',
+    'ELEVATE_LLM_URL',
+    'ELEVATE_LLM_SECRET',
+    'STUDIO_BROWSER_URL',
+    'STUDIO_BROWSER_PUBLIC_URL',
+    'STUDIO_BROWSER_SECRET',
   ] as const;
   const selectedSecrets = Object.fromEntries(
     await Promise.all(
@@ -53,6 +58,47 @@ export async function GET(request: NextRequest) {
   const hasCloudflare = cloudflareProbe.reachable;
   const hasOpenHands = Boolean(selectedSecrets.OPENHANDS_API_KEY || process.env.OPENHANDS_API_KEY);
   const dbGitHub = Boolean(selectedSecrets.GITHUB_TOKEN);
+  const elevateLlmUrl =
+    selectedSecrets.ELEVATE_LLM_URL || process.env.ELEVATE_LLM_URL || '';
+  const elevateLlmSecret =
+    selectedSecrets.ELEVATE_LLM_SECRET || process.env.ELEVATE_LLM_SECRET || '';
+  const hasElevateOwnedAI = Boolean(elevateLlmUrl && elevateLlmSecret);
+  const studioBrowserUrl = (
+    selectedSecrets.STUDIO_BROWSER_URL ||
+    process.env.STUDIO_BROWSER_URL ||
+    ''
+  ).replace(/\/$/, '');
+  const studioBrowserPublicUrl =
+    selectedSecrets.STUDIO_BROWSER_PUBLIC_URL ||
+    process.env.STUDIO_BROWSER_PUBLIC_URL ||
+    '';
+  const studioBrowserSecret =
+    selectedSecrets.STUDIO_BROWSER_SECRET ||
+    process.env.STUDIO_BROWSER_SECRET ||
+    '';
+  const browserConfigured = Boolean(
+    studioBrowserUrl && studioBrowserPublicUrl && studioBrowserSecret,
+  );
+  let browserReachable = false;
+  let browserDetail = browserConfigured
+    ? 'configured but not yet probed'
+    : 'STUDIO_BROWSER_URL, STUDIO_BROWSER_PUBLIC_URL, or STUDIO_BROWSER_SECRET is missing';
+  if (browserConfigured) {
+    try {
+      const browserResponse = await fetch(`${studioBrowserUrl}/health`, {
+        cache: 'no-store',
+        signal: AbortSignal.timeout(8_000),
+      });
+      browserReachable = browserResponse.ok;
+      browserDetail = browserResponse.ok
+        ? 'isolated Studio browser runtime is reachable'
+        : `isolated Studio browser returned HTTP ${browserResponse.status}`;
+    } catch (error) {
+      browserDetail = `isolated Studio browser is unreachable: ${
+        error instanceof Error ? error.message : String(error)
+      }`;
+    }
+  }
 
   const hasAnyAI = ai.anyConfigured;
   const githubOk = hasGitHub || dbGitHub;
@@ -93,6 +139,29 @@ export async function GET(request: NextRequest) {
     detail: githubOk
       ? 'configured — workflow dispatch and devcontainer writes available'
       : 'not configured — deploy buttons and devcontainer saves will fail',
+  });
+
+  checks.push({
+    name: 'Elevate Owned AI',
+    status: hasElevateOwnedAI ? 'ok' : 'fail',
+    detail: hasElevateOwnedAI
+      ? 'ELEVATE_LLM_URL and ELEVATE_LLM_SECRET configured — no-paid default inference available'
+      : 'Elevate-owned AI is not configured; automatic Dev Studio reasoning cannot run without external providers',
+  });
+
+  checks.push({
+    name: 'Internal Engineering',
+    status: githubOk && hasElevateOwnedAI ? 'ok' : 'fail',
+    detail:
+      githubOk && hasElevateOwnedAI
+        ? 'Elevate-owned branch/PR engineering path is available; OpenHands is optional'
+        : 'Internal engineering requires both Elevate-owned AI and GitHub authorization',
+  });
+
+  checks.push({
+    name: 'Studio Browser Runtime',
+    status: browserReachable ? 'ok' : browserConfigured ? 'fail' : 'fail',
+    detail: browserDetail,
   });
 
   // ── AI providers ───────────────────────────────────────────────────────────
@@ -165,7 +234,7 @@ export async function GET(request: NextRequest) {
   const okCount = checks.filter((c) => c.status === 'ok').length;
 
   return NextResponse.json({
-    ok: failCount === 0,
+    ok: failCount === 0 && hasElevateOwnedAI && browserReachable && githubOk,
     summary: { okCount, warnCount, failCount },
     checks,
     meta: {

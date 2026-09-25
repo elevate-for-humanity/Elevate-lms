@@ -4,11 +4,6 @@ import { getInstructorById, getInstructorForCourse } from '@/lib/ai-instructors'
 import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
-  executePaidInference,
-  paidArtifactFingerprint,
-  reservePaidInference,
-} from '@/lib/ai/paid-inference-gateway';
-import {
   heartbeatJob,
   markAwaitingPaidApproval,
   markCandidate,

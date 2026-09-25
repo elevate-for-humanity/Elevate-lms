@@ -81,7 +81,7 @@ export const estheticsConfig: ProgramConfig = {
     { title: 'Product Representative', icon: '💼' },
     { title: 'Spa Owner', icon: '🏢' },
   ],
-  tuition: 4980,
+  tuition: 6000,
 
   // Business
   businessItems: [

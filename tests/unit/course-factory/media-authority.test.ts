@@ -366,4 +366,49 @@ describe('canonical Course Factory media architecture', () => {
     expect(narration).toContain("provider === 'edge'");
     expect(narration).not.toContain("production' && provider === 'edge'");
   });
+  it('uses the strict credential lesson contract as a production completion gate', () => {
+    const gate = read('lib/course-factory/canonical-course-gate.ts');
+    const readiness = read('lib/course-package/readiness.ts');
+    const adapter = read('lib/course-package/from-course-session.ts');
+    expect(gate).toContain('CanonicalCredentialLessonSchema.safeParse');
+    expect(gate).toContain('strictCredentialLessonFindings');
+    expect(readiness).toContain('CourseExperienceSchema.safeParse(exp)');
+    expect(readiness).not.toContain('CourseExperienceSchema.partial().safeParse(exp)');
+    expect(adapter).toContain('lesson.scene_data');
+    expect(adapter).toContain('practicalRequired: lesson.practical_required === true');
+  });
+
+  it('does not equate media approval with credential lesson completion', () => {
+    const queue = read('lib/video/job-queue.ts');
+    expect(queue).toContain('evaluatePersistedCredentialLesson');
+    expect(queue).toContain("generation_status: 'generating'");
+    expect(queue).toContain("generation_status: 'generated'");
+    expect(queue.indexOf('evaluatePersistedCredentialLesson')).toBeLessThan(
+      queue.lastIndexOf("generation_status: 'generated'"),
+    );
+    expect(queue).toContain('automated_media_quality_gate');
+  });
+
+  it('rejects backward replay and preserves licensed-source provenance', () => {
+    const quality = read('lib/video/media-quality-gate.ts');
+    const director = read('lib/video/media-director.ts');
+    const renderer = read('lib/video/process-video-job.ts');
+    expect(quality).toContain("MEDIA_QUALITY_GATE_VERSION = 'media-quality-v6'");
+    expect(quality).toContain('detectBackwardTimelineReplay');
+    expect(quality).toContain('backwardTimelineJumpDetected');
+    expect(quality).toContain('licenseEvidenceCoverage');
+    expect(director).toContain('sourceLicenseEvidenceUrl');
+    expect(renderer).toContain('licensed_media_entitlements');
+    expect(renderer).toContain('source_license_evidence_url');
+  });
+
+  it('wakes the canonical video worker from Supabase cron instead of relying only on GitHub cron', () => {
+    const migration = read(
+      'supabase/migrations/20260925104000_course_video_worker_supabase_schedule.sql',
+    );
+    expect(migration).toContain('course-video-worker-every-minute');
+    expect(migration).toContain('private.wake_course_video_worker');
+    expect(migration).toContain('/api/internal/videos/process-queue');
+  });
+
 });

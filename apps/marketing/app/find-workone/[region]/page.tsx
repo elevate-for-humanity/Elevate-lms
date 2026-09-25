@@ -8,6 +8,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { CredentialAuthorityFootnote } from '@/components/compliance/CredentialAuthorityFootnote';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 
 export async function generateMetadata({

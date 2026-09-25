@@ -1,6 +1,5 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -18,7 +17,7 @@ const STEPS = [
   {
     step: '1',
     title: 'Check Eligibility',
-    desc: 'Complete the preliminary intake and, when applicable, attend the responsible agency's orientation. The agency—not Elevate—determines funding eligibility.',
+    desc: "Complete the preliminary intake and, when applicable, attend the responsible agency's orientation. The agency—not Elevate—determines funding eligibility.",
     icon: HelpCircle,
   },
   {
@@ -72,7 +71,6 @@ export default function FundingHowItWorksPage() {
         <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'How It Works' }]} />
       </div>
       {/* Hero */}
-      {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
           <Image
@@ -106,7 +104,6 @@ export default function FundingHowItWorksPage() {
           </h2>
           <div className="grid md:grid-cols-4 gap-8">
             {STEPS.map((s) => {
-              const Icon = s.icon;
               return (
                 <div key={s.step} className="text-center">
                   <div className="w-14 h-14 bg-brand-red-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">

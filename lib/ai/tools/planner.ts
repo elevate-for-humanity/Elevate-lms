@@ -158,7 +158,7 @@ export function planAIToolFromCommand(
   // can use the requested browser verification as an acceptance criterion.
   if (isEngineeringExecutionCommand(lower)) {
     return {
-      name: 'openhands.execute',
+      name: /\bopenhands\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute',
       input: { ...asAIRecord(context.toolInput), task: command },
     };
   }
@@ -172,7 +172,7 @@ export function planAIToolFromCommand(
   }
   if (isEngineeringCommand(lower)) {
     return {
-      name: 'openhands.execute',
+      name: /\bopenhands\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute',
       input: { ...asAIRecord(context.toolInput), task: command },
     };
   }
@@ -388,7 +388,7 @@ export function planAIToolFromCommand(
   }
   if (isEngineeringCommand(lower)) {
     return {
-      name: 'openhands.execute',
+      name: /\bopenhands\b/.test(lower) ? 'openhands.execute' : 'studio.engineering.execute',
       input: {
         ...asAIRecord(context.toolInput),
         task: command,

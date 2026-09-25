@@ -91,6 +91,7 @@ async function classifyCommand(command: string, agent: AIAgentId): Promise<Plann
 
   const toolCatalog = getAIToolCatalogForPrompt(agent);
   const result = await aiChat({
+    providerPolicy: 'owned-only',
     messages: [
       {
         role: 'system',
@@ -201,6 +202,7 @@ export async function POST(request: NextRequest) {
             write(plan.answer);
           } else {
             const answer = await aiChat({
+              providerPolicy: 'owned-only',
               messages: [
                 {
                   role: 'system',

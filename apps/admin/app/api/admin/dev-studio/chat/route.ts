@@ -1569,7 +1569,29 @@ async function _POST(req: NextRequest) {
     let provider = 'none';
     let model = 'none';
     const canonicalProvider = getActiveProviderName();
-    const providerOrder = [providerPreference === 'auto' ? canonicalProvider : providerPreference];
+
+    // Auto mode is the no-paid default for Dev Studio. It must use the
+    // Elevate-owned provider and must not silently fall through to a metered
+    // commercial provider. Operators may still explicitly select an external
+    // provider when they intentionally want that provider.
+    if (providerPreference === 'auto') {
+      try {
+        const owned = await aiChat({
+          providerPolicy: 'owned-only',
+          messages: [{ role: 'system', content: systemPrompt }, ...messages],
+          temperature: 0.4,
+          maxTokens: 4096,
+        });
+        assistantMessage = owned.content ?? null;
+        provider = owned.provider ?? 'elevate';
+        model = owned.model;
+      } catch (error) {
+        logger.warn('[devstudio/chat] Elevate-owned AI unavailable', normalizeError(error));
+      }
+    }
+
+    const providerOrder =
+      providerPreference === 'auto' ? [] : [providerPreference];
 
     for (const nextProvider of providerOrder) {
       if (assistantMessage) break;
@@ -1756,7 +1778,7 @@ async function _POST(req: NextRequest) {
       }
     }
 
-    if (!assistantMessage) {
+    if (!assistantMessage && providerPreference !== 'auto') {
       try {
         const db = await requireAdminClient();
         const requestNonce = req.headers.get('x-request-id')?.trim() || crypto.randomUUID();
@@ -1822,9 +1844,11 @@ async function _POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:
-            canonicalProvider === 'none'
-              ? 'LIZZY has no active AI provider. Configure the canonical Elevate, Cloudflare, Groq, Gemini, Anthropic, Azure, or OpenAI provider in Admin → Integrations.'
-              : `LIZZY could not reach the configured ${canonicalProvider} provider. Check that provider connection in Admin → Integrations.`,
+            providerPreference === 'auto'
+              ? 'Elevate-owned AI is unavailable. Repair ELEVATE_LLM_URL / ELEVATE_LLM_SECRET in the Admin runtime; automatic mode will not fall back to paid inference.'
+              : canonicalProvider === 'none'
+                ? 'No explicitly selected AI provider is available.'
+                : `LIZZY could not reach the selected ${providerPreference} provider. Check that provider connection in Admin → Integrations.`,
           debug: {
             hasGroq: isGroqConfigured(),
             hasXAI: isXAIConfigured(),

@@ -548,7 +548,7 @@ export async function markComplete(
       mode: 'automated_media_quality_gate',
       gateVersion:
         result.quality_evidence && typeof result.quality_evidence === 'object'
-          ? (result.quality_evidence as Record<string, unknown>).gateVersion ?? null
+          ? (result.quality_evidence as unknown as Record<string, unknown>).gateVersion ?? null
           : null,
       checkedAt: now,
       evidence: result.quality_evidence ?? {},

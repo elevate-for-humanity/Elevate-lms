@@ -411,4 +411,19 @@ describe('canonical Course Factory media architecture', () => {
     expect(migration).toContain('/api/internal/videos/process-queue');
   });
 
+  it('keeps Stripe and checkout payment flows out of Course Builder generation', () => {
+    const runtimeFiles = [
+      'lib/course-builder/orchestrator.ts',
+      'lib/course-builder/build-lifecycle.ts',
+      'lib/course-factory/factory.ts',
+      'lib/course-factory/publisher.ts',
+      'lib/course-factory/canonical-course-gate.ts',
+      'lib/course-factory/persisted-authored-upgrade.ts',
+    ];
+    for (const file of runtimeFiles) {
+      const source = read(file);
+      expect(source).not.toMatch(/stripe|payment_intent|checkout_session|stripe_checkout/i);
+    }
+  });
+
 });

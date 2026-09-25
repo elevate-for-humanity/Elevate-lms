@@ -365,7 +365,9 @@ export default async function ApprenticePortalPage() {
     automaticBillingSchedule?.provider_status === 'active' &&
     automaticBillingSchedule?.provider_subscription_id,
   );
+  const sponsorBillingAccessActive = Boolean(invoiceAccess.accessExemptUntil);
   const paymentNeedsAction =
+    !sponsorBillingAccessActive &&
     !cosmetologyBilling?.fully_paid &&
     (invoiceAccess.openInvoices.length > 0 ||
       !automaticBillingActive ||
@@ -509,7 +511,7 @@ export default async function ApprenticePortalPage() {
                 href="/apprentice/billing"
                 className="rounded-xl bg-pink-600 px-5 py-3 font-black text-white shadow-lg hover:bg-pink-500"
               >
-                Complete payment setup
+                {invoiceAccess.accessExemptUntil ? 'Review billing' : 'Complete payment setup'}
               </Link>
               <Link
                 href="/apprentice/documents"
@@ -528,8 +530,8 @@ export default async function ApprenticePortalPage() {
                 Required to-do — {incompleteCount} incomplete
               </h2>
               <p className="mt-1 text-sm font-semibold text-red-900">
-                PARIS will walk you through these items in order. Red items must be completed before
-                the corresponding activity is unlocked.
+                PARIS will walk you through these items in order. Items marked Open still need attention,
+                but sponsor-approved access remains available while an active access exception is in place.
               </p>
               <div className="mt-5 grid gap-3">
                 {todoItems.map(({ label, done, href, icon: Icon }, index) => (

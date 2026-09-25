@@ -160,6 +160,12 @@ async function dispatchToolRequest(
   if (tool.name === 'deployments.autopilot') {
     return dispatchGithubWorkflow('deploy-production.yml');
   }
+  if (tool.name === 'studio.engineering.execute') {
+    const { POST } = await import(
+      '@/apps/admin/app/api/admin/dev-studio/engineering/route'
+    );
+    return POST(new NextRequest(url, init));
+  }
   if (tool.name === 'courses.generate') {
     const { POST } = await import(
       '@/apps/admin/app/api/admin/dev-studio/course-agent/route'

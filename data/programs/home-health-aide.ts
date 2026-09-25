@@ -242,7 +242,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
     {
       courseId: 'hsi-cpr-aed',
       label: 'CPR/AED Certification',
-      partnerName: 'Health & Safety Institute / AHA',
+      partnerName: 'Approved CPR/AED credential provider',
       credentialIssued: 'AHA BLS CPR/AED Certificate',
       duration: '4 hours',
       required: true,

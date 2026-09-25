@@ -1815,7 +1815,7 @@ async function _POST(req: NextRequest) {
               messages: [{ role: 'system', content: systemPrompt }, ...messages],
               temperature: 0.4,
               maxTokens: 2048,
-              provider: providerPreference === 'auto' ? undefined : providerPreference,
+              provider: providerPreference,
             }),
         });
         if (paidExecution.decision === 'approved' && paidExecution.value) {

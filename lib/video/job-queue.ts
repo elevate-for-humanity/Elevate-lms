@@ -493,7 +493,7 @@ export async function markComplete(
   if (job?.lesson_id && job.asset_kind === 'lesson') {
     const { data: lesson } = await supabase
       .from('course_lessons')
-      .select('video_url')
+      .select('video_url,content_json')
       .eq('id', job.lesson_id)
       .maybeSingle();
     await supabase
@@ -534,9 +534,30 @@ export async function markComplete(
           .eq('id', existingVersion.id)
       : await supabase.from('lesson_video_versions').insert(candidateVersion);
     if (versionResult.error) throw versionResult.error;
+    const currentContentJson =
+      lesson?.content_json && typeof lesson.content_json === 'object'
+        ? structuredClone(lesson.content_json as Record<string, any>)
+        : {};
+    const currentExperience =
+      currentContentJson.experience && typeof currentContentJson.experience === 'object'
+        ? (currentContentJson.experience as Record<string, any>)
+        : {};
+    currentExperience.technicalReview = {
+      approved: true,
+      mode: 'automated_media_quality_gate',
+      gateVersion:
+        result.quality_evidence && typeof result.quality_evidence === 'object'
+          ? (result.quality_evidence as Record<string, unknown>).gateVersion ?? null
+          : null,
+      checkedAt: now,
+      evidence: result.quality_evidence ?? {},
+    };
+    currentContentJson.experience = currentExperience;
+
     const { error: lessonPromotionError } = await supabase
       .from('course_lessons')
       .update({
+        content_json: currentContentJson,
         video_url: result.video_url,
         video_status: 'complete',
         video_error: null,

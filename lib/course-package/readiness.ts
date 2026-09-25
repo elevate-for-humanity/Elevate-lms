@@ -132,21 +132,25 @@ function lessonFindings(lesson: CoursePackageLesson): ReadinessFinding[] {
   const exp = record(lesson.experience);
   const findings: ReadinessFinding[] = [];
   const isAssessment = ['checkpoint', 'quiz', 'exam', 'final_exam', 'assessment'].includes(lesson.type);
-  const isPractical = ['practical', 'lab', 'assignment'].includes(lesson.type);
+  const isPractical = lesson.practicalRequired === true || ['practical', 'lab', 'assignment'].includes(lesson.type);
   if (!lesson.objectives.length) findings.push({ gate: 'learning_objectives', path, message: 'Lesson has no measurable objectives.' });
-  if (!isAssessment && !isPractical && !lesson.html.trim()) findings.push({ gate: 'instructional_content', path, message: 'Lesson has no instructional content.' });
-  if (!isAssessment && !isPractical && !lesson.videoUrl && !lesson.storyboard.length) findings.push({ gate: 'demonstration', path, message: 'Lesson has neither an approved video nor a production storyboard.' });
-  if (!isAssessment && !isPractical && !lesson.storyboard.length) findings.push({ gate: 'storyboard', path, message: 'Versioned scene storyboard is missing.' });
-  if (!isAssessment && record(exp.technicalReview).approved !== true) findings.push({ gate: 'technical_review', path, message: 'Independent technical review has not approved this lesson.' });
-  if (!isAssessment && (!CourseExperienceSchema.partial().safeParse(exp).success || (!exp.scenario && !exp.caseStudy && !exp.exercises && !exp.hotspots && !exp.dragDrop && !exp.matching && !exp.simulation && !isPractical))) findings.push({ gate: 'interactive_practice', path, message: 'Required applied interaction is missing or invalid.' });
-  if (!lesson.questions.length && !Array.isArray(exp.knowledgeChecks) && !isPractical) findings.push({ gate: 'knowledge_checks', path, message: 'Knowledge checks are missing.' });
-  if (!isAssessment && !isPractical && !String(exp.narrationScript ?? '').trim()) findings.push({ gate: 'narration', path, message: 'Narration is missing.' });
+  if (!isAssessment && !lesson.competencies.length) findings.push({ gate: 'credential_alignment', path, message: 'Credential lesson has no mapped competencies.' });
+  if (!isAssessment && !lesson.html.trim()) findings.push({ gate: 'instructional_content', path, message: 'Lesson has no instructional content.' });
+  if (!isAssessment && !lesson.videoUrl && !lesson.storyboard.length) findings.push({ gate: 'demonstration', path, message: 'Lesson has neither an approved video nor a production storyboard.' });
+  if (!isAssessment && lesson.storyboard.length < 6) findings.push({ gate: 'storyboard', path, message: 'Credential lesson requires a versioned storyboard with at least six scenes.' });
+  if (!isAssessment && record(exp.technicalReview).approved !== true) findings.push({ gate: 'technical_review', path, message: 'Automated or independent technical review has not approved this lesson.' });
+  if (!isAssessment && !CourseExperienceSchema.safeParse(exp).success) findings.push({ gate: 'interactive_practice', path, message: 'Complete credential lesson experience is missing or invalid.' });
+  if (!isAssessment && !Array.isArray(exp.knowledgeChecks)) findings.push({ gate: 'knowledge_checks', path, message: 'Knowledge checks are missing.' });
+  if (!isAssessment && !String(exp.narrationScript ?? '').trim()) findings.push({ gate: 'narration', path, message: 'Narration is missing.' });
   const timeline = lesson.timeline;
-  if (!isAssessment && !isPractical) findings.push(...validateNarrationVisualAlignment(lesson, path));
-  if (!isAssessment && !isPractical && !timeline?.captions.length) findings.push({ gate: 'captions', path, message: 'Timed captions are missing.' });
-  if (!isAssessment && !isPractical && !String(exp.transcript ?? exp.narrationScript ?? '').trim()) findings.push({ gate: 'transcript', path, message: 'Transcript is missing.' });
-  if (!isAssessment && !isPractical && (!timeline || lesson.completion.requiredWatchPercent <= 0)) findings.push({ gate: 'progress_tracking', path, message: 'Timeline progress requirements are missing.' });
-  if (!isAssessment && !isPractical && !timeline) findings.push({ gate: 'resume_tracking', path, message: 'Timeline required for exact resume location is missing.' });
+  if (!isAssessment) findings.push(...validateNarrationVisualAlignment(lesson, path));
+  if (!isAssessment && !timeline?.captions.length) findings.push({ gate: 'captions', path, message: 'Timed captions are missing.' });
+  if (!isAssessment && !String(exp.transcript ?? exp.narrationScript ?? '').trim()) findings.push({ gate: 'transcript', path, message: 'Transcript is missing.' });
+  if (!isAssessment && (!timeline || lesson.completion.requiredWatchPercent <= 0)) findings.push({ gate: 'progress_tracking', path, message: 'Timeline progress requirements are missing.' });
+  if (!isAssessment && !timeline) findings.push({ gate: 'resume_tracking', path, message: 'Timeline required for exact resume location is missing.' });
+  if (isPractical && (!lesson.completion.evidenceRequired || !lesson.completion.instructorSignoffRequired)) {
+    findings.push({ gate: 'interactive_practice', path, message: 'Practical credential lesson requires evidence submission and instructor sign-off.' });
+  }
   return findings;
 }
 

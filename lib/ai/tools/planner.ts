@@ -376,10 +376,6 @@ export function planAIToolFromCommand(
       },
     };
   }
-  if (/\b(build|generate)\b.*\b(all )?courses?\b/.test(lower)) {
-    return { name: 'workflows.buildCourses', input: asAIRecord(context.toolInput) };
-  }
-
   // OpenHands is an engineering worker, not a general platform action router.
   if (isOpenHandsStatusCommand(lower)) {
     return { name: 'openhands.status', input: asAIRecord(context.toolInput) };

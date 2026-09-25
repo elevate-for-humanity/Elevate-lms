@@ -63,7 +63,9 @@ export async function ProgramHolderWorkspaceView({
   payoutPanel?: React.ReactNode;
 }) {
   const data = await getProgramHolderWorkspace();
-  const isTexasStateCoordinator = data.mode === 'holder' && data.holder?.features?.approved_role === 'Texas State Site Coordinator';
+  const coordinatorRole = data.mode === 'holder' ? String(data.holder?.features?.approved_role || '') : '';
+  const isTexasStateCoordinator = coordinatorRole === 'Texas State Site Coordinator';
+  const isGaryRegionalCoordinator = coordinatorRole === 'Gary Regional Site Coordinator';
   if (data.mode === 'admin') return <AdminBoundary />;
   if (section === 'dashboard' && isTexasStateCoordinator) {
     return <div className="space-y-6"><TexasCoordinatorLaunchKit /></div>;

@@ -1048,20 +1048,28 @@ export async function courseFactory(
 
     let scaffoldCourseId = input.courseId;
     if (!input.dryRun && input.videoMode !== 'off') {
-      tracker.emit('publish', 'Creating the canonical draft shell for unified lesson builds.', 10);
-      const scaffold = await publishCourse({
-        blueprint,
-        courseTitle,
-        programId: persistenceProgramId,
-        contentSource: 'blueprint',
-        mode: 'missing-only',
-        evidence,
-      });
-      if (!scaffold.success || !scaffold.courseId) {
-        throw new Error(scaffold.errors.join('; ') || 'Unable to create canonical course shell');
-      }
-      scaffoldCourseId = scaffold.courseId;
       const db = await requireAdminClient();
+      if (scaffoldCourseId) {
+        // A pre-created credential shell must remain lesson-empty until the
+        // complete lesson+narration+storyboard package has passed validation.
+        // Seeding blueprint-only lessons here would violate the atomic
+        // lesson/media contract.
+        tracker.emit('publish', 'Preparing the empty canonical credential shell.', 10);
+      } else {
+        tracker.emit('publish', 'Creating the canonical draft shell for unified lesson builds.', 10);
+        const scaffold = await publishCourse({
+          blueprint: { ...blueprint, modules: [] },
+          courseTitle,
+          programId: persistenceProgramId,
+          contentSource: 'blueprint',
+          mode: 'missing-only',
+          evidence,
+        });
+        if (!scaffold.success || !scaffold.courseId) {
+          throw new Error(scaffold.errors.join('; ') || 'Unable to create canonical course shell');
+        }
+        scaffoldCourseId = scaffold.courseId;
+      }
       const { error: shellStateError } = await db
         .from('courses')
         .update({

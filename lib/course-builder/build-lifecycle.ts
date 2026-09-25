@@ -4,6 +4,47 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { getCourseMediaState } from '@/lib/course-factory/media-manager';
 import { evaluatePersistedCredentialCourse } from '@/lib/course-factory/canonical-course-gate';
 
+
+async function ensureModuleProgressionRules(db: SupabaseClient, courseId: string) {
+  const [{ data: modules, error: moduleError }, { data: lessons, error: lessonError }] =
+    await Promise.all([
+      db
+        .from('course_modules')
+        .select('id,order_index')
+        .eq('course_id', courseId)
+        .order('order_index'),
+      db
+        .from('course_lessons')
+        .select('id,module_id,lesson_type,passing_score,order_index')
+        .eq('course_id', courseId)
+        .order('order_index'),
+    ]);
+  if (moduleError) throw moduleError;
+  if (lessonError) throw lessonError;
+
+  const orderedModules = modules ?? [];
+  for (const [index, module] of orderedModules.entries()) {
+    const checkpoint = (lessons ?? []).find(
+      (lesson) =>
+        lesson.module_id === module.id &&
+        ['checkpoint', 'quiz', 'exam'].includes(String(lesson.lesson_type)),
+    );
+    const { error } = await db.from('module_completion_rules').upsert(
+      {
+        course_id: courseId,
+        module_id: module.id,
+        required_previous_module_id: index > 0 ? orderedModules[index - 1]?.id ?? null : null,
+        required_checkpoint_lesson_id: checkpoint?.id ?? null,
+        minimum_score: checkpoint?.id
+          ? Math.max(1, Math.min(100, Number(checkpoint.passing_score ?? 80)))
+          : null,
+      },
+      { onConflict: 'course_id,module_id' },
+    );
+    if (error) throw error;
+  }
+}
+
 /** Course build completion is separate from publication. */
 export async function markCourseMediaPendingWithClient(input: {
   db: SupabaseClient;
@@ -31,6 +72,7 @@ export async function finalizeUnifiedCourseBuildWithClient(input: {
   courseId: string;
   verifyUrls?: boolean;
 }) {
+  await ensureModuleProgressionRules(input.db, input.courseId);
   const media = await getCourseMediaState(input.courseId, {
     verifyUrls: input.verifyUrls !== false,
   });

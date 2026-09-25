@@ -5,6 +5,7 @@ import { ADD_ON_MARKETPLACE, BASE_PLANS } from '@/lib/store/platform-pricing';
 import { INDIVIDUAL_APP_CATALOG } from '@/lib/apps/individual-app-plans';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 const CATEGORY_LABELS: Record<string, string> = {
   business: 'Business Growth',

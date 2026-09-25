@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     const courseRows = (courses ?? []) as CourseRow[];
     const ids = courseRows.map((c) => c.id);
 
-    const [modulesRes, lessonsRes, jobsRes, legacyRes] = await Promise.all([
+    const [modulesRes, lessonsRes, jobsRes, legacyRes, careerFeedRes] = await Promise.all([
       ids.length
         ? db.from('course_modules').select('id, course_id').in('course_id', ids)
         : Promise.resolve({ data: [], error: null }),
@@ -67,6 +67,11 @@ export async function GET(request: NextRequest) {
         ? db.from('video_jobs').select('id, course_id, status').in('course_id', ids)
         : Promise.resolve({ data: [], error: null }),
       db.from('lms_courses').select('id, title, slug, status, created_at').order('created_at', { ascending: false }).limit(10),
+      db
+        .from('government_job_feed')
+        .select('id,source')
+        .order('created_at', { ascending: false })
+        .limit(500),
     ]);
 
     const moduleCount = new Map<string, number>();
@@ -118,6 +123,30 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    const careerSources = {
+      onet: {
+        name: 'O*NET Career Data',
+        configured: Boolean(process.env.ONET_API_KEY),
+        endpoint: '/api/onet/careers',
+      },
+      usajobs: {
+        name: 'USAJobs.gov',
+        configured: Boolean(process.env.USAJOBS_API_KEY),
+        records: (careerFeedRes.data ?? []).filter((row) =>
+          String(row.source ?? '').toLowerCase().includes('usa'),
+        ).length,
+      },
+      careerOneStop: {
+        name: 'CareerOneStop',
+        configured: Boolean(
+          process.env.CAREERONESTOP_TOKEN || process.env.CAREERONESTOP_API_KEY,
+        ),
+        records: (careerFeedRes.data ?? []).filter((row) =>
+          String(row.source ?? '').toLowerCase().includes('career'),
+        ).length,
+      },
+    };
+
     return NextResponse.json({
       timestamp: new Date().toISOString(),
       supabase: {
@@ -127,6 +156,11 @@ export async function GET(request: NextRequest) {
       migrations: {
         ok: migrationResults.every((m) => m.status === 'EXISTS'),
         results: migrationResults,
+      },
+      careerPipeline: {
+        enabled: true,
+        sources: careerSources,
+        stripePaymentFlowIncluded: false,
       },
       courses: courseRows.map((course) => ({
         ...course,
@@ -142,6 +176,7 @@ export async function GET(request: NextRequest) {
         lessons: lessonsRes.error?.message ?? null,
         jobs: jobsRes.error?.message ?? null,
         legacy: legacyRes.error?.message ?? null,
+        careerFeed: careerFeedRes.error?.message ?? null,
       },
     });
   } catch (error) {

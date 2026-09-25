@@ -53,6 +53,7 @@ export type UserRole =
   | 'workforce_board_admin'
   | 'government'
   | 'program_holder'
+  | 'site_coordinator'
   | 'provider'
   | 'provider_admin'
   | 'creator'

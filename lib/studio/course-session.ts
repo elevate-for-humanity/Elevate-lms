@@ -84,6 +84,9 @@ export interface StudioLesson {
   video_job_id: string | null;
   video_error: string | null;
   video_config: Record<string, unknown> | null;
+  scene_data: Record<string, unknown> | null;
+  media_quality_status: string | null;
+  media_quality_evidence: Record<string, unknown> | null;
   activities: Record<string, unknown> | null;
   quiz_questions: unknown[] | null;
   ai_generated: boolean;
@@ -232,7 +235,8 @@ export async function loadCourseSession(
         id, course_id, module_id, title, slug, lesson_type, order_index,
         status, is_published, is_required, passing_score, duration_minutes,
         content, rendered_html, content_json, video_url, media_asset_id,
-        video_status, video_job_id, video_error, video_config, activities,
+        video_status, video_job_id, video_error, video_config, scene_data,
+        media_quality_status, media_quality_evidence, activities,
         quiz_questions, ai_generated, approved, generation_status, domain_key,
         practical_required, required_artifacts, requires_instructor_signoff,
         learning_objectives, competency_checks, created_at, updated_at
@@ -299,6 +303,12 @@ export async function loadCourseSession(
   const readyToPublish =
     lessons.length > 0 &&
     generatedLessons === lessons.length &&
+    lessons.every((lesson) =>
+      lesson.approved === true &&
+      lesson.video_status === 'complete' &&
+      lesson.media_quality_status === 'approved' &&
+      Boolean(lesson.video_url),
+    ) &&
     course.review_status !== 'rejected';
 
   const publishState: StudioPublishState = {

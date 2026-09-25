@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@/lib/supabase';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getBlueprintBySlug } from './blueprint-loader';
 import { compileAuthoredLessonExperience } from './authored-content-compiler';
+import { createJob } from '@/lib/video/job-queue';
 
 function record(value: unknown): Record<string, any> {
   if (value && typeof value === 'object' && !Array.isArray(value))
@@ -180,6 +181,7 @@ export async function upgradePersistedAuthoredCourse(
       .digest('hex');
     return {
       id: lesson.id,
+      title: lesson.title,
       content: {
         ...currentContent,
         html: source.html,
@@ -220,6 +222,9 @@ export async function upgradePersistedAuthoredCourse(
           fingerprint: sourceFingerprint,
           narration_locked: true,
         },
+        scenes: compiled.experience.instructionalTimeline?.scenes ?? [],
+        captions: compiled.experience.instructionalTimeline?.captions ?? [],
+        timeline_events: compiled.experience.instructionalTimeline?.events ?? [],
         visual_prompt: compiled.experience.visualPrompt,
         reading_guide: compiled.experience.readingGuide,
         scenario: compiled.experience.scenario,
@@ -239,6 +244,19 @@ export async function upgradePersistedAuthoredCourse(
     p_lessons: payload,
   });
   if (error) throw error;
+
+  for (const lesson of payload) {
+    await createJob({
+      lesson_id: lesson.id,
+      course_id: courseId,
+      lesson_title: lesson.title,
+      script: lesson.script,
+      bullet_points: lesson.learning_objectives,
+      scene_data: lesson.scene_data,
+      asset_kind: 'lesson',
+    });
+  }
+
   return {
     ok: true as const,
     courseId,

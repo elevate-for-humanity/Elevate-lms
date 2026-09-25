@@ -471,6 +471,7 @@ const ROLE_TO_NAVIGATION: Readonly<Record<UserRole, NavigationRole>> = {
   workforce_board_admin: 'workforce_board',
   government: 'workforce_board',
   program_holder: 'program_holder',
+  site_coordinator: 'program_holder',
   provider: 'provider',
   provider_admin: 'provider',
   creator: 'creator',

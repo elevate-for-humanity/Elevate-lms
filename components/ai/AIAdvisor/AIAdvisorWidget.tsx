@@ -62,10 +62,19 @@ export function AIAdvisorWidget() {
     setIsLoading(true);
     setShowSuggestions(false);
 
-    // Simulate AI response
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    const response = generateResponse(userMessage);
+    let response: string;
+    try {
+      const apiResponse = await fetch('/api/ai-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage }),
+      });
+      if (!apiResponse.ok) throw new Error('advisor unavailable');
+      const payload = await apiResponse.json();
+      response = payload.response || payload.message || payload.content || generateResponse(userMessage);
+    } catch {
+      response = generateResponse(userMessage);
+    }
     
     const assistantMessage: Message = {
       id: (Date.now() + 1).toString(),
@@ -86,7 +95,7 @@ export function AIAdvisorWidget() {
     }
     
     if (q.includes('work') && (q.includes('while') || q.includes('during'))) {
-      return "Yes! That's one of the best parts about our apprenticeship programs. You can earn $14-18/hour while you train at a real workplace. Unlike traditional school where you pay to learn, you'll actually get PAID to gain experience. The barbering apprenticeship takes 12-18 months, and you work 40 hours a week at a partner salon.";
+      return "Registered apprenticeship compensation, schedules, and completion requirements depend on the occupation, employer, and applicable standards. Review the specific apprenticeship page and your employer agreement for current wage, hours, and competency requirements.";
     }
     
     if (q.includes('funding') || q.includes('wioa') || q.includes('eligible') || q.includes('qualify')) {
@@ -109,7 +118,7 @@ export function AIAdvisorWidget() {
       return "I'd love to connect you with a human advisor! You can text us at (317) 314-3757, call us, or schedule a free consultation. Our admissions team can answer any question and help you find the best path for your situation. Would you like me to show you how to reach us?";
     }
     
-    return "That's a great question! Based on what you've told me, I think our Barbering Registered Apprenticeship might be a perfect fit - you can earn $14-18/hour while you train, and most students pay nothing upfront. Would you like to learn more about this program, or do you have other questions I can help with?";
+    return "I can help with program tuition, duration, credentials, funding pathways, applications, and apprenticeship requirements. For program-specific facts, use the current published program record rather than assuming the same terms apply to every pathway.";
   };
 
   return (

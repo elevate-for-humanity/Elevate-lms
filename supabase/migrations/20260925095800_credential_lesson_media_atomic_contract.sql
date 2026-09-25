@@ -106,14 +106,11 @@ begin
     new.course_id,
     new.title,
     coalesce(new.script, new.script_text),
-    coalesce(
-      case
-        when jsonb_typeof(new.learning_objectives) = 'array'
-          then array(select jsonb_array_elements_text(new.learning_objectives))
-        else '{}'::text[]
-      end,
-      '{}'::text[]
-    ),
+    case
+      when jsonb_typeof(new.learning_objectives) = 'array'
+        then new.learning_objectives
+      else '[]'::jsonb
+    end,
     new.scene_data,
     'lesson',
     null,

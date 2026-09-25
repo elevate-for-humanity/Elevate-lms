@@ -302,7 +302,7 @@ export async function ProgramHolderWorkspaceView({
     return (
       <Students
         title="Enrolled Students"
-        rows={[...data.enrollments, ...data.convertedStudents]}
+        rows={data.enrollments}
         programs={data.programs}
       />
     );
@@ -1520,7 +1520,7 @@ function Students({ title, rows, programs }: { title: string; rows: any[]; progr
           View Applicants
         </Link>
       </div>
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-6">
         <EnrollmentTable rows={rows} programs={programs} />
       </section>
       <ProgramHolderStudentCloseoutForm enrollments={rows} />
@@ -2025,9 +2025,9 @@ function Settings({
 }
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-3">
-      <dt className="text-slate-600">{label}</dt>
-      <dd className="font-bold text-right">{value}</dd>
+    <div className="grid min-w-0 grid-cols-[minmax(0,0.9fr)_minmax(0,1.35fr)] items-start gap-3 border-b border-slate-100 pb-3">
+      <dt className="min-w-0 break-words text-slate-600">{label}</dt>
+      <dd className="min-w-0 break-words text-right font-bold">{value}</dd>
     </div>
   );
 }

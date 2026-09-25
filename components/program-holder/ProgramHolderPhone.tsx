@@ -702,7 +702,19 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
           <p className="mt-1 text-sm text-slate-600">
             The caller sees the Elevate business number, not your personal number.
           </p>
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {['1','2','3','4','5','6','7','8','9','*','0','#'].map((digit) => (
+              <button
+                key={digit}
+                type="button"
+                onClick={() => setReturnNumber((current) => (current + digit).slice(0, 20))}
+                className="min-h-12 rounded-xl border border-slate-300 bg-slate-50 text-xl font-black text-slate-950 active:bg-slate-200"
+              >
+                {digit}
+              </button>
+            ))}
+          </div>
+          <div className="mt-3 flex gap-2">
             <input
               value={returnNumber}
               onChange={(event) => setReturnNumber(event.target.value)}
@@ -718,6 +730,10 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
               <PhoneCall className="h-5 w-5" />
               <span className="sr-only">Call</span>
             </button>
+          </div>
+          <div className="mt-2 flex gap-2">
+            <button type="button" onClick={() => setReturnNumber((current) => current.slice(0, -1))} className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold">Delete</button>
+            <button type="button" onClick={() => setReturnNumber('')} className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold">Clear</button>
           </div>
           <div className="mt-6 rounded-xl border border-violet-200 bg-violet-50 p-4">
             <h3 className="flex items-center gap-2 font-black text-violet-950">

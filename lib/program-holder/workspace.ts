@@ -191,7 +191,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       )
       .eq('program_holder_id', holderId)
       .order('work_date', { ascending: false })
-      .limit(100),
+      .limit(5000),
     db
       .from('program_holder_documents')
       .select('*')
@@ -266,9 +266,23 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       )
       .map((row: any) => row.id),
   );
-  const enrolledRoster = (enrollmentsRes.data ?? []).filter((row: any) =>
-    eligibleRosterUserIds.has(row.user_id),
-  );
+  const verifiedHoursByUser = new Map<string, number>();
+  for (const entry of hoursRes.data ?? []) {
+    if (!entry.user_id || !['approved', 'verified', 'complete', 'completed'].includes(String(entry.approval_status || entry.status || '').toLowerCase())) continue;
+    verifiedHoursByUser.set(
+      entry.user_id,
+      (verifiedHoursByUser.get(entry.user_id) ?? 0) + Number(entry.hours_claimed ?? entry.hours ?? 0),
+    );
+  }
+  const enrolledRoster = (enrollmentsRes.data ?? [])
+    .filter((row: any) => eligibleRosterUserIds.has(row.user_id))
+    .map((row: any) => ({
+      ...row,
+      total_hours_completed: Math.max(
+        Number(row.total_hours_completed || 0),
+        verifiedHoursByUser.get(row.user_id) ?? 0,
+      ),
+    }));
   const upcomingRoster = (upcomingRes.data ?? []).filter((row: any) =>
     eligibleRosterUserIds.has(row.user_id),
   );

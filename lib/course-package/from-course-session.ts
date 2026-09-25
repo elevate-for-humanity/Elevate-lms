@@ -298,24 +298,40 @@ export async function loadPersistedCoursePackageEvidence(
   courseId: string,
 ): Promise<CoursePackageEvidence> {
   const db = await requireAdminClient();
-  const [{ data: jobs, error: jobsError }, { data: course, error: courseError }] =
-    await Promise.all([
-      db
-        .from('video_jobs')
-        .select('lesson_id,quality_evidence,status,review_status,video_url')
-        .eq('course_id', courseId)
-        .eq('asset_kind', 'lesson'),
-      db
-        .from('courses')
-        .select('review_status,reviewed_at,reviewed_by,version')
-        .eq('id', courseId)
-        .maybeSingle(),
-    ]);
+  const [
+    { data: jobs, error: jobsError },
+    { data: course, error: courseError },
+    { data: lessons, error: lessonsError },
+    { data: visualAssets, error: visualAssetsError },
+  ] = await Promise.all([
+    db
+      .from('video_jobs')
+      .select('lesson_id,quality_evidence,status,review_status,video_url')
+      .eq('course_id', courseId)
+      .eq('asset_kind', 'lesson'),
+    db
+      .from('courses')
+      .select('review_status,reviewed_at,reviewed_by,version')
+      .eq('id', courseId)
+      .maybeSingle(),
+    db
+      .from('course_lessons')
+      .select('id,lesson_type,content_json,video_url,is_required')
+      .eq('course_id', courseId),
+    db
+      .from('course_visual_assets')
+      .select('id,media_type,alt_text,is_active,placement')
+      .eq('course_id', courseId)
+      .eq('is_active', true),
+  ]);
   if (jobsError) throw jobsError;
   if (courseError) throw courseError;
+  if (lessonsError) throw lessonsError;
+  if (visualAssetsError) throw visualAssetsError;
 
   const lessonJobs = jobs ?? [];
-  const accessibilityApproved =
+  const requiredLessons = (lessons ?? []).filter((lesson) => lesson.is_required !== false);
+  const mediaEvidenceApproved =
     lessonJobs.length > 0 &&
     lessonJobs.every(
       (job) =>
@@ -323,13 +339,47 @@ export async function loadPersistedCoursePackageEvidence(
         job.review_status === 'approved' &&
         hasCanonicalMediaQualityEvidence(job.quality_evidence),
     );
+  const lessonAccessibilityApproved = requiredLessons.every((lesson) => {
+    const contentJson = record(lesson.content_json);
+    const experience = record(contentJson?.experience);
+    if (['checkpoint', 'quiz', 'exam', 'final_exam', 'assessment'].includes(String(lesson.lesson_type))) {
+      return true;
+    }
+    const timeline = record(experience?.instructionalTimeline);
+    const captions = Array.isArray(timeline?.captions) ? timeline?.captions : [];
+    const transcript = String(experience?.transcript ?? experience?.narrationScript ?? '').trim();
+    return Boolean(transcript && captions.length > 0);
+  });
+  const activeLessonImages = (visualAssets ?? []).filter(
+    (asset) => asset.media_type === 'image' && asset.placement === 'lesson',
+  );
+  const visualAltTextApproved = activeLessonImages.every(
+    (asset) => typeof asset.alt_text === 'string' && asset.alt_text.trim().length > 0,
+  );
+  // Interactive lesson controls use native buttons/inputs and the canonical
+  // player keyboard contract. Persisted evidence here verifies content-specific
+  // caption/transcript and alt-text requirements; UI keyboard support remains a
+  // tested platform invariant.
+  const accessibilityApproved =
+    mediaEvidenceApproved && lessonAccessibilityApproved && visualAltTextApproved;
+  const accessibilityFindings = [
+    ...(!mediaEvidenceApproved ? ['Canonical media quality evidence is incomplete.'] : []),
+    ...(!lessonAccessibilityApproved ? ['One or more lessons are missing captions or transcript evidence.'] : []),
+    ...(!visualAltTextApproved ? ['One or more active lesson images are missing alt text.'] : []),
+  ];
   const accessibility = accessibilityApproved
     ? {
         approved: true,
         checkedAt: new Date().toISOString(),
         findings: [],
       }
-    : null;
+    : accessibilityFindings.length
+      ? {
+          approved: false,
+          checkedAt: new Date().toISOString(),
+          findings: accessibilityFindings,
+        }
+      : null;
 
   const learnerPreview =
     course?.review_status === 'approved' && course.reviewed_at && course.reviewed_by

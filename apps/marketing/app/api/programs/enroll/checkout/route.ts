@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     // Get program details
     const { data: program, error: programError } = await supabase
       .from('programs')
-      .select('id, title, slug, total_cost, status')
+      .select('id, title, slug, price, tuition, total_cost, status, funding_eligible, funding_confirmed, wioa_approved, etpl_listed, is_free')
       .eq('id', program_id)
       .maybeSingle();
 
@@ -112,13 +112,28 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate amount based on funding source
-    const stickerPrice = program.total_cost ? Number(program.total_cost) : 0;
-    let amountToCharge = stickerPrice;
-
-    // Funded enrollments charge $0 (or use 100% coupon)
-    if (funding_source !== 'self_pay') {
-      amountToCharge = 0;
+    const stickerPrice = Number(program.price ?? program.tuition ?? program.total_cost ?? 0);
+    if (funding_source === 'self_pay' && stickerPrice <= 0 && program.is_free !== true) {
+      return NextResponse.json(
+        { error: 'Tuition is not published for this program yet. Contact admissions before checkout.' },
+        { status: 409 },
+      );
     }
+    const agencyFundingRequested = funding_source !== 'self_pay';
+    if (
+      agencyFundingRequested &&
+      !program.funding_confirmed &&
+      !program.wioa_approved &&
+      !program.etpl_listed
+    ) {
+      return NextResponse.json(
+        { error: 'This program does not have a verified agency-funded checkout path. Choose self-pay or contact admissions.' },
+        { status: 409 },
+      );
+    }
+    // A funding request is not a payment authorization. Keep the enrollment
+    // pending until staff records the agency's written authorization.
+    const amountToCharge = agencyFundingRequested ? 0 : stickerPrice;
 
     const admin = await requireAdminClient();
     const partnerProgram =
@@ -193,10 +208,10 @@ export async function POST(request: NextRequest) {
               email: customerEmail,
               full_name: profile?.full_name || customerEmail,
               funding_source,
-              status: amountCents > 0 ? 'checkout_pending' : 'active',
-              payment_status: amountCents > 0 ? 'pending' : 'funded',
-              enrollment_state: amountCents > 0 ? 'payment_pending' : 'active',
-              next_required_action: amountCents > 0 ? 'PAYMENT' : 'ONBOARDING',
+              status: agencyFundingRequested ? 'pending' : amountCents > 0 ? 'checkout_pending' : 'active',
+              payment_status: agencyFundingRequested ? 'authorization_pending' : amountCents > 0 ? 'pending' : 'paid',
+              enrollment_state: agencyFundingRequested ? 'funding_authorization_pending' : amountCents > 0 ? 'payment_pending' : 'active',
+              next_required_action: agencyFundingRequested ? 'FUNDING_AUTHORIZATION' : amountCents > 0 ? 'PAYMENT' : 'ONBOARDING',
               amount_paid_cents: 0,
               billing_provider: amountCents > 0 ? 'quickbooks' : null,
               program_holder_id: partnerHolderId,
@@ -206,6 +221,14 @@ export async function POST(request: NextRequest) {
     if (pending.error || !pending.data)
       throw new Error(pending.error?.message || 'Enrollment could not be prepared.');
 
+    if (agencyFundingRequested) {
+      return NextResponse.json({
+        success: true,
+        authorization_pending: true,
+        url: `${lmsUrl}/lms/dashboard?funding=authorization-pending`,
+        enrollment_id: pending.data.id,
+      });
+    }
     if (amountCents === 0) {
       return NextResponse.json({
         success: true,

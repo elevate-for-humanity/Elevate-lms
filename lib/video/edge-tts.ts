@@ -8,7 +8,6 @@
  */
 
 import { spawn } from 'node:child_process';
-import { tts } from 'edge-tts';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { logger } from '@/lib/logger';
 
@@ -473,8 +472,9 @@ export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}
     if (provider === 'gemini') return await generateGeminiNarration(normalizedText, voice);
     if (provider === 'openai') return await generateOpenAINarration(normalizedText, voice);
     if (provider === 'edge') {
-      const audio = await tts(normalizedText, { voice, rate, pitch, volume });
-      return Buffer.isBuffer(audio) ? audio : Buffer.from(audio);
+      throw new Error(
+        'The legacy edge-tts provider is disabled in production builds. Configure cloudflare, elevenlabs, gemini, openai, or local narration instead.',
+      );
     }
     logger.info('[Narration] Using explicitly selected local narration');
     return await generateLocalNarration(normalizedText);

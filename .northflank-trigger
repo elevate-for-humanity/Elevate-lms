@@ -1,4 +1,3 @@
-merge_sha=9fc846f4ed01e49529bc59fd1d925fcc039052b5
+merge_sha=f453e29c27defd10310878413140e3ab349a10cc
 services=admin
-requested_at=2026-09-25T00:36:00.000Z
-reason=Deploy current Admin production revision
+reason=retry stalled admin production deployment

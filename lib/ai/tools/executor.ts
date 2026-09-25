@@ -6,6 +6,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { emitPlatformEvent } from '@/lib/platform/orchestration/events';
 import { logger } from '@/lib/logger';
 import { getPlatformHealth } from '@/lib/platform/platform-health';
+import { getDecryptedPlatformSecret } from '@/lib/secrets';
 import { getAITool, type AIAgentId, type AIToolDefinition } from './registry';
 
 export type AIToolExecutionContext = {
@@ -66,6 +67,77 @@ function toolUrl(tool: AIToolDefinition, input: Record<string, unknown>, context
   return `${origin.replace(/\/$/, '')}${path}`;
 }
 
+async function githubToken(): Promise<string> {
+  const token =
+    process.env.GITHUB_TOKEN?.trim() ||
+    (await getDecryptedPlatformSecret('GITHUB_TOKEN').catch(() => undefined))?.trim();
+  if (!token) throw new Error('GITHUB_TOKEN is not configured for the internal GitHub Actions control plane.');
+  return token;
+}
+
+async function dispatchGithubWorkflow(
+  workflow: string,
+): Promise<Response> {
+  const token = await githubToken();
+  const repository = process.env.GITHUB_REPOSITORY?.trim() || 'elevate-for-humanity/Elevate-lms';
+  const api = `https://api.github.com/repos/${repository}`;
+  const headers = {
+    Accept: 'application/vnd.github+json',
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    'X-GitHub-Api-Version': '2022-11-28',
+  };
+  const before = await fetch(`${api}/actions/workflows/${workflow}/runs?branch=main&per_page=5`, {
+    headers,
+    cache: 'no-store',
+    signal: AbortSignal.timeout(20_000),
+  });
+  const beforePayload = before.ok ? await before.json().catch(() => ({})) : {};
+  const beforeIds = new Set(
+    Array.isArray((beforePayload as any).workflow_runs)
+      ? (beforePayload as any).workflow_runs.map((run: any) => String(run.id))
+      : [],
+  );
+
+  const dispatch = await fetch(`${api}/actions/workflows/${workflow}/dispatches`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ ref: 'main' }),
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!dispatch.ok) {
+    const body = await dispatch.text().catch(() => '');
+    throw new Error(`GitHub workflow dispatch failed for ${workflow}: HTTP ${dispatch.status} ${body}`.slice(0, 500));
+  }
+
+  let workflowRun: any = null;
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const response = await fetch(
+      `${api}/actions/workflows/${workflow}/runs?branch=main&event=workflow_dispatch&per_page=10`,
+      { headers, cache: 'no-store', signal: AbortSignal.timeout(20_000) },
+    );
+    if (!response.ok) continue;
+    const payload = await response.json().catch(() => ({}));
+    workflowRun = Array.isArray((payload as any).workflow_runs)
+      ? (payload as any).workflow_runs.find((run: any) => !beforeIds.has(String(run.id)))
+      : null;
+    if (workflowRun) break;
+  }
+
+  return Response.json(
+    {
+      status: 'queued',
+      workflow,
+      workflow_run_id: workflowRun?.id ?? null,
+      run_id: workflowRun?.id ?? null,
+      html_url: workflowRun?.html_url ?? null,
+      head_sha: workflowRun?.head_sha ?? null,
+    },
+    { status: 202 },
+  );
+}
+
 async function dispatchToolRequest(
   tool: AIToolDefinition,
   url: string,
@@ -81,6 +153,12 @@ async function dispatchToolRequest(
     );
     const request = new NextRequest(url, init);
     return tool.method === 'GET' ? route.GET(request) : route.POST(request);
+  }
+  if (tool.name === 'workflows.runTests') {
+    return dispatchGithubWorkflow('ci.yml');
+  }
+  if (tool.name === 'deployments.autopilot') {
+    return dispatchGithubWorkflow('deploy-production.yml');
   }
   if (tool.name === 'courses.generate') {
     const { POST } = await import(

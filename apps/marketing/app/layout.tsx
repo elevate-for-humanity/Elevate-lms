@@ -10,6 +10,9 @@ import './layout.css';
 import '../../../styles/contrast-guardrails.css';
 import '../../../styles/responsive-guardrails.css';
 import { MarketingChromeBoundary } from '@/components/site/MarketingChromeBoundary';
+import Header from '@/components/site/Header';
+import { SiteFooter } from '@/components/site-footer';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 import { I18nProvider } from '@/lib/i18n/context';
 import { ChunkRecovery } from '@/components/system/ChunkRecovery';
 import { MarketingPwaClient } from '@/components/pwa/MarketingPwaClient';
@@ -138,7 +141,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AssociateFormLabels />
         <SpeechCanceller />
         <I18nProvider>
-          <MarketingChromeBoundary>{children}</MarketingChromeBoundary>
+          <MarketingChromeBoundary
+            header={<Header />}
+            footer={<SiteFooter />}
+            paris={<ParisFloatingWrapper surface="public" />}
+          >
+            {children}
+          </MarketingChromeBoundary>
         </I18nProvider>
         <MediaPlaybackCoordinator />
         <ScrollNarrator />

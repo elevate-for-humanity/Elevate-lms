@@ -123,7 +123,7 @@ export const nailConfig: ProgramConfig = {
     {
       icon: '🏛️',
       title: 'Workforce Funding',
-      description: 'Potentially $0 out-of-pocket through WIOA, Workforce Ready Grant, or VR',
+      description: 'Funding may be available only when the program and participant are eligible and the responsible source authorizes payment',
       ctaHref: '/check-eligibility',
       ctaLabel: 'Check eligibility',
     },

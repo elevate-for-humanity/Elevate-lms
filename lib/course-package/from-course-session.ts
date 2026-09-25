@@ -57,8 +57,8 @@ export type CoursePackageEvidence = {
   accessibility: CoursePackage['evidence']['accessibility'];
   learnerPreview: CoursePackage['evidence']['learnerPreview'];
   mediaByLesson?: Map<string, {
-    source: 'owned';
-    licenseStatus: 'owned';
+    source: 'envato' | 'owned';
+    licenseStatus: 'verified_paid' | 'owned';
     licenseEvidenceUrl?: string;
     matchScore: number;
   }>;
@@ -316,8 +316,8 @@ export async function loadPersistedCoursePackageEvidence(
       : null;
 
   const mediaByLesson = new Map<string, {
-    source: 'owned';
-    licenseStatus: 'owned';
+    source: 'envato' | 'owned';
+    licenseStatus: 'verified_paid' | 'owned';
     licenseEvidenceUrl?: string;
     matchScore: number;
   }>();
@@ -330,11 +330,22 @@ export async function loadPersistedCoursePackageEvidence(
     const quality = job.quality_evidence as {
       visualEvidenceCoverage?: number;
       sourceEvidenceCoverage?: number;
+      sourceProviders?: string[];
+      licenseEvidenceUrls?: string[];
     };
+    const providers = Array.isArray(quality.sourceProviders) ? quality.sourceProviders : [];
+    const licenseUrls = Array.isArray(quality.licenseEvidenceUrls)
+      ? quality.licenseEvidenceUrls.filter(Boolean)
+      : [];
+    const envatoLicensed = providers.some((provider) => provider.toLowerCase() === 'envato');
     mediaByLesson.set(job.lesson_id, {
-      source: 'owned',
-      licenseStatus: 'owned',
-      ...(typeof job.video_url === 'string' && job.video_url ? { licenseEvidenceUrl: job.video_url } : {}),
+      source: envatoLicensed ? 'envato' : 'owned',
+      licenseStatus: envatoLicensed ? 'verified_paid' : 'owned',
+      ...(licenseUrls[0]
+        ? { licenseEvidenceUrl: licenseUrls[0] }
+        : typeof job.video_url === 'string' && job.video_url
+          ? { licenseEvidenceUrl: job.video_url }
+          : {}),
       matchScore: Math.min(
         1,
         Math.max(

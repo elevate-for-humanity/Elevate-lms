@@ -95,18 +95,32 @@ export function coursePackageFromSession(
                 : [];
           const storyboard = rawStoryboard.map((value, index) => {
             const scene = record(value) ?? {};
+            const onScreenTextValue = scene.onScreenText ?? scene.on_screen_text;
             return {
-              objectiveId: String(scene.objectiveId ?? scene.objective_id ?? `${lesson.slug}-objective-${index + 1}`),
+              objectiveId: String(
+                scene.objectiveId ??
+                  scene.objective_id ??
+                  `${lesson.slug}-objective-${index + 1}`,
+              ),
               sceneNumber: Number(scene.sceneNumber ?? scene.scene_number ?? index + 1),
               narration: String(scene.narration ?? scene.dialogue ?? ''),
-              visualDirection: String(scene.visualDirection ?? scene.visual_style ?? scene.action ?? ''),
-              onScreenText: Array.isArray(scene.onScreenText ?? scene.on_screen_text)
-                ? (scene.onScreenText ?? scene.on_screen_text as unknown[]).map(String)
+              visualDirection: String(
+                scene.visualDirection ?? scene.visual_style ?? scene.action ?? '',
+              ),
+              onScreenText: Array.isArray(onScreenTextValue)
+                ? onScreenTextValue.map(String)
                 : [],
               ...(scene.demonstration ? { demonstration: String(scene.demonstration) } : {}),
-              durationSeconds: Math.max(1, Number(scene.durationSeconds ?? scene.duration_seconds ?? 1)),
+              durationSeconds: Math.max(
+                1,
+                Number(scene.durationSeconds ?? scene.duration_seconds ?? 1),
+              ),
               ...(scene.interactionAfterScene ?? scene.interaction_after_scene
-                ? { interactionAfterScene: String(scene.interactionAfterScene ?? scene.interaction_after_scene) }
+                ? {
+                    interactionAfterScene: String(
+                      scene.interactionAfterScene ?? scene.interaction_after_scene,
+                    ),
+                  }
                 : {}),
             };
           });

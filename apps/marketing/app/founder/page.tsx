@@ -217,7 +217,6 @@ export default function FounderPage() {
                   'EmployIndy Partner',
                   'WorkOne Partner',
                   'Job Ready Indy Partner',
-                  'HSI (Health & Safety Institute) Affiliate',
                   'CareerSafe OSHA Training Provider',
                   'Elevate LMS Curriculum Partner',
                   'NRF Rise Up Provider',

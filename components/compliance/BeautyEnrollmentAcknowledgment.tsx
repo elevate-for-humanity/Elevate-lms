@@ -30,7 +30,7 @@ const PROGRAM_FEES: Record<ProgramType, number> = {
   barber: 4980,
   'nail-technician': 2980,
   esthetician: 6000,
-  cosmetology: 4980,
+  cosmetology: 6000,
 };
 
 const PROGRAM_HOURS: Record<ProgramType, number> = {

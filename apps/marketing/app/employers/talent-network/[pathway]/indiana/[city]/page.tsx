@@ -6,13 +6,9 @@ import {
   EMPLOYER_TALENT_PATHWAYS,
   getEmployerTalentPathway,
 } from '@/lib/marketing/employer-talent-network';
+export const dynamic = 'force-dynamic';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
-export function generateStaticParams() {
-  return EMPLOYER_TALENT_PATHWAYS.flatMap((pathway) =>
-    EMPLOYER_NETWORK_REGIONS.map((region) => ({ pathway: pathway.slug, city: region.slug })),
-  );
-}
 export async function generateMetadata({
   params,
 }: {

@@ -60,8 +60,12 @@
       "failureThreshold": 3
     },
     "replicas": {
-      "min": 1,
+      "min": 3,
       "max": 3
+    },
+    "runtimeEnvironment": {
+      "VIDEO_RENDER_CONCURRENCY": "1",
+      "VIDEO_RENDER_GLOBAL_CONCURRENCY": "3"
     },
     "resources": {
       "cpu": "4000m",

@@ -160,7 +160,7 @@ export default async function LearnerOnboardingPage({
     .eq('id', user.id)
     .maybeSingle();
 
-  if (roleCheck?.role === 'program_holder') {
+  if (['program_holder', 'site_coordinator'].includes(String(roleCheck?.role || ''))) {
     redirect('https://app.elevateforhumanity.org/program-holder/onboarding');
   }
   if (roleCheck?.role === 'employer') {

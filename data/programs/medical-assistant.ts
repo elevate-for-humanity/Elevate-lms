@@ -355,7 +355,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
     {
       courseId: 'hsi-bloodborne-pathogens',
       label: 'Bloodborne Pathogens Training',
-      partnerName: 'Health & Safety Institute',
+      partnerName: 'Approved CPR/AED credential provider',
       credentialIssued: 'Bloodborne Pathogens Certificate',
       duration: '2 hours',
       required: true,
@@ -375,7 +375,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
     {
       courseId: 'hsi-cpr-aed',
       label: 'CPR/AED Certification',
-      partnerName: 'Health & Safety Institute',
+      partnerName: 'Approved CPR/AED credential provider',
       credentialIssued: 'CPR/AED Certification',
       duration: '4 hours',
       required: true,

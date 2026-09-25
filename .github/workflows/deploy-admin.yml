@@ -54,7 +54,7 @@ concurrency:
   # Serialize production deployments. Once a verified build has been handed to
   # Northflank, a newer push must wait rather than cancel deployment
   # verification and waste the completed build.
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy-admin:

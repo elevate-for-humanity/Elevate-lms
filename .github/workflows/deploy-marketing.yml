@@ -82,8 +82,6 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
       SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_PUBLIC_SITE_URL: https://www.elevateforhumanity.org

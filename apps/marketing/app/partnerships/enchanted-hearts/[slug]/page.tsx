@@ -7,10 +7,8 @@ import {
   formatUsd,
   getEnchantedHeartsProgram,
 } from '@/lib/partners/enchanted-hearts';
+export const dynamic = 'force-dynamic';
 
-export function generateStaticParams() {
-  return ENCHANTED_HEARTS.programs.map(({ slug }) => ({ slug }));
-}
 
 export async function generateMetadata({
   params,

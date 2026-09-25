@@ -58,6 +58,23 @@ function hasDurableToolEvidence(tool: string, result: unknown): string | null {
   const record = asRecord(result);
   if (!record) return null;
 
+  if (tool === 'studio.engineering.execute') {
+    const branch = asRecord(record.branch);
+    const pullRequest = asRecord(record.pull_request ?? record.pullRequest);
+    const changedFiles = Array.isArray(record.changed_files ?? record.changedFiles)
+      ? (record.changed_files ?? record.changedFiles as unknown[])
+      : [];
+    const repositoryEvidence = Boolean(
+      changedFiles.length > 0 &&
+      typeof branch?.sha === 'string' &&
+      branch.sha.length >= 7 &&
+      (typeof pullRequest?.number === 'number' || typeof pullRequest?.url === 'string'),
+    );
+    return repositoryEvidence
+      ? 'Elevate-owned Studio returned a changed branch and pull request for CI verification.'
+      : null;
+  }
+
   if (tool === 'openhands.execute') {
     const github = asRecord(record.github_verification);
     const branch = asRecord(github?.branch);
@@ -153,16 +170,19 @@ export function evaluateExecution(input: EvaluationInput): EvaluationResult {
 
   const requiresEngineeringEvidence =
     input.verificationRule?.toLowerCase().includes('engineering runtime') ?? false;
-  if (requiresEngineeringEvidence && input.tool !== 'openhands.execute') {
+  if (
+    requiresEngineeringEvidence &&
+    !['studio.engineering.execute', 'openhands.execute'].includes(input.tool)
+  ) {
     reasons.push(
-      `Engineering verification requires openhands.execute evidence; received ${input.tool}.`,
+      `Engineering verification requires registered repository-mutation evidence; received ${input.tool}.`,
     );
     return {
       status: 'FAIL_BLOCKING',
       reasons,
       evidence: {
         tool: input.tool,
-        expected_tool: 'openhands.execute',
+        expected_tool: 'studio.engineering.execute|openhands.execute',
         verification_rule: input.verificationRule ?? null,
       },
     };

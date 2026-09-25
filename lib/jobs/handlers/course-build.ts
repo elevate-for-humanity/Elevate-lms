@@ -5,11 +5,6 @@ import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type { FactoryInput, FactoryStage } from '@/lib/course-factory/types';
 import { assertCourseBuilderGenerationEnabled } from '@/lib/course-builder/generation-control';
-import {
-  executePaidInference,
-  paidArtifactFingerprint,
-  reservePaidInference,
-} from '@/lib/ai/paid-inference-gateway';
 
 export interface CourseBuildJob {
   id: string;
@@ -144,48 +139,11 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
     });
   } else {
     try {
-      const projectedCostMicros = Math.max(
-        0,
-        Number(process.env.COURSE_BUILDER_PROJECTED_COST_MICROS ?? '250000'),
-      );
-      const artifactFingerprint = paidArtifactFingerprint({
-        operation: 'course-builder-job',
-        jobId: job.id,
-        toolArgs: job.tool_args,
-      });
-      const isSelectiveRepair =
-        job.tool_args.mode === 'missing-only' &&
-        job.tool_args.contentSource === 'curriculum_lessons' &&
-        Boolean(job.tool_args.courseId);
-      if (isSelectiveRepair) {
-        // Existing authored courses must enter the Blueprint repair/validation
-        // path directly. Paid inference is authorized later only for the exact
-        // failed component that truly needs provider work.
-        result = await courseFactory(job.tool_args, progress);
-      } else {
-        const paidExecution = await executePaidInference({
-          db,
-          authorize: () =>
-            reservePaidInference(db, {
-              scopeKey: `job:${job.id}`,
-              actorId: job.user_id ?? null,
-              jobId: job.id,
-              artifactFingerprint,
-              idempotencyKey: `course-builder-job:${job.id}`,
-              provider: process.env.AI_PROVIDER?.trim() || 'configured',
-              model: process.env.AI_MODEL?.trim() || 'course-factory-router',
-              operation: 'course-builder-generate',
-              projectedCostMicros,
-            }),
-          dispatch: () => courseFactory(job.tool_args, progress),
-        });
-        if (paidExecution.decision !== 'approved' || !paidExecution.value) {
-          throw new Error(
-            `PAID_INFERENCE_${paidExecution.decision.toUpperCase()}:course-build`,
-          );
-        }
-        result = paidExecution.value;
-      }
+      // Course Builder is an authorized production workflow. Provider selection,
+      // metering, and quality controls belong to the individual generation/media
+      // components; the orchestrator itself must never stop on the legacy
+      // paid-inference approval gate.
+      result = await courseFactory(job.tool_args, progress);
     } finally {
       clearInterval(heartbeat);
       await Promise.allSettled(progressWrites);

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
@@ -86,6 +87,11 @@ export async function POST(request: NextRequest) {
     existing.billing_provider &&
     existing.billing_provider !== 'quickbooks'
   ) {
+    logger.warn('[platform-checkout] preventing duplicate billing during provider cutover', {
+      organizationId: billingOrganizationId,
+      activeProvider: existing.billing_provider,
+      currentPeriodEnd: existing.current_period_end,
+    });
     return NextResponse.json(
       {
         error: 'This organization already has an active subscription with another billing provider. Duplicate billing was prevented.',

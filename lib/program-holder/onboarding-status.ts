@@ -90,7 +90,7 @@ export async function getProgramHolderOnboardingStatus(
     .eq('id', currentUserId)
     .maybeSingle();
 
-  const isProgramHolder = profile?.role === 'program_holder';
+  const isProgramHolder = ['program_holder', 'site_coordinator'].includes(String(profile?.role || ''));
 
   if (!isProgramHolder) {
     return {

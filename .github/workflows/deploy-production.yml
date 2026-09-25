@@ -39,8 +39,6 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
       SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
       QB_CLIENT_ID: ${{ secrets.QB_CLIENT_ID }}
       QB_CLIENT_SECRET: ${{ secrets.QB_CLIENT_SECRET }}
@@ -53,6 +51,12 @@ jobs:
       ANTHROPIC_API_TOKEN: ${{ secrets.ANTHROPIC_API_TOKEN }}
       CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
       ENVATO_API_TOKEN: ${{ secrets.ENVATO_API_TOKEN }}
+      ONET_API_KEY: ${{ secrets.ONET_API_KEY }}
+      USAJOBS_API_KEY: ${{ secrets.USAJOBS_API_KEY }}
+      USAJOBS_USER_AGENT_EMAIL: ${{ secrets.USAJOBS_USER_AGENT_EMAIL }}
+      CAREERONESTOP_USER_ID: ${{ secrets.CAREERONESTOP_USER_ID }}
+      CAREERONESTOP_TOKEN: ${{ secrets.CAREERONESTOP_TOKEN }}
+      CAREERONESTOP_API_KEY: ${{ secrets.CAREERONESTOP_API_KEY || secrets.CAREERONESTOP_TOKEN }}
 
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
@@ -92,7 +96,6 @@ jobs:
             NEXT_PUBLIC_SUPABASE_ANON_KEY
             SUPABASE_SERVICE_ROLE_KEY
             NEXTAUTH_SECRET
-            STRIPE_SECRET_KEY
           )
           for name in "${required[@]}"; do
             test -n "${!name:-}" || { echo "$name GitHub secret is missing"; exit 1; }

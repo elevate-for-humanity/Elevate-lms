@@ -16,7 +16,6 @@
 
 import { isAIAvailable } from '@/lib/ai/ai-service';
 import { logger } from '@/lib/logger';
-import { queueCourseLessonVideos } from './media-service';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { markCourseMediaPendingWithClient } from '@/lib/course-builder/build-lifecycle';
 import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
@@ -1151,29 +1150,37 @@ export async function courseFactory(
 
     let videosQueued = 0;
     if (input.videoMode !== 'off' && published.courseId) {
-      // The atomic publisher persists content before media exists. Enter the
-      // media-pending state before queueing so an enqueue failure can never
-      // leave a text-only course falsely marked 100% complete.
+      // Credential lesson persistence creates the version-locked primary media
+      // job in the same transaction as each lesson. Course Factory never runs
+      // a second, detached "queue all media later" pass.
+      const db = await requireAdminClient();
       await markCourseMediaPendingWithClient({
-        db: await requireAdminClient(),
+        db,
         courseId: published.courseId,
       });
-      tracker.emit('media', 'Queueing missing lesson videos and microclips.', 93);
-      const media = await queueCourseLessonVideos({
-        courseId: published.courseId,
-        onlyMissing: input.mode !== 'replace',
-        force: input.mode === 'replace',
-        limit: input.videoQueueLimit ?? null,
-      });
-      videosQueued = media.queued + media.microclipsQueued;
-      if (media.lessonVideosReady !== media.attempted) {
+      tracker.emit('media', 'Verifying lesson-bound primary media jobs.', 93);
+      const [{ data: persistedLessons, error: lessonError }, { data: mediaJobs, error: mediaError }] =
+        await Promise.all([
+          db.from('course_lessons').select('id').eq('course_id', published.courseId),
+          db
+            .from('video_jobs')
+            .select('id,lesson_id,status')
+            .eq('course_id', published.courseId)
+            .eq('asset_kind', 'lesson'),
+        ]);
+      if (lessonError) throw lessonError;
+      if (mediaError) throw mediaError;
+      const lessonIds = new Set((persistedLessons ?? []).map((lesson) => lesson.id));
+      const jobLessonIds = new Set((mediaJobs ?? []).map((job) => job.lesson_id));
+      const missingJobIds = [...lessonIds].filter((lessonId) => !jobLessonIds.has(lessonId));
+      if (missingJobIds.length > 0 || lessonIds.size !== jobLessonIds.size) {
         throw new Error(
-          `Lesson video queue gate failed: ${media.lessonVideosReady}/${media.attempted} primary lesson videos are queued, rendering, or quality-approved.`,
+          `Atomic lesson/media contract failed: ${jobLessonIds.size}/${lessonIds.size} lessons have primary media jobs.`,
         );
       }
-      if (media.failed > 0) {
-        logger.warn('[course-factory] Optional microclip enqueue warnings', media);
-      }
+      videosQueued = (mediaJobs ?? []).filter((job) =>
+        ['queued', 'rendering', 'complete'].includes(String(job.status)),
+      ).length;
     }
 
     tracker.emit(

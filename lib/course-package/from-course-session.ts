@@ -178,6 +178,48 @@ export function coursePackageFromSession(
                 }
               : null
           );
+          const persistedCompetencies = Array.isArray(lesson.competency_checks)
+            ? lesson.competency_checks.flatMap((value, index) => {
+                const check = record(value);
+                if (!check) return [];
+                const objective = String(check.objective ?? check.description ?? '').trim();
+                if (!objective) return [];
+                return [{
+                  id: String(check.id ?? `${lesson.slug}-competency-${index + 1}`),
+                  domain: String(check.domain ?? check.domainKey ?? module.domain_key ?? 'general'),
+                  objective,
+                  requiredKnowledge: Array.isArray(check.requiredKnowledge)
+                    ? check.requiredKnowledge.map(String).filter(Boolean)
+                    : [objective],
+                  assessmentStandard: String(
+                    check.assessmentStandard ??
+                      check.standard ??
+                      'Demonstrate mastery through the configured lesson assessment.',
+                  ),
+                }];
+              })
+            : [];
+          const intelligenceSkills = Array.isArray(record(experience?.intelligence)?.skills)
+            ? ((record(experience?.intelligence)?.skills as unknown[]) ?? [])
+            : [];
+          const inferredCompetencies = intelligenceSkills.flatMap((value, index) => {
+            const skill = record(value);
+            if (!skill) return [];
+            const objective = String(skill.label ?? skill.key ?? '').trim();
+            if (!objective) return [];
+            return [{
+              id: String(skill.key ?? `${lesson.slug}-competency-${index + 1}`),
+              domain: String(lesson.domain_key ?? module.domain_key ?? 'general'),
+              objective,
+              requiredKnowledge: [objective],
+              assessmentStandard:
+                'Demonstrate mastery through the configured lesson assessment and practical evidence.',
+            }];
+          });
+          const competencies = persistedCompetencies.length
+            ? persistedCompetencies
+            : inferredCompetencies;
+
           const requiredInteractionIds = [
             ...(Array.isArray(experience?.knowledgeChecks) ? [`${lesson.slug}-kc`] : []),
             ...(experience?.scenario ? [`${lesson.slug}-scenario`] : []),
@@ -198,37 +240,7 @@ export function coursePackageFromSession(
             objectives: Array.isArray(lesson.learning_objectives)
               ? lesson.learning_objectives.map(String).filter(Boolean)
               : [],
-            competencies: Array.isArray(lesson.competency_checks)
-              ? lesson.competency_checks.flatMap((value, index) => {
-                  const check = record(value);
-                  if (!check) return [];
-                  const objective = String(check.objective ?? check.description ?? '').trim();
-                  if (!objective) return [];
-                  return [{
-                    id: String(check.id ?? `${lesson.slug}-competency-${index + 1}`),
-                    domain: String(check.domain ?? check.domainKey ?? module.domain_key ?? 'general'),
-                    objective,
-                    requiredKnowledge: Array.isArray(check.requiredKnowledge)
-                      ? check.requiredKnowledge.map(String).filter(Boolean)
-                      : [objective],
-                    assessmentStandard: String(check.assessmentStandard ?? check.standard ?? 'Demonstrate mastery through the configured lesson assessment.'),
-                  }];
-                })
-              : Array.isArray((record(experience?.intelligence)?.skills as unknown[] | undefined))
-                ? ((record(experience?.intelligence)?.skills as unknown[]) ?? []).flatMap((value, index) => {
-                    const skill = record(value);
-                    if (!skill) return [];
-                    const objective = String(skill.label ?? skill.key ?? '').trim();
-                    if (!objective) return [];
-                    return [{
-                      id: String(skill.key ?? `${lesson.slug}-competency-${index + 1}`),
-                      domain: String(lesson.domain_key ?? module.domain_key ?? 'general'),
-                      objective,
-                      requiredKnowledge: [objective],
-                      assessmentStandard: 'Demonstrate mastery through the configured lesson assessment and practical evidence.',
-                    }];
-                  })
-                : [],
+            competencies,
             html: lessonHtml(lesson),
             videoUrl:
               lesson.video_status === 'complete' &&

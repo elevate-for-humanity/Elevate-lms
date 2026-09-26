@@ -44,9 +44,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git fetch origin ultimate-course-builder-production
           sha="$(git rev-parse HEAD)"
+          expected="$(git rev-parse origin/ultimate-course-builder-production)"
           test -n "$sha"
-          test "$(git branch --show-current)" = "ultimate-course-builder-production"
+          test "$sha" = "$expected"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
           echo "ULTIMATE_SOURCE_SHA=$sha" >> "$GITHUB_ENV"
           echo "Deploying Ultimate source SHA $sha"

@@ -1,4 +1,3 @@
-import {requireAdminClient} from '@/lib/supabase/admin';
 import {UltimateSupabasePersistence} from '../persistence/supabase-persistence';
 import {UltimateArtifactStore} from '../artifacts/artifact-store';
 import {UltimatePlatformWorkforce} from '../adapters/platform-workforce';
@@ -7,6 +6,7 @@ import {UltimatePlatformInstructionalGenerator} from '../adapters/platform-instr
 import {UltimatePlatformMedia} from '../adapters/platform-media';
 import {UltimatePlatformAssessment} from '../adapters/platform-assessment';
 import type {UltimateRuntime} from './runtime';
+import type {SupabaseClient} from '@supabase/supabase-js';
 import type {UltimateNarrationPort,UltimateRenderPort} from './ports';
 
 class LazyNarration implements UltimateNarrationPort{
@@ -21,8 +21,7 @@ class LazyRenderer implements UltimateRenderPort{
     return new UltimatePlatformRenderer().render(input);
   }
 }
-export async function createUltimateRuntime():Promise<UltimateRuntime>{
-  const db=await requireAdminClient();
+export async function createUltimateRuntime(db:SupabaseClient):Promise<UltimateRuntime>{
   return {
     persistence:new UltimateSupabasePersistence(db as any),
     artifacts:new UltimateArtifactStore(db as any),

@@ -442,23 +442,18 @@ async function main() {
         const expectedSha = getExpectedSha();
         if (expectedSha) {
           console.log(`${serviceId}: build/deploy ready — polling HTTP health (expecting ${expectedSha.slice(0, 7)})...`);
-          // Poll the health endpoint until it returns the expected SHA or times out
-          while (Date.now() - start < timeoutMs) {
-            const health = await checkHttpHealth(serviceId, expectedSha);
-            if (health.ok) {
-              console.log(`${serviceId}: service ready ✅ (commit: ${health.currentCommit.slice(0, 7)})`);
-              process.exit(0);
-            }
-            // Fail immediately if build identity is missing — retrying won't fix it.
-            if (health.error?.includes('build identity missing')) {
-              console.error(`${serviceId}: FATAL — ${health.error}`);
-              process.exit(1);
-            }
-            console.log(`${serviceId}: health: ${health.error} — new container not ready yet, retrying in 15s...`);
-            await new Promise((r) => setTimeout(r, 15000));
+          // Check once per outer iteration so Northflank status and instance count
+          // are refreshed while the public endpoint still serves the old image.
+          const health = await checkHttpHealth(serviceId, expectedSha);
+          if (health.ok) {
+            console.log(`${serviceId}: service ready ✅ (commit: ${health.currentCommit.slice(0, 7)})`);
+            process.exit(0);
           }
-          console.error(`${serviceId}: health check timeout after ${Math.round((Date.now() - start) / 1000)}s — new container never reached expected SHA`);
-          process.exit(1);
+          if (health.error?.includes('build identity missing')) {
+            console.error(`${serviceId}: FATAL — ${health.error}`);
+            process.exit(1);
+          }
+          console.log(`${serviceId}: health: ${health.error} — refreshing Northflank status in 15s...`);
         } else {
           console.log(`${serviceId}: service ready ✅ (no SHA to verify)`);
           process.exit(0);
@@ -472,23 +467,16 @@ async function main() {
       if (buildDone && !deploy && SERVICE_HEALTH_URLS[serviceId]) {
         const expectedSha = getExpectedSha();
         console.log(`${serviceId}: build done (${buildStatus}), deployment status unknown — switching to HTTP health polling`);
-        while (Date.now() - start < timeoutMs) {
-          const health = await checkHttpHealth(serviceId, expectedSha);
-          if (health.ok) {
-            console.log(`${serviceId}: HTTP health OK ✅ (commit: ${health.currentCommit.slice(0, 7)})`);
-            process.exit(0);
-          }
-          // Fail immediately if build identity is missing — retrying won't fix it.
-          if (health.error?.includes('build identity missing')) {
-            console.error(`${serviceId}: FATAL — ${health.error}`);
-            process.exit(1);
-          }
-          console.log(`${serviceId}: health: ${health.error} — retrying in 15s...`);
-          await new Promise((r) => setTimeout(r, 15000));
+        const health = await checkHttpHealth(serviceId, expectedSha);
+        if (health.ok) {
+          console.log(`${serviceId}: HTTP health OK ✅ (commit: ${health.currentCommit.slice(0, 7)})`);
+          process.exit(0);
         }
-        console.error(`${serviceId}: HTTP health check timeout after ${Math.round((Date.now() - start) / 1000)}s`);
-        await printRuntimeLogs(projectId, serviceId);
-        process.exit(1);
+        if (health.error?.includes('build identity missing')) {
+          console.error(`${serviceId}: FATAL — ${health.error}`);
+          process.exit(1);
+        }
+        console.log(`${serviceId}: health: ${health.error} — refreshing Northflank status in 15s...`);
       }
 
       if (DEPLOY_FAILURE_STATUSES.has(deploy ?? '')) {
@@ -502,6 +490,9 @@ async function main() {
   }
 
   console.error(`${serviceId}: timeout after ${timeoutMs}ms`);
+  if (lastService) {
+    await printFailureDiagnostics(projectId, serviceId, targetBuildId, lastService);
+  }
   await printRuntimeLogs(projectId, serviceId);
   if (lastBuild) {
     console.error('Last build:', JSON.stringify(lastBuild, null, 2));

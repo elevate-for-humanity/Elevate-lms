@@ -39,21 +39,21 @@ function record(value: unknown): Record<string, any> {
 
 function gateForCredentialLessonPath(path: PropertyKey[]): CourseGate {
   const key = path.join('.');
-  if (/domainKey|competencyKeys|intelligence/.test(key)) return 'credential_alignment';
+  if (/domainKey|competencyKeys|intelligence/.test(key)) return 'standards';
   if (/objectives/.test(key)) return 'learning_objectives';
   if (/media\.storyboard|minimumStoryboardScenes/.test(key)) return 'storyboard';
-  if (/media\.captions/.test(key)) return 'captions';
-  if (/media\.transcript/.test(key)) return 'transcript';
-  if (/professionalNarration|narrationProvider|noLoopingNarration/.test(key)) return 'narration';
+  if (/media\.captions/.test(key)) return 'synchronization';
+  if (/media\.transcript/.test(key)) return 'instructional_script';
+  if (/professionalNarration|narrationProvider|noLoopingNarration/.test(key)) return 'natural_narration';
   if (/visual|provenance|noRepeatedFillerVisuals|noBackwardTimelineJumps/.test(key))
-    return 'visual_alignment';
+    return 'visual_assignment';
   if (/qualityApproval|primaryVideoJob|createdWithLesson|learnerPlayback/.test(key))
-    return 'demonstration';
-  if (/knowledgeChecks|remediation/.test(key)) return 'knowledge_checks';
-  if (/scenario|caseStudy|exercises|practicalTask/.test(key)) return 'interactive_practice';
-  if (/progressTracking/.test(key)) return 'progress_tracking';
-  if (/resumeTracking/.test(key)) return 'resume_tracking';
-  return 'instructional_content';
+    return 'scene_build';
+  if (/knowledgeChecks|remediation/.test(key)) return 'assessment_alignment';
+  if (/scenario|caseStudy|exercises|practicalTask/.test(key)) return 'active_teaching';
+  if (/progressTracking/.test(key)) return 'learner_runthrough';
+  if (/resumeTracking/.test(key)) return 'learner_runthrough';
+  return 'teaching_sequence';
 }
 
 export function strictCredentialLessonFindings(
@@ -164,7 +164,7 @@ export async function evaluatePersistedCredentialLesson(lessonId: string) {
     return {
       pass: false as const,
       findings: [{
-        gate: 'instructional_content' as CourseGate,
+        gate: 'teaching_sequence' as CourseGate,
         lessonId,
         path: 'lesson',
         pass: false,
@@ -178,7 +178,7 @@ export async function evaluatePersistedCredentialLesson(lessonId: string) {
     return {
       pass: false as const,
       findings: [{
-        gate: 'instructional_content' as CourseGate,
+        gate: 'teaching_sequence' as CourseGate,
         lessonId,
         path: 'lesson',
         pass: false,
@@ -227,7 +227,7 @@ export async function evaluatePersistedCredentialCourse(courseId: string) {
       ) as Record<CourseGate, boolean>,
       findings: [
         {
-          gate: 'instructional_content' as const,
+          gate: 'teaching_sequence' as const,
           message:
             error instanceof Error
               ? `Course package contract is invalid: ${error.message}`

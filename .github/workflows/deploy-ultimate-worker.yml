@@ -1,0 +1,61 @@
+name: Deploy Ultimate Course Builder Worker
+on:
+  issues:
+    types: [opened, reopened]
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: ultimate-course-builder-worker-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.event.issue.title == 'DEPLOY ULTIMATE COURSE BUILDER WORKER'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 60
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID: elevate-ultimate-worker
+      NORTHFLANK_GIT_BRANCH: ultimate-course-builder-production
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ultimate-course-builder-production
+          fetch-depth: 1
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.28.2 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Require deployment credentials
+        run: |
+          test -n "$NORTHFLANK_API_TOKEN"
+          test -n "$SUPABASE_SERVICE_ROLE_KEY"
+      - name: Provision Ultimate worker
+        run: pnpm tsx scripts/northflank/provision-ultimate-worker.ts --execute
+      - name: Trigger worker build
+        id: build
+        run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID"
+      - name: Require build id
+        run: test -n "${{ steps.build.outputs.build_id }}"
+      - name: Wait for build
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --timeout-ms 2400000
+      - name: Deploy exact worker build
+        run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}"
+      - name: Verify queue claim
+        shell: bash
+        run: |
+          for attempt in $(seq 1 60); do
+            state="$(curl -fsS "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/ultimate_build_jobs?id=eq.eb37bbfd-ada4-4e57-8e60-419672e71724&select=status,attempts,lease_owner" -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" || true)"
+            echo "$state"
+            echo "$state" | grep -Eq '"status":"(running|completed)"' && exit 0
+            sleep 10
+          done
+          exit 1

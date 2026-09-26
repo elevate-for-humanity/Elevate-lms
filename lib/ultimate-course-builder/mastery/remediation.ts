@@ -1,0 +1,2 @@
+export interface RemediationPlan{objectiveId:string;returnToTeachingCue:string;differentExplanation:true;differentExample:true;guidedPractice:true;independentPractice:true;newReassessment:true}
+export function createRemediationPlan(objectiveId:string,cueId:string):RemediationPlan{return {objectiveId,returnToTeachingCue:cueId,differentExplanation:true,differentExample:true,guidedPractice:true,independentPractice:true,newReassessment:true};}

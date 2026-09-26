@@ -1,0 +1,2 @@
+export interface TraceabilityRow{requirementId:string;competencyId:string;objectiveId:string;instructionId?:string;demonstrationId?:string;guidedPracticeId?:string;independentPracticeId?:string;assessmentIds:string[];masteryRuleId?:string}
+export function auditTraceability(rows:TraceabilityRow[]){const failures=rows.filter(r=>!r.requirementId||!r.competencyId||!r.objectiveId||!r.instructionId||!r.guidedPracticeId||!r.independentPracticeId||!r.assessmentIds.length||!r.masteryRuleId);return {pass:failures.length===0,failures};}

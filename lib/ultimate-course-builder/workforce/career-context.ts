@@ -1,0 +1,2 @@
+export interface CareerContext{socCode:string;occupationTitle:string;tasks:string[];skills:string[];knowledge:string[];technology:string[];wages?:{median?:number;entry?:number;experienced?:number};outlook?:{growthPct?:number;openings?:number};relatedCareers:string[];liveJobs:number;sources:string[]}
+export function careerTeachingContext(c:CareerContext){return {occupation:c.occupationTitle,whyItMatters:[...c.tasks.slice(0,5),...c.skills.slice(0,5)],resumeSkills:c.skills.slice(0,12),technology:c.technology.slice(0,10),sources:c.sources};}

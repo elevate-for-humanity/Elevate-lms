@@ -1,0 +1,3 @@
+export type UltimateQuestionType='multiple_choice'|'multiple_select'|'true_false'|'matching'|'sequencing'|'scenario'|'visual_identification'|'application';
+export interface UltimateAssessmentItem{id:string;objectiveIds:string[];type:UltimateQuestionType;prompt:string;choices?:string[];answer:unknown;explanation:string;difficulty:'easy'|'medium'|'hard'}
+export function validateAssessmentCoverage(objectiveIds:string[],items:UltimateAssessmentItem[]){const covered=new Set(items.flatMap(i=>i.objectiveIds));const missing=objectiveIds.filter(id=>!covered.has(id));return {pass:missing.length===0,missing};}

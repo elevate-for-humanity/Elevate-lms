@@ -22,6 +22,8 @@ jobs:
       NORTHFLANK_GIT_BRANCH: ultimate-course-builder-production
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      ELEVATE_LLM_URL: ${{ secrets.ELEVATE_LLM_URL }}
+      ELEVATE_LLM_SECRET: ${{ secrets.ELEVATE_LLM_SECRET }}
     steps:
       - name: Checkout exact Ultimate source branch
         uses: actions/checkout@v4
@@ -51,6 +53,8 @@ jobs:
           set -euo pipefail
           test -n "$NORTHFLANK_API_TOKEN"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          test -n "$ELEVATE_LLM_URL"
+          test -n "$ELEVATE_LLM_SECRET"
           test -n "$ULTIMATE_SOURCE_SHA"
       - name: Provision Ultimate worker
         run: pnpm tsx scripts/northflank/provision-ultimate-worker.ts --execute

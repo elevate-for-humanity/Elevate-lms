@@ -1,11 +1,59 @@
-create table if not exists public.ultimate_course_builds(id uuid primary key default gen_random_uuid(),course_id uuid not null,profile jsonb not null,status text not null default 'running',current_step text,findings jsonb not null default '[]'::jsonb,created_at timestamptz not null default now(),updated_at timestamptz not null default now());
-create table if not exists public.ultimate_lesson_builds(id uuid primary key default gen_random_uuid(),build_id uuid not null references public.ultimate_course_builds(id) on delete cascade,lesson_key text not null,competency_id text not null,status text not null default 'running',artifacts jsonb not null default '{}'::jsonb,findings jsonb not null default '[]'::jsonb,created_at timestamptz not null default now(),updated_at timestamptz not null default now(),unique(build_id,lesson_key));
-create table if not exists public.ultimate_lesson_steps(id uuid primary key default gen_random_uuid(),lesson_build_id uuid not null references public.ultimate_lesson_builds(id) on delete cascade,step text not null,state text not null default 'pending',artifacts jsonb not null default '{}'::jsonb,findings jsonb not null default '[]'::jsonb,started_at timestamptz,completed_at timestamptz,unique(lesson_build_id,step));
-create table if not exists public.ultimate_requirement_traceability(id uuid primary key default gen_random_uuid(),build_id uuid not null references public.ultimate_course_builds(id) on delete cascade,requirement_id text not null,competency_id text not null,objective_id text not null,instruction_id text,demonstration_id text,guided_practice_id text,independent_practice_id text,assessment_ids jsonb not null default '[]'::jsonb,mastery_rule_id text,unique(build_id,requirement_id,objective_id));
-create index if not exists ultimate_lesson_builds_build_idx on public.ultimate_lesson_builds(build_id);
-create index if not exists ultimate_lesson_steps_lesson_idx on public.ultimate_lesson_steps(lesson_build_id);
-create index if not exists ultimate_traceability_build_idx on public.ultimate_requirement_traceability(build_id);
-alter table public.ultimate_course_builds enable row level security;
-alter table public.ultimate_lesson_builds enable row level security;
-alter table public.ultimate_lesson_steps enable row level security;
-alter table public.ultimate_requirement_traceability enable row level security;
+CREATE TABLE IF NOT EXISTS public.ultimate_course_builds (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  course_id uuid NOT NULL,
+  profile jsonb NOT NULL,
+  status text NOT NULL DEFAULT 'running',
+  current_step text,
+  findings jsonb NOT NULL DEFAULT '[]'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.ultimate_lesson_builds (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  build_id uuid NOT NULL REFERENCES public.ultimate_course_builds(id) ON DELETE CASCADE,
+  lesson_key text NOT NULL,
+  competency_id text NOT NULL,
+  status text NOT NULL DEFAULT 'running',
+  artifacts jsonb NOT NULL DEFAULT '{}'::jsonb,
+  findings jsonb NOT NULL DEFAULT '[]'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE(build_id, lesson_key)
+);
+
+CREATE TABLE IF NOT EXISTS public.ultimate_lesson_steps (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  lesson_build_id uuid NOT NULL REFERENCES public.ultimate_lesson_builds(id) ON DELETE CASCADE,
+  step text NOT NULL,
+  state text NOT NULL DEFAULT 'pending',
+  artifacts jsonb NOT NULL DEFAULT '{}'::jsonb,
+  findings jsonb NOT NULL DEFAULT '[]'::jsonb,
+  started_at timestamptz,
+  completed_at timestamptz,
+  UNIQUE(lesson_build_id, step)
+);
+
+CREATE TABLE IF NOT EXISTS public.ultimate_requirement_traceability (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  build_id uuid NOT NULL REFERENCES public.ultimate_course_builds(id) ON DELETE CASCADE,
+  requirement_id text NOT NULL,
+  competency_id text NOT NULL,
+  objective_id text NOT NULL,
+  instruction_id text,
+  demonstration_id text,
+  guided_practice_id text,
+  independent_practice_id text,
+  assessment_ids jsonb NOT NULL DEFAULT '[]'::jsonb,
+  mastery_rule_id text,
+  UNIQUE(build_id, requirement_id, objective_id)
+);
+
+CREATE INDEX IF NOT EXISTS ultimate_lesson_builds_build_idx ON public.ultimate_lesson_builds(build_id);
+CREATE INDEX IF NOT EXISTS ultimate_lesson_steps_lesson_idx ON public.ultimate_lesson_steps(lesson_build_id);
+CREATE INDEX IF NOT EXISTS ultimate_traceability_build_idx ON public.ultimate_requirement_traceability(build_id);
+
+ALTER TABLE public.ultimate_course_builds ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ultimate_lesson_builds ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ultimate_lesson_steps ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ultimate_requirement_traceability ENABLE ROW LEVEL SECURITY;

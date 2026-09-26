@@ -25,8 +25,9 @@ const requiredProvision = [
   "deploymentPlan:'nf-compute-400'",
   'storageSize:16384',
   'shmSize:1024',
-  'ELEVATE_LLM_URL',
-  'ELEVATE_LLM_SECRET',
+  'CLOUDFLARE_ACCOUNT_ID',
+  'CLOUDFLARE_AI_API_TOKEN',
+  'CLOUDFLARE_AI_MODEL',
   "ULTIMATE_WORKER_ID:'northflank-ultimate-worker'",
 ];
 

@@ -1,32 +1,3 @@
-import { UltimateBuildRunner, type UltimateRunContext } from './build-runner';
-import type { UltimateCredentialProfile } from './types';
-
-export type UltimateCoursePlan = {
-  courseId: string;
-  profile: UltimateCredentialProfile;
-};
-
-export async function runUltimateCourse(
-  plan: UltimateCoursePlan,
-  makeRunner: (competencyId: string) => UltimateBuildRunner,
-) {
-  const lessons = [];
-  for (const competency of plan.profile.competencies) {
-    const context: UltimateRunContext = {
-      buildId: plan.courseId + ':' + competency.id,
-      courseId: plan.courseId,
-      profile: plan.profile,
-      artifacts: {},
-      findings: [],
-    };
-    lessons.push({
-      competencyId: competency.id,
-      result: await makeRunner(competency.id).run(context),
-    });
-  }
-  return {
-    courseId: plan.courseId,
-    lessons,
-    completed: lessons.length === plan.profile.competencies.length,
-  };
-}
+import {UltimateBuildRunner,type UltimateRunContext} from './build-runner';import type {UltimateCredentialProfile} from './types';import type {UltimateBuildStore} from '../persistence/build-store';
+export type UltimateCoursePlan={buildId:string;courseId:string;profile:UltimateCredentialProfile};
+export async function runUltimateCourse(plan:UltimateCoursePlan,makeRunner:(competencyId:string)=>UltimateBuildRunner,store?:UltimateBuildStore){const lessons=[];for(const competency of plan.profile.competencies){const lesson=store?await store.createLesson(plan.buildId,competency.id,competency.id):null;const context:UltimateRunContext={buildId:plan.buildId+':'+competency.id,courseId:plan.courseId,profile:plan.profile,lessonBuildId:lesson?.id,artifacts:{},findings:[],persistStep:lesson?async input=>store!.step(lesson.id,input.step,input.state,input.artifacts??{},input.findings??[]):undefined,persistFinding:undefined};const result=await makeRunner(competency.id).run(context);if(lesson)await store!.finishLesson(lesson.id,result.findings.some(f=>f.severity==='error')?'built_with_findings':'built');lessons.push({competencyId:competency.id,lessonBuildId:lesson?.id,result});}return {buildId:plan.buildId,courseId:plan.courseId,lessons,completed:lessons.length===plan.profile.competencies.length};}

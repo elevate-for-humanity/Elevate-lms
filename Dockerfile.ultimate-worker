@@ -3,6 +3,7 @@ WORKDIR /app
 RUN npm init -y >/dev/null 2>&1 && npm install --omit=dev --no-audit --no-fund @supabase/supabase-js tsx server-only
 COPY workers/ultimate-course-builder.ts ./workers/ultimate-course-builder.ts
 COPY lib/ultimate-course-builder ./lib/ultimate-course-builder
+COPY lib/apprenticeship/registered-program-contract.ts ./lib/apprenticeship/registered-program-contract.ts
 COPY lib/industry/onet.ts ./lib/industry/onet.ts
 COPY lib/industry/careeronestop.ts ./lib/industry/careeronestop.ts
 COPY lib/onet/soc-map.ts ./lib/onet/soc-map.ts

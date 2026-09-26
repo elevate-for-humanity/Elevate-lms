@@ -1,2 +1,2 @@
-2026-09-25 marketing green checkpoint
-remove failing request-aware routes from static prerender
+2026-09-26 marketing root suspense repair
+isolate pathname consumers during Next prerender

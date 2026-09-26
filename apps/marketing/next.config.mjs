@@ -127,19 +127,6 @@ const nextConfig = {
         }),
       );
 
-      config.optimization.splitChunks = {
-        ...config.optimization.splitChunks,
-        cacheGroups: {
-          ...config.optimization.splitChunks?.cacheGroups,
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-            priority: 10,
-            reuseExistingChunk: true,
-          },
-        },
-      };
     }
 
     return config;

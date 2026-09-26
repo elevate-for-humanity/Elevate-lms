@@ -55,9 +55,9 @@ jobs:
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
           test -n "$ELEVATE_LLM_URL"
           test -n "$ELEVATE_LLM_SECRET"
-          test -n "$ELEVATE_LLM_URL"
-          test -n "$ELEVATE_LLM_SECRET"
           test -n "$ULTIMATE_SOURCE_SHA"
+      - name: Verify Ultimate worker parity
+        run: pnpm tsx scripts/verify-ultimate-worker-parity.ts
       - name: Provision Ultimate worker
         run: pnpm tsx scripts/northflank/provision-ultimate-worker.ts --execute
       - name: Trigger or reuse exact worker build

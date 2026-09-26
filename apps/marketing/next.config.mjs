@@ -113,6 +113,11 @@ const nextConfig = {
     // and removes its big-string performance warning. Development keeps cache.
     if (!dev) config.cache = false;
     if (!isServer) {
+      // Resolve shared components and the client renderer against one React copy.
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'react$': require.resolve('react'),
+      };
       config.resolve.fallback = {
         ...(config.resolve.fallback ?? {}),
         buffer: false,
@@ -127,19 +132,6 @@ const nextConfig = {
         }),
       );
 
-      config.optimization.splitChunks = {
-        ...config.optimization.splitChunks,
-        cacheGroups: {
-          ...config.optimization.splitChunks?.cacheGroups,
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-            priority: 10,
-            reuseExistingChunk: true,
-          },
-        },
-      };
     }
 
     return config;

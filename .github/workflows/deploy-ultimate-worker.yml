@@ -24,6 +24,8 @@ jobs:
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       ELEVATE_LLM_URL: ${{ secrets.ELEVATE_LLM_URL }}
       ELEVATE_LLM_SECRET: ${{ secrets.ELEVATE_LLM_SECRET }}
+      ELEVATE_LLM_URL: ${{ secrets.ELEVATE_LLM_URL }}
+      ELEVATE_LLM_SECRET: ${{ secrets.ELEVATE_LLM_SECRET }}
     steps:
       - name: Checkout exact Ultimate source branch
         uses: actions/checkout@v4
@@ -53,6 +55,8 @@ jobs:
           set -euo pipefail
           test -n "$NORTHFLANK_API_TOKEN"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          test -n "$ELEVATE_LLM_URL"
+          test -n "$ELEVATE_LLM_SECRET"
           test -n "$ELEVATE_LLM_URL"
           test -n "$ELEVATE_LLM_SECRET"
           test -n "$ULTIMATE_SOURCE_SHA"

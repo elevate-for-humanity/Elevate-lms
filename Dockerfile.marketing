@@ -130,6 +130,13 @@ COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/standalone \
     ./
 
+# Preserve the pnpm virtual-store graph used by the traced standalone server.
+# Copying one package at a time breaks Next transitive resolution (for example
+# styled-jsx). The standalone tree contains package links; materialize the
+# matching production dependency graph from the builder so those links resolve.
+COPY --from=builder --chown=nextjs:nodejs /workspace/node_modules ./node_modules/
+COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/node_modules ./apps/marketing/node_modules/
+
 COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/static \
     ./apps/marketing/.next/static/
@@ -144,6 +151,8 @@ RUN test -f /app/public/version.json && \
     test -f /app/public/manifest-marketing.json && \
     test -f /app/apps/marketing/public/manifest-marketing.json && \
     test -f /app/apps/marketing/server.js && \
+    test -f /app/apps/marketing/node_modules/next/dist/server/next.js && \
+    node -e "require.resolve('styled-jsx/style',{paths:['/app/apps/marketing']})" && \
     test -s /app/public/data/hero-banners.json && \
     test -s /app/apps/marketing/public/data/hero-banners.json && \
     test -s /app/public/images/partners/razors-image-storefront.webp && \

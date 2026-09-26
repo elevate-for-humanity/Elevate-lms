@@ -19,26 +19,24 @@ jobs:
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
       NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID: elevate-ultimate-worker
-      NORTHFLANK_GIT_BRANCH: ultimate-course-builder-production
+      NORTHFLANK_GIT_BRANCH: main
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      ELEVATE_LLM_URL: ${{ secrets.ELEVATE_LLM_URL }}
-      ELEVATE_LLM_SECRET: ${{ secrets.ELEVATE_LLM_SECRET }}
       ELEVATE_LLM_URL: ${{ secrets.ELEVATE_LLM_URL }}
       ELEVATE_LLM_SECRET: ${{ secrets.ELEVATE_LLM_SECRET }}
     steps:
       - name: Checkout exact Ultimate source branch
         uses: actions/checkout@v4
         with:
-          ref: ultimate-course-builder-production
+          ref: main
           fetch-depth: 0
       - name: Resolve exact Ultimate branch SHA
         id: source
         shell: bash
         run: |
           set -euo pipefail
-          git fetch origin ultimate-course-builder-production
-          sha="$(git rev-parse origin/ultimate-course-builder-production)"
+          git fetch origin main
+          sha="$(git rev-parse origin/main)"
           test -n "$sha"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
           echo "ULTIMATE_SOURCE_SHA=$sha" >> "$GITHUB_ENV"

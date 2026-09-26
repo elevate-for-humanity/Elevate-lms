@@ -9,7 +9,7 @@ RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 COPY . .
 FROM base AS runner
 ENV NODE_ENV=production
-RUN apt-get update && apt-get install -y --no-install-recommends chromium espeak-ng ffmpeg ca-certificates fontconfig fonts-dejavu-core && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends espeak-ng ffmpeg ca-certificates fontconfig fonts-dejavu-core && rm -rf /var/lib/apt/lists/*
 WORKDIR /workspace
 COPY --from=base /workspace /workspace
 CMD ["pnpm","exec","tsx","workers/ultimate-course-builder.ts"]

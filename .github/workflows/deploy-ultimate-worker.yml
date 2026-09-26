@@ -22,8 +22,6 @@ jobs:
       NORTHFLANK_GIT_BRANCH: main
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      ELEVATE_LLM_URL: ${{ secrets.ELEVATE_LLM_URL }}
-      ELEVATE_LLM_SECRET: ${{ secrets.ELEVATE_LLM_SECRET }}
     steps:
       - name: Checkout exact Ultimate source branch
         uses: actions/checkout@v4
@@ -53,9 +51,14 @@ jobs:
           set -euo pipefail
           test -n "$NORTHFLANK_API_TOKEN"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          test -n "$NORTHFLANK_API_TOKEN"
+          test -n "$ULTIMATE_SOURCE_SHA"
+      - name: Load canonical course LLM configuration from Northflank
+        run: node scripts/northflank/export-course-llm-env.mjs
+      - name: Require canonical course LLM configuration
+        run: |
           test -n "$ELEVATE_LLM_URL"
           test -n "$ELEVATE_LLM_SECRET"
-          test -n "$ULTIMATE_SOURCE_SHA"
       - name: Verify Ultimate worker parity
         run: pnpm tsx scripts/verify-ultimate-worker-parity.ts
       - name: Provision Ultimate worker

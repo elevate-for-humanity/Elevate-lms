@@ -59,7 +59,7 @@ concurrency:
   group: northflank-marketing-deploy
   # Never terminate an active production deployment when another commit lands.
   # GitHub still keeps only the newest pending run for this concurrency group.
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   EXPECTED_SHA: ${{ github.sha }}

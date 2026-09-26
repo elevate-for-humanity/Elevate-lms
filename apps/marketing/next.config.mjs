@@ -113,6 +113,11 @@ const nextConfig = {
     // and removes its big-string performance warning. Development keeps cache.
     if (!dev) config.cache = false;
     if (!isServer) {
+      // Resolve shared components and the client renderer against one React copy.
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'react$': require.resolve('react'),
+      };
       config.resolve.fallback = {
         ...(config.resolve.fallback ?? {}),
         buffer: false,

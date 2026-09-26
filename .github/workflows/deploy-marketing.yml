@@ -58,8 +58,9 @@ permissions:
 concurrency:
   group: northflank-marketing-deploy
   # Never terminate an active production deployment when another commit lands.
-  # GitHub still keeps only the newest pending run for this concurrency group.
-  cancel-in-progress: true
+  # Keep the active release alive through build, deployment, SHA verification, and live smoke checks.
+  # GitHub may replace an older pending run with the newest pending run, but it must not kill the running release.
+  cancel-in-progress: false
 
 env:
   EXPECTED_SHA: ${{ github.sha }}

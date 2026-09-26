@@ -32,6 +32,7 @@ export const runtime = 'nodejs';
 function repo()   { return process.env.GITHUB_REPO   ?? 'elevate-for-humanity/Elevate-lms'; }
 function branch() { return process.env.GITHUB_BRANCH ?? 'main'; }
 const GH_API = 'https://api.github.com';
+const RETIRED_COURSE_WORKFLOWS=new Set(['dev-studio-course-builder.yml','build-cosmetology-course.yml','regenerate-barber-cosmetology.yml','build-esb-acceptance.yml','business-draft-bootstrap.yml']);
 
 /**
  * Resolve a secret: env var first, then platform_secrets table fallback.
@@ -89,7 +90,7 @@ async function listDispatchableWorkflows(): Promise<GHWorkflow[]> {
     );
     if (!res.ok) throw new Error(`GitHub API ${res.status}: ${(await res.text()).slice(0, 200)}`);
     const data = await res.json() as { workflows: GHWorkflow[]; total_count: number };
-    all.push(...data.workflows);
+    all.push(...data.workflows.filter(w=>!RETIRED_COURSE_WORKFLOWS.has(w.path.replace('.github/workflows/',''))));
     if (all.length >= data.total_count) break;
     page++;
   }
@@ -181,6 +182,7 @@ export async function POST(request: NextRequest) {
 
   // Normalise to filename
   const workflowFile = workflowAliases[workflowRaw] ?? (workflowRaw.endsWith('.yml') ? workflowRaw : `${workflowRaw}.yml`);
+  if(RETIRED_COURSE_WORKFLOWS.has(workflowFile))return safeError(`Workflow "${workflowFile}" is retired. Course production is owned by Ultimate Course Builder through Dev Studio.`,409);
 
   // Validate the workflow exists and is active in the repo
   try {

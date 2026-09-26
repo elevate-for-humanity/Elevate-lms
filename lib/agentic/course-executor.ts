@@ -1,14 +1,7 @@
 import 'server-only';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { loadBlueprintWithProgram } from '@/lib/course-factory/blueprint-loader';
-import { getCourseMediaState } from '@/lib/course-factory/media-manager';
-import { courseBuilderController } from '@/lib/devstudio/course-builder-controller';
-import { queueCourseMedia } from '@/lib/course-builder/orchestrator';
-import {
-  publishPersistedCourseWithClient,
-  repairPersistedCourseAcceptanceWithClient,
-} from '@/lib/course-builder/persisted-publish-service';
+import {DevStudioUltimateCourseControl} from '@/lib/devstudio/ultimate-course-control';
 
 interface AgenticTaskRow {
   id: string;
@@ -325,50 +318,7 @@ export async function processCourseAgenticTask(input: {
         return;
       }
     }
-    const result = await courseBuilderController({
-      programId: target.programId ?? undefined,
-      programSlug: target.programSlug ?? undefined,
-      mode: target.courseId ? 'missing-only' : 'replace',
-      contentSource: 'ai',
-      videoMode: 'off',
-      ...buildIntent,
-    });
-    if (!result.ok || !result.courseId) {
-      throw new Error(
-        `Course Builder failed: ${(result.errors ?? result.warnings ?? []).join('; ') || result.status || 'unknown error'}`,
-      );
-    }
-    await db
-      .from('agentic_build_projects')
-      .update({
-        target_id: result.courseId,
-        metadata: {
-          ...(project.metadata ?? {}),
-          programId: target.programId,
-          programSlug: target.programSlug,
-          courseId: result.courseId,
-          moduleCount: result.moduleCount,
-          lessonCount: result.lessonCount,
-        },
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', project.id);
-    await updateTask(
-      task,
-      project,
-      'completed',
-      {
-        course_id: result.courseId,
-        course_slug: result.courseSlug,
-        module_count: result.moduleCount,
-        lesson_count: result.lessonCount,
-        assessments_generated: result.assessmentsGenerated,
-        completion_ratio: result.completionRatio,
-        warnings: result.warnings ?? [],
-      },
-      `Canonical Course Builder persisted ${result.moduleCount ?? 0} modules and ${result.lessonCount ?? 0} lessons.`,
-    );
-    return;
+    throw new Error('Legacy instructional generation is retired. Create/queue the canonical Ultimate build through DevStudioUltimateCourseControl.');
   }
 
   const courseId = target.courseId ?? metadataValue(project.metadata, 'courseId', 'course_id');
@@ -418,129 +368,11 @@ export async function processCourseAgenticTask(input: {
     return;
   }
 
-  if (task.worker === 'media-director') {
-    const queued = await queueCourseMedia({ courseId: target.courseId, onlyMissing: true });
-    const media = await getCourseMediaState(target.courseId, { verifyUrls: true });
-    if (!media.completePackage) {
-      await updateTask(
-        task,
-        project,
-        'queued',
-        {
-          course_id: target.courseId,
-          ...queued,
-          ...media,
-          note: 'Queued is not complete. This task remains queued until every required canonical media asset is complete and playable.',
-        },
-        `Media pending: ${media.complete}/${media.expectedTotal} canonical assets complete; ${media.failed} failed; ${media.queued} queued; ${media.rendering} rendering.`,
-      );
-      return;
-    }
-    await updateTask(
-      task,
-      project,
-      'completed',
-      { course_id: target.courseId, ...queued, ...media },
-      'All required canonical course media is persisted and playable.',
-    );
-    return;
-  }
+  if (task.worker === 'media-director') { const control=new DevStudioUltimateCourseControl(db as any); const buildId=metadataValue(project.metadata,'ultimateBuildId','ultimate_build_id'); if(!buildId)throw new Error('Ultimate build identity required for media stage status'); const state=await control.status(buildId); await updateTask(task,project,'completed',{build_id:buildId,ultimate:state},'Ultimate owns media acquisition, narration, rendering and media QA inside the build.'); return; }
 
-  if (task.worker === 'compliance-qa') {
-    const media = await getCourseMediaState(target.courseId, { verifyUrls: true });
-    if (!media.completePackage) {
-      await updateTask(
-        task,
-        project,
-        'queued',
-        { course_id: target.courseId, ...media },
-        'QA is waiting for canonical Course Factory media readiness.',
-      );
-      return;
-    }
-    const health = await repairPersistedCourseAcceptanceWithClient({
-      db,
-      courseId: target.courseId,
-    });
-    if (health.pass) {
-      await updateTask(
-        task,
-        project,
-        'completed',
-        {
-          course_id: target.courseId,
-          procurement: health.metrics,
-          media,
-          blocking_issues: [],
-          repairs: health.repairs,
-        },
-        'Course passed canonical procurement, governance, accessibility, instructional, and media readiness checks.',
-      );
-      return;
-    }
-    const humanReviewOnly = health.blocking_issues.every(
-      (issue) => issue.includes('human sign-off') || issue.includes('human-approved'),
-    );
-    if (humanReviewOnly) {
-      await updateTask(
-        task,
-        project,
-        'queued',
-        {
-          course_id: target.courseId,
-          procurement: health.metrics,
-          media,
-          blocking_issues: health.blocking_issues,
-          repairs: health.repairs,
-        },
-        'Automated QA passed; publication is waiting for authorized human course and lesson review.',
-      );
-      return;
-    }
-    throw new Error(`Automated course repair exhausted: ${health.blocking_issues.join(' | ')}`);
-  }
+  if (task.worker === 'compliance-qa') { const control=new DevStudioUltimateCourseControl(db as any); const buildId=metadataValue(project.metadata,'ultimateBuildId','ultimate_build_id'); if(!buildId)throw new Error('Ultimate build identity required for QA'); const state=await control.status(buildId); const blocked=(state.lessons??[]).some((x:any)=>x.status==='built_with_findings'); await updateTask(task,project,blocked?'waiting_review':'completed',{build_id:buildId,ultimate:state},blocked?'Ultimate QA has blocking findings requiring review.':'Ultimate stage evidence passed.'); return; }
 
-  if (task.worker === 'publisher') {
-    if (!project.user_id)
-      throw new Error(
-        'Canonical publication requires an authenticated initiating identity for the audit trail.',
-      );
-    const media = await getCourseMediaState(target.courseId, { verifyUrls: true });
-    if (!media.completePackage) {
-      throw new Error(
-        `Publication blocked: canonical media package incomplete (${media.complete}/${media.expectedTotal} complete, ${media.failed} failed, ${media.queued} queued, ${media.rendering} rendering).`,
-      );
-    }
-    const result = await publishPersistedCourseWithClient({
-      db,
-      courseId: target.courseId,
-      actorId: project.user_id,
-      label: 'Agentic Course Builder publication',
-    });
-    if (!result.ok) {
-      throw new Error(
-        `Publication blocked: ${(result.blocking_issues ?? []).join(' | ') || result.error}`,
-      );
-    }
-    await updateTask(
-      task,
-      project,
-      'completed',
-      {
-        course_id: target.courseId,
-        procurement_gate: result.procurement_gate,
-        media,
-        published: true,
-      },
-      'Canonical course publication completed after deterministic checks and authorized human approval.',
-    );
-    await db
-      .from('agentic_build_runs')
-      .update({ status: 'completed', completed_at: new Date().toISOString(), error: null })
-      .eq('id', run.id);
-    await db.from('agentic_build_projects').update({ status: 'completed' }).eq('id', project.id);
-    return;
-  }
+  if (task.worker === 'publisher') { throw new Error('Publication is owned by UltimateLmsPublisher after Ultimate release evidence is complete.'); }
 
   throw new Error(`Unsupported course agentic worker: ${task.worker}`);
 }

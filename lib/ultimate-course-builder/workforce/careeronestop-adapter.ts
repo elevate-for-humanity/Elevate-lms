@@ -1,0 +1,2 @@
+export interface CareerOneStopProvider{load(socCode:string,title:string,state?:string):Promise<{job_postings_count:number;local_median_wage?:number;certifications?:Array<{name:string;organization:string}>;top_employers?:string[]}>}
+export class UltimateCareerOneStopAdapter{constructor(private provider:CareerOneStopProvider){}async load(socCode:string,title:string,state?:string){const x=await this.provider.load(socCode,title,state);return {...x,socCode,title,source:'CareerOneStop'};}}

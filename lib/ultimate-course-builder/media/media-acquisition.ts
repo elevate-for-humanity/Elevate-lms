@@ -1,0 +1,3 @@
+import type {TeachingVisualRequirement,UltimateMediaCandidate} from './media-director';
+export interface UltimateMediaSource{search(requirement:TeachingVisualRequirement):Promise<UltimateMediaCandidate[]>;acquire(candidate:UltimateMediaCandidate):Promise<UltimateMediaCandidate>}
+export async function acquireTeachingMedia(requirement:TeachingVisualRequirement,sources:UltimateMediaSource[]){const candidates:UltimateMediaCandidate[]=[];for(const source of sources)candidates.push(...await source.search(requirement));const ranked=candidates.filter(x=>x.licenseVerified).sort((a,b)=>b.matchScore-a.matchScore);const winner=ranked.find(x=>x.matchScore>=.9);return winner?await sources.find(async()=>true)?.acquire(winner):null;}

@@ -1,0 +1,2 @@
+import type {UltimateAssessmentItem} from './assessment-engine';
+export function validateQuestion(q:UltimateAssessmentItem){const failures:string[]=[];if(!q.objectiveIds.length)failures.push('OBJECTIVE_MAPPING_REQUIRED');if(!q.prompt.trim())failures.push('PROMPT_REQUIRED');if(!q.explanation.trim())failures.push('EXPLANATION_REQUIRED');if(q.type==='multiple_choice'&&(!q.choices||q.choices.length!==4))failures.push('FOUR_CHOICES_REQUIRED');return {pass:failures.length===0,failures};}

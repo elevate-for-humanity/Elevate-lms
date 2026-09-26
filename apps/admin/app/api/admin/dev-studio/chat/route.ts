@@ -452,9 +452,9 @@ const TOOLS: any[] = [
     function: {
       name: 'build_course',
       description:
-        'Queue durable generation, validation, persistence, governance normalization, and automated quality-gated publishing through the canonical Course Factory. ' +
+        'Queue durable generation through the Ultimate Course Builder 20-stage production pipeline, including instructional depth, media, narration, assessment, QA, repair, and LMS release evidence. ' +
         'Use when the user says "build a course", "create a course", "make a course about", or "generate a course". ' +
-        'Returns a resumable job ID immediately; duplicate active builds for the same canonical target are suppressed.',
+        'Returns a durable Ultimate build/job identity; the Northflank Ultimate worker claims and checkpoints the build.',
       parameters: {
         type: 'object',
         properties: {
@@ -491,7 +491,7 @@ const TOOLS: any[] = [
     function: {
       name: 'generate_videos',
       description:
-        'Start video generation for a saved course. Uses TTS narration (OpenAI) + Pexels b-roll + ffmpeg pipeline. ' +
+        'Inspect or repair the Ultimate course media stages. Media, Cloudflare narration, licensed Envato assets, Remotion rendering, captions and QA are owned by the Ultimate pipeline; this is not a separate video-generation authority. ' +
         'Use when user says "generate videos", "make videos for this course", "add videos", etc.',
       parameters: {
         type: 'object',

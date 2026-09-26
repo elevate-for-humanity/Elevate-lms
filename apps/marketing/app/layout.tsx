@@ -5,6 +5,7 @@
 import './client-polyfills';
 
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import './globals.css';
 import './layout.css';
 import '../../../styles/contrast-guardrails.css';
@@ -137,11 +138,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MarketingPwaClient />
         <ChunkRecovery />
         <GoogleAnalytics />
-        <FacebookPixel />
-        <FirstPartyTraffic />
+        <Suspense fallback={null}><FacebookPixel /></Suspense>
+        <Suspense fallback={null}><FirstPartyTraffic /></Suspense>
         <AssociateFormLabels />
-        <SpeechCanceller />
+        <Suspense fallback={null}><SpeechCanceller /></Suspense>
         <I18nProvider>
+          <Suspense fallback={<div id="main-content" className="min-h-dvh">{children}</div>}>
           <MarketingChromeBoundary
             header={<Header />}
             footer={<SiteFooter />}
@@ -149,9 +151,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           >
             {children}
           </MarketingChromeBoundary>
+        </Suspense>
         </I18nProvider>
         <MediaPlaybackCoordinator />
-        <ScrollNarrator />
+        <Suspense fallback={null}><ScrollNarrator /></Suspense>
         <CookieConsent />
       </body>
     </html>

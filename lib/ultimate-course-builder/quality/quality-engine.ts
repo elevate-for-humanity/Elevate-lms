@@ -1,0 +1,2 @@
+import {evaluateUltimateLesson} from './lesson-quality';import {evaluateNarration,type NarrationMetrics} from './narration-quality';import {evaluateLearnerRunthrough} from './learner-runthrough';
+export function runUltimateQuality(input:{lesson:any;narration:NarrationMetrics;learner:any}){const mediaInstruction=evaluateUltimateLesson(input.lesson);const narration=evaluateNarration(input.narration);const learner=evaluateLearnerRunthrough(input.learner);return {pass:mediaInstruction.pass&&narration.pass&&learner.pass,mediaInstruction,narration,learner};}

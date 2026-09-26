@@ -1,0 +1,3 @@
+import type {UltimatePersistencePort,UltimateWorkforcePort,UltimateCredentialPort,UltimateMediaPort,UltimateNarrationPort,UltimateRenderPort,UltimateAssessmentPort} from './ports';
+export interface UltimateRuntime{persistence:UltimatePersistencePort;workforce:UltimateWorkforcePort;credential:UltimateCredentialPort;media:UltimateMediaPort;narration:UltimateNarrationPort;renderer:UltimateRenderPort;assessment:UltimateAssessmentPort}
+export function assertUltimateRuntime(r:Partial<UltimateRuntime>):asserts r is UltimateRuntime{for(const key of ['persistence','workforce','credential','media','narration','renderer','assessment'] as const)if(!r[key])throw new Error(`ULTIMATE_RUNTIME_MISSING:${key}`);}

@@ -1,13 +1,17 @@
 name: Deploy Ultimate Course Builder Worker
+
 on:
   issues:
     types: [opened, reopened]
+
 permissions:
   contents: read
   issues: write
+
 concurrency:
   group: ultimate-course-builder-worker-deploy
   cancel-in-progress: false
+
 jobs:
   deploy:
     if: github.event.issue.title == 'DEPLOY ULTIMATE COURSE BUILDER WORKER'
@@ -19,61 +23,91 @@ jobs:
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
       NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID: elevate-ultimate-worker
-      NORTHFLANK_GIT_BRANCH: main
+      NORTHFLANK_GIT_BRANCH: ultimate-course-builder-production
+      NEXT_PUBLIC_ADMIN_URL: https://admin.elevateforhumanity.org
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       ELEVATE_LLM_URL: ${{ secrets.ELEVATE_LLM_URL }}
       ELEVATE_LLM_SECRET: ${{ secrets.ELEVATE_LLM_SECRET }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
     steps:
       - name: Checkout exact Ultimate source branch
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ultimate-course-builder-production
           fetch-depth: 0
+          clean: true
+
       - name: Resolve exact Ultimate branch SHA
         id: source
         shell: bash
         run: |
           set -euo pipefail
-          git fetch origin main
-          sha="$(git rev-parse origin/main)"
+          sha="$(git rev-parse HEAD)"
           test -n "$sha"
+          test "$(git branch --show-current)" = "ultimate-course-builder-production"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
           echo "ULTIMATE_SOURCE_SHA=$sha" >> "$GITHUB_ENV"
           echo "Deploying Ultimate source SHA $sha"
+
       - uses: pnpm/action-setup@v4
-        with: { version: 10.28.2 }
+        with:
+          version: 10.28.2
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
+
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
       - name: Require deployment credentials
+        shell: bash
         run: |
           set -euo pipefail
           test -n "$NORTHFLANK_API_TOKEN"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
           test -n "$ELEVATE_LLM_URL"
           test -n "$ELEVATE_LLM_SECRET"
-          test -n "$ELEVATE_LLM_URL"
-          test -n "$ELEVATE_LLM_SECRET"
+          test -n "$CRON_SECRET"
           test -n "$ULTIMATE_SOURCE_SHA"
+          test -f Dockerfile.ultimate-worker
+          test -f scripts/northflank/provision-ultimate-worker.ts
+          test -f workers/ultimate-course-builder.ts
+
+      - name: Validate minimal worker source
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -Fq "@/lib/video/edge-tts" lib/ultimate-course-builder/adapters/platform-narration.ts
+          ! grep -Fq "@/lib/video/remotion-render" lib/ultimate-course-builder/adapters/platform-renderer.ts
+          ! grep -Fq "next: { revalidate:" lib/industry/onet.ts
+          ! grep -Fq "next: { revalidate:" lib/industry/careeronestop.ts
+          grep -Fq "ultimate-worker-import-graph-ok" Dockerfile.ultimate-worker
+
       - name: Provision Ultimate worker
         run: pnpm tsx scripts/northflank/provision-ultimate-worker.ts --execute
+
       - name: Trigger or reuse exact worker build
         id: build
         env:
           GITHUB_SHA: ${{ steps.source.outputs.sha }}
           BUILD_SHA: ${{ steps.source.outputs.sha }}
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID"
+
       - name: Require concrete build id
         run: test -n "${{ steps.build.outputs.build_id }}"
+
       - name: Wait for exact worker build
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --timeout-ms 2400000
+
       - name: Verify exact worker build SHA
         run: pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --sha "${{ steps.source.outputs.sha }}"
+
       - name: Deploy exact worker build
         run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --sha "${{ steps.source.outputs.sha }}"
+
       - name: Verify Introduction job is claimed
         shell: bash
         run: |

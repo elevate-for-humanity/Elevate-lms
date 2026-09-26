@@ -23,10 +23,22 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout exact Ultimate source branch
+        uses: actions/checkout@v4
         with:
           ref: ultimate-course-builder-production
-          fetch-depth: 1
+          fetch-depth: 0
+      - name: Resolve exact Ultimate branch SHA
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin ultimate-course-builder-production
+          sha="$(git rev-parse origin/ultimate-course-builder-production)"
+          test -n "$sha"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "ULTIMATE_SOURCE_SHA=$sha" >> "$GITHUB_ENV"
+          echo "Deploying Ultimate source SHA $sha"
       - uses: pnpm/action-setup@v4
         with: { version: 10.28.2 }
       - uses: actions/setup-node@v4
@@ -36,26 +48,36 @@ jobs:
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Require deployment credentials
         run: |
+          set -euo pipefail
           test -n "$NORTHFLANK_API_TOKEN"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          test -n "$ULTIMATE_SOURCE_SHA"
       - name: Provision Ultimate worker
         run: pnpm tsx scripts/northflank/provision-ultimate-worker.ts --execute
-      - name: Trigger worker build
+      - name: Trigger or reuse exact worker build
         id: build
+        env:
+          GITHUB_SHA: ${{ steps.source.outputs.sha }}
+          BUILD_SHA: ${{ steps.source.outputs.sha }}
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID"
-      - name: Require build id
+      - name: Require concrete build id
         run: test -n "${{ steps.build.outputs.build_id }}"
-      - name: Wait for build
+      - name: Wait for exact worker build
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --timeout-ms 2400000
+      - name: Verify exact worker build SHA
+        run: pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --sha "${{ steps.source.outputs.sha }}"
       - name: Deploy exact worker build
-        run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}"
-      - name: Verify queue claim
+        run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --sha "${{ steps.source.outputs.sha }}"
+      - name: Verify Introduction job is claimed
         shell: bash
         run: |
-          for attempt in $(seq 1 60); do
-            state="$(curl -fsS "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/ultimate_build_jobs?id=eq.eb37bbfd-ada4-4e57-8e60-419672e71724&select=status,attempts,lease_owner" -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" || true)"
+          set -euo pipefail
+          for attempt in $(seq 1 90); do
+            state="$(curl -fsS "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/ultimate_build_jobs?id=eq.eb37bbfd-ada4-4e57-8e60-419672e71724&select=status,attempts,lease_owner,last_error" -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" || true)"
             echo "$state"
             echo "$state" | grep -Eq '"status":"(running|completed)"' && exit 0
+            echo "$state" | grep -Eq '"status":"failed"' && exit 1
             sleep 10
           done
+          echo "::error::Ultimate worker did not claim Introduction job"
           exit 1

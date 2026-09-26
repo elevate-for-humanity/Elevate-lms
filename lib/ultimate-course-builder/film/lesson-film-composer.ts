@@ -1,0 +1,3 @@
+export interface FilmShot{id:string;cueId:string;src:string;start:number;end:number;transition:'cut'|'crossfade'|'fade';loop:false;overlays?:Array<{type:'label'|'arrow'|'callout'|'diagram';text:string}>}
+export interface UltimateLessonFilmPlan{lessonId:string;narrationTrack:string;shots:FilmShot[];captions:boolean;continuousNarration:true}
+export function validateFilmPlan(p:UltimateLessonFilmPlan){const errors:string[]=[];if(!p.narrationTrack)errors.push('narration');if(p.shots.length<6)errors.push('shots');if(p.shots.some(s=>s.loop!==false))errors.push('loop');return {pass:errors.length===0,errors};}

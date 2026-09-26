@@ -237,6 +237,39 @@ async function printBuildLogs(
   }
 }
 
+async function printRuntimeLogs(
+  projectId: string,
+  serviceId: string,
+  lineLimit = 200,
+): Promise<void> {
+  const params = new URLSearchParams({
+    type: 'runtime',
+    queryType: 'range',
+    endTime: new Date().toISOString(),
+    duration: '1800',
+    lineLimit: String(lineLimit),
+    direction: 'backward',
+  });
+
+  try {
+    const logs = await nfFetch<BuildLogLine[]>(
+      projectApiPath(projectId, `/services/${serviceId}/logs?${params.toString()}`),
+    );
+    if (!Array.isArray(logs) || logs.length === 0) {
+      console.error(`No Northflank runtime logs returned for ${serviceId}.`);
+      return;
+    }
+    console.error(`Last ${logs.length} Northflank runtime log lines for ${serviceId}:`);
+    for (const entry of logs) {
+      const timestamp = entry.ts ? `${entry.ts} ` : '';
+      const container = entry.containerId ? `[${entry.containerId}] ` : '';
+      console.error(redactText(`${timestamp}${container}${entry.log ?? ''}`));
+    }
+  } catch (error) {
+    console.error(`Could not fetch Northflank runtime logs for ${serviceId}: ${formatError(error)}`);
+  }
+}
+
 async function printFailureDiagnostics(
   projectId: string,
   serviceId: string,
@@ -454,11 +487,13 @@ async function main() {
           await new Promise((r) => setTimeout(r, 15000));
         }
         console.error(`${serviceId}: HTTP health check timeout after ${Math.round((Date.now() - start) / 1000)}s`);
+        await printRuntimeLogs(projectId, serviceId);
         process.exit(1);
       }
 
       if (DEPLOY_FAILURE_STATUSES.has(deploy ?? '')) {
         console.error(`${serviceId}: deployment failed (${deploy})`);
+        await printRuntimeLogs(projectId, serviceId);
         process.exit(1);
       }
     }
@@ -467,6 +502,7 @@ async function main() {
   }
 
   console.error(`${serviceId}: timeout after ${timeoutMs}ms`);
+  await printRuntimeLogs(projectId, serviceId);
   if (lastBuild) {
     console.error('Last build:', JSON.stringify(lastBuild, null, 2));
   }

@@ -1,0 +1,2 @@
+import {renderStoryboardVideo} from '@/lib/video/remotion-render';import type {UltimateRenderPort} from '../core/ports';
+export class UltimatePlatformRenderer implements UltimateRenderPort{async render(input:any){const storyboard=input.artifacts?.synchronization?.timeline?.scenes??input.artifacts?.scene_construction?.scenes;if(!storyboard)throw new Error('ULTIMATE_RENDER_STORYBOARD_REQUIRED');return renderStoryboardVideo({lessonId:String(input.lessonId),courseTitle:String(input.courseTitle??'Ultimate Course'),storyboard:storyboard as any});}}

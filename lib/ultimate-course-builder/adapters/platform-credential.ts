@@ -1,0 +1,2 @@
+import type {SupabaseClient} from '@supabase/supabase-js';import type {UltimateCredentialPort} from '../core/ports';
+export class UltimatePlatformCredential implements UltimateCredentialPort{constructor(private db:SupabaseClient){}async load(profileId:string){const {data,error}=await this.db.from('credential_registry').select('*').or(`id.eq.${profileId},abbreviation.eq.${profileId},name.eq.${profileId}`).limit(1).maybeSingle();if(error)throw error;return data??{id:profileId,status:'profile-provided-by-build'};}}

@@ -53,13 +53,8 @@ jobs:
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
           test -n "$NORTHFLANK_API_TOKEN"
           test -n "$ULTIMATE_SOURCE_SHA"
-      - name: Load canonical Cloudflare AI configuration from Northflank
-        run: node scripts/northflank/export-ultimate-cloudflare-env.mjs
-      - name: Require canonical Cloudflare AI configuration
-        run: |
-          test -n "$CLOUDFLARE_ACCOUNT_ID"
-          test -n "$CLOUDFLARE_AI_API_TOKEN"
-          test -n "$CLOUDFLARE_AI_MODEL"
+      - name: Attach canonical production runtime secrets to Ultimate worker
+        run: pnpm tsx scripts/northflank/attach-ultimate-secret-group.ts
       - name: Verify Ultimate worker parity
         run: pnpm tsx scripts/verify-ultimate-worker-parity.ts
       - name: Provision Ultimate worker

@@ -14,7 +14,7 @@ for(const signal of ['SIGTERM','SIGINT'] as const)process.on(signal,()=>{stoppin
 async function main(){
   console.log('[UltimateWorker] polling loop started',{workerId,pollMs});
   while(!stopping){
-    const result=await processUltimateJob(db,workerId);
+    let result;try{result=await processUltimateJob(db,workerId);}catch(error){console.error('[UltimateWorker] poll error',error);await new Promise(resolve=>setTimeout(resolve,pollMs));continue;}
     if(result.claimed)console.log('[UltimateWorker] processed',result);
     else await new Promise(resolve=>setTimeout(resolve,pollMs));
   }

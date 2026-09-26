@@ -26,6 +26,8 @@ const requiredProvision = [
   'storageSize:2048',
   'cacheStorageSize:10240',
   'shmSize:64',
+  "configType:'customEntrypointCustomCommand'",
+  'workers/ultimate-course-builder.ts',
   "AI_PROVIDER:'cloudflare'",
   "ULTIMATE_WORKER_ID:'northflank-ultimate-worker'",
 ];

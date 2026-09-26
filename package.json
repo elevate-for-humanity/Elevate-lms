@@ -405,7 +405,8 @@
     "verify:native": "pnpm --filter @elevate/admin exec node scripts/check-native-modules.cjs",
     "verify:repo": "node scripts/verify-repository-integrity.cjs",
     "verify:all": "pnpm run lockfile:check && pnpm run verify:repo && pnpm run typecheck:all && pnpm run build:all",
-    "audit:marketing-images": "node scripts/audit-marketing-images.mjs"
+    "audit:marketing-images": "node scripts/audit-marketing-images.mjs",
+    "verify:ultimate": "node scripts/verify-ultimate-clean-room.mjs && node scripts/verify-ultimate-section-1.mjs"
   },
   "overrides": {
     "inflight": "npm:lru-cache@^10.0.0"

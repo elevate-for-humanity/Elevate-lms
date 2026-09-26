@@ -18,7 +18,7 @@
 import 'server-only';
 
 // Canonical SOC map lives in lib/onet/soc-map.ts — import from there for program→SOC lookups.
-export { PROGRAM_SOC_CODES } from '@/lib/onet/soc-map';
+export { PROGRAM_SOC_CODES } from '../onet/soc-map';
 
 const BASE = 'https://services.onetcenter.org/ws';
 

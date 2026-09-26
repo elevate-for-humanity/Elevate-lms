@@ -1,3 +1,4 @@
 2026-09-26 marketing root suspense repair
 isolate pathname consumers during Next prerender
 Marketing known-good build constraints restored 2026-09-26
+Verify store prerender repair 2026-09-26

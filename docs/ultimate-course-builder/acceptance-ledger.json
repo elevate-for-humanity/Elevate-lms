@@ -8,21 +8,31 @@
     "FAILED",
     "VERIFIED"
   ],
-  "updatedAt": "2026-09-26T13:38:45.703Z",
+  "updatedAt": "2026-09-26T13:42:14.487Z",
   "areas": {
     "A_repository_ci": {
       "state": "IN_PROGRESS",
-      "evidence": [],
+      "evidence": [
+        "56b14b16e24d7abeea6bcd75f9e4e7f2082cc00c: CourseBlueprint parse/lint root fix",
+        "877a0bfe1507ec3518c07cb45c158c86219082a7: marketing standalone Next runtime packaging root fix"
+      ],
       "blockers": []
     },
     "B_persistence_integrity": {
-      "state": "NOT_STARTED",
-      "evidence": [],
+      "state": "IN_PROGRESS",
+      "evidence": [
+        "c0c98b77457f00987d689d85192ab71580f4d97e: referential integrity migration",
+        "e147f355143197fd6a5a201b3f07dd1f1e54c561: referential integrity architecture guard",
+        "29acbe18cd98f7ee3b80a123cb5229a779fc729f: worker writes stage outputs to versioned artifact store"
+      ],
       "blockers": []
     },
     "C_durable_execution": {
-      "state": "NOT_STARTED",
-      "evidence": [],
+      "state": "IN_PROGRESS",
+      "evidence": [
+        "6c12322762a21fcd94ee97635fc6dbcaf5c0ae94: queue lease/heartbeat/recovery",
+        "ebd36dc18820ccab620cd99d45ad38da3c859269: checkpoint resume"
+      ],
       "blockers": []
     },
     "D_universal_authoring": {

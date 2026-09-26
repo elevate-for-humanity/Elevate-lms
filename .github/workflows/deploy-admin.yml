@@ -1,6 +1,6 @@
 name: Deploy Admin
 
-# Deployment checkpoint: instructional Course Builder acceptance release
+# Deployment checkpoint: instructional Course Builder gate migration release
 
 on:
   push:

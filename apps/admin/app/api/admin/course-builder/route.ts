@@ -93,7 +93,8 @@ type CourseBuilderAction =
   | 'publish'
   | 'publish-persisted'
   | 'repair'
-  | 'generate-missing';
+  | 'generate-missing'
+  | 'start-existing';
 
 function toPipelineStage(stage: FactoryStage): PipelineStage {
   if (stage === 'enrich') return 'lessons';
@@ -319,7 +320,7 @@ export async function POST(req: NextRequest) {
 
   const action = String(body.action || 'generate') as CourseBuilderAction;
   if (
-    ['generate', 'generate-from-blueprint', 'queue-media', 'repair', 'generate-missing'].includes(
+    ['generate', 'generate-from-blueprint', 'queue-media', 'repair', 'generate-missing', 'start-existing'].includes(
       action,
     )
   ) {
@@ -343,6 +344,24 @@ export async function POST(req: NextRequest) {
         { status: 423 },
       );
     }
+  }
+
+  if (action === 'start-existing') {
+    const courseId = typeof body.courseId === 'string' ? body.courseId.trim() : '';
+    if (!courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+    const course = await loadCourse(courseId);
+    if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+    const result = await courseFactory(
+      {
+        courseId,
+        programSlug: course.slug,
+        mode: 'refresh',
+        contentSource: 'curriculum_lessons',
+        videoMode: 'queue',
+      },
+      () => {},
+    );
+    return NextResponse.json({ ok: result.ok, action: 'start-existing', course, result });
   }
 
   if (action === 'generate-from-blueprint') {

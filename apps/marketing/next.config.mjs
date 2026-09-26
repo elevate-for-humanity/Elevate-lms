@@ -105,6 +105,14 @@ const nextConfig = {
   },
 
 
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', '@supabase/supabase-js'],
+    optimizeCss: false,
+    scrollRestoration: false,
+    workerThreads: false,
+    cpus: 1,
+  },
+
   webpack: (config, { dev, isServer }) => {
     config.parallelism = 1;
     // The production image is rebuilt from source in CI; disabling webpack's

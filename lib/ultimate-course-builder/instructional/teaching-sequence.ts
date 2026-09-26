@@ -1,0 +1,2 @@
+export const ULTIMATE_TEACHING_SEQUENCE=['why_it_matters','activate_prior_knowledge','terminology','concept_explanation','instructor_example','demonstration','guided_practice','knowledge_check','independent_practice','mistake_and_correction','assessment','remediation','recap'] as const;
+export function teachingSequence(){return ULTIMATE_TEACHING_SEQUENCE.map((stage,index)=>({order:index+1,stage}));}

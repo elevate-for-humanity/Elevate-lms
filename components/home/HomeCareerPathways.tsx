@@ -55,16 +55,16 @@ export function HomeCareerPathways() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 max-w-3xl">
           <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">
-            Workforce-funded career training
+            Career training
           </p>
           <h2
             id="featured-pathways-heading"
             className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl"
           >
-            Training may be free for people who qualify.
+            Explore career training.
           </h2>
           <p className="mt-4 text-lg leading-8 text-slate-700">
-            HVAC, CDL, Bookkeeping, and Business training may be available at no cost when you qualify through WorkOne or another approved workforce funding source. Eligibility and written authorization are required before training begins.
+            Explore HVAC, CDL, Bookkeeping, and Business pathways. Program-specific tuition, funding eligibility, payment options, and enrollment requirements are listed on each program page.
           </p>
         </div>
 
@@ -84,9 +84,6 @@ export function HomeCareerPathways() {
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     loading="lazy"
                   />
-                  <div className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-950 shadow-sm">
-                      Funding may cover tuition
-                    </div>
                 </div>
                 <div className="flex flex-1 flex-col p-6 sm:p-7">
                   <h3 className="text-2xl font-black leading-tight text-slate-950">{p.title}</h3>

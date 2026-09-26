@@ -6,7 +6,7 @@ const HOME_VIDEO =
   'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4';
 
 const HOME_NARRATION =
-  "Welcome to Elevate for Humanity. You're in the right place to turn a career goal into a clear next step. If you want to earn while you learn, begin with our Barber and Cosmetology apprenticeship programs. You'll learn the skills, practice them with supervision at an approved Host Site, and track your progress along the way. Looking for career training instead? Explore HVAC, CDL, Bookkeeping, or Business. Training may be free if you qualify for workforce funding. Approval is not automatic, but we will show you what to do. When you reach Paying for Training, press the orange Schedule WorkOne Orientation button. Complete that appointment, then come back and press Start Elevate Funding Intake. Take your time as you explore. When you find the path that feels right, use the application link to get started.";
+  "Welcome to Elevate for Humanity. Explore career training, Barber and Cosmetology apprenticeships, approved Host Sites, and employer-connected pathways. Choose the program or apprenticeship path that fits your goal, then review the program page for current enrollment requirements and next steps.";
 
 export function PlatformHubHero() {
   return (

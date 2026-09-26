@@ -23,7 +23,8 @@ const requiredDeps = ['@supabase/supabase-js','tsx','server-only','@remotion/bun
 const requiredProvision = [
   "NORTHFLANK_GIT_BRANCH||'main'",
   "deploymentPlan:'nf-compute-400'",
-  'storageSize:16384',
+  'storageSize:2048',
+  'cacheStorageSize:10240',
   'shmSize:64',
   "AI_PROVIDER:'cloudflare'",
   "ULTIMATE_WORKER_ID:'northflank-ultimate-worker'",

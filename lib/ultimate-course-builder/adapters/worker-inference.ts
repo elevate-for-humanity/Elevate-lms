@@ -1,4 +1,8 @@
+import {aiChat} from '@/lib/ai/ai-service';
 type ChatInput={system:string;input:unknown;temperature?:number;maxTokens?:number};
-function endpoint(){const value=process.env.ELEVATE_LLM_URL?.trim();if(!value)throw new Error('ULTIMATE_LLM_URL_REQUIRED');return value.replace(/\/+$/,'');}
-function secret(){const value=process.env.ELEVATE_LLM_SECRET?.trim();if(!value)throw new Error('ULTIMATE_LLM_SECRET_REQUIRED');return value;}
-export async function ultimateWorkerJson(input:ChatInput){const response=await fetch(endpoint()+'/v1/chat/completions',{method:'POST',headers:{Authorization:'Bearer '+secret(),'Content-Type':'application/json'},body:JSON.stringify({model:'elevate-local',messages:[{role:'system',content:input.system+' Return valid JSON only.'},{role:'user',content:JSON.stringify(input.input)}],temperature:input.temperature??.25,max_tokens:input.maxTokens??7000,response_format:{type:'json_object'}}),signal:AbortSignal.timeout(180000)});const payload:any=await response.json().catch(()=>({}));if(!response.ok)throw new Error('ULTIMATE_LLM_FAILED:'+response.status);const content=payload?.choices?.[0]?.message?.content;if(!content)throw new Error('ULTIMATE_LLM_EMPTY');return JSON.parse(content);}
+export async function ultimateWorkerJson(input:ChatInput){
+ const result=await aiChat({provider:'cloudflare',messages:[{role:'system',content:input.system+' Return valid JSON only.'},{role:'user',content:JSON.stringify(input.input)}],temperature:input.temperature??.25,maxTokens:input.maxTokens??7000});
+ const content=String(result.content??'').replace(/\`\`\`json?/g,'').replace(/\`\`\`/g,'').trim();
+ if(!content)throw new Error('ULTIMATE_AI_EMPTY');
+ try{return JSON.parse(content);}catch{throw new Error('ULTIMATE_AI_INVALID_JSON');}
+}

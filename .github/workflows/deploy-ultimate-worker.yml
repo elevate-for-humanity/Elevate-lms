@@ -53,12 +53,13 @@ jobs:
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
           test -n "$NORTHFLANK_API_TOKEN"
           test -n "$ULTIMATE_SOURCE_SHA"
-      - name: Load canonical course LLM configuration from Northflank
-        run: node scripts/northflank/export-course-llm-env.mjs
-      - name: Require canonical course LLM configuration
+      - name: Load canonical Cloudflare AI configuration from Northflank
+        run: node scripts/northflank/export-ultimate-cloudflare-env.mjs
+      - name: Require canonical Cloudflare AI configuration
         run: |
-          test -n "$ELEVATE_LLM_URL"
-          test -n "$ELEVATE_LLM_SECRET"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test -n "$CLOUDFLARE_AI_API_TOKEN"
+          test -n "$CLOUDFLARE_AI_MODEL"
       - name: Verify Ultimate worker parity
         run: pnpm tsx scripts/verify-ultimate-worker-parity.ts
       - name: Provision Ultimate worker

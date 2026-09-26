@@ -130,6 +130,14 @@ COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/standalone \
     ./
 
+# Next standalone tracing can preserve pnpm's package symlink layout without
+# materializing the app-local Next runtime. Copy the resolved Next package into
+# the exact location required by apps/marketing/server.js so the canonical
+# container is self-contained rather than depending on builder-stage symlinks.
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/node_modules/next \
+    ./apps/marketing/node_modules/next/
+
 COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/static \
     ./apps/marketing/.next/static/
@@ -144,6 +152,7 @@ RUN test -f /app/public/version.json && \
     test -f /app/public/manifest-marketing.json && \
     test -f /app/apps/marketing/public/manifest-marketing.json && \
     test -f /app/apps/marketing/server.js && \
+    test -f /app/apps/marketing/node_modules/next/dist/server/next.js && \
     test -s /app/public/data/hero-banners.json && \
     test -s /app/apps/marketing/public/data/hero-banners.json && \
     test -s /app/public/images/partners/razors-image-storefront.webp && \

@@ -1,0 +1,3 @@
+export type AuthorMode='AUTOPILOT'|'GUIDED'|'LOCKED';
+export type GovernedArtifact={artifactVersionId:string;artifactType:string;locked:boolean;approvalStatus:'unreviewed'|'pending'|'approved'|'rejected'|'change_requested'};
+export class AuthorControlPolicy{constructor(readonly mode:AuthorMode){}canGenerate(a?:GovernedArtifact){if(!a)return {allowed:true};if(a.locked)return {allowed:false,reason:'ARTIFACT_LOCKED'};if(this.mode==='LOCKED'&&a.approvalStatus==='approved')return {allowed:false,reason:'APPROVED_ARTIFACT_LOCKED_BY_POLICY'};return {allowed:true};}requiresApproval(){return this.mode==='GUIDED'||this.mode==='LOCKED';}canRepair(a:GovernedArtifact){return this.canGenerate(a);}}

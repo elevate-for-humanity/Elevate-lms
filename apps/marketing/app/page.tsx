@@ -2,7 +2,6 @@
 import type { Metadata } from 'next';
 import { HomeTrustBar } from '@/components/home/HomeTrustBar';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
-import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
@@ -116,13 +115,6 @@ export default function HomePage() {
           data-narration="Employers can hire credentialed graduates, become an apprenticeship Host Site, or work with Elevate to design a training cohort around their workforce needs."
         >
           <HomeEmployerStrip />
-        </div>
-        <div
-          data-scroll-narration
-          data-narration-src="/audio/narration/funding.mp3"
-          data-narration="Not sure how you will pay for training? Start here. Review workforce funding, employer-supported training, grants, and self-pay options. If you are using WorkOne, schedule your official orientation and then complete Elevate's funding intake."
-        >
-          <HomeFunding />
         </div>
         <div
           data-scroll-narration

@@ -1,3 +1,55 @@
-import {renderStoryboardVideo} from '@/lib/video/remotion-render';import type {UltimateRenderPort} from '../core/ports';
-function asStoryboard(input:any){const raw=input.artifacts?.synchronization?.timeline?.scenes??input.artifacts?.scene_construction?.scenes??input.storyboard;if(raw?.scenes)return raw;if(Array.isArray(raw)){return {version:1,width:1920,height:1080,fps:30,characters:[],scenes:raw.map((s:any,i:number)=>({id:String(s.id??`scene-${i+1}`),sceneType:String(s.sceneType??s.scene_type??'worked_example'),subject:String(s.subject??input.courseTitle??'Ultimate Course'),environment:String(s.environment??''),action:String(s.action??s.teachingPoint??''),dialogue:String(s.dialogue??s.narration??''),requiredVisualEvidence:String(s.requiredVisualEvidence??s.visualRequirement??s.visualDirection??''),shotSize:String(s.shotSize??'medium-close'),cameraMove:String(s.cameraMove??'dolly-in'),transition:String(s.transition??'crossfade'),durationSeconds:Number(s.durationSeconds??8),sourceVideoUrl:s.sourceVideoUrl??s.src??null,referenceImageUrl:s.referenceImageUrl??null}))};}throw new Error('ULTIMATE_RENDER_STORYBOARD_REQUIRED');}
-export class UltimatePlatformRenderer implements UltimateRenderPort{async render(input:any){const storyboard=asStoryboard(input);return renderStoryboardVideo({lessonId:String(input.lessonId),courseTitle:String(input.courseTitle??'Ultimate Course'),storyboard:storyboard as any,instructorId:input.instructorId});}}
+import type { UltimateRenderPort } from '../core/ports';
+import { callUltimateMediaService } from './platform-media-service';
+
+function asStoryboard(input: any) {
+  const raw =
+    input.artifacts?.synchronization?.timeline?.scenes ??
+    input.artifacts?.scene_construction?.scenes ??
+    input.storyboard;
+
+  if (raw?.scenes) return raw;
+  if (Array.isArray(raw)) {
+    return {
+      version: 1,
+      width: 1920,
+      height: 1080,
+      fps: 30,
+      characters: [],
+      scenes: raw.map((s: any, i: number) => ({
+        id: String(s.id ?? `scene-${i + 1}`),
+        sceneType: String(s.sceneType ?? s.scene_type ?? 'worked_example'),
+        subject: String(s.subject ?? input.courseTitle ?? 'Ultimate Course'),
+        environment: String(s.environment ?? ''),
+        action: String(s.action ?? s.teachingPoint ?? ''),
+        dialogue: String(s.dialogue ?? s.narration ?? ''),
+        requiredVisualEvidence: String(
+          s.requiredVisualEvidence ?? s.visualRequirement ?? s.visualDirection ?? '',
+        ),
+        shotSize: String(s.shotSize ?? 'medium-close'),
+        cameraMove: String(s.cameraMove ?? 'dolly-in'),
+        transition: String(s.transition ?? 'crossfade'),
+        durationSeconds: Number(s.durationSeconds ?? 8),
+        sourceVideoUrl: s.sourceVideoUrl ?? s.src ?? null,
+        referenceImageUrl: s.referenceImageUrl ?? null,
+      })),
+    };
+  }
+
+  throw new Error('ULTIMATE_RENDER_STORYBOARD_REQUIRED');
+}
+
+export class UltimatePlatformRenderer implements UltimateRenderPort {
+  async render(input: any) {
+    const storyboard = asStoryboard(input);
+    return callUltimateMediaService<unknown>(
+      '/api/internal/ultimate-course-builder/render',
+      {
+        lessonId: String(input.lessonId ?? ''),
+        courseTitle: String(input.courseTitle ?? 'Ultimate Course'),
+        storyboard,
+        instructorId: input.instructorId ?? null,
+      },
+      Number(process.env.ULTIMATE_RENDER_TIMEOUT_MS ?? 1_800_000),
+    );
+  }
+}

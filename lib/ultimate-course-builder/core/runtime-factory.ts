@@ -1,2 +1,37 @@
-import {requireAdminClient} from '@/lib/supabase/admin';import {UltimateSupabasePersistence} from '../persistence/supabase-persistence';import {UltimateArtifactStore} from '../artifacts/artifact-store';import {UltimatePlatformWorkforce} from '../adapters/platform-workforce';import {UltimatePlatformCredential} from '../adapters/platform-credential';import {UltimatePlatformInstructionalGenerator} from '../adapters/platform-instructional-generator';import {UltimatePlatformMedia} from '../adapters/platform-media';import {UltimatePlatformNarration} from '../adapters/platform-narration';import {UltimatePlatformRenderer} from '../adapters/platform-renderer';import {UltimatePlatformAssessment} from '../adapters/platform-assessment';import type {UltimateRuntime} from './runtime';
-export async function createUltimateRuntime():Promise<UltimateRuntime>{const db=await requireAdminClient();return {persistence:new UltimateSupabasePersistence(db as any),artifacts:new UltimateArtifactStore(db as any),workforce:new UltimatePlatformWorkforce(),credential:new UltimatePlatformCredential(db as any),instructional:new UltimatePlatformInstructionalGenerator(),media:new UltimatePlatformMedia(db as any),narration:new UltimatePlatformNarration(),renderer:new UltimatePlatformRenderer(),assessment:new UltimatePlatformAssessment()};}
+import {requireAdminClient} from '@/lib/supabase/admin';
+import {UltimateSupabasePersistence} from '../persistence/supabase-persistence';
+import {UltimateArtifactStore} from '../artifacts/artifact-store';
+import {UltimatePlatformWorkforce} from '../adapters/platform-workforce';
+import {UltimatePlatformCredential} from '../adapters/platform-credential';
+import {UltimatePlatformInstructionalGenerator} from '../adapters/platform-instructional-generator';
+import {UltimatePlatformMedia} from '../adapters/platform-media';
+import {UltimatePlatformAssessment} from '../adapters/platform-assessment';
+import type {UltimateRuntime} from './runtime';
+import type {UltimateNarrationPort,UltimateRenderPort} from './ports';
+
+class LazyNarration implements UltimateNarrationPort{
+  async generate(input:unknown){
+    const {UltimatePlatformNarration}=await import('../adapters/platform-narration');
+    return new UltimatePlatformNarration().generate(input);
+  }
+}
+class LazyRenderer implements UltimateRenderPort{
+  async render(input:unknown){
+    const {UltimatePlatformRenderer}=await import('../adapters/platform-renderer');
+    return new UltimatePlatformRenderer().render(input);
+  }
+}
+export async function createUltimateRuntime():Promise<UltimateRuntime>{
+  const db=await requireAdminClient();
+  return {
+    persistence:new UltimateSupabasePersistence(db as any),
+    artifacts:new UltimateArtifactStore(db as any),
+    workforce:new UltimatePlatformWorkforce(),
+    credential:new UltimatePlatformCredential(db as any),
+    instructional:new UltimatePlatformInstructionalGenerator(),
+    media:new UltimatePlatformMedia(db as any),
+    narration:new LazyNarration(),
+    renderer:new LazyRenderer(),
+    assessment:new UltimatePlatformAssessment()
+  };
+}

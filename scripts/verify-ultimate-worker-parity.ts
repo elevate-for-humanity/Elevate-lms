@@ -24,7 +24,7 @@ const requiredProvision = [
   "NORTHFLANK_GIT_BRANCH||'main'",
   "deploymentPlan:'nf-compute-400'",
   'storageSize:16384',
-  'shmSize:1024',
+  'shmSize:64',
   "AI_PROVIDER:'cloudflare'",
   "ULTIMATE_WORKER_ID:'northflank-ultimate-worker'",
 ];
@@ -38,4 +38,4 @@ if(missing.length){
   console.error('Ultimate worker parity FAILED:',missing);
   process.exit(1);
 }
-console.log('Ultimate worker parity PASS: main + Docker runtime + dependencies + 16GB storage + nf-compute-400');
+console.log('Ultimate worker parity PASS: main + Docker runtime + dependencies + 16GB storage + 64MB shm + nf-compute-400');

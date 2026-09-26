@@ -50,17 +50,16 @@ async function main(): Promise<void> {
   console.log(`Service:  ${serviceId}`);
   console.log(`Build ID: ${buildId}`);
   console.log(`Verified SHA: ${sha}`);
-  console.log(`Branch (verification only): ${branch}`);
+  console.log(`Branch:   ${branch}`);
 
   const deploymentPath = projectApiPath(projectId, `/services/${serviceId}/deployment`);
-  // For a combined service, the internal deployment source is the service's
-  // build service. Pin the deployment to the concrete verified build artifact.
-  // Do not include branch here: Northflank can resolve branch head separately
-  // from buildId, which allowed a stale image to remain active even after the
-  // exact build had succeeded.
+  // Northflank requires branch alongside the internal service id. Keep the
+  // concrete verified buildId so deployment remains pinned to the artifact
+  // that passed build verification.
   const deploymentPayload = {
     internal: {
       id: serviceId,
+      branch,
       buildId,
     },
     docker: { configType: 'default' as const },

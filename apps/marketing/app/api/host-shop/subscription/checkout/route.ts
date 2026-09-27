@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import {
-  HOST_SHOP_TIER_AMOUNTS,
-  HOST_SHOP_TIER_LABELS,
-  isHostShopTier,
-} from '@/lib/platform/orchestration/host-shop-subscription';
+// These labels and prices are the active QuickBooks invoice checkout tiers.
+// Keep this route independent of the retired subscription lifecycle module.
+const HOST_SHOP_TIER_AMOUNTS = {
+  bronze: 14900,
+  silver: 29900,
+  gold: 49900,
+  platinum: 99900,
+} as const;
+type HostShopTier = keyof typeof HOST_SHOP_TIER_AMOUNTS;
+const HOST_SHOP_TIER_LABELS: Record<HostShopTier, string> = {
+  bronze: 'Bronze Host Partner',
+  silver: 'Silver Growth Partner',
+  gold: 'Gold Business Accelerator',
+  platinum: 'Platinum Elite Partner',
+};
+function isHostShopTier(value: unknown): value is HostShopTier {
+  return typeof value === 'string' && value in HOST_SHOP_TIER_AMOUNTS;
+}
 import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
 
 export const runtime = 'nodejs';

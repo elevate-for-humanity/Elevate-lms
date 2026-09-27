@@ -16,6 +16,6 @@ export function getStripeWriteClient(): LegacyPaymentClient | null {
 
 export const stripe: LegacyPaymentClient | null = null;
 
-export async function stripeCall<T>(_operation: () => Promise<T>): Promise<T> {
+export async function stripeCall(_operation: () => Promise<any>): Promise<any> {
   throw new Error('Legacy payment provider is unavailable; use the active billing provider.');
 }

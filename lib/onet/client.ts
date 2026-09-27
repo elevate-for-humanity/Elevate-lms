@@ -71,7 +71,7 @@ export interface OnetSkills {
   element: {
     id: string;
     name: string;
-    score: { value: number; important: boolean };
+    score?: { value?: number; important?: boolean };
   }[];
 }
 
@@ -79,12 +79,12 @@ export interface OnetKnowledge {
   element: {
     id: string;
     name: string;
-    score: { value: number; important: boolean };
+    score?: { value?: number; important?: boolean };
   }[];
 }
 
 export interface OnetTasks {
-  task: { id: string; statement: string; importance?: number }[];
+  task: { id: string; title?: string; statement?: string; importance?: number }[];
 }
 
 export interface OnetRelatedOccupations {
@@ -147,15 +147,15 @@ export async function getOnetSnapshot(soc: string): Promise<OnetLaborSnapshot | 
     jobZoneEducation: jobZone?.education ?? '',
     topSkills:
       skills?.element
-        ?.filter((e) => e.score.important)
+        ?.filter((e) => e.name && e.score?.important !== false)
         .slice(0, 8)
         .map((e) => e.name) ?? [],
     topKnowledge:
       knowledge?.element
-        ?.filter((e) => e.score.important)
+        ?.filter((e) => e.name && e.score?.important !== false)
         .slice(0, 6)
         .map((e) => e.name) ?? [],
-    coreTasks: tasks?.task?.slice(0, 6).map((t) => t.statement) ?? [],
+    coreTasks: tasks?.task?.map((t) => t.title || t.statement).filter((title): title is string => !!title).slice(0, 6) ?? [],
     sampleTitles: occupation.sample_of_reported_titles?.slice(0, 6) ?? [],
     hasApprenticeships: (apprenticeships?.apprenticeship?.length ?? 0) > 0,
     relatedOccupations:

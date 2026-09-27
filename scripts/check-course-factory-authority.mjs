@@ -69,8 +69,16 @@ if (!orchestrator.includes('saveCourseProgramConfiguration'))
 if (!orchestrator.includes('queueCourseLessonVideos'))
   failures.push('Course Builder orchestrator does not own canonical media queue orchestration');
 const controller = readRequired('lib/devstudio/course-builder-controller.ts');
-if (!controller.includes("from '../course-builder/orchestrator'"))
-  failures.push('Studio Course Builder controller is not backed by canonical orchestrator');
+if (!controller.includes('DevStudioUltimateCourseControl'))
+  failures.push('Studio Course Builder controller is not backed by Ultimate control plane');
+const studioChat = readRequired(studioChatRoute);
+for (const required of ['DevStudioUltimateCourseControl','ultimate_course_builds','apprenticeship_standard_versions','apprenticeship_standard_competencies']) {
+  if (!studioChat.includes(required)) failures.push(`${studioChatRoute}: Ultimate build_course path missing ${required}`);
+}
+for (const forbidden of ['process-course-builder-jobs',"from('devstudio_jobs')"]) {
+  const buildCase = studioChat.slice(studioChat.indexOf("case 'build_course':"), studioChat.indexOf("case 'generate_videos':"));
+  if (buildCase.includes(forbidden)) failures.push(`${studioChatRoute}: legacy build_course orchestration remains: ${forbidden}`);
+}
 const editService = readRequired('lib/course-builder/edit-service.ts');
 for (const capability of [
   'saveCourseModule',
@@ -313,5 +321,5 @@ if (failures.length) {
   process.exit(1);
 }
 console.log(
-  'Course Builder authority gate passed: Studio control plane -> Course Builder generation/editing/review/media/clone/publication -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; legacy lesson/media/clone routes are compatibility-only and no raw-engine, parallel package, review, media, clone, or publication authority was detected.',
+  'Course Builder authority gate passed: Dev Studio build_course -> Ultimate control plane -> registered standards -> Ultimate durable queue/worker; legacy build orchestration is excluded. Existing editing/review/clone/publication compatibility surfaces remain separately governed.',
 );

@@ -5,7 +5,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Stripe Integration | Admin | Elevate For Humanity' };
+export const metadata: Metadata = { title: 'Legacy Payment Archive | Admin | Elevate For Humanity' };
 
 type PaymentRow = {
   id: string;
@@ -76,7 +76,7 @@ export default async function AdminStripeIntegrationPage() {
       reference: row.payment_intent ?? row.session_id,
       status: row.payment_status ?? null,
       paidAt: row.created_at ?? null,
-      source: 'Stripe session',
+      source: 'Legacy payment session',
     })),
     ...(barberResult.data ?? []).map((row: any) => ({
       id: row.id,
@@ -112,14 +112,12 @@ export default async function AdminStripeIntegrationPage() {
 
   const unresolvedFlags = flags.filter((flag) => !flag.resolved_at);
   const totalRevenue = payments.reduce((sum, payment) => sum + payment.amountCents, 0);
-  const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
-  const webhookConfigured = Boolean(process.env.STRIPE_WEBHOOK_SECRET);
 
   return (
     <main className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6">
-      <Breadcrumbs items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Integrations', href: '/integrations' }, { label: 'Stripe' }]} />
+      <Breadcrumbs items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Integrations', href: '/integrations' }, { label: 'Legacy Payment Archive' }]} />
       <section className="rounded-3xl bg-gradient-to-r from-violet-700 via-indigo-700 to-blue-700 p-6 text-white shadow-lg">
-        <div className="flex flex-wrap items-center gap-4"><CreditCard className="h-10 w-10" /><div><h1 className="text-3xl font-black">Stripe Integration</h1><p className="text-sm text-violet-100">Live payment evidence and integrity review.</p></div><div className="ml-auto flex flex-wrap gap-2"><span className="rounded-full bg-white/15 px-3 py-1 text-xs font-black">{stripeConfigured ? 'API keys configured' : 'API keys missing'}</span><span className="rounded-full bg-white/15 px-3 py-1 text-xs font-black">{webhookConfigured ? 'Webhook configured' : 'Webhook missing'}</span></div></div>
+        <div className="flex flex-wrap items-center gap-4"><CreditCard className="h-10 w-10" /><div><h1 className="text-3xl font-black">Legacy Payment Archive</h1><p className="text-sm text-violet-100">Read-only historical payment evidence and integrity review. Stripe is retired for new billing.</p></div></div>
       </section>
 
       <div className="grid gap-4 sm:grid-cols-3">

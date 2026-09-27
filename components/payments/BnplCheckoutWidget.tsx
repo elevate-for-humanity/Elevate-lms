@@ -6,9 +6,7 @@
  * Standalone BNPL payment UI driven entirely by bnpl-config.ts.
  * No provider names are hardcoded here — add/remove providers in bnpl-config only.
  *
- * Stripe-native providers (klarna, afterpay, zip, cashapp, amazon_pay, us_bank_account)
- * open an EmbeddedCheckout inline. Separate-SDK providers (affirm, sezzle) redirect
- * to their own checkout URLs via the respective API routes.
+ * Active providers use their dedicated checkout routes. Stripe-native BNPL methods are retired.
  *
  * Usage:
  *   <BnplCheckoutWidget
@@ -21,8 +19,6 @@
  */
 
 import { useState, useCallback } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js';
 import { Loader2, AlertCircle, ChevronRight, X } from 'lucide-react';
 import {
   ACTIVE_BNPL_PROVIDERS,
@@ -30,13 +26,6 @@ import {
   type BnplProvider,
 } from '@/lib/bnpl-config';
 import type { AffirmWindow } from '@/lib/types/external-sdks';
-
-// Stripe-native provider IDs — derived from bnpl-config (stripeMethodId !== null)
-const STRIPE_NATIVE_IDS = new Set(
-  ACTIVE_BNPL_PROVIDERS.filter((p) => p.stripeMethodId !== null).map((p) => p.id),
-);
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -110,7 +99,6 @@ export function BnplCheckoutWidget({
   filterByAmount = true,
 }: BnplCheckoutWidgetProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -119,7 +107,6 @@ export function BnplCheckoutWidget({
     : ACTIVE_BNPL_PROVIDERS;
 
   const selectedProvider = providers.find((p) => p.id === selectedId) ?? null;
-  const isStripeNative = selectedId ? STRIPE_NATIVE_IDS.has(selectedId) : false;
 
   const handleContinue = useCallback(async () => {
     if (!selectedId || !selectedProvider) return;
@@ -127,23 +114,7 @@ export function BnplCheckoutWidget({
     setError(null);
 
     try {
-      if (isStripeNative) {
-        // Open Stripe EmbeddedCheckout inline
-        const res = await fetch(checkoutEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...checkoutPayload,
-            bnpl_provider: selectedId,
-          }),
-        });
-        const data = await res.json();
-        if (!res.ok || !data.clientSecret) {
-          setError(data.error ?? 'Unable to start checkout. Please try another option.');
-          return;
-        }
-        setClientSecret(data.clientSecret);
-      } else if (selectedId === 'affirm') {
+      if (selectedId === 'affirm') {
         // Affirm uses a client-side JS SDK — fetch config then invoke affirm.checkout()
         const email = (checkoutPayload.customer_email as string) ?? '';
         const fullName = (checkoutPayload.customer_name as string) ?? '';
@@ -201,50 +172,13 @@ export function BnplCheckoutWidget({
     } finally {
       setLoading(false);
     }
-  }, [selectedId, selectedProvider, isStripeNative, checkoutEndpoint, checkoutPayload, amountCents]);
+  }, [selectedId, selectedProvider, checkoutEndpoint, checkoutPayload, amountCents]);
 
   const handleClose = useCallback(() => {
-    setClientSecret(null);
     setSelectedId(null);
     onCancel?.();
   }, [onCancel]);
 
-  // ── Embedded checkout open ────────────────────────────────────────────────
-  if (clientSecret) {
-    return (
-      <div className="rounded-2xl border-2 border-brand-blue-200 overflow-hidden">
-        {/* Header */}
-        <div className="bg-brand-blue-50 px-5 py-3 flex items-center justify-between border-b border-brand-blue-200">
-          <div className="flex items-center gap-2">
-            {selectedProvider && (
-              <span
-                className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${selectedProvider.badgeBg} ${selectedProvider.badgeText}`}
-              >
-                {selectedProvider.name}
-              </span>
-            )}
-            <p className="text-sm font-semibold text-slate-800">Secure Checkout</p>
-          </div>
-          <button
-            type="button"
-            onClick={handleClose}
-            className="text-slate-500 hover:text-slate-700 transition-colors"
-            aria-label="Close checkout"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Stripe EmbeddedCheckout */}
-        <EmbeddedCheckoutProvider
-          stripe={stripePromise}
-          options={{ clientSecret }}
-        >
-          <EmbeddedCheckout />
-        </EmbeddedCheckoutProvider>
-      </div>
-    );
-  }
 
   // ── Provider selection ────────────────────────────────────────────────────
   return (

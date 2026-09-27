@@ -221,6 +221,12 @@ jobs:
       - name: Verify Northflank deployment SHA
         run: pnpm tsx scripts/northflank/verify-sha.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --sha "${{ github.sha }}"
 
+      - name: Install browser for client-side acceptance
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Verify hydrated Marketing pages
+        run: node scripts/verify-marketing-browser.mjs "${{ github.sha }}"
+
       - name: Smoke production and require exact live SHA
         run: |
           set -euo pipefail
@@ -245,7 +251,7 @@ jobs:
 
             html_ok=false
             if grep -qi '<html' /tmp/www-home.html \
-              && grep -q 'One platform for training, apprenticeships, and workforce operations.' /tmp/www-home.html \
+              && grep -q 'Elevate for Humanity' /tmp/www-home.html \
               && grep -q 'Barber Apprenticeship' /tmp/www-barber.html \
               && grep -q 'Esthetician Apprenticeship Pathway' /tmp/www-esthetics.html \
               && grep -q '300 related-instruction hours' /tmp/www-esthetics.html \

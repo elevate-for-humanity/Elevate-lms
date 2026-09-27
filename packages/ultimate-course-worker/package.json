@@ -1,0 +1,16 @@
+{
+  "name": "@elevate/ultimate-course-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@remotion/bundler": "^4.0.454",
+    "@remotion/licensing": "^4.0.454",
+    "@remotion/renderer": "^4.0.454",
+    "@supabase/supabase-js": "2.89.0",
+    "remotion": "^4.0.454",
+    "server-only": "0.0.1",
+    "tsx": "^4.21.0",
+    "zod": "4.1.12"
+  }
+}

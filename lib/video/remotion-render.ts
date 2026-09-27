@@ -114,6 +114,7 @@ export interface StoryboardRenderInput {
   preRollDurationSeconds?: number;
   postRollUrl?: string | null;
   postRollDurationSeconds?: number;
+  ultimateStrict?: boolean;
 }
 
 function enabled(value: string | undefined): boolean {
@@ -505,6 +506,7 @@ export async function renderStoryboardVideo(
     // enhancement is an explicit deployment choice until it has a bounded,
     // asynchronous per-scene contract.
     const canGenerateMotion =
+      !input.ultimateStrict &&
       !cpuOnlyCourseMedia() &&
       enabled(process.env.ENABLE_GPU_LESSON_SCENES) &&
       (await gpuVideoAvailable());
@@ -548,6 +550,7 @@ export async function renderStoryboardVideo(
       // D-ID polling is also an optional enrichment. It must not sit in the
       // critical path of the canonical lesson render unless explicitly enabled.
       if (
+        !input.ultimateStrict &&
         index === 0 &&
         enabled(process.env.ENABLE_DID_LESSON_INSTRUCTOR) &&
         process.env.DID_API_KEY?.trim()
@@ -589,14 +592,10 @@ export async function renderStoryboardVideo(
         ? CANONICAL_TALKING_INSTRUCTOR_IMAGE
         : instructionalLayout
           ? null
-          : normalizeRemotionMediaUrl(scene.referenceImageUrl) ||
-            normalizeRemotionMediaUrl(
-              await getPexelsImage('default', {
-                query,
-                deterministicKey: scene.contentHash,
-                allowGeneratedFallback: false,
-              }),
-            );
+          : normalizeRemotionMediaUrl(scene.referenceImageUrl);
+      if (!imageUrl && !input.ultimateStrict) {
+        imageUrl = normalizeRemotionMediaUrl(await getPexelsImage('default', {query,deterministicKey:scene.contentHash,allowGeneratedFallback:false}));
+      }
       // Pollinations can take longer than Chromium's delayRender window. Fetch
       // the generated image once on the server and persist it beside the lesson
       // media before Remotion starts. The composition then reads a stable CDN

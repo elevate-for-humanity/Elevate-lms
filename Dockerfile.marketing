@@ -136,6 +136,7 @@ COPY --from=builder --chown=nextjs:nodejs \
 # matching production dependency graph from the builder so those links resolve.
 COPY --from=builder --chown=nextjs:nodejs /workspace/node_modules ./node_modules/
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/node_modules ./apps/marketing/node_modules/
+RUN mkdir -p /app/apps/marketing/node_modules && src=$(find /app/node_modules/.pnpm -maxdepth 1 -type d -name 'styled-jsx@*' | head -n1) && test -n "$src" && cp -aL "$src/node_modules/styled-jsx" /app/apps/marketing/node_modules/styled-jsx
 
 COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/static \

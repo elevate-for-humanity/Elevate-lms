@@ -1,2 +1,2 @@
-import {ultimateWorkerJson} from './worker-inference';import type {UltimateAssessmentPort} from '../core/ports';
-export class UltimatePlatformAssessment implements UltimateAssessmentPort{async generate(input:any){return ultimateWorkerJson({temperature:.2,maxTokens:6500,system:'Create original credential-aligned assessment items covering every supplied objective. Use multiple choice with exactly four plausible choices, scenarios, sequencing or application as appropriate. Include objectiveIds, correct answer, explanation and difficulty. Never reproduce proprietary exam questions.',input});}}
+import type {UltimateAssessmentPort} from '../core/ports';
+export class UltimatePlatformAssessment implements UltimateAssessmentPort{async generate(){throw new Error('ULTIMATE_AUTHORED_ASSESSMENT_REQUIRED: reviewed assessment items are required before release');}}

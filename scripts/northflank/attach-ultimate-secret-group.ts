@@ -2,16 +2,12 @@
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 
 const serviceId = process.env.NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID || 'elevate-ultimate-worker';
-const secretGroupIds = [
-  process.env.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env',
-  'elevate-llm-client-env',
-];
+const secretGroupIds = [process.env.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env'];
 
 async function main() {
   const projectId = resolveProjectId();
   if (!projectId) throw new Error('NORTHFLANK_PROJECT_ID_REQUIRED');
   for (const groupId of new Set(secretGroupIds)) {
-    // Fail before deployment if the owned inference credentials have not been provisioned.
     const current: any = await nfFetch(projectApiPath(projectId, `/secrets/${groupId}`));
     const restrictions = current.restrictions ?? {};
     const objects = restrictions.nfObjects ?? [];
@@ -31,6 +27,18 @@ async function main() {
       }),
     });
     console.log(`Attached ${groupId} to ${serviceId} without reading secret values`);
+  }
+  // The GPU/LLM service is archived. Remove only this worker's old LLM grant.
+  const llmGroup: any = await nfFetch(projectApiPath(projectId, '/secrets/elevate-llm-client-env'));
+  const restrictions = llmGroup.restrictions ?? {};
+  const existing = restrictions.nfObjects ?? [];
+  const remaining = existing.filter((item: any) => !(item.type === 'service' && item.id === serviceId));
+  if (remaining.length !== existing.length) {
+    await nfFetch(projectApiPath(projectId, '/secrets/elevate-llm-client-env'), {
+      method: 'PATCH',
+      body: JSON.stringify({restrictions: {...restrictions, nfObjects: remaining}}),
+    });
+    console.log(`Removed archived LLM secret access from ${serviceId}`);
   }
 }
 

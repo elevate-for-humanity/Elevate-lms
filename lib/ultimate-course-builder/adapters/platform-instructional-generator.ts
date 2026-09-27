@@ -1,4 +1,35 @@
-import {ultimateWorkerJson} from './worker-inference';import type {UltimateInstructionalGenerator} from '../instructional/generation-contract';
-async function json(system:string,input:unknown){return ultimateWorkerJson({system,input,temperature:.25,maxTokens:7000});}
-const universal='Apply the supplied universal instructional-depth requirements. Requirements are derived from competency characteristics, never from occupation names. Teach enough conceptual depth to explain why, not only what. When required, include conditions/alternatives/consequences, ordered procedures, observable checkpoints, demonstrations, guided and independent practice, critical errors/stop conditions, practical performance criteria, professional application, and assessment evidence. Do not invent occupation-specific requirements that are absent from the competency/standards input.';
-export class UltimatePlatformInstructionalGenerator implements UltimateInstructionalGenerator{objectives(input:unknown){return json(universal+' Create measurable standards-aligned learning objectives and map every objective to supplied authority requirements.',input);}prerequisites(input:unknown){return json(universal+' Identify genuine prerequisite knowledge/skills and progressive complexity dependencies required for the supplied objectives.',input);}teachingSequence(input:unknown){return json(universal+' Design complete teaching: why it matters, terminology, conceptual explanation, worked example, demonstration when required, guided practice, knowledge check, independent practice, mistakes/corrections, application, assessment, remediation and recap.',input);}instructorScript(input:unknown){return json(universal+' Write a professional instructor script that teaches what, why and how; explicitly teach every required section and observable criterion rather than listing them.',input);}storyboard(input:unknown){return json(universal+' Convert the instruction into a narration-driven multi-scene storyboard. Each scene must identify its teaching point and exact visual evidence. Demonstrations must show observable evidence rather than generic topical footage.',input);}}
+import type { UltimateInstructionalGenerator } from '../instructional/generation-contract';
+import { buildObjectives } from '../instructional/objective-builder';
+import { teachingSequence } from '../instructional/teaching-sequence';
+import type { UltimateCompetency, UltimateCredentialProfile } from '../core/types';
+
+type Evidence = { profile: UltimateCredentialProfile; competency: UltimateCompetency; prior?: Record<string, unknown> };
+function evidence(value: unknown): Evidence {
+  const input = value as Evidence;
+  if (!input?.competency?.id || !input?.profile?.authority) throw new Error('ULTIMATE_STANDARDS_EVIDENCE_REQUIRED');
+  return input;
+}
+
+/** Structural stages can be derived from the verified contract; substantive teaching requires authored evidence. */
+export class UltimatePlatformInstructionalGenerator implements UltimateInstructionalGenerator {
+  async objectives(input: unknown) {
+    return buildObjectives(evidence(input).competency);
+  }
+  async prerequisites(input: unknown) {
+    const { competency } = evidence(input);
+    return { competencyId: competency.id, candidates: [], reviewRequired: true,
+      reason: 'Appendix A does not specify prerequisite knowledge for this individual competency' };
+  }
+  async teachingSequence(input: unknown) {
+    const { competency } = evidence(input);
+    return { competencyId: competency.id, stages: teachingSequence(), reviewRequired: true };
+  }
+  async instructorScript(input: unknown): Promise<never> {
+    const { competency } = evidence(input);
+    throw new Error(`ULTIMATE_AUTHORED_INSTRUCTION_REQUIRED:${competency.id}: Appendix A describes the work, but does not supply a reviewed teaching script`);
+  }
+  async storyboard(input: unknown): Promise<never> {
+    const { competency } = evidence(input);
+    throw new Error(`ULTIMATE_AUTHORED_STORYBOARD_REQUIRED:${competency.id}`);
+  }
+}

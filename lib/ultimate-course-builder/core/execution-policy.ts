@@ -10,7 +10,7 @@ export const ULTIMATE_EXECUTION_POLICY = {
   mode: 'progressive-observation',
   instructionalFindingsBlockProgress: false,
   recordFindings: true,
-  continueThroughAllTwentySteps: true,
+  continueThroughAllTwentySteps: false,
 } as const;
 
 export type UltimateInstructionalFinding = {

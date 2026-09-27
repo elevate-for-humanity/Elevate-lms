@@ -226,8 +226,11 @@ if (
 )
   failures.push('SCORM POST still mutates outside Course Builder root');
 
+// Ultimate release-service is the governed release adapter for the dedicated Ultimate pipeline.
+// It may materialize a completed, quality-gated Ultimate package into canonical LMS tables.
 const specializedPackageWriters = new Set([
   'lib/course-builder/clone-service.ts',
+  'lib/ultimate-course-builder/release/release-service.ts',
   'lib/course-factory/versioning.ts',
   'lib/course-factory/post-generation-governance.ts',
   'lib/db/courses.ts',

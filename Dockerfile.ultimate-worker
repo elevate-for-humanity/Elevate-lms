@@ -4,7 +4,7 @@ ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0 NODE_ENV=production REMOTION_BROWSER_EXECU
 RUN corepack enable && corepack prepare pnpm@10.28.2 --activate && apt-get update && apt-get install -y --no-install-recommends chromium ffmpeg ca-certificates && rm -rf /var/lib/apt/lists/*
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/ultimate-course-worker/package.json ./packages/ultimate-course-worker/package.json
-RUN pnpm install --frozen-lockfile --prod --strict-peer-dependencies=false --filter @elevate/ultimate-course-worker...
+RUN pnpm install --prod --strict-peer-dependencies=false --filter @elevate/ultimate-course-worker... --no-frozen-lockfile --lockfile=false
 COPY workers/ultimate-course-builder.ts ./workers/ultimate-course-builder.ts
 COPY lib/ultimate-course-builder ./lib/ultimate-course-builder
 COPY lib/ai/ai-service.ts lib/ai/cloudflare-natural-voice.ts ./lib/ai/

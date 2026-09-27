@@ -12,7 +12,8 @@ export function verifyRegisteredProfile(profile: UltimateCredentialProfile) {
     standard.competencies.every((item, index) => {
       const actual = profile.competencies[index];
       return actual?.id === item.id && actual.title === item.category && actual.description === item.description &&
-        actual.authorityRequirementIds.length > 0;
+        actual.authorityRequirementIds.length > 0 && actual.authorityRequirementIds.every((ref) =>
+          ref === item.id || ref === `RAPIDS:${standard.rapidsCode}:APPENDIX_A:${item.sourceLabel ?? item.id}`);
     });
   if (!sameCompetencies || profile.standardVersion !== APPENDIX_A_REGISTRATION.revisionDate ||
     !profile.socCodes?.includes(standard.onetSocCode) ||

@@ -568,9 +568,7 @@ export default async function ApprenticePortalPage() {
                   {invoiceAccess.openInvoices.length
                     ? `${invoiceAccess.openInvoices.length} invoice${invoiceAccess.openInvoices.length === 1 ? '' : 's'} totaling $${(openInvoiceTotal / 100).toFixed(2)} ${invoiceAccess.openInvoices.length === 1 ? 'is' : 'are'} due. Open Billing to see each due date and Pay Now link. `
                     : 'Your account shows a payment problem. '}
-                  If an invoice remains unpaid after its due date, your course account will be
-                  suspended, active sessions will be signed out, and you will not be able to sign in
-                  again until every past-due invoice is paid.
+                  Your apprentice portal remains available while billing is resolved.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <Link
@@ -774,9 +772,7 @@ export default async function ApprenticePortalPage() {
                 {invoiceAccess.openInvoices.length
                   ? `${invoiceAccess.openInvoices.length} invoice${invoiceAccess.openInvoices.length === 1 ? '' : 's'} totaling $${(openInvoiceTotal / 100).toFixed(2)} ${invoiceAccess.openInvoices.length === 1 ? 'is' : 'are'} due. Open Billing to see each due date and Pay Now link. `
                   : 'Your account shows a payment problem. '}
-                If an invoice remains unpaid after its due date, your course account will be
-                suspended, active sessions will be signed out, and you will not be able to sign in
-                again until every past-due invoice is paid.
+                Your apprentice portal remains available while billing is resolved.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <Link

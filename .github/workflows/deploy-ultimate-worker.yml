@@ -22,7 +22,7 @@ jobs:
       NORTHFLANK_GIT_BRANCH: main
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      ULTIMATE_ACCEPTANCE_BUILD_ID: 7e778de3-3284-4218-82e1-738d55678033
+      ULTIMATE_ACCEPTANCE_BUILD_ID: 8c64618b-5db8-4caa-8714-f77da2c19dbe
     steps:
       - name: Checkout exact Ultimate source branch
         uses: actions/checkout@v4

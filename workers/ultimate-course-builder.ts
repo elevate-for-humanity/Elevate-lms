@@ -3,6 +3,7 @@ import {processUltimateJob} from '../lib/ultimate-course-builder/worker/process-
 
 const url=process.env.NEXT_PUBLIC_SUPABASE_URL??process.env.SUPABASE_URL;
 const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
+console.log('[UltimateWorker] boot',{supabaseUrlPresent:Boolean(url),serviceRolePresent:Boolean(key),nodeEnv:process.env.NODE_ENV??null});
 if(!url||!key)throw new Error('ULTIMATE_WORKER_SUPABASE_CONFIG_REQUIRED');
 
 const db=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});

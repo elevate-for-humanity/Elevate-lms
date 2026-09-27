@@ -2,6 +2,7 @@ import 'server-only';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import {DevStudioUltimateCourseControl} from '@/lib/devstudio/ultimate-course-control';
+import { loadBlueprintWithProgram } from '@/lib/course-factory/blueprint-loader';
 
 interface AgenticTaskRow {
   id: string;

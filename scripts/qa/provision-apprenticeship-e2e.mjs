@@ -74,7 +74,7 @@ async function createQaUser(kind, role, fullName) {
 }
 
 async function provision() {
-  let state = { runId, marker, host: null, apprentice: null, partnerId: null, shopId: null, enrollmentId: null, placementId: null };
+  let state = { runId, marker, host: null, apprentice: null, partnerId: null, shopId: null, hostShopId: null, enrollmentId: null, placementId: null };
 
   try {
     const host = await createQaUser('host', 'host_shop', '[QA E2E] Host Shop Supervisor');
@@ -163,6 +163,20 @@ async function provision() {
     );
     state.shopId = shop.id;
 
+    const hostShop = await must(
+      db.from('host_shops').insert({
+        name: `[QA E2E] Host Shop ${runId}`,
+        owner_id: host.id,
+        tenant_id: program.tenant_id || tenantId,
+        address: '100 QA Test Way', city: 'Indianapolis', state: 'IN', zip_code: '46201',
+        email: host.email, owner_name: '[QA E2E] Host Shop Supervisor', owner_email: host.email,
+        shop_status: 'active', approval_status: 'approved', is_approved: true, verified: true,
+        is_accepting_apprentices: true,
+      }).select('id').single(),
+      'create canonical QA host_shop',
+    );
+    state.hostShopId = hostShop.id;
+
     await must(
       db.from('shop_staff').insert({
         shop_id: shop.id,
@@ -197,7 +211,7 @@ async function provision() {
         tenant_id: program.tenant_id || tenantId,
         source: 'qa_e2e',
         draft_data: { qa_e2e: true, qa_run_id: runId, disposable: true },
-        host_shop_id: partner.id,
+        host_shop_id: hostShop.id,
         host_shop_name: `[QA E2E] Host Shop ${runId}`,
         has_host_shop: true,
         supervisor_id: host.id,
@@ -268,6 +282,7 @@ async function cleanup() {
   const enrollmentId = state.enrollmentId;
   const placementId = state.placementId;
   const shopId = state.shopId;
+  const hostShopId = state.hostShopId;
   const partnerId = state.partnerId;
   const hostId = state.host?.id;
   const apprenticeId = state.apprentice?.id;
@@ -280,6 +295,7 @@ async function cleanup() {
   if (shopId) await db.from('shop_staff').delete().eq('shop_id', shopId);
   if (hostId && partnerId) await db.from('partner_users').delete().eq('user_id', hostId).eq('partner_id', partnerId);
   if (shopId) await db.from('shops').delete().eq('id', shopId);
+  if (hostShopId) await db.from('host_shops').delete().eq('id', hostShopId);
   if (partnerId) await db.from('partners').delete().eq('id', partnerId);
 
   for (const userId of [apprenticeId, hostId].filter(Boolean)) {

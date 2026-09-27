@@ -1,3 +1,4 @@
+import { DevStudioUltimateCourseControl } from '@/lib/devstudio/ultimate-course-control';
 /**
  * /api/admin/dev-studio/chat
  *
@@ -1220,143 +1221,74 @@ async function execTool(
     // ── Course generation ──────────────────────────────────────────────────
     case 'build_course': {
       if (!actorUserId) throw new Error('Authenticated operator identity is required');
+      const db = await requireAdminClient();
       const requestedCourseId = String(args.course_id || '').trim();
-      let programId = String(args.program_id || '').trim() || undefined;
-      const programSlug = String(args.program_slug || '').trim() || undefined;
-      let canonicalTitle = '';
+      const programSlug = String(args.program_slug || '').trim();
+      if (!requestedCourseId) return 'course_id is required for an Ultimate build';
+      if (!programSlug) return 'program_slug is required for an Ultimate build';
 
-      if (requestedCourseId) {
-        const db = await requireAdminClient();
-        const { data: existingCourse, error: courseLookupError } = await db
-          .from('courses')
-          .select('id, title, program_id')
-          .eq('id', requestedCourseId)
-          .maybeSingle();
-        if (courseLookupError) {
-          throw new Error(
-            `Unable to resolve canonical course ${requestedCourseId}: ${courseLookupError.message}`,
-          );
-        }
-        if (!existingCourse) return `Canonical course not found: ${requestedCourseId}`;
-        canonicalTitle = String(existingCourse.title || '').trim();
-        programId = String(existingCourse.program_id || '').trim() || programId;
-      }
+      const { data: course, error: courseError } = await db
+        .from('courses').select('id,title,program_id').eq('id', requestedCourseId).maybeSingle();
+      if (courseError) throw courseError;
+      if (!course) return `Canonical course not found: ${requestedCourseId}`;
 
-      const title = String(args.title || canonicalTitle).trim();
-      if (!title) return 'title or course_id is required to build a course';
+      const { data: standard, error: standardError } = await db
+        .from('apprenticeship_standard_versions').select('*')
+        .eq('program_slug', programSlug).eq('is_active', true)
+        .order('updated_at', { ascending: false }).limit(1).maybeSingle();
+      if (standardError) throw standardError;
+      if (!standard) return `Active registered standard not found for ${programSlug}`;
 
-      const description = String(args.description || title).trim();
-      const audience = String(args.audience || 'adult workforce learners').trim();
-      const moduleCount = Math.max(1, Math.min(40, Number(args.modules || 5)));
-      const lessonsPerModule = Math.max(1, Math.min(20, Number(args.lessons_per_module || 3)));
-      const hours = Number(args.hours || 0) || undefined;
-      const state = typeof args.state === 'string' ? args.state.trim() || undefined : undefined;
-      const credential =
-        typeof args.credential === 'string' ? args.credential.trim() || undefined : undefined;
+      const { data: competencyRows, error: competencyError } = await db
+        .from('apprenticeship_standard_competencies').select('*')
+        .eq('standard_key', standard.standard_key).eq('is_required', true)
+        .order('display_order');
+      if (competencyError) throw competencyError;
+      if (!competencyRows?.length) return `No required competencies found for ${standard.standard_key}`;
 
-      const factoryInput = {
-        title,
-        topic: description,
-        ...(requestedCourseId ? { courseId: requestedCourseId } : {}),
-        ...(programId ? { programId } : {}),
-        ...(programSlug ? { programSlug } : {}),
-        audience,
-        ...(hours !== undefined ? { hours } : {}),
-        ...(state !== undefined ? { state } : {}),
-        ...(credential !== undefined ? { credential } : {}),
-        moduleCount,
-        lessonsPerModule,
-        contentSource: 'ai',
-        // Dev Studio never bypasses Course Builder. Existing canonical courses
-        // are repaired component-by-component against the embedded Blueprint;
-        // new courses are generated through the same Blueprint gates.
-        mode: requestedCourseId ? 'missing-only' : 'refresh',
-        videoMode: 'queue',
-        dryRun: false,
+      const profile = {
+        id: standard.standard_key,
+        title: String(args.title || course.title),
+        authority: standard.source_authority,
+        jurisdiction: String(args.state || 'IN'),
+        standardVersion: String(standard.revision_date || standard.registration_date || standard.standard_key),
+        effectiveDate: standard.revision_date || standard.registration_date || undefined,
+        sourceDocuments: ['DOL Appendix A Work Process Schedule', 'Related Instruction Outline'],
+        socCodes: standard.onet_soc_code ? [standard.onet_soc_code] : [],
+        trainingRequirements: { instructionalHours: standard.related_instruction_hours || undefined },
+        competencies: competencyRows.map((row:any) => ({
+          id: row.competency_key,
+          title: row.category || row.source_label || row.competency_key,
+          description: row.description,
+          type: /trim|clean|covering/i.test(String(row.category || '')) ? 'practical_skill' :
+                /discuss|recommend/i.test(String(row.category || '')) ? 'decision' : 'procedure',
+          authorityRequirementIds: [row.competency_key],
+          requiresDemonstration: true,
+          requiresPracticalEvidence: true,
+          criticalSafetyCompetency: /clean tools|protective/i.test(String(row.category || '')),
+        })),
       };
 
-      const db = await requireAdminClient();
-      const target = requestedCourseId || programId || programSlug || title.toLowerCase();
-      const idempotencyKey = `course_build:${target}`;
-      const { data: existing } = await db
-        .from('devstudio_jobs')
-        .select('id, status, stage, progress')
-        .eq('idempotency_key', idempotencyKey)
-        .in('status', ['queued', 'running'])
-        .maybeSingle();
-      if (existing) {
-        after(async () => {
-          const secret = process.env.CRON_SECRET;
-          if (!secret) {
-            logger.error('[devstudio/chat] Course Builder cannot auto-start: CRON_SECRET is missing');
-            return;
-          }
-          const baseUrl = process.env.ADMIN_URL || process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org';
-          await fetch(`${baseUrl}/api/cron/process-course-builder-jobs`, {
-            headers: { authorization: `Bearer ${secret}` }, cache: 'no-store',
-          }).catch((error) => logger.warn('[devstudio/chat] existing Course Builder wake-up failed', normalizeError(error)));
-        });
-        return JSON.stringify({
-          __type: 'course_build_queued', success: true, jobId: existing.id,
-          status: existing.status, stage: existing.stage, progress: existing.progress,
-          message: `This canonical course already has an active build. Worker wake requested for job ${existing.id}.`,
-        });
+      const { data: activeBuild } = await db.from('ultimate_course_builds')
+        .select('id,status,current_step').eq('course_id', course.id)
+        .in('status',['initializing','running']).order('created_at',{ascending:false}).limit(1).maybeSingle();
+      let build = activeBuild;
+      if (!build) {
+        const created = await db.from('ultimate_course_builds')
+          .insert({course_id:course.id,profile,status:'initializing',current_step:'standards_lock',findings:[]})
+          .select('id,status,current_step').single();
+        if (created.error || !created.data) throw created.error ?? new Error('ULTIMATE_BUILD_CREATE_FAILED');
+        build = created.data;
       }
 
-      const { data: job, error: enqueueError } = await db
-        .from('devstudio_jobs')
-        .insert({
-          user_id: actorUserId,
-          command: `${requestedCourseId ? 'Repair' : 'Build'} canonical course through Course Builder Blueprint: ${title}`,
-          status: 'queued',
-          stage: 'queued',
-          progress: 0,
-          tool_name: 'build_course',
-          tool_args: factoryInput,
-          idempotency_key: idempotencyKey,
-          log_lines: ['Dev Studio command accepted.', 'Course Builder Blueprint is the source of logic.', 'Passing components will be preserved; only failed or missing Blueprint components may regenerate.'],
-        })
-        .select('id')
-        .single();
-      if (enqueueError || !job)
-        throw new Error(
-          `Unable to queue Course Builder: ${enqueueError?.message ?? 'no job returned'}`,
-        );
-
-      // Start immediately. The durable row remains the recovery checkpoint, but
-      // accepting a Studio command must actively wake the worker rather than
-      // leaving new work parked until a later scheduler tick.
-      after(async () => {
-        const secret = process.env.CRON_SECRET;
-        if (!secret) return;
-        const baseUrl =
-          process.env.ADMIN_URL ||
-          process.env.NEXT_PUBLIC_ADMIN_URL ||
-          'https://admin.elevateforhumanity.org';
-        await fetch(`${baseUrl}/api/cron/process-course-builder-jobs`, {
-          headers: { authorization: `Bearer ${secret}` },
-          cache: 'no-store',
-        }).catch((error) =>
-          logger.warn('[devstudio/chat] Course Builder wake-up failed', normalizeError(error)),
-        );
-      });
-
-      return JSON.stringify(
-        {
-          __type: 'course_build_queued',
-          success: true,
-          jobId: job.id,
-          courseId: requestedCourseId || null,
-          title,
-          status: 'queued',
-          stage: 'queued',
-          progress: 0,
-          url: requestedCourseId ? `/studio/courses/${requestedCourseId}` : null,
-          message: `Course "${title}" was accepted and an immediate Course Builder worker wake was requested. The durable job remains the recovery checkpoint if the worker restarts.`,
-        },
-        null,
-        2,
-      );
+      const control = new DevStudioUltimateCourseControl(db as any);
+      const queued = await control.queue(build.id, actorUserId);
+      return JSON.stringify({
+        __type:'ultimate_course_build_queued', success:true, buildId:build.id,
+        jobId:queued.job?.id ?? null, courseId:course.id, title:profile.title,
+        status:build.status, stage:build.current_step,
+        message:'Ultimate Course Builder accepted the registered-standard build and queued it on the dedicated Ultimate worker.'
+      },null,2);
     }
 
     case 'generate_videos': {

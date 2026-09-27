@@ -10,7 +10,7 @@ COPY lib/ultimate-course-builder ./lib/ultimate-course-builder
 COPY lib/ai ./lib/ai
 COPY lib/resilience ./lib/resilience
 COPY lib/industry ./lib/industry
-COPY lib/onet/soc-map.ts ./lib/onet/soc-map.ts
+COPY lib/onet/soc-map.ts lib/onet/client.ts ./lib/onet/
 COPY lib/apprenticeship/registered-program-contract.ts ./lib/apprenticeship/registered-program-contract.ts
 COPY lib/supabase/admin.ts lib/supabase/timed-fetch.ts ./lib/supabase/
 COPY tsconfig.ultimate-worker.json ./tsconfig.json

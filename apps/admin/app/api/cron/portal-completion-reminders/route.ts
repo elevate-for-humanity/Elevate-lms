@@ -81,8 +81,15 @@ async function loadCandidates(db: any): Promise<Candidate[]> {
   const { data: holders } = await db.from('program_holders')
     .select('id,user_id,organization_name,contact_name,contact_email,contact_phone,mou_signed,mou_status,status,welcome_email_sent')
     .in('status', ['active', 'approved']);
+  const holderUserIds = [...new Set((holders || []).map((row: any) => row.user_id).filter(Boolean))];
+  const { data: holderProfiles } = holderUserIds.length
+    ? await db.from('profiles').select('id,role').in('id', holderUserIds)
+    : { data: [] };
+  const holderRoleByUser = new Map((holderProfiles || []).map((row: any) => [row.id, String(row.role || '').toLowerCase()]));
+  const privilegedRoles = new Set(['admin', 'super_admin', 'staff']);
   for (const holder of holders || []) {
     if (holder.welcome_email_sent === true) continue;
+    if (holder.user_id && privilegedRoles.has(holderRoleByUser.get(holder.user_id) || '')) continue;
     result.push({
       entityId: holder.id,
       userId: holder.user_id || null,

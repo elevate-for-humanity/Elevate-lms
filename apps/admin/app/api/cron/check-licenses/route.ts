@@ -6,10 +6,8 @@ import { logger } from '@/lib/logger';
  * Set up as scheduled cron: "0 6 * * *" (6 AM daily)
  */
 
-import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import type Stripe from 'stripe';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -65,47 +63,9 @@ async function _GET(request: NextRequest) {
       results.checked++;
     }
 
-    // 2. Check subscription status for active licenses
-    const { data: subscriptionLicenses } = await supabase
-      .from('licenses')
-      .select('id, tenant_id, stripe_subscription_id, status')
-      .not('stripe_subscription_id', 'is', null);
-
-    for (const license of subscriptionLicenses || []) {
-      try {
-        const stripe = getStripe();
-        const subscription = await stripe.subscriptions.retrieve(license.stripe_subscription_id);
-
-        const shouldBeActive = ['active', 'trialing'].includes(subscription.status);
-        const isActive = license.status === 'active';
-
-        if (shouldBeActive && !isActive) {
-          // Reactivate
-          await supabase
-            .from('licenses')
-            .update({ status: 'active', suspended_at: null, suspended_reason: null })
-            .eq('id', license.id);
-          await supabase.from('tenants').update({ active: true }).eq('id', license.tenant_id);
-          results.reactivated++;
-        } else if (!shouldBeActive && isActive) {
-          // Suspend
-          await supabase
-            .from('licenses')
-            .update({
-              status: 'suspended',
-              suspended_at: new Date().toISOString(),
-              suspended_reason: `Subscription ${subscription.status}`,
-            })
-            .eq('id', license.id);
-          await supabase.from('tenants').update({ active: false }).eq('id', license.tenant_id);
-          results.suspended++;
-        }
-
-        results.checked++;
-      } catch (error) {
-        results.errors.push(`Failed to check subscription for license ${license.id}: ${error}`);
-      }
-    }
+    // 2. Provider subscription checks are retired with Stripe.
+    // License expiry remains authoritative; QuickBooks/PayPal billing status is
+    // reconciled by the active Elevate billing system.
 
     // 3. Send warning emails for licenses expiring soon (7 days)
     const sevenDaysFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();

@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { ArrowRight, Shield, Loader2, AlertCircle, CreditCard } from 'lucide-react';
 import { ACTIVE_BNPL_PROVIDERS, getProvidersForAmount } from '@/lib/bnpl-config';
 
-type PaymentMethod = 'stripe' | 'affirm' | 'sezzle';
+type PaymentMethod = 'invoice' | 'affirm' | 'sezzle';
 
 interface AddOnCheckoutProps {
   productId: string;
@@ -37,7 +37,7 @@ function CheckoutForm({
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('stripe');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('invoice');
 
   const isMonthly = plan === 'monthly';
   const price = isMonthly ? monthlyPrice : oneTimePrice;
@@ -150,36 +150,11 @@ function CheckoutForm({
             <div className="bg-white rounded-xl border p-6 mb-6">
               <h2 className="text-sm font-semibold text-slate-900 mb-4">Payment Method</h2>
               <div className="space-y-3">
-                {/* Stripe / Card */}
-                <label
-                  className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition ${
-                    paymentMethod === 'stripe'
-                      ? 'border-brand-blue-500 bg-brand-blue-50'
-                      : 'border-slate-200 hover:border-slate-300'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="stripe"
-                    checked={paymentMethod === 'stripe'}
-                    onChange={() => setPaymentMethod('stripe')}
-                    className="sr-only"
-                  />
+                {/* QuickBooks invoice */}
+                <label className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition ${paymentMethod === 'invoice' ? 'border-brand-blue-500 bg-brand-blue-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                  <input type="radio" name="payment" value="invoice" checked={paymentMethod === 'invoice'} onChange={() => setPaymentMethod('invoice')} className="sr-only" />
                   <CreditCard className="w-6 h-6 text-slate-900" />
-                  <div className="flex-1">
-                    <div className="font-semibold text-slate-900">Credit / Debit Card</div>
-                    <div className="text-xs text-slate-700">Visa, Mastercard, Amex via Stripe</div>
-                  </div>
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      paymentMethod === 'stripe' ? 'border-brand-blue-500' : 'border-slate-300'
-                    }`}
-                  >
-                    {paymentMethod === 'stripe' && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-brand-blue-500" />
-                    )}
-                  </div>
+                  <div className="flex-1"><div className="font-semibold text-slate-900">Card / Bank Payment</div><div className="text-xs text-slate-700">Secure QuickBooks invoice checkout</div></div>
                 </label>
 
                 {/* Affirm */}

@@ -153,7 +153,7 @@ async function _GET(req: NextRequest) {
       if (reserveError || !reservation) continue;
 
       const message = `Elevate reminder for ${candidate.name}: please ${candidate.action}. Continue securely at ${candidate.portalUrl}. Reply STOP to opt out.`;
-      const smsResult = await sendSMS(smsPhone, message);
+      const smsResult = await sendSMS(String(smsPhone), message);
       await db.from('notification_outbox').update({
         status: smsResult.success ? 'sent' : 'failed', sent_at: smsResult.success ? new Date().toISOString() : null,
         attempts: 1, last_error: smsResult.success ? null : 'SMS provider rejected this reminder',

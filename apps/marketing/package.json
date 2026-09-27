@@ -15,6 +15,7 @@
     "next": "catalog:",
     "process": "^0.11.10",
     "react": "19.2.7",
-    "react-dom": "19.2.7"
+    "react-dom": "19.2.7",
+    "styled-jsx": "5.1.7"
   }
 }

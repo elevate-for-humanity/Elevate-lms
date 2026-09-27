@@ -22,6 +22,7 @@ jobs:
       NORTHFLANK_GIT_BRANCH: main
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      ULTIMATE_ACCEPTANCE_BUILD_ID: 7e778de3-3284-4218-82e1-738d55678033
     steps:
       - name: Checkout exact Ultimate source branch
         uses: actions/checkout@v4
@@ -78,12 +79,12 @@ jobs:
         run: |
           set -euo pipefail
           for attempt in $(seq 1 90); do
-            state="$(curl -fsS "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/ultimate_build_jobs?status=in.(queued,running)&order=created_at.asc&limit=1&select=id,status,attempts,lease_owner,heartbeat_at,last_error" -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" || true)"
+            state="$(curl -fsS "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/ultimate_build_jobs?build_id=eq.${ULTIMATE_ACCEPTANCE_BUILD_ID}&status=in.(queued,running)&order=created_at.desc&limit=1&select=id,build_id,status,attempts,lease_owner,heartbeat_at,last_error" -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" || true)"
             echo "$state"
             echo "$state" | grep -Eq '"status":"running"' && echo "$state" | grep -Eq '"attempts":[1-9]' && echo "$state" | grep -Eq '"lease_owner":"[^"]+"' && echo "$state" | grep -Eq '"heartbeat_at":"[^"]+"' && exit 0
-            completed="$(curl -fsS "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/ultimate_build_jobs?status=eq.completed&order=updated_at.desc&limit=1&select=id,status,attempts,last_error" -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" || true)"
+            completed="$(curl -fsS "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/ultimate_build_jobs?build_id=eq.${ULTIMATE_ACCEPTANCE_BUILD_ID}&status=eq.completed&order=updated_at.desc&limit=1&select=id,build_id,status,attempts,last_error" -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" || true)"
             echo "$completed" | grep -Eq '"status":"completed"' && echo "$completed" | grep -Eq '"attempts":[1-9]' && exit 0
             sleep 10
           done
-          echo "::error::Ultimate worker did not claim an active queued job"
+          echo "::error::Ultimate worker did not claim the bound acceptance build ${ULTIMATE_ACCEPTANCE_BUILD_ID}"
           exit 1

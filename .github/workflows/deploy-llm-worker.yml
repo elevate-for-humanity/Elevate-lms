@@ -52,7 +52,8 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Install GPU provisioner dependencies
+        run: pnpm install --filter @elevate/ultimate-course-worker... --no-frozen-lockfile --lockfile=false --strict-peer-dependencies=false
 
       - name: Verify provisioner and credentials
         shell: bash

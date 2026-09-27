@@ -11,11 +11,6 @@ export type RuntimeIntegration = {
  */
 export const RUNTIME_INTEGRATIONS: readonly RuntimeIntegration[] = [
   {
-    id: 'stripe',
-    required: ['STRIPE_SECRET_KEY', 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', 'STRIPE_WEBHOOK_SECRET'],
-    webhook: true,
-  },
-  {
     id: 'sezzle',
     required: [
       'SEZZLE_MERCHANT_ID',

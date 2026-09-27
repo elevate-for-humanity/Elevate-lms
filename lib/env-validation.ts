@@ -16,8 +16,6 @@ export interface EnvConfig {
 
   // Optional - Services degrade gracefully if missing
   SUPABASE_SERVICE_ROLE_KEY?: string;
-  STRIPE_SECRET_KEY?: string;
-  STRIPE_PUBLISHABLE_KEY?: string;
   SENDGRID_API_KEY?: string;
   OPENAI_API_KEY?: string;
   DID_API_KEY?: string;
@@ -74,7 +72,6 @@ export function getEnvOrFallback(key: string, fallback: string = ''): string {
  * Service availability checks
  */
 export const services = {
-  stripe: () => isServiceAvailable('STRIPE_SECRET_KEY'),
   resend: () => isServiceAvailable('SENDGRID_API_KEY'),
   openai: () => isServiceAvailable('OPENAI_API_KEY'),
   jotform: () => isServiceAvailable('JOTFORM_API_KEY'),
@@ -87,7 +84,6 @@ export const services = {
  */
 export function getServiceStatus() {
   return {
-    stripe: services.stripe(),
     resend: services.resend(),
     openai: services.openai(),
     jotform: services.jotform(),

@@ -65,7 +65,7 @@ export function ProgramBnplPageClient({
           </div>
           <div className="flex items-center gap-1.5 text-slate-400 text-xs">
             <Shield className="w-3.5 h-3.5" />
-            Secured by Stripe
+            Secure checkout
           </div>
         </div>
       </div>
@@ -127,7 +127,7 @@ export function ProgramBnplPageClient({
         {/* Security note */}
         <div className="flex items-center justify-center gap-2 text-slate-400 text-xs pt-2">
           <Shield className="w-3.5 h-3.5" />
-          256-bit SSL · PCI DSS compliant · Powered by Stripe
+          Secure checkout · Payment handled by the selected provider
         </div>
       </div>
     </div>

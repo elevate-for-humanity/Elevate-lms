@@ -20,8 +20,6 @@ import {
   remainingHoursDisplay,
   TOTAL_HOURS_REQUIRED,
 } from '@/lib/barber/pricing';
-import { loadStripe } from '@stripe/stripe-js';
-import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js';
 import { ACTIVE_BNPL_PROVIDERS } from '@/lib/bnpl-config';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -29,8 +27,6 @@ import {
   TRANSFER_HOURS_EVIDENCE_ACCEPT,
   uploadTransferHoursEvidence,
 } from '@/lib/applications/upload-transfer-hours-evidence';
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // Single source of truth — do not duplicate pricing constants here.
 const PRICING = BARBER_PRICING;
@@ -54,20 +50,13 @@ function getNextFriday(): string {
   return nextFriday.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
-type PaymentOption = 'weekly' | 'full' | 'custom' | 'sezzle' | 'affirm' | 'stripe_bnpl';
+type PaymentOption = 'weekly' | 'full' | 'custom' | 'sezzle' | 'affirm';
 
 function resolveInitialPayment(param: string | null): PaymentOption {
   if (param === 'pay_in_full') return 'full';
   if (param === 'payment_plan') return 'custom';
   if (param === 'affirm') return 'affirm';
   if (param === 'sezzle') return 'sezzle';
-  // Stripe-native methods — all go through Stripe checkout
-  if (
-    ['bnpl', 'klarna', 'afterpay', 'zip', 'cashapp', 'amazon_pay', 'us_bank_account'].includes(
-      param ?? '',
-    )
-  )
-    return 'stripe_bnpl';
   return 'weekly';
 }
 
@@ -91,9 +80,6 @@ export default function ApprenticeForm({
   const [error, setError] = useState('');
   const [errorSeverity, setErrorSeverity] = useState<'info' | 'critical'>('info');
   const [nextFriday, setNextFriday] = useState('Friday');
-
-  // Embedded Stripe checkout (BNPL — Klarna / Afterpay)
-  const [embeddedClientSecret, setEmbeddedClientSecret] = useState<string | null>(null);
 
   // Transfer hours — progress credit only, does not affect price or term.
   const [transferHoursChoice, setTransferHoursChoice] =
@@ -455,35 +441,6 @@ export default function ApprenticeForm({
           setErrorSeverity('info');
           setLoading(false);
         }
-        return;
-      } else if (paymentOption === 'stripe_bnpl') {
-        // Klarna / Afterpay — open embedded checkout inline (no redirect)
-        const embeddedRes = await fetch('/api/barber/checkout/embedded', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            customer_email: formData.email,
-            customer_name: `${formData.firstName} ${formData.lastName}`,
-            customer_phone: formData.phone,
-            sms_consent: smsConsent,
-            application_id: applicationId,
-            transferred_hours_verified: transferHours,
-            hours_per_week: 40,
-            has_host_shop: formData.hasHostShop,
-            host_shop_name: formData.hostShopName,
-          }),
-        });
-        const embeddedData = await embeddedRes.json();
-        if (!embeddedRes.ok || !embeddedData.clientSecret) {
-          setError(
-            embeddedData.error || 'Unable to start checkout. Please try another payment option.',
-          );
-          setErrorSeverity('info');
-          setLoading(false);
-          return;
-        }
-        setEmbeddedClientSecret(embeddedData.clientSecret);
-        setLoading(false);
         return;
       } else if (paymentOption === 'full') {
         // Pay in full - one-time payment
@@ -1168,33 +1125,8 @@ export default function ApprenticeForm({
                 </div>
                 )}
 
-                {/* Embedded Stripe Checkout — Klarna / Afterpay */}
-                {embeddedClientSecret && (
-                  <div className="mt-4 border-2 border-pink-200 rounded-xl overflow-hidden">
-                    <div className="bg-pink-50 px-4 py-3 flex items-center justify-between">
-                      <p className="text-sm font-semibold text-pink-900">
-                        Klarna / Afterpay Checkout
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setEmbeddedClientSecret(null)}
-                        className="text-xs text-pink-700 hover:underline"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                    <EmbeddedCheckoutProvider
-                      stripe={stripePromise}
-                      options={{ clientSecret: embeddedClientSecret }}
-                    >
-                      <EmbeddedCheckout />
-                    </EmbeddedCheckoutProvider>
-                  </div>
-                )}
-
-                {/* Submit — hidden while embedded checkout is open */}
-                {!embeddedClientSecret && (
-                  <>
+                {/* Submit */}
+                <>
                     {isSelfPay && (
                       <Turnstile
                         onVerify={(token) => setTurnstileToken(token)}
@@ -1231,9 +1163,7 @@ export default function ApprenticeForm({
                           )}
                           {!isSelfPay
                             ? 'Submit Application'
-                            : paymentOption === 'stripe_bnpl'
-                              ? 'Open Klarna / Afterpay'
-                              : 'Continue to Payment'}
+                            : 'Continue to Payment'}
                         </>
                       )}
                     </button>
@@ -1244,7 +1174,6 @@ export default function ApprenticeForm({
                       </p>
                     )}
                   </>
-                )}
               </div>
             </div>
 

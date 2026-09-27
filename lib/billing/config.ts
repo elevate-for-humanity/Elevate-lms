@@ -1,27 +1,23 @@
-import type { BillingProvider, BillingProviderMode } from './contracts';
+import type { BillingProvider } from './contracts';
 
 export interface BillingProviderConfig {
   primary: BillingProvider;
-  stripe: BillingProviderMode;
 }
 
-/** Stripe can remain readable during migration without silently receiving new charges. */
+/** Active billing is provider-neutral and no longer permits Stripe. */
 export function getBillingProviderConfig(env: NodeJS.ProcessEnv = process.env): BillingProviderConfig {
-  const primary = env.BILLING_PROVIDER === 'stripe' ? 'stripe' : 'quickbooks';
-  const stripe = env.STRIPE_BILLING_MODE === 'primary' ? 'primary' : 'archive';
-  if (primary === 'stripe' && stripe !== 'primary') {
-    throw new Error('Invalid billing configuration: Stripe cannot be primary while STRIPE_BILLING_MODE is archive.');
+  const requested = String(env.BILLING_PROVIDER || 'quickbooks').toLowerCase();
+  if (requested === 'stripe') {
+    throw new Error('Invalid billing configuration: Stripe is retired. Use QuickBooks or PayPal.');
   }
-  return { primary, stripe };
+  const primary: BillingProvider = requested === 'paypal' ? 'paypal' : 'quickbooks';
+  return { primary };
 }
 
 export function assertProviderCanCreateCharges(
   provider: BillingProvider,
   config: BillingProviderConfig = getBillingProviderConfig(),
 ): void {
-  if (provider === 'stripe' && config.stripe === 'archive') {
-    throw new Error('Stripe is archive-only. New charges must be created through QuickBooks.');
-  }
   if (provider !== config.primary) throw new Error(`${provider} is not the active billing provider.`);
 }
 
@@ -29,12 +25,11 @@ export async function loadBillingProviderConfig(db: any): Promise<BillingProvide
   const { data, error } = await db
     .from('platform_settings')
     .select('key,value')
-    .in('key', ['billing_provider', 'stripe_billing_mode']);
+    .eq('key', 'billing_provider');
   if (error) throw new Error(`Could not load billing settings: ${error.message}`);
   const stored = Object.fromEntries((data || []).map((row: any) => [row.key, row.value]));
   return getBillingProviderConfig({
     ...process.env,
     BILLING_PROVIDER: stored.billing_provider || process.env.BILLING_PROVIDER,
-    STRIPE_BILLING_MODE: stored.stripe_billing_mode || process.env.STRIPE_BILLING_MODE,
   });
 }

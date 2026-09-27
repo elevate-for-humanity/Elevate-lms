@@ -91,9 +91,8 @@ export default async function BillingPage() {
         </div>
         {totalOwed > 0 ? (
           <div className="mb-8 rounded-xl border-2 border-red-300 bg-red-50 p-5 text-sm text-red-900">
-            <strong>Account access warning:</strong> If an invoice remains unpaid after its due
-            date, your course account will be suspended, active sessions will be signed out, and you
-            will not be able to sign in again until every past-due invoice is paid.
+            <strong>Payment reminder:</strong> Review each invoice due date and payment link. Your
+            learner portal remains available while billing is resolved.
           </div>
         ) : null}
         <div className="bg-white rounded-xl border border-slate-200 mb-8">

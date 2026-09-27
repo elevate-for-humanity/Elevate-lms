@@ -44,31 +44,15 @@ export default function HomePage() {
       <StructuredData />
       <main className="[&_a]:no-underline [&_a:hover]:no-underline">
         <PlatformHubHero />
-        <div data-scroll-narration data-narration-src="/audio/narration/host-shop.mp3" data-narration="Meet featured Host Shops where apprentices build real skills under qualified supervision.">
-          <HomeFeaturedHostShop />
-        </div>
-        <div data-scroll-narration data-narration="Join Elevate's professional networks and explore apprenticeship and employer connections.">
-          <HomeNetworks />
-        </div>
-        <div data-scroll-narration data-narration-src="/audio/narration/career-pathways.mp3" data-narration="Explore career pathways and registered apprenticeship programs. Open a program page for its current eligibility, tuition, duration, and enrollment details.">
-          <HomeCareerPathways />
-        </div>
-        <div data-scroll-narration data-narration="Employers can hire credentialed graduates, become an apprenticeship Host Site, or work with Elevate to design a training cohort.">
-          <HomeEmployerStrip />
-        </div>
-        <div data-scroll-narration data-narration-src="/audio/narration/website-builder.mp3" data-narration="Use Elevate's no-code Website Builder to create and revise business website pages with voice or text.">
-          <HomeWebsiteBuilderSales />
-        </div>
-        <div data-scroll-narration data-narration="Follow Elevate's official channels and install the app for convenient access.">
-          <HomeSocialAppCTA />
-        </div>
-        <div data-scroll-narration data-narration="Elevate connects applications, courses, apprenticeships, attendance, credentials, employer workflows, and workforce operations in one coordinated platform.">
-          <HomePlatformOverview />
-        </div>
-        <div data-scroll-narration data-narration-src="/audio/narration/final.mp3" data-narration="Ready for your next step? Start an application or contact our team for help choosing the right path.">
-          <HomeFinalCTA />
-        </div>
-        <div data-narration-disabled="true"><HomeTrustBar /></div>
+        <HomeFeaturedHostShop />
+        <HomeNetworks />
+        <HomeCareerPathways />
+        <HomeEmployerStrip />
+        <HomeWebsiteBuilderSales />
+        <HomeSocialAppCTA />
+        <HomePlatformOverview />
+        <HomeFinalCTA />
+        <HomeTrustBar />
       </main>
     </>
   );

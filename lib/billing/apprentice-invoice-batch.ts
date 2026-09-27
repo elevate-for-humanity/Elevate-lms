@@ -104,7 +104,8 @@ export async function getApprenticeBillingAccess(
     openInvoices,
     overdueInvoices,
     accessExemptUntil: exemption.data?.expires_at || null,
-    suspended: overdueInvoices.length > 0 && !exemption.data?.expires_at,
+    // Tuition remains payable, but an invoice cannot suspend portal access.
+    suspended: false,
   };
 }
 
@@ -194,10 +195,10 @@ export function apprenticeInvoiceEmail(input: ApprenticeInvoiceEmailInput): {
         <thead><tr><th style="padding:8px 6px;text-align:left">Invoice</th><th style="padding:8px 6px;text-align:left">Due</th><th style="padding:8px 6px;text-align:right">Amount</th><th style="padding:8px 6px;text-align:right">Payment</th></tr></thead>
         <tbody>${invoiceRows}</tbody>
       </table>
-      <div style="border:2px solid #dc2626;border-radius:8px;background:#fef2f2;padding:14px;color:#7f1d1d"><strong>Account access warning:</strong> If an invoice remains unpaid after its due date, your course account will be suspended, active sessions will be signed out, and you will not be able to sign in again until every past-due invoice is paid.</div>
+      <div style="border:2px solid #f59e0b;border-radius:8px;background:#fffbeb;padding:14px;color:#78350f"><strong>Payment reminder:</strong> Review each invoice due date and Pay Now link. Your apprentice portal remains available while billing is resolved.</div>
       <p style="font-size:13px;color:#475569">This invoice is the temporary weekly billing path while your PayPal recurring-payment agreement is being activated. It does not create a duplicate automatic charge.</p>
       <p style="font-size:13px;color:#475569">Questions? Reply to this email or contact billing@elevateforhumanity.org.</p>
     </div>`,
-    text: `Hi ${input.customerName},\n\nYour ${input.productName} invoice${invoiceLabel} for ${amount} is ready. Every invoice currently due is listed below:\n\n${textInvoices}\n\nACCOUNT ACCESS WARNING: If an invoice remains unpaid after its due date, your course account will be suspended, active sessions will be signed out, and you will not be able to sign in again until every past-due invoice is paid.\n\nThis invoice is the temporary weekly billing path while your PayPal recurring-payment agreement is being activated. It does not create a duplicate automatic charge.\n\nQuestions: billing@elevateforhumanity.org`,
+    text: `Hi ${input.customerName},\n\nYour ${input.productName} invoice${invoiceLabel} for ${amount} is ready. Every invoice currently due is listed below:\n\n${textInvoices}\n\nPAYMENT REMINDER: Review each invoice due date and Pay Now link. Your apprentice portal remains available while billing is resolved.\n\nThis invoice is the temporary weekly billing path while your PayPal recurring-payment agreement is being activated. It does not create a duplicate automatic charge.\n\nQuestions: billing@elevateforhumanity.org`,
   };
 }

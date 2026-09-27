@@ -8,12 +8,14 @@ export function PlatformHubHero() {
     <section
       className="relative w-full overflow-hidden bg-slate-950"
       aria-label="Elevate for Humanity career training and apprenticeship hero"
+      data-scroll-narration
+      data-narration="Welcome to Elevate for Humanity. Explore career training and apprenticeships, find a program that fits your goals, and learn how to get started."
+      data-narration-style="instructor"
     >
       <div className="relative h-[clamp(420px,68svh,760px)] w-full">
         <SafeHeroVideo
           src={HOME_VIDEO}
           poster="/images/pages/comp-home-hero.webp"
-          showPosterBeforePlayback
           priority
           loop
           ariaLabel="Elevate for Humanity career training, apprenticeship, and workforce programs"

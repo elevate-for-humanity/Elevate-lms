@@ -191,17 +191,6 @@ export async function POST(request: NextRequest) {
         emailed = true;
       }
 
-      const userId = schedule.customer_external_key.replace(/^user:/, '');
-      const billingAccess = await getApprenticeBillingAccess(db, userId, today);
-      if (billingAccess.suspended) {
-        const { error: signOutError } = await db.auth.admin.signOut(userId);
-        if (signOutError) {
-          throw new Error(
-            `Invoice email was sent, but session revocation failed: ${signOutError.message}`,
-          );
-        }
-      }
-
       const remaining =
         schedule.remaining_invoices == null ? null : Math.max(0, schedule.remaining_invoices - 1);
       const nextDate = nextWeeklyInvoiceDateAfter(schedule.next_invoice_date, today);

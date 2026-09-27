@@ -8,7 +8,6 @@ import { generateBreadcrumbs } from '@/lib/navigation/navigation-config';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-program-config';
-import { getApprenticeBillingAccess } from '@/lib/billing/apprentice-invoice-batch';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -36,13 +35,6 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const db = await requireAdminClient();
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
-  if (user && !subject.previewing) {
-    const billingAccess = await getApprenticeBillingAccess(db, subject.userId);
-    if (billingAccess.suspended) {
-      await supabase.auth.signOut();
-      redirect('/login?reason=billing_past_due');
-    }
-  }
   const [{ data: profile }, { data: actorProfile }] = await Promise.all([
     db
       .from('profiles')

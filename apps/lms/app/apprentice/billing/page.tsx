@@ -141,9 +141,8 @@ function InvoiceLedger({ invoices }: { invoices: ApprenticeDashboardInvoice[] })
       )}
       {open.length ? (
         <div className="m-5 rounded-lg border-2 border-red-300 bg-red-50 p-4 text-sm text-red-900">
-          <strong>Account access warning:</strong> If an invoice remains unpaid after its due date,
-          your course account will be suspended, active sessions will be signed out, and you will
-          not be able to sign in again until every past-due invoice is paid.
+          <strong>Payment reminder:</strong> Review each invoice due date and payment link. Your
+          apprentice portal remains available while billing is resolved.
         </div>
       ) : null}
     </section>

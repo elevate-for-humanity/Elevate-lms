@@ -7,7 +7,13 @@ COPY packages/ultimate-course-worker/package.json ./package.json
 RUN npm install --omit=dev --ignore-scripts --no-audit --no-fund
 COPY workers/ultimate-course-builder.ts ./workers/ultimate-course-builder.ts
 COPY lib/ultimate-course-builder ./lib/ultimate-course-builder
-COPY lib/ai/ai-service.ts lib/ai/cloudflare-natural-voice.ts ./lib/ai/
+COPY lib/ai ./lib/ai
+COPY lib/resilience ./lib/resilience
+COPY lib/industry ./lib/industry
+COPY lib/onet/soc-map.ts ./lib/onet/soc-map.ts
+COPY lib/apprenticeship/registered-program-contract.ts ./lib/apprenticeship/registered-program-contract.ts
+COPY lib/supabase/admin.ts lib/supabase/timed-fetch.ts ./lib/supabase/
+COPY tsconfig.ultimate-worker.json ./tsconfig.json
 COPY lib/media/licensed-course-media.ts ./lib/media/licensed-course-media.ts
 COPY lib/config ./lib/config
 COPY lib/logger.ts lib/secrets.ts ./lib/

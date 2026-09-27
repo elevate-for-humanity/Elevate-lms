@@ -22,6 +22,11 @@ jobs:
       NORTHFLANK_GIT_BRANCH: main
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      ONET_API_KEY: ${{ secrets.ONET_API_KEY }}
+      USAJOBS_API_KEY: ${{ secrets.USAJOBS_API_KEY }}
+      USAJOBS_USER_AGENT_EMAIL: ${{ secrets.USAJOBS_USER_AGENT_EMAIL }}
+      CAREERONESTOP_USER_ID: ${{ secrets.CAREERONESTOP_USER_ID }}
+      CAREERONESTOP_API_KEY: ${{ secrets.CAREERONESTOP_API_KEY || secrets.CAREERONESTOP_TOKEN }}
       ULTIMATE_ACCEPTANCE_BUILD_ID: 8c64618b-5db8-4caa-8714-f77da2c19dbe
     steps:
       - name: Checkout exact Ultimate source branch
@@ -55,6 +60,9 @@ jobs:
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
           test -n "$NORTHFLANK_API_TOKEN"
           test -n "$ULTIMATE_SOURCE_SHA"
+          for key in ONET_API_KEY USAJOBS_API_KEY USAJOBS_USER_AGENT_EMAIL CAREERONESTOP_USER_ID CAREERONESTOP_API_KEY; do
+            if [ -z "${!key:-}" ]; then echo "::warning::Ultimate workforce feed credential $key is unavailable"; fi
+          done
       - name: Attach canonical production runtime secrets to Ultimate worker
         run: pnpm tsx scripts/northflank/attach-ultimate-secret-group.ts
       - name: Verify Ultimate worker parity

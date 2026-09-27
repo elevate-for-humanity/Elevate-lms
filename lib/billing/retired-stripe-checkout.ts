@@ -1,28 +1,30 @@
 import { NextResponse } from 'next/server';
 
-type Replacement = {
+type CompatibilityCheckout = {
   destination: string;
   reason: string;
 };
 
 /**
- * Permanent fail-closed response for URLs that previously created Stripe charges.
- * Historical Stripe reads and signed webhook reconciliation remain separate.
+ * Compatibility response for legacy checkout URLs.
+ * All active billing is Elevate billing: QuickBooks invoices/accounting and
+ * PayPal recurring collection.
  */
-export function retiredStripeCheckout({ destination, reason }: Replacement) {
+export function retiredStripeCheckout({ destination, reason }: CompatibilityCheckout) {
   return NextResponse.json(
     {
-      error: 'This legacy Stripe checkout has been retired.',
-      code: 'STRIPE_CHECKOUT_RETIRED',
+      code: 'PAYMENT_ROUTE_MOVED',
       billingProvider: 'quickbooks',
+      recurringProvider: 'paypal',
       destination,
       reason,
     },
     {
-      status: 410,
+      status: 307,
       headers: {
         'Cache-Control': 'no-store',
         'X-Elevate-Billing-Provider': 'quickbooks',
+        Location: destination,
       },
     },
   );

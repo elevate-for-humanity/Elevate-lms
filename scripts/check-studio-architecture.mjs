@@ -328,8 +328,8 @@ if (
   fail('public Course Factory barrel bypasses Course Builder orchestration');
 }
 const studioController = read('lib/devstudio/course-builder-controller.ts');
-if (!studioController.includes("from '../course-builder/orchestrator'"))
-  fail('Studio Course Builder controller does not delegate to canonical orchestrator');
+if (!studioController.includes('DevStudioUltimateCourseControl'))
+  fail('Studio Course Builder controller is not backed by Ultimate control plane');
 const courseOrchestrator = read('lib/course-builder/orchestrator.ts');
 if (!courseOrchestrator.includes("from '../course-factory/factory'"))
   fail('Course Builder orchestrator is not the owner of private Course Factory execution');
@@ -383,12 +383,12 @@ for (const forbiddenWrite of [
 const buildCourseBlock =
   adminAiChat.match(/case 'build_course': \{([\s\S]*?)case 'generate_videos':/i)?.[1] ?? '';
 for (const invariant of [
-  'dryRun: false',
-  "__type: 'course_build_queued'",
-  "status: 'queued'",
-  'idempotency_key',
+  'DevStudioUltimateCourseControl',
+  'ultimate_course_builds',
+  'apprenticeship_standard_versions',
+  'apprenticeship_standard_competencies',
+  "__type:'ultimate_course_build_queued'",
   'requestedCourseId',
-  'programId',
   'programSlug',
 ]) {
   if (!buildCourseBlock.includes(invariant))

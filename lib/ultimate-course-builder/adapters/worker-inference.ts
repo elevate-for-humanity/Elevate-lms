@@ -1,24 +1,8 @@
-import { aiChat } from '@/lib/ai/ai-service';
-type ChatInput = { system: string; input: unknown; temperature?: number; maxTokens?: number };
-export async function ultimateWorkerJson(input: ChatInput) {
-  const result = await aiChat({
-    provider: 'elevate',
-    providerPolicy: 'owned-only',
-    messages: [
-      { role: 'system', content: input.system + ' Return valid JSON only.' },
-      { role: 'user', content: JSON.stringify(input.input) },
-    ],
-    temperature: input.temperature ?? 0.25,
-    maxTokens: input.maxTokens ?? 7000,
-  });
-  const content = String(result.content ?? '')
-    .replace(/```json?/g, '')
-    .replace(/```/g, '')
-    .trim();
-  if (!content) throw new Error('ULTIMATE_AI_EMPTY');
-  try {
-    return JSON.parse(content);
-  } catch {
-    throw new Error('ULTIMATE_AI_INVALID_JSON');
-  }
+type ChatInput={system:string;input:unknown;temperature?:number;maxTokens?:number};
+function model(){const v=process.env.CLOUDFLARE_AI_MODEL?.trim();if(!v?.startsWith('@cf/'))throw new Error('ULTIMATE_CLOUDFLARE_MODEL_REQUIRED');return v}
+export async function ultimateWorkerJson(input:ChatInput){
+ const accountId=process.env.CLOUDFLARE_ACCOUNT_ID?.trim();const token=(process.env.CLOUDFLARE_AI_API_TOKEN||process.env.CLOUDFLARE_API_TOKEN)?.trim();if(!accountId||!token)throw new Error('ULTIMATE_CLOUDFLARE_CREDENTIALS_REQUIRED');
+ const m=model();const response=await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${m}`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'cf-aig-gateway-id':process.env.AI_GATEWAY_ID?.trim()||'default','Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'system',content:input.system+' Return valid JSON only.'},{role:'user',content:JSON.stringify(input.input)}],temperature:input.temperature??.25,max_tokens:input.maxTokens??7000}),signal:AbortSignal.timeout(120000)});
+ if(!response.ok){const detail=await response.text().catch(()=>'');throw new Error(`ULTIMATE_CLOUDFLARE_ERROR:${response.status}:${detail.slice(0,240)}`)}
+ const payload:any=await response.json();const content=String(payload?.result?.response??payload?.result?.text??'').replace(/```json?/g,'').replace(/```/g,'').trim();if(!content)throw new Error('ULTIMATE_AI_EMPTY');try{return JSON.parse(content)}catch{throw new Error('ULTIMATE_AI_INVALID_JSON')}
 }

@@ -792,6 +792,12 @@ importers:
       '@supabase/supabase-js':
         specifier: 2.89.0
         version: 2.89.0
+      groq-sdk:
+        specifier: ^1.1.2
+        version: 1.6.0
+      openai:
+        specifier: 6.42.0
+        version: 6.42.0(ws@8.21.3)(zod@4.1.12)
       remotion:
         specifier: ^4.0.454
         version: 4.0.525(react-dom@19.2.7(react@19.2.7))(react@19.2.7)

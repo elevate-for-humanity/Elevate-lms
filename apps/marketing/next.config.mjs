@@ -127,19 +127,9 @@ const nextConfig = {
         }),
       );
 
-      config.optimization.splitChunks = {
-        ...config.optimization.splitChunks,
-        cacheGroups: {
-          ...config.optimization.splitChunks?.cacheGroups,
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-            priority: 10,
-            reuseExistingChunk: true,
-          },
-        },
-      };
+      // Preserve Next.js client chunking. Forcing every dependency into one
+      // vendors chunk groups React with unrelated client modules; the live
+      // layout currently fails while reading React's hook dispatcher.
     }
 
     return config;

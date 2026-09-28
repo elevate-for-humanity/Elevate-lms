@@ -199,11 +199,25 @@ export async function POST(req: NextRequest) {
     }
     const { data: course, error: courseError } = await db
       .from('courses')
-      .select('id,title,slug,description,program_id')
+      .select('id,title,slug,description,program_id,status')
       .eq('id', courseId)
       .maybeSingle();
     if (courseError) throw courseError;
     if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+
+    const reactivated = course.status === 'archived';
+    if (reactivated) {
+      const { error: reactivateError } = await db
+        .from('courses')
+        .update({
+          status: 'draft',
+          is_active: true,
+          is_published: false,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', course.id);
+      if (reactivateError) throw reactivateError;
+    }
 
     const programSlug = String(body.programSlug || course.slug || '').trim();
     if (!programSlug) {
@@ -261,6 +275,7 @@ export async function POST(req: NextRequest) {
         courseId: course.id,
         programSlug,
         authority: 'ultimate-course-builder',
+        reactivated,
       },
       { status: 202 },
     );

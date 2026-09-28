@@ -91,6 +91,7 @@ export async function GET() {
     warnings.push('Notification preferences are temporarily unavailable.');
   }
   return NextResponse.json({
+    readOnly: ctx.previewing,
     warnings,
     phoneNumber: publicPhoneNumber(),
     system: { name: system.name, timezone: system.timezone, status: system.status },
@@ -124,6 +125,12 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   const { ctx, extension } = await phoneContext();
+  if (ctx.previewing) {
+    return NextResponse.json(
+      { error: 'Administrator portal previews are read-only. Sign in as the Program Holder to change phone settings.' },
+      { status: 403 },
+    );
+  }
   if (!ctx.roles.some((role) => ['program_holder', 'site_coordinator'].includes(role))) {
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
   }

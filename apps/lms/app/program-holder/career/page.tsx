@@ -24,7 +24,7 @@ export default async function ProgramHolderCareerPage() {
           <Link href="/program-holder/students" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-white px-4 text-sm font-black text-slate-950">
             <GraduationCap className="h-4 w-4" /> Open student roster
           </Link>
-          <Link href="/program-holder/reports" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/50 bg-white/10 px-4 text-sm font-black text-white">
+          <Link href="/program-holder/reports" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/50 bg-blue-900/60 px-4 text-sm font-black text-white">
             <ClipboardCheck className="h-4 w-4" /> Record outcomes
           </Link>
         </div>

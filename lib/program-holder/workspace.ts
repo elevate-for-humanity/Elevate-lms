@@ -102,13 +102,6 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     regionalAssignment?.all_programs_in_region === true;
   const garyHub = { latitude: 41.5863, longitude: -87.3510 };
   const garyRadiusMiles = Number(regionalAssignment?.radius_miles || 40);
-  const applicantsQuery = db
-    .from('program_holder_students')
-    .select(
-      `id,application_id,user_id,enrollment_id,applicant_name,status,application_status,program_id,created_at,label,call_notes,call_date,call_outcome,next_follow_up,work_start_date,work_site${applicantContactColumns}`,
-    )
-    .in('status', ['applied', 'pending'])
-    .order('created_at', { ascending: false });
   const [
     programsRes,
     regionalApplicantsRes,
@@ -130,7 +123,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     programIds.length
       ? db
           .from('programs')
-          .select('id,name,title,slug,status,is_active,credential_name,total_hours')
+          .select('id,name,title,slug,status,is_active,credential_name,total_hours,tuition,total_cost,price,is_free,funding,funding_tags,funding_eligibility,funding_eligible,wioa_approved,etpl_listed')
           .in('id', programIds)
           .order('title')
       : Promise.resolve({ data: [] }),
@@ -171,7 +164,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           )
           .eq('program_holder_id', holderId)
           .in('program_id', programIds)
-          .in('status', ['applied', 'pending'])
+          .in('status', ['applicant', 'applied', 'pending'])
           .order('created_at', { ascending: false })
       : Promise.resolve({ data: [] }),
     programIds.length

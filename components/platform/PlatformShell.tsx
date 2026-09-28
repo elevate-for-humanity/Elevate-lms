@@ -424,7 +424,7 @@ export function PlatformShell({ user, role, actions = [], children, paris, showL
             paris?.surface ?? (role === 'student' || role === 'apprentice' ? 'learner' : 'portal')
           }
           portalRole={paris?.portalRole ?? ROLE_DISPLAY_NAMES[role]}
-          personName={user.full_name || user.first_name || null}
+          personName={paris?.personName ?? user.full_name ?? user.first_name ?? null}
           courseTitle={paris?.courseTitle}
           nextLessonTitle={paris?.nextLessonTitle}
           autoOpenOnDashboard={paris?.autoOpenOnDashboard ?? true}

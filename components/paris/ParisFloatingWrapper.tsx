@@ -13,7 +13,12 @@ export type ParisLearnerContext = {
 };
 
 export function ParisFloatingWrapper(props: ParisLearnerContext) {
-  return <ParisFloatingButton {...props} />;
+  // Admins can move between holder previews without a full page reload. Key the
+  // assistant by the visible portal identity so its welcome message and memory
+  // cannot carry the previous holder's name into the next dashboard.
+  const identityKey = `${props.surface ?? 'public'}:${props.portalRole ?? ''}:${props.personName ?? ''}`;
+
+  return <ParisFloatingButton key={identityKey} {...props} />;
 }
 
 export default ParisFloatingWrapper;

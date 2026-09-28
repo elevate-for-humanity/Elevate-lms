@@ -39,6 +39,7 @@ type InboxItem = {
   recordingUrl: string | null;
 };
 type PhoneData = {
+  readOnly: boolean;
   phoneNumber: string;
   system: { name: string; timezone: string; status: string };
   notifications: { emailMissedCalls: boolean; smsMissedCalls: boolean; smsPhone: string };
@@ -177,7 +178,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
   }, []);
 
   const connect = useCallback(async () => {
-    if (connected || connecting || !data) return;
+    if (connected || connecting || !data || data.readOnly) return;
     setConnecting(true);
     setError('');
     try {
@@ -251,6 +252,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
   useEffect(() => {
     if (
       !data ||
+      data.readOnly ||
       autoConnectAttemptedRef.current ||
       connected ||
       connecting ||
@@ -263,7 +265,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
   }, [connect, connected, connecting, data]);
 
   async function saveSettings() {
-    if (!data) return;
+    if (!data || data.readOnly) return;
     setSaving(true);
     setMessage('');
     const response = await fetch(apiBase, {
@@ -292,6 +294,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
   }
 
   async function enableNotifications() {
+    if (data?.readOnly) return;
     setError('');
     try {
       const registration = await navigator.serviceWorker.ready;
@@ -332,6 +335,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
   }
 
   function returnCall(number = returnNumber) {
+    if (data?.readOnly) return;
     const digits = number.replace(/\D/g, '');
     const destination =
       digits.length === 10
@@ -361,6 +365,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
   }
 
   async function setTaskStatus(id: string, status: InboxItem['status']) {
+    if (data?.readOnly) return;
     const response = await fetch(`${apiBase}/inbox/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -402,6 +407,11 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
     <main className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
       <audio ref={remoteAudioRef} autoPlay playsInline />
       <ProgramHolderPhoneIntroduction />
+      {data.readOnly && (
+        <p className="rounded-2xl border border-blue-200 bg-blue-50 p-4 font-bold text-blue-950">
+          Administrator preview: this holder’s extension, settings, and PARIS call inbox are shown read-only. Sign in as the Program Holder to connect the PWA, change settings, return calls, or update callback status.
+        </p>
+      )}
       <header className="rounded-3xl bg-gradient-to-br from-blue-950 via-blue-800 to-cyan-700 p-6 text-white shadow-xl sm:p-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -428,7 +438,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
             <button
               onClick={connected ? disconnect : connect}
               disabled={
-                connecting || ['offline', 'do_not_disturb'].includes(data.extension.ringMode)
+                data.readOnly || connecting || ['offline', 'do_not_disturb'].includes(data.extension.ringMode)
               }
               className="mt-3 min-h-11 rounded-xl bg-white px-5 font-black text-blue-900 disabled:opacity-50"
             >
@@ -633,7 +643,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
           <div className="mt-5 flex flex-wrap gap-3">
             <button
               onClick={saveSettings}
-              disabled={saving}
+              disabled={saving || data.readOnly}
               className="min-h-12 rounded-xl bg-blue-700 px-5 font-black text-white disabled:opacity-50"
             >
               <Save className="mr-2 inline h-5 w-5" />
@@ -641,7 +651,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
             </button>
             <button
               onClick={enableNotifications}
-              disabled={notificationsEnabled}
+              disabled={notificationsEnabled || data.readOnly}
               className="min-h-12 rounded-xl border border-blue-300 bg-blue-50 px-5 font-black text-blue-900 disabled:opacity-60"
             >
               {notificationsEnabled ? (
@@ -725,6 +735,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
             />
             <button
               onClick={() => returnCall()}
+              disabled={data.readOnly}
               className="min-h-12 rounded-xl bg-emerald-700 px-4 font-black text-white"
             >
               <PhoneCall className="h-5 w-5" />
@@ -807,6 +818,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
                 </div>
                 <select
                   aria-label="Callback status"
+                  disabled={data.readOnly}
                   value={item.status}
                   onChange={(event) =>
                     void setTaskStatus(item.id, event.target.value as InboxItem['status'])

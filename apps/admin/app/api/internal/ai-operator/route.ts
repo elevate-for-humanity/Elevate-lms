@@ -1,37 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { getStripe } from '@/lib/stripe/client';
-import { resolveStripeCustomer } from '@/lib/stripe/customer-resolver';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 55;
 
-async function repairBillingCustomer(db: any, userId: string) {
-  const [{ data: profile }, { data: enrollment }] = await Promise.all([
-    db.from('profiles').select('email,full_name').eq('id', userId).maybeSingle(),
-    db.from('program_enrollments').select('id,stripe_customer_id')
-      .or(`user_id.eq.${userId},student_id.eq.${userId}`)
-      .order('created_at', { ascending: false }).limit(1).maybeSingle(),
+async function inspectBillingSetup(db: any, userId: string) {
+  const { data: profile } = await db.from('profiles')
+    .select('email,full_name')
+    .eq('id', userId)
+    .maybeSingle();
+  if (!profile?.email) return { configured: false, reason: 'billing profile unavailable' };
+
+  const externalKeys = [userId, `user:${userId}`];
+  const [{ data: schedules }, { data: invoices }] = await Promise.all([
+    db.from('billing_schedules')
+      .select('id,status,customer_external_key')
+      .in('customer_external_key', externalKeys)
+      .in('status', ['active', 'pending'])
+      .limit(1),
+    db.from('billing_invoices')
+      .select('id,provider,status,customer_external_key')
+      .in('customer_external_key', externalKeys)
+      .order('created_at', { ascending: false })
+      .limit(1),
   ]);
-  if (!profile?.email || !enrollment?.id) return { repaired: false, reason: 'billing record unavailable' };
-  const stripe = getStripe();
-  if (!stripe) return { repaired: false, reason: 'billing service unavailable' };
-  const { customer, recovered } = await resolveStripeCustomer({
-    stripe,
-    email: profile.email,
-    name: profile.full_name,
-    candidateIds: [enrollment.stripe_customer_id],
-    metadata: { user_id: userId, enrollment_id: enrollment.id },
-    createIfMissing: true,
-  });
-  if (!customer) return { repaired: false, reason: 'customer resolution failed' };
-  if (customer.id !== enrollment.stripe_customer_id) {
-    await db.from('program_enrollments').update({ stripe_customer_id: customer.id }).eq('id', enrollment.id);
-  }
-  return { repaired: recovered || customer.id !== enrollment.stripe_customer_id, reason: 'customer verified' };
+
+  const configured = Boolean(schedules?.length || invoices?.length);
+  return {
+    configured,
+    reason: configured ? 'billing configured' : 'billing setup requires review',
+    provider: invoices?.[0]?.provider || 'quickbooks',
+  };
 }
 
 async function _POST(req: NextRequest) {
@@ -54,14 +56,14 @@ async function _POST(req: NextRequest) {
     const args = (job.tool_args || {}) as { incident_id?: string; workflow?: string };
     try {
       if (args.workflow === 'billing_setup' && job.user_id) {
-        const result = await repairBillingCustomer(db, job.user_id);
+        const result = await inspectBillingSetup(db, job.user_id);
         await db.from('platform_incidents').update({
-          status: result.reason === 'customer verified' ? 'resolved' : 'identified',
+          status: result.configured ? 'resolved' : 'identified',
           identified_at: new Date().toISOString(),
-          resolved_at: result.reason === 'customer verified' ? new Date().toISOString() : null,
-          root_cause: 'The stored Stripe customer reference required validation against the active Stripe account.',
-          remediation: result.reason === 'customer verified'
-            ? 'Validated or recovered the customer reference. The user can retry the secure billing action.'
+          resolved_at: result.configured ? new Date().toISOString() : null,
+          root_cause: 'The billing workflow required validation against the current provider-neutral billing records.',
+          remediation: result.configured
+            ? 'Validated the current billing schedule or invoice record. The user can retry the secure billing action.'
             : `Automated repair paused: ${result.reason}`,
         }).eq('id', args.incident_id);
         await db.from('devstudio_jobs').update({

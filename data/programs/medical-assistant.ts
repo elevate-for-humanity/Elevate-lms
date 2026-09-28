@@ -21,7 +21,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   cohortSize: '10–15 participants per cohort',
   fundingStatement: 'Workforce funding may apply only with program and participant eligibility plus written agency authorization. Self-pay: $5,000. BNPL financing available through Affirm and Sezzle.',
   selfPayCost: '$5,000',
-  badge: 'Funding Available',
+  badge: 'Medical Assistant Training',
   badgeColor: 'green',
   credentials: [
     {
@@ -220,10 +220,6 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
       description: 'Lab procedures meet CLIA waived testing requirements.',
     },
     { standard: 'HIPAA', description: 'Training includes HIPAA privacy and security compliance.' },
-    {
-      standard: 'WIOA Title I',
-      description: 'Program meets WIOA eligibility for Individual Training Accounts.',
-    },
   ],
   trainingPhases: [
     {
@@ -335,12 +331,12 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
     'Career placement support',
   ],
   paymentTerms:
-    'WIOA, Next Level Jobs, and WRG funding accepted. Payment plans available for self-pay students.',
+    'Payment plans are available for self-pay students. Workforce or third-party funding may be represented only after current program-level verification and written participant authorization.',
   // ─── Content model ──────────────────────────────────────────────
   deliveryModel: 'hybrid',
   deliveryModelDetail: 'hybrid',
   partnerProvider: 'careersafe',
-  fundingOptions: ['wioa', 'impact', 'self_pay'],
+  fundingOptions: ['self_pay'],
   enrollmentType: 'internal',
   partnerCourses: [
     {
@@ -359,7 +355,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
       credentialIssued: 'Bloodborne Pathogens Certificate',
       duration: '2 hours',
       required: true,
-      enrollmentUrl: 'https://www.hsi.com/courses/bloodborne-pathogens',
+      enrollmentUrl: '/contact',
     },
   ],
   microCourses: [
@@ -379,7 +375,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
       credentialIssued: 'CPR/AED Certification',
       duration: '4 hours',
       required: true,
-      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
+      enrollmentUrl: '/contact',
     },
   ],
 
@@ -401,7 +397,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
     },
     {
       question: 'Is funding available?',
-      answer: 'Yes. WIOA and Next Level Jobs funding covers tuition for eligible participants.',
+      answer: 'No public WIOA or Next Level Jobs claim is currently made for this program. Any funded enrollment requires current program-level verification and written authorization from the responsible agency.',
     },
   ],
   breadcrumbs: [
@@ -411,14 +407,14 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
   ],
   metaTitle: 'Medical Assistant Program | CCMA Certified | Indianapolis',
   metaDescription:
-    'Prepare for the NHA CCMA, CPT, and CET exams in 20 weeks. Clinical and administrative medical assisting. Medical assistants earn $38,270/year. 14% job growth. WIOA funding available. Indianapolis.',
+    'Prepare for the NHA CCMA, CPT, and CET exams in 20 weeks with clinical and administrative medical assisting training in Indianapolis.',
 
 
   funding: {
-    wioa_eligible: true,
-    fssa_eligible: true,
-    wrg_eligible: true,
-    jobReadyIndyEligible: true,
-    fundingNotes: 'Indiana ETPL-listed. FSSA IMPACT and WIOA Title I funding available for eligible Indiana residents.',
+    wioa_eligible: false,
+    fssa_eligible: false,
+    wrg_eligible: false,
+    jobReadyIndyEligible: false,
+    fundingNotes: 'No public workforce-funding claim is currently authorized for this program. Any third-party funding requires current program-level verification and written participant authorization.',
   },
 };

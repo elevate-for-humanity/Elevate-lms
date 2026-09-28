@@ -1,17 +1,17 @@
-import { NextResponse } from 'next/server';
+import {
+  retiredSubscriptionWebhookGet,
+  retiredSubscriptionWebhookPost,
+} from '@/lib/billing/retired-subscription-webhook';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// The previous payment webhook has been retired. Never acknowledge a payment
-// or advance apprentice access based on an event sent to this old URL.
+// RETIRED compatibility URL. Keep the route present so old senders receive an
+// explicit non-success response without advancing access or mutating billing.
 export async function POST() {
-  return NextResponse.json(
-    { error: 'Legacy subscription webhook is unavailable.' },
-    { status: 503 },
-  );
+  return retiredSubscriptionWebhookPost('/api/host-shop/subscription/webhook');
 }
 
 export async function GET() {
-  return NextResponse.json({ error: 'Legacy subscription webhook is unavailable.' }, { status: 410 });
+  return retiredSubscriptionWebhookGet('/api/host-shop/subscription/webhook');
 }

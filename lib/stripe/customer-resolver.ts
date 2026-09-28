@@ -1,7 +1,22 @@
-import type Stripe from 'stripe';
+type LegacyStripeCustomer = {
+  id: string;
+  deleted?: boolean;
+};
+
+type LegacyStripeClient = {
+  customers: {
+    retrieve(id: string): Promise<LegacyStripeCustomer>;
+    search(input: { query: string; limit: number }): Promise<{ data: LegacyStripeCustomer[] }>;
+    create(input: {
+      email: string;
+      name?: string;
+      metadata?: Record<string, string>;
+    }): Promise<LegacyStripeCustomer>;
+  };
+};
 
 type ResolveStripeCustomerOptions = {
-  stripe: Stripe;
+  stripe: LegacyStripeClient;
   email: string;
   name?: string | null;
   candidateIds?: Array<string | null | undefined>;
@@ -9,7 +24,7 @@ type ResolveStripeCustomerOptions = {
   createIfMissing?: boolean;
 };
 
-function isActiveCustomer(customer: Stripe.Customer | Stripe.DeletedCustomer): customer is Stripe.Customer {
+function isActiveCustomer(customer: LegacyStripeCustomer): customer is LegacyStripeCustomer {
   return !('deleted' in customer) || customer.deleted !== true;
 }
 
@@ -32,7 +47,7 @@ export async function resolveStripeCustomer({
   candidateIds = [],
   metadata,
   createIfMissing = false,
-}: ResolveStripeCustomerOptions): Promise<{ customer: Stripe.Customer | null; recovered: boolean }> {
+}: ResolveStripeCustomerOptions): Promise<{ customer: LegacyStripeCustomer | null; recovered: boolean }> {
   const normalizedEmail = email.trim();
   const candidates = [...new Set(candidateIds.filter((id): id is string => Boolean(id?.startsWith('cus_'))))];
 

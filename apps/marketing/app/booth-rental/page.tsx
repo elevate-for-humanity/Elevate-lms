@@ -16,7 +16,7 @@ import { organization } from '@/lib/config/organization';
 export const metadata: Metadata = {
   title: 'Booth & Suite Rentals in Indianapolis, Indiana',
   description:
-    'Rent a booth or suite at Elevate for Humanity in Indianapolis. Barber, cosmetology, esthetician, and nail tech spaces available. Weekly billing via Stripe. No long-term lease.',
+    'Rent a booth or suite at Elevate for Humanity in Indianapolis. Barber, cosmetology, esthetician, and nail tech spaces available. Weekly billing through the current Elevate billing system. No long-term lease.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/booth-rental' },
 };
 

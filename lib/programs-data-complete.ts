@@ -473,7 +473,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     description:
       'The CPR & First Aid program through approved CPR/First Aid credential provider provides essential emergency response training. Students learn CPR for adults, children, and infants, AED operation, choking relief, and basic first aid. This certification is required for many healthcare, childcare, and safety positions. The course includes hands-on practice with manikins and AED trainers.',
     summary:
-      'Earn HSI CPR and First Aid certifications required for healthcare and safety careers.',
+      'Earn CPR and First Aid credentials through the currently approved training provider.',
     bullets: [
       '1-day intensive training',
       '4-8 hours of instruction',

@@ -57,7 +57,7 @@ const categories = [
     category: 'Integrations',
     icon: Settings,
     color: 'bg-slate-100 text-slate-600',
-    topics: ['Stripe Setup', 'Calendar Sync', 'Email Integration', 'API Access']
+    topics: ['QuickBooks Billing', 'PayPal Payments', 'Calendar Sync', 'Email Integration']
   }
 ];
 

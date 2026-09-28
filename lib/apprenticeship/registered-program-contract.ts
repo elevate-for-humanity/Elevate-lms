@@ -99,6 +99,21 @@ export function isRegisteredProgramSlug(programSlug: string | null | undefined) 
   return Boolean(programSlug && findStandard(programSlug));
 }
 
+export function listRegisteredProgramStandards() {
+  return Object.entries(APPENDIX_A_STANDARDS).map(([standardKey, standard]) => ({
+    sponsor: APPENDIX_A_REGISTRATION,
+    standardKey: standardKey as RegisteredProgramKey,
+    canonicalProgramSlug: standard.programSlugs[0],
+    standard,
+    completion: {
+      basis: 'competency' as const,
+      competencyCount: standard.competencyCount,
+      requiredRtiHours: standard.relatedInstructionHours,
+      fixedOjlCompletionHours: null,
+    },
+  }));
+}
+
 async function resolvePartnerId(
   supabase: SupabaseClient,
   input: { partnerId?: string | null; enrollmentId?: string | null },

@@ -158,8 +158,6 @@ export function ProgramStructuredData({
       },
     }),
     ...(category && { programType: category }),
-    applicationDeadline: 'Rolling Admissions',
-    financialAidEligible: 'Yes - WIOA, Pell Grant, State Funding',
   };
 
   return (

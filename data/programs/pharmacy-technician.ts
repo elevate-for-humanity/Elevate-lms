@@ -34,8 +34,8 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
   cohortSize: '12–16 participants per cohort',
   fundingStatement: 'Workforce funding may apply only with program and participant eligibility plus written agency authorization.',
   selfPayCost: '$4,200 (payment plans available)',
-  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
-  badge: 'Funding Available',
+  fundingOptions: ['self_pay'],
+  badge: 'Pharmacy Training',
   badgeColor: 'green',
 
   credentials: [
@@ -281,18 +281,8 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
         'Sterile compounding training follows United States Pharmacopeia Chapter 797 standards.',
     },
     {
-      standard: 'WIOA Title I',
-      description:
-        'Program eligible for Workforce Innovation and Opportunity Act funding through Indiana DWD.',
-    },
-    {
       standard: 'Indiana Board of Pharmacy',
       description: 'Training meets Indiana requirements for pharmacy technician registration.',
-    },
-    {
-      standard: 'ETPL Listed',
-      description:
-        'Eligible Training Provider List — approved for Individual Training Accounts through local workforce boards.',
     },
   ],
 
@@ -415,7 +405,7 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
     'Career placement support',
   ],
   paymentTerms:
-    'WIOA and Next Level Jobs funding accepted. Payment plans available for self-pay students.',
+    'Payment plans are available for self-pay students. Workforce or third-party funding may be represented only after current program-level verification and written participant authorization.',
 
   faqs: [
     {
@@ -431,7 +421,7 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
     {
       question: 'Is this program free?',
       answer:
-        'Yes, for eligible participants through WIOA or Next Level Jobs funding. Self-pay is $4,200 with payment plans available.',
+        'Self-pay is $4,200 with payment plans available. No public WIOA or Next Level Jobs claim is made unless current program-level evidence is verified and the responsible agency authorizes the participant in writing.',
     },
     {
       question: 'Where can I work after certification?',
@@ -448,14 +438,14 @@ export const PHARMACY_TECHNICIAN: ProgramSchema = {
 
   metaTitle: 'Pharmacy Technician Training | PTCB Certified | Indianapolis',
   metaDescription:
-    '10-week pharmacy technician program. PTCB CPhT exam prep, sterile compounding, and 5 credentials. 180–220 hours. WIOA funding available.',
+    '10-week pharmacy technician program with PTCB CPhT exam preparation, sterile compounding, and credential preparation. 180–220 hours.',
 
 
   funding: {
-    wioa_eligible: true,
-    fssa_eligible: true,
-    wrg_eligible: true,
-    jobReadyIndyEligible: true,
-    fundingNotes: 'Indiana ETPL-listed. FSSA IMPACT and WIOA Title I funding available for eligible Indiana residents.',
+    wioa_eligible: false,
+    fssa_eligible: false,
+    wrg_eligible: false,
+    jobReadyIndyEligible: false,
+    fundingNotes: 'No public workforce-funding claim is currently authorized for this program. Any third-party funding requires current program-level verification and written participant authorization.',
   },
 };

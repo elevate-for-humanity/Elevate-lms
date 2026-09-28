@@ -1,10 +1,11 @@
 /**
- * Legacy AI Course Create compatibility endpoint.
+ * RETIRED legacy AI Course Create compatibility endpoint.
  *
- * COURSE GENERATION IS OWNED BY lib/course-factory/factory.ts.
+ * COURSE GENERATION IS OWNED BY THE CANONICAL ULTIMATE COURSE BUILDER CONTROL PLANE.
  * This Edge Function previously implemented an independent AI generator and
  * wrote directly to courses/modules/lessons with the service-role client.
- * Keeping that execution path would violate the single-authority Ultimate Course Builder
+ * The private generation engine may be reached only through the governed Course Builder orchestrator.
+ * Keeping an independent execution path here would violate the single-authority Ultimate Course Builder
  * contract and bypass Admin authorization/governance.
  *
  * The endpoint is intentionally retained as a non-writing compatibility surface

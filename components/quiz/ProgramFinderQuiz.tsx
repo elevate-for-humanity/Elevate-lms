@@ -241,8 +241,8 @@ const programResults: Record<string, ProgramResult[]> = {
   ],
   safety: [
     {
-      title: 'CPR & First Aid (HSI)',
-      description: 'Same-day certification. American Heart Association equivalent through HSI.',
+      title: 'CPR & First Aid',
+      description: 'Same-day CPR, AED, and First Aid training through an approved credential provider.',
       href: '/programs/cpr-first-aid',
       duration: '1 day',
       salary: 'Required for many jobs',

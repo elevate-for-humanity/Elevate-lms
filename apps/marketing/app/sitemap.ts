@@ -31,19 +31,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const trustAndBuyerRoutes: MetadataRoute.Sitemap = [
     {
       url: `${PUBLIC_SITE_ORIGIN}/trust`,
-      lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${PUBLIC_SITE_ORIGIN}/procurement`,
-      lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${PUBLIC_SITE_ORIGIN}/platform/demo`,
-      lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
@@ -51,7 +48,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const programRoutes: MetadataRoute.Sitemap = [...STATIC_PROGRAM_MAP.keys()].map((slug) => ({
     url: `${PUBLIC_SITE_ORIGIN}/programs/${slug}`,
-    lastModified: new Date(),
     changeFrequency: 'weekly',
     priority: 0.82,
   }));
@@ -62,7 +58,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const featuredHostShopRoutes: MetadataRoute.Sitemap = FEATURED_BEAUTY_HOST_PARTNERS.map(
     (shop) => ({
       url: `${PUBLIC_SITE_ORIGIN}/host-shops/${shop.slug}`,
-      lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.86,
     }),
@@ -70,7 +65,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const hostShopRegionRoutes: MetadataRoute.Sitemap = HOST_SHOP_REGIONS.map((region) => ({
     url: `${PUBLIC_SITE_ORIGIN}/partners/host-shops/indiana/${region.slug}`,
-    lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: 0.8,
   }));
@@ -78,13 +72,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const hvacEmployerRoutes: MetadataRoute.Sitemap = [
     {
       url: `${PUBLIC_SITE_ORIGIN}/employers/hvac-partners`,
-      lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.86,
     },
     ...HVAC_EMPLOYER_REGIONS.map((region) => ({
       url: `${PUBLIC_SITE_ORIGIN}/employers/hvac-partners/indiana/${region.slug}`,
-      lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.78,
     })),
@@ -93,21 +85,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const employerTalentRoutes: MetadataRoute.Sitemap = [
     {
       url: `${PUBLIC_SITE_ORIGIN}/employers/talent-network`,
-      lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.88,
     },
     ...EMPLOYER_TALENT_PATHWAYS.flatMap((pathway) => [
       {
         url: `${PUBLIC_SITE_ORIGIN}/employers/talent-network/${pathway.slug}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly' as const,
+          changeFrequency: 'weekly' as const,
         priority: 0.84,
       },
       ...EMPLOYER_NETWORK_REGIONS.map((region) => ({
         url: `${PUBLIC_SITE_ORIGIN}/employers/talent-network/${pathway.slug}/indiana/${region.slug}`,
-        lastModified: new Date(),
-        changeFrequency: 'monthly' as const,
+          changeFrequency: 'monthly' as const,
         priority: 0.76,
       })),
     ]),
@@ -150,8 +139,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .filter((shop) => Boolean(shop.publicSlug))
       .map((shop) => ({
         url: `${PUBLIC_SITE_ORIGIN}/host-shops/${shop.publicSlug}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly' as const,
+          changeFrequency: 'weekly' as const,
         priority: 0.82,
       }));
   } catch {

@@ -3,8 +3,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ComplianceBar } from '@/components/ComplianceBar';
 
 export const metadata: Metadata = {
-  title: 'Platform Architecture | Elevate for Humanity',
-  description: 'Technical architecture for the Elevate for Humanity workforce platform across Marketing, LMS, Admin, Supabase, Stripe, and Northflank.',
+  title: 'Platform Architecture',
+  description: 'Technical architecture for the Elevate for Humanity workforce platform across Marketing, LMS, Admin, Supabase, QuickBooks, PayPal, and Northflank.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/platform/architecture' },
 };
 
@@ -29,7 +29,7 @@ const SERVICE_SURFACES = [
 const STACK = [
   ['Application framework', 'Next.js 15 + React 19 + TypeScript'],
   ['Database & identity', 'Supabase PostgreSQL, Auth, Storage, and Row Level Security'],
-  ['Payments', 'Stripe Checkout, subscriptions, and webhook-backed payment workflows'],
+  ['Payments', 'QuickBooks billing, PayPal payments, and platform-managed billing workflows'],
   ['Deployment', 'Northflank multi-container services for Marketing, LMS, and Admin'],
   ['Package/runtime', 'pnpm workspace + Node.js 22'],
   ['Access control', 'Server-side role normalization, protected portal routes, and database RLS'],

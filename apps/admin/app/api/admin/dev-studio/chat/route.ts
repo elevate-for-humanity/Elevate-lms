@@ -1237,35 +1237,53 @@ async function execTool(
         .eq('program_slug', programSlug).eq('is_active', true)
         .order('updated_at', { ascending: false }).limit(1).maybeSingle();
       if (standardError) throw standardError;
-      if (!standard) return `Active registered standard not found for ${programSlug}`;
 
-      const { data: competencyRows, error: competencyError } = await db
-        .from('apprenticeship_standard_competencies').select('*')
-        .eq('standard_key', standard.standard_key).eq('is_required', true)
-        .order('display_order');
-      if (competencyError) throw competencyError;
-      if (!competencyRows?.length) return `No required competencies found for ${standard.standard_key}`;
+      let competencyRows:any[] = [];
+      if (standard) {
+        const competencyResult = await db
+          .from('apprenticeship_standard_competencies').select('*')
+          .eq('standard_key', standard.standard_key).eq('is_required', true)
+          .order('display_order');
+        if (competencyResult.error) throw competencyResult.error;
+        competencyRows = competencyResult.data ?? [];
+      }
+
+      if (!standard) {
+        const { data: existingLessons, error: lessonError } = await db
+          .from('course_lessons').select('id,title,learning_objectives')
+          .eq('course_id', course.id).order('order_index');
+        if (lessonError) throw lessonError;
+        competencyRows = (existingLessons ?? []).map((lesson:any,index:number)=>({
+          competency_key: lesson.id,
+          category: lesson.title || `Lesson ${index + 1}`,
+          source_label: lesson.title || `Lesson ${index + 1}`,
+          description: Array.isArray(lesson.learning_objectives) && lesson.learning_objectives.length
+            ? lesson.learning_objectives.join('; ')
+            : `Teach and verify the learner-facing requirements for ${lesson.title || `lesson ${index + 1}`}.`,
+        }));
+      }
+      if (!competencyRows.length) return `No course lessons or registered competencies found for ${programSlug}`;
 
       const profile = {
-        id: standard.standard_key,
+        id: standard?.standard_key ?? `course:${course.id}`,
         title: String(args.title || course.title),
-        authority: standard.source_authority,
+        authority: standard?.source_authority ?? 'course-build-request',
         jurisdiction: String(args.state || 'IN'),
-        standardVersion: String(standard.revision_date || standard.registration_date || standard.standard_key),
-        effectiveDate: standard.revision_date || standard.registration_date || undefined,
-        sourceDocuments: ['DOL Appendix A Work Process Schedule', 'Related Instruction Outline'],
-        socCodes: standard.onet_soc_code ? [standard.onet_soc_code] : [],
-        trainingRequirements: { instructionalHours: standard.related_instruction_hours || undefined },
+        standardVersion: String(standard?.revision_date || standard?.registration_date || 'course-defined'),
+        effectiveDate: standard?.revision_date || standard?.registration_date || undefined,
+        sourceDocuments: standard ? ['DOL Appendix A Work Process Schedule', 'Related Instruction Outline'] : [],
+        socCodes: standard?.onet_soc_code ? [standard.onet_soc_code] : [],
+        trainingRequirements: { instructionalHours: standard?.related_instruction_hours || undefined },
         competencies: competencyRows.map((row:any) => ({
           id: row.competency_key,
           title: row.category || row.source_label || row.competency_key,
           description: row.description,
-          type: /trim|clean|covering/i.test(String(row.category || '')) ? 'practical_skill' :
-                /discuss|recommend/i.test(String(row.category || '')) ? 'decision' : 'procedure',
-          authorityRequirementIds: [row.competency_key],
-          requiresDemonstration: true,
-          requiresPracticalEvidence: true,
-          criticalSafetyCompetency: /clean tools|protective/i.test(String(row.category || '')),
+          type: standard && /trim|clean|covering/i.test(String(row.category || '')) ? 'practical_skill' :
+                standard && /discuss|recommend/i.test(String(row.category || '')) ? 'decision' : 'knowledge',
+          authorityRequirementIds: standard ? [row.competency_key] : [],
+          requiresDemonstration: standard ? true : false,
+          requiresPracticalEvidence: standard ? true : false,
+          criticalSafetyCompetency: standard ? /clean tools|protective/i.test(String(row.category || '')) : false,
         })),
       };
 
@@ -1287,7 +1305,7 @@ async function execTool(
         __type:'ultimate_course_build_queued', success:true, buildId:build.id,
         jobId:queued.job?.id ?? null, courseId:course.id, title:profile.title,
         status:build.status, stage:build.current_step,
-        message:'Ultimate Course Builder accepted the registered-standard build and queued it on the dedicated Ultimate worker.'
+        message:standard?'Ultimate Course Builder accepted the registered-standard build and queued it on the dedicated Ultimate worker.':'Ultimate Course Builder accepted the course-defined build and queued all existing lessons through the dedicated Ultimate worker.'
       },null,2);
     }
 

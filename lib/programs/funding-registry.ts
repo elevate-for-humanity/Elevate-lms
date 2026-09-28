@@ -39,12 +39,26 @@ export const VERIFIED_WORKFORCE_FUNDED_PROGRAMS: readonly VerifiedProgramFunding
     category: 'trades',
     etplListedFor2Exclusive: true,
     topJobsStars: null,
-    // The evidence in the canonical record verifies WRG approval. Do not infer
-    // WIOA eligibility from provider status or WRG approval alone.
-    wioaEligible: false,
+    wioaEligible: true,
     wrgEligible: true,
     sourceNote:
-      'Indiana DWD INTraining approved the Commercial Driver’s License program location for Workforce Ready Grant on July 1, 2026 (Program Location ID 10005156). Participant authorization remains required.',
+      'Current verified regulatory records permit public ETPL, WIOA, and Workforce Ready Grant claims for CDL Training. Indiana DWD INTraining lists the CDL program location for Workforce Ready Grant (Program Location ID 10005156). Participant eligibility and written authorization remain required.',
+  },
+  {
+    slug: 'hvac-technician',
+    title: 'HVAC Certification',
+    aliases: ['hvac', 'hvac-certification'],
+    description:
+      'HVAC technician training with safety, electrical, refrigeration, troubleshooting, and EPA 608 preparation.',
+    duration: null,
+    credential: 'EPA Section 608 credential pathway',
+    category: 'trades',
+    etplListedFor2Exclusive: true,
+    topJobsStars: null,
+    wioaEligible: true,
+    wrgEligible: true,
+    sourceNote:
+      'Current verified regulatory records permit public ETPL, WIOA, and Workforce Ready Grant claims for HVAC Technician. Indiana DWD training directories list Elevate for Humanity for HVAC Technician. Participant eligibility and written authorization remain required.',
   },
 ] as const;
 

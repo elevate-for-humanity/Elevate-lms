@@ -425,20 +425,41 @@ if (
   fail('pre-auth registry contains retired legacy Studio tables');
 
 const courseCatalog = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
-for (const dependency of ['CourseProvider', 'CourseStudioApplication', 'StudioWorkspace']) {
-  if (!courseCatalog.includes(dependency))
-    fail(`master Course Builder application is missing ${dependency}`);
+for (const invariant of [
+  'UltimateBuildPanel',
+  '/api/admin/ultimate-course-builder',
+  "action: 'queue-course'",
+  'Legacy Course Factory is archived',
+]) {
+  if (!courseCatalog.includes(invariant))
+    fail(`Ultimate Course Builder surface is missing: ${invariant}`);
 }
-const courseBuilderApi = read('apps/admin/app/api/admin/course-builder/route.ts');
-if (!courseBuilderApi.includes('loadCourseSession')) {
-  fail('master Course Builder API is missing loadCourseSession');
+for (const retiredDependency of [
+  'CourseProvider',
+  'CourseStudioApplication',
+  'StudioWorkspace',
+  'runCourseFactoryPipeline',
+]) {
+  if (courseCatalog.includes(retiredDependency))
+    fail(`Ultimate Course Builder reintroduced retired Course Factory UI: ${retiredDependency}`);
+}
+const ultimateCourseBuilderApi = read('apps/admin/app/api/admin/ultimate-course-builder/route.ts');
+for (const invariant of ['UltimateJobQueue', "body.action === 'queue-course'"]) {
+  if (!ultimateCourseBuilderApi.includes(invariant))
+    fail(`Ultimate Course Builder API is missing: ${invariant}`);
+}
+const legacyCourseBuilderApi = read('apps/admin/app/api/admin/course-builder/route.ts');
+for (const invariant of ['COURSE_FACTORY_ARCHIVED', 'status: 410', 'ultimateEndpoint']) {
+  if (!legacyCourseBuilderApi.includes(invariant))
+    fail(`legacy Course Factory generation is not archived: ${invariant}`);
 }
 const legacyCourseApplication = read('apps/admin/app/studio/courses/[courseId]/page.tsx');
 if (
   !legacyCourseApplication.includes('redirect(') ||
-  !legacyCourseApplication.includes('/studio/courses?courseId=')
+  !legacyCourseApplication.includes('/studio/courses?courseId=') ||
+  !legacyCourseApplication.includes('&tab=ultimate')
 ) {
-  fail('legacy per-course builder route does not redirect to the master Course Builder');
+  fail('legacy per-course builder route does not redirect to Ultimate Course Builder');
 }
 for (const forbiddenDependency of [
   '/api/admin/course-builder/course',

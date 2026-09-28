@@ -34,18 +34,19 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(middleware).toContain("pathname === '/admin' || pathname.startsWith('/admin/')");
   });
 
-  it('uses the single canonical Course Builder route from the Studio UI', () => {
-    const builder = source('components/course/AutomaticCourseBuilder.tsx');
-    const client = source('components/admin/course-builder/runCourseFactoryPipeline.ts');
+  it('uses Ultimate Course Builder as the single production generator', () => {
     const unified = source('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+    const ultimateRoute = source('apps/admin/app/api/admin/ultimate-course-builder/route.ts');
+    const legacyRoute = source('apps/admin/app/api/admin/course-builder/route.ts');
 
-    expect(builder).toContain('runCourseFactoryPipeline');
-    expect(client).toContain("fetch('/api/admin/course-builder'");
-    expect(client).not.toContain('/api/admin/course-builder/pipeline');
-    expect(unified).toContain("fetch('/api/admin/course-builder?action=blueprints'");
-    expect(unified).not.toContain('/api/admin/course-builder/generate-from-blueprint');
-    expect(builder).not.toContain('/api/admin/courses/generate');
-    expect(builder).not.toContain('/api/ai/generate-and-publish-course');
+    expect(unified).toContain('/api/admin/ultimate-course-builder');
+    expect(unified).toContain("action: 'queue-course'");
+    expect(unified).toContain('Legacy Course Factory is archived');
+    expect(unified).not.toContain('runCourseFactoryPipeline');
+    expect(ultimateRoute).toContain('UltimateJobQueue');
+    expect(ultimateRoute).toContain("body.action === 'queue-course'");
+    expect(legacyRoute).toContain('COURSE_FACTORY_ARCHIVED');
+    expect(legacyRoute).toContain('{ status: 410 }');
   });
 
   it('provides shared voice control without bypassing course-generation confirmation', () => {

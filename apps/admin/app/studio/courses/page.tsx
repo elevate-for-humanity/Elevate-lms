@@ -35,7 +35,7 @@ export default async function StudioCoursesPage({
             </Link>
             <h1 className="mt-1 text-2xl font-black tracking-tight">Ultimate Course Builder</h1>
             <p className="mt-1 text-sm text-slate-600">
-              The sole production path for course construction, media, QA, durable execution, and LMS release.
+              The sole active production path for course construction, media, QA, durable execution, and LMS release.
             </p>
           </div>
         </div>

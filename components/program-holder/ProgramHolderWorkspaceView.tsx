@@ -1674,11 +1674,16 @@ function formatProgramFunding(program: any) {
   const fundingTags = tags.filter(
     (tag: string) => !['self-pay', 'a-la-carte'].includes(tag.toLowerCase()),
   );
+  const listedAmount = Number(program.tuition ?? program.total_cost ?? program.price);
+  if (program.is_free === true && (!Number.isFinite(listedAmount) || listedAmount <= 0)) {
+    return fundingTags.length
+      ? `No student tuition; ${fundingTags.join(', ')} eligibility rules may apply`
+      : 'No student tuition charged';
+  }
   if (fundingTags.length) return `${fundingTags.join(', ')} may be available; verify written approval`;
   if (program.wioa_approved || program.etpl_listed || program.funding_eligible) {
     return 'Funding may be available; verify written approval';
   }
-  if (program.is_free) return 'No tuition charged';
   if (tags.some((tag: string) => tag.toLowerCase() === 'a-la-carte')) {
     return 'Self-pay, à-la-carte; confirm selected items with Admissions';
   }

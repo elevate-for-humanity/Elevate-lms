@@ -175,7 +175,8 @@ async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
 const KOKORO_MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
 
 interface KokoroAudio {
-  data: Float32Array;
+  audio?: Float32Array;
+  data?: Float32Array;
   sampling_rate: number;
 }
 
@@ -256,9 +257,10 @@ async function generateKokoroNarration(
     if (audio.sampling_rate !== 24000) {
       throw new Error(`Kokoro narration returned unsupported sample rate ${audio.sampling_rate}`);
     }
-    if (!audio.data.length) throw new Error('Kokoro narration returned an empty audio segment');
-    segments.push(audio.data);
-    totalSamples += audio.data.length;
+    const samples = audio.audio ?? audio.data;
+    if (!samples?.length) throw new Error('Kokoro narration returned an empty audio segment');
+    segments.push(samples);
+    totalSamples += samples.length;
   }
   if (!segments.length) throw new Error('Kokoro narration returned no audio segments');
 

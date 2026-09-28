@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { UltimateBuildRunner } from '../../lib/ultimate-course-builder/core/build-runner';
 import { ULTIMATE_BUILD_STEPS } from '../../lib/ultimate-course-builder/core/types';
 import { UltimatePlatformCredential } from '../../lib/ultimate-course-builder/adapters/platform-credential';
-import { UltimatePlatformRenderer } from '../../lib/ultimate-course-builder/adapters/platform-renderer';
+import { prepareUltimateStoryboardInput, UltimatePlatformRenderer } from '../../lib/ultimate-course-builder/adapters/platform-renderer';
 import { UltimateSupabasePersistence } from '../../lib/ultimate-course-builder/persistence/supabase-persistence';
 
 describe('Ultimate builder recovery', () => {
@@ -77,4 +77,40 @@ describe('Ultimate builder recovery', () => {
     expect(checkpoint.passedSteps).toEqual(['learning_objectives']);
     expect(checkpoint.artifacts.learning_objectives).toEqual({ objectives: ['cutting'] });
   });
+  it('maps verified licensed media into unique render scenes and preserves generated fallbacks', () => {
+    const prepared = prepareUltimateStoryboardInput({
+      lessonId: 'lesson-1',
+      courseTitle: 'HVAC Fundamentals',
+      artifacts: {
+        storyboard: {
+          storyboard: {
+            scenes: [
+              { id: 's1', title: 'Hook', teachingPoint: 'Inspect the system.' },
+              { id: 's2', title: 'Practice', teachingPoint: 'Verify the readings.' },
+            ],
+          },
+        },
+        visual_assignment: {
+          media: {
+            readyAssets: [
+              {
+                lesson_id: 'lesson-1',
+                storage_path: 'https://cdn.example.com/licensed/scene.mp4',
+                entitlement_id: 'entitlement-1',
+              },
+            ],
+            licensedSuggestions: [],
+          },
+        },
+      },
+    });
+    const scenes = prepared.sceneData?.scenes as Record<string, unknown>[];
+    expect(scenes[0]).toMatchObject({
+      source_video_url: 'https://cdn.example.com/licensed/scene.mp4',
+      media_source: 'elevate-owned',
+    });
+    expect(scenes[1]).toMatchObject({ media_source: 'elevate-motion' });
+    expect(scenes[1]).not.toHaveProperty('source_video_url');
+  });
+
 });

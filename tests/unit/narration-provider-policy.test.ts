@@ -68,17 +68,24 @@ describe('publication narration provider policy', () => {
     expect(edgeTts).not.toHaveBeenCalled();
   });
 
-  it('rejects diagnostic narration routes in production', () => {
-    expect(() => assertNarrationProviderConfigured({
-      NODE_ENV: 'production',
-      AI_NARRATION_PROVIDER: 'edge',
-    })).toThrow(/diagnostic-only/);
-    expect(configuredNarrationProvider({ NODE_ENV: 'production' })).toBe('cloudflare');
+  it('rejects diagnostic or unconfigured narration routes in production', () => {
+    expect(() =>
+      assertNarrationProviderConfigured({
+        NODE_ENV: 'production',
+        AI_NARRATION_PROVIDER: 'edge',
+      }),
+    ).toThrow(/diagnostic-only/);
+    expect(() => configuredNarrationProvider({ NODE_ENV: 'production' })).toThrow(
+      /No production narration provider/,
+    );
     expect(configuredNarrationProvider({ NODE_ENV: 'test' })).toBe('local');
   });
 
-  it('keeps Gemini available only when explicitly selected', () => {
+  it('selects the configured production provider before the request starts', () => {
     expect(DEFAULT_GEMINI_TTS_MODEL).toBe('gemini-2.5-flash-preview-tts');
     expect(configuredNarrationProvider({ AI_NARRATION_PROVIDER: 'gemini' })).toBe('gemini');
+    expect(
+      configuredNarrationProvider({ NODE_ENV: 'production', GEMINI_API_KEY: 'configured' }),
+    ).toBe('gemini');
   });
 });

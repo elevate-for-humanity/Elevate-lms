@@ -61,24 +61,40 @@ export type NarrationProvider =
 export function configuredNarrationProvider(
   env: NodeJS.ProcessEnv = process.env,
 ): NarrationProvider {
-  const safeDefault = env.NODE_ENV === 'production' ? 'cloudflare' : 'local';
-  const configured = (env.AI_NARRATION_PROVIDER || env.AI_MEDIA_PROVIDER || safeDefault)
-    .trim()
-    .toLowerCase();
-  if (
-    configured === 'cloudflare' ||
-    configured === 'elevenlabs' ||
-    configured === 'gemini' ||
-    configured === 'openai' ||
-    configured === 'edge' ||
-    configured === 'local'
-  )
-    return configured;
-  throw new Error(`Unsupported AI_NARRATION_PROVIDER "${configured}"`);
+  const explicit = (env.AI_NARRATION_PROVIDER || env.AI_MEDIA_PROVIDER)?.trim().toLowerCase();
+  if (explicit) {
+    if (
+      explicit === 'cloudflare' ||
+      explicit === 'elevenlabs' ||
+      explicit === 'gemini' ||
+      explicit === 'openai' ||
+      explicit === 'edge' ||
+      explicit === 'local'
+    )
+      return explicit;
+    throw new Error(`Unsupported AI_NARRATION_PROVIDER "${explicit}"`);
+  }
+
+  const cloudflareToken = (env.CLOUDFLARE_AI_API_TOKEN || env.CLOUDFLARE_API_TOKEN)?.trim();
+  if (env.CLOUDFLARE_ACCOUNT_ID?.trim() && cloudflareToken) return 'cloudflare';
+  if (env.GEMINI_API_KEY?.trim()) return 'gemini';
+  if (env.OPENAI_API_KEY?.trim()) return 'openai';
+  if (env.ELEVENLABS_API_KEY?.trim()) return 'elevenlabs';
+  if (env.NODE_ENV === 'production') {
+    throw new Error(
+      'No production narration provider is configured. Set AI_NARRATION_PROVIDER and its credentials.',
+    );
+  }
+  return 'local';
 }
 
 export function assertNarrationProviderConfigured(env: NodeJS.ProcessEnv = process.env): void {
   const provider = configuredNarrationProvider(env);
+  if (env.NODE_ENV === 'production' && (provider === 'edge' || provider === 'local')) {
+    throw new Error(
+      `Narration provider "${provider}" is diagnostic-only and cannot publish production course media`,
+    );
+  }
   if (provider === 'cloudflare') {
     const accountId = env.CLOUDFLARE_ACCOUNT_ID?.trim();
     const token = (env.CLOUDFLARE_AI_API_TOKEN || env.CLOUDFLARE_API_TOKEN)?.trim();

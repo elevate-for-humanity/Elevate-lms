@@ -594,7 +594,7 @@ export async function renderStoryboardVideo(
           ? null
           : normalizeRemotionMediaUrl(scene.referenceImageUrl);
       if (!imageUrl && !input.ultimateStrict) {
-        imageUrl = normalizeRemotionMediaUrl(await getPexelsImage('default', {query,deterministicKey:scene.contentHash,allowGeneratedFallback:false}));
+        imageUrl = normalizeRemotionMediaUrl(await getPexelsImage('default', {query,deterministicKey:scene.contentHash,allowGeneratedFallback:!input.ultimateStrict}));
       }
       // Pollinations can take longer than Chromium's delayRender window. Fetch
       // the generated image once on the server and persist it beside the lesson
@@ -745,7 +745,7 @@ export async function renderStoryboardVideo(
         await getPexelsImage('default', {
           query: normalizedScenes[0]?.clip_keyword || input.storyboard.title,
           deterministicKey: firstStoryboardScene?.contentHash || input.lessonId,
-          allowGeneratedFallback: false,
+          allowGeneratedFallback: !input.ultimateStrict,
         }),
       );
     if (!openingImageUrl || !firstStoryboardScene) {

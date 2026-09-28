@@ -1,23 +1,24 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-const RELOAD_KEY = "elevate-chunk-reload";
+export const CHUNK_RELOAD_KEY = 'elevate-chunk-reload';
+
+export function reloadWithFreshBuild() {
+  const url = new URL(window.location.href);
+  url.searchParams.set('__elevate_reload', Date.now().toString());
+  window.location.replace(url.toString());
+}
 
 function isChunkError(value: unknown): boolean {
-  const message =
-    value instanceof Error
-      ? value.message
-      : typeof value === "string"
-        ? value
-        : "";
+  const message = value instanceof Error ? value.message : typeof value === 'string' ? value : '';
 
   return (
-    message.includes("ChunkLoadError") ||
-    message.includes("Loading chunk") ||
-    message.includes("Failed to fetch dynamically imported module") ||
-    message.includes("Failed to fetch dynamically imported module") ||
-    message.includes("Application error")
+    message.includes('ChunkLoadError') ||
+    message.includes('Loading chunk') ||
+    message.includes('Failed to fetch dynamically imported module') ||
+    message.includes('Failed to fetch dynamically imported module') ||
+    message.includes('Application error')
   );
 }
 
@@ -26,13 +27,13 @@ export function ChunkRecovery() {
     const reloadOnce = (error: unknown) => {
       if (!isChunkError(error)) return;
 
-      if (sessionStorage.getItem(RELOAD_KEY) === "1") {
-        sessionStorage.removeItem(RELOAD_KEY);
+      if (sessionStorage.getItem(CHUNK_RELOAD_KEY) === '1') {
+        sessionStorage.removeItem(CHUNK_RELOAD_KEY);
         return;
       }
 
-      sessionStorage.setItem(RELOAD_KEY, "1");
-      window.location.reload();
+      sessionStorage.setItem(CHUNK_RELOAD_KEY, '1');
+      reloadWithFreshBuild();
     };
 
     const handleError = (event: ErrorEvent) => {
@@ -43,17 +44,17 @@ export function ChunkRecovery() {
       reloadOnce(event.reason);
     };
 
-    window.addEventListener("error", handleError);
-    window.addEventListener("unhandledrejection", handleRejection);
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleRejection);
 
     const timer = window.setTimeout(() => {
-      sessionStorage.removeItem(RELOAD_KEY);
+      sessionStorage.removeItem(CHUNK_RELOAD_KEY);
     }, 15000);
 
     return () => {
       window.clearTimeout(timer);
-      window.removeEventListener("error", handleError);
-      window.removeEventListener("unhandledrejection", handleRejection);
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleRejection);
     };
   }, []);
 

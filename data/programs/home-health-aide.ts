@@ -231,7 +231,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
       credentialIssued: 'Bloodborne Pathogens Certificate',
       duration: '2 hours',
       required: true,
-      enrollmentUrl: 'https://www.hsi.com/courses/bloodborne-pathogens',
+      enrollmentUrl: '/contact',
     },
   ],
   microCourses: [
@@ -242,7 +242,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
       credentialIssued: 'AHA BLS CPR/AED Certificate',
       duration: '4 hours',
       required: true,
-      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
+      enrollmentUrl: '/contact',
     },
     {
       courseId: 'careersafe-infection-control',

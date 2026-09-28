@@ -784,6 +784,12 @@ importers:
 
   packages/ultimate-course-worker:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.1068.0
+        version: 3.1134.0
+      '@aws-sdk/s3-request-presigner':
+        specifier: ^3.1068.0
+        version: 3.1134.0
       '@remotion/bundler':
         specifier: ^4.0.454
         version: 4.0.525(@swc/helpers@0.5.23)(postcss@8.5.28)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)

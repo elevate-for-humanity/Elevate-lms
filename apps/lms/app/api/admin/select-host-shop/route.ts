@@ -85,22 +85,23 @@ async function selectHostShop(request: NextRequest, postedHandoff = '') {
     .join(' ')
     .toLowerCase();
 
-  const canOpen =
+  const canInspect =
     !partnerError &&
     Boolean(partner?.id) &&
     partner?.status === 'active' &&
-    partner?.approval_status === 'approved' &&
     partner?.is_active !== false &&
     /(barber|cosmet|nail|esthetic|salon|shop|training_site)/.test(typeText);
 
-  if (!canOpen) {
+  if (!canInspect) {
     return NextResponse.json(
-      { error: 'This Host Shop is not yet connected to an active approved partnership record' },
+      { error: 'This Host Shop is not connected to an active partnership record' },
       { status: 409 },
     );
   }
 
-  const response = NextResponse.redirect(new URL('/host-shop/dashboard', APP_ORIGIN));
+  const destination =
+    partner?.approval_status === 'approved' ? '/host-shop/dashboard' : '/host-shop/onboarding';
+  const response = NextResponse.redirect(new URL(destination, APP_ORIGIN));
   response.cookies.set(HOST_SHOP_ADMIN_COOKIE, partnerId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

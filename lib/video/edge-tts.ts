@@ -55,7 +55,7 @@ export type NarrationProvider =
   | 'elevenlabs'
   | 'gemini'
   | 'openai'
-  | 'edge'
+  | 'kokoro'
   | 'local';
 
 export function configuredNarrationProvider(
@@ -68,7 +68,7 @@ export function configuredNarrationProvider(
       explicit === 'elevenlabs' ||
       explicit === 'gemini' ||
       explicit === 'openai' ||
-      explicit === 'edge' ||
+      explicit === 'kokoro' ||
       explicit === 'local'
     )
       return explicit;
@@ -172,21 +172,106 @@ async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
   });
 }
 
-async function generateEdgeNeuralNarration(
+const KOKORO_MODEL_ID = 'onnx-community/Kokoro-82M-v1.0-ONNX';
+
+interface KokoroAudio {
+  data: Float32Array;
+  sampling_rate: number;
+}
+
+interface KokoroModel {
+  generate(text: string, options: { voice: string; speed: number }): Promise<KokoroAudio>;
+}
+
+let kokoroModelPromise: Promise<KokoroModel> | undefined;
+
+function kokoroVoice(instructorVoice: EdgeTTSVoice): string {
+  const voices: Record<EdgeTTSVoice, string> = {
+    [EDGE_TTS_VOICES.marcus]: 'am_michael',
+    [EDGE_TTS_VOICES.female]: 'af_heart',
+    [EDGE_TTS_VOICES.neutral]: 'af_sarah',
+    [EDGE_TTS_VOICES.british]: 'bm_fable',
+    [EDGE_TTS_VOICES.warm]: 'am_puck',
+  };
+  return voices[instructorVoice];
+}
+
+function kokoroSpeed(rate: string): number {
+  const match = /^([+-]?\d+(?:\.\d+)?)%$/.exec(rate.trim());
+  const adjustment = match ? Number(match[1]) / 100 : 0;
+  return Math.max(0.75, Math.min(1.25, 1 + adjustment));
+}
+
+function kokoroNarrationChunks(text: string, maxCharacters = 420): string[] {
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  const chunks: string[] = [];
+  let remaining = normalized;
+  while (remaining.length > maxCharacters) {
+    const window = remaining.slice(0, maxCharacters + 1);
+    const sentenceBreak = Math.max(
+      window.lastIndexOf('. '),
+      window.lastIndexOf('? '),
+      window.lastIndexOf('! '),
+    );
+    const wordBreak = window.lastIndexOf(' ');
+    const splitAt =
+      sentenceBreak >= Math.floor(maxCharacters * 0.45)
+        ? sentenceBreak + 1
+        : wordBreak > 0
+          ? wordBreak
+          : maxCharacters;
+    chunks.push(remaining.slice(0, splitAt).trim());
+    remaining = remaining.slice(splitAt).trim();
+  }
+  if (remaining) chunks.push(remaining);
+  return chunks;
+}
+
+async function getKokoroModel(): Promise<KokoroModel> {
+  if (!kokoroModelPromise) {
+    kokoroModelPromise = import('kokoro-js').then(async ({ KokoroTTS }) => {
+      const model = await KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
+        dtype: 'q8',
+        device: 'cpu',
+      });
+      return model as unknown as KokoroModel;
+    });
+  }
+  return kokoroModelPromise;
+}
+
+async function generateKokoroNarration(
   text: string,
-  voice: EdgeTTSVoice,
-  options: { rate: string; pitch: string; volume: string },
+  instructorVoice: EdgeTTSVoice,
+  rate: string,
 ): Promise<Buffer> {
-  const { tts } = await import('edge-tts');
-  const audio = await tts(text, {
-    voice,
-    rate: options.rate,
-    pitch: options.pitch,
-    volume: options.volume,
-  });
-  const buffer = Buffer.isBuffer(audio) ? audio : Buffer.from(audio as Uint8Array);
-  if (!buffer.length) throw new Error('Edge neural narration returned empty MP3');
-  return buffer;
+  const model = await getKokoroModel();
+  const segments: Float32Array[] = [];
+  let totalSamples = 0;
+  for (const chunk of kokoroNarrationChunks(text)) {
+    const audio = await model.generate(chunk, {
+      voice: kokoroVoice(instructorVoice),
+      speed: kokoroSpeed(rate),
+    });
+    if (audio.sampling_rate !== 24000) {
+      throw new Error(`Kokoro narration returned unsupported sample rate ${audio.sampling_rate}`);
+    }
+    if (!audio.data.length) throw new Error('Kokoro narration returned an empty audio segment');
+    segments.push(audio.data);
+    totalSamples += audio.data.length;
+  }
+  if (!segments.length) throw new Error('Kokoro narration returned no audio segments');
+
+  const pcm = Buffer.allocUnsafe(totalSamples * 2);
+  let offset = 0;
+  for (const segment of segments) {
+    for (const sample of segment) {
+      const value = Math.max(-1, Math.min(1, sample));
+      pcm.writeInt16LE(Math.round(value < 0 ? value * 32768 : value * 32767), offset);
+      offset += 2;
+    }
+  }
+  return pcm16MonoToMp3(pcm);
 }
 
 async function generateLocalNarration(text: string): Promise<Buffer> {
@@ -495,7 +580,7 @@ async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promi
 export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}): Promise<Buffer> {
   const normalizedText = text.trim();
   if (!normalizedText) throw new Error('Narration requires non-empty text');
-  const { voice = EDGE_TTS_VOICES.marcus, rate = '-5%', pitch = '0Hz', volume = '+0%' } = options;
+  const { voice = EDGE_TTS_VOICES.marcus, rate = '-5%' } = options;
   assertNarrationProviderConfigured();
   const provider = configuredNarrationProvider();
   try {
@@ -504,8 +589,8 @@ export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}
     if (provider === 'elevenlabs') return await generateElevenLabsNarration(normalizedText);
     if (provider === 'gemini') return await generateGeminiNarration(normalizedText, voice);
     if (provider === 'openai') return await generateOpenAINarration(normalizedText, voice);
-    if (provider === 'edge')
-      return await generateEdgeNeuralNarration(normalizedText, voice, { rate, pitch, volume });
+    if (provider === 'kokoro')
+      return await generateKokoroNarration(normalizedText, voice, rate);
     logger.info('[Narration] Using explicitly selected local narration');
     return await generateLocalNarration(normalizedText);
   } catch (error) {

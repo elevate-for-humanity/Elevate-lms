@@ -1,8 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-const { edgeTts } = vi.hoisted(() => ({ edgeTts: vi.fn() }));
-
-vi.mock('edge-tts', () => ({ tts: edgeTts }));
 vi.mock('@/lib/ai/openai-client', () => ({
   getOpenAIClient: vi.fn(),
   isOpenAIConfigured: () => false,
@@ -16,7 +13,6 @@ import {
   configuredNarrationProvider,
   DEFAULT_CLOUDFLARE_TTS_MODEL,
   DEFAULT_GEMINI_TTS_MODEL,
-  EDGE_TTS_VOICES,
   generateEdgeTTS,
 } from '@/lib/video/edge-tts';
 
@@ -24,7 +20,6 @@ describe('publication narration provider policy', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
     vi.restoreAllMocks();
-    edgeTts.mockReset();
   });
 
   it('routes narration through Cloudflare Workers AI by default', async () => {
@@ -50,7 +45,6 @@ describe('publication narration provider policy', () => {
         headers: expect.objectContaining({ 'cf-aig-gateway-id': 'default' }),
       }),
     );
-    expect(edgeTts).not.toHaveBeenCalled();
   });
 
   it('does not silently bypass a failed configured route', async () => {
@@ -66,7 +60,6 @@ describe('publication narration provider policy', () => {
     await expect(generateEdgeTTS('A production narration test.')).rejects.toThrow(
       /route "cloudflare" failed; no provider bypass was attempted.*503/,
     );
-    expect(edgeTts).not.toHaveBeenCalled();
   });
 
   it('rejects diagnostic or unconfigured narration routes in production', () => {
@@ -82,21 +75,14 @@ describe('publication narration provider policy', () => {
     expect(configuredNarrationProvider({ NODE_ENV: 'test' })).toBe('local');
   });
 
-  it('uses the configured Edge neural voice without a credential fallback', async () => {
-    vi.stubEnv('NODE_ENV', 'production');
-    vi.stubEnv('AI_NARRATION_PROVIDER', 'edge');
-    edgeTts.mockResolvedValue(Buffer.from('edge-mp3'));
-
-    await expect(
-      generateEdgeTTS('A production Edge narration test.', {
-        voice: EDGE_TTS_VOICES.female,
+  it('accepts the configured local neural production provider', () => {
+    expect(() =>
+      assertNarrationProviderConfigured({
+        NODE_ENV: 'production',
+        AI_NARRATION_PROVIDER: 'kokoro',
       }),
-    ).resolves.toEqual(Buffer.from('edge-mp3'));
-
-    expect(edgeTts).toHaveBeenCalledWith(
-      'A production Edge narration test.',
-      expect.objectContaining({ voice: 'en-US-JennyNeural' }),
-    );
+    ).not.toThrow();
+    expect(configuredNarrationProvider({ AI_NARRATION_PROVIDER: 'kokoro' })).toBe('kokoro');
   });
 
   it('selects the configured production provider before the request starts', () => {

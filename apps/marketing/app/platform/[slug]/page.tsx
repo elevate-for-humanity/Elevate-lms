@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const product = await getCatalogProduct(slug).catch(() => null);
   if (!product) return { title: 'Product Not Found' };
   return {
-    title: `${product.name} | Elevate For Humanity`,
+    title: product.name,
     description: product.description,
     alternates: { canonical: `${PLATFORM_DEFAULTS.siteUrl}/platform/${product.slug}` },
   };

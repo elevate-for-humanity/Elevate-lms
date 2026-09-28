@@ -592,13 +592,13 @@ async function resolveIntent(message: string, db: SupabaseClient): Promise<Inten
   if (lower.includes('workflow') || lower.includes('automation') || lower.includes('cron')) {
     const { data } = await db
       .from('workflows')
-      .select('id, name, status, last_run_at, next_run_at, trigger_type')
+      .select('id, name, status, last_run_at, metadata')
       .order('last_run_at', { ascending: false, nullsFirst: false })
       .limit(20);
     if (data?.length) {
       return {
         text: `WORKFLOWS (${data.length}):\n${data.map((w: any) =>
-          `• ${w.name} — ${w.status} — trigger: ${w.trigger_type ?? 'manual'} — last run: ${w.last_run_at ? new Date(w.last_run_at).toLocaleDateString() : 'never'}`
+          `• ${w.name} — ${w.status} — trigger: ${w.metadata?.trigger_type ?? 'manual'} — last run: ${w.last_run_at ? new Date(w.last_run_at).toLocaleDateString() : 'never'}`
         ).join('\n')}`,
       };
     }

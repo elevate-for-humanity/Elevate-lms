@@ -5,24 +5,11 @@ import UnifiedCourseBuilder from '@/components/admin/course-builder/UnifiedCours
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-type CourseBuilderTab =
-  | 'courses'
-  | 'workspace'
-  | 'ai'
-  | 'blueprints'
-  | 'media'
-  | 'monitor'
-  | 'governance'
-  | 'registry';
+type CourseBuilderTab = 'courses' | 'ultimate' | 'registry';
 
 const COURSE_BUILDER_TABS: ReadonlySet<string> = new Set([
   'courses',
-  'workspace',
-  'ai',
-  'blueprints',
-  'media',
-  'monitor',
-  'governance',
+  'ultimate',
   'registry',
 ] as const);
 
@@ -36,7 +23,7 @@ export default async function StudioCoursesPage({
   searchParams: Promise<{ courseId?: string; tab?: string }>;
 }) {
   const params = await searchParams;
-  const initialTab = isCourseBuilderTab(params.tab) ? params.tab : 'workspace';
+  const initialTab = isCourseBuilderTab(params.tab) ? params.tab : 'ultimate';
 
   return (
     <main className="min-h-screen bg-white text-slate-950">
@@ -46,9 +33,9 @@ export default async function StudioCoursesPage({
             <Link href="/studio" className="text-sm font-semibold text-slate-600 hover:text-slate-950">
               ← Admin AI
             </Link>
-            <h1 className="mt-1 text-2xl font-black tracking-tight">Course Builder</h1>
+            <h1 className="mt-1 text-2xl font-black tracking-tight">Ultimate Course Builder</h1>
             <p className="mt-1 text-sm text-slate-600">
-              Create freeform courses or route regulated programs through their canonical blueprints.
+              The sole production path for course construction, media, QA, durable execution, and LMS release.
             </p>
           </div>
         </div>

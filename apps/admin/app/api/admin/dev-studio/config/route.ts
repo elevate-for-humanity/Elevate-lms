@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
       { label: 'Programs', url: `${siteUrl}/programs` },
       { label: 'Apply', url: `${siteUrl}/apply` },
       { label: 'Admin Dashboard', url: `${adminUrl}/dashboard` },
-      { label: 'Master Course Builder', url: `${adminUrl}/studio/courses` },
+      { label: 'Ultimate Course Builder', url: `${adminUrl}/studio/courses?tab=ultimate` },
       { label: 'Dev Studio', url: `${adminUrl}/studio` },
       { label: 'LMS', url: process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org' },
     ],

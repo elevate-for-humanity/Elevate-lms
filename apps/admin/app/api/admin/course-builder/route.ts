@@ -319,6 +319,27 @@ export async function POST(req: NextRequest) {
   }
 
   const action = String(body.action || 'generate') as CourseBuilderAction;
+  const archivedGenerationActions: CourseBuilderAction[] = [
+    'generate',
+    'generate-from-blueprint',
+    'queue-media',
+    'repair',
+    'generate-missing',
+    'start-existing',
+  ];
+  if (archivedGenerationActions.includes(action)) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: 'COURSE_FACTORY_ARCHIVED',
+        message:
+          'Course Factory is archived. Start or resume production through Ultimate Course Builder.',
+        ultimateEndpoint: '/api/admin/ultimate-course-builder',
+        ultimateRoute: '/studio/courses?tab=ultimate',
+      },
+      { status: 410 },
+    );
+  }
   if (
     ['generate', 'generate-from-blueprint', 'queue-media', 'repair', 'generate-missing', 'start-existing'].includes(
       action,

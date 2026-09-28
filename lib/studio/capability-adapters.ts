@@ -22,7 +22,7 @@ export type CapabilityAdapter = {
 };
 
 export const MASTER_STUDIO_CAPABILITIES: readonly CapabilityAdapter[] = [
-  { id: 'course', authority: 'Course Builder → Course Factory', execution: 'tool-registry', retainedCapabilities: ['curriculum','assessments','credentials','media','governance','publish-readiness'] },
+  { id: 'course', authority: 'Course Builder → Ultimate Course Builder', execution: 'tool-registry', retainedCapabilities: ['curriculum','assessments','credentials','media','governance','publish-readiness'] },
   { id: 'website', authority: 'Website Builder', execution: 'tool-registry', retainedCapabilities: ['generate','import','edit','revision','domain','publish'] },
   { id: 'media', authority: 'Media Studio', execution: 'tool-registry', retainedCapabilities: ['Envato','licensed-assets','video','images','course-media','rendering'] },
   { id: 'workflow', authority: 'Studio Run Engine', execution: 'tool-registry', retainedCapabilities: ['definitions','triggers','dependencies','checkpoints','retry','resume'] },

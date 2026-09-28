@@ -14,7 +14,8 @@ describe('Admin communications send contract', () => {
 
   it('validates bounded recipient lists and records delivery state', () => {
     expect(action).toContain('recipients.length > 25');
-    expect(action).toContain("status: 'queued'");
+    expect(action).toContain("status: 'draft'");
+    expect(action).not.toContain("status: 'queued'");
     expect(action).toContain('recipient_id:');
     expect(action).toContain('sender_id: auth.user.id');
     expect(action).toContain('body: message');

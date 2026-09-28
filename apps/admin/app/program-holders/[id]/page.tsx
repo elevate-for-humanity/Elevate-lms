@@ -241,7 +241,7 @@ export default async function ProgramHolderDetailPage({
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-black text-slate-950">Program Holder follow-up notes</h2>
-          <p className="mt-1 text-sm text-slate-600">Notes entered in David’s applicant workflow appear here for Admin review with outcome and update time.</p>
+          <p className="mt-1 text-sm text-slate-600">Notes entered in this Program Holder’s applicant workflow appear here for Admin review with outcome and update time.</p>
           <div className="mt-4 grid gap-3">
             {applicantNotes?.length ? applicantNotes.map((note: any) => (
               <article key={note.id} className="rounded-xl border border-slate-200 p-4">

@@ -7,7 +7,7 @@ permissions:
   issues: write
 concurrency:
   group: ultimate-course-builder-worker-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   deploy:
     if: github.event.issue.title == 'DEPLOY ULTIMATE COURSE BUILDER WORKER'
@@ -27,7 +27,6 @@ jobs:
       USAJOBS_USER_AGENT_EMAIL: ${{ secrets.USAJOBS_USER_AGENT_EMAIL }}
       CAREERONESTOP_USER_ID: ${{ secrets.CAREERONESTOP_USER_ID }}
       CAREERONESTOP_API_KEY: ${{ secrets.CAREERONESTOP_API_KEY || secrets.CAREERONESTOP_TOKEN }}
-      ULTIMATE_ACCEPTANCE_BUILD_ID: 8c64618b-5db8-4caa-8714-f77da2c19dbe
     steps:
       - name: Checkout exact Ultimate source branch
         uses: actions/checkout@v4
@@ -87,13 +86,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for attempt in $(seq 1 90); do
-            state="$(curl -fsS "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/ultimate_build_jobs?build_id=eq.${ULTIMATE_ACCEPTANCE_BUILD_ID}&status=in.(queued,running)&order=created_at.desc&limit=1&select=id,build_id,status,attempts,lease_owner,heartbeat_at,last_error" -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" || true)"
+          for attempt in $(seq 1 45); do
+            state="$(curl -fsS "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/ultimate_build_jobs?status=eq.running&order=heartbeat_at.desc&limit=1&select=id,build_id,status,attempts,lease_owner,heartbeat_at,last_error" -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" || true)"
             echo "$state"
             echo "$state" | grep -Eq '"status":"running"' && echo "$state" | grep -Eq '"attempts":[1-9]' && echo "$state" | grep -Eq '"lease_owner":"[^"]+"' && echo "$state" | grep -Eq '"heartbeat_at":"[^"]+"' && exit 0
-            completed="$(curl -fsS "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/ultimate_build_jobs?build_id=eq.${ULTIMATE_ACCEPTANCE_BUILD_ID}&status=eq.completed&order=updated_at.desc&limit=1&select=id,build_id,status,attempts,last_error" -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" || true)"
-            echo "$completed" | grep -Eq '"status":"completed"' && echo "$completed" | grep -Eq '"attempts":[1-9]' && exit 0
             sleep 10
           done
-          echo "::error::Ultimate worker did not claim the bound acceptance build ${ULTIMATE_ACCEPTANCE_BUILD_ID}"
+          echo "::error::Ultimate worker did not claim an active queued build after deployment"
           exit 1

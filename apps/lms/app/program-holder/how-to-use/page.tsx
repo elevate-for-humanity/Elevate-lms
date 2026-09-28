@@ -43,11 +43,20 @@ function amount(program: any) {
 
 function fundingPath(program: any) {
   const tags = Array.isArray(program.funding_tags) ? program.funding_tags.filter(Boolean) : [];
-  if (tags.length) return `Funding may be available: ${tags.join(', ')}. Verify written approval.`;
-  if (program.wioa_approved || program.etpl_listed || program.funding_eligible) {
-    return 'Funding may be available. Written eligibility and authorization are required.';
+  const fundingTags = tags.filter(
+    (tag: string) => !['self-pay', 'a-la-carte'].includes(tag.toLowerCase()),
+  );
+  if (fundingTags.length) {
+    return `Potential funding paths: ${fundingTags.join(', ')}. Treat as self-pay until written approval is verified.`;
   }
-  return 'Self-pay unless Elevate documents funding approval.';
+  if (program.wioa_approved || program.etpl_listed || program.funding_eligible) {
+    return 'Funding may be available. Treat as self-pay until written eligibility and authorization are verified.';
+  }
+  if (program.is_free === true) return 'No tuition is charged for this program.';
+  if (tags.some((tag: string) => tag.toLowerCase() === 'a-la-carte')) {
+    return 'Self-pay, à-la-carte NHA items. Confirm the selected items and total with Admissions before quoting.';
+  }
+  return 'Self-pay at the published amount.';
 }
 
 export default async function ProgramHolderStartHerePage() {

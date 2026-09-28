@@ -15,10 +15,10 @@ export function SmsComposer({ enabled, recipients }: { enabled: boolean; recipie
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 id="sms-compose-title" className="text-lg font-semibold text-gray-950">Send a text message</h2>
-          <p className="mt-1 text-sm text-gray-600">Send an operational message through the configured Twilio number.</p>
+          <p className="mt-1 text-sm text-gray-600">Send an operational message through the configured Telnyx number.</p>
         </div>
         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${enabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-          {enabled ? 'Twilio connected' : 'Twilio not configured'}
+          {enabled ? 'Telnyx sender configured' : 'Telnyx SMS not configured'}
         </span>
       </div>
 
@@ -42,7 +42,7 @@ export function SmsComposer({ enabled, recipients }: { enabled: boolean; recipie
       </form>
       <label className="mt-4 flex items-start gap-2 text-sm text-gray-700"><input name="consentConfirmed" value="yes" type="checkbox" required form="sms-outreach-form" className="mt-1" /><span>I verified that this learner consented to receive this operational text. The sender and learner will be recorded in the delivery audit.</span></label>
       {state.message && <p role="status" className={`mt-3 text-sm font-medium ${state.ok ? 'text-green-700' : 'text-red-700'}`}>{state.message}</p>}
-      {!enabled && <p className="mt-3 text-sm text-red-700">Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER to enable sending.</p>}
+      {!enabled && <p className="mt-3 text-sm text-red-700">Set TELNYX_API_KEY and an SMS-enabled TELNYX_PHONE_NUMBER on the Admin service to enable sending.</p>}
     </section>
   );
 }

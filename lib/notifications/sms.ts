@@ -1,6 +1,7 @@
-// SMS notification system using Twilio
+// SMS notification system using the platform's Telnyx number.
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export interface SMSNotification {
   to: string;
@@ -27,12 +28,12 @@ async function auditSMSDelivery(
     const { error } = await db.from('delivery_logs').insert({
       channel: 'sms',
       recipient,
-      status: result.success ? 'sent' : 'failed',
+      status: result.success ? 'pending' : 'failed',
       provider_message_id: result.messageId ?? null,
       error_message: result.error ?? null,
-      sent_at: result.success ? new Date().toISOString() : null,
+      sent_at: null,
       metadata: {
-        provider: 'twilio',
+        provider: 'telnyx',
         message_length: messageLength,
         ...metadata,
       },
@@ -47,17 +48,7 @@ async function auditSMSDelivery(
 
 export class SMSService {
   private static instance: SMSService;
-  private accountSid: string | undefined;
-  private authToken: string | undefined;
-  private fromNumber: string | undefined;
-  private enabled: boolean;
-
-  private constructor() {
-    this.accountSid = process.env.TWILIO_ACCOUNT_SID;
-    this.authToken = process.env.TWILIO_AUTH_TOKEN;
-    this.fromNumber = process.env.TWILIO_PHONE_NUMBER;
-    this.enabled = !!(this.accountSid && this.authToken && this.fromNumber);
-  }
+  private constructor() {}
 
   static getInstance(): SMSService {
     if (!SMSService.instance) {
@@ -67,12 +58,13 @@ export class SMSService {
   }
 
   isEnabled(): boolean {
-    return this.enabled;
+    return Boolean(process.env.TELNYX_API_KEY?.trim() && process.env.TELNYX_PHONE_NUMBER?.trim());
   }
 
   async send(notification: SMSNotification): Promise<SMSResult> {
+    await hydrateProcessEnv();
     const cleanPhone = notification.to.replace(/\D/g, '');
-    if (cleanPhone.length < 10) {
+    if (cleanPhone.length !== 10 && !(cleanPhone.length === 11 && cleanPhone.startsWith('1'))) {
       const result = { success: false, error: 'Invalid phone number' };
       await auditSMSDelivery(notification.to, notification.message.length, result, notification.metadata);
       return result;
@@ -80,47 +72,43 @@ export class SMSService {
 
     const formattedPhone = cleanPhone.startsWith('1') ? `+${cleanPhone}` : `+1${cleanPhone}`;
 
-    if (!this.enabled) {
-      logger.error('SMS not sent — Twilio is not configured. Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER.', new Error('SMS service unavailable'), {
+    if (!this.isEnabled()) {
+      logger.error('SMS not sent — Telnyx messaging is not configured.', new Error('SMS service unavailable'), {
         to: formattedPhone,
         messageLength: notification.message.length,
       });
-      const result = { success: false, error: 'SMS service unavailable — Twilio not configured' };
+      const result = { success: false, error: 'SMS service unavailable — Telnyx API key or sending number is missing.' };
       await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
       return result;
     }
 
     try {
-      const url = `https://api.twilio.com/2010-04-01/Accounts/${this.accountSid}/Messages.json`;
-
-      const response = await fetch(url, {
+      const response = await fetch('https://api.telnyx.com/v2/messages', {
         method: 'POST',
         headers: {
-          Authorization:
-            'Basic ' + Buffer.from(`${this.accountSid}:${this.authToken}`).toString('base64'),
-          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Bearer ${process.env.TELNYX_API_KEY!.trim()}`,
+          'Content-Type': 'application/json',
         },
-        body: new URLSearchParams({
-          To: formattedPhone,
-          From: this.fromNumber!,
-          Body: notification.message,
-        }),
+        body: JSON.stringify({ to: formattedPhone, from: process.env.TELNYX_PHONE_NUMBER!.trim(), text: notification.message }),
+        signal: AbortSignal.timeout(15_000),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        logger.error('Twilio SMS failed', new Error(data.message || 'Unknown error'), {
+        const error = data?.errors?.[0]?.detail || data?.errors?.[0]?.title || 'SMS send failed';
+        logger.error('Telnyx SMS failed', new Error(error), {
           to: formattedPhone,
           status: response.status,
         });
-        const result = { success: false, error: data.message || 'SMS send failed' };
+        const result = { success: false, error };
         await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
         return result;
       }
 
-      logger.info('SMS sent successfully', { to: formattedPhone, messageId: data.sid });
-      const result = { success: true, messageId: data.sid };
+      if (!data?.data?.id) throw new Error('Telnyx accepted the request without a message ID');
+      logger.info('SMS accepted by Telnyx', { to: formattedPhone, messageId: data.data.id });
+      const result = { success: true, messageId: data.data.id };
       await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
       return result;
     } catch (error) {

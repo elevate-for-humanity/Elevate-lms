@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { smsService } from '@/lib/notifications/sms';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { SmsComposer } from './SmsComposer';
 
 export const dynamic = 'force-dynamic';
@@ -39,6 +40,7 @@ function statusClass(status: string | null) {
 
 export default async function SmsDeliveryPage() {
   await requireRole(['admin', 'staff']);
+  await hydrateProcessEnv();
   const admin = await requireAdminClient();
   const [{ data, error }, { data: recipientRows }] = await Promise.all([
     admin.from('delivery_logs').select('id, recipient, status, provider_message_id, error_message, sent_at, created_at').eq('channel', 'sms').order('created_at', { ascending: false }).limit(250),
@@ -50,8 +52,8 @@ export default async function SmsDeliveryPage() {
   }
 
   const deliveries = (data ?? []) as SmsDelivery[];
-  const delivered = deliveries.filter((item) =>
-    ['sent', 'delivered'].includes(item.status?.toLowerCase() ?? ''),
+  const accepted = deliveries.filter((item) =>
+    ['pending', 'sent', 'delivered'].includes(item.status?.toLowerCase() ?? ''),
   ).length;
   const failed = deliveries.filter((item) =>
     ['failed', 'undelivered'].includes(item.status?.toLowerCase() ?? ''),
@@ -62,7 +64,7 @@ export default async function SmsDeliveryPage() {
       <div>
         <h1 className="text-2xl font-semibold text-gray-950">SMS Delivery</h1>
         <p className="mt-1 text-sm text-gray-600">
-          Twilio delivery attempts recorded by the notification service. Recipients are masked.
+          Telnyx message requests recorded by the notification service. Recipients are masked.
         </p>
       </div>
 
@@ -71,7 +73,7 @@ export default async function SmsDeliveryPage() {
       <section className="grid gap-4 sm:grid-cols-3" aria-label="SMS delivery summary">
         {[
           ['Recent attempts', deliveries.length],
-          ['Sent or delivered', delivered],
+          ['Accepted or delivered', accepted],
           ['Failed', failed],
         ].map(([label, value]) => (
           <div key={label} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">

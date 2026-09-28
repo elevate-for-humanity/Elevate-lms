@@ -250,7 +250,7 @@ export const ESTHETICIAN: ProgramSchema = {
       credentialIssued: 'CPR/AED Certificate',
       duration: '4 hours',
       required: false,
-      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
+      enrollmentUrl: '/contact',
     },
   ],
 

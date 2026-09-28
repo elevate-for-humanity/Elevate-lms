@@ -72,7 +72,7 @@ export async function runCourseFactoryPipeline(
 
   if (!response.ok || !response.body) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body.error || `Course Factory request failed (HTTP ${response.status})`);
+    throw new Error(body.error || body.message || `Course Factory request failed (HTTP ${response.status})`);
   }
 
   const reader = response.body.getReader();

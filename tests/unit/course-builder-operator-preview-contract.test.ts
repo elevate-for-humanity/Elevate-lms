@@ -25,4 +25,15 @@ describe('Course Builder operator preview contract', () => {
     expect(route).toContain('? await runFactory()');
     expect(route).toContain('dispatch: runFactory');
   });
+
+  it('routes canonical programs through their non-uniform credential blueprints', () => {
+    const workspace = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+    const pipeline = read('components/admin/course-builder/runCourseFactoryPipeline.ts');
+
+    expect(workspace).toContain("blueprint.slug === selectedProgram.slug");
+    expect(workspace).toContain("action: 'generate-from-blueprint'");
+    expect(workspace).toContain("contentSource: 'blueprint'");
+    expect(workspace).toContain("videoMode: 'queue'");
+    expect(pipeline).toContain('body.error || body.message');
+  });
 });

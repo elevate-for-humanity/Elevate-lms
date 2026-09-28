@@ -30,6 +30,7 @@ type CourseRow = {
 type ProgramRow = {
   id: string;
   title: string;
+  slug?: string | null;
   status?: string | null;
   is_active?: boolean | null;
 };
@@ -509,6 +510,47 @@ function CreateCoursePanel({
       const topic = String(data.get('topic') ?? '').trim();
       const audience = String(data.get('audience') ?? '').trim();
       const programId = String(data.get('programId') ?? '').trim();
+      const selectedProgram = programs.find((program) => program.id === programId);
+      const blueprintResponse = await fetch('/api/admin/course-builder?action=blueprints', {
+        cache: 'no-store',
+      });
+      const blueprintPayload = await blueprintResponse.json().catch(() => ({}));
+      const canonicalBlueprint = Array.isArray(blueprintPayload.blueprints)
+        ? blueprintPayload.blueprints.find(
+            (blueprint: BlueprintRow) =>
+              selectedProgram?.slug && blueprint.slug === selectedProgram.slug,
+          )
+        : null;
+
+      if (canonicalBlueprint) {
+        const response = await fetch('/api/admin/course-builder', {
+          method: 'POST',
+          headers: courseBuilderJsonHeaders('generate-from-blueprint'),
+          body: JSON.stringify({
+            action: 'generate-from-blueprint',
+            blueprintId: canonicalBlueprint.id,
+            programId,
+            mode: 'refresh',
+            contentSource: 'blueprint',
+            videoMode: 'queue',
+            requestedTitle: title,
+            requestedTopic: topic,
+            requestedAudience: audience,
+          }),
+        });
+        const generated = await response.json().catch(() => ({}));
+        if (!response.ok || !generated.courseId) {
+          throw new Error(
+            generated.error ||
+              generated.message ||
+              (Array.isArray(generated.errors) ? generated.errors.join('; ') : '') ||
+              'Canonical blueprint generation failed',
+          );
+        }
+        await onCreated(generated.courseId);
+        return;
+      }
+
       const result = await runCourseFactoryPipeline({
         title,
         topic,

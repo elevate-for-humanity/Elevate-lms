@@ -17,10 +17,17 @@ COPY lib/supabase/admin.ts lib/supabase/timed-fetch.ts ./lib/supabase/
 COPY tsconfig.ultimate-worker.json ./tsconfig.json
 COPY lib/media/licensed-course-media.ts ./lib/media/licensed-course-media.ts
 COPY lib/config ./lib/config
+COPY lib/video ./lib/video
+COPY lib/cloudflare-r2.ts ./lib/cloudflare-r2.ts
+COPY lib/storage/file-storage.ts ./lib/storage/file-storage.ts
 COPY lib/logger.ts lib/secrets.ts ./lib/
+COPY server/video-generator/visual-intelligence.ts ./server/video-generator/visual-intelligence.ts
 COPY remotion-src ./remotion-src
 COPY public ./public
 RUN node -e "require.resolve('@supabase/supabase-js');require.resolve('@remotion/renderer');require.resolve('tsx')"  && test ! -d node_modules/stripe && test ! -d node_modules/next && test ! -d node_modules/@sentry
+# Lazy media adapters are the worker's production boundary. Resolve them in the
+# image build so a missing shared renderer file cannot reach a live course job.
+RUN node --conditions=react-server --import=tsx -e "await Promise.all([import('./lib/ultimate-course-builder/adapters/platform-narration.ts'),import('./lib/ultimate-course-builder/adapters/platform-renderer.ts')])"
 # Verify the standalone image resolves every startup import before deployment.
 RUN (NEXT_PUBLIC_SUPABASE_URL=https://example.supabase.co SUPABASE_SERVICE_ROLE_KEY=probe timeout 5 node --conditions=react-server --import=tsx workers/ultimate-course-builder.ts > /tmp/ultimate-start.log 2>&1 || true) && (grep -q 'polling loop started' /tmp/ultimate-start.log || (cat /tmp/ultimate-start.log && exit 1))
 CMD ["node","--conditions=react-server","--import=tsx","workers/ultimate-course-builder.ts"]

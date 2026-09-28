@@ -79,7 +79,8 @@ export default async function ProgramHolderDetailPage({
     'use server';
     const { user: actor, profile: actorProfile } = await requireRole(['admin']);
     const nextStatus = String(formData.get('status') ?? '');
-    if (!['active', 'rejected', 'suspended'].includes(nextStatus))
+    const allowedStatuses = ['pending', 'approved_pending_mou', 'approved', 'active', 'inactive', 'suspended', 'rejected'];
+    if (!allowedStatuses.includes(nextStatus))
       redirect(`/program-holders/${id}?error=Invalid+status`);
     if (!['admin', 'super_admin'].includes(String(actorProfile.role ?? '')))
       redirect('/unauthorized');
@@ -87,7 +88,13 @@ export default async function ProgramHolderDetailPage({
     const adminDb = await requireAdminClient();
     const { error: updateError } = await adminDb
       .from('program_holders')
-      .update({ status: nextStatus, updated_at: new Date().toISOString() })
+      .update({
+        status: nextStatus,
+        updated_at: new Date().toISOString(),
+        ...(['approved', 'active'].includes(nextStatus) && !holder.approved_at
+          ? { approved_at: new Date().toISOString() }
+          : {}),
+      })
       .eq('id', id);
     if (updateError) redirect(`/program-holders/${id}?error=Status+update+failed`);
 
@@ -440,7 +447,11 @@ export default async function ProgramHolderDetailPage({
                     defaultValue={holder.status || 'active'}
                     className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold"
                   >
+                    <option value="pending">Pending</option>
+                    <option value="approved_pending_mou">Approved — MOU pending</option>
+                    <option value="approved">Approved</option>
                     <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
                     <option value="suspended">Suspended</option>
                     <option value="rejected">Rejected</option>
                   </select>

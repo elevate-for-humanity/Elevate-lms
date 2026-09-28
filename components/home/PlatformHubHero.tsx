@@ -16,6 +16,7 @@ export function PlatformHubHero() {
         <SafeHeroVideo
           src={HOME_VIDEO}
           poster="/images/pages/comp-home-hero.webp"
+          showPosterBeforePlayback
           priority
           loop
           ariaLabel="Elevate for Humanity career training, apprenticeship, and workforce programs"

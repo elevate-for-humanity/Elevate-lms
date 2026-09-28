@@ -11,13 +11,25 @@ const COMMUNICATION_ROLES = new Set([
 ]);
 
 export async function requireCommunicationActor() {
-  const auth = await createClient();
-  const { data: { user: authenticatedUser }, error } = await auth.auth.getUser();
-  if (error || !authenticatedUser) throw new Error('COMMUNICATIONS_UNAUTHENTICATED');
-
   const db = await requireAdminClient();
-  const preview = await resolvePortalPreviewSubject(db, authenticatedUser.id);
-  const effectiveUserId = preview.previewing ? preview.userId : authenticatedUser.id;
+
+  // Cross-domain Admin previews use a short-lived signed handoff and may not
+  // carry the LMS Supabase session. Resolve that verified subject first, then
+  // fall back to the authenticated actor for ordinary holder sessions.
+  const handoffPreview = await resolvePortalPreviewSubject(db, null);
+  const auth = await createClient();
+  const {
+    data: { user: authenticatedUser },
+    error,
+  } = await auth.auth.getUser();
+  if ((error || !authenticatedUser) && !handoffPreview.previewing) {
+    throw new Error('COMMUNICATIONS_UNAUTHENTICATED');
+  }
+
+  const preview = handoffPreview.previewing
+    ? handoffPreview
+    : await resolvePortalPreviewSubject(db, authenticatedUser?.id);
+  const effectiveUserId = preview.previewing ? preview.userId : authenticatedUser!.id;
 
   const [{ data: profile }, { data: roleRows }] = await Promise.all([
     db.from('profiles').select('id,email,full_name,role').eq('id', effectiveUserId).maybeSingle(),
@@ -27,7 +39,9 @@ export async function requireCommunicationActor() {
     profile?.role,
     ...(roleRows ?? []).map((row: any) => row?.roles?.name),
   ]).filter(Boolean);
-  if (!roles.some((role) => COMMUNICATION_ROLES.has(role))) throw new Error('COMMUNICATIONS_FORBIDDEN');
+  if (!roles.some((role) => COMMUNICATION_ROLES.has(role))) {
+    throw new Error('COMMUNICATIONS_FORBIDDEN');
+  }
 
   const { data: extension } = await db
     .from('communication_extensions')
@@ -40,12 +54,8 @@ export async function requireCommunicationActor() {
     ? await db.from('phone_systems').select('*').eq('id', systemId).maybeSingle()
     : { data: null };
 
-  const user = preview.previewing
-    ? ({ ...authenticatedUser, id: effectiveUserId, email: profile?.email || authenticatedUser.email } as typeof authenticatedUser)
-    : authenticatedUser;
-
   return {
-    user,
+    user: { id: effectiveUserId, email: profile?.email || authenticatedUser?.email },
     authenticatedUser,
     previewing: preview.previewing,
     profile,

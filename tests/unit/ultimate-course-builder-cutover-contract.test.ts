@@ -33,6 +33,13 @@ describe('Ultimate Course Builder production cutover', () => {
     expect(coursesRoute).toContain('slug: courseSlug');
   });
 
+  it('keeps standard React available to the standalone Remotion worker', () => {
+    const docker = read('Dockerfile.ultimate-worker');
+    expect(docker).toContain("find lib server -type f -name '*.ts'");
+    expect(docker).toContain('CMD ["node","--import=tsx"');
+    expect(docker).not.toContain('--conditions=react-server');
+  });
+
   it('retires public Course Factory pages and legacy generation actions', () => {
     const lms = read('apps/lms/app/ai/course-factory/page.tsx');
     const marketing = read('apps/marketing/app/ai/course-factory/page.tsx');

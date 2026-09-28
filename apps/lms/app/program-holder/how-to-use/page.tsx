@@ -46,13 +46,18 @@ function fundingPath(program: any) {
   const fundingTags = tags.filter(
     (tag: string) => !['self-pay', 'a-la-carte'].includes(tag.toLowerCase()),
   );
+  const listedAmount = Number(program.tuition ?? program.total_cost ?? program.price);
+  if (program.is_free === true && (!Number.isFinite(listedAmount) || listedAmount <= 0)) {
+    return fundingTags.length
+      ? `No student tuition is charged. ${fundingTags.join(', ')} eligibility or participation rules may still apply.`
+      : 'No student tuition is charged for this program.';
+  }
   if (fundingTags.length) {
     return `Potential funding paths: ${fundingTags.join(', ')}. Treat as self-pay until written approval is verified.`;
   }
   if (program.wioa_approved || program.etpl_listed || program.funding_eligible) {
     return 'Funding may be available. Treat as self-pay until written eligibility and authorization are verified.';
   }
-  if (program.is_free === true) return 'No tuition is charged for this program.';
   if (tags.some((tag: string) => tag.toLowerCase() === 'a-la-carte')) {
     return 'Self-pay, à-la-carte NHA items. Confirm the selected items and total with Admissions before quoting.';
   }

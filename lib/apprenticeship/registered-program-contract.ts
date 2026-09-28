@@ -99,6 +99,16 @@ export function isRegisteredProgramSlug(programSlug: string | null | undefined) 
   return Boolean(programSlug && findStandard(programSlug));
 }
 
+export function getRegisteredProgramStandardByProfileId(profileId: string) {
+  const normalized = profileId.toLowerCase();
+  const entry = Object.entries(APPENDIX_A_STANDARDS).find(
+    ([standardKey, standard]) =>
+      normalized.includes(standard.rapidsCode.toLowerCase()) ||
+      normalized.includes(`:${standardKey.toLowerCase()}:`),
+  );
+  return entry ? getRegisteredProgramStandard(entry[1].programSlugs[0]) : null;
+}
+
 async function resolvePartnerId(
   supabase: SupabaseClient,
   input: { partnerId?: string | null; enrollmentId?: string | null },

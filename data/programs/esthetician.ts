@@ -5,7 +5,7 @@ export const ESTHETICIAN: ProgramSchema = {
   slug: 'esthetician',
   title: 'Professional Esthetician & Client Services',
   subtitle:
-    '5-week accelerated non-licensure certificate. Skin analysis, facial treatments, hair removal, and business startup — WIOA funded.',
+    '5-week accelerated non-licensure certificate covering skin analysis, facial treatments, hair removal, and business startup.',
   sector: 'personal-services',
   category: 'Beauty & Personal Services',
   programType: 'certification',
@@ -21,10 +21,10 @@ export const ESTHETICIAN: ProgramSchema = {
   schedule: 'Monthly enrollment — flexible hybrid scheduling',
   cohortSize: '8–12 participants per cohort',
   fundingStatement:
-    '$0 with WIOA or Workforce Ready Grant. Self-pay starts at a $600 deposit, then weekly or BNPL options.',
+    'Self-pay enrollment is available. Any workforce funding must be verified for this exact program and authorized in writing for the participant before enrollment.',
   selfPayCost: '$4,575',
-  fundingOptions: ['wioa', 'wrg', 'self_pay'],
-  badge: 'ETPL Approved',
+  fundingOptions: ['self_pay'],
+  badge: 'Career Training',
   badgeColor: 'green',
 
   credentials: [
@@ -184,8 +184,8 @@ export const ESTHETICIAN: ProgramSchema = {
 
   complianceAlignment: [
     {
-      standard: 'ETPL Program ID #10004628',
-      description: 'Approved on Indiana ETPL for WIOA Individual Training Account funding.',
+      standard: 'Program Funding Review',
+      description: 'No public ETPL, WIOA, or Workforce Ready Grant claim is made for this program unless current program-level evidence is verified and participant authorization is documented.',
     },
     {
       standard: 'Indiana Professional Licensing Agency — Awareness',
@@ -195,10 +195,6 @@ export const ESTHETICIAN: ProgramSchema = {
     {
       standard: 'CIP Code 12.0409',
       description: 'Aesthetician/Esthetician and Skin Care Specialist classification.',
-    },
-    {
-      standard: 'WIOA Title I',
-      description: 'Program meets WIOA eligibility requirements for workforce funding.',
     },
   ],
 
@@ -281,7 +277,7 @@ export const ESTHETICIAN: ProgramSchema = {
     'Career placement support',
   ],
   paymentTerms:
-    'WIOA and Workforce Ready Grant accepted. Self-pay starts with a $600 deposit, then weekly payments or BNPL. All options available at checkout.',
+    'Self-pay terms are shown at enrollment. Any third-party or workforce funding must be verified and authorized before it is represented as available.',
 
   faqs: [
     {
@@ -297,7 +293,7 @@ export const ESTHETICIAN: ProgramSchema = {
     {
       question: 'Is this program WIOA-funded?',
       answer:
-        'Yes. This program is ETPL-approved (Program ID #10004628) and eligible for WIOA Individual Training Accounts. Contact your local WorkOne office to apply.',
+        'No public WIOA or ETPL claim is made for this program unless current program-level evidence is verified. WorkOne or the responsible agency must authorize any funded enrollment in writing.',
     },
   ],
 
@@ -306,16 +302,16 @@ export const ESTHETICIAN: ProgramSchema = {
     { label: 'Programs', href: '/programs' },
     { label: 'Professional Esthetician' },
   ],
-  metaTitle: 'Professional Esthetician & Client Services | ETPL Approved | Indianapolis',
+  metaTitle: 'Professional Esthetician & Client Services | Indianapolis',
   metaDescription:
-    'Earn an Elevate certificate and OSHA 10 in 5 weeks. WIOA-funded esthetician and skincare training in Indianapolis. Non-licensure certificate program.',
+    'Earn an Elevate certificate and OSHA 10 in 5 weeks through esthetician and skincare training in Indianapolis. Non-licensure certificate program.',
 
 
   funding: {
-    wioa_eligible: true,
-    fssa_eligible: true,
-    wrg_eligible: true,
-    jobReadyIndyEligible: true,
-    fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',
+    wioa_eligible: false,
+    fssa_eligible: false,
+    wrg_eligible: false,
+    jobReadyIndyEligible: false,
+    fundingNotes: 'No public workforce-funding claim is currently authorized for this program. Any third-party funding requires current program-level verification and written participant authorization.',
   },
 };

@@ -49,19 +49,27 @@ export type CommunicationEmailApiOptions = {
 async function emailContext(
   options: CommunicationEmailApiOptions = {},
 ): Promise<EmailContext | NextResponse> {
-  const auth = await createClient();
-  const {
-    data: { user: authenticatedUser },
-    error,
-  } = await auth.auth.getUser();
-  if (error || !authenticatedUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   const db = await requireAdminClient();
   try {
-    const preview = await resolvePortalPreviewSubject(db, authenticatedUser.id);
-    const effectiveUserId = preview.previewing ? preview.userId : authenticatedUser.id;
+    // The Admin and LMS apps can be on separate domains. A verified preview
+    // handoff is sufficient for read-only mailbox inspection even when the LMS
+    // domain has no Supabase session cookie.
+    const handoffPreview = await resolvePortalPreviewSubject(db, null);
+    const auth = await createClient();
+    const {
+      data: { user: authenticatedUser },
+      error,
+    } = await auth.auth.getUser();
+    if ((error || !authenticatedUser) && !handoffPreview.previewing) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    if (options.adminOversight && !preview.previewing) {
+    const preview = handoffPreview.previewing
+      ? handoffPreview
+      : await resolvePortalPreviewSubject(db, authenticatedUser?.id);
+    const effectiveUserId = preview.previewing ? preview.userId : authenticatedUser!.id;
+
+    if (options.adminOversight && !preview.previewing && authenticatedUser) {
       const [{ data: profile }, { data: userRoleRows }] = await Promise.all([
         db.from('profiles').select('role').eq('id', authenticatedUser.id).maybeSingle(),
         db.from('user_roles').select('roles(name)').eq('user_id', authenticatedUser.id),
@@ -86,7 +94,7 @@ async function emailContext(
       ensureActorMailboxes(db, effectiveUserId),
     ]);
     return {
-      user: { id: effectiveUserId, email: profile?.email || authenticatedUser.email },
+      user: { id: effectiveUserId, email: profile?.email || authenticatedUser?.email },
       db,
       mailboxes,
       previewing: preview.previewing,

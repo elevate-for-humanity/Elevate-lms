@@ -132,6 +132,15 @@ after insert or update of program_holder_id, program_id, program_slug, status, i
 on public.program_holder_programs
 for each row execute function public.sync_program_holder_assignment_applicants_v1();
 
+-- The legacy index incorrectly limited each holder to one primary program.
+-- Primary ownership is a property of the program, so one holder may own several.
+drop index if exists public.idx_php_one_primary_per_holder;
+create unique index if not exists idx_php_one_primary_per_program
+  on public.program_holder_programs (program_id)
+  where is_primary = true
+    and status = 'active'
+    and lower(coalesce(role_in_program, 'owner')) = 'owner';
+
 -- Ameco's Enterprise / Amiko Martin is the accountable owner for every
 -- technology program in her approved scope.
 update public.program_holder_programs php

@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Award, BookOpen, Bot, Loader2, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
 import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
 
@@ -443,31 +443,41 @@ function CreateCoursePanel({
 
 function UltimateBuildPanel({ course, programSlug }: { course: CourseRow; programSlug: string }) {
   const [builds, setBuilds] = useState<UltimateBuildRow[]>([]);
+  const [buildsCourseId, setBuildsCourseId] = useState('');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const latest = builds[0] ?? null;
+  const refreshToken = useRef(0);
+  const latest = buildsCourseId === course.id ? builds[0] ?? null : null;
+  const statusLoading = loading || buildsCourseId !== course.id;
 
-  async function refresh() {
+  async function refresh(requestedCourseId = course.id) {
+    const token = ++refreshToken.current;
     setLoading(true);
     setError('');
     try {
       const response = await fetch(
-        `/api/admin/ultimate-course-builder?courseId=${encodeURIComponent(course.id)}`,
+        `/api/admin/ultimate-course-builder?courseId=${encodeURIComponent(requestedCourseId)}`,
         { cache: 'no-store' },
       );
       const payload = await readJson(response);
+      if (token !== refreshToken.current) return;
       if (!response.ok) throw new Error(payload?.error || 'Unable to load Ultimate build status');
       setBuilds(Array.isArray(payload?.builds) ? payload.builds : []);
+      setBuildsCourseId(requestedCourseId);
     } catch (reason) {
+      if (token !== refreshToken.current) return;
       setError(reason instanceof Error ? reason.message : 'Unable to load Ultimate build status');
     } finally {
-      setLoading(false);
+      if (token === refreshToken.current) setLoading(false);
     }
   }
 
   useEffect(() => {
-    void refresh();
+    setBuilds([]);
+    setBuildsCourseId('');
+    setError('');
+    void refresh(course.id);
   }, [course.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -519,8 +529,8 @@ function UltimateBuildPanel({ course, programSlug }: { course: CourseRow; progra
             Program authority: {programSlug || 'course-defined'} · durable Northflank worker · 20 checkpointed stages
           </p>
         </div>
-        <button type="button" onClick={() => void refresh()} disabled={loading} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-bold text-slate-200 disabled:opacity-50">
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+        <button type="button" onClick={() => void refresh()} disabled={statusLoading} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-bold text-slate-200 disabled:opacity-50">
+          <RefreshCw className={`h-4 w-4 ${statusLoading ? 'animate-spin' : ''}`} /> Refresh
         </button>
       </div>
 
@@ -529,15 +539,15 @@ function UltimateBuildPanel({ course, programSlug }: { course: CourseRow; progra
       <div className="mt-5 grid gap-4 md:grid-cols-3">
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-500">Status</p>
-          <p className="mt-1 text-lg font-black text-white">{latest?.status ?? 'not queued'}</p>
+          <p className="mt-1 text-lg font-black text-white">{statusLoading ? 'loading…' : latest?.status ?? 'not queued'}</p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-500">Current stage</p>
-          <p className="mt-1 break-words text-lg font-black text-white">{latest?.current_step ?? 'standards_lock'}</p>
+          <p className="mt-1 break-words text-lg font-black text-white">{statusLoading ? 'loading…' : latest?.current_step ?? 'standards_lock'}</p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-500">Build ID</p>
-          <p className="mt-1 break-all text-sm font-bold text-slate-200">{latest?.id ?? 'Created when queued'}</p>
+          <p className="mt-1 break-all text-sm font-bold text-slate-200">{statusLoading ? 'Loading course build…' : latest?.id ?? 'Created when queued'}</p>
         </div>
       </div>
 
@@ -548,9 +558,9 @@ function UltimateBuildPanel({ course, programSlug }: { course: CourseRow; progra
       </ol>
 
       <div className="mt-6 flex flex-wrap gap-3">
-        <button type="button" onClick={() => void queue()} disabled={busy || ['initializing', 'queued', 'running'].includes(latest?.status ?? '')} className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50">
-          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
-          {['initializing', 'queued', 'running'].includes(latest?.status ?? '') ? 'Ultimate build running' : 'Queue Ultimate build'}
+        <button type="button" onClick={() => void queue()} disabled={busy || statusLoading || ['initializing', 'queued', 'running'].includes(latest?.status ?? '')} className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50">
+          {busy || statusLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
+          {statusLoading ? 'Loading build status…' : ['initializing', 'queued', 'running'].includes(latest?.status ?? '') ? 'Ultimate build running' : 'Queue Ultimate build'}
         </button>
         {latest?.status === 'built' ? (
           <button type="button" onClick={() => void publish()} disabled={busy} className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50">

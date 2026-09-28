@@ -18,6 +18,9 @@ describe('Ultimate Course Builder production cutover', () => {
     expect(builder).toContain("label: 'Ultimate Build'");
     expect(builder).toContain("action: 'queue-course'");
     expect(builder).toContain('/api/admin/ultimate-course-builder');
+    expect(builder).toContain('const latest = buildsCourseId === course.id');
+    expect(builder).toContain('if (token !== refreshToken.current) return');
+    expect(builder).toContain("setBuildsCourseId('')");
     expect(builder).not.toContain('runCourseFactoryPipeline');
     expect(ultimateRoute).toContain('UltimateJobQueue');
     expect(ultimateRoute).toContain("body.action === 'queue-course'");

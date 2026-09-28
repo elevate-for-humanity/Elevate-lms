@@ -212,7 +212,6 @@ export async function POST(req: NextRequest) {
         .update({
           status: 'draft',
           is_active: true,
-          is_published: false,
           updated_at: new Date().toISOString(),
         })
         .eq('id', course.id);

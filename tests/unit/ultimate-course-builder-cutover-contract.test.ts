@@ -10,6 +10,7 @@ describe('Ultimate Course Builder production cutover', () => {
     const page = read('apps/admin/app/studio/courses/page.tsx');
     const builder = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
     const ultimateRoute = read('apps/admin/app/api/admin/ultimate-course-builder/route.ts');
+    const coursesRoute = read('apps/admin/app/api/admin/courses/route.ts');
 
     expect(page).toContain('Ultimate Course Builder');
     expect(page).not.toContain('Course Factory');
@@ -19,6 +20,9 @@ describe('Ultimate Course Builder production cutover', () => {
     expect(builder).not.toContain('runCourseFactoryPipeline');
     expect(ultimateRoute).toContain('UltimateJobQueue');
     expect(ultimateRoute).toContain("body.action === 'queue-course'");
+    expect(ultimateRoute).not.toContain('is_published: false');
+    expect(coursesRoute).toContain(".from('programs')");
+    expect(coursesRoute).toContain('slug: courseSlug');
   });
 
   it('retires public Course Factory pages and legacy generation actions', () => {

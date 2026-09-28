@@ -133,7 +133,6 @@ export function ProgramStructuredData({ program }: ProgramStructuredDataProps) {
             'Workforce funding may be available after agency eligibility review and written authorization.',
         }
       : {}),
-    applicationDeadline: 'Rolling admissions',
   };
 
   return (

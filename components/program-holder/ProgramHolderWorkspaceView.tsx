@@ -1657,6 +1657,9 @@ function Programs({ data }: { data: any }) {
 }
 
 function formatProgramAmount(program: any) {
+  if (['nha-ekg-technician', 'nha-ehr', 'nha-billing-coding'].includes(program.slug)) {
+    return 'Contact admissions — à-la-carte items';
+  }
   const raw = program.tuition ?? program.total_cost ?? program.price;
   const amount = Number(raw);
   if (Number.isFinite(amount) && amount >= 0) {

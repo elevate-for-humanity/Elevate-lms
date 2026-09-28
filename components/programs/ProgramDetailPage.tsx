@@ -63,6 +63,8 @@ interface Props {
   banner?: HeroBannerConfig | null;
   /** Replaces the default video/image hero entirely. */
   heroOverride?: React.ReactNode;
+  /** Route-specific content rendered after the complete hero and program summary. */
+  afterHero?: React.ReactNode;
   /** Route-specific proof shown immediately after the decision panel. */
   featuredContent?: React.ReactNode;
   /** Supplemental compliance, instructor, or authority content shown after the core template. */
@@ -73,6 +75,7 @@ export default function ProgramDetailPage({
   program: p,
   banner: bannerProp,
   heroOverride,
+  afterHero,
   featuredContent,
   children,
 }: Props) {
@@ -192,10 +195,13 @@ export default function ProgramDetailPage({
 
   return (
     <main className="min-h-screen bg-white [&_a]:no-underline [&_a:hover]:no-underline">
-
-
       {/* A. HERO */}
-      <section data-scroll-narration data-narration={programHeroNarration} data-narration-rate="0.82" data-narration-style="instructor">
+      <section
+        data-scroll-narration
+        data-narration={programHeroNarration}
+        data-narration-rate="0.82"
+        data-narration-style="instructor"
+      >
         {heroOverride ??
           (() => {
             // bannerProp is passed from the server page.tsx — use it first.
@@ -255,53 +261,80 @@ export default function ProgramDetailPage({
             );
           })()}
 
-      {isWorkforceFunded ? (
-        <section className="border-y border-slate-800 bg-slate-950 px-4 py-6 text-white">
-          <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
-                Funding review available
-              </p>
-              <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">
-                This training may be no-cost if you qualify.
-              </h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-200 sm:text-base">
-                Apply first, then complete the required WorkOne or agency intake. Free training
-                requires written approval before enrollment. If funding is not approved, Buy Now
-                Pay Later is one separate payment option—not free funding and not guaranteed.
-              </p>
+        {isWorkforceFunded ? (
+          <section className="border-y border-slate-800 bg-slate-950 px-4 py-6 text-white">
+            <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
+                  Funding review available
+                </p>
+                <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">
+                  This training may be no-cost if you qualify.
+                </h2>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-200 sm:text-base">
+                  Apply first, then complete the required WorkOne or agency intake. Free training
+                  requires written approval before enrollment. If funding is not approved, Buy Now
+                  Pay Later is one separate payment option—not free funding and not guaranteed.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
+                <Link
+                  href={applicationHref}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-black text-white hover:bg-brand-red-700"
+                >
+                  <ClipboardList className="h-5 w-5" /> Apply Now
+                </Link>
+                <a
+                  href={WORKONE_INDY_BOOKING_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-white bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-100"
+                >
+                  <CalendarDays className="h-5 w-5" /> Schedule Funding Intake
+                </a>
+              </div>
             </div>
-            <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
-              <Link href={applicationHref} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-black text-white hover:bg-brand-red-700">
-                <ClipboardList className="h-5 w-5" /> Apply Now
+          </section>
+        ) : isApprenticeship ? (
+          <section className="border-y border-slate-800 bg-slate-950 px-4 py-6 text-white">
+            <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
+                  Earn while you learn
+                </p>
+                <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">
+                  Related instruction plus paid, supervised workplace training.
+                </h2>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-200 sm:text-base">
+                  Apply first. Elevate confirms program requirements, Host Site or employer
+                  placement, schedule, related instruction, wages, and any available funding before
+                  training begins.
+                </p>
+              </div>
+              <Link
+                href={applicationHref}
+                className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
+              >
+                Apply for Apprenticeship
               </Link>
-              <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-white bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-100">
-                <CalendarDays className="h-5 w-5" /> Schedule Funding Intake
-              </a>
             </div>
-          </div>
-        </section>
-      ) : isApprenticeship ? (
-        <section className="border-y border-slate-800 bg-slate-950 px-4 py-6 text-white">
-          <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">Earn while you learn</p>
-              <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">Related instruction plus paid, supervised workplace training.</h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-200 sm:text-base">Apply first. Elevate confirms program requirements, Host Site or employer placement, schedule, related instruction, wages, and any available funding before training begins.</p>
-            </div>
-            <Link href={applicationHref} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Apply for Apprenticeship</Link>
-          </div>
-        </section>
-      ) : null}
+          </section>
+        ) : null}
 
-        {isApprenticeship ? (
+        {isApprenticeship && !afterHero ? (
           <div className="border-y border-red-200 bg-red-700 px-4 py-4 text-white">
             <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-red-100">October enrollment special</p>
-                <p className="mt-1 text-lg font-black">50% off the standard startup deposit — start for $300.</p>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-red-100">
+                  October enrollment special
+                </p>
+                <p className="mt-1 text-lg font-black">
+                  50% off the standard startup deposit — start for $300.
+                </p>
               </div>
-              <div className="shrink-0 rounded-xl border border-white/30 bg-white/10 px-4 py-2 text-sm font-black">Coupon: <span className="font-mono">50OFFOCT</span></div>
+              <div className="shrink-0 rounded-xl border border-white/30 bg-white/10 px-4 py-2 text-sm font-black">
+                Coupon: <span className="font-mono">50OFFOCT</span>
+              </div>
             </div>
           </div>
         ) : null}
@@ -460,7 +493,12 @@ export default function ProgramDetailPage({
         </div>
       </section>
 
-      <section id="program-overview" className="border-y border-slate-200 bg-slate-50 px-4 py-12 sm:py-16">
+      {afterHero ? <div>{afterHero}</div> : null}
+
+      <section
+        id="program-overview"
+        className="border-y border-slate-200 bg-slate-50 px-4 py-12 sm:py-16"
+      >
         <div className="mx-auto max-w-6xl">
           <div className="max-w-4xl">
             <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
@@ -482,8 +520,16 @@ export default function ProgramDetailPage({
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <h3 className="text-xl font-black text-slate-950">Program format</h3>
               <dl className="mt-4 space-y-3 text-sm">
-                <div><dt className="font-bold text-slate-500">Length</dt><dd className="mt-1 font-black text-slate-950">{durationLabel}</dd></div>
-                <div><dt className="font-bold text-slate-500">Weekly schedule</dt><dd className="mt-1 font-black text-slate-950">{p.schedule || `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hours per week`}</dd></div>
+                <div>
+                  <dt className="font-bold text-slate-500">Length</dt>
+                  <dd className="mt-1 font-black text-slate-950">{durationLabel}</dd>
+                </div>
+                <div>
+                  <dt className="font-bold text-slate-500">Weekly schedule</dt>
+                  <dd className="mt-1 font-black text-slate-950">
+                    {p.schedule || `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hours per week`}
+                  </dd>
+                </div>
                 <div>
                   <dt className="font-bold text-slate-500">Delivery</dt>
                   <dd className="mt-1 font-black text-slate-950">
@@ -494,44 +540,92 @@ export default function ProgramDetailPage({
                         : 'In-person'}
                   </dd>
                 </div>
-                <div><dt className="font-bold text-slate-500">Credentials</dt><dd className="mt-1 font-black text-slate-950">{p.credentials.length} listed credential{p.credentials.length === 1 ? '' : 's'}</dd></div>
+                <div>
+                  <dt className="font-bold text-slate-500">Credentials</dt>
+                  <dd className="mt-1 font-black text-slate-950">
+                    {p.credentials.length} listed credential{p.credentials.length === 1 ? '' : 's'}
+                  </dd>
+                </div>
               </dl>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <h3 className="text-xl font-black text-slate-950">Your next steps</h3>
               <ol className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
-                <li><strong className="text-slate-950">1. Apply:</strong> Select this program and submit your contact, readiness, and funding information.</li>
-                <li><strong className="text-slate-950">2. Complete intake:</strong> Admissions confirms requirements, documents, schedule, and the correct enrollment path.</li>
-                <li><strong className="text-slate-950">3. Start training:</strong> Complete lessons, hands-on work, assessments, attendance, and progress requirements.</li>
-                <li><strong className="text-slate-950">4. Finish:</strong> Complete required credentials and use career or placement support.</li>
+                <li>
+                  <strong className="text-slate-950">1. Apply:</strong> Select this program and
+                  submit your contact, readiness, and funding information.
+                </li>
+                <li>
+                  <strong className="text-slate-950">2. Complete intake:</strong> Admissions
+                  confirms requirements, documents, schedule, and the correct enrollment path.
+                </li>
+                <li>
+                  <strong className="text-slate-950">3. Start training:</strong> Complete lessons,
+                  hands-on work, assessments, attendance, and progress requirements.
+                </li>
+                <li>
+                  <strong className="text-slate-950">4. Finish:</strong> Complete required
+                  credentials and use career or placement support.
+                </li>
               </ol>
             </div>
 
-            <div id="payment-options" className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
+            <div
+              id="payment-options"
+              className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm"
+            >
               <h3 className="text-xl font-black text-slate-950">Funding and payment options</h3>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
                 {isWorkforceFunded ? (
-                  <li><strong className="text-slate-950">Workforce funding:</strong> Training may be free only if you qualify and receive written agency authorization before enrollment.</li>
+                  <li>
+                    <strong className="text-slate-950">Workforce funding:</strong> Training may be
+                    free only if you qualify and receive written agency authorization before
+                    enrollment.
+                  </li>
                 ) : null}
-                <li><strong className="text-slate-950">Pay in full:</strong> Pay the published tuition through the secure enrollment process.</li>
-                <li><strong className="text-slate-950">Payment plan:</strong> Split eligible tuition into installments; deposit and terms are shown before acceptance.</li>
-                <li><strong className="text-slate-950">Buy Now Pay Later:</strong> If workforce funding is not approved, this is one optional payment alternative. It is not free training, is not funding, and requires separate provider approval.</li>
-                <li><strong className="text-slate-950">Employer-sponsored:</strong> An employer may pay eligible costs when an arrangement is approved.</li>
+                <li>
+                  <strong className="text-slate-950">Pay in full:</strong> Pay the published tuition
+                  through the secure enrollment process.
+                </li>
+                <li>
+                  <strong className="text-slate-950">Payment plan:</strong> Split eligible tuition
+                  into installments; deposit and terms are shown before acceptance.
+                </li>
+                <li>
+                  <strong className="text-slate-950">Buy Now Pay Later:</strong> If workforce
+                  funding is not approved, this is one optional payment alternative. It is not free
+                  training, is not funding, and requires separate provider approval.
+                </li>
+                <li>
+                  <strong className="text-slate-950">Employer-sponsored:</strong> An employer may
+                  pay eligible costs when an arrangement is approved.
+                </li>
               </ul>
             </div>
           </div>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Link href={applicationHref} className="inline-flex min-h-14 items-center justify-center rounded-xl bg-brand-red-700 px-7 py-4 text-base font-black text-white hover:bg-brand-red-800">
+            <Link
+              href={applicationHref}
+              className="inline-flex min-h-14 items-center justify-center rounded-xl bg-brand-red-700 px-7 py-4 text-base font-black text-white hover:bg-brand-red-800"
+            >
               Apply to {p.title}
             </Link>
             {showPriorityFundingPath ? (
-              <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-14 items-center justify-center rounded-xl bg-emerald-700 px-7 py-4 text-base font-black text-white hover:bg-emerald-800">
+              <a
+                href={WORKONE_INDY_BOOKING_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-14 items-center justify-center rounded-xl bg-emerald-700 px-7 py-4 text-base font-black text-white hover:bg-emerald-800"
+              >
                 Schedule WorkOne Intake
               </a>
             ) : null}
-            <Link href={requestInfoHref} className="inline-flex min-h-14 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-7 py-4 text-base font-black text-slate-950 hover:bg-slate-50">
+            <Link
+              href={requestInfoHref}
+              className="inline-flex min-h-14 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-7 py-4 text-base font-black text-slate-950 hover:bg-slate-50"
+            >
               Request Program Information
             </Link>
           </div>
@@ -567,8 +661,8 @@ export default function ProgramDetailPage({
                   Complete the program application
                 </h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  Select {p.title} so the admissions team can review your program choice,
-                  readiness, and preferred payment path.
+                  Select {p.title} so the admissions team can review your program choice, readiness,
+                  and preferred payment path.
                 </p>
                 <Link
                   href={applicationHref}
@@ -685,27 +779,41 @@ export default function ProgramDetailPage({
                 href={paymentSelectionHref('full')}
                 className="rounded-xl border border-white/25 bg-slate-900 p-4 transition hover:border-white/60"
               >
-                <span className="block text-xs font-black uppercase tracking-wider text-orange-300">Pay in full</span>
+                <span className="block text-xs font-black uppercase tracking-wider text-orange-300">
+                  Pay in full
+                </span>
                 <span className="mt-1 block text-xl font-black text-white">{p.selfPayCost}</span>
-                <span className="mt-1 block text-xs leading-5 text-slate-300">One payment after application approval</span>
+                <span className="mt-1 block text-xs leading-5 text-slate-300">
+                  One payment after application approval
+                </span>
               </Link>
               <Link
                 href={paymentSelectionHref('plan')}
                 className="rounded-xl border border-white/25 bg-slate-900 p-4 transition hover:border-white/60"
               >
-                <span className="block text-xs font-black uppercase tracking-wider text-orange-300">Payment plan</span>
-                <span className="mt-1 block text-xl font-black text-white">
-                  {bnplDepositStart ? `From $${bnplDepositStart.toLocaleString()} down` : 'See available terms'}
+                <span className="block text-xs font-black uppercase tracking-wider text-orange-300">
+                  Payment plan
                 </span>
-                <span className="mt-1 block text-xs leading-5 text-slate-300">Deposit and installment options</span>
+                <span className="mt-1 block text-xl font-black text-white">
+                  {bnplDepositStart
+                    ? `From $${bnplDepositStart.toLocaleString()} down`
+                    : 'See available terms'}
+                </span>
+                <span className="mt-1 block text-xs leading-5 text-slate-300">
+                  Deposit and installment options
+                </span>
               </Link>
               <Link
                 href={paymentSelectionHref('bnpl')}
                 className="rounded-xl border border-white/25 bg-white p-4 text-slate-950 transition hover:bg-slate-100"
               >
-                <span className="block text-xs font-black uppercase tracking-wider text-brand-red-700">Buy now, pay later</span>
+                <span className="block text-xs font-black uppercase tracking-wider text-brand-red-700">
+                  Buy now, pay later
+                </span>
                 <span className="mt-1 block text-xl font-black">Check eligibility</span>
-                <span className="mt-1 block text-xs leading-5 text-slate-600">Provider approval and terms apply</span>
+                <span className="mt-1 block text-xs leading-5 text-slate-600">
+                  Provider approval and terms apply
+                </span>
               </Link>
             </div>
             <div className="mt-4 grid gap-3">
@@ -1138,11 +1246,13 @@ export default function ProgramDetailPage({
               {/* Every published self-pay program uses the canonical server-created checkout.
                   This provides the payment calculator, BNPL eligibility, and coupon entry
                   without depending on a legacy hard-coded Stripe URL. */}
-              {enrollmentTracks.selfPay.available && selfPayNumeric > 0 && p.slug !== 'hvac-technician' && (
-                <div className="mt-4 mb-4">
-                  <PaymentPlanCalculator programSlug={p.slug} />
-                </div>
-              )}
+              {enrollmentTracks.selfPay.available &&
+                selfPayNumeric > 0 &&
+                p.slug !== 'hvac-technician' && (
+                  <div className="mt-4 mb-4">
+                    <PaymentPlanCalculator programSlug={p.slug} />
+                  </div>
+                )}
 
               {/* Application fallback remains available when no legacy direct link exists. */}
               {enrollmentTracks.selfPay.available && !p.cta.stripeCheckoutHref && (

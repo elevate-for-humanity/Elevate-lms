@@ -96,10 +96,10 @@ export default function CosmetologyVisualExperience() {
                   Enroll now <ArrowRight className="h-5 w-5" />
                 </Link>
                 <Link
-                  href="/partners/host-shops"
+                  href="/partners/host-shop/apply?program=cosmetology"
                   className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-brand-blue-700 bg-white px-6 py-3 font-black text-brand-blue-900 hover:bg-sky-50"
                 >
-                  View all Host Sites
+                  Apply as a Host Salon
                 </Link>
               </div>
               <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-slate-700">

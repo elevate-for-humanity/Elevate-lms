@@ -17,7 +17,7 @@ function revalidateProfilePaths() {
   revalidatePath('/employer/dashboard');
   revalidatePath('/host-shop/dashboard');
   revalidatePath('/staff/dashboard');
-  revalidatePath('/apprentice/dashboard');
+  revalidatePath('/apprentice');
 }
 
 export async function uploadProfileAvatar(file: File) {
@@ -40,7 +40,10 @@ export async function uploadProfileAvatar(file: File) {
       return { error: 'Image was not approved: that file is not a readable image.' };
     }
     if (metadata.width < 300 || metadata.height < 300) {
-      return { error: 'Image was not approved: profile photos must be at least 300×300 pixels so authorized staff can identify you clearly.' };
+      return {
+        error:
+          'Image was not approved: profile photos must be at least 300×300 pixels so authorized staff can identify you clearly.',
+      };
     }
     normalized = await sharp(input, { limitInputPixels: MAX_AVATAR_PIXELS })
       .rotate()

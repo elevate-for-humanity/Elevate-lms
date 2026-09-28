@@ -19,7 +19,10 @@ export default function BeautyTheoryDailyPolicy({ programTitle, className = '' }
         <p className="text-slate-700 mb-6 leading-relaxed">{DAILY_THEORY_POLICY.summary}</p>
         <ul className="space-y-3 mb-6">
           {DAILY_THEORY_POLICY.rules.map((rule) => (
-            <li key={rule} className="flex items-start gap-2 text-slate-700 text-sm leading-relaxed">
+            <li
+              key={rule}
+              className="flex items-start gap-2 text-slate-700 text-sm leading-relaxed"
+            >
               <span className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2" />
               {rule}
             </li>
@@ -27,7 +30,10 @@ export default function BeautyTheoryDailyPolicy({ programTitle, className = '' }
         </ul>
         <p className="text-sm text-slate-600">
           {programTitle} apprentices complete bookwork in Elevate LMS.{' '}
-          <Link href="https://app.elevateforhumanity.org/apprentice/dashboard" className="text-brand-blue-600 font-semibold hover:underline">
+          <Link
+            href="https://app.elevateforhumanity.org/apprentice"
+            className="text-brand-blue-600 font-semibold hover:underline"
+          >
             Open apprentice portal
           </Link>{' '}
           to start today&apos;s theory.

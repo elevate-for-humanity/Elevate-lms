@@ -1,11 +1,12 @@
 import { notFound } from 'next/navigation';
 
-import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
+import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';
+import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import BeautyApprenticeshipAuthority, {
   buildBeautyProgramStructuredData,
 } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
+import CosmetologyVisualExperience from '@/components/programs/beauty/CosmetologyVisualExperience';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
-import NailDesignShowcase from '@/components/programs/beauty/NailDesignShowcase';
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 import { getStaticProgram } from '@/data/programs';
@@ -46,11 +47,11 @@ export default async function CosmetologyApprenticeshipPage() {
           __html: JSON.stringify(structuredData).replace(/</g, '\\u003c'),
         }}
       />
-      <BeautyEnrollmentPromotion />
       <ProgramDetailPage
         program={program}
         banner={banner}
-        heroOverride={<NailDesignShowcase asHero />}
+        heroOverride={<CosmetologyVisualExperience />}
+        afterHero={<BeautyEnrollmentPromotion />}
         featuredContent={<FeaturedHostPartners programSlug="cosmetology-apprenticeship" />}
       >
         <BeautyApprenticeshipAuthority program={program} />

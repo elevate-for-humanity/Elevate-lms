@@ -12,6 +12,7 @@ const PORTAL_LINKS = [
   ['Hours', '/program-holder/hours'],
   ['Meetings', '/program-holder/meetings'],
   ['Phone', '/program-holder/phone'],
+  ['AirScript', '/program-holder/airscript'],
   ['Email', '/program-holder/email'],
   ['Community', '/program-holder/community'],
   ['Career Feed', '/program-holder/career'],

@@ -105,7 +105,7 @@ const aiProducts = [
     tagline: 'Connect Everything',
     description: 'Integrate with payroll, HRIS, LMS, and workforce systems across the enterprise.',
     icon: '🔗',
-    features: ['Stripe payments', 'SendGrid email', 'Google Classroom', 'API webhooks'],
+    features: ['QuickBooks billing', 'PayPal payments', 'Google Classroom', 'API webhooks'],
     color: 'from-cyan-600 to-blue-600',
     href: '/platform',
   },
@@ -126,7 +126,7 @@ export default function AIPage() {
     <div className="min-h-screen">
       <SEO
         title="AI Workforce Platform"
-        description="AI-powered workforce technology. PARIS AI, Dev Studio, Course Factory, Credential Engine, and more."
+        description="AI-powered workforce technology. PARIS AI, Dev Studio, Ultimate Course Builder, Credential Engine, and more."
         breadcrumb={[{ name: 'Platform', url: '/platform' }, { name: 'AI', url: '/ai' }]}
       />
       

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { UltimateJobQueue } from '@/lib/ultimate-course-builder/worker/job-queue';
+import { UltimateAppendixAStandardsSource } from '@/lib/ultimate-course-builder/credential/appendix-a-source';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -34,6 +35,16 @@ async function buildUltimateProfile(
     state?: string;
   },
 ) {
+  const registeredSource = new UltimateAppendixAStandardsSource();
+  if (registeredSource.supports({ programSlug: input.programSlug })) {
+    const profile = await registeredSource.load({ programSlug: input.programSlug });
+    return {
+      ...profile,
+      title: input.title,
+      audience: input.audience?.trim() || undefined,
+    };
+  }
+
   const { data: standard, error: standardError } = await db
     .from('apprenticeship_standard_versions')
     .select('*')

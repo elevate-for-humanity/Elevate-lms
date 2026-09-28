@@ -11,6 +11,7 @@ describe('Ultimate Course Builder production cutover', () => {
     const builder = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
     const ultimateRoute = read('apps/admin/app/api/admin/ultimate-course-builder/route.ts');
     const coursesRoute = read('apps/admin/app/api/admin/courses/route.ts');
+    const productionHandlers = read('lib/ultimate-course-builder/core/production-handlers.ts');
 
     expect(page).toContain('Ultimate Course Builder');
     expect(page).not.toContain('Course Factory');
@@ -21,6 +22,10 @@ describe('Ultimate Course Builder production cutover', () => {
     expect(ultimateRoute).toContain('UltimateJobQueue');
     expect(ultimateRoute).toContain("body.action === 'queue-course'");
     expect(ultimateRoute).not.toContain('is_published: false');
+    expect(ultimateRoute).toContain('UltimateAppendixAStandardsSource');
+    expect(productionHandlers).toContain("ctx.profile.authority==='course-defined'");
+    expect(productionHandlers).toContain("ctx.profile.id.startsWith('course:')");
+    expect(productionHandlers).toContain("status:'course-defined',verified:true");
     expect(coursesRoute).toContain(".from('programs')");
     expect(coursesRoute).toContain('slug: courseSlug');
   });

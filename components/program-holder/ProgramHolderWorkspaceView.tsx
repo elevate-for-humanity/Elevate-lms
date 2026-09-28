@@ -1671,10 +1671,18 @@ function formatProgramAmount(program: any) {
 
 function formatProgramFunding(program: any) {
   const tags = Array.isArray(program.funding_tags) ? program.funding_tags.filter(Boolean) : [];
-  if (tags.length) return tags.join(', ');
-  if (program.wioa_approved || program.etpl_listed) return 'Workforce funding may be available';
-  if (program.funding_eligible || program.is_free) return 'Eligibility must be verified';
-  return 'Self-pay unless Elevate confirms funding';
+  const fundingTags = tags.filter(
+    (tag: string) => !['self-pay', 'a-la-carte'].includes(tag.toLowerCase()),
+  );
+  if (fundingTags.length) return `${fundingTags.join(', ')} may be available; verify written approval`;
+  if (program.wioa_approved || program.etpl_listed || program.funding_eligible) {
+    return 'Funding may be available; verify written approval';
+  }
+  if (program.is_free) return 'No tuition charged';
+  if (tags.some((tag: string) => tag.toLowerCase() === 'a-la-carte')) {
+    return 'Self-pay, à-la-carte; confirm selected items with Admissions';
+  }
+  return 'Self-pay at the published amount';
 }
 
 function ProgramCards({

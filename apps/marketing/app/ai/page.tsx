@@ -5,7 +5,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'AI Workforce Platform',
-  description: 'AI-powered workforce technology platform. PARIS AI, Dev Studio, Course Factory, Credential Engine, and more.',
+  description: 'AI-powered workforce technology platform. PARIS AI, Dev Studio, Ultimate Course Builder, Credential Engine, and more.',
 };
 
 const aiProducts = [
@@ -30,14 +30,14 @@ const aiProducts = [
     href: '/apps/website-builder',
   },
   {
-    slug: 'course-factory',
-    name: 'AI Course Factory',
-    tagline: 'Create Curriculum at Scale',
-    description: 'Generate complete courses with lessons, quizzes, and assessments using AI automation.',
+    slug: 'ultimate-course-builder',
+    name: 'Ultimate Course Builder',
+    tagline: 'Governed Course Production',
+    description: 'Build and repair courses through the governed production pipeline used by the current platform.',
     icon: '📚',
-    features: ['Auto lesson generation', 'Quiz creation', 'Assessment builders', 'Curriculum templates'],
+    features: ['Course generation', 'Media and narration workflow', 'Assessment generation', 'Publishing and repair checks'],
     color: 'from-orange-600 to-red-600',
-    href: '/ai/course-factory',
+    href: '/course-builder',
   },
   {
     slug: 'credential-engine',

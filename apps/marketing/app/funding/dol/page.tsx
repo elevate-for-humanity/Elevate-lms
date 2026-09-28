@@ -5,10 +5,10 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
-import { createClient } from '@/lib/supabase/server';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 export const metadata: Metadata = {
   title: 'DOL Registered Apprenticeship Programs',
   description:
@@ -20,15 +20,28 @@ const benefits = [
   'Earn wages during training — paid on-the-job learning',
   'Industry-recognized credentials upon completion',
   'Structured instructor support from experienced professionals',
-  'Funding may cover full tuition for eligible participants',
+  'Funding, when available, requires separate program-level and participant authorization',
   'Direct pathway to full-time employment',
   'Portable, nationally recognized certification',
 ];
 
-export default async function DOLFundingPage() {
-  const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('funding_sources').select('*').limit(50);
-  const programs = (dbRows as any[]) || [];
+const REGISTERED_PROGRAMS = [
+  { slug: 'barber-apprenticeship', label: 'Barber Apprenticeship' },
+  { slug: 'esthetician-apprenticeship', label: 'Esthetician Apprenticeship' },
+  { slug: 'nail-technician-apprenticeship', label: 'Nail Technician Apprenticeship' },
+]
+  .map((program) => {
+    const contract = getRegisteredProgramStandard(program.slug);
+    if (!contract) return null;
+    return {
+      name: program.label,
+      href: `/programs/${program.slug}`,
+      detail: `${contract.completion.competencyCount} competencies · ${contract.completion.requiredRtiHours} RTI hours · RAPIDS ${contract.standard.rapidsCode}`,
+    };
+  })
+  .filter((program): program is NonNullable<typeof program> => Boolean(program));
+
+export default function DOLFundingPage() {
 
   return (
     <div className="min-h-screen bg-white">
@@ -68,9 +81,8 @@ export default async function DOLFundingPage() {
                 recognized credential.
               </p>
               <p className="text-slate-700 leading-relaxed mb-6">
-                {PLATFORM_DEFAULTS.orgName} is a DOL Registered Apprenticeship Sponsor for select programs
-                (currently Barber Apprenticeship), meaning these programs meet federal standards for
-                quality, safety, and outcomes.
+                {PLATFORM_DEFAULTS.orgName} is a DOL Registered Apprenticeship Sponsor. Public occupation
+                claims on this page are generated only from the canonical approved Appendix A registry.
               </p>
               <Link
                 href="/start-trial"
@@ -99,12 +111,10 @@ export default async function DOLFundingPage() {
           </h2>
           <div className="max-w-3xl mx-auto bg-white rounded-xl p-6 border border-slate-200">
             <p className="text-slate-700 leading-relaxed">
-              Registered Apprenticeships let you earn wages during training through paid on-the-job
-              learning. You receive industry-recognized credentials upon completion that are
-              portable and nationally recognized. Experienced professionals provide structured
-              instructor support throughout the program. Funding may cover full tuition for eligible
-              participants, and the apprenticeship creates a direct pathway to full-time employment
-              with the training employer.
+              Registered Apprenticeships combine paid on-the-job learning with related instruction
+              and documented competency progression. Funding is separate from registered status and
+              is never assumed: any workforce-funded enrollment requires current program-level evidence,
+              participant eligibility, available funds, and written authorization from the responsible agency.
             </p>
           </div>
         </div>
@@ -119,7 +129,7 @@ export default async function DOLFundingPage() {
             Programs registered with the U.S. Department of Labor.
           </p>
           <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
-            {programs.map((p) => (
+            {REGISTERED_PROGRAMS.map((p) => (
               <Link
                 key={p.name}
                 href={p.href}
@@ -129,7 +139,7 @@ export default async function DOLFundingPage() {
                   <h3 className="font-bold text-slate-900 group-hover:text-brand-blue-600 transition-colors">
                     {p.name}
                   </h3>
-                  <p className="text-sm text-black">{p.duration}</p>
+                  <p className="text-sm text-black">{p.detail}</p>
                 </div>
                 <ArrowRight className="w-5 h-5 text-black group-hover:text-brand-blue-600 transition-colors" />
               </Link>

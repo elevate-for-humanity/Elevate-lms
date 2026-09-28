@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 
@@ -38,6 +38,11 @@ export default function UniversalHostSiteApplyPage() {
   const [draftMessage, setDraftMessage] = useState('');
   const [error, setError] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (!defaultPrograms.length) return;
+    setPrograms((current) => [...new Set([...current, ...defaultPrograms])]);
+  }, [defaultPrograms]);
 
   function toggleProgram(value: string, checked: boolean) {
     setPrograms((current) =>
@@ -553,61 +558,3 @@ function SelectField({
   options: Array<[string, string]>;
   className: string;
   labelClass: string;
-}) {
-  return (
-    <div className="min-w-0">
-      <label htmlFor={`host-${name}`} className={labelClass}>
-        {label}
-      </label>
-      <select id={`host-${name}`} name={name} required defaultValue="" className={className}>
-        <option value="">Select</option>
-        {options.map(([value, text]) => (
-          <option key={value} value={value}>
-            {text}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-function FileField({
-  label,
-  name,
-  required = true,
-}: {
-  label: string;
-  name: string;
-  required?: boolean;
-}) {
-  return (
-    <div className="min-w-0 overflow-hidden rounded-xl border border-slate-300 bg-slate-50 p-3 sm:p-4">
-      <label
-        htmlFor={`host-${name}`}
-        className="block break-words text-sm font-black text-slate-950"
-      >
-        {label}
-      </label>
-      <input
-        id={`host-${name}`}
-        type="file"
-        name={name}
-        accept={FILE_ACCEPT}
-        required={required}
-        className="mt-3 block w-full min-w-0 max-w-full overflow-hidden text-ellipsis text-xs text-slate-900 file:mr-2 file:max-w-full file:rounded-lg file:border-0 file:bg-slate-950 file:px-3 file:py-2 file:text-xs file:font-bold file:text-white sm:text-sm sm:file:mr-3 sm:file:text-sm"
-      />
-      <p className="mt-2 text-xs font-semibold text-slate-700">
-        PDF, JPG, PNG, or WEBP; maximum 10 MB.
-      </p>
-    </div>
-  );
-}
-
-function Checkbox({ name, label }: { name: string; label: string }) {
-  return (
-    <label className="flex min-w-0 items-start gap-3 rounded-xl border border-slate-300 p-4 text-sm font-semibold leading-6 text-slate-900">
-      <input type="checkbox" name={name} value="true" required className="mt-1 h-5 w-5 flex-none" />
-      <span className="min-w-0 break-words">{label}</span>
-    </label>
-  );
-}

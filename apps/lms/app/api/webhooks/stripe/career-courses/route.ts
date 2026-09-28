@@ -1,14 +1,7 @@
-import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { handleCareerCourseStripeWebhook } from '@/lib/payments/career-course-webhook';
+import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export const POST = withApiAudit(
-  '/api/webhooks/stripe/career-courses',
-  handleCareerCourseStripeWebhook,
-  {
-    actor_type: 'webhook',
-    skip_body: true,
-    critical: true,
-  },
-);
+// Career course purchases use the active payment system. The retired Stripe
+// checkout must never activate learner access through an old callback.
+export const POST = () => NextResponse.json({ error: 'Webhook retired' }, { status: 410 });

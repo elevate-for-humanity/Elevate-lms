@@ -734,10 +734,10 @@ async function handleEvent(
       .order('position');
     if (system.routing_mode === 'menu' && options?.length) {
       const menuDigits = Array.from(
-        new Set([...options.map((option: any) => String(option.digit)), '9', '0']),
+        new Set([...options.map((option: any) => String(option.digit)), '8', '9', '0']),
       ).join('');
       await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
-        payload: `${menuPrompt(system.greeting, options)} Press 0 for immediate assistance or for questions not covered by the directory.`,
+        payload: `${menuPrompt(system.greeting, options)} Press 8 to enter a three-digit extension. Press 9 for PARIS, or press 0 for immediate assistance.`,
         voice: 'Telnyx.KokoroTTS.af',
         minimum_digits: 1,
         maximum_digits: 1,
@@ -789,6 +789,25 @@ async function handleEvent(
       } else {
         await startParis(db, system, call, payload.call_control_id, eventId);
       }
+      return;
+    }
+    if (digits === '8') {
+      await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
+        payload: 'Please enter the three-digit extension now.',
+        voice: 'Telnyx.KokoroTTS.af',
+        minimum_digits: 3,
+        maximum_digits: 3,
+        valid_digits: '0123456789',
+        maximum_tries: 2,
+        timeout_millis: 7000,
+        command_id: `${eventId}-extension-directory`,
+        client_state: encodeCallState({
+          systemId: system.id,
+          callId: call.id,
+          parentCallControlId: payload.call_control_id,
+          phase: 'extension_menu',
+        }),
+      });
       return;
     }
     if (digits === '9') {

@@ -802,6 +802,9 @@ importers:
       '@supabase/supabase-js':
         specifier: 2.89.0
         version: 2.89.0
+      edge-tts:
+        specifier: ^1.0.1
+        version: 1.0.1(typescript@5.9.3)
       groq-sdk:
         specifier: ^1.1.2
         version: 1.6.0

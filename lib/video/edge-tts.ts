@@ -90,7 +90,7 @@ export function configuredNarrationProvider(
 
 export function assertNarrationProviderConfigured(env: NodeJS.ProcessEnv = process.env): void {
   const provider = configuredNarrationProvider(env);
-  if (env.NODE_ENV === 'production' && (provider === 'edge' || provider === 'local')) {
+  if (env.NODE_ENV === 'production' && provider === 'local') {
     throw new Error(
       `Narration provider "${provider}" is diagnostic-only and cannot publish production course media`,
     );
@@ -170,6 +170,23 @@ async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
     });
     ffmpeg.stdin.end(pcm);
   });
+}
+
+async function generateEdgeNeuralNarration(
+  text: string,
+  voice: EdgeTTSVoice,
+  options: { rate: string; pitch: string; volume: string },
+): Promise<Buffer> {
+  const { tts } = await import('edge-tts');
+  const audio = await tts(text, {
+    voice,
+    rate: options.rate,
+    pitch: options.pitch,
+    volume: options.volume,
+  });
+  const buffer = Buffer.isBuffer(audio) ? audio : Buffer.from(audio as Uint8Array);
+  if (!buffer.length) throw new Error('Edge neural narration returned empty MP3');
+  return buffer;
 }
 
 async function generateLocalNarration(text: string): Promise<Buffer> {
@@ -487,11 +504,8 @@ export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}
     if (provider === 'elevenlabs') return await generateElevenLabsNarration(normalizedText);
     if (provider === 'gemini') return await generateGeminiNarration(normalizedText, voice);
     if (provider === 'openai') return await generateOpenAINarration(normalizedText, voice);
-    if (provider === 'edge') {
-      throw new Error(
-        'The legacy edge-tts provider is disabled in production builds. Configure cloudflare, elevenlabs, gemini, openai, or local narration instead.',
-      );
-    }
+    if (provider === 'edge')
+      return await generateEdgeNeuralNarration(normalizedText, voice, { rate, pitch, volume });
     logger.info('[Narration] Using explicitly selected local narration');
     return await generateLocalNarration(normalizedText);
   } catch (error) {

@@ -16,6 +16,7 @@ import {
   configuredNarrationProvider,
   DEFAULT_CLOUDFLARE_TTS_MODEL,
   DEFAULT_GEMINI_TTS_MODEL,
+  EDGE_TTS_VOICES,
   generateEdgeTTS,
 } from '@/lib/video/edge-tts';
 
@@ -72,13 +73,30 @@ describe('publication narration provider policy', () => {
     expect(() =>
       assertNarrationProviderConfigured({
         NODE_ENV: 'production',
-        AI_NARRATION_PROVIDER: 'edge',
+        AI_NARRATION_PROVIDER: 'local',
       }),
     ).toThrow(/diagnostic-only/);
     expect(() => configuredNarrationProvider({ NODE_ENV: 'production' })).toThrow(
       /No production narration provider/,
     );
     expect(configuredNarrationProvider({ NODE_ENV: 'test' })).toBe('local');
+  });
+
+  it('uses the configured Edge neural voice without a credential fallback', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('AI_NARRATION_PROVIDER', 'edge');
+    edgeTts.mockResolvedValue(Buffer.from('edge-mp3'));
+
+    await expect(
+      generateEdgeTTS('A production Edge narration test.', {
+        voice: EDGE_TTS_VOICES.female,
+      }),
+    ).resolves.toEqual(Buffer.from('edge-mp3'));
+
+    expect(edgeTts).toHaveBeenCalledWith(
+      'A production Edge narration test.',
+      expect.objectContaining({ voice: 'en-US-JennyNeural' }),
+    );
   });
 
   it('selects the configured production provider before the request starts', () => {

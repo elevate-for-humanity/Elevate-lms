@@ -231,7 +231,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
     {
       courseId: 'hsi-bloodborne-pathogens',
       label: 'Bloodborne Pathogens Training',
-      partnerName: 'Health & Safety Institute',
+      partnerName: 'Approved safety-training provider',
       credentialIssued: 'Bloodborne Pathogens Certificate',
       duration: '2 hours',
       required: true,

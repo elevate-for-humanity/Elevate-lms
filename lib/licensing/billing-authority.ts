@@ -4,12 +4,13 @@ import { logger } from '@/lib/logger';
  *
  * SINGLE SOURCE OF TRUTH for license access decisions.
  *
- * Two billing authorities:
- * 1. DB-Authoritative: Access controlled by expires_at (trial, lifetime, one_time)
- * 2. Stripe-Authoritative: Access controlled by current_period_end (subscriptions)
+ * Two active billing authorities:
+ * 1. DB-authoritative: Access controlled by expires_at (trial, lifetime, one_time)
+ * 2. Provider-authoritative: QuickBooks-backed plans use current_period_end.
+ *    Historical Stripe identifiers remain readable for archive compatibility only.
  *
  * Rules:
- * - Subscription tiers MUST have stripe_subscription_id AND current_period_end
+ * - Subscription tiers MUST have a provider subscription id AND current_period_end
  * - Trial tiers MUST have expires_at (no perpetual trials)
  * - Unknown tiers are DENIED (fail closed)
  * - canceled_at or suspended_at set = DENY regardless of status
@@ -19,7 +20,7 @@ import { logger } from '@/lib/logger';
 // TIER CATALOG - All valid tiers must be declared here
 // ============================================================================
 
-// Subscription tiers (Stripe-authoritative)
+// Subscription tiers (provider-authoritative)
 const SUBSCRIPTION_TIERS = new Set([
   'managed_monthly',
   'managed_annual',
@@ -121,7 +122,7 @@ export function getBillingAuthority(
   tier: string | null | undefined,
   provider?: License['billing_provider'],
 ): BillingAuthority {
-  return isSubscriptionTier(tier) ? provider || 'stripe' : 'database';
+  return isSubscriptionTier(tier) ? provider || 'quickbooks' : 'database';
 }
 
 /**
@@ -206,9 +207,9 @@ export function isLicenseActiveNow(
     };
   }
 
-  // Rule 5: Subscription tiers (Stripe-authoritative)
+  // Rule 5: Subscription tiers (provider-authoritative)
   if (isSubscriptionTier(tier)) {
-    // MUST have stripe_subscription_id
+    // MUST have a provider subscription id
     const subscriptionId = license.provider_subscription_id || license.stripe_subscription_id;
     if (!subscriptionId) {
       logger.error('[billing-authority] Subscription tier missing provider subscription id', undefined, {

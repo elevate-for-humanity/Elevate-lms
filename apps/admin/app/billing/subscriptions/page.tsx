@@ -154,6 +154,7 @@ export default async function AdminBillingSubscriptionsPage() {
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Cadence</th>
               <th className="px-4 py-3">Next invoice</th>
+              <th className="px-4 py-3">Ledger</th>
               <th className="px-4 py-3">Automatic collection</th>
             </tr>
           </thead>
@@ -167,6 +168,7 @@ export default async function AdminBillingSubscriptionsPage() {
                 </td>
                 <td className="px-4 py-3 capitalize">{s.cadence}</td>
                 <td className="px-4 py-3">{new Date(s.next_invoice_date).toLocaleDateString()}</td>
+                <td className="px-4 py-3 capitalize">{s.provider || 'quickbooks'}</td>
                 <td className="px-4 py-3">
                   {s.collection_mode === 'automatic' ? (
                     <PayPalSetupAction
@@ -191,6 +193,7 @@ export default async function AdminBillingSubscriptionsPage() {
               <th className="px-4 py-3">Organization</th>
               <th className="px-4 py-3">Plan</th>
               <th className="px-4 py-3">Status</th>
+              <th className="px-4 py-3">Provider</th>
               <th className="px-4 py-3">Period end</th>
             </tr>
           </thead>
@@ -207,6 +210,7 @@ export default async function AdminBillingSubscriptionsPage() {
                   )?.name || '—'}
                 </td>
                 <td className="px-4 py-3">{r.status}</td>
+                <td className="px-4 py-3 capitalize">{r.billing_provider || 'quickbooks'}</td>
                 <td className="px-4 py-3">
                   {r.current_period_end ? new Date(r.current_period_end).toLocaleDateString() : '—'}
                 </td>

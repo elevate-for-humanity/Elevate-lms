@@ -6,10 +6,8 @@ import { logger } from '@/lib/logger';
  * Set up as scheduled cron: "0 6 * * *" (6 AM daily)
  */
 
-import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import type Stripe from 'stripe';
 
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -65,22 +63,36 @@ async function _GET(request: NextRequest) {
       results.checked++;
     }
 
-    // 2. Check subscription status for active licenses
+    // 2. Enforce provider-neutral subscription periods.
+    // QuickBooks payment fulfillment advances the period. PayPal collection is
+    // reconciled into that ledger by the dedicated billing reconciliation job.
     const { data: subscriptionLicenses } = await supabase
       .from('licenses')
-      .select('id, tenant_id, stripe_subscription_id, status')
-      .not('stripe_subscription_id', 'is', null);
+      .select(
+        'id, tenant_id, billing_provider, provider_subscription_id, current_period_end, status, suspended_reason',
+      )
+      .not('provider_subscription_id', 'is', null);
 
+    const now = Date.now();
     for (const license of subscriptionLicenses || []) {
       try {
-        const stripe = getStripe();
-        const subscription = await stripe.subscriptions.retrieve(license.stripe_subscription_id);
+        const periodEnd = license.current_period_end
+          ? Date.parse(license.current_period_end)
+          : Number.NaN;
+        if (!Number.isFinite(periodEnd)) {
+          results.errors.push(`Subscription license ${license.id} is missing current_period_end`);
+          results.checked++;
+          continue;
+        }
 
-        const shouldBeActive = ['active', 'trialing'].includes(subscription.status);
+        const shouldBeActive = periodEnd > now;
         const isActive = license.status === 'active';
+        const provider = String(license.billing_provider || 'quickbooks');
+        const billingSuspension = String(license.suspended_reason || '').startsWith(
+          'Billing period ended',
+        );
 
-        if (shouldBeActive && !isActive) {
-          // Reactivate
+        if (shouldBeActive && !isActive && billingSuspension) {
           await supabase
             .from('licenses')
             .update({ status: 'active', suspended_at: null, suspended_reason: null })
@@ -88,13 +100,12 @@ async function _GET(request: NextRequest) {
           await supabase.from('tenants').update({ active: true }).eq('id', license.tenant_id);
           results.reactivated++;
         } else if (!shouldBeActive && isActive) {
-          // Suspend
           await supabase
             .from('licenses')
             .update({
               status: 'suspended',
               suspended_at: new Date().toISOString(),
-              suspended_reason: `Subscription ${subscription.status}`,
+              suspended_reason: `Billing period ended (${provider})`,
             })
             .eq('id', license.id);
           await supabase.from('tenants').update({ active: false }).eq('id', license.tenant_id);

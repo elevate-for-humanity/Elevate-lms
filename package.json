@@ -250,6 +250,7 @@
     "integrity:media": "node scripts/integrity/media.mjs",
     "integrity:lms": "node scripts/integrity/lms.mjs",
     "integrity:store": "node scripts/integrity/store.mjs",
+    "integrity:stripe": "node scripts/check-stripe-integrity.mjs",
     "integrity:analytics": "node scripts/check-analytics-integrity.mjs",
     "integrity:self-service": "node scripts/check-self-service-policy.mjs",
     "integrity:test-endpoints": "node scripts/check-no-test-endpoints.mjs",

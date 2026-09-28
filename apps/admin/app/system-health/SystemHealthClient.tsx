@@ -41,8 +41,7 @@ function formatRelative(iso: string, nowMs: number) {
 const SERVICE_ICONS: Record<string, React.ElementType> = {
   Database: Database,
   Redis: Zap,
-  Stripe: Shield,
-  'Stripe (legacy archive)': Shield,
+  'Billing (QuickBooks + PayPal)': Shield,
   'Email (SendGrid)': Mail,
   'Storage (Supabase)': Server,
 };

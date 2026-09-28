@@ -40,8 +40,15 @@ export default function UniversalHostSiteApplyPage() {
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (!defaultPrograms.length) return;
-    setPrograms((current) => [...new Set([...current, ...defaultPrograms])]);
+    // The shared search-params provider intentionally renders once with empty
+    // params during hydration. Read the browser URL on mount as the canonical
+    // fallback so CTA deep links always preserve their requested program.
+    const browserProgram = new URLSearchParams(window.location.search).get('program') || '';
+    const hydratedPrograms = PROGRAM_OPTIONS.some((option) => option.value === browserProgram)
+      ? [browserProgram]
+      : defaultPrograms;
+    if (!hydratedPrograms.length) return;
+    setPrograms((current) => [...new Set([...current, ...hydratedPrograms])]);
   }, [defaultPrograms]);
 
   function toggleProgram(value: string, checked: boolean) {

@@ -424,10 +424,12 @@ async function routeToExtension(
     .from('communication_extensions')
     .select('*')
     .eq('id', extensionId)
-    .eq('enabled', true)
     .maybeSingle();
   if (!extension) return startParis(db, system, call, callControlId, eventId);
   const route = { extensionId: extension.id, profileId: extension.profile_id || undefined };
+  if (!extension.enabled) {
+    return startParis(db, system, call, callControlId, eventId, route);
+  }
   const { data: device } = await db
     .from('phone_webrtc_devices')
     .select('sip_username,last_seen_at')

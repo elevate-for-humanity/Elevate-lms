@@ -125,9 +125,9 @@ export function selectPrimaryMailbox<T extends CommunicationMailboxSummary>(
 ): T | null {
   const priority: Record<CommunicationMailboxKind, number> = {
     program_holder: 0,
-    host_shop: 0,
-    individual: 1,
-    department: 2,
+    host_shop: 1,
+    individual: 2,
+    department: 3,
   };
   return (
     [...mailboxes].sort((a, b) => priority[a.mailboxKind] - priority[b.mailboxKind])[0] ?? null

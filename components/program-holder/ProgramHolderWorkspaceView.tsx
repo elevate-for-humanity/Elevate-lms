@@ -46,6 +46,7 @@ function resolveDashboardHero(
 type Section =
   | 'dashboard'
   | 'students'
+  | 'at-risk'
   | 'pending'
   | 'programs'
   | 'hours'
@@ -310,6 +311,8 @@ export async function ProgramHolderWorkspaceView({
         programs={data.programs}
       />
     );
+  if (section === 'at-risk')
+    return <Students title="At-Risk Students" rows={atRisk} programs={data.programs} />;
   if (section === 'pending')
     return (
       <Applicants
@@ -596,19 +599,19 @@ export async function ProgramHolderWorkspaceView({
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
-              href="/lms/community"
+              href="/program-holder/community"
               className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-black text-slate-950"
             >
               <MessageSquare className="h-4 w-4" aria-hidden="true" /> Community hub
             </Link>
             <Link
-              href="/lms/career"
+              href="/program-holder/career"
               className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/50 bg-white/10 px-4 py-2.5 text-sm font-black text-white backdrop-blur"
             >
               <BriefcaseBusiness className="h-4 w-4" aria-hidden="true" /> Career services
             </Link>
             <Link
-              href="/lms/events"
+              href="/program-holder/meetings"
               className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/50 bg-white/10 px-4 py-2.5 text-sm font-black text-white backdrop-blur"
             >
               <CalendarDays className="h-4 w-4" aria-hidden="true" /> School events
@@ -625,14 +628,14 @@ export async function ProgramHolderWorkspaceView({
                 Opportunities to share with students
               </h3>
             </div>
-            <Link href="/lms/career" className="text-sm font-black text-blue-800 underline">
+            <Link href="/program-holder/career" className="text-sm font-black text-blue-800 underline">
               Open full career center
             </Link>
           </div>
           {careerJobs.length > 0 ? (
             <div className="mt-5 grid gap-4 lg:grid-cols-2">
               {careerJobs.map((job) => (
-                <JobCard key={job.id} job={job} href="/lms/career" />
+                <JobCard key={job.id} job={job} href="/program-holder/career" />
               ))}
             </div>
           ) : (
@@ -1215,12 +1218,19 @@ function DashboardHero({
             </span>
           </div>
         </div>
-        <Link
-          href="/program-holder/hours"
-          className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-sm sm:w-auto"
-        >
-          Record training hours
-        </Link>
+        <div className="flex flex-col items-center gap-3">
+          {isPortrait ? (
+            <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-white/80 bg-white shadow-xl">
+              <Image src={heroImage} alt={title} fill sizes="96px" className="object-cover object-top" />
+            </div>
+          ) : null}
+          <Link
+            href="/program-holder/hours"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-sm sm:w-auto"
+          >
+            Record training hours
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -1646,6 +1656,24 @@ function Programs({ data }: { data: any }) {
   );
 }
 
+function formatProgramAmount(program: any) {
+  const raw = program.tuition ?? program.total_cost ?? program.price;
+  const amount = Number(raw);
+  if (Number.isFinite(amount) && amount >= 0) {
+    return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+  }
+  if (program.is_free === true) return '$0.00';
+  return 'Amount not configured';
+}
+
+function formatProgramFunding(program: any) {
+  const tags = Array.isArray(program.funding_tags) ? program.funding_tags.filter(Boolean) : [];
+  if (tags.length) return tags.join(', ');
+  if (program.wioa_approved || program.etpl_listed) return 'Workforce funding may be available';
+  if (program.funding_eligible || program.is_free) return 'Eligibility must be verified';
+  return 'Self-pay unless Elevate confirms funding';
+}
+
 function ProgramCards({
   programs,
   courseAssignments,
@@ -1700,8 +1728,17 @@ function ProgramCards({
                         program.total_hours ? String(program.total_hours) : 'Review program record'
                       }
                     />
+                    <Row label="Published amount" value={formatProgramAmount(program)} />
+                    <Row label="Funding path" value={formatProgramFunding(program)} />
                     <Row label="Course assignments" value={String(courses.length)} />
                   </dl>
+                  <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
+                    <strong>Student payment conversation:</strong> confirm whether Elevate has documented
+                    funding approval before describing a program as funded. Otherwise explain the published
+                    self-pay amount. Students may use the payment options shown at checkout; eligible applicants
+                    can request a buy-now-pay-later decision, including Affirm when offered. Approval is made by
+                    the payment provider, not by the Program Holder.
+                  </div>
                   {!courses.length && (
                     <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900">
                       This program is assigned, but no delivery course is connected yet.

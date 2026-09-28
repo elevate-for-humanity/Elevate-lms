@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, RefreshCw, Home, ArrowLeft } from 'lucide-react';
+import { CHUNK_RELOAD_KEY, reloadWithFreshBuild } from '@/components/system/ChunkRecovery';
 
 interface ErrorPageProps {
   error: Error & { digest?: string };
@@ -17,6 +18,15 @@ export default function GlobalErrorPage({ error, reset }: ErrorPageProps) {
       stack: error.stack,
       digest: error.digest,
     });
+
+    const isChunkError =
+      error.message.includes('ChunkLoadError') ||
+      error.message.includes('Loading chunk') ||
+      error.message.includes('dynamically imported module');
+    if (!isChunkError || sessionStorage.getItem(CHUNK_RELOAD_KEY) === '1') return;
+
+    sessionStorage.setItem(CHUNK_RELOAD_KEY, '1');
+    reloadWithFreshBuild();
   }, [error]);
 
   return (
@@ -25,18 +35,14 @@ export default function GlobalErrorPage({ error, reset }: ErrorPageProps) {
         <div className="max-w-2xl w-full bg-slate-800/50 border border-white/10 rounded-2xl p-8 md:p-12 text-center">
           <div className="mb-8">
             <AlertTriangle className="h-20 w-20 text-amber-500 mx-auto mb-6" />
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Application Error
-            </h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Application Error</h1>
             <p className="text-lg text-slate-400 mb-6">
               A client-side error occurred while loading the page.
             </p>
 
             {error.message && (
               <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-4 mb-6 text-left">
-                <p className="text-xs font-mono text-red-400 break-words">
-                  Error: {error.message}
-                </p>
+                <p className="text-xs font-mono text-red-400 break-words">Error: {error.message}</p>
                 {error.stack && (
                   <details className="mt-2">
                     <summary className="text-xs text-slate-400 cursor-pointer">Stack Trace</summary>
@@ -75,11 +81,7 @@ export default function GlobalErrorPage({ error, reset }: ErrorPageProps) {
             Go Back
           </button>
 
-          {error.digest && (
-            <p className="mt-6 text-xs text-slate-500">
-              Error ID: {error.digest}
-            </p>
-          )}
+          {error.digest && <p className="mt-6 text-xs text-slate-500">Error ID: {error.digest}</p>}
         </div>
       </body>
     </html>

@@ -137,7 +137,7 @@ set role_in_program = 'owner',
     is_primary = true
 from public.programs p
 where php.program_id = p.id
-  and php.program_holder_id = '01a77939-a012-42a2-8673-db4b264f4259'::uuid
+  and php.program_holder_id = (select id from public.program_holders where organization_name = 'Ameco''s Enterprise' order by created_at asc limit 1)
   and p.slug = any(array[
     'information-technology',
     'cad-drafting',
@@ -156,12 +156,12 @@ where php.program_id = p.id
 update public.program_holder_programs
 set role_in_program = 'coordinator',
     is_primary = false
-where program_holder_id = 'f9d0329a-ad7b-4854-923f-3ef3aa8322b0'::uuid;
+where program_holder_id = (select id from public.program_holders where organization_name = 'Top Ace Solutions' order by created_at asc limit 1);
 
 -- Remove only applicant projections from the pending coordinator. Canonical
 -- applications and enrollment records remain untouched.
 delete from public.program_holder_students
-where program_holder_id = 'f9d0329a-ad7b-4854-923f-3ef3aa8322b0'::uuid
+where program_holder_id = (select id from public.program_holders where organization_name = 'Top Ace Solutions' order by created_at asc limit 1)
   and application_id is not null;
 
 -- Reconcile current applicant projections to the one selected primary owner.

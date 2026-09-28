@@ -48,7 +48,7 @@ export default async function StudioCoursesPage({
             </Link>
             <h1 className="mt-1 text-2xl font-black tracking-tight">Course Builder</h1>
             <p className="mt-1 text-sm text-slate-600">
-              Create, govern, review, and publish courses through the canonical Course Factory.
+              Create freeform courses or route regulated programs through their canonical blueprints.
             </p>
           </div>
         </div>

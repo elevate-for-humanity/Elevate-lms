@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 
@@ -34,12 +34,66 @@ export default function UniversalHostSiteApplyPage() {
 
   const [programs, setPrograms] = useState<string[]>(defaultPrograms);
   const [submitting, setSubmitting] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
+  const [draftMessage, setDraftMessage] = useState('');
   const [error, setError] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
 
   function toggleProgram(value: string, checked: boolean) {
     setPrograms((current) =>
       checked ? [...new Set([...current, value])] : current.filter((item) => item !== value),
     );
+  }
+
+  async function saveDraft() {
+    setError('');
+    setDraftMessage('');
+    const formElement = formRef.current;
+    if (!formElement) return;
+    if (!programs.length) {
+      setError('Select at least one apprenticeship program before saving.');
+      return;
+    }
+
+    const form = new FormData(formElement);
+    const value = (name: string) => String(form.get(name) || '').trim();
+    setSavingDraft(true);
+    try {
+      const response = await fetch('/api/host-shop/draft', {
+        method: 'POST',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          legalBusinessName: value('legalBusinessName'),
+          dbaName: value('dbaName'),
+          ownerName: value('ownerName'),
+          industryType: value('industryType'),
+          contactName: value('contactName'),
+          email: value('email'),
+          phone: value('phone'),
+          address1: value('address1'),
+          address2: value('address2'),
+          city: value('city'),
+          state: value('state'),
+          zip: value('zip'),
+          programs,
+        }),
+      });
+      const data = (await response.json().catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+        referenceNumber?: string;
+      };
+      if (!response.ok || !data.ok) throw new Error(data.error || 'Unable to save the draft.');
+      setDraftMessage(
+        `Application saved. Reference ${data.referenceNumber}. We emailed secure Host Shop access so you can finish the remaining compliance items.`,
+      );
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Unable to save the draft.');
+    } finally {
+      setSavingDraft(false);
+    }
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -143,7 +197,16 @@ export default function UniversalHostSiteApplyPage() {
           </div>
         ) : null}
 
-        <form onSubmit={handleSubmit} className="min-w-0 space-y-5 sm:space-y-6">
+        {draftMessage ? (
+          <div
+            role="status"
+            className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm font-bold leading-6 text-emerald-950"
+          >
+            {draftMessage}
+          </div>
+        ) : null}
+
+        <form ref={formRef} onSubmit={handleSubmit} className="min-w-0 space-y-5 sm:space-y-6">
           <section className={sectionClass}>
             <h2 className="text-xl font-black">1. Business identity</h2>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -308,6 +371,23 @@ export default function UniversalHostSiteApplyPage() {
                 </label>
               ))}
             </div>
+          </section>
+
+          <section className="min-w-0 rounded-2xl border-2 border-blue-300 bg-blue-50 p-4 sm:p-6">
+            <h2 className="text-lg font-black text-blue-950">Need time to gather the documents?</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-blue-900">
+              After completing sections 1–3, save the application and receive secure conditional
+              Host Shop access. You can finish the supervisor, insurance, license, EIN/W-9, and
+              signature requirements before approval.
+            </p>
+            <button
+              type="button"
+              onClick={saveDraft}
+              disabled={savingDraft || submitting}
+              className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-blue-950 px-5 py-3 text-center font-black text-white hover:bg-blue-900 disabled:cursor-not-allowed disabled:bg-slate-500 sm:w-auto"
+            >
+              {savingDraft ? 'Saving application…' : 'Save application and finish later'}
+            </button>
           </section>
 
           <section className={sectionClass}>

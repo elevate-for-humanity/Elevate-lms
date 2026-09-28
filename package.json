@@ -115,6 +115,7 @@
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "jszip": "3.10.1",
+    "kokoro-js": "1.2.1",
     "livekit-client": "^2.22.3",
     "livekit-server-sdk": "^2.19.0",
     "lucide-react": "0.471.2",

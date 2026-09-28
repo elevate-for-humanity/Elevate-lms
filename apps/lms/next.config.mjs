@@ -36,6 +36,11 @@ const nextConfig = {
     // edge-tts ships TypeScript source in its package. Keep it outside the
     // Next/Webpack bundle so Node loads it through the server runtime path.
     'edge-tts',
+    // Kokoro loads platform-specific ONNX native bindings at runtime. These
+    // must be traced as server dependencies instead of parsed by webpack.
+    'kokoro-js',
+    '@huggingface/transformers',
+    'onnxruntime-node',
   ],
 
   async headers() {

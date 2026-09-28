@@ -355,7 +355,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
       credentialIssued: 'Bloodborne Pathogens Certificate',
       duration: '2 hours',
       required: true,
-      enrollmentUrl: 'https://www.hsi.com/courses/bloodborne-pathogens',
+      enrollmentUrl: '/contact',
     },
   ],
   microCourses: [
@@ -375,7 +375,7 @@ export const MEDICAL_ASSISTANT: ProgramSchema = {
       credentialIssued: 'CPR/AED Certification',
       duration: '4 hours',
       required: true,
-      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
+      enrollmentUrl: '/contact',
     },
   ],
 

@@ -43,6 +43,14 @@ async function ensureCustomer(db: Database, input: BillingCustomerInput) {
   return created.Customer;
 }
 
+/** Idempotently prepare a customer for an existing billing schedule. No invoice or charge is created. */
+export async function ensureQuickBooksCustomer(db: Database, input: BillingCustomerInput): Promise<string> {
+  assertProviderCanCreateCharges('quickbooks', await loadBillingProviderConfig(db));
+  const customer = await ensureCustomer(db, input);
+  if (!customer?.Id) throw new Error('QuickBooks did not return a customer ID.');
+  return String(customer.Id);
+}
+
 async function ensureItem(db: Database, line: BillingLineInput) {
   const config = await loadQuickBooksConfig(db);
   const name = `Elevate | ${line.canonicalKey}`.slice(0, 100);

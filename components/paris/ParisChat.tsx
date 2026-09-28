@@ -68,7 +68,7 @@ function resolvePortalNavigation(command: string, pathname: string) {
   const text = command.toLowerCase();
   if (!/\b(open|show|go to|take me|manage|change|update|view|send)\b/.test(text)) return null;
   if (/\b(card|payment method)\b/.test(text)) {
-    return { href: '/account/payment-methods', label: 'secure payment methods' };
+    return { href: '/account/payment-methods', label: 'billing and payment options' };
   }
 
   const prefix = pathname.startsWith('/program-holder')

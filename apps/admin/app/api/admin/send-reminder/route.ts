@@ -6,41 +6,15 @@ import { requireApiAuth } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { smsService } from '@/lib/notifications/sms';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
 async function sendSMS(phone: string, message: string): Promise<boolean> {
-  if (!process.env.TWILIO_SID || !process.env.TWILIO_AUTH_TOKEN || !process.env.TWILIO_PHONE) {
-    return false;
-  }
-
-  try {
-    const auth = Buffer.from(`${process.env.TWILIO_SID}:${process.env.TWILIO_AUTH_TOKEN}`).toString(
-      'base64',
-    );
-
-    const response = await fetch(
-      `https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_SID}/Messages.json`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Basic ${auth}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          From: process.env.TWILIO_PHONE,
-          To: phone,
-          Body: message,
-        }),
-      },
-    );
-
-    return response.ok;
-  } catch {
-    return false;
-  }
+  const result = await smsService.send({ to: phone, message, metadata: { source: 'admin_application_reminder' } });
+  return result.success;
 }
 
 async function _POST(req: Request) {

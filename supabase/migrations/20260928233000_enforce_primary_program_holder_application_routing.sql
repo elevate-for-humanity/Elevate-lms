@@ -30,7 +30,7 @@ begin
   join public.program_holders ph on ph.id = php.program_holder_id
   where php.program_id = v_program_id
     and coalesce(php.status, 'active') = 'active'
-    and lower(coalesce(php.role_in_program, 'owner')) = 'owner'
+    and lower(coalesce(php.role_in_program, 'owner')) in ('owner', 'primary', 'training_provider')
     and lower(coalesce(ph.status, '')) in ('active', 'approved')
   order by coalesce(php.is_primary, false) desc, php.created_at asc, php.id asc
   limit 1;
@@ -87,7 +87,7 @@ begin
   join public.program_holders ph on ph.id = php.program_holder_id
   where php.program_id = new.program_id
     and coalesce(php.status, 'active') = 'active'
-    and lower(coalesce(php.role_in_program, 'owner')) = 'owner'
+    and lower(coalesce(php.role_in_program, 'owner')) in ('owner', 'primary', 'training_provider')
     and lower(coalesce(ph.status, '')) in ('active', 'approved')
   order by coalesce(php.is_primary, false) desc, php.created_at asc, php.id asc
   limit 1;
@@ -146,7 +146,7 @@ create unique index if not exists idx_php_one_primary_per_program
   on public.program_holder_programs (program_id)
   where is_primary = true
     and status = 'active'
-    and lower(coalesce(role_in_program, 'owner')) = 'owner';
+    and lower(coalesce(role_in_program, 'owner')) in ('owner', 'primary', 'training_provider');
 
 -- Ameco's Enterprise / Amiko Martin is the accountable owner for every
 -- technology program in her approved scope.
@@ -200,7 +200,7 @@ primary_owners as (
   from public.program_holder_programs php
   join public.program_holders ph on ph.id = php.program_holder_id
   where coalesce(php.status, 'active') = 'active'
-    and lower(coalesce(php.role_in_program, 'owner')) = 'owner'
+    and lower(coalesce(php.role_in_program, 'owner')) in ('owner', 'primary', 'training_provider')
     and lower(coalesce(ph.status, '')) in ('active', 'approved')
   order by php.program_id, coalesce(php.is_primary, false) desc, php.created_at asc, php.id asc
 )
@@ -235,7 +235,7 @@ primary_owners as (
   from public.program_holder_programs php
   join public.program_holders ph on ph.id = php.program_holder_id
   where coalesce(php.status, 'active') = 'active'
-    and lower(coalesce(php.role_in_program, 'owner')) = 'owner'
+    and lower(coalesce(php.role_in_program, 'owner')) in ('owner', 'primary', 'training_provider')
     and lower(coalesce(ph.status, '')) in ('active', 'approved')
   order by php.program_id, coalesce(php.is_primary, false) desc, php.created_at asc, php.id asc
 )

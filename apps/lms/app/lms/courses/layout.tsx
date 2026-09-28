@@ -13,6 +13,7 @@ export const dynamic = 'force-dynamic';
  * boundary here so an admin session can never be mistaken for a learner.
  */
 export default async function LearnerCoursesLayout({ children }: { children: React.ReactNode }) {
+  let isAdminCoursePreview = false;
   const userDb = await createClient();
   const {
     data: { user },
@@ -26,10 +27,11 @@ export default async function LearnerCoursesLayout({ children }: { children: Rea
       resolveCoursePreview(),
     ]);
     const isAdmin = ['admin', 'super_admin'].includes(String(actor?.role || ''));
+    isAdminCoursePreview = isAdmin && coursePreview.active;
 
     if (isAdmin && !coursePreview.active) {
       return (
-        <CanonicalLearnerWorkspaceLayout>
+        <CanonicalLearnerWorkspaceLayout showLearnerNotices={false}>
           <main className="mx-auto max-w-5xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
               Administrator portal preview
@@ -68,5 +70,9 @@ export default async function LearnerCoursesLayout({ children }: { children: Rea
     }
   }
 
-  return <CanonicalLearnerWorkspaceLayout>{children}</CanonicalLearnerWorkspaceLayout>;
+  return (
+    <CanonicalLearnerWorkspaceLayout showLearnerNotices={!isAdminCoursePreview}>
+      {children}
+    </CanonicalLearnerWorkspaceLayout>
+  );
 }

@@ -824,18 +824,23 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const paidAuthorization = await reservePaidInference(db, {
-    scopeKey,
-    tenantId,
-    actorId: auth.id,
-    artifactFingerprint,
-    idempotencyKey: `course-builder-generate:${artifactFingerprint}`,
-    provider: paidProvider,
-    model: paidModel,
-    operation: 'course-builder-generate',
-    projectedCostMicros,
-  });
-  if (paidAuthorization.decision !== 'approved' || !paidAuthorization.requestId) {
+  const paidAuthorization = creditOwner.operator
+    ? null
+    : await reservePaidInference(db, {
+        scopeKey,
+        tenantId,
+        actorId: auth.id,
+        artifactFingerprint,
+        idempotencyKey: `course-builder-generate:${artifactFingerprint}`,
+        provider: paidProvider,
+        model: paidModel,
+        operation: 'course-builder-generate',
+        projectedCostMicros,
+      });
+  if (
+    paidAuthorization &&
+    (paidAuthorization.decision !== 'approved' || !paidAuthorization.requestId)
+  ) {
     return NextResponse.json(
       {
         ok: false,
@@ -900,10 +905,8 @@ export async function POST(req: NextRequest) {
       const write = (data: object) =>
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
       try {
-        const paidExecution = await executePaidInference({
-          db,
-          authorize: async () => paidAuthorization,
-          dispatch: () => courseFactory(
+        const runFactory = () =>
+          courseFactory(
             {
             title,
             topic,
@@ -929,10 +932,17 @@ export async function POST(req: NextRequest) {
             },
             (stage, message, progress) =>
               write({ stage: toPipelineStage(stage), message, progress }),
-          ),
-        });
-        if (!paidExecution.value) throw new Error('Paid generation completed without a result');
-        const result = paidExecution.value;
+          );
+        const result = creditOwner.operator
+          ? await runFactory()
+          : (
+              await executePaidInference({
+                db,
+                authorize: async () => paidAuthorization!,
+                dispatch: runFactory,
+              })
+            ).value;
+        if (!result) throw new Error('Course generation completed without a result');
 
         let governance: Awaited<ReturnType<typeof normalizeGeneratedCourseForGovernance>> | null =
           null;

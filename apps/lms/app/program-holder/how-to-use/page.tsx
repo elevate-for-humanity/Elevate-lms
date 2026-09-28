@@ -30,6 +30,9 @@ const paymentRequirements = [
 ];
 
 function amount(program: any) {
+  if (['nha-ekg-technician', 'nha-ehr', 'nha-billing-coding'].includes(program.slug)) {
+    return 'Contact admissions — à-la-carte items';
+  }
   const value = Number(program.tuition ?? program.total_cost ?? program.price);
   if (Number.isFinite(value) && value >= 0) {
     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
@@ -92,7 +95,7 @@ export default async function ProgramHolderStartHerePage() {
               {(data.programs || []).map((program: any) => (
                 <tr key={program.id} className="border-b border-slate-100 align-top">
                   <td className="p-3 font-black">{program.title || program.name}</td>
-                  <td className={`p-3 font-black ${amount(program).startsWith('Not configured') ? 'text-rose-700' : 'text-slate-950'}`}>{amount(program)}</td>
+                  <td className={`p-3 font-black ${amount(program).startsWith('Not configured') || amount(program).startsWith('Contact admissions') ? 'text-rose-700' : 'text-slate-950'}`}>{amount(program)}</td>
                   <td className="max-w-xl p-3 leading-6 text-slate-700">{fundingPath(program)}</td>
                 </tr>
               ))}

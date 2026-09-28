@@ -21,7 +21,7 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
   cohortSize: '10–15 participants per cohort',
   fundingStatement: 'Self-pay: $4,950. Workforce funding may apply only with program and participant eligibility plus written agency authorization.',
   selfPayCost: '$4,950',
-  badge: 'ETPL Approved',
+  badge: 'Safety Training',
   badgeColor: 'green',
 
   credentials: [
@@ -175,8 +175,8 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
 
   complianceAlignment: [
     {
-      standard: 'ETPL Program ID #10004621',
-      description: 'Approved on Indiana ETPL for WIOA Individual Training Account funding.',
+      standard: 'Program Funding Review',
+      description: 'No public ETPL or WIOA claim is made unless current program-level evidence permits it and participant authorization is documented.'
     },
     {
       standard: 'NREMT EMR Standards',
@@ -274,7 +274,7 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
     'Career placement support',
   ],
   paymentTerms:
-    'WIOA and Workforce Ready Grant accepted. Self-pay: $4,950 with payment plans available.',
+    'Self-pay: $4,950 with payment plans available. Workforce funding, if any, requires current program-level verification and written participant authorization.',
 
   faqs: [
     {
@@ -285,7 +285,7 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
     {
       question: 'Is this program WIOA-funded?',
       answer:
-        'Yes. This program is ETPL-approved (Program ID #10004621) and eligible for WIOA Individual Training Accounts. Contact your local WorkOne office to apply.',
+        'No public WIOA or ETPL claim is currently made for this program. Any funded enrollment must be supported by current program-level evidence and written agency authorization.',
     },
     {
       question: 'What jobs can I get after this program?',
@@ -301,7 +301,7 @@ export const EMERGENCY_HEALTH_SAFETY: ProgramSchema = {
   ],
   metaTitle: 'Emergency Health & Safety Technician | EMR + OSHA 10 | Indianapolis',
   metaDescription:
-    'Earn EMR, CPR/AED, First Aid, and OSHA 10 certifications in 4 weeks. WIOA-funded Emergency Health & Safety Technician program in Indianapolis.',
+    'Complete EMR, CPR/AED, First Aid, and OSHA 10-aligned training in 4 weeks through the Emergency Health & Safety Technician program in Indianapolis.',
 
 
   fundingOptions: ['self_pay', 'employer_paid'],

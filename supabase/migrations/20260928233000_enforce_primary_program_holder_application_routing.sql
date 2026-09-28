@@ -38,7 +38,9 @@ begin
   if v_holder_id is null then return new; end if;
   v_name := coalesce(nullif(new.full_name, ''), nullif(new.name, ''), trim(concat_ws(' ', new.first_name, new.last_name)));
 
-  delete from public.program_holder_students phs
+  update public.program_holder_students phs
+  set status = 'routing_replaced',
+      updated_at = now()
   where phs.application_id = new.id
     and phs.program_holder_id <> v_holder_id
     and lower(coalesce(phs.status, 'applied')) in ('applied', 'applicant', 'pending', 'inactive', 'removed');
@@ -158,9 +160,11 @@ set role_in_program = 'coordinator',
     is_primary = false
 where program_holder_id = (select id from public.program_holders where organization_name = 'Top Ace Solutions' order by created_at asc limit 1);
 
--- Remove only applicant projections from the pending coordinator. Canonical
--- applications and enrollment records remain untouched.
-delete from public.program_holder_students
+-- Archive only applicant projections from the pending coordinator. Canonical
+-- applications and enrollment records remain untouched and this is reversible.
+update public.program_holder_students
+set status = 'routing_replaced',
+    updated_at = now()
 where program_holder_id = (select id from public.program_holders where organization_name = 'Top Ace Solutions' order by created_at asc limit 1)
   and application_id is not null;
 
@@ -191,8 +195,10 @@ primary_owners as (
     and lower(coalesce(ph.status, '')) in ('active', 'approved')
   order by php.program_id, coalesce(php.is_primary, false) desc, php.created_at asc, php.id asc
 )
-delete from public.program_holder_students phs
-using application_programs a, primary_owners po
+update public.program_holder_students phs
+set status = 'routing_replaced',
+    updated_at = now()
+from application_programs a, primary_owners po
 where phs.application_id = a.id
   and po.program_id = a.resolved_program_id
   and phs.program_holder_id <> po.program_holder_id

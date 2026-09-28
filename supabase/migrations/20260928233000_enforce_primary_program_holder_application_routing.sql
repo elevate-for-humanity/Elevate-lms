@@ -132,6 +132,13 @@ after insert or update of program_holder_id, program_id, program_slug, status, i
 on public.program_holder_programs
 for each row execute function public.sync_program_holder_assignment_applicants_v1();
 
+-- Top Ace is a Texas statewide coordinator pending its MOU, not the training
+-- owner. Keep its regional program visibility while preventing owner routing.
+update public.program_holder_programs
+set role_in_program = 'coordinator',
+    is_primary = false
+where program_holder_id = (select id from public.program_holders where organization_name = 'Top Ace Solutions' order by created_at asc limit 1);
+
 -- The legacy index incorrectly limited each holder to one primary program.
 -- Primary ownership is a property of the program, so one holder may own several.
 drop index if exists public.idx_php_one_primary_per_holder;
@@ -161,13 +168,6 @@ where php.program_id = p.id
     'it-help-desk',
     'data-analytics'
   ]);
-
--- Top Ace is a Texas statewide coordinator pending its MOU, not the training
--- owner. Keep its regional program visibility while preventing owner routing.
-update public.program_holder_programs
-set role_in_program = 'coordinator',
-    is_primary = false
-where program_holder_id = (select id from public.program_holders where organization_name = 'Top Ace Solutions' order by created_at asc limit 1);
 
 -- Archive only applicant projections from the pending coordinator. Canonical
 -- applications and enrollment records remain untouched and this is reversible.

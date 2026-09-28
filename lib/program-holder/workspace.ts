@@ -107,7 +107,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     .select(
       `id,application_id,user_id,enrollment_id,applicant_name,status,application_status,program_id,created_at,label,call_notes,call_date,call_outcome,next_follow_up,work_start_date,work_site${applicantContactColumns}`,
     )
-    .in('status', ['applied', 'pending'])
+    .in('status', ['applicant', 'applied', 'pending'])
     .order('created_at', { ascending: false });
   const [
     programsRes,
@@ -130,7 +130,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     programIds.length
       ? db
           .from('programs')
-          .select('id,name,title,slug,status,is_active,credential_name,total_hours')
+          .select('id,name,title,slug,status,is_active,credential_name,total_hours,tuition,total_cost,price,is_free,funding,funding_tags,funding_eligibility,funding_eligible,wioa_approved,etpl_listed')
           .in('id', programIds)
           .order('title')
       : Promise.resolve({ data: [] }),

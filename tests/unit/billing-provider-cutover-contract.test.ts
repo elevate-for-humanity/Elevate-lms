@@ -18,12 +18,16 @@ describe('Canonical billing provider cutover', () => {
   it('keeps the active Admin payment configuration provider-neutral', () => {
     const settings = read('apps/admin/app/settings/payments/page.tsx');
     const diagnostic = read('apps/admin/app/api/admin/payment-config/route.ts');
+    const navigation = read('lib/admin/nav-config.ts');
     expect(settings).toContain('PayPal automatic collection + QuickBooks ledger');
     expect(settings).not.toContain('stripe_billing_mode');
     expect(diagnostic).toContain("authority: 'admin_dashboard'");
     expect(diagnostic).toContain("automaticCollection: 'paypal'");
     expect(diagnostic).toContain("invoiceLedger: 'quickbooks'");
     expect(diagnostic).not.toContain("@/lib/stripe");
+    expect(navigation).toContain("label: 'Billing Schedules'");
+    expect(navigation).toContain("label: 'Payment Settings'");
+    expect(navigation).not.toContain('Integrations — Stripe');
   });
 
   it('does not call Stripe from active license enforcement or system health', () => {

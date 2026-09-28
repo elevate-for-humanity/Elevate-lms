@@ -3,10 +3,15 @@ import { buildObjectives } from '../instructional/objective-builder';
 import { teachingSequence } from '../instructional/teaching-sequence';
 import type { UltimateCompetency, UltimateCredentialProfile } from '../core/types';
 
-type Evidence = { profile: UltimateCredentialProfile; competency: UltimateCompetency; prior?: Record<string, unknown> };
+type Evidence = {
+  profile: UltimateCredentialProfile;
+  competency: UltimateCompetency;
+  prior?: Record<string, unknown>;
+};
 function evidence(value: unknown): Evidence {
   const input = value as Evidence;
-  if (!input?.competency?.id || !input?.profile?.authority) throw new Error('ULTIMATE_STANDARDS_EVIDENCE_REQUIRED');
+  if (!input?.competency?.id || !input?.profile?.authority)
+    throw new Error('ULTIMATE_STANDARDS_EVIDENCE_REQUIRED');
   return input;
 }
 
@@ -17,8 +22,12 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
   }
   async prerequisites(input: unknown) {
     const { competency } = evidence(input);
-    return { competencyId: competency.id, candidates: [], reviewRequired: true,
-      reason: 'Appendix A does not specify prerequisite knowledge for this individual competency' };
+    return {
+      competencyId: competency.id,
+      candidates: [],
+      reviewRequired: true,
+      reason: 'Appendix A does not specify prerequisite knowledge for this individual competency',
+    };
   }
   async teachingSequence(input: unknown) {
     const { competency } = evidence(input);
@@ -36,17 +45,47 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       `Common correction: if the result does not match the agreed service, stop and consult the mentor before changing it. Record what was practiced and which observable steps the mentor verified.`,
       `To finish, explain what you did, why it met the work-process requirement, what feedback you received, and what you would improve on the next attempt. The mentor must verify practical evidence before competency sign-off.`,
     ].join('\n\n');
-    return {script,sourceRequirementIds:competency.authorityRequirementIds,competencyId:competency.id};
+    return {
+      script,
+      sourceRequirementIds: competency.authorityRequirementIds,
+      competencyId: competency.id,
+    };
   }
   async storyboard(input: unknown) {
     const { competency } = evidence(input);
     const points = [
-      ['Work process',competency.description],
-      ['Client request',`Confirm the desired result before ${competency.title.toLowerCase()}.`],
-      ['Mentor demonstration',`Observe the mentor perform ${competency.title.toLowerCase()} and identify checkpoints.`],
-      ['Guided practice',`Practice ${competency.title.toLowerCase()} while the mentor observes and corrects.`],
-      ['Evidence and recap',`Describe the completed task and ask the mentor to verify practical evidence.`],
+      ['Work process', competency.description],
+      ['Client request', `Confirm the desired result before ${competency.title.toLowerCase()}.`],
+      [
+        'Safety and setup',
+        `Identify the required tools, work area, personal protective equipment, and safety checks for ${competency.title.toLowerCase()}.`,
+      ],
+      [
+        'Mentor demonstration',
+        `Observe the mentor perform ${competency.title.toLowerCase()} and identify checkpoints.`,
+      ],
+      [
+        'Guided practice',
+        `Practice ${competency.title.toLowerCase()} while the mentor observes and corrects.`,
+      ],
+      [
+        'Common correction',
+        `Recognize an incorrect result, stop the task safely, and apply the mentor's correction before continuing.`,
+      ],
+      [
+        'Evidence and recap',
+        `Describe the completed task and ask the mentor to verify practical evidence.`,
+      ],
     ];
-    return {version:1,scenes:points.map(([title,teachingPoint],index)=>({id:`${competency.id}-scene-${index+1}`,title,teachingPoint,visualRequirement:`Capture the actual ${competency.title.toLowerCase()} task or its verified work-process evidence`,sourceRequirementIds:competency.authorityRequirementIds}))};
+    return {
+      version: 1,
+      scenes: points.map(([title, teachingPoint], index) => ({
+        id: `${competency.id}-scene-${index + 1}`,
+        title,
+        teachingPoint,
+        visualRequirement: `Capture the actual ${competency.title.toLowerCase()} task or its verified work-process evidence`,
+        sourceRequirementIds: competency.authorityRequirementIds,
+      })),
+    };
   }
 }

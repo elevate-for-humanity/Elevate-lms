@@ -115,6 +115,9 @@ export interface StoryboardRenderInput {
   postRollUrl?: string | null;
   postRollDurationSeconds?: number;
   ultimateStrict?: boolean;
+  /** Fail before encoding when any scene would render without a concrete
+   * image or video URL, or when scenes reuse the same visual. */
+  requireVisualEvidence?: boolean;
 }
 
 function enabled(value: string | undefined): boolean {
@@ -531,10 +534,15 @@ export async function renderStoryboardVideo(
         sceneType: scene.sceneType,
       });
       const query = visualIntent.query;
+      const hasResolvedVisual = Boolean(
+        normalizeRemotionMediaUrl(scene.sourceVideoUrl) ||
+        normalizeRemotionMediaUrl(scene.referenceImageUrl),
+      );
       const instructionalLayout =
-        scene.mediaSource === 'elevate-motion' ||
-        visualIntent.deterministicDiagram ||
-        EXACT_INSTRUCTIONAL_SCENE_TYPES.has(scene.sceneType)
+        !hasResolvedVisual &&
+        (scene.mediaSource === 'elevate-motion' ||
+          visualIntent.deterministicDiagram ||
+          EXACT_INSTRUCTIONAL_SCENE_TYPES.has(scene.sceneType))
           ? instructionalLayoutForScene({
               title: scene.subject,
               action: scene.action,
@@ -594,7 +602,13 @@ export async function renderStoryboardVideo(
           ? null
           : normalizeRemotionMediaUrl(scene.referenceImageUrl);
       if (!imageUrl && !input.ultimateStrict) {
-        imageUrl = normalizeRemotionMediaUrl(await getPexelsImage('default', {query,deterministicKey:scene.contentHash,allowGeneratedFallback:!input.ultimateStrict}));
+        imageUrl = normalizeRemotionMediaUrl(
+          await getPexelsImage('default', {
+            query,
+            deterministicKey: scene.contentHash,
+            allowGeneratedFallback: !input.ultimateStrict,
+          }),
+        );
       }
       // Pollinations can take longer than Chromium's delayRender window. Fetch
       // the generated image once on the server and persist it beside the lesson
@@ -675,7 +689,7 @@ export async function renderStoryboardVideo(
           if (generated) await deleteGpuVideoAsset(generated);
         }
       }
-      if (!clipUrl) {
+      if (!clipUrl && !input.ultimateStrict) {
         clipUrl = normalizeRemotionMediaUrl(
           await getPexelsVideoClip(query, {
             minDuration: 3,
@@ -738,16 +752,33 @@ export async function renderStoryboardVideo(
     // Final trust boundary before Chromium. Runtime provider and storage values
     // must be normalized even when their SDK declarations claim strings.
     const normalizedScenes = normalizeSlideLessonScenes(scenes);
+    if (input.requireVisualEvidence) {
+      const primaryVisuals = normalizedScenes.map((scene) => scene.clipUrl || scene.imageUrl);
+      const missing = primaryVisuals
+        .map((url, index) => (url ? null : index + 1))
+        .filter((index): index is number => index !== null);
+      if (missing.length) {
+        throw new Error(`MEDIA_RESOLVED_VISUALS_MISSING:${missing.join(',')}`);
+      }
+      const distinctVisuals = new Set(primaryVisuals).size;
+      if (distinctVisuals < normalizedScenes.length) {
+        throw new Error(
+          `MEDIA_RESOLVED_VISUALS_REPEATED:${distinctVisuals}:${normalizedScenes.length}`,
+        );
+      }
+    }
     const firstStoryboardScene = resolvedStoryboard.scenes[0];
     const openingImageUrl =
       normalizeRemotionMediaUrl(firstStoryboardScene?.referenceImageUrl) ||
-      normalizeRemotionMediaUrl(
-        await getPexelsImage('default', {
-          query: normalizedScenes[0]?.clip_keyword || input.storyboard.title,
-          deterministicKey: firstStoryboardScene?.contentHash || input.lessonId,
-          allowGeneratedFallback: !input.ultimateStrict,
-        }),
-      );
+      (!input.ultimateStrict
+        ? normalizeRemotionMediaUrl(
+            await getPexelsImage('default', {
+              query: normalizedScenes[0]?.clip_keyword || input.storyboard.title,
+              deterministicKey: firstStoryboardScene?.contentHash || input.lessonId,
+              allowGeneratedFallback: true,
+            }),
+          )
+        : null);
     if (!openingImageUrl || !firstStoryboardScene) {
       throw new Error('MEDIA_OPENING_STILL_MISSING');
     }
@@ -777,7 +808,9 @@ export async function renderStoryboardVideo(
         : 0,
     };
     const totalFrames =
-      (props.preRollDurationFrames ?? 0) + (props.postRollDurationFrames ?? 0) + STORYBOARD_RENDER_FPS * 5 +
+      (props.preRollDurationFrames ?? 0) +
+      (props.postRollDurationFrames ?? 0) +
+      STORYBOARD_RENDER_FPS * 5 +
       normalizedScenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
     const bundleUrl = await getBundleUrl();
     const { renderMedia, selectComposition } = await import('@remotion/renderer');

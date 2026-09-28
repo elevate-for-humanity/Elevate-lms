@@ -1,9 +1,223 @@
 import 'server-only';
-import type {SupabaseClient} from '@supabase/supabase-js';
-const slug=(v:string)=>v.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,120)||'lesson';
-export class UltimateReleaseService{constructor(private db:SupabaseClient){}
-async derive(buildId:string){const {data:b,error}=await this.db.from('ultimate_course_builds').select('id,course_id,profile,status').eq('id',buildId).single();if(error||!b)throw error??new Error('ULTIMATE_BUILD_NOT_FOUND');if(b.status!=='built')throw new Error('ULTIMATE_BUILD_NOT_RELEASE_READY');const {data:ls,error:le}=await this.db.from('ultimate_lesson_builds').select('id,lesson_key,competency_id,status,artifacts').eq('build_id',buildId).order('created_at');if(le)throw le;if(!ls?.length||ls.some((x:any)=>x.status!=='built'))throw new Error('ULTIMATE_LESSONS_NOT_RELEASE_READY');const p:any=b.profile,cm=new Map((p.competencies??[]).map((c:any)=>[String(c.id),c]));return{schemaVersion:1,buildId,courseId:b.course_id,title:p.title,profile:p,lessons:ls.map((l:any,i:number)=>{const c:any=cm.get(String(l.competency_id))??{},a=l.artifacts??{},r=a.lesson_film_render?.render??a.lesson_film_render??{};return{sourceLessonBuildId:l.id,competencyId:l.competency_id,slug:slug(String(l.lesson_key)),title:c.title??c.description??l.lesson_key,orderIndex:i+1,objectives:a.learning_objectives?.objectives??a.learning_objectives??[],content:a.active_teaching??{},assessment:a.assessment_alignment?.assessment??a.assessment_alignment??{},remediation:a.selective_repair??{},traceability:a.credential_release?.release?.rows??[],videoUrl:r.videoUrl??r.outputPath??null,script:a.instructor_script?.script??a.instructor_script??null,storyboard:a.storyboard?.storyboard??a.storyboard??null,practicalRequired:c.requiresPracticalEvidence===true}})}}
-async applyPackage(p:any,actorId:string){const now=new Date().toISOString();const {data:existingModule,error:me}=await this.db.from('course_modules').select('id').eq('course_id',p.courseId).eq('slug','ultimate-core').maybeSingle();if(me)throw me;let m=existingModule;if(!m){const q=await this.db.from('course_modules').insert({course_id:p.courseId,title:p.title,slug:'ultimate-core',order_index:1,is_required:true,is_published:true,is_draft:false,created_by:actorId}).select('id').single();if(q.error)throw q.error;m=q.data;}for(const l of p.lessons){const row:any={course_id:p.courseId,module_id:m.id,slug:l.slug,title:l.title,order_index:l.orderIndex,lesson_type:'lesson',is_required:true,status:'published',is_published:true,generation_status:'completed',ai_generated:true,approved:true,learning_objectives:l.objectives,video_url:l.videoUrl,script_text:typeof l.script==='string'?l.script:JSON.stringify(l.script??{}),scene_data:l.storyboard,practical_required:l.practicalRequired,content_json:{ultimate:true,buildId:p.buildId,sourceLessonBuildId:l.sourceLessonBuildId,competencyId:l.competencyId,learning:l.content,assessment:l.assessment,remediation:l.remediation,traceability:l.traceability},published_at:now,published_by:actorId,updated_at:now};const {data:e,error:ee}=await this.db.from('course_lessons').select('id').eq('course_id',p.courseId).eq('slug',l.slug).maybeSingle();if(ee)throw ee;const q=e?await this.db.from('course_lessons').update(row).eq('id',e.id):await this.db.from('course_lessons').insert(row);if(q.error)throw q.error;}return now}
-async publish(buildId:string,actorId:string){const p:any=await this.derive(buildId),now=await this.applyPackage(p,actorId),version=await this.nextVersion(p.courseId);await this.db.from('ultimate_release_versions').update({status:'superseded'}).eq('course_id',p.courseId).eq('status','released');const q=await this.db.from('ultimate_release_versions').insert({build_id:buildId,course_id:p.courseId,version,package:p,status:'released',released_by:actorId}).select('*').single();if(q.error)throw q.error;const u=await this.db.from('courses').update({status:'published',is_active:true,review_status:'approved',published_at:now,published_by:actorId,version,total_lessons:p.lessons.length,updated_at:now}).eq('id',p.courseId);if(u.error)throw u.error;return q.data}
-async rollback(courseId:string,version:number,actorId:string){const q=await this.db.from('ultimate_release_versions').select('*').eq('course_id',courseId).eq('version',version).single();if(q.error||!q.data)throw q.error??new Error('ULTIMATE_RELEASE_NOT_FOUND');const p={...(q.data.package as any),buildId:q.data.build_id,courseId};const now=await this.applyPackage(p,actorId),next=await this.nextVersion(courseId);await this.db.from('ultimate_release_versions').update({status:'superseded'}).eq('course_id',courseId).eq('status','released');const n=await this.db.from('ultimate_release_versions').insert({build_id:q.data.build_id,course_id:courseId,version:next,package:p,status:'released',released_by:actorId,rolled_back_from:q.data.id}).select('*').single();if(n.error)throw n.error;const u=await this.db.from('courses').update({version:next,updated_at:now}).eq('id',courseId);if(u.error)throw u.error;return n.data}
-private async nextVersion(courseId:string){const {data}=await this.db.from('ultimate_release_versions').select('version').eq('course_id',courseId).order('version',{ascending:false}).limit(1).maybeSingle();return(data?.version??0)+1}}
+import type { SupabaseClient } from '@supabase/supabase-js';
+const slug = (v: string) =>
+  v
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 120) || 'lesson';
+export class UltimateReleaseService {
+  constructor(private db: SupabaseClient) {}
+  async derive(buildId: string) {
+    const { data: b, error } = await this.db
+      .from('ultimate_course_builds')
+      .select('id,course_id,profile,status')
+      .eq('id', buildId)
+      .single();
+    if (error || !b) throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
+    if (b.status !== 'built') throw new Error('ULTIMATE_BUILD_NOT_RELEASE_READY');
+    const { data: ls, error: le } = await this.db
+      .from('ultimate_lesson_builds')
+      .select('id,lesson_key,competency_id,status,artifacts')
+      .eq('build_id', buildId)
+      .order('created_at');
+    if (le) throw le;
+    if (
+      !ls?.length ||
+      ls.some(
+        (x: any) => x.status !== 'built' || x.artifacts?.finished_media_qa?.mediaQA?.pass !== true,
+      )
+    )
+      throw new Error('ULTIMATE_LESSONS_NOT_RELEASE_READY');
+    const p: any = b.profile,
+      cm = new Map((p.competencies ?? []).map((c: any) => [String(c.id), c]));
+    return {
+      schemaVersion: 1,
+      buildId,
+      courseId: b.course_id,
+      title: p.title,
+      profile: p,
+      lessons: ls.map((l: any, i: number) => {
+        const c: any = cm.get(String(l.competency_id)) ?? {},
+          a = l.artifacts ?? {},
+          r = a.lesson_film_render?.render ?? a.lesson_film_render ?? {};
+        return {
+          sourceLessonBuildId: l.id,
+          competencyId: l.competency_id,
+          slug: slug(String(l.lesson_key)),
+          title: c.title ?? c.description ?? l.lesson_key,
+          orderIndex: i + 1,
+          objectives: a.learning_objectives?.objectives ?? a.learning_objectives ?? [],
+          content: a.active_teaching ?? {},
+          assessment: a.assessment_alignment?.assessment ?? a.assessment_alignment ?? {},
+          remediation: a.selective_repair ?? {},
+          traceability: a.credential_release?.release?.rows ?? [],
+          videoUrl: r.videoUrl ?? r.outputPath ?? null,
+          script: a.instructor_script?.script ?? a.instructor_script ?? null,
+          storyboard: a.storyboard?.storyboard ?? a.storyboard ?? null,
+          practicalRequired: c.requiresPracticalEvidence === true,
+        };
+      }),
+    };
+  }
+  async applyPackage(p: any, actorId: string) {
+    const now = new Date().toISOString();
+    const { data: existingModule, error: me } = await this.db
+      .from('course_modules')
+      .select('id')
+      .eq('course_id', p.courseId)
+      .eq('slug', 'ultimate-core')
+      .maybeSingle();
+    if (me) throw me;
+    let m = existingModule;
+    if (!m) {
+      const q = await this.db
+        .from('course_modules')
+        .insert({
+          course_id: p.courseId,
+          title: p.title,
+          slug: 'ultimate-core',
+          order_index: 1,
+          is_required: true,
+          is_published: true,
+          is_draft: false,
+          created_by: actorId,
+        })
+        .select('id')
+        .single();
+      if (q.error) throw q.error;
+      m = q.data;
+    }
+    for (const l of p.lessons) {
+      const row: any = {
+        course_id: p.courseId,
+        module_id: m.id,
+        slug: l.slug,
+        title: l.title,
+        order_index: l.orderIndex,
+        lesson_type: 'lesson',
+        is_required: true,
+        status: 'published',
+        is_published: true,
+        generation_status: 'completed',
+        ai_generated: true,
+        approved: true,
+        learning_objectives: l.objectives,
+        video_url: l.videoUrl,
+        script_text: typeof l.script === 'string' ? l.script : JSON.stringify(l.script ?? {}),
+        scene_data: l.storyboard,
+        practical_required: l.practicalRequired,
+        content_json: {
+          ultimate: true,
+          buildId: p.buildId,
+          sourceLessonBuildId: l.sourceLessonBuildId,
+          competencyId: l.competencyId,
+          learning: l.content,
+          assessment: l.assessment,
+          remediation: l.remediation,
+          traceability: l.traceability,
+        },
+        published_at: now,
+        published_by: actorId,
+        updated_at: now,
+      };
+      const { data: e, error: ee } = await this.db
+        .from('course_lessons')
+        .select('id')
+        .eq('course_id', p.courseId)
+        .eq('slug', l.slug)
+        .maybeSingle();
+      if (ee) throw ee;
+      const q = e
+        ? await this.db.from('course_lessons').update(row).eq('id', e.id)
+        : await this.db.from('course_lessons').insert(row);
+      if (q.error) throw q.error;
+    }
+    return now;
+  }
+  async publish(buildId: string, actorId: string) {
+    const p: any = await this.derive(buildId),
+      now = await this.applyPackage(p, actorId),
+      version = await this.nextVersion(p.courseId);
+    await this.db
+      .from('ultimate_release_versions')
+      .update({ status: 'superseded' })
+      .eq('course_id', p.courseId)
+      .eq('status', 'released');
+    const q = await this.db
+      .from('ultimate_release_versions')
+      .insert({
+        build_id: buildId,
+        course_id: p.courseId,
+        version,
+        package: p,
+        status: 'released',
+        released_by: actorId,
+      })
+      .select('*')
+      .single();
+    if (q.error) throw q.error;
+    const u = await this.db
+      .from('courses')
+      .update({
+        status: 'published',
+        is_active: true,
+        review_status: 'approved',
+        published_at: now,
+        published_by: actorId,
+        version,
+        total_lessons: p.lessons.length,
+        updated_at: now,
+      })
+      .eq('id', p.courseId);
+    if (u.error) throw u.error;
+    return q.data;
+  }
+  async rollback(courseId: string, version: number, actorId: string) {
+    const q = await this.db
+      .from('ultimate_release_versions')
+      .select('*')
+      .eq('course_id', courseId)
+      .eq('version', version)
+      .single();
+    if (q.error || !q.data) throw q.error ?? new Error('ULTIMATE_RELEASE_NOT_FOUND');
+    const p = { ...(q.data.package as any), buildId: q.data.build_id, courseId };
+    const now = await this.applyPackage(p, actorId),
+      next = await this.nextVersion(courseId);
+    await this.db
+      .from('ultimate_release_versions')
+      .update({ status: 'superseded' })
+      .eq('course_id', courseId)
+      .eq('status', 'released');
+    const n = await this.db
+      .from('ultimate_release_versions')
+      .insert({
+        build_id: q.data.build_id,
+        course_id: courseId,
+        version: next,
+        package: p,
+        status: 'released',
+        released_by: actorId,
+        rolled_back_from: q.data.id,
+      })
+      .select('*')
+      .single();
+    if (n.error) throw n.error;
+    const u = await this.db
+      .from('courses')
+      .update({ version: next, updated_at: now })
+      .eq('id', courseId);
+    if (u.error) throw u.error;
+    return n.data;
+  }
+  private async nextVersion(courseId: string) {
+    const { data } = await this.db
+      .from('ultimate_release_versions')
+      .select('version')
+      .eq('course_id', courseId)
+      .order('version', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return (data?.version ?? 0) + 1;
+  }
+}

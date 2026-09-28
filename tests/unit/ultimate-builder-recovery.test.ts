@@ -2,7 +2,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { UltimateBuildRunner } from '../../lib/ultimate-course-builder/core/build-runner';
 import { ULTIMATE_BUILD_STEPS } from '../../lib/ultimate-course-builder/core/types';
 import { UltimatePlatformCredential } from '../../lib/ultimate-course-builder/adapters/platform-credential';
-import { prepareUltimateStoryboardInput, UltimatePlatformRenderer } from '../../lib/ultimate-course-builder/adapters/platform-renderer';
+import {
+  prepareUltimateStoryboardInput,
+  requireResolvedVisualEvidence,
+  UltimatePlatformRenderer,
+} from '../../lib/ultimate-course-builder/adapters/platform-renderer';
 import { UltimateSupabasePersistence } from '../../lib/ultimate-course-builder/persistence/supabase-persistence';
 
 describe('Ultimate builder recovery', () => {
@@ -28,6 +32,42 @@ describe('Ultimate builder recovery', () => {
     await new UltimateBuildRunner(handlers).run(ctx);
     expect(called).toEqual(ULTIMATE_BUILD_STEPS.slice(0, 2));
     expect(ctx.findings).toMatchObject([{ step: 'learning_objectives', severity: 'error' }]);
+  });
+
+  it('persists a failed quality result as failed and blocks downstream steps', async () => {
+    const called: string[] = [];
+    const persisted: Array<{ step: string; state: string; artifacts?: unknown }> = [];
+    const handlers = Object.fromEntries(
+      ULTIMATE_BUILD_STEPS.map((step) => [
+        step,
+        async () => {
+          called.push(step);
+          if (step === 'finished_media_qa') {
+            return {
+              passed: false,
+              artifacts: { mediaQA: { pass: false, failures: ['INSUFFICIENT_DISTINCT_SHOTS'] } },
+            };
+          }
+          return { artifacts: { step } };
+        },
+      ]),
+    );
+    const ctx: any = {
+      buildId: 'build:competency',
+      courseId: 'course',
+      profile: { competencies: [] },
+      artifacts: {},
+      findings: [],
+      persistStep: async (input: any) => persisted.push(input),
+    };
+    await new UltimateBuildRunner(handlers).run(ctx);
+    expect(called.at(-1)).toBe('finished_media_qa');
+    expect(called).not.toContain('credential_release');
+    expect(persisted.at(-1)).toMatchObject({
+      step: 'finished_media_qa',
+      state: 'failed',
+      artifacts: { mediaQA: { pass: false } },
+    });
   });
 
   it('does not compare a text credential profile against the UUID column', async () => {
@@ -77,28 +117,32 @@ describe('Ultimate builder recovery', () => {
     expect(checkpoint.passedSteps).toEqual(['learning_objectives']);
     expect(checkpoint.artifacts.learning_objectives).toEqual({ objectives: ['cutting'] });
   });
-  it('maps verified licensed media into unique render scenes and preserves generated fallbacks', () => {
+  it('maps stored Envato media into unique render scenes without stock fallbacks', () => {
     const prepared = prepareUltimateStoryboardInput({
       lessonId: 'lesson-1',
       courseTitle: 'HVAC Fundamentals',
       artifacts: {
         storyboard: {
           storyboard: {
-            scenes: [
-              { id: 's1', title: 'Hook', teachingPoint: 'Inspect the system.' },
-              { id: 's2', title: 'Practice', teachingPoint: 'Verify the readings.' },
-            ],
+            scenes: Array.from({ length: 6 }, (_, index) => ({
+              id: `s${index + 1}`,
+              title: `Scene ${index + 1}`,
+              teachingPoint: `Teaching point ${index + 1}`,
+            })),
           },
         },
         visual_assignment: {
           media: {
-            readyAssets: [
-              {
-                lesson_id: 'lesson-1',
-                storage_path: 'https://cdn.example.com/licensed/scene.mp4',
-                entitlement_id: 'entitlement-1',
-              },
-            ],
+            readyAssets: Array.from({ length: 6 }, (_, index) => ({
+              lesson_id: 'lesson-1',
+              public_url:
+                index === 0
+                  ? 'https://cdn.example.com/licensed/scene.jpg'
+                  : `https://cdn.example.com/licensed/scene-${index + 1}.mp4`,
+              mime_type: index === 0 ? 'image/jpeg' : 'video/mp4',
+              entitlement_id: `entitlement-${index + 1}`,
+              provider_item_id: `item-${index + 1}`,
+            })),
             licensedSuggestions: [],
           },
         },
@@ -106,11 +150,72 @@ describe('Ultimate builder recovery', () => {
     });
     const scenes = prepared.sceneData?.scenes as Record<string, unknown>[];
     expect(scenes[0]).toMatchObject({
-      source_video_url: 'https://cdn.example.com/licensed/scene.mp4',
+      reference_image_url: 'https://cdn.example.com/licensed/scene.jpg',
       media_source: 'elevate-owned',
+      resolved_provider: 'envato',
     });
-    expect(scenes[1]).toMatchObject({ media_source: 'elevate-motion' });
-    expect(scenes[1]).not.toHaveProperty('source_video_url');
+    expect(scenes[1]).toMatchObject({
+      source_video_url: 'https://cdn.example.com/licensed/scene-2.mp4',
+      media_source: 'elevate-owned',
+      resolved_provider: 'envato',
+    });
+    expect(
+      new Set(scenes.map((scene) => scene.source_video_url ?? scene.reference_image_url)).size,
+    ).toBe(6);
   });
 
+  it('rejects a rendered storyboard whose scenes do not contain real visual assets', () => {
+    expect(() =>
+      requireResolvedVisualEvidence({
+        scenes: Array.from({ length: 6 }, (_, index) => ({
+          id: `scene-${index + 1}`,
+          sourceVideoUrl: index === 0 ? 'https://cdn.example.com/only-one.mp4' : undefined,
+        })),
+      }),
+    ).toThrow('ULTIMATE_RENDER_VISUAL_ASSETS_MISSING');
+  });
+
+  it('counts distinct resolved images and clips instead of storyboard cards', () => {
+    const result = requireResolvedVisualEvidence({
+      scenes: Array.from({ length: 6 }, (_, index) => ({
+        id: `scene-${index + 1}`,
+        ...(index % 2 === 0
+          ? { sourceVideoUrl: `https://cdn.example.com/scene-${index + 1}.mp4` }
+          : { referenceImageUrl: `https://cdn.example.com/scene-${index + 1}.jpg` }),
+      })),
+    });
+    expect(result).toEqual({ visualAssetCount: 6, distinctShots: 6 });
+  });
+
+  it('blocks Ultimate rendering when stored Envato visuals do not cover every scene', () => {
+    const storyboard = {
+      title: 'HVAC safety',
+      objective: 'Inspect equipment safely',
+      scenes: Array.from({ length: 6 }, (_, index) => ({
+        id: `scene-${index + 1}`,
+        teachingPoint: `Teaching point ${index + 1}`,
+      })),
+    };
+    expect(() =>
+      prepareUltimateStoryboardInput({
+        lessonId: 'lesson-1',
+        courseTitle: 'HVAC',
+        storyboard,
+        artifacts: {
+          visual_assignment: {
+            media: {
+              readyAssets: [
+                {
+                  lesson_id: 'lesson-1',
+                  entitlement_id: 'envato-1',
+                  public_url: 'https://cdn.example.com/one.jpg',
+                  mime_type: 'image/jpeg',
+                },
+              ],
+            },
+          },
+        },
+      }),
+    ).toThrow('ULTIMATE_ENVATO_VISUALS_REQUIRED:1:6');
+  });
 });

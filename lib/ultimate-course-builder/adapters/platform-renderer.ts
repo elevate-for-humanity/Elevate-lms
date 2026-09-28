@@ -1,5 +1,5 @@
 import type { UltimateRenderPort } from '../core/ports';
-import type { MediaDirectorInput } from '@/lib/video/media-director';
+import { MIN_LESSON_VIDEO_SCENES, type MediaDirectorInput } from '@/lib/video/media-director';
 
 type RecordLike = Record<string, any>;
 
@@ -12,13 +12,7 @@ type VisualCandidate = {
 };
 
 function record(value: unknown): RecordLike {
-  return value && typeof value === 'object' && !Array.isArray(value)
-    ? (value as RecordLike)
-    : {};
-}
-
-function firstRecord(value: unknown): RecordLike {
-  return Array.isArray(value) ? record(value[0]) : record(value);
+  return value && typeof value === 'object' && !Array.isArray(value) ? (value as RecordLike) : {};
 }
 
 function publicCourseMediaUrl(value: unknown): string | null {
@@ -26,9 +20,7 @@ function publicCourseMediaUrl(value: unknown): string | null {
   if (!path) return null;
   if (/^https?:\/\//i.test(path)) return path;
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
-  return base
-    ? `${base}/storage/v1/object/public/course-videos/${path.replace(/^\/+/, '')}`
-    : null;
+  return base ? `${base}/storage/v1/object/public/course-videos/${path.replace(/^\/+/, '')}` : null;
 }
 
 function mediaKind(url: string, mimeType?: unknown): VisualCandidate['kind'] | null {
@@ -55,46 +47,16 @@ function visualCandidates(input: any): VisualCandidate[] {
   for (const asset of Array.isArray(assignment.readyAssets) ? assignment.readyAssets : []) {
     const row = record(asset);
     if (row.lesson_id && String(row.lesson_id) !== lessonId) continue;
-    const url = publicCourseMediaUrl(row.public_url ?? row.storage_path);
+    const url = publicCourseMediaUrl(row.public_url);
     const kind = url ? mediaKind(url, row.mime_type) : null;
-    if (!url || !kind) continue;
+    if (!url || !kind || !row.entitlement_id) continue;
     candidates.push({
       url,
       kind,
-      provider: row.entitlement_id ? 'envato' : 'elevate-owned',
-      providerItemId: row.entitlement_id ? String(row.entitlement_id) : undefined,
+      provider: String(row.provider ?? 'envato'),
+      providerItemId: row.provider_item_id ? String(row.provider_item_id) : undefined,
+      licenseEvidenceUrl: row.license_evidence_url ? String(row.license_evidence_url) : undefined,
     });
-  }
-
-  for (const suggestion of Array.isArray(assignment.licensedSuggestions)
-    ? assignment.licensedSuggestions
-    : []) {
-    const match = record(suggestion);
-    if (String(match.lesson_id ?? '') !== lessonId) continue;
-    if (!['approved', 'attached'].includes(String(match.status ?? ''))) continue;
-    const entitlement = firstRecord(match.licensed_media_entitlements);
-    const metadata = record(entitlement.metadata);
-    const possibleUrls = [
-      metadata.assetUrl,
-      metadata.asset_url,
-      metadata.storage_path,
-      entitlement.thumbnail_url,
-    ];
-    for (const value of possibleUrls) {
-      const url = publicCourseMediaUrl(value);
-      const kind = url ? mediaKind(url, metadata.mime_type) : null;
-      if (!url || !kind) continue;
-      candidates.push({
-        url,
-        kind,
-        provider: String(entitlement.provider ?? 'envato'),
-        providerItemId: entitlement.provider_item_id
-          ? String(entitlement.provider_item_id)
-          : undefined,
-        licenseEvidenceUrl: entitlement.item_url ? String(entitlement.item_url) : undefined,
-      });
-      break;
-    }
   }
 
   const seen = new Set<string>();
@@ -117,7 +79,52 @@ function rawStoryboard(input: any): RecordLike {
   if (!Array.isArray(board.scenes) || board.scenes.length < 2) {
     throw new Error('ULTIMATE_RENDER_MULTISCENE_STORYBOARD_REQUIRED');
   }
+  if (board.scenes.length < MIN_LESSON_VIDEO_SCENES) {
+    throw new Error(
+      `ULTIMATE_RENDER_SCENE_COUNT_REQUIRED:${board.scenes.length}:${MIN_LESSON_VIDEO_SCENES}`,
+    );
+  }
   return board;
+}
+
+function resolvedVisualUrl(value: unknown): string | null {
+  const scene = record(value);
+  for (const candidate of [scene.sourceVideoUrl, scene.referenceImageUrl]) {
+    if (typeof candidate !== 'string' || !candidate.trim()) continue;
+    try {
+      const url = new URL(candidate.trim());
+      if (url.protocol === 'https:' || url.protocol === 'http:') return url.toString();
+    } catch {
+      // Keep checking the remaining resolved visual fields.
+    }
+  }
+  return null;
+}
+
+export function requireResolvedVisualEvidence(sceneData: unknown): {
+  visualAssetCount: number;
+  distinctShots: number;
+} {
+  const scenes = Array.isArray(record(sceneData).scenes) ? record(sceneData).scenes : [];
+  if (scenes.length < MIN_LESSON_VIDEO_SCENES) {
+    throw new Error(
+      `ULTIMATE_RENDER_SCENE_COUNT_REQUIRED:${scenes.length}:${MIN_LESSON_VIDEO_SCENES}`,
+    );
+  }
+  const urls = scenes.map(resolvedVisualUrl);
+  const missing = urls
+    .map((url, index) => (url ? null : index + 1))
+    .filter((index): index is number => index !== null);
+  if (missing.length) {
+    throw new Error(`ULTIMATE_RENDER_VISUAL_ASSETS_MISSING:${missing.join(',')}`);
+  }
+  const distinctShots = new Set(urls).size;
+  if (distinctShots < MIN_LESSON_VIDEO_SCENES) {
+    throw new Error(
+      `ULTIMATE_RENDER_DISTINCT_VISUALS_REQUIRED:${distinctShots}:${MIN_LESSON_VIDEO_SCENES}`,
+    );
+  }
+  return { visualAssetCount: urls.length, distinctShots };
 }
 
 function sceneType(index: number, total: number) {
@@ -131,6 +138,9 @@ function sceneType(index: number, total: number) {
 export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
   const board = rawStoryboard(input);
   const candidates = visualCandidates(input);
+  if (candidates.length < board.scenes.length) {
+    throw new Error(`ULTIMATE_ENVATO_VISUALS_REQUIRED:${candidates.length}:${board.scenes.length}`);
+  }
   const scenes = board.scenes.map((value: unknown, index: number) => {
     const scene = record(value);
     const teachingPoint = String(
@@ -170,7 +180,10 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
         : {}),
     };
   });
-  const script = scenes.map((scene: RecordLike) => scene.dialogue).filter(Boolean).join('\n\n');
+  const script = scenes
+    .map((scene: RecordLike) => scene.dialogue)
+    .filter(Boolean)
+    .join('\n\n');
   return {
     title: String(board.title ?? input.courseTitle ?? input.lessonId ?? 'Lesson'),
     objective: String(board.objective ?? scenes[0]?.action ?? input.courseTitle ?? 'Lesson'),
@@ -207,16 +220,18 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       courseTitle,
       storyboard,
       instructorId: instructorFor(courseTitle),
-      ultimateStrict: false,
+      ultimateStrict: true,
+      requireVisualEvidence: true,
     });
     if (!result.success || !result.videoUrl) {
       throw new Error(`ULTIMATE_VIDEO_RENDER_FAILED:${result.error ?? 'missing video URL'}`);
     }
+    const visualEvidence = requireResolvedVisualEvidence(result.sceneData);
     return {
       ...result,
       captionsUrl: result.sceneData?.captionUrl,
       transcriptUrl: result.sceneData?.transcriptUrl,
-      distinctShots: result.sceneData?.scenes.length ?? storyboard.scenes.length,
+      ...visualEvidence,
       licensedFirst: true,
     };
   }

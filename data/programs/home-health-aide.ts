@@ -19,10 +19,10 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 30, handsOnLab: 40, examPrep: 6, careerPlacement: 4 },
   schedule: 'Day or evening options — monthly cohort start dates',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement: '$0 with WIOA or Workforce Ready Grant. Self-pay: $2,500.',
+  fundingStatement: 'Self-pay: $2,500. Any workforce or third-party funding requires current program-level verification and written participant authorization.',
   selfPayCost: '$2,500',
-  fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
-  badge: 'ETPL Approved',
+  fundingOptions: ['self_pay'],
+  badge: 'Healthcare Training',
   badgeColor: 'green',
 
   credentials: [
@@ -178,17 +178,13 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
 
   complianceAlignment: [
     {
-      standard: 'ETPL Program ID #10004626',
-      description: 'Approved on Indiana ETPL for WIOA Individual Training Account funding.',
+      standard: 'Program Funding Review',
+      description: 'No public ETPL or WIOA claim is made unless current program-level evidence permits it and the participant is authorized in writing.'
     },
     {
       standard: 'Indiana HHA Certification Standards',
       description:
         'Curriculum meets Indiana State Department of Health HHA competency requirements.',
-    },
-    {
-      standard: 'WIOA Title I',
-      description: 'Program meets WIOA eligibility requirements for workforce funding.',
     },
   ],
 
@@ -281,7 +277,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
     'Career placement support',
   ],
   paymentTerms:
-    'WIOA and Workforce Ready Grant accepted. Self-pay: $2,500 with payment plans available.',
+    'Self-pay: $2,500 with payment plans available. Third-party funding is shown only after current program-level verification and participant authorization.',
 
   faqs: [
     {
@@ -292,7 +288,7 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
     {
       question: 'Is this program WIOA-funded?',
       answer:
-        'Yes. This program is ETPL-approved (Program ID #10004626) and eligible for WIOA Individual Training Accounts in certain areas. Contact your local WorkOne office to verify eligibility.',
+        'No public WIOA or ETPL claim is made for this program unless current program-level evidence is verified. WorkOne or the responsible agency must authorize any funded enrollment in writing.',
     },
     {
       question: 'How quickly can I find work after completing this program?',
@@ -308,14 +304,14 @@ export const HOME_HEALTH_AIDE: ProgramSchema = {
   ],
   metaTitle: 'Home Health Aide Certification | HHA + CCHW | Indianapolis',
   metaDescription:
-    'Earn your HHA and CCHW certifications in 4 weeks. WIOA-funded Home Health Aide program in Indianapolis with direct employer placement.',
+    'Earn HHA and CCHW-related training in 4 weeks through a Home Health Aide program in Indianapolis with career-support services.',
 
 
   funding: {
-    wioa_eligible: true,
-    fssa_eligible: true,
+    wioa_eligible: false,
+    fssa_eligible: false,
     wrg_eligible: false,
-    jobReadyIndyEligible: true,
-    fundingNotes: 'Indiana ETPL-listed. FSSA IMPACT and WIOA Title I funding available. WRG eligibility determined by Indiana DWD.',
+    jobReadyIndyEligible: false,
+    fundingNotes: 'No public workforce-funding claim is currently authorized for this program. Any third-party funding requires current program-level verification and written participant authorization.',
   },
 };

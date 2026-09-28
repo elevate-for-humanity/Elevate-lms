@@ -2,6 +2,7 @@ import 'server-only';
 
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { normalizeRoles } from '@/lib/rbac/role-matrix';
 
 const COMMUNICATION_ROLES = new Set([
@@ -11,13 +12,16 @@ const COMMUNICATION_ROLES = new Set([
 
 export async function requireCommunicationActor() {
   const auth = await createClient();
-  const { data: { user }, error } = await auth.auth.getUser();
-  if (error || !user) throw new Error('COMMUNICATIONS_UNAUTHENTICATED');
+  const { data: { user: authenticatedUser }, error } = await auth.auth.getUser();
+  if (error || !authenticatedUser) throw new Error('COMMUNICATIONS_UNAUTHENTICATED');
 
   const db = await requireAdminClient();
+  const preview = await resolvePortalPreviewSubject(db, authenticatedUser.id);
+  const effectiveUserId = preview.previewing ? preview.userId : authenticatedUser.id;
+
   const [{ data: profile }, { data: roleRows }] = await Promise.all([
-    db.from('profiles').select('id,email,full_name,role').eq('id', user.id).maybeSingle(),
-    db.from('user_roles').select('roles(name)').eq('user_id', user.id),
+    db.from('profiles').select('id,email,full_name,role').eq('id', effectiveUserId).maybeSingle(),
+    db.from('user_roles').select('roles(name)').eq('user_id', effectiveUserId),
   ]);
   const roles = normalizeRoles([
     profile?.role,
@@ -28,7 +32,7 @@ export async function requireCommunicationActor() {
   const { data: extension } = await db
     .from('communication_extensions')
     .select('*,communication_workspaces!inner(id,phone_system_id)')
-    .eq('profile_id', user.id)
+    .eq('profile_id', effectiveUserId)
     .eq('enabled', true)
     .maybeSingle();
   const systemId = extension?.communication_workspaces?.phone_system_id;
@@ -36,5 +40,18 @@ export async function requireCommunicationActor() {
     ? await db.from('phone_systems').select('*').eq('id', systemId).maybeSingle()
     : { data: null };
 
-  return { user, profile, roles, db, extension, system };
+  const user = preview.previewing
+    ? ({ ...authenticatedUser, id: effectiveUserId, email: profile?.email || authenticatedUser.email } as typeof authenticatedUser)
+    : authenticatedUser;
+
+  return {
+    user,
+    authenticatedUser,
+    previewing: preview.previewing,
+    profile,
+    roles,
+    db,
+    extension,
+    system,
+  };
 }

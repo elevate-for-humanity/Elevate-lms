@@ -8,6 +8,7 @@ import {
   UltimatePlatformRenderer,
 } from '../../lib/ultimate-course-builder/adapters/platform-renderer';
 import { UltimateSupabasePersistence } from '../../lib/ultimate-course-builder/persistence/supabase-persistence';
+import { createProductionHandlers } from '../../lib/ultimate-course-builder/core/production-handlers';
 
 describe('Ultimate builder recovery', () => {
   it('stops at a failed prerequisite instead of fabricating downstream artifacts', async () => {
@@ -217,5 +218,29 @@ describe('Ultimate builder recovery', () => {
         },
       }),
     ).toThrow('ULTIMATE_ENVATO_VISUALS_REQUIRED:1:6');
+  });
+
+  it('blocks narration before synthesis when Envato visuals do not cover the storyboard', async () => {
+    const generate = vi.fn();
+    const handlers = createProductionHandlers({ narration: { generate } } as any);
+    const context = {
+      buildId: 'build:lesson-1',
+      courseId: 'course-1',
+      profile: { competencies: [{ id: 'lesson-1' }] },
+      artifacts: {
+        storyboard: {
+          storyboard: {
+            scenes: Array.from({ length: 7 }, (_, index) => ({ id: `scene-${index + 1}` })),
+          },
+        },
+        visual_assignment: { media: { readyAssets: [] } },
+        instructor_script: { script: 'Teach the lesson.' },
+      },
+    };
+
+    await expect(handlers.natural_narration(context as any)).rejects.toThrow(
+      'ULTIMATE_ENVATO_VISUALS_REQUIRED:0:7',
+    );
+    expect(generate).not.toHaveBeenCalled();
   });
 });

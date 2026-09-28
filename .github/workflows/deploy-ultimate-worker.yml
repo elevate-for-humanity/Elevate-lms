@@ -2,6 +2,14 @@ name: Deploy Ultimate Course Builder Worker
 on:
   issues:
     types: [opened, reopened]
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/deploy-ultimate-worker.yml'
+      - 'Dockerfile.ultimate-worker'
+      - 'packages/ultimate-course-worker/**'
+      - 'lib/ultimate-course-builder/**'
+      - 'scripts/northflank/**'
 permissions:
   contents: read
   issues: write
@@ -10,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   deploy:
-    if: github.event.issue.title == 'DEPLOY ULTIMATE COURSE BUILDER WORKER'
+    if: github.event_name == 'push' || github.event.issue.title == 'DEPLOY ULTIMATE COURSE BUILDER WORKER'
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 60

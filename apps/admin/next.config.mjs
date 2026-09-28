@@ -136,6 +136,14 @@ const adminConfig = {
   },
 
   serverExternalPackages: [
+    // Kokoro loads platform-specific ONNX binaries at runtime. Keep the full
+    // inference stack outside webpack so Admin instrumentation never attempts
+    // to parse a native `.node` binding during the production build.
+    'kokoro-js',
+    '@huggingface/transformers',
+    'onnxruntime-node',
+    'onnxruntime-common',
+    'onnxruntime-web',
     'remotion', '@remotion/bundler', '@remotion/renderer',
     '@remotion/compositor-linux-x64-gnu', '@rspack/core', '@rspack/binding',
     '@rspack/binding-linux-x64-gnu', 'esbuild', '@sentry/nextjs', '@sentry/node',

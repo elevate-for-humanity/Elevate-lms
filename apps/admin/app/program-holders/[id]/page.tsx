@@ -302,12 +302,18 @@ export default async function ProgramHolderDetailPage({
                     return (
                       <tr key={learner.id} className={learner.at_risk ? 'bg-amber-50' : 'bg-white'}>
                         <td className="px-5 py-4">
-                          <Link
-                            href={`/students/${learner.user_id}`}
-                            className="font-black text-brand-blue-700 hover:underline"
-                          >
-                            {learner.full_name || learner.email || 'Learner'}
-                          </Link>
+                          {learner.user_id ? (
+                            <Link
+                              href={`/students/${learner.user_id}`}
+                              className="font-black text-brand-blue-700 hover:underline"
+                            >
+                              {learner.full_name || learner.email || 'Learner'}
+                            </Link>
+                          ) : (
+                            <span className="font-black text-slate-900">
+                              {learner.full_name || learner.email || 'Learner'}
+                            </span>
+                          )}
                           <p className="mt-1 text-xs text-slate-500">
                             {learner.email || 'No email recorded'}
                           </p>

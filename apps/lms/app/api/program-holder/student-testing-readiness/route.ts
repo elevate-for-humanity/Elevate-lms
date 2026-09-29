@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     const { error } = await ctx.db
       .from('program_enrollments')
       .update({
-        next_required_action: 'Admin testing-readiness review',
+        next_required_action: 'EPA 608 testing requested — Admin review',
         updated_at: new Date().toISOString(),
       })
       .eq('id', studentId)
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     const { error } = await ctx.db
       .from('program_holder_students')
       .update({
-        work_progress: 'Ready for testing — Admin review requested',
+        work_progress: 'EPA 608 testing requested — Admin review',
         updated_at: new Date().toISOString(),
       })
       .eq('id', studentId)
@@ -83,8 +83,8 @@ export async function POST(request: Request) {
 
   const { error: notificationError } = await ctx.db.from('staff_notifications').insert({
     type: 'student_ready_for_testing',
-    title: `${studentName} is ready to test`,
-    message: `${ctx.profile.full_name || 'A Program Holder'} reported that ${studentName} completed training and is ready to test.`,
+    title: `EPA 608 test requested for ${studentName}`,
+    message: `${ctx.profile.full_name || 'A Program Holder'} requested EPA 608 testing review for ${studentName}. Verify training hours, progress, and eligibility before scheduling.`,
     severity: 'action_required',
     metadata: {
       source: body.source,

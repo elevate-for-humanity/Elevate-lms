@@ -7,7 +7,9 @@ import { normalizeGeneratedCourseForGovernance } from '../course-factory/post-ge
 import { publicationRequirements, type PublicationRequirement } from '../course-factory/experience-contract';
 import { assessmentQuestionIssues } from './assessment-validation';
 
-const ASSESSMENT_TYPES = new Set(['quiz', 'checkpoint', 'exam', 'final_exam']);
+// Keep assessment detection aligned with the persisted lesson_type contract.
+const ASSESSMENT_TYPES = new Set(['quiz', 'checkpoint', 'exam', 'assessment']);
+const PRACTICE_EXAM_TYPES = new Set(['exam', 'assessment']);
 const PRACTICAL_TYPES = new Set(['practical', 'lab', 'fieldwork', 'observation', 'practicum']);
 
 function asArray(value: unknown): any[] {
@@ -144,7 +146,7 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
       if (isAssessment) {
         assessments += 1;
         moduleHasAssessment = true;
-        if (type === 'exam' || type === 'final_exam') practiceExams += 1;
+        if (PRACTICE_EXAM_TYPES.has(type)) practiceExams += 1;
       }
       if (isPractical) practicals += 1;
       competencyMappings += competencies.length;

@@ -75,9 +75,11 @@ function mailboxLabel(kind: Mailbox['mailboxKind']) {
 export function EmailWorkspace({
   apiPath = '/api/communications/email',
   initialMailboxId,
+  roleLabel = 'Program Holder',
 }: {
   apiPath?: string;
   initialMailboxId?: string;
+  roleLabel?: string;
 }) {
   const [data, setData] = useState<WorkspaceData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -142,7 +144,9 @@ export function EmailWorkspace({
     if (!compose || !data?.selectedMailboxId) return;
     if (data.readOnly) {
       setCompose(null);
-      setError('Administrator portal previews are read-only. Sign in as the Program Holder to send email.');
+      setError(
+        `Administrator portal previews are read-only. Sign in as the ${roleLabel} to send email.`,
+      );
       return;
     }
     setSending(true);
@@ -200,7 +204,7 @@ export function EmailWorkspace({
       {data.readOnly ? (
         <div className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm font-bold text-amber-950">
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
-          Administrator preview is read-only. You can inspect the selected Program Holder’s mailbox, but only the Program Holder can compose, reply, or mark messages as read.
+          Administrator preview is read-only. You can inspect the selected {roleLabel} mailbox, but only an authorized {roleLabel} user can compose, reply, or mark messages as read.
         </div>
       ) : null}
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
@@ -384,7 +388,7 @@ export function EmailWorkspace({
                 <h2 className="mt-4 text-lg font-black text-slate-900">Select a conversation</h2>
                 <p className="mt-1 text-sm text-slate-500">
                   {data.readOnly
-                    ? 'Choose a conversation to inspect this Program Holder mailbox.'
+                    ? `Choose a conversation to inspect this ${roleLabel} mailbox.`
                     : 'Or compose a new email from this mailbox.'}
                 </p>
               </div>

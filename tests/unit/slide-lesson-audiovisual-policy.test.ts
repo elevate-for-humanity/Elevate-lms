@@ -17,6 +17,8 @@ describe('SlideLesson audiovisual policy', () => {
   it('shows a photographic poster before lesson motion and narration', () => {
     expect(source).toContain('openingImageUrl');
     expect(source).toContain('const INTRO_FRAMES = 45');
+    expect(renderer).toContain('createOpeningStillFromLicensedVideo');
+    expect(renderer).toContain('MEDIA_OPENING_STILL_EXTRACTION_FAILED');
     expect(renderer).toContain("throw new Error('MEDIA_OPENING_STILL_MISSING')");
     expect(renderer).toContain('openingImageUrl,');
   });

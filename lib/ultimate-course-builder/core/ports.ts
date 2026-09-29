@@ -7,3 +7,18 @@ export interface UltimateMediaPort{find(input:unknown):Promise<UltimateMediaDisc
 export interface UltimateNarrationPort{generate(input:unknown):Promise<unknown>}
 export interface UltimateRenderPort{render(input:unknown):Promise<unknown>}
 export interface UltimateAssessmentPort{generate(input:unknown):Promise<unknown>}
+export interface UltimateLearnerRuntimeEvidence{
+  progress_save:boolean;
+  resume:boolean;
+  completion:boolean;
+  evidence:{
+    courseLesson:boolean;
+    playableFilm:boolean;
+    videoProgressStore:boolean;
+    lessonCompletionStore:boolean;
+    checkedAt:string;
+  };
+}
+export interface UltimateLearnerRuntimePort{
+  verify(input:{courseId:string;lessonId:string;videoUrl:string}):Promise<UltimateLearnerRuntimeEvidence>;
+}

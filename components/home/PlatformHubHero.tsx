@@ -12,10 +12,11 @@ export function PlatformHubHero() {
       data-narration="Welcome to Elevate for Humanity. Explore career training and apprenticeships, find a program that fits your goals, and learn how to get started."
       data-narration-style="instructor"
     >
+      <h1 className="sr-only">Elevate for Humanity career training and apprenticeships</h1>
       <div className="relative h-[clamp(420px,68svh,760px)] w-full">
         <SafeHeroVideo
           src={HOME_VIDEO}
-          poster="/images/pages/comp-home-hero.webp"
+          poster="/images/pages/hero-home-first-frame.webp"
           priority
           loop
           ariaLabel="Elevate for Humanity career training, apprenticeship, and workforce programs"

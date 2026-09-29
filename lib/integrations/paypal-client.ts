@@ -55,6 +55,10 @@ async function payPalAccessToken(config: PayPalConfig): Promise<string> {
   return body.access_token;
 }
 
+export async function verifyPayPalConnection(): Promise<void> {
+  await payPalAccessToken(await loadPayPalConfig());
+}
+
 export async function payPalRequest<T>(
   path: string,
   init: RequestInit = {},

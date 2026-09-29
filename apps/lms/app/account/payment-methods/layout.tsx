@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Payment methods | Account',
+  title: 'Billing and payment options | Account',
   robots: { index: false, follow: false },
 };
 

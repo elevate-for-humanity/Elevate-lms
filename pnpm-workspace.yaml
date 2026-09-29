@@ -51,9 +51,12 @@ overrides:
   '@opentelemetry/exporter-trace-otlp-http': ^0.220.0
   '@opentelemetry/exporter-logs-otlp-http': ^0.220.0
   '@opentelemetry/exporter-metrics-otlp-http': ^0.220.0
-  fast-uri: 3.1.6
+  fast-uri: 3.1.7
   browserslist: 4.28.8
   sharp: 0.35.4
+  'onnxruntime-node>tar': 7.5.21
+  'onnxruntime-web>protobufjs': 7.6.5
+  '@huggingface/transformers>sharp': 0.35.4
   '@xmldom/xmldom@>=0.7.0 <0.9.0': 0.8.15
   'brace-expansion@1': 1.1.18
   'brace-expansion@2': 2.1.4

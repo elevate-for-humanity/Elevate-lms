@@ -1,66 +1,99 @@
-'use client';
+import type { ApprenticeDashboardInvoice } from '@/lib/billing/apprentice-invoice-batch';
 
-import { useState } from 'react';
-import { CreditCard, Loader2, ShieldCheck } from 'lucide-react';
+type Schedule = {
+  id: string;
+  product_name: string;
+  amount_cents: number;
+  cadence: string;
+  status: string;
+  collection_mode: string;
+  provider_status: string | null;
+  provider_approval_url: string | null;
+};
 
-export function PaymentMethodsClient({ configured }: { configured: boolean }) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-
-  async function addCard() {
-    setBusy(true);
-    setError('');
-    const response = await fetch('/api/billing/setup', { method: 'POST' });
-    const result = await response.json().catch(() => ({}));
-    if (response.ok && result.url) window.location.assign(result.url);
-    else {
-      setError(result.error || 'Debit-card setup could not be started.');
-      setBusy(false);
-    }
+function safePaymentUrl(value: string | null, provider: 'paypal' | 'quickbooks'): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase();
+    const domain = provider === 'paypal' ? 'paypal.com' : 'intuit.com';
+    return url.protocol === 'https:' && (host === domain || host.endsWith(`.${domain}`))
+      ? url.href
+      : null;
+  } catch {
+    return null;
   }
+}
 
+function amount(cents: number): string {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100);
+}
+
+export function PaymentMethodsClient({
+  invoices,
+  schedules,
+}: {
+  invoices: ApprenticeDashboardInvoice[];
+  schedules: Schedule[];
+}) {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10">
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <CreditCard className="h-9 w-9 text-blue-700" />
-        <h1 className="mt-4 text-3xl font-black text-slate-950">Payment methods</h1>
+    <main className="mx-auto max-w-3xl space-y-6 px-4 py-10">
+      <header>
+        <h1 className="text-3xl font-black text-slate-950">Billing and payment options</h1>
         <p className="mt-2 text-slate-700">
-          Add a credit or debit card for authorized Elevate payments. Card numbers are collected and
-          stored by the payment processor, not Elevate.
+          Pay an invoice through its secure QuickBooks link. Recurring PayPal payments begin only
+          after you approve the agreement in PayPal.
         </p>
-        <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p className="font-black text-slate-950">
-            {configured
-              ? 'A default payment method is on file'
-              : 'No default payment method is on file'}
-          </p>
-          <p className="mt-1 text-sm text-slate-600">
-            You can securely add or replace the card used for future authorized charges.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => void addCard()}
-          disabled={busy}
-          className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl bg-blue-700 px-5 py-3 font-black text-white disabled:opacity-50"
-        >
-          {busy ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <ShieldCheck className="h-5 w-5" />
-          )}
-          {busy
-            ? 'Opening secure setup…'
-            : configured
-              ? 'Replace card'
-              : 'Add debit or credit card'}
-        </button>
-        {error ? (
-          <p role="alert" className="mt-4 rounded-xl bg-red-50 p-3 text-sm font-bold text-red-800">
-            {error}
-          </p>
-        ) : null}
+      </header>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" aria-labelledby="billing-schedules-heading">
+        <h2 id="billing-schedules-heading" className="text-xl font-bold text-slate-950">Payment schedules</h2>
+        {schedules.length ? (
+          <ul className="mt-4 divide-y divide-slate-200">
+            {schedules.map((schedule) => {
+              const approvalUrl = safePaymentUrl(schedule.provider_approval_url, 'paypal');
+              const needsApproval = schedule.collection_mode === 'automatic' && schedule.provider_status !== 'active';
+              return (
+                <li key={schedule.id} className="space-y-2 py-4 first:pt-0 last:pb-0">
+                  <p className="font-semibold text-slate-950">{schedule.product_name}</p>
+                  <p className="text-sm text-slate-700">{amount(Number(schedule.amount_cents))} {schedule.cadence} · {schedule.status}</p>
+                  {needsApproval && approvalUrl ? (
+                    <a className="inline-block rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white" href={approvalUrl} rel="noopener noreferrer">Approve automatic payments in PayPal</a>
+                  ) : needsApproval ? (
+                    <p className="text-sm text-amber-800">Your automatic payment agreement is awaiting setup. Contact Elevate for the secure PayPal approval link.</p>
+                  ) : schedule.collection_mode === 'automatic' ? (
+                    <p className="text-sm text-green-800">PayPal agreement active</p>
+                  ) : (
+                    <p className="text-sm text-slate-600">Pay individual QuickBooks invoices below.</p>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        ) : <p className="mt-3 text-slate-700">No payment schedule is assigned to your account.</p>}
       </section>
-    </div>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" aria-labelledby="invoices-heading">
+        <h2 id="invoices-heading" className="text-xl font-bold text-slate-950">Invoices</h2>
+        {invoices.length ? (
+          <ul className="mt-4 divide-y divide-slate-200">
+            {invoices.map((invoice) => {
+              const paymentUrl = safePaymentUrl(invoice.paymentUrl, 'quickbooks');
+              return (
+                <li key={invoice.id} className="flex flex-wrap items-center justify-between gap-3 py-4 first:pt-0 last:pb-0">
+                  <div>
+                    <p className="font-semibold text-slate-950">Invoice {invoice.invoiceNumber || invoice.id.slice(0, 8)}</p>
+                    <p className="text-sm text-slate-700">{amount(invoice.amountCents)} · {invoice.status}{invoice.dueDate ? ` · Due ${invoice.dueDate}` : ''}</p>
+                  </div>
+                  {paymentUrl && ['open', 'past_due'].includes(invoice.status) ? (
+                    <a className="rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white" href={paymentUrl} rel="noopener noreferrer">Pay in QuickBooks</a>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+        ) : <p className="mt-3 text-slate-700">No invoices are assigned to your account.</p>}
+      </section>
+    </main>
   );
 }

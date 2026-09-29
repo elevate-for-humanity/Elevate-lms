@@ -828,7 +828,7 @@ export async function renderStoryboardVideo(
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         if (input.ultimateStrict) {
-          throw new Error(`MEDIA_OPENING_STILL_EXTRACTION_FAILED:${message}`);
+          throw new Error(`MEDIA_OPENING_STILL_EXTRACTION_FAILED:${message}`, { cause: error });
         }
         logger.warn('[RemotionRender] Could not derive an opening still from lesson video', {
           lessonId: input.lessonId,

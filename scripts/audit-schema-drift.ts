@@ -225,9 +225,9 @@ function parseMigrations(migrationsDir: string): TableSchema {
     while ((m = createRe.exec(sql)) !== null) {
       const t = m[1].toLowerCase();
       if (!schema.has(t)) schema.set(t, new Set());
-      const lineRe = /^\s+"?(\w+)"?\s+\w/gm;
-      let lm: RegExpExecArray | null;
-      while ((lm = lineRe.exec(m[2])) !== null) {
+      for (const definition of splitTopLevelCommaList(m[2])) {
+        const lm = definition.trim().match(/^"?(\w+)"?\s+\w/);
+        if (!lm) continue;
         const col = lm[1].toLowerCase();
         if (!['primary', 'unique', 'check', 'foreign', 'constraint', 'index'].includes(col)) {
           schema.get(t)!.add(col);

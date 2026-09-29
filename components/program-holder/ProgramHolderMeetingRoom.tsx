@@ -37,7 +37,7 @@ export function ProgramHolderMeetingRoom({
 
   return (
     <div
-      className="h-[72vh] min-h-[520px] overflow-hidden rounded-2xl bg-slate-950"
+      className="h-[min(72dvh,760px)] min-h-[420px] w-full min-w-0 max-w-full overflow-hidden rounded-2xl bg-slate-950 sm:min-h-[520px]"
       data-lk-theme="default"
     >
       <LiveKitRoom
@@ -46,7 +46,7 @@ export function ProgramHolderMeetingRoom({
         connect
         audio
         video
-        className="h-full"
+        className="h-full min-w-0 max-w-full overflow-hidden"
       >
         <VideoConference />
         <RoomAudioRenderer />

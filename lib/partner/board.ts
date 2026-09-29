@@ -315,12 +315,12 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
     for (const row of (hourError ? [] : hourRows || []) as HourRow[]) {
       if (!row.user_id || !workProgress[row.user_id]) continue;
       const placement = placementByStudent.get(row.user_id);
-      if (!placement || placement.tradeInfo.progressModel === 'unconfigured') continue;
+      if (!placement) continue;
       if (row.host_shop_id && row.host_shop_id !== placement.shopId) continue;
       if (placement.programSlug && row.program_slug && row.program_slug !== placement.programSlug)
         continue;
       if (isPending(row)) pendingHoursCount += 1;
-      if (!isApproved(row)) continue;
+      if (!isApproved(row) || placement.tradeInfo.progressModel === 'unconfigured') continue;
       workProgress[row.user_id].completed +=
         numericHours(row.accepted_hours) ||
         numericHours(row.hours) ||

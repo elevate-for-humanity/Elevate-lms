@@ -61,7 +61,7 @@ export function HomeFeaturedHostShop() {
           {FEATURED_SHOPS.map((shop) => (
             <article key={shop.name} className="overflow-hidden rounded-3xl border border-white/15 bg-slate-900">
               <div className="relative min-h-[280px] sm:min-h-[340px]">
-                <Image src={shop.image} alt={shop.imageAlt} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                <Image src={shop.image} alt={shop.imageAlt} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover object-center brightness-105 contrast-105 saturate-105" />
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 to-transparent p-6 pt-20">
                   <p className="text-xs font-black uppercase tracking-[0.16em] text-red-300">{shop.program}</p>
                   <h3 className="mt-2 text-2xl font-black">{shop.name}</h3>

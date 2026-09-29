@@ -89,7 +89,7 @@ export default function HostShopSelect({ program, value, onChange }: Props) {
       {shops.length === 0 && !loading && (
         <p className="mt-1 text-xs text-slate-500">
           No approved shops on file yet.{' '}
-          <a href="/programs/barber-apprenticeship/host-shops" className="underline">
+          <a href="/partners/host-shops?program=barber" className="underline">
             Learn about becoming a training site.
           </a>
         </p>

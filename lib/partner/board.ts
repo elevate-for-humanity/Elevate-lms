@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { cache } from 'react';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { normalizeRole } from '@/lib/rbac/role-matrix';
@@ -125,7 +126,7 @@ function isApproved(row: HourRow) {
 }
 
 function isPending(row: HourRow) {
-  return row.approval_status === 'pending' || row.status === 'pending';
+  return row.approval_status === 'pending' && row.status === 'pending';
 }
 
 const ACCEPTED_DOCUMENT_STATUSES = new Set([
@@ -175,8 +176,10 @@ async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerR
     .eq('user_id', userId)
     .eq('status', 'active');
 
+  if (partnerLinkError) throw new Error(`HOST_SHOP_MEMBERSHIP_QUERY_FAILED:${partnerLinkError.message}`);
+
   const partnerLink = (partnerLinks || []).find((row: any) => row?.partner_id && row?.partners);
-  if (!partnerLinkError && partnerLink?.partner_id && partnerLink.partners) {
+  if (partnerLink?.partner_id && partnerLink.partners) {
     return partnerLink.partners as unknown as PartnerRecord;
   }
 
@@ -205,7 +208,9 @@ export async function getHostShopAdminPartnerOptions() {
   });
 }
 
-export async function getHostShopBoard(userId: string) {
+// Layout and nested pages request the same board during one render. Sharing the
+// result avoids repeating the entire set of database reads on every navigation.
+export const getHostShopBoard = cache(async function getHostShopBoard(userId: string) {
   const db = await requireAdminClient();
   const partner = await resolvePartnerForBoard(db, userId);
 
@@ -495,4 +500,4 @@ export async function getHostShopBoard(userId: string) {
     })),
     pendingHoursCount,
   };
-}
+});

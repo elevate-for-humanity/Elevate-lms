@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UltimateMediaDiscoveryResult, UltimateMediaPort } from '../core/ports';
-import { recommendLicensedMediaForCourse } from '@/lib/media/licensed-course-media';
+import {\n  attachStoredLicensedMedia,\n  recommendLicensedMediaForCourse,\n  storedLicensedMediaMetadata,\n} from '@/lib/media/licensed-course-media';
 
 type RecordLike = Record<string, any>;
 

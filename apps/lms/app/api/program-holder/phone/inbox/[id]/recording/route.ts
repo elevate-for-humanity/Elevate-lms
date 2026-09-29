@@ -1,6 +1,6 @@
-// pre-auth-registry: exempt - requireProgramHolder and assigned_profile_id scope access to the recording.
+// pre-auth-registry: exempt - requireCommunicationActor and assigned_profile_id scope access to the recording.
 import { NextResponse } from 'next/server';
-import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { requireCommunicationActor } from '@/lib/communications/actor';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -9,8 +9,7 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const ctx = await requireProgramHolder();
-  if (ctx.mode !== 'holder') return new NextResponse('Forbidden', { status: 403 });
+  const ctx = await requireCommunicationActor();
   const { id } = await params;
   const { data: item } = await ctx.db
     .from('phone_callback_tasks')

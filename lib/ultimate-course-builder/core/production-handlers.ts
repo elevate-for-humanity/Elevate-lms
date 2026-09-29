@@ -10,7 +10,7 @@ prerequisites:async ctx=>({artifacts:{prerequisites:await runtime.instructional.
 teaching_sequence:async ctx=>({artifacts:{sequence:await runtime.instructional.teachingSequence(evidence(ctx))}}),
 instructor_script:async ctx=>({artifacts:{script:await runtime.instructional.instructorScript(evidence(ctx))}}),
 storyboard:async ctx=>({artifacts:{storyboard:await runtime.instructional.storyboard(evidence(ctx))}}),
-visual_assignment:async ctx=>{const media=await runtime.media.find({courseId:ctx.courseId,competency:comp(ctx),storyboard:ctx.artifacts.storyboard,artifacts:ctx.artifacts});requireLicensedVisualCoverage(ctx,media);return {artifacts:{media}};},
+visual_assignment:async ctx=>{const request={courseId:ctx.courseId,competency:comp(ctx),storyboard:ctx.artifacts.storyboard,artifacts:ctx.artifacts};let media=await runtime.media.find(request);try{requireLicensedVisualCoverage(ctx,media);}catch(error){await runtime.media.acquire(request);media=await runtime.media.find(request);requireLicensedVisualCoverage(ctx,media);}return {artifacts:{media}};},
 scene_construction:async ctx=>({artifacts:{scenes:{storyboard:ctx.artifacts.storyboard,media:ctx.artifacts.visual_assignment,loop:false}}}),
 natural_narration:async ctx=>({artifacts:{narration:await runtime.narration.generate({lessonId:comp(ctx).id,script:(ctx.artifacts.instructor_script as any)?.script?.script??(ctx.artifacts.instructor_script as any)?.script??ctx.artifacts.instructor_script,artifacts:ctx.artifacts,tone:'neutral-calm',targetWpm:135})}}),
 synchronization:async ctx=>({artifacts:{timeline:{narration:ctx.artifacts.natural_narration,scenes:ctx.artifacts.scene_construction,captions:true,continuousNarration:true}}}),

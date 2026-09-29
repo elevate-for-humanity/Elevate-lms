@@ -406,7 +406,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
   return (
     <main className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
       <audio ref={remoteAudioRef} autoPlay playsInline />
-      <ProgramHolderPhoneIntroduction />
+      <ProgramHolderPhoneIntroduction roleLabel={roleLabel} />
       {data.readOnly && (
         <p className="rounded-2xl border border-blue-200 bg-blue-50 p-4 font-bold text-blue-950">
           Administrator preview: this holder’s extension, settings, and PARIS call inbox are shown read-only. Sign in as the Program Holder to connect the PWA, change settings, return calls, or update callback status.

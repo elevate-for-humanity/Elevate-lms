@@ -4,7 +4,7 @@ import { UltimatePlatformLearnerRuntime } from '@/lib/ultimate-course-builder/ad
 
 function query(result: { data: unknown; error: unknown }) {
   const chain: Record<string, any> = {};
-  for (const method of ['select', 'eq', 'limit']) chain[method] = () => chain;
+  for (const method of ['select', 'eq', 'order', 'limit']) chain[method] = () => chain;
   chain.maybeSingle = async () => result;
   chain.then = (resolve: (value: unknown) => unknown) => Promise.resolve(result).then(resolve);
   return chain;
@@ -58,5 +58,34 @@ describe('UltimatePlatformLearnerRuntime', () => {
     expect(evidence.resume).toBe(false);
     expect(evidence.completion).toBe(false);
     expect(evidence.evidence.videoProgressStore).toBe(false);
+  });
+
+  it('verifies a staged lesson build when the competency uses a stable non-UUID key', async () => {
+    const results = [
+      { data: { id: 'lesson-build-1' }, error: null },
+      { data: [], error: null },
+      { data: [], error: null },
+    ];
+    const db = { from: () => query(results.shift()!) } as any;
+    const runtime = new UltimatePlatformLearnerRuntime(db);
+
+    const evidence = await runtime.verify({
+      courseId: 'course-1',
+      lessonId: 'barber-a',
+      videoUrl: 'https://media.example.org/lesson.mp4',
+    });
+
+    expect(evidence).toMatchObject({
+      progress_save: true,
+      resume: true,
+      completion: true,
+      evidence: {
+        courseLesson: true,
+        stagedLesson: true,
+        resolvedLessonId: null,
+        videoProgressStore: true,
+        lessonCompletionStore: true,
+      },
+    });
   });
 });

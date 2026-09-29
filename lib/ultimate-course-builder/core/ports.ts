@@ -13,6 +13,8 @@ export interface UltimateLearnerRuntimeEvidence{
   completion:boolean;
   evidence:{
     courseLesson:boolean;
+    stagedLesson?:boolean;
+    resolvedLessonId?:string|null;
     playableFilm:boolean;
     videoProgressStore:boolean;
     lessonCompletionStore:boolean;

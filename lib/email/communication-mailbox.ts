@@ -20,10 +20,8 @@ export async function ensureActorMailboxes(
   db: SupabaseClient<any>,
   userId: string,
 ): Promise<ActorMailbox[]> {
-  const { error: provisionError } = await db.rpc('communication_email_provision_user', {
-    p_user_id: userId,
-  });
-  if (provisionError) throw provisionError;
+  // Mailbox reads must not change identity or membership. Provisioning is handled
+  // by the database lifecycle triggers and explicit administrative workflows.
 
   const [{ data, error }, { data: profile }] = await Promise.all([
     db

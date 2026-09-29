@@ -25,6 +25,10 @@ const hostShopPreview = readFileSync(
   'apps/lms/app/api/admin/select-host-shop/route.ts',
   'utf8',
 );
+const hostShopDashboard = readFileSync(
+  'apps/lms/app/host-shop/dashboard/HostShopDashboardView.tsx',
+  'utf8',
+);
 
 describe('Host Shop communications contract', () => {
   it('keeps Host Shop users inside Host Shop phone and scheduling routes', () => {
@@ -55,5 +59,7 @@ describe('Host Shop communications contract', () => {
     expect(hostShopPreview).toContain(
       'createPortalPreviewHandoff(previewActorId, previewUserId',
     );
+    expect(hostShopDashboard).toContain('HOST_SHOP_PREVIEW_SESSION_COOKIE');
+    expect(hostShopDashboard).toContain('PORTAL_PREVIEW_SESSION_COOKIE');
   });
 });

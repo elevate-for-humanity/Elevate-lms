@@ -7,7 +7,6 @@ import {
   type AvailabilitySource,
   type RingMode,
 } from '@/lib/phone/availability';
-import { publicPhoneNumber } from '@/lib/phone/telnyx';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,14 +25,28 @@ async function phoneContext() {
     .eq('enabled', true)
     .maybeSingle();
   const systemId = extension?.communication_workspaces?.phone_system_id;
-  const { data: system } = systemId
-    ? await ctx.db
-        .from('phone_systems')
-        .select('id,name,timezone,status')
-        .eq('id', systemId)
-        .maybeSingle()
-    : { data: null };
-  return { ctx, extension, system };
+  const [{ data: system }, { data: primaryNumber }] = systemId
+    ? await Promise.all([
+        ctx.db
+          .from('phone_systems')
+          .select('id,name,timezone,status')
+          .eq('id', systemId)
+          .maybeSingle(),
+        ctx.db
+          .from('phone_numbers')
+          .select('e164')
+          .eq('phone_system_id', systemId)
+          .eq('status', 'active')
+          .eq('is_primary', true)
+          .maybeSingle(),
+      ])
+    : [{ data: null }, { data: null }];
+  return {
+    ctx,
+    extension,
+    system,
+    phoneNumber: primaryNumber?.e164 || process.env.TELNYX_PHONE_NUMBER?.trim() || '',
+  };
 }
 
 function safeSchedule(value: unknown): AvailabilitySchedule | null {
@@ -57,8 +70,8 @@ function safeSchedule(value: unknown): AvailabilitySchedule | null {
 }
 
 export async function GET() {
-  const { ctx, extension, system } = await phoneContext();
-  if (!extension || !system) {
+  const { ctx, extension, system, phoneNumber } = await phoneContext();
+  if (!extension || !system || !phoneNumber) {
     return NextResponse.json(
       { error: 'An administrator has not assigned a phone extension to this account.' },
       { status: 404 },
@@ -93,7 +106,7 @@ export async function GET() {
   return NextResponse.json({
     readOnly: ctx.previewing,
     warnings,
-    phoneNumber: publicPhoneNumber(),
+    phoneNumber,
     system: { name: system.name, timezone: system.timezone, status: system.status },
     notifications: {
       emailMissedCalls: notificationPreferences?.email_missed_calls !== false,

@@ -7,12 +7,10 @@ import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
 import { HomePlatformOverview } from '@/components/home/HomePlatformOverview';
-import { HomeWebsiteBuilderSales } from '@/components/home/HomeWebsiteBuilderSales';
-import { HomeSocialAppCTA } from '@/components/home/HomeSocialAppCTA';
-import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { HomeNetworks } from '@/components/home/HomeNetworks';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
+import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
 export const revalidate = 300;
 
@@ -43,13 +41,18 @@ export default function HomePage() {
     <>
       <StructuredData />
       <main className="[&_a]:no-underline [&_a:hover]:no-underline">
+        <a
+          href={WORKONE_INDY_BOOKING_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block bg-yellow-300 px-4 py-4 text-center text-lg font-black uppercase tracking-wide text-slate-950 sm:text-xl"
+        >
+          SIGN UP FOR YOUR WORKONE APPOINTMENT
+        </a>
         <PlatformHubHero />
         <HomeFeaturedHostShop />
         <HomeNetworks />
         <HomeCareerPathways />
-        <HomeEmployerStrip />
-        <HomeWebsiteBuilderSales />
-        <HomeSocialAppCTA />
         <HomePlatformOverview />
         <HomeFinalCTA />
         <HomeTrustBar />

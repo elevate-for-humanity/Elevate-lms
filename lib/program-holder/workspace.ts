@@ -30,6 +30,51 @@ export type ProgramHolderWorkspace = {
   } | null;
 };
 
+type RegionalLocation = { latitude: number; longitude: number };
+
+const GARY_REGIONAL_CITY_CENTERS: Record<string, RegionalLocation> = {
+  gary: { latitude: 41.5934, longitude: -87.3464 },
+  hammond: { latitude: 41.5834, longitude: -87.5 },
+  merrillville: { latitude: 41.4828, longitude: -87.3328 },
+  merrilville: { latitude: 41.4828, longitude: -87.3328 },
+  chicago: { latitude: 41.8781, longitude: -87.6298 },
+  chesterton: { latitude: 41.6106, longitude: -87.0642 },
+  'crown point': { latitude: 41.4169, longitude: -87.3653 },
+  dyer: { latitude: 41.4942, longitude: -87.5217 },
+  'east chicago': { latitude: 41.6392, longitude: -87.4548 },
+  griffith: { latitude: 41.5284, longitude: -87.4237 },
+  griff: { latitude: 41.5284, longitude: -87.4237 },
+  hebron: { latitude: 41.3186, longitude: -87.2003 },
+  highland: { latitude: 41.5536, longitude: -87.4517 },
+  hobart: { latitude: 41.5323, longitude: -87.255 },
+  'lake station': { latitude: 41.575, longitude: -87.2389 },
+  munster: { latitude: 41.5645, longitude: -87.5125 },
+  portage: { latitude: 41.5759, longitude: -87.1761 },
+  schererville: { latitude: 41.4789, longitude: -87.4548 },
+  'st john': { latitude: 41.45, longitude: -87.47 },
+  'cedar lake': { latitude: 41.3648, longitude: -87.4411 },
+  valparaiso: { latitude: 41.4731, longitude: -87.0611 },
+  'michigan city': { latitude: 41.7075, longitude: -86.895 },
+  'la porte': { latitude: 41.6111, longitude: -86.7225 },
+  'new buffalo': { latitude: 41.7939, longitude: -86.7439 },
+  'calumet city': { latitude: 41.6156, longitude: -87.5295 },
+  lansing: { latitude: 41.5648, longitude: -87.5389 },
+  dolton: { latitude: 41.6389, longitude: -87.6073 },
+  harvey: { latitude: 41.61, longitude: -87.6467 },
+  homewood: { latitude: 41.5573, longitude: -87.6656 },
+  matteson: { latitude: 41.5039, longitude: -87.7131 },
+  midlothian: { latitude: 41.6253, longitude: -87.7175 },
+  'oak park': { latitude: 41.885, longitude: -87.7845 },
+  'tinley park': { latitude: 41.5734, longitude: -87.7845 },
+  whiting: { latitude: 41.6798, longitude: -87.4945 },
+};
+
+function getGaryRegionalCityCenter(city: unknown): RegionalLocation | null {
+  if (typeof city !== 'string') return null;
+  const normalized = city.trim().toLowerCase().replace(/[.,]/g, '').replace(/\s+/g, ' ');
+  return GARY_REGIONAL_CITY_CENTERS[normalized] ?? null;
+}
+
 /** Canonical, holder-scoped data contract shared by every Program Holder page. */
 export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspace> {
   const ctx = await requireProgramHolder();
@@ -325,8 +370,10 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           .filter(Boolean)
           .join(', ');
         if (!address) return null;
-        const location = await geocodeAddress(address);
-        if (!isGeocodingResult(location)) return null;
+        const cityCenter = getGaryRegionalCityCenter(row.city);
+        const geocodedLocation = cityCenter ? null : await geocodeAddress(address);
+        const location = cityCenter || (isGeocodingResult(geocodedLocation) ? geocodedLocation : null);
+        if (!location) return null;
         const distanceMiles = calculateDistanceMiles(
           garyHub.latitude,
           garyHub.longitude,
@@ -359,7 +406,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         work_site: row.city,
       }))
     : [];
-  const applicantRows = [...holderApplicantRows, ...regionalApplicantRows];
+  const applicantRows = isGaryRegionalCoordinator ? regionalApplicantRows : holderApplicantRows;
   const deduplicatedApplicants = (allApplicantAccess || isGaryRegionalCoordinator)
     ? applicantRows.filter((row: any, index: number, rows: any[]) => {
         const key =

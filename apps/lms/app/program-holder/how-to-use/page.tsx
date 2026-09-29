@@ -83,6 +83,7 @@ export default async function ProgramHolderStartHerePage() {
               <p>Your dashboard is the official workspace for routed applicants, enrolled learners, program delivery, communications, compliance, evidence, reporting, and payment readiness.</p>
               <p>Every person in Applicants must be contacted. Confirm the selected program, explain whether verified funding exists or the program is self-pay, state the published amount, schedule the next step, and document the call.</p>
               <p>PARIS can explain the dashboard, open workspaces, identify missing actions, and prepare drafts. You remain responsible for reviewing facts, protecting student information, supervising training, and verifying every submitted record.</p>
+              <p>If you work in more than one Elevate role, verify the Program Holder name, official mailbox, and phone extension at the top of the workspace before contacting a student.</p>
             </div>
             <p className="mt-5 text-sm font-bold text-white">— Elizabeth Greene, Founder &amp; Chief Executive Officer</p>
           </div>

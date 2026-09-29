@@ -146,8 +146,11 @@ export async function PATCH(request: Request) {
   }
   const phoneSettingsRoles = [
     'program_holder',
+    'programholder',
     'site_coordinator',
     'host_shop',
+    'host_shop_admin',
+    'hostshop',
     'partner',
     'employer',
   ];

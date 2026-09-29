@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getStripe } from '@/lib/stripe/client';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { loadBillingProviderConfig } from '@/lib/billing/config';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -15,13 +16,12 @@ type SupabaseStatus = {
   last_error?: string;
 };
 
-type StripeStatus = {
-  status: 'inactive' | 'active' | 'error';
-  mode: 'test' | 'live';
-  balance_cents: number;
-  active_subscriptions: number;
-  failed_payments_24h: number;
-  pending_invoices: number;
+type BillingStatus = {
+  status: 'ledger_ready' | 'error';
+  primary_provider: 'quickbooks' | 'paypal';
+  active_schedules: number;
+  open_invoices: number;
+  past_due_invoices: number;
 };
 
 export async function GET(request: NextRequest) {
@@ -56,42 +56,32 @@ export async function GET(request: NextRequest) {
       supabaseStatus.last_error = 'Connection failed';
     }
 
-    let stripeStatus: StripeStatus = {
-      status: 'inactive',
-      mode: 'test',
-      balance_cents: 0,
-      active_subscriptions: 0,
-      failed_payments_24h: 0,
-      pending_invoices: 0,
+    let billingStatus: BillingStatus = {
+      status: 'error',
+      primary_provider: 'quickbooks',
+      active_schedules: 0,
+      open_invoices: 0,
+      past_due_invoices: 0,
     };
 
     try {
-      const stripe = getStripe();
-      if (stripe) {
-        const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
-
-        const [balance, subscriptions, failedPayments, pendingInvoices] = await Promise.all([
-          stripe.balance.retrieve(),
-          stripe.subscriptions.list({ status: 'active', limit: 100 }),
-          stripe.charges.list({
-            created: { gte: Math.floor(yesterday.getTime() / 1000) },
-            limit: 100,
-          }).then((r) => r.data.filter((c) => !c.paid && c.failure_message)),
-          stripe.invoices.list({ status: 'open', limit: 100 }),
-        ]);
-
-        stripeStatus = {
-          status: 'active',
-          mode: process.env.NEXT_PUBLIC_STRIPE_MODE === 'live' ? 'live' : 'test',
-          balance_cents: balance.available.reduce((sum, b) => sum + b.amount, 0),
-          active_subscriptions: subscriptions.data.length,
-          failed_payments_24h: failedPayments.length,
-          pending_invoices: pendingInvoices.data.length,
-        };
-      }
-    } catch (err) {
-      console.error('Stripe status error:', err);
-      stripeStatus.status = 'error';
+      const db = await requireAdminClient();
+      const [config, schedules, openInvoices, pastDueInvoices] = await Promise.all([
+        loadBillingProviderConfig(db),
+        db.from('billing_schedules').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+        db.from('billing_invoices').select('id', { count: 'exact', head: true }).eq('status', 'open'),
+        db.from('billing_invoices').select('id', { count: 'exact', head: true }).eq('status', 'past_due'),
+      ]);
+      if (schedules.error || openInvoices.error || pastDueInvoices.error) throw new Error('Billing ledger query failed');
+      billingStatus = {
+        status: 'ledger_ready',
+        primary_provider: config.primary,
+        active_schedules: schedules.count ?? 0,
+        open_invoices: openInvoices.count ?? 0,
+        past_due_invoices: pastDueInvoices.count ?? 0,
+      };
+    } catch {
+      // Preserve status as error without exposing billing account details.
     }
 
     const githubStatus = {
@@ -148,7 +138,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       supabase: supabaseStatus,
-      stripe: stripeStatus,
+      billing: billingStatus,
       github: githubStatus,
       fetched_at: new Date().toISOString(),
     });

@@ -7,7 +7,6 @@ import { ArrowLeft } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { SecureIdentityVerificationForm } from '@/components/verification/SecureIdentityVerificationForm';
 import { hasSSNOnFile } from '@/lib/security/secure-identity';
-import { StripeIdentityButton } from '@/components/verification/StripeIdentityButton';
 
 export const metadata: Metadata = {
   robots: { index: false },
@@ -126,16 +125,12 @@ export default async function VerifyIdentityPage() {
         ) : (
           <div className="mt-8 space-y-6">
             <section className="rounded-xl border border-blue-200 bg-blue-50 p-6">
-              <h2 className="text-xl font-black text-blue-950">Automated ID and face verification</h2>
+              <h2 className="text-xl font-black text-blue-950">Secure document review</h2>
               <p className="mt-2 text-sm leading-6 text-blue-900">
-                Use the secure verification provider to validate your government ID and match a live selfie. Elevate stores the verification result, not biometric templates.
+                Submit your ID and selfie securely for authorized staff review. Your verification remains pending until that review is complete.
               </p>
-              <div className="mt-5"><StripeIdentityButton /></div>
-            </section>
-            <details className="rounded-xl border border-slate-300 bg-white p-5">
-              <summary className="cursor-pointer font-black text-slate-950">Use staff review instead</summary>
               <div className="mt-6"><SecureIdentityVerificationForm /></div>
-            </details>
+            </section>
           </div>
         )}
       </div>

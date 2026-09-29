@@ -53,6 +53,8 @@ interface ExternalItem {
   sort_order: number;
   manual_completion_enabled: boolean;
   competency_area: string | null;
+  cost_cents: number | null;
+  payer_rule: 'sponsored' | 'always_student' | 'always_elevate';
 }
 
 interface AvailableCourse {
@@ -113,6 +115,8 @@ const BLANK_EXTERNAL: Omit<ExternalItem, 'id'> = {
   sort_order: 0,
   manual_completion_enabled: true,
   competency_area: null,
+  cost_cents: null,
+  payer_rule: 'always_student',
 };
 
 // Competency areas that Elevate holds proctor authority over.
@@ -144,6 +148,7 @@ function ExternalItemForm({
   saving: boolean;
 }) {
   const [form, setForm] = useState(initial);
+  const [costInput, setCostInput] = useState(initial.cost_cents == null ? '' : (initial.cost_cents / 100).toFixed(2));
   const set = (k: keyof typeof form, v: unknown) => setForm((f) => ({ ...f, [k]: v }));
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -151,7 +156,11 @@ function ExternalItemForm({
     if (!form.partner_name.trim()) return;
     if (!form.title.trim()) return;
     if (!form.external_url.trim()) return;
-    onSave(form);
+    if (!/^\d+(?:\.\d{1,2})?$/.test(costInput)) return;
+    const [dollars, cents = ''] = costInput.split('.');
+    const costCents = Number(dollars) * 100 + Number(cents.padEnd(2, '0'));
+    if (!Number.isSafeInteger(costCents)) return;
+    onSave({ ...form, cost_cents: costCents });
   };
 
   const field = (
@@ -228,6 +237,32 @@ function ExternalItemForm({
         placeholder: 'Steps learners must follow to register or access this training',
         multiline: true,
       })}
+      <div className="grid sm:grid-cols-2 gap-4">
+        <label className="block text-xs font-medium text-slate-600">
+          Course cost (USD) <span className="text-red-500">*</span>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            required
+            value={costInput}
+            onChange={(e) => setCostInput(e.target.value)}
+            className="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm"
+          />
+        </label>
+        <label className="block text-xs font-medium text-slate-600">
+          Who pays <span className="text-red-500">*</span>
+          <select
+            value={form.payer_rule}
+            onChange={(e) => set('payer_rule', e.target.value)}
+            className="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white"
+          >
+            <option value="always_student">Student pays</option>
+            <option value="sponsored">Sponsor may pay, subject to authorization</option>
+            <option value="always_elevate">Elevate pays</option>
+          </select>
+        </label>
+      </div>
       <div>
         <label className="block text-xs font-medium text-slate-600 mb-1">
           Competency Area
@@ -652,6 +687,10 @@ export default function ProgramManagerClient({
                     {item.partner_name}
                     {item.duration_display ? ` · ${item.duration_display}` : ''}
                     {item.credential_name ? ` · ${item.credential_name}` : ''}
+                  </p>
+                  <p className="text-xs text-slate-600">
+                    {item.cost_cents == null ? 'Cost needs review' : `$${(item.cost_cents / 100).toFixed(2)}`}
+                    {' · '}{item.payer_rule === 'always_student' ? 'Student pays' : item.payer_rule === 'always_elevate' ? 'Elevate pays' : 'Sponsor funding requires authorization'}
                   </p>
                   <a
                     href={item.external_url}

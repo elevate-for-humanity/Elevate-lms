@@ -16,6 +16,14 @@ export interface UltimateLearnerRuntimeEvidence{
     playableFilm:boolean;
     videoProgressStore:boolean;
     lessonCompletionStore:boolean;
+    accessibility:{
+      contractVersion:string;
+      semanticHeadings:boolean;
+      colorContrast:boolean;
+      nonColorMeaning:boolean;
+      screenReaderLabels:boolean;
+      reducedMotion:boolean;
+    };
     checkedAt:string;
   };
 }

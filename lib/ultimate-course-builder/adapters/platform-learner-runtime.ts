@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { UltimateLearnerRuntimeEvidence, UltimateLearnerRuntimePort } from '../core/ports';
+import { LMS_RUNTIME_ACCESSIBILITY_EVIDENCE } from '../accessibility/lms-runtime-accessibility';
 
 function isPlayableUrl(value: string) {
   try {
@@ -52,6 +53,7 @@ export class UltimatePlatformLearnerRuntime implements UltimateLearnerRuntimePor
         playableFilm,
         videoProgressStore,
         lessonCompletionStore,
+        accessibility: LMS_RUNTIME_ACCESSIBILITY_EVIDENCE,
         checkedAt: new Date().toISOString(),
       },
     };

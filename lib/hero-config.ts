@@ -187,7 +187,7 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
       { label: 'Cost', value: 'Free if eligible' },
     ],
     ctaPrimary: { label: 'Apply Now', href: '/programs/barber-apprenticeship/apply' },
-    ctaSecondary: { label: 'Find a Host Shop', href: '/programs/barber-apprenticeship/host-shops' },
+    ctaSecondary: { label: 'Find a Host Shop', href: '/partners/host-shops?program=barber' },
   },
 
   // CNA Certification

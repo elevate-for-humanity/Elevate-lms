@@ -254,8 +254,8 @@ export default async function HostShopDashboardView() {
     },
     {
       href: '/host-shop/dashboard/communications',
-      title: 'Meetings & screen share',
-      detail: 'Join secure browser meetings with camera, microphone, chat, and screen sharing when enabled.',
+      title: 'Phone, meetings & follow-up',
+      detail: 'Open Host Shop communications for the assigned phone extension, PARIS callback intake, messages, and scheduling.',
       image: '/images/heroes/lms-analytics.webp',
     },
     {

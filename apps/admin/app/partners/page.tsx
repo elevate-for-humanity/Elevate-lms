@@ -102,7 +102,7 @@ export default async function PartnersPage() {
                 <td className="px-5 py-4"><StatusLine ok={partner.mou_signed === true}>{partner.mou_signed ? 'Signed' : 'Missing'}</StatusLine></td>
                 <td className="px-5 py-4"><StatusLine ok={partner.onboarding_completed === true}>{partner.onboarding_completed ? 'Complete' : `Incomplete${partner.onboarding_step ? ` — ${partner.onboarding_step}` : ''}`}</StatusLine></td>
                 <td className="px-5 py-4">{complete ? <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 font-black text-green-900"><CheckCircle2 className="h-4 w-4" /> Ready</span> : <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 font-black text-red-900"><CircleAlert className="h-4 w-4" /> Action required</span>}</td>
-                <td className="px-5 py-4">{previewUserId ? <OpenPortalPreviewButton targetUserId={previewUserId} label="Open dashboard" reason={`Admin review of Host Shop ${partner.id}`} /> : <span className="text-xs font-bold text-amber-800">Link an account first</span>}</td>
+                <td className="px-5 py-4">{previewUserId ? <OpenPortalPreviewButton targetUserId={previewUserId} hostShopPartnerId={partner.id} label="Open dashboard" reason={`Admin review of Host Shop ${partner.id}`} /> : <span className="text-xs font-bold text-amber-800">Link an account first</span>}</td>
               </tr>))}</tbody>
           </table></div>
         </section>

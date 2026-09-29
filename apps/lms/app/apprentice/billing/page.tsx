@@ -321,13 +321,13 @@ function StudentPaymentCard() {
           Manage the recurring-payment release, PayPal agreement, and payment history.
         </p>
         <Link
-          href="/lms/documents"
+          href="/lms/documents#billing-authorization"
           className="flex items-center justify-between rounded-lg bg-brand-blue-50 p-4 hover:bg-brand-blue-100"
         >
           <span className="flex items-center gap-3">
             <CreditCard className="h-5 w-5 text-brand-blue-700" />
             <span>
-              <span className="block font-medium text-slate-950">PayPal billing agreement</span>
+              <span className="block font-medium text-slate-950">Payment authorization & PayPal setup</span>
               <span className="text-xs text-slate-600">
                 Complete the signed release and provider approval steps
               </span>
@@ -336,7 +336,7 @@ function StudentPaymentCard() {
           <ChevronRight className="h-5 w-5 text-slate-400" />
         </Link>
         <Link
-          href="/billing"
+          href="/apprentice/billing/history"
           className="flex items-center justify-between rounded-lg bg-slate-50 p-4 hover:bg-slate-100"
         >
           <span className="flex items-center gap-3">
@@ -349,7 +349,7 @@ function StudentPaymentCard() {
           <ChevronRight className="h-5 w-5 text-slate-400" />
         </Link>
         <Link
-          href="/lms/documents"
+          href="/lms/documents#required-documents"
           className="flex items-center justify-between rounded-lg bg-brand-blue-50 p-4 hover:bg-brand-blue-100"
         >
           <span className="flex items-center gap-3">

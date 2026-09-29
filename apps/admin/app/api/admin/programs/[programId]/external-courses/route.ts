@@ -36,6 +36,8 @@ const ExternalCourseSchema = z.object({
   sort_order: z.number().int().min(0).default(0),
   manual_completion_enabled: z.boolean().default(true),
   competency_area: z.string().optional().nullable(),
+  cost_cents: z.number().int().min(0),
+  payer_rule: z.enum(['sponsored', 'always_student', 'always_elevate']),
 });
 
 export async function GET(

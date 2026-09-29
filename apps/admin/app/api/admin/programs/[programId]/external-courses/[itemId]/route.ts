@@ -30,6 +30,8 @@ const PatchSchema = z.object({
   sort_order: z.number().int().min(0).optional(),
   manual_completion_enabled: z.boolean().optional(),
   is_active: z.boolean().optional(),
+  cost_cents: z.number().int().min(0).optional(),
+  payer_rule: z.enum(['sponsored', 'always_student', 'always_elevate']).optional(),
 });
 
 export async function PATCH(

@@ -292,6 +292,72 @@ export async function fulfillPaidBillingInvoice(
     return;
   }
 
+  if (job.fulfillment_type === 'apprenticeship_deposit') {
+    const email = String(payload.customer_email || '').toLowerCase().trim();
+    const programSlug = String(payload.program_slug || '');
+    if (!email || !programSlug) throw new Error('Apprenticeship deposit requires customer_email and program_slug.');
+
+    const profile = await db.from('profiles').select('id,full_name').ilike('email', email).maybeSingle();
+    if (profile.error || !profile.data?.id) throw new Error(profile.error?.message || 'Apprentice profile was not found.');
+
+    const program = await db.from('programs').select('id,organization_id,tenant_id,title').eq('slug', programSlug).maybeSingle();
+    if (program.error || !program.data?.id) throw new Error(program.error?.message || 'Apprenticeship program was not found.');
+
+    const existing = await db.from('program_enrollments').select('id').eq('user_id', profile.data.id).eq('program_id', program.data.id).maybeSingle();
+    if (existing.error) throw new Error(existing.error.message);
+
+    const enrollmentValues = {
+      user_id: profile.data.id,
+      student_id: profile.data.id,
+      program_id: program.data.id,
+      program_slug: programSlug,
+      email,
+      full_name: profile.data.full_name || payload.customer_name || email,
+      status: 'active',
+      enrollment_state: 'enrolled',
+      payment_status: 'paid',
+      funding_source: 'self_pay',
+      amount_paid_cents: Number(payload.amount_cents || 0),
+      billing_provider: 'quickbooks',
+      organization_id: program.data.organization_id,
+      tenant_id: program.data.tenant_id,
+      enrolled_at: new Date().toISOString(),
+      access_granted_at: new Date().toISOString(),
+      next_required_action: 'ONBOARDING',
+      updated_at: new Date().toISOString(),
+    };
+
+    let enrollmentId = existing.data?.id as string | undefined;
+    if (enrollmentId) {
+      const updated = await db.from('program_enrollments').update(enrollmentValues).eq('id', enrollmentId);
+      if (updated.error) throw new Error(updated.error.message);
+    } else {
+      const created = await db.from('program_enrollments').insert(enrollmentValues).select('id').single();
+      if (created.error || !created.data?.id) throw new Error(created.error?.message || 'Enrollment was not created.');
+      enrollmentId = created.data.id;
+    }
+
+    const app = await db.from('applications').update({
+      status: 'approved',
+      payment_status: 'paid',
+      payment_provider: 'quickbooks',
+      payment_amount_cents: Number(payload.amount_cents || 0),
+      payment_received_at: new Date().toISOString(),
+      enrollment_id: enrollmentId,
+      user_id: profile.data.id,
+      updated_at: new Date().toISOString(),
+    }).ilike('email', email).eq('program_slug', programSlug);
+    if (app.error) throw new Error(app.error.message);
+
+    const portal = await db.from('profiles').update({
+      enrollment_status: 'active',
+      portal_type: 'apprentice',
+      updated_at: new Date().toISOString(),
+    }).eq('id', profile.data.id);
+    if (portal.error) throw new Error(portal.error.message);
+    return;
+  }
+
   if (job.fulfillment_type === 'program_enrollment') {
     const result = await db
       .from('program_enrollments')

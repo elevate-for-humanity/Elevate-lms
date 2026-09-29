@@ -13,6 +13,15 @@ const FEATURED_SHOPS = [
     programHref: '/programs/cosmetology-apprenticeship',
   },
   {
+    name: 'Kountry Kutz Barbershop',
+    program: 'Barber Apprenticeship',
+    image: '/images/partners/kountry-kutz/interior-active.webp',
+    imageAlt: 'Barbers and customers inside Kountry Kutz apprenticeship host barbershop',
+    address: '56 W Main St, Suite A, New Palestine, Indiana',
+    shopHref: '/host-shops/kountry-kutz-barbershop',
+    programHref: '/programs/barber-apprenticeship',
+  },
+  {
     name: 'Top Shelf Barber Lounge',
     program: 'Barber Apprenticeship',
     image: '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade.jpg',
@@ -45,8 +54,9 @@ export function HomeFeaturedHostShop() {
   return (
     <section className="border-y border-slate-200 bg-slate-950 px-4 py-12 text-white" aria-labelledby="featured-host-shop-heading">
       <div className="mx-auto max-w-6xl">
-        <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">Featured apprenticeship shops</p>
-        <h2 id="featured-host-shop-heading" className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Meet the shops, see the work, and follow real apprenticeship journeys.</h2>
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">Earn while you learn</p>
+        <h2 id="featured-host-shop-heading" className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl">Skip the traditional-school-only path. Build real skills and earn wages while you train in an apprenticeship.</h2>
+        <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-300">Train in a real salon or barbershop with licensed professionals while completing the related instruction and documented competencies required by your apprenticeship pathway.</p>
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           {FEATURED_SHOPS.map((shop) => (
             <article key={shop.name} className="overflow-hidden rounded-3xl border border-white/15 bg-slate-900">

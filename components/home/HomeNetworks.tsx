@@ -23,8 +23,8 @@ export function HomeNetworks() {
             <h3 className="mt-5 text-3xl font-black text-slate-950">Business Owners Network</h3>
             <p className="mt-4 leading-7 text-slate-700">A separate network for employers, entrepreneurs and small businesses to connect with workforce opportunities, talent, apprenticeship pathways and business resources without mixing the experience into the beauty community.</p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link href="/employers" className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-brand-blue-700 px-5 py-3 font-black text-white hover:bg-brand-blue-800">Business & Employer Resources <ArrowRight className="h-4 w-4" /></Link>
-              <Link href="/store#marketplace" className="inline-flex min-h-12 items-center gap-2 rounded-xl border-2 border-slate-300 bg-white px-5 py-3 font-black text-slate-950 hover:border-brand-blue-700"><Store className="h-4 w-4" /> Explore Store</Link>
+              <Link href="/business-network" className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-brand-blue-700 px-5 py-3 font-black text-white hover:bg-brand-blue-800">Explore Business Network <ArrowRight className="h-4 w-4" /></Link>
+              <Link href="/business-network#join" className="inline-flex min-h-12 items-center gap-2 rounded-xl border-2 border-slate-300 bg-white px-5 py-3 font-black text-slate-950 hover:border-brand-blue-700"><Store className="h-4 w-4" /> Join Business Network</Link>
             </div>
           </article>
         </div>

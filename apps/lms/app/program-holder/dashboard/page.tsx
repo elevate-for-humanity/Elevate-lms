@@ -17,7 +17,11 @@ export default async function Page() {
   return (
     <>
       <div className="px-4 pt-5 sm:px-6">
-        <EmailAccountNotice href="/program-holder/email" />
+        <EmailAccountNotice
+          href="/program-holder/email"
+          userId={context.profile.id}
+          accountName={`Elevate for Humanity — ${context.profile.full_name || 'Program Holder'}`}
+        />
       </div>
       <ProgramHolderWorkspaceView
         section="dashboard"

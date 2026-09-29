@@ -18,23 +18,44 @@ export async function POST(req: Request) {
 
   const db = await getAdminClient();
 
+  // Keep the callback on the same public origin that received the login request.
+  // Supabase PKCE state/session cookies are origin-bound; sending an LMS login
+  // request through app.elevateforhumanity.org can strand the verifier on the
+  // wrong host and produce an invalid/expired-looking first login.
   const requestOrigin = new URL(req.url).origin;
   const configuredAppUrl = process.env.NEXT_PUBLIC_APP_URL || requestOrigin;
-  let appOrigin = 'https://app.elevateforhumanity.org';
+  let appOrigin = requestOrigin;
 
   try {
     const candidate = new URL(configuredAppUrl);
-    const isSafeProductionOrigin =
-      candidate.protocol === 'https:' &&
-      candidate.hostname === 'app.elevateforhumanity.org' &&
-      !candidate.port;
+    const allowedProductionHosts = new Set([
+      'lms.elevateforhumanity.org',
+      'app.elevateforhumanity.org',
+    ]);
+    const requestHost = new URL(requestOrigin).hostname;
+    const requestIsPublicElevateHost =
+      new URL(requestOrigin).protocol === 'https:' &&
+      allowedProductionHosts.has(requestHost);
 
-    if (process.env.NODE_ENV !== 'production' || isSafeProductionOrigin) {
+    if (process.env.NODE_ENV !== 'production') {
       appOrigin = candidate.origin;
+    } else if (requestIsPublicElevateHost) {
+      // Same-origin callback is required for the browser PKCE verifier/session.
+      appOrigin = requestOrigin;
+    } else if (
+      candidate.protocol === 'https:' &&
+      allowedProductionHosts.has(candidate.hostname) &&
+      !candidate.port
+    ) {
+      appOrigin = candidate.origin;
+    } else {
+      appOrigin = 'https://lms.elevateforhumanity.org';
     }
   } catch {
-    // Fall back to the canonical app origin. Never email an internal or
-    // restricted-port callback URL to a portal user.
+    appOrigin =
+      process.env.NODE_ENV === 'production'
+        ? 'https://lms.elevateforhumanity.org'
+        : requestOrigin;
   }
 
   // Always route through /auth/callback so the session is established correctly

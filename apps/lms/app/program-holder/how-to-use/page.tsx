@@ -177,7 +177,7 @@ export default async function ProgramHolderStartHerePage() {
           <ShieldCheck className="h-8 w-8 text-blue-700" />
           <h2 className="mt-3 text-2xl font-black text-slate-950">Operating responsibilities</h2>
           <ul className="mt-4 space-y-3">{responsibilities.map((item) => <li key={item} className="flex gap-3 text-sm leading-6 text-slate-700"><CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-blue-700" /> {item}</li>)}</ul>
-          <Link href="/program-holder/sign-mou" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-blue-700 px-4 text-sm font-black text-white">Review the complete MOU</Link>
+          <Link href="/program-holder/dashboard" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-blue-700 px-4 text-sm font-black text-white">Return to dashboard</Link>
         </article>
         <article className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6">
           <DollarSign className="h-8 w-8 text-emerald-700" />

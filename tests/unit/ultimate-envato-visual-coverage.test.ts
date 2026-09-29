@@ -44,6 +44,31 @@ describe('Ultimate Envato visual coverage', () => {
     });
   });
 
+  it('acquires approved stored media and retries discovery before blocking', async () => {
+    const find = vi
+      .fn()
+      .mockResolvedValueOnce({
+        policy: 'licensed-first',
+        licensedSuggestions: [],
+        readyAssets: licensedAssets(6),
+        storyboard: null,
+      })
+      .mockResolvedValueOnce({
+        policy: 'licensed-first',
+        licensedSuggestions: [],
+        readyAssets: licensedAssets(7),
+        storyboard: null,
+      });
+    const acquire = vi.fn().mockResolvedValue({ attached: 1, pending: 0 });
+    const handlers = createProductionHandlers({ media: { find, acquire } } as any);
+
+    await expect(handlers.visual_assignment(context())).resolves.toMatchObject({
+      artifacts: { media: { readyAssets: expect.arrayContaining(licensedAssets(7)) } },
+    });
+    expect(acquire).toHaveBeenCalledTimes(1);
+    expect(find).toHaveBeenCalledTimes(2);
+  });
+
   it('blocks at visual assignment before narration when fewer than seven shots exist', async () => {
     const handlers = createProductionHandlers({
       media: {

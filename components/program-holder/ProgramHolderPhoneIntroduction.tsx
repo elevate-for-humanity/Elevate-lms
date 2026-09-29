@@ -14,12 +14,10 @@ import {
 } from 'lucide-react';
 import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
 
-const STORAGE_KEY = 'program-holder-phone-introduction-v1';
-
 const guide = [
   {
     title: 'Your extension and business identity',
-    body: 'Your assigned three-digit extension belongs to your Program Holder account. Incoming calls ring inside the Elevate PWA, and returned calls show the Elevate business number. Your personal cell number is not shown to callers and employee extensions never forward to a personal phone.',
+    body: 'Your assigned three-digit extension belongs to your Elevate portal account. Incoming calls ring inside the Elevate PWA, and returned calls show the Elevate business number. Your personal cell number is not shown to callers and employee extensions never forward to a personal phone.',
   },
   {
     title: 'Ring, Vibrate, Silent, Do Not Disturb, and Off',
@@ -55,15 +53,20 @@ const guide = [
   },
 ];
 
-export function ProgramHolderPhoneIntroduction() {
+export function ProgramHolderPhoneIntroduction({
+  roleLabel = 'Program Holder',
+}: {
+  roleLabel?: string;
+} = {}) {
+  const storageKey = `${roleLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-phone-introduction-v1`;
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
-    setShowWelcome(window.localStorage.getItem(STORAGE_KEY) !== 'complete');
-  }, []);
+    setShowWelcome(window.localStorage.getItem(storageKey) !== 'complete');
+  }, [storageKey]);
 
   function completeIntroduction() {
-    window.localStorage.setItem(STORAGE_KEY, 'complete');
+    window.localStorage.setItem(storageKey, 'complete');
     setShowWelcome(false);
   }
 
@@ -91,7 +94,7 @@ export function ProgramHolderPhoneIntroduction() {
               Your Elevate dashboard now includes your work phone
             </h2>
             <p className="mt-3 text-base leading-7 text-slate-700">
-              Install the Program Holder PWA, connect your extension, choose how and when it rings,
+              Install the {roleLabel} PWA, connect your extension, choose how and when it rings,
               and manage every missed call from one secure dashboard. Calls do not forward to your
               personal cell.
             </p>
@@ -122,8 +125,8 @@ export function ProgramHolderPhoneIntroduction() {
                 or desktop Chrome/Edge, use the install button.
               </p>
               <PwaInstallButton
-                label="Install Program Holder PWA"
-                installedLabel="Program Holder PWA installed"
+                label={`Install ${roleLabel} PWA`}
+                installedLabel={`${roleLabel} PWA installed`}
                 className="mt-3 inline-flex min-h-12 items-center gap-2 rounded-xl bg-blue-700 px-5 py-3 font-black text-white"
               />
             </div>
@@ -148,11 +151,11 @@ export function ProgramHolderPhoneIntroduction() {
                 New
               </span>
               <h2 className="mt-3 text-2xl font-black text-slate-950">
-                Install the Program Holder PWA for live calls
+                Install the {roleLabel} PWA for live calls
               </h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
                 The installed app gives you the quickest access to incoming calls, your PARIS inbox,
-                students, meetings, documents, and other Program Holder tools.
+                students, meetings, documents, and other {roleLabel} tools.
               </p>
               <p className="mt-2 text-xs font-bold text-slate-600">
                 iPhone/iPad: Safari → Share → Add to Home Screen. Android/Chrome/Edge: select

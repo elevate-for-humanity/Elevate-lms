@@ -336,7 +336,7 @@ function StudentPaymentCard() {
           <ChevronRight className="h-5 w-5 text-slate-400" />
         </Link>
         <Link
-          href="/apprentice/billing/history"
+          href="/billing"
           className="flex items-center justify-between rounded-lg bg-slate-50 p-4 hover:bg-slate-100"
         >
           <span className="flex items-center gap-3">

@@ -7,7 +7,7 @@ import { BillingAuthorizationUpload } from './BillingAuthorizationUpload';
 export const dynamic = 'force-dynamic';
 
 export default async function LearnerDocumentsPage() {
-  const { user } = await requireRole(['student', 'learner', 'admin']);
+  const { user } = await requireRole(['student', 'learner', 'apprentice', 'admin']);
   const workspace = await loadLearnerWorkspace(user.id);
   const db = await createClient();
   const { data: billingAuthorizations } = await db

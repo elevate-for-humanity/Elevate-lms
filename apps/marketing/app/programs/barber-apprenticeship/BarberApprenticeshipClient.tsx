@@ -135,7 +135,7 @@ export default function BarberApprenticeshipClient({
               <Link href="/programs/barber-apprenticeship/apply" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-bold text-white hover:bg-brand-red-700">
                 Start Apprentice Application <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/host-shop" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-slate-300 px-6 py-3 font-bold text-slate-950 hover:bg-slate-50">
+              <Link href="/partners/host-shops?program=barber" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-slate-300 px-6 py-3 font-bold text-slate-950 hover:bg-slate-50">
                 Host Shop Information
               </Link>
             </div>

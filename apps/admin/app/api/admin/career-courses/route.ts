@@ -1,9 +1,7 @@
-import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
@@ -56,7 +54,7 @@ async function _GET(request: Request) {
   }
 }
 
-// POST - Create Stripe products for career courses
+// POST - Retired catalog sync compatibility endpoint
 async function _POST(req: Request) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
@@ -67,78 +65,9 @@ async function _POST(req: Request) {
     const { action } = await req.json();
 
     if (action === 'sync-stripe') {
-      const supabase = await requireAdminClient();
-
-      const { data: courses, error } = await supabase
-        .from('career_courses')
-        .select('*')
-        .is('stripe_product_id', null);
-
-      if (error) {
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-      }
-
-      const stripe = getStripe();
-      const results = [];
-
-      for (const course of courses || []) {
-        try {
-          const product = await stripe.products.create({
-            name: course.title,
-            description: course.description || undefined,
-            metadata: {
-              course_id: course.id,
-              course_slug: course.slug,
-              type: 'career_course',
-            },
-          });
-
-          const price = await stripe.prices.create({
-            product: product.id,
-            unit_amount: Math.round(course.price * 100),
-            currency: 'usd',
-            metadata: {
-              course_id: course.id,
-            },
-          });
-
-          await supabase
-            .from('career_courses')
-            .update({
-              stripe_product_id: product.id,
-              stripe_price_id: price.id,
-            })
-            .eq('id', course.id);
-
-          results.push({
-            course: course.title,
-            product_id: product.id,
-            price_id: price.id,
-            status: 'success',
-          });
-        } catch {
-          results.push({
-            course: course.title,
-            status: 'error',
-            error: 'Payment processing failed',
-          });
-        }
-      }
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user)
-        await logAdminAudit({
-          action: AdminAction.CAREER_COURSE_UPDATED,
-          actorId: user.id,
-          entityType: 'career_courses',
-          entityId: BULK_ENTITY_ID,
-          metadata: { action: 'sync_stripe', count: results.length },
-          req,
-        });
-
-      return NextResponse.json({ results });
+      return NextResponse.json({
+        error: 'Legacy product synchronization is retired. Set course prices in the active program catalog.',
+      }, { status: 410 });
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

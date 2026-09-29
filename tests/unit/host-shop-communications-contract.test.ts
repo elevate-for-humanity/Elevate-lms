@@ -29,6 +29,14 @@ const hostShopDashboard = readFileSync(
   'apps/lms/app/host-shop/dashboard/HostShopDashboardView.tsx',
   'utf8',
 );
+const hostShopEmail = readFileSync(
+  'apps/lms/app/host-shop/email/page.tsx',
+  'utf8',
+);
+const emailWorkspace = readFileSync(
+  'components/communications/EmailWorkspace.tsx',
+  'utf8',
+);
 
 describe('Host Shop communications contract', () => {
   it('keeps Host Shop users inside Host Shop phone and scheduling routes', () => {
@@ -61,5 +69,12 @@ describe('Host Shop communications contract', () => {
     );
     expect(hostShopDashboard).toContain('HOST_SHOP_PREVIEW_SESSION_COOKIE');
     expect(hostShopDashboard).toContain('PORTAL_PREVIEW_SESSION_COOKIE');
+  });
+
+  it('uses Host Shop language in mailbox previews', () => {
+    expect(hostShopEmail).toContain('<EmailWorkspace roleLabel="Host Shop" />');
+    expect(emailWorkspace).toContain("roleLabel = 'Program Holder'");
+    expect(emailWorkspace).toContain('selected {roleLabel} mailbox');
+    expect(emailWorkspace).not.toContain('selected Program Holder’s mailbox');
   });
 });

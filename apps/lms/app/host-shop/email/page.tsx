@@ -22,7 +22,7 @@ export default async function HostShopEmailPage() {
           Use your approved shop address for apprenticeship communication.
         </p>
       </div>
-      <EmailWorkspace />
+      <EmailWorkspace roleLabel="Host Shop" />
     </main>
   );
 }

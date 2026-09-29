@@ -11,9 +11,8 @@ test.describe('Homepage PLATFORM_DEFAULTS leaks', () => {
 
   test('homepage pathway image alt is human-readable', async ({ page }) => {
     await page.goto('/');
-    // aria-labelledby takes precedence over aria-label, so use the visible
-    // heading that actually names this region in the accessibility tree.
-    const pathwaySection = page.getByRole('region', { name: 'Training may be free for people who qualify.' });
+    // Match the current heading that names the pathway region.
+    const pathwaySection = page.getByRole('region', { name: 'Choose the program you want to explore.' });
     await expect(pathwaySection).toBeVisible();
     const img = pathwaySection.getByRole('img').first();
     const alt = await img.getAttribute('alt');

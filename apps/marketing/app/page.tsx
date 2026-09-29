@@ -47,7 +47,7 @@ export default function HomePage() {
           rel="noopener noreferrer"
           className="block bg-yellow-300 px-4 py-4 text-center text-lg font-black uppercase tracking-wide text-slate-950 sm:text-xl"
         >
-          SIGN UP FOR YOUR WORKONE APPOINTMENT
+          POSSIBLE FUNDING FOR CDL, BOOKKEEPING, BUSINESS & HVAC TRAINING — SIGN UP FOR YOUR WORKONE APPOINTMENT HERE FOR YOUR INTAKE TO SEE IF YOU QUALIFY
         </a>
         <PlatformHubHero />
         <HomeFeaturedHostShop />

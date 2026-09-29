@@ -64,7 +64,6 @@ export async function runCosmetologyPostPayment(
 
   const studentEmail = app.email;
   const studentName = [app.first_name, app.last_name].filter(Boolean).join(' ') || studentEmail;
-  const firstName = app.first_name || 'there';
 
   // ── Step 2: Find or create profile + program_enrollment (CRITICAL) ──────
   let enrollmentId: string | undefined = app.enrollment_id ?? undefined;
@@ -339,7 +338,7 @@ export async function runCosmetologyPostPayment(
     <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:16px;margin-bottom:20px;">
       <p style="margin:0 0 8px;font-weight:700;color:#dc2626;">Required Actions:</p>
       <ol style="margin:0;padding-left:20px;color:#374151;font-size:14px;">
-        <li style="margin-bottom:6px;">Confirm host shop placement at Mesmerized by Beauty within 1–2 business days</li>
+        <li style="margin-bottom:6px;">Confirm the student's assigned Host Shop in the apprenticeship placement record within 1–2 business days. Do not assume or hard-code a shop.</li>
         <li style="margin-bottom:0;">Contact student to confirm start date</li>
       </ol>
     </div>

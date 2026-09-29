@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { target_user_id, reason } = body;
+  const hostShopPartnerId = String(body.host_shop_partner_id || '').trim();
   const db = await requireAdminClient();
   if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
 
@@ -66,6 +67,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Cannot impersonate yourself' }, { status: 400 });
   }
 
+  if (hostShopPartnerId) {
+    const { data: membership, error: membershipError } = await db
+      .from('partner_users')
+      .select('partner_id,user_id,status')
+      .eq('partner_id', hostShopPartnerId)
+      .eq('user_id', target_user_id)
+      .eq('status', 'active')
+      .maybeSingle();
+    if (membershipError || !membership?.partner_id) {
+      return NextResponse.json(
+        { error: 'Active Host Shop account link not found' },
+        { status: 404 },
+      );
+    }
+  }
+
   const session = {
     real_user_id: auth.id,
     real_user_email: auth.email,
@@ -85,6 +102,7 @@ export async function POST(req: NextRequest) {
     metadata: {
       actorRole: auth.role ?? 'admin',
       after: session,
+      preview_partner_id: hostShopPartnerId || null,
     },
   });
 
@@ -103,8 +121,13 @@ export async function POST(req: NextRequest) {
     // prevents it from being stored in browser history, access logs, and
     // referrer headers, and avoids security filters that reject credential-like
     // query parameters during the cross-subdomain transition.
-    preview_url: 'https://app.elevateforhumanity.org/api/admin/preview',
-    preview_handoff: createPortalPreviewHandoff(auth.id, target_user_id),
+    preview_url: hostShopPartnerId
+      ? 'https://app.elevateforhumanity.org/api/admin/select-host-shop'
+      : 'https://app.elevateforhumanity.org/api/admin/preview',
+    preview_handoff: createPortalPreviewHandoff(
+      auth.id,
+      hostShopPartnerId || target_user_id,
+    ),
     impersonating: {
       user_id: target_user_id,
       name: target.full_name,

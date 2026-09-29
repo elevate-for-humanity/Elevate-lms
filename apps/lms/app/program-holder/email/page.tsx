@@ -18,7 +18,7 @@ export default async function ProgramHolderEmailPage() {
         </p>
         <h1 className="mt-1 text-3xl font-black text-slate-950">Program Email</h1>
         <p className="mt-2 text-sm font-medium text-slate-600">
-          Use your program’s Elevate address for official communication.
+          Use your program’s Elevate address for official communication. If you work in more than one portal role, confirm the mailbox label before sending.
         </p>
       </div>
       <EmailWorkspace />

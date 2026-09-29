@@ -12,6 +12,12 @@ const DEVICE_ID = /^[A-Za-z0-9_-]{16,100}$/;
 
 export async function POST(request: Request) {
   const ctx = await requireCommunicationActor();
+  if (ctx.previewing) {
+    return NextResponse.json(
+      { error: 'Administrator portal previews cannot connect or place calls.' },
+      { status: 403 },
+    );
+  }
   const body = await request.json().catch(() => ({}));
   const deviceId = String(body.deviceId || '');
   if (!DEVICE_ID.test(deviceId)) {

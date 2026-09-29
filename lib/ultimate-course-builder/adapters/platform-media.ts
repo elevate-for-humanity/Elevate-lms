@@ -4,6 +4,8 @@ import { recommendLicensedMediaForCourse } from '@/lib/media/licensed-course-med
 
 type RecordLike = Record<string, any>;
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 function firstRecord(value: unknown): RecordLike {
   const row = Array.isArray(value) ? value[0] : value;
   return row && typeof row === 'object' ? (row as RecordLike) : {};
@@ -36,7 +38,15 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       .eq('status', 'ready')
       .eq('asset_role', 'source_broll')
       .not('entitlement_id', 'is', null);
-    if (lessonId) readyAssetQuery = readyAssetQuery.eq('lesson_id', String(lessonId));
+    if (lessonId && UUID_PATTERN.test(String(lessonId))) {
+      readyAssetQuery = readyAssetQuery.or(`lesson_id.is.null,lesson_id.eq.${String(lessonId)}`);
+    } else if (lessonId) {
+      // Some registered work-process profiles use stable competency keys such
+      // as `barber-a` instead of course_lessons UUIDs. Those keys cannot be
+      // compared with the UUID lesson_id column, so use the licensed,
+      // course-scoped media pool for that competency.
+      readyAssetQuery = readyAssetQuery.is('lesson_id', null);
+    }
     const { data, error } = await readyAssetQuery.limit(20);
     if (error) throw error;
 

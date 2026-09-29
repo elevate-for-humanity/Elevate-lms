@@ -5,6 +5,7 @@ import {UltimatePlatformCredential} from '../adapters/platform-credential';
 import {UltimatePlatformInstructionalGenerator} from '../adapters/platform-instructional-generator';
 import {UltimatePlatformMedia} from '../adapters/platform-media';
 import {UltimatePlatformAssessment} from '../adapters/platform-assessment';
+import {UltimatePlatformLearnerRuntime} from '../adapters/platform-learner-runtime';
 import type {UltimateRuntime} from './runtime';
 import type {SupabaseClient} from '@supabase/supabase-js';
 import type {UltimateNarrationPort,UltimateRenderPort} from './ports';
@@ -31,6 +32,7 @@ export async function createUltimateRuntime(db:SupabaseClient):Promise<UltimateR
     media:new UltimatePlatformMedia(db as any),
     narration:new LazyNarration(),
     renderer:new LazyRenderer(),
-    assessment:new UltimatePlatformAssessment()
+    assessment:new UltimatePlatformAssessment(),
+    learner:new UltimatePlatformLearnerRuntime(db as any)
   };
 }

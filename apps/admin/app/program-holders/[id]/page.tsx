@@ -79,7 +79,8 @@ export default async function ProgramHolderDetailPage({
     'use server';
     const { user: actor, profile: actorProfile } = await requireRole(['admin']);
     const nextStatus = String(formData.get('status') ?? '');
-    if (!['active', 'rejected', 'suspended'].includes(nextStatus))
+    const allowedStatuses = ['pending', 'approved_pending_mou', 'approved', 'active', 'inactive', 'suspended', 'rejected'];
+    if (!allowedStatuses.includes(nextStatus))
       redirect(`/program-holders/${id}?error=Invalid+status`);
     if (!['admin', 'super_admin'].includes(String(actorProfile.role ?? '')))
       redirect('/unauthorized');
@@ -87,7 +88,13 @@ export default async function ProgramHolderDetailPage({
     const adminDb = await requireAdminClient();
     const { error: updateError } = await adminDb
       .from('program_holders')
-      .update({ status: nextStatus, updated_at: new Date().toISOString() })
+      .update({
+        status: nextStatus,
+        updated_at: new Date().toISOString(),
+        ...(['approved', 'active'].includes(nextStatus) && !holder.approved_at
+          ? { approved_at: new Date().toISOString() }
+          : {}),
+      })
       .eq('id', id);
     if (updateError) redirect(`/program-holders/${id}?error=Status+update+failed`);
 
@@ -241,7 +248,7 @@ export default async function ProgramHolderDetailPage({
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-black text-slate-950">Program Holder follow-up notes</h2>
-          <p className="mt-1 text-sm text-slate-600">Notes entered in David’s applicant workflow appear here for Admin review with outcome and update time.</p>
+          <p className="mt-1 text-sm text-slate-600">Notes entered in this Program Holder’s applicant workflow appear here for Admin review with outcome and update time.</p>
           <div className="mt-4 grid gap-3">
             {applicantNotes?.length ? applicantNotes.map((note: any) => (
               <article key={note.id} className="rounded-xl border border-slate-200 p-4">
@@ -295,12 +302,18 @@ export default async function ProgramHolderDetailPage({
                     return (
                       <tr key={learner.id} className={learner.at_risk ? 'bg-amber-50' : 'bg-white'}>
                         <td className="px-5 py-4">
-                          <Link
-                            href={`/students/${learner.user_id}`}
-                            className="font-black text-brand-blue-700 hover:underline"
-                          >
-                            {learner.full_name || learner.email || 'Learner'}
-                          </Link>
+                          {learner.user_id ? (
+                            <Link
+                              href={`/students/${learner.user_id}`}
+                              className="font-black text-brand-blue-700 hover:underline"
+                            >
+                              {learner.full_name || learner.email || 'Learner'}
+                            </Link>
+                          ) : (
+                            <span className="font-black text-slate-900">
+                              {learner.full_name || learner.email || 'Learner'}
+                            </span>
+                          )}
                           <p className="mt-1 text-xs text-slate-500">
                             {learner.email || 'No email recorded'}
                           </p>
@@ -440,7 +453,11 @@ export default async function ProgramHolderDetailPage({
                     defaultValue={holder.status || 'active'}
                     className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold"
                   >
+                    <option value="pending">Pending</option>
+                    <option value="approved_pending_mou">Approved — MOU pending</option>
+                    <option value="approved">Approved</option>
                     <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
                     <option value="suspended">Suspended</option>
                     <option value="rejected">Rejected</option>
                   </select>

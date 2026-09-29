@@ -15,7 +15,7 @@ import path from 'path';
 import os from 'os';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
-import { mkdir, writeFile, unlink, rm } from 'fs/promises';
+import { mkdir, readFile, writeFile, unlink, rm } from 'fs/promises';
 import { generateEdgeTTS, buildLessonScript, EDGE_TTS_VOICES, type EdgeTTSVoice } from './edge-tts';
 import { getPexelsImage, getPexelsVideoClip } from './pexels';
 import { logger } from '@/lib/logger';
@@ -172,6 +172,54 @@ export function buildStoryboardWebVtt(scenes: SceneData[]): string {
     return `${index + 1}\n${vttTimestamp(start)} --> ${vttTimestamp(cursor)}\n${scene.narration}`;
   });
   return `WEBVTT\n\n${cues.join('\n\n')}\n`;
+}
+
+async function createOpeningStillFromLicensedVideo(input: {
+  videoUrl: string;
+  outputDir: string;
+  lessonId: string;
+}): Promise<string> {
+  const response = await fetch(input.videoUrl, {
+    cache: 'no-store',
+    signal: AbortSignal.timeout(120_000),
+  });
+  if (!response.ok) {
+    throw new Error(`licensed video returned ${response.status}`);
+  }
+  const video = Buffer.from(await response.arrayBuffer());
+  if (!video.length || video.length > 512 * 1024 * 1024) {
+    throw new Error(`licensed video size is invalid (${video.length} bytes)`);
+  }
+
+  const safeLessonId = input.lessonId.replace(/[^a-z0-9_-]+/gi, '-');
+  const sourcePath = path.join(input.outputDir, `opening-${safeLessonId}.mp4`);
+  const stillPath = path.join(input.outputDir, `opening-${safeLessonId}.jpg`);
+  await writeFile(sourcePath, video);
+  await execFileAsync(
+    'ffmpeg',
+    [
+      '-y',
+      '-ss',
+      '1',
+      '-i',
+      sourcePath,
+      '-frames:v',
+      '1',
+      '-vf',
+      'scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black',
+      '-q:v',
+      '2',
+      stillPath,
+    ],
+    { timeout: 120_000, maxBuffer: 2_000_000 },
+  );
+  const still = await readFile(stillPath);
+  if (!still.length) throw new Error('licensed video produced an empty opening still');
+  return uploadCourseVideosObject(
+    still,
+    `generated-lessons/lesson-${safeLessonId}-opening.jpg`,
+    'image/jpeg',
+  );
 }
 
 // ── Instructor config ─────────────────────────────────────────────────────────
@@ -768,17 +816,35 @@ export async function renderStoryboardVideo(
       }
     }
     const firstStoryboardScene = resolvedStoryboard.scenes[0];
-    const openingImageUrl =
-      normalizeRemotionMediaUrl(firstStoryboardScene?.referenceImageUrl) ||
-      (!input.ultimateStrict
-        ? normalizeRemotionMediaUrl(
-            await getPexelsImage('default', {
-              query: normalizedScenes[0]?.clip_keyword || input.storyboard.title,
-              deterministicKey: firstStoryboardScene?.contentHash || input.lessonId,
-              allowGeneratedFallback: true,
-            }),
-          )
-        : null);
+    let openingImageUrl = normalizeRemotionMediaUrl(firstStoryboardScene?.referenceImageUrl);
+    const openingVideoUrl = normalizeRemotionMediaUrl(normalizedScenes[0]?.clipUrl);
+    if (!openingImageUrl && openingVideoUrl) {
+      try {
+        openingImageUrl = await createOpeningStillFromLicensedVideo({
+          videoUrl: openingVideoUrl,
+          outputDir: paths.outputDir,
+          lessonId: input.lessonId,
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (input.ultimateStrict) {
+          throw new Error(`MEDIA_OPENING_STILL_EXTRACTION_FAILED:${message}`, { cause: error });
+        }
+        logger.warn('[RemotionRender] Could not derive an opening still from lesson video', {
+          lessonId: input.lessonId,
+          error: message,
+        });
+      }
+    }
+    if (!openingImageUrl && !input.ultimateStrict) {
+      openingImageUrl = normalizeRemotionMediaUrl(
+        await getPexelsImage('default', {
+          query: normalizedScenes[0]?.clip_keyword || input.storyboard.title,
+          deterministicKey: firstStoryboardScene?.contentHash || input.lessonId,
+          allowGeneratedFallback: true,
+        }),
+      );
+    }
     if (!openingImageUrl || !firstStoryboardScene) {
       throw new Error('MEDIA_OPENING_STILL_MISSING');
     }

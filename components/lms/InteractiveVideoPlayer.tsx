@@ -1,6 +1,7 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
+import { LMS_VIDEO_CONTROL_LABELS } from '@/lib/ultimate-course-builder/accessibility/lms-runtime-accessibility';
 
 import React from 'react';
 
@@ -81,8 +82,7 @@ interface TranscriptSegment {
   text: string;
 }
 
-const getCheckpointKey = (checkpoint: Checkpoint) =>
-  `${checkpoint.type}:${checkpoint.timestamp}`;
+const getCheckpointKey = (checkpoint: Checkpoint) => `${checkpoint.type}:${checkpoint.timestamp}`;
 
 interface InteractiveVideoPlayerProps {
   videoUrl: string;
@@ -145,9 +145,12 @@ export default function InteractiveVideoPlayer({
         correctAnswer: checkpoint.answer,
         explanation: checkpoint.explanation,
       }));
-    return [...quizzes, ...checkpointQuizzes.filter(
-      (checkpoint) => !quizzes.some((quiz) => quiz.id === checkpoint.id),
-    )];
+    return [
+      ...quizzes,
+      ...checkpointQuizzes.filter(
+        (checkpoint) => !quizzes.some((quiz) => quiz.id === checkpoint.id),
+      ),
+    ];
   }, [checkpoints, quizzes]);
   const nonQuizCheckpoints = useMemo(
     () => checkpoints.filter((checkpoint) => checkpoint.type !== 'quiz'),
@@ -175,7 +178,9 @@ export default function InteractiveVideoPlayer({
         .order('position_seconds', { ascending: true });
 
       if (error) {
-        setPersistenceError('Your saved video notes could not be loaded. Refresh the page or contact support.');
+        setPersistenceError(
+          'Your saved video notes could not be loaded. Refresh the page or contact support.',
+        );
         return;
       }
 
@@ -197,34 +202,49 @@ export default function InteractiveVideoPlayer({
   useEffect(() => {
     const loadPlaybackState = async () => {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user || !lessonRecordId || !courseId) return;
 
       const [progressResult, quizResult, checkpointResult] = await Promise.all([
-        supabase.from('learner_video_progress')
+        supabase
+          .from('learner_video_progress')
           .select('last_position_seconds')
-          .eq('user_id', user.id).eq('course_id', courseId).eq('lesson_id', lessonRecordId)
+          .eq('user_id', user.id)
+          .eq('course_id', courseId)
+          .eq('lesson_id', lessonRecordId)
           .maybeSingle(),
-        supabase.from('interactive_video_quiz_answers')
+        supabase
+          .from('interactive_video_quiz_answers')
           .select('timestamp_sec,is_correct')
-          .eq('user_id', user.id).eq('course_id', courseId).eq('lesson_id', lessonRecordId)
+          .eq('user_id', user.id)
+          .eq('course_id', courseId)
+          .eq('lesson_id', lessonRecordId)
           .eq('is_correct', true),
-        supabase.from('learner_video_checkpoint_responses')
+        supabase
+          .from('learner_video_checkpoint_responses')
           .select('checkpoint_key')
-          .eq('user_id', user.id).eq('course_id', courseId).eq('lesson_id', lessonRecordId)
+          .eq('user_id', user.id)
+          .eq('course_id', courseId)
+          .eq('lesson_id', lessonRecordId)
           .eq('completed', true),
       ]);
 
       const failure = progressResult.error || quizResult.error || checkpointResult.error;
       if (failure) {
-        setPersistenceError('Saved playback and checkpoint progress could not be loaded. Refresh and try again.');
+        setPersistenceError(
+          'Saved playback and checkpoint progress could not be loaded. Refresh and try again.',
+        );
         return;
       }
       resumePositionRef.current = Number(progressResult.data?.last_position_seconds ?? 0);
-      setCompletedCheckpointKeys(new Set([
-        ...(quizResult.data ?? []).map((row) => `quiz:${Number(row.timestamp_sec)}`),
-        ...(checkpointResult.data ?? []).map((row) => row.checkpoint_key),
-      ]));
+      setCompletedCheckpointKeys(
+        new Set([
+          ...(quizResult.data ?? []).map((row) => `quiz:${Number(row.timestamp_sec)}`),
+          ...(checkpointResult.data ?? []).map((row) => row.checkpoint_key),
+        ]),
+      );
     };
     void loadPlaybackState();
   }, [courseId, lessonRecordId]);
@@ -239,14 +259,22 @@ export default function InteractiveVideoPlayer({
     } = await supabase.auth.getUser();
 
     if (!user || !lessonRecordId || !courseId) {
-      setPersistenceError('Sign in and open this lesson from your enrolled course before saving notes.');
+      setPersistenceError(
+        'Sign in and open this lesson from your enrolled course before saving notes.',
+      );
       return;
     }
 
     const body = newNote.trim();
     const { data, error } = await supabase
       .from('learner_video_notes')
-      .insert({ user_id: user.id, course_id: courseId, lesson_id: lessonRecordId, body, position_seconds: currentTime })
+      .insert({
+        user_id: user.id,
+        course_id: courseId,
+        lesson_id: lessonRecordId,
+        body,
+        position_seconds: currentTime,
+      })
       .select('id, body, position_seconds, created_at')
       .single();
 
@@ -255,12 +283,15 @@ export default function InteractiveVideoPlayer({
       return;
     }
 
-    setNotes((current) => [...current, {
-      id: data.id,
-      timestamp: Number(data.position_seconds),
-      content: data.body,
-      createdAt: new Date(data.created_at),
-    }]);
+    setNotes((current) => [
+      ...current,
+      {
+        id: data.id,
+        timestamp: Number(data.position_seconds),
+        content: data.body,
+        createdAt: new Date(data.created_at),
+      },
+    ]);
     setNewNote('');
     setPersistenceError(null);
   };
@@ -275,9 +306,8 @@ export default function InteractiveVideoPlayer({
     if (!user || !lessonRecordId || !courseId) return;
 
     const now = new Date().toISOString();
-    const { error } = await supabase
-      .from('learner_video_progress')
-      .upsert({
+    const { error } = await supabase.from('learner_video_progress').upsert(
+      {
         user_id: user.id,
         course_id: courseId,
         lesson_id: lessonRecordId,
@@ -286,10 +316,14 @@ export default function InteractiveVideoPlayer({
         completed: progress >= 95 && allCheckpointsComplete,
         completed_at: progress >= 95 && allCheckpointsComplete ? now : null,
         updated_at: now,
-      }, { onConflict: 'user_id,lesson_id' });
+      },
+      { onConflict: 'user_id,lesson_id' },
+    );
 
     if (error) {
-      setPersistenceError('Playback progress could not be saved. Keep this page open and try again.');
+      setPersistenceError(
+        'Playback progress could not be saved. Keep this page open and try again.',
+      );
       return;
     }
     setPersistenceError(null);
@@ -325,7 +359,15 @@ export default function InteractiveVideoPlayer({
       setIsPlaying(false);
       videoRef.current?.pause();
     }
-  }, [activeCheckpoint, completedCheckpointKeys, currentTime, effectiveQuizzes, isPlaying, nonQuizCheckpoints, showQuiz]);
+  }, [
+    activeCheckpoint,
+    completedCheckpointKeys,
+    currentTime,
+    effectiveQuizzes,
+    isPlaying,
+    nonQuizCheckpoints,
+    showQuiz,
+  ]);
 
   // Update caption based on current time
   useEffect(() => {
@@ -359,7 +401,10 @@ export default function InteractiveVideoPlayer({
         videoRef.current.pause();
       } else {
         syncAudioOutput();
-        void videoRef.current.play().then(() => {}, () => {});
+        void videoRef.current.play().then(
+          () => {},
+          () => {},
+        );
       }
       setIsPlaying(!isPlaying);
     }
@@ -411,7 +456,10 @@ export default function InteractiveVideoPlayer({
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
-      const resumeAt = Math.min(resumePositionRef.current, Math.max(0, videoRef.current.duration - 0.25));
+      const resumeAt = Math.min(
+        resumePositionRef.current,
+        Math.max(0, videoRef.current.duration - 0.25),
+      );
       if (resumeAt > 0) {
         videoRef.current.currentTime = resumeAt;
         setCurrentTime(resumeAt);
@@ -489,20 +537,27 @@ export default function InteractiveVideoPlayer({
         }),
       }).catch(() => null);
       if (!response?.ok) {
-        setPersistenceError('Your quiz response was not saved. Check your connection and submit it again.');
+        setPersistenceError(
+          'Your quiz response was not saved. Check your connection and submit it again.',
+        );
         return;
       }
       setPersistenceError(null);
 
       if (!isCorrect) return;
-      setCompletedCheckpointKeys((current) => new Set(current).add(`quiz:${currentQuiz.timestamp}`));
+      setCompletedCheckpointKeys((current) =>
+        new Set(current).add(`quiz:${currentQuiz.timestamp}`),
+      );
       setTimeout(() => {
         setShowQuiz(false);
         setShowQuizResult(false);
         setQuizAnswer(null);
         setCurrentQuiz(null);
         setIsPlaying(true);
-        videoRef.current?.play().then(()=>{}, ()=>{});
+        videoRef.current?.play().then(
+          () => {},
+          () => {},
+        );
       }, 1500);
     }
   };
@@ -520,7 +575,8 @@ export default function InteractiveVideoPlayer({
     if (activeCheckpoint.type === 'key-concept') valid = true;
     if (activeCheckpoint.type === 'reflection') {
       valid = checkpointResponse.trim().length >= (activeCheckpoint.minChars ?? 1);
-      if (!valid) feedback = `Write at least ${activeCheckpoint.minChars ?? 1} characters before continuing.`;
+      if (!valid)
+        feedback = `Write at least ${activeCheckpoint.minChars ?? 1} characters before continuing.`;
     }
     if (activeCheckpoint.type === 'hotspot' && checkpointChoice !== null) {
       const area = activeCheckpoint.areas[checkpointChoice];
@@ -530,54 +586,72 @@ export default function InteractiveVideoPlayer({
     if (activeCheckpoint.type === 'scenario' && checkpointChoice !== null) {
       const choice = activeCheckpoint.choices[checkpointChoice];
       valid = !!choice?.correct;
-      feedback = choice?.feedback || (valid ? 'Correct.' : 'Review the safety decision and try again.');
+      feedback =
+        choice?.feedback || (valid ? 'Correct.' : 'Review the safety decision and try again.');
     }
 
     setCheckpointFeedback(feedback);
     if (!valid) return;
 
     if (!lessonRecordId || !courseId) {
-      setPersistenceError('Open this video from your enrolled course before completing checkpoints.');
+      setPersistenceError(
+        'Open this video from your enrolled course before completing checkpoints.',
+      );
       return;
     }
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       setPersistenceError('Sign in before completing this checkpoint.');
       return;
     }
     const completed = activeCheckpoint;
     const checkpointKey = getCheckpointKey(completed);
-    const { error } = await supabase.from('learner_video_checkpoint_responses').upsert({
-      user_id: user.id,
-      course_id: courseId,
-      lesson_id: lessonRecordId,
-      checkpoint_key: checkpointKey,
-      checkpoint_type: completed.type,
-      response: completed.type === 'reflection'
-        ? { text: checkpointResponse.trim() }
-        : completed.type === 'key-concept'
-          ? { acknowledged: true }
-          : { selectedIndex: checkpointChoice },
-      is_correct: completed.type === 'reflection' || completed.type === 'key-concept' ? null : true,
-      completed: true,
-      completed_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'user_id,lesson_id,checkpoint_key' });
+    const { error } = await supabase.from('learner_video_checkpoint_responses').upsert(
+      {
+        user_id: user.id,
+        course_id: courseId,
+        lesson_id: lessonRecordId,
+        checkpoint_key: checkpointKey,
+        checkpoint_type: completed.type,
+        response:
+          completed.type === 'reflection'
+            ? { text: checkpointResponse.trim() }
+            : completed.type === 'key-concept'
+              ? { acknowledged: true }
+              : { selectedIndex: checkpointChoice },
+        is_correct:
+          completed.type === 'reflection' || completed.type === 'key-concept' ? null : true,
+        completed: true,
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,lesson_id,checkpoint_key' },
+    );
     if (error) {
-      setPersistenceError('Your checkpoint response was not saved. Confirm course access and try again.');
+      setPersistenceError(
+        'Your checkpoint response was not saved. Confirm course access and try again.',
+      );
       return;
     }
     setPersistenceError(null);
     setCompletedCheckpointKeys((current) => new Set(current).add(checkpointKey));
-    setTimeout(() => {
-      setActiveCheckpoint(null);
-      setCheckpointChoice(null);
-      setCheckpointResponse('');
-      setCheckpointFeedback('');
-      setIsPlaying(true);
-      videoRef.current?.play().then(()=>{}, ()=>{});
-    }, feedback ? 1200 : 0);
+    setTimeout(
+      () => {
+        setActiveCheckpoint(null);
+        setCheckpointChoice(null);
+        setCheckpointResponse('');
+        setCheckpointFeedback('');
+        setIsPlaying(true);
+        videoRef.current?.play().then(
+          () => {},
+          () => {},
+        );
+      },
+      feedback ? 1200 : 0,
+    );
   };
 
   const allCheckpointsComplete =
@@ -595,8 +669,12 @@ export default function InteractiveVideoPlayer({
   return (
     <div className="bg-black rounded-lg overflow-hidden shadow-2xl">
       {validationErrors.length > 0 && (
-        <div className="border-b border-amber-300 bg-amber-50 p-3 text-sm text-amber-900" role="alert">
-          This lesson has {validationErrors.length} interaction configuration issue{validationErrors.length === 1 ? '' : 's'}. An instructor has been notified.
+        <div
+          className="border-b border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"
+          role="alert"
+        >
+          This lesson has {validationErrors.length} interaction configuration issue
+          {validationErrors.length === 1 ? '' : 's'}. An instructor has been notified.
         </div>
       )}
       {persistenceError && (
@@ -633,11 +711,12 @@ export default function InteractiveVideoPlayer({
               <Volume2 className="w-12 h-12 text-white" />
             </div>
             <p className="text-white text-lg font-medium mb-2">{title}</p>
-            <p className="text-slate-700 text-sm">Audio Lesson</p>
+            <p className="text-slate-300 text-sm">Audio Lesson</p>
             {/* Hidden audio element using same ref */}
             <audio
               ref={videoRef as React.RefObject<HTMLAudioElement>}
               src={videoUrl}
+              aria-label={title}
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
               onError={() => setLoadError(true)}
@@ -651,6 +730,7 @@ export default function InteractiveVideoPlayer({
           <video
             ref={videoRef}
             src={videoUrl}
+            aria-label={title}
             className="w-full aspect-video"
             controls
             preload="metadata"
@@ -676,7 +756,12 @@ export default function InteractiveVideoPlayer({
 
         {/* Structured checkpoint overlay */}
         {activeCheckpoint && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/90 p-4" role="dialog" aria-modal="true" aria-label="Required video checkpoint">
+          <div
+            className="absolute inset-0 z-20 flex items-center justify-center bg-black/90 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Required video checkpoint"
+          >
             <div className="w-full max-w-2xl rounded-xl bg-white p-6 text-slate-900">
               <p className="mb-2 text-xs font-bold uppercase tracking-wide text-brand-blue-700">
                 Required {activeCheckpoint.type.replace('-', ' ')}
@@ -686,7 +771,9 @@ export default function InteractiveVideoPlayer({
                   <h3 className="text-xl font-bold">{activeCheckpoint.concept}</h3>
                   {activeCheckpoint.bullets?.length ? (
                     <ul className="mt-4 list-disc space-y-2 pl-6">
-                      {activeCheckpoint.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                      {activeCheckpoint.bullets.map((bullet) => (
+                        <li key={bullet}>{bullet}</li>
+                      ))}
                     </ul>
                   ) : null}
                 </>
@@ -708,8 +795,12 @@ export default function InteractiveVideoPlayer({
                   <h3 className="text-xl font-bold">{activeCheckpoint.prompt}</h3>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     {activeCheckpoint.areas.map((area, index) => (
-                      <button key={area.label} type="button" onClick={() => setCheckpointChoice(index)}
-                        className={`rounded-lg border-2 p-4 text-left ${checkpointChoice === index ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200'}`}>
+                      <button
+                        key={area.label}
+                        type="button"
+                        onClick={() => setCheckpointChoice(index)}
+                        className={`rounded-lg border-2 p-4 text-left ${checkpointChoice === index ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200'}`}
+                      >
                         {area.label}
                       </button>
                     ))}
@@ -721,18 +812,31 @@ export default function InteractiveVideoPlayer({
                   <h3 className="text-xl font-bold">{activeCheckpoint.situation}</h3>
                   <div className="mt-4 space-y-3">
                     {activeCheckpoint.choices.map((choice, index) => (
-                      <button key={choice.text} type="button" onClick={() => setCheckpointChoice(index)}
-                        className={`w-full rounded-lg border-2 p-4 text-left ${checkpointChoice === index ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200'}`}>
+                      <button
+                        key={choice.text}
+                        type="button"
+                        onClick={() => setCheckpointChoice(index)}
+                        className={`w-full rounded-lg border-2 p-4 text-left ${checkpointChoice === index ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200'}`}
+                      >
                         {choice.text}
                       </button>
                     ))}
                   </div>
                 </>
               )}
-              {checkpointFeedback ? <p className="mt-4 rounded-lg bg-slate-100 p-3" role="status">{checkpointFeedback}</p> : null}
-              <button type="button" onClick={completeActiveCheckpoint}
-                className="mt-5 w-full rounded-lg bg-brand-blue-600 px-4 py-3 font-semibold text-white">
-                {activeCheckpoint.type === 'key-concept' ? 'I understand — continue' : 'Submit and continue'}
+              {checkpointFeedback ? (
+                <p className="mt-4 rounded-lg bg-slate-100 p-3" role="status">
+                  {checkpointFeedback}
+                </p>
+              ) : null}
+              <button
+                type="button"
+                onClick={completeActiveCheckpoint}
+                className="mt-5 w-full rounded-lg bg-brand-blue-600 px-4 py-3 font-semibold text-white"
+              >
+                {activeCheckpoint.type === 'key-concept'
+                  ? 'I understand — continue'
+                  : 'Submit and continue'}
               </button>
             </div>
           </div>
@@ -792,7 +896,11 @@ export default function InteractiveVideoPlayer({
                   </p>
                   {currentQuiz.explanation && <p className="text-sm">{currentQuiz.explanation}</p>}
                   {quizAnswer !== currentQuiz.correctAnswer && (
-                    <button type="button" onClick={retryQuiz} className="mt-3 rounded-lg bg-brand-blue-600 px-4 py-2 font-semibold text-white">
+                    <button
+                      type="button"
+                      onClick={retryQuiz}
+                      className="mt-3 rounded-lg bg-brand-blue-600 px-4 py-2 font-semibold text-white"
+                    >
                       Review and try again
                     </button>
                   )}
@@ -813,214 +921,253 @@ export default function InteractiveVideoPlayer({
         )}
 
         {/* Video Controls */}
-        {showPlayerChrome && <div className="absolute bottom-0 left-0 right-0    p-4">
-          {/* Progress Bar */}
-          <div className="mb-4">
-            <input
-              type="range"
-              min="0"
-              max={duration}
-              value={currentTime}
-              onChange={(
-                e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-              ) => handleSeek(parseFloat(e.target.value))}
-              className="w-full h-1 bg-slate-600 rounded-lg appearance-none cursor-pointer"
-              style={{
-                background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(currentTime / duration) * 100}%, #4b5563 ${(currentTime / duration) * 100}%, #4b5563 100%)`,
-              }}
-            />
-            {/* Interaction markers */}
-            <div className="relative h-2">
-              {effectiveQuizzes.map((quiz) => (
-                <div
-                  key={quiz.id}
-                  className="absolute w-2 h-2 bg-yellow-400 rounded-full -mt-1"
-                  style={{ left: `${(quiz.timestamp / duration) * 100}%` }}
-                  title={`Quiz at ${formatTime(quiz.timestamp)}`}
-                />
-              ))}
-              {nonQuizCheckpoints.map((checkpoint) => (
-                <div
-                  key={getCheckpointKey(checkpoint)}
-                  className="absolute h-2 w-2 rounded-full bg-cyan-400 -mt-3"
-                  style={{ left: `${(checkpoint.timestamp / duration) * 100}%` }}
-                  title={`${checkpoint.type} at ${formatTime(checkpoint.timestamp)}`}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Control Buttons */}
-          <div className="flex items-center justify-between text-white">
-            <div className="flex items-center gap-4">
-              <button onClick={togglePlay} className="hover:text-brand-blue-400">
-                {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
-              </button>
-
-              <button onClick={() => skip(-10)} className="hover:text-brand-blue-400">
-                <SkipBack className="w-5 h-5" />
-              </button>
-
-              <button onClick={() => skip(10)} className="hover:text-brand-blue-400">
-                <SkipForward className="w-5 h-5" />
-              </button>
-
-              <div className="flex items-center gap-2">
-                <button onClick={toggleMute} className="hover:text-brand-blue-400">
-                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                </button>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.1"
-                  value={volume}
-                  onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-                  className="w-20 h-1"
-                />
-              </div>
-
-              <span className="text-sm">
-                {formatTime(currentTime)} / {formatTime(duration)}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <select
-                value={playbackRate}
+        {showPlayerChrome && (
+          <div className="absolute bottom-0 left-0 right-0    p-4">
+            {/* Progress Bar */}
+            <div className="mb-4">
+              <input
+                type="range"
+                aria-label={LMS_VIDEO_CONTROL_LABELS.playbackPosition}
+                min="0"
+                max={duration}
+                value={currentTime}
                 onChange={(
                   e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-                ) => changePlaybackRate(parseFloat(e.target.value))}
-                className="bg-transparent border border-slate-600 rounded px-2 py-2 text-sm"
-              >
-                <option value="0.5">0.5x</option>
-                <option value="0.75">0.75x</option>
-                <option value="1">1x</option>
-                <option value="1.25">1.25x</option>
-                <option value="1.5">1.5x</option>
-                <option value="2">2x</option>
-              </select>
-
-              <button
-                onClick={() => setShowCaptions(!showCaptions)}
-                className={`hover:text-brand-blue-400 ${showCaptions ? 'text-brand-blue-400' : ''}`}
-              >
-                <MessageSquare className="w-5 h-5" />
-              </button>
-
-              <button onClick={toggleFullscreen} className="hover:text-brand-blue-400">
-                <Maximize className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>}
-      </div>
-
-      {/* Tabs Section */}
-      {showPlayerChrome && <div className="bg-slate-900 text-white">
-        <div className="flex border-b border-slate-700">
-          <button
-            onClick={() => setActiveTab('transcript')}
-            className={`flex items-center gap-2 px-6 py-3 ${
-              activeTab === 'transcript'
-                ? 'border-b-2 border-brand-blue-500 text-brand-blue-400'
-                : 'text-slate-700'
-            }`}
-          >
-            <FileText className="w-4 h-4" />
-            Transcript
-          </button>
-          <button
-            onClick={() => setActiveTab('notes')}
-            className={`flex items-center gap-2 px-6 py-3 ${
-              activeTab === 'notes'
-                ? 'border-b-2 border-brand-blue-500 text-brand-blue-400'
-                : 'text-slate-700'
-            }`}
-          >
-            <Bookmark className="w-4 h-4" />
-            My Notes ({notes.length})
-          </button>
-        </div>
-
-        <div className="p-6 max-h-96 overflow-y-auto">
-          {activeTab === 'transcript' && (
-            <div className="space-y-2">
-              {transcript.length > 0 ? (
-                transcript.map((segment, index) => (
+                ) => handleSeek(parseFloat(e.target.value))}
+                className="w-full h-1 bg-slate-600 rounded-lg appearance-none cursor-pointer"
+                style={{
+                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(currentTime / duration) * 100}%, #4b5563 ${(currentTime / duration) * 100}%, #4b5563 100%)`,
+                }}
+              />
+              {/* Interaction markers */}
+              <div className="relative h-2">
+                {effectiveQuizzes.map((quiz) => (
                   <div
-                    key={index}
-                    className={`p-3 rounded cursor-pointer hover:bg-slate-800 ${
-                      currentTime >= segment.start && currentTime <= segment.end
-                        ? 'bg-slate-800'
-                        : ''
-                    }`}
-                    onClick={() => handleSeek(segment.start)}
-                  >
-                    <span className="text-brand-blue-400 text-sm mr-3">
-                      {formatTime(segment.start)}
-                    </span>
-                    <span className="text-slate-700">{segment.text}</span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-slate-700">No transcript available</p>
-              )}
+                    key={quiz.id}
+                    className="absolute w-2 h-2 bg-yellow-400 rounded-full -mt-1"
+                    style={{ left: `${(quiz.timestamp / duration) * 100}%` }}
+                    title={`Quiz at ${formatTime(quiz.timestamp)}`}
+                  />
+                ))}
+                {nonQuizCheckpoints.map((checkpoint) => (
+                  <div
+                    key={getCheckpointKey(checkpoint)}
+                    className="absolute h-2 w-2 rounded-full bg-cyan-400 -mt-3"
+                    style={{ left: `${(checkpoint.timestamp / duration) * 100}%` }}
+                    title={`${checkpoint.type} at ${formatTime(checkpoint.timestamp)}`}
+                  />
+                ))}
+              </div>
             </div>
-          )}
 
-          {activeTab === 'notes' && (
-            <div className="space-y-4">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={newNote}
+            {/* Control Buttons */}
+            <div className="flex items-center justify-between text-white">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={togglePlay}
+                  className="hover:text-brand-blue-400"
+                  aria-label={
+                    isPlaying ? LMS_VIDEO_CONTROL_LABELS.pause : LMS_VIDEO_CONTROL_LABELS.play
+                  }
+                >
+                  {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+                </button>
+
+                <button
+                  onClick={() => skip(-10)}
+                  className="hover:text-brand-blue-400"
+                  aria-label={LMS_VIDEO_CONTROL_LABELS.skipBack}
+                >
+                  <SkipBack className="w-5 h-5" />
+                </button>
+
+                <button
+                  onClick={() => skip(10)}
+                  className="hover:text-brand-blue-400"
+                  aria-label={LMS_VIDEO_CONTROL_LABELS.skipForward}
+                >
+                  <SkipForward className="w-5 h-5" />
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={toggleMute}
+                    className="hover:text-brand-blue-400"
+                    aria-label={
+                      isMuted ? LMS_VIDEO_CONTROL_LABELS.unmute : LMS_VIDEO_CONTROL_LABELS.mute
+                    }
+                  >
+                    {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  </button>
+                  <input
+                    type="range"
+                    aria-label={LMS_VIDEO_CONTROL_LABELS.volume}
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={volume}
+                    onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+                    className="w-20 h-1"
+                  />
+                </div>
+
+                <span className="text-sm">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <select
+                  aria-label={LMS_VIDEO_CONTROL_LABELS.playbackSpeed}
+                  value={playbackRate}
                   onChange={(
                     e: React.ChangeEvent<
                       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                     >,
-                  ) => setNewNote(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') void saveNote();
-                  }}
-                  placeholder="Add a note at current timestamp..."
-                  className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white"
-                />
-                <button
-                  onClick={() => void saveNote()}
-                  className="px-4 py-2 bg-brand-blue-600 rounded hover:bg-brand-blue-700"
+                  ) => changePlaybackRate(parseFloat(e.target.value))}
+                  className="bg-transparent border border-slate-600 rounded px-2 py-2 text-sm"
                 >
-                  Add Note
+                  <option value="0.5">0.5x</option>
+                  <option value="0.75">0.75x</option>
+                  <option value="1">1x</option>
+                  <option value="1.25">1.25x</option>
+                  <option value="1.5">1.5x</option>
+                  <option value="2">2x</option>
+                </select>
+
+                <button
+                  onClick={() => setShowCaptions(!showCaptions)}
+                  className={`hover:text-brand-blue-400 ${showCaptions ? 'text-brand-blue-400' : ''}`}
+                  aria-label={
+                    showCaptions
+                      ? LMS_VIDEO_CONTROL_LABELS.captionsOn
+                      : LMS_VIDEO_CONTROL_LABELS.captionsOff
+                  }
+                  aria-pressed={showCaptions}
+                >
+                  <MessageSquare className="w-5 h-5" />
+                </button>
+
+                <button
+                  onClick={toggleFullscreen}
+                  className="hover:text-brand-blue-400"
+                  aria-label={LMS_VIDEO_CONTROL_LABELS.fullscreen}
+                >
+                  <Maximize className="w-5 h-5" />
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+      </div>
 
-              <div className="space-y-3">
-                {notes.map((note) => (
-                  <div key={note.id} className="p-4 bg-slate-800 rounded">
-                    <div className="flex items-center justify-between mb-2">
-                      <button
-                        onClick={() => handleSeek(note.timestamp)}
-                        className="text-brand-blue-400 text-sm hover:underline"
-                      >
-                        {formatTime(note.timestamp)}
-                      </button>
-                      <span className="text-slate-700 text-xs">
-                        {note.createdAt.toLocaleDateString()}
+      {/* Tabs Section */}
+      {showPlayerChrome && (
+        <div className="bg-slate-900 text-white">
+          <div className="flex border-b border-slate-700">
+            <button
+              onClick={() => setActiveTab('transcript')}
+              className={`flex items-center gap-2 px-6 py-3 ${
+                activeTab === 'transcript'
+                  ? 'border-b-2 border-brand-blue-500 text-brand-blue-400'
+                  : 'text-slate-300'
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              Transcript
+            </button>
+            <button
+              onClick={() => setActiveTab('notes')}
+              className={`flex items-center gap-2 px-6 py-3 ${
+                activeTab === 'notes'
+                  ? 'border-b-2 border-brand-blue-500 text-brand-blue-400'
+                  : 'text-slate-300'
+              }`}
+            >
+              <Bookmark className="w-4 h-4" />
+              My Notes ({notes.length})
+            </button>
+          </div>
+
+          <div className="p-6 max-h-96 overflow-y-auto">
+            {activeTab === 'transcript' && (
+              <div className="space-y-2">
+                {transcript.length > 0 ? (
+                  transcript.map((segment, index) => (
+                    <div
+                      key={index}
+                      className={`p-3 rounded cursor-pointer hover:bg-slate-800 ${
+                        currentTime >= segment.start && currentTime <= segment.end
+                          ? 'bg-slate-800'
+                          : ''
+                      }`}
+                      onClick={() => handleSeek(segment.start)}
+                    >
+                      <span className="text-brand-blue-400 text-sm mr-3">
+                        {formatTime(segment.start)}
                       </span>
+                      <span className="text-slate-300">{segment.text}</span>
                     </div>
-                    <p className="text-slate-700">{note.content}</p>
-                  </div>
-                ))}
-                {notes.length === 0 && (
-                  <p className="text-slate-700 text-center py-8">
-                    No notes yet. Add your first note!
-                  </p>
+                  ))
+                ) : (
+                  <p className="text-slate-300">No transcript available</p>
                 )}
               </div>
-            </div>
-          )}
+            )}
+
+            {activeTab === 'notes' && (
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newNote}
+                    onChange={(
+                      e: React.ChangeEvent<
+                        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+                      >,
+                    ) => setNewNote(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') void saveNote();
+                    }}
+                    placeholder="Add a note at current timestamp..."
+                    className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white"
+                  />
+                  <button
+                    onClick={() => void saveNote()}
+                    className="px-4 py-2 bg-brand-blue-600 rounded hover:bg-brand-blue-700"
+                  >
+                    Add Note
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {notes.map((note) => (
+                    <div key={note.id} className="p-4 bg-slate-800 rounded">
+                      <div className="flex items-center justify-between mb-2">
+                        <button
+                          onClick={() => handleSeek(note.timestamp)}
+                          className="text-brand-blue-400 text-sm hover:underline"
+                        >
+                          {formatTime(note.timestamp)}
+                        </button>
+                        <span className="text-slate-700 text-xs">
+                          {note.createdAt.toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-slate-700">{note.content}</p>
+                    </div>
+                  ))}
+                  {notes.length === 0 && (
+                    <p className="text-slate-700 text-center py-8">
+                      No notes yet. Add your first note!
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>}
+      )}
     </div>
   );
 }

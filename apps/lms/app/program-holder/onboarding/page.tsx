@@ -1,41 +1,29 @@
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
 
 export default async function ProgramHolderOnboardingPage() {
-  const auth = await createClient();
-  const db = await requireAdminClient();
-  const { data: { user } } = await auth.auth.getUser();
+  const context = await requireProgramHolder();
 
-  if (!user) {
-    redirect('/login?redirect=/program-holder/onboarding');
+  if (context.mode === 'admin') {
+    redirect('/program-holder/dashboard');
   }
 
-  const { data: profile } = await db
-    .from('profiles')
-    .select('program_holder_id')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!profile?.program_holder_id) {
-    redirect('https://www.elevateforhumanity.org/apply/program-holder?status=pending');
-  }
-
-  const { data: holder } = await db
+  const { data: holder } = await context.db
     .from('program_holders')
-    .select('status, approved_at, mou_signed')
-    .eq('id', profile.program_holder_id)
+    .select('status,approved_at,mou_signed')
+    .eq('id', context.holderId)
     .maybeSingle();
 
   if (!holder || !holder.approved_at || !['approved', 'active'].includes(String(holder.status || ''))) {
-    redirect('https://www.elevateforhumanity.org/apply/program-holder?status=pending');
+    redirect('/program-holder/dashboard?onboarding=pending-approval');
   }
 
   if (!holder.mou_signed) {
     redirect('/program-holder/sign-mou');
   }
 
-  redirect('/program-holder/dashboard');
+  redirect('/program-holder/how-to-use');
 }

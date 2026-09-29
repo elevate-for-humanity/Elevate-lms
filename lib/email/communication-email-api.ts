@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { sendEmail, type EmailAttachment } from '@/lib/email/sendgrid';
 import {
   cleanEmailSubject,
@@ -38,6 +39,7 @@ type EmailContext = {
   user: { id: string; email?: string };
   db: Awaited<ReturnType<typeof requireAdminClient>>;
   mailboxes: ActorMailbox[];
+  previewing: boolean;
 };
 
 export type CommunicationEmailApiOptions = {
@@ -47,34 +49,56 @@ export type CommunicationEmailApiOptions = {
 async function emailContext(
   options: CommunicationEmailApiOptions = {},
 ): Promise<EmailContext | NextResponse> {
-  const auth = await createClient();
-  const {
-    data: { user },
-    error,
-  } = await auth.auth.getUser();
-  if (error || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   const db = await requireAdminClient();
   try {
-    if (options.adminOversight) {
+    // The Admin and LMS apps can be on separate domains. A verified preview
+    // handoff is sufficient for read-only mailbox inspection even when the LMS
+    // domain has no Supabase session cookie.
+    const handoffPreview = await resolvePortalPreviewSubject(db, null);
+    const auth = await createClient();
+    const {
+      data: { user: authenticatedUser },
+      error,
+    } = await auth.auth.getUser();
+    if ((error || !authenticatedUser) && !handoffPreview.previewing) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const preview = handoffPreview.previewing
+      ? handoffPreview
+      : await resolvePortalPreviewSubject(db, authenticatedUser?.id);
+    const effectiveUserId = preview.previewing ? preview.userId : authenticatedUser!.id;
+
+    if (options.adminOversight && !preview.previewing && authenticatedUser) {
       const [{ data: profile }, { data: userRoleRows }] = await Promise.all([
-        db.from('profiles').select('role').eq('id', user.id).maybeSingle(),
-        db.from('user_roles').select('roles(name)').eq('user_id', user.id),
+        db.from('profiles').select('role').eq('id', authenticatedUser.id).maybeSingle(),
+        db.from('user_roles').select('roles(name)').eq('user_id', authenticatedUser.id),
       ]);
       const effectiveRoles = normalizeRoles([
         profile?.role,
         ...(userRoleRows ?? []).map((row: any) => row.roles?.name),
       ]);
       if (effectiveRoles.some((role) => role === 'admin' || role === 'super_admin')) {
-        // Admin oversight is read-only across other actors' mailboxes. Sending must
-        // always use a mailbox explicitly assigned to the authenticated admin so the
-        // Admin composer can never impersonate a Program Holder or Host Shop.
-        const actorMailboxes = await ensureActorMailboxes(db, user.id);
-        return { user: { id: user.id, email: user.email }, db, mailboxes: actorMailboxes };
+        const actorMailboxes = await ensureActorMailboxes(db, authenticatedUser.id);
+        return {
+          user: { id: authenticatedUser.id, email: authenticatedUser.email },
+          db,
+          mailboxes: actorMailboxes,
+          previewing: false,
+        };
       }
     }
-    const mailboxes = await ensureActorMailboxes(db, user.id);
-    return { user: { id: user.id, email: user.email }, db, mailboxes };
+
+    const [{ data: profile }, mailboxes] = await Promise.all([
+      db.from('profiles').select('email').eq('id', effectiveUserId).maybeSingle(),
+      ensureActorMailboxes(db, effectiveUserId),
+    ]);
+    return {
+      user: { id: effectiveUserId, email: profile?.email || authenticatedUser?.email },
+      db,
+      mailboxes,
+      previewing: preview.previewing,
+    };
   } catch {
     return NextResponse.json({ error: 'Email accounts could not be loaded.' }, { status: 500 });
   }
@@ -169,6 +193,7 @@ export async function handleCommunicationEmailGet(
           new Date(thread.last_message_at).getTime(),
     })),
     selectedThread: selectedThread ? { ...selectedThread, messages } : null,
+    readOnly: context.previewing,
   });
 }
 
@@ -197,6 +222,12 @@ export async function handleCommunicationEmailPost(
 ) {
   const context = await emailContext(options);
   if (context instanceof NextResponse) return context;
+  if (context.previewing) {
+    return NextResponse.json(
+      { error: 'Administrator portal previews are read-only. Sign in as the Program Holder to send email.' },
+      { status: 403 },
+    );
+  }
   const form = await request.formData().catch(() => null);
   if (!form) return NextResponse.json({ error: 'Invalid email request.' }, { status: 400 });
 
@@ -355,6 +386,12 @@ export async function handleCommunicationEmailPatch(
 ) {
   const context = await emailContext(options);
   if (context instanceof NextResponse) return context;
+  if (context.previewing) {
+    return NextResponse.json(
+      { error: 'Administrator portal previews are read-only.' },
+      { status: 403 },
+    );
+  }
   const body = await request.json().catch(() => ({}));
   const threadId = String(body.threadId || '');
   const { data: thread } = await context.db

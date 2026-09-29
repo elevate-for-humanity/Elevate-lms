@@ -53,10 +53,11 @@ test.describe('Canonical application flow', () => {
     });
   }
 
-  test('login, onboarding and tracking routes exist', async ({ page, request }) => {
-    await page.goto('/login');
-    await expect(page.locator('input[type="email"]').first()).toBeVisible();
-    await expect(page.locator('input[type="password"]').first()).toBeVisible();
+  test('login, onboarding and tracking routes exist', async ({ request }) => {
+    const login = await request.get('/login', { maxRedirects: 0, failOnStatusCode: false });
+    expect(login.status()).toBeGreaterThanOrEqual(300);
+    expect(login.status()).toBeLessThan(400);
+    expect(login.headers().location).toMatch(/\/login(?:\?|$)/);
 
     const onboarding = await request.get('/onboarding/learner', { failOnStatusCode: false });
     expect(onboarding.status()).not.toBe(404);

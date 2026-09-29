@@ -144,8 +144,15 @@ export async function PATCH(request: Request) {
       { status: 403 },
     );
   }
-  if (!ctx.roles.some((role) => ['program_holder', 'site_coordinator'].includes(role))) {
-    return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
+  const phoneSettingsRoles = [
+    'program_holder',
+    'site_coordinator',
+    'host_shop',
+    'partner',
+    'employer',
+  ];
+  if (!ctx.roles.some((role) => phoneSettingsRoles.includes(role))) {
+    return NextResponse.json({ error: 'An assigned communications account is required.' }, { status: 403 });
   }
   if (!extension) {
     return NextResponse.json({ error: 'No phone extension is assigned.' }, { status: 404 });

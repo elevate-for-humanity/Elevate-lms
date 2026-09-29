@@ -183,9 +183,20 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain('<UnifiedEllieChat');
     expect(workspace).toContain('<RepositoryLivePreview');
     expect(workspace).toContain('<CloudBrowserWorkspace');
+    expect(workspace).toContain('<UnifiedCourseBuilder embedded />');
     expect(workspace).toContain(
       "type StudioSurface = 'commands' | 'course' | 'preview' | 'browser' | 'capability'",
     );
+  });
+
+  it('mounts the first-party Course Builder directly instead of framing it', () => {
+    const workspace = source('components/studio/StudioCommandWorkspace.tsx');
+    const courseBuilder = source('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+
+    expect(workspace).toContain("import('@/components/admin/course-builder/UnifiedCourseBuilder')");
+    expect(workspace).toContain('<UnifiedCourseBuilder embedded />');
+    expect(courseBuilder).toContain('embedded?: boolean');
+    expect(courseBuilder).toContain('if (embedded) return;');
   });
 
   it('keeps task evidence, tool surfaces, and durable files in the unified Studio', () => {

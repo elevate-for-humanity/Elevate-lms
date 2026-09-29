@@ -69,9 +69,11 @@ async function queueUltimateCourse(input: {
 export default function UnifiedCourseBuilder({
   initialCourseId = '',
   initialTab = 'ultimate',
+  embedded = false,
 }: {
   initialCourseId?: string;
   initialTab?: Tab;
+  embedded?: boolean;
 }) {
   const [tab, setTab] = useState<Tab>(initialTab);
   const [courses, setCourses] = useState<CourseRow[]>([]);
@@ -92,6 +94,7 @@ export default function UnifiedCourseBuilder({
   );
 
   function syncLocation(nextCourseId: string, nextTab: Tab) {
+    if (embedded) return;
     const params = new URLSearchParams(window.location.search);
     if (nextCourseId) params.set('courseId', nextCourseId);
     else params.delete('courseId');
@@ -156,7 +159,9 @@ export default function UnifiedCourseBuilder({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="min-h-screen min-w-0 w-full overflow-x-clip bg-slate-950 text-slate-100">
+    <div
+      className={`${embedded ? 'h-full overflow-y-auto' : 'min-h-screen'} min-w-0 w-full overflow-x-clip bg-slate-950 text-slate-100`}
+    >
       <div className="border-b border-slate-800 bg-slate-900 px-5 py-4">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="min-w-0">
@@ -560,7 +565,15 @@ function UltimateBuildPanel({ course, programSlug }: { course: CourseRow; progra
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={() => void queue()} disabled={busy || statusLoading || ['initializing', 'queued', 'running'].includes(latest?.status ?? '')} className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50">
           {busy || statusLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
-          {statusLoading ? 'Loading build status…' : ['initializing', 'queued', 'running'].includes(latest?.status ?? '') ? 'Ultimate build running' : 'Queue Ultimate build'}
+          {statusLoading
+            ? 'Loading build status…'
+            : latest?.status === 'initializing'
+              ? 'Preparing Ultimate build…'
+              : latest?.status === 'queued'
+                ? 'Ultimate build queued'
+                : latest?.status === 'running'
+                  ? 'Ultimate build running'
+                  : 'Queue Ultimate build'}
         </button>
         {latest?.status === 'built' ? (
           <button type="button" onClick={() => void publish()} disabled={busy} className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50">

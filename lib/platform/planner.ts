@@ -319,6 +319,39 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
     },
   ],
 
+  read_only_studio_diagnostic: () => [
+    {
+      id: 's1',
+      order: 1,
+      title: 'Studio provider health',
+      command: 'Check Studio provider health status',
+      status: 'pending',
+      expected_output: 'Current Studio provider and runtime health',
+      verification_rule: 'The read-only Studio health tool must return a current result.',
+    },
+    {
+      id: 's2',
+      order: 2,
+      title: 'Platform health',
+      command: 'Check current platform health status',
+      status: 'pending',
+      depends_on: ['s1'],
+      expected_output: 'Current platform health result',
+      verification_rule: 'The read-only platform health tool must return a current result.',
+    },
+    {
+      id: 's3',
+      order: 3,
+      title: 'Workflow inspection',
+      command:
+        'Inspect current Studio workflow status. Read-only: do not modify, start, stop, deploy, publish, send, upload, or delete anything.',
+      status: 'pending',
+      depends_on: ['s2'],
+      expected_output: 'Current workflow state from a registered read-only tool',
+      verification_rule: 'The read-only workflow inspector must return evidence without mutation.',
+    },
+  ],
+
   quickbooks_connection: () => [
     {
       id: 's1',
@@ -355,8 +388,13 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
 
 export function decomposePlan(goal: string, params: Record<string, string> = {}): Plan {
   const g = goal.toLowerCase();
+  const explicitReadOnly = /\bread[- ]?only\b/.test(g);
+  const explicitReadOnlyStudioDiagnostic =
+    explicitReadOnly &&
+    /\b(studio|provider|router|tool(?:-response)?|platform|system|health|diagnostic)\b/.test(g);
   const affirmativeDeployment =
     /\bdeploy(?:ment|ing|ed)?\b/.test(g) &&
+    !explicitReadOnly &&
     !/\b(?:do not|don't|dont|never|without)\s+(?:\w+\s+){0,3}deploy(?:ment|ing|ed)?\b/.test(g);
   let steps: PlanStep[];
   const compoundEngineeringExecution =
@@ -364,7 +402,9 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
       g,
     ) && /\b(fix|repair|correct|implement|modify|change|update|edit|refactor|add|remove)\b/.test(g);
 
-  if (g.includes('quickbooks')) {
+  if (explicitReadOnlyStudioDiagnostic) {
+    steps = GOAL_TEMPLATES.read_only_studio_diagnostic!({});
+  } else if (g.includes('quickbooks')) {
     steps = /\b(fix|repair|connect|reconnect|configure)\b/.test(g)
       ? GOAL_TEMPLATES.quickbooks_repair!({})
       : GOAL_TEMPLATES.quickbooks_connection!({});

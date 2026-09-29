@@ -4,9 +4,11 @@ vi.mock('server-only', () => ({}));
 
 describe('Admin AI operational planner safety', () => {
   let planAIToolFromCommand: typeof import('@/lib/ai/tools/planner').planAIToolFromCommand;
+  let decomposePlan: typeof import('@/lib/platform/planner').decomposePlan;
 
   beforeAll(async () => {
     ({ planAIToolFromCommand } = await import('@/lib/ai/tools/planner'));
+    ({ decomposePlan } = await import('@/lib/platform/planner'));
   });
 
   it('routes workflow inspection to the read-only inspector', () => {
@@ -27,5 +29,28 @@ describe('Admin AI operational planner safety', () => {
     const planned = planAIToolFromCommand('Deploy the latest approved Admin build.');
 
     expect(planned).toEqual({ name: 'deployments.autopilot', input: {} });
+  });
+
+  it('keeps an explicit read-only Studio diagnostic on read-only tools', () => {
+    const plan = decomposePlan(
+      'READ-ONLY DIAGNOSTIC TEST. Verify the Studio provider, router, and tool-response path. Report the current Studio health and name one read-only internal tool you can successfully execute. Do not modify data, create records, start or stop jobs, approve tasks, deploy, publish, send messages, upload, or delete anything.',
+    );
+
+    expect(plan.steps).toHaveLength(3);
+    expect(plan.steps.map((step) => planAIToolFromCommand(step.command)?.name)).toEqual([
+      'devstudio.health',
+      'system.health',
+      'workflows.inspect',
+    ]);
+    expect(plan.steps.some((step) => step.title === 'Create snapshot')).toBe(false);
+  });
+
+  it('never treats an explicit read-only request as affirmative deployment authorization', () => {
+    const plan = decomposePlan(
+      'READ-ONLY: inspect the current course status and report it. Do not deploy anything.',
+    );
+
+    expect(plan.steps.some((step) => step.title === 'Create snapshot')).toBe(false);
+    expect(plan.steps.some((step) => step.title === 'Execute approved deployment')).toBe(false);
   });
 });

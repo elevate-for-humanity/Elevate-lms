@@ -38,6 +38,7 @@ export type PlatformHealthSnapshot = {
     billing: ServiceCheck;
     email: ServiceCheck;
     storage: ServiceCheck;
+    studioBrowser: ServiceCheck;
   };
   ai: {
     activeProvider: string | null;
@@ -279,6 +280,57 @@ async function checkStorage(): Promise<ServiceCheck> {
   }
 }
 
+async function checkStudioBrowser(): Promise<ServiceCheck> {
+  const url = process.env.STUDIO_BROWSER_URL?.trim().replace(/\/$/, '');
+  const publicUrl = (
+    process.env.STUDIO_BROWSER_PUBLIC_URL || process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL
+  )?.trim();
+  const secret = process.env.STUDIO_BROWSER_SECRET?.trim();
+  const configured = Boolean(url && publicUrl && secret);
+  if (!configured) {
+    return {
+      name: 'Studio Browser',
+      status: 'unknown',
+      configured: false,
+      message: 'Studio Browser URL, public URL, or shared secret is not configured',
+    };
+  }
+
+  const start = Date.now();
+  try {
+    const response = await fetch(`${url}/health`, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(5_000),
+    });
+    const payload = (await response.json().catch(() => null)) as {
+      browserState?: string;
+      browserConnected?: boolean;
+      commit?: string;
+    } | null;
+    const runtimeReady =
+      response.ok && payload?.browserState === 'ready' && payload.browserConnected === true;
+    return {
+      name: 'Studio Browser',
+      status: runtimeReady ? 'healthy' : 'down',
+      latencyMs: Date.now() - start,
+      configured: true,
+      message: runtimeReady
+        ? `Chromium ready${payload?.commit ? ` · ${payload.commit.slice(0, 7)}` : ''}`
+        : response.ok
+          ? `Runtime reported ${payload?.browserState || 'not ready'}`
+          : `Health endpoint returned HTTP ${response.status}`,
+    };
+  } catch (err) {
+    return {
+      name: 'Studio Browser',
+      status: 'down',
+      latencyMs: Date.now() - start,
+      configured: true,
+      message: err instanceof Error ? err.message : 'Studio Browser health check failed',
+    };
+  }
+}
+
 function checkAIProviders(): PlatformHealthSnapshot['ai'] {
   const providers: AIProviderCheck[] = [
     { name: 'openai', configured: Boolean(process.env.OPENAI_API_KEY), active: false },
@@ -313,7 +365,12 @@ function generateAlerts(
     alerts.push({ severity: 'warning', service: 'Redis', message: 'Rate limiting unavailable — Redis is not configured' });
   }
 
-  for (const service of [services.billing, services.email, services.storage]) {
+  for (const service of [
+    services.billing,
+    services.email,
+    services.storage,
+    services.studioBrowser,
+  ]) {
     if (!service.configured && !/disabled for new transactions/i.test(service.message ?? '')) {
       alerts.push({ severity: 'warning', service: service.name, message: service.message ?? `${service.name} is not configured` });
     } else if (service.status === 'down') {
@@ -346,6 +403,7 @@ const DOWN_REDIS: ServiceCheck = { name: 'Redis', status: 'down', configured: tr
 const DOWN_BILLING: ServiceCheck = { name: 'Billing (QuickBooks + PayPal)', status: 'down', configured: true, message: 'Timed out' };
 const DOWN_EMAIL: ServiceCheck = { name: 'Email (SendGrid)', status: 'down', configured: true, message: 'Timed out' };
 const DOWN_STORAGE: ServiceCheck = { name: 'Storage (Supabase)', status: 'down', configured: true, message: 'Timed out' };
+const DOWN_STUDIO_BROWSER: ServiceCheck = { name: 'Studio Browser', status: 'down', configured: true, message: 'Timed out' };
 
 export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
   const start = Date.now();
@@ -355,16 +413,17 @@ export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
     // especially important after credential rotation (Stripe, Redis, AI, etc.).
     await hydrateProcessEnv().catch(() => undefined);
 
-    const [database, redis, billing, email, storage] = await Promise.all([
+    const [database, redis, billing, email, storage, studioBrowser] = await Promise.all([
       withTimeout(checkDatabase(), TIMEOUT_MS, DOWN_DB),
       withTimeout(checkRedis(), TIMEOUT_MS, DOWN_REDIS),
       withTimeout(checkBilling(), TIMEOUT_MS, DOWN_BILLING),
       withTimeout(checkEmail(), TIMEOUT_MS, DOWN_EMAIL),
       withTimeout(checkStorage(), TIMEOUT_MS, DOWN_STORAGE),
+      withTimeout(checkStudioBrowser(), TIMEOUT_MS, DOWN_STUDIO_BROWSER),
     ]);
 
     const ai = checkAIProviders();
-    const services = { database, redis, billing, email, storage };
+    const services = { database, redis, billing, email, storage, studioBrowser };
     const alerts = generateAlerts(services, ai);
     const overall = determineOverall(services, alerts);
 
@@ -388,6 +447,7 @@ export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
         billing: DOWN_BILLING,
         email: DOWN_EMAIL,
         storage: DOWN_STORAGE,
+        studioBrowser: DOWN_STUDIO_BROWSER,
       },
       ai: { activeProvider: null, providers: [], anyConfigured: false },
       alerts: [{ severity: 'critical', service: 'Platform', message: 'Health check failed entirely' }],
@@ -447,6 +507,17 @@ export function getPlatformHealthSync(): Pick<PlatformHealthSnapshot, 'ai' | 'se
         status: 'unknown',
         configured: storageConfigured,
         message: storageConfigured ? 'Not probed' : 'Supabase URL or service-role key not configured',
+      },
+      studioBrowser: {
+        name: 'Studio Browser',
+        status: 'unknown',
+        configured: Boolean(
+          process.env.STUDIO_BROWSER_URL &&
+            (process.env.STUDIO_BROWSER_PUBLIC_URL ||
+              process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL) &&
+            process.env.STUDIO_BROWSER_SECRET,
+        ),
+        message: 'Not probed',
       },
     },
     ai,

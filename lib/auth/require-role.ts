@@ -81,11 +81,20 @@ export async function requireRole(allowedRoles: readonly (UserRole | string)[]):
     redirect('/login');
   }
 
-  const [{ data: profile }, { data: userRoleRows }, { data: partnerMembershipRows }] = await Promise.all([
+  const [profileResult, rolesResult, membershipResult] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
     supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
     supabase.from('partner_users').select('partner_id, role, status').eq('user_id', user.id).eq('status', 'active'),
   ]);
+
+  // A transient Data API failure must not be mistaken for a missing profile or
+  // revoked membership, which would send an authorized user to /unauthorized.
+  if (profileResult.error || rolesResult.error || membershipResult.error) {
+    throw new Error('ROLE_LOOKUP_UNAVAILABLE');
+  }
+  const profile = profileResult.data;
+  const userRoleRows = rolesResult.data;
+  const partnerMembershipRows = membershipResult.data;
 
   if (!profile) redirect('/unauthorized');
 

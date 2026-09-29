@@ -21,10 +21,12 @@ const sharedPortalButton = readFileSync(
   'components/admin/OpenPortalPreviewButton.tsx',
   'utf8',
 );
+const partnersPage = readFileSync('apps/admin/app/partners/page.tsx', 'utf8');
 
 describe('portal preview POST handoff contract', () => {
   it('keeps the signed handoff out of newly issued preview URLs', () => {
-    expect(adminRoute).toContain("preview_url: 'https://app.elevateforhumanity.org/api/admin/preview'");
+    expect(adminRoute).toContain("'https://app.elevateforhumanity.org/api/admin/preview'");
+    expect(adminRoute).toContain("'https://app.elevateforhumanity.org/api/admin/select-host-shop'");
     expect(adminRoute).toContain('preview_handoff: createPortalPreviewHandoff');
     expect(adminRoute).not.toContain('preview?handoff=');
   });
@@ -34,6 +36,13 @@ describe('portal preview POST handoff contract', () => {
     expect(previewRoute).toContain("request.formData()");
     expect(previewRoute).toContain("NextResponse.redirect(\`${appUrl}${portalPreviewDestination(target.role)}\`, 303)");
     expect(previewRoute).toContain('PORTAL_PREVIEW_SESSION_COOKIE');
+  });
+
+  it('uses the exact partner-scoped handoff for Host Shop previews', () => {
+    expect(sharedPortalButton).toContain('host_shop_partner_id: hostShopPartnerId');
+    expect(adminRoute).toContain(".from('partner_users')");
+    expect(adminRoute).toContain('hostShopPartnerId || target_user_id');
+    expect(partnersPage).toContain('hostShopPartnerId={partner.id}');
   });
 
   it('uses form POST navigation from every admin entry point', () => {

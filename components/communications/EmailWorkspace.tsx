@@ -11,6 +11,7 @@ import {
   RefreshCw,
   Reply,
   Send,
+  ShieldCheck,
   X,
 } from 'lucide-react';
 
@@ -44,6 +45,7 @@ type Message = {
   attachments?: Attachment[];
 };
 type WorkspaceData = {
+  readOnly?: boolean;
   mailboxes: Mailbox[];
   selectedMailboxId: string | null;
   threads: Thread[];
@@ -112,14 +114,17 @@ export function EmailWorkspace({
   async function openThread(threadId: string) {
     if (!data?.selectedMailboxId) return;
     await load(data.selectedMailboxId, threadId);
-    void fetch(apiPath, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ threadId }),
-    });
+    if (!data.readOnly) {
+      void fetch(apiPath, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ threadId }),
+      });
+    }
   }
 
   function startReply() {
+    if (data?.readOnly) return;
     const messages = data?.selectedThread?.messages ?? [];
     const lastInbound = [...messages].reverse().find((message) => message.direction === 'inbound');
     const recipient = lastInbound?.sender_email || messages.at(-1)?.to_addresses?.[0] || '';
@@ -135,6 +140,11 @@ export function EmailWorkspace({
   async function sendMessage(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!compose || !data?.selectedMailboxId) return;
+    if (data.readOnly) {
+      setCompose(null);
+      setError('Administrator portal previews are read-only. Sign in as the Program Holder to send email.');
+      return;
+    }
     setSending(true);
     setError('');
     const form = new FormData();
@@ -187,6 +197,12 @@ export function EmailWorkspace({
           {error}
         </div>
       ) : null}
+      {data.readOnly ? (
+        <div className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm font-bold text-amber-950">
+          <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
+          Administrator preview is read-only. You can inspect the selected Program Holder’s mailbox, but only the Program Holder can compose, reply, or mark messages as read.
+        </div>
+      ) : null}
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div className="flex flex-col border-b border-slate-200 bg-slate-950 p-4 text-white sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
@@ -204,16 +220,22 @@ export function EmailWorkspace({
             >
               <RefreshCw className="h-4 w-4" /> Refresh
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                setCompose({ ...EMPTY_COMPOSE });
-                setFiles([]);
-              }}
-              className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-orange-500 px-4 text-sm font-black text-white"
-            >
-              <Plus className="h-4 w-4" /> Compose
-            </button>
+            {data.readOnly ? (
+              <span className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 text-sm font-black text-amber-950">
+                <ShieldCheck className="h-4 w-4" /> Read-only preview
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setCompose({ ...EMPTY_COMPOSE });
+                  setFiles([]);
+                }}
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-orange-500 px-4 text-sm font-black text-white"
+              >
+                <Plus className="h-4 w-4" /> Compose
+              </button>
+            )}
           </div>
         </div>
 
@@ -306,13 +328,15 @@ export function EmailWorkspace({
                   <h2 className="min-w-0 flex-1 truncate font-black text-slate-950">
                     {data.selectedThread.subject}
                   </h2>
-                  <button
-                    type="button"
-                    onClick={startReply}
-                    className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-blue-700 px-4 text-sm font-black text-white"
-                  >
-                    <Reply className="h-4 w-4" /> Reply
-                  </button>
+                  {!data.readOnly ? (
+                    <button
+                      type="button"
+                      onClick={startReply}
+                      className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-blue-700 px-4 text-sm font-black text-white"
+                    >
+                      <Reply className="h-4 w-4" /> Reply
+                    </button>
+                  ) : null}
                 </div>
                 <div className="max-h-[555px] space-y-4 overflow-y-auto bg-slate-50 p-4 sm:p-6">
                   {data.selectedThread.messages.map((message) => (
@@ -359,7 +383,9 @@ export function EmailWorkspace({
                 <Mail className="h-12 w-12 text-slate-300" />
                 <h2 className="mt-4 text-lg font-black text-slate-900">Select a conversation</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Or compose a new email from this mailbox.
+                  {data.readOnly
+                    ? 'Choose a conversation to inspect this Program Holder mailbox.'
+                    : 'Or compose a new email from this mailbox.'}
                 </p>
               </div>
             )}

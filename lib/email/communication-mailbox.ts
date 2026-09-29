@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
+  programHolderMailboxDisplayName,
   selectPrimaryMailbox,
   type CommunicationMailboxKind,
   type CommunicationMailboxSummary,
@@ -24,13 +25,16 @@ export async function ensureActorMailboxes(
   });
   if (provisionError) throw provisionError;
 
-  const { data, error } = await db
-    .from('communication_email_mailbox_members')
-    .select(
-      'access_level, mailbox:communication_email_mailboxes!inner(id,address,display_name,mailbox_kind,active)',
-    )
-    .eq('user_id', userId)
-    .eq('mailbox.active', true);
+  const [{ data, error }, { data: profile }] = await Promise.all([
+    db
+      .from('communication_email_mailbox_members')
+      .select(
+        'access_level, mailbox:communication_email_mailboxes!inner(id,address,display_name,mailbox_kind,active)',
+      )
+      .eq('user_id', userId)
+      .eq('mailbox.active', true),
+    db.from('profiles').select('full_name').eq('id', userId).maybeSingle(),
+  ]);
   if (error) throw error;
 
   const mailboxes = (data ?? [])
@@ -40,7 +44,10 @@ export async function ensureActorMailboxes(
       return {
         id: String(mailbox.id),
         address: String(mailbox.address),
-        displayName: String(mailbox.display_name),
+        displayName:
+          mailbox.mailbox_kind === 'program_holder'
+            ? programHolderMailboxDisplayName(profile?.full_name || mailbox.display_name)
+            : String(mailbox.display_name),
         mailboxKind: mailbox.mailbox_kind as CommunicationMailboxKind,
         active: mailbox.active !== false,
         accessLevel: membership.access_level,

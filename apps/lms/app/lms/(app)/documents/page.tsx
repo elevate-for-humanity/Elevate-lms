@@ -50,7 +50,8 @@ export default async function LearnerDocumentsPage() {
       {(billingAuthorizations || []).map((authorization) => (
         <section
           key={authorization.id}
-          className="mt-6 rounded-2xl border-2 border-red-400 bg-red-50 p-6"
+          id="billing-authorization"
+          className="mt-6 scroll-mt-24 rounded-2xl border-2 border-red-400 bg-red-50 p-6"
         >
           <h2 className="text-xl font-black text-red-950">
             Action required: new subscription authorization
@@ -112,7 +113,7 @@ export default async function LearnerDocumentsPage() {
           </Link>
         </div>
       ) : (
-        <div className="mt-6 space-y-4">
+        <div id="required-documents" className="mt-6 scroll-mt-24 space-y-4">
           {workspace.requirements.map((requirement) => {
             const complete = ['verified', 'completed'].includes(requirement.status);
             const urgent =

@@ -9,20 +9,36 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { provisionPartnerFromBarberApplication } from '@/lib/partners/provision-barber-partner';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
-import { resolveHostShopAdminPreview } from '@/lib/admin/host-shop-preview';
+import {
+  HOST_SHOP_PREVIEW_SESSION_COOKIE,
+  resolveHostShopAdminPreview,
+} from '@/lib/admin/host-shop-preview';
+import {
+  PORTAL_PREVIEW_ACTOR_COOKIE,
+  PORTAL_PREVIEW_COOKIE,
+  PORTAL_PREVIEW_SESSION_COOKIE,
+} from '@/lib/admin/portal-preview';
 import { EmailAccountNotice } from '@/components/communications/EmailAccountNotice';
 
 async function clearAdminPartner() {
   'use server';
   await requireRole(['super_admin', 'admin', 'org_admin']);
   const cookieStore = await cookies();
-  cookieStore.set(HOST_SHOP_ADMIN_COOKIE, '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 0,
-  });
+  for (const name of [
+    HOST_SHOP_ADMIN_COOKIE,
+    HOST_SHOP_PREVIEW_SESSION_COOKIE,
+    PORTAL_PREVIEW_COOKIE,
+    PORTAL_PREVIEW_ACTOR_COOKIE,
+    PORTAL_PREVIEW_SESSION_COOKIE,
+  ]) {
+    cookieStore.set(name, '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 0,
+    });
+  }
   redirect('/host-shop/dashboard');
 }
 
@@ -254,8 +270,8 @@ export default async function HostShopDashboardView() {
     },
     {
       href: '/host-shop/dashboard/communications',
-      title: 'Meetings & screen share',
-      detail: 'Join secure browser meetings with camera, microphone, chat, and screen sharing when enabled.',
+      title: 'Phone, meetings & follow-up',
+      detail: 'Open Host Shop communications for the assigned phone extension, PARIS callback intake, messages, and scheduling.',
       image: '/images/heroes/lms-analytics.webp',
     },
     {

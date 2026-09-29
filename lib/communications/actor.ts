@@ -7,7 +7,7 @@ import { normalizeRoles } from '@/lib/rbac/role-matrix';
 
 const COMMUNICATION_ROLES = new Set([
   'super_admin','admin','org_admin','staff','program_holder','programholder',
-  'site_coordinator','host_shop','hostshop','partner','employer','instructor','case_manager','counselor','advisor'
+  'site_coordinator','host_shop','host_shop_admin','hostshop','partner','employer','instructor','case_manager','counselor','advisor'
 ]);
 
 export async function requireCommunicationActor() {

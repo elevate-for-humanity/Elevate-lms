@@ -406,10 +406,10 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
   return (
     <main className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
       <audio ref={remoteAudioRef} autoPlay playsInline />
-      <ProgramHolderPhoneIntroduction />
+      <ProgramHolderPhoneIntroduction roleLabel={roleLabel} />
       {data.readOnly && (
         <p className="rounded-2xl border border-blue-200 bg-blue-50 p-4 font-bold text-blue-950">
-          Administrator preview: this holder’s extension, settings, and PARIS call inbox are shown read-only. Sign in as the Program Holder to connect the PWA, change settings, return calls, or update callback status.
+          Administrator preview: this {roleLabel} extension, settings, and PARIS call inbox are shown read-only. Sign in as the {roleLabel} to connect the PWA, change settings, return calls, or update callback status.
         </p>
       )}
       <header className="rounded-3xl bg-gradient-to-br from-blue-950 via-blue-800 to-cyan-700 p-6 text-white shadow-xl sm:p-8">

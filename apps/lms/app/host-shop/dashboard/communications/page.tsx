@@ -7,8 +7,8 @@ export default function HostShopCommunicationsPage() {
   const tools = [
     { href: '/host-shop/email', title: 'Host Shop email', detail: 'Read, reply, compose, and manage official shop email.', icon: Mail },
     { href: '/host-shop/dashboard/apprentices', title: 'Apprentice messages', detail: 'Open assigned apprentices and use their communication actions without leaving the Host Shop scope.', icon: MessageSquareText },
-    { href: '/program-holder/phone', title: 'Elevate phone', detail: 'Open the assigned Elevate extension and review routed calls and PARIS callback intake when a phone extension is assigned to this account.', icon: Phone },
-    { href: '/program-holder/meetings', title: 'Meetings & screen share', detail: 'Use the shared communications service for browser meetings, camera, microphone, chat, and screen sharing.', icon: Video },
+    { href: '/host-shop/dashboard/phone', title: 'Elevate phone', detail: 'Open the assigned Host Shop extension, answer calls in the PWA, and review PARIS callback intake.', icon: Phone },
+    { href: '/host-shop/dashboard/schedule', title: 'Training schedule', detail: 'Open the Host Shop schedule for supervised training sessions and apprentice follow-up.', icon: Video },
   ];
   return (
     <main className="space-y-6">

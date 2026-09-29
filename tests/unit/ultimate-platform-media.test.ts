@@ -45,8 +45,8 @@ function mockDb() {
   };
 }
 
-describe('UltimatePlatformMedia course-scoped fallback', () => {
-  it('includes both lesson-specific and course-scoped assets for UUID competencies', async () => {
+describe('UltimatePlatformMedia course-scoped library', () => {
+  it('keeps all licensed assets in the course available to UUID lessons', async () => {
     const { db, calls } = mockDb();
     const lessonId = '840f94e8-6025-47d4-ac26-835a119b6062';
 
@@ -55,10 +55,15 @@ describe('UltimatePlatformMedia course-scoped fallback', () => {
       competency: { id: lessonId },
     });
 
-    expect(calls).toContainEqual(['or', `lesson_id.is.null,lesson_id.eq.${lessonId}`]);
+    expect(calls).toContainEqual([
+      'eq',
+      'course_id',
+      '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0',
+    ]);
+    expect(calls.some(([method]) => method === 'or' || method === 'is')).toBe(false);
   });
 
-  it('uses only course-scoped assets for non-UUID competency keys', async () => {
+  it('keeps the same course library available to stable competency keys', async () => {
     const { db, calls } = mockDb();
 
     await new UltimatePlatformMedia(db).find({
@@ -66,7 +71,11 @@ describe('UltimatePlatformMedia course-scoped fallback', () => {
       competency: { id: 'barber-a' },
     });
 
-    expect(calls).toContainEqual(['is', 'lesson_id', null]);
-    expect(calls.some(([method]) => method === 'or')).toBe(false);
+    expect(calls).toContainEqual([
+      'eq',
+      'course_id',
+      '2c723bfa-8c40-4acc-b961-98d917710ffc',
+    ]);
+    expect(calls.some(([method]) => method === 'or' || method === 'is')).toBe(false);
   });
 });

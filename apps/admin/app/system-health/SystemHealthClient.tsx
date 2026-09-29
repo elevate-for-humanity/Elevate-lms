@@ -44,6 +44,7 @@ const SERVICE_ICONS: Record<string, React.ElementType> = {
   'Billing (QuickBooks + PayPal)': Shield,
   'Email (SendGrid)': Mail,
   'Storage (Supabase)': Server,
+  'Studio Browser': Wifi,
 };
 
 function ServiceCard({ check }: { check: ServiceCheck }) {

@@ -35,6 +35,17 @@ const IntelligenceWorkspace = dynamic(() => import('./StudioIntelligencePanel'),
 const TasksWorkspace = dynamic(() => import('@/apps/admin/app/studio/tasks/TasksClient'), {
   ssr: false,
 });
+const UnifiedCourseBuilder = dynamic(
+  () => import('@/components/admin/course-builder/UnifiedCourseBuilder'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full items-center justify-center bg-slate-950 text-sm text-slate-400">
+        Loading Course Builder…
+      </div>
+    ),
+  },
+);
 
 type StudioSurface = 'commands' | 'course' | 'preview' | 'browser' | 'capability';
 type NativeCapability = 'workflows' | 'intelligence' | 'tasks' | 'browser';
@@ -147,7 +158,7 @@ export default function StudioCommandWorkspace({
         ? 'browser'
         : /\b(course|lesson|curriculum|quiz|assessment|learning object|media)\b/i.test(command)
           ? 'course'
-          : 'browser',
+          : 'commands',
     );
   };
 
@@ -172,7 +183,12 @@ export default function StudioCommandWorkspace({
   return (
     <div
       data-studio-root="unified"
-      className={`flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white ${focusMode ? 'fixed inset-0 z-[100] h-[100dvh] w-screen' : ''}`}
+      className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white"
+      style={
+        focusMode
+          ? { position: 'fixed', inset: 0, zIndex: 100, width: '100vw', height: '100dvh' }
+          : undefined
+      }
     >
       <header className="shrink-0 border-b-4 border-brand-red-600 bg-brand-blue-700 text-white shadow-sm">
         <div className="flex min-h-14 min-w-0 items-center gap-2 px-3 sm:px-5">
@@ -381,15 +397,7 @@ export default function StudioCommandWorkspace({
               ) : null}
             </div>
             <div className={surface === 'course' ? 'h-full' : 'hidden'}>
-              <RepositoryLivePreview
-                filePath={null}
-                content=""
-                initialUrl={courseBuilderUrl}
-                trustedInteractive
-                allowManualTarget={false}
-                allowExternalOpen={false}
-                targetLabel="Course Builder · active conversation"
-              />
+              <UnifiedCourseBuilder embedded />
             </div>
             <div className={surface === 'preview' ? 'h-full' : 'hidden'}>
               <RepositoryLivePreview

@@ -51,6 +51,29 @@ export type ProgramHolderContext =
   | ProgramHolderAdminContext
   | ProgramHolderPreviewContext;
 
+async function resolveProgramIdsForHolder(db: any, holderId: string): Promise<string[]> {
+  const [{ data: associations }, { data: holder }] = await Promise.all([
+    db
+      .from('program_holder_programs')
+      .select('program_id')
+      .eq('program_holder_id', holderId)
+      .eq('status', 'active'),
+    db.from('program_holders').select('features').eq('id', holderId).maybeSingle(),
+  ]);
+
+  const regional = holder?.features?.regional_assignment;
+  if (regional?.all_programs_in_region === true) {
+    const { data: regionalPrograms } = await db
+      .from('programs')
+      .select('id')
+      .eq('is_active', true)
+      .eq('status', 'active');
+    return (regionalPrograms || []).map((row: { id: string }) => row.id);
+  }
+
+  return (associations || []).map((item: { program_id: string }) => item.program_id);
+}
+
 /**
  * Canonical Program Holder portal context.
  *
@@ -72,11 +95,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
       .eq('id', handoffPreview.userId)
       .maybeSingle();
     if (targetProfile?.program_holder_id && ['program_holder', 'programholder', 'site_coordinator'].includes(targetProfile.role)) {
-      const { data: associations } = await db
-        .from('program_holder_programs')
-        .select('program_id')
-        .eq('program_holder_id', targetProfile.program_holder_id)
-        .eq('status', 'active');
+      const programIds = await resolveProgramIdsForHolder(db, targetProfile.program_holder_id);
       return {
         mode: 'preview',
         isPlatformAdmin: true,
@@ -84,7 +103,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
         profile: targetProfile,
         holderId: targetProfile.program_holder_id,
         tenantId: targetProfile.tenant_id ?? null,
-        programIds: (associations || []).map((item: { program_id: string }) => item.program_id),
+        programIds,
         db,
       };
     }
@@ -101,11 +120,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
         .eq('id', preview.userId)
         .maybeSingle();
       if (targetProfile?.program_holder_id && ['program_holder', 'site_coordinator'].includes(targetProfile.role)) {
-        const { data: associations } = await db
-          .from('program_holder_programs')
-          .select('program_id')
-          .eq('program_holder_id', targetProfile.program_holder_id)
-          .eq('status', 'active');
+        const programIds = await resolveProgramIdsForHolder(db, targetProfile.program_holder_id);
         return {
           mode: 'preview',
           isPlatformAdmin: true,
@@ -113,7 +128,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
           profile: targetProfile,
           holderId: targetProfile.program_holder_id,
           tenantId: targetProfile.tenant_id ?? null,
-          programIds: (associations || []).map((item: { program_id: string }) => item.program_id),
+          programIds,
           db,
         };
       }
@@ -160,23 +175,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
   // Money movement and other privileged actions enforce the full checklist
   // independently; an unsigned MOU must never make student records invisible.
 
-  const { data: associations } = await db
-    .from('program_holder_programs')
-    .select('program_id')
-    .eq('program_holder_id', holderId)
-    .eq('status', 'active');
-
-  let programIds = (associations || []).map((a: { program_id: string }) => a.program_id);
-  const { data: holderFeatures } = await db.from('program_holders').select('features').eq('id', holderId).maybeSingle();
-  const regional = holderFeatures?.features?.regional_assignment;
-  if (regional?.all_programs_in_region === true) {
-    const { data: regionalPrograms } = await db
-      .from('programs')
-      .select('id')
-      .eq('is_active', true)
-      .eq('status', 'active');
-    programIds = (regionalPrograms || []).map((row: { id: string }) => row.id);
-  }
+  const programIds = await resolveProgramIdsForHolder(db, holderId);
 
   return {
     mode: 'holder',
@@ -208,14 +207,10 @@ export async function getProgramHolderContext(db: any, userId: string) {
 
   if (!profile?.program_holder_id) return null;
 
-  const { data: associations } = await db
-    .from('program_holder_programs')
-    .select('program_id')
-    .eq('program_holder_id', profile.program_holder_id)
-    .eq('status', 'active');
+  const programIds = await resolveProgramIdsForHolder(db, profile.program_holder_id);
 
   return {
     holderId: profile.program_holder_id as string,
-    programIds: (associations || []).map((a: { program_id: string }) => a.program_id),
+    programIds,
   };
 }

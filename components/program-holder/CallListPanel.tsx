@@ -122,11 +122,16 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
             {applicants.length}
           </span>
         </h2>
-        <p className="text-xs text-amber-600">Program applicants — tap phone to call, log notes below</p>
+        <p className="text-xs text-amber-700 font-semibold">Daily business: call every new applicant, help them complete setup, and document the outcome.</p>
       </div>
 
       <div className="border-b border-amber-100 bg-white px-6 py-4">
-        <p className="text-xs font-black uppercase tracking-wide text-slate-500">Today&apos;s to-do list</p>
+        <p className="text-xs font-black uppercase tracking-wide text-slate-500">Today&apos;s required applicant work</p>
+        <p className="mt-2 text-sm leading-6 text-slate-700">
+          Applications are received by Elevate Admin first and copied to the primary Program Holder for the assigned program.
+          You are responsible for contacting each applicant, explaining the next steps, helping them complete required setup,
+          recording the call outcome and notes, and scheduling follow-up when needed. Do not leave new applicants sitting in the queue.
+        </p>
         <ul className="mt-2 grid gap-2 text-sm text-slate-800 sm:grid-cols-2">
           <li className="rounded-lg bg-red-50 px-3 py-2 font-bold">
             {applicants.filter((item) => !item.call_outcome).length} new calls to complete

@@ -108,7 +108,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     db
       .from('program_holders')
       .select(
-        'id,status,mou_signed,mou_status,mou_type,approved_at,payout_status,organization_name,name,is_using_internal_lms,hvac_license_url,features',
+        'id,status,mou_signed,mou_status,mou_type,approved_at,payout_status,organization_name,name,contact_phone,contact_email,is_using_internal_lms,hvac_license_url,features',
       )
       .eq('id', holderId)
       .maybeSingle(),
@@ -168,7 +168,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     programIds.length
       ? db
           .from('programs')
-          .select('id,name,title,slug,status,is_active,credential_name,total_hours,tuition,total_cost,price,is_free,funding,funding_tags,funding_eligibility,funding_eligible,wioa_approved,etpl_listed,hero_image_url,image_url,cover_image_url')
+          .select('id,name,title,slug,status,is_active,credential_name,total_hours,tuition,total_cost,price,is_free,funding,funding_tags,funding_eligibility,funding_eligible,wioa_approved,etpl_listed,hero_image_url,image_url,cover_image_url,short_description,description,career_outcomes,salary_min,salary_max,estimated_weeks,delivery_method')
           .in('id', programIds)
           .order('title')
       : Promise.resolve({ data: [] }),

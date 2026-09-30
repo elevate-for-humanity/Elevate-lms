@@ -91,6 +91,7 @@ function trackNoun(program: ProgramSchema): string {
 export function buildBeautyProgramStructuredData(program: ProgramSchema) {
   const registered = isRAPIDSProgram(program.slug);
   const hours = totalHours(program);
+  const requirement = registeredRequirement(program);
   const credentialNames = program.credentials.map((credential) => credential.name).filter(Boolean);
 
   return {
@@ -126,8 +127,10 @@ export function buildBeautyProgramStructuredData(program: ProgramSchema) {
     additionalProperty: [
       {
         '@type': 'PropertyValue',
-        name: 'Total structured training hours displayed by Elevate',
-        value: String(hours),
+        name: requirement ? 'Registered apprenticeship requirement' : 'Total structured training hours displayed by Elevate',
+        value: requirement
+          ? `${requirement.model}; ${requirement.termLabel}; ${requirement.rtiHours} RTI hours; ${requirement.probationHours}-hour probation`
+          : String(hours),
       },
       {
         '@type': 'PropertyValue',

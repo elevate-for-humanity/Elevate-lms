@@ -24,10 +24,10 @@ export const siteConfig = {
     e164: '+13173143757',
   },
   email: {
-    general: 'info@elevateforhumanity.org',
-    enrollment: 'info@elevateforhumanity.org',
-    support: 'info@elevateforhumanity.org',
-    careers: 'info@elevateforhumanity.org',
+    general: 'elevate4humanityedu@gmail.com',
+    enrollment: 'elevate4humanityedu@gmail.com',
+    support: 'elevate4humanityedu@gmail.com',
+    careers: 'elevate4humanityedu@gmail.com',
   },
 
   // Public Indianapolis location. Keep this synchronized with lib/contact-info.ts

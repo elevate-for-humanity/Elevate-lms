@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ProgramHolderPhoneReceiver } from '@/components/program-holder/ProgramHolderPhoneReceiver';
+import { ProgramHolderMobileNav } from '@/components/program-holder/ProgramHolderMobileNav';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 
 const PORTAL_LINKS = [
@@ -58,21 +59,24 @@ export default async function ProgramHolderPortalLayout({
     <>
       <nav
         aria-label="Program Holder portal"
-        className="sticky top-0 z-40 overflow-x-auto border-b border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur"
+        className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur"
       >
-        <div className="mx-auto flex min-w-max max-w-[1600px] items-center gap-2">
-          {PORTAL_LINKS.map(([label, href]) => (
-            <Link
-              key={href}
-              href={href}
-              className="inline-flex min-h-10 items-center rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-800"
-            >
-              {label}
-            </Link>
-          ))}
+        <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-2">
+          <ProgramHolderMobileNav links={PORTAL_LINKS} />
+          <div className="hidden min-w-0 flex-wrap items-center gap-1 md:flex">
+            {PORTAL_LINKS.map(([label, href]) => (
+              <Link
+                key={href}
+                href={href}
+                className="inline-flex min-h-10 items-center rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-800"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
           <Link
             href="/program-holder/settings"
-            className="ml-3 flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 py-1 pl-1 pr-3"
+            className="flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 py-1 pl-1 pr-2 sm:pr-3"
             aria-label={`Open ${profileName} profile settings`}
           >
             {avatarUrl ? (
@@ -88,7 +92,7 @@ export default async function ProgramHolderPortalLayout({
                 {initials || 'PH'}
               </span>
             )}
-            <span className="max-w-40 truncate text-sm font-black text-slate-800">{profileName}</span>
+            <span className="hidden max-w-40 truncate text-sm font-black text-slate-800 sm:inline">{profileName}</span>
           </Link>
         </div>
       </nav>

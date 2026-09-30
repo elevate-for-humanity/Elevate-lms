@@ -177,7 +177,7 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Jobs', href: '/jobs' },
       { label: 'Affiliates', href: '/affiliates' },
       { label: 'Marketplace', href: '/marketplace' },
-      { label: 'Shops', href: '/shops' },
+      { label: 'Host Shops', href: '/partners' },
       { label: 'Delegates', href: '/delegates' },
     ],
   },

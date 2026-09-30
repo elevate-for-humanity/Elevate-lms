@@ -38,9 +38,11 @@ export function ProgramHolderPhoneReceiver() {
     let active = true;
     let heartbeat: ReturnType<typeof setInterval> | null = null;
     let client: TelnyxRTCType | null = null;
+    let ready = false;
     const id = currentDeviceId();
 
     async function ping() {
+      if (!ready) return;
       await fetch('/api/program-holder/phone', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -69,9 +71,14 @@ export function ProgramHolderPhoneReceiver() {
       });
       clientRef.current = client;
       client.on('telnyx.ready', () => {
-        if (active) setOnline(true);
+        if (active) {
+          ready = true;
+          setOnline(true);
+          void ping();
+        }
       });
       client.on('telnyx.error', () => {
+        ready = false;
         if (active) setOnline(false);
       });
       client.on('telnyx.notification', (notification: any) => {
@@ -106,7 +113,6 @@ export function ProgramHolderPhoneReceiver() {
         }
       });
       await client.connect();
-      await ping();
       heartbeat = setInterval(() => void ping(), 45_000);
     }
 

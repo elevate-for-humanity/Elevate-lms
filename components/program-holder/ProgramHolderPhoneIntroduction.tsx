@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   BellRing,
   Bot,
@@ -58,15 +58,9 @@ export function ProgramHolderPhoneIntroduction({
 }: {
   roleLabel?: string;
 } = {}) {
-  const storageKey = `${roleLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-phone-introduction-v1`;
   const [showWelcome, setShowWelcome] = useState(false);
 
-  useEffect(() => {
-    setShowWelcome(window.localStorage.getItem(storageKey) !== 'complete');
-  }, [storageKey]);
-
   function completeIntroduction() {
-    window.localStorage.setItem(storageKey, 'complete');
     setShowWelcome(false);
   }
 

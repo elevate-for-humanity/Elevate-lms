@@ -195,12 +195,17 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
         keepConnectionAliveOnSocketClose: true,
         hangupOnBeforeUnload: false,
       });
+      let ready = false;
       client.on('telnyx.ready', () => {
+        ready = true;
         setConnected(true);
         setConnecting(false);
         setMessage('Phone is online and ready for calls.');
+        void heartbeat();
       });
       client.on('telnyx.error', (event: any) => {
+        ready = false;
+        setConnected(false);
         setError(
           event?.error?.message || event?.message || 'The phone connection reported an error.',
         );
@@ -240,8 +245,9 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
       });
       clientRef.current = client;
       await client.connect();
-      await heartbeat();
-      heartbeatRef.current = setInterval(() => void heartbeat(), 45_000);
+      heartbeatRef.current = setInterval(() => {
+        if (ready) void heartbeat();
+      }, 45_000);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'The phone could not connect.');
       setConnecting(false);
@@ -406,7 +412,6 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
   return (
     <main className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
       <audio ref={remoteAudioRef} autoPlay playsInline />
-      <ProgramHolderPhoneIntroduction roleLabel={roleLabel} />
       {data.readOnly && (
         <p className="rounded-2xl border border-blue-200 bg-blue-50 p-4 font-bold text-blue-950">
           Administrator preview: this {roleLabel} extension, settings, and PARIS call inbox are shown read-only. Sign in as the {roleLabel} to connect the PWA, change settings, return calls, or update callback status.
@@ -871,6 +876,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
           ))}
         </div>
       </section>
+      <ProgramHolderPhoneIntroduction roleLabel={roleLabel} />
     </main>
   );
 }

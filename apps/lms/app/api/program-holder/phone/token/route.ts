@@ -58,15 +58,22 @@ export async function POST(request: Request) {
       profileId: ctx.user.id,
       deviceId,
     });
-    await ctx.db
-      .from('communication_extensions')
-      .update({
-        presence_status: extension.ring_mode === 'do_not_disturb' ? 'do_not_disturb' : 'available',
-        last_presence_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', extension.id)
-      .eq('profile_id', ctx.user.id);
+    // A credential is only a permission to connect. The PWA reports presence
+    // after Telnyx confirms its socket is ready.
+    const { count: otherLiveDevices } = await ctx.db
+      .from('phone_webrtc_devices')
+      .select('id', { count: 'exact', head: true })
+      .eq('extension_id', extension.id)
+      .eq('status', 'active')
+      .neq('device_id', deviceId)
+      .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString());
+    if (!otherLiveDevices) {
+      await ctx.db
+        .from('communication_extensions')
+        .update({ presence_status: 'offline', updated_at: new Date().toISOString() })
+        .eq('id', extension.id)
+        .eq('profile_id', ctx.user.id);
+    }
     return NextResponse.json({
       token: credential.token,
       sipUsername: credential.sipUsername,

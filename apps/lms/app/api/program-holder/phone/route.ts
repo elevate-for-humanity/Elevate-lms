@@ -77,7 +77,7 @@ export async function GET() {
       { status: 404 },
     );
   }
-  const [{ data: inbox, error: inboxError }, { data: notificationPreferences, error: preferencesError }] = await Promise.all([
+  const [{ data: inbox, error: inboxError }, { data: notificationPreferences, error: preferencesError }, { count: liveDevices }] = await Promise.all([
     ctx.db
       .from('phone_callback_tasks')
       .select(
@@ -91,6 +91,12 @@ export async function GET() {
       .select('email_missed_calls,sms_missed_calls,sms_phone')
       .eq('user_id', ctx.user.id)
       .maybeSingle(),
+    ctx.db
+      .from('phone_webrtc_devices')
+      .select('id', { count: 'exact', head: true })
+      .eq('extension_id', extension.id)
+      .eq('status', 'active')
+      .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString()),
   ]);
   // The phone itself must remain usable if callback history or notification
   // preferences are temporarily unavailable. Those are secondary features.
@@ -123,7 +129,7 @@ export async function GET() {
       schedule: extension.availability_schedule || DEFAULT_AVAILABILITY_SCHEDULE,
       ringSeconds: extension.ring_seconds,
       voicemailGreeting: extension.voicemail_greeting || '',
-      presenceStatus: extension.presence_status,
+      presenceStatus: (liveDevices ?? 0) > 0 ? extension.presence_status : 'offline',
     },
     inbox: (inbox || []).map((item: any) => ({
       ...item,
@@ -169,6 +175,17 @@ export async function PATCH(request: Request) {
         { error: 'A valid PWA device identifier is required.' },
         { status: 400 },
       );
+    }
+    const { data: registeredDevice, error: deviceError } = await ctx.db
+      .from('phone_webrtc_devices')
+      .select('id')
+      .eq('profile_id', ctx.user.id)
+      .eq('extension_id', extension.id)
+      .eq('device_id', deviceId)
+      .eq('status', 'active')
+      .maybeSingle();
+    if (deviceError || !registeredDevice) {
+      return NextResponse.json({ error: 'Connect this PWA phone before reporting availability.' }, { status: 409 });
     }
     patch.last_presence_at = new Date().toISOString();
     patch.presence_status = ['do_not_disturb', 'offline'].includes(extension.ring_mode)
@@ -229,7 +246,7 @@ export async function PATCH(request: Request) {
       availability_schedule: schedule,
       ring_seconds: ringSeconds,
       voicemail_greeting: voicemailGreeting || null,
-      presence_status: ['do_not_disturb', 'offline'].includes(ringMode) ? ringMode : 'available',
+      presence_status: ['do_not_disturb', 'offline'].includes(ringMode) ? ringMode : 'offline',
       last_presence_at: new Date().toISOString(),
     });
     if (typeof body.emailMissedCalls === 'boolean' || typeof body.smsMissedCalls === 'boolean') {

@@ -35,7 +35,8 @@ describe('apprentice self-service portal contracts', () => {
     const portal = source('apps/lms/app/api/billing/portal/route.ts');
     expect(setup).toContain('retiredStripeCheckout');
     expect(setup).toContain('PayPal automatic billing and QuickBooks accounting');
-    expect(portal).toContain('.or(`user_id.eq.${user.id},student_id.eq.${user.id}`)');
+    expect(portal).toContain("url: '/account/payment-methods'");
+    expect(portal).toContain("provider: 'paypal_quickbooks'");
   });
 
   it('collects automatically through PayPal and mirrors completed payments to QuickBooks', () => {
@@ -56,7 +57,7 @@ describe('apprentice self-service portal contracts', () => {
     expect(billingPage).toContain(".from('billing_schedules')");
     expect(billingPage).toContain('provider_subscription_id');
     expect(billingCard).toContain('Complete PayPal Authorization');
-    expect(apprenticeDashboard).toContain('approve PayPal billing');
+    expect(apprenticeDashboard).toContain('automaticBillingActive');
     expect(billingCard).not.toContain('Stripe');
     expect(apprenticeDashboard).not.toContain('stripe_subscription_id');
   });

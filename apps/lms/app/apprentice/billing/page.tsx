@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import BillingCard, { type BillingSummary } from '@/components/learner/BillingCard';
+import { AffirmInvoiceButton } from '@/components/payments/AffirmInvoiceButton';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
 import { APPRENTICE_PORTAL_CONFIGS } from '@/components/portal/ApprenticePortalShell';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
@@ -94,7 +95,13 @@ function BillingFallback({ portalPath, message }: { portalPath: string; message:
   );
 }
 
-function InvoiceLedger({ invoices }: { invoices: ApprenticeDashboardInvoice[] }) {
+function InvoiceLedger({
+  invoices,
+  readOnly,
+}: {
+  invoices: ApprenticeDashboardInvoice[];
+  readOnly: boolean;
+}) {
   const openStatuses = new Set(['draft', 'open', 'past_due', 'unpaid', 'pending']);
   const open = invoices.filter((invoice) => openStatuses.has(invoice.status.toLowerCase()));
   if (!invoices.length) return null;
@@ -118,7 +125,7 @@ function InvoiceLedger({ invoices }: { invoices: ApprenticeDashboardInvoice[] })
                   Due {invoice.dueDate || 'now'} · {invoice.status.replace(/_/g, ' ')}
                 </p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center justify-end gap-3">
                 <span className="text-lg font-black text-slate-950">
                   ${(invoice.amountCents / 100).toFixed(2)}
                 </span>
@@ -132,6 +139,11 @@ function InvoiceLedger({ invoices }: { invoices: ApprenticeDashboardInvoice[] })
                     Pay now
                   </a>
                 ) : null}
+                {['open', 'past_due'].includes(invoice.status.toLowerCase()) &&
+                invoice.amountCents >= 5_000 &&
+                invoice.amountCents <= 3_000_000 ? (
+                  <AffirmInvoiceButton billingInvoiceId={invoice.id} disabled={readOnly} />
+                ) : null}
               </div>
             </div>
           ))}
@@ -144,6 +156,12 @@ function InvoiceLedger({ invoices }: { invoices: ApprenticeDashboardInvoice[] })
           <strong>Payment reminder:</strong> Review each invoice due date and payment link. Your
           apprentice portal remains available while billing is resolved.
         </div>
+      ) : null}
+      {open.length ? (
+        <p className="px-5 pb-5 text-xs leading-5 text-slate-600">
+          Affirm is a separate financing application. Eligibility, APR, and payment terms are
+          determined by Affirm; checking eligibility does not change the invoice amount.
+        </p>
       ) : null}
     </section>
   );
@@ -195,16 +213,7 @@ function SubscriptionBilling({
         </div>
       ) : null}
       <BillingCard billing={billing} readOnly={previewing} />
-      <section className="rounded-xl border border-indigo-200 bg-indigo-50 p-5">
-        <h2 className="font-black text-slate-950">Affirm financing</h2>
-        <p className="mt-1 text-sm leading-6 text-slate-700">If Affirm is offered on your QuickBooks invoice, select Affirm from the invoice payment screen to check eligibility and apply. Approval, available plans, and terms are determined by Affirm. Checking the invoice does not change the amount you owe Elevate.</p>
-        {invoices.some((invoice) => invoice.paymentUrl) ? (
-          <a href={invoices.find((invoice) => invoice.paymentUrl)?.paymentUrl || '#'} target="_blank" rel="noreferrer" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-indigo-700 px-5 py-3 text-sm font-black text-white">Open invoice & check Affirm eligibility</a>
-        ) : (
-          <p className="mt-3 text-xs font-semibold text-slate-600">Your invoice payment link will appear here after QuickBooks synchronization.</p>
-        )}
-      </section>
-      <InvoiceLedger invoices={invoices} />
+      <InvoiceLedger invoices={invoices} readOnly={previewing} />
     </div>
   );
 }
@@ -327,7 +336,9 @@ function StudentPaymentCard() {
           <span className="flex items-center gap-3">
             <CreditCard className="h-5 w-5 text-brand-blue-700" />
             <span>
-              <span className="block font-medium text-slate-950">Payment authorization & PayPal setup</span>
+              <span className="block font-medium text-slate-950">
+                Payment authorization & PayPal setup
+              </span>
               <span className="text-xs text-slate-600">
                 Complete the signed release and provider approval steps
               </span>

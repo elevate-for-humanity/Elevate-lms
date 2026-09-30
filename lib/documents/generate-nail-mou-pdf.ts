@@ -222,7 +222,7 @@ export async function generateNailMOUPdf(data: NailMOUPDFData): Promise<Uint8Arr
     },
     {
       title: '3. Sponsor Responsibilities',
-      body: `The Sponsor agrees to: (a) Recruit, screen, and enroll qualified apprentice candidates; (b) Provide all Related Technical Instruction (RTI) — minimum 144 hours/year via Elevate LMS; (c) Register each apprentice in RAPIDS within 30 days of enrollment; (d) Provide ongoing case management and compliance support; (e) Issue Certificates of Completion upon program completion; (f) Handle all WIOA, WRG, and grant compliance reporting.`,
+      body: `The Sponsor agrees to: (a) Recruit, screen, and enroll qualified apprentice candidates; (b) Coordinate the registered Manicurist RTI requirement — 210 total hours — through the approved RTI arrangement and maintain verified RTI records; (c) Register each apprentice in RAPIDS within 30 days of enrollment; (d) Provide ongoing case management and compliance support; (e) Issue Certificates of Completion upon program completion; (f) Handle all WIOA, WRG, and grant compliance reporting.`,
     },
     {
       title: '4. Supervising Nail Technician',

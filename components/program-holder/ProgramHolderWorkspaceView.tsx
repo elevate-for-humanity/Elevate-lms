@@ -379,6 +379,11 @@ export async function ProgramHolderWorkspaceView({
             Your dashboard is linked to the assigned regional team while preserving your individual
             login and audit history.
           </p>
+          {coordinatorRole === 'Gary Regional Site Coordinator' && (
+            <Link href="/program-holder/gary-launch" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-blue-800 px-4 py-2 text-sm font-black text-white">
+              Open your Gary step-by-step launch guide
+            </Link>
+          )}
           <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
             <strong>Applicant routing:</strong> Your regional queue includes applicants across
             all Elevate programs whose residence is within the assigned regional service area
@@ -1689,6 +1694,16 @@ function formatProgramFunding(program: any) {
   return 'Self-pay at the published amount';
 }
 
+function formatCareerPay(program: any) {
+  const usd = (value: unknown) =>
+    Number(value) > 0 ? Number(value).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) : null;
+  const low = usd(program.salary_min);
+  const high = usd(program.salary_max);
+  return low || high
+    ? `${low || 'Varies'}–${high || 'Varies'} annual estimate; confirm local wages`
+    : 'No verified local pay range on file';
+}
+
 function ProgramCards({
   programs,
   courseAssignments,
@@ -1745,8 +1760,20 @@ function ProgramCards({
                     />
                     <Row label="Published amount" value={formatProgramAmount(program)} />
                     <Row label="Funding path" value={formatProgramFunding(program)} />
+                    <Row
+                      label="Career pay"
+                      value={formatCareerPay(program)}
+                    />
                     <Row label="Course assignments" value={String(courses.length)} />
                   </dl>
+                  <p className="mt-5 text-sm leading-6 text-slate-700">
+                    {program.short_description || program.description || 'Ask the program team for the approved course outline before recruiting.'}
+                  </p>
+                  <p className="mt-3 text-xs font-bold text-slate-600">
+                    Indiana WIOA status: {program.etpl_listed || program.wioa_approved
+                      ? 'Internal record has a funding flag; confirm this exact program and location on Indiana INTraining before offering a funded seat.'
+                      : 'Indiana ETPL approval has not been verified in this workspace. Treat as self-pay until WorkOne confirms eligibility in writing.'}
+                  </p>
                   <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
                     <strong>Student payment conversation:</strong> confirm whether Elevate has documented
                     funding approval before describing a program as funded. Otherwise explain the published

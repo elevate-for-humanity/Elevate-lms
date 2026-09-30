@@ -97,7 +97,7 @@ export default async function ProgramHolderPortalLayout({
         </div>
       </nav>
       <ProgramHolderPhoneReceiver />
-      {children}
+      <div className="program-holder-portal min-w-0 overflow-x-clip">{children}</div>
     </>
   );
 }

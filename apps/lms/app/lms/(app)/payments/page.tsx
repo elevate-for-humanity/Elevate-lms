@@ -14,6 +14,8 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { listApprenticeInvoices } from '@/lib/billing/apprentice-invoice-batch';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { AffirmInvoiceButton } from '@/components/payments/AffirmInvoiceButton';
+import { isAffirmInvoiceAmount } from '@/lib/billing/invoice-checkout';
 
 export const metadata: Metadata = { title: 'Payments & Billing' };
 export const dynamic = 'force-dynamic';
@@ -185,6 +187,50 @@ export default async function PaymentsPage() {
             and records are preserved.
           </p>
         </div>
+      ) : null}
+      {openInvoices.length ? (
+        <section className="mb-8 overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="border-b border-slate-200 px-5 py-4">
+            <h2 className="font-black text-slate-950">Open QuickBooks invoices</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Pay directly or use Affirm when the individual invoice is eligible.
+            </p>
+          </div>
+          <div className="divide-y divide-slate-100">
+            {openInvoices.map((invoice: any) => (
+              <div
+                key={invoice.id}
+                className="flex flex-wrap items-center justify-between gap-4 px-5 py-4"
+              >
+                <div>
+                  <p className="font-bold text-slate-950">
+                    Invoice {invoice.invoiceNumber || invoice.id.slice(0, 8)}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-600">
+                    {invoice.dueDate ? `Due ${fmtDate(invoice.dueDate)}` : 'Due now'}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center justify-end gap-3">
+                  <span className="font-black text-slate-950">{fmt(invoice.amountCents)}</span>
+                  {invoice.paymentUrl ? (
+                    <a
+                      href={invoice.paymentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white"
+                    >
+                      Pay now
+                    </a>
+                  ) : null}
+                  {['open', 'past_due'].includes(String(invoice.status).toLowerCase()) &&
+                  isAffirmInvoiceAmount(Number(invoice.amountCents)) ? (
+                    <AffirmInvoiceButton billingInvoiceId={invoice.id} />
+                  ) : null}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       ) : null}
       {payments.length ? (
         <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3">

@@ -5,6 +5,10 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { listApprenticeInvoices } from '@/lib/billing/apprentice-invoice-batch';
+import { isAffirmInvoiceAmount } from '@/lib/billing/invoice-checkout';
+import { AffirmInvoiceButton } from '@/components/payments/AffirmInvoiceButton';
+import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
+import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
 import { CreditCard, FileText, Clock, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -23,7 +27,7 @@ export default async function BillingPage() {
   if (!user) redirect('/login?redirect=/billing');
 
   const db = await requireAdminClient();
-  const [{ data: legacyInvoices }, quickBooksInvoices] = await Promise.all([
+  const [{ data: legacyInvoices }, quickBooksInvoices, billingRequirement] = await Promise.all([
     db
       .from('invoices')
       .select('id, invoice_number, amount, total, status, due_date, paid_at, created_at, items')
@@ -31,6 +35,7 @@ export default async function BillingPage() {
       .order('created_at', { ascending: false })
       .limit(20),
     listApprenticeInvoices(db, user.id),
+    loadLearnerBillingRequirement(db, user.id),
   ]);
   const invoices = [
     ...(quickBooksInvoices || []).map((invoice: any) => ({
@@ -42,6 +47,7 @@ export default async function BillingPage() {
       due_date: invoice.dueDate,
       paid_at: invoice.paidAt || null,
       payment_url: invoice.paymentUrl,
+      billing_invoice_id: invoice.id,
       created_at: invoice.createdAt || invoice.dueDate || '',
       source: 'quickbooks',
     })),
@@ -49,6 +55,7 @@ export default async function BillingPage() {
       ...invoice,
       payment_url: null,
       source: 'history',
+      billing_invoice_id: null,
     })),
   ].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
 
@@ -69,6 +76,11 @@ export default async function BillingPage() {
       </div>
       <div className="max-w-5xl mx-auto px-4 py-10">
         <h1 className="text-2xl font-bold text-slate-900 mb-8">Billing &amp; Payments</h1>
+        {billingRequirement.required ? (
+          <div className="mb-8">
+            <MandatoryBillingSetup requirement={billingRequirement} />
+          </div>
+        ) : null}
         <div className="mb-6 flex justify-end">
           <Link
             href="/account/payment-methods"
@@ -134,7 +146,7 @@ export default async function BillingPage() {
                         : new Date(inv.created_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-wrap items-center justify-end gap-4">
                     <span
                       className={`text-xs font-semibold px-2.5 py-1 rounded-full ${inv.status === 'paid' ? 'bg-brand-green-50 text-brand-green-700' : ['overdue', 'past_due'].includes(inv.status) ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'}`}
                     >
@@ -152,6 +164,12 @@ export default async function BillingPage() {
                       >
                         Pay now
                       </a>
+                    ) : null}
+                    {inv.source === 'quickbooks' &&
+                    inv.billing_invoice_id &&
+                    ['open', 'past_due'].includes(String(inv.status).toLowerCase()) &&
+                    isAffirmInvoiceAmount(Math.round(Number(inv.total ?? inv.amount ?? 0) * 100)) ? (
+                      <AffirmInvoiceButton billingInvoiceId={inv.billing_invoice_id} />
                     ) : null}
                   </div>
                 </div>

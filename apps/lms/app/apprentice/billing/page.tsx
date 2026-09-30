@@ -13,6 +13,11 @@ import {
   getApprenticeBillingAccess,
   type ApprenticeDashboardInvoice,
 } from '@/lib/billing/apprentice-invoice-batch';
+import {
+  loadLearnerBillingRequirement,
+  type LearnerBillingRequirement,
+} from '@/lib/billing/learner-billing-requirement';
+import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
 
 export const metadata: Metadata = {
   title: 'Billing | Apprentice Portal',
@@ -72,7 +77,17 @@ function summary(
   };
 }
 
-function BillingFallback({ portalPath, message }: { portalPath: string; message: string }) {
+function BillingFallback({
+  portalPath,
+  message,
+  requirement,
+  readOnly,
+}: {
+  portalPath: string;
+  message: string;
+  requirement: LearnerBillingRequirement;
+  readOnly: boolean;
+}) {
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 py-8">
       <Link
@@ -81,6 +96,7 @@ function BillingFallback({ portalPath, message }: { portalPath: string; message:
       >
         <ArrowLeft className="h-4 w-4" /> Back to dashboard
       </Link>
+      <MandatoryBillingSetup requirement={requirement} readOnly={readOnly} />
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
         <div className="flex gap-3">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
@@ -170,17 +186,15 @@ function InvoiceLedger({
 function SubscriptionBilling({
   billing,
   portalPath,
-  needsBillingAgreement,
-  billingApprovalUrl,
   previewing,
   invoices,
+  requirement,
 }: {
   billing: BillingSummary;
   portalPath: string;
-  needsBillingAgreement: boolean;
-  billingApprovalUrl?: string | null;
   previewing: boolean;
   invoices: ApprenticeDashboardInvoice[];
+  requirement: LearnerBillingRequirement;
 }) {
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 py-8">
@@ -190,28 +204,7 @@ function SubscriptionBilling({
       >
         <ArrowLeft className="h-4 w-4" /> Back to dashboard
       </Link>
-      {needsBillingAgreement ? (
-        <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
-          <div className="text-sm text-red-800">
-            <p className="mb-1 font-semibold">PayPal approval required</p>
-            <p>
-              Complete the recurring-payment release and approve the PayPal billing agreement to
-              keep the tuition account current.
-            </p>
-            {billingApprovalUrl ? (
-              <a
-                href={billingApprovalUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-3 inline-flex rounded-lg bg-[#0070ba] px-4 py-2 font-bold text-white"
-              >
-                Approve PayPal billing
-              </a>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
+      <MandatoryBillingSetup requirement={requirement} readOnly={previewing} />
       <BillingCard billing={billing} readOnly={previewing} />
       <InvoiceLedger invoices={invoices} readOnly={previewing} />
     </div>
@@ -227,6 +220,7 @@ export default async function ApprenticeBillingPage() {
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) redirect('/login?redirect=/apprentice/billing');
   const billingAccess = await getApprenticeBillingAccess(db, subject.userId);
+  const billingRequirement = await loadLearnerBillingRequirement(db, subject.userId);
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
   const portalPath =
     (programSlug && APPRENTICE_PORTAL_CONFIGS[programSlug]?.portalPath) || '/apprentice';
@@ -264,6 +258,8 @@ export default async function ApprenticeBillingPage() {
         <BillingFallback
           portalPath={portalPath}
           message="No barber tuition account was found. Contact support if you recently enrolled."
+          requirement={billingRequirement}
+          readOnly={subject.previewing}
         />
       );
     const billing = summary('barber', sub || {}, schedule);
@@ -271,10 +267,9 @@ export default async function ApprenticeBillingPage() {
       <SubscriptionBilling
         billing={billing}
         portalPath={portalPath}
-        needsBillingAgreement={!billing.fullyPaid && !billing.hasSubscription}
-        billingApprovalUrl={schedule?.provider_approval_url}
         previewing={subject.previewing}
         invoices={billingAccess.invoices}
+        requirement={billingRequirement}
       />
     );
   }
@@ -296,10 +291,9 @@ export default async function ApprenticeBillingPage() {
         <SubscriptionBilling
           billing={billing}
           portalPath={portalPath}
-          needsBillingAgreement={!billing.fullyPaid && !billing.hasSubscription}
-          billingApprovalUrl={schedule?.provider_approval_url}
           previewing={subject.previewing}
           invoices={billingAccess.invoices}
+          requirement={billingRequirement}
         />
       );
     }
@@ -313,6 +307,7 @@ export default async function ApprenticeBillingPage() {
       >
         <ArrowLeft className="h-4 w-4" /> Back to dashboard
       </Link>
+      <MandatoryBillingSetup requirement={billingRequirement} readOnly={subject.previewing} />
       <StudentPaymentCard />
     </div>
   );

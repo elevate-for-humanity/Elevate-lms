@@ -33,6 +33,8 @@ import JobCard from '@/components/jobs/JobCard';
 import { MARKETING_HOST } from '@/lib/routing/portal-map';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
+import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
 
 export const metadata: Metadata = generateInternalMetadata({
   title: 'Student Dashboard',
@@ -91,6 +93,7 @@ export default async function StudentDashboard() {
     ? await db.from('profiles').select('role,full_name,email').eq('id', subjectId).maybeSingle()
     : { data: profile };
   const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
+  const billingRequirement = await loadLearnerBillingRequirement(db, subjectId);
   const careerJobs = await getActiveJobs({ limit: 4 });
   const { data: holderStudentRows } = await db
     .from('program_holder_students')
@@ -169,7 +172,7 @@ export default async function StudentDashboard() {
     supabase
       .from('external_course_completions')
       .select(
-        'id, external_course_id, completed_at, certificate_url, approved_at, elevate_sponsored, stripe_session_id',
+        'id, external_course_id, completed_at, certificate_url, approved_at, elevate_sponsored',
       )
       .eq('user_id', subjectId),
     supabase
@@ -448,6 +451,10 @@ export default async function StudentDashboard() {
             </div>
           </section>
         ) : null}
+        <MandatoryBillingSetup
+          requirement={billingRequirement}
+          readOnly={subject.previewing}
+        />
         {activeCourseEnrollment && activeCourseId ? (
           <section className="relative isolate min-h-[360px] overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
             <Image

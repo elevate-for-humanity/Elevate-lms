@@ -36,6 +36,8 @@ import {
   APPRENTICE_POLICY_VERSION,
 } from '@/lib/apprenticeship/apprentice-policy';
 import { getApprenticeBillingAccess } from '@/lib/billing/apprentice-invoice-batch';
+import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
+import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
 
 export const metadata: Metadata = {
   title: 'Apprentice Dashboard',
@@ -90,6 +92,7 @@ export default async function ApprenticePortalPage() {
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) redirect('/login?redirect=/apprentice');
   const invoiceAccess = await getApprenticeBillingAccess(db, subject.userId);
+  const billingRequirement = await loadLearnerBillingRequirement(db, subject.userId);
   const { data: subjectProfile } = await db
     .from('profiles')
     .select('role')
@@ -359,24 +362,10 @@ export default async function ApprenticePortalPage() {
   );
   const timeclockPolicyAccepted = acceptedPolicyKeys.has(APPRENTICE_POLICY_KEYS.timeclock);
   const paymentPolicyAccepted = acceptedPolicyKeys.has(APPRENTICE_POLICY_KEYS.payment);
-  const paymentStatus = String(automaticBillingSchedule?.provider_status || '').toLowerCase();
   const automaticBillingActive = Boolean(
     automaticBillingSchedule?.status === 'active' &&
     automaticBillingSchedule?.provider_status === 'active' &&
     automaticBillingSchedule?.provider_subscription_id,
-  );
-  const sponsorBillingAccessActive = Boolean(invoiceAccess.accessExemptUntil);
-  const paymentNeedsAction =
-    !sponsorBillingAccessActive &&
-    !cosmetologyBilling?.fully_paid &&
-    (invoiceAccess.openInvoices.length > 0 ||
-      !automaticBillingActive ||
-      paymentStatus === 'suspended' ||
-      paymentStatus === 'failed' ||
-      paymentStatus === 'expired');
-  const openInvoiceTotal = invoiceAccess.openInvoices.reduce(
-    (sum, invoice) => sum + invoice.amountCents,
-    0,
   );
   const requiredPolicyPanel = (
     <section className="rounded-3xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-6 shadow-sm sm:p-8">
@@ -558,36 +547,10 @@ export default async function ApprenticePortalPage() {
             </div>
           </div>
         </section>
-        {paymentNeedsAction ? (
-          <section className="rounded-3xl border-2 border-red-400 bg-red-50 p-6 shadow-sm">
-            <div className="flex gap-3">
-              <AlertCircle className="mt-1 h-6 w-6 shrink-0 text-red-700" />
-              <div>
-                <h2 className="text-xl font-black text-red-950">Payment action required</h2>
-                <p className="mt-2 font-semibold leading-7 text-red-900">
-                  {invoiceAccess.openInvoices.length
-                    ? `${invoiceAccess.openInvoices.length} invoice${invoiceAccess.openInvoices.length === 1 ? '' : 's'} totaling $${(openInvoiceTotal / 100).toFixed(2)} ${invoiceAccess.openInvoices.length === 1 ? 'is' : 'are'} due. Open Billing to see each due date and Pay Now link. `
-                    : 'Your account shows a payment problem. '}
-                  Your apprentice portal remains available while billing is resolved.
-                </p>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <Link
-                    href="/apprentice/billing"
-                    className="rounded-xl bg-red-800 px-4 py-3 font-black text-white"
-                  >
-                    Review invoices and Pay Now links
-                  </Link>
-                  <Link
-                    href="/contact?topic=billing"
-                    className="rounded-xl border border-red-300 bg-white px-4 py-3 font-black text-red-900"
-                  >
-                    Contact Elevate
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </section>
-        ) : null}
+        <MandatoryBillingSetup
+          requirement={billingRequirement}
+          readOnly={subject.previewing}
+        />
         {requiredPolicyPanel}
         <section className="grid gap-4 sm:grid-cols-3">
           <Metric
@@ -762,36 +725,10 @@ export default async function ApprenticePortalPage() {
         </div>
       </section>
 
-      {paymentNeedsAction ? (
-        <section className="rounded-3xl border-2 border-red-400 bg-red-50 p-6 shadow-sm">
-          <div className="flex gap-3">
-            <AlertCircle className="mt-1 h-6 w-6 shrink-0 text-red-700" />
-            <div>
-              <h2 className="text-xl font-black text-red-950">Payment action required</h2>
-              <p className="mt-2 font-semibold leading-7 text-red-900">
-                {invoiceAccess.openInvoices.length
-                  ? `${invoiceAccess.openInvoices.length} invoice${invoiceAccess.openInvoices.length === 1 ? '' : 's'} totaling $${(openInvoiceTotal / 100).toFixed(2)} ${invoiceAccess.openInvoices.length === 1 ? 'is' : 'are'} due. Open Billing to see each due date and Pay Now link. `
-                  : 'Your account shows a payment problem. '}
-                Your apprentice portal remains available while billing is resolved.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <Link
-                  href="/apprentice/billing"
-                  className="rounded-xl bg-red-800 px-4 py-3 font-black text-white"
-                >
-                  Review invoices and Pay Now links
-                </Link>
-                <Link
-                  href="/contact?topic=billing"
-                  className="rounded-xl border border-red-300 bg-white px-4 py-3 font-black text-red-900"
-                >
-                  Contact Elevate
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-      ) : null}
+      <MandatoryBillingSetup
+        requirement={billingRequirement}
+        readOnly={subject.previewing}
+      />
 
       {requiredPolicyPanel}
 

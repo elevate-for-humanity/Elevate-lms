@@ -19,7 +19,7 @@ The platform tracks all DOL-required apprenticeship data:
 | Wage schedule compliance | Wage progression tracked per apprentice                                                    |
 | Equal opportunity        | EEO disclosures on all apprenticeship pages; sponsor disclosure required by 29 CFR Part 30 |
 
-Registered occupations: Building Services Technician (432 RTI hrs), Hair Stylist (154), Barber (260), Esthetician (300), Nail Tech (200), Youth Culinary (144).
+Registered occupations: Building Services Technician (432 RTI hrs), Hair Stylist (154), Barber (260), Esthetician (300), Nail Tech / Manicurist (210), Youth Culinary (144).
 
 ## WIOA Compliance
 

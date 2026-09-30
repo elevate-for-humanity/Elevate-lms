@@ -483,7 +483,7 @@ export async function ProgramHolderWorkspaceView({
                     {' · '}
                     {data.phoneLine.status === 'active' ? 'Active' : 'Setup in progress'}
                   </p>
-                  {data.programs.length ? (
+                  {data.programs.length && !regionalAssignment?.all_programs_in_region ? (
                     <div className="mt-3">
                       <p className="text-xs font-black uppercase tracking-wider text-slate-500">
                         Programs on this extension
@@ -1098,17 +1098,23 @@ export async function ProgramHolderWorkspaceView({
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
             <h2 id="program-holder-programs-heading" className="text-xl font-black text-slate-950">
-              Your programs
+              {regionalAssignment?.all_programs_in_region ? 'Regional program coverage' : 'Your programs'}
             </h2>
             <p className="mt-1 text-sm text-slate-600">
-              Approved training pathways connected to this Program Holder account.
+              {regionalAssignment?.all_programs_in_region
+                ? `${data.programs.length} active pathways in your regional coordination scope. Local Program Holder assignments still control delivery.`
+                : 'Approved training pathways connected to this Program Holder account.'}
             </p>
           </div>
           <Link href="/program-holder/programs" className="text-sm font-bold text-blue-700">
             View details
           </Link>
         </div>
-        <ProgramCards programs={data.programs} courseAssignments={data.courseAssignments} compact />
+        <ProgramCards
+          programs={regionalAssignment?.all_programs_in_region ? data.programs.slice(0, 4) : data.programs}
+          courseAssignments={data.courseAssignments}
+          compact
+        />
       </section>
       <section className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

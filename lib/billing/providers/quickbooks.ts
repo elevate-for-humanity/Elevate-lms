@@ -25,6 +25,20 @@ export interface ExternalPaymentInput {
   paidAt: string;
 }
 
+export interface InvoiceExternalPaymentInput {
+  billingInvoiceId: string;
+  collectionProvider: 'affirm';
+  providerPaymentId: string;
+  paidAt: string;
+}
+
+export interface QuickBooksInvoiceCollectionState {
+  billingInvoiceId: string;
+  providerInvoiceId: string;
+  amountCents: number;
+  invoice: Record<string, any>;
+}
+
 async function ensureCustomer(db: Database, input: BillingCustomerInput) {
   const config = await loadQuickBooksConfig(db);
   const query = encodeURIComponent(
@@ -44,11 +58,123 @@ async function ensureCustomer(db: Database, input: BillingCustomerInput) {
 }
 
 /** Idempotently prepare a customer for an existing billing schedule. No invoice or charge is created. */
-export async function ensureQuickBooksCustomer(db: Database, input: BillingCustomerInput): Promise<string> {
+export async function ensureQuickBooksCustomer(
+  db: Database,
+  input: BillingCustomerInput,
+): Promise<string> {
   assertProviderCanCreateCharges('quickbooks', await loadBillingProviderConfig(db));
   const customer = await ensureCustomer(db, input);
   if (!customer?.Id) throw new Error('QuickBooks did not return a customer ID.');
   return String(customer.Id);
+}
+
+export async function getQuickBooksInvoiceCollectionState(
+  db: Database,
+  billingInvoiceId: string,
+): Promise<QuickBooksInvoiceCollectionState> {
+  const tracked = await db
+    .from('billing_invoices')
+    .select('id,provider,provider_invoice_id,total_cents,status')
+    .eq('id', billingInvoiceId)
+    .maybeSingle();
+  if (tracked.error || !tracked.data?.provider_invoice_id) {
+    throw new Error(tracked.error?.message || 'The QuickBooks invoice is not linked.');
+  }
+  if (tracked.data.provider !== 'quickbooks') throw new Error('Unsupported invoice provider.');
+  if (!['open', 'past_due'].includes(String(tracked.data.status))) {
+    throw new Error('This invoice is not open for payment.');
+  }
+
+  const config = await loadQuickBooksConfig(db);
+  const result = await quickBooksRequest<any>(
+    db,
+    config,
+    `invoice/${encodeURIComponent(String(tracked.data.provider_invoice_id))}`,
+  );
+  const invoice = result.Invoice;
+  if (!invoice?.CustomerRef?.value) throw new Error('QuickBooks invoice customer is unavailable.');
+  const amountCents = Math.round(Number(invoice.Balance ?? invoice.TotalAmt ?? 0) * 100);
+  if (amountCents <= 0) throw new Error('This invoice no longer has an outstanding balance.');
+  if (amountCents !== Number(tracked.data.total_cents)) {
+    throw new Error('The QuickBooks balance changed. Refresh the dashboard before paying.');
+  }
+  return {
+    billingInvoiceId: tracked.data.id,
+    providerInvoiceId: String(tracked.data.provider_invoice_id),
+    amountCents,
+    invoice,
+  };
+}
+
+export async function recordQuickBooksInvoiceExternalPayment(
+  db: Database,
+  input: InvoiceExternalPaymentInput,
+): Promise<{ providerPaymentId: string; quickBooksPaymentId?: string }> {
+  const existing = await db
+    .from('billing_invoices')
+    .select('id,provider_payment_id,provider_payment_status,status,provider_payload')
+    .eq('id', input.billingInvoiceId)
+    .maybeSingle();
+  if (existing.error || !existing.data) {
+    throw new Error(existing.error?.message || 'The tracked invoice was not found.');
+  }
+  if (
+    existing.data.provider_payment_id === input.providerPaymentId &&
+    existing.data.provider_payment_status === 'recorded'
+  ) {
+    return {
+      providerPaymentId: input.providerPaymentId,
+      quickBooksPaymentId: existing.data.provider_payload?.externalPayment?.Id,
+    };
+  }
+
+  const state = await getQuickBooksInvoiceCollectionState(db, input.billingInvoiceId);
+  const config = await loadQuickBooksConfig(db);
+  const paymentResult = await quickBooksRequest<any>(db, config, 'payment', {
+    method: 'POST',
+    headers: {
+      'Request-Id': createHash('sha256')
+        .update(`${input.collectionProvider}-payment:${input.providerPaymentId}`)
+        .digest('hex')
+        .slice(0, 50),
+    },
+    body: JSON.stringify({
+      CustomerRef: { value: state.invoice.CustomerRef.value },
+      TotalAmt: state.amountCents / 100,
+      TxnDate: input.paidAt.slice(0, 10),
+      PaymentRefNum: `Affirm ${input.providerPaymentId}`.slice(0, 21),
+      PrivateNote: `Affirm invoice payment ${input.providerPaymentId}`,
+      Line: [
+        {
+          Amount: state.amountCents / 100,
+          LinkedTxn: [{ TxnId: state.providerInvoiceId, TxnType: 'Invoice' }],
+        },
+      ],
+    }),
+  });
+  const updatedPayload = { ...state.invoice, externalPayment: paymentResult.Payment };
+  const saved = await db
+    .from('billing_invoices')
+    .update({
+      collection_provider: input.collectionProvider,
+      provider_payment_id: input.providerPaymentId,
+      provider_payment_status: 'recorded',
+      status: 'paid',
+      paid_at: input.paidAt,
+      provider_payload: updatedPayload,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', input.billingInvoiceId)
+    .in('status', ['open', 'past_due']);
+  if (saved.error) {
+    throw new Error(
+      `Payment was recorded in QuickBooks but the local ledger update failed: ${saved.error.message}`,
+    );
+  }
+  return {
+    providerPaymentId: input.providerPaymentId,
+    quickBooksPaymentId: paymentResult.Payment?.Id,
+  };
 }
 
 async function ensureItem(db: Database, line: BillingLineInput) {
@@ -239,7 +365,8 @@ export async function recordQuickBooksExternalPayment(
     .maybeSingle();
   if (existing.error || !existing.data?.provider_invoice_id) {
     throw new Error(
-      existing.error?.message || 'QuickBooks invoice must exist before its payment can be recorded.',
+      existing.error?.message ||
+        'QuickBooks invoice must exist before its payment can be recorded.',
     );
   }
   if (

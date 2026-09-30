@@ -14,5 +14,10 @@ export default async function Page() {
     email={data.profile?.email || data.holder?.contact_email}
     agreementSigned={data.holder?.mou_signed === true}
     programCount={data.programs.length}
+    compensation={{
+      perEnrollment: Number(data.holder?.features?.custom_mou?.compensation_per_eligible_enrollment || 0),
+      initial: Number(data.holder?.features?.custom_mou?.initial_payment || 0),
+      completion: Number(data.holder?.features?.custom_mou?.completion_payment || 0),
+    }}
   />;
 }

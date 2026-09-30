@@ -1765,10 +1765,20 @@ function ProgramCards({
                       value={formatCareerPay(program)}
                     />
                     <Row label="Course assignments" value={String(courses.length)} />
+                    <Row label="Delivery" value={program.delivery_method || 'Confirm with the program team'} />
+                    <Row label="Duration" value={program.estimated_weeks ? `${program.estimated_weeks} estimated weeks` : 'Confirm schedule with the program team'} />
                   </dl>
                   <p className="mt-5 text-sm leading-6 text-slate-700">
-                    {program.short_description || program.description || 'Ask the program team for the approved course outline before recruiting.'}
+                    {program.full_description || program.description || program.short_description || 'Ask the program team for the approved course outline before recruiting.'}
                   </p>
+                  {Array.isArray(program.what_you_learn) && program.what_you_learn.length > 0 && (
+                    <div className="mt-3 text-sm text-slate-700">
+                      <p className="font-bold">What students learn</p>
+                      <ul className="mt-1 list-disc space-y-1 pl-5">
+                        {program.what_you_learn.map((topic: string, index: number) => <li key={`${program.id}-${index}`}>{topic}</li>)}
+                      </ul>
+                    </div>
+                  )}
                   <p className="mt-3 text-xs font-bold text-slate-600">
                     Indiana WIOA status: {program.etpl_listed || program.wioa_approved
                       ? 'Internal record has a funding flag; confirm this exact program and location on Indiana INTraining before offering a funded seat.'

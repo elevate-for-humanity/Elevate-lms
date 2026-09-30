@@ -60,8 +60,6 @@ export async function POST(request: NextRequest) {
 
     const account = await getProgramHolderPayoutAccount(ctx);
     const provider = account.provider || body.provider || 'branch';
-    if (!account.provider) await configureProgramHolderPayoutAccount(ctx, provider);
-
     const url = await payoutProviderUrl(provider, body.action);
     if (!url) {
       return NextResponse.json(
@@ -74,6 +72,8 @@ export async function POST(request: NextRequest) {
         { status: 503 },
       );
     }
+
+    if (!account.provider) await configureProgramHolderPayoutAccount(ctx, provider);
 
     return NextResponse.json({ url });
   } catch (cause) {

@@ -89,6 +89,11 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+      LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
+      LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
+      LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
       NEXT_PUBLIC_GIT_SHA: ${{ github.sha }}
       NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_PIXEL_ID }}
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
@@ -149,6 +154,9 @@ jobs:
 
       - name: Install dependencies deterministically
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Merge meeting credentials into the shared runtime
+        run: pnpm tsx scripts/northflank/sync-env.ts --execute
 
       - name: Enforce canonical Northflank LMS runtime configuration
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_LMS_SERVICE_ID" --execute

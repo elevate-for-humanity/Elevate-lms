@@ -4,10 +4,10 @@ import { resend } from '@/lib/resend';
 import { PushNotificationService } from '@/lib/notifications/push-service';
 import { sendSMS } from '@/lib/notifications/sms';
 import { isExtensionReachable } from '@/lib/phone/availability';
+import { BARBER_PRICING } from '@/lib/programs/pricing';
 import {
   decodeCallState,
   encodeCallState,
-  isOpenNow,
   menuPrompt,
   publicPhoneNumber,
   telnyxClient,
@@ -342,6 +342,26 @@ async function startParis(
     profileId: route.profileId || '',
     phase: 'paris_intake',
   };
+  // Use the live catalog for program names, and the same canonical barber
+  // pricing source as the public tuition page. Other program prices may come
+  // from website fallbacks that are not represented by the catalog columns.
+  const { data: publishedPrograms, error: catalogError } = await db
+    .from('programs')
+    .select('name,slug')
+    .eq('is_active', true)
+    .order('name')
+    .limit(100);
+  const approvedProgramFacts = catalogError
+    ? 'The current program catalog is unavailable. Do not quote any tuition or program price.'
+    : (publishedPrograms || [])
+        .filter((program: any) => program.name && program.slug)
+        .map((program: any) => {
+          const tuition = program.slug === 'barber-apprenticeship'
+            ? `published tuition $${BARBER_PRICING.fullPrice.toLocaleString('en-US')}`
+            : 'price must be confirmed on the current website or with admissions';
+          return `${String(program.name).slice(0, 100)} (${String(program.slug).slice(0, 100)}): ${tuition}`;
+        })
+        .join('; ');
   try {
     if (taskId) {
       await telnyxClient().calls.actions.startRecording(callControlId, {
@@ -387,7 +407,9 @@ async function startParis(
       assistant: {
         instructions: `${system.ai_instructions} You are PARIS, the Elevate for Humanity telephone career and admissions assistant. Be warm, concise, and conversational. Tell callers to call 911 for an emergency. Start with a brief overview: Elevate provides career and technical training, Registered Apprenticeship support, industry credentials, and workforce pathways. Explain that some training can be workforce-funded for eligible participants and other training is self-pay.
 
-For this intake, the currently designated workforce-funded program group is HVAC, CDL, Bookkeeping, and Business. Do not describe other programs as workforce-funded unless approved system data is updated. Other programs are self-pay. For self-pay programs, explain that Elevate has payment arrangements and financing/payment options that may help; mention only providers enabled by the current Elevate payment configuration and make clear that approval and terms are determined by the payment provider.
+Current active program names and verified website tuition: ${approvedProgramFacts || 'No current prices are available.'}. Quote a price only when the exact program matches an entry with published tuition. If a caller asks about deposits, fees, payment schedules, or another price not given here, direct them to the current website tuition page or an administrator. Never infer a price from duration, hours, another program, or earlier conversations.
+
+Funding eligibility varies by program and participant and must be confirmed by the relevant workforce agency. Do not call any program funded or self-pay only without current approved information. For self-pay questions, refer callers to the current website or admissions for payment options and provider terms.
 
 Conduct a real two-way interview, not a field-reading script. Ask what program the caller is interested in. Then explicitly ask, "What questions can I answer for you about that program?" Listen and answer from current approved Elevate website/program information before asking the next relevant question. Invite a follow-up if useful. Do not just record their question for someone else when you have an approved answer.
 
@@ -722,10 +744,6 @@ async function handleEvent(
         updated_at: new Date().toISOString(),
       })
       .eq('id', call.id);
-    if (!isOpenNow(system.business_hours, system.timezone)) {
-      await startParis(db, system, call, payload.call_control_id, eventId);
-      return;
-    }
     const { data: options } = await db
       .from('phone_menu_options')
       .select('digit,label')
@@ -733,15 +751,13 @@ async function handleEvent(
       .eq('enabled', true)
       .order('position');
     if (system.routing_mode === 'menu' && options?.length) {
-      const menuDigits = Array.from(
-        new Set([...options.map((option: any) => String(option.digit)), '8', '9', '0']),
-      ).join('');
       await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
-        payload: `${menuPrompt(system.greeting, options)} Press 8 to enter a three-digit extension. Press 9 for PARIS, or press 0 for immediate assistance.`,
+        payload: `${system.greeting} If you know your party's three-digit extension, dial it now. ${menuPrompt('', options.filter((option: any) => ![0, 8, 9].includes(Number(option.digit))))} Press 9 for PARIS, or press 0 for immediate assistance.`,
         voice: 'Telnyx.KokoroTTS.af',
         minimum_digits: 1,
-        maximum_digits: 1,
-        valid_digits: menuDigits,
+        maximum_digits: 3,
+        valid_digits: '0123456789',
+        inter_digit_timeout_millis: 2500,
         maximum_tries: 2,
         timeout_millis: 7000,
         command_id: `${eventId}-menu`,
@@ -769,6 +785,21 @@ async function handleEvent(
 
   if (type === 'call.gather.ended') {
     const digits = String(payload.digits ?? '').trim();
+    if (state.phase === 'main_menu' && /^\d{3}$/.test(digits)) {
+      const { data: workspace } = await db
+        .from('communication_workspaces')
+        .select('id')
+        .eq('phone_system_id', system.id)
+        .maybeSingle();
+      const { data: extension } = workspace?.id
+        ? await db.from('communication_extensions').select('id')
+            .eq('workspace_id', workspace.id).eq('extension', digits)
+            .eq('enabled', true).maybeSingle()
+        : { data: null };
+      return extension?.id
+        ? routeToExtension(db, system, call, payload.call_control_id, extension.id, eventId)
+        : startParis(db, system, call, payload.call_control_id, eventId);
+    }
     if (state.phase === 'extension_menu') {
       const { data: workspace } = await db
         .from('communication_workspaces')

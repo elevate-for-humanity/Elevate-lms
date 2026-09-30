@@ -40,10 +40,11 @@ async function approveHour(formData: FormData) {
   'use server';
   const hourId = String(formData.get('hourId') || '').trim();
   if (!hourId) return;
-  const { user, db, hour } = await getAuthorizedHour(hourId);
+  const { user, effectiveRoles, db, hour } = await getAuthorizedHour(hourId);
   const claimed = Number(hour.hours_claimed ?? hour.hours ?? 0);
   if (!Number.isFinite(claimed) || claimed <= 0) throw new Error('INVALID_HOURS');
-  const { data: updated, error } = await db.from('hour_entries').update({ status: 'approved', approval_status: 'approved', accepted_hours: claimed, approved_by: user.email || user.id, approved_by_user_id: user.id, approved_by_role: 'host_shop', approved_at: new Date().toISOString(), rejection_reason: null, approval_notes: 'Verified by assigned Host Shop supervisor.' }).eq('id', hourId).eq('host_shop_id', hour.host_shop_id).eq('status', 'pending').eq('approval_status', 'pending').select('id');
+  const adminViewer = isPlatformAdmin(effectiveRoles);
+  const { data: updated, error } = await db.from('hour_entries').update({ status: 'approved', approval_status: 'approved', accepted_hours: claimed, approved_by: user.email || user.id, approved_by_user_id: user.id, approved_by_role: adminViewer ? 'admin' : 'host_shop', approved_at: new Date().toISOString(), rejection_reason: null, approval_notes: adminViewer ? 'Approved by platform administrator.' : 'Verified by assigned Host Shop supervisor.' }).eq('id', hourId).eq('host_shop_id', hour.host_shop_id).eq('status', 'pending').eq('approval_status', 'pending').select('id');
   if (error) throw new Error(`HOUR_APPROVAL_FAILED:${error.message}`);
   if (updated?.length !== 1) throw new Error('HOUR_ENTRY_NOT_PENDING');
   revalidatePath('/host-shop/dashboard');
@@ -56,8 +57,8 @@ async function rejectHour(formData: FormData) {
   const hourId = String(formData.get('hourId') || '').trim();
   const reason = String(formData.get('reason') || '').trim().slice(0, 1000);
   if (!hourId || reason.length < 3) return;
-  const { user, db, hour } = await getAuthorizedHour(hourId);
-  const { data: updated, error } = await db.from('hour_entries').update({ status: 'rejected', approval_status: 'rejected', accepted_hours: 0, approved_by: user.email || user.id, approved_by_user_id: user.id, approved_by_role: 'host_shop', approved_at: null, rejection_reason: reason, approval_notes: reason }).eq('id', hourId).eq('host_shop_id', hour.host_shop_id).eq('status', 'pending').eq('approval_status', 'pending').select('id');
+  const { user, effectiveRoles, db, hour } = await getAuthorizedHour(hourId);
+  const { data: updated, error } = await db.from('hour_entries').update({ status: 'rejected', approval_status: 'rejected', accepted_hours: 0, approved_by: user.email || user.id, approved_by_user_id: user.id, approved_by_role: isPlatformAdmin(effectiveRoles) ? 'admin' : 'host_shop', approved_at: null, rejection_reason: reason, approval_notes: reason }).eq('id', hourId).eq('host_shop_id', hour.host_shop_id).eq('status', 'pending').eq('approval_status', 'pending').select('id');
   if (error) throw new Error(`HOUR_REJECTION_FAILED:${error.message}`);
   if (updated?.length !== 1) throw new Error('HOUR_ENTRY_NOT_PENDING');
   revalidatePath('/host-shop/dashboard');

@@ -87,6 +87,33 @@ export function GaryCoordinatorLaunchKit({ name, phone, email, agreementSigned, 
         </article>
       </section>
 
+      <section className="grid gap-4 lg:grid-cols-2">
+        <article className="rounded-2xl border bg-white p-5 sm:p-7">
+          <h2 className="text-xl font-black">Email draft: Workforce Ready Grant</h2>
+          <p className="mt-1 text-xs">To: wrg@dwd.in.gov · Subject: Gary certificate provider eligibility and application steps</p>
+          <div className="mt-3 whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm leading-6">{`Hello Workforce Ready Grant team,
+
+I coordinate proposed Gary-area training partnerships for Elevate for Humanity. We are first confirming Indiana ETPL status for the exact provider, program, and delivery location. Which of our proposed certificate pathways might qualify for Workforce Ready Grant review, and what is the current provider application process, evidence, and timeline?
+
+Please direct us to the current qualifying program list and the appropriate reviewer. We will not represent any program as grant funded until DWD approves it in writing.
+
+Thank you,
+${signature}`}</div>
+        </article>
+        <article className="rounded-2xl border bg-white p-5 sm:p-7">
+          <h2 className="text-xl font-black">Email draft: apprenticeship coordination</h2>
+          <p className="mt-1 text-xs">To: wbl@dwd.in.gov · Subject: Gary employer apprenticeship site coordination</p>
+          <div className="mt-3 whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm leading-6">{`Hello Indiana Work-Based Learning and Apprenticeship team,
+
+I am a Gary Regional Site Coordinator with Elevate for Humanity. We are recruiting qualified local employers and training providers and want to coordinate correctly with Indiana before proposing apprenticeship delivery sites.
+
+Could you identify the regional contact, the required employer/site and mentor information, and the steps for coordinating an existing sponsor's programs in Indiana? We can share our current sponsor and occupation documents for review. We will submit each employer and site for sponsor approval before representing it as active.
+
+Thank you,
+${signature}`}</div>
+        </article>
+      </section>
+
       <section className="rounded-2xl border border-blue-200 bg-white p-5 sm:p-7">
         <h2 className="text-xl font-black">Start in this order</h2>
         <ol className="mt-4 list-decimal space-y-4 pl-5 text-sm leading-6">

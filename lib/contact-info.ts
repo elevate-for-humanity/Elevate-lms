@@ -9,9 +9,9 @@ export const CONTACT_INFO = {
   },
 
   email: {
-    general: 'info@elevateforhumanity.org',
-    support: 'info@elevateforhumanity.org',
-    partnerships: 'info@elevateforhumanity.org',
+    general: 'elevate4humanityedu@gmail.com',
+    support: 'elevate4humanityedu@gmail.com',
+    partnerships: 'elevate4humanityedu@gmail.com',
   },
 
   address: {

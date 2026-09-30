@@ -1,10 +1,8 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
-import { getRoleDestination } from '@/lib/auth/role-destinations';
+import { getRoleDestinationUrl } from '@/lib/auth/role-destinations';
 
-const WWW_ORIGIN =
-  process.env.NEXT_PUBLIC_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 const ADMIN_ORIGIN =
   process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org';
 const ADMIN_PORTAL_ROLES = new Set(['admin', 'staff', 'org_admin', 'admin']);
@@ -39,12 +37,7 @@ export default function UnauthorizedPage() {
 
   const isAdminPortalRole = ADMIN_PORTAL_ROLES.has(role ?? '');
   const adminDashboardHref = `${ADMIN_ORIGIN.replace(/\/$/, '')}/dashboard`;
-  const portalPath = role ? getRoleDestination(role) : null;
-  const portalHref = portalPath?.startsWith('http')
-    ? portalPath
-    : portalPath
-      ? `${WWW_ORIGIN.replace(/\/$/, '')}${portalPath}`
-      : `${WWW_ORIGIN}/portals`;
+  const portalHref = role ? getRoleDestinationUrl(role) : null;
 
   useEffect(() => {
     if (isAdminPortalRole) {

@@ -277,7 +277,7 @@ export default function InstitutionalGovernancePage() {
                     {
                       occ: 'Nail Tech',
                       provider: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-                      hours: '200',
+                      hours: '210',
                       method: 'Classroom / Web-Based',
                     },
                     {

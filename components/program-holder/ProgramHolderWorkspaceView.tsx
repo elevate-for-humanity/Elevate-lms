@@ -23,7 +23,7 @@ import { ProgramHolderNotificationPreferences } from './ProgramHolderNotificatio
 import { WorkOneOutreachButton } from './WorkOneOutreachButton';
 import { StudentCommunicationActions } from './StudentCommunicationActions';
 import { AlumniCareerOutreachButton } from './AlumniCareerOutreachButton';
-import { getProgramCardImage } from '@/lib/images/programImages';
+import { getProgramCardImage, getProgramHeroImage } from '@/lib/images/programImages';
 import { UniversalProfilePhotoEditor } from '@/components/profile/UniversalProfilePhotoEditor';
 import { ENCHANTED_HEARTS, formatUsd } from '@/lib/partners/enchanted-hearts';
 import { CallListPanel } from './CallListPanel';
@@ -34,11 +34,18 @@ import { TexasCoordinatorLaunchKit } from './TexasCoordinatorLaunchKit';
 
 function resolveDashboardHero(
   avatarUrl: string | null | undefined,
-  programSlug: string | undefined,
+  program: { hero_image_url?: string | null; image_url?: string | null; cover_image_url?: string | null; slug?: string } | undefined,
 ) {
+  const programPhoto = program?.hero_image_url || program?.image_url || program?.cover_image_url;
+  // Some legacy database image paths point to files that were never published.
+  // Use the maintained program image map for local paths; keep hosted program photos.
+  if (programPhoto?.trim() && /^https:\/\//.test(programPhoto.trim())) {
+    return { src: programPhoto.trim(), isPortrait: false };
+  }
+  if (program?.slug) return { src: getProgramHeroImage(program.slug), isPortrait: false };
   if (avatarUrl?.trim()) return { src: avatarUrl.trim(), isPortrait: true };
   return {
-    src: getProgramCardImage(programSlug || 'business-administration'),
+    src: '/images/pages/community-page-2.webp',
     isPortrait: false,
   };
 }
@@ -301,7 +308,7 @@ export async function ProgramHolderWorkspaceView({
     data.payoutProfile?.transfers_enabled &&
     data.payoutProfile?.verification_status === 'active',
   );
-  const dashboardHero = resolveDashboardHero(data.profile?.avatar_url, data.programs[0]?.slug);
+  const dashboardHero = resolveDashboardHero(data.profile?.avatar_url, data.programs[0]);
 
   if (section === 'students')
     return (
@@ -372,6 +379,11 @@ export async function ProgramHolderWorkspaceView({
             Your dashboard is linked to the assigned regional team while preserving your individual
             login and audit history.
           </p>
+          {coordinatorRole === 'Gary Regional Site Coordinator' && (
+            <Link href="/program-holder/gary-launch" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-blue-800 px-4 py-2 text-sm font-black text-white">
+              Open your Gary step-by-step launch guide
+            </Link>
+          )}
           <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
             <strong>Applicant routing:</strong> Your regional queue includes applicants across
             all Elevate programs whose residence is within the assigned regional service area
@@ -398,22 +410,8 @@ export async function ProgramHolderWorkspaceView({
             <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
               <h3 className="font-black text-emerald-950">Compensation</h3>
               <p className="mt-2 text-sm text-emerald-950">
-                {Number(customMou.compensation_per_eligible_enrollment) > 0 ? (
-                  <>
-                    <strong>
-                      {formatUsd(Number(customMou.compensation_per_eligible_enrollment))}
-                    </strong>{' '}
-                    per eligible, verified enrollment.
-                    {Number(customMou.initial_payment) > 0 ? (
-                      <> {formatUsd(Number(customMou.initial_payment))} after the configured enrollment milestone.</>
-                    ) : null}
-                    {Number(customMou.completion_payment) > 0 ? (
-                      <> {formatUsd(Number(customMou.completion_payment))} after the configured completion/closeout milestone.</>
-                    ) : null}
-                  </>
-                ) : (
-                  <strong>Compensation follows the signed coordinator MOU on file.</strong>
-                )}
+                Compensation terms are recorded in the current signed coordinator agreement.
+                Review the agreement and payout schedule for the applicable amounts and milestones.
               </p>
               <p className="mt-2 text-xs text-emerald-900">
                 A lead, incomplete application, unverified enrollment, or unverified completion does
@@ -1696,6 +1694,16 @@ function formatProgramFunding(program: any) {
   return 'Self-pay at the published amount';
 }
 
+function formatCareerPay(program: any) {
+  const usd = (value: unknown) =>
+    Number(value) > 0 ? Number(value).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) : null;
+  const low = usd(program.salary_min);
+  const high = usd(program.salary_max);
+  return low || high
+    ? `${low || 'Varies'}–${high || 'Varies'} annual estimate; confirm local wages`
+    : 'No verified local pay range on file';
+}
+
 function ProgramCards({
   programs,
   courseAssignments,
@@ -1752,8 +1760,30 @@ function ProgramCards({
                     />
                     <Row label="Published amount" value={formatProgramAmount(program)} />
                     <Row label="Funding path" value={formatProgramFunding(program)} />
+                    <Row
+                      label="Career pay"
+                      value={formatCareerPay(program)}
+                    />
                     <Row label="Course assignments" value={String(courses.length)} />
+                    <Row label="Delivery" value={program.delivery_method || 'Confirm with the program team'} />
+                    <Row label="Duration" value={program.estimated_weeks ? `${program.estimated_weeks} estimated weeks` : 'Confirm schedule with the program team'} />
                   </dl>
+                  <p className="mt-5 text-sm leading-6 text-slate-700">
+                    {program.full_description || program.description || program.short_description || 'Ask the program team for the approved course outline before recruiting.'}
+                  </p>
+                  {Array.isArray(program.what_you_learn) && program.what_you_learn.length > 0 && (
+                    <div className="mt-3 text-sm text-slate-700">
+                      <p className="font-bold">What students learn</p>
+                      <ul className="mt-1 list-disc space-y-1 pl-5">
+                        {program.what_you_learn.map((topic: string, index: number) => <li key={`${program.id}-${index}`}>{topic}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                  <p className="mt-3 text-xs font-bold text-slate-600">
+                    Indiana WIOA status: {program.etpl_listed || program.wioa_approved
+                      ? 'Internal record has a funding flag; confirm this exact program and location on Indiana INTraining before offering a funded seat.'
+                      : 'Indiana ETPL approval has not been verified in this workspace. Treat as self-pay until WorkOne confirms eligibility in writing.'}
+                  </p>
                   <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
                     <strong>Student payment conversation:</strong> confirm whether Elevate has documented
                     funding approval before describing a program as funded. Otherwise explain the published

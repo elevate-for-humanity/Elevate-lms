@@ -1,0 +1,24 @@
+/* Keep long organization names and dashboard headings readable in installed PWAs. */
+@media (max-width: 767px) {
+  .program-holder-portal :is(h1, h2, h3) {
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
+
+  .program-holder-portal h1 {
+    font-size: clamp(1.35rem, 5.5vw, 1.65rem);
+  }
+
+  .program-holder-portal h2 {
+    font-size: clamp(1.15rem, 4.8vw, 1.4rem);
+  }
+
+  .program-holder-portal h3 {
+    font-size: clamp(1.05rem, 4.4vw, 1.25rem);
+  }
+
+  .program-holder-portal :is(section, article, a, p, span, td, th) {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}

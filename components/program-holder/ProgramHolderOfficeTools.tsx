@@ -18,8 +18,15 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
   const [status, setStatus] = useState('');
 
   const load = useCallback(async () => {
-    const response = await fetch(endpoint, { cache: 'no-store' });
-    setData(await response.json());
+    try {
+      const response = await fetch(endpoint, { cache: 'no-store' });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Unable to load the workspace.');
+      setData(result);
+      setStatus('');
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Unable to load the workspace.');
+    }
   }, [endpoint]);
 
   useEffect(() => {
@@ -84,8 +91,9 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
             </p>
             <h1 className="mt-3 text-3xl font-black sm:text-5xl">Meet inside your Elevate PWA</h1>
             <p className="mt-4 text-base leading-7 text-slate-100">
-              Create secure browser video rooms without sending staff to a separate meeting app.
-              Camera, microphone, participant chat, and screen sharing are available in the room.
+              {data.videoReady
+                ? 'Create secure browser video rooms with camera, microphone, participant chat, and screen sharing.'
+                : 'Video and screen sharing require the meeting service to be connected. Phone and in-person meetings are available while it is being activated.'}
             </p>
             <div className="mt-6 flex flex-wrap gap-2 text-sm font-black">
               <span className="rounded-full bg-white/15 px-3 py-2">Camera and microphone</span>
@@ -98,12 +106,10 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
         {!data.videoReady ? (
           <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-950">
             <p className="font-black">Secure video connection is not active yet</p>
-            <p className="mt-1 text-sm">
-              Phone and in-person scheduling remain available. Video creation will unlock only after
-              the meeting service passes its connection test.
-            </p>
+            <p className="mt-1 text-sm">Phone and in-person scheduling remain available. Ask Elevate to activate the meeting service before promising a video or screen share.</p>
           </section>
         ) : null}
+        {status && <p role="status" className="rounded-xl border bg-white p-3 text-sm font-bold">{status}</p>}
 
         <section className="grid gap-4 sm:grid-cols-3">
           {[

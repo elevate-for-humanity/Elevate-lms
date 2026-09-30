@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 type Provider = 'paypal' | 'branch';
 
@@ -108,13 +109,21 @@ export function PayoutAccessPanel() {
         </p>
       ) : null}
 
-      <button
-        disabled={busy}
-        onClick={() => openPayoutProvider(ready ? 'dashboard' : 'onboard')}
-        className="mt-5 rounded-xl bg-blue-700 px-5 py-3 font-bold text-white disabled:opacity-50"
-      >
-        {busy ? 'Checking…' : ready ? 'Open payout settings' : 'Add banking information'}
-      </button>
+      {!busy && !status.providerConfigured ? (
+        <div className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+          <p className="font-bold">The secure banking invitation is not available for this account yet.</p>
+          <p className="mt-1">Ask Elevate to activate the payout provider. Do not send bank account or routing numbers in messages.</p>
+          <Link href="/program-holder/inbox" className="mt-3 inline-flex min-h-11 items-center rounded-lg bg-amber-900 px-4 py-2 font-bold text-white">Contact Elevate</Link>
+        </div>
+      ) : (
+        <button
+          disabled={busy}
+          onClick={() => openPayoutProvider(ready ? 'dashboard' : 'onboard')}
+          className="mt-5 rounded-xl bg-blue-700 px-5 py-3 font-bold text-white disabled:opacity-50"
+        >
+          {busy ? 'Checking…' : ready ? 'Open payout settings' : 'Add banking information'}
+        </button>
+      )}
     </section>
   );
 }

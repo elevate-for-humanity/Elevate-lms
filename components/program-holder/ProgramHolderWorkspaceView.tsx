@@ -23,7 +23,7 @@ import { ProgramHolderNotificationPreferences } from './ProgramHolderNotificatio
 import { WorkOneOutreachButton } from './WorkOneOutreachButton';
 import { StudentCommunicationActions } from './StudentCommunicationActions';
 import { AlumniCareerOutreachButton } from './AlumniCareerOutreachButton';
-import { getProgramCardImage } from '@/lib/images/programImages';
+import { getProgramCardImage, getProgramHeroImage } from '@/lib/images/programImages';
 import { UniversalProfilePhotoEditor } from '@/components/profile/UniversalProfilePhotoEditor';
 import { ENCHANTED_HEARTS, formatUsd } from '@/lib/partners/enchanted-hearts';
 import { CallListPanel } from './CallListPanel';
@@ -37,8 +37,12 @@ function resolveDashboardHero(
   program: { hero_image_url?: string | null; image_url?: string | null; cover_image_url?: string | null; slug?: string } | undefined,
 ) {
   const programPhoto = program?.hero_image_url || program?.image_url || program?.cover_image_url;
-  if (programPhoto?.trim()) return { src: programPhoto.trim(), isPortrait: false };
-  if (program?.slug) return { src: getProgramCardImage(program.slug), isPortrait: false };
+  // Some legacy database image paths point to files that were never published.
+  // Use the maintained program image map for local paths; keep hosted program photos.
+  if (programPhoto?.trim() && /^https:\/\//.test(programPhoto.trim())) {
+    return { src: programPhoto.trim(), isPortrait: false };
+  }
+  if (program?.slug) return { src: getProgramHeroImage(program.slug), isPortrait: false };
   if (avatarUrl?.trim()) return { src: avatarUrl.trim(), isPortrait: true };
   return {
     src: '/images/pages/community-page-2.webp',
@@ -401,22 +405,8 @@ export async function ProgramHolderWorkspaceView({
             <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
               <h3 className="font-black text-emerald-950">Compensation</h3>
               <p className="mt-2 text-sm text-emerald-950">
-                {Number(customMou.compensation_per_eligible_enrollment) > 0 ? (
-                  <>
-                    <strong>
-                      {formatUsd(Number(customMou.compensation_per_eligible_enrollment))}
-                    </strong>{' '}
-                    per eligible, verified enrollment.
-                    {Number(customMou.initial_payment) > 0 ? (
-                      <> {formatUsd(Number(customMou.initial_payment))} after the configured enrollment milestone.</>
-                    ) : null}
-                    {Number(customMou.completion_payment) > 0 ? (
-                      <> {formatUsd(Number(customMou.completion_payment))} after the configured completion/closeout milestone.</>
-                    ) : null}
-                  </>
-                ) : (
-                  <strong>Compensation follows the signed coordinator MOU on file.</strong>
-                )}
+                Compensation terms are recorded in the current signed coordinator agreement.
+                Review the agreement and payout schedule for the applicable amounts and milestones.
               </p>
               <p className="mt-2 text-xs text-emerald-900">
                 A lead, incomplete application, unverified enrollment, or unverified completion does

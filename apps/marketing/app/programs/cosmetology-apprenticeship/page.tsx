@@ -26,7 +26,7 @@ export default async function CosmetologyApprenticeshipPage() {
         videoSrcMobile: undefined,
         belowHeroHeadline: 'Build your cosmetology career through supervised salon training.',
         belowHeroSubheadline:
-          'Learn in a licensed Host Salon, complete required instruction, document your hours and skills, and prepare for the applicable Indiana licensing process.',
+          'Registered Hair Stylist/Cosmetologist occupation 0096HY V1: complete the 2,000–2,500-hour hybrid term, 154 RTI hours, supervised Host Salon training, required work processes, and the applicable Indiana examination and licensing process.',
         trustIndicators: [
           'Supervised salon training',
           'Related Technical Instruction',
@@ -34,7 +34,7 @@ export default async function CosmetologyApprenticeshipPage() {
           'Licensing preparation',
         ],
         transcript:
-          'Cosmetology Apprenticeship — Program Page Guide. Start by applying to Elevate and reviewing the program requirements. Elevate confirms enrollment, instruction, records, and the available payment or funding path. An approved Host Salon employs and supervises the apprentice during hands-on training. The apprentice completes Related Technical Instruction, records attendance and hours, demonstrates required competencies, and follows the applicable Indiana testing and licensing process. Self-pay students may pay in full or review an available buy now, pay later option. Buy now, pay later is offered by an outside provider, requires separate approval, and is subject to that provider’s payment schedule, fees, and agreement.',
+          'Hair Stylist, existing title Cosmetologist, is registered in RAPIDS as occupation 0096HY V1 using a hybrid model. Apprentices complete a 2,000 to 2,500 hour registered term, including 154 hours of Related Technical Instruction, supervised Host Salon training, required work processes, and program records. The 500-hour figure is the probationary period, not graduation. After registered apprenticeship completion, the apprentice follows the applicable Indiana examination and licensing process.',
       }
     : null;
   const structuredData = buildBeautyProgramStructuredData(program);
@@ -64,7 +64,7 @@ export async function generateMetadata() {
   return {
     title: 'Cosmetology Apprenticeship Program | Indiana | Elevate for Humanity',
     description:
-      'Indiana cosmetology apprenticeship pathway with 2,000 hours of supervised salon training, related instruction, host-site placement, progress tracking and licensing preparation. Current funding status is verified per program before enrollment.',
+      'Registered Indiana Hair Stylist/Cosmetologist apprenticeship, RAPIDS 0096HY V1: hybrid 2,000–2,500-hour term, 154 RTI hours, 500-hour probation, supervised Host Salon training, progress tracking, and licensing preparation.',
     keywords: [
       'cosmetology apprenticeship Indiana',
       'Indiana cosmetology apprenticeship program',
@@ -80,7 +80,7 @@ export async function generateMetadata() {
     openGraph: {
       title: 'Cosmetology Apprenticeship Program | Indiana',
       description:
-        'Complete supervised salon training and related instruction with Elevate’s cosmetology apprenticeship pathway. Funding eligibility varies and is reviewed before enrollment.',
+        'Registered Hair Stylist/Cosmetologist apprenticeship (0096HY V1) with a 2,000–2,500-hour hybrid term, 154 RTI hours, supervised Host Salon training, and licensing preparation.'
       url: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship',
       type: 'website',
     },

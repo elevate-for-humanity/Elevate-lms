@@ -170,7 +170,7 @@ export default async function HostShopDashboardView() {
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <a
-                  href="https://admin.elevateforhumanity.org/dashboard"
+                  href="https://admin.elevateforhumanity.org/partners"
                   className="inline-flex min-h-12 items-center justify-center rounded-xl bg-slate-950 px-6 py-3 font-black text-white"
                 >
                   Select a Host Shop in Admin

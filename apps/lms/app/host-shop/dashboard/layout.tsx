@@ -89,7 +89,7 @@ export default async function HostShopDashboardLayout({ children }: { children: 
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a
-                href="https://admin.elevateforhumanity.org/dashboard"
+                href="https://admin.elevateforhumanity.org/partners"
                 className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white"
               >
                 Select a Host Shop in Admin

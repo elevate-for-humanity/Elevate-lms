@@ -1,7 +1,6 @@
 // pre-auth-registry: exempt - requireProgramHolder verifies the holder before a scoped Telnyx token is minted.
 import { NextResponse } from 'next/server';
 import { requireCommunicationActor } from '@/lib/communications/actor';
-import { publicPhoneNumber } from '@/lib/phone/telnyx';
 import { ensureDeviceCredential } from '@/lib/phone/webrtc';
 import { hydrateProcessEnv } from '@/lib/secrets';
 
@@ -49,6 +48,16 @@ export async function POST(request: Request) {
     .maybeSingle();
   if (!system)
     return NextResponse.json({ error: 'The phone system is not active.' }, { status: 503 });
+  const { data: primaryNumber, error: numberError } = await ctx.db
+    .from('phone_numbers')
+    .select('e164')
+    .eq('phone_system_id', system.id)
+    .eq('status', 'active')
+    .eq('is_primary', true)
+    .maybeSingle();
+  if (numberError || !primaryNumber?.e164) {
+    return NextResponse.json({ error: 'The phone system has no active primary caller ID.' }, { status: 503 });
+  }
   try {
     await hydrateProcessEnv();
     const credential = await ensureDeviceCredential({
@@ -57,6 +66,7 @@ export async function POST(request: Request) {
       extension,
       profileId: ctx.user.id,
       deviceId,
+      callerId: primaryNumber.e164,
     });
     // A credential is only a permission to connect. The PWA reports presence
     // after Telnyx confirms its socket is ready.
@@ -78,7 +88,7 @@ export async function POST(request: Request) {
       token: credential.token,
       sipUsername: credential.sipUsername,
       extension: extension.extension,
-      callerId: publicPhoneNumber(),
+      callerId: primaryNumber.e164,
     });
   } catch (cause) {
     console.error('WebRTC credential provisioning failed:', cause);

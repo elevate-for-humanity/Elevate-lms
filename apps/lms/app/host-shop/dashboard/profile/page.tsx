@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { revalidatePath } from 'next/cache';
 import { Building2, CheckCircle2, FileText, MapPin, ShieldCheck } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
@@ -9,12 +10,37 @@ import HostShopPublicMediaForm from './HostShopPublicMediaForm';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Shop Profile | Host Shop Portal', description: 'View and manage the verified Host Shop profile stored in Elevate.', robots: { index: false, follow: false } };
 
+async function reviewShopAddress(formData: FormData) {
+  'use server';
+  const { user, effectiveRoles } = await requireRole(HOST_SHOP_ROLES);
+  if (effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role))) throw new Error('HOST_SHOP_REVIEW_REQUIRES_OWNER');
+  const board = await getHostShopBoard(user.id);
+  const shopId = String(formData.get('shopId') || '');
+  if (!board.shops.some((shop) => shop.id === shopId)) throw new Error('SHOP_NOT_AUTHORIZED');
+  const decision = String(formData.get('decision') || '');
+  if (!['confirmed', 'correction_requested'].includes(decision)) throw new Error('INVALID_ADDRESS_REVIEW');
+  const note = String(formData.get('note') || '').trim().slice(0, 500);
+  if (decision === 'correction_requested' && note.length < 10) throw new Error('CORRECTED_ADDRESS_REQUIRED');
+  const db = await requireAdminClient();
+  const { error } = await db.from('shops').update({
+    address_review_status: decision,
+    address_review_note: decision === 'confirmed' ? null : note,
+    address_reviewed_at: new Date().toISOString(),
+    address_reviewed_by: user.id,
+  }).eq('id', shopId).eq('partner_id', board.partner.id);
+  if (error) throw new Error(`SHOP_ADDRESS_REVIEW_FAILED:${error.message}`);
+  revalidatePath('/host-shop/dashboard/profile');
+}
+
 export default async function HostShopProfilePage() {
   const { user, effectiveRoles } = await requireRole(HOST_SHOP_ROLES);
   const board = await getHostShopBoard(user.id);
   const isPlatformAdmin = effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role));
   const db = await requireAdminClient();
   const partnerId = board.partner?.id;
+  const { data: locations } = board.shops.length
+    ? await db.from('shops').select('id,address1,address2,city,state,zip,address_review_status,address_review_note,address_reviewed_at').in('id', board.shops.map((shop) => shop.id)).eq('partner_id', partnerId)
+    : { data: [] };
   const { data: publicProfile } = partnerId
     ? await db.from('partners').select('logo_url,flyer_url,video_url,public_slug,verification_status').eq('id', partnerId).maybeSingle()
     : { data: null };
@@ -36,7 +62,7 @@ export default async function HostShopProfilePage() {
 
       {!isPlatformAdmin ? <HostShopPublicMediaForm logoUrl={publicProfile?.logo_url} flyerUrl={publicProfile?.flyer_url} videoUrl={publicProfile?.video_url} publicProfileUrl={publicProfileUrl} /> : null}
 
-      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><MapPin className="h-5 w-5 text-brand-blue-700"/><h2 className="break-words font-black">Active shop locations</h2></div>{board.shops.length === 0 ? <p className="mt-4 text-sm text-slate-500">No active shop location is linked to this partner record.</p> : <div className="mt-4 grid min-w-0 gap-3 sm:grid-cols-2">{board.shops.map((shop) => <div key={shop.id} className="min-w-0 max-w-full rounded-xl border border-slate-200 p-4"><div className="flex items-start gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 text-brand-green-700"/><div className="min-w-0"><p className="break-words font-black">{shop.name}</p><p className="mt-1 text-sm text-slate-600">{[shop.city, shop.state].filter(Boolean).join(', ') || 'Location details not provided'}</p></div></div></div>)}</div>}</section>
+      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><MapPin className="h-5 w-5 text-brand-blue-700"/><h2 className="break-words font-black">Active shop locations</h2></div><p className="mt-2 text-sm text-slate-600">Confirm the exact place where apprentices work. A confirmed address still needs a verified map location before geofenced clock-in is enabled.</p>{board.shops.length === 0 ? <p className="mt-4 text-sm text-slate-500">No active shop location is linked to this partner record.</p> : <div className="mt-4 grid min-w-0 gap-3 sm:grid-cols-2">{board.shops.map((shop) => { const location = locations?.find((row) => row.id === shop.id); return <div key={shop.id} className="min-w-0 max-w-full rounded-xl border border-slate-200 p-4"><div className="flex items-start gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 text-brand-green-700"/><div className="min-w-0"><p className="break-words font-black">{shop.name}</p><p className="mt-1 text-sm text-slate-700">{[location?.address1, location?.address2, location?.city, location?.state, location?.zip].filter(Boolean).join(', ') || 'Address not provided'}</p><p className="mt-2 text-sm font-semibold text-slate-700">{location?.address_review_status === 'confirmed' ? 'Address confirmed by Host Shop' : location?.address_review_status === 'correction_requested' ? 'Correction requested; administrator review needed' : 'Address confirmation needed'}</p>{location?.address_review_note ? <p className="mt-1 text-sm text-slate-600">Correction: {location.address_review_note}</p> : null}</div></div>{!isPlatformAdmin ? <form action={reviewShopAddress} className="mt-4 space-y-3"><input type="hidden" name="shopId" value={shop.id}/><label className="block text-sm font-semibold">If incorrect, enter the complete work-site address<input name="note" maxLength={500} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Street, suite, city, state, ZIP" /></label><div className="flex flex-wrap gap-2"><button name="decision" value="confirmed" className="rounded-lg bg-green-700 px-3 py-2 text-sm font-bold text-white">Confirm this address</button><button name="decision" value="correction_requested" className="rounded-lg border border-slate-400 px-3 py-2 text-sm font-bold">Submit correction</button></div></form> : null}</div>; })}</div>}</section>
     </main>
   );
 }

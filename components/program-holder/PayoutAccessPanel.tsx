@@ -31,12 +31,18 @@ export function PayoutAccessPanel() {
   const [status, setStatus] = useState<Status>(initial);
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState('');
+  const [preview, setPreview] = useState(false);
 
   const load = () =>
     fetch('/api/program-holder/payouts')
       .then(async (response) => {
         const data = await response.json();
+        if (response.status === 403 && data.error === 'Program Holder session required.') {
+          setPreview(true);
+          return;
+        }
         if (!response.ok) throw new Error(data.error);
+        setPreview(false);
         setStatus(data);
       })
       .catch((cause) =>
@@ -80,7 +86,7 @@ export function PayoutAccessPanel() {
         Secure contractor payouts
       </p>
       <h2 className="mt-2 text-2xl font-black">
-        {ready ? 'Funds access is ready' : 'Finish secure payment setup'}
+        {preview ? 'Payout setup preview' : ready ? 'Funds access is ready' : 'Finish secure payment setup'}
       </h2>
       <p className="mt-2 text-sm text-slate-600">
         Your payment provider securely collects your banking details. Elevate never receives or
@@ -88,7 +94,7 @@ export function PayoutAccessPanel() {
         not hold your payout credentials.
       </p>
 
-      <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4">
+      {!preview && <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4">
         <p className="font-bold text-blue-950">
           {status.provider === 'paypal' ? 'PayPal' : 'Direct deposit (ACH)'}
         </p>
@@ -97,7 +103,7 @@ export function PayoutAccessPanel() {
             ? 'Connect PayPal only if you want payments delivered to PayPal.'
             : 'Add banking information through the secure ACH provider to receive direct deposits. Availability and speed are confirmed by the provider.'}
         </p>
-      </div>
+      </div>}
 
       {status.destination ? (
         <p className="mt-3 text-sm">Connected destination: {status.destination}</p>
@@ -109,7 +115,11 @@ export function PayoutAccessPanel() {
         </p>
       ) : null}
 
-      {!busy && !status.providerConfigured ? (
+      {preview ? (
+        <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-950">
+          Administrator preview is read only. Sign in as this Program Holder to check banking setup and payout readiness.
+        </div>
+      ) : !busy && !status.providerConfigured ? (
         <div className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
           <p className="font-bold">The secure banking invitation is not available for this account yet.</p>
           <p className="mt-1">Ask Elevate to activate the payout provider. Do not send bank account or routing numbers in messages.</p>

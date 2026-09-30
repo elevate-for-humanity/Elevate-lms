@@ -16,16 +16,26 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
     videoReady: false,
   });
   const [status, setStatus] = useState('');
+  const [preview, setPreview] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   const load = useCallback(async () => {
     try {
       const response = await fetch(endpoint, { cache: 'no-store' });
       const result = await response.json();
+      if (response.status === 403 && result.error === 'Program Holder session required.') {
+        setPreview(true);
+        setStatus(`Administrator preview is read only. Sign in as this Program Holder to use ${mode === 'meetings' ? 'meetings' : 'office mail'}.`);
+        return;
+      }
       if (!response.ok) throw new Error(result.error || 'Unable to load the workspace.');
+      setPreview(false);
       setData(result);
       setStatus('');
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Unable to load the workspace.');
+    } finally {
+      setLoaded(true);
     }
   }, [endpoint]);
 
@@ -91,7 +101,11 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
             </p>
             <h1 className="mt-3 text-3xl font-black sm:text-5xl">Meet inside your Elevate PWA</h1>
             <p className="mt-4 text-base leading-7 text-slate-100">
-              {data.videoReady
+              {!loaded
+                ? 'Checking the meeting connection…'
+                : preview
+                ? 'This support preview cannot check the holder meeting connection. Sign in as the Program Holder to use video and screen sharing.'
+                : data.videoReady
                 ? 'Create secure browser video rooms with camera, microphone, participant chat, and screen sharing.'
                 : 'Video and screen sharing require the meeting service to be connected. Phone and in-person meetings are available while it is being activated.'}
             </p>
@@ -103,7 +117,7 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
           </div>
         </section>
 
-        {!data.videoReady ? (
+        {loaded && !preview && !data.videoReady && !status ? (
           <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-950">
             <p className="font-black">Secure video connection is not active yet</p>
             <p className="mt-1 text-sm">Phone and in-person scheduling remain available. Ask Elevate to activate the meeting service before promising a video or screen share.</p>
@@ -130,6 +144,7 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
 
         <form
           onSubmit={submit}
+          aria-disabled={preview}
           className="grid gap-3 rounded-2xl border bg-white p-5 shadow-sm sm:grid-cols-2"
         >
           <div className="sm:col-span-2">
@@ -186,7 +201,7 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
             placeholder="Meeting agenda and preparation notes"
             className="rounded-xl border p-3 sm:col-span-2"
           />
-          <button className="min-h-11 rounded-xl bg-indigo-700 px-4 font-black text-white">
+          <button disabled={preview || !loaded} className="min-h-11 rounded-xl bg-indigo-700 px-4 font-black text-white disabled:opacity-50">
             Schedule meeting
           </button>
           <p role="status" className="self-center text-sm font-bold">

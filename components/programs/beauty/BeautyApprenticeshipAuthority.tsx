@@ -11,6 +11,58 @@ import {
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { isRAPIDSProgram } from '@/lib/compliance/rapids-config';
 
+type RegisteredBeautyRequirement = {
+  occupation: string;
+  rapidsCode: string;
+  model: 'Competency-Based' | 'Hybrid';
+  rtiHours: number;
+  probationHours: number;
+  termLabel: string;
+  competencyCount?: number;
+};
+
+const REGISTERED_BEAUTY_REQUIREMENTS: Record<string, RegisteredBeautyRequirement> = {
+  'barber-apprenticeship': {
+    occupation: 'Barber',
+    rapidsCode: '0030CB V1',
+    model: 'Competency-Based',
+    rtiHours: 260,
+    probationHours: 500,
+    termLabel: '14 verified Appendix A competencies',
+    competencyCount: 14,
+  },
+  'esthetician-apprenticeship': {
+    occupation: 'Esthetician',
+    rapidsCode: '2089CB V1',
+    model: 'Competency-Based',
+    rtiHours: 300,
+    probationHours: 500,
+    termLabel: '20 verified Appendix A competencies',
+    competencyCount: 20,
+  },
+  'nail-technician-apprenticeship': {
+    occupation: 'Manicurist / Nail Tech',
+    rapidsCode: '2090CB V1',
+    model: 'Competency-Based',
+    rtiHours: 210,
+    probationHours: 500,
+    termLabel: '19 verified Appendix A competencies',
+    competencyCount: 19,
+  },
+  'cosmetology-apprenticeship': {
+    occupation: 'Hair Stylist (existing title: Cosmetologist)',
+    rapidsCode: '0096HY V1',
+    model: 'Hybrid',
+    rtiHours: 154,
+    probationHours: 500,
+    termLabel: '2,000–2,500 hour registered hybrid term',
+  },
+};
+
+function registeredRequirement(program: ProgramSchema) {
+  return REGISTERED_BEAUTY_REQUIREMENTS[program.slug] ?? null;
+}
+
 function totalHours(program: ProgramSchema): number {
   return Object.values(program.hoursBreakdown).reduce((sum, value) => sum + value, 0);
 }
@@ -92,6 +144,7 @@ export function buildBeautyProgramStructuredData(program: ProgramSchema) {
 export default function BeautyApprenticeshipAuthority({ program }: { program: ProgramSchema }) {
   const registered = isRAPIDSProgram(program.slug);
   const hours = totalHours(program);
+  const requirement = registeredRequirement(program);
   const wioaEtpl = Boolean(program.funding?.wioa_eligible && program.funding?.etpl_approved);
   const locations = program.locations?.filter((location) => location.status === 'active') ?? [];
   const shopNoun = trackNoun(program);
@@ -122,14 +175,20 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
     ],
     [
       'Finish closeout and licensing steps',
-      'Complete the required hours and competencies, resolve missing records, complete final documentation, and follow the applicable state testing or licensing process.',
+      requirement?.model === 'Competency-Based'
+        ? 'Complete the registered competencies and required RTI, resolve missing records, complete sponsor closeout, and then follow the applicable Indiana examination and licensing process.'
+        : 'Complete the registered hybrid term, required RTI, work-process requirements, resolve missing records, complete sponsor closeout, and then follow the applicable Indiana examination and licensing process.',
     ],
   ] as const;
 
   const faqs = [
     {
-      question: `How many hours is the ${program.title}?`,
-      answer: `Elevate’s canonical program record currently displays ${hours.toLocaleString()} structured hours across on-the-job/practical training and related instruction components. The program page above shows the detailed breakdown used by the platform.`,
+      question: `What do I actually have to complete for the ${program.title}?`,
+      answer: requirement
+        ? requirement.model === 'Competency-Based'
+          ? `This is a registered competency-based occupation. Complete ${requirement.termLabel} plus ${requirement.rtiHours} verified RTI hours. RAPIDS displays a 2,000-hour term value for this occupation, but the approved Appendix A completion model is competency-based. The 500-hour figure is probation, not graduation.`
+          : `This is a registered hybrid Hair Stylist/Cosmetologist occupation. The registered term is ${requirement.termLabel}, including ${requirement.rtiHours} RTI hours. The 500-hour figure is probation, not graduation.`
+        : `Program requirements are confirmed from the registered standard before enrollment.`,
     },
     {
       question: 'Can I use WorkOne / WIOA funding for this apprenticeship?',
@@ -194,10 +253,12 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                   <GraduationCap className="h-6 w-6 text-violet-700" />
                   <div className="mt-3 text-sm font-black text-slate-950">
-                    {hours.toLocaleString()} Structured Hours
+                    {requirement ? `${requirement.rtiHours} RTI Hours` : `${hours.toLocaleString()} Structured Hours`}
                   </div>
                   <p className="mt-1 text-xs font-medium leading-5 text-slate-600">
-                    Pulled from the canonical program hours breakdown shown on this page.
+                    {requirement
+                      ? `${requirement.rapidsCode} • ${requirement.model} • ${requirement.termLabel} • 500-hour probation`
+                      : 'Pulled from the canonical program hours breakdown shown on this page.'}
                   </p>
                 </div>
               </div>
@@ -285,7 +346,9 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
               />
               <Responsibility
                 title="What the Host Site does"
-                body="Provides qualified supervision, a safe workplace, scheduled learning opportunities, and verification of hours, competencies, and progress."
+                body={requirement?.model === 'Competency-Based'
+                  ? `Provides qualified supervision and real work opportunities, teaches the registered work processes, and verifies demonstrated competencies and work records. Do not treat the 500-hour probation period as program completion.`
+                  : `Provides qualified supervision and real work opportunities, teaches the registered Hair Stylist work processes, and verifies hours, skills, and progress toward the 2,000–2,500-hour hybrid term. The 500-hour probation period is not program completion.`}
               />
               <Responsibility
                 title="What Elevate does"

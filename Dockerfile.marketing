@@ -46,6 +46,7 @@ ARG NEXT_PUBLIC_LMS_URL=https://app.elevateforhumanity.org
 ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_SUPPORT_EMAIL=support@elevateforhumanity.org
 
 ENV NODE_ENV=production
 ENV CI=true
@@ -65,6 +66,7 @@ ENV NEXT_PUBLIC_LMS_URL=$NEXT_PUBLIC_LMS_URL
 ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_SUPPORT_EMAIL=$NEXT_PUBLIC_SUPPORT_EMAIL
 
 COPY --from=dependencies /workspace/node_modules ./node_modules
 # pnpm keeps direct workspace dependencies (including browser polyfills) in the
@@ -75,6 +77,7 @@ COPY . .
 
 RUN test -n "$NEXT_PUBLIC_SUPABASE_URL" \
     && test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+    && test -n "$NEXT_PUBLIC_SUPPORT_EMAIL" \
     && echo "Marketing public build arguments verified"
 
 # Website Builder defaults and shared authenticated portal contracts are release

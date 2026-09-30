@@ -103,6 +103,11 @@ function requirePublicBuildArgs(): Record<string, string> {
     NEXT_PUBLIC_ADMIN_URL:
       process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org',
     NEXT_PUBLIC_LMS_URL: process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhumanity.org',
+    // Client bundles cannot read the runtime secret group. Keep the public
+    // contact address in the Docker build contract so client hydration uses
+    // the same value as the server runtime.
+    NEXT_PUBLIC_SUPPORT_EMAIL:
+      process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@elevateforhumanity.org',
   };
 }
 

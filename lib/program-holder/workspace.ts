@@ -168,7 +168,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     programIds.length
       ? db
           .from('programs')
-          .select('id,name,title,slug,status,is_active,credential_name,total_hours,tuition,total_cost,price,is_free,funding,funding_tags,funding_eligibility,funding_eligible,wioa_approved,etpl_listed')
+          .select('id,name,title,slug,status,is_active,credential_name,total_hours,tuition,total_cost,price,is_free,funding,funding_tags,funding_eligibility,funding_eligible,wioa_approved,etpl_listed,hero_image_url,image_url,cover_image_url')
           .in('id', programIds)
           .order('title')
       : Promise.resolve({ data: [] }),
@@ -187,7 +187,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           )
           .eq('program_holder_id', holderId)
           .in('program_id', programIds)
-          .in('status', ['active', 'enrolled', 'completed', 'graduated'])
+          .in('status', ['active', 'enrolled', 'in_progress', 'completed', 'graduated'])
           .order('enrolled_at', { ascending: false })
       : Promise.resolve({ data: [] }),
     programIds.length
@@ -250,8 +250,9 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .eq('program_holder_id', holderId),
     db
       .from('progress_entries')
-      .select('apprentice_id,hours_worked,work_date,clock_in_at,clock_out_at')
+      .select('apprentice_id,hours_worked,work_date,clock_in_at,clock_out_at,status')
       .not('apprentice_id', 'is', null)
+      .eq('status', 'verified')
       .order('work_date', { ascending: false })
       .limit(5000),
     db
@@ -292,6 +293,20 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .maybeSingle(),
   ]);
 
+  // Surface database failures instead of showing an apparently empty dashboard.
+  for (const [name, result] of Object.entries({
+    holder: holderRes, acknowledgements: acknowledgementsRes, imageRelease: imageReleaseRes,
+    programs: programsRes, regionalApplicants: regionalApplicantsRes,
+    enrollments: enrollmentsRes, upcoming: upcomingRes, applicants: applicantsRes,
+    convertedStudents: convertedStudentsRes, hours: hoursRes, documents: documentsRes,
+    reports: reportsRes, courses: coursesRes, progressEntries: progressEntriesRes,
+    payout: payoutRes, schedules: schedulesRes, notifications: notificationRes,
+    phoneLine: phoneLineRes, extension: extensionRes,
+  })) {
+    const error = (result as { error?: { message: string } }).error;
+    if (error) throw new Error(`Program Holder ${name} could not load: ${error.message}`);
+  }
+
   const rosterUserIds: string[] = Array.from(
     new Set(
       [...(enrollmentsRes.data ?? []), ...(upcomingRes.data ?? []), ...(convertedStudentsRes.data ?? [])]
@@ -299,9 +314,10 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         .filter((value: unknown): value is string => typeof value === 'string' && value.length > 0),
     ),
   );
-  const { data: rosterProfiles } = rosterUserIds.length
+  const { data: rosterProfiles, error: rosterProfilesError } = rosterUserIds.length
     ? await db.from('profiles').select('id,role,email').in('id', rosterUserIds)
-    : { data: [] };
+    : { data: [], error: null };
+  if (rosterProfilesError) throw new Error(`Program Holder roster profiles could not load: ${rosterProfilesError.message}`);
   const eligibleRosterUserIds = new Set(
     (rosterProfiles ?? [])
       .filter(
@@ -320,7 +336,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   for (const entry of progressEntriesRes.data ?? []) {
     if (!entry.apprentice_id) continue;
     const hours = Number(entry.hours_worked || 0);
-    if (hours > 0) verifiedHoursByUser.set(entry.apprentice_id, Math.max(verifiedHoursByUser.get(entry.apprentice_id) ?? 0, (verifiedHoursByUser.get(entry.apprentice_id) ?? 0) + hours));
+    if (hours > 0) verifiedHoursByUser.set(entry.apprentice_id, (verifiedHoursByUser.get(entry.apprentice_id) ?? 0) + hours);
     if (entry.work_date) {
       const existing = firstClockDateByUser.get(entry.apprentice_id);
       if (!existing || entry.work_date < existing) firstClockDateByUser.set(entry.apprentice_id, entry.work_date);

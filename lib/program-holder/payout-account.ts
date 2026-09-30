@@ -52,7 +52,7 @@ export async function getProgramHolderPayoutAccount(ctx: HolderContext): Promise
     destination: masked(data?.provider_recipient_id),
     transfersEnabled: Boolean(data?.transfers_enabled),
     payoutsEnabled: Boolean(data?.payouts_enabled),
-    providerConfigured: provider ? await payoutProviderConfigured(provider) : false,
+    providerConfigured: await payoutProviderConfigured(provider || 'branch'),
     verificationStatus: data?.verification_status || 'not_started',
   };
 }

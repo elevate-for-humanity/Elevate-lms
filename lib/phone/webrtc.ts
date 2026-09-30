@@ -1,11 +1,11 @@
 import 'server-only';
 
 import { randomBytes } from 'node:crypto';
-import { telnyxClient, publicPhoneNumber } from '@/lib/phone/telnyx';
+import { telnyxClient } from '@/lib/phone/telnyx';
 
 type DatabaseClient = any;
 
-export async function ensureWebrtcConnection(db: DatabaseClient, system: any) {
+export async function ensureWebrtcConnection(db: DatabaseClient, system: any, callerId: string) {
   const client = telnyxClient();
   if (system.webrtc_connection_id) {
     try {
@@ -51,7 +51,7 @@ export async function ensureWebrtcConnection(db: DatabaseClient, system: any) {
       sip_uri_calling_preference: 'internal',
       inbound: { simultaneous_ringing: 'enabled' },
       outbound: {
-        ani_override: publicPhoneNumber(),
+        ani_override: callerId,
         ani_override_type: 'always',
         call_parking_enabled: false,
         ...(outboundProfileId ? { outbound_voice_profile_id: outboundProfileId } : {}),
@@ -79,8 +79,9 @@ export async function ensureDeviceCredential(input: {
   extension: any;
   profileId: string;
   deviceId: string;
+  callerId: string;
 }) {
-  const { db, system, extension, profileId, deviceId } = input;
+  const { db, system, extension, profileId, deviceId, callerId } = input;
   const client = telnyxClient();
   const { data: stored } = await db
     .from('phone_webrtc_devices')
@@ -103,7 +104,7 @@ export async function ensureDeviceCredential(input: {
   }
 
   if (!credentialId) {
-    const connectionId = await ensureWebrtcConnection(db, system);
+    const connectionId = await ensureWebrtcConnection(db, system, callerId);
     const response = await client.telephonyCredentials.create({
       connection_id: connectionId,
       name: `Extension ${extension.extension} device ${deviceId.slice(0, 8)}`,

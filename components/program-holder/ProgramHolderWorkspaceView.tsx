@@ -34,11 +34,14 @@ import { TexasCoordinatorLaunchKit } from './TexasCoordinatorLaunchKit';
 
 function resolveDashboardHero(
   avatarUrl: string | null | undefined,
-  programSlug: string | undefined,
+  program: { hero_image_url?: string | null; image_url?: string | null; cover_image_url?: string | null; slug?: string } | undefined,
 ) {
+  const programPhoto = program?.hero_image_url || program?.image_url || program?.cover_image_url;
+  if (programPhoto?.trim()) return { src: programPhoto.trim(), isPortrait: false };
+  if (program?.slug) return { src: getProgramCardImage(program.slug), isPortrait: false };
   if (avatarUrl?.trim()) return { src: avatarUrl.trim(), isPortrait: true };
   return {
-    src: getProgramCardImage(programSlug || 'business-administration'),
+    src: '/images/pages/community-page-2.webp',
     isPortrait: false,
   };
 }
@@ -301,7 +304,7 @@ export async function ProgramHolderWorkspaceView({
     data.payoutProfile?.transfers_enabled &&
     data.payoutProfile?.verification_status === 'active',
   );
-  const dashboardHero = resolveDashboardHero(data.profile?.avatar_url, data.programs[0]?.slug);
+  const dashboardHero = resolveDashboardHero(data.profile?.avatar_url, data.programs[0]);
 
   if (section === 'students')
     return (

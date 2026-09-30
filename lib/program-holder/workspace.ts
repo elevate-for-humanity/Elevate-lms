@@ -168,7 +168,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     programIds.length
       ? db
           .from('programs')
-          .select('id,name,title,slug,status,is_active,credential_name,total_hours,tuition,total_cost,price,is_free,funding,funding_tags,funding_eligibility,funding_eligible,wioa_approved,etpl_listed,hero_image_url,image_url,cover_image_url,short_description,description,career_outcomes,salary_min,salary_max,estimated_weeks,delivery_method')
+          .select('id,name,title,slug,status,is_active,credential_name,total_hours,tuition,total_cost,price,is_free,funding,funding_tags,funding_eligibility,funding_eligible,wioa_approved,etpl_listed,hero_image_url,image_url,cover_image_url,short_description,description,full_description,what_you_learn,career_outcomes,salary_min,salary_max,estimated_weeks,delivery_method')
           .in('id', programIds)
           .order('title')
       : Promise.resolve({ data: [] }),

@@ -7,6 +7,7 @@ type Props = {
   email?: string | null;
   agreementSigned: boolean;
   programCount: number;
+  compensation?: { perEnrollment?: number; initial?: number; completion?: number };
 };
 
 const contacts = [
@@ -60,9 +61,10 @@ const contacts = [
   },
 ];
 
-export function GaryCoordinatorLaunchKit({ name, phone, email, agreementSigned, programCount }: Props) {
+export function GaryCoordinatorLaunchKit({ name, phone, email, agreementSigned, programCount, compensation }: Props) {
   const signature = [name, 'Gary Regional Site Coordinator', 'Elevate for Humanity', phone, email]
     .filter(Boolean).join('\n');
+  const money = (amount: number) => amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 p-4 pb-16 sm:p-8">
@@ -135,7 +137,11 @@ ${signature}`}</div>
             <li><strong>Workforce Ready Grant:</strong> this is a separate Indiana approval for qualifying certificate programs and approved providers. Ask the state provider team before advertising it.</li>
             <li><strong>Employer OJT:</strong> WorkOne may reimburse an eligible employer for qualifying training wages under its agreement. Ask Business Services for current terms before hiring or promising reimbursement.</li>
             <li><strong>Student cost and career wages:</strong> each program card shows the current published price and any career salary estimate on file. Salary is an estimate, not a job offer or guaranteed Gary wage. If no written funding determination exists, explain the self-pay option and refer financing questions to Admissions.</li>
-            <li><strong>Your compensation:</strong> {agreementSigned ? 'Review your signed coordinator MOU and the Payouts page for your actual terms and earned milestones.' : 'Your MOU is not signed. Review the proposed terms with Elevate before representing any amount as earned.'} No lead or unverified enrollment guarantees a payout.</li>
+            <li><strong>Your compensation:</strong> {agreementSigned && compensation?.perEnrollment
+              ? `The current account terms record ${money(compensation.perEnrollment)} per eligible verified enrollment${compensation.initial && compensation.completion ? `, scheduled as ${money(compensation.initial)} and ${money(compensation.completion)} after the applicable milestones` : ''}. Check the signed MOU and Payouts page before relying on those terms.`
+              : agreementSigned
+                ? 'Review your signed coordinator MOU and the Payouts page for your actual terms and earned milestones.'
+                : 'Your MOU is not signed. Review the proposed terms with Elevate before representing any amount as earned.'} No lead or unverified enrollment guarantees a payout.</li>
           </ul>
         </article>
         <article className="rounded-2xl border bg-white p-5 sm:p-7">

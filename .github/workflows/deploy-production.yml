@@ -189,7 +189,11 @@ jobs:
             url="$2"
             output="$3"
 
-            curl -fsS --max-time 20 "$url" > "$output"
+            cache_bust="?deploy_sha=$EXPECTED_SHA&ts=$(date +%s%N)"
+            curl -fsS --max-time 20 \
+              -H 'Cache-Control: no-cache, no-store, max-age=0' \
+              -H 'Pragma: no-cache' \
+              "${url}${cache_bust}" > "$output"
             cat "$output"
 
             live_sha=$(node -e '

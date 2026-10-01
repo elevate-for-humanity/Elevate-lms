@@ -258,6 +258,24 @@ export async function reviewPractical(
         evidenceSubmissionId: submissionId,
       });
       competencyAchieved = compResult.success;
+      if (compResult.success) {
+        const { data: competency } = await db.from('competencies').select('id,minimum_touchpoints').eq('key', submission.competency_key).maybeSingle();
+        if (competency?.id) {
+          const { data: enrollment } = await db.from('program_enrollments').select('program_id').eq('user_id', submission.user_id).eq('course_id', submission.course_id).maybeSingle();
+          const { data: existingProgress } = await db.from('student_competency_progress').select('touchpoints,is_mastered').eq('user_id', submission.user_id).eq('competency_id', competency.id).maybeSingle();
+          const touchpoints = Math.max(1, Number(existingProgress?.touchpoints ?? 0) + 1);
+          const isMastered = touchpoints >= Math.max(1, Number(competency.minimum_touchpoints ?? 1));
+          await db.from('student_competency_progress').upsert({
+            user_id: submission.user_id,
+            competency_id: competency.id,
+            program_id: enrollment?.program_id ?? null,
+            touchpoints,
+            is_mastered: isMastered,
+            mastered_at: isMastered ? (existingProgress?.is_mastered ? undefined : now) : null,
+            updated_at: now,
+          }, { onConflict: 'user_id,competency_id' });
+        }
+      }
       if (!compResult.success) {
         logger.warn('[practical-workflow] markCompetencyAchieved failed (non-fatal)', {
           competencyKey: submission.competency_key,

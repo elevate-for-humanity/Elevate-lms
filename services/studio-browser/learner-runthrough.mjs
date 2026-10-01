@@ -118,6 +118,10 @@ export async function runLearnerTest(input, { browser, secret, lmsUrl, evidenceR
     await page.addScriptTag({path:require.resolve('axe-core/axe.min.js')});
     const axe=await page.evaluate(async()=>window.axe.run(document.querySelector('main'),{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}}));
     const violations=axe.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.length}));
+    if (errors.length || violations.some(v=>['serious','critical'].includes(v.impact))) {
+      const desktop = observations.find(o=>o.check==='desktop');
+      if (desktop) { desktop.passed=false; desktop.observed=`Browser errors: ${JSON.stringify(errors)}; accessibility violations: ${JSON.stringify(violations)}`; }
+    }
     const motion=await page.evaluate(()=>({preference:matchMedia('(prefers-reduced-motion: reduce)').matches,
       animated:[...document.querySelectorAll('main *')].some(e=>{const s=getComputedStyle(e);return s.animationName!=='none' && s.animationDuration.split(',').some(d=>parseFloat(d)>0);})}));
     const nonColor=await page.getByRole('status').filter({hasText:'Passed.'}).count()>0 && await page.getByTestId('lesson-completed').isVisible();

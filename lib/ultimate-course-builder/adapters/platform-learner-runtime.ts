@@ -58,7 +58,11 @@ export class UltimatePlatformLearnerRuntime implements UltimateLearnerRuntimePor
       } while (response.status === 202 && Date.now() < deadline);
       if (response.status === 202) throw new Error('ULTIMATE_BROWSER_TEST_DEADLINE_EXCEEDED');
     }
-    if (!response.ok) throw new Error(`Browser runthrough returned HTTP ${response.status}`);
+    if (!response.ok) {
+      const failure = await response.json().catch(() => ({}));
+      const detail = typeof failure.error === 'string' ? failure.error.slice(0, 1000) : 'No failure details';
+      throw new Error(`ULTIMATE_BROWSER_RUNTHROUGH_FAILED:HTTP ${response.status}:${detail}`);
+    }
     const { evidence, signature } = await response.json();
     const expected = createHmac('sha256', secret).update(contractHash(evidence)).digest('hex');
     if (

@@ -1,4 +1,4 @@
-merge_sha=287ddc344d293aaaaec5e3c7354b996d05e03775
+merge_sha=b5260741ebf0612e6544f7f53945328c46cf4677
 services=admin,lms
-requested_at=2026-10-01T14:40:00.000Z
-reason=Deploy apprenticeship hour approval and portal routing repairs through canonical Northflank production path
+requested_at=2026-10-01T17:40:00.000Z
+reason=Deploy host shop portal access and occupation-specific orientation media repairs

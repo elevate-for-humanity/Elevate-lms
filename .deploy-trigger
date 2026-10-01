@@ -2,3 +2,4 @@
 Admin + LMS production deployment checkpoint
 2026-10-01 deploy registered beauty apprenticeship standards alignment
 2026-10-01 retry production after Northflank exact-build payload repair
+2026-10-01 deploy after CDN probe and Northflank deployment repairs

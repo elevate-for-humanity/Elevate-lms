@@ -277,7 +277,7 @@ export default function LoginPage() {
             <Link
               href={
                 isProgramHolderLogin
-                  ? '/reset-password?portal=program-holder&next=/program-holder/dashboard'
+                  ? '/reset-password?portal=program-holder'
                   : '/reset-password'
               }
               className="text-sm font-semibold text-blue-700 hover:underline"

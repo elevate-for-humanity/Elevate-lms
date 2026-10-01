@@ -10,8 +10,21 @@ import {
 } from '../../lib/ultimate-course-builder/adapters/platform-renderer';
 import { UltimateSupabasePersistence } from '../../lib/ultimate-course-builder/persistence/supabase-persistence';
 import { createProductionHandlers } from '../../lib/ultimate-course-builder/core/production-handlers';
+import { evaluateUltimateLesson } from '../../lib/ultimate-course-builder/quality/lesson-quality';
+import { auditTraceability } from '../../lib/ultimate-course-builder/release/traceability';
 
 describe('Ultimate builder recovery', () => {
+  it('does not approve a rendered lesson with no learning objectives or traceability rows', () => {
+    const quality = evaluateUltimateLesson({
+      distinctShots: 7, loopDetected: false, captionSync: true,
+      narrationVisualAlignment: 1, naturalNarration: true,
+      objectivesTaught: 0, objectivesTotal: 0, guidedPractice: true,
+      independentPractice: true, assessmentCoverage: 1, remediation: true,
+      learnerRunthrough: true,
+    });
+    expect(quality).toMatchObject({ pass: false, failures: ['LEARNING_OBJECTIVES_MISSING'] });
+    expect(auditTraceability([])).toMatchObject({ pass: false, missingRows: true });
+  });
   it('stops at a failed prerequisite instead of fabricating downstream artifacts', async () => {
     const called: string[] = [];
     const handlers = Object.fromEntries(

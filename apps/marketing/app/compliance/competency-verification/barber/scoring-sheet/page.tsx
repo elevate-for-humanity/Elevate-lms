@@ -11,7 +11,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'Barber Apprenticeship Scoring Sheet',
-  description: 'Printable Barber competency scoring rubric aligned to the registered 14-competency Appendix A and 260-hour RTI requirement.'
+  description: 'Printable Barber competency scoring rubric aligned to the registered 14-competency Appendix A and 260-hour RTI requirement.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/compliance/competency-verification/barber/scoring-sheet' },
 };
 

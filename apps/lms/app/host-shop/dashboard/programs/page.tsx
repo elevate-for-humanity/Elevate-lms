@@ -18,6 +18,7 @@ export default async function HostShopProgramsPage() {
   const board = await getHostShopBoard(user.id);
   const configured = board.unconfiguredPrograms.length === 0;
   const timeBased = board.timeBasedPrograms.length > 0;
+  const hybrid = board.hybridPrograms.length > 0;
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
@@ -93,9 +94,11 @@ export default async function HostShopProgramsPage() {
                   <h3 className="font-black text-slate-950">{apprentice.name}</h3>
                   <p className="text-sm font-medium text-slate-600">
                     {config?.label || apprentice.program_slug || 'Apprenticeship'} ·{' '}
-                    {apprentice.tradeInfo.registered
-                      ? `Appendix A ${apprentice.tradeInfo.rapidsCode}`
-                      : apprentice.tradeInfo.progressModel === 'time_based'
+                    {apprentice.tradeInfo.progressModel === 'hybrid'
+                      ? `RAPIDS ${apprentice.tradeInfo.rapidsCode} · 2,000–2,500-hour hybrid term · ${apprentice.tradeInfo.rtiHours ?? 154} RTI`
+                      : apprentice.tradeInfo.registered
+                        ? `Appendix A ${apprentice.tradeInfo.rapidsCode}`
+                        : apprentice.tradeInfo.progressModel === 'time_based'
                         ? `${Number(apprentice.tradeInfo.hours || 0).toLocaleString()}-hour time-based progress`
                         : 'approved standard pending configuration'}
                   </p>

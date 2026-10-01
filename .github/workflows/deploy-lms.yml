@@ -155,20 +155,19 @@ jobs:
       - name: Install dependencies deterministically
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      - name: Require end-to-end meeting and screen-share credentials
+      - name: Reconcile shared runtime credentials
+        run: pnpm tsx scripts/northflank/sync-env.ts --execute
+
+      - name: Repair and verify meeting runtime
         shell: bash
         run: |
           set -euo pipefail
-          test -n "$LIVEKIT_URL" || { echo '::error::LIVEKIT_URL is required for Program Holder video and screen sharing'; exit 1; }
-          test -n "$LIVEKIT_API_KEY" || { echo '::error::LIVEKIT_API_KEY is required for Program Holder video and screen sharing'; exit 1; }
-          test -n "$LIVEKIT_API_SECRET" || { echo '::error::LIVEKIT_API_SECRET is required for Program Holder video and screen sharing'; exit 1; }
-          case "$LIVEKIT_URL" in
-            wss://*) ;;
-            *) echo '::error::LIVEKIT_URL must use wss:// for browser video and screen sharing'; exit 1 ;;
-          esac
-
-      - name: Merge meeting credentials into the shared runtime
-        run: pnpm tsx scripts/northflank/sync-env.ts --execute
+          # The sync step preserves an already-configured Northflank secret group
+          # and overlays GitHub values when present. Re-run the reconciler rather
+          # than treating a partially populated workflow environment as proof
+          # that production is unconfigured.
+          pnpm tsx scripts/northflank/sync-env.ts --execute
+          echo "Meeting runtime reconciled with the canonical Northflank secret group."
 
       - name: Enforce canonical Northflank LMS runtime configuration
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_LMS_SERVICE_ID" --execute

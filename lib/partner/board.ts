@@ -17,10 +17,11 @@ export type TradeTarget = {
   programSlug: string | null;
   hours: number | null;
   label: string;
-  progressModel: 'competency_based' | 'time_based' | 'unconfigured';
+  progressModel: 'competency_based' | 'hybrid' | 'time_based' | 'unconfigured';
   registered: boolean;
   competencyCount?: number;
   rtiHours?: number;
+  maxHours?: number;
   rapidsCode?: string;
   mentorRatio?: string;
   blockingReason?: string;
@@ -50,6 +51,19 @@ export function resolveTradeTarget(programSlug: string | null | undefined): Trad
     .trim()
     .toLowerCase();
   const canonical = REGISTERED_PROGRAM_ALIASES[raw] || raw;
+  if (canonical === 'cosmetology-apprenticeship') {
+    return {
+      programSlug: canonical,
+      hours: 2000,
+      maxHours: 2500,
+      label: 'Registered Hair Stylist / Cosmetologist Apprenticeship',
+      progressModel: 'hybrid',
+      registered: true,
+      rtiHours: 154,
+      rapidsCode: '0096HY V1',
+      mentorRatio: '1:1',
+    };
+  }
   const registered = canonical ? getRegisteredProgramStandard(canonical) : null;
   if (registered) {
     return {
@@ -465,6 +479,13 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
         .map((apprentice) => [apprentice.program_slug || 'unknown', apprentice.tradeInfo]),
     ).values(),
   );
+  const hybridPrograms = Array.from(
+    new Map(
+      apprentices
+        .filter((apprentice) => apprentice.tradeInfo.progressModel === 'hybrid')
+        .map((apprentice) => [apprentice.program_slug || 'unknown', apprentice.tradeInfo]),
+    ).values(),
+  );
   const unconfiguredPrograms = Array.from(
     new Map(
       apprentices
@@ -481,6 +502,7 @@ export const getHostShopBoard = cache(async function getHostShopBoard(userId: st
     programType,
     onboardingPaths,
     registeredPrograms,
+    hybridPrograms,
     timeBasedPrograms,
     unconfiguredPrograms,
     documentStatuses,

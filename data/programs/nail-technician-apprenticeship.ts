@@ -18,7 +18,7 @@ export const NAIL_TECH: ProgramSchema = {
   hoursPerWeekMin: 30,
   hoursPerWeekMax: 40,
   hoursBreakdown: { onlineInstruction: 210, handsOnLab: 0, examPrep: 0, careerPlacement: 0 },
-  schedule: 'Competency-based progression through 19 Appendix A competencies, with 210 required RTI hours and supervised host-site practice. Work hours are documented as training evidence rather than used as a fixed completion denominator.'
+  schedule: 'Competency-based progression through 19 Appendix A competencies, with 210 required RTI hours and supervised host-site practice. Work hours are documented as training evidence rather than used as a fixed completion denominator.',
   cohortSize: '1–3 apprentices per salon',
   fundingStatement:
     'Paid apprenticeship track available. For self-pay enrollment, BNPL starts at a $600 deposit with weekly payment options.',

@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UltimatePersistencePort } from '../core/ports';
 import { ULTIMATE_BUILD_STEPS } from '../core/types';
+import { MIN_LESSON_VIDEO_SCENES } from '@/lib/video/media-director';
 export class UltimateSupabasePersistence implements UltimatePersistencePort {
   constructor(private db: SupabaseClient) {}
   async createBuild(input: any) {
@@ -55,7 +56,18 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
       ['PACE_OUT_OF_RANGE', 'CLIPPED_WORDS'].includes(failure));
     const render = (artifacts.lesson_film_render as any)?.render;
     const oldLayout = render && render.layoutVersion !== 2;
-    const firstRebuildStep = narrationNeedsRepair ? 'natural_narration' : oldLayout ? 'lesson_film_render' : null;
+    const storyboard = (artifacts.storyboard as any)?.storyboard ?? artifacts.storyboard;
+    const insufficientScenes = Array.isArray(storyboard?.scenes) &&
+      storyboard.scenes.length < MIN_LESSON_VIDEO_SCENES;
+    const emptyObjectives = Array.isArray((artifacts.learning_objectives as any)?.objectives) &&
+      (artifacts.learning_objectives as any).objectives.length === 0;
+    const emptyTraceability = Array.isArray((artifacts.credential_release as any)?.release?.rows) &&
+      (artifacts.credential_release as any).release.rows.length === 0;
+    const firstRebuildStep = insufficientScenes ? 'storyboard'
+      : narrationNeedsRepair ? 'natural_narration'
+      : oldLayout ? 'lesson_film_render'
+      : emptyObjectives ? 'finished_media_qa'
+      : emptyTraceability ? 'credential_release' : null;
     const ordered: readonly string[] = ULTIMATE_BUILD_STEPS;
     const rebuildIndex = firstRebuildStep ? ordered.indexOf(firstRebuildStep) : -1;
     const reusable = rebuildIndex < 0 ? passed : passed.filter((step: any) => ordered.indexOf(String(step.step)) < rebuildIndex);

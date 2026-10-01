@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { ULTIMATE_LESSON_CONTRACT_VERSION } from '@/lib/ultimate-course-builder/core/lesson-contract';
 import { validateLessonBlueprint } from '@/lib/ultimate-course-builder/instructional/lesson-blueprint';
 import { NextRequest, NextResponse } from 'next/server';
@@ -8,6 +9,11 @@ import { UltimateAppendixAStandardsSource } from '@/lib/ultimate-course-builder/
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+function databaseFailure(error: unknown, status = 500) {
+  logger.error('Ultimate Course Builder database operation failed', error);
+  return NextResponse.json({ error: 'Course Builder operation failed. Check the server audit log.' }, { status });
+}
 
 type CompetencyRow = {
   competency_key?: string | null;
@@ -148,7 +154,7 @@ export async function GET(req: NextRequest) {
       .eq('id', buildId)
       .single();
     return error
-      ? NextResponse.json({ error: error.message }, { status: 500 })
+      ? databaseFailure(error)
       : NextResponse.json({ build: data });
   }
 
@@ -160,7 +166,7 @@ export async function GET(req: NextRequest) {
   if (courseId) query = query.eq('course_id', courseId);
   const { data, error } = await query;
   return error
-    ? NextResponse.json({ error: error.message }, { status: 500 })
+    ? databaseFailure(error)
     : NextResponse.json({ builds: data ?? [] });
 }
 
@@ -199,8 +205,9 @@ export async function POST(req: NextRequest) {
         try {
           validateLessonBlueprint(blueprint as any, competency);
         } catch (e) {
+          logger.error('Ultimate lesson blueprint validation failed', e);
           return NextResponse.json(
-            { error: e instanceof Error ? e.message : String(e) },
+            { error: 'Lesson blueprint does not satisfy the lesson contract' },
             { status: 400 },
           );
         }
@@ -233,7 +240,7 @@ export async function POST(req: NextRequest) {
       .eq('status', build.status)
       .select('id')
       .single();
-    if (saved.error) return NextResponse.json({ error: saved.error.message }, { status: 409 });
+    if (saved.error) return databaseFailure(saved.error, 409);
     return NextResponse.json({
       ok: true,
       buildId: build.id,
@@ -257,7 +264,7 @@ export async function POST(req: NextRequest) {
       .select('*')
       .single();
     return error
-      ? NextResponse.json({ error: error.message }, { status: 500 })
+      ? databaseFailure(error)
       : NextResponse.json({ ok: true, build: data });
   }
 
@@ -268,7 +275,7 @@ export async function POST(req: NextRequest) {
       .eq('id', body.buildId)
       .single();
     return error
-      ? NextResponse.json({ error: error.message }, { status: 500 })
+      ? databaseFailure(error)
       : NextResponse.json({ ok: true, build: data });
   }
 

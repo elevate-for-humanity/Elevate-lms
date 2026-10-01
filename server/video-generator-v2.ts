@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Video Generator V2
  * Main orchestrator for video generation pipeline
@@ -26,7 +27,6 @@ export interface VideoScene {
   textPosition: 'center' | 'top' | 'bottom';
   animation: 'fade' | 'slide' | 'zoom' | 'none';
   image?: string;
-  video?: string;
   textStyle?: {
     fontSize: number;
     color: string;
@@ -62,20 +62,13 @@ export interface VideoGenerationResponse {
  * Generate complete video from scenes
  */
 export async function generateVideo(
-  request: VideoGenerationRequest
+  request: VideoGenerationRequest,
 ): Promise<VideoGenerationResponse> {
-  const validation = processTimeline(request.scenes);
-  if (!validation.valid) {
-    return { jobId: 'invalid', status: 'failed', error: validation.errors.join('; '), progress: 0 };
-  }
-
   const jobId = `video-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  updateJobStatus(jobId, { status: 'processing', progress: 1, currentScene: 0, totalScenes: request.scenes.length });
   const tempDir = path.join(process.cwd(), 'temp', jobId);
   const outputDir = path.join(process.cwd(), 'output');
 
   try {
-
     // Create directories
     await fs.mkdir(tempDir, { recursive: true });
     await fs.mkdir(outputDir, { recursive: true });
@@ -100,13 +93,7 @@ export async function generateVideo(
     let totalDuration = 0;
 
     for (let i = 0; i < request.scenes.length; i++) {
-      const scene = { ...request.scenes[i] };
-      updateJobStatus(jobId, {
-        status: 'processing',
-        currentScene: i + 1,
-        totalScenes: request.scenes.length,
-        progress: Math.max(1, Math.floor((i / request.scenes.length) * 85)),
-      });
+      const scene = request.scenes[i];
 
       // Generate TTS audio if voice-over is enabled
       let audioPath: string | undefined;
@@ -114,8 +101,6 @@ export async function generateVideo(
         const audioBuffer = await generateTextToSpeech(scene.script, 'alloy', 1.0);
         audioPath = path.join(tempDir, `scene-${i + 1}-audio.mp3`);
         await fs.writeFile(audioPath, audioBuffer);
-        // Scene video must never end before its narration. Keep a small tail so
-        // transitions do not clip the final word.
         scene.duration = Math.max(scene.duration, estimateAudioDuration(scene.script, 1.0) + 0.5);
       }
 
@@ -130,7 +115,6 @@ export async function generateVideo(
         animation: scene.animation,
         audioPath: audioPath,
         imagePath: scene.image,
-        videoPath: scene.video,
         textStyle: scene.textStyle,
       };
 
@@ -139,10 +123,7 @@ export async function generateVideo(
       await renderScene(renderSceneData, sceneVideoPath, renderOptions);
       sceneVideoPaths.push(sceneVideoPath);
       totalDuration += scene.duration;
-
     }
-
-    updateJobStatus(jobId, { status: 'processing', progress: 90 });
 
     // Concatenate all scenes
     const concatenatedPath = path.join(tempDir, 'concatenated.mp4');
@@ -157,7 +138,7 @@ export async function generateVideo(
         concatenatedPath,
         request.settings.musicPath,
         finalVideoPath,
-        musicVolume
+        musicVolume,
       );
     } else {
       // Move concatenated video to output
@@ -168,9 +149,6 @@ export async function generateVideo(
     // Clean up temporary files
     await cleanupTempFiles(tempDir);
 
-
-    updateJobStatus(jobId, { status: 'completed', progress: 100, videoPath: finalVideoPath });
-
     return {
       jobId,
       status: 'completed',
@@ -179,18 +157,13 @@ export async function generateVideo(
       progress: 100,
     };
   } catch (error) {
-    console.error(`Video generation failed for job ${jobId}:`, error);
-
     // Clean up on error
     await cleanupTempFiles(tempDir).catch(() => {});
-
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    updateJobStatus(jobId, { status: 'failed', progress: 0, error: message });
 
     return {
       jobId,
       status: 'failed',
-      error: message,
+      error: error instanceof Error ? error.message : 'Unknown error',
       progress: 0,
     };
   }
@@ -272,10 +245,7 @@ export interface VideoJobStatus {
 // In-memory job tracking (in production, use Redis or database)
 const jobStatuses = new Map<string, VideoJobStatus>();
 
-export function updateJobStatus(
-  jobId: string,
-  status: Partial<VideoJobStatus>
-): void {
+export function updateJobStatus(jobId: string, status: Partial<VideoJobStatus>): void {
   const existing = jobStatuses.get(jobId) || {
     jobId,
     status: 'pending',

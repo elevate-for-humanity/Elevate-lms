@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Search, ArrowRight } from 'lucide-react';
+import { Search, ArrowRight, ShieldCheck } from 'lucide-react';
 import type { CommerceCatalogItem, CommerceCategory } from '@/lib/store/commerce-catalog';
 
 const CATEGORY_LABELS: Record<'all' | CommerceCategory, string> = {
@@ -119,6 +119,12 @@ export default function CommerceCatalogClient({ items }: { items: CommerceCatalo
                 >
                   {item.status === 'sellable' ? 'View plans' : item.status === 'preview' ? 'Explore preview' : 'Explore options'}
                   <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href={`/store/proof#offer-${item.id}`}
+                  className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-emerald-800 hover:underline"
+                >
+                  <ShieldCheck className="h-4 w-4" /> Verify claims and source
                 </Link>
               </div>
             </article>

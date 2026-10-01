@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { ShieldCheck } from 'lucide-react';
 import {
   CAPABILITY_CATALOG,
   type CapabilityCategory,
@@ -292,6 +293,12 @@ export function UnifiedSalesMarketplace() {
                         Open Live Demo
                       </Link>
                     ) : null}
+                    <Link
+                      href={`/store/proof#feature-${capability.key}`}
+                      className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-emerald-50 px-4 py-2.5 text-sm font-black text-emerald-900 hover:bg-emerald-100"
+                    >
+                      <ShieldCheck className="h-4 w-4" /> View source-backed proof
+                    </Link>
                   </div>
                 </div>
               </article>

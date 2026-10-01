@@ -17,6 +17,8 @@ on:
       - 'scripts/northflank/configure-store-domain.ts'
       - 'scripts/northflank/attach-store-secret-group.ts'
       - 'scripts/northflank/resolve-store-runtime-url.ts'
+      - 'scripts/verify-store-proof-contract.ts'
+      - 'scripts/verify-store-runtime.mjs'
       - 'Dockerfile.marketing'
       - '.github/workflows/deploy-store.yml'
 
@@ -91,6 +93,9 @@ jobs:
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
           test -n "$NEXTAUTH_SECRET"
           test -n "$STRIPE_SECRET_KEY"
+
+      - name: Reject Store offers without source-backed proof
+        run: pnpm exec tsx scripts/verify-store-proof-contract.ts
 
       - name: Validate isolated store service contract
         run: pnpm exec tsx scripts/northflank/configure-store.ts
@@ -169,6 +174,11 @@ jobs:
           grep -q 'Authentication required' /tmp/checkout-unauth.json
 
           echo "Accepted isolated store runtime at ${RUNTIME_URL}"
+
+      - name: Verify Store proof index and Website Builder runtime
+        env:
+          RUNTIME_URL: ${{ steps.runtime.outputs.url }}
+        run: node scripts/verify-store-runtime.mjs "$RUNTIME_URL" "$GITHUB_SHA"
 
       - name: Branded store domain acceptance
         shell: bash

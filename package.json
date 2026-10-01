@@ -251,6 +251,7 @@
     "integrity:media": "node scripts/integrity/media.mjs",
     "integrity:lms": "node scripts/integrity/lms.mjs",
     "integrity:store": "node scripts/integrity/store.mjs",
+    "integrity:store-proof": "tsx scripts/verify-store-proof-contract.ts",
     "integrity:stripe": "node scripts/check-stripe-integrity.mjs",
     "integrity:analytics": "node scripts/check-analytics-integrity.mjs",
     "integrity:self-service": "node scripts/check-self-service-policy.mjs",

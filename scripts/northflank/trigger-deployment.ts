@@ -3,9 +3,10 @@
  * Deploy one exact Northflank build.
  *
  * The build is created and verified before this script runs. Deployment must use
- * Northflank's deployment endpoint with the concrete verified build ID. The SHA
- * is validated and logged here, but Northflank rejects deployment requests that
- * specify both buildId and buildSHA in the same payload.
+ * Northflank's deployment endpoint with both the concrete verified build ID and
+ * its Git SHA. A 200 response from that endpoint contains no deployment identity,
+ * so the script also requires Northflank's deployment history to acknowledge the
+ * exact commit before returning success.
  *
  * Usage:
  *   npx tsx scripts/northflank/trigger-deployment.ts <service-id> --build-id <build-id> --sha <sha>
@@ -13,9 +14,36 @@
 
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 
+type ServiceDeployment = {
+  id: string;
+  active?: boolean;
+  commit?: { sha?: string };
+};
+
+type ServiceDeploymentList = {
+  deployments?: ServiceDeployment[];
+};
+
+const HANDOFF_TIMEOUT_MS = Number(process.env.NORTHFLANK_HANDOFF_TIMEOUT_MS || 120_000);
+const HANDOFF_POLL_MS = Number(process.env.NORTHFLANK_HANDOFF_POLL_MS || 5_000);
+
 function readArgument(name: string): string | undefined {
   const index = process.argv.indexOf(name);
   return index === -1 ? undefined : process.argv[index + 1];
+}
+
+async function listDeployments(
+  projectId: string,
+  serviceId: string,
+): Promise<ServiceDeployment[]> {
+  const result = await nfFetch<ServiceDeploymentList>(
+    projectApiPath(projectId, `/services/${serviceId}/deployments?per_page=20`),
+  );
+  return Array.isArray(result.deployments) ? result.deployments : [];
+}
+
+function shaMatches(actual: string | undefined, expected: string): boolean {
+  return actual?.toLowerCase() === expected.toLowerCase();
 }
 
 async function main(): Promise<void> {
@@ -53,13 +81,21 @@ async function main(): Promise<void> {
   console.log(`Branch:   ${branch}`);
 
   const deploymentPath = projectApiPath(projectId, `/services/${serviceId}/deployment`);
-  // Northflank requires branch alongside the internal service id. Keep the
-  // concrete verified buildId so deployment remains pinned to the artifact
-  // that passed build verification.
+  const deploymentsPath = projectApiPath(
+    projectId,
+    `/services/${serviceId}/deployments?per_page=20`,
+  );
+  const deploymentsBefore = await listDeployments(projectId, serviceId);
+  const existingDeploymentIds = new Set(deploymentsBefore.map((deployment) => deployment.id));
+
+  // Northflank's internal-deployment contract accepts the build identity and
+  // source commit together. Supplying both prevents an accepted request from
+  // resolving to a previous build on the same branch.
   const deploymentPayload = {
     internal: {
       id: serviceId,
       branch,
+      buildSHA: sha,
       buildId,
     },
     docker: { configType: 'default' as const },
@@ -71,7 +107,39 @@ async function main(): Promise<void> {
   });
 
   console.log('Exact Northflank deployment request accepted.');
-  console.log(`Deployment source locked to verified build ${buildId} for SHA ${sha}.`);
+  console.log('Waiting for Northflank to acknowledge the exact deployment handoff...');
+
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < HANDOFF_TIMEOUT_MS) {
+    const deployments = await nfFetch<ServiceDeploymentList>(deploymentsPath);
+    const matching = deployments.deployments?.find(
+      (deployment) =>
+        shaMatches(deployment.commit?.sha, sha) &&
+        (deployment.active === true || !existingDeploymentIds.has(deployment.id)),
+    );
+
+    if (matching) {
+      console.log(
+        `Deployment handoff acknowledged: ${matching.id} (${matching.active ? 'active' : 'created'}) for ${sha}.`,
+      );
+      console.log(`Deployment source locked to verified build ${buildId} for SHA ${sha}.`);
+      return;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, HANDOFF_POLL_MS));
+  }
+
+  const latest = await listDeployments(projectId, serviceId);
+  const summary = latest
+    .slice(0, 5)
+    .map(
+      (deployment) =>
+        `${deployment.id}:${deployment.commit?.sha ?? 'missing-sha'}:${deployment.active ? 'active' : 'inactive'}`,
+    )
+    .join(', ');
+  throw new Error(
+    `Northflank accepted the deployment request but did not create or activate SHA ${sha} within ${HANDOFF_TIMEOUT_MS}ms. Latest deployments: ${summary || 'none'}`,
+  );
 }
 
 main().catch((error) => {

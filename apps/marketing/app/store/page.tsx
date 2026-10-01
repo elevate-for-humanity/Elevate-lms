@@ -3,7 +3,7 @@ export const revalidate = 0;
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, PlayCircle, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, PlayCircle, ShieldCheck, Sparkles } from 'lucide-react';
 import StoreFAQ from './StoreFAQ';
 import { ROICalculator } from '@/components/store/ROICalculator';
 import { UnifiedSalesMarketplace } from '@/components/store/UnifiedSalesMarketplace';
@@ -58,8 +58,9 @@ export default function StorePage() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link href="/store/trial" className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-red-700 px-6 py-3 text-center font-black text-white hover:bg-brand-red-800 sm:w-auto">Start Free Trial</Link>
               <Link href="#role-demos" className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-6 py-3 text-center font-black text-slate-950 hover:border-brand-red-600 sm:w-auto">See Role Demos</Link>
+              <Link href="/store/proof" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-emerald-300 bg-emerald-50 px-6 py-3 text-center font-black text-emerald-950 hover:border-emerald-600 sm:w-auto"><ShieldCheck className="h-5 w-5" /> Verify Every Offer</Link>
             </div>
-            <p className="mt-4 text-sm font-semibold text-slate-600">14 days · no card required · build new or connect an existing website</p>
+            <p className="mt-4 text-sm font-semibold text-slate-600">14 days · no card required · source-backed proof and limits available before checkout</p>
           </div>
           <div className="relative h-[280px] min-w-0 overflow-hidden rounded-2xl bg-slate-950 shadow-xl ring-1 ring-slate-200 sm:h-[500px] sm:rounded-3xl sm:shadow-2xl">
             <SafeHeroVideo src={STORE_VIDEO} poster="/images/pages/platform-page-1.webp" ariaLabel="Elevate connected business and workforce platform" className="absolute inset-0 h-full w-full object-cover" />

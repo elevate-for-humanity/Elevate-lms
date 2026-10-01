@@ -62,6 +62,9 @@ export function AddOnMarketplaceSection({ selectedSlugs, onToggle }: Props) {
                   <Plus className="w-4 h-4" />
                   {selected ? 'Included at checkout' : 'Add to checkout'}
                 </button>
+                <Link href={`/store/proof#offer-${addon.slug}`} className="mt-3 text-center text-sm font-black text-emerald-800 underline underline-offset-4">
+                  Verify claims and source
+                </Link>
               </div>
             );
           })}

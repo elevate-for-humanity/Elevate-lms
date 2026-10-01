@@ -93,6 +93,7 @@ export function PlatformBasePlansSection({
                   {loadingPlan === plan.id ? 'Loading secure checkout…' : `Subscribe — $${price}${priceLabel}`}
                 </button>
                 <Link href="/store/trial" className={`mt-2 block w-full rounded-lg border py-2.5 text-center text-sm font-semibold ${popular ? 'border-white/40 text-white hover:bg-white/10' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`}>14-day free trial — no card required</Link>
+                <Link href={`/store/proof#offer-plan-${plan.id}`} className={`mt-3 text-center text-sm font-black underline underline-offset-4 ${popular ? 'text-white' : 'text-emerald-800'}`}>Verify included capabilities</Link>
               </div>
             );
           })}

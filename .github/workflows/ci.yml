@@ -41,6 +41,8 @@ jobs:
         run: node scripts/verify-payment-lifecycle-contract.mjs
       - name: Canonical Store commerce contract
         run: node scripts/verify-store-commerce-contract.mjs
+      - name: Store source-backed offer proof
+        run: pnpm exec tsx scripts/verify-store-proof-contract.ts
       - name: Canonical platform route and auth doctor
         run: node scripts/platform-doctor-static.mjs
       - name: Canonical portal contracts

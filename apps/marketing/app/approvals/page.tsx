@@ -70,13 +70,21 @@ export default async function ApprovalsPage() {
               <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Sponsor of Record</dt><dd className="mt-1 font-black">{registeredPrograms[0].sponsor.sponsor}</dd></div>
               <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Registration</dt><dd className="mt-1 font-black">{registeredPrograms[0].sponsor.registrationNumber}</dd></div>
             </dl>
-            <div className="mt-7 grid gap-4 md:grid-cols-3">{registeredPrograms.map((program) => <article key={program.standardKey} className="rounded-2xl bg-slate-50 p-5">
-              <h3 className="text-xl font-black">{program.standard.occupationTitle}</h3>
-              <p className="mt-2 text-sm font-bold text-slate-600">RAPIDS occupation {program.standard.rapidsCode}</p>
-              <p className="mt-3 text-sm leading-6 text-slate-700">Competency-based: {program.completion.competencyCount} verified competencies and {program.completion.requiredRtiHours} verified RTI hours.</p>
-              <Link href={`/programs/${program.canonicalProgramSlug}`} className="mt-4 inline-flex font-black text-brand-blue-700">View pathway →</Link>
-            </article>)}</div>
-            <p className="mt-6 leading-7 text-slate-700">Supervised work, employer wage schedules, and state-licensing records are maintained separately for the applicable occupation and participant. Cosmetology is not included in this registered-occupation list.</p>
+            <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {registeredPrograms.map((program) => <article key={program.standardKey} className="rounded-2xl bg-slate-50 p-5">
+                <h3 className="text-xl font-black">{program.standard.occupationTitle}</h3>
+                <p className="mt-2 text-sm font-bold text-slate-600">RAPIDS occupation {program.standard.rapidsCode}</p>
+                <p className="mt-3 text-sm leading-6 text-slate-700">Competency-based: {program.completion.competencyCount} verified competencies and {program.completion.requiredRtiHours} verified RTI hours.</p>
+                <Link href={`/programs/${program.canonicalProgramSlug}`} className="mt-4 inline-flex font-black text-brand-blue-700">View pathway →</Link>
+              </article>)}
+              <article className="rounded-2xl bg-slate-50 p-5">
+                <h3 className="text-xl font-black">Hair Stylist / Cosmetologist</h3>
+                <p className="mt-2 text-sm font-bold text-slate-600">RAPIDS occupation 0096HY V1</p>
+                <p className="mt-3 text-sm leading-6 text-slate-700">Hybrid: 2,000–2,500-hour registered term and 154 verified RTI hours. The 500-hour figure is probation, not completion.</p>
+                <Link href="/programs/cosmetology-apprenticeship" className="mt-4 inline-flex font-black text-brand-blue-700">View pathway →</Link>
+              </article>
+            </div>
+            <p className="mt-6 leading-7 text-slate-700">Supervised work, employer wage schedules, RTI records, competency or work-process records, and state-licensing records are maintained separately for the applicable occupation and participant.</p>
             <Link href="/compliance/apprenticeship-structure" className="mt-5 inline-flex rounded-xl border border-slate-300 px-5 py-3 text-sm font-black">Review apprenticeship structure</Link>
           </div>
         </section>

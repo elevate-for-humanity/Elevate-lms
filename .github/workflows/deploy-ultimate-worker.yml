@@ -35,6 +35,8 @@ jobs:
       USAJOBS_USER_AGENT_EMAIL: ${{ secrets.USAJOBS_USER_AGENT_EMAIL }}
       CAREERONESTOP_USER_ID: ${{ secrets.CAREERONESTOP_USER_ID }}
       CAREERONESTOP_API_KEY: ${{ secrets.CAREERONESTOP_API_KEY || secrets.CAREERONESTOP_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_AI_API_TOKEN: ${{ secrets.CLOUDFLARE_AI_API_TOKEN || secrets.CLOUDFLARE_API_TOKEN }}
     steps:
       - name: Checkout exact Ultimate source branch
         uses: actions/checkout@v4
@@ -67,6 +69,8 @@ jobs:
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
           test -n "$NORTHFLANK_API_TOKEN"
           test -n "$ULTIMATE_SOURCE_SHA"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test -n "$CLOUDFLARE_AI_API_TOKEN"
           for key in ONET_API_KEY USAJOBS_API_KEY USAJOBS_USER_AGENT_EMAIL CAREERONESTOP_USER_ID CAREERONESTOP_API_KEY; do
             if [ -z "${!key:-}" ]; then echo "::warning::Ultimate workforce feed credential $key is unavailable"; fi
           done

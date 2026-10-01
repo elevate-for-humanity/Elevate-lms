@@ -13,6 +13,8 @@ import {
 import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
+import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
+import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
 import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
 import BarberPaymentPlanner from '@/components/programs/beauty/BarberPaymentPlanner';
 import KountryKutzTourSlideshow from '@/components/programs/beauty/KountryKutzTourSlideshow';
@@ -207,6 +209,9 @@ export default async function BarberApprenticeshipPage() {
           </div>
         </div>
       </section>
+
+      <ApprenticeshipExperienceGuide programTitle={program.title} applyHref={program.cta.applyHref} />
+      <HostShopPlacementGuide programSlug="barber-apprenticeship" />
 
       <section
         data-scroll-narration

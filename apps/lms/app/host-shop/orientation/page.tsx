@@ -146,6 +146,9 @@ export default async function HostShopOrientationPage({ searchParams }: { search
   const params = searchParams ? await searchParams : {};
   const canSign = Boolean(board.partner?.mou_signed) && board.missingDocuments.length === 0 && board.pendingDocuments.length === 0 && contracts.length > 0 && board.unconfiguredPrograms.length === 0;
   const orientations = contracts.map((contract) => ({ contract, course: buildHostShopApprenticeshipOrientation(contract.canonicalProgramSlug) }));
+  const orientationMedia = contracts.some((contract) => contract.canonicalProgramSlug === 'barber-apprenticeship')
+    ? { src: '/videos/barber-lessons/barber-apprenticeship-intro.mp4', poster: '/images/pages/barber-gallery-1.webp', label: 'Barber apprenticeship orientation' }
+    : null;
 
   return <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
     <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">Required Host Shop Training · Version {HOST_SHOP_ORIENTATION_VERSION}</p>
@@ -155,7 +158,7 @@ export default async function HostShopOrientationPage({ searchParams }: { search
     <section className="mt-6 overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 text-white shadow-sm">
       <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
         <div className="p-6 sm:p-8"><p className="text-xs font-black uppercase tracking-[0.16em] text-cyan-300">Orientation media</p><h2 className="mt-2 text-2xl font-black">See the apprenticeship workflow before you certify it.</h2><p className="mt-3 text-sm font-medium leading-6 text-slate-200">This overview introduces the same Host Shop responsibilities covered below: supervised OJL, RTI coordination, accurate hours, competency sign-off, wages, safety, and sponsor oversight. The written registered-standard modules and electronic signature remain the controlling orientation record.</p></div>
-        <video className="min-h-[260px] h-full w-full object-cover" controls playsInline preload="metadata" poster="/images/pages/barber-gallery-1.webp"><source src="/videos/barber-lessons/barber-apprenticeship-intro.mp4" type="video/mp4" />Your browser does not support the orientation video.</video>
+        {orientationMedia ? <video className="min-h-[260px] h-full w-full object-cover" controls playsInline preload="metadata" poster={orientationMedia.poster} aria-label={orientationMedia.label}><source src={orientationMedia.src} type="video/mp4" />Your browser does not support the orientation video.</video> : <div className="flex min-h-[260px] items-center justify-center bg-slate-900 p-8 text-center text-sm font-semibold text-slate-200">Occupation-specific orientation video is not published for this program yet. Complete the registered-standard orientation modules and acknowledgment below; a missing media asset does not block the written orientation.</div>}
       </div>
     </section>
 

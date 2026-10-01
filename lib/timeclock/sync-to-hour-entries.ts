@@ -116,6 +116,7 @@ export async function syncProgressEntryToHourEntries(
     accepted_hours:     hoursWorked,
     hours:              hoursWorked,
     category:           'ojl',
+    host_shop_id:        apprentice.shop_id || apprentice.employer_id || entry.site_id || null,
     status:             entry.auto_clocked_out ? 'pending' : 'approved',
     approval_status:    entry.auto_clocked_out ? 'pending' : 'approved',
     progress_entry_id:  entry.id,

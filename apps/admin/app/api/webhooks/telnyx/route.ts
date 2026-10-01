@@ -751,8 +751,11 @@ async function handleEvent(
       .eq('enabled', true)
       .order('position');
     if (system.routing_mode === 'menu' && options?.length) {
+      const { data: workspace } = await db.from('communication_workspaces').select('id').eq('phone_system_id', system.id).maybeSingle();
+      const { data: directory } = workspace?.id ? await db.from('communication_extensions').select('extension,display_name,department').eq('workspace_id', workspace.id).eq('enabled', true).order('extension') : { data: [] };
+      const directoryPrompt = (directory || []).map((entry: any) => entry.extension === '0' ? `For Elizabeth Greene, Administrator, press 0.` : `For ${entry.display_name}${entry.department ? `, ${entry.department}` : ''}, dial extension ${entry.extension}.`).join(' ');
       await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
-        payload: `${system.greeting} If you know your party's three-digit extension, dial it now. ${menuPrompt('', options.filter((option: any) => ![0, 8, 9].includes(Number(option.digit))))} Press 9 for PARIS, or press 0 for immediate assistance.`,
+        payload: `${system.greeting} ${directoryPrompt} If you know your party's extension, dial it now. Press 9 for PARIS.`,
         voice: 'Telnyx.KokoroTTS.af',
         minimum_digits: 1,
         maximum_digits: 3,

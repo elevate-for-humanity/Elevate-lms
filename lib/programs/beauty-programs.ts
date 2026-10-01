@@ -18,8 +18,14 @@ export interface BeautyProgramConfig {
   color: string;
   /** Indiana license name */
   licenseTitle: string;
-  /** Required OJT hours */
+  /** Registered minimum work/term hours when the occupation uses an hour-based or hybrid term. Competency-based programs use 0 here. */
   ojtHours: number;
+  /** Registered RTI hours. */
+  rtiHours: number;
+  /** Registered progress model. */
+  progressModel: 'competency_based' | 'hybrid';
+  competencyCount?: number;
+  probationHours: number;
   /** Deposit amount in cents (for Stripe payment intent) */
   depositCents: number;
   /** Full tuition in cents */
@@ -44,11 +50,14 @@ export interface BeautyProgramConfig {
 export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
   'cosmetology-apprenticeship': {
     slug: 'cosmetology-apprenticeship',
-    title: 'Cosmetology Apprenticeship',
-    shortTitle: 'Cosmetology',
+    title: 'Hair Stylist Apprenticeship',
+    shortTitle: 'Hair Stylist / Cosmetologist',
     color: 'purple',
     licenseTitle: 'Indiana Cosmetology License',
     ojtHours: 2000,
+    rtiHours: 154,
+    progressModel: 'hybrid',
+    probationHours: 500,
     depositCents: 210000,
     fullTuitionCents: 600000,
     stripeDepositLink: 'https://buy.stripe.com/fZu00j2UUdnofsDcfDgIo0a',
@@ -57,8 +66,8 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     orientationTime: '10–12 minutes',
     nextSteps: [
       { title: 'Complete orientation', desc: 'Sanitation, safety, and salon protocols — required before hands-on training' },
-      { title: 'Apply for your Indiana Cosmetology License', desc: 'We guide you through the PLA application — 1,500 hours required for licensure' },
-      { title: 'Log OJT hours weekly', desc: '2,000 hours required — track via your apprentice dashboard' },
+      { title: 'Complete the registered hybrid term', desc: 'RAPIDS 0096HY V1 requires a 2,000–2,500-hour hybrid term plus 154 RTI hours; 500 hours is probation, not graduation' },
+      { title: 'Complete Indiana licensing steps', desc: 'After registered-program completion, follow the applicable Indiana examination and licensing process' },
     ],
   },
   'esthetician': {
@@ -67,7 +76,11 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     shortTitle: 'Esthetician',
     color: 'pink',
     licenseTitle: 'Indiana Esthetician License',
-    ojtHours: 2000,
+    ojtHours: 0,
+    rtiHours: 300,
+    progressModel: 'competency_based',
+    competencyCount: 20,
+    probationHours: 500,
     depositCents: 112000,
     fullTuitionCents: 320000,
     stripeDepositLink: 'https://buy.stripe.com/cNicN52UU4QS4NZ1AZgIo06',
@@ -77,7 +90,7 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     nextSteps: [
       { title: 'Complete orientation', desc: 'Sanitation, safety, and spa protocols — required before hands-on training' },
       { title: 'Apply for your Indiana Esthetician License', desc: 'We guide you through the Indiana licensing application after completing the registered apprenticeship requirements' },
-      { title: 'Log OJT hours weekly', desc: '2,000 OJL hours required — track via your apprentice dashboard' },
+      { title: 'Complete registered requirements', desc: 'Complete 20 verified Appendix A competencies plus 300 RTI hours; work hours remain auditable training evidence and 500 hours is probation' },
     ],
   },
   'nail-technician-apprenticeship': {
@@ -86,7 +99,11 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     shortTitle: 'Nail Tech',
     color: 'rose',
     licenseTitle: 'Indiana Nail Technician License',
-    ojtHours: 2000,
+    ojtHours: 0,
+    rtiHours: 210,
+    progressModel: 'competency_based',
+    competencyCount: 19,
+    probationHours: 500,
     depositCents: 175000,
     fullTuitionCents: 500000,
     stripeDepositLink: 'https://buy.stripe.com/cNicN52UU4QS4NZ1AZgIo06',
@@ -96,7 +113,7 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     nextSteps: [
       { title: 'Complete orientation', desc: 'Sanitation, safety, and salon protocols — required before hands-on training' },
       { title: 'Apply for your Indiana Nail Technician License', desc: 'We guide you through the Indiana licensing application after completing the registered apprenticeship requirements' },
-      { title: 'Log OJT hours weekly', desc: '2,000 OJL hours required — track via your apprentice dashboard' },
+      { title: 'Complete registered requirements', desc: 'Complete 19 verified Appendix A competencies plus 210 RTI hours; work hours remain auditable training evidence and 500 hours is probation' },
     ],
   },
 };

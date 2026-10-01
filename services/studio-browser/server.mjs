@@ -10,7 +10,7 @@ import { pipeline } from 'node:stream/promises';
 import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 import { chromium } from 'playwright-core';
-import { runLearnerTest, credentialMatches } from './learner-runthrough.mjs';
+import { runLearnerTest, credentialMatches, learnerSetupReady } from './learner-runthrough.mjs';
 
 const execFileAsync = promisify(execFile);
 
@@ -1023,7 +1023,9 @@ const server = http.createServer(async (req, res) => {
       const probe = await fetch(`${process.env.STUDIO_LEARNER_LMS_URL || 'https://app.elevateforhumanity.org'}/api/learner-testing/runs`, {
         method: 'POST', headers: { authorization: `Bearer ${credential}`, 'content-type': 'application/json' },
         body: JSON.stringify({ lessonBuildId: '00000000-0000-0000-0000-000000000000' }), signal: AbortSignal.timeout(15000) });
-      return json(res, probe.status === 404 ? 200 : 503, { ready: probe.status === 404, lmsSetupStatus: probe.status, commit: process.env.GIT_SHA });
+      const probeBody = await probe.json().catch(() => null);
+      const ready = learnerSetupReady(probe.status, probeBody);
+      return json(res, ready ? 200 : 503, { ready, lmsSetupStatus: probe.status, commit: process.env.GIT_SHA });
     }
     if (req.method === 'POST' && url.pathname === '/learner/runthrough') {
       const credential = process.env.ULTIMATE_LEARNER_RUNTHROUGH_SECRET;

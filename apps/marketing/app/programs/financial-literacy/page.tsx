@@ -10,16 +10,16 @@ import { TEAM } from '@/data/team';
 
 const PROGRAM = {
   slug: 'financial-literacy',
-  title: 'Financial Literacy Program',
+  title: 'Accounting & Financial Empowerment Career Pathway',
   description:
-    'A practical financial literacy course that helps participants take control of their finances and build a stronger financial future.',
+    'One 8-week pathway combining personal finance, bookkeeping fundamentals, Excel for accounting and business finance, and QuickBooks Online.',
   category: 'business',
 } as const;
 
 const canonical = `${PLATFORM_DEFAULTS.siteUrl}/programs/financial-literacy`;
 
 export const metadata: Metadata = {
-  title: 'Financial Literacy Program | Elevate for Humanity',
+  title: 'Accounting & Financial Empowerment Career Pathway | Elevate for Humanity',
   description: PROGRAM.description,
   alternates: { canonical },
   openGraph: {
@@ -83,12 +83,12 @@ export default function FinancialLiteracyPage() {
             Financial Literacy Program
           </h1>
           <p className="mt-3 text-xl font-extrabold text-orange-300 sm:text-2xl">
-            Featuring the Elevate Financial Empowerment Program
+            8 Weeks · Five Progressive Skill Levels
           </p>
           <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-200">{PROGRAM.description}</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
-              href="/apply/student?program=financial-literacy"
+              href="/apply/student?program=bookkeeping"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-4 font-extrabold text-white hover:bg-brand-red-700"
             >
               Apply for Training <ArrowRight className="h-5 w-5" aria-hidden="true" />
@@ -146,7 +146,7 @@ export default function FinancialLiteracyPage() {
           </h2>
           <div className="mt-6 max-w-4xl space-y-5 text-lg leading-8 text-slate-700">
             <p>
-              The Elevate Financial Empowerment Program, taught within Elevate&apos;s Financial Literacy Program, is a practical course
+              The Elevate Financial Empowerment Program is the personal-finance foundation of this 8-week Accounting &amp; Financial Empowerment Career Pathway. It is not a separate training track. The pathway is a practical program
               designed to help participants take control of their finances and build a stronger
               financial future. Participants learn essential skills in budgeting, banking, saving,
               credit and credit scores, debt management, consumer protection, taxes, insurance,
@@ -187,7 +187,7 @@ export default function FinancialLiteracyPage() {
             <ShieldCheck className="h-8 w-8 text-slate-700" aria-hidden="true" />
             <h2 className="mt-4 text-2xl font-black text-slate-950">FREE to those who qualify</h2>
             <p className="mt-3 leading-7 text-slate-700">
-              Financial Literacy is delivered within Elevate&apos;s funded Bookkeeping and Financial Empowerment pathway. Eligible participants may receive workforce funding for approved training costs.
+              Personal finance and financial literacy are delivered inside Elevate&apos;s 8-week Accounting &amp; Financial Empowerment Career Pathway rather than as a duplicate standalone course. Eligible participants may receive workforce funding for approved training costs.
             </p>
             <p className="mt-3 text-sm leading-6 text-slate-700">
               Funding is not automatic. Participant eligibility and program authorization are determined by the responsible workforce agency. Self-pay and payment options remain available for participants who do not qualify.

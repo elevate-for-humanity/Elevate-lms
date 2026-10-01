@@ -1,4 +1,5 @@
 import type { UltimateRenderPort } from '../core/ports';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { MIN_LESSON_VIDEO_SCENES, type MediaDirectorInput } from '@/lib/video/media-director';
 
 type RecordLike = Record<string, any>;
@@ -37,6 +38,40 @@ function visualAssignment(input: any): RecordLike {
       input.artifacts?.scene_construction?.scenes?.media ??
       input.media,
   );
+}
+
+/** Checkpointed visual assignments contain short-lived signed URLs. Renew them
+ * from the licensed storage path at the point of rendering, including resumes
+ * that skip visual_assignment entirely. Never fall back to an expired URL. */
+export async function refreshLicensedVisualUrls(input: any, db: SupabaseClient): Promise<any> {
+  const assignment = visualAssignment(input);
+  if (!Array.isArray(assignment.readyAssets)) return input;
+  const readyAssets = await Promise.all(assignment.readyAssets.map(async (value: unknown) => {
+    const asset = record(value);
+    if (!asset.storage_path) {
+      if (typeof asset.public_url === 'string' && asset.public_url.includes('/object/sign/')) {
+        throw new Error(`ULTIMATE_LICENSED_VISUAL_STORAGE_PATH_REQUIRED:${String(asset.id ?? 'unknown')}`);
+      }
+      return asset;
+    }
+    const { data, error } = await db.storage
+      .from('course_videos')
+      .createSignedUrl(String(asset.storage_path), 60 * 60);
+    if (error || !data?.signedUrl) {
+      throw new Error(`ULTIMATE_LICENSED_VISUAL_URL_REFRESH_FAILED:${String(asset.id ?? asset.storage_path)}`);
+    }
+    return { ...asset, public_url: data.signedUrl };
+  }));
+  return {
+    ...input,
+    artifacts: {
+      ...input.artifacts,
+      visual_assignment: {
+        ...input.artifacts?.visual_assignment,
+        media: { ...assignment, readyAssets },
+      },
+    },
+  };
 }
 
 function visualCandidates(input: any): VisualCandidate[] {
@@ -207,8 +242,12 @@ function instructorFor(courseTitle: string): string {
 }
 
 export class UltimatePlatformRenderer implements UltimateRenderPort {
+  constructor(private db?: SupabaseClient) {}
+
   async render(input: any) {
-    const prepared = prepareUltimateStoryboardInput(input);
+    const prepared = prepareUltimateStoryboardInput(
+      this.db ? await refreshLicensedVisualUrls(input, this.db) : input,
+    );
     const [{ directMedia }, { renderStoryboardVideo }] = await Promise.all([
       import('@/lib/video/media-director'),
       import('@/lib/video/remotion-render'),

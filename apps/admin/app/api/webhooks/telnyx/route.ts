@@ -755,7 +755,7 @@ async function handleEvent(
       const { data: directory } = workspace?.id ? await db.from('communication_extensions').select('extension,display_name,department').eq('workspace_id', workspace.id).eq('enabled', true).order('extension') : { data: [] };
       const directoryPrompt = (directory || []).map((entry: any) => entry.extension === '0' ? `For Elizabeth Greene, Administrator, press 0.` : `For ${entry.display_name}${entry.department ? `, ${entry.department}` : ''}, dial extension ${entry.extension}.`).join(' ');
       await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
-        payload: `${system.greeting} ${directoryPrompt} If you know your party's extension, dial it now. Press 9 for PARIS.`,
+        payload: `${system.greeting} If you know your party's extension, dial it at any time. Press 8 to hear the full staff and partner directory. Press 9 for PARIS. Press 0 for Elizabeth Greene, Administrator.`,
         voice: 'Telnyx.KokoroTTS.af',
         minimum_digits: 1,
         maximum_digits: 3,
@@ -826,8 +826,11 @@ async function handleEvent(
       return;
     }
     if (digits === '8') {
+      const { data: workspace } = await db.from('communication_workspaces').select('id').eq('phone_system_id', system.id).maybeSingle();
+      const { data: directory } = workspace?.id ? await db.from('communication_extensions').select('extension,display_name,department').eq('workspace_id', workspace.id).eq('enabled', true).order('extension') : { data: [] };
+      const spokenDirectory = (directory || []).map((entry: any) => entry.extension === '0' ? 'Elizabeth Greene, Administrator, extension 0.' : `${entry.display_name}${entry.department ? `, ${entry.department}` : ''}, extension ${entry.extension}.`).join(' ');
       await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
-        payload: 'Please enter the three-digit extension now.',
+        payload: `${spokenDirectory || 'No directory entries are currently available.'} You may enter any listed extension now. Press 8 to hear the directory again, press 9 for PARIS, or press 0 for Elizabeth Greene, Administrator.`,
         voice: 'Telnyx.KokoroTTS.af',
         minimum_digits: 3,
         maximum_digits: 3,
@@ -839,7 +842,7 @@ async function handleEvent(
           systemId: system.id,
           callId: call.id,
           parentCallControlId: payload.call_control_id,
-          phase: 'extension_menu',
+          phase: 'main_menu',
         }),
       });
       return;

@@ -7,6 +7,7 @@ import {
 } from '@/lib/media/licensed-course-media';
 
 import { buildSceneAssignments } from '../instructional/scene-assignments';
+import { UltimateEnvatoMarketClient } from './envato-client';
 
 type RecordLike = Record<string, any>;
 
@@ -16,7 +17,53 @@ function firstRecord(value: unknown): RecordLike {
 }
 
 export class UltimatePlatformMedia implements UltimateMediaPort {
+  private envato = new UltimateEnvatoMarketClient();
   constructor(private db: SupabaseClient) {}
+
+  private async acquireApprovedEnvatoMatch(match: RecordLike) {
+    const entitlement = firstRecord(match.licensed_media_entitlements);
+    const itemId = String(entitlement.provider_item_id ?? '').trim();
+    if (!itemId || String(entitlement.provider ?? 'envato') !== 'envato') return false;
+    const acquired: any = await this.envato.acquire({
+      id: itemId,
+      url: String(entitlement.item_url ?? ''),
+      source: 'envato',
+      licenseVerified: false,
+      matchScore: Number(match.match_score ?? 1),
+    });
+    const bytes = acquired?.download?.bytes;
+    if (!(bytes instanceof Uint8Array) || !bytes.byteLength) throw new Error('ULTIMATE_ENVATO_DOWNLOAD_EMPTY');
+    const mimeType = String(acquired.download.mimeType ?? 'video/mp4');
+    const extension = mimeType.includes('quicktime') ? 'mov' : mimeType.includes('webm') ? 'webm' : 'mp4';
+    const storagePath = `licensed-library/envato/${itemId}/${crypto.randomUUID()}.${extension}`;
+    const { error: uploadError } = await this.db.storage.from('course_videos').upload(storagePath, bytes, {
+      contentType: mimeType,
+      upsert: false,
+    });
+    if (uploadError) throw uploadError;
+    const metadata = firstRecord(entitlement.metadata);
+    const { error: entitlementError } = await this.db
+      .from('licensed_media_entitlements')
+      .update({
+        metadata: {
+          ...metadata,
+          storage_bucket: 'course_videos',
+          storage_path: storagePath,
+          mime_type: mimeType,
+          file_size: bytes.byteLength,
+          source_url: String(entitlement.item_url ?? ''),
+          license_evidence_url: String(entitlement.item_url ?? ''),
+          acquired_at: new Date().toISOString(),
+          acquisition: acquired.licenseEvidence ?? { provider: 'envato', itemId },
+        },
+      })
+      .eq('id', match.entitlement_id);
+    if (entitlementError) {
+      await this.db.storage.from('course_videos').remove([storagePath]).catch(() => undefined);
+      throw entitlementError;
+    }
+    return true;
+  }
 
   async find(input: any): Promise<UltimateMediaDiscoveryResult> {
     const courseId = input.courseId ?? input.artifacts?.courseId;
@@ -103,7 +150,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
 
     const { data: matches, error } = await this.db
       .from('course_lesson_media_matches')
-      .select('id,lesson_id,status,entitlement_id,licensed_media_entitlements!inner(metadata)')
+      .select('id,lesson_id,status,entitlement_id,match_score,licensed_media_entitlements!inner(provider,provider_item_id,item_url,metadata)')
       .eq('course_id', courseId)
       .in('status', ['suggested', 'approved']);
     if (error) throw error;
@@ -112,15 +159,14 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
     let pending = 0;
     for (const match of matches ?? []) {
       const entitlement = firstRecord(match.licensed_media_entitlements);
-      if (!storedLicensedMediaMetadata(entitlement.metadata)) {
-        pending += 1;
-        continue;
-      }
-
       if (match.status === 'suggested') {
         // Discovery is not source/scene approval. Do not manufacture an approval.
         pending += 1;
         continue;
+      }
+
+      if (!storedLicensedMediaMetadata(entitlement.metadata)) {
+        await this.acquireApprovedEnvatoMatch(match);
       }
 
       await attachStoredLicensedMedia({

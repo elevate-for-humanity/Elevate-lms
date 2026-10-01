@@ -168,7 +168,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     .maybeSingle();
 
   if (!holder) redirect('/program-holder?error=pending-approval');
-  if (!['approved', 'active'].includes(holder.status) || !holder.approved_at) {
+  if (!['approved', 'active', 'approved_pending_mou'].includes(holder.status) || !holder.approved_at) {
     redirect('/program-holder/onboarding?status=pending-approval');
   }
   // Program Holders may view their dashboard while completing onboarding.

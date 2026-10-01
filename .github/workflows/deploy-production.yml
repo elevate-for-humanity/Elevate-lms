@@ -110,6 +110,9 @@ jobs:
             pnpm tsx scripts/northflank/sync-env.ts --execute
           fi
 
+      - name: Prove LiveKit runtime without exposing secrets
+        run: pnpm tsx scripts/northflank/verify-livekit-runtime.ts
+
       - name: Merge QuickBooks OAuth configuration
         run: |
           if [ -n "${QB_CLIENT_ID:-}" ] && [ -n "${QB_CLIENT_SECRET:-}" ]; then

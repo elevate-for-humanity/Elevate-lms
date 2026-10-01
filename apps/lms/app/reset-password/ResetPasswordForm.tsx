@@ -26,10 +26,12 @@ export default function ResetPasswordForm({ portal, mode }: { portal?: string; m
       const recoveryMode = mode === 'recovery';
       if (data.session && recoveryMode) {
         setSessionReady(true);
+        setRequestMode(false);
+      } else if (recoveryMode) {
+        setError('This password-reset session is missing or expired. Request a new secure link below.');
+        setRequestMode(true);
+        setSessionReady(true);
       } else {
-        // A direct visit from the login page is a recovery-email request.
-        // A visit from the emailed recovery link carries a Supabase session
-        // and continues to the new-password form above.
         setRequestMode(true);
         setSessionReady(true);
       }
@@ -77,6 +79,8 @@ export default function ResetPasswordForm({ portal, mode }: { portal?: string; m
     setLoading(true);
     try {
       const supabase = createClient();
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) throw new Error('Your password-reset session expired. Request a new reset link and try again.');
       const { error: updateError } = await supabase.auth.updateUser({ password });
       if (updateError) throw updateError;
       setSuccess(true);

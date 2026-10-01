@@ -10,7 +10,10 @@ const services = await Promise.all(ids.map(id => nfFetch<Service>(projectApiPath
 const domain = services[0].ports?.find(p => p.dns)?.dns;
 if (!domain) throw new Error('Existing Studio Browser domain required');
 const browserUrl = `https://${domain}`;
-const secret = services[0].runtimeEnvironment?.ULTIMATE_LEARNER_RUNTHROUGH_SECRET || randomBytes(32).toString('base64url');
+// Recover the same credential from an existing connected service if one config is missing.
+// Generate only during first setup; never rotate a connected account on redeploy.
+const secret = services.map(service => service.runtimeEnvironment?.ULTIMATE_LEARNER_RUNTHROUGH_SECRET)
+  .find(value => typeof value === 'string' && value.length > 0) || randomBytes(32).toString('base64url');
 const patches = [
   { ULTIMATE_LEARNER_RUNTHROUGH_SECRET: secret, STUDIO_LEARNER_LMS_URL: 'https://app.elevateforhumanity.org' },
   { ULTIMATE_LEARNER_RUNTHROUGH_SECRET: secret },

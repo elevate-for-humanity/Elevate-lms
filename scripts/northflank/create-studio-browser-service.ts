@@ -23,8 +23,9 @@ async function exists() {
     );
     existingRuntimeEnvironment = current.runtimeEnvironment ?? {};
     return true;
-  } catch {
-    return false;
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith("Northflank API 404 GET ")) return false;
+    throw error;
   }
 }
 

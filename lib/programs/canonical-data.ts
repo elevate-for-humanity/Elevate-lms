@@ -41,7 +41,7 @@ export interface ProgramData {
 }
 
 export const ADMINISTRATOR_STATEMENT =
-  'Elevate for Humanity coordinates training, employer participation, and funding access for its workforce and apprenticeship pathways. Registered status is stated only when an approved registered-program standard is present in the canonical registry.';
+  'Elevate for Humanity coordinates training, employer participation, and funding access for its workforce and apprenticeship pathways. Registered status is stated only when a verified RAPIDS occupation record or approved Appendix A standard is represented in the canonical registry.';
 
 export const STATE_VARIATION_DISCLAIMER =
   'State licensing requirements and DOL registered-apprenticeship standards are separate controls. The applicable approved program and jurisdiction rules govern.';

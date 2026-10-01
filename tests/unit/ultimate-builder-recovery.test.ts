@@ -132,6 +132,22 @@ describe('Ultimate builder recovery', () => {
     expect(checkpoint.passedSteps).toEqual(['learning_objectives']);
     expect(checkpoint.artifacts.learning_objectives).toEqual({ objectives: ['cutting'] });
   });
+  it('rebuilds an old five-scene storyboard before retrying licensed media', async () => {
+    const steps = ULTIMATE_BUILD_STEPS.slice(0, 8).map((step) => ({
+      step, state: 'passed', artifacts: step === 'storyboard'
+        ? { storyboard: { scenes: Array.from({ length: 5 }, (_, index) => ({ id: `scene-${index}` })) } }
+        : {},
+    }));
+    const db = { from: (table: string) => ({ select: () => ({ eq: () =>
+      table === 'ultimate_lesson_builds'
+        ? { single: async () => ({ data: { artifacts: {}, findings: [] }, error: null }) }
+        : Promise.resolve({ data: steps, error: null }),
+    }) }) } as any;
+    const checkpoint = await new UltimateSupabasePersistence(db).loadLessonCheckpoint({
+      lessonBuildId: 'lesson-1',
+    });
+    expect(checkpoint.passedSteps).toEqual(ULTIMATE_BUILD_STEPS.slice(0, 5));
+  });
   it('maps stored Envato media into unique render scenes without stock fallbacks', () => {
     const prepared = prepareUltimateStoryboardInput({
       lessonId: 'lesson-1',

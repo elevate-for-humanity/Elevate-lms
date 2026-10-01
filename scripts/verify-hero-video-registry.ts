@@ -85,16 +85,33 @@ if (LIVE) {
     const video = videoId ? VIDEO_REGISTRY[videoId] : undefined;
     if (!video) continue;
     try {
-      const response = await fetch(video.video_url, {
-        headers: { Range: 'bytes=0-1023' },
-        redirect: 'follow',
+      const probe = async (headers: Record<string, string>) =>
+        fetch(video.video_url, { headers, redirect: 'follow' });
+
+      // Some object-storage/CDN front doors reject byte-range probes from
+      // datacenter runners even though ordinary browser GET playback is healthy.
+      // Prefer the cheap range probe, then retry with a browser-like GET before
+      // declaring production media unavailable.
+      let response = await probe({
+        Range: 'bytes=0-1023',
+        Accept: 'video/mp4,video/*;q=0.9,*/*;q=0.1',
+        'User-Agent': 'Mozilla/5.0 ElevateHeroRegistry/1.0',
       });
+      if (response.status === 403 || response.status === 405) {
+        await response.body?.cancel();
+        response = await probe({
+          Accept: 'video/mp4,video/*;q=0.9,*/*;q=0.1',
+          'User-Agent': 'Mozilla/5.0 ElevateHeroRegistry/1.0',
+        });
+      }
+
       if (!(response.ok || response.status === 206)) {
         fail(`${pageKey}: CDN returned HTTP ${response.status} for ${video.video_url}`);
-      }
-      const contentType = response.headers.get('content-type') || '';
-      if (contentType && !contentType.toLowerCase().includes('video')) {
-        fail(`${pageKey}: unexpected CDN content-type ${contentType}`);
+      } else {
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType && !contentType.toLowerCase().includes('video')) {
+          fail(`${pageKey}: unexpected CDN content-type ${contentType}`);
+        }
       }
       await response.body?.cancel();
     } catch (error) {

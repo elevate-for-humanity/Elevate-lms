@@ -1,2 +1,4 @@
-2026-09-27 deploy Ultimate universal 20-step course-defined build path
-Admin + LMS production deployment checkpoint
+LMS production deployment trigger
+Date: 2026-10-01
+Reason: deploy repository recovery audit, restored LMS-native workflows, and retained recovered templates
+Target: main

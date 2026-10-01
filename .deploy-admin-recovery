@@ -1,0 +1,7 @@
+Admin recovery deployment trigger
+Date: 2026-10-01
+Branch: main
+Reason: deploy shared course media renderer and orchestration repairs
+Attempt: 4
+Workflow: northflank-deploy.yml push recovery
+Commit target: a56fb498a6b4a70db3d337eebdaf8145c2901e21

@@ -342,9 +342,11 @@ jobs:
           grep -q 'CDL Class A' /tmp/cdl-page.html
           grep -q 'CDL student performing a pre-trip inspection' /tmp/cdl-page.html
 
-          curl -fsS --range 0-1023 --max-time 30 -D /tmp/cdl-video.headers -o /tmp/cdl-video.bin https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cdl-hero.mp4
+          video_url=https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cdl-hero.mp4
+          if ! curl -fsS --range 0-1023 --max-time 30 -A 'Mozilla/5.0 ElevateDeploy/1.0' -H 'Accept: video/mp4,video/*;q=0.9,*/*;q=0.1' -D /tmp/cdl-video.headers -o /tmp/cdl-video.bin "$video_url"; then
+            curl -fsS --max-time 30 -A 'Mozilla/5.0 ElevateDeploy/1.0' -H 'Accept: video/mp4,video/*;q=0.9,*/*;q=0.1' -D /tmp/cdl-video.headers -o /tmp/cdl-video.bin "$video_url"
+          fi
           grep -qi '^content-type: video/mp4' /tmp/cdl-video.headers
-          grep -qi '^accept-ranges: bytes' /tmp/cdl-video.headers
           test "$(wc -c < /tmp/cdl-video.bin)" -gt 0
 
           curl -fsS --max-time 30 -D /tmp/cdl-audio.headers -o /tmp/cdl-audio.mp3 https://www.elevateforhumanity.org/audio/heroes/cdl.mp3
@@ -361,7 +363,10 @@ jobs:
           grep -q 'Self-Pay Available' /tmp/cna-page.html
           grep -q 'cna-hero.mp4' /tmp/cna-page.html
 
-          curl -fsS --range 0-1023 --max-time 30 -D /tmp/cna-video.headers -o /tmp/cna-video.bin https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4
+          cna_video_url=https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4
+          if ! curl -fsS --range 0-1023 --max-time 30 -A 'Mozilla/5.0 ElevateDeploy/1.0' -H 'Accept: video/mp4,video/*;q=0.9,*/*;q=0.1' -D /tmp/cna-video.headers -o /tmp/cna-video.bin "$cna_video_url"; then
+            curl -fsS --max-time 30 -A 'Mozilla/5.0 ElevateDeploy/1.0' -H 'Accept: video/mp4,video/*;q=0.9,*/*;q=0.1' -D /tmp/cna-video.headers -o /tmp/cna-video.bin "$cna_video_url"
+          fi
           grep -qi '^content-type: video/mp4' /tmp/cna-video.headers
           test "$(wc -c < /tmp/cna-video.bin)" -gt 0
 

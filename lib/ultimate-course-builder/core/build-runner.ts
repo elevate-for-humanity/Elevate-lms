@@ -7,7 +7,7 @@ import {
   ULTIMATE_LESSON_CONTRACT_VERSION,
   MAX_TARGETED_REPAIRS,
 } from './lesson-contract';
-import { routeSelectiveRepairs } from './repair-router';
+import { isDurableExternalBlocker, routeSelectiveRepairs } from './repair-router';
 import {
   ULTIMATE_BUILD_STEPS,
   type UltimateBuildStep,
@@ -131,7 +131,8 @@ export class UltimateBuildRunner {
       const transient = failures.every((f) =>
         /HTTP (429|5\d\d)|timeout|timed out|ECONNRESET|fetch failed/i.test(f.message),
       );
-      const target = route?.step ?? (transient ? step : undefined);
+      const durableBlocker = failures.some((f) => isDurableExternalBlocker(f));
+      const target = !durableBlocker ? (route?.step ?? (transient ? step : undefined)) : undefined;
       if (target && attempts.length < MAX_TARGETED_REPAIRS) {
         attempts.push({ failedStep: step, target, codes: failures.map((f) => f.code) });
         index = Math.min(index, ULTIMATE_BUILD_STEPS.indexOf(target));

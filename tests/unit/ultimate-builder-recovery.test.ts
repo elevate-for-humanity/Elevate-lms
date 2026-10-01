@@ -357,4 +357,70 @@ describe('Ultimate builder recovery', () => {
     );
     expect(generate).not.toHaveBeenCalled();
   });
+  it('selectively repairs failed media QA and resumes downstream stages', async () => {
+    const called: string[] = [];
+    let qaAttempts = 0;
+    const handlers = Object.fromEntries(
+      ULTIMATE_BUILD_STEPS.map((step) => [
+        step,
+        async () => {
+          called.push(step);
+          if (step === 'finished_media_qa' && qaAttempts++ === 0) {
+            return {
+              findings: [{
+                step,
+                severity: 'error',
+                code: 'INSUFFICIENT_DISTINCT_SHOTS',
+                message: 'Rendered lesson repeated visual material.',
+              }],
+              artifacts: { mediaQA: { pass: false } },
+            };
+          }
+          return { artifacts: fixtureArtifact(step) };
+        },
+      ]),
+    );
+    const ctx: any = {
+      buildId: 'build:competency',
+      courseId: 'course',
+      profile: { competencies: [] },
+      artifacts: {},
+      findings: [],
+      passedSteps: new Set(),
+    };
+    await new UltimateBuildRunner(handlers).run(ctx);
+    expect(called.filter((step) => step === 'visual_assignment')).toHaveLength(2);
+    expect(called.filter((step) => step === 'natural_narration')).toHaveLength(2);
+    expect(called.at(-1)).toBe('credential_release');
+    expect(ctx.findings.some((f: any) => f.severity === 'error')).toBe(false);
+  });
+
+  it('keeps explicit media approval failures as durable blockers', async () => {
+    const called: string[] = [];
+    const handlers = Object.fromEntries(
+      ULTIMATE_BUILD_STEPS.map((step) => [
+        step,
+        async () => {
+          called.push(step);
+          if (step === 'visual_assignment') {
+            throw new Error('MEDIA_LICENSE_REQUIRED:approved entitlement is required');
+          }
+          return { artifacts: fixtureArtifact(step) };
+        },
+      ]),
+    );
+    const ctx: any = {
+      buildId: 'build:competency',
+      courseId: 'course',
+      profile: { competencies: [] },
+      artifacts: {},
+      findings: [],
+      passedSteps: new Set(),
+    };
+    await new UltimateBuildRunner(handlers).run(ctx);
+    expect(called.filter((step) => step === 'visual_assignment')).toHaveLength(1);
+    expect(called).not.toContain('natural_narration');
+    expect(ctx.findings).toMatchObject([{ code: 'MEDIA_LICENSE_REQUIRED' }]);
+  });
+
 });

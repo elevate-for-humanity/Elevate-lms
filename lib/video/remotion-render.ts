@@ -780,12 +780,16 @@ export async function renderStoryboardVideo(
         .split(/(?<=[.!?])\s+/)
         .map((value) => value.trim())
         .filter(Boolean)
-        .slice(0, 4);
+        .slice(0, 3)
+        .map((sentence) => {
+          const words = sentence.split(/\s+/);
+          return words.length > 12 ? `${words.slice(0, 12).join(' ')}…` : sentence;
+        });
 
       scenes.push({
         scene_number: index + 1,
         title: scene.subject,
-        bullets: bullets.length ? bullets : [scene.action],
+        bullets: bullets.length ? bullets : [scene.action.split(/\s+/).slice(0, 12).join(' ')],
         narration,
         clip_keyword: query,
         clipUrl,

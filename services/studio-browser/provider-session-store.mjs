@@ -33,7 +33,7 @@ export class ProviderSessionStore {
       return state;
     } catch (error) {
       if (error.code === 'ENOENT') return undefined;
-      throw new Error('PROVIDER_SESSION_RESTORE_FAILED');
+      throw new Error('PROVIDER_SESSION_RESTORE_FAILED', { cause: error });
     }
   }
   async save(scope, context) {

@@ -158,5 +158,5 @@ export const BARBER_STATS: BarberStats = {
   totalCompetencies: 14,
   sections: 5,
   totalRTIHours: 260,
-  totalOJTHours: 1500,
+  totalOJTHours: 0,
 };

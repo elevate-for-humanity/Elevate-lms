@@ -53,6 +53,8 @@ type PhoneData = {
     schedule: Schedule;
     ringSeconds: number;
     voicemailGreeting: string;
+    externalFallbackEnabled: boolean;
+    externalFallbackNumber: string;
     presenceStatus: string;
   };
   inbox: InboxItem[];
@@ -283,6 +285,8 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
         schedule: data.extension.schedule,
         ringSeconds: data.extension.ringSeconds,
         voicemailGreeting: data.extension.voicemailGreeting,
+        externalFallbackEnabled: data.extension.externalFallbackEnabled,
+        externalFallbackNumber: data.extension.externalFallbackNumber,
         emailMissedCalls: data.notifications.emailMissedCalls,
           smsMissedCalls: data.notifications.smsMissedCalls,
       }),
@@ -524,8 +528,37 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
             Availability and ringing
           </h2>
           <p className="mt-1 text-sm leading-6 text-slate-600">
-            Calls ring only in this PWA. They never forward to your personal cell number.
+            Your extension rings in the PWA first. You may also add your own phone number as a fallback for your extension.
           </p>
+          <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
+            <label className="flex items-center gap-3 text-sm font-bold text-blue-950">
+              <input
+                type="checkbox"
+                checked={data.extension.externalFallbackEnabled}
+                onChange={(event) => updateExtension({ externalFallbackEnabled: event.target.checked })}
+                disabled={data.readOnly}
+                className="h-5 w-5 accent-blue-700"
+              />
+              Ring my own phone number as an extension fallback
+            </label>
+            {data.extension.externalFallbackEnabled && (
+              <label className="mt-3 block text-sm font-bold text-slate-800">
+                My phone number
+                <input
+                  type="tel"
+                  inputMode="tel"
+                  value={data.extension.externalFallbackNumber}
+                  onChange={(event) => updateExtension({ externalFallbackNumber: event.target.value })}
+                  placeholder="(317) 555-0123"
+                  disabled={data.readOnly}
+                  className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-3 font-normal"
+                />
+              </label>
+            )}
+            <p className="mt-2 text-xs leading-5 text-slate-600">
+              This does not change your extension or business caller ID. It gives the phone system a verified fallback destination when your PWA cannot take the call.
+            </p>
+          </div>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <label className="text-sm font-bold text-slate-800">
               Phone mode

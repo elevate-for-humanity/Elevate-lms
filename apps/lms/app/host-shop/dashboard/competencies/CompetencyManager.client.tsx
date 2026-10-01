@@ -148,6 +148,7 @@ export default function CompetencyManager() {
 
   return (
     <div className="space-y-6">
+      <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-6"><p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">Supervisor workflow</p><h2 className="mt-2 text-2xl font-black leading-tight text-slate-950">Sign progress from the apprentice’s real Appendix A standard</h2><div className="mt-4 grid gap-3 md:grid-cols-3"><div className="rounded-2xl bg-white p-4"><b>1. Observe the service</b><p className="mt-1 text-sm leading-6 text-slate-600">Watch the apprentice perform the work safely and to the standard shown below.</p></div><div className="rounded-2xl bg-white p-4"><b>2. Capture evidence</b><p className="mt-1 text-sm leading-6 text-slate-600">Practical skills require the performance subject, dated evidence, and verifier license information when applicable.</p></div><div className="rounded-2xl bg-white p-4"><b>3. Check off the skill</b><p className="mt-1 text-sm leading-6 text-slate-600">Use Check off only after you personally verified it. The completion becomes part of the apprentice’s progress record.</p></div></div></section>
       <div className="flex flex-col gap-3 rounded-2xl border bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-brand-blue-700">DOL Appendix A</p>

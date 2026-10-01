@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --check learner-runthrough.mjs && node --test server.test.mjs learner-runthrough.test.mjs"
+    "check": "node --check server.mjs && node --check learner-runthrough.mjs && node --check provider-session-store.mjs && node --test server.test.mjs learner-runthrough.test.mjs provider-session-store.test.mjs"
   },
   "dependencies": {
     "axe-core": "^4.10.3",

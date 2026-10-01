@@ -5,6 +5,22 @@ if (!BARBER_CONTRACT) throw new Error('REGISTERED_BARBER_CONTRACT_MISSING');
 const BARBER = BARBER_CONTRACT.standard;
 const SPONSOR = BARBER_CONTRACT.sponsor;
 
+const HAIR_STYLIST = {
+  slug: 'cosmetology-apprenticeship',
+  name: 'Hair Stylist Apprenticeship',
+  occupation: 'Hair Stylist',
+  existingTitle: 'Cosmetologist',
+  onetSocCode: '39-5012.00',
+  rapidsCode: '0096HY',
+  rapidsVersion: 'V1',
+  approach: 'hybrid' as const,
+  minimumTermHours: 2000,
+  maximumTermHours: 2500,
+  relatedInstructionHours: 154,
+  probationaryHours: 500,
+  apprenticeToMentorRatio: '1:1',
+} as const;
+
 /**
  * Static RAPIDS/public registration metadata only.
  *
@@ -22,6 +38,12 @@ export const RAPIDS_CONFIG = {
   revisionDate: SPONSOR.revisionDate,
 
   programs: {
+    hairStylist: {
+      ...HAIR_STYLIST,
+      state: 'IN',
+      fundingType: 'self_pay',
+      tuition: 5980,
+    },
     barber: {
       slug: BARBER_CONTRACT.programSlug,
       name: 'Barber Apprenticeship',
@@ -53,6 +75,23 @@ export const RAPIDS_CONFIG = {
 } as const;
 
 export function getRAPIDSMetadata(programSlug: string) {
+  if (programSlug === HAIR_STYLIST.slug) {
+    return {
+      rapids_sponsor_legal: SPONSOR.sponsor,
+      rapids_program_brand: RAPIDS_CONFIG.programBrand,
+      rapids_program: HAIR_STYLIST.name,
+      rapids_state: RAPIDS_CONFIG.stateCode,
+      rapids_registration_id: SPONSOR.registrationNumber,
+      rapids_occupation_code: HAIR_STYLIST.rapidsCode,
+      onet_soc_code: HAIR_STYLIST.onetSocCode,
+      apprenticeship_approach: HAIR_STYLIST.approach,
+      competency_count: null,
+      related_instruction_hours: HAIR_STYLIST.relatedInstructionHours,
+      minimum_term_hours: HAIR_STYLIST.minimumTermHours,
+      maximum_term_hours: HAIR_STYLIST.maximumTermHours,
+      probationary_hours: HAIR_STYLIST.probationaryHours,
+    };
+  }
   const registered = getRegisteredProgramStandard(programSlug);
   if (!registered) return null;
   const standard = registered.standard;
@@ -71,6 +110,25 @@ export function getRAPIDSMetadata(programSlug: string) {
 }
 
 export function getRAPIDSEnrollmentData(programSlug: string) {
+  if (programSlug === HAIR_STYLIST.slug) {
+    return {
+      rapids_sponsor: SPONSOR.sponsor,
+      rapids_program: HAIR_STYLIST.name,
+      rapids_state: RAPIDS_CONFIG.stateCode,
+      rapids_registration_on_file: true,
+      rapids_occupation_code: HAIR_STYLIST.rapidsCode,
+      onet_soc_code: HAIR_STYLIST.onetSocCode,
+      apprenticeship_approach: HAIR_STYLIST.approach,
+      competency_count_required: null,
+      related_instruction_hours: HAIR_STYLIST.relatedInstructionHours,
+      probationary_hours: HAIR_STYLIST.probationaryHours,
+      apprentice_to_mentor_ratio: HAIR_STYLIST.apprenticeToMentorRatio,
+      minimum_term_hours: HAIR_STYLIST.minimumTermHours,
+      maximum_term_hours: HAIR_STYLIST.maximumTermHours,
+      starting_hourly_rate: null,
+      wage_milestones: [],
+    };
+  }
   const registered = getRegisteredProgramStandard(programSlug);
   if (!registered) return null;
   const standard = registered.standard;
@@ -92,7 +150,7 @@ export function getRAPIDSEnrollmentData(programSlug: string) {
 }
 
 export function isRAPIDSProgram(programSlug: string): boolean {
-  return getRegisteredProgramStandard(programSlug) !== null;
+  return programSlug === HAIR_STYLIST.slug || getRegisteredProgramStandard(programSlug) !== null;
 }
 
 export function getPublicRegistrationDetails() {

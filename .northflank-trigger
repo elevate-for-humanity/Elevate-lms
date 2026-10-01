@@ -1,4 +1,4 @@
-merge_sha=e6d049376280de603c3df83354295364a214508b
+merge_sha=a6bdace22d06d5070148ea895923ffd3a6223d5d
 services=admin,lms
-requested_at=2026-10-01T18:05:00.000Z
-reason=Deploy universal portal navigation, Host Shop communications guidance, responsive cards, and weekly hour verification
+requested_at=2026-10-01T21:10:00.000Z
+reason=Deploy password recovery repair and dynamic PARIS extension directory

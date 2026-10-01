@@ -4,6 +4,7 @@ import { ULTIMATE_BUILD_STEPS } from '../../lib/ultimate-course-builder/core/typ
 import { UltimatePlatformCredential } from '../../lib/ultimate-course-builder/adapters/platform-credential';
 import {
   prepareUltimateStoryboardInput,
+  refreshLicensedVisualUrls,
   requireResolvedVisualEvidence,
   UltimatePlatformRenderer,
 } from '../../lib/ultimate-course-builder/adapters/platform-renderer';
@@ -163,6 +164,34 @@ describe('Ultimate builder recovery', () => {
     expect(
       new Set(scenes.map((scene) => scene.source_video_url ?? scene.reference_image_url)).size,
     ).toBe(6);
+  });
+
+  it('renews a checkpointed licensed video URL immediately before rendering', async () => {
+    const createSignedUrl = vi.fn().mockResolvedValue({
+      data: { signedUrl: 'https://storage.example.com/fresh.mp4' }, error: null,
+    });
+    const input = {
+      artifacts: { visual_assignment: { media: { readyAssets: [{
+        id: 'asset-1', storage_path: 'licensed-library/envato/asset-1.mp4',
+        public_url: 'https://storage.example.com/expired.mp4', entitlement_id: 'license-1',
+      }] } } },
+    };
+    const db = { storage: { from: vi.fn().mockReturnValue({ createSignedUrl }) } } as any;
+    const refreshed = await refreshLicensedVisualUrls(input, db);
+    expect(createSignedUrl).toHaveBeenCalledWith('licensed-library/envato/asset-1.mp4', 3600);
+    expect(refreshed.artifacts.visual_assignment.media.readyAssets[0].public_url)
+      .toBe('https://storage.example.com/fresh.mp4');
+    expect(input.artifacts.visual_assignment.media.readyAssets[0].public_url)
+      .toBe('https://storage.example.com/expired.mp4');
+  });
+
+  it('fails closed when a licensed video URL cannot be renewed', async () => {
+    const db = { storage: { from: () => ({ createSignedUrl: async () => ({
+      data: null, error: new Error('storage unavailable'),
+    }) }) } } as any;
+    await expect(refreshLicensedVisualUrls({ artifacts: { visual_assignment: {
+      media: { readyAssets: [{ id: 'asset-1', storage_path: 'licensed-library/asset-1.mp4' }] },
+    } } }, db)).rejects.toThrow('ULTIMATE_LICENSED_VISUAL_URL_REFRESH_FAILED:asset-1');
   });
 
   it('rejects a rendered storyboard whose scenes do not contain real visual assets', () => {

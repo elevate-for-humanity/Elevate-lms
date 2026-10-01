@@ -45,7 +45,7 @@ export async function getApprovedHoursByType(
     .from('hour_entries')
     .select('hours_claimed, accepted_hours, source_type, category')
     .eq('user_id', userId)
-    .in('status', ['approved', 'locked']);
+    .in('status', ['approved', 'verified', 'accepted', 'complete', 'completed', 'locked']);
 
   if (programSlug) {
     query = query.eq('program_slug', programSlug);

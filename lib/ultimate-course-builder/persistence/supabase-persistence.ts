@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UltimatePersistencePort } from '../core/ports';
+import { ULTIMATE_BUILD_STEPS } from '../core/types';
 export class UltimateSupabasePersistence implements UltimatePersistencePort {
   constructor(private db: SupabaseClient) {}
   async createBuild(input: any) {
@@ -46,9 +47,20 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     const passed = (steps ?? []).filter((x: any) => x.state === 'passed');
     const artifacts = { ...((lesson?.artifacts ?? {}) as Record<string, unknown>) };
     for (const step of passed) artifacts[String(step.step)] = step.artifacts ?? {};
+    // A repaired provider or renderer must rebuild downstream media instead of
+    // replaying a failed QA result against the same cached audio/video. Keep
+    // all earlier instructional work and licensed visual assignments.
+    const narrationQA = (artifacts.narration_qa as any)?.narrationQA;
+    const paceFailed = narrationQA?.failures?.includes('PACE_OUT_OF_RANGE');
+    const render = (artifacts.lesson_film_render as any)?.render;
+    const oldLayout = render && render.layoutVersion !== 2;
+    const firstRebuildStep = paceFailed ? 'natural_narration' : oldLayout ? 'lesson_film_render' : null;
+    const ordered: readonly string[] = ULTIMATE_BUILD_STEPS;
+    const rebuildIndex = firstRebuildStep ? ordered.indexOf(firstRebuildStep) : -1;
+    const reusable = rebuildIndex < 0 ? passed : passed.filter((step: any) => ordered.indexOf(String(step.step)) < rebuildIndex);
     return {
       artifacts,
-      passedSteps: passed.map((x: any) => String(x.step)),
+      passedSteps: reusable.map((x: any) => String(x.step)),
       findings: Array.isArray(lesson?.findings) ? lesson.findings : [],
     };
   }

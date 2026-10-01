@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ClipboardCheck, MessageSquareText, PhoneCall, ShieldCheck } from 'lucide-react';
 import { getProgramHolderWorkspace } from '@/lib/program-holder/workspace';
 
@@ -12,22 +13,27 @@ export default async function ProgramHolderAirScriptPage() {
   const data = await getProgramHolderWorkspace();
   const holderName = data.holder?.organization_name || data.holder?.name || 'your organization';
   const programs = data.programs || [];
+  const applicants = data.applicants || [];
 
   return (
     <main className="space-y-6 px-4 py-6 sm:px-6">
-      <section className="rounded-3xl bg-gradient-to-br from-slate-950 via-blue-950 to-cyan-800 p-6 text-white shadow-xl sm:p-9">
+      <section className="relative overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
+        <Image src="/images/pages/community-page-2.webp" alt="Program Holder using Elevate communication tools" fill priority sizes="100vw" className="object-cover" />
+        <div className="relative max-w-3xl bg-slate-950/80 p-6 sm:p-9">
         <MessageSquareText className="h-9 w-9 text-cyan-200" />
         <p className="mt-4 text-xs font-black uppercase tracking-[0.18em] text-cyan-200">AirScript service</p>
         <h1 className="mt-2 text-3xl font-black sm:text-5xl">Approved student call scripts</h1>
         <p className="mt-4 max-w-3xl text-sm font-medium leading-7 text-slate-100 sm:text-base">
           Use these scripts with your dashboard phone. Personalize the student and program names, stay within the verified facts on the record, and save the outcome immediately after the call.
         </p>
+        </div>
       </section>
 
       <section className="grid gap-5 lg:grid-cols-2">
         <article className="rounded-2xl border border-blue-200 bg-white p-6 shadow-sm">
           <PhoneCall className="h-7 w-7 text-blue-700" />
           <h2 className="mt-3 text-xl font-black">Live-call opening</h2>
+          <p className="mt-2 text-sm text-slate-600">{applicants.length} routed applicant{applicants.length === 1 ? '' : 's'} currently available in your queue. Open an applicant record before calling so the script uses the actual student, program, funding status, and next step.</p>
           <blockquote className="mt-4 rounded-xl bg-blue-50 p-4 text-sm leading-7 text-slate-800">
             “Hello, may I speak with [student name]? My name is [your name] with {holderName}, an approved Elevate for Humanity Program Holder. Your application shows interest in [program]. I am calling to confirm your next step, whether your funding has already been approved or the program will be self-pay, and when you are available to begin.”
           </blockquote>

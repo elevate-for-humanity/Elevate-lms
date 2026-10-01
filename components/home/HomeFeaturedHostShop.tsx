@@ -4,30 +4,12 @@ import { ArrowRight, MapPin } from 'lucide-react';
 
 const FEATURED_SHOPS = [
   {
-    name: 'Salon Saloon',
-    program: 'Cosmetology Apprenticeship',
-    image: '/images/partners/salon-saloon/team-interior.webp',
-    imageAlt: 'Salon Saloon team inside the South Bend cosmetology apprenticeship host salon',
-    address: '1740 S Bend Ave, Suite A, South Bend, Indiana',
-    shopHref: '/host-shops/salon-saloon',
-    programHref: '/programs/cosmetology-apprenticeship',
-  },
-  {
-    name: 'Kountry Kutz Barbershop',
-    program: 'Barber Apprenticeship',
-    image: '/images/partners/kountry-kutz/interior-active.webp',
-    imageAlt: 'Barbers and customers inside Kountry Kutz apprenticeship host barbershop',
-    address: '56 W Main St, Suite A, New Palestine, Indiana',
-    shopHref: '/host-shops/kountry-kutz-barbershop',
-    programHref: '/programs/barber-apprenticeship',
-  },
-  {
-    name: 'Top Shelf Barber Lounge',
-    program: 'Barber Apprenticeship',
-    image: '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade.jpg',
-    imageAlt: 'Precision barber work from Top Shelf Barber Lounge in Elkhart, Indiana',
-    address: '1600 E Bristol St, Elkhart, Indiana',
-    shopHref: '/host-shops/top-shelf-barber-lounge',
+    name: "Cal's Kutz Studio",
+    program: 'Barber Apprenticeship • Earn While You Learn',
+    image: '/images/partners/cals-kutz-shop-interior.webp',
+    imageAlt: "Cal's Kutz Studio apprenticeship host barbershop",
+    address: 'Indianapolis, Indiana',
+    shopHref: '/host-shops/cals-kutz-studio',
     programHref: '/programs/barber-apprenticeship',
   },
   {
@@ -38,6 +20,15 @@ const FEATURED_SHOPS = [
     address: '155 S Kingston Dr, Bloomington, Indiana',
     shopHref: '/host-shops/razors-image-barbershop',
     programHref: '/programs/barber-apprenticeship',
+  },
+  {
+    name: 'Salon Saloon',
+    program: 'Cosmetology Apprenticeship',
+    image: '/images/partners/salon-saloon/team-interior.webp',
+    imageAlt: 'Salon Saloon team inside the South Bend cosmetology apprenticeship host salon',
+    address: '1740 S Bend Ave, Suite A, South Bend, Indiana',
+    shopHref: '/host-shops/salon-saloon',
+    programHref: '/programs/cosmetology-apprenticeship',
   },
   {
     name: 'Kountry Kutz Barbershop',

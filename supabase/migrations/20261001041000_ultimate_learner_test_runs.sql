@@ -28,3 +28,6 @@ create table if not exists public.ultimate_learner_test_evidence (
 alter table public.ultimate_learner_test_evidence enable row level security;
 revoke all on public.ultimate_learner_test_evidence from anon, authenticated;
 grant all on public.ultimate_learner_test_evidence to service_role;
+insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
+values('ultimate-learner-evidence','ultimate-learner-evidence',false,104857600,array['image/png','application/zip'])
+on conflict(id) do nothing;

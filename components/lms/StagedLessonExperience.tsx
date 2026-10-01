@@ -12,9 +12,9 @@ export default function StagedLessonExperience({ runId, snapshot, initialProgres
     if (!res.ok) { setError(data.error); throw new Error(data.error); }
     setError(''); setProgress(data.progress); return data;
   }
-  async function savePlayback() {
+  async function savePlayback(force = false) {
     const video = root.current?.querySelector('video');
-    if (!video || saving.current || Date.now() - lastSave.current < 3000 || !Number.isFinite(video.duration)) return;
+    if (!video || saving.current || (!force && Date.now() - lastSave.current < 3000) || !Number.isFinite(video.duration)) return;
     saving.current = true; lastSave.current = Date.now();
     try { await act({ action: 'progress', position: video.currentTime, duration: video.duration }); }
     catch { /* act displays the save failure; playback can retry on its next update. */ }
@@ -24,7 +24,7 @@ export default function StagedLessonExperience({ runId, snapshot, initialProgres
   const questions = retake ? b.assessment.reassessment : b.assessment.questions;
   return <div ref={root} className="space-y-6" data-testid="staged-lesson">
     <InteractiveVideoPlayer videoUrl={snapshot.render.videoUrl} captionsUrl={snapshot.render.captionsUrl} title={snapshot.title}
-      initialPositionSeconds={Number(initialProgress.position ?? 0)} onProgress={() => { void savePlayback(); }} onComplete={() => { void savePlayback(); }} />
+      initialPositionSeconds={Number(initialProgress.position ?? 0)} onProgress={() => { void savePlayback(); }} onComplete={() => { void savePlayback(true); }} />
     <p role="status" data-testid="saved-position">Saved position: {Number(progress.position ?? 0).toFixed(1)}</p>
     {b.stages.map((s: any) => <section key={s.stage}><h2 className="text-lg font-bold">{s.stage.replaceAll('_', ' ')}</h2><p className="text-base leading-7">{s.instruction}</p></section>)}
     {b.activities.filter((a: any) => ['guided_practice', 'independent_practice', 'knowledge_check'].includes(a.type)).map((a: any) => <section key={a.id} data-testid={a.type}>

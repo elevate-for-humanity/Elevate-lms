@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID, randomBytes } from 'node:crypto';
+import { createClient } from '@supabase/supabase-js';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { contractHash, ULTIMATE_LESSON_CONTRACT_VERSION } from '@/lib/ultimate-course-builder/core/lesson-contract';
 import { validTestCredential } from '@/lib/ultimate-course-builder/testing/learner-test-policy';
@@ -44,10 +45,18 @@ export async function POST(req: NextRequest) {
       lesson_build_id: lesson.id, artifact_hash: input.artifactHash, media_sha256: input.mediaSha256,
       contract_version: input.contractVersion, snapshot });
     if (saveError) throw saveError;
-    const { data: session, error: sessionError } = await db.auth.signInWithPassword({ email, password });
+    const authClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { auth: { persistSession: false, autoRefreshToken: false } });
+    const { data: session, error: sessionError } = await authClient.auth.signInWithPassword({ email, password });
     if (sessionError || !session.session) throw sessionError ?? new Error('Test authentication failed');
+    const uploads = await Promise.all(['desktop.png','mobile.png','trace.zip'].map(async filename => {
+      const objectPath = `${id}/${filename}`;
+      const { data, error: uploadError } = await db.storage.from('ultimate-learner-evidence').createSignedUploadUrl(objectPath);
+      if (uploadError || !data) throw uploadError ?? new Error('Evidence upload preparation failed');
+      return { filename, objectPath, signedUrl: data.signedUrl };
+    }));
     return NextResponse.json({ runId: id, accessToken: session.session.access_token, refreshToken: session.session.refresh_token,
-      path: `/learner-testing/${id}`, snapshot }, { headers: { 'Cache-Control': 'private, no-store' } });
+      path: `/learner-testing/${id}`, snapshot, uploads }, { headers: { 'Cache-Control': 'private, no-store' } });
   } catch (error) {
     if (createdUserId) await db.auth.admin.deleteUser(createdUserId);
     logger.error('Learner test setup failed', error);

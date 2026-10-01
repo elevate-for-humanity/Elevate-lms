@@ -123,8 +123,17 @@ export async function runLearnerTest(input, { browser, secret, lmsUrl, evidenceR
     const nonColor=await page.getByRole('status').filter({hasText:'Passed.'}).count()>0 && await page.getByTestId('lesson-completed').isVisible();
     const accessibility={contractVersion:input.contractVersion,semanticHeadings:!violations.some(v=>/heading/.test(v.id)),colorContrast:!violations.some(v=>v.id==='color-contrast'),nonColorMeaning:nonColor,screenReaderLabels:!violations.some(v=>/label|name/.test(v.id)),reducedMotion:motion.preference&&!motion.animated};
     const evidence={...input,testRunId:runId,stagedLesson:true,courseLesson:false,observations,checkedAt:new Date().toISOString(),accessibility,
-      accessibilityViolations:violations,browserErrors:errors,durationSeconds:(Date.now()-startedAt)/1000,evidenceFiles:['desktop.png','mobile.png','trace.zip']};
+      accessibilityViolations:violations,browserErrors:errors,durationSeconds:(Date.now()-startedAt)/1000,evidenceFiles:[]};
     await context.tracing.stop({path:path.join(directory,'trace.zip')});
+    for (const upload of setup.uploads) {
+      assert(['desktop.png','mobile.png','trace.zip'].includes(upload.filename),'Unexpected evidence filename');
+      if (!await fs.stat(path.join(directory,upload.filename)).catch(()=>null)) continue;
+      const target=new URL(upload.signedUrl);
+      assert(target.protocol==='https:' && target.hostname==='cuxzzpsyufcewtmicszk.supabase.co','Unexpected evidence storage host');
+      const result=await page.request.put(upload.signedUrl,{data:await fs.readFile(path.join(directory,upload.filename)),headers:{'content-type':upload.filename.endsWith('.png')?'image/png':'application/zip'}});
+      assert(result.ok(),`Evidence upload failed: ${upload.filename}`);
+      evidence.evidenceFiles.push({bucket:'ultimate-learner-evidence',path:upload.objectPath});
+    }
     await fs.writeFile(path.join(directory,'evidence.json'),JSON.stringify(evidence,null,2),{mode:0o600});
     const result={evidence,signature:crypto.createHmac('sha256',secret).update(canonicalHash(evidence)).digest('hex')};
     const saved=await page.request.put(`${base.origin}/api/learner-testing/runs/${setup.runId}`,{headers:{authorization:`Bearer ${secret}`},data:result});

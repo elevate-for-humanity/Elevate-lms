@@ -38,13 +38,26 @@ export class UltimatePlatformLearnerRuntime implements UltimateLearnerRuntimePor
       artifactHash: contractHash(artifacts),
       requiredChecks: LEARNER_RUNTHROUGH_CHECKS,
     };
-    const response = await fetch(url, {
+    let response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${secret}` },
       body: JSON.stringify(request),
       // Complete playback may exceed five minutes. The runner has its own bounded deadline.
       signal: AbortSignal.timeout(3600000),
     });
+    if (response.status === 202) {
+      const { testTicket } = await response.json();
+      if (typeof testTicket !== 'string' || !/^[a-f0-9-]{36}$/i.test(testTicket))
+        throw new Error('ULTIMATE_BROWSER_TEST_TICKET_INVALID');
+      const deadline = Date.now() + 3600000;
+      do {
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        response = await fetch(`${url.toString().replace(/\/$/, '')}/${testTicket}`, {
+          headers: { Authorization: `Bearer ${secret}` }, signal: AbortSignal.timeout(30000),
+        });
+      } while (response.status === 202 && Date.now() < deadline);
+      if (response.status === 202) throw new Error('ULTIMATE_BROWSER_TEST_DEADLINE_EXCEEDED');
+    }
     if (!response.ok) throw new Error(`Browser runthrough returned HTTP ${response.status}`);
     const { evidence, signature } = await response.json();
     const expected = createHmac('sha256', secret).update(contractHash(evidence)).digest('hex');

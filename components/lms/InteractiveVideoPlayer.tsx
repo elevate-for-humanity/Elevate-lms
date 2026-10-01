@@ -468,6 +468,7 @@ export default function InteractiveVideoPlayer({
         videoRef.current.currentTime = resumeAt;
         setCurrentTime(resumeAt);
       }
+      onProgressRef.current?.(videoRef.current.duration > 0 ? Math.round((videoRef.current.currentTime / videoRef.current.duration) * 100) : 0);
       syncAudioOutput();
     }
   };

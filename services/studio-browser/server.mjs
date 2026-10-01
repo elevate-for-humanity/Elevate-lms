@@ -44,6 +44,7 @@ const allowedDomains = (
   .filter(Boolean);
 const sessions = new Map();
 let learnerTestRunning = false;
+const learnerTests = new Map();
 const workspaceRoot = process.env.STUDIO_WORKSPACE_ROOT || '/workspace/project';
 const allowedExecCommands = new Set(['git', 'node', 'npm', 'npx', 'pnpm', 'python3', 'bash', 'ls', 'cat', 'grep', 'find', 'pwd']);
 let shuttingDown = false;
@@ -1028,12 +1029,28 @@ const server = http.createServer(async (req, res) => {
       const credential = process.env.ULTIMATE_LEARNER_RUNTHROUGH_SECRET;
       if (!credentialMatches(req.headers.authorization?.replace(/^Bearer /, ''), credential)) return json(res, 401, { error: 'unauthorized' });
       if (learnerTestRunning) return json(res, 429, { error: 'learner_test_capacity_reached' });
+      const input = await readBody(req), id = crypto.randomUUID();
       learnerTestRunning = true;
-      try {
-        const result = await runLearnerTest(await readBody(req), { browser: await browserManager.getBrowser(), secret: credential,
-          lmsUrl: process.env.STUDIO_LEARNER_LMS_URL || 'https://app.elevateforhumanity.org' });
-        return json(res, 200, result);
-      } finally { learnerTestRunning = false; }
+      learnerTests.set(id, { state: 'running', createdAt: Date.now() });
+      void (async () => {
+        try {
+          const result = await runLearnerTest(input, { browser: await browserManager.getBrowser(), secret: credential,
+            lmsUrl: process.env.STUDIO_LEARNER_LMS_URL || 'https://app.elevateforhumanity.org' });
+          learnerTests.set(id, { state: 'finished', result, createdAt: Date.now() });
+        } catch (error) {
+          learnerTests.set(id, { state: 'failed', error: String(error.message).slice(0,1000), createdAt: Date.now() });
+        } finally { learnerTestRunning = false; }
+      })();
+      return json(res, 202, { testTicket: id });
+    }
+    const learnerMatch = url.pathname.match(/^\/learner\/runthrough\/([a-f0-9-]{36})$/);
+    if (req.method === 'GET' && learnerMatch) {
+      if (!credentialMatches(req.headers.authorization?.replace(/^Bearer /, ''), process.env.ULTIMATE_LEARNER_RUNTHROUGH_SECRET)) return json(res, 401, { error: 'unauthorized' });
+      const test = learnerTests.get(learnerMatch[1]);
+      if (!test) return json(res, 404, { error: 'test_ticket_expired' });
+      if (test.state === 'running') return json(res, 202, { state: 'running' });
+      if (test.state === 'failed') return json(res, 422, { error: test.error });
+      return json(res, 200, test.result);
     }
     if (req.method === 'GET' && url.pathname === '/health') {
       const lifecycle = browserManager.health();
@@ -1199,6 +1216,7 @@ const server = http.createServer(async (req, res) => {
 const cleanupTimer = setInterval(() => {
   const cutoff = Date.now() - sessionTtlMs;
   for (const [id, session] of sessions) if (session.lastSeen < cutoff) void destroySession(id);
+  for (const [id, test] of learnerTests) if (test.state !== 'running' && test.createdAt < Date.now() - 2 * 60 * 60_000) learnerTests.delete(id);
 }, 30_000).unref();
 
 const heartbeatTimer = setInterval(() => {

@@ -1,4 +1,4 @@
-merge_sha=a6bdace22d06d5070148ea895923ffd3a6223d5d
-services=admin,lms
-requested_at=2026-10-01T21:10:00.000Z
-reason=Deploy password recovery repair and dynamic PARIS extension directory
+merge_sha=7585f4e60cb8066180bb96a1d182948f0f02d460
+services=lms
+requested_at=2026-10-01T21:35:00.000Z
+reason=Deploy canonical Program Holder password recovery flow

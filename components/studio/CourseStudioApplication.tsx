@@ -227,22 +227,32 @@ function StudioSidebar({
 }
 
 function PublishProgress() {
-  const { state } = useCourse();
-  const { totalLessons } = state.publishState;
-  if (totalLessons === 0) return null;
-  const generatedLessons = state.lessons.filter((lesson) =>
-    ['generated', 'complete', 'completed', 'verification_ready', 'certificate_ready', 'published'].includes(
-      String(lesson.generation_status ?? ''),
-    ),
-  ).length;
-  const pct = Math.round((generatedLessons / totalLessons) * 100);
+  const { state, setPanel } = useCourse();
+  const [readiness, setReadiness] = useState<{ pass: boolean; metrics: Record<string, unknown>; blocking_issues: string[] } | null>(null);
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/admin/course-builder/audit?courseId=${encodeURIComponent(state.course.id)}`, { cache: 'no-store' })
+      .then((response) => response.json())
+      .then((body) => { if (active && body?.result) setReadiness(body.result); })
+      .catch(() => { if (active) setReadiness(null); });
+    return () => { active = false; };
+  }, [state.course.id, state.autosave.lastSavedAt]);
+  if (!readiness) return null;
+  const metrics = readiness.metrics ?? {};
+  const totalLessons = Number(metrics.lessons ?? state.lessons.length ?? 0);
+  const validated = Number(metrics.validatedLessons ?? 0);
+  const videoTotal = Number(metrics.lessonVideoJobs ?? 0);
+  const videos = Number(metrics.completedVideoJobs ?? 0);
+  const lessonPct = totalLessons ? validated / totalLessons : 0;
+  const mediaPct = videoTotal ? videos / videoTotal : 1;
+  const pct = readiness.pass ? 100 : Math.max(0, Math.min(99, Math.round(((lessonPct + mediaPct) / 2) * 100)));
   return (
-    <div className="h-1 bg-slate-100 shrink-0">
-      <div
-        className="h-full bg-brand-blue-500 transition-all duration-500"
-        style={{ width: `${pct}%` }}
-      />
-    </div>
+    <button type="button" onClick={() => setPanel('compliance')} className="relative h-6 w-full shrink-0 bg-slate-100 text-left" title="Open persisted course readiness">
+      <div className="absolute inset-y-0 left-0 bg-brand-blue-500 transition-all duration-500" style={{ width: `${pct}%` }} />
+      <span className="relative z-10 flex h-full items-center justify-center text-[10px] font-bold text-slate-900">
+        {readiness.pass ? 'Ready for publication' : `${pct}% readiness · ${readiness.blocking_issues.length} blocker${readiness.blocking_issues.length === 1 ? '' : 's'}`}
+      </span>
+    </button>
   );
 }
 

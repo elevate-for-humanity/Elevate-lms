@@ -20,7 +20,7 @@ export default async function HostShopAttendancePage() {
   const placementIds = board.apprentices.map((apprentice) => apprentice.id).filter(Boolean);
 
   const [{ data: sessions, error: sessionsError }, attendanceResult] = await Promise.all([
-    db.from('attendance_sessions').select('id, title, scheduled_at, status, created_at').eq('host_id', user.id).order('scheduled_at', { ascending: false }).limit(25),
+    db.from('attendance_sessions').select('id, title, scheduled_at, status, created_at').in('host_shop_id', board.shops.map((shop) => shop.id)).order('scheduled_at', { ascending: false }).limit(25),
     placementIds.length
       ? db.from('host_shop_attendance_records').select('id, placement_id, student_id, attendance_date, status, notes, recorded_by, created_at, updated_at').eq('partner_id', board.partner.id).in('placement_id', placementIds).order('attendance_date', { ascending: false }).order('created_at', { ascending: false }).limit(100)
       : Promise.resolve({ data: [], error: null }),

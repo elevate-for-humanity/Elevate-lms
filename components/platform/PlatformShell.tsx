@@ -16,6 +16,8 @@ import {
   Download,
   CalendarDays,
   Mail,
+  ArrowLeft,
+  Home,
 } from 'lucide-react';
 import type {
   UserRole,
@@ -56,6 +58,7 @@ function isActiveHref(href: string, pathname: string): boolean {
 
 export function PlatformShell({ user, role, actions = [], children, paris, showLanguageSwitcher = true }: PlatformShellProps) {
   const pathname = usePathname();
+  const dashboardHref = role === 'host_shop' ? '/host-shop/dashboard' : role === 'program_holder' || role === 'site_coordinator' ? '/program-holder/dashboard' : role === 'student' || role === 'apprentice' ? '/student/dashboard' : '/';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -193,7 +196,12 @@ export function PlatformShell({ user, role, actions = [], children, paris, showL
             </Link>
           </div>
 
-          <div className="mx-8 hidden max-w-md flex-1 md:flex">
+          <div className="hidden items-center gap-1 sm:flex">
+            {pathname !== dashboardHref ? <button type="button" onClick={() => window.history.back()} className="inline-flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-slate-100" aria-label="Go back"><ArrowLeft className="h-4 w-4" /> Back</button> : null}
+            <Link href={dashboardHref} className="inline-flex min-h-11 items-center gap-1 rounded-lg px-3 text-sm font-bold text-slate-700 hover:bg-slate-100"><Home className="h-4 w-4" /> Dashboard</Link>
+          </div>
+
+          <div className="mx-4 hidden max-w-md flex-1 md:flex">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input

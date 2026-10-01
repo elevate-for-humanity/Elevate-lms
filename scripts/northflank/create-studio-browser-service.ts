@@ -15,9 +15,13 @@ const execute = process.argv.includes('--execute');
 const projectId = resolveProjectId();
 if (!projectId) throw new Error('Set NORTHFLANK_PROJECT_ID');
 
+let existingRuntimeEnvironment: Record<string, string> = {};
 async function exists() {
   try {
-    await nfFetch(projectApiPath(projectId!, `/services/${serviceId}`));
+    const current = await nfFetch<{ runtimeEnvironment?: Record<string, string> }>(
+      projectApiPath(projectId!, `/services/${serviceId}`),
+    );
+    existingRuntimeEnvironment = current.runtimeEnvironment ?? {};
     return true;
   } catch {
     return false;
@@ -82,12 +86,15 @@ console.log(
   `${execute ? 'EXECUTE' : 'DRY RUN'}: ${serviceId} from ${branch}, Dockerfile.studio-browser, port 3100`,
 );
 if (!execute) process.exit(0);
-if (await exists())
+if (await exists()) {
+  // Preserve the separate learner-test credential and other configured extensions.
+  // Replacing the entire environment would rotate the credential on every deploy.
+  payload.runtimeEnvironment = { ...existingRuntimeEnvironment, ...payload.runtimeEnvironment };
   await nfFetch(combinedServicePatchPath(projectId, serviceId), {
     method: 'PATCH',
     body: JSON.stringify(payload),
   });
-else
+} else
   await nfFetch(combinedServiceCreatePath(projectId), {
     method: 'POST',
     body: JSON.stringify(payload),

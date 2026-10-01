@@ -30,12 +30,12 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
     licenseTitle: 'Indiana Barber License',
     licensingBody: 'Indiana Professional Licensing Agency (IPLA)',
     salaryRange: '$35,000 - $75,000+',
-    totalHours: 2000,
-    hoursLabel: '2,000 hours',
+    totalHours: 260,
+    hoursLabel: '14 competencies + 260 RTI hours',
     ojtDescription:
-      'Work in a licensed barbershop under a mentor barber. Learn real skills with real clients.',
+      'Complete and document all 14 registered Appendix A competencies through supervised barbershop practice. Work hours are training evidence, not a fixed completion denominator.',
     rtiDescription:
-      'Complete Prestige Elevation Barber Curriculum online through Elevate LMS. Learn sanitation, anatomy, and business skills.',
+      'Complete 260 verified hours of Related Technical Instruction. The 500-hour figure is the probationary period, not graduation.',
     tuition: {
       total: 4980,
       setupFeePercent: 35,
@@ -70,16 +70,16 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
   },
   'cosmetology-apprenticeship': {
     programSlug: 'cosmetology-apprenticeship',
-    programTitle: 'Cosmetology Apprenticeship',
+    programTitle: 'Hair Stylist / Cosmetology Apprenticeship',
     licenseTitle: 'Indiana Cosmetology License',
     licensingBody: 'Indiana Professional Licensing Agency (IPLA)',
     salaryRange: '$30,000 - $65,000+',
     totalHours: 2000,
-    hoursLabel: '2,000 hours',
+    hoursLabel: '2,000–2,500-hour hybrid term + 154 RTI hours',
     ojtDescription:
-      'Work in a licensed salon under a supervising cosmetologist. Perform real services on real clients while earning a wage from day one.',
+      'RAPIDS 0096HY V1 uses a hybrid 2,000–2,500-hour term with supervised salon work-process training. The 500-hour figure is probation, not graduation.',
     rtiDescription:
-      'Complete Milady theory courses online through the Elevate LMS. Covers hair, skin, nail techniques, sanitation, infection control, and salon business skills.',
+      'Complete 154 verified RTI hours alongside the registered hybrid work-process requirements.'
     tuition: {
       total: 0,
       setupFeePercent: 0,
@@ -96,12 +96,12 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
     licenseTitle: 'Indiana Nail Technician License',
     licensingBody: 'Indiana Professional Licensing Agency (IPLA)',
     salaryRange: '$28,000 - $55,000+',
-    totalHours: 450,
-    hoursLabel: '450 hours',
+    totalHours: 210,
+    hoursLabel: '19 competencies + 210 RTI hours',
     ojtDescription:
-      'Work in a licensed nail salon under a supervising nail technician. Perform real services on real clients while earning a wage from day one.',
+      'Complete and document all 19 registered Appendix A competencies through supervised nail-salon practice. Work hours are training evidence, not a fixed completion denominator.'
     rtiDescription:
-      'Complete theory courses online through the Elevate LMS. Covers nail anatomy, sanitation, manicuring, pedicuring, nail enhancements, and Indiana nail tech law.',
+      'Complete 210 verified RTI hours covering the registered Manicurist instructional outline. The 500-hour figure is probation, not graduation.'
     tuition: {
       total: 2490,
       setupFeePercent: 35,
@@ -118,12 +118,12 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
     licenseTitle: 'Indiana Nail Technician License',
     licensingBody: 'Indiana Professional Licensing Agency (IPLA)',
     salaryRange: '$28,000 - $55,000+',
-    totalHours: 450,
-    hoursLabel: '450 hours',
+    totalHours: 210,
+    hoursLabel: '19 competencies + 210 RTI hours',
     ojtDescription:
-      'Work in a licensed salon under a mentor. Practice manicures, pedicures, and nail art with real clients.',
+      'Complete and document all 19 registered Appendix A competencies through supervised nail-salon practice. Work hours are training evidence, not a fixed completion denominator.'
     rtiDescription:
-      'Complete theory courses online. Learn nail anatomy, sanitation, and business skills.',
+      'Complete 210 verified RTI hours covering the registered Manicurist instructional outline. The 500-hour figure is probation, not graduation.'
     tuition: {
       total: 2500,
       setupFeePercent: 35,

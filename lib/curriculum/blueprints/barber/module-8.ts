@@ -730,11 +730,16 @@ export const barberModule8: BlueprintModule = {
             {
               id: 'ep-q40',
               question:
-                'The DOL-registered apprenticeship path to a barber license in Indiana requires:',
-              options: ['1,000 OJT hours', '1,500 OJT hours', '2,000 OJT hours', '2,500 OJT hours'],
-              correctAnswer: 2,
+                'Under the approved Barber Appendix A, registered-program completion requires:',
+              options: [
+                '500 probation hours only',
+                '14 verified competencies plus 260 RTI hours',
+                '1,500 fixed OJT hours plus 500 RTI hours',
+                '2,000 fixed OJT hours only',
+              ],
+              correctAnswer: 1,
               explanation:
-                'The Department of Labor registered apprenticeship path requires 2,000 on-the-job training hours.',
+                'The approved Barber standard is competency-based: complete 14 verified Appendix A competencies plus 260 RTI hours. The 500-hour figure is the probationary period, not completion.',
             },
             // ── ANATOMY & PHYSIOLOGY ──────────────────────────────────────────
             {

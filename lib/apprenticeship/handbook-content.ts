@@ -46,11 +46,13 @@ DBA ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute
 - **RTI Provider ID:** ${process.env.NEXT_PUBLIC_RTI_PROVIDER_ID || '208029'}
 - **ETPL Approved:** Yes
 
-## Program Duration
-- **Total Hours Required:** 1,500 hours (Indiana IPLA requirement)
-- **Estimated Duration:** 12-18 months (depending on hours worked per week)
-- **RTI Hours:** Approximately 150 hours (10%)
-- **OJT Hours:** Approximately 1,350 hours (90%)
+## Registered Program Requirements
+- **RAPIDS Occupation:** Barber 0030CB V1
+- **Progress Model:** Competency-based
+- **Occupational Competencies:** 14 verified Appendix A competencies
+- **RTI Hours:** 260 verified hours
+- **Probationary Period:** 500 hours — probation is not graduation
+- **Supervised Work:** Work/OJL hours are retained as auditable training evidence and do not replace competency or RTI completion
 
 ## What This Program Provides
 - DOL Registered Apprenticeship sponsorship and oversight
@@ -81,7 +83,7 @@ As a registered apprentice, you have specific responsibilities that you must ful
 ## Attendance & Punctuality
 - Report to your assigned barbershop on time for all scheduled shifts
 - Notify your supervisor AND Elevate if you will be absent or late
-- Maintain a minimum of 20 hours per week of OJT (recommended)
+- Follow the approved work schedule and document supervised work accurately
 - Complete RTI coursework on schedule
 
 ## Professional Conduct
@@ -148,7 +150,7 @@ Your sponsoring barbershop has agreed to provide the following as part of your a
 - Cannot charge apprentice for training or chair rental
 
 ## Documentation
-- Verify and sign off on OJT hours
+- Verify supervised work records and required competencies
 - Complete competency assessments
 - Provide feedback to Elevate on apprentice progress
 - Maintain required employment records
@@ -169,13 +171,16 @@ Your sponsoring barbershop has agreed to provide the following as part of your a
       content: `
 # Hour Requirements & Logging
 
-## Indiana IPLA Requirements
-To be eligible for the Indiana barber license examination, you must complete:
-- **Total Hours:** 1,500 hours minimum
-- **RTI (Theory):** Approximately 150 hours via Elevate LMS
-- **OJT (Hands-on):** Approximately 1,350 hours at your shop
+## Registered Apprenticeship Requirements
+For the registered Barber apprenticeship, complete:
+- **14 verified Appendix A competencies**
+- **260 verified RTI hours**
+- **Supervised work records and sponsor-required documentation**
+- **500-hour probationary period** — this is not program completion
 
-## Hour Types
+Indiana examination and professional licensing are separate steps after registered-program completion. Traditional beauty-school hour requirements must not be substituted for this registered apprenticeship standard.
+
+## Training Record Types
 
 ### Related Technical Instruction (RTI)
 - Elevate LMS theory coursework (online)
@@ -183,7 +188,7 @@ To be eligible for the Indiana barber license examination, you must complete:
 - Business and professional development
 - State board exam preparation
 
-### On-the-Job Training (OJT)
+### Supervised Work / On-the-Job Learning (OJL)
 - Haircuts (fades, tapers, scissors work)
 - Shaving and facial hair services
 - Client consultation and communication
@@ -222,17 +227,15 @@ To be eligible for the Indiana barber license examination, you must complete:
 ## Completion Requirements
 To successfully complete this apprenticeship program, you must:
 
-1. **Complete 1,500 Hours**
-   - All hours logged and approved
-   - Proper mix of RTI and OJT
+1. **Complete 260 RTI Hours**
+   - Verified instructional activity and required assessments
 
-2. **Complete LMS Theory**
-   - All required modules completed
-   - Passing scores on assessments
+2. **Demonstrate All 14 Appendix A Competencies**
+   - Required skills verified by the qualified supervisor/mentor
+   - Competency records completed
 
-3. **Demonstrate Practical Competencies**
-   - All required skills verified by mentor
-   - Competency checklist completed
+3. **Maintain Accurate Supervised Work Records**
+   - Work/OJL hours document training activity and do not act as a fixed completion denominator
 
 4. **Maintain Good Standing**
    - Tuition paid in full
@@ -476,7 +479,7 @@ This agreement begins on the date of signature and continues until:
 - Mutual agreement to terminate
 
 ## Apprentice Agrees To:
-1. Complete all required training hours (1,500 minimum)
+1. Complete all 14 registered Appendix A competencies and 260 RTI hours
 2. Attend work regularly and punctually
 3. Perform all duties assigned by supervisor
 4. Complete all RTI coursework
@@ -501,7 +504,7 @@ This agreement begins on the date of signature and continues until:
 1. Provide safe training environment
 2. Assign qualified supervisor/mentor
 3. Allow time for RTI completion
-4. Verify OJT hours
+4. Verify supervised work records and required competencies
 5. Pay at least minimum wage
 6. Not charge apprentice for training
 7. Comply with all applicable laws
@@ -527,14 +530,25 @@ By signing below, all parties agree to the terms of this MOU.
 export const COSMETOLOGY_HANDBOOK: ProgramHandbook = {
   ...BARBER_HANDBOOK,
   programSlug: 'cosmetology-apprenticeship',
-  programName: 'Registered Cosmetology Apprenticeship Program',
+  programName: 'Registered Hair Stylist / Cosmetology Apprenticeship Program',
   sections: BARBER_HANDBOOK.sections.map((section) => ({
     ...section,
     content: section.content
-      .replace(/barber/gi, 'cosmetology')
+      .replace(/barber/gi, 'hair stylist')
       .replace(/barbershop/gi, 'salon')
-      .replace(/Barber/g, 'Cosmetology')
-      .replace(/Barbershop/g, 'Salon'),
+      .replace(/Barber/g, 'Hair Stylist')
+      .replace(/Barbershop/g, 'Salon')
+      .replace(/0030CB V1/g, '0096HY V1')
+      .replace(/Competency-based/g, 'Hybrid')
+      .replace(/14 verified Appendix A competencies/g, 'required registered Hair Stylist work processes')
+      .replace(/14 registered Appendix A competencies/g, 'registered Hair Stylist work processes')
+      .replace(/all 14 Appendix A competencies/gi, 'all required Hair Stylist work processes')
+      .replace(/260 verified RTI hours/g, '154 verified RTI hours')
+      .replace(/260 RTI hours/g, '154 RTI hours')
+      .replace(/Complete 260 RTI Hours/g, 'Complete 154 RTI Hours')
+      .replace(/2,000-hour completion counter/g, '2,000–2,500-hour registered hybrid term')
+      .replace(/Work\/OJL hours are retained as auditable training evidence and do not replace competency or RTI completion/g, 'Complete the registered 2,000–2,500-hour hybrid term, 154 RTI hours, required work processes, and sponsor documentation')
+      .replace(/Work\/OJL hours document training activity and do not act as a fixed completion denominator/g, 'Supervised work hours count toward the registered 2,000–2,500-hour hybrid term; RTI and work-process requirements are tracked separately'),
   })),
 };
 
@@ -549,15 +563,20 @@ export const ESTHETICIAN_HANDBOOK: ProgramHandbook = {
       .replace(/barbershop/gi, 'spa/salon')
       .replace(/Barber/g, 'Esthetician')
       .replace(/Barbershop/g, 'Spa/Salon')
-      .replace(/1,500 hours/g, '20 verified competencies plus 300 RTI hours')
-      .replace(/1500/g, '300'),
+      .replace(/0030CB V1/g, '2089CB V1')
+      .replace(/14 verified Appendix A competencies/g, '20 verified Appendix A competencies')
+      .replace(/14 registered Appendix A competencies/g, '20 registered Appendix A competencies')
+      .replace(/all 14 Appendix A competencies/gi, 'all 20 Appendix A competencies')
+      .replace(/260 verified RTI hours/g, '300 verified RTI hours')
+      .replace(/260 RTI hours/g, '300 RTI hours')
+      .replace(/Complete 260 RTI Hours/g, 'Complete 300 RTI Hours'),
   })),
 };
 
 export const NAIL_TECH_HANDBOOK: ProgramHandbook = {
   ...BARBER_HANDBOOK,
   programSlug: 'nail-technician-apprenticeship',
-  programName: 'Registered Nail Technician Apprenticeship Program',
+  programName: 'Registered Manicurist / Nail Technician Apprenticeship Program',
   sections: BARBER_HANDBOOK.sections.map((section) => ({
     ...section,
     content: section.content
@@ -565,8 +584,13 @@ export const NAIL_TECH_HANDBOOK: ProgramHandbook = {
       .replace(/barbershop/gi, 'nail salon')
       .replace(/Barber/g, 'Nail Technician')
       .replace(/Barbershop/g, 'Nail Salon')
-      .replace(/1,500 hours/g, '450 hours')
-      .replace(/1500/g, '450'),
+      .replace(/0030CB V1/g, '2090CB V1')
+      .replace(/14 verified Appendix A competencies/g, '19 verified Appendix A competencies')
+      .replace(/14 registered Appendix A competencies/g, '19 registered Appendix A competencies')
+      .replace(/all 14 Appendix A competencies/gi, 'all 19 Appendix A competencies')
+      .replace(/260 verified RTI hours/g, '210 verified RTI hours')
+      .replace(/260 RTI hours/g, '210 RTI hours')
+      .replace(/Complete 260 RTI Hours/g, 'Complete 210 RTI Hours'),
   })),
 };
 

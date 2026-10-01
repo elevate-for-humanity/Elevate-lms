@@ -41,14 +41,23 @@ export default function HomePage() {
     <>
       <StructuredData />
       <main className="[&_a]:no-underline [&_a:hover]:no-underline">
-        <a
-          href={WORKONE_INDY_BOOKING_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block bg-yellow-300 px-4 py-4 text-center text-lg font-black uppercase tracking-wide text-slate-950 sm:text-xl"
-        >
-          POSSIBLE FUNDING FOR CDL, BOOKKEEPING, BUSINESS & HVAC TRAINING — SIGN UP FOR YOUR WORKONE APPOINTMENT HERE FOR YOUR INTAKE TO SEE IF YOU QUALIFY
-        </a>
+        <section className="border-b border-amber-300 bg-amber-50 px-4 py-5" aria-labelledby="workone-home-cta">
+          <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-900">Funding intake</p>
+              <h2 id="workone-home-cta" className="mt-1 text-xl font-black text-slate-950 sm:text-2xl">Interested in possible funding for CDL, bookkeeping, business or HVAC training?</h2>
+              <p className="mt-1 max-w-3xl text-sm font-semibold leading-6 text-slate-700">Schedule your WorkOne intake appointment to begin the eligibility process. Funding is based on individual eligibility and program requirements.</p>
+            </div>
+            <a
+              href={WORKONE_INDY_BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-slate-950 px-6 py-3 text-center font-black text-white hover:bg-slate-800"
+            >
+              Schedule WorkOne Appointment
+            </a>
+          </div>
+        </section>
         <PlatformHubHero />
         <HomeFeaturedHostShop />
         <HomeNetworks />

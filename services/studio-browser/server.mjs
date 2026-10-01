@@ -10,6 +10,7 @@ import { pipeline } from 'node:stream/promises';
 import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 import { chromium } from 'playwright-core';
+import { runLearnerTest, credentialMatches } from './learner-runthrough.mjs';
 
 const execFileAsync = promisify(execFile);
 
@@ -42,6 +43,7 @@ const allowedDomains = (
   .map((value) => value.trim().toLowerCase())
   .filter(Boolean);
 const sessions = new Map();
+let learnerTestRunning = false;
 const workspaceRoot = process.env.STUDIO_WORKSPACE_ROOT || '/workspace/project';
 const allowedExecCommands = new Set(['git', 'node', 'npm', 'npx', 'pnpm', 'python3', 'bash', 'ls', 'cat', 'grep', 'find', 'pwd']);
 let shuttingDown = false;
@@ -1014,6 +1016,25 @@ const server = http.createServer(async (req, res) => {
   try {
     if (req.method === 'OPTIONS') return json(res, 204, {});
     const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
+    if (req.method === 'GET' && url.pathname === '/learner/health') {
+      const credential = process.env.ULTIMATE_LEARNER_RUNTHROUGH_SECRET;
+      if (!credentialMatches(req.headers.authorization?.replace(/^Bearer /, ''), credential)) return json(res, 401, { error: 'unauthorized' });
+      const probe = await fetch(`${process.env.STUDIO_LEARNER_LMS_URL || 'https://app.elevateforhumanity.org'}/api/learner-testing/runs`, {
+        method: 'POST', headers: { authorization: `Bearer ${credential}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ lessonBuildId: '00000000-0000-0000-0000-000000000000' }), signal: AbortSignal.timeout(15000) });
+      return json(res, probe.status === 404 ? 200 : 503, { ready: probe.status === 404, lmsSetupStatus: probe.status, commit: process.env.GIT_SHA });
+    }
+    if (req.method === 'POST' && url.pathname === '/learner/runthrough') {
+      const credential = process.env.ULTIMATE_LEARNER_RUNTHROUGH_SECRET;
+      if (!credentialMatches(req.headers.authorization?.replace(/^Bearer /, ''), credential)) return json(res, 401, { error: 'unauthorized' });
+      if (learnerTestRunning) return json(res, 429, { error: 'learner_test_capacity_reached' });
+      learnerTestRunning = true;
+      try {
+        const result = await runLearnerTest(await readBody(req), { browser: await browserManager.getBrowser(), secret: credential,
+          lmsUrl: process.env.STUDIO_LEARNER_LMS_URL || 'https://app.elevateforhumanity.org' });
+        return json(res, 200, result);
+      } finally { learnerTestRunning = false; }
+    }
     if (req.method === 'GET' && url.pathname === '/health') {
       const lifecycle = browserManager.health();
       const ready =
@@ -1214,4 +1235,3 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       );
   });
 }
-

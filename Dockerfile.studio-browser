@@ -15,6 +15,7 @@ RUN apt-get update \
     && mkdir -p /workspace/project \
     && chown -R studio:studio /app /workspace
 COPY services/studio-browser/server.mjs ./server.mjs
+COPY services/studio-browser/learner-runthrough.mjs ./learner-runthrough.mjs
 
 ENV NODE_ENV=production PORT=3100 GIT_SHA=${NF_GIT_SHA}
 EXPOSE 3100

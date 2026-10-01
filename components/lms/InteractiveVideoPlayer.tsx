@@ -86,6 +86,8 @@ const getCheckpointKey = (checkpoint: Checkpoint) => `${checkpoint.type}:${check
 
 interface InteractiveVideoPlayerProps {
   videoUrl: string;
+  captionsUrl?: string;
+  initialPositionSeconds?: number;
   title: string;
   lessonId?: string;
   courseId?: string;
@@ -99,6 +101,8 @@ interface InteractiveVideoPlayerProps {
 
 export default function InteractiveVideoPlayer({
   videoUrl,
+  captionsUrl,
+  initialPositionSeconds = 0,
   title,
   lessonId: lessonRecordId,
   courseId,
@@ -132,7 +136,7 @@ export default function InteractiveVideoPlayer({
   const [checkpointChoice, setCheckpointChoice] = useState<number | null>(null);
   const [checkpointFeedback, setCheckpointFeedback] = useState('');
   const [completedCheckpointKeys, setCompletedCheckpointKeys] = useState<Set<string>>(new Set());
-  const resumePositionRef = useRef(0);
+  const resumePositionRef = useRef(initialPositionSeconds);
 
   const effectiveQuizzes = useMemo(() => {
     const checkpointQuizzes: VideoQuiz[] = checkpoints
@@ -730,6 +734,7 @@ export default function InteractiveVideoPlayer({
           <video
             ref={videoRef}
             src={videoUrl}
+            crossOrigin={captionsUrl ? 'anonymous' : undefined}
             aria-label={title}
             className="w-full aspect-video"
             controls
@@ -742,7 +747,9 @@ export default function InteractiveVideoPlayer({
               setIsPlaying(false);
               if (allCheckpointsComplete && onComplete) onComplete();
             }}
-          />
+          >
+            {captionsUrl ? <track kind="captions" src={captionsUrl} srcLang="en" label="English" default /> : null}
+          </video>
         )}
 
         {/* Captions Overlay */}

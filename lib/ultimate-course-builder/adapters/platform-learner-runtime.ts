@@ -42,7 +42,8 @@ export class UltimatePlatformLearnerRuntime implements UltimateLearnerRuntimePor
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${secret}` },
       body: JSON.stringify(request),
-      signal: AbortSignal.timeout(300000),
+      // Complete playback may exceed five minutes. The runner has its own bounded deadline.
+      signal: AbortSignal.timeout(3600000),
     });
     if (!response.ok) throw new Error(`Browser runthrough returned HTTP ${response.status}`);
     const { evidence, signature } = await response.json();

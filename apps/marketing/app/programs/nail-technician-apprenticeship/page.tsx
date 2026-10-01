@@ -6,6 +6,7 @@ import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from 
 import NailDesignShowcase from '@/components/programs/beauty/NailDesignShowcase';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
+import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
 import heroBanners from '@/content/heroBanners';
 import { notFound } from 'next/navigation';
 import { getStaticProgram } from '@/data/programs';
@@ -47,6 +48,7 @@ export default async function NailTechnicianApprenticeshipPage() {
         heroOverride={heroOverride}
         featuredContent={
           <>
+            <ApprenticeshipExperienceGuide programTitle={program.title} applyHref={program.cta.applyHref} />
             <FeaturedHostPartners programSlug="nail-technician-apprenticeship" />
             <HostShopPlacementGuide programSlug="nail-technician-apprenticeship" />
           </>

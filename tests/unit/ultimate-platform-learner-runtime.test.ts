@@ -7,23 +7,15 @@ import {
 } from '../../lib/ultimate-course-builder/core/lesson-contract';
 import { LEARNER_RUNTHROUGH_CHECKS } from '../../lib/ultimate-course-builder/quality/learner-runthrough';
 const artifacts = { finished_media_qa: { mediaQA: { inspection: { mediaSha256: 'media' } } } };
-const db: any = {
-  from: () => ({
-    select: () => ({
-      eq: () => ({
-        eq: () => ({
-          order: () => ({
-            limit: () => ({
-              single: async () => ({ data: { id: 'lesson-build', artifacts }, error: null }),
-            }),
-          }),
-        }),
-      }),
-    }),
-  }),
+let currentArtifacts: unknown = artifacts;
+const query: any = {
+  select: () => query, eq: () => query, order: () => query, limit: () => query,
+  single: async () => ({ data: { id: 'lesson-build', artifacts: currentArtifacts }, error: null }),
 };
+const db: any = { from: () => query };
 const input = { courseId: 'course', lessonId: 'lesson', videoUrl: 'https://example.org/video.mp4' };
 afterEach(() => {
+  currentArtifacts = artifacts;
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
@@ -54,6 +46,14 @@ function response(evidence: any) {
   return { ok: true, json: async () => ({ evidence, signature }) };
 }
 describe('authentic learner evidence', () => {
+  it('rejects a lesson changed while its browser test was running', async () => {
+    configured();
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      currentArtifacts = { ...artifacts, replacedLesson: true };
+      return response(report());
+    }));
+    await expect(new UltimatePlatformLearnerRuntime(db).verify(input)).rejects.toThrow('LESSON_CHANGED_DURING_TEST');
+  });
   it('blocks when no browser worker is configured', async () => {
     vi.stubEnv('ULTIMATE_LEARNER_RUNTHROUGH_URL', '');
     await expect(new UltimatePlatformLearnerRuntime(db).verify(input)).rejects.toThrow(

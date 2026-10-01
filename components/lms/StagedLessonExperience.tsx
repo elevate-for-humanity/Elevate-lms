@@ -16,7 +16,9 @@ export default function StagedLessonExperience({ runId, snapshot, initialProgres
     const video = root.current?.querySelector('video');
     if (!video || saving.current || Date.now() - lastSave.current < 3000 || !Number.isFinite(video.duration)) return;
     saving.current = true; lastSave.current = Date.now();
-    try { await act({ action: 'progress', position: video.currentTime, duration: video.duration }); } catch {} finally { saving.current = false; }
+    try { await act({ action: 'progress', position: video.currentTime, duration: video.duration }); }
+    catch { /* act displays the save failure; playback can retry on its next update. */ }
+    finally { saving.current = false; }
   }
   const retake = progress.assessment && !progress.assessment.passed && progress.remediationReviewed;
   const questions = retake ? b.assessment.reassessment : b.assessment.questions;

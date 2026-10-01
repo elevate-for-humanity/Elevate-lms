@@ -51,6 +51,8 @@ export async function runLearnerTest(input, { browser, secret, lmsUrl, evidenceR
     page.on('pageerror',e=>errors.push(e.message.slice(0,300)));
     await page.goto(`${base.origin}${setup.path}`,{waitUntil:'domcontentloaded'});
     await page.getByTestId('staged-lesson').waitFor({timeout:30000});
+    const premature=await page.request.post(`${base.origin}/api/learner-testing/runs/${setup.runId}`,{data:{action:'complete'}});
+    assert(premature.status()===409,'Incomplete lesson incorrectly awarded completion');
     await check('desktop','Open protected lesson at desktop size and inspect layout',async()=>{ const d=await readable(page); await page.screenshot({path:path.join(directory,'desktop.png'),fullPage:true});return d; });
     await check('mobile','Open authenticated lesson at 390px and inspect readable controls',async()=>{
       const ctx=await authContext({width:390,height:844},true), p=await ctx.newPage();

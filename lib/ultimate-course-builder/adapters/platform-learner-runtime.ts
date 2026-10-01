@@ -66,6 +66,10 @@ export class UltimatePlatformLearnerRuntime implements UltimateLearnerRuntimePor
     const checkedAt = Date.parse(evidence.checkedAt);
     if (!Number.isFinite(checkedAt) || Math.abs(Date.now() - checkedAt) > 600000)
       throw new Error('ULTIMATE_BROWSER_EVIDENCE_EXPIRED');
+    const { data: current, error: currentError } = await this.db
+      .from('ultimate_lesson_builds').select('artifacts').eq('id', lesson.id).single();
+    if (currentError || !current || contractHash(current.artifacts) !== request.artifactHash)
+      throw new Error('ULTIMATE_BROWSER_LESSON_CHANGED_DURING_TEST');
     const results = Object.fromEntries(
       LEARNER_RUNTHROUGH_CHECKS.map((check) => [
         check,

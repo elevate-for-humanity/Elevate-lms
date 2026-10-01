@@ -6,9 +6,9 @@ const FEATURED_SHOPS = [
   {
     name: "Cal's Kutz Studio",
     program: 'Barber Apprenticeship • Earn While You Learn',
-    image: '/images/partners/cals-kutz-shop-interior.webp',
+    image: '/images/partners/cals-kutz-official.webp',
     imageAlt: "Cal's Kutz Studio apprenticeship host barbershop",
-    address: 'Indianapolis, Indiana',
+    address: '6240 La Pas Trl, Indianapolis, Indiana',
     shopHref: '/host-shops/cals-kutz-studio',
     programHref: '/programs/barber-apprenticeship',
   },

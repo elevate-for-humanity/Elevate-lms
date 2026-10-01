@@ -52,9 +52,11 @@ export default async function HostShopProgramsPage() {
         <h2 className="mt-4 text-2xl font-black text-slate-950">{board.tradeInfo.label}</h2>
         <p className="mt-2 leading-7 text-slate-700">
           {configured
-            ? timeBased
-              ? `The ${Number(board.timeBasedPrograms[0]?.hours || 0).toLocaleString()}-hour time-based apprenticeship target is active. Approved Host Shop OJL entries feed progress automatically.`
-              : `${board.registeredPrograms.length} active registered occupation standard${board.registeredPrograms.length === 1 ? '' : 's'} available for regulated progress.`
+            ? hybrid
+              ? 'Hair Stylist / Cosmetologist is registered as RAPIDS 0096HY V1 using a 2,000–2,500-hour hybrid term with 154 RTI hours and a 500-hour probationary period.'
+              : timeBased
+                ? `The ${Number(board.timeBasedPrograms[0]?.hours || 0).toLocaleString()}-hour time-based apprenticeship target is active. Approved Host Shop OJL entries feed progress automatically.`
+                : `${board.registeredPrograms.length} active registered occupation standard${board.registeredPrograms.length === 1 ? '' : 's'} available for regulated progress.`
             : 'No active approved registered-program standard is configured for the assigned occupation. Competency, RTI, wage-milestone, and regulated completion credit remain blocked.'}
         </p>
       </section>

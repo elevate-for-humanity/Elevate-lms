@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { canonicalHash, credentialMatches, runLearnerTest, CHECKS } from './learner-runthrough.mjs';
+import { canonicalHash, credentialMatches, runLearnerTest, CHECKS, learnerSetupReady } from './learner-runthrough.mjs';
 test('evidence hashes are stable across object ordering but change with lesson contents', () => {
   assert.equal(canonicalHash({b:2,a:[{z:1,x:3}]}), canonicalHash({a:[{x:3,z:1}],b:2}));
   assert.notEqual(canonicalHash({a:'old lesson'}),canonicalHash({a:'new lesson'}));
@@ -16,4 +16,11 @@ test('runner rejects arbitrary target hosts before opening a browser or creating
 test('runner rejects partial test contracts rather than returning fake passing observations', async () => {
   await assert.rejects(runLearnerTest({requiredChecks:['desktop']},{lmsUrl:'https://app.elevateforhumanity.org',secret:'secret'}),/Full learner contract/);
   await assert.rejects(runLearnerTest({requiredChecks:CHECKS},{lmsUrl:'https://app.elevateforhumanity.org',secret:'secret'}),/Missing lessonBuildId/);
+});
+
+test("learner readiness rejects a generic missing route and wrong credentials", () => {
+ assert.equal(learnerSetupReady(404, null), false);
+ assert.equal(learnerSetupReady(404, {error:"Not Found"}), false);
+ assert.equal(learnerSetupReady(401, {error:"unauthorized"}), false);
+ assert.equal(learnerSetupReady(404, {error:"Lesson not found"}), true);
 });

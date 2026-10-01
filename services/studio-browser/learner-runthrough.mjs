@@ -148,3 +148,7 @@ export async function runLearnerTest(input, { browser, secret, lmsUrl, evidenceR
     if(setup){const clean=await browser.newContext();try{await clean.request.delete(`${base.origin}/api/learner-testing/runs/${setup.runId}`,{headers:{authorization:`Bearer ${secret}`}});}finally{await clean.close();}}
   }
 }
+
+export function learnerSetupReady(status, body) {
+ return status === 404 && body?.error === "Lesson not found";
+}

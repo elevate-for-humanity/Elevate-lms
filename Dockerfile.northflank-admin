@@ -44,10 +44,9 @@ RUN echo "nf-deps-2026-08-13-block-ffmpeg-static-postinstall"
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json ./apps/admin/package.json
 COPY packages ./packages
-# Runtime ships Debian FFmpeg. Prevent ffmpeg-static from downloading a second
-# binary during dependency installation, which has historically failed on
-# Northflank with ECONNRESET.
-RUN node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); if (p.pnpm?.onlyBuiltDependencies) p.pnpm.onlyBuiltDependencies=p.pnpm.onlyBuiltDependencies.filter((name)=>name!=='ffmpeg-static'); fs.writeFileSync('package.json', JSON.stringify(p,null,2)+'\n');"
+# Runtime ships Debian FFmpeg. Fail closed unless the workspace blocks the
+# redundant ffmpeg-static GitHub download during dependency installation.
+RUN node -e "const fs=require('fs'); const yaml=fs.readFileSync('pnpm-workspace.yaml','utf8'); if (!/^  ffmpeg-static: false$/m.test(yaml)) throw new Error('pnpm-workspace.yaml must block ffmpeg-static builds');"
 RUN set -eux; \
     PNPM_BIN="$(command -v pnpm)"; \
     test -n "${PNPM_BIN}"; \

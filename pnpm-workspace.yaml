@@ -13,7 +13,10 @@ allowBuilds:
   canvas: true
   core-js: true
   esbuild: true
-  ffmpeg-static: true
+  # Production images use the operating-system FFmpeg binary (or
+  # @ffmpeg-installer/ffmpeg where explicitly required). Never run
+  # ffmpeg-static's network-dependent GitHub release download during install.
+  ffmpeg-static: false
   node-pty: true
   onnxruntime-node: true
   protobufjs: true

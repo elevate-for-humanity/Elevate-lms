@@ -51,10 +51,11 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     // replaying a failed QA result against the same cached audio/video. Keep
     // all earlier instructional work and licensed visual assignments.
     const narrationQA = (artifacts.narration_qa as any)?.narrationQA;
-    const paceFailed = narrationQA?.failures?.includes('PACE_OUT_OF_RANGE');
+    const narrationNeedsRepair = narrationQA?.failures?.some((failure: string) =>
+      ['PACE_OUT_OF_RANGE', 'CLIPPED_WORDS'].includes(failure));
     const render = (artifacts.lesson_film_render as any)?.render;
     const oldLayout = render && render.layoutVersion !== 2;
-    const firstRebuildStep = paceFailed ? 'natural_narration' : oldLayout ? 'lesson_film_render' : null;
+    const firstRebuildStep = narrationNeedsRepair ? 'natural_narration' : oldLayout ? 'lesson_film_render' : null;
     const ordered: readonly string[] = ULTIMATE_BUILD_STEPS;
     const rebuildIndex = firstRebuildStep ? ordered.indexOf(firstRebuildStep) : -1;
     const reusable = rebuildIndex < 0 ? passed : passed.filter((step: any) => ordered.indexOf(String(step.step)) < rebuildIndex);

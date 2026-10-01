@@ -87,7 +87,7 @@ function PortalImageCard({ card }: { card: PortalCard }) {
   return (
     <Link
       href={card.href}
-      className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-brand-blue-300 hover:shadow-md"
+      className="group min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-brand-blue-300 hover:shadow-md"
     >
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
         <Image
@@ -98,11 +98,11 @@ function PortalImageCard({ card }: { card: PortalCard }) {
           className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
         />
       </div>
-      <div className="p-5">
+      <div className="min-w-0 p-5">
         {card.value !== undefined ? (
-          <p className="text-3xl font-black text-slate-950">{card.value}</p>
+          <p className="break-words text-2xl font-black leading-tight text-slate-950 sm:text-3xl">{card.value}</p>
         ) : null}
-        <h2 className={`${card.value !== undefined ? 'mt-1' : ''} font-black text-slate-950`}>
+        <h2 className={`${card.value !== undefined ? 'mt-1' : ''} break-words text-base font-black leading-snug text-slate-950 sm:text-lg`}>
           {card.title}
         </h2>
         <p className="mt-1 text-sm font-medium leading-6 text-slate-700">{card.detail}</p>

@@ -4,14 +4,14 @@ export const cosmetologyConfig: ProgramConfig = {
   // Hero
   title: 'Transform Hair Into Art',
   tagline: 'DOL Registered Apprenticeship',
-  subtitle: 'Master hair coloring, cutting, styling, and client services through paid apprenticeship in professional salons.',
+  subtitle: 'Registered Hair Stylist/Cosmetologist apprenticeship (0096HY V1): complete a 2,000–2,500-hour hybrid term, 154 RTI hours, supervised salon training, and required work processes.'
   heroVideo: '/videos/programs/cosmetology-hero.mp4',
   heroImage: '/images/beauty/cosmetology-hero.webp',
   primaryCta: { label: 'Apply Now', href: '/programs/cosmetology-apprenticeship/apply' },
   secondaryCta: { label: 'Schedule a Tour', href: '/contact' },
   stats: [
-    { value: '2,000', label: 'Training Hours' },
-    { value: '18-24', label: 'Months' },
+    { value: '2,000–2,500', label: 'Hybrid Term Hours' },
+    { value: '154', label: 'RTI Hours' },
     { value: '$0', label: 'with Funding' },
   ],
 
@@ -49,7 +49,7 @@ export const cosmetologyConfig: ProgramConfig = {
     { icon: '🏪', title: 'Salon Match', description: 'Get matched with a host salon partner' },
     { icon: '🎓', title: 'Orientation', description: 'Learn the program, meet your mentor' },
     { icon: '💇', title: 'Training Begins', description: 'Start your apprenticeship journey' },
-    { icon: '🎉', title: 'Graduation', description: 'Complete hours, pass state exam, get licensed' },
+    { icon: '🎉', title: 'Completion', description: 'Complete the registered hybrid term and 154 RTI hours, then follow Indiana examination and licensing steps' },
   ],
 
   // Skills

@@ -6,7 +6,7 @@ export const NAIL_TECH: ProgramSchema = {
   slug: 'nail-technician-apprenticeship',
   title: 'Nail Technician Apprenticeship',
   subtitle:
-    `Registered Indiana Manicurist apprenticeship: complete ${NAIL_STANDARD.totalOjlHours.toLocaleString('en-US')} OJL hours, ${NAIL_STANDARD.competencyCount} verified occupational competencies, and ${NAIL_STANDARD.relatedInstructionHours} RTI hours through supervised host-site training.`,
+    `Registered Indiana Manicurist apprenticeship: complete ${NAIL_STANDARD.competencyCount} verified occupational competencies and ${NAIL_STANDARD.relatedInstructionHours} RTI hours through supervised host-site training. Work hours are maintained as auditable training evidence under the competency-based standard.`,
   sector: 'personal-services',
   category: 'Nail Technology',
   programType: 'apprenticeship',
@@ -17,8 +17,8 @@ export const NAIL_TECH: ProgramSchema = {
   durationWeeks: 50,
   hoursPerWeekMin: 30,
   hoursPerWeekMax: 40,
-  hoursBreakdown: { onlineInstruction: 210, handsOnLab: 2000, examPrep: 0, careerPlacement: 0 },
-  schedule: '2,000 OJL hours of supervised host-site practice, 19 Appendix A competencies, and 210 required RTI hours.',
+  hoursBreakdown: { onlineInstruction: 210, handsOnLab: 0, examPrep: 0, careerPlacement: 0 },
+  schedule: 'Competency-based progression through 19 Appendix A competencies, with 210 required RTI hours and supervised host-site practice. Work hours are documented as training evidence rather than used as a fixed completion denominator.'
   cohortSize: '1–3 apprentices per salon',
   fundingStatement:
     'Paid apprenticeship track available. For self-pay enrollment, BNPL starts at a $600 deposit with weekly payment options.',
@@ -51,7 +51,7 @@ export const NAIL_TECH: ProgramSchema = {
       statement: 'Perform manicures, pedicures, and nail enhancements on live clients',
       assessedAt: 'Month 3',
     },
-    { statement: 'Complete 2,000 OJL hours, 19 verified Appendix A competencies, and 210 RTI hours', assessedAt: 'Program completion' },
+    { statement: 'Complete 19 verified Appendix A competencies and 210 RTI hours with required sponsor documentation', assessedAt: 'Program completion' },
     {
       statement: 'Demonstrate readiness for the current Indiana manicurist licensing process',
       assessedAt: 'After registered-program completion',

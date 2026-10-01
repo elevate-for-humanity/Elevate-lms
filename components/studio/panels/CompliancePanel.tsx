@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CheckCircle2, Loader2, RefreshCw, XCircle } from 'lucide-react';
+import { CheckCircle2, Loader2, RefreshCw, XCircle, BookOpen, Video, Captions, ClipboardCheck, Wrench, ShieldCheck } from 'lucide-react';
 import { useCourse } from '../CourseProvider';
 
 interface PersistedAudit {
@@ -42,6 +42,24 @@ export function CompliancePanel() {
     void loadAudit();
   }, [state.course.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const metrics = audit?.metrics ?? {};
+  const totalLessons = Number(metrics.lessons ?? state.lessons.length ?? 0);
+  const assessments = Number(metrics.assessments ?? 0);
+  const practicals = Number(metrics.practicals ?? 0);
+  const completedVideos = Number(metrics.completedVideoJobs ?? 0);
+  const totalVideoJobs = Number(metrics.lessonVideoJobs ?? 0);
+  const captionReady = Number(metrics.captionReadyLessons ?? 0);
+  const practicalReady = Number(metrics.practicalSignoffReady ?? 0);
+  const validatedLessons = Number(metrics.validatedLessons ?? 0);
+  const readinessCards = [
+    { label: 'Lessons', value: totalLessons ? `${validatedLessons}/${totalLessons}` : '—', icon: BookOpen, panel: 'curriculum' as const },
+    { label: 'Assessments', value: String(assessments), icon: ClipboardCheck, panel: 'assessments' as const },
+    { label: 'Media', value: totalVideoJobs ? `${completedVideos}/${totalVideoJobs}` : '—', icon: Video, panel: 'media' as const },
+    { label: 'Captions / transcripts', value: totalLessons ? `${captionReady}/${totalLessons}` : '—', icon: Captions, panel: 'media' as const },
+    { label: 'Practical skills', value: practicals ? `${practicalReady}/${totalLessons}` : '0', icon: Wrench, panel: 'interactions' as const },
+    { label: 'QA / release gate', value: audit?.pass ? 'Ready' : 'Blocked', icon: ShieldCheck, panel: 'publish' as const },
+  ];
+
   const cards = [
     ['Course declared hours', String(state.course.duration_hours ?? '—')],
     ['Lesson seat hours', (lessonMinutes / 60).toFixed(2)],
@@ -63,6 +81,15 @@ export function CompliancePanel() {
         </button>
       </div>
 
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+        {readinessCards.map(({ label, value, icon: Icon, panel }) => (
+          <button key={label} type="button" onClick={() => state.activePanel !== panel && window.dispatchEvent(new CustomEvent('course-studio:navigate', { detail: { panel } }))} className="rounded-xl border border-slate-200 bg-white p-4 text-left hover:border-brand-blue-300">
+            <Icon className="h-5 w-5 text-brand-blue-600" />
+            <div className="mt-3 text-xs uppercase tracking-wide text-slate-500">{label}</div>
+            <div className="mt-1 text-xl font-black text-slate-950">{loading ? '…' : value}</div>
+          </button>
+        ))}
+      </div>
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map(([label, value]) => <div key={label} className="rounded-xl border border-slate-200 bg-white p-4"><div className="text-xs uppercase tracking-wide text-slate-500">{label}</div><div className="mt-1 text-2xl font-black text-slate-950">{value}</div></div>)}
       </div>

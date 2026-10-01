@@ -45,6 +45,10 @@ export interface ApprenticePortalConfig {
   shopLabel: string;
   requiredOjl: number;
   requiredRti: number;
+  progressModel?: 'competency_based' | 'hybrid' | 'time_based';
+  competencyCount?: number;
+  maximumTermHours?: number;
+  probationHours?: number;
   portalPath: string; // canonical /apprentice route for this program
 }
 
@@ -57,20 +61,26 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     accentText: 'text-amber-600',
     heroImage: '/images/pages/barber-hero.webp',
     shopLabel: 'Barber Shop',
-    requiredOjl: 1500,
-    requiredRti: 500,
+    requiredOjl: 0,
+    requiredRti: 260,
+    progressModel: 'competency_based',
+    competencyCount: 14,
+    probationHours: 500,
     portalPath: '/apprentice?program=barber-apprenticeship',
   },
   'cosmetology-apprenticeship': {
     programSlug: 'cosmetology-apprenticeship',
-    label: 'Cosmetology Apprenticeship',
+    label: 'Hair Stylist / Cosmetology Apprenticeship',
     icon: Scissors,
     accentBg: 'bg-pink-500',
     accentText: 'text-pink-600',
     heroImage: '/images/pages/cosmetology-hero.webp',
     shopLabel: 'Salon',
-    requiredOjl: 1500,
-    requiredRti: 500,
+    requiredOjl: 2000,
+    requiredRti: 154,
+    progressModel: 'hybrid',
+    maximumTermHours: 2500,
+    probationHours: 500,
     portalPath: '/apprentice?program=cosmetology-apprenticeship',
   },
   'esthetician-apprenticeship': {
@@ -81,8 +91,11 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     accentText: 'text-rose-600',
     heroImage: '/images/beauty/esthetician.webp',
     shopLabel: 'Spa / Salon',
-    requiredOjl: 525,
-    requiredRti: 175,
+    requiredOjl: 0,
+    requiredRti: 300,
+    progressModel: 'competency_based',
+    competencyCount: 20,
+    probationHours: 500,
     portalPath: '/apprentice?program=esthetician-apprenticeship',
   },
   'nail-technician-apprenticeship': {
@@ -93,8 +106,11 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     accentText: 'text-fuchsia-600',
     heroImage: '/images/pages/nail-technician.webp',
     shopLabel: 'Nail Salon',
-    requiredOjl: 400,
-    requiredRti: 100,
+    requiredOjl: 0,
+    requiredRti: 210,
+    progressModel: 'competency_based',
+    competencyCount: 19,
+    probationHours: 500,
     portalPath: '/apprentice?program=nail-technician-apprenticeship',
   },
   'culinary-apprenticeship': {
@@ -185,12 +201,18 @@ export function ApprenticePortalShell({
 
   const requiredOjl = config.requiredOjl;
   const requiredRti = config.requiredRti;
+  const competencyBased = config.progressModel === 'competency_based';
+  const hybrid = config.progressModel === 'hybrid';
   const ojlPercent = requiredOjl > 0 ? Math.min((hours.ojl / requiredOjl) * 100, 100) : 0;
   const rtiPercent = requiredRti > 0 ? Math.min((hours.rti / requiredRti) * 100, 100) : 0;
   const totalHours = hours.ojl + hours.rti;
-  const totalRequired = requiredOjl + requiredRti;
-  const overallPercent = totalRequired > 0 ? Math.min((totalHours / totalRequired) * 100, 100) : 0;
-  const weeksComplete = Math.floor(totalHours / 40);
+  const totalRequired = competencyBased ? requiredRti : hybrid ? requiredOjl : requiredOjl + requiredRti;
+  const overallPercent = competencyBased
+    ? rtiPercent
+    : totalRequired > 0
+      ? Math.min(((hybrid ? hours.ojl : totalHours) / totalRequired) * 100, 100)
+      : 0;
+  const weeksComplete = Math.floor((hybrid ? hours.ojl : totalHours) / 40);
   const weeksTotal = Math.ceil(totalRequired / 40);
 
   const hasPhotoId = docs.some((d) => d.document_type === 'photo_id');
@@ -300,7 +322,8 @@ export function ApprenticePortalShell({
               </div>
             </div>
             <p className="text-white/80 text-sm mt-2">
-              Welcome back, <strong>{firstName}</strong> · Week {weeksComplete + 1} of {weeksTotal}
+              Welcome back, <strong>{firstName}</strong>
+              {!competencyBased ? <> · Week {weeksComplete + 1} of {weeksTotal}</> : null}
               {shopName && (
                 <span className="ml-2 text-white/60">
                   · {config.shopLabel}:{' '}
@@ -526,9 +549,13 @@ export function ApprenticePortalShell({
           {[
             {
               icon: Clock,
-              label: 'Total Hours',
-              value: totalHours.toLocaleString(),
-              sub: `of ${totalRequired.toLocaleString()} required`,
+              label: competencyBased ? 'RTI Hours' : hybrid ? 'Hybrid Term Hours' : 'Total Hours',
+              value: competencyBased ? hours.rti.toLocaleString() : hybrid ? hours.ojl.toLocaleString() : totalHours.toLocaleString(),
+              sub: competencyBased
+                ? `of ${requiredRti.toLocaleString()} RTI · ${config.competencyCount ?? 0} competencies required`
+                : hybrid
+                  ? `of ${requiredOjl.toLocaleString()} minimum · ${requiredRti} RTI tracked separately`
+                  : `of ${totalRequired.toLocaleString()} required`,
             },
             {
               icon: CalendarDays,
@@ -546,7 +573,7 @@ export function ApprenticePortalShell({
               icon: TrendingUp,
               label: 'Progress',
               value: `${Math.round(overallPercent)}%`,
-              sub: 'toward completion',
+              sub: competencyBased ? 'RTI progress only — competencies tracked separately' : hybrid ? 'toward minimum hybrid term' : 'toward completion',
             },
           ].map(({ icon: Icon, label, value, sub }) => (
             <div key={label} className="bg-white rounded-xl border border-slate-200 p-4">
@@ -562,26 +589,38 @@ export function ApprenticePortalShell({
 
         {/* Progress bars */}
         <div className="bg-white rounded-xl border border-slate-200 p-5">
-          <h2 className="text-sm font-semibold text-slate-900 mb-4">Hour Progress</h2>
+          <h2 className="text-sm font-semibold text-slate-900 mb-4">{competencyBased ? 'RTI & Work Evidence' : 'Hour Progress'}</h2>
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-sm font-medium text-slate-700">
-                  On-the-Job Learning (OJL)
+                  {competencyBased ? 'Supervised work evidence' : hybrid ? 'Hybrid term work hours' : 'On-the-Job Learning (OJL)'}
                 </span>
                 <span className="text-sm font-bold text-slate-900">
-                  {hours.ojl.toLocaleString()} / {requiredOjl.toLocaleString()}
+                  {competencyBased
+                    ? `${hours.ojl.toLocaleString()} recorded`
+                    : `${hours.ojl.toLocaleString()} / ${requiredOjl.toLocaleString()}`}
                 </span>
               </div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${config.accentBg} rounded-full transition-all duration-700`}
-                  style={{ width: `${ojlPercent}%` }}
-                />
-              </div>
-              <p className="text-xs text-slate-500 mt-1">
-                {Math.max(0, requiredOjl - hours.ojl).toLocaleString()} hours remaining
-              </p>
+              {!competencyBased ? (
+                <>
+                  <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full ${config.accentBg} rounded-full transition-all duration-700`}
+                      style={{ width: `${ojlPercent}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {hybrid
+                      ? `${Math.max(0, requiredOjl - hours.ojl).toLocaleString()} hours remaining to the 2,000-hour minimum term; maximum registered term is ${(config.maximumTermHours ?? 2500).toLocaleString()} hours`
+                      : `${Math.max(0, requiredOjl - hours.ojl).toLocaleString()} hours remaining`}
+                  </p>
+                </>
+              ) : (
+                <p className="text-xs text-slate-500 mt-1">
+                  Work hours document supervised training. Completion is based on {config.competencyCount ?? 0} verified competencies plus {requiredRti} RTI hours. The {config.probationHours ?? 500}-hour figure is probation, not graduation.
+                </p>
+              )}
             </div>
             {requiredRti > 0 && (
               <div>

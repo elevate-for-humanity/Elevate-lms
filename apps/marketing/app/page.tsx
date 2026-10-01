@@ -8,6 +8,10 @@ import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
 import { HomePlatformOverview } from '@/components/home/HomePlatformOverview';
 import { HomeNetworks } from '@/components/home/HomeNetworks';
+import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
+import { HomeFunding } from '@/components/home/HomeFunding';
+import { HomeWebsiteBuilderSales } from '@/components/home/HomeWebsiteBuilderSales';
+import { HomeInstitutionalGateway } from '@/components/home/HomeInstitutionalGateway';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
@@ -60,8 +64,12 @@ export default function HomePage() {
         </section>
         <PlatformHubHero />
         <HomeFeaturedHostShop />
-        <HomeNetworks />
         <HomeCareerPathways />
+        <HomeFunding />
+        <HomeNetworks />
+        <HomeEmployerStrip />
+        <HomeInstitutionalGateway />
+        <HomeWebsiteBuilderSales />
         <HomePlatformOverview />
         <HomeFinalCTA />
         <HomeTrustBar />

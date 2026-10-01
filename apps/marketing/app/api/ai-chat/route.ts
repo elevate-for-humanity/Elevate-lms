@@ -47,7 +47,13 @@ ${COMPLIANCE_RULES}
 VERIFIED PUBLIC WORKFORCE-FUNDING PROGRAM RECORDS:
 - ${verifiedFundingList || 'No program-level public funding records are currently configured.'}
 
-Barber Apprenticeship is the federally registered beauty occupation currently identified by Elevate's canonical public RAPIDS configuration. Do not label another occupation registered unless the canonical registry changes.
+REGISTERED BEAUTY APPRENTICESHIP FACTS — 2Exclusive LLC-S, 2025-IN-132301:
+- Barber 0030CB V1: competency-based; 14 verified Appendix A competencies; 260 RTI hours; 500-hour probation.
+- Esthetician 2089CB V1: competency-based; 20 verified Appendix A competencies; 300 RTI hours; 500-hour probation.
+- Nail Tech / Manicurist 2090CB V1: competency-based; 19 verified Appendix A competencies; 210 RTI hours; 500-hour probation.
+- Hair Stylist (existing title: Cosmetologist) 0096HY V1: hybrid; 2,000–2,500-hour registered term; 154 RTI hours; 500-hour probation.
+- Never describe 500 hours as program completion. For the competency-based occupations, explain completion in terms of verified competencies plus RTI; work hours are documented training evidence. For Hair Stylist, explain the registered hybrid term plus RTI and work-process requirements.
+- Indiana examination and licensing are separate steps after registered-program completion.
 
 Answer directly, distinguish verified facts from screening, and give the next official step. Use /programs, /funding, /apply, or /contact when appropriate. Keep responses under 180 words.`;
 
@@ -117,8 +123,20 @@ function fallbackReply(message: string, context: ParisContext): string {
   if (/fund|free|wioa|wrg|cost|price/.test(lower)) {
     return 'Funding is program- and participant-specific and is not guaranteed. Review /funding, then use /apply for the exact program so the responsible agency can verify eligibility and authorization.';
   }
-  if (/barber|apprent/.test(lower)) {
-    return 'Review the current Barber Apprenticeship record at /programs/barber-apprenticeship. Host-shop placement and third-party funding require separate confirmation and are not guaranteed.';
+  if (/barber/.test(lower)) {
+    return 'Barber is RAPIDS 0030CB V1, competency-based: 14 verified Appendix A competencies plus 260 RTI hours. The 500-hour figure is probation, not graduation. Review /programs/barber-apprenticeship.';
+  }
+  if (/esthetic|aesthetic/.test(lower)) {
+    return 'Esthetician is RAPIDS 2089CB V1, competency-based: 20 verified Appendix A competencies plus 300 RTI hours. The 500-hour figure is probation, not graduation. Review /programs/esthetician-apprenticeship.';
+  }
+  if (/nail|manicur/.test(lower)) {
+    return 'Nail Tech / Manicurist is RAPIDS 2090CB V1, competency-based: 19 verified Appendix A competencies plus 210 RTI hours. The 500-hour figure is probation, not graduation. Review /programs/nail-technician-apprenticeship.';
+  }
+  if (/cosmet|hair stylist/.test(lower)) {
+    return 'Hair Stylist (existing title: Cosmetologist) is RAPIDS 0096HY V1, hybrid: a 2,000–2,500-hour registered term with 154 RTI hours. The 500-hour figure is probation, not graduation. Review /programs/cosmetology-apprenticeship.';
+  }
+  if (/apprent/.test(lower)) {
+    return 'Beauty apprenticeship requirements differ by registered occupation. Review the exact program page so RTI, competency, hybrid-term, and probation requirements are not mixed together.';
   }
   return 'I can help you find the correct program, application, funding guidance, or apprenticeship information. Tell me the exact program or goal, or start at /programs.';
 }

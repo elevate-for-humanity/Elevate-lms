@@ -2,3 +2,4 @@ LMS production deployment trigger
 Date: 2026-10-01
 Reason: deploy repository recovery audit, restored LMS-native workflows, and retained recovered templates
 Target: main
+2026-10-01 deploy approvals Hair Stylist RAPIDS correction

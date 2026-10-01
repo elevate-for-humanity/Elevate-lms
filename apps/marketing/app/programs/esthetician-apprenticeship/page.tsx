@@ -8,6 +8,7 @@ import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from 
 import JozannaIndustryInstructor from '@/components/programs/beauty/JozannaIndustryInstructor';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
+import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
 import heroBanners, { type HeroBannerConfig } from '@/content/heroBanners';
 
 export const dynamic = 'force-dynamic';
@@ -116,6 +117,7 @@ export default async function EstheticianApprenticeshipPage() {
         heroOverride={heroOverride}
         featuredContent={
           <>
+            <ApprenticeshipExperienceGuide programTitle={program.title} applyHref={program.cta.applyHref} />
             <FeaturedHostPartners programSlug="esthetician-apprenticeship" />
             <HostShopPlacementGuide programSlug="esthetician-apprenticeship" />
           </>

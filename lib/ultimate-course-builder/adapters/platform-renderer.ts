@@ -229,6 +229,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
     const visualEvidence = requireResolvedVisualEvidence(result.sceneData);
     return {
       ...result,
+      layoutVersion: 2,
       captionsUrl: result.sceneData?.captionUrl,
       transcriptUrl: result.sceneData?.transcriptUrl,
       ...visualEvidence,

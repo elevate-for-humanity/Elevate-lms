@@ -1,3 +1,5 @@
+import { ULTIMATE_LESSON_CONTRACT_VERSION } from '@/lib/ultimate-course-builder/core/lesson-contract';
+import { validateLessonBlueprint } from '@/lib/ultimate-course-builder/instructional/lesson-blueprint';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -118,8 +120,7 @@ async function buildUltimateProfile(
     competencies: competencyRows.map((row, index) => ({
       id: row.competency_key || `competency-${index + 1}`,
       title: row.category || row.source_label || `Competency ${index + 1}`,
-      description:
-        row.description || row.source_label || `Demonstrate competency ${index + 1}`,
+      description: row.description || row.source_label || `Demonstrate competency ${index + 1}`,
       type: competencyType(row, Boolean(standard)),
       authorityRequirementIds: standard && row.competency_key ? [row.competency_key] : [],
       requiresDemonstration: Boolean(standard),
@@ -171,6 +172,74 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
   const db = await requireAdminClient();
+
+  if (body.action === 'configure-contract') {
+    const { data: build, error } = await db
+      .from('ultimate_course_builds')
+      .select('id,profile,status')
+      .eq('id', body.buildId)
+      .single();
+    if (error || !build) return NextResponse.json({ error: 'Build not found' }, { status: 404 });
+    if (build.status === 'running')
+      return NextResponse.json(
+        { error: 'Stop the active job before changing its locked contract inputs' },
+        { status: 409 },
+      );
+    const profile: any = { ...build.profile };
+    if (body.lessonBlueprints) {
+      if (typeof body.lessonBlueprints !== 'object' || Array.isArray(body.lessonBlueprints))
+        return NextResponse.json(
+          { error: 'lessonBlueprints must be keyed by competency ID' },
+          { status: 400 },
+        );
+      for (const [id, blueprint] of Object.entries(body.lessonBlueprints)) {
+        const competency = profile.competencies?.find((c: any) => c.id === id);
+        if (!competency)
+          return NextResponse.json({ error: `Unknown competency: ${id}` }, { status: 400 });
+        try {
+          validateLessonBlueprint(blueprint as any, competency);
+        } catch (e) {
+          return NextResponse.json(
+            { error: e instanceof Error ? e.message : String(e) },
+            { status: 400 },
+          );
+        }
+      }
+      profile.lessonBlueprints = { ...profile.lessonBlueprints, ...body.lessonBlueprints };
+    }
+    if (body.instructionalSources) {
+      if (
+        !Array.isArray(body.instructionalSources) ||
+        !body.instructionalSources.length ||
+        body.instructionalSources.some(
+          (s: any) =>
+            typeof s.id !== 'string' ||
+            !s.id.trim() ||
+            typeof s.text !== 'string' ||
+            !s.text.trim(),
+        )
+      )
+        return NextResponse.json(
+          { error: 'Each instructional source needs its source ID and complete authorized text' },
+          { status: 400 },
+        );
+      profile.instructionalSources = body.instructionalSources;
+    }
+    profile.lessonContractVersion = ULTIMATE_LESSON_CONTRACT_VERSION;
+    const saved = await db
+      .from('ultimate_course_builds')
+      .update({ profile, updated_at: new Date().toISOString() })
+      .eq('id', build.id)
+      .eq('status', build.status)
+      .select('id')
+      .single();
+    if (saved.error) return NextResponse.json({ error: saved.error.message }, { status: 409 });
+    return NextResponse.json({
+      ok: true,
+      buildId: build.id,
+      contractVersion: ULTIMATE_LESSON_CONTRACT_VERSION,
+    });
+  }
 
   if (body.action === 'create') {
     if (!body.courseId || !body.profile) {

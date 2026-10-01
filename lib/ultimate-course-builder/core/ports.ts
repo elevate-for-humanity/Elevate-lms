@@ -1,34 +1,98 @@
-import type {UltimateBuildStep} from './types';import type {UltimateInstructionalFinding} from './execution-policy';
-export interface UltimatePersistencePort{createBuild(input:unknown):Promise<{id:string}>;createLesson(input:{buildId:string;lessonKey:string;competencyId:string}):Promise<{id:string}>;loadLessonCheckpoint(input:{lessonBuildId:string}):Promise<{artifacts:Record<string,unknown>;passedSteps:string[];findings:UltimateInstructionalFinding[]}>;recordStep(input:{lessonBuildId:string;step:UltimateBuildStep;state:'running'|'passed'|'failed';artifacts?:Record<string,unknown>;findings?:UltimateInstructionalFinding[]}):Promise<void>;saveArtifact(input:{lessonBuildId:string;artifacts:unknown}):Promise<void>;recordFinding(input:{buildId:string;finding:UltimateInstructionalFinding}):Promise<void>;finishLesson(input:{lessonBuildId:string;status:string;artifacts:unknown;findings:UltimateInstructionalFinding[]}):Promise<void>;updateBuild(input:{buildId:string;status:string;currentStep?:UltimateBuildStep|null;findings?:UltimateInstructionalFinding[]}):Promise<void>}
-export interface UltimateWorkforcePort{load(input:{socCodes:string[];jurisdiction?:string;occupationTitle?:string}):Promise<unknown>}
-export interface UltimateCredentialPort{load(profileId:string):Promise<unknown>}
-export interface UltimateMediaDiscoveryResult{policy:'licensed-first';licensedSuggestions:unknown[];readyAssets:unknown[];storyboard:unknown|null}
-export interface UltimateMediaPort{find(input:unknown):Promise<UltimateMediaDiscoveryResult>;acquire(input:unknown):Promise<unknown>;store(input:unknown):Promise<unknown>}
-export interface UltimateNarrationPort{generate(input:unknown):Promise<unknown>}
-export interface UltimateRenderPort{render(input:unknown):Promise<unknown>}
-export interface UltimateAssessmentPort{generate(input:unknown):Promise<unknown>}
-export interface UltimateLearnerRuntimeEvidence{
-  progress_save:boolean;
-  resume:boolean;
-  completion:boolean;
-  evidence:{
-    courseLesson:boolean;
-    stagedLesson?:boolean;
-    resolvedLessonId?:string|null;
-    playableFilm:boolean;
-    videoProgressStore:boolean;
-    lessonCompletionStore:boolean;
-    accessibility:{
-      contractVersion:string;
-      semanticHeadings:boolean;
-      colorContrast:boolean;
-      nonColorMeaning:boolean;
-      screenReaderLabels:boolean;
-      reducedMotion:boolean;
+import type { UltimateBuildStep } from './types';
+import type { UltimateInstructionalFinding } from './execution-policy';
+export interface UltimatePersistencePort {
+  createBuild(input: unknown): Promise<{ id: string }>;
+  createLesson(input: {
+    buildId: string;
+    lessonKey: string;
+    competencyId: string;
+  }): Promise<{ id: string }>;
+  loadLessonCheckpoint(input: {
+    lessonBuildId: string;
+  }): Promise<{
+    artifacts: Record<string, unknown>;
+    passedSteps: string[];
+    findings: UltimateInstructionalFinding[];
+  }>;
+  recordStep(input: {
+    lessonBuildId: string;
+    step: UltimateBuildStep;
+    state: 'running' | 'passed' | 'failed';
+    artifacts?: Record<string, unknown>;
+    findings?: UltimateInstructionalFinding[];
+  }): Promise<void>;
+  saveArtifact(input: { lessonBuildId: string; artifacts: unknown }): Promise<void>;
+  recordFinding(input: { buildId: string; finding: UltimateInstructionalFinding }): Promise<void>;
+  finishLesson(input: {
+    lessonBuildId: string;
+    status: string;
+    artifacts: unknown;
+    findings: UltimateInstructionalFinding[];
+  }): Promise<void>;
+  updateBuild(input: {
+    buildId: string;
+    status: string;
+    currentStep?: UltimateBuildStep | null;
+    findings?: UltimateInstructionalFinding[];
+  }): Promise<void>;
+}
+export interface UltimateWorkforcePort {
+  load(input: {
+    socCodes: string[];
+    jurisdiction?: string;
+    occupationTitle?: string;
+  }): Promise<unknown>;
+}
+export interface UltimateCredentialPort {
+  load(profileId: string): Promise<unknown>;
+}
+export interface UltimateMediaDiscoveryResult {
+  assignments?: unknown[];
+  policy: 'licensed-first';
+  licensedSuggestions: unknown[];
+  readyAssets: unknown[];
+  storyboard: unknown | null;
+}
+export interface UltimateMediaPort {
+  find(input: unknown): Promise<UltimateMediaDiscoveryResult>;
+  acquire(input: unknown): Promise<unknown>;
+  store(input: unknown): Promise<unknown>;
+}
+export interface UltimateNarrationPort {
+  generate(input: unknown): Promise<unknown>;
+}
+export interface UltimateRenderPort {
+  render(input: unknown): Promise<unknown>;
+}
+export interface UltimateAssessmentPort {
+  generate(input: unknown): Promise<unknown>;
+}
+export interface UltimateLearnerRuntimeEvidence {
+  progress_save: boolean;
+  resume: boolean;
+  completion: boolean;
+  evidence: {
+    courseLesson: boolean;
+    stagedLesson?: boolean;
+    resolvedLessonId?: string | null;
+    playableFilm: boolean;
+    videoProgressStore: boolean;
+    lessonCompletionStore: boolean;
+    accessibility: {
+      contractVersion: string;
+      semanticHeadings: boolean;
+      colorContrast: boolean;
+      nonColorMeaning: boolean;
+      screenReaderLabels: boolean;
+      reducedMotion: boolean;
     };
-    checkedAt:string;
+    checkedAt: string;
   };
 }
-export interface UltimateLearnerRuntimePort{
-  verify(input:{courseId:string;lessonId:string;videoUrl:string}):Promise<UltimateLearnerRuntimeEvidence>;
+export interface UltimateLearnerRuntimePort {
+  verify(input: {
+    courseId: string;
+    lessonId: string;
+    videoUrl: string;
+  }): Promise<UltimateLearnerRuntimeEvidence>;
 }

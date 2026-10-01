@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UltimatePersistencePort } from '../core/ports';
+import { currentEvidence } from '../core/lesson-contract';
 import { ULTIMATE_BUILD_STEPS } from '../core/types';
 import { MIN_LESSON_VIDEO_SCENES } from '@/lib/video/media-director';
 export class UltimateSupabasePersistence implements UltimatePersistencePort {
@@ -45,7 +46,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
       ]);
     if (lessonError) throw lessonError;
     if (stepsError) throw stepsError;
-    const passed = (steps ?? []).filter((x: any) => x.state === 'passed');
+    const passed = (steps ?? []).filter((x: any) => x.state === 'passed' && currentEvidence(x.artifacts));
     const artifacts = { ...((lesson?.artifacts ?? {}) as Record<string, unknown>) };
     for (const step of passed) artifacts[String(step.step)] = step.artifacts ?? {};
     // A repaired provider or renderer must rebuild downstream media instead of

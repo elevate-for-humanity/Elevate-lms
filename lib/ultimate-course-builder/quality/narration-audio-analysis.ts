@@ -6,7 +6,7 @@ import { promisify } from 'node:util';
 import type { Metric, NarrationMetrics } from './narration-quality';
 
 const execFileAsync = promisify(execFile);
-const MAX_NARRATION_BYTES = 25 * 1024 * 1024;
+const MAX_NARRATION_BYTES = 512 * 1024 * 1024;
 
 type SignalSummary = {
   durationSeconds: number;
@@ -98,6 +98,7 @@ function assertTrustedNarrationUrl(audioUrl: string): URL {
 export async function analyzeNarrationAudio(input: {
   audioUrl: string;
   transcript: string;
+  deliveredMp4?: boolean;
 }): Promise<NarrationMetrics> {
   const url = assertTrustedNarrationUrl(input.audioUrl);
   const response = await fetch(url, {
@@ -105,7 +106,7 @@ export async function analyzeNarrationAudio(input: {
     signal: AbortSignal.timeout(120_000),
   });
   const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
-  if (!response.ok || !contentType.startsWith('audio/')) {
+  if (!response.ok || !(contentType.startsWith('audio/') || (input.deliveredMp4 && contentType.startsWith('video/')))) {
     throw new Error(
       `NARRATION_ANALYSIS_AUDIO_FETCH_FAILED:${response.status}:${contentType || 'unknown'}`,
     );

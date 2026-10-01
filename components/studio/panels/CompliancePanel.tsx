@@ -11,7 +11,7 @@ interface PersistedAudit {
 }
 
 export function CompliancePanel() {
-  const { state } = useCourse();
+  const { state, setPanel } = useCourse();
   const [audit, setAudit] = useState<PersistedAudit | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -83,7 +83,7 @@ export function CompliancePanel() {
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
         {readinessCards.map(({ label, value, icon: Icon, panel }) => (
-          <button key={label} type="button" onClick={() => state.activePanel !== panel && window.dispatchEvent(new CustomEvent('course-studio:navigate', { detail: { panel } }))} className="rounded-xl border border-slate-200 bg-white p-4 text-left hover:border-brand-blue-300">
+          <button key={label} type="button" onClick={() => setPanel(panel)} className="rounded-xl border border-slate-200 bg-white p-4 text-left hover:border-brand-blue-300">
             <Icon className="h-5 w-5 text-brand-blue-600" />
             <div className="mt-3 text-xs uppercase tracking-wide text-slate-500">{label}</div>
             <div className="mt-1 text-xl font-black text-slate-950">{loading ? '…' : value}</div>

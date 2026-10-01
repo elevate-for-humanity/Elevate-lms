@@ -1,4 +1,4 @@
-merge_sha=b5260741ebf0612e6544f7f53945328c46cf4677
+merge_sha=e6d049376280de603c3df83354295364a214508b
 services=admin,lms
-requested_at=2026-10-01T17:40:00.000Z
-reason=Deploy host shop portal access and occupation-specific orientation media repairs
+requested_at=2026-10-01T18:05:00.000Z
+reason=Deploy universal portal navigation, Host Shop communications guidance, responsive cards, and weekly hour verification

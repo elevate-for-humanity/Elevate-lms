@@ -10,6 +10,7 @@ import { pipeline } from 'node:stream/promises';
 import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 import { chromium } from 'playwright-core';
+import { ProviderSessionStore } from './provider-session-store.mjs';
 import { runLearnerTest, credentialMatches, learnerSetupReady } from './learner-runthrough.mjs';
 
 const execFileAsync = promisify(execFile);
@@ -43,6 +44,11 @@ const allowedDomains = (
   .map((value) => value.trim().toLowerCase())
   .filter(Boolean);
 const sessions = new Map();
+const providerSessionCreations = new Map();
+const providerSessions = new ProviderSessionStore({
+  secret: sharedSecret,
+  directory: process.env.STUDIO_BROWSER_AUTH_STATE_DIR || undefined,
+});
 let learnerTestRunning = false;
 const learnerTests = new Map();
 const workspaceRoot = process.env.STUDIO_WORKSPACE_ROOT || '/workspace/project';
@@ -404,6 +410,9 @@ async function destroySession(id) {
   sessions.delete(id);
   if (session.frameTimer) clearTimeout(session.frameTimer);
   for (const stream of session.streams) stream.end();
+  await providerSessions.save(session.providerScope, session.context).catch(() => {
+    console.warn('Provider session checkpoint failed');
+  });
   await session.context.close().catch(() => undefined);
   await fs.promises
     .rm(session.downloadDir, { recursive: true, force: true })
@@ -594,7 +603,15 @@ const browserManager = createBrowserLifecycleManager({
   },
 });
 
-async function createSession(target, viewport, authCookies = []) {
+async function createSession(target, viewport, authCookies = [], ownerId) {
+  const providerScope = providerSessions.scope(ownerId, target);
+  // Reuse the live worker session, including its workspace and downloads.
+  const shared = providerScope && [...sessions.values()].find(s => s.providerScope === providerScope);
+  if (shared) {
+    shared.lastSeen = Date.now();
+    await shared.page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    return shared;
+  }
   if (shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
   const state = browserManager.health().browserState;
   if (state === 'recycling') throw new BrowserServiceError('browser_recycling', 503);
@@ -633,6 +650,7 @@ async function createSession(target, viewport, authCookies = []) {
         viewport,
         ignoreHTTPSErrors: false,
         acceptDownloads: true,
+        storageState: await providerSessions.load(providerScope),
       });
       if (
         safeAuthCookies.length &&
@@ -651,6 +669,7 @@ async function createSession(target, viewport, authCookies = []) {
         context,
         page,
         target,
+        providerScope,
         createdAt: Date.now(),
         lastSeen: Date.now(),
         streams: new Set(),
@@ -1154,7 +1173,15 @@ const server = http.createServer(async (req, res) => {
       const target = await validateTarget(String(body.url || 'https://www.elevateforhumanity.org'));
       const width = Math.min(1920, Math.max(320, Number(body.width || 1440)));
       const height = Math.min(1080, Math.max(480, Number(body.height || 900)));
-      const session = await createSession(target, { width, height }, body.authCookies);
+      const scope = providerSessions.scope(body.ownerId, target);
+      let creation = scope && providerSessionCreations.get(scope);
+      if (!creation) {
+        creation = createSession(target, { width, height }, body.authCookies, body.ownerId);
+        if (scope) providerSessionCreations.set(scope, creation);
+      }
+      let session;
+      try { session = await creation; }
+      finally { if (scope && providerSessionCreations.get(scope) === creation) providerSessionCreations.delete(scope); }
       return json(res, 201, {
         id: session.id,
         token: session.token,
@@ -1197,6 +1224,7 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, await auditPage(session));
     if (req.method === 'POST' && match[2] === 'actions') {
       const metrics = await runActions(session, await readBody(req));
+      await providerSessions.save(session.providerScope, session.context);
       return json(res, 200, { ok: true, url: session.page.url(), ...metrics });
     }
     if (req.method === 'POST' && match[2] === 'imports')

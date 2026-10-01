@@ -108,12 +108,14 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
     visual_assignment: async (ctx) => {
       const request = {
         courseId: ctx.courseId,
+        profile: ctx.profile,
         competency: comp(ctx),
         storyboard: ctx.artifacts.storyboard,
         artifacts: ctx.artifacts,
       };
-      let media = await runtime.media.find(request);
+      let media;
       try {
+        media = await runtime.media.find(request);
         requireLicensedVisualCoverage(ctx, media);
       } catch (error) {
         if (typeof runtime.media.acquire !== 'function') throw error;

@@ -6,6 +6,8 @@ import {
   storedLicensedMediaMetadata,
 } from '@/lib/media/licensed-course-media';
 
+import { buildSceneAssignments } from '../instructional/scene-assignments';
+
 type RecordLike = Record<string, any>;
 
 function firstRecord(value: unknown): RecordLike {
@@ -38,7 +40,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       .eq('status', 'ready')
       .eq('asset_role', 'source_broll')
       .not('entitlement_id', 'is', null)
-      .limit(20);
+      .order('id');
     if (error) throw error;
 
     const readyAssets = await Promise.all(
@@ -63,25 +65,22 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
           license_evidence_url: metadata.license_evidence_url ?? metadata.licenseEvidenceUrl,
           scene_id: metadata.scene_id,
           relevance_reason: metadata.relevance_reason,
-          duration_seconds: metadata.duration_seconds,
+          duration_seconds: metadata.duration_seconds ?? metadata.verifiedDurationSeconds ?? metadata.technicalQa?.durationSeconds,
+          visual_coverage_verified: metadata.visual_coverage_verified === true,
+          visual_requirements: metadata.visual_requirements,
         };
       }),
     );
 
     const scenes = input.storyboard?.storyboard?.scenes ?? [];
-    const assignments = scenes.map((scene: any) => {
-      const asset = readyAssets.find(
-        (a: any) => a.scene_id === scene.id && a.relevance_reason && a.license_evidence_url,
-      );
-      if (!asset)
-        throw new Error(`ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED:${scene.id}`);
-      return {
-        sceneId: scene.id,
-        assetId: asset.id,
-        licenseEvidenceUrl: asset.license_evidence_url,
-        relevanceReason: asset.relevance_reason,
-      };
-    });
+    const { assignments, gaps } = buildSceneAssignments(
+      scenes,
+      readyAssets,
+      input.profile?.sceneAssignments?.[input.competency?.id] ?? [],
+    );
+    if (gaps.length) {
+      throw new Error(`ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED:${JSON.stringify({ assignments, gaps })}`);
+    }
     return {
       assignments,
       policy: 'licensed-first',

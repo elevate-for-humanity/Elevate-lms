@@ -129,6 +129,8 @@ export async function GET() {
       schedule: extension.availability_schedule || DEFAULT_AVAILABILITY_SCHEDULE,
       ringSeconds: extension.ring_seconds,
       voicemailGreeting: extension.voicemail_greeting || '',
+      externalFallbackEnabled: extension.admin_external_fallback === true,
+      externalFallbackNumber: extension.external_fallback_number || '',
       presenceStatus: (liveDevices ?? 0) > 0 ? extension.presence_status : 'offline',
     },
     inbox: (inbox || []).map((item: any) => ({
@@ -225,6 +227,9 @@ export async function PATCH(request: Request) {
     const schedule = safeSchedule(body.schedule);
     const ringSeconds = Number(body.ringSeconds);
     const voicemailGreeting = String(body.voicemailGreeting || '').trim();
+    const externalFallbackEnabled = body.externalFallbackEnabled === true;
+    const externalDigits = String(body.externalFallbackNumber || '').replace(/\D/g, '');
+    const externalFallbackNumber = externalDigits.length === 10 ? `+1${externalDigits}` : externalDigits.length === 11 && externalDigits.startsWith('1') ? `+${externalDigits}` : '';
     if (!RING_MODES.has(ringMode) || !AVAILABILITY_SOURCES.has(availabilitySource)) {
       return NextResponse.json(
         { error: 'Choose a valid phone and availability mode.' },
@@ -233,6 +238,9 @@ export async function PATCH(request: Request) {
     }
     if (!schedule || !Number.isInteger(ringSeconds) || ringSeconds < 5 || ringSeconds > 60) {
       return NextResponse.json({ error: 'Schedule or ring duration is invalid.' }, { status: 400 });
+    }
+    if (externalFallbackEnabled && !externalFallbackNumber) {
+      return NextResponse.json({ error: 'Enter a valid 10-digit fallback phone number.' }, { status: 400 });
     }
     if (voicemailGreeting.length > 600) {
       return NextResponse.json(
@@ -246,6 +254,8 @@ export async function PATCH(request: Request) {
       availability_schedule: schedule,
       ring_seconds: ringSeconds,
       voicemail_greeting: voicemailGreeting || null,
+      admin_external_fallback: externalFallbackEnabled,
+      external_fallback_number: externalFallbackEnabled ? externalFallbackNumber : null,
       presence_status: ['do_not_disturb', 'offline'].includes(ringMode) ? ringMode : 'offline',
       last_presence_at: new Date().toISOString(),
     });

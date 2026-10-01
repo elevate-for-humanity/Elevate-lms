@@ -83,12 +83,10 @@ export async function refreshLicensedVisualUrls(input: any, db: SupabaseClient):
 
 function visualCandidates(input: any): VisualCandidate[] {
   const assignment = visualAssignment(input);
-  const lessonId = String(input.lessonId ?? '');
   const candidates: VisualCandidate[] = [];
 
   for (const asset of Array.isArray(assignment.readyAssets) ? assignment.readyAssets : []) {
     const row = record(asset);
-    if (row.lesson_id && String(row.lesson_id) !== lessonId) continue;
     const url = publicCourseMediaUrl(row.public_url);
     const kind = url ? mediaKind(url, row.mime_type) : null;
     if (!url || !kind || !row.entitlement_id) continue;

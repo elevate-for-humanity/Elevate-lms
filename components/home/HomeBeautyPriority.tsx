@@ -6,15 +6,15 @@ import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollm
 const TRACKS = [
   {
     title: 'Barber Apprenticeship',
-    hours: '2,000 hours of supervised host-shop training',
+    hours: '14 Appendix A competencies + 260 RTI hours',
     focus: 'Haircutting, fades, grooming, sanitation, client service, and professional practice',
     image: '/images/partners/kountry-kutz/interior-active.webp',
     href: '/programs/barber-apprenticeship',
     icon: BadgeCheck,
   },
   {
-    title: 'Cosmetology Apprenticeship',
-    hours: '2,000 hours of supervised salon training',
+    title: 'Hair Stylist / Cosmetology Apprenticeship',
+    hours: '2,000–2,500-hour hybrid term + 154 RTI hours',
     focus: 'Haircutting, styling, color, chemical services, sanitation, and client care',
     image: '/images/pexels/cosmetology.webp',
     href: '/programs/cosmetology-apprenticeship',
@@ -22,7 +22,7 @@ const TRACKS = [
   },
   {
     title: 'Esthetician Apprenticeship',
-    hours: '2,000 hours of supervised work-based training',
+    hours: '20 Appendix A competencies + 300 RTI hours',
     focus: 'Skin care, sanitation, client consultation, services, safety, and professional practice',
     image: '/images/beauty/esthetics-hero.webp',
     href: '/programs/esthetician-apprenticeship',
@@ -30,7 +30,7 @@ const TRACKS = [
   },
   {
     title: 'Nail Technician Apprenticeship',
-    hours: '2,000 hours of supervised nail-salon training',
+    hours: '19 Appendix A competencies + 210 RTI hours',
     focus: 'Manicuring, pedicuring, nail enhancements, sanitation, and client safety',
     image: '/images/pexels/nail-tech.webp',
     href: '/programs/nail-technician-apprenticeship',

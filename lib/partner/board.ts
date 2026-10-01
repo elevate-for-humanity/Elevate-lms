@@ -136,11 +136,17 @@ function numericHours(value: number | string | null | undefined) {
 }
 
 function isApproved(row: HourRow) {
-  return row.approval_status === 'approved' || row.status === 'approved';
+  const approval = String(row.approval_status || '').trim().toLowerCase();
+  const status = String(row.status || '').trim().toLowerCase();
+  const accepted = new Set(['approved', 'verified', 'accepted', 'complete', 'completed']);
+  return accepted.has(approval) || accepted.has(status);
 }
 
 function isPending(row: HourRow) {
-  return row.approval_status === 'pending' && row.status === 'pending';
+  const approval = String(row.approval_status || '').trim().toLowerCase();
+  const status = String(row.status || '').trim().toLowerCase();
+  const pending = new Set(['pending', 'submitted', 'awaiting_review']);
+  return pending.has(approval) || pending.has(status);
 }
 
 const ACCEPTED_DOCUMENT_STATUSES = new Set([

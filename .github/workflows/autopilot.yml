@@ -1,40 +1,50 @@
 name: Autopilot (Builder Mode)
 
 on:
-  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "chore/**"
+      - "fix/**"
+      - "feat/**"
 
-concurrency:
-  group: autopilot-${{ github.ref }}
-  cancel-in-progress: true
+permissions:
+  contents: read
 
 jobs:
   autopilot:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.28.2
+          version: 8
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Verify runner
+        shell: bash
+        run: |
+          set -euxo pipefail
+          node --version
+          pnpm --version
+          test -f package.json
+          test -f scripts/autopilot.sh
 
       - name: Install
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+        run: pnpm install --frozen-lockfile
 
       - name: Autopilot
-        env:
-          NODE_OPTIONS: '--max-old-space-size=6144'
-          GENERATE_SOURCEMAP: 'false'
-          AUTOPILOT_STRICT_TYPECHECK: ${{ github.head_ref == 'release/production-recovery-20260813' && 'true' || 'false' }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
-        run: ./scripts/autopilot.sh
+        shell: bash
+        run: bash scripts/autopilot.sh

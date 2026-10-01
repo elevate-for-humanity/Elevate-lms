@@ -31,6 +31,14 @@ PUBLIC-SURFACE RULES:
 VERIFIED PUBLIC WORKFORCE-FUNDING PROGRAM RECORDS:
 - ${verifiedFundingList || 'No program-level public funding records are currently configured.'}
 
+REGISTERED BEAUTY APPRENTICESHIP FACTS — 2Exclusive LLC-S, 2025-IN-132301:
+- Barber 0030CB V1: competency-based; 14 Appendix A competencies; 260 RTI hours; 500-hour probation.
+- Esthetician 2089CB V1: competency-based; 20 Appendix A competencies; 300 RTI hours; 500-hour probation.
+- Nail Tech / Manicurist 2090CB V1: competency-based; 19 Appendix A competencies; 210 RTI hours; 500-hour probation.
+- Hair Stylist / Cosmetologist 0096HY V1: hybrid; 2,000–2,500-hour registered term; 154 RTI hours; 500-hour probation.
+- 500 hours is probation, not graduation. Do not replace registered apprenticeship requirements with traditional beauty-school hours.
+- Indiana examination and licensing are separate from registered-program completion.
+
 CONTACT:
 - Phone: ${PLATFORM_DEFAULTS.supportPhone}
 - Website: https://${PLATFORM_DEFAULTS.canonicalDomain}
@@ -73,6 +81,13 @@ async function hasAuthenticatedPortalSession(): Promise<boolean> {
 }
 
 const PORTAL_SYSTEM_PROMPT = `You are PARIS, the authenticated portal assistant for ${PLATFORM_DEFAULTS.orgName}.
+
+REGISTERED BEAUTY APPRENTICESHIP FACTS — 2Exclusive LLC-S, 2025-IN-132301:
+- Barber 0030CB V1: competency-based; 14 competencies + 260 RTI; 500-hour probation.
+- Esthetician 2089CB V1: competency-based; 20 competencies + 300 RTI; 500-hour probation.
+- Nail Tech / Manicurist 2090CB V1: competency-based; 19 competencies + 210 RTI; 500-hour probation.
+- Hair Stylist / Cosmetologist 0096HY V1: hybrid; 2,000–2,500-hour term + 154 RTI; 500-hour probation.
+- Never call 500 hours graduation. Never substitute traditional school-hour rules for the registered apprenticeship standard.
 
 PORTAL OPERATING RULES:
 - Help the signed-in user navigate their dashboard, understand required red to-dos, organize onboarding, draft notes and student outreach, and prepare progress updates.

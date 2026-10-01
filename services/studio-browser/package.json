@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --test server.test.mjs"
+    "check": "node --check server.mjs && node --check learner-runthrough.mjs && node --test server.test.mjs learner-runthrough.test.mjs"
   },
   "dependencies": {
+    "axe-core": "^4.10.3",
     "playwright-core": "1.57.0"
   }
 }

@@ -470,7 +470,7 @@ async function routeToExtension(
     phase: 'webrtc_leg',
   };
   if (!device || !isExtensionReachable(extension, system.timezone)) {
-    const usedFallback = await dialAdminFallback(db, system, call, state, eventId);
+    const usedFallback = await dialExtensionFallback(db, system, call, state, eventId);
     if (usedFallback) return;
     return startParis(db, system, call, callControlId, eventId, route);
   }
@@ -571,7 +571,7 @@ async function routeAdmin(
   return startParis(db, system, call, callControlId, eventId);
 }
 
-async function dialAdminFallback(
+async function dialExtensionFallback(
   db: any,
   system: System,
   call: any,
@@ -587,7 +587,7 @@ async function dialAdminFallback(
   if (!extension?.external_fallback_number || !state.parentCallControlId) return false;
   const connectionId = process.env.TELNYX_CONNECTION_ID;
   if (!connectionId) throw new Error('TELNYX_CONNECTION_ID is not configured.');
-  const fallbackState = { ...state, phase: 'admin_fallback' };
+  const fallbackState = { ...state, phase: 'external_fallback' };
   const response = await telnyxClient().calls.dial({
     connection_id: connectionId,
     from: publicPhoneNumber(),
@@ -661,7 +661,7 @@ async function handleEvent(
     return;
   }
 
-  if (state.phase === 'webrtc_leg' || state.phase === 'admin_fallback') {
+  if (state.phase === 'webrtc_leg' || state.phase === 'external_fallback') {
     if (type === 'call.initiated') {
       await db.from('phone_call_legs').upsert(
         {
@@ -669,7 +669,7 @@ async function handleEvent(
           provider_call_id: payload.call_control_id,
           extension_id: state.extensionId || null,
           profile_id: state.profileId || null,
-          leg_type: state.phase === 'admin_fallback' ? 'admin_fallback' : 'webrtc',
+          leg_type: state.phase === 'external_fallback' ? 'admin_fallback' : 'webrtc',
           status: 'ringing',
           updated_at: new Date().toISOString(),
         },
@@ -723,7 +723,7 @@ async function handleEvent(
       }
       if (!leg?.answered_at && state.parentCallControlId) {
         if (state.phase === 'webrtc_leg') {
-          const usedFallback = await dialAdminFallback(db, system, call, state, eventId);
+          const usedFallback = await dialExtensionFallback(db, system, call, state, eventId);
           if (usedFallback) return;
         }
         await startParis(db, system, call, state.parentCallControlId, eventId, {

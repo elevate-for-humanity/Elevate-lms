@@ -79,7 +79,7 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
     ojtDescription:
       'RAPIDS 0096HY V1 uses a hybrid 2,000–2,500-hour term with supervised salon work-process training. The 500-hour figure is probation, not graduation.',
     rtiDescription:
-      'Complete 154 verified RTI hours alongside the registered hybrid work-process requirements.'
+      'Complete 154 verified RTI hours alongside the registered hybrid work-process requirements.',
     tuition: {
       total: 0,
       setupFeePercent: 0,
@@ -99,9 +99,9 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
     totalHours: 210,
     hoursLabel: '19 competencies + 210 RTI hours',
     ojtDescription:
-      'Complete and document all 19 registered Appendix A competencies through supervised nail-salon practice. Work hours are training evidence, not a fixed completion denominator.'
+      'Complete and document all 19 registered Appendix A competencies through supervised nail-salon practice. Work hours are training evidence, not a fixed completion denominator.',
     rtiDescription:
-      'Complete 210 verified RTI hours covering the registered Manicurist instructional outline. The 500-hour figure is probation, not graduation.'
+      'Complete 210 verified RTI hours covering the registered Manicurist instructional outline. The 500-hour figure is probation, not graduation.',
     tuition: {
       total: 2490,
       setupFeePercent: 35,
@@ -121,9 +121,9 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
     totalHours: 210,
     hoursLabel: '19 competencies + 210 RTI hours',
     ojtDescription:
-      'Complete and document all 19 registered Appendix A competencies through supervised nail-salon practice. Work hours are training evidence, not a fixed completion denominator.'
+      'Complete and document all 19 registered Appendix A competencies through supervised nail-salon practice. Work hours are training evidence, not a fixed completion denominator.',
     rtiDescription:
-      'Complete 210 verified RTI hours covering the registered Manicurist instructional outline. The 500-hour figure is probation, not graduation.'
+      'Complete 210 verified RTI hours covering the registered Manicurist instructional outline. The 500-hour figure is probation, not graduation.',
     tuition: {
       total: 2500,
       setupFeePercent: 35,

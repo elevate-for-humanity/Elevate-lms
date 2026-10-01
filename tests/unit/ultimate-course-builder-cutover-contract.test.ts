@@ -26,9 +26,9 @@ describe('Ultimate Course Builder production cutover', () => {
     expect(ultimateRoute).toContain("body.action === 'queue-course'");
     expect(ultimateRoute).not.toContain('is_published: false');
     expect(ultimateRoute).toContain('UltimateAppendixAStandardsSource');
-    expect(productionHandlers).toContain("ctx.profile.authority==='course-defined'");
+    expect(productionHandlers).toContain("ctx.profile.authority === 'course-defined'");
     expect(productionHandlers).toContain("ctx.profile.id.startsWith('course:')");
-    expect(productionHandlers).toContain("status:'course-defined',verified:true");
+    expect(productionHandlers).toContain("status: 'course-defined', verified: true");
     expect(coursesRoute).toContain(".from('programs')");
     expect(coursesRoute).toContain('slug: courseSlug');
   });
@@ -45,9 +45,11 @@ describe('Ultimate Course Builder production cutover', () => {
     const marketing = read('apps/marketing/app/ai/course-factory/page.tsx');
     const legacyRoute = read('apps/admin/app/api/admin/course-builder/route.ts');
 
-    expect(lms).toContain("redirect('https://admin.elevateforhumanity.org/studio/courses?tab=ultimate')");
+    expect(lms).toContain(
+      "redirect('https://admin.elevateforhumanity.org/studio/courses?tab=ultimate')",
+    );
     expect(marketing).toContain("getAdminUrl('/studio/courses?tab=ultimate')");
     expect(legacyRoute).toContain('COURSE_FACTORY_ARCHIVED');
-    expect(legacyRoute).toContain("status: 410");
+    expect(legacyRoute).toContain('status: 410');
   });
 });

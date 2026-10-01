@@ -165,7 +165,11 @@ export async function POST(request: NextRequest) {
 
     const expectedId =
       interactionType === 'knowledge-check'
-        ? `${lesson.slug}-kc`
+        ? interactionId === `${lesson.slug}-reassessment` &&
+          Array.isArray(experience.reassessment) &&
+          experience.reassessment.length
+          ? `${lesson.slug}-reassessment`
+          : `${lesson.slug}-kc`
         : interactionType === 'case-study'
           ? `${lesson.slug}-case`
           : `${lesson.slug}-scenario`;
@@ -176,7 +180,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const scored = scoreAttempt(interactionType, responses, experience);
+    const scored = scoreAttempt(
+      interactionType,
+      responses,
+      interactionId === `${lesson.slug}-reassessment`
+        ? { ...experience, knowledgeChecks: experience.reassessment }
+        : experience,
+    );
     if (!scored) {
       return NextResponse.json(
         { error: 'Interaction is not configured for scoring' },
@@ -397,6 +407,12 @@ function experienceToInteractions(
       remediation: experience.remediation ?? null,
     });
   }
+  if (Array.isArray(experience.reassessment) && experience.reassessment.length)
+    add('reassessment', 'knowledge-check', 'Reassessment', {
+      questions: experience.reassessment,
+      passingScore: experience.remediation?.passingScore ?? 80,
+      remediation: experience.remediation ?? null,
+    });
   add(
     'scenario',
     'scenario',

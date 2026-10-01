@@ -118,6 +118,13 @@ export interface StoryboardRenderInput {
   /** Fail before encoding when any scene would render without a concrete
    * image or video URL, or when scenes reuse the same visual. */
   requireVisualEvidence?: boolean;
+  narrationSegments?: Array<{
+    segmentId: string;
+    text: string;
+    audioUrl: string;
+    durationSeconds: number;
+    captions?: Array<{ startSeconds: number; endSeconds: number; text: string }>;
+  }>;
 }
 
 function enabled(value: string | undefined): boolean {
@@ -165,12 +172,22 @@ function vttTimestamp(seconds: number): string {
 }
 
 export function buildStoryboardWebVtt(scenes: SceneData[]): string {
-  let cursor = 1;
-  const cues = scenes.map((scene, index) => {
-    const start = cursor;
+  let cursor = 3;
+  const cues: string[] = [];
+  for (const scene of scenes) {
+    const timed = scene.captionCues ?? [
+      {
+        startSeconds: 0,
+        endSeconds: scene.durationFrames / STORYBOARD_RENDER_FPS,
+        text: scene.narration,
+      },
+    ];
+    for (const cue of timed)
+      cues.push(
+        `${cues.length + 1}\n${vttTimestamp(cursor + cue.startSeconds)} --> ${vttTimestamp(cursor + cue.endSeconds)}\n${cue.text}`,
+      );
     cursor += scene.durationFrames / STORYBOARD_RENDER_FPS;
-    return `${index + 1}\n${vttTimestamp(start)} --> ${vttTimestamp(cursor)}\n${scene.narration}`;
-  });
+  }
   return `WEBVTT\n\n${cues.join('\n\n')}\n`;
 }
 
@@ -565,15 +582,37 @@ export async function renderStoryboardVideo(
 
     for (const [index, scene] of input.storyboard.scenes.entries()) {
       const narration = scene.dialogue?.trim() || scene.action.trim();
-      const audio = await generateEdgeTTS(narration, { voice: instructor.voice });
-      const sceneAudioPath = path.join(paths.outputDir, `scene-${index + 1}.mp3`);
-      await writeFile(sceneAudioPath, audio);
-      const measuredNarrationSeconds = await measuredAudioDurationSeconds(sceneAudioPath);
-      const audioSrc = await uploadLessonMediaBuffer(
-        audio,
-        `${input.lessonId}-scene-${index + 1}`,
-        'mp3',
-      );
+      const approvedAudio = input.narrationSegments?.[index];
+      if (input.ultimateStrict && (!approvedAudio || approvedAudio.text !== narration))
+        throw new Error('ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED');
+      let audioSrc: string;
+      let measuredNarrationSeconds: number | null;
+      if (approvedAudio) {
+        const response = await fetch(approvedAudio.audioUrl, {
+          signal: AbortSignal.timeout(60000),
+        });
+        if (!response.ok) throw new Error(`Approved narration returned HTTP ${response.status}`);
+        const audio = Buffer.from(await response.arrayBuffer());
+        const sceneAudioPath = path.join(paths.outputDir, `scene-${index + 1}.mp3`);
+        await writeFile(sceneAudioPath, audio);
+        measuredNarrationSeconds = await measuredAudioDurationSeconds(sceneAudioPath);
+        if (
+          !measuredNarrationSeconds ||
+          Math.abs(measuredNarrationSeconds - approvedAudio.durationSeconds) > 0.1
+        )
+          throw new Error('ULTIMATE_APPROVED_AUDIO_DURATION_CHANGED');
+        audioSrc = approvedAudio.audioUrl;
+      } else {
+        const audio = await generateEdgeTTS(narration, { voice: instructor.voice });
+        const sceneAudioPath = path.join(paths.outputDir, `scene-${index + 1}.mp3`);
+        await writeFile(sceneAudioPath, audio);
+        measuredNarrationSeconds = await measuredAudioDurationSeconds(sceneAudioPath);
+        audioSrc = await uploadLessonMediaBuffer(
+          audio,
+          `${input.lessonId}-scene-${index + 1}`,
+          'mp3',
+        );
+      }
       const visualIntent = deriveInstructionalVisualIntent({
         domainKey: /hvac|epa 608|refriger/i.test(input.courseTitle) ? 'hvac_epa608' : null,
         title: scene.subject,
@@ -775,7 +814,17 @@ export async function renderStoryboardVideo(
       // and review; it must not become one continuous hour-long MP4. Time each
       // visual to its spoken narration so malformed blueprint durations cannot
       // keep Chromium encoding indefinitely.
-      const durationSeconds = Math.min(180, Math.max(narrationSeconds, 4));
+      const durationSeconds = Math.max(narrationSeconds, 4);
+      resolvedStoryboard.scenes[index].durationSeconds = durationSeconds;
+      if (input.ultimateStrict && clipUrl) {
+        const response = await fetch(clipUrl, { signal: AbortSignal.timeout(60000) });
+        if (!response.ok) throw new Error(`Licensed visual returned HTTP ${response.status}`);
+        const visualPath = path.join(paths.outputDir, `visual-${index}.mp4`);
+        await writeFile(visualPath, Buffer.from(await response.arrayBuffer()));
+        const sourceSeconds = await measuredAudioDurationSeconds(visualPath);
+        if (!sourceSeconds || sourceSeconds < durationSeconds)
+          throw new Error(`ULTIMATE_VISUAL_DURATION_INSUFFICIENT:${index + 1}`);
+      }
       const bullets = narration
         .split(/(?<=[.!?])\s+/)
         .map((value) => value.trim())
@@ -795,6 +844,7 @@ export async function renderStoryboardVideo(
         clipUrl,
         imageUrl,
         audioSrc,
+        captionCues: approvedAudio?.captions,
         durationFrames: Math.ceil(durationSeconds * STORYBOARD_RENDER_FPS),
         sceneType: scene.sceneType,
         memoryAnchor: scene.memoryAnchor,
@@ -920,12 +970,12 @@ export async function renderStoryboardVideo(
     }
     const captionUrl = await uploadCourseVideosObject(
       Buffer.from(buildStoryboardWebVtt(scenes), 'utf8'),
-      `generated-lessons/lesson-${input.lessonId}.vtt`,
+      `generated-lessons/lesson-${input.lessonId}-${Date.now()}.vtt`,
       'text/vtt',
     );
     const transcriptUrl = await uploadCourseVideosObject(
       Buffer.from(scenes.map((scene) => scene.narration).join('\n\n'), 'utf8'),
-      `generated-lessons/lesson-${input.lessonId}.txt`,
+      `generated-lessons/lesson-${input.lessonId}-${Date.now()}.txt`,
       'text/plain',
     );
     resolvedStoryboard.captionUrl = captionUrl;

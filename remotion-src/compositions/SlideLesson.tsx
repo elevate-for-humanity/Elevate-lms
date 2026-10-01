@@ -47,6 +47,7 @@ export interface SceneData {
   audioSrc: string | null;
   /** Duration in frames at the SlideLesson composition frame rate. */
   durationFrames: number;
+  captionCues?: Array<{ startSeconds: number; endSeconds: number; text: string }>;
   sceneType?: string;
   memoryAnchor?: string;
 }
@@ -75,8 +76,8 @@ export interface SlideLessonProps {
 
 // ââ Constants âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
-const INTRO_FRAMES = 45; // Three-second photographic poster at the canonical 15fps delivery rate.
-const OUTRO_FRAMES = 30;
+const INTRO_FRAMES = 90; // Three seconds at the canonical 30fps delivery rate.
+const OUTRO_FRAMES = 60;
 
 // ââ Animation helpers âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
@@ -267,7 +268,9 @@ function CaptionBar({
   durationFrames,
   primaryColor,
   bright,
+  cues,
 }: {
+  cues?: Array<{ startSeconds: number; endSeconds: number; text: string }>;
   text: string;
   frame: number;
   durationFrames: number;
@@ -275,7 +278,7 @@ function CaptionBar({
   bright: boolean;
 }) {
   // Render timed caption phrases, never a persistent narration paragraph.
-  const words = text.trim().split(/\\s+/).filter(Boolean);
+  const words = text.trim().split(/\s+/).filter(Boolean);
   const phrases = Array.from({ length: Math.max(1, Math.ceil(words.length / 8)) }, (_, index) =>
     words.slice(index * 8, index * 8 + 8).join(' '),
   );
@@ -283,7 +286,11 @@ function CaptionBar({
     phrases.length - 1,
     Math.floor((Math.max(0, frame) / Math.max(1, durationFrames)) * phrases.length),
   );
-  const caption = phrases[phraseIndex] ?? '';
+  const { fps } = useVideoConfig();
+  const caption = cues
+    ? (cues.find((cue) => frame / fps >= cue.startSeconds && frame / fps <= cue.endSeconds)?.text ??
+      '')
+    : (phrases[phraseIndex] ?? '');
   return (
     <div
       style={{
@@ -491,7 +498,6 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
       {!instructionalLayout && scene.clipUrl ? (
         <Video
           src={scene.clipUrl}
-          loop
           style={{
             position: 'absolute',
             inset: 0,
@@ -600,7 +606,16 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
         {instructionalLayout ? (
           <InstructionalGraphic layout={instructionalLayout} frame={frame} props={props} />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '20px 24px', background: bright ? 'rgba(255,255,255,0.94)' : 'rgba(15,23,42,0.88)', borderRadius: 18 }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+              padding: '20px 24px',
+              background: bright ? 'rgba(255,255,255,0.94)' : 'rgba(15,23,42,0.88)',
+              borderRadius: 18,
+            }}
+          >
             {scene.bullets.map((bullet, i) => (
               <div
                 key={i}
@@ -645,6 +660,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
       {/* Caption bar */}
       <CaptionBar
         text={scene.narration}
+        cues={scene.captionCues}
         frame={frame}
         durationFrames={scene.durationFrames}
         primaryColor={props.primaryColor}
@@ -759,7 +775,10 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
 
       {props.preRollUrl && (
         <Sequence from={0} durationInFrames={preRollFrames}>
-          <Video src={props.preRollUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <Video
+            src={props.preRollUrl}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
         </Sequence>
       )}
 
@@ -789,7 +808,10 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
           from={preRollFrames + INTRO_FRAMES + offset + OUTRO_FRAMES}
           durationInFrames={postRollFrames}
         >
-          <Video src={props.postRollUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <Video
+            src={props.postRollUrl}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
         </Sequence>
       )}
     </AbsoluteFill>
@@ -804,5 +826,11 @@ export function calcSlideLessonFrames(
   preRollDurationFrames = 0,
   postRollDurationFrames = 0,
 ): number {
-  return preRollDurationFrames + INTRO_FRAMES + scenes.reduce((sum, s) => sum + s.durationFrames, 0) + OUTRO_FRAMES + postRollDurationFrames;
+  return (
+    preRollDurationFrames +
+    INTRO_FRAMES +
+    scenes.reduce((sum, s) => sum + s.durationFrames, 0) +
+    OUTRO_FRAMES +
+    postRollDurationFrames
+  );
 }

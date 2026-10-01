@@ -1,0 +1,461 @@
+{
+  "competencyId": "e8df8cf3-74cf-455b-93dd-8ea6ee732cc8",
+  "objectives": [
+    {
+      "id": "professional-action",
+      "text": "Choose and explain a professional response to a client request that exceeds the apprentice's verified authorization.",
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ]
+    },
+    {
+      "id": "training-path",
+      "text": "Distinguish mentored workplace learning, related instruction, apprenticeship completion, and state licensing requirements.",
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ]
+    },
+    {
+      "id": "verify-record",
+      "text": "Create an accurate training record and identify the supervisor or official source needed to resolve uncertainty.",
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ]
+    }
+  ],
+  "prerequisites": {
+    "checks": [],
+    "noneReason": "Introductory knowledge lesson. No independent salon procedure is performed.",
+    "reviewRequired": false
+  },
+  "stages": [
+    {
+      "stage": "why_it_matters",
+      "instruction": "Welcome to Cosmetology Apprenticeship. Professionalism means making dependable decisions a client and supervisor can trust. Imagine a client asks you to perform a chemical service you have only watched once. Saying yes to keep the appointment moving can create a safety problem. In this lesson you will practice checking your authorization, communicating clearly, and recording the learning you actually completed.",
+      "objectiveIds": [
+        "professional-action"
+      ]
+    },
+    {
+      "stage": "activate_prior_knowledge",
+      "instruction": "Think about a time someone did not listen to what you wanted. What would have improved the conversation? Pause and write one action: ask a clarifying question, explain a limit, or seek help. In the salon, a confident tone does not replace competence. Your useful prior skill is listening carefully and checking what the other person means before promising an outcome.",
+      "objectiveIds": [
+        "professional-action"
+      ]
+    },
+    {
+      "stage": "terminology",
+      "instruction": "Use four terms accurately. Workplace learning is learning through job tasks with an experienced mentor. Related instruction is the learning that supports those tasks, including classroom or online study. An apprenticeship credential records completion of the apprenticeship requirements. A state license is authorization governed by the state licensing authority. An online lesson completion does not establish that all apprenticeship or licensing requirements have been met.",
+      "objectiveIds": [
+        "training-path"
+      ]
+    },
+    {
+      "stage": "concept_explanation",
+      "instruction": "Use this decision sequence: identify the request, check your verified training and permitted role, involve the supervisor when authorization is unclear, and explain the next step to the client. For Indiana requirements, start with the Professional Licensing Agency's current Cosmetology and Barber information, including its statutes and rules. Do not rely on an old screenshot: the Board reports rule updates effective July twenty-second, twenty twenty-six.",
+      "objectiveIds": [
+        "professional-action"
+      ]
+    },
+    {
+      "stage": "instructor_example",
+      "instruction": "Here is a worked example. A client says, Can you color my hair now? The apprentice first clarifies the requested service. Next, the apprentice checks whether that service is within their verified assignment and authorization. If uncertain, they contact the supervising professional. A professional response is: I will check this with my supervisor before we proceed. That gives the client a clear next step without inventing a promise.",
+      "objectiveIds": [
+        "professional-action"
+      ]
+    },
+    {
+      "stage": "demonstration",
+      "instruction": "Now watch the record-making process as a knowledge demonstration. Start with the date and the learning activity. In this example write: observed a supervised client consultation. State what happened accurately; observation is not the same as independently performing a service. Add the actual duration and the designated reviewer. Before submitting, compare the entry with your notes and ask the reviewer how corrections or approvals are handled in your program.",
+      "objectiveIds": [
+        "verify-record"
+      ]
+    },
+    {
+      "stage": "guided_practice",
+      "instruction": "Practice with me. A client asks for a service you have observed, but you cannot confirm you are authorized to perform it. Which response is professional: promise the service, guess based on a video, or check with the supervisor? Choose the supervisor check. Now complete this sentence: Before we proceed, I need to confirm this service with my supervisor. Explain your reason: observation alone does not verify authorization or independent competence.",
+      "objectiveIds": [
+        "professional-action"
+      ]
+    },
+    {
+      "stage": "knowledge_check",
+      "instruction": "Check your understanding. You finished one online lesson and answered its questions. Does that by itself prove you completed the apprenticeship and qualify for a state license? Pause before answering. The answer is no. Lesson progress is evidence of that lesson's learning. Workplace learning, related instruction, apprenticeship completion, and licensing have distinct requirements. Your next action is to confirm your remaining requirements with the program and the state licensing authority.",
+      "objectiveIds": [
+        "training-path"
+      ]
+    },
+    {
+      "stage": "independent_practice",
+      "instruction": "Work independently with this fictional example. On Monday you observed a consultation for thirty minutes. Write one training entry and one question for the reviewer. Include the date, observation activity, actual thirty-minute duration, and designated reviewer. Your question could be: Is this the correct category for observed consultation learning? Compare your work with the example only after finishing. Do not put this fictional event into a real hours log.",
+      "objectiveIds": [
+        "verify-record"
+      ]
+    },
+    {
+      "stage": "mistake_and_correction",
+      "instruction": "A common mistake is changing an observation into a claim of independent performance. Another is replacing the actual duration with a rounded number that did not happen. Correct the entry to describe the actual activity and actual time, then use your program's correction process. Accurate records let the reviewer evaluate real learning. Professionalism also means raising an uncertainty promptly instead of hiding it behind a polished but inaccurate entry.",
+      "objectiveIds": [
+        "verify-record"
+      ]
+    },
+    {
+      "stage": "assessment",
+      "instruction": "Your assessment checks decisions, not whether you can repeat a slogan. First select the response to an unverified client-service request and explain why. Next distinguish a completed lesson from completion of the training and licensing pathways. Finally select the accurate record for an observed activity. The quiz uses new situations and a passing target of eighty percent. This knowledge check does not certify hands-on performance; that requires the appropriate supervised evidence.",
+      "objectiveIds": [
+        "professional-action"
+      ]
+    },
+    {
+      "stage": "remediation",
+      "instruction": "If you miss a question, use the explanation to locate the gap. For an authorization error, repeat the check-and-supervisor decision sequence. For a completion error, redraw the four-part training map. For a record error, compare the activity and duration against the scenario. Then answer the separate reassessment questions about a different request, training situation, and record. Improvement means applying the reason to a new example, not memorizing the first answer.",
+      "objectiveIds": [
+        "training-path"
+      ]
+    },
+    {
+      "stage": "recap",
+      "instruction": "You now have a practical knowledge routine: listen, verify, consult the supervisor, communicate the next step, and record accurately. Before your next learning session, identify your supervising contact and confirm where current program and state requirements are kept. Keep workplace learning, related instruction, apprenticeship completion, and licensing separate in your plan. Use the independent practice and reassessment to demonstrate these decisions. This introductory lesson starts that learning; it does not replace supervised skill training.",
+      "objectiveIds": [
+        "professional-action"
+      ]
+    }
+  ],
+  "segments": [
+    {
+      "id": "welcome-why_it_matters",
+      "stage": "why_it_matters",
+      "text": "Welcome to Cosmetology Apprenticeship. Professionalism means making dependable decisions a client and supervisor can trust. Imagine a client asks you to perform a chemical service you have only watched once. Saying yes to keep the appointment moving can create a safety problem. In this lesson you will practice checking your authorization, communicating clearly, and recording the learning you actually completed.",
+      "objectiveIds": [
+        "professional-action"
+      ],
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ],
+      "visualRequirement": "An apprentice discussing a request with a supervising stylist; show the request and a pause-before-service decision.",
+      "sceneType": "mental_model"
+    },
+    {
+      "id": "welcome-activate_prior_knowledge",
+      "stage": "activate_prior_knowledge",
+      "text": "Think about a time someone did not listen to what you wanted. What would have improved the conversation? Pause and write one action: ask a clarifying question, explain a limit, or seek help. In the salon, a confident tone does not replace competence. Your useful prior skill is listening carefully and checking what the other person means before promising an outcome.",
+      "objectiveIds": [
+        "professional-action"
+      ],
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ],
+      "visualRequirement": "A client consultation with an apprentice taking notes; highlight listening and clarification.",
+      "sceneType": "worked_example"
+    },
+    {
+      "id": "welcome-terminology",
+      "stage": "terminology",
+      "text": "Use four terms accurately. Workplace learning is learning through job tasks with an experienced mentor. Related instruction is the learning that supports those tasks, including classroom or online study. An apprenticeship credential records completion of the apprenticeship requirements. A state license is authorization governed by the state licensing authority. An online lesson completion does not establish that all apprenticeship or licensing requirements have been met.",
+      "objectiveIds": [
+        "training-path"
+      ],
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ],
+      "visualRequirement": "Four clearly labeled training components with different relevant salon-learning visuals.",
+      "sceneType": "system_diagram"
+    },
+    {
+      "id": "welcome-concept_explanation",
+      "stage": "concept_explanation",
+      "text": "Use this decision sequence: identify the request, check your verified training and permitted role, involve the supervisor when authorization is unclear, and explain the next step to the client. For Indiana requirements, start with the Professional Licensing Agency's current Cosmetology and Barber information, including its statutes and rules. Do not rely on an old screenshot: the Board reports rule updates effective July twenty-second, twenty twenty-six.",
+      "objectiveIds": [
+        "professional-action"
+      ],
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ],
+      "visualRequirement": "An apprentice and mentor reviewing current requirements together; display the verify-before-service sequence.",
+      "sceneType": "system_diagram"
+    },
+    {
+      "id": "welcome-instructor_example",
+      "stage": "instructor_example",
+      "text": "Here is a worked example. A client says, Can you color my hair now? The apprentice first clarifies the requested service. Next, the apprentice checks whether that service is within their verified assignment and authorization. If uncertain, they contact the supervising professional. A professional response is: I will check this with my supervisor before we proceed. That gives the client a clear next step without inventing a promise.",
+      "objectiveIds": [
+        "professional-action"
+      ],
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ],
+      "visualRequirement": "A real client-stylist consultation with a visible request, verification, and supervisor handoff.",
+      "sceneType": "worked_example"
+    },
+    {
+      "id": "welcome-demonstration",
+      "stage": "demonstration",
+      "text": "Now watch the record-making process as a knowledge demonstration. Start with the date and the learning activity. In this example write: observed a supervised client consultation. State what happened accurately; observation is not the same as independently performing a service. Add the actual duration and the designated reviewer. Before submitting, compare the entry with your notes and ask the reviewer how corrections or approvals are handled in your program.",
+      "objectiveIds": [
+        "verify-record"
+      ],
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ],
+      "visualRequirement": "An apprentice documenting an observed consultation on a tablet; show date, activity, actual duration, reviewer.",
+      "sceneType": "worked_example"
+    },
+    {
+      "id": "welcome-guided_practice",
+      "stage": "guided_practice",
+      "text": "Practice with me. A client asks for a service you have observed, but you cannot confirm you are authorized to perform it. Which response is professional: promise the service, guess based on a video, or check with the supervisor? Choose the supervisor check. Now complete this sentence: Before we proceed, I need to confirm this service with my supervisor. Explain your reason: observation alone does not verify authorization or independent competence.",
+      "objectiveIds": [
+        "professional-action"
+      ],
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ],
+      "visualRequirement": "A supervised salon conversation; show three response choices and then the reason for checking.",
+      "sceneType": "knowledge_check"
+    },
+    {
+      "id": "welcome-knowledge_check",
+      "stage": "knowledge_check",
+      "text": "Check your understanding. You finished one online lesson and answered its questions. Does that by itself prove you completed the apprenticeship and qualify for a state license? Pause before answering. The answer is no. Lesson progress is evidence of that lesson's learning. Workplace learning, related instruction, apprenticeship completion, and licensing have distinct requirements. Your next action is to confirm your remaining requirements with the program and the state licensing authority.",
+      "objectiveIds": [
+        "training-path"
+      ],
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ],
+      "visualRequirement": "An apprentice reviewing learning progress with a mentor; show lesson progress separate from program and licensing requirements.",
+      "sceneType": "knowledge_check"
+    },
+    {
+      "id": "welcome-independent_practice",
+      "stage": "independent_practice",
+      "text": "Work independently with this fictional example. On Monday you observed a consultation for thirty minutes. Write one training entry and one question for the reviewer. Include the date, observation activity, actual thirty-minute duration, and designated reviewer. Your question could be: Is this the correct category for observed consultation learning? Compare your work with the example only after finishing. Do not put this fictional event into a real hours log.",
+      "objectiveIds": [
+        "verify-record"
+      ],
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ],
+      "visualRequirement": "An apprentice independently writing a practice record; distinguish fictional practice from submitted work hours.",
+      "sceneType": "worked_example"
+    },
+    {
+      "id": "welcome-mistake_and_correction",
+      "stage": "mistake_and_correction",
+      "text": "A common mistake is changing an observation into a claim of independent performance. Another is replacing the actual duration with a rounded number that did not happen. Correct the entry to describe the actual activity and actual time, then use your program's correction process. Accurate records let the reviewer evaluate real learning. Professionalism also means raising an uncertainty promptly instead of hiding it behind a polished but inaccurate entry.",
+      "objectiveIds": [
+        "verify-record"
+      ],
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ],
+      "visualRequirement": "A mentor and apprentice reviewing a record; show observed activity replacing the unsupported independent-performance claim.",
+      "sceneType": "worked_example"
+    },
+    {
+      "id": "welcome-assessment",
+      "stage": "assessment",
+      "text": "Your assessment checks decisions, not whether you can repeat a slogan. First select the response to an unverified client-service request and explain why. Next distinguish a completed lesson from completion of the training and licensing pathways. Finally select the accurate record for an observed activity. The quiz uses new situations and a passing target of eighty percent. This knowledge check does not certify hands-on performance; that requires the appropriate supervised evidence.",
+      "objectiveIds": [
+        "professional-action"
+      ],
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ],
+      "visualRequirement": "An apprentice taking a knowledge assessment; show three distinct decision tasks and the knowledge-only scope.",
+      "sceneType": "knowledge_check"
+    },
+    {
+      "id": "welcome-remediation",
+      "stage": "remediation",
+      "text": "If you miss a question, use the explanation to locate the gap. For an authorization error, repeat the check-and-supervisor decision sequence. For a completion error, redraw the four-part training map. For a record error, compare the activity and duration against the scenario. Then answer the separate reassessment questions about a different request, training situation, and record. Improvement means applying the reason to a new example, not memorizing the first answer.",
+      "objectiveIds": [
+        "training-path"
+      ],
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ],
+      "visualRequirement": "An apprentice reviewing feedback with a mentor and then attempting a different question set.",
+      "sceneType": "worked_example"
+    },
+    {
+      "id": "welcome-recap",
+      "stage": "recap",
+      "text": "You now have a practical knowledge routine: listen, verify, consult the supervisor, communicate the next step, and record accurately. Before your next learning session, identify your supervising contact and confirm where current program and state requirements are kept. Keep workplace learning, related instruction, apprenticeship completion, and licensing separate in your plan. Use the independent practice and reassessment to demonstrate these decisions. This introductory lesson starts that learning; it does not replace supervised skill training.",
+      "objectiveIds": [
+        "professional-action"
+      ],
+      "sourceRequirementIds": [
+        "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
+      ],
+      "visualRequirement": "A mentoring conversation with a concise recap of listen, verify, consult, communicate, and record.",
+      "sceneType": "memory_recap"
+    }
+  ],
+  "activities": [
+    {
+      "id": "guided-response",
+      "type": "guided_practice",
+      "prompt": "A client requests a chemical service you have only observed. Write your response and the supervisor-check step before promising the service.",
+      "feedback": "Clarify the request, verify authorization and assignment, contact the supervisor if uncertain, and communicate the next step. Observation is not independent competence.",
+      "objectiveIds": [
+        "professional-action"
+      ]
+    },
+    {
+      "id": "independent-record",
+      "type": "independent_practice",
+      "prompt": "FICTIONAL practice: Monday, observed consultation, actual duration 30 minutes. Write a record with date, observed activity, duration, and designated reviewer, then one verification question. Do not submit this fictional event to an actual hours log.",
+      "feedback": "An accurate practice entry identifies observation, actual 30-minute duration, date, and reviewer. Ask the reviewer to confirm the appropriate category and correction process.",
+      "objectiveIds": [
+        "verify-record"
+      ]
+    },
+    {
+      "id": "check-pathways",
+      "type": "knowledge_check",
+      "prompt": "Does one completed LMS lesson alone establish completion of apprenticeship and state licensing requirements? Explain.",
+      "feedback": "No. Lesson completion documents that lesson; verify the separate workplace, related instruction, apprenticeship, and licensing requirements.",
+      "objectiveIds": [
+        "training-path"
+      ]
+    },
+    {
+      "id": "review-gap",
+      "type": "remediation",
+      "prompt": "For each missed objective, redo its example: check authorization, draw the four-part training map, or correct the observation entry. State the reason for the corrected answer.",
+      "feedback": "Choose the example matching the missed objective. Explain the decision before moving to the new reassessment scenarios.",
+      "objectiveIds": [
+        "professional-action",
+        "training-path",
+        "verify-record"
+      ]
+    },
+    {
+      "id": "new-scenarios",
+      "type": "reassessment",
+      "prompt": "Answer the separate reassessment bank about a different service request, online-course milestone, and observation entry. Explain the reason before selecting your response.",
+      "feedback": "Check authorization rather than guess; distinguish course progress from program and license completion; report the actual activity and duration.",
+      "objectiveIds": [
+        "professional-action",
+        "training-path",
+        "verify-record"
+      ]
+    }
+  ],
+  "mistakes": [
+    {
+      "mistake": "Treating an observed service as verified independent competence.",
+      "correction": "Identify it as observation and ask the supervisor to verify permitted duties before performing the service.",
+      "reason": "Observation does not establish authorization or demonstrated independent skill.",
+      "objectiveIds": [
+        "professional-action"
+      ]
+    },
+    {
+      "mistake": "Reporting independent performance or inflated time for an observation.",
+      "correction": "Record the actual observation and duration using the designated review and correction process.",
+      "reason": "Review must be based on accurate evidence.",
+      "objectiveIds": [
+        "verify-record"
+      ]
+    }
+  ],
+  "assessment": {
+    "questions": [
+      {
+        "id": "authorization-first",
+        "prompt": "A client requests a service you have watched once, but your authorization is unverified. What should you do?",
+        "choices": [
+          "Promise the service to keep the appointment",
+          "Clarify and check with the supervisor before proceeding",
+          "Assume watching proves independent competence"
+        ],
+        "answerIndex": 1,
+        "explanation": "Verify the permitted role and seek supervisor guidance when uncertain; observation alone does not establish authorization.",
+        "remediation": "Review the professional-action example, explain the corrected decision, then attempt the different reassessment question.",
+        "objectiveIds": [
+          "professional-action"
+        ]
+      },
+      {
+        "id": "lesson-scope",
+        "prompt": "What does passing one LMS lesson establish by itself?",
+        "choices": [
+          "All state licensing requirements are satisfied",
+          "The apprenticeship is complete",
+          "Evidence of learning in that lesson"
+        ],
+        "answerIndex": 2,
+        "explanation": "Workplace learning, related instruction, program completion and licensing remain separate requirements.",
+        "remediation": "Review the training-path example, explain the corrected decision, then attempt the different reassessment question.",
+        "objectiveIds": [
+          "training-path"
+        ]
+      },
+      {
+        "id": "accurate-observation",
+        "prompt": "You observed a consultation for 30 minutes. Which record is accurate?",
+        "choices": [
+          "Observed consultation, actual duration 30 minutes, date and reviewer",
+          "Performed consultation independently for an hour",
+          "Completed all practical skills"
+        ],
+        "answerIndex": 0,
+        "explanation": "Describe the activity and actual duration; do not substitute independent performance for observation.",
+        "remediation": "Review the verify-record example, explain the corrected decision, then attempt the different reassessment question.",
+        "objectiveIds": [
+          "verify-record"
+        ]
+      }
+    ],
+    "reassessment": [
+      {
+        "id": "different-request",
+        "prompt": "A returning client requests a chemical procedure outside your verified assignment. Which next step is appropriate?",
+        "choices": [
+          "Skip verification because the client knows you",
+          "Use an unrelated online video as authorization",
+          "Verify the request and assignment with the supervising professional"
+        ],
+        "answerIndex": 2,
+        "explanation": "A returning client does not remove the need to verify authorization and consult the supervisor.",
+        "remediation": "Review the professional-action example, explain the corrected decision, then attempt the different reassessment question.",
+        "objectiveIds": [
+          "professional-action"
+        ]
+      },
+      {
+        "id": "different-milestone",
+        "prompt": "After an online module shows completed, which claim is justified without other evidence?",
+        "choices": [
+          "This module is complete; other program and licensing requirements must still be checked",
+          "A state license has automatically been issued",
+          "Every workplace competency is approved"
+        ],
+        "answerIndex": 0,
+        "explanation": "Module completion does not replace workplace, program or licensing evidence.",
+        "remediation": "Review the training-path example, explain the corrected decision, then attempt the different reassessment question.",
+        "objectiveIds": [
+          "training-path"
+        ]
+      },
+      {
+        "id": "different-record",
+        "prompt": "You watched a supervisor demonstrate a consultation for 20 minutes. What should your entry show?",
+        "choices": [
+          "Independent client service, 60 minutes",
+          "Observed demonstration, actual 20 minutes, date and reviewer",
+          "Whatever time will reach the weekly target"
+        ],
+        "answerIndex": 1,
+        "explanation": "An accurate record preserves the actual observed activity and time for designated review.",
+        "remediation": "Review the verify-record example, explain the corrected decision, then attempt the different reassessment question.",
+        "objectiveIds": [
+          "verify-record"
+        ]
+      }
+    ],
+    "passingScore": 80
+  }
+}

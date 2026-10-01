@@ -80,7 +80,7 @@ export async function generateMetadata() {
     openGraph: {
       title: 'Cosmetology Apprenticeship Program | Indiana',
       description:
-        'Registered Hair Stylist/Cosmetologist apprenticeship (0096HY V1) with a 2,000–2,500-hour hybrid term, 154 RTI hours, supervised Host Salon training, and licensing preparation.'
+        'Registered Hair Stylist/Cosmetologist apprenticeship (0096HY V1) with a 2,000–2,500-hour hybrid term, 154 RTI hours, supervised Host Salon training, and licensing preparation.',
       url: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship',
       type: 'website',
     },

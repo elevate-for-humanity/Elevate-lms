@@ -4,7 +4,7 @@ export const cosmetologyConfig: ProgramConfig = {
   // Hero
   title: 'Transform Hair Into Art',
   tagline: 'DOL Registered Apprenticeship',
-  subtitle: 'Registered Hair Stylist/Cosmetologist apprenticeship (0096HY V1): complete a 2,000–2,500-hour hybrid term, 154 RTI hours, supervised salon training, and required work processes.'
+  subtitle: 'Registered Hair Stylist/Cosmetologist apprenticeship (0096HY V1): complete a 2,000–2,500-hour hybrid term, 154 RTI hours, supervised salon training, and required work processes.',
   heroVideo: '/videos/programs/cosmetology-hero.mp4',
   heroImage: '/images/beauty/cosmetology-hero.webp',
   primaryCta: { label: 'Apply Now', href: '/programs/cosmetology-apprenticeship/apply' },

@@ -1,16 +1,38 @@
+import { fixtureArtifact } from '../fixtures/ultimate-contract';
 import { describe, expect, it, vi } from 'vitest';
 import { UltimateBuildRunner } from '../../lib/ultimate-course-builder/core/build-runner';
 import { ULTIMATE_BUILD_STEPS } from '../../lib/ultimate-course-builder/core/types';
 import { UltimatePlatformCredential } from '../../lib/ultimate-course-builder/adapters/platform-credential';
 import {
   prepareUltimateStoryboardInput,
+  refreshLicensedVisualUrls,
   requireResolvedVisualEvidence,
   UltimatePlatformRenderer,
 } from '../../lib/ultimate-course-builder/adapters/platform-renderer';
 import { UltimateSupabasePersistence } from '../../lib/ultimate-course-builder/persistence/supabase-persistence';
 import { createProductionHandlers } from '../../lib/ultimate-course-builder/core/production-handlers';
+import { evaluateUltimateLesson } from '../../lib/ultimate-course-builder/quality/lesson-quality';
+import { auditTraceability } from '../../lib/ultimate-course-builder/release/traceability';
 
 describe('Ultimate builder recovery', () => {
+  it('does not approve a rendered lesson with no learning objectives or traceability rows', () => {
+    const quality = evaluateUltimateLesson({
+      distinctShots: 7,
+      loopDetected: false,
+      captionSync: true,
+      narrationVisualAlignment: 1,
+      naturalNarration: true,
+      objectivesTaught: 0,
+      objectivesTotal: 0,
+      guidedPractice: true,
+      independentPractice: true,
+      assessmentCoverage: 1,
+      remediation: true,
+      learnerRunthrough: true,
+    });
+    expect(quality).toMatchObject({ pass: false, failures: ['LEARNING_OBJECTIVES_MISSING'] });
+    expect(auditTraceability([])).toMatchObject({ pass: false, missingRows: true });
+  });
   it('stops at a failed prerequisite instead of fabricating downstream artifacts', async () => {
     const called: string[] = [];
     const handlers = Object.fromEntries(
@@ -19,7 +41,7 @@ describe('Ultimate builder recovery', () => {
         async () => {
           called.push(step);
           if (step === 'learning_objectives') throw new Error('owned inference unavailable');
-          return { artifacts: { step } };
+          return { artifacts: fixtureArtifact(step) };
         },
       ]),
     );
@@ -49,7 +71,7 @@ describe('Ultimate builder recovery', () => {
               artifacts: { mediaQA: { pass: false, failures: ['INSUFFICIENT_DISTINCT_SHOTS'] } },
             };
           }
-          return { artifacts: { step } };
+          return { artifacts: fixtureArtifact(step) };
         },
       ]),
     );
@@ -94,7 +116,7 @@ describe('Ultimate builder recovery', () => {
     ).rejects.toThrow('ULTIMATE_RENDER_MULTISCENE_STORYBOARD_REQUIRED');
   });
 
-  it('restores saved step artifacts when resuming a partially built lesson', async () => {
+  it('rejects unversioned saved step passes when resuming a partially built lesson', async () => {
     const from = (table: string) => ({
       select: () => ({
         eq: () =>
@@ -115,8 +137,36 @@ describe('Ultimate builder recovery', () => {
     const checkpoint = await new UltimateSupabasePersistence({ from } as any).loadLessonCheckpoint({
       lessonBuildId: 'lesson',
     });
-    expect(checkpoint.passedSteps).toEqual(['learning_objectives']);
-    expect(checkpoint.artifacts.learning_objectives).toEqual({ objectives: ['cutting'] });
+    expect(checkpoint.passedSteps).toEqual([]);
+    expect(checkpoint.artifacts.learning_objectives).toBeUndefined();
+  });
+  it('rebuilds an old five-scene storyboard before retrying licensed media', async () => {
+    const steps = ULTIMATE_BUILD_STEPS.slice(0, 8).map((step) => ({
+      step,
+      state: 'passed',
+      artifacts:
+        step === 'storyboard'
+          ? {
+              storyboard: {
+                scenes: Array.from({ length: 5 }, (_, index) => ({ id: `scene-${index}` })),
+              },
+            }
+          : {},
+    }));
+    const db = {
+      from: (table: string) => ({
+        select: () => ({
+          eq: () =>
+            table === 'ultimate_lesson_builds'
+              ? { single: async () => ({ data: { artifacts: {}, findings: [] }, error: null }) }
+              : Promise.resolve({ data: steps, error: null }),
+        }),
+      }),
+    } as any;
+    const checkpoint = await new UltimateSupabasePersistence(db).loadLessonCheckpoint({
+      lessonBuildId: 'lesson-1',
+    });
+    expect(checkpoint.passedSteps).toEqual([]);
   });
   it('maps stored Envato media into unique render scenes without stock fallbacks', () => {
     const prepared = prepareUltimateStoryboardInput({
@@ -134,7 +184,12 @@ describe('Ultimate builder recovery', () => {
         },
         visual_assignment: {
           media: {
+            assignments: Array.from({ length: 6 }, (_, index) => ({
+              sceneId: `s${index + 1}`,
+              assetId: `asset-${index + 1}`,
+            })),
             readyAssets: Array.from({ length: 6 }, (_, index) => ({
+              id: `asset-${index + 1}`,
               lesson_id: 'lesson-1',
               public_url:
                 index === 0
@@ -163,6 +218,65 @@ describe('Ultimate builder recovery', () => {
     expect(
       new Set(scenes.map((scene) => scene.source_video_url ?? scene.reference_image_url)).size,
     ).toBe(6);
+  });
+
+  it('renews a checkpointed licensed video URL immediately before rendering', async () => {
+    const createSignedUrl = vi.fn().mockResolvedValue({
+      data: { signedUrl: 'https://storage.example.com/fresh.mp4' },
+      error: null,
+    });
+    const input = {
+      artifacts: {
+        visual_assignment: {
+          media: {
+            readyAssets: [
+              {
+                id: 'asset-1',
+                storage_path: 'licensed-library/envato/asset-1.mp4',
+                public_url: 'https://storage.example.com/expired.mp4',
+                entitlement_id: 'license-1',
+              },
+            ],
+          },
+        },
+      },
+    };
+    const db = { storage: { from: vi.fn().mockReturnValue({ createSignedUrl }) } } as any;
+    const refreshed = await refreshLicensedVisualUrls(input, db);
+    expect(createSignedUrl).toHaveBeenCalledWith('licensed-library/envato/asset-1.mp4', 3600);
+    expect(refreshed.artifacts.visual_assignment.media.readyAssets[0].public_url).toBe(
+      'https://storage.example.com/fresh.mp4',
+    );
+    expect(input.artifacts.visual_assignment.media.readyAssets[0].public_url).toBe(
+      'https://storage.example.com/expired.mp4',
+    );
+  });
+
+  it('fails closed when a licensed video URL cannot be renewed', async () => {
+    const db = {
+      storage: {
+        from: () => ({
+          createSignedUrl: async () => ({
+            data: null,
+            error: new Error('storage unavailable'),
+          }),
+        }),
+      },
+    } as any;
+    await expect(
+      refreshLicensedVisualUrls(
+        {
+          artifacts: {
+            visual_assignment: {
+              media: {
+                readyAssets: [{ id: 'asset-1', storage_path: 'licensed-library/asset-1.mp4' }],
+              },
+            },
+          },
+        },
+        db,
+      ),
+    ).rejects.toThrow('ULTIMATE_LICENSED_VISUAL_URL_REFRESH_FAILED:asset-1');
   });
 
   it('rejects a rendered storyboard whose scenes do not contain real visual assets', () => {

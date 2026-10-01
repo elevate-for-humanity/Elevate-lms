@@ -113,11 +113,10 @@ describe('storyboard caption adapter', () => {
       },
     ]);
 
-    expect(vtt).toContain('00:00:01.000 --> 00:00:06.000');
+    expect(vtt).toContain('00:00:03.000 --> 00:00:08.000');
     expect(vtt).toContain('Define the business plan.');
   });
 });
-
 
 describe('canonical storyboard round trips', () => {
   it('preserves camelCase fields written by the renderer on retry', () => {
@@ -125,23 +124,25 @@ describe('canonical storyboard round trips', () => {
       title: 'Workplace Safety',
       script: 'Watch this safety demonstration and observe the correct tool handling.',
       sceneData: {
-        scenes: [{
-          id: 'scene-1',
-          action: 'Demonstrate safe tool handling.',
-          dialogue: 'Watch this safety demonstration.',
-          durationSeconds: 30,
-          shotSize: 'close-up',
-          cameraMove: 'locked',
-          referenceImageUrl: 'https://example.com/safety.jpg',
-          sourceVideoUrl: 'https://example.com/safety.mp4',
-          procedurePhase: 'safety',
-          requiredVisualEvidence: 'Correct hand placement.',
-          sceneType: 'worked_example',
-          mediaSource: 'elevate-motion',
-          overlayTemplate: 'elevate-callout-v1',
-          contentHash: 'canonical-hash',
-          reviewStatus: 'approved',
-        }],
+        scenes: [
+          {
+            id: 'scene-1',
+            action: 'Demonstrate safe tool handling.',
+            dialogue: 'Watch this safety demonstration.',
+            durationSeconds: 30,
+            shotSize: 'close-up',
+            cameraMove: 'locked',
+            referenceImageUrl: 'https://example.com/safety.jpg',
+            sourceVideoUrl: 'https://example.com/safety.mp4',
+            procedurePhase: 'safety',
+            requiredVisualEvidence: 'Correct hand placement.',
+            sceneType: 'worked_example',
+            mediaSource: 'elevate-motion',
+            overlayTemplate: 'elevate-callout-v1',
+            contentHash: 'canonical-hash',
+            reviewStatus: 'approved',
+          },
+        ],
       },
     });
 

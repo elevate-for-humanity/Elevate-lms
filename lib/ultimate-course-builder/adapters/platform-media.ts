@@ -19,12 +19,21 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
   async find(input: any): Promise<UltimateMediaDiscoveryResult> {
     const courseId = input.courseId ?? input.artifacts?.courseId;
     if (!courseId) {
-      return { policy: 'licensed-first', licensedSuggestions: [], readyAssets: [], storyboard: input.storyboard ?? null };
+      return {
+        policy: 'licensed-first',
+        licensedSuggestions: [],
+        readyAssets: [],
+        storyboard: input.storyboard ?? null,
+      };
     }
-    const licensed = await recommendLicensedMediaForCourse({ db: this.db as any, courseId }).catch(() => []);
+    const licensed = await recommendLicensedMediaForCourse({ db: this.db as any, courseId }).catch(
+      () => [],
+    );
     const { data, error } = await this.db
       .from('course_videos')
-      .select('id,title,video_url,storage_path,status,asset_role,entitlement_id,lesson_id,licensed_media_entitlements(provider,provider_item_id,item_url,metadata)')
+      .select(
+        'id,title,video_url,storage_path,status,asset_role,entitlement_id,lesson_id,licensed_media_entitlements(provider,provider_item_id,item_url,metadata)',
+      )
       .eq('course_id', courseId)
       .eq('status', 'ready')
       .eq('asset_role', 'source_broll')
@@ -32,28 +41,49 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       .limit(20);
     if (error) throw error;
 
-    const readyAssets = await Promise.all((data ?? []).map(async (asset: RecordLike) => {
-      const entitlement = firstRecord(asset.licensed_media_entitlements);
-      const metadata = firstRecord(entitlement.metadata);
-      let publicUrl = typeof asset.video_url === 'string' ? asset.video_url : '';
-      if (!publicUrl && asset.storage_path) {
-        const { data: signed, error: signedError } = await this.db.storage
-          .from('course_videos')
-          .createSignedUrl(String(asset.storage_path), 60 * 60 * 24);
-        if (signedError) throw signedError;
-        publicUrl = signed?.signedUrl ?? '';
-      }
-      return {
-        ...asset,
-        public_url: publicUrl,
-        mime_type: metadata.mime_type,
-        provider: entitlement.provider ?? 'envato',
-        provider_item_id: entitlement.provider_item_id,
-        license_evidence_url: entitlement.item_url,
-      };
-    }));
+    const readyAssets = await Promise.all(
+      (data ?? []).map(async (asset: RecordLike) => {
+        const entitlement = firstRecord(asset.licensed_media_entitlements);
+        const metadata = firstRecord(entitlement.metadata);
+        let publicUrl = typeof asset.video_url === 'string' ? asset.video_url : '';
+        if (!publicUrl && asset.storage_path) {
+          const { data: signed, error: signedError } = await this.db.storage
+            .from('course_videos')
+            .createSignedUrl(String(asset.storage_path), 60 * 60 * 24);
+          if (signedError) throw signedError;
+          publicUrl = signed?.signedUrl ?? '';
+        }
+        return {
+          ...asset,
+          id: String(asset.id),
+          public_url: publicUrl,
+          mime_type: metadata.mime_type,
+          provider: entitlement.provider ?? 'envato',
+          provider_item_id: entitlement.provider_item_id,
+          license_evidence_url: metadata.license_evidence_url ?? metadata.licenseEvidenceUrl,
+          scene_id: metadata.scene_id,
+          relevance_reason: metadata.relevance_reason,
+          duration_seconds: metadata.duration_seconds,
+        };
+      }),
+    );
 
+    const scenes = input.storyboard?.storyboard?.scenes ?? [];
+    const assignments = scenes.map((scene: any) => {
+      const asset = readyAssets.find(
+        (a: any) => a.scene_id === scene.id && a.relevance_reason && a.license_evidence_url,
+      );
+      if (!asset)
+        throw new Error(`ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED:${scene.id}`);
+      return {
+        sceneId: scene.id,
+        assetId: asset.id,
+        licenseEvidenceUrl: asset.license_evidence_url,
+        relevanceReason: asset.relevance_reason,
+      };
+    });
     return {
+      assignments,
       policy: 'licensed-first',
       licensedSuggestions: licensed,
       readyAssets: readyAssets.filter((asset) => Boolean(asset.public_url)),
@@ -89,17 +119,9 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       }
 
       if (match.status === 'suggested') {
-        const { error: promoteError } = await this.db
-          .from('course_lesson_media_matches')
-          .update({
-            status: 'approved',
-            approved_by: course?.created_by ?? null,
-            approved_at: new Date().toISOString(),
-            failure_reason: null,
-          })
-          .eq('id', match.id)
-          .eq('status', 'suggested');
-        if (promoteError) throw promoteError;
+        // Discovery is not source/scene approval. Do not manufacture an approval.
+        pending += 1;
+        continue;
       }
 
       await attachStoredLicensedMedia({

@@ -1,76 +1,89 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { UltimateLearnerRuntimeEvidence, UltimateLearnerRuntimePort } from '../core/ports';
-import { LMS_RUNTIME_ACCESSIBILITY_EVIDENCE } from '../accessibility/lms-runtime-accessibility';
-
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-function isPlayableUrl(value: string) {
-  try {
-    const url = new URL(value);
-    return url.protocol === 'https:' && url.hostname.length > 0;
-  } catch {
-    return false;
-  }
-}
-
+import { ULTIMATE_LESSON_CONTRACT_VERSION, contractHash } from '../core/lesson-contract';
+import { LEARNER_RUNTHROUGH_CHECKS } from '../quality/learner-runthrough';
+/** Browser worker must exercise the staged lesson in a test enrollment. Database
+ * existence and a syntactically valid URL are never learner test evidence. */
 export class UltimatePlatformLearnerRuntime implements UltimateLearnerRuntimePort {
   constructor(private db: SupabaseClient) {}
-
   async verify(input: {
     courseId: string;
     lessonId: string;
     videoUrl: string;
   }): Promise<UltimateLearnerRuntimeEvidence> {
-    const persistedLessonId = UUID_PATTERN.test(input.lessonId) ? input.lessonId : null;
-    const lessonQuery = persistedLessonId
-      ? this.db
-          .from('course_lessons')
-          .select('id')
-          .eq('id', persistedLessonId)
-          .eq('course_id', input.courseId)
-          .maybeSingle()
-      : this.db
-          .from('ultimate_lesson_builds')
-          .select('id,ultimate_course_builds!inner(course_id)')
-          .eq('competency_id', input.lessonId)
-          .eq('ultimate_course_builds.course_id', input.courseId)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-    const progressQuery = (table: 'learner_video_progress' | 'lesson_progress') => {
-      let query = this.db
-        .from(table)
-        .select('progress_percent,last_position_seconds,completed,completed_at');
-      if (persistedLessonId) query = query.eq('lesson_id', persistedLessonId);
-      return query.limit(1);
+    const endpoint = process.env.ULTIMATE_LEARNER_RUNTHROUGH_URL;
+    const secret = process.env.ULTIMATE_LEARNER_RUNTHROUGH_SECRET;
+    if (!endpoint || !secret)
+      throw new Error('ULTIMATE_AUTHENTICATED_BROWSER_WORKER_NOT_CONFIGURED');
+    const url = new URL(endpoint);
+    if (url.protocol !== 'https:') throw new Error('ULTIMATE_BROWSER_WORKER_HTTPS_REQUIRED');
+    const { data: lesson, error } = await this.db
+      .from('ultimate_lesson_builds')
+      .select('id,artifacts,ultimate_course_builds!inner(course_id)')
+      .eq('competency_id', input.lessonId)
+      .eq('ultimate_course_builds.course_id', input.courseId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+    if (error || !lesson) throw new Error('ULTIMATE_STAGED_LESSON_TEST_INPUT_REQUIRED');
+    const artifacts: any = lesson.artifacts;
+    const mediaSha256 = artifacts?.finished_media_qa?.mediaQA?.inspection?.mediaSha256;
+    if (!mediaSha256) throw new Error('ULTIMATE_BROWSER_TEST_MEDIA_HASH_REQUIRED');
+    const request = {
+      ...input,
+      lessonBuildId: lesson.id,
+      contractVersion: ULTIMATE_LESSON_CONTRACT_VERSION,
+      mediaSha256,
+      artifactHash: contractHash(artifacts),
+      requiredChecks: LEARNER_RUNTHROUGH_CHECKS,
     };
-    const [lessonResult, videoProgressResult, lessonCompletionResult] = await Promise.all([
-      lessonQuery,
-      progressQuery('learner_video_progress'),
-      progressQuery('lesson_progress'),
-    ]);
-
-    const courseLesson = !lessonResult.error && Boolean(lessonResult.data?.id);
-    const stagedLesson = !persistedLessonId && courseLesson;
-    const playableFilm = isPlayableUrl(input.videoUrl);
-    const videoProgressStore = !videoProgressResult.error;
-    const lessonCompletionStore = !lessonCompletionResult.error;
-
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${secret}` },
+      body: JSON.stringify(request),
+      signal: AbortSignal.timeout(300000),
+    });
+    if (!response.ok) throw new Error(`Browser runthrough returned HTTP ${response.status}`);
+    const { evidence, signature } = await response.json();
+    const expected = createHmac('sha256', secret).update(contractHash(evidence)).digest('hex');
+    if (
+      typeof signature !== 'string' ||
+      signature.length !== expected.length ||
+      !timingSafeEqual(Buffer.from(signature), Buffer.from(expected))
+    )
+      throw new Error('ULTIMATE_BROWSER_EVIDENCE_SIGNATURE_INVALID');
+    if (
+      evidence.contractVersion !== request.contractVersion ||
+      evidence.mediaSha256 !== mediaSha256 ||
+      evidence.artifactHash !== request.artifactHash ||
+      evidence.lessonBuildId !== lesson.id ||
+      !evidence.testRunId ||
+      !Array.isArray(evidence.observations)
+    )
+      throw new Error('ULTIMATE_BROWSER_EVIDENCE_VERSION_MISMATCH');
+    const checkedAt = Date.parse(evidence.checkedAt);
+    if (!Number.isFinite(checkedAt) || Math.abs(Date.now() - checkedAt) > 600000)
+      throw new Error('ULTIMATE_BROWSER_EVIDENCE_EXPIRED');
+    const results = Object.fromEntries(
+      LEARNER_RUNTHROUGH_CHECKS.map((check) => [
+        check,
+        evidence.observations.some(
+          (o: any) =>
+            o.check === check &&
+            o.passed === true &&
+            typeof o.action === 'string' &&
+            o.action.trim() &&
+            typeof o.observed === 'string' &&
+            o.observed.trim(),
+        ),
+      ]),
+    );
     return {
-      progress_save: courseLesson && playableFilm && videoProgressStore,
-      resume: courseLesson && playableFilm && videoProgressStore,
-      completion: courseLesson && playableFilm && videoProgressStore && lessonCompletionStore,
-      evidence: {
-        courseLesson,
-        stagedLesson,
-        resolvedLessonId: persistedLessonId,
-        playableFilm,
-        videoProgressStore,
-        lessonCompletionStore,
-        accessibility: LMS_RUNTIME_ACCESSIBILITY_EVIDENCE,
-        checkedAt: new Date().toISOString(),
-      },
+      progress_save: results.progress_save,
+      resume: results.resume,
+      completion: results.completion,
+      evidence: { ...evidence, results },
     };
   }
 }

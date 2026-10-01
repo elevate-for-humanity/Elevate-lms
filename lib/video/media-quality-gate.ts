@@ -1,4 +1,5 @@
 import 'server-only';
+import { createHash } from 'node:crypto';
 
 import { execFile } from 'node:child_process';
 import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
@@ -22,6 +23,9 @@ const MAX_BLACK_SECONDS = 0.75;
 const MIN_ASR_NARRATION_COVERAGE = 0.9;
 
 export interface MediaQualityEvidence {
+  mediaSha256?: string;
+  actualTranscript?: string;
+  readability?: Array<{ scene: number; width: number; wordCoverage: number }>;
   gateVersion: typeof MEDIA_QUALITY_GATE_VERSION;
   bytes: number;
   actualDurationSeconds: number;
@@ -103,7 +107,8 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
   if (!evidence.transcriptUrl) failures.push('transcript URL is missing');
   if (!evidence.provider) failures.push('provider evidence is missing');
   if (!evidence.providerModel) failures.push('provider model evidence is missing');
-  if (evidence.narrationProviderClass !== 'professional') failures.push('narration uses a robotic/diagnostic or unverified voice provider');
+  if (evidence.narrationProviderClass !== 'professional')
+    failures.push('narration uses a robotic/diagnostic or unverified voice provider');
   if (evidence.narrationCoverage < MIN_ASR_NARRATION_COVERAGE)
     failures.push(
       `narration coverage ${(evidence.narrationCoverage * 100).toFixed(1)}% is below ${(MIN_ASR_NARRATION_COVERAGE * 100).toFixed(0)}%`,
@@ -123,7 +128,9 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
   if (evidence.exactVisualSourceCoverage < 1)
     failures.push('one or more demonstration scenes use unverified stock imagery');
   if (evidence.licenseEvidenceCoverage < 1)
-    failures.push('one or more licensed third-party scenes are missing entitlement/license evidence');
+    failures.push(
+      'one or more licensed third-party scenes are missing entitlement/license evidence',
+    );
   if (evidence.instructionalQuality.instructionLeakageDetected)
     failures.push('narration contains internal generation instructions');
   if (evidence.instructionalQuality.objectiveCoverage < 1)
@@ -234,7 +241,6 @@ async function detectBackwardTimelineReplay(
     repeatedTemporalSequenceCount,
   };
 }
-
 
 async function requireTextAsset(url: string, label: string): Promise<string> {
   const response = await fetch(url, { signal: AbortSignal.timeout(15_000) });
@@ -517,9 +523,53 @@ export async function enforceMediaQuality(input: {
     );
     const temporalReplay = await detectBackwardTimelineReplay(videoPath, workDir);
 
-
+    // OCR the encoded title at desktop and a phone-sized delivery width.
+    // Metadata about font sizes cannot establish that the final picture is readable.
+    const readability: Array<{ scene: number; width: number; wordCoverage: number }> = [];
+    let sceneStart = 3;
+    for (const [index, scene] of input.sceneData.scenes.entries()) {
+      const time = sceneStart + Math.min(2, scene.durationSeconds / 2);
+      for (const width of [1280, 390]) {
+        const frame = join(workDir, `readability-${index}-${width}.png`);
+        await execFileAsync(
+          'ffmpeg',
+          [
+            '-y',
+            '-ss',
+            String(time),
+            '-i',
+            videoPath,
+            '-frames:v',
+            '1',
+            '-vf',
+            `scale=${width}:-1`,
+            frame,
+          ],
+          { timeout: 30000, maxBuffer: 1000000 },
+        );
+        const { stdout: ocr } = await execFileAsync('tesseract', [frame, 'stdout', '--psm', '11'], {
+          timeout: 30000,
+          maxBuffer: 1000000,
+        });
+        const titleWords: string[] =
+          String(scene.subject)
+            .toLowerCase()
+            .match(/[a-z0-9]+/g) ?? [];
+        const expected = [...new Set(titleWords.filter((w) => w.length > 2))];
+        const decoded = new Set(ocr.toLowerCase().match(/[a-z0-9]+/g) ?? []);
+        const wordCoverage = expected.length
+          ? expected.filter((w) => decoded.has(w)).length / expected.length
+          : 0;
+        readability.push({ scene: index + 1, width, wordCoverage });
+        if (wordCoverage < 0.75) throw new Error(`MEDIA_TEXT_UNREADABLE:${index + 1}:${width}`);
+      }
+      sceneStart += scene.durationSeconds;
+    }
     const evidence: MediaQualityEvidence = {
       gateVersion: MEDIA_QUALITY_GATE_VERSION,
+      mediaSha256: createHash('sha256').update(buffer).digest('hex'),
+      actualTranscript,
+      readability,
       bytes: buffer.length,
       actualDurationSeconds,
       expectedDurationSeconds: input.expectedDurationSeconds,
@@ -578,4 +628,60 @@ export async function enforceMediaQuality(input: {
   } finally {
     await rm(workDir, { recursive: true, force: true }).catch(() => undefined);
   }
+}
+
+export interface MeasuredCaptionCue {
+  startSeconds: number;
+  endSeconds: number;
+  text: string;
+}
+/** Cloudflare Whisper exposes real decoded word start/end times. Missing timing
+ * data blocks the strict renderer; do not substitute estimated phrase timing. */
+export async function measureNarrationCaptions(
+  audio: Buffer,
+  expectedScript: string,
+  durationSeconds: number,
+): Promise<MeasuredCaptionCue[]> {
+  const { accountId, token } = await requireCloudflareTranscriptionCredentials();
+  const model = resolveCloudflareTranscriptionModel();
+  const response = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'audio/mpeg' },
+      body: Uint8Array.from(audio).buffer,
+      signal: AbortSignal.timeout(180000),
+    },
+  );
+  if (!response.ok) throw new Error(`Caption alignment returned HTTP ${response.status}`);
+  const payload = await response.json();
+  const words: Array<{ word: string; start: number; end: number }> = payload.result?.words;
+  if (
+    !Array.isArray(words) ||
+    !words.length ||
+    words.some(
+      (w, i) =>
+        typeof w.word !== 'string' ||
+        !w.word.trim() ||
+        !Number.isFinite(w.start) ||
+        !Number.isFinite(w.end) ||
+        w.start < 0 ||
+        w.end <= w.start ||
+        w.end > durationSeconds + 0.2 ||
+        (i > 0 && w.start < words[i - 1].start),
+    )
+  )
+    throw new Error('ULTIMATE_RECOGNIZED_WORD_TIMINGS_REQUIRED');
+  if (narrationCoverage(expectedScript, words.map((w) => w.word).join(' ')) < 0.9)
+    throw new Error('ULTIMATE_CAPTION_NARRATION_COVERAGE_FAILED');
+  const cues: MeasuredCaptionCue[] = [];
+  for (let index = 0; index < words.length; index += 8) {
+    const phrase = words.slice(index, index + 8);
+    cues.push({
+      startSeconds: phrase[0].start,
+      endSeconds: phrase[phrase.length - 1].end,
+      text: phrase.map((w) => w.word).join(' '),
+    });
+  }
+  return cues;
 }

@@ -2,6 +2,7 @@ export interface UltimateLmsLessonPackage {
   id: string;
   title: string;
   objectives: string[];
+  contractArtifacts?: import('../core/build-runner').UltimateRunContext['artifacts'];
   film: { videoUrl: string; captionsUrl?: string; transcript?: string };
   learningObjects: unknown[];
   assessment: unknown;
@@ -28,14 +29,16 @@ export function validateLmsCoursePackage(p: UltimateLmsCoursePackage) {
   if (!p.title) missing.push('title');
   if (!p.credentialProfileId) missing.push('credentialProfileId');
   if (!Array.isArray(p.lessons) || !p.lessons.length) missing.push('lessons');
-  if (!Array.isArray(p.moduleAssessments) || !p.moduleAssessments.length) missing.push('moduleAssessments');
+  if (!Array.isArray(p.moduleAssessments) || !p.moduleAssessments.length)
+    missing.push('moduleAssessments');
   if (!Array.isArray(p.traceability) || !p.traceability.length) missing.push('traceability');
 
   for (const lesson of p.lessons ?? []) {
     if (!lesson.id) missing.push('lesson.id');
     if (!lesson.film?.videoUrl) missing.push(`lesson.${lesson.id || 'unknown'}.film.videoUrl`);
     if (!lesson.objectives?.length) missing.push(`lesson.${lesson.id || 'unknown'}.objectives`);
-    if (!lesson.learningObjects?.length) missing.push(`lesson.${lesson.id || 'unknown'}.learningObjects`);
+    if (!lesson.learningObjects?.length)
+      missing.push(`lesson.${lesson.id || 'unknown'}.learningObjects`);
     if (!lesson.masteryRules?.length) missing.push(`lesson.${lesson.id || 'unknown'}.masteryRules`);
     if (!lesson.traceability?.length) missing.push(`lesson.${lesson.id || 'unknown'}.traceability`);
   }

@@ -128,7 +128,7 @@ function narrationFailureDetail(error: unknown): string {
   );
 }
 
-async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
+async function pcm16MonoToMp3(pcm: Buffer, speed = 1): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const ffmpeg = spawn('ffmpeg', [
       '-hide_banner',
@@ -142,6 +142,7 @@ async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
       '1',
       '-i',
       'pipe:0',
+      ...(speed === 1 ? [] : ['-filter:a', `atempo=${speed.toFixed(4)}`]),
       '-codec:a',
       'libmp3lame',
       '-b:a',
@@ -548,7 +549,22 @@ async function generateCloudflareNarration(
   for (const chunk of chunks) {
     segments.push(await generateCloudflareNarrationChunk(chunk, instructorVoice));
   }
-  return normalizeCloudflareMp3Segments(segments);
+  const combined = await normalizeCloudflareMp3Segments(segments);
+  // Cloudflare's TTS API does not honor the Edge-style rate option. Measure the
+  // delivered audio and preserve pitch while bringing instruction into the
+  // narration QA's teaching pace. Do not alter short phrases, where a word
+  // count is too noisy to give a meaningful pace measurement.
+  const words = text.trim().split(/\s+/).length;
+  if (words < 20) return combined;
+  const pcm = await decodeCloudflareMp3Segment(combined);
+  const durationSeconds = pcm.length / (24000 * 2);
+  const measuredWpm = words * 60 / durationSeconds;
+  if (measuredWpm >= 118 && measuredWpm <= 145) return combined;
+  const speed = 135 / measuredWpm;
+  if (!Number.isFinite(speed) || speed < 0.5 || speed > 2) {
+    throw new Error(`Cloudflare narration pace cannot be safely corrected: ${measuredWpm.toFixed(1)} WPM`);
+  }
+  return pcm16MonoToMp3(pcm, speed);
 }
 
 async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promise<Buffer> {

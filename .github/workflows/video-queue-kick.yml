@@ -28,23 +28,12 @@ concurrency:
 
 jobs:
   process:
-    name: Process ${{ matrix.course_name }} canonical CPU queue
+    name: Process universal canonical course video queue
     runs-on: ubuntu-latest
     timeout-minutes: 360
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - course_name: Barbering
-            course_id: '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17'
-          - course_name: Cosmetology
-            course_id: '9ca9fb50-7119-46ea-ab81-9b0193c29c31'
-          - course_name: HVAC
-            course_id: '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
     env:
       ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
-      COURSE_ID: ${{ matrix.course_id }}
     steps:
       - name: Check out release history
         uses: actions/checkout@v4
@@ -114,7 +103,7 @@ jobs:
           echo "::error::Approved Admin media planner release did not become live"
           exit 1
 
-      - name: Process only the approved course queue
+      - name: Process all eligible canonical course queues
         shell: bash
         run: |
           set -euo pipefail
@@ -157,7 +146,7 @@ jobs:
               case "$reason" in
                 queue-empty|no-draft-or-queued-job) break ;;
                 course-builder-generation-paused|course-generation-paused)
-                  echo "::error::Course queue is paused ($reason)"
+                  echo "::error::Eligible course generation is paused ($reason)"
                   exit 1
                   ;;
                 *)

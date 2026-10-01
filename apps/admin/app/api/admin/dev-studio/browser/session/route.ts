@@ -74,6 +74,8 @@ export async function POST(req: NextRequest) {
         width: body.width,
         height: body.height,
         authCookies,
+        // Identity comes from verified Admin auth, never from the request body.
+        ownerId: auth.user?.id,
       }),
       cache: 'no-store',
       signal: AbortSignal.timeout(35_000),

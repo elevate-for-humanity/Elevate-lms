@@ -128,7 +128,7 @@ function narrationFailureDetail(error: unknown): string {
   );
 }
 
-async function pcm16MonoToMp3(pcm: Buffer, speed = 1): Promise<Buffer> {
+async function pcm16MonoToMp3(pcm: Buffer, speed = 1, volume = 1): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const ffmpeg = spawn('ffmpeg', [
       '-hide_banner',
@@ -142,7 +142,9 @@ async function pcm16MonoToMp3(pcm: Buffer, speed = 1): Promise<Buffer> {
       '1',
       '-i',
       'pipe:0',
-      ...(speed === 1 ? [] : ['-filter:a', `atempo=${speed.toFixed(4)}`]),
+      ...(speed === 1 && volume === 1
+        ? []
+        : ['-filter:a', [speed === 1 ? null : `atempo=${speed.toFixed(4)}`, volume === 1 ? null : `volume=${volume.toFixed(2)}`].filter(Boolean).join(',')]),
       '-codec:a',
       'libmp3lame',
       '-b:a',
@@ -559,12 +561,12 @@ async function generateCloudflareNarration(
   const pcm = await decodeCloudflareMp3Segment(combined);
   const durationSeconds = pcm.length / (24000 * 2);
   const measuredWpm = words * 60 / durationSeconds;
-  if (measuredWpm >= 118 && measuredWpm <= 145) return combined;
-  const speed = 135 / measuredWpm;
+  const speed = measuredWpm >= 118 && measuredWpm <= 145 ? 1 : 135 / measuredWpm;
   if (!Number.isFinite(speed) || speed < 0.5 || speed > 2) {
     throw new Error(`Cloudflare narration pace cannot be safely corrected: ${measuredWpm.toFixed(1)} WPM`);
   }
-  return pcm16MonoToMp3(pcm, speed);
+  // Leave headroom even when the provider's original peak hit 0 dBFS.
+  return pcm16MonoToMp3(pcm, speed, 0.8);
 }
 
 async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promise<Buffer> {

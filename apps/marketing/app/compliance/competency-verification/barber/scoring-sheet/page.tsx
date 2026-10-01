@@ -11,7 +11,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'Barber Apprenticeship Scoring Sheet',
-  description: 'Printable master competency scoring rubric for barber apprenticeship. 30 competencies, 0–5 scale, evaluator signature lines.',
+  description: 'Printable Barber competency scoring rubric aligned to the registered 14-competency Appendix A and 260-hour RTI requirement.'
   alternates: { canonical: 'https://www.elevateforhumanity.org/compliance/competency-verification/barber/scoring-sheet' },
 };
 
@@ -39,7 +39,7 @@ export default function BarberScoringSheetPage() {
             <p className="text-[10px] text-slate-700">{PLATFORM_DEFAULTS.orgName} | RAPIDS ID: 2025-IN-132301 | Occupation: Barber (330.371-010)</p>
           </div>
           <div className="text-right text-[10px] text-slate-700">
-            <p>Total: 2,000 hours (260 RTI + 1,500 OJT)</p>
+            <p>Registered completion: 14 competencies + 260 RTI hours</p>
             <p>{BARBER_STATS.totalCompetencies} competencies | {BARBER_STATS.sections} sections</p>
           </div>
         </div>
@@ -98,7 +98,7 @@ export default function BarberScoringSheetPage() {
                   <th className="text-left p-2 border font-semibold w-8 print:p-1">ID</th>
                   <th className="text-left p-2 border font-semibold print:p-1">Competency</th>
                   <th className="text-center p-2 border font-semibold w-12 print:p-1">RTI</th>
-                  <th className="text-center p-2 border font-semibold w-12 print:p-1">OJT</th>
+                  <th className="text-center p-2 border font-semibold w-24 print:p-1">Work evidence</th>
                   <th className="text-center p-2 border font-semibold w-16 print:p-1">Score (0–5)</th>
                   <th className="text-left p-2 border font-semibold w-32 print:p-1 print:w-24">Notes</th>
                 </tr>
@@ -109,7 +109,7 @@ export default function BarberScoringSheetPage() {
                     <td className="p-2 border text-xs font-mono print:p-1 print:text-[9px]">{item.id}</td>
                     <td className="p-2 border print:p-1">{item.competency}</td>
                     <td className="p-2 border text-center print:p-1">{item.rtiHours > 0 ? `${item.rtiHours}h` : '—'}</td>
-                    <td className="p-2 border text-center print:p-1">{item.ojtHours > 0 ? `${item.ojtHours}h` : '—'}</td>
+                    <td className="p-2 border text-center text-xs print:p-1">Documented</td>
                     <td className="p-2 border text-center print:p-1">
                       <span className="print:hidden text-slate-500">___</span>
                       <span className="hidden print:inline">&nbsp;</span>

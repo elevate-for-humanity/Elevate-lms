@@ -27,6 +27,30 @@ export default async function HostShopApprenticesPage() {
         <div className="rounded-2xl border border-slate-200 bg-white p-5"><ShieldCheck className="h-5 w-5 text-brand-green-700"/><p className="mt-3 text-3xl font-black text-slate-950">{!progressConfigured ? 'Blocked' : competencyBased ? `${board.tradeInfo.competencyCount ?? 0} skills` : hybrid ? '2,000–2,500h' : `${Number(board.tradeInfo.hours ?? 0).toLocaleString()}h`}</p><p className="text-sm text-slate-600">{!progressConfigured ? 'Registered-program standard not configured' : competencyBased ? `${board.tradeInfo.rtiHours ?? 0} RTI hours · competency-based` : hybrid ? `${board.tradeInfo.rtiHours ?? 154} RTI hours · RAPIDS hybrid` : `OJT target · ${board.tradeInfo.label}`}</p></div>
       </div>
 
+      <section className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-5 sm:p-6">
+        <p className="text-xs font-black uppercase tracking-[0.14em] text-blue-800">How to run your apprenticeship</p>
+        <h2 className="mt-2 text-2xl font-black text-slate-950">What your Host Shop is responsible for each week</h2>
+        <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-700">You are the apprentice's supervised worksite. Elevate manages the registered-program record and related training coordination; your shop provides paid, supervised on-the-job learning and verifies what actually happened at work.</p>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {[
+            ['1. Schedule paid work', 'Give the apprentice real work in the registered occupation. Follow the wage method and progression shown in Wage Compliance. Do not count unpaid practice as paid OJL.'],
+            ['2. Clock-in and geofence', 'The apprentice clocks in and out from the assigned worksite. Review exceptions when a clock-out is missed or location evidence needs confirmation.'],
+            ['3. Review hours every week', 'Open Work Hours or Verify pending hours. Compare the entry with the schedule, correct only documented errors, then approve or reject it. Approved hours become OJL evidence.'],
+            ['4. Teach and supervise skills', 'Provide hands-on work that matches the occupation. Do not sign a competency until you personally observed acceptable performance and any required evidence is present.'],
+            ['5. Sign competencies', 'Open Competencies to review Appendix A skills. Record the completion date and mentor/supervisor identity. Skills and hours are different records and both matter.'],
+            ['6. Keep RTI separate', 'RTI means Related Technical Instruction: classroom/online instruction tied to the occupation. The shop should not convert ordinary work hours into RTI. Elevate tracks required RTI separately.'],
+            ['7. Check progress', 'The apprentice card below shows approved work hours, the required work target, percentage complete, and competency progress when the registered standard uses competencies.'],
+            ['8. Resolve exceptions', 'Use Documents, Compliance, and PARIS when something is missing or unclear. Do not invent hours, competencies, wages, or dates just to clear an alert.'],
+            ['9. Communicate in the portal', 'Use dashboard Email, Phone, Meetings, and PARIS so program communication stays connected to the apprentice and Host Shop record.'],
+          ].map(([title, body]) => <div key={title} className="rounded-xl border border-blue-100 bg-white p-4"><h3 className="font-black text-slate-950">{title}</h3><p className="mt-2 text-sm leading-6 text-slate-600">{body}</p></div>)}
+        </div>
+        <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-700">
+          <p><strong>OJL/OJT:</strong> supervised paid work in the occupation. <strong>RTI:</strong> Related Technical Instruction completed separately from work hours. <strong>Appendix A:</strong> the registered occupation's work processes/competencies used to document skill development. <strong>RAPIDS:</strong> the U.S. Department of Labor Registered Apprenticeship system that holds the registered program standard.</p>
+          {hybrid ? <p className="mt-2"><strong>For this hybrid program:</strong> the registered work term is 2,000–2,500 hours, with 154 RTI hours tracked separately. The apprentice's actual progress appears below; the 2,000-hour figure is the minimum work-term reference, not a statement that the apprentice has already completed those hours.</p> : null}
+        </div>
+        <div className="mt-5 flex flex-wrap gap-3"><Link href="/host-shop/dashboard/hours/pending" className="rounded-xl bg-blue-700 px-4 py-3 text-sm font-black text-white hover:bg-blue-800">Review weekly hours</Link><Link href="/host-shop/dashboard/competencies" className="rounded-xl border border-blue-300 bg-white px-4 py-3 text-sm font-black text-blue-900 hover:bg-blue-50">Review competencies</Link><Link href="/host-shop/dashboard/compliance" className="rounded-xl border border-blue-300 bg-white px-4 py-3 text-sm font-black text-blue-900 hover:bg-blue-50">Check compliance</Link></div>
+      </section>
+
       <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <div className="border-b border-slate-200 px-5 py-4 sm:px-6"><h2 className="font-black text-slate-950">Current roster</h2></div>
         {board.apprentices.length === 0 ? (

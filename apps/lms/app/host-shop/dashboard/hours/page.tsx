@@ -15,6 +15,7 @@ export default async function HostShopHoursPage() {
   const { user } = await requireRole(HOST_SHOP_ROLES);
   const board = await getHostShopBoard(user.id);
   const competencyBased = board.tradeInfo.progressModel === 'competency_based';
+  const hybrid = board.tradeInfo.progressModel === 'hybrid';
   const progressConfigured = board.unconfiguredPrograms.length === 0;
   const totalApprovedHours = board.apprentices.reduce(
     (sum, apprentice) => sum + (apprentice.ojt.completed || 0),
@@ -35,7 +36,9 @@ export default async function HostShopHoursPage() {
               ? 'Completion progress remains blocked until the registered-program standard is configured.'
               : competencyBased
                 ? 'Appendix A completion progress is competency-based and is shown separately.'
-                : 'Approved entries automatically update the time-based apprenticeship progress target.'}
+                : hybrid
+                  ? 'Approved work entries document progress toward the registered Hair Stylist hybrid term; 154 RTI hours and required work-process completion are tracked separately.'
+                  : 'Approved entries automatically update the time-based apprenticeship progress target.'}
           </p>
         </div>
         <Link
@@ -51,12 +54,27 @@ export default async function HostShopHoursPage() {
           <div className="flex gap-3">
             <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
             <div>
-              <h2 className="font-black">Barber progress rule</h2>
+              <h2 className="font-black">Competency-based progress rule</h2>
               <p className="mt-1 text-sm font-semibold leading-6">
-                Do not treat recorded hours as a 2,000-hour completion counter. Verify work time
-                accurately, then use the Appendix A Competencies workspace to verify mastery of all{' '}
-                {board.tradeInfo.competencyCount ?? 14} competencies. The related-instruction
-                requirement is {board.tradeInfo.rtiHours ?? 260} RTI hours.
+                Do not treat recorded hours as the completion counter. Verify work time accurately,
+                then use the Appendix A Competencies workspace to verify mastery of all{' '}
+                {board.tradeInfo.competencyCount ?? 0} registered competencies. The related-instruction
+                requirement is {board.tradeInfo.rtiHours ?? 0} RTI hours.
+              </p>
+            </div>
+          </div>
+        </section>
+      ) : null}
+      {hybrid ? (
+        <section className="mt-6 rounded-2xl border border-violet-200 bg-violet-50 p-5 text-violet-950">
+          <div className="flex gap-3">
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
+            <div>
+              <h2 className="font-black">Hair Stylist hybrid progress rule</h2>
+              <p className="mt-1 text-sm font-semibold leading-6">
+                RAPIDS 0096HY V1 uses a 2,000–2,500-hour hybrid term with 154 RTI hours. The
+                500-hour figure is probation only. Verify supervised work accurately and keep RTI
+                and required work-process documentation separate.
               </p>
             </div>
           </div>
@@ -154,7 +172,9 @@ export default async function HostShopHoursPage() {
                         />
                       </div>
                       <p className="mt-1 text-right text-xs text-slate-500">
-                        {pct}% of the time-based requirement
+                        {apprentice.ojt.progressModel === 'hybrid'
+                          ? `${pct}% of the 2,000-hour minimum hybrid term`
+                          : `${pct}% of the time-based requirement`}
                       </p>
                     </>
                   ) : apprentice.ojt.progressModel === 'competency_based' ? (

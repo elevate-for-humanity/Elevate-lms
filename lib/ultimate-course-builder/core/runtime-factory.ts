@@ -17,9 +17,10 @@ class LazyNarration implements UltimateNarrationPort{
   }
 }
 class LazyRenderer implements UltimateRenderPort{
+  constructor(private db:SupabaseClient){}
   async render(input:unknown){
     const {UltimatePlatformRenderer}=await import('../adapters/platform-renderer');
-    return new UltimatePlatformRenderer().render(input);
+    return new UltimatePlatformRenderer(this.db).render(input);
   }
 }
 export async function createUltimateRuntime(db:SupabaseClient):Promise<UltimateRuntime>{
@@ -31,7 +32,7 @@ export async function createUltimateRuntime(db:SupabaseClient):Promise<UltimateR
     instructional:new UltimatePlatformInstructionalGenerator(),
     media:new UltimatePlatformMedia(db as any),
     narration:new LazyNarration(),
-    renderer:new LazyRenderer(),
+    renderer:new LazyRenderer(db),
     assessment:new UltimatePlatformAssessment(),
     learner:new UltimatePlatformLearnerRuntime(db as any)
   };

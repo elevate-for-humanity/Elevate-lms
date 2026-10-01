@@ -99,6 +99,12 @@ export default async function HostShopHoursPage() {
         </section>
       ) : null}
 
+      <section className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-5 text-blue-950">
+        <h2 className="font-black">Weekly Host Shop verification</h2>
+        <p className="mt-1 text-sm font-semibold leading-6">Review apprentice work records every week. Confirm the dates, supervised work time, clock-in/clock-out and available location or evidence before approving. Return inaccurate entries for correction rather than approving them. Approved OJL is retained in the apprenticeship record; RTI is tracked separately.</p>
+        <Link href="/host-shop/dashboard/hours/pending" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-blue-800 px-4 py-2 text-sm font-black text-white">Open weekly hour verification</Link>
+      </section>
+
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
           <Users className="h-5 w-5 text-brand-blue-700" />

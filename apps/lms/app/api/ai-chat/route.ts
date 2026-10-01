@@ -310,7 +310,18 @@ async function _POST(req: NextRequest) {
       return NextResponse.json({ reply: groqResult.reply, provider: groqResult.provider });
     }
 
-    if (learnerRequested || portalRequested) {
+    const userMessage = messages.slice(-1)?.[0]?.content || '';
+
+    if (portalRequested) {
+      const role = String(body.context?.portalRole || '').toLowerCase();
+      const page = String(body.context?.page || '');
+      const portalReply = role.includes('program_holder') || role.includes('program holder')
+        ? `I can still provide verified Program Holder guidance while the live AI provider reconnects. Use Applications to work routed applicants, Students for enrolled learners, Phone to connect extension 105 and manage calls, and the red to-do list for required actions. Current page: ${page || '/program-holder/dashboard'}. I will not claim that an official record was submitted or changed unless the dashboard confirms it.`
+        : `I can still provide verified portal navigation while the live AI provider reconnects. Use the dashboard's current records and red to-do list for required actions. Current page: ${page || 'portal dashboard'}. I will not claim an official record was submitted or changed unless the dashboard confirms it.`;
+      return NextResponse.json({ reply: portalReply, provider: 'verified-portal-fallback' });
+    }
+
+    if (learnerRequested) {
       return NextResponse.json(
         { error: 'No live AI provider is reachable. No task was completed.' },
         { status: 503 },
@@ -318,7 +329,6 @@ async function _POST(req: NextRequest) {
     }
 
     // Use smart fallback
-    const userMessage = messages.slice(-1)?.[0]?.content || '';
     const fallbackReply = getSmartFallback(userMessage, learnerContext);
 
     return NextResponse.json({ reply: fallbackReply, provider: 'demo' });

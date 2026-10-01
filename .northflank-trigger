@@ -1,4 +1,4 @@
-merge_sha=d1040e84de145c790901a106b6d9e0a41ad5dff5
-services=all
-requested_at=2026-09-29T08:30:00.000Z
-reason=Reactivate and redeploy Northflank production services through canonical supervised deployment path
+merge_sha=287ddc344d293aaaaec5e3c7354b996d05e03775
+services=admin,lms
+requested_at=2026-10-01T14:40:00.000Z
+reason=Deploy apprenticeship hour approval and portal routing repairs through canonical Northflank production path

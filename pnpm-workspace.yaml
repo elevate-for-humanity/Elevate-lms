@@ -24,6 +24,7 @@ allowBuilds:
   workerd: true
 
 overrides:
+  '@grpc/grpc-js': 1.14.5
   basic-ftp: ^6.0.0
   protobufjs: ^8.0.3
   fast-xml-parser: ^5.10.1

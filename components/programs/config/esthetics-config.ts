@@ -48,7 +48,7 @@ export const estheticsConfig: ProgramConfig = {
     { icon: '🏪', title: 'Spa Match', description: 'Get matched with a host spa partner' },
     { icon: '🎓', title: 'Orientation', description: 'Learn the program, meet your mentor' },
     { icon: '✨', title: 'Training Begins', description: 'Start your apprenticeship journey' },
-    { icon: '🎉', title: 'Graduation', description: 'Complete hours, pass state exam, get licensed' },
+    { icon: '🎉', title: 'Completion', description: 'Complete 20 verified competencies and 300 RTI hours, then follow Indiana examination and licensing steps' },
   ],
 
   // Skills

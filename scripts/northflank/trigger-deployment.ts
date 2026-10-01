@@ -3,8 +3,10 @@
  * Deploy one exact Northflank build.
  *
  * The build is created and verified before this script runs. Deployment must use
- * Northflank's deployment endpoint with both the concrete verified build ID and
- * its Git SHA. A 200 response from that endpoint contains no deployment identity,
+ * Northflank's deployment endpoint with the concrete verified build ID. The
+ * build has already been verified against the requested Git SHA before this
+ * script runs. Northflank rejects requests that specify buildId and buildSHA
+ * together. A 200 response from that endpoint contains no deployment identity,
  * so the script also requires Northflank's deployment history to acknowledge the
  * exact commit before returning success.
  *
@@ -88,14 +90,12 @@ async function main(): Promise<void> {
   const deploymentsBefore = await listDeployments(projectId, serviceId);
   const existingDeploymentIds = new Set(deploymentsBefore.map((deployment) => deployment.id));
 
-  // Northflank's internal-deployment contract accepts the build identity and
-  // source commit together. Supplying both prevents an accepted request from
-  // resolving to a previous build on the same branch.
+  // Deploy the exact concrete build that the preceding verification step proved
+  // belongs to the requested SHA. Northflank rejects buildId + buildSHA together.
   const deploymentPayload = {
     internal: {
       id: serviceId,
       branch,
-      buildSHA: sha,
       buildId,
     },
     docker: { configType: 'default' as const },

@@ -3,3 +3,4 @@ Date: 2026-10-01
 Reason: deploy repository recovery audit, restored LMS-native workflows, and retained recovered templates
 Target: main
 2026-10-01 deploy approvals Hair Stylist RAPIDS correction
+2026-10-01 explicit production deploy approvals and beauty apprenticeship standards

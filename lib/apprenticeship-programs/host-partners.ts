@@ -138,6 +138,11 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'A full-service Indianapolis barber studio offering precision cuts, grooming, hair-loss consultation, and professional mentorship in a working shop environment.',
     media: [
       {
+        src: '/images/partners/cals-kutz-official.webp',
+        alt: 'Cals Kutz Studio professional barber shop and apprenticeship host image',
+        kind: 'photo',
+      },
+      {
         src: '/images/partners/cals-kutz-confidence-restored.webp',
         alt: 'Cals Kutz Studio Confidence Restored hair replacement promotion',
         kind: 'flyer',
@@ -355,6 +360,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     socialUrl: 'https://www.instagram.com/midwesternmanes/',
     socialLabel: 'Contact / view shop photos',
   },
+  /* Mesmerized by Beauty Host Shop archived 2026-10-01; Jozanna George remains a Program Holder only.
   {
     slug: 'mesmerized-by-beauty-cosmetology-academy',
     name: 'Mesmerized by Beauty Cosmetology Academy',
@@ -377,6 +383,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     websiteUrl: '/schools/mesmerized-by-beauty',
     websiteLabel: 'Visit Mesmerized by Beauty school page',
   },
+  */
   {
     slug: 'salon-saloon',
     name: 'Salon Saloon LLC',

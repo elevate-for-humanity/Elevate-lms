@@ -571,12 +571,12 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
           position: 'absolute',
           top: 80,
           left: 60,
-          right: 60,
+          right: instructionalLayout ? 60 : '50%',
           bottom: 100,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          gap: 28,
+          gap: 20,
         }}
       >
         {/* Scene title */}
@@ -584,7 +584,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
           style={{
             opacity: fadeIn(frame, 8, 22),
             transform: `translateY(${slideUp(frame, fps, 8)}px)`,
-            fontSize: instructionalLayout ? 42 : 52,
+            fontSize: instructionalLayout ? 42 : 44,
             fontWeight: 900,
             color: instructionalLayout || bright ? '#0f172a' : '#fff',
             fontFamily: 'sans-serif',
@@ -600,7 +600,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
         {instructionalLayout ? (
           <InstructionalGraphic layout={instructionalLayout} frame={frame} props={props} />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingLeft: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '20px 24px', background: bright ? 'rgba(255,255,255,0.94)' : 'rgba(15,23,42,0.88)', borderRadius: 18 }}>
             {scene.bullets.map((bullet, i) => (
               <div
                 key={i}
@@ -625,7 +625,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
                 <div
                   style={{
                     color: bright ? '#0f172a' : '#e2e8f0',
-                    fontSize: 28,
+                    fontSize: 24,
                     fontFamily: 'sans-serif',
                     lineHeight: 1.5,
                     textShadow: bright ? 'none' : '0 1px 6px rgba(0,0,0,0.5)',

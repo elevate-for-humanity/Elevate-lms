@@ -38,11 +38,14 @@ jobs:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (
-        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) &&
-        contains(
-          fromJSON('["RUN COURSE MEDIA CANARY: barber-apprenticeship","RUN COURSE MEDIA FULL: barber-apprenticeship","RUN COURSE MEDIA CANARY: cosmetology-apprenticeship","RUN COURSE MEDIA FULL: cosmetology-apprenticeship","RUN COURSE MEDIA CANARY: hvac-technician","RUN COURSE MEDIA FULL: hvac-technician"]'),
-          github.event.issue.title
-        )
+        (github.event.issue.author_association == 'OWNER' ||
+         github.event.issue.author_association == 'MEMBER' ||
+         github.event.issue.author_association == 'COLLABORATOR') &&
+        (startsWith(github.event.issue.title, 'RUN COURSE MEDIA CANARY: ') ||
+         startsWith(github.event.issue.title, 'RUN COURSE MEDIA FULL: ')) &&
+        (endsWith(github.event.issue.title, 'barber-apprenticeship') ||
+         endsWith(github.event.issue.title, 'cosmetology-apprenticeship') ||
+         endsWith(github.event.issue.title, 'hvac-technician'))
       )
     runs-on: ubuntu-latest
     timeout-minutes: 720
@@ -113,7 +116,10 @@ jobs:
           course_id="$(jq -r '.courseId' /tmp/recovery.json)"
           first_job_id="$(jq -r '.recoveredJobIds[0] // empty' /tmp/recovery.json)"
           recovered="$(jq -r '.recovered' /tmp/recovery.json)"
-          test "$recovered" -gt 0 || { echo '::error::No matching failed jobs were recovered'; exit 1; }
+          # A previously repaired course may already have a clean queued backlog.
+          # Zero failed narration jobs is not an error; the drain step below owns
+          # queued canonical jobs for the selected existing course.
+          test "$recovered" -ge 0 || { echo '::error::Invalid recovery result'; exit 1; }
           test -n "$course_id" || { echo '::error::Recovery did not return a course ID'; exit 1; }
           echo "course_id=$course_id" >> "$GITHUB_OUTPUT"
           echo "first_job_id=$first_job_id" >> "$GITHUB_OUTPUT"

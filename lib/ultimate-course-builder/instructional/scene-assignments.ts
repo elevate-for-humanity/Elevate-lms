@@ -1,33 +1,101 @@
-/** Reuse a course's licensed source files without mutating global entitlement metadata.
- * Automatic assignment requires reviewed, explicit visual coverage; titles alone are not evidence. */
+import { mediaMatchTerms } from '@/lib/media/licensed-course-media';
+
+/** Assign distinct licensed source files to storyboard scenes using persisted
+ * lesson-match evidence plus deterministic scene/asset semantic overlap.
+ * Automatic assignment never treats a title alone as proof: the asset must
+ * have entitlement/license evidence and either explicit reviewed coverage or
+ * a persisted lesson match with positive semantic overlap to the scene. */
 export function buildSceneAssignments(scenes: any[], assets: any[], configured: any[] = []) {
   const assignments: any[] = [];
   const gaps: any[] = [];
   const used = new Set<string>();
+
+  const overlapEvidence = (scene: any, asset: any) => {
+    const requirement = String(scene.visualRequirement ?? '').trim();
+    const assetText = [
+      asset.title,
+      asset.relevance_reason,
+      ...(Array.isArray(asset.visual_requirements) ? asset.visual_requirements : []),
+    ].filter(Boolean).join(' ');
+    const required = mediaMatchTerms(requirement);
+    const available = new Set(mediaMatchTerms(assetText));
+    const overlap = required.filter((term) => available.has(term));
+    return {
+      overlap,
+      reason: overlap.length
+        ? `Licensed lesson match shares scene terms: ${overlap.join(', ')}`
+        : '',
+    };
+  };
+
   for (const scene of scenes) {
     const explicit = configured.find((a) => a.sceneId === scene.id);
     const requirement = String(scene.visualRequirement ?? '').trim().toLowerCase();
-    const candidates = assets.filter((a) => a.public_url && a.entitlement_id && a.license_evidence_url);
-    const asset = explicit
-      ? candidates.find((a) => a.id === explicit.assetId)
-      : candidates.find((a) => !used.has(a.provider_item_id ?? a.entitlement_id) && (
-          (a.scene_id === scene.id && a.relevance_reason) ||
-          (a.visual_coverage_verified === true && a.visual_requirements?.some(
+    const candidates = assets.filter(
+      (a) => a.public_url && a.entitlement_id && a.license_evidence_url,
+    );
+    let asset: any;
+    let reason = '';
+
+    if (explicit) {
+      asset = candidates.find((a) => a.id === explicit.assetId);
+      reason = explicit.relevanceReason ?? asset?.relevance_reason ?? '';
+    } else {
+      for (const candidate of candidates) {
+        const identity = candidate.provider_item_id ?? candidate.entitlement_id;
+        if (used.has(identity)) continue;
+        if (candidate.scene_id === scene.id && candidate.relevance_reason) {
+          asset = candidate;
+          reason = candidate.relevance_reason;
+          break;
+        }
+        if (
+          candidate.visual_coverage_verified === true &&
+          candidate.visual_requirements?.some(
             (r: string) => r.trim().toLowerCase() === requirement,
-          ))
-        ));
-    const reason = explicit?.relevanceReason ?? asset?.relevance_reason ??
-      (asset ? `Verified visual coverage matches the scene requirement: ${scene.visualRequirement}` : '');
-    if (!asset || !reason?.trim() || used.has(asset.provider_item_id ?? asset.entitlement_id)) {
-      gaps.push({ sceneId: scene.id, visualRequirement: scene.visualRequirement,
-        reason: explicit ? 'Configured asset is unavailable, unlicensed, repeated, or missing relevance evidence' : 'No distinct licensed asset has verified coverage for this scene',
-        licensedAssetCount: candidates.length });
+          )
+        ) {
+          asset = candidate;
+          reason =
+            candidate.relevance_reason ??
+            `Verified visual coverage matches the scene requirement: ${scene.visualRequirement}`;
+          break;
+        }
+        if (candidate.lesson_match_verified === true) {
+          const evidence = overlapEvidence(scene, candidate);
+          if (evidence.overlap.length) {
+            asset = candidate;
+            reason = evidence.reason;
+            break;
+          }
+        }
+      }
+    }
+
+    const identity = asset?.provider_item_id ?? asset?.entitlement_id;
+    if (!asset || !reason?.trim() || used.has(identity)) {
+      gaps.push({
+        sceneId: scene.id,
+        visualRequirement: scene.visualRequirement,
+        reason: explicit
+          ? 'Configured asset is unavailable, unlicensed, repeated, or missing relevance evidence'
+          : 'No distinct licensed asset has verified lesson/scene relevance evidence',
+        licensedAssetCount: candidates.length,
+      });
       continue;
     }
-    used.add(asset.provider_item_id ?? asset.entitlement_id);
-    assignments.push({ sceneId: scene.id, assetId: asset.id,
-      licenseEvidenceUrl: asset.license_evidence_url, relevanceReason: reason,
-      assignmentMethod: explicit ? 'lesson-scoped' : 'verified-coverage' });
+    used.add(identity);
+    assignments.push({
+      sceneId: scene.id,
+      assetId: asset.id,
+      licenseEvidenceUrl: asset.license_evidence_url,
+      relevanceReason: reason,
+      assignmentMethod: explicit
+        ? 'lesson-scoped'
+        : asset.visual_coverage_verified === true
+          ? 'verified-coverage'
+          : 'verified-lesson-semantic-overlap',
+    });
   }
   return { assignments, gaps };
 }

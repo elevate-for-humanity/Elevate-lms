@@ -10,6 +10,7 @@ import { loadProgramForPage, loadProgramMetadataSource } from '@/lib/programs/lo
 import { getProgramOgImageUrl } from '@/lib/programs/og-images';
 import Link from 'next/link';
 import { EMPLOYER_TALENT_PATHWAYS } from '@/lib/marketing/employer-talent-network';
+import { NonRefundableDepositNotice } from '@/components/payments/NonRefundableDepositNotice';
 
 export const dynamic = 'force-dynamic';
 
@@ -174,6 +175,7 @@ export default async function PublicProgramPage({
           ) : undefined
         }
       />
+      <NonRefundableDepositNotice />
       {employerPathway ? (
         <section className="border-t border-slate-200 bg-slate-950 px-4 py-12 text-white">
           <div className="mx-auto flex max-w-6xl flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">

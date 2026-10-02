@@ -79,8 +79,12 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
           mime_type: mimeType,
           file_size: bytes.byteLength,
           source_url: String(entitlement.item_url ?? ''),
-          license_evidence_url: String(entitlement.item_url ?? ''),
+          license_evidence_url:
+            String(metadata.licenseTermsUrl ?? metadata.license_evidence_url ?? entitlement.item_url ?? ''),
           acquired_at: new Date().toISOString(),
+          storageState: 'stored_secure_library',
+          downloadState: 'stored',
+          courseMediaImportState: 'secure_file_handoff_complete',
           acquisition: acquired.licenseEvidence ?? { provider: 'envato', itemId },
         },
       })

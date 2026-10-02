@@ -49,8 +49,8 @@ export default function EmployerJourneyPage() {
   return (
     <main className="min-h-screen bg-white text-slate-950">
       <HeroPicture
-        src="/images/pages/for-employers-page-1.webp"
-        alt="Employer partners collaborating on workforce training and hiring"
+        src="/images/pages/employer-page-1.webp"
+        alt="Employer reviewing workforce training and hiring information"
         microLabel="Employer Partnerships"
         heightStyle="h-[clamp(280px,42svh,460px)]"
         belowHeroHeadline="Build a documented workforce partnership"

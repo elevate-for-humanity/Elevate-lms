@@ -108,7 +108,7 @@ export default function ApprenticeshipExperienceGuide({
             <MapPinned className="h-7 w-7 text-brand-blue-800" />
             <h3 className="mt-3 text-2xl font-black text-slate-950">Placement is a process, not a promise.</h3>
             <p className="mt-3 text-sm leading-6 text-slate-700">
-              You may train at an approved Host Shop with confirmed capacity, suggest a licensed business for review, or join the geographic waitlist. No public listing should be interpreted as a guaranteed job or immediate placement.
+              You may train at an approved Host Shop with confirmed capacity, suggest a licensed business for review, or join the geographic waitlist. A public listing does not promise employment or immediate placement; Host Shop capacity and placement must be confirmed during enrollment.
             </p>
           </article>
         </div>

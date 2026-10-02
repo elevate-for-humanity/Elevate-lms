@@ -98,8 +98,10 @@ export async function runUltimateCourse(
   const completed = !hasErrors && lessons.length === competencies.length;
   await persistence.updateBuild({
     buildId: plan.buildId,
-    status: hasErrors ? 'blocked' : 'built',
-    currentStep: hasErrors ? null : ('credential_release' as UltimateBuildStep),
+    // Repairable quality findings remain in the automatic production lifecycle.
+    // Only the worker's durable external prerequisites may terminate a run.
+    status: hasErrors ? 'repairing' : 'built',
+    currentStep: hasErrors ? ('selective_repair' as UltimateBuildStep) : ('credential_release' as UltimateBuildStep),
     findings,
   });
   return { buildId: plan.buildId, courseId: plan.courseId, lessons, findings, completed };

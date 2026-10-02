@@ -1,0 +1,161 @@
+name: Deploy DigitalOcean recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: Recovery service to deploy
+        required: true
+        default: all
+        type: choice
+        options:
+          - marketing
+          - admin
+          - lms
+          - all
+      confirmation:
+        description: Type DEPLOY_BACKUP to authorize billable recovery resources
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digitalocean-recovery-${{ inputs.service }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Authorize recovery deployment
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.selection.outputs.services }}
+    env:
+      DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require explicit confirmation and main branch
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test '${{ inputs.confirmation }}' = 'DEPLOY_BACKUP' || {
+            echo '::error::Type DEPLOY_BACKUP to authorize creation or update of billable DigitalOcean resources.'
+            exit 1
+          }
+          test '${{ github.ref }}' = 'refs/heads/main' || {
+            echo '::error::Recovery deployments must run from main.'
+            exit 1
+          }
+          git fetch origin main --depth=200
+          git merge-base --is-ancestor '${{ github.sha }}' origin/main || {
+            echo '::error::The requested commit is not contained in main.'
+            exit 1
+          }
+
+      - name: Verify required GitHub secrets
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          required=(
+            DIGITALOCEAN_ACCESS_TOKEN
+            NEXT_PUBLIC_SUPABASE_URL
+            NEXT_PUBLIC_SUPABASE_ANON_KEY
+            SUPABASE_SERVICE_ROLE_KEY
+            NEXTAUTH_SECRET
+          )
+          for name in "${required[@]}"; do
+            test -n "${!name:-}" || {
+              echo "::error::$name is missing from GitHub Actions secrets."
+              exit 1
+            }
+          done
+
+      - name: Resolve selected services
+        id: selection
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          case '${{ inputs.service }}' in
+            marketing) echo 'services=["marketing"]' >> "$GITHUB_OUTPUT" ;;
+            admin) echo 'services=["admin"]' >> "$GITHUB_OUTPUT" ;;
+            lms) echo 'services=["lms"]' >> "$GITHUB_OUTPUT" ;;
+            all) echo 'services=["marketing","admin","lms"]' >> "$GITHUB_OUTPUT" ;;
+            *) echo '::error::Unknown recovery service selection.'; exit 1 ;;
+          esac
+
+  deploy:
+    name: Deploy ${{ matrix.service }} recovery app
+    needs: prepare
+    runs-on: ubuntu-latest
+    environment: disaster-recovery
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJSON(needs.prepare.outputs.services) }}
+    env:
+      DEPLOY_SHA: ${{ github.sha }}
+      DEPLOY_TIMESTAMP: ${{ github.event.repository.updated_at }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      ADMIN_GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+      XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+      GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+      ONET_API_KEY: ${{ secrets.ONET_API_KEY }}
+      CAREERONESTOP_USER_ID: ${{ secrets.CAREERONESTOP_USER_ID }}
+      CAREERONESTOP_TOKEN: ${{ secrets.CAREERONESTOP_TOKEN }}
+      USAJOBS_API_KEY: ${{ secrets.USAJOBS_API_KEY }}
+    steps:
+      - name: Checkout exact recovery revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+
+      - name: Validate selected app specification
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          SPEC=".do/${{ matrix.service }}.yaml"
+          test -f "$SPEC"
+          grep -q 'deploy_on_push: false' "$SPEC"
+          grep -q 'http_port: 3000' "$SPEC"
+
+      - name: Create or update DigitalOcean recovery app
+        id: deploy
+        uses: digitalocean/app_action/deploy@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          app_spec_location: .do/${{ matrix.service }}.yaml
+          print_build_logs: true
+          print_deploy_logs: true
+
+      - name: Publish recovery endpoint
+        env:
+          APP_JSON: ${{ steps.deploy.outputs.app }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          LIVE_URL="$(jq -r '.live_url // .default_ingress // empty' <<< "$APP_JSON")"
+          test -n "$LIVE_URL" || LIVE_URL='See the DigitalOcean Apps dashboard for the generated URL.'
+          {
+            echo "### ${{ matrix.service }} recovery deployment"
+            echo
+            echo "- Commit: \`${{ github.sha }}\`"
+            echo "- Endpoint: $LIVE_URL"
+          } >> "$GITHUB_STEP_SUMMARY"

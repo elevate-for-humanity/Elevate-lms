@@ -1,0 +1,73 @@
+name: elevate-dr-marketing
+region: nyc
+
+alerts:
+  - rule: DEPLOYMENT_FAILED
+
+services:
+  - name: marketing
+    github:
+      repo: elevate-for-humanity/Elevate-lms
+      branch: main
+      deploy_on_push: false
+    source_dir: /
+    dockerfile_path: Dockerfile.marketing
+    http_port: 3000
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-1gb-fixed
+    health_check:
+      http_path: /api/ping
+      initial_delay_seconds: 120
+      period_seconds: 20
+      timeout_seconds: 10
+      success_threshold: 1
+      failure_threshold: 5
+    envs:
+      - key: NF_GIT_SHA
+        value: ${DEPLOY_SHA}
+        scope: RUN_AND_BUILD_TIME
+        type: GENERAL
+      - key: BUILD_TIMESTAMP
+        value: ${DEPLOY_TIMESTAMP}
+        scope: RUN_AND_BUILD_TIME
+        type: GENERAL
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        value: ${NEXT_PUBLIC_SUPABASE_URL}
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        value: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        value: ${SUPABASE_SERVICE_ROLE_KEY}
+        scope: RUN_TIME
+        type: SECRET
+      - key: NEXTAUTH_SECRET
+        value: ${NEXTAUTH_SECRET}
+        scope: RUN_TIME
+        type: SECRET
+      - key: SENDGRID_API_KEY
+        value: ${SENDGRID_API_KEY}
+        scope: RUN_TIME
+        type: SECRET
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://www.elevateforhumanity.org
+        scope: RUN_AND_BUILD_TIME
+        type: GENERAL
+      - key: NEXT_PUBLIC_PUBLIC_SITE_URL
+        value: https://www.elevateforhumanity.org
+        scope: RUN_AND_BUILD_TIME
+        type: GENERAL
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://app.elevateforhumanity.org
+        scope: RUN_AND_BUILD_TIME
+        type: GENERAL
+      - key: NEXT_PUBLIC_LMS_URL
+        value: https://app.elevateforhumanity.org
+        scope: RUN_AND_BUILD_TIME
+        type: GENERAL
+      - key: NEXT_PUBLIC_ADMIN_URL
+        value: https://admin.elevateforhumanity.org
+        scope: RUN_AND_BUILD_TIME
+        type: GENERAL

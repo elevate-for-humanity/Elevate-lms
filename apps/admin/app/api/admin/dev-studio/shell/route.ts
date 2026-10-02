@@ -175,9 +175,10 @@ export async function POST(request: NextRequest) {
   }
 
   const workflowAliases: Record<string, string> = {
-    'deploy-all': 'deploy-production-dispatch.yml',
-    'deploy-production': 'deploy-production-dispatch.yml',
-    'deploy-production-dispatch': 'deploy-production-dispatch.yml',
+    'deploy-all': 'deploy-production.yml',
+    'deploy-production': 'deploy-production.yml',
+    'deploy-backup': 'deploy-digitalocean-recovery.yml',
+    'deploy-digitalocean': 'deploy-digitalocean-recovery.yml',
   };
 
   // Normalise to filename
@@ -241,6 +242,15 @@ export async function POST(request: NextRequest) {
         runUrl: latestRun?.html_url ?? `https://github.com/${repo()}/actions`,
         status: latestRun?.status ?? 'queued',
       });
+    }
+
+    // This recovery workflow is intentionally manual-only. A Contents API
+    // commit cannot trigger it and must not be reported as a successful deploy.
+    if (workflowFile === 'deploy-digitalocean-recovery.yml') {
+      return safeError(
+        `GitHub could not dispatch the DigitalOcean recovery workflow (HTTP ${dispatchRes.status}). Verify the Admin GitHub token has Actions workflow permission.`,
+        502,
+      );
     }
 
     // Fallback: bump retry marker via Contents API

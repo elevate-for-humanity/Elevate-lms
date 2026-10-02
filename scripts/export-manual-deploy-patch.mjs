@@ -130,11 +130,11 @@ Application-specific production secrets still need to be present for live valida
 
 Preferred production deploy options after the patch is pushed:
 
-1. GitHub UI: Actions → **Deploy production (both services)** → Run workflow → branch \`${targetBranch}\`.
+1. GitHub UI: Actions → **Deploy production (all services)** → Run workflow → branch \`${targetBranch}\`.
 2. GitHub CLI from an unrestricted machine:
 
 \`\`\`bash
-gh workflow run deploy-production-dispatch.yml --ref ${targetBranch}
+gh workflow run deploy-production.yml --ref ${targetBranch}
 \`\`\`
 
 3. GitHub REST API from an unrestricted machine:
@@ -143,7 +143,7 @@ gh workflow run deploy-production-dispatch.yml --ref ${targetBranch}
 curl -X POST \\
   -H 'Accept: application/vnd.github+json' \\
   -H "Authorization: Bearer $GITHUB_TOKEN" \\
-  https://api.github.com/repos/elevateforhumanity/Elevate-lms/actions/workflows/deploy-production-dispatch.yml/dispatches \\
+  https://api.github.com/repos/elevateforhumanity/Elevate-lms/actions/workflows/deploy-production.yml/dispatches \\
   -d '{"ref":"${targetBranch}"}'
 \`\`\`
 

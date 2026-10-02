@@ -10,6 +10,7 @@ interface WorkflowButton {
   key: WorkflowKey;
   label: string;
   description: string;
+  inputs?: Record<string, string>;
 }
 
 interface WorkflowRun {
@@ -32,7 +33,13 @@ interface DispatchResult {
 }
 
 const DEFAULT_WORKFLOWS: WorkflowButton[] = [
-  { key: 'deploy-all', label: 'Deploy All', description: 'Build and deploy LMS plus Admin on Northflank from main' },
+  { key: 'deploy-all', label: 'Deploy All', description: 'Build and deploy Marketing, LMS, and Admin on Northflank from main' },
+  {
+    key: 'deploy-digitalocean-recovery',
+    label: 'Deploy Backup',
+    description: 'Create or update the Marketing, Admin, and LMS recovery apps on DigitalOcean',
+    inputs: { service: 'all', confirmation: 'DEPLOY_BACKUP' },
+  },
   { key: 'deploy-lms', label: 'Deploy Website', description: 'Build and deploy the public website service on Northflank' },
   { key: 'deploy-admin', label: 'Deploy Admin', description: 'Build and deploy the admin dashboard service on Northflank' },
   { key: 'ci', label: 'Run CI', description: 'Run the validation pipeline before deployment' },
@@ -71,6 +78,7 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           workflow: workflow.key,
+          inputs: workflow.inputs ?? {},
           ...(workflow.key.startsWith('deploy-') ? { confirmation: 'CONFIRM DEPLOY' } : {}),
         }),
       });
@@ -137,13 +145,13 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
       const res = await fetch('/api/admin/dev-studio/shell', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ workflow: 'deploy-production-dispatch', confirmation: 'CONFIRM DEPLOY' }),
+        body: JSON.stringify({ workflow: 'deploy-production', confirmation: 'CONFIRM DEPLOY' }),
       });
       const data = await res.json().catch(() => ({})) as DispatchResult;
       if (!res.ok || data.error) throw new Error(data.error || `Deploy failed with HTTP ${res.status}`);
       setLastResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not trigger Northflank deploy');
+      setError(err instanceof Error ? err.message : 'Could not trigger deployment');
     } finally {
       setDeployAllState('idle');
     }
@@ -167,10 +175,10 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <Rocket className="h-4 w-4" style={{ color: '#4ec9b0' }} />
-              <h2 className="text-sm font-semibold text-white">Northflank Deploy Control</h2>
+              <h2 className="text-sm font-semibold text-white">Deployment Control</h2>
             </div>
             <p className="mt-1 text-[11px]" style={{ color: '#858585' }}>
-              Dispatch GitHub Actions workflows that build and deploy on Northflank.
+              Dispatch GitHub Actions workflows for primary and recovery hosting.
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
@@ -206,7 +214,7 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
                   <div className="min-w-0"><p className="truncate text-sm font-semibold text-white">{workflow.label}</p><p className="mt-1 text-[11px] leading-relaxed" style={{ color: '#9ca3af' }}>{workflow.description}</p></div>
                   <Rocket className="h-4 w-4 flex-shrink-0" style={{ color: '#4ec9b0' }} />
                 </div>
-                {needsConfirm && <p className="mb-2 rounded border px-2 py-1.5 text-[11px]" style={{ borderColor: '#f59e0b', color: '#fcd34d', background: 'rgba(245,158,11,0.08)' }}>Click again to deploy production.</p>}
+                {needsConfirm && <p className="mb-2 rounded border px-2 py-1.5 text-[11px]" style={{ borderColor: '#f59e0b', color: '#fcd34d', background: 'rgba(245,158,11,0.08)' }}>Click again to authorize this deployment.</p>}
                 <button type="button" onClick={() => void dispatchWorkflow(workflow)} disabled={pending} className="inline-flex h-9 w-full items-center justify-center gap-2 rounded text-xs font-semibold transition disabled:opacity-50" style={{ background: needsConfirm ? '#f59e0b' : '#0078d4', color: needsConfirm ? '#111827' : '#ffffff' }}>
                   {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5" />}
                   {workflow.key.startsWith('deploy-') ? needsConfirm ? 'Confirm Deploy' : 'Deploy' : 'Run'}

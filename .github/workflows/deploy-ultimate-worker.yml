@@ -1,5 +1,6 @@
 name: Deploy Ultimate Course Builder Worker
 on:
+  workflow_dispatch:
   issues:
     types: [opened, reopened]
   push:

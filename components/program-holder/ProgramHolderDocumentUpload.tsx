@@ -16,6 +16,7 @@ const commonOptions = [
 export function ProgramHolderDocumentUpload({ isHvac = false }: { isHvac?: boolean }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
+  const [selectedType, setSelectedType] = useState('');
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
@@ -40,10 +41,18 @@ export function ProgramHolderDocumentUpload({ isHvac = false }: { isHvac?: boole
         PDF, JPG, or PNG up to 10 MB; MP4 video up to 50 MB. Identity documents remain in protected
         storage.
       </p>
+      <div className="mt-4 rounded-xl border border-blue-200 bg-white p-4 text-sm leading-6 text-slate-700">
+        <p className="font-black text-slate-950">What should I upload?</p>
+        <p className="mt-1">Upload the documents that apply to your Program Holder account. Start with your government-issued photo ID, business registration, W-9, general liability insurance, and your program syllabus/training plan. Upload a profile photo and company logo so your portal and program presentation can be completed. Student training photos/videos are evidence uploads, not substitutes for your onboarding records.</p>
+        {isHvac ? <p className="mt-2 font-semibold text-blue-950">HVAC Program Holders should also upload the HVAC syllabus/training plan and EPA Section 608 certification when applicable.</p> : null}
+        <p className="mt-2"><strong>Do not guess.</strong> If a document does not apply to your business or you do not have it yet, leave it unselected and use Ask PARIS – Portal help for that specific requirement.</p>
+      </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
         <select
           name="documentType"
           required
+          value={selectedType}
+          onChange={(event) => setSelectedType(event.target.value)}
           className="min-h-11 rounded-xl border border-blue-200 bg-white px-3 text-sm"
         >
           <option value="">Select document type</option>
@@ -75,6 +84,16 @@ export function ProgramHolderDocumentUpload({ isHvac = false }: { isHvac?: boole
           {busy ? 'Uploading…' : 'Upload'}
         </button>
       </div>
+      {selectedType ? (
+        <p className="mt-3 text-sm font-semibold text-blue-950">
+          Selected: {[
+            ...commonOptions,
+            ...(isHvac ? ([['epa_608', 'EPA Section 608 certification'], ['hvac_training_plan', 'HVAC syllabus and training plan']] as const) : []),
+          ].find(([value]) => value === selectedType)?.[1]}. Choose the matching file from your device, then press Upload.
+        </p>
+      ) : (
+        <p className="mt-3 text-sm font-semibold text-amber-900">Choose the document type first. The file you attach must match that selection.</p>
+      )}
       {message ? (
         <p role="status" className="mt-3 text-sm font-bold text-blue-950">
           {message}

@@ -59,6 +59,15 @@ function isActiveHref(href: string, pathname: string): boolean {
 export function PlatformShell({ user, role, actions = [], children, paris, showLanguageSwitcher = true }: PlatformShellProps) {
   const pathname = usePathname();
   const dashboardHref = role === 'host_shop' ? '/host-shop/dashboard' : role === 'program_holder' || role === 'site_coordinator' ? '/program-holder/dashboard' : role === 'student' || role === 'apprentice' ? '/student/dashboard' : '/';
+  const installHref = role === 'host_shop'
+    ? '/install/host-shop'
+    : role === 'program_holder' || role === 'site_coordinator'
+      ? '/install/program-holder'
+      : role === 'apprentice'
+        ? '/install/apprentice'
+        : role === 'student'
+          ? '/install/learner'
+          : '/mobile-app';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -96,7 +105,7 @@ export function PlatformShell({ user, role, actions = [], children, paris, showL
               icon: CalendarDays,
             },
             { id: 'office-mail', label: 'Office Mail', href: '/program-holder/inbox', icon: Mail },
-            { id: 'install-app', label: 'Install App', href: '/install', icon: Download },
+            { id: 'install-app', label: 'Install App', href: installHref, icon: Download },
           ],
         }))
       : baseSections;

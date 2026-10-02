@@ -31,6 +31,7 @@ import { StudentReadyForTestingButton } from './StudentReadyForTestingButton';
 import { getActiveJobs } from '@/lib/data/jobs';
 import JobCard from '@/components/jobs/JobCard';
 import { TexasCoordinatorLaunchKit } from './TexasCoordinatorLaunchKit';
+import { ProgramHolderOperationsGuide } from './ProgramHolderOperationsGuide';
 
 function resolveDashboardHero(
   avatarUrl: string | null | undefined,
@@ -387,6 +388,11 @@ export async function ProgramHolderWorkspaceView({
         </div>
       </section>
       {texasLaunchKit}
+      <ProgramHolderOperationsGuide
+        holderName={data.holder?.organization_name || data.holder?.name || data.profile?.full_name}
+        programs={data.programs}
+        role={coordinatorRole || 'Program Holder'}
+      />
       {regionalAssignment && customMou ? (
         <section className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm sm:p-6">
           <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
@@ -1185,10 +1191,10 @@ function Hero({
   description: string;
 }) {
   return (
-    <section className="min-w-0 overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-blue-950 to-blue-800 p-5 text-white shadow-lg sm:rounded-3xl sm:p-7">
-      <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-200">{eyebrow}</p>
+    <section className="min-w-0 overflow-hidden rounded-2xl border border-blue-200 bg-white p-5 text-slate-950 shadow-sm sm:rounded-3xl sm:p-6">
+      <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-700">{eyebrow}</p>
       <h1 className="mt-2 break-words text-2xl font-black sm:text-4xl">{title}</h1>
-      <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-blue-50 sm:text-base">
+      <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-slate-700 sm:text-base">
         {description}
       </p>
     </section>
@@ -1218,9 +1224,9 @@ function DashboardHero({
         fill
         priority
         sizes="100vw"
-        className={`object-cover opacity-60 ${isPortrait ? 'object-top' : 'object-center'}`}
+        className={`object-cover opacity-90 ${isPortrait ? 'object-top' : 'object-center'}`}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/60" />
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/72 via-slate-950/42 to-transparent" />
       <div className="relative grid gap-5 p-5 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
         <div className="min-w-0">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-200">

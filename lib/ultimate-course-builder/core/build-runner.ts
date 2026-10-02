@@ -81,8 +81,7 @@ export class UltimateBuildRunner {
               ...(artifacts.repair as object),
               attempts,
               unresolved: Number(
-                (artifacts.repair as any)?.unresolved ??
-                  ctx.findings.filter((f) => f.severity === 'error').length,
+                (artifacts.repair as any)?.unresolved ?? 0,
               ),
             },
           };

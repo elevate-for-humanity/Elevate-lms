@@ -62,6 +62,22 @@ export class UltimateJobQueue {
     if (error) throw error;
   }
 
+  async requeueForRepair(jobId: string, workerId: string, message: string) {
+    const { error } = await this.db
+      .from('ultimate_build_jobs')
+      .update({
+        status: 'queued',
+        available_at: new Date().toISOString(),
+        lease_owner: null,
+        lease_expires_at: null,
+        last_error: message,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', jobId)
+      .eq('lease_owner', workerId);
+    if (error) throw error;
+  }
+
   async fail(jobId: string, workerId: string, errorMessage: string, retry = true) {
     const { data, error } = await this.db
       .from('ultimate_build_jobs')

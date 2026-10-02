@@ -13,7 +13,7 @@ export function PlatformHubHero() {
       data-narration-style="instructor"
     >
       <h1 className="sr-only">Elevate for Humanity career training and apprenticeships</h1>
-      <div className="relative h-[clamp(420px,68svh,760px)] w-full">
+      <div className="relative aspect-video w-full max-h-[560px] min-h-0 bg-slate-950 sm:aspect-[16/8] lg:h-[clamp(420px,52svh,560px)] lg:aspect-auto">
         <SafeHeroVideo
           src={HOME_VIDEO}
           poster="/images/pages/hero-home-first-frame.webp"

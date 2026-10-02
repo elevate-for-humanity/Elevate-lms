@@ -100,7 +100,7 @@ export async function runUltimateCourse(
     buildId: plan.buildId,
     // Repairable quality findings remain in the automatic production lifecycle.
     // Only the worker's durable external prerequisites may terminate a run.
-    status: hasErrors ? 'repairing' : 'built',
+    status: hasErrors ? 'running' : 'built',
     currentStep: hasErrors ? ('selective_repair' as UltimateBuildStep) : ('credential_release' as UltimateBuildStep),
     findings,
   });

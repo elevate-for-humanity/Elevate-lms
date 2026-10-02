@@ -132,7 +132,6 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
           provider_item_id: entitlement.provider_item_id,
           license_evidence_url: metadata.license_evidence_url ?? metadata.licenseEvidenceUrl,
           scene_id: metadata.scene_id,
-          relevance_reason: metadata.relevance_reason,
           duration_seconds: metadata.duration_seconds ?? metadata.verifiedDurationSeconds ?? metadata.technicalQa?.durationSeconds,
           visual_coverage_verified: metadata.visual_coverage_verified === true,
           visual_requirements: metadata.visual_requirements,

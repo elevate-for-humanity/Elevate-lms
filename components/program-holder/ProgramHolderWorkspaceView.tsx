@@ -365,6 +365,27 @@ export async function ProgramHolderWorkspaceView({
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div><p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">This week</p><h2 className="mt-1 text-2xl font-black text-slate-950">Your weekly responsibilities</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">This list is calculated from your live applicants, students, hours, reports, compliance record, agreement, and payout setup. Open an item to finish the work; do not mark work complete unless the record supports it.</p></div>
+          <span className="rounded-full bg-white px-3 py-2 text-sm font-black text-emerald-900">{[
+            callQueue.length === 0,
+            pendingHours.length === 0,
+            atRisk.length === 0,
+            missingRequirements === 0,
+            Boolean(data.holder?.mou_signed),
+          ].filter(Boolean).length}/5 core checks clear</span>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {[
+            { label: 'Contact every new applicant', detail: callQueue.length ? `${callQueue.length} applicant${callQueue.length === 1 ? '' : 's'} still need a documented call/outcome.` : 'Every routed applicant has a documented call/outcome.', done: callQueue.length === 0, href: '/program-holder/students/pending' },
+            { label: 'Review and verify training hours', detail: pendingHours.length ? `${pendingHours.length} hour entr${pendingHours.length === 1 ? 'y' : 'ies'} need review.` : 'No submitted training-hour records are waiting for review.', done: pendingHours.length === 0, href: '/program-holder/hours' },
+            { label: 'Follow up with students needing attention', detail: atRisk.length ? `${atRisk.length} student${atRisk.length === 1 ? '' : 's'} currently need intervention or follow-up.` : 'No active students are currently flagged at risk.', done: atRisk.length === 0, href: '/program-holder/students/at-risk' },
+            { label: 'Clear documents and compliance', detail: missingRequirements ? `${missingRequirements} required compliance item${missingRequirements === 1 ? '' : 's'} remain incomplete.` : 'Required compliance checks are currently complete.', done: missingRequirements === 0, href: '/program-holder/compliance' },
+            { label: 'Review your actual agreement and payment readiness', detail: data.holder?.mou_signed ? 'Your MOU is recorded as signed. Review payout milestones and payment history against that agreement.' : 'Your assigned MOU still requires signature before agreement-controlled payment milestones can be completed.', done: Boolean(data.holder?.mou_signed), href: data.holder?.mou_signed ? '/program-holder/payouts' : '/program-holder/sign-mou' },
+          ].map((item) => <Link key={item.label} href={item.href} className="flex min-w-0 gap-3 rounded-2xl border border-emerald-100 bg-white p-4 hover:border-emerald-300"><span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-black ${item.done ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}`}>{item.done ? '✓' : '!'}</span><span className="min-w-0"><span className="block font-black text-slate-950">{item.label}</span><span className="mt-1 block text-sm leading-5 text-slate-600">{item.detail}</span><span className="mt-2 block text-xs font-black text-blue-800">{item.done ? 'Review record' : 'Open required action'} →</span></span></Link>)}
+        </div>
+      </section>
       {texasLaunchKit}
       {regionalAssignment && customMou ? (
         <section className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm sm:p-6">

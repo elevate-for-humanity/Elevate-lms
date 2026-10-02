@@ -576,6 +576,19 @@ export default async function HostShopDashboardView() {
           </Link>
         </section>
       ) : null}
+      <section className="mt-6 rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">This week</p><h2 className="mt-1 text-2xl font-black text-slate-950">Host Shop weekly responsibilities</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">These checks come from this shop's live apprentices, submitted work hours, registered standards, documents, and partner record. Use the linked workspace to finish anything still open.</p></div><span className="rounded-full bg-white px-3 py-2 text-sm font-black text-emerald-900">{[board.pendingHoursCount === 0, board.documentsComplete, partnerMouSigned, board.unconfiguredPrograms.length === 0].filter(Boolean).length}/4 core checks clear</span></div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {[
+            { label: 'Review apprentice roster and progress', detail: `${board.apprentices.length} active apprentice${board.apprentices.length === 1 ? '' : 's'} assigned. Review work progress and next required skill for each apprentice.`, done: board.apprentices.length > 0, href: '/host-shop/dashboard/apprentices' },
+            { label: 'Approve submitted work hours', detail: board.pendingHoursCount ? `${board.pendingHoursCount} work entr${board.pendingHoursCount === 1 ? 'y' : 'ies'} need Host Shop review.` : 'No submitted work-hour records are waiting for review.', done: board.pendingHoursCount === 0, href: '/host-shop/dashboard/hours/pending' },
+            { label: 'Verify Appendix A skills and services', detail: board.registeredPrograms.length ? 'Open the apprentice competency record and sign only skills/services personally observed with required evidence.' : 'A registered standard must be configured before regulated competency progress can be credited.', done: board.registeredPrograms.length > 0 && board.unconfiguredPrograms.length === 0, href: '/host-shop/dashboard/competencies' },
+            { label: 'Keep compliance documents current', detail: board.documentsComplete ? 'Required Host Shop documents are accepted.' : `${board.missingDocuments.length} missing and ${board.pendingDocuments.length} awaiting review.`, done: board.documentsComplete, href: '/host-shop/dashboard/documents' },
+            { label: 'Review wage compliance and attendance', detail: 'Confirm the apprentice is being paid under the applicable registered wage schedule and that attendance/work evidence matches actual supervised work.', done: false, href: '/host-shop/dashboard/wages' },
+            { label: 'Check messages, phone, and follow-up', detail: 'Review official communications, missed calls, apprentice issues, meetings, and any follow-up that must be documented this week.', done: false, href: '/host-shop/dashboard/communications' },
+          ].map((item) => <Link key={item.label} href={item.href} className="flex min-w-0 gap-3 rounded-2xl border border-emerald-100 bg-white p-4 hover:border-emerald-300"><span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-black ${item.done ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}`}>{item.done ? '✓' : '!'}</span><span className="min-w-0"><span className="block font-black text-slate-950">{item.label}</span><span className="mt-1 block text-sm leading-5 text-slate-600">{item.detail}</span><span className="mt-2 block text-xs font-black text-blue-800">{item.done ? 'Review record' : 'Open weekly action'} →</span></span></Link>)}
+        </div>
+      </section>
       <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {summaryCards.map((card) => (
           <PortalImageCard key={card.title} card={card} />

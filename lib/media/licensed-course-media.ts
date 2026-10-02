@@ -232,7 +232,7 @@ export async function attachStoredLicensedMedia(input: {
   matchId: string;
   courseId: string;
   lessonId: string;
-  actorId: string;
+  actorId?: string | null;
 }) {
   const { data: match, error: matchError } = await input.db
     .from('course_lesson_media_matches')
@@ -277,7 +277,7 @@ export async function attachStoredLicensedMedia(input: {
         asset_role: 'source_broll',
         entitlement_id: match.entitlement_id,
         status: 'ready',
-        created_by: input.actorId,
+        created_by: input.actorId || null,
       })
       .select('id,title,storage_path,status')
       .single();

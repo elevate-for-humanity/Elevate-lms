@@ -239,10 +239,19 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
           .split(/[^a-z0-9]+/)
           .filter((term) => term.length >= 5);
         const matched = terms.filter((term) => delivered.includes(term));
+        const firstMatch = matched
+          .map((term) => delivered.indexOf(term))
+          .filter((index) => index >= 0)
+          .sort((a, b) => a - b)[0];
+        const deliveredExcerpt =
+          firstMatch === undefined
+            ? ''
+            : delivered.slice(Math.max(0, firstMatch - 120), firstMatch + 240).trim();
         return {
           objectiveId: objective.id,
           matchedTerms: matched,
           requiredTerms: Math.min(3, Math.max(1, terms.length)),
+          deliveredExcerpt,
           pass: matched.length >= Math.min(3, Math.max(1, terms.length)),
         };
       });

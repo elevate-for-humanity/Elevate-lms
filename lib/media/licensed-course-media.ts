@@ -152,12 +152,34 @@ export async function recommendLicensedMediaForCourse(input: {
       .filter(Boolean)
       .join(' ');
     const ranked = (entitlements ?? [])
-      .map((entitlement) => ({
-        entitlement,
-        ...scoreLicensedMediaMatch(lessonText, entitlement.title),
-      }))
-      .filter((match) => match.score >= 0.15)
-      .sort((a, b) => b.score - a.score)
+      .map((entitlement) => {
+        const metadata =
+          entitlement.metadata && typeof entitlement.metadata === 'object'
+            ? (entitlement.metadata as Record<string, unknown>)
+            : {};
+        const stored = Boolean(storedLicensedMediaMetadata(metadata));
+        const retrievableWorkspaceAsset =
+          typeof metadata.assetUrl === 'string' &&
+          metadata.assetUrl.trim().startsWith('https://') &&
+          (metadata.licenseObserved === true ||
+            String(metadata.licenseVerificationStatus ?? '').startsWith('license_observed') ||
+            String(metadata.licenseVerificationStatus ?? '') === 'verified_item_detail_banner');
+        return {
+          entitlement,
+          stored,
+          retrievableWorkspaceAsset,
+          ...scoreLicensedMediaMatch(lessonText, entitlement.title),
+        };
+      })
+      .filter(
+        (match) =>
+          match.score >= 0.15 &&
+          (match.stored || match.retrievableWorkspaceAsset),
+      )
+      .sort((a, b) => {
+        if (a.stored !== b.stored) return a.stored ? -1 : 1;
+        return b.score - a.score;
+      })
       .slice(0, 3);
     for (const match of ranked) {
       suggestions.push({

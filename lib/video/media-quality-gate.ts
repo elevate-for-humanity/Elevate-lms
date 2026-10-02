@@ -26,6 +26,8 @@ export interface MediaQualityEvidence {
   mediaSha256?: string;
   actualTranscript?: string;
   readability?: Array<{ scene: number; width: number; wordCoverage: number }>;
+  teachingVisualEvidence?: Array<{sceneId:string;step:number;width:number;time:number;expected:string;decoded:string;wordCoverage:number}>;
+  sceneNarrationEvidence?: Array<{sceneId:string;startSeconds:number;endSeconds:number;actualTranscript:string;coverage:number}>;
   gateVersion: typeof MEDIA_QUALITY_GATE_VERSION;
   bytes: number;
   actualDurationSeconds: number;
@@ -526,6 +528,8 @@ export async function enforceMediaQuality(input: {
     // OCR the encoded title at desktop and a phone-sized delivery width.
     // Metadata about font sizes cannot establish that the final picture is readable.
     const readability: Array<{ scene: number; width: number; wordCoverage: number }> = [];
+    const teachingVisualEvidence: NonNullable<MediaQualityEvidence['teachingVisualEvidence']> = [];
+    const sceneNarrationEvidence: NonNullable<MediaQualityEvidence['sceneNarrationEvidence']> = [];
     let sceneStart = 3;
     for (const [index, scene] of input.sceneData.scenes.entries()) {
       const time = sceneStart + Math.min(2, scene.durationSeconds / 2);
@@ -563,6 +567,32 @@ export async function enforceMediaQuality(input: {
         readability.push({ scene: index + 1, width, wordCoverage });
         if (wordCoverage < 0.75) throw new Error(`MEDIA_TEXT_UNREADABLE:${index + 1}:${width}`);
       }
+      // Inspect every authored teaching state in the encoded movie, including
+      // phone delivery. A diagram or record listed in metadata is not evidence
+      // that the compositor actually rendered it.
+      for (const [stepIndex, step] of (scene.teachingVisual?.steps ?? []).entries()) {
+        const time = sceneStart + (stepIndex + 0.5) * scene.durationSeconds / scene.teachingVisual!.steps.length;
+        for (const width of [1280,390]) {
+          const frame=join(workDir,`teaching-${index}-${stepIndex}-${width}.png`);
+          await execFileAsync('ffmpeg',['-y','-ss',String(time),'-i',videoPath,'-frames:v','1','-vf',`scale=${width}:-1`,frame],{timeout:30000,maxBuffer:1000000});
+          const {stdout:decoded}=await execFileAsync('tesseract',[frame,'stdout','--psm','11'],{timeout:30000,maxBuffer:1000000});
+          const expected=`${step.label} ${step.value}`;
+          const words=[...new Set(normalizedWords(expected).filter(w=>w.length>2))];
+          const observed=new Set(normalizedWords(decoded));
+          const wordCoverage=words.length ? words.filter(w=>observed.has(w)).length/words.length : 0;
+          teachingVisualEvidence.push({sceneId:scene.id,step:stepIndex,width,time,expected,decoded,wordCoverage});
+          if (wordCoverage<0.85) throw new Error(`MEDIA_TEACHING_STATE_NOT_VISIBLE:${scene.id}:${stepIndex}:${width}`);
+        }
+      }
+      if (scene.teachingVisual) {
+        const directory=await mkdtemp(join(workDir,`scene-${index}-`));
+        const audio=join(directory,'rendered-scene.mp3');
+        await execFileAsync('ffmpeg',['-y','-ss',String(sceneStart),'-i',videoPath,'-t',String(scene.durationSeconds),'-vn','-ac','1','-ar','16000',audio],{timeout:60000,maxBuffer:1000000});
+        const transcript=await transcribeRenderedAudio(audio,directory);
+        const coverage=narrationCoverage(scene.dialogue ?? scene.action,transcript);
+        sceneNarrationEvidence.push({sceneId:scene.id,startSeconds:sceneStart,endSeconds:sceneStart+scene.durationSeconds,actualTranscript:transcript,coverage});
+        if (coverage<MIN_ASR_NARRATION_COVERAGE) throw new Error(`MEDIA_SCENE_NARRATION_MISMATCH:${scene.id}:${coverage.toFixed(3)}`);
+      }
       sceneStart += scene.durationSeconds;
     }
     const evidence: MediaQualityEvidence = {
@@ -570,6 +600,8 @@ export async function enforceMediaQuality(input: {
       mediaSha256: createHash('sha256').update(buffer).digest('hex'),
       actualTranscript,
       readability,
+      teachingVisualEvidence,
+      sceneNarrationEvidence,
       bytes: buffer.length,
       actualDurationSeconds,
       expectedDurationSeconds: input.expectedDurationSeconds,

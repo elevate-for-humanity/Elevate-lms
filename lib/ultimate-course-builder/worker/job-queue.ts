@@ -67,8 +67,7 @@ export class UltimateJobQueue {
       .from('ultimate_build_jobs')
       .update({
         status: 'queued',
-        attempts: 0,
-        available_at: new Date().toISOString(),
+        available_at: new Date(Date.now() + 60000).toISOString(),
         lease_owner: null,
         lease_expires_at: null,
         last_error: message,
@@ -76,6 +75,18 @@ export class UltimateJobQueue {
       })
       .eq('id', jobId)
       .eq('lease_owner', workerId);
+    if (error) throw error;
+  }
+
+  /** Yield between lessons. A successful checkpoint is progress, not a failed
+   * attempt. The persisted cursor resumes the same job and lets other courses run. */
+  async yieldProgress(jobId: string, workerId: string, payload: unknown) {
+    const { error } = await this.db.from('ultimate_build_jobs').update({
+      status: 'queued', payload, attempts: 0,
+      available_at: new Date(Date.now() + 1000).toISOString(),
+      lease_owner: null, lease_expires_at: null, last_error: null,
+      updated_at: new Date().toISOString(),
+    }).eq('id', jobId).eq('lease_owner', workerId);
     if (error) throw error;
   }
 

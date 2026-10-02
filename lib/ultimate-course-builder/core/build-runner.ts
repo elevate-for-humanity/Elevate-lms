@@ -150,6 +150,13 @@ export class UltimateBuildRunner {
       if (target && attempts.length < MAX_TARGETED_REPAIRS) {
         attempts.push({ failedStep: step, target, codes: failures.map((f) => f.code) });
         index = Math.min(index, ULTIMATE_BUILD_STEPS.indexOf(target));
+        // A routed repair deliberately changes an upstream producer. Its old
+        // passed certificate must not cause the loop to skip that producer and
+        // merely rerun QA against the identical failed movie.
+        for (const dependent of ULTIMATE_BUILD_STEPS.slice(index)) {
+          ctx.passedSteps?.delete(dependent);
+          delete ctx.artifacts[dependent];
+        }
         continue;
       }
       ctx.findings.push(...failures);

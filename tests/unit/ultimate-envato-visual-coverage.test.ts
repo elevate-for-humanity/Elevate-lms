@@ -12,7 +12,7 @@ function context() {
     artifacts: {
       storyboard: {
         storyboard: {
-          scenes: Array.from({ length: 7 }, (_, index) => ({ id: `scene-${index + 1}` })),
+          scenes: Array.from({ length: 13 }, (_, index) => ({ id: `scene-${index + 1}` })),
         },
       },
     },
@@ -22,6 +22,8 @@ function context() {
 
 function licensedAssets(count: number) {
   return Array.from({ length: count }, (_, index) => ({
+    id: `asset-${index + 1}`,
+    license_evidence_url: 'https://media.example/license',
     entitlement_id: `entitlement-${index + 1}`,
     public_url: `https://media.example/envato-${index + 1}.mp4`,
     // Source ownership is course-scoped even when first attached to another lesson.
@@ -29,18 +31,21 @@ function licensedAssets(count: number) {
   }));
 }
 
+function assignments(count: number) { return Array.from({length:count},(_,i)=>({sceneId:`scene-${i+1}`,assetId:`asset-${i+1}`,licenseEvidenceUrl:'https://media.example/license',relevanceReason:'Reviewed scene teaching coverage'})); }
+
 describe('Ultimate Envato visual coverage', () => {
-  it('accepts a seven-shot licensed course library for another lesson in that course', async () => {
+  it('accepts a thirteen-shot licensed course library for another lesson in that course', async () => {
     const find = vi.fn().mockResolvedValue({
       policy: 'licensed-first',
       licensedSuggestions: [],
-      readyAssets: licensedAssets(7),
+      readyAssets: licensedAssets(13),
+      assignments: assignments(13),
       storyboard: null,
     });
     const handlers = createProductionHandlers({ media: { find } } as any);
 
     await expect(handlers.visual_assignment(context())).resolves.toMatchObject({
-      artifacts: { media: { readyAssets: expect.arrayContaining(licensedAssets(7)) } },
+      artifacts: { media: { readyAssets: expect.arrayContaining(licensedAssets(13)) } },
     });
   });
 
@@ -50,39 +55,42 @@ describe('Ultimate Envato visual coverage', () => {
       .mockResolvedValueOnce({
         policy: 'licensed-first',
         licensedSuggestions: [],
-        readyAssets: licensedAssets(6),
+        readyAssets: licensedAssets(12),
+      assignments: assignments(12),
         storyboard: null,
       })
       .mockResolvedValueOnce({
         policy: 'licensed-first',
         licensedSuggestions: [],
-        readyAssets: licensedAssets(7),
+        readyAssets: licensedAssets(13),
+      assignments: assignments(13),
         storyboard: null,
       });
     const acquire = vi.fn().mockResolvedValue({ attached: 1, pending: 0 });
     const handlers = createProductionHandlers({ media: { find, acquire } } as any);
 
     await expect(handlers.visual_assignment(context())).resolves.toMatchObject({
-      artifacts: { media: { readyAssets: expect.arrayContaining(licensedAssets(7)) } },
+      artifacts: { media: { readyAssets: expect.arrayContaining(licensedAssets(13)) } },
     });
     expect(acquire).toHaveBeenCalledTimes(1);
     expect(find).toHaveBeenCalledTimes(2);
   });
 
-  it('blocks at visual assignment before narration when fewer than seven shots exist', async () => {
+  it('blocks at visual assignment before narration when fewer than thirteen shots exist', async () => {
     const handlers = createProductionHandlers({
       media: {
         find: vi.fn().mockResolvedValue({
           policy: 'licensed-first',
           licensedSuggestions: [],
-          readyAssets: licensedAssets(6),
+          readyAssets: licensedAssets(12),
+      assignments: assignments(12),
           storyboard: null,
         }),
       },
     } as any);
 
     await expect(handlers.visual_assignment(context())).rejects.toThrow(
-      'ULTIMATE_ENVATO_VISUALS_REQUIRED:6:7',
+      'ULTIMATE_SCENE_ASSIGNMENT_COVERAGE_REQUIRED:12:13',
     );
   });
 });

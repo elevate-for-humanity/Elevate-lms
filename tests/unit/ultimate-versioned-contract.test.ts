@@ -6,6 +6,7 @@ import {
   stepInputHash,
   validateStepOutput,
   ULTIMATE_LESSON_CONTRACT_VERSION,
+  MAX_TARGETED_REPAIRS,
 } from '../../lib/ultimate-course-builder/core/lesson-contract';
 import type { UltimateRunContext } from '../../lib/ultimate-course-builder/core/build-runner';
 const profile: any = {
@@ -102,8 +103,8 @@ describe('versioned lesson contract', () => {
         throw new Error('HTTP 503');
       },
     }).run(c);
-    expect(calls).toBe(3);
-    expect((c.artifacts.selective_repair as any).repair.attempts).toHaveLength(2);
+    expect(calls).toBe(MAX_TARGETED_REPAIRS + 1);
+    expect((c.artifacts.selective_repair as any).repair.attempts).toHaveLength(MAX_TARGETED_REPAIRS);
     expect(c.findings).toHaveLength(1);
   });
   it('does not retry absent sources as if a retry could supply them', async () => {

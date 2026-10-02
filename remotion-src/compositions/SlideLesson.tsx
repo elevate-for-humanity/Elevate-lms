@@ -30,6 +30,7 @@ import {
   staticFile,
 } from 'remotion';
 import { instructionalLayoutForScene, type InstructionalLayout } from '../instructional-layout';
+import { teachingVisualStepIndex, type TeachingVisual } from '../../lib/ultimate-course-builder/instructional/teaching-visual';
 
 // ââ Types âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
@@ -50,6 +51,8 @@ export interface SceneData {
   captionCues?: Array<{ startSeconds: number; endSeconds: number; text: string }>;
   sceneType?: string;
   memoryAnchor?: string;
+  strictBlueprint?: boolean;
+  teachingVisual?: TeachingVisual;
 }
 
 export interface SlideLessonProps {
@@ -269,6 +272,7 @@ function CaptionBar({
   primaryColor,
   bright,
   cues,
+  strictBlueprint,
 }: {
   cues?: Array<{ startSeconds: number; endSeconds: number; text: string }>;
   text: string;
@@ -276,6 +280,7 @@ function CaptionBar({
   durationFrames: number;
   primaryColor: string;
   bright: boolean;
+  strictBlueprint?: boolean;
 }) {
   // Render timed caption phrases, never a persistent narration paragraph.
   const words = text.trim().split(/\s+/).filter(Boolean);
@@ -311,7 +316,7 @@ function CaptionBar({
       <p
         style={{
           color: bright ? '#0f172a' : '#f1f5f9',
-          fontSize: 28,
+          fontSize: strictBlueprint ? 80 : 28,
           fontFamily: 'sans-serif',
           lineHeight: 1.5,
           margin: 0,
@@ -323,6 +328,19 @@ function CaptionBar({
       </p>
     </div>
   );
+}
+
+function BlueprintTeachingGraphic({plan,seconds,duration,color}: {plan:TeachingVisual;seconds:number;duration:number;color:string}) {
+  const index=teachingVisualStepIndex(seconds,duration,plan.steps.length);
+  const step=plan.steps[index];
+  return <div style={{background:'rgba(255,255,255,0.96)',borderRadius:18,padding:'28px 32px',
+    fontFamily:'sans-serif',color:'#0f172a',borderLeft:`8px solid ${color}`}}>
+    <div style={{fontSize:80,fontWeight:900,lineHeight:1.2,marginBottom:18}}>{step.label}</div>
+    <div style={{fontSize:80,lineHeight:1.3}}>{step.value}</div>
+    <div style={{marginTop:24,height:12,background:'#e2e8f0',borderRadius:8}}>
+      <div style={{height:'100%',width:`${((index+1)/plan.steps.length)*100}%`,background:color,borderRadius:8}} />
+    </div>
+  </div>;
 }
 
 function InstructionalGraphic({
@@ -446,7 +464,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
   // motion already completed, leaving long frozen stills in rendered lessons.
   const frame = useCurrentFrame();
   const bright = props.surfaceMode === 'bright';
-  const instructionalLayout = instructionalLayoutForScene({
+  const instructionalLayout = scene.strictBlueprint ? null : instructionalLayoutForScene({
     title: scene.title,
     action: scene.narration,
     sceneType: scene.sceneType,
@@ -577,7 +595,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
           position: 'absolute',
           top: 80,
           left: 60,
-          right: instructionalLayout ? 60 : '50%',
+          right: instructionalLayout || scene.teachingVisual ? 60 : '50%',
           bottom: 100,
           display: 'flex',
           flexDirection: 'column',
@@ -590,7 +608,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
           style={{
             opacity: fadeIn(frame, 8, 22),
             transform: `translateY(${slideUp(frame, fps, 8)}px)`,
-            fontSize: instructionalLayout ? 42 : 44,
+            fontSize: scene.strictBlueprint ? 80 : instructionalLayout ? 42 : 44,
             fontWeight: 900,
             color: instructionalLayout || bright ? '#0f172a' : '#fff',
             fontFamily: 'sans-serif',
@@ -603,7 +621,10 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
           {scene.title}
         </div>
 
-        {instructionalLayout ? (
+        {scene.teachingVisual ? (
+          <BlueprintTeachingGraphic plan={scene.teachingVisual} seconds={frame/fps}
+            duration={scene.durationFrames/fps} color={props.primaryColor} />
+        ) : instructionalLayout ? (
           <InstructionalGraphic layout={instructionalLayout} frame={frame} props={props} />
         ) : (
           <div
@@ -659,6 +680,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
 
       {/* Caption bar */}
       <CaptionBar
+        strictBlueprint={scene.strictBlueprint}
         text={scene.narration}
         cues={scene.captionCues}
         frame={frame}

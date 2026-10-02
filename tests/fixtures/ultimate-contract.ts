@@ -39,7 +39,7 @@ export const fixtureArtifact = (step: UltimateBuildStep): Record<string, any> =>
     },
     storyboard: {
       storyboard: {
-        scenes: Array.from({ length: 6 }, (_, i) => ({
+        scenes: Array.from({ length: 13 }, (_, i) => ({
           id: `s${i}`,
           scriptSegmentId: 's',
           dialogue: 'Supported instruction',
@@ -50,14 +50,9 @@ export const fixtureArtifact = (step: UltimateBuildStep): Record<string, any> =>
     },
     visual_assignment: {
       media: {
-        assignments: [
-          {
-            sceneId: 's',
-            assetId: 'a',
-            licenseEvidenceUrl: 'https://example.org/license',
-            relevanceReason: 'An actual example',
-          },
-        ],
+        assignments: Array.from({length:13},(_,i)=>({
+          sceneId:`s${i}`,assetId:`a${i}`,licenseEvidenceUrl:'https://example.org/license',relevanceReason:'An actual example',
+        })),
       },
     },
     scene_construction: { scenes: { shots: [{ sceneId: 's', assetId: 'a', loop: false }] } },
@@ -117,6 +112,8 @@ export const fixtureArtifact = (step: UltimateBuildStep): Record<string, any> =>
       render: {
         videoUrl: 'https://example.org/video',
         duration: 10,
+        visualAssetCount: 13,
+        distinctShots: 13,
         captionsUrl: 'https://example.org/captions',
         transcriptUrl: 'https://example.org/transcript',
       },

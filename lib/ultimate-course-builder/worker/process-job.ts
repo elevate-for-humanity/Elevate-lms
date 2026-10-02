@@ -5,6 +5,9 @@ import { createProductionHandlers } from '../core/production-handlers';
 import { UltimateBuildRunner } from '../core/build-runner';
 import { runUltimateCourse } from '../core/full-course-runner';
 import type { UltimateCredentialProfile } from '../core/types';
+import { assertCompleteLesson } from '../core/lesson-contract';
+import { UltimateReleaseService } from '../release/release-service';
+import { nextCourseWork } from './course-cursor';
 export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
@@ -25,6 +28,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     const runtime = await createUltimateRuntime(db);
     const handlers = createProductionHandlers(runtime);
     const payload = (job.payload ?? {}) as any;
+    const targeted = Boolean(payload.competencyId || payload.lessonBuildId || payload.acceptance);
     const result = await runUltimateCourse(
       {
         buildId: build.id,
@@ -32,22 +36,51 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         profile,
         targetLessonBuildId: payload.lessonBuildId,
         targetCompetencyId:
-          payload.competencyId ?? (payload.acceptance ? profile.competencies?.[0]?.id : undefined),
+          payload.competencyId ?? payload.repairCompetencyId ?? (payload.acceptance ? profile.competencies?.[0]?.id : undefined),
+        startIndex: Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0,
+        maxLessons: 1,
       },
       () => new UltimateBuildRunner(handlers as any),
       runtime.persistence,
       runtime.artifacts,
     );
+    if (!targeted) {
+      const continuation = nextCourseWork(payload, result);
+      if (continuation.continue) {
+        await queue.yieldProgress(job.id, workerId, continuation.payload);
+        return { claimed: true, completed: false, continuing: true, jobId: job.id, result };
+      }
+      if (continuation.unresolved?.length) {
+        await queue.fail(job.id,workerId,`ULTIMATE_DEPENDENCIES_UNRESOLVED:${continuation.unresolved.join(',')}`,false);
+        return {claimed:true,completed:false,jobId:job.id,result};
+      }
+    }
     if (!result.completed) {
       // Quality findings are repair work, not a terminal queue state. Requeue
       // the durable build so the worker resumes from its persisted checkpoint
       // and selective-repair plan instead of stranding the entire course.
-      await queue.requeueForRepair(
+      await queue.fail(
         job.id,
         workerId,
-        'ULTIMATE_REPAIR_REQUIRED: automatic selective repair and checkpoint resume',
+        `ULTIMATE_REPAIR_REQUIRED:${JSON.stringify(result.findings.map(f => ({step:f.step,code:f.code,message:f.message}))).slice(0,4000)}`,
       );
       return { claimed: true, completed: false, repairQueued: true, jobId: job.id, result };
+    }
+    if (!targeted) {
+      // Completion is the current contract for every competency plus canonical
+      // publication readback, never the last lesson's status or legacy flags.
+      const { data: lessons, error: lessonError } = await db.from('ultimate_lesson_builds')
+        .select('competency_id,status,artifacts').eq('build_id', build.id);
+      if (lessonError) throw lessonError;
+      for (const competency of profile.competencies) {
+        const lesson = lessons?.find(l => l.competency_id === competency.id);
+        if (!lesson || lesson.status !== 'built') throw new Error(`ULTIMATE_COMPETENCY_NOT_COMPLETE:${competency.id}`);
+        assertCompleteLesson(lesson.artifacts, profile);
+      }
+      const { data: course, error: courseError } = await db.from('courses').select('created_by').eq('id', build.course_id).single();
+      if (courseError || !course?.created_by) throw courseError ?? new Error('ULTIMATE_RELEASE_ACTOR_REQUIRED');
+      await runtime.persistence.updateBuild({buildId:build.id,status:'built',currentStep:'credential_release'});
+      await new UltimateReleaseService(db).publish(build.id, course.created_by);
     }
     await queue.complete(job.id, workerId);
     return { claimed: true, completed: true, jobId: job.id, result };

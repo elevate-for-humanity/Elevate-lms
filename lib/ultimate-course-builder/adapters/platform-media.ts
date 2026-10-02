@@ -15,6 +15,21 @@ function firstRecord(value: unknown): RecordLike {
   return row && typeof row === 'object' ? (row as RecordLike) : {};
 }
 
+/** A terms page alone is not proof that a particular item was licensed. */
+export function observedLicenseEvidence(entitlement: RecordLike): string | undefined {
+  const metadata = firstRecord(entitlement.metadata);
+  const document = entitlement.license_document_url ?? metadata.license_evidence_url ?? metadata.licenseEvidenceUrl;
+  if (typeof document === 'string' && document.trim()) return document.trim();
+  const observed = metadata.licenseObserved === true ||
+    String(metadata.licenseVerificationStatus ?? '').startsWith('license_observed') ||
+    metadata.licenseVerificationStatus === 'verified_item_detail_banner';
+  // Keep the observed item, capture time and workspace in the ready asset too;
+  // the shared terms URL must never manufacture a license observation.
+  if (observed && metadata.licenseObservedAt && entitlement.provider_item_id && metadata.licenseTermsUrl)
+    return String(metadata.licenseTermsUrl);
+  return undefined;
+}
+
 export class UltimatePlatformMedia implements UltimateMediaPort {
   constructor(private db: SupabaseClient) {}
 
@@ -51,7 +66,8 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
     const bytes = acquired?.download?.bytes;
     if (!(bytes instanceof Uint8Array) || !bytes.byteLength) throw new Error('ULTIMATE_ENVATO_DOWNLOAD_EMPTY');
     const mimeType = String(acquired.download.mimeType ?? 'video/mp4');
-    const extension = mimeType.includes('quicktime') ? 'mov' : mimeType.includes('webm') ? 'webm' : 'mp4';
+    const extension = mimeType.includes('quicktime') ? 'mov' : mimeType.includes('webm') ? 'webm'
+      : mimeType.includes('jpeg') ? 'jpg' : mimeType.includes('png') ? 'png' : mimeType.includes('webp') ? 'webp' : 'mp4';
     const storagePath = `licensed-library/envato/${itemId}/${crypto.randomUUID()}.${extension}`;
     const { error: uploadError } = await this.db.storage.from('course_videos').upload(storagePath, bytes, {
       contentType: mimeType,
@@ -101,7 +117,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
     const { data, error } = await this.db
       .from('course_videos')
       .select(
-        'id,title,video_url,storage_path,status,asset_role,entitlement_id,lesson_id,course_lesson_media_matches!course_video_id(match_score,match_reasons,search_query,status),licensed_media_entitlements(provider,provider_item_id,item_url,metadata)',
+        'id,title,video_url,storage_path,status,asset_role,entitlement_id,lesson_id,course_lesson_media_matches!course_video_id(lesson_id,match_score,match_reasons,search_query,status),licensed_media_entitlements(provider,provider_item_id,item_url,license_document_url,certificate_storage_path,metadata)',
       )
       .eq('course_id', courseId)
       .eq('status', 'ready')
@@ -122,7 +138,8 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
           if (signedError) throw signedError;
           publicUrl = signed?.signedUrl ?? '';
         }
-        const match = firstRecord(asset.course_lesson_media_matches);
+        const matches = Array.isArray(asset.course_lesson_media_matches) ? asset.course_lesson_media_matches : [];
+        const match = firstRecord(matches.find((m: RecordLike) => String(m.lesson_id) === String(input.competency?.id)));
         return {
           ...asset,
           id: String(asset.id),
@@ -130,7 +147,9 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
           mime_type: metadata.mime_type,
           provider: entitlement.provider ?? 'envato',
           provider_item_id: entitlement.provider_item_id,
-          license_evidence_url: metadata.license_evidence_url ?? metadata.licenseEvidenceUrl,
+          license_evidence_url: observedLicenseEvidence(entitlement),
+          license_observation: { itemId: entitlement.provider_item_id, observedAt: metadata.licenseObservedAt,
+            workspaceId: metadata.workspaceId, verificationStatus: metadata.licenseVerificationStatus },
           scene_id: metadata.scene_id,
           duration_seconds: metadata.duration_seconds ?? metadata.verifiedDurationSeconds ?? metadata.technicalQa?.durationSeconds,
           visual_coverage_verified: metadata.visual_coverage_verified === true,
@@ -182,7 +201,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       .from('course_lesson_media_matches')
       .select('id,lesson_id,status,entitlement_id,match_score,licensed_media_entitlements!inner(provider,provider_item_id,item_url,metadata)')
       .eq('course_id', courseId)
-      .in('status', ['suggested', 'approved']);
+      .in('status', ['approved']);
     if (error) throw error;
 
     let attached = 0;
@@ -192,6 +211,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
     // records are evidence of intent, not usable media.
     const usableMatches = (matches ?? []).filter((match: RecordLike) => {
       const entitlement = firstRecord(match.licensed_media_entitlements);
+      if (entitlement.provider !== 'envato') return false;
       const metadata = firstRecord(entitlement.metadata);
       const stored = Boolean(storedLicensedMediaMetadata(metadata));
       const retrievableWorkspaceAsset =
@@ -213,20 +233,6 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
     const selectedMatches = [...selectedByLesson.values()].flat();
     for (const match of selectedMatches) {
       const entitlement = firstRecord(match.licensed_media_entitlements);
-      if (match.status === 'suggested') {
-        const { error: approveError } = await this.db
-          .from('course_lesson_media_matches')
-          .update({
-            status: 'approved',
-            approved_at: new Date().toISOString(),
-            failure_reason: null,
-          })
-          .eq('id', match.id)
-          .eq('status', 'suggested');
-        if (approveError) throw approveError;
-        match.status = 'approved';
-      }
-
       if (!storedLicensedMediaMetadata(entitlement.metadata)) {
         await this.acquireApprovedEnvatoMatch(match);
       }

@@ -76,16 +76,6 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
             reason = evidence.reason;
             break;
           }
-          // A positive persisted lesson match is valid lesson-level relevance
-          // evidence. Scene-specific semantics improve ranking, but generic
-          // instructional stages (recap, assessment, remediation, etc.) must
-          // not require the stock asset title to literally contain the stage
-          // label. Distinctness still prevents looping/reuse.
-          if (Number(candidate.lesson_match_score ?? 0) > 0) {
-            asset = candidate;
-            reason = `Licensed asset has persisted positive lesson relevance score ${Number(candidate.lesson_match_score).toFixed(2)} for this lesson`;
-            break;
-          }
         }
       }
     }

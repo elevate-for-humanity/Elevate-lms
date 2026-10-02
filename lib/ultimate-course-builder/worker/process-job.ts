@@ -21,7 +21,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       .single();
     if (error || !build) throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
     const profile = build.profile as UltimateCredentialProfile;
-    if (!profile?.competencies?.length) throw new Error('ULTIMATE_PROFILE_HAS_NO_COMPETENCIES');
+    if (!profile?.competencies?.length) throw new Error('ULTIMATE_PROFILE_REPAIR_REQUIRED');
     const runtime = await createUltimateRuntime(db);
     const handlers = createProductionHandlers(runtime);
     const payload = (job.payload ?? {}) as any;
@@ -58,9 +58,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       job.id,
       workerId,
       message,
-      !/PAID_INFERENCE_AUTHORIZATION_REQUIRED|ULTIMATE_PROFILE_HAS_NO_COMPETENCIES|ULTIMATE_STANDARDS_SOURCE_NOT_FOUND|ULTIMATE_TARGET_COMPETENCY_NOT_FOUND/.test(
-        message,
-      ),
+      true,
     );
     return { claimed: true, completed: false, jobId: job.id, error: message };
   } finally {

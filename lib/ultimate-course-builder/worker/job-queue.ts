@@ -67,6 +67,7 @@ export class UltimateJobQueue {
       .from('ultimate_build_jobs')
       .update({
         status: 'queued',
+        attempts: 0,
         available_at: new Date().toISOString(),
         lease_owner: null,
         lease_expires_at: null,

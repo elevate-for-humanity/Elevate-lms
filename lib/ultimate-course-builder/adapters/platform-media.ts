@@ -188,12 +188,23 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
 
     let attached = 0;
     let pending = 0;
-    // During an automatic Ultimate build, deterministic relevance scoring is the
-    // approval authority for licensed Envato scene acquisition. This is not a
-    // learner/compliance approval gate: the entitlement already exists and the
-    // builder records the score/evidence before attaching the stored asset.
+    // Only media that is already stored or has a verified retrievable workspace
+    // asset may participate in automatic selection. Pending workspace handoff
+    // records are evidence of intent, not usable media.
+    const usableMatches = (matches ?? []).filter((match: RecordLike) => {
+      const entitlement = firstRecord(match.licensed_media_entitlements);
+      const metadata = firstRecord(entitlement.metadata);
+      const stored = Boolean(storedLicensedMediaMetadata(metadata));
+      const retrievableWorkspaceAsset =
+        typeof metadata.assetUrl === 'string' &&
+        metadata.assetUrl.trim().startsWith('https://') &&
+        (metadata.licenseObserved === true ||
+          String(metadata.licenseVerificationStatus ?? '').startsWith('license_observed') ||
+          String(metadata.licenseVerificationStatus ?? '') === 'verified_item_detail_banner');
+      return stored || retrievableWorkspaceAsset;
+    });
     const bestByLesson = new Map<string, RecordLike>();
-    for (const match of matches ?? []) {
+    for (const match of usableMatches) {
       const lessonId = String(match.lesson_id);
       const current = bestByLesson.get(lessonId);
       if (!current || Number(match.match_score ?? 0) > Number(current.match_score ?? 0))
@@ -228,7 +239,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       });
       attached += 1;
     }
-    pending = Math.max(0, (matches ?? []).length - attached);
+    pending = Math.max(0, usableMatches.length - attached);
     return { attached, pending };
   }
 

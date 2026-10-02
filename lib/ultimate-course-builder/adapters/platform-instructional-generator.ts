@@ -43,7 +43,11 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     }
   }
   private async generate(e: Evidence): Promise<LessonBlueprint> {
-    const sources = e.profile.instructionalSources;
+    // Course-wide source arrays contain many different lessons. Never narrate
+    // the first lesson's source for every competency in a course.
+    const sources = e.profile.instructionalSources?.filter(s =>
+      [e.competency.id, `course-lesson:${e.competency.id}`, `course:${e.competency.id}`].includes(s.id) ||
+      e.competency.authorityRequirementIds.includes(s.id));
     if (!sources?.length || sources.some((s) => !s.id || !s.text?.trim()))
       throw new Error('ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED');
 
@@ -57,19 +61,19 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     const competencyText = e.competency.description?.trim() || e.competency.title;
     const teachingBase = `${e.competency.title}. ${competencyText}`;
     const stageText: Record<string, string> = {
-      hook: `Connect ${e.competency.title} to the learner's job role and explain why the skill matters.`,
-      objectives: `State the lesson objective: ${competencyText}`,
+      why_it_matters: `Connect ${e.competency.title} to the learner's job role and explain why the skill matters.`,
       activate_prior_knowledge: `Recall related workplace knowledge before applying ${e.competency.title}.`,
-      mental_model: `Build a clear mental model of ${e.competency.title}: ${competencyText}`,
+      terminology: `Explain the terms used in the authorized material for ${e.competency.title}.`,
+      concept_explanation: `Build a clear mental model of ${e.competency.title}: ${competencyText}`,
       instructor_example: `Walk through an instructor example using the authorized course material for ${e.competency.title}.`,
       demonstration: `Demonstrate the required knowledge or procedure step by step and connect each action to the lesson objective.`,
       guided_practice: `Guide the learner through practice, prompting them to explain decisions and correct errors as they work.`,
       independent_practice: `Have the learner independently apply ${e.competency.title} and document the result.`,
       knowledge_check: `Check understanding of ${e.competency.title} with an applied question and immediate feedback.`,
-      mistakes_corrections: `Identify a common mistake, explain why it is incorrect, and model the correct approach.`,
-      transfer: `Apply ${e.competency.title} to a different realistic workplace scenario.`,
+      mistake_and_correction: `Identify a common mistake, explain why it is incorrect, and model the correct approach.`,
+      assessment: `Apply ${e.competency.title} to a different realistic workplace scenario.`,
+      remediation: `Explain the error using the authorized material, then attempt a separate reassessment.`,
       recap: `Recap the essential knowledge and the correct sequence for applying ${e.competency.title}.`,
-      next_step: `Explain what the learner should practice next and how this competency connects to later course work.`,
     };
     const stages = ULTIMATE_TEACHING_SEQUENCE.map((stage) => ({
       stage,
@@ -173,6 +177,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
         sourceRequirementIds: s.sourceRequirementIds,
         visualRequirement: s.visualRequirement,
         sceneType: s.sceneType,
+        teachingVisual: s.teachingVisual,
       })),
     };
   }

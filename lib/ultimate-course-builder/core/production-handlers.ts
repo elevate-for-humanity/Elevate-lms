@@ -50,7 +50,7 @@ function requireLicensedVisualCoverage(ctx: any, mediaInput?: any) {
     const identity = String(asset.provider_item_id ?? asset.entitlement_id);
     reuse.set(identity, (reuse.get(identity) ?? 0) + 1);
   }
-  const prohibited = [...reuse.entries()].filter(([, count]) => count > 2);
+  const prohibited = [...reuse.entries()].filter(([, count]) => count > 1);
   if (prohibited.length)
     throw new Error(`ULTIMATE_PROHIBITED_VISUAL_REPETITION:${JSON.stringify(prohibited)}`);
 }
@@ -242,6 +242,8 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
         sceneData: render.sceneData,
         expectedScript: script.script,
         instructionalQuality: quality.evidence,
+        provider: render.provider,
+        providerModel: render.providerModel,
       });
       return { passed: true, artifacts: { mediaQA: { pass: true, inspection } } };
     },

@@ -12,6 +12,8 @@ export type UltimateCoursePlan = {
   profile: UltimateCredentialProfile;
   targetLessonBuildId?: string;
   targetCompetencyId?: string;
+  startIndex?: number;
+  maxLessons?: number;
 };
 export async function runUltimateCourse(
   plan: UltimateCoursePlan,
@@ -25,9 +27,11 @@ export async function runUltimateCourse(
     currentStep: 'standards_lock',
   });
   const lessons = [];
-  const competencies = plan.targetCompetencyId
+  const eligible = plan.targetCompetencyId
     ? plan.profile.competencies.filter((c) => c.id === plan.targetCompetencyId)
     : plan.profile.competencies;
+  const startIndex = plan.targetCompetencyId ? 0 : Math.max(0, plan.startIndex ?? 0);
+  const competencies = eligible.slice(startIndex, plan.maxLessons ? startIndex + plan.maxLessons : undefined);
   if (plan.targetCompetencyId && !competencies.length)
     throw new Error('ULTIMATE_TARGET_COMPETENCY_NOT_FOUND');
   for (const competency of competencies) {
@@ -100,9 +104,10 @@ export async function runUltimateCourse(
     buildId: plan.buildId,
     // Repairable quality findings remain in the automatic production lifecycle.
     // Only the worker's durable external prerequisites may terminate a run.
-    status: hasErrors ? 'running' : 'built',
+    status: hasErrors || plan.targetCompetencyId || competencies.length !== plan.profile.competencies.length ? 'running' : 'built',
     currentStep: hasErrors ? ('selective_repair' as UltimateBuildStep) : ('credential_release' as UltimateBuildStep),
     findings,
   });
-  return { buildId: plan.buildId, courseId: plan.courseId, lessons, findings, completed };
+  return { buildId: plan.buildId, courseId: plan.courseId, lessons, findings, completed,
+    nextIndex: startIndex + competencies.length, hasRemaining: startIndex + competencies.length < eligible.length };
 }

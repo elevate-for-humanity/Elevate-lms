@@ -848,6 +848,8 @@ export async function renderStoryboardVideo(
         durationFrames: Math.ceil(durationSeconds * STORYBOARD_RENDER_FPS),
         sceneType: scene.sceneType,
         memoryAnchor: scene.memoryAnchor,
+        strictBlueprint: input.ultimateStrict,
+        teachingVisual: scene.teachingVisual,
       });
     }
 

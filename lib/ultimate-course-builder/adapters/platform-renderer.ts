@@ -236,6 +236,7 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
     objective: String(board.objective ?? scenes[0]?.action ?? input.courseTitle ?? 'Lesson'),
     script,
     defaultDurationSeconds: 8,
+    requiredSceneCount: 13,
     sceneData: {
       ...board,
       version: '1.0',
@@ -282,6 +283,8 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
     return {
       ...result,
       layoutVersion: 2,
+      provider: 'remotion',
+      providerModel: 'SlideLesson-blueprint-v3',
       captionsUrl: result.sceneData?.captionUrl,
       transcriptUrl: result.sceneData?.transcriptUrl,
       ...visualEvidence,

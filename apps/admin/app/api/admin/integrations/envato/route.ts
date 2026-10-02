@@ -13,6 +13,7 @@ import {
 } from '@/lib/course-builder/licensed-media';
 import { queueCourseMedia } from '@/lib/course-builder/orchestrator';
 import { upsertEnvatoWorkspaceManifest, type EnvatoWorkspaceManifestItem } from '@/lib/course-builder/envato-workspace';
+import { resumeMediaDependency } from '@/lib/ultimate-course-builder/worker/resume-media-dependency';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -296,6 +297,8 @@ const _POST = withAuth(
           lessonId: input.lessonId,
           actorId: user.id,
         });
+        const resumed = await resumeMediaDependency(db,input.courseId,[input.lessonId]);
+        if (resumed.length) return NextResponse.json({ok:true,video,ultimateJobs:resumed});
         const { error: lessonError } = await db
           .from('course_lessons')
           .update({

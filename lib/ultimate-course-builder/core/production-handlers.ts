@@ -29,14 +29,30 @@ function requireLicensedVisualCoverage(ctx: any, mediaInput?: any) {
     (ctx.artifacts.visual_assignment as any)?.media ??
     ctx.artifacts.visual_assignment ??
     {};
+  const assignments = Array.isArray(media.assignments) ? media.assignments : [];
   const readyAssets = Array.isArray(media.readyAssets) ? media.readyAssets : [];
-  const distinct = new Set(
-    readyAssets
-      .filter((asset: any) => asset?.entitlement_id && asset?.public_url)
-      .map((asset: any) => String(asset.public_url)),
-  ).size;
-  if (distinct < scenes.length)
-    throw new Error(`ULTIMATE_ENVATO_VISUALS_REQUIRED:${distinct}:${scenes.length}`);
+  const assetById = new Map(readyAssets.map((asset: any) => [String(asset.id), asset]));
+  if (scenes.length !== 13)
+    throw new Error(`ULTIMATE_STORYBOARD_13_SCENES_REQUIRED:${scenes.length}:13`);
+  if (assignments.length !== scenes.length)
+    throw new Error(`ULTIMATE_SCENE_ASSIGNMENT_COVERAGE_REQUIRED:${assignments.length}:${scenes.length}`);
+  const sceneIds = new Set(scenes.map((scene: any) => String(scene.id)));
+  const assignedSceneIds = new Set(assignments.map((assignment: any) => String(assignment.sceneId)));
+  if (assignedSceneIds.size !== scenes.length || [...sceneIds].some((id) => !assignedSceneIds.has(id)))
+    throw new Error('ULTIMATE_SCENE_ASSIGNMENT_ONE_TO_ONE_REQUIRED');
+  const reuse = new Map<string, number>();
+  for (const assignment of assignments) {
+    if (!assignment?.assetId || !assignment?.licenseEvidenceUrl || !assignment?.relevanceReason)
+      throw new Error('ULTIMATE_VISUAL_LICENSE_RELEVANCE_REQUIRED');
+    const asset = assetById.get(String(assignment.assetId)) as any;
+    if (!asset?.entitlement_id || !asset?.public_url)
+      throw new Error(`ULTIMATE_VISUAL_ASSET_NOT_READY:${assignment.assetId}`);
+    const identity = String(asset.provider_item_id ?? asset.entitlement_id);
+    reuse.set(identity, (reuse.get(identity) ?? 0) + 1);
+  }
+  const prohibited = [...reuse.entries()].filter(([, count]) => count > 2);
+  if (prohibited.length)
+    throw new Error(`ULTIMATE_PROHIBITED_VISUAL_REPETITION:${JSON.stringify(prohibited)}`);
 }
 export function createProductionHandlers(runtime: UltimateRuntime): Record<string, StepHandler> {
   return {

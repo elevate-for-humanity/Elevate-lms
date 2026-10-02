@@ -15,6 +15,8 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
     const assetText = [
       asset.title,
       asset.relevance_reason,
+      asset.lesson_match_query,
+      ...(Array.isArray(asset.lesson_match_reasons) ? asset.lesson_match_reasons : []),
       ...(Array.isArray(asset.visual_requirements) ? asset.visual_requirements : []),
     ].filter(Boolean).join(' ');
     const required = mediaMatchTerms(requirement);

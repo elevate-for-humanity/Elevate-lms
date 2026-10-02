@@ -106,6 +106,37 @@ async function buildUltimateProfile(
     ];
   }
 
+  // Hydrate the Ultimate instructional source package from curriculum already
+  // owned by this course. This gives fresh builds source-grounded material
+  // instead of forcing learning_objectives to retry with an empty source list.
+  const { data: sourceLessons, error: sourceLessonError } = await db
+    .from('course_lessons')
+    .select('id,title,learning_objectives,content')
+    .eq('course_id', input.courseId)
+    .order('order_index');
+  if (sourceLessonError) throw sourceLessonError;
+  const instructionalSources = (sourceLessons ?? [])
+    .map((lesson: any) => {
+      const objectives = Array.isArray(lesson.learning_objectives)
+        ? lesson.learning_objectives.filter(Boolean).join('; ')
+        : '';
+      const content =
+        typeof lesson.content === 'string'
+          ? lesson.content
+          : lesson.content
+            ? JSON.stringify(lesson.content)
+            : '';
+      const text = [
+        lesson.title ? `Lesson: ${lesson.title}` : '',
+        objectives ? `Learning objectives: ${objectives}` : '',
+        content ? `Authorized course content: ${content}` : '',
+      ]
+        .filter(Boolean)
+        .join('\n');
+      return text.trim() ? { id: `course-lesson:${lesson.id}`, text } : null;
+    })
+    .filter(Boolean);
+
   return {
     id: standard?.standard_key ?? `course:${input.courseId}`,
     title: input.title,
@@ -117,7 +148,8 @@ async function buildUltimateProfile(
     effectiveDate: standard?.revision_date || standard?.registration_date || undefined,
     sourceDocuments: standard
       ? ['DOL Appendix A Work Process Schedule', 'Related Instruction Outline']
-      : [],
+      : instructionalSources.map((source: any) => source.id),
+    instructionalSources,
     socCodes: standard?.onet_soc_code ? [standard.onet_soc_code] : [],
     trainingRequirements: {
       instructionalHours: standard?.related_instruction_hours || undefined,

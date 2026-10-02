@@ -180,7 +180,7 @@ export async function recommendLicensedMediaForCourse(input: {
         if (a.stored !== b.stored) return a.stored ? -1 : 1;
         return b.score - a.score;
       })
-      .slice(0, 3);
+      .slice(0, 16);
     for (const match of ranked) {
       suggestions.push({
         course_id: input.courseId,

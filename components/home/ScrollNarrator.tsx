@@ -285,7 +285,7 @@ export function ScrollNarrator() {
   if (pathname === '/programs/bookkeeping' || !hasNarration) return null;
 
   return (
-    <div className="fixed bottom-24 left-4 z-[80] sm:bottom-6 sm:left-6">
+    <div className="fixed bottom-24 left-3 z-[80] sm:bottom-6 sm:left-6">
       <button
         type="button"
         onClick={toggle}
@@ -323,7 +323,7 @@ export function ScrollNarrator() {
       {notice && enabled ? (
         <p
           role="status"
-          className="mt-2 max-w-64 rounded-lg bg-white p-2 text-xs font-bold text-red-800 shadow-lg"
+          className="mt-2 max-w-[min(15rem,calc(100vw-5rem))] rounded-lg bg-white px-3 py-2 text-xs font-bold leading-5 text-slate-800 shadow-lg"
         >
           {notice}
         </p>

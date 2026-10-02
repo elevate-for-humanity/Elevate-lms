@@ -112,7 +112,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
     const { data, error } = await this.db
       .from('course_videos')
       .select(
-        'id,title,video_url,storage_path,status,asset_role,entitlement_id,lesson_id,licensed_media_entitlements(provider,provider_item_id,item_url,metadata)',
+        'id,title,video_url,storage_path,status,asset_role,entitlement_id,lesson_id,course_lesson_media_matches!course_video_id(match_score,match_reasons,status),licensed_media_entitlements(provider,provider_item_id,item_url,metadata)',
       )
       .eq('course_id', courseId)
       .eq('status', 'ready')
@@ -133,6 +133,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
           if (signedError) throw signedError;
           publicUrl = signed?.signedUrl ?? '';
         }
+        const match = firstRecord(asset.course_lesson_media_matches);
         return {
           ...asset,
           id: String(asset.id),
@@ -146,6 +147,13 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
           duration_seconds: metadata.duration_seconds ?? metadata.verifiedDurationSeconds ?? metadata.technicalQa?.durationSeconds,
           visual_coverage_verified: metadata.visual_coverage_verified === true,
           visual_requirements: metadata.visual_requirements,
+          lesson_match_verified:
+            ['approved', 'attached'].includes(String(match.status ?? '')) &&
+            Number(match.match_score ?? 0) > 0,
+          lesson_match_score: Number(match.match_score ?? 0),
+          relevance_reason:
+            metadata.relevance_reason ??
+            (Array.isArray(match.match_reasons) ? match.match_reasons.join('; ') : ''),
         };
       }),
     );

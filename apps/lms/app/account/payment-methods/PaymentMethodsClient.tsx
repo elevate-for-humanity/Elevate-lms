@@ -1,5 +1,6 @@
 import type { ApprenticeDashboardInvoice } from '@/lib/billing/apprentice-invoice-batch';
 import { AffirmInvoiceButton } from '@/components/payments/AffirmInvoiceButton';
+import { NonRefundableDepositNotice } from '@/components/payments/NonRefundableDepositNotice';
 
 type Schedule = {
   id: string;
@@ -46,6 +47,8 @@ export function PaymentMethodsClient({
           after you approve the agreement in PayPal.
         </p>
       </header>
+
+      <NonRefundableDepositNotice compact />
 
       <section
         className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"

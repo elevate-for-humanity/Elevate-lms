@@ -42,11 +42,10 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       // Quality findings are repair work, not a terminal queue state. Requeue
       // the durable build so the worker resumes from its persisted checkpoint
       // and selective-repair plan instead of stranding the entire course.
-      await queue.fail(
+      await queue.requeueForRepair(
         job.id,
         workerId,
         'ULTIMATE_REPAIR_REQUIRED: automatic selective repair and checkpoint resume',
-        true,
       );
       return { claimed: true, completed: false, repairQueued: true, jobId: job.id, result };
     }

@@ -120,8 +120,23 @@ export class UltimateBuildRunner {
           continue;
         }
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        failures = [{ step, severity: 'error', code: message.split(':')[0], message }];
+        const message =
+          error instanceof Error
+            ? error.message
+            : typeof error === 'string'
+              ? error
+              : (() => {
+                  try {
+                    return JSON.stringify(error);
+                  } catch {
+                    return String(error);
+                  }
+                })();
+        const code =
+          error && typeof error === 'object' && 'code' in error && typeof (error as any).code === 'string'
+            ? (error as any).code
+            : message.split(':')[0];
+        failures = [{ step, severity: 'error', code, message }];
       }
       await ctx.persistStep?.({ step, state: 'failed', artifacts, findings: failures });
       for (const finding of failures) await ctx.persistFinding?.(finding);

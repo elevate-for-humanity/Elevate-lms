@@ -112,7 +112,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
     const { data, error } = await this.db
       .from('course_videos')
       .select(
-        'id,title,video_url,storage_path,status,asset_role,entitlement_id,lesson_id,course_lesson_media_matches!course_video_id(match_score,match_reasons,status),licensed_media_entitlements(provider,provider_item_id,item_url,metadata)',
+        'id,title,video_url,storage_path,status,asset_role,entitlement_id,lesson_id,course_lesson_media_matches!course_video_id(match_score,match_reasons,search_query,status),licensed_media_entitlements(provider,provider_item_id,item_url,metadata)',
       )
       .eq('course_id', courseId)
       .eq('status', 'ready')
@@ -151,6 +151,8 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
             ['approved', 'attached'].includes(String(match.status ?? '')) &&
             Number(match.match_score ?? 0) > 0,
           lesson_match_score: Number(match.match_score ?? 0),
+          lesson_match_query: String(match.search_query ?? ''),
+          lesson_match_reasons: Array.isArray(match.match_reasons) ? match.match_reasons : [],
           relevance_reason:
             metadata.relevance_reason ??
             (Array.isArray(match.match_reasons) ? match.match_reasons.join('; ') : ''),

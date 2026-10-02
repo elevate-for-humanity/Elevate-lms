@@ -26,7 +26,8 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
     const workspaceAssetUrl = String(metadata.assetUrl ?? metadata.asset_url ?? '').trim();
     const workspaceLicensed =
       metadata.licenseObserved === true ||
-      String(metadata.licenseVerificationStatus ?? '').startsWith('license_observed');
+      String(metadata.licenseVerificationStatus ?? '').startsWith('license_observed') ||
+      String(metadata.licenseVerificationStatus ?? '') === 'verified_item_detail_banner';
     let acquired: any;
     if (workspaceAssetUrl && workspaceLicensed) {
       const response = await fetch(workspaceAssetUrl, { signal: AbortSignal.timeout(60000) });
@@ -45,17 +46,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
         },
       };
     } else {
-      // Envato Market buyer/download requires a real marketplace item id.
-      // Internal workspace UUIDs must never be sent to that endpoint.
-      if (!/^\\d+$/.test(itemId))
-        throw new Error('ULTIMATE_ENVATO_MARKET_ITEM_ID_REQUIRED');
-      acquired = await this.envato.acquire({
-        id: itemId,
-        url: String(entitlement.item_url ?? ''),
-        source: 'envato',
-        licenseVerified: false,
-        matchScore: Number(match.match_score ?? 1),
-      });
+      throw new Error('ULTIMATE_ENVATO_WORKSPACE_ASSET_REQUIRED');
     }
     const bytes = acquired?.download?.bytes;
     if (!(bytes instanceof Uint8Array) || !bytes.byteLength) throw new Error('ULTIMATE_ENVATO_DOWNLOAD_EMPTY');
@@ -204,8 +195,8 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       const metadata = firstRecord(entitlement.metadata);
       const stored = Boolean(storedLicensedMediaMetadata(metadata));
       const retrievableWorkspaceAsset =
-        typeof metadata.assetUrl === 'string' &&
-        metadata.assetUrl.trim().startsWith('https://') &&
+        (typeof metadata.assetUrl === 'string' || typeof metadata.asset_url === 'string') &&
+        String(metadata.assetUrl ?? metadata.asset_url).trim().startsWith('https://') &&
         (metadata.licenseObserved === true ||
           String(metadata.licenseVerificationStatus ?? '').startsWith('license_observed') ||
           String(metadata.licenseVerificationStatus ?? '') === 'verified_item_detail_banner');

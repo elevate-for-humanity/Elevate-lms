@@ -294,7 +294,10 @@ export async function attachStoredLicensedMedia(input: {
         course_id: input.courseId,
         lesson_id: input.lessonId,
         storage_path: stored.storage_path,
-        duration_seconds: stored.duration_seconds ?? null,
+        duration_seconds:
+          typeof stored.duration_seconds === 'number' && Number.isFinite(stored.duration_seconds)
+            ? Math.max(0, Math.round(stored.duration_seconds))
+            : null,
         generated_by: 'manual',
         asset_role: 'source_broll',
         entitlement_id: match.entitlement_id,

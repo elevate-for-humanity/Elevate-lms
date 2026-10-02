@@ -203,14 +203,16 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
           String(metadata.licenseVerificationStatus ?? '') === 'verified_item_detail_banner');
       return stored || retrievableWorkspaceAsset;
     });
-    const bestByLesson = new Map<string, RecordLike>();
+    const selectedByLesson = new Map<string, RecordLike[]>();
     for (const match of usableMatches) {
       const lessonId = String(match.lesson_id);
-      const current = bestByLesson.get(lessonId);
-      if (!current || Number(match.match_score ?? 0) > Number(current.match_score ?? 0))
-        bestByLesson.set(lessonId, match);
+      const bucket = selectedByLesson.get(lessonId) ?? [];
+      bucket.push(match);
+      bucket.sort((a, b) => Number(b.match_score ?? 0) - Number(a.match_score ?? 0));
+      selectedByLesson.set(lessonId, bucket.slice(0, 16));
     }
-    for (const match of bestByLesson.values()) {
+    const selectedMatches = [...selectedByLesson.values()].flat();
+    for (const match of selectedMatches) {
       const entitlement = firstRecord(match.licensed_media_entitlements);
       if (match.status === 'suggested') {
         const { error: approveError } = await this.db
@@ -239,7 +241,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       });
       attached += 1;
     }
-    pending = Math.max(0, usableMatches.length - attached);
+    pending = Math.max(0, selectedMatches.length - attached);
     return { attached, pending };
   }
 

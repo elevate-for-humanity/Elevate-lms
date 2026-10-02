@@ -24,13 +24,41 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
     const entitlement = firstRecord(match.licensed_media_entitlements);
     const itemId = String(entitlement.provider_item_id ?? '').trim();
     if (!itemId || String(entitlement.provider ?? 'envato') !== 'envato') return false;
-    const acquired: any = await this.envato.acquire({
-      id: itemId,
-      url: String(entitlement.item_url ?? ''),
-      source: 'envato',
-      licenseVerified: false,
-      matchScore: Number(match.match_score ?? 1),
-    });
+    const metadata = firstRecord(entitlement.metadata);
+    const workspaceAssetUrl = String(metadata.assetUrl ?? metadata.asset_url ?? '').trim();
+    const workspaceLicensed =
+      metadata.licenseObserved === true ||
+      String(metadata.licenseVerificationStatus ?? '').startsWith('license_observed');
+    let acquired: any;
+    if (workspaceAssetUrl && workspaceLicensed) {
+      const response = await fetch(workspaceAssetUrl, { signal: AbortSignal.timeout(60000) });
+      if (!response.ok) throw new Error(`ULTIMATE_ENVATO_WORKSPACE_ASSET_HTTP_${response.status}`);
+      acquired = {
+        download: {
+          bytes: new Uint8Array(await response.arrayBuffer()),
+          mimeType: response.headers.get('content-type') ?? metadata.mime_type ?? 'application/octet-stream',
+        },
+        licenseEvidence: {
+          provider: 'envato',
+          workspaceId: metadata.workspaceId ?? null,
+          licenseObservedAt: metadata.licenseObservedAt ?? null,
+          licenseTermsUrl: metadata.licenseTermsUrl ?? null,
+          source: 'authenticated-envato-workspace',
+        },
+      };
+    } else {
+      // Envato Market buyer/download requires a real marketplace item id.
+      // Internal workspace UUIDs must never be sent to that endpoint.
+      if (!/^\\d+$/.test(itemId))
+        throw new Error('ULTIMATE_ENVATO_MARKET_ITEM_ID_REQUIRED');
+      acquired = await this.envato.acquire({
+        id: itemId,
+        url: String(entitlement.item_url ?? ''),
+        source: 'envato',
+        licenseVerified: false,
+        matchScore: Number(match.match_score ?? 1),
+      });
+    }
     const bytes = acquired?.download?.bytes;
     if (!(bytes instanceof Uint8Array) || !bytes.byteLength) throw new Error('ULTIMATE_ENVATO_DOWNLOAD_EMPTY');
     const mimeType = String(acquired.download.mimeType ?? 'video/mp4');
@@ -41,7 +69,6 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       upsert: false,
     });
     if (uploadError) throw uploadError;
-    const metadata = firstRecord(entitlement.metadata);
     const { error: entitlementError } = await this.db
       .from('licensed_media_entitlements')
       .update({

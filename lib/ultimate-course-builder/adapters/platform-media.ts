@@ -193,7 +193,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
         matchId: String(match.id),
         courseId,
         lessonId: String(match.lesson_id),
-        actorId: String(course?.created_by ?? ''),
+        actorId: course?.created_by ?? null,
       });
       attached += 1;
     }

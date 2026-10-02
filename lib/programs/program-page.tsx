@@ -3,6 +3,7 @@ import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import heroBanners from '@/content/heroBanners';
 import { url } from '@/lib/utils/url-factory';
+import { NonRefundableDepositNotice } from '@/components/payments/NonRefundableDepositNotice';
 
 export function buildProgramMetadata(program: ProgramSchema): Metadata {
   return {
@@ -16,5 +17,10 @@ export function buildProgramMetadata(program: ProgramSchema): Metadata {
 
 export function ProgramMarketingPage({ program }: { program: ProgramSchema }) {
   const banner = heroBanners[program.slug] ?? null;
-  return <ProgramDetailPage program={program} banner={banner} />;
+  return (
+    <>
+      <ProgramDetailPage program={program} banner={banner} />
+      <NonRefundableDepositNotice />
+    </>
+  );
 }

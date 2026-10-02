@@ -39,13 +39,16 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       runtime.artifacts,
     );
     if (!result.completed) {
+      // Quality findings are repair work, not a terminal queue state. Requeue
+      // the durable build so the worker resumes from its persisted checkpoint
+      // and selective-repair plan instead of stranding the entire course.
       await queue.fail(
         job.id,
         workerId,
-        'ULTIMATE_BUILD_BLOCKED: inspect lesson findings before resuming',
-        false,
+        'ULTIMATE_REPAIR_REQUIRED: automatic selective repair and checkpoint resume',
+        true,
       );
-      return { claimed: true, completed: false, jobId: job.id, result };
+      return { claimed: true, completed: false, repairQueued: true, jobId: job.id, result };
     }
     await queue.complete(job.id, workerId);
     return { claimed: true, completed: true, jobId: job.id, result };
@@ -55,7 +58,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       job.id,
       workerId,
       message,
-      !/PAID_INFERENCE_AUTHORIZATION_REQUIRED|ULTIMATE_PROFILE_HAS_NO_COMPETENCIES|ULTIMATE_BUILD_BLOCKED/.test(
+      !/PAID_INFERENCE_AUTHORIZATION_REQUIRED|ULTIMATE_PROFILE_HAS_NO_COMPETENCIES|ULTIMATE_STANDARDS_SOURCE_NOT_FOUND|ULTIMATE_TARGET_COMPETENCY_NOT_FOUND/.test(
         message,
       ),
     );

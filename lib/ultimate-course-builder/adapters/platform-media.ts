@@ -7,7 +7,6 @@ import {
 } from '@/lib/media/licensed-course-media';
 
 import { buildSceneAssignments } from '../instructional/scene-assignments';
-import { UltimateEnvatoMarketClient } from './envato-client';
 
 type RecordLike = Record<string, any>;
 
@@ -17,7 +16,6 @@ function firstRecord(value: unknown): RecordLike {
 }
 
 export class UltimatePlatformMedia implements UltimateMediaPort {
-  private envato = new UltimateEnvatoMarketClient();
   constructor(private db: SupabaseClient) {}
 
   private async acquireApprovedEnvatoMatch(match: RecordLike) {
@@ -94,85 +92,6 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       throw entitlementError;
     }
     return true;
-  }
-
-  private sceneRequirement(scene: any, competency: any) {
-    const requirement = String(scene?.visualRequirement ?? scene?.teachingPoint ?? '').trim();
-    const words = requirement.split(/\s+/).filter(Boolean);
-    return {
-      cueId: String(scene?.id ?? crypto.randomUUID()),
-      objectiveId: String(scene?.objectiveIds?.[0] ?? competency?.id ?? 'objective'),
-      narration: String(scene?.dialogue ?? scene?.teachingPoint ?? ''),
-      action: words.slice(0, 4).join(' ') || 'demonstrate',
-      subject: String(competency?.title ?? words.slice(0, 8).join(' ') ?? 'instruction'),
-      shot: scene?.sceneType === 'mental_model' || scene?.sceneType === 'system_diagram' ? 'diagram' : 'medium',
-      evidence: requirement || String(scene?.teachingPoint ?? ''),
-    } as any;
-  }
-
-  private async acquireSceneAssets(input: any) {
-    const scenes = input.storyboard?.storyboard?.scenes ?? [];
-    const acquired: any[] = [];
-    const used = new Set<string>();
-    for (const scene of scenes) {
-      const requirement = this.sceneRequirement(scene, input.competency);
-      const candidates = await this.envato.search(requirement);
-      const candidate = candidates.find((item: any) => !used.has(item.id) && item.matchScore >= 0.35);
-      if (!candidate) continue;
-      used.add(candidate.id);
-      const media: any = await this.envato.acquire(candidate);
-      const bytes = media?.download?.bytes;
-      if (!(bytes instanceof Uint8Array) || !bytes.byteLength) continue;
-      const mimeType = String(media.download.mimeType ?? 'video/mp4');
-      const extension = mimeType.includes('quicktime') ? 'mov' : mimeType.includes('webm') ? 'webm' : 'mp4';
-      const storagePath = `licensed-library/envato/${candidate.id}/${crypto.randomUUID()}.${extension}`;
-      const { error: uploadError } = await this.db.storage.from('course_videos').upload(storagePath, bytes, {
-        contentType: mimeType,
-        upsert: false,
-      });
-      if (uploadError) throw uploadError;
-      const { data: entitlement, error: entitlementError } = await this.db
-        .from('licensed_media_entitlements')
-        .upsert({
-          provider: 'envato',
-          provider_item_id: candidate.id,
-          item_url: candidate.url,
-          title: `${input.competency?.title ?? 'Course'} — ${scene.title ?? scene.id}`,
-          license_type: 'envato',
-          metadata: {
-            storage_bucket: 'course_videos',
-            storage_path: storagePath,
-            mime_type: mimeType,
-            file_size: bytes.byteLength,
-            source_url: candidate.url,
-            license_evidence_url: candidate.url,
-            acquisition: media.licenseEvidence,
-            scene_id: scene.id,
-            relevance_reason: `Envato search matched storyboard requirement: ${scene.visualRequirement}`,
-            visual_coverage_verified: true,
-            visual_requirements: [scene.visualRequirement],
-          },
-        }, { onConflict: 'provider,provider_item_id' })
-        .select('id')
-        .single();
-      if (entitlementError) throw entitlementError;
-      const { data: video, error: videoError } = await this.db
-        .from('course_videos')
-        .insert({
-          title: `${input.competency?.title ?? 'Course'} scene visual`,
-          course_id: input.courseId,
-          lesson_id: input.competency?.id,
-          storage_path: storagePath,
-          status: 'ready',
-          asset_role: 'source_broll',
-          entitlement_id: entitlement.id,
-        })
-        .select('id')
-        .single();
-      if (videoError) throw videoError;
-      acquired.push({ sceneId: scene.id, assetId: video.id });
-    }
-    return acquired;
   }
 
   async find(input: any): Promise<UltimateMediaDiscoveryResult> {
@@ -258,12 +177,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
   }
 
   async acquire(input: any) {
-    const scenes = input?.storyboard?.storyboard?.scenes ?? [];
-    if (scenes.length) {
-      const sceneAssets = await this.acquireSceneAssets(input);
-      if (sceneAssets.length) return { attached: sceneAssets.length, pending: Math.max(0, scenes.length - sceneAssets.length) };
-    }
-    const courseId = String(input?.courseId ?? input?.artifacts?.courseId ?? '').trim();
+    // Active Ultimate media uses only the authenticated licensed workspace/library.\n    const courseId = String(input?.courseId ?? input?.artifacts?.courseId ?? '').trim();
     if (!courseId) return { attached: 0, pending: 0 };
 
     const { data: course, error: courseError } = await this.db

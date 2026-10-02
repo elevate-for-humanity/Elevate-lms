@@ -330,10 +330,26 @@ jobs:
           done
           test "$missing_ready" = "true"
 
-          curl -fsS --max-time 20 https://www.elevateforhumanity.org/legal/student-handbook -o /tmp/student-handbook.html
+          fetch_public_page() {
+            label="$1"
+            url="$2"
+            output="$3"
+            for attempt in $(seq 1 6); do
+              status=$(curl -sS --max-time 30 -A 'Mozilla/5.0 ElevateDeploy/1.0' -H 'Accept: text/html,application/xhtml+xml' -o "$output" -w '%{http_code}' "$url" || true)
+              echo "$label attempt ${attempt}/6: status=${status:-request-failed}"
+              if [ "$status" = "200" ]; then
+                return 0
+              fi
+              sleep 5
+            done
+            echo "::error::$label remained unavailable after deployment convergence window"
+            return 1
+          }
+
+          fetch_public_page student-handbook https://www.elevateforhumanity.org/legal/student-handbook /tmp/student-handbook.html
           ! grep -q 'Indianapolis, IN 46220, Indianapolis, IN 46220' /tmp/student-handbook.html
 
-          curl -fsS --max-time 30 https://www.elevateforhumanity.org/programs/cdl-training -o /tmp/cdl-page.html
+          fetch_public_page cdl-page https://www.elevateforhumanity.org/programs/cdl-training /tmp/cdl-page.html
           grep -q 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cdl-hero.mp4' /tmp/cdl-page.html
           grep -q '/audio/heroes/cdl.mp3' /tmp/cdl-page.html
           # Verify the current accessible hero contract. The CDL hero intentionally
@@ -358,7 +374,7 @@ jobs:
           test "$(wc -c < /tmp/cdl-poster.webp)" -gt 1000
 
           # CNA must remain explicitly self-pay and must use claim-free, playable hero media.
-          curl -fsS --max-time 30 https://www.elevateforhumanity.org/programs/cna -o /tmp/cna-page.html
+          fetch_public_page cna-page https://www.elevateforhumanity.org/programs/cna /tmp/cna-page.html
           grep -q 'Self-Pay Program' /tmp/cna-page.html
           grep -q 'Self-Pay Available' /tmp/cna-page.html
           grep -q 'cna-hero.mp4' /tmp/cna-page.html
@@ -371,5 +387,5 @@ jobs:
           test "$(wc -c < /tmp/cna-video.bin)" -gt 0
 
           # Trial owners must be directed through password creation before PARIS.
-          curl -fsS --max-time 20 https://www.elevateforhumanity.org/auth/set-password -o /tmp/set-password.html
+          fetch_public_page set-password https://www.elevateforhumanity.org/auth/set-password /tmp/set-password.html
           grep -qi 'create.*password\|set.*password' /tmp/set-password.html

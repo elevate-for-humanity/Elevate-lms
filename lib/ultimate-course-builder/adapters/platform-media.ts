@@ -86,7 +86,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
   }
 
   async find(input: any): Promise<UltimateMediaDiscoveryResult> {
-    const courseId = input.courseId ?? input.artifacts?.courseId;
+    const courseId = String(input?.courseId ?? input?.artifacts?.courseId ?? '').trim();
     if (!courseId) {
       return {
         policy: 'licensed-first',
@@ -168,7 +168,8 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
   }
 
   async acquire(input: any) {
-    // Active Ultimate media uses only the authenticated licensed workspace/library.\n    const courseId = String(input?.courseId ?? input?.artifacts?.courseId ?? '').trim();
+    // Active Ultimate media uses only the authenticated licensed workspace/library.
+    const courseId = String(input?.courseId ?? input?.artifacts?.courseId ?? '').trim();
     if (!courseId) return { attached: 0, pending: 0 };
 
     const { data: course, error: courseError } = await this.db

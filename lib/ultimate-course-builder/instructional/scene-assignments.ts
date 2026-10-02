@@ -9,7 +9,6 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
   const assignments: any[] = [];
   const gaps: any[] = [];
   const used = new Set<string>();
-  const sceneReuseCounts = new Map<string, number>();
 
   const overlapEvidence = (scene: any, asset: any) => {
     const requirement = String(scene.visualRequirement ?? '').trim();
@@ -50,10 +49,9 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
     } else {
       for (const candidate of candidates) {
         const identity = candidate.provider_item_id ?? candidate.entitlement_id;
-        // A single source clip may support multiple short teaching stages only
-        // when the lesson has insufficient distinct licensed footage. Cap reuse
-        // at two scenes and preserve the separate scene treatment downstream.
-        if ((sceneReuseCounts.get(String(identity)) ?? 0) >= 2) continue;
+        // Every scene must use a distinct licensed source clip. Editing the same
+        // footage differently is not distinct visual evidence for another scene.
+        if (used.has(String(identity))) continue;
         if (candidate.scene_id === scene.id && candidate.relevance_reason) {
           asset = candidate;
           reason = candidate.relevance_reason;
@@ -93,7 +91,7 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
     }
 
     const identity = asset?.provider_item_id ?? asset?.entitlement_id;
-    if (!asset || !reason?.trim() || (sceneReuseCounts.get(String(identity)) ?? 0) >= 2) {
+    if (!asset || !reason?.trim() || used.has(String(identity))) {
       gaps.push({
         sceneId: scene.id,
         visualRequirement: scene.visualRequirement,
@@ -104,8 +102,7 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
       });
       continue;
     }
-    used.add(identity);
-    sceneReuseCounts.set(String(identity), (sceneReuseCounts.get(String(identity)) ?? 0) + 1);
+    used.add(String(identity));
     assignments.push({
       sceneId: scene.id,
       assetId: asset.id,
@@ -115,9 +112,7 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
         ? 'lesson-scoped'
         : asset.visual_coverage_verified === true
           ? 'verified-coverage'
-          : (sceneReuseCounts.get(String(identity)) ?? 0) > 1
-            ? 'verified-lesson-semantic-overlap-bounded-reuse'
-            : 'verified-lesson-semantic-overlap',
+          : 'verified-lesson-semantic-overlap',
     });
   }
   return { assignments, gaps };

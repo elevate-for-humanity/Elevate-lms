@@ -22,10 +22,14 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
     const required = mediaMatchTerms(requirement);
     const available = new Set(mediaMatchTerms(assetText));
     const overlap = required.filter((term) => available.has(term));
+    const lessonTopic = mediaMatchTerms(String(scene.lessonTitle ?? scene.topic ?? requirement))
+      .filter((term) => !['show','relevant','non','looping','instructional','visual','during'].includes(term));
+    const topicOverlap = lessonTopic.filter((term) => available.has(term));
+    const evidence = [...new Set([...overlap, ...topicOverlap])];
     return {
-      overlap,
-      reason: overlap.length
-        ? `Licensed lesson match shares scene terms: ${overlap.join(', ')}`
+      overlap: evidence,
+      reason: evidence.length
+        ? `Licensed lesson match shares instructional terms: ${evidence.join(', ')}`
         : '',
     };
   };

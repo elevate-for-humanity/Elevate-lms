@@ -87,7 +87,7 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
         ), 'SCRIPT_SEGMENTS_REQUIRED');
       break;
     case 'storyboard':
-      require(a.storyboard?.scenes?.length >= 6 &&
+      require(a.storyboard?.scenes?.length === 13 &&
         a.storyboard.scenes.every(
           (s: any) =>
             nonempty(s.id) &&
@@ -97,16 +97,25 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
             populated(s.objectiveIds),
         ), 'STORYBOARD_SCRIPT_MAPPING_REQUIRED');
       break;
-    case 'visual_assignment':
-      require(populated(a.media?.assignments) &&
-        a.media.assignments.every(
+    case 'visual_assignment': {
+      const assignments = Array.isArray(a.media?.assignments) ? a.media.assignments : [];
+      require(assignments.length === 13 &&
+        new Set(assignments.map((s: any) => s.sceneId)).size === 13 &&
+        assignments.every(
           (s: any) =>
             nonempty(s.sceneId) &&
             nonempty(s.assetId) &&
             nonempty(s.licenseEvidenceUrl) &&
             nonempty(s.relevanceReason),
-        ), 'VISUAL_LICENSE_RELEVANCE_REQUIRED');
+        ), 'VISUAL_13_SCENE_LICENSE_RELEVANCE_REQUIRED');
+      const reuse = new Map<string, number>();
+      for (const assignment of assignments) {
+        const id = String(assignment.assetId ?? '');
+        reuse.set(id, (reuse.get(id) ?? 0) + 1);
+      }
+      require([...reuse.values()].every((count) => count <= 2), 'VISUAL_PROHIBITED_REPETITION');
       break;
+    }
     case 'scene_construction':
       require(populated(a.scenes?.shots) &&
         a.scenes.shots.every(

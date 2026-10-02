@@ -1,6 +1,4 @@
-LMS production deployment trigger
-Date: 2026-10-01
-Reason: deploy repository recovery audit, restored LMS-native workflows, and retained recovered templates
-Target: main
-2026-10-01 deploy approvals Hair Stylist RAPIDS correction
-2026-10-01 explicit production deploy approvals and beauty apprenticeship standards
+LMS deployment trigger
+Target: current main
+Reason: deploy Ultimate Course Builder deterministic non-LLM path
+Timestamp marker: 2026-10-02T04:50:00-04:00

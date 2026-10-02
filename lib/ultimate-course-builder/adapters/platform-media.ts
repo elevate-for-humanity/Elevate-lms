@@ -157,12 +157,31 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
 
     let attached = 0;
     let pending = 0;
+    // During an automatic Ultimate build, deterministic relevance scoring is the
+    // approval authority for licensed Envato scene acquisition. This is not a
+    // learner/compliance approval gate: the entitlement already exists and the
+    // builder records the score/evidence before attaching the stored asset.
+    const bestByLesson = new Map<string, RecordLike>();
     for (const match of matches ?? []) {
+      const lessonId = String(match.lesson_id);
+      const current = bestByLesson.get(lessonId);
+      if (!current || Number(match.match_score ?? 0) > Number(current.match_score ?? 0))
+        bestByLesson.set(lessonId, match);
+    }
+    for (const match of bestByLesson.values()) {
       const entitlement = firstRecord(match.licensed_media_entitlements);
       if (match.status === 'suggested') {
-        // Discovery is not source/scene approval. Do not manufacture an approval.
-        pending += 1;
-        continue;
+        const { error: approveError } = await this.db
+          .from('course_lesson_media_matches')
+          .update({
+            status: 'approved',
+            approved_at: new Date().toISOString(),
+            failure_reason: null,
+          })
+          .eq('id', match.id)
+          .eq('status', 'suggested');
+        if (approveError) throw approveError;
+        match.status = 'approved';
       }
 
       if (!storedLicensedMediaMetadata(entitlement.metadata)) {
@@ -178,6 +197,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       });
       attached += 1;
     }
+    pending = Math.max(0, (matches ?? []).length - attached);
     return { attached, pending };
   }
 

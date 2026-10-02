@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from './types';
 
 /** Changing this version invalidates every checkpoint and release certificate. */
-export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-01.1';
+export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-02.2';
 export const MAX_TARGETED_REPAIRS = 8;
 type Artifact = Record<string, any>;
 export function contractHash(value: unknown): string {

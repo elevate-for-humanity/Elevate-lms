@@ -462,12 +462,16 @@ test.describe('Studio readable sign-in and composer', () => {
     await page.goto(`${ADMIN_BASE}/studio/browser`);
     await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
     await page.getByLabel('Browser URL').fill('https://app.envato.com');
+    await expect(page.getByRole('button', { name: 'Start Chromium', exact: true })).toBeEnabled({ timeout: 30_000 });
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
     const stream = page.getByAltText('Live isolated Chromium browser');
+    try {
     await expect(stream).toBeVisible({ timeout: 30_000 });
     await expect.poll(() => stream.evaluate(el => (el as HTMLImageElement).naturalWidth), { timeout: 30_000 }).toBeGreaterThan(0);
+    const initialWidth = await stream.evaluate(el => el.getBoundingClientRect().width);
     await page.getByRole('button', { name: 'Zoom browser in' }).click();
     await expect(page.getByLabel('Browser zoom')).toHaveText('150%');
+    await expect.poll(() => stream.evaluate(el => el.getBoundingClientRect().width)).toBeGreaterThan(initialWidth);
     const viewport = stream.locator('..');
     const overflow = await viewport.evaluate(el => ({
       height: el.scrollHeight, available: el.clientHeight, width: el.scrollWidth, availableWidth: el.clientWidth,
@@ -477,6 +481,7 @@ test.describe('Studio readable sign-in and composer', () => {
     await page.mouse.wheel(0, 300);
     await expect.poll(() => viewport.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
     await page.getByRole('button', { name: 'Zoom browser out' }).click();
+    await expect.poll(() => stream.evaluate(el => el.getBoundingClientRect().width)).toBeLessThanOrEqual(480);
     if ((page.viewportSize()?.width || 1280) < 1024)
       await page.getByRole('button', { name: 'Sign-in & tools' }).click();
     const input = page.getByLabel('Secure browser input');
@@ -491,7 +496,13 @@ test.describe('Studio readable sign-in and composer', () => {
     expect(geometry.width).toBeGreaterThanOrEqual(250);
     expect(geometry.right).toBeLessThanOrEqual(geometry.viewport);
     await page.screenshot({ path: testInfo.outputPath('studio-readable-sign-in.png') });
-    await page.getByRole('button', { name: 'Browser controls', exact: true }).click();
-    await page.getByTitle('Stop', { exact: true }).click();
+    } finally {
+      // A failed assertion must not leave an isolated Chromium session running.
+      const controls = page.getByRole('button', { name: 'Browser controls', exact: true });
+      if (await controls.isVisible() && await controls.getAttribute('aria-expanded') === 'false')
+        await controls.click();
+      const stop = page.getByTitle('Stop', { exact: true });
+      if (await stop.isVisible() && await stop.isEnabled()) await stop.click();
+    }
   });
 });

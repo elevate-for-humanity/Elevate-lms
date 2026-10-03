@@ -248,7 +248,7 @@ function ConversationActivity({ conversationId }: { conversationId: string | nul
                   </button>
                 ) : null}
               </div>
-              {task.approval_reason ? (
+              {waiting && task.approval_reason ? (
                 <p className="mt-2 text-xs text-amber-800">{task.approval_reason}</p>
               ) : null}
               {task.error_message ? (
@@ -299,7 +299,7 @@ function CourseBuildRuns() {
     <div className="shrink-0 border-b border-gray-200 bg-gray-50 px-4 py-3" aria-live="polite">
       <div className="mx-auto max-w-4xl space-y-2">
         <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">
-          Course Builder runs
+          Earlier course runs
         </p>
         {jobs.slice(0, 3).map((job) => {
           const progress = Math.max(0, Math.min(100, job.progress ?? 0));

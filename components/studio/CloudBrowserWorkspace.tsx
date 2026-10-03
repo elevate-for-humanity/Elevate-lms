@@ -86,6 +86,9 @@ export default function CloudBrowserWorkspace({
   const imageRef = useRef<HTMLImageElement>(null);
   const secureInputRef = useRef<HTMLInputElement>(null);
   const targetEditedRef = useRef(Boolean(initialTarget));
+  const targetDraftRef = useRef<string | null>(null);
+  const navigationRevisionRef = useRef(0);
+  const navigatingRef = useRef(false);
   const autoStartedRef = useRef(false);
   const autoRunCommandRef = useRef('');
 
@@ -96,6 +99,8 @@ export default function CloudBrowserWorkspace({
     const requestedTarget = initialTarget.trim();
     if (!requestedTarget) return;
     targetEditedRef.current = true;
+    targetDraftRef.current = requestedTarget;
+    navigationRevisionRef.current += 1;
     autoStartedRef.current = false;
     setTarget(requestedTarget);
   }, [initialTarget]);
@@ -184,6 +189,7 @@ export default function CloudBrowserWorkspace({
   }, []);
 
   async function start() {
+    const startingTarget = target;
     setError('');
     setStatus('Starting isolated Chromium…');
     const response = await fetch('/api/admin/dev-studio/browser/session', {
@@ -211,6 +217,10 @@ export default function CloudBrowserWorkspace({
       return;
     }
     setStatus('Connected');
+    if (targetDraftRef.current === null || targetDraftRef.current === startingTarget) {
+      targetDraftRef.current = null;
+      if (payload.url) setTarget(payload.url);
+    }
   }
 
   useEffect(() => {
@@ -235,14 +245,26 @@ export default function CloudBrowserWorkspace({
 
   async function action(payload: Record<string, unknown>) {
     if (!session) return;
-    const response = await fetch(`${endpoint}/actions`, {
-      method: 'POST',
-      headers: { ...authHeaders, 'content-type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const body = await response.json().catch(() => ({}));
-    if (!response.ok) setError(body.error || 'Browser action failed');
-    else if (body.url) setTarget(body.url);
+    const navigation = payload.type === 'navigate';
+    const revision = navigation ? ++navigationRevisionRef.current : navigationRevisionRef.current;
+    if (navigation) navigatingRef.current = true;
+    try {
+      const response = await fetch(`${endpoint}/actions`, {
+        method: 'POST',
+        headers: { ...authHeaders, 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) setError(body.error || 'Browser action failed');
+      else if (navigationRevisionRef.current === revision) {
+        if (navigation) targetDraftRef.current = null;
+        if (body.url && targetDraftRef.current === null) setTarget(body.url);
+      }
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Browser action failed');
+    } finally {
+      if (navigation && navigationRevisionRef.current === revision) navigatingRef.current = false;
+    }
   }
 
   async function storeLicensedDownload(download: StudioDownload) {
@@ -469,11 +491,18 @@ export default function CloudBrowserWorkspace({
     const headers = { Authorization: `Bearer ${session.token}` };
     const timer = window.setInterval(
       async () => {
+        const revision = navigationRevisionRef.current;
         const response = await fetch(`${endpoint}/events`, { headers }).catch(() => null);
         if (response?.ok) {
           const payload = await response.json();
           setEvents(payload.events || []);
-          if (payload.url) setTarget(payload.url);
+          if (
+            payload.url &&
+            targetDraftRef.current === null &&
+            !navigatingRef.current &&
+            revision === navigationRevisionRef.current
+          )
+            setTarget(payload.url);
         }
         const downloadsResponse = await fetch(`${endpoint}/downloads`, { headers }).catch(
           () => null,
@@ -509,6 +538,9 @@ export default function CloudBrowserWorkspace({
           value={target}
           onChange={(event) => {
             targetEditedRef.current = true;
+            targetDraftRef.current = event.target.value;
+            navigationRevisionRef.current += 1;
+            navigatingRef.current = false;
             setTarget(event.target.value);
           }}
           className="min-w-[260px] flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs"

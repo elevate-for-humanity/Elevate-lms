@@ -541,17 +541,8 @@ export default function CloudBrowserWorkspace({
     return () => window.clearInterval(timer);
   }, [agentRunning, endpoint, session]);
 
-  useEffect(() => {
-    if (!session) return;
-    const token = session.token;
-    return () => {
-      void fetch(endpoint, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-        keepalive: true,
-      });
-    };
-  }, [endpoint, session]);
+  // Page navigation detaches the view, not the shared provider session.
+  // Explicit Stop and the worker TTL own session cleanup.
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-slate-950 text-white">

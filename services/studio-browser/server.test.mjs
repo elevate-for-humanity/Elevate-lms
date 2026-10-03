@@ -122,6 +122,18 @@ test('does not reuse stale Envato 401 events after authentication succeeds', () 
   );
 });
 
+test('pauses signed-out Envato snapshots before planning or DOM evaluation', async () => {
+  const session = {
+    target: 'https://app.envato.com/',
+    events: [{ type: 'response', status: 401, at: new Date().toISOString(), url: 'https://account.envato.com/api/public/refresh_id_token' }],
+    page: {
+      url: () => 'https://app.envato.com/',
+      evaluate: () => { throw new Error('must not evaluate an unauthenticated page'); },
+    },
+  };
+  await assert.rejects(() => snapshotPage(session), error => error.code === 'authentication_required' && error.status === 409);
+});
+
 test('returns the compact actionable page snapshot', async () => {
   const expected = {
     title: 'Elevate',

@@ -13,6 +13,8 @@ COPY lib/industry ./lib/industry
 COPY lib/onet/soc-map.ts lib/onet/client.ts ./lib/onet/
 COPY lib/apprenticeship/registered-program-contract.ts ./lib/apprenticeship/registered-program-contract.ts
 COPY lib/compliance/appendix-a-standards.ts ./lib/compliance/appendix-a-standards.ts
+COPY lib/curriculum/blueprints/types.ts ./lib/curriculum/blueprints/types.ts
+COPY lib/curriculum/blueprints/barber ./lib/curriculum/blueprints/barber
 COPY lib/supabase/admin.ts lib/supabase/timed-fetch.ts ./lib/supabase/
 COPY tsconfig.ultimate-worker.json ./tsconfig.json
 COPY lib/media/licensed-course-media.ts ./lib/media/licensed-course-media.ts

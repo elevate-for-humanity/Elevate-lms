@@ -3,13 +3,10 @@ import { withAuth } from '@/lib/with-auth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { toErrorMessage } from '@/lib/safe';
-import { hydrateProcessEnv } from '@/lib/secrets';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import {
   attachStoredLicensedMedia,
   recommendLicensedMediaForCourse,
-  syncLicensedPurchases,
-  type LicensedPurchase,
 } from '@/lib/course-builder/licensed-media';
 import { queueCourseMedia } from '@/lib/course-builder/orchestrator';
 import { upsertEnvatoWorkspaceManifest, type EnvatoWorkspaceManifestItem } from '@/lib/course-builder/envato-workspace';
@@ -18,80 +15,19 @@ import { resumeMediaDependency } from '@/lib/ultimate-course-builder/worker/resu
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ENVATO_API = 'https://api.envato.com';
-const MAX_RESULTS = 100;
-
-function safeText(value: unknown) {
-  return typeof value === 'string' ? value : '';
-}
-
-function normalizePurchase(value: unknown): LicensedPurchase {
-  const row = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  const item =
-    row.item && typeof row.item === 'object' ? (row.item as Record<string, unknown>) : {};
-  return {
-    itemId: String(item.id ?? ''),
-    title: safeText(item.name) || safeText(item.title) || 'Purchased item',
-    url: safeText(item.url),
-    thumbnail: safeText(item.thumbnail_url) || safeText(item.previews),
-    site: safeText(item.site),
-    purchaseCode: safeText(row.code) || safeText(row.purchase_code),
-    purchasedAt: safeText(row.sold_at) || safeText(row.purchase_date),
-    supportedUntil: safeText(row.supported_until),
-  };
-}
-
-async function envatoGet(path: string, params?: URLSearchParams) {
-  await hydrateProcessEnv();
-  const token = process.env.ENVATO_API_TOKEN?.trim();
-  if (!token)
-    throw Object.assign(new Error('ENVATO_API_TOKEN is not configured in Studio Secrets'), {
-      status: 503,
-    });
-  const url = new URL(path, ENVATO_API);
-  params?.forEach((value, key) => url.searchParams.set(key, value));
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/json',
-      'User-Agent': 'Elevate Course Builder/2.0',
-    },
-    cache: 'no-store',
-    signal: AbortSignal.timeout(20_000),
-  });
-  const payload = (await response.json().catch(() => ({}))) as Record<string, unknown>;
-  if (!response.ok) {
-    const retryAfter = response.headers.get('retry-after');
-    const detail = String(
-      payload.error_description ?? payload.error ?? `Envato returned HTTP ${response.status}`,
-    );
-    throw Object.assign(
-      new Error(
-        response.status === 429 && retryAfter
-          ? `${detail}. Try again in ${retryAfter} seconds.`
-          : detail,
-      ),
-      { status: response.status },
-    );
-  }
-  return payload;
-}
-
-async function listPurchases() {
-  const payload = await envatoGet(
-    '/v3/market/buyer/list-purchases',
-    new URLSearchParams({
-      page: '1',
-      page_size: String(MAX_RESULTS),
-    }),
-  );
-  const rows = Array.isArray(payload.results) ? payload.results : [];
-  return rows.map(normalizePurchase).filter((purchase) => purchase.itemId);
-}
-
-async function marketAccount() {
-  const payload = await envatoGet('/v1/market/private/user/username.json');
-  return safeText(payload.username);
+// Unlimited subscription media is acquired through the existing authenticated
+// Studio browser and stored licensed library. Market tokens prove neither
+// subscription access nor a license for a subscription item.
+const SUBSCRIPTION_BROWSER_URL = '/studio/browser?provider=envato&signin=1';
+function marketDisabledResponse() {
+  return NextResponse.json({
+    connected: false,
+    provider: 'Envato subscription',
+    accessModel: 'subscription-licensed-library',
+    marketEnabled: false,
+    error: 'ENVATO_MARKET_DISABLED_USE_SUBSCRIPTION_WORKSPACE',
+    browserUrl: SUBSCRIPTION_BROWSER_URL,
+  }, { status: 410 });
 }
 
 async function courseOrg(db: Awaited<ReturnType<typeof requireAdminClient>>, courseId: string) {
@@ -121,23 +57,17 @@ const _GET = withAuth(
       const action = request.nextUrl.searchParams.get('action') || 'status';
       const courseId = request.nextUrl.searchParams.get('courseId')?.trim() || '';
       if (action === 'status') {
-        const username = await marketAccount();
         return NextResponse.json({
-          connected: true,
-          username,
-          provider: 'Envato Market',
+          connected: false,
+          provider: 'Envato subscription',
+          accessModel: 'subscription-licensed-library',
+          marketEnabled: false,
+          subscriptionVerified: false,
+          connectionStatus: 'browser_session_verification_required',
+          browserUrl: SUBSCRIPTION_BROWSER_URL,
         });
       }
-      if (action === 'purchases') {
-        const [purchases, username] = await Promise.all([listPurchases(), marketAccount()]);
-        return NextResponse.json({
-          connected: true,
-          provider: 'Envato Market',
-          username,
-          purchases,
-          count: purchases.length,
-        });
-      }
+      if (action === 'purchases' || action === 'download') return marketDisabledResponse();
       if (action === 'recommendations') {
         if (!courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
         const db = await requireAdminClient();
@@ -167,26 +97,6 @@ const _GET = withAuth(
           );
         });
         return NextResponse.json({ connected: true, assets });
-      }
-      if (action === 'download') {
-        const itemId = request.nextUrl.searchParams.get('itemId')?.trim() || '';
-        const purchaseCode = request.nextUrl.searchParams.get('purchaseCode')?.trim() || '';
-        if (!itemId && !purchaseCode)
-          return NextResponse.json(
-            { error: 'itemId or purchaseCode is required' },
-            { status: 400 },
-          );
-        const payload = await envatoGet(
-          '/v3/market/buyer/download',
-          new URLSearchParams(itemId ? { item_id: itemId } : { purchase_code: purchaseCode }),
-        );
-        const downloadUrl = safeText(payload.download_url);
-        if (!downloadUrl.startsWith('https://'))
-          return NextResponse.json(
-            { error: 'Envato did not return a secure download URL' },
-            { status: 502 },
-          );
-        return NextResponse.json({ downloadUrl });
       }
       return NextResponse.json({ error: 'Unsupported action' }, { status: 400 });
     } catch (error) {
@@ -226,30 +136,7 @@ const _POST = withAuth(
         });
         return NextResponse.json({ ok: true, manifest });
       }
-      if (input.action === 'sync') {
-        if (!input.courseId)
-          return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
-        const orgId = await courseOrg(db, input.courseId);
-        const [purchases, username] = await Promise.all([listPurchases(), marketAccount()]);
-        const entitlements = await syncLicensedPurchases({
-          db,
-          purchases,
-          actorId: user.id,
-          orgId,
-        });
-        const recommendations = await recommendLicensedMediaForCourse({
-          db,
-          courseId: input.courseId,
-        });
-        return NextResponse.json({
-          ok: true,
-          provider: 'Envato Market',
-          username,
-          purchases,
-          entitlements: entitlements.length,
-          recommendations,
-        });
-      }
+      if (input.action === 'sync') return marketDisabledResponse();
       if (input.action === 'recommend') {
         if (!input.courseId)
           return NextResponse.json({ error: 'courseId is required' }, { status: 400 });

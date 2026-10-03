@@ -11,6 +11,7 @@ on:
       - 'scripts/northflank/connect-studio-browser-to-admin.ts'
       - 'scripts/northflank/resolve-studio-browser-secret.ts'
       - 'scripts/northflank/verify-studio-browser-link.ts'
+      - 'scripts/northflank/verify-studio-browser-foundation.ts'
       - 'scripts/northflank/connect-ultimate-learner-testing.ts'
       - 'scripts/northflank/resolve-service-url.ts'
       - '.github/workflows/deploy-studio-browser.yml'
@@ -130,3 +131,6 @@ jobs:
           done
           echo '::error::Studio Browser did not become healthy'
           exit 1
+
+      - name: Exercise actual browser input, tabs, uploads, downloads, dialogs, and history
+        run: pnpm tsx scripts/northflank/verify-studio-browser-foundation.ts

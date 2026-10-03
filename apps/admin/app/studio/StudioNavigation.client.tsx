@@ -13,7 +13,7 @@ export default function StudioNavigation() {
   // navigation. Mounting this section header above /studio frames the Studio
   // twice and removes usable height. Nested capability routes keep this
   // breadcrumb header because they do not render the command workspace.
-  if (pathname === '/studio' || embeddedInConversation) return null;
+  if (pathname === '/studio' || pathname === '/studio/browser' || embeddedInConversation) return null;
 
   return (
     <div className="border-b border-slate-200 bg-white">

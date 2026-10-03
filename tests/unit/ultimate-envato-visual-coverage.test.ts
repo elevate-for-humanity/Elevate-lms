@@ -76,6 +76,29 @@ describe('Ultimate Envato visual coverage', () => {
     expect(find).toHaveBeenCalledTimes(2);
   });
 
+  it('retries transient HTML discovery responses without invoking media acquisition', async () => {
+    const find = vi
+      .fn()
+      .mockRejectedValueOnce(
+        new SyntaxError(`Unexpected token '<', "<html>\r\n<h"... is not valid JSON`),
+      )
+      .mockResolvedValueOnce({
+        policy: 'licensed-first',
+        licensedSuggestions: [],
+        readyAssets: licensedAssets(13),
+        assignments: assignments(13),
+        storyboard: null,
+      });
+    const acquire = vi.fn();
+    const handlers = createProductionHandlers({ media: { find, acquire } } as any);
+
+    await expect(handlers.visual_assignment(context())).resolves.toMatchObject({
+      artifacts: { media: { readyAssets: expect.arrayContaining(licensedAssets(13)) } },
+    });
+    expect(find).toHaveBeenCalledTimes(2);
+    expect(acquire).not.toHaveBeenCalled();
+  });
+
   it('blocks at visual assignment before narration when fewer than thirteen shots exist', async () => {
     const handlers = createProductionHandlers({
       media: {

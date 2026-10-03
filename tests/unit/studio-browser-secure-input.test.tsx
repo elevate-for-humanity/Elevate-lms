@@ -168,3 +168,36 @@ it('binds each sign-in label to its own field when Studio mounts multiple browse
     expect(input.labels![0].control).toBe(input);
   }
 });
+
+it('zooms the existing stream without recreating the browser session', async () => {
+  const { actions } = await start();
+  const image = screen.getByAltText('Live isolated Chromium browser');
+  fireEvent.click(screen.getByRole('button', { name: 'Zoom browser in' }));
+  expect(screen.getByLabelText('Browser zoom').textContent).toBe('150%');
+  expect(image.style.width).toBe('150%');
+  expect(image.style.touchAction).toBe('pan-x pan-y pinch-zoom');
+  expect(screen.getByAltText('Live isolated Chromium browser')).toBe(image);
+  fireEvent.click(screen.getByRole('button', { name: 'Zoom browser out' }));
+  expect(screen.getByLabelText('Browser zoom').textContent).toBe('100%');
+  expect(actions).toEqual([]);
+});
+it('provides explicit website scrolling while touch panning stays local', async () => {
+  const { actions } = await start();
+  const image = screen.getByAltText('Live isolated Chromium browser');
+  const down = new Event('pointerdown', { bubbles: true });
+  Object.defineProperty(down, 'pointerType', { value: 'touch' });
+  fireEvent(image, down);
+  const viewport = image.parentElement!;
+  Object.defineProperty(viewport, 'scrollHeight', { value: 1000, configurable: true });
+  Object.defineProperty(viewport, 'clientHeight', { value: 400, configurable: true });
+  fireEvent.wheel(image, { deltaY: 200 });
+  await act(async () => {});
+  expect(actions).toEqual([]);
+  fireEvent.click(screen.getByRole('button', { name: 'Scroll website down' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Scroll website up' }));
+  await waitFor(() => expect(actions.length).toBe(2));
+  expect(actions).toEqual([
+    { type: 'scroll', deltaX: 0, deltaY: 400 },
+    { type: 'scroll', deltaX: 0, deltaY: -400 },
+  ]);
+});

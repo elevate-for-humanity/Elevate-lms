@@ -7,6 +7,7 @@ import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
 import { runWithPaidInferenceContext } from '@/lib/ai/paid-inference-context';
 import {
   browserActionRecords,
+  browserTurnRequiresAuthentication,
   browserTaskMatches,
   planBrowserTurn,
   type BrowserActionRecord,
@@ -45,12 +46,23 @@ export async function POST(req: NextRequest) {
 
   const db = await requireAdminClient();
   if (acquisitionRunId) {
-    const { data: acquisition, error: acquisitionError } = await db.from('studio_runs')
-      .select('id,command,context').eq('id', acquisitionRunId).eq('user_id', auth.id).maybeSingle();
-    if (acquisitionError) return NextResponse.json({ error: 'Media request lookup failed' }, { status: 503 });
-    if (!acquisition || acquisition.command !== command ||
-        acquisition.context?.acquisition_mode !== 'envato-workspace-batch') {
-      return NextResponse.json({ error: 'Media request does not match this owner or exact command' }, { status: 403 });
+    const { data: acquisition, error: acquisitionError } = await db
+      .from('studio_runs')
+      .select('id,command,context')
+      .eq('id', acquisitionRunId)
+      .eq('user_id', auth.id)
+      .maybeSingle();
+    if (acquisitionError)
+      return NextResponse.json({ error: 'Media request lookup failed' }, { status: 503 });
+    if (
+      !acquisition ||
+      acquisition.command !== command ||
+      acquisition.context?.acquisition_mode !== 'envato-workspace-batch'
+    ) {
+      return NextResponse.json(
+        { error: 'Media request does not match this owner or exact command' },
+        { status: 403 },
+      );
     }
   }
   const tenantId = await resolveTenantIdForUser(auth.id).catch(() => null);
@@ -65,8 +77,10 @@ export async function POST(req: NextRequest) {
       .eq('tool_name', 'browser.execute')
       .maybeSingle();
     task = data;
-    if (!browserTaskMatches(task, { command, sessionId }) ||
-        (acquisitionRunId && task?.studio_run_id !== acquisitionRunId)) {
+    if (
+      !browserTaskMatches(task, { command, sessionId }) ||
+      (acquisitionRunId && task?.studio_run_id !== acquisitionRunId)
+    ) {
       return NextResponse.json(
         { error: 'Browser task does not match this session or command' },
         { status: 403 },
@@ -170,6 +184,8 @@ export async function POST(req: NextRequest) {
             status: 'running',
             started_at: task.started_at || new Date().toISOString(),
             attempts: Number(task.attempts ?? 0) + 1,
+            completed_at: null,
+            error_message: null,
           });
           await db
             .from('ai_task_steps')
@@ -265,6 +281,51 @@ export async function POST(req: NextRequest) {
               return;
             }
             if (plan.status === 'blocked') {
+              if (browserTurnRequiresAuthentication(plan)) {
+                const reason = plan.reason || plan.summary;
+                await db
+                  .from('ai_task_steps')
+                  .update({
+                    status: 'pending',
+                    error_message: null,
+                    completed_at: null,
+                  })
+                  .eq('task_id', taskId)
+                  .eq('action_type', 'execute');
+                await updateTask({
+                  status: 'queued',
+                  completed_at: null,
+                  error_message: null,
+                  result_json: {
+                    ok: true,
+                    status: 'awaiting_authentication',
+                    authenticationRequired: true,
+                    reason,
+                    steps,
+                    history,
+                    usage: { totalTokens },
+                  },
+                  tool_output: {
+                    status: 'awaiting_authentication',
+                    authenticationRequired: true,
+                    reason,
+                    steps,
+                    provider: plan.provider,
+                    model: plan.model,
+                    usage: { totalTokens },
+                  },
+                });
+                await appendLog(
+                  'Browser workflow paused for secure authentication and can resume from its persisted checkpoint.',
+                  'warn',
+                );
+                emit({
+                  type: 'authentication_required',
+                  message: reason,
+                  steps,
+                });
+                return;
+              }
               throw new Error(`Browser workflow blocked: ${plan.reason || plan.summary}`);
             }
             const actions = plan.actions;

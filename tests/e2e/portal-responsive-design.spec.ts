@@ -440,3 +440,34 @@ test.describe('Authenticated portal responsive design certification', () => {
     '/manifest-admin.json',
   );
 });
+
+test.describe('Studio readable sign-in and composer', () => {
+  test.skip(!creds.admin[0] || !creds.admin[1], 'Disposable admin identity is required');
+  test('sign-in controls and chat text remain usable on the active device', async ({ page }, testInfo) => {
+    await login(page, ADMIN_BASE, creds.admin[0], creds.admin[1]);
+    await page.goto(`${ADMIN_BASE}/studio`);
+    const composer = page.locator('textarea').first();
+    await expect(composer).toBeVisible();
+    expect(await composer.evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(20);
+    await composer.fill('Readability test draft');
+    await page.screenshot({ path: testInfo.outputPath('studio-readable-chat.png') });
+    await composer.clear();
+    await page.goto(`${ADMIN_BASE}/studio/browser`);
+    await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    if ((page.viewportSize()?.width || 1280) < 1024)
+      await page.getByRole('button', { name: 'Sign-in & tools' }).click();
+    const input = page.getByLabel('Secure browser input');
+    await expect(input).toBeVisible();
+    const geometry = await input.evaluate(el => {
+      const rect = el.getBoundingClientRect();
+      return { font: parseFloat(getComputedStyle(el).fontSize), height: rect.height,
+        width: rect.width, right: rect.right, viewport: window.innerWidth };
+    });
+    expect(geometry.font).toBeGreaterThanOrEqual(20);
+    expect(geometry.height).toBeGreaterThanOrEqual(48);
+    expect(geometry.width).toBeGreaterThanOrEqual(250);
+    expect(geometry.right).toBeLessThanOrEqual(geometry.viewport);
+    await page.screenshot({ path: testInfo.outputPath('studio-readable-sign-in.png') });
+  });
+});

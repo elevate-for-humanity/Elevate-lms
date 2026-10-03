@@ -1362,7 +1362,7 @@ export default function UnifiedEllieChat({
                 )}
                 <div className="min-w-0 max-w-[min(100%,44rem)]">
                   <div
-                    className={`rounded-2xl px-4 py-3 text-lg leading-7 ${
+                    className={`rounded-2xl px-4 py-3 text-xl leading-8 ${
                       message.role === 'user'
                         ? 'bg-brand-blue-700 text-white shadow-sm'
                         : assistantClass
@@ -1522,7 +1522,7 @@ export default function UnifiedEllieChat({
               }}
               rows={3}
               placeholder="Tell Admin AI what you need done..."
-              className={`order-first min-h-[104px] max-h-[30dvh] w-full min-w-0 basis-full resize-none rounded-xl border px-3 py-3 text-lg leading-7 outline-none ${inputClass}`}
+              className={`order-first min-h-[104px] max-h-[30dvh] w-full min-w-0 basis-full resize-none rounded-xl border px-3 py-3 text-xl leading-8 outline-none ${inputClass}`}
             />
             <button
               type="button"

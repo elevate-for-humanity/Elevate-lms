@@ -364,7 +364,7 @@ export default function StudioCommandWorkspace({
                     setSurface('commands');
                     setSidebarOpen(false);
                   }}
-                  className="block w-full truncate rounded-lg px-2 py-2 text-left text-xs text-slate-200 hover:bg-slate-800 disabled:opacity-50"
+                  className="block w-full truncate rounded-lg px-2 py-2 text-left text-xs text-slate-700 hover:bg-slate-200 disabled:opacity-50"
                   title={conversation.title}
                 >
                   {conversation.title || 'Untitled conversation'}
@@ -410,7 +410,7 @@ export default function StudioCommandWorkspace({
             }
             aria-label="Active Studio tool"
           >
-            <header className="flex min-h-12 shrink-0 items-center gap-2 overflow-x-auto border-b border-slate-800 bg-slate-900 px-3 text-white">
+            <header className="flex min-h-12 shrink-0 items-center gap-2 overflow-x-auto border-b border-slate-200 bg-slate-50 px-3 text-slate-950">
               <span className="mr-auto shrink-0 text-xs font-black">
                 {activeWorkspace?.label ??
                   (surface === 'course' ? 'Course Builder' : 'Active run tools')}
@@ -422,7 +422,7 @@ export default function StudioCommandWorkspace({
                   setActiveCapability(null);
                   setSurface(previewUrl ? 'preview' : 'course');
                 }}
-                className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'preview' || surface === 'course' ? 'bg-cyan-500 text-slate-950' : 'text-slate-700 hover:bg-slate-800'}`}
+                className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'preview' || surface === 'course' ? 'bg-cyan-500 text-slate-950' : 'text-slate-700 hover:bg-slate-200'}`}
               >
                 <Eye className="h-4 w-4" aria-hidden="true" /> Preview
               </button>
@@ -433,14 +433,14 @@ export default function StudioCommandWorkspace({
                   setActiveCapability(null);
                   setSurface('browser');
                 }}
-                className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'browser' ? 'bg-violet-500 text-white' : 'text-slate-700 hover:bg-slate-800'}`}
+                className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'browser' ? 'bg-violet-500 text-white' : 'text-slate-700 hover:bg-slate-200'}`}
               >
                 <Globe2 className="h-4 w-4" aria-hidden="true" /> Browser
               </button>
               <button
                 type="button"
                 onClick={() => setFocusMode((value) => !value)}
-                className="inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800"
+                className="inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200"
                 aria-label={
                   focusMode ? 'Exit full screen workspace' : 'Expand workspace to full screen'
                 }
@@ -455,7 +455,7 @@ export default function StudioCommandWorkspace({
               <button
                 type="button"
                 onClick={() => setSurface('commands')}
-                className="shrink-0 rounded-md px-3 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800"
+                className="shrink-0 rounded-md px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200"
               >
                 Commands
               </button>

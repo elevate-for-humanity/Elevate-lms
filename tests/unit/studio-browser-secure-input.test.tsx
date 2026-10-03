@@ -132,3 +132,18 @@ it('switches mobile browser panels without resetting the session, stream or inpu
   expect(screen.getByRole('img', { name: 'Live isolated Chromium browser' })).toBe(image);
   expect(input.value).toBe('sample@example.com');
 });
+
+it('opens a readable sign-in view on the existing session and keeps the draft', async () => {
+  const { actions } = await start();
+  const image = screen.getByAltText('Live isolated Chromium browser');
+  const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
+  fireEvent.change(input, { target: { value: 'sample@example.com' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Sign in', exact: true }));
+  await waitFor(() => expect(actions).toContainEqual({ type: 'viewport', width: 390, height: 780 }));
+  expect(screen.getByAltText('Live isolated Chromium browser')).toBe(image);
+  expect(input.value).toBe('sample@example.com');
+  expect(screen.getByRole('button', { name: 'Sign in', exact: true }).getAttribute('aria-pressed')).toBe('true');
+  fireEvent.click(screen.getByRole('button', { name: 'Exit sign-in view' }));
+  expect(screen.getByAltText('Live isolated Chromium browser')).toBe(image);
+  expect(input.value).toBe('sample@example.com');
+});

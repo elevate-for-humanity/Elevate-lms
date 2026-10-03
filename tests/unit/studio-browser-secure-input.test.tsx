@@ -156,3 +156,15 @@ it('offers a literal @ for the general browser keyboard without relying on the p
   fireEvent.click(screen.getByRole('button', { name: 'Type', exact: true }));
   await waitFor(() => expect(actions).toContainEqual({ type: 'type', text: '@' }));
 });
+
+it('binds each sign-in label to its own field when Studio mounts multiple browser panels', async () => {
+  await start();
+  render(<Workspace initialTarget="https://app.envato.com" />);
+  const inputs = screen.getAllByLabelText('Secure browser input') as HTMLInputElement[];
+  expect(inputs).toHaveLength(2);
+  expect(inputs[0].id).not.toBe(inputs[1].id);
+  for (const input of inputs) {
+    expect(input.labels).toHaveLength(1);
+    expect(input.labels![0].control).toBe(input);
+  }
+});

@@ -12,7 +12,36 @@ import {
   runActions,
   sessionRequiresAuthentication,
   snapshotPage,
+  writeBrowserFrame,
 } from './server.mjs';
+
+test('slow viewers do not accumulate stale or partial browser frames', () => {
+  const writes=[];
+  const stream={destroyed:false,writableNeedDrain:false,writableLength:0,write:(bytes)=>{writes.push(bytes);return false;}};
+  const image=Buffer.from([0xff,0xd8,0xff,0xd9]);
+  assert.equal(writeBrowserFrame(stream,image),true);
+  assert.equal(writes.length,1);
+  assert.deepEqual(writes[0],Buffer.concat([Buffer.from('--studioframe\r\nContent-Type: image/jpeg\r\nContent-Length: 4\r\n\r\n'),image,Buffer.from('\r\n')]));
+  stream.writableNeedDrain=true;
+  for(let i=0;i<100;i++)assert.equal(writeBrowserFrame(stream,image),false);
+  assert.equal(writes.length,1);
+  stream.writableNeedDrain=false;
+  assert.equal(writeBrowserFrame(stream,image),true);
+  assert.equal(writes.length,2);
+});
+
+test('input checkpoints coalesce behind a slow save without blocking or racing it', async()=>{
+  const handlers=new Map();let saves=0,active=0,maxActive=0,release;
+  const page={on:(name,callback)=>handlers.set(name,callback)};
+  const session={page,events:[],context:{pages:()=>[page],on:()=>{}}};
+  attachBrowserTabs(session,()=>{},async()=>{saves++;active++;maxActive=Math.max(maxActive,active);if(saves===1)await new Promise(r=>{release=r});active--;});
+  const first=session.checkpointProviderState();
+  for(let i=0;i<100;i++)session.checkpointProviderState();
+  assert.equal(saves,1);
+  release();await first;
+  assert.equal(saves,2);assert.equal(maxActive,1);
+  await session.checkpointProviderState();assert.equal(saves,3);
+});
 
 test('blocks private IPv4 networks', () => {
   for (const address of ['127.0.0.1', '10.0.0.4', '172.16.1.2', '192.168.1.2', '169.254.1.1']) {

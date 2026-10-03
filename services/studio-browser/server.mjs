@@ -428,6 +428,7 @@ async function destroySession(id) {
   sessions.delete(id);
   if (session.frameTimer) clearTimeout(session.frameTimer);
   for (const stream of session.streams) stream.end();
+  await session.checkpointProviderState?.();
   await providerSessions.save(session.providerScope, session.context).catch(() => {
     console.warn('Provider session checkpoint failed');
   });
@@ -689,6 +690,8 @@ async function runBrowserFoundationTest() {
       const box = await page.locator('#text').boundingBox();
       await runActions(session, { actions: [{ type: 'pointer_click', clickCount: 1, x: box.x + 4, y: box.y + 4 }, { type: 'type', text: 'connected browser' }] });
       assert(await page.locator('#text').inputValue() === 'connected browser', 'keyboard_value_mismatch');
+      await runActions(session, { actions: [{ type: 'keypress', key: 'ControlOrMeta+A' }, { type: 'type', text: 'training@example.com' }] });
+      assert(await page.locator('#text').inputValue() === 'training@example.com', 'email_symbol_or_replacement_failed');
     });
     await check('double_click', async () => {
       const box = await page.locator('#text').boundingBox();
@@ -781,7 +784,22 @@ async function runBrowserFoundationTest() {
 export function attachBrowserTabs(session, attachPage, saveState = async () => {}) {
   session.pages = new Map();
   session.activeTabId = '';
-  let checkpoint = Promise.resolve();
+  let checkpointRequested = false;
+  let checkpoint;
+  const requestCheckpoint = () => {
+    checkpointRequested = true;
+    if (!checkpoint) {
+      checkpoint = (async () => {
+        while (checkpointRequested) {
+          checkpointRequested = false;
+          try { await saveState(); }
+          catch { session.events.push({ type: 'checkpoint_failed', at: new Date().toISOString() }); }
+        }
+      })().finally(() => { checkpoint = undefined; });
+    }
+    return checkpoint;
+  };
+  session.checkpointProviderState = requestCheckpoint;
   const attach = (page) => {
     const viewport = session.viewport || session.page?.viewportSize?.();
     if (viewport) void page.setViewportSize?.(viewport)?.catch(() => undefined);
@@ -794,12 +812,7 @@ export function attachBrowserTabs(session, attachPage, saveState = async () => {
     // OAuth cookies may arrive after the input action has returned. Persist the
     // completed document state, using the existing encrypted provider store.
     page.on('domcontentloaded', () => {
-      checkpoint = checkpoint
-        .catch(() => undefined)
-        .then(() => saveState())
-        .catch(() => {
-          session.events.push({ type: 'checkpoint_failed', at: new Date().toISOString() });
-        });
+      void requestCheckpoint();
     });
     page.on('close', () => {
       session.pages.delete(id);
@@ -1320,6 +1333,14 @@ function scheduleFrame(session, delay = frameIntervalMs) {
   session.frameTimer.unref();
 }
 
+export function writeBrowserFrame(stream, image) {
+  // Slow readers receive the newest complete frame after draining, not a backlog.
+  if (stream.destroyed || stream.writableNeedDrain || stream.writableLength > 0) return false;
+  const header = Buffer.from(`--studioframe\r\nContent-Type: image/jpeg\r\nContent-Length: ${image.length}\r\n\r\n`);
+  stream.write(Buffer.concat([header, image, Buffer.from('\r\n')]));
+  return true;
+}
+
 async function broadcastFrame(session) {
   if (session.frameInFlight || !session.streams.size || !sessions.has(session.id)) return;
   session.frameInFlight = true;
@@ -1328,18 +1349,11 @@ async function broadcastFrame(session) {
     const image = await session.page.screenshot({
       type: 'jpeg',
       quality: frameQuality,
-      animations: 'disabled',
+      animations: 'allow',
     });
-    const header = `--studioframe\r\nContent-Type: image/jpeg\r\nContent-Length: ${image.length}\r\n\r\n`;
     for (const stream of [...session.streams]) {
-      if (stream.destroyed) {
-        session.streams.delete(stream);
-        continue;
-      }
-      const headerWritable = stream.write(header);
-      const imageWritable = stream.write(image);
-      const boundaryWritable = stream.write('\r\n');
-      if (!(headerWritable && imageWritable && boundaryWritable)) session.framesDropped += 1;
+      if (stream.destroyed) { session.streams.delete(stream); continue; }
+      if (!writeBrowserFrame(stream, image)) session.framesDropped += 1;
     }
     session.framesSent += 1;
   } catch {
@@ -1355,6 +1369,8 @@ function streamFrames(req, res, session) {
   res.writeHead(200, {
     ...corsHeaders(),
     'content-type': 'multipart/x-mixed-replace; boundary=studioframe',
+    'cache-control': 'no-store',
+    'x-accel-buffering': 'no',
     connection: 'keep-alive',
   });
   session.streams.add(res);
@@ -1584,7 +1600,8 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, await receiveBrowserUpload(session, req));
     if (req.method === 'POST' && match[2] === 'actions') {
       const metrics = await runActions(session, await readBody(req));
-      await providerSessions.save(session.providerScope, session.context);
+      // Persist through the same coalesced OAuth checkpoint queue without blocking input.
+      void session.checkpointProviderState?.();
       return json(res, 200, { ok: true, url: session.page.url(), viewport: session.page.viewportSize(), ...metrics });
     }
     if (req.method === 'POST' && match[2] === 'imports')

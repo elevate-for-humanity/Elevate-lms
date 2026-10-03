@@ -106,6 +106,10 @@ export default function CloudBrowserWorkspace({
   const [approvedTaskId, setApprovedTaskId] = useState('');
   const imageRef = useRef<HTMLImageElement>(null);
   const secureInputRef = useRef<HTMLInputElement>(null);
+  const actionQueueRef = useRef<Promise<unknown>>(Promise.resolve());
+  const [secureInputKind, setSecureInputKind] = useState<'email' | 'password'>('email');
+  const [replaceSecureInput, setReplaceSecureInput] = useState(true);
+  const [sendingSecureInput, setSendingSecureInput] = useState(false);
   const targetEditedRef = useRef(Boolean(initialTarget));
   const targetDraftRef = useRef<string | null>(null);
   const navigationRevisionRef = useRef(0);
@@ -114,7 +118,9 @@ export default function CloudBrowserWorkspace({
   const autoRunCommandRef = useRef('');
 
   const endpoint = session ? `${session.publicUrl}/sessions/${session.id}` : '';
-  const authHeaders = session ? { Authorization: `Bearer ${session.token}` } : {};
+  const authHeaders: Record<string, string> = session
+    ? { Authorization: `Bearer ${session.token}` }
+    : {};
 
   useEffect(() => {
     const requestedTarget = initialTarget.trim();
@@ -320,7 +326,14 @@ export default function CloudBrowserWorkspace({
     }
   }
 
-  async function action(payload: Record<string, unknown>): Promise<boolean> {
+  function action(payload: Record<string, unknown>): Promise<boolean> {
+    // Keep clicks, text and submission in the user's order, even on a slow connection.
+    const queued = actionQueueRef.current.catch(() => undefined).then(() => performAction(payload));
+    actionQueueRef.current = queued;
+    return queued;
+  }
+
+  async function performAction(payload: Record<string, unknown>): Promise<boolean> {
     if (!session) return false;
     const navigation = payload.type === 'navigate';
     if (
@@ -557,12 +570,32 @@ export default function CloudBrowserWorkspace({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [continuationTaskId, agentRunning, session, activeTaskId]);
 
+  async function sendSecureInput() {
+    const input = secureInputRef.current;
+    const value = input?.value || '';
+    if (!input || !value || !session || sendingSecureInput) return;
+    input.value = '';
+    setSendingSecureInput(true);
+    try {
+      await action(
+        replaceSecureInput
+          ? {
+              actions: [
+                { type: 'keypress', key: 'ControlOrMeta+A' },
+                { type: 'type', text: value },
+              ],
+            }
+          : { type: 'type', text: value },
+      );
+    } finally {
+      setSendingSecureInput(false);
+    }
+  }
+
   async function submitBrowserEnter() {
-    const submitted = await action({ type: 'keypress', key: 'Enter' });
-    if (!submitted || !authenticationRequired || !activeTaskId) return;
-    setStatus('Checking authenticated session…');
-    await new Promise((resolve) => window.setTimeout(resolve, 750));
-    await runAgent(activeTaskId);
+    // Email submission is only the first login step; do not restart the agent
+    // while the administrator is still entering a password or verification code.
+    await action({ type: 'keypress', key: 'Enter' });
   }
 
   async function approveAndResume() {
@@ -1128,37 +1161,89 @@ export default function CloudBrowserWorkspace({
               securely. The value is sent directly to the active isolated browser, cleared
               immediately, and never added to the AI conversation or task evidence.
             </p>
-            <div className="flex gap-2">
+            <div className="mb-2 flex flex-wrap gap-2">
+              {(['email', 'password'] as const).map((kind) => (
+                <button
+                  key={kind}
+                  type="button"
+                  aria-pressed={secureInputKind === kind}
+                  onClick={() => {
+                    if (secureInputRef.current) secureInputRef.current.value = '';
+                    setSecureInputKind(kind);
+                    secureInputRef.current?.focus();
+                  }}
+                  className="min-h-12 rounded border border-emerald-800 px-4 text-base aria-pressed:bg-emerald-900"
+                >
+                  {kind === 'email' ? 'Email input' : 'Password input'}
+                </button>
+              ))}
+            </div>
+            <label className="mb-2 block text-base" htmlFor="studio-secure-input">
+              {secureInputKind === 'email' ? 'Email address' : 'Password'}
+            </label>
+            <div className="flex flex-wrap gap-2">
               <input
+                id="studio-secure-input"
                 ref={secureInputRef}
                 type="password"
+                inputMode={secureInputKind === 'email' ? 'email' : 'text'}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 autoComplete="off"
                 aria-label="Secure browser input"
-                disabled={!session}
-                className="min-h-12 min-w-0 flex-1 rounded border border-emerald-800 bg-slate-900 px-3 py-2 text-base"
+                disabled={!session || sendingSecureInput}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    void sendSecureInput();
+                  }
+                }}
+                className="min-h-12 w-full min-w-0 rounded border border-emerald-800 bg-slate-900 px-3 py-2 text-base"
               />
+              {secureInputKind === 'email' ? (
+                <button
+                  type="button"
+                  aria-label="Insert at sign into secure input"
+                  disabled={!session || sendingSecureInput}
+                  onClick={() => {
+                    const input = secureInputRef.current;
+                    if (!input) return;
+                    const start = input.selectionStart ?? input.value.length;
+                    const end = input.selectionEnd ?? start;
+                    input.setRangeText('@', start, end, 'end');
+                    input.focus();
+                  }}
+                  className="min-h-12 min-w-12 rounded border border-emerald-800 px-4 text-xl"
+                >
+                  @
+                </button>
+              ) : null}
               <button
                 type="button"
-                onClick={() => {
-                  const value = secureInputRef.current?.value || '';
-                  if (!value || !session) return;
-                  if (secureInputRef.current) secureInputRef.current.value = '';
-                  void action({ type: 'type', text: value });
-                }}
-                disabled={!session}
-                className="min-h-12 rounded bg-emerald-600 px-3 text-sm font-black text-white disabled:opacity-50"
+                onClick={() => void sendSecureInput()}
+                disabled={!session || sendingSecureInput}
+                className="min-h-12 rounded bg-emerald-600 px-4 text-base font-bold text-white disabled:opacity-50"
               >
-                Type securely
+                {sendingSecureInput ? 'Sending securely…' : 'Type securely'}
               </button>
               <button
                 type="button"
-                onClick={() => void submitBrowserEnter()}
-                disabled={!session}
-                className="min-h-12 rounded border border-emerald-800 px-3 text-sm text-emerald-200 disabled:opacity-50"
+                onClick={() => void action({ type: 'keypress', key: 'Enter' })}
+                disabled={!session || sendingSecureInput}
+                className="min-h-12 rounded border border-emerald-800 px-4 text-base text-emerald-200 disabled:opacity-50"
               >
                 Enter
               </button>
             </div>
+            <label className="mt-3 flex min-h-12 items-center gap-3 text-sm">
+              <input
+                type="checkbox"
+                checked={replaceSecureInput}
+                onChange={(event) => setReplaceSecureInput(event.target.checked)}
+              />
+              Replace the selected browser field
+            </label>
           </div>
           <div className="border-b border-slate-800 p-3">
             <p className="mb-2 flex items-center gap-2 text-xs font-black">

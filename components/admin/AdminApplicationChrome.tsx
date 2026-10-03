@@ -38,7 +38,7 @@ export function AdminApplicationChrome({
       >
         {children}
       </main>
-      <AdminMobileDock />
+      {!studioOwnsViewport ? <AdminMobileDock /> : null}
     </div>
   );
 }

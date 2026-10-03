@@ -626,6 +626,8 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
   const shared = providerScope && [...sessions.values()].find(s => s.providerScope === providerScope);
   if (shared) {
     shared.lastSeen = Date.now();
+    await shared.page.setViewportSize(viewport);
+    shared.target = target;
     await shared.page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30_000 });
     return shared;
   }
@@ -961,6 +963,9 @@ export async function auditPage(session) {
 
 export async function snapshotPage(session) {
   session.lastSeen = Date.now();
+  if (sessionRequiresAuthentication(session)) {
+    throw new BrowserServiceError('authentication_required', 409);
+  }
   await session.page
     .waitForLoadState('domcontentloaded', { timeout: 10_000 })
     .catch(() => undefined);

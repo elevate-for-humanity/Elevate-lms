@@ -26,7 +26,7 @@ import type { OrchestratedPlanCheckpoint } from '@/lib/devstudio/ellie-unified-h
 const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-full items-center justify-center bg-slate-950 text-sm text-slate-400">
+    <div className="flex h-full items-center justify-center bg-white text-sm text-slate-600">
       Connecting isolated browser…
     </div>
   ),
@@ -46,7 +46,7 @@ const UnifiedCourseBuilder = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-full items-center justify-center bg-slate-950 text-sm text-slate-400">
+      <div className="flex h-full items-center justify-center bg-white text-sm text-slate-600">
         Loading Course Builder…
       </div>
     ),
@@ -345,7 +345,7 @@ export default function StudioCommandWorkspace({
             onOpenWorkspace={openCapability}
           >
             <nav aria-label="Saved Studio conversations" className="mb-4 space-y-1">
-              <p className="px-2 py-2 text-xs font-semibold text-slate-300">Your conversations</p>
+              <p className="px-2 py-2 text-xs font-semibold text-slate-700">Your conversations</p>
               {historyError ? (
                 <p role="alert" className="px-2 text-xs text-amber-300">
                   {historyError}
@@ -406,7 +406,7 @@ export default function StudioCommandWorkspace({
             className={
               surface === 'commands'
                 ? 'hidden'
-                : 'flex h-full min-h-0 min-w-0 flex-col bg-slate-950'
+                : 'flex h-full min-h-0 min-w-0 flex-col bg-white'
             }
             aria-label="Active Studio tool"
           >
@@ -422,7 +422,7 @@ export default function StudioCommandWorkspace({
                   setActiveCapability(null);
                   setSurface(previewUrl ? 'preview' : 'course');
                 }}
-                className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'preview' || surface === 'course' ? 'bg-cyan-500 text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}
+                className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'preview' || surface === 'course' ? 'bg-cyan-500 text-slate-950' : 'text-slate-700 hover:bg-slate-800'}`}
               >
                 <Eye className="h-4 w-4" aria-hidden="true" /> Preview
               </button>
@@ -433,7 +433,7 @@ export default function StudioCommandWorkspace({
                   setActiveCapability(null);
                   setSurface('browser');
                 }}
-                className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'browser' ? 'bg-violet-500 text-white' : 'text-slate-300 hover:bg-slate-800'}`}
+                className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'browser' ? 'bg-violet-500 text-white' : 'text-slate-700 hover:bg-slate-800'}`}
               >
                 <Globe2 className="h-4 w-4" aria-hidden="true" /> Browser
               </button>

@@ -1,5 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { UltimateAppendixAStandardsSource } from '../credential/appendix-a-source';
+import { registeredInstructionalSources } from '../credential/registered-instructional-sources';
+import { getRegisteredProgramStandardByProfileId } from '@/lib/apprenticeship/registered-program-contract';
 import type { UltimateCredentialProfile } from './types';
 
 type CompetencyRow = {
@@ -24,6 +26,10 @@ export async function hydrateUltimateProfileSources(
   courseId: string,
   profile: UltimateCredentialProfile,
 ): Promise<UltimateCredentialProfile> {
+  const registeredContract = getRegisteredProgramStandardByProfileId(profile.id);
+  const registeredSources = registeredContract
+    ? registeredInstructionalSources(registeredContract.canonicalProgramSlug)
+    : [];
   const { data: lessons, error } = await db
     .from('course_lessons')
     .select('id,title,learning_objectives,content')
@@ -55,14 +61,15 @@ export async function hydrateUltimateProfileSources(
     })
     .filter((source): source is { id: string; text: string } => Boolean(source));
 
-  if (!canonicalSources.length) return profile;
-  const sources = new Map((profile.instructionalSources ?? []).map((source) => [source.id, source]));
+  if (!canonicalSources.length && !registeredSources.length) return profile;
+  const sources = new Map(registeredSources.map((source) => [source.id, source]));
+  for (const source of profile.instructionalSources ?? []) sources.set(source.id, source);
   for (const source of canonicalSources) sources.set(source.id, source);
   return {
     ...profile,
     sourceDocuments: profile.sourceDocuments.length
       ? profile.sourceDocuments
-      : canonicalSources.map((source) => source.id),
+      : [...registeredSources, ...canonicalSources].map((source) => source.id),
     instructionalSources: [...sources.values()],
   };
 }
@@ -174,4 +181,3 @@ export async function buildUltimateProfile(
     })),
   });
 }
-

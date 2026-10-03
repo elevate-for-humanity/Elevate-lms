@@ -459,11 +459,12 @@ test.describe('Studio readable sign-in and composer', () => {
     await composer.fill('Readability test draft');
     await page.screenshot({ path: testInfo.outputPath('studio-readable-chat.png') });
     await composer.clear();
-    await page.goto(`${ADMIN_BASE}/studio/browser`);
-    await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
-    await page.getByLabel('Browser URL').fill('https://app.envato.com');
-    await expect(page.getByRole('button', { name: 'Start Chromium', exact: true })).toBeEnabled({ timeout: 30_000 });
-    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await page.goto(`${ADMIN_BASE}/dashboard`);
+    const access = page.getByRole('region', { name: 'Course and media access' });
+    await expect(access.getByRole('link', { name: 'Open Course Builder' })).toHaveAttribute('href', '/studio/courses');
+    await expect(page.getByRole('navigation', { name: 'Course tools' }).getByRole('link', { name: 'Course Builder', exact: true })).toBeVisible();
+    await access.getByRole('link', { name: 'Enter Envato credentials' }).click();
+    await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toHaveAttribute('aria-pressed', 'true');
     const stream = page.getByAltText('Live isolated Chromium browser');
     try {
     await expect(stream).toBeVisible({ timeout: 30_000 });
@@ -491,6 +492,11 @@ test.describe('Studio readable sign-in and composer', () => {
     await expect.poll(() => viewport.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
     await page.getByRole('button', { name: 'Zoom browser out' }).click();
     await expect.poll(() => stream.evaluate(el => el.getBoundingClientRect().width)).toBeLessThanOrEqual(480);
+    const normalWidth = await stream.evaluate(el => el.getBoundingClientRect().width);
+    await page.getByRole('button', { name: 'Zoom browser out' }).click();
+    await expect(page.getByLabel('Browser zoom')).toHaveText('75%');
+    await expect.poll(() => stream.evaluate(el => el.getBoundingClientRect().width)).toBeLessThan(normalWidth);
+    await page.getByRole('button', { name: 'Fit screen' }).click();
     if ((page.viewportSize()?.width || 1280) < 1024)
       await page.getByRole('button', { name: 'Sign-in & tools' }).click();
     const input = page.getByLabel('Secure browser input');
@@ -507,6 +513,8 @@ test.describe('Studio readable sign-in and composer', () => {
     await page.screenshot({ path: testInfo.outputPath('studio-readable-sign-in.png') });
     } finally {
       // A failed assertion must not leave an isolated Chromium session running.
+      const browserPane = page.getByRole('button', { name: 'Browser', exact: true });
+      if (await browserPane.isVisible()) await browserPane.click();
       const controls = page.getByRole('button', { name: 'Browser controls', exact: true });
       if (await controls.isVisible() && await controls.getAttribute('aria-expanded') === 'false')
         await controls.click();

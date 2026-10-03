@@ -264,6 +264,13 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
           </div>
         </div>
 
+        {NAV.some(section => section.href === '/studio' || section.items.some(item => item.href === '/studio' || item.href === '/studio/courses')) && (
+          <nav aria-label="Course tools" className="flex flex-wrap gap-2 border-t border-slate-200 px-2 py-1">
+            <Link href="/studio/courses" className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-bold text-blue-800 hover:bg-blue-50">Course Builder</Link>
+            <Link href="/studio/browser?provider=envato&signin=1" className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-bold text-emerald-800 hover:bg-emerald-50">Envato credentials</Link>
+          </nav>
+        )}
+
         {/* Horizontal Mobile Nav - Scrollable */}
         <div
           id="admin-all-tools-menu"

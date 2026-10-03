@@ -25,8 +25,11 @@ export default function StudioBrowserPage() {
     };
   } | null>(null);
   const [error, setError] = useState('');
+  const [envatoSignIn, setEnvatoSignIn] = useState(false);
   useEffect(() => {
-    const runId = new URLSearchParams(window.location.search).get('acquisitionRunId');
+    const params = new URLSearchParams(window.location.search);
+    setEnvatoSignIn(params.get('provider') === 'envato' && params.get('signin') === '1');
+    const runId = params.get('acquisitionRunId');
     if (!runId) return;
     let current = true;
     void fetch(`/api/admin/ultimate-course-builder?acquisitionRunId=${encodeURIComponent(runId)}`, {
@@ -51,12 +54,16 @@ export default function StudioBrowserPage() {
       style={viewportStyle}
       className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white"
     >
+      <nav aria-label="Studio access" className="flex shrink-0 flex-wrap items-center border-b border-slate-200">
+        <Link href="/dashboard" className="flex min-h-11 items-center px-4 text-base font-semibold">Admin dashboard</Link>
+        <Link href="/studio/courses" className="flex min-h-11 items-center px-4 text-base font-semibold">Course Builder</Link>
       <Link
         href="/studio"
         className="flex min-h-11 shrink-0 items-center px-4 text-base font-semibold text-slate-950"
       >
         Back to Studio chat
       </Link>
+      </nav>
       {error && (
         <p role="alert" className="p-4 text-red-700">
           {error}
@@ -76,10 +83,11 @@ export default function StudioBrowserPage() {
       )}
       <div className="min-h-0 flex-1 overflow-hidden">
         <CloudBrowserWorkspace
-          autoStart={Boolean(request)}
+          autoStart={Boolean(request) || envatoSignIn}
           autoRunTask={Boolean(request)}
           acquisitionRunId={request?.id || ''}
-          initialTarget={request?.context.browser_target || ''}
+          initialTarget={request?.context.browser_target || (envatoSignIn ? 'https://app.envato.com' : '')}
+          initialSignIn={envatoSignIn}
           initialTask={request?.command || ''}
         />
       </div>

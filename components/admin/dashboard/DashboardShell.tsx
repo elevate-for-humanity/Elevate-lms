@@ -279,6 +279,16 @@ export function AdminDashboardContent({
         </div>
       </section>
       <DegradedBanner data={data} />
+      {canAccessDevStudio && (
+        <section aria-label="Course and media access" className="mb-6 rounded-2xl border border-blue-200 bg-white p-4">
+          <h2 className="text-xl font-bold text-slate-950">Course Builder and Envato</h2>
+          <p className="mt-1 text-base text-slate-700">Open these tools on your phone or desktop. Enter your Envato sign-in in the protected Studio browser.</p>
+          <div className="mt-3 flex flex-wrap gap-3">
+            <Link href="/studio/browser?provider=envato&signin=1" className="inline-flex min-h-12 items-center rounded-lg bg-emerald-700 px-4 py-3 text-base font-bold text-white">Enter Envato credentials</Link>
+            <Link href="/studio/courses" className="inline-flex min-h-12 items-center rounded-lg bg-blue-700 px-4 py-3 text-base font-bold text-white">Open Course Builder</Link>
+          </div>
+        </section>
+      )}
       <StatsOverviewBar data={data} />
       <OperationalShortcuts />
       {canAccessDevStudio && (

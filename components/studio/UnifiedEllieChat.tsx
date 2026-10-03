@@ -672,7 +672,7 @@ export default function UnifiedEllieChat({
   const [selectedProvider, setSelectedProvider] = useState<StudioProvider>('auto');
   const [showActivity, setShowActivity] = useState(false);
   const [lastRoute, setLastRoute] = useState<EllieMessageRoute | null>(null);
-  const endRef = useRef<HTMLDivElement>(null);
+  const messagesViewportRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const [listening, setListening] = useState(false);
@@ -846,7 +846,8 @@ export default function UnifiedEllieChat({
   }, [selectedProvider]);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const viewport = messagesViewportRef.current;
+    if (viewport) viewport.scrollTop = viewport.scrollHeight;
   }, [messages, loading]);
 
   async function resolveAction(
@@ -1306,7 +1307,10 @@ export default function UnifiedEllieChat({
         </div>
       ) : null}
 
-      <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-white px-3 py-4 sm:px-8 sm:py-8">
+      <div
+        ref={messagesViewportRef}
+        className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-white px-3 py-4 sm:px-8 sm:py-8"
+      >
         {messages.length === 0 ? (
           <div className="mx-auto flex w-full min-w-0 max-w-3xl flex-col items-center py-8 text-center sm:py-20">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-blue-700 shadow-lg shadow-brand-blue-700/20 ring-4 ring-brand-blue-100">
@@ -1425,7 +1429,6 @@ export default function UnifiedEllieChat({
                 <div className={`rounded-2xl px-4 py-3 text-sm ${assistantClass}`}>Working…</div>
               </div>
             )}
-            <div ref={endRef} />
           </div>
         )}
       </div>

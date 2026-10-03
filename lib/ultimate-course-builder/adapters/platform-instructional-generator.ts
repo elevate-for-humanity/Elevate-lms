@@ -88,7 +88,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       stage: stage.stage,
       visualRequirement: `Show a relevant, non-looping instructional visual for ${e.competency.title} during ${stage.stage.replace(/_/g, ' ')}.`,
       sceneType:
-        stage.stage === 'mental_model' ? 'mental_model' :
+        stage.stage === 'concept_explanation' ? 'mental_model' :
         stage.stage === 'instructor_example' ? 'worked_example' :
         stage.stage === 'knowledge_check' ? 'knowledge_check' :
         stage.stage === 'recap' ? 'memory_recap' : 'system_diagram',

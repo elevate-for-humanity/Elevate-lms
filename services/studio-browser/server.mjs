@@ -289,7 +289,19 @@ export function createBrowserLifecycleManager({
     return recycleInFlight;
   };
   const heartbeat = async () => {
-    if (heartbeatInFlight || recycleInFlight || lifecycle.state !== 'ready') return false;
+    if (heartbeatInFlight || recycleInFlight) return false;
+    // A failed pre-warm must not strand the container in a permanent 503
+    // state. Northflank can keep the process alive after a transient Chromium
+    // launch failure, so the normal heartbeat is also the recovery loop.
+    if (lifecycle.state !== 'ready') {
+      heartbeatInFlight = launchBrowser()
+        .then(() => true)
+        .catch(() => false)
+        .finally(() => {
+          heartbeatInFlight = undefined;
+        });
+      return heartbeatInFlight;
+    }
     heartbeatInFlight = (async () => {
       try {
         if (!connected()) throw new Error('Chromium disconnected');

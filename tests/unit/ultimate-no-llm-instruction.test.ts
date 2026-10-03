@@ -2,15 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { UltimateAppendixAStandardsSource } from '../../lib/ultimate-course-builder/credential/appendix-a-source';
 import { UltimatePlatformInstructionalGenerator } from '../../lib/ultimate-course-builder/adapters/platform-instructional-generator';
 describe('source-grounded instruction', () => {
-  it('does not fabricate a full lesson from a work-process title', async () => {
+  it('builds the registered barber lesson from the authorized curriculum blueprint', async () => {
     const profile = await new UltimateAppendixAStandardsSource().load({
       programSlug: 'barber-apprenticeship',
     });
-    await expect(
-      new UltimatePlatformInstructionalGenerator().objectives({
-        profile,
-        competency: profile.competencies[0],
-      }),
-    ).rejects.toThrow('ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED');
+    const objectives = await new UltimatePlatformInstructionalGenerator().objectives({
+      profile,
+      competency: profile.competencies[0],
+    });
+    expect(profile.instructionalSources).toHaveLength(profile.competencies.length);
+    expect(profile.instructionalSources?.[0]?.text).toContain('Clipper Over Comb');
+    expect(objectives[0]?.text).toBe(profile.competencies[0].description);
   });
 });

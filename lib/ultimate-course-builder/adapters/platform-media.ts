@@ -7,6 +7,7 @@ import {
 } from '@/lib/media/licensed-course-media';
 
 import { buildSceneAssignments } from '../instructional/scene-assignments';
+import { requestMediaDependency } from '../worker/request-media-dependency';
 
 type RecordLike = Record<string, any>;
 
@@ -174,7 +175,13 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       input.profile?.sceneAssignments?.[input.competency?.id] ?? [],
     );
     if (gaps.length) {
-      throw new Error(`ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED:${JSON.stringify({ assignments, gaps })}`);
+      const workspaceId = firstRecord(firstRecord(data?.[0]?.licensed_media_entitlements).metadata).workspaceId;
+      const acquisition = await requestMediaDependency(this.db, {
+        courseId, competencyId: input.competency.id, lessonTitle: input.competency.title,
+        gaps, workspaceUrl: typeof workspaceId === 'string' && /^[a-zA-Z0-9-]+$/.test(workspaceId)
+          ? `https://app.envato.com/workspaces/${workspaceId}` : undefined,
+      });
+      throw new Error(`ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED:${JSON.stringify({ acquisition, assignments, gaps })}`);
     }
     return {
       assignments,

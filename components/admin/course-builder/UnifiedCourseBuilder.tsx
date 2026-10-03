@@ -448,6 +448,7 @@ function CreateCoursePanel({
 
 function UltimateBuildPanel({ course, programSlug }: { course: CourseRow; programSlug: string }) {
   const [builds, setBuilds] = useState<UltimateBuildRow[]>([]);
+  const [acquisitions, setAcquisitions] = useState<Array<{id: string; goal: string | null}>>([]);
   const [buildsCourseId, setBuildsCourseId] = useState('');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -469,6 +470,7 @@ function UltimateBuildPanel({ course, programSlug }: { course: CourseRow; progra
       if (token !== refreshToken.current) return;
       if (!response.ok) throw new Error(payload?.error || 'Unable to load Ultimate build status');
       setBuilds(Array.isArray(payload?.builds) ? payload.builds : []);
+      setAcquisitions(Array.isArray(payload?.acquisitions) ? payload.acquisitions : []);
       setBuildsCourseId(requestedCourseId);
     } catch (reason) {
       if (token !== refreshToken.current) return;
@@ -480,6 +482,7 @@ function UltimateBuildPanel({ course, programSlug }: { course: CourseRow; progra
 
   useEffect(() => {
     setBuilds([]);
+    setAcquisitions([]);
     setBuildsCourseId('');
     setError('');
     void refresh(course.id);
@@ -555,6 +558,14 @@ function UltimateBuildPanel({ course, programSlug }: { course: CourseRow; progra
           <p className="mt-1 break-all text-sm font-bold text-slate-200">{statusLoading ? 'Loading course build…' : latest?.id ?? 'Created when queued'}</p>
         </div>
       </div>
+
+      {!statusLoading && acquisitions.length > 0 && <div className="mt-5 space-y-2">
+        {acquisitions.map(request => <a key={request.id}
+          href={`/studio/browser?acquisitionRunId=${encodeURIComponent(request.id)}`}
+          className="block rounded-lg border border-cyan-700 bg-slate-950 p-3 text-cyan-300">
+          {request.goal || 'Complete lesson scene media'} · Open existing Studio browser
+        </a>)}
+      </div>}
 
       <ol className="mt-5 grid gap-2 text-sm text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
         {['Standards lock', 'Instruction design', 'Media + narration', 'Assessment alignment', 'Finished-media QA', 'Learner run-through', 'Selective repair', 'Credential release'].map((step) => (

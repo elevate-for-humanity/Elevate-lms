@@ -37,11 +37,21 @@ export async function POST(req: NextRequest) {
   const sessionToken = String(body.sessionToken || '');
   const requestedTaskId = String(body.taskId || '');
   const conversationId = String(body.conversationId || '').trim();
+  const acquisitionRunId = String(body.acquisitionRunId || '').trim();
   if (!command || !sessionId || !sessionToken) {
     return NextResponse.json({ error: 'Task and browser session are required' }, { status: 400 });
   }
 
   const db = await requireAdminClient();
+  if (acquisitionRunId) {
+    const { data: acquisition, error: acquisitionError } = await db.from('studio_runs')
+      .select('id,command,context').eq('id', acquisitionRunId).eq('user_id', auth.id).maybeSingle();
+    if (acquisitionError) return NextResponse.json({ error: 'Media request lookup failed' }, { status: 503 });
+    if (!acquisition || acquisition.command !== command ||
+        acquisition.context?.acquisition_mode !== 'envato-workspace-batch') {
+      return NextResponse.json({ error: 'Media request does not match this owner or exact command' }, { status: 403 });
+    }
+  }
   const tenantId = await resolveTenantIdForUser(auth.id).catch(() => null);
   let task: Record<string, any> | null = null;
 
@@ -54,7 +64,8 @@ export async function POST(req: NextRequest) {
       .eq('tool_name', 'browser.execute')
       .maybeSingle();
     task = data;
-    if (!browserTaskMatches(task, { command, sessionId })) {
+    if (!browserTaskMatches(task, { command, sessionId }) ||
+        (acquisitionRunId && task?.studio_run_id !== acquisitionRunId)) {
       return NextResponse.json(
         { error: 'Browser task does not match this session or command' },
         { status: 403 },
@@ -72,6 +83,7 @@ export async function POST(req: NextRequest) {
         toolInput: { task: command, sessionId },
         executionMode: 'interactive',
         conversationId: conversationId || undefined,
+        studioRunId: acquisitionRunId || undefined,
       },
       {
         actorRoles: auth.effectiveRoles,

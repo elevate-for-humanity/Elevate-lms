@@ -38,7 +38,9 @@ type StudioDownload = {
   fileName: string;
   contentType: string;
   size: number;
-  status: 'downloading' | 'ready' | 'uploading' | 'stored' | 'failed';
+  status: 'downloading' | 'normalizing' | 'ready' | 'uploading' | 'stored' | 'failed';
+  durationSeconds?: number;
+  resolution?: string;
   uploadProgress?: number;
   sourceUrl?: string;
   error?: string;
@@ -51,6 +53,7 @@ export default function CloudBrowserWorkspace({
   initialTarget = '',
   initialTask = '',
   autoRunTask = false,
+  acquisitionRunId = '',
 }: {
   unifiedTask?: OrchestratedPlanCheckpoint | null;
   conversationId?: string | null;
@@ -58,6 +61,7 @@ export default function CloudBrowserWorkspace({
   initialTarget?: string;
   initialTask?: string;
   autoRunTask?: boolean;
+  acquisitionRunId?: string;
 }) {
   const [target, setTarget] = useState(initialTarget);
   const [session, setSession] = useState<Session | null>(null);
@@ -257,7 +261,8 @@ export default function CloudBrowserWorkspace({
       provider: 'envato',
       providerItemId: envatoItemId.trim(),
       sourceUrl: download.sourceUrl || target,
-      resolution: resolution.trim(),
+      resolution: download.resolution || resolution.trim(),
+      durationSeconds: download.durationSeconds,
       programTags: programTags
         .split(',')
         .map((value) => value.trim())
@@ -353,6 +358,7 @@ export default function CloudBrowserWorkspace({
           sessionToken: session.token,
           taskId: taskId || undefined,
           conversationId: conversationId || undefined,
+          acquisitionRunId: acquisitionRunId || undefined,
         }),
       });
       if (!response.ok || !response.body) {

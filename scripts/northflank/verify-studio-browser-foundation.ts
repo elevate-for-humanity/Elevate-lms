@@ -29,6 +29,8 @@ if (
   throw new Error('Browser evidence signature is invalid');
 const required = [
   'keyboard_and_pointer',
+  'double_click',
+  'embedded_frame_controls',
   'mobile_viewport_and_screenshot',
   'popup_and_tab_switch',
   'file_picker_and_upload',

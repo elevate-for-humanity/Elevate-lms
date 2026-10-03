@@ -654,15 +654,31 @@ async function runBrowserFoundationTest() {
     try { await action(); checks.push({ name, passed: true }); }
     catch (error) { checks.push({ name, passed: false, reason: sanitizeReason(error) }); }
   };
-  const fixture = `<html><body style="height:2200px"><label>Text<input id="text"></label><button id="popup" onclick="window.open('about:blank')">Open tab</button><input id="file" type="file"><button id="confirm" onclick="document.body.dataset.confirmed=String(confirm('Confirm test'))">Confirm</button><button id="download" onclick="const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['browser acceptance'],{type:'text/plain'}));a.download='acceptance.txt';a.click()">Download</button></body></html>`;
+  const fixture = `<html><body style="height:2200px"><label>Text<input id="text" ondblclick="this.dataset.doubleclicked='true'"></label><iframe srcdoc="<input placeholder='Embedded lesson form'>"></iframe><button id="popup" onclick="window.open('about:blank')">Open tab</button><input id="file" type="file"><button id="confirm" onclick="document.body.dataset.confirmed=String(confirm('Confirm test'))">Confirm</button><button id="download" onclick="const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['browser acceptance'],{type:'text/plain'}));a.download='acceptance.txt';a.click()">Download</button></body></html>`;
   const assert = (condition, reason) => { if (!condition) throw new Error(reason); };
   try {
     const page = session.page;
-    await page.setContent(fixture);
+    // Use a routed HTTPS origin, as real downloads do, instead of an opaque
+    // about:blank document whose blob download policies differ.
+    await session.context.route('https://www.elevateforhumanity.org/studio-browser-acceptance/**', route => route.fulfill({ contentType: 'text/html', body: fixture }));
+    await page.goto('https://www.elevateforhumanity.org/studio-browser-acceptance/fixture');
     await check('keyboard_and_pointer', async () => {
       const box = await page.locator('#text').boundingBox();
-      await runActions(session, { actions: [{ type: 'click', x: box.x + 4, y: box.y + 4 }, { type: 'type', text: 'connected browser' }] });
+      await runActions(session, { actions: [{ type: 'pointer_click', clickCount: 1, x: box.x + 4, y: box.y + 4 }, { type: 'type', text: 'connected browser' }] });
       assert(await page.locator('#text').inputValue() === 'connected browser', 'keyboard_value_mismatch');
+    });
+    await check('double_click', async () => {
+      const box = await page.locator('#text').boundingBox();
+      await runActions(session, { actions: [{ type: 'pointer_click', clickCount: 1, x: box.x + 4, y: box.y + 4 }, { type: 'pointer_click', clickCount: 2, x: box.x + 4, y: box.y + 4 }] });
+      assert(await page.locator('#text').getAttribute('data-doubleclicked') === 'true', 'double_click_missing');
+    });
+    await check('embedded_frame_controls', async () => {
+      await page.frameLocator('iframe').locator('input').waitFor({ state: 'visible' });
+      const snapshot = await snapshotPage(session);
+      const control = snapshot.controls.find(control => control.placeholder === 'Embedded lesson form');
+      assert(control, 'embedded_control_missing');
+      await runActions(session, { type: 'fill_ref', ref: control.ref, text: 'embedded input works' });
+      assert(await page.frameLocator('iframe').locator('input').inputValue() === 'embedded input works', 'embedded_input_mismatch');
     });
     await check('mobile_viewport_and_screenshot', async () => {
       assert(page.viewportSize().width === 390, 'mobile_viewport_mismatch');
@@ -697,18 +713,19 @@ async function runBrowserFoundationTest() {
       assert(await page.getAttribute('body', 'data-confirmed') === 'true', 'dialog_response_missing');
     });
     await check('download_bytes', async () => {
+      const downloadEvent = page.waitForEvent('download', { timeout: 10000 });
       await page.locator('#download').click();
+      await downloadEvent;
       const deadline = Date.now() + 10000;
       while (![...session.downloads.values()].some(item => item.status === 'ready') && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 100));
       const downloaded = [...session.downloads.values()].find(item => item.status === 'ready');
-      assert(downloaded && await fs.promises.readFile(downloaded.filePath, 'utf8') === 'browser acceptance', 'download_bytes_mismatch');
+      assert(downloaded && await fs.promises.readFile(downloaded.filePath, 'utf8') === 'browser acceptance', `download_bytes_mismatch:${[...session.downloads.values()].map(item => `${item.status}:${item.error || ''}`).join(',')}`);
     });
     await check('scroll', async () => {
       await runActions(session, { type: 'scroll', deltaY: 600 });
       await page.waitForFunction(() => window.scrollY > 0, null, { timeout: 10000 });
     });
     await check('navigation_and_history', async () => {
-      await session.context.route('https://www.elevateforhumanity.org/studio-browser-acceptance/**', route => route.fulfill({ contentType: 'text/html', body: fixture }));
       await runActions(session, { actions: [{ type: 'navigate', url: 'https://www.elevateforhumanity.org/studio-browser-acceptance/one' }, { type: 'navigate', url: 'https://www.elevateforhumanity.org/studio-browser-acceptance/two' }, { type: 'back' }] });
       assert(page.url().endsWith('/one'), 'history_back_failed');
       await runActions(session, { type: 'forward' });
@@ -919,7 +936,16 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
 async function runAction(session, action) {
   session.lastSeen = Date.now();
   const page = session.page;
-  if (action.type === 'switch_tab') {
+  const controlPage = (ref) => {
+    if (session.controlFrames?.has(ref) && session.controlPage !== page) throw new BrowserServiceError('stale_control', 409);
+    return session.controlFrames?.get(ref) || page;
+  };
+  if (action.type === 'pointer_click') {
+    const options = {button: ['left', 'right', 'middle'].includes(action.button) ? action.button : 'left', clickCount: Math.min(2, Math.max(1, Number(action.clickCount) || 1))};
+    await page.mouse.move(Number(action.x), Number(action.y));
+    await page.mouse.down(options);
+    await page.mouse.up(options);
+  } else if (action.type === 'switch_tab') {
     const selected = session.pages?.get(String(action.tabId || ''));
     if (!selected || selected.isClosed()) throw new BrowserServiceError('tab_not_found', 404);
     session.page = selected;
@@ -954,18 +980,18 @@ async function runAction(session, action) {
   } else if (action.type === 'click_ref') {
     const ref = String(action.ref || '').slice(0, 80);
     if (!/^e\d+$/.test(ref)) throw new Error('Invalid browser control reference');
-    await page.locator(`[data-studio-ref="${ref}"]`).first().click({ timeout: 10_000 });
+    await controlPage(ref).locator(`[data-studio-ref="${ref}"]`).first().click({ timeout: 10_000 });
   } else if (action.type === 'fill_ref') {
     const ref = String(action.ref || '').slice(0, 80);
     if (!/^e\d+$/.test(ref)) throw new Error('Invalid browser control reference');
-    await page
+    await controlPage(ref)
       .locator(`[data-studio-ref="${ref}"]`)
       .first()
       .fill(String(action.text || '').slice(0, 4000), { timeout: 10_000 });
   } else if (action.type === 'select_ref') {
     const ref = String(action.ref || '').slice(0, 80);
     if (!/^e\d+$/.test(ref)) throw new Error('Invalid browser control reference');
-    await page
+    await controlPage(ref)
       .locator(`[data-studio-ref="${ref}"]`)
       .first()
       .selectOption(String(action.value || '').slice(0, 1000), { timeout: 10_000 });
@@ -1140,13 +1166,14 @@ export async function auditPage(session) {
 
 export async function snapshotPage(session) {
   session.lastSeen = Date.now();
+  if ((session.dialog && session.dialogPage === session.page) || (session.fileChooser && session.fileChooserPage === session.page)) throw new BrowserServiceError('interaction_required', 409);
   if (sessionRequiresAuthentication(session)) {
     throw new BrowserServiceError('authentication_required', 409);
   }
   await session.page
     .waitForLoadState('domcontentloaded', { timeout: 10_000 })
     .catch(() => undefined);
-  return session.page.evaluate(() => {
+  const readFrame = (frame, offset) => frame.evaluate((offset) => {
     const visible = (element) => {
       const style = window.getComputedStyle(element);
       const rect = element.getBoundingClientRect();
@@ -1177,7 +1204,7 @@ export async function snapshotPage(session) {
       .filter(visible)
       .slice(0, 80);
     const controls = elements.map((element, index) => {
-      const ref = `e${index + 1}`;
+      const ref = `e${offset + index + 1}`;
       element.setAttribute('data-studio-ref', ref);
       const tag = element.tagName.toLowerCase();
       const explicitRole = element.getAttribute('role');
@@ -1207,7 +1234,29 @@ export async function snapshotPage(session) {
       headings,
       controls,
     };
-  });
+  }, offset);
+  const frames = session.page.frames?.() || [session.page];
+  session.controlFrames = new Map();
+  session.controlPage = session.page;
+  let result;
+  const frameErrors = [];
+  for (const frame of frames.slice(0, 15)) {
+    let snapshot;
+    try { snapshot = await readFrame(frame, session.controlFrames.size); }
+    catch (error) {
+      if (!result) throw error;
+      frameErrors.push(sanitizeReason(error));
+      continue;
+    }
+    for (const control of snapshot.controls) session.controlFrames.set(control.ref, frame);
+    if (!result) result = snapshot;
+    else {
+      result.controls.push(...snapshot.controls);
+      result.headings.push(...snapshot.headings);
+      result.visibleText = `${result.visibleText}\nFrame: ${snapshot.title}\n${snapshot.visibleText}`.slice(0, 12000);
+    }
+  }
+  return { ...result, ...(frameErrors.length ? { frameErrors } : {}) };
 }
 
 function scheduleFrame(session, delay = frameIntervalMs) {

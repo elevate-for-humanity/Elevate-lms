@@ -173,6 +173,7 @@ export async function POST(req: NextRequest) {
     totalTokens: number,
     provider?: string,
     model?: string,
+    mode: 'authentication' | 'interaction' = 'authentication',
   ) => {
     await db
       .from('ai_task_steps')
@@ -189,16 +190,18 @@ export async function POST(req: NextRequest) {
       error_message: null,
       result_json: {
         ok: true,
-        status: 'awaiting_authentication',
-        authenticationRequired: true,
+        status: mode === 'authentication' ? 'awaiting_authentication' : 'awaiting_interaction',
+        authenticationRequired: mode === 'authentication',
+        interactionRequired: mode === 'interaction',
         reason,
         steps,
         history,
         usage: { totalTokens },
       },
       tool_output: {
-        status: 'awaiting_authentication',
-        authenticationRequired: true,
+        status: mode === 'authentication' ? 'awaiting_authentication' : 'awaiting_interaction',
+        authenticationRequired: mode === 'authentication',
+        interactionRequired: mode === 'interaction',
         reason,
         steps,
         provider,
@@ -207,7 +210,9 @@ export async function POST(req: NextRequest) {
       },
     });
     await appendLog(
-      'Browser workflow paused for secure authentication and can resume from its persisted checkpoint.',
+      mode === 'authentication'
+        ? 'Browser workflow paused for secure authentication and can resume from its persisted checkpoint.'
+        : 'Browser workflow paused for the administrator to answer a dialog or choose files; the same task can resume.',
       'warn',
     );
   };
@@ -259,6 +264,21 @@ export async function POST(req: NextRequest) {
               .catch(() => ({}))) as BrowserSnapshot & {
               error?: string;
             };
+            if (!snapshotResponse.ok && snapshot.error === 'interaction_required') {
+              const reason =
+                'Respond to the browser dialog or choose files in the workspace, then resume this task.';
+              await pauseForAuthentication(
+                reason,
+                steps,
+                history,
+                totalTokens,
+                undefined,
+                undefined,
+                'interaction',
+              );
+              emit({ type: 'interaction_required', message: reason });
+              return;
+            }
             if (!snapshotResponse.ok && snapshot.error === 'authentication_required') {
               const reason = 'Sign in securely in the existing Studio browser to resume this task.';
               await pauseForAuthentication(reason, steps, history, totalTokens);

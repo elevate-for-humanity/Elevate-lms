@@ -266,3 +266,33 @@ test('dialogs require an explicit response and never affect another tab', async 
   assert.deepEqual(responses, ['test response']);
   assert.equal(session.dialog, undefined);
 });
+
+
+test('iframe references resolve to their owning frame and cannot be reused after tab switch', async () => {
+  const clicks = [];
+  const snapshot = (title, offset) => ({title, url: 'https://www.elevateforhumanity.org', visibleText: title, headings: [], controls: [{ref: `e${offset + 1}`, role: 'button', name: title}]});
+  const main = { evaluate: async (_, offset) => snapshot('Main', offset), locator: () => ({ first: () => ({click: async () => clicks.push('main')}) }) };
+  const child = { evaluate: async (_, offset) => snapshot('Embedded form', offset), locator: () => ({ first: () => ({click: async () => clicks.push('frame')}) }) };
+  const page = { waitForLoadState: async () => {}, frames: () => [main, child], url: () => 'https://www.elevateforhumanity.org' };
+  const session = {page};
+  const result = await snapshotPage(session);
+  assert.deepEqual(result.controls.map(control => control.ref), ['e1', 'e2']);
+  await runActions(session, {type: 'click_ref', ref: 'e2'});
+  assert.deepEqual(clicks, ['frame']);
+  session.page = {};
+  await assert.rejects(() => runActions(session, {type: 'click_ref', ref: 'e2'}), error => error.code === 'stale_control');
+});
+
+test('dialog/file selection pauses planning before evaluating a blocked document', async () => {
+  const page = {evaluate: async () => { throw new Error('must not evaluate'); }};
+  await assert.rejects(() => snapshotPage({page, dialog: {}, dialogPage: page}), error => error.code === 'interaction_required');
+  await assert.rejects(() => snapshotPage({page, fileChooser: {}, fileChooserPage: page}), error => error.code === 'interaction_required');
+});
+
+
+test('manual double click forwards exactly two pointer pairs without delayed focus', async () => {
+  const calls = [];
+  const mouse = {move: async () => {}, down: async options => calls.push(['down', options.clickCount]), up: async options => calls.push(['up', options.clickCount])};
+  await runActions({page: {mouse}}, {actions: [{type: 'pointer_click', x: 10, y: 20, clickCount: 1}, {type: 'pointer_click', x: 10, y: 20, clickCount: 2}]});
+  assert.deepEqual(calls, [['down', 1], ['up', 1], ['down', 2], ['up', 2]]);
+});

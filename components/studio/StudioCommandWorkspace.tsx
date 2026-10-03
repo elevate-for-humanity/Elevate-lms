@@ -18,6 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import UnifiedEllieChat from './UnifiedEllieChat';
+import { useStudioViewport } from './useStudioViewport';
 import RepositoryLivePreview from './RepositoryLivePreview';
 import StudioCapabilityRail, { type StudioSpecialist } from './StudioCapabilityRail';
 import type { OrchestratedPlanCheckpoint } from '@/lib/devstudio/ellie-unified-handlers';
@@ -34,7 +35,9 @@ const WorkflowsWorkspace = dynamic(
   () => import('@/apps/admin/app/studio/workflows/WorkflowsClient'),
   { ssr: false },
 );
-const IntelligenceWorkspace = dynamic(() => import('./StudioIntelligencePanel'), { ssr: false });
+const IntelligenceWorkspace = dynamic(() => import('./StudioIntelligencePanel'), {
+  ssr: false,
+});
 const TasksWorkspace = dynamic(() => import('@/apps/admin/app/studio/tasks/TasksClient'), {
   ssr: false,
 });
@@ -94,6 +97,7 @@ export default function StudioCommandWorkspace({
   const [activeCapability, setActiveCapability] = useState<string | null>(initialWorkspace ?? null);
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const viewportStyle = useStudioViewport();
   const [focusMode, setFocusMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [specialist, setSpecialist] = useState<StudioSpecialist | null>(null);
@@ -222,9 +226,16 @@ export default function StudioCommandWorkspace({
       data-studio-root="unified"
       className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white"
       style={
-        focusMode
-          ? { position: 'fixed', inset: 0, zIndex: 100, width: '100vw', height: '100dvh' }
-          : undefined
+        viewportStyle ??
+        (focusMode
+          ? {
+              position: 'fixed',
+              inset: 0,
+              zIndex: 100,
+              width: '100vw',
+              height: '100dvh',
+            }
+          : undefined)
       }
     >
       <header className="shrink-0 border-b border-slate-200 bg-white text-slate-950">
@@ -234,11 +245,11 @@ export default function StudioCommandWorkspace({
             onClick={() => setSidebarOpen((value) => !value)}
             aria-label={sidebarOpen ? 'Close Studio sidebar' : 'Open Studio sidebar'}
             aria-expanded={sidebarOpen}
-            className="rounded-lg p-2 text-slate-700 md:hidden"
+            className="min-h-11 min-w-11 rounded-lg p-2 text-slate-700"
           >
             {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-blue-50 text-brand-blue-700">
+          <span className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-blue-50 sm:flex text-brand-blue-700">
             <Bot className="h-5 w-5" aria-hidden="true" />
           </span>
           <div className="min-w-0 shrink-0">
@@ -250,7 +261,7 @@ export default function StudioCommandWorkspace({
           <div className="ml-auto flex shrink-0 items-center gap-1">
             <Link
               href="/dashboard"
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-xs font-bold hover:bg-slate-100 sm:px-3"
+              className="inline-flex min-h-11 min-w-11 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-xs font-bold hover:bg-slate-100 sm:px-3"
               aria-label="Open admin dashboard"
             >
               <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
@@ -258,7 +269,7 @@ export default function StudioCommandWorkspace({
             </Link>
             <Link
               href="/phone"
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-xs font-bold hover:bg-slate-100 sm:px-3"
+              className="inline-flex min-h-11 min-w-11 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-xs font-bold hover:bg-slate-100 sm:px-3"
               aria-label="Open phone system"
             >
               <Phone className="h-4 w-4" aria-hidden="true" />
@@ -267,6 +278,7 @@ export default function StudioCommandWorkspace({
           </div>
           <button
             type="button"
+            aria-label="New task"
             onClick={() => {
               setConversationKey((value) => value + 1);
               setSelectedConversationId(null);
@@ -277,9 +289,10 @@ export default function StudioCommandWorkspace({
               setBrowserTarget('');
               setSurface('commands');
             }}
-            className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-xs font-bold hover:bg-slate-100 sm:px-3"
+            className="inline-flex min-h-11 min-w-11 shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-xs font-bold hover:bg-slate-100 sm:px-3"
           >
-            <Plus className="h-4 w-4" aria-hidden="true" /> New task
+            <Plus className="h-4 w-4" aria-hidden="true" />{' '}
+            <span className="hidden min-[430px]:inline">New task</span>
           </button>
         </div>
         <nav
@@ -293,7 +306,7 @@ export default function StudioCommandWorkspace({
               setSurface('commands');
             }}
             aria-pressed={surface === 'commands'}
-            className={`inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${surface === 'commands' ? 'bg-slate-100 text-slate-950' : 'text-slate-600 hover:bg-slate-50'}`}
+            className={`inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${surface === 'commands' ? 'bg-slate-100 text-slate-950' : 'text-slate-600 hover:bg-slate-50'}`}
           >
             <MessageSquare className="h-4 w-4" aria-hidden="true" /> Commands
           </button>
@@ -304,7 +317,7 @@ export default function StudioCommandWorkspace({
               setSurface('course');
             }}
             aria-pressed={surface === 'course'}
-            className={`inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${surface === 'course' ? 'bg-slate-100 text-slate-950' : 'text-slate-600 hover:bg-slate-50'}`}
+            className={`inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${surface === 'course' ? 'bg-slate-100 text-slate-950' : 'text-slate-600 hover:bg-slate-50'}`}
           >
             <PanelRightOpen className="h-4 w-4" aria-hidden="true" /> Course Builder live
           </button>
@@ -319,7 +332,7 @@ export default function StudioCommandWorkspace({
           className={
             sidebarOpen
               ? 'absolute inset-y-0 left-0 z-20 h-full shadow-xl md:relative md:shadow-none'
-              : 'hidden h-full md:block'
+              : 'hidden h-full'
           }
         >
           <StudioCapabilityRail

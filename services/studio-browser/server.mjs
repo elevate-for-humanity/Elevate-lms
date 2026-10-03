@@ -10,6 +10,7 @@ import { pipeline } from 'node:stream/promises';
 import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 import { chromium } from 'playwright-core';
+import { commandArguments } from './command-arguments.mjs';
 import { ProviderSessionStore } from './provider-session-store.mjs';
 import { prepareCourseVideoDownload, hasActiveMediaTransfer } from './course-video-download.mjs';
 import { runLearnerTest, credentialMatches, learnerSetupReady } from './learner-runthrough.mjs';
@@ -53,7 +54,7 @@ const providerSessions = new ProviderSessionStore({
 let learnerTestRunning = false;
 const learnerTests = new Map();
 const workspaceRoot = process.env.STUDIO_WORKSPACE_ROOT || '/workspace/project';
-const allowedExecCommands = new Set(['git', 'node', 'npm', 'npx', 'pnpm', 'python3', 'bash', 'ls', 'cat', 'grep', 'find', 'pwd']);
+const allowedExecCommands = new Set(['git', 'node', 'npm', 'npx', 'pnpm', 'python3', 'bash', 'ls', 'cat', 'grep', 'rg', 'find', 'pwd']);
 let shuttingDown = false;
 
 function authorizedService(req) {
@@ -133,7 +134,10 @@ async function ensureRepository(body = {}) {
 async function executeWorkspaceCommand(body) {
   const command = String(body.command || '').trim();
   if (!command) throw new BrowserServiceError('command_required', 400);
-  const [binary, ...args] = Array.isArray(body.args) ? [command, ...body.args.map(String)] : command.split(/\s+/);
+  let argv;
+  try { argv = Array.isArray(body.args) ? [command, ...body.args.map(String)] : commandArguments(command); }
+  catch (error) { throw new BrowserServiceError(error.message, 400); }
+  const [binary, ...args] = argv;
   if (!allowedExecCommands.has(binary)) throw new BrowserServiceError('command_not_allowed', 400);
   const cwd = safeWorkspacePath(String(body.cwd || ''));
   const result = await execFileAsync(binary, args, {

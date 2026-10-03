@@ -1,3 +1,5 @@
+import { executeStudioCommand } from '@/lib/studio/runtime-command';
+import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
 import { DevStudioUltimateCourseControl } from '@/lib/devstudio/ultimate-course-control';
 /**
  * /api/admin/dev-studio/chat
@@ -483,7 +485,7 @@ const TOOLS: any[] = [
           state: { type: 'string', description: 'State/jurisdiction when relevant' },
           credential: { type: 'string', description: 'Credential or license target when relevant' },
         },
-        required: ['title'],
+        required: ['course_id', 'program_slug', 'title'],
       },
     },
   },
@@ -501,11 +503,6 @@ const TOOLS: any[] = [
             type: 'string',
             description: 'Canonical course ID from build_course',
           },
-          voice: {
-            type: 'string',
-            description: 'TTS voice: alloy | echo | fable | onyx | nova | shimmer (default alloy)',
-          },
-          use_pexels: { type: 'boolean', description: 'Use Pexels b-roll footage (default true)' },
         },
         required: ['course_id'],
       },
@@ -1205,17 +1202,9 @@ async function execTool(
       if (!isSafeCommand(cmd)) {
         return `Command not permitted: "${cmd}". Only read-only diagnostics are allowed.`;
       }
-      try {
-        const { execSync } = await import('child_process');
-        const out = execSync(cmd, {
-          encoding: 'utf8',
-          timeout: 10_000,
-          cwd: process.cwd(),
-        });
-        return out.slice(0, 4000);
-      } catch {
-        return 'Command execution failed';
-      }
+      const result = await executeStudioCommand(cmd);
+      return JSON.stringify({...result,stdout:result.stdout.slice(0,4000),stderr:result.stderr.slice(0,4000)});
+
     }
 
     // ── Course generation ──────────────────────────────────────────────────
@@ -1232,64 +1221,19 @@ async function execTool(
       if (courseError) throw courseError;
       if (!course) return `Canonical course not found: ${requestedCourseId}`;
 
-      const { data: standard, error: standardError } = await db
-        .from('apprenticeship_standard_versions').select('*')
-        .eq('program_slug', programSlug).eq('is_active', true)
-        .order('updated_at', { ascending: false }).limit(1).maybeSingle();
-      if (standardError) throw standardError;
-
-      let competencyRows:any[] = [];
-      if (standard) {
-        const competencyResult = await db
-          .from('apprenticeship_standard_competencies').select('*')
-          .eq('standard_key', standard.standard_key).eq('is_required', true)
-          .order('display_order');
-        if (competencyResult.error) throw competencyResult.error;
-        competencyRows = competencyResult.data ?? [];
-      }
-
-      if (!standard) {
-        const { data: existingLessons, error: lessonError } = await db
-          .from('course_lessons').select('id,title,learning_objectives')
-          .eq('course_id', course.id).order('order_index');
-        if (lessonError) throw lessonError;
-        competencyRows = (existingLessons ?? []).map((lesson:any,index:number)=>({
-          competency_key: lesson.id,
-          category: lesson.title || `Lesson ${index + 1}`,
-          source_label: lesson.title || `Lesson ${index + 1}`,
-          description: Array.isArray(lesson.learning_objectives) && lesson.learning_objectives.length
-            ? lesson.learning_objectives.join('; ')
-            : `Teach and verify the learner-facing requirements for ${lesson.title || `lesson ${index + 1}`}.`,
-        }));
-      }
-      if (!competencyRows.length) return `No course lessons or registered competencies found for ${programSlug}`;
-
       const profile = {
-        id: standard?.standard_key ?? `course:${course.id}`,
-        title: String(args.title || course.title),
-        authority: standard?.source_authority ?? 'course-build-request',
-        jurisdiction: String(args.state || 'IN'),
-        standardVersion: String(standard?.revision_date || standard?.registration_date || 'course-defined'),
-        effectiveDate: standard?.revision_date || standard?.registration_date || undefined,
-        sourceDocuments: standard ? ['DOL Appendix A Work Process Schedule', 'Related Instruction Outline'] : [],
-        socCodes: standard?.onet_soc_code ? [standard.onet_soc_code] : [],
-        trainingRequirements: { instructionalHours: standard?.related_instruction_hours || undefined },
-        competencies: competencyRows.map((row:any) => ({
-          id: row.competency_key,
-          title: row.category || row.source_label || row.competency_key,
-          description: row.description,
-          type: standard && /trim|clean|covering/i.test(String(row.category || '')) ? 'practical_skill' :
-                standard && /discuss|recommend/i.test(String(row.category || '')) ? 'decision' : 'knowledge',
-          authorityRequirementIds: standard ? [row.competency_key] : [],
-          requiresDemonstration: standard ? true : false,
-          requiresPracticalEvidence: standard ? true : false,
-          criticalSafetyCompetency: standard ? /clean tools|protective/i.test(String(row.category || '')) : false,
-        })),
+        ...await buildUltimateProfile(db, {
+          courseId: course.id, programSlug, title: String(args.title || course.title),
+          state: String(args.state || 'IN'),
+          topic: String(args.description || ''), audience: String(args.audience || ''),
+        }),
+        mediaAcquisitionOwnerId: actorUserId,
       };
 
-      const { data: activeBuild } = await db.from('ultimate_course_builds')
+      const { data: activeBuild, error: activeBuildError } = await db.from('ultimate_course_builds')
         .select('id,status,current_step').eq('course_id', course.id)
-        .in('status',['initializing','running']).order('created_at',{ascending:false}).limit(1).maybeSingle();
+        .in('status',['initializing','queued','running','built']).order('created_at',{ascending:false}).limit(1).maybeSingle();
+      if (activeBuildError) throw activeBuildError;
       let build = activeBuild;
       if (!build) {
         const created = await db.from('ultimate_course_builds')
@@ -1299,52 +1243,30 @@ async function execTool(
         build = created.data;
       }
 
-      const control = new DevStudioUltimateCourseControl(db as any);
+      const control = new DevStudioUltimateCourseControl(db);
       const queued = await control.queue(build.id, actorUserId);
       return JSON.stringify({
         __type:'ultimate_course_build_queued', success:true, buildId:build.id,
-        jobId:queued.job?.id ?? null, courseId:course.id, title:profile.title,
-        status:build.status, stage:build.current_step,
-        message:standard?'Ultimate Course Builder accepted the registered-standard build and queued it on the dedicated Ultimate worker.':'Ultimate Course Builder accepted the course-defined build and queued all existing lessons through the dedicated Ultimate worker.'
+        jobId:queued.job.id, courseId:course.id, title:profile.title,
+        status:queued.job.status, stage:build.current_step,
+        message:'Ultimate Course Builder persisted this command in the existing dedicated worker queue; completion requires its media and learner checks.'
       },null,2);
     }
 
     case 'generate_videos': {
-      const courseId = String(args.course_id || '');
-      if (!courseId) return 'course_id is required';
-
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001';
-        const res = await fetch(`${baseUrl}/api/admin/courses/${courseId}/generate-videos`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-internal-key': process.env.INTERNAL_API_KEY || '',
-          },
-          body: JSON.stringify({
-            provider: args.provider || 'auto',
-            voice: args.voice || 'alloy',
-            usePexels: args.use_pexels !== false,
-          }),
-        }).catch(() => null);
-
-        if (res?.ok) {
-          const data = await res.json();
-          return JSON.stringify({
-            __type: 'video_generation_started',
-            jobId: data.jobId,
-            lessonCount: data.lessonCount,
-            message: `Video generation started for ${data.lessonCount} lessons. TTS + Pexels b-roll pipeline running.`,
-          });
-        }
-        return JSON.stringify({
-          __type: 'video_generation_started',
-          courseId,
-          message: 'Video generation queued. Check /studio/courses/' + courseId + ' for progress.',
-        });
-      } catch {
-        return 'Video generation failed';
-      }
+      if (!actorUserId) throw new Error('Authenticated operator identity is required');
+      const courseId = String(args.course_id || '').trim();
+      if (!courseId) throw new Error('course_id is required');
+      const db = await requireAdminClient();
+      const { data: build, error } = await db.from('ultimate_course_builds')
+        .select('id,course_id,status,current_step').eq('course_id',courseId)
+        .neq('status','published').order('created_at',{ascending:false}).limit(1).maybeSingle();
+      if (error) throw error;
+      if (!build) throw new Error('Create the canonical Ultimate build before requesting lesson media');
+      const queued = await new DevStudioUltimateCourseControl(db).queue(build.id,actorUserId);
+      return JSON.stringify({__type:'ultimate_course_build_queued',success:true,
+        buildId:build.id,jobId:queued.job.id,courseId,status:queued.job.status,
+        message:'Lesson media command persisted in the existing Ultimate worker queue.'});
     }
 
     case 'analyze_document': {

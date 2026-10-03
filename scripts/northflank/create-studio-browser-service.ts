@@ -12,7 +12,8 @@ import {
 const serviceId = process.env.NORTHFLANK_STUDIO_BROWSER_SERVICE_ID || 'elevate-studio-browser';
 const authVolumeId =
   process.env.NORTHFLANK_STUDIO_BROWSER_AUTH_VOLUME_ID || 'elevate-studio-browser-auth';
-const authVolumeMb = Number(process.env.NORTHFLANK_STUDIO_BROWSER_AUTH_VOLUME_MB || '1024');
+// Northflank's default NVMe class rejects volumes smaller than 6 GiB.
+const authVolumeMb = Number(process.env.NORTHFLANK_STUDIO_BROWSER_AUTH_VOLUME_MB || '6144');
 const authStateDir = '/var/lib/studio-browser-auth';
 const branch = process.env.NORTHFLANK_GIT_BRANCH || 'main';
 const execute = process.argv.includes('--execute');

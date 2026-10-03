@@ -11,6 +11,29 @@ const asset = {
   visual_requirements: ['A client consultation'],
 };
 describe('automatic licensed scene assignment', () => {
+  it('uses inspected visible actions instead of a misleading title for semantic assignment', () => {
+    const inspected = {
+      ...asset,
+      visual_coverage_verified: false,
+      lesson_match_verified: true,
+      title: 'A client consultation',
+      observed_visual_actions: ['Shampooing hair at a basin'],
+    };
+    expect(buildSceneAssignments(scenes, [inspected]).gaps).toHaveLength(1);
+    expect(
+      buildSceneAssignments([{ id: 'shampoo', visualRequirement: 'Shampooing hair' }], [inspected])
+        .gaps,
+    ).toEqual([]);
+  });
+  it('does not count derivatives of the same licensed item as different source clips', () => {
+    const copies = [
+      { ...asset, content_sha256: 'original' },
+      { ...asset, id: 'derived', content_sha256: 'converted' },
+    ];
+    expect(
+      buildSceneAssignments([...scenes, { ...scenes[0], id: 'second' }], copies).gaps,
+    ).toHaveLength(1);
+  });
   it("finds complete coverage when first-fit would consume another scene's only clip", () => {
     const boards = [
       { id: 'first', visualRequirement: 'Consultation' },

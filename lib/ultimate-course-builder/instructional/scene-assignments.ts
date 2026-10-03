@@ -11,15 +11,20 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
 
   const overlapEvidence = (scene: any, asset: any) => {
     const requirement = String(scene.visualRequirement ?? '').trim();
-    const assetText = [
-      asset.title,
-      asset.relevance_reason,
-      asset.lesson_match_query,
-      ...(Array.isArray(asset.lesson_match_reasons) ? asset.lesson_match_reasons : []),
-      ...(Array.isArray(asset.visual_requirements) ? asset.visual_requirements : []),
-    ]
-      .filter(Boolean)
-      .join(' ');
+    const observed = Array.isArray(asset.observed_visual_actions)
+      ? asset.observed_visual_actions
+      : [];
+    const assetText = observed.length
+      ? observed.join(' ')
+      : [
+          asset.title,
+          asset.relevance_reason,
+          asset.lesson_match_query,
+          ...(Array.isArray(asset.lesson_match_reasons) ? asset.lesson_match_reasons : []),
+          ...(Array.isArray(asset.visual_requirements) ? asset.visual_requirements : []),
+        ]
+          .filter(Boolean)
+          .join(' ');
     const required = mediaMatchTerms(requirement);
     const available = new Set(mediaMatchTerms(assetText));
     const overlap = required.filter((term) => available.has(term));
@@ -42,8 +47,23 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
   const candidates = assets.filter(
     (a) => a.public_url && a.entitlement_id && a.license_evidence_url,
   );
-  const identity = (asset: any) =>
-    String(asset.content_sha256 ?? asset.provider_item_id ?? asset.entitlement_id);
+  // Both item identity and byte identity must remain distinct. Derivatives of
+  // one item cannot become additional licensed clips merely by changing hash.
+  const groups = new Map<string, string>();
+  const root = (key: string): string => {
+    const parent = groups.get(key);
+    if (!parent || parent === key) return key;
+    const resolved = root(parent);
+    groups.set(key, resolved);
+    return resolved;
+  };
+  const itemKey = (asset: any) =>
+    `item:${asset.provider ?? 'envato'}:${asset.provider_item_id ?? asset.entitlement_id}`;
+  for (const asset of candidates) {
+    if (asset.content_sha256)
+      groups.set(root(`hash:${asset.content_sha256}`), root(itemKey(asset)));
+  }
+  const identity = (asset: any) => root(itemKey(asset));
   const choices = scenes.map((scene) => {
     const explicit = configured.find((a) => a.sceneId === scene.id);
     const requirement = String(scene.visualRequirement ?? '')

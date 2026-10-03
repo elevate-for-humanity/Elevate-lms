@@ -56,6 +56,16 @@ export type BrowserTurn = {
   usage?: { promptTokens: number; completionTokens: number; totalTokens: number };
 };
 
+export function browserTurnRequiresAuthentication(
+  turn: Pick<BrowserTurn, 'status' | 'summary' | 'reason'>,
+): boolean {
+  if (turn.status !== 'blocked') return false;
+  const message = `${turn.reason || ''} ${turn.summary}`;
+  return /\b(?:sign[ -]?in|log[ -]?in|login|authentication|password|verification code|one[ -]?time code|session (?:has )?expired)\b/i.test(
+    message,
+  );
+}
+
 const ALLOWED_ACTIONS = new Set([
   'click_ref',
   'fill_ref',

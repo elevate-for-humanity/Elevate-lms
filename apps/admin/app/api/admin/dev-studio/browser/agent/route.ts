@@ -259,6 +259,12 @@ export async function POST(req: NextRequest) {
               .catch(() => ({}))) as BrowserSnapshot & {
               error?: string;
             };
+            if (!snapshotResponse.ok && snapshot.error === 'authentication_required') {
+              const reason = 'Sign in securely in the existing Studio browser to resume this task.';
+              await pauseForAuthentication(reason, steps, history, totalTokens);
+              emit({ type: 'authentication_required', message: reason, steps });
+              return;
+            }
             if (!snapshotResponse.ok) {
               throw new Error(snapshot.error || 'Could not read the current browser page');
             }

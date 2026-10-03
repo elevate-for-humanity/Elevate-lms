@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { UltimateAppendixAStandardsSource } from '../credential/appendix-a-source';
+import type { UltimateCredentialProfile } from './types';
 
 type CompetencyRow = {
   competency_key?: string | null;
@@ -18,6 +19,54 @@ function competencyType(row: CompetencyRow, regulated: boolean) {
   return 'knowledge' as const;
 }
 
+export async function hydrateUltimateProfileSources(
+  db: SupabaseClient,
+  courseId: string,
+  profile: UltimateCredentialProfile,
+): Promise<UltimateCredentialProfile> {
+  const { data: lessons, error } = await db
+    .from('course_lessons')
+    .select('id,title,learning_objectives,content')
+    .eq('course_id', courseId)
+    .order('order_index');
+  if (error) throw error;
+
+  const competencyIds = new Set(profile.competencies.map((competency) => competency.id));
+  const canonicalSources = (lessons ?? [])
+    .filter((lesson: any) => competencyIds.has(lesson.id))
+    .map((lesson: any) => {
+      const objectives = Array.isArray(lesson.learning_objectives)
+        ? lesson.learning_objectives.filter(Boolean).join('; ')
+        : '';
+      const content =
+        typeof lesson.content === 'string'
+          ? lesson.content
+          : lesson.content
+            ? JSON.stringify(lesson.content)
+            : '';
+      const text = [
+        lesson.title ? `Lesson: ${lesson.title}` : '',
+        objectives ? `Learning objectives: ${objectives}` : '',
+        content ? `Authorized course content: ${content}` : '',
+      ]
+        .filter(Boolean)
+        .join('\n');
+      return text.trim() ? { id: `course-lesson:${lesson.id}`, text } : null;
+    })
+    .filter((source): source is { id: string; text: string } => Boolean(source));
+
+  if (!canonicalSources.length) return profile;
+  const sources = new Map((profile.instructionalSources ?? []).map((source) => [source.id, source]));
+  for (const source of canonicalSources) sources.set(source.id, source);
+  return {
+    ...profile,
+    sourceDocuments: profile.sourceDocuments.length
+      ? profile.sourceDocuments
+      : canonicalSources.map((source) => source.id),
+    instructionalSources: [...sources.values()],
+  };
+}
+
 export async function buildUltimateProfile(
   db: SupabaseClient,
   input: {
@@ -32,11 +81,11 @@ export async function buildUltimateProfile(
   const registeredSource = new UltimateAppendixAStandardsSource();
   if (registeredSource.supports({ programSlug: input.programSlug })) {
     const profile = await registeredSource.load({ programSlug: input.programSlug });
-    return {
+    return hydrateUltimateProfileSources(db, input.courseId, {
       ...profile,
       title: input.title,
       audience: input.audience?.trim() || undefined,
-    };
+    });
   }
 
   const { data: standard, error: standardError } = await db
@@ -92,38 +141,7 @@ export async function buildUltimateProfile(
     ];
   }
 
-  // Hydrate the Ultimate instructional source package from curriculum already
-  // owned by this course. This gives fresh builds source-grounded material
-  // instead of forcing learning_objectives to retry with an empty source list.
-  const { data: sourceLessons, error: sourceLessonError } = await db
-    .from('course_lessons')
-    .select('id,title,learning_objectives,content')
-    .eq('course_id', input.courseId)
-    .order('order_index');
-  if (sourceLessonError) throw sourceLessonError;
-  const instructionalSources = (sourceLessons ?? [])
-    .map((lesson: any) => {
-      const objectives = Array.isArray(lesson.learning_objectives)
-        ? lesson.learning_objectives.filter(Boolean).join('; ')
-        : '';
-      const content =
-        typeof lesson.content === 'string'
-          ? lesson.content
-          : lesson.content
-            ? JSON.stringify(lesson.content)
-            : '';
-      const text = [
-        lesson.title ? `Lesson: ${lesson.title}` : '',
-        objectives ? `Learning objectives: ${objectives}` : '',
-        content ? `Authorized course content: ${content}` : '',
-      ]
-        .filter(Boolean)
-        .join('\n');
-      return text.trim() ? { id: `course-lesson:${lesson.id}`, text } : null;
-    })
-    .filter(Boolean);
-
-  return {
+  return hydrateUltimateProfileSources(db, input.courseId, {
     id: standard?.standard_key ?? `course:${input.courseId}`,
     title: input.title,
     authority: standard?.source_authority ?? 'course-defined',
@@ -134,8 +152,7 @@ export async function buildUltimateProfile(
     effectiveDate: standard?.revision_date || standard?.registration_date || undefined,
     sourceDocuments: standard
       ? ['DOL Appendix A Work Process Schedule', 'Related Instruction Outline']
-      : instructionalSources.map((source: any) => source.id),
-    instructionalSources,
+      : [],
     socCodes: standard?.onet_soc_code ? [standard.onet_soc_code] : [],
     trainingRequirements: {
       instructionalHours: standard?.related_instruction_hours || undefined,
@@ -155,6 +172,6 @@ export async function buildUltimateProfile(
           )
         : false,
     })),
-  };
+  });
 }
 

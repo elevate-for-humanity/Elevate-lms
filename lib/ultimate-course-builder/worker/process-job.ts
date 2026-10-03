@@ -9,6 +9,7 @@ import { assertCompleteLesson } from '../core/lesson-contract';
 import { UltimateReleaseService } from '../release/release-service';
 import { nextCourseWork } from './course-cursor';
 import { resolveReleaseActor } from './release-actor';
+import { hydrateUltimateProfileSources } from '../core/course-profile';
 export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
@@ -24,8 +25,19 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       .eq('id', job.build_id)
       .single();
     if (error || !build) throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
-    const profile = build.profile as UltimateCredentialProfile;
-    if (!profile?.competencies?.length) throw new Error('ULTIMATE_PROFILE_REPAIR_REQUIRED');
+    const storedProfile = build.profile as UltimateCredentialProfile;
+    if (!storedProfile?.competencies?.length) throw new Error('ULTIMATE_PROFILE_REPAIR_REQUIRED');
+    const profile = await hydrateUltimateProfileSources(db, build.course_id, storedProfile);
+    if (
+      JSON.stringify(profile.instructionalSources ?? []) !==
+      JSON.stringify(storedProfile.instructionalSources ?? [])
+    ) {
+      const { error: profileError } = await db
+        .from('ultimate_course_builds')
+        .update({ profile })
+        .eq('id', build.id);
+      if (profileError) throw profileError;
+    }
     const runtime = await createUltimateRuntime(db);
     const handlers = createProductionHandlers(runtime);
     const payload = (job.payload ?? {}) as any;

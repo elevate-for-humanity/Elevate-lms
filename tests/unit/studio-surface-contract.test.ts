@@ -139,7 +139,11 @@ describe('Admin Dashboard and Studio surface contract', () => {
     const worker = source('services/studio-browser/server.mjs');
     expect(worker).toContain("BrowserServiceError('authentication_required', 409");
     expect(route).toContain("actionMetrics.error === 'authentication_required'");
-    expect(route).toContain("status: 'awaiting_authentication'");
+    expect(route).toContain(
+      "mode === 'authentication' ? 'awaiting_authentication' : 'awaiting_interaction'",
+    );
+    expect(route).toContain("snapshot.error === 'interaction_required'");
+    expect(route).toContain("emit({ type: 'interaction_required'");
     expect(route).toContain('pauseForAuthentication(');
   });
 

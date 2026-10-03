@@ -106,7 +106,10 @@ export async function fetchAiHealth(): Promise<{
   providers: Record<string, boolean>;
 }> {
   try {
-    const res = await fetch('/api/admin/dev-studio/health');
+    const res = await fetch('/api/admin/dev-studio/health', {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(15000),
+    });
     const data = await res.json().catch(() => ({}));
     const providers = {
       elevate: Boolean(data.hasElevate || data.availableProviders?.elevate),

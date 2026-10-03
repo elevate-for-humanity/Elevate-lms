@@ -18,6 +18,7 @@ import { AdminPwaRegister } from '@/components/pwa/AdminPwaRegister';
 import { AdminUpdateNotice } from '@/components/pwa/AdminUpdateNotice';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
+import { chunkRecoveryBootstrap } from '@/lib/browser/chunk-recovery-bootstrap';
 
 export const metadata: Metadata = {
   title: {
@@ -68,6 +69,10 @@ export default async function AdminGroupLayout({ children }: { children: React.R
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          id="admin-chunk-recovery"
+          dangerouslySetInnerHTML={{ __html: chunkRecoveryBootstrap() }}
+        />
         <SupabasePublicConfigScript />
       </head>
       <body className="admin-portal efh-contrast">

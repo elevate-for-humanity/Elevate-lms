@@ -114,6 +114,8 @@ interface UnifiedEllieChatProps {
   restoreLatest?: boolean;
   onConversationChange?: (conversationId: string | null) => void;
   onCommandStart?: (command: string) => void;
+  selectedConversationId?: string | null;
+  restoredCheckpoint?: OrchestratedPlanCheckpoint | null;
 }
 
 const ANSI_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
@@ -206,7 +208,7 @@ function ConversationActivity({ conversationId }: { conversationId: string | nul
 
   return (
     <div className="shrink-0 border-b border-blue-100 bg-blue-50/70 px-4 py-3" aria-live="polite">
-      <div className="mx-auto max-w-5xl space-y-2">
+      <div className="mx-auto max-w-3xl space-y-2">
         <p className="text-xs font-black uppercase tracking-wide text-brand-blue-800">
           This conversation’s live work
         </p>
@@ -399,7 +401,7 @@ function CanonicalRunActivity({ runId }: { runId: string | null }) {
   if (!payload) {
     return (
       <div className="shrink-0 border-b border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-700">
-        <div className="mx-auto flex max-w-5xl items-center gap-2">
+        <div className="mx-auto flex max-w-3xl items-center gap-2">
           {loadError ? (
             <XCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
           ) : (
@@ -424,7 +426,7 @@ function CanonicalRunActivity({ runId }: { runId: string | null }) {
       aria-label="Canonical Studio run"
       aria-live="polite"
     >
-      <div className="mx-auto max-w-5xl space-y-3">
+      <div className="mx-auto max-w-3xl space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           {payload.run.status === 'completed' ? (
             <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-hidden="true" />
@@ -468,7 +470,10 @@ function CanonicalRunActivity({ runId }: { runId: string | null }) {
               ) : step.status === 'failed' ? (
                 <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" aria-hidden="true" />
               ) : step.status === 'blocked' ? (
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" aria-hidden="true" />
+                <AlertTriangle
+                  className="mt-0.5 h-4 w-4 shrink-0 text-amber-600"
+                  aria-hidden="true"
+                />
               ) : step.status === 'running' ? (
                 <Loader2
                   className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-blue-600"
@@ -653,14 +658,19 @@ export default function UnifiedEllieChat({
   restoreLatest = true,
   onConversationChange,
   onCommandStart,
+  selectedConversationId,
+  restoredCheckpoint,
 }: UnifiedEllieChatProps) {
   const naturalVoice = useNaturalVoice();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [restoreError, setRestoreError] = useState('');
+  const [restoringConversation, setRestoringConversation] = useState(false);
+  const [restoreAttempt, setRestoreAttempt] = useState(0);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [health, setHealth] = useState('checking…');
-  const [aiOk, setAiOk] = useState(true);
+  const [aiOk, setAiOk] = useState<boolean | null>(null);
   const [availableProviders, setAvailableProviders] = useState<Record<string, boolean>>({});
   const [selectedProvider, setSelectedProvider] = useState<StudioProvider>('auto');
   const [showActivity, setShowActivity] = useState(false);
@@ -691,16 +701,21 @@ export default function UnifiedEllieChat({
   }, [suggestedPrompt]);
 
   useEffect(() => {
-    if (!restoreLatest) {
+    if (!restoreLatest && !selectedConversationId) {
       setConversationId(null);
       setMessages([]);
       onConversationChange?.(null);
       return;
     }
     let cancelled = false;
-    void fetch('/api/admin/dev-studio/conversations', { cache: 'no-store' })
+    setRestoringConversation(true);
+    setRestoreError('');
+    void fetch(
+      `/api/admin/dev-studio/conversations${selectedConversationId ? `?id=${encodeURIComponent(selectedConversationId)}` : ''}`,
+      { cache: 'no-store', signal: AbortSignal.timeout(15000) },
+    )
       .then(async (response) => {
-        if (!response.ok) return null;
+        if (!response.ok) throw new Error('Could not restore this conversation.');
         const payload = await response.json();
         return Array.isArray(payload.conversations) ? payload.conversations[0] : null;
       })
@@ -720,11 +735,24 @@ export default function UnifiedEllieChat({
           );
         }
       })
-      .catch(() => undefined);
+      .catch((error) => {
+        if (!cancelled)
+          setRestoreError(
+            error instanceof Error ? error.message : 'Could not restore this conversation.',
+          );
+      })
+      .finally(() => {
+        if (!cancelled) setRestoringConversation(false);
+      });
     return () => {
       cancelled = true;
     };
-  }, [onConversationChange, restoreLatest]);
+  }, [onConversationChange, restoreLatest, selectedConversationId, restoreAttempt]);
+
+  useEffect(() => {
+    setPlanCheckpoint(restoredCheckpoint ?? null);
+    setCanonicalRunId(restoredCheckpoint?.runId ?? null);
+  }, [restoredCheckpoint]);
 
   async function ensureConversation(nextMessages: ChatMessage[]): Promise<string> {
     if (conversationId) return conversationId;
@@ -989,7 +1017,7 @@ export default function UnifiedEllieChat({
 
   async function send() {
     const text = input.trim();
-    if (!text || loading) return;
+    if (!text || loading || restoringConversation || restoreError) return;
 
     setInput('');
     setLoading(true);
@@ -1148,7 +1176,7 @@ export default function UnifiedEllieChat({
         </div>
       )}
 
-      {!aiOk && (
+      {aiOk === false && (
         <div className="flex shrink-0 items-start gap-2 border-b border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           <p>
@@ -1165,7 +1193,7 @@ export default function UnifiedEllieChat({
       )}
 
       <div className="shrink-0 border-b border-slate-200 bg-white px-3 py-2">
-        <div className="mx-auto flex max-w-5xl items-center gap-2">
+        <div className="mx-auto flex max-w-3xl items-center gap-2">
           <label className="sr-only" htmlFor="studio-ai-provider">
             Choose AI
           </label>
@@ -1203,6 +1231,26 @@ export default function UnifiedEllieChat({
         </div>
       </div>
 
+      {restoringConversation ? (
+        <p role="status" className="px-4 py-2 text-sm text-slate-600">
+          Restoring your conversation…
+        </p>
+      ) : null}
+      {restoreError ? (
+        <div
+          role="alert"
+          className="flex items-center gap-3 bg-amber-50 px-4 py-2 text-sm text-amber-900"
+        >
+          <p>{restoreError}</p>
+          <button
+            type="button"
+            onClick={() => setRestoreAttempt((value) => value + 1)}
+            className="font-semibold underline"
+          >
+            Retry conversation
+          </button>
+        </div>
+      ) : null}
       {showActivity ? (
         <div className="max-h-[42vh] shrink-0 overflow-y-auto border-b border-slate-200">
           <CanonicalRunActivity runId={canonicalRunId} />
@@ -1213,7 +1261,7 @@ export default function UnifiedEllieChat({
 
       {planCheckpoint?.status === 'awaiting_approval' ? (
         <div className="shrink-0 border-b border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-          <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3">
+          <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-3">
             <Shield className="h-5 w-5 shrink-0" aria-hidden="true" />
             <div className="min-w-0 flex-1">
               <p className="font-bold">
@@ -1236,16 +1284,16 @@ export default function UnifiedEllieChat({
             </button>
           </div>
           {checkpointError ? (
-            <p role="alert" className="mx-auto mt-2 max-w-5xl text-xs text-red-700">
+            <p role="alert" className="mx-auto mt-2 max-w-3xl text-xs text-red-700">
               {checkpointError}
             </p>
           ) : null}
         </div>
       ) : null}
 
-      <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-gradient-to-b from-white via-white to-brand-blue-50/30 px-3 py-4 sm:px-8 sm:py-8">
+      <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-white px-3 py-4 sm:px-8 sm:py-8">
         {messages.length === 0 ? (
-          <div className="mx-auto flex w-full min-w-0 max-w-5xl flex-col items-center py-8 text-center sm:py-20">
+          <div className="mx-auto flex w-full min-w-0 max-w-3xl flex-col items-center py-8 text-center sm:py-20">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-blue-700 shadow-lg shadow-brand-blue-700/20 ring-4 ring-brand-blue-100">
               <Bot className="h-8 w-8 text-white" aria-hidden="true" />
             </div>
@@ -1257,7 +1305,12 @@ export default function UnifiedEllieChat({
               database contract, workflow, builder, or deployment capability.
             </p>
             <p className="mt-1 text-xs text-gray-500">
-              LIZZY runtime: {aiOk ? 'connected' : 'configuration required'}
+              AI configuration:{' '}
+              {aiOk === null
+                ? 'checking…'
+                : aiOk
+                  ? 'available — execution is verified per command'
+                  : 'configuration required'}
             </p>
 
             <div className="mt-5 grid w-full min-w-0 grid-cols-1 gap-2 sm:mt-7 sm:grid-cols-2">
@@ -1277,7 +1330,7 @@ export default function UnifiedEllieChat({
             </div>
           </div>
         ) : (
-          <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-5">
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -1361,7 +1414,7 @@ export default function UnifiedEllieChat({
       </div>
 
       <div className={`min-w-0 shrink-0 border-t p-3 sm:p-4 ${inputAreaClass}`}>
-        <div className="mx-auto w-full min-w-0 max-w-5xl">
+        <div className="mx-auto w-full min-w-0 max-w-3xl">
           {attachment ? (
             <div className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900">
               <span className="min-w-0 truncate font-semibold">Attached: {attachment.name}</span>
@@ -1427,6 +1480,7 @@ export default function UnifiedEllieChat({
             </button>
             <textarea
               ref={inputRef}
+              aria-label="Tell Admin AI what you need done..."
               value={input}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={(event) => {
@@ -1479,7 +1533,7 @@ export default function UnifiedEllieChat({
             <button
               type="button"
               aria-label="Send request"
-              disabled={!input.trim() || loading}
+              disabled={!input.trim() || loading || restoringConversation || Boolean(restoreError)}
               onClick={() => void send()}
               className="flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-4 text-sm font-bold text-white transition hover:bg-brand-red-800 disabled:cursor-not-allowed disabled:opacity-40"
             >

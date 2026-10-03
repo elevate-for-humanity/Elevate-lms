@@ -297,3 +297,19 @@ test('manual double click forwards exactly two pointer pairs without delayed foc
   await runActions({page: {mouse}}, {actions: [{type: 'pointer_click', x: 10, y: 20, clickCount: 1}, {type: 'pointer_click', x: 10, y: 20, clickCount: 2}]});
   assert.deepEqual(calls, [['down', 1], ['up', 1], ['down', 2], ['up', 2]]);
 });
+
+
+test('viewport changes reach every tab and future popups with matching pointer geometry', async () => {
+  let onPage;
+  const page = () => ({on: () => {}, setViewportSize: async function(viewport) {this.viewport = viewport;}, viewportSize: function() {return this.viewport;}});
+  const main = page(), popup = page(), future = page();
+  const session = {page: main, viewport: {width: 1280, height: 900}, events: [], context: {on: (_, listener) => {onPage = listener;}}};
+  attachBrowserTabs(session, () => {});
+  onPage(popup);
+  await runActions(session, {type: 'viewport', width: 390, height: 780});
+  onPage(future);
+  assert.deepEqual(main.viewport, {width: 390, height: 780});
+  assert.deepEqual(popup.viewport, main.viewport);
+  assert.deepEqual(future.viewport, main.viewport);
+  await assert.rejects(() => runActions(session, {type: 'viewport', width: 1, height: 1}), error => error.code === 'invalid_viewport');
+});

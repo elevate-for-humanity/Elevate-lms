@@ -134,6 +134,15 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain('STUDIO_BROWSER_PUBLIC_URL');
   });
 
+  it('pauses the canonical browser task when the worker detects provider authentication', () => {
+    const route = source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
+    const worker = source('services/studio-browser/server.mjs');
+    expect(worker).toContain("BrowserServiceError('authentication_required', 409");
+    expect(route).toContain("actionMetrics.error === 'authentication_required'");
+    expect(route).toContain("status: 'awaiting_authentication'");
+    expect(route).toContain('pauseForAuthentication(');
+  });
+
   it('binds browser evidence to the canonical task identity for the full stream', () => {
     const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
     const route = source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');

@@ -249,10 +249,16 @@ export default function CloudBrowserWorkspace({
     const revision = navigation ? ++navigationRevisionRef.current : navigationRevisionRef.current;
     if (navigation) navigatingRef.current = true;
     try {
-      const response = await fetch(`${endpoint}/actions`, {
+      // Keep privileged browser actions on the authenticated Admin origin.
+      // The public worker URL is retained only for read-only frame/event streams.
+      const response = await fetch('/api/admin/dev-studio/browser/action', {
         method: 'POST',
-        headers: { ...authHeaders, 'content-type': 'application/json' },
-        body: JSON.stringify(payload),
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: session.id,
+          sessionToken: session.token,
+          action: payload,
+        }),
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) setError(body.error || 'Browser action failed');

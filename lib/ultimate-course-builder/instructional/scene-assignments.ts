@@ -8,22 +8,32 @@ import { mediaMatchTerms } from '@/lib/media/licensed-course-media';
 export function buildSceneAssignments(scenes: any[], assets: any[], configured: any[] = []) {
   const assignments: any[] = [];
   const gaps: any[] = [];
-  const used = new Set<string>();
 
   const overlapEvidence = (scene: any, asset: any) => {
     const requirement = String(scene.visualRequirement ?? '').trim();
-    const assetText = [
-      asset.title,
-      asset.relevance_reason,
-      asset.lesson_match_query,
-      ...(Array.isArray(asset.lesson_match_reasons) ? asset.lesson_match_reasons : []),
-      ...(Array.isArray(asset.visual_requirements) ? asset.visual_requirements : []),
-    ].filter(Boolean).join(' ');
+    const observed = Array.isArray(asset.observed_visual_actions)
+      ? asset.observed_visual_actions
+      : [];
+    const assetText = observed.length
+      ? observed.join(' ')
+      : [
+          asset.title,
+          asset.relevance_reason,
+          asset.lesson_match_query,
+          ...(Array.isArray(asset.lesson_match_reasons) ? asset.lesson_match_reasons : []),
+          ...(Array.isArray(asset.visual_requirements) ? asset.visual_requirements : []),
+        ]
+          .filter(Boolean)
+          .join(' ');
     const required = mediaMatchTerms(requirement);
     const available = new Set(mediaMatchTerms(assetText));
     const overlap = required.filter((term) => available.has(term));
-    const lessonTopic = mediaMatchTerms(String(scene.lessonTitle ?? scene.topic ?? requirement))
-      .filter((term) => !['show','relevant','non','looping','instructional','visual','during'].includes(term));
+    const lessonTopic = mediaMatchTerms(
+      String(scene.lessonTitle ?? scene.topic ?? requirement),
+    ).filter(
+      (term) =>
+        !['show', 'relevant', 'non', 'looping', 'instructional', 'visual', 'during'].includes(term),
+    );
     const topicOverlap = lessonTopic.filter((term) => available.has(term));
     const evidence = [...new Set([...overlap, ...topicOverlap])];
     return {
@@ -34,75 +44,107 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
     };
   };
 
-  for (const scene of scenes) {
+  const candidates = assets.filter(
+    (a) => a.public_url && a.entitlement_id && a.license_evidence_url,
+  );
+  // Both item identity and byte identity must remain distinct. Derivatives of
+  // one item cannot become additional licensed clips merely by changing hash.
+  const groups = new Map<string, string>();
+  const root = (key: string): string => {
+    const parent = groups.get(key);
+    if (!parent || parent === key) return key;
+    const resolved = root(parent);
+    groups.set(key, resolved);
+    return resolved;
+  };
+  const itemKey = (asset: any) =>
+    `item:${asset.provider ?? 'envato'}:${asset.provider_item_id ?? asset.entitlement_id}`;
+  for (const asset of candidates) {
+    if (asset.content_sha256)
+      groups.set(root(`hash:${asset.content_sha256}`), root(itemKey(asset)));
+  }
+  const identity = (asset: any) => root(itemKey(asset));
+  const choices = scenes.map((scene) => {
     const explicit = configured.find((a) => a.sceneId === scene.id);
-    const requirement = String(scene.visualRequirement ?? '').trim().toLowerCase();
-    const candidates = assets.filter(
-      (a) => a.public_url && a.entitlement_id && a.license_evidence_url,
-    );
-    let asset: any;
-    let reason = '';
-
-    if (explicit) {
-      asset = candidates.find((a) => a.id === explicit.assetId);
-      reason = explicit.relevanceReason ?? asset?.relevance_reason ?? '';
-    } else {
-      for (const candidate of candidates) {
-        const identity = candidate.provider_item_id ?? candidate.entitlement_id;
-        // Every scene must use a distinct licensed source clip. Editing the same
-        // footage differently is not distinct visual evidence for another scene.
-        if (used.has(String(identity))) continue;
-        if (candidate.scene_id === scene.id && candidate.relevance_reason) {
-          asset = candidate;
-          reason = candidate.relevance_reason;
-          break;
-        }
-        if (
-          candidate.visual_coverage_verified === true &&
-          candidate.visual_requirements?.some(
-            (r: string) => r.trim().toLowerCase() === requirement,
-          )
+    const requirement = String(scene.visualRequirement ?? '')
+      .trim()
+      .toLowerCase();
+    return candidates
+      .flatMap((asset) => {
+        let reason = '';
+        let method = '';
+        if (explicit) {
+          if (asset.id !== explicit.assetId) return [];
+          reason = explicit.relevanceReason ?? asset.relevance_reason ?? '';
+          method = 'lesson-scoped';
+        } else if (asset.scene_id === scene.id && asset.relevance_reason) {
+          reason = asset.relevance_reason;
+          method = 'verified-coverage';
+        } else if (
+          asset.visual_coverage_verified === true &&
+          asset.visual_requirements?.some((r: string) => r.trim().toLowerCase() === requirement)
         ) {
-          asset = candidate;
           reason =
-            candidate.relevance_reason ??
+            asset.relevance_reason ??
             `Verified visual coverage matches the scene requirement: ${scene.visualRequirement}`;
-          break;
-        }
-        if (candidate.lesson_match_verified === true) {
-          const evidence = overlapEvidence(scene, candidate);
+          method = 'verified-coverage';
+        } else if (asset.lesson_match_verified === true) {
+          const evidence = overlapEvidence(scene, asset);
           if (evidence.overlap.length) {
-            asset = candidate;
             reason = evidence.reason;
-            break;
+            method = 'verified-lesson-semantic-overlap';
           }
         }
+        return reason?.trim() ? [{ asset, reason, method }] : [];
+      })
+      .sort((a, b) => {
+        const rank = (m: string) => (m === 'lesson-scoped' ? 0 : m === 'verified-coverage' ? 1 : 2);
+        return (
+          rank(a.method) - rank(b.method) || String(a.asset.id).localeCompare(String(b.asset.id))
+        );
+      });
+  });
+  // Reassign earlier choices before requesting more files. Eligibility stays
+  // unchanged; this cannot manufacture coverage or license evidence.
+  const owners = new Map<string, number>();
+  const selected = new Map<number, (typeof choices)[number][number]>();
+  const assign = (index: number, visited: Set<string>): boolean => {
+    for (const choice of choices[index]) {
+      const key = identity(choice.asset);
+      if (visited.has(key)) continue;
+      visited.add(key);
+      const owner = owners.get(key);
+      if (owner === undefined || assign(owner, visited)) {
+        owners.set(key, index);
+        selected.set(index, choice);
+        return true;
       }
     }
-
-    const identity = asset?.provider_item_id ?? asset?.entitlement_id;
-    if (!asset || !reason?.trim() || used.has(String(identity))) {
+    return false;
+  };
+  const order = scenes
+    .map((_, index) => index)
+    .sort((a, b) => choices[a].length - choices[b].length || a - b);
+  for (const index of order) assign(index, new Set());
+  for (const [index, scene] of scenes.entries()) {
+    const choice = selected.get(index);
+    if (!choice) {
       gaps.push({
         sceneId: scene.id,
         visualRequirement: scene.visualRequirement,
-        reason: explicit
+        reason: configured.some((a) => a.sceneId === scene.id)
           ? 'Configured asset is unavailable, unlicensed, repeated, or missing relevance evidence'
           : 'No distinct licensed asset has verified lesson/scene relevance evidence',
         licensedAssetCount: candidates.length,
       });
       continue;
     }
-    used.add(String(identity));
     assignments.push({
       sceneId: scene.id,
-      assetId: asset.id,
-      licenseEvidenceUrl: asset.license_evidence_url,
-      relevanceReason: reason,
-      assignmentMethod: explicit
-        ? 'lesson-scoped'
-        : asset.visual_coverage_verified === true
-          ? 'verified-coverage'
-          : 'verified-lesson-semantic-overlap',
+      assetId: choice.asset.id,
+      licenseEvidenceUrl: choice.asset.license_evidence_url,
+      relevanceReason: choice.reason,
+      assignmentMethod: choice.method,
     });
   }
   return { assignments, gaps };

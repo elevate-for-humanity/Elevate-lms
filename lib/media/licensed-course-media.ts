@@ -135,12 +135,14 @@ export async function recommendLicensedMediaForCourse(input: {
     // Licensed media is selected against the actual teaching/narration context,
     // not merely the lesson title. This lets Envato assets follow the spoken
     // instruction and prevents generic decorative footage from winning.
-    const content = lesson.content && typeof lesson.content === 'object'
-      ? (lesson.content as Record<string, unknown>)
-      : {};
-    const experience = content.experience && typeof content.experience === 'object'
-      ? (content.experience as Record<string, unknown>)
-      : {};
+    const content =
+      lesson.content && typeof lesson.content === 'object'
+        ? (lesson.content as Record<string, unknown>)
+        : {};
+    const experience =
+      content.experience && typeof content.experience === 'object'
+        ? (content.experience as Record<string, unknown>)
+        : {};
     const lessonText = [
       lesson.title,
       typeof lesson.content === 'string' ? lesson.content : JSON.stringify(lesson.content ?? {}),
@@ -171,11 +173,7 @@ export async function recommendLicensedMediaForCourse(input: {
           ...scoreLicensedMediaMatch(lessonText, entitlement.title),
         };
       })
-      .filter(
-        (match) =>
-          match.score >= 0.15 &&
-          (match.stored || match.retrievableWorkspaceAsset),
-      )
+      .filter((match) => match.score >= 0.15 && (match.stored || match.retrievableWorkspaceAsset))
       .sort((a, b) => {
         if (a.stored !== b.stored) return a.stored ? -1 : 1;
         return b.score - a.score;
@@ -226,9 +224,23 @@ export type StoredLicensedMediaMetadata = {
 export function storedLicensedMediaMetadata(value: unknown): StoredLicensedMediaMetadata | null {
   if (!value || typeof value !== 'object') return null;
   const metadata = value as Record<string, unknown>;
-  const storageBucket = String(metadata.storage_bucket ?? '');
-  const storagePath = String(metadata.storage_path ?? '');
-  if (storageBucket !== 'course_videos' || !storagePath.startsWith('licensed-library/'))
+  const courseId = String(metadata.courseId ?? '');
+  const legacyCoursePath = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    courseId,
+  );
+  const storagePath = String(metadata.storage_path ?? metadata.storagePath ?? '');
+  const storageBucket = String(
+    metadata.storage_bucket ?? (legacyCoursePath ? 'course_videos' : ''),
+  );
+  // Historical imports already live in this private bucket, under their
+  // course UUID. Recognize them without fetching another copy or moving files.
+  const ownedCoursePath = legacyCoursePath && storagePath.startsWith(`${courseId}/`);
+  if (
+    storageBucket !== 'course_videos' ||
+    (!storagePath.startsWith('licensed-library/') && !ownedCoursePath) ||
+    storagePath.split('/').some((part) => !part || part === '.' || part === '..') ||
+    /[\\?#]/.test(storagePath)
+  )
     return null;
   return {
     storage_bucket: storageBucket,

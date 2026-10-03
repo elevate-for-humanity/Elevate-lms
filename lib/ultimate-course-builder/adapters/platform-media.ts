@@ -148,6 +148,8 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
           mime_type: metadata.mime_type,
           provider: entitlement.provider ?? 'envato',
           provider_item_id: entitlement.provider_item_id,
+          content_sha256: metadata.courseReadySha256 ?? metadata.sha256,
+          observed_visual_actions: metadata.visual_observation?.visibleActions,
           license_evidence_url: observedLicenseEvidence(entitlement),
           license_observation: { itemId: entitlement.provider_item_id, observedAt: metadata.licenseObservedAt,
             workspaceId: metadata.workspaceId, verificationStatus: metadata.licenseVerificationStatus },

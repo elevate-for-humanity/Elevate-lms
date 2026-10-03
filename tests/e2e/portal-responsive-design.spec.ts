@@ -462,6 +462,7 @@ test.describe('Studio readable sign-in and composer', () => {
     await page.goto(`${ADMIN_BASE}/studio/browser`);
     await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
     await page.getByLabel('Browser URL').fill('https://app.envato.com');
+    await expect(page.getByRole('button', { name: 'Start Chromium', exact: true })).toBeEnabled({ timeout: 30_000 });
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
     const stream = page.getByAltText('Live isolated Chromium browser');
     try {

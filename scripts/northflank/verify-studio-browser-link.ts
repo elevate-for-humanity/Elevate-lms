@@ -40,6 +40,12 @@ const authVolumeDetail = authVolume?.id
       projectApiPath(projectId, `/volumes/${String(authVolume.id)}`),
     )
   : null;
+const authVolumeSizeMb = Number(
+  authVolumeDetail?.spec?.storageSize ??
+    authVolumeDetail?.data?.spec?.storageSize ??
+    authVolume?.spec?.storageSize ??
+    0,
+);
 const attachedObjects = arrayFrom(authVolumeDetail?.attachedObjects).concat(
   arrayFrom(authVolumeDetail?.data?.attachedObjects),
 );
@@ -59,6 +65,8 @@ const failures = [
   authStateDir !== '/var/lib/studio-browser-auth' &&
     'Browser durable provider-session directory is missing',
   !authVolume && 'Browser durable provider-session volume is missing',
+  authVolume && authVolumeSizeMb < 6144 &&
+    'Browser durable provider-session volume is below the Northflank 6 GiB minimum',
   authVolume &&
     !attachedObjects.some(
       (attached) => attached.id === browserServiceId && attached.type === 'service',

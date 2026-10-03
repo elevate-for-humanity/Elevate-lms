@@ -20,7 +20,7 @@ describe('paid provider boundary', () => {
     );
   });
 
-  it('keeps metered Course Builder dispatch inside the gateway while allowing owned browser planning', () => {
+  it('keeps metered Course Builder dispatch inside an explicit authorization boundary', () => {
     const generation = readFileSync('apps/admin/app/api/admin/course-builder/route.ts', 'utf8');
     const canonicalGeneration = readFileSync(
       'apps/admin/app/api/admin/courses/generate/route.ts',
@@ -41,9 +41,9 @@ describe('paid provider boundary', () => {
       'utf8',
     );
     const planner = readFileSync('lib/devstudio/browser-planner.ts', 'utf8');
-    expect(studioBrowser).not.toContain('reservePaidInference');
-    expect(studioBrowser).not.toContain('executePaidInference');
-    expect(planner).toContain("providerPolicy: 'owned-only'");
+    expect(studioBrowser).toContain('runWithPaidInferenceContext(taskId');
+    expect(planner).toContain("providerPolicy: 'canonical'");
+    expect(planner).not.toContain("providerPolicy: 'owned-only'");
   });
 
   it('does not require paid authorization for Elevate-owned chat inference', () => {

@@ -4,6 +4,7 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createAiTask } from '@/lib/devstudio/os/task-runner';
 import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
+import { runWithPaidInferenceContext } from '@/lib/ai/paid-inference-context';
 import {
   browserActionRecords,
   browserTaskMatches,
@@ -199,12 +200,18 @@ export async function POST(req: NextRequest) {
             if (!snapshotResponse.ok) {
               throw new Error(snapshot.error || 'Could not read the current browser page');
             }
-            const plan = await planBrowserTurn({
-              command,
-              instructions,
-              snapshot,
-              history,
-            });
+            // The canonical browser task is the authorization boundary for its
+            // planner calls. Preserve that boundary while allowing the planner
+            // to use Studio's configured provider instead of hard-coding the
+            // optional Elevate-owned gateway.
+            const plan = await runWithPaidInferenceContext(taskId, () =>
+              planBrowserTurn({
+                command,
+                instructions,
+                snapshot,
+                history,
+              }),
+            );
             totalTokens += plan.usage?.totalTokens || 0;
             await appendLog(
               `Browser plan ${turn + 1}: ${plan.status} via ${plan.provider}/${plan.model}.`,

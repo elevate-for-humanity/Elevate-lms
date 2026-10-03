@@ -176,7 +176,11 @@ export async function planBrowserTurn(input: {
     temperature: 0.1,
     maxTokens: 1200,
     jsonMode: true,
-    providerPolicy: 'owned-only',
+    // Browser planning must use the same canonical provider selected for the
+    // rest of Studio. Pinning this path to Elevate-owned inference stranded
+    // every browser task when that optional gateway was offline even though a
+    // healthy canonical provider was configured.
+    providerPolicy: 'canonical',
   });
   return {
     ...validateBrowserTurn(result.content, input.snapshot),

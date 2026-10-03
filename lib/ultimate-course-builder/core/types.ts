@@ -30,6 +30,7 @@ export interface UltimateCredentialProfile {
   standardVersion: string;
   effectiveDate?: string;
   sourceDocuments: string[];
+  mediaAcquisitionOwnerId?: string;
   sceneAssignments?: Record<string, Array<{ sceneId: string; assetId: string; relevanceReason: string }>>;
   instructionalSources?: Array<{ id: string; text: string }>;
   lessonBlueprints?: Record<string, import('../instructional/lesson-blueprint').LessonBlueprint>;

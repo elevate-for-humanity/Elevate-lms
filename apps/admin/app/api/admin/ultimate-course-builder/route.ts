@@ -303,7 +303,7 @@ export async function POST(req: NextRequest) {
       .from('ultimate_course_builds')
       .insert({
         course_id: body.courseId,
-        profile: body.profile,
+        profile: { ...body.profile, mediaAcquisitionOwnerId: auth.id },
         status: 'initializing',
         current_step: 'standards_lock',
         findings: [],
@@ -356,7 +356,7 @@ export async function POST(req: NextRequest) {
     if (!programSlug) {
       return NextResponse.json({ error: 'programSlug is required' }, { status: 400 });
     }
-    const profile = await buildUltimateProfile(db, {
+    const generatedProfile = await buildUltimateProfile(db, {
       courseId: course.id,
       programSlug,
       title: String(body.title || course.title),
@@ -364,6 +364,7 @@ export async function POST(req: NextRequest) {
       audience: String(body.audience || ''),
       state: String(body.state || ''),
     });
+    const profile = { ...generatedProfile, mediaAcquisitionOwnerId: auth.id };
 
     const { data: activeBuild, error: activeError } = await db
       .from('ultimate_course_builds')

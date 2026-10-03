@@ -1,12 +1,12 @@
 import {describe,it,expect} from 'vitest';
 import {requestMediaDependency} from '@/lib/ultimate-course-builder/worker/request-media-dependency';
 
-function database(owner: string|null='creator') {
+function database(owner: string|null='creator', role='admin') {
   const runs:Record<string,unknown>[]=[];
   const api={from(table:string){
     let row:Record<string,unknown>|undefined;
     const query={select(){return query;},eq(){return query;},
-      async single(){return {data:table==='courses'?{created_by:owner,title:'Cosmetology'}:runs[0],error:null};},
+      async single(){return {data:table==='courses'?{created_by:owner,title:'Cosmetology'}:table==='profiles'?{id:'configured-owner',role}:runs[0],error:null};},
       async upsert(input:Record<string,unknown>,options:Record<string,unknown>){
         expect(options).toEqual({onConflict:'user_id,idempotency_key',ignoreDuplicates:true});
         if(!runs.length)runs.push({id:'run-id',...input});
@@ -37,6 +37,17 @@ describe('existing Studio media request',()=>{
   it('does not create a browser request for a fully covered lesson',async()=>{
     const {db,runs}=database();
     expect(await requestMediaDependency(db as never,{...input,gaps:[]})).toBeNull();
+    expect(runs).toHaveLength(0);
+  });
+  it('uses a verified configured administrator for an imported course without changing creator history',async()=>{
+    const {db,runs}=database(null);
+    await requestMediaDependency(db as never,{...input,ownerId:'configured-owner'});
+    expect(runs[0].user_id).toBe('configured-owner');
+  });
+  it('rejects a configured learner as an acquisition administrator',async()=>{
+    const {db,runs}=database(null,'student');
+    await expect(requestMediaDependency(db as never,{...input,ownerId:'configured-owner'}))
+      .rejects.toThrow('ULTIMATE_MEDIA_OWNER_REQUIRED');
     expect(runs).toHaveLength(0);
   });
   it('does not create unowned provider sessions',async()=>{

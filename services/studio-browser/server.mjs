@@ -11,6 +11,7 @@ import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 import { chromium } from 'playwright-core';
 import { ProviderSessionStore } from './provider-session-store.mjs';
+import { prepareCourseVideoDownload, hasActiveMediaTransfer } from './course-video-download.mjs';
 import { runLearnerTest, credentialMatches, learnerSetupReady } from './learner-runthrough.mjs';
 
 const execFileAsync = promisify(execFile);
@@ -720,6 +721,9 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
           .saveAs(filePath)
           .then(async () => {
             await normalizeDownloadedVideo(item);
+            item.status = 'normalizing';
+            record('download', { downloadId: id, fileName: item.fileName, status: 'normalizing' });
+            await prepareCourseVideoDownload(item);
             const stat = await fs.promises.stat(item.filePath);
             item.size = stat.size;
             item.status = 'ready';
@@ -1245,7 +1249,8 @@ const server = http.createServer(async (req, res) => {
 
 const cleanupTimer = setInterval(() => {
   const cutoff = Date.now() - sessionTtlMs;
-  for (const [id, session] of sessions) if (session.lastSeen < cutoff) void destroySession(id);
+  for (const [id, session] of sessions)
+    if (session.lastSeen < cutoff && !hasActiveMediaTransfer(session.downloads)) void destroySession(id);
   for (const [id, test] of learnerTests) if (test.state !== 'running' && test.createdAt < Date.now() - 2 * 60 * 60_000) learnerTests.delete(id);
 }, 30_000).unref();
 

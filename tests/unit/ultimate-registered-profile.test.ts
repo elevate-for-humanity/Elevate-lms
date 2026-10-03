@@ -6,6 +6,10 @@ describe('Barber standards lock', () => {
   it('matches the registered Appendix A contract and rejects altered competencies', async () => {
     const profile = await new UltimateAppendixAStandardsSource().load({programSlug:'barber-apprenticeship'});
     expect(verifyRegisteredProfile(profile).rapidsCode).toBe('0030CB');
+    expect(profile.instructionalSources).toHaveLength(profile.competencies.length);
+    expect(profile.instructionalSources?.map((source) => source.id)).toEqual(
+      profile.competencies.map((competency) => competency.id),
+    );
     const changed = {...profile,competencies:profile.competencies.map((c,index)=>index?c:{...c,description:'Different standard'})};
     expect(() => verifyRegisteredProfile(changed)).toThrow('ULTIMATE_REGISTERED_PROFILE_MISMATCH');
   });

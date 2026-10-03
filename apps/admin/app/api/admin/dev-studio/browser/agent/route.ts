@@ -44,6 +44,31 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Task and browser session are required' }, { status: 400 });
   }
 
+  await hydrateProcessEnv().catch(() => undefined);
+  const workerUrl = (process.env.STUDIO_BROWSER_URL || '').replace(/\/$/, '');
+  if (!workerUrl) {
+    return NextResponse.json(
+      { error: 'Studio browser runtime is not configured' },
+      { status: 503 },
+    );
+  }
+  const identityResponse = await fetch(`${workerUrl}/sessions/${sessionId}/identity`, {
+    headers: { Authorization: `Bearer ${sessionToken}` },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(10000),
+  }).catch(() => null);
+  const identity = await identityResponse?.json().catch(() => ({}));
+  if (!identityResponse?.ok)
+    return NextResponse.json(
+      { error: identity?.error || 'Browser connection is unavailable' },
+      { status: identityResponse?.status || 503 },
+    );
+  if (identity?.ownerId !== auth.id)
+    return NextResponse.json(
+      { error: 'Browser session does not belong to this administrator' },
+      { status: 403 },
+    );
+
   const db = await requireAdminClient();
   if (acquisitionRunId) {
     const { data: acquisition, error: acquisitionError } = await db
@@ -77,6 +102,29 @@ export async function POST(req: NextRequest) {
       .eq('tool_name', 'browser.execute')
       .maybeSingle();
     task = data;
+    // A restarted worker has a new ephemeral session ID. Rebind only after
+    // proving both the task and live browser belong to the same administrator
+    // and the exact original command remains unchanged.
+    const priorSessionId = String(task?.tool_input?.sessionId || '');
+    if (
+      task &&
+      priorSessionId !== sessionId &&
+      browserTaskMatches(task, { command, sessionId: priorSessionId }) &&
+      (!acquisitionRunId || task.studio_run_id === acquisitionRunId)
+    ) {
+      const toolInput = { ...task.tool_input, sessionId };
+      const { error: rebindError } = await db
+        .from('ai_tasks')
+        .update({ tool_input: toolInput })
+        .eq('id', requestedTaskId)
+        .eq('requested_by', auth.id);
+      if (rebindError)
+        return NextResponse.json(
+          { error: 'Could not reconnect the browser checkpoint' },
+          { status: 503 },
+        );
+      task = { ...task, tool_input: toolInput };
+    }
     if (
       !browserTaskMatches(task, { command, sessionId }) ||
       (acquisitionRunId && task?.studio_run_id !== acquisitionRunId)
@@ -131,14 +179,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  await hydrateProcessEnv().catch(() => undefined);
-  const workerUrl = (process.env.STUDIO_BROWSER_URL || '').replace(/\/$/, '');
-  if (!workerUrl) {
-    return NextResponse.json(
-      { error: 'Studio browser runtime is not configured' },
-      { status: 503 },
-    );
-  }
   const workerHeaders = {
     Authorization: `Bearer ${sessionToken}`,
     'content-type': 'application/json',
@@ -252,7 +292,49 @@ export async function POST(req: NextRequest) {
           emit({ type: 'status', message: 'Planning browser workflow…' });
           if (steps.length)
             await appendLog(`Browser workflow resumed from checkpoint ${steps.length}.`);
-          for (let turn = steps.length; turn < 20; turn++) {
+          const requestStartedAt = Date.now();
+          const batchStart = steps.length;
+          const maxTaskSteps = Math.min(
+            2000,
+            Math.max(100, Number(process.env.STUDIO_BROWSER_MAX_TASK_STEPS) || 400),
+          );
+          const continueFromCheckpoint = async () => {
+            await updateTask({
+              status: 'queued',
+              completed_at: null,
+              error_message: null,
+              result_json: {
+                ok: true,
+                status: 'continuing',
+                steps,
+                history,
+                usage: { totalTokens },
+              },
+            });
+            emit({
+              type: 'continue',
+              message: 'Continuing the same browser task from its saved checkpoint.',
+            });
+          };
+          for (let turn = batchStart; turn < batchStart + 20; turn++) {
+            if (steps.length >= maxTaskSteps) {
+              const reason = `Review the browser task after ${maxTaskSteps} checkpoints and narrow the command or increase its configured budget.`;
+              await pauseForAuthentication(
+                reason,
+                steps,
+                history,
+                totalTokens,
+                undefined,
+                undefined,
+                'interaction',
+              );
+              emit({ type: 'interaction_required', message: reason });
+              return;
+            }
+            if (Date.now() - requestStartedAt > 55000) {
+              await continueFromCheckpoint();
+              return;
+            }
             await assertNotCancelled();
             const snapshotResponse = await fetch(`${workerUrl}/sessions/${sessionId}/snapshot`, {
               headers: { Authorization: `Bearer ${sessionToken}` },
@@ -404,6 +486,10 @@ export async function POST(req: NextRequest) {
               emit({ type: 'authentication_required', message: reason, steps });
               return;
             }
+            if (!actionResponse.ok && actionMetrics.error === 'stale_control') {
+              await appendLog('A popup changed the active tab; rebuilding the control snapshot.');
+              continue;
+            }
             if (!actionResponse.ok) throw new Error(actionMetrics.error || 'Browser action failed');
             const step: BrowserStep = {
               turn: turn + 1,
@@ -447,7 +533,8 @@ export async function POST(req: NextRequest) {
               `Browser checkpoint ${turn + 1} persisted (${actions.length} actions).`,
             );
           }
-          throw new Error('AI browser reached the 20-step safety limit');
+          await continueFromCheckpoint();
+          return;
         } catch (error) {
           const message = error instanceof Error ? error.message : 'AI browser task failed';
           const cancelled = message.includes('cancelled');

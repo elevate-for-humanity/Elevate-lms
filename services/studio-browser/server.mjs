@@ -648,20 +648,28 @@ export async function receiveBrowserUpload(session, request, limit = 32 * 1024 *
 
 async function runBrowserFoundationTest() {
   // A fresh context in the existing worker: no learner/provider account is used.
-  const session = await createSession('about:blank', { width: 390, height: 780 });
+  const testOwner = `foundation-${crypto.randomUUID()}`;
+  const session = await createSession('about:blank', { width: 390, height: 780 }, [], testOwner);
   const checks = [];
   const check = async (name, action) => {
     try { await action(); checks.push({ name, passed: true }); }
-    catch (error) { checks.push({ name, passed: false, reason: sanitizeReason(error) }); }
+    catch (error) { checks.push({ name, passed: false, reason: `${sanitizeReason(error)} ${session.events.filter(event => event.type === 'pageerror' || (event.type === 'console' && event.level === 'error')).slice(-3).map(event => event.text).join('; ')}`.slice(0, 2000) }); }
   };
-  const fixture = `<html><body style="height:2200px"><label>Text<input id="text" ondblclick="this.dataset.doubleclicked='true'"></label><iframe srcdoc="<input placeholder='Embedded lesson form'>"></iframe><button id="popup" onclick="window.open('about:blank')">Open tab</button><input id="file" type="file"><button id="confirm" onclick="document.body.dataset.confirmed=String(confirm('Confirm test'))">Confirm</button><button id="download" onclick="const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['browser acceptance'],{type:'text/plain'}));a.download='acceptance.txt';a.click()">Download</button></body></html>`;
+  const fixture = `<html><body style="height:2200px"><label>Text<input id="text" ondblclick="this.dataset.doubleclicked='true'"></label><iframe srcdoc="<input placeholder='Embedded lesson form'>"></iframe><button id="popup" onclick="window.open('about:blank')">Open tab</button><input id="file" type="file"><button id="confirm" onclick="document.body.dataset.confirmed=String(confirm('Confirm test'))">Confirm</button><a id="download" href="https://www.elevateforhumanity.org/studio-browser-acceptance/download" download="acceptance.txt">Download</a></body></html>`;
   const assert = (condition, reason) => { if (!condition) throw new Error(reason); };
   try {
     const page = session.page;
     // Use a routed HTTPS origin, as real downloads do, instead of an opaque
     // about:blank document whose blob download policies differ.
-    await session.context.route('https://www.elevateforhumanity.org/studio-browser-acceptance/**', route => route.fulfill({ contentType: 'text/html', body: fixture }));
+    await session.context.route('https://www.elevateforhumanity.org/studio-browser-acceptance/**', route => route.request().url().endsWith('/download') ? route.fulfill({ contentType: 'text/plain', headers: {'content-disposition': 'attachment; filename="acceptance.txt"'}, body: 'browser acceptance' }) : route.fulfill({ contentType: 'text/html', body: fixture }));
     await page.goto('https://www.elevateforhumanity.org/studio-browser-acceptance/fixture');
+    await check('session_identity', async () => {
+      const url = `http://127.0.0.1:${port}/sessions/${session.id}/identity`;
+      const response = await fetch(url, {headers: {Authorization: `Bearer ${session.token}`}});
+      assert(response.ok && (await response.json()).ownerId === testOwner, 'session_owner_mismatch');
+      const denied = await fetch(url, {headers: {Authorization: 'Bearer invalid'}});
+      assert(denied.status === 401, 'invalid_session_credential_accepted');
+    });
     await check('keyboard_and_pointer', async () => {
       const box = await page.locator('#text').boundingBox();
       await runActions(session, { actions: [{ type: 'pointer_click', clickCount: 1, x: box.x + 4, y: box.y + 4 }, { type: 'type', text: 'connected browser' }] });
@@ -677,7 +685,7 @@ async function runBrowserFoundationTest() {
       const snapshot = await snapshotPage(session);
       const control = snapshot.controls.find(control => control.placeholder === 'Embedded lesson form');
       assert(control, 'embedded_control_missing');
-      await runActions(session, { type: 'fill_ref', ref: control.ref, text: 'embedded input works' });
+      await runActions(session, { actions: [{ type: 'fill_ref', ref: control.ref, text: 'embedded input works' }, { type: 'press_ref', ref: control.ref, key: 'Enter' }] });
       assert(await page.frameLocator('iframe').locator('input').inputValue() === 'embedded input works', 'embedded_input_mismatch');
     });
     await check('mobile_viewport_and_screenshot', async () => {
@@ -840,6 +848,7 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
         page,
         target,
         providerScope,
+        ownerId: String(ownerId || ''),
         createdAt: Date.now(),
         lastSeen: Date.now(),
         streams: new Set(),
@@ -1001,7 +1010,7 @@ async function runAction(session, action) {
     if (!key) throw new Error('Browser key is required');
     if (ref) {
       if (!/^e\d+$/.test(ref)) throw new Error('Invalid browser control reference');
-      await page.locator(`[data-studio-ref="${ref}"]`).first().press(key, { timeout: 10_000 });
+      await controlPage(ref).locator(`[data-studio-ref="${ref}"]`).first().press(key, { timeout: 10_000 });
     } else await page.keyboard.press(key);
   } else if (action.type === 'click' || action.type === 'double_click')
     await page.mouse.click(Number(action.x), Number(action.y), {
@@ -1480,12 +1489,13 @@ const server = http.createServer(async (req, res) => {
       });
     }
     const match = url.pathname.match(
-      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit|downloads|imports|batch-imports|uploads|file))?$/,
+      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit|downloads|imports|batch-imports|uploads|file|identity))?$/,
     );
     if (!match) return json(res, 404, { error: 'Not found' });
     const session = sessions.get(match[1]);
     if (!session) return json(res, 410, { error: 'session_expired' });
     if (!authorized(req, session, url)) return json(res, 401, { error: 'unauthorized' });
+    if (req.method === 'GET' && match[2] === 'identity') return json(res, 200, { ownerId: session.ownerId });
     if (req.method === 'GET' && match[2] === 'file') {
       const download = session.downloads.get(url.searchParams.get('id'));
       if (!download || download.status !== 'ready') throw new BrowserServiceError('download_not_ready', 409);

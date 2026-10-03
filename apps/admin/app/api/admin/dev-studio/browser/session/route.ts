@@ -51,6 +51,23 @@ export async function POST(req: NextRequest) {
     );
   }
   const body = await req.json().catch(() => ({}));
+  if (body.action === 'verify') {
+    try {
+      const response = await fetch(`${config.internalUrl}/foundation-test`, {
+        method: 'POST',
+        headers: { 'x-studio-browser-secret': config.secret },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(120000),
+      });
+      const evidence = await response.json();
+      return NextResponse.json(evidence, { status: response.status });
+    } catch {
+      return NextResponse.json(
+        { error: 'Live browser acceptance could not finish' },
+        { status: 503 },
+      );
+    }
+  }
   // The browser worker is an isolated Chromium process, so it does not inherit
   // the Admin request's cookie jar. Forward only Supabase auth-cookie chunks
   // over the authenticated internal channel. The worker installs them before

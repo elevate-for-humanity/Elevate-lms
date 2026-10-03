@@ -59,12 +59,39 @@ export async function POST(req: NextRequest) {
         cache: 'no-store',
         signal: AbortSignal.timeout(120000),
       });
-      const evidence = await response.json();
+      const evidence = await response.json().catch(() => null);
+      if (!evidence || !Array.isArray(evidence.checks)) {
+        const reason =
+          evidence?.error === 'session_capacity_reached'
+            ? 'All browser slots are occupied. Close an unused Studio browser session and run the check again.'
+            : `The worker did not return browser test evidence (HTTP ${response.status}).`;
+        return NextResponse.json(
+          {
+            passed: false,
+            error: reason,
+            checks: [{ name: 'worker_verification', passed: false, reason }],
+          },
+          { status: response.ok ? 502 : response.status },
+        );
+      }
       return NextResponse.json(evidence, { status: response.status });
-    } catch {
+    } catch (error) {
+      const timeout =
+        !!error &&
+        typeof error === 'object' &&
+        'name' in error &&
+        ['TimeoutError', 'AbortError'].includes(String(error.name));
+      const reason = timeout
+        ? 'The worker verification exceeded two minutes. No passing result was recorded.'
+        : 'Admin could not reach the worker verification endpoint. Check the Studio browser connection.';
+      logger.warn('[studio-browser] Verification failed', { timeout });
       return NextResponse.json(
-        { error: 'Live browser acceptance could not finish' },
-        { status: 503 },
+        {
+          passed: false,
+          error: reason,
+          checks: [{ name: 'worker_verification', passed: false, reason }],
+        },
+        { status: timeout ? 504 : 503 },
       );
     }
   }

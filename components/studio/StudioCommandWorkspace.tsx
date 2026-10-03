@@ -88,13 +88,15 @@ export default function StudioCommandWorkspace({
 }) {
   const [conversationKey, setConversationKey] = useState(0);
   const [surface, setSurface] = useState<StudioSurface>(
-    initialWorkspace ? 'capability' : 'commands',
+    initialWorkspace === 'browser' ? 'browser' : initialWorkspace === 'courses' ? 'course' : initialWorkspace ? 'capability' : 'commands',
   );
   const [previewUrl, setPreviewUrl] = useState('');
   const [browserTarget, setBrowserTarget] = useState('');
   const [browserCommand, setBrowserCommand] = useState('');
   const [activeTask, setActiveTask] = useState<OrchestratedPlanCheckpoint | null>(null);
-  const [activeCapability, setActiveCapability] = useState<string | null>(initialWorkspace ?? null);
+  const [activeCapability, setActiveCapability] = useState<string | null>(
+    initialWorkspace === 'browser' || initialWorkspace === 'courses' ? null : initialWorkspace ?? null,
+  );
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const viewportStyle = useStudioViewport();
@@ -287,6 +289,8 @@ export default function StudioCommandWorkspace({
               setActiveCapability(null);
               setPreviewUrl('');
               setBrowserTarget('');
+              setBrowserCommand('');
+              setFocusMode(false);
               setSurface('commands');
             }}
             className="inline-flex min-h-11 min-w-11 shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-xs font-bold hover:bg-slate-100 sm:px-3"
@@ -322,8 +326,17 @@ export default function StudioCommandWorkspace({
             <PanelRightOpen className="h-4 w-4" aria-hidden="true" /> Course Builder live
           </button>
           <span className="ml-2 hidden text-[11px] font-semibold text-slate-500 sm:inline">
-            One workspace · governed workflow · verified evidence
+            One conversation, connected tools
           </span>
+          <button type="button" aria-pressed={surface === 'browser'}
+            onClick={() => { setActiveCapability(null); setSurface('browser'); }}
+            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold text-slate-700 hover:bg-slate-100">
+            <Globe2 className="h-4 w-4" aria-hidden="true" /> Studio browser
+          </button>
+          <Link href="/studio/browser?provider=envato&signin=1"
+            className="inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 text-xs font-bold text-emerald-800 hover:bg-emerald-50">
+            Envato sign-in
+          </Link>
         </nav>
       </header>
 
@@ -360,6 +373,7 @@ export default function StudioCommandWorkspace({
                     setSelectedConversationId(conversation.id);
                     setActiveConversationId(null);
                     setActiveTask(null);
+                    setBrowserCommand('');
                     setConversationKey((value) => value + 1);
                     setSurface('commands');
                     setSidebarOpen(false);
@@ -485,20 +499,6 @@ export default function StudioCommandWorkspace({
                 }
               >
                 <TasksWorkspace embedded conversationId={activeConversationId} />
-              </div>
-              <div
-                className={
-                  surface === 'capability' && activeCapability === 'browser' ? 'h-full' : 'hidden'
-                }
-              >
-                <CloudBrowserWorkspace
-                  unifiedTask={activeTask}
-                  conversationId={activeConversationId}
-                  autoStart={surface === 'capability' && activeCapability === 'browser'}
-                  initialTarget={browserTarget}
-                  initialTask={browserCommand}
-                  autoRunTask={surface === 'capability' && activeCapability === 'browser'}
-                />
               </div>
               <div
                 className={

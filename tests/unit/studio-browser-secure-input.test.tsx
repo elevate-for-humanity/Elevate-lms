@@ -6,6 +6,7 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+  vi.useRealTimers();
 });
 async function start(holdFirst = false) {
   const actions: any[] = [];
@@ -31,13 +32,14 @@ async function start(holdFirst = false) {
               }
             : { configured: true, ready: true },
         );
-      if (url.endsWith('/actions')) {
-        actions.push(JSON.parse(options.body));
+      if (url.endsWith('/actions') || url.endsWith('/browser/action')) {
+        const body = JSON.parse(options.body);
+        actions.push(body.action || body);
         if (holdFirst && actions.length === 1)
           await new Promise<void>((r) => {
             release = r;
           });
-        return response({});
+        return response({ ok: true });
       }
       return response({ events: [], downloads: [] });
     }),
@@ -72,6 +74,41 @@ it('lets a touch user insert @ and replaces the selected field without retaining
   expect(input.getAttribute('inputmode')).toBe('text');
   expect(input.type).toBe('password');
   expect(screen.queryByRole('button', { name: 'Insert at sign into secure input' })).toBeNull();
+});
+
+it.each(['keyboard', 'button'])('sends the secure draft and submits in order using %s Enter', async (source) => {
+  const { actions } = await start();
+  const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
+  fireEvent.change(input, { target: { value: 'sample@example.com' } });
+  if (source === 'keyboard') fireEvent.keyDown(input, { key: 'Enter' });
+  else fireEvent.click(screen.getAllByRole('button', { name: 'Enter', exact: true })[0]);
+  await waitFor(() => expect(actions).toEqual([{
+    actions: [
+      { type: 'keypress', key: 'ControlOrMeta+A' },
+      { type: 'type', text: 'sample@example.com' },
+      { type: 'keypress', key: 'Enter' },
+    ],
+  }]));
+  expect(input.value).toBe('');
+});
+
+it('sends the general keyboard draft before submitting with Enter', async () => {
+  const { actions } = await start();
+  const input = screen.getByLabelText('Browser keyboard input');
+  fireEvent.change(input, { target: { value: 'search text' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  await waitFor(() => expect(actions).toEqual([{
+    actions: [{ type: 'type', text: 'search text' }, { type: 'keypress', key: 'Enter' }],
+  }]));
+});
+
+it('fits even before the first streamed frame has decoded', async () => {
+  await start();
+  const image = screen.getByAltText('Live isolated Chromium browser');
+  Object.defineProperty(image.parentElement, 'clientWidth', { value: 390, configurable: true });
+  Object.defineProperty(image.parentElement, 'clientHeight', { value: 100, configurable: true });
+  fireEvent.click(screen.getByRole('button', { name: 'Fit screen' }));
+  expect(parseFloat(image.style.width)).toBeLessThanOrEqual(100 / 780 * 100);
 });
 it('keeps a slow pointer click ahead of typing and Enter', async () => {
   const { actions, release } = await start(true);
@@ -237,4 +274,66 @@ it('focuses the desktop page for direct typing after selecting a website field',
   await waitFor(() => expect(actions.length).toBe(2));
   expect(actions[0].type).toBe('pointer_click');
   expect(actions[1]).toEqual({ type: 'type', text: '@' });
+});
+
+it('pauses on a stalled action, cancels queued input, and reconnects without replaying it', async () => {
+  const { actions } = await start();
+  const fetchBefore = globalThis.fetch;
+  vi.stubGlobal('fetch', vi.fn((url: string, options: any = {}) => {
+    if (url.endsWith('/browser/action')) {
+      actions.push(JSON.parse(options.body).action);
+      return new Promise((_resolve, reject) => {
+        options.signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+      });
+    }
+    return fetchBefore(url, options);
+  }));
+  vi.useFakeTimers();
+  const image = screen.getByAltText('Live isolated Chromium browser');
+  fireEvent.click(image, { clientX: 20, clientY: 20 });
+  await act(async () => {});
+  const input = screen.getByLabelText('Secure browser input');
+  fireEvent.change(input, { target: { value: 'never-replay@example.com' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  await act(async () => { await vi.advanceTimersByTimeAsync(40_001); });
+  expect(actions).toHaveLength(1);
+  expect(screen.getByRole('alert')).toHaveTextContent('timed out');
+  expect(input).toBeDisabled();
+  vi.stubGlobal('fetch', fetchBefore);
+  fireEvent.click(screen.getByRole('button', { name: 'Reconnect controls' }));
+  await act(async () => {});
+  expect(input).toBeEnabled();
+  expect(actions).toHaveLength(1);
+  expect(input).toHaveValue('');
+  fireEvent.change(input, { target: { value: 'new@example.com' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  await act(async () => {});
+  expect(actions).toHaveLength(2);
+  expect(actions[1].actions[1].text).toBe('new@example.com');
+});
+
+it('shows disconnected status when worker polling fails instead of staying Connected', async () => {
+  let poll: () => Promise<void> = async () => {};
+  const interval = window.setInterval.bind(window);
+  vi.spyOn(window, 'setInterval').mockImplementation(((callback: any, ms: number, ...args: any[]) => {
+    if (ms === 3000) { poll = callback; return 123; }
+    return interval(callback, ms, ...args);
+  }) as any);
+  await start();
+  const fetchBefore = globalThis.fetch;
+  vi.stubGlobal('fetch', vi.fn((url: string, options: any) => (url.endsWith('/events') || url.includes('resource=events'))
+    ? Promise.resolve({ ok: false, status: 503 }) : fetchBefore(url, options)));
+  await act(async () => { await poll(); });
+  expect(screen.getByRole('status', { name: 'Browser connection' })).toHaveTextContent('Controls paused');
+  expect(screen.getByRole('alert')).toHaveTextContent('connection is unavailable');
+});
+
+it('forwards Tab from the remote view to the website and Escape returns local focus', async () => {
+  const { actions } = await start();
+  const image = screen.getByAltText('Live isolated Chromium browser');
+  image.focus();
+  fireEvent.keyDown(image, { key: 'Tab' });
+  await waitFor(() => expect(actions).toContainEqual({ type: 'keypress', key: 'Tab' }));
+  fireEvent.keyDown(image, { key: 'Escape' });
+  expect(document.activeElement).not.toBe(image);
 });

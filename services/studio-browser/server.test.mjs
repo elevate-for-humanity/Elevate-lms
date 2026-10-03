@@ -272,13 +272,14 @@ test('iframe references resolve to their owning frame and cannot be reused after
   const clicks = [];
   const snapshot = (title, offset) => ({title, url: 'https://www.elevateforhumanity.org', visibleText: title, headings: [], controls: [{ref: `e${offset + 1}`, role: 'button', name: title}]});
   const main = { evaluate: async (_, offset) => snapshot('Main', offset), locator: () => ({ first: () => ({click: async () => clicks.push('main')}) }) };
-  const child = { evaluate: async (_, offset) => snapshot('Embedded form', offset), locator: () => ({ first: () => ({click: async () => clicks.push('frame')}) }) };
+  const child = { evaluate: async (_, offset) => snapshot('Embedded form', offset), locator: () => ({ first: () => ({click: async () => clicks.push('frame'), press: async key => clicks.push(`frame:${key}`)}) }) };
   const page = { waitForLoadState: async () => {}, frames: () => [main, child], url: () => 'https://www.elevateforhumanity.org' };
   const session = {page};
   const result = await snapshotPage(session);
   assert.deepEqual(result.controls.map(control => control.ref), ['e1', 'e2']);
   await runActions(session, {type: 'click_ref', ref: 'e2'});
-  assert.deepEqual(clicks, ['frame']);
+  await runActions(session, {type: 'press_ref', ref: 'e2', key: 'Enter'});
+  assert.deepEqual(clicks, ['frame', 'frame:Enter']);
   session.page = {};
   await assert.rejects(() => runActions(session, {type: 'click_ref', ref: 'e2'}), error => error.code === 'stale_control');
 });

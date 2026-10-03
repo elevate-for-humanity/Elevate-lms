@@ -1,8 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { Readable } from 'node:stream';
 import {
   auditPage,
   attachBrowserTabs,
+  receiveBrowserUpload,
   isPrivateAddress,
   runActions,
   sessionRequiresAuthentication,
@@ -227,4 +232,37 @@ test('back and forward actions use the active page history', async () => {
   const calls = [];
   await runActions({ page: { goBack: async () => calls.push('back'), goForward: async () => calls.push('forward') } }, { actions: [{ type: 'back' }, { type: 'forward' }] });
   assert.deepEqual(calls, ['back', 'forward']);
+});
+
+
+test('file picker uploads preserve bytes, stay in the session, and reject oversized files', async () => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'studio-upload-test-'));
+  const selected = [];
+  const session = { downloadDir: directory, fileChooser: { isMultiple: () => true, setFiles: async files => selected.push(...files) } };
+  const request = bytes => Object.assign(Readable.from([Buffer.from(bytes)]), { headers: { 'x-studio-file-name': '..%2Fexample.txt' } });
+  try {
+    const file = await receiveBrowserUpload(session, request('lesson source'));
+    assert.equal(await fs.readFile(session.uploads.get(file.id), 'utf8'), 'lesson source');
+    assert.equal(path.dirname(path.dirname(session.uploads.get(file.id))), directory);
+    assert.equal(path.basename(session.uploads.get(file.id)), '..-example.txt');
+    await assert.rejects(() => receiveBrowserUpload(session, request('too large'), 2), error => error.code === 'upload_too_large');
+    assert.equal((await fs.readdir(directory)).length, 1);
+    await assert.rejects(() => runActions(session, { type: 'choose_files', fileIds: ['other-session'] }), error => error.code === 'invalid_upload_selection');
+    await runActions(session, { type: 'choose_files', fileIds: [file.id] });
+    assert.deepEqual(selected, [session.uploads.get(file.id)]);
+    assert.equal(session.fileChooser, undefined);
+  } finally { await fs.rm(directory, { recursive: true, force: true }); }
+});
+
+test('dialogs require an explicit response and never affect another tab', async () => {
+  const responses = [];
+  const active = {};
+  const session = { page: active, dialogPage: active, dialog: { accept: async text => responses.push(text), dismiss: async () => responses.push('dismiss') } };
+  assert.deepEqual(responses, []);
+  session.dialogPage = {};
+  await assert.rejects(() => runActions(session, { type: 'dialog', accept: true }), error => error.code === 'dialog_not_found');
+  session.dialogPage = active;
+  await runActions(session, { type: 'dialog', accept: true, text: 'test response' });
+  assert.deepEqual(responses, ['test response']);
+  assert.equal(session.dialog, undefined);
 });

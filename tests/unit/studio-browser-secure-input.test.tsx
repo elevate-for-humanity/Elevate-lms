@@ -54,6 +54,7 @@ it('lets a touch user insert @ and replaces the selected field without retaining
   const { actions } = await start();
   const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
   expect(input.getAttribute('inputmode')).toBe('email');
+  expect(input.type).toBe('text');
   fireEvent.change(input, { target: { value: 'sampleexample.com' } });
   input.setSelectionRange(6, 6);
   fireEvent.click(screen.getByRole('button', { name: 'Insert at sign into secure input' }));
@@ -146,4 +147,12 @@ it('opens a readable sign-in view on the existing session and keeps the draft', 
   fireEvent.click(screen.getByRole('button', { name: 'Exit sign-in view' }));
   expect(screen.getByAltText('Live isolated Chromium browser')).toBe(image);
   expect(input.value).toBe('sample@example.com');
+});
+
+it('offers a literal @ for the general browser keyboard without relying on the phone keyboard', async () => {
+  const { actions } = await start();
+  fireEvent.click(screen.getByRole('button', { name: 'Insert at sign into browser keyboard input' }));
+  expect((screen.getByLabelText('Browser keyboard input') as HTMLInputElement).value).toBe('@');
+  fireEvent.click(screen.getByRole('button', { name: 'Type', exact: true }));
+  await waitFor(() => expect(actions).toContainEqual({ type: 'type', text: '@' }));
 });

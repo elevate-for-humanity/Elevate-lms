@@ -446,9 +446,9 @@ test.describe('Studio readable sign-in and composer', () => {
   test('sign-in controls and chat text remain usable on the active device', async ({ page }, testInfo) => {
     await login(page, ADMIN_BASE, creds.admin[0], creds.admin[1]);
     await page.goto(`${ADMIN_BASE}/studio`);
-    const composer = page.locator('textarea').first();
+    const composer = page.getByRole('textbox', { name: 'Tell Admin AI what you need done...', exact: true });
     await expect(composer).toBeVisible();
-    expect(await composer.evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(20);
+    await expect.poll(() => composer.evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(20);
     await composer.fill('Readability test draft');
     await page.screenshot({ path: testInfo.outputPath('studio-readable-chat.png') });
     await composer.clear();

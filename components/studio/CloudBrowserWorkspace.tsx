@@ -70,6 +70,7 @@ export default function CloudBrowserWorkspace({
   const lifecycleRef = useRef(0);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
   const draggedRef = useRef(false);
+  const [imageZoom, setImageZoom] = useState(1);
   const [signInView, setSignInView] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(false);
   const [mobilePane, setMobilePane] = useState<'browser' | 'tools'>('browser');
@@ -748,6 +749,21 @@ export default function CloudBrowserWorkspace({
         {signInView ? <button type="button" onClick={() => setSignInView(false)}
           className="min-h-12 rounded-lg border border-slate-300 px-3 text-base">Exit sign-in view</button> : null}
       </div>
+      {session ? (
+        <div role="toolbar" aria-label="Browser view controls" className="flex shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-2 py-1">
+          <button type="button" aria-label="Zoom browser out" disabled={imageZoom <= 1}
+            onClick={() => setImageZoom((zoom) => Math.max(1, zoom - 0.5))}
+            className="min-h-11 min-w-11 rounded border border-slate-300 text-xl disabled:opacity-40">−</button>
+          <output aria-label="Browser zoom" className="min-w-12 text-center text-base">{Math.round(imageZoom * 100)}%</output>
+          <button type="button" aria-label="Zoom browser in" disabled={imageZoom >= 3}
+            onClick={() => setImageZoom((zoom) => Math.min(3, zoom + 0.5))}
+            className="min-h-11 min-w-11 rounded border border-slate-300 text-xl disabled:opacity-40">+</button>
+          <button type="button" aria-label="Scroll website up" onClick={() => void action({ type: 'scroll', deltaX: 0, deltaY: -400 })}
+            className="min-h-11 min-w-11 rounded border border-slate-300 px-3 text-base">↑</button>
+          <button type="button" aria-label="Scroll website down" onClick={() => void action({ type: 'scroll', deltaX: 0, deltaY: 400 })}
+            className="min-h-11 min-w-11 rounded border border-slate-300 px-3 text-base">↓</button>
+        </div>
+      ) : null}
       <header className={`${controlsOpen || !session ? 'flex' : 'hidden'} max-h-[30dvh] shrink-0 flex-wrap items-center gap-2 overflow-y-auto border-b border-slate-200 bg-slate-50 p-3`}>
         <Globe2 className="h-5 w-5 text-cyan-800" />
         <strong className="mr-2">Cloud Browser</strong>
@@ -972,7 +988,7 @@ export default function CloudBrowserWorkspace({
       </nav>
       <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div
-          className={`${mobilePane === 'browser' ? 'flex' : 'hidden lg:flex'} relative min-h-0 items-start justify-center overflow-auto bg-slate-100`}
+          className={`${mobilePane === 'browser' ? 'flex' : 'hidden lg:flex'} relative min-h-0 items-start ${imageZoom > 1 ? 'justify-start' : 'justify-center'} overflow-auto overscroll-contain bg-slate-100`}
         >
           {session ? (
             <img
@@ -1007,8 +1023,16 @@ export default function CloudBrowserWorkspace({
                   text: event.clipboardData.getData('text/plain'),
                 });
               }}
-              className={`h-auto w-full cursor-crosshair select-none bg-white shadow-sm ${signInView ? 'max-w-[480px]' : ''}`}
+              className="h-auto shrink-0 cursor-crosshair select-none bg-white shadow-sm"
+              style={{ width: `${imageZoom * 100}%`, maxWidth: signInView ? `${480 * imageZoom}px` : imageZoom > 1 ? 'none' : '100%', touchAction: 'pan-x pan-y pinch-zoom' }}
               onPointerDown={(event) => {
+                draggedRef.current = false;
+                // Touch drags belong to the local scroll/zoom viewport. A tap
+                // still reaches onClick, while mouse selection remains remote.
+                if (event.pointerType === 'touch') {
+                  dragStartRef.current = null;
+                  return;
+                }
                 const rect = event.currentTarget.getBoundingClientRect();
                 draggedRef.current = false;
                 dragStartRef.current = {
@@ -1074,6 +1098,11 @@ export default function CloudBrowserWorkspace({
                 });
               }}
               onWheel={(event) => {
+                const viewport = event.currentTarget.parentElement;
+                // Pinch zoom and oversized image scrolling remain native.
+                if (event.ctrlKey || (viewport &&
+                  (viewport.scrollHeight > viewport.clientHeight + 1 ||
+                   viewport.scrollWidth > viewport.clientWidth + 1))) return;
                 event.preventDefault();
                 void action({
                   type: 'scroll',

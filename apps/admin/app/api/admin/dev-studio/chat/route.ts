@@ -1,5 +1,4 @@
 import { executeStudioCommand } from '@/lib/studio/runtime-command';
-import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
 import { DevStudioUltimateCourseControl } from '@/lib/devstudio/ultimate-course-control';
 /**
  * /api/admin/dev-studio/chat
@@ -1221,36 +1220,14 @@ async function execTool(
       if (courseError) throw courseError;
       if (!course) return `Canonical course not found: ${requestedCourseId}`;
 
-      const profile = {
-        ...await buildUltimateProfile(db, {
-          courseId: course.id, programSlug, title: String(args.title || course.title),
-          state: String(args.state || 'IN'),
-          topic: String(args.description || ''), audience: String(args.audience || ''),
-        }),
-        mediaAcquisitionOwnerId: actorUserId,
-      };
-
-      const { data: activeBuild, error: activeBuildError } = await db.from('ultimate_course_builds')
-        .select('id,status,current_step').eq('course_id', course.id)
-        .in('status',['initializing','queued','running','built']).order('created_at',{ascending:false}).limit(1).maybeSingle();
-      if (activeBuildError) throw activeBuildError;
-      let build = activeBuild;
-      if (!build) {
-        const created = await db.from('ultimate_course_builds')
-          .insert({course_id:course.id,profile,status:'initializing',current_step:'standards_lock',findings:[]})
-          .select('id,status,current_step').single();
-        if (created.error || !created.data) throw created.error ?? new Error('ULTIMATE_BUILD_CREATE_FAILED');
-        build = created.data;
-      }
-
-      const control = new DevStudioUltimateCourseControl(db);
-      const queued = await control.queue(build.id, actorUserId);
-      return JSON.stringify({
-        __type:'ultimate_course_build_queued', success:true, buildId:build.id,
-        jobId:queued.job.id, courseId:course.id, title:profile.title,
-        status:queued.job.status, stage:build.current_step,
-        message:'Ultimate Course Builder persisted this command in the existing dedicated worker queue; completion requires its media and learner checks.'
-      },null,2);
+      const queued=await new DevStudioUltimateCourseControl(db).queueCourse({
+        courseId:course.id,programSlug,actorId:actorUserId,title:String(args.title || course.title),
+        state:String(args.state || 'IN'),goal:String(args.description || ''),
+      });
+      return JSON.stringify({__type:'ultimate_course_build_queued',success:true,
+        buildId:queued.build.id,jobId:queued.job.id,courseId:course.id,title:course.title,
+        status:queued.job.status,stage:queued.build.current_step,
+        message:'Command persisted in the existing Ultimate worker queue.'});
     }
 
     case 'generate_videos': {

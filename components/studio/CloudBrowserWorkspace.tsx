@@ -71,6 +71,12 @@ export default function CloudBrowserWorkspace({
   const [events, setEvents] = useState<BrowserEvent[]>([]);
   const [browserTabs, setBrowserTabs] = useState<{ id: string; url: string }[]>([]);
   const [activeTabId, setActiveTabId] = useState('');
+  const [filePicker, setFilePicker] = useState(false);
+  const [browserDialog, setBrowserDialog] = useState<{ type: string; message: string } | null>(
+    null,
+  );
+  const [dialogText, setDialogText] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [downloads, setDownloads] = useState<StudioDownload[]>([]);
   const [envatoItemId, setEnvatoItemId] = useState('');
   const [licensedTitle, setLicensedTitle] = useState('');
@@ -245,6 +251,36 @@ export default function CloudBrowserWorkspace({
     // start uses the active conversation and checkpoint identity captured by this render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStart, runtimeReady, session, target, conversationId, unifiedTask?.taskId]);
+
+  async function uploadFiles(files: FileList | null) {
+    if (!session || !files?.length) return;
+    setUploading(true);
+    setError('');
+    try {
+      if (files.length > 10) throw new Error('Choose at most 10 files per upload.');
+      const ids: string[] = [];
+      for (const file of Array.from(files)) {
+        if (file.size > 32 * 1024 * 1024) throw new Error('Each upload must be at most 32 MB.');
+        const response = await fetch(`${endpoint}/uploads`, {
+          method: 'POST',
+          headers: {
+            ...authHeaders,
+            'content-type': 'application/octet-stream',
+            'x-studio-file-name': encodeURIComponent(file.name),
+          },
+          body: file,
+        });
+        const body = await response.json();
+        if (!response.ok) throw new Error(body.error || 'Browser upload failed');
+        ids.push(body.id);
+      }
+      if (await action({ type: 'choose_files', fileIds: ids })) setFilePicker(false);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Browser upload failed');
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function action(payload: Record<string, unknown>): Promise<boolean> {
     if (!session) return false;
@@ -524,6 +560,8 @@ export default function CloudBrowserWorkspace({
           setEvents(payload.events || []);
           setBrowserTabs(payload.tabs || []);
           setActiveTabId(payload.activeTabId || '');
+          setFilePicker(Boolean(payload.filePicker));
+          setBrowserDialog(payload.dialog || null);
           if (
             payload.url &&
             targetDraftRef.current === null &&
@@ -618,11 +656,17 @@ export default function CloudBrowserWorkspace({
           </span>
         ) : null}
       </header>
-      {session && browserTabs.length > 1 ? (
+      {session ? (
         <nav
           aria-label="Browser tabs"
           className="flex shrink-0 gap-2 overflow-x-auto border-b border-slate-800 p-2"
         >
+          <button
+            onClick={() => action({ type: 'new_tab', url: target })}
+            className="min-h-12 shrink-0 rounded-lg border border-slate-700 px-3"
+          >
+            New tab
+          </button>
           {browserTabs.map((tab) => (
             <button
               key={tab.id}
@@ -633,7 +677,56 @@ export default function CloudBrowserWorkspace({
               {tab.url || 'New tab'}
             </button>
           ))}
+          {browserTabs.length > 1 ? (
+            <button
+              onClick={() => action({ type: 'close_tab', tabId: activeTabId })}
+              className="min-h-12 shrink-0 rounded-lg border border-slate-700 px-3"
+            >
+              Close tab
+            </button>
+          ) : null}
         </nav>
+      ) : null}
+      {browserDialog ? (
+        <div
+          role="dialog"
+          aria-label="Browser confirmation"
+          className="border-b border-slate-700 p-3"
+        >
+          <p>{browserDialog.message}</p>
+          {browserDialog.type === 'prompt' ? (
+            <input
+              aria-label="Browser prompt response"
+              value={dialogText}
+              onChange={(event) => setDialogText(event.target.value)}
+              className="rounded bg-slate-800 p-3 text-base"
+            />
+          ) : null}
+          <button
+            onClick={() => action({ type: 'dialog', accept: true, text: dialogText })}
+            className="min-h-12 px-4"
+          >
+            Accept
+          </button>
+          <button
+            onClick={() => action({ type: 'dialog', accept: false })}
+            className="min-h-12 px-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      ) : null}
+      {filePicker ? (
+        <label className="border-b border-slate-700 p-3">
+          Choose files for the active browser page (32 MB each)
+          <input
+            type="file"
+            multiple
+            disabled={uploading}
+            onChange={(event) => void uploadFiles(event.target.files)}
+            className="block min-h-12 text-base"
+          />
+        </label>
       ) : null}
       {error && (
         <div className="flex items-center gap-2 border-b border-rose-900 bg-rose-950/60 px-3 py-2 text-xs text-rose-200">
@@ -650,6 +743,25 @@ export default function CloudBrowserWorkspace({
               alt="Live isolated Chromium browser"
               referrerPolicy="no-referrer"
               draggable={false}
+              tabIndex={0}
+              onKeyDown={(event) => {
+                if (event.key === 'Tab' && !event.shiftKey) return;
+                event.preventDefault();
+                const key = event.key === ' ' ? 'Space' : event.key;
+                const modifiers = [
+                  event.ctrlKey ? 'Control' : '',
+                  event.metaKey ? 'Meta' : '',
+                  event.altKey ? 'Alt' : '',
+                  event.shiftKey ? 'Shift' : '',
+                ].filter(Boolean);
+                if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey)
+                  void action({ type: 'type', text: event.key });
+                else void action({ type: 'keypress', key: [...modifiers, key].join('+') });
+              }}
+              onPaste={(event) => {
+                event.preventDefault();
+                void action({ type: 'type', text: event.clipboardData.getData('text/plain') });
+              }}
               className="h-auto w-full cursor-crosshair select-none bg-white shadow-2xl"
               onClick={(event) => {
                 const rect = event.currentTarget.getBoundingClientRect();
@@ -729,6 +841,15 @@ export default function CloudBrowserWorkspace({
                     {download.status === 'uploading' ? ` · ${download.uploadProgress || 0}%` : ''}
                   </p>
                   {download.error ? <p className="text-rose-300">{download.error}</p> : null}
+                  {download.status === 'ready' && session ? (
+                    <a
+                      href={`${endpoint}/file?id=${encodeURIComponent(download.id)}&token=${encodeURIComponent(session.token)}`}
+                      referrerPolicy="no-referrer"
+                      className="block min-h-12 rounded-lg border border-slate-600 p-3 text-sm"
+                    >
+                      Download file
+                    </a>
+                  ) : null}
                   {download.status === 'ready' ? (
                     <button
                       onClick={() => storeLicensedDownload(download)}

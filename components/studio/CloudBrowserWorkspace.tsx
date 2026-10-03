@@ -69,6 +69,8 @@ export default function CloudBrowserWorkspace({
   const [runtimeReady, setRuntimeReady] = useState<boolean | null>(null);
   const [error, setError] = useState('');
   const [events, setEvents] = useState<BrowserEvent[]>([]);
+  const [browserTabs, setBrowserTabs] = useState<{ id: string; url: string }[]>([]);
+  const [activeTabId, setActiveTabId] = useState('');
   const [downloads, setDownloads] = useState<StudioDownload[]>([]);
   const [envatoItemId, setEnvatoItemId] = useState('');
   const [licensedTitle, setLicensedTitle] = useState('');
@@ -520,6 +522,8 @@ export default function CloudBrowserWorkspace({
         if (response?.ok) {
           const payload = await response.json();
           setEvents(payload.events || []);
+          setBrowserTabs(payload.tabs || []);
+          setActiveTabId(payload.activeTabId || '');
           if (
             payload.url &&
             targetDraftRef.current === null &&
@@ -572,6 +576,20 @@ export default function CloudBrowserWorkspace({
         ) : (
           <>
             <button
+              aria-label="Back"
+              onClick={() => action({ type: 'back' })}
+              className="min-h-12 rounded-lg border border-slate-700 px-3"
+            >
+              ←
+            </button>
+            <button
+              aria-label="Forward"
+              onClick={() => action({ type: 'forward' })}
+              className="min-h-12 rounded-lg border border-slate-700 px-3"
+            >
+              →
+            </button>
+            <button
               onClick={() => action({ type: 'navigate', url: target })}
               className="rounded-lg bg-cyan-500 px-3 py-2 text-xs font-black text-slate-950"
             >
@@ -600,6 +618,23 @@ export default function CloudBrowserWorkspace({
           </span>
         ) : null}
       </header>
+      {session && browserTabs.length > 1 ? (
+        <nav
+          aria-label="Browser tabs"
+          className="flex shrink-0 gap-2 overflow-x-auto border-b border-slate-800 p-2"
+        >
+          {browserTabs.map((tab) => (
+            <button
+              key={tab.id}
+              aria-pressed={tab.id === activeTabId}
+              onClick={() => action({ type: 'switch_tab', tabId: tab.id })}
+              className="min-h-12 max-w-64 truncate rounded-lg border border-slate-700 px-3 text-sm aria-pressed:bg-cyan-900"
+            >
+              {tab.url || 'New tab'}
+            </button>
+          ))}
+        </nav>
+      ) : null}
       {error && (
         <div className="flex items-center gap-2 border-b border-rose-900 bg-rose-950/60 px-3 py-2 text-xs text-rose-200">
           <AlertTriangle className="h-4 w-4" />

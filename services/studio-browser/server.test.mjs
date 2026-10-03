@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   auditPage,
+  attachBrowserTabs,
   isPrivateAddress,
   runActions,
   sessionRequiresAuthentication,
@@ -192,4 +193,38 @@ test('returns measured browser events with document audit evidence', async () =>
   assert.equal(result.browserEvents.length, 2);
   assert.equal(result.browserEvents[0].level, 'error');
   assert.match(result.evidenceCapturedAt, /^\d{4}-\d{2}-\d{2}T/);
+});
+
+
+test('OAuth popup becomes the visible tab, checkpoints, and returns to opener on close', async () => {
+  const listeners = new Map();
+  const page = (url) => ({ url: () => url, on: (event, handler) => listeners.set(url + event, handler), isClosed: () => false, bringToFront: async () => {} });
+  const opener = page('https://account.envato.com');
+  const popup = page('https://accounts.google.com');
+  let onPage;
+  let saves = 0;
+  const session = { page: opener, context: { on: (event, handler) => { assert.equal(event, 'page'); onPage = handler; } }, events: [] };
+  const attached = [];
+  attachBrowserTabs(session, p => attached.push(p), async () => { saves++; });
+  const openerId = session.activeTabId;
+  onPage(popup);
+  assert.equal(session.page, popup);
+  assert.equal(session.pages.size, 2);
+  listeners.get('https://accounts.google.comdomcontentloaded')();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(saves, 1);
+  await runActions(session, { type: 'switch_tab', tabId: openerId });
+  assert.equal(session.page, opener);
+  await assert.rejects(() => runActions(session, { type: 'switch_tab', tabId: 'another-owner-tab' }), error => error.code === 'tab_not_found');
+  await runActions(session, { type: 'switch_tab', tabId: [...session.pages.keys()][1] });
+  listeners.get('https://accounts.google.comclose')();
+  assert.equal(session.page, opener);
+  assert.equal(session.activeTabId, openerId);
+  assert.deepEqual(attached, [opener, popup]);
+});
+
+test('back and forward actions use the active page history', async () => {
+  const calls = [];
+  await runActions({ page: { goBack: async () => calls.push('back'), goForward: async () => calls.push('forward') } }, { actions: [{ type: 'back' }, { type: 'forward' }] });
+  assert.deepEqual(calls, ['back', 'forward']);
 });

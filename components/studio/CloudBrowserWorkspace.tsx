@@ -198,8 +198,8 @@ export default function CloudBrowserWorkspace({
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         url: target,
-        width: 1440,
-        height: 900,
+        width: Math.min(1440, Math.max(390, window.innerWidth)),
+        height: window.innerWidth < 1024 ? 780 : 900,
         conversationId: conversationId || undefined,
         taskId: unifiedTask?.taskId || undefined,
       }),
@@ -616,7 +616,7 @@ export default function CloudBrowserWorkspace({
         </div>
       )}
       <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="relative flex min-h-0 items-center justify-center overflow-hidden bg-slate-800">
+        <div className="relative flex min-h-0 items-start justify-center overflow-auto bg-slate-800">
           {session ? (
             <img
               ref={imageRef}
@@ -624,7 +624,7 @@ export default function CloudBrowserWorkspace({
               alt="Live isolated Chromium browser"
               referrerPolicy="no-referrer"
               draggable={false}
-              className="h-full w-full cursor-crosshair select-none bg-white object-contain shadow-2xl"
+              className="h-auto w-full cursor-crosshair select-none bg-white shadow-2xl"
               onClick={(event) => {
                 const rect = event.currentTarget.getBoundingClientRect();
                 void action({
@@ -649,7 +649,7 @@ export default function CloudBrowserWorkspace({
             </div>
           )}
         </div>
-        <aside className="hidden min-h-0 flex-col border-l border-slate-800 bg-slate-950 lg:flex">
+        <aside className="flex min-h-0 flex-col border-t border-slate-800 bg-slate-950 lg:border-l lg:border-t-0">
           <div className="border-b border-slate-800 p-3">
             <p className="mb-1 flex items-center gap-2 text-xs font-black text-cyan-300">
               <Download className="h-4 w-4" /> Envato licensed downloads
@@ -760,10 +760,10 @@ export default function CloudBrowserWorkspace({
               </p>
             )}
           </div>
-          <div className="border-b border-slate-800 p-3">
-            <p className="mb-2 text-xs font-black text-emerald-300">Secure sign-in handoff</p>
+          <div className="order-first border-b border-slate-800 p-3">
+            <p className="mb-2 text-sm font-black text-emerald-300">Secure sign-in handoff</p>
             <p className="mb-2 text-[10px] leading-4 text-slate-500">
-              Enter passwords or verification codes here. The value is sent directly to the active
+              Tap the field you want to fill in the browser above, then type here and select Type securely. The value is sent directly to the active
               isolated browser, cleared immediately, and never added to the AI conversation or task
               evidence.
             </p>
@@ -773,7 +773,8 @@ export default function CloudBrowserWorkspace({
                 type="password"
                 autoComplete="off"
                 aria-label="Secure browser input"
-                className="min-w-0 flex-1 rounded border border-emerald-800 bg-slate-900 px-2 py-1.5 text-xs"
+                disabled={!session}
+                className="min-h-12 min-w-0 flex-1 rounded border border-emerald-800 bg-slate-900 px-3 py-2 text-base"
               />
               <button
                 type="button"
@@ -784,7 +785,7 @@ export default function CloudBrowserWorkspace({
                   void action({ type: 'type', text: value });
                 }}
                 disabled={!session}
-                className="rounded bg-emerald-600 px-2 text-xs font-black text-white disabled:opacity-50"
+                className="min-h-12 rounded bg-emerald-600 px-3 text-sm font-black text-white disabled:opacity-50"
               >
                 Type securely
               </button>
@@ -792,7 +793,7 @@ export default function CloudBrowserWorkspace({
                 type="button"
                 onClick={() => void submitBrowserEnter()}
                 disabled={!session}
-                className="rounded border border-emerald-800 px-2 text-xs text-emerald-200 disabled:opacity-50"
+                className="min-h-12 rounded border border-emerald-800 px-3 text-sm text-emerald-200 disabled:opacity-50"
               >
                 Enter
               </button>
@@ -804,6 +805,7 @@ export default function CloudBrowserWorkspace({
             </p>
             <div className="flex gap-2">
               <input
+                aria-label="Browser keyboard input"
                 value={typedText}
                 onChange={(event) => setTypedText(event.target.value)}
                 className="min-w-0 flex-1 rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs"

@@ -23,7 +23,7 @@ export function AdminApplicationChrome({
       data-elevate-dashboard-shell={studioOwnsViewport ? 'studio' : 'admin'}
       className={
         studioOwnsViewport
-          ? 'h-dvh min-w-0 overflow-hidden bg-slate-950'
+          ? 'h-dvh min-w-0 overflow-hidden bg-white'
           : 'min-h-dvh min-w-0 overflow-x-clip bg-slate-50'
       }
     >

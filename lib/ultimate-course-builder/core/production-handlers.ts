@@ -54,6 +54,34 @@ function requireLicensedVisualCoverage(ctx: any, mediaInput?: any) {
   if (prohibited.length)
     throw new Error(`ULTIMATE_PROHIBITED_VISUAL_REPETITION:${JSON.stringify(prohibited)}`);
 }
+
+function isTransientMediaDiscoveryError(error: unknown): boolean {
+  const message = (error instanceof Error ? error.message : String(error)).toLowerCase();
+  return (
+    message.includes("unexpected token '<'") ||
+    message.includes('is not valid json') ||
+    message.includes('fetch failed') ||
+    message.includes('network error') ||
+    message.includes('econnreset') ||
+    message.includes('etimedout') ||
+    message.includes('socket hang up')
+  );
+}
+
+async function findMediaWithTransientRetry(runtime: UltimateRuntime, request: any) {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return await runtime.media.find(request);
+    } catch (error) {
+      lastError = error;
+      if (!isTransientMediaDiscoveryError(error) || attempt === 2) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)));
+    }
+  }
+  throw lastError;
+}
+
 export function createProductionHandlers(runtime: UltimateRuntime): Record<string, StepHandler> {
   return {
     standards_lock: async (ctx) => {
@@ -131,12 +159,12 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       };
       let media;
       try {
-        media = await runtime.media.find(request);
+        media = await findMediaWithTransientRetry(runtime, request);
         requireLicensedVisualCoverage(ctx, media);
       } catch (error) {
         if (typeof runtime.media.acquire !== 'function') throw error;
         await runtime.media.acquire(request);
-        media = await runtime.media.find(request);
+        media = await findMediaWithTransientRetry(runtime, request);
         requireLicensedVisualCoverage(ctx, media);
       }
       return { artifacts: { media } };

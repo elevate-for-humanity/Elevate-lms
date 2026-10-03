@@ -69,6 +69,7 @@ export default function CloudBrowserWorkspace({
   const lifecycleRef = useRef(0);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
   const draggedRef = useRef(false);
+  const [mobilePane, setMobilePane] = useState<'browser' | 'tools'>('browser');
   const [target, setTarget] = useState(initialTarget);
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
@@ -82,9 +83,10 @@ export default function CloudBrowserWorkspace({
   const [browserTabs, setBrowserTabs] = useState<{ id: string; url: string }[]>([]);
   const [activeTabId, setActiveTabId] = useState('');
   const [filePicker, setFilePicker] = useState(false);
-  const [browserDialog, setBrowserDialog] = useState<{ type: string; message: string } | null>(
-    null,
-  );
+  const [browserDialog, setBrowserDialog] = useState<{
+    type: string;
+    message: string;
+  } | null>(null);
   const [dialogText, setDialogText] = useState('');
   const [uploading, setUploading] = useState(false);
   const [downloads, setDownloads] = useState<StudioDownload[]>([]);
@@ -453,9 +455,9 @@ export default function CloudBrowserWorkspace({
   async function stop() {
     lifecycleRef.current += 1;
     if (activeTaskId) {
-      await fetch(`/api/admin/dev-studio/tasks/${activeTaskId}/cancel`, { method: 'POST' }).catch(
-        () => undefined,
-      );
+      await fetch(`/api/admin/dev-studio/tasks/${activeTaskId}/cancel`, {
+        method: 'POST',
+      }).catch(() => undefined);
     }
     if (session)
       await fetch(endpoint, { method: 'DELETE', headers: authHeaders }).catch(() => undefined);
@@ -698,9 +700,9 @@ export default function CloudBrowserWorkspace({
           )
             setTarget(payload.url);
         }
-        const downloadsResponse = await fetch(`${endpoint}/downloads`, { headers }).catch(
-          () => null,
-        );
+        const downloadsResponse = await fetch(`${endpoint}/downloads`, {
+          headers,
+        }).catch(() => null);
         if (downloadsResponse?.ok) {
           const payload = await downloadsResponse.json();
           setDownloads(payload.downloads || []);
@@ -717,14 +719,14 @@ export default function CloudBrowserWorkspace({
   // Explicit Stop and the worker TTL own session cleanup.
 
   return (
-    <div ref={workspaceRef} className="flex h-full min-h-0 flex-col bg-slate-950 text-white">
-      <header className="flex flex-wrap items-center gap-2 border-b border-slate-800 bg-slate-900 p-3">
-        <Globe2 className="h-5 w-5 text-cyan-300" />
+    <div ref={workspaceRef} className="flex h-full min-h-0 flex-col bg-white text-slate-950">
+      <header className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 p-3">
+        <Globe2 className="h-5 w-5 text-cyan-800" />
         <strong className="mr-2">Cloud Browser</strong>
         <button
           onClick={() => void verifyBrowser()}
           disabled={checkingBrowser || runtimeReady !== true}
-          className="min-h-12 rounded-lg border border-slate-700 px-3 text-sm"
+          className="min-h-12 rounded-lg border border-slate-300 px-3 text-sm"
         >
           {checkingBrowser ? 'Checking live browser…' : 'Run browser check'}
         </button>
@@ -737,7 +739,7 @@ export default function CloudBrowserWorkspace({
             navigatingRef.current = false;
             setTarget(event.target.value);
           }}
-          className="min-w-[260px] flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs"
+          className="min-h-12 min-w-0 basis-full flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base lg:basis-auto"
           aria-label="Browser URL"
         />
         {!session ? (
@@ -753,14 +755,14 @@ export default function CloudBrowserWorkspace({
             <button
               aria-label="Back"
               onClick={() => action({ type: 'back' })}
-              className="min-h-12 rounded-lg border border-slate-700 px-3"
+              className="min-h-12 rounded-lg border border-slate-300 px-3"
             >
               ←
             </button>
             <button
               aria-label="Forward"
               onClick={() => action({ type: 'forward' })}
-              className="min-h-12 rounded-lg border border-slate-700 px-3"
+              className="min-h-12 rounded-lg border border-slate-300 px-3"
             >
               →
             </button>
@@ -772,14 +774,14 @@ export default function CloudBrowserWorkspace({
             </button>
             <button
               onClick={() => action({ type: 'reload' })}
-              className="rounded-lg border border-slate-700 p-2"
+              className="rounded-lg border border-slate-300 p-2"
               title="Reload"
             >
               <RefreshCw className="h-4 w-4" />
             </button>
             <button
               onClick={stop}
-              className="rounded-lg border border-rose-800 p-2 text-rose-300"
+              className="rounded-lg border border-rose-300 p-2 text-rose-700"
               title="Stop"
             >
               <Square className="h-4 w-4" />
@@ -790,13 +792,13 @@ export default function CloudBrowserWorkspace({
           <>
             <button
               onClick={() => action({ type: 'viewport', width: 390, height: 780 })}
-              className="min-h-12 rounded-lg border border-slate-700 px-3 text-sm"
+              className="min-h-12 rounded-lg border border-slate-300 px-3 text-sm"
             >
               Mobile view
             </button>
             <button
               onClick={() => action({ type: 'viewport', width: 1280, height: 900 })}
-              className="min-h-12 rounded-lg border border-slate-700 px-3 text-sm"
+              className="min-h-12 rounded-lg border border-slate-300 px-3 text-sm"
             >
               Desktop view
             </button>
@@ -811,15 +813,15 @@ export default function CloudBrowserWorkspace({
                   ),
                 );
               }}
-              className="min-h-12 rounded-lg border border-slate-700 px-3 text-sm"
+              className="min-h-12 rounded-lg border border-slate-300 px-3 text-sm"
             >
               Full screen
             </button>
           </>
         ) : null}
-        <span className="text-[11px] text-slate-400">{status}</span>
+        <span className="text-[11px] text-slate-600">{status}</span>
         {unifiedTask ? (
-          <span className="max-w-full truncate rounded-full border border-violet-500/50 bg-violet-500/10 px-2 py-1 text-[10px] font-bold text-violet-200">
+          <span className="max-w-full truncate rounded-full border border-violet-500/50 bg-violet-500/10 px-2 py-1 text-[10px] font-bold text-violet-800">
             LIZZY conversation · {unifiedTask.title || unifiedTask.planId}
           </span>
         ) : null}
@@ -827,11 +829,11 @@ export default function CloudBrowserWorkspace({
       {session ? (
         <nav
           aria-label="Browser tabs"
-          className="flex shrink-0 gap-2 overflow-x-auto border-b border-slate-800 p-2"
+          className="flex shrink-0 gap-2 overflow-x-auto border-b border-slate-200 p-2"
         >
           <button
             onClick={() => action({ type: 'new_tab', url: target })}
-            className="min-h-12 shrink-0 rounded-lg border border-slate-700 px-3"
+            className="min-h-12 shrink-0 rounded-lg border border-slate-300 px-3"
           >
             New tab
           </button>
@@ -840,7 +842,7 @@ export default function CloudBrowserWorkspace({
               key={tab.id}
               aria-pressed={tab.id === activeTabId}
               onClick={() => action({ type: 'switch_tab', tabId: tab.id })}
-              className="min-h-12 max-w-64 truncate rounded-lg border border-slate-700 px-3 text-sm aria-pressed:bg-cyan-900"
+              className="min-h-12 max-w-64 truncate rounded-lg border border-slate-300 px-3 text-sm aria-pressed:bg-cyan-100"
             >
               {tab.url || 'New tab'}
             </button>
@@ -848,7 +850,7 @@ export default function CloudBrowserWorkspace({
           {browserTabs.length > 1 ? (
             <button
               onClick={() => action({ type: 'close_tab', tabId: activeTabId })}
-              className="min-h-12 shrink-0 rounded-lg border border-slate-700 px-3"
+              className="min-h-12 shrink-0 rounded-lg border border-slate-300 px-3"
             >
               Close tab
             </button>
@@ -856,7 +858,7 @@ export default function CloudBrowserWorkspace({
         </nav>
       ) : null}
       {foundationChecks.length ? (
-        <details open className="border-b border-slate-700 p-3 text-sm">
+        <details open className="border-b border-slate-300 p-3 text-sm">
           <summary>Live Chromium acceptance</summary>
           <table className="w-full">
             <tbody>
@@ -876,7 +878,7 @@ export default function CloudBrowserWorkspace({
         <div
           role="dialog"
           aria-label="Browser confirmation"
-          className="border-b border-slate-700 p-3"
+          className="border-b border-slate-300 p-3"
         >
           <p>{browserDialog.message}</p>
           {browserDialog.type === 'prompt' ? (
@@ -884,7 +886,7 @@ export default function CloudBrowserWorkspace({
               aria-label="Browser prompt response"
               value={dialogText}
               onChange={(event) => setDialogText(event.target.value)}
-              className="rounded bg-slate-800 p-3 text-base"
+              className="rounded bg-slate-100 p-3 text-base"
             />
           ) : null}
           <button
@@ -902,7 +904,7 @@ export default function CloudBrowserWorkspace({
         </div>
       ) : null}
       {filePicker ? (
-        <label className="border-b border-slate-700 p-3">
+        <label className="border-b border-slate-300 p-3">
           Choose files for the active browser page (32 MB each)
           <input
             type="file"
@@ -914,13 +916,36 @@ export default function CloudBrowserWorkspace({
         </label>
       ) : null}
       {error && (
-        <div className="flex items-center gap-2 border-b border-rose-900 bg-rose-950/60 px-3 py-2 text-xs text-rose-200">
+        <div className="flex items-center gap-2 border-b border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
           <AlertTriangle className="h-4 w-4" />
           {error}
         </div>
       )}
+      <nav
+        aria-label="Browser workspace panels"
+        className="flex shrink-0 gap-2 border-b border-slate-300 p-2 lg:hidden"
+      >
+        <button
+          type="button"
+          aria-pressed={mobilePane === 'browser'}
+          onClick={() => setMobilePane('browser')}
+          className="min-h-11 flex-1 rounded-lg border border-slate-400 px-3 text-base font-semibold aria-pressed:bg-cyan-100"
+        >
+          Browser
+        </button>
+        <button
+          type="button"
+          aria-pressed={mobilePane === 'tools'}
+          onClick={() => setMobilePane('tools')}
+          className="min-h-11 flex-1 rounded-lg border border-slate-400 px-3 text-base font-semibold aria-pressed:bg-cyan-100"
+        >
+          Sign-in &amp; tools
+        </button>
+      </nav>
       <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="relative flex min-h-0 items-start justify-center overflow-auto bg-slate-800">
+        <div
+          className={`${mobilePane === 'browser' ? 'flex' : 'hidden lg:flex'} relative min-h-0 items-start justify-center overflow-auto bg-slate-100`}
+        >
           {session ? (
             <img
               ref={imageRef}
@@ -941,11 +966,18 @@ export default function CloudBrowserWorkspace({
                 ].filter(Boolean);
                 if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey)
                   void action({ type: 'type', text: event.key });
-                else void action({ type: 'keypress', key: [...modifiers, key].join('+') });
+                else
+                  void action({
+                    type: 'keypress',
+                    key: [...modifiers, key].join('+'),
+                  });
               }}
               onPaste={(event) => {
                 event.preventDefault();
-                void action({ type: 'type', text: event.clipboardData.getData('text/plain') });
+                void action({
+                  type: 'type',
+                  text: event.clipboardData.getData('text/plain'),
+                });
               }}
               className="h-auto w-full cursor-crosshair select-none bg-white shadow-2xl"
               onPointerDown={(event) => {
@@ -1015,22 +1047,28 @@ export default function CloudBrowserWorkspace({
               }}
               onWheel={(event) => {
                 event.preventDefault();
-                void action({ type: 'scroll', deltaX: event.deltaX, deltaY: event.deltaY });
+                void action({
+                  type: 'scroll',
+                  deltaX: event.deltaX,
+                  deltaY: event.deltaY,
+                });
               }}
             />
           ) : (
-            <div className="text-center text-slate-400">
+            <div className="text-center text-slate-600">
               <Loader2 className="mx-auto mb-3 h-8 w-8" />
               <p>Start the isolated open-source browser to inspect the live platform.</p>
             </div>
           )}
         </div>
-        <aside className="flex min-h-0 flex-col border-t border-slate-800 bg-slate-950 lg:border-l lg:border-t-0">
-          <div className="border-b border-slate-800 p-3">
-            <p className="mb-1 flex items-center gap-2 text-xs font-black text-cyan-300">
+        <aside
+          className={`${mobilePane === 'tools' ? 'flex' : 'hidden lg:flex'} min-h-0 flex-col overflow-y-auto border-t border-slate-200 bg-white lg:border-l lg:border-t-0`}
+        >
+          <div className="border-b border-slate-200 p-3">
+            <p className="mb-1 flex items-center gap-2 text-xs font-black text-cyan-800">
               <Download className="h-4 w-4" /> Envato licensed downloads
             </p>
-            <p className="mb-2 text-[10px] leading-4 text-slate-500">
+            <p className="mb-2 text-[10px] leading-4 text-slate-600">
               Download inside this browser, then store the finished 4K file directly in the private
               Course Builder library.
             </p>
@@ -1039,41 +1077,41 @@ export default function CloudBrowserWorkspace({
                 value={envatoItemId}
                 onChange={(event) => setEnvatoItemId(event.target.value)}
                 placeholder="Envato item ID"
-                className="rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs"
+                className="rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
               />
               <input
                 value={resolution}
                 onChange={(event) => setResolution(event.target.value)}
                 placeholder="Resolution"
-                className="rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs"
+                className="rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
               />
               <input
                 value={licensedTitle}
                 onChange={(event) => setLicensedTitle(event.target.value)}
                 placeholder="Asset title"
-                className="col-span-2 rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs"
+                className="col-span-2 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
               />
               <input
                 value={programTags}
                 onChange={(event) => setProgramTags(event.target.value)}
                 placeholder="Programs: barber, hvac"
-                className="col-span-2 rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs"
+                className="col-span-2 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
               />
               <input
                 value={lessonTags}
                 onChange={(event) => setLessonTags(event.target.value)}
                 placeholder="Lesson tags, comma separated"
-                className="col-span-2 rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs"
+                className="col-span-2 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
               />
             </div>
             <div className="mt-2 max-h-40 space-y-2 overflow-y-auto">
               {downloads.map((download) => (
                 <div
                   key={download.id}
-                  className="rounded border border-slate-800 bg-slate-900 p-2 text-[10px]"
+                  className="rounded border border-slate-200 bg-slate-50 p-2 text-[10px]"
                 >
-                  <p className="truncate font-bold text-white">{download.fileName}</p>
-                  <p className="text-slate-400">
+                  <p className="truncate font-bold text-slate-950">{download.fileName}</p>
+                  <p className="text-slate-600">
                     {download.status} ·{' '}
                     {download.size ? `${Math.round(download.size / 1048576)} MB` : 'preparing'}
                     {download.status === 'uploading' ? ` · ${download.uploadProgress || 0}%` : ''}
@@ -1083,7 +1121,7 @@ export default function CloudBrowserWorkspace({
                     <a
                       href={`${endpoint}/file?id=${encodeURIComponent(download.id)}&token=${encodeURIComponent(session.token)}`}
                       referrerPolicy="no-referrer"
-                      className="block min-h-12 rounded-lg border border-slate-600 p-3 text-sm"
+                      className="block min-h-12 rounded-lg border border-slate-400 p-3 text-sm"
                     >
                       Download file
                     </a>
@@ -1101,18 +1139,18 @@ export default function CloudBrowserWorkspace({
                 </div>
               ))}
               {!downloads.length ? (
-                <p className="text-[10px] text-slate-500">No browser downloads yet.</p>
+                <p className="text-[10px] text-slate-600">No browser downloads yet.</p>
               ) : null}
             </div>
           </div>
-          <div className="border-b border-slate-800 p-3">
-            <p className="mb-1 text-xs font-black text-violet-300">LIZZY Browser Task</p>
-            <p className="mb-2 text-[10px] text-slate-500">
+          <div className="border-b border-slate-200 p-3">
+            <p className="mb-1 text-xs font-black text-violet-800">LIZZY Browser Task</p>
+            <p className="mb-2 text-[10px] text-slate-600">
               Runs as a tool in this LIZZY conversation. Progress, approvals, evidence, and results
               appear in the conversation timeline.
             </p>
             {activeTaskId && (
-              <p className="mb-2 block truncate rounded border border-slate-800 bg-slate-900 px-2 py-1 text-[10px] text-cyan-300">
+              <p className="mb-2 block truncate rounded border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] text-cyan-800">
                 Task evidence: {activeTaskId}
               </p>
             )}
@@ -1121,7 +1159,7 @@ export default function CloudBrowserWorkspace({
               onChange={(event) => setAgentTask(event.target.value)}
               rows={3}
               placeholder="Example: inspect every navigation link and report failures"
-              className="w-full rounded border border-slate-700 bg-slate-900 p-2 text-xs"
+              className="w-full rounded border border-slate-300 bg-slate-50 p-2 text-base"
             />
             <button
               onClick={() => runAgent()}
@@ -1149,15 +1187,15 @@ export default function CloudBrowserWorkspace({
               </button>
             )}
             {agentResult && (
-              <p className="mt-2 rounded bg-slate-900 p-2 text-[10px] text-slate-300">
+              <p className="mt-2 rounded bg-slate-50 p-2 text-[10px] text-slate-700">
                 {agentResult}
               </p>
             )}
           </div>
-          <div className="order-first border-b border-slate-800 p-3">
-            <p className="mb-2 text-sm font-black text-emerald-300">Secure sign-in handoff</p>
-            <p className="mb-2 text-[10px] leading-4 text-slate-500">
-              Tap the field you want to fill in the browser above, then type here and select Type
+          <div className="order-first shrink-0 border-b border-slate-200 p-3">
+            <p className="mb-2 text-sm font-black text-emerald-800">Secure sign-in handoff</p>
+            <p className="mb-2 text-base leading-6 text-slate-700">
+              Tap the field you want to fill in the Browser panel, then type here and select Type
               securely. The value is sent directly to the active isolated browser, cleared
               immediately, and never added to the AI conversation or task evidence.
             </p>
@@ -1172,7 +1210,7 @@ export default function CloudBrowserWorkspace({
                     setSecureInputKind(kind);
                     secureInputRef.current?.focus();
                   }}
-                  className="min-h-12 rounded border border-emerald-800 px-4 text-base aria-pressed:bg-emerald-900"
+                  className="min-h-12 rounded border border-emerald-300 px-4 text-base aria-pressed:bg-emerald-100"
                 >
                   {kind === 'email' ? 'Email input' : 'Password input'}
                 </button>
@@ -1199,7 +1237,7 @@ export default function CloudBrowserWorkspace({
                     void sendSecureInput();
                   }
                 }}
-                className="min-h-12 w-full min-w-0 rounded border border-emerald-800 bg-slate-900 px-3 py-2 text-base"
+                className="min-h-12 w-full min-w-0 rounded border border-emerald-300 bg-slate-50 px-3 py-2 text-base"
               />
               {secureInputKind === 'email' ? (
                 <button
@@ -1214,7 +1252,7 @@ export default function CloudBrowserWorkspace({
                     input.setRangeText('@', start, end, 'end');
                     input.focus();
                   }}
-                  className="min-h-12 min-w-12 rounded border border-emerald-800 px-4 text-xl"
+                  className="min-h-12 min-w-12 rounded border border-emerald-300 px-4 text-xl"
                 >
                   @
                 </button>
@@ -1231,7 +1269,7 @@ export default function CloudBrowserWorkspace({
                 type="button"
                 onClick={() => void action({ type: 'keypress', key: 'Enter' })}
                 disabled={!session || sendingSecureInput}
-                className="min-h-12 rounded border border-emerald-800 px-4 text-base text-emerald-200 disabled:opacity-50"
+                className="min-h-12 rounded border border-emerald-300 px-4 text-base text-emerald-800 disabled:opacity-50"
               >
                 Enter
               </button>
@@ -1245,7 +1283,7 @@ export default function CloudBrowserWorkspace({
               Replace the selected browser field
             </label>
           </div>
-          <div className="border-b border-slate-800 p-3">
+          <div className="border-b border-slate-200 p-3">
             <p className="mb-2 flex items-center gap-2 text-xs font-black">
               <Keyboard className="h-4 w-4" /> Keyboard input
             </p>
@@ -1254,7 +1292,7 @@ export default function CloudBrowserWorkspace({
                 aria-label="Browser keyboard input"
                 value={typedText}
                 onChange={(event) => setTypedText(event.target.value)}
-                className="min-w-0 flex-1 rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs"
+                className="min-w-0 flex-1 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
               />
               <button
                 onClick={() => {
@@ -1262,7 +1300,7 @@ export default function CloudBrowserWorkspace({
                   setTypedText('');
                 }}
                 disabled={!session}
-                className="rounded bg-slate-700 px-2 text-xs"
+                className="rounded bg-slate-200 px-2 text-xs"
               >
                 Type
               </button>
@@ -1277,7 +1315,7 @@ export default function CloudBrowserWorkspace({
                       : void action({ type: 'keypress', key })
                   }
                   disabled={!session}
-                  className="rounded border border-slate-700 px-2 py-1 text-[10px]"
+                  className="rounded border border-slate-300 px-2 py-1 text-[10px]"
                 >
                   {key}
                 </button>
@@ -1295,17 +1333,17 @@ export default function CloudBrowserWorkspace({
                 .map((item, index) => (
                   <div
                     key={`${item.at}-${index}`}
-                    className="mb-2 rounded border border-slate-800 bg-slate-900 p-2 text-[10px]"
+                    className="mb-2 rounded border border-slate-200 bg-slate-50 p-2 text-[10px]"
                   >
-                    <span className="font-bold text-cyan-300">{item.type}</span>{' '}
-                    <span className="text-slate-500">{item.at}</span>
-                    <p className="mt-1 break-all text-slate-300">
+                    <span className="font-bold text-cyan-800">{item.type}</span>{' '}
+                    <span className="text-slate-600">{item.at}</span>
+                    <p className="mt-1 break-all text-slate-700">
                       {item.text || item.error || `${item.status || ''} ${item.url || ''}`}
                     </p>
                   </div>
                 ))
             ) : (
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-600">
                 Console errors, failed requests, and HTTP failures will appear here.
               </p>
             )}

@@ -119,3 +119,16 @@ it('retains the streamed image and secure input focus through repeated status up
   expect(document.activeElement).toBe(input);
   expect(input.value).toBe('sample@example.com');
 });
+
+it('switches mobile browser panels without resetting the session, stream or input draft', async () => {
+  await start();
+  const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
+  const image = screen.getByRole('img', { name: 'Live isolated Chromium browser' });
+  fireEvent.change(input, { target: { value: 'sample@example.com' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Sign-in & tools' }));
+  expect(screen.getByRole('button', { name: 'Sign-in & tools' }).getAttribute('aria-pressed')).toBe('true');
+  expect(screen.getByLabelText('Secure browser input')).toBe(input);
+  fireEvent.click(screen.getByRole('button', { name: 'Browser', exact: true }));
+  expect(screen.getByRole('img', { name: 'Live isolated Chromium browser' })).toBe(image);
+  expect(input.value).toBe('sample@example.com');
+});

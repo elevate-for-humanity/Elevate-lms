@@ -69,6 +69,8 @@ export default function CloudBrowserWorkspace({
   const lifecycleRef = useRef(0);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
   const draggedRef = useRef(false);
+  const [signInView, setSignInView] = useState(false);
+  const [controlsOpen, setControlsOpen] = useState(false);
   const [mobilePane, setMobilePane] = useState<'browser' | 'tools'>('browser');
   const [target, setTarget] = useState(initialTarget);
   const [session, setSession] = useState<Session | null>(null);
@@ -297,6 +299,13 @@ export default function CloudBrowserWorkspace({
     // start uses the active conversation and checkpoint identity captured by this render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStart, runtimeReady, session, target, conversationId, unifiedTask?.taskId]);
+
+  async function openSignIn() {
+    setSignInView(true);
+    setMobilePane('browser');
+    setControlsOpen(false);
+    if (session) await action({ type: 'viewport', width: 390, height: 780 });
+  }
 
   async function uploadFiles(files: FileList | null) {
     if (!session || !files?.length) return;
@@ -719,8 +728,21 @@ export default function CloudBrowserWorkspace({
   // Explicit Stop and the worker TTL own session cleanup.
 
   return (
-    <div ref={workspaceRef} className="flex h-full min-h-0 flex-col bg-white text-slate-950">
-      <header className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-slate-50 p-3">
+    <div ref={workspaceRef} className="flex h-full min-h-0 flex-col bg-white text-lg leading-7 text-slate-950">
+      <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white p-2">
+        <strong className="flex-1 text-lg">Studio browser</strong>
+        <button type="button" onClick={() => void openSignIn()} aria-pressed={signInView}
+          className="min-h-12 rounded-lg bg-emerald-700 px-4 text-lg font-bold text-white">
+          Sign in
+        </button>
+        <button type="button" aria-expanded={controlsOpen} onClick={() => setControlsOpen(!controlsOpen)}
+          className="min-h-12 rounded-lg border border-slate-300 px-3 text-base">
+          Browser controls
+        </button>
+        {signInView ? <button type="button" onClick={() => setSignInView(false)}
+          className="min-h-12 rounded-lg border border-slate-300 px-3 text-base">Exit sign-in view</button> : null}
+      </div>
+      <header className={`${controlsOpen || !session ? 'flex' : 'hidden'} max-h-[30dvh] shrink-0 flex-wrap items-center gap-2 overflow-y-auto border-b border-slate-200 bg-slate-50 p-3`}>
         <Globe2 className="h-5 w-5 text-cyan-800" />
         <strong className="mr-2">Cloud Browser</strong>
         <button
@@ -819,9 +841,9 @@ export default function CloudBrowserWorkspace({
             </button>
           </>
         ) : null}
-        <span className="text-[11px] text-slate-600">{status}</span>
+        <span className="text-base text-slate-600">{status}</span>
         {unifiedTask ? (
-          <span className="max-w-full truncate rounded-full border border-violet-500/50 bg-violet-500/10 px-2 py-1 text-[10px] font-bold text-violet-800">
+          <span className="max-w-full truncate rounded-full border border-violet-500/50 bg-violet-500/10 px-2 py-1 text-sm font-bold text-violet-800">
             LIZZY conversation · {unifiedTask.title || unifiedTask.planId}
           </span>
         ) : null}
@@ -829,7 +851,7 @@ export default function CloudBrowserWorkspace({
       {session ? (
         <nav
           aria-label="Browser tabs"
-          className="flex shrink-0 gap-2 overflow-x-auto border-b border-slate-200 p-2"
+          className={`${controlsOpen ? 'flex' : 'hidden'} shrink-0 gap-2 overflow-x-auto border-b border-slate-200 p-2`}
         >
           <button
             onClick={() => action({ type: 'new_tab', url: target })}
@@ -858,7 +880,7 @@ export default function CloudBrowserWorkspace({
         </nav>
       ) : null}
       {foundationChecks.length ? (
-        <details open className="border-b border-slate-300 p-3 text-sm">
+        <details className="max-h-[25dvh] shrink-0 overflow-y-auto border-b border-slate-300 p-3 text-base">
           <summary>Live Chromium acceptance</summary>
           <table className="w-full">
             <tbody>
@@ -916,7 +938,7 @@ export default function CloudBrowserWorkspace({
         </label>
       ) : null}
       {error && (
-        <div className="flex items-center gap-2 border-b border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
+        <div className="flex items-center gap-2 border-b border-rose-200 bg-rose-50 max-h-[15dvh] shrink-0 overflow-auto px-3 py-2 text-base text-rose-800">
           <AlertTriangle className="h-4 w-4" />
           {error}
         </div>
@@ -979,7 +1001,7 @@ export default function CloudBrowserWorkspace({
                   text: event.clipboardData.getData('text/plain'),
                 });
               }}
-              className="h-auto w-full cursor-crosshair select-none bg-white shadow-2xl"
+              className={`h-auto w-full cursor-crosshair select-none bg-white shadow-sm ${signInView ? 'max-w-[480px]' : ''}`}
               onPointerDown={(event) => {
                 const rect = event.currentTarget.getBoundingClientRect();
                 draggedRef.current = false;
@@ -1068,7 +1090,7 @@ export default function CloudBrowserWorkspace({
             <p className="mb-1 flex items-center gap-2 text-xs font-black text-cyan-800">
               <Download className="h-4 w-4" /> Envato licensed downloads
             </p>
-            <p className="mb-2 text-[10px] leading-4 text-slate-600">
+            <p className="mb-2 text-sm leading-4 text-slate-600">
               Download inside this browser, then store the finished 4K file directly in the private
               Course Builder library.
             </p>
@@ -1108,7 +1130,7 @@ export default function CloudBrowserWorkspace({
               {downloads.map((download) => (
                 <div
                   key={download.id}
-                  className="rounded border border-slate-200 bg-slate-50 p-2 text-[10px]"
+                  className="rounded border border-slate-200 bg-slate-50 p-2 text-sm"
                 >
                   <p className="truncate font-bold text-slate-950">{download.fileName}</p>
                   <p className="text-slate-600">
@@ -1139,18 +1161,18 @@ export default function CloudBrowserWorkspace({
                 </div>
               ))}
               {!downloads.length ? (
-                <p className="text-[10px] text-slate-600">No browser downloads yet.</p>
+                <p className="text-sm text-slate-600">No browser downloads yet.</p>
               ) : null}
             </div>
           </div>
           <div className="border-b border-slate-200 p-3">
             <p className="mb-1 text-xs font-black text-violet-800">LIZZY Browser Task</p>
-            <p className="mb-2 text-[10px] text-slate-600">
+            <p className="mb-2 text-sm text-slate-600">
               Runs as a tool in this LIZZY conversation. Progress, approvals, evidence, and results
               appear in the conversation timeline.
             </p>
             {activeTaskId && (
-              <p className="mb-2 block truncate rounded border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] text-cyan-800">
+              <p className="mb-2 block truncate rounded border border-slate-200 bg-slate-50 px-2 py-1 text-sm text-cyan-800">
                 Task evidence: {activeTaskId}
               </p>
             )}
@@ -1187,17 +1209,15 @@ export default function CloudBrowserWorkspace({
               </button>
             )}
             {agentResult && (
-              <p className="mt-2 rounded bg-slate-50 p-2 text-[10px] text-slate-700">
+              <p className="mt-2 rounded bg-slate-50 p-2 text-sm text-slate-700">
                 {agentResult}
               </p>
             )}
           </div>
           <div className="order-first shrink-0 border-b border-slate-200 p-3">
-            <p className="mb-2 text-sm font-black text-emerald-800">Secure sign-in handoff</p>
+            <p className="mb-2 text-xl font-bold text-emerald-800">Sign in securely</p>
             <p className="mb-2 text-base leading-6 text-slate-700">
-              Tap the field you want to fill in the Browser panel, then type here and select Type
-              securely. The value is sent directly to the active isolated browser, cleared
-              immediately, and never added to the AI conversation or task evidence.
+              1. Select the email or password field on the website. 2. Enter it below. 3. Select Type securely, then Enter. Your entry clears immediately and stays out of the chat.
             </p>
             <div className="mb-2 flex flex-wrap gap-2">
               {(['email', 'password'] as const).map((kind) => (
@@ -1237,7 +1257,7 @@ export default function CloudBrowserWorkspace({
                     void sendSecureInput();
                   }
                 }}
-                className="min-h-12 w-full min-w-0 rounded border border-emerald-300 bg-slate-50 px-3 py-2 text-base"
+                className="min-h-12 w-full min-w-0 rounded border border-emerald-300 bg-slate-50 px-3 py-3 text-xl"
               />
               {secureInputKind === 'email' ? (
                 <button
@@ -1315,7 +1335,7 @@ export default function CloudBrowserWorkspace({
                       : void action({ type: 'keypress', key })
                   }
                   disabled={!session}
-                  className="rounded border border-slate-300 px-2 py-1 text-[10px]"
+                  className="rounded border border-slate-300 px-2 py-1 text-sm"
                 >
                   {key}
                 </button>
@@ -1333,7 +1353,7 @@ export default function CloudBrowserWorkspace({
                 .map((item, index) => (
                   <div
                     key={`${item.at}-${index}`}
-                    className="mb-2 rounded border border-slate-200 bg-slate-50 p-2 text-[10px]"
+                    className="mb-2 rounded border border-slate-200 bg-slate-50 p-2 text-sm"
                   >
                     <span className="font-bold text-cyan-800">{item.type}</span>{' '}
                     <span className="text-slate-600">{item.at}</span>

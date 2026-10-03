@@ -349,7 +349,7 @@ function json(res, status, body) {
 function corsHeaders() {
   return {
     'access-control-allow-origin': adminOrigin,
-    'access-control-allow-headers': 'authorization,content-type,x-studio-browser-secret',
+    'access-control-allow-headers': 'authorization,content-type,x-studio-browser-secret,x-studio-file-name',
     'access-control-allow-methods': 'GET,POST,PUT,DELETE,OPTIONS',
     'cache-control': 'no-store',
     'x-content-type-options': 'nosniff',
@@ -464,7 +464,7 @@ async function normalizeDownloadedVideo(item) {
     .filter(Boolean)
     .map((match) => ({ size: Number(match[1]), name: match[2] }))
     .sort((left, right) => right.size - left.size)[0];
-  if (!selected) throw new Error('Envato archive did not contain a supported video file');
+  if (!selected) return item; // Keep document/template archives available as ordinary downloads.
   const fileName = safeFileName(path.basename(selected.name));
   const extractedPath = path.join(path.dirname(item.filePath), `${item.id}-${fileName}`);
   const unzip = spawn('unzip', ['-p', item.filePath, selected.name], {
@@ -620,6 +620,105 @@ const browserManager = createBrowserLifecycleManager({
   },
 });
 
+export async function receiveBrowserUpload(session, request, limit = 32 * 1024 * 1024) {
+  if (!session.fileChooser || (session.fileChooserPage && session.fileChooserPage !== session.page)) throw new BrowserServiceError('file_picker_not_found', 409);
+  const id = crypto.randomUUID();
+  const name = safeFileName(decodeURIComponent(String(request.headers['x-studio-file-name'] || 'upload')));
+  const filePath = path.join(session.downloadDir, id, name);
+  await fs.promises.mkdir(path.dirname(filePath), { mode: 0o700 });
+  const file = await fs.promises.open(filePath, 'wx', 0o600);
+  let size = 0;
+  try {
+    for await (const chunk of request) {
+      size += chunk.length;
+      if (size > limit) throw new BrowserServiceError('upload_too_large', 413);
+      await file.write(chunk);
+    }
+    if (!size) throw new BrowserServiceError('empty_upload', 400);
+    session.uploads ||= new Map();
+    session.uploads.set(id, filePath);
+    return { id, size };
+  } catch (error) {
+    await fs.promises.rm(path.dirname(filePath), { recursive: true, force: true });
+    throw error;
+  } finally {
+    await file.close();
+  }
+}
+
+async function runBrowserFoundationTest() {
+  // A fresh context in the existing worker: no learner/provider account is used.
+  const session = await createSession('about:blank', { width: 390, height: 780 });
+  const checks = [];
+  const check = async (name, action) => {
+    try { await action(); checks.push({ name, passed: true }); }
+    catch (error) { checks.push({ name, passed: false, reason: sanitizeReason(error) }); }
+  };
+  const fixture = `<html><body style="height:2200px"><label>Text<input id="text"></label><button id="popup" onclick="window.open('about:blank')">Open tab</button><input id="file" type="file"><button id="confirm" onclick="document.body.dataset.confirmed=String(confirm('Confirm test'))">Confirm</button><button id="download" onclick="const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['browser acceptance'],{type:'text/plain'}));a.download='acceptance.txt';a.click()">Download</button></body></html>`;
+  const assert = (condition, reason) => { if (!condition) throw new Error(reason); };
+  try {
+    const page = session.page;
+    await page.setContent(fixture);
+    await check('keyboard_and_pointer', async () => {
+      const box = await page.locator('#text').boundingBox();
+      await runActions(session, { actions: [{ type: 'click', x: box.x + 4, y: box.y + 4 }, { type: 'type', text: 'connected browser' }] });
+      assert(await page.locator('#text').inputValue() === 'connected browser', 'keyboard_value_mismatch');
+    });
+    await check('mobile_viewport_and_screenshot', async () => {
+      assert(page.viewportSize().width === 390, 'mobile_viewport_mismatch');
+      assert((await page.screenshot({ type: 'jpeg' })).length > 1000, 'screenshot_empty');
+    });
+    await check('popup_and_tab_switch', async () => {
+      const opener = session.activeTabId;
+      const popupEvent = page.waitForEvent('popup', { timeout: 10000 });
+      await page.locator('#popup').click();
+      const popup = await popupEvent;
+      assert(session.page === popup && session.pages.size === 2, 'popup_not_connected');
+      await runActions(session, { type: 'switch_tab', tabId: opener });
+      assert(session.page === page, 'tab_switch_failed');
+      await popup.close();
+    });
+    await check('file_picker_and_upload', async () => {
+      const chooserEvent = page.waitForEvent('filechooser', { timeout: 10000 });
+      await page.locator('#file').click();
+      await chooserEvent;
+      const content = Buffer.from('browser acceptance');
+      const request = { headers: { 'x-studio-file-name': 'acceptance.txt' }, async *[Symbol.asyncIterator]() { yield content; } };
+      const uploaded = await receiveBrowserUpload(session, request);
+      await runActions(session, { type: 'choose_files', fileIds: [uploaded.id] });
+      assert(await page.locator('#file').evaluate(element => element.files.length) === 1, 'file_not_selected');
+    });
+    await check('browser_dialog_response', async () => {
+      const dialogEvent = page.waitForEvent('dialog', { timeout: 10000 });
+      const clicked = page.locator('#confirm').click();
+      await dialogEvent;
+      await runActions(session, { type: 'dialog', accept: true });
+      await clicked;
+      assert(await page.getAttribute('body', 'data-confirmed') === 'true', 'dialog_response_missing');
+    });
+    await check('download_bytes', async () => {
+      await page.locator('#download').click();
+      const deadline = Date.now() + 10000;
+      while (![...session.downloads.values()].some(item => item.status === 'ready') && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 100));
+      const downloaded = [...session.downloads.values()].find(item => item.status === 'ready');
+      assert(downloaded && await fs.promises.readFile(downloaded.filePath, 'utf8') === 'browser acceptance', 'download_bytes_mismatch');
+    });
+    await check('scroll', async () => {
+      await runActions(session, { type: 'scroll', deltaY: 600 });
+      await page.waitForFunction(() => window.scrollY > 0, null, { timeout: 10000 });
+    });
+    await check('navigation_and_history', async () => {
+      await session.context.route('https://www.elevateforhumanity.org/studio-browser-acceptance/**', route => route.fulfill({ contentType: 'text/html', body: fixture }));
+      await runActions(session, { actions: [{ type: 'navigate', url: 'https://www.elevateforhumanity.org/studio-browser-acceptance/one' }, { type: 'navigate', url: 'https://www.elevateforhumanity.org/studio-browser-acceptance/two' }, { type: 'back' }] });
+      assert(page.url().endsWith('/one'), 'history_back_failed');
+      await runActions(session, { type: 'forward' });
+      assert(page.url().endsWith('/two'), 'history_forward_failed');
+    });
+  } finally { await destroySession(session.id); }
+  const evidence = { contract: 'studio-browser-foundation-v1', commit: process.env.GIT_SHA || process.env.COMMIT_SHA || process.env.GIT_COMMIT || '', testedAt: new Date().toISOString(), passed: checks.every(check => check.passed), checks };
+  return { ...evidence, signature: crypto.createHmac('sha256', sharedSecret).update(JSON.stringify(evidence)).digest('hex') };
+}
+
 export function attachBrowserTabs(session, attachPage, saveState = async () => {}) {
   session.pages = new Map();
   session.activeTabId = '';
@@ -740,6 +839,8 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
         if (session.events.length > 500) session.events.shift();
       };
       const attachPage = (page) => {
+        page.on('filechooser', chooser => { session.fileChooser = chooser; session.fileChooserPage = page; });
+        page.on('dialog', dialog => { session.dialog = dialog; session.dialogPage = page; });
         page.on('console', (message) =>
           record('console', { level: message.type(), text: message.text().slice(0, 2000) }),
         );
@@ -824,6 +925,28 @@ async function runAction(session, action) {
     session.page = selected;
     session.activeTabId = String(action.tabId);
     await selected.bringToFront();
+  } else if (action.type === 'close_tab') {
+    if (!session.pages || session.pages.size < 2) throw new BrowserServiceError('last_tab', 409);
+    const selected = session.pages.get(String(action.tabId || session.activeTabId));
+    if (!selected) throw new BrowserServiceError('tab_not_found', 404);
+    await selected.close();
+  } else if (action.type === 'new_tab') {
+    const target = await validateTarget(String(action.url || session.target));
+    const opened = await session.context.newPage();
+    await opened.goto(target, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+  } else if (action.type === 'dialog') {
+    if (!session.dialog || (session.dialogPage && session.dialogPage !== session.page)) throw new BrowserServiceError('dialog_not_found', 409);
+    const dialog = session.dialog;
+    if (action.accept === true) await dialog.accept(String(action.text || '').slice(0, 4000));
+    else await dialog.dismiss();
+    session.dialog = undefined;
+  } else if (action.type === 'choose_files') {
+    if (!session.fileChooser || (session.fileChooserPage && session.fileChooserPage !== session.page)) throw new BrowserServiceError('file_picker_not_found', 409);
+    const ids = Array.isArray(action.fileIds) ? action.fileIds : [];
+    if (!ids.length || ids.length > 10 || ids.some(id => !session.uploads?.has(id))) throw new BrowserServiceError('invalid_upload_selection', 400);
+    if (ids.length > 1 && !session.fileChooser.isMultiple()) throw new BrowserServiceError('single_file_required', 400);
+    await session.fileChooser.setFiles(ids.map(id => session.uploads.get(id)));
+    session.fileChooser = undefined;
   } else if (action.type === 'back') {
     await page.goBack({ waitUntil: 'domcontentloaded', timeout: 30_000 });
   } else if (action.type === 'forward') {
@@ -1278,6 +1401,11 @@ const server = http.createServer(async (req, res) => {
         browserGeneration: before.browserGeneration,
       });
     }
+    if (req.method === 'POST' && url.pathname === '/foundation-test') {
+      if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
+      const evidence = await runBrowserFoundationTest();
+      return json(res, evidence.passed ? 200 : 422, evidence);
+    }
     if (req.method === 'POST' && url.pathname === '/sessions') {
       if (!sharedSecret || req.headers['x-studio-browser-secret'] !== sharedSecret)
         return json(res, 401, { error: 'unauthorized' });
@@ -1303,12 +1431,19 @@ const server = http.createServer(async (req, res) => {
       });
     }
     const match = url.pathname.match(
-      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit|downloads|imports|batch-imports))?$/,
+      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit|downloads|imports|batch-imports|uploads|file))?$/,
     );
     if (!match) return json(res, 404, { error: 'Not found' });
     const session = sessions.get(match[1]);
     if (!session) return json(res, 410, { error: 'session_expired' });
     if (!authorized(req, session, url)) return json(res, 401, { error: 'unauthorized' });
+    if (req.method === 'GET' && match[2] === 'file') {
+      const download = session.downloads.get(url.searchParams.get('id'));
+      if (!download || download.status !== 'ready') throw new BrowserServiceError('download_not_ready', 409);
+      res.writeHead(200, { ...corsHeaders(), 'content-type': 'application/octet-stream', 'content-disposition': `attachment; filename="${safeFileName(download.fileName)}"`, 'content-length': download.size });
+      await pipeline(fs.createReadStream(download.filePath), res);
+      return;
+    }
     if (req.method === 'GET' && match[2] === 'stream') return streamFrames(req, res, session);
     if (req.method === 'GET' && match[2] === 'screenshot') {
       const quality = Math.min(80, Math.max(35, Number(url.searchParams.get('quality') || 65)));
@@ -1325,7 +1460,7 @@ const server = http.createServer(async (req, res) => {
       return res.end(image);
     }
     if (req.method === 'GET' && match[2] === 'events')
-      return json(res, 200, { events: session.events, url: session.page?.url() || '', activeTabId: session.activeTabId, tabs: [...(session.pages || new Map()).entries()].map(([id, page]) => ({ id, url: page.url() })) });
+      return json(res, 200, { events: session.events, url: session.page?.url() || '', filePicker: Boolean(session.fileChooser && session.fileChooserPage === session.page), dialog: session.dialog && session.dialogPage === session.page ? { type: session.dialog.type(), message: session.dialog.message().slice(0, 2000) } : null, activeTabId: session.activeTabId, tabs: [...(session.pages || new Map()).entries()].map(([id, page]) => ({ id, url: page.url() })) });
     if (req.method === 'GET' && match[2] === 'downloads')
       return json(res, 200, {
         downloads: [...session.downloads.values()].map(({ filePath, ...download }) => download),
@@ -1334,6 +1469,8 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, await snapshotPage(session));
     if (req.method === 'GET' && match[2] === 'audit')
       return json(res, 200, await auditPage(session));
+    if (req.method === 'POST' && match[2] === 'uploads')
+      return json(res, 200, await receiveBrowserUpload(session, req));
     if (req.method === 'POST' && match[2] === 'actions') {
       const metrics = await runActions(session, await readBody(req));
       await providerSessions.save(session.providerScope, session.context);

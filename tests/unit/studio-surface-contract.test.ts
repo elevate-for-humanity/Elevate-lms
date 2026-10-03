@@ -147,6 +147,28 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(route).toContain('pauseForAuthentication(');
   });
 
+  it('continues the same browser task from its durable checkpoint instead of failing at the request batch limit', () => {
+    const route = source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
+    const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
+    expect(route).not.toContain('AI browser reached the 20-step safety limit');
+    expect(route).toContain('continueFromCheckpoint');
+    expect(route).toContain("type: 'continue'");
+    expect(workspace).toContain('setContinuationTaskId(canonicalTaskId)');
+    expect(workspace).toContain('void runAgent(taskId)');
+    expect(workspace).toContain('continuationTaskId !== activeTaskId');
+  });
+
+  it('reconnects expired sessions only after verifying the administrator owns the live browser', () => {
+    const route = source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
+    const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
+    expect(route).toContain('/identity');
+    expect(route).toContain('identity?.ownerId !== auth.id');
+    expect(route).toContain('browserTaskMatches(task, { command, sessionId: priorSessionId })');
+    expect(route).toContain(".eq('requested_by', auth.id)");
+    expect(workspace).toContain('response?.status === 410');
+    expect(workspace).toContain('lifecycle !== lifecycleRef.current');
+  });
+
   it('binds browser evidence to the canonical task identity for the full stream', () => {
     const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
     const route = source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');

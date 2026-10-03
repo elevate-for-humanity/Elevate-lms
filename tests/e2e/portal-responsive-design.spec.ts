@@ -513,6 +513,8 @@ test.describe('Studio readable sign-in and composer', () => {
     await page.screenshot({ path: testInfo.outputPath('studio-readable-sign-in.png') });
     } finally {
       // A failed assertion must not leave an isolated Chromium session running.
+      const browserPane = page.getByRole('button', { name: 'Browser', exact: true });
+      if (await browserPane.isVisible()) await browserPane.click();
       const controls = page.getByRole('button', { name: 'Browser controls', exact: true });
       if (await controls.isVisible() && await controls.getAttribute('aria-expanded') === 'false')
         await controls.click();

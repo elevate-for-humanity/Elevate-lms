@@ -739,7 +739,7 @@ export default function CloudBrowserWorkspace({
             navigatingRef.current = false;
             setTarget(event.target.value);
           }}
-          className="min-w-[260px] flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs"
+          className="min-h-12 min-w-0 basis-full flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base lg:basis-auto"
           aria-label="Browser URL"
         />
         {!session ? (
@@ -781,7 +781,7 @@ export default function CloudBrowserWorkspace({
             </button>
             <button
               onClick={stop}
-              className="rounded-lg border border-rose-800 p-2 text-rose-300"
+              className="rounded-lg border border-rose-300 p-2 text-rose-700"
               title="Stop"
             >
               <Square className="h-4 w-4" />
@@ -1077,31 +1077,31 @@ export default function CloudBrowserWorkspace({
                 value={envatoItemId}
                 onChange={(event) => setEnvatoItemId(event.target.value)}
                 placeholder="Envato item ID"
-                className="rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-xs"
+                className="rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
               />
               <input
                 value={resolution}
                 onChange={(event) => setResolution(event.target.value)}
                 placeholder="Resolution"
-                className="rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-xs"
+                className="rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
               />
               <input
                 value={licensedTitle}
                 onChange={(event) => setLicensedTitle(event.target.value)}
                 placeholder="Asset title"
-                className="col-span-2 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-xs"
+                className="col-span-2 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
               />
               <input
                 value={programTags}
                 onChange={(event) => setProgramTags(event.target.value)}
                 placeholder="Programs: barber, hvac"
-                className="col-span-2 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-xs"
+                className="col-span-2 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
               />
               <input
                 value={lessonTags}
                 onChange={(event) => setLessonTags(event.target.value)}
                 placeholder="Lesson tags, comma separated"
-                className="col-span-2 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-xs"
+                className="col-span-2 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
               />
             </div>
             <div className="mt-2 max-h-40 space-y-2 overflow-y-auto">
@@ -1110,7 +1110,7 @@ export default function CloudBrowserWorkspace({
                   key={download.id}
                   className="rounded border border-slate-200 bg-slate-50 p-2 text-[10px]"
                 >
-                  <p className="truncate font-bold text-white">{download.fileName}</p>
+                  <p className="truncate font-bold text-slate-950">{download.fileName}</p>
                   <p className="text-slate-600">
                     {download.status} ·{' '}
                     {download.size ? `${Math.round(download.size / 1048576)} MB` : 'preparing'}
@@ -1159,7 +1159,7 @@ export default function CloudBrowserWorkspace({
               onChange={(event) => setAgentTask(event.target.value)}
               rows={3}
               placeholder="Example: inspect every navigation link and report failures"
-              className="w-full rounded border border-slate-300 bg-slate-50 p-2 text-xs"
+              className="w-full rounded border border-slate-300 bg-slate-50 p-2 text-base"
             />
             <button
               onClick={() => runAgent()}
@@ -1292,7 +1292,7 @@ export default function CloudBrowserWorkspace({
                 aria-label="Browser keyboard input"
                 value={typedText}
                 onChange={(event) => setTypedText(event.target.value)}
-                className="min-w-0 flex-1 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-xs"
+                className="min-w-0 flex-1 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
               />
               <button
                 onClick={() => {

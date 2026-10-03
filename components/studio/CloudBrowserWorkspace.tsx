@@ -69,6 +69,7 @@ export default function CloudBrowserWorkspace({
   const lifecycleRef = useRef(0);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
   const draggedRef = useRef(false);
+  const [mobilePane, setMobilePane] = useState<'browser' | 'tools'>('browser');
   const [target, setTarget] = useState(initialTarget);
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
@@ -82,9 +83,10 @@ export default function CloudBrowserWorkspace({
   const [browserTabs, setBrowserTabs] = useState<{ id: string; url: string }[]>([]);
   const [activeTabId, setActiveTabId] = useState('');
   const [filePicker, setFilePicker] = useState(false);
-  const [browserDialog, setBrowserDialog] = useState<{ type: string; message: string } | null>(
-    null,
-  );
+  const [browserDialog, setBrowserDialog] = useState<{
+    type: string;
+    message: string;
+  } | null>(null);
   const [dialogText, setDialogText] = useState('');
   const [uploading, setUploading] = useState(false);
   const [downloads, setDownloads] = useState<StudioDownload[]>([]);
@@ -453,9 +455,9 @@ export default function CloudBrowserWorkspace({
   async function stop() {
     lifecycleRef.current += 1;
     if (activeTaskId) {
-      await fetch(`/api/admin/dev-studio/tasks/${activeTaskId}/cancel`, { method: 'POST' }).catch(
-        () => undefined,
-      );
+      await fetch(`/api/admin/dev-studio/tasks/${activeTaskId}/cancel`, {
+        method: 'POST',
+      }).catch(() => undefined);
     }
     if (session)
       await fetch(endpoint, { method: 'DELETE', headers: authHeaders }).catch(() => undefined);
@@ -698,9 +700,9 @@ export default function CloudBrowserWorkspace({
           )
             setTarget(payload.url);
         }
-        const downloadsResponse = await fetch(`${endpoint}/downloads`, { headers }).catch(
-          () => null,
-        );
+        const downloadsResponse = await fetch(`${endpoint}/downloads`, {
+          headers,
+        }).catch(() => null);
         if (downloadsResponse?.ok) {
           const payload = await downloadsResponse.json();
           setDownloads(payload.downloads || []);
@@ -919,8 +921,31 @@ export default function CloudBrowserWorkspace({
           {error}
         </div>
       )}
+      <nav
+        aria-label="Browser workspace panels"
+        className="flex shrink-0 gap-2 border-b border-slate-700 p-2 lg:hidden"
+      >
+        <button
+          type="button"
+          aria-pressed={mobilePane === 'browser'}
+          onClick={() => setMobilePane('browser')}
+          className="min-h-11 flex-1 rounded-lg border border-slate-600 px-3 text-base font-semibold aria-pressed:bg-cyan-900"
+        >
+          Browser
+        </button>
+        <button
+          type="button"
+          aria-pressed={mobilePane === 'tools'}
+          onClick={() => setMobilePane('tools')}
+          className="min-h-11 flex-1 rounded-lg border border-slate-600 px-3 text-base font-semibold aria-pressed:bg-cyan-900"
+        >
+          Sign-in &amp; tools
+        </button>
+      </nav>
       <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="relative flex min-h-0 items-start justify-center overflow-auto bg-slate-800">
+        <div
+          className={`${mobilePane === 'browser' ? 'flex' : 'hidden lg:flex'} relative min-h-0 items-start justify-center overflow-auto bg-slate-800`}
+        >
           {session ? (
             <img
               ref={imageRef}
@@ -941,11 +966,18 @@ export default function CloudBrowserWorkspace({
                 ].filter(Boolean);
                 if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey)
                   void action({ type: 'type', text: event.key });
-                else void action({ type: 'keypress', key: [...modifiers, key].join('+') });
+                else
+                  void action({
+                    type: 'keypress',
+                    key: [...modifiers, key].join('+'),
+                  });
               }}
               onPaste={(event) => {
                 event.preventDefault();
-                void action({ type: 'type', text: event.clipboardData.getData('text/plain') });
+                void action({
+                  type: 'type',
+                  text: event.clipboardData.getData('text/plain'),
+                });
               }}
               className="h-auto w-full cursor-crosshair select-none bg-white shadow-2xl"
               onPointerDown={(event) => {
@@ -1015,7 +1047,11 @@ export default function CloudBrowserWorkspace({
               }}
               onWheel={(event) => {
                 event.preventDefault();
-                void action({ type: 'scroll', deltaX: event.deltaX, deltaY: event.deltaY });
+                void action({
+                  type: 'scroll',
+                  deltaX: event.deltaX,
+                  deltaY: event.deltaY,
+                });
               }}
             />
           ) : (
@@ -1025,7 +1061,9 @@ export default function CloudBrowserWorkspace({
             </div>
           )}
         </div>
-        <aside className="flex min-h-0 flex-col border-t border-slate-800 bg-slate-950 lg:border-l lg:border-t-0">
+        <aside
+          className={`${mobilePane === 'tools' ? 'flex' : 'hidden lg:flex'} min-h-0 flex-col overflow-y-auto border-t border-slate-800 bg-slate-950 lg:border-l lg:border-t-0`}
+        >
           <div className="border-b border-slate-800 p-3">
             <p className="mb-1 flex items-center gap-2 text-xs font-black text-cyan-300">
               <Download className="h-4 w-4" /> Envato licensed downloads
@@ -1154,10 +1192,10 @@ export default function CloudBrowserWorkspace({
               </p>
             )}
           </div>
-          <div className="order-first border-b border-slate-800 p-3">
+          <div className="order-first shrink-0 border-b border-slate-800 p-3">
             <p className="mb-2 text-sm font-black text-emerald-300">Secure sign-in handoff</p>
-            <p className="mb-2 text-[10px] leading-4 text-slate-500">
-              Tap the field you want to fill in the browser above, then type here and select Type
+            <p className="mb-2 text-base leading-6 text-slate-300">
+              Tap the field you want to fill in the Browser panel, then type here and select Type
               securely. The value is sent directly to the active isolated browser, cleared
               immediately, and never added to the AI conversation or task evidence.
             </p>

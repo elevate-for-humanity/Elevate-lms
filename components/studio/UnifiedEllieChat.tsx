@@ -77,18 +77,14 @@ interface ChatMessage {
   toolCalls?: ToolCall[];
   action?: EllieAction | null;
   capabilitiesUsed?: string[];
-  actionOutcome?: { status: 'executed' | 'rejected' | 'failed'; message: string };
+  actionOutcome?: {
+    status: 'executed' | 'rejected' | 'failed';
+    message: string;
+  };
 }
 
 type StudioProvider =
-  | 'auto'
-  | 'elevate'
-  | 'cloudflare'
-  | 'xai'
-  | 'openai'
-  | 'anthropic'
-  | 'gemini'
-  | 'groq';
+  'auto' | 'elevate' | 'cloudflare' | 'xai' | 'openai' | 'anthropic' | 'gemini' | 'groq';
 
 const STUDIO_PROVIDER_LABELS: Record<StudioProvider, string> = {
   auto: 'Best available',
@@ -668,6 +664,7 @@ export default function UnifiedEllieChat({
   const [restoringConversation, setRestoringConversation] = useState(false);
   const [restoreAttempt, setRestoreAttempt] = useState(0);
   const [input, setInput] = useState('');
+  const [composerToolsOpen, setComposerToolsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [health, setHealth] = useState('checking…');
   const [aiOk, setAiOk] = useState<boolean | null>(null);
@@ -798,7 +795,10 @@ export default function UnifiedEllieChat({
       const form = new FormData();
       form.append('file', file);
       form.append('label', file.name);
-      const response = await fetch('/api/admin/dev-studio/upload', { method: 'POST', body: form });
+      const response = await fetch('/api/admin/dev-studio/upload', {
+        method: 'POST',
+        body: form,
+      });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error ?? `Upload failed (HTTP ${response.status})`);
       const preview =
@@ -997,7 +997,10 @@ export default function UnifiedEllieChat({
             const next = [...current];
             const row = next[assistantIdx];
             if (row?.role === 'assistant')
-              next[assistantIdx] = { ...row, content: `${row.content}\n${clean}`.trim() };
+              next[assistantIdx] = {
+                ...row,
+                content: `${row.content}\n${clean}`.trim(),
+              };
             return next;
           });
         },
@@ -1034,7 +1037,13 @@ export default function UnifiedEllieChat({
       {
         setMessages((prev) => [
           ...prev,
-          { role: 'assistant', content: '', provider: 'admin-ai', route, agent },
+          {
+            role: 'assistant',
+            content: '',
+            provider: 'admin-ai',
+            route,
+            agent,
+          },
         ]);
         const command = [text, fileContext, attachment?.context].filter(Boolean).join('\n\n');
         const appendLine = (line: string) => {
@@ -1110,7 +1119,13 @@ export default function UnifiedEllieChat({
         await persistConversation(canonicalConversationId, [
           ...messages,
           userMsg,
-          { role: 'assistant', content: spokenText, provider: 'admin-ai', route, agent },
+          {
+            role: 'assistant',
+            content: spokenText,
+            provider: 'admin-ai',
+            route,
+            agent,
+          },
         ]);
       }
     } catch (error) {
@@ -1337,13 +1352,13 @@ export default function UnifiedEllieChat({
                 className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {message.role === 'assistant' && (
-                  <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm">
+                  <div className="mt-1 hidden h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm sm:flex">
                     <Bot className="h-4 w-4 text-gray-800" aria-hidden="true" />
                   </div>
                 )}
-                <div className="max-w-[min(100%,44rem)]">
+                <div className="min-w-0 max-w-[min(100%,44rem)]">
                   <div
-                    className={`rounded-2xl px-4 py-3 text-sm leading-6 ${
+                    className={`rounded-2xl px-4 py-3 text-lg leading-7 ${
                       message.role === 'user'
                         ? 'bg-brand-blue-700 text-white shadow-sm'
                         : assistantClass
@@ -1355,7 +1370,9 @@ export default function UnifiedEllieChat({
                         {message.route ? ` · ${ELLIE_ROUTE_LABEL[message.route]}` : ''}
                       </p>
                     )}
-                    <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                    <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
+                      {message.content}
+                    </p>
                     {message.role === 'assistant' && message.capabilitiesUsed?.length ? (
                       <p className="mt-2 text-[11px] text-gray-500">
                         Capabilities used: {message.capabilitiesUsed.join(', ')}
@@ -1393,7 +1410,7 @@ export default function UnifiedEllieChat({
                   </div>
                 </div>
                 {message.role === 'user' && (
-                  <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100">
+                  <div className="mt-1 hidden h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 sm:flex">
                     <User className="h-4 w-4 text-gray-700" aria-hidden="true" />
                   </div>
                 )}
@@ -1402,7 +1419,7 @@ export default function UnifiedEllieChat({
 
             {loading && (
               <div className="flex justify-start gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm sm:flex">
                   <Loader2 className="h-4 w-4 animate-spin text-gray-700" aria-hidden="true" />
                 </div>
                 <div className={`rounded-2xl px-4 py-3 text-sm ${assistantClass}`}>Working…</div>
@@ -1413,7 +1430,9 @@ export default function UnifiedEllieChat({
         )}
       </div>
 
-      <div className={`min-w-0 shrink-0 border-t p-3 sm:p-4 ${inputAreaClass}`}>
+      <div
+        className={`min-w-0 shrink-0 border-t p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-4 ${inputAreaClass}`}
+      >
         <div className="mx-auto w-full min-w-0 max-w-3xl">
           {attachment ? (
             <div className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900">
@@ -1459,7 +1478,7 @@ export default function UnifiedEllieChat({
               aria-label="Attach a file"
               disabled={uploading}
               onClick={() => attachmentInputRef.current?.click()}
-              className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+              className={`${composerToolsOpen ? 'flex' : 'hidden sm:flex'} h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50`}
             >
               {uploading ? (
                 <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
@@ -1473,10 +1492,19 @@ export default function UnifiedEllieChat({
               aria-label="Take a photo"
               disabled={uploading}
               onClick={() => cameraInputRef.current?.click()}
-              className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+              className={`${composerToolsOpen ? 'flex' : 'hidden sm:flex'} h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50`}
             >
               <Camera className="h-5 w-5" aria-hidden="true" />
               <span className="text-xs font-semibold">Camera</span>
+            </button>
+            <button
+              type="button"
+              aria-label="Attachment and voice tools"
+              aria-expanded={composerToolsOpen}
+              onClick={() => setComposerToolsOpen((open) => !open)}
+              className="flex h-11 shrink-0 items-center gap-2 rounded-xl border border-gray-300 px-3 text-base font-semibold text-gray-700 sm:hidden"
+            >
+              <Paperclip className="h-5 w-5" aria-hidden="true" /> Tools
             </button>
             <textarea
               ref={inputRef}
@@ -1489,9 +1517,9 @@ export default function UnifiedEllieChat({
                   void send();
                 }
               }}
-              rows={2}
+              rows={3}
               placeholder="Tell Admin AI what you need done..."
-              className={`order-first min-h-[88px] w-full min-w-0 basis-full resize-none rounded-xl border px-3 py-2 text-base outline-none sm:min-h-[72px] sm:text-sm ${inputClass}`}
+              className={`order-first min-h-[104px] max-h-[30dvh] w-full min-w-0 basis-full resize-none rounded-xl border px-3 py-3 text-lg leading-7 outline-none ${inputClass}`}
             />
             <button
               type="button"
@@ -1509,7 +1537,9 @@ export default function UnifiedEllieChat({
               ) : (
                 <Mic className="h-5 w-5" aria-hidden="true" />
               )}
-              <span>{listening ? 'Stop listening' : `Talk to ${preferredAgent ?? 'Lizzy'}`}</span>
+              <span className="hidden sm:inline">
+                {listening ? 'Stop listening' : `Talk to ${preferredAgent ?? 'Lizzy'}`}
+              </span>
             </button>
             <button
               type="button"
@@ -1521,7 +1551,7 @@ export default function UnifiedEllieChat({
                   return !enabled;
                 });
               }}
-              className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+              className={`${composerToolsOpen ? 'flex' : 'hidden sm:flex'} h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50`}
             >
               {voiceOutputEnabled ? (
                 <Volume2 className="h-5 w-5" aria-hidden="true" />
@@ -1535,7 +1565,7 @@ export default function UnifiedEllieChat({
               aria-label="Send request"
               disabled={!input.trim() || loading || restoringConversation || Boolean(restoreError)}
               onClick={() => void send()}
-              className="flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-4 text-sm font-bold text-white transition hover:bg-brand-red-800 disabled:cursor-not-allowed disabled:opacity-40"
+              className="ml-auto flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-4 text-base font-bold text-white transition hover:bg-brand-red-800 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />

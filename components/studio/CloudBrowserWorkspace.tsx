@@ -80,6 +80,9 @@ export default function CloudBrowserWorkspace({
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
   const [runtimeReady, setRuntimeReady] = useState<boolean | null>(null);
+  const [connectionAttempt, setConnectionAttempt] = useState(0);
+  const startingRef = useRef(false);
+  const [starting, setStarting] = useState(false);
   const [checkingBrowser, setCheckingBrowser] = useState(false);
   const [foundationChecks, setFoundationChecks] = useState<
     { name: string; passed: boolean; reason?: string }[]
@@ -115,6 +118,14 @@ export default function CloudBrowserWorkspace({
   const imageRef = useRef<HTMLImageElement>(null);
   const secureInputRef = useRef<HTMLInputElement>(null);
   const actionQueueRef = useRef<Promise<unknown>>(Promise.resolve());
+  const actionEpochRef = useRef(0);
+  const actionControllerRef = useRef<AbortController | null>(null);
+  const controlsPausedRef = useRef(false);
+  const secureSendingRef = useRef(false);
+  const [controlsPaused, setControlsPaused] = useState(false);
+  const [reconnecting, setReconnecting] = useState(false);
+  const [fitMode, setFitMode] = useState(false);
+  const [streamRevision, setStreamRevision] = useState(0);
   const [secureInputKind, setSecureInputKind] = useState<'email' | 'password'>('email');
   const [replaceSecureInput, setReplaceSecureInput] = useState(true);
   const [sendingSecureInput, setSendingSecureInput] = useState(false);
@@ -133,6 +144,77 @@ export default function CloudBrowserWorkspace({
   const authHeaders: Record<string, string> = session
     ? { Authorization: `Bearer ${session.token}` }
     : {};
+
+  function pauseControls(message: string) {
+    actionEpochRef.current += 1;
+    controlsPausedRef.current = true;
+    setControlsPaused(true);
+    setStatus('Controls paused');
+    setError(message);
+  }
+
+  function fitScreen() {
+    const image = imageRef.current;
+    const viewport = image?.parentElement;
+    if (!viewport || !session || !viewport.clientWidth || !viewport.clientHeight) return;
+    const width = image.naturalWidth || session.viewport.width;
+    const height = image.naturalHeight || session.viewport.height;
+    const baseWidth = Math.min(viewport.clientWidth, signInView ? 480 : viewport.clientWidth);
+    setImageZoom(Math.min(1, viewport.clientHeight / (baseWidth * height / width)));
+    viewport.scrollTop = 0;
+    viewport.scrollLeft = 0;
+  }
+
+  useEffect(() => {
+    if (!fitMode || !session) return;
+    fitScreen();
+    const viewport = imageRef.current?.parentElement;
+    if (!viewport || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(fitScreen);
+    observer.observe(viewport);
+    return () => observer.disconnect();
+    // Refit when the actual workspace or remote viewport changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fitMode, signInView, mobilePane, session?.id, session?.viewport.width, session?.viewport.height]);
+
+  useEffect(() => () => {
+    actionEpochRef.current += 1;
+    actionControllerRef.current?.abort();
+  }, []);
+
+  async function reconnectControls() {
+    if (!session || reconnectingRef.current) return;
+    reconnectingRef.current = true;
+    setReconnecting(true);
+    try {
+      const response = await fetch(`/api/admin/dev-studio/browser/action?sessionId=${encodeURIComponent(session.id)}&resource=events`, {
+        headers: { 'x-studio-session-token': session.token },
+        signal: AbortSignal.timeout(8000),
+        cache: 'no-store',
+      });
+      if (response.status === 410) {
+        await start(launchTargetRef.current || target, signInView);
+        return;
+      }
+      if (!response.ok) throw new Error(`Connection check failed (HTTP ${response.status}).`);
+      const body = await response.json();
+      if (body.viewport) setSession(current => current ? { ...current, viewport: body.viewport } : current);
+      // Discard old queued input. Never replay a password or uncertain submission.
+      actionEpochRef.current += 1;
+      actionControllerRef.current?.abort();
+      actionQueueRef.current = Promise.resolve();
+      controlsPausedRef.current = false;
+      setControlsPaused(false);
+      setStreamRevision(value => value + 1);
+      setError('');
+      setStatus('Connected — check the website before resending input');
+    } catch (cause) {
+      pauseControls(cause instanceof Error ? cause.message : 'Browser connection could not be restored.');
+    } finally {
+      reconnectingRef.current = false;
+      setReconnecting(false);
+    }
+  }
 
   useEffect(() => {
     const requestedTarget = initialTarget.trim();
@@ -178,7 +260,9 @@ export default function CloudBrowserWorkspace({
 
   useEffect(() => {
     let cancelled = false;
-    void fetch('/api/admin/dev-studio/browser/session', { cache: 'no-store' })
+    setRuntimeReady(null);
+    setStatus('Checking browser connection…');
+    void fetch('/api/admin/dev-studio/browser/session', { cache: 'no-store', signal: AbortSignal.timeout(8000) })
       .then(async (response) => {
         const raw = await response.text();
         let payload: Record<string, any> = {};
@@ -225,7 +309,7 @@ export default function CloudBrowserWorkspace({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [connectionAttempt]);
 
   async function verifyBrowser() {
     setCheckingBrowser(true);
@@ -236,55 +320,76 @@ export default function CloudBrowserWorkspace({
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ action: 'verify' }),
+        signal: AbortSignal.timeout(125_000),
       });
-      const evidence = await response.json();
+      const evidence = await response.json().catch(() => ({
+        error: `Browser verification returned an unreadable response (HTTP ${response.status}).`,
+      }));
       setFoundationChecks(evidence.checks || []);
       if (!response.ok || evidence.passed !== true)
         setError(
           evidence.error || 'Live browser acceptance did not pass. See the failed check below.',
         );
     } catch {
-      setError('Live browser acceptance could not finish.');
+      setError('Browser verification did not respond in time. No passing result was recorded.');
     } finally {
       setCheckingBrowser(false);
     }
   }
 
   async function start(overrideTarget = target, compact = false) {
+    if (startingRef.current) return;
+    startingRef.current = true;
+    setStarting(true);
     const lifecycle = ++lifecycleRef.current;
+    actionEpochRef.current += 1;
+    actionControllerRef.current?.abort();
+    actionQueueRef.current = Promise.resolve();
     const startingTarget = overrideTarget;
     launchTargetRef.current = startingTarget;
     setError('');
     setStatus('Starting isolated Chromium…');
-    const response = await fetch('/api/admin/dev-studio/browser/session', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        url: startingTarget,
-        width: compact ? 390 : Math.min(1440, Math.max(390, window.innerWidth)),
-        height: compact || window.innerWidth < 1024 ? 780 : 900,
-        conversationId: conversationId || undefined,
-        taskId: unifiedTask?.taskId || undefined,
-      }),
-    });
-    const payload = await response.json();
-    if (lifecycle !== lifecycleRef.current) return;
-    if (!response.ok) {
-      setError(payload.error || 'Could not start browser');
+    try {
+      const response = await fetch('/api/admin/dev-studio/browser/session', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          url: startingTarget,
+          width: compact ? 390 : Math.min(1440, Math.max(390, window.innerWidth)),
+          height: compact || window.innerWidth < 1024 ? 780 : 900,
+          conversationId: conversationId || undefined,
+          taskId: unifiedTask?.taskId || undefined,
+        }),
+        signal: AbortSignal.timeout(40_000),
+      });
+      const payload = await response.json();
+      if (lifecycle !== lifecycleRef.current) return;
+      if (!response.ok) {
+        setError(payload.error || 'Could not start browser');
+        setStatus('Unavailable');
+        return;
+      }
+      setSession(payload);
+      controlsPausedRef.current = false;
+      setControlsPaused(false);
+      if (conversationId && payload.conversationId && payload.conversationId !== conversationId) {
+        setSession(null);
+        setError('Browser session context did not match the active LIZZY conversation.');
+        setStatus('Unavailable');
+        return;
+      }
+      setStatus('Connected');
+      if (targetDraftRef.current === null || targetDraftRef.current === startingTarget) {
+        targetDraftRef.current = null;
+        if (payload.url) setTarget(payload.url);
+      }
+    } catch (cause) {
+      if (lifecycle !== lifecycleRef.current) return;
       setStatus('Unavailable');
-      return;
-    }
-    setSession(payload);
-    if (conversationId && payload.conversationId && payload.conversationId !== conversationId) {
-      setSession(null);
-      setError('Browser session context did not match the active LIZZY conversation.');
-      setStatus('Unavailable');
-      return;
-    }
-    setStatus('Connected');
-    if (targetDraftRef.current === null || targetDraftRef.current === startingTarget) {
-      targetDraftRef.current = null;
-      if (payload.url) setTarget(payload.url);
+      setError(cause instanceof Error ? cause.message : 'Could not start browser');
+    } finally {
+      startingRef.current = false;
+      setStarting(false);
     }
   }
 
@@ -353,13 +458,22 @@ export default function CloudBrowserWorkspace({
 
   function action(payload: Record<string, unknown>): Promise<boolean> {
     // Keep clicks, text and submission in the user's order, even on a slow connection.
-    const queued = actionQueueRef.current.catch(() => undefined).then(() => performAction(payload));
+    const epoch = actionEpochRef.current;
+    if (controlsPausedRef.current) return Promise.resolve(false);
+    const queued = actionQueueRef.current.catch(() => undefined).then(() =>
+      epoch === actionEpochRef.current && !controlsPausedRef.current
+        ? performAction(payload, epoch)
+        : false,
+    );
     actionQueueRef.current = queued;
     return queued;
   }
 
-  async function performAction(payload: Record<string, unknown>): Promise<boolean> {
+  async function performAction(payload: Record<string, unknown>, epoch: number): Promise<boolean> {
     if (!session) return false;
+    const controller = new AbortController();
+    actionControllerRef.current = controller;
+    const timeout = window.setTimeout(() => controller.abort(), 40_000);
     const navigation = payload.type === 'navigate';
     if (
       navigation &&
@@ -370,14 +484,16 @@ export default function CloudBrowserWorkspace({
     const revision = navigation ? ++navigationRevisionRef.current : navigationRevisionRef.current;
     if (navigation) navigatingRef.current = true;
     try {
-      const response = await fetch(`${endpoint}/actions`, {
+      const response = await fetch('/api/admin/dev-studio/browser/action', {
         method: 'POST',
-        headers: { ...authHeaders, 'content-type': 'application/json' },
-        body: JSON.stringify(payload),
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ sessionId: session.id, sessionToken: session.token, action: payload }),
+        signal: controller.signal,
       });
-      const body = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        setError(body.error || 'Browser action failed');
+      const body = await response.json().catch(() => null);
+      if (epoch !== actionEpochRef.current) return false;
+      if (!response.ok || body?.ok !== true) {
+        pauseControls(body?.error || `Browser action was not confirmed (HTTP ${response.status}). Reconnect controls before trying again.`);
         return false;
       }
       if (body.viewport)
@@ -386,11 +502,17 @@ export default function CloudBrowserWorkspace({
         if (navigation) targetDraftRef.current = null;
         if (body.url && targetDraftRef.current === null) setTarget(body.url);
       }
+      setStatus('Connected');
       return true;
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Browser action failed');
+      if (epoch === actionEpochRef.current)
+        pauseControls(controller.signal.aborted
+          ? 'The browser action timed out. Queued input was cancelled. Reconnect and check the website before trying again.'
+          : 'The browser connection failed. Queued input was cancelled. Reconnect before trying again.');
       return false;
     } finally {
+      window.clearTimeout(timeout);
+      if (actionControllerRef.current === controller) actionControllerRef.current = null;
       if (navigation && navigationRevisionRef.current === revision) navigatingRef.current = false;
     }
   }
@@ -477,13 +599,24 @@ export default function CloudBrowserWorkspace({
 
   async function stop() {
     lifecycleRef.current += 1;
+    actionEpochRef.current += 1;
+    actionControllerRef.current?.abort();
+    autoStartedRef.current = true;
     if (activeTaskId) {
       await fetch(`/api/admin/dev-studio/tasks/${activeTaskId}/cancel`, {
         method: 'POST',
+        signal: AbortSignal.timeout(8000),
       }).catch(() => undefined);
     }
-    if (session)
-      await fetch(endpoint, { method: 'DELETE', headers: authHeaders }).catch(() => undefined);
+    if (session) {
+      const stopped = await fetch(`/api/admin/dev-studio/browser/action?sessionId=${encodeURIComponent(session.id)}`, {
+        method: 'DELETE', headers: { 'x-studio-session-token': session.token }, signal: AbortSignal.timeout(8000),
+      }).catch(() => null);
+      if (!stopped?.ok && stopped?.status !== 410) {
+        pauseControls('The browser stop could not be confirmed. Reconnect controls and try Stop again.');
+        return;
+      }
+    }
     setSession(null);
     setEvents([]);
     setDownloads([]);
@@ -595,24 +728,25 @@ export default function CloudBrowserWorkspace({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [continuationTaskId, agentRunning, session, activeTaskId]);
 
-  async function sendSecureInput() {
+  async function sendSecureInput(submit = false) {
     const input = secureInputRef.current;
     const value = input?.value || '';
-    if (!input || !value || !session || sendingSecureInput) return;
+    if (!input || !session || secureSendingRef.current || controlsPausedRef.current) return;
+    if (!value) {
+      if (submit) await action({ type: 'keypress', key: 'Enter' });
+      return;
+    }
+    secureSendingRef.current = true;
     input.value = '';
     setSendingSecureInput(true);
     try {
-      await action(
-        replaceSecureInput
-          ? {
-              actions: [
-                { type: 'keypress', key: 'ControlOrMeta+A' },
-                { type: 'type', text: value },
-              ],
-            }
-          : { type: 'type', text: value },
-      );
+      const actions: Record<string, unknown>[] = [];
+      if (replaceSecureInput) actions.push({ type: 'keypress', key: 'ControlOrMeta+A' });
+      actions.push({ type: 'type', text: value });
+      if (submit) actions.push({ type: 'keypress', key: 'Enter' });
+      await action({ actions });
     } finally {
+      secureSendingRef.current = false;
       setSendingSecureInput(false);
     }
   }
@@ -620,7 +754,11 @@ export default function CloudBrowserWorkspace({
   async function submitBrowserEnter() {
     // Email submission is only the first login step; do not restart the agent
     // while the administrator is still entering a password or verification code.
-    await action({ type: 'keypress', key: 'Enter' });
+    const value = typedText;
+    setTypedText('');
+    await action(value ? { actions: [
+      { type: 'type', text: value }, { type: 'keypress', key: 'Enter' },
+    ] } : { type: 'keypress', key: 'Enter' });
   }
 
   async function approveAndResume() {
@@ -678,65 +816,70 @@ export default function CloudBrowserWorkspace({
 
   useEffect(() => {
     if (!session) return;
-    const headers = { Authorization: `Bearer ${session.token}` };
+    const headers = { 'x-studio-session-token': session.token };
+    let polling = false;
+    let disposed = false;
     const timer = window.setInterval(
       async () => {
-        const revision = navigationRevisionRef.current;
-        const response = await fetch(`${endpoint}/events`, { headers }).catch(() => null);
-        if (response?.status === 410 && !reconnectingRef.current) {
-          reconnectingRef.current = true;
-          const reconnectTarget = target.includes('accounts.google.com')
-            ? launchTargetRef.current
-            : target;
-          setSession(null);
-          setStatus('Reconnecting the existing browser account…');
-          try {
-            await start(reconnectTarget);
-            if (activeTaskId) setContinuationTaskId(activeTaskId);
-          } catch (cause) {
-            setError(cause instanceof Error ? cause.message : 'Browser reconnect failed');
-          } finally {
-            reconnectingRef.current = false;
+        if (polling || disposed) return;
+        polling = true;
+        try {
+          const revision = navigationRevisionRef.current;
+          const response = await fetch(`/api/admin/dev-studio/browser/action?sessionId=${encodeURIComponent(session.id)}&resource=events`, { headers, signal: AbortSignal.timeout(8000) }).catch(() => null);
+          if (disposed) return;
+          if (response?.status === 410 && !reconnectingRef.current) {
+            if (!controlsPausedRef.current) pauseControls('The browser session expired. Reconnect controls to restore your browser account.');
+            return;
           }
-          return;
-        }
-        if (response?.ok) {
-          const payload = await response.json();
-          setEvents(payload.events || []);
-          if (payload.viewport)
-            setSession((current) =>
-              current &&
-              (current.viewport.width !== payload.viewport.width ||
-                current.viewport.height !== payload.viewport.height)
-                ? { ...current, viewport: payload.viewport }
-                : current,
-            );
-          setBrowserTabs(payload.tabs || []);
-          setActiveTabId(payload.activeTabId || '');
-          setFilePicker(Boolean(payload.filePicker));
-          setBrowserDialog(payload.dialog || null);
-          if (
-            payload.url &&
-            targetDraftRef.current === null &&
-            !navigatingRef.current &&
-            revision === navigationRevisionRef.current
-          )
-            setTarget(payload.url);
-        }
-        const downloadsResponse = await fetch(`${endpoint}/downloads`, {
-          headers,
-        }).catch(() => null);
-        if (downloadsResponse?.ok) {
-          const payload = await downloadsResponse.json();
-          setDownloads(payload.downloads || []);
+          if (!response?.ok) {
+            if (!controlsPausedRef.current) pauseControls('The browser connection is unavailable. Reconnect controls before sending more input.');
+            return;
+          }
+          if (response?.ok) {
+            const payload = await response.json();
+            if (disposed) return;
+            setEvents(payload.events || []);
+            if (payload.viewport)
+              setSession((current) =>
+                current &&
+                (current.viewport.width !== payload.viewport.width ||
+                  current.viewport.height !== payload.viewport.height)
+                  ? { ...current, viewport: payload.viewport }
+                  : current,
+              );
+            setBrowserTabs(payload.tabs || []);
+            setActiveTabId(payload.activeTabId || '');
+            setFilePicker(Boolean(payload.filePicker));
+            setBrowserDialog(payload.dialog || null);
+            if (
+              payload.url &&
+              targetDraftRef.current === null &&
+              !navigatingRef.current &&
+              revision === navigationRevisionRef.current
+            )
+              setTarget(payload.url);
+          }
+          const downloadsResponse = await fetch(`/api/admin/dev-studio/browser/action?sessionId=${encodeURIComponent(session.id)}&resource=downloads`, {
+            headers,
+            signal: AbortSignal.timeout(8000),
+          }).catch(() => null);
+          if (!disposed && downloadsResponse?.ok) {
+            const payload = await downloadsResponse.json();
+            if (disposed) return;
+            setDownloads(payload.downloads || []);
+          }
+        } catch {
+          if (!disposed && !controlsPausedRef.current) pauseControls('Browser status could not be read. Reconnect controls to check the session.');
+        } finally {
+          polling = false;
         }
       },
       agentRunning ? 1000 : 3000,
     );
-    return () => window.clearInterval(timer);
-    // Polling reconnects the verified account and exact existing task after worker restart.
+    return () => { disposed = true; window.clearInterval(timer); };
+    // Polling reports loss of connection; explicit reconnect never replays input or resumes tasks.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [agentRunning, endpoint, session, activeTaskId]);
+  }, [agentRunning, endpoint, session?.token, activeTaskId]);
 
   // Page navigation detaches the view, not the shared provider session.
   // Explicit Stop and the worker TTL own session cleanup.
@@ -756,22 +899,29 @@ export default function CloudBrowserWorkspace({
         {signInView ? <button type="button" onClick={() => setSignInView(false)}
           className="min-h-12 rounded-lg border border-slate-300 px-3 text-base">Exit sign-in view</button> : null}
       </div>
+      <div role="status" aria-label="Browser connection" aria-live="polite" className="flex shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 px-3 py-1 text-sm">
+        <span>{controlsPaused ? 'Controls paused — reconnect required' : status}</span>
+        {session ? <button type="button" onClick={() => void reconnectControls()} disabled={reconnecting}
+          className="ml-auto min-h-11 rounded border border-slate-300 px-3 font-semibold disabled:opacity-50">
+          {reconnecting ? 'Reconnecting…' : 'Reconnect controls'}
+        </button> : <button type="button" disabled={runtimeReady === null || starting}
+          onClick={() => { autoStartedRef.current = false; setConnectionAttempt(value => value + 1); }}
+          className="ml-auto min-h-11 rounded border border-slate-300 px-3 font-semibold disabled:opacity-50">
+          Retry connection
+        </button>}
+      </div>
       {session ? (
         <div role="toolbar" aria-label="Browser view controls" className={`${mobilePane === 'tools' ? 'hidden lg:flex' : 'flex'} shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-2 py-1`}>
           <button type="button" aria-label="Zoom browser out" disabled={imageZoom <= 0.25}
-            onClick={() => setImageZoom((zoom) => Math.max(0.25, zoom > 1 ? zoom - 0.5 : zoom - 0.25))}
+            onClick={() => { setFitMode(false); setImageZoom((zoom) => Math.max(0.25, zoom > 1 ? zoom - 0.5 : zoom - 0.25)); }}
             className="min-h-11 min-w-11 rounded border border-slate-300 text-xl disabled:opacity-40">−</button>
           <output aria-label="Browser zoom" className="min-w-12 text-center text-base">{Math.round(imageZoom * 100)}%</output>
           <button type="button" aria-label="Zoom browser in" disabled={imageZoom >= 3}
-            onClick={() => setImageZoom((zoom) => Math.min(3, zoom < 1 ? zoom + 0.25 : zoom + 0.5))}
+            onClick={() => { setFitMode(false); setImageZoom((zoom) => Math.min(3, zoom < 1 ? zoom + 0.25 : zoom + 0.5)); }}
             className="min-h-11 min-w-11 rounded border border-slate-300 text-xl disabled:opacity-40">+</button>
           <button type="button" onClick={() => {
-            const image = imageRef.current;
-            const viewport = image?.parentElement;
-            if (!image || !viewport || !image.naturalWidth || !image.naturalHeight) return;
-            const baseWidth = Math.min(viewport.clientWidth, signInView ? 480 : viewport.clientWidth);
-            const baseHeight = baseWidth * image.naturalHeight / image.naturalWidth;
-            setImageZoom(Math.max(0.25, Math.min(1, viewport.clientHeight / baseHeight)));
+            setFitMode(true);
+            fitScreen();
           }} className="min-h-11 rounded border border-slate-300 px-3 text-base">
             Fit screen
           </button>
@@ -802,14 +952,21 @@ export default function CloudBrowserWorkspace({
           }}
           className="min-h-12 min-w-0 basis-full flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base lg:basis-auto"
           aria-label="Browser URL"
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              if (session) void action({ type: 'navigate', url: target });
+              else if (runtimeReady && target.trim()) void start();
+            }
+          }}
         />
         {!session ? (
           <button
             onClick={() => void start()}
-            disabled={runtimeReady !== true || !target.trim()}
+            disabled={starting || runtimeReady !== true || !target.trim()}
             className="rounded-lg bg-cyan-500 px-4 py-2 text-xs font-black text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Start Chromium
+            {starting ? 'Starting browser…' : 'Start Chromium'}
           </button>
         ) : (
           <>
@@ -977,7 +1134,7 @@ export default function CloudBrowserWorkspace({
         </label>
       ) : null}
       {error && (
-        <div className="flex items-center gap-2 border-b border-rose-200 bg-rose-50 max-h-[15dvh] shrink-0 overflow-auto px-3 py-2 text-base text-rose-800">
+        <div role="alert" className="flex items-center gap-2 border-b border-rose-200 bg-rose-50 max-h-[15dvh] shrink-0 overflow-auto px-3 py-2 text-base text-rose-800">
           <AlertTriangle className="h-4 w-4" />
           {error}
         </div>
@@ -1010,13 +1167,16 @@ export default function CloudBrowserWorkspace({
           {session ? (
             <img
               ref={imageRef}
-              src={`${endpoint}/stream?token=${encodeURIComponent(session.token)}`}
+              src={`${endpoint}/stream?token=${encodeURIComponent(session.token)}&view=${streamRevision}`}
+              onLoad={() => { if (fitMode) fitScreen(); }}
+              onError={() => pauseControls('The browser picture disconnected. Reconnect controls to restore the view.')}
               alt="Live isolated Chromium browser"
               referrerPolicy="no-referrer"
               draggable={false}
               tabIndex={0}
               onKeyDown={(event) => {
-                if (event.key === 'Tab' && !event.shiftKey) return;
+                // Escape releases the remote view for local keyboard navigation.
+                if (event.key === 'Escape') { event.currentTarget.blur(); return; }
                 event.preventDefault();
                 const key = event.key === ' ' ? 'Space' : event.key;
                 const modifiers = [
@@ -1142,7 +1302,7 @@ export default function CloudBrowserWorkspace({
           <div className="shrink-0 border-b border-slate-200 p-3">
             <p className="mb-2 text-xl font-bold text-emerald-800">Sign in securely</p>
             <p className="mb-2 text-base leading-6 text-slate-700">
-              1. Select the email or password field on the website. 2. Enter it below. 3. Select Type securely, then Enter. Your entry clears immediately and stays out of the chat.
+              Select the email or password field on the website, then enter it below. Enter sends your text and submits the website form. Type securely fills the field without submitting. Your entry clears and stays out of chat.
             </p>
             <div className="mb-2 flex flex-wrap gap-2">
               {(['email', 'password'] as const).map((kind) => (
@@ -1175,11 +1335,11 @@ export default function CloudBrowserWorkspace({
                 spellCheck={false}
                 autoComplete="off"
                 aria-label="Secure browser input"
-                disabled={!session || sendingSecureInput}
+                disabled={!session || sendingSecureInput || controlsPaused}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter') {
                     event.preventDefault();
-                    void sendSecureInput();
+                    void sendSecureInput(true);
                   }
                 }}
                 className="min-h-12 w-full min-w-0 rounded border border-emerald-300 bg-slate-50 px-3 py-3 text-xl"
@@ -1188,7 +1348,7 @@ export default function CloudBrowserWorkspace({
                 <button
                   type="button"
                   aria-label="Insert at sign into secure input"
-                  disabled={!session || sendingSecureInput}
+                  disabled={!session || sendingSecureInput || controlsPaused}
                   onClick={() => {
                     const input = secureInputRef.current;
                     if (!input) return;
@@ -1206,15 +1366,15 @@ export default function CloudBrowserWorkspace({
               <button
                 type="button"
                 onClick={() => void sendSecureInput()}
-                disabled={!session || sendingSecureInput}
+                disabled={!session || sendingSecureInput || controlsPaused}
                 className="min-h-12 rounded bg-emerald-600 px-4 text-base font-bold text-white disabled:opacity-50"
               >
                 {sendingSecureInput ? 'Sending securely…' : 'Type securely'}
               </button>
               <button
                 type="button"
-                onClick={() => void action({ type: 'keypress', key: 'Enter' })}
-                disabled={!session || sendingSecureInput}
+                onClick={() => void sendSecureInput(true)}
+                disabled={!session || sendingSecureInput || controlsPaused}
                 className="min-h-12 rounded border border-emerald-300 px-4 text-base text-emerald-800 disabled:opacity-50"
               >
                 Enter
@@ -1368,6 +1528,9 @@ export default function CloudBrowserWorkspace({
                 autoCorrect="off"
                 spellCheck={false}
                 value={typedText}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') { event.preventDefault(); void submitBrowserEnter(); }
+                }}
                 onChange={(event) => setTypedText(event.target.value)}
                 className="min-w-0 flex-1 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
               />
@@ -1376,14 +1539,14 @@ export default function CloudBrowserWorkspace({
                   void action({ type: 'type', text: typedText });
                   setTypedText('');
                 }}
-                disabled={!session}
+                disabled={!session || controlsPaused}
                 className="rounded bg-slate-200 px-2 text-xs"
               >
                 Type
               </button>
             </div>
             <button type="button" aria-label="Insert at sign into browser keyboard input"
-              disabled={!session} onClick={() => setTypedText((value) => value + '@')}
+              disabled={!session || controlsPaused} onClick={() => setTypedText((value) => value + '@')}
               className="mt-2 min-h-12 min-w-12 rounded border border-slate-300 px-4 text-xl">@</button>
             <div className="mt-2 flex gap-2">
               {['Enter', 'Tab', 'Escape', 'Backspace'].map((key) => (
@@ -1394,7 +1557,7 @@ export default function CloudBrowserWorkspace({
                       ? void submitBrowserEnter()
                       : void action({ type: 'keypress', key })
                   }
-                  disabled={!session}
+                  disabled={!session || controlsPaused}
                   className="rounded border border-slate-300 px-2 py-1 text-sm"
                 >
                   {key}

@@ -7,12 +7,41 @@ vi.mock('@/lib/devstudio/api-auth', () => ({
 vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: vi.fn(async () => undefined) }));
 vi.mock('@/lib/logger', () => ({ logger: { warn: vi.fn() } }));
 
-import { POST } from '@/apps/admin/app/api/admin/dev-studio/browser/action/route';
+import { GET, POST, DELETE } from '@/apps/admin/app/api/admin/dev-studio/browser/action/route';
 
 describe('Studio browser action proxy', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     process.env.STUDIO_BROWSER_URL = 'http://studio-browser.internal';
+  });
+
+  it('reads events through Admin without putting the session token in a URL', async () => {
+    const workerFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ events: [] })));
+    const response = await GET(new NextRequest('https://admin.example/api/admin/dev-studio/browser/action?sessionId=session_123&resource=events', {
+      headers: { 'x-studio-session-token': 'fixture-token' },
+    }));
+    expect(response.status).toBe(200);
+    expect(workerFetch).toHaveBeenCalledWith('http://studio-browser.internal/sessions/session_123/events',
+      expect.objectContaining({ headers: { Authorization: 'Bearer fixture-token' } }));
+  });
+
+  it('rejects arbitrary worker resources', async () => {
+    const workerFetch = vi.spyOn(globalThis, 'fetch');
+    const response = await GET(new NextRequest('https://admin.example/api/admin/dev-studio/browser/action?sessionId=session_123&resource=../../workspace/files', {
+      headers: { 'x-studio-session-token': 'fixture-token' },
+    }));
+    expect(response.status).toBe(400);
+    expect(workerFetch).not.toHaveBeenCalled();
+  });
+
+  it('stops only the selected bearer-authenticated session', async () => {
+    const workerFetch = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ ok: true })));
+    const response = await DELETE(new NextRequest('https://admin.example/api/admin/dev-studio/browser/action?sessionId=session_123', {
+      method: 'DELETE', headers: { 'x-studio-session-token': 'fixture-token' },
+    }));
+    expect(response.status).toBe(200);
+    expect(workerFetch).toHaveBeenCalledWith('http://studio-browser.internal/sessions/session_123',
+      expect.objectContaining({ method: 'DELETE', headers: { Authorization: 'Bearer fixture-token' } }));
   });
 
   it('sends an authenticated Admin action through the internal worker channel', async () => {

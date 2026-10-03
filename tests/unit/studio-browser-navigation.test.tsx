@@ -10,9 +10,10 @@ afterEach(() => {
 
 it('keeps a typed destination through event polling and navigates the worker to that destination', async () => {
   let poll: () => Promise<void> = async () => {};
-  vi.spyOn(window, 'setInterval').mockImplementation((callback: any) => {
-    poll = callback;
-    return 123;
+  const interval = window.setInterval.bind(window);
+  vi.spyOn(window, 'setInterval').mockImplementation((callback: any, ms: any, ...args: any[]) => {
+    if (ms === 3000) { poll = callback; return 123; }
+    return interval(callback, ms, ...args);
   });
   const requested: any[] = [];
   let workerUrl = 'https://www.elevateforhumanity.org/';
@@ -34,13 +35,13 @@ it('keeps a typed destination through event polling and navigates the worker to 
           viewport: { width: 1440, height: 900 },
         });
       if (url.endsWith('/browser/session')) return response({ configured: true, ready: true });
-      if (url.endsWith('/events')) return response({ events: [], url: workerUrl });
-      if (url.endsWith('/downloads')) return response({ downloads: [] });
+      if ((url.endsWith('/events') || url.includes('resource=events'))) return response({ events: [], url: workerUrl });
+      if ((url.endsWith('/downloads') || url.includes('resource=downloads'))) return response({ downloads: [] });
       if (url.endsWith('/browser/action')) {
         const body = JSON.parse(options.body);
         requested.push(body);
         workerUrl = body.action.url;
-        return response({ url: workerUrl });
+        return response({ ok: true, url: workerUrl });
       }
       return response({});
     }),

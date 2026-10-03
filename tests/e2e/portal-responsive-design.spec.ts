@@ -477,8 +477,17 @@ test.describe('Studio readable sign-in and composer', () => {
       height: el.scrollHeight, available: el.clientHeight, width: el.scrollWidth, availableWidth: el.clientWidth,
     }));
     expect(overflow.height > overflow.available || overflow.width > overflow.availableWidth).toBe(true);
-    await viewport.hover();
-    await page.mouse.wheel(0, 300);
+    if (testInfo.project.name === 'iphone-webkit') {
+      // Playwright mobile WebKit cannot generate mouse-wheel input. Prove its
+      // native scroll range and explicit touch/pinch policy; Chromium projects
+      // additionally certify an actual wheel gesture. Physical iPhone gestures
+      // remain a separate manual acceptance check.
+      expect(await stream.evaluate(el => getComputedStyle(el).touchAction)).toContain('pinch-zoom');
+      await viewport.evaluate(el => el.scrollBy({ top: 300, behavior: 'instant' }));
+    } else {
+      await viewport.hover();
+      await page.mouse.wheel(0, 300);
+    }
     await expect.poll(() => viewport.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
     await page.getByRole('button', { name: 'Zoom browser out' }).click();
     await expect.poll(() => stream.evaluate(el => el.getBoundingClientRect().width)).toBeLessThanOrEqual(480);

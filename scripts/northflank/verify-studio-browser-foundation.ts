@@ -28,6 +28,7 @@ if (
 )
   throw new Error('Browser evidence signature is invalid');
 const required = [
+  'durable_provider_checkpoint',
   'session_identity',
   'keyboard_and_pointer',
   'double_click',
@@ -37,8 +38,10 @@ const required = [
   'file_picker_and_upload',
   'browser_dialog_response',
   'download_bytes',
+  'blob_download_bytes',
   'scroll',
   'navigation_and_history',
+  'viewport_switch_and_popup_geometry',
 ];
 const checks: Array<{ name: string; passed: boolean; reason?: string }> = evidence.checks || [];
 for (const name of required) {

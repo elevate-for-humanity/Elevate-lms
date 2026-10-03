@@ -445,7 +445,14 @@ test.describe('Studio readable sign-in and composer', () => {
   test.skip(!creds.admin[0] || !creds.admin[1], 'Disposable admin identity is required');
   test('sign-in controls and chat text remain usable on the active device', async ({ page }, testInfo) => {
     await login(page, ADMIN_BASE, creds.admin[0], creds.admin[1]);
-    await page.goto(`${ADMIN_BASE}/studio`);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        await page.goto(`${ADMIN_BASE}/studio`, { waitUntil: 'domcontentloaded' });
+        break;
+      } catch (error) {
+        if (attempt === 1) throw error;
+      }
+    }
     const composer = page.getByRole('textbox', { name: 'Tell Admin AI what you need done...', exact: true });
     await expect(composer).toBeVisible();
     await expect.poll(() => composer.evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(20);
@@ -454,7 +461,20 @@ test.describe('Studio readable sign-in and composer', () => {
     await composer.clear();
     await page.goto(`${ADMIN_BASE}/studio/browser`);
     await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
+    await page.getByLabel('Browser URL').fill('https://app.envato.com');
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    const stream = page.getByAltText('Live isolated Chromium browser');
+    await expect(stream).toBeVisible({ timeout: 30_000 });
+    await page.getByRole('button', { name: 'Zoom browser in' }).click();
+    await expect(page.getByLabel('Browser zoom')).toHaveText('150%');
+    const viewport = stream.locator('..');
+    const overflow = await viewport.evaluate(el => ({
+      height: el.scrollHeight, available: el.clientHeight, width: el.scrollWidth, availableWidth: el.clientWidth,
+    }));
+    expect(overflow.height > overflow.available || overflow.width > overflow.availableWidth).toBe(true);
+    await viewport.evaluate(el => { el.scrollTop = 40; });
+    expect(await viewport.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+    await page.getByRole('button', { name: 'Zoom browser out' }).click();
     if ((page.viewportSize()?.width || 1280) < 1024)
       await page.getByRole('button', { name: 'Sign-in & tools' }).click();
     const input = page.getByLabel('Secure browser input');
@@ -469,5 +489,7 @@ test.describe('Studio readable sign-in and composer', () => {
     expect(geometry.width).toBeGreaterThanOrEqual(250);
     expect(geometry.right).toBeLessThanOrEqual(geometry.viewport);
     await page.screenshot({ path: testInfo.outputPath('studio-readable-sign-in.png') });
+    await page.getByRole('button', { name: 'Browser controls', exact: true }).click();
+    await page.getByTitle('Stop', { exact: true }).click();
   });
 });

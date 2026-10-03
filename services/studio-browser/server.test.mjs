@@ -1,6 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { auditPage, isPrivateAddress, runActions, snapshotPage } from './server.mjs';
+import {
+  auditPage,
+  isPrivateAddress,
+  runActions,
+  sessionRequiresAuthentication,
+  snapshotPage,
+} from './server.mjs';
 
 test('blocks private IPv4 networks', () => {
   for (const address of ['127.0.0.1', '10.0.0.4', '172.16.1.2', '192.168.1.2', '169.254.1.1']) {
@@ -61,6 +67,58 @@ test('executes validated DOM-reference actions without arbitrary selectors', asy
   await assert.rejects(
     () => runActions(session, { type: 'click_ref', ref: 'body > *' }),
     /Invalid browser control reference/,
+  );
+});
+
+test('returns a deterministic authentication signal when an Envato action fails after token refresh 401', async () => {
+  const now = Date.now();
+  const session = {
+    lastSeen: 0,
+    target: 'https://app.envato.com/workspaces/course-media',
+    events: [
+      {
+        type: 'response',
+        status: 401,
+        url: 'https://account.envato.com/api/public/refresh_id_token',
+        at: new Date(now - 500).toISOString(),
+      },
+    ],
+    page: {
+      url: () => 'https://app.envato.com/workspaces/course-media',
+      keyboard: {
+        insertText: async () => {
+          throw new Error('page action aborted');
+        },
+      },
+    },
+  };
+
+  assert.equal(sessionRequiresAuthentication(session, now), true);
+  await assert.rejects(
+    () => runActions(session, { type: 'type', text: 'search' }),
+    (error) => error?.code === 'authentication_required' && error?.status === 409,
+  );
+});
+
+test('does not reuse stale Envato 401 events after authentication succeeds', () => {
+  const now = Date.now();
+  assert.equal(
+    sessionRequiresAuthentication(
+      {
+        target: 'https://app.envato.com/search',
+        events: [
+          {
+            type: 'response',
+            status: 401,
+            url: 'https://account.envato.com/api/public/refresh_id_token',
+            at: new Date(now - 30_000).toISOString(),
+          },
+        ],
+        page: { url: () => 'https://app.envato.com/search' },
+      },
+      now,
+    ),
+    false,
   );
 });
 

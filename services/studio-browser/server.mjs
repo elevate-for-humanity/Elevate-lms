@@ -839,10 +839,43 @@ async function runAction(session, action) {
   else throw new Error('Unsupported browser action');
 }
 
+function isEnvatoHost(value) {
+  try {
+    const hostname = new URL(String(value || '')).hostname.toLowerCase();
+    return hostname === 'envato.com' || hostname.endsWith('.envato.com');
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Envato's signed-out application shell can remain mounted while its token
+ * refresh endpoint returns 401. The planner may therefore see ordinary page
+ * controls instead of an explicit sign-in screen. Keep authentication state a
+ * deterministic worker signal rather than requiring the model to infer it.
+ */
+export function sessionRequiresAuthentication(session, now = Date.now()) {
+  const currentUrl = session?.page?.url?.() || '';
+  if (!isEnvatoHost(currentUrl) && !isEnvatoHost(session?.target)) return false;
+  const cutoff = now - 15_000;
+  return (Array.isArray(session?.events) ? session.events : []).some((event) => {
+    if (event?.type !== 'response' || Number(event.status) !== 401) return false;
+    const occurredAt = Date.parse(String(event.at || ''));
+    return Number.isFinite(occurredAt) && occurredAt >= cutoff && isEnvatoHost(event.url);
+  });
+}
+
 export async function runActions(session, payload) {
   const actions = Array.isArray(payload?.actions) ? payload.actions.slice(0, 50) : [payload];
   const startedAt = Date.now();
-  for (const action of actions) await runAction(session, action);
+  try {
+    for (const action of actions) await runAction(session, action);
+  } catch (error) {
+    if (sessionRequiresAuthentication(session)) {
+      throw new BrowserServiceError('authentication_required', 409, { cause: error });
+    }
+    throw error;
+  }
   return { count: actions.length, durationMs: Date.now() - startedAt };
 }
 

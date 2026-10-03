@@ -166,6 +166,52 @@ export async function POST(req: NextRequest) {
     if (data?.status === 'cancelled') throw new Error('Browser task cancelled by administrator');
   };
 
+  const pauseForAuthentication = async (
+    reason: string,
+    steps: BrowserStep[],
+    history: BrowserHistoryEntry[],
+    totalTokens: number,
+    provider?: string,
+    model?: string,
+  ) => {
+    await db
+      .from('ai_task_steps')
+      .update({
+        status: 'pending',
+        error_message: null,
+        completed_at: null,
+      })
+      .eq('task_id', taskId)
+      .eq('action_type', 'execute');
+    await updateTask({
+      status: 'queued',
+      completed_at: null,
+      error_message: null,
+      result_json: {
+        ok: true,
+        status: 'awaiting_authentication',
+        authenticationRequired: true,
+        reason,
+        steps,
+        history,
+        usage: { totalTokens },
+      },
+      tool_output: {
+        status: 'awaiting_authentication',
+        authenticationRequired: true,
+        reason,
+        steps,
+        provider,
+        model,
+        usage: { totalTokens },
+      },
+    });
+    await appendLog(
+      'Browser workflow paused for secure authentication and can resume from its persisted checkpoint.',
+      'warn',
+    );
+  };
+
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     start(controller) {
@@ -283,41 +329,13 @@ export async function POST(req: NextRequest) {
             if (plan.status === 'blocked') {
               if (browserTurnRequiresAuthentication(plan)) {
                 const reason = plan.reason || plan.summary;
-                await db
-                  .from('ai_task_steps')
-                  .update({
-                    status: 'pending',
-                    error_message: null,
-                    completed_at: null,
-                  })
-                  .eq('task_id', taskId)
-                  .eq('action_type', 'execute');
-                await updateTask({
-                  status: 'queued',
-                  completed_at: null,
-                  error_message: null,
-                  result_json: {
-                    ok: true,
-                    status: 'awaiting_authentication',
-                    authenticationRequired: true,
-                    reason,
-                    steps,
-                    history,
-                    usage: { totalTokens },
-                  },
-                  tool_output: {
-                    status: 'awaiting_authentication',
-                    authenticationRequired: true,
-                    reason,
-                    steps,
-                    provider: plan.provider,
-                    model: plan.model,
-                    usage: { totalTokens },
-                  },
-                });
-                await appendLog(
-                  'Browser workflow paused for secure authentication and can resume from its persisted checkpoint.',
-                  'warn',
+                await pauseForAuthentication(
+                  reason,
+                  steps,
+                  history,
+                  totalTokens,
+                  plan.provider,
+                  plan.model,
                 );
                 emit({
                   type: 'authentication_required',
@@ -346,6 +364,20 @@ export async function POST(req: NextRequest) {
               durationMs?: number;
               url?: string;
             };
+            if (!actionResponse.ok && actionMetrics.error === 'authentication_required') {
+              const reason =
+                'The licensed-media provider session requires secure authentication before this browser task can continue.';
+              await pauseForAuthentication(
+                reason,
+                steps,
+                history,
+                totalTokens,
+                plan.provider,
+                plan.model,
+              );
+              emit({ type: 'authentication_required', message: reason, steps });
+              return;
+            }
             if (!actionResponse.ok) throw new Error(actionMetrics.error || 'Browser action failed');
             const step: BrowserStep = {
               turn: turn + 1,

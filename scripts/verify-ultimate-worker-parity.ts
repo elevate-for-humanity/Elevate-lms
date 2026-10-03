@@ -4,3 +4,10 @@ const forbiddenActiveMedia=['UltimateEnvatoMarketClient','this.envato.search(','
 const mediaViolations=forbiddenActiveMedia.filter((token)=>activeMedia.includes(token));
 if(mediaViolations.length){console.error('Ultimate worker parity FAILED: active visual_assignment must use authenticated licensed workspace/library only',mediaViolations);process.exit(1)}
 console.log('Ultimate media parity PASS: active visual_assignment is workspace/library-bound; no Envato Market API acquisition path');
+
+const subscriptionRoute=fs.readFileSync('apps/admin/app/api/admin/integrations/envato/route.ts','utf8');
+const forbiddenSubscriptionRoute=['https://api.envato.com','ENVATO_API_TOKEN','/v3/market/','marketAccount(','listPurchases('];
+const subscriptionViolations=forbiddenSubscriptionRoute.filter(token=>subscriptionRoute.includes(token));
+if(subscriptionViolations.length){console.error('Ultimate subscription parity FAILED: Market must be disconnected',subscriptionViolations);process.exit(1)}
+if(!subscriptionRoute.includes('marketEnabled: false')||!subscriptionRoute.includes('subscriptionVerified: false')){console.error('Ultimate subscription parity FAILED: status must not invent subscription verification');process.exit(1)}
+console.log('Ultimate subscription parity PASS: Market disconnected; subscription verification is explicit');

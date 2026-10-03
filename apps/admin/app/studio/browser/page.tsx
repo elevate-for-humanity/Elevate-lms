@@ -86,7 +86,7 @@ export default function StudioBrowserPage() {
           autoStart={Boolean(request) || envatoSignIn}
           autoRunTask={Boolean(request)}
           acquisitionRunId={request?.id || ''}
-          initialTarget={request?.context.browser_target || (envatoSignIn ? 'https://app.envato.com' : '')}
+          initialTarget={request?.context.browser_target || (envatoSignIn ? 'https://account.envato.com/sign_in' : '')}
           initialSignIn={envatoSignIn}
           initialTask={request?.command || ''}
         />

@@ -115,10 +115,6 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     ],
   },
   {
-    label: 'Licensed Media — Envato',
-    keys: ['ENVATO_API_TOKEN'],
-  },
-  {
     label: 'OpenAI',
     keys: ['OPENAI_API_KEY', 'AI_IMAGE_PROVIDER'],
   },

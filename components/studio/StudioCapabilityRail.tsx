@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import {
   Bot,
   Boxes,
@@ -64,12 +65,18 @@ export default function StudioCapabilityRail({
   onSpecialistChange,
   mobile = false,
   onNavigate,
+  onOpenWorkspace,
+  activeWorkspaceId,
+  children,
 }: {
   workspaces: Workspace[];
   specialist: StudioSpecialist | null;
   onSpecialistChange: (agent: StudioSpecialist | null) => void;
   mobile?: boolean;
   onNavigate?: () => void;
+  onOpenWorkspace?: (id: string) => void;
+  activeWorkspaceId?: string | null;
+  children?: ReactNode;
 }) {
   const [expanded, setExpanded] = useState(true);
   const pathname = usePathname();
@@ -100,9 +107,7 @@ export default function StudioCapabilityRail({
               ? 'degraded'
               : 'healthy',
         );
-        setPluginChecks(
-          Array.isArray(pluginResult.body.checks) ? pluginResult.body.checks : [],
-        );
+        setPluginChecks(Array.isArray(pluginResult.body.checks) ? pluginResult.body.checks : []);
         const rows = Array.isArray(agentResult.body.agents)
           ? agentResult.body.agents
           : Array.isArray(agentResult.body)
@@ -142,6 +147,7 @@ export default function StudioCapabilityRail({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-2 py-3">
+        {expanded ? children : null}
         {expanded ? (
           <p className="px-2 pb-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
             Agents {agentCount !== null ? `· ${agentCount} active` : ''}
@@ -189,14 +195,18 @@ export default function StudioCapabilityRail({
               <Link
                 key={workspace.id}
                 href={href}
-                onClick={onNavigate}
+                onClick={(event) => {
+                  if (onOpenWorkspace) {
+                    event.preventDefault();
+                    onOpenWorkspace(workspace.id);
+                  }
+                  onNavigate?.();
+                }}
                 title={label}
-                className={`flex items-center gap-3 rounded-xl px-2 py-2 transition ${pathname === workspace.route || pathname.startsWith(`${workspace.route}/`) ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
+                className={`flex items-center gap-3 rounded-xl px-2 py-2 transition ${activeWorkspaceId === workspace.id || pathname === workspace.route || pathname.startsWith(`${workspace.route}/`) ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
               >
                 <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                {expanded ? (
-                  <span className="truncate text-xs font-semibold">{label}</span>
-                ) : null}
+                {expanded ? <span className="truncate text-xs font-semibold">{label}</span> : null}
               </Link>
             );
           })}
@@ -204,50 +214,56 @@ export default function StudioCapabilityRail({
       </div>
 
       <div className="border-t border-slate-800">
-      <button
-        type="button"
-        onClick={() => setConnectionsOpen((value) => !value)}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-300 hover:bg-slate-900 hover:text-white"
-        title="Connected capabilities"
-      >
-        {plugins === 'healthy' ? (
-          <PlugZap className="h-5 w-5 shrink-0 text-emerald-400" />
-        ) : (
-          <Cable className="h-5 w-5 shrink-0 text-amber-400" />
-        )}
-        {expanded ? (
-          <span className="min-w-0">
-            <span className="block text-xs font-bold">Plugins & connections</span>
-            <span className="block text-[10px] text-slate-500">
-              {plugins === 'checking'
-                ? 'Checking…'
-                : plugins === 'healthy'
-                  ? 'Connected'
-                  : plugins === 'degraded'
-                    ? 'Partially connected'
-                    : 'Needs configuration'}
+        <button
+          type="button"
+          onClick={() => setConnectionsOpen((value) => !value)}
+          className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-300 hover:bg-slate-900 hover:text-white"
+          title="Connected capabilities"
+        >
+          {plugins === 'healthy' ? (
+            <PlugZap className="h-5 w-5 shrink-0 text-emerald-400" />
+          ) : (
+            <Cable className="h-5 w-5 shrink-0 text-amber-400" />
+          )}
+          {expanded ? (
+            <span className="min-w-0">
+              <span className="block text-xs font-bold">Plugins & connections</span>
+              <span className="block text-[10px] text-slate-500">
+                {plugins === 'checking'
+                  ? 'Checking…'
+                  : plugins === 'healthy'
+                    ? 'Connected'
+                    : plugins === 'degraded'
+                      ? 'Partially connected'
+                      : 'Needs configuration'}
+              </span>
             </span>
-          </span>
-        ) : null}
-      </button>
-      {expanded && connectionsOpen ? (
-        <div className="max-h-52 space-y-1 overflow-y-auto border-t border-slate-800 bg-slate-900 px-3 py-2">
-          {pluginChecks.map((check) => (
-            <div key={check.name} className="rounded-lg bg-slate-950 px-2.5 py-2">
-              <div className="flex items-center gap-2">
-                <span className={`h-2 w-2 rounded-full ${check.passed ? 'bg-emerald-400' : check.required ? 'bg-red-400' : 'bg-amber-400'}`} />
-                <span className="truncate text-[11px] font-bold capitalize text-slate-200">
-                  {check.name.replace(/-/g, ' ')}
-                </span>
+          ) : null}
+        </button>
+        {expanded && connectionsOpen ? (
+          <div className="max-h-52 space-y-1 overflow-y-auto border-t border-slate-800 bg-slate-900 px-3 py-2">
+            {pluginChecks.map((check) => (
+              <div key={check.name} className="rounded-lg bg-slate-950 px-2.5 py-2">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`h-2 w-2 rounded-full ${check.passed ? 'bg-emerald-400' : check.required ? 'bg-red-400' : 'bg-amber-400'}`}
+                  />
+                  <span className="truncate text-[11px] font-bold capitalize text-slate-200">
+                    {check.name.replace(/-/g, ' ')}
+                  </span>
+                </div>
+                <p className="mt-1 text-[10px] leading-4 text-slate-500">{check.message}</p>
               </div>
-              <p className="mt-1 text-[10px] leading-4 text-slate-500">{check.message}</p>
-            </div>
-          ))}
-          <Link href="/studio/settings" onClick={onNavigate} className="block rounded-lg px-2 py-2 text-[11px] font-bold text-cyan-300 hover:bg-slate-800">
-            Connection settings
-          </Link>
-        </div>
-      ) : null}
+            ))}
+            <Link
+              href="/studio/settings"
+              onClick={onNavigate}
+              className="block rounded-lg px-2 py-2 text-[11px] font-bold text-cyan-300 hover:bg-slate-800"
+            >
+              Connection settings
+            </Link>
+          </div>
+        ) : null}
       </div>
     </aside>
   );

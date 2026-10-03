@@ -25,6 +25,8 @@ export type UltimateStepState = 'pending' | 'running' | 'passed' | 'failed' | 'b
 export interface UltimateCredentialProfile {
   id: string;
   title: string;
+  /** Learner audience carried from the canonical course record into lesson generation. */
+  audience?: string;
   authority: string;
   jurisdiction?: string;
   standardVersion: string;

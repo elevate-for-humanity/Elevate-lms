@@ -201,3 +201,40 @@ it('provides explicit website scrolling while touch panning stays local', async 
     { type: 'scroll', deltaX: 0, deltaY: -400 },
   ]);
 });
+
+it('shrinks below 100 percent to 25 percent and restores without recreating the session', async () => {
+  const { actions } = await start();
+  const image = screen.getByAltText('Live isolated Chromium browser');
+  for (const percent of ['75%', '50%', '25%']) {
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom browser out' }));
+    expect(screen.getByLabelText('Browser zoom').textContent).toBe(percent);
+    expect(image.style.width).toBe(percent);
+  }
+  expect((screen.getByRole('button', { name: 'Zoom browser out' }) as HTMLButtonElement).disabled).toBe(true);
+  for (let i = 0; i < 3; i++) fireEvent.click(screen.getByRole('button', { name: 'Zoom browser in' }));
+  expect(image.style.width).toBe('100%');
+  expect(actions).toEqual([]);
+});
+it('fits the compact frame to available height and places secure input first', async () => {
+  await start();
+  const image = screen.getByAltText('Live isolated Chromium browser');
+  fireEvent.click(screen.getByRole('button', { name: 'Sign in', exact: true }));
+  Object.defineProperty(image, 'naturalWidth', { value: 390, configurable: true });
+  Object.defineProperty(image, 'naturalHeight', { value: 780, configurable: true });
+  Object.defineProperty(image.parentElement, 'clientWidth', { value: 1000, configurable: true });
+  Object.defineProperty(image.parentElement, 'clientHeight', { value: 400, configurable: true });
+  fireEvent.click(screen.getByRole('button', { name: 'Fit screen' }));
+  expect(parseFloat(image.style.maxWidth)).toBeCloseTo(200);
+  const input = screen.getByLabelText('Secure browser input');
+  expect(input.closest('aside')!.firstElementChild!.contains(input)).toBe(true);
+});
+it('focuses the desktop page for direct typing after selecting a website field', async () => {
+  const { actions } = await start();
+  const image = screen.getByAltText('Live isolated Chromium browser');
+  fireEvent.click(image, { clientX: 20, clientY: 20, detail: 1 });
+  expect(document.activeElement).toBe(image);
+  fireEvent.keyDown(image, { key: '@', shiftKey: true });
+  await waitFor(() => expect(actions.length).toBe(2));
+  expect(actions[0].type).toBe('pointer_click');
+  expect(actions[1]).toEqual({ type: 'type', text: '@' });
+});

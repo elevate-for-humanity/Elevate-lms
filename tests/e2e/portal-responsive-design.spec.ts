@@ -465,6 +465,7 @@ test.describe('Studio readable sign-in and composer', () => {
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
     const stream = page.getByAltText('Live isolated Chromium browser');
     await expect(stream).toBeVisible({ timeout: 30_000 });
+    await expect.poll(() => stream.evaluate(el => (el as HTMLImageElement).naturalWidth), { timeout: 30_000 }).toBeGreaterThan(0);
     await page.getByRole('button', { name: 'Zoom browser in' }).click();
     await expect(page.getByLabel('Browser zoom')).toHaveText('150%');
     const viewport = stream.locator('..');
@@ -472,8 +473,9 @@ test.describe('Studio readable sign-in and composer', () => {
       height: el.scrollHeight, available: el.clientHeight, width: el.scrollWidth, availableWidth: el.clientWidth,
     }));
     expect(overflow.height > overflow.available || overflow.width > overflow.availableWidth).toBe(true);
-    await viewport.evaluate(el => { el.scrollTop = 40; });
-    expect(await viewport.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+    await viewport.hover();
+    await page.mouse.wheel(0, 300);
+    await expect.poll(() => viewport.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
     await page.getByRole('button', { name: 'Zoom browser out' }).click();
     if ((page.viewportSize()?.width || 1280) < 1024)
       await page.getByRole('button', { name: 'Sign-in & tools' }).click();

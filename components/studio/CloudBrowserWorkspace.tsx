@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import {
   AlertTriangle,
   Database,
@@ -63,6 +63,7 @@ export default function CloudBrowserWorkspace({
   autoRunTask?: boolean;
   acquisitionRunId?: string;
 }) {
+  const secureInputId = useId();
   const workspaceRef = useRef<HTMLDivElement | null>(null);
   const reconnectingRef = useRef(false);
   const launchTargetRef = useRef(initialTarget);
@@ -1241,12 +1242,12 @@ export default function CloudBrowserWorkspace({
                 </button>
               ))}
             </div>
-            <label className="mb-2 block text-base" htmlFor="studio-secure-input">
+            <label className="mb-2 block text-base" htmlFor={secureInputId}>
               {secureInputKind === 'email' ? 'Email address' : 'Password'}
             </label>
             <div className="flex flex-wrap gap-2">
               <input
-                id="studio-secure-input"
+                id={secureInputId}
                 ref={secureInputRef}
                 type={secureInputKind === 'password' ? 'password' : 'text'}
                 inputMode={secureInputKind === 'email' ? 'email' : 'text'}

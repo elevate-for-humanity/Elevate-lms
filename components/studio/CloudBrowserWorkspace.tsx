@@ -54,6 +54,7 @@ export default function CloudBrowserWorkspace({
   initialTask = '',
   autoRunTask = false,
   acquisitionRunId = '',
+  initialSignIn = false,
 }: {
   unifiedTask?: OrchestratedPlanCheckpoint | null;
   conversationId?: string | null;
@@ -62,6 +63,7 @@ export default function CloudBrowserWorkspace({
   initialTask?: string;
   autoRunTask?: boolean;
   acquisitionRunId?: string;
+  initialSignIn?: boolean;
 }) {
   const secureInputId = useId();
   const workspaceRef = useRef<HTMLDivElement | null>(null);
@@ -71,7 +73,7 @@ export default function CloudBrowserWorkspace({
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
   const draggedRef = useRef(false);
   const [imageZoom, setImageZoom] = useState(1);
-  const [signInView, setSignInView] = useState(false);
+  const [signInView, setSignInView] = useState(initialSignIn);
   const [controlsOpen, setControlsOpen] = useState(false);
   const [mobilePane, setMobilePane] = useState<'browser' | 'tools'>('browser');
   const [target, setTarget] = useState(initialTarget);
@@ -122,6 +124,10 @@ export default function CloudBrowserWorkspace({
   const navigatingRef = useRef(false);
   const autoStartedRef = useRef(false);
   const autoRunCommandRef = useRef('');
+
+  useEffect(() => {
+    if (initialSignIn) setSignInView(true);
+  }, [initialSignIn]);
 
   const endpoint = session ? `${session.publicUrl}/sessions/${session.id}` : '';
   const authHeaders: Record<string, string> = session
@@ -293,17 +299,18 @@ export default function CloudBrowserWorkspace({
       return;
     }
     autoStartedRef.current = true;
-    void start().catch((cause) => {
+    void start(target, initialSignIn).catch((cause) => {
       autoStartedRef.current = false;
       setError(cause instanceof Error ? cause.message : 'Could not start browser');
       setStatus('Unavailable');
     });
     // start uses the active conversation and checkpoint identity captured by this render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoStart, runtimeReady, session, target, conversationId, unifiedTask?.taskId]);
+  }, [autoStart, runtimeReady, session, target, conversationId, unifiedTask?.taskId, initialSignIn]);
 
   async function openSignIn() {
     setSignInView(true);
+    setImageZoom(1);
     setMobilePane('browser');
     setControlsOpen(false);
     if (session) await action({ type: 'viewport', width: 390, height: 780 });
@@ -751,13 +758,23 @@ export default function CloudBrowserWorkspace({
       </div>
       {session ? (
         <div role="toolbar" aria-label="Browser view controls" className="flex shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-2 py-1">
-          <button type="button" aria-label="Zoom browser out" disabled={imageZoom <= 1}
-            onClick={() => setImageZoom((zoom) => Math.max(1, zoom - 0.5))}
+          <button type="button" aria-label="Zoom browser out" disabled={imageZoom <= 0.25}
+            onClick={() => setImageZoom((zoom) => Math.max(0.25, zoom > 1 ? zoom - 0.5 : zoom - 0.25))}
             className="min-h-11 min-w-11 rounded border border-slate-300 text-xl disabled:opacity-40">−</button>
           <output aria-label="Browser zoom" className="min-w-12 text-center text-base">{Math.round(imageZoom * 100)}%</output>
           <button type="button" aria-label="Zoom browser in" disabled={imageZoom >= 3}
-            onClick={() => setImageZoom((zoom) => Math.min(3, zoom + 0.5))}
+            onClick={() => setImageZoom((zoom) => Math.min(3, zoom < 1 ? zoom + 0.25 : zoom + 0.5))}
             className="min-h-11 min-w-11 rounded border border-slate-300 text-xl disabled:opacity-40">+</button>
+          <button type="button" onClick={() => {
+            const image = imageRef.current;
+            const viewport = image?.parentElement;
+            if (!image || !viewport || !image.naturalWidth || !image.naturalHeight) return;
+            const baseWidth = Math.min(viewport.clientWidth, signInView ? 480 : viewport.clientWidth);
+            const baseHeight = baseWidth * image.naturalHeight / image.naturalWidth;
+            setImageZoom(Math.max(0.25, Math.min(1, viewport.clientHeight / baseHeight)));
+          }} className="min-h-11 rounded border border-slate-300 px-3 text-base">
+            Fit screen
+          </button>
           <button type="button" aria-label="Scroll website up" onClick={() => void action({ type: 'scroll', deltaX: 0, deltaY: -400 })}
             className="min-h-11 min-w-11 rounded border border-slate-300 px-3 text-base">↑</button>
           <button type="button" aria-label="Scroll website down" onClick={() => void action({ type: 'scroll', deltaX: 0, deltaY: 400 })}
@@ -1068,6 +1085,7 @@ export default function CloudBrowserWorkspace({
               }}
               onClick={(event) => {
                 if (draggedRef.current) return;
+                event.currentTarget.focus({ preventScroll: true });
                 const rect = event.currentTarget.getBoundingClientRect();
                 const point = {
                   x: Math.round(
@@ -1121,6 +1139,96 @@ export default function CloudBrowserWorkspace({
         <aside
           className={`${mobilePane === 'tools' ? 'flex' : 'hidden lg:flex'} min-h-0 flex-col overflow-y-auto border-t border-slate-200 bg-white lg:border-l lg:border-t-0`}
         >
+          <div className="shrink-0 border-b border-slate-200 p-3">
+            <p className="mb-2 text-xl font-bold text-emerald-800">Sign in securely</p>
+            <p className="mb-2 text-base leading-6 text-slate-700">
+              1. Select the email or password field on the website. 2. Enter it below. 3. Select Type securely, then Enter. Your entry clears immediately and stays out of the chat.
+            </p>
+            <div className="mb-2 flex flex-wrap gap-2">
+              {(['email', 'password'] as const).map((kind) => (
+                <button
+                  key={kind}
+                  type="button"
+                  aria-pressed={secureInputKind === kind}
+                  onClick={() => {
+                    if (secureInputRef.current) secureInputRef.current.value = '';
+                    setSecureInputKind(kind);
+                    secureInputRef.current?.focus();
+                  }}
+                  className="min-h-12 rounded border border-emerald-300 px-4 text-base aria-pressed:bg-emerald-100"
+                >
+                  {kind === 'email' ? 'Email input' : 'Password input'}
+                </button>
+              ))}
+            </div>
+            <label className="mb-2 block text-base" htmlFor={secureInputId}>
+              {secureInputKind === 'email' ? 'Email address' : 'Password'}
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <input
+                id={secureInputId}
+                ref={secureInputRef}
+                type={secureInputKind === 'password' ? 'password' : 'text'}
+                inputMode={secureInputKind === 'email' ? 'email' : 'text'}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                autoComplete="off"
+                aria-label="Secure browser input"
+                disabled={!session || sendingSecureInput}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    void sendSecureInput();
+                  }
+                }}
+                className="min-h-12 w-full min-w-0 rounded border border-emerald-300 bg-slate-50 px-3 py-3 text-xl"
+              />
+              {secureInputKind === 'email' ? (
+                <button
+                  type="button"
+                  aria-label="Insert at sign into secure input"
+                  disabled={!session || sendingSecureInput}
+                  onClick={() => {
+                    const input = secureInputRef.current;
+                    if (!input) return;
+                    const start = input.selectionStart ?? input.value.length;
+                    const end = input.selectionEnd ?? start;
+                    input.value = input.value.slice(0, start) + '@' + input.value.slice(end);
+                    input.setSelectionRange(start + 1, start + 1);
+                    input.focus();
+                  }}
+                  className="min-h-12 min-w-12 rounded border border-emerald-300 px-4 text-xl"
+                >
+                  @
+                </button>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => void sendSecureInput()}
+                disabled={!session || sendingSecureInput}
+                className="min-h-12 rounded bg-emerald-600 px-4 text-base font-bold text-white disabled:opacity-50"
+              >
+                {sendingSecureInput ? 'Sending securely…' : 'Type securely'}
+              </button>
+              <button
+                type="button"
+                onClick={() => void action({ type: 'keypress', key: 'Enter' })}
+                disabled={!session || sendingSecureInput}
+                className="min-h-12 rounded border border-emerald-300 px-4 text-base text-emerald-800 disabled:opacity-50"
+              >
+                Enter
+              </button>
+            </div>
+            <label className="mt-3 flex min-h-12 items-center gap-3 text-sm">
+              <input
+                type="checkbox"
+                checked={replaceSecureInput}
+                onChange={(event) => setReplaceSecureInput(event.target.checked)}
+              />
+              Replace the selected browser field
+            </label>
+          </div>
           <div className="border-b border-slate-200 p-3">
             <p className="mb-1 flex items-center gap-2 text-xs font-black text-cyan-800">
               <Download className="h-4 w-4" /> Envato licensed downloads
@@ -1248,96 +1356,6 @@ export default function CloudBrowserWorkspace({
                 {agentResult}
               </p>
             )}
-          </div>
-          <div className="order-first shrink-0 border-b border-slate-200 p-3">
-            <p className="mb-2 text-xl font-bold text-emerald-800">Sign in securely</p>
-            <p className="mb-2 text-base leading-6 text-slate-700">
-              1. Select the email or password field on the website. 2. Enter it below. 3. Select Type securely, then Enter. Your entry clears immediately and stays out of the chat.
-            </p>
-            <div className="mb-2 flex flex-wrap gap-2">
-              {(['email', 'password'] as const).map((kind) => (
-                <button
-                  key={kind}
-                  type="button"
-                  aria-pressed={secureInputKind === kind}
-                  onClick={() => {
-                    if (secureInputRef.current) secureInputRef.current.value = '';
-                    setSecureInputKind(kind);
-                    secureInputRef.current?.focus();
-                  }}
-                  className="min-h-12 rounded border border-emerald-300 px-4 text-base aria-pressed:bg-emerald-100"
-                >
-                  {kind === 'email' ? 'Email input' : 'Password input'}
-                </button>
-              ))}
-            </div>
-            <label className="mb-2 block text-base" htmlFor={secureInputId}>
-              {secureInputKind === 'email' ? 'Email address' : 'Password'}
-            </label>
-            <div className="flex flex-wrap gap-2">
-              <input
-                id={secureInputId}
-                ref={secureInputRef}
-                type={secureInputKind === 'password' ? 'password' : 'text'}
-                inputMode={secureInputKind === 'email' ? 'email' : 'text'}
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck={false}
-                autoComplete="off"
-                aria-label="Secure browser input"
-                disabled={!session || sendingSecureInput}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                    event.preventDefault();
-                    void sendSecureInput();
-                  }
-                }}
-                className="min-h-12 w-full min-w-0 rounded border border-emerald-300 bg-slate-50 px-3 py-3 text-xl"
-              />
-              {secureInputKind === 'email' ? (
-                <button
-                  type="button"
-                  aria-label="Insert at sign into secure input"
-                  disabled={!session || sendingSecureInput}
-                  onClick={() => {
-                    const input = secureInputRef.current;
-                    if (!input) return;
-                    const start = input.selectionStart ?? input.value.length;
-                    const end = input.selectionEnd ?? start;
-                    input.value = input.value.slice(0, start) + '@' + input.value.slice(end);
-                    input.setSelectionRange(start + 1, start + 1);
-                    input.focus();
-                  }}
-                  className="min-h-12 min-w-12 rounded border border-emerald-300 px-4 text-xl"
-                >
-                  @
-                </button>
-              ) : null}
-              <button
-                type="button"
-                onClick={() => void sendSecureInput()}
-                disabled={!session || sendingSecureInput}
-                className="min-h-12 rounded bg-emerald-600 px-4 text-base font-bold text-white disabled:opacity-50"
-              >
-                {sendingSecureInput ? 'Sending securely…' : 'Type securely'}
-              </button>
-              <button
-                type="button"
-                onClick={() => void action({ type: 'keypress', key: 'Enter' })}
-                disabled={!session || sendingSecureInput}
-                className="min-h-12 rounded border border-emerald-300 px-4 text-base text-emerald-800 disabled:opacity-50"
-              >
-                Enter
-              </button>
-            </div>
-            <label className="mt-3 flex min-h-12 items-center gap-3 text-sm">
-              <input
-                type="checkbox"
-                checked={replaceSecureInput}
-                onChange={(event) => setReplaceSecureInput(event.target.checked)}
-              />
-              Replace the selected browser field
-            </label>
           </div>
           <div className="border-b border-slate-200 p-3">
             <p className="mb-2 flex items-center gap-2 text-xs font-black">

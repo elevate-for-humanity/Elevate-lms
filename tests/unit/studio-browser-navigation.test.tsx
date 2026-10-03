@@ -36,9 +36,10 @@ it('keeps a typed destination through event polling and navigates the worker to 
       if (url.endsWith('/browser/session')) return response({ configured: true, ready: true });
       if (url.endsWith('/events')) return response({ events: [], url: workerUrl });
       if (url.endsWith('/downloads')) return response({ downloads: [] });
-      if (url.endsWith('/actions')) {
-        requested.push(JSON.parse(options.body));
-        workerUrl = requested.at(-1).url;
+      if (url.endsWith('/browser/action')) {
+        const body = JSON.parse(options.body);
+        requested.push(body);
+        workerUrl = body.action.url;
         return response({ url: workerUrl });
       }
       return response({});
@@ -56,7 +57,11 @@ it('keeps a typed destination through event polling and navigates the worker to 
   expect(address).toHaveValue('https://app.envato.com/workspaces');
   fireEvent.click(screen.getByRole('button', { name: 'Go', exact: true }));
   await waitFor(() =>
-    expect(requested).toEqual([{ type: 'navigate', url: 'https://app.envato.com/workspaces' }]),
+    expect(requested).toEqual([{
+      sessionId: 'session',
+      sessionToken: 'test-token',
+      action: { type: 'navigate', url: 'https://app.envato.com/workspaces' },
+    }]),
   );
   await act(async () => {
     await poll();

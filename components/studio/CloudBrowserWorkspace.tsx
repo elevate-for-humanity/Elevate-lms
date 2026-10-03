@@ -242,7 +242,7 @@ export default function CloudBrowserWorkspace({
     }
   }
 
-  async function start(overrideTarget = target) {
+  async function start(overrideTarget = target, compact = false) {
     const lifecycle = ++lifecycleRef.current;
     const startingTarget = overrideTarget;
     launchTargetRef.current = startingTarget;
@@ -253,8 +253,8 @@ export default function CloudBrowserWorkspace({
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         url: startingTarget,
-        width: Math.min(1440, Math.max(390, window.innerWidth)),
-        height: window.innerWidth < 1024 ? 780 : 900,
+        width: compact ? 390 : Math.min(1440, Math.max(390, window.innerWidth)),
+        height: compact || window.innerWidth < 1024 ? 780 : 900,
         conversationId: conversationId || undefined,
         taskId: unifiedTask?.taskId || undefined,
       }),
@@ -305,6 +305,11 @@ export default function CloudBrowserWorkspace({
     setMobilePane('browser');
     setControlsOpen(false);
     if (session) await action({ type: 'viewport', width: 390, height: 780 });
+    else if (runtimeReady === true && target.trim()) await start(target, true);
+    else {
+      setControlsOpen(true);
+      setError('Enter the website address and start the browser before signing in.');
+    }
   }
 
   async function uploadFiles(files: FileList | null) {

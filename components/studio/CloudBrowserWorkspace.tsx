@@ -81,6 +81,7 @@ export default function CloudBrowserWorkspace({
   const [agentResult, setAgentResult] = useState('');
   const [agentRunning, setAgentRunning] = useState(false);
   const [approvalRequested, setApprovalRequested] = useState(false);
+  const [authenticationRequired, setAuthenticationRequired] = useState(false);
   const [activeTaskId, setActiveTaskId] = useState('');
   const [approvedTaskId, setApprovedTaskId] = useState('');
   const imageRef = useRef<HTMLImageElement>(null);
@@ -243,31 +244,30 @@ export default function CloudBrowserWorkspace({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStart, runtimeReady, session, target, conversationId, unifiedTask?.taskId]);
 
-  async function action(payload: Record<string, unknown>) {
-    if (!session) return;
+  async function action(payload: Record<string, unknown>): Promise<boolean> {
+    if (!session) return false;
     const navigation = payload.type === 'navigate';
     const revision = navigation ? ++navigationRevisionRef.current : navigationRevisionRef.current;
     if (navigation) navigatingRef.current = true;
     try {
-      // Keep privileged browser actions on the authenticated Admin origin.
-      // The public worker URL is retained only for read-only frame/event streams.
-      const response = await fetch('/api/admin/dev-studio/browser/action', {
+      const response = await fetch(`${endpoint}/actions`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: session.id,
-          sessionToken: session.token,
-          action: payload,
-        }),
+        headers: { ...authHeaders, 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
       });
       const body = await response.json().catch(() => ({}));
-      if (!response.ok) setError(body.error || 'Browser action failed');
-      else if (navigationRevisionRef.current === revision) {
+      if (!response.ok) {
+        setError(body.error || 'Browser action failed');
+        return false;
+      }
+      if (navigationRevisionRef.current === revision) {
         if (navigation) targetDraftRef.current = null;
         if (body.url && targetDraftRef.current === null) setTarget(body.url);
       }
+      return true;
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Browser action failed');
+      return false;
     } finally {
       if (navigation && navigationRevisionRef.current === revision) navigatingRef.current = false;
     }
@@ -376,6 +376,7 @@ export default function CloudBrowserWorkspace({
     setAgentResult('');
     setError('');
     setApprovalRequested(false);
+    setAuthenticationRequired(false);
     try {
       const response = await fetch('/api/admin/dev-studio/browser/agent', {
         method: 'POST',
@@ -405,7 +406,7 @@ export default function CloudBrowserWorkspace({
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
-      let completed = false;
+      let settled = false;
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -424,19 +425,36 @@ export default function CloudBrowserWorkspace({
           }
           if (event.type === 'status' || event.type === 'step') setStatus(event.message);
           if (event.type === 'done') {
-            completed = true;
+            settled = true;
             setAgentResult(event.output || `Completed ${event.steps?.length || 0} browser steps.`);
             setStatus('Connected');
+          }
+          if (event.type === 'authentication_required') {
+            settled = true;
+            setAuthenticationRequired(true);
+            setStatus('Secure sign-in required');
+            setError(
+              event.message ||
+                'Sign in in the isolated browser, then press Enter to resume this same task.',
+            );
           }
           if (event.type === 'error') throw new Error(event.error || 'AI browser task failed');
         }
       }
-      if (!completed) throw new Error('AI browser task ended without a result');
+      if (!settled) throw new Error('AI browser task ended without a result');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'AI browser task failed');
     } finally {
       setAgentRunning(false);
     }
+  }
+
+  async function submitBrowserEnter() {
+    const submitted = await action({ type: 'keypress', key: 'Enter' });
+    if (!submitted || !authenticationRequired || !activeTaskId) return;
+    setStatus('Checking authenticated session…');
+    await new Promise((resolve) => window.setTimeout(resolve, 750));
+    await runAgent(activeTaskId);
   }
 
   async function approveAndResume() {
@@ -772,7 +790,7 @@ export default function CloudBrowserWorkspace({
               </button>
               <button
                 type="button"
-                onClick={() => action({ type: 'keypress', key: 'Enter' })}
+                onClick={() => void submitBrowserEnter()}
                 disabled={!session}
                 className="rounded border border-emerald-800 px-2 text-xs text-emerald-200 disabled:opacity-50"
               >
@@ -805,7 +823,11 @@ export default function CloudBrowserWorkspace({
               {['Enter', 'Tab', 'Escape', 'Backspace'].map((key) => (
                 <button
                   key={key}
-                  onClick={() => action({ type: 'keypress', key })}
+                  onClick={() =>
+                    key === 'Enter'
+                      ? void submitBrowserEnter()
+                      : void action({ type: 'keypress', key })
+                  }
                   disabled={!session}
                   className="rounded border border-slate-700 px-2 py-1 text-[10px]"
                 >

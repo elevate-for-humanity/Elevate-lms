@@ -29,6 +29,13 @@ type UltimateBuildRow = {
   findings?: unknown[] | null;
   created_at?: string | null;
   updated_at?: string | null;
+  ultimate_build_jobs?: Array<{
+    id: string;
+    status: string;
+    last_error?: string | null;
+    created_at: string;
+    heartbeat_at?: string | null;
+  }>;
 };
 
 const TABS: Array<{ id: Tab; label: string; icon: any }> = [
@@ -124,7 +131,8 @@ export default function UnifiedCourseBuilder({
     try {
       const response = await fetch('/api/admin/courses', { cache: 'no-store' });
       const payload = await readJson(response);
-      if (!response.ok) throw new Error(payload?.error ?? `Course inventory failed (${response.status})`);
+      if (!response.ok)
+        throw new Error(payload?.error ?? `Course inventory failed (${response.status})`);
       const rows: CourseRow[] = Array.isArray(payload)
         ? payload
         : Array.isArray(payload?.courses)
@@ -169,14 +177,18 @@ export default function UnifiedCourseBuilder({
               <Bot className="h-4 w-4" /> Ultimate Course Builder
             </div>
             <p className="mt-1 max-w-3xl text-sm text-slate-400">
-              One durable 20-stage authority for standards, instruction, media, narration, assessments, QA, repair, and LMS release.
+              One durable 20-stage authority for standards, instruction, media, narration,
+              assessments, QA, repair, and LMS release.
             </p>
             <p className="mt-2 inline-flex items-center gap-2 text-sm font-bold text-emerald-300">
-              <ShieldCheck className="h-4 w-4" /> Legacy Course Factory is archived and cannot start production builds.
+              <ShieldCheck className="h-4 w-4" /> Legacy Course Factory is archived and cannot start
+              production builds.
             </p>
           </div>
           <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <label className="sr-only" htmlFor="ultimate-course-selector">Selected course</label>
+            <label className="sr-only" htmlFor="ultimate-course-selector">
+              Selected course
+            </label>
             <select
               id="ultimate-course-selector"
               value={courseId}
@@ -242,8 +254,8 @@ export default function UnifiedCourseBuilder({
           />
         )}
 
-        {tab === 'ultimate' && (
-          selectedCourse ? (
+        {tab === 'ultimate' &&
+          (selectedCourse ? (
             <UltimateBuildPanel
               course={selectedCourse}
               programSlug={selectedProgram?.slug?.trim() || selectedCourse.slug}
@@ -252,8 +264,7 @@ export default function UnifiedCourseBuilder({
             <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-400">
               Select a course, or create a course shell, to start an Ultimate build.
             </div>
-          )
-        )}
+          ))}
         {tab === 'registry' && <CredentialRegistryPanel course={selectedCourse} />}
       </main>
     </div>
@@ -292,16 +303,25 @@ function CourseCatalog({
       <section className="min-w-0 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
         <h2 className="text-lg font-bold">Course inventory</h2>
         <p className="mt-1 text-sm text-slate-400">
-          Open a canonical course in Ultimate Course Builder. Publishing is available only after the Ultimate release gate passes.
+          Open a canonical course in Ultimate Course Builder. Publishing is available only after the
+          Ultimate release gate passes.
         </p>
         {inventoryError ? (
-          <div role="alert" className="mt-3 rounded-lg bg-red-950/60 px-3 py-3 text-sm text-red-100">
+          <div
+            role="alert"
+            className="mt-3 rounded-lg bg-red-950/60 px-3 py-3 text-sm text-red-100"
+          >
             <strong>Course inventory could not load.</strong> {inventoryError}{' '}
-            <button onClick={() => void onChanged()} className="underline">Retry</button>
+            <button onClick={() => void onChanged()} className="underline">
+              Retry
+            </button>
           </div>
         ) : null}
         {programError ? (
-          <p role="alert" className="mt-3 rounded-lg bg-amber-950/60 px-3 py-2 text-sm text-amber-100">
+          <p
+            role="alert"
+            className="mt-3 rounded-lg bg-amber-950/60 px-3 py-2 text-sm text-amber-100"
+          >
             Program list could not load: {programError}
           </p>
         ) : null}
@@ -325,7 +345,10 @@ function CourseCatalog({
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {visibleCourses.map((course) => (
-            <article key={course.id} className="min-w-0 rounded-xl border border-slate-700 bg-slate-950 p-4 hover:border-cyan-500">
+            <article
+              key={course.id}
+              className="min-w-0 rounded-xl border border-slate-700 bg-slate-950 p-4 hover:border-cyan-500"
+            >
               <button
                 type="button"
                 onClick={() => onOpen(course.id)}
@@ -415,12 +438,21 @@ function CreateCoursePanel({
   }
 
   return (
-    <form onSubmit={submit} className="mx-auto min-w-0 max-w-3xl space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-6">
+    <form
+      onSubmit={submit}
+      className="mx-auto min-w-0 max-w-3xl space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-6"
+    >
       <h2 className="text-xl font-bold">Create and queue in Ultimate</h2>
       <p className="text-sm text-slate-400">
-        Creates only the canonical course shell, then hands all generation to Ultimate Course Builder.
+        Creates only the canonical course shell, then hands all generation to Ultimate Course
+        Builder.
       </p>
-      <input name="title" required placeholder="Course title" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" />
+      <input
+        name="title"
+        required
+        placeholder="Course title"
+        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+      />
       <textarea
         name="topic"
         required
@@ -428,17 +460,39 @@ function CreateCoursePanel({
         placeholder="Specific scope, standards, practical skills, and outcomes"
         className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
       />
-      <input name="audience" placeholder="Learner audience" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" />
-      <select name="programId" required defaultValue="" aria-label="Canonical program" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2">
-        <option value="" disabled>Select a canonical program</option>
+      <input
+        name="audience"
+        placeholder="Learner audience"
+        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+      />
+      <select
+        name="programId"
+        required
+        defaultValue=""
+        aria-label="Canonical program"
+        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+      >
+        <option value="" disabled>
+          Select a canonical program
+        </option>
         {programs
           .filter((program) => program.is_active !== false && program.status !== 'archived')
           .map((program) => (
-            <option key={program.id} value={program.id}>{program.title}</option>
+            <option key={program.id} value={program.id}>
+              {program.title}
+            </option>
           ))}
       </select>
-      {error ? <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">{error}</p> : null}
-      <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50">
+      {error ? (
+        <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
+          {error}
+        </p>
+      ) : null}
+      <button
+        type="submit"
+        disabled={saving}
+        className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50"
+      >
         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
         {saving ? 'Queuing Ultimate build…' : 'Create and queue Ultimate build'}
       </button>
@@ -446,16 +500,27 @@ function CreateCoursePanel({
   );
 }
 
-function UltimateBuildPanel({ course, programSlug }: { course: CourseRow; programSlug: string }) {
+export function UltimateBuildPanel({
+  course,
+  programSlug,
+}: {
+  course: CourseRow;
+  programSlug: string;
+}) {
   const [builds, setBuilds] = useState<UltimateBuildRow[]>([]);
-  const [acquisitions, setAcquisitions] = useState<Array<{id: string; goal: string | null}>>([]);
+  const [acquisitions, setAcquisitions] = useState<Array<{ id: string; goal: string | null }>>([]);
   const [buildsCourseId, setBuildsCourseId] = useState('');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const refreshToken = useRef(0);
-  const latest = buildsCourseId === course.id ? builds[0] ?? null : null;
+  const latest = buildsCourseId === course.id ? (builds[0] ?? null) : null;
   const statusLoading = loading || buildsCourseId !== course.id;
+  const jobs = [...(latest?.ultimate_build_jobs ?? [])].sort((a, b) =>
+    b.created_at.localeCompare(a.created_at),
+  );
+  const activeJob = jobs.find((job) => ['queued', 'running'].includes(job.status));
+  const workerJob = activeJob ?? jobs[0];
 
   async function refresh(requestedCourseId = course.id) {
     const token = ++refreshToken.current;
@@ -531,69 +596,141 @@ function UltimateBuildPanel({ course, programSlug }: { course: CourseRow; progra
     <section className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-400">Ultimate Course Builder</p>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-400">
+            Ultimate Course Builder
+          </p>
           <h2 className="mt-1 text-2xl font-black text-white">{course.title}</h2>
           <p className="mt-2 text-sm text-slate-400">
-            Program authority: {programSlug || 'course-defined'} · durable Northflank worker · 20 checkpointed stages
+            Program authority: {programSlug || 'course-defined'} · durable Northflank worker · 20
+            checkpointed stages
           </p>
         </div>
-        <button type="button" onClick={() => void refresh()} disabled={statusLoading} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-bold text-slate-200 disabled:opacity-50">
+        <button
+          type="button"
+          onClick={() => void refresh()}
+          disabled={statusLoading}
+          className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-bold text-slate-200 disabled:opacity-50"
+        >
           <RefreshCw className={`h-4 w-4 ${statusLoading ? 'animate-spin' : ''}`} /> Refresh
         </button>
       </div>
 
-      {error ? <p role="alert" className="mt-4 rounded-lg border border-red-500/40 bg-red-950/40 p-3 text-sm text-red-100">{error}</p> : null}
+      {!statusLoading && latest ? (
+        <div className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4">
+          <p className="text-xs uppercase tracking-wide text-slate-500">Worker job</p>
+          <p className="mt-1 text-sm font-bold text-slate-200">
+            {workerJob?.status ?? 'not queued'} · {workerJob?.id ?? 'No persisted job'}
+          </p>
+          {workerJob?.last_error ? (
+            <p role="alert" className="mt-2 break-words text-sm text-amber-200">
+              {workerJob.last_error}
+            </p>
+          ) : null}
+          {workerJob?.status === 'completed' && !['built', 'published'].includes(latest.status) ? (
+            <p className="mt-2 text-sm text-slate-400">
+              This worker job finished. Course acceptance and release are still required.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
+      {error ? (
+        <p
+          role="alert"
+          className="mt-4 rounded-lg border border-red-500/40 bg-red-950/40 p-3 text-sm text-red-100"
+        >
+          {error}
+        </p>
+      ) : null}
 
       <div className="mt-5 grid gap-4 md:grid-cols-3">
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-500">Status</p>
-          <p className="mt-1 text-lg font-black text-white">{statusLoading ? 'loading…' : latest?.status ?? 'not queued'}</p>
+          <p className="mt-1 text-lg font-black text-white">
+            {statusLoading ? 'loading…' : (latest?.status ?? 'not queued')}
+          </p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-500">Current stage</p>
-          <p className="mt-1 break-words text-lg font-black text-white">{statusLoading ? 'loading…' : latest?.current_step ?? 'standards_lock'}</p>
+          <p className="mt-1 break-words text-lg font-black text-white">
+            {statusLoading ? 'loading…' : (latest?.current_step ?? 'standards_lock')}
+          </p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-500">Build ID</p>
-          <p className="mt-1 break-all text-sm font-bold text-slate-200">{statusLoading ? 'Loading course build…' : latest?.id ?? 'Created when queued'}</p>
+          <p className="mt-1 break-all text-sm font-bold text-slate-200">
+            {statusLoading ? 'Loading course build…' : (latest?.id ?? 'Created when queued')}
+          </p>
         </div>
       </div>
 
-      {!statusLoading && acquisitions.length > 0 && <div className="mt-5 space-y-2">
-        {acquisitions.map(request => <a key={request.id}
-          href={`/studio/browser?acquisitionRunId=${encodeURIComponent(request.id)}`}
-          className="block rounded-lg border border-cyan-700 bg-slate-950 p-3 text-cyan-300">
-          {request.goal || 'Complete lesson scene media'} · Open existing Studio browser
-        </a>)}
-      </div>}
+      {!statusLoading && acquisitions.length > 0 && (
+        <div className="mt-5 space-y-2">
+          {acquisitions.map((request) => (
+            <a
+              key={request.id}
+              href={`/studio/browser?acquisitionRunId=${encodeURIComponent(request.id)}`}
+              className="block rounded-lg border border-cyan-700 bg-slate-950 p-3 text-cyan-300"
+            >
+              {request.goal || 'Complete lesson scene media'} · Open existing Studio browser
+            </a>
+          ))}
+        </div>
+      )}
 
       <ol className="mt-5 grid gap-2 text-sm text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
-        {['Standards lock', 'Instruction design', 'Media + narration', 'Assessment alignment', 'Finished-media QA', 'Learner run-through', 'Selective repair', 'Credential release'].map((step) => (
-          <li key={step} className="rounded-lg border border-slate-800 bg-slate-950/70 px-3 py-2">{step}</li>
+        {[
+          'Standards lock',
+          'Instruction design',
+          'Media + narration',
+          'Assessment alignment',
+          'Finished-media QA',
+          'Learner run-through',
+          'Selective repair',
+          'Credential release',
+        ].map((step) => (
+          <li key={step} className="rounded-lg border border-slate-800 bg-slate-950/70 px-3 py-2">
+            {step}
+          </li>
         ))}
       </ol>
 
       <div className="mt-6 flex flex-wrap gap-3">
-        <button type="button" onClick={() => void queue()} disabled={busy || statusLoading || ['initializing', 'queued', 'running'].includes(latest?.status ?? '')} className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50">
-          {busy || statusLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
+        <button
+          type="button"
+          onClick={() => void queue()}
+          disabled={busy || statusLoading || Boolean(activeJob)}
+          className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50"
+        >
+          {busy || statusLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Rocket className="h-4 w-4" />
+          )}
           {statusLoading
             ? 'Loading build status…'
-            : latest?.status === 'initializing'
-              ? 'Preparing Ultimate build…'
-              : latest?.status === 'queued'
-                ? 'Ultimate build queued'
-                : latest?.status === 'running'
-                  ? 'Ultimate build running'
+            : workerJob?.status === 'queued'
+              ? 'Ultimate build queued'
+              : workerJob?.status === 'running'
+                ? 'Ultimate build running'
+                : latest
+                  ? 'Resume Ultimate build'
                   : 'Queue Ultimate build'}
         </button>
         {latest?.status === 'built' ? (
-          <button type="button" onClick={() => void publish()} disabled={busy} className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50">
+          <button
+            type="button"
+            onClick={() => void publish()}
+            disabled={busy}
+            className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50"
+          >
             <ShieldCheck className="h-4 w-4" /> Publish Ultimate release
           </button>
         ) : null}
       </div>
       <p className="mt-4 text-xs text-slate-500">
-        Course Factory generation, blueprint execution, and standalone media queues are not available from this surface.
+        Course Factory generation, blueprint execution, and standalone media queues are not
+        available from this surface.
       </p>
     </section>
   );

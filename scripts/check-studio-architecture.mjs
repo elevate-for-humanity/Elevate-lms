@@ -107,8 +107,18 @@ for (const forbiddenProviderBypass of [
     fail(`Studio browser agent bypasses the canonical AI provider: ${forbiddenProviderBypass}`);
   }
 }
-if (!browserPlanner.includes("providerPolicy: 'owned-only'")) {
-  fail('Studio browser planner is not restricted to Elevate-owned inference');
+if (!browserPlanner.includes("providerPolicy: 'canonical'")) {
+  fail('Studio browser planner is not routed through canonical configured inference');
+}
+const studioBrowserProvisioner = read('scripts/northflank/create-studio-browser-service.ts');
+for (const providerSessionInvariant of [
+  'STUDIO_BROWSER_AUTH_STATE_DIR',
+  'elevate-studio-browser-auth',
+  'volumesToAttach',
+]) {
+  if (!studioBrowserProvisioner.includes(providerSessionInvariant)) {
+    fail(`Studio Browser deployment is missing durable provider-session invariant: ${providerSessionInvariant}`);
+  }
 }
 for (const providerNeutralInvariant of ['planBrowserTurn', '/snapshot']) {
   if (!browserAgentRoute.includes(providerNeutralInvariant)) {

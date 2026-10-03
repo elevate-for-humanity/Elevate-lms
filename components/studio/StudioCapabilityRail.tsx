@@ -127,19 +127,19 @@ export default function StudioCapabilityRail({
 
   return (
     <aside
-      className={`${expanded ? 'w-64' : 'w-16'} ${mobile ? 'flex h-full' : 'hidden md:flex'} shrink-0 flex-col border-r border-slate-200 bg-slate-950 text-white transition-[width] duration-200`}
+      className={`${expanded ? 'w-64' : 'w-16'} ${mobile ? 'flex h-full' : 'hidden md:flex'} shrink-0 flex-col border-r border-slate-200 bg-slate-50 text-slate-950 transition-[width] duration-200`}
       aria-label="Studio capabilities"
     >
-      <div className="flex h-12 items-center border-b border-slate-800 px-3">
+      <div className="flex h-12 items-center border-b border-slate-200 px-3">
         {expanded ? (
-          <span className="text-xs font-black uppercase tracking-[0.16em] text-slate-300">
+          <span className="text-sm font-black uppercase tracking-[0.16em] text-slate-700">
             Intelligence
           </span>
         ) : null}
         <button
           type="button"
           onClick={() => setExpanded((value) => !value)}
-          className="ml-auto rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white"
+          className="ml-auto rounded-lg p-2 text-slate-600 hover:bg-slate-200 hover:text-slate-950"
           aria-label={expanded ? 'Collapse capability sidebar' : 'Expand capability sidebar'}
         >
           {expanded ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
@@ -149,7 +149,7 @@ export default function StudioCapabilityRail({
       <div className="min-h-0 flex-1 overflow-y-auto px-2 py-3">
         {expanded ? children : null}
         {expanded ? (
-          <p className="px-2 pb-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+          <p className="px-2 pb-2 text-xs font-bold uppercase tracking-widest text-slate-600">
             Agents {agentCount !== null ? `· ${agentCount} active` : ''}
           </p>
         ) : null}
@@ -162,14 +162,14 @@ export default function StudioCapabilityRail({
                 type="button"
                 onClick={() => onSpecialistChange(selected ? null : agent.id)}
                 title={`${agent.label} — ${agent.detail}`}
-                className={`flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition ${selected ? 'bg-cyan-500 text-slate-950' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
+                className={`flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition ${selected ? 'bg-cyan-500 text-slate-950' : 'text-slate-700 hover:bg-slate-200 hover:text-slate-950'}`}
               >
                 <Bot className="h-5 w-5 shrink-0" aria-hidden="true" />
                 {expanded ? (
                   <span className="min-w-0">
-                    <span className="block text-xs font-black">{agent.label}</span>
+                    <span className="block text-sm font-black">{agent.label}</span>
                     <span
-                      className={`block truncate text-[10px] ${selected ? 'text-slate-800' : 'text-slate-500'}`}
+                      className={`block truncate text-xs ${selected ? 'text-slate-800' : 'text-slate-600'}`}
                     >
                       {agent.detail}
                     </span>
@@ -180,9 +180,9 @@ export default function StudioCapabilityRail({
           })}
         </div>
 
-        <div className="my-3 border-t border-slate-800" />
+        <div className="my-3 border-t border-slate-200" />
         {expanded ? (
-          <p className="px-2 pb-2 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+          <p className="px-2 pb-2 text-xs font-bold uppercase tracking-widest text-slate-600">
             Tools
           </p>
         ) : null}
@@ -203,32 +203,32 @@ export default function StudioCapabilityRail({
                   onNavigate?.();
                 }}
                 title={label}
-                className={`flex items-center gap-3 rounded-xl px-2 py-2 transition ${activeWorkspaceId === workspace.id || pathname === workspace.route || pathname.startsWith(`${workspace.route}/`) ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
+                className={`flex items-center gap-3 rounded-xl px-2 py-2 transition ${activeWorkspaceId === workspace.id || pathname === workspace.route || pathname.startsWith(`${workspace.route}/`) ? 'bg-slate-200 text-slate-950' : 'text-slate-700 hover:bg-slate-200 hover:text-slate-950'}`}
               >
                 <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                {expanded ? <span className="truncate text-xs font-semibold">{label}</span> : null}
+                {expanded ? <span className="truncate text-sm font-semibold">{label}</span> : null}
               </Link>
             );
           })}
         </nav>
       </div>
 
-      <div className="border-t border-slate-800">
+      <div className="border-t border-slate-200">
         <button
           type="button"
           onClick={() => setConnectionsOpen((value) => !value)}
-          className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-300 hover:bg-slate-900 hover:text-white"
+          className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-700 hover:bg-slate-100 hover:text-slate-950"
           title="Connected capabilities"
         >
           {plugins === 'healthy' ? (
-            <PlugZap className="h-5 w-5 shrink-0 text-emerald-400" />
+            <PlugZap className="h-5 w-5 shrink-0 text-emerald-700" />
           ) : (
-            <Cable className="h-5 w-5 shrink-0 text-amber-400" />
+            <Cable className="h-5 w-5 shrink-0 text-amber-700" />
           )}
           {expanded ? (
             <span className="min-w-0">
-              <span className="block text-xs font-bold">Plugins & connections</span>
-              <span className="block text-[10px] text-slate-500">
+              <span className="block text-sm font-bold">Plugins & connections</span>
+              <span className="block text-xs text-slate-600">
                 {plugins === 'checking'
                   ? 'Checking…'
                   : plugins === 'healthy'
@@ -241,24 +241,24 @@ export default function StudioCapabilityRail({
           ) : null}
         </button>
         {expanded && connectionsOpen ? (
-          <div className="max-h-52 space-y-1 overflow-y-auto border-t border-slate-800 bg-slate-900 px-3 py-2">
+          <div className="max-h-52 space-y-1 overflow-y-auto border-t border-slate-200 bg-slate-100 px-3 py-2">
             {pluginChecks.map((check) => (
-              <div key={check.name} className="rounded-lg bg-slate-950 px-2.5 py-2">
+              <div key={check.name} className="rounded-lg bg-slate-50 px-2.5 py-2">
                 <div className="flex items-center gap-2">
                   <span
                     className={`h-2 w-2 rounded-full ${check.passed ? 'bg-emerald-400' : check.required ? 'bg-red-400' : 'bg-amber-400'}`}
                   />
-                  <span className="truncate text-[11px] font-bold capitalize text-slate-200">
+                  <span className="truncate text-xs font-bold capitalize text-slate-800">
                     {check.name.replace(/-/g, ' ')}
                   </span>
                 </div>
-                <p className="mt-1 text-[10px] leading-4 text-slate-500">{check.message}</p>
+                <p className="mt-1 text-xs leading-4 text-slate-600">{check.message}</p>
               </div>
             ))}
             <Link
               href="/studio/settings"
               onClick={onNavigate}
-              className="block rounded-lg px-2 py-2 text-[11px] font-bold text-cyan-300 hover:bg-slate-800"
+              className="block rounded-lg px-2 py-2 text-xs font-bold text-cyan-800 hover:bg-slate-200"
             >
               Connection settings
             </Link>

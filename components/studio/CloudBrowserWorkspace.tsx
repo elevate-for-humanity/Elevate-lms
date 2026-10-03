@@ -763,9 +763,9 @@ export default function CloudBrowserWorkspace({
           <div className="order-first border-b border-slate-800 p-3">
             <p className="mb-2 text-sm font-black text-emerald-300">Secure sign-in handoff</p>
             <p className="mb-2 text-[10px] leading-4 text-slate-500">
-              Tap the field you want to fill in the browser above, then type here and select Type securely. The value is sent directly to the active
-              isolated browser, cleared immediately, and never added to the AI conversation or task
-              evidence.
+              Tap the field you want to fill in the browser above, then type here and select Type
+              securely. The value is sent directly to the active isolated browser, cleared
+              immediately, and never added to the AI conversation or task evidence.
             </p>
             <div className="flex gap-2">
               <input

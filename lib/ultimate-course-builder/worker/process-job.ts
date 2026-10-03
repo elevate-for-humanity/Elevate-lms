@@ -8,6 +8,7 @@ import type { UltimateCredentialProfile } from '../core/types';
 import { assertCompleteLesson } from '../core/lesson-contract';
 import { UltimateReleaseService } from '../release/release-service';
 import { nextCourseWork } from './course-cursor';
+import { resolveReleaseActor } from './release-actor';
 export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
@@ -77,10 +78,9 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         if (!lesson || lesson.status !== 'built') throw new Error(`ULTIMATE_COMPETENCY_NOT_COMPLETE:${competency.id}`);
         assertCompleteLesson(lesson.artifacts, profile);
       }
-      const { data: course, error: courseError } = await db.from('courses').select('created_by').eq('id', build.course_id).single();
-      if (courseError || !course?.created_by) throw courseError ?? new Error('ULTIMATE_RELEASE_ACTOR_REQUIRED');
+      const releaseActor = await resolveReleaseActor(db, build.course_id, profile.mediaAcquisitionOwnerId);
       await runtime.persistence.updateBuild({buildId:build.id,status:'built',currentStep:'credential_release'});
-      await new UltimateReleaseService(db).publish(build.id, course.created_by);
+      await new UltimateReleaseService(db).publish(build.id, releaseActor);
     }
     await queue.complete(job.id, workerId);
     return { claimed: true, completed: true, jobId: job.id, result };

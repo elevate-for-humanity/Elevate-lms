@@ -53,7 +53,7 @@ export default function StudioBrowserPage() {
     >
       <Link
         href="/studio"
-        className="flex min-h-11 shrink-0 items-center px-4 text-base font-semibold text-slate-950 lg:hidden"
+        className="flex min-h-11 shrink-0 items-center px-4 text-base font-semibold text-slate-950"
       >
         Back to Studio chat
       </Link>

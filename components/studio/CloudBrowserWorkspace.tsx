@@ -63,6 +63,7 @@ export default function CloudBrowserWorkspace({
   autoRunTask?: boolean;
   acquisitionRunId?: string;
 }) {
+  const workspaceRef = useRef<HTMLDivElement | null>(null);
   const reconnectingRef = useRef(false);
   const launchTargetRef = useRef(initialTarget);
   const lifecycleRef = useRef(0);
@@ -341,6 +342,8 @@ export default function CloudBrowserWorkspace({
         setError(body.error || 'Browser action failed');
         return false;
       }
+      if (body.viewport)
+        setSession((current) => (current ? { ...current, viewport: body.viewport } : current));
       if (navigationRevisionRef.current === revision) {
         if (navigation) targetDraftRef.current = null;
         if (body.url && targetDraftRef.current === null) setTarget(body.url);
@@ -642,6 +645,14 @@ export default function CloudBrowserWorkspace({
         if (response?.ok) {
           const payload = await response.json();
           setEvents(payload.events || []);
+          if (payload.viewport)
+            setSession((current) =>
+              current &&
+              (current.viewport.width !== payload.viewport.width ||
+                current.viewport.height !== payload.viewport.height)
+                ? { ...current, viewport: payload.viewport }
+                : current,
+            );
           setBrowserTabs(payload.tabs || []);
           setActiveTabId(payload.activeTabId || '');
           setFilePicker(Boolean(payload.filePicker));
@@ -673,7 +684,7 @@ export default function CloudBrowserWorkspace({
   // Explicit Stop and the worker TTL own session cleanup.
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-slate-950 text-white">
+    <div ref={workspaceRef} className="flex h-full min-h-0 flex-col bg-slate-950 text-white">
       <header className="flex flex-wrap items-center gap-2 border-b border-slate-800 bg-slate-900 p-3">
         <Globe2 className="h-5 w-5 text-cyan-300" />
         <strong className="mr-2">Cloud Browser</strong>
@@ -742,6 +753,37 @@ export default function CloudBrowserWorkspace({
             </button>
           </>
         )}
+        {session ? (
+          <>
+            <button
+              onClick={() => action({ type: 'viewport', width: 390, height: 780 })}
+              className="min-h-12 rounded-lg border border-slate-700 px-3 text-sm"
+            >
+              Mobile view
+            </button>
+            <button
+              onClick={() => action({ type: 'viewport', width: 1280, height: 900 })}
+              className="min-h-12 rounded-lg border border-slate-700 px-3 text-sm"
+            >
+              Desktop view
+            </button>
+            <button
+              onClick={() => {
+                const request = document.fullscreenElement
+                  ? document.exitFullscreen()
+                  : workspaceRef.current?.requestFullscreen();
+                void request?.catch(() =>
+                  setError(
+                    'Full screen is not supported in this browser. Use Mobile view for larger controls.',
+                  ),
+                );
+              }}
+              className="min-h-12 rounded-lg border border-slate-700 px-3 text-sm"
+            >
+              Full screen
+            </button>
+          </>
+        ) : null}
         <span className="text-[11px] text-slate-400">{status}</span>
         {unifiedTask ? (
           <span className="max-w-full truncate rounded-full border border-violet-500/50 bg-violet-500/10 px-2 py-1 text-[10px] font-bold text-violet-200">

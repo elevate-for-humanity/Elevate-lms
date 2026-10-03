@@ -620,15 +620,50 @@ const browserManager = createBrowserLifecycleManager({
   },
 });
 
+export function attachBrowserTabs(session, attachPage, saveState = async () => {}) {
+  session.pages = new Map();
+  session.activeTabId = '';
+  let checkpoint = Promise.resolve();
+  const attach = (page) => {
+    if ([...session.pages.values()].includes(page)) return;
+    const id = crypto.randomUUID();
+    session.pages.set(id, page);
+    session.page = page;
+    session.activeTabId = id;
+    attachPage(page);
+    // OAuth cookies may arrive after the input action has returned. Persist the
+    // completed document state, using the existing encrypted provider store.
+    page.on('domcontentloaded', () => {
+      checkpoint = checkpoint
+        .catch(() => undefined)
+        .then(() => saveState())
+        .catch(() => {
+          session.events.push({ type: 'checkpoint_failed', at: new Date().toISOString() });
+        });
+    });
+    page.on('close', () => {
+      session.pages.delete(id);
+      if (session.activeTabId === id) {
+        const fallback = [...session.pages.entries()].at(-1);
+        session.activeTabId = fallback?.[0] || '';
+        session.page = fallback?.[1];
+      }
+    });
+  };
+  attach(session.page);
+  session.context.on('page', attach);
+}
+
 async function createSession(target, viewport, authCookies = [], ownerId) {
   const providerScope = providerSessions.scope(ownerId, target);
   // Reuse the live worker session, including its workspace and downloads.
-  const shared = providerScope && [...sessions.values()].find(s => s.providerScope === providerScope);
+  const shared =
+    providerScope && [...sessions.values()].find((s) => s.providerScope === providerScope);
   if (shared) {
     shared.lastSeen = Date.now();
     await shared.page.setViewportSize(viewport);
-    shared.target = target;
-    await shared.page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    // Reattaching a view must preserve an in-progress OAuth flow and workspace.
+    // Deliberate navigation is performed by the existing navigate action.
     return shared;
   }
   if (shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
@@ -704,55 +739,64 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
         session.events.push({ type, at: new Date().toISOString(), ...data });
         if (session.events.length > 500) session.events.shift();
       };
-      page.on('console', (message) =>
-        record('console', { level: message.type(), text: message.text().slice(0, 2000) }),
-      );
-      page.on('pageerror', (error) => record('pageerror', { text: error.message.slice(0, 2000) }));
-      page.on('requestfailed', (request) =>
-        record('requestfailed', {
-          url: request.url(),
-          error: request.failure()?.errorText || 'failed',
-        }),
-      );
-      page.on('response', (response) => {
-        if (response.status() >= 400)
-          record('response', { url: response.url(), status: response.status() });
-      });
-      page.on('download', (download) => {
-        const id = crypto.randomUUID();
-        const fileName = safeFileName(download.suggestedFilename());
-        const filePath = path.join(downloadDir, `${id}-${fileName}`);
-        const item = {
-          id,
-          fileName,
-          filePath,
-          contentType: videoContentType(fileName),
-          size: 0,
-          status: 'downloading',
-          uploadProgress: 0,
-          createdAt: new Date().toISOString(),
-          sourceUrl: page.url(),
-        };
-        session.downloads.set(id, item);
-        record('download', { downloadId: id, fileName, status: 'downloading' });
-        void download
-          .saveAs(filePath)
-          .then(async () => {
-            await normalizeDownloadedVideo(item);
-            item.status = 'normalizing';
-            record('download', { downloadId: id, fileName: item.fileName, status: 'normalizing' });
-            await prepareCourseVideoDownload(item);
-            const stat = await fs.promises.stat(item.filePath);
-            item.size = stat.size;
-            item.status = 'ready';
-            record('download', { downloadId: id, fileName, size: stat.size, status: 'ready' });
-          })
-          .catch((error) => {
-            item.status = 'failed';
-            item.error = sanitizeReason(error);
-            record('download', { downloadId: id, fileName, status: 'failed', error: item.error });
-          });
-      });
+      const attachPage = (page) => {
+        page.on('console', (message) =>
+          record('console', { level: message.type(), text: message.text().slice(0, 2000) }),
+        );
+        page.on('pageerror', (error) =>
+          record('pageerror', { text: error.message.slice(0, 2000) }),
+        );
+        page.on('requestfailed', (request) =>
+          record('requestfailed', {
+            url: request.url(),
+            error: request.failure()?.errorText || 'failed',
+          }),
+        );
+        page.on('response', (response) => {
+          if (response.status() >= 400)
+            record('response', { url: response.url(), status: response.status() });
+        });
+        page.on('download', (download) => {
+          const id = crypto.randomUUID();
+          const fileName = safeFileName(download.suggestedFilename());
+          const filePath = path.join(downloadDir, `${id}-${fileName}`);
+          const item = {
+            id,
+            fileName,
+            filePath,
+            contentType: videoContentType(fileName),
+            size: 0,
+            status: 'downloading',
+            uploadProgress: 0,
+            createdAt: new Date().toISOString(),
+            sourceUrl: page.url(),
+          };
+          session.downloads.set(id, item);
+          record('download', { downloadId: id, fileName, status: 'downloading' });
+          void download
+            .saveAs(filePath)
+            .then(async () => {
+              await normalizeDownloadedVideo(item);
+              item.status = 'normalizing';
+              record('download', {
+                downloadId: id,
+                fileName: item.fileName,
+                status: 'normalizing',
+              });
+              await prepareCourseVideoDownload(item);
+              const stat = await fs.promises.stat(item.filePath);
+              item.size = stat.size;
+              item.status = 'ready';
+              record('download', { downloadId: id, fileName, size: stat.size, status: 'ready' });
+            })
+            .catch((error) => {
+              item.status = 'failed';
+              item.error = sanitizeReason(error);
+              record('download', { downloadId: id, fileName, status: 'failed', error: item.error });
+            });
+        });
+      };
+      attachBrowserTabs(session, attachPage, () => providerSessions.save(providerScope, context));
       sessions.set(id, session);
       return session;
     } catch (error) {
@@ -774,7 +818,17 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
 async function runAction(session, action) {
   session.lastSeen = Date.now();
   const page = session.page;
-  if (action.type === 'click_ref') {
+  if (action.type === 'switch_tab') {
+    const selected = session.pages?.get(String(action.tabId || ''));
+    if (!selected || selected.isClosed()) throw new BrowserServiceError('tab_not_found', 404);
+    session.page = selected;
+    session.activeTabId = String(action.tabId);
+    await selected.bringToFront();
+  } else if (action.type === 'back') {
+    await page.goBack({ waitUntil: 'domcontentloaded', timeout: 30_000 });
+  } else if (action.type === 'forward') {
+    await page.goForward({ waitUntil: 'domcontentloaded', timeout: 30_000 });
+  } else if (action.type === 'click_ref') {
     const ref = String(action.ref || '').slice(0, 80);
     if (!/^e\d+$/.test(ref)) throw new Error('Invalid browser control reference');
     await page.locator(`[data-studio-ref="${ref}"]`).first().click({ timeout: 10_000 });
@@ -1271,7 +1325,7 @@ const server = http.createServer(async (req, res) => {
       return res.end(image);
     }
     if (req.method === 'GET' && match[2] === 'events')
-      return json(res, 200, { events: session.events, url: session.page.url() });
+      return json(res, 200, { events: session.events, url: session.page?.url() || '', activeTabId: session.activeTabId, tabs: [...(session.pages || new Map()).entries()].map(([id, page]) => ({ id, url: page.url() })) });
     if (req.method === 'GET' && match[2] === 'downloads')
       return json(res, 200, {
         downloads: [...session.downloads.values()].map(({ filePath, ...download }) => download),
@@ -1342,3 +1396,4 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       );
   });
 }
+

@@ -63,12 +63,19 @@ export default function CloudBrowserWorkspace({
   autoRunTask?: boolean;
   acquisitionRunId?: string;
 }) {
+  const reconnectingRef = useRef(false);
+  const launchTargetRef = useRef(initialTarget);
+  const lifecycleRef = useRef(0);
   const dragStartRef = useRef<{ x: number; y: number } | null>(null);
   const draggedRef = useRef(false);
   const [target, setTarget] = useState(initialTarget);
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
   const [runtimeReady, setRuntimeReady] = useState<boolean | null>(null);
+  const [checkingBrowser, setCheckingBrowser] = useState(false);
+  const [foundationChecks, setFoundationChecks] = useState<
+    { name: string; passed: boolean; reason?: string }[]
+  >([]);
   const [error, setError] = useState('');
   const [events, setEvents] = useState<BrowserEvent[]>([]);
   const [browserTabs, setBrowserTabs] = useState<{ id: string; url: string }[]>([]);
@@ -93,6 +100,7 @@ export default function CloudBrowserWorkspace({
   const [approvalRequested, setApprovalRequested] = useState(false);
   const [authenticationRequired, setAuthenticationRequired] = useState(false);
   const [interactionRequired, setInteractionRequired] = useState(false);
+  const [continuationTaskId, setContinuationTaskId] = useState('');
   const [activeTaskId, setActiveTaskId] = useState('');
   const [approvedTaskId, setApprovedTaskId] = useState('');
   const imageRef = useRef<HTMLImageElement>(null);
@@ -200,15 +208,40 @@ export default function CloudBrowserWorkspace({
     };
   }, []);
 
-  async function start() {
-    const startingTarget = target;
+  async function verifyBrowser() {
+    setCheckingBrowser(true);
+    setFoundationChecks([]);
+    setError('');
+    try {
+      const response = await fetch('/api/admin/dev-studio/browser/session', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'verify' }),
+      });
+      const evidence = await response.json();
+      setFoundationChecks(evidence.checks || []);
+      if (!response.ok || evidence.passed !== true)
+        setError(
+          evidence.error || 'Live browser acceptance did not pass. See the failed check below.',
+        );
+    } catch {
+      setError('Live browser acceptance could not finish.');
+    } finally {
+      setCheckingBrowser(false);
+    }
+  }
+
+  async function start(overrideTarget = target) {
+    const lifecycle = ++lifecycleRef.current;
+    const startingTarget = overrideTarget;
+    launchTargetRef.current = startingTarget;
     setError('');
     setStatus('Starting isolated Chromium…');
     const response = await fetch('/api/admin/dev-studio/browser/session', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        url: target,
+        url: startingTarget,
         width: Math.min(1440, Math.max(390, window.innerWidth)),
         height: window.innerWidth < 1024 ? 780 : 900,
         conversationId: conversationId || undefined,
@@ -216,6 +249,7 @@ export default function CloudBrowserWorkspace({
       }),
     });
     const payload = await response.json();
+    if (lifecycle !== lifecycleRef.current) return;
     if (!response.ok) {
       setError(payload.error || 'Could not start browser');
       setStatus('Unavailable');
@@ -288,6 +322,12 @@ export default function CloudBrowserWorkspace({
   async function action(payload: Record<string, unknown>): Promise<boolean> {
     if (!session) return false;
     const navigation = payload.type === 'navigate';
+    if (
+      navigation &&
+      typeof payload.url === 'string' &&
+      !payload.url.includes('accounts.google.com')
+    )
+      launchTargetRef.current = payload.url;
     const revision = navigation ? ++navigationRevisionRef.current : navigationRevisionRef.current;
     if (navigation) navigatingRef.current = true;
     try {
@@ -395,6 +435,7 @@ export default function CloudBrowserWorkspace({
   }
 
   async function stop() {
+    lifecycleRef.current += 1;
     if (activeTaskId) {
       await fetch(`/api/admin/dev-studio/tasks/${activeTaskId}/cancel`, { method: 'POST' }).catch(
         () => undefined,
@@ -407,6 +448,7 @@ export default function CloudBrowserWorkspace({
     setDownloads([]);
     setStatus('Stopped');
     setActiveTaskId('');
+    setContinuationTaskId('');
   }
 
   async function runAgent(taskId = '', taskOverride = '') {
@@ -466,6 +508,11 @@ export default function CloudBrowserWorkspace({
             throw new Error('AI browser task identity changed during execution');
           }
           if (event.type === 'status' || event.type === 'step') setStatus(event.message);
+          if (event.type === 'continue') {
+            settled = true;
+            setStatus(event.message);
+            setContinuationTaskId(canonicalTaskId);
+          }
           if (event.type === 'done') {
             settled = true;
             setAgentResult(event.output || `Completed ${event.steps?.length || 0} browser steps.`);
@@ -496,6 +543,16 @@ export default function CloudBrowserWorkspace({
       setAgentRunning(false);
     }
   }
+
+  useEffect(() => {
+    if (!continuationTaskId || agentRunning || !session || continuationTaskId !== activeTaskId)
+      return;
+    const taskId = continuationTaskId;
+    setContinuationTaskId('');
+    void runAgent(taskId);
+    // Resume the same canonical checkpoint; do not create a second task.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [continuationTaskId, agentRunning, session, activeTaskId]);
 
   async function submitBrowserEnter() {
     const submitted = await action({ type: 'keypress', key: 'Enter' });
@@ -565,6 +622,23 @@ export default function CloudBrowserWorkspace({
       async () => {
         const revision = navigationRevisionRef.current;
         const response = await fetch(`${endpoint}/events`, { headers }).catch(() => null);
+        if (response?.status === 410 && !reconnectingRef.current) {
+          reconnectingRef.current = true;
+          const reconnectTarget = target.includes('accounts.google.com')
+            ? launchTargetRef.current
+            : target;
+          setSession(null);
+          setStatus('Reconnecting the existing browser account…');
+          try {
+            await start(reconnectTarget);
+            if (activeTaskId) setContinuationTaskId(activeTaskId);
+          } catch (cause) {
+            setError(cause instanceof Error ? cause.message : 'Browser reconnect failed');
+          } finally {
+            reconnectingRef.current = false;
+          }
+          return;
+        }
         if (response?.ok) {
           const payload = await response.json();
           setEvents(payload.events || []);
@@ -591,7 +665,9 @@ export default function CloudBrowserWorkspace({
       agentRunning ? 1000 : 3000,
     );
     return () => window.clearInterval(timer);
-  }, [agentRunning, endpoint, session]);
+    // Polling reconnects the verified account and exact existing task after worker restart.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [agentRunning, endpoint, session, activeTaskId]);
 
   // Page navigation detaches the view, not the shared provider session.
   // Explicit Stop and the worker TTL own session cleanup.
@@ -601,6 +677,13 @@ export default function CloudBrowserWorkspace({
       <header className="flex flex-wrap items-center gap-2 border-b border-slate-800 bg-slate-900 p-3">
         <Globe2 className="h-5 w-5 text-cyan-300" />
         <strong className="mr-2">Cloud Browser</strong>
+        <button
+          onClick={() => void verifyBrowser()}
+          disabled={checkingBrowser || runtimeReady !== true}
+          className="min-h-12 rounded-lg border border-slate-700 px-3 text-sm"
+        >
+          {checkingBrowser ? 'Checking live browser…' : 'Run browser check'}
+        </button>
         <input
           value={target}
           onChange={(event) => {
@@ -615,7 +698,7 @@ export default function CloudBrowserWorkspace({
         />
         {!session ? (
           <button
-            onClick={start}
+            onClick={() => void start()}
             disabled={runtimeReady !== true || !target.trim()}
             className="rounded-lg bg-cyan-500 px-4 py-2 text-xs font-black text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
           >
@@ -696,6 +779,23 @@ export default function CloudBrowserWorkspace({
             </button>
           ) : null}
         </nav>
+      ) : null}
+      {foundationChecks.length ? (
+        <details open className="border-b border-slate-700 p-3 text-sm">
+          <summary>Live Chromium acceptance</summary>
+          <table className="w-full">
+            <tbody>
+              {foundationChecks.map((check) => (
+                <tr key={check.name}>
+                  <td className="p-2">{check.name.replaceAll('_', ' ')}</td>
+                  <td className="p-2">
+                    {check.passed ? 'PASS' : `FAIL: ${check.reason || 'check failed'}`}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </details>
       ) : null}
       {browserDialog ? (
         <div

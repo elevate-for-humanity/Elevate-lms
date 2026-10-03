@@ -10,6 +10,10 @@ import {
 } from './lib.ts';
 
 const serviceId = process.env.NORTHFLANK_STUDIO_BROWSER_SERVICE_ID || 'elevate-studio-browser';
+const authVolumeId =
+  process.env.NORTHFLANK_STUDIO_BROWSER_AUTH_VOLUME_ID || 'elevate-studio-browser-auth';
+const authVolumeMb = Number(process.env.NORTHFLANK_STUDIO_BROWSER_AUTH_VOLUME_MB || '1024');
+const authStateDir = '/var/lib/studio-browser-auth';
 const branch = process.env.NORTHFLANK_GIT_BRANCH || 'main';
 const execute = process.argv.includes('--execute');
 const projectId = resolveProjectId();
@@ -30,7 +34,40 @@ async function exists() {
 }
 
 const secret = process.env.STUDIO_BROWSER_SECRET || crypto.randomBytes(32).toString('base64url');
-const payload = {
+type NorthflankRecord = Record<string, any>;
+
+function arrayFrom(value: unknown, key?: string): NorthflankRecord[] {
+  if (Array.isArray(value)) return value as NorthflankRecord[];
+  const object = value as NorthflankRecord | null;
+  if (key && Array.isArray(object?.[key])) return object[key] as NorthflankRecord[];
+  if (key && Array.isArray(object?.data?.[key])) return object.data[key] as NorthflankRecord[];
+  if (Array.isArray(object?.data)) return object.data as NorthflankRecord[];
+  return [];
+}
+
+async function ensureAuthVolume(): Promise<string> {
+  const volumes = arrayFrom(
+    await nfFetch<NorthflankRecord>(projectApiPath(projectId!, '/volumes')),
+    'volumes',
+  );
+  let volume = volumes.find(
+    (item) => item.id === authVolumeId || item.name === authVolumeId,
+  );
+  if (!volume) {
+    volume = await nfFetch<NorthflankRecord>(projectApiPath(projectId!, '/volumes'), {
+      method: 'POST',
+      body: JSON.stringify({
+        name: authVolumeId,
+        mounts: [{ volumeMountPath: '', containerMountPath: authStateDir }],
+        spec: { accessMode: 'ReadWriteOnce', storageSize: authVolumeMb },
+      }),
+    });
+  }
+  return String(volume.id || authVolumeId);
+}
+
+function servicePayload(volumeId: string) {
+  return {
   name: serviceId,
   description: 'Isolated Playwright Chromium runtime for canonical Admin Dev Studio',
   billing: { deploymentPlan: 'nf-compute-200' },
@@ -44,6 +81,7 @@ const payload = {
     // browser runtime must stay within that bounded scratch allocation.
     storage: { ephemeralStorage: { storageSize: 2048 } },
   },
+  createOptions: { volumesToAttach: [volumeId] },
   ports: [{ name: 'browser', internalPort: 3100, public: true, protocol: 'HTTP' }],
   buildSource: 'git',
   vcsData: {
@@ -67,6 +105,7 @@ const payload = {
     STUDIO_BROWSER_ALLOWED_DOMAINS: 'elevateforhumanity.org,envato.com,github.com,supabase.com,northflank.com',
     STUDIO_BROWSER_SESSION_TTL_MS: '7200000',
     STUDIO_BROWSER_MAX_SESSIONS: '4',
+    STUDIO_BROWSER_AUTH_STATE_DIR: authStateDir,
   },
   healthChecks: [
     {
@@ -81,12 +120,15 @@ const payload = {
       successThreshold: 1,
     },
   ],
-};
+  };
+}
 
 console.log(
   `${execute ? 'EXECUTE' : 'DRY RUN'}: ${serviceId} from ${branch}, Dockerfile.studio-browser, port 3100`,
 );
 if (!execute) process.exit(0);
+const volumeId = await ensureAuthVolume();
+const payload = servicePayload(volumeId);
 if (await exists()) {
   // Preserve the separate learner-test credential and other configured extensions.
   // Replacing the entire environment would rotate the credential on every deploy.
@@ -95,11 +137,20 @@ if (await exists()) {
     method: 'PATCH',
     body: JSON.stringify(payload),
   });
+  try {
+    await nfFetch(projectApiPath(projectId, `/volumes/${volumeId}/attach`), {
+      method: 'POST',
+      body: JSON.stringify({ nfObject: { id: serviceId, type: 'service' } }),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!/already|attached|conflict/i.test(message)) throw error;
+  }
 } else
   await nfFetch(combinedServiceCreatePath(projectId), {
     method: 'POST',
     body: JSON.stringify(payload),
   });
 console.log(
-  `Studio browser service saved. Configure Admin with STUDIO_BROWSER_URL, STUDIO_BROWSER_PUBLIC_URL, NEXT_PUBLIC_STUDIO_BROWSER_URL and the same STUDIO_BROWSER_SECRET.`,
+  `Studio browser service saved with encrypted provider auth state on ${volumeId}. Configure Admin with STUDIO_BROWSER_URL, STUDIO_BROWSER_PUBLIC_URL, NEXT_PUBLIC_STUDIO_BROWSER_URL and the same STUDIO_BROWSER_SECRET.`,
 );

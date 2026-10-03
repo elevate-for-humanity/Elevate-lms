@@ -178,7 +178,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       const workspaceId = firstRecord(firstRecord(data?.[0]?.licensed_media_entitlements).metadata).workspaceId;
       const acquisition = await requestMediaDependency(this.db, {
         courseId, competencyId: input.competency.id, lessonTitle: input.competency.title,
-        gaps, workspaceUrl: typeof workspaceId === 'string' && /^[a-zA-Z0-9-]+$/.test(workspaceId)
+        gaps, ownerId: input.profile?.mediaAcquisitionOwnerId, workspaceUrl: typeof workspaceId === 'string' && /^[a-zA-Z0-9-]+$/.test(workspaceId)
           ? `https://app.envato.com/workspaces/${workspaceId}` : undefined,
       });
       throw new Error(`ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED:${JSON.stringify({ acquisition, assignments, gaps })}`);

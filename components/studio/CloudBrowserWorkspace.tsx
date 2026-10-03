@@ -1243,7 +1243,7 @@ export default function CloudBrowserWorkspace({
               <input
                 id="studio-secure-input"
                 ref={secureInputRef}
-                type="password"
+                type={secureInputKind === 'password' ? 'password' : 'text'}
                 inputMode={secureInputKind === 'email' ? 'email' : 'text'}
                 autoCapitalize="none"
                 autoCorrect="off"
@@ -1269,7 +1269,8 @@ export default function CloudBrowserWorkspace({
                     if (!input) return;
                     const start = input.selectionStart ?? input.value.length;
                     const end = input.selectionEnd ?? start;
-                    input.setRangeText('@', start, end, 'end');
+                    input.value = input.value.slice(0, start) + '@' + input.value.slice(end);
+                    input.setSelectionRange(start + 1, start + 1);
                     input.focus();
                   }}
                   className="min-h-12 min-w-12 rounded border border-emerald-300 px-4 text-xl"
@@ -1310,6 +1311,9 @@ export default function CloudBrowserWorkspace({
             <div className="flex gap-2">
               <input
                 aria-label="Browser keyboard input"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 value={typedText}
                 onChange={(event) => setTypedText(event.target.value)}
                 className="min-w-0 flex-1 rounded border border-slate-300 bg-slate-50 px-2 py-1.5 text-base"
@@ -1325,6 +1329,9 @@ export default function CloudBrowserWorkspace({
                 Type
               </button>
             </div>
+            <button type="button" aria-label="Insert at sign into browser keyboard input"
+              disabled={!session} onClick={() => setTypedText((value) => value + '@')}
+              className="mt-2 min-h-12 min-w-12 rounded border border-slate-300 px-4 text-xl">@</button>
             <div className="mt-2 flex gap-2">
               {['Enter', 'Tab', 'Escape', 'Backspace'].map((key) => (
                 <button

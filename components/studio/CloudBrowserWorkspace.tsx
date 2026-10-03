@@ -63,6 +63,8 @@ export default function CloudBrowserWorkspace({
   autoRunTask?: boolean;
   acquisitionRunId?: string;
 }) {
+  const dragStartRef = useRef<{ x: number; y: number } | null>(null);
+  const draggedRef = useRef(false);
   const [target, setTarget] = useState(initialTarget);
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
@@ -90,6 +92,7 @@ export default function CloudBrowserWorkspace({
   const [agentRunning, setAgentRunning] = useState(false);
   const [approvalRequested, setApprovalRequested] = useState(false);
   const [authenticationRequired, setAuthenticationRequired] = useState(false);
+  const [interactionRequired, setInteractionRequired] = useState(false);
   const [activeTaskId, setActiveTaskId] = useState('');
   const [approvedTaskId, setApprovedTaskId] = useState('');
   const imageRef = useRef<HTMLImageElement>(null);
@@ -415,6 +418,7 @@ export default function CloudBrowserWorkspace({
     setError('');
     setApprovalRequested(false);
     setAuthenticationRequired(false);
+    setInteractionRequired(false);
     try {
       const response = await fetch('/api/admin/dev-studio/browser/agent', {
         method: 'POST',
@@ -466,6 +470,12 @@ export default function CloudBrowserWorkspace({
             settled = true;
             setAgentResult(event.output || `Completed ${event.steps?.length || 0} browser steps.`);
             setStatus('Connected');
+          }
+          if (event.type === 'interaction_required') {
+            settled = true;
+            setInteractionRequired(true);
+            setStatus('Browser response required');
+            setError(event.message);
           }
           if (event.type === 'authentication_required') {
             settled = true;
@@ -763,10 +773,63 @@ export default function CloudBrowserWorkspace({
                 void action({ type: 'type', text: event.clipboardData.getData('text/plain') });
               }}
               className="h-auto w-full cursor-crosshair select-none bg-white shadow-2xl"
+              onPointerDown={(event) => {
+                const rect = event.currentTarget.getBoundingClientRect();
+                draggedRef.current = false;
+                dragStartRef.current = {
+                  x: Math.round(
+                    ((event.clientX - rect.left) * session.viewport.width) / rect.width,
+                  ),
+                  y: Math.round(
+                    ((event.clientY - rect.top) * session.viewport.height) / rect.height,
+                  ),
+                };
+                event.currentTarget.setPointerCapture(event.pointerId);
+              }}
+              onPointerUp={(event) => {
+                const start = dragStartRef.current;
+                dragStartRef.current = null;
+                if (!start) return;
+                const rect = event.currentTarget.getBoundingClientRect();
+                const end = {
+                  x: Math.round(
+                    ((event.clientX - rect.left) * session.viewport.width) / rect.width,
+                  ),
+                  y: Math.round(
+                    ((event.clientY - rect.top) * session.viewport.height) / rect.height,
+                  ),
+                };
+                if (Math.hypot(end.x - start.x, end.y - start.y) > 5) {
+                  draggedRef.current = true;
+                  void action({ type: 'drag', path: [start, end] });
+                }
+              }}
+              onPointerCancel={() => {
+                dragStartRef.current = null;
+              }}
               onClick={(event) => {
+                if (draggedRef.current) return;
+                const rect = event.currentTarget.getBoundingClientRect();
+                const point = {
+                  x: Math.round(
+                    ((event.clientX - rect.left) * session.viewport.width) / rect.width,
+                  ),
+                  y: Math.round(
+                    ((event.clientY - rect.top) * session.viewport.height) / rect.height,
+                  ),
+                };
+                void action({
+                  type: 'pointer_click',
+                  clickCount: Math.min(2, Math.max(1, event.detail)),
+                  ...point,
+                });
+              }}
+              onContextMenu={(event) => {
+                event.preventDefault();
                 const rect = event.currentTarget.getBoundingClientRect();
                 void action({
                   type: 'click',
+                  button: 'right',
                   x: Math.round(
                     ((event.clientX - rect.left) * session.viewport.width) / rect.width,
                   ),
@@ -892,6 +955,15 @@ export default function CloudBrowserWorkspace({
             >
               {agentRunning ? 'Running approved task…' : 'Run AI browser task'}
             </button>
+            {(authenticationRequired || interactionRequired) && activeTaskId ? (
+              <button
+                onClick={() => runAgent(activeTaskId)}
+                disabled={agentRunning}
+                className="mt-2 min-h-12 w-full rounded bg-emerald-600 px-3 py-2 text-base font-bold"
+              >
+                Resume this browser task
+              </button>
+            ) : null}
             {approvalRequested && (
               <button
                 onClick={approveAndResume}

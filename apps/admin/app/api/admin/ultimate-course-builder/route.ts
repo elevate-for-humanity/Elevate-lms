@@ -12,7 +12,10 @@ export const dynamic = 'force-dynamic';
 
 function databaseFailure(error: unknown, status = 500) {
   logger.error('Ultimate Course Builder database operation failed', error);
-  return NextResponse.json({ error: 'Course Builder operation failed. Check the server audit log.' }, { status });
+  return NextResponse.json(
+    { error: 'Course Builder operation failed. Check the server audit log.' },
+    { status },
+  );
 }
 
 export async function GET(req: NextRequest) {
@@ -21,10 +24,15 @@ export async function GET(req: NextRequest) {
   const db = await requireAdminClient();
   const acquisitionRunId = req.nextUrl.searchParams.get('acquisitionRunId')?.trim();
   if (acquisitionRunId) {
-    const {data:run,error}=await db.from('studio_runs').select('id,command,context,course_id')
-      .eq('id',acquisitionRunId).eq('user_id',auth.id).single();
-    if(error || !run) return NextResponse.json({error:'Media acquisition request not found'},{status:404});
-    return NextResponse.json({acquisition:run});
+    const { data: run, error } = await db
+      .from('studio_runs')
+      .select('id,command,context,course_id')
+      .eq('id', acquisitionRunId)
+      .eq('user_id', auth.id)
+      .single();
+    if (error || !run)
+      return NextResponse.json({ error: 'Media acquisition request not found' }, { status: 404 });
+    return NextResponse.json({ acquisition: run });
   }
   const buildId = req.nextUrl.searchParams.get('buildId')?.trim();
   const courseId = req.nextUrl.searchParams.get('courseId')?.trim();
@@ -35,25 +43,27 @@ export async function GET(req: NextRequest) {
       .select('*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
       .eq('id', buildId)
       .single();
-    return error
-      ? databaseFailure(error)
-      : NextResponse.json({ build: data });
+    return error ? databaseFailure(error) : NextResponse.json({ build: data });
   }
 
   let query = db
     .from('ultimate_course_builds')
-    .select('*')
+    .select('*,ultimate_build_jobs(id,status,last_error,created_at,heartbeat_at)')
     .order('created_at', { ascending: false })
     .limit(50);
   if (courseId) query = query.eq('course_id', courseId);
   const { data, error } = await query;
   if (error) return databaseFailure(error);
-  let acquisitions: Array<{id: string; goal: string | null}> = [];
+  let acquisitions: Array<{ id: string; goal: string | null }> = [];
   if (courseId) {
-    const requests = await db.from('studio_runs').select('id,goal')
-      .eq('course_id', courseId).eq('user_id', auth.id)
-      .contains('context', {acquisition_mode: 'envato-workspace-batch'})
-      .neq('status', 'completed').order('updated_at', {ascending: false});
+    const requests = await db
+      .from('studio_runs')
+      .select('id,goal')
+      .eq('course_id', courseId)
+      .eq('user_id', auth.id)
+      .contains('context', { acquisition_mode: 'envato-workspace-batch' })
+      .neq('status', 'completed')
+      .order('updated_at', { ascending: false });
     if (requests.error) return databaseFailure(requests.error);
     acquisitions = requests.data ?? [];
   }
@@ -153,9 +163,7 @@ export async function POST(req: NextRequest) {
       })
       .select('*')
       .single();
-    return error
-      ? databaseFailure(error)
-      : NextResponse.json({ ok: true, build: data });
+    return error ? databaseFailure(error) : NextResponse.json({ ok: true, build: data });
   }
 
   if (body.action === 'status') {
@@ -164,9 +172,7 @@ export async function POST(req: NextRequest) {
       .select('*')
       .eq('id', body.buildId)
       .single();
-    return error
-      ? databaseFailure(error)
-      : NextResponse.json({ ok: true, build: data });
+    return error ? databaseFailure(error) : NextResponse.json({ ok: true, build: data });
   }
 
   if (body.action === 'queue-course') {

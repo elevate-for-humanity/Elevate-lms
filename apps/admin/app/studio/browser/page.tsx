@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 const CloudBrowserWorkspace = dynamic(() => import('@/components/studio/CloudBrowserWorkspace'), {
   ssr: false,
   loading: () => (
-    <div className="flex h-full items-center justify-center text-slate-400">
+    <div className="flex h-full items-center justify-center text-slate-600">
       Connecting cloud browser…
     </div>
   ),
@@ -49,11 +49,11 @@ export default function StudioBrowserPage() {
   return (
     <main
       style={viewportStyle}
-      className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-slate-950"
+      className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white"
     >
       <Link
         href="/studio"
-        className="flex min-h-11 shrink-0 items-center px-4 text-base font-semibold text-white lg:hidden"
+        className="flex min-h-11 shrink-0 items-center px-4 text-base font-semibold text-slate-950 lg:hidden"
       >
         Back to Studio chat
       </Link>
@@ -63,7 +63,7 @@ export default function StudioBrowserPage() {
         </p>
       )}
       {request && (
-        <details className="max-h-[25vh] shrink-0 overflow-auto p-3 text-base text-white">
+        <details className="max-h-[25vh] shrink-0 overflow-auto p-3 text-base text-slate-950">
           <summary className="font-semibold">
             Required scenes for this lesson ({request.context.media_gaps.length})
           </summary>

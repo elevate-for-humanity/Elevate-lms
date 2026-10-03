@@ -743,7 +743,7 @@ export default function CloudBrowserWorkspace({
 
   return (
     <div ref={workspaceRef} className="flex h-full min-h-0 flex-col bg-white text-lg leading-7 text-slate-950">
-      <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white p-2">
+      <div className={`${mobilePane === 'tools' ? 'hidden lg:flex' : 'flex'} shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white p-2`}>
         <strong className="flex-1 text-lg">Studio browser</strong>
         <button type="button" onClick={() => void openSignIn()} aria-pressed={signInView}
           className="min-h-12 rounded-lg bg-emerald-700 px-4 text-lg font-bold text-white">
@@ -757,7 +757,7 @@ export default function CloudBrowserWorkspace({
           className="min-h-12 rounded-lg border border-slate-300 px-3 text-base">Exit sign-in view</button> : null}
       </div>
       {session ? (
-        <div role="toolbar" aria-label="Browser view controls" className="flex shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-2 py-1">
+        <div role="toolbar" aria-label="Browser view controls" className={`${mobilePane === 'tools' ? 'hidden lg:flex' : 'flex'} shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-2 py-1`}>
           <button type="button" aria-label="Zoom browser out" disabled={imageZoom <= 0.25}
             onClick={() => setImageZoom((zoom) => Math.max(0.25, zoom > 1 ? zoom - 0.5 : zoom - 0.25))}
             className="min-h-11 min-w-11 rounded border border-slate-300 text-xl disabled:opacity-40">−</button>

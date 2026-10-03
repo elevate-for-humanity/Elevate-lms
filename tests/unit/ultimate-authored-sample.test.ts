@@ -3,15 +3,51 @@ import blueprint from '../../docs/ultimate-course-builder/lessons/cosmetology-we
 import { UltimatePlatformInstructionalGenerator } from '../../lib/ultimate-course-builder/adapters/platform-instructional-generator';
 
 describe('existing authored cosmetology sample', () => {
+  it('fills omitted teaching visuals from the same narration in the production storyboard path', async () => {
+    const legacy = {
+      ...blueprint,
+      segments: blueprint.segments.map(({ teachingVisual, ...segment }) => segment),
+    };
+    const input = {
+      competency: {
+        id: blueprint.competencyId,
+        title: 'Welcome',
+        authorityRequirementIds: [],
+        requiresPracticalEvidence: false,
+      },
+      profile: {
+        authority: 'course-defined',
+        lessonBlueprints: { [blueprint.competencyId]: legacy },
+      },
+    };
+    const board = await new UltimatePlatformInstructionalGenerator().storyboard(input);
+    for (const [index, scene] of board.scenes.entries()) {
+      expect(scene.teachingVisual.steps.map((s) => s.value).join(' ')).toBe(
+        legacy.segments[index].text,
+      );
+    }
+  });
   it('preserves the complete authored script and every visual requirement', async () => {
     const generator = new UltimatePlatformInstructionalGenerator();
-    const competency = { id: blueprint.competencyId, title: 'Welcome to Cosmetology Apprenticeship', authorityRequirementIds: [], requiresPracticalEvidence: false };
-    const input = { competency, profile: { authority: 'course-defined', lessonBlueprints: { [competency.id]: blueprint } } };
+    const competency = {
+      id: blueprint.competencyId,
+      title: 'Welcome to Cosmetology Apprenticeship',
+      authorityRequirementIds: [],
+      requiresPracticalEvidence: false,
+    };
+    const input = {
+      competency,
+      profile: { authority: 'course-defined', lessonBlueprints: { [competency.id]: blueprint } },
+    };
     const script = await generator.instructorScript(input);
     const storyboard = await generator.storyboard(input);
     expect(script.segments).toEqual(blueprint.segments);
     expect(storyboard.scenes).toHaveLength(13);
-    expect(storyboard.scenes.map(scene => scene.dialogue)).toEqual(blueprint.segments.map(segment => segment.text));
-    expect(storyboard.scenes.map(scene => scene.visualRequirement)).toEqual(blueprint.segments.map(segment => segment.visualRequirement));
+    expect(storyboard.scenes.map((scene) => scene.dialogue)).toEqual(
+      blueprint.segments.map((segment) => segment.text),
+    );
+    expect(storyboard.scenes.map((scene) => scene.visualRequirement)).toEqual(
+      blueprint.segments.map((segment) => segment.visualRequirement),
+    );
   });
 });

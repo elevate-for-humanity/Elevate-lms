@@ -3,6 +3,7 @@ import type { UltimateCompetency, UltimateCredentialProfile } from '../core/type
 import { validateLessonBlueprint, type LessonBlueprint } from '../instructional/lesson-blueprint';
 import { contractHash, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/lesson-contract';
 import { ULTIMATE_TEACHING_SEQUENCE } from '../instructional/teaching-sequence';
+import { produceTeachingVisual } from '../instructional/teaching-visual';
 
 type Evidence = {
   profile: UltimateCredentialProfile & {
@@ -177,7 +178,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
         sourceRequirementIds: s.sourceRequirementIds,
         visualRequirement: s.visualRequirement,
         sceneType: s.sceneType,
-        teachingVisual: s.teachingVisual,
+        teachingVisual: s.teachingVisual ?? produceTeachingVisual(s.text, s.stage),
       })),
     };
   }

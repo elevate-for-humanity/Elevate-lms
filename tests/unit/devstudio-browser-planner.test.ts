@@ -6,6 +6,7 @@ vi.mock('@/lib/ai/ai-service', () => ({ aiChat: aiChatMock }));
 
 import {
   browserActionRecords,
+  browserTurnRequiresAuthentication,
   browserTaskMatches,
   planBrowserTurn,
   validateBrowserTurn,
@@ -113,6 +114,22 @@ describe('provider-neutral browser planner validation', () => {
     expect(browserTaskMatches(task, { command: 'inspect', sessionId: 'session-1' })).toBe(true);
     expect(browserTaskMatches(task, { command: 'inspect', sessionId: 'session-2' })).toBe(false);
     expect(browserTaskMatches(task, { command: 'change it', sessionId: 'session-1' })).toBe(false);
+  });
+
+  it('distinguishes a resumable authentication handoff from a terminal browser block', () => {
+    expect(
+      browserTurnRequiresAuthentication({
+        status: 'blocked',
+        summary: 'Sign in is visible.',
+        reason: 'Authentication is required before licensed files can be inspected.',
+      }),
+    ).toBe(true);
+    expect(
+      browserTurnRequiresAuthentication({
+        status: 'blocked',
+        summary: 'The requested purchase is outside the approved scope.',
+      }),
+    ).toBe(false);
   });
 
   it('repairs malformed provider JSON once, revalidates it, and accounts for both calls', async () => {

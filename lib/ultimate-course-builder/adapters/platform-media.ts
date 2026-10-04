@@ -33,6 +33,25 @@ export function observedLicenseEvidence(entitlement: RecordLike): string | undef
   return undefined;
 }
 
+export function canAutoApproveLicensedMediaMatch(match: RecordLike, courseId: string): boolean {
+  if (String(match.status ?? '') !== 'suggested') return false;
+  if (!(Number(match.match_score ?? 0) > 0)) return false;
+  if (!Array.isArray(match.match_reasons) || match.match_reasons.length === 0) return false;
+  const entitlement = firstRecord(match.licensed_media_entitlements);
+  if (String(entitlement.provider ?? '') !== 'envato') return false;
+  const metadata = firstRecord(entitlement.metadata);
+  if (!licensedMediaBelongsToCourse(metadata, courseId)) return false;
+  if (!observedLicenseEvidence(entitlement)) return false;
+  const stored = Boolean(storedLicensedMediaMetadata(metadata));
+  const retrievableWorkspaceAsset =
+    (typeof metadata.assetUrl === 'string' || typeof metadata.asset_url === 'string') &&
+    String(metadata.assetUrl ?? metadata.asset_url).trim().startsWith('https://') &&
+    (metadata.licenseObserved === true ||
+      String(metadata.licenseVerificationStatus ?? '').startsWith('license_observed') ||
+      String(metadata.licenseVerificationStatus ?? '') === 'verified_item_detail_banner');
+  return stored || retrievableWorkspaceAsset;
+}
+
 export class UltimatePlatformMedia implements UltimateMediaPort {
   constructor(private db: SupabaseClient) {}
 
@@ -222,9 +241,9 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
 
     const { data: matches, error } = await this.db
       .from('course_lesson_media_matches')
-      .select('id,lesson_id,status,entitlement_id,match_score,licensed_media_entitlements!inner(provider,provider_item_id,item_url,metadata)')
+      .select('id,lesson_id,status,entitlement_id,match_score,match_reasons,licensed_media_entitlements!inner(provider,provider_item_id,item_url,license_document_url,metadata)')
       .eq('course_id', courseId)
-      .in('status', ['approved']);
+      .in('status', ['suggested', 'approved']);
     if (error) throw error;
 
     let attached = 0;
@@ -246,9 +265,30 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
           String(metadata.licenseVerificationStatus ?? '') === 'verified_item_detail_banner');
       return stored || retrievableWorkspaceAsset;
     });
-    const selectedMatches = selectApprovedAcquisitionMatches(usableMatches);
+    const eligibleMatches = usableMatches.filter(
+      (match: RecordLike) =>
+        String(match.status ?? '') === 'approved' ||
+        canAutoApproveLicensedMediaMatch(match, courseId),
+    );
+    const selectedMatches = selectApprovedAcquisitionMatches(eligibleMatches);
     const acquiredEntitlements = new Set<string>();
     for (const match of selectedMatches) {
+      if (String(match.status ?? '') === 'suggested') {
+        const approvedBy =
+          course?.created_by ?? input.profile?.mediaAcquisitionOwnerId ?? null;
+        const { error: approveError } = await this.db
+          .from('course_lesson_media_matches')
+          .update({
+            status: 'approved',
+            approved_by: approvedBy,
+            approved_at: new Date().toISOString(),
+            failure_reason: null,
+          })
+          .eq('id', match.id)
+          .eq('status', 'suggested');
+        if (approveError) throw approveError;
+        match.status = 'approved';
+      }
       const entitlement = firstRecord(match.licensed_media_entitlements);
       const entitlementId = String(match.entitlement_id);
       if (!storedLicensedMediaMetadata(entitlement.metadata) && !acquiredEntitlements.has(entitlementId)) {

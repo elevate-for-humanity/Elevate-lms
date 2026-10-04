@@ -8,7 +8,6 @@ import {
   attachStoredLicensedMedia,
   recommendLicensedMediaForCourse,
 } from '@/lib/course-builder/licensed-media';
-import { queueCourseMedia } from '@/lib/course-builder/orchestrator';
 import { upsertEnvatoWorkspaceManifest, type EnvatoWorkspaceManifestItem } from '@/lib/course-builder/envato-workspace';
 import { resumeMediaDependency } from '@/lib/ultimate-course-builder/worker/resume-media-dependency';
 
@@ -185,26 +184,15 @@ const _POST = withAuth(
           actorId: user.id,
         });
         const resumed = await resumeMediaDependency(db,input.courseId,[input.lessonId]);
-        if (resumed.length) return NextResponse.json({ok:true,video,ultimateJobs:resumed});
-        const { error: lessonError } = await db
-          .from('course_lessons')
-          .update({
-            media_origin: 'uploaded',
-            media_quality_status: 'pending',
-            video_status: 'queued',
-            video_error: null,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', input.lessonId)
-          .eq('course_id', input.courseId);
-        if (lessonError) throw lessonError;
-        const queued = await queueCourseMedia({
-          courseId: input.courseId,
-          lessonId: input.lessonId,
-          onlyMissing: false,
-          force: true,
+        // Importing source footage must never start the archived media queue or
+        // label an unqueued learner video as queued. Only the Ultimate builder
+        // owns rendering, scene verification and publication.
+        return NextResponse.json({
+          ok: true,
+          video,
+          ultimateJobs: resumed,
+          buildResumeStatus: resumed.length ? 'queued' : 'not_queued',
         });
-        return NextResponse.json({ ok: true, video, queued });
       }
       return NextResponse.json({ error: 'Unsupported action' }, { status: 400 });
     } catch (error) {

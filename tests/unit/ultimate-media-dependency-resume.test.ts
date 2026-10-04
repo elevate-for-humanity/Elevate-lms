@@ -16,6 +16,7 @@ function database(
     licensed?: boolean;
     attached?: boolean;
     wrongEntitlement?: boolean;
+    published?: boolean;
   } = {},
 ) {
   const filters: Array<[string, string, unknown]> = [];
@@ -43,7 +44,7 @@ function database(
               entitlement_id: options.wrongEntitlement ? 'other-license' : 'license',
             },
           ],
-    ultimate_course_builds: [{ id: 'existing-build' }],
+    ultimate_course_builds: [{ id: 'existing-build', status: options.published ? 'published' : 'running' }],
   };
   const sign = vi
     .fn()
@@ -63,6 +64,14 @@ function database(
         in: () => query,
         not: () => query,
         neq: () => query,
+        order: (column: string, value: unknown) => {
+          filters.push([table, column, value]);
+          return query;
+        },
+        limit: (value: number) => {
+          filters.push([table, 'limit', value]);
+          return query;
+        },
         then: (resolve: any) =>
           Promise.resolve({ data: rows[table] ?? [], error: null }).then(resolve),
       };
@@ -84,6 +93,8 @@ it('resumes existing builds for a licensed stored clip linked through its attach
   });
   expect(filters).toContainEqual(['course_lesson_media_matches', 'status', 'attached']);
   expect(filters).toContainEqual(['course_videos', 'course_id', 'course']);
+  expect(filters).toContainEqual(['ultimate_course_builds', 'created_at', { ascending: false }]);
+  expect(filters).toContainEqual(['ultimate_course_builds', 'limit', 1]);
 });
 
 it.each([{ missing: true }, { licensed: false }, { attached: false }, { wrongEntitlement: true }])(
@@ -99,6 +110,12 @@ it('does not resume from an empty intended lesson list', async () => {
   const { db, sign } = database();
   expect(await resumeMediaDependency(db, 'course', [])).toEqual([]);
   expect(sign).not.toHaveBeenCalled();
+  expect(enqueue).not.toHaveBeenCalled();
+});
+
+it('does not revive historical attempts when the current build is already published', async () => {
+  const { db } = database({ published: true });
+  expect(await resumeMediaDependency(db, 'course', ['lesson'])).toEqual([]);
   expect(enqueue).not.toHaveBeenCalled();
 });
 

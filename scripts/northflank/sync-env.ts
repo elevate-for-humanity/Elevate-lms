@@ -44,7 +44,7 @@ const STATIC_ENV: Record<string, string> = {
   // the canonical managed TTS route; edge/espeak remain diagnostics only.
   AI_NARRATION_PROVIDER: 'cloudflare',
   COURSE_VIDEO_STORAGE_BACKEND: 'auto',
-  COURSE_VIDEO_R2_MIN_BYTES: '5242880',
+  COURSE_VIDEO_OBJECT_MIN_BYTES: '5242880',
   REMOTION_RELEASE_BUNDLE_AFTER_RENDER: 'true',
 };
 

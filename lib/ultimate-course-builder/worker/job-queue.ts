@@ -26,6 +26,10 @@ export class UltimateJobQueue {
       if (concurrent) return concurrent;
     }
     if (error) throw error;
+    const { error: buildError } = await this.db.from('ultimate_course_builds')
+      .update({ status: 'queued', updated_at: new Date().toISOString() })
+      .eq('id', buildId);
+    if (buildError) throw buildError;
     return data;
   }
 
@@ -93,7 +97,7 @@ export class UltimateJobQueue {
   async fail(jobId: string, workerId: string, errorMessage: string, retry = true) {
     const { data, error } = await this.db
       .from('ultimate_build_jobs')
-      .select('attempts,max_attempts')
+      .select('attempts,max_attempts,build_id')
       .eq('id', jobId)
       .eq('lease_owner', workerId)
       .single();
@@ -116,5 +120,12 @@ export class UltimateJobQueue {
       .eq('id', jobId)
       .eq('lease_owner', workerId);
     if (updateError) throw updateError;
+    if (!canRetry) {
+      // A terminal job cannot leave a course advertising active execution.
+      const { error: buildError } = await this.db.from('ultimate_course_builds')
+        .update({ status: 'blocked', current_step: 'selective_repair', updated_at: new Date().toISOString() })
+        .eq('id', data.build_id);
+      if (buildError) throw buildError;
+    }
   }
 }

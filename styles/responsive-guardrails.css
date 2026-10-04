@@ -1,11 +1,4 @@
-/*
- * Platform-wide responsive safety layer.
- *
- * Component styles remain responsible for their intended layout. These rules
- * provide the invariants every surface needs so long labels, database values,
- * tables, forms, and media cannot make a page wider than the device viewport.
- */
-
+/* Platform-wide overflow safety. Component layouts still own media dimensions. */
 html {
   min-width: 0;
   max-width: 100%;
@@ -13,173 +6,74 @@ html {
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
 }
+body, main, [data-public-layout-root], [data-marketing-main] { min-width: 0; max-width: 100%; }
+body { overflow-x: clip; }
+:where(main, header, footer, nav, section, article, aside, form, fieldset, div) { min-width: 0; }
+:where(img, video, canvas, svg, iframe) { max-width: 100%; }
+:where(input, select, textarea, button) { max-width: 100%; font: inherit; }
+:where(p, li, dd, dt, label, legend, h1, h2, h3, h4, h5, h6, a, button, th, td) { overflow-wrap: anywhere; word-break: normal; }
+:where(pre, code) { max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; }
+:where([role='dialog'], [role='menu'], [role='listbox']) { max-width: calc(100vw - 1rem); }
 
-body,
-main,
-[data-public-layout-root],
-[data-marketing-main] {
-  min-width: 0;
-  max-width: 100%;
-}
-
-body {
-  overflow-x: clip;
-}
-
-:where(main, header, footer, nav, section, article, aside, form, fieldset, div) {
-  min-width: 0;
-}
-
-:where(img, video, canvas, svg, iframe) {
-  max-width: 100%;
-}
-
-:where(input, select, textarea, button) {
-  max-width: 100%;
-  font: inherit;
-}
-
-:where(p, li, dd, dt, label, legend, h1, h2, h3, h4, h5, h6, a, button, th, td) {
-  overflow-wrap: anywhere;
-  word-break: normal;
-}
-
-:where(pre, code) {
-  max-width: 100%;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-:where([role='dialog'], [role='menu'], [role='listbox']) {
-  max-width: calc(100vw - 1rem);
-}
+/* Native details remain readable without JavaScript. MobileDisclosure enhances
+   their initial open state after hydration without hiding or deleting content. */
+.mobile-reading-details > summary { min-height: 44px; cursor: pointer; list-style: none; }
+.mobile-reading-details > summary::-webkit-details-marker { display: none; }
+.mobile-reading-details[open] > summary .mobile-reading-chevron { transform: rotate(180deg); }
+.mobile-reading-chevron { transition: transform 160ms ease; }
+.mobile-reading-details > summary:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) { .mobile-reading-chevron { transition: none; } }
 
 @media (max-width: 767px) {
-  :where(main) {
-    width: 100%;
-  }
-
-  :where(main) h1 {
-    font-size: clamp(1.75rem, 8vw, 2.25rem);
-    line-height: 1.12;
-  }
-
-  :where(main) h2 {
-    font-size: clamp(1.4rem, 6.5vw, 1.875rem);
-    line-height: 1.2;
-  }
-
-  :where(main) h3 {
-    font-size: clamp(1.15rem, 5vw, 1.5rem);
-    line-height: 1.25;
-  }
-
-  :where(main) table {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    overflow-x: auto;
-    overscroll-behavior-inline: contain;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  :where(main) th,
-  :where(main) td {
-    padding-inline: 0.75rem;
-  }
-
-  :where(main) input:not([type='checkbox']):not([type='radio']),
-  :where(main) select,
-  :where(main) textarea {
-    width: 100%;
-    min-height: 44px;
-  }
-
+  :where(main) { width: 100%; }
+  :where(main) h1 { font-size: clamp(1.75rem, 8vw, 2.25rem); line-height: 1.12; }
+  :where(main) h2 { font-size: clamp(1.4rem, 6.5vw, 1.875rem); line-height: 1.2; }
+  :where(main) h3 { font-size: clamp(1.15rem, 5vw, 1.5rem); line-height: 1.25; }
+  :where(main) table { display: block; width: 100%; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; }
+  :where(main) th, :where(main) td { padding-inline: 0.75rem; }
+  :where(main) input:not([type='checkbox']):not([type='radio']), :where(main) select, :where(main) textarea { width: 100%; min-height: 44px; }
   :where(.admin-portal, .lms-portal) main [class*='grid-cols-2'],
   :where(.admin-portal, .lms-portal) main [class*='grid-cols-3'],
   :where(.admin-portal, .lms-portal) main [class*='grid-cols-4'],
   :where(.admin-portal, .lms-portal) main [class*='grid-cols-5'],
   :where(.admin-portal, .lms-portal) main [class*='grid-cols-6'],
   :where(.admin-portal, .lms-portal) main [class*='grid-cols-7'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-8'] {
-    grid-template-columns: minmax(0, 1fr);
-  }
+  :where(.admin-portal, .lms-portal) main [class*='grid-cols-8'] { grid-template-columns: minmax(0, 1fr); }
+  :where(.admin-portal, .lms-portal) main [class*='min-w-['] { min-width: 0; }
+  :where(.admin-portal, .lms-portal) main [class*='w-['] { max-width: 100%; }
+  .admin-portal :where(main) { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
 
-  :where(.admin-portal, .lms-portal) main [class*='min-w-['] {
-    min-width: 0;
-  }
+  /* Public-site scope excludes operational and standalone brand routes.
+     Do not overwrite Next Image fill or object-cover video with auto heights. */
+  [data-marketing-main] :where(section, article, aside, form) { max-width: 100%; }
+  [data-marketing-main] :where([class*='w-['], [class*='min-w-[']) { max-width: 100%; min-width: 0; }
+  [data-marketing-main] :where(img, video, iframe, canvas) { max-width: 100%; }
+  [data-marketing-main] img[data-nimg='fill'] { width: 100%; height: 100%; }
+  [data-marketing-main] video.object-cover { width: 100%; height: 100%; }
+  [data-marketing-main] :where(.flex) { min-width: 0; }
+  [data-marketing-main] :where(a, button, summary) { touch-action: manipulation; }
+  [data-marketing-main] :where(a[class*='px-'], button[class*='px-'], summary) { min-height: 44px; }
 
-  :where(.admin-portal, .lms-portal) main [class*='w-['] {
-    max-width: 100%;
-  }
+  /* Target only unprefixed desktop-first grids. A substring match also catches
+     sm:/md: utilities and incorrectly destroys deliberate responsive layouts. */
+  [data-marketing-main] :where(.grid-cols-2, .grid-cols-3, .grid-cols-4, .grid-cols-5, .grid-cols-6):not([data-mobile-columns]) { grid-template-columns: minmax(0, 1fr); }
 
-  .admin-portal :where(main) {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  }
+  #main-content[data-marketing-main] :where(h1) { font-size: clamp(1.75rem, 7.6vw, 2.25rem); line-height: 1.15; text-wrap: balance; }
+  #main-content[data-marketing-main] :where(h2) { font-size: clamp(1.35rem, 6vw, 1.75rem); line-height: 1.22; text-wrap: balance; }
+  #main-content[data-marketing-main] :where(h3) { font-size: clamp(1.05rem, 4.6vw, 1.3rem); line-height: 1.3; text-wrap: balance; }
+  #main-content[data-marketing-main] :where(p.text-lg, p.text-xl, p.text-2xl) { font-size: 1rem; line-height: 1.65; }
+  #main-content[data-marketing-main] :where(p, li) { text-wrap: pretty; }
+  [data-marketing-main] main > :where(section.py-12, section.py-14, section.py-16, section.py-20, section.py-24) { padding-block: 1.75rem; }
+  [data-marketing-main] :where(article.p-7, article.p-8, article.p-10) { padding: 1.25rem; }
 }
 
+@media (max-width: 390px) {
+  main :where([class*='px-8'], [class*='px-10'], [class*='px-12']) { padding-left: 1rem; padding-right: 1rem; }
+  main :where([class*='gap-8'], [class*='gap-10'], [class*='gap-12']) { gap: 1.25rem; }
+}
 @media (min-width: 768px) and (max-width: 1100px) {
   :where(.admin-portal, .lms-portal) main [class*='grid-cols-5'],
   :where(.admin-portal, .lms-portal) main [class*='grid-cols-6'],
   :where(.admin-portal, .lms-portal) main [class*='grid-cols-7'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-8'] {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-
-/* Public marketing mobile hardening.
- * Preserve deliberate horizontal scrollers, but prevent desktop-first grids,
- * fixed widths, media, and CTA rows from escaping a phone viewport. */
-@media (max-width: 767px) {
-  body {
-    width: 100%;
-    min-width: 0;
-  }
-
-  main :where(section, article, aside, form) {
-    max-width: 100%;
-  }
-
-  main :where([class*='max-w-']) {
-    width: 100%;
-  }
-
-  main :where([class*='grid-cols-2'], [class*='grid-cols-3'], [class*='grid-cols-4'], [class*='grid-cols-5'], [class*='grid-cols-6']) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  main :where([class*='w-['], [class*='min-w-[']) {
-    max-width: 100%;
-    min-width: 0;
-  }
-
-  main :where(img, video, iframe, canvas) {
-    width: auto;
-    max-width: 100%;
-    height: auto;
-  }
-
-  main :where(.flex) {
-    min-width: 0;
-  }
-
-  main :where(a, button) {
-    touch-action: manipulation;
-  }
-
-  main :where(a[class*='px-'], button[class*='px-']) {
-    min-height: 44px;
-  }
-}
-
-@media (max-width: 390px) {
-  main :where([class*='px-8'], [class*='px-10'], [class*='px-12']) {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  main :where([class*='gap-8'], [class*='gap-10'], [class*='gap-12']) {
-    gap: 1.25rem;
-  }
+  :where(.admin-portal, .lms-portal) main [class*='grid-cols-8'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

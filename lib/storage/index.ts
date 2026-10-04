@@ -2,7 +2,7 @@
  * Storage Module - Barrel Export
  * 
  * Central export point for all storage utilities.
- * Supabase Storage and provider-neutral S3-compatible object storage are supported.
+ * Supabase Storage and Elevate-owned S3-compatible Elevate Media Storage are supported.
  */
 
 // Supabase Storage - Course Assets
@@ -27,24 +27,24 @@ export {
   getPublicFallbackUrl,
 } from './file-storage';
 
-// Provider-neutral S3-compatible object storage
+// Provider-neutral S3-compatible Elevate Media Storage
 export {
-  getObjectStorageConfig,
-  getObjectStorageClient,
-  getObjectStoragePublicUrl,
-  getObjectStorageRuntimeSummary,
-  isObjectStorageConfigured,
-  isObjectStoragePublicDeliveryConfigured,
-  uploadToObjectStorage,
-  uploadFromUrlToObjectStorage,
-  deleteFromObjectStorage,
-  getSignedObjectUrl,
-  listObjectStorageKeys,
+  getElevateMediaStorageConfig,
+  getElevateMediaStorageClient,
+  getElevateMediaPublicUrl,
+  getElevateMediaRuntimeSummary,
+  isElevateMediaStorageConfigured,
+  isElevateMediaPublicDeliveryConfigured,
+  uploadToElevateMedia,
+  uploadFromUrlToElevateMedia,
+  deleteFromElevateMedia,
+  getSignedElevateMediaUrl,
+  listElevateMediaKeys,
   getContentType,
-  type ObjectStorageConfig,
-  type ObjectStorageProvider,
-  type ObjectUploadResult,
-} from './object-storage';
+  type ElevateMediaStorageConfig,
+  type ElevateMediaProvider,
+  type ElevateMediaUploadResult,
+} from './elevate-media-storage';
 
 // Legacy R2 names remain available while callers migrate.
 export {

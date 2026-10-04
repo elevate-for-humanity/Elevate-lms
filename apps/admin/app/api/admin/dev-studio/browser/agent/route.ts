@@ -5,6 +5,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { createAiTask } from '@/lib/devstudio/os/task-runner';
 import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
 import { runWithPaidInferenceContext } from '@/lib/ai/paid-inference-context';
+import { findAcquisitionBrowserCheckpoint } from '@/lib/devstudio/browser-acquisition-checkpoint';
 import {
   browserActionRecords,
   browserTurnRequiresAuthentication,
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
   const command = String(body.task || '').trim();
   const sessionId = String(body.sessionId || '');
   const sessionToken = String(body.sessionToken || '');
-  const requestedTaskId = String(body.taskId || '');
+  let requestedTaskId = String(body.taskId || '');
   const conversationId = String(body.conversationId || '').trim();
   const acquisitionRunId = String(body.acquisitionRunId || '').trim();
   if (!command || !sessionId || !sessionToken) {
@@ -92,6 +93,12 @@ export async function POST(req: NextRequest) {
   }
   const tenantId = await resolveTenantIdForUser(auth.id).catch(() => null);
   let task: Record<string, any> | null = null;
+  let runningRecently = false;
+
+  if (!requestedTaskId && acquisitionRunId) {
+    const saved = await findAcquisitionBrowserCheckpoint(db, auth.id, acquisitionRunId, command);
+    requestedTaskId = String(saved?.id ?? '');
+  }
 
   if (requestedTaskId) {
     const { data } = await db
@@ -102,6 +109,8 @@ export async function POST(req: NextRequest) {
       .eq('tool_name', 'browser.execute')
       .maybeSingle();
     task = data;
+    runningRecently = task?.status === 'running' &&
+      Date.now() - Date.parse(String(task.updated_at ?? '')) < 150_000;
     // A restarted worker has a new ephemeral session ID. Rebind only after
     // proving both the task and live browser belong to the same administrator
     // and the exact original command remains unchanged.
@@ -113,17 +122,18 @@ export async function POST(req: NextRequest) {
       (!acquisitionRunId || task.studio_run_id === acquisitionRunId)
     ) {
       const toolInput = { ...task.tool_input, sessionId };
-      const { error: rebindError } = await db
+      const { data: rebound, error: rebindError } = await db
         .from('ai_tasks')
-        .update({ tool_input: toolInput })
+        .update({ tool_input: toolInput, updated_at: new Date().toISOString() })
         .eq('id', requestedTaskId)
-        .eq('requested_by', auth.id);
+        .eq('requested_by', auth.id)
+        .select('*').single();
       if (rebindError)
         return NextResponse.json(
           { error: 'Could not reconnect the browser checkpoint' },
           { status: 503 },
         );
-      task = { ...task, tool_input: toolInput };
+      task = rebound;
     }
     if (
       !browserTaskMatches(task, { command, sessionId }) ||
@@ -161,6 +171,10 @@ export async function POST(req: NextRequest) {
   }
 
   if (!task) return NextResponse.json({ error: 'Could not create browser task' }, { status: 503 });
+  if (runningRecently) {
+    return NextResponse.json({ error: 'This browser task is already running. Resume its checkpoint when the current request finishes.',
+      taskId: task.id, running: true }, { status: 409 });
+  }
   if (task.status === 'cancelled') {
     return NextResponse.json(
       { error: 'This browser task was cancelled', taskId: task.id },
@@ -257,6 +271,21 @@ export async function POST(req: NextRequest) {
     );
   };
 
+  // A page reload or second tab must not execute the same checkpoint twice.
+  let claim = db.from('ai_tasks').update({
+    status: 'running', started_at: task.started_at || new Date().toISOString(),
+    attempts: Number(task.attempts ?? 0) + 1, completed_at: null,
+    error_message: null, updated_at: new Date().toISOString(),
+  }).eq('id', taskId).eq('requested_by', auth.id);
+  claim = task.updated_at ? claim.eq('updated_at', task.updated_at) : claim.is('updated_at', null);
+  const { data: claimed, error: claimError } = await claim.select('id').maybeSingle();
+  if (claimError) return NextResponse.json({
+    error: 'Could not claim the browser checkpoint.',
+  }, { status: 503 });
+  if (!claimed) return NextResponse.json({
+    error: 'This browser checkpoint is being used by another request.', taskId, running: true,
+  }, { status: 409 });
+
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     start(controller) {
@@ -271,13 +300,6 @@ export async function POST(req: NextRequest) {
           : [];
         let totalTokens = Number(task.result_json?.usage?.totalTokens || 0);
         try {
-          await updateTask({
-            status: 'running',
-            started_at: task.started_at || new Date().toISOString(),
-            attempts: Number(task.attempts ?? 0) + 1,
-            completed_at: null,
-            error_message: null,
-          });
           await db
             .from('ai_task_steps')
             .update({ status: 'completed', completed_at: new Date().toISOString() })

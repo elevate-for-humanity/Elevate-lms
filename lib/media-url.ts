@@ -8,7 +8,6 @@
 const ELEVATE_MEDIA_PUBLIC_URL = (
   process.env.NEXT_PUBLIC_ELEVATE_MEDIA_URL ||
   process.env.ELEVATE_MEDIA_PUBLIC_URL ||
-  process.env.NEXT_PUBLIC_OBJECT_STORAGE_URL ||
   process.env.ELEVATE_MEDIA_PUBLIC_URL ||
   process.env.NEXT_PUBLIC_R2_URL ||
   process.env.CLOUDFLARE_R2_PUBLIC_URL ||

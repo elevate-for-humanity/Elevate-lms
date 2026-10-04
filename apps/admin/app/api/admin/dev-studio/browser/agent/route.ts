@@ -347,7 +347,7 @@ export async function POST(req: NextRequest) {
               error?: string;
             };
             if (!snapshotResponse.ok && snapshot.error === 'human_verification_required') {
-              const reason = 'Envato is asking you to verify you are human in the existing Studio browser. Complete the verification, then resume this same media task.';
+              const reason = 'The website is asking you to verify you are human in the existing Studio browser. Complete the verification, then resume this same task.';
               await pauseForAuthentication(reason, steps, history, totalTokens,
                 undefined, undefined, 'interaction');
               emit({ type: 'interaction_required', message: reason });

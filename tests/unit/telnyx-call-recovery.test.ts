@@ -192,8 +192,8 @@ describe('Telnyx webhook recovery and routing (provider verification mocked)', (
     await event('call.ai_gather.ended', { status: 'valid', result: { program_interest: 'technology', conversation_complete: true } }, { phase: 'paris_intake', taskId: 'task', extensionId: 'tech', profileId: 'tech-profile' });
     expect(tables.phone_callback_tasks[0].assigned_profile_id).toBe('tech-profile');
   });
-  it('routes full extension 105 and menu option 5 to the same owner when unavailable', async () => {
-    for (const [digits, phase] of [['105', 'extension_menu'], ['5', 'main_menu']]) {
+  it('routes full extension 105 to its assigned owner when unavailable', async () => {
+    for (const [digits, phase] of [['105', 'extension_menu']]) {
       mocks.actions.gatherUsingAI.mockClear();
       await event('call.gather.ended', { digits, status: 'valid' }, { phase });
       const config = mocks.actions.gatherUsingAI.mock.calls[0][1];
@@ -218,7 +218,7 @@ describe('Telnyx webhook recovery and routing (provider verification mocked)', (
     await event('call.gather.ended', { digits: '8', status: 'valid' });
     let config = mocks.actions.gatherUsingSpeak.mock.lastCall![1];
     let state = JSON.parse(Buffer.from(config.client_state, 'base64').toString());
-    await event('call.gather.ended', { digits: '', status: 'invalid' }, state);
+    await event('call.gather.ended', { digits: '', status: 'client_error' }, state);
     const retry = mocks.actions.gatherUsingSpeak.mock.lastCall![1];
     expect(retry.payload).toBe(config.payload);
     expect(retry.voice).not.toBe(config.voice);
@@ -233,6 +233,49 @@ describe('Telnyx webhook recovery and routing (provider verification mocked)', (
     expect(spoken).toContain('Partner 21');
     expect(spoken).toContain('End of directory');
     expect(mocks.actions.gatherUsingAI).not.toHaveBeenCalled();
+  });
+  it('advances on the actual no-input invalid event and reads Gary, Texas and every enabled holder', async () => {
+    tables.communication_extensions.push(...Array.from({ length: 12 }, (_, i) => ({
+      id: `staff${i}`, workspace_id: 'workspace', extension: String(110+i), display_name: `Staff ${i}`,
+      department: 'Program services', profile_id: `profile${i}`, enabled: true,
+    })),
+      { id: 'gary1', workspace_id: 'workspace', extension: '206', display_name: 'Matthew Barnes', department: 'Gary Site Coordinator', enabled: true },
+      { id: 'gary2', workspace_id: 'workspace', extension: '208', display_name: 'Tempestt Barnes', department: 'Gary Site Coordinator', enabled: true },
+      { id: 'texas', workspace_id: 'workspace', extension: '209', display_name: 'Amir Naseen', department: 'Texas State Site Coordinator', enabled: true },
+      { id: 'inactive', workspace_id: 'workspace', extension: '205', display_name: 'Inactive holder', enabled: false },
+    );
+    await event('call.gather.ended', { digits: '8', status: 'valid' });
+    let speech = '';
+    const pages = new Set();
+    for (let count = 0; count < 20; count++) {
+      const config = mocks.actions.gatherUsingSpeak.mock.lastCall![1];
+      const state = JSON.parse(Buffer.from(config.client_state, 'base64').toString());
+      expect(pages.has(state.directoryPage)).toBe(false);
+      pages.add(state.directoryPage);
+      speech += config.payload;
+      if (state.directoryMore !== 'true') break;
+      await event('call.gather.ended', { digits: '', status: 'invalid' }, state);
+    }
+    for (const e of tables.communication_extensions.filter(e => e.enabled)) expect(speech).toContain(e.display_name);
+    expect(speech).toContain('End of directory');
+    expect(speech).not.toContain('Inactive holder');
+    expect(speech).not.toMatch(/or press \d/i);
+  });
+  it.each([
+    ['206', 'Matthew Barnes'], ['208', 'Tempestt Barnes'], ['209', 'Amir Naseen'], ['207', 'Tanesha Anderson'],
+  ])('routes extension %s to its coordinator or holder without requiring a menu option', async (extension, name) => {
+    tables.communication_extensions.push({ id: 'requested-staff', workspace_id: 'workspace', extension,
+      display_name: name, profile_id: 'requested-profile', enabled: true });
+    await event('call.gather.ended', { digits: extension, status: 'valid' }, { phase: 'extension_menu' });
+    expect(tables.phone_calls[0].assigned_profile_id).toBe('requested-profile');
+    expect(tables.phone_callback_tasks[0].assigned_profile_id).toBe('requested-profile');
+    expect(mocks.actions.hangup).not.toHaveBeenCalled();
+  });
+  it('does not route a retired single-digit holder shortcut', async () => {
+    await event('call.gather.ended', { digits: '5', status: 'valid' });
+    expect(mocks.actions.gatherUsingAI).not.toHaveBeenCalled();
+    expect(mocks.dial).not.toHaveBeenCalled();
+    expect(mocks.actions.gatherUsingSpeak).toHaveBeenCalled();
   });
   it('only hangs up after an explicit finished choice and completed goodbye', async () => {
     await event('call.gather.ended', { digits: '2', status: 'valid' }, { phase: 'paris_followup', taskId: 'task' });

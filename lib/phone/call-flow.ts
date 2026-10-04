@@ -9,7 +9,7 @@ export const MENU_INPUT = {
   timeout_millis: 10000,
 } as const;
 
-type DirectoryEntry = { extension: string; display_name: string; department?: string | null; menu_digit?: number };
+type DirectoryEntry = { extension: string; display_name: string; department?: string | null };
 export function directoryPages(entries: DirectoryEntry[]): string[] {
   const pages: string[] = [];
   let page = '';
@@ -18,7 +18,7 @@ export function directoryPages(entries: DirectoryEntry[]): string[] {
     const name = String(entry.display_name || 'Staff member').slice(0, 120);
     const department = String(entry.department || '').slice(0, 160);
     const number = String(entry.extension).split('').join(' ');
-    const line = `${name}${department ? `, ${department}` : ''}. Extension ${number}.${entry.menu_digit !== undefined ? ` Or press ${entry.menu_digit}.` : ''}`;
+    const line = `${name}${department ? `, ${department}` : ''}. Extension ${number}.`;
     if (page && page.length + line.length + 1 > 500) {
       pages.push(page);
       page = '';

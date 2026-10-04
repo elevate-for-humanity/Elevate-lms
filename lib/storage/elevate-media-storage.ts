@@ -56,7 +56,7 @@ function bool(value?: string): boolean | undefined {
 }
 
 function inferProvider(endpoint: string): ElevateMediaProvider {
-  const explicit = clean(process.env.ELEVATE_MEDIA_PROVIDER || process.env.OBJECT_STORAGE_PROVIDER).toLowerCase();
+  const explicit = clean(process.env.ELEVATE_MEDIA_PROVIDER).toLowerCase();
   if (explicit === 'b2' || explicit === 'backblaze' || explicit === 'backblaze-b2') {
     return 'backblaze-b2';
   }
@@ -102,7 +102,6 @@ function regionFromEndpoint(endpoint: string, provider: ElevateMediaProvider): s
 export function getElevateMediaStorageConfig(): ElevateMediaStorageConfig {
   const endpoint = clean(
     process.env.ELEVATE_MEDIA_ENDPOINT ||
-      process.env.OBJECT_STORAGE_ENDPOINT ||
       process.env.S3_ENDPOINT ||
       process.env.R2_ENDPOINT ||
       process.env.CLOUDFLARE_R2_ENDPOINT ||
@@ -113,7 +112,6 @@ export function getElevateMediaStorageConfig(): ElevateMediaStorageConfig {
   const region =
     clean(
       process.env.ELEVATE_MEDIA_REGION ||
-        process.env.OBJECT_STORAGE_REGION ||
         process.env.S3_REGION ||
         process.env.R2_REGION ||
         process.env.AWS_REGION,
@@ -121,7 +119,6 @@ export function getElevateMediaStorageConfig(): ElevateMediaStorageConfig {
 
   const accessKeyId = clean(
     process.env.ELEVATE_MEDIA_ACCESS_KEY_ID ||
-      process.env.OBJECT_STORAGE_ACCESS_KEY_ID ||
       process.env.S3_ACCESS_KEY_ID ||
       process.env.R2_ACCESS_KEY ||
       process.env.CLOUDFLARE_R2_ACCESS_KEY_ID ||
@@ -129,7 +126,6 @@ export function getElevateMediaStorageConfig(): ElevateMediaStorageConfig {
   );
   const secretAccessKey = clean(
     process.env.ELEVATE_MEDIA_SECRET_ACCESS_KEY ||
-      process.env.OBJECT_STORAGE_SECRET_ACCESS_KEY ||
       process.env.S3_SECRET_ACCESS_KEY ||
       process.env.R2_SECRET_KEY ||
       process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY ||
@@ -137,7 +133,6 @@ export function getElevateMediaStorageConfig(): ElevateMediaStorageConfig {
   );
   const bucket = clean(
     process.env.ELEVATE_MEDIA_BUCKET ||
-      process.env.OBJECT_STORAGE_BUCKET ||
       process.env.S3_BUCKET ||
       process.env.R2_BUCKET ||
       process.env.CLOUDFLARE_R2_BUCKET_NAME ||
@@ -147,15 +142,13 @@ export function getElevateMediaStorageConfig(): ElevateMediaStorageConfig {
   const publicUrl = clean(
     process.env.ELEVATE_MEDIA_PUBLIC_URL ||
       process.env.NEXT_PUBLIC_ELEVATE_MEDIA_URL ||
-      process.env.OBJECT_STORAGE_PUBLIC_URL ||
-      process.env.NEXT_PUBLIC_OBJECT_STORAGE_URL ||
       process.env.S3_PUBLIC_URL ||
       process.env.CLOUDFLARE_R2_PUBLIC_URL ||
       process.env.NEXT_PUBLIC_R2_URL,
   ).replace(/\/$/, '');
 
   const configuredForcePathStyle = bool(
-    process.env.ELEVATE_MEDIA_FORCE_PATH_STYLE || process.env.OBJECT_STORAGE_FORCE_PATH_STYLE || process.env.S3_FORCE_PATH_STYLE,
+    process.env.ELEVATE_MEDIA_FORCE_PATH_STYLE || process.env.S3_FORCE_PATH_STYLE,
   );
   const forcePathStyle =
     configuredForcePathStyle ?? (provider === 'supabase-s3');

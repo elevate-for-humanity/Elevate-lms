@@ -115,7 +115,7 @@ jobs:
               -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
               -H "Authorization: Bearer $CRON_SECRET" \
               -H "Content-Type: application/json" \
-              --data "{\"courseId\":\"$COURSE_ID\",\"maxJobs\":2}")
+              --data '{"maxJobs":2}')
             cat /tmp/video-worker.json
             case "$status" in
               200|202)

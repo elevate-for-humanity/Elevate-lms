@@ -674,6 +674,37 @@ export async function markFailed(
     return;
   }
 
+  try {
+    await supabase.from('platform_events').insert({
+      event_type: 'video_job_failed',
+      category: 'course_media',
+      severity: terminalFailure ? 'error' : 'warning',
+      actor_type: 'system',
+      subject_id: jobId,
+      subject_type: 'video_job',
+      source: 'video-worker',
+      correlation_id: jobId,
+      idempotency_key: `video-job-failure:${jobId}:${retryCount}:${now}`,
+      message: errorMessage,
+      payload: {
+        job_id: jobId,
+        lesson_id: job?.lesson_id ?? null,
+        asset_kind: job?.asset_kind ?? null,
+        asset_key: job?.asset_key ?? null,
+        retry_count: retryCount,
+        failure_class: failureClass,
+        terminal: terminalFailure,
+        provider: evidence.provider ?? null,
+        provider_model: evidence.provider_model ?? null,
+      },
+    });
+  } catch (eventError) {
+    logger.warn('[VideoJob] Unable to persist failure event', {
+      jobId,
+      error: eventError instanceof Error ? eventError.message : String(eventError),
+    });
+  }
+
   if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
     await updateMicroclipExperience(job.lesson_id, job.asset_key, {
       status: 'failed',

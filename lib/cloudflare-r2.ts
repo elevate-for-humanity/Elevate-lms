@@ -34,7 +34,7 @@ export function getR2PublicUrl(key: string): string {
   const url = getElevateMediaPublicUrl(key);
   if (!url) {
     throw new Error(
-      'Elevate Media Storage public delivery is not configured. Set OBJECT_STORAGE_PUBLIC_URL.',
+      'Elevate Media Storage public delivery is not configured. Set ELEVATE_MEDIA_PUBLIC_URL.',
     );
   }
   return url;

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   SUPABASE_SAFE_VIDEO_BYTES,
   resolveCourseVideoStorageBackend,
-  shouldUploadCourseMediaToObjectStorage,
+  shouldUploadCourseMediaToElevateMedia,
 } from '@/lib/video/upload-lesson-media';
 
 describe('upload-lesson-media routing', () => {
@@ -60,7 +60,7 @@ describe('upload-lesson-media routing', () => {
 
   it('maps legacy r2 backend selection to the generic object backend', () => {
     process.env.COURSE_VIDEO_STORAGE_BACKEND = 'r2';
-    expect(resolveCourseVideoStorageBackend()).toBe('object');
+    expect(resolveCourseVideoStorageBackend()).toBe('elevate-media');
   });
 
   it('compresses Supabase-bound video before the production request ceiling', () => {
@@ -69,45 +69,45 @@ describe('upload-lesson-media routing', () => {
 
   it('auto keeps large video on Supabase when object storage is unset', () => {
     const buf = Buffer.alloc(6 * 1024 * 1024);
-    expect(shouldUploadCourseMediaToObjectStorage(buf, 'video/mp4')).toBe(false);
+    expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(false);
   });
 
   it('does not send course media to object storage without a browser delivery URL', () => {
     configureB2(false);
     const buf = Buffer.alloc(6 * 1024 * 1024);
-    expect(shouldUploadCourseMediaToObjectStorage(buf, 'video/mp4')).toBe(false);
+    expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(false);
   });
 
   it('auto sends large mp4 to Backblaze B2 when configured for public delivery', () => {
     configureB2(true);
     const buf = Buffer.alloc(6 * 1024 * 1024);
-    expect(shouldUploadCourseMediaToObjectStorage(buf, 'video/mp4')).toBe(true);
+    expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(true);
   });
 
   it('auto keeps small mp4 on Supabase even when B2 is available', () => {
     configureB2(true);
     const buf = Buffer.alloc(1 * 1024 * 1024);
-    expect(shouldUploadCourseMediaToObjectStorage(buf, 'video/mp4')).toBe(false);
+    expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(false);
   });
 
   it('never routes mp3 to object storage in auto mode', () => {
     configureB2(true);
     const buf = Buffer.alloc(10 * 1024 * 1024);
-    expect(shouldUploadCourseMediaToObjectStorage(buf, 'audio/mpeg')).toBe(false);
+    expect(shouldUploadCourseMediaToElevateMedia(buf, 'audio/mpeg')).toBe(false);
   });
 
   it('force supabase backend overrides configured object storage', () => {
     configureB2(true);
     process.env.COURSE_VIDEO_STORAGE_BACKEND = 'supabase';
     const buf = Buffer.alloc(20 * 1024 * 1024);
-    expect(shouldUploadCourseMediaToObjectStorage(buf, 'video/mp4')).toBe(false);
+    expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(false);
   });
 
-  it('force object backend routes video even below the automatic size threshold', () => {
+  it('force Elevate Media backend routes video even below the automatic size threshold', () => {
     configureB2(true);
-    process.env.COURSE_VIDEO_STORAGE_BACKEND = 'object';
+    process.env.COURSE_VIDEO_STORAGE_BACKEND = 'elevate-media';
     const buf = Buffer.alloc(1 * 1024 * 1024);
-    expect(shouldUploadCourseMediaToObjectStorage(buf, 'video/mp4')).toBe(true);
+    expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(true);
   });
 
   it('keeps legacy Cloudflare R2 environment variables working', () => {
@@ -117,6 +117,6 @@ describe('upload-lesson-media routing', () => {
     process.env.CLOUDFLARE_R2_BUCKET_NAME = 'elevate-media';
     process.env.CLOUDFLARE_R2_PUBLIC_URL = 'https://legacy-media.example.com';
     const buf = Buffer.alloc(6 * 1024 * 1024);
-    expect(shouldUploadCourseMediaToObjectStorage(buf, 'video/mp4')).toBe(true);
+    expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(true);
   });
 });

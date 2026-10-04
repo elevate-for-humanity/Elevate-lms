@@ -16,14 +16,7 @@ const GROUPS = [
   { title: 'Funding', links: [[ROUTES.funding, 'All Funding Options'], [ROUTES.fundingWIOA, 'WIOA / WorkOne'], ['/funding/wrg', 'Workforce Ready Grant'], [ROUTES.fundingJobReadyIndy, 'Job Ready Indy'], [ROUTES.scholarships, 'Scholarships'], [ROUTES.eligibility, 'Check Eligibility']] },
 ] as const;
 
-const LEGAL_LINKS = [
-  ['/privacy', 'Privacy Policy'],
-  ['/terms-of-service', 'Terms of Service'],
-  ['/security-and-data-protection', 'Security & Data'],
-  ['/accessibility', 'Accessibility'],
-  ['/federal-compliance', 'Federal Compliance'],
-  ['/legal', 'Legal & Policies'],
-] as const;
+const legalLinkClass = 'inline-flex min-h-11 items-center hover:text-slate-950 hover:underline';
 
 export function SiteFooter() {
   return (
@@ -63,7 +56,12 @@ export function SiteFooter() {
         <div className="mt-7 border-t border-slate-200 pt-5">
           <p className="text-sm leading-6 text-slate-700"><strong className="text-slate-950">Operating structure:</strong> {LEGAL_ENTITY_OPERATING_LINE}. Training, public funding, and charitable support remain separate functions with separate eligibility and authorization requirements.</p>
           <nav aria-label="Legal and policies" className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-700">
-            {LEGAL_LINKS.map(([href, label]) => <Link key={href} href={href} className="inline-flex min-h-11 items-center hover:text-slate-950 hover:underline">{label}</Link>)}
+            <Link href="/privacy" className={legalLinkClass}>Privacy Policy</Link>
+            <Link href="/terms-of-service" className={legalLinkClass}>Terms of Service</Link>
+            <Link href="/security-and-data-protection" className={legalLinkClass}>Security &amp; Data</Link>
+            <Link href="/accessibility" className={legalLinkClass}>Accessibility</Link>
+            <Link href="/federal-compliance" className={legalLinkClass}>Federal Compliance</Link>
+            <Link href="/legal" className={legalLinkClass}>Legal &amp; Policies</Link>
             <a href="https://www.dol.gov/agencies/eta/apprenticeship" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-1 hover:text-slate-950 hover:underline">DOL Apprenticeship <ExternalLink className="h-3 w-3" aria-hidden="true" /></a>
           </nav>
           <p className="mt-3 text-sm text-slate-600">© {new Date().getFullYear()} {PLATFORM_DEFAULTS.orgName}. All rights reserved.</p>

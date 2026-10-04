@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { RouteTransition } from '@/components/site/RouteTransition';
+import '@/styles/marketing-mobile-density.css';
 
 const OPERATIONAL_PREFIXES = ['/case-manager', '/workforce-board', '/provider'] as const;
 const STANDALONE_BRAND_PREFIXES = ['/meri-gold-round', '/merigoldround'] as const;

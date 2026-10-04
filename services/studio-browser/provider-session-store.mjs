@@ -38,7 +38,9 @@ export class ProviderSessionStore {
   }
   async save(scope, context) {
     if (!scope) return;
-    const source = await context.storageState();
+    // Provider authentication can live in IndexedDB as well as cookies and
+    // localStorage. Preserve it in the same encrypted, account-scoped state.
+    const source = await context.storageState({ indexedDB: true });
     const isEnvato = host => host === 'envato.com' || host.endsWith('.envato.com');
     const state = {
       cookies: source.cookies.filter(cookie => isEnvato(cookie.domain.replace(/^\./, ''))),

@@ -29,8 +29,9 @@ import {
   Sequence,
   staticFile,
 } from 'remotion';
+import { BlueprintTeachingGraphic } from './BlueprintTeachingGraphic';
 import { instructionalLayoutForScene, type InstructionalLayout } from '../instructional-layout';
-import { teachingVisualStepIndex, type TeachingVisual } from '../../lib/ultimate-course-builder/instructional/teaching-visual';
+import { type TeachingVisual } from '../../lib/ultimate-course-builder/instructional/teaching-visual';
 
 // ââ Types âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
@@ -330,18 +331,6 @@ function CaptionBar({
   );
 }
 
-function BlueprintTeachingGraphic({plan,seconds,duration,color}: {plan:TeachingVisual;seconds:number;duration:number;color:string}) {
-  const index=teachingVisualStepIndex(seconds,duration,plan.steps.length);
-  const step=plan.steps[index];
-  return <div style={{background:'rgba(255,255,255,0.96)',borderRadius:18,padding:'28px 32px',
-    fontFamily:'sans-serif',color:'#0f172a',borderLeft:`8px solid ${color}`}}>
-    <div style={{fontSize:80,fontWeight:900,lineHeight:1.2,marginBottom:18}}>{step.label}</div>
-    <div style={{fontSize:80,lineHeight:1.3}}>{step.value}</div>
-    <div style={{marginTop:24,height:12,background:'#e2e8f0',borderRadius:8}}>
-      <div style={{height:'100%',width:`${((index+1)/plan.steps.length)*100}%`,background:color,borderRadius:8}} />
-    </div>
-  </div>;
-}
 
 function InstructionalGraphic({
   layout,

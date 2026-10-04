@@ -9,6 +9,11 @@ import {
 import { prepareUltimateStoryboardInput } from '@/lib/ultimate-course-builder/adapters/platform-renderer';
 import { directMedia } from '@/lib/video/media-director';
 describe('script-bound teaching producer', () => {
+  it('cannot invent an approval while citing an unrelated valid sentence', () => {
+    expect(() => validateTeachingVisual({kind:'record',steps:[{
+      label:'Review',value:'Approved',narrationQuote:'Ask the designated reviewer to check the entry.'
+    }]}, 'Ask the designated reviewer to check the entry.')).toThrow('NOT_SCRIPT_BOUND');
+  });
   it('constructs every teaching state from the script without dropping or inventing words', () => {
     const narration =
       'Record the actual duration. Ask the designated reviewer to check the entry. Do not claim independent performance when you only observed a service.';

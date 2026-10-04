@@ -1,0 +1,63 @@
+/* Public marketing only: operational dashboards retain their own density. */
+@media (max-width: 767px) {
+  #main-content.site-main main h1:not(.sr-only) {
+    font-size: clamp(1.75rem, 7.5vw, 2.125rem);
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  #main-content.site-main main h2 {
+    font-size: clamp(1.375rem, 6vw, 1.75rem);
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  #main-content.site-main main p:is(.text-lg, .text-xl, .text-2xl) {
+    font-size: 1rem;
+    line-height: 1.625;
+  }
+
+  #main-content.site-main main .prose {
+    max-width: 100%;
+    font-size: 1rem;
+    line-height: 1.625;
+  }
+
+  #main-content.site-main main .prose :where(p) {
+    margin-block: 0.75em;
+  }
+
+  #main-content.site-main main section:is(.py-12, .py-14, .py-16, .py-20, .py-24) {
+    padding-block: 2rem;
+  }
+
+  /* Opt-in compact grids must not be flattened by the older safety layer. */
+  #main-content.site-main main [data-mobile-grid='2'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #main-content.site-main main [data-featured-shop] h3 {
+    font-size: 1rem;
+    line-height: 1.375;
+  }
+
+  [data-public-footer] [data-responsive-details] {
+    border-bottom: 1px solid #e2e8f0;
+    padding-block: 0.25rem;
+  }
+}
+
+/* Never omit disclosed information from a printed page. */
+@media print {
+  .responsive-details-panel[hidden] {
+    display: block !important;
+  }
+
+  [data-responsive-details] h3 > span {
+    display: block !important;
+  }
+
+  [data-responsive-details] h3 > button {
+    display: none !important;
+  }
+}

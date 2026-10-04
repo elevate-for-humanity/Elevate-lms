@@ -65,6 +65,13 @@ export function mediaMatchTerms(value: string): string[] {
   ];
 }
 
+export function licensedMediaBelongsToCourse(value: unknown, courseId: string): boolean {
+  if (!value || typeof value !== 'object' || !courseId) return false;
+  const metadata = value as Record<string, unknown>;
+  const owner = String(metadata.courseId ?? metadata.course_id ?? '').trim();
+  return owner === courseId;
+}
+
 export function scoreLicensedMediaMatch(lessonText: string, assetTitle: string) {
   const lessonTerms = mediaMatchTerms(lessonText);
   const assetTerms = mediaMatchTerms(assetTitle);
@@ -159,6 +166,7 @@ export async function recommendLicensedMediaForCourse(input: {
           entitlement.metadata && typeof entitlement.metadata === 'object'
             ? (entitlement.metadata as Record<string, unknown>)
             : {};
+        const courseScoped = licensedMediaBelongsToCourse(metadata, input.courseId);
         const stored = Boolean(storedLicensedMediaMetadata(metadata));
         const retrievableWorkspaceAsset =
           typeof metadata.assetUrl === 'string' &&
@@ -168,12 +176,18 @@ export async function recommendLicensedMediaForCourse(input: {
             String(metadata.licenseVerificationStatus ?? '') === 'verified_item_detail_banner');
         return {
           entitlement,
+          courseScoped,
           stored,
           retrievableWorkspaceAsset,
           ...scoreLicensedMediaMatch(lessonText, entitlement.title),
         };
       })
-      .filter((match) => match.score >= 0.15 && (match.stored || match.retrievableWorkspaceAsset))
+      .filter(
+        (match) =>
+          match.courseScoped &&
+          match.score >= 0.15 &&
+          (match.stored || match.retrievableWorkspaceAsset),
+      )
       .sort((a, b) => {
         if (a.stored !== b.stored) return a.stored ? -1 : 1;
         return b.score - a.score;
@@ -284,6 +298,9 @@ export async function attachStoredLicensedMedia(input: {
   const entitlement = Array.isArray(match.licensed_media_entitlements)
     ? match.licensed_media_entitlements[0]
     : match.licensed_media_entitlements;
+  if (!licensedMediaBelongsToCourse(entitlement?.metadata, input.courseId)) {
+    throw new Error('The licensed asset is scoped to a different course');
+  }
   const stored = storedLicensedMediaMetadata(entitlement?.metadata);
   if (!stored)
     throw new Error('The licensed asset has not been stored in the secure media library');
@@ -345,7 +362,9 @@ export async function attachLicensedMediaUpload(input: {
 }) {
   const { data: match, error: lookupError } = await input.db
     .from('course_lesson_media_matches')
-    .select('id,status,course_id,lesson_id,entitlement_id')
+    .select(
+      'id,status,course_id,lesson_id,entitlement_id,licensed_media_entitlements!inner(metadata)',
+    )
     .eq('id', input.matchId)
     .maybeSingle();
   if (lookupError) throw lookupError;
@@ -354,6 +373,12 @@ export async function attachLicensedMediaUpload(input: {
   }
   if (match.status !== 'approved') {
     throw new Error('Approve the licensed scene before uploading and attaching it');
+  }
+  const uploadEntitlement = Array.isArray(match.licensed_media_entitlements)
+    ? match.licensed_media_entitlements[0]
+    : match.licensed_media_entitlements;
+  if (!licensedMediaBelongsToCourse(uploadEntitlement?.metadata, input.courseId)) {
+    throw new Error('The licensed asset is scoped to a different course');
   }
   const { error: placementError } = await input.db
     .from('course_videos')

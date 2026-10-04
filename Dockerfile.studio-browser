@@ -19,6 +19,7 @@ RUN apt-get update \
 COPY services/studio-browser/command-arguments.mjs ./command-arguments.mjs
 COPY services/studio-browser/server.mjs ./server.mjs
 COPY services/studio-browser/provider-session-store.mjs ./provider-session-store.mjs
+COPY services/studio-browser/provider-verification.mjs ./provider-verification.mjs
 COPY services/studio-browser/course-video-download.mjs ./course-video-download.mjs
 COPY services/studio-browser/learner-runthrough.mjs ./learner-runthrough.mjs
 

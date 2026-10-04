@@ -51,7 +51,8 @@ export class UltimateReleaseService {
           r = a.lesson_film_render?.render ?? a.lesson_film_render ?? {};
         return {
           sourceLessonBuildId: l.id,
-          canonicalLessonId: /^[0-9a-f-]{36}$/i.test(l.competency_id) ? l.competency_id : null,
+          canonicalLessonId: p.canonicalLessonIds?.[l.competency_id] ??
+            (/^[0-9a-f-]{36}$/i.test(l.competency_id) ? l.competency_id : null),
           contractArtifacts: a,
           competencyId: l.competency_id,
           slug: slug(String(l.lesson_key)),
@@ -88,13 +89,24 @@ export class UltimateReleaseService {
     if (me) throw me;
     let m = existingModule;
     if (!m) {
+      const { data: canonical, error: canonicalError } = await this.db.from('course_lessons')
+        .select('id,module_id').eq('course_id', p.courseId);
+      if (canonicalError) throw canonicalError;
+      const existingLesson = canonical?.find((lesson: any) => lesson.module_id &&
+        p.lessons.some((release: any) => release.canonicalLessonId === lesson.id));
+      if (existingLesson) m = { id: existingLesson.module_id };
+    }
+    if (!m) {
+      const { data: modules, error: modulesError } = await this.db.from('course_modules')
+        .select('order_index').eq('course_id', p.courseId);
+      if (modulesError) throw modulesError;
       const q = await this.db
         .from('course_modules')
         .insert({
           course_id: p.courseId,
           title: p.title,
           slug: 'ultimate-core',
-          order_index: 1,
+          order_index: Math.max(0, ...(modules ?? []).map((module: any) => module.order_index ?? 0)) + 1,
           is_required: true,
           is_published: true,
           is_draft: false,
@@ -105,6 +117,9 @@ export class UltimateReleaseService {
       if (q.error) throw q.error;
       m = q.data;
     }
+    const { error: modulePublishError } = await this.db.from('course_modules')
+      .update({ is_published: true, is_draft: false }).eq('id', m!.id);
+    if (modulePublishError) throw modulePublishError;
     for (const l of p.lessons) {
       const row: any = {
         course_id: p.courseId,
@@ -218,10 +233,15 @@ export class UltimateReleaseService {
         .eq(l.canonicalLessonId ? 'id' : 'slug', l.canonicalLessonId ?? l.slug)
         .maybeSingle();
       if (ee) throw ee;
+      if (e?.module_id && e.module_id !== m!.id) {
+        const { error: publishError } = await this.db.from('course_modules')
+          .update({ is_published: true, is_draft: false }).eq('id', e.module_id);
+        if (publishError) throw publishError;
+      }
       const q = e
         ? await this.db
             .from('course_lessons')
-            .update({ ...row, module_id: e.module_id, slug: e.slug })
+            .update({ ...row, module_id: e.module_id ?? m!.id, slug: e.slug })
             .eq('id', e.id)
         : await this.db.from('course_lessons').insert(row);
       if (q.error) throw q.error;
@@ -269,6 +289,8 @@ export class UltimateReleaseService {
         status: 'published',
         is_active: true,
         review_status: 'approved',
+        generation_status: 'published',
+        generation_progress: 100,
         published_at: now,
         published_by: actorId,
         version,

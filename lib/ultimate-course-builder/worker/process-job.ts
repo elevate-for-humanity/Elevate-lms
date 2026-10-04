@@ -10,6 +10,7 @@ import { UltimateReleaseService } from '../release/release-service';
 import { nextCourseWork } from './course-cursor';
 import { resolveReleaseActor } from './release-actor';
 import { hydrateUltimateProfileSources } from '../core/course-profile';
+import { materializeUltimateDraft } from './materialize-draft';
 export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
@@ -27,10 +28,10 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     if (error || !build) throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
     const storedProfile = build.profile as UltimateCredentialProfile;
     if (!storedProfile?.competencies?.length) throw new Error('ULTIMATE_PROFILE_REPAIR_REQUIRED');
-    const profile = await hydrateUltimateProfileSources(db, build.course_id, storedProfile);
+    const profile = await materializeUltimateDraft(db, build.course_id,
+      await hydrateUltimateProfileSources(db, build.course_id, storedProfile));
     if (
-      JSON.stringify(profile.instructionalSources ?? []) !==
-      JSON.stringify(storedProfile.instructionalSources ?? [])
+      JSON.stringify(profile) !== JSON.stringify(storedProfile)
     ) {
       const { error: profileError } = await db
         .from('ultimate_course_builds')

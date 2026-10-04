@@ -33,6 +33,8 @@ export interface UltimateCredentialProfile {
   effectiveDate?: string;
   sourceDocuments: string[];
   mediaAcquisitionOwnerId?: string;
+  /** Stable canonical draft lessons for non-UUID standards competency keys. */
+  canonicalLessonIds?: Record<string, string>;
   sceneAssignments?: Record<string, Array<{ sceneId: string; assetId: string; relevanceReason: string }>>;
   instructionalSources?: Array<{ id: string; text: string }>;
   lessonBlueprints?: Record<string, import('../instructional/lesson-blueprint').LessonBlueprint>;

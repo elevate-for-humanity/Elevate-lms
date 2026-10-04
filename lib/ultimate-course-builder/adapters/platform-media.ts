@@ -141,7 +141,8 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
           publicUrl = signed?.signedUrl ?? '';
         }
         const matches = Array.isArray(asset.course_lesson_media_matches) ? asset.course_lesson_media_matches : [];
-        const match = firstRecord(matches.find((m: RecordLike) => String(m.lesson_id) === String(input.competency?.id)));
+        const canonicalLessonId = input.profile?.canonicalLessonIds?.[input.competency?.id] ?? input.competency?.id;
+        const match = firstRecord(matches.find((m: RecordLike) => String(m.lesson_id) === String(canonicalLessonId)));
         return {
           ...asset,
           id: String(asset.id),

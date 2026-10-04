@@ -58,7 +58,7 @@ describe('upload-lesson-media routing', () => {
     expect(resolveCourseVideoStorageBackend()).toBe('auto');
   });
 
-  it('maps legacy r2 backend selection to the generic object backend', () => {
+  it('maps legacy r2 backend selection to the Elevate Media backend', () => {
     process.env.COURSE_VIDEO_STORAGE_BACKEND = 'r2';
     expect(resolveCourseVideoStorageBackend()).toBe('elevate-media');
   });
@@ -67,12 +67,12 @@ describe('upload-lesson-media routing', () => {
     expect(SUPABASE_SAFE_VIDEO_BYTES).toBe(45 * 1024 * 1024);
   });
 
-  it('auto keeps large video on Supabase when object storage is unset', () => {
+  it('auto keeps large video on Supabase when Elevate Media Storage is unset', () => {
     const buf = Buffer.alloc(6 * 1024 * 1024);
     expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(false);
   });
 
-  it('does not send course media to object storage without a browser delivery URL', () => {
+  it('does not send course media to Elevate Media Storage without a browser delivery URL', () => {
     configureB2(false);
     const buf = Buffer.alloc(6 * 1024 * 1024);
     expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(false);
@@ -90,13 +90,13 @@ describe('upload-lesson-media routing', () => {
     expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(false);
   });
 
-  it('never routes mp3 to object storage in auto mode', () => {
+  it('never routes mp3 to Elevate Media Storage in auto mode', () => {
     configureB2(true);
     const buf = Buffer.alloc(10 * 1024 * 1024);
     expect(shouldUploadCourseMediaToElevateMedia(buf, 'audio/mpeg')).toBe(false);
   });
 
-  it('force supabase backend overrides configured object storage', () => {
+  it('force supabase backend overrides configured Elevate Media Storage', () => {
     configureB2(true);
     process.env.COURSE_VIDEO_STORAGE_BACKEND = 'supabase';
     const buf = Buffer.alloc(20 * 1024 * 1024);

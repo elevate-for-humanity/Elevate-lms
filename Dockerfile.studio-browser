@@ -22,6 +22,7 @@ COPY services/studio-browser/provider-session-store.mjs ./provider-session-store
 COPY services/studio-browser/provider-verification.mjs ./provider-verification.mjs
 COPY services/studio-browser/course-video-download.mjs ./course-video-download.mjs
 COPY services/studio-browser/learner-runthrough.mjs ./learner-runthrough.mjs
+RUN node --input-type=module -e "await import('./server.mjs')"
 
 ENV NODE_ENV=production PORT=3100 GIT_SHA=${NF_GIT_SHA}
 EXPOSE 3100

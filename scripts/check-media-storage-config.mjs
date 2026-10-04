@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Reports whether Supabase and provider-neutral S3-compatible object storage
+ * Reports whether Supabase and Elevate-owned Elevate Media Storage
  * are configured. Does not call external APIs — environment check only.
  */
 import { existsSync, readFileSync } from 'node:fs';
@@ -22,11 +22,11 @@ function has(name) {
   return env(name) || fromEnvFiles(name);
 }
 
-const genericObjectStorage =
-  (has('OBJECT_STORAGE_ENDPOINT') || has('S3_ENDPOINT')) &&
-  (has('OBJECT_STORAGE_ACCESS_KEY_ID') || has('S3_ACCESS_KEY_ID')) &&
-  (has('OBJECT_STORAGE_SECRET_ACCESS_KEY') || has('S3_SECRET_ACCESS_KEY')) &&
-  (has('OBJECT_STORAGE_BUCKET') || has('S3_BUCKET'));
+const elevateMediaStorage =
+  (has('ELEVATE_MEDIA_ENDPOINT') || has('S3_ENDPOINT')) &&
+  (has('ELEVATE_MEDIA_ACCESS_KEY_ID') || has('S3_ACCESS_KEY_ID')) &&
+  (has('ELEVATE_MEDIA_SECRET_ACCESS_KEY') || has('S3_SECRET_ACCESS_KEY')) &&
+  (has('ELEVATE_MEDIA_BUCKET') || has('S3_BUCKET'));
 
 const legacyR2 =
   (
@@ -38,8 +38,8 @@ const legacyR2 =
   (has('R2_ENDPOINT') && has('R2_ACCESS_KEY') && has('R2_SECRET_KEY') && has('R2_BUCKET'));
 
 const publicDelivery =
-  has('OBJECT_STORAGE_PUBLIC_URL') ||
-  has('NEXT_PUBLIC_OBJECT_STORAGE_URL') ||
+  has('ELEVATE_MEDIA_PUBLIC_URL') ||
+  has('NEXT_PUBLIC_ELEVATE_MEDIA_URL') ||
   has('S3_PUBLIC_URL') ||
   has('CLOUDFLARE_R2_PUBLIC_URL') ||
   has('NEXT_PUBLIC_R2_URL');
@@ -50,8 +50,8 @@ const checks = [
     ok: has('NEXT_PUBLIC_SUPABASE_URL') && has('SUPABASE_SERVICE_ROLE_KEY'),
   },
   {
-    label: 'S3-compatible object storage (Backblaze B2 / Wasabi / AWS / custom)',
-    ok: genericObjectStorage || legacyR2,
+    label: 'Elevate Media Storage (Backblaze B2 / Wasabi / AWS / custom)',
+    ok: elevateMediaStorage || legacyR2,
   },
   {
     label: 'Object-storage public delivery URL (required for direct learner video URLs)',
@@ -74,5 +74,5 @@ for (const c of checks) {
   if (!c.ok && !c.warn) failed = true;
 }
 
-console.log('\nCourse video policy: large MP4s use object storage only when credentials and public delivery are configured; otherwise Supabase remains the safe fallback.');
+console.log('\nCourse video policy: large MP4s use Elevate Media Storage only when credentials and public delivery are configured; otherwise Supabase remains the safe fallback.');
 process.exit(failed ? 1 : 0);

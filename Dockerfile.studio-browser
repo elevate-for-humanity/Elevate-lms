@@ -17,6 +17,7 @@ RUN apt-get update \
     && mkdir -p /workspace/project \
     && chown -R studio:studio /app /workspace
 COPY services/studio-browser/command-arguments.mjs ./command-arguments.mjs
+COPY services/studio-browser/cdp-session.mjs ./cdp-session.mjs
 COPY services/studio-browser/server.mjs ./server.mjs
 COPY services/studio-browser/provider-session-store.mjs ./provider-session-store.mjs
 COPY services/studio-browser/provider-verification.mjs ./provider-verification.mjs
@@ -28,3 +29,4 @@ ENV NODE_ENV=production PORT=3100 GIT_SHA=${NF_GIT_SHA}
 EXPOSE 3100
 USER studio
 CMD ["node", "server.mjs"]
+

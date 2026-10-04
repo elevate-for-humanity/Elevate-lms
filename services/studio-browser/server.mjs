@@ -10,6 +10,7 @@ import { pipeline } from 'node:stream/promises';
 import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
 import { chromium } from 'playwright-core';
+import { cdpStatus, runCdpInput } from './cdp-session.mjs';
 import { commandArguments } from './command-arguments.mjs';
 import { ProviderSessionStore } from './provider-session-store.mjs';
 import { requiresHumanVerification, redactBrowserEvidence } from './provider-verification.mjs';
@@ -667,6 +668,13 @@ async function runBrowserFoundationTest() {
     // Real HTTP responses exercise the native download pipeline. DevTools
     // route.fulfill fixtures do not model a streaming attachment transfer.
     await page.goto(`http://127.0.0.1:${port}/foundation-fixture/${fixtureNonce}/start`);
+    await check('cdp_same_tab_input', async () => {
+      assert((await cdpStatus(session)).connected, 'cdp_not_connected');
+      await page.locator('#text').focus();
+      await runActions(session, { type: 'type', transport: 'cdp', text: 'CDP acceptance' });
+      assert(await page.locator('#text').inputValue() === 'CDP acceptance', 'cdp_input_not_visible');
+      await page.locator('#text').fill('');
+    });
     await check('durable_provider_checkpoint', async () => {
       assert(providerSessions.directory && providerSessions.key, 'provider_checkpoint_not_configured');
       const scope = providerSessions.scope(testOwner, 'https://app.envato.com');
@@ -1000,6 +1008,7 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
 
 async function runAction(session, action) {
   session.lastSeen = Date.now();
+  if (action.transport === 'cdp' && await runCdpInput(session, action)) return;
   const page = session.page;
   const controlPage = (ref) => {
     if (session.controlFrames?.has(ref) && session.controlPage !== page) throw new BrowserServiceError('stale_control', 409);
@@ -1565,12 +1574,16 @@ const server = http.createServer(async (req, res) => {
       });
     }
     const match = url.pathname.match(
-      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit|downloads|imports|batch-imports|uploads|file|identity))?$/,
+      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit|downloads|imports|batch-imports|uploads|file|identity|cdp))?$/,
     );
     if (!match) return json(res, 404, { error: 'Not found' });
     const session = sessions.get(match[1]);
     if (!session) return json(res, 410, { error: 'session_expired' });
     if (!authorized(req, session, url)) return json(res, 401, { error: 'unauthorized' });
+    if (req.method === 'GET' && match[2] === 'cdp') {
+      session.lastSeen = Date.now();
+      return json(res, 200, await cdpStatus(session));
+    }
     if (req.method === 'GET' && match[2] === 'identity') return json(res, 200, { ownerId: session.ownerId });
     if (req.method === 'GET' && match[2] === 'file') {
       const download = session.downloads.get(url.searchParams.get('id'));

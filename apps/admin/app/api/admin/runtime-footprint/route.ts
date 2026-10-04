@@ -37,15 +37,15 @@ export async function GET(request: NextRequest) {
     storage: {
       policy: MEDIA_STORAGE_POLICY,
       supabaseConfigured: envSet('NEXT_PUBLIC_SUPABASE_URL') && envSet('SUPABASE_SERVICE_ROLE_KEY'),
-      objectStorageConfigured: isElevateMediaStorageConfigured(),
-      objectStorage: getElevateMediaRuntimeSummary(),
+      elevateMediaConfigured: isElevateMediaStorageConfigured(),
+      elevateMedia: getElevateMediaRuntimeSummary(),
       courseVideoBackend: resolveCourseVideoStorageBackend(),
-      courseVideoObjectMinBytes: Number(
-        process.env.COURSE_VIDEO_OBJECT_MIN_BYTES ||
+      elevateMediaVideoMinBytes: Number(
+        process.env.ELEVATE_MEDIA_VIDEO_MIN_BYTES ||
           process.env.COURSE_VIDEO_R2_MIN_BYTES ||
           5_242_880,
       ),
-      largeMp4UsesObjectStorageWhenConfigured: isAnyElevateMediaStorageConfigured(),
+      largeMp4UsesElevateMediaWhenConfigured: isAnyElevateMediaStorageConfigured(),
       remotionReleaseAfterJob: process.env.REMOTION_RELEASE_BUNDLE_AFTER_RENDER !== 'false',
     },
     notes: [

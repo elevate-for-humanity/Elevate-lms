@@ -1,9 +1,11 @@
 /**
  * Upload generated lesson audio/video to durable storage.
  * - Small assets (MP3, slide JPEG) → Supabase `course-videos`
- * - Large MP4 (when R2 configured) → Cloudflare R2 under `course-videos/` prefix
+ * - Large MP4 → configured S3-compatible object storage when available
  *
- * Avoids writing under public/generated/ on ephemeral containers.
+ * Production object storage can be Backblaze B2, Wasabi, AWS S3, Supabase S3,
+ * Cloudflare R2, or another S3-compatible endpoint. Container disk remains
+ * ephemeral and is used only while rendering.
  */
 
 import { execFile } from 'child_process';
@@ -12,20 +14,19 @@ import { promisify } from 'util';
 import os from 'os';
 import path from 'path';
 import {
-  uploadToR2,
-  isR2Configured,
-  isR2PublicDeliveryConfigured,
-} from '@/lib/cloudflare-r2';
-import { isStorageConfigured } from '@/lib/storage/file-storage';
+  uploadToObjectStorage,
+  isObjectStorageConfigured,
+  isObjectStoragePublicDeliveryConfigured,
+} from '@/lib/storage/object-storage';
 import { logger } from '@/lib/logger';
 import { videoEncoderArgs } from './ffmpeg-runtime';
 
 const SUPABASE_BUCKET = 'course-videos';
-const R2_KEY_PREFIX = 'course-videos';
+const OBJECT_STORAGE_KEY_PREFIX = 'course-videos';
 
-export type CourseVideoStorageBackend = 'auto' | 'supabase' | 'r2';
+export type CourseVideoStorageBackend = 'auto' | 'supabase' | 'object';
 
-const DEFAULT_R2_MIN_BYTES = 5 * 1024 * 1024; // 5 MB
+const DEFAULT_OBJECT_STORAGE_MIN_BYTES = 5 * 1024 * 1024; // 5 MB
 const SUPABASE_TUS_CHUNK_BYTES = 6 * 1024 * 1024;
 const SUPABASE_TUS_RETRY_DELAYS_MS = [0, 3_000, 5_000, 10_000, 20_000] as const;
 // Keep standard uploads below the production project's effective request
@@ -70,35 +71,49 @@ async function compressVideoBufferForSupabase(buffer: Buffer): Promise<Buffer> {
 
 export function resolveCourseVideoStorageBackend(): CourseVideoStorageBackend {
   const raw = (process.env.COURSE_VIDEO_STORAGE_BACKEND ?? 'auto').toLowerCase().trim();
-  if (raw === 'supabase' || raw === 'r2' || raw === 'auto') return raw;
+  if (raw === 'supabase' || raw === 'auto') return raw;
+  // Legacy "r2" and provider-oriented values map to the generic object backend.
+  if (raw === 'object' || raw === 's3' || raw === 'b2' || raw === 'r2') return 'object';
   return 'auto';
 }
 
-export function isAnyR2Configured(): boolean {
-  return isR2Configured() || isStorageConfigured();
+export function isAnyObjectStorageConfigured(): boolean {
+  return isObjectStorageConfigured();
 }
 
-/** Whether this buffer should upload to R2 (not Supabase). */
-export function shouldUploadCourseMediaToR2(
+/** @deprecated Compatibility alias for older admin diagnostics. */
+export const isAnyR2Configured = isAnyObjectStorageConfigured;
+
+/** Whether this buffer should upload to S3-compatible object storage instead of Supabase. */
+export function shouldUploadCourseMediaToObjectStorage(
   buffer: Buffer,
   contentType: string,
 ): boolean {
   const backend = resolveCourseVideoStorageBackend();
   if (backend === 'supabase') return false;
-  if (!isR2Configured() || !isR2PublicDeliveryConfigured()) {
-    if (backend === 'r2') {
-      logger.warn('[upload-lesson-media] COURSE_VIDEO_STORAGE_BACKEND=r2 but Cloudflare R2 public delivery is not configured');
+  if (!isObjectStorageConfigured() || !isObjectStoragePublicDeliveryConfigured()) {
+    if (backend === 'object') {
+      logger.warn(
+        '[upload-lesson-media] COURSE_VIDEO_STORAGE_BACKEND=object but object storage public delivery is not configured',
+      );
     }
     return false;
   }
 
-  if (backend === 'r2') return true;
+  if (backend === 'object') return true;
 
-  // auto: large video files → R2; audio/images stay on Supabase
+  // auto: large video files → object storage; audio/images stay on Supabase
   if (!contentType.startsWith('video/')) return false;
-  const minBytes = Number(process.env.COURSE_VIDEO_R2_MIN_BYTES || DEFAULT_R2_MIN_BYTES);
+  const minBytes = Number(
+    process.env.COURSE_VIDEO_OBJECT_MIN_BYTES ||
+      process.env.COURSE_VIDEO_R2_MIN_BYTES ||
+      DEFAULT_OBJECT_STORAGE_MIN_BYTES,
+  );
   return buffer.length >= minBytes;
 }
+
+/** @deprecated Compatibility alias. */
+export const shouldUploadCourseMediaToR2 = shouldUploadCourseMediaToObjectStorage;
 
 export function lessonMediaStoragePath(lessonId: string, ext: 'mp3' | 'mp4'): string {
   // Rendered MP4s are immutable candidates. Reusing the same public object key
@@ -116,8 +131,8 @@ export function lessonMediaPublicUrl(storagePath: string): string {
   return `${base}/storage/v1/object/public/${SUPABASE_BUCKET}/${storagePath}`;
 }
 
-function r2KeyForStoragePath(storagePath: string): string {
-  return `${R2_KEY_PREFIX}/${storagePath}`;
+function objectStorageKeyForStoragePath(storagePath: string): string {
+  return `${OBJECT_STORAGE_KEY_PREFIX}/${storagePath}`;
 }
 
 async function uploadCourseVideosToSupabase(
@@ -264,17 +279,17 @@ async function uploadCourseVideosToSupabaseResumable(
   return lessonMediaPublicUrl(storagePath);
 }
 
-async function uploadCourseVideosToR2(
+async function uploadCourseVideosToObjectStorage(
   buffer: Buffer,
   storagePath: string,
   contentType: string,
 ): Promise<string> {
-  const key = r2KeyForStoragePath(storagePath);
-  const result = await uploadToR2(buffer, key, contentType);
+  const key = objectStorageKeyForStoragePath(storagePath);
+  const result = await uploadToObjectStorage(buffer, key, contentType);
   if (!result.success || !result.url) {
-    throw new Error(result.error ?? `R2 upload failed for ${key}`);
+    throw new Error(result.error ?? `Object storage upload failed for ${key}`);
   }
-  logger.info('[upload-lesson-media] uploaded to R2', {
+  logger.info('[upload-lesson-media] uploaded to object storage', {
     key,
     bytes: buffer.length,
     url: result.url.slice(0, 80),
@@ -288,11 +303,11 @@ export async function uploadCourseVideosObject(
   contentType: string,
   options?: { forceSupabase?: boolean },
 ): Promise<string> {
-  if (!options?.forceSupabase && shouldUploadCourseMediaToR2(buffer, contentType)) {
+  if (!options?.forceSupabase && shouldUploadCourseMediaToObjectStorage(buffer, contentType)) {
     try {
-      return await uploadCourseVideosToR2(buffer, storagePath, contentType);
+      return await uploadCourseVideosToObjectStorage(buffer, storagePath, contentType);
     } catch (err) {
-      logger.warn('[upload-lesson-media] R2 upload failed, falling back to Supabase', { err });
+      logger.warn('[upload-lesson-media] object storage upload failed, falling back to Supabase', { err });
     }
   }
   if (contentType.startsWith('video/') && buffer.length > SUPABASE_TUS_CHUNK_BYTES) {

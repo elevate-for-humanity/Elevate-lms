@@ -14,20 +14,26 @@ afterEach(() => {
 });
 
 describe('homepage curation', () => {
-  it('renders precisely four existing shops with one photo and destination each', () => {
+  it('renders only the two approved shops with one photo and the correct destination each', () => {
     const root = document.createElement('div');
     root.innerHTML = renderToStaticMarkup(<HomeFeaturedHostShop />);
     const cards = [...root.querySelectorAll('[data-featured-shop]')];
     expect(cards.map((card) => card.getAttribute('data-featured-shop'))).toEqual([
-      "Cal's Kutz Studio", "Razor's Image Barbershop", 'Salon Saloon', 'Kountry Kutz Barbershop',
+      'Salon Saloon', 'Kountry Kutz Barbershop',
     ]);
-    expect(root.querySelectorAll('img').length).toBe(4);
+    expect(cards.map((card) => card.querySelector('a')?.getAttribute('href'))).toEqual([
+      '/host-shops/salon-saloon', '/host-shops/kountry-kutz-barbershop',
+    ]);
+    expect(root.querySelectorAll('img').length).toBe(2);
+    expect(root.innerHTML).not.toMatch(/cals-kutz|razors-image/);
     for (const card of cards) {
       expect(card.querySelectorAll('img').length).toBe(1);
       expect(card.querySelector('img')?.getAttribute('alt')).toBeTruthy();
-      expect(card.querySelector('a')?.getAttribute('href')).toMatch(/^\/host-shops\//);
     }
-    expect(root.querySelector('[data-featured-shops]')?.getAttribute('data-mobile-grid')).toBe('2');
+    const grid = root.querySelector('[data-featured-shops]');
+    expect(grid?.getAttribute('data-mobile-grid')).toBe('2');
+    expect(grid?.className).toContain('max-w-3xl');
+    expect(grid?.className).not.toContain('lg:grid-cols-4');
   });
 
   it('does not reintroduce stock-photo sections or the platform-operations wall', () => {

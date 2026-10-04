@@ -49,6 +49,8 @@ async function cf(path){
 const accountResponse=await fetch('https://api.cloudflare.com/client/v4/accounts',{headers:{authorization:'Bearer '+api},signal:AbortSignal.timeout(30000)});
 const accountData=await accountResponse.json();
 console.info(JSON.stringify({accountListingStatus:accountResponse.status,accounts:accountData.result?.map(a=>({name:a.name,configured:a.id===account}))}));
+const subscriptions=await cf('/subscriptions');
+console.info(JSON.stringify({subscriptions:subscriptions?.map(s=>({id:s.id,state:s.state,rate_plan:s.rate_plan,current_period_end:s.current_period_end,price:s.price,currency:s.currency}))}));
 const buckets=await cf('/r2/buckets');
 const names=new Set([vars.CLOUDFLARE_R2_BUCKET_NAME||'elevate-media',...(buckets?.buckets??[]).map(b=>b.name)]);
 console.info(JSON.stringify({buckets:[...names]}));

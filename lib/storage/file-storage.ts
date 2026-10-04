@@ -1,9 +1,9 @@
 import { logger } from '@/lib/logger';
 import {
-  getSignedObjectUrl,
-  isObjectStorageConfigured,
-  uploadToObjectStorage,
-} from '@/lib/storage/object-storage';
+  getSignedElevateMediaUrl,
+  isElevateMediaStorageConfigured,
+  uploadToElevateMedia,
+} from '@/lib/storage/elevate-media-storage';
 
 /**
  * File Storage Service
@@ -14,7 +14,7 @@ import {
  */
 
 export function isStorageConfigured(): boolean {
-  return isObjectStorageConfigured();
+  return isElevateMediaStorageConfigured();
 }
 
 export const PRODUCT_FILES: Record<
@@ -64,11 +64,11 @@ export async function generateSignedDownloadUrl(
   }
 
   if (!isStorageConfigured()) {
-    logger.error('Object storage not configured');
+    logger.error('Elevate Media Storage not configured');
     return null;
   }
 
-  return getSignedObjectUrl(fileInfo.path, expiresInSeconds, {
+  return getSignedElevateMediaUrl(fileInfo.path, expiresInSeconds, {
     contentDisposition: `attachment; filename="${fileInfo.filename}"`,
     contentType: fileInfo.contentType,
   });
@@ -80,10 +80,10 @@ export async function uploadFile(
   contentType: string,
 ): Promise<boolean> {
   if (!isStorageConfigured()) {
-    throw new Error('Object storage not configured');
+    throw new Error('Elevate Media Storage not configured');
   }
 
-  const result = await uploadToObjectStorage(body, key, contentType);
+  const result = await uploadToElevateMedia(body, key, contentType);
   if (!result.success) {
     logger.error('Error uploading file:', result.error);
     return false;

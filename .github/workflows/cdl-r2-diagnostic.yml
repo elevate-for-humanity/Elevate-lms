@@ -1,0 +1,21 @@
+name: Diagnose CDL R2 delivery
+on:
+  push:
+    branches: [codex/cdl-r2-diagnostic-20261004]
+    paths: ['.github/workflows/cdl-r2-diagnostic.yml', 'scripts/cdl-r2-diagnostic.mjs']
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Inspect Northflank and R2 delivery metadata
+        env:
+          NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+        run: node scripts/cdl-r2-diagnostic.mjs

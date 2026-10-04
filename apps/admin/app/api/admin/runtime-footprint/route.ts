@@ -7,12 +7,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { MEDIA_STORAGE_POLICY } from '@/lib/media/storage-policy';
 import {
-  getObjectStorageRuntimeSummary,
-  isObjectStorageConfigured,
-} from '@/lib/storage/object-storage';
+  getElevateMediaRuntimeSummary,
+  isElevateMediaStorageConfigured,
+} from '@/lib/storage/elevate-media-storage';
 import {
   resolveCourseVideoStorageBackend,
-  isAnyObjectStorageConfigured,
+  isAnyElevateMediaStorageConfigured,
 } from '@/lib/video/upload-lesson-media';
 
 export const dynamic = 'force-dynamic';
@@ -37,19 +37,19 @@ export async function GET(request: NextRequest) {
     storage: {
       policy: MEDIA_STORAGE_POLICY,
       supabaseConfigured: envSet('NEXT_PUBLIC_SUPABASE_URL') && envSet('SUPABASE_SERVICE_ROLE_KEY'),
-      objectStorageConfigured: isObjectStorageConfigured(),
-      objectStorage: getObjectStorageRuntimeSummary(),
+      objectStorageConfigured: isElevateMediaStorageConfigured(),
+      objectStorage: getElevateMediaRuntimeSummary(),
       courseVideoBackend: resolveCourseVideoStorageBackend(),
       courseVideoObjectMinBytes: Number(
         process.env.COURSE_VIDEO_OBJECT_MIN_BYTES ||
           process.env.COURSE_VIDEO_R2_MIN_BYTES ||
           5_242_880,
       ),
-      largeMp4UsesObjectStorageWhenConfigured: isAnyObjectStorageConfigured(),
+      largeMp4UsesObjectStorageWhenConfigured: isAnyElevateMediaStorageConfigured(),
       remotionReleaseAfterJob: process.env.REMOTION_RELEASE_BUNDLE_AFTER_RENDER !== 'false',
     },
     notes: [
-      'Generated lesson videos use Supabase for small assets and configured S3-compatible object storage for large MP4s.',
+      'Generated lesson videos use Supabase for small assets and configured S3-compatible Elevate Media Storage for large MP4s.',
       'Backblaze B2, Wasabi, AWS S3, Supabase S3, Cloudflare R2, and custom S3 endpoints share the same storage adapter.',
       'Container disk is temp-only; nothing in this response starts background work.',
     ],

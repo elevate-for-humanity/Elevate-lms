@@ -97,15 +97,18 @@ jobs:
         run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --sha "${{ steps.source.outputs.sha }}"
       - name: Restart deployed Ultimate worker
         run: pnpm tsx scripts/northflank/restart-service.ts "$NORTHFLANK_ULTIMATE_WORKER_SERVICE_ID"
-      - name: Verify active Ultimate job is claimed
+      - name: Verify deployed Ultimate worker claims queued work
         shell: bash
         run: |
           set -euo pipefail
           verify_after="$(date -u -d '2 minutes ago' +'%Y-%m-%dT%H:%M:%SZ')"
           for attempt in $(seq 1 45); do
-            state="$(curl -fsS "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/ultimate_build_jobs?status=eq.running&heartbeat_at=gte.${verify_after}&order=heartbeat_at.desc&limit=1&select=id,build_id,status,attempts,lease_owner,heartbeat_at,last_error" -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" || true)"
+            state="$(curl -fsS "${NEXT_PUBLIC_SUPABASE_URL}/rest/v1/ultimate_build_jobs?heartbeat_at=gte.${verify_after}&order=heartbeat_at.desc&limit=1&select=id,build_id,status,attempts,lease_owner,heartbeat_at,last_error" -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" || true)"
             echo "$state"
-            echo "$state" | grep -Eq '"status":"running"' && echo "$state" | grep -Eq '"attempts":[1-9]' && echo "$state" | grep -Eq '"lease_owner":"[^"]+"' && echo "$state" | grep -Eq '"heartbeat_at":"[^"]+"' && exit 0
+            # Claim RPC persists heartbeat and attempts. Bounded lesson jobs can
+            # finish or yield before the next poll and release their lease;
+            # requiring a currently-running job incorrectly fails a live worker.
+            echo "$state" | grep -Eq '"attempts":[1-9]' && echo "$state" | grep -Eq '"heartbeat_at":"[^"]+"' && exit 0
             sleep 10
           done
           echo "::error::Ultimate worker did not claim an active queued build after deployment"

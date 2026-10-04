@@ -1,5 +1,2 @@
 import '@livekit/components-styles';
-
-export default function MeetingsLayout({ children }: { children: React.ReactNode }) {
-  return children;
-}
+export { ProgramHolderSectionLayout as default } from '@/components/program-holder/ProgramHolderSectionLayout';

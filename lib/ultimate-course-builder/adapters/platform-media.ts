@@ -7,6 +7,7 @@ import {
 } from '@/lib/media/licensed-course-media';
 
 import { buildSceneAssignments } from '../instructional/scene-assignments';
+import { selectApprovedAcquisitionMatches } from '../instructional/acquisition-selection';
 import { requestMediaDependency } from '../worker/request-media-dependency';
 
 type RecordLike = Record<string, any>;
@@ -232,19 +233,17 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
           String(metadata.licenseVerificationStatus ?? '') === 'verified_item_detail_banner');
       return stored || retrievableWorkspaceAsset;
     });
-    const selectedByLesson = new Map<string, RecordLike[]>();
-    for (const match of usableMatches) {
-      const lessonId = String(match.lesson_id);
-      const bucket = selectedByLesson.get(lessonId) ?? [];
-      bucket.push(match);
-      bucket.sort((a, b) => Number(b.match_score ?? 0) - Number(a.match_score ?? 0));
-      selectedByLesson.set(lessonId, bucket.slice(0, 16));
-    }
-    const selectedMatches = [...selectedByLesson.values()].flat();
+    const selectedMatches = selectApprovedAcquisitionMatches(usableMatches);
+    const acquiredEntitlements = new Set<string>();
     for (const match of selectedMatches) {
       const entitlement = firstRecord(match.licensed_media_entitlements);
-      if (!storedLicensedMediaMetadata(entitlement.metadata)) {
+      const entitlementId = String(match.entitlement_id);
+      if (!storedLicensedMediaMetadata(entitlement.metadata) && !acquiredEntitlements.has(entitlementId)) {
         await this.acquireApprovedEnvatoMatch(match);
+        // The selected match snapshot remains stale after the first download.
+        // Attachment reloads the persisted entitlement; another lesson using
+        // the same approved source should not download/upload it again.
+        acquiredEntitlements.add(entitlementId);
       }
 
       await attachStoredLicensedMedia({

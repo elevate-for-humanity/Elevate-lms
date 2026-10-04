@@ -17,8 +17,8 @@ import {
   uploadToElevateMedia,
   isElevateMediaStorageConfigured,
   isElevateMediaPublicDeliveryConfigured,
-} from '@/lib/storage/elevate-media-storage';
-import { logger } from '@/lib/logger';
+} from '../storage/elevate-media-storage';
+import { logger } from '../logger';
 import { videoEncoderArgs } from './ffmpeg-runtime';
 
 const SUPABASE_BUCKET = 'course-videos';

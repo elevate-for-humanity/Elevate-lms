@@ -1,9 +1,9 @@
 /**
  * Upload generated lesson audio/video to durable storage.
  * - Small assets (MP3, slide JPEG) → Supabase `course-videos`
- * - Large MP4 → configured S3-compatible object storage when available
+ * - Large MP4 → configured S3-compatible Elevate Media Storage when available
  *
- * Production object storage can be Backblaze B2, Wasabi, AWS S3, Supabase S3,
+ * Production Elevate Media Storage can be Backblaze B2, Wasabi, AWS S3, Supabase S3,
  * Cloudflare R2, or another S3-compatible endpoint. Container disk remains
  * ephemeral and is used only while rendering.
  */
@@ -14,10 +14,10 @@ import { promisify } from 'util';
 import os from 'os';
 import path from 'path';
 import {
-  uploadToObjectStorage,
-  isObjectStorageConfigured,
-  isObjectStoragePublicDeliveryConfigured,
-} from '@/lib/storage/object-storage';
+  uploadToElevateMedia,
+  isElevateMediaStorageConfigured,
+  isElevateMediaPublicDeliveryConfigured,
+} from '@/lib/storage/elevate-media-storage';
 import { logger } from '@/lib/logger';
 import { videoEncoderArgs } from './ffmpeg-runtime';
 
@@ -72,29 +72,29 @@ async function compressVideoBufferForSupabase(buffer: Buffer): Promise<Buffer> {
 export function resolveCourseVideoStorageBackend(): CourseVideoStorageBackend {
   const raw = (process.env.COURSE_VIDEO_STORAGE_BACKEND ?? 'auto').toLowerCase().trim();
   if (raw === 'supabase' || raw === 'auto') return raw;
-  // Legacy "r2" and provider-oriented values map to the generic object backend.
+  // Legacy "r2" and provider-oriented values map to the object backend.
   if (raw === 'object' || raw === 's3' || raw === 'b2' || raw === 'r2') return 'object';
   return 'auto';
 }
 
-export function isAnyObjectStorageConfigured(): boolean {
-  return isObjectStorageConfigured();
+export function isAnyElevateMediaStorageConfigured(): boolean {
+  return isElevateMediaStorageConfigured();
 }
 
 /** @deprecated Compatibility alias for older admin diagnostics. */
-export const isAnyR2Configured = isAnyObjectStorageConfigured;
+export const isAnyR2Configured = isAnyElevateMediaStorageConfigured;
 
-/** Whether this buffer should upload to S3-compatible object storage instead of Supabase. */
+/** Whether this buffer should upload to S3-compatible Elevate Media Storage instead of Supabase. */
 export function shouldUploadCourseMediaToObjectStorage(
   buffer: Buffer,
   contentType: string,
 ): boolean {
   const backend = resolveCourseVideoStorageBackend();
   if (backend === 'supabase') return false;
-  if (!isObjectStorageConfigured() || !isObjectStoragePublicDeliveryConfigured()) {
+  if (!isElevateMediaStorageConfigured() || !isElevateMediaPublicDeliveryConfigured()) {
     if (backend === 'object') {
       logger.warn(
-        '[upload-lesson-media] COURSE_VIDEO_STORAGE_BACKEND=object but object storage public delivery is not configured',
+        '[upload-lesson-media] COURSE_VIDEO_STORAGE_BACKEND=object but Elevate Media Storage public delivery is not configured',
       );
     }
     return false;
@@ -102,7 +102,7 @@ export function shouldUploadCourseMediaToObjectStorage(
 
   if (backend === 'object') return true;
 
-  // auto: large video files → object storage; audio/images stay on Supabase
+  // auto: large video files → Elevate Media Storage; audio/images stay on Supabase
   if (!contentType.startsWith('video/')) return false;
   const minBytes = Number(
     process.env.COURSE_VIDEO_OBJECT_MIN_BYTES ||
@@ -285,11 +285,11 @@ async function uploadCourseVideosToObjectStorage(
   contentType: string,
 ): Promise<string> {
   const key = objectStorageKeyForStoragePath(storagePath);
-  const result = await uploadToObjectStorage(buffer, key, contentType);
+  const result = await uploadToElevateMedia(buffer, key, contentType);
   if (!result.success || !result.url) {
-    throw new Error(result.error ?? `Object storage upload failed for ${key}`);
+    throw new Error(result.error ?? `Elevate Media Storage upload failed for ${key}`);
   }
-  logger.info('[upload-lesson-media] uploaded to object storage', {
+  logger.info('[upload-lesson-media] uploaded to Elevate Media Storage', {
     key,
     bytes: buffer.length,
     url: result.url.slice(0, 80),
@@ -307,7 +307,7 @@ export async function uploadCourseVideosObject(
     try {
       return await uploadCourseVideosToObjectStorage(buffer, storagePath, contentType);
     } catch (err) {
-      logger.warn('[upload-lesson-media] object storage upload failed, falling back to Supabase', { err });
+      logger.warn('[upload-lesson-media] Elevate Media Storage upload failed, falling back to Supabase', { err });
     }
   }
   if (contentType.startsWith('video/') && buffer.length > SUPABASE_TUS_CHUNK_BYTES) {

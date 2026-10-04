@@ -2,7 +2,7 @@
  * Storage Module - Barrel Export
  * 
  * Central export point for all storage utilities.
- * Supabase Storage and Cloudflare R2 are both supported.
+ * Supabase Storage and provider-neutral S3-compatible object storage are supported.
  */
 
 // Supabase Storage - Course Assets
@@ -27,7 +27,26 @@ export {
   getPublicFallbackUrl,
 } from './file-storage';
 
-// Cloudflare R2
+// Provider-neutral S3-compatible object storage
+export {
+  getObjectStorageConfig,
+  getObjectStorageClient,
+  getObjectStoragePublicUrl,
+  getObjectStorageRuntimeSummary,
+  isObjectStorageConfigured,
+  isObjectStoragePublicDeliveryConfigured,
+  uploadToObjectStorage,
+  uploadFromUrlToObjectStorage,
+  deleteFromObjectStorage,
+  getSignedObjectUrl,
+  listObjectStorageKeys,
+  getContentType,
+  type ObjectStorageConfig,
+  type ObjectStorageProvider,
+  type ObjectUploadResult,
+} from './object-storage';
+
+// Legacy R2 names remain available while callers migrate.
 export {
   isR2Configured,
   uploadToR2,
@@ -36,7 +55,6 @@ export {
   getSignedR2Url,
   listR2Files,
   getR2PublicUrl,
-  getContentType,
   type UploadResult,
 } from '@/lib/cloudflare-r2';
 

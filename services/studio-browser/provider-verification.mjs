@@ -20,5 +20,5 @@ export function redactBrowserEvidence(value) {
     })
     .replace(/\b(?:password|access_token|refresh_token|id_token|session_token|token|secret)\s*[:=]\s*[^\s,;]+/gi,
       (match) => `${match.split(/[:=]/)[0]}=[redacted]`)
-    .replace(/\bBearer\s+[A-Za-z0-9._~+\/-]+/gi, 'Bearer [redacted]');
+    .replace(/\bBearer\s+[A-Za-z0-9._~+/-]+/gi, 'Bearer [redacted]');
 }

@@ -163,7 +163,17 @@ export async function launchConnection({
   let connection;
   let closing;
   let exited = false;
-  const cleanup = () => rm(profile, { recursive: true, force: true });
+  const ownsProcessGroup = process.platform !== 'win32';
+  const signalProcess = signal => {
+    if (!child?.pid) return;
+    try {
+      // A crashed browser can leave renderer/GPU children alive. Own and clean
+      // the entire group, never the worker's own process group.
+      if (ownsProcessGroup) process.kill(-child.pid, signal);
+      else if (!exited) child.kill(signal);
+    } catch (error) { if (error.code !== 'ESRCH') throw error; }
+  };
+  const cleanup = () => rm(profile, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
   const close = () => {
     if (closing) return closing;
     closing = Promise.resolve().then(async () => {
@@ -175,12 +185,13 @@ export async function launchConnection({
             clearTimeout(deadline);
             resolve();
           };
-          const killTimer = setTimeout(() => child.kill('SIGKILL'), 1500);
+          const killTimer = setTimeout(() => signalProcess('SIGKILL'), 1500);
           const deadline = setTimeout(finish, 5000);
           child.once('exit', finish);
-          child.kill('SIGTERM');
+          signalProcess('SIGTERM');
         });
       }
+      signalProcess('SIGKILL');
       await cleanup();
     });
     return closing;
@@ -197,7 +208,7 @@ export async function launchConnection({
         '--remote-debugging-pipe',
         'about:blank',
       ],
-      { stdio: ['ignore', 'ignore', 'ignore', 'pipe', 'pipe'] },
+      { stdio: ['ignore', 'ignore', 'ignore', 'pipe', 'pipe'], detached: ownsProcessGroup },
     );
     connection = new PipeConnection({
       ...transportOptions,

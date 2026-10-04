@@ -143,3 +143,48 @@ input.on('data', chunk => {
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test('browser crash terminates surviving child processes and removes its profile', { skip: process.platform !== 'linux' }, async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'fake-chromium-crash-'));
+  const executable = join(directory, 'browser');
+  await writeFile(executable, `#!/usr/bin/env node
+const fs = require('node:fs');
+const { spawn } = require('node:child_process');
+const renderer = spawn(process.execPath, ['-e', 'process.on("SIGTERM",()=>{}); setInterval(()=>{},1000)'], { stdio: 'ignore' });
+const input = fs.createReadStream(null, { fd: 3 });
+let buffer = '';
+input.on('data', chunk => {
+  buffer += chunk.toString();
+  let end;
+  while ((end = buffer.indexOf('\\0')) !== -1) {
+    const request = JSON.parse(buffer.slice(0, end)); buffer = buffer.slice(end + 1);
+    fs.writeSync(4, JSON.stringify({ id: request.id, result: { rendererPid: renderer.pid } }) + '\\0');
+  }
+});
+`, { mode: 0o700 });
+  let browser;
+  try {
+    browser = await launchConnection({ executablePath: executable, launchTimeoutMs: 2000 });
+    const { rendererPid } = await browser.connection.send('Browser.getVersion');
+    const profile = browser.process.spawnargs.find(arg => arg.startsWith('--user-data-dir=')).slice('--user-data-dir='.length);
+    const disconnected = new Promise(resolve => browser.connection.once('disconnected', resolve));
+    browser.process.kill('SIGKILL');
+    await disconnected;
+    await browser.close();
+    await assert.rejects(access(profile), { code: 'ENOENT' });
+    // A container without init may briefly retain a reparented zombie; it must
+    // never retain a running renderer after the browser process has crashed.
+    const { readFile } = await import('node:fs/promises');
+    let state;
+    for (let attempt = 0; attempt < 100; attempt++) {
+      try { state = (await readFile(`/proc/${rendererPid}/stat`, 'utf8')).split(') ')[1][0]; }
+      catch (error) { if (error.code === 'ENOENT') { state = 'gone'; break; } throw error; }
+      if (state === 'Z') break;
+      await new Promise(resolve => setTimeout(resolve, 10));
+    }
+    assert.ok(['gone', 'Z'].includes(state), `renderer remains active: ${state}`);
+  } finally {
+    await browser?.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});

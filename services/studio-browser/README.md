@@ -55,11 +55,11 @@ runs every service test with its installed Chromium under the nonroot service us
 
 Local verification on 2026-10-04:
 
-- 73 service checks passed, zero skipped, using real Chromium 153; includes all
+- 88 service checks passed, zero skipped, using real Chromium 153; includes all
   14 HTTP foundation checks, navigation, trusted input, same/cross-site iframes,
   popups, mobile geometry, open shadow roots, upload/download/dialog handling,
   cookie isolation, storage restoration, evidence ZIPs, and manual takeover.
-- 31 focused dashboard/API/planner tests passed.
+- Combined Ultimate, dashboard/API, practical review, and staged QA regression tests pass; see the PR for the final count.
 - Scoped Studio and full Admin TypeScript checks passed.
 - Changed TypeScript files and new CDP modules passed ESLint.
 - Service `npm ci` and lockfile validation passed.
@@ -78,9 +78,50 @@ rather than silently losing data. Evidence ZIPs contain `cdp-evidence.json` in
 Before release, require the Docker/Chromium workflow and Admin production build,
 then exercise authenticated provider login/resume and a complete course import in
 the deployment environment. Local fixture tests do not prove external provider
-compatibility. Marketing/LMS production builds and live provider acceptance have
-not been established by these scoped checks. No deployment is implied by this PR.
+compatibility. Live provider acceptance has not been established by these scoped checks. No deployment is implied by this PR.
 
 Roll back by deploying the previous service and Admin revisions together. Retain
-the existing encrypted provider state and encryption key; no schema migration or
-second session store is introduced.
+the existing encrypted provider state and encryption key; no second browser
+session store is introduced.
+
+
+## Integration audit follow-up
+
+The deeper predeployment audit found and repaired missing main-document lifecycle
+notifications (OAuth checkpoints), public storage-helper tabs (focus theft),
+unhandled browser restart failures, leaked renderer processes, concurrent session
+capacity oversubscription, and SSE disconnects invalidating browser checkpoints.
+Learner verification now selects the exact lesson build being processed.
+
+Media arrival is now atomic with the existing worker queue. Apply
+`20261004150000_ultimate_media_dependency_wakeup.sql` through the official migration
+workflow before deploying the changed Admin or Ultimate worker. Both deployment
+workflows check the read-only schema capability before installation/build work.
+The migration regression executes the actual SQL in PostgreSQL and covers stale
+worker yield/failure/completion, merged arrivals, targeted acceptance scope, and
+already-published builds. The forward migration remains compatible with the
+previous worker; rollback code does not require deleting queue state.
+
+Missing media uses the existing durable Studio acquisition request. Its browser
+execution begins when the owner opens the acquisition workspace; there is no
+separate background browser runner. The course resumes after licensed files are
+actually attached, not merely selected or requested. Practical-required staged learner acceptance now uses the same submission/review
+policy as the published workflow with an isolated adapter in the existing QA run
+record. The runner uploads an actual, explicitly synthetic PNG, submits through
+the QA UI, exercises rejection and revision before approval, checks persistence,
+and signs the artifact metadata and review history into its evidence. It neither
+creates a real learner enrollment nor awards mastery, hours, or credentials.
+
+For published lessons, the existing practical submission/review tables now feed
+the actual completion gate, and the existing instructor review area exposes the
+queue. Authorized reviewers must explicitly confirm every required competency.
+The latest rejection or requested revision overrides older approvals. Missing
+rubrics remain blocked; other playback/assessment/workplace requirements remain
+part of normal lesson completion.
+
+
+Read-only CI checks compare the configured Browser/Admin/Ultimate/LMS connections,
+credential equality (without printing secrets), auth-volume attachment, and actual
+required database columns with zero learner rows requested. Configured provider
+storage readiness includes a private write/fsync/delete probe; unavailable storage
+makes the service unhealthy instead of silently losing logins at restart.

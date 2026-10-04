@@ -208,6 +208,7 @@ export function createBrowserLifecycleManager({
   let recycleInFlight;
   let heartbeatInFlight;
   let intentionalClose = false;
+  let stopped = false;
 
   const connected = () => Boolean(browser?.isConnected?.());
   const fail = (error) => {
@@ -226,7 +227,7 @@ export function createBrowserLifecycleManager({
     }
   };
   const launchBrowser = async () => {
-    if (shuttingDown || lifecycle.state === 'shutting_down')
+    if (stopped || shuttingDown || lifecycle.state === 'shutting_down')
       throw new BrowserServiceError('browser_unavailable', 503);
     if (connected()) return browser;
     if (launchInFlight) return launchInFlight;
@@ -247,6 +248,7 @@ export function createBrowserLifecycleManager({
           ],
         });
         await withTimeout(verify(candidate), heartbeatTimeoutMs);
+        if (stopped || shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
         browser = candidate;
         lifecycle.generation += 1;
         lifecycle.launchTimestamp = new Date().toISOString();
@@ -256,15 +258,15 @@ export function createBrowserLifecycleManager({
         lifecycle.state = 'ready';
         candidate.on('disconnected', () => {
           if (candidate !== browser || intentionalClose || shuttingDown) return;
-          browser = undefined;
           fail(new Error('Chromium disconnected'));
-          void onUnavailable('browser_disconnected');
-          void recycleBrowser('browser_disconnected');
+          // recycle owns invalidation and records failures; never leave a
+          // rejected automatic restart unobserved by the Node process.
+          void recycleBrowser('browser_disconnected').catch(() => undefined);
         });
         return candidate;
       } catch (error) {
         await candidate?.close?.().catch(() => undefined);
-        fail(error);
+        if (!stopped) fail(error);
         throw new BrowserServiceError('browser_unavailable', 503, { cause: error });
       } finally {
         launchInFlight = undefined;
@@ -273,25 +275,31 @@ export function createBrowserLifecycleManager({
     return launchInFlight;
   };
   const recycleBrowser = async (reason = 'administrative_recycle') => {
-    if (shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
+    if (stopped || shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
     if (recycleInFlight) return recycleInFlight;
     lifecycle.state = 'recycling';
     recycleInFlight = (async () => {
       const old = browser;
       browser = undefined;
-      await onUnavailable(reason);
-      intentionalClose = true;
-      await old?.close?.().catch(() => undefined);
-      intentionalClose = false;
+      try {
+        await onUnavailable(reason);
+      } finally {
+        intentionalClose = true;
+        await old?.close?.().catch(() => undefined);
+        intentionalClose = false;
+      }
       lifecycle.restartCount += 1;
       return launchBrowser();
-    })().finally(() => {
+    })().catch(error => {
+      if (!stopped && lifecycle.state !== 'failed') fail(error);
+      throw error;
+    }).finally(() => {
       recycleInFlight = undefined;
     });
     return recycleInFlight;
   };
   const heartbeat = async () => {
-    if (heartbeatInFlight || recycleInFlight) return false;
+    if (stopped || shuttingDown || heartbeatInFlight || recycleInFlight) return false;
     // A failed pre-warm must not strand the container in a permanent 503
     // state. Northflank can keep the process alive after a transient Chromium
     // launch failure, so the normal heartbeat is also the recovery loop.
@@ -308,10 +316,12 @@ export function createBrowserLifecycleManager({
       try {
         if (!connected()) throw new Error('Chromium disconnected');
         await withTimeout(verify(browser), heartbeatTimeoutMs);
+        if (stopped || shuttingDown) return false;
         lifecycle.lastSuccessfulHeartbeat = new Date().toISOString();
         lifecycle.consecutiveFailures = 0;
         return true;
       } catch (error) {
+        if (stopped || shuttingDown) return false;
         fail(error);
         await recycleBrowser('heartbeat_failed').catch(() => undefined);
         return false;
@@ -334,13 +344,15 @@ export function createBrowserLifecycleManager({
     recycling: Boolean(recycleInFlight),
   });
   const shutdown = async () => {
+    stopped = true;
     lifecycle.state = 'shutting_down';
     intentionalClose = true;
     const old = browser;
     browser = undefined;
     await old?.close?.().catch(() => undefined);
+    await Promise.allSettled([launchInFlight, recycleInFlight].filter(Boolean));
   };
-  return { getBrowser: launchBrowser, recycleBrowser, heartbeat, health, shutdown };
+  return { getBrowser: () => recycleInFlight || launchBrowser(), recycleBrowser, heartbeat, health, shutdown };
 }
 
 function json(res, status, body) {
@@ -831,6 +843,18 @@ export function attachBrowserTabs(session, attachPage, saveState = async () => {
   session.context.on('page', attach);
 }
 
+export function createSessionCapacityGuard(limit, activeCount) {
+  let pending = 0;
+  return async (create) => {
+    if (activeCount() + pending >= limit)
+      throw new BrowserServiceError('session_capacity_reached', 429);
+    pending += 1;
+    try { return await create(); }
+    finally { pending -= 1; }
+  };
+}
+const admitSession = createSessionCapacityGuard(maxSessions, () => sessions.size);
+
 async function createSession(target, viewport, authCookies = [], ownerId) {
   const providerScope = providerSessions.scope(ownerId, target);
   // Reuse the live worker session, including its workspace and downloads.
@@ -847,7 +871,7 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
   if (shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
   const state = browserManager.health().browserState;
   if (state === 'recycling') throw new BrowserServiceError('browser_recycling', 503);
-  if (sessions.size >= maxSessions) throw new BrowserServiceError('session_capacity_reached', 429);
+  return admitSession(async () => {
   const targetUrl = new URL(target);
   const safeAuthCookies = Array.isArray(authCookies)
     ? authCookies
@@ -999,6 +1023,7 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
       throw new BrowserServiceError('browser_unavailable', 503, { cause: error });
     }
   }
+  });
 }
 
 async function runAction(session, action) {
@@ -1475,7 +1500,9 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'GET' && url.pathname === '/health') {
       const lifecycle = browserManager.health();
+      const providerAuthStorage = await providerSessions.checkReadiness();
       const ready =
+        providerAuthStorage.ready &&
         lifecycle.browserState === 'ready' &&
         lifecycle.browserConnected &&
         sessions.size < maxSessions;
@@ -1483,6 +1510,7 @@ const server = http.createServer(async (req, res) => {
         ok: ready,
         service: 'studio-browser',
         engine: 'direct-cdp-chromium',
+        providerAuthStorage,
         commit: process.env.GIT_SHA || 'MISSING',
         ...lifecycle,
         activeSessions: sessions.size,
@@ -1559,7 +1587,7 @@ const server = http.createServer(async (req, res) => {
       const correlationId = String(body.correlationId || crypto.randomUUID()).slice(0, 100);
       void browserManager.recycleBrowser(
         String(body.reason || 'administrative_recycle').slice(0, 120),
-      );
+      ).catch(() => { /* Lifecycle health records failure; heartbeat retries startup. */ });
       return json(res, 202, {
         status: 'queued',
         correlationId,
@@ -1695,6 +1723,9 @@ process.on('SIGINT', shutdown);
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   server.listen(port, '0.0.0.0', () => {
     console.info(`Studio browser listening on ${port}`);
+    void providerSessions.checkReadiness().then(status => {
+      if (!status.ready) console.error('Studio provider persistence not ready', status.error);
+    });
     void browserManager
       .getBrowser()
       .catch((error) =>

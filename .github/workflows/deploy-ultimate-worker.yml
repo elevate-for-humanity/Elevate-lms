@@ -61,6 +61,8 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+      - name: Verify required Ultimate database migration (read-only)
+        run: node scripts/verify-ultimate-media-schema.mjs
       - name: Install dedicated Ultimate worker dependencies
         run: pnpm install --filter @elevate/ultimate-course-worker... --no-frozen-lockfile --lockfile=false --strict-peer-dependencies=false
       - name: Require deployment credentials

@@ -88,8 +88,13 @@ class CdpBrowser extends EventEmitter {
         ctx.pageMap.set(page.id, page);
         page.ready = page
           .initialize()
-          .then(() => {
-            ctx.emit('page', page);
+          .then(async () => {
+            // Target attachment can precede the createTarget response. Classify
+            // internal storage targets before exposing any page to consumers.
+            await Promise.allSettled([...ctx.pageCreations]);
+            page.internal = ctx.internalTargetIds.delete(page.id);
+            page.storageRestore = page.internal;
+            if (!page.internal) ctx.emit('page', page);
             const opener = this.targets.get(p.targetInfo.openerId);
             opener?.emit('popup', page);
             return page;
@@ -212,10 +217,12 @@ class CdpContext extends EventEmitter {
     this.id = id;
     this.options = options;
     this.pageMap = new Map();
+    this.pageCreations = new Set();
+    this.internalTargetIds = new Set();
     this.storageOrigins = new Set();
     this.routes = [];
     this.request = Object.fromEntries(
-      ['get', 'post', 'put', 'delete'].map((method) => [
+      ['get', 'post', 'put', 'patch', 'delete'].map((method) => [
         method,
         (url, options) => this.fetch(url, method.toUpperCase(), options),
       ]),
@@ -249,7 +256,7 @@ class CdpContext extends EventEmitter {
     return this.browser.send(method, params);
   }
   pages() {
-    return [...this.pageMap.values()].filter((p) => !p.closed);
+    return [...this.pageMap.values()].filter((p) => !p.closed && !p.internal);
   }
   async initialize() {
     this.downloadDir = await fs.mkdtemp(path.join(os.tmpdir(), 'studio-cdp-downloads-'));
@@ -261,11 +268,21 @@ class CdpContext extends EventEmitter {
     });
     if (this.options.storageState) await restoreStorage(this, this.options.storageState);
   }
-  async newPage() {
-    const { targetId } = await this.send('Target.createTarget', {
+  async newPage({ internal = false } = {}) {
+    const creation = this.send('Target.createTarget', {
       url: 'about:blank',
       browserContextId: this.id,
+    }).then(({ targetId }) => {
+      if (internal) this.internalTargetIds.add(targetId);
+      return targetId;
     });
+    this.pageCreations.add(creation);
+    let targetId;
+    try {
+      targetId = await creation;
+    } finally {
+      this.pageCreations.delete(creation);
+    }
     const end = Date.now() + 15000;
     while (!this.pageMap.has(targetId)) {
       if (!this.browser.isConnected()) throw new Error('Browser disconnected');
@@ -279,8 +296,7 @@ class CdpContext extends EventEmitter {
     for (const page of this.pages()) await page.enableRoutes();
   }
   async withStorageOrigin(origin, callback) {
-    const page = await this.newPage();
-    page.storageRestore = true;
+    const page = await this.newPage({ internal: true });
     try {
       await page.send('Fetch.enable', { patterns: [{ urlPattern: '*', requestStage: 'Request' }] });
       await page.goto(origin + '/');
@@ -433,7 +449,7 @@ class CdpContext extends EventEmitter {
     await this.send('Target.disposeBrowserContext', { browserContextId: this.id }).catch(
       () => undefined,
     );
-    for (const page of this.pages()) page.didClose();
+    for (const page of [...this.pageMap.values()]) page.didClose();
     this.browser.contexts.delete(this.id);
     for (const [id, item] of this.browser.downloads)
       if (item.context === this) {
@@ -650,6 +666,10 @@ class CdpPage extends EventEmitter {
       this.lifecycle.set(`${p.loaderId}:${p.name}`, true);
       if (this.lifecycle.size > 200) this.lifecycle.delete(this.lifecycle.keys().next().value);
       this.emit('lifecycle', p);
+      if (sourceSessionId === this.sessionId && p.frameId === this.mainFrameId) {
+        if (p.name === 'DOMContentLoaded') this.emit('domcontentloaded');
+        if (p.name === 'load') this.emit('load');
+      }
     }
     if (method === 'Inspector.targetCrashed') this.didClose();
     if (method === 'Runtime.consoleAPICalled')

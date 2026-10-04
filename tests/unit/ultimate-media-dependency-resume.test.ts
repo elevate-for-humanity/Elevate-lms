@@ -127,3 +127,9 @@ it('surfaces a transient storage failure so the import can retry instead of sile
   );
   expect(enqueue).not.toHaveBeenCalled();
 });
+
+it('does not report a queued job when publication wins the atomic wakeup race', async () => {
+  const { db } = database();
+  enqueue.mockResolvedValue(null);
+  expect(await resumeMediaDependency(db, 'course', ['lesson'])).toEqual([]);
+});

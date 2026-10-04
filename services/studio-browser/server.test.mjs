@@ -6,6 +6,7 @@ import path from 'node:path';
 import { Readable } from 'node:stream';
 import {
   auditPage,
+  createSessionCapacityGuard,
   attachBrowserTabs,
   receiveBrowserUpload,
   isPrivateAddress,
@@ -372,4 +373,17 @@ test('viewport changes reach every tab and future popups with matching pointer g
   assert.deepEqual(popup.viewport, main.viewport);
   assert.deepEqual(future.viewport, main.viewport);
   await assert.rejects(() => runActions(session, {type: 'viewport', width: 1, height: 1}), error => error.code === 'invalid_viewport');
+});
+
+
+test('session admission reserves in-flight capacity and releases failed creations', async () => {
+  let active = 0, release;
+  const admit = createSessionCapacityGuard(1, () => active);
+  const creating = admit(async () => { await new Promise(resolve => { release = resolve; }); active++; });
+  await assert.rejects(admit(async () => { throw new Error('must not start'); }), /session_capacity_reached/);
+  release(); await creating;
+  await assert.rejects(admit(async () => undefined), /session_capacity_reached/);
+  active = 0;
+  await assert.rejects(admit(async () => { throw new Error('launch failed'); }), /launch failed/);
+  assert.equal(await admit(async () => 'recovered'), 'recovered');
 });

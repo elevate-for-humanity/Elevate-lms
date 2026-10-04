@@ -11,6 +11,7 @@
 
 import type { SupabaseClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
+import { requiredPracticalKeys, practicalReviewPasses } from './course-practical-policy';
 
 interface CompetencyCheck {
   key: string;
@@ -42,7 +43,7 @@ export async function checkCompetencyGate(
   // Load lesson metadata
   const { data: lesson, error: lessonErr } = await db
     .from('course_lessons')
-    .select('practical_required, competency_checks')
+    .select('practical_required, competency_checks, content_json')
     .eq('id', lessonId)
     .maybeSingle();
 
@@ -60,15 +61,10 @@ export async function checkCompetencyGate(
     return { allowed: true, missingKeys: [], applicable: false };
   }
 
-  const checks: CompetencyCheck[] = Array.isArray(lesson.competency_checks)
-    ? (lesson.competency_checks as CompetencyCheck[])
-    : [];
-
-  const requiredKeys = checks.filter((c) => c.requiresInstructorSignoff).map((c) => c.key);
-
-  // No sign-off checks defined — practical flag set but no checks configured yet
-  if (requiredKeys.length === 0) {
-    return { allowed: true, missingKeys: [], applicable: true };
+  const requiredKeys = requiredPracticalKeys(lesson);
+  if (!requiredKeys.length) {
+    // A practical flag with no rubric cannot legitimately award competence.
+    return { allowed: false, missingKeys: ['practical_requirements_not_configured'], applicable: true };
   }
 
   // Query approved submissions for this learner + lesson + required keys
@@ -90,6 +86,18 @@ export async function checkCompetencyGate(
   }
 
   const approvedKeys = new Set((approved ?? []).map((s) => s.competency_key));
+  const { data: practicals, error: practicalError } = await db.from('course_practical_submissions')
+    .select('status,competency_keys,evidence,learner_attestation,submitted_at,updated_at,course_practical_reviews(reviewer_id,decision,competency_results,reviewed_at)')
+    .eq('learner_id', userId).eq('lesson_id', lessonId).order('updated_at', { ascending: false });
+  if (practicalError) throw new Error(`Failed to load practical reviews: ${practicalError.message}`);
+  for (const key of requiredKeys) {
+    const latest = (practicals ?? []).find((submission: any) => submission.competency_keys?.includes(key));
+    if (!latest) continue;
+    // Newer canonical evidence is authoritative, including a failed/revised
+    // review; an earlier legacy approval must never override it.
+    if (practicalReviewPasses(latest, key)) approvedKeys.add(key);
+    else approvedKeys.delete(key);
+  }
   const missingKeys = requiredKeys.filter((k) => !approvedKeys.has(k));
 
   return {

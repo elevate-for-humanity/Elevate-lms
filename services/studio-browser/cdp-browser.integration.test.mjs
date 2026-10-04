@@ -32,6 +32,23 @@ test(
       res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify({ cookie: req.headers.cookie || '', method: req.method })); return;
     }
+    if (req.url === '/learner-controls') {
+      res.setHeader('Content-Type', 'text/html');
+      res.end(`<!doctype html><h1>Local learner adapter fixture</h1><main data-testid="staged-lesson">
+        <p role="status">Saved position: 5</p>
+        <section data-testid="guided_practice"><p>First prompt</p><textarea aria-label="First prompt"></textarea><button>Submit practice</button></section>
+        <section data-testid="guided_practice"><p>Second prompt</p><textarea aria-label="Second prompt"></textarea><button>Submit practice</button></section>
+        <section data-testid="scenario"><button>Continue with the mistake</button><button>Correct the procedure</button><p role="status">Choose a decision</p></section>
+        <section id="assessment"><fieldset><legend>Which answer is correct?</legend><label><input type="radio" name="answer" value="0">Wrong</label><label><input type="radio" name="answer" value="1">Correct</label></fieldset><button>Submit assessment</button><p role="status">Not submitted</p></section>
+        <div id="remediation"></div><button id="complete">Complete lesson</button>
+        </main><script>
+        document.querySelectorAll('[data-testid="guided_practice"] button').forEach(button=>button.onclick=()=>{const status=document.createElement('p');status.setAttribute('role','status');status.textContent='Practice saved.';button.parentElement.append(status);});
+        document.querySelectorAll('[data-testid="scenario"] button').forEach((button,index)=>button.onclick=()=>{button.parentElement.querySelector('[role="status"]').textContent=index?'Correct decision.':'Review this decision.';});
+        document.querySelector('#assessment button').onclick=()=>{const passed=document.querySelector('input:checked')?.value==='1';document.querySelector('#assessment [role="status"]').textContent=passed?'Score: 100. Passed.':'Score: 0. Review required.';if(!passed){document.querySelector('#remediation').innerHTML='<section data-testid="remediation"><button>I have reviewed the missed objectives</button></section>';document.querySelector('#remediation button').onclick=()=>{document.querySelector('#assessment').setAttribute('data-testid','reassessment');};}};
+        document.querySelector('#complete').onclick=()=>{sessionStorage.setItem('completed','true');const done=document.createElement('p');done.dataset.testid='lesson-completed';done.textContent='Lesson completed';document.querySelector('main').append(done);};
+        if(sessionStorage.getItem('completed'))document.querySelector('#complete').click();
+        </script>`); return;
+    }
     if (req.url === '/download') {
         res.writeHead(200, {
           'Content-Type': 'text/plain',
@@ -81,7 +98,23 @@ test(
     page.on('pageerror', (error) => t.diagnostic(error.message));
     await page.goto(origin);
 
-    await t.test('navigation waits for the new delayed document', async () => {
+    await t.test('page lifecycle emits main document events without duplicating child frame events', async () => {
+    const lifecyclePage = await context.newPage();
+    const events = [];
+    lifecyclePage.on('domcontentloaded', () => events.push('domcontentloaded'));
+    lifecyclePage.on('load', () => events.push('load'));
+    try {
+      const loaded = lifecyclePage.waitForEvent('load', { timeout: 5000 });
+      await lifecyclePage.goto(origin);
+      await loaded;
+      assert.deepEqual(events, ['domcontentloaded', 'load']);
+      const again = lifecyclePage.waitForEvent('load', { timeout: 5000 });
+      await lifecyclePage.goto(origin + '/slow');
+      await again;
+      assert.deepEqual(events, ['domcontentloaded', 'load', 'domcontentloaded', 'load']);
+    } finally { await lifecyclePage.close(); }
+  });
+  await t.test('navigation waits for the new delayed document', async () => {
       await page.goto(origin + '/slow');
       assert.equal(
         await page.evaluate(() => document.querySelector('h1').textContent),
@@ -243,12 +276,68 @@ test(
         await restored.close();
       },
     );
-    await t.test('context requests share HttpOnly cookies with browser without leaking across hosts', async () => {
+    await t.test('storage capture for a departed origin does not expose internal pages or steal the visible tab', async () => {
+    const storageContext = await browser.newContext();
+    const pageEvents = [];
+    storageContext.on('page', tab => pageEvents.push(tab));
+    try {
+      const visible = await storageContext.newPage();
+      await visible.goto(origin + '/slow');
+      await visible.evaluate(() => localStorage.setItem('departed', 'retained'));
+      await visible.goto(crossOrigin + '/slow');
+      assert.deepEqual(storageContext.pages().map(tab => tab.id), [visible.id]);
+      assert.deepEqual(pageEvents.map(tab => tab.id), [visible.id]);
+      const state = await storageContext.storageState();
+      assert.deepEqual(storageContext.pages().map(tab => tab.id), [visible.id]);
+      assert.deepEqual(pageEvents.map(tab => tab.id), [visible.id]);
+      assert.equal(visible.url(), crossOrigin + '/slow');
+      const captured = state.origins.find(item => item.origin === origin);
+      assert.ok(captured);
+      assert.deepEqual(captured.localStorage.find(item => item.name === 'departed'), { name: 'departed', value: 'retained' });
+    } finally { await storageContext.close(); }
+  });
+  await t.test('learner runner locator chains submit practices, wrong answers, remediation and reassessment', async () => {
+    const learner = await context.newPage();
+    try {
+      await learner.goto(origin + '/learner-controls');
+      await learner.getByTestId('staged-lesson').waitFor();
+      for (const prompt of ['First prompt', 'Second prompt']) {
+        const section = learner.getByTestId('guided_practice').filter({ has: learner.getByText(prompt, { exact: true }) });
+        await section.locator('textarea').fill('Response: ' + prompt);
+        await section.getByRole('button', { name: 'Submit practice' }).click();
+        await section.getByRole('status').waitFor();
+        assert.equal(await section.locator('textarea').inputValue(), 'Response: ' + prompt);
+      }
+      const scenario = learner.getByTestId('scenario');
+      await scenario.getByRole('button', { name: 'Continue with the mistake' }).click();
+      await scenario.getByRole('status').filter({ hasText: 'Review this decision' }).waitFor();
+      await scenario.getByRole('button', { name: 'Correct the procedure', exact: true }).click();
+      await scenario.getByRole('status').filter({ hasText: 'Correct decision' }).waitFor();
+      const field = learner.locator('fieldset').filter({ has: learner.getByText('Which answer is correct?', { exact: true }) });
+      await field.locator('input[type=radio]').nth(0).check();
+      await learner.getByRole('button', { name: 'Submit assessment', exact: true }).click();
+      await learner.getByRole('status').filter({ hasText: 'Score: 0' }).waitFor();
+      await learner.getByTestId('remediation').waitFor();
+      await learner.getByRole('button', { name: 'I have reviewed the missed objectives' }).click();
+      await learner.getByTestId('reassessment').waitFor();
+      await field.locator('input[type=radio]').nth(1).check();
+      await learner.getByRole('button', { name: 'Submit assessment', exact: true }).click();
+      await learner.getByRole('status').filter({ hasText: 'Score: 100' }).waitFor();
+      assert.equal(await learner.getByTestId('practical').count(), 0);
+      await learner.getByRole('button', { name: 'Complete lesson', exact: true }).click();
+      await learner.reload();
+      await learner.getByTestId('lesson-completed').waitFor();
+      assert.equal(await learner.getByTestId('lesson-completed').isVisible(), true);
+    } finally { await learner.close(); }
+  });
+  await t.test('context requests share HttpOnly cookies with browser without leaking across hosts', async () => {
     const apiContext = await browser.newContext();
     try {
       const login = await apiContext.request.post(origin + '/api/session', { data: { fixture: true } });
       assert.equal(login.status(), 200);
       assert.equal((await login.json()).method, 'POST');
+      const review = await apiContext.request.patch(origin + '/api/session', { data: { decision: 'revision_required' } });
+      assert.equal((await review.json()).method, 'PATCH');
       const request = await apiContext.request.get(origin + '/api/session');
       assert.equal((await request.json()).cookie, 'api-session=fixture-http-only');
       const apiPage = await apiContext.newPage();

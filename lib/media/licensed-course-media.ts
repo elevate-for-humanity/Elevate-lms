@@ -219,7 +219,12 @@ export async function recommendLicensedMediaForCourse(input: {
     .eq('course_id', input.courseId)
     .order('match_score', { ascending: false });
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []).filter((row: any) => {
+    const entitlement = Array.isArray(row.licensed_media_entitlements)
+      ? row.licensed_media_entitlements[0]
+      : row.licensed_media_entitlements;
+    return licensedMediaBelongsToCourse(entitlement?.metadata, input.courseId);
+  });
 }
 
 export type StoredLicensedMediaMetadata = {

@@ -94,7 +94,9 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
           reason = `Inspected source shows ${visualEvidence.matchedActions.join('; ')}. ` +
             `This exactly matches the scene's contextual visual requirement. ${visualEvidence.scope}`;
           method = 'reviewed-action-coverage';
-        } else if (asset.lesson_match_verified === true) {
+        } else if (asset.lesson_match_verified === true && !asset.visual_observation) {
+          // A failed inspected-action comparison must not fall back to a weaker
+          // lesson keyword match (including a demonstration or stale hash).
           const evidence = overlapEvidence(scene, asset);
           if (evidence.overlap.length) {
             reason = evidence.reason;

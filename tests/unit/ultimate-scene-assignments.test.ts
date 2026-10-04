@@ -145,6 +145,11 @@ describe('reviewed scene assignment producer', () => {
   it('requires every requested action, not shared keywords or a misleading title', () => {
     expect(buildSceneAssignments([{ ...context[0], visualRequirement:
       'Show shampooing and massaging hair at a basin and supervisor approval.' }], [reviewed]).gaps).toHaveLength(1);
+    expect(buildSceneAssignments([{ ...context[0], visualRequirement:
+      'Show shampooing and massaging hair at a basin and supervisor approval.' }], [{
+        ...reviewed, lesson_match_verified: true,
+        observed_visual_actions: reviewed.visual_observation.visibleActions,
+      }]).gaps).toHaveLength(1);
   });
   it('rejects observations with no source hash, date or sampled frame provenance', () => {
     for (const candidate of [

@@ -1,8 +1,8 @@
 const token=process.env.NORTHFLANK_API_TOKEN;
 if(!token)throw new Error('Northflank token unavailable');
 const vars={};
-async function nf(path){
- const r=await fetch('https://api.northflank.com/v1/projects/elevate-platform'+path,{headers:{authorization:'Bearer '+token},signal:AbortSignal.timeout(30000)});
+async function nf(path,project='elevate-platform'){
+ const r=await fetch('https://api.northflank.com/v1/projects/'+project+path,{headers:{authorization:'Bearer '+token},signal:AbortSignal.timeout(30000)});
  console.info(JSON.stringify({northflank:path,status:r.status}));
  if(!r.ok)return null;const j=await r.json();return j.data??j;
 }
@@ -29,7 +29,17 @@ for(const id of ['elevate-gpu-client-env','elevate-cron-runtime']){
 const keys=['CLOUDFLARE_ACCOUNT_ID','CLOUDFLARE_API_TOKEN','CLOUDFLARE_AI_API_TOKEN','CLOUDFLARE_R2_ACCESS_KEY_ID','CLOUDFLARE_R2_SECRET_ACCESS_KEY','CLOUDFLARE_R2_BUCKET_NAME','CLOUDFLARE_R2_PUBLIC_URL','NEXT_PUBLIC_R2_URL'];
 console.info(JSON.stringify({configured:Object.fromEntries(keys.map(k=>[k,typeof vars[k]==='string'&&!!vars[k]]))}));
 for(const k of ['CLOUDFLARE_R2_PUBLIC_URL','NEXT_PUBLIC_R2_URL']){try{console.info(JSON.stringify({key:k,host:new URL(vars[k]).hostname}));}catch{}}
-const api=vars.CLOUDFLARE_API_TOKEN;const account=vars.CLOUDFLARE_ACCOUNT_ID;
+const mediaGroups=await nf('/secrets','elevate-media-gpu');
+console.info(JSON.stringify({mediaGroups:mediaGroups?.secrets?.map(g=>({id:g.id,name:g.name}))}));
+for(const group of mediaGroups?.secrets??[]){
+ if(!/media|r2|cloudflare|worker/.test(group.id))continue;
+ const g=await nf('/secrets/'+encodeURIComponent(group.id)+'/details','elevate-media-gpu');
+ const env=g?.secrets?.variables??{};
+ const relevant=Object.fromEntries(Object.entries(env).filter(([k])=>/^(CLOUDFLARE_|R2_|NEXT_PUBLIC_R2_)/.test(k)));
+ console.info(JSON.stringify({mediaGroup:group.id,matchingKeys:Object.keys(relevant)}));Object.assign(vars,relevant);
+}
+const api=vars.CLOUDFLARE_API_TOKEN||vars.CLOUDFLARE_AI_API_TOKEN;const account=vars.CLOUDFLARE_ACCOUNT_ID;
+console.info(JSON.stringify({tokenSource:vars.CLOUDFLARE_API_TOKEN?'CLOUDFLARE_API_TOKEN':'CLOUDFLARE_AI_API_TOKEN'}));
 if(!api||!account)throw new Error('General Cloudflare API token or account missing');
 async function cf(path){
  const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+encodeURIComponent(account)+path,{headers:{authorization:'Bearer '+api},signal:AbortSignal.timeout(30000)});

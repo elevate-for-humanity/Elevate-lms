@@ -14,6 +14,18 @@ Object.assign(vars,g?.secrets?.variables??g?.variables??g?.secrets??{});
 const service=await nf('/services/elevate-marketing');console.info(JSON.stringify({serviceFields:Object.keys(service??{}),runtimeType:typeof service?.runtimeEnvironment}));
 const groups=await nf('/secrets');console.info(JSON.stringify({groupList:groups?.secrets?.map(g=>({id:g.id,name:g.name})),listFields:Object.keys(groups??{})}));
 
+for(const id of ['elevate-marketing','elevate-admin','elevate-lms','elevate-ultimate-worker']){
+ const service=await nf('/services/'+id);
+ const env=service?.runtimeEnvironment??{};
+ const relevant=Object.fromEntries(Object.entries(env).filter(([k])=>/^(CLOUDFLARE_|R2_|NEXT_PUBLIC_R2_)/.test(k)));
+ console.info(JSON.stringify({service:id,matchingKeys:Object.keys(relevant),types:Object.fromEntries(Object.entries(relevant).map(([k,v])=>[k,typeof v]))}));
+ for(const [k,v] of Object.entries(relevant))if(typeof v==='string'&&v&&!v.includes('***'))vars[k]=v;
+}
+for(const id of ['elevate-gpu-client-env','elevate-cron-runtime']){
+ const g=await nf('/secrets/'+id+'/details');const env=g?.secrets?.variables??{};
+ const relevant=Object.fromEntries(Object.entries(env).filter(([k])=>/^(CLOUDFLARE_|R2_|NEXT_PUBLIC_R2_)/.test(k)));
+ console.info(JSON.stringify({group:id,matchingKeys:Object.keys(relevant)}));Object.assign(vars,relevant);
+}
 const keys=['CLOUDFLARE_ACCOUNT_ID','CLOUDFLARE_API_TOKEN','CLOUDFLARE_AI_API_TOKEN','CLOUDFLARE_R2_ACCESS_KEY_ID','CLOUDFLARE_R2_SECRET_ACCESS_KEY','CLOUDFLARE_R2_BUCKET_NAME','CLOUDFLARE_R2_PUBLIC_URL','NEXT_PUBLIC_R2_URL'];
 console.info(JSON.stringify({configured:Object.fromEntries(keys.map(k=>[k,typeof vars[k]==='string'&&!!vars[k]]))}));
 for(const k of ['CLOUDFLARE_R2_PUBLIC_URL','NEXT_PUBLIC_R2_URL']){try{console.info(JSON.stringify({key:k,host:new URL(vars[k]).hostname}));}catch{}}

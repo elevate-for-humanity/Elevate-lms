@@ -37,3 +37,31 @@ test('account-scoped encrypted connection excludes LMS and other provider state'
     await assert.rejects(() => new ProviderSessionStore({ secret: 'test-secret', directory }).load(scope), /RESTORE_FAILED/);
   } finally { await fs.rm(directory, { recursive: true, force: true }); }
 });
+
+test('persistent readiness writes and removes a private probe in the configured directory', async () => {
+  const parent = await fs.mkdtemp(path.join(os.tmpdir(), 'provider-ready-'));
+  const directory = path.join(parent, 'auth');
+  try {
+    const store = new ProviderSessionStore({ secret: 'fixture-only', directory });
+    const results = await Promise.all([store.checkReadiness(), store.checkReadiness()]);
+    assert.deepEqual(results[0], { ready: true, persistent: true, mode: 'encrypted-disk' });
+    assert.deepEqual(results[1], results[0]);
+    assert.deepEqual(await fs.readdir(directory), []);
+    assert.equal((await fs.stat(directory)).mode & 0o777, 0o700);
+  } finally { await fs.rm(parent, { recursive: true, force: true }); }
+});
+
+test('configured unwritable persistence reports failure without leaking the directory', { skip: process.platform !== 'linux' }, async () => {
+  // procfs cannot create arbitrary files even when this test executes as root.
+  const store = new ProviderSessionStore({ secret: 'fixture-only', directory: '/proc' });
+  assert.deepEqual(await store.checkReadiness(), {
+    ready: false, persistent: true, mode: 'encrypted-disk', error: 'provider_auth_storage_unavailable',
+  });
+});
+
+test('readiness permits deliberate memory mode but rejects unencrypted persistence', async () => {
+  assert.deepEqual(await new ProviderSessionStore().checkReadiness(), { ready: true, persistent: false, mode: 'memory' });
+  assert.deepEqual(await new ProviderSessionStore({ directory: '/unused' }).checkReadiness(), {
+    ready: false, persistent: true, mode: 'encrypted-disk', error: 'provider_auth_encryption_unavailable',
+  });
+});

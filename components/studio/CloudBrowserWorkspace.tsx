@@ -88,6 +88,7 @@ export default function CloudBrowserWorkspace({
   const [events, setEvents] = useState<BrowserEvent[]>([]);
   const [browserTabs, setBrowserTabs] = useState<{ id: string; url: string }[]>([]);
   const [activeTabId, setActiveTabId] = useState('');
+  const [cdpConnected, setCdpConnected] = useState(false);
   const [filePicker, setFilePicker] = useState(false);
   const [browserDialog, setBrowserDialog] = useState<{
     type: string;
@@ -133,6 +134,27 @@ export default function CloudBrowserWorkspace({
   const authHeaders: Record<string, string> = session
     ? { Authorization: `Bearer ${session.token}` }
     : {};
+  const cdpSessionId = session?.id;
+  const cdpSessionToken = session?.token;
+  const cdpServiceUrl = session?.publicUrl;
+
+  useEffect(() => {
+    setCdpConnected(false);
+    if (!cdpSessionId || !cdpSessionToken || !cdpServiceUrl) return;
+    let cancelled = false;
+    const check = async () => {
+      try {
+        const response = await fetch(`${cdpServiceUrl}/sessions/${cdpSessionId}/cdp`, {
+          headers: { Authorization: `Bearer ${cdpSessionToken}` }, cache: 'no-store',
+        });
+        const body = await response.json();
+        if (!cancelled) setCdpConnected(response.ok && body.connected === true && body.engine === 'direct-cdp-chromium');
+      } catch { if (!cancelled) setCdpConnected(false); }
+    };
+    void check();
+    const timer = window.setInterval(check, 15000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, [cdpSessionId, cdpSessionToken, cdpServiceUrl, activeTabId]);
 
   useEffect(() => {
     const requestedTarget = initialTarget.trim();
@@ -370,10 +392,13 @@ export default function CloudBrowserWorkspace({
     const revision = navigation ? ++navigationRevisionRef.current : navigationRevisionRef.current;
     if (navigation) navigatingRef.current = true;
     try {
-      const response = await fetch(`${endpoint}/actions`, {
+      const browserAction = { ...payload, actor: 'human' };
+      const response = await fetch(navigation ? '/api/admin/dev-studio/browser/action' : `${endpoint}/actions`, {
         method: 'POST',
-        headers: { ...authHeaders, 'content-type': 'application/json' },
-        body: JSON.stringify(payload),
+        headers: { ...(navigation ? {} : authHeaders), 'content-type': 'application/json' },
+        body: JSON.stringify(navigation
+          ? { sessionId: session.id, sessionToken: session.token, action: browserAction }
+          : browserAction),
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) {
@@ -495,6 +520,8 @@ export default function CloudBrowserWorkspace({
   async function runAgent(taskId = '', taskOverride = '') {
     const command = taskOverride.trim() || agentTask.trim();
     if (!session || !command) return;
+    // Explicitly starting/resuming a task hands this same browser back to automation.
+    if (!await action({ type: 'resume_automation' })) return;
     if (!taskId) setActiveTaskId('');
     setAgentRunning(true);
     setAgentResult('');
@@ -888,6 +915,9 @@ export default function CloudBrowserWorkspace({
           </>
         ) : null}
         <span className="text-base text-slate-600">{status}</span>
+        {session ? <span role="status" className="text-sm text-slate-600">
+          {cdpConnected ? 'Direct CDP connected' : 'Direct CDP unverified'}
+        </span> : null}
         {unifiedTask ? (
           <span className="max-w-full truncate rounded-full border border-violet-500/50 bg-violet-500/10 px-2 py-1 text-sm font-bold text-violet-800">
             LIZZY conversation · {unifiedTask.title || unifiedTask.planId}

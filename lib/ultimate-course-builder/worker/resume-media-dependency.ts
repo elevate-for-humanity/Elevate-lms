@@ -68,13 +68,12 @@ export async function resumeMediaDependency(
   const jobs = [];
   for (const build of builds ?? []) {
     if (build.status === 'published') continue;
-    jobs.push(
-      await queue.enqueue(build.id, {
+    const job = await queue.enqueue(build.id, {
         dependencyResume: 'licensed_media_attached',
         lessonIds: [...new Set(stored.flatMap((f) => f.lessonIds))],
         assetIds: stored.map((f) => f.id),
-      }),
-    );
+      });
+    if (job) jobs.push(job);
   }
   return jobs;
 }

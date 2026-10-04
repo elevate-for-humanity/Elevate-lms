@@ -10,6 +10,32 @@ export class ProviderSessionStore {
     this.directory = directory;
     this.states = new Map();
   }
+  async checkReadiness() {
+    if (!this.directory) return { ready: true, persistent: false, mode: 'memory' };
+    if (!this.key) return { ready: false, persistent: true, mode: 'encrypted-disk', error: 'provider_auth_encryption_unavailable' };
+    if (this.readinessInFlight) return this.readinessInFlight;
+    this.readinessInFlight = (async () => {
+      let probe, handle;
+      try {
+        await fs.mkdir(this.directory, { recursive: true, mode: 0o700 });
+        probe = path.join(this.directory, '.readiness-' + crypto.randomUUID());
+        handle = await fs.open(probe, 'wx', 0o600);
+        // Only fixed, nonsecret probe bytes. Exercise actual writes, not access()
+        // permissions, so read-only volumes and full disks cannot appear ready.
+        await handle.writeFile('studio-provider-storage-probe');
+        await handle.sync();
+        await handle.close(); handle = undefined;
+        await fs.unlink(probe); probe = undefined;
+        return { ready: true, persistent: true, mode: 'encrypted-disk' };
+      } catch {
+        return { ready: false, persistent: true, mode: 'encrypted-disk', error: 'provider_auth_storage_unavailable' };
+      } finally {
+        await handle?.close().catch(() => undefined);
+        if (probe) await fs.unlink(probe).catch(() => undefined);
+      }
+    })().finally(() => { this.readinessInFlight = undefined; });
+    return this.readinessInFlight;
+  }
   scope(ownerId, target) {
     const host = new URL(target).hostname;
     return typeof ownerId === 'string' && /^[a-zA-Z0-9_-]{1,128}$/.test(ownerId) &&

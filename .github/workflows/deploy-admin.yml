@@ -145,6 +145,8 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
+      - name: Verify required Ultimate database migration (read-only)
+        run: node scripts/verify-ultimate-media-schema.mjs
       - name: Install dependencies deterministically
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Enforce Admin instrumentation boundary

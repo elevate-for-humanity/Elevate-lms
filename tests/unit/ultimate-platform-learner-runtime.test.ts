@@ -9,12 +9,13 @@ import { LEARNER_RUNTHROUGH_CHECKS } from '../../lib/ultimate-course-builder/qua
 const artifacts = { finished_media_qa: { mediaQA: { inspection: { mediaSha256: 'media' } } } };
 let currentArtifacts: unknown = artifacts;
 const query: any = {
-  select: () => query, eq: () => query, order: () => query, limit: () => query,
+  select: () => query, eq: vi.fn(() => query), order: () => query, limit: () => query,
   single: async () => ({ data: { id: 'lesson-build', artifacts: currentArtifacts }, error: null }),
 };
 const db: any = { from: () => query };
-const input = { courseId: 'course', lessonId: 'lesson', videoUrl: 'https://example.org/video.mp4' };
+const input = { lessonBuildId: 'lesson-build', courseId: 'course', lessonId: 'lesson', videoUrl: 'https://example.org/video.mp4' };
 afterEach(() => {
+  query.eq.mockClear();
   currentArtifacts = artifacts;
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
@@ -46,6 +47,15 @@ function response(evidence: any) {
   return { ok: true, json: async () => ({ evidence, signature }) };
 }
 describe('authentic learner evidence', () => {
+  it('pins the exact current lesson build instead of selecting the latest course attempt', async () => {
+    configured();
+    vi.stubGlobal('fetch', vi.fn(async () => response(report())));
+    await new UltimatePlatformLearnerRuntime(db).verify(input);
+    expect(query.eq).toHaveBeenCalledWith('id', 'lesson-build');
+    expect(query.eq).toHaveBeenCalledWith('competency_id', 'lesson');
+    expect(query.eq).toHaveBeenCalledWith('ultimate_course_builds.course_id', 'course');
+  });
+
   it('rejects a lesson changed while its browser test was running', async () => {
     configured();
     vi.stubGlobal('fetch', vi.fn(async () => {

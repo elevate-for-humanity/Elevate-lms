@@ -327,6 +327,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
     learner_runthrough: async (ctx) => {
       const render: any = ctx.artifacts.lesson_film_render?.render;
       const learnerRuntimeEvidence = await runtime.learner.verify({
+        lessonBuildId: ctx.lessonBuildId ?? '',
         courseId: ctx.courseId,
         lessonId: String(comp(ctx).id),
         videoUrl: render.videoUrl,

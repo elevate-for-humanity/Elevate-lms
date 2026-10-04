@@ -1,0 +1,36 @@
+name: Ultimate Media Wakeup Contract
+on:
+  pull_request:
+    paths:
+      - 'lib/ultimate-course-builder/worker/**'
+      - 'supabase/migrations/**'
+      - 'tests/integration/ultimate-media-wakeup.test.mjs'
+      - 'scripts/verify-ultimate-media-schema*.mjs'
+      - '.github/workflows/ultimate-media-wakeup-contract.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'lib/ultimate-course-builder/worker/**'
+      - 'supabase/migrations/**'
+      - 'tests/integration/ultimate-media-wakeup.test.mjs'
+      - 'scripts/verify-ultimate-media-schema*.mjs'
+      - '.github/workflows/ultimate-media-wakeup-contract.yml'
+permissions:
+  contents: read
+jobs:
+  postgres-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install isolated pinned PostgreSQL test engine
+        run: npm install --prefix "$RUNNER_TEMP/ultimate-sql-test" --no-audit --no-fund @electric-sql/pglite@0.5.8
+      - name: Exercise actual migration and stale worker transitions
+        env:
+          PGLITE_MODULE: ${{ runner.temp }}/ultimate-sql-test/node_modules/@electric-sql/pglite/dist/index.js
+        run: node --test tests/integration/ultimate-media-wakeup.test.mjs
+      - name: Verify read-only deployment prerequisite behavior
+        run: node --test scripts/verify-ultimate-media-schema.test.mjs

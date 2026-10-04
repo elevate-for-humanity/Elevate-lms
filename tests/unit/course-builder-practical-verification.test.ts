@@ -7,9 +7,9 @@ const read = (file: string) => fs.readFileSync(path.join(process.cwd(), file), '
 describe('universal practical verification', () => {
   it('requires learner evidence, attestation, and authorized human review', () => {
     const learner = read('apps/lms/app/api/learner/practical-submissions/route.ts');
-    const reviewer = read('apps/admin/app/api/admin/course-builder/practical-reviews/route.ts');
+    const reviewer = read('lib/lms/course-practical-workflow.ts');
     expect(learner).toContain('learnerAttestation: z.literal(true)');
-    expect(learner).toContain("action: 'request_expert_review'");
+    expect(reviewer).toContain("action: 'request_expert_review'");
     expect(reviewer).toContain("'record_mastery'");
     expect(reviewer).toContain("'unlock_next'");
     expect(reviewer).toContain("'assign_remediation'");

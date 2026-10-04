@@ -4,6 +4,19 @@ export class UltimateJobQueue {
   constructor(private db: SupabaseClient) {}
 
   async enqueue(buildId: string, payload: unknown = {}) {
+    if ((payload as any)?.dependencyResume === 'licensed_media_attached') {
+      const { data, error } = await this.db.rpc('wake_ultimate_media_dependency', {
+        p_build: buildId, p_payload: payload,
+      });
+      if (error) throw error;
+      if (!data?.[0]) {
+        const { data: build, error: buildError } = await this.db.from('ultimate_course_builds').select('status').eq('id', buildId).single();
+        if (buildError) throw buildError;
+        if (build?.status === 'published') return null;
+        throw new Error('ULTIMATE_DEPENDENCY_WAKEUP_NOT_PERSISTED');
+      }
+      return data[0];
+    }
     const active = () =>
       this.db
         .from('ultimate_build_jobs')
@@ -120,12 +133,7 @@ export class UltimateJobQueue {
       .eq('id', jobId)
       .eq('lease_owner', workerId);
     if (updateError) throw updateError;
-    if (!canRetry) {
-      // A terminal job cannot leave a course advertising active execution.
-      const { error: buildError } = await this.db.from('ultimate_course_builds')
-        .update({ status: 'blocked', current_step: 'selective_repair', updated_at: new Date().toISOString() })
-        .eq('id', data.build_id);
-      if (buildError) throw buildError;
-    }
+    // The database transition atomically blocks or requeues the build. A
+    // separate update here could overwrite a concurrently arriving media wakeup.
   }
 }

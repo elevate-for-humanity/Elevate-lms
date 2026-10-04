@@ -1066,7 +1066,7 @@ async function execTool(
       } catch (error) {
         return JSON.stringify(
           {
-            evidenceType: 'live-playwright-browser-audit',
+            evidenceType: 'live-cdp-browser-audit',
             status: 'failed',
             error: error instanceof Error ? error.message : 'Live browser audit failed',
             verified: false,

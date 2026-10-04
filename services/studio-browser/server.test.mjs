@@ -6,6 +6,7 @@ import path from 'node:path';
 import { Readable } from 'node:stream';
 import {
   auditPage,
+  createSessionCapacityGuard,
   attachBrowserTabs,
   receiveBrowserUpload,
   isPrivateAddress,
@@ -14,6 +15,23 @@ import {
   snapshotPage,
   writeBrowserFrame,
 } from './server.mjs';
+
+test('human takeover interrupts automation between actions and requires explicit resume', async () => {
+  const calls = []; let release, started;
+  const first = new Promise(resolve => { started = resolve; });
+  const session = { page: { keyboard: { insertText: async text => {
+    calls.push(text); if (text === 'automation-first') { started(); await new Promise(resolve => { release = resolve; }); }
+  } } } };
+  const automatic = runActions(session, { actor: 'automation', actions: [{type:'type',text:'automation-first'},{type:'type',text:'automation-second'}] });
+  await first;
+  const manual = runActions(session, { actor:'human', type:'type', text:'human' });
+  release();
+  await assert.rejects(automatic, /manual_control_active/); await manual;
+  await assert.rejects(runActions(session,{actor:'automation',type:'type',text:'blocked'}), /manual_control_active/);
+  await runActions(session,{actor:'human',type:'resume_automation'});
+  await runActions(session,{actor:'automation',type:'type',text:'resumed'});
+  assert.deepEqual(calls,['automation-first','human','resumed']);
+});
 
 test('slow viewers do not accumulate stale or partial browser frames', () => {
   const writes=[];
@@ -355,4 +373,17 @@ test('viewport changes reach every tab and future popups with matching pointer g
   assert.deepEqual(popup.viewport, main.viewport);
   assert.deepEqual(future.viewport, main.viewport);
   await assert.rejects(() => runActions(session, {type: 'viewport', width: 1, height: 1}), error => error.code === 'invalid_viewport');
+});
+
+
+test('session admission reserves in-flight capacity and releases failed creations', async () => {
+  let active = 0, release;
+  const admit = createSessionCapacityGuard(1, () => active);
+  const creating = admit(async () => { await new Promise(resolve => { release = resolve; }); active++; });
+  await assert.rejects(admit(async () => { throw new Error('must not start'); }), /session_capacity_reached/);
+  release(); await creating;
+  await assert.rejects(admit(async () => undefined), /session_capacity_reached/);
+  active = 0;
+  await assert.rejects(admit(async () => { throw new Error('launch failed'); }), /launch failed/);
+  assert.equal(await admit(async () => 'recovered'), 'recovered');
 });

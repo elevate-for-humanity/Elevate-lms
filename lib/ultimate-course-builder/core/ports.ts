@@ -91,6 +91,7 @@ export interface UltimateLearnerRuntimeEvidence {
 }
 export interface UltimateLearnerRuntimePort {
   verify(input: {
+    lessonBuildId: string;
     courseId: string;
     lessonId: string;
     videoUrl: string;

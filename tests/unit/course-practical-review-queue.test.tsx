@@ -1,0 +1,20 @@
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { afterEach, expect, it, vi } from 'vitest';
+import CoursePracticalReviewQueue from '@/components/lms/CoursePracticalReviewQueue';
+afterEach(() => vi.unstubAllGlobals());
+it('requires an explicit competency verification and comments before submitting the human review', async () => {
+  const request = vi.fn(async (_url: any, options?: any) => ({ ok: true, json: async () => options?.method === 'POST' ? { success: true } : { submissions: [{ id: 'submission', learner_id: 'learner', interaction_id: 'safe-work-practical', competency_keys: ['safe-work'], evidence: [{ type: 'url', value: 'https://example.test/evidence.mp4' }] }] } }));
+  vi.stubGlobal('fetch', request);
+  render(<CoursePracticalReviewQueue />);
+  const approve = await screen.findByRole('button', { name: 'Approve' });
+  expect((approve as HTMLButtonElement).disabled).toBe(true);
+  expect(screen.getByRole('link', { name: 'Open submitted evidence' }).getAttribute('href')).toBe('https://example.test/evidence.mp4');
+  fireEvent.change(screen.getByRole('textbox', { name: 'Review comments' }), { target: { value: 'Observed safety steps in submitted evidence.' } });
+  expect((approve as HTMLButtonElement).disabled).toBe(true);
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Observed and verified: safe-work' }));
+  fireEvent.click(approve);
+  await waitFor(() => expect(request.mock.calls.some(call => call[1]?.method === 'POST')).toBe(true));
+  const call: any = request.mock.calls.find(call => call[1]?.method === 'POST');
+  expect(call[0]).toBe('/api/admin/course-builder/practical-reviews');
+  expect(JSON.parse(call[1].body)).toEqual({ submissionId: 'submission', decision: 'approved', comments: 'Observed safety steps in submitted evidence.', competencyResults: { 'safe-work': true } });
+});

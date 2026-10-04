@@ -286,11 +286,19 @@ export async function POST(req: NextRequest) {
     error: 'This browser checkpoint is being used by another request.', taskId, running: true,
   }, { status: 409 });
 
+  // Transport lifetime must not invalidate the action already submitted to the
+  // worker. Finish its checkpoint, then release this same task for resumption.
+  let disconnected = req.signal.aborted;
+  const disconnect = () => { disconnected = true; };
+  req.signal.addEventListener('abort', disconnect, { once: true });
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     start(controller) {
-      const emit = (event: Record<string, unknown>) =>
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ ...event, taskId })}\n\n`));
+      const emit = (event: Record<string, unknown>) => {
+        if (disconnected) return;
+        try { controller.enqueue(encoder.encode(`data: ${JSON.stringify({ ...event, taskId })}\n\n`)); }
+        catch { disconnect(); }
+      };
       void (async () => {
         const steps: BrowserStep[] = Array.isArray(task.result_json?.steps)
           ? task.result_json.steps
@@ -338,7 +346,15 @@ export async function POST(req: NextRequest) {
               message: 'Continuing the same browser task from its saved checkpoint.',
             });
           };
+          const pauseIfDisconnected = async () => {
+            if (!disconnected) return false;
+            await assertNotCancelled();
+            await continueFromCheckpoint();
+            await appendLog('Browser client disconnected; the same task is queued at its persisted checkpoint.');
+            return true;
+          };
           for (let turn = batchStart; turn < batchStart + 20; turn++) {
+            if (await pauseIfDisconnected()) return;
             if (steps.length >= maxTaskSteps) {
               const reason = `Review the browser task after ${maxTaskSteps} checkpoints and narrow the command or increase its configured budget.`;
               await pauseForAuthentication(
@@ -358,6 +374,7 @@ export async function POST(req: NextRequest) {
               return;
             }
             await assertNotCancelled();
+            if (await pauseIfDisconnected()) return;
             const snapshotResponse = await fetch(`${workerUrl}/sessions/${sessionId}/snapshot`, {
               headers: { Authorization: `Bearer ${sessionToken}` },
               cache: 'no-store',
@@ -403,6 +420,7 @@ export async function POST(req: NextRequest) {
             // planner calls. Preserve that boundary while allowing the planner
             // to use Studio's configured provider instead of hard-coding the
             // optional Elevate-owned gateway.
+            if (await pauseIfDisconnected()) return;
             const plan = await runWithPaidInferenceContext(taskId, () =>
               planBrowserTurn({
                 command,
@@ -415,6 +433,7 @@ export async function POST(req: NextRequest) {
             await appendLog(
               `Browser plan ${turn + 1}: ${plan.status} via ${plan.provider}/${plan.model}.`,
             );
+            if (await pauseIfDisconnected()) return;
             if (plan.status === 'complete') {
               const completedAt = new Date().toISOString();
               await db
@@ -490,10 +509,11 @@ export async function POST(req: NextRequest) {
               actions: actions.length,
               message: `Running browser step ${turn + 1}…`,
             });
+            if (await pauseIfDisconnected()) return;
             const actionResponse = await fetch(`${workerUrl}/sessions/${sessionId}/actions`, {
               method: 'POST',
               headers: workerHeaders,
-              body: JSON.stringify({ actions }),
+              body: JSON.stringify({ actions, actor: 'automation' }),
               signal: AbortSignal.timeout(35_000),
             });
             const actionMetrics = (await actionResponse.json().catch(() => ({}))) as {
@@ -501,6 +521,12 @@ export async function POST(req: NextRequest) {
               durationMs?: number;
               url?: string;
             };
+            if (!actionResponse.ok && actionMetrics.error === 'manual_control_active') {
+              const reason = 'You took control of the Studio browser. Finish your input, then resume this same task.';
+              await pauseForAuthentication(reason, steps, history, totalTokens, undefined, undefined, 'interaction');
+              emit({ type: 'interaction_required', message: reason, steps });
+              return;
+            }
             if (!actionResponse.ok && actionMetrics.error === 'authentication_required') {
               const reason =
                 'The licensed-media provider session requires secure authentication before this browser task can continue.';
@@ -586,10 +612,18 @@ export async function POST(req: NextRequest) {
           await appendLog(message, cancelled ? 'warn' : 'error');
           emit({ type: 'error', error: message, steps });
         } finally {
-          controller.close();
+          req.signal.removeEventListener('abort', disconnect);
+          if (!disconnected) {
+            try { controller.close(); } catch { disconnect(); }
+          }
         }
-      })();
+      })().catch(error => {
+        // Persistence failures remain failures; never let a detached SSE task
+        // produce an unhandled rejection or overwrite its last saved checkpoint.
+        console.error('[studio-browser-agent] stream task failed', error instanceof Error ? error.message : 'Unknown error');
+      });
     },
+    cancel() { disconnect(); },
   });
   return new Response(stream, {
     headers: {

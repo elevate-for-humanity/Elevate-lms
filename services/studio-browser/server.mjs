@@ -9,7 +9,7 @@ import { execFile, spawn } from 'node:child_process';
 import { pipeline } from 'node:stream/promises';
 import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
-import { chromium } from 'playwright-core';
+import { launchBrowser } from './cdp-browser.mjs';
 import { commandArguments } from './command-arguments.mjs';
 import { ProviderSessionStore } from './provider-session-store.mjs';
 import { requiresHumanVerification, redactBrowserEvidence } from './provider-verification.mjs';
@@ -190,7 +190,7 @@ async function withTimeout(promise, timeoutMs, code = 'browser_unavailable') {
 }
 
 export function createBrowserLifecycleManager({
-  launch = (options) => chromium.launch(options),
+  launch = (options) => launchBrowser(options),
   onUnavailable = async () => {},
 } = {}) {
   const lifecycle = {
@@ -208,6 +208,7 @@ export function createBrowserLifecycleManager({
   let recycleInFlight;
   let heartbeatInFlight;
   let intentionalClose = false;
+  let stopped = false;
 
   const connected = () => Boolean(browser?.isConnected?.());
   const fail = (error) => {
@@ -226,18 +227,17 @@ export function createBrowserLifecycleManager({
     }
   };
   const launchBrowser = async () => {
-    if (shuttingDown || lifecycle.state === 'shutting_down')
+    if (stopped || shuttingDown || lifecycle.state === 'shutting_down')
       throw new BrowserServiceError('browser_unavailable', 503);
     if (connected()) return browser;
     if (launchInFlight) return launchInFlight;
     lifecycle.state = 'starting';
     launchInFlight = (async () => {
+      let candidate;
       try {
-        const candidate = await launch({
+        candidate = await launch({
           headless: true,
-          ...(process.env.STUDIO_BROWSER_EXECUTABLE_PATH
-            ? { executablePath: process.env.STUDIO_BROWSER_EXECUTABLE_PATH }
-            : {}),
+          executablePath: process.env.STUDIO_BROWSER_EXECUTABLE_PATH || '/usr/bin/chromium',
           args: [
             '--disable-background-networking',
             '--disable-component-update',
@@ -248,6 +248,7 @@ export function createBrowserLifecycleManager({
           ],
         });
         await withTimeout(verify(candidate), heartbeatTimeoutMs);
+        if (stopped || shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
         browser = candidate;
         lifecycle.generation += 1;
         lifecycle.launchTimestamp = new Date().toISOString();
@@ -257,14 +258,15 @@ export function createBrowserLifecycleManager({
         lifecycle.state = 'ready';
         candidate.on('disconnected', () => {
           if (candidate !== browser || intentionalClose || shuttingDown) return;
-          browser = undefined;
           fail(new Error('Chromium disconnected'));
-          void onUnavailable('browser_disconnected');
-          void recycleBrowser('browser_disconnected');
+          // recycle owns invalidation and records failures; never leave a
+          // rejected automatic restart unobserved by the Node process.
+          void recycleBrowser('browser_disconnected').catch(() => undefined);
         });
         return candidate;
       } catch (error) {
-        fail(error);
+        await candidate?.close?.().catch(() => undefined);
+        if (!stopped) fail(error);
         throw new BrowserServiceError('browser_unavailable', 503, { cause: error });
       } finally {
         launchInFlight = undefined;
@@ -273,25 +275,31 @@ export function createBrowserLifecycleManager({
     return launchInFlight;
   };
   const recycleBrowser = async (reason = 'administrative_recycle') => {
-    if (shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
+    if (stopped || shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
     if (recycleInFlight) return recycleInFlight;
     lifecycle.state = 'recycling';
     recycleInFlight = (async () => {
       const old = browser;
       browser = undefined;
-      await onUnavailable(reason);
-      intentionalClose = true;
-      await old?.close?.().catch(() => undefined);
-      intentionalClose = false;
+      try {
+        await onUnavailable(reason);
+      } finally {
+        intentionalClose = true;
+        await old?.close?.().catch(() => undefined);
+        intentionalClose = false;
+      }
       lifecycle.restartCount += 1;
       return launchBrowser();
-    })().finally(() => {
+    })().catch(error => {
+      if (!stopped && lifecycle.state !== 'failed') fail(error);
+      throw error;
+    }).finally(() => {
       recycleInFlight = undefined;
     });
     return recycleInFlight;
   };
   const heartbeat = async () => {
-    if (heartbeatInFlight || recycleInFlight) return false;
+    if (stopped || shuttingDown || heartbeatInFlight || recycleInFlight) return false;
     // A failed pre-warm must not strand the container in a permanent 503
     // state. Northflank can keep the process alive after a transient Chromium
     // launch failure, so the normal heartbeat is also the recovery loop.
@@ -308,10 +316,12 @@ export function createBrowserLifecycleManager({
       try {
         if (!connected()) throw new Error('Chromium disconnected');
         await withTimeout(verify(browser), heartbeatTimeoutMs);
+        if (stopped || shuttingDown) return false;
         lifecycle.lastSuccessfulHeartbeat = new Date().toISOString();
         lifecycle.consecutiveFailures = 0;
         return true;
       } catch (error) {
+        if (stopped || shuttingDown) return false;
         fail(error);
         await recycleBrowser('heartbeat_failed').catch(() => undefined);
         return false;
@@ -334,13 +344,15 @@ export function createBrowserLifecycleManager({
     recycling: Boolean(recycleInFlight),
   });
   const shutdown = async () => {
+    stopped = true;
     lifecycle.state = 'shutting_down';
     intentionalClose = true;
     const old = browser;
     browser = undefined;
     await old?.close?.().catch(() => undefined);
+    await Promise.allSettled([launchInFlight, recycleInFlight].filter(Boolean));
   };
-  return { getBrowser: launchBrowser, recycleBrowser, heartbeat, health, shutdown };
+  return { getBrowser: () => recycleInFlight || launchBrowser(), recycleBrowser, heartbeat, health, shutdown };
 }
 
 function json(res, status, body) {
@@ -737,7 +749,7 @@ async function runBrowserFoundationTest() {
       await dialogEvent;
       await runActions(session, { type: 'dialog', accept: true });
       await clicked;
-      assert(await page.getAttribute('body', 'data-confirmed') === 'true', 'dialog_response_missing');
+      assert(await page.locator('body').getAttribute('data-confirmed') === 'true', 'dialog_response_missing');
     });
     await check('download_bytes', async () => {
       const downloadEvent = page.waitForEvent('download', { timeout: 10000 });
@@ -762,8 +774,11 @@ async function runBrowserFoundationTest() {
       await page.waitForFunction(() => window.scrollY > 0, null, { timeout: 10000 });
     });
     await check('navigation_and_history', async () => {
-      await session.context.route('https://www.elevateforhumanity.org/studio-browser-acceptance/**', route => route.fulfill({contentType: 'text/html', body: fixture}));
-      await runActions(session, { actions: [{ type: 'navigate', url: 'https://www.elevateforhumanity.org/studio-browser-acceptance/one' }, { type: 'navigate', url: 'https://www.elevateforhumanity.org/studio-browser-acceptance/two' }, { type: 'back' }] });
+      // Synthetic local pages exercise real navigation without depending on public DNS.
+      // Public action URL validation remains unchanged and rejects private targets.
+      await page.goto(`http://127.0.0.1:${port}/foundation-fixture/${fixtureNonce}/one`);
+      await page.goto(`http://127.0.0.1:${port}/foundation-fixture/${fixtureNonce}/two`);
+      await runActions(session, { type: 'back' });
       assert(page.url().endsWith('/one'), 'history_back_failed');
       await runActions(session, { type: 'forward' });
       assert(page.url().endsWith('/two'), 'history_forward_failed');
@@ -828,6 +843,18 @@ export function attachBrowserTabs(session, attachPage, saveState = async () => {
   session.context.on('page', attach);
 }
 
+export function createSessionCapacityGuard(limit, activeCount) {
+  let pending = 0;
+  return async (create) => {
+    if (activeCount() + pending >= limit)
+      throw new BrowserServiceError('session_capacity_reached', 429);
+    pending += 1;
+    try { return await create(); }
+    finally { pending -= 1; }
+  };
+}
+const admitSession = createSessionCapacityGuard(maxSessions, () => sessions.size);
+
 async function createSession(target, viewport, authCookies = [], ownerId) {
   const providerScope = providerSessions.scope(ownerId, target);
   // Reuse the live worker session, including its workspace and downloads.
@@ -844,7 +871,7 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
   if (shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
   const state = browserManager.health().browserState;
   if (state === 'recycling') throw new BrowserServiceError('browser_recycling', 503);
-  if (sessions.size >= maxSessions) throw new BrowserServiceError('session_capacity_reached', 429);
+  return admitSession(async () => {
   const targetUrl = new URL(target);
   const safeAuthCookies = Array.isArray(authCookies)
     ? authCookies
@@ -996,6 +1023,7 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
       throw new BrowserServiceError('browser_unavailable', 503, { cause: error });
     }
   }
+  });
 }
 
 async function runAction(session, action) {
@@ -1140,11 +1168,32 @@ export function sessionRequiresAuthentication(session, now = Date.now()) {
   });
 }
 
-export async function runActions(session, payload) {
+export function runActions(session, payload) {
+  if (payload?.actor === 'human') {
+    session.manualControl = true;
+    session.controlRevision = (session.controlRevision || 0) + 1;
+  }
+  // Serialize whole batches across all dashboard/worker HTTP connections.
+  const queued = (session.actionQueue || Promise.resolve()).catch(() => undefined)
+    .then(() => executeActions(session, payload));
+  session.actionQueue = queued;
+  return queued;
+}
+
+async function executeActions(session, payload) {
+  if (payload?.type === 'resume_automation') {
+    session.manualControl = false;
+    return { count: 0, durationMs: 0 };
+  }
+  if (payload?.actor === 'automation' && session.manualControl) throw new BrowserServiceError('manual_control_active', 409);
+  const revision = session.controlRevision || 0;
   const actions = Array.isArray(payload?.actions) ? payload.actions.slice(0, 50) : [payload];
   const startedAt = Date.now();
   try {
-    for (const action of actions) await runAction(session, action);
+    for (const action of actions) {
+      if (payload?.actor === 'automation' && (session.manualControl || revision !== (session.controlRevision || 0))) throw new BrowserServiceError('manual_control_active', 409);
+      await runAction(session, action);
+    }
   } catch (error) {
     if (sessionRequiresAuthentication(session)) {
       throw new BrowserServiceError('authentication_required', 409, { cause: error });
@@ -1266,8 +1315,15 @@ export async function snapshotPage(session) {
           element.textContent ||
           element.getAttribute('placeholder'),
       );
+    const queryAll = (selector, root = document) => {
+      const found = [...root.querySelectorAll(selector)];
+      for (const element of root.querySelectorAll('*')) {
+        if (element.shadowRoot) found.push(...queryAll(selector, element.shadowRoot));
+      }
+      return found;
+    };
     const elements = [
-      ...document.querySelectorAll(
+      ...queryAll(
         'button, a[href], input, select, textarea, [role="button"], [contenteditable="true"]',
       ),
     ]
@@ -1290,7 +1346,7 @@ export async function snapshotPage(session) {
         disabled: Boolean(element.disabled || element.getAttribute('aria-disabled') === 'true'),
       };
     });
-    const headings = [...document.querySelectorAll('h1, h2, h3, h4, h5, h6')]
+    const headings = queryAll('h1, h2, h3, h4, h5, h6')
       .filter(visible)
       .slice(0, 40)
       .map((element) => ({
@@ -1396,7 +1452,7 @@ const server = http.createServer(async (req, res) => {
   try {
     if (req.method === 'OPTIONS') return json(res, 204, {});
     const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
-    const fixtureMatch = url.pathname.match(/^\/foundation-fixture\/([a-f0-9-]{36})\/(start|download)$/);
+    const fixtureMatch = url.pathname.match(/^\/foundation-fixture\/([a-f0-9-]{36})\/(start|download|one|two)$/);
     if (req.method === 'GET' && fixtureMatch) {
       const fixture = foundationFixtures.get(fixtureMatch[1]);
       if (!fixture || fixture.expiresAt < Date.now()) return json(res, 404, {error: 'fixture_expired'});
@@ -1444,14 +1500,17 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'GET' && url.pathname === '/health') {
       const lifecycle = browserManager.health();
+      const providerAuthStorage = await providerSessions.checkReadiness();
       const ready =
+        providerAuthStorage.ready &&
         lifecycle.browserState === 'ready' &&
         lifecycle.browserConnected &&
         sessions.size < maxSessions;
       return json(res, ready ? 200 : 503, {
         ok: ready,
         service: 'studio-browser',
-        engine: 'playwright-chromium',
+        engine: 'direct-cdp-chromium',
+        providerAuthStorage,
         commit: process.env.GIT_SHA || 'MISSING',
         ...lifecycle,
         activeSessions: sessions.size,
@@ -1528,7 +1587,7 @@ const server = http.createServer(async (req, res) => {
       const correlationId = String(body.correlationId || crypto.randomUUID()).slice(0, 100);
       void browserManager.recycleBrowser(
         String(body.reason || 'administrative_recycle').slice(0, 120),
-      );
+      ).catch(() => { /* Lifecycle health records failure; heartbeat retries startup. */ });
       return json(res, 202, {
         status: 'queued',
         correlationId,
@@ -1557,6 +1616,7 @@ const server = http.createServer(async (req, res) => {
       try { session = await creation; }
       finally { if (scope && providerSessionCreations.get(scope) === creation) providerSessionCreations.delete(scope); }
       return json(res, 201, {
+        engine: 'direct-cdp-chromium',
         id: session.id,
         token: session.token,
         url: session.page.url(),
@@ -1565,12 +1625,16 @@ const server = http.createServer(async (req, res) => {
       });
     }
     const match = url.pathname.match(
-      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit|downloads|imports|batch-imports|uploads|file|identity))?$/,
+      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit|downloads|imports|batch-imports|uploads|file|identity|cdp))?$/,
     );
     if (!match) return json(res, 404, { error: 'Not found' });
     const session = sessions.get(match[1]);
     if (!session) return json(res, 410, { error: 'session_expired' });
     if (!authorized(req, session, url)) return json(res, 401, { error: 'unauthorized' });
+    if (req.method === 'GET' && match[2] === 'cdp') {
+      await session.page.send('Page.getFrameTree');
+      return json(res, 200, { connected: true, engine: 'direct-cdp-chromium', transport: 'private-pipe', tabId: session.activeTabId });
+    }
     if (req.method === 'GET' && match[2] === 'identity') return json(res, 200, { ownerId: session.ownerId });
     if (req.method === 'GET' && match[2] === 'file') {
       const download = session.downloads.get(url.searchParams.get('id'));
@@ -1659,6 +1723,9 @@ process.on('SIGINT', shutdown);
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   server.listen(port, '0.0.0.0', () => {
     console.info(`Studio browser listening on ${port}`);
+    void providerSessions.checkReadiness().then(status => {
+      if (!status.ready) console.error('Studio provider persistence not ready', status.error);
+    });
     void browserManager
       .getBrowser()
       .catch((error) =>

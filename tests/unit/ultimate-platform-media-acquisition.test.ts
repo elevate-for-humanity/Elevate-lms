@@ -4,7 +4,10 @@ vi.mock('@/lib/media/licensed-course-media', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/media/licensed-course-media')>();
   return { ...actual, attachStoredLicensedMedia: vi.fn().mockResolvedValue({ id: 'stored' }) };
 });
-import { UltimatePlatformMedia } from '../../lib/ultimate-course-builder/adapters/platform-media';
+import {
+  canAutoApproveLicensedMediaMatch,
+  UltimatePlatformMedia,
+} from '../../lib/ultimate-course-builder/adapters/platform-media';
 import { attachStoredLicensedMedia } from '@/lib/media/licensed-course-media';
 
 test('acquisition resolves the requested course before reading its matches', async () => {
@@ -90,4 +93,40 @@ test('approved media scoped to a different course is never acquired or attached'
   expect(await media.acquire({ courseId: 'course-a' })).toEqual({ attached: 0, pending: 0 });
   expect(download).not.toHaveBeenCalled();
   expect(attachStoredLicensedMedia).not.toHaveBeenCalled();
+});
+
+
+test('auto-approval requires course ownership, license evidence, usable media, and semantic evidence', () => {
+  const base = {
+    status: 'suggested',
+    match_score: 0.4,
+    match_reasons: ['Shared topic: sanitation'],
+    licensed_media_entitlements: {
+      provider: 'envato',
+      provider_item_id: 'item-a',
+      license_document_url: 'https://license.example/item-a',
+      metadata: {
+        courseId: 'course-a',
+        storage_bucket: 'course_videos',
+        storage_path: 'licensed-library/envato/item-a/file.mp4',
+      },
+    },
+  };
+  expect(canAutoApproveLicensedMediaMatch(base, 'course-a')).toBe(true);
+  expect(canAutoApproveLicensedMediaMatch({
+    ...base,
+    licensed_media_entitlements: {
+      ...base.licensed_media_entitlements,
+      metadata: { ...base.licensed_media_entitlements.metadata, courseId: 'course-b' },
+    },
+  }, 'course-a')).toBe(false);
+  expect(canAutoApproveLicensedMediaMatch({ ...base, match_reasons: [] }, 'course-a')).toBe(false);
+  expect(canAutoApproveLicensedMediaMatch({
+    ...base,
+    licensed_media_entitlements: {
+      ...base.licensed_media_entitlements,
+      license_document_url: '',
+      metadata: { courseId: 'course-a' },
+    },
+  }, 'course-a')).toBe(false);
 });

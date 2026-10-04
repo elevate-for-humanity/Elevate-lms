@@ -66,6 +66,8 @@ describe('One Studio conversation workspace', () => {
         ]}
       />,
     );
+    fireEvent.click(screen.getByRole('button', { name: 'Open Studio sidebar' }));
+    expect(screen.queryByRole('button', { name: /PARIS|ELLIE|ZORA/ })).toBeNull();
     fireEvent.click(await screen.findByRole('button', { name: 'Reviewed course sample' }));
     await waitFor(() => expect(screen.getByText('Conversation second')).toBeInTheDocument());
     await waitFor(() => expect(screen.getByText('plan-2: awaiting_approval')).toBeInTheDocument());

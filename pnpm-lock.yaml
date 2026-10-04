@@ -11,6 +11,7 @@ catalogs:
       version: 15.5.25
 
 overrides:
+  braces: file:./packages/bounded-braces
   '@grpc/grpc-js': 1.14.5
   basic-ftp: ^6.0.0
   protobufjs: ^8.0.3
@@ -767,6 +768,12 @@ importers:
         specifier: 10.2.2
         version: 10.2.2
 
+  packages/bounded-braces:
+    dependencies:
+      fill-range:
+        specifier: 7.1.1
+        version: 7.1.1
+
   packages/config: {}
 
   packages/db:
@@ -1152,6 +1159,9 @@ packages:
     resolution: {integrity: sha512-+MKAJEOfaBe5SmV6t34p80MMKhjvUz0vRrvVJbPT0WElzaOJ/1xs+D+KDv+tD/NE5ujfrChEcshd4fLn0wpiqg==}
     peerDependencies:
       react: '>=16.8.0'
+
+  '@elevate/bounded-braces@file:packages/bounded-braces':
+    resolution: {directory: packages/bounded-braces, type: directory}
 
   '@emnapi/core@1.11.3':
     resolution: {integrity: sha512-zLpS5asjEb7lq8jYLq37N6XKaE41DIexlY1rF/z4/tIl3wo13Sqm28fRyfIsKZD+NZ8mM5RoKkpW/rBcuoSZSg==}
@@ -5414,10 +5424,6 @@ packages:
   brace-expansion@5.0.11:
     resolution: {integrity: sha512-awigjhi6cLTh90bdw6+QJ9CtmJmyYhEIi70iCbc8Rozn04Fw9FeQIBjv/E22FFGuCGx1bLJyUfB64x/szUSXUg==}
     engines: {node: 20 || >=22}
-
-  braces@3.0.3:
-    resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
-    engines: {node: '>=8'}
 
   brotli@1.3.3:
     resolution: {integrity: sha512-oTKjJdShmDuGW94SyyaoQvAjf30dZaHnjJ8uAF+u2/vGJkJbJPJAT1gDiOJP5v1Zb6f9KEyW/1HpuaWIXtGHPg==}
@@ -10789,6 +10795,10 @@ snapshots:
       react: 19.2.7
       tslib: 2.8.1
 
+  '@elevate/bounded-braces@file:packages/bounded-braces':
+    dependencies:
+      fill-range: 7.1.1
+
   '@emnapi/core@1.11.3':
     dependencies:
       '@emnapi/wasi-threads': 1.2.3
@@ -15254,10 +15264,6 @@ snapshots:
     dependencies:
       balanced-match: 4.0.4
 
-  braces@3.0.3:
-    dependencies:
-      fill-range: 7.1.1
-
   brotli@1.3.3:
     dependencies:
       base64-js: 1.5.1
@@ -15401,7 +15407,7 @@ snapshots:
   chokidar@3.6.0:
     dependencies:
       anymatch: 3.1.3
-      braces: 3.0.3
+      braces: '@elevate/bounded-braces@file:packages/bounded-braces'
       glob-parent: 5.1.2
       is-binary-path: 2.1.0
       is-glob: 4.0.3
@@ -18057,7 +18063,7 @@ snapshots:
 
   micromatch@4.0.8:
     dependencies:
-      braces: 3.0.3
+      braces: '@elevate/bounded-braces@file:packages/bounded-braces'
       picomatch: 2.3.2
 
   mime-db@1.33.0: {}

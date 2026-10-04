@@ -26,15 +26,7 @@ import {
   Workflow,
 } from 'lucide-react';
 
-export type StudioSpecialist = 'PARIS' | 'ELLIE' | 'LIZZY' | 'ZORA';
 type Workspace = { id: string; label: string; route: string };
-
-const AGENTS: Array<{ id: StudioSpecialist; label: string; detail: string }> = [
-  { id: 'PARIS', label: 'PARIS', detail: 'Websites & pathways' },
-  { id: 'ELLIE', label: 'ELLIE', detail: 'Courses & coaching' },
-  { id: 'LIZZY', label: 'LIZZY', detail: 'Platform operations' },
-  { id: 'ZORA', label: 'ZORA', detail: 'Compliance & evidence' },
-];
 
 const ICONS: Record<string, typeof Bot> = {
   courses: Brain,
@@ -61,8 +53,6 @@ type PluginCheck = { name: string; passed: boolean; required: boolean; message: 
 
 export default function StudioCapabilityRail({
   workspaces,
-  specialist,
-  onSpecialistChange,
   mobile = false,
   onNavigate,
   onOpenWorkspace,
@@ -70,8 +60,6 @@ export default function StudioCapabilityRail({
   children,
 }: {
   workspaces: Workspace[];
-  specialist: StudioSpecialist | null;
-  onSpecialistChange: (agent: StudioSpecialist | null) => void;
   mobile?: boolean;
   onNavigate?: () => void;
   onOpenWorkspace?: (id: string) => void;
@@ -83,22 +71,14 @@ export default function StudioCapabilityRail({
   const [plugins, setPlugins] = useState<'checking' | 'healthy' | 'degraded' | 'blocked'>(
     'checking',
   );
-  const [agentCount, setAgentCount] = useState<number | null>(null);
   const [pluginChecks, setPluginChecks] = useState<PluginCheck[]>([]);
   const [connectionsOpen, setConnectionsOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
-    Promise.all([
-      fetch('/api/admin/dev-studio/plugins/health', { cache: 'no-store' }).then(
-        async (response) => ({ response, body: await response.json().catch(() => ({})) }),
-      ),
-      fetch('/api/admin/dev-studio/agents', { cache: 'no-store' }).then(async (response) => ({
-        response,
-        body: await response.json().catch(() => ({})),
-      })),
-    ])
-      .then(([pluginResult, agentResult]) => {
+    fetch('/api/admin/dev-studio/plugins/health', { cache: 'no-store' })
+      .then(async (response) => ({ response, body: await response.json().catch(() => ({})) }))
+      .then((pluginResult) => {
         if (!active) return;
         setPlugins(
           !pluginResult.response.ok || pluginResult.body.status === 'unavailable'
@@ -108,12 +88,7 @@ export default function StudioCapabilityRail({
               : 'healthy',
         );
         setPluginChecks(Array.isArray(pluginResult.body.checks) ? pluginResult.body.checks : []);
-        const rows = Array.isArray(agentResult.body.agents)
-          ? agentResult.body.agents
-          : Array.isArray(agentResult.body)
-            ? agentResult.body
-            : [];
-        setAgentCount(agentResult.response.ok ? rows.length : null);
+
       })
       .catch(() => {
         if (active) setPlugins('blocked');
@@ -133,7 +108,7 @@ export default function StudioCapabilityRail({
       <div className="flex h-12 items-center border-b border-slate-200 px-3">
         {expanded ? (
           <span className="text-sm font-black uppercase tracking-[0.16em] text-slate-700">
-            Intelligence
+            Workspace
           </span>
         ) : null}
         <button
@@ -148,38 +123,6 @@ export default function StudioCapabilityRail({
 
       <div className="min-h-0 flex-1 overflow-y-auto px-2 py-3">
         {expanded ? children : null}
-        {expanded ? (
-          <p className="px-2 pb-2 text-xs font-bold uppercase tracking-widest text-slate-600">
-            Agents {agentCount !== null ? `· ${agentCount} active` : ''}
-          </p>
-        ) : null}
-        <div className="space-y-1">
-          {AGENTS.map((agent) => {
-            const selected = specialist === agent.id;
-            return (
-              <button
-                key={agent.id}
-                type="button"
-                onClick={() => onSpecialistChange(selected ? null : agent.id)}
-                title={`${agent.label} — ${agent.detail}`}
-                className={`flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition ${selected ? 'bg-cyan-500 text-slate-950' : 'text-slate-700 hover:bg-slate-200 hover:text-slate-950'}`}
-              >
-                <Bot className="h-5 w-5 shrink-0" aria-hidden="true" />
-                {expanded ? (
-                  <span className="min-w-0">
-                    <span className="block text-sm font-black">{agent.label}</span>
-                    <span
-                      className={`block truncate text-xs ${selected ? 'text-slate-800' : 'text-slate-600'}`}
-                    >
-                      {agent.detail}
-                    </span>
-                  </span>
-                ) : null}
-              </button>
-            );
-          })}
-        </div>
-
         <div className="my-3 border-t border-slate-200" />
         {expanded ? (
           <p className="px-2 pb-2 text-xs font-bold uppercase tracking-widest text-slate-600">

@@ -34,6 +34,8 @@ jobs:
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Recovery hardening regression check
         run: node scripts/verify-recovery-gate-hardening.mjs
+      - name: Bounded brace parser security regression
+        run: node --test tests/security/bounded-braces.test.cjs
       - name: Dependency security audit
         run: pnpm audit --audit-level high
 

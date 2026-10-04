@@ -27,6 +27,7 @@ allowBuilds:
   workerd: true
 
 overrides:
+  braces: file:./packages/bounded-braces
   '@grpc/grpc-js': 1.14.5
   basic-ftp: ^6.0.0
   protobufjs: ^8.0.3

@@ -41,6 +41,7 @@ export default function HomePage() {
     <>
       <StructuredData />
       <main className="[&_a]:no-underline [&_a:hover]:no-underline">
+        <h1 className="sr-only">Elevate for Humanity career training and apprenticeships</h1>
         <section className="border-b border-amber-300 bg-amber-50 px-4 py-5" aria-labelledby="workone-home-cta">
           <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>

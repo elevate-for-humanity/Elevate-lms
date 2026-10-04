@@ -6,11 +6,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { MEDIA_STORAGE_POLICY } from '@/lib/media/storage-policy';
-import { isR2Configured } from '@/lib/cloudflare-r2';
-import { isStorageConfigured } from '@/lib/storage/file-storage';
+import {
+  getObjectStorageRuntimeSummary,
+  isObjectStorageConfigured,
+} from '@/lib/storage/object-storage';
 import {
   resolveCourseVideoStorageBackend,
-  isAnyR2Configured,
+  isAnyObjectStorageConfigured,
 } from '@/lib/video/upload-lesson-media';
 
 export const dynamic = 'force-dynamic';
@@ -35,17 +37,21 @@ export async function GET(request: NextRequest) {
     storage: {
       policy: MEDIA_STORAGE_POLICY,
       supabaseConfigured: envSet('NEXT_PUBLIC_SUPABASE_URL') && envSet('SUPABASE_SERVICE_ROLE_KEY'),
-      r2CloudflareModule: isR2Configured(),
-      r2FileStorageModule: isStorageConfigured(),
+      objectStorageConfigured: isObjectStorageConfigured(),
+      objectStorage: getObjectStorageRuntimeSummary(),
       courseVideoBackend: resolveCourseVideoStorageBackend(),
-      courseVideoR2MinBytes: Number(process.env.COURSE_VIDEO_R2_MIN_BYTES || 5_242_880),
-      largeMp4UsesR2WhenConfigured: isAnyR2Configured(),
+      courseVideoObjectMinBytes: Number(
+        process.env.COURSE_VIDEO_OBJECT_MIN_BYTES ||
+          process.env.COURSE_VIDEO_R2_MIN_BYTES ||
+          5_242_880,
+      ),
+      largeMp4UsesObjectStorageWhenConfigured: isAnyObjectStorageConfigured(),
       remotionReleaseAfterJob: process.env.REMOTION_RELEASE_BUNDLE_AFTER_RENDER !== 'false',
     },
     notes: [
-      'Generated lesson videos upload to Supabase course-videos; container disk is temp-only.',
-      'Cloudflare R2 is for digital downloads (and optional Dev Studio R2 path), not required for course videos.',
-      'Nothing in this response starts background work — diagnostic only.',
+      'Generated lesson videos use Supabase for small assets and configured S3-compatible object storage for large MP4s.',
+      'Backblaze B2, Wasabi, AWS S3, Supabase S3, Cloudflare R2, and custom S3 endpoints share the same storage adapter.',
+      'Container disk is temp-only; nothing in this response starts background work.',
     ],
   });
 }

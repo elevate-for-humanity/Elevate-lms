@@ -9,10 +9,13 @@ const mocks = vi.hoisted(() => ({
     speak: vi.fn(), hangup: vi.fn(), answer: vi.fn(),
   },
   dial: vi.fn(),
+  push: vi.fn(),
+  email: vi.fn(),
+  failVoicemailWrite: false,
 }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => mocks.db }));
-vi.mock('@/lib/resend', () => ({ resend: { emails: { send: vi.fn() } } }));
-vi.mock('@/lib/notifications/push-service', () => ({ PushNotificationService: class { sendToUserWithDatabase = vi.fn(); } }));
+vi.mock('@/lib/resend', () => ({ resend: { emails: { send: mocks.email } } }));
+vi.mock('@/lib/notifications/push-service', () => ({ PushNotificationService: class { sendToUserWithDatabase = mocks.push; } }));
 vi.mock('@/lib/notifications/sms', () => ({ sendSMS: vi.fn() }));
 vi.mock('@/lib/phone/telnyx', () => ({
   verifyTelnyxWebhook: async () => mocks.event,
@@ -45,6 +48,9 @@ function query(table: string) {
     maybeSingle: () => { one = true; return chain; },
     single: () => { one = true; return chain; },
     then: (resolve: any, reject: any) => {
+      if (mocks.failVoicemailWrite && table === 'voicemails' && operation === 'insert') {
+        return Promise.resolve({ data: null, error: new Error('voicemail write failed') }).then(resolve, reject);
+      }
       const rows = tables[table] ||= [];
       let found = rows.filter(row => filters.every(f => f(row)));
       if (operation === 'update') found.forEach(row => Object.assign(row, values));
@@ -55,16 +61,17 @@ function query(table: string) {
   return chain;
 }
 
-async function event(type: string, payload: any = {}, state: any = {}) {
+async function event(type: string, payload: any = {}, state: any = {}, expectedStatus = 200) {
   mocks.event = { data: { id: `evt-${Math.random()}`, event_type: type, occurred_at: '2026-10-04T00:00:00Z', payload: {
     call_control_id: 'call-control', client_state: Buffer.from(JSON.stringify({systemId:'system',callId:'call',phase:'main_menu',...state})).toString('base64'), ...payload,
   } } };
   const response = await POST(new Request('https://admin.example/api/webhooks/telnyx', { method: 'POST', body: '{}' }));
-  expect(response.status).toBe(200);
+  expect(response.status).toBe(expectedStatus);
 }
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.failVoicemailWrite = false;
   tables = {
     phone_systems: [{ ...system }], phone_calls: [{ id: 'call', provider: 'telnyx', provider_call_id: 'call-control', from_number: '+13175550100' }],
     communication_workspaces: [{ id: 'workspace', phone_system_id: 'system' }],
@@ -88,6 +95,58 @@ beforeEach(() => {
 });
 
 describe('Telnyx webhook recovery and routing (provider verification mocked)', () => {
+  it('requests provider retry rather than acknowledging a voicemail that could not be saved', async () => {
+    mocks.failVoicemailWrite = true;
+    await event('call.recording.saved', { recording_urls: { mp3: 'https://recordings.example/message.mp3' } }, {
+      phase: 'voicemail_recording', taskId: 'task', extensionId: 'beauty', profileId: 'beauty-profile',
+    }, 500);
+    expect(mocks.push).not.toHaveBeenCalled();
+  });
+  it('copies voicemail notification to Admin without transferring the call or changing its holder', async () => {
+    tables.profiles = [{ id: 'admin-profile', email: 'admin@example.test' }, { id: 'beauty-profile', email: 'holder@example.test' }];
+    Object.assign(tables.phone_callback_tasks[0], { source: 'voicemail', extension_id: 'beauty', assigned_profile_id: 'beauty-profile' });
+    await event('call.recording.saved', { recording_urls: { mp3: 'https://recordings.example/message.mp3' } }, {
+      phase: 'voicemail_recording', taskId: 'task', extensionId: 'beauty', profileId: 'beauty-profile',
+    });
+    expect(tables.voicemails).toHaveLength(1);
+    expect(tables.voicemails[0]).toMatchObject({ call_id: 'call', assigned_profile_id: 'beauty-profile' });
+    expect(tables.phone_callback_tasks[0].assigned_profile_id).toBe('beauty-profile');
+    expect(mocks.push.mock.calls.map(c => c[1])).toEqual(expect.arrayContaining(['beauty-profile', 'admin-profile']));
+    expect(mocks.email.mock.calls.map(c => c[0].to)).toEqual(expect.arrayContaining(['holder@example.test', 'admin@example.test']));
+    expect(mocks.email.mock.calls.find(c => c[0].to === 'admin@example.test')?.[0].text).toContain('/phone/inbox');
+    expect(mocks.dial).not.toHaveBeenCalled();
+  });
+  it('does not duplicate the voicemail row when recording delivery is repeated', async () => {
+    for (let i = 0; i < 2; i++) await event('call.recording.saved', { recording_urls: { mp3: 'https://recordings.example/message.mp3' } }, {
+      phase: 'voicemail_recording', taskId: 'task', extensionId: 'beauty', profileId: 'beauty-profile',
+    });
+    expect(tables.voicemails).toHaveLength(1);
+  });
+  it('notifies Admin only once when Admin is already the assigned recipient', async () => {
+    Object.assign(tables.phone_callback_tasks[0], { source: 'voicemail', extension_id: 'admin', assigned_profile_id: 'admin-profile' });
+    await event('call.recording.saved', { recording_urls: { mp3: 'https://recordings.example/message.mp3' } }, {
+      phase: 'voicemail_recording', taskId: 'task', extensionId: 'admin', profileId: 'admin-profile',
+    });
+    expect(mocks.push).toHaveBeenCalledTimes(1);
+    expect(mocks.push.mock.calls[0][2].url).toContain('admin.elevateforhumanity.org/phone/inbox');
+  });
+  it('recognizes the observed voicemail_prompt recording event using its persisted callback source', async () => {
+    Object.assign(tables.phone_callback_tasks[0], { source: 'voicemail', extension_id: 'beauty', assigned_profile_id: 'beauty-profile' });
+    await event('call.recording.saved', { recording_urls: { mp3: 'https://recordings.example/message.mp3' } }, {
+      phase: 'voicemail_prompt', taskId: 'task', extensionId: 'tech', profileId: 'tech-profile',
+    });
+    expect(tables.voicemails[0]).toMatchObject({ call_id: 'call', assigned_profile_id: 'beauty-profile' });
+    expect(mocks.push.mock.calls.map(c => c[1])).toEqual(expect.arrayContaining(['beauty-profile', 'admin-profile']));
+  });
+  it('keeps an unanswered holder call with PARIS rather than dialing Admin', async () => {
+    tables.phone_call_legs = [{ provider_call_id: 'holder-leg', answered_at: null }];
+    await event('call.hangup', { call_control_id: 'holder-leg', hangup_cause: 'timeout' }, {
+      phase: 'webrtc_leg', parentCallControlId: 'call-control', extensionId: 'beauty', profileId: 'beauty-profile',
+    });
+    expect(mocks.dial).not.toHaveBeenCalled();
+    expect(mocks.actions.gatherUsingAI).toHaveBeenCalled();
+    expect(tables.phone_callback_tasks[0].assigned_profile_id).toBe('beauty-profile');
+  });
   it('does not hang up after the observed voice-provider timeout', async () => {
     await event('call.ai_gather.ended', { status: 'client_error', result: null }, { phase: 'paris_intake', taskId: 'task', extensionId: 'tech', profileId: 'tech-profile' });
     expect(mocks.actions.hangup).not.toHaveBeenCalled();

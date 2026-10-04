@@ -88,7 +88,7 @@ function appUrl(path: string) {
   return new URL(path, base).toString();
 }
 
-async function notifyAssignee(
+async function notifyRecipient(
   db: any,
   input: {
     profileId?: string;
@@ -102,12 +102,18 @@ async function notifyAssignee(
     transcript?: string;
     callbackNumber?: string;
     preferredCallbackTime?: string;
+    adminCopy?: boolean;
+    source?: 'voicemail' | 'paris';
+    responsibleHolder?: string;
   },
 ) {
-  const url = input.profileId ? appUrl('/program-holder/phone') : appUrl('/phone/inbox');
+  const url = input.adminCopy
+    ? new URL('/phone/inbox', process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org').toString()
+    : input.profileId ? appUrl('/program-holder/phone') : appUrl('/phone/inbox');
+  const messageType = input.source === 'voicemail' ? 'a voicemail' : 'details with PARIS';
   if (input.profileId) await push.sendToUserWithDatabase(db, input.profileId, {
-    title: input.urgency === 'urgent' ? 'Urgent call for your extension' : 'New call to return',
-    body: `${input.caller} left details with PARIS. Open your secure phone inbox.`,
+    title: input.adminCopy ? 'Admin copy: new phone message' : input.urgency === 'urgent' ? 'Urgent call for your extension' : 'New call to return',
+    body: `${input.caller} left ${messageType}. ${input.adminCopy ? 'The assigned holder remains responsible for follow-up.' : 'Open your secure phone inbox.'}`,
     icon: '/icon-192x192.png',
     badge: '/icon-72.png',
     url,
@@ -123,6 +129,10 @@ async function notifyAssignee(
       ])
     : [{ data: null }, { data: null }];
   const detailLines = [
+    input.adminCopy ? 'Admin oversight copy — callback responsibility remains with the assigned holder.' : '',
+    input.source === 'voicemail' ? 'A voicemail was left. Open the secure inbox to listen.' : '',
+    input.responsibleHolder ? `Responsible holder: ${input.responsibleHolder}` : '',
+    `Callback reference: ${input.taskId}`,
     `Caller: ${input.caller}`,
     input.callbackNumber ? `Callback: ${input.callbackNumber}` : '',
     input.extension ? `Extension attempted: ${input.extension}` : '',
@@ -146,7 +156,7 @@ async function notifyAssignee(
       from: 'Elevate Phone <noreply@elevateforhumanity.org>',
       to: profile.email,
       subject:
-        input.urgency === 'urgent'
+        input.adminCopy ? 'Admin copy: phone message and callback follow-up' : input.urgency === 'urgent'
           ? 'Urgent call requires follow-up'
           : 'New call in your Elevate Phone inbox',
       text: `${readableDetails}\n\nFull call record: ${url}`,
@@ -154,6 +164,23 @@ async function notifyAssignee(
     });
   } catch (error) {
     console.error('Missed-call email delivery failed:', error);
+  }
+}
+
+async function notifyAssignee(db: any, input: Parameters<typeof notifyRecipient>[1], system: System) {
+  const admin = await defaultAdminRoute(db, system);
+  const { data: holder } = input.profileId
+    ? await db.from('profiles').select('full_name').eq('id', input.profileId).maybeSingle()
+    : { data: null };
+  input = { ...input, responsibleHolder: holder?.full_name || input.responsibleHolder };
+  const recipients = [notifyRecipient(db, { ...input, adminCopy: Boolean(admin.profileId && admin.profileId === input.profileId) })];
+  if (admin.profileId && admin.profileId !== input.profileId) {
+    recipients.push(notifyRecipient(db, { ...input, profileId: admin.profileId, adminCopy: true }));
+  }
+  // One recipient's delivery failure must not prevent the other recipient's
+  // notification. The shared call/task remains the durable inbox copy.
+  for (const result of await Promise.allSettled(recipients)) {
+    if (result.status === 'rejected') console.error('Phone message notification failed:', result.reason);
   }
 }
 
@@ -1080,7 +1107,7 @@ async function handleEvent(
       transcript: savedTask?.transcript || undefined,
       preferredCallbackTime: String(result.preferred_callback_time || '').trim() || undefined,
       urgency,
-    });
+    }, system);
     await db.from('phone_calls').update({ assigned_extension_id: assignedState.extensionId || null,
       assigned_profile_id: assignedState.profileId || null }).eq('id', call.id);
     return parisNextStep(system, call, payload.call_control_id, eventId,
@@ -1121,22 +1148,33 @@ async function handleEvent(
     (payload.recording_urls?.mp3 || payload.recording_urls?.wav)
   ) {
     const recordingUrl = payload.recording_urls.mp3 || payload.recording_urls.wav;
+    const { data: recordingTask, error: taskLookupError } = state.taskId
+      ? await db.from('phone_callback_tasks').select('source,transcript,summary,extension_id,assigned_profile_id').eq('id', state.taskId).maybeSingle()
+      : { data: null, error: null };
+    if (taskLookupError) throw taskLookupError;
     if (state.taskId && recordingUrl) {
-      await db
+      const { error } = await db
         .from('phone_callback_tasks')
         .update({ recording_url: recordingUrl, updated_at: new Date().toISOString() })
         .eq('id', state.taskId);
+      if (error) throw error;
     }
-    await db
+    const { error: recordingError } = await db
       .from('phone_calls')
       .update({ recording_url: recordingUrl, updated_at: new Date().toISOString() })
       .eq('id', call.id);
-    if (state.phase === 'voicemail_recording' && recordingUrl) {
-      await db.from('voicemails').insert({
+    if (recordingError) throw recordingError;
+    // Telnyx may retain the prompt state on recording.saved. The persisted
+    // callback source identifies the voicemail even when action state lags.
+    if ((recordingTask?.source === 'voicemail' || ['voicemail_recording', 'voicemail_prompt'].includes(state.phase)) && recordingUrl) {
+      const { data: existingVoicemail, error: lookupError } = await db.from('voicemails')
+        .select('id').eq('call_id', call.id).eq('recording_url', recordingUrl).limit(1).maybeSingle();
+      if (lookupError) throw lookupError;
+      const voicemail = {
         phone_system_id: system.id,
         call_id: call?.id ?? null,
-        extension_id: state.extensionId || null,
-        assigned_profile_id: state.profileId || null,
+        extension_id: recordingTask?.extension_id || state.extensionId || null,
+        assigned_profile_id: recordingTask?.assigned_profile_id || state.profileId || null,
         phone_number: call?.from_number || 'unknown',
         recording_url: recordingUrl,
         duration_seconds: payload.duration_millis
@@ -1144,13 +1182,21 @@ async function handleEvent(
           : null,
         is_read: false,
         status: 'new',
-      });
+        transcription: recordingTask?.transcript || null,
+        summary: recordingTask?.summary || null,
+      };
+      if (!existingVoicemail) {
+        const { error } = await db.from('voicemails').insert(voicemail);
+        if (error) throw error;
+      }
       await notifyAssignee(db, {
-        profileId: state.profileId,
+        profileId: recordingTask?.assigned_profile_id || state.profileId,
         taskId: state.taskId,
         caller: call?.from_number || 'A caller',
         urgency: 'normal',
-      });
+        source: 'voicemail',
+        transcript: recordingTask?.transcript || undefined,
+      }, system);
     }
     return;
   }
@@ -1196,7 +1242,7 @@ async function handleEvent(
           taskId: state.taskId,
           caller: unfinished.callback_number || call?.from_number || 'A caller',
           urgency: 'normal',
-        });
+        }, system);
       }
     }
     await db

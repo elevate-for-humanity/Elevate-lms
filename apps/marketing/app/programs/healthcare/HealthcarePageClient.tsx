@@ -35,7 +35,7 @@ export default function HealthcarePageClient({ programs }: { programs: Program[]
       {/* Hero */}
       <section className="relative flex h-[clamp(520px,72svh,860px)] w-full items-center overflow-hidden bg-slate-900">
         <UltraVideoPlayer
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/cna-hero.mp4"
+          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4"
           className="absolute inset-0 w-full h-full object-cover brightness-110"
           autoPlayOnMount
           playThrough={false}

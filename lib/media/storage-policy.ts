@@ -13,17 +13,17 @@ export const MEDIA_STORAGE_POLICY = {
     objectPrefix: 'course-videos/',
     upload: 'lib/video/upload-lesson-media.ts',
     backend: 'COURSE_VIDEO_STORAGE_BACKEND=auto|supabase|object',
-    provider: 'OBJECT_STORAGE_PROVIDER=backblaze-b2|wasabi|aws-s3|supabase-s3|cloudflare-r2|custom-s3',
+    provider: 'ELEVATE_MEDIA_PROVIDER=backblaze-b2|wasabi|aws-s3|supabase-s3|cloudflare-r2|custom-s3',
     temp: 'os.tmpdir() only during render; deleted after upload',
   },
   devStudioDocs: {
     primary: 'supabase:documents',
-    optional: 'S3-compatible object storage',
+    optional: 'Elevate Media Storage',
     route: 'apps/admin/app/api/admin/dev-studio/upload/route.ts',
   },
   digitalProducts: {
-    backend: 'shared S3-compatible object storage',
-    fallback: 'public/downloads/* when object storage is unset',
+    backend: 'shared Elevate Media Storage',
+    fallback: 'public/downloads/* when Elevate Media Storage is unset',
   },
   wioaExports: {
     bucket: 'wioa-exports',

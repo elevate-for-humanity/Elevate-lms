@@ -203,16 +203,16 @@ export async function GET(request: NextRequest) {
 
   // ── Upload storage ─────────────────────────────────────────────────────────
   const hasObjectStorage = Boolean(
-    (process.env.OBJECT_STORAGE_ENDPOINT || process.env.S3_ENDPOINT || process.env.R2_ENDPOINT) &&
-      (process.env.OBJECT_STORAGE_ACCESS_KEY_ID ||
+    (process.env.ELEVATE_MEDIA_ENDPOINT || process.env.S3_ENDPOINT || process.env.R2_ENDPOINT) &&
+      (process.env.ELEVATE_MEDIA_ACCESS_KEY_ID ||
         process.env.S3_ACCESS_KEY_ID ||
         process.env.R2_ACCESS_KEY ||
         process.env.CLOUDFLARE_R2_ACCESS_KEY_ID) &&
-      (process.env.OBJECT_STORAGE_SECRET_ACCESS_KEY ||
+      (process.env.ELEVATE_MEDIA_SECRET_ACCESS_KEY ||
         process.env.S3_SECRET_ACCESS_KEY ||
         process.env.R2_SECRET_KEY ||
         process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY) &&
-      (process.env.OBJECT_STORAGE_BUCKET ||
+      (process.env.ELEVATE_MEDIA_BUCKET ||
         process.env.S3_BUCKET ||
         process.env.R2_BUCKET ||
         process.env.CLOUDFLARE_R2_BUCKET_NAME),
@@ -221,7 +221,7 @@ export async function GET(request: NextRequest) {
     name: 'Upload Storage',
     status: 'ok',
     detail: hasObjectStorage
-      ? `S3-compatible object storage configured (${process.env.OBJECT_STORAGE_PROVIDER || 'auto-detected'})`
+      ? `Elevate Media Storage configured (${process.env.ELEVATE_MEDIA_PROVIDER || 'auto-detected'})`
       : 'Supabase Storage (safe fallback)',
   });
 

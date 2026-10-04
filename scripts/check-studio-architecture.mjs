@@ -58,11 +58,20 @@ const browserDeployWorkflow = read('.github/workflows/deploy-studio-browser.yml'
 for (const invariant of [
   'resolve-studio-browser-secret.ts',
   'verify-studio-browser-link.ts',
-  'cancel-in-progress: false',
+  'verify-build.ts',
+  'trigger-deployment.ts',
+  '--build-id "${{ steps.trigger_browser_build.outputs.build_id }}" --sha "${{ github.sha }}"',
 ]) {
   if (!browserDeployWorkflow.includes(invariant)) {
     fail(`Studio Browser deployment is missing credit-safe invariant: ${invariant}`);
   }
+}
+
+// New pushes may supersede obsolete browser releases. Manual recovery runs
+// remain serialized, and both paths must verify/deploy the exact build above.
+const browserCancellation = browserDeployWorkflow.match(/^\s*cancel-in-progress:\s*(.+)$/m)?.[1].trim();
+if (!['false', "${{ github.event_name == 'push' }}"].includes(browserCancellation)) {
+  fail('Studio Browser cancellation must preserve manual recovery deployments');
 }
 
 const browserAgentRoute = read('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');

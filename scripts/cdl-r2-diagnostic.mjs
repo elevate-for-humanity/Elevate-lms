@@ -7,9 +7,13 @@ async function nf(path){
  if(!r.ok)return null;const j=await r.json();return j.data??j;
 }
 for(const id of ['elevate-production-env','elevate-llm-client-env']){
- const g=await nf('/secrets/'+id+'/details');Object.assign(vars,g?.secrets?.variables??g?.variables??{});
+ const g=await nf('/secrets/'+id+'/details');
+console.info(JSON.stringify({group:id,fields:Object.keys(g??{}),secretFields:Object.keys(g?.secrets??{}),matchingKeys:Object.keys(g?.secrets?.variables??g?.variables??g?.secrets??{}).filter(k=>/CLOUDFLARE|R2/.test(k))}));
+Object.assign(vars,g?.secrets?.variables??g?.variables??g?.secrets??{});
 }
-const service=await nf('/services/elevate-marketing');Object.assign(vars,service?.runtimeEnvironment??{});
+const service=await nf('/services/elevate-marketing');console.info(JSON.stringify({serviceFields:Object.keys(service??{}),runtimeType:typeof service?.runtimeEnvironment}));
+const groups=await nf('/secrets');console.info(JSON.stringify({groupList:groups?.secrets?.map(g=>({id:g.id,name:g.name})),listFields:Object.keys(groups??{})}));
+
 const keys=['CLOUDFLARE_ACCOUNT_ID','CLOUDFLARE_API_TOKEN','CLOUDFLARE_AI_API_TOKEN','CLOUDFLARE_R2_ACCESS_KEY_ID','CLOUDFLARE_R2_SECRET_ACCESS_KEY','CLOUDFLARE_R2_BUCKET_NAME','CLOUDFLARE_R2_PUBLIC_URL','NEXT_PUBLIC_R2_URL'];
 console.info(JSON.stringify({configured:Object.fromEntries(keys.map(k=>[k,typeof vars[k]==='string'&&!!vars[k]]))}));
 for(const k of ['CLOUDFLARE_R2_PUBLIC_URL','NEXT_PUBLIC_R2_URL']){try{console.info(JSON.stringify({key:k,host:new URL(vars[k]).hostname}));}catch{}}

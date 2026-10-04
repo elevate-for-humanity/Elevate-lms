@@ -7,7 +7,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
-async function start(holdFirst = false) {
+async function start(holdFirst = false, cdpCheck?: () => Promise<any>) {
   const actions: any[] = [];
   let release = () => {};
   const response = (body: any) => ({
@@ -18,6 +18,7 @@ async function start(holdFirst = false) {
   vi.stubGlobal(
     'fetch',
     vi.fn(async (url: string, options: any = {}) => {
+      if (url.endsWith('/cdp') && cdpCheck) return cdpCheck();
       if (url.endsWith('/config')) return response({});
       if (url.endsWith('/browser/session'))
         return response(
@@ -62,6 +63,7 @@ it('lets a touch user insert @ and replaces the selected field without retaining
   fireEvent.click(screen.getByRole('button', { name: 'Type securely' }));
   await waitFor(() => expect(actions.length).toBe(1));
   expect(actions[0]).toEqual({
+    actor: 'human',
     actions: [
       { type: 'keypress', key: 'ControlOrMeta+A' },
       { type: 'type', text: 'sample@example.com' },
@@ -140,7 +142,7 @@ it('opens a readable sign-in view on the existing session and keeps the draft', 
   const input = screen.getByLabelText('Secure browser input') as HTMLInputElement;
   fireEvent.change(input, { target: { value: 'sample@example.com' } });
   fireEvent.click(screen.getByRole('button', { name: 'Sign in', exact: true }));
-  await waitFor(() => expect(actions).toContainEqual({ type: 'viewport', width: 390, height: 780 }));
+  await waitFor(() => expect(actions).toContainEqual({ type: 'viewport', width: 390, height: 780, actor: 'human' }));
   expect(screen.getByAltText('Live isolated Chromium browser')).toBe(image);
   expect(input.value).toBe('sample@example.com');
   expect(screen.getByRole('button', { name: 'Sign in', exact: true }).getAttribute('aria-pressed')).toBe('true');
@@ -154,7 +156,7 @@ it('offers a literal @ for the general browser keyboard without relying on the p
   fireEvent.click(screen.getByRole('button', { name: 'Insert at sign into browser keyboard input' }));
   expect((screen.getByLabelText('Browser keyboard input') as HTMLInputElement).value).toBe('@');
   fireEvent.click(screen.getByRole('button', { name: 'Type', exact: true }));
-  await waitFor(() => expect(actions).toContainEqual({ type: 'type', text: '@' }));
+  await waitFor(() => expect(actions).toContainEqual({ type: 'type', text: '@', actor: 'human' }));
 });
 
 it('binds each sign-in label to its own field when Studio mounts multiple browser panels', async () => {
@@ -197,8 +199,8 @@ it('provides explicit website scrolling while touch panning stays local', async 
   fireEvent.click(screen.getByRole('button', { name: 'Scroll website up' }));
   await waitFor(() => expect(actions.length).toBe(2));
   expect(actions).toEqual([
-    { type: 'scroll', deltaX: 0, deltaY: 400 },
-    { type: 'scroll', deltaX: 0, deltaY: -400 },
+    { type: 'scroll', deltaX: 0, deltaY: 400, actor: 'human' },
+    { type: 'scroll', deltaX: 0, deltaY: -400, actor: 'human' },
   ]);
 });
 
@@ -236,5 +238,34 @@ it('focuses the desktop page for direct typing after selecting a website field',
   fireEvent.keyDown(image, { key: '@', shiftKey: true });
   await waitFor(() => expect(actions.length).toBe(2));
   expect(actions[0].type).toBe('pointer_click');
-  expect(actions[1]).toEqual({ type: 'type', text: '@' });
+  expect(actions[1]).toEqual({ type: 'type', text: '@', actor: 'human' });
+});
+
+
+it('shows direct CDP connected only after its authenticated connection check succeeds', async () => {
+  let resolveCheck!: (response: any) => void;
+  const check = new Promise((resolve) => { resolveCheck = resolve; });
+  await start(false, () => check);
+  expect(screen.getByText('Direct CDP unverified')).toBeTruthy();
+  expect(screen.queryByText('Direct CDP connected')).toBeNull();
+  expect(fetch).toHaveBeenCalledWith('https://worker.example/sessions/test/cdp', {
+    headers: { Authorization: 'Bearer fixture' }, cache: 'no-store',
+  });
+  await act(async () => {
+    resolveCheck({ ok: true, json: async () => ({ connected: true, engine: 'direct-cdp-chromium' }) });
+  });
+  await waitFor(() => expect(screen.getByText('Direct CDP connected')).toBeTruthy());
+  expect(screen.queryByText('Direct CDP unverified')).toBeNull();
+});
+
+it.each([
+  ['network failure', async () => { throw new Error('connection unavailable'); }],
+  ['unsuccessful response', async () => ({ ok: false, json: async () => ({ connected: true, engine: 'direct-cdp-chromium' }) })],
+  ['disconnected browser', async () => ({ ok: true, json: async () => ({ connected: false, engine: 'direct-cdp-chromium' }) })],
+  ['different browser engine', async () => ({ ok: true, json: async () => ({ connected: true, engine: 'playwright' }) })],
+])('keeps direct CDP unverified after %s', async (_reason, cdpCheck) => {
+  await start(false, cdpCheck);
+  await act(async () => {});
+  expect(screen.getByText('Direct CDP unverified')).toBeTruthy();
+  expect(screen.queryByText('Direct CDP connected')).toBeNull();
 });

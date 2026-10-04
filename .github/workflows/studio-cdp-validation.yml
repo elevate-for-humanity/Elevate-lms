@@ -1,0 +1,29 @@
+name: Studio direct CDP validation
+
+on:
+  pull_request:
+    paths:
+      - 'services/studio-browser/**'
+      - 'Dockerfile.studio-browser'
+      - 'components/studio/CloudBrowserWorkspace.tsx'
+      - '.github/workflows/studio-cdp-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  chromium-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build actual Studio browser image
+        run: docker build -f Dockerfile.studio-browser -t studio-cdp-validation .
+      - name: Exercise native CDP and all browser contracts in Chromium
+        run: >-
+          docker run --rm
+          -e STUDIO_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
+          -v "$PWD/services/studio-browser:/tests:ro"
+          --entrypoint sh studio-cdp-validation
+          -c 'cp /tests/*.mjs /app/ && node --test /app/*.test.mjs'

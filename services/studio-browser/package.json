@@ -5,10 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --check learner-runthrough.mjs && node --check provider-session-store.mjs && node --check course-video-download.mjs && node --check provider-verification.mjs && node --test cdp-session.test.mjs command-arguments.test.mjs server.test.mjs learner-runthrough.test.mjs provider-session-store.test.mjs course-video-download.test.mjs provider-verification.test.mjs"
+    "check": "node --check server.mjs && node --check cdp-browser.mjs && node --test *.test.mjs"
   },
   "dependencies": {
-    "axe-core": "^4.10.3",
-    "playwright-core": "1.57.0"
+    "axe-core": "^4.10.3"
   }
 }

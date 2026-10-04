@@ -9,8 +9,7 @@ import { execFile, spawn } from 'node:child_process';
 import { pipeline } from 'node:stream/promises';
 import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
-import { chromium } from 'playwright-core';
-import { cdpStatus, runCdpInput } from './cdp-session.mjs';
+import { launchBrowser } from './cdp-browser.mjs';
 import { commandArguments } from './command-arguments.mjs';
 import { ProviderSessionStore } from './provider-session-store.mjs';
 import { requiresHumanVerification, redactBrowserEvidence } from './provider-verification.mjs';
@@ -191,7 +190,7 @@ async function withTimeout(promise, timeoutMs, code = 'browser_unavailable') {
 }
 
 export function createBrowserLifecycleManager({
-  launch = (options) => chromium.launch(options),
+  launch = (options) => launchBrowser(options),
   onUnavailable = async () => {},
 } = {}) {
   const lifecycle = {
@@ -233,12 +232,11 @@ export function createBrowserLifecycleManager({
     if (launchInFlight) return launchInFlight;
     lifecycle.state = 'starting';
     launchInFlight = (async () => {
+      let candidate;
       try {
-        const candidate = await launch({
+        candidate = await launch({
           headless: true,
-          ...(process.env.STUDIO_BROWSER_EXECUTABLE_PATH
-            ? { executablePath: process.env.STUDIO_BROWSER_EXECUTABLE_PATH }
-            : {}),
+          executablePath: process.env.STUDIO_BROWSER_EXECUTABLE_PATH || '/usr/bin/chromium',
           args: [
             '--disable-background-networking',
             '--disable-component-update',
@@ -265,6 +263,7 @@ export function createBrowserLifecycleManager({
         });
         return candidate;
       } catch (error) {
+        await candidate?.close?.().catch(() => undefined);
         fail(error);
         throw new BrowserServiceError('browser_unavailable', 503, { cause: error });
       } finally {
@@ -668,13 +667,6 @@ async function runBrowserFoundationTest() {
     // Real HTTP responses exercise the native download pipeline. DevTools
     // route.fulfill fixtures do not model a streaming attachment transfer.
     await page.goto(`http://127.0.0.1:${port}/foundation-fixture/${fixtureNonce}/start`);
-    await check('cdp_same_tab_input', async () => {
-      assert((await cdpStatus(session)).connected, 'cdp_not_connected');
-      await page.locator('#text').focus();
-      await runActions(session, { type: 'type', transport: 'cdp', text: 'CDP acceptance' });
-      assert(await page.locator('#text').inputValue() === 'CDP acceptance', 'cdp_input_not_visible');
-      await page.locator('#text').fill('');
-    });
     await check('durable_provider_checkpoint', async () => {
       assert(providerSessions.directory && providerSessions.key, 'provider_checkpoint_not_configured');
       const scope = providerSessions.scope(testOwner, 'https://app.envato.com');
@@ -745,7 +737,7 @@ async function runBrowserFoundationTest() {
       await dialogEvent;
       await runActions(session, { type: 'dialog', accept: true });
       await clicked;
-      assert(await page.getAttribute('body', 'data-confirmed') === 'true', 'dialog_response_missing');
+      assert(await page.locator('body').getAttribute('data-confirmed') === 'true', 'dialog_response_missing');
     });
     await check('download_bytes', async () => {
       const downloadEvent = page.waitForEvent('download', { timeout: 10000 });
@@ -770,8 +762,11 @@ async function runBrowserFoundationTest() {
       await page.waitForFunction(() => window.scrollY > 0, null, { timeout: 10000 });
     });
     await check('navigation_and_history', async () => {
-      await session.context.route('https://www.elevateforhumanity.org/studio-browser-acceptance/**', route => route.fulfill({contentType: 'text/html', body: fixture}));
-      await runActions(session, { actions: [{ type: 'navigate', url: 'https://www.elevateforhumanity.org/studio-browser-acceptance/one' }, { type: 'navigate', url: 'https://www.elevateforhumanity.org/studio-browser-acceptance/two' }, { type: 'back' }] });
+      // Synthetic local pages exercise real navigation without depending on public DNS.
+      // Public action URL validation remains unchanged and rejects private targets.
+      await page.goto(`http://127.0.0.1:${port}/foundation-fixture/${fixtureNonce}/one`);
+      await page.goto(`http://127.0.0.1:${port}/foundation-fixture/${fixtureNonce}/two`);
+      await runActions(session, { type: 'back' });
       assert(page.url().endsWith('/one'), 'history_back_failed');
       await runActions(session, { type: 'forward' });
       assert(page.url().endsWith('/two'), 'history_forward_failed');
@@ -1008,7 +1003,6 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
 
 async function runAction(session, action) {
   session.lastSeen = Date.now();
-  if (action.transport === 'cdp' && await runCdpInput(session, action)) return;
   const page = session.page;
   const controlPage = (ref) => {
     if (session.controlFrames?.has(ref) && session.controlPage !== page) throw new BrowserServiceError('stale_control', 409);
@@ -1149,11 +1143,32 @@ export function sessionRequiresAuthentication(session, now = Date.now()) {
   });
 }
 
-export async function runActions(session, payload) {
+export function runActions(session, payload) {
+  if (payload?.actor === 'human') {
+    session.manualControl = true;
+    session.controlRevision = (session.controlRevision || 0) + 1;
+  }
+  // Serialize whole batches across all dashboard/worker HTTP connections.
+  const queued = (session.actionQueue || Promise.resolve()).catch(() => undefined)
+    .then(() => executeActions(session, payload));
+  session.actionQueue = queued;
+  return queued;
+}
+
+async function executeActions(session, payload) {
+  if (payload?.type === 'resume_automation') {
+    session.manualControl = false;
+    return { count: 0, durationMs: 0 };
+  }
+  if (payload?.actor === 'automation' && session.manualControl) throw new BrowserServiceError('manual_control_active', 409);
+  const revision = session.controlRevision || 0;
   const actions = Array.isArray(payload?.actions) ? payload.actions.slice(0, 50) : [payload];
   const startedAt = Date.now();
   try {
-    for (const action of actions) await runAction(session, action);
+    for (const action of actions) {
+      if (payload?.actor === 'automation' && (session.manualControl || revision !== (session.controlRevision || 0))) throw new BrowserServiceError('manual_control_active', 409);
+      await runAction(session, action);
+    }
   } catch (error) {
     if (sessionRequiresAuthentication(session)) {
       throw new BrowserServiceError('authentication_required', 409, { cause: error });
@@ -1275,8 +1290,15 @@ export async function snapshotPage(session) {
           element.textContent ||
           element.getAttribute('placeholder'),
       );
+    const queryAll = (selector, root = document) => {
+      const found = [...root.querySelectorAll(selector)];
+      for (const element of root.querySelectorAll('*')) {
+        if (element.shadowRoot) found.push(...queryAll(selector, element.shadowRoot));
+      }
+      return found;
+    };
     const elements = [
-      ...document.querySelectorAll(
+      ...queryAll(
         'button, a[href], input, select, textarea, [role="button"], [contenteditable="true"]',
       ),
     ]
@@ -1299,7 +1321,7 @@ export async function snapshotPage(session) {
         disabled: Boolean(element.disabled || element.getAttribute('aria-disabled') === 'true'),
       };
     });
-    const headings = [...document.querySelectorAll('h1, h2, h3, h4, h5, h6')]
+    const headings = queryAll('h1, h2, h3, h4, h5, h6')
       .filter(visible)
       .slice(0, 40)
       .map((element) => ({
@@ -1405,7 +1427,7 @@ const server = http.createServer(async (req, res) => {
   try {
     if (req.method === 'OPTIONS') return json(res, 204, {});
     const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
-    const fixtureMatch = url.pathname.match(/^\/foundation-fixture\/([a-f0-9-]{36})\/(start|download)$/);
+    const fixtureMatch = url.pathname.match(/^\/foundation-fixture\/([a-f0-9-]{36})\/(start|download|one|two)$/);
     if (req.method === 'GET' && fixtureMatch) {
       const fixture = foundationFixtures.get(fixtureMatch[1]);
       if (!fixture || fixture.expiresAt < Date.now()) return json(res, 404, {error: 'fixture_expired'});
@@ -1460,7 +1482,7 @@ const server = http.createServer(async (req, res) => {
       return json(res, ready ? 200 : 503, {
         ok: ready,
         service: 'studio-browser',
-        engine: 'playwright-chromium',
+        engine: 'direct-cdp-chromium',
         commit: process.env.GIT_SHA || 'MISSING',
         ...lifecycle,
         activeSessions: sessions.size,
@@ -1566,6 +1588,7 @@ const server = http.createServer(async (req, res) => {
       try { session = await creation; }
       finally { if (scope && providerSessionCreations.get(scope) === creation) providerSessionCreations.delete(scope); }
       return json(res, 201, {
+        engine: 'direct-cdp-chromium',
         id: session.id,
         token: session.token,
         url: session.page.url(),
@@ -1581,8 +1604,8 @@ const server = http.createServer(async (req, res) => {
     if (!session) return json(res, 410, { error: 'session_expired' });
     if (!authorized(req, session, url)) return json(res, 401, { error: 'unauthorized' });
     if (req.method === 'GET' && match[2] === 'cdp') {
-      session.lastSeen = Date.now();
-      return json(res, 200, await cdpStatus(session));
+      await session.page.send('Page.getFrameTree');
+      return json(res, 200, { connected: true, engine: 'direct-cdp-chromium', transport: 'private-pipe', tabId: session.activeTabId });
     }
     if (req.method === 'GET' && match[2] === 'identity') return json(res, 200, { ownerId: session.ownerId });
     if (req.method === 'GET' && match[2] === 'file') {

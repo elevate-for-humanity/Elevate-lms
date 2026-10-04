@@ -15,6 +15,23 @@ import {
   writeBrowserFrame,
 } from './server.mjs';
 
+test('human takeover interrupts automation between actions and requires explicit resume', async () => {
+  const calls = []; let release, started;
+  const first = new Promise(resolve => { started = resolve; });
+  const session = { page: { keyboard: { insertText: async text => {
+    calls.push(text); if (text === 'automation-first') { started(); await new Promise(resolve => { release = resolve; }); }
+  } } } };
+  const automatic = runActions(session, { actor: 'automation', actions: [{type:'type',text:'automation-first'},{type:'type',text:'automation-second'}] });
+  await first;
+  const manual = runActions(session, { actor:'human', type:'type', text:'human' });
+  release();
+  await assert.rejects(automatic, /manual_control_active/); await manual;
+  await assert.rejects(runActions(session,{actor:'automation',type:'type',text:'blocked'}), /manual_control_active/);
+  await runActions(session,{actor:'human',type:'resume_automation'});
+  await runActions(session,{actor:'automation',type:'type',text:'resumed'});
+  assert.deepEqual(calls,['automation-first','human','resumed']);
+});
+
 test('slow viewers do not accumulate stale or partial browser frames', () => {
   const writes=[];
   const stream={destroyed:false,writableNeedDrain:false,writableLength:0,write:(bytes)=>{writes.push(bytes);return false;}};

@@ -10,10 +10,12 @@ afterEach(() => {
 
 it('keeps a typed destination through event polling and navigates the worker to that destination', async () => {
   let poll: () => Promise<void> = async () => {};
-  vi.spyOn(window, 'setInterval').mockImplementation((callback: any) => {
-    poll = callback;
-    return 123;
-  });
+  const originalInterval = window.setInterval.bind(window);
+  vi.spyOn(window, 'setInterval').mockImplementation(((callback: any, ms: number, ...args: any[]) => {
+    // Capture only worker polling. Testing Library also uses setInterval to retry assertions.
+    if (ms === 3000) { poll = callback; return 123; }
+    return originalInterval(callback, ms, ...args);
+  }) as typeof window.setInterval);
   const requested: any[] = [];
   let workerUrl = 'https://www.elevateforhumanity.org/';
   const response = (body: unknown) => ({
@@ -60,7 +62,7 @@ it('keeps a typed destination through event polling and navigates the worker to 
     expect(requested).toEqual([{
       sessionId: 'session',
       sessionToken: 'test-token',
-      action: { type: 'navigate', url: 'https://app.envato.com/workspaces' },
+      action: { type: 'navigate', url: 'https://app.envato.com/workspaces', actor: 'human' },
     }]),
   );
   await act(async () => {

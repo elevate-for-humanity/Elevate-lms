@@ -493,7 +493,7 @@ export async function POST(req: NextRequest) {
             const actionResponse = await fetch(`${workerUrl}/sessions/${sessionId}/actions`, {
               method: 'POST',
               headers: workerHeaders,
-              body: JSON.stringify({ actions }),
+              body: JSON.stringify({ actions, actor: 'automation' }),
               signal: AbortSignal.timeout(35_000),
             });
             const actionMetrics = (await actionResponse.json().catch(() => ({}))) as {
@@ -501,6 +501,12 @@ export async function POST(req: NextRequest) {
               durationMs?: number;
               url?: string;
             };
+            if (!actionResponse.ok && actionMetrics.error === 'manual_control_active') {
+              const reason = 'You took control of the Studio browser. Finish your input, then resume this same task.';
+              await pauseForAuthentication(reason, steps, history, totalTokens, undefined, undefined, 'interaction');
+              emit({ type: 'interaction_required', message: reason, steps });
+              return;
+            }
             if (!actionResponse.ok && actionMetrics.error === 'authentication_required') {
               const reason =
                 'The licensed-media provider session requires secure authentication before this browser task can continue.';

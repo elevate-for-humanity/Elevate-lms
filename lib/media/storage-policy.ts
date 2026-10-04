@@ -1,37 +1,37 @@
 /**
- * Where durable media lives vs ephemeral container disk.
- * Admin Northflank pods must not grow public/ or keep generated videos locally.
+ * Durable media storage policy.
+ *
+ * Supabase remains the system of record for auth/database/permissions and small
+ * course assets. Large generated video is routed to the configured
+ * S3-compatible object store so storage vendors can be changed without
+ * rewriting Course Builder.
  */
 
 export const MEDIA_STORAGE_POLICY = {
-  /** Lesson/course MP4 — R2 when ≥5MB + CLOUDFLARE_R2_* set; MP3/slides → Supabase `course-videos` */
   courseVideo: {
-    bucket: 'course-videos',
+    supabaseBucket: 'course-videos',
+    objectPrefix: 'course-videos/',
     upload: 'lib/video/upload-lesson-media.ts',
-    r2Prefix: 'course-videos/',
-    env: 'COURSE_VIDEO_STORAGE_BACKEND=auto|supabase|r2',
+    backend: 'COURSE_VIDEO_STORAGE_BACKEND=auto|supabase|object',
+    provider: 'OBJECT_STORAGE_PROVIDER=backblaze-b2|wasabi|aws-s3|supabase-s3|cloudflare-r2|custom-s3',
     temp: 'os.tmpdir() only during render; deleted after upload',
   },
-  /** Dev Studio uploads — Supabase `documents`; optional R2 when R2_* set */
   devStudioDocs: {
     primary: 'supabase:documents',
-    optional: 'cloudflare-r2 (R2_ENDPOINT + R2_BUCKET)',
+    optional: 'S3-compatible object storage',
     route: 'apps/admin/app/api/admin/dev-studio/upload/route.ts',
   },
-  /** Digital store downloads — Cloudflare R2 via lib/storage/file-storage.ts */
   digitalProducts: {
-    backend: 'R2 (R2_ACCESS_KEY / R2_SECRET_KEY / R2_BUCKET)',
-    fallback: 'public/downloads/* when R2 unset',
+    backend: 'shared S3-compatible object storage',
+    fallback: 'public/downloads/* when object storage is unset',
   },
-  /** WIOA PIRL exports — Supabase `wioa-exports` after temp build */
   wioaExports: {
     bucket: 'wioa-exports',
     temp: 'os.tmpdir()/pirl-{jobId}',
   },
-  /** Legacy server/video-storage local disk — not used by Northflank admin routes */
   legacyLocalVideo: {
     module: 'server/video-storage.ts',
-    note: 'STORAGE_TYPE=local only for dev CLI; production uses Supabase/R2/Stream',
+    note: 'local disk is development-only; production media must use durable storage',
   },
 } as const;
 

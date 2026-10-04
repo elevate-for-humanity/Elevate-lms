@@ -44,7 +44,7 @@ if(!api||!account)throw new Error('General Cloudflare API token or account missi
 async function cf(path){
  const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+encodeURIComponent(account)+path,{headers:{authorization:'Bearer '+api},signal:AbortSignal.timeout(30000)});
  console.info(JSON.stringify({cloudflare:path,status:r.status}));
- const j=await r.json();if(!r.ok||!j.success){console.info(JSON.stringify({errorCodes:j.errors?.map(e=>e.code)}));return null;}return j.result;
+ const j=await r.json();if(!r.ok||!j.success){console.info(JSON.stringify({errors:j.errors?.map(e=>({code:e.code,message:String(e.message??'').replaceAll(api,'[redacted]').replaceAll(account,'[account]').slice(0,300)}))}));return null;}return j.result;
 }
 const buckets=await cf('/r2/buckets');
 const names=new Set([vars.CLOUDFLARE_R2_BUCKET_NAME||'elevate-media',...(buckets?.buckets??[]).map(b=>b.name)]);

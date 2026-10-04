@@ -24,6 +24,12 @@ pipeline. The earlier draft's `cdp-session` Playwright bridge is superseded.
   Per-session action batches are serialized. Human input pauses automation before
   its next action; starting/resuming a task explicitly releases manual control.
 
+Ultimate Course Builder is the primary consumer for this migration. Its
+`worker/request-media-dependency.ts` links missing-media jobs to the existing
+`/studio/browser?acquisitionRunId=...` workspace; its
+`adapters/platform-learner-runtime.ts` uses the authenticated browser worker for
+learner verification. Those paths keep their existing orchestration and persistence.
+
 The dashboard verifies the active tab using authenticated `GET /sessions/:id/cdp`.
 This endpoint actually sends `Page.getFrameTree`; a label alone does not establish
 connectivity. Course Builder consumers continue using the same service contract.
@@ -57,6 +63,9 @@ Local verification on 2026-10-04:
 - Scoped Studio and full Admin TypeScript checks passed.
 - Changed TypeScript files and new CDP modules passed ESLint.
 - Service `npm ci` and lockfile validation passed.
+- Admin production build passed (142 static pages). It required a complete source
+  checkout, `GIT_SHA`, and a 6 GiB Node heap; type/lint were run separately because
+  the repository build configuration skips those checks.
 
 ## Compatibility boundaries and release checks
 

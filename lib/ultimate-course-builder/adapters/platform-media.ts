@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UltimateMediaDiscoveryResult, UltimateMediaPort } from '../core/ports';
 import {
   attachStoredLicensedMedia,
+  licensedMediaBelongsToCourse,
   recommendLicensedMediaForCourse,
   storedLicensedMediaMetadata,
 } from '@/lib/media/licensed-course-media';
@@ -35,11 +36,14 @@ export function observedLicenseEvidence(entitlement: RecordLike): string | undef
 export class UltimatePlatformMedia implements UltimateMediaPort {
   constructor(private db: SupabaseClient) {}
 
-  private async acquireApprovedEnvatoMatch(match: RecordLike) {
+  private async acquireApprovedEnvatoMatch(match: RecordLike, courseId: string) {
     const entitlement = firstRecord(match.licensed_media_entitlements);
     const itemId = String(entitlement.provider_item_id ?? '').trim();
     if (!itemId || String(entitlement.provider ?? 'envato') !== 'envato') return false;
     const metadata = firstRecord(entitlement.metadata);
+    if (!licensedMediaBelongsToCourse(metadata, courseId)) {
+      throw new Error('ULTIMATE_ENVATO_COURSE_SCOPE_MISMATCH');
+    }
     const workspaceAssetUrl = String(metadata.assetUrl ?? metadata.asset_url ?? '').trim();
     const workspaceLicensed =
       metadata.licenseObserved === true ||
@@ -128,8 +132,13 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       .order('id');
     if (error) throw error;
 
+    const courseScopedData = (data ?? []).filter((asset: RecordLike) => {
+      const entitlement = firstRecord(asset.licensed_media_entitlements);
+      return licensedMediaBelongsToCourse(firstRecord(entitlement.metadata), courseId);
+    });
+
     const readyAssets = await Promise.all(
-      (data ?? []).map(async (asset: RecordLike) => {
+      courseScopedData.map(async (asset: RecordLike) => {
         const entitlement = firstRecord(asset.licensed_media_entitlements);
         const metadata = firstRecord(entitlement.metadata);
         let publicUrl = typeof asset.video_url === 'string' ? asset.video_url : '';
@@ -180,7 +189,9 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       input.profile?.sceneAssignments?.[input.competency?.id] ?? [],
     );
     if (gaps.length) {
-      const workspaceId = firstRecord(firstRecord(data?.[0]?.licensed_media_entitlements).metadata).workspaceId;
+      const workspaceId = firstRecord(
+        firstRecord(courseScopedData[0]?.licensed_media_entitlements).metadata,
+      ).workspaceId;
       const acquisition = await requestMediaDependency(this.db, {
         courseId, competencyId: input.competency.id, lessonTitle: input.competency.title,
         gaps, ownerId: input.profile?.mediaAcquisitionOwnerId, workspaceUrl: typeof workspaceId === 'string' && /^[a-zA-Z0-9-]+$/.test(workspaceId)
@@ -225,6 +236,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       const entitlement = firstRecord(match.licensed_media_entitlements);
       if (entitlement.provider !== 'envato') return false;
       const metadata = firstRecord(entitlement.metadata);
+      if (!licensedMediaBelongsToCourse(metadata, courseId)) return false;
       const stored = Boolean(storedLicensedMediaMetadata(metadata));
       const retrievableWorkspaceAsset =
         (typeof metadata.assetUrl === 'string' || typeof metadata.asset_url === 'string') &&
@@ -240,7 +252,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       const entitlement = firstRecord(match.licensed_media_entitlements);
       const entitlementId = String(match.entitlement_id);
       if (!storedLicensedMediaMetadata(entitlement.metadata) && !acquiredEntitlements.has(entitlementId)) {
-        await this.acquireApprovedEnvatoMatch(match);
+        await this.acquireApprovedEnvatoMatch(match, courseId);
         // The selected match snapshot remains stale after the first download.
         // Attachment reloads the persisted entitlement; another lesson using
         // the same approved source should not download/upload it again.

@@ -2,7 +2,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
 
-import { mediaMatchTerms, scoreLicensedMediaMatch } from '@/lib/course-builder/licensed-media';
+import {
+  licensedMediaBelongsToCourse,
+  mediaMatchTerms,
+  scoreLicensedMediaMatch,
+} from '@/lib/course-builder/licensed-media';
 import { XAIProvider } from '@/lib/ai/providers/xai';
 import { AnthropicProvider } from '@/lib/ai/providers/anthropic';
 
@@ -11,6 +15,12 @@ describe('licensed media course matching', () => {
     expect(
       mediaMatchTerms('The course lesson: Barber clipper safety and clipper guards video'),
     ).toEqual(['barber', 'clipper', 'safety', 'guards']);
+  });
+
+  it('enforces exact entitlement course ownership', () => {
+    expect(licensedMediaBelongsToCourse({ courseId: 'course-a' }, 'course-a')).toBe(true);
+    expect(licensedMediaBelongsToCourse({ courseId: 'course-b' }, 'course-a')).toBe(false);
+    expect(licensedMediaBelongsToCourse({}, 'course-a')).toBe(false);
   });
 
   it('scores course-specific purchased scenes above unrelated footage', () => {

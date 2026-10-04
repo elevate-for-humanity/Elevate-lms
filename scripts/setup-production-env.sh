@@ -44,7 +44,7 @@ cat > .env.production << 'EOF'
 NEXT_PUBLIC_SUPABASE_URL=https://cuxzzpsyufcewtmicszk.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=GET_FROM_SUPABASE_DASHBOARD
 SUPABASE_SERVICE_ROLE_KEY=GET_FROM_SUPABASE_DASHBOARD
-SUPABASE_DB_URL=postgresql://postgres:KingGreene08$$$@db.cuxzzpsyufcewtmicszk.supabase.co:5432/postgres
+SUPABASE_DB_URL=
 
 # -----------------------------------------------------------------------------
 # SITE CONFIGURATION
@@ -57,7 +57,7 @@ NODE_ENV=production
 # -----------------------------------------------------------------------------
 # AUTHENTICATION
 # -----------------------------------------------------------------------------
-NEXTAUTH_SECRET=zB2ZTPxFJsfJziHrY1p+gaNW4X1apaT9Y0dX9LSScl4=
+NEXTAUTH_SECRET=
 NEXTAUTH_URL=https://www.elevateforhumanity.org
 
 # -----------------------------------------------------------------------------
@@ -93,7 +93,7 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-SWPG2HVYVH
 # -----------------------------------------------------------------------------
 # POSTGRES
 # -----------------------------------------------------------------------------
-POSTGRES_PASSWORD=KingGreene08$$$
+POSTGRES_PASSWORD=
 POSTGRES_USER=postgres
 POSTGRES_HOST=db.cuxzzpsyufcewtmicszk.supabase.co
 POSTGRES_DATABASE=postgres
@@ -102,8 +102,8 @@ POSTGRES_PORT=5432
 # -----------------------------------------------------------------------------
 # FEDERAL APIs
 # -----------------------------------------------------------------------------
-SAM_GOV_API_KEY=Vyi2/MKIhgOcxxrjHzZMtAZUFeW3AqW5Pa1IOmFYEHo=
-SAM_API_TOKEN=SAM-736d2153-2d8a-475a-ad02-9e4eee1d0e99
+SAM_GOV_API_KEY=
+SAM_API_TOKEN=
 
 # -----------------------------------------------------------------------------
 # VERCEL
@@ -119,7 +119,7 @@ echo -e "${YELLOW}   ⚠️  MANUAL STEPS REQUIRED${NC}"
 echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
-echo -e "${BLUE}You need to add these 2 critical keys:${NC}"
+echo -e "${BLUE}Load production secrets from your deployment secret store; do not commit them:${NC}"
 echo ""
 echo "1. Get Supabase keys from:"
 echo "   ${BLUE}https://supabase.com/dashboard/project/cuxzzpsyufcewtmicszk/settings/api${NC}"
@@ -139,11 +139,11 @@ echo -e "${BLUE}   📋 WHAT'S ALREADY SET${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
-echo "✅ NEXTAUTH_SECRET (generated)"
+echo "ℹ️  NEXTAUTH_SECRET is intentionally not stored in this repository"
 echo "✅ RESEND_API_KEY (for emails)"
 echo "✅ NEXT_PUBLIC_GA_MEASUREMENT_ID (analytics)"
-echo "✅ POSTGRES_PASSWORD"
-echo "✅ SAM_GOV_API_KEY (federal APIs)"
+echo "ℹ️  POSTGRES_PASSWORD is intentionally not stored in this repository"
+echo "ℹ️  SAM.gov credentials are intentionally not stored in this repository"
 echo "✅ Site URLs configured for production"
 echo ""
 
@@ -152,7 +152,7 @@ echo -e "${BLUE}   🎯 NEXT STEPS${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
-echo "1. Add Supabase keys (see above)"
+echo "1. Add required secrets through the deployment environment/secret store"
 echo "2. Optionally add Stripe keys for payments"
 echo "3. Copy to Vercel:"
 echo "   ${BLUE}vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production${NC}"

@@ -517,6 +517,13 @@ export default function CloudBrowserWorkspace({
       });
       if (!response.ok || !response.body) {
         const payload = await response.json().catch(() => ({}));
+        if (response.status === 409 && payload.running && payload.taskId) {
+          setActiveTaskId(payload.taskId);
+          setInteractionRequired(true);
+          setStatus('Existing browser task is running');
+          setError(payload.error);
+          return;
+        }
         if (response.status === 409 && payload.approvalRequired) {
           setActiveTaskId(payload.taskId || '');
           setApprovalRequested(true);

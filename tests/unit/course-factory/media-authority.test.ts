@@ -393,7 +393,7 @@ describe('canonical Course Factory media architecture', () => {
     const quality = read('lib/video/media-quality-gate.ts');
     const director = read('lib/video/media-director.ts');
     const renderer = read('lib/video/process-video-job.ts');
-    expect(quality).toContain("MEDIA_QUALITY_GATE_VERSION = 'media-quality-v6'");
+    expect(quality).toContain("MEDIA_QUALITY_GATE_VERSION = 'media-quality-v7'");
     expect(quality).toContain('detectBackwardTimelineReplay');
     expect(quality).toContain('backwardTimelineJumpDetected');
     expect(quality).toContain('licenseEvidenceCoverage');

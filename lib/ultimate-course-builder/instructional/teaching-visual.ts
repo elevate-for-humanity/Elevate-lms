@@ -51,6 +51,7 @@ export function validateTeachingVisual(plan: TeachingVisual, narration: string) 
       step.label.length > 55 ||
       step.value.length > 160 ||
       !step.narrationQuote?.trim() ||
+      normalize(step.value) !== normalize(step.narrationQuote) ||
       !normalize(narration).includes(normalize(step.narrationQuote))
     )
       throw new Error('BLUEPRINT_TEACHING_VISUAL_NOT_SCRIPT_BOUND');

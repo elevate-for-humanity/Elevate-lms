@@ -1,4 +1,5 @@
 import 'server-only';
+import { teachingPresentation } from '@/lib/ultimate-course-builder/instructional/teaching-presentation';
 import { createHash } from 'node:crypto';
 
 import { execFile } from 'node:child_process';
@@ -12,7 +13,7 @@ import type { MediaStoryboard } from './media-director';
 import type { InstructionalQualityEvidence } from './instructional-quality-gate';
 import { configuredNarrationProvider } from './edge-tts';
 
-export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v6';
+export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v7';
 
 const execFileAsync = promisify(execFile);
 const MIN_BYTES = 100_000;
@@ -26,7 +27,7 @@ export interface MediaQualityEvidence {
   mediaSha256?: string;
   actualTranscript?: string;
   readability?: Array<{ scene: number; width: number; wordCoverage: number }>;
-  teachingVisualEvidence?: Array<{sceneId:string;step:number;width:number;time:number;expected:string;decoded:string;wordCoverage:number}>;
+  teachingVisualEvidence?: Array<{sceneId:string;step:number;width:number;time:number;expected:string;decoded:string;wordCoverage:number;ocrMode?:'sparse'|'block'}>;
   sceneNarrationEvidence?: Array<{sceneId:string;startSeconds:number;endSeconds:number;actualTranscript:string;coverage:number}>;
   gateVersion: typeof MEDIA_QUALITY_GATE_VERSION;
   bytes: number;
@@ -575,12 +576,24 @@ export async function enforceMediaQuality(input: {
         for (const width of [1280,390]) {
           const frame=join(workDir,`teaching-${index}-${stepIndex}-${width}.png`);
           await execFileAsync('ffmpeg',['-y','-ss',String(time),'-i',videoPath,'-frames:v','1','-vf',`scale=${width}:-1`,frame],{timeout:30000,maxBuffer:1000000});
-          const {stdout:decoded}=await execFileAsync('tesseract',[frame,'stdout','--psm','11'],{timeout:30000,maxBuffer:1000000});
-          const expected=`${step.label} ${step.value}`;
+          let {stdout:decoded}=await execFileAsync('tesseract',[frame,'stdout','--psm','11'],{timeout:30000,maxBuffer:1000000});
+          let ocrMode: 'sparse' | 'block' = 'sparse';
+          const expected=teachingPresentation(scene.teachingVisual!, time-sceneStart, scene.durationSeconds).expectedText;
           const words=[...new Set(normalizedWords(expected).filter(w=>w.length>2))];
-          const observed=new Set(normalizedWords(decoded));
-          const wordCoverage=words.length ? words.filter(w=>observed.has(w)).length/words.length : 0;
-          teachingVisualEvidence.push({sceneId:scene.id,step:stepIndex,width,time,expected,decoded,wordCoverage});
+          const coverageOf = (text: string) => {
+            const observed = new Set(normalizedWords(text));
+            return words.length ? words.filter(word => observed.has(word)).length / words.length : 0;
+          };
+          let wordCoverage = coverageOf(decoded);
+          // Sparse OCR sometimes interprets a bordered form as one graphic.
+          // Re-inspect the same encoded pixels as a text block; the evidence
+          // and required 85% coverage stay unchanged. Never use source text as OCR.
+          if (wordCoverage < 0.85) {
+            const block = await execFileAsync('tesseract', [frame, 'stdout', '--psm', '6'], {timeout:30000,maxBuffer:1000000});
+            const blockCoverage = coverageOf(block.stdout);
+            if (blockCoverage > wordCoverage) { decoded = block.stdout; wordCoverage = blockCoverage; ocrMode = 'block'; }
+          }
+          teachingVisualEvidence.push({sceneId:scene.id,step:stepIndex,width,time,expected,decoded,wordCoverage,ocrMode});
           if (wordCoverage<0.85) throw new Error(`MEDIA_TEACHING_STATE_NOT_VISIBLE:${scene.id}:${stepIndex}:${width}`);
         }
       }

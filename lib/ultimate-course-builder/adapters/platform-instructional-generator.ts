@@ -174,6 +174,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
         dialogue: s.text,
         teachingPoint: s.text,
         title: s.stage.replace(/_/g, ' '),
+        stage: s.stage,
         objectiveIds: s.objectiveIds,
         sourceRequirementIds: s.sourceRequirementIds,
         visualRequirement: s.visualRequirement,

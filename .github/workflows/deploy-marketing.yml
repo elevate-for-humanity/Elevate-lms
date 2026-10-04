@@ -350,7 +350,7 @@ jobs:
           ! grep -q 'Indianapolis, IN 46220, Indianapolis, IN 46220' /tmp/student-handbook.html
 
           fetch_public_page cdl-page https://www.elevateforhumanity.org/programs/cdl-training /tmp/cdl-page.html
-          grep -q 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cdl-hero.mp4' /tmp/cdl-page.html
+          grep -q 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cdl.mp4' /tmp/cdl-page.html
           grep -q '/audio/heroes/cdl.mp3' /tmp/cdl-page.html
           # Verify the current accessible hero contract. The CDL hero intentionally
           # uses the visual label and descriptive image text instead of legacy
@@ -358,7 +358,7 @@ jobs:
           grep -q 'CDL Class A' /tmp/cdl-page.html
           grep -q 'CDL student performing a pre-trip inspection' /tmp/cdl-page.html
 
-          video_url=https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cdl-hero.mp4
+          video_url=https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cdl.mp4
           if ! curl -fsS --range 0-1023 --max-time 30 -A 'Mozilla/5.0 ElevateDeploy/1.0' -H 'Accept: video/mp4,video/*;q=0.9,*/*;q=0.1' -D /tmp/cdl-video.headers -o /tmp/cdl-video.bin "$video_url"; then
             curl -fsS --max-time 30 -A 'Mozilla/5.0 ElevateDeploy/1.0' -H 'Accept: video/mp4,video/*;q=0.9,*/*;q=0.1' -D /tmp/cdl-video.headers -o /tmp/cdl-video.bin "$video_url"
           fi
@@ -377,9 +377,9 @@ jobs:
           fetch_public_page cna-page https://www.elevateforhumanity.org/programs/cna /tmp/cna-page.html
           grep -q 'Self-Pay Program' /tmp/cna-page.html
           grep -q 'Self-Pay Available' /tmp/cna-page.html
-          grep -q 'cna-hero.mp4' /tmp/cna-page.html
+          grep -q 'course-cna.mp4' /tmp/cna-page.html
 
-          cna_video_url=https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4
+          cna_video_url=https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4
           if ! curl -fsS --range 0-1023 --max-time 30 -A 'Mozilla/5.0 ElevateDeploy/1.0' -H 'Accept: video/mp4,video/*;q=0.9,*/*;q=0.1' -D /tmp/cna-video.headers -o /tmp/cna-video.bin "$cna_video_url"; then
             curl -fsS --max-time 30 -A 'Mozilla/5.0 ElevateDeploy/1.0' -H 'Accept: video/mp4,video/*;q=0.9,*/*;q=0.1' -D /tmp/cna-video.headers -o /tmp/cna-video.bin "$cna_video_url"
           fi

@@ -346,6 +346,13 @@ export async function POST(req: NextRequest) {
               .catch(() => ({}))) as BrowserSnapshot & {
               error?: string;
             };
+            if (!snapshotResponse.ok && snapshot.error === 'human_verification_required') {
+              const reason = 'Envato is asking you to verify you are human in the existing Studio browser. Complete the verification, then resume this same media task.';
+              await pauseForAuthentication(reason, steps, history, totalTokens,
+                undefined, undefined, 'interaction');
+              emit({ type: 'interaction_required', message: reason });
+              return;
+            }
             if (!snapshotResponse.ok && snapshot.error === 'interaction_required') {
               const reason =
                 'Respond to the browser dialog or choose files in the workspace, then resume this task.';

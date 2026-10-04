@@ -184,6 +184,20 @@ test('returns the compact actionable page snapshot', async () => {
   assert.deepEqual(await snapshotPage(session), expected);
 });
 
+test('preserves a human verification task before planning and resumes when the challenge clears', async () => {
+  let challenged = true;
+  const session = {
+    page: { waitForLoadState: async () => undefined, evaluate: async () => ({
+      title: 'Envato', url: 'https://elements.envato.com/', headings: [], controls: [],
+      visibleText: challenged ? 'Performing security verification Verify you are human Cloudflare' : 'Envato Workspaces',
+    }) },
+  };
+  await assert.rejects(() => snapshotPage(session), error =>
+    error.code === 'human_verification_required' && error.status === 409);
+  challenged = false;
+  assert.equal((await snapshotPage(session)).visibleText, 'Envato Workspaces');
+});
+
 test('allows public IPv4 networks', () => {
   assert.equal(isPrivateAddress('1.1.1.1'), false);
   assert.equal(isPrivateAddress('8.8.8.8'), false);

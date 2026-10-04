@@ -12,6 +12,7 @@ import { promisify } from 'node:util';
 import { chromium } from 'playwright-core';
 import { commandArguments } from './command-arguments.mjs';
 import { ProviderSessionStore } from './provider-session-store.mjs';
+import { requiresHumanVerification, redactBrowserEvidence } from './provider-verification.mjs';
 import { prepareCourseVideoDownload, hasActiveMediaTransfer } from './course-video-download.mjs';
 import { runLearnerTest, credentialMatches, learnerSetupReady } from './learner-runthrough.mjs';
 
@@ -912,7 +913,11 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
         downloadDir,
       };
       const record = (type, data) => {
-        session.events.push({ type, at: new Date().toISOString(), ...data });
+        const evidence = { ...data };
+        for (const key of ['url', 'text', 'error']) {
+          if (typeof evidence[key] === 'string') evidence[key] = redactBrowserEvidence(evidence[key]);
+        }
+        session.events.push({ type, at: new Date().toISOString(), ...evidence });
         if (session.events.length > 500) session.events.shift();
       };
       const attachPage = (page) => {
@@ -1321,6 +1326,9 @@ export async function snapshotPage(session) {
       result.visibleText = `${result.visibleText}\nFrame: ${snapshot.title}\n${snapshot.visibleText}`.slice(0, 12000);
     }
   }
+  if (requiresHumanVerification(result)) {
+    throw new BrowserServiceError('human_verification_required', 409);
+  }
   return { ...result, ...(frameErrors.length ? { frameErrors } : {}) };
 }
 
@@ -1661,4 +1669,3 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       );
   });
 }
-

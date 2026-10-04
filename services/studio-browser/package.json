@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --check learner-runthrough.mjs && node --check provider-session-store.mjs && node --check course-video-download.mjs && node --test command-arguments.test.mjs server.test.mjs learner-runthrough.test.mjs provider-session-store.test.mjs course-video-download.test.mjs"
+    "check": "node --check server.mjs && node --check learner-runthrough.mjs && node --check provider-session-store.mjs && node --check course-video-download.mjs && node --check provider-verification.mjs && node --test command-arguments.test.mjs server.test.mjs learner-runthrough.test.mjs provider-session-store.test.mjs course-video-download.test.mjs provider-verification.test.mjs"
   },
   "dependencies": {
     "axe-core": "^4.10.3",

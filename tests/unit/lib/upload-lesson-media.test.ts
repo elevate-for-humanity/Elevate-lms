@@ -11,14 +11,14 @@ describe('upload-lesson-media routing', () => {
   beforeEach(() => {
     process.env = { ...env };
     for (const key of [
-      'OBJECT_STORAGE_PROVIDER',
-      'OBJECT_STORAGE_ENDPOINT',
-      'OBJECT_STORAGE_REGION',
-      'OBJECT_STORAGE_ACCESS_KEY_ID',
-      'OBJECT_STORAGE_SECRET_ACCESS_KEY',
-      'OBJECT_STORAGE_BUCKET',
-      'OBJECT_STORAGE_PUBLIC_URL',
-      'NEXT_PUBLIC_OBJECT_STORAGE_URL',
+      'ELEVATE_MEDIA_PROVIDER',
+      'ELEVATE_MEDIA_ENDPOINT',
+      'ELEVATE_MEDIA_REGION',
+      'ELEVATE_MEDIA_ACCESS_KEY_ID',
+      'ELEVATE_MEDIA_SECRET_ACCESS_KEY',
+      'ELEVATE_MEDIA_BUCKET',
+      'ELEVATE_MEDIA_PUBLIC_URL',
+      'NEXT_PUBLIC_ELEVATE_MEDIA_URL',
       'S3_ENDPOINT',
       'S3_REGION',
       'S3_ACCESS_KEY_ID',
@@ -43,14 +43,14 @@ describe('upload-lesson-media routing', () => {
   });
 
   function configureB2(publicDelivery = true) {
-    process.env.OBJECT_STORAGE_PROVIDER = 'backblaze-b2';
-    process.env.OBJECT_STORAGE_ENDPOINT = 'https://s3.us-east-005.backblazeb2.com';
-    process.env.OBJECT_STORAGE_REGION = 'us-east-005';
-    process.env.OBJECT_STORAGE_ACCESS_KEY_ID = 'key';
-    process.env.OBJECT_STORAGE_SECRET_ACCESS_KEY = 'secret';
-    process.env.OBJECT_STORAGE_BUCKET = 'elevate-media';
+    process.env.ELEVATE_MEDIA_PROVIDER = 'backblaze-b2';
+    process.env.ELEVATE_MEDIA_ENDPOINT = 'https://s3.us-east-005.backblazeb2.com';
+    process.env.ELEVATE_MEDIA_REGION = 'us-east-005';
+    process.env.ELEVATE_MEDIA_ACCESS_KEY_ID = 'key';
+    process.env.ELEVATE_MEDIA_SECRET_ACCESS_KEY = 'secret';
+    process.env.ELEVATE_MEDIA_BUCKET = 'elevate-media';
     if (publicDelivery) {
-      process.env.OBJECT_STORAGE_PUBLIC_URL = 'https://media.example.com';
+      process.env.ELEVATE_MEDIA_PUBLIC_URL = 'https://media.example.com';
     }
   }
 

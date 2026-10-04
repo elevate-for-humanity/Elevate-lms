@@ -1,12 +1,15 @@
 /**
  * Media URL Helper
  *
- * Returns the configured public object-storage URL when available, with legacy
+ * Returns the configured public Elevate Media Storage URL when available, with legacy
  * R2 variables retained as fallbacks.
  */
 
-const OBJECT_STORAGE_PUBLIC_URL = (
+const ELEVATE_MEDIA_PUBLIC_URL = (
+  process.env.NEXT_PUBLIC_ELEVATE_MEDIA_URL ||
+  process.env.ELEVATE_MEDIA_PUBLIC_URL ||
   process.env.NEXT_PUBLIC_OBJECT_STORAGE_URL ||
+  process.env.ELEVATE_MEDIA_PUBLIC_URL ||
   process.env.NEXT_PUBLIC_R2_URL ||
   process.env.CLOUDFLARE_R2_PUBLIC_URL ||
   ''
@@ -14,26 +17,26 @@ const OBJECT_STORAGE_PUBLIC_URL = (
 
 export function getVideoUrl(filename: string): string {
   const cleanName = filename.replace(/^\/?(videos\/)?/, '');
-  if (OBJECT_STORAGE_PUBLIC_URL) {
-    return `${OBJECT_STORAGE_PUBLIC_URL}/videos/${cleanName}`;
+  if (ELEVATE_MEDIA_PUBLIC_URL) {
+    return `${ELEVATE_MEDIA_PUBLIC_URL}/videos/${cleanName}`;
   }
   return `/videos/${cleanName}`;
 }
 
 export function getImageUrl(filename: string): string {
   const cleanName = filename.replace(/^\/?(images\/)?/, '');
-  if (OBJECT_STORAGE_PUBLIC_URL) {
-    return `${OBJECT_STORAGE_PUBLIC_URL}/images/${cleanName}`;
+  if (ELEVATE_MEDIA_PUBLIC_URL) {
+    return `${ELEVATE_MEDIA_PUBLIC_URL}/images/${cleanName}`;
   }
   return `/images/${cleanName}`;
 }
 
 export function isObjectStorageEnabled(): boolean {
-  return Boolean(OBJECT_STORAGE_PUBLIC_URL);
+  return Boolean(ELEVATE_MEDIA_PUBLIC_URL);
 }
 
 export function getObjectStorageBaseUrl(): string | null {
-  return OBJECT_STORAGE_PUBLIC_URL || null;
+  return ELEVATE_MEDIA_PUBLIC_URL || null;
 }
 
 /** @deprecated Use isObjectStorageEnabled. */

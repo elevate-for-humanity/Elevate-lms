@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { getCurrentUser } from '@/lib/auth';
+import { requireApiRole } from '@/lib/auth/require-api-role';
 import { practicalReviewerCourseIds, reviewCoursePractical } from '@/lib/lms/course-practical-workflow';
 
 const ReviewSchema = z.object({
@@ -12,8 +12,9 @@ const ReviewSchema = z.object({
 });
 
 async function reviewer() {
-  const user = await getCurrentUser();
-  if (!user) return null;
+  const auth = await requireApiRole(['admin', 'super_admin', 'instructor', 'staff', 'org_admin']);
+  if (auth instanceof NextResponse) return auth;
+  const user = auth.user;
   const db = await requireAdminClient();
   try { return { db, user, courseIds: await practicalReviewerCourseIds(db, user.id) }; }
   catch { return null; }
@@ -21,6 +22,7 @@ async function reviewer() {
 
 export async function GET() {
   const actor = await reviewer();
+  if (actor instanceof NextResponse) return actor;
   if (!actor) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   let query = actor.db
     .from('course_practical_submissions')
@@ -39,6 +41,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const actor = await reviewer();
+  if (actor instanceof NextResponse) return actor;
   if (!actor) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   const parsed = ReviewSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success)

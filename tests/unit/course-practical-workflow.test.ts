@@ -1,4 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+import { NextRequest, NextResponse } from 'next/server';
+
+const routeAuth = vi.hoisted(() => ({ guard: vi.fn(), admin: vi.fn() }));
+vi.mock('@/lib/auth/require-api-role', () => ({ requireApiRole: routeAuth.guard }));
+vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: routeAuth.admin }));
+import { GET, POST } from '@/apps/admin/app/api/admin/course-builder/practical-reviews/route';
 import { submitCoursePractical, reviewCoursePractical, practicalReviewerCourseIds } from '@/lib/lms/course-practical-workflow';
 import { checkCompetencyGate } from '@/lib/lms/competency-gate';
 
@@ -39,6 +45,22 @@ const input = { courseId: 'course', lessonId: 'lesson', interactionId: 'lesson-p
 const review = { submissionId: 'submission', decision: 'approved', competencyResults: { 'safe-work': true }, comments: 'Observed required safety steps.' };
 
 describe('practical submission to actual completion gate', () => {
+  it.each([401, 403])('denies review endpoints before privileged queries when the role guard returns %s', async status => {
+    routeAuth.admin.mockClear();
+    routeAuth.guard.mockResolvedValue(NextResponse.json({ error: 'Denied' }, { status }));
+    expect((await GET()).status).toBe(status);
+    expect((await POST(new NextRequest('https://admin.test/api/admin/course-builder/practical-reviews', { method: 'POST' }))).status).toBe(status);
+    expect(routeAuth.admin).not.toHaveBeenCalled();
+  });
+  it('limits the review endpoint queue to the authenticated instructor assignments', async () => {
+    const { db, rows } = fixture();
+    rows.course_practical_submissions.push({ id: 'own', course_id: 'course', status: 'submitted' }, { id: 'outside', course_id: 'outside', status: 'submitted' });
+    routeAuth.guard.mockResolvedValue({ user: { id: 'instructor' } });
+    routeAuth.admin.mockResolvedValue(db);
+    const response = await GET();
+    expect(response.status).toBe(200);
+    expect((await response.json()).submissions.map((row: { id: string }) => row.id)).toEqual(['own']);
+  });
   it('keeps submitted evidence blocked until assigned instructor verifies every competency', async () => {
     const { db, rows } = fixture();
     await submitCoursePractical(db, 'learner', input);

@@ -27,7 +27,7 @@ export {
   getPublicFallbackUrl,
 } from './file-storage';
 
-// Provider-neutral S3-compatible Elevate Media Storage
+// Elevate Media Storage
 export {
   getElevateMediaStorageConfig,
   getElevateMediaStorageClient,

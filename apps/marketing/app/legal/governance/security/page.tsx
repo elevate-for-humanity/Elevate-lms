@@ -414,7 +414,7 @@ export default async function SecurityStatementPage() {
               <strong>Data Protection Officer:</strong> our contact form
             </p>
             <p>
-              <strong>Phone:</strong> {PLATFORM_DEFAULTS.supportPhone}
+              <strong>Phone:</strong> {PLATFORM_DEFAULTS.mainPhone}
             </p>
           </div>
         </section>

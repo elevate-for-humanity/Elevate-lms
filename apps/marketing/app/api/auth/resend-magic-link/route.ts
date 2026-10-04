@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
             </div>
             <p style="font-size:13px;color:#888;line-height:1.7">
               If you did not request this link, you can ignore this email.
-              Questions? Call <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color:#888">${PLATFORM_DEFAULTS.supportPhone}</a>.
+              Questions? Call <a href="tel:${PLATFORM_DEFAULTS.mainPhone}" style="color:#888">${PLATFORM_DEFAULTS.mainPhone}</a>.
             </p>
           </div>
         </div>`,

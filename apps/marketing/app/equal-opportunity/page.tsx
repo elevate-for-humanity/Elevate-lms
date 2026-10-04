@@ -166,8 +166,8 @@ export default function EqualOpportunityPage() {
             <h2 className="text-2xl font-bold mb-4">Need Accommodations?</h2>
             <p className="text-blue-100 mb-6 max-w-2xl mx-auto">If you need accommodations to participate in any of our programs or services, please contact us. We are committed to making our programs accessible to everyone.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="tel:+13173143757" className="bg-white text-brand-blue-700 font-bold py-3 px-8 rounded-lg hover:bg-blue-50 transition-colors">
-                Call (317) 314-3757
+              <a href="tel:+13179999620" className="bg-white text-brand-blue-700 font-bold py-3 px-8 rounded-lg hover:bg-blue-50 transition-colors">
+                Call (317) 999-9620
               </a>
               <Link href="/contact" className="bg-white/20 text-white font-bold py-3 px-8 rounded-lg hover:bg-white/30 transition-colors">
                 Contact Us

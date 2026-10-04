@@ -102,11 +102,11 @@ function BillingRequiredContent() {
               <div className="border-t pt-4 space-y-2">
                 <p className="text-sm font-medium text-slate-700">Need help?</p>
                 <a
-                  href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+                  href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`}
                   className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900"
                 >
                   <Phone className="w-4 h-4" />
-                  {PLATFORM_DEFAULTS.supportPhone}
+                  {PLATFORM_DEFAULTS.mainPhone}
                 </a>
                 <a
                   href="mailto:elevate4humanityedu@gmail.com"

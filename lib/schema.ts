@@ -33,7 +33,7 @@ export const organizationSchema: WithContext<Organization> = {
   },
   contactPoint: {
     '@type': 'ContactPoint',
-    telephone: `+1-${PLATFORM_DEFAULTS.supportPhone}`,
+    telephone: `+1-${PLATFORM_DEFAULTS.mainPhone}`,
     contactType: 'Admissions',
     email: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
   },

@@ -125,7 +125,7 @@ export default function FerpaConsentPage() {
             <br />
             6331 N Keystone Ave, Suite D, Indianapolis, IN 46220
             <br />
-            Email: info@elevateforhumanity.org · Phone: {PLATFORM_DEFAULTS.supportPhone}
+            Email: info@elevateforhumanity.org · Phone: {PLATFORM_DEFAULTS.mainPhone}
             <br />
             U.S. Department of Education: studentprivacy.ed.gov
           </p>

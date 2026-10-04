@@ -82,7 +82,7 @@ export default function FssaWaitlistPage() {
           <div className="bg-slate-50 rounded-xl p-5 text-sm text-slate-600 text-left space-y-2">
             <p className="font-semibold text-slate-800">While you wait:</p>
             <ul className="space-y-1 list-disc list-inside">
-              <li>Ask your case manager to contact us directly at {PLATFORM_DEFAULTS.supportPhone}</li>
+              <li>Ask your case manager to contact us directly at {PLATFORM_DEFAULTS.mainPhone}</li>
               <li>Gather any FSSA/TANF benefit documentation you have</li>
               <li>
                 <Link href="/programs" className="text-brand-blue-600 underline">
@@ -134,10 +134,10 @@ export default function FssaWaitlistPage() {
           </div>
           <div className="flex flex-wrap gap-4 text-sm">
             <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+              href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`}
               className="flex items-center gap-1.5 text-blue-700 hover:text-blue-900 font-medium"
             >
-              <Phone className="w-4 h-4" /> {PLATFORM_DEFAULTS.supportPhone}
+              <Phone className="w-4 h-4" /> {PLATFORM_DEFAULTS.mainPhone}
             </a>
             <a
               href="mailto:info@elevateforhumanity.org"

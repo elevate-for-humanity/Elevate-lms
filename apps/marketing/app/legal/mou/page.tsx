@@ -149,7 +149,7 @@ export default async function MOUPage() {
                 <br />
                 Email: our contact form
                 <br />
-                Phone: {PLATFORM_DEFAULTS.supportPhone}
+                Phone: {PLATFORM_DEFAULTS.mainPhone}
               </p>
             </div>
           </section>

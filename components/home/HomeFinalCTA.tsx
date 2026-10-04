@@ -39,8 +39,8 @@ export function HomeFinalCTA() {
           </div>
 
           <div className="mt-7 flex flex-col gap-2 text-sm text-slate-200 sm:flex-row sm:flex-wrap sm:items-center">
-            <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`} className="inline-flex items-center gap-2 font-black text-white hover:text-red-200">
-              <Phone className="h-4 w-4" aria-hidden="true" /> {PLATFORM_DEFAULTS.supportPhone}
+            <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, '')}`} className="inline-flex items-center gap-2 font-black text-white hover:text-red-200">
+              <Phone className="h-4 w-4" aria-hidden="true" /> {PLATFORM_DEFAULTS.mainPhone}
             </a>
             <span className="hidden sm:inline" aria-hidden="true">·</span>
             <span>Call or text Mon–Fri, 9am–5pm ET</span>

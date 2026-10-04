@@ -118,11 +118,11 @@ export default function EstheticianEligibilityPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+              href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`}
               className="inline-flex items-center gap-2 bg-white text-slate-900 px-6 py-3 rounded-lg font-medium hover:bg-slate-100 transition"
             >
               <Phone className="w-5 h-5" />
-              {PLATFORM_DEFAULTS.supportPhone}
+              {PLATFORM_DEFAULTS.mainPhone}
             </a>
             <a
               href="mailto:elevate4humanityedu@gmail.com"

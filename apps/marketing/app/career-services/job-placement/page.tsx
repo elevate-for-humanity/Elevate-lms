@@ -24,7 +24,7 @@ export default function JobPlacementPage() {
     { value: 'Ongoing', label: 'Graduate Support' },
     { value: 'Direct', label: 'Workforce Referrals' },
   ];
-  const phoneHref = `tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`;
+  const phoneHref = `tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, '')}`;
 
   return (
     <div className="min-h-screen bg-white">
@@ -37,7 +37,7 @@ export default function JobPlacementPage() {
         actions={(
           <>
             <Link href="/career-services/contact" className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">Get Placement Help</Link>
-            <a href={phoneHref} className="inline-flex items-center rounded-lg border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-900 transition-colors hover:border-slate-500"><Phone className="mr-2 h-4 w-4" /> Call {PLATFORM_DEFAULTS.supportPhone}</a>
+            <a href={phoneHref} className="inline-flex items-center rounded-lg border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-900 transition-colors hover:border-slate-500"><Phone className="mr-2 h-4 w-4" /> Call {PLATFORM_DEFAULTS.mainPhone}</a>
           </>
         )}
       />

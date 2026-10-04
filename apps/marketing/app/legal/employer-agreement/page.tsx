@@ -139,7 +139,7 @@ export default function EmployerAgreementPage() {
             <br />
             6331 N Keystone Ave, Suite D, Indianapolis, IN 46220
             <br />
-            Email: info@elevateforhumanity.org · Phone: {PLATFORM_DEFAULTS.supportPhone}
+            Email: info@elevateforhumanity.org · Phone: {PLATFORM_DEFAULTS.mainPhone}
           </p>
         </DocumentSection>
 

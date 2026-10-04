@@ -391,7 +391,7 @@ export default async function TuitionFeesPage() {
 
         <div className="mt-12 border-t pt-8 text-center">
           <p className="text-slate-800">
-            Questions about tuition or payment options? Call {PLATFORM_DEFAULTS.supportPhone} or use
+            Questions about tuition or payment options? Call {PLATFORM_DEFAULTS.mainPhone} or use
             the contact form.
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-5 text-sm">
@@ -420,11 +420,11 @@ export default async function TuitionFeesPage() {
               Apply Now
             </Link>
             <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/\D/g, '')}`}
+              href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/\D/g, '')}`}
               className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-white px-6 py-3 font-bold text-white hover:bg-brand-blue-900"
             >
               <Phone className="h-4 w-4" />
-              {PLATFORM_DEFAULTS.supportPhone}
+              {PLATFORM_DEFAULTS.mainPhone}
             </a>
           </div>
         </section>

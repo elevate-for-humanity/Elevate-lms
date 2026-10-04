@@ -157,8 +157,8 @@ export default async function OrientationCompletePage() {
 
         <p className="text-center text-xs text-slate-700 mt-6">
           Questions? Call{' '}
-          <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="underline">
-            {PLATFORM_DEFAULTS.supportPhone}
+          <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`} className="underline">
+            {PLATFORM_DEFAULTS.mainPhone}
           </a>{' '}
           or email{' '}
           <a href="mailto:elevate4humanityedu@gmail.com" className="underline">

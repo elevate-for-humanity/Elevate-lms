@@ -232,7 +232,7 @@ export default function FundingPage() {
 
         <p className="text-xs text-slate-400 mt-4">
           Not sure which applies to you?{' '}
-          <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="underline">Call {PLATFORM_DEFAULTS.supportPhone}</a> and we&apos;ll help you figure it out.
+          <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`} className="underline">Call {PLATFORM_DEFAULTS.mainPhone}</a> and we&apos;ll help you figure it out.
         </p>
       </div>
     </div>

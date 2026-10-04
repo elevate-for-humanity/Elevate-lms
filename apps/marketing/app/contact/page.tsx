@@ -1,3 +1,4 @@
+import { siteConfig } from '@/lib/config/site';
 import { Metadata } from 'next';
 import { Phone, Mail, MapPin, Clock, MessageSquare, Users, Building2 } from 'lucide-react';
 import Link from 'next/link';
@@ -180,16 +181,21 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
               <div className="bg-white rounded-2xl shadow-lg p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-4">Quick Contact</h3>
                 <div className="space-y-4">
-                  <a href="tel:+13173140199" className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
+                  <a href={siteConfig.phone.href} className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
                     <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                       <Phone className="w-5 h-5 text-brand-blue-700" />
                     </div>
                     <div>
-                      <p className="text-sm text-slate-500">Phone</p>
-                      <p className="font-semibold">(317) 314-3757</p>
+                      <p className="text-sm text-slate-500">Main Phone — Programs and Admissions</p>
+                      <p className="font-semibold">{siteConfig.phone.display}</p>
                     </div>
                   </a>
                   
+                  <a href={siteConfig.technicalSupport.href} className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
+                    <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center"><Phone className="w-5 h-5 text-brand-blue-700" /></div>
+                    <div><p className="text-sm text-slate-500">Technical Support — Login and Website Help</p><p className="font-semibold">{siteConfig.technicalSupport.display}</p></div>
+                  </a>
+
                   <a href="mailto:info@elevateforhumanity.org" className="flex items-center gap-3 text-slate-700 hover:text-brand-orange-600 transition-colors">
                     <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                       <Mail className="w-5 h-5 text-brand-blue-700" />

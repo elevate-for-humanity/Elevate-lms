@@ -17,6 +17,7 @@ export type TelnyxCallEvent = {
       client_state?: string;
       digits?: string;
       result?: string | Record<string, unknown>;
+      partial_results?: Record<string, unknown>;
       status?: string;
       hangup_cause?: string;
       hangup_source?: string;

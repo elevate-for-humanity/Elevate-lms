@@ -414,8 +414,8 @@ export default async function VerifyCertificatePage({
               Elevate4humanityedu@gmail.com
             </a>{' '}
             or call{' '}
-            <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-brand-blue-600 hover:underline">
-              {PLATFORM_DEFAULTS.supportPhone}
+            <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`} className="text-brand-blue-600 hover:underline">
+              {PLATFORM_DEFAULTS.mainPhone}
             </a>
           </p>
         </div>

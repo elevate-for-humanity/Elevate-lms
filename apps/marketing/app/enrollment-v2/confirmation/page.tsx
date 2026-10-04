@@ -99,11 +99,11 @@ export default async function EnrollmentV2ConfirmationPage({
             <p className="text-sm font-semibold text-slate-700 mb-4">Questions? We're here to help:</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a
-                href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
+                href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, '')}`}
                 className="inline-flex items-center justify-center px-6 py-3 bg-slate-900 text-white font-semibold rounded-xl hover:bg-slate-800 transition-colors"
               >
                 <Phone className="w-4 h-4 mr-2" />
-                {PLATFORM_DEFAULTS.supportPhone}
+                {PLATFORM_DEFAULTS.mainPhone}
               </a>
               <a
                 href="mailto:admissions@elevateforhumanity.org"

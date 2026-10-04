@@ -61,7 +61,7 @@ export default function HelpPage() {
             <a href="tel:+13173141234" className="flex flex-col items-center p-6 bg-slate-50 rounded-xl hover:bg-slate-100 transition">
               <Phone className="w-10 h-10 text-blue-600 mb-3" />
               <h3 className="font-bold mb-1">Call Us</h3>
-              <p className="text-sm text-slate-500">(317) 314-3757</p>
+              <p className="text-sm text-slate-500">(317) 999-9620</p>
             </a>
             <div className="flex flex-col items-center p-6 bg-slate-50 rounded-xl">
               <MessageCircle className="w-10 h-10 text-blue-600 mb-3" />

@@ -94,10 +94,10 @@ export default function ProgramHolderConfirmationPage() {
                 </a>
                 <span className="hidden sm:inline text-white">|</span>
                 <a
-                  href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+                  href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`}
                   className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
                 >
-                  {PLATFORM_DEFAULTS.supportPhone}
+                  {PLATFORM_DEFAULTS.mainPhone}
                 </a>
               </div>
             </div>

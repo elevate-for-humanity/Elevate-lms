@@ -5,10 +5,10 @@ import { PushNotificationService } from '@/lib/notifications/push-service';
 import { sendSMS } from '@/lib/notifications/sms';
 import { isExtensionReachable } from '@/lib/phone/availability';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
+import { directoryPages, intakeCompleted, MENU_INPUT, PHONE_VOICE, programDestination, RECOVERY_VOICE } from '@/lib/phone/call-flow';
 import {
   decodeCallState,
   encodeCallState,
-  menuPrompt,
   publicPhoneNumber,
   telnyxClient,
   verifyTelnyxWebhook,
@@ -238,13 +238,14 @@ async function startVoicemail(
   callControlId: string,
   eventId: string,
   route: { extensionId?: string; profileId?: string } = {},
+  voice = PHONE_VOICE,
 ) {
   if (!route.extensionId) route = await defaultAdminRoute(db, system);
   const greeting = await unavailableGreeting(db, route, system.after_hours_message);
   if (!system.voicemail_enabled) {
     await telnyxClient().calls.actions.speak(callControlId, {
       payload: `${greeting} Please try again later.`,
-      voice: 'Telnyx.KokoroTTS.af',
+      voice,
       command_id: `${eventId}-unavailable`,
       client_state: encodeCallState({
         systemId: system.id,
@@ -281,7 +282,7 @@ async function startVoicemail(
   if (taskError || !task?.id) throw new Error('Unable to create the voicemail callback task.');
   await telnyxClient().calls.actions.speak(callControlId, {
     payload: `${greeting} Your message will be recorded and transcribed. Please leave your name, callback number, and message after the beep.`,
-    voice: 'Telnyx.KokoroTTS.af',
+    voice,
     command_id: `${eventId}-voicemail-prompt`,
     client_state: encodeCallState({
       systemId: system.id,
@@ -301,6 +302,8 @@ async function startParis(
   callControlId: string,
   eventId: string,
   route: { extensionId?: string; profileId?: string } = {},
+  resume = false,
+  voice = PHONE_VOICE,
 ) {
   if (!route.extensionId) route = await defaultAdminRoute(db, system);
   if (!system.paris_intake_enabled) {
@@ -332,6 +335,11 @@ async function startParis(
         .single();
   if (taskError || !created?.id) throw new Error('Unable to create the PARIS callback task.');
   const taskId = created?.id || '';
+  const { error: assignmentError } = await db.from('phone_callback_tasks').update({
+    extension_id: route.extensionId || null, assigned_profile_id: route.profileId || null,
+    updated_at: new Date().toISOString(),
+  }).eq('id', taskId);
+  if (assignmentError) throw assignmentError;
   const greeting = await unavailableGreeting(db, route, 'The person you selected is unavailable.');
   const state = {
     systemId: system.id,
@@ -363,7 +371,7 @@ async function startParis(
         })
         .join('; ');
   try {
-    if (taskId) {
+    if (taskId && !resume) {
       await telnyxClient().calls.actions.startRecording(callControlId, {
         channels: 'single',
         format: 'mp3',
@@ -375,10 +383,20 @@ async function startParis(
         client_state: encodeCallState(state),
       });
     }
+    const { data: lastHistory } = resume
+      ? await db.from('phone_call_events').select('payload')
+          .eq('call_id', call.id).eq('event_type', 'call.ai_gather.message_history_updated')
+          .order('occurred_at', { ascending: false }).limit(1).maybeSingle()
+      : { data: null };
+    const history = Array.isArray(lastHistory?.payload?.message_history)
+      ? lastHistory.payload.message_history.filter((entry: any) =>
+          ['user', 'assistant'].includes(entry?.role) && typeof entry?.content === 'string')
+      : [];
     await telnyxClient().calls.actions.gatherUsingAI(callControlId, {
       parameters: {
         type: 'object',
         properties: {
+          conversation_complete: { type: 'boolean', description: 'True only after asking if the caller needs anything else and the caller explicitly confirms they are finished. Pauses, background noise, thank-you, or collecting the intake fields are not confirmation.' },
           caller_name: { type: 'string', description: 'Caller full name' },
           callback_number: {
             type: 'string',
@@ -402,10 +420,10 @@ async function startParis(
           workone_contacted: { type: 'boolean', description: 'Whether the caller has contacted or visited WorkOne' },
           website_orientation_completed: { type: 'boolean', description: 'Whether a caller seeking workforce-funded training completed the funded-program orientation linked from the Elevate homepage' },
         },
-        required: ['caller_name', 'callback_number', 'reason', 'urgency', 'program_interest', 'funding_preference', 'workone_contacted', 'website_orientation_completed'],
+        required: ['caller_name', 'callback_number', 'reason', 'urgency', 'program_interest', 'funding_preference', 'workone_contacted', 'website_orientation_completed', 'conversation_complete'],
       },
       assistant: {
-        instructions: `${system.ai_instructions} You are PARIS, the Elevate for Humanity telephone career and admissions assistant. Be warm, concise, and conversational. Tell callers to call 911 for an emergency. Start with a brief overview: Elevate provides career and technical training, Registered Apprenticeship support, industry credentials, and workforce pathways. Explain that some training can be workforce-funded for eligible participants and other training is self-pay.
+        instructions: `${system.ai_instructions} You are PARIS, the Elevate for Humanity telephone career and admissions assistant. Be warm, concise, and conversational. Allow callers to finish each thought. A pause, background sound, or thank-you does not mean the caller is finished. Before completing the interview, ask whether there is anything else you can help with and wait for explicit confirmation that they are finished. Never end merely because the intake fields have been collected. Tell callers to call 911 for an emergency. Start with a brief overview: Elevate provides career and technical training, Registered Apprenticeship support, industry credentials, and workforce pathways. Explain that some training can be workforce-funded for eligible participants and other training is self-pay.
 
 Current active program names and verified website tuition: ${approvedProgramFacts || 'No current prices are available.'}. Quote a price only when the exact program matches an entry with published tuition. If a caller asks about deposits, fees, payment schedules, or another price not given here, direct them to the current website tuition page or an administrator. Never infer a price from duration, hours, another program, or earlier conversations.
 
@@ -417,20 +435,21 @@ Ask whether they are seeking workforce-funded training, self-pay training, or ar
 
 Do not repeat the extension directory or tell the caller again to enter an extension during the PARIS interview; they already heard routing instructions before reaching you. Do not invent dates, prices, eligibility, approvals, financing approval, or application status. WorkOne/workforce agencies determine workforce-funding eligibility. If approved information does not establish an answer, say you do not want to give incorrect information and route the question to an administrator. Never request a Social Security number, payment card, password, medical details, or other highly sensitive data. Collect the required intake details naturally and confirm the callback number.`,
       },
-      greeting: `Welcome to Elevate for Humanity. We provide career and technical training, Registered Apprenticeship support, industry credentials, and workforce pathways. Some programs may be workforce-funded for eligible participants, while other programs are self-pay with payment and financing options that may be available. I am PARIS, your career and admissions assistant. This call may be recorded and transcribed. I can answer questions about our programs and help you figure out your next step. If this is an emergency, hang up and call 911. May I have your name, and what program or service are you calling about today?`,
+      greeting: resume ? 'I am here. Please continue; you do not need to repeat what you already told me.' : `Welcome to Elevate for Humanity. We provide career and technical training, Registered Apprenticeship support, industry credentials, and workforce pathways. Some programs may be workforce-funded for eligible participants, while other programs are self-pay with payment and financing options that may be available. I am PARIS, your career and admissions assistant. This call may be recorded and transcribed. I can answer questions about our programs and help you figure out your next step. If this is an emergency, hang up and call 911. May I have your name, and what program or service are you calling about today?`,
       gather_ended_speech:
-        'Thank you. I saved your message securely and someone will get back to you as soon as possible.',
+        'Let me make sure you have everything you need.',
       language: 'en',
-      voice: 'Telnyx.KokoroTTS.af',
+      voice,
+      message_history: history,
       send_message_history_updates: true,
-      send_partial_results: false,
-      user_response_timeout_ms: 20000,
+      send_partial_results: true,
+      user_response_timeout_ms: 30000,
       command_id: `${eventId}-paris-intake`,
       client_state: encodeCallState(state),
     });
   } catch (error) {
     console.error('PARIS gather unavailable; falling back to voicemail:', error);
-    await startVoicemail(db, system, call, callControlId, `${eventId}-fallback`, route);
+    await startVoicemail(db, system, call, callControlId, `${eventId}-fallback`, route, RECOVERY_VOICE);
   }
 }
 
@@ -449,6 +468,11 @@ async function routeToExtension(
     .maybeSingle();
   if (!extension) return startParis(db, system, call, callControlId, eventId);
   const route = { extensionId: extension.id, profileId: extension.profile_id || undefined };
+  const { error: assignmentError } = await db.from('phone_calls').update({
+    assigned_extension_id: extension.id, assigned_profile_id: extension.profile_id || null,
+    updated_at: new Date().toISOString(),
+  }).eq('id', call.id);
+  if (assignmentError) throw assignmentError;
   if (!extension.enabled) {
     return startParis(db, system, call, callControlId, eventId, route);
   }
@@ -617,6 +641,107 @@ async function dialExtensionFallback(
   return true;
 }
 
+async function gatherMenu(
+  system: System, call: any, callControlId: string, eventId: string,
+  prompt: string, state: CallState = {}, voice = PHONE_VOICE,
+) {
+  await telnyxClient().calls.actions.gatherUsingSpeak(callControlId, {
+    ...MENU_INPUT, payload: prompt, voice,
+    command_id: `${eventId}-menu-${state.phase || 'main_menu'}`,
+    client_state: encodeCallState({
+      systemId: system.id, callId: call.id, parentCallControlId: callControlId,
+      phase: 'main_menu', ...state,
+    }),
+  });
+}
+
+async function mainMenu(db: any, system: System, call: any, callControlId: string, eventId: string, retry = false) {
+  const prompt = retry ? 'Please choose an option.' : system.greeting;
+  return gatherMenu(system, call, callControlId, eventId,
+    `${prompt} For a three digit extension, press star, then enter the extension. Press 8 to hear the full staff and partner directory. Press 9 for PARIS. Press 0 for Elizabeth Greene, Administrator.`,
+    {}, retry ? RECOVERY_VOICE : PHONE_VOICE);
+}
+
+async function readDirectory(db: any, system: System, call: any, callControlId: string, eventId: string, page = 0, fallback = false) {
+  const { data: workspace, error: workspaceError } = await db.from('communication_workspaces')
+    .select('id').eq('phone_system_id', system.id).maybeSingle();
+  if (workspaceError) throw workspaceError;
+  const { data: directory, error } = workspace?.id
+    ? await db.from('communication_extensions').select('extension,display_name,department,destination_id')
+        .eq('workspace_id', workspace.id).eq('enabled', true).order('extension')
+    : { data: [], error: null };
+  if (error) throw error;
+  const { data: options, error: optionsError } = await db.from('phone_menu_options')
+    .select('digit,destination_id').eq('phone_system_id', system.id).eq('enabled', true);
+  if (optionsError) throw optionsError;
+  const pages = directoryPages((directory || []).map((entry: any) => ({ ...entry,
+    menu_digit: options?.find((option: any) => option.destination_id && option.destination_id === entry.destination_id)?.digit,
+  })));
+  const index = Math.min(Math.max(page, 0), Math.max(0, pages.length - 1));
+  const more = index + 1 < pages.length;
+  const prompt = `${index === 0 ? 'Full directory. To dial an extension, press star first. ' : ''}${pages[index] || 'No directory entries are currently available.'} ${more ? 'The directory will continue shortly.' : 'End of directory. Press star to enter an extension, 8 to repeat, 9 for PARIS, or 0 for the administrator.'}`;
+  await telnyxClient().calls.actions.gatherUsingSpeak(callControlId, {
+    ...MENU_INPUT, payload: prompt, voice: fallback ? RECOVERY_VOICE : PHONE_VOICE,
+    timeout_millis: more ? 1000 : 10000,
+    command_id: `${eventId}-directory-${index}-${fallback ? 'fallback' : 'primary'}`,
+    client_state: encodeCallState({ systemId: system.id, callId: call.id,
+      parentCallControlId: callControlId, phase: 'directory', directoryPage: String(index),
+      directoryMore: String(more), directoryFallback: String(fallback) }),
+  });
+}
+
+async function parisNextStep(system: System, call: any, callControlId: string, eventId: string, state: CallState, failed: boolean) {
+  return gatherMenu(system, call, callControlId, eventId,
+    failed
+      ? 'I am sorry, the voice connection was interrupted. Your call is still connected. Press 1 to continue with PARIS, 2 to leave a voice message, 8 for the directory, or 0 for the administrator.'
+      : 'Do you need anything else? Press 1 to continue with PARIS, 2 if you are finished, 8 for the directory, or 0 for the administrator.',
+    { ...state, phase: failed ? 'paris_recovery' : 'paris_followup' }, RECOVERY_VOICE);
+}
+
+async function resolveProgramRoute(db: any, system: System, program: string) {
+  const { data: options, error } = await db.from('phone_menu_options')
+    .select('destination_id,spoken_keywords').eq('phone_system_id', system.id).eq('enabled', true);
+  if (error) throw error;
+  if (!program.trim()) return null;
+  // Enrich department keywords with the current program-holder assignments.
+  // Only holders attached to this phone system's configured destinations qualify.
+  const { data: configuredDestinations, error: destinationsError } = await db.from('phone_destinations')
+    .select('id,extension_id').eq('phone_system_id', system.id).eq('enabled', true)
+    .in('id', (options || []).map((option: any) => option.destination_id).filter(Boolean));
+  if (destinationsError) throw destinationsError;
+  const { data: configuredExtensions, error: extensionsError } = await db.from('communication_extensions')
+    .select('id,profile_id').eq('enabled', true)
+    .in('id', (configuredDestinations || []).map((destination: any) => destination.extension_id).filter(Boolean));
+  if (extensionsError) throw extensionsError;
+  const { data: holders, error: holdersError } = await db.from('program_holders')
+    .select('id,user_id').in('status', ['active', 'approved'])
+    .in('user_id', (configuredExtensions || []).map((extension: any) => extension.profile_id).filter(Boolean));
+  if (holdersError) throw holdersError;
+  const { data: assignments, error: assignmentsError } = await db.from('program_holder_programs')
+    .select('program_holder_id,program_slug').eq('status', 'active')
+    .in('program_holder_id', (holders || []).map((holder: any) => holder.id));
+  if (assignmentsError) throw assignmentsError;
+  const enrichedOptions = (options || []).map((option: any) => {
+    const destination = configuredDestinations?.find((entry: any) => entry.id === option.destination_id);
+    const extension = configuredExtensions?.find((entry: any) => entry.id === destination?.extension_id);
+    const holderIds = (holders || []).filter((holder: any) => holder.user_id === extension?.profile_id).map((holder: any) => holder.id);
+    return { ...option, spoken_keywords: [...(option.spoken_keywords || []),
+      ...(assignments || []).filter((assignment: any) => holderIds.includes(assignment.program_holder_id))
+        .map((assignment: any) => assignment.program_slug).filter(Boolean)] };
+  });
+  const destinationId = programDestination(program, enrichedOptions);
+  if (!destinationId) return null;
+  const { data: destination } = await db.from('phone_destinations').select('extension_id')
+    .eq('id', destinationId).eq('phone_system_id', system.id).eq('enabled', true).maybeSingle();
+  if (!destination?.extension_id) return null;
+  const { data: workspace } = await db.from('communication_workspaces').select('id')
+    .eq('phone_system_id', system.id).maybeSingle();
+  if (!workspace?.id) return null;
+  const { data: extension } = await db.from('communication_extensions').select('id,profile_id')
+    .eq('id', destination.extension_id).eq('workspace_id', workspace.id).eq('enabled', true).maybeSingle();
+  return extension?.profile_id ? { extensionId: extension.id, profileId: extension.profile_id } : null;
+}
+
 async function handleEvent(
   db: any,
   event: TelnyxCallEvent,
@@ -628,6 +753,9 @@ async function handleEvent(
   const { event_type: type, id: eventId } = event.data;
   const payload = event.data.payload;
   const client = telnyxClient();
+
+  if (['call.gather.ended', 'call.ai_gather.ended'].includes(type) &&
+      (call?.ended_at || ['call_hangup', 'cancelled', 'cancelled_amd'].includes(String(payload.status)))) return;
 
   if (type === 'call.initiated' && payload.direction === 'incoming') {
     const { data: created } = await db
@@ -744,33 +872,8 @@ async function handleEvent(
         updated_at: new Date().toISOString(),
       })
       .eq('id', call.id);
-    const { data: options } = await db
-      .from('phone_menu_options')
-      .select('digit,label')
-      .eq('phone_system_id', system.id)
-      .eq('enabled', true)
-      .order('position');
-    if (system.routing_mode === 'menu' && options?.length) {
-      const { data: workspace } = await db.from('communication_workspaces').select('id').eq('phone_system_id', system.id).maybeSingle();
-      const { data: directory } = workspace?.id ? await db.from('communication_extensions').select('extension,display_name,department').eq('workspace_id', workspace.id).eq('enabled', true).order('extension') : { data: [] };
-      const directoryPrompt = (directory || []).map((entry: any) => entry.extension === '0' ? `For Elizabeth Greene, Administrator, press 0.` : `For ${entry.display_name}${entry.department ? `, ${entry.department}` : ''}, dial extension ${entry.extension}.`).join(' ');
-      await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
-        payload: `${system.greeting} If you know your party's extension, dial it at any time. Press 8 to hear the full staff and partner directory. Press 9 for PARIS. Press 0 for Elizabeth Greene, Administrator.`,
-        voice: 'Telnyx.KokoroTTS.af',
-        minimum_digits: 1,
-        maximum_digits: 3,
-        valid_digits: '0123456789',
-        inter_digit_timeout_millis: 2500,
-        maximum_tries: 2,
-        timeout_millis: 7000,
-        command_id: `${eventId}-menu`,
-        client_state: encodeCallState({
-          systemId: system.id,
-          callId: call.id,
-          parentCallControlId: payload.call_control_id,
-          phase: 'main_menu',
-        }),
-      });
+    if (system.routing_mode === 'menu') {
+      await mainMenu(db, system, call, payload.call_control_id, eventId);
     } else if (system.default_destination_id) {
       await routeDestination(
         db,
@@ -788,20 +891,40 @@ async function handleEvent(
 
   if (type === 'call.gather.ended') {
     const digits = String(payload.digits ?? '').trim();
-    if (state.phase === 'main_menu' && /^\d{3}$/.test(digits)) {
-      const { data: workspace } = await db
-        .from('communication_workspaces')
-        .select('id')
-        .eq('phone_system_id', system.id)
-        .maybeSingle();
-      const { data: extension } = workspace?.id
-        ? await db.from('communication_extensions').select('id')
-            .eq('workspace_id', workspace.id).eq('extension', digits)
-            .eq('enabled', true).maybeSingle()
-        : { data: null };
-      return extension?.id
-        ? routeToExtension(db, system, call, payload.call_control_id, extension.id, eventId)
-        : startParis(db, system, call, payload.call_control_id, eventId);
+    const route = { extensionId: state.extensionId, profileId: state.profileId };
+    if (state.phase === 'paris_recovery' || state.phase === 'paris_followup') {
+      if (digits === '1') return startParis(db, system, call, payload.call_control_id, eventId, route, true, RECOVERY_VOICE);
+      if (digits === '2' && state.phase === 'paris_recovery') return startVoicemail(db, system, call, payload.call_control_id, eventId, route, RECOVERY_VOICE);
+      if (digits === '2') {
+        await client.calls.actions.speak(payload.call_control_id, {
+          payload: 'Thank you for calling Elevate for Humanity. Goodbye.', voice: RECOVERY_VOICE,
+          command_id: `${eventId}-confirmed-goodbye`,
+          client_state: encodeCallState({ ...state, phase: 'caller_confirmed_end' }),
+        });
+        return;
+      }
+      if (!['0', '8'].includes(digits)) {
+        if (state.reprompted === 'true') return startVoicemail(db, system, call, payload.call_control_id, eventId, route, RECOVERY_VOICE);
+        return parisNextStep(system, call, payload.call_control_id, eventId, { ...state, reprompted: 'true' }, state.phase === 'paris_recovery');
+      }
+    }
+    if (state.phase === 'directory' && !digits) {
+      if (payload.status === 'invalid' && state.directoryFallback !== 'true') {
+        return readDirectory(db, system, call, payload.call_control_id, eventId, Number(state.directoryPage) || 0, true);
+      }
+      if (payload.status === 'invalid') return mainMenu(db, system, call, payload.call_control_id, eventId, true);
+      if (state.directoryMore === 'true') return readDirectory(db, system, call, payload.call_control_id, eventId, (Number(state.directoryPage) || 0) + 1, state.directoryFallback === 'true');
+      return mainMenu(db, system, call, payload.call_control_id, eventId, true);
+    }
+    if (digits === '*' && state.phase !== 'extension_menu') {
+      await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
+        payload: 'Please enter the full three digit extension.', voice: PHONE_VOICE,
+        minimum_digits: 3, maximum_digits: 3, maximum_tries: 2,
+        valid_digits: '0123456789', inter_digit_timeout_millis: 5000, timeout_millis: 10000,
+        command_id: `${eventId}-extension-entry`,
+        client_state: encodeCallState({ systemId: system.id, callId: call.id, phase: 'extension_menu' }),
+      });
+      return;
     }
     if (state.phase === 'extension_menu') {
       const { data: workspace } = await db
@@ -821,32 +944,12 @@ async function handleEvent(
       if (extension?.id) {
         await routeToExtension(db, system, call, payload.call_control_id, extension.id, eventId);
       } else {
-        await startParis(db, system, call, payload.call_control_id, eventId);
+        await mainMenu(db, system, call, payload.call_control_id, eventId, true);
       }
       return;
     }
-    if (digits === '8') {
-      const { data: workspace } = await db.from('communication_workspaces').select('id').eq('phone_system_id', system.id).maybeSingle();
-      const { data: directory } = workspace?.id ? await db.from('communication_extensions').select('extension,display_name,department').eq('workspace_id', workspace.id).eq('enabled', true).order('extension') : { data: [] };
-      const spokenDirectory = (directory || []).map((entry: any) => entry.extension === '0' ? 'Elizabeth Greene, Administrator, extension 0.' : `${entry.display_name}${entry.department ? `, ${entry.department}` : ''}, extension ${entry.extension}.`).join(' ');
-      await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
-        payload: `${spokenDirectory || 'No directory entries are currently available.'} You may enter any listed extension now. Press 8 to hear the directory again, press 9 for PARIS, or press 0 for Elizabeth Greene, Administrator.`,
-        voice: 'Telnyx.KokoroTTS.af',
-        minimum_digits: 3,
-        maximum_digits: 3,
-        valid_digits: '0123456789',
-        maximum_tries: 2,
-        timeout_millis: 7000,
-        command_id: `${eventId}-extension-directory`,
-        client_state: encodeCallState({
-          systemId: system.id,
-          callId: call.id,
-          parentCallControlId: payload.call_control_id,
-          phase: 'main_menu',
-        }),
-      });
-      return;
-    }
+    if (digits === '8') return readDirectory(db, system, call, payload.call_control_id, eventId);
+    if (!/^\d$/.test(digits)) return mainMenu(db, system, call, payload.call_control_id, eventId, true);
     if (digits === '9') {
       await startParis(db, system, call, payload.call_control_id, eventId);
       return;
@@ -882,8 +985,31 @@ async function handleEvent(
     return;
   }
 
+  if (type === 'call.ai_gather.partial_results' && state.taskId) {
+    const partial = aiResult(payload.partial_results);
+    const program = String(partial.program_interest || partial.program_or_department || '').trim();
+    const route = await resolveProgramRoute(db, system, program);
+    if (route) {
+      const { error } = await db.from('phone_callback_tasks').update({
+        extension_id: route.extensionId, assigned_profile_id: route.profileId,
+        program_or_department: program.slice(0, 300), updated_at: new Date().toISOString(),
+      }).eq('id', state.taskId);
+      if (error) throw error;
+    }
+    return;
+  }
+
   if (type === 'call.ai_gather.ended' && state.taskId) {
     const result = aiResult(payload.result);
+    const { data: existingTask } = await db.from('phone_callback_tasks').select('extension_id,assigned_profile_id')
+      .eq('id', state.taskId).maybeSingle();
+    const savedState = { ...state, extensionId: existingTask?.extension_id || state.extensionId,
+      profileId: existingTask?.assigned_profile_id || state.profileId };
+    if (payload.status !== 'valid') {
+      return parisNextStep(system, call, payload.call_control_id, eventId, savedState, true);
+    }
+    const programRoute = await resolveProgramRoute(db, system, String(result.program_interest || result.program_or_department || ''));
+    const assignedState = { ...savedState, ...(programRoute || {}) };
     const urgency = ['low', 'normal', 'high', 'urgent'].includes(String(result.urgency))
       ? String(result.urgency)
       : 'normal';
@@ -914,6 +1040,8 @@ async function handleEvent(
     await db
       .from('phone_callback_tasks')
       .update({
+        extension_id: assignedState.extensionId || null,
+        assigned_profile_id: assignedState.profileId || null,
         caller_name: callerName,
         callback_number: callbackNumber,
         reason,
@@ -932,8 +1060,8 @@ async function handleEvent(
         updated_at: new Date().toISOString(),
       })
       .eq('id', state.taskId);
-    const { data: attemptedExtension } = state.extensionId
-      ? await db.from('communication_extensions').select('extension').eq('id', state.extensionId).maybeSingle()
+    const { data: attemptedExtension } = assignedState.extensionId
+      ? await db.from('communication_extensions').select('extension').eq('id', assignedState.extensionId).maybeSingle()
       : { data: null };
     const { data: savedTask } = await db
       .from('phone_callback_tasks')
@@ -941,7 +1069,7 @@ async function handleEvent(
       .eq('id', state.taskId)
       .maybeSingle();
     await notifyAssignee(db, {
-      profileId: state.profileId,
+      profileId: assignedState.profileId,
       taskId: state.taskId,
       caller: callerName || callbackNumber || 'A caller',
       callbackNumber: callbackNumber || undefined,
@@ -953,13 +1081,14 @@ async function handleEvent(
       preferredCallbackTime: String(result.preferred_callback_time || '').trim() || undefined,
       urgency,
     });
-    try {
-      await client.calls.actions.hangup(payload.call_control_id, {
-        command_id: `${eventId}-paris-complete-hangup`,
-      });
-    } catch {
-      // The caller may hang up after the closing message.
-    }
+    await db.from('phone_calls').update({ assigned_extension_id: assignedState.extensionId || null,
+      assigned_profile_id: assignedState.profileId || null }).eq('id', call.id);
+    return parisNextStep(system, call, payload.call_control_id, eventId,
+      { ...assignedState, intakeComplete: String(intakeCompleted(payload.status, result)) }, false);
+  }
+
+  if (type === 'call.speak.ended' && state.phase === 'caller_confirmed_end') {
+    await client.calls.actions.hangup(payload.call_control_id, { command_id: `${eventId}-confirmed-hangup` });
     return;
   }
 
@@ -1051,7 +1180,7 @@ async function handleEvent(
     if (state.taskId && state.profileId) {
       const { data: unfinished } = await db
         .from('phone_callback_tasks')
-        .select('summary,callback_number')
+        .select('summary,callback_number,assigned_profile_id')
         .eq('id', state.taskId)
         .maybeSingle();
       if (unfinished && !unfinished.summary) {
@@ -1063,7 +1192,7 @@ async function handleEvent(
           })
           .eq('id', state.taskId);
         await notifyAssignee(db, {
-          profileId: state.profileId,
+          profileId: unfinished.assigned_profile_id || state.profileId,
           taskId: state.taskId,
           caller: unfinished.callback_number || call?.from_number || 'A caller',
           urgency: 'normal',

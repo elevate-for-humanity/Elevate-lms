@@ -148,7 +148,7 @@ export const assets = {
 export const org = {
   name: process.env.NEXT_PUBLIC_ORG_NAME || 'Elevate for Humanity',
   legalName: process.env.NEXT_PUBLIC_ORG_LEGAl_NAME || 'Elevate for Humanity Technical and Career Institute',
-  phone: process.env.NEXT_PUBLIC_SUPPORT_PHONE || '(317) 314-3757',
+  phone: '(317) 999-9620',
   email: INFO_EMAIL,
   support: SUPPORT_EMAIL,
   address: 'Indianapolis, Indiana',

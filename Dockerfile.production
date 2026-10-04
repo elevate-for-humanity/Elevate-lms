@@ -24,6 +24,7 @@ RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies (frozen lockfile)
+COPY packages/bounded-braces ./packages/bounded-braces
 RUN pnpm install --frozen-lockfile --prod=false
 
 # =============================================================================

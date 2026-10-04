@@ -89,8 +89,8 @@ export default function Page() {
             <h2 className="text-2xl font-bold mb-4">Questions About Partnering?</h2>
             <p className="text-blue-100 mb-6 max-w-xl mx-auto">Our partnership team is here to help you find the right collaboration model.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="tel:+13173143757" className="inline-flex items-center gap-2 bg-white text-brand-blue-700 font-bold py-3 px-8 rounded-lg hover:bg-blue-50 transition-colors">
-                <Phone className="w-5 h-5" /> (317) 314-3757
+              <a href="tel:+13179999620" className="inline-flex items-center gap-2 bg-white text-brand-blue-700 font-bold py-3 px-8 rounded-lg hover:bg-blue-50 transition-colors">
+                <Phone className="w-5 h-5" /> (317) 999-9620
               </a>
               <a href="mailto:partnerships@elevateforhumanity.org" className="inline-flex items-center gap-2 bg-white/20 text-white font-bold py-3 px-8 rounded-lg hover:bg-white/30 transition-colors">
                 <Mail className="w-5 h-5" /> Email Us

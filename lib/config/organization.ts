@@ -9,7 +9,7 @@
 import { PLATFORM_DEFAULTS } from './platform-config';
 
 export const organization = {
-  phone: PLATFORM_DEFAULTS.supportPhone,
+  phone: PLATFORM_DEFAULTS.mainPhone,
   email: 'info@elevateforhumanity.org',
 
   // Canonical administrative/contact address

@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           ok: false,
-          error: `Program Holder applications are temporarily unavailable. Please call ${PLATFORM_DEFAULTS.supportPhone}.`,
+          error: `Program Holder applications are temporarily unavailable. Please call ${PLATFORM_DEFAULTS.mainPhone}.`,
         },
         { status: 503 },
       );
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
       applicantName: contactName,
       applicantEmail: email,
       applicantSubject: 'Program Holder Application Received | Elevate for Humanity',
-      applicantHtml: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto"><h2>Program Holder Application Received</h2><p>Hello ${safeName},</p><p>We received the Program Holder application for <strong>${safeOrganization}</strong>.</p><p><strong>Reference:</strong> ${safeRef}</p><p><strong>Programs/services listed:</strong> ${safePrograms}</p><h3>What happens next</h3><ol><li>Elevate reviews organizational eligibility, program scope, required credentials, and operating documents.</li><li>If documents or an agreement are required, we will send a specific checklist.</li><li>After approval, portal access and Program Holder onboarding instructions will be issued to <strong>${safeEmail}</strong>.</li><li>Approved Program Holders can then manage authorized programs, documents, participants, and reporting from the partner portal.</li></ol><p>You do not need to submit another application. Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.</p></div>`,
+      applicantHtml: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto"><h2>Program Holder Application Received</h2><p>Hello ${safeName},</p><p>We received the Program Holder application for <strong>${safeOrganization}</strong>.</p><p><strong>Reference:</strong> ${safeRef}</p><p><strong>Programs/services listed:</strong> ${safePrograms}</p><h3>What happens next</h3><ol><li>Elevate reviews organizational eligibility, program scope, required credentials, and operating documents.</li><li>If documents or an agreement are required, we will send a specific checklist.</li><li>After approval, portal access and Program Holder onboarding instructions will be issued to <strong>${safeEmail}</strong>.</li><li>Approved Program Holders can then manage authorized programs, documents, participants, and reporting from the partner portal.</li></ol><p>You do not need to submit another application. Questions? Call ${PLATFORM_DEFAULTS.mainPhone}.</p></div>`,
       staffSubject: `[PROGRAM HOLDER APPLICATION] ${organizationName}`,
       staffHtml: `<h2>New Program Holder Application</h2><p><strong>${safeOrganization}</strong><br>${safeName}<br>${safeEmail}<br>${escapeHtml(phone || 'No phone')}</p><p><strong>Reference:</strong> ${safeRef}</p><p><strong>Program types:</strong> ${safePrograms}</p><p><strong>Website:</strong> ${escapeHtml(website || 'Not provided')}</p><p>Review eligibility/documents and initiate Program Holder onboarding when approved.</p>`,
       metadata: { organization_name: organizationName, program_types: programTypes, requested_program_slugs: requestedProgramSlugs },

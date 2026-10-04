@@ -126,10 +126,10 @@ export default async function EnrollPage() {
           </p>
           <div className="flex flex-wrap gap-4">
             <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+              href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`}
               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              Call {PLATFORM_DEFAULTS.supportPhone}
+              Call {PLATFORM_DEFAULTS.mainPhone}
             </a>
             <Link
               href="/contact"

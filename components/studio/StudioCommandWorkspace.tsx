@@ -20,7 +20,7 @@ import {
 import UnifiedEllieChat from './UnifiedEllieChat';
 import { useStudioViewport } from './useStudioViewport';
 import RepositoryLivePreview from './RepositoryLivePreview';
-import StudioCapabilityRail, { type StudioSpecialist } from './StudioCapabilityRail';
+import StudioCapabilityRail from './StudioCapabilityRail';
 import type { OrchestratedPlanCheckpoint } from '@/lib/devstudio/ellie-unified-handlers';
 
 const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), {
@@ -100,7 +100,6 @@ export default function StudioCommandWorkspace({
   const viewportStyle = useStudioViewport();
   const [focusMode, setFocusMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [specialist, setSpecialist] = useState<StudioSpecialist | null>(null);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<Array<{ id: string; title: string }>>([]);
   const [historyError, setHistoryError] = useState('');
@@ -337,8 +336,6 @@ export default function StudioCommandWorkspace({
         >
           <StudioCapabilityRail
             workspaces={workspaces}
-            specialist={specialist}
-            onSpecialistChange={setSpecialist}
             mobile={sidebarOpen}
             activeWorkspaceId={surface === 'course' ? 'courses' : activeCapability}
             onNavigate={() => setSidebarOpen(false)}
@@ -397,7 +394,6 @@ export default function StudioCommandWorkspace({
               restoreLatest={conversationKey === 0}
               selectedConversationId={selectedConversationId}
               restoredCheckpoint={activeTask}
-              preferredAgent={specialist ?? undefined}
               onConversationChange={setActiveConversationId}
             />
           </section>

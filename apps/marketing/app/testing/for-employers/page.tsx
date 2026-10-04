@@ -104,7 +104,7 @@ export default function TestingForEmployersPage() {
             <Link href="/contact?type=employer" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-colors text-lg">
               Contact Us
             </Link>
-            <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`} className="border-2 border-white/30 text-white hover:bg-white/10 font-bold px-8 py-4 rounded-xl transition-colors text-lg inline-flex items-center justify-center gap-2">
+            <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, '')}`} className="border-2 border-white/30 text-white hover:bg-white/10 font-bold px-8 py-4 rounded-xl transition-colors text-lg inline-flex items-center justify-center gap-2">
               <Phone className="w-5 h-5" /> Call for Info
             </a>
           </div>

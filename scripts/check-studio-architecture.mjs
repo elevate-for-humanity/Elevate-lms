@@ -378,8 +378,13 @@ for (const interaction of ['Attach a file', 'selectStudioAgent', 'capabilitiesUs
     fail(`canonical Studio chat is missing intelligence interaction: ${interaction}`);
 }
 const studioWorkspace = read('components/studio/StudioCommandWorkspace.tsx');
-if (studioWorkspace.includes('StudioCapabilityRail'))
-  fail('Root Studio still exposes separate agent/capability navigation');
+// Tool navigation stays in the shared conversation; agent selection is automatic.
+for (const override of ['onSpecialistChange', 'preferredAgent', 'setSpecialist']) {
+  if (studioWorkspace.includes(override) || capabilityRail.includes(override) || unifiedChat.includes(override))
+    fail(`Root Studio reintroduced manual agent selection: ${override}`);
+}
+if (!studioWorkspace.includes('onOpenWorkspace={openCapability}'))
+  fail('Studio tools must open in the same conversation workspace');
 if (unifiedChat.includes('agentOverride'))
   fail('Canonical Studio chat still allows a user-selected agent override');
 for (const forbiddenWrite of [
@@ -394,15 +399,25 @@ const buildCourseBlock =
   adminAiChat.match(/case 'build_course': \{([\s\S]*?)case 'generate_videos':/i)?.[1] ?? '';
 for (const invariant of [
   'DevStudioUltimateCourseControl',
-  'ultimate_course_builds',
-  'apprenticeship_standard_versions',
-  'apprenticeship_standard_competencies',
   "__type:'ultimate_course_build_queued'",
   'requestedCourseId',
   'programSlug',
 ]) {
   if (!buildCourseBlock.includes(invariant))
     fail(`build_course is not a one-step governed Course Builder operation: ${invariant}`);
+}
+// Check persistence and standards at their canonical owners, not as duplicate
+// queries in the chat handler. Keep every governance requirement enforced.
+const ultimateControl = read('lib/devstudio/ultimate-course-control.ts');
+const ultimateProfile = read('lib/ultimate-course-builder/core/course-profile.ts');
+for (const [source, invariants] of [
+  [buildCourseBlock, ['.queueCourse({']],
+  [ultimateControl, ["from '@/lib/ultimate-course-builder/core/course-profile'", 'buildUltimateProfile(this.db', ".from('ultimate_course_builds')", 'new UltimateJobQueue(this.db).enqueue']],
+  [ultimateProfile, [".from('apprenticeship_standard_versions')", ".from('apprenticeship_standard_competencies')", 'UltimateAppendixAStandardsSource']],
+]) {
+  for (const invariant of invariants) {
+    if (!source.includes(invariant)) fail(`Canonical Course Builder governance is missing: ${invariant}`);
+  }
 }
 for (const durableFile of [
   'lib/jobs/handlers/course-build.ts',

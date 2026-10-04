@@ -96,13 +96,13 @@ export default function BeautyDocumentsPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setSubmitError(data.error || `Submission failed. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
+        setSubmitError(data.error || `Submission failed. Please try again or call ${PLATFORM_DEFAULTS.mainPhone}.`);
         setSubmitting(false);
         return;
       }
       router.push(`/programs/${cfg.slug}/payment-setup`);
     } catch {
-      setSubmitError(`Unable to submit. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`);
+      setSubmitError(`Unable to submit. Please try again or call ${PLATFORM_DEFAULTS.mainPhone}.`);
       setSubmitting(false);
     }
   };

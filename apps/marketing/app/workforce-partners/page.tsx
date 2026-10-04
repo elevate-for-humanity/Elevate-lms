@@ -54,7 +54,7 @@ export default function WorkforcePartnersPage() {
         },
         cta: {
           heading: 'Become a Referral Partner',
-          subtitle: 'Contact us to set up a referral agreement. Call (317) 314-3757 or use the form below.',
+          subtitle: 'Contact us to set up a referral agreement. Call (317) 999-9620 or use the form below.',
           primaryLabel: 'Contact Us',
           primaryHref: '/contact',
           secondaryLabel: 'View Programs',

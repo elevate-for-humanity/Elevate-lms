@@ -81,7 +81,7 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ id: s
           <li>Explore other training opportunities in your area</li>
           <li>Contact us if you have questions about this decision</li>
         </ul>
-        <p>Questions? Call us at <a href="tel:${PLATFORM_DEFAULTS.supportPhone}">${PLATFORM_DEFAULTS.supportPhone}</a></p>
+        <p>Questions? Call us at <a href="tel:${PLATFORM_DEFAULTS.mainPhone}">${PLATFORM_DEFAULTS.mainPhone}</a></p>
         <p>Best regards,<br>${PLATFORM_DEFAULTS.orgName} Admissions Team</p>
       `,
     });

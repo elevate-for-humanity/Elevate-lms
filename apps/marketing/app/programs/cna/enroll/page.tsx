@@ -73,7 +73,7 @@ export default function CNAEnrollPage() {
 
       const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       if (!data.enrollmentId || !uuidPattern.test(data.enrollmentId)) {
-        throw new Error(`Enrollment could not be confirmed. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);
+        throw new Error(`Enrollment could not be confirmed. Please call ${PLATFORM_DEFAULTS.mainPhone}.`);
       }
 
       // Step 2: Route to payment
@@ -104,10 +104,10 @@ export default function CNAEnrollPage() {
       if (checkoutData.url) {
         window.location.href = checkoutData.url;
       } else {
-        throw new Error('No checkout URL returned. Please try again or call ' + PLATFORM_DEFAULTS.supportPhone);
+        throw new Error('No checkout URL returned. Please try again or call ' + PLATFORM_DEFAULTS.mainPhone);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : `Something went wrong. Call ${PLATFORM_DEFAULTS.supportPhone}.`);
+      setError(err instanceof Error ? err.message : `Something went wrong. Call ${PLATFORM_DEFAULTS.mainPhone}.`);
       setIsSubmitting(false);
     }
   };
@@ -307,7 +307,7 @@ export default function CNAEnrollPage() {
 
                 <div className="flex items-center gap-2 text-xs text-slate-500">
                   <Shield className="w-4 h-4" />
-                  <span>All payments processed securely by Stripe · Call {PLATFORM_DEFAULTS.supportPhone} for help</span>
+                  <span>All payments processed securely by Stripe · Call {PLATFORM_DEFAULTS.mainPhone} for help</span>
                 </div>
 
                 {/* Coupon Code */}

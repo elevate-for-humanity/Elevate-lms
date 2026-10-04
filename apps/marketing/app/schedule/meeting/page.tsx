@@ -53,7 +53,7 @@ export default function Page() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Prefer to Call?</h2>
           <p className="text-xl text-slate-300 mb-6">Our team is available Monday through Friday, 8am to 5pm EST.</p>
-          <a href="tel:+13173143757" className="text-3xl font-bold text-emerald-400 hover:text-emerald-300">(317) 314-3757</a>
+          <a href="tel:+13179999620" className="text-3xl font-bold text-emerald-400 hover:text-emerald-300">(317) 999-9620</a>
         </div>
       </section>
     </div>

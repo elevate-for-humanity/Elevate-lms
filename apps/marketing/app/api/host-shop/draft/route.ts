@@ -204,7 +204,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         ok: false,
-        error: `We could not save the Host Shop draft. Please call ${PLATFORM_DEFAULTS.supportPhone}.`,
+        error: `We could not save the Host Shop draft. Please call ${PLATFORM_DEFAULTS.mainPhone}.`,
       },
       { status: 500 },
     );

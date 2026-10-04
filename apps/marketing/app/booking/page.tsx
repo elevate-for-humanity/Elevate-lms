@@ -205,10 +205,10 @@ export default async function BookingPage() {
             <p className="text-slate-700 mb-4">Contact our team for scheduling assistance.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9+]/g, '')}`}
+                href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9+]/g, '')}`}
                 className="inline-flex items-center justify-center bg-slate-800 text-white px-6 py-3 rounded-lg font-medium hover:bg-slate-900"
               >
-                Call {PLATFORM_DEFAULTS.supportPhone}
+                Call {PLATFORM_DEFAULTS.mainPhone}
               </a>
               <Link
                 href="/contact"

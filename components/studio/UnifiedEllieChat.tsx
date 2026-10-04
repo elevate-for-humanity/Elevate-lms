@@ -103,7 +103,6 @@ interface UnifiedEllieChatProps {
   embedded?: boolean;
   fileContext?: string;
   onPreviewTarget?: (url: string) => void;
-  preferredAgent?: StudioSpecialist;
   onTaskCheckpoint?: (checkpoint: OrchestratedPlanCheckpoint | null) => void;
   onOpenTasks?: () => void;
   suggestedPrompt?: string;
@@ -647,7 +646,6 @@ export default function UnifiedEllieChat({
   embedded = false,
   fileContext,
   onPreviewTarget,
-  preferredAgent,
   onTaskCheckpoint,
   onOpenTasks,
   suggestedPrompt,
@@ -761,7 +759,7 @@ export default function UnifiedEllieChat({
           nextMessages.find((message) => message.role === 'user')?.content.slice(0, 100) ||
           'Studio conversation',
         messages: nextMessages,
-        config: { agent: preferredAgent ?? 'LIZZY', surface: 'unified-studio' },
+        config: { agent: 'LIZZY', surface: 'unified-studio' },
       }),
     });
     const payload = await response.json().catch(() => ({}));
@@ -1026,7 +1024,7 @@ export default function UnifiedEllieChat({
     setInput('');
     setLoading(true);
     const route = attachment ? 'platform' : routeEllieMessage(text);
-    const agent = preferredAgent ?? selectStudioAgent(text);
+    const agent = selectStudioAgent(text);
     setLastRoute(route);
     const userMsg: ChatMessage = { role: 'user', content: text, route, agent };
     setMessages((prev) => [...prev, userMsg]);
@@ -1370,7 +1368,7 @@ export default function UnifiedEllieChat({
                   >
                     {message.role === 'assistant' && (
                       <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-                        {message.agent ?? preferredAgent ?? 'LIZZY'}
+                        {message.agent ?? 'LIZZY'}
                         {message.route ? ` · ${ELLIE_ROUTE_LABEL[message.route]}` : ''}
                       </p>
                     )}
@@ -1541,7 +1539,7 @@ export default function UnifiedEllieChat({
                 <Mic className="h-5 w-5" aria-hidden="true" />
               )}
               <span className="hidden sm:inline">
-                {listening ? 'Stop listening' : `Talk to ${preferredAgent ?? 'Lizzy'}`}
+                {listening ? 'Stop listening' : 'Talk to Lizzy'}
               </span>
             </button>
             <button

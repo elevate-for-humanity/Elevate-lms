@@ -67,6 +67,7 @@ ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 RUN test -x "$FFMPEG_BIN" && "$FFMPEG_BIN" -version >/dev/null
 # Production containers must be reproducible. Never mutate dependency resolution
 # during an image build.
+COPY packages/bounded-braces ./packages/bounded-braces
 RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 # Reassert the pinned pnpm executable after repository lifecycle hooks.

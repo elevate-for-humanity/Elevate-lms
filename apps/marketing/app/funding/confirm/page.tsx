@@ -102,7 +102,7 @@ export default async function ConfirmFundingPage({
 
         {errorParam && (
           <div className="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm">
-            The funding review request could not be saved. Please try again or contact {PLATFORM_DEFAULTS.supportPhone}.
+            The funding review request could not be saved. Please try again or contact {PLATFORM_DEFAULTS.mainPhone}.
           </div>
         )}
 

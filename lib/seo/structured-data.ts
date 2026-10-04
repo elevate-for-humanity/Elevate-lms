@@ -19,7 +19,7 @@ export const organizationSchema = {
   },
   contactPoint: {
     '@type': 'ContactPoint',
-    telephone: '+1-317-314-3757',
+    telephone: '+1-317-999-9620',
     contactType: 'Admissions',
     email: 'info@www.elevateforhumanity.org',
   },

@@ -211,10 +211,10 @@ export default function WioaPage() {
               Contact Admissions
             </Link>
             <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9+]/g, '')}`}
+              href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9+]/g, '')}`}
               className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-6 py-3 font-bold text-slate-950 hover:bg-slate-100"
             >
-              Call {PLATFORM_DEFAULTS.supportPhone}
+              Call {PLATFORM_DEFAULTS.mainPhone}
             </a>
           </div>
         </div>

@@ -31,6 +31,7 @@ COPY packages/ui/package.json ./packages/ui/package.json
 # Marketing and Store do not use ffmpeg-static at runtime. Fail closed unless
 # the workspace explicitly blocks its network-dependent postinstall download.
 RUN node -e "const fs=require('fs'); const yaml=fs.readFileSync('pnpm-workspace.yaml','utf8'); if (!/^  ffmpeg-static: false$/m.test(yaml)) throw new Error('pnpm-workspace.yaml must block ffmpeg-static builds');"
+COPY packages/bounded-braces ./packages/bounded-braces
 RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 FROM base AS builder

@@ -54,7 +54,7 @@ export default function MedicalAssistantEnrollPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Enrollment failed');
       const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!data.enrollmentId || !uuidPattern.test(data.enrollmentId)) throw new Error(`Enrollment could not be confirmed. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);
+      if (!data.enrollmentId || !uuidPattern.test(data.enrollmentId)) throw new Error(`Enrollment could not be confirmed. Please call ${PLATFORM_DEFAULTS.mainPhone}.`);
 
       if (paymentOption === 'affirm') {
         const r = await fetch('/api/affirm/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: PROGRAM.price * 100, programId: PROGRAM.slug, programSlug: PROGRAM.slug, programName: PROGRAM.name, enrollmentId: data.enrollmentId, email: formData.email, firstName: formData.firstName, lastName: formData.lastName }) });
@@ -68,7 +68,7 @@ export default function MedicalAssistantEnrollPage() {
       } else {
         window.location.href = `/enroll/payment?application_id=${data.enrollmentId}&program=medical-assistant&amount=${PROGRAM.price}&type=full-payment`;
       }
-    } catch (err: any) { setError(err?.message || `Something went wrong. Call ${PLATFORM_DEFAULTS.supportPhone}.`); setIsSubmitting(false); }
+    } catch (err: any) { setError(err?.message || `Something went wrong. Call ${PLATFORM_DEFAULTS.mainPhone}.`); setIsSubmitting(false); }
   };
 
   return (
@@ -138,7 +138,7 @@ export default function MedicalAssistantEnrollPage() {
                     <div className="flex items-center justify-between"><div><div className="flex items-center gap-2"><span className="font-bold text-lg">Sezzle</span><span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs font-medium">BNPL</span></div><p className="text-slate-700 mt-1">4 interest-free payments of <strong>${(PROGRAM.price / 4).toFixed(2)}</strong></p></div>{paymentOption === 'sezzle' && <CheckCircle className="w-5 h-5 text-brand-blue-600" />}</div>
                   </label>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-slate-500"><Shield className="w-4 h-4" /><span>All payments secure - Call {PLATFORM_DEFAULTS.supportPhone} for help</span></div>
+                <div className="flex items-center gap-2 text-xs text-slate-500"><Shield className="w-4 h-4" /><span>All payments secure - Call {PLATFORM_DEFAULTS.mainPhone} for help</span></div>
 
                 {/* Coupon Code */}
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4">

@@ -117,7 +117,7 @@ export default function PeerRecoveryApplyPage() {
         `/apply/confirmation?program=peer-recovery-specialist&ref=${encodeURIComponent(data.referenceNumber || data.id || '')}`,
       );
     } catch {
-      setError(`Unexpected error. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);
+      setError(`Unexpected error. Please call ${PLATFORM_DEFAULTS.mainPhone}.`);
     } finally {
       setLoading(false);
     }

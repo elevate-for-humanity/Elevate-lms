@@ -92,7 +92,7 @@ const organizationJsonLd = {
   url: siteUrl,
   logo: { '@type': 'ImageObject', url: logoUrl, contentUrl: logoUrl, width: 256, height: 256 },
   image: logoUrl,
-  telephone: '+1-317-314-3757',
+  telephone: '+1-317-999-9620',
   address: {
     '@type': 'PostalAddress',
     streetAddress: '120 East Market Street, Suite 930',

@@ -232,9 +232,10 @@ export default function ServerFooter() {
 
             {/* Contact */}
             <div className="flex flex-wrap items-center justify-center gap-4 text-white text-sm mb-4">
-              <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="hover:text-white">
-                {PLATFORM_DEFAULTS.supportPhone}
+              <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`} className="hover:text-white">
+                Main: {PLATFORM_DEFAULTS.mainPhone}
               </a>
+              <a href="tel:+13173143757" className="hover:text-white">Technical Support: {PLATFORM_DEFAULTS.supportPhone}</a>
               <span className="text-white">|</span>
               <a href="mailto:info@elevateforhumanity.org" className="hover:text-white">
                 info@elevateforhumanity.org

@@ -198,11 +198,11 @@ export default async function ConfirmationPage({
               <p className="text-sm font-semibold text-black mb-4">Questions? Contact us:</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+                  href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`}
                   className="inline-flex items-center justify-center px-6 py-3 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-colors"
                 >
                   <Phone className="w-4 h-4 mr-2" />
-                  {PLATFORM_DEFAULTS.supportPhone}
+                  {PLATFORM_DEFAULTS.mainPhone}
                 </a>
                 <a
                   href="mailto:elevate4humanityedu@gmail.com"

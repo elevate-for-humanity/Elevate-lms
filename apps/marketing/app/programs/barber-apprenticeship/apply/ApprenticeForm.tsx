@@ -262,7 +262,7 @@ export default function ApprenticeForm({
           // If we found the existing application, continue to checkout
           if (!applicationId) {
             setError(
-              `You already have an application on file. Please call ${PLATFORM_DEFAULTS.supportPhone} or email info@${PLATFORM_DEFAULTS.canonicalDomain} to continue.`,
+              `You already have an application on file. Please call ${PLATFORM_DEFAULTS.mainPhone} or email info@${PLATFORM_DEFAULTS.canonicalDomain} to continue.`,
             );
             setErrorSeverity('info');
             setLoading(false);
@@ -274,8 +274,8 @@ export default function ApprenticeForm({
           const isBotError = apiError.toLowerCase().includes('bot') || apiError.toLowerCase().includes('verification');
           setError(
             isBotError
-              ? `Security check failed. Please scroll up, complete the verification widget, and try again. Need help? Call ${PLATFORM_DEFAULTS.supportPhone}.`
-              : apiError || `Failed to save your application. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
+              ? `Security check failed. Please scroll up, complete the verification widget, and try again. Need help? Call ${PLATFORM_DEFAULTS.mainPhone}.`
+              : apiError || `Failed to save your application. Please try again or call ${PLATFORM_DEFAULTS.mainPhone}.`,
           );
           setErrorSeverity('critical');
           setLoading(false);
@@ -654,7 +654,7 @@ export default function ApprenticeForm({
                     href="/support"
                     className="inline-block mt-2 text-brand-red-600 font-medium hover:underline"
                   >
-                    Need help? Call {PLATFORM_DEFAULTS.supportPhone}
+                    Need help? Call {PLATFORM_DEFAULTS.mainPhone}
                   </a>
                 )}
               </div>
@@ -713,7 +713,7 @@ export default function ApprenticeForm({
                     value={formData.phone}
                     onChange={(e) => updateField('phone', e.target.value)}
                     className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
-                    placeholder={PLATFORM_DEFAULTS.supportPhone}
+                    placeholder={PLATFORM_DEFAULTS.mainPhone}
                   />
                 </div>
 

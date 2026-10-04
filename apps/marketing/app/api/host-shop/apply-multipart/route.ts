@@ -340,7 +340,7 @@ export async function POST(request: NextRequest) {
           <li>The Host Shop supervises on-the-job learning, verifies hours and competencies, and responds to Elevate compliance requests through the portal.</li>
         </ol>
         <p>If additional documentation is required, Elevate will identify the exact item in the portal or by email.</p>
-        <p>Questions? Reply to this email or call ${PLATFORM_DEFAULTS.supportPhone}.</p>
+        <p>Questions? Reply to this email or call ${PLATFORM_DEFAULTS.mainPhone}.</p>
       </div>`;
 
     const staffHtml = `

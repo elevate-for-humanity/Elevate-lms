@@ -54,7 +54,7 @@ export default function CommunityServicesPage() {
         },
         cta: {
           heading: 'Get Help Today',
-          subtitle: 'Free community services for all Indiana residents. No referral required. Call (317) 314-3757.',
+          subtitle: 'Free community services for all Indiana residents. No referral required. Call (317) 999-9620.',
           primaryLabel: 'Contact Us',
           primaryHref: '/contact',
           secondaryLabel: 'Consumer Education',

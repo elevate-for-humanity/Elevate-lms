@@ -59,10 +59,10 @@ export default function CosmetologyEligibilityPage() {
               <Phone className="w-4 h-4" /> Contact Admissions
             </Link>
             <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
+              href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, '')}`}
               className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-brand-blue-700 text-brand-blue-700 rounded-lg hover:bg-blue-50 transition font-semibold"
             >
-              <ExternalLink className="w-4 h-4" /> Call {PLATFORM_DEFAULTS.supportPhone}
+              <ExternalLink className="w-4 h-4" /> Call {PLATFORM_DEFAULTS.mainPhone}
             </a>
           </div>
         </div>

@@ -1,40 +1,40 @@
 /**
  * Legacy Cloudflare R2 compatibility facade.
  *
- * New code should import from '@/lib/storage/object-storage'. The underlying
- * implementation is provider-neutral and supports Backblaze B2, Wasabi,
+ * New code should import from '@/lib/storage/elevate-media-storage'. The underlying
+ * implementation is Elevate-owned and supports Backblaze B2, Wasabi,
  * AWS S3, Supabase S3, Cloudflare R2, and custom S3-compatible endpoints.
  */
 
 import {
-  deleteFromObjectStorage,
+  deleteFromElevateMedia,
   getContentType,
-  getObjectStoragePublicUrl,
-  getSignedObjectUrl,
-  isObjectStorageConfigured,
-  isObjectStoragePublicDeliveryConfigured,
-  listObjectStorageKeys,
-  uploadFromUrlToObjectStorage,
-  uploadToObjectStorage,
-  type ObjectUploadResult,
-} from '@/lib/storage/object-storage';
+  getElevateMediaPublicUrl,
+  getSignedElevateMediaUrl,
+  isElevateMediaStorageConfigured,
+  isElevateMediaPublicDeliveryConfigured,
+  listElevateMediaKeys,
+  uploadFromUrlToElevateMedia,
+  uploadToElevateMedia,
+  type ElevateMediaUploadResult,
+} from '@/lib/storage/elevate-media-storage';
 
-export type UploadResult = ObjectUploadResult;
+export type UploadResult = ElevateMediaUploadResult;
 
-export const isR2Configured = isObjectStorageConfigured;
-export const isR2PublicDeliveryConfigured = isObjectStoragePublicDeliveryConfigured;
+export const isR2Configured = isElevateMediaStorageConfigured;
+export const isR2PublicDeliveryConfigured = isElevateMediaPublicDeliveryConfigured;
 
-export const uploadToR2 = uploadToObjectStorage;
-export const uploadFromUrlToR2 = uploadFromUrlToObjectStorage;
-export const deleteFromR2 = deleteFromObjectStorage;
-export const getSignedR2Url = getSignedObjectUrl;
-export const listR2Files = listObjectStorageKeys;
+export const uploadToR2 = uploadToElevateMedia;
+export const uploadFromUrlToR2 = uploadFromUrlToElevateMedia;
+export const deleteFromR2 = deleteFromElevateMedia;
+export const getSignedR2Url = getSignedElevateMediaUrl;
+export const listR2Files = listElevateMediaKeys;
 
 export function getR2PublicUrl(key: string): string {
-  const url = getObjectStoragePublicUrl(key);
+  const url = getElevateMediaPublicUrl(key);
   if (!url) {
     throw new Error(
-      'Object storage public delivery is not configured. Set OBJECT_STORAGE_PUBLIC_URL.',
+      'Elevate Media Storage public delivery is not configured. Set OBJECT_STORAGE_PUBLIC_URL.',
     );
   }
   return url;

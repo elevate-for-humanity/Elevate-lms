@@ -694,16 +694,11 @@ async function readDirectory(db: any, system: System, call: any, callControlId: 
     .select('id').eq('phone_system_id', system.id).maybeSingle();
   if (workspaceError) throw workspaceError;
   const { data: directory, error } = workspace?.id
-    ? await db.from('communication_extensions').select('extension,display_name,department,destination_id')
+    ? await db.from('communication_extensions').select('extension,display_name,department')
         .eq('workspace_id', workspace.id).eq('enabled', true).order('extension')
     : { data: [], error: null };
   if (error) throw error;
-  const { data: options, error: optionsError } = await db.from('phone_menu_options')
-    .select('digit,destination_id').eq('phone_system_id', system.id).eq('enabled', true);
-  if (optionsError) throw optionsError;
-  const pages = directoryPages((directory || []).map((entry: any) => ({ ...entry,
-    menu_digit: options?.find((option: any) => option.destination_id && option.destination_id === entry.destination_id)?.digit,
-  })));
+  const pages = directoryPages(directory || []);
   const index = Math.min(Math.max(page, 0), Math.max(0, pages.length - 1));
   const more = index + 1 < pages.length;
   const prompt = `${index === 0 ? 'Full directory. To dial an extension, press star first. ' : ''}${pages[index] || 'No directory entries are currently available.'} ${more ? 'The directory will continue shortly.' : 'End of directory. Press star to enter an extension, 8 to repeat, 9 for PARIS, or 0 for the administrator.'}`;
@@ -936,10 +931,12 @@ async function handleEvent(
       }
     }
     if (state.phase === 'directory' && !digits) {
-      if (payload.status === 'invalid' && state.directoryFallback !== 'true') {
+      // Telnyx reports an exhausted no-input gather as invalid. Listening without
+      // pressing a key must advance the directory, not replay its first page.
+      if (payload.status === 'client_error' && state.directoryFallback !== 'true') {
         return readDirectory(db, system, call, payload.call_control_id, eventId, Number(state.directoryPage) || 0, true);
       }
-      if (payload.status === 'invalid') return mainMenu(db, system, call, payload.call_control_id, eventId, true);
+      if (payload.status === 'client_error') return mainMenu(db, system, call, payload.call_control_id, eventId, true);
       if (state.directoryMore === 'true') return readDirectory(db, system, call, payload.call_control_id, eventId, (Number(state.directoryPage) || 0) + 1, state.directoryFallback === 'true');
       return mainMenu(db, system, call, payload.call_control_id, eventId, true);
     }
@@ -985,20 +982,9 @@ async function handleEvent(
       await routeAdmin(db, system, call, payload.call_control_id, eventId);
       return;
     }
-    const { data: option } = await db
-      .from('phone_menu_options')
-      .select('destination_id')
-      .eq('phone_system_id', system.id)
-      .eq('digit', Number(digits))
-      .eq('enabled', true)
-      .maybeSingle();
-    const destinationId = option?.destination_id || system.default_destination_id;
-    if (destinationId) {
-      await routeDestination(db, system, call, payload.call_control_id, destinationId, eventId);
-    } else {
-      await startParis(db, system, call, payload.call_control_id, eventId);
-    }
-    return;
+    // Holders have one published extension. Retain department keyword mappings
+    // for PARIS, but do not expose a second single-key route to the same holder.
+    return mainMenu(db, system, call, payload.call_control_id, eventId, true);
   }
 
   if (type === 'call.ai_gather.message_history_updated' && state.taskId) {

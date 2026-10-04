@@ -16,6 +16,12 @@ describe('phone call flow', () => {
     expect(pages.every((p) => p.length <= 500)).toBe(true);
     for (const e of entries) expect(pages.join(' ')).toContain(`${e.display_name}, ${e.department}. Extension ${e.extension.split('').join(' ')}.`);
   });
+  it('announces one extension per person without a competing menu shortcut', () => {
+    const legacyEntry = { extension: '103', display_name: 'Doreen Hawkins', menu_digit: 3 };
+    const speech = directoryPages([legacyEntry]).join(' ');
+    expect(speech).toContain('Extension 1 0 3.');
+    expect(speech).not.toMatch(/or press|press 3/i);
+  });
   it('never treats timeout, provider failure, or unconfirmed intake as completed', () => {
     for (const status of ['client_error', 'timeout', 'invalid', undefined]) {
       expect(intakeCompleted(status, { conversation_complete: true })).toBe(false);

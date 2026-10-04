@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { siteConfig } from '@/content/site';
+import { siteConfig as contactConfig } from '@/lib/config/site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { LEGAL_ENTITY_OPERATING_LINE } from '@/lib/config/legal-entity';
 import { PARTNER_LINKS } from '@/config/social-links';
@@ -186,11 +187,18 @@ export function SiteFooter() {
                 <span className="break-all">{PLATFORM_DEFAULTS.supportEmail}</span>
               </a>
               <a
-                href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9+]/g, '')}`}
-                className="flex items-center gap-2 hover:text-slate-950 hover:underline"
+                href={contactConfig.phone.href}
+                className="flex items-start gap-2 hover:text-slate-950 hover:underline"
               >
-                <Phone className="h-4 w-4" />
-                <span>{PLATFORM_DEFAULTS.supportPhone}</span>
+                <Phone className="mt-1 h-4 w-4 shrink-0" />
+                <span>Main Phone: {contactConfig.phone.display}</span>
+              </a>
+              <a
+                href={contactConfig.technicalSupport.href}
+                className="flex items-start gap-2 hover:text-slate-950 hover:underline"
+              >
+                <Phone className="mt-1 h-4 w-4 shrink-0" />
+                <span>Technical Support: {contactConfig.technicalSupport.display}</span>
               </a>
               <div className="flex items-start gap-2">
                 <MapPin className="mt-1 h-4 w-4 shrink-0" />

@@ -202,13 +202,27 @@ export async function GET(request: NextRequest) {
   });
 
   // ── Upload storage ─────────────────────────────────────────────────────────
-  const hasR2 = Boolean(
-    process.env.R2_ENDPOINT && process.env.R2_ACCESS_KEY && process.env.R2_BUCKET,
+  const hasObjectStorage = Boolean(
+    (process.env.OBJECT_STORAGE_ENDPOINT || process.env.S3_ENDPOINT || process.env.R2_ENDPOINT) &&
+      (process.env.OBJECT_STORAGE_ACCESS_KEY_ID ||
+        process.env.S3_ACCESS_KEY_ID ||
+        process.env.R2_ACCESS_KEY ||
+        process.env.CLOUDFLARE_R2_ACCESS_KEY_ID) &&
+      (process.env.OBJECT_STORAGE_SECRET_ACCESS_KEY ||
+        process.env.S3_SECRET_ACCESS_KEY ||
+        process.env.R2_SECRET_KEY ||
+        process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY) &&
+      (process.env.OBJECT_STORAGE_BUCKET ||
+        process.env.S3_BUCKET ||
+        process.env.R2_BUCKET ||
+        process.env.CLOUDFLARE_R2_BUCKET_NAME),
   );
   checks.push({
     name: 'Upload Storage',
     status: 'ok',
-    detail: hasR2 ? 'R2/S3 configured' : 'Supabase Storage (default)',
+    detail: hasObjectStorage
+      ? `S3-compatible object storage configured (${process.env.OBJECT_STORAGE_PROVIDER || 'auto-detected'})`
+      : 'Supabase Storage (safe fallback)',
   });
 
   // ── Deploy identity ────────────────────────────────────────────────────────

@@ -142,7 +142,7 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+    <div className="my-auto w-full min-w-0 flex justify-center">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">

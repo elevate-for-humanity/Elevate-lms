@@ -22,6 +22,7 @@ COPY lib/config ./lib/config
 COPY lib/video ./lib/video
 COPY lib/cloudflare-r2.ts ./lib/cloudflare-r2.ts
 COPY lib/storage/file-storage.ts ./lib/storage/file-storage.ts
+COPY lib/storage/elevate-media-storage.ts ./lib/storage/elevate-media-storage.ts
 COPY lib/logger.ts lib/secrets.ts ./lib/
 COPY server/video-generator/visual-intelligence.ts ./server/video-generator/visual-intelligence.ts
 COPY remotion-src ./remotion-src

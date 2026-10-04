@@ -7,7 +7,7 @@
  * migration/failover targets, not the architectural identity of this module.
  */
 
-import { logger } from '@/lib/logger';
+import { logger } from '../logger';
 import {
   DeleteObjectCommand,
   GetObjectCommand,

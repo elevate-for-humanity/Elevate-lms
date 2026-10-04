@@ -112,3 +112,51 @@ describe('automatic licensed scene assignment', () => {
     ).toBe('lesson-scoped');
   });
 });
+
+
+describe('reviewed scene assignment producer', () => {
+  const reviewed = {
+    ...asset, visual_coverage_verified: false,
+    content_sha256: 'a'.repeat(64),
+    visual_observation: {
+      contentSha256: 'a'.repeat(64),
+      method: 'sampled-frame-inspection', reviewedAt: '2026-10-03T22:36:32Z',
+      sampleFractions: [0.05, 0.35, 0.65, 0.9],
+      visibleActions: ['Shampooing and massaging hair at a basin'],
+      scope: 'Visible actions at sampled times only; not proof of a complete procedure.',
+    },
+  };
+  const context = [{ id: 'basin', sceneType: 'system_diagram',
+    visualRequirement: 'Show shampooing and massaging hair at a basin.' }];
+  it('produces a grounded assignment from inspected actions without a pre-existing lesson UUID', () => {
+    const result = buildSceneAssignments(context, [reviewed]);
+    expect(result.gaps).toEqual([]);
+    expect(result.assignments[0]).toMatchObject({
+      assignmentMethod: 'reviewed-action-coverage',
+      visualEvidence: { contentSha256: reviewed.content_sha256,
+        matchedActions: reviewed.visual_observation.visibleActions,
+        sampleFractions: [0.05, 0.35, 0.65, 0.9] },
+    });
+  });
+  it('does not turn sampled footage into a full procedural demonstration', () => {
+    expect(buildSceneAssignments([{ ...context[0], sceneType: 'demonstration' }], [reviewed]).gaps).toHaveLength(1);
+    expect(buildSceneAssignments([{ ...context[0], title: 'Demonstration' }], [reviewed]).gaps).toHaveLength(1);
+  });
+  it('requires every requested action, not shared keywords or a misleading title', () => {
+    expect(buildSceneAssignments([{ ...context[0], visualRequirement:
+      'Show shampooing and massaging hair at a basin and supervisor approval.' }], [reviewed]).gaps).toHaveLength(1);
+    expect(buildSceneAssignments([{ ...context[0], visualRequirement:
+      'Show shampooing and massaging hair at a basin and supervisor approval.' }], [{
+        ...reviewed, lesson_match_verified: true,
+        observed_visual_actions: reviewed.visual_observation.visibleActions,
+      }]).gaps).toHaveLength(1);
+  });
+  it('rejects observations with no source hash, date or sampled frame provenance', () => {
+    for (const candidate of [
+      { ...reviewed, content_sha256: undefined },
+      { ...reviewed, content_sha256: 'b'.repeat(64) },
+      { ...reviewed, visual_observation: { ...reviewed.visual_observation, reviewedAt: 'invalid' } },
+      { ...reviewed, visual_observation: { ...reviewed.visual_observation, sampleFractions: [] } },
+    ]) expect(buildSceneAssignments(context, [candidate]).gaps).toHaveLength(1);
+  });
+});

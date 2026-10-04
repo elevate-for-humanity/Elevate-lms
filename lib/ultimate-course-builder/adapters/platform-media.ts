@@ -150,6 +150,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
           provider_item_id: entitlement.provider_item_id,
           content_sha256: metadata.courseReadySha256 ?? metadata.sha256,
           observed_visual_actions: metadata.visual_observation?.visibleActions,
+          visual_observation: metadata.visual_observation,
           license_evidence_url: observedLicenseEvidence(entitlement),
           license_observation: { itemId: entitlement.provider_item_id, observedAt: metadata.licenseObservedAt,
             workspaceId: metadata.workspaceId, verificationStatus: metadata.licenseVerificationStatus },

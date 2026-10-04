@@ -1,4 +1,5 @@
 import { mediaMatchTerms } from '@/lib/media/licensed-course-media';
+import { reviewedSceneEvidence } from './reviewed-scene-evidence';
 
 /** Assign distinct licensed source files to storyboard scenes using persisted
  * lesson-match evidence plus deterministic scene/asset semantic overlap.
@@ -73,6 +74,7 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
       .flatMap((asset) => {
         let reason = '';
         let method = '';
+        let visualEvidence: ReturnType<typeof reviewedSceneEvidence> = null;
         if (explicit) {
           if (asset.id !== explicit.assetId) return [];
           reason = explicit.relevanceReason ?? asset.relevance_reason ?? '';
@@ -88,14 +90,20 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
             asset.relevance_reason ??
             `Verified visual coverage matches the scene requirement: ${scene.visualRequirement}`;
           method = 'verified-coverage';
-        } else if (asset.lesson_match_verified === true) {
+        } else if ((visualEvidence = reviewedSceneEvidence(scene, asset))) {
+          reason = `Inspected source shows ${visualEvidence.matchedActions.join('; ')}. ` +
+            `This exactly matches the scene's contextual visual requirement. ${visualEvidence.scope}`;
+          method = 'reviewed-action-coverage';
+        } else if (asset.lesson_match_verified === true && !asset.visual_observation) {
+          // A failed inspected-action comparison must not fall back to a weaker
+          // lesson keyword match (including a demonstration or stale hash).
           const evidence = overlapEvidence(scene, asset);
           if (evidence.overlap.length) {
             reason = evidence.reason;
             method = 'verified-lesson-semantic-overlap';
           }
         }
-        return reason?.trim() ? [{ asset, reason, method }] : [];
+        return reason?.trim() ? [{ asset, reason, method, visualEvidence }] : [];
       })
       .sort((a, b) => {
         const rank = (m: string) => (m === 'lesson-scoped' ? 0 : m === 'verified-coverage' ? 1 : 2);
@@ -145,6 +153,7 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
       licenseEvidenceUrl: choice.asset.license_evidence_url,
       relevanceReason: choice.reason,
       assignmentMethod: choice.method,
+      ...(choice.visualEvidence ? { visualEvidence: choice.visualEvidence } : {}),
     });
   }
   return { assignments, gaps };

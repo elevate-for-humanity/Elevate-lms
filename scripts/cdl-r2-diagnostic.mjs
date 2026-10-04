@@ -46,6 +46,9 @@ async function cf(path){
  console.info(JSON.stringify({cloudflare:path,status:r.status}));
  const j=await r.json();if(!r.ok||!j.success){console.info(JSON.stringify({errors:j.errors?.map(e=>({code:e.code,message:String(e.message??'').replaceAll(api,'[redacted]').replaceAll(account,'[account]').slice(0,300)}))}));return null;}return j.result;
 }
+const accountResponse=await fetch('https://api.cloudflare.com/client/v4/accounts',{headers:{authorization:'Bearer '+api},signal:AbortSignal.timeout(30000)});
+const accountData=await accountResponse.json();
+console.info(JSON.stringify({accountListingStatus:accountResponse.status,accounts:accountData.result?.map(a=>({name:a.name,configured:a.id===account}))}));
 const buckets=await cf('/r2/buckets');
 const names=new Set([vars.CLOUDFLARE_R2_BUCKET_NAME||'elevate-media',...(buckets?.buckets??[]).map(b=>b.name)]);
 console.info(JSON.stringify({buckets:[...names]}));

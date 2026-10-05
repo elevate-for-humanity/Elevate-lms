@@ -1,0 +1,65 @@
+name: Build migration images for Google
+on:
+  workflow_dispatch:
+    inputs:
+      component:
+        type: choice
+        required: true
+        description: Build and upload only; does not start services or switch domains
+        options: [marketing, admin, lms, store, ultimate-worker, studio-browser]
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: google-image-${{ inputs.component }}
+  cancel-in-progress: false
+jobs:
+  image:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 120
+    env:
+      COMPONENT: ${{ inputs.component }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build existing Dockerfile without server secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$COMPONENT" in
+            marketing|store) FILE=Dockerfile.marketing ;;
+            admin) FILE=Dockerfile.northflank-admin ;;
+            lms) FILE=Dockerfile.northflank-lms ;;
+            ultimate-worker) FILE=Dockerfile.ultimate-worker ;;
+            studio-browser) FILE=Dockerfile.studio-browser ;;
+            *) exit 1 ;;
+          esac
+          test "$NEXT_PUBLIC_SUPABASE_URL" = "https://cuxzzpsyufcewtmicszk.supabase.co"
+          test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"
+          docker build -f "$FILE" -t "elevate-$COMPONENT:$GITHUB_SHA" \
+            --build-arg "NF_GIT_SHA=$GITHUB_SHA" \
+            --build-arg "BUILD_TIMESTAMP=$(date -u +%FT%TZ)" \
+            --build-arg NEXT_PUBLIC_SUPABASE_URL \
+            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY .
+      # Authenticate after build to keep the credential file outside the build context.
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Upload versioned image
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! gcloud artifacts repositories describe elevate --project=elegant-racer-299721 --location=us-central1 >/dev/null 2>&1; then
+            gcloud artifacts repositories create elevate --project=elegant-racer-299721 --location=us-central1 --repository-format=docker
+          fi
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/$COMPONENT:$GITHUB_SHA"
+          docker tag "elevate-$COMPONENT:$GITHUB_SHA" "$IMAGE"
+          docker push "$IMAGE"
+          printf 'Uploaded image: %s\nNo runtime deployed.\n' "$IMAGE" >> "$GITHUB_STEP_SUMMARY"

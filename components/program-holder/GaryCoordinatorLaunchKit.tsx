@@ -129,6 +129,65 @@ ${signature}`}</div>
         </ol>
       </section>
 
+      <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 sm:p-7">
+        <h2 className="text-xl font-black text-emerald-950">WorkOne call script</h2>
+        <p className="mt-2 text-sm leading-6 text-emerald-950">Use this when you call WorkOne Gary. Record the person you spoke with, their title, the date, the answers, and your next follow-up in the dashboard.</p>
+        <div className="mt-4 whitespace-pre-wrap rounded-xl bg-white p-4 text-sm leading-6 text-slate-800">{`Hello, my name is ${name}. I am a Gary Regional Site Coordinator with Elevate for Humanity. I am calling to introduce our workforce training and registered apprenticeship pathways and to make sure we follow Region 1 procedures correctly.
+
+May I speak with a Business Services Representative and the person who handles WIOA training provider or INTraining questions?
+
+We would like to confirm:
+1. Current Region 1 priority occupations and training needs.
+2. The process for verifying an exact provider, program, and Gary-area delivery location for WIOA/ITA use.
+3. Current OJT and employer-services requirements.
+4. The correct referral process for applicants who may need an eligibility determination.
+5. What documents you want us to send before a meeting.
+
+We will not promise funding to a participant. We want WorkOne to make the eligibility and funding determination.
+
+Can we schedule a meeting, and may I have your name, title, email, and the best follow-up date?
+
+Thank you,
+${signature}`}</div>
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-2">
+        <article className="rounded-2xl border bg-white p-5 sm:p-7">
+          <h2 className="text-xl font-black">Sample letter: WorkOne introduction</h2>
+          <p className="mt-1 text-xs">Use after the first call or when WorkOne requests a written introduction.</p>
+          <div className="mt-3 whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm leading-6">{`Subject: Elevate for Humanity — Gary workforce training coordination
+
+Dear WorkOne Representative,
+
+My name is ${name}, and I serve as a Gary Regional Site Coordinator for Elevate for Humanity. I am contacting you to establish the correct Region 1 referral and training-provider coordination process for our Gary-area workforce programs and registered apprenticeship pathways.
+
+We would like to coordinate with your team regarding employer needs, participant referrals, WIOA/ITA procedures, OJT opportunities, and verification of each exact provider, program, and delivery location before discussing funding with applicants.
+
+Please let me know the appropriate Business Services and training-provider contacts, the documents you would like us to provide, and a convenient time for an introductory meeting.
+
+Elevate will not represent a participant as eligible or a program as funded until the appropriate workforce agency confirms that status.
+
+Sincerely,
+${signature}`}</div>
+        </article>
+        <article className="rounded-2xl border bg-white p-5 sm:p-7">
+          <h2 className="text-xl font-black">Sample letter: applicant referral</h2>
+          <p className="mt-1 text-xs">Use only after speaking with the applicant. Do not state that the applicant is approved for funding.</p>
+          <div className="mt-3 whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm leading-6">{`Subject: Participant referral for WorkOne eligibility review
+
+Dear WorkOne Representative,
+
+Elevate for Humanity is referring a prospective participant for an individual workforce eligibility and funding review. The participant has expressed interest in an Elevate training pathway, but no funding approval has been represented or promised.
+
+Please advise the participant regarding required orientation, eligibility documentation, case-management steps, and whether the requested training option can be considered under the participant's available workforce funding.
+
+We will provide program information requested by the assigned case manager and will wait for written authorization before treating the enrollment as workforce funded.
+
+Thank you,
+${signature}`}</div>
+        </article>
+      </section>
+
       <section className="grid gap-4 lg:grid-cols-2">
         <article className="rounded-2xl border bg-white p-5 sm:p-7">
           <h2 className="text-xl font-black">Funding and earnings: read this before quoting numbers</h2>

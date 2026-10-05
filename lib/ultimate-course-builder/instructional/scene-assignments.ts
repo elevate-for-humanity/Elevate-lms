@@ -131,13 +131,16 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
   for (const [index, scene] of scenes.entries()) {
     const choice = selected.get(index);
     if (!choice) {
-      gaps.push({
+      // Instructional stages do not require stock footage to be valid. Preserve
+      // licensed B-roll where relevance is proven, and self-heal uncovered
+      // scenes with deterministic renderer-owned instructional visuals.
+      assignments.push({
         sceneId: scene.id,
+        assetId: `instructional:${scene.id}`,
+        relevanceReason: `Renderer-generated instructional visual for: ${scene.visualRequirement}`,
+        assignmentMethod: 'instructional-render',
+        generatedInstructionalVisual: true,
         visualRequirement: scene.visualRequirement,
-        reason: configured.some((a) => a.sceneId === scene.id)
-          ? 'Configured asset is unavailable, unlicensed, repeated, or missing relevance evidence'
-          : 'No distinct licensed asset has verified lesson/scene relevance evidence',
-        licensedAssetCount: candidates.length,
       });
       continue;
     }

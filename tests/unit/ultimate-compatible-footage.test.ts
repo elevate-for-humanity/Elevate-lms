@@ -65,7 +65,9 @@ describe('task-compatible footage without sentence equality', () => {
   });
   it('does not use a filename or lesson match to override contrary inspected footage', () => {
     const misleading = { ...asset, title: 'Client consultation', lesson_match_verified: true };
-    assert.equal(buildSceneAssignments([{ ...scene, visualRequirement: 'Client consultation' }], [misleading]).gaps.length, 1);
+    const result = buildSceneAssignments([{ ...scene, visualRequirement: 'Client consultation' }], [misleading]);
+    assert.equal(result.assignments.some((entry) => entry.assetId === misleading.id), false);
+    assert.equal(result.assignments[0].assignmentMethod, 'instructional-render');
   });
   it('retains every demonstration guard', () => {
     for (const field of ['sceneType', 'scene_type', 'stage', 'title']) {
@@ -83,8 +85,11 @@ describe('task-compatible footage without sentence equality', () => {
     ]) assert.equal(reviewedSceneEvidence(scene, candidate), null);
   });
   it('retains licensing and distinct-source checks', () => {
-    assert.equal(buildSceneAssignments([scene], [{ ...asset, license_evidence_url: '' }]).gaps.length, 1);
-    assert.equal(buildSceneAssignments([scene, { ...scene, id: 'second' }], [asset, { ...asset, id: 'copy' }]).gaps.length, 1);
+    const unlicensed = buildSceneAssignments([scene], [{ ...asset, license_evidence_url: '' }]);
+    assert.equal(unlicensed.assignments.some((entry) => entry.assetId === asset.id), false);
+    const duplicated = buildSceneAssignments([scene, { ...scene, id: 'second' }], [asset, { ...asset, id: 'copy' }]);
+    assert.equal(duplicated.assignments.filter((entry) => entry.assignmentMethod === 'reviewed-action-coverage').length, 1);
+    assert.equal(duplicated.assignments.filter((entry) => entry.assignmentMethod === 'instructional-render').length, 1);
   });
   it('does not mutate the scene requirement or inspection metadata', () => {
     const before = JSON.stringify({ scene, asset });

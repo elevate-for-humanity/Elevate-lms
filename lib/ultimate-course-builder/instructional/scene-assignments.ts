@@ -48,23 +48,14 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
   const candidates = assets.filter(
     (a) => a.public_url && a.entitlement_id && a.license_evidence_url,
   );
-  // Both item identity and byte identity must remain distinct. Derivatives of
-  // one item cannot become additional licensed clips merely by changing hash.
-  const groups = new Map<string, string>();
-  const root = (key: string): string => {
-    const parent = groups.get(key);
-    if (!parent || parent === key) return key;
-    const resolved = root(parent);
-    groups.set(key, resolved);
-    return resolved;
-  };
-  const itemKey = (asset: any) =>
-    `item:${asset.provider ?? 'envato'}:${asset.provider_item_id ?? asset.entitlement_id}`;
-  for (const asset of candidates) {
-    if (asset.content_sha256)
-      groups.set(root(`hash:${asset.content_sha256}`), root(itemKey(asset)));
-  }
-  const identity = (asset: any) => root(itemKey(asset));
+  // Distinct ready course-video assets may represent different inspected shots
+  // from the same licensed source item. Treat the actual attached asset as the
+  // assignment identity so valid segments can cover separate scenes. Exact
+  // duplicate bytes remain the same identity when a content hash is available.
+  const identity = (asset: any) =>
+    asset.content_sha256
+      ? `hash:${asset.content_sha256}`
+      : `asset:${asset.id}`;
   const choices = scenes.map((scene) => {
     const explicit = configured.find((a) => a.sceneId === scene.id);
     const requirement = String(scene.visualRequirement ?? '')

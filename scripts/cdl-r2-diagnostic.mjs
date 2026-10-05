@@ -12,16 +12,21 @@ async function nf(path,method='GET',body){
 const g=await nf('/secrets/elevate-production-env/details');const v=g.secrets.variables;
 const required=['ELEVATE_MEDIA_PROVIDER','ELEVATE_MEDIA_ENDPOINT','ELEVATE_MEDIA_REGION','ELEVATE_MEDIA_BUCKET','ELEVATE_MEDIA_ACCESS_KEY_ID','ELEVATE_MEDIA_SECRET_ACCESS_KEY'];
 if(required.some(k=>!v[k]))throw new Error('Missing media configuration');
-const client=new S3Client({endpoint:v.ELEVATE_MEDIA_ENDPOINT,region:v.ELEVATE_MEDIA_REGION,credentials:{accessKeyId:v.ELEVATE_MEDIA_ACCESS_KEY_ID,secretAccessKey:v.ELEVATE_MEDIA_SECRET_ACCESS_KEY}});
-const Bucket=v.ELEVATE_MEDIA_BUCKET;const Key='_connection-check/'+process.env.GITHUB_RUN_ID+'.txt';const body='Elevate B2 connection verification';
-try{
- await client.send(new PutObjectCommand({Bucket,Key,Body:body,ContentType:'text/plain'}));
- const listed=await client.send(new ListObjectsV2Command({Bucket,Prefix:Key}));if(!listed.Contents?.some(o=>o.Key===Key))throw new Error('List verification failed');
- const signed=await getSignedUrl(client,new GetObjectCommand({Bucket,Key}),{expiresIn:120});
- const r=await fetch(signed,{headers:{Range:'bytes=0-6'}});if(r.status!==206||await r.text()!=='Elevate')throw new Error('Signed range download failed');
- const unsigned=new URL(signed);unsigned.search='';const privateResponse=await fetch(unsigned);if(privateResponse.ok)throw new Error('Bucket unexpectedly public');
- console.info(JSON.stringify({bucket:Bucket,upload:true,list:true,signedDownload:true,byteRange:true,privateAccess:true}));
-}finally{await client.send(new DeleteObjectCommand({Bucket,Key}));}
+const config=Object.fromEntries(required.map(k=>[k,v[k]]));
+const groups=await nf('/secrets');
+for(const [name,ids] of [
+ ['elevate-media-runtime-secrets',['elevate-admin','elevate-lms']],
+ ['elevate-media-worker-secrets',['elevate-ultimate-worker','elevate-studio-browser']]
+]){
+ const exists=groups.secrets?.some(x=>x.id===name);
+ const body={type:'secret',secretType:'environment',priority:30,restrictions:{restricted:true,nfObjects:ids.map(id=>({id,type:'service'})),tags:[]},secrets:{variables:config}};
+ await nf(exists?'/secrets/'+name:'/secrets',exists?'PATCH':'POST',exists?body:{name,...body});
+ console.info(JSON.stringify({runtimeGroup:name,services:ids,saved:true}));
+}
+const retained={...v};delete retained.ELEVATE_MEDIA_ACCESS_KEY_ID;delete retained.ELEVATE_MEDIA_SECRET_ACCESS_KEY;
+await nf('/secrets/elevate-production-env','PATCH',{secrets:{...g.secrets,variables:retained}});
+const readback=await nf('/secrets/elevate-production-env/details');
+console.info(JSON.stringify({sharedCredentialsRemoved:!readback.secrets.variables.ELEVATE_MEDIA_SECRET_ACCESS_KEY,sharedGroupScope:g.secretType}));
 for(const id of ['elevate-admin','elevate-lms','elevate-ultimate-worker','elevate-studio-browser']){
  const env=await nf('/services/'+id+'/runtime-environment/details');
  const actual=env.runtimeEnvironment??{};
@@ -30,4 +35,8 @@ for(const id of ['elevate-admin','elevate-lms','elevate-ultimate-worker','elevat
  if(!matches)throw new Error('Media configuration not inherited by '+id);
  await nf('/services/'+id+'/restart','POST',{});
  console.info(JSON.stringify({service:id,restartAccepted:true}));
+}
+
+for(const id of ['elevate-admin','elevate-lms','elevate-ultimate-worker','elevate-studio-browser']){
+ const service=await nf('/services/'+id);console.info(JSON.stringify({service:id,status:service.status}));
 }

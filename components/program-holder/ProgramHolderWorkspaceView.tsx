@@ -73,6 +73,7 @@ export async function ProgramHolderWorkspaceView({
   const data = await getProgramHolderWorkspace();
   const coordinatorRole = data.mode === 'holder' ? String(data.holder?.features?.approved_role || '') : '';
   const isTexasStateCoordinator = coordinatorRole === 'Texas State Site Coordinator';
+  const isGaryRegionalCoordinator = coordinatorRole === 'Gary Regional Site Coordinator';
   if (data.mode === 'admin') return <AdminBoundary />;
   const texasLaunchKit =
     section === 'dashboard' && isTexasStateCoordinator ? (
@@ -455,14 +456,29 @@ export async function ProgramHolderWorkspaceView({
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             <div>
               <h3 className="font-black text-slate-950">Required setup and operating checklist</h3>
-              <ul className="mt-2 space-y-2 text-sm text-slate-700">
-                {coordinatorRequirements.map((item) => (
-                  <li key={item} className="flex gap-2">
-                    <span aria-hidden="true">□</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="mt-2 space-y-2 text-sm text-slate-700">
+                {coordinatorRequirements.map((item) => {
+                  const normalized = item.toLowerCase();
+                  const href =
+                    normalized.includes('mou') || normalized.includes('agreement') ? '/program-holder/sign-mou' :
+                    normalized.includes('document') || normalized.includes('w-9') || normalized.includes('insurance') || normalized.includes('license') ? '/program-holder/documents' :
+                    normalized.includes('payment') || normalized.includes('payout') || normalized.includes('bank') ? '/program-holder/payouts' :
+                    normalized.includes('phone') || normalized.includes('extension') || normalized.includes('call') ? '/program-holder/phone' :
+                    normalized.includes('applicant') || normalized.includes('workone') || normalized.includes('outreach') ? '/program-holder/students/pending' :
+                    normalized.includes('student') || normalized.includes('learner') ? '/program-holder/students' :
+                    normalized.includes('hour') || normalized.includes('attendance') ? '/program-holder/hours' :
+                    normalized.includes('report') ? '/program-holder/reports' :
+                    normalized.includes('program') || normalized.includes('catalog') ? '/program-holder/programs' :
+                    isGaryRegionalCoordinator ? '/program-holder/gary-launch' : '/program-holder/how-to-use';
+                  return (
+                    <Link key={item} href={href} className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 font-semibold hover:border-blue-300 hover:bg-blue-50">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-black text-amber-900" aria-hidden="true">!</span>
+                      <span className="min-w-0 flex-1">{item}</span>
+                      <span className="shrink-0 text-xs font-black text-blue-800">Open →</span>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
             <div>
               <h3 className="font-black text-slate-950">Required training</h3>
@@ -548,15 +564,16 @@ export async function ProgramHolderWorkspaceView({
               New here?
             </p>
             <h2 className="mt-1 text-xl font-black text-slate-950">
-              Start with Elizabeth and Paris
+              {isGaryRegionalCoordinator ? 'Start with your Gary coordinator launch guide' : 'Start with Elizabeth and Paris'}
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-700">
-              Review Elizabeth Greene&apos;s expectations, take the Paris dashboard walkthrough, and
-              learn what is required for payment.
+              {isGaryRegionalCoordinator
+                ? 'Follow the coordinator steps in order: account setup, program review, WorkOne outreach, Program Holder recruitment, employer outreach, applicant routing, and weekly operations.'
+                : <>Review Elizabeth Greene&apos;s expectations, take the Paris dashboard walkthrough, and learn what is required for payment.</>}
             </p>
           </div>
           <Link
-            href="/program-holder/how-to-use"
+            href={isGaryRegionalCoordinator ? '/program-holder/gary-launch' : '/program-holder/how-to-use'}
             className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-black text-white"
           >
             Start orientation

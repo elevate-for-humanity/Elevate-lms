@@ -13,6 +13,7 @@ import { DevStudioUltimateCourseControl } from '@/lib/devstudio/ultimate-course-
 import { logger } from '@/lib/logger';
 import { normalizeError } from '@/lib/errors/normalize-error';
 import { after, NextRequest, NextResponse } from 'next/server';
+import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -159,7 +160,7 @@ async function recordUnifiedCapabilityUse(
 const PROVIDER_MODELS: Record<Exclude<ChatProvider, 'auto'>, readonly [string, ...string[]]> = {
   xai: ['grok-4.6'],
   groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
-  openai: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'],
+  openai: ['gpt-6-luna', 'gpt-4.1-mini', 'gpt-4o-mini'],
   gemini: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'],
   anthropic: ['claude-sonnet-4-5', 'claude-3-5-haiku-latest'],
 };
@@ -1391,6 +1392,9 @@ async function _POST(req: NextRequest) {
     }
 
     const providerPreference = normalizeProvider(rawProvider);
+    // While the self-hosted GPU is archived, Admin auto mode uses the lowest-cost
+    // connected OpenAI model. This is scoped to authenticated Dev Studio chat only.
+    const effectiveProvider: ChatProvider = providerPreference === 'auto' ? 'openai' : providerPreference;
     const lastUserMessage =
       messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
     const masterDb = await requireAdminClient();
@@ -1419,28 +1423,7 @@ async function _POST(req: NextRequest) {
     let model = 'none';
     const canonicalProvider = getActiveProviderName();
 
-    // Auto mode is the no-paid default for Dev Studio. It must use the
-    // Elevate-owned provider and must not silently fall through to a metered
-    // commercial provider. Operators may still explicitly select an external
-    // provider when they intentionally want that provider.
-    if (providerPreference === 'auto') {
-      try {
-        const owned = await aiChat({
-          providerPolicy: 'owned-only',
-          messages: [{ role: 'system', content: systemPrompt }, ...messages],
-          temperature: 0.4,
-          maxTokens: 4096,
-        });
-        assistantMessage = owned.content ?? null;
-        provider = owned.provider ?? 'elevate';
-        model = owned.model;
-      } catch (error) {
-        logger.warn('[devstudio/chat] Elevate-owned AI unavailable', normalizeError(error));
-      }
-    }
-
-    const providerOrder =
-      providerPreference === 'auto' ? [] : [providerPreference];
+    const providerOrder = [effectiveProvider];
 
     for (const nextProvider of providerOrder) {
       if (assistantMessage) break;
@@ -1508,7 +1491,9 @@ async function _POST(req: NextRequest) {
       if (nextProvider === 'openai' && isOpenAIConfigured()) {
         try {
           const selectedModel = modelFor('openai', rawModel);
-          const openai = getOpenAIClient();
+          const apiKey = process.env.OPENAI_API_KEY;
+          if (!apiKey) throw new Error('OPENAI_API_KEY not configured');
+          const openai = new OpenAI({ apiKey });
           const initial = await openai.chat.completions.create({
             model: selectedModel,
             messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
@@ -1627,7 +1612,7 @@ async function _POST(req: NextRequest) {
       }
     }
 
-    if (!assistantMessage && providerPreference !== 'auto') {
+    if (!assistantMessage && effectiveProvider !== 'openai') {
       try {
         const db = await requireAdminClient();
         const requestNonce = req.headers.get('x-request-id')?.trim() || crypto.randomUUID();
@@ -1664,7 +1649,7 @@ async function _POST(req: NextRequest) {
               messages: [{ role: 'system', content: systemPrompt }, ...messages],
               temperature: 0.4,
               maxTokens: 2048,
-              provider: providerPreference,
+              provider: effectiveProvider,
             }),
         });
         if (paidExecution.decision === 'approved' && paidExecution.value) {
@@ -1693,18 +1678,18 @@ async function _POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:
-            providerPreference === 'auto'
-              ? 'Elevate-owned AI is unavailable. Repair ELEVATE_LLM_URL / ELEVATE_LLM_SECRET in the Admin runtime; automatic mode will not fall back to paid inference.'
+            effectiveProvider === 'openai' && !isOpenAIConfigured()
+              ? 'OpenAI is not configured for Admin Studio. Connect OPENAI_API_KEY in Admin → Integrations.'
               : canonicalProvider === 'none'
                 ? 'No explicitly selected AI provider is available.'
-                : `LIZZY could not reach the selected ${providerPreference} provider. Check that provider connection in Admin → Integrations.`,
+                : `LIZZY could not reach the selected ${effectiveProvider} provider. Check that provider connection in Admin → Integrations.`,
           debug: {
             hasGroq: isGroqConfigured(),
             hasXAI: isXAIConfigured(),
             hasOpenAI: isOpenAIConfigured(),
             hasAnthropic: isAnthropicConfigured(),
             hasGemini: isGeminiConfigured(),
-            requestedProvider: providerPreference,
+            requestedProvider: effectiveProvider,
           },
         },
         { status: 503 },

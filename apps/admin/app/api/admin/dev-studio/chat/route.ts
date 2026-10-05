@@ -13,7 +13,7 @@ import { DevStudioUltimateCourseControl } from '@/lib/devstudio/ultimate-course-
 import { logger } from '@/lib/logger';
 import { normalizeError } from '@/lib/errors/normalize-error';
 import { after, NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { createAdminChatClient } from '@/lib/ai/admin-chat-client';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -1432,7 +1432,7 @@ async function _POST(req: NextRequest) {
       if (!apiKey) {
         return NextResponse.json({ error: 'OPENAI_API_KEY not configured' }, { status: 503 });
       }
-      const openai = new OpenAI({ apiKey });
+      const openai = createAdminChatClient(apiKey);
       const encoder = new TextEncoder();
       const stream = new ReadableStream({
         async start(controller) {
@@ -1627,7 +1627,7 @@ async function _POST(req: NextRequest) {
           const selectedModel = modelFor('openai', rawModel);
           const apiKey = process.env.OPENAI_API_KEY;
           if (!apiKey) throw new Error('OPENAI_API_KEY not configured');
-          const openai = new OpenAI({ apiKey });
+          const openai = createAdminChatClient(apiKey);
           const initial = await openai.chat.completions.create({
             model: selectedModel,
             messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],

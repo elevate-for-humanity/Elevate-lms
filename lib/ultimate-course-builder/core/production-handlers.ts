@@ -42,12 +42,20 @@ function requireLicensedVisualCoverage(ctx: any, mediaInput?: any) {
     throw new Error('ULTIMATE_SCENE_ASSIGNMENT_ONE_TO_ONE_REQUIRED');
   const reuse = new Map<string, number>();
   for (const assignment of assignments) {
-    if (!assignment?.assetId || !assignment?.licenseEvidenceUrl || !assignment?.relevanceReason)
+    if (!assignment?.assetId || !assignment?.relevanceReason)
+      throw new Error('ULTIMATE_VISUAL_RELEVANCE_REQUIRED');
+    if (assignment.generatedInstructionalVisual === true || assignment.assignmentMethod === 'instructional-render') {
+      if (!String(assignment.assetId).startsWith('instructional:'))
+        throw new Error(`ULTIMATE_INSTRUCTIONAL_VISUAL_ID_INVALID:${assignment.assetId}`);
+      reuse.set(String(assignment.assetId), (reuse.get(String(assignment.assetId)) ?? 0) + 1);
+      continue;
+    }
+    if (!assignment?.licenseEvidenceUrl)
       throw new Error('ULTIMATE_VISUAL_LICENSE_RELEVANCE_REQUIRED');
     const asset = assetById.get(String(assignment.assetId)) as any;
     if (!asset?.entitlement_id || !asset?.public_url)
       throw new Error(`ULTIMATE_VISUAL_ASSET_NOT_READY:${assignment.assetId}`);
-    const identity = String(asset.provider_item_id ?? asset.entitlement_id);
+    const identity = String(asset.id ?? assignment.assetId);
     reuse.set(identity, (reuse.get(identity) ?? 0) + 1);
   }
   const prohibited = [...reuse.entries()].filter(([, count]) => count > 1);

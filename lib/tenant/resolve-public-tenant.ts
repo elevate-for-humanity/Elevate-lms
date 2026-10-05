@@ -23,7 +23,20 @@ export type ResolvedPublicTenant = {
   ownerUserId: string | null;
   subdomain: string | null;
   host: string;
+  externalBackend: { url: string; publishableKey: string } | null;
 };
+
+function externalBackendFromConfig(config: unknown): ResolvedPublicTenant['externalBackend'] {
+  if (!config || typeof config !== 'object' || Array.isArray(config)) return null;
+  const meta = (config as Record<string, unknown>).meta;
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return null;
+  const backend = (meta as Record<string, unknown>).externalBackend;
+  if (!backend || typeof backend !== 'object' || Array.isArray(backend)) return null;
+  const url = typeof (backend as any).url === 'string' ? (backend as any).url.trim() : '';
+  const publishableKey = typeof (backend as any).publishableKey === 'string' ? (backend as any).publishableKey.trim() : '';
+  if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url) || !publishableKey) return null;
+  return { url, publishableKey };
+}
 
 async function ownerCanServeWebsite(db: Awaited<ReturnType<typeof requireAdminClient>>, ownerUserId: string | null) {
   // Legacy organization-owned sites without a user owner continue through the
@@ -46,13 +59,13 @@ export async function resolvePublishedTenantFromRequest(
   if (slug) {
     const { data } = await db
       .from('user_websites')
-      .select('id, user_id, subdomain')
+      .select('id, user_id, subdomain, site_config')
       .eq('subdomain', slug)
       .eq('is_published', true)
       .maybeSingle();
     if (!data) return null;
     if (!(await ownerCanServeWebsite(db, data.user_id ?? null))) return null;
-    return { websiteId: data.id, ownerUserId: data.user_id ?? null, subdomain: data.subdomain, host };
+    return { websiteId: data.id, ownerUserId: data.user_id ?? null, subdomain: data.subdomain, host, externalBackend: externalBackendFromConfig(data.site_config) };
   }
 
   if (RESERVED_ELEVATE_HOSTS.has(host) || host.endsWith('.elevateforhumanity.org')) {
@@ -69,11 +82,11 @@ export async function resolvePublishedTenantFromRequest(
 
   const { data: website } = await db
     .from('user_websites')
-    .select('id, user_id, subdomain')
+    .select('id, user_id, subdomain, site_config')
     .eq('id', domain.website_id)
     .eq('is_published', true)
     .maybeSingle();
   if (!website) return null;
   if (!(await ownerCanServeWebsite(db, website.user_id ?? null))) return null;
-  return { websiteId: website.id, ownerUserId: website.user_id ?? null, subdomain: website.subdomain, host };
+  return { websiteId: website.id, ownerUserId: website.user_id ?? null, subdomain: website.subdomain, host, externalBackend: externalBackendFromConfig(website.site_config) };
 }

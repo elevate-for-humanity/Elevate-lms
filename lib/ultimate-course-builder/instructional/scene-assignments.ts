@@ -1,5 +1,6 @@
 import { mediaMatchTerms } from '@/lib/media/licensed-course-media';
 import { reviewedSceneEvidence } from './reviewed-scene-evidence';
+import { visualRequirementCompatibility } from './visual-compatibility';
 
 /** Assign distinct licensed source files to storyboard scenes using persisted
  * lesson-match evidence plus deterministic scene/asset semantic overlap.
@@ -75,7 +76,9 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
           method = 'verified-coverage';
         } else if (
           asset.visual_coverage_verified === true &&
-          asset.visual_requirements?.some((r: string) => r.trim().toLowerCase() === requirement)
+          Array.isArray(asset.visual_requirements) &&
+          asset.visual_requirements.some((r: unknown) => typeof r === 'string' &&
+            visualRequirementCompatibility(requirement, r).compatible)
         ) {
           reason =
             asset.relevance_reason ??
@@ -83,7 +86,7 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
           method = 'verified-coverage';
         } else if ((visualEvidence = reviewedSceneEvidence(scene, asset))) {
           reason = `Inspected source shows ${visualEvidence.matchedActions.join('; ')}. ` +
-            `This exactly matches the scene's contextual visual requirement. ${visualEvidence.scope}`;
+            `This is compatible with the scene's contextual visual requirement. ${visualEvidence.scope}`;
           method = 'reviewed-action-coverage';
         } else if (asset.lesson_match_verified === true && !asset.visual_observation) {
           // A failed inspected-action comparison must not fall back to a weaker

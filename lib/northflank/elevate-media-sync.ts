@@ -32,7 +32,7 @@ export function isElevateMediaRuntimeKey(key: string): boolean {
 export function validateElevateMediaUpdates(updates: Record<string, string>): void {
   for (const [key, value] of Object.entries(updates)) {
     if (!MEDIA_KEYS.has(key)) throw new Error('Unsupported Elevate Media setting');
-    if (typeof value !== 'string' || value.length > 16_384 || /[\r\n\u0000]/.test(value)) {
+    if (typeof value !== 'string' || value.length > 16_384 || /[\r\n]/.test(value) || value.includes(String.fromCharCode(0))) {
       throw new Error('Invalid Elevate Media setting value');
     }
     if (/^\s*[•*]{4,}/.test(value)) {

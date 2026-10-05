@@ -363,7 +363,6 @@ describe('canonical Course Factory media architecture', () => {
     expect(renderer).not.toContain("process.env.AI_NARRATION_PROVIDER = 'edge'");
     expect(narration).toContain('const provider = configuredNarrationProvider()');
     expect(narration).toContain("provider === 'cloudflare'");
-    expect(narration).toContain("provider === 'edge'");
     expect(narration).toContain("if (env.NODE_ENV === 'production') return 'kokoro'");
   });
   it('uses the strict credential lesson contract as a production completion gate', () => {

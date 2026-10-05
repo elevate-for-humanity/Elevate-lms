@@ -255,17 +255,9 @@ function applyLockedCourseBuilderMediaPolicy(job: VideoJob): void {
       ? (policy.narration as Record<string, unknown>)
       : null;
   if (policy?.locked_by === 'course_builder' && narration?.strategy === 'repository_voice') {
-    if (narration.allow_paid_provider === true && narration.provider === 'cloudflare') {
-      process.env.AI_NARRATION_PROVIDER = 'cloudflare';
-      return;
-    }
-    if (narration.allow_paid_provider !== false) {
-      throw new Error('MEDIA_NARRATION_POLICY_INVALID');
-    }
-    // Canonical narration is not a paid-inference approval decision. Use the
-    // configured repository voice route and let the professional-quality gate
-    // reject an unavailable or diagnostic provider.
-    process.env.AI_NARRATION_PROVIDER = process.env.AI_NARRATION_PROVIDER || 'repository_voice';
+    // Course Builder narration is self-hosted Kokoro. Do not let historical
+    // Cloudflare/paid-provider policy or environment variables override it.
+    process.env.AI_NARRATION_PROVIDER = 'kokoro';
   }
 }
 

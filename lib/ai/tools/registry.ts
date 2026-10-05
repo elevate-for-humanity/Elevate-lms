@@ -670,7 +670,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
   },
   {
     name: 'deployments.autopilot',
-    description: 'Trigger the existing deployment autopilot after explicit human approval.',
+    description: 'Trigger the existing deployment autopilot for an authenticated super administrator.',
     method: 'POST',
     path: '/api/autopilots/deploy',
     classification: 'write',
@@ -678,8 +678,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     scope: 'platform',
     allowedAgents: ['LIZZY'],
     allowedRoles: ['super_admin'],
-    approvalRequired: true,
-    confirmationPhrase: 'CONFIRM DEPLOY',
+    approvalRequired: false,
     idempotent: false,
     timeoutMs: 120_000,
     retryAttempts: 1,

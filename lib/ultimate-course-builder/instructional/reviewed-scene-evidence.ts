@@ -1,6 +1,8 @@
+import { visualRequirementCompatibility } from './visual-compatibility';
+
 /** Produce an assignment from actual, persisted frame observations. This is
  * contextual coverage only: sampled frames cannot certify a whole procedure.
- * Exact action comparison deliberately avoids title/keyword inference. */
+ * Equivalent observed actions may satisfy differently worded requirements. */
 export function reviewedSceneEvidence(scene: any, asset: any) {
   const observation = asset.visual_observation;
   if (!observation || observation.method !== 'sampled-frame-inspection') return null;
@@ -15,20 +17,21 @@ export function reviewedSceneEvidence(scene: any, asset: any) {
   if (scene.sceneType === 'demonstration' || scene.scene_type === 'demonstration' ||
       scene.stage === 'demonstration' ||
       String(scene.title ?? '').trim().toLowerCase() === 'demonstration') return null;
-  const normalize = (value: string) => value.toLowerCase().trim()
-    .replace(/^show\s+/, '').replace(/[.!?]+$/, '').replace(/\s+/g, ' ');
-  const requirement = normalize(String(scene.visualRequirement ?? ''));
-  const actions = Array.isArray(observation.visibleActions)
+  const requirement = String(scene.visualRequirement ?? '').trim();
+  const actions: string[] = Array.isArray(observation.visibleActions)
     ? observation.visibleActions.filter((value: unknown): value is string =>
         typeof value === 'string' && Boolean(value.trim())) : [];
-  const matched = actions.filter((action: string) => normalize(action) === requirement);
-  if (!requirement || !matched.length) return null;
+  const compatibility = visualRequirementCompatibility(requirement, actions);
+  if (!compatibility.compatible) return null;
+  const matched = actions.filter((action) =>
+    visualRequirementCompatibility(requirement, action).matchedConcepts.length > 0);
   return {
     contentSha256: asset.content_sha256,
     method: observation.method,
     reviewedAt: observation.reviewedAt,
     sampleFractions: [...fractions],
     matchedActions: matched,
+    compatibility: { method: 'instructional-compatibility-v1', ...compatibility },
     scope: String(observation.scope ?? 'Visible actions at sampled times only.'),
   };
 }

@@ -7,7 +7,7 @@ async function nf(project,path){
  const j=await r.json();return j.data??j;
 }
 function inspect(source,env){
- const found=Object.fromEntries(Object.entries(env??{}).filter(([k,v])=>/B2|BACKBLAZE|S3|MEDIA_STORAGE/.test(k)&&typeof v==='string'));
+ const found=Object.fromEntries(Object.entries(env??{}).filter(([k,v])=>/B2|BACKBLAZE|S3|ELEVATE_MEDIA|MEDIA_STORAGE/.test(k)&&typeof v==='string'));
  console.info(JSON.stringify({source,configuredKeys:Object.keys(found)}));candidates.push(found);
 }
 for(const project of ['elevate-platform','elevate-media-gpu']){
@@ -21,8 +21,8 @@ for(const id of ['elevate-admin','elevate-lms','elevate-ultimate-worker']){
  const d=await nf('elevate-platform','/services/'+id);inspect(id,d.runtimeEnvironment);
 }
 const env=Object.assign({},...candidates);
-const keyId=env.B2_APPLICATION_KEY_ID||env.B2_KEY_ID||env.BACKBLAZE_KEY_ID||env.S3_ACCESS_KEY_ID;
-const secret=env.B2_APPLICATION_KEY||env.BACKBLAZE_APPLICATION_KEY||env.B2_SECRET_ACCESS_KEY||env.S3_SECRET_ACCESS_KEY;
+const keyId=env.ELEVATE_MEDIA_ACCESS_KEY_ID||env.B2_APPLICATION_KEY_ID||env.B2_KEY_ID||env.BACKBLAZE_KEY_ID||env.S3_ACCESS_KEY_ID;
+const secret=env.ELEVATE_MEDIA_SECRET_ACCESS_KEY||env.B2_APPLICATION_KEY||env.BACKBLAZE_APPLICATION_KEY||env.B2_SECRET_ACCESS_KEY||env.S3_SECRET_ACCESS_KEY;
 console.info(JSON.stringify({matchingKeyId:keyId==='0055076046dd6520000000001',secretPresent:!!secret}));
 if(!secret){console.info('B2_SECRET_NOT_CONFIGURED');process.exit(0);}
 if(keyId!=='0055076046dd6520000000001'){console.info('B2_KEY_ID_NOT_MATCHED');process.exit(0);}

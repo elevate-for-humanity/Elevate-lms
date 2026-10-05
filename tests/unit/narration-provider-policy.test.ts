@@ -22,29 +22,13 @@ describe('publication narration provider policy', () => {
     vi.restoreAllMocks();
   });
 
-  it('routes narration through Cloudflare Workers AI by default', async () => {
-    vi.stubEnv('NODE_ENV', 'production');
-    vi.stubEnv('AI_NARRATION_PROVIDER', '');
-    vi.stubEnv('CLOUDFLARE_ACCOUNT_ID', 'test-account-id');
-    vi.stubEnv('CLOUDFLARE_AI_API_TOKEN', 'test-cloudflare-token');
-    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(Buffer.from('test-mp3'), {
-        status: 200,
-        headers: { 'content-type': 'audio/mpeg' },
-      }),
-    );
-
-    await expect(generateEdgeTTS('A production narration test.')).resolves.toEqual(
-      Buffer.from('test-mp3'),
-    );
-
-    expect(DEFAULT_CLOUDFLARE_TTS_MODEL).toBe('@cf/deepgram/aura-1');
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining(`/ai/run/${DEFAULT_CLOUDFLARE_TTS_MODEL}`),
-      expect.objectContaining({
-        headers: expect.objectContaining({ 'cf-aig-gateway-id': 'default' }),
-      }),
-    );
+  it('routes production narration through self-hosted Kokoro by default', () => {
+    expect(configuredNarrationProvider({ NODE_ENV: 'production' })).toBe('kokoro');
+    expect(configuredNarrationProvider({
+      NODE_ENV: 'production',
+      CLOUDFLARE_ACCOUNT_ID: 'present-but-not-authoritative',
+      CLOUDFLARE_AI_API_TOKEN: 'present-but-not-authoritative',
+    })).toBe('kokoro');
   });
 
   it('does not silently bypass a failed configured route', async () => {
@@ -69,9 +53,7 @@ describe('publication narration provider policy', () => {
         AI_NARRATION_PROVIDER: 'local',
       }),
     ).toThrow(/diagnostic-only/);
-    expect(() => configuredNarrationProvider({ NODE_ENV: 'production' })).toThrow(
-      /No production narration provider/,
-    );
+    expect(configuredNarrationProvider({ NODE_ENV: 'production' })).toBe('kokoro');
     expect(configuredNarrationProvider({ NODE_ENV: 'test' })).toBe('local');
   });
 

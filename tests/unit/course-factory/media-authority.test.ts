@@ -355,16 +355,16 @@ describe('canonical Course Factory media architecture', () => {
     expect(media).toContain("locked_by: 'course_builder'");
     expect(media).toContain("strategy: 'repository_voice'");
     expect(media).toContain('allow_paid_provider: allowPaidNarration');
-    expect(media).toContain("provider: 'cloudflare'");
+    expect(media).toContain("strategy: 'repository_voice'");
     expect(media).toContain("strategy: 'existing_then_pexels'");
     expect(renderer).toContain('applyLockedCourseBuilderMediaPolicy(job)');
-    expect(renderer).toContain("process.env.AI_NARRATION_PROVIDER = 'cloudflare'");
+    expect(renderer).not.toContain("process.env.AI_NARRATION_PROVIDER = 'cloudflare'");
     expect(renderer).toContain('MEDIA_NARRATION_AUTHORIZATION_REQUIRED');
     expect(renderer).not.toContain("process.env.AI_NARRATION_PROVIDER = 'edge'");
     expect(narration).toContain('const provider = configuredNarrationProvider()');
     expect(narration).toContain("provider === 'cloudflare'");
     expect(narration).toContain("provider === 'edge'");
-    expect(narration).not.toContain("production' && provider === 'edge'");
+    expect(narration).toContain("if (env.NODE_ENV === 'production') return 'kokoro'");
   });
   it('uses the strict credential lesson contract as a production completion gate', () => {
     const gate = read('lib/course-factory/canonical-course-gate.ts');

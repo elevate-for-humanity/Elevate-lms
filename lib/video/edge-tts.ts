@@ -75,16 +75,10 @@ export function configuredNarrationProvider(
     throw new Error(`Unsupported AI_NARRATION_PROVIDER "${explicit}"`);
   }
 
-  const cloudflareToken = (env.CLOUDFLARE_AI_API_TOKEN || env.CLOUDFLARE_API_TOKEN)?.trim();
-  if (env.CLOUDFLARE_ACCOUNT_ID?.trim() && cloudflareToken) return 'cloudflare';
-  if (env.GEMINI_API_KEY?.trim()) return 'gemini';
-  if (env.OPENAI_API_KEY?.trim()) return 'openai';
-  if (env.ELEVENLABS_API_KEY?.trim()) return 'elevenlabs';
-  if (env.NODE_ENV === 'production') {
-    throw new Error(
-      'No production narration provider is configured. Set AI_NARRATION_PROVIDER and its credentials.',
-    );
-  }
+  // Course production defaults to self-hosted Kokoro. External providers remain
+  // explicit opt-ins only; Cloudflare credentials must never silently take
+  // ownership of narration or introduce a quota dependency.
+  if (env.NODE_ENV === 'production') return 'kokoro';
   return 'local';
 }
 

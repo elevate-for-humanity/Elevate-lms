@@ -1,22 +1,33 @@
-import {privateDecrypt,createDecipheriv} from 'node:crypto';
-const blob={"key":"gcF3+WObwSpQO/NucaNDUCMXlhGAds2JfFkhjYqaS/uaBcyHBIRONmaSRRFWksyVXq4076ObmHnTghf/InF1o/+4EgcHurfNw3vnZHNoO//j59bBW48Hg2YQZ5TaSDe5HN3EuyIoWE6rHe4yvaeJIgEQjWfN8lC4TM4OoqzXJEI/SbFwlkqRSzdPBE3fT+ltfOhqzJGubMmd9kWoKWM8qShvJBSaob5cUGC47rN91RSi3X/csBGDDH4ucYHy1Gd/EoXBMP294BqPjUPBkMc4pI3ZM3079+AoBGIRzaU5kShJQAnoYKXBpj7S6M1nflrf73qPi/sMs4kg45NQJ924Miu7CMkR+c6XsTRtgsxE3/FBxZWKFZBJJkWcWt/rhMzIginH0qtReR0dfoPzVahJPHIWRvlw4E6RsgUgiA2SWMI6smZycnPf9wJnrs9Jegqmvm4jGuQxHBXN9R7nA2pKuplAXQX840wzemUR+VoHyO8ZHznSYWT2G65Kj6Cj2R2I","iv":"+bAsQsOYObu55+hW","data":"BnkKNgBE82VNOLijS0X2LDKt4zvYdBmAuOW2/odxj1+ZZJHt5q1C9vjYhyRvUzcktqrhHcHkkJhYdlrEt4X5quLlBbG/ndMbMbDNin9hteQ1EgbCp1NGVLbKeCb/WXhnUxW+e7xiH79ZNtSWgE+/mf0LvRYtwAtNpeI6o+yRFmTb+bLrHGgQhTc2FQPZnXDl7NyZnTVongvrbPfZlZwI7EfyJMdq/fIc/Z6eA67pTeistXz2Gkz6a8LCGy0FQWpx92EmPZd8qqHHlV7YbhCqBh0RSfpjx3jMD6wfpt+j9Y6k+rDWVp2o6oZqTQ0j2e9ACtnLc3OBi0hWrtMXUDXCbAlKYRyFiWHWVF06frISt0F4Blbud+R+JkbOKvBPEJAQIwxO+i5W5K+PRebnsjH7DGYg5lusuKEasdTuGjhoOj7lX6QR3Zdz","tag":"0UWLol8x6EVMrBk179jD6A=="};
+import {createRequire} from 'node:module';
+const require=createRequire('/tmp/b2-verify/package.json');
+const {S3Client,PutObjectCommand,GetObjectCommand,DeleteObjectCommand,ListObjectsV2Command}=require('@aws-sdk/client-s3');
+const {getSignedUrl}=require('@aws-sdk/s3-request-presigner');
 const token=process.env.NORTHFLANK_API_TOKEN;
 const base='https://api.northflank.com/v1/projects/elevate-platform';
 async function nf(path,method='GET',body){
  const r=await fetch(base+path,{method,headers:{authorization:'Bearer '+token,'content-type':'application/json'},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(30000)});
  if(!r.ok)throw new Error('Northflank '+method+' '+path+' HTTP '+r.status);
- if(r.status===204)return {};const j=await r.json();return j.data??j;
+ const txt=await r.text();if(!txt)return {};const j=JSON.parse(txt);return j.data??j;
 }
-const transfer=await nf('/secrets/b2-setup-transfer-20261005/details');
-const aes=privateDecrypt({key:transfer.secrets.variables.TRANSFER_PRIVATE_KEY,oaepHash:'sha256'},Buffer.from(blob.key,'base64'));
-const d=createDecipheriv('aes-256-gcm',aes,Buffer.from(blob.iv,'base64'));d.setAuthTag(Buffer.from(blob.tag,'base64'));
-const config=JSON.parse(Buffer.concat([d.update(Buffer.from(blob.data,'base64')),d.final()]).toString());
-const current=await nf('/secrets/elevate-production-env/details');
-await nf('/secrets/elevate-production-env','PATCH',{secrets:{...current.secrets,variables:{...current.secrets.variables,...config}}});
-const verified=await nf('/secrets/elevate-production-env/details');
-if(!Object.entries(config).every(([k,v])=>verified.secrets.variables[k]===v))throw new Error('Configuration readback mismatch');
-const auth=await fetch('https://api.backblazeb2.com/b2api/v4/b2_authorize_account',{headers:{authorization:'Basic '+Buffer.from(config.ELEVATE_MEDIA_ACCESS_KEY_ID+':'+config.ELEVATE_MEDIA_SECRET_ACCESS_KEY).toString('base64')}});
-if(!auth.ok)throw new Error('Restricted B2 credential HTTP '+auth.status);
-console.info(JSON.stringify({saved:true,bucket:config.ELEVATE_MEDIA_BUCKET,provider:config.ELEVATE_MEDIA_PROVIDER,restrictedCredentialVerified:true}));
-await nf('/secrets/b2-setup-transfer-20261005','DELETE');
-console.info('Temporary transfer key removed');
+const g=await nf('/secrets/elevate-production-env/details');const v=g.secrets.variables;
+const required=['ELEVATE_MEDIA_PROVIDER','ELEVATE_MEDIA_ENDPOINT','ELEVATE_MEDIA_REGION','ELEVATE_MEDIA_BUCKET','ELEVATE_MEDIA_ACCESS_KEY_ID','ELEVATE_MEDIA_SECRET_ACCESS_KEY'];
+if(required.some(k=>!v[k]))throw new Error('Missing media configuration');
+const client=new S3Client({endpoint:v.ELEVATE_MEDIA_ENDPOINT,region:v.ELEVATE_MEDIA_REGION,credentials:{accessKeyId:v.ELEVATE_MEDIA_ACCESS_KEY_ID,secretAccessKey:v.ELEVATE_MEDIA_SECRET_ACCESS_KEY}});
+const Bucket=v.ELEVATE_MEDIA_BUCKET;const Key='_connection-check/'+process.env.GITHUB_RUN_ID+'.txt';const body='Elevate B2 connection verification';
+try{
+ await client.send(new PutObjectCommand({Bucket,Key,Body:body,ContentType:'text/plain'}));
+ const listed=await client.send(new ListObjectsV2Command({Bucket,Prefix:Key}));if(!listed.Contents?.some(o=>o.Key===Key))throw new Error('List verification failed');
+ const signed=await getSignedUrl(client,new GetObjectCommand({Bucket,Key}),{expiresIn:120});
+ const r=await fetch(signed,{headers:{Range:'bytes=0-6'}});if(r.status!==206||await r.text()!=='Elevate')throw new Error('Signed range download failed');
+ const unsigned=new URL(signed);unsigned.search='';const privateResponse=await fetch(unsigned);if(privateResponse.ok)throw new Error('Bucket unexpectedly public');
+ console.info(JSON.stringify({bucket:Bucket,upload:true,list:true,signedDownload:true,byteRange:true,privateAccess:true}));
+}finally{await client.send(new DeleteObjectCommand({Bucket,Key}));}
+for(const id of ['elevate-admin','elevate-lms','elevate-ultimate-worker','elevate-studio-browser']){
+ const env=await nf('/services/'+id+'/runtime-environment/details');
+ const actual=env.runtimeEnvironment??{};
+ const matches=required.every(k=>(actual[k]?.value??actual[k])===v[k]);
+ console.info(JSON.stringify({service:id,mediaConfigInherited:matches}));
+ if(!matches)throw new Error('Media configuration not inherited by '+id);
+ await nf('/services/'+id+'/restart','POST',{});
+ console.info(JSON.stringify({service:id,restartAccepted:true}));
+}

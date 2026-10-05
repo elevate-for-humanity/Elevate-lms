@@ -8,14 +8,16 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     environment: production
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Inspect Northflank and R2 delivery metadata
+      - name: Install isolated storage verification dependencies
+        run: npm install --prefix /tmp/b2-verify --no-audit --no-fund @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
+      - name: Verify B2 and activate connected services
         env:
           NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
         run: node scripts/cdl-r2-diagnostic.mjs

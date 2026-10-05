@@ -836,7 +836,13 @@ export default function UnifiedEllieChat({
 
   useEffect(() => {
     const saved = window.localStorage.getItem('elevate:studio:provider') as StudioProvider | null;
-    if (saved && saved in STUDIO_PROVIDER_LABELS) setSelectedProvider(saved);
+    // The self-hosted Elevate GPU is intentionally archived. Migrate stale
+    // selections back to auto, which currently resolves to the low-cost OpenAI lane.
+    if (saved === 'elevate' || !saved) {
+      setSelectedProvider('auto');
+      return;
+    }
+    if (saved in STUDIO_PROVIDER_LABELS) setSelectedProvider(saved);
   }, []);
 
   useEffect(() => {

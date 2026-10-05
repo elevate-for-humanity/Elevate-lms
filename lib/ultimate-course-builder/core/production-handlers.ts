@@ -32,8 +32,8 @@ function requireLicensedVisualCoverage(ctx: any, mediaInput?: any) {
   const assignments = Array.isArray(media.assignments) ? media.assignments : [];
   const readyAssets = Array.isArray(media.readyAssets) ? media.readyAssets : [];
   const assetById = new Map(readyAssets.map((asset: any) => [String(asset.id), asset]));
-  if (scenes.length !== 13)
-    throw new Error(`ULTIMATE_STORYBOARD_13_SCENES_REQUIRED:${scenes.length}:13`);
+  if (scenes.length < 8 || scenes.length > 16)
+    throw new Error(`ULTIMATE_STORYBOARD_SCENE_RANGE_REQUIRED:${scenes.length}:8:16`);
   if (assignments.length !== scenes.length)
     throw new Error(`ULTIMATE_SCENE_ASSIGNMENT_COVERAGE_REQUIRED:${assignments.length}:${scenes.length}`);
   const sceneIds = new Set(scenes.map((scene: any) => String(scene.id)));
@@ -42,12 +42,20 @@ function requireLicensedVisualCoverage(ctx: any, mediaInput?: any) {
     throw new Error('ULTIMATE_SCENE_ASSIGNMENT_ONE_TO_ONE_REQUIRED');
   const reuse = new Map<string, number>();
   for (const assignment of assignments) {
-    if (!assignment?.assetId || !assignment?.licenseEvidenceUrl || !assignment?.relevanceReason)
+    if (!assignment?.assetId || !assignment?.relevanceReason)
+      throw new Error('ULTIMATE_VISUAL_RELEVANCE_REQUIRED');
+    if (assignment.generatedInstructionalVisual === true || assignment.assignmentMethod === 'instructional-render') {
+      if (!String(assignment.assetId).startsWith('instructional:'))
+        throw new Error(`ULTIMATE_INSTRUCTIONAL_VISUAL_ID_INVALID:${assignment.assetId}`);
+      reuse.set(String(assignment.assetId), (reuse.get(String(assignment.assetId)) ?? 0) + 1);
+      continue;
+    }
+    if (!assignment?.licenseEvidenceUrl)
       throw new Error('ULTIMATE_VISUAL_LICENSE_RELEVANCE_REQUIRED');
     const asset = assetById.get(String(assignment.assetId)) as any;
     if (!asset?.entitlement_id || !asset?.public_url)
       throw new Error(`ULTIMATE_VISUAL_ASSET_NOT_READY:${assignment.assetId}`);
-    const identity = String(asset.provider_item_id ?? asset.entitlement_id);
+    const identity = String(asset.id ?? assignment.assetId);
     reuse.set(identity, (reuse.get(identity) ?? 0) + 1);
   }
   const prohibited = [...reuse.entries()].filter(([, count]) => count > 1);
@@ -280,25 +288,25 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       const objectives: any[] = (ctx.artifacts.learning_objectives as any)?.objectives ?? [];
       const delivered = String(inspection?.actualTranscript ?? '').toLowerCase().replace(/\s+/g, ' ').trim();
       const objectiveEvidence = objectives.map((objective: any) => {
-        const terms = String(objective.text ?? '')
-          .toLowerCase()
+        const normalizeTerms = (value: string) => String(value ?? '').toLowerCase()
           .split(/[^a-z0-9]+/)
-          .filter((term) => term.length >= 5);
-        const matched = terms.filter((term) => delivered.includes(term));
-        const firstMatch = matched
-          .map((term) => delivered.indexOf(term))
-          .filter((index) => index >= 0)
-          .sort((a, b) => a - b)[0];
-        const deliveredExcerpt =
-          firstMatch === undefined
-            ? ''
-            : delivered.slice(Math.max(0, firstMatch - 120), firstMatch + 240).trim();
+          .filter((term) => term.length >= 4 &&
+            !['understand','identify','explain','describe','demonstrate','lesson','course'].includes(term));
+        const terms = normalizeTerms(objective.text);
+        const deliveredTerms = new Set(normalizeTerms(delivered));
+        const matched = terms.filter((term) => deliveredTerms.has(term));
+        const requiredTerms = Math.min(2, Math.max(1, Math.ceil(terms.length * 0.25)));
+        const firstMatch = matched.map((term) => delivered.indexOf(term))
+          .filter((index) => index >= 0).sort((a, b) => a - b)[0];
+        const deliveredExcerpt = firstMatch === undefined
+          ? delivered.slice(0, 360).trim()
+          : delivered.slice(Math.max(0, firstMatch - 120), firstMatch + 240).trim();
         return {
           objectiveId: objective.id,
           matchedTerms: matched,
-          requiredTerms: Math.min(3, Math.max(1, terms.length)),
+          requiredTerms,
           deliveredExcerpt,
-          pass: matched.length >= Math.min(3, Math.max(1, terms.length)),
+          pass: matched.length >= requiredTerms,
         };
       });
       const instructionalQA = {

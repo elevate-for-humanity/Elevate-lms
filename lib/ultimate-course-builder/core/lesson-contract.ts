@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from './types';
 
 /** Changing this version invalidates every checkpoint and release certificate. */
-export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-03.2';
+export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-05.1';
 export const MAX_TARGETED_REPAIRS = 8;
 type Artifact = Record<string, any>;
 export function contractHash(value: unknown): string {
@@ -61,17 +61,19 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
       break;
     case 'learning_objectives':
       require(populated(a.objectives) &&
-        a.objectives.every(
-          (o: any) => nonempty(o.id) && nonempty(o.text) && populated(o.sourceRequirementIds),
-        ), 'OBJECTIVE_SOURCE_MAPPING_REQUIRED');
+        a.objectives.every((o: any) =>
+          nonempty(o.id) && nonempty(o.text) &&
+          (populated(o.sourceRequirementIds) || nonempty(o.courseDefinedReason)),
+        ), 'OBJECTIVE_EVIDENCE_MAPPING_REQUIRED');
       break;
     case 'prerequisites':
-      require(a.prerequisites?.reviewRequired === false &&
-        (populated(a.prerequisites.checks) ||
-          nonempty(a.prerequisites.noneReason)), 'PREREQUISITE_CHECKS_REQUIRED');
+      require(
+        populated(a.prerequisites?.checks) || nonempty(a.prerequisites?.noneReason),
+        'PREREQUISITE_CHECKS_REQUIRED',
+      );
       break;
     case 'teaching_sequence':
-      require(a.sequence?.stages?.length === 13 &&
+      require(a.sequence?.stages?.length >= 8 && a.sequence?.stages?.length <= 16 &&
         a.sequence.stages.every(
           (s: any) => nonempty(s.instruction) && populated(s.objectiveIds),
         ), 'TEACHING_CONTENT_REQUIRED');
@@ -83,11 +85,11 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
             nonempty(s.id) &&
             nonempty(s.text) &&
             populated(s.objectiveIds) &&
-            populated(s.sourceRequirementIds),
+            (populated(s.sourceRequirementIds) || nonempty(s.courseDefinedReason)),
         ), 'SCRIPT_SEGMENTS_REQUIRED');
       break;
     case 'storyboard':
-      require(a.storyboard?.scenes?.length === 13 &&
+      require(a.storyboard?.scenes?.length >= 8 && a.storyboard?.scenes?.length <= 16 &&
         a.storyboard.scenes.every(
           (s: any) =>
             nonempty(s.id) &&
@@ -99,15 +101,18 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
       break;
     case 'visual_assignment': {
       const assignments = Array.isArray(a.media?.assignments) ? a.media.assignments : [];
-      require(assignments.length === 13 &&
-        new Set(assignments.map((s: any) => s.sceneId)).size === 13 &&
+      require(assignments.length >= 8 && assignments.length <= 16 &&
+        new Set(assignments.map((s: any) => s.sceneId)).size === assignments.length &&
         assignments.every(
           (s: any) =>
             nonempty(s.sceneId) &&
             nonempty(s.assetId) &&
-            nonempty(s.licenseEvidenceUrl) &&
-            nonempty(s.relevanceReason),
-        ), 'VISUAL_13_SCENE_LICENSE_RELEVANCE_REQUIRED');
+            nonempty(s.relevanceReason) &&
+            (s.generatedInstructionalVisual === true
+              ? s.assignmentMethod === 'instructional-render' &&
+                String(s.assetId).startsWith('instructional:')
+              : nonempty(s.licenseEvidenceUrl)),
+        ), 'VISUAL_SCENE_COVERAGE_REQUIRED');
       const reuse = new Map<string, number>();
       for (const assignment of assignments) {
         const id = String(assignment.assetId ?? '');

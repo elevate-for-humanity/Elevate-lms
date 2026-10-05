@@ -105,9 +105,12 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
           (s: any) =>
             nonempty(s.sceneId) &&
             nonempty(s.assetId) &&
-            nonempty(s.licenseEvidenceUrl) &&
-            nonempty(s.relevanceReason),
-        ), 'VISUAL_13_SCENE_LICENSE_RELEVANCE_REQUIRED');
+            nonempty(s.relevanceReason) &&
+            (s.generatedInstructionalVisual === true
+              ? s.assignmentMethod === 'instructional-render' &&
+                String(s.assetId).startsWith('instructional:')
+              : nonempty(s.licenseEvidenceUrl)),
+        ), 'VISUAL_13_SCENE_COVERAGE_REQUIRED');
       const reuse = new Map<string, number>();
       for (const assignment of assignments) {
         const id = String(assignment.assetId ?? '');

@@ -1,5 +1,5 @@
 import { mediaMatchTerms } from '@/lib/media/licensed-course-media';
-import { reviewedSceneEvidence } from './reviewed-scene-evidence';
+import { compatibleVisualTask, reviewedSceneEvidence } from './reviewed-scene-evidence';
 
 /** Assign distinct licensed source files to storyboard scenes using persisted
  * lesson-match evidence plus deterministic scene/asset semantic overlap.
@@ -75,15 +75,16 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
           method = 'verified-coverage';
         } else if (
           asset.visual_coverage_verified === true &&
-          asset.visual_requirements?.some((r: string) => r.trim().toLowerCase() === requirement)
+          asset.visual_requirements?.some((r: string) =>
+            typeof r === 'string' && compatibleVisualTask(requirement, r))
         ) {
           reason =
             asset.relevance_reason ??
-            `Verified visual coverage matches the scene requirement: ${scene.visualRequirement}`;
+            `Verified visual coverage is compatible with the scene requirement: ${scene.visualRequirement}`;
           method = 'verified-coverage';
         } else if ((visualEvidence = reviewedSceneEvidence(scene, asset))) {
           reason = `Inspected source shows ${visualEvidence.matchedActions.join('; ')}. ` +
-            `This exactly matches the scene's contextual visual requirement. ${visualEvidence.scope}`;
+            `This supports the scene's contextual visual task through compatible action coverage. ${visualEvidence.scope}`;
           method = 'reviewed-action-coverage';
         } else if (asset.lesson_match_verified === true && !asset.visual_observation) {
           // A failed inspected-action comparison must not fall back to a weaker
@@ -99,7 +100,9 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
       .sort((a, b) => {
         const rank = (m: string) => (m === 'lesson-scoped' ? 0 : m === 'verified-coverage' ? 1 : 2);
         return (
-          rank(a.method) - rank(b.method) || String(a.asset.id).localeCompare(String(b.asset.id))
+          rank(a.method) - rank(b.method) ||
+          (b.visualEvidence?.requirementCoverage ?? 0) - (a.visualEvidence?.requirementCoverage ?? 0) ||
+          String(a.asset.id).localeCompare(String(b.asset.id))
         );
       });
   });

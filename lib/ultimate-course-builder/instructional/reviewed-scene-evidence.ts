@@ -72,7 +72,7 @@ function taskText(value: string): string {
 
 function taskTerms(value: string): string[] {
   return [...new Set((taskText(value).match(/[a-z0-9]+/g) ?? []).flatMap((word) => {
-    if (FILLER.has(word) || word.length < 2) return [];
+    if (FILLER.has(word) || (word.length < 2 && !/^\d+$/.test(word))) return [];
     const singular = word.length > 3 && word.endsWith('s') && !word.endsWith('ss')
       ? word.slice(0, -1) : word;
     return [EQUIVALENTS[word] ?? EQUIVALENTS[singular] ?? singular];
@@ -85,7 +85,7 @@ export function compatibleVisualTask(requirement: string, action: string) {
   const requiredText = taskText(requirement);
   const availableText = taskText(action);
   // Unstructured negation/order cannot safely establish positive action coverage.
-  const qualified = /\b(no|not|never|without|avoid|dont|doesnt|cannot|before|after)\b|step[- ]by[- ]step/;
+  const qualified = /\b(no|not|never|without|avoid|dont|doesnt|cannot|before|after)\b|\bnon[- ]|step[- ]by[- ]step/;
   if (qualified.test(requiredText) || qualified.test(availableText)) return null;
   const required = taskTerms(requirement);
   const available = new Set(taskTerms(action));

@@ -21,6 +21,8 @@ const cases = [
   ['same action different subject', 'Cleaning a gauge', 'Cleaning a basin', false],
   ['low is not high pressure', 'High pressure refrigerant system', 'Low pressure refrigerant system', false],
   ['contradictory qualifier', 'High pressure gauge', 'Low and high pressure gauges', false],
+  ['single-digit number matters', 'Gauge set to 2 bar', 'Gauge set to 3 bar', false],
+  ['non-prefixed qualifier is not positive evidence', 'Conductive safety glove', 'Non-conductive safety glove', false],
   ['explicit number matters', 'Gauge set to 50 psi', 'Gauge set to 30 psi', false],
   ['negation in observation', 'Connecting a gauge', 'Not connecting a gauge', false],
   ['negation in requirement', 'Do not connect the gauge', 'Connecting the gauge', false],

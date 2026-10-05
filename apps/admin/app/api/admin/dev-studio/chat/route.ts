@@ -1423,6 +1423,140 @@ async function _POST(req: NextRequest) {
     let model = 'none';
     const canonicalProvider = getActiveProviderName();
 
+    // True model streaming for the default Admin conversation. The response is
+    // returned immediately; OpenAI deltas are forwarded as they arrive instead
+    // of waiting for a completed answer and replaying it word-by-word.
+    if (effectiveProvider === 'openai' && isOpenAIConfigured()) {
+      const selectedModel = modelFor('openai', rawModel);
+      const apiKey = process.env.OPENAI_API_KEY;
+      if (!apiKey) {
+        return NextResponse.json({ error: 'OPENAI_API_KEY not configured' }, { status: 503 });
+      }
+      const openai = new OpenAI({ apiKey });
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        async start(controller) {
+          let complete = '';
+          const streamedToolCalls: Record<number, { id: string; name: string; args: string }> = {};
+          const emit = (payload: Record<string, unknown>) =>
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+          try {
+            const first = await openai.chat.completions.create({
+              model: selectedModel,
+              messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
+              tools: TOOLS,
+              tool_choice: 'auto',
+              temperature: 0.4,
+              max_tokens: 4096,
+              stream: true,
+            });
+            for await (const chunk of first) {
+              const delta = chunk.choices[0]?.delta;
+              if (delta?.content) {
+                complete += delta.content;
+                emit({ token: delta.content });
+              }
+              for (const tc of delta?.tool_calls ?? []) {
+                const index = tc.index ?? 0;
+                const row = streamedToolCalls[index] ?? { id: '', name: '', args: '' };
+                if (tc.id) row.id = tc.id;
+                if (tc.function?.name) row.name += tc.function.name;
+                if (tc.function?.arguments) row.args += tc.function.arguments;
+                streamedToolCalls[index] = row;
+              }
+            }
+
+            const calls = Object.values(streamedToolCalls).filter((call) => call.name);
+            if (calls.length) {
+              const toolResults = [];
+              const assistantToolCalls = [];
+              for (const call of calls) {
+                let args: Record<string, unknown> = {};
+                try { args = JSON.parse(call.args || '{}'); } catch { /* malformed args become empty */ }
+                const result = await execTool(call.name, { ...args, studio_run_id: masterExecution?.studioRunId }, auth.userId);
+                toolCalls.push({ tool: call.name, args, result });
+                const id = call.id || `call_${crypto.randomUUID()}`;
+                assistantToolCalls.push({
+                  id,
+                  type: 'function' as const,
+                  function: { name: call.name, arguments: JSON.stringify(args) },
+                });
+                toolResults.push({ role: 'tool' as const, tool_call_id: id, content: result });
+                emit({ tool: call.name, toolStatus: 'completed' });
+              }
+
+              const second = await openai.chat.completions.create({
+                model: selectedModel,
+                messages: [
+                  { role: 'system', content: systemPrompt },
+                  ...toChatMessages(messages),
+                  { role: 'assistant', content: complete || null, tool_calls: assistantToolCalls },
+                  ...toolResults,
+                ],
+                temperature: 0.4,
+                max_tokens: 4096,
+                stream: true,
+              });
+              for await (const chunk of second) {
+                const token = chunk.choices[0]?.delta?.content;
+                if (token) {
+                  complete += token;
+                  emit({ token });
+                }
+              }
+            }
+
+            const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
+            emit({
+              done: true,
+              provider: 'openai',
+              model: selectedModel,
+              providerPreference: effectiveProvider,
+              availableProviders: {
+                xai: isXAIConfigured(),
+                groq: isGroqConfigured(),
+                openai: isOpenAIConfigured(),
+                anthropic: isAnthropicConfigured(),
+                gemini: isGeminiConfigured(),
+              },
+              toolCalls,
+              capabilitiesUsed,
+              studioRun: masterExecution,
+            });
+            after(async () => {
+              try {
+                const db = await requireAdminClient();
+                await db.from('devstudio_chat_log').insert({
+                  user_id: auth.userId,
+                  user_message: lastUserMessage,
+                  assistant_response: complete,
+                  file_context: fileContext || null,
+                  provider: 'openai',
+                  model: selectedModel,
+                });
+                await recordUnifiedCapabilityUse(db, capabilitiesUsed, 'openai', selectedModel, toolCalls);
+              } catch (err: unknown) {
+                logger.warn('[devstudio/chat] streamed DB log failed', normalizeError(err));
+              }
+            });
+          } catch (error) {
+            logger.error('[devstudio/chat] OpenAI stream failed', error);
+            emit({ error: normalizeError(error).message ?? String(error), done: true });
+          } finally {
+            controller.close();
+          }
+        },
+      });
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache, no-transform',
+          'X-Accel-Buffering': 'no',
+          Connection: 'keep-alive',
+        },
+      });
+    }
+
     const providerOrder = [effectiveProvider];
 
     for (const nextProvider of providerOrder) {

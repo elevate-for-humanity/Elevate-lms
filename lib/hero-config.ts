@@ -13,7 +13,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 // Video hero sources - used across the site
 // Rules: No gradient overlays, text in solid container, calm motion only
-// All URLs point to R2 CDN — confirmed 206 on all files listed below.
+// Hero video sources may use verified legacy CDN media or canonical Supabase public previews.
 const R2 = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos';
 export const VIDEO_HEROES = {
   // Main/Marketing
@@ -23,7 +23,7 @@ export const VIDEO_HEROES = {
   // Program Categories
   barber: `${R2}/barber-hero-final.mp4`,
   barberApprenticeship: `${R2}/barber-hero-final.mp4`,
-  healthcare: `${R2}/cna-hero.mp4`,
+  healthcare: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4',
   skilledTrades: `${R2}/hvac-hero-final.mp4`,
   technology: `${R2}/hero-home-fast.mp4`,
 

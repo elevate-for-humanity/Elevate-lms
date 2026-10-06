@@ -149,6 +149,62 @@ async function notifyClockIn(
     .then(() => {}, () => {});
 }
 
+async function notifyAdminsOfClockInAttempt(
+  db: any,
+  params: {
+    userId: string;
+    apprenticeId?: string | null;
+    siteId?: string | null;
+    siteName?: string | null;
+    successful: boolean;
+    reason?: string | null;
+    code?: string | null;
+    progressEntryId?: string | null;
+    attemptedAt: string;
+  },
+) {
+  const [{ data: profile }, { data: admins }] = await Promise.all([
+    db.from('profiles').select('full_name,email').eq('id', params.userId).maybeSingle(),
+    db.from('profiles').select('id').in('role', ['admin', 'super_admin']),
+  ]);
+  const learner = profile?.full_name || profile?.email || params.userId;
+  const outcome = params.successful ? 'Successful clock-in' : 'Clock-in failed';
+  const site = params.siteName || params.siteId || 'unresolved site';
+  const reason = params.successful ? 'Clock-in accepted.' : params.reason || 'Clock-in was not accepted.';
+  const rows = (admins || []).map((admin: any) => ({
+    user_id: admin.id,
+    type: 'timeclock',
+    title: `${outcome}: ${learner}`,
+    message: `${learner} — ${site}. ${reason}`,
+    action_label: 'Review timeclock',
+    action_url: '/apprenticeships/hours',
+    link: '/apprenticeships/hours',
+    read: false,
+    metadata: {
+      learner_user_id: params.userId,
+      apprentice_id: params.apprenticeId || null,
+      site_id: params.siteId || null,
+      site_name: params.siteName || null,
+      successful: params.successful,
+      reason: params.reason || null,
+      code: params.code || null,
+      progress_entry_id: params.progressEntryId || null,
+      attempted_at: params.attemptedAt,
+    },
+    idempotency_key: `admin-clock-in-${params.userId}-${params.successful ? 'success' : 'failed'}-${params.progressEntryId || params.attemptedAt}`,
+  }));
+  if (rows.length) {
+    const { error } = await db.from('notifications').insert(rows);
+    if (error) logger.warn('[Timeclock] admin clock-in notification failed', error);
+  }
+  await sendEmail({
+    to: ADMIN_EMAIL,
+    subject: `${outcome}: ${learner}`,
+    text: `${learner} attempted to clock in at ${site} on ${params.attemptedAt}. ${reason}`,
+    html: `<p><strong>${escapeHtml(outcome)}</strong></p><p>${escapeHtml(learner)} attempted to clock in at ${escapeHtml(site)} on ${escapeHtml(params.attemptedAt)}.</p><p>${escapeHtml(reason)}</p>`,
+  }).catch((error) => logger.warn('[Timeclock] admin clock-in email failed', error));
+}
+
 function validateCoordinates(lat: number, lng: number, accuracyM?: number) {
   if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
     return 'Valid GPS coordinates are required';
@@ -366,6 +422,18 @@ async function _POST(request: NextRequest) {
           }
         });
       });
+      if (action === 'clock_in') {
+        await notifyAdminsOfClockInAttempt(db, {
+          userId: user.id,
+          apprenticeId: apprentice.id,
+          siteId: site_id,
+          siteName: site.name ?? null,
+          successful: false,
+          reason: studentText,
+          code: 'OUTSIDE_GEOFENCE',
+          attemptedAt: details.timestamp,
+        });
+      }
       return NextResponse.json(
         {
           error: 'Outside geofence',
@@ -575,6 +643,15 @@ async function _POST(request: NextRequest) {
         accepted: true,
       });
       await notifyClockIn(db, { entryId: newEntry.id, userId: user.id, siteName: site.name ?? null, clockInAt: serverNow });
+      await notifyAdminsOfClockInAttempt(db, {
+        userId: user.id,
+        apprenticeId: apprentice.id,
+        siteId: site_id,
+        siteName: site.name ?? null,
+        successful: true,
+        progressEntryId: newEntry.id,
+        attemptedAt: serverNow,
+      });
 
       return NextResponse.json({
         success: true,

@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
 import { LMS_HOST } from '@/lib/routing/portal-map';
 
+export const metadata = { robots: { index: false, follow: false } };
+
 export const dynamic = 'force-dynamic';
 
 /** Preserve old billing links while the authenticated billing UI lives in LMS. */

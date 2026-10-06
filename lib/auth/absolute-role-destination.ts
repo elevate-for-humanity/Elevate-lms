@@ -22,6 +22,7 @@ const ADMIN_PATH_PREFIXES = [
 // here. Program Holder and Creator are LMS-owned and must not be reclassified
 // by this compatibility helper.
 const MARKETING_PATH_PREFIXES = [
+  '/apps/website-builder',
   '/case-manager',
   '/workforce-board',
   '/provider',

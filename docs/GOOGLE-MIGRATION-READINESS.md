@@ -1,6 +1,6 @@
-# Northflank to Google migration readiness — 2026-10-05
+# Northflank to Google migration readiness — 2026-10-06
 
-Status: preparation only. No Google deployment, DNS change, database migration, secret export or source-service change has been made.
+Status: partially migrated. Marketing, Admin and LMS are live on Google. Full six-service configuration parity, Store, Studio persistence and worker scheduling are not yet accepted. Do not shut down or delete source recovery materials based on this document.
 
 ## Verified source
 GitHub Actions run 37387850342 successfully queried Northflank's management API using the existing production connection. Six services were returned, each with zero instances:
@@ -33,14 +33,19 @@ Supabase project cuxzzpsyufcewtmicszk is ACTIVE_HEALTHY. Storage bucket metadata
 - inventory-migration-source.yml: read-only source topology inventory.
 - build-google-migration-images.yml: builds the existing Dockerfiles for all six components and uploads SHA-tagged images to Artifact Registry after authorization. It does not deploy containers.
 
-## Remaining gates
-1. Complete Google authorization and verify its workflow.
-2. Inventory complete effective environments, volume attachments/content and any jobs/addons outside the primary project.
-3. Choose target runtime for continuous worker and persistent Studio based on measured resource requirements; web-only Cloud Run is insufficient for the whole topology.
-4. Securely transfer runtime credentials directly between trusted systems; never commit them or put them in artifacts/logs. Production credentials must not be Docker build arguments.
-5. Build each image and verify packaged runtime. Image-build workflow is not yet executed.
-6. Deploy isolated staging, verify login, dashboard permissions, uploads, payments, phone/email, media, Studio sessions and a controlled course job. A container-ready response alone is not acceptance.
-7. Review cost limits and domain/TLS routing, then cut over with a rollback record.
-8. Retain source volumes and recovery materials until acceptance.
+Google project: elegant-racer-299721, region us-central1. Authenticated verification run 37489183780 confirms healthy Marketing, Admin and LMS, including Supabase readiness, on deployed commit 23f09682ade2f2989aa3312d3f6b80d96c8284d1. Existing web capacity is 4 CPU / 8 GiB per service, minimum 1 and maximum 1 instance. Store public health returns 503; the public QuickBooks health route returns 404. These failures remain open.
 
-Google project: elegant-racer-299721. Billing linkage was shown by the owner. Google permissions and runtime access remain unverified.
+## Completion order and acceptance
+
+| Work | Configuration and acceptance | Current state |
+|---|---|---|
+| Effective environments | Run audit-google-runtime-parity.yml on main; compare inherited and direct values in memory, transfer missing values directly into Google without logging them; repeat until all six services match approved adaptations. | New audit requires merge and an approving write-access review. |
+| Web health | Run configure-google-health.yml serially; use /api/ping for startup/liveness and /api/ready plus /api/health for deployment acceptance. Preserve existing runtime configuration and capacity. | Probe reconciliation prepared; not executed. |
+| New application release | Build pinned-SHA Google images, deploy serially with deploy-google-repaired.yml, verify health, Admin executor and QuickBooks; retain prior image and revision for rollback. | Current Google release predates the new checks. |
+| Store | Build the Store image from Dockerfile.marketing, preserve STORE_ONLY_RUNTIME and exact Store variables, provision an appropriate runtime identity, verify checkout and domain/TLS before routing Store to Google. | Public endpoint unhealthy; target and permissions must be verified by audit. |
+| Studio browser | Preserve shared Admin/browser and learner credentials, port 3100, session policy and domain restrictions. Recover encrypted authentication-state contents and migrate to verified persistent storage before enabling sessions. | Source project volume exists; contents and target persistence unverified. |
+| Worker | Preserve finite-job leases, pause controls, queue claims, retry/idempotency and execution overlap limits; prove a queued job and its persisted outputs. Verify scheduled authentication independently from manual dispatch. | Course-builder Google job exists; schedule and complete processing unverified. |
+| Other dependencies | Inventory source jobs/addons/unattached secret groups; classify active dependencies and recovery-only resources. Validate storage, email, phone, media and billing integrations without sending unsolicited communications or charging customers. | Inventory and application acceptance outstanding. |
+| Exit Northflank | Retarget active deployment/health workflows and scheduled URLs to Google. Verify DNS and every public domain. Remove deployment dependence only after all above checks pass; retain source recovery data. | Health monitor replacement prepared; legacy deploy workflows remain. |
+
+The current authorization bootstrap restricts Google OIDC to manual main-branch workflows. A scheduled worker workflow cannot be assumed to authenticate under that policy. Dedicated runtime identities, persistent storage and domain routing must be verified against actual Google permissions; GitHub deployment authorization alone does not prove those administrative permissions exist.

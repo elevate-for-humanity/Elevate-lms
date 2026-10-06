@@ -6,10 +6,10 @@
  *
  * Supported playbooks:
  *   auth-gap          — adds apiAuthGuard to unprotected API routes
- *   env-gap           — checks whether Northflank environment sync is configured
+ *   env-gap           — checks whether Google environment sync is configured
  *   devcontainer-readonly — rotates/sets GITHUB_TOKEN + switches mode to github-only
- *   stale-image       — triggers Northflank builds for the LMS/Admin services
- *   northflank-env    — reports Northflank env sync status
+ *   stale-image       — triggers Google builds for the LMS/Admin services
+ *   google-env    — reports Google env sync status
  *
  * POST body: { playbook: string; dryRun?: boolean; options?: Record<string, unknown> }
  * Response:  { ok, playbook, dryRun, actions: ActionResult[], summary, timestamp }
@@ -20,12 +20,7 @@ import { spawn } from 'child_process';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import {
-  getNorthflankProjectId,
-  getNorthflankServices,
-  isNorthflankReady,
-  triggerNorthflankBuild,
-} from '@/lib/northflank/runtime';
+import { getGoogleServices,getGoogleService } from '@/lib/google/runtime';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -119,27 +114,9 @@ async function playbookAuthGap(dryRun: boolean): Promise<ActionResult[]> {
 }
 
 /**
- * env-gap: verify Northflank API configuration is present.
+ * env-gap: verify Google API configuration is present.
  */
-async function playbookEnvGap(_dryRun: boolean): Promise<ActionResult[]> {
-  const actions: ActionResult[] = [];
-  const projectId = getNorthflankProjectId();
-
-  if (!projectId) {
-    actions.push(error('northflank-project', 'NORTHFLANK_PROJECT_ID is not configured'));
-    return actions;
-  }
-
-  if (!isNorthflankReady()) {
-    actions.push(error('northflank-token', 'NORTHFLANK_API_TOKEN is not configured'));
-    return actions;
-  }
-
-  actions.push(ok('northflank-env', `Northflank env sync can run for project ${projectId}`));
-  actions.push(skipped('secret-values', 'Secret values are not printed or audited from this endpoint'));
-
-  return actions;
-}
+async function playbookEnvGap(_dryRun:boolean):Promise<ActionResult[]>{const actions:ActionResult[]=[];const results=await Promise.all(getGoogleServices().map(async s=>{try{return (await getGoogleService(s)).healthy}catch{return false}}));actions.push(results.every(Boolean)?ok('google-runtime','All Google production services are healthy'):error('google-runtime',results.filter(Boolean).length+'/'+results.length+' Google services healthy'));return actions;}
 
 /**
  * devcontainer-readonly: switch DEVSTUDIO_DEVCONTAINER_MODE to github-only
@@ -162,7 +139,7 @@ async function playbookDevcontainerReadonly(dryRun: boolean): Promise<ActionResu
   }
 
   if (!dryRun) {
-    actions.push(skipped('set-mode', 'Set DEVSTUDIO_DEVCONTAINER_MODE=github-only in the Northflank secret group, then redeploy'));
+    actions.push(skipped('set-mode', 'Set DEVSTUDIO_DEVCONTAINER_MODE=github-only in the Google secret group, then redeploy'));
   } else {
     actions.push(skipped('set-mode', `dry-run: would set DEVSTUDIO_DEVCONTAINER_MODE=github-only (currently: ${currentMode})`));
   }
@@ -171,43 +148,14 @@ async function playbookDevcontainerReadonly(dryRun: boolean): Promise<ActionResu
 }
 
 /**
- * stale-image: trigger Northflank builds for LMS/Admin.
+ * stale-image: trigger Google builds for LMS/Admin.
  */
-async function playbookStaleImage(dryRun: boolean, options: Record<string, unknown>): Promise<ActionResult[]> {
-  const actions: ActionResult[] = [];
-  const projectId = getNorthflankProjectId();
-  if (!projectId || !isNorthflankReady()) {
-    actions.push(error('northflank-config', 'Northflank API credentials are not configured'));
-    return actions;
-  }
-
-  const requested = (options.services as string[] | undefined)?.length
-    ? (options.services as string[])
-    : getNorthflankServices().map((service) => service.id);
-
-  for (const svc of requested) {
-    if (!dryRun) {
-      try {
-        await triggerNorthflankBuild(projectId, svc);
-        actions.push(ok('northflank-build', `${svc} build triggered`));
-      } catch (err) {
-        const msg = 'Unknown error';
-        actions.push(error('northflank-build', `${svc} failed: ${msg.slice(0, 200)}`));
-      }
-    } else {
-      actions.push(skipped('northflank-build', `dry-run: would trigger build for ${svc}`));
-    }
-  }
-
-  return actions;
-}
+async function playbookStaleImage(_dryRun:boolean,_options:Record<string,unknown>):Promise<ActionResult[]>{return [skipped('google-deploy','Production images are deployed from GitHub main to Google; direct provider build triggers are disabled.')];}
 
 /**
- * northflank-env: read-only Northflank environment readiness check.
+ * google-env: read-only Google environment readiness check.
  */
-async function playbookNorthflankEnv(): Promise<ActionResult[]> {
-  return playbookEnvGap(true);
-}
+async function playbookGoogleEnv():Promise<ActionResult[]>{return playbookEnvGap(true);}
 
 // ── Registry ──────────────────────────────────────────────────────────────────
 
@@ -216,7 +164,7 @@ const PLAYBOOKS: Record<string, (dryRun: boolean, options: Record<string, unknow
   'env-gap':                (d) => playbookEnvGap(d),
   'devcontainer-readonly':  (d) => playbookDevcontainerReadonly(d),
   'stale-image':            (d, o) => playbookStaleImage(d, o),
-  'northflank-env':         () => playbookNorthflankEnv(),
+  'google-env':             () => playbookGoogleEnv(),
 };
 
 // ── Handlers ──────────────────────────────────────────────────────────────────
@@ -269,10 +217,10 @@ export async function GET(request: NextRequest) {
     method: 'POST',
     playbooks: {
       'auth-gap':              'Scan for unprotected API routes; mark with TODO in non-dry-run',
-      'env-gap':               'Check Northflank env sync configuration',
-      'devcontainer-readonly': 'Verify GITHUB_TOKEN and remind operator to set github-only mode in Northflank',
-      'stale-image':           'Trigger Northflank builds for services',
-      'northflank-env':        'Read-only Northflank env readiness check',
+      'env-gap':               'Check Google env sync configuration',
+      'devcontainer-readonly': 'Verify GITHUB_TOKEN and remind operator to set github-only mode in Google',
+      'stale-image':           'Trigger Google builds for services',
+      'google-env':        'Read-only Google env readiness check',
     },
     body: {
       playbook: 'string (required)',

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
-import { retiredStripeCheckout } from '@/lib/billing/retired-stripe-checkout';
+import { retiredLegacyCheckout } from '@/lib/billing/retired-legacy-checkout';
 import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
@@ -29,9 +29,9 @@ async function readHistory(request: NextRequest) {
 }
 
 async function retireMutations() {
-  return retiredStripeCheckout({
+  return retiredLegacyCheckout({
     destination: '/lms/documents',
-    reason: 'Stripe payment, saved-card, refund, and subscription mutations are retired.',
+    reason: 'legacy provider payment, saved-card, refund, and subscription mutations are retired.',
   });
 }
 

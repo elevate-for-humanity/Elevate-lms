@@ -60,7 +60,7 @@ async function main() {
     const name = `elevate-${component}-migration`;
     const existing = gcloud(['run', 'services', 'list', '--project', projectId, '--region', 'us-central1', `--filter=metadata.name=${name}`, '--format=value(metadata.name)']);
     if (existing) throw new Error('Migration service already exists; review its revision and IAM before updating');
-    gcloud(['run', 'deploy', name, '--project', projectId, '--region', 'us-central1', '--image', `${image}@${digest}`, '--service-account', `elevate-${component}-runtime@${projectId}.iam.gserviceaccount.com`, '--port', '3000', '--cpu', '1', '--memory', component === 'admin' ? '2Gi' : '1Gi', '--min-instances', '0', '--max-instances', '2', '--concurrency', '20', '--timeout', '300', '--env-vars-file', envFile, '--quiet']);
+    gcloud(['run', 'deploy', name, '--project', projectId, '--region', 'us-central1', '--image', `${image}@${digest}`, '--service-account', `elevate-${component}-runtime@${projectId}.iam.gserviceaccount.com`, '--port', '3000', '--cpu', '4', '--memory', '16Gi', '--min-instances', '0', '--max-instances', '2', '--concurrency', '20', '--timeout', '300', '--env-vars-file', envFile, '--quiet']);
     const url = gcloud(['run', 'services', 'describe', name, '--project', projectId, '--region', 'us-central1', '--format=value(status.url)']);
     if (!/^https:\/\/[a-z0-9.-]+\.run\.app$/.test(url)) throw new Error('Unexpected service URL');
     const summary = `Private ${component} service deployed: ${url}\nImage: ${image}@${digest}\nPublic IAM, application health, dependencies and DNS cutover remain unverified.\n`;

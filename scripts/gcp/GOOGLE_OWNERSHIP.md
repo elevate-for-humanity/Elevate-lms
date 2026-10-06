@@ -51,6 +51,8 @@ The six JSON configuration secrets are an import staging format, not the final p
 
 Repair validation: Marketing/Admin/LMS TypeScript checks, repository lint, 53 focused application tests, and 46 Google deployment contract tests passed locally. The production readiness gate could not verify live Supabase without credentials and its Store proof encountered a local IPC permission error. Production build, live routing, credential delivery and state acceptance remain unverified by these local checks.
 
+A broader unit run reported 3,097 passing, 70 failing and five skipped tests across 446 files. It includes outdated Northflank and retired Stripe assertions as well as application/media failures; none are treated as acceptable production evidence. The obsolete Builds Northflank assertion was subsequently replaced with canonical-dispatch coverage and actual unauthorized/unconfirmed request tests; all 36 tests in the two related guard suites pass. The remaining broad failures require triage before platform-wide acceptance.
+
 ## Complete responsibility comparison
 
 | Northflank responsibility | Google replacement / improvement | Acceptance still required |

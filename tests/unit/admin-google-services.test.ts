@@ -74,4 +74,15 @@ describe('Google Admin service operations', () => {
     expect(mocks.fetch).toHaveBeenCalledTimes(1);
     expect(mocks.fetch.mock.calls[0][0]).toContain('/build-google-migration-images.yml/dispatches');
   });
+  it('rejects unauthorized Builds requests before accessing deployment credentials', async () => {
+    mocks.auth.mockResolvedValue({ error: new Response('{}', { status: 403 }) });
+    expect((await BUILD_POST(request({ service: 'admin', action: 'build', confirmation: 'CONFIRM DEPLOY' }))).status).toBe(403);
+    expect(mocks.secret).not.toHaveBeenCalled();
+    expect(mocks.fetch).not.toHaveBeenCalled();
+  });
+  it('rejects unconfirmed Builds requests before dispatching any workflow', async () => {
+    expect((await BUILD_POST(request({ service: 'admin', action: 'deploy', image_sha: 'a'.repeat(40) }))).status).toBe(409);
+    expect(mocks.secret).not.toHaveBeenCalled();
+    expect(mocks.fetch).not.toHaveBeenCalled();
+  });
 });

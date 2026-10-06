@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { AlertCircle, FileText } from 'lucide-react';
-import { TIER3_INTERNAL_PLAN, REFUND_POLICY } from '@/lib/stripe/tuition-config';
+import { TIER3_INTERNAL_PLAN, REFUND_POLICY } from '@/lib/billing/tuition-config';
 
 interface PaymentDisclosureProps {
   programName: string;

@@ -72,6 +72,6 @@ describe('publication narration provider policy', () => {
     expect(configuredNarrationProvider({ AI_NARRATION_PROVIDER: 'gemini' })).toBe('gemini');
     expect(
       configuredNarrationProvider({ NODE_ENV: 'production', GEMINI_API_KEY: 'configured' }),
-    ).toBe('gemini');
+    ).toBe('kokoro');
   });
 });

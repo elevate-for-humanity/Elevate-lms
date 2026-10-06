@@ -47,22 +47,17 @@ describe('universal payment-method completion', () => {
     mocks.upsert.mockResolvedValue({ error: null });
   });
 
-  it('sets the test card as default only after a matching completed Setup session', async () => {
+  it('routes a legacy completed setup to current billing without saving a retired-provider card', async () => {
     const { GET } = await import('@/apps/lms/app/api/billing/payment-method/complete/route');
     const response = await GET(new NextRequest(
       'https://app.elevateforhumanity.org/api/billing/payment-method/complete?session_id=cs_test_universal',
     ));
 
     expect(response.status).toBe(307);
-    expect(response.headers.get('location')).toContain('/account/payment-methods?setup=success');
-    expect(mocks.updateCustomer).toHaveBeenCalledWith('cus_test_universal', {
-      invoice_settings: { default_payment_method: 'pm_test_card' },
-    });
-    expect(mocks.upsert).toHaveBeenCalledWith(expect.objectContaining({
-      user_id: 'test-user-universal',
-      stripe_customer_id: 'cus_test_universal',
-      stripe_default_payment_method_id: 'pm_test_card',
-    }), { onConflict: 'user_id' });
+    expect(response.headers.get('location')).toBe('https://app.elevateforhumanity.org/account/payment-methods');
+    expect(mocks.retrieveSession).not.toHaveBeenCalled();
+    expect(mocks.updateCustomer).not.toHaveBeenCalled();
+    expect(mocks.upsert).not.toHaveBeenCalled();
   });
 
   it('rejects a completed session belonging to a different user', async () => {
@@ -77,7 +72,17 @@ describe('universal payment-method completion', () => {
       'https://app.elevateforhumanity.org/api/billing/payment-method/complete?session_id=cs_other',
     ));
 
-    expect(response.headers.get('location')).toContain('/account/payment-methods?setup=invalid');
+    expect(response.headers.get('location')).toBe('https://app.elevateforhumanity.org/account/payment-methods');
+    expect(mocks.retrieveSession).not.toHaveBeenCalled();
+    expect(mocks.updateCustomer).not.toHaveBeenCalled();
+    expect(mocks.upsert).not.toHaveBeenCalled();
+  });
+  it('requires sign-in before exposing the current billing destination', async () => {
+    mocks.getUser.mockResolvedValue({ data: { user: null }, error: null });
+    const { GET } = await import('@/apps/lms/app/api/billing/payment-method/complete/route');
+    const response = await GET(new NextRequest('https://app.elevateforhumanity.org/api/billing/payment-method/complete?session_id=cs_old'));
+    expect(response.headers.get('location')).toBe('https://app.elevateforhumanity.org/login?redirect=/account/payment-methods');
+    expect(mocks.retrieveSession).not.toHaveBeenCalled();
     expect(mocks.updateCustomer).not.toHaveBeenCalled();
     expect(mocks.upsert).not.toHaveBeenCalled();
   });

@@ -14,7 +14,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -30,4 +30,11 @@ jobs:
       - name: Dispatch only queued work without overlapping executions
         env:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: node scripts/gcp/dispatch-course-job.mjs
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5; do
+            if node scripts/gcp/dispatch-course-job.mjs; then exit 0; fi
+            if [ "$attempt" = 5 ]; then exit 1; fi
+            sleep $((attempt * 15))
+          done

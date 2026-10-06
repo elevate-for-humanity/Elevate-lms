@@ -537,6 +537,17 @@ async function _POST(request: NextRequest) {
         .limit(1)
         .maybeSingle();
       if (openShift) {
+        await notifyAdminsOfClockInAttempt(db, {
+          userId: user.id,
+          apprenticeId: apprentice.id,
+          siteId: site_id,
+          siteName: site.name ?? null,
+          successful: true,
+          reason: 'Clock-in retry recognized; apprentice was already clocked in.',
+          code: 'ALREADY_CLOCKED_IN',
+          progressEntryId: openShift.id,
+          attemptedAt: serverNow,
+        });
         return NextResponse.json({
           success: true,
           action,

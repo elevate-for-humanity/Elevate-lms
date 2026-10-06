@@ -1,15 +1,11 @@
-name: Stage web service on Google
+name: Import runtime configuration into Google ownership
 on:
   workflow_dispatch:
     inputs:
       component:
+        required: true
         type: choice
-        required: true
-        options: [marketing, admin, lms, store]
-      image_sha:
-        description: Full commit SHA of an image already uploaded to Google
-        required: true
-        type: string
+        options: [marketing, admin, lms, store, ultimate-worker, studio-browser]
 permissions:
   contents: read
   id-token: write
@@ -17,16 +13,17 @@ concurrency:
   group: google-runtime-operations
   cancel-in-progress: false
 jobs:
-  stage:
+  import:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - run: node --test scripts/gcp/runtime-config.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -35,10 +32,10 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
-      - name: Verify runner-supplied Google SDK compatibility
-        run: node scripts/gcp/verify-sdk.mjs
-      - name: Transfer runtime configuration and deploy private service
+      - run: node scripts/gcp/verify-sdk.mjs
+      - name: Import once and verify encrypted Google configuration
         env:
           COMPONENT: ${{ inputs.component }}
-          IMAGE_SHA: ${{ inputs.image_sha }}
-        run: node scripts/gcp/stage-web.mjs
+          NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+          NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID }}
+        run: node scripts/gcp/import-runtime-config.mjs

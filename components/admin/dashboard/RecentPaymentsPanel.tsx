@@ -8,7 +8,7 @@ interface Props {
 }
 
 const SOURCE_LABELS: Record<string, string> = {
-  stripe: 'Stripe',
+  billing: 'QuickBooks',
   barber: 'Barber',
   cosmetology: 'Cosmetology',
   barber_recurring: 'Barber recurring',

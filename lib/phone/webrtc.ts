@@ -6,7 +6,7 @@ import { telnyxClient } from '@/lib/phone/telnyx';
 type DatabaseClient = any;
 
 export async function ensureWebrtcConnection(db: DatabaseClient, system: any, callerId: string) {
-  const client = telnyxClient();
+  const client = await telnyxClient();
   if (system.webrtc_connection_id) {
     try {
       const existing = await client.credentialConnections.retrieve(system.webrtc_connection_id);
@@ -82,7 +82,7 @@ export async function ensureDeviceCredential(input: {
   callerId: string;
 }) {
   const { db, system, extension, profileId, deviceId, callerId } = input;
-  const client = telnyxClient();
+  const client = await telnyxClient();
   const { data: stored } = await db
     .from('phone_webrtc_devices')
     .select('*')

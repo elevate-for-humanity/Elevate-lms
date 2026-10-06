@@ -5,6 +5,8 @@ import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { formatUsPhone, parseBusinessHours } from '@/lib/phone/config';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { telnyxClient } from '@/lib/phone/telnyx';
 import {
   CapabilityGuide,
   NewSystemNotice,
@@ -29,6 +31,7 @@ export const metadata: Metadata = { title: 'Communications Hub' };
 export default async function PhonePage() {
   const auth = await requireRole(PHONE_MANAGER_ROLES);
   const db = await requireAdminClient();
+  await hydrateProcessEnv();
   const tenantId = auth.profile.tenant_id ?? auth.profile.organization_id ?? null;
   const platformAdmin = auth.effectiveRoles.some(
     (role) => role === 'admin' || role === 'super_admin',
@@ -159,9 +162,27 @@ export default async function PhonePage() {
     ['Calls', callsResult.count ?? 0, Workflow],
     ['New voicemail', voicemailResult.count ?? 0, Voicemail],
   ] as const;
-  const carrierReady = numbers.some(
-    (number: any) => number.source === 'provider' && number.status === 'active',
-  );
+  let carrierRuntimeReady = false;
+  try {
+    const client = await telnyxClient();
+    const configuredNumber = process.env.TELNYX_PHONE_NUMBER?.trim();
+    if (configuredNumber) {
+      for await (const item of client.phoneNumbers.list({
+        filter: { phone_number: configuredNumber },
+        'page[size]': 20,
+      })) {
+        if (item.phone_number === configuredNumber) {
+          carrierRuntimeReady = true;
+          break;
+        }
+      }
+    }
+  } catch {
+    carrierRuntimeReady = false;
+  }
+  const carrierReady =
+    carrierRuntimeReady &&
+    numbers.some((number: any) => number.source === 'provider' && number.status === 'active');
   const meetingReady = workspaceResult.data?.status === 'active';
   const primaryNumber = numbers.find(
     (number: any) =>

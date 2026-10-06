@@ -774,7 +774,7 @@ async function handleEvent(
 ) {
   const { event_type: type, id: eventId } = event.data;
   const payload = event.data.payload;
-  const client = telnyxClient();
+  const client = await telnyxClient();
 
   if (['call.gather.ended', 'call.ai_gather.ended'].includes(type) &&
       (call?.ended_at || ['call_hangup', 'cancelled', 'cancelled_amd'].includes(String(payload.status)))) return;

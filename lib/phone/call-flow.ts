@@ -1,6 +1,6 @@
 /** Pure decisions shared by the signed Telnyx webhook and its regression tests. */
-export const PHONE_VOICE = 'Telnyx.KokoroTTS.af';
-export const RECOVERY_VOICE = 'AWS.Polly.Joanna';
+// Use one clear production voice for menus, names, extensions, and recovery so\n// callers do not hear abrupt voice changes or unclear proper-name pronunciation.\nexport const PHONE_VOICE = 'AWS.Polly.Joanna';
+export const RECOVERY_VOICE = PHONE_VOICE;
 export const MENU_INPUT = {
   minimum_digits: 1,
   maximum_digits: 1,
@@ -17,8 +17,11 @@ export function directoryPages(entries: DirectoryEntry[]): string[] {
     // Bound each utterance, never the number of people in the directory.
     const name = String(entry.display_name || 'Staff member').slice(0, 120);
     const department = String(entry.department || '').slice(0, 160);
-    const number = String(entry.extension).split('').join(' ');
-    const line = `${name}${department ? `, ${department}` : ''}. Extension ${number}.`;
+    const number = String(entry.extension).replace(/[^0-9]/g, '');
+    // Keep each directory entry as one compact phrase. TTS naturally reads a
+    // short numeric extension without the artificial inter-digit pauses that
+    // were caused by inserting spaces between every digit.
+    const line = `${name}${department ? `, ${department}` : ''}, extension ${number}.`;
     if (page && page.length + line.length + 1 > 500) {
       pages.push(page);
       page = '';

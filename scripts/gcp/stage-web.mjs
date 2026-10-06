@@ -1,4 +1,5 @@
 import { loadGoogleConfig } from './runtime-config.mjs';
+import { resolveStoreDatabase } from './store-runtime.mjs';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -29,7 +30,8 @@ async function main() {
   const component = process.env.COMPONENT;
   const sha = process.env.IMAGE_SHA;
   if (!['marketing', 'admin', 'lms', 'store'].includes(component) || !/^[a-f0-9]{40}$/.test(sha ?? '')) throw new Error('Invalid component or image SHA');
-  const config = loadGoogleConfig(component);
+  const owned = loadGoogleConfig(component);
+  const config = component === 'store' ? resolveStoreDatabase(owned, loadGoogleConfig('marketing')) : owned;
   const vars = runtimeForGoogle(config, { volumes: config.volumes });
   const dir = mkdtempSync(join(tmpdir(), 'elevate-runtime-'));
   function gcloud(args) {

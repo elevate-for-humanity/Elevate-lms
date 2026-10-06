@@ -1,6 +1,16 @@
 name: Deploy repaired Google services
 on:
   workflow_dispatch:
+    inputs:
+      component:
+        description: Service to update; other services keep their current images
+        type: choice
+        required: true
+        options: [marketing, admin, lms, all]
+      image_sha:
+        description: Full commit SHA of the successfully uploaded image
+        type: string
+        required: true
 permissions:
   contents: read
   id-token: write
@@ -64,7 +74,7 @@ jobs:
       max-parallel: 1
       fail-fast: true
       matrix:
-        component: [marketing, admin, lms]
+        component: ${{ fromJSON(inputs.component == 'all' && '["marketing","admin","lms"]' || format('["{0}"]', inputs.component)) }}
     concurrency:
       group: google-stage-${{ matrix.component }}
       cancel-in-progress: false
@@ -78,13 +88,15 @@ jobs:
       - name: Update only the image of the existing migration service
         env:
           COMPONENT: ${{ matrix.component }}
+          IMAGE_SHA: ${{ inputs.image_sha }}
         shell: bash
         run: |
           set -euo pipefail
           PROJECT=elegant-racer-299721
           SERVICE="elevate-$COMPONENT-migration"
           IMAGE="us-central1-docker.pkg.dev/$PROJECT/elevate/$COMPONENT"
-          SHA=3e9d4ff2d4cfd57e8481a9469315cad907acf67b
+          SHA="$IMAGE_SHA"
+          [[ "$SHA" =~ ^[a-f0-9]{40}$ ]]
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='value(metadata.name)'
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
@@ -102,6 +114,7 @@ jobs:
         env:
           TOKEN: ${{ steps.health_auth.outputs.id_token }}
           COMPONENT: ${{ matrix.component }}
+          IMAGE_SHA: ${{ inputs.image_sha }}
         shell: bash
         run: |
           set -euo pipefail
@@ -128,7 +141,7 @@ jobs:
               ready:body.ready===true, supabase:dependency?.ok===true,
               dependencyStatus:dependency?.status, dependencyLatencyMs:dependency?.latencyMs,
               dependencyTimeout:dependency?.error==='TimeoutError',
-              correctCommit:body.commit==='3e9d4ff2d4cfd57e8481a9469315cad907acf67b'};
+              correctCommit:body.commit===process.env.IMAGE_SHA};
             console.log(JSON.stringify(result));
             const passed=response.status===200 && result.correctService && result.healthy &&
               result.ready && result.supabase && result.correctCommit;
@@ -153,7 +166,7 @@ jobs:
           const readiness=await readinessResponse.json();
           const readyResult={component,httpStatus:readinessResponse.status,ready:readiness.ready===true,
             correctService:readiness.service===component,
-            correctCommit:readiness.commit==='3e9d4ff2d4cfd57e8481a9469315cad907acf67b',
+            correctCommit:readiness.commit===process.env.IMAGE_SHA,
             executorReady:component!=='admin' || readiness.agenticExecutorReady===true};
           console.log(JSON.stringify(readyResult));
           if(readinessResponse.status!==200 || !readyResult.ready || !readyResult.correctService ||

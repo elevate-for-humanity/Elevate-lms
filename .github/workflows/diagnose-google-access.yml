@@ -1,0 +1,47 @@
+name: Diagnose and prepare Google migration access
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: google-runtime-operations
+  cancel-in-progress: false
+jobs:
+  diagnose:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: node scripts/gcp/verify-sdk.mjs
+      - name: Enable metadata inspection API
+        run: gcloud services enable cloudresourcemanager.googleapis.com iam.googleapis.com --project=elegant-racer-299721 --quiet
+      - name: Check every boundary and actual project IAM permissions
+        run: node scripts/gcp/diagnose-access.mjs
+      - name: Attempt authorized scoped preparation
+        run: |
+          if node --input-type=module -e "import fs from 'node:fs'; process.exit(JSON.parse(fs.readFileSync('google-access-diagnostic.json')).canPrepareAccess ? 0 : 1)"; then
+            bash scripts/gcp/prepare-inventory-access.sh
+            bash scripts/gcp/bootstrap-runtime-config.sh
+          else
+            echo 'Google did not report the required IAM grant permissions. See google-access-diagnostic.json for each tested permission.'
+            exit 1
+          fi
+      - name: Verify access after preparation
+        run: node scripts/gcp/inventory-google-ownership.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: google-access-diagnostic
+          path: |
+            google-access-diagnostic.json
+            google-ownership-inventory.json
+          if-no-files-found: warn

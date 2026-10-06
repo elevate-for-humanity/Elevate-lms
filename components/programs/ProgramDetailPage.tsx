@@ -54,6 +54,7 @@ import {
   sanitizePublicFundingText,
 } from '@/lib/programs/public-funding-copy';
 import { getVerifiedProgramFunding } from '@/lib/programs/funding-registry';
+import { resolveProgramFundingStatus } from '@/lib/programs/funding-visibility';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
@@ -93,10 +94,8 @@ export default function ProgramDetailPage({
   const primaryCTA = getPrimaryCTA(p);
   const enrollmentTracks = getEnrollmentTracks(p);
   const verifiedFunding = getVerifiedProgramFunding(p.slug);
-  const isWorkforceFunded = Boolean(
-    verifiedFunding?.etplListedFor2Exclusive &&
-    (verifiedFunding.wioaEligible || verifiedFunding.wrgEligible),
-  );
+  const fundingStatus = resolveProgramFundingStatus(p);
+  const isWorkforceFunded = fundingStatus.showWorkforceFundingProcess;
   const publicFundingOptions: FundingType[] = [
     ...(verifiedFunding?.wioaEligible ? (['wioa'] as const) : []),
     ...(verifiedFunding?.wrgEligible ? (['wrg'] as const) : []),
@@ -143,12 +142,7 @@ export default function ProgramDetailPage({
     }).toString()}`;
   const employerPartners = Array.isArray(p.employerPartners) ? p.employerPartners : [];
   const isTaxPreparationProgram = p.slug === 'tax-preparation';
-  const showPriorityFundingPath = [
-    'hvac-technician',
-    'cdl-training',
-    'business-administration',
-    'bookkeeping',
-  ].includes(p.slug);
+  const showPriorityFundingPath = isWorkforceFunded;
   const narrationCurriculum = p.curriculum
     .slice(0, 3)
     .map((module) => module.title)
@@ -246,7 +240,7 @@ export default function ProgramDetailPage({
             }
             // Fallback: plain image hero for programs without a banner entry
             return (
-              <div className="relative h-[clamp(520px,72svh,860px)] w-full overflow-hidden">
+              <div className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
                 {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
                 <Image
                   src={heroPosterSrc}
@@ -266,10 +260,10 @@ export default function ProgramDetailPage({
             <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
-                  Funding review available
+                  Free to those who qualify
                 </p>
                 <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">
-                  This training may be no-cost if you qualify.
+                  Workforce funding may cover your training if you qualify.
                 </h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-200 sm:text-base">
                   Apply first, then complete the required WorkOne or agency intake. Free training

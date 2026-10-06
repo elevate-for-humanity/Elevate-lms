@@ -2,14 +2,14 @@
 
 import { Check } from 'lucide-react';
 import Link from 'next/link';
-import { APP_STORE_PRODUCTS } from '@/lib/stripe/app-store-products';
+import { APP_STORE_PRODUCTS } from '@/lib/quickbooks/app-store-products';
 
 /**
  * In-App Pricing Screen
  *
  * IMPORTANT: This component is designed for app store compliance.
  * - Shows all pricing tiers
- * - Directs to external checkout (Stripe)
+ * - Directs to external checkout (QuickBooks)
  * - Uses approved language
  *
  * DO NOT modify pricing or wording without checking app store guidelines.

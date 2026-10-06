@@ -34,9 +34,17 @@ jobs:
           node --input-type=module <<'NODE'
           import { execFileSync } from 'node:child_process';
           const token=execFileSync('gcloud',['auth','print-access-token'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
-          const required = {'run.googleapis.com/cpu_allocation':32000,'run.googleapis.com/mem_allocation':68719476736};
-          // Three services x two instances, plus one service's old/new revision overlap.
+          const required = {'run.googleapis.com/cpu_allocation':16000,'run.googleapis.com/mem_allocation':34359738368};
+          // Three services x one instance, plus one service's old/new revision overlap.
           // This is the approved 4-vCPU/8-GiB web topology, not a worker capacity budget.
+          // This launch budget is valid only after all three services have been resized.
+          for(const component of ['marketing','admin','lms']) {
+            const service=JSON.parse(execFileSync('gcloud',['run','services','describe','elevate-'+component+'-migration','--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            const template=service.spec.template;
+            const resources=template.spec.containers[0].resources.limits;
+            if(resources.cpu!=='4' || resources.memory!=='8Gi' || template.metadata.annotations?.['autoscaling.knative.dev/maxScale']!=='1')
+              throw new Error(component+': run the sequential launch sizing workflow before deploying images');
+          }
           const limits = {};
           let pageToken='';
           do {
@@ -63,7 +71,7 @@ jobs:
             console.log(JSON.stringify({metric,available,required:needed,ok}));
             if(!ok) insufficient=true;
           }
-          if(insufficient) throw new Error('Regional quota cannot support the approved web capacity and serialized revision overlap. Request 32 vCPU and 64 GiB minimum before deployment; no service was changed.');
+          if(insufficient) throw new Error('Regional quota cannot support the approved web capacity and serialized revision overlap. Request 16 vCPU and 32 GiB minimum before deployment; no service was changed.');
           NODE
   deploy:
     needs: capacity
@@ -100,7 +108,7 @@ jobs:
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='value(metadata.name)'
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
-          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --cpu=4 --memory=8Gi --startup-probe='httpGet.path=/api/health,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' --quiet
+          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --cpu=4 --memory=8Gi --min-instances=1 --max-instances=1 --startup-probe='httpGet.path=/api/health,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' --quiet
       - uses: google-github-actions/auth@v3
         id: health_auth
         with:

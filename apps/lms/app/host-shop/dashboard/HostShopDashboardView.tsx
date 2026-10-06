@@ -216,7 +216,9 @@ export default async function HostShopDashboardView() {
     ? board.registeredPrograms
         .map(
           (program) =>
-            `${program.rapidsCode}: ${program.competencyCount} competencies / ${program.rtiHours} RTI`,
+            program.progressModel === 'hybrid'
+              ? `${program.rapidsCode}: ${program.hours?.toLocaleString()}–${program.maxHours?.toLocaleString()} OJL hours / ${program.rtiHours} RTI hours / required work processes`
+              : `${program.rapidsCode}: ${program.competencyCount} competencies / ${program.rtiHours} RTI hours`,
         )
         .join(' · ')
     : timeBasedCount

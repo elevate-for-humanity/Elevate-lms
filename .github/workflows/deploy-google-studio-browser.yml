@@ -1,42 +1,34 @@
-name: Stage web service on Google
+name: Deploy Studio Browser to Google
 on:
   workflow_dispatch:
     inputs:
-      component:
-        type: choice
-        required: true
-        options: [marketing, admin, lms, store]
       image_sha:
-        description: Full commit SHA of an image already uploaded to Google
         required: true
         type: string
 permissions:
   contents: read
   id-token: write
 concurrency:
-  group: google-stage-${{ inputs.component }}
+  group: google-studio-browser
   cancel-in-progress: false
 jobs:
-  stage:
+  deploy:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+        with: {node-version: '22'}
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
-      - name: Transfer runtime configuration and deploy private service
+      - name: Reconcile stateful Studio runtime
         env:
-          COMPONENT: ${{ inputs.component }}
           IMAGE_SHA: ${{ inputs.image_sha }}
           NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
-          NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID }}
-        run: node scripts/gcp/stage-web.mjs
+        run: node scripts/gcp/deploy-studio-browser.mjs

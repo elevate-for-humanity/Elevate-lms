@@ -54,13 +54,10 @@ export async function GET(request: NextRequest, context: RouteContext) {
       lastActiveAt: new Date(),
     };
 
-    const [moduleRows, lessonRows, competencyRows, certificationRow, exams, apprenticeshipRow] = await Promise.all([
+    const [moduleRows, lessonRows, competencyRows, exams, apprenticeshipRow] = await Promise.all([
       supabase.from('module_progress').select('*').eq('learner_id', user!.id).eq('course_id', enrollment.course_id),
       supabase.from('lesson_progress').select('*').eq('learner_id', user!.id).eq('course_id', enrollment.course_id),
       supabase.from('competency_progress').select('*').eq('learner_id', user!.id).eq('course_id', enrollment.course_id),
-      blueprint.certificationPathway
-        ? supabase.from('certification_readiness').select('*').eq('learner_id', user!.id).eq('certification_id', blueprint.certificationPathway.certificationBodyId).single()
-        : Promise.resolve({ data: null }),
       supabase.from('practice_exams').select('*').eq('program_id', course.program_id).eq('is_active', true),
       enrollment.enrollment_type === 'apprentice'
         ? supabase.from('apprenticeship_progress').select('*').eq('learner_id', user!.id).eq('enrollment_id', enrollment.id).single()
@@ -75,7 +72,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       buildModuleProgress(blueprint, moduleRows.data || []),
       buildLessonProgress(blueprint, lessonRows.data || []),
       buildCompetencyProgress(blueprint, competencyRows.data || []),
-      certificationRow.data as CertificationReadiness | undefined,
+      undefined as CertificationReadiness | undefined,
       (exams.data || []) as PracticeExam[],
       apprenticeshipRow.data as ApprenticeshipProgress | undefined,
     );

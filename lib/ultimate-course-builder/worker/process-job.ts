@@ -95,6 +95,14 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       await runtime.persistence.updateBuild({buildId:build.id,status:'built',currentStep:'credential_release'});
       await new UltimateReleaseService(db).publish(build.id, releaseActor);
     }
+    if (targeted) {
+      // A lesson acceptance/repair job does not complete or publish the course.
+      // There is no continuation lease after this job, so do not leave the
+      // course claiming to be running while the remaining work is idle.
+      await runtime.persistence.updateBuild({
+        buildId: build.id, status: 'blocked', currentStep: 'selective_repair',
+      });
+    }
     await queue.complete(job.id, workerId);
     return { claimed: true, completed: true, jobId: job.id, result };
   } catch (error) {

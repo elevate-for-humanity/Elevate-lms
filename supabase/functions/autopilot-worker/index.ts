@@ -5,6 +5,21 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const AUTOPILOT_SECRET = Deno.env.get('AUTOPILOT_SECRET')!;
 const SLACK_WEBHOOK_URL = Deno.env.get('SLACK_WEBHOOK_URL') || '';
+const GOOGLE_DEPLOY_WEBHOOK_URL = Deno.env.get('GOOGLE_DEPLOY_WEBHOOK_URL') || '';
+const GOOGLE_DEPLOY_WEBHOOK_SECRET = Deno.env.get('GOOGLE_DEPLOY_WEBHOOK_SECRET') || '';
+
+async function triggerGoogleDeployment(serviceId: string) {
+  if (!GOOGLE_DEPLOY_WEBHOOK_URL || !GOOGLE_DEPLOY_WEBHOOK_SECRET) {
+    throw new Error('Google deployment webhook is not configured');
+  }
+  const response = await fetch(GOOGLE_DEPLOY_WEBHOOK_URL, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','Authorization':`Bearer ${GOOGLE_DEPLOY_WEBHOOK_SECRET}`},
+    body: JSON.stringify({service:serviceId, source:'supabase-autopilot'}),
+  });
+  if (!response.ok) throw new Error(`Google deployment trigger failed for ${serviceId}: ${response.status}`);
+  return response.json().catch(()=>({}));
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -158,8 +173,8 @@ async function runTask(task: any) {
 
       case 'redeploy': {
         const [lmsRes, adminRes] = await Promise.allSettled([
-          triggerGoogleDeployment(NORTHFLANK_LMS_SERVICE_ID),
-          triggerGoogleDeployment(NORTHFLANK_ADMIN_SERVICE_ID),
+          triggerGoogleDeployment('lms'),
+          triggerGoogleDeployment('admin'),
         ]);
         const lmsOk = lmsRes.status === 'fulfilled';
         const adminOk = adminRes.status === 'fulfilled';

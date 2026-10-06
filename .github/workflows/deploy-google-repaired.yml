@@ -117,7 +117,7 @@ jobs:
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='value(metadata.name)'
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
-          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --cpu=4 --memory=8Gi --min-instances=1 --max-instances=1 --startup-probe='httpGet.path=/api/health,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' --quiet
+          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --cpu=4 --memory=8Gi --min-instances=1 --max-instances=1 --startup-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' --liveness-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=3,periodSeconds=30,timeoutSeconds=5' --quiet
       - uses: google-github-actions/auth@v3
         id: health_auth
         with:

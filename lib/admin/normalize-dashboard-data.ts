@@ -47,15 +47,15 @@ const FALLBACK_OPERATIONAL: OperationalCounts = {
 };
 
 const FALLBACK_SYSTEM_HEALTH: AdminDashboardData['systemHealth'] = {
-  stripeWebhookOk: true,
-  stripeIssuingOk: true,
-  buildEnvOk: true,
+  quickBooksWebhookOk: false,
+  quickBooksBillingOk: false,
+  buildEnvOk: false,
   staleJobs: 0,
-  degraded: false,
+  degraded: true,
   missingDocuments: 0,
   missingCertifications: 0,
   unresolvedFlags: 0,
-  alerts: [],
+  alerts: [{ code: 'system_health_unavailable', severity: 'warning', message: 'System health status is unavailable.' }],
 };
 
 const FALLBACK_COUNTS: DashboardCounts = {
@@ -118,6 +118,7 @@ function normalizeOperational(
 function normalizeSystemHealth(
   health: Partial<AdminDashboardData['systemHealth']> | null | undefined,
 ): AdminDashboardData['systemHealth'] {
+  if (!health) return { ...FALLBACK_SYSTEM_HEALTH, alerts: [...FALLBACK_SYSTEM_HEALTH.alerts] };
   const raw = health ?? {};
   const alerts = asObjectArray(raw.alerts).map((alert) => ({
     code: typeof alert.code === 'string' ? alert.code : 'unknown',
@@ -128,8 +129,8 @@ function normalizeSystemHealth(
     message: typeof alert.message === 'string' ? alert.message : 'System health alert',
   }));
   return {
-    stripeWebhookOk: raw.stripeWebhookOk === true,
-    stripeIssuingOk: raw.stripeIssuingOk === true,
+    quickBooksWebhookOk: raw.quickBooksWebhookOk === true,
+    quickBooksBillingOk: raw.quickBooksBillingOk === true,
     buildEnvOk: raw.buildEnvOk === true,
     staleJobs: asCount(raw.staleJobs, FALLBACK_SYSTEM_HEALTH.staleJobs),
     degraded: raw.degraded === true || alerts.some((a) => a.severity === 'critical'),

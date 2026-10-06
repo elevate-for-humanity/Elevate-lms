@@ -2,6 +2,20 @@ import { describe, expect, it } from 'vitest';
 import { normalizeAdminDashboardData } from '@/lib/admin/normalize-dashboard-data';
 
 describe('normalizeAdminDashboardData', () => {
+  it('preserves live QuickBooks health and does not report an absent health source as healthy', () => {
+    const missing = normalizeAdminDashboardData(null).systemHealth;
+    expect(missing.quickBooksWebhookOk).toBe(false);
+    expect(missing.quickBooksBillingOk).toBe(false);
+    expect(missing.degraded).toBe(true);
+    const health = normalizeAdminDashboardData({ systemHealth: {
+      quickBooksWebhookOk: true, quickBooksBillingOk: false, buildEnvOk: true,
+      staleJobs: 0, degraded: true, missingDocuments: 0, missingCertifications: 0,
+      unresolvedFlags: 0, alerts: [],
+    } }).systemHealth;
+    expect(health.quickBooksWebhookOk).toBe(true);
+    expect(health.quickBooksBillingOk).toBe(false);
+    expect(health).not.toHaveProperty('stripeWebhookOk');
+  });
   it('fills missing arrays and coerces array counts to numbers', () => {
     const normalized = normalizeAdminDashboardData({
       counts: {

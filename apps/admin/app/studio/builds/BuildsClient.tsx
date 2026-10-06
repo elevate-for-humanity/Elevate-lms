@@ -19,7 +19,9 @@ export default function BuildsClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [triggering, setTriggering] = useState(false);
-  const [northflankConfigured, setNorthflankConfigured] = useState(false);
+  const [googleConfigured, setGoogleConfigured] = useState(false);
+  const [imageSha, setImageSha] = useState('');
+  const [notice, setNotice] = useState<string | null>(null);
 
   async function fetchBuilds() {
     setLoading(true);
@@ -28,7 +30,7 @@ export default function BuildsClient() {
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
       setBuilds(json.builds ?? []);
-      setNorthflankConfigured(json.northflankConfigured === true);
+      setGoogleConfigured(json.googleConfigured === true);
       setError(null);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to load');
@@ -37,18 +39,23 @@ export default function BuildsClient() {
     }
   }
 
-  async function triggerBuild(service: string) {
-    if (!northflankConfigured) return;
-    if (!window.confirm(`Deploy ${service} to production?`)) return;
+  async function triggerBuild(service: string, action: 'build' | 'deploy' = 'build') {
+    if (!googleConfigured) return;
+    if (action === 'deploy' && !/^[a-f0-9]{40}$/.test(imageSha)) {
+      setError('Enter the full commit SHA from a successfully uploaded Google image.');
+      return;
+    }
+    if (!window.confirm(`${action === 'build' ? 'Build' : 'Deploy'} ${service} on Google?`)) return;
     setTriggering(true);
     try {
       const response = await fetch('/api/admin/dev-studio/builds', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ service, confirmation: 'CONFIRM DEPLOY' }),
+        body: JSON.stringify({ service, action, image_sha: imageSha, confirmation: 'CONFIRM DEPLOY' }),
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'Deployment could not be started.');
+      setNotice(payload.message || 'Google workflow queued; completion is pending verification.');
       await fetchBuilds();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Deployment could not be started.');
@@ -93,7 +100,7 @@ export default function BuildsClient() {
               Builds & Deploy
             </h1>
             <p className="text-amber-100 text-lg mt-2 max-w-2xl">
-              Trigger, monitor, and track Northflank deployments in real time.
+              Build and deploy through the Google release workflows.
             </p>
           </div>
         </div>
@@ -105,17 +112,17 @@ export default function BuildsClient() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => triggerBuild('admin')}
-              disabled={triggering || !northflankConfigured}
+              disabled={triggering || !googleConfigured}
               className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:opacity-50 transition shadow-sm"
             >
-              <Play className="h-4 w-4" /> Deploy Admin
+              <Play className="h-4 w-4" /> Build Admin
             </button>
             <button
               onClick={() => triggerBuild('lms')}
-              disabled={triggering || !northflankConfigured}
+              disabled={triggering || !googleConfigured}
               className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-50 transition shadow-sm"
             >
-              <Play className="h-4 w-4" /> Deploy LMS
+              <Play className="h-4 w-4" /> Build LMS
             </button>
           </div>
           <button
@@ -126,9 +133,26 @@ export default function BuildsClient() {
           </button>
         </div>
 
-        {!northflankConfigured && (
+        <div className="mb-6 rounded-xl border border-slate-200 p-4">
+          <label htmlFor="google-image-sha" className="text-sm font-semibold text-slate-900">Uploaded image commit SHA</label>
+          <input id="google-image-sha" value={imageSha} onChange={event => setImageSha(event.target.value.trim())}
+            className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm"
+            placeholder="Full 40-character SHA from a successful Google image build" />
+          <div className="mt-3 flex flex-wrap gap-3">
+            {['admin', 'lms'].map(service => <button key={service} onClick={() => triggerBuild(service, 'deploy')}
+              disabled={triggering || !googleConfigured || !/^[a-f0-9]{40}$/.test(imageSha)}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold capitalize text-white disabled:opacity-50">
+              Deploy {service}
+            </button>)}
+          </div>
+          <p className="mt-2 text-xs text-slate-500">Google verifies the image digest and live readiness before reporting deployment success.</p>
+        </div>
+
+        {notice && <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">{notice}</div>}
+
+        {!googleConfigured && (
           <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-700 mb-6">
-            Deployment is disabled until NORTHFLANK_API_TOKEN and NORTHFLANK_PROJECT_ID are configured.
+            Google workflow access is unavailable. Configure the Admin service’s GitHub deployment credential.
           </div>
         )}
 

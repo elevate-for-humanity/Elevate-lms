@@ -125,7 +125,7 @@ export interface CTALinks {
   careerConnectHref?: string;
   advisorHref?: string;
   courseHref?: string;
-  stripeCheckoutHref?: string;
+  quickbooksCheckoutHref?: string;
 }
 
 export interface ProgramSchema {

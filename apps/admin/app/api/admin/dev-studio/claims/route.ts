@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
         evidence_url: evidenceUrl,
         evidence_summary: evidenceSummary,
         value_text: body.value_text ? String(body.value_text) : null,
-        source: claimKey === 'soc2_certified' ? 'external-auditor' : 'northflank-runtime',
+        source: claimKey === 'soc2_certified' ? 'external-auditor' : 'google-runtime',
         verified_at: new Date().toISOString(),
         verified_by: auth.id,
         expires_at: body.expires_at ? String(body.expires_at) : null,

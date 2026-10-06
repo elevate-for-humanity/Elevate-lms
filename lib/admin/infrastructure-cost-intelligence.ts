@@ -144,7 +144,7 @@ export async function getInfrastructureCostIntelligence(
   const generatedAt = new Date();
   const since = new Date(generatedAt.getTime() - windowDays * DAY_MS).toISOString();
   const rate = finiteNonNegative(
-    process.env.process.env.GPU_COST_PER_HOUR,
+    process.env.GPU_COST_PER_HOUR,
   );
 
   const [usageResult, jobsResult, gpuReadyResult] = await Promise.all([
@@ -219,7 +219,7 @@ export async function getInfrastructureCostIntelligence(
       estimatedWindowCost,
       estimatedFailedAttemptCost,
     },
-    google: { configured: northflankConfigured, services },
+    google: { configured: googleConfigured, services },
     recommendations,
   };
 }

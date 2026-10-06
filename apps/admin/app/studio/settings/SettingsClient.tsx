@@ -14,7 +14,7 @@ interface HealthStatus {
   hasGitHub: boolean;
   aiConfigured: boolean;
   execution?: { mode?: string; ready?: boolean; legacyShellRemoved?: boolean };
-  northflank?: { ready?: boolean; tokenPresent?: boolean; projectIdPresent?: boolean };
+  google?: { ready?: boolean; tokenPresent?: boolean; projectIdPresent?: boolean };
 }
 
 interface HealthCheck {
@@ -115,7 +115,7 @@ export default function SettingsClient() {
       const allHealthy =
         probed && services.every((service: { healthy?: boolean }) => service.healthy === true);
       results.push({
-        name: 'Northflank',
+        name: 'Google Cloud',
         status: allHealthy ? 'healthy' : probed ? 'degraded' : 'offline',
         detail: allHealthy
           ? `${services.length} service health probes passed`
@@ -123,13 +123,13 @@ export default function SettingsClient() {
             ? 'Configured, but one or more service probes are not healthy'
             : 'No services returned by the canonical service endpoint',
       });
-    } catch (northflankError) {
+    } catch (googleError) {
       results.push({
-        name: 'Northflank',
+        name: 'Google Cloud',
         status: 'offline',
         detail:
-          northflankError instanceof Error
-            ? northflankError.message
+          googleError instanceof Error
+            ? googleError.message
             : 'Unable to reach service API',
       });
     }
@@ -251,7 +251,7 @@ export default function SettingsClient() {
             </div>
             <div className="rounded-xl bg-white border border-slate-200 p-4">
               <p className="text-xs text-slate-500 mb-1">Platform</p>
-              <p className="font-mono text-sm font-bold text-slate-700">Northflank</p>
+              <p className="font-mono text-sm font-bold text-slate-700">Google Cloud</p>
               <p className="text-xs text-slate-400 mt-1">Docker + CI/CD</p>
             </div>
           </div>

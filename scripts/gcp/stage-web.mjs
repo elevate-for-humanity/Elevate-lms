@@ -1,3 +1,4 @@
+import { loadGoogleConfig } from './runtime-config.mjs';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -28,22 +29,8 @@ async function main() {
   const component = process.env.COMPONENT;
   const sha = process.env.IMAGE_SHA;
   if (!['marketing', 'admin', 'lms', 'store'].includes(component) || !/^[a-f0-9]{40}$/.test(sha ?? '')) throw new Error('Invalid component or image SHA');
-  const token = process.env.NORTHFLANK_API_TOKEN;
-  if (!token) throw new Error('Northflank connection missing');
-  const project = encodeURIComponent(process.env.NORTHFLANK_PROJECT_ID || 'elevate-platform');
-  const sourceService = component === 'store' ? 'elevate-store' : `elevate-${component}`;
-  const base = `https://api.northflank.com/v1/projects/${project}/services/${sourceService}`;
-  async function get(url) {
-    const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(30000) });
-    if (!response.ok) throw new Error(`Source configuration returned HTTP ${response.status}`);
-    let json;
-    try { json = await response.json(); } catch { throw new Error('Source configuration returned invalid JSON'); }
-    return json.data ?? json;
-  }
-  const service = await get(base);
-  // Compatibility endpoint explicitly resolves inherited secret groups/templates.
-  const source = await get(`${base}/runtime-environment?show=all&replaceTemplatedValues=true`);
-  const vars = runtimeForGoogle(source, service);
+  const config = loadGoogleConfig(component);
+  const vars = runtimeForGoogle(config, { volumes: config.volumes });
   const dir = mkdtempSync(join(tmpdir(), 'elevate-runtime-'));
   function gcloud(args) {
     const result = spawnSync('gcloud', args, { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 });
@@ -61,7 +48,7 @@ async function main() {
     const name = `elevate-${component}-migration`;
     const existing = gcloud(['run', 'services', 'list', '--project', projectId, '--region', 'us-central1', `--filter=metadata.name=${name}`, '--format=value(metadata.name)']);
     if (existing) throw new Error('Migration service already exists; review its revision and IAM before updating');
-    gcloud(['run', 'deploy', name, '--project', projectId, '--region', 'us-central1', '--image', `${image}@${digest}`, '--service-account', `elevate-${component}-runtime@${projectId}.iam.gserviceaccount.com`, '--port', '3000', '--cpu', '4', '--memory', '8Gi', '--min-instances', '0', '--max-instances', '2', '--concurrency', '20', '--timeout', '300', '--startup-probe', 'httpGet.path=/api/health,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5', '--env-vars-file', envFile, '--quiet']);
+    gcloud(['run', 'deploy', name, '--project', projectId, '--region', 'us-central1', '--image', `${image}@${digest}`, '--service-account', `elevate-${component}-runtime@${projectId}.iam.gserviceaccount.com`, '--port', '3000', '--cpu', '4', '--memory', '8Gi', '--min-instances', '0', '--max-instances', '2', '--concurrency', '20', '--timeout', '300', '--startup-probe', 'httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5', '--liveness-probe', 'httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=3,periodSeconds=30,timeoutSeconds=5', '--env-vars-file', envFile, '--quiet']);
     const url = gcloud(['run', 'services', 'describe', name, '--project', projectId, '--region', 'us-central1', '--format=value(status.url)']);
     if (!/^https:\/\/[a-z0-9.-]+\.run\.app$/.test(url)) throw new Error('Unexpected service URL');
     const summary = `Private ${component} service deployed: ${url}\nImage: ${image}@${digest}\nPublic IAM, application health, dependencies and DNS cutover remain unverified.\n`;

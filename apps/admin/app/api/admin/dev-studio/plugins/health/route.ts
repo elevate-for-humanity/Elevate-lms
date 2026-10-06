@@ -4,6 +4,7 @@ import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { gpuVideoAvailable } from '@/lib/video/gpu-video-client';
 import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
+import { getGoogleServices, getGoogleService } from '@/lib/google/runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,10 +21,9 @@ export async function GET(request: NextRequest) {
       probeCloudflareWorkersAI(),
     ]);
     const aiConfigured = aiRuntime.anyConfigured;
-    const northflankConfigured = Boolean(
-      (process.env.NORTHFLANK_API_TOKEN || process.env.NORTHFLANK_API_KEY) &&
-      process.env.NORTHFLANK_PROJECT_ID,
-    );
+    const googleReady = (await Promise.all(getGoogleServices().map(async service => {
+      try { return (await getGoogleService(service)).healthy; } catch { return false; }
+    }))).every(Boolean);
     const browserConfigured = Boolean(
       process.env.STUDIO_BROWSER_URL &&
       (process.env.STUDIO_BROWSER_PUBLIC_URL || process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL) &&
@@ -64,12 +64,12 @@ export async function GET(request: NextRequest) {
           : 'No governed AI provider is configured.',
       },
       {
-        name: 'northflank',
-        passed: northflankConfigured,
+        name: 'google-cloud',
+        passed: googleReady,
         required: false,
-        message: northflankConfigured
-          ? 'Northflank deployment control is configured.'
-          : 'Northflank deployment control is not configured.',
+        message: googleReady
+          ? 'Google application services are healthy.'
+          : 'Google application service health has not passed.',
       },
       {
         name: 'cloud-browser',

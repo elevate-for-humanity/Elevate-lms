@@ -48,8 +48,8 @@ function timeboxDashboardHealth(
 ): Promise<DashboardSystemHealth> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const fallback: DashboardSystemHealth = {
-    stripeWebhookOk: false,
-    stripeIssuingOk: false,
+    quickBooksWebhookOk: false,
+    quickBooksBillingOk: false,
     buildEnvOk: false,
     staleJobs: 0,
     degraded: true,

@@ -7,7 +7,7 @@ permissions:
 jobs:
   inspect:
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 10
     strategy:
@@ -15,6 +15,7 @@ jobs:
       matrix:
         component: [marketing, admin, lms]
     steps:
+      - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v3
         id: auth
         with:
@@ -25,6 +26,10 @@ jobs:
           id_token_audience: https://elevate-${{ matrix.component }}-migration-aabnh2y32a-uc.a.run.app
           id_token_include_email: true
       - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify runner-supplied Google SDK compatibility
+        run: node scripts/gcp/verify-sdk.mjs
       - name: Read readiness, public access, domain mappings and DNS
         env:
           COMPONENT: ${{ matrix.component }}
@@ -34,6 +39,8 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import { execFileSync } from 'node:child_process';
+          import { healthPassed } from './scripts/gcp/audit-runtime-parity.mjs';
+          let failed = false;
           const component=process.env.COMPONENT;
           const service='elevate-'+component+'-migration';
           const base='https://'+service+'-aabnh2y32a-uc.a.run.app';
@@ -57,7 +64,9 @@ jobs:
               report({component,path,status:r.status,contentType:r.headers.get('content-type'),
                 ready:b.ready,healthy:b.healthy,commit:b.commit,executorReady:b.agenticExecutorReady,
                 supabaseOK:b.dependencies?.supabase?.ok});
-            } catch {report({component,path,error:'probe_failed'});}
+              if (path !== '/' && !healthPassed(component,path,r.status,b)) failed=true;
+              if (path === '/' && ![200,302,303,307,308].includes(r.status)) failed=true;
+            } catch {report({component,path,error:'probe_failed'});failed=true;}
           }
           if(component==='marketing') {
             try {
@@ -74,4 +83,5 @@ jobs:
               }
             }
           }
+          if(failed) process.exitCode=1;
           NODE

@@ -286,7 +286,7 @@ export const CAPABILITY_CATALOG: PlatformCapability[] = [
     category: 'enterprise',
     description: 'Deployment, health, monitoring, rollback and operational automation tooling.',
     status: 'internal',
-    keywords: ['deployment', 'autopilot', 'northflank', 'rollback', 'monitoring'],
+    keywords: ['deployment', 'autopilot', 'google-cloud', 'rollback', 'monitoring'],
   },
 ];
 

@@ -20,7 +20,7 @@ concurrency:
 jobs:
   capacity:
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +30,10 @@ jobs:
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify runner-supplied Google SDK compatibility
+        run: node scripts/gcp/verify-sdk.mjs
       - name: Refuse an active course execution before changing runtime capacity
         run: |
           node --input-type=module <<'NODE'
@@ -85,23 +89,25 @@ jobs:
   deploy:
     needs: capacity
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       max-parallel: 1
       fail-fast: true
       matrix:
         component: ${{ fromJSON(inputs.component == 'all' && '["marketing","admin","lms"]' || format('["{0}"]', inputs.component)) }}
-    concurrency:
-      group: google-stage-${{ matrix.component }}
-      cancel-in-progress: false
     steps:
+      - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify runner-supplied Google SDK compatibility
+        run: node scripts/gcp/verify-sdk.mjs
       - name: Update only the image of the existing migration service
         env:
           COMPONENT: ${{ matrix.component }}
@@ -117,7 +123,7 @@ jobs:
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='value(metadata.name)'
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
-          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --cpu=4 --memory=8Gi --min-instances=1 --max-instances=1 --startup-probe='httpGet.path=/api/health,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' --quiet
+          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --cpu=4 --memory=8Gi --min-instances=1 --max-instances=1 --startup-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' --liveness-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=3,periodSeconds=30,timeoutSeconds=5' --quiet
       - uses: google-github-actions/auth@v3
         id: health_auth
         with:
@@ -202,6 +208,22 @@ jobs:
             if(qbResponse.status!==200 || !qbResult.quickBooksReady || !qbResult.quickBooksConfigured ||
                 !qbResult.quickBooksConnected || !qbResult.quickBooksWebhookVerifier)
               throw new Error('QuickBooks runtime is not synchronized with the Google deployment');
+          }
+          if(component==='admin') {
+            const telnyxResponse=await fetch('https://elevate-admin-migration-aabnh2y32a-uc.a.run.app/api/health/telnyx',{
+              headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
+              redirect:'manual',signal:AbortSignal.timeout(20000)
+            });
+            const telnyx=await telnyxResponse.json().catch(()=>({}));
+            const telnyxResult={component:'admin',telnyxHttpStatus:telnyxResponse.status,
+              telnyxReady:telnyx.ready===true,telnyxConfigured:telnyx.configured===true,
+              carrierNumberActive:telnyx.carrierNumberActive===true,
+              primaryNumberActive:telnyx.primaryNumberActive===true,
+              webrtcConfigured:telnyx.webrtcConfigured===true};
+            console.log(JSON.stringify(telnyxResult));
+            if(telnyxResponse.status!==200 || !telnyxResult.telnyxReady || !telnyxResult.telnyxConfigured ||
+                !telnyxResult.carrierNumberActive || !telnyxResult.primaryNumberActive || !telnyxResult.webrtcConfigured)
+              throw new Error('Telnyx runtime is not synchronized with the Google Admin deployment');
           }
           appendFileSync(process.env.GITHUB_STEP_SUMMARY,component+': dependency health and canonical readiness passed.\n');
 

@@ -164,8 +164,6 @@ interface Props {
     id: string;
     enrollment_state: string;
     orientation_completed_at?: string | null;
-    stripe_subscription_id?: string | null;
-    stripe_subscription_status?: string | null;
   } | null;
   hours: { ojl: number; rti: number };
   docs: { document_type: string; status: string; verification_status: string }[];
@@ -222,26 +220,29 @@ export function ApprenticePortalShell({
   const docsApproved =
     docs.length > 0 &&
     docs.every((d) => d.status === 'approved' || d.verification_status === 'verified');
-  const hasPaidEnrollment =
-    !!enrollment?.stripe_subscription_id || billing?.setupFeePaid || billing?.fullyPaid;
-  const subStatus = enrollment?.stripe_subscription_status ?? billing?.paymentStatus ?? null;
+  const hasPaidEnrollment = Boolean(
+    billing?.setupFeePaid || billing?.fullyPaid || billing?.paymentStatus === 'active',
+  );
+  const subStatus = billing?.paymentStatus ?? null;
   const weeklyPaymentLabel =
     billing?.weeklyPaymentCents != null && billing.weeklyPaymentCents > 0
       ? (billing.weeklyPaymentCents / 100).toFixed(2)
       : '151.03';
   const needsPaymentMethod =
     !!enrollment &&
+    billing !== null &&
     !billing?.fullyPaid &&
     (subStatus === 'pending_payment_method' ||
       subStatus === 'past_due' ||
       subStatus === 'incomplete' ||
       subStatus === 'incomplete_expired' ||
-      (!enrollment.stripe_subscription_id && !billing?.setupFeePaid));
+      (!billing?.setupFeePaid && billing?.paymentStatus !== 'active'));
   const showPaymentSetupAlert =
     !!enrollment &&
+    billing !== null &&
     !billing?.fullyPaid &&
-    !enrollment.stripe_subscription_id &&
-    !billing?.setupFeePaid;
+    !billing?.setupFeePaid &&
+    billing?.paymentStatus !== 'active';
   const transferCredit =
     transferHoursVerified != null && transferHoursVerified > 0
       ? transferHoursVerified
@@ -387,14 +388,14 @@ export function ApprenticePortalShell({
                   n: 1,
                   text: 'Click "Set Up Payment" above — you\'ll be taken to a secure Stripe page.',
                 },
-                { n: 2, text: 'Enter your debit or credit card number, expiration date, and CVC.' },
+                { n: 2, text: 'Complete the PayPal authorization steps shown on your billing page, or use the Pay Now link on an open QuickBooks invoice.' },
                 {
                   n: 3,
-                  text: 'Click "Save" — Stripe will verify your card. No charge happens yet.',
+                  text: 'Confirm the authorization only after reviewing the amount and billing schedule.',
                 },
                 {
                   n: 4,
-                  text: `Return here. Your first weekly payment of $${weeklyPaymentLabel} will process on the next billing date.`,
+                  text: `Return here after setup. Your billing page will show the next scheduled payment of ${weeklyPaymentLabel} when applicable.`,
                 },
               ].map(({ n, text }) => (
                 <li key={n} className="flex items-start gap-3 text-xs text-red-800">

@@ -1,5 +1,3 @@
-import { PRICES } from '@/lib/stripe/prices';
-
 /**
  * License Types and Pricing Tiers
  *
@@ -34,9 +32,9 @@ export interface License {
   trialStartedAt: Date | null;
   trialEndsAt: Date | null;
 
-  // Stripe integration
-  stripeCustomerId: string | null;
-  stripeSubscriptionId: string | null;
+  // Billing integration
+  billingCustomerId: string | null;
+  providerSubscriptionId: string | null;
 
   // Billing period
   currentPeriodStart: Date | null;
@@ -95,7 +93,7 @@ export interface PlanDefinition {
   price: number;
   priceDisplay: string;
   interval: 'month';
-  stripePriceId?: string;
+  billingProductKey?: string;
   trialDays: number;
   features: string[];
   limits: {
@@ -121,7 +119,6 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     price: 750,
     priceDisplay: '$750',
     interval: 'month',
-    stripePriceId: PRICES.CORE,
     trialDays: TRIAL_DAYS,
     features: [
       'Automated learner intake and eligibility screening',
@@ -152,7 +149,6 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     price: 2500,
     priceDisplay: '$2,500',
     interval: 'month',
-    stripePriceId: PRICES.INSTITUTIONAL,
     trialDays: TRIAL_DAYS,
     highlighted: true,
     features: [
@@ -184,7 +180,6 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     price: 8500,
     priceDisplay: '$8,500',
     interval: 'month',
-    stripePriceId: PRICES.ENTERPRISE,
     trialDays: 0,
     requiresContact: true,
     features: [

@@ -1,3 +1,4 @@
+import { siteUrls } from '@/lib/utils/site-urls';
 import { absoluteRoleDestination } from '@/lib/auth/absolute-role-destination';
 import {
   ROLE_ROUTE_CONFIG,
@@ -12,6 +13,16 @@ function firstPathSegment(path: string): string {
 }
 
 const STORE_ORIGIN = 'https://store.elevateforhumanity.org';
+
+/** Shared tools enforce their own subscription and site ownership after login. */
+export function isSharedPostLoginDestination(destination: string): boolean {
+  try {
+    const url = new URL(destination);
+    return (url.origin === STORE_ORIGIN && (url.pathname === '/store' || url.pathname.startsWith('/store/'))) ||
+      (url.origin === new URL(siteUrls.site).origin &&
+        (url.pathname === '/apps/website-builder' || url.pathname.startsWith('/apps/website-builder/')));
+  } catch { return false; }
+}
 
 const ROLE_OWNED_PREFIXES = new Set(
   Object.values(ROLE_ROUTE_CONFIG).map((config) => firstPathSegment(config.path)),
@@ -46,10 +57,7 @@ export function resolveRoleCompatiblePostLoginUrl(
     // The Store is a trusted shared buyer surface, not a role-owned portal.
     // A validated sign-in may return any role to a Store route without granting
     // access to a different role's dashboard.
-    if (
-      requestedUrl.origin === STORE_ORIGIN &&
-      (requestedUrl.pathname === '/store' || requestedUrl.pathname.startsWith('/store/'))
-    ) {
+    if (isSharedPostLoginDestination(requestedUrl.toString())) {
       return requestedUrl.toString();
     }
 

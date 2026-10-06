@@ -10,9 +10,10 @@ concurrency:
 jobs:
   verify:
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
+      - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -21,5 +22,9 @@ jobs:
           create_credentials_file: true
           export_environment_variables: true
       - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify runner-supplied Google SDK compatibility
+        run: node scripts/gcp/verify-sdk.mjs
       - name: Verify authenticated Cloud Run access
         run: gcloud run services list --project=elegant-racer-299721 --region=us-central1 --format='table(metadata.name,status.url)'

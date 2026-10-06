@@ -198,9 +198,9 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
     enrollmentTracks: undefined,
     cta: {
       ...program.cta,
-      stripeCheckoutHref: hasNumericSelfPayPrice(program)
-        ? '/api/checkout/program'
-        : program.cta.stripeCheckoutHref,
+      quickbooksCheckoutHref: hasNumericSelfPayPrice(program)
+        ? `/programs/${encodeURIComponent(program.slug)}/apply`
+        : program.cta.quickbooksCheckoutHref,
     },
   };
 }

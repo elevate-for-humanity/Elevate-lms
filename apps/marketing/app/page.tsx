@@ -1,12 +1,11 @@
-// Homepage sections are intentionally ordered from visual proof to pathways to action.
-// Funding/payment sales content belongs on funding and program pages, not the homepage.
+// Keep the homepage focused on training, the featured shops, and enrollment.
+// Detailed platform operations remain on the dedicated platform pages.
 import type { Metadata } from 'next';
 import { HomeTrustBar } from '@/components/home/HomeTrustBar';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
-import { HomePlatformOverview } from '@/components/home/HomePlatformOverview';
 import { HomeNetworks } from '@/components/home/HomeNetworks';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
@@ -40,30 +39,23 @@ export default function HomePage() {
   return (
     <>
       <StructuredData />
-      <main className="[&_a]:no-underline [&_a:hover]:no-underline">
+      <main data-homepage-curation="20261004" className="[&_a]:no-underline [&_a:hover]:no-underline">
         <h1 className="sr-only">Elevate for Humanity career training and apprenticeships</h1>
-        <section className="border-b border-amber-300 bg-amber-50 px-4 py-5" aria-labelledby="workone-home-cta">
+        <PlatformHubHero />
+        <HomeFeaturedHostShop />
+        <HomeCareerPathways />
+        <section className="border-y border-slate-200 bg-slate-50 px-4 py-6" aria-labelledby="workone-home-cta">
           <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-900">Funding intake</p>
-              <h2 id="workone-home-cta" className="mt-1 text-xl font-black text-slate-950 sm:text-2xl">Interested in possible funding for CDL, bookkeeping, business or HVAC training?</h2>
-              <p className="mt-1 max-w-3xl text-sm font-semibold leading-6 text-slate-700">Schedule your WorkOne intake appointment to begin the eligibility process. Funding is based on individual eligibility and program requirements.</p>
+              <h2 id="workone-home-cta" className="text-xl font-bold text-slate-950">Explore training funding</h2>
+              <p className="mt-2 max-w-2xl text-base leading-6 text-slate-700">CDL, bookkeeping, business and HVAC. Free to those who qualify; eligibility and program requirements apply.</p>
             </div>
-            <a
-              href={WORKONE_INDY_BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-slate-950 px-6 py-3 text-center font-black text-white hover:bg-slate-800"
-            >
+            <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-center text-sm font-bold text-white hover:bg-slate-800">
               Schedule WorkOne Appointment
             </a>
           </div>
         </section>
-        <PlatformHubHero />
-        <HomeFeaturedHostShop />
         <HomeNetworks />
-        <HomeCareerPathways />
-        <HomePlatformOverview />
         <HomeFinalCTA />
         <HomeTrustBar />
       </main>

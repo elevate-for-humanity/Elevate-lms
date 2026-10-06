@@ -292,6 +292,7 @@ async function _POST(request: NextRequest) {
           verification_basis: identity.basis,
           timestamp: new Date().toISOString(),
         });
+        await notifyAdminsOfClockInAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, successful: false, reason: 'Secure ID and selfie verification is incomplete.', code: 'IDENTITY_VERIFICATION_REQUIRED', attemptedAt: new Date().toISOString() });
         return NextResponse.json(
           { error: 'Complete secure ID and selfie verification before clock-in.', code: 'IDENTITY_VERIFICATION_REQUIRED' },
           { status: 403 },
@@ -469,6 +470,7 @@ async function _POST(request: NextRequest) {
         .limit(1)
         .maybeSingle();
       if (activeTheorySession) {
+        await notifyAdminsOfClockInAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: 'An active theory lesson blocked OJL clock-in.', code: 'THEORY_SESSION_ACTIVE', attemptedAt: serverNow });
         return NextResponse.json(
           {
             error: 'Close or pause the active theory lesson before clocking into OJL.',
@@ -503,6 +505,7 @@ async function _POST(request: NextRequest) {
         0,
       );
       if (weeklyOjlHours + weeklyTheoryHours >= APPRENTICE_TIME_POLICY.weeklyCombinedMaxHours) {
+        await notifyAdminsOfClockInAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: 'Combined weekly OJL and RTI limit reached.', code: 'WEEKLY_COMBINED_LIMIT_REACHED', attemptedAt: serverNow });
         return NextResponse.json(
           {
             error: `The ${APPRENTICE_TIME_POLICY.weeklyCombinedMaxHours}-hour combined weekly OJL and RTI limit has been reached. Clock-in is disabled until the next work week.`,
@@ -513,6 +516,7 @@ async function _POST(request: NextRequest) {
       }
 
       if (weeklyOjlHours >= APPRENTICE_TIME_POLICY.weeklyOjlMaxHours) {
+        await notifyAdminsOfClockInAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: 'Weekly OJL limit reached.', code: 'WEEKLY_OJL_LIMIT_REACHED', attemptedAt: serverNow });
         return NextResponse.json(
           {
             error: `The ${APPRENTICE_TIME_POLICY.weeklyOjlMaxHours}-hour weekly OJL limit has been reached.`,
@@ -565,6 +569,7 @@ async function _POST(request: NextRequest) {
           site_id,
           shop_id: site.shop_id,
         });
+        await notifyAdminsOfClockInAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: 'Training site is not connected to a program partner.', code: 'PARTNER_NOT_RESOLVED', attemptedAt: serverNow });
         return NextResponse.json(
           { error: 'This training site is not connected to a program partner. Contact support.' },
           { status: 409 },
@@ -625,6 +630,7 @@ async function _POST(request: NextRequest) {
           timestamp: serverNow,
         });
         logger.error('[Timeclock] clock_in insert failed', insertError);
+        await notifyAdminsOfClockInAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: insertError?.message || 'Clock-in persistence failed.', code: 'TIMECLOCK_PERSISTENCE_ERROR', attemptedAt: serverNow });
         return NextResponse.json({ error: 'Failed to clock in' }, { status: 500 });
       }
 

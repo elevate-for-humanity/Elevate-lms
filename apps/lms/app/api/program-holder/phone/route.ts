@@ -77,12 +77,18 @@ export async function GET() {
       { status: 404 },
     );
   }
-  const [{ data: inbox, error: inboxError }, { data: notificationPreferences, error: preferencesError }, { count: liveDevices }] = await Promise.all([
+  const [{ data: inbox, error: inboxError }, { data: voicemails, error: voicemailError }, { data: notificationPreferences, error: preferencesError }, { count: liveDevices }] = await Promise.all([
     ctx.db
       .from('phone_callback_tasks')
       .select(
         'id,source,caller_name,callback_number,reason,program_or_department,urgency,preferred_callback_time,transcript,summary,status,read_at,created_at,recording_url',
       )
+      .eq('assigned_profile_id', ctx.user.id)
+      .order('created_at', { ascending: false })
+      .limit(100),
+    ctx.db
+      .from('voicemails')
+      .select('id,call_id,phone_number,duration_seconds,is_read,status,transcription,summary,created_at,recording_url')
       .eq('assigned_profile_id', ctx.user.id)
       .order('created_at', { ascending: false })
       .limit(100),
@@ -104,6 +110,10 @@ export async function GET() {
   if (inboxError) {
     console.error('[program-holder/phone] callback inbox query failed', inboxError);
     warnings.push('Callback history is temporarily unavailable.');
+  }
+  if (voicemailError) {
+    console.error('[program-holder/phone] voicemail inbox query failed', voicemailError);
+    warnings.push('Voicemail history is temporarily unavailable.');
   }
   if (preferencesError) {
     console.error('[program-holder/phone] notification preferences query failed', preferencesError);
@@ -132,6 +142,17 @@ export async function GET() {
       externalFallbackEnabled: extension.admin_external_fallback === true,
       externalFallbackNumber: extension.external_fallback_number || '',
       presenceStatus: (liveDevices ?? 0) > 0 ? extension.presence_status : 'offline',
+    },
+    voicemail: {
+      unreadCount: (voicemails || []).filter((item: any) => !item.is_read).length,
+      items: (voicemails || []).map((item: any) => ({
+        ...item,
+        hasRecording: Boolean(item.recording_url),
+        recording_url: undefined,
+        recordingUrl: item.recording_url
+          ? `/api/program-holder/phone/voicemail/${item.id}/recording`
+          : null,
+      })),
     },
     inbox: (inbox || []).map((item: any) => ({
       ...item,

@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - resolveOwnedSite verifies the authenticated user and website ownership before any insert; its error result is returned immediately.
 import { NextRequest, NextResponse } from 'next/server';
 import { checkDomainPurchase, isDomaineeConfigured } from '@/lib/domainee/client';
 import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';

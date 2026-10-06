@@ -33,7 +33,6 @@ export async function fulfillPaidBillingInvoice(
         completed_at: new Date().toISOString(),
         metadata: {
           program_enrollment_id: payload.enrollment_id,
-          legacy_stripe_subscription_id: payload.legacy_stripe_subscription_id,
         },
       },
       { onConflict: 'billing_invoice_id' },
@@ -136,7 +135,6 @@ export async function fulfillPaidBillingInvoice(
           user_id: user.id,
           plan_id: planId,
           status: 'active',
-          stripe_subscription_id: null,
           metadata: {
             billing_provider: 'quickbooks',
             billing_invoice_id: job.billing_invoice_id,

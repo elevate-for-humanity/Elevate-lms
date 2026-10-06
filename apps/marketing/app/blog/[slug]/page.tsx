@@ -135,13 +135,14 @@ export default async function BlogPostPage({ params }: { params: Params }) {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
+        timeZone: 'UTC',
       })
     : 'Recently';
 
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Blog', href: '/blog' }, { label: '[Slug]' }]} />
+        <Breadcrumbs items={[{ label: 'Blog', href: '/blog' }, { label: post.title }]} />
       </div>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 flex items-end overflow-hidden">
@@ -160,6 +161,18 @@ export default async function BlogPostPage({ params }: { params: Params }) {
 
       {/* Content */}
       <article className="max-w-4xl mx-auto px-6 py-12">
+        <header className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-black">{post.title}</h1>
+          <p className="mt-4 text-slate-700">
+            {post.author_name} · <time dateTime={post.published_at}>{publishedDate}</time>
+          </p>
+          {post.id.startsWith('durable-') && (
+            <p className="mt-4 text-sm text-slate-600">
+              Originally published on our previous website. Program details and funding
+              availability may have changed; consult current program and funding guidance.
+            </p>
+          )}
+        </header>
         <div className="mb-8 pb-8 border-b border-slate-200">
           <SocialShare url={postUrl} title={post.title} description={post.excerpt} />
         </div>
@@ -250,6 +263,8 @@ export default async function BlogPostPage({ params }: { params: Params }) {
 
 function formatContent(content: string): string {
   if (!content) return '';
+  // Imported articles are already HTML; sanitization still runs at the render boundary.
+  if (/^\s*</.test(content)) return content;
 
   return content
     .replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold mt-8 mb-4">$1</h3>')

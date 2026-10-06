@@ -21,7 +21,7 @@ export function courseJobEnvironment(source, service) {
   result.ULTIMATE_WORKER_ONCE = 'true';
   result.AI_PROVIDER = 'none';
   result.AI_NARRATION_PROVIDER = 'kokoro';
-  environment.AI_TRANSCRIPTION_PROVIDER = 'local_whisper';
+  result.AI_TRANSCRIPTION_PROVIDER = 'local_whisper';
   return result;
 }
 

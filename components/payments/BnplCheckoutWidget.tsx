@@ -6,7 +6,7 @@
  * Standalone BNPL payment UI driven entirely by bnpl-config.ts.
  * No provider names are hardcoded here — add/remove providers in bnpl-config only.
  *
- * Active providers use their dedicated checkout routes. Stripe-native BNPL methods are retired.
+ * Active providers use their dedicated checkout routes. QuickBooks-native BNPL methods are retired.
  *
  * Usage:
  *   <BnplCheckoutWidget
@@ -32,11 +32,11 @@ import type { AffirmWindow } from '@/lib/types/external-sdks';
 export interface BnplCheckoutWidgetProps {
   /** Amount in cents */
   amountCents: number;
-  /** API route that returns { clientSecret } for Stripe EmbeddedCheckout */
+  /** API route that returns { clientSecret } for QuickBooks EmbeddedCheckout */
   checkoutEndpoint: string;
   /** Extra body fields forwarded to checkoutEndpoint */
   checkoutPayload?: Record<string, unknown>;
-  /** Called when Stripe EmbeddedCheckout completes (receives session_id) */
+  /** Called when QuickBooks EmbeddedCheckout completes (receives session_id) */
   onSuccess?: (sessionId: string) => void;
   /** Called when user cancels / closes the embedded checkout */
   onCancel?: () => void;

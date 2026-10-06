@@ -38,14 +38,6 @@ export const BARBER_PRICING = {
   remainingBalance: 4980 - _barberMinFee,
 } as const;
 
-// Stripe price IDs — resolved via centralized config (lib/stripe/prices.ts)
-import { PRICES } from '@/lib/stripe/prices';
-
-export const STRIPE_PRICES = {
-  barberSetupFee: PRICES.BARBER_SETUP_FEE,
-  barberWeeklyPayment: PRICES.BARBER_WEEKLY,
-} as const;
-
 export interface WeeklyPaymentCalculation {
   hoursRemaining: number;
   weeksRemaining: number;
@@ -108,7 +100,7 @@ export function getWeeklyPaymentExamples() {
 // ─── BOOTH RENTAL PRICING ────────────────────────────────────────────────────
 //
 // Weekly booth/suite rental rates for Elevate's barbershop.
-// Deposit = 1 week's rent, collected once at signup via Stripe before
+// Deposit = 1 week's rent, collected once at signup via billing provider before
 // the first weekly charge begins.
 //
 // Late fee policy:
@@ -128,8 +120,8 @@ export interface BoothRentalTier {
   weeklyRateCents: number;
   depositDollars: number; // 1 week's rent
   depositCents: number;
-  stripePriceKey: string; // key into PRICES for the weekly subscription
-  stripeDepositKey: string; // key into PRICES for the one-time deposit
+  billingProductKey: string; // canonical key for the weekly billing schedule
+  depositProductKey: string; // canonical key for the one-time deposit
 }
 
 export const BOOTH_RENTAL_TIERS: Record<BoothRentalDiscipline, BoothRentalTier> = {
@@ -141,8 +133,8 @@ export const BOOTH_RENTAL_TIERS: Record<BoothRentalDiscipline, BoothRentalTier> 
     weeklyRateCents: 15000,
     depositDollars: 150,
     depositCents: 15000,
-    stripePriceKey: 'BOOTH_BARBER_WEEKLY',
-    stripeDepositKey: 'BOOTH_BARBER_DEPOSIT',
+    billingProductKey: 'BOOTH_BARBER_WEEKLY',
+    depositProductKey: 'BOOTH_BARBER_DEPOSIT',
   },
   cosmetologist: {
     discipline: 'cosmetologist',
@@ -152,8 +144,8 @@ export const BOOTH_RENTAL_TIERS: Record<BoothRentalDiscipline, BoothRentalTier> 
     weeklyRateCents: 15000,
     depositDollars: 150,
     depositCents: 15000,
-    stripePriceKey: 'BOOTH_COSMO_WEEKLY',
-    stripeDepositKey: 'BOOTH_COSMO_DEPOSIT',
+    billingProductKey: 'BOOTH_COSMO_WEEKLY',
+    depositProductKey: 'BOOTH_COSMO_DEPOSIT',
   },
   nail_tech: {
     discipline: 'nail_tech',
@@ -163,8 +155,8 @@ export const BOOTH_RENTAL_TIERS: Record<BoothRentalDiscipline, BoothRentalTier> 
     weeklyRateCents: 15000,
     depositDollars: 150,
     depositCents: 15000,
-    stripePriceKey: 'BOOTH_NAIL_WEEKLY',
-    stripeDepositKey: 'BOOTH_NAIL_DEPOSIT',
+    billingProductKey: 'BOOTH_NAIL_WEEKLY',
+    depositProductKey: 'BOOTH_NAIL_DEPOSIT',
   },
   esthetician: {
     discipline: 'esthetician',
@@ -174,8 +166,8 @@ export const BOOTH_RENTAL_TIERS: Record<BoothRentalDiscipline, BoothRentalTier> 
     weeklyRateCents: 16000,
     depositDollars: 0, // no deposit for esthetician suite
     depositCents: 0,
-    stripePriceKey: 'BOOTH_ESTHI_WEEKLY',
-    stripeDepositKey: '', // no deposit charge
+    billingProductKey: 'BOOTH_ESTHI_WEEKLY',
+    depositProductKey: '', // no deposit charge
   },
 };
 
@@ -253,7 +245,7 @@ export function getNextFridayAnchor(): Date {
   nextFriday.setDate(nextFriday.getDate() + daysUntilFriday);
 
   // Set to 10:00 AM Indianapolis time
-  // Note: This creates a local time; Stripe will handle timezone conversion
+  // Note: This creates a local time; billing provider will handle timezone conversion
   nextFriday.setHours(BARBER_PRICING.billingHour, 0, 0, 0);
 
   return nextFriday;
@@ -273,7 +265,7 @@ export function formatFirstBillingDate(): string {
 }
 
 /**
- * Get billing cycle anchor as Unix timestamp for Stripe
+ * Get billing cycle anchor as Unix timestamp for billing provider
  */
 export function getBillingCycleAnchor(): number {
   return Math.floor(getNextFridayAnchor().getTime() / 1000);

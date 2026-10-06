@@ -24,7 +24,7 @@ async function _POST(request: NextRequest) {
       {
         ok: true,
         checkoutPath: '/store/plans',
-        message: 'Use POST /api/store/platform-checkout for Stripe checkout',
+        message: 'Use POST /api/store/platform-checkout for QuickBooks billing',
         redirectUrl: `${siteUrl}/store/plans?plan=${encodeURIComponent(String(planId))}`,
       },
       { status: 200 },

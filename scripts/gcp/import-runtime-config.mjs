@@ -4,6 +4,10 @@ import { configSecret, validateConfig, google, PROJECT } from './runtime-config.
 // One-time compatibility boundary. Deployment consumers never call Northflank.
 export async function importRuntimeConfig(component, { request = fetch, run = google, env = process.env } = {}) {
   const secret = configSecret(component);
+  const invoke = (phase, args, input) => {
+    try { return run(args, input); }
+    catch { throw new Error(`Runtime import failed at ${phase}`); }
+  };
   if (!env.NORTHFLANK_API_TOKEN) throw new Error('Source connection required for one-time import');
   const base = `https://api.northflank.com/v1/projects/${encodeURIComponent(env.NORTHFLANK_PROJECT_ID || 'elevate-platform')}/services/elevate-${component}`;
   async function get(url) {
@@ -18,17 +22,19 @@ export async function importRuntimeConfig(component, { request = fetch, run = go
     runtimeFiles: source.runtimeFiles, volumes: service.deployment?.volumes ?? service.volumes ?? [],
     importedAt: new Date().toISOString() }, component);
   // Refuse silent replacement of the now-authoritative Google configuration.
-  const exists = run(['secrets', 'list', '--project', PROJECT, `--filter=name:${secret}`, '--format=value(name)']);
+  const exists = invoke('destination_inventory', ['secrets', 'list', '--project', PROJECT, `--filter=name:${secret}`, '--format=value(name)']);
   if (exists) throw new Error('Google configuration already exists; use Google-owned configuration management');
-  run(['secrets', 'create', secret, '--project', PROJECT, '--replication-policy=automatic']);
-  run(['secrets', 'versions', 'add', secret, '--project', PROJECT, '--data-file=-'], JSON.stringify(config));
-  const readback = JSON.parse(run(['secrets', 'versions', 'access', 'latest', '--secret', secret, '--project', PROJECT]));
+  invoke('destination_create', ['secrets', 'create', secret, '--project', PROJECT, '--replication-policy=automatic']);
+  invoke('destination_write', ['secrets', 'versions', 'add', secret, '--project', PROJECT, '--data-file=-'], JSON.stringify(config));
+  const readback = JSON.parse(invoke('destination_readback', ['secrets', 'versions', 'access', 'latest', '--secret', secret, '--project', PROJECT]));
   if (JSON.stringify(readback) !== JSON.stringify(config)) throw new Error('Google configuration readback mismatch');
   return { component, runtimeKeys: Object.keys(config.runtimeEnvironment).sort(), volumes: config.volumes.length,
     runtimeFiles: Object.keys(config.runtimeFiles).length, configurationOwner: 'Google Secret Manager' };
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  importRuntimeConfig(process.env.COMPONENT).then(result => console.log(JSON.stringify(result))).catch(() => {
-    console.error('Runtime import failed; no deployment or cutover performed'); process.exitCode = 1;
+  importRuntimeConfig(process.env.COMPONENT).then(result => console.log(JSON.stringify(result))).catch(error => {
+    const known = ['Source connection required for one-time import', 'Complete resolved runtime inventory required', 'Google configuration already exists; use Google-owned configuration management', 'Google configuration readback mismatch', 'Invalid Google runtime configuration', 'Invalid runtime variable', 'Runtime persistence inventory required', 'Configuration exceeds Secret Manager payload limit; split secrets before import'];
+    const reason = known.includes(error.message) || /^Runtime import failed at (destination_inventory|destination_create|destination_write|destination_readback)$/.test(error.message) || /^Source configuration HTTP [0-9]{3}$/.test(error.message) ? error.message : 'unrecognized_response';
+    console.error(`Runtime import failed: ${reason}; no deployment or cutover performed`); process.exitCode = 1;
   });
 }

@@ -20,7 +20,7 @@ concurrency:
 jobs:
   capacity:
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +30,10 @@ jobs:
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify runner-supplied Google SDK compatibility
+        run: node scripts/gcp/verify-sdk.mjs
       - name: Refuse an active course execution before changing runtime capacity
         run: |
           node --input-type=module <<'NODE'
@@ -85,23 +89,25 @@ jobs:
   deploy:
     needs: capacity
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       max-parallel: 1
       fail-fast: true
       matrix:
         component: ${{ fromJSON(inputs.component == 'all' && '["marketing","admin","lms"]' || format('["{0}"]', inputs.component)) }}
-    concurrency:
-      group: google-stage-${{ matrix.component }}
-      cancel-in-progress: false
     steps:
+      - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify runner-supplied Google SDK compatibility
+        run: node scripts/gcp/verify-sdk.mjs
       - name: Update only the image of the existing migration service
         env:
           COMPONENT: ${{ matrix.component }}

@@ -7,7 +7,7 @@ permissions:
 jobs:
   inspect:
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 10
     strategy:
@@ -26,6 +26,10 @@ jobs:
           id_token_audience: https://elevate-${{ matrix.component }}-migration-aabnh2y32a-uc.a.run.app
           id_token_include_email: true
       - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify runner-supplied Google SDK compatibility
+        run: node scripts/gcp/verify-sdk.mjs
       - name: Read readiness, public access, domain mappings and DNS
         env:
           COMPONENT: ${{ matrix.component }}

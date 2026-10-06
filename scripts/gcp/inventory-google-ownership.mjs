@@ -4,7 +4,7 @@ import { google, PROJECT } from './runtime-config.mjs';
 const report = { project: PROJECT, observedAt: new Date().toISOString(), resources: {}, failures: [] };
 function read(name, args, select) {
   try { report.resources[name] = select(JSON.parse(google([...args, '--project', PROJECT, '--format=json']))); }
-  catch { report.failures.push({ resource: name, reason: 'inventory_unavailable' }); }
+  catch (error) { report.failures.push({ resource: name, reason: error.code ?? 'inventory_unavailable' }); }
 }
 read('instances', ['compute', 'instances', 'list'], rows => rows.map(v => ({
   name: v.name, zone: v.zone, status: v.status, machineType: v.machineType,

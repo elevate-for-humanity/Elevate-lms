@@ -1,3 +1,4 @@
+import { loadGoogleConfig } from './runtime-config.mjs';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -28,18 +29,8 @@ export function courseJobEnvironment(source, service) {
 async function main() {
   const sha = process.env.IMAGE_SHA;
   if (!/^[a-f0-9]{40}$/.test(sha ?? '')) throw new Error('Full worker image commit required');
-  const token = process.env.NORTHFLANK_API_TOKEN;
-  if (!token) throw new Error('Worker source connection unavailable');
-  const sourceProject = encodeURIComponent(process.env.NORTHFLANK_PROJECT_ID || 'elevate-platform');
-  const base = `https://api.northflank.com/v1/projects/${sourceProject}/services/elevate-ultimate-worker`;
-  async function get(url) {
-    const r = await fetch(url, { headers:{Authorization:`Bearer ${token}`}, signal:AbortSignal.timeout(30000) });
-    if (!r.ok) throw new Error(`Worker configuration unavailable: HTTP ${r.status}`);
-    const body = await r.json(); return body.data ?? body;
-  }
-  const service = await get(base);
-  const source = await get(`${base}/runtime-environment?show=all&replaceTemplatedValues=true`);
-  const vars = courseJobEnvironment(source,service);
+  const config = loadGoogleConfig('ultimate-worker');
+  const vars = courseJobEnvironment(config, { volumes: config.volumes });
   const project='elegant-racer-299721', region='us-central1';
   function gcloud(args) {
     const r=spawnSync('gcloud',args,{encoding:'utf8',maxBuffer:4*1024*1024});

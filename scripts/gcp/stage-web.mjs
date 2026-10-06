@@ -1,3 +1,4 @@
+import { loadGoogleConfig } from './runtime-config.mjs';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -28,22 +29,8 @@ async function main() {
   const component = process.env.COMPONENT;
   const sha = process.env.IMAGE_SHA;
   if (!['marketing', 'admin', 'lms', 'store'].includes(component) || !/^[a-f0-9]{40}$/.test(sha ?? '')) throw new Error('Invalid component or image SHA');
-  const token = process.env.NORTHFLANK_API_TOKEN;
-  if (!token) throw new Error('Northflank connection missing');
-  const project = encodeURIComponent(process.env.NORTHFLANK_PROJECT_ID || 'elevate-platform');
-  const sourceService = component === 'store' ? 'elevate-store' : `elevate-${component}`;
-  const base = `https://api.northflank.com/v1/projects/${project}/services/${sourceService}`;
-  async function get(url) {
-    const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(30000) });
-    if (!response.ok) throw new Error(`Source configuration returned HTTP ${response.status}`);
-    let json;
-    try { json = await response.json(); } catch { throw new Error('Source configuration returned invalid JSON'); }
-    return json.data ?? json;
-  }
-  const service = await get(base);
-  // Compatibility endpoint explicitly resolves inherited secret groups/templates.
-  const source = await get(`${base}/runtime-environment?show=all&replaceTemplatedValues=true`);
-  const vars = runtimeForGoogle(source, service);
+  const config = loadGoogleConfig(component);
+  const vars = runtimeForGoogle(config, { volumes: config.volumes });
   const dir = mkdtempSync(join(tmpdir(), 'elevate-runtime-'));
   function gcloud(args) {
     const result = spawnSync('gcloud', args, { encoding: 'utf8', maxBuffer: 4 * 1024 * 1024 });

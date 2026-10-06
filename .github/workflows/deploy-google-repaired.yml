@@ -15,7 +15,7 @@ permissions:
   contents: read
   id-token: write
 concurrency:
-  group: google-repaired-rollout
+  group: google-runtime-operations
   cancel-in-progress: false
 jobs:
   capacity:

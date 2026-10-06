@@ -180,6 +180,20 @@ jobs:
           if(readinessResponse.status!==200 || !readyResult.ready || !readyResult.correctService ||
               !readyResult.correctCommit || !readyResult.executorReady)
             throw new Error('Canonical application readiness failed');
+          if(component==='marketing') {
+            const qbResponse=await fetch('https://elevate-marketing-migration-aabnh2y32a-uc.a.run.app/api/health/quickbooks',{
+              headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
+              redirect:'manual',signal:AbortSignal.timeout(20000)
+            });
+            const qb=await qbResponse.json().catch(()=>({}));
+            const qbResult={component:'marketing',quickBooksHttpStatus:qbResponse.status,
+              quickBooksReady:qb.ready===true,quickBooksConfigured:qb.configured===true,
+              quickBooksConnected:qb.connected===true,quickBooksWebhookVerifier:qb.webhookVerifierConfigured===true};
+            console.log(JSON.stringify(qbResult));
+            if(qbResponse.status!==200 || !qbResult.quickBooksReady || !qbResult.quickBooksConfigured ||
+                !qbResult.quickBooksConnected || !qbResult.quickBooksWebhookVerifier)
+              throw new Error('QuickBooks runtime is not synchronized with the Google deployment');
+          }
           appendFileSync(process.env.GITHUB_STEP_SUMMARY,component+': dependency health and canonical readiness passed.\n');
 
           NODE

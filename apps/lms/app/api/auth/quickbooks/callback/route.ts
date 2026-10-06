@@ -3,6 +3,8 @@ import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { verifyQuickBooksOAuthState } from '@/lib/integrations/quickbooks-oauth-state';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -21,6 +23,8 @@ export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'auth');
   if (rateLimited) return rateLimited;
 
+  await hydrateProcessEnv();
+
   const { searchParams } = request.nextUrl;
   const code          = searchParams.get('code');
   const realmId       = searchParams.get('realmId');
@@ -34,6 +38,7 @@ export async function GET(request: NextRequest) {
 
   if (error)  return redirect(`error=${error}`);
   if (!code)  return redirect('error=no_code');
+  if (!state) return redirect('error=invalid_state');
 
   const clientId     = process.env.QB_CLIENT_ID;
   const clientSecret = process.env.QB_CLIENT_SECRET;
@@ -41,6 +46,7 @@ export async function GET(request: NextRequest) {
     `${base}/api/auth/quickbooks/callback`;
 
   if (!clientId || !clientSecret) return redirect('error=not_configured');
+  if (!verifyQuickBooksOAuthState(state, clientSecret)) return redirect('error=invalid_state');
 
   try {
     // Exchange code for tokens

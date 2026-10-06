@@ -37,7 +37,7 @@ const ELEVATE_PUBLIC_HOSTS = new Set([
   'testing.elevateforhumanity.org',
 ]);
 
-const DEPLOYMENT_HOST_SUFFIXES = ['.northflank.app'] as const;
+const DEPLOYMENT_HOST_SUFFIXES = ['.northflank.app', '.run.app'] as const;
 
 const STORE_RUNTIME_ALLOWED_PREFIXES = [
   '/store', '/login', '/signup', '/register', '/forgot-password', '/reset-password', '/auth',
@@ -89,6 +89,7 @@ function isStaticRequest(pathname: string) {
 
 function isCustomTenantHost(host: string) {
   if (!host || host === 'localhost' || host === '127.0.0.1' || host === '::1') return false;
+  if (isDeploymentHost(host)) return false;
   if (ELEVATE_PUBLIC_HOSTS.has(host)) return false;
   if (host.endsWith('.elevateforhumanity.org')) return false;
   return true;
@@ -162,7 +163,7 @@ export async function middleware(req: NextRequest) {
   // Build and provider URLs are operational deployment surfaces, not public
   // websites or customer custom domains. Keep them usable for health checks
   // while preventing search engines from indexing a second copy of Marketing.
-  if (isDeploymentHost(host)) {
+  if (isDeploymentHost(host) && !isProtectedPortal(pathname)) {
     return deploymentHostResponse(pathname, search, requestHeaders);
   }
 

@@ -28,7 +28,7 @@ test('refuses overwrite and incomplete inventory before any mutation', async () 
     let mutations = 0;
     await assert.rejects(importRuntimeConfig('store', { env: { NORTHFLANK_API_TOKEN: 'test' },
       request: async url => ({ ok: true, json: async () => ({ data: String(url).includes('runtime-environment') ? (incomplete ? { runtimeEnvironment: {} } : config()) : { volumes: [] } }) }),
-      run: args => { if (args[1] !== 'list') mutations++; return 'existing'; } }));
+      run: args => { if (['create', 'add'].includes(args[1]) || args[2] === 'add') mutations++; return 'existing'; } }));
     assert.equal(mutations, 0);
   }
 });
@@ -65,4 +65,20 @@ test('Google failures expose only a fixed diagnosis, never raw credentials', () 
   assert.equal(googleFailureCode('API [secretmanager.googleapis.com] not enabled; TOKEN=private'), 'api_disabled');
   assert.equal(googleFailureCode('PERMISSION_DENIED: TOKEN=private'), 'permission_denied');
   assert.equal(googleFailureCode('arbitrary credential output'), 'command_failed');
+});
+
+test('owner-preprovisioned empty secret can be initialized without project-wide create or list permissions', async () => {
+  let payload; const calls = [];
+  await importRuntimeConfig('store', {
+    env: { NORTHFLANK_API_TOKEN: 'test' },
+    request: async url => ({ ok: true, json: async () => ({ data: url.includes('runtime-environment') ? config() : { volumes: [] } }) }),
+    run: (args, input) => {
+      calls.push(args);
+      if (args[1] === 'list' || args[1] === 'create') throw new Error('project-wide operation forbidden');
+      if (input) payload = input;
+      return args[1] === 'describe' ? 'existing-empty' : args[2] === 'access' ? payload : '';
+    },
+  });
+  assert.equal(calls.some(a => a[1] === 'create' || a[1] === 'list'), false);
+  assert.ok(payload);
 });

@@ -12,7 +12,7 @@
 import 'server-only';
 
 import path from 'path';
-import os from 'os';
+import { renderConcurrency } from './render-concurrency.mjs';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { mkdir, readFile, writeFile, unlink, rm } from 'fs/promises';
@@ -511,8 +511,8 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
       codec: 'h264',
       outputLocation: paths.videoPath,
       inputProps: compositionProps,
-      // Use all available CPU cores for encoding
-      concurrency: Math.max(1, (os.cpus().length ?? 2) - 1),
+      // Bound render fan-out independently of the underlying host CPU count
+      concurrency: renderConcurrency(),
       // Reasonable quality for LMS delivery
       crf: 23,
       // Log progress every 10%
@@ -952,7 +952,7 @@ export async function renderStoryboardVideo(
         codec: 'h264',
         outputLocation: paths.videoPath,
         inputProps,
-        concurrency: Math.max(1, (os.cpus().length ?? 2) - 1),
+        concurrency: renderConcurrency(),
         crf: 20,
       });
     };

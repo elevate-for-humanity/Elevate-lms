@@ -81,7 +81,6 @@ for (const file of [
   '.github/workflows/predeploy-check.yml',
   '.github/workflows/design-policy-enforcement.yml',
   '.github/workflows/lockfile-check.yml',
-  '.github/workflows/health-check.yml',
   '.github/workflows/supabase-auto-migrate-seed.yml',
 ]) protectDeterministicGate(file);
 
@@ -140,7 +139,14 @@ for (const file of [
 requireText('.github/workflows/elevate-production-deploy.yml', "inputs.environment }}' == 'production'", 'Canonical production deploy must explicitly enforce production SHA provenance.');
 requireText('.github/workflows/elevate-production-deploy.yml', 'Recovery hardening regression check', 'Canonical deployment must run recovery hardening before publish/deploy.');
 
-requireText('.github/workflows/health-check.yml', 'Require Northflank health credentials', 'Health checks must fail when required credentials are unavailable.');
+// The public Google monitor imports only Node builtins and local modules, so it
+// needs neither provider credentials nor dependency installation. Enforce the
+// actual fail-closed runtime contract instead of a retired Northflank token.
+requireText('.github/workflows/health-check.yml', 'node scripts/gcp/verify-public-health.mjs', 'Health checks must execute the live Google runtime contract.');
+requireText('.github/workflows/health-check.yml', 'node --test scripts/gcp/audit-runtime-parity.test.mjs scripts/gcp/verify-public-health.test.mjs', 'Health checks must prove failure handling before probing production.');
+forbidText('.github/workflows/health-check.yml', 'NORTHFLANK_', 'Health monitoring must not depend on the retired deployment platform.');
+forbidText('.github/workflows/health-check.yml', 'continue-on-error', 'Unhealthy Google services must not produce a green check.');
+requireText('scripts/gcp/verify-public-health.mjs', 'if (results.some(x => !x.passed)) process.exitCode = 1;', 'Any failed Google runtime probe must fail the health check.');
 forbidText('.github/workflows/health-check.yml', 'Skipping health check for now', 'Missing health credentials must not produce a green check.');
 
 forbidText('.github/workflows/supabase-auto-migrate-seed.yml', 'node scripts/db/runMigrations.js', 'Supabase workflow must not automatically apply production migrations.');

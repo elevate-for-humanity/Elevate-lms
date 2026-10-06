@@ -27,6 +27,8 @@ allowBuilds:
   workerd: true
 
 overrides:
+  compression: 1.8.2
+  source-map-js: 1.2.2
   braces: file:./packages/bounded-braces
   '@grpc/grpc-js': 1.14.5
   basic-ftp: ^6.0.0

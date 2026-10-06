@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 const execute=promisify(execFile);
 const sentence="Before cutting hair, wash your hands and clean the tools. Check the client's scalp and explain the next step.";
-const text=Array(4).fill(sentence).join(' ');
+const text=sentence+" Place a clean cape around the shoulders and adjust the chair. Choose the correct guard before starting the first section. Keep the clipper moving with steady pressure. Stop immediately if the skin becomes irritated. After the haircut, brush away loose hair, show the finished shape in a mirror, and disinfect every reusable tool."
 const directory=await mkdtemp(join(tmpdir(),'course-speech-smoke-'));
 try {
   const narrator=await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:'q8',device:'cpu'});
@@ -21,9 +21,19 @@ try {
   const {stdout}=await execute('ffmpeg',['-hide_banner','-loglevel','error','-f','f32le','-ar','24000','-ac','1','-i',path,'-f','mp3','pipe:1'],{encoding:'buffer',timeout:60000,maxBuffer:8*1024*1024});
   const result=await transcribeLocalAudio(stdout);
   const tokens=value=>value.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(/\s+/);
-  const actual=new Set(tokens(result.text));
+  const actual=tokens(result.text);
   const expected=tokens(text);
-  const coverage=expected.filter(word=>actual.has(word)).length/expected.length;
+  // Ordered word coverage must detect omissions and repeated-phrase collapse.
+  const row=Array(actual.length+1).fill(0);
+  for(const word of expected) {
+    let diagonal=0;
+    for(let j=1;j<=actual.length;j++) {
+      const previous=row[j];
+      row[j]=word===actual[j-1] ? diagonal+1 : Math.max(row[j],row[j-1]);
+      diagonal=previous;
+    }
+  }
+  const coverage=row[actual.length]/expected.length;
   if(coverage<0.9 || result.words.length<10) throw new Error('SMOKE_DECODED_SPEECH_OR_TIMINGS_FAILED');
   console.log(JSON.stringify({provider:result.provider,model:result.model,wordCount:result.words.length,coverage}));
 } catch(error) {

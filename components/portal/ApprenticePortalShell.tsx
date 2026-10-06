@@ -386,7 +386,7 @@ export function ApprenticePortalShell({
               {[
                 {
                   n: 1,
-                  text: 'Click "Set Up Payment" above — you\'ll be taken to a secure Stripe page.',
+                  text: 'Click "Set Up Payment" above to review your PayPal authorization and current QuickBooks invoice options.',
                 },
                 { n: 2, text: 'Complete the PayPal authorization steps shown on your billing page, or use the Pay Now link on an open QuickBooks invoice.' },
                 {
@@ -438,13 +438,13 @@ export function ApprenticePortalShell({
                 ? [
                     {
                       n: 1,
-                      text: 'Click "Update Card" above — you\'ll be taken to a secure Stripe page.',
+                      text: 'Click the billing action above to review your PayPal authorization and current QuickBooks invoice options.',
                     },
-                    { n: 2, text: 'Under "Payment methods," add a new debit or credit card.' },
-                    { n: 3, text: 'Set it as your default payment method.' },
+                    { n: 2, text: 'Review the PayPal authorization status and complete any required provider step.' },
+                    { n: 3, text: 'If an invoice is open, use its QuickBooks Pay Now link or the approved PayPal billing flow.' },
                     {
                       n: 4,
-                      text: 'Stripe will automatically retry the failed payment within 24 hours.',
+                      text: 'The billing page will show whether PayPal will retry automatically or whether the invoice requires action.',
                     },
                     {
                       n: 5,
@@ -454,19 +454,19 @@ export function ApprenticePortalShell({
                 : [
                     {
                       n: 1,
-                      text: 'Click "Add Card" above — you\'ll be taken to a secure Stripe page.',
+                      text: 'Click the billing action above to complete PayPal authorization or review your QuickBooks invoice.',
                     },
                     {
                       n: 2,
-                      text: 'Enter your debit or credit card number, expiration date, and CVC.',
+                      text: 'Follow the PayPal authorization steps shown on the billing page.',
                     },
                     {
                       n: 3,
-                      text: 'Click "Save" — Stripe will verify your card. No charge happens yet.',
+                      text: 'Confirm the authorization only after reviewing the amount and billing schedule.',
                     },
                     {
                       n: 4,
-                      text: 'Your first weekly payment will process automatically on the next billing date.',
+                      text: 'Your billing page will show the next scheduled payment date and amount when automatic billing is active.',
                     },
                     {
                       n: 5,

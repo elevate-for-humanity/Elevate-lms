@@ -20,6 +20,11 @@ read('enabledServices', ['services', 'list', '--enabled'], rows => rows.map(s =>
 read('deploymentRoles', ['projects', 'get-iam-policy', PROJECT], policy => (policy.bindings ?? []).filter(b => (b.members ?? []).includes(`serviceAccount:elevate-github-deploy@${PROJECT}.iam.gserviceaccount.com`)).map(b => ({ role: b.role, conditional: Boolean(b.condition) })));
 read('scheduler', ['scheduler', 'jobs', 'list', '--location=us-central1'], rows => rows.map(j => ({ name: j.name, schedule: j.schedule, state: j.state, target: j.httpTarget?.uri, serviceAccount: j.httpTarget?.oauthToken?.serviceAccountEmail ?? j.httpTarget?.oidcToken?.serviceAccountEmail })));
 read('buckets', ['storage', 'buckets', 'list'], rows => rows.map(b => ({ name: b.name, location: b.location, versioning: b.versioning?.enabled, uniformAccess: b.iamConfiguration?.uniformBucketLevelAccess?.enabled })));
+read('courseExecutions', ['run', 'jobs', 'executions', 'list', '--job=elevate-course-builder', '--region=us-central1', '--limit=5'], rows => rows.map(e => ({
+  name: e.metadata?.name, startedAt: e.status?.startTime, completedAt: e.status?.completionTime,
+  running: e.status?.runningCount, succeeded: e.status?.succeededCount, failed: e.status?.failedCount,
+  conditions: (e.status?.conditions ?? []).map(c => ({ type: c.type, status: c.status, reason: c.reason })),
+})));
 writeFileSync('google-ownership-inventory.json', JSON.stringify(report, null, 2));
 console.log(JSON.stringify({ observedAt: report.observedAt, resources: Object.keys(report.resources), failures: report.failures }));
 if (report.failures.length) process.exitCode = 1;

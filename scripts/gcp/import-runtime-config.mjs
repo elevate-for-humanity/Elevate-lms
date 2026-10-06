@@ -39,9 +39,20 @@ export async function importRuntimeConfig(component, { request = fetch, run = go
     runtimeFiles: source.runtimeFiles, volumes,
     importedAt: new Date().toISOString() }, component);
   // Refuse silent replacement of the now-authoritative Google configuration.
-  const exists = invoke('destination_inventory', ['secrets', 'list', '--project', PROJECT, `--filter=name:${secret}`, '--format=value(name)']);
-  if (exists) throw new Error('Google configuration already exists; use Google-owned configuration management');
-  invoke('destination_create', ['secrets', 'create', secret, '--project', PROJECT, '--replication-policy=automatic']);
+  let exists = false;
+  try { run(['secrets', 'describe', secret, '--project', PROJECT, '--format=value(name)']); exists = true; }
+  catch (error) {
+    if (error.code !== 'not_found') {
+      const code = ['api_disabled', 'permission_denied', 'authentication_failed', 'quota_exceeded'].includes(error.code) ? error.code : 'command_failed';
+      throw new Error(`Runtime import failed at destination_inventory: ${code}`);
+    }
+  }
+  if (exists) {
+    const versions = invoke('destination_inventory', ['secrets', 'versions', 'list', secret, '--project', PROJECT, '--limit=1', '--format=value(name)']);
+    if (versions) throw new Error('Google configuration already exists; use Google-owned configuration management');
+  } else {
+    invoke('destination_create', ['secrets', 'create', secret, '--project', PROJECT, '--replication-policy=automatic']);
+  }
   invoke('destination_write', ['secrets', 'versions', 'add', secret, '--project', PROJECT, '--data-file=-'], JSON.stringify(config));
   const readback = JSON.parse(invoke('destination_readback', ['secrets', 'versions', 'access', 'latest', '--secret', secret, '--project', PROJECT]));
   if (JSON.stringify(readback) !== JSON.stringify(config)) throw new Error('Google configuration readback mismatch');

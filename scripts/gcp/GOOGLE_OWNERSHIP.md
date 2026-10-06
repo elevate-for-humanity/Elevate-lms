@@ -1,6 +1,23 @@
-# Google ownership audit — repository evidence
+# Google ownership audit
 
-This is source-code evidence, not a live resource inventory. Do not retire Northflank based on this document.
+The repository review and the live observations below are separate acceptance evidence. Do not retire Northflank based on source-code checks alone.
+
+## Live observations — 2026-10-06 UTC
+
+| Boundary | Northflank observation | Google observation | Remaining gate |
+|---|---|---|---|
+| Marketing, Admin, LMS | All three source services report zero instances | Resolved environment parity passed. Startup and liveness probes installed; both dependency health and readiness passed for all three in [run 37509834503](https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/37509834503) | Google-owned configuration import and deployment/recovery without source credentials |
+| Store | Source service reports zero instances | Parity audit found no mapped Cloud Run target; Google Store image build started in [run 37511152443](https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/37511152443) | Image upload, scoped runtime identity, configuration, actual target, billing routes, DNS and readiness |
+| Studio | 6144 MiB auth volume is BOUND and attached to elevate-studio-browser; no backup schedules. Source service reports zero instances | Compute Engine instances and disks both empty in [run 37510506802](https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/37510506802) | Supported singleton runtime, state/key/workspace transfer, private/authenticated networking, backups and restart/provider acceptance |
+| Course Builder | Source worker reports zero instances | Resolved environment parity passed. [Run 37511074343](https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/37511074343) successfully dispatched elevate-course-builder-j5r8g | Execution completion, resulting course acceptance, and Google-owned scheduling |
+| Configuration | Source resolved variables and files are readable | Secret Manager absent from enabled API inventory. Import reached destination inventory and failed in [run 37509744077](https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/37509744077) | Enable API, provision six configuration secrets and confined access, import/readback all components |
+| Scheduling/backups/IAM | Source auth volume has no scheduled backup | Cloud Scheduler absent from enabled APIs. Snapshot, bucket and project IAM inventories unavailable | Resolve access failures; unavailable inventories cannot be treated as empty resources |
+
+Source attachment evidence: [run 37510213829](https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/37510213829). Import must discover standalone attached volumes, because Studio's service deployment object does not declare its auth volume.
+
+`bootstrap-runtime-config.sh` is the concrete project-administrator preparation for configuration ownership: enable Secret Manager, create the six empty secrets, and grant metadata/version-add/payload-access only on those resources. It does not deploy workloads or change public access. The importer initializes empty secrets and refuses any secret with existing versions. Do not grant project-wide secret payload access to make the import pass.
+
+## Architecture and acceptance
 
 | Boundary | Existing implementation | Google architecture / remaining acceptance |
 |---|---|---|

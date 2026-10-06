@@ -49,7 +49,7 @@ export function EnrollmentPaymentWidget({ programId, programName }: EnrollmentPa
     <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
       <p className="text-sm font-semibold text-slate-900">Ready to Enroll in {programName}?</p>
       <p className="mt-2 text-[11px] text-slate-600">
-        Choose your payment option below. You&apos;ll be redirected to Stripe for secure checkout.
+        Choose your payment option below. You&apos;ll be redirected to QuickBooks for secure checkout.
       </p>
 
       {error && (
@@ -76,7 +76,7 @@ export function EnrollmentPaymentWidget({ programId, programName }: EnrollmentPa
       </div>
 
       <p className="mt-3 text-[10px] text-slate-500">
-        NOTE: This widget requires Stripe to be configured with real product and price IDs in{' '}
+        NOTE: This widget requires QuickBooks to be configured with real product and price IDs in{' '}
         <span className="font-mono">lms-data/billingConfig.ts</span>. Until then, checkout will fail
         gracefully.
       </p>

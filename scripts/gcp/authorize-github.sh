@@ -29,7 +29,7 @@ gcloud iam service-accounts add-iam-policy-binding "$SA_EMAIL" --project="$PROJE
 for ROLE in roles/run.developer roles/artifactregistry.admin roles/serviceusage.serviceUsageConsumer; do
   gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:$SA_EMAIL" --role="$ROLE" --condition=None >/dev/null
 done
-for APP in marketing admin lms; do
+for APP in marketing admin lms store ultimate-worker studio-browser; do
   RUNTIME="elevate-$APP-runtime@$PROJECT_ID.iam.gserviceaccount.com"
   if ! gcloud iam service-accounts describe "$RUNTIME" --project="$PROJECT_ID" >/dev/null 2>&1; then
     gcloud iam service-accounts create "elevate-$APP-runtime" --project="$PROJECT_ID"

@@ -79,3 +79,19 @@ A broader unit run reported 3,097 passing, 70 failing and five skipped tests acr
 | Northflank removal | Disable source triggers, remove runtime credentials/configuration, then delete source resources | All preceding acceptance evidence; historical tooling unreachable from production |
 
 Supabase remains database/Auth/RLS/queues/storage. Cloudflare remains DNS/proxy; Cloudflare TTS must not become Course Builder narration. No secret transfer, Studio state migration or source deletion has been represented as complete.
+
+## Direct IAM diagnosis and broader repair — 2026-10-06
+
+[Google diagnostic run 37546064990](https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/37546064990/job/112550261090) authenticated the actual deployment identity and enabled the metadata API successfully. Direct secret, Scheduler, bucket, snapshot and project-policy requests returned HTTP 403. The project `testIamPermissions` request succeeded and returned none of these requested permissions:
+
+- `resourcemanager.projects.getIamPolicy`, `resourcemanager.projects.setIamPolicy`
+- `iam.roles.create`, `iam.roles.get`, `iam.roles.list`
+- `secretmanager.secrets.list`, `secretmanager.secrets.get`, `secretmanager.secrets.create`, `secretmanager.secrets.setIamPolicy`
+- `secretmanager.versions.add`, `secretmanager.versions.access`
+- `cloudscheduler.jobs.list`, `storage.buckets.list`, `compute.snapshots.list`
+
+This distinguishes API enablement from IAM authority. The deployment identity cannot perform the tested preparation with its observed permissions. A project administrator can run `prepare-inventory-access.sh` and `bootstrap-runtime-config.sh`; these grants are metadata-only and confined to the six staging configuration secrets respectively. They do not establish final per-variable secret bindings, create a Store runtime, transfer Studio state, or authorize source deletion. Staging import remains a migration boundary, never a shared credential group for production containers.
+
+Broader repairs now reject fabricated scene assignments, unify duplicate licensed source identities, retain exact read-only planning scope, redact credential-bearing Studio errors, restore actionable Course Builder health display, and fix the phone controls at the mobile breakpoint. Current billing contract coverage checks QuickBooks/PayPal and the retirement of Stripe. The worker deployment code now selects its dedicated runtime identity, and the administrator identity setup includes Store, worker and Studio; these source changes are not evidence that the live accounts or bindings exist.
+
+All three production application builds completed locally before these additional repairs. A subsequent full unit run recorded 3,134 passing, 37 failing and five skipped tests; follow-up suites verified the three planner/footage failures exposed in that run. The remaining failures still block broad acceptance. Focused health, media, planner and retired-payment checks pass. Marketing, Admin and LMS TypeScript checks passed with increased Node heap after the first invocation hit the local heap limit. Changed application source lint and all 48 Google deployment contract tests passed. CI must still be checked against the final PR head. No final acceptance, secret transfer, Studio transfer, DNS cutover, or Northflank deletion has occurred.

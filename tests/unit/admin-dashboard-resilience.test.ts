@@ -14,7 +14,8 @@ describe('Admin dashboard resilience', () => {
 
     expect(workspace).toContain("fetch('/api/admin/dev-studio/config'");
     expect(workspace).toContain('payload.defaultPreviewUrl');
-    expect(workspace).toContain('window.location.origin');
+    expect(workspace).toContain("setTarget(configuredTarget || '')");
+    expect(workspace).not.toContain('window.location.origin');
     expect(workspace).not.toContain(
       "useState('https://admin.elevateforhumanity.org/dashboard')",
     );

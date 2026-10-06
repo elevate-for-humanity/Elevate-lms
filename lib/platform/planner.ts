@@ -399,7 +399,9 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
       g,
     ) && /\b(fix|repair|correct|implement|modify|change|update|edit|refactor|add|remove)\b/.test(g);
 
-  if (explicitReadOnly) {
+  if (explicitReadOnly && /\bstudio\b/.test(g) && /\b(diagnostic|provider|router|tool-response)\b/.test(g)) {
+    steps = GOAL_TEMPLATES.read_only_studio_diagnostic!({});
+  } else if (explicitReadOnly) {
     // Keep the exact read scope ahead of every template that can mutate state.
     // A deployment prohibition must never become a deployment/snapshot plan.
     steps = [{ id: 's1', order: 1, title: 'Execute requested outcome', command: goal,

@@ -66,6 +66,7 @@ test('approved media scoped to a different course is never acquired or attached'
   vi.mocked(attachStoredLicensedMedia).mockClear();
   const matches = [{
     id: 'match-wrong-course',
+    status: 'approved',
     lesson_id: 'lesson-a',
     entitlement_id: 'asset-b',
     match_score: 1,

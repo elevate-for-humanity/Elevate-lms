@@ -5,12 +5,13 @@ import UnifiedCourseBuilder from '@/components/admin/course-builder/UnifiedCours
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-type CourseBuilderTab = 'courses' | 'ultimate' | 'registry';
+type CourseBuilderTab = 'courses' | 'ultimate' | 'registry' | 'health';
 
 const COURSE_BUILDER_TABS: ReadonlySet<string> = new Set([
   'courses',
   'ultimate',
   'registry',
+  'health',
 ] as const);
 
 function isCourseBuilderTab(value: string | undefined): value is CourseBuilderTab {

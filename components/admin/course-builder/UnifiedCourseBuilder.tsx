@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Award, BookOpen, Bot, Loader2, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
 import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
 
-type Tab = 'courses' | 'ultimate' | 'registry';
+type Tab = 'courses' | 'ultimate' | 'registry' | 'health';
 type CourseRow = {
   id: string;
   title: string;
@@ -42,6 +42,7 @@ const TABS: Array<{ id: Tab; label: string; icon: any }> = [
   { id: 'courses', label: 'Courses', icon: BookOpen },
   { id: 'ultimate', label: 'Ultimate Build', icon: Rocket },
   { id: 'registry', label: 'Credential Registry', icon: Award },
+  { id: 'health', label: 'Health', icon: ShieldCheck },
 ];
 
 async function readJson(response: Response) {
@@ -266,6 +267,7 @@ export default function UnifiedCourseBuilder({
             </div>
           ))}
         {tab === 'registry' && <CredentialRegistryPanel course={selectedCourse} />}
+        {tab === 'health' && <CourseBuilderHealthPanel onOpen={openUltimate} />}
       </main>
     </div>
   );
@@ -732,6 +734,63 @@ export function UltimateBuildPanel({
         Course Factory generation, blueprint execution, and standalone media queues are not
         available from this surface.
       </p>
+    </section>
+  );
+}
+
+
+type CourseHealthCheck = {
+  name: string;
+  passed: boolean;
+  message: string;
+  state?: 'ready' | 'paused' | 'attention';
+  issues?: Array<{ courseId: string; title: string; issues: string[] }>;
+};
+
+export function CourseBuilderHealthPanel({ onOpen }: { onOpen: (id: string) => void }) {
+  const [checks, setChecks] = useState<CourseHealthCheck[]>([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const requestId = useRef(0);
+  async function refresh() {
+    const id = ++requestId.current;
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch('/api/admin/courses/health', { cache: 'no-store' });
+      const payload = await readJson(response);
+      if (!response.ok || !Array.isArray(payload.checks)) throw new Error('Course health could not be verified');
+      if (id === requestId.current) setChecks(payload.checks);
+    } catch (reason) {
+      if (id === requestId.current) setError(reason instanceof Error ? reason.message : 'Health check failed');
+    } finally {
+      if (id === requestId.current) setLoading(false);
+    }
+  }
+  useEffect(() => {
+    void refresh();
+    return () => { requestId.current++; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  return (
+    <section className="space-y-4 rounded-xl border border-slate-800 bg-slate-900 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-xl font-bold">Course health</h2>
+        <button type="button" disabled={loading} onClick={() => void refresh()} className="rounded-lg border border-slate-700 px-3 py-2 disabled:opacity-50">Refresh health</button>
+      </div>
+      {loading && <p role="status">Checking course health…</p>}
+      {error && <p role="alert" className="text-red-300">{error}</p>}
+      {!loading && !error && checks.map((check) => (
+        <article key={check.name} className="rounded-lg border border-slate-700 p-3">
+          <h3 className="font-bold">{check.name} — {check.state === 'paused' ? 'Paused' : check.passed ? 'Ready' : 'Needs attention'}</h3>
+          <p className="mt-1 text-sm text-slate-300">{check.message}</p>
+          {!!check.issues?.length && <ul className="mt-3 space-y-3">{check.issues.map((issue) => (
+            <li key={issue.courseId}>
+              <button type="button" onClick={() => onOpen(issue.courseId)} className="text-cyan-300 underline">Open {issue.title}</button>
+              <p className="text-sm text-slate-300">{issue.issues.join('; ')}</p>
+            </li>
+          ))}</ul>}
+        </article>
+      ))}
     </section>
   );
 }

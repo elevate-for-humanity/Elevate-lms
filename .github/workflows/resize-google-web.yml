@@ -1,0 +1,42 @@
+name: Restore Northflank web container sizing
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: google-repaired-rollout
+  cancel-in-progress: false
+jobs:
+  resize:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      max-parallel: 1
+      fail-fast: true
+      matrix:
+        component: [marketing, admin, lms]
+    concurrency:
+      group: google-stage-${{ matrix.component }}
+      cancel-in-progress: false
+    steps:
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Restore 8 GiB while preserving the last ready image
+        env:
+          COMPONENT: ${{ matrix.component }}
+        run: |
+          set -euo pipefail
+          PROJECT=elegant-racer-299721
+          SERVICE="elevate-$COMPONENT-migration"
+          REVISION="$(gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='value(status.latestReadyRevisionName)')"
+          test -n "$REVISION"
+          IMAGE="$(gcloud run revisions describe "$REVISION" --project="$PROJECT" --region=us-central1 --format='value(status.imageDigest)')"
+          [[ "$IMAGE" == us-central1-docker.pkg.dev/elegant-racer-299721/elevate/"$COMPONENT"@sha256:* ]]
+          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE" --cpu=4 --memory=8Gi --startup-probe='httpGet.path=/api/health,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' --quiet
+          gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='yaml(status.latestReadyRevisionName,spec.template.spec.containers.resources)'

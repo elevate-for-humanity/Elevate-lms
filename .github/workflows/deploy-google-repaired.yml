@@ -4,13 +4,65 @@ on:
 permissions:
   contents: read
   id-token: write
+concurrency:
+  group: google-repaired-rollout
+  cancel-in-progress: false
 jobs:
+  capacity:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Require regional capacity before changing any revision
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          const token=execFileSync('gcloud',['auth','print-access-token'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+          const required = {'run.googleapis.com/cpu_allocation':32000,'run.googleapis.com/mem_allocation':68719476736};
+          // Three services x two instances, plus one service's old/new revision overlap.
+          // This is the approved 4-vCPU/8-GiB web topology, not a worker capacity budget.
+          const limits = {};
+          let pageToken='';
+          do {
+            const url=new URL('https://serviceusage.googleapis.com/v1beta1/projects/484736877039/services/run.googleapis.com/consumerQuotaMetrics');
+            url.searchParams.set('view','FULL');
+            url.searchParams.set('pageSize','200');
+            if(pageToken) url.searchParams.set('pageToken',pageToken);
+            const r=await fetch(url,{headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(30000)});
+            if(!r.ok) throw new Error('Cannot verify regional quota: HTTP '+r.status);
+            const body=await r.json();
+            for(const metric of body.metrics || []) {
+              if(!(metric.metric in required)) continue;
+              const buckets=(metric.consumerQuotaLimits || []).flatMap(x=>x.quotaBuckets || []);
+              const bucket=buckets.find(x=>x.dimensions?.region==='us-central1') ||
+                buckets.find(x=>!Object.keys(x.dimensions || {}).length);
+              if(bucket) limits[metric.metric]=Number(bucket.effectiveLimit);
+            }
+            pageToken=body.nextPageToken || '';
+          } while(pageToken);
+          let insufficient=false;
+          for(const [metric,needed] of Object.entries(required)) {
+            const available=limits[metric];
+            const ok=Number.isFinite(available) && (available===-1 || available>=needed);
+            console.log(JSON.stringify({metric,available,required:needed,ok}));
+            if(!ok) insufficient=true;
+          }
+          if(insufficient) throw new Error('Regional quota cannot support the approved web capacity and serialized revision overlap. Request 32 vCPU and 64 GiB minimum before deployment; no service was changed.');
+          NODE
   deploy:
+    needs: capacity
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
-      fail-fast: false
+      max-parallel: 1
+      fail-fast: true
       matrix:
         component: [marketing, admin, lms]
     concurrency:
@@ -36,7 +88,7 @@ jobs:
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='value(metadata.name)'
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
-          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --quiet
+          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --cpu=4 --memory=8Gi --startup-probe='httpGet.path=/api/health,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' --quiet
       - uses: google-github-actions/auth@v3
         id: health_auth
         with:
@@ -56,18 +108,57 @@ jobs:
           node --input-type=module <<'NODE'
           import { appendFileSync } from 'node:fs';
           const component = process.env.COMPONENT;
-          const response = await fetch('https://elevate-' + component + '-migration-aabnh2y32a-uc.a.run.app/api/health', {
-            headers: { 'X-Serverless-Authorization': 'Bearer ' + process.env.TOKEN },
-            redirect: 'manual', signal: AbortSignal.timeout(90000)
+          const deadline=Date.now()+120000;
+          let consecutive=0;
+          for(let attempt=1; Date.now()<deadline; attempt++) {
+            let response, body={};
+            try {
+              response=await fetch('https://elevate-' + component + '-migration-aabnh2y32a-uc.a.run.app/api/health', {
+                headers: {'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
+                redirect:'manual', signal:AbortSignal.timeout(Math.min(20000,deadline-Date.now()))
+              });
+              body=await response.json();
+            } catch {
+              console.log(JSON.stringify({component,attempt,error:'health_probe_failed'}));
+              throw new Error('Health endpoint did not return a valid bounded response');
+            }
+            const dependency=body.dependencies?.supabase;
+            const result={component,attempt,httpStatus:response.status,
+              correctService:body.service===component, healthy:body.healthy===true,
+              ready:body.ready===true, supabase:dependency?.ok===true,
+              dependencyStatus:dependency?.status, dependencyLatencyMs:dependency?.latencyMs,
+              dependencyTimeout:dependency?.error==='TimeoutError',
+              correctCommit:body.commit==='3e9d4ff2d4cfd57e8481a9469315cad907acf67b'};
+            console.log(JSON.stringify(result));
+            const passed=response.status===200 && result.correctService && result.healthy &&
+              result.ready && result.supabase && result.correctCommit;
+            consecutive=passed ? consecutive+1 : 0;
+            if(consecutive===3) {
+              break;
+            }
+            // Only the observed cold-start dependency timeout gets a bounded warm-up window.
+            // Wrong image, missing config, bad credentials and unexpected responses fail immediately.
+            if(!passed && !(response.status===503 && result.correctService && result.ready &&
+                result.correctCommit && result.dependencyTimeout)) {
+              throw new Error('Non-transient runtime health failure');
+            }
+            await new Promise(resolve=>setTimeout(resolve,5000));
+          }
+          if(consecutive<3) throw new Error('Service did not establish stable dependency health within two minutes');
+          // /health confirms dependency access; /ready enforces the application's own readiness contract.
+          const readinessResponse=await fetch('https://elevate-'+component+'-migration-aabnh2y32a-uc.a.run.app/api/ready',{
+            headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
+            redirect:'manual',signal:AbortSignal.timeout(20000)
           });
-          let body;
-          try { body = await response.json(); } catch { body = {}; }
-          const result = {component, httpStatus: response.status,
-            correctService: body.service === component, healthy: body.healthy === true,
-            ready: body.ready === true, supabase: body.dependencies?.supabase?.ok === true,
-            correctCommit: body.commit === '3e9d4ff2d4cfd57e8481a9469315cad907acf67b'};
-          console.log(JSON.stringify(result));
-          appendFileSync(process.env.GITHUB_STEP_SUMMARY, JSON.stringify(result) + '\n');
-          if (response.status !== 200 || !result.correctService || !result.healthy ||
-            !result.ready || !result.supabase || !result.correctCommit) process.exitCode = 1;
+          const readiness=await readinessResponse.json();
+          const readyResult={component,httpStatus:readinessResponse.status,ready:readiness.ready===true,
+            correctService:readiness.service===component,
+            correctCommit:readiness.commit==='3e9d4ff2d4cfd57e8481a9469315cad907acf67b',
+            executorReady:component!=='admin' || readiness.agenticExecutorReady===true};
+          console.log(JSON.stringify(readyResult));
+          if(readinessResponse.status!==200 || !readyResult.ready || !readyResult.correctService ||
+              !readyResult.correctCommit || !readyResult.executorReady)
+            throw new Error('Canonical application readiness failed');
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY,component+': dependency health and canonical readiness passed.\n');
+
           NODE

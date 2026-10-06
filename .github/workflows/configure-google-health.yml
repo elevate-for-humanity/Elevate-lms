@@ -83,16 +83,10 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import { execFileSync } from 'node:child_process';
-          import { healthPassed } from './scripts/gcp/audit-runtime-parity.mjs';
+          import { verifyRuntimeReadiness } from './scripts/gcp/verify-runtime-readiness.mjs';
           const component=process.env.COMPONENT;
           const s=JSON.parse(execFileSync('gcloud',['run','services','describe','elevate-'+component+'-migration','--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
           const c=s.spec.template.spec.containers[0];
           if(c.startupProbe?.httpGet?.path!=='/api/ping' || c.livenessProbe?.httpGet?.path!=='/api/ping') throw new Error('Probe readback mismatch');
-          for(const path of ['/api/health','/api/ready']) {
-            const r=await fetch(s.status.url+path,{headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},redirect:'manual',signal:AbortSignal.timeout(30000)});
-            const b=await r.json().catch(()=>({}));
-            const passed=healthPassed(component,path,r.status,b);
-            console.log(JSON.stringify({component,path,status:r.status,passed}));
-            if(!passed) throw new Error('Canonical runtime health failed after probe update');
-          }
+          console.log(JSON.stringify(await verifyRuntimeReadiness(component,s.status.url,process.env.TOKEN)));
           NODE

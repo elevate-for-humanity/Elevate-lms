@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends chromium ffmpeg
 # Standalone worker dependency contract: do not load the monorepo workspace/root manifest.
 COPY packages/ultimate-course-worker/package.json ./package.json
 RUN npm install --omit=dev --ignore-scripts --no-audit --no-fund
-COPY workers/ultimate-course-builder.ts ./workers/ultimate-course-builder.ts
+COPY workers/ultimate-course-builder.ts workers/worker-loop.mjs ./workers/
 COPY lib/ultimate-course-builder ./lib/ultimate-course-builder
 COPY lib/ai ./lib/ai
 COPY lib/resilience ./lib/resilience

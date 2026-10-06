@@ -1,0 +1,82 @@
+name: Diagnose Google runtime and capacity
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  diagnose:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        component: [admin, lms, marketing]
+    steps:
+      - uses: google-github-actions/auth@v3
+        id: auth
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-${{ matrix.component }}-migration-aabnh2y32a-uc.a.run.app
+          id_token_include_email: true
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Read capacity, configuration parity and dependency diagnostics
+        env:
+          TOKEN: ${{ steps.auth.outputs.id_token }}
+          COMPONENT: ${{ matrix.component }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          const component = process.env.COMPONENT;
+          const project = 'elegant-racer-299721';
+          function gcloud(args) {
+            return execFileSync('gcloud', args, {encoding: 'utf8', stdio: ['ignore','pipe','pipe']}).trim();
+          }
+          function report(value) { console.log(JSON.stringify(value)); }
+          const service = JSON.parse(gcloud(['run','services','describe','elevate-'+component+'-migration','--project='+project,'--region=us-central1','--format=json']));
+          const spec = service.spec.template.spec;
+          const container = spec.containers[0];
+          const env = Object.fromEntries((container.env || []).filter(x => typeof x.value === 'string').map(x => [x.name, x.value]));
+          report({component, resources:container.resources, concurrency:spec.containerConcurrency,
+            scaling: Object.fromEntries(Object.entries(service.spec.template.metadata.annotations || {}).filter(([k]) => /Scale|cpu-throttling/.test(k))),
+            latestReadyRevision:service.status.latestReadyRevisionName, latestCreatedRevision:service.status.latestCreatedRevisionName,
+            traffic:service.status.traffic, conditions:(service.status.conditions || []).map(x=>({type:x.type,status:x.status,reason:x.reason}))});
+          report({component, expectedSupabase:env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/,'') === 'https://cuxzzpsyufcewtmicszk.supabase.co',
+            anonPresent:Boolean(env.NEXT_PUBLIC_SUPABASE_ANON_KEY), serviceRolePresent:Boolean(env.SUPABASE_SERVICE_ROLE_KEY)});
+          if (component === 'marketing') {
+            const access = gcloud(['auth','print-access-token']);
+            let pageToken = '';
+            do {
+              const endpoint = new URL('https://serviceusage.googleapis.com/v1beta1/projects/484736877039/services/run.googleapis.com/consumerQuotaMetrics');
+              endpoint.searchParams.set('view','FULL');
+              endpoint.searchParams.set('pageSize','200');
+              if (pageToken) endpoint.searchParams.set('pageToken',pageToken);
+              const r = await fetch(endpoint,{headers:{Authorization:'Bearer '+access},signal:AbortSignal.timeout(30000)});
+              const body = await r.json();
+              report({quotaHttpStatus:r.status,errorStatus:body.error?.status});
+              if (!r.ok) break;
+              for (const metric of body.metrics || []) {
+                if (!/memory|cpu/i.test(metric.metric+' '+metric.displayName)) continue;
+                report({metric:metric.metric,displayName:metric.displayName,limits:metric.consumerQuotaLimits});
+              }
+              pageToken = body.nextPageToken || '';
+            } while (pageToken);
+          }
+          const allowedErrors = new Set(['TimeoutError','AbortError','TypeError','Error','request_failed','non_success_status','missing_configuration']);
+          for (let sample=1; sample<=3; sample++) {
+            const start=Date.now();
+            try {
+              const r = await fetch('https://elevate-'+component+'-migration-aabnh2y32a-uc.a.run.app/api/health',
+                {headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},redirect:'manual',signal:AbortSignal.timeout(90000)});
+              const b=await r.json();
+              const d=b.dependencies?.supabase;
+              report({component,sample,httpStatus:r.status,totalMs:Date.now()-start,service:b.service,ready:b.ready,healthy:b.healthy,
+                commit:b.commit,uptime:b.uptime,supabase:d ? {ok:d.ok,status:d.status,latencyMs:d.latencyMs,error:allowedErrors.has(d.error)?d.error:undefined}:null});
+            } catch(e) {report({component,sample,probeError:allowedErrors.has(e.name)?e.name:'probe_failed'});}
+          }
+          NODE

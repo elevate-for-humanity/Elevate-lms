@@ -3,14 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { hydrateNorthflankEnv } from '@/lib/secrets';
+import { getGoogleServices, getGoogleService } from '@/lib/google/runtime';
 import { requireTypedConfirmation } from '@/lib/security/require-confirmation';
-import {
-  getNorthflankProjectId,
-  getNorthflankServices,
-  isNorthflankReady,
-  triggerNorthflankBuild,
-} from '@/lib/northflank/runtime';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,15 +20,14 @@ export async function GET(req: NextRequest) {
     .limit(20);
 
   if (error) return safeError('Failed to fetch Dev Studio builds', 500);
-  await hydrateNorthflankEnv().catch(() => {});
-  return NextResponse.json({ builds: data, northflankConfigured: isNorthflankReady() && Boolean(getNorthflankProjectId()) });
+  const health=await Promise.all(getGoogleServices().map(async s=>{try{return (await getGoogleService(s)).healthy}catch{return false}}));
+  return NextResponse.json({builds:data,googleConfigured:health.every(Boolean)});
 }
 
 export async function POST(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
 
-  await hydrateNorthflankEnv().catch(() => {});
 
   const body = await req.json().catch(() => ({}));
   const confirmation = requireTypedConfirmation(body.confirmation, 'deploy_autopilot');
@@ -44,55 +37,13 @@ export async function POST(req: NextRequest) {
   const db = await requireAdminClient();
   const service = body.service ?? 'admin';
 
-  const projectId = getNorthflankProjectId();
-  if (!projectId || !isNorthflankReady()) {
-    return safeError('Northflank is not configured. Add NORTHFLANK_API_TOKEN and NORTHFLANK_PROJECT_ID before deploying.', 503);
-  }
-
-  const { data, error } = await db
-    .from('ai_deployments')
-    .insert({
-      service,
-      environment: body.environment ?? 'production',
-      status: 'building',
-      commit_sha: body.commit_sha ?? null,
-      triggered_by: auth.id,
-    })
-    .select()
-    .single();
-
-  if (error) return safeError('Failed to create Dev Studio build record', 500);
-
-  await db.from('dev_audit_logs').insert({
-    user_id: auth.id,
-    action: 'build_triggered',
-    resource_type: 'ai_deployment',
-    resource_id: data.id,
-    metadata: { service },
-  });
-
-  const services = service === 'all'
-    ? getNorthflankServices()
-    : getNorthflankServices().filter((item) => item.key === service || item.id === service);
-
-  if (!services.length) {
-    await db.from('ai_deployments').update({ status: 'failed' }).eq('id', data.id);
-    return safeError(`Unknown Northflank service: ${service}`, 400);
-  }
-
-  try {
-    const northflankBuilds = await Promise.all(
-      services.map(async (item) => ({
-        service: item.id,
-        build: await triggerNorthflankBuild(projectId, item.id),
-      })),
-    );
-    await db.from('ai_deployments').update({ status: 'deploying' }).eq('id', data.id);
-    return NextResponse.json(
-      { build: { ...data, status: 'deploying' }, triggered: true, northflankBuilds },
-      { status: 201 },
-    );
-  } catch (err) {
+  const services=service==='all'?getGoogleServices():getGoogleServices().filter(item=>item.key===service||item.id===service);
+  if(!services.length){await db.from('ai_deployments').update({status:'failed'}).eq('id',data.id);return safeError(`Unknown Google service: ${service}`,400);}
+  const checks=await Promise.all(services.map(async item=>({service:item.id,health:await getGoogleService(item)})));
+  const healthy=checks.every(x=>x.health.healthy);
+  await db.from('ai_deployments').update({status:healthy?'deployed':'failed'}).eq('id',data.id);
+  return NextResponse.json({build:{...data,status:healthy?'deployed':'failed'},provider:'google-cloud',services:checks},{status:healthy?201:503});
+catch (err) {
     await db.from('ai_deployments').update({ status: 'failed' }).eq('id', data.id);
     return safeInternalError(err, 'Northflank build trigger failed');
   }

@@ -21,7 +21,9 @@ for(const item of services) {
       runtimeKeys:Object.keys(s.runtimeEnvironment ?? {}).sort(),
       buildKeys:Object.keys(s.buildEnvironment ?? {}).sort(),
       ports:(s.ports??[]).map(p=>({name:p.name,internalPort:p.internalPort,public:p.public})),
-      volumeCount:(s.volumes??[]).length,
+      volumeCount:(s.deployment?.volumes??s.volumes??[]).length,
+      persistence:{deploymentKeys:Object.keys(s.deployment??{}).sort(),storageKeys:Object.keys(s.deployment?.storage??{}).sort(),
+        declaredVolumes:(s.deployment?.volumes??s.volumes??[]).map(v=>({id:v.id,mounts:(v.mounts??[]).map(m=>({containerMountPath:m.containerMountPath,volumeMountPath:m.volumeMountPath})),spec:v.spec}))},
       hasCommandOverride:Boolean(s.deployment?.command || s.runtime?.command || s.config?.command),
       deployedSHA:s.deployment?.internal?.deployedSHA});
   } catch(e) {report.failures.push({id:item.id,error:e.message});}
@@ -31,6 +33,16 @@ for(const resource of ['volumes','secrets']) {
     const response=await get('/projects/'+encodeURIComponent(project)+'/'+resource);
     const items=Array.isArray(response)?response:response[resource];
     if(!Array.isArray(items)) throw new Error('Unrecognized '+resource+' response');
+    if(resource==='volumes') {
+      report.volumes=[];
+      for(const item of items) {
+        const v=await get('/projects/'+encodeURIComponent(project)+'/volumes/'+encodeURIComponent(item.id));
+        report.volumes.push({id:v.id,name:v.name,storageSize:v.spec?.storageSize,status:v.status,
+          attachedObjects:(v.attachedObjects??[]).map(o=>({id:o.id,type:o.type})),
+          backupSchedules:(v.backupSchedules??[]).map(b=>({scheduling:b.scheduling,retentionTime:b.retentionTime}))});
+      }
+      continue;
+    }
     report[resource]=items.map(v=>({id:v.id,name:v.name,
       ...(resource==='volumes'?{storageSize:v.spec?.storageSize,mounts:(v.mounts??[]).map(m=>({containerMountPath:m.containerMountPath}))}:{priority:v.priority,restricted:v.restrictions?.restricted,serviceIds:(v.restrictions?.nfObjects??[]).map(o=>o.id)})}));
   } catch(e) {report.failures.push({resource,error:e.message});}

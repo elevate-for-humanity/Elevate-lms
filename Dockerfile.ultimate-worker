@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends chromium ffmpeg
 # Standalone worker dependency contract: do not load the monorepo workspace/root manifest.
 COPY packages/ultimate-course-worker/package.json ./package.json
 RUN npm install --omit=dev --ignore-scripts --no-audit --no-fund
+COPY workers/local-speech-smoke.mjs ./workers/local-speech-smoke.mjs
 COPY workers/ultimate-course-builder.ts workers/worker-loop.mjs ./workers/
 COPY lib/ultimate-course-builder ./lib/ultimate-course-builder
 COPY lib/ai ./lib/ai
@@ -36,6 +37,7 @@ RUN node -e "require.resolve('@supabase/supabase-js');require.resolve('@remotion
 RUN node --input-type=module -e "const {KokoroTTS}=await import('kokoro-js');await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:'q8',device:'cpu'})"
 # Cache CPU speech recognition so captions and rendered-audio QA do not depend on API quotas.
 RUN node --input-type=module -e "const {loadLocalTranscriber}=await import('./lib/video/local-transcription.mjs');await loadLocalTranscriber()"
+RUN node workers/local-speech-smoke.mjs
 # Lazy media adapters are the worker's production boundary. Resolve them in the
 # image build so a missing shared renderer file cannot reach a live course job.
 RUN node --import=tsx -e "await Promise.all([import('./lib/ultimate-course-builder/adapters/platform-narration.ts'),import('./lib/ultimate-course-builder/adapters/platform-renderer.ts'),import('./lib/video/media-director.ts'),import('./lib/video/remotion-render.ts'),import('kokoro-js')])"

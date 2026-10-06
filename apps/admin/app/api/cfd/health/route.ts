@@ -35,11 +35,11 @@ export async function GET(): Promise<NextResponse<CapabilityHealth>> {
   });
   
   // Check container support
-  const hasContainers = !!process.env.NORTHFLANK_API_TOKEN;
+  const hasContainers = Boolean(process.env.GOOGLE_CLOUD_PROJECT || process.env.GCP_PROJECT || process.env.K_SERVICE);
   checks.push({
     name: 'Container Support',
     passed: hasContainers,
-    message: hasContainers ? 'Container runtime available' : 'Container runtime required for CFD simulations',
+    message: hasContainers ? 'Google container runtime available' : 'Container runtime required for CFD simulations',
   });
   
   // Check storage for simulation files

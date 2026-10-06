@@ -6,10 +6,21 @@ export function configSecret(component) {
   if (!COMPONENTS.includes(component)) throw new Error('Unsupported runtime component');
   return `elevate-${component}-runtime-config`;
 }
+export function googleFailureCode(stderr = '') {
+  if (/SERVICE_DISABLED|API .*not enabled|has not been used.*before|is disabled/i.test(stderr)) return 'api_disabled';
+  if (/PERMISSION_DENIED|permission denied|does not have permission|Permission .* denied/i.test(stderr)) return 'permission_denied';
+  if (/NOT_FOUND|was not found|does not exist/i.test(stderr)) return 'not_found';
+  if (/UNAUTHENTICATED|invalid_grant|authentication failed/i.test(stderr)) return 'authentication_failed';
+  if (/RESOURCE_EXHAUSTED|quota exceeded/i.test(stderr)) return 'quota_exceeded';
+  return 'command_failed';
+}
 export function google(args, input) {
   const result = spawnSync('gcloud', args, { input, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
   // CLI errors may include credential values. Never emit stdout/stderr on failure.
-  if (result.status !== 0) throw new Error(`Google operation failed: ${args.slice(0, 3).join(' ')}`);
+  if (result.status !== 0) {
+    const error = new Error(`Google operation failed: ${args.slice(0, 3).join(' ')}`);
+    error.code = googleFailureCode(result.stderr); throw error;
+  }
   return result.stdout.trim();
 }
 export function validateConfig(config, component) {

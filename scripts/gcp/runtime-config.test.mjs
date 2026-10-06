@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { loadGoogleConfig, validateConfig } from './runtime-config.mjs';
+import { loadGoogleConfig, validateConfig, googleFailureCode } from './runtime-config.mjs';
 import { importRuntimeConfig } from './import-runtime-config.mjs';
 const config = () => ({ version: 1, component: 'store', runtimeEnvironment: { MULTILINE: 'one\ntwo', TOKEN: 'a,b="c"' }, runtimeFiles: {}, volumes: [] });
 test('deployment loads only Google-owned configuration and preserves exact values', () => {
@@ -27,7 +27,7 @@ test('refuses overwrite and incomplete inventory before any mutation', async () 
   for (const incomplete of [false, true]) {
     let mutations = 0;
     await assert.rejects(importRuntimeConfig('store', { env: { NORTHFLANK_API_TOKEN: 'test' },
-      request: async url => ({ ok: true, json: async () => ({ data: String(url).includes('runtime-environment') ? (incomplete ? { runtimeEnvironment: {} } : config()) : {} }) }),
+      request: async url => ({ ok: true, json: async () => ({ data: String(url).includes('runtime-environment') ? (incomplete ? { runtimeEnvironment: {} } : config()) : { volumes: [] } }) }),
       run: args => { if (args[1] !== 'list') mutations++; return 'existing'; } }));
     assert.equal(mutations, 0);
   }
@@ -36,4 +36,33 @@ test('refuses overwrite and incomplete inventory before any mutation', async () 
 test('rejects configuration larger than Secret Manager capacity before import', () => {
   const c = config(); c.runtimeEnvironment.LARGE = 'x'.repeat(65536);
   assert.throws(() => validateConfig(c, 'store'), /payload limit/);
+});
+
+test('standalone attached Studio volume is recorded even when service has no volume declarations', async () => {
+  let payload;
+  const c = config(); c.component = 'studio-browser';
+  const result = await importRuntimeConfig('studio-browser', {
+    env: { NORTHFLANK_API_TOKEN: 'test' },
+    request: async url => ({ ok: true, json: async () => ({ data:
+      url.endsWith('/volumes') ? { volumes: [{ id: 'auth' }] } :
+      url.endsWith('/volumes/auth') ? { id: 'auth', spec: { storageSize: 6144 }, attachedObjects: [{ type: 'service', id: 'elevate-studio-browser' }] } :
+      url.includes('runtime-environment') ? c : {} }) }),
+    run: (args, input) => { if (input) payload = input; return args[2] === 'access' ? payload : ''; },
+  });
+  assert.equal(result.volumes, 1);
+  assert.equal(JSON.parse(payload).volumes[0].mountInventoryVerified, false);
+});
+test('unavailable volume attachment inventory prevents secret creation', async () => {
+  let mutations = 0;
+  await assert.rejects(importRuntimeConfig('store', {
+    env: { NORTHFLANK_API_TOKEN: 'test' },
+    request: async url => ({ ok: true, json: async () => ({ data: url.includes('runtime-environment') ? config() : {} }) }),
+    run: () => { mutations++; return ''; },
+  }), /persistence inventory/);
+  assert.equal(mutations, 0);
+});
+test('Google failures expose only a fixed diagnosis, never raw credentials', () => {
+  assert.equal(googleFailureCode('API [secretmanager.googleapis.com] not enabled; TOKEN=private'), 'api_disabled');
+  assert.equal(googleFailureCode('PERMISSION_DENIED: TOKEN=private'), 'permission_denied');
+  assert.equal(googleFailureCode('arbitrary credential output'), 'command_failed');
 });

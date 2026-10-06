@@ -1,6 +1,6 @@
 /**
  * Admin Environment Manager API. Credentials are encrypted in platform_secrets.
- * Elevate Media changes also require verified Northflank configuration sync.
+ * Runtime values are persisted in the encrypted platform secret store; Google runtime deployment consumes the canonical values.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -10,13 +10,7 @@ import { safeError, safeDbError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { refreshSecrets } from '@/lib/secrets';
 import {
-  getNorthflankProjectId,
-  isNorthflankReady,
-  upsertNorthflankServiceSecretVariable,
-} from '@/lib/northflank/runtime';
-import {
   isElevateMediaRuntimeKey,
-  syncElevateMediaToNorthflank,
   validateElevateMediaUpdates,
 } from '@/lib/northflank/elevate-media-sync';
 
@@ -148,12 +142,9 @@ export async function POST(req: NextRequest) {
   // Persistence must remain auditable even when the external sync fails.
   await auditWrite(auth.id, 'upsert', keys);
 
-  const agentMemoryEntries = entries.filter((entry) => entry.key.startsWith('AGENT_MEMORY_'));
-  let runtimeSync: 'not-requested' | 'admin' | 'admin+lms' = 'not-requested';
-  if (agentMemoryEntries.length) {
-    const projectId = getNorthflankProjectId();
-    if (!projectId || !isNorthflankReady()) {
-      return NextResponse.json({
+  const runtimeSync = entries.some(entry=>entry.key.startsWith('AGENT_MEMORY_') || isElevateMediaRuntimeKey(entry.key))
+    ? 'google-on-next-deploy' : 'not-requested';
+  return NextResponse.json({
         error: 'Iris settings were encrypted in Supabase Vault, but Northflank control-plane access is not configured.',
         vaultSaved: true, runtimeSynced: false,
       }, { status: 503 });
@@ -182,10 +173,8 @@ export async function POST(req: NextRequest) {
     }
   }
   return NextResponse.json({
-    saved: keys.length, encrypted: secretEntries.length, runtimeSync, mediaRuntimeSync,
-    message: mediaRuntimeSync
-      ? 'Settings saved and Northflank configuration verified for Admin and LMS. A workload restart is still required; Backblaze access and video playback have not been tested.'
-      : 'Settings saved successfully.',
+    saved: keys.length, encrypted: secretEntries.length, runtimeSync,
+    message: 'Settings saved in the canonical encrypted store. Google production consumes these values through the deployment secret binding.',
   });
 }
 

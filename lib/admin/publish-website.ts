@@ -8,20 +8,9 @@ import 'server-only';
 
 import { logger } from '@/lib/logger';
 import { PUBLIC_REVALIDATE_PATHS } from '@/lib/public-revalidate-paths';
-import {
-  getNorthflankProjectId,
-  getNorthflankService,
-  getNorthflankServices,
-  isNorthflankReady,
-  triggerNorthflankBuild,
-} from '@/lib/northflank/runtime';
+import { getGoogleServices, getGoogleService } from '@/lib/google/runtime';
 
-export type NorthflankDeployResult = {
-  service: string;
-  key: string;
-  status: 'triggered' | 'failed';
-  detail?: string;
-};
+export type GoogleDeployResult = { service:string; key:string; status:'managed'|'failed'; detail?:string };
 
 export type RevalidateLmsResult = {
   ok: boolean;
@@ -36,7 +25,7 @@ export type PublishWebsiteResult = {
   ok: boolean;
   timestamp: string;
   revalidate: RevalidateLmsResult;
-  deploy: NorthflankDeployResult[];
+  deploy: GoogleDeployResult[];
   liveSiteUrl: string;
 };
 
@@ -103,34 +92,18 @@ export async function revalidatePublicLmsSite(): Promise<RevalidateLmsResult> {
   }
 }
 
-/** Trigger Northflank builds for all production services. */
-export async function triggerProductionDeploys(): Promise<NorthflankDeployResult[]> {
-  const projectId = getNorthflankProjectId();
-  if (!projectId || !isNorthflankReady()) {
-    return getNorthflankServices().map((s) => ({
-      service: s.id,
-      key: s.key,
-      status: 'failed' as const,
-      detail: 'Northflank API credentials are not configured',
-    }));
-  }
-
-  return Promise.all(
-    getNorthflankServices().map(async (service) => {
-      try {
-        await triggerNorthflankBuild(projectId, service.id);
-        return { service: service.id, key: service.key, status: 'triggered' as const };
-      } catch (err) {
-        const detail = err instanceof Error ? err.message : String(err);
-        return {
-          service: service.id,
-          key: service.key,
-          status: 'failed' as const,
-          detail: detail.slice(0, 200),
-        };
-      }
-    }),
-  );
+/** Google production deploys are GitHub-authoritative; Admin publish refreshes live services without invoking a second control plane. */
+export async function triggerProductionDeploys(): Promise<GoogleDeployResult[]> {
+  return Promise.all(getGoogleServices().map(async service => {
+    try {
+      const health=await getGoogleService(service);
+      return health.healthy
+        ? {service:service.id,key:service.key,status:'managed' as const}
+        : {service:service.id,key:service.key,status:'failed' as const,detail:'Google service is not healthy'};
+    } catch(err) {
+      return {service:service.id,key:service.key,status:'failed' as const,detail:(err instanceof Error?err.message:String(err)).slice(0,200)};
+    }
+  }));
 }
 
 export type PublishWebsiteOptions = {
@@ -148,11 +121,11 @@ export async function publishAndUpdateWebsite(
     ? await revalidatePublicLmsSite()
     : { ok: true, paths: PUBLIC_REVALIDATE_PATHS, error: 'skipped' };
 
-  const deployResults: NorthflankDeployResult[] = deploy
+  const deployResults: GoogleDeployResult[] = deploy
     ? await triggerProductionDeploys()
     : [];
 
-  const deployOk = deployResults.length === 0 || deployResults.every((r) => r.status === 'triggered');
+  const deployOk = deployResults.length === 0 || deployResults.every((r) => r.status === 'managed');
   const ok = (revalidate ? revalidateResult.ok : true) && deployOk;
 
   return {
@@ -164,82 +137,12 @@ export async function publishAndUpdateWebsite(
   };
 }
 
-export type PublishWebsiteStatus = {
-  northflankReady: boolean;
-  liveSiteUrl: string;
-  services: Array<{
-    key: string;
-    id: string;
-    label: string;
-    url: string;
-    status: string | null;
-    lastDeployedAt: string | null;
-  }>;
-  revalidatePathCount: number;
-};
+export type PublishWebsiteStatus = { googleReady:boolean; liveSiteUrl:string; services:Array<{key:string;id:string;label:string;url:string;status:string|null;lastDeployedAt:string|null}>; revalidatePathCount:number; };
 
 export async function getPublishWebsiteStatus(): Promise<PublishWebsiteStatus> {
-  const projectId = getNorthflankProjectId();
-  const nfReady = isNorthflankReady();
-
-  const services = await Promise.all(
-    getNorthflankServices().map(async (cfg) => {
-      let status: string | null = null;
-      let lastDeployedAt: string | null = null;
-
-      if (nfReady && projectId) {
-        try {
-          const nf = await getNorthflankService(projectId, cfg.id);
-          const deploymentStatus = nf.deploymentStatus as
-            | { status?: string; lastTransitionTime?: string; updatedAt?: string }
-            | undefined;
-          status =
-            deploymentStatus?.status ??
-            (nf.buildStatus as string | undefined) ??
-            'unknown';
-          lastDeployedAt =
-            deploymentStatus?.lastTransitionTime ?? deploymentStatus?.updatedAt ?? null;
-        } catch {
-          status = 'unavailable';
-        }
-      }
-
-      if (!status || status === 'unknown' || status === 'unavailable') {
-        try {
-          const health = await fetch(`${cfg.url.replace(/\/$/, '')}${cfg.healthPath}`, {
-            cache: 'no-store',
-            signal: AbortSignal.timeout(8_000),
-          });
-          const contentType = health.headers.get('content-type') || '';
-          const payload = contentType.includes('application/json')
-            ? (await health.json().catch(() => null)) as { ok?: boolean; timestamp?: string } | null
-            : null;
-          if (health.ok && payload?.ok === true) {
-            status = 'healthy';
-            lastDeployedAt ??= payload.timestamp ?? null;
-          } else {
-            status = `unhealthy (HTTP ${health.status})`;
-          }
-        } catch {
-          status = 'unreachable';
-        }
-      }
-
-      return {
-        key: cfg.key,
-        id: cfg.id,
-        label: cfg.label,
-        url: cfg.url,
-        status,
-        lastDeployedAt,
-      };
-    }),
-  );
-
-  return {
-    northflankReady: nfReady,
-    liveSiteUrl: lmsOrigin(),
-    services,
-    revalidatePathCount: PUBLIC_REVALIDATE_PATHS.length,
-  };
+  const services=await Promise.all(getGoogleServices().map(async cfg=>{
+    try { const g=await getGoogleService(cfg); return {key:cfg.key,id:cfg.id,label:cfg.label,url:cfg.url,status:g.status,lastDeployedAt:null}; }
+    catch { return {key:cfg.key,id:cfg.id,label:cfg.label,url:cfg.url,status:'unreachable',lastDeployedAt:null}; }
+  }));
+  return {googleReady:services.every(s=>s.status==='healthy'),liveSiteUrl:lmsOrigin(),services,revalidatePathCount:PUBLIC_REVALIDATE_PATHS.length};
 }

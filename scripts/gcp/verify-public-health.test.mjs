@@ -19,3 +19,17 @@ test('HTTP success cannot conceal a disconnected billing provider', async () => 
   assert.equal(result.find(x => x.path.endsWith('/quickbooks')).passed, false);
   assert.equal(JSON.stringify(result).includes('secret'), false);
 });
+
+test('Store is monitored independently with its actual Marketing container identity', async () => {
+  const seen = [];
+  const request = async url => {
+    seen.push(url);
+    return { status: 200, json: async () => ({ service: 'marketing', ok: true, ready: true, healthy: true, dependencies: { supabase: { ok: true } } }) };
+  };
+  const result = await verifySite('store', request);
+  assert.equal(result.length, 3);
+  assert.equal(result.every(x => x.component === 'store' && x.passed), true);
+  assert.equal(seen.every(url => url.startsWith('https://store.elevateforhumanity.org/')), true);
+  const failed = await verifySite('store', async () => ({ status: 503, json: async () => ({}) }));
+  assert.equal(failed.some(x => x.passed), false);
+});

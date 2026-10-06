@@ -5,19 +5,22 @@ export const sites = {
   marketing: 'https://www.elevateforhumanity.org',
   admin: 'https://admin.elevateforhumanity.org',
   lms: 'https://app.elevateforhumanity.org',
+  store: 'https://store.elevateforhumanity.org',
 };
 
 export async function verifySite(component, request = fetch) {
   const base = sites[component];
   if (!base) throw new Error('Unknown public service');
+  // Store uses the Marketing Dockerfile and reports its actual process identity.
+  const processService = component === 'store' ? 'marketing' : component;
   const results = [];
   for (const path of ['/api/ping', '/api/health', '/api/ready']) {
     try {
       const r = await request(base + path, { redirect: 'manual', signal: AbortSignal.timeout(20000), headers: { 'Cache-Control': 'no-cache' } });
       const body = await r.json();
       const passed = path === '/api/ping'
-        ? r.status === 200 && body.ok === true && body.service === component
-        : healthPassed(component, path, r.status, body);
+        ? r.status === 200 && body.ok === true && body.service === processService
+        : healthPassed(processService, path, r.status, body);
       results.push({ component, path, status: r.status, passed,
         commit: /^[a-f0-9]{40}$/.test(body.commit ?? '') ? body.commit : undefined });
     } catch { results.push({ component, path, passed: false, error: 'probe_failed' }); }

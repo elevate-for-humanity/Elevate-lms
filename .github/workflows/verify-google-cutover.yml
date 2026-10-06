@@ -1,0 +1,77 @@
+name: Verify Google public cutover prerequisites
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  inspect:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [marketing, admin, lms]
+    steps:
+      - uses: google-github-actions/auth@v3
+        id: auth
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-${{ matrix.component }}-migration-aabnh2y32a-uc.a.run.app
+          id_token_include_email: true
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Read readiness, public access, domain mappings and DNS
+        env:
+          COMPONENT: ${{ matrix.component }}
+          TOKEN: ${{ steps.auth.outputs.id_token }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          const component=process.env.COMPONENT;
+          const service='elevate-'+component+'-migration';
+          const base='https://'+service+'-aabnh2y32a-uc.a.run.app';
+          const gcloud=args=>execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+          const report=x=>console.log(JSON.stringify(x));
+          const metadata=JSON.parse(gcloud(['run','services','describe',service,'--project=elegant-racer-299721','--region=us-central1','--format=json']));
+          report({component,url:metadata.status.url,revision:metadata.status.latestReadyRevisionName,
+            ingress:metadata.metadata.annotations?.['run.googleapis.com/ingress'],
+            startupProbe:metadata.spec.template.spec.containers[0].startupProbe,
+            resources:metadata.spec.template.spec.containers[0].resources,
+            min:metadata.spec.template.metadata.annotations?.['autoscaling.knative.dev/minScale'],
+            max:metadata.spec.template.metadata.annotations?.['autoscaling.knative.dev/maxScale']});
+          try {
+            const policy=JSON.parse(gcloud(['run','services','get-iam-policy',service,'--project=elegant-racer-299721','--region=us-central1','--format=json']));
+            report({component,publicInvoker:(policy.bindings || []).some(b=>b.role==='roles/run.invoker' && b.members?.includes('allUsers'))});
+          } catch {report({component,iamRead:'unavailable'});}
+          for(const path of ['/api/health','/api/ready','/']) {
+            try {
+              const r=await fetch(base+path,{headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},redirect:'manual',signal:AbortSignal.timeout(30000)});
+              const b=path==='/'?{}:await r.json().catch(()=>({}));
+              report({component,path,status:r.status,contentType:r.headers.get('content-type'),
+                ready:b.ready,healthy:b.healthy,commit:b.commit,executorReady:b.agenticExecutorReady,
+                supabaseOK:b.dependencies?.supabase?.ok});
+            } catch {report({component,path,error:'probe_failed'});}
+          }
+          if(component==='marketing') {
+            try {
+              const mappings=JSON.parse(gcloud(['run','domain-mappings','list','--project=elegant-racer-299721','--region=us-central1','--format=json']));
+              report({domainMappings:mappings.map(x=>({domain:x.metadata?.name,service:x.spec?.routeName,conditions:x.status?.conditions,records:x.status?.resourceRecords}))});
+            } catch {report({domainMappings:'unavailable'});}
+            const token=process.env.CLOUDFLARE_API_TOKEN, zone=process.env.CLOUDFLARE_ZONE_ID;
+            report({cloudflareTokenPresent:Boolean(token),cloudflareZonePresent:Boolean(zone)});
+            if(token && /^[a-f0-9]{32}$/.test(zone || '')) {
+              for(const name of ['elevateforhumanity.org','www.elevateforhumanity.org','admin.elevateforhumanity.org','app.elevateforhumanity.org']) {
+                const r=await fetch('https://api.cloudflare.com/client/v4/zones/'+zone+'/dns_records?name='+encodeURIComponent(name),{headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(20000)});
+                const b=await r.json();
+                report({dnsName:name,httpStatus:r.status,success:b.success,records:Array.isArray(b.result)?b.result.map(x=>({type:x.type,name:x.name,content:x.content,proxied:x.proxied,ttl:x.ttl})):[]});
+              }
+            }
+          }
+          NODE

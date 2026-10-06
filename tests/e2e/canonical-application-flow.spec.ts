@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { siteUrls } from '../../lib/utils/site-urls';
 
 test.describe('Canonical application flow', () => {
   test('homepage exposes a visible application path', async ({ page }) => {
@@ -54,9 +55,18 @@ test.describe('Canonical application flow', () => {
   }
 
   test('login, onboarding and tracking routes exist', async ({ page, request }) => {
-    await page.goto('/login');
-    await expect(page.locator('input[type="email"]').first()).toBeVisible();
-    await expect(page.locator('input[type="password"]').first()).toBeVisible();
+    // This suite runs Marketing only. Verify its redirect without requiring the
+    // separately deployed LMS to be online or changing canonical portal routing.
+    const login = await request.get('/login?next=%2Flms&reason=session', {
+      maxRedirects: 0,
+      failOnStatusCode: false,
+    });
+    expect(login.status()).toBe(307);
+    const target = new URL(login.headers().location);
+    expect(target.origin).toBe(new URL(siteUrls.app).origin);
+    expect(target.pathname).toBe('/login');
+    expect(target.searchParams.get('next')).toBe('/lms');
+    expect(target.searchParams.get('reason')).toBe('session');
 
     const onboarding = await request.get('/onboarding/learner', { failOnStatusCode: false });
     expect(onboarding.status()).not.toBe(404);

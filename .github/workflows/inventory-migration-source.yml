@@ -1,0 +1,30 @@
+name: Inventory Northflank migration source
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/google-cloud-migration-setup]
+    paths: ['.github/workflows/inventory-migration-source.yml', 'scripts/gcp/inventory-northflank.mjs']
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read source configuration metadata
+        env:
+          NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+          NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID }}
+        run: node scripts/gcp/inventory-northflank.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: northflank-migration-inventory
+          path: northflank-migration-inventory.json
+          retention-days: 3
+          if-no-files-found: warn

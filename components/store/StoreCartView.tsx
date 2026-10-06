@@ -220,7 +220,7 @@ export default function StoreCartView({ checkoutError, addParam }: Props) {
               <span className="font-black text-slate-950">${cart.total.toFixed(2)}</span>
             </div>
             <p className="mt-3 text-xs leading-5 text-slate-500">
-              The server revalidates every item and price before creating Stripe Checkout. Shipping
+              The server revalidates every item and price before creating QuickBooks Checkout. Shipping
               details are requested for physical products.
             </p>
             <button

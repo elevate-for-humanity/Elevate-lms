@@ -394,8 +394,8 @@ export function AdminDashboardContent({
         <SystemHealthPanel
           health={
             data.systemHealth ?? {
-              stripeWebhookOk: false,
-              stripeIssuingOk: false,
+              quickBooksWebhookOk: false,
+              quickBooksBillingOk: false,
               buildEnvOk: false,
               staleJobs: 0,
               degraded: true,

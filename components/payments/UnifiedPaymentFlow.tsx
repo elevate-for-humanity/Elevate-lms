@@ -398,7 +398,7 @@ export default function UnifiedPaymentFlow({
           <div className="text-sm text-black">
             <p className="font-semibold mb-1">Secure Payment Processing</p>
             <p>
-              Your payment is processed securely through Stripe. We never store your payment
+              Your payment is processed securely through QuickBooks. We never store your payment
               information. All transactions are encrypted and PCI-DSS compliant.
             </p>
           </div>

@@ -7,11 +7,13 @@ import {
 import { loadQuickBooksConfig, quickBooksRequest } from '@/lib/integrations/quickbooks-client';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
+  await hydrateProcessEnv();
   const rawBody = await request.text();
   const verifier = process.env.QB_WEBHOOK_VERIFIER_TOKEN || '';
   if (!verifyQuickBooksWebhook(rawBody, request.headers.get('intuit-signature'), verifier)) {

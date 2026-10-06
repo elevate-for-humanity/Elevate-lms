@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { BriefcaseBusiness, CheckCircle2, ClipboardCheck, GraduationCap, WalletCards } from 'lucide-react';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
+import { resolveProgramFundingStatus } from '@/lib/programs/funding-visibility';
+import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
 const APPRENTICESHIP_SLUGS = new Set([
   'barber-apprenticeship',
@@ -14,6 +16,7 @@ const APPRENTICESHIP_SLUGS = new Set([
 export default function ProgramExperienceGuide({ program }: { program: ProgramSchema }) {
   const isApprenticeship =
     program.programType === 'apprenticeship' || APPRENTICESHIP_SLUGS.has(program.slug);
+  const funding = resolveProgramFundingStatus(program);
   const paymentPlanHref = `/apply/student?${new URLSearchParams({
     program: program.slug,
     intent: 'enrollment',
@@ -89,10 +92,12 @@ export default function ProgramExperienceGuide({ program }: { program: ProgramSc
           <div>
             <div className="flex items-center gap-3">
               <WalletCards className="h-7 w-7 text-brand-blue-800" aria-hidden="true" />
-              <h3 className="text-2xl font-black text-slate-950">How self-pay and BNPL work</h3>
+              <h3 className="text-2xl font-black text-slate-950">{funding.showWorkforceFundingProcess ? 'Funding first. Payment options if needed.' : 'Self-pay and payment options'}</h3>
             </div>
             <p className="mt-3 max-w-4xl text-sm font-medium leading-6 text-slate-700 sm:text-base">
-              Apply first. After your program and enrollment details are confirmed, choose full payment or an available payment plan. BNPL means “buy now, pay later”: an outside payment provider reviews your application, shows its own terms, and decides approval. Approval is not guaranteed. Review the payment amount, due dates, fees, and provider agreement before accepting. Workforce funding is a separate process and requires written authorization from the responsible agency.
+              {funding.showWorkforceFundingProcess
+                ? 'Free to those who qualify. Apply first, then complete the required WorkOne or workforce-agency intake. The agency determines eligibility and must provide written authorization. If you do not qualify or choose self-pay, you can then review pay-in-full, installment, employer-sponsored, or available Buy Now Pay Later options. BNPL is a separate provider decision and is not workforce funding.'
+                : 'Apply first. After your program and enrollment details are confirmed, choose pay-in-full, an available installment plan, employer sponsorship, or an available Buy Now Pay Later option. BNPL is reviewed by an outside payment provider, is not guaranteed, and is not workforce funding.'}
             </p>
             {isApprenticeship ? (
               <p className="mt-3 text-sm font-bold leading-6 text-slate-800">
@@ -101,6 +106,11 @@ export default function ProgramExperienceGuide({ program }: { program: ProgramSc
             ) : null}
           </div>
           <div className="flex flex-col gap-3">
+            {funding.showWorkforceFundingProcess ? (
+              <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-emerald-700 px-6 py-3 text-center font-black text-white hover:bg-emerald-800">
+                Schedule WorkOne Intake
+              </a>
+            ) : null}
             <Link href={paymentPlanHref} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-blue-700 px-6 py-3 text-center font-black text-white hover:bg-brand-blue-800">
               Review payment options
             </Link>

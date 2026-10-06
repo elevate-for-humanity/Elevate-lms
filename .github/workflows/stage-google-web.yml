@@ -5,7 +5,7 @@ on:
       component:
         type: choice
         required: true
-        options: [marketing, admin, lms]
+        options: [marketing, admin, lms, store]
       image_sha:
         description: Full commit SHA of an image already uploaded to Google
         required: true

@@ -209,6 +209,22 @@ jobs:
                 !qbResult.quickBooksConnected || !qbResult.quickBooksWebhookVerifier)
               throw new Error('QuickBooks runtime is not synchronized with the Google deployment');
           }
+          if(component==='admin') {
+            const telnyxResponse=await fetch('https://elevate-admin-migration-aabnh2y32a-uc.a.run.app/api/health/telnyx',{
+              headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
+              redirect:'manual',signal:AbortSignal.timeout(20000)
+            });
+            const telnyx=await telnyxResponse.json().catch(()=>({}));
+            const telnyxResult={component:'admin',telnyxHttpStatus:telnyxResponse.status,
+              telnyxReady:telnyx.ready===true,telnyxConfigured:telnyx.configured===true,
+              carrierNumberActive:telnyx.carrierNumberActive===true,
+              primaryNumberActive:telnyx.primaryNumberActive===true,
+              webrtcConfigured:telnyx.webrtcConfigured===true};
+            console.log(JSON.stringify(telnyxResult));
+            if(telnyxResponse.status!==200 || !telnyxResult.telnyxReady || !telnyxResult.telnyxConfigured ||
+                !telnyxResult.carrierNumberActive || !telnyxResult.primaryNumberActive || !telnyxResult.webrtcConfigured)
+              throw new Error('Telnyx runtime is not synchronized with the Google Admin deployment');
+          }
           appendFileSync(process.env.GITHUB_STEP_SUMMARY,component+': dependency health and canonical readiness passed.\n');
 
           NODE

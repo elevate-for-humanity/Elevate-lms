@@ -38,5 +38,5 @@ jobs:
           test -n "$REVISION"
           IMAGE="$(gcloud run revisions describe "$REVISION" --project="$PROJECT" --region=us-central1 --format='value(status.imageDigest)')"
           [[ "$IMAGE" == us-central1-docker.pkg.dev/elegant-racer-299721/elevate/"$COMPONENT"@sha256:* ]]
-          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE" --cpu=4 --memory=8Gi --quiet
+          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE" --cpu=4 --memory=8Gi --startup-probe='httpGet.path=/api/health,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' --quiet
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='yaml(status.latestReadyRevisionName,spec.template.spec.containers.resources)'

@@ -1,0 +1,73 @@
+name: Deploy repaired Google services
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [marketing, admin, lms]
+    concurrency:
+      group: google-stage-${{ matrix.component }}
+      cancel-in-progress: false
+    steps:
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Update only the image of the existing migration service
+        env:
+          COMPONENT: ${{ matrix.component }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT=elegant-racer-299721
+          SERVICE="elevate-$COMPONENT-migration"
+          IMAGE="us-central1-docker.pkg.dev/$PROJECT/elevate/$COMPONENT"
+          SHA=3e9d4ff2d4cfd57e8481a9469315cad907acf67b
+          gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='value(metadata.name)'
+          DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
+          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --quiet
+      - uses: google-github-actions/auth@v3
+        id: health_auth
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-${{ matrix.component }}-migration-aabnh2y32a-uc.a.run.app
+          id_token_include_email: true
+      - name: Verify image version and Supabase health
+        env:
+          TOKEN: ${{ steps.health_auth.outputs.id_token }}
+          COMPONENT: ${{ matrix.component }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { appendFileSync } from 'node:fs';
+          const component = process.env.COMPONENT;
+          const response = await fetch('https://elevate-' + component + '-migration-aabnh2y32a-uc.a.run.app/api/health', {
+            headers: { 'X-Serverless-Authorization': 'Bearer ' + process.env.TOKEN },
+            redirect: 'manual', signal: AbortSignal.timeout(90000)
+          });
+          let body;
+          try { body = await response.json(); } catch { body = {}; }
+          const result = {component, httpStatus: response.status,
+            correctService: body.service === component, healthy: body.healthy === true,
+            ready: body.ready === true, supabase: body.dependencies?.supabase?.ok === true,
+            correctCommit: body.commit === '3e9d4ff2d4cfd57e8481a9469315cad907acf67b'};
+          console.log(JSON.stringify(result));
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, JSON.stringify(result) + '\n');
+          if (response.status !== 200 || !result.correctService || !result.healthy ||
+            !result.ready || !result.supabase || !result.correctCommit) process.exitCode = 1;
+          NODE

@@ -113,6 +113,7 @@ export async function loadApprenticePortalData(programSlug: string) {
           enrollment_state: 'active',
           orientation_completed_at: null,
         };
+      }
     }
 
     const email = profileRes.data?.email ?? user.email ?? '';

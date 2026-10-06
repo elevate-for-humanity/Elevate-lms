@@ -2,6 +2,12 @@ name: Autopilot (Builder Mode)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/autopilot-worker/**'
+      - 'scripts/autopilot.sh'
+      - '.github/workflows/autopilot.yml'
 
 concurrency:
   group: autopilot-${{ github.ref }}
@@ -10,7 +16,7 @@ concurrency:
 jobs:
   autopilot:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
@@ -37,4 +43,6 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          GOOGLE_CLOUD_PROJECT: elegant-racer-299721
+          GOOGLE_CLOUD_REGION: us-central1
         run: ./scripts/autopilot.sh

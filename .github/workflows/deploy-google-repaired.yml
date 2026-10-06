@@ -88,7 +88,7 @@ jobs:
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='value(metadata.name)'
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
-          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --cpu=4 --memory=8Gi --quiet
+          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --cpu=4 --memory=8Gi --startup-probe='httpGet.path=/api/health,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' --quiet
       - uses: google-github-actions/auth@v3
         id: health_auth
         with:
@@ -134,7 +134,6 @@ jobs:
               result.ready && result.supabase && result.correctCommit;
             consecutive=passed ? consecutive+1 : 0;
             if(consecutive===3) {
-              appendFileSync(process.env.GITHUB_STEP_SUMMARY,component+': three consecutive verified dependency checks passed.\\n');
               break;
             }
             // Only the observed cold-start dependency timeout gets a bounded warm-up window.
@@ -146,4 +145,20 @@ jobs:
             await new Promise(resolve=>setTimeout(resolve,5000));
           }
           if(consecutive<3) throw new Error('Service did not establish stable dependency health within two minutes');
+          // /health confirms dependency access; /ready enforces the application's own readiness contract.
+          const readinessResponse=await fetch('https://elevate-'+component+'-migration-aabnh2y32a-uc.a.run.app/api/ready',{
+            headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
+            redirect:'manual',signal:AbortSignal.timeout(20000)
+          });
+          const readiness=await readinessResponse.json();
+          const readyResult={component,httpStatus:readinessResponse.status,ready:readiness.ready===true,
+            correctService:readiness.service===component,
+            correctCommit:readiness.commit==='3e9d4ff2d4cfd57e8481a9469315cad907acf67b',
+            executorReady:component!=='admin' || readiness.agenticExecutorReady===true};
+          console.log(JSON.stringify(readyResult));
+          if(readinessResponse.status!==200 || !readyResult.ready || !readyResult.correctService ||
+              !readyResult.correctCommit || !readyResult.executorReady)
+            throw new Error('Canonical application readiness failed');
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY,component+': dependency health and canonical readiness passed.\n');
+
           NODE

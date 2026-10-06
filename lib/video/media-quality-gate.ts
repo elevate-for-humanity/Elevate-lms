@@ -291,6 +291,10 @@ async function requireCloudflareTranscriptionCredentials(): Promise<{
 }
 
 async function transcribeRenderedAudio(videoPath: string, workDir: string): Promise<string> {
+  if (process.env.AI_TRANSCRIPTION_PROVIDER === 'local_whisper') {
+    const { transcribeLocalAudio } = await import('./local-transcription.mjs');
+    return (await transcribeLocalAudio(videoPath)).text;
+  }
   const model = resolveCloudflareTranscriptionModel();
 
   // Raw WAV expands long lessons enough to exceed the Workers AI request
@@ -680,27 +684,33 @@ export interface MeasuredCaptionCue {
   endSeconds: number;
   text: string;
 }
-/** Cloudflare Whisper exposes real decoded word start/end times. Missing timing
+/** Speech recognition exposes decoded word start/end times. Missing timing
  * data blocks the strict renderer; do not substitute estimated phrase timing. */
 export async function measureNarrationCaptions(
   audio: Buffer,
   expectedScript: string,
   durationSeconds: number,
 ): Promise<MeasuredCaptionCue[]> {
-  const { accountId, token } = await requireCloudflareTranscriptionCredentials();
-  const model = resolveCloudflareTranscriptionModel();
-  const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
-    {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'audio/mpeg' },
-      body: Uint8Array.from(audio).buffer,
-      signal: AbortSignal.timeout(180000),
-    },
-  );
-  if (!response.ok) throw new Error(`Caption alignment returned HTTP ${response.status}`);
-  const payload = await response.json();
-  const words: Array<{ word: string; start: number; end: number }> = payload.result?.words;
+  let words: Array<{ word: string; start: number; end: number }>;
+  if (process.env.AI_TRANSCRIPTION_PROVIDER === 'local_whisper') {
+    const { transcribeLocalAudio } = await import('./local-transcription.mjs');
+    words = (await transcribeLocalAudio(audio)).words;
+  } else {
+    const { accountId, token } = await requireCloudflareTranscriptionCredentials();
+    const model = resolveCloudflareTranscriptionModel();
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'audio/mpeg' },
+        body: Uint8Array.from(audio).buffer,
+        signal: AbortSignal.timeout(180000),
+      },
+    );
+    if (!response.ok) throw new Error(`Caption alignment returned HTTP ${response.status}`);
+    const payload = await response.json();
+    words = payload.result?.words;
+    }
   if (
     !Array.isArray(words) ||
     !words.length ||

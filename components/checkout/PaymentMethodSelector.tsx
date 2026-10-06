@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 
-export type PaymentMethod = 'stripe' | 'sezzle';
+export type PaymentMethod = 'quickbooks' | 'sezzle';
 
 interface PaymentMethodSelectorProps {
   amount: number;
@@ -26,13 +26,13 @@ export default function PaymentMethodSelector({
     <div className="space-y-3">
       <label className="block text-sm font-medium text-slate-700 mb-2">Payment Method</label>
 
-      {/* Stripe (Card, Affirm, Klarna, Afterpay) */}
+      {/* QuickBooks (Card, Affirm, Klarna, Afterpay) */}
       <button
         type="button"
-        onClick={() => onSelect('stripe')}
+        onClick={() => onSelect('quickbooks')}
         disabled={disabled}
         className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
-          selectedMethod === 'stripe'
+          selectedMethod === 'quickbooks'
             ? 'border-brand-blue-500 bg-brand-blue-50'
             : 'border-slate-200 hover:border-slate-300'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
@@ -54,7 +54,7 @@ export default function PaymentMethodSelector({
             </div>
           </div>
         </div>
-        {selectedMethod === 'stripe' && (
+        {selectedMethod === 'quickbooks' && (
           <p className="text-xs text-brand-blue-600 mt-2">
             Pay in full or split into payments with Affirm, Klarna, or Afterpay
           </p>

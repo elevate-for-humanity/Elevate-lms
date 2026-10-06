@@ -33,7 +33,6 @@ export async function fulfillPaidBillingInvoice(
         completed_at: new Date().toISOString(),
         metadata: {
           program_enrollment_id: payload.enrollment_id,
-          legacy_stripe_subscription_id: payload.legacy_stripe_subscription_id,
         },
       },
       { onConflict: 'billing_invoice_id' },
@@ -136,7 +135,6 @@ export async function fulfillPaidBillingInvoice(
           user_id: user.id,
           plan_id: planId,
           status: 'active',
-          stripe_subscription_id: null,
           metadata: {
             billing_provider: 'quickbooks',
             billing_invoice_id: job.billing_invoice_id,
@@ -456,6 +454,45 @@ export async function fulfillPaidBillingInvoice(
           .eq('id', item.product_id)
           .eq('inventory_quantity', product.data.inventory_quantity);
     }
+    return;
+  }
+
+  if (job.fulfillment_type === 'website_domain_purchase') {
+    const { checkDomainPurchase, buyDomain } = await import('@/lib/domainee/client');
+    const { data: row, error } = await db.from('website_domains')
+      .select('id,website_id,user_id,hostname,status,retail_cents,origin_url,customer_reference,metadata')
+      .eq('id', payload.domain_record_id).eq('user_id', payload.user_id).maybeSingle();
+    if (error || !row) throw new Error(error?.message || 'Domain purchase record was not found.');
+    if (row.status === 'active' || row.status === 'processing') return;
+    if (Number(row.retail_cents) !== Number(payload.amount_cents)) throw new Error('Domain invoice does not match the order amount.');
+    const quote = await checkDomainPurchase(row.hostname);
+    if (!quote.available) {
+      await db.from('website_domains').update({ status: 'failed', payment_status: 'paid_refund_required', error: 'Domain became unavailable after payment.' }).eq('id', row.id);
+      throw new Error('Domain became unavailable after payment; refund review is required.');
+    }
+    if (quote.pricing.totalCents > Number(row.retail_cents)) {
+      await db.from('website_domains').update({ status: 'failed', payment_status: 'paid_refund_required', provider_cost_cents: quote.pricing.totalCents, error: 'Registrar cost exceeds collected amount.' }).eq('id', row.id);
+      throw new Error('Registrar cost changed after payment; refund review is required.');
+    }
+    const registrant = row.metadata?.registrant;
+    const years = Number(row.metadata?.years || 1);
+    if (!registrant || !row.origin_url) throw new Error('Domain registrant or origin data is missing.');
+    await db.from('website_domains').update({ status: 'processing', payment_status: 'paid', provider_cost_cents: quote.pricing.totalCents }).eq('id', row.id);
+    const result = await buyDomain(row.hostname, years, registrant, {
+      originUrl: row.origin_url,
+      customerReference: row.customer_reference || `elevate-${row.user_id}-${row.website_id}`,
+      idempotencyKey: `billing-invoice-${job.billing_invoice_id}`,
+    });
+    const purchase = result.purchase;
+    const saved = await db.from('website_domains').update({
+      domainee_domain_id: purchase.connectedDomainId || null,
+      domainee_purchase_id: purchase.id,
+      status: purchase.status === 'completed' ? 'active' : 'processing',
+      payment_status: 'paid',
+      provider_cost_cents: purchase.totalCents,
+      updated_at: new Date().toISOString(),
+    }).eq('id', row.id);
+    if (saved.error) throw new Error(saved.error.message);
     return;
   }
 

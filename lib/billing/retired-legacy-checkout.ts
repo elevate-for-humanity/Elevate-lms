@@ -6,13 +6,13 @@ type Replacement = {
 };
 
 /**
- * Permanent fail-closed response for URLs that previously created Stripe charges.
- * Historical Stripe reads and signed webhook reconciliation remain separate.
+ * Permanent fail-closed response for URLs that previously created Legacy charges.
+ * Historical Legacy reads and signed webhook reconciliation remain separate.
  */
-export function retiredStripeCheckout({ destination, reason }: Replacement) {
+export function retiredLegacyCheckout({ destination, reason }: Replacement) {
   return NextResponse.json(
     {
-      error: 'This legacy Stripe checkout has been retired.',
+      error: 'This legacy Legacy checkout has been retired.',
       code: 'STRIPE_CHECKOUT_RETIRED',
       billingProvider: 'quickbooks',
       destination,

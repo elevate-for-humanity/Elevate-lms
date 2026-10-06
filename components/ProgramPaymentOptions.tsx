@@ -19,10 +19,10 @@ export default function ProgramPaymentOptions({
   price,
   duration,
 }: ProgramPaymentOptionsProps) {
-  const [paymentMethod, setPaymentMethod] = useState<'full' | 'stripe' | 'bnpl'>('full');
+  const [paymentMethod, setPaymentMethod] = useState<'full' | 'quickbooks' | 'bnpl'>('full');
 
   // Calculate payment plan options
-  const stripeMonthly = Math.ceil(price / 12);
+  const quickbooksMonthly = Math.ceil(price / 12);
   const bnplPayment = Math.ceil(price / 4); // Pay in 4 with BNPL providers
 
   const handlePayment = async (method: string) => {
@@ -83,11 +83,11 @@ export default function ProgramPaymentOptions({
           </div>
         </button>
 
-        {/* Stripe Payment Plan */}
+        {/* QuickBooks Payment Plan */}
         <button
-          onClick={() => setPaymentMethod('stripe')}
+          onClick={() => setPaymentMethod('quickbooks')}
           className={`w-full text-left p-6 rounded-lg border-2 transition ${
-            paymentMethod === 'stripe'
+            paymentMethod === 'quickbooks'
               ? 'border-brand-blue-600 bg-brand-blue-50'
               : 'border-slate-300 hover:border-brand-blue-400'
           }`}
@@ -96,15 +96,15 @@ export default function ProgramPaymentOptions({
             <div className="flex items-start gap-3">
               <CreditCard className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
               <div>
-                <h4 className="font-bold text-lg mb-1">Stripe Payment Plan</h4>
+                <h4 className="font-bold text-lg mb-1">QuickBooks Payment Plan</h4>
                 <p className="text-sm text-black mb-2">Break up payments over 12 months</p>
-                <p className="text-2xl font-bold text-brand-blue-600">${stripeMonthly}/month</p>
+                <p className="text-2xl font-bold text-brand-blue-600">${quickbooksMonthly}/month</p>
                 <p className="text-xs text-slate-700 mt-1">
                   12 monthly payments • Low interest rates
                 </p>
               </div>
             </div>
-            {paymentMethod === 'stripe' && <span className="text-slate-400 flex-shrink-0">•</span>}
+            {paymentMethod === 'quickbooks' && <span className="text-slate-400 flex-shrink-0">•</span>}
           </div>
         </button>
 
@@ -142,7 +142,7 @@ export default function ProgramPaymentOptions({
         className="w-full bg-brand-orange-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-brand-orange-700 transition"
       >
         {paymentMethod === 'full' && `Pay $${price.toLocaleString('en-US')} Now`}
-        {paymentMethod === 'stripe' && `Set Up Payment Plan - $${stripeMonthly}/mo`}
+        {paymentMethod === 'quickbooks' && `Set Up Payment Plan - $${quickbooksMonthly}/mo`}
         {paymentMethod === 'bnpl' && `Pay in 4 - $${bnplPayment}/payment`}
       </button>
 
@@ -150,7 +150,7 @@ export default function ProgramPaymentOptions({
       <div className="mt-6 space-y-3 text-sm text-black">
         <p className="flex items-start gap-2">
           <span className="text-slate-400 flex-shrink-0">•</span>
-          <span>Secure payment processing via Stripe</span>
+          <span>Secure payment processing via QuickBooks</span>
         </p>
         <p className="flex items-start gap-2">
           <span className="text-slate-400 flex-shrink-0">•</span>

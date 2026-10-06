@@ -8,7 +8,6 @@ import FundingEligibilityFlow, {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CheckCircle, CreditCard, Loader2 } from 'lucide-react';
-import { PAYMENT_LINKS } from '@/lib/stripe/price-map';
 import { BNPL_PROVIDER_SUMMARY } from '@/lib/bnpl-config';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { createBrowserClient } from '@/lib/supabase/client';
@@ -101,15 +100,10 @@ export default function PeerRecoveryApplyPage() {
         return;
       }
 
-      // Self-pay: redirect to Stripe payment link (with ref for post-payment confirmation)
+      // Self-pay applications continue to the canonical billing flow.
       if (fundingType === 'self_pay') {
-        const link =
-          paymentPlan === 'full'
-            ? PAYMENT_LINKS.peerRecovery.full
-            : PAYMENT_LINKS.peerRecovery.deposit;
-        const emailParam = encodeURIComponent(form.email);
         const refParam = encodeURIComponent(data.referenceNumber || data.id || '');
-        window.location.href = `${link}?prefilled_email=${emailParam}${refParam ? `&ref=${refParam}` : ''}`;
+        router.push(`/programs/peer-recovery-specialist/confirm?ref=${refParam}&paymentPlan=${paymentPlan}`);
         return;
       }
 
@@ -309,7 +303,7 @@ export default function PeerRecoveryApplyPage() {
                 </div>
               </label>
               <p className="text-xs text-slate-500 pt-1">
-                You&apos;ll be redirected to our secure Stripe checkout after submitting.
+                You&apos;ll be redirected to our secure secure billing checkout after submitting.
               </p>
             </div>
           )}

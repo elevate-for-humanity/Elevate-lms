@@ -98,8 +98,8 @@ export interface SystemHealthAlert {
 }
 
 export interface SystemHealth {
-  stripeWebhookOk: boolean;
-  stripeIssuingOk: boolean;
+  quickBooksWebhookOk: boolean;
+  quickBooksBillingOk: boolean;
   buildEnvOk: boolean;
   staleJobs: number;
   degraded: boolean;

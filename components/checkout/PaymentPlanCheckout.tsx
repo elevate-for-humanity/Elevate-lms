@@ -24,7 +24,7 @@ interface CheckoutOptions {
   downPayment: number;
   weeklyPayment: number;
   numberOfWeeks: number;
-  bnplProvider?: 'stripe' | 'sezzle';
+  bnplProvider?: 'quickbooks' | 'sezzle';
   useBnpl: boolean;
 }
 
@@ -62,7 +62,7 @@ export default function PaymentPlanCheckout({
   const [paymentType, setPaymentType] = useState<'full' | 'plan'>('plan');
   const [downPayment, setDownPayment] = useState(Math.min(minDown, remainingBalance));
   const [useBnpl, setUseBnpl] = useState(false);
-  const [selectedBnpl, setSelectedBnpl] = useState<'stripe' | 'sezzle'>('stripe');
+  const [selectedBnpl, setSelectedBnpl] = useState<'quickbooks' | 'sezzle'>('quickbooks');
   const [showSchedule, setShowSchedule] = useState(false);
 
   // Calculate payment plan based on down payment
@@ -417,9 +417,9 @@ export default function PaymentPlanCheckout({
                 <div className="mt-4 space-y-2 ml-8">
                   <button
                     type="button"
-                    onClick={() => setSelectedBnpl('stripe')}
+                    onClick={() => setSelectedBnpl('quickbooks')}
                     className={`w-full p-3 rounded-lg border-2 text-left ${
-                      selectedBnpl === 'stripe'
+                      selectedBnpl === 'quickbooks'
                         ? 'border-brand-blue-500 bg-brand-blue-50'
                         : 'border-slate-200'
                     }`}

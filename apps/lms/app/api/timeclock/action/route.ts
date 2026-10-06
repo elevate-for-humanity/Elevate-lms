@@ -149,6 +149,62 @@ async function notifyClockIn(
     .then(() => {}, () => {});
 }
 
+async function notifyAdminsOfClockInAttempt(
+  db: any,
+  params: {
+    userId: string;
+    apprenticeId?: string | null;
+    siteId?: string | null;
+    siteName?: string | null;
+    successful: boolean;
+    reason?: string | null;
+    code?: string | null;
+    progressEntryId?: string | null;
+    attemptedAt: string;
+  },
+) {
+  const [{ data: profile }, { data: admins }] = await Promise.all([
+    db.from('profiles').select('full_name,email').eq('id', params.userId).maybeSingle(),
+    db.from('profiles').select('id').in('role', ['admin', 'super_admin']),
+  ]);
+  const learner = profile?.full_name || profile?.email || params.userId;
+  const outcome = params.successful ? 'Successful clock-in' : 'Clock-in failed';
+  const site = params.siteName || params.siteId || 'unresolved site';
+  const reason = params.successful ? 'Clock-in accepted.' : params.reason || 'Clock-in was not accepted.';
+  const rows = (admins || []).map((admin: any) => ({
+    user_id: admin.id,
+    type: 'timeclock',
+    title: `${outcome}: ${learner}`,
+    message: `${learner} — ${site}. ${reason}`,
+    action_label: 'Review timeclock',
+    action_url: '/apprenticeships/hours',
+    link: '/apprenticeships/hours',
+    read: false,
+    metadata: {
+      learner_user_id: params.userId,
+      apprentice_id: params.apprenticeId || null,
+      site_id: params.siteId || null,
+      site_name: params.siteName || null,
+      successful: params.successful,
+      reason: params.reason || null,
+      code: params.code || null,
+      progress_entry_id: params.progressEntryId || null,
+      attempted_at: params.attemptedAt,
+    },
+    idempotency_key: `admin-clock-in-${params.userId}-${params.successful ? 'success' : 'failed'}-${params.progressEntryId || params.attemptedAt}`,
+  }));
+  if (rows.length) {
+    const { error } = await db.from('notifications').insert(rows);
+    if (error) logger.warn('[Timeclock] admin clock-in notification failed', error);
+  }
+  await sendEmail({
+    to: ADMIN_EMAIL,
+    subject: `${outcome}: ${learner}`,
+    text: `${learner} attempted to clock in at ${site} on ${params.attemptedAt}. ${reason}`,
+    html: `<p><strong>${escapeHtml(outcome)}</strong></p><p>${escapeHtml(learner)} attempted to clock in at ${escapeHtml(site)} on ${escapeHtml(params.attemptedAt)}.</p><p>${escapeHtml(reason)}</p>`,
+  }).catch((error) => logger.warn('[Timeclock] admin clock-in email failed', error));
+}
+
 function validateCoordinates(lat: number, lng: number, accuracyM?: number) {
   if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
     return 'Valid GPS coordinates are required';
@@ -236,6 +292,7 @@ async function _POST(request: NextRequest) {
           verification_basis: identity.basis,
           timestamp: new Date().toISOString(),
         });
+        await notifyAdminsOfClockInAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, successful: false, reason: 'Secure ID and selfie verification is incomplete.', code: 'IDENTITY_VERIFICATION_REQUIRED', attemptedAt: new Date().toISOString() });
         return NextResponse.json(
           { error: 'Complete secure ID and selfie verification before clock-in.', code: 'IDENTITY_VERIFICATION_REQUIRED' },
           { status: 403 },
@@ -366,6 +423,18 @@ async function _POST(request: NextRequest) {
           }
         });
       });
+      if (action === 'clock_in') {
+        await notifyAdminsOfClockInAttempt(db, {
+          userId: user.id,
+          apprenticeId: apprentice.id,
+          siteId: site_id,
+          siteName: site.name ?? null,
+          successful: false,
+          reason: studentText,
+          code: 'OUTSIDE_GEOFENCE',
+          attemptedAt: details.timestamp,
+        });
+      }
       return NextResponse.json(
         {
           error: 'Outside geofence',
@@ -401,6 +470,7 @@ async function _POST(request: NextRequest) {
         .limit(1)
         .maybeSingle();
       if (activeTheorySession) {
+        await notifyAdminsOfClockInAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: 'An active theory lesson blocked OJL clock-in.', code: 'THEORY_SESSION_ACTIVE', attemptedAt: serverNow });
         return NextResponse.json(
           {
             error: 'Close or pause the active theory lesson before clocking into OJL.',
@@ -435,6 +505,7 @@ async function _POST(request: NextRequest) {
         0,
       );
       if (weeklyOjlHours + weeklyTheoryHours >= APPRENTICE_TIME_POLICY.weeklyCombinedMaxHours) {
+        await notifyAdminsOfClockInAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: 'Combined weekly OJL and RTI limit reached.', code: 'WEEKLY_COMBINED_LIMIT_REACHED', attemptedAt: serverNow });
         return NextResponse.json(
           {
             error: `The ${APPRENTICE_TIME_POLICY.weeklyCombinedMaxHours}-hour combined weekly OJL and RTI limit has been reached. Clock-in is disabled until the next work week.`,
@@ -445,6 +516,7 @@ async function _POST(request: NextRequest) {
       }
 
       if (weeklyOjlHours >= APPRENTICE_TIME_POLICY.weeklyOjlMaxHours) {
+        await notifyAdminsOfClockInAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: 'Weekly OJL limit reached.', code: 'WEEKLY_OJL_LIMIT_REACHED', attemptedAt: serverNow });
         return NextResponse.json(
           {
             error: `The ${APPRENTICE_TIME_POLICY.weeklyOjlMaxHours}-hour weekly OJL limit has been reached.`,
@@ -465,6 +537,17 @@ async function _POST(request: NextRequest) {
         .limit(1)
         .maybeSingle();
       if (openShift) {
+        await notifyAdminsOfClockInAttempt(db, {
+          userId: user.id,
+          apprenticeId: apprentice.id,
+          siteId: site_id,
+          siteName: site.name ?? null,
+          successful: true,
+          reason: 'Clock-in retry recognized; apprentice was already clocked in.',
+          code: 'ALREADY_CLOCKED_IN',
+          progressEntryId: openShift.id,
+          attemptedAt: serverNow,
+        });
         return NextResponse.json({
           success: true,
           action,
@@ -497,6 +580,7 @@ async function _POST(request: NextRequest) {
           site_id,
           shop_id: site.shop_id,
         });
+        await notifyAdminsOfClockInAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: 'Training site is not connected to a program partner.', code: 'PARTNER_NOT_RESOLVED', attemptedAt: serverNow });
         return NextResponse.json(
           { error: 'This training site is not connected to a program partner. Contact support.' },
           { status: 409 },
@@ -557,6 +641,7 @@ async function _POST(request: NextRequest) {
           timestamp: serverNow,
         });
         logger.error('[Timeclock] clock_in insert failed', insertError);
+        await notifyAdminsOfClockInAttempt(db, { userId: user.id, apprenticeId: apprentice.id, siteId: site_id, siteName: site.name ?? null, successful: false, reason: insertError?.message || 'Clock-in persistence failed.', code: 'TIMECLOCK_PERSISTENCE_ERROR', attemptedAt: serverNow });
         return NextResponse.json({ error: 'Failed to clock in' }, { status: 500 });
       }
 
@@ -575,6 +660,15 @@ async function _POST(request: NextRequest) {
         accepted: true,
       });
       await notifyClockIn(db, { entryId: newEntry.id, userId: user.id, siteName: site.name ?? null, clockInAt: serverNow });
+      await notifyAdminsOfClockInAttempt(db, {
+        userId: user.id,
+        apprenticeId: apprentice.id,
+        siteId: site_id,
+        siteName: site.name ?? null,
+        successful: true,
+        progressEntryId: newEntry.id,
+        attemptedAt: serverNow,
+      });
 
       return NextResponse.json({
         success: true,

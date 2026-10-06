@@ -1227,19 +1227,19 @@ export default function ProgramDetailPage({
               </p>
 
               {/* Legacy direct checkout link, when one is configured. */}
-              {enrollmentTracks.selfPay.available && p.cta.stripeCheckoutHref && (
+              {enrollmentTracks.selfPay.available && p.cta.quickbooksCheckoutHref && (
                 <div className="mt-2 mb-4">
                   <PayNowButton
                     slug={p.slug}
                     cost={enrollmentTracks.selfPay.cost}
-                    stripeCheckoutHref={p.cta.stripeCheckoutHref}
+                    quickbooksCheckoutHref={p.cta.quickbooksCheckoutHref}
                   />
                 </div>
               )}
 
               {/* Every published self-pay program uses the canonical server-created checkout.
                   This provides the payment calculator, BNPL eligibility, and coupon entry
-                  without depending on a legacy hard-coded Stripe URL. */}
+                  without depending on a legacy hard-coded QuickBooks URL. */}
               {enrollmentTracks.selfPay.available &&
                 selfPayNumeric > 0 &&
                 p.slug !== 'hvac-technician' && (
@@ -1249,7 +1249,7 @@ export default function ProgramDetailPage({
                 )}
 
               {/* Application fallback remains available when no legacy direct link exists. */}
-              {enrollmentTracks.selfPay.available && !p.cta.stripeCheckoutHref && (
+              {enrollmentTracks.selfPay.available && !p.cta.quickbooksCheckoutHref && (
                 <Link
                   href={enrollmentTracks.selfPay.applyHref}
                   className="block w-full text-center border-2 border-brand-blue-200 hover:border-brand-blue-400 text-brand-blue-700 font-bold py-3.5 rounded-xl transition-colors text-sm mt-2 mb-4"

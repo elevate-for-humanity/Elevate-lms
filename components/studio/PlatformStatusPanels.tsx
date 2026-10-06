@@ -23,7 +23,7 @@ interface SupabaseStatus {
   last_error?: string;
 }
 
-interface StripeStatus {
+interface BillingStatus {
   status: 'active' | 'inactive' | 'error';
   mode: 'live' | 'test';
   balance_cents: number;
@@ -50,7 +50,7 @@ interface GitHubPRStatus {
 
 interface PlatformStatusData {
   supabase: SupabaseStatus;
-  stripe: StripeStatus;
+  billing: BillingStatus;
   github: GitHubPRStatus;
   fetched_at: string;
 }
@@ -184,48 +184,48 @@ export default function PlatformStatusPanels() {
           )}
         </StatusCard>
 
-        {/* Stripe Status */}
+        {/* QuickBooks Status */}
         <StatusCard
-          title="Stripe"
+          title="QuickBooks"
           icon={CreditCard}
           status={
-            data?.stripe.status === 'active' ? 'good' :
-            data?.stripe.failed_payments_24h > 5 ? 'error' : 'warning'
+            data?.billing.status === 'active' ? 'good' :
+            data?.billing.failed_payments_24h > 5 ? 'error' : 'warning'
           }
         >
-          {data?.stripe ? (
+          {data?.billing ? (
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-slate-600">Status</span>
                 <span className={`font-medium ${
-                  data.stripe.status === 'active' ? 'text-green-600' : 'text-red-600'
+                  data.billing.status === 'active' ? 'text-green-600' : 'text-red-600'
                 }`}>
-                  {data.stripe.status}
+                  {data.billing.status}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-600">Mode</span>
-                <span className={data.stripe.mode === 'test' ? 'text-amber-600' : 'text-green-600'}>
-                  {data.stripe.mode}
+                <span className={data.billing.mode === 'test' ? 'text-amber-600' : 'text-green-600'}>
+                  {data.billing.mode}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-600">Balance</span>
-                <span className="font-mono">${(data.stripe.balance_cents / 100).toFixed(2)}</span>
+                <span className="font-mono">${(data.billing.balance_cents / 100).toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-600">Active Subs</span>
-                <span>{data.stripe.active_subscriptions}</span>
+                <span>{data.billing.active_subscriptions}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-600">Failed 24h</span>
-                <span className={data.stripe.failed_payments_24h > 0 ? 'text-red-600 font-medium' : ''}>
-                  {data.stripe.failed_payments_24h}
+                <span className={data.billing.failed_payments_24h > 0 ? 'text-red-600 font-medium' : ''}>
+                  {data.billing.failed_payments_24h}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-600">Pending</span>
-                <span>{data.stripe.pending_invoices}</span>
+                <span>{data.billing.pending_invoices}</span>
               </div>
             </div>
           ) : (

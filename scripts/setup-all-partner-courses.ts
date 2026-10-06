@@ -1,18 +1,14 @@
 /**
- * Setup ALL Partner Courses in Stripe with 40% Markup
+ * Setup ALL Partner Courses in the provider-neutral catalog with 40% markup
  * Run with: npx tsx scripts/setup-all-partner-courses.ts
  */
 
-import Stripe from 'stripe';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { createClient } from '@supabase/supabase-js';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  process.exit(1);
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-11-20.acacia',
-});
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!url || !key) throw new Error('Missing Supabase service credentials');
+const db = createClient(url, key);
 
 // All Partner Courses with 40% Markup
 const partnerCourses = {
@@ -422,37 +418,28 @@ const partnerCourses = {
 };
 
 async function createProduct(item: any, providerKey: string) {
-  try {
-    // Skip free courses
-    if (item.price === 0) {
-      return null;
-    }
-
-    // Create product
-    const product = await stripe.products.create({
-      name: item.name,
-      description: item.description,
-      metadata: {
-        type: 'partner_course',
-        provider: item.provider,
-        category: item.category,
-        base_price: item.basePrice.toString(),
-        markup: '40%',
-        provider_key: providerKey,
-      },
-    });
-
-    // Create price
-    const price = await stripe.prices.create({
-      product: product.id,
-      unit_amount: item.price * 100, // Convert to cents
-      currency: 'usd',
-    });
-
-    return { product, price };
-  } catch (error) {
-    return null;
-  }
+  if (item.price === 0) return null;
+  const slug = `partner-${providerKey}-${item.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+  const payload = {
+    slug,
+    name: item.name,
+    description: item.description,
+    price_cents: Math.round(item.price * 100),
+    type: 'partner_course',
+    active: true,
+    metadata: {
+      provider: item.provider,
+      category: item.category,
+      base_price_cents: Math.round(item.basePrice * 100),
+      markup: '40%',
+      provider_key: providerKey,
+      billing_provider: 'quickbooks',
+    },
+    updated_at: new Date().toISOString(),
+  };
+  const { data, error } = await db.from('products').upsert(payload, { onConflict: 'slug' }).select('id,slug').single();
+  if (error) throw error;
+  return data;
 }
 
 async function main() {

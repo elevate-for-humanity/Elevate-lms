@@ -172,10 +172,10 @@ export default function IntegrationsPanel() {
       .catch((err) => setHealthError(err instanceof Error ? err.message : 'Health status unavailable'));
   }, []);
 
-  const stripe = health?.services
-    ? Object.values(health.services).find((service) => service.name === 'Stripe')
+  const billing = health?.services
+    ? Object.values(health.services).find((service) => service.name === 'QuickBooks')
     : undefined;
-  const stripeConfigured = Boolean(stripe?.configured && stripe?.status === 'healthy');
+  const billingConfigured = Boolean(billing?.configured && billing?.status === 'healthy');
   const alertCount = health?.alerts?.length ?? 0;
   const firstAlert = health?.alerts?.[0];
 
@@ -193,18 +193,18 @@ export default function IntegrationsPanel() {
           <div className="flex items-center justify-between border-b border-slate-200 p-4">
             <div className="flex items-center gap-2">
               <Globe className="h-4 w-4 text-slate-600" />
-              <h3 className="text-sm font-semibold text-slate-900">Stripe</h3>
+              <h3 className="text-sm font-semibold text-slate-900">QuickBooks</h3>
             </div>
-            <span className={`rounded-full px-2 py-0.5 text-xs ${stripeConfigured ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-              {health ? (stripeConfigured ? 'Configured' : 'Needs setup') : 'Checking…'}
+            <span className={`rounded-full px-2 py-0.5 text-xs ${billingConfigured ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+              {health ? (billingConfigured ? 'Configured' : 'Needs setup') : 'Checking…'}
             </span>
           </div>
           <div className="p-4">
             <p className="text-xs text-slate-600">
-              {stripe?.message || (stripeConfigured ? 'Stripe runtime configuration is available.' : 'Stripe runtime configuration is incomplete.')}
+              {billing?.message || (billingConfigured ? 'QuickBooks runtime configuration is available.' : 'QuickBooks runtime configuration is incomplete.')}
             </p>
-            <Link href="/integrations/stripe" className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-200">
-              Configure Stripe <ExternalLink className="h-3 w-3" />
+            <Link href="/integrations/quickbooks" className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-200">
+              Configure QuickBooks <ExternalLink className="h-3 w-3" />
             </Link>
           </div>
         </div>

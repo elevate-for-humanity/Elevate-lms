@@ -1,11 +1,11 @@
-import { retiredStripeCheckout } from '@/lib/billing/retired-stripe-checkout';
+import { retiredLegacyCheckout } from '@/lib/billing/retired-legacy-checkout';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST() {
-  return retiredStripeCheckout({
+  return retiredLegacyCheckout({
     destination: '/store/plans',
-    reason: 'Stripe trials are retired; use the current plan onboarding flow.',
+    reason: 'legacy provider trials are retired; use the current plan onboarding flow.',
   });
 }

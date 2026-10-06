@@ -1,4 +1,4 @@
-import { STRIPE_BNPL_PAYMENT_METHODS } from '@/lib/bnpl-config';
+import { BNPL_PAYMENT_METHODS } from '@/lib/bnpl-config';
 
 /**
  * TUITION CONFIGURATION
@@ -123,11 +123,11 @@ export const PROGRAM_TUITION: ProgramTuition[] = [
 export const TIER1_THIRD_PARTY_FINANCING = {
   name: 'Pay in 4',
   // Derived from bnpl-config at module load — add/remove providers there only
-  providers: STRIPE_BNPL_PAYMENT_METHODS.filter((m) => m !== 'card'),
+  providers: BNPL_PAYMENT_METHODS.filter((m) => m !== 'card'),
   enabled: true,
 
-  // Stripe payment method types — derived from bnpl-config
-  stripePaymentMethods: STRIPE_BNPL_PAYMENT_METHODS,
+  // Available payment method types — derived from bnpl-config
+  paymentMethods: BNPL_PAYMENT_METHODS,
 
   // Terms (set by providers, not us)
   typicalTerms: {
@@ -239,7 +239,7 @@ export const TIER3B_EXTERNAL_FINANCING = {
     {
       name: 'Pay in 4',
       // Derived from bnpl-config — do not hardcode provider names here
-      providers: STRIPE_BNPL_PAYMENT_METHODS.filter((m) => m !== 'card'),
+      providers: BNPL_PAYMENT_METHODS.filter((m) => m !== 'card'),
       description: 'Apply at checkout. Split into 4 interest-free payments.',
     },
     {
@@ -401,7 +401,7 @@ export function calculateRefund(
 
 // Derived from bnpl-config — do not hardcode provider names here
 export const PAYMENT_METHODS: Record<string, boolean> = Object.fromEntries(
-  STRIPE_BNPL_PAYMENT_METHODS.map((m) => [m, true]),
+  BNPL_PAYMENT_METHODS.map((m) => [m, true]),
 );
 
 // =============================================================================

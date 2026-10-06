@@ -1,3 +1,3 @@
-import { retiredStripeCheckout } from '@/lib/billing/retired-stripe-checkout';
+import { retiredLegacyCheckout } from '@/lib/billing/retired-legacy-checkout';
 export const runtime='nodejs'; export const dynamic='force-dynamic';
-export async function POST(){return retiredStripeCheckout({destination:'/programs',reason:'Use the canonical QuickBooks enrollment checkout.'});}
+export async function POST(){return retiredLegacyCheckout({destination:'/programs',reason:'Use the canonical QuickBooks enrollment checkout.'});}

@@ -33,19 +33,43 @@ export async function POST(request: NextRequest) {
   }
 
   const db = await requireAdminClient();
-  const { error } = await db.from('tenant_site_leads').insert({
-    website_id: tenant.websiteId,
-    user_id: tenant.ownerUserId,
-    name,
-    email,
-    phone: phone || null,
-    message,
-    source_path: path,
-    source_host: tenant.host,
-    status: 'new',
-  });
 
-  if (error) return NextResponse.json({ error: 'Could not send message' }, { status: 500 });
+  if (tenant.externalBackend) {
+    const response = await fetch(`${tenant.externalBackend.url}/rest/v1/contact_submissions`, {
+      method: 'POST',
+      headers: {
+        apikey: tenant.externalBackend.publishableKey,
+        Authorization: `Bearer ${tenant.externalBackend.publishableKey}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        phone: phone || null,
+        message,
+        source: 'website',
+        status: 'new',
+      }),
+      cache: 'no-store',
+    }).catch(() => null);
+    if (!response?.ok) {
+      return NextResponse.json({ error: 'Could not send message' }, { status: 500 });
+    }
+  } else {
+    const { error } = await db.from('tenant_site_leads').insert({
+      website_id: tenant.websiteId,
+      user_id: tenant.ownerUserId,
+      name,
+      email,
+      phone: phone || null,
+      message,
+      source_path: path,
+      source_host: tenant.host,
+      status: 'new',
+    });
+    if (error) return NextResponse.json({ error: 'Could not send message' }, { status: 500 });
+  }
 
   await db.from('tenant_site_events').insert({
     website_id: tenant.websiteId,

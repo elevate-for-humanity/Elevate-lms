@@ -6,7 +6,8 @@ import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 const execute=promisify(execFile);
-const text="Before cutting hair, wash your hands and clean the tools. Check the client's scalp and explain the next step.";
+const sentence="Before cutting hair, wash your hands and clean the tools. Check the client's scalp and explain the next step.";
+const text=Array(4).fill(sentence).join(' ');
 const directory=await mkdtemp(join(tmpdir(),'course-speech-smoke-'));
 try {
   const narrator=await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:'q8',device:'cpu'});
@@ -25,4 +26,9 @@ try {
   const coverage=expected.filter(word=>actual.has(word)).length/expected.length;
   if(coverage<0.9 || result.words.length<10) throw new Error('SMOKE_DECODED_SPEECH_OR_TIMINGS_FAILED');
   console.log(JSON.stringify({provider:result.provider,model:result.model,wordCount:result.words.length,coverage}));
+} catch(error) {
+  // Emscripten installs an uncaught-error handler that otherwise prints its entire
+  // single-line module and hides the actual failure in Docker log truncation.
+  console.error(`COURSE_SPEECH_SMOKE_FAILED: ${error instanceof Error ? error.message : String(error)}`);
+  process.exitCode=1;
 } finally { await rm(directory,{recursive:true,force:true}); }

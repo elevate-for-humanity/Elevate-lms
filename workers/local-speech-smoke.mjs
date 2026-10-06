@@ -34,6 +34,10 @@ try {
     }
   }
   const coverage=row[actual.length]/expected.length;
+  const durationSeconds=samples.length/audio.sampling_rate;
+  const ordered=result.words.every((word,index)=>index===0 || word.start>=result.words[index-1].start);
+  const lastEnd=result.words.at(-1)?.end;
+  if(!ordered || lastEnd>durationSeconds+0.5 || lastEnd<durationSeconds*0.8) throw new Error('SMOKE_CAPTION_TIMELINE_INVALID');
   if(coverage<0.9 || result.words.length<10) throw new Error('SMOKE_DECODED_SPEECH_OR_TIMINGS_FAILED');
   console.log(JSON.stringify({provider:result.provider,model:result.model,wordCount:result.words.length,coverage}));
 } catch(error) {

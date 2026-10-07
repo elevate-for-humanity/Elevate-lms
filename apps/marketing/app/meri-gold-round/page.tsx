@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Storefront from './Storefront';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: { absolute: 'Meri-Gold-Round Multi-Zone Essential Oil | Curvature Body Sculpting' },
@@ -22,5 +22,5 @@ export const metadata: Metadata = {
 };
 
 export default function MeriGoldRoundPage() {
-  return <Storefront />;
+  redirect('/sites/meri-gold-round');
 }

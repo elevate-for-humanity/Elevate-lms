@@ -1,0 +1,68 @@
+name: Provision Elevate PBX on Google
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: Create/update the PBX VM after inspection
+        required: true
+        type: boolean
+        default: false
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: google-pbx-infrastructure
+  cancel-in-progress: false
+jobs:
+  provision:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Inspect PBX infrastructure
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT=elegant-racer-299721
+          ZONE=us-central1-a
+          gcloud compute instances describe elevate-pbx --project="$PROJECT" --zone="$ZONE" --format=json || true
+          gcloud compute addresses describe elevate-pbx-ip --project="$PROJECT" --region=us-central1 --format=json || true
+      - name: Provision PBX host
+        if: inputs.apply
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT=elegant-racer-299721
+          ZONE=us-central1-a
+          REGION=us-central1
+          if ! gcloud compute addresses describe elevate-pbx-ip --project="$PROJECT" --region="$REGION" >/dev/null 2>&1; then
+            gcloud compute addresses create elevate-pbx-ip --project="$PROJECT" --region="$REGION"
+          fi
+          IP="$(gcloud compute addresses describe elevate-pbx-ip --project="$PROJECT" --region="$REGION" --format='value(address)')"
+          for rule in elevate-pbx-sip elevate-pbx-rtp; do
+            if gcloud compute firewall-rules describe "$rule" --project="$PROJECT" >/dev/null 2>&1; then continue; fi
+            if [[ "$rule" == elevate-pbx-sip ]]; then
+              gcloud compute firewall-rules create "$rule" --project="$PROJECT" --direction=INGRESS --action=ALLOW --rules=tcp:5061,tcp:8089,udp:5060 --target-tags=elevate-pbx
+            else
+              gcloud compute firewall-rules create "$rule" --project="$PROJECT" --direction=INGRESS --action=ALLOW --rules=udp:10000-20000 --target-tags=elevate-pbx
+            fi
+          done
+          if ! gcloud compute instances describe elevate-pbx --project="$PROJECT" --zone="$ZONE" >/dev/null 2>&1; then
+            gcloud compute instances create elevate-pbx --project="$PROJECT" --zone="$ZONE" --machine-type=e2-standard-2 --address="$IP" --tags=elevate-pbx --image-family=debian-12 --image-project=debian-cloud --boot-disk-size=30GB --boot-disk-type=pd-balanced --metadata-from-file=startup-script=infra/pbx/google-startup.sh
+          fi
+          echo "PBX_IP=$IP" >> "$GITHUB_ENV"
+      - name: Verify host exists
+        if: inputs.apply
+        run: |
+          set -euo pipefail
+          gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='table(name,status,networkInterfaces[0].accessConfigs[0].natIP,tags.items)'

@@ -1,17 +1,81 @@
-/**
- * Admin Environment Manager API. Values are stored in the canonical encrypted platform store.
- * Google production receives runtime bindings through the governed deployment path.
- */
-import { NextRequest,NextResponse } from 'next/server';
+/** Admin configuration writes go directly to service-scoped Google secrets. */
+import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { safeError,safeDbError } from '@/lib/api/safe-error';
-import { refreshSecrets } from '@/lib/secrets';
-export const runtime='nodejs';export const dynamic='force-dynamic';
-const SECRET_PATTERNS=[/key$/i,/secret$/i,/token$/i,/password$/i,/pass$/i,/api_key/i,/private/i,/auth/i,/sid$/i,/dsn$/i,/salt$/i,/encryption/i,/webhook/i];
-const isSecret=(k:string)=>k.startsWith('AGENT_MEMORY_')||k==='ELEVATE_MEDIA_ACCESS_KEY_ID'||SECRET_PATTERNS.some(p=>p.test(k));
-const valid=(k:string)=>/^[A-Z][A-Z0-9_]*$/.test(k);
-export async function GET(req:NextRequest){const rl=await applyRateLimit(req,'strict');if(rl)return rl;const auth=await apiRequireAdmin(req);if(auth.error)return auth.error;const db=await requireAdminClient();const [{data,error},{data:secrets,error:se}]=await Promise.all([db.from('platform_settings').select('key,value,updated_at').order('key'),db.from('platform_secrets').select('key,updated_at').order('key')]);if(error)return safeDbError(error,'Failed to load settings');if(se)return safeDbError(se,'Failed to load encrypted secrets');return NextResponse.json({settings:[...(data??[]).map(r=>({key:r.key,value:isSecret(r.key)?'••••••••':r.value??'',is_secret:isSecret(r.key),updated_at:r.updated_at})),...(secrets??[]).map(r=>({key:r.key,value:'••••••••',is_secret:true,updated_at:r.updated_at}))],secretWritePolicy:'encrypted-platform-secrets',runtimeProvider:'google-cloud'});}
-export async function POST(req:NextRequest){const rl=await applyRateLimit(req,'strict');if(rl)return rl;const auth=await apiRequireAdmin(req);if(auth.error)return auth.error;const body=await req.json().catch(()=>null);if(!body||!Array.isArray(body.entries)||!body.entries.length)return safeError('entries array required',400);if(body.entries.length>50)return safeError('Maximum 50 entries per request',400);const entries:{key:string,value:string}[]=[];const seen=new Set<string>();for(const raw of body.entries){if(typeof raw?.key!=='string'||typeof raw?.value!=='string')return safeError('Each entry must have a string key and value',400);const key=raw.key.trim();if(!valid(key)||seen.has(key))return safeError('Invalid or duplicate key',400);if(isSecret(key)&&(!raw.value.trim()||/^[•*]{4,}$/.test(raw.value.trim())))return safeError('A secret must contain an unmasked value',400);if(raw.value.length>16384)return safeError('Setting value exceeds maximum length',400);seen.add(key);entries.push({key,value:raw.value});}const db=await requireAdminClient();const settings=entries.filter(e=>!isSecret(e.key)).map(e=>({...e,updated_at:new Date().toISOString(),updated_by:auth.id}));if(settings.length){const {error}=await db.from('platform_settings').upsert(settings,{onConflict:'key'});if(error)return safeDbError(error,'Failed to save settings');}for(const e of entries.filter(e=>isSecret(e.key))){const {error}=await db.rpc('set_platform_secret',{p_key:e.key,p_value:e.value,p_description:`Updated through Admin Environment Manager by ${auth.id}`,p_category:'integrations'});if(error)return safeDbError(error,`Failed to save encrypted secret ${e.key}`);}await refreshSecrets();await db.from('audit_logs').insert({user_id:auth.id,action:'env_vars.upsert',resource_type:'platform_settings',resource_id:entries.map(e=>e.key).join(','),metadata:{keys:entries.map(e=>e.key),count:entries.length,source:'admin-env-manager',runtime:'pending-google-secret-manager'},created_at:new Date().toISOString()});return NextResponse.json({saved:entries.length,encrypted:entries.filter(e=>isSecret(e.key)).length,runtimeSync:'pending-google-secret-manager',runtimeSynced:false,configurationVerified:false,message:'Saved securely. Google runtime transfer and verification are still pending.'},{status:202});}
-export async function DELETE(req:NextRequest){const rl=await applyRateLimit(req,'strict');if(rl)return rl;const auth=await apiRequireAdmin(req);if(auth.error)return auth.error;const key=new URL(req.url).searchParams.get('key')?.trim();if(!key||!valid(key))return safeError('Valid key query param required',400);if(isSecret(key))return safeError('Secrets must be removed through the governed secret lifecycle.',409);const db=await requireAdminClient();const {error}=await db.from('platform_settings').delete().eq('key',key);if(error)return safeDbError(error,'Failed to delete setting');return NextResponse.json({deleted:key});}
+import { safeError, safeDbError } from '@/lib/api/safe-error';
+import {
+  GoogleConfigurationError,
+  getGoogleRuntimeConfiguration,
+  runtimeComponent,
+  saveGoogleRuntimeConfiguration,
+  validateRuntimeEntries,
+} from '@/lib/google/runtime-configuration';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 90;
+
+function configurationError(error: unknown) {
+  const known = error instanceof GoogleConfigurationError;
+  return NextResponse.json({
+    error: known
+      ? `Google configuration could not be verified (${error.phase}: ${error.code}).`
+      : 'Google configuration could not be verified.',
+    code: known ? error.code : 'configuration_failed',
+    phase: known ? error.phase : 'configuration',
+    configurationVerified: false,
+    runtimeSynced: false,
+  }, { status: known && error.phase === 'validation' ? 400 : 503 });
+}
+
+export async function GET(req: NextRequest) {
+  const limited = await applyRateLimit(req, 'strict');
+  if (limited) return limited;
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+  try {
+    const component = runtimeComponent(req.nextUrl.searchParams.get('component') ?? 'admin');
+    return NextResponse.json(await getGoogleRuntimeConfiguration(component));
+  } catch (error) { return configurationError(error); }
+}
+
+export async function POST(req: NextRequest) {
+  const limited = await applyRateLimit(req, 'strict');
+  if (limited) return limited;
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+  const body = await req.json().catch(() => null);
+  if (!body || !Array.isArray(body.entries) || !body.entries.length) return safeError('entries array required', 400);
+  if (body.entries.length > 50) return safeError('Maximum 50 entries per request', 400);
+  const entries: { key: string; value: string }[] = [];
+  for (const raw of body.entries) {
+    if (typeof raw?.key !== 'string' || typeof raw?.value !== 'string') return safeError('Each entry must have a string key and value', 400);
+    entries.push({ key: raw.key.trim(), value: raw.value });
+  }
+  try {
+    const component = runtimeComponent(body.component ?? 'admin');
+    validateRuntimeEntries(component, entries);
+    const db = await requireAdminClient();
+    const audit = {
+      user_id: auth.id, resource_type: 'google_runtime_configuration', resource_id: component,
+      metadata: { keys: entries.map(entry => entry.key), count: entries.length, source: 'admin-env-manager', runtime: 'google-cloud' },
+    };
+    const { error } = await db.from('audit_logs').insert({ ...audit, action: 'env_vars.google_write_requested', created_at: new Date().toISOString() });
+    if (error) return safeDbError(error, 'Failed to record configuration request');
+    const result = await saveGoogleRuntimeConfiguration(component, entries);
+    const completed = await db.from('audit_logs').insert({ ...audit, action: 'env_vars.google_verified',
+      metadata: { ...audit.metadata, revision: result.revision, previousRevision: result.previousRevision, versions: result.versions, verifiedAt: result.verifiedAt },
+      created_at: new Date().toISOString() });
+    if (completed.error) return NextResponse.json({ ...result, error: 'Google configuration is verified, but its application audit record could not be saved.', auditRecorded: false }, { status: 503 });
+    return NextResponse.json({ ...result, auditRecorded: true });
+  } catch (error) { return configurationError(error); }
+}
+
+export async function DELETE(req: NextRequest) {
+  const limited = await applyRateLimit(req, 'strict');
+  if (limited) return limited;
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+  return safeError('Google secrets must be removed through the governed secret lifecycle.', 409);
+}

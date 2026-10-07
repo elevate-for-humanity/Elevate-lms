@@ -4,6 +4,7 @@ import { validateLessonBlueprint, type LessonBlueprint } from '../instructional/
 import { contractHash, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/lesson-contract';
 import { ULTIMATE_TEACHING_SEQUENCE } from '../instructional/teaching-sequence';
 import { produceTeachingVisual } from '../instructional/teaching-visual';
+import { sourceTeaching, narrationChunks } from '../instructional/source-teaching';
 
 type Evidence = {
   profile: UltimateCredentialProfile & {
@@ -58,32 +59,17 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       ? e.competency.authorityRequirementIds
       : [`course:${e.competency.id}`];
     const objectiveId = `${e.competency.id}:objective:1`;
-    const sourceText = sources.map((s) => s.text.trim()).filter(Boolean).join('\n\n');
     const competencyText = e.competency.description?.trim() || e.competency.title;
-    const teachingBase = `${e.competency.title}. ${competencyText}`;
-    const stageText: Record<string, string> = {
-      why_it_matters: `Connect ${e.competency.title} to the learner's job role and explain why the skill matters.`,
-      activate_prior_knowledge: `Recall related workplace knowledge before applying ${e.competency.title}.`,
-      terminology: `Explain the terms used in the authorized material for ${e.competency.title}.`,
-      concept_explanation: `Build a clear mental model of ${e.competency.title}: ${competencyText}`,
-      instructor_example: `Walk through an instructor example using the authorized course material for ${e.competency.title}.`,
-      demonstration: `Demonstrate the required knowledge or procedure step by step and connect each action to the lesson objective.`,
-      guided_practice: `Guide the learner through practice, prompting them to explain decisions and correct errors as they work.`,
-      independent_practice: `Have the learner independently apply ${e.competency.title} and document the result.`,
-      knowledge_check: `Check understanding of ${e.competency.title} with an applied question and immediate feedback.`,
-      mistake_and_correction: `Identify a common mistake, explain why it is incorrect, and model the correct approach.`,
-      assessment: `Apply ${e.competency.title} to a different realistic workplace scenario.`,
-      remediation: `Explain the error using the authorized material, then attempt a separate reassessment.`,
-      recap: `Recap the essential knowledge and the correct sequence for applying ${e.competency.title}.`,
-    };
+    const teaching = sourceTeaching(sources, e.competency.title);
+    const stageText = teaching.stageText;
     const stages = ULTIMATE_TEACHING_SEQUENCE.map((stage) => ({
       stage,
       instruction: stageText[stage] || `Teach ${e.competency.title} using the authorized curriculum.`,
       objectiveIds: [objectiveId],
     }));
-    const segments = stages.map((stage, index) => ({
-      id: `${e.competency.id}:segment:${index + 1}`,
-      text: `${stage.instruction} ${teachingBase} Use the approved curriculum evidence for this lesson: ${sourceText.slice(0, 900)}`,
+    const segments = stages.flatMap((stage, index) => narrationChunks(stage.instruction).map((text, part) => ({
+      id: `${e.competency.id}:segment:${index + 1}:${part + 1}`,
+      text,
       objectiveIds: [objectiveId],
       sourceRequirementIds: requirementIds,
       stage: stage.stage,
@@ -93,7 +79,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
         stage.stage === 'instructor_example' ? 'worked_example' :
         stage.stage === 'knowledge_check' ? 'knowledge_check' :
         stage.stage === 'recap' ? 'memory_recap' : 'system_diagram',
-    }));
+    })));
     const activities = ['guided_practice','independent_practice','knowledge_check','remediation','reassessment'].map((type) => ({
       id: `${e.competency.id}:activity:${type}`,
       type,
@@ -101,7 +87,12 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       feedback: `Compare the response with the authorized lesson content, correct any mismatch, and repeat until the objective is demonstrated.`,
       objectiveIds: [objectiveId],
     }));
-    const question = (suffix: string, alternate = false) => ({
+    const question = (suffix: string, alternate = false) => {
+      const sourced = teaching.questions[alternate ? 1 : 0];
+      if (sourced) return { id: `${e.competency.id}:question:${suffix}`, prompt: sourced.question,
+        choices: sourced.options, answerIndex: sourced.correct, explanation: sourced.explanation,
+        remediation: 'Review the explanation and practice applying it before attempting a different question.', objectiveIds: [objectiveId] };
+      return ({
       id: `${e.competency.id}:question:${suffix}`,
       prompt: alternate
         ? `Which response best demonstrates correct transfer of ${e.competency.title} to a new workplace situation?`
@@ -116,6 +107,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       remediation: `Review the instructor example and demonstration for ${e.competency.title}, then try again.`,
       objectiveIds: [objectiveId],
     });
+    };
     const blueprint: LessonBlueprint = {
       competencyId: e.competency.id,
       objectives: [{ id: objectiveId, text: competencyText, sourceRequirementIds: requirementIds }],

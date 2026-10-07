@@ -1,6 +1,6 @@
 services:
   asterisk:
-    image: andrius/asterisk:20-current
+    image: andrius/asterisk:20.15.2
     restart: unless-stopped
     network_mode: host
     volumes:

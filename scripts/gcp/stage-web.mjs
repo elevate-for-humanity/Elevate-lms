@@ -5,6 +5,28 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
+// The source Store was only a routing shell. Its Google application needs the
+// same database and commerce authority as Marketing, without unrelated secrets.
+export function completeStoreConfig(store, marketing) {
+  if (store.component !== 'store' || marketing.component !== 'marketing') throw new Error('Invalid Store configuration sources');
+  const allowed = new Set(['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', 'SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'NEXTAUTH_SECRET',
+    'QB_CLIENT_ID', 'QB_CLIENT_SECRET', 'QB_ACCESS_TOKEN', 'QB_REFRESH_TOKEN', 'QB_REALM_ID', 'QB_REDIRECT_URI', 'QB_TOKEN_EXPIRES', 'QB_WEBHOOK_VERIFIER_TOKEN', 'QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN',
+    'PAYPAL_API_BASE', 'PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', 'PAYPAL_MODE', 'PAYPAL_WEBHOOK_ID',
+    'SENDGRID_API_KEY', 'SENDGRID_FROM', 'EMAIL_FROM', 'EMAIL_PROVIDER', 'EMAIL_REPLY_TO']);
+  const runtimeEnvironment = { ...store.runtimeEnvironment };
+  for (const [client, secret] of [['QB_CLIENT_ID', 'QB_CLIENT_SECRET'], ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET']]) {
+    if (runtimeEnvironment[client] && runtimeEnvironment[client] !== marketing.runtimeEnvironment[client] && !runtimeEnvironment[secret])
+      throw new Error('Store commerce credentials require their own matching secret');
+  }
+  for (const key of allowed) {
+    if (!runtimeEnvironment[key] && marketing.runtimeEnvironment[key]) runtimeEnvironment[key] = marketing.runtimeEnvironment[key];
+  }
+  // Validate before writing a new authoritative version or creating a service.
+  const completed = { ...store, runtimeEnvironment };
+  runtimeForGoogle(completed, { volumes: store.volumes });
+  return completed;
+}
+
 export function runtimeForGoogle(source, service) {
   if (Object.keys(source.runtimeFiles ?? {}).length) throw new Error('Runtime files require a separate migration');
   if ((service.deployment?.volumes ?? service.volumes ?? []).length) throw new Error('Persistent volumes require a separate migration');
@@ -29,7 +51,8 @@ async function main() {
   const component = process.env.COMPONENT;
   const sha = process.env.IMAGE_SHA;
   if (!['marketing', 'admin', 'lms', 'store'].includes(component) || !/^[a-f0-9]{40}$/.test(sha ?? '')) throw new Error('Invalid component or image SHA');
-  const config = loadGoogleConfig(component);
+  let config = loadGoogleConfig(component);
+  if (component === 'store') config = completeStoreConfig(config, loadGoogleConfig('marketing'));
   const vars = runtimeForGoogle(config, { volumes: config.volumes });
   const dir = mkdtempSync(join(tmpdir(), 'elevate-runtime-'));
   function gcloud(args) {

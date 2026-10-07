@@ -8,7 +8,7 @@ const Service = new Function('assertCompleteLesson', 'ULTIMATE_LESSON_CONTRACT_V
   a => { if (!a.verified) throw new Error('QA_FAILED'); }, 'current');
 const lesson = () => ({
   title: 'Lesson', videoUrl: 'https://media.example/film.mp4', script: 'Verified narration',
-  storyboard: { scenes: [{ id: 'scene' }] }, segments: [{}], sourceLessonBuildId: 'lesson-build',
+  storyboard: { scenes: [{ id: 'scene' }] }, segments: [{ stage: 'problem_hook', text: 'Teaching' }], sourceLessonBuildId: 'lesson-build',
   contractArtifacts: { verified: true, lesson_film_render: { render: { videoUrl: 'https://media.example/film.mp4', duration: 249.2 } },
     finished_media_qa: { mediaQA: { inspection: { mediaSha256: 'verified-hash' } } } }
 });
@@ -59,4 +59,27 @@ test('conditional write preserves a concurrently claimed media job', async () =>
   await assert.rejects(new Service(db).recordApprovedFilm(pkg,lesson(),'lesson','actor','now'), /JOB_CHANGED/);
   assert.ok(db.filters.some(([k,v])=>k==='status'&&v==='queued'));
   assert.ok(db.filters.some(([k,v])=>k==='lease_token'&&v===null));
+});
+
+test('canonical lesson publication attaches the verified primary media record', async () => {
+  const mediaDb=database(); const writes=[];
+  const l={...lesson(),canonicalLessonId:'lesson',slug:'lesson',orderIndex:1,objectives:['Objective'],
+    content:{activities:[]},assessment:{questions:[],reassessment:[]},timeline:{segments:[]}};
+  const db={ from(table) {
+    if(table==='video_jobs') return mediaDb.from(table);
+    let value;
+    const q={
+      select(){return q;},eq(){return q;},
+      update(v){value=v; writes.push([table,v]);return q;},
+      async maybeSingle(){return {data:table==='course_modules'?{id:'module'}:{id:'lesson',module_id:'module',slug:'lesson'},error:null};},
+      async single(){return {data:{video_url:l.videoUrl,content_json:{contractVersion:'current'},status:'published'},error:null};},
+      then(resolve){resolve({error:null});}
+    };return q;
+  }};
+  await new Service(db).applyPackage({...pkg,lessons:[l]},'actor');
+  const row=writes.find(([table])=>table==='course_lessons')[1];
+  assert.equal(row.video_job_id,'media');
+  assert.equal(row.video_status,'complete');assert.equal(row.media_quality_status,'approved');
+  assert.equal(row.module_id,'module');assert.equal(row.status,'published');
+  assert.equal(row.media_quality_evidence.mediaSha256,'verified-hash');
 });

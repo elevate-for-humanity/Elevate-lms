@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { CommandCenterSnapshot } from './types';
+import { isGoogleRuntimeReady } from '@/lib/google/runtime';
 
 function isMissingTable(error: { code?: string } | null): boolean {
   return error?.code === '42P01' || error?.code === 'PGRST205';
@@ -87,7 +88,7 @@ export async function buildCommandCenterSnapshot(
     integrationPending.push('AI provider key');
   }
   if (!health?.supabaseServiceKeyPresent) integrationPending.push('Supabase service key');
-  if (!process.env.NORTHFLANK_API_TOKEN) integrationPending.push('Northflank API token');
+  if (!isGoogleRuntimeReady()) integrationPending.push('Google runtime identity');
 
   return {
     activeTasks,
@@ -102,7 +103,7 @@ export async function buildCommandCenterSnapshot(
             kind: lastBuildKind,
           }
         : null,
-      northflankConfigured: Boolean(process.env.NORTHFLANK_API_TOKEN),
+      googleConfigured: isGoogleRuntimeReady(),
     },
     health: {
       website: Boolean(health?.hasGitHub ?? health?.supabaseUrlPresent),

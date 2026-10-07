@@ -8,24 +8,10 @@ const lmsAdapterPath = path.join(root, 'apps/lms/app/api/webhooks/stripe/route.t
 const retiredSingular = path.join(root, 'app/api/license/webhook/route.ts');
 const retiredPlural = path.join(root, 'app/api/licenses/webhook/route.ts');
 
-describe('Canonical Stripe webhook ownership', () => {
-  it('keeps one canonical Marketing writer and a mutation-free LMS adapter', () => {
-    const canonical = fs.readFileSync(canonicalPath, 'utf-8');
-    const adapter = fs.readFileSync(lmsAdapterPath, 'utf-8');
-
-    for (const event of [
-      'checkout.session.completed',
-      'customer.subscription.updated',
-      'customer.subscription.deleted',
-      'invoice.payment_succeeded',
-      'invoice.payment_failed',
-      'charge.refunded',
-    ])
-      expect(canonical).toContain(event);
-
-    expect(adapter).toContain('proxyCanonicalRoute');
-    expect(adapter).toContain("'marketing'");
-    expect(adapter).not.toMatch(/\.from\s*\(|\.insert\s*\(|\.update\s*\(|\.delete\s*\(/);
+describe('Retired Stripe webhook ownership', () => {
+  it('cannot create license mutations through retired Marketing or LMS webhook routes', () => {
+    expect(fs.existsSync(canonicalPath)).toBe(false);
+    expect(fs.existsSync(lmsAdapterPath)).toBe(false);
   });
 
   it('does not retain retired license webhook aliases', () => {

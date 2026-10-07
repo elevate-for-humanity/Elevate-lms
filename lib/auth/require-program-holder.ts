@@ -2,6 +2,10 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { requirePortalAccess } from '@/lib/auth/portal-access';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { siteUrls } from '@/lib/utils/site-urls';
+
+export const PROGRAM_HOLDER_PENDING_APPLICATION_URL =
+  `${siteUrls.site}/apply/program-holder?status=pending`;
 
 interface ProgramHolderProfile {
   id: string;
@@ -159,7 +163,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
   }
 
   const holderId = profile.program_holder_id;
-  if (!holderId) redirect('/program-holder?error=pending-approval');
+  if (!holderId) redirect(PROGRAM_HOLDER_PENDING_APPLICATION_URL);
 
   const { data: holder } = await db
     .from('program_holders')
@@ -167,9 +171,9 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     .eq('id', holderId)
     .maybeSingle();
 
-  if (!holder) redirect('/program-holder?error=pending-approval');
+  if (!holder) redirect(PROGRAM_HOLDER_PENDING_APPLICATION_URL);
   if (!['approved', 'active', 'approved_pending_mou'].includes(holder.status) || !holder.approved_at) {
-    redirect('/program-holder/onboarding?status=pending-approval');
+    redirect(PROGRAM_HOLDER_PENDING_APPLICATION_URL);
   }
   // Program Holders may view their dashboard while completing onboarding.
   // Money movement and other privileged actions enforce the full checklist

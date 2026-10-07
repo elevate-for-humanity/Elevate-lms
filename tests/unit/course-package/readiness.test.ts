@@ -20,7 +20,7 @@ describe('evaluateCourseReadiness', () => {
     const result = evaluateCourseReadiness(course);
     expect(result.pass).toBe(false);
     expect(result.gates.storyboard).toBe(false);
-    expect(result.gates.practice_exam).toBe(false);
-    expect(result.gates.credential_alignment).toBe(false);
+    expect(result.gates.assessment_alignment).toBe(false);
+    expect(result.gates.standards).toBe(false);
   });
 });

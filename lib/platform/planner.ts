@@ -389,9 +389,6 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
 export function decomposePlan(goal: string, params: Record<string, string> = {}): Plan {
   const g = goal.toLowerCase();
   const explicitReadOnly = /\bread[- ]?only\b/.test(g);
-  const explicitReadOnlyStudioDiagnostic =
-    explicitReadOnly &&
-    /\b(studio|provider|router|tool(?:-response)?|platform|system|health|diagnostic)\b/.test(g);
   const affirmativeDeployment =
     /\bdeploy(?:ment|ing|ed)?\b/.test(g) &&
     !explicitReadOnly &&
@@ -402,8 +399,14 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
       g,
     ) && /\b(fix|repair|correct|implement|modify|change|update|edit|refactor|add|remove)\b/.test(g);
 
-  if (explicitReadOnlyStudioDiagnostic) {
+  if (explicitReadOnly && /\bstudio\b/.test(g) && /\b(diagnostic|provider|router|tool-response)\b/.test(g)) {
     steps = GOAL_TEMPLATES.read_only_studio_diagnostic!({});
+  } else if (explicitReadOnly) {
+    // Keep the exact read scope ahead of every template that can mutate state.
+    // A deployment prohibition must never become a deployment/snapshot plan.
+    steps = [{ id: 's1', order: 1, title: 'Execute requested outcome', command: goal,
+      status: 'pending', expected_output: 'Read-only evidence for the requested scope',
+      verification_rule: 'Return current evidence using read-only tools; do not mutate state.' }];
   } else if (g.includes('quickbooks')) {
     steps = /\b(fix|repair|connect|reconnect|configure)\b/.test(g)
       ? GOAL_TEMPLATES.quickbooks_repair!({})

@@ -48,14 +48,27 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
   const candidates = assets.filter(
     (a) => a.public_url && a.entitlement_id && a.license_evidence_url,
   );
-  // Distinct ready course-video assets may represent different inspected shots
-  // from the same licensed source item. Treat the actual attached asset as the
-  // assignment identity so valid segments can cover separate scenes. Exact
-  // duplicate bytes remain the same identity when a content hash is available.
-  const identity = (asset: any) =>
-    asset.content_sha256
-      ? `hash:${asset.content_sha256}`
-      : `asset:${asset.id}`;
+  // Encoding a second derivative does not create a new licensed source. Group
+  // both source-item copies and byte-identical files, including transitive copies.
+  const parents = new Map<string, string>();
+  const root = (key: string): string => {
+    const parent = parents.get(key);
+    if (!parent || parent === key) return key;
+    const resolved = root(parent);
+    parents.set(key, resolved);
+    return resolved;
+  };
+  const keys = (asset: any): string[] => [
+    `asset:${asset.id}`,
+    ...(asset.provider_item_id ? [`source:${asset.provider ?? ''}:${asset.provider_item_id}`] : []),
+    ...(asset.content_sha256 ? [`hash:${asset.content_sha256}`] : []),
+  ];
+  for (const asset of candidates) {
+    const aliases = keys(asset);
+    const first = root(aliases[0]);
+    for (const alias of aliases.slice(1)) parents.set(root(alias), first);
+  }
+  const identity = (asset: any) => root(keys(asset)[0]);
   const choices = scenes.map((scene) => {
     const explicit = configured.find((a) => a.sceneId === scene.id);
     const requirement = String(scene.visualRequirement ?? '')
@@ -131,16 +144,12 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
   for (const [index, scene] of scenes.entries()) {
     const choice = selected.get(index);
     if (!choice) {
-      // Instructional stages do not require stock footage to be valid. Preserve
-      // licensed B-roll where relevance is proven, and self-heal uncovered
-      // scenes with deterministic renderer-owned instructional visuals.
-      assignments.push({
+      // A request for a generated visual is not rendered/inspected evidence.
+      // Keep the gap actionable until an actual asset satisfies the scene.
+      gaps.push({
         sceneId: scene.id,
-        assetId: `instructional:${scene.id}`,
-        relevanceReason: `Renderer-generated instructional visual for: ${scene.visualRequirement}`,
-        assignmentMethod: 'instructional-render',
-        generatedInstructionalVisual: true,
         visualRequirement: scene.visualRequirement,
+        reason: 'No distinct licensed asset with verified visual coverage is available.',
       });
       continue;
     }

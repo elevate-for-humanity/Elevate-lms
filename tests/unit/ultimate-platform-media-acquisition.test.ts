@@ -40,7 +40,7 @@ test('acquisition without a course makes no database request', async () => {
 test('one approved source shared by lessons downloads once and attaches to both lessons', async () => {
   vi.mocked(attachStoredLicensedMedia).mockClear();
   const matches = ['one', 'two'].map(lesson => ({
-    id: `match-${lesson}`, lesson_id: lesson, entitlement_id: 'shared', match_score: 1,
+    id: `match-${lesson}`, status: 'approved', lesson_id: lesson, entitlement_id: 'shared', match_score: 1,
     licensed_media_entitlements: { provider: 'envato', provider_item_id: 'item', metadata: {
       assetUrl: 'https://example.org/licensed.mp4', licenseObserved: true, courseId: 'course',
     } },
@@ -66,6 +66,7 @@ test('approved media scoped to a different course is never acquired or attached'
   vi.mocked(attachStoredLicensedMedia).mockClear();
   const matches = [{
     id: 'match-wrong-course',
+    status: 'approved',
     lesson_id: 'lesson-a',
     entitlement_id: 'asset-b',
     match_score: 1,

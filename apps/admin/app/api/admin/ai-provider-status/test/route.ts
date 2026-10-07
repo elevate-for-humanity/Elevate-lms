@@ -2,14 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { getDecryptedPlatformSecret, hydrateNorthflankEnv, refreshSecrets } from '@/lib/secrets';
+import { getDecryptedPlatformSecret, refreshSecrets } from '@/lib/secrets';
 import { resetProviders } from '@/lib/ai/ai-service';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import {
-  getNorthflankProjectId,
-  isNorthflankReady,
-  upsertNorthflankSecretVariable,
-} from '@/lib/northflank/runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -68,20 +63,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await hydrateNorthflankEnv();
-    const projectId = getNorthflankProjectId();
-    if (!projectId || !isNorthflankReady()) {
-      return safeError(
-        'Credential is valid, but Northflank control-plane access is not configured',
-        503,
-      );
-    }
-    const synced = await upsertNorthflankSecretVariable(projectId, config.key, secret);
-    await upsertNorthflankSecretVariable(projectId, 'AI_PROVIDER', provider);
 
     // The validated provider becomes the single canonical runtime authority.
     // Persisting this alongside the credential keeps Admin, Course Builder,
-    // Studio, and future Northflank deployments on the same provider.
+    // Studio, and future Google deployments on the same provider.
     const db = await requireAdminClient();
     const { error: activationError } = await db.rpc('set_platform_secret', {
       p_key: 'AI_PROVIDER',
@@ -98,7 +83,7 @@ export async function POST(request: NextRequest) {
       key: config.key,
       valid: true,
       active: true,
-      northflank: { synchronized: true, secretGroup: synced.groupId },
+      runtime: { provider: 'google-cloud', persisted: true },
       checkedAt: new Date().toISOString(),
     });
   } catch (error) {

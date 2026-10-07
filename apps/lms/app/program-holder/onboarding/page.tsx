@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { PROGRAM_HOLDER_PENDING_APPLICATION_URL, requireProgramHolder } from '@/lib/auth/require-program-holder';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { robots: { index: false, follow: false } };
@@ -17,8 +17,8 @@ export default async function ProgramHolderOnboardingPage() {
     .eq('id', context.holderId)
     .maybeSingle();
 
-  if (!holder || !holder.approved_at || !['approved', 'active'].includes(String(holder.status || ''))) {
-    redirect('/program-holder/dashboard?onboarding=pending-approval');
+  if (!holder || !holder.approved_at || !['approved', 'active', 'approved_pending_mou'].includes(String(holder.status || ''))) {
+    redirect(PROGRAM_HOLDER_PENDING_APPLICATION_URL);
   }
 
   if (!holder.mou_signed) {

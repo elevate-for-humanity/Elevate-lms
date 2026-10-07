@@ -196,13 +196,16 @@ describe('Elevate Media Northflank configuration sync', () => {
     assert.ok(h.calls.every(({ url }) => url.includes('/projects/my-project/')));
   });
 
-  it('keeps the Admin authorization and encrypted write boundary in the save route', () => {
+  it('keeps Admin authorization ahead of service-scoped Google writes', () => {
     const source = readFileSync('apps/admin/app/api/admin/env-vars/route.ts', 'utf8');
     const post = source.slice(source.indexOf('export async function POST'));
-    assert.ok(post.indexOf('apiRequireAdmin(req)') < post.indexOf('syncElevateMediaToNorthflank(mediaUpdates)'));
-    assert.ok(post.indexOf("db.rpc('set_platform_secret'") < post.indexOf('syncElevateMediaToNorthflank(mediaUpdates)'));
-    assert.match(post, /runtimeSynced: false, configurationVerified: false/);
-    assert.match(post, /status: 503/);
-    assert.match(source, /key === 'ELEVATE_MEDIA_ACCESS_KEY_ID'/);
+    assert.ok(post.indexOf('apiRequireAdmin(req)') < post.indexOf('saveGoogleRuntimeConfiguration(component, entries)'));
+    assert.match(post, /validateRuntimeEntries\(component, entries\)/);
+    assert.doesNotMatch(post, /syncElevateMediaToNorthflank/);
+    assert.doesNotMatch(post, /set_platform_secret|pending-google-secret-manager/);
+    assert.match(post, /return NextResponse\.json\(\{ \.\.\.result, auditRecorded: true \}\)/);
+    const google = readFileSync('lib/google/runtime-configuration.ts', 'utf8');
+    assert.match(google, /await client\.health\(ready\)/);
+    assert.match(google, /value: variable \? '••••••••' : ''/);
   });
 });

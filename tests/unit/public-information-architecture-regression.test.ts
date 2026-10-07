@@ -35,7 +35,8 @@ describe('public information architecture regressions', () => {
     expect(showcase).toContain('Funding is limited and is never guaranteed');
     expect(read('apps/marketing/app/page.tsx')).not.toContain('<HomeProgramShowcase />');
     expect(read('apps/marketing/app/page.tsx')).toContain('<HomeCareerPathways />');
-    expect(read('apps/marketing/app/page.tsx')).toContain('<HomeFunding />');
+    expect(read('apps/marketing/app/page.tsx')).toContain('id="workone-home-cta"');
+    expect(read('apps/marketing/app/page.tsx')).toContain('href={WORKONE_INDY_BOOKING_URL}');
   });
 
   it('limits registered claims to the approved sponsor standards', () => {

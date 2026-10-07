@@ -20,6 +20,7 @@ export async function GET() {
   return NextResponse.json(
     {
       service: 'marketing',
+      revision: process.env.K_REVISION ?? null,
       status: healthy ? 'healthy' : readiness.ready ? 'degraded' : 'unhealthy',
       healthy,
       ready: readiness.ready,

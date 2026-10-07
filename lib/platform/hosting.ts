@@ -1,18 +1,5 @@
-/**
- * Canonical production hosting identifiers.
- * Elevate LMS + Admin run on Northflank only (see Dockerfile.northflank-*).
- */
-export const PRODUCTION_HOSTING_PLATFORM = 'northflank' as const;
-
-export type ProductionHostingPlatform = typeof PRODUCTION_HOSTING_PLATFORM;
-
-/** Runtime label for diagnostics (/api/build, health metadata). */
-export function getProductionHostingPlatform(): ProductionHostingPlatform {
-  return PRODUCTION_HOSTING_PLATFORM;
-}
-
-/** Northflank service IDs (project elevate-platform). */
-export const NORTHFLANK_SERVICES = {
-  lms: 'elevate-lms',
-  admin: 'elevate-admin',
-} as const;
+/** Canonical production hosting identifiers. Google Cloud is the sole production compute authority. */
+export const PRODUCTION_HOSTING_PLATFORM='google-cloud' as const;
+export type ProductionHostingPlatform=typeof PRODUCTION_HOSTING_PLATFORM;
+export function getProductionHostingPlatform():ProductionHostingPlatform{return PRODUCTION_HOSTING_PLATFORM}
+export const GOOGLE_SERVICES={marketing:'elevate-marketing-migration',lms:'elevate-lms-migration',admin:'elevate-admin-migration',store:'elevate-store-migration',courseBuilder:'elevate-course-builder',studioBrowser:'elevate-studio-browser'} as const;

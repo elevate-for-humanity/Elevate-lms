@@ -223,7 +223,7 @@ export default async function PhonePage() {
             screen sharing, and communication history.
           </p>
         </div>
-        <div className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto sm:flex-wrap">
+        <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:w-auto sm:flex-wrap">
           <Link
             href="/phone/email"
             className="inline-flex items-center gap-2 rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-black text-white"

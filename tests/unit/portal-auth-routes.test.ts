@@ -55,12 +55,12 @@ describe('deployed portal middleware auth coverage', () => {
     expect(lms).not.toContain('hasSupabaseSession || protectedPath');
   });
 
-  it('renders the marketing homepage from the conversion-focused static hero', () => {
+  it('renders the marketing homepage from the curated video hero', () => {
     expect(marketingHome).not.toContain('getApprovedHomeHeroAsset');
     expect(marketingHome).toContain('<PlatformHubHero />');
     expect(marketingHome).not.toContain('<HomeHeroVideo');
-    expect(homeHero).toContain('Build skills that move your career forward.');
-    expect(homeHero).toContain('href="/programs"');
+    expect(homeHero).toContain('hero-home-fast.mp4');
+    expect(homeHero).toContain('poster="/images/pages/hero-home-first-frame.webp"');
     expect(homeHero).not.toContain("fetch('/api/public/home-hero'");
   });
 

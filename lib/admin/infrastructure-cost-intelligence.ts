@@ -1,12 +1,7 @@
 import 'server-only';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
-import {
-  getNorthflankProjectId,
-  getNorthflankService,
-  getNorthflankServices,
-  isNorthflankReady,
-} from '@/lib/northflank/runtime';
+import { getGoogleServices,getGoogleService } from '@/lib/google/runtime';
 import { gpuVideoAvailable } from '@/lib/video/gpu-video-client';
 
 const DAY_MS = 86_400_000;
@@ -39,7 +34,7 @@ export type InfrastructureCostIntelligence = {
     estimatedWindowCost: number | null;
     estimatedFailedAttemptCost: number | null;
   };
-  northflank: {
+  google: {
     configured: boolean;
     services: Array<{ key: string; label: string; status: string; deployedCommit: string | null }>;
   };
@@ -149,7 +144,7 @@ export async function getInfrastructureCostIntelligence(
   const generatedAt = new Date();
   const since = new Date(generatedAt.getTime() - windowDays * DAY_MS).toISOString();
   const rate = finiteNonNegative(
-    process.env.NORTHFLANK_GPU_COST_PER_HOUR ?? process.env.GPU_COST_PER_HOUR,
+    process.env.GPU_COST_PER_HOUR,
   );
 
   const [usageResult, jobsResult, gpuReadyResult] = await Promise.all([
@@ -188,29 +183,9 @@ export async function getInfrastructureCostIntelligence(
   const estimatedWindowCost = rate == null ? null : (renderSeconds / 3600) * rate;
   const estimatedFailedAttemptCost = rate == null ? null : (failedAttemptSeconds / 3600) * rate;
 
-  const projectId = getNorthflankProjectId();
-  const northflankConfigured = Boolean(projectId && isNorthflankReady());
-  const serviceConfigs = getNorthflankServices();
-  const services = northflankConfigured && projectId
-    ? await Promise.all(serviceConfigs.map(async (config) => {
-        try {
-          const service = await getNorthflankService(projectId, config.id);
-          return {
-            key: config.key,
-            label: config.label,
-            status: serviceField(service, ['status', 'deploymentStatus', 'buildStatus']) ?? 'reachable',
-            deployedCommit: serviceField(service, ['deploymentCommitSha', 'commitSha', 'sha']),
-          };
-        } catch {
-          return { key: config.key, label: config.label, status: 'unavailable', deployedCommit: null };
-        }
-      }))
-    : serviceConfigs.map((config) => ({
-        key: config.key,
-        label: config.label,
-        status: 'integration not configured',
-        deployedCommit: null,
-      }));
+  const serviceConfigs=getGoogleServices();
+  const services=await Promise.all(serviceConfigs.map(async config=>{try{const service=await getGoogleService(config);return {key:config.key,label:config.label,status:service.status,deployedCommit:service.commit};}catch{return {key:config.key,label:config.label,status:'unavailable',deployedCommit:null};}}));
+  const googleConfigured=services.every(service=>service.status==='healthy');
 
   const recommendations = buildCostRecommendations({
     gpuReady: gpuReadyResult,
@@ -244,7 +219,7 @@ export async function getInfrastructureCostIntelligence(
       estimatedWindowCost,
       estimatedFailedAttemptCost,
     },
-    northflank: { configured: northflankConfigured, services },
+    google: { configured: googleConfigured, services },
     recommendations,
   };
 }

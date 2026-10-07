@@ -38,14 +38,11 @@ jobs:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (
-        (github.event.issue.author_association == 'OWNER' ||
-         github.event.issue.author_association == 'MEMBER' ||
-         github.event.issue.author_association == 'COLLABORATOR') &&
-        (startsWith(github.event.issue.title, 'RUN COURSE MEDIA CANARY: ') ||
-         startsWith(github.event.issue.title, 'RUN COURSE MEDIA FULL: ')) &&
-        (endsWith(github.event.issue.title, 'barber-apprenticeship') ||
-         endsWith(github.event.issue.title, 'cosmetology-apprenticeship') ||
-         endsWith(github.event.issue.title, 'hvac-technician'))
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) &&
+        contains(
+          fromJSON('["RUN COURSE MEDIA CANARY: barber-apprenticeship","RUN COURSE MEDIA CANARY: cosmetology-apprenticeship","RUN COURSE MEDIA CANARY: hvac-technician","RUN COURSE MEDIA FULL: barber-apprenticeship","RUN COURSE MEDIA FULL: cosmetology-apprenticeship","RUN COURSE MEDIA FULL: hvac-technician"]'),
+          github.event.issue.title
+        )
       )
     runs-on: ubuntu-latest
     timeout-minutes: 720

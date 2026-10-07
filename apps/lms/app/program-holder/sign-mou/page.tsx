@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { PROGRAM_HOLDER_PENDING_APPLICATION_URL } from '@/lib/auth/require-program-holder';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { DocumentSignatureBlock } from '@/components/documents';
@@ -27,7 +28,7 @@ export default async function SignMouPage() {
     .eq('id', user.id)
     .maybeSingle();
   if (!profile?.program_holder_id) {
-    redirect('https://www.elevateforhumanity.org/apply/program-holder?status=pending');
+    redirect(PROGRAM_HOLDER_PENDING_APPLICATION_URL);
   }
 
   const { data: holder } = await db
@@ -40,7 +41,7 @@ export default async function SignMouPage() {
     !holder.approved_at ||
     !['approved', 'active'].includes(String(holder.status || ''))
   ) {
-    redirect('https://www.elevateforhumanity.org/apply/program-holder?status=pending');
+    redirect(PROGRAM_HOLDER_PENDING_APPLICATION_URL);
   }
   if (holder.mou_signed) {
     redirect('/program-holder/dashboard');

@@ -117,8 +117,9 @@ describe('Admin Dashboard and Studio surface contract', () => {
 
     expect(shell).toContain("requireTypedConfirmation(body?.confirmation, 'deploy_autopilot')");
     expect(files).toContain("requireTypedConfirmation(body.confirmation, 'git_push')");
-    expect(builds).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
-    expect(builds).toContain("return safeError('Northflank is not configured.");
+    // Builds delegates to the same guarded dispatcher, verified behaviorally
+    // in admin-google-services.test.ts, rather than duplicating its guards.
+    expect(builds).toContain("export { POST } from '../services/route'");
     expect(services).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
     expect(environment).toContain(
       "requireTypedConfirmation(req.headers.get('x-confirmation'), 'delete_secret')",

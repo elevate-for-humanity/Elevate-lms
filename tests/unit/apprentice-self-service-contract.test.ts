@@ -33,7 +33,7 @@ describe('apprentice self-service portal contracts', () => {
   it('retires Stripe setup while keeping the authenticated legacy portal lookup fail-safe', () => {
     const setup = source('apps/lms/app/api/billing/setup/route.ts');
     const portal = source('apps/lms/app/api/billing/portal/route.ts');
-    expect(setup).toContain('retiredStripeCheckout');
+    expect(setup).toContain('retiredLegacyCheckout');
     expect(setup).toContain('PayPal automatic billing and QuickBooks accounting');
     expect(portal).toContain("url: '/account/payment-methods'");
     expect(portal).toContain("provider: 'paypal_quickbooks'");

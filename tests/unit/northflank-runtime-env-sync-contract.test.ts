@@ -50,8 +50,9 @@ describe('Northflank runtime environment synchronization contract', () => {
   it('gives the Admin secret merge every critical runtime credential', () => {
     const admin = read('.github/workflows/deploy-admin.yml');
 
-    for (const key of ['NEXTAUTH_SECRET', 'STRIPE_SECRET_KEY', 'SENDGRID_API_KEY']) {
+    for (const key of ['NEXTAUTH_SECRET', 'SENDGRID_API_KEY']) {
       expect(admin).toContain(`${key}: \${{ secrets.${key} }}`);
     }
+    expect(admin).not.toContain('STRIPE_SECRET_KEY: \${{ secrets.STRIPE_SECRET_KEY }}');
   });
 });

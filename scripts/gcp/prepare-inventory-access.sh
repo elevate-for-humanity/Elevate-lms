@@ -42,3 +42,4 @@ fi
 gcloud projects add-iam-policy-binding "$PROJECT" --member="$DEPLOY" \
   --role="projects/$PROJECT/roles/$ROLE" --condition=None --quiet >/dev/null
 printf 'Metadata inventory access prepared. Rerun inventory-google-ownership.yml; all boundaries must succeed.\n'
+

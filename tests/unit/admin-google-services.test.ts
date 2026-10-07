@@ -4,6 +4,8 @@ vi.mock('next/server', () => ({ NextResponse: { json: (body: unknown, init?: Res
 vi.mock('@/lib/devstudio/api-auth', () => ({ apiRequireDevStudio: mocks.auth }));
 vi.mock('@/lib/api/withRateLimit', () => ({ applyRateLimit: mocks.rate }));
 vi.mock('@/lib/secrets', () => ({ getDecryptedPlatformSecret: mocks.secret }));
+vi.mock('@/lib/devstudio/github-token', () => ({ getGitHubToken: mocks.secret }));
+vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logger: { info: vi.fn() } }));
 vi.mock('@/lib/api/safe-error', () => ({
   safeError: (error: string, status: number) => new Response(JSON.stringify({ error }), { status }),
@@ -18,6 +20,7 @@ vi.mock('@/lib/routing/portal-map', () => ({
   LMS_HOST: 'https://app.elevateforhumanity.org',
 }));
 import { GET, POST } from '@/apps/admin/app/api/admin/dev-studio/services/route';
+import { POST as BUILD_POST } from '@/apps/admin/app/api/admin/dev-studio/builds/route';
 const request = (body = {}) => ({ json: async () => body }) as any;
 describe('Google Admin service operations', () => {
   beforeEach(() => {
@@ -62,5 +65,24 @@ describe('Google Admin service operations', () => {
     expect((await POST(request({ service: 'admin', action: 'build', confirmation: 'CONFIRM DEPLOY' }))).status).toBe(502);
     expect(mocks.fetch).toHaveBeenCalledTimes(1);
     expect(mocks.fetch.mock.calls[0][0]).toContain('/build-google-migration-images.yml/dispatches');
+  });
+  it('the Builds page queues a real workflow instead of recording a health probe as deployed', async () => {
+    mocks.fetch.mockResolvedValue(new Response(null, { status: 204 }));
+    const response = await BUILD_POST(request({ service: 'admin', action: 'build', confirmation: 'CONFIRM DEPLOY' }));
+    expect(response.status).toBe(202);
+    expect(await response.json()).toMatchObject({ state: 'queued', action: 'build', service: 'admin' });
+    expect(mocks.fetch).toHaveBeenCalledTimes(1);
+    expect(mocks.fetch.mock.calls[0][0]).toContain('/build-google-migration-images.yml/dispatches');
+  });
+  it('rejects unauthorized Builds requests before accessing deployment credentials', async () => {
+    mocks.auth.mockResolvedValue({ error: new Response('{}', { status: 403 }) });
+    expect((await BUILD_POST(request({ service: 'admin', action: 'build', confirmation: 'CONFIRM DEPLOY' }))).status).toBe(403);
+    expect(mocks.secret).not.toHaveBeenCalled();
+    expect(mocks.fetch).not.toHaveBeenCalled();
+  });
+  it('rejects unconfirmed Builds requests before dispatching any workflow', async () => {
+    expect((await BUILD_POST(request({ service: 'admin', action: 'deploy', image_sha: 'a'.repeat(40) }))).status).toBe(409);
+    expect(mocks.secret).not.toHaveBeenCalled();
+    expect(mocks.fetch).not.toHaveBeenCalled();
   });
 });

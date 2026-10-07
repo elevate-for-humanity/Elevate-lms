@@ -5,6 +5,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { getSecret } from '@/lib/secrets';
 import { getAdminUrl } from '@/lib/utils/siteUrl';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getGoogleServices, getGoogleService } from '@/lib/google/runtime';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -161,10 +162,14 @@ export async function GET(request: NextRequest) {
       write(fmt(results.at(-1)!));
 
       results.push(
-        await check('Northflank configuration', async () => {
-          const token = await resolveSecret('NORTHFLANK_API_TOKEN');
-          if (!token) return 'token not configured; VCS deploy checks only';
-          return 'API token configured';
+        await check('Google application services', async () => {
+          const services = await Promise.all(getGoogleServices().map(async service => ({
+            key: service.key, health: await getGoogleService(service),
+          })));
+          if (services.some(service => !service.health.healthy || !service.health.ready)) {
+            throw new Error('Google application readiness failed');
+          }
+          return services.map(service => service.key).join(', ');
         }),
       );
       write(fmt(results.at(-1)!));

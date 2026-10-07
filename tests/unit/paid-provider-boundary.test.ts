@@ -31,10 +31,18 @@ describe('paid provider boundary', () => {
       'utf8',
     );
     const media = readFileSync('lib/video/process-video-job.ts', 'utf8');
-    for (const source of [generation, canonicalGeneration, blueprintGeneration, media]) {
+    for (const source of [generation, canonicalGeneration, blueprintGeneration]) {
       expect(source).toContain('reservePaidInference');
       expect(source).toContain('executePaidInference');
     }
+
+    // The Google job uses owned Kokoro, not a metered inference reservation.
+    const googleJob = readFileSync('scripts/gcp/deploy-course-job.mjs', 'utf8');
+    expect(googleJob).toContain("result.AI_PROVIDER = 'none'");
+    expect(googleJob).toContain("result.AI_NARRATION_PROVIDER = 'kokoro'");
+    expect(googleJob).toContain("result.AI_TRANSCRIPTION_PROVIDER = 'local_whisper'");
+    expect(media).toContain("process.env.AI_NARRATION_PROVIDER = 'kokoro'");
+    expect(media).not.toContain("process.env.AI_NARRATION_PROVIDER = 'cloudflare'");
 
     const studioBrowser = readFileSync(
       'apps/admin/app/api/admin/dev-studio/browser/agent/route.ts',

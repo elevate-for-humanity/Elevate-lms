@@ -9,7 +9,18 @@ describe('instructional script repair', () => {
       lessonType: 'lesson',
       baseScript: 'Ask the client what service they need.',
       content: {
-        html: `<h2>Client consultation</h2><p>${'Assess hair history, service goals, contraindications, maintenance needs, and informed consent before selecting a safe service plan. '.repeat(24)}</p>`,
+        html: `<h2>Client consultation</h2>${[
+          'Begin by asking the client to describe the result they want and the reason for requesting the service.',
+          'Listen without interrupting, then summarize the requested outcome in language the client can understand and confirm.',
+          'Record the relevant service history and discuss previous results before selecting products or tools for the appointment.',
+          'Ask about the current home maintenance routine and identify which parts of that routine the client can sustain.',
+          'Observe the condition relevant to the requested service and document facts separately from assumptions or preferences.',
+          'Explain the available service options, their practical differences, and the information still needed to make a decision.',
+          'Discuss time, maintenance, and cost expectations so the proposed plan addresses the needs described during the conversation.',
+          'Check whether the client has additional questions and answer each question before asking them to confirm the service plan.',
+          'Document the agreed outcome and communicate any unresolved concern to the supervisor before proceeding with the appointment.',
+          'At the end of the consultation, repeat the agreed plan and confirm that the written record accurately reflects the discussion.',
+        ].map(sentence => `<p>${sentence}</p>`).join('')}`,
       },
       contentJson: {},
     });
@@ -18,6 +29,14 @@ describe('instructional script repair', () => {
     expect(result.wordCount).toBeGreaterThanOrEqual(180);
     expect(result.script).not.toContain('<h2>');
     expect(result.script).toContain('Client Consultation and Needs Assessment');
+  });
+
+  it('does not count repeated source sentences as substantive instructional expansion', () => {
+    const result = repairInstructionalScript({ lessonTitle: 'Client Consultation', lessonType: 'lesson',
+      baseScript: 'Ask the client about their goals.', contentJson: {},
+      content: { html: `<p>${'Confirm the client goals before selecting a service plan. '.repeat(30)}</p>` } });
+    expect(result.wordCount).toBeLessThan(result.minimumWordCount);
+    expect(result.script.match(/Confirm the client goals/g)).toHaveLength(1);
   });
 
   it('repairs a checkpoint from governed questions and explanations', () => {

@@ -35,7 +35,8 @@ describe('portal routing and PARIS inbound email', () => {
     const applicationUrl =
       'https://www.elevateforhumanity.org/apply/program-holder?status=pending';
     expect(holderMou).toContain(applicationUrl);
-    expect(holderOnboarding).toContain(applicationUrl);
+    expect(holderOnboarding).toContain('redirect(PROGRAM_HOLDER_PENDING_APPLICATION_URL)');
+    expect(fs.readFileSync(path.resolve('lib/auth/require-program-holder.ts'), 'utf8')).toContain(applicationUrl);
     expect(holderMou).not.toContain("redirect('/apply/program-holder?status=pending')");
     expect(holderOnboarding).not.toContain("redirect('/apply/program-holder?status=pending')");
   });

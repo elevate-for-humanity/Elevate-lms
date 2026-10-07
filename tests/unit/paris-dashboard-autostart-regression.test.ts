@@ -18,7 +18,7 @@ describe('PARIS dashboard introduction', () => {
   });
 
   it('greets the authenticated program holder by name', () => {
-    expect(platformShell).toContain('personName={user.full_name || user.first_name || null}');
+    expect(platformShell).toContain('personName={paris?.personName || user.full_name || user.first_name || null}');
     expect(chat).toContain("Hi${firstName ? ` ${firstName}` : ''} — I'm PARIS");
   });
 

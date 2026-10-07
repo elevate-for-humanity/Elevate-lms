@@ -602,6 +602,7 @@ export default function EnvManagerClient() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveNotice, setSaveNotice] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -652,6 +653,7 @@ export default function EnvManagerClient() {
         return;
       }
       setEdits({});
+      setSaveNotice(data.message || 'Settings saved. Runtime verification is pending.');
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
       await load();
@@ -707,7 +709,7 @@ export default function EnvManagerClient() {
       {saved && (
         <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl mb-4 text-sm">
           <CheckCircle className="w-4 h-4 flex-shrink-0" />
-          Settings saved successfully.
+          {saveNotice}
         </div>
       )}
       {error && (

@@ -9,15 +9,18 @@ test.describe('Homepage PLATFORM_DEFAULTS leaks', () => {
     expect(html).not.toContain('${PLATFORM_DEFAULTS.orgName}');
   });
 
-  test('homepage pathway image alt is human-readable', async ({ page }) => {
+  test('featured homepage photographs have human-readable alt text', async ({ page }) => {
     await page.goto('/');
-    // Match the current heading that names the pathway region.
-    const pathwaySection = page.getByRole('region', { name: 'Choose the program you want to explore.' });
-    await expect(pathwaySection).toBeVisible();
-    const img = pathwaySection.getByRole('img').first();
-    const alt = await img.getAttribute('alt');
-    expect(alt).toBeTruthy();
-    expect(alt).not.toMatch(/PLATFORM_DEFAULTS/);
-    expect(alt!.length).toBeGreaterThan(10);
+    const photographs = page.getByRole('region', { name: 'Real shops. Real experience.' });
+    await expect(photographs).toBeVisible();
+    const images = photographs.getByRole('img');
+    await expect(images).toHaveCount(2);
+    for (const image of await images.all()) {
+      await expect(image).toBeVisible();
+      const alt = await image.getAttribute('alt');
+      expect(alt).toBeTruthy();
+      expect(alt).not.toMatch(/PLATFORM_DEFAULTS|\.(?:webp|png|jpe?g)$/i);
+      expect(alt!.length).toBeGreaterThan(10);
+    }
   });
 });

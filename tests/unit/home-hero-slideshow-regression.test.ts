@@ -13,15 +13,13 @@ describe('homepage hero slideshow rendering', () => {
 
     expect(homepageHero).toContain('SafeHeroVideo');
     expect(homepageHero).toContain('hero-home-fast.mp4');
-    expect(homepageHero).toContain('showPosterBeforePlayback');
+    expect(homepageHero).toContain('poster="/images/pages/hero-home-first-frame.webp"');
     expect(homepageHero).toContain('loop');
-    expect(homepageHero).toContain('Barber and Cosmetology apprenticeship programs');
-    expect(homepageHero).toContain('Training may be free if you qualify for workforce funding');
-    expect(homepageHero).toContain('press the orange Schedule WorkOne Orientation button');
-    expect(homepageHero).toContain('press Start Elevate Funding Intake');
+    expect(homepageHero).toContain('data-narration="Welcome to Elevate for Humanity.');
+    expect(homepageHero).toContain('data-narration-style="instructor"');
     expect(homepageHero).not.toContain('data-narration-src="/audio/narration/home-hero.mp3"');
-    expect(homepageHero).toContain('className="order-1 flex items-center');
-    expect(homepageHero).toContain('className="relative order-2');
+    expect(homepageHero).not.toContain('showPosterBeforePlayback');
+    expect(homepageHero).toContain('max-h-[560px]');
   });
 
   it('loops only the homepage hero visual while narration remains separate', () => {

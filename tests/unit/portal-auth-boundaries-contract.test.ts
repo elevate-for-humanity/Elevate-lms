@@ -29,9 +29,10 @@ const guardedPortals: Array<{ path: string; required: string[] }> = [
   {
     path: 'apps/lms/app/host-shop/dashboard/layout.tsx',
     required: [
-      'getMyPartnerContext()',
-      "partner.status !== 'active'",
-      "partner.approval_status !== 'approved'",
+      'requireRole(HOST_SHOP_ROLES)',
+      "board.partner?.status === 'active'",
+      "board.partner?.approval_status === 'approved'",
+      "if (!partnerApproved) redirect('/host-shop/onboarding')",
     ],
   },
   {

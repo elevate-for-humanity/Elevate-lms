@@ -100,7 +100,7 @@ function Section({ section, primary, secondary, basePath }: { section: TenantSit
             {text(c.text) ? <p className={`mt-5 text-lg leading-8 text-slate-600 ${centered || !image ? 'mx-auto max-w-3xl' : 'max-w-2xl'}`}>{text(c.text)}</p> : null}
             {text(c.buttonText) ? <div className={`mt-8 ${centered || !image ? 'flex justify-center' : ''}`}><ActionLink href={text(c.buttonHref) || '/contact'} primary={primary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}
           </div>
-          {image ? <div className="overflow-hidden rounded-[2rem] bg-slate-100 shadow-xl"><img src={image} alt={text(c.imageAlt) || text(c.title)} className="h-full min-h-80 w-full object-cover" /></div> : null}
+          {image ? <div className="overflow-hidden rounded-[2rem] bg-slate-100 shadow-xl"><img src={image} alt={text(c.imageAlt) || text(c.title)} className={section.settings?.imageFit === 'contain' ? 'h-full min-h-80 w-full object-contain' : 'h-full min-h-80 w-full object-cover'} /></div> : null}
         </div>
       </section>
     );
@@ -126,7 +126,7 @@ function Section({ section, primary, secondary, basePath }: { section: TenantSit
 
   if (section.type === 'products') {
     const items = list(c.items);
-    return <section className="mx-auto max-w-7xl px-5 py-14 sm:px-6">{text(c.title) ? <h2 className="text-3xl font-black">{text(c.title)}</h2> : null}<div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{items.map((item, index) => <article key={`${text(item.name)}-${index}`} className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm">{text(item.image) ? <img src={text(item.image)} alt={text(item.imageAlt) || text(item.name)} className="aspect-square w-full object-cover" /> : null}<div className="p-5"><h3 className="text-lg font-black">{text(item.name)}</h3>{text(item.description) ? <p className="mt-2 text-sm leading-6 text-slate-600">{text(item.description)}</p> : null}{text(item.price) ? <p className="mt-3 text-lg font-black" style={{ color: primary }}>{text(item.price)}</p> : null}{text(item.href) ? <div className="mt-4"><ActionLink href={text(item.href)} primary={primary} basePath={basePath} eventName="product_click">{text(item.buttonText) || 'View product'}</ActionLink></div> : null}</div></article>)}</div></section>;
+    return <section className="mx-auto max-w-7xl px-5 py-14 sm:px-6">{text(c.title) ? <h2 className="text-3xl font-black">{text(c.title)}</h2> : null}<div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{items.map((item, index) => <article key={`${text(item.name)}-${index}`} className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm">{text(item.image) ? <img src={text(item.image)} alt={text(item.imageAlt) || text(item.name)} className="aspect-square w-full object-contain" /> : null}<div className="p-5"><h3 className="text-lg font-black">{text(item.name)}</h3>{text(item.description) ? <p className="mt-2 text-sm leading-6 text-slate-600">{text(item.description)}</p> : null}{text(item.price) ? <p className="mt-3 text-lg font-black" style={{ color: primary }}>{text(item.price)}</p> : null}{text(item.href) ? <div className="mt-4"><ActionLink href={text(item.href)} primary={primary} basePath={basePath} eventName="product_click">{text(item.buttonText) || 'View product'}</ActionLink></div> : null}</div></article>)}</div></section>;
   }
 
   if (section.type === 'testimonial') {

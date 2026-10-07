@@ -16,7 +16,7 @@ import { buildLicensedAssetProjectPolicy } from '@/lib/media/licensed-asset-poli
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 30;
+export const maxDuration = 90;
 
 const PLAN_SITE_LIMITS: Record<string, number | null> = { starter: 1, professional: 3, enterprise: null };
 
@@ -46,6 +46,7 @@ async function _POST(request: NextRequest) {
     getWebsiteBuilderAccess(user.id, supabase),
     supabase.from('user_websites').select('id, site_config, organization_id, subdomain').eq('user_id', user.id).order('updated_at', { ascending: false }),
   ]);
+  if (sitesResult.error) return NextResponse.json({ error: 'Could not load your existing websites. No new website was created.' }, { status: 503 });
   const ownedSites = sitesResult.data;
 
   if (!access.allowed) {
@@ -72,7 +73,20 @@ async function _POST(request: NextRequest) {
   const answers: WebsiteInterviewAnswers = Object.fromEntries(
     Object.entries(rawAnswers).map(([key, value]) => [key, safeString(value, '', 3000)]),
   );
-  const missing = missingRequiredWebsiteAnswers(answers);
+  const briefMode = typeof body.brief === 'string';
+  if (briefMode) {
+    const brief = safeString(body.brief, '', 12000);
+    const name = safeString(body.businessName, '', 120);
+    if (!name || brief.length < 40 || body.brief.length > 12000) {
+      return NextResponse.json({ error: 'Provide a business name and a description between 40 and 12,000 characters.' }, { status: 400 });
+    }
+    // A single customer-authored brief is an alternative input, not invented interview answers.
+    for (const key of Object.keys(answers)) delete answers[key];
+    answers.businessName = name;
+    answers.siteOwnerType = 'business';
+    answers.brief = brief;
+  }
+  const missing = briefMode ? [] : missingRequiredWebsiteAnswers(answers);
   if (missing.length) {
     return NextResponse.json({ error: 'Complete the required PARIS interview questions before generation.', missing }, { status: 400 });
   }

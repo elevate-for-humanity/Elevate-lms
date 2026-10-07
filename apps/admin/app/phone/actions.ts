@@ -425,7 +425,7 @@ export async function testDestination(formData: FormData): Promise<void> {
   if (!target) throw new Error('This route has no callable PWA device.');
   const connectionId = process.env.TELNYX_CONNECTION_ID;
   if (!connectionId) throw new Error('TELNYX_CONNECTION_ID is not configured.');
-  await telnyxClient().calls.dial({
+  await (await telnyxClient()).calls.dial({
     connection_id: connectionId,
     from: number.e164,
     to: target,

@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { verifyRuntimeReadiness } from './verify-runtime-readiness.mjs';
 
 // The source Store was only a routing shell. Its Google application needs the
 // same database and commerce authority as Marketing, without unrelated secrets.
@@ -74,7 +75,9 @@ async function main() {
     gcloud(['run', 'deploy', name, '--project', projectId, '--region', 'us-central1', '--image', `${image}@${digest}`, '--service-account', `elevate-${component}-runtime@${projectId}.iam.gserviceaccount.com`, '--port', '3000', '--cpu', '4', '--memory', '8Gi', '--min-instances', '0', '--max-instances', '2', '--concurrency', '20', '--timeout', '300', '--startup-probe', 'httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5', '--liveness-probe', 'httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=3,periodSeconds=30,timeoutSeconds=5', '--env-vars-file', envFile, '--quiet']);
     const url = gcloud(['run', 'services', 'describe', name, '--project', projectId, '--region', 'us-central1', '--format=value(status.url)']);
     if (!/^https:\/\/[a-z0-9.-]+\.run\.app$/.test(url)) throw new Error('Unexpected service URL');
-    const summary = `Private ${component} service deployed: ${url}\nImage: ${image}@${digest}\nPublic IAM, application health, dependencies and DNS cutover remain unverified.\n`;
+    const token = gcloud(['auth', 'print-identity-token', '--audiences', url]);
+    await verifyRuntimeReadiness(component, url, token);
+    const summary = `Private ${component} service deployed with verified readiness and database health: ${url}\nImage: ${image}@${digest}\nPublic IAM, commerce acceptance and DNS cutover remain unverified.\n`;
     console.log(summary);
     if (process.env.GITHUB_STEP_SUMMARY) writeFileSync(process.env.GITHUB_STEP_SUMMARY, summary, { flag: 'a' });
   } finally {

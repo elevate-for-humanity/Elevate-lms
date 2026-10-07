@@ -1,0 +1,30 @@
+name: Configure Elevate PBX domain
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  dns:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure DNS-only PBX hostname
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          PBX_HOSTNAME: phone.elevateforhumanity.org
+          PBX_IP: 107.178.216.162
+        run: bash scripts/gcp/configure-pbx-domain.sh
+      - name: Verify public DNS
+        run: |
+          set -euo pipefail
+          for attempt in {1..30}; do
+            IP="$(getent ahostsv4 phone.elevateforhumanity.org | awk 'NR==1{print $1}')"
+            echo "attempt=$attempt ip=$IP"
+            [[ "$IP" == "107.178.216.162" ]] && exit 0
+            sleep 10
+          done
+          exit 1

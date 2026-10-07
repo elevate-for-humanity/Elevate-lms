@@ -45,7 +45,7 @@ async function main() {
     const environment=join(directory,'environment.json');
     writeFileSync(environment,JSON.stringify(vars),{mode:0o600});
     gcloud(['run','jobs','deploy','elevate-course-builder','--project',project,'--region',region,
-      '--image',`${image}@${digest}`,'--service-account',`elevate-admin-runtime@${project}.iam.gserviceaccount.com`,
+      '--image',`${image}@${digest}`,'--service-account',`elevate-worker-runtime@${project}.iam.gserviceaccount.com`,
       '--cpu','4','--memory','8Gi','--tasks','1','--parallelism','1','--max-retries','0','--task-timeout','3600s',
       '--env-vars-file',environment,'--quiet']);
     const job=JSON.parse(gcloud(['run','jobs','describe','elevate-course-builder','--project',project,'--region',region,'--format=json']));

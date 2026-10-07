@@ -1,0 +1,98 @@
+name: Deploy Google Marketing on trigger
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.deploy-google-marketing'
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: google-runtime-operations
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 120
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Refuse active course execution
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+
+      - name: Guard shared regional capacity
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { assertNoActiveExecutions } from './scripts/gcp/execute-course-job.mjs';
+          const executions=JSON.parse(execFileSync('gcloud',['run','jobs','executions','list','--job=elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          assertNoActiveExecutions(executions);
+          NODE
+
+      - name: Build Marketing image
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$NEXT_PUBLIC_SUPABASE_URL" = "https://cuxzzpsyufcewtmicszk.supabase.co"
+          test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"
+          docker build -f Dockerfile.marketing -t "elevate-marketing:$GITHUB_SHA" \
+            --build-arg "NF_GIT_SHA=$GITHUB_SHA" \
+            --build-arg "BUILD_TIMESTAMP=$(date -u +%FT%TZ)" \
+            --build-arg NEXT_PUBLIC_SUPABASE_URL \
+            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY .
+
+      - name: Push Marketing image
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing:$GITHUB_SHA"
+          docker tag "elevate-marketing:$GITHUB_SHA" "$IMAGE"
+          docker push "$IMAGE"
+
+      - name: Deploy exact image to Google Cloud Run
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing"
+          DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
+          test -n "$DIGEST"
+          gcloud run services update elevate-marketing-migration \
+            --project=elegant-racer-299721 \
+            --region=us-central1 \
+            --image="$IMAGE@$DIGEST" \
+            --quiet
+
+      - name: Verify live Marketing revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="https://elevate-marketing-migration-aabnh2y32a-uc.a.run.app"
+          for i in $(seq 1 24); do
+            code="$(curl -sS --max-time 15 -o /tmp/health.json -w '%{http_code}' "$URL/api/health" || true)"
+            if [ "$code" = "200" ] && grep -q '"healthy":true' /tmp/health.json; then
+              cat /tmp/health.json
+              exit 0
+            fi
+            sleep 5
+          done
+          cat /tmp/health.json || true
+          exit 1

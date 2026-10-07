@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { runtimeForGoogle, completeStoreConfig } from './stage-web.mjs';
+import { runtimeForGoogle, completeStoreConfig, verifyExistingStage } from './stage-web.mjs';
 const base = () => ({ runtimeEnvironment: { NEXT_PUBLIC_SUPABASE_URL: 'https://cuxzzpsyufcewtmicszk.supabase.co', NEXT_PUBLIC_SUPABASE_ANON_KEY: 'test-public', SUPABASE_SERVICE_ROLE_KEY: 'test-private', PORT: '3000', MULTILINE: 'one\ntwo', QUOTED: 'a,b="c"' } });
 test('preserves runtime values without modifying source and removes reserved port', () => {
   const source = base();
@@ -42,4 +42,17 @@ test('does not silently lose persistent data, secret files or unresolved templat
   assert.throws(() => runtimeForGoogle({ ...base(), runtimeFiles: { '/secret': {} } }, {}), /files/);
   const source = base(); source.runtimeEnvironment.SECRET = '${unresolved}';
   assert.throws(() => runtimeForGoogle(source, {}), /Unresolved/);
+});
+function existing() { return { metadata: { annotations: {} }, spec: { template: { spec: { serviceAccountName: 'runtime', containers: [{ image: 'image@sha256:approved', env: [{ name: 'KEY', value: 'value' }], ports: [{ containerPort: 3000 }], startupProbe: { httpGet: { path: '/api/ping' } }, livenessProbe: { httpGet: { path: '/api/ping' } } }] } } } }; }
+test('a failed verification can retry the exact existing runtime without redeployment', () => {
+  assert.equal(verifyExistingStage(existing(), 'image@sha256:approved', 'runtime', { KEY: 'value' }), true);
+});
+for (const field of ['image', 'identity', 'credential', 'probe', 'public']) test('retry refuses an unexpected ' + field + ' instead of overwriting production', () => {
+  const resource = existing(), container = resource.spec.template.spec.containers[0];
+  if (field === 'image') container.image = 'different';
+  if (field === 'identity') resource.spec.template.spec.serviceAccountName = 'different';
+  if (field === 'credential') container.env[0].value = 'different';
+  if (field === 'probe') container.startupProbe.httpGet.path = '/';
+  if (field === 'public') resource.metadata.annotations['run.googleapis.com/invoker-iam-disabled'] = 'true';
+  assert.throws(() => verifyExistingStage(resource, 'image@sha256:approved', 'runtime', { KEY: 'value' }));
 });

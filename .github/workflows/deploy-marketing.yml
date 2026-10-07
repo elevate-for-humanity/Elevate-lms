@@ -2,54 +2,10 @@ name: Deploy Marketing (www)
 
 # Deployment checkpoint: full-stack production parity release
 
+# Retired: Northflank must not deploy production Marketing.
+# Google Cloud Run is the canonical production deployment target.
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '.deploy-trigger'
-      - 'apps/marketing/**'
-      - 'components/**'
-      - '!components/admin/**'
-      - '!components/lms/**'
-      - '!components/studio/**'
-      - 'lib/api/**'
-      - 'lib/apprenticeship-programs/**'
-      - 'lib/auth/**'
-      - 'lib/marketing/**'
-      - 'lib/navigation/**'
-      - 'lib/payments/**'
-      - 'lib/stripe/**'
-      - 'lib/programs/**'
-      - 'lib/rate-limit.ts'
-      - 'lib/resend.ts'
-      - 'lib/store/**'
-      - 'lib/supabase/**'
-      - 'packages/shared-utils/**'
-      - 'public/**'
-      - '!public/manifest-admin.json'
-      - '!public/manifest-lms.json'
-      - '!public/sw-admin.js'
-      - '!public/sw-lms.js'
-      - 'scripts/northflank/**'
-      - 'scripts/verify-marketing-*.mjs'
-      - 'Dockerfile.marketing'
-      - 'Dockerfile.northflank-marketing'
-      - 'next.config.mjs'
-      - 'tailwind.config.js'
-      - 'tsconfig.json'
-      - 'proxy.ts'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - '.github/workflows/deploy-marketing.yml'
   workflow_dispatch:
-    inputs:
-      sync_secrets:
-        description: 'Synchronize shared production secret group to all three services'
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   contents: read

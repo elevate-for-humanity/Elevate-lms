@@ -16,7 +16,10 @@ fi
 if ! gcloud iam workload-identity-pools describe "$POOL" --location=global --project="$PROJECT_ID" >/dev/null 2>&1; then
   gcloud iam workload-identity-pools create "$POOL" --location=global --project="$PROJECT_ID" --display-name="Elevate GitHub"
 fi
-CONDITION="assertion.repository_id == '1096408995' && assertion.repository_owner_id == '286334428' && assertion.ref == 'refs/heads/main' && assertion.event_name == 'workflow_dispatch'"
+# Manual operations remain authorized. Automatic access is confined to the
+# canonical course dispatcher on main, rather than every scheduled workflow.
+SCHEDULED_COURSE_WORKFLOW="elevate-for-humanity/Elevate-lms/.github/workflows/dispatch-google-course-job.yml@refs/heads/main"
+CONDITION="assertion.repository_id == '1096408995' && assertion.repository_owner_id == '286334428' && assertion.ref == 'refs/heads/main' && (assertion.event_name == 'workflow_dispatch' || (assertion.event_name == 'schedule' && assertion.workflow_ref == '$SCHEDULED_COURSE_WORKFLOW'))"
 MAPPING="google.subject=assertion.sub,attribute.repository_id=assertion.repository_id"
 if gcloud iam workload-identity-pools providers describe "$PROVIDER" --workload-identity-pool="$POOL" --location=global --project="$PROJECT_ID" >/dev/null 2>&1; then
   gcloud iam workload-identity-pools providers update-oidc "$PROVIDER" --workload-identity-pool="$POOL" --location=global --project="$PROJECT_ID" --issuer-uri=https://token.actions.githubusercontent.com --attribute-mapping="$MAPPING" --attribute-condition="$CONDITION"

@@ -94,7 +94,6 @@ export default async function BarberApprenticeshipPage() {
 
   return (
     <main className="min-h-screen bg-white text-slate-950">
-      <BeautyEnrollmentPromotion />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -124,6 +123,12 @@ export default async function BarberApprenticeshipPage() {
           belowHeroHeadline={heroBanner.belowHeroHeadline}
           belowHeroSubheadline={heroBanner.belowHeroSubheadline}
         />
+      </section>
+
+      <section className="border-b border-slate-200 bg-white px-4 py-5">
+        <div className="mx-auto max-w-6xl">
+          <BeautyEnrollmentPromotion compact programLabel="Barber Apprenticeship" />
+        </div>
       </section>
 
       <div data-scroll-narration data-narration={KOUNTRY_KUTZ_HERO_TRANSCRIPT}>

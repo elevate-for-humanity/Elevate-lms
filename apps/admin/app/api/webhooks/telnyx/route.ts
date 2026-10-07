@@ -270,7 +270,7 @@ async function startVoicemail(
   if (!route.extensionId) route = await defaultAdminRoute(db, system);
   const greeting = await unavailableGreeting(db, route, system.after_hours_message);
   if (!system.voicemail_enabled) {
-    await telnyxClient().calls.actions.speak(callControlId, {
+    await (await telnyxClient()).calls.actions.speak(callControlId, {
       payload: `${greeting} Please try again later.`,
       voice,
       command_id: `${eventId}-unavailable`,
@@ -307,7 +307,7 @@ async function startVoicemail(
         .select('id')
         .single();
   if (taskError || !task?.id) throw new Error('Unable to create the voicemail callback task.');
-  await telnyxClient().calls.actions.speak(callControlId, {
+  await (await telnyxClient()).calls.actions.speak(callControlId, {
     payload: `${greeting} Your message will be recorded and transcribed. Please leave your name, callback number, and message after the beep.`,
     voice,
     command_id: `${eventId}-voicemail-prompt`,
@@ -399,7 +399,7 @@ async function startParis(
         .join('; ');
   try {
     if (taskId && !resume) {
-      await telnyxClient().calls.actions.startRecording(callControlId, {
+      await (await telnyxClient()).calls.actions.startRecording(callControlId, {
         channels: 'single',
         format: 'mp3',
         recording_track: 'inbound',
@@ -419,7 +419,7 @@ async function startParis(
       ? lastHistory.payload.message_history.filter((entry: any) =>
           ['user', 'assistant'].includes(entry?.role) && typeof entry?.content === 'string')
       : [];
-    await telnyxClient().calls.actions.gatherUsingAI(callControlId, {
+    await (await telnyxClient()).calls.actions.gatherUsingAI(callControlId, {
       parameters: {
         type: 'object',
         properties: {
@@ -527,7 +527,7 @@ async function routeToExtension(
   }
   const connectionId = process.env.TELNYX_CONNECTION_ID;
   if (!connectionId) throw new Error('TELNYX_CONNECTION_ID is not configured.');
-  const response = await telnyxClient().calls.dial({
+  const response = await (await telnyxClient()).calls.dial({
     connection_id: connectionId,
     from: publicPhoneNumber(),
     to: `sip:${device.sip_username}@sip.telnyx.com;secure=srtp`,
@@ -639,7 +639,7 @@ async function dialExtensionFallback(
   const connectionId = process.env.TELNYX_CONNECTION_ID;
   if (!connectionId) throw new Error('TELNYX_CONNECTION_ID is not configured.');
   const fallbackState = { ...state, phase: 'external_fallback' };
-  const response = await telnyxClient().calls.dial({
+  const response = await (await telnyxClient()).calls.dial({
     connection_id: connectionId,
     from: publicPhoneNumber(),
     to: extension.external_fallback_number,
@@ -672,7 +672,7 @@ async function gatherMenu(
   system: System, call: any, callControlId: string, eventId: string,
   prompt: string, state: CallState = {}, voice = PHONE_VOICE,
 ) {
-  await telnyxClient().calls.actions.gatherUsingSpeak(callControlId, {
+  await (await telnyxClient()).calls.actions.gatherUsingSpeak(callControlId, {
     ...MENU_INPUT, payload: prompt, voice,
     command_id: `${eventId}-menu-${state.phase || 'main_menu'}`,
     client_state: encodeCallState({
@@ -702,7 +702,7 @@ async function readDirectory(db: any, system: System, call: any, callControlId: 
   const index = Math.min(Math.max(page, 0), Math.max(0, pages.length - 1));
   const more = index + 1 < pages.length;
   const prompt = `${index === 0 ? 'Full directory. To dial an extension, press star first. ' : ''}${pages[index] || 'No directory entries are currently available.'} ${more ? 'The directory will continue shortly.' : 'End of directory. Press star to enter an extension, 8 to repeat, 9 for PARIS, or 0 for the administrator.'}`;
-  await telnyxClient().calls.actions.gatherUsingSpeak(callControlId, {
+  await (await telnyxClient()).calls.actions.gatherUsingSpeak(callControlId, {
     ...MENU_INPUT, payload: prompt, voice: fallback ? RECOVERY_VOICE : PHONE_VOICE,
     timeout_millis: more ? 1000 : 10000,
     command_id: `${eventId}-directory-${index}-${fallback ? 'fallback' : 'primary'}`,

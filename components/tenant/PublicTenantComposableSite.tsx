@@ -197,9 +197,9 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
     <div className="min-h-screen" style={{ backgroundColor: background, color: textColor }}>
       {config.homepage.announcement ? <div className="px-4 py-2 text-center text-sm font-black text-white" style={{ backgroundColor: primary }}>{config.homepage.announcement}</div> : null}
       <header className="sticky top-0 z-20 border-b border-black/10 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-4 py-4 sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-4 py-4 sm:px-6">
           <Link href={hrefFor('/', basePath)} className="flex min-w-0 items-center gap-3">{config.branding.logoImage ? <img src={config.branding.logoImage} alt={`${config.branding.logoText} logo`} className="h-10 w-auto max-w-36 object-contain" /> : null}<span className="truncate text-lg font-black" style={{ color: primary }}>{config.branding.logoText || site.siteName}</span></Link>
-          <nav className="hidden items-center gap-5 text-sm font-bold md:flex">{navigation.slice(0, 8).map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === page.slug ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === page.slug ? { color: primary } : undefined}>{item.navLabel || item.title}</Link>)}</nav>
+          <nav className="order-last flex w-full flex-wrap items-center gap-5 text-sm font-bold md:order-none md:w-auto">{navigation.slice(0, 8).map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === page.slug ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === page.slug ? { color: primary } : undefined}>{item.navLabel || item.title}</Link>)}</nav>
           {navigation.some((item) => item.slug === '/contact') ? <Link href={hrefFor('/contact', basePath)} className="rounded-full px-4 py-2 text-sm font-black text-white" style={{ backgroundColor: primary }}>Contact</Link> : null}
         </div>
       </header>

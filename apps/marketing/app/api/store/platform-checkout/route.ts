@@ -157,6 +157,15 @@ export async function POST(request: NextRequest) {
       cadence: interval === 'annual' ? 'annual' : 'monthly',
       next_invoice_date: nextPeriod(interval),
       status: 'active',
+      fulfillment_type: 'platform_subscription',
+      fulfillment_payload: {
+        organization_id: billingOrganizationId,
+        tenant_id: tenantId,
+        plan_id: plan.id,
+        billing_interval: interval,
+        addon_codes: addonSlugs.map(normalizeAddonCode),
+        amount_cents: totalCents,
+      },
     },
     { onConflict: 'provider,customer_external_key,canonical_product_key' },
   );

@@ -11,11 +11,11 @@ export const NAV_ITEMS: NavItem[] = [
   {
     id: 'students',
     name: 'Students',
-    href: '/learner/dashboard',
+    href: ROUTES.studentPortal,
     subItems: [
-      { name: 'Student Dashboard', href: '/learner/dashboard', isSectionLink: true, isAuth: true },
+      { name: 'Student Dashboard', href: ROUTES.studentPortal, isSectionLink: true, isAuth: true },
       { name: 'Apply for Training', href: ROUTES.apply, isSectionLink: true },
-      { name: 'My Courses', href: '/lms/dashboard', isSectionLink: true, isAuth: true },
+      { name: 'My Courses', href: ROUTES.lmsPortal, isSectionLink: true, isAuth: true },
       { name: 'Check Eligibility', href: ROUTES.eligibility, isSectionLink: true },
       { name: 'Student Support', href: '/student-support', isSectionLink: true },
     ],

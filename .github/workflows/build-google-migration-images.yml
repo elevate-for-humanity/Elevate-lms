@@ -6,7 +6,7 @@ on:
         type: choice
         required: true
         description: Build and upload only; does not start services or switch domains
-        options: [marketing, admin, lms, store, ultimate-worker, studio-browser]
+        options: [marketing, admin, lms, store, ultimate-worker, studio-browser, llm-gpu-worker, media-gpu-worker]
 permissions:
   contents: read
   id-token: write
@@ -35,10 +35,14 @@ jobs:
             lms) FILE=Dockerfile.northflank-lms ;;
             ultimate-worker) FILE=Dockerfile.ultimate-worker ;;
             studio-browser) FILE=Dockerfile.studio-browser ;;
+            llm-gpu-worker) FILE=services/llm-gpu-worker/Dockerfile ;;
+            media-gpu-worker) FILE=services/media-gpu-worker/Dockerfile ;;
             *) exit 1 ;;
           esac
-          test "$NEXT_PUBLIC_SUPABASE_URL" = "https://cuxzzpsyufcewtmicszk.supabase.co"
-          test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"
+          if [[ "$COMPONENT" != llm-gpu-worker && "$COMPONENT" != media-gpu-worker ]]; then
+            test "$NEXT_PUBLIC_SUPABASE_URL" = "https://cuxzzpsyufcewtmicszk.supabase.co"
+            test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"
+          fi
           docker build -f "$FILE" -t "elevate-$COMPONENT:$GITHUB_SHA" \
             --build-arg "NF_GIT_SHA=$GITHUB_SHA" \
             --build-arg "BUILD_TIMESTAMP=$(date -u +%FT%TZ)" \

@@ -117,13 +117,17 @@ export async function syncProgressEntryToHourEntries(
     hours:              hoursWorked,
     category:           'ojl',
     host_shop_id:        apprentice.shop_id || apprentice.employer_id || entry.site_id || null,
-    status:             entry.auto_clocked_out ? 'pending' : 'approved',
-    approval_status:    entry.auto_clocked_out ? 'pending' : 'approved',
+    // Completed timeclock shifts are authoritative OJL records. Administrator policy:
+    // clocked shifts report immediately to the canonical ledger as approved,
+    // including bounded system auto-clock-outs. Manual/disputed corrections use
+    // their separate audited review path.
+    status:             'approved',
+    approval_status:    'approved',
     progress_entry_id:  entry.id,
     entered_at:         new Date().toISOString(),
     entered_by_email:   'system@elevateforhumanity.org',
     notes:              entry.auto_clocked_out
-      ? 'Auto-clocked out — pending admin review'
+      ? `System auto-clocked timeclock shift: ${entry.clock_in_at} – ${entry.clock_out_at}`
       : `Timeclock shift: ${entry.clock_in_at} – ${entry.clock_out_at}`,
   };
 

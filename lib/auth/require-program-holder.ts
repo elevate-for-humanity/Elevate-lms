@@ -2,9 +2,10 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { requirePortalAccess } from '@/lib/auth/portal-access';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { siteUrls } from '@/lib/utils/site-urls';
 
 export const PROGRAM_HOLDER_PENDING_APPLICATION_URL =
-  'https://www.elevateforhumanity.org/apply/program-holder?status=pending';
+  `${siteUrls.site}/apply/program-holder?status=pending`;
 
 interface ProgramHolderProfile {
   id: string;

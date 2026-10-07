@@ -7,6 +7,7 @@ const state = vi.hoisted(() => ({
   tables: [] as string[],
 }));
 vi.mock('server-only', () => ({}));
+vi.mock('@/lib/utils/site-urls', () => ({ siteUrls: { site: 'https://marketing.example.test' } }));
 vi.mock('next/navigation', () => ({ redirect: (url: string) => { throw new Error(`REDIRECT:${url}`); } }));
 vi.mock('@/lib/admin/portal-preview', () => ({ resolvePortalPreviewSubject: async () => ({ previewing: false }) }));
 vi.mock('@/lib/auth/portal-access', () => ({ requirePortalAccess: async () => ({
@@ -35,6 +36,9 @@ beforeEach(() => {
 });
 
 describe('Program Holder pending approval boundary', () => {
+  it('uses the configured public Marketing origin for the pending destination', () => {
+    expect(PROGRAM_HOLDER_PENDING_APPLICATION_URL).toBe('https://marketing.example.test/apply/program-holder?status=pending');
+  });
   it.each(['pending', 'rejected', 'archived', 'inactive'])('denies %s without reentering protected onboarding', async status => {
     state.holder!.status = status;
     await expect(requireProgramHolder()).rejects.toThrow(`REDIRECT:${PROGRAM_HOLDER_PENDING_APPLICATION_URL}`);

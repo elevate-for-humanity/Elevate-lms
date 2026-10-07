@@ -1,6 +1,6 @@
 services:
   asterisk:
-    image: andrius/asterisk:20.15.2
+    image: mlan/asterisk:xtra-1.1.13
     restart: unless-stopped
     network_mode: host
     volumes:

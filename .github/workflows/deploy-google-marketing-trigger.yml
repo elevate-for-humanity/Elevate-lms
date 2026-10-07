@@ -5,6 +5,13 @@ on:
     branches: [main]
     paths:
       - '.deploy-google-marketing'
+      - 'apps/marketing/**'
+      - 'components/**'
+      - 'lib/programs/**'
+      - 'lib/apprenticeship-programs/**'
+      - 'content/heroBanners.ts'
+      - 'public/images/**'
+      - 'Dockerfile.marketing'
 
 permissions:
   contents: read

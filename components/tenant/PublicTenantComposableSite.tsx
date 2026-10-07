@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import type { PublishedTenantSite, TenantSitePage, TenantSiteSection } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig, normalizePageSlug } from '@/lib/tenant/site-composition';
+import { TenantAssessment, TenantEvents, TenantJournal } from '@/components/tenant/TenantInteractiveSections';
 import {
   TenantCustomLeadForm,
   TenantLeadForm,
@@ -168,6 +169,10 @@ function Section({ section, primary, secondary, basePath }: { section: TenantSit
     const href = text(c.url) || text(c.bookingUrl);
     return <section className="mx-auto max-w-4xl px-5 py-14 text-center sm:px-6"><h2 className="text-3xl font-black">{text(c.title) || 'Book an appointment'}</h2>{text(c.text) ? <p className="mt-4 text-slate-600">{text(c.text)}</p> : null}{href ? <div className="mt-7"><ActionLink href={href} primary={primary} basePath={basePath} eventName="booking_click">{text(c.buttonText) || 'Book now'}</ActionLink></div> : null}</section>;
   }
+
+  if (section.type === 'assessment') return <TenantAssessment content={c} accent={primary} />;
+  if (section.type === 'journal') return <TenantJournal content={c} accent={primary} />;
+  if (section.type === 'events') return <TenantEvents content={c} accent={primary} />;
 
   if (section.type === 'contact_form') {
     const fields = customFields(c.fields);

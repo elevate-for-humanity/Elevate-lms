@@ -8,13 +8,7 @@ import 'server-only';
 
 import { logger } from '@/lib/logger';
 import { PUBLIC_REVALIDATE_PATHS } from '@/lib/public-revalidate-paths';
-import {
-  getNorthflankProjectId,
-  getNorthflankService,
-  getNorthflankServices,
-  isNorthflankReady,
-  triggerNorthflankBuild,
-} from '@/lib/northflank/runtime';
+import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
 
 export type NorthflankDeployResult = {
   service: string;
@@ -103,34 +97,24 @@ export async function revalidatePublicLmsSite(): Promise<RevalidateLmsResult> {
   }
 }
 
-/** Trigger Northflank builds for all production services. */
+/** Public website publishing belongs exclusively to Google Marketing. */
 export async function triggerProductionDeploys(): Promise<NorthflankDeployResult[]> {
-  const projectId = getNorthflankProjectId();
-  if (!projectId || !isNorthflankReady()) {
-    return getNorthflankServices().map((s) => ({
-      service: s.id,
-      key: s.key,
-      status: 'failed' as const,
-      detail: 'Northflank API credentials are not configured',
-    }));
+  try {
+    const result = await dispatchGoogleDeployment('marketing');
+    return [{
+      service: result.target,
+      key: result.target,
+      status: 'triggered',
+      detail: 'Google Cloud Run workflow dispatched; exact live revision still requires verification',
+    }];
+  } catch (error) {
+    return [{
+      service: 'marketing',
+      key: 'marketing',
+      status: 'failed',
+      detail: error instanceof Error ? error.message : 'Google Marketing dispatch failed',
+    }];
   }
-
-  return Promise.all(
-    getNorthflankServices().map(async (service) => {
-      try {
-        await triggerNorthflankBuild(projectId, service.id);
-        return { service: service.id, key: service.key, status: 'triggered' as const };
-      } catch (err) {
-        const detail = err instanceof Error ? err.message : String(err);
-        return {
-          service: service.id,
-          key: service.key,
-          status: 'failed' as const,
-          detail: detail.slice(0, 200),
-        };
-      }
-    }),
-  );
 }
 
 export type PublishWebsiteOptions = {
@@ -179,65 +163,27 @@ export type PublishWebsiteStatus = {
 };
 
 export async function getPublishWebsiteStatus(): Promise<PublishWebsiteStatus> {
-  const projectId = getNorthflankProjectId();
-  const nfReady = isNorthflankReady();
-
-  const services = await Promise.all(
-    getNorthflankServices().map(async (cfg) => {
-      let status: string | null = null;
-      let lastDeployedAt: string | null = null;
-
-      if (nfReady && projectId) {
-        try {
-          const nf = await getNorthflankService(projectId, cfg.id);
-          const deploymentStatus = nf.deploymentStatus as
-            | { status?: string; lastTransitionTime?: string; updatedAt?: string }
-            | undefined;
-          status =
-            deploymentStatus?.status ??
-            (nf.buildStatus as string | undefined) ??
-            'unknown';
-          lastDeployedAt =
-            deploymentStatus?.lastTransitionTime ?? deploymentStatus?.updatedAt ?? null;
-        } catch {
-          status = 'unavailable';
-        }
-      }
-
-      if (!status || status === 'unknown' || status === 'unavailable') {
-        try {
-          const health = await fetch(`${cfg.url.replace(/\/$/, '')}${cfg.healthPath}`, {
-            cache: 'no-store',
-            signal: AbortSignal.timeout(8_000),
-          });
-          const contentType = health.headers.get('content-type') || '';
-          const payload = contentType.includes('application/json')
-            ? (await health.json().catch(() => null)) as { ok?: boolean; timestamp?: string } | null
-            : null;
-          if (health.ok && payload?.ok === true) {
-            status = 'healthy';
-            lastDeployedAt ??= payload.timestamp ?? null;
-          } else {
-            status = `unhealthy (HTTP ${health.status})`;
-          }
-        } catch {
-          status = 'unreachable';
-        }
-      }
-
-      return {
-        key: cfg.key,
-        id: cfg.id,
-        label: cfg.label,
-        url: cfg.url,
-        status,
-        lastDeployedAt,
-      };
-    }),
-  );
-
+  const targets = [
+    { key: 'marketing', id: 'elevate-marketing-migration', label: 'Marketing', url: 'https://elevate-marketing-migration-aabnh2y32a-uc.a.run.app' },
+    { key: 'admin', id: 'elevate-admin-migration', label: 'Admin', url: 'https://elevate-admin-migration-aabnh2y32a-uc.a.run.app' },
+    { key: 'lms', id: 'elevate-lms-migration', label: 'LMS', url: 'https://elevate-lms-migration-aabnh2y32a-uc.a.run.app' },
+  ];
+  const services = await Promise.all(targets.map(async (target) => {
+    let status = 'unreachable';
+    try {
+      const response = await fetch(target.url + '/api/health', {
+        cache: 'no-store',
+        signal: AbortSignal.timeout(8000),
+      });
+      const payload = await response.json().catch(() => null) as { healthy?: boolean } | null;
+      status = response.ok && payload?.healthy === true
+        ? 'healthy (revision not verified)'
+        : 'unhealthy (HTTP ' + response.status + ')';
+    } catch { /* Do not treat a failed probe as healthy. */ }
+    return { ...target, status, lastDeployedAt: null };
+  }));
   return {
-    northflankReady: nfReady,
+    northflankReady: false,
     liveSiteUrl: lmsOrigin(),
     services,
     revalidatePathCount: PUBLIC_REVALIDATE_PATHS.length,

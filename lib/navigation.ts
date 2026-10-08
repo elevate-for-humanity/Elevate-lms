@@ -102,9 +102,12 @@ export const NAV_ITEMS: NavItem[] = [
   {
     id: 'barber-beauty-network',
     name: 'Barber & Beauty Network',
-    href: '/partners/host-shops',
+    href: '/barber-beauty-network',
     subItems: [
-      { name: 'Explore the Network', href: '/partners/host-shops', isSectionLink: true },
+      { name: 'Network Home', href: '/barber-beauty-network', isSectionLink: true },
+      { name: 'Member Community', href: 'https://app.elevateforhumanity.org/lms/community', isSectionLink: true },
+      { name: 'Host Shop Directory', href: '/partners/host-shops', isSectionLink: true },
+      { name: 'Job Board', href: '/jobs', isSectionLink: true },
       { name: 'Join & Showcase Your Work', href: '/host-shop/apply', isSectionLink: true },
       { name: 'Barber Apprenticeship', href: ROUTES.programsBarber, isSectionLink: true },
       { name: 'Cosmetology', href: ROUTES.programsCosmetology, isSectionLink: true },

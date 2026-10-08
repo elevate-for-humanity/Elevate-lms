@@ -14,6 +14,7 @@ jobs:
   audit:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
+    environment: production
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4

@@ -12,6 +12,12 @@ on:
       - 'content/heroBanners.ts'
       - 'public/images/**'
       - 'Dockerfile.marketing'
+      - 'next.config.mjs'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'lib/marketing/**'
+      - 'lib/navigation/**'
+      - '.github/workflows/deploy-google-marketing-trigger.yml'
 
 permissions:
   contents: read
@@ -81,7 +87,7 @@ jobs:
           set -euo pipefail
           IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing"
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
-          test -n "$DIGEST"
+          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
           gcloud run services update elevate-marketing-migration \
             --project=elegant-racer-299721 \
             --region=us-central1 \
@@ -103,3 +109,31 @@ jobs:
           done
           cat /tmp/health.json || true
           exit 1
+
+      - name: Verify public website serves exact commit and requested homepage
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          const root='https://www.elevateforhumanity.org';
+          const required=['Esthetics Apprenticeship','Nail Technician Apprenticeship','HVAC Technician','CDL Training','Bookkeeping','Business & Entrepreneurship','Find or become a Host Shop'];
+          const forbidden=['Workforce systems and public-sector alignment'];
+          const deadline=Date.now()+180000;
+          let last='';
+          while(Date.now()<deadline) {
+            try {
+              const version=await fetch(root+'/api/version?release='+process.env.GITHUB_SHA,{cache:'no-store',signal:AbortSignal.timeout(15000)});
+              const data=version.ok?await version.json():{};
+              const sha=data.commitSha||data.commit||data.sha||'';
+              const page=await fetch(root+'/?release='+process.env.GITHUB_SHA,{cache:'no-store',signal:AbortSignal.timeout(20000)});
+              const html=await page.text();
+              const missing=required.filter(t=>!html.includes(t));
+              const present=forbidden.filter(t=>html.includes(t));
+              last=JSON.stringify({versionStatus:version.status,homepageStatus:page.status,sha,expected:process.env.GITHUB_SHA,missing,unwanted:present});
+              console.log(last);
+              if(version.ok && sha===process.env.GITHUB_SHA && page.ok && !missing.length && !present.length) process.exit(0);
+            } catch(e) { last=String(e);console.log(last); }
+            await new Promise(resolve=>setTimeout(resolve,10000));
+          }
+          throw new Error('Public website failed exact-revision/homepage acceptance: '+last);
+          NODE

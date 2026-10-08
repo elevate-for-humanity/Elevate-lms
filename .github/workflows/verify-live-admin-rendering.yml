@@ -1,0 +1,55 @@
+name: Verify live Admin rendering
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/verify-live-admin-rendering.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch trusted read-only verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-live-admin-rendering.yml/dispatches" -f ref=main
+  verify:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Inspect effective runtime and sanitized render failure categories
+        run: |
+          node --input-type=module <<'NODE'
+          import {execFileSync} from 'node:child_process';
+          const base=['--project=elegant-racer-299721','--format=json'];
+          const service=JSON.parse(execFileSync('gcloud',['run','services','describe','elevate-admin-migration','--region=us-central1',...base],{encoding:'utf8'}));
+          const spec=service.spec.template.spec;
+          const env=Object.fromEntries((spec.containers[0].env||[]).filter(x=>typeof x.value==='string').map(x=>[x.name,x.value]));
+          console.log(JSON.stringify({latestReadyRevision:service.status.latestReadyRevisionName,traffic:service.status.traffic,resources:spec.containers[0].resources,scaling:service.spec.template.metadata.annotations,narrationProvider:['kokoro','local','cloudflare'].includes(env.AI_NARRATION_PROVIDER)?env.AI_NARRATION_PROVIDER:'other',workerDisabled:env.DISABLE_ADMIN_VIDEO_WORKER==='true'}));
+          const filter='resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration"';
+          let rows;
+          try {rows=JSON.parse(execFileSync('gcloud',['logging','read',filter,'--freshness=30m','--limit=500',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));}
+          catch {throw new Error('Runtime log read did not succeed; live rendering verification requires log evidence');}
+          const patterns={out_of_memory:/memory limit|out of memory|OOM|SIGKILL/i,terminated:/SIGTERM|terminated|shutting down/i,model_loading:/kokoro|onnx|model.*load|download.*model/i,render_failure:/render.*fail|compositor.*error|narration.*fail/i,quality_failure:/quality.*fail|quality.*reject/i,worker_failure:/trigger loop error|Processor failed|Automated course finalization failed/i,render_complete:/markComplete|render.*complete|video.*complete/i};
+          const counts={};
+          for(const row of rows) {
+            const message=row.textPayload||JSON.stringify(row.jsonPayload||{});
+            const categories=Object.entries(patterns).filter(([,pattern])=>pattern.test(message)).map(([key])=>key);
+            for(const category of categories)counts[category]=(counts[category]||0)+1;
+            if(categories.length)console.log(JSON.stringify({timestamp:row.timestamp,severity:row.severity,revision:row.resource?.labels?.revision_name,categories}));
+          }
+          console.log(JSON.stringify({logEntriesRead:rows.length,categories:counts}));
+          NODE

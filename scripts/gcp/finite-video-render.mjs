@@ -1,4 +1,25 @@
 import { spawn, execFileSync } from 'node:child_process';
+import { request } from 'node:http';
+
+export function startLocalRender(port, secret, options) {
+  const body = JSON.stringify(options);
+  return new Promise((resolve, reject) => {
+    const req = request({ hostname: '127.0.0.1', port, path: '/api/internal/videos/process-queue', method: 'POST', agent: false,
+      headers: { authorization: 'Bearer ' + secret, 'content-type': 'application/json', 'content-length': Buffer.byteLength(body), connection: 'close' } }, response => {
+      let text = '';
+      response.setEncoding('utf8');
+      response.on('data', chunk => { text += chunk; });
+      response.on('error', reject);
+      response.on('end', () => {
+        if (response.statusCode !== 200) return reject(new Error('Renderer execution rejected: HTTP ' + response.statusCode));
+        try { resolve(JSON.parse(text)); } catch { reject(new Error('Renderer execution returned invalid JSON')); }
+      });
+    });
+    req.setTimeout(60000, () => req.destroy(new Error('Local render handoff timed out')));
+    req.on('error', reject);
+    req.end(body);
+  });
+}
 
 export function completedRenderEvidence(job) {
   if (job.status !== 'complete' || !job.video_url || !job.completed_at) return false;
@@ -87,12 +108,7 @@ export async function runFiniteVideoRender() {
       }
       if (!claimed && job.status === 'queued') {
         stage = 'start_exact_render';
-        const r = await fetch('http://127.0.0.1:' + port + '/api/internal/videos/process-queue', {
-          method: 'POST', headers: { authorization: 'Bearer ' + secret, 'content-type': 'application/json' },
-          body: JSON.stringify({ courseId, jobId, queueOneDraft: true, maxJobs: 1 }), signal: AbortSignal.timeout(60000),
-        });
-        if (!r.ok) throw new Error('Renderer execution rejected: HTTP ' + r.status);
-        const result = await r.json();
+        const result = await startLocalRender(port, secret, { courseId, jobId, queueOneDraft: true, maxJobs: 1 });
         claimed = result.started === 1;
         if (claimed) console.log(JSON.stringify({ started: true, courseId, jobId }));
       }
@@ -102,8 +118,13 @@ export async function runFiniteVideoRender() {
   } catch (error) {
     const categories = { module_missing: /MODULE_NOT_FOUND|Cannot find module|ERR_MODULE_NOT_FOUND/.test(diagnostic), address_failure: /EADDR|ENOTFOUND|EAI_AGAIN/.test(diagnostic), memory_failure: /out of memory|OOM|SIGKILL/i.test(diagnostic), react_boundary: /createContext is not a function/.test(diagnostic) };
     let message = String(error.message || '').replace(/https?:\/\/\S+/g, '[url]').replace(/Bearer\s+\S+/gi, 'Bearer [redacted]');
-    for (const [name, value] of Object.entries(process.env)) if (/KEY|TOKEN|SECRET|PASSWORD/.test(name) && value?.length > 5) message = message.split(value).join('[redacted]');
-    await event('finite_video_session_failed', { stage, errorName: ['Error','TimeoutError','AbortError','TypeError'].includes(error.name) ? error.name : 'runtime_error', message: message.slice(0,500), childExitCode: server.exitCode, childSignal: server.signalCode, categories, runtimeStarted: /Ready in|Listening|started server/i.test(diagnostic) });
+    let safeDiagnostic = diagnostic.replace(/https?:\/\/\S+/g, '[url]').replace(/Bearer\s+\S+/gi, 'Bearer [redacted]');
+    for (const [name, value] of Object.entries(process.env)) if (/KEY|TOKEN|SECRET|PASSWORD|DATABASE.*URL/.test(name) && value?.length > 5) {
+      message = message.split(value).join('[redacted]');
+      safeDiagnostic = safeDiagnostic.split(value).join('[redacted]');
+    }
+    const code = error.cause?.code || error.code;
+    await event('finite_video_session_failed', { stage, connectionCode: ['UND_ERR_SOCKET','ECONNRESET','ECONNREFUSED','ETIMEDOUT','ENOTFOUND','UND_ERR_CONNECT_TIMEOUT'].includes(code) ? code : null, errorName: ['Error','TimeoutError','AbortError','TypeError'].includes(error.name) ? error.name : 'runtime_error', message: message.slice(0,500), diagnostic: safeDiagnostic.slice(-4000), childExitCode: server.exitCode, childSignal: server.signalCode, categories, runtimeStarted: /Ready in|Listening|started server/i.test(diagnostic) });
     throw error;
   } finally { server.kill('SIGTERM'); }
 }

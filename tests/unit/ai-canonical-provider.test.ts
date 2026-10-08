@@ -1,6 +1,31 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 describe('canonical AI provider authority', () => {
+  it('allows canonical Elevate inference without a paid authorization context', async () => {
+    vi.stubEnv('AI_PROVIDER', 'elevate');
+    vi.stubEnv('ELEVATE_LLM_URL', 'https://owned-provider.test');
+    vi.stubEnv('ELEVATE_LLM_SECRET', 'owned-secret');
+    const request = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      model: 'elevate-local', choices: [{ message: { content: 'owned response' } }],
+    }), { status: 200, headers: { 'content-type': 'application/json' } }));
+    vi.stubGlobal('fetch', request);
+    const { aiChat } = await import('@/lib/ai/ai-service');
+    const result = await aiChat({ messages: [{ role: 'user', content: 'test' }] });
+    expect(result.provider).toBe('elevate');
+    expect(request).toHaveBeenCalledTimes(1);
+  });
+
+  it('blocks canonical external inference without paid authorization', async () => {
+    vi.stubEnv('AI_PROVIDER', 'openai');
+    vi.stubEnv('OPENAI_API_KEY', 'external-key');
+    const request = vi.fn();
+    vi.stubGlobal('fetch', request);
+    const { aiChat } = await import('@/lib/ai/ai-service');
+    await expect(aiChat({ messages: [{ role: 'user', content: 'test' }] }))
+      .rejects.toThrow('PAID_INFERENCE_AUTHORIZATION_REQUIRED');
+    expect(request).not.toHaveBeenCalled();
+  });
+
   afterEach(() => {
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();

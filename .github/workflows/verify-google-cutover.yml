@@ -4,7 +4,7 @@ on:
     branches: [main]
     paths: ['.github/workflows/verify-google-cutover.yml']
   workflow_run:
-    workflows: ['Deploy Admin', 'Deploy Google Marketing on trigger', 'Deploy repaired Google services', 'Deploy Google Store subscriptions']
+    workflows: ['Deploy Admin', 'Deploy Google Marketing on trigger', 'Deploy repaired Google services', 'Deploy Google Store subscription delivery']
     types: [completed]
   workflow_dispatch:
 permissions:

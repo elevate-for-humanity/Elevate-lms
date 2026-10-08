@@ -11,7 +11,7 @@
  *
  * POST { workflow: string, inputs?: Record<string, string> }
  *   → triggers workflow_dispatch on any workflow that supports it
- *   → falls back to Contents API bump if token lacks workflow scope
+ *   → fails closed when dispatch authorization is unavailable
  *
  * No hardcoded workflow allowlist — any workflow with workflow_dispatch
  * trigger in the repo can be dispatched. Repo and branch are read from env.
@@ -96,52 +96,6 @@ async function listDispatchableWorkflows(): Promise<GHWorkflow[]> {
   }
   // Return only active workflows — disabled ones can't be dispatched
   return all.filter(w => w.state === 'active');
-}
-
-/**
- * Fallback trigger: bump the retry-marker comment in a workflow file via the
- * Contents API. Used when workflow_dispatch returns 403/404 (e.g. the token
- * lacks workflow scope or the workflow has no workflow_dispatch trigger).
- *
- * Reads the current file, replaces the marker timestamp, and PUTs it back.
- * GitHub sees a push to main on a path that matches the workflow's path filter,
- * which fires the deploy job exactly as a normal push would.
- */
-async function triggerViaContentsApi(workflowFile: string): Promise<{ runUrl: string }> {
-  const token = await resolveSecret('GITHUB_TOKEN');
-  if (!token) throw new Error('GITHUB_TOKEN is not configured in platform_secrets');
-
-  const filePath = `.github/workflows/${workflowFile}`;
-  const apiBase  = `${GH_API}/repos/${repo()}/contents/${filePath}`;
-  const headers = await ghHeaders();
-
-  const getRes = await fetch(`${apiBase}?ref=${branch()}`, { headers });
-  if (!getRes.ok) throw new Error(`Could not read ${filePath}: ${getRes.status}`);
-  const { sha, content: b64 } = await getRes.json() as { sha: string; content: string };
-
-  const current  = Buffer.from(b64.replace(/\n/g, ''), 'base64').toString('utf8');
-  const ts       = new Date().toISOString().slice(0, 16) + 'Z';
-  const markerRe = /(#\s*Retry trigger marker:\s*)\S+/;
-  const updated  = markerRe.test(current)
-    ? current.replace(markerRe, `$1${ts}`)
-    : current + `\n# Retry trigger marker: ${ts}\n`;
-
-  const putRes = await fetch(apiBase, {
-    method: 'PUT',
-    headers,
-    body: JSON.stringify({
-      message: `chore: trigger ${workflowFile.replace('.yml', '')}`,
-      content: Buffer.from(updated).toString('base64'),
-      sha,
-      branch: branch(),
-    }),
-  });
-
-  if (!putRes.ok) {
-    throw new Error(`Contents API PUT failed: ${putRes.status}`);
-  }
-
-  return { runUrl: `https://github.com/${repo()}/actions` };
 }
 
 // ── POST — dispatch a workflow ────────────────────────────────────────────────
@@ -243,16 +197,12 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Fallback: bump retry marker via Contents API
-    const fallback = await triggerViaContentsApi(workflowFile);
+    // Refuse a failed workflow dispatch. Never rewrite main as a fallback.
     return NextResponse.json({
-      ok: true,
+      ok: false,
       workflow: workflowFile,
-      method: 'contents-api',
-      runId: null,
-      runUrl: fallback.runUrl,
-      status: 'queued',
-    });
+      error: 'GitHub workflow dispatch rejected with HTTP ' + dispatchRes.status,
+    }, { status: 502 });
   } catch (err) {
     return safeInternalError(err, 'Failed to dispatch workflow');
   }

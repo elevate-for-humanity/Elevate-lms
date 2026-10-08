@@ -301,7 +301,7 @@
   },
   "hvac-technician": {
     "pageKey": "hvac-technician",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hvac-hero-final.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-hvac-technician.mp4",
     "voiceoverSrc": "/audio/heroes/skilled-trades.mp3",
     "microLabel": "EPA 608 Universal",
     "credentialLabel": "EPA 608 Universal",
@@ -327,7 +327,7 @@
     ],
     "transcript": "Train for EPA 608 Universal certification in 6 weeks at Elevate for Humanity, working on real HVAC systems with hands-on instruction. Graduates also earn OSHA 10, CPR, and Rise Up credentials. HVAC technicians in Indiana commonly earn $38,000 to $55,000. Total program cost is $5,000 — most students pay $0 through the Workforce Ready Grant.",
     "analyticsName": "hvac-technician",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-hvac-technician.mp4"
   },
   "cdl-training": {
     "pageKey": "cdl-training",
@@ -568,7 +568,7 @@
   },
   "medical-assistant": {
     "pageKey": "medical-assistant",
-    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-medical-assistant.mp4",
     "voiceoverSrc": "/audio/heroes/medical-assistant.mp3",
     "microLabel": "NHA CCMA Certification",
     "credentialLabel": "NHA CCMA",
@@ -593,7 +593,7 @@
     ],
     "transcript": "Train for NHA CCMA and CPT certification in 20 weeks, building skills in clinical procedures, patient intake, EHR documentation, and phlebotomy. Medical assistants commonly earn $35,000 to $45,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "medical-assistant",
-    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-medical-assistant.mp4",
     "_pexelsVideoId": 6130025
   },
   "pharmacy-technician": {
@@ -629,7 +629,7 @@
   },
   "phlebotomy": {
     "pageKey": "phlebotomy",
-    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-phlebotomy.mp4",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "NHA CPT Certification",
     "credentialLabel": "NHA CPT",
@@ -654,7 +654,7 @@
     ],
     "transcript": "Train for NHA CPT certification in 4 weeks, completing 120 hours of classroom and clinical training in venipuncture, specimen processing, and patient interaction. Phlebotomy technicians commonly earn $30,000 to $40,000. The NHA CPT is the employer-accepted standard in Indiana. Self-pay is $1,500 with payment plans available.",
     "analyticsName": "phlebotomy",
-    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-phlebotomy.mp4",
     "_pexelsVideoId": 6290542
   },
   "home-health-aide": {
@@ -1217,8 +1217,8 @@
     ],
     "transcript": "Train for IRS PTIN and AFSP credentials in 8 weeks, building skills in individual and small business tax preparation using real tax software. Tax preparers commonly earn $35,000 to $55,000. Enrolled Agent exam preparation included. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "tax-preparation",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-tax-preparation.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-tax-preparation.mp4"
   },
   "bookkeeping": {
     "pageKey": "bookkeeping",
@@ -2538,8 +2538,8 @@
     ],
     "transcript": "Prepare for CompTIA Security+ and CySA+ in 12 weeks through hands-on security labs, threat analysis practice, and career coaching. Eligible Indiana residents may use WIOA or Workforce Ready Grant funding. Cybersecurity analyst roles commonly pay $55,000 to $85,000.",
     "analyticsName": "cybersecurity",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cybersecurity.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cybersecurity.mp4"
   },
   "hospitality": {
     "pageKey": "hospitality",

@@ -124,7 +124,10 @@ export async function createAiTask(
   input: CreateTaskInput,
   runtime: TaskExecutionRuntimeContext = { actorRoles: [] },
 ) {
-  const command = `${input.title} ${input.description ?? ''} ${input.command ?? ''}`.trim();
+  // Plan metadata describes the overall goal, not this step's executable intent.
+  // Keep it on the task record without letting it select another operational tool.
+  const command = input.command?.trim() ||
+    `${input.title} ${input.description ?? ''}`.trim();
   const executionMode = input.executionMode ?? 'automatic';
   const plannedTool = planAIToolFromCommand(command, {
     toolName: input.toolName,

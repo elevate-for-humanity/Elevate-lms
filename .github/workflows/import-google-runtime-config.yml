@@ -22,7 +22,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/37806171056/cancel" || true
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/import-google-runtime-config.yml/dispatches" -f ref=main -f 'inputs[component]=all'
   import:
     concurrency:
@@ -51,6 +50,7 @@ jobs:
         env:
           COMPONENT: ${{ inputs.component }}
           VERIFY_EXISTING_GOOGLE_CONFIG: 'true'
+          GOOGLE_SECRET_GROUP_ARCHIVE_MODE: 'existing-admin-config'
           NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
           NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID }}
         run: |

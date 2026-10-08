@@ -125,19 +125,24 @@ forbidText('.github/workflows/promote-to-production.yml', 'git push origin main'
 forbidText('.github/workflows/promote-to-production.yml', 'skipping LMS health check', 'Missing staging health configuration must not be treated as success.');
 forbidText('.github/workflows/promote-to-production.yml', 'skipping Admin health check', 'Missing Admin staging health configuration must not be treated as success.');
 
-requireText('.github/workflows/northflank-trigger-dispatch.yml', 'git merge-base --is-ancestor', 'Production dispatcher must prove requested SHA belongs to main.');
-requireText('.github/workflows/northflank-trigger-dispatch.yml', 'RESOLVED_SHA', 'Production dispatcher must resolve the exact requested commit.');
-
+// Active deployment requirements: Google only, preserving production identity,
+// immutable image selection and fail-closed live revision checks.
 for (const file of [
-  '.github/workflows/deploy-marketing.yml',
   '.github/workflows/deploy-admin.yml',
-  '.github/workflows/deploy-lms.yml',
-  '.github/workflows/recover-marketing.yml',
-  '.github/workflows/elevate-production-deploy.yml',
-]) protectProductionWorkflow(file);
-
-requireText('.github/workflows/elevate-production-deploy.yml', "inputs.environment }}' == 'production'", 'Canonical production deploy must explicitly enforce production SHA provenance.');
-requireText('.github/workflows/elevate-production-deploy.yml', 'Recovery hardening regression check', 'Canonical deployment must run recovery hardening before publish/deploy.');
+  '.github/workflows/deploy-google-marketing-trigger.yml',
+]) {
+  requireText(file, 'environment: production', 'Google release must use protected production environment.');
+  requireText(file, 'google-github-actions/auth@v3', 'Google workload identity is required.');
+  requireText(file, 'elegant-racer-299721', 'Google release must use the approved production project.');
+  requireText(file, 'gcloud run services update', 'Release must update Google Cloud Run.');
+  forbidText(file, 'api.northflank.com', 'Never trigger Northflank from a Google release.');
+}
+requireText('.github/workflows/deploy-admin.yml', 'body.commit===process.env.GITHUB_SHA', 'Admin live exact commit verification is required.');
+requireText('.github/workflows/deploy-google-marketing-trigger.yml', 'git merge-base --is-ancestor', 'Marketing SHA must belong to main.');
+requireText('.github/workflows/deploy-google-marketing-trigger.yml', 'sha===process.env.GITHUB_SHA', 'Marketing public exact commit verification is required.');
+for (const old of ['northflank-trigger-dispatch.yml','deploy-lms.yml','deploy-marketing.yml','recover-marketing.yml','elevate-production-deploy.yml']) {
+  if (fs.existsSync('.github/workflows/' + old)) failures.push('Retired deployment workflow still present: ' + old);
+}
 
 // The public Google monitor imports only Node builtins and local modules, so it
 // needs neither provider credentials nor dependency installation. Enforce the
@@ -153,9 +158,8 @@ forbidText('.github/workflows/supabase-auto-migrate-seed.yml', 'node scripts/db/
 forbidText('.github/workflows/supabase-auto-migrate-seed.yml', 'pnpm db:seed', 'Supabase workflow must not automatically seed production data.');
 requireText('.github/workflows/supabase-auto-migrate-seed.yml', 'This workflow does NOT apply migrations or seed production data.', 'Supabase workflow must remain audit-only during recovery.');
 
-forbidText('.github/workflows/fix-northflank-services.yml', '--all --execute', 'Legacy all-service mutator must remain disabled.');
-forbidText('.github/workflows/fix-northflank-services.yml', 'restart-service.ts', 'Legacy workflow must not restart all production services.');
-requireText('.github/workflows/fix-northflank-services.yml', 'does not mutate or restart production services', 'Northflank legacy fixer must remain audit-only.');
+// Legacy inventory-only scripts may remain for safe migration audits. No
+// historical Northflank workflow is required for a Google production release.
 
 requireText('scripts/check-stripe-integrity.mjs', 'process.exit(1)', 'Stripe violations must remain blocking.');
 forbidText('scripts/check-stripe-integrity.mjs', 'Warn only for now', 'Stripe gate must not regress to warning-only behavior.');

@@ -36,6 +36,7 @@ export async function runFiniteVideoRender() {
   for (const stream of [server.stdout, server.stderr]) stream.on('data', chunk => { diagnostic = (diagnostic + chunk.toString()).slice(-16000); });
   const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
   const deadline = Date.now() + 55 * 60 * 1000;
+  let stage = 'runtime_start';
   async function readJob() {
     const endpoint = new URL('/rest/v1/video_jobs', url);
     endpoint.searchParams.set('id', 'eq.' + jobId);
@@ -60,6 +61,7 @@ export async function runFiniteVideoRender() {
     let claimed = false;
     while (Date.now() < deadline) {
       if (server.exitCode !== null) throw new Error('Renderer process exited during execution');
+      stage = 'read_exact_job';
       const job = await readJob();
       if (job.status === 'failed') throw new Error('Exact render failed; no automatic retry');
       if (job.status === 'complete') {
@@ -84,6 +86,7 @@ export async function runFiniteVideoRender() {
         return;
       }
       if (!claimed && job.status === 'queued') {
+        stage = 'start_exact_render';
         const r = await fetch('http://127.0.0.1:' + port + '/api/internal/videos/process-queue', {
           method: 'POST', headers: { authorization: 'Bearer ' + secret, 'content-type': 'application/json' },
           body: JSON.stringify({ courseId, jobId, queueOneDraft: true, maxJobs: 1 }), signal: AbortSignal.timeout(60000),
@@ -98,7 +101,9 @@ export async function runFiniteVideoRender() {
     throw new Error('Finite render exceeded its execution deadline');
   } catch (error) {
     const categories = { module_missing: /MODULE_NOT_FOUND|Cannot find module|ERR_MODULE_NOT_FOUND/.test(diagnostic), address_failure: /EADDR|ENOTFOUND|EAI_AGAIN/.test(diagnostic), memory_failure: /out of memory|OOM|SIGKILL/i.test(diagnostic), react_boundary: /createContext is not a function/.test(diagnostic) };
-    await event('finite_video_session_failed', { childExitCode: server.exitCode, childSignal: server.signalCode, categories, runtimeStarted: /Ready in|Listening|started server/i.test(diagnostic) });
+    let message = String(error.message || '').replace(/https?:\/\/\S+/g, '[url]').replace(/Bearer\s+\S+/gi, 'Bearer [redacted]');
+    for (const [name, value] of Object.entries(process.env)) if (/KEY|TOKEN|SECRET|PASSWORD/.test(name) && value?.length > 5) message = message.split(value).join('[redacted]');
+    await event('finite_video_session_failed', { stage, errorName: ['Error','TimeoutError','AbortError','TypeError'].includes(error.name) ? error.name : 'runtime_error', message: message.slice(0,500), childExitCode: server.exitCode, childSignal: server.signalCode, categories, runtimeStarted: /Ready in|Listening|started server/i.test(diagnostic) });
     throw error;
   } finally { server.kill('SIGTERM'); }
 }

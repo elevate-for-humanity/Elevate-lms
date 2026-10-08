@@ -110,7 +110,11 @@ export default function ProgramDetailPage({
     : 'WIOA may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment.';
   const selfPayNumeric = Number((p.selfPayCost || '').replace(/[^0-9.]/g, '')) || 0;
   const isApprenticeship = p.programType === 'apprenticeship';
-  const octoberCouponCode = '50OFFOCT';
+  const octoberCouponCode = 'OCT300';
+  const isEstheticsApprenticeship = p.slug === 'esthetician-apprenticeship';
+  const weeklyHoursLabel = p.hoursPerWeekMin === p.hoursPerWeekMax
+    ? `${p.hoursPerWeekMin} hrs/week`
+    : `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`;
   const bnplDepositStart = isApprenticeship
     ? 300
     : p.depositAmount
@@ -138,7 +142,7 @@ export default function ProgramDetailPage({
       intent: 'enrollment',
       funding: 'self_pay',
       payment: mode,
-      ...(isApprenticeship ? { coupon: octoberCouponCode } : {}),
+      ...(isApprenticeship ? { coupon: mode === 'full' ? 'PAYFULL600' : octoberCouponCode } : {}),
     }).toString()}`;
   const employerPartners = Array.isArray(p.employerPartners) ? p.employerPartners : [];
   const isTaxPreparationProgram = p.slug === 'tax-preparation';
@@ -327,7 +331,7 @@ export default function ProgramDetailPage({
                 </p>
               </div>
               <div className="shrink-0 rounded-xl border border-white/30 bg-white/10 px-4 py-2 text-sm font-black">
-                Coupon: <span className="font-mono">50OFFOCT</span>
+                Coupon: <span className="font-mono">OCT300</span>
               </div>
             </div>
           </div>
@@ -776,7 +780,7 @@ export default function ProgramDetailPage({
                 <span className="block text-xs font-black uppercase tracking-wider text-orange-300">
                   Pay in full
                 </span>
-                <span className="mt-1 block text-xl font-black text-white">{p.selfPayCost}</span>
+                <span className="mt-1 block text-xl font-black text-white">{isEstheticsApprenticeship ? '$5,400 with PAYFULL600' : p.selfPayCost}</span>
                 <span className="mt-1 block text-xs leading-5 text-slate-300">
                   One payment after application approval
                 </span>

@@ -21,7 +21,7 @@ export const ESTHETICIAN_APPRENTICESHIP: ProgramSchema = {
   cohortSize: '1–3 participants per approved host site',
   fundingStatement:
     'Self-pay enrollment is available. Any employer or workforce funding must be confirmed in writing for the individual participant before enrollment.',
-  selfPayCost: '$4,980',
+  selfPayCost: '$6,000',
   fundingOptions: ['self_pay'],
   badge: 'Indiana Esthetics Pathway',
   badgeColor: 'blue',

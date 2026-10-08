@@ -1,253 +1,114 @@
 name: Deploy Admin
 
-# Deployment checkpoint: instructional Course Builder gate migration release
-
 on:
   push:
     branches: [main]
     paths:
-      - '.deploy-trigger'
       - 'apps/admin/**'
       - 'lib/**'
       - 'remotion-src/**'
       - 'packages/**'
       - 'components/admin/**'
       - 'components/studio/**'
-      - 'components/pwa/**'
-      # Admin owns only its PWA shell and shared brand assets. Marketing media
-      # must not enqueue an unrelated Admin build.
-      - 'public/manifest-admin.json'
-      - 'public/sw-admin.js'
-      - 'public/offline.html'
-      - 'public/icon-*.png'
-      - 'public/icon-*.webp'
-      - 'public/logo.*'
-      - 'public/logo-*.png'
-      - 'public/logo-*.svg'
-      - 'public/logo-*.webp'
-      - 'public/fonts/**'
-      - 'scripts/northflank/**'
-      - 'scripts/course-factory/**'
-      - 'scripts/verify-admin-instrumentation-boundary.mjs'
-      - 'scripts/guard-admin-routes.sh'
       - 'instrumentation.ts'
-      - 'scripts/verify-no-retired-admin-ui-routes.mjs'
-      - 'scripts/verify-portal-production-contracts.mjs'
-      - 'next.config.mjs'
-      - 'tailwind.config.js'
-      - 'tsconfig.json'
-      - 'proxy.ts'
-      - 'Dockerfile.admin'
       - 'Dockerfile.northflank-admin'
-      - 'pnpm-lock.yaml'
       - 'package.json'
-      - 'pnpm-workspace.yaml'
+      - 'pnpm-lock.yaml'
       - '.github/workflows/deploy-admin.yml'
   workflow_dispatch:
-  repository_dispatch:
-    types: [deploy-admin]
 
 permissions:
   contents: read
+  actions: write
+  id-token: write
 
 concurrency:
-  group: northflank-admin-deploy
-  # Serialize production deployments. Once a verified build has been handed to
-  # Northflank, a newer push must wait rather than cancel deployment
-  # verification and waste the completed build.
+  group: google-runtime-operations
   cancel-in-progress: false
 
 jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch Google-trusted workflow event
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-admin.yml/dispatches" -f ref=main
   deploy-admin:
-    name: Build and deploy admin on Northflank
-    runs-on: ubuntu-latest
+    name: Build and deploy Admin on Google
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
     environment: production
+    timeout-minutes: 120
     env:
-      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
-      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
-      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
-      NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
-      NORTHFLANK_TARGET_SERVICE: admin
-      DEPLOY_BRANCH: main
-      NORTHFLANK_EPHEMERAL_STORAGE_MB: '32768'
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      # sync-env validates the complete shared runtime before it writes. Admin
-      # must supply the same critical credentials as the full production
-      # workflow instead of depending on a partially readable secret-group
-      # response from Northflank.
-      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-      CRON_SECRET: ${{ secrets.CRON_SECRET }}
-      TELNYX_API_KEY: ${{ secrets.TELNYX_API_KEY }}
-      TELNYX_PUBLIC_KEY: ${{ secrets.TELNYX_PUBLIC_KEY }}
-      TELNYX_CONNECTION_ID: ${{ secrets.TELNYX_CONNECTION_ID }}
-      TELNYX_PHONE_NUMBER: ${{ secrets.TELNYX_PHONE_NUMBER }}
-      TELNYX_PHONE_NUMBER_ID: ${{ secrets.TELNYX_PHONE_NUMBER_ID }}
-      TELNYX_OUTBOUND_VOICE_PROFILE_ID: ${{ secrets.TELNYX_OUTBOUND_VOICE_PROFILE_ID }}
-      LIVEKIT_URL: ${{ secrets.LIVEKIT_URL }}
-      LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY }}
-      LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET }}
-      XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
-      XAI_API_TOKEN: ${{ secrets.XAI_API_TOKEN }}
-      GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
-      GROK_API_TOKEN: ${{ secrets.GROK_API_TOKEN }}
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      ANTHROPIC_API_TOKEN: ${{ secrets.ANTHROPIC_API_TOKEN }}
-      CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
-      ENVATO_API_TOKEN: ${{ secrets.ENVATO_API_TOKEN }}
-      ONET_API_KEY: ${{ secrets.ONET_API_KEY }}
-      USAJOBS_API_KEY: ${{ secrets.USAJOBS_API_KEY }}
-      USAJOBS_USER_AGENT_EMAIL: ${{ secrets.USAJOBS_USER_AGENT_EMAIL }}
-      CAREERONESTOP_USER_ID: ${{ secrets.CAREERONESTOP_USER_ID }}
-      CAREERONESTOP_TOKEN: ${{ secrets.CAREERONESTOP_TOKEN }}
-      CAREERONESTOP_API_KEY: ${{ secrets.CAREERONESTOP_API_KEY || secrets.CAREERONESTOP_TOKEN }}
-      NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
-      NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
-      NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
-      NEXT_PUBLIC_ADMIN_URL: https://admin.elevateforhumanity.org
-      NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_PIXEL_ID }}
-
     steps:
-      - name: Checkout repository history
-        uses: actions/checkout@v4
-        with: { fetch-depth: 0, clean: true }
-
-      - name: Prove deployment SHA belongs to main
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build the Admin image
         shell: bash
         run: |
-          set -Eeuo pipefail
-          REQUESTED_SHA="${{ github.sha }}"
-          git fetch origin main --depth=200
-          RESOLVED_SHA="$(git rev-parse "$REQUESTED_SHA^{commit}" 2>/dev/null || true)"
-          test -n "$RESOLVED_SHA"
-          git merge-base --is-ancestor "$RESOLVED_SHA" origin/main
-          test "$RESOLVED_SHA" = "$(git rev-parse HEAD)"
-          test "$(git status --porcelain)" = ""
-
-      - name: Set build environment variables
-        run: |
-          echo "GITHUB_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
-          echo "BUILD_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
-
-      - name: Generate version file
-        run: |
-          cat > public/version.json <<EOF
-          {"service":"admin","commit":"${{ github.sha }}","builtAt":"$(date -u +%Y-%m-%dT%H:%M:%SZ)"}
-          EOF
-
-      - uses: pnpm/action-setup@v4
-        with: { version: 10.28.2 }
-      - uses: actions/setup-node@v4
+          set -euo pipefail
+          test "$NEXT_PUBLIC_SUPABASE_URL" = 'https://cuxzzpsyufcewtmicszk.supabase.co'
+          test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"
+          node scripts/verify-admin-instrumentation-boundary.mjs
+          node scripts/verify-portal-production-contracts.mjs
+          docker build -f Dockerfile.northflank-admin -t "elevate-admin:$GITHUB_SHA" \
+            --build-arg "NF_GIT_SHA=$GITHUB_SHA" \
+            --build-arg "BUILD_TIMESTAMP=$(date -u +%FT%TZ)" \
+            --build-arg NEXT_PUBLIC_SUPABASE_URL \
+            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY .
+      - uses: google-github-actions/auth@v3
         with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-
-      - name: Verify required Ultimate database migration (read-only)
-        run: node scripts/verify-ultimate-media-schema.mjs
-      - name: Install dependencies deterministically
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-      - name: Enforce Admin instrumentation boundary
-        run: node scripts/verify-admin-instrumentation-boundary.mjs
-      - name: Enforce portal production contracts
-        run: node scripts/verify-portal-production-contracts.mjs
-      - name: Reconcile canonical Admin database binding
-        run: pnpm tsx scripts/northflank/sync-admin-database-env.ts
-      - name: Merge provider and marketplace secrets into the shared runtime
-        run: pnpm tsx scripts/northflank/sync-env.ts --execute
-      - name: Enforce canonical Northflank Admin runtime configuration
-        run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
-      - name: Enforce canonical Admin domain assignment
-        run: pnpm tsx scripts/northflank/configure-admin-domain.ts
-      - name: Verify Admin health-check contract
-        run: pnpm tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
-
-      - name: Trigger Admin build
-        id: trigger_admin_build
-        run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
-      - name: Require concrete build id
-        run: test -n "${{ steps.trigger_admin_build.outputs.build_id }}"
-      - name: Wait for Admin build to complete
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --timeout-ms 3600000
-      - name: Verify exact Admin build succeeded
-        run: pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
-      - name: Deploy exact Admin build
-        run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
-      - name: Wait for Admin deployment
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 3600000
-      - name: Verify deployed SHA matches main
-        env: { EXPECTED_SHA: '${{ github.sha }}' }
-        run: pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-admin --trust-deploy-status
-
-      - name: Reconcile and verify Telnyx production number
-        run: pnpm tsx scripts/northflank/reconcile-telnyx.ts
-
-      - name: Smoke Admin liveness, readiness, dependency health, and exact live SHA
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify Google SDK
+        run: node scripts/gcp/verify-sdk.mjs
+      - name: Upload and deploy the exact Admin image
+        shell: bash
         run: |
           set -euo pipefail
-          EXPECTED_SHA="${{ github.sha }}"
-          for i in $(seq 1 20); do
-            ping_status=$(curl -sS --max-time 10 -o /tmp/admin-ping.json -w "%{http_code}" "https://admin.elevateforhumanity.org/api/ping?deploy=${EXPECTED_SHA}" || true)
-            ready_status=$(curl -sS --max-time 10 -o /tmp/admin-ready.json -w "%{http_code}" "https://admin.elevateforhumanity.org/api/ready?deploy=${EXPECTED_SHA}" || true)
-            health_status=$(curl -sS --max-time 10 -o /tmp/admin-health.json -w "%{http_code}" "https://admin.elevateforhumanity.org/api/health?deploy=${EXPECTED_SHA}" || true)
-            version_status=$(curl -sS --max-time 10 -o /tmp/admin-version.json -w "%{http_code}" "https://admin.elevateforhumanity.org/api/version?deploy=${EXPECTED_SHA}" || true)
-            LIVE_SHA="$(node -e "try{const d=require('/tmp/admin-version.json');process.stdout.write(d.commitSha||d.commit||'')}catch(e){}")"
-            echo "Attempt $i/20: ping=$ping_status ready=$ready_status health=$health_status version=$version_status live_sha=${LIVE_SHA:-missing}"
-            if [ "$ping_status" = 200 ] \
-              && [ "$ready_status" = 200 ] \
-              && [ "$health_status" = 200 ] \
-              && [ "$version_status" = 200 ] \
-              && grep -q '"ok":true' /tmp/admin-ping.json \
-              && grep -q '"ready":true' /tmp/admin-ready.json \
-              && grep -q '"healthy":true' /tmp/admin-health.json \
-              && [ "$LIVE_SHA" = "$EXPECTED_SHA" ]; then
-              echo "ADMIN DEPLOYMENT VERIFIED: $EXPECTED_SHA is live, ready, and dependency-healthy"
-              exit 0
-            fi
-            sleep 15
-          done
-          echo "::error::Admin production did not converge to exact SHA $EXPECTED_SHA with healthy runtime contracts"
-          cat /tmp/admin-ping.json 2>/dev/null || true
-          cat /tmp/admin-ready.json 2>/dev/null || true
-          cat /tmp/admin-health.json 2>/dev/null || true
-          cat /tmp/admin-version.json 2>/dev/null || true
-          exit 1
-
-      - name: Smoke canonical Admin and installed-PWA contracts
+          IMAGE='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/admin'
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker tag "elevate-admin:$GITHUB_SHA" "$IMAGE:$GITHUB_SHA"
+          docker push "$IMAGE:$GITHUB_SHA"
+          DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
+          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          # Keep the existing runtime identity, secrets, memory and scaling.
+          # CPU must remain allocated while leased background renders execute.
+          gcloud run services update elevate-admin-migration \
+            --project=elegant-racer-299721 --region=us-central1 \
+            --image="$IMAGE@$DIGEST" --no-cpu-throttling --quiet
+      - name: Verify exact live revision and wake the video worker
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        shell: bash
         run: |
           set -euo pipefail
-          for url in \
-            'https://admin.elevateforhumanity.org/studio/browser' \
-            'https://admin.elevateforhumanity.org/studio/browser?utm_source=homescreen&utm_medium=pwa' \
-            'https://admin.elevateforhumanity.org/manifest-admin.json' \
-            'https://admin.elevateforhumanity.org/sw-admin.js' \
-            'https://admin.elevateforhumanity.org/offline.html'; do
-            status=$(curl -sS -L --max-time 20 -o /tmp/admin-smoke -w "%{http_code}" "$url" || true)
-            case "$status" in 2*|3*) ;; *) echo "::error::$url failed HTTP $status"; exit 1;; esac
-          done
-          manifest=$(curl -fsSL --max-time 20 https://admin.elevateforhumanity.org/manifest-admin.json)
-          echo "$manifest" | grep -q '"start_url"[[:space:]]*:[[:space:]]*"/dashboard"' || { echo '::error::Admin manifest does not use canonical /dashboard start_url'; exit 1; }
-          worker=$(curl -fsSL --max-time 20 https://admin.elevateforhumanity.org/sw-admin.js)
-          echo "$worker" | grep -q 'Service Worker — Admin Domain' || { echo '::error::Admin service worker is not the canonical worker'; exit 1; }
-
-      - name: Kick canonical Course Builder worker after deploy
-        run: |
-          set -euo pipefail
-          for i in $(seq 1 10); do
-            body=$(curl -sf -X POST "https://admin.elevateforhumanity.org/api/cron/process-course-builder-jobs" \
-              -H "Authorization: Bearer $CRON_SECRET" \
-              -H "Content-Type: application/json" \
-              --max-time 3600)
-            echo "$body"
-            if echo "$body" | grep -q '"processed":0'; then break; fi
-          done
-
-      - name: Generate this week's apprentice invoice fallback batch
-        continue-on-error: true
-        run: |
-          curl -sf -X POST "https://admin.elevateforhumanity.org/api/cron/generate-apprentice-invoices" \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            -H "Content-Type: application/json" \
-            --max-time 180
+          node --input-type=module <<'NODE'
+          const root='https://elevate-admin-migration-aabnh2y32a-uc.a.run.app';
+          let verified=false;
+          for(let attempt=0;attempt<24;attempt++) {
+            const response=await fetch(root+'/api/health',{signal:AbortSignal.timeout(15000)});
+            const body=await response.json().catch(()=>({}));
+            if(response.ok && body.service==='admin' && body.commit===process.env.GITHUB_SHA && body.healthy===true && body.dependencies?.supabase?.ok===true) {verified=true;break;}
+            await new Promise(resolve=>setTimeout(resolve,5000));
+          }
+          if(!verified) throw new Error('Exact Google Admin revision did not become healthy');
+          if(!process.env.CRON_SECRET) throw new Error('Video worker wake secret is unavailable');
+          const response=await fetch(root+'/api/internal/videos/process-queue',{
+            method:'POST',headers:{Authorization:'Bearer '+process.env.CRON_SECRET,'Content-Type':'application/json'},
+            body:JSON.stringify({maxJobs:1}),signal:AbortSignal.timeout(60000)
+          });
+          const body=await response.json().catch(()=>({}));
+          if(!response.ok || body.ok!==true) throw new Error('Google video worker wake failed: HTTP '+response.status);
+          console.log(JSON.stringify({verified:true,started:body.started,reason:body.reason}));
+          NODE

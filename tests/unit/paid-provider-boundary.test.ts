@@ -48,6 +48,6 @@ describe('paid provider boundary', () => {
 
   it('does not require paid authorization for Elevate-owned chat inference', () => {
     const service = readFileSync('lib/ai/ai-service.ts', 'utf8');
-    expect(service).toContain("if (options.providerPolicy !== 'owned-only') requirePaidInferenceContext('ai-chat')");
+    expect(service).toContain("if (provider.name !== 'elevate') requirePaidInferenceContext('ai-chat')");
   });
 });

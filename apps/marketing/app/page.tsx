@@ -1,7 +1,6 @@
 // Keep the homepage focused on training, the featured shops, and enrollment.
 // Detailed platform operations remain on the dedicated platform pages.
 import type { Metadata } from 'next';
-import { HomeTrustBar } from '@/components/home/HomeTrustBar';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
@@ -55,7 +54,6 @@ export default function HomePage() {
           </div>
         </section>
         <HomeFinalCTA />
-        <HomeTrustBar />
       </main>
     </>
   );

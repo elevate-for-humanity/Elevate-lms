@@ -3803,7 +3803,8 @@
     "ctaSecondary": {
       "label": "Learn More",
       "href": "/programs/nha-medical-admin-assistant"
-    }
+    },
+    "posterImage": "/images/pages/medical-assistant-desk.webp"
   },
   "nha-patient-care-technician": {
     "pageKey": "nha-patient-care-technician",

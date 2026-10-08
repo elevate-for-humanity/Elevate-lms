@@ -54,24 +54,22 @@ for (const invariant of [
   }
 }
 
-const browserDeployWorkflow = read('.github/workflows/deploy-studio-browser.yml');
+// Google Cloud Run owns Studio Browser deployment. Do not resurrect the retired
+// Northflank workflow to satisfy an obsolete source-level integrity check.
+const browserDeployWorkflow = read('.github/workflows/deploy-google-studio-browser.yml');
 for (const invariant of [
-  'resolve-studio-browser-secret.ts',
-  'verify-studio-browser-link.ts',
-  'verify-build.ts',
-  'trigger-deployment.ts',
-  '--build-id "${{ steps.trigger_browser_build.outputs.build_id }}" --sha "${{ github.sha }}"',
+  'google-github-actions/auth@v3',
+  'elegant-racer-299721',
+  'scripts/gcp/deploy-studio-browser.mjs',
+  'environment: production',
+  'cancel-in-progress: false',
 ]) {
   if (!browserDeployWorkflow.includes(invariant)) {
-    fail(`Studio Browser deployment is missing credit-safe invariant: ${invariant}`);
+    fail(`Google Studio Browser deployment is missing required invariant: ${invariant}`);
   }
 }
-
-// New pushes may supersede obsolete browser releases. Manual recovery runs
-// remain serialized, and both paths must verify/deploy the exact build above.
-const browserCancellation = browserDeployWorkflow.match(/^\s*cancel-in-progress:\s*(.+)$/m)?.[1].trim();
-if (!['false', "${{ github.event_name == 'push' }}"].includes(browserCancellation)) {
-  fail('Studio Browser cancellation must preserve manual recovery deployments');
+if (browserDeployWorkflow.includes('api.northflank.com')) {
+  fail('Studio Browser deployment must not call the legacy deployment API');
 }
 
 const browserAgentRoute = read('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');

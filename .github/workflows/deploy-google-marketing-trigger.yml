@@ -89,7 +89,8 @@ jobs:
           for(const name of required) if(!shops.includes(name)) throw new Error('Missing homepage content: '+name);
           for(const name of ['HVAC Technician','CDL Training','Bookkeeping','Business & Entrepreneurship']) if(!cards.includes(name)) throw new Error('Missing program: '+name);
           if(page.includes('<HomeNetworks') || trust.includes('Workforce systems and public-sector alignment')) throw new Error('Retired homepage section still enabled');
-          for(const src of [...cards.matchAll(/image: '(\\/images\\/[^']+)'/g),...shops.matchAll(/image: '(\\/images\\/[^']+)'/g)]) {
+          const imagePattern = /image: '(\\/images\\/[^']+)'/g;
+          for(const src of [...cards.matchAll(imagePattern),...shops.matchAll(imagePattern)]) {
             if(!existsSync('public'+src[1])) throw new Error('Missing image: '+src[1]);
           }
           NODE

@@ -86,7 +86,8 @@ jobs:
           # CPU must remain allocated while leased background renders execute.
           gcloud run services update elevate-admin-migration \
             --project=elegant-racer-299721 --region=us-central1 \
-            --image="$IMAGE@$DIGEST" --no-cpu-throttling --quiet
+            --image="$IMAGE@$DIGEST" --no-cpu-throttling \
+            --update-env-vars=AI_NARRATION_PROVIDER=kokoro --quiet
       - name: Verify exact live Admin revision and Supabase health (read-only)
         shell: bash
         run: |

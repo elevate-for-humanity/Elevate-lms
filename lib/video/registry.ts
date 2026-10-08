@@ -132,7 +132,7 @@ export const VIDEO_REGISTRY: Record<string, VideoRecord> = {
     title: 'Tax Preparation program preview',
     description: 'Existing Tax Preparation program preview.',
     video_url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-tax-preparation.mp4',
-    thumbnail_url: '/images/heroes/hero-homepage.webp',
+    thumbnail_url: '/images/pages/office-admin-desk.jpg',
     duration: 'PT32.28S',
     upload_date: '2026-03-07',
     category: 'Business',

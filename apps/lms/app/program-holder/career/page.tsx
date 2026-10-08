@@ -15,7 +15,7 @@ export default async function ProgramHolderCareerPage() {
   return (
     <main className="space-y-6 px-4 py-6 sm:px-6">
       <section className="relative overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
-        <Image src="/images/pages/community-page-2.webp" alt="" fill priority sizes="100vw" className="object-cover opacity-30" />
+        <Image src="/images/pages/career-services-page-1.webp" alt="" fill priority sizes="100vw" className="object-cover opacity-30" />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/65" />
         <div className="relative p-6 sm:p-9">
         <BriefcaseBusiness className="h-9 w-9 text-blue-200" />

@@ -32,7 +32,7 @@ interface DispatchResult {
 }
 
 const DEFAULT_WORKFLOWS: WorkflowButton[] = [
-  { key: 'deploy-all', label: 'Deploy All', description: 'Deploy Google production services from main' },
+  { key: 'deploy-all', label: 'Deploy Marketing', description: 'Dispatch Google Marketing workflow on main' },
   { key: 'deploy-lms', label: 'Deploy Website', description: 'Deploy Google LMS from main' },
   { key: 'deploy-admin', label: 'Deploy Admin', description: 'Deploy Google Admin from main' },
   { key: 'ci', label: 'Run CI', description: 'Run the validation pipeline before deployment' },
@@ -180,7 +180,7 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
             </button>
             <button type="button" onClick={() => void deployAll()} disabled={deployAllState === 'loading'} className="inline-flex h-8 items-center gap-1.5 rounded px-2 text-[11px] font-semibold disabled:opacity-50" style={{ background: deployAllState === 'confirm' ? '#f59e0b' : '#0078d4', color: deployAllState === 'confirm' ? '#111827' : '#ffffff' }}>
               {deployAllState === 'loading' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Rocket className="h-3.5 w-3.5" />}
-              {deployAllState === 'confirm' ? 'Confirm Deploy All' : 'Deploy All'}
+              {deployAllState === 'confirm' ? 'Confirm Marketing Deploy' : 'Deploy Marketing'}
             </button>
             <button type="button" onClick={() => void refreshRun()} disabled={!lastResult?.runId} className="inline-flex h-8 items-center gap-1.5 rounded border px-2 text-[11px] disabled:opacity-40" style={{ borderColor: '#3c3c3c', color: '#cccccc' }}>
               <RefreshCw className="h-3.5 w-3.5" /> Refresh

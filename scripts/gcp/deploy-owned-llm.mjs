@@ -5,6 +5,11 @@ const REGION='us-central1';
 const SERVICE='elevate-owned-llm';
 const SECRET='elevate-owned-llm-token';
 const IDENTITY=`elevate-llm-runtime@${PROJECT}.iam.gserviceaccount.com`;
+function ensureSecretReader(member){
+  const policy=JSON.parse(google(['secrets','get-iam-policy',SECRET,'--project',PROJECT,'--format=json']));
+  if(policy.bindings?.some(binding=>binding.role==='roles/secretmanager.secretAccessor'&&!binding.condition&&binding.members?.includes(member)))return;
+  google(['secrets','add-iam-policy-binding',SECRET,'--project',PROJECT,`--member=${member}`,'--role=roles/secretmanager.secretAccessor','--condition=None','--quiet']);
+}
 
 export function modelCredential(config) {
   const candidates=[config.runtimeEnvironment.ELEVATE_LLM_SECRET];
@@ -91,7 +96,7 @@ async function main(){
   const versions=google(['secrets','versions','list',SECRET,'--project',PROJECT,'--limit=1','--format=value(name)']);
   if(versions){if(google(['secrets','versions','access','latest','--secret',SECRET,'--project',PROJECT])!==token)throw new Error('existing_model_token_differs');}
   else google(['secrets','versions','add',SECRET,'--project',PROJECT,'--data-file=-'],token);
-  google(['secrets','add-iam-policy-binding',SECRET,'--project',PROJECT,`--member=serviceAccount:${IDENTITY}`,'--role=roles/secretmanager.secretAccessor','--condition=None','--quiet']);
+  ensureSecretReader(`serviceAccount:${IDENTITY}`);
   if(process.env.PREPARE_ONLY==='true'){console.log(JSON.stringify({dedicatedModelIdentityPrepared:true,scopedModelSecretPrepared:true,computeActivated:false}));return;}
   const image=`us-central1-docker.pkg.dev/${PROJECT}/elevate/owned-llm:${process.env.IMAGE_SHA}`;
   const digest=google(['artifacts','docker','images','describe',image,'--project',PROJECT,'--format=value(image_summary.digest)']);
@@ -112,7 +117,7 @@ async function main(){
   const liveAdmin=JSON.parse(google(['run','services','describe','elevate-admin-migration','--project',PROJECT,'--region',REGION,'--format=json']));
   const adminIdentity=liveAdmin.spec?.template?.spec?.serviceAccountName;
   if(!/^[a-z0-9-]+@elegant-racer-299721\.iam\.gserviceaccount\.com$/.test(adminIdentity??''))throw new Error('admin_runtime_identity_unverified');
-  google(['secrets','add-iam-policy-binding',SECRET,'--project',PROJECT,`--member=serviceAccount:${adminIdentity}`,'--role=roles/secretmanager.secretAccessor','--condition=None','--quiet']);
+  ensureSecretReader(`serviceAccount:${adminIdentity}`);
   // Replace the old environment binding with a scoped Secret Manager reference.
   google(['run','services','update','elevate-admin-migration','--project',PROJECT,'--region',REGION,
     `--update-env-vars=ELEVATE_LLM_URL=${url}`,'--remove-env-vars=ELEVATE_LLM_SECRET',`--update-secrets=ELEVATE_LLM_SECRET=${SECRET}:latest`,'--quiet']);

@@ -192,7 +192,27 @@ jobs:
               const present=forbidden.filter(t=>html.includes(t));
               last=JSON.stringify({versionStatus:version.status,homepageStatus:page.status,sha,expected:process.env.GITHUB_SHA,missing,unwanted:present});
               console.log(last);
-              if(version.ok && sha===process.env.GITHUB_SHA && page.ok && !missing.length && !present.length) process.exit(0);
+              if(version.ok && sha===process.env.GITHUB_SHA && page.ok && !missing.length && !present.length) {
+                const paths=['/programs/esthetician-apprenticeship','/programs/barber-apprenticeship','/barber-beauty-network','/jobs','/partners/host-shops'];
+                const results=await Promise.all(paths.map(async path => {
+                  const response=await fetch(root+path+'?release='+process.env.GITHUB_SHA,{cache:'no-store',signal:AbortSignal.timeout(20000)});
+                  return {path,status:response.status,html:await response.text()};
+                }));
+                for(const result of results) if(result.status!==200) throw new Error('Production route failed: '+result.path+' HTTP '+result.status);
+                const esthetics=results.find(x=>x.path.includes('esthetician'))?.html||'';
+                const barber=results.find(x=>x.path.includes('barber-apprenticeship'))?.html||'';
+                for(const expected of ['$6,000','$5,400','OCT300','25 hrs/week']) {
+                  if(!esthetics.includes(expected)) throw new Error('Missing esthetics production requirement: '+expected);
+                }
+                if(esthetics.includes('25–25 hrs/week')||esthetics.includes('25-25 hrs/week'))
+                  throw new Error('Esthetics still shows duplicated weekly hours');
+                if(barber.includes('50OFFOCT'))
+                  throw new Error('Retired 50OFFOCT coupon is still published');
+                if(!barber.includes('OCT300'))
+                  throw new Error('Barber OCT300 coupon missing');
+                console.log('Public content acceptance passed; checkout payment enforcement requires separate controlled test.');
+                process.exit(0);
+              }
             } catch(e) { last=String(e);console.log(last); }
             await new Promise(resolve=>setTimeout(resolve,10000));
           }

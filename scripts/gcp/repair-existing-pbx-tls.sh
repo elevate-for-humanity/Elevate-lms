@@ -38,7 +38,7 @@ phone.elevateforhumanity.org {
 }
 CADDY
 docker pull caddy:2.10.2
-docker run --rm --network host -v "$CONF_DIR/Caddyfile:/etc/caddy/Caddyfile:ro" caddy:2.10.2 validate --config /etc/caddy/Caddyfile --adapter caddyfile
+docker run --rm --network host -v "$CONF_DIR/Caddyfile:/etc/caddy/Caddyfile:ro" --entrypoint caddy caddy:2.10.2 validate --config /etc/caddy/Caddyfile --adapter caddyfile
 # Replace only our own proxy; never touch the healthy PBX container.
 if docker ps -a --format '{{.Names}}' | grep -qx "$NAME"; then
   docker rm -f "$NAME"

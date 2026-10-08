@@ -1,5 +1,8 @@
 name: Diagnose and prepare Google migration access
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/diagnose-google-access.yml']
   workflow_dispatch:
 permissions:
   contents: read

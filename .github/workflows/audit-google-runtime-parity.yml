@@ -23,7 +23,6 @@ jobs:
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/audit-google-runtime-parity.yml/dispatches" -f ref=main
   audit:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 15

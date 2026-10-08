@@ -42,7 +42,9 @@ jobs:
           try {
             const job=JSON.parse(execFileSync('gcloud',['run','jobs','describe','elevate-video-render','--region=us-central1',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             const task=job.spec.template.spec.template.spec;
-            console.log(JSON.stringify({videoJobPresent:true,videoJobImage:task.containers[0].image,videoJobIdentity:task.serviceAccountName,videoJobRetries:task.maxRetries,videoJobTimeout:task.timeoutSeconds}));
+            const videoContainer=task.containers[0];
+            const videoEnv=Object.fromEntries((videoContainer.env||[]).filter(x=>typeof x.value==='string').map(x=>[x.name,x.value]));
+            console.log(JSON.stringify({videoJobPresent:true,videoJobImage:videoContainer.image,videoJobIdentity:task.serviceAccountName,videoJobRetries:task.maxRetries,videoJobTimeout:task.timeoutSeconds,command:videoContainer.command,args:(videoContainer.args||[]).map((x,i)=>i<2?x:{characters:x.length,hasMainCall:x.includes('await runFiniteVideoRender();')}),envPresent:Object.fromEntries(['SUPABASE_SERVICE_ROLE_KEY','CRON_SECRET','VIDEO_JOB_ID','VIDEO_COURSE_ID'].map(x=>[x,Boolean(videoEnv[x])])),expectedDatabase:videoEnv.NEXT_PUBLIC_SUPABASE_URL==='https://cuxzzpsyufcewtmicszk.supabase.co'}));
             const executions=JSON.parse(execFileSync('gcloud',['run','jobs','executions','list','--job=elevate-video-render','--region=us-central1',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             console.log(JSON.stringify({videoExecutions:executions.slice(0,3).map(x=>({name:x.metadata.name,started:x.status?.startTime,completed:x.status?.completionTime,running:x.status?.runningCount,succeeded:x.status?.succeededCount,failed:x.status?.failedCount,conditions:(x.status?.conditions||[]).map(y=>({type:y.type,status:y.status,reason:y.reason}))}))}));
           } catch {console.log(JSON.stringify({videoJobInspectionSucceeded:false}));}

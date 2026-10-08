@@ -30,6 +30,7 @@ jobs:
     name: Build and deploy Admin on Google
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
+    environment: production
     timeout-minutes: 120
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}

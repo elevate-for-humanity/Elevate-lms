@@ -87,9 +87,7 @@ jobs:
           gcloud run services update elevate-admin-migration \
             --project=elegant-racer-299721 --region=us-central1 \
             --image="$IMAGE@$DIGEST" --no-cpu-throttling --quiet
-      - name: Verify exact live revision and wake the video worker
-        env:
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      - name: Verify exact live Admin revision and Supabase health (read-only)
         shell: bash
         run: |
           set -euo pipefail
@@ -103,12 +101,5 @@ jobs:
             await new Promise(resolve=>setTimeout(resolve,5000));
           }
           if(!verified) throw new Error('Exact Google Admin revision did not become healthy');
-          if(!process.env.CRON_SECRET) throw new Error('Video worker wake secret is unavailable');
-          const response=await fetch(root+'/api/internal/videos/process-queue',{
-            method:'POST',headers:{Authorization:'Bearer '+process.env.CRON_SECRET,'Content-Type':'application/json'},
-            body:JSON.stringify({maxJobs:1}),signal:AbortSignal.timeout(60000)
-          });
-          const body=await response.json().catch(()=>({}));
-          if(!response.ok || body.ok!==true) throw new Error('Google video worker wake failed: HTTP '+response.status);
-          console.log(JSON.stringify({verified:true,started:body.started,reason:body.reason}));
+          console.log(JSON.stringify({verified:true,commit:process.env.GITHUB_SHA,workerDispatch:'not_started'}));
           NODE

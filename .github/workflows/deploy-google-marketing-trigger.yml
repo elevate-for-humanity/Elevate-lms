@@ -45,7 +45,7 @@ jobs:
           [[ "$APPROVED_SHA" =~ ^[a-f0-9]{40}$ ]]
           test "$APPROVED_SHA" = "$GITHUB_SHA"
           git fetch --depth=1 origin main
-          test "$(git rev-parse origin/main)" = "$APPROVED_SHA"
+          git merge-base --is-ancestor "$APPROVED_SHA" origin/main
 
       - name: Preflight homepage release content and image assets
         shell: bash

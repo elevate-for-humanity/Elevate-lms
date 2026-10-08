@@ -1,30 +1,26 @@
-name: Configure Elevate PBX domain
+name: Verify Elevate PBX domain (Durable DNS)
 on:
   workflow_dispatch:
 permissions:
   contents: read
-  id-token: write
 jobs:
-  dns:
+  verify-domain:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - name: Configure DNS-only PBX hostname
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-          PBX_HOSTNAME: phone.elevateforhumanity.org
-          PBX_IP: 107.178.216.162
-        run: bash scripts/gcp/configure-pbx-domain.sh
-      - name: Verify public DNS
+      - name: Verify externally managed DNS and HTTPS
+        shell: bash
         run: |
           set -euo pipefail
-          for attempt in {1..30}; do
-            IP="$(getent ahostsv4 phone.elevateforhumanity.org | awk 'NR==1{print $1}')"
-            echo "attempt=$attempt ip=$IP"
-            [[ "$IP" == "107.178.216.162" ]] && exit 0
-            sleep 10
-          done
-          exit 1
+          host=phone.elevateforhumanity.org
+          expected=107.178.216.162
+          resolved="$(dig +short A "$host" | grep -E '^[0-9]+(\.[0-9]+){3}$' || true)"
+          echo "A records: $resolved"
+          if ! printf '%s\n' "$resolved" | grep -Fxq "$expected"; then
+            echo "::error::Durable DNS A record for $host must point to $expected"
+            exit 1
+          fi
+          echo "DNS verified. Checking TLS and HTTPS without modifying phone service."
+          curl --silent --show-error --fail --max-time 15 --output /dev/null "https://$host/"

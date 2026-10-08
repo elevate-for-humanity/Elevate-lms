@@ -233,7 +233,7 @@ body {
   }
 
   /* Only apply to non-Next.js images */
-  img:not([data-nimg]) {
+  img:not([data-nimg]):not(.absolute) {
     max-width: 100%;
     height: auto;
   }
@@ -1420,7 +1420,7 @@ a {
 }
 
 /* 5) Images: prevent "cheap" stretching - exclude Next.js Image */
-img:not([data-nimg]) {
+img:not([data-nimg]):not(.absolute) {
   max-width: 100%;
   height: auto;
 }

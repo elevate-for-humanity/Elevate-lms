@@ -18,7 +18,9 @@ if ! gcloud iam workload-identity-pools describe "$POOL" --location=global --pro
 fi
 SCHEDULED_COURSE_WORKFLOW="elevate-for-humanity/Elevate-lms/.github/workflows/dispatch-google-course-job.yml@refs/heads/main"
 MARKETING_PUSH_WORKFLOW="elevate-for-humanity/Elevate-lms/.github/workflows/deploy-google-marketing-trigger.yml@refs/heads/main"
-CONDITION="assertion.repository_id == '1096408995' && assertion.repository_owner_id == '286334428' && assertion.ref == 'refs/heads/main' && (assertion.event_name == 'workflow_dispatch' || (assertion.event_name == 'schedule' && assertion.workflow_ref == '$SCHEDULED_COURSE_WORKFLOW') || (assertion.event_name == 'push' && assertion.workflow_ref == '$MARKETING_PUSH_WORKFLOW'))"
+ADMIN_PUSH_WORKFLOW="elevate-for-humanity/Elevate-lms/.github/workflows/deploy-admin.yml@refs/heads/main"
+COURSE_WORKER_PUSH_WORKFLOW="elevate-for-humanity/Elevate-lms/.github/workflows/deploy-google-course-worker.yml@refs/heads/main"
+CONDITION="assertion.repository_id == '1096408995' && assertion.repository_owner_id == '286334428' && assertion.ref == 'refs/heads/main' && (assertion.event_name == 'workflow_dispatch' || (assertion.event_name == 'schedule' && assertion.workflow_ref == '$SCHEDULED_COURSE_WORKFLOW') || (assertion.event_name == 'push' && (assertion.workflow_ref == '$MARKETING_PUSH_WORKFLOW' || assertion.workflow_ref == '$ADMIN_PUSH_WORKFLOW' || assertion.workflow_ref == '$COURSE_WORKER_PUSH_WORKFLOW')))"
 MAPPING="google.subject=assertion.sub,attribute.repository_id=assertion.repository_id"
 if gcloud iam workload-identity-pools providers describe "$PROVIDER" --workload-identity-pool="$POOL" --location=global --project="$PROJECT_ID" >/dev/null 2>&1; then
   gcloud iam workload-identity-pools providers update-oidc "$PROVIDER" --workload-identity-pool="$POOL" --location=global --project="$PROJECT_ID" --issuer-uri=https://token.actions.githubusercontent.com --attribute-mapping="$MAPPING" --attribute-condition="$CONDITION"

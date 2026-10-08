@@ -125,13 +125,17 @@ forbidText('.github/workflows/promote-to-production.yml', 'git push origin main'
 forbidText('.github/workflows/promote-to-production.yml', 'skipping LMS health check', 'Missing staging health configuration must not be treated as success.');
 forbidText('.github/workflows/promote-to-production.yml', 'skipping Admin health check', 'Missing Admin staging health configuration must not be treated as success.');
 
-requireText('.github/workflows/northflank-trigger-dispatch.yml', 'git merge-base --is-ancestor', 'Production dispatcher must prove requested SHA belongs to main.');
-requireText('.github/workflows/northflank-trigger-dispatch.yml', 'RESOLVED_SHA', 'Production dispatcher must resolve the exact requested commit.');
-
+// Google is the production publisher. Preserve provenance, protected environments,
+// deterministic Docker dependencies and exact live revision verification.
+protectProductionWorkflow('.github/workflows/deploy-google-marketing-trigger.yml');
+requireText('.github/workflows/deploy-google-marketing-trigger.yml', 'sha===process.env.GITHUB_SHA', 'Marketing must verify the exact public commit after deploying.');
+requireText('.github/workflows/deploy-admin.yml', 'environment: production', 'Admin must use the protected production environment.');
+requireText('.github/workflows/deploy-admin.yml', "github.ref == 'refs/heads/main'", 'Admin production deployment must be restricted to main.');
+requireText('.github/workflows/deploy-admin.yml', 'body.commit===process.env.GITHUB_SHA', 'Admin must verify the exact live commit after deploying.');
+requireText('.github/workflows/deploy-admin.yml', 'Dockerfile.northflank-admin', 'Admin must use its audited deterministic image build.');
+for (const file of ['Dockerfile.marketing', 'Dockerfile.northflank-admin', 'Dockerfile.northflank-lms']) protectDeterministicGate(file);
+requireText('scripts/gcp/authorize-github.sh', "assertion.ref == 'refs/heads/main'", 'Google deployment identity must remain restricted to main.');
 for (const file of [
-  '.github/workflows/deploy-marketing.yml',
-  '.github/workflows/deploy-admin.yml',
-  '.github/workflows/deploy-lms.yml',
   '.github/workflows/recover-marketing.yml',
   '.github/workflows/elevate-production-deploy.yml',
 ]) protectProductionWorkflow(file);

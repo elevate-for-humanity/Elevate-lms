@@ -22,9 +22,6 @@ permissions:
   actions: write
   id-token: write
 
-concurrency:
-  group: google-runtime-operations
-  cancel-in-progress: false
 
 jobs:
   dispatch:
@@ -37,6 +34,9 @@ jobs:
         run: |
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-admin.yml/dispatches" -f ref=main
   deploy-admin:
+    concurrency:
+      group: google-runtime-operations
+      cancel-in-progress: false
     name: Build and deploy Admin on Google
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04

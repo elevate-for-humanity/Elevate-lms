@@ -13,9 +13,6 @@ permissions:
   contents: read
   actions: write
   id-token: write
-concurrency:
-  group: google-runtime-operations
-  cancel-in-progress: false
 jobs:
   dispatch:
     if: github.event_name == 'push'
@@ -25,8 +22,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/37806171056/cancel" || true
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/import-google-runtime-config.yml/dispatches" -f ref=main -f 'inputs[component]=all'
   import:
+    concurrency:
+      group: google-runtime-operations
+      cancel-in-progress: false
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production

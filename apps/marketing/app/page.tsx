@@ -6,7 +6,6 @@ import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
-import { HomeNetworks } from '@/components/home/HomeNetworks';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
@@ -55,7 +54,6 @@ export default function HomePage() {
             </a>
           </div>
         </section>
-        <HomeNetworks />
         <HomeFinalCTA />
         <HomeTrustBar />
       </main>

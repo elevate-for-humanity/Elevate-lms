@@ -92,15 +92,5 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          node --input-type=module <<'NODE'
-          const root='https://elevate-admin-migration-aabnh2y32a-uc.a.run.app';
-          let verified=false;
-          for(let attempt=0;attempt<24;attempt++) {
-            const response=await fetch(root+'/api/health',{signal:AbortSignal.timeout(15000)});
-            const body=await response.json().catch(()=>({}));
-            if(response.ok && body.service==='admin' && body.commit===process.env.GITHUB_SHA && body.healthy===true && body.dependencies?.supabase?.ok===true) {verified=true;break;}
-            await new Promise(resolve=>setTimeout(resolve,5000));
-          }
-          if(!verified) throw new Error('Exact Google Admin revision did not become healthy');
-          console.log(JSON.stringify({verified:true,commit:process.env.GITHUB_SHA,workerDispatch:'not_started'}));
-          NODE
+          export GOOGLE_ADMIN_URL="$(gcloud run services describe elevate-admin-migration --project=elegant-racer-299721 --region=us-central1 --format='value(status.url)')"
+          node scripts/gcp/verify-admin-revision.mjs

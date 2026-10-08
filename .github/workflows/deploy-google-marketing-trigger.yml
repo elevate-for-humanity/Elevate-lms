@@ -1,23 +1,17 @@
 name: Deploy Google Marketing on trigger
 
+# Production is an explicitly approved release, never a side effect of each push.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.deploy-google-marketing'
-      - 'apps/marketing/**'
-      - 'components/**'
-      - 'lib/programs/**'
-      - 'lib/apprenticeship-programs/**'
-      - 'content/heroBanners.ts'
-      - 'public/images/**'
-      - 'Dockerfile.marketing'
-      - 'next.config.mjs'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'lib/marketing/**'
-      - 'lib/navigation/**'
-      - '.github/workflows/deploy-google-marketing-trigger.yml'
+  workflow_dispatch:
+    inputs:
+      release_sha:
+        description: 'Full 40-character main commit SHA approved for production'
+        required: true
+        type: string
+      confirmation:
+        description: 'Type DEPLOY_GOOGLE_MARKETING to approve this release'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -37,6 +31,40 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Verify explicit release approval and immutable revision
+        shell: bash
+        env:
+          APPROVED_SHA: ${{ inputs.release_sha }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -euo pipefail
+          test "$CONFIRMATION" = 'DEPLOY_GOOGLE_MARKETING'
+          [[ "$APPROVED_SHA" =~ ^[a-f0-9]{40}$ ]]
+          test "$APPROVED_SHA" = "$GITHUB_SHA"
+          git fetch --depth=1 origin main
+          test "$(git rev-parse origin/main)" = "$APPROVED_SHA"
+
+      - name: Preflight homepage release content and image assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import {readFileSync,existsSync} from 'node:fs';
+          const page=readFileSync('apps/marketing/app/page.tsx','utf8');
+          const cards=readFileSync('components/home/HomeCareerPathways.tsx','utf8');
+          const shops=readFileSync('components/home/HomeFeaturedHostShop.tsx','utf8');
+          const trust=readFileSync('components/home/HomeTrustBar.tsx','utf8');
+          const required=['Esthetics Apprenticeship','Nail Technician Apprenticeship','Find or become a Host Shop'];
+          for(const name of required) if(!shops.includes(name)) throw new Error('Missing homepage content: '+name);
+          for(const name of ['HVAC Technician','CDL Training','Bookkeeping','Business & Entrepreneurship']) if(!cards.includes(name)) throw new Error('Missing program: '+name);
+          if(page.includes('<HomeNetworks') || trust.includes('Workforce systems and public-sector alignment')) throw new Error('Retired homepage section still enabled');
+          for(const src of [...cards.matchAll(/image: '(\\/images\\/[^']+)'/g),...shops.matchAll(/image: '(\\/images\\/[^']+)'/g)]) {
+            if(!existsSync('public'+src[1])) throw new Error('Missing image: '+src[1]);
+          }
+          NODE
 
       - name: Refuse active course execution
         uses: google-github-actions/auth@v3

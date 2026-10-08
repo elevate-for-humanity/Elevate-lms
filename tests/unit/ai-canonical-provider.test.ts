@@ -1,6 +1,33 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 describe('canonical AI provider authority', () => {
+  it('blocks external streaming outside the paid inference authorization boundary', async () => {
+    vi.stubEnv('AI_PROVIDER', 'openai');
+    vi.stubEnv('OPENAI_API_KEY', 'external-key');
+    const request = vi.fn();
+    vi.stubGlobal('fetch', request);
+    const { aiChatStream } = await import('@/lib/ai/ai-service');
+    await expect(aiChatStream({ messages: [{ role: 'user', content: 'Hello' }] }).next())
+      .rejects.toThrow('PAID_INFERENCE_AUTHORIZATION_REQUIRED');
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  it('honors owned-only streaming even when the canonical provider is commercial', async () => {
+    vi.stubEnv('AI_PROVIDER', 'openai');
+    vi.stubEnv('OPENAI_API_KEY', 'must-not-be-used');
+    vi.stubEnv('ELEVATE_LLM_URL', 'https://owned-provider.test');
+    vi.stubEnv('ELEVATE_LLM_SECRET', 'owned-secret');
+    const request = vi.fn().mockResolvedValue(new Response(
+      'data: {"choices":[{"delta":{"content":"Owned response"}}]}\n\ndata: [DONE]\n\n',
+      { headers: { 'content-type': 'text/event-stream' } },
+    ));
+    vi.stubGlobal('fetch', request);
+    const { aiChatStream } = await import('@/lib/ai/ai-service');
+    const chunks: string[] = [];
+    for await (const chunk of aiChatStream({ providerPolicy: 'owned-only', messages: [{ role: 'user', content: 'Hello' }] })) chunks.push(chunk);
+    expect(chunks).toEqual(['Owned response']);
+    expect(request.mock.calls[0][0]).toBe('https://owned-provider.test/v1/chat/completions');
+  });
   it('allows canonical Elevate inference without a paid authorization context', async () => {
     vi.stubEnv('AI_PROVIDER', 'elevate');
     vi.stubEnv('ELEVATE_LLM_URL', 'https://owned-provider.test');

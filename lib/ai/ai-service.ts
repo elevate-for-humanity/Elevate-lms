@@ -237,7 +237,8 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
 }
 
 export async function* aiChatStream(options: ChatCompletionOptions): AsyncIterable<string> {
-  const provider = resolveChatProvider();
+  const provider = resolveConfiguredChatProvider(options);
+  if (provider.name !== 'elevate') requirePaidInferenceContext('ai-chat-stream');
   if (
     'chatStream' in provider &&
     typeof (provider as { chatStream?: unknown }).chatStream === 'function'

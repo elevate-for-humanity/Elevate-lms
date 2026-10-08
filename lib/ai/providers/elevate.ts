@@ -62,7 +62,12 @@ type OpenAIChatResponse = {
 function endpoint(): string | null {
   const raw = process.env.ELEVATE_LLM_URL?.trim();
   if (!raw) return null;
-  return raw.replace(/\/+$/, '');
+  const base = raw.replace(/\/+$/, '');
+  try {
+    const url = new URL(base);
+    if (/(^|\.)(?:code\.run|northflank\.app|northflank\.com)$/i.test(url.hostname)) return null;
+    return base;
+  } catch { return null; }
 }
 
 function secret(): string | null {
@@ -86,6 +91,68 @@ export class ElevateProvider implements AIProvider {
 
   isAvailable(): boolean {
     return Boolean(endpoint() && secret());
+  }
+
+  async *chatStream(options: ChatCompletionOptions): AsyncGenerator<string> {
+    const base = endpoint();
+    const token = secret();
+    if (!base || !token) throw new Error('Elevate LLM worker not configured (ELEVATE_LLM_URL / ELEVATE_LLM_SECRET)');
+    const response = await fetch(`${base}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: SERVED_MODEL,
+        messages: options.messages,
+        temperature: options.temperature ?? 0.5,
+        max_tokens: elevateCompletionBudget(options),
+        stream: true,
+        ...(requestsJson(options) ? { response_format: { type: 'json_object' } } : {}),
+      }),
+      signal: options.signal
+        ? AbortSignal.any([options.signal, AbortSignal.timeout(requestTimeoutMs())])
+        : AbortSignal.timeout(requestTimeoutMs()),
+    });
+    if (!response.ok) {
+      await response.body?.cancel();
+      throw new Error(`Elevate LLM worker streaming request failed: HTTP ${response.status}`);
+    }
+    if (!response.body || !response.headers.get('content-type')?.includes('text/event-stream')) {
+      await response.body?.cancel();
+      throw new Error('Elevate LLM worker did not return an event stream');
+    }
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let completed = false;
+    let hasContent = false;
+    try {
+      while (!completed) {
+        const chunk = await reader.read();
+        buffer += decoder.decode(chunk.value, { stream: !chunk.done });
+        if (buffer.length > 1_048_576) throw new Error('Elevate LLM stream event exceeds the size limit');
+        let boundary: RegExpExecArray | null;
+        while ((boundary = /\r?\n\r?\n/.exec(buffer))) {
+          const event = buffer.slice(0, boundary.index);
+          buffer = buffer.slice(boundary.index + boundary[0].length);
+          const data = event.split(/\r?\n/).filter((line) => line.startsWith('data:'))
+            .map((line) => line.slice(5).replace(/^ /, '')).join('\n');
+          if (!data) continue;
+          if (data === '[DONE]') { completed = true; break; }
+          const payload = JSON.parse(data) as {
+            error?: unknown;
+            choices?: Array<{ delta?: { content?: string | null } }>;
+          };
+          if (payload.error) throw new Error('Elevate LLM worker reported a stream error');
+          const content = payload.choices?.[0]?.delta?.content;
+          if (typeof content === 'string' && content) { hasContent = true; yield content; }
+        }
+        if (chunk.done && !completed) throw new Error('Elevate LLM stream ended before completion');
+      }
+      if (!hasContent) throw new Error('Elevate LLM worker returned no text content');
+    } finally {
+      await reader.cancel().catch(() => undefined);
+      reader.releaseLock();
+    }
   }
 
   async chat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {

@@ -30,7 +30,7 @@ fi
 gcloud iam service-accounts add-iam-policy-binding "$SA_EMAIL" --project="$PROJECT_ID" --role=roles/iam.workloadIdentityUser --member="principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/$POOL/attribute.repository_id/1096408995" --condition=None >/dev/null
 # Deployment identity can manage Cloud Run and container images, but cannot
 # change project IAM, billing, or make a service public.
-for ROLE in roles/run.developer roles/artifactregistry.admin roles/serviceusage.serviceUsageConsumer; do
+for ROLE in roles/run.developer roles/artifactregistry.admin roles/serviceusage.serviceUsageConsumer roles/logging.viewer; do
   gcloud projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:$SA_EMAIL" --role="$ROLE" --condition=None >/dev/null
 done
 for APP in marketing admin lms; do

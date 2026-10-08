@@ -57,6 +57,8 @@ jobs:
           import { healthPassed } from './scripts/gcp/audit-runtime-parity.mjs';
           let failed = false;
           const component=process.env.COMPONENT;
+          // Store deliberately uses Dockerfile.marketing in the migration image workflow.
+          const application=component==='store'?'marketing':component;
           const service='elevate-'+component+'-migration';
           const base='https://'+service+'-aabnh2y32a-uc.a.run.app';
           const gcloud=args=>execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
@@ -79,7 +81,7 @@ jobs:
               report({component,path,status:r.status,contentType:r.headers.get('content-type'),
                 ready:b.ready,healthy:b.healthy,commit:b.commit,executorReady:b.agenticExecutorReady,
                 supabaseOK:b.dependencies?.supabase?.ok});
-              if (path !== '/' && !healthPassed(component,path,r.status,b)) failed=true;
+              if (path !== '/' && !healthPassed(application,path,r.status,b)) failed=true;
               if (path === '/' && ![200,302,303,307,308].includes(r.status)) failed=true;
             } catch {report({component,path,error:'probe_failed'});failed=true;}
           }
@@ -87,10 +89,18 @@ jobs:
           const traffic=(metadata.status.traffic || []).filter(t=>t.revisionName===readyRevision).reduce((sum,t)=>sum+Number(t.percent || 0),0);
           const revision=JSON.parse(gcloud(['run','revisions','describe',readyRevision,'--project=elegant-racer-299721','--region=us-central1','--format=json']));
           const image=revision.spec.containers[0].image;
+          const correctImage=image.startsWith('us-central1-docker.pkg.dev/elegant-racer-299721/elevate/'+component+'@');
           const revisionReady=(metadata.status.conditions || []).some(c=>c.type==='Ready' && c.status==='True');
           const immutable=/@sha256:[a-f0-9]{64}$/.test(image);
           report({component,readyRevision,traffic,image,revisionReady,immutable});
-          if(!revisionReady || traffic!==100 || !immutable) failed=true;
+          if(!revisionReady || traffic!==100 || !immutable || !correctImage) failed=true;
+          if(component==='store') {
+            try {
+              const storefront=await fetch(base+'/store',{signal:AbortSignal.timeout(30000)});
+              report({component,storefrontStatus:storefront.status,application});
+              if(storefront.status!==200) failed=true;
+            } catch {report({component,storefrontError:'storefront_probe_failed'});failed=true;}
+          }
           const publicBases={marketing:'https://www.elevateforhumanity.org',admin:'https://admin.elevateforhumanity.org',lms:'https://app.elevateforhumanity.org'};
           if(publicBases[component]) {
             try {

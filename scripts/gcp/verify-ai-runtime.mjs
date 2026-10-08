@@ -61,8 +61,15 @@ async function main() {
     report.runtimeErrors=classifyRuntimeErrors(entries);
   } catch { report.failures.push('admin_error_logs_unavailable'); }
   try {
-    const accounts=JSON.parse(google(['iam','service-accounts','list','--project',PROJECT,'--format=json']));
     const policy=JSON.parse(google(['projects','get-iam-policy',PROJECT,'--format=json']));
+    let accounts;
+    try { accounts=JSON.parse(google(['iam','service-accounts','list','--project',PROJECT,'--format=json'])); report.identityInventoryComplete=true; }
+    catch {
+      const members=(policy.bindings??[]).flatMap(binding=>binding.members??[]).filter(member=>member.startsWith('serviceAccount:')).map(member=>member.slice(15));
+      const deployed=services.map(service=>service.spec?.template?.spec?.serviceAccountName).filter(Boolean);
+      accounts=[...new Set([...members,...deployed])].filter(email=>email.endsWith('@'+PROJECT+'.iam.gserviceaccount.com')).map(email=>({email}));
+      report.identityInventoryComplete=false;
+    }
     report.runtimeIdentities=accounts.filter(account=>!account.disabled).map(account=>({
       email:account.email,
       dedicatedModelCandidate:/elevate-(?:llm|model|gpu)(?:-|@)/.test(account.email??''),

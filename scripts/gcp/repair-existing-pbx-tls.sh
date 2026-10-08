@@ -16,12 +16,30 @@ docker inspect pbx_asterisk_1 --format '{{.State.Running}}' | grep -qx true
 curl -fsS --max-time 5 http://127.0.0.1:8088/httpstatus >/dev/null || {
   echo "Asterisk local HTTP endpoint unavailable; preserving existing service." >&2; exit 1;
 }
+# Asterisk's SIP-over-WebSocket URI is normally /ws, but verify the running
+# instance instead of publishing a proxy that can only return 404.
+WS_PATH=""
+for candidate in /ws /asterisk/ws; do
+  status="$(curl -sS --max-time 5 -o /dev/null -w '%{http_code}' \
+    -H 'Connection: Upgrade' -H 'Upgrade: websocket' \
+    -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' \
+    -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Protocol: sip' \
+    "http://127.0.0.1:8088$candidate" || true)"
+  if [[ "$status" == 101 || "$status" == 400 || "$status" == 426 ]]; then
+    WS_PATH="$candidate"; break
+  fi
+done
+if [[ -z "$WS_PATH" ]]; then
+  echo "Asterisk SIP WebSocket endpoint is not enabled on 127.0.0.1:8088; refusing a false TLS deployment." >&2
+  docker exec pbx_asterisk_1 asterisk -rx 'http show status' >&2 || true
+  exit 1
+fi
 # Do not replace unrelated services already bound to the public TLS port.
 if ss -ltn '( sport = :443 )' | grep -q LISTEN && ! docker ps --format '{{.Names}}' | grep -qx "$NAME"; then
   echo "TCP 443 already occupied by another service. Refusing takeover." >&2; exit 1;
 fi
 install -d -m 0755 "$CONF_DIR" "$STATE_DIR"
-cat > "$CONF_DIR/Caddyfile" <<'CADDY'
+cat > "$CONF_DIR/Caddyfile" <<CADDY
 {
   auto_https disable_redirects
 }
@@ -32,7 +50,10 @@ phone.elevateforhumanity.org {
     }
   }
   @sipws path /ws
-  reverse_proxy @sipws 127.0.0.1:8088
+  handle @sipws {
+    uri replace /ws $WS_PATH
+    reverse_proxy 127.0.0.1:8088
+  }
   respond /healthz "ok" 200
   respond "Not Found" 404
 }

@@ -19,6 +19,7 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
       - '.github/workflows/deploy-google-marketing-trigger.yml'
+      - '.deploy-google-marketing'
   workflow_dispatch:
   schedule:
     - cron: '17 * * * *'

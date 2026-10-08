@@ -18,7 +18,7 @@ export default function BoothRentalApplyPage() {
   return (
     <div className="min-h-screen bg-white">
       <PictureFirstPageHero
-        image="/images/pages/barber-shop-interior.webp"
+        image="/images/pages/barber-hero.webp"
         alt="Licensed beauty professional workspace"
         eyebrow="Beauty Workspace"
         title="Booth Rental & Workspace Interest"

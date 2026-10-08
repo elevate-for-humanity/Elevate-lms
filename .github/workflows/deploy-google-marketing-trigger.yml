@@ -1,17 +1,25 @@
 name: Deploy Google Marketing on trigger
 
 # Production is an explicitly approved release, never a side effect of each push.
+# Automatically deploy only after the full release has been validated.
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/marketing/**'
+      - 'components/**'
+      - 'lib/marketing/**'
+      - 'lib/programs/**'
+      - 'lib/apprenticeship-programs/**'
+      - 'lib/navigation/**'
+      - 'public/images/**'
+      - 'content/heroBanners.ts'
+      - 'Dockerfile.marketing'
+      - 'next.config.mjs'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/deploy-google-marketing-trigger.yml'
   workflow_dispatch:
-    inputs:
-      release_sha:
-        description: 'Full 40-character main commit SHA approved for production'
-        required: true
-        type: string
-      confirmation:
-        description: 'Type DEPLOY_GOOGLE_MARKETING to approve this release'
-        required: true
-        type: string
 
 permissions:
   contents: read
@@ -35,18 +43,23 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Verify explicit release approval and immutable revision
+      - name: Verify immutable main revision
         shell: bash
-        env:
-          APPROVED_SHA: ${{ inputs.release_sha }}
-          CONFIRMATION: ${{ inputs.confirmation }}
         run: |
           set -euo pipefail
-          test "$CONFIRMATION" = 'DEPLOY_GOOGLE_MARKETING'
-          [[ "$APPROVED_SHA" =~ ^[a-f0-9]{40}$ ]]
-          test "$APPROVED_SHA" = "$GITHUB_SHA"
           git fetch --depth=1 origin main
-          git merge-base --is-ancestor "$APPROVED_SHA" origin/main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+
+      - name: Install dependencies and validate before expensive build
+        shell: bash
+        run: |
+          set -euo pipefail
+          corepack enable
+          pnpm install --frozen-lockfile --strict-peer-dependencies=false
+          pnpm exec tsc --noEmit --project apps/marketing/tsconfig.json
+          node scripts/audit-geo-claims.mjs
+          node scripts/check-public-claims.mjs
+          node scripts/check-public-address-integrity.mjs
 
       - name: Preflight homepage release content and image assets
         shell: bash

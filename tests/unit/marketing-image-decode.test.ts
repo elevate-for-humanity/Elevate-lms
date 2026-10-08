@@ -15,6 +15,12 @@ const damagedPublicImages = [
   '/images/partners/razors-image-storefront.webp',
   '/images/logo-small.png',
   '/images/logo.jpg',
+  '/images/clear-path-main-image.jpg',
+  '/images/healthcare/healthcare-professional-portrait-1.jpg',
+  '/images/healthcare/healthcare-professional-portrait-2.jpg',
+  '/images/icon-72.png',
+  '/images/icon-192.png',
+  '/images/icon-192x192.png',
 ];
 
 describe('public image delivery', () => {
@@ -25,7 +31,7 @@ describe('public image delivery', () => {
       .raw()
       .toBuffer({ resolveWithObject: true });
     expect(data.byteLength).toBeGreaterThan(0);
-    expect(info.width).toBeGreaterThan(100);
-    expect(info.height).toBeGreaterThan(100);
+    expect(info.width).toBeGreaterThan(16);
+    expect(info.height).toBeGreaterThan(16);
   });
 });

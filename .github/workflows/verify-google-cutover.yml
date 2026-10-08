@@ -1,19 +1,34 @@
 name: Verify Google public cutover prerequisites
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/verify-google-cutover.yml']
+  workflow_run:
+    workflows: ['Deploy Admin', 'Deploy Google Marketing on trigger', 'Deploy repaired Google services', 'Deploy Google Store subscriptions']
+    types: [completed]
   workflow_dispatch:
 permissions:
+  actions: write
   contents: read
   id-token: write
 jobs:
+  dispatch:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch trusted production acceptance
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-google-cutover.yml/dispatches" -f ref=main
   inspect:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
-        component: [marketing, admin, lms]
+        component: [marketing, admin, lms, store]
     steps:
       - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v3
@@ -67,6 +82,27 @@ jobs:
               if (path !== '/' && !healthPassed(component,path,r.status,b)) failed=true;
               if (path === '/' && ![200,302,303,307,308].includes(r.status)) failed=true;
             } catch {report({component,path,error:'probe_failed'});failed=true;}
+          }
+          const readyRevision=metadata.status.latestReadyRevisionName;
+          const traffic=(metadata.status.traffic || []).filter(t=>t.revisionName===readyRevision).reduce((sum,t)=>sum+Number(t.percent || 0),0);
+          const revision=JSON.parse(gcloud(['run','revisions','describe',readyRevision,'--project=elegant-racer-299721','--region=us-central1','--format=json']));
+          const image=revision.spec.containers[0].image;
+          const revisionReady=(metadata.status.conditions || []).some(c=>c.type==='Ready' && c.status==='True');
+          const immutable=/@sha256:[a-f0-9]{64}$/.test(image);
+          report({component,readyRevision,traffic,image,revisionReady,immutable});
+          if(!revisionReady || traffic!==100 || !immutable) failed=true;
+          const publicBases={marketing:'https://www.elevateforhumanity.org',admin:'https://admin.elevateforhumanity.org',lms:'https://app.elevateforhumanity.org'};
+          if(publicBases[component]) {
+            try {
+              const direct=await fetch(base+'/api/health',{signal:AbortSignal.timeout(30000)});
+              const directBody=await direct.json();
+              const publicResponse=await fetch(publicBases[component]+'/api/health?acceptance='+Date.now(),{cache:'no-store',redirect:'manual',signal:AbortSignal.timeout(30000)});
+              const publicBody=await publicResponse.json();
+              const sameCommit=Boolean(directBody.commit) && directBody.commit===publicBody.commit;
+              const publicHealthy=healthPassed(component,'/api/health',publicResponse.status,publicBody);
+              report({component,publicUrl:publicBases[component],publicStatus:publicResponse.status,directCommit:directBody.commit,publicCommit:publicBody.commit,sameCommit,publicHealthy});
+              if(!sameCommit || !publicHealthy) failed=true;
+            } catch {report({component,publicError:'public_revision_probe_failed'});failed=true;}
           }
           if(component==='marketing') {
             try {

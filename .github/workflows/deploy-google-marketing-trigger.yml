@@ -20,6 +20,8 @@ on:
       - 'pnpm-lock.yaml'
       - '.github/workflows/deploy-google-marketing-trigger.yml'
   workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
 
 permissions:
   contents: read
@@ -32,6 +34,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.event_name != 'schedule' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 120

@@ -1,4 +1,5 @@
 name: Diagnose and prepare Google migration access
+# Revalidate effective Google IAM permissions against the production identity.
 on:
   push:
     branches: [main]

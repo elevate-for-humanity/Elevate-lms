@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * CI guard: production deploy must be Northflank-only (no AWS ECS artifacts or workflows).
+ * CI guard: production deploy must be Google Cloud Run only (no AWS ECS artifacts or workflows).
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -22,7 +22,7 @@ const forbiddenRepoPaths = [
   'aws/buildspec-admin.yml',
   '.github/workflows/deploy-aws.yml',
   'Dockerfile.package',
-  // Dockerfile.admin is allowed - standard Dockerfile for local dev / Northflank (not AWS ECS)
+  // Dockerfile.admin is allowed for standard Docker container builds.
 ];
 
 let failed = false;
@@ -45,14 +45,13 @@ for (const path of forbiddenRepoPaths) {
 }
 
 const required = [
-  '.github/workflows/deploy-lms.yml',
   '.github/workflows/deploy-admin.yml',
-  'Dockerfile.northflank-lms',
+  '.github/workflows/deploy-google-marketing-trigger.yml',
   'Dockerfile.northflank-admin',
 ];
 for (const path of required) {
   if (!existsSync(path)) {
-    console.error(`❌ missing required Northflank artifact: ${path}`);
+    console.error(`❌ missing required Google deployment artifact: ${path}`);
     failed = true;
   }
 }
@@ -60,4 +59,4 @@ for (const path of required) {
 if (failed) {
   process.exit(1);
 }
-console.log('✅ No AWS ECS deploy artifacts; Northflank deploy workflows present.');
+console.log('✅ No AWS ECS deploy artifacts; Google deployment workflows present.');

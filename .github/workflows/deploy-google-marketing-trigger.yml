@@ -16,6 +16,7 @@ on:
 permissions:
   contents: read
   id-token: write
+  deployments: write
 
 concurrency:
   group: google-runtime-operations
@@ -165,3 +166,37 @@ jobs:
           }
           throw new Error('Public website failed exact-revision/homepage acceptance: '+last);
           NODE
+
+      - name: Publish verified live deployment status
+        if: ${{ success() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          API="https://api.github.com/repos/$GITHUB_REPOSITORY/deployments"
+          DEPLOYMENT="$(curl --fail-with-body -sS -X POST "$API" \
+            -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            -d "$(node -e 'console.log(JSON.stringify({ref:process.env.GITHUB_SHA,environment:"production-google-marketing",auto_merge:false,required_contexts:[],description:"Verified Google Cloud Run and public homepage"}))')")"
+          ID="$(printf '%s' "$DEPLOYMENT" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).id||""))')"
+          test -n "$ID"
+          curl --fail-with-body -sS -X POST "$API/$ID/statuses" \
+            -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            -d '{"state":"success","environment_url":"https://www.elevateforhumanity.org","description":"Exact revision and homepage acceptance verified"}'
+          {
+            echo "## Google Marketing — VERIFIED LIVE"
+            echo "Commit: \`$GITHUB_SHA\`"
+            echo "Production: https://www.elevateforhumanity.org"
+            echo "Cloud Run service: elevate-marketing-migration (us-central1)"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish failed release notice
+        if: ${{ failure() }}
+        shell: bash
+        run: |
+          {
+            echo "## Google Marketing — NOT VERIFIED LIVE"
+            echo "Attempted commit: \`$GITHUB_SHA\`"
+            echo "Deployment is NOT confirmed. Inspect the failed job; do not mark this release successful."
+            echo "The previously serving revision may remain active; verify Cloud Run traffic separately."
+          } >> "$GITHUB_STEP_SUMMARY"

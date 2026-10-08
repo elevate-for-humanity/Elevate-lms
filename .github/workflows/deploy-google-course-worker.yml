@@ -18,11 +18,11 @@ on:
 permissions:
   contents: read
   id-token: write
-concurrency:
-  group: google-runtime-operations
-  cancel-in-progress: false
 jobs:
-  deploy:
+  build:
+    concurrency:
+      group: google-course-worker-image
+      cancel-in-progress: true
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
@@ -60,6 +60,29 @@ jobs:
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
           docker tag "elevate-ultimate-worker:$GITHUB_SHA" "$IMAGE"
           docker push "$IMAGE"
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    concurrency:
+      group: google-runtime-operations
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify Google SDK
+        run: node scripts/gcp/verify-sdk.mjs
       - name: Preserve active execution before changing job
         run: |
           node --input-type=module <<'NODE'

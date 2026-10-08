@@ -47,14 +47,25 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git fetch --depth=1 origin main
+          git fetch --depth=50 origin main
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+
+      - name: Configure pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Configure Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies and validate before expensive build
         shell: bash
         run: |
           set -euo pipefail
-          corepack enable
           pnpm install --frozen-lockfile --strict-peer-dependencies=false
           pnpm exec tsc --noEmit --project apps/marketing/tsconfig.json
           node scripts/audit-geo-claims.mjs

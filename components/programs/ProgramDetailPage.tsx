@@ -156,7 +156,7 @@ export default function ProgramDetailPage({
     .map((credential) => credential.name)
     .join(', ');
   const programHeroNarration = isApprenticeship
-    ? `Welcome to ${p.title}. This is an earn-while-you-learn path that connects classroom instruction with supervised experience at an approved Host Site. Picture yourself learning a skill, practicing it with a qualified professional, and seeing your progress build week by week. The full pathway is ${durationLabel}, usually ${p.hoursPerWeekMin} to ${p.hoursPerWeekMax} hours each week. You will grow through areas such as ${narrationCurriculum || 'the skills required for this occupation'}, while working toward ${narrationCredentials || 'the program completion requirements'}. Your first step is simple: apply and complete intake. We will then help confirm your Host Site, schedule, and funding or payment path before training begins. Move through this page at your own pace. You will see what to expect, what it costs, and exactly how to apply.`
+    ? `Welcome to ${p.title}. This is an earn-while-you-learn path that connects classroom instruction with supervised experience at an approved Host Site. Picture yourself learning a skill, practicing it with a qualified professional, and seeing your progress build week by week. The full pathway is ${durationLabel}, usually ${weeklyHoursLabel.replace("hrs/week", "hours each week")}. You will grow through areas such as ${narrationCurriculum || 'the skills required for this occupation'}, while working toward ${narrationCredentials || 'the program completion requirements'}. Your first step is simple: apply and complete intake. We will then help confirm your Host Site, schedule, and funding or payment path before training begins. Move through this page at your own pace. You will see what to expect, what it costs, and exactly how to apply.`
     : `Welcome to ${p.title}. This program is designed to help you move from interest to real, usable career skills. The ${durationLabel} experience is ${p.deliveryMode === 'hybrid' ? 'a blend of flexible online learning and scheduled hands-on practice' : p.deliveryMode === 'online' ? 'available online, so you can build skills with a flexible learning routine' : 'taught in person, with direct guidance and practical learning'}. Along the way, you will build confidence in areas such as ${narrationCurriculum || 'the program skills'} and prepare for ${narrationCredentials || 'the program credentials'}. Start by applying and completing intake. That gives admissions what they need to confirm your schedule, requirements, and best enrollment path. ${isWorkforceFunded ? 'Your training may be free if you qualify and receive written approval from the workforce agency before enrollment.' : 'You will also find clear payment choices on this page.'} Take your time, review the details, and use the application link when you are ready.`;
 
   const pathwaySteps = [
@@ -395,7 +395,7 @@ export default function ProgramDetailPage({
                     },
                     {
                       icon: <BookOpen className="w-3.5 h-3.5" />,
-                      val: `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`,
+                      val: weeklyHoursLabel,
                     },
                     {
                       icon: <Award aria-label="award" className="w-3.5 h-3.5" />,
@@ -525,7 +525,7 @@ export default function ProgramDetailPage({
                 <div>
                   <dt className="font-bold text-slate-500">Weekly schedule</dt>
                   <dd className="mt-1 font-black text-slate-950">
-                    {p.schedule || `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hours per week`}
+                    {p.schedule || weeklyHoursLabel.replace("hrs/week", "hours per week")}
                   </dd>
                 </div>
                 <div>
@@ -739,7 +739,7 @@ export default function ProgramDetailPage({
               <DecisionFact label="Length" value={durationLabel} />
               <DecisionFact
                 label="Schedule"
-                value={`${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`}
+                value={weeklyHoursLabel}
               />
               <DecisionFact
                 label="Training"

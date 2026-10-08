@@ -185,7 +185,8 @@ jobs:
               const sha=data.commitSha||data.commit||data.sha||'';
               const page=await fetch(root+'/?release='+process.env.GITHUB_SHA,{cache:'no-store',signal:AbortSignal.timeout(20000)});
               const html=await page.text();
-              const missing=required.filter(t=>!html.includes(t));
+              const normalizedHtml=html.replace(/&amp;/g,'&').replace(/&#0*38;/g,'&').replace(/&#x0*26;/gi,'&');
+              const missing=required.filter(t=>!normalizedHtml.includes(t));
               const present=forbidden.filter(t=>html.includes(t));
               last=JSON.stringify({versionStatus:version.status,homepageStatus:page.status,sha,expected:process.env.GITHUB_SHA,missing,unwanted:present});
               console.log(last);

@@ -21,7 +21,7 @@ const PATHWAYS = [
   {
     slug: 'business', title: 'Business & Entrepreneurship',
     description: 'Develop a business plan and practical skills in budgeting, marketing, customer service, operations and business administration.',
-    image: '/images/pages/business-meeting.webp', alt: 'Business professionals collaborating at a meeting', href: '/programs/business',
+    image: '/images/pages/business-meeting.webp', alt: 'Business professionals collaborating at a meeting', href: '/programs/business-administration',
   },
 ] as const;
 

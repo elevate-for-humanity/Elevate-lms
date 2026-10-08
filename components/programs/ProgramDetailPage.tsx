@@ -17,6 +17,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import HeroPicture from '@/components/marketing/HeroPicture';
+import HeroVideo from '@/components/marketing/HeroVideo';
 import ProgramApplyForm from '@/components/programs/ProgramApplyForm';
 import { PayNowButton } from '@/components/programs/PayNowButton';
 import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
@@ -66,6 +67,8 @@ interface Props {
   heroOverride?: React.ReactNode;
   /** Route-specific content rendered after the complete hero and program summary. */
   afterHero?: React.ReactNode;
+  /** Photography or demonstrations shown before the detailed program text. */
+  visualContent?: React.ReactNode;
   /** Route-specific proof shown immediately after the decision panel. */
   featuredContent?: React.ReactNode;
   /** Supplemental compliance, instructor, or authority content shown after the core template. */
@@ -77,6 +80,7 @@ export default function ProgramDetailPage({
   banner: bannerProp,
   heroOverride,
   afterHero,
+  visualContent,
   featuredContent,
   children,
 }: Props) {
@@ -112,9 +116,10 @@ export default function ProgramDetailPage({
   const isApprenticeship = p.programType === 'apprenticeship';
   const octoberCouponCode = 'OCT300';
   const isEstheticsApprenticeship = p.slug === 'esthetician-apprenticeship';
-  const weeklyHoursLabel = p.hoursPerWeekMin === p.hoursPerWeekMax
-    ? `${p.hoursPerWeekMin} hrs/week`
-    : `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`;
+  const weeklyHoursLabel =
+    p.hoursPerWeekMin === p.hoursPerWeekMax
+      ? `${p.hoursPerWeekMin} hrs/week`
+      : `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`;
   const bnplDepositStart = isApprenticeship
     ? 300
     : p.depositAmount
@@ -230,8 +235,23 @@ export default function ProgramDetailPage({
               const bannerCtas = [banner.primaryCta, banner.secondaryCta].filter(
                 (cta): cta is NonNullable<typeof cta> => Boolean(cta?.href && cta.label),
               );
-              // Program pages use a clear picture-first hero. Primary copy and
-              // actions render below the image so no dark overlay obscures the media.
+              // Keep configured motion on every shared program route. A real
+              // photograph stays beneath the video if delivery or autoplay fails.
+              if (banner.videoSrcDesktop || banner.videoSrcMobile) {
+                return (
+                  <HeroVideo
+                    videoSrcDesktop={banner.videoSrcDesktop}
+                    videoSrcMobile={banner.videoSrcMobile}
+                    posterImage={heroPosterSrc}
+                    microLabel={banner.microLabel}
+                    analyticsName={banner.analyticsName}
+                    heightClassName="h-[clamp(260px,42svh,480px)]"
+                    overlayMode="none"
+                    narrateTranscript={false}
+                    preloadTranscriptVoice={false}
+                  />
+                );
+              }
               return (
                 <HeroPicture
                   src={heroPosterSrc}
@@ -317,24 +337,6 @@ export default function ProgramDetailPage({
               </Link>
             </div>
           </section>
-        ) : null}
-
-        {isApprenticeship && !afterHero ? (
-          <div className="border-y border-red-200 bg-red-700 px-4 py-4 text-white">
-            <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-red-100">
-                  October enrollment special
-                </p>
-                <p className="mt-1 text-lg font-black">
-                  50% off the standard startup deposit — start for $300.
-                </p>
-              </div>
-              <div className="shrink-0 rounded-xl border border-white/30 bg-white/10 px-4 py-2 text-sm font-black">
-                Coupon: <span className="font-mono">OCT300</span>
-              </div>
-            </div>
-          </div>
         ) : null}
 
         {/* Hero content panel — below image, no overlay */}
@@ -432,13 +434,18 @@ export default function ProgramDetailPage({
               {/* CTA card */}
               <div className="lg:w-64 flex-shrink-0">
                 <div className="bg-white rounded-2xl shadow-xl p-5">
-                  {/* Cost */}
-                  <p className="text-2xl font-extrabold text-slate-900 mb-0.5">{p.selfPayCost}</p>
-
-                  {/* Funding — only verified options, no fallback text */}
-                  <div className="mb-4 mt-2">
-                    <FundingSection fundingOptions={publicFundingOptions} />
-                  </div>
+                  <p className="text-lg font-extrabold text-slate-900">
+                    Your next step starts here
+                  </p>
+                  <p className="mb-4 mt-2 text-sm leading-6 text-slate-600">
+                    Explore the training, then apply or ask admissions a question.
+                  </p>
+                  <Link
+                    href="#enrollment-options"
+                    className="mb-4 inline-flex min-h-11 items-center text-sm font-bold text-brand-blue-700"
+                  >
+                    Review funding and costs ↓
+                  </Link>
 
                   {primaryCTA && (
                     <>
@@ -491,7 +498,7 @@ export default function ProgramDetailPage({
         </div>
       </section>
 
-      {afterHero ? <div>{afterHero}</div> : null}
+      {visualContent ? <div>{visualContent}</div> : null}
 
       <section
         id="program-overview"
@@ -711,6 +718,8 @@ export default function ProgramDetailPage({
 
       <ProgramExperienceGuide program={p} />
 
+      {afterHero ? <div>{afterHero}</div> : null}
+
       {/* DECISION PANEL — answers the questions visitors need before applying */}
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-12 sm:py-16">
         <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.05fr_.95fr]">
@@ -780,7 +789,9 @@ export default function ProgramDetailPage({
                 <span className="block text-xs font-black uppercase tracking-wider text-orange-300">
                   Pay in full
                 </span>
-                <span className="mt-1 block text-xl font-black text-white">{isEstheticsApprenticeship ? '$5,400 with PAYFULL600' : p.selfPayCost}</span>
+                <span className="mt-1 block text-xl font-black text-white">
+                  {isEstheticsApprenticeship ? '$5,400 with PAYFULL600' : p.selfPayCost}
+                </span>
                 <span className="mt-1 block text-xs leading-5 text-slate-300">
                   One payment after application approval
                 </span>

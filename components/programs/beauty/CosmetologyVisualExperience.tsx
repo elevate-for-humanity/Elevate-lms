@@ -77,7 +77,7 @@ export default function CosmetologyVisualExperience() {
         data-narration-style="instructor"
       >
         <div className="mx-auto grid max-w-7xl lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
-          <div className="flex items-center px-5 py-12 sm:px-8 sm:py-16 lg:px-10 lg:py-20">
+          <div className="order-2 flex items-center px-5 py-7 lg:order-1 sm:px-8 sm:py-16 lg:px-10 lg:py-20">
             <div className="max-w-2xl">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-brand-red-700">
                 Cosmetology apprenticeship pathway
@@ -116,7 +116,7 @@ export default function CosmetologyVisualExperience() {
               </div>
             </div>
           </div>
-          <div className="relative min-h-[430px] bg-white sm:min-h-[560px] lg:min-h-[680px]">
+          <div className="order-1 relative min-h-[300px] bg-white sm:min-h-[460px] lg:order-2 lg:min-h-[680px]">
             {slides.map((item, index) => (
               <Image
                 key={item.src}

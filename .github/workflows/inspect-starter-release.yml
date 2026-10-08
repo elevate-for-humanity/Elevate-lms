@@ -6,12 +6,22 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: write
   id-token: write
 concurrency:
   group: google-starter-release-inspection
   cancel-in-progress: false
 jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch production target inspection
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/inspect-starter-release.yml/dispatches" -f ref=main
   inspect:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 10

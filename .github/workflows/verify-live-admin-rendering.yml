@@ -39,6 +39,13 @@ jobs:
           const spec=service.spec.template.spec;
           const env=Object.fromEntries((spec.containers[0].env||[]).filter(x=>typeof x.value==='string').map(x=>[x.name,x.value]));
           console.log(JSON.stringify({latestReadyRevision:service.status.latestReadyRevisionName,traffic:service.status.traffic,resources:spec.containers[0].resources,scaling:service.spec.template.metadata.annotations,narrationProvider:['kokoro','local','cloudflare'].includes(env.AI_NARRATION_PROVIDER)?env.AI_NARRATION_PROVIDER:'other',workerDisabled:env.DISABLE_ADMIN_VIDEO_WORKER==='true'}));
+          try {
+            const job=JSON.parse(execFileSync('gcloud',['run','jobs','describe','elevate-video-render','--region=us-central1',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            const task=job.spec.template.spec.template.spec;
+            console.log(JSON.stringify({videoJobPresent:true,videoJobImage:task.containers[0].image,videoJobIdentity:task.serviceAccountName,videoJobRetries:task.maxRetries,videoJobTimeout:task.timeoutSeconds}));
+            const executions=JSON.parse(execFileSync('gcloud',['run','jobs','executions','list','--job=elevate-video-render','--region=us-central1',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            console.log(JSON.stringify({videoExecutions:executions.slice(0,3).map(x=>({name:x.metadata.name,started:x.status?.startTime,completed:x.status?.completionTime,running:x.status?.runningCount,succeeded:x.status?.succeededCount,failed:x.status?.failedCount,conditions:(x.status?.conditions||[]).map(y=>({type:y.type,status:y.status,reason:y.reason}))}))}));
+          } catch {console.log(JSON.stringify({videoJobInspectionSucceeded:false}));}
           const filter='resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration"';
           let rows;
           try {rows=JSON.parse(execFileSync('gcloud',['logging','read',filter,'--freshness=30m','--limit=500',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));}

@@ -8,7 +8,7 @@ permissions:
   contents: read
   id-token: write
 concurrency:
-  group: google-runtime-operations
+  group: google-starter-release-inspection
   cancel-in-progress: false
 jobs:
   inspect:

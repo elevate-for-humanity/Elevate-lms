@@ -60,6 +60,15 @@ async function main() {
     const entries=JSON.parse(google(['logging','read','resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration" AND severity>=ERROR','--project',PROJECT,'--freshness=20m','--limit=15','--format=json']));
     report.runtimeErrors=classifyRuntimeErrors(entries);
   } catch { report.failures.push('admin_error_logs_unavailable'); }
+  try {
+    const accounts=JSON.parse(google(['iam','service-accounts','list','--project',PROJECT,'--format=json']));
+    const policy=JSON.parse(google(['projects','get-iam-policy',PROJECT,'--format=json']));
+    report.runtimeIdentities=accounts.filter(account=>!account.disabled).map(account=>({
+      email:account.email,
+      dedicatedModelCandidate:/elevate-(?:llm|model|gpu)(?:-|@)/.test(account.email??''),
+      projectRoles:(policy.bindings??[]).filter(binding=>binding.members?.includes('serviceAccount:'+account.email)).map(binding=>binding.role),
+    }));
+  } catch(error) { report.identityInventoryStatus=error.code??'read_failed'; }
   report.access=await diagnoseAccess(google(['auth','print-access-token']));
   console.log(JSON.stringify(report,null,2));
   if(!ownedModel.verified || !report.studio.googleInstancePresent || report.failures.length) process.exitCode=1;

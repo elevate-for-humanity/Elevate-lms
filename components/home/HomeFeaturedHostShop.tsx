@@ -50,11 +50,11 @@ export function HomeFeaturedHostShop() {
         </div>
         <div className="mt-7 grid gap-3 sm:grid-cols-2">
           <Link href="/programs/esthetician-apprenticeship" className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-            <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-lg"><Image src="/images/pexels/esthetician.webp" alt="Esthetics training and skincare practice" fill sizes="96px" loading="lazy" className="object-cover" /></div>
+            <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-lg"><Image src="/images/pexels/esthetician.webp" alt="Esthetics training and skincare practice" fill sizes="192px" loading="lazy" className="object-cover" /></div>
             <div><h3 className="font-bold text-slate-950">Esthetics Apprenticeship</h3><p className="mt-1 text-sm text-slate-700">Skincare, sanitation, client care and supervised practice.</p><span className="text-sm font-bold text-brand-red-700">Explore program →</span></div>
           </Link>
           <Link href="/programs/nail-technician-apprenticeship" className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-            <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-lg"><Image src="/images/pexels/nail-tech.webp" alt="Nail technician training and supervised salon practice" fill sizes="96px" loading="lazy" className="object-cover" /></div>
+            <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-lg"><Image src="/images/pexels/nail-tech.webp" alt="Nail technician training and supervised salon practice" fill sizes="192px" loading="lazy" className="object-cover" /></div>
             <div><h3 className="font-bold text-slate-950">Nail Technician Apprenticeship</h3><p className="mt-1 text-sm text-slate-700">Manicuring, nail services, sanitation and client care.</p><span className="text-sm font-bold text-brand-red-700">Explore program →</span></div>
           </Link>
         </div>

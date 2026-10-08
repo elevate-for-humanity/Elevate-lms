@@ -22,6 +22,9 @@ if ss -ltn '( sport = :443 )' | grep -q LISTEN && ! docker ps --format '{{.Names
 fi
 install -d -m 0755 "$CONF_DIR" "$STATE_DIR"
 cat > "$CONF_DIR/Caddyfile" <<'CADDY'
+{
+  auto_https disable_redirects
+}
 phone.elevateforhumanity.org {
   tls {
     issuer acme {

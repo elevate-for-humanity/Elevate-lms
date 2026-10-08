@@ -13,6 +13,7 @@ concurrency:
 jobs:
   inspect:
     runs-on: ubuntu-24.04
+    environment: production
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4

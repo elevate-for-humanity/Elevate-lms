@@ -42,7 +42,12 @@ jobs:
           const filter='resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration"';
           let rows;
           try {rows=JSON.parse(execFileSync('gcloud',['logging','read',filter,'--freshness=30m','--limit=500',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));}
-          catch {throw new Error('Runtime log read did not succeed; live rendering verification requires log evidence');}
+          catch (error) {
+            const stderr=String(error.stderr||'');
+            const category=/PERMISSION_DENIED|permission.*denied/i.test(stderr)?'PERMISSION_DENIED':/unrecognized arguments|Invalid choice/i.test(stderr)?'SDK_ARGUMENT_ERROR':/RESOURCE_EXHAUSTED/i.test(stderr)?'RESOURCE_EXHAUSTED':'OTHER';
+            console.log(JSON.stringify({logReadSucceeded:false,category,exitStatus:error.status}));
+            throw new Error('Runtime log read did not succeed: '+category);
+          }
           const patterns={out_of_memory:/memory limit|out of memory|OOM|SIGKILL/i,terminated:/SIGTERM|terminated|shutting down/i,model_loading:/kokoro|onnx|model.*load|download.*model/i,render_failure:/render.*fail|compositor.*error|narration.*fail/i,quality_failure:/quality.*fail|quality.*reject/i,worker_failure:/trigger loop error|Processor failed|Automated course finalization failed/i,render_complete:/markComplete|render.*complete|video.*complete/i};
           const counts={};
           for(const row of rows) {

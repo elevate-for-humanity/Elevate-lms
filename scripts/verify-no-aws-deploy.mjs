@@ -56,6 +56,44 @@ for (const path of required) {
   }
 }
 
+// Google ownership contract: an operational deployment entrypoint must never
+// reintroduce a Northflank API call or the removed production webhook path.
+// Migration inventories are intentionally retained until cutover acceptance.
+const googleOwnedEntrypoints = [
+  '.github/workflows/deploy-admin.yml',
+  '.github/workflows/deploy-google-marketing-trigger.yml',
+  'apps/admin/app/api/admin/env-vars/deploy/route.ts',
+  'apps/admin/app/api/admin/dev-studio/builds/route.ts',
+  'apps/admin/app/api/admin/dev-studio/shell/route.ts',
+  'apps/admin/app/api/admin/dev-studio/autofix/route.ts',
+  'lib/admin/publish-website.ts',
+  'lib/gcp/dispatch-production-workflow.ts',
+  'supabase/functions/autopilot-worker/index.ts',
+];
+for (const file of googleOwnedEntrypoints) {
+  if (!existsSync(file)) {
+    console.error('Missing canonical Google-owned entrypoint: ' + file);
+    failed = true;
+    continue;
+  }
+  const source = readFileSync(file, 'utf8');
+  if (/api\\.northflank\\.com|triggerNorthflankBuild|trigger-northflank\\.sh|scripts\\/northflank\\/(?:trigger|deploy|restart)/i.test(source)) {
+    console.error('Legacy Northflank execution path in Google-owned entrypoint: ' + file);
+    failed = true;
+  }
+}
+for (const legacy of [
+  'northflank-trigger-dispatch.yml', 'deploy-lms.yml', 'deploy-marketing.yml',
+  'recover-marketing.yml', 'elevate-production-deploy.yml',
+  'force-admin-remotion-deploy.yml', 'restart-admin-renderer.yml',
+  'repair-llm-runtime.yml', 'wait-admin-video-runtime.yml',
+]) {
+  if (existsSync(join(workflowDir, legacy))) {
+    console.error('Retired Northflank deployment workflow reintroduced: ' + legacy);
+    failed = true;
+  }
+}
+
 if (failed) {
   process.exit(1);
 }

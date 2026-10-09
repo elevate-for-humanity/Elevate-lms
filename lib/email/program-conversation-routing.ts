@@ -23,16 +23,12 @@ export async function programConversationRoute(
     ...new Set(applications.map((row) => row.program_slug || row.program_interest).filter(Boolean)),
   ];
   const ids = [...new Set(applications.map((row) => row.program_id).filter(Boolean))];
-  // This release covers the CDL Academy Class A relationship. Other tracks have other partners.
-  if (
-    slugs.some((slug) => slug !== 'cdl-training') ||
-    applications.some(
+  // Preserve distinct CDL pathway assignments while allowing every other program.
+  if (slugs.includes('cdl-training') && applications.some(
       (row) =>
         row.pathway_slug && row.pathway_slug !== 'cdl-training' && row.pathway_slug !== 'class-a',
-    )
-  )
+    ))
     return null;
-  if (!slugs.includes('cdl-training')) return null;
   const linked = await db
     .from('program_holder_students')
     .select('program_holder_id,program_id')
@@ -45,13 +41,13 @@ export async function programConversationRoute(
     .from('program_holder_programs')
     .select('program_holder_id,program_id,program_slug')
     .eq('status', 'active')
-    .eq('is_primary', true)
-    .eq('program_slug', 'cdl-training');
+    .eq('is_primary', true);
   if (assignments.error) throw assignments.error;
   const holderIds = [
     ...new Set(
       (assignments.data || [])
         .filter((row) => !ids.length || ids.includes(row.program_id))
+        .filter((row) => (linked.data || []).some(link => link.program_id===row.program_id))
         .filter((row) => linkedHolderIds.includes(row.program_holder_id))
         .map((row) => row.program_holder_id),
     ),

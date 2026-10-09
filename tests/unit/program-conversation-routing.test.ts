@@ -31,7 +31,10 @@ function database(
   });
   return { from } as any;
 }
-describe('assigned CDL interoffice conversations', () => {
+describe('assigned program interoffice conversations', () => {
+  it('routes non-CDL programs through their canonical holder assignment', async () => {
+    expect(await programConversationRoute(database([{program_slug:'barber-apprenticeship',program_id:'cdl'}]),['student@example.com'],['admissions@elevateforhumanity.org'])).not.toBeNull();
+  });
   it('copies student replies to admin and the assigned holder', async () => {
     expect(
       await programConversationRoute(

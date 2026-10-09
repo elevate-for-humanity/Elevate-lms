@@ -30,6 +30,19 @@ export type VerifiedProgramFunding = {
  */
 export const VERIFIED_WORKFORCE_FUNDED_PROGRAMS: readonly VerifiedProgramFunding[] = [
   {
+    slug: 'hvac-technician',
+    title: 'HVAC Certification',
+    description: 'HVAC career training with technical instruction and certification preparation.',
+    duration: null,
+    credential: null,
+    category: 'trades',
+    etplListedFor2Exclusive: true,
+    topJobsStars: null,
+    wioaEligible: true,
+    wrgEligible: true,
+    sourceNote: 'Indiana DWD INTraining lists Elevate for Humanity Training Center HVAC technician (Program 10002289, Location 10004322). Verified public ETPL, WIOA and NextLevel Jobs WRG evidence is recorded in program_regulatory_status. Individual authorization remains required.',
+  },
+  {
     slug: 'cdl-training',
     title: 'CDL Training',
     description:

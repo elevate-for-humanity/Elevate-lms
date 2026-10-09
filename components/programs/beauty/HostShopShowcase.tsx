@@ -113,6 +113,7 @@ export default function HostShopShowcase({
   }, [mediaOverrides, mediaSequence, shops, videoTourShopSlug]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
   const [interacting, setInteracting] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
@@ -131,15 +132,12 @@ export default function HostShopShowcase({
   }, []);
 
   useEffect(() => {
-    if (paused || interacting || reduceMotion || slides.length < 2) return;
-    const activeMedia = slides[activeIndex]?.media;
-    // Video tours control their own advancement so they always play to completion.
-    if (activeMedia?.kind === 'video') return;
+    if (paused || interacting || reduceMotion || videoPlaying || slides.length < 2) return;
     const timer = window.setTimeout(() => {
       setActiveIndex((current) => (current + 1) % slides.length);
     }, ROTATION_MS);
     return () => window.clearTimeout(timer);
-  }, [activeIndex, interacting, paused, reduceMotion, slides]);
+  }, [activeIndex, interacting, paused, reduceMotion, videoPlaying, slides]);
 
   useEffect(() => {
     if (!autoPlayVideoOnVisible) return;
@@ -184,6 +182,7 @@ export default function HostShopShowcase({
 
   useEffect(() => {
     userEnabledSoundRef.current = false;
+    setVideoPlaying(false);
   }, [activeIndex]);
 
   useEffect(() => {
@@ -329,7 +328,9 @@ export default function HostShopShowcase({
                     muted={autoPlayVideoOnVisible}
                     data-host-shop-tour
                     poster={image.backdropSrc}
+                    onPause={() => setVideoPlaying(false)}
                     onPlay={(event) => {
+                      setVideoPlaying(true);
                       event.currentTarget.defaultPlaybackRate = 1;
                       event.currentTarget.playbackRate = 1;
                       if (!event.currentTarget.muted) {
@@ -347,8 +348,8 @@ export default function HostShopShowcase({
                       if (userEnabledSoundRef.current) stopAllNaturalVoicePlayback();
                     }}
                     onEnded={(event) => {
-                      // Hold the final frame. The tour is never cut short, sped up,
-                      // reset, or advanced automatically.
+                      // Resume photo rotation only after the full tour finishes.
+                      setVideoPlaying(false);
                       event.currentTarget.pause();
                     }}
                     onError={() =>

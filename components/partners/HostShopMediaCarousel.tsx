@@ -46,12 +46,14 @@ export default function HostShopMediaCarousel({
     });
   }, [items, shopName, videoUrl]);
   const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(true);
+  const [videoPlaying, setVideoPlaying] = useState(false);
+  useEffect(() => setVideoPlaying(false), [index]);
   useEffect(() => {
-    if (!playing || media.length < 2 || media[Math.min(index, media.length - 1)]?.type === 'video') return;
+    if (!playing || videoPlaying || media.length < 2) return;
     const timer = window.setInterval(() => setIndex((current) => (current + 1) % media.length), 5000);
     return () => window.clearInterval(timer);
-  }, [playing, media, index]);
+  }, [playing, videoPlaying, media, index]);
 
   if (!media.length) return null;
   const safeIndex = Math.min(index, media.length - 1);
@@ -63,7 +65,7 @@ export default function HostShopMediaCarousel({
     <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg sm:rounded-3xl">
       <div className={`relative flex w-full items-center justify-center bg-slate-950 ${compact ? "aspect-[16/10]" : "aspect-[4/3] sm:aspect-[16/10] lg:max-h-[560px]"}`}>
         {active.type === 'video' ? (
-          <video key={active.url} src={active.url} controls playsInline preload="metadata" onPlay={() => setPlaying(false)} className="host-shop-media-enter mx-auto h-auto w-auto max-h-[240px] object-scale-down bg-black sm:max-h-[320px]" style={{ maxWidth: 'min(100%, 480px)' }} aria-label={active.alt || `${shopName} video`} />
+          <video key={active.url} src={active.url} controls playsInline preload="metadata" onPlay={() => setVideoPlaying(true)} onPause={() => setVideoPlaying(false)} onEnded={() => setVideoPlaying(false)} onError={() => setVideoPlaying(false)} className="host-shop-media-enter mx-auto h-auto w-auto max-h-[240px] object-scale-down bg-black sm:max-h-[320px]" style={{ maxWidth: 'min(100%, 480px)' }} aria-label={active.alt || `${shopName} video`} />
         ) : (
           <img key={active.url} src={active.url} alt={active.alt || `${shopName} promotional image`} className="host-shop-media-enter h-full w-full object-contain" loading="lazy" decoding="async" />
         )}

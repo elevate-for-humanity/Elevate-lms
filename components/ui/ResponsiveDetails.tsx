@@ -10,21 +10,16 @@ function subscribe(onChange: () => void) {
   media.addEventListener('change', onChange);
   return () => media.removeEventListener('change', onChange);
 }
-
 function getSnapshot() {
   return window.matchMedia(DESKTOP_QUERY).matches;
 }
-
-// Server rendering and no-JavaScript browsing retain the complete content.
+// Compact at first paint; native details remain usable before JavaScript loads.
 function getServerSnapshot() {
-  return true;
+  return false;
 }
 
 export function ResponsiveDetails({
-  title,
-  children,
-  className = '',
-  defaultOpen = false,
+  title, children, className = '', defaultOpen = false,
 }: {
   title: string;
   children: ReactNode;
@@ -37,15 +32,17 @@ export function ResponsiveDetails({
   const visible = desktop || expanded;
 
   return (
-    <div className={className} data-responsive-details>
-      <h3 className="text-base font-bold text-slate-950">
-        <span className="hidden md:block">{title}</span>
-        <button type="button" aria-expanded={visible} aria-controls={id} onClick={() => setExpanded((value) => !value)} className="flex min-h-11 w-full items-center justify-between gap-3 text-left font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-red-700 md:hidden">
-          {title}
-          <ChevronDown aria-hidden="true" className={`h-4 w-4 shrink-0 transition-transform motion-reduce:transition-none ${visible ? 'rotate-180' : ''}`} />
-        </button>
-      </h3>
-      <div id={id} hidden={!visible} className="responsive-details-panel pt-3">{children}</div>
-    </div>
+    <details className={className} data-responsive-details open={visible}
+      onToggle={(event) => {
+        if (!desktop) setExpanded(event.currentTarget.open);
+      }}>
+      <summary aria-controls={id} onClick={(event) => {
+        if (desktop) event.preventDefault();
+      }} className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-left text-base font-bold text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-red-700 md:cursor-default">
+        <h3>{title}</h3>
+        <ChevronDown aria-hidden="true" className={`h-4 w-4 shrink-0 transition-transform motion-reduce:transition-none md:hidden ${visible ? 'rotate-180' : ''}`} />
+      </summary>
+      <div id={id} className="responsive-details-panel pt-3">{children}</div>
+    </details>
   );
 }

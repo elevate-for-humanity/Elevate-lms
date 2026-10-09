@@ -124,8 +124,18 @@ jobs:
           node --input-type=module <<'NODE'
           import { execFileSync } from 'node:child_process';
           import { assertNoActiveExecutions } from './scripts/gcp/execute-course-job.mjs';
-          const executions=JSON.parse(execFileSync('gcloud',['run','jobs','executions','list','--job=elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
-          assertNoActiveExecutions(executions);
+          for (let attempt = 1; attempt <= 21; attempt++) {
+            const executions=JSON.parse(execFileSync('gcloud',['run','jobs','executions','list','--job=elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            try {
+              assertNoActiveExecutions(executions);
+              console.log('Shared regional capacity is available.');
+              break;
+            } catch (error) {
+              if (error.message !== 'COURSE_JOB_ALREADY_ACTIVE' || attempt === 21) throw error;
+              console.log('Course execution is active; waiting 60 seconds before checking again (' + attempt + '/20).');
+              await new Promise(resolve => setTimeout(resolve, 60000));
+            }
+          }
           NODE
 
       - name: Build Marketing image

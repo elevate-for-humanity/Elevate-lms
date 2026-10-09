@@ -16,9 +16,9 @@ const FEATURED_SHOPS = [
   {
     name: "Razor’s Image Barbershop",
     program: 'Barber',
-    image: '/images/partners/razors-image-video-poster.webp',
+    image: '/images/partners/razors-image/owner-portrait-enhanced-2026.webp',
     imageAlt: 'Aaron Brown of Razor’s Image Barbershop introducing his host shop',
-    imagePosition: '50% 38%',
+    imagePosition: '50% 50%',
     location: 'Bloomington, IN',
     shopHref: '/host-shops/razors-image-barbershop-deedb623',
   },

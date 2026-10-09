@@ -5,6 +5,7 @@ import { syncLicenseFromSaasEntitlements } from '@/lib/platform/sync-license-fro
 import type { BasePlanId, BillingInterval } from '@/lib/store/platform-pricing';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { TESTING_CENTER } from '@/lib/testing/testing-config';
+import { notifyAdminOfStudentPayment } from '@/lib/billing/notify-student-payment';
 
 type Database = any;
 
@@ -48,6 +49,7 @@ export async function fulfillPaidBillingInvoice(
       })
       .eq('id', payload.enrollment_id);
     if (enrollment.error) throw new Error(enrollment.error.message);
+    await notifyAdminOfStudentPayment(db, job.billing_invoice_id, payload);
     return;
   }
   if (job.fulfillment_type === 'tenant_offer') {
@@ -371,6 +373,7 @@ export async function fulfillPaidBillingInvoice(
       .eq('id', payload.enrollment_id)
       .eq('payment_status', 'pending');
     if (result.error) throw new Error(result.error.message);
+    await notifyAdminOfStudentPayment(db, job.billing_invoice_id, payload);
     return;
   }
 

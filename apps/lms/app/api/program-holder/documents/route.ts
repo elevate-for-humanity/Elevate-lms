@@ -17,6 +17,7 @@ const DOCUMENT_TYPES = new Set([
   ...CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type),
   ...HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type),
   'company_logo',
+  'provider_invoice',
 ]);
 
 export async function POST(request: NextRequest) {
@@ -31,6 +32,23 @@ export async function POST(request: NextRequest) {
   const documentType = String(form.get('documentType') || '');
   if (!(file instanceof File) || !DOCUMENT_TYPES.has(documentType as any))
     return NextResponse.json({ error: 'Choose a required document and file.' }, { status: 400 });
+  if (documentType === 'provider_invoice') {
+    const holder = await ctx.db
+      .from('program_holders')
+      .select('organization_name')
+      .eq('id', ctx.holderId)
+      .maybeSingle();
+    if (holder.error || holder.data?.organization_name !== 'The CDL Academy')
+      return NextResponse.json(
+        { error: 'Training invoice submission is unavailable for this account.' },
+        { status: 403 },
+      );
+    if (file.type === 'video/mp4')
+      return NextResponse.json(
+        { error: 'Submit the invoice as a PDF, JPG, or PNG.' },
+        { status: 400 },
+      );
+  }
   const maxBytes = file.type === 'video/mp4' ? MAX_VIDEO_BYTES : MAX_BYTES;
   if (!MIME_TYPES.has(file.type) || file.size <= 0 || file.size > maxBytes)
     return NextResponse.json(
@@ -64,7 +82,10 @@ export async function POST(request: NextRequest) {
       file_url: path,
       file_size: file.size,
       mime_type: file.type,
-      description: 'Submitted through protected Program Holder onboarding',
+      description:
+        documentType === 'provider_invoice'
+          ? 'CDL training invoice submitted to Elevate for payment review'
+          : 'Submitted through protected Program Holder onboarding',
       uploaded_by: ctx.user.id,
       uploaded_at: now,
       status: 'pending',

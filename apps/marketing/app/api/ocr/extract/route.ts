@@ -132,19 +132,22 @@ export async function POST(req: NextRequest) {
         result = extracted;
     }
 
-    // Log extraction for audit
-    await supabase
+    // The canonical OCR table stores document metadata; actor and program
+    // context belong in the authenticated server audit log.
+    const { error: auditError } = await supabase
       .from('ocr_extractions')
       .insert({
-        user_id: user.id,
         document_type: documentType,
-        program_context: programContext,
         file_name: file.name,
         file_type: file.type,
-        success: true,
-        extracted_at: new Date().toISOString(),
-      })
-      .then(()=>{}, ()=>{}); // Don't fail if logging fails
+      });
+    logger.info('OCR extraction completed', {
+      userId: user.id, programContext, documentType,
+      metadataPersisted: !auditError,
+    });
+    if (auditError) logger.warn('OCR extraction metadata audit write failed', {
+      code: auditError.code,
+    });
 
     return NextResponse.json({
       success: true,

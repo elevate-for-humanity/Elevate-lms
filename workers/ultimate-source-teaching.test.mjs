@@ -75,3 +75,16 @@ test('duplicate narration repairs the source blueprint rather than rerendering t
  const {routeSelectiveRepairs}=await import(data(raw));
  assert.deepEqual(routeSelectiveRepairs([{step:'finished_media_qa',severity:'error',code:'NARRATION_DUPLICATION',message:'Repeated practice narration'}]),[{step:'learning_objectives',codes:['NARRATION_DUPLICATION'],rebuildOnlyThisStage:true}]);
 });
+
+test('questionless and single-question lessons do not repeat teaching across fallback stages',async()=>{
+ const raw=stripTypeScriptTypes(await readFile(new URL('../lib/video/instructional-quality-gate.ts',import.meta.url),'utf8'));
+ const {repeatedTeachingSegments}=await import(data(raw));
+ for(const knowledgeChecks of [[],[{question:'How should a completed service transaction be documented?',options:['Record the service and payment','Ignore the payment','Discard the service record'],correct:0,explanation:'Enter the service description and payment amount in the authorized record.'}]]) {
+  const body='Record each completed service with the date, price, and payment method.';
+  const text='Authorized course content: '+JSON.stringify({html:'<p>'+body+'</p>',experience:{knowledgeChecks}});
+  const result=sourceTeaching([{id:'records',text}],'Maintain financial or account records');
+  assert.match(result.stageText.concept_explanation,/Record each completed service/);
+  assert.equal(repeatedTeachingSegments(Object.values(result.stageText).join('\n\n')),0);
+  assert.notEqual(result.stageText.knowledge_check,result.stageText.assessment);
+ }
+});

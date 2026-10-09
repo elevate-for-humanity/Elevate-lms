@@ -42,12 +42,15 @@ jobs:
           }
           if(!/^elevate-course-builder-[a-z0-9]+$/.test(execution)) throw new Error('COURSE_EXECUTION_NAME_INVALID');
           const run=call(['run','jobs','executions','describe',execution,'--project=elegant-racer-299721','--region=us-central1','--format=json']);
-          console.log(JSON.stringify({execution,status:run.status,image:run.spec?.template?.spec?.containers?.[0]?.image}));
+          const task=run.spec?.template?.spec ?? {};
+          const container=task.containers?.[0] ?? {};
+          console.log(JSON.stringify({execution,status:run.status,image:container.image,timeoutSeconds:task.timeoutSeconds,maxRetries:task.maxRetries,mode:(container.env || []).filter(x=>['ULTIMATE_WORKER_ONCE','AI_NARRATION_PROVIDER','AI_TRANSCRIPTION_PROVIDER'].includes(x.name))}));
           const filter='resource.type="cloud_run_job" AND resource.labels.job_name="elevate-course-builder" AND labels."run.googleapis.com/execution_name"="'+execution+'"';
-          const logs=call(['logging','read',filter,'--project=elegant-racer-299721','--limit=30','--format=json']);
+          const logs=call(['logging','read',filter,'--project=elegant-racer-299721','--freshness=2h','--limit=200','--format=json']);
+          console.log(JSON.stringify({logCount:logs.length,logTypes:[...new Set(logs.map(x=>x.logName))]}));
           for(const item of logs) {
             const message=String(item.textPayload ?? item.jsonPayload?.message ?? '');
-            if(!/error|failed|exception|ultimate_|claim|complete|starting/i.test(message)) continue;
+            if(!/error|failed|exception|ultimate_|claim|complete|starting|polling|once|narration/i.test(message)) continue;
             const safe=message.replace(/Bearer\s+\S+/gi,'Bearer [redacted]').replace(/(token|password|secret|api[_-]?key)\s*[:=]\s*\S+/gi,'$1=[redacted]').slice(0,1500);
             console.log(JSON.stringify({timestamp:item.timestamp,severity:item.severity,message:safe}));
           }

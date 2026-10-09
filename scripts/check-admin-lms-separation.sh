@@ -13,23 +13,7 @@ pass() {
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-# CI images do not all include ripgrep; preserve the same checks with grep.
-if command -v rg >/dev/null 2>&1; then
-  search() { rg "$@"; }
-else
-  search() {
-    local args=() pattern="" path=""
-    for arg in "$@"; do
-      case "$arg" in
-        -q|-Fq|-n) args+=("$arg");;
-        -g) shift;;
-        "*.tsx") ;;
-        *) if [[ -z "$pattern" ]]; then pattern="$arg"; else path="$arg"; fi;;
-      esac
-    done
-    if [[ -n "$path" ]]; then grep -R "${args[@]}" -- "$pattern" "$path"; else grep "${args[@]}" -- "$pattern"; fi
-  }
-fi
+# Use portable grep checks on GitHub runner images without ripgrep.
 
 # 1) The separate Google container images must serve their own applications.
 LMS_DOCKERFILE="Dockerfile.northflank-lms"

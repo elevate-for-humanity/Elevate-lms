@@ -78,6 +78,7 @@ jobs:
           set -euo pipefail
           test "$NEXT_PUBLIC_SUPABASE_URL" = 'https://cuxzzpsyufcewtmicszk.supabase.co'
           test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"
+          node --test workers/ultimate-source-teaching.test.mjs
           node scripts/verify-admin-instrumentation-boundary.mjs
           node scripts/verify-portal-production-contracts.mjs
           docker build -f Dockerfile.northflank-admin -t "elevate-admin:$GITHUB_SHA" \

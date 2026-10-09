@@ -35,6 +35,7 @@ type Message = {
   direction: 'inbound' | 'outbound';
   status: string;
   sender_email: string;
+  reply_to?: string;
   sender_name?: string | null;
   to_addresses: string[];
   subject: string;
@@ -129,7 +130,11 @@ export function EmailWorkspace({
     if (data?.readOnly) return;
     const messages = data?.selectedThread?.messages ?? [];
     const lastInbound = [...messages].reverse().find((message) => message.direction === 'inbound');
-    const recipient = lastInbound?.sender_email || messages.at(-1)?.to_addresses?.[0] || '';
+    const recipient =
+      lastInbound?.reply_to ||
+      lastInbound?.sender_email ||
+      messages.at(-1)?.to_addresses?.[0] ||
+      '';
     setCompose({
       threadId: data?.selectedThread?.id,
       to: recipient,
@@ -168,6 +173,7 @@ export function EmailWorkspace({
     setCompose(null);
     setFiles([]);
     await load(data.selectedMailboxId, payload.threadId);
+    if (payload.warning) setError(payload.warning);
   }
 
   if (loading && !data) {
@@ -204,7 +210,8 @@ export function EmailWorkspace({
       {data.readOnly ? (
         <div className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm font-bold text-amber-950">
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
-          Administrator preview is read-only. You can inspect the selected {roleLabel} mailbox, but only an authorized {roleLabel} user can compose, reply, or mark messages as read.
+          Administrator preview is read-only. You can inspect the selected {roleLabel} mailbox, but
+          only an authorized {roleLabel} user can compose, reply, or mark messages as read.
         </div>
       ) : null}
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">

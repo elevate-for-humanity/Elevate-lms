@@ -1,0 +1,53 @@
+name: Student Career Services Production Acceptance
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Deploy LMS]
+    types: [completed]
+permissions:
+  contents: read
+concurrency:
+  group: student-career-production-e2e
+  cancel-in-progress: false
+jobs:
+  learner-acceptance:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 35
+    env:
+      PLAYWRIGHT_BASE_URL: https://app.elevateforhumanity.org
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Verify deployed LMS readiness
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --max-time 15 https://app.elevateforhumanity.org/api/health >/dev/null
+      - name: Require isolated QA account provisioning
+        run: |
+          test -n "$NEXT_PUBLIC_SUPABASE_URL" || exit 1
+          test -n "$SUPABASE_SERVICE_ROLE_KEY" || exit 1
+      - name: Provision disposable learner
+        run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
+      - name: Install Chromium
+        run: pnpm exec playwright install chromium --with-deps
+      - name: Verify live authenticated student resume lifecycle
+        run: pnpm exec playwright test tests/e2e/student-career-resume.spec.ts --project=desktop-chrome --config playwright.config.ts
+      - name: Remove disposable learner and program holder
+        if: always()
+        run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup

@@ -10,11 +10,7 @@ import { LMS_HOST, MARKETING_HOST } from '@/lib/routing/portal-map';
 // These route families are authenticated operational software, not public
 // marketing pages. Protect the complete family so child routes cannot inherit
 // a weaker boundary than their dashboard entry point.
-const PROTECTED_PORTAL_PREFIXES = [
-  '/case-manager',
-  '/workforce-board',
-  '/provider',
-] as const;
+const PROTECTED_PORTAL_PREFIXES = ['/case-manager', '/workforce-board', '/provider'] as const;
 
 // Competency forms are operational apprenticeship records. They used to be
 // rendered by the public marketing app, which made blank sign-off sheets and
@@ -40,8 +36,20 @@ const ELEVATE_PUBLIC_HOSTS = new Set([
 const DEPLOYMENT_HOST_SUFFIXES = ['.northflank.app', '.run.app'] as const;
 
 const STORE_RUNTIME_ALLOWED_PREFIXES = [
-  '/store', '/login', '/signup', '/register', '/forgot-password', '/reset-password', '/auth',
-  '/api/store', '/api/webhooks/store', '/api/webhooks/stripe', '/api/auth', '/api/ping', '/api/health', '/api/ready', '/api/version',
+  '/store',
+  '/login',
+  '/signup',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/auth',
+  '/api/store',
+  '/api/webhooks/store',
+  '/api/webhooks/stripe',
+  '/api/auth',
+  '/api/ping',
+  '/api/health',
+  '/api/ready',
 ] as const;
 
 function isProtectedPortal(pathname: string) {
@@ -50,7 +58,10 @@ function isProtectedPortal(pathname: string) {
   );
 }
 
-function cookieOptions(name: string, options: Record<string, unknown> | undefined): Record<string, unknown> {
+function cookieOptions(
+  name: string,
+  options: Record<string, unknown> | undefined,
+): Record<string, unknown> {
   const isAuthCookie = name.startsWith('sb-') && name.includes('-auth-token');
   return {
     ...(options || {}),
@@ -84,7 +95,13 @@ function requestHost(req: NextRequest) {
 }
 
 function isStaticRequest(pathname: string) {
-  return pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.startsWith('/robots.txt') || pathname.startsWith('/sitemap') || /\.[a-z0-9]+$/i.test(pathname);
+  return (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/favicon') ||
+    pathname.startsWith('/robots.txt') ||
+    pathname.startsWith('/sitemap') ||
+    /\.[a-z0-9]+$/i.test(pathname)
+  );
 }
 
 function isCustomTenantHost(host: string) {
@@ -101,11 +118,7 @@ function isDeploymentHost(host: string) {
   );
 }
 
-function deploymentHostResponse(
-  pathname: string,
-  search: string,
-  requestHeaders: Headers,
-) {
+function deploymentHostResponse(pathname: string, search: string, requestHeaders: Headers) {
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
   response.headers.set(
@@ -116,7 +129,9 @@ function deploymentHostResponse(
 }
 
 function isStoreRuntimeAllowed(pathname: string): boolean {
-  return STORE_RUNTIME_ALLOWED_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+  return STORE_RUNTIME_ALLOWED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
 }
 
 function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextResponse | null {
@@ -127,7 +142,10 @@ function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextRespons
     return NextResponse.redirect(url, 307);
   }
   if (isStoreRuntimeAllowed(pathname)) return NextResponse.next();
-  return NextResponse.redirect(new URL(`https://www.elevateforhumanity.org${pathname}${req.nextUrl.search}`), 307);
+  return NextResponse.redirect(
+    new URL(`https://www.elevateforhumanity.org${pathname}${req.nextUrl.search}`),
+    307,
+  );
 }
 
 export async function middleware(req: NextRequest) {
@@ -173,7 +191,8 @@ export async function middleware(req: NextRequest) {
 
   const tenantSlug = tenantSlugFromAppHost(host);
   if (tenantSlug) return rewriteTenantAppHostRequest(req, tenantSlug, pathname, requestHeaders);
-  if (isCustomTenantHost(host)) return rewriteCustomDomainRequest(req, host, pathname, requestHeaders);
+  if (isCustomTenantHost(host))
+    return rewriteCustomDomainRequest(req, host, pathname, requestHeaders);
 
   // Preserve the pathname header for all requests so the root layout can
   // reliably distinguish operational software from public marketing chrome.
@@ -186,11 +205,18 @@ export async function middleware(req: NextRequest) {
     cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
     response = NextResponse.next({ request: { headers: requestHeaders } });
     cookiesToSet.forEach(({ name, value, options }) => {
-      response.cookies.set(name, value, cookieOptions(name, options as Record<string, unknown>) as any);
+      response.cookies.set(
+        name,
+        value,
+        cookieOptions(name, options as Record<string, unknown>) as any,
+      );
     });
   });
 
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
   if (error || !user) {
     const loginUrl = new URL('/login', LMS_HOST);
     loginUrl.searchParams.set('redirect', `${MARKETING_HOST}${pathname}${search}`);

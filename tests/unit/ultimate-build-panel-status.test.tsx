@@ -1,5 +1,5 @@
 import React from 'react';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { UltimateBuildPanel } from '@/components/admin/course-builder/UnifiedCourseBuilder';
 vi.mock('@/components/admin/course-builder/CredentialRegistryPanel', () => ({
@@ -52,14 +52,22 @@ it('shows a failed durable job and allows resuming an existing build whose aggre
   expect(screen.queryByRole('button', { name: 'Ultimate build running' })).not.toBeInTheDocument();
 });
 
-it.each(['queued', 'running'])(
-  'uses the durable %s job to prevent a duplicate start',
-  async (status) => {
-    show(status);
-    expect(await screen.findByText(`${status} · persisted-job`)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: `Ultimate build ${status}` })).toBeDisabled();
-  },
-);
+it('prevents another start while the durable worker job is running', async () => {
+  show('running');
+  expect(await screen.findByText('running · persisted-job')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Ultimate build running' })).toBeDisabled();
+});
+
+it('starts the Google worker for the existing queued build without creating a duplicate course build', async () => {
+  show('queued');
+  expect(await screen.findByText('queued · persisted-job')).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Start Google worker' }));
+  await waitFor(() => expect(fetch).toHaveBeenCalledWith('/api/admin/ultimate-course-builder/run', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ buildId: 'existing-build' }),
+  }));
+  expect(vi.mocked(fetch).mock.calls.filter(([url, options]) => url === '/api/admin/ultimate-course-builder' && options?.method === 'POST')).toHaveLength(0);
+});
 
 it('does not present a completed worker job as a completed course or offer publication before acceptance', async () => {
   show('completed');

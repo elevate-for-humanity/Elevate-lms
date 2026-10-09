@@ -1,6 +1,6 @@
 {
   "repository": "elevate-for-humanity/next-platform-starter",
-  "commit": "5ab3a233bc2a9ff625713145cdb1c40133a24359",
+  "commit": "fb2ce99454fd54a60c2ff4f86db7332425b1dd83",
   "files": [
     {
       "source": "app/tax/page.tsx",
@@ -105,7 +105,7 @@
     {
       "source": "app/api/ocr/extract/route.ts",
       "target": "apps/marketing/app/api/ocr/extract/route.ts",
-      "sha256": "2958855d6535df0be40fdda089206d0d4db308909b82ddaa3f0c90b781c52ca2"
+      "sha256": "ea9463cdc4bd4801118eb5c56eb47e985bc79bdb8d9336f41fd745c37526f56f"
     },
     {
       "source": "lib/tax-software/calculation/ty2026-base-1040.ts",

@@ -105,7 +105,8 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/barber-beauty-network',
     subItems: [
       { name: 'Network Home', href: '/barber-beauty-network', isSectionLink: true },
-      { name: 'Member Community', href: ROUTES.lmsCommunity, isSectionLink: true },
+      { name: 'Join the Community', href: '/community', isSectionLink: true },
+      { name: 'Member Community', href: 'https://app.elevateforhumanity.org/community', isSectionLink: true },
       { name: 'Host Shop Directory', href: '/partners/host-shops', isSectionLink: true },
       { name: 'Job Board', href: '/jobs', isSectionLink: true },
       { name: 'Join & Showcase Your Work', href: '/host-shop/apply', isSectionLink: true },

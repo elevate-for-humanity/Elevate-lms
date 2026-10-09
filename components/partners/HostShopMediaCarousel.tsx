@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink, PlayCircle } from 'lucide-react';
 
 type MediaItem = {
@@ -24,10 +24,12 @@ export default function HostShopMediaCarousel({
   shopName,
   items,
   videoUrl,
+  compact = false,
 }: {
   shopName: string;
   items: MediaItem[];
   videoUrl?: string;
+  compact?: boolean;
 }) {
   const media = useMemo(() => {
     const candidates: MediaItem[] = [
@@ -44,6 +46,12 @@ export default function HostShopMediaCarousel({
     });
   }, [items, shopName, videoUrl]);
   const [index, setIndex] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  useEffect(() => {
+    if (!playing || media.length < 2) return;
+    const timer = window.setInterval(() => setIndex((current) => (current + 1) % media.length), 5000);
+    return () => window.clearInterval(timer);
+  }, [playing, media.length]);
 
   if (!media.length) return null;
   const safeIndex = Math.min(index, media.length - 1);
@@ -53,9 +61,9 @@ export default function HostShopMediaCarousel({
 
   return (
     <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg sm:rounded-3xl">
-      <div className="relative aspect-[4/3] w-full bg-white sm:aspect-[16/10] lg:max-h-[560px]">
+      <div className={`relative w-full bg-slate-950 ${compact ? "aspect-[16/10]" : "aspect-[4/3] sm:aspect-[16/10] lg:max-h-[560px]"}`}>
         {active.type === 'video' ? (
-          <video key={active.url} src={active.url} autoPlay muted playsInline loop preload="auto" className="host-shop-media-enter h-full w-full object-contain bg-black" aria-label={active.alt || `${shopName} video`} />
+          <video key={active.url} src={active.url} controls playsInline preload="metadata" className="host-shop-media-enter h-full w-full object-contain bg-black" aria-label={active.alt || `${shopName} video`} />
         ) : (
           <img key={active.url} src={active.url} alt={active.alt || `${shopName} promotional image`} className="host-shop-media-enter h-full w-full object-contain" loading="lazy" decoding="async" />
         )}
@@ -68,7 +76,8 @@ export default function HostShopMediaCarousel({
         {active.type === 'video' ? <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1.5 text-xs font-black text-white"><span className="inline-flex items-center gap-1.5"><PlayCircle className="h-4 w-4" /> Video</span></div> : null}
       </div>
       <div className="flex min-h-12 flex-wrap items-center justify-between gap-2 border-t border-slate-200 px-4 py-3 text-sm text-slate-600">
-        <span>{media.length > 1 ? `${safeIndex + 1} of ${media.length}` : 'Verified business media'}</span>
+        {media.length > 1 ? <button type="button" onClick={() => setPlaying((current) => !current)} className="min-h-11 font-bold text-slate-900" aria-label={playing ? 'Pause slideshow' : 'Play slideshow'}>{playing ? 'Pause slideshow' : 'Play slideshow'}</button> : null}
+        <span>{media.length > 1 ? `${safeIndex + 1} of ${media.length}` : active.alt?.startsWith('Representative') ? 'Representative training image' : 'Shop portfolio'}</span>
         {active.source ? <a href={active.source} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-bold text-slate-900 hover:underline">Media source <ExternalLink className="h-3.5 w-3.5" /></a> : null}
       </div>
       <style jsx>{`

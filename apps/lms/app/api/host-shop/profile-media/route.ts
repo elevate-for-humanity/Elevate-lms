@@ -31,8 +31,8 @@ export async function POST(request: NextRequest) {
   const form = await request.formData();
   const kind = String(form.get('kind') || '');
   const file = form.get('file');
-  if (kind !== 'logo' && kind !== 'flyer' && kind !== 'video') {
-    return NextResponse.json({ ok: false, error: 'Choose logo, flyer, or video.' }, { status: 400 });
+  if (kind !== 'logo' && kind !== 'flyer' && kind !== 'photo' && kind !== 'video') {
+    return NextResponse.json({ ok: false, error: 'Choose logo, flyer, photo, or video.' }, { status: 400 });
   }
   const isVideo = kind === 'video';
   const allowedTypes = isVideo ? VIDEO_TYPES : IMAGE_TYPES;
@@ -71,11 +71,32 @@ export async function POST(request: NextRequest) {
 
   const { data: publicData } = db.storage.from('website-assets').getPublicUrl(path);
   const publicUrl = publicData.publicUrl;
-  const field = kind === 'logo' ? 'logo_url' : kind === 'flyer' ? 'flyer_url' : 'video_url';
-  const { error: updateError } = await db
-    .from('partners')
-    .update({ [field]: publicUrl, updated_at: new Date().toISOString() })
-    .eq('id', partnerId);
+  let updateError: { message: string } | null = null;
+  if (kind === 'photo') {
+    // Compare the previous gallery before replacing it so concurrent uploads
+    // cannot silently discard another photo.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const { data: current, error: readError } = await db.from('partners')
+        .select('media_gallery,updated_at').eq('id', partnerId).single();
+      if (readError || !current) { updateError = readError || { message: 'Partner not found.' }; break; }
+      const gallery = Array.isArray(current.media_gallery) ? current.media_gallery : [];
+      const mutation = db.from('partners').update({
+        media_gallery: [{ url: publicUrl, alt: `${board.partner?.name || 'Shop'} portfolio photo` }, ...gallery],
+        updated_at: new Date().toISOString(),
+      }).eq('id', partnerId);
+      const { data: saved, error } = await (current.updated_at
+        ? mutation.eq('updated_at', current.updated_at)
+        : mutation.is('updated_at', null)).select('id');
+      if (error) { updateError = error; break; }
+      if (saved?.length) { updateError = null; break; }
+      updateError = { message: 'Another upload updated this gallery. Please try again.' };
+    }
+  } else {
+    const field = kind === 'logo' ? 'logo_url' : kind === 'flyer' ? 'flyer_url' : 'video_url';
+    const result = await db.from('partners')
+      .update({ [field]: publicUrl, updated_at: new Date().toISOString() }).eq('id', partnerId);
+    updateError = result.error;
+  }
 
   if (updateError) {
     await db.storage.from('website-assets').remove([path]);

@@ -6,22 +6,22 @@ const PATHWAYS = [
   {
     slug: 'hvac-technician', title: 'HVAC Technician',
     description: 'Learn heating and cooling fundamentals, electrical safety, diagnostics, maintenance and equipment service. Explore classroom and hands-on training options.',
-    image: '/images/hvac-hero.webp', alt: 'HVAC technician working on heating and cooling equipment', href: '/programs/hvac-technician',
+    image: '/images/hvac-training-vibrant-2026.webp', alt: 'Illustrative HVAC training scene with a trainee and mentor', href: '/programs/hvac-technician',
   },
   {
     slug: 'cdl-training', title: 'CDL Training',
     description: 'Prepare for commercial driving through permit study, vehicle inspections, safety procedures and supervised driving practice.',
-    image: '/images/pages/cdl-loading-dock.webp', alt: 'Commercial truck at a loading dock', href: '/programs/cdl-training',
+    image: '/images/cdl-training-vibrant-2026.webp', alt: 'Illustrative commercial driving training scene', href: '/programs/cdl-training',
   },
   {
     slug: 'bookkeeping', title: 'Bookkeeping',
     description: 'Learn financial records, payroll, accounts payable and receivable, reconciliations and practical QuickBooks workflows.',
-    image: '/images/pages/bookkeeping-ledger.webp', alt: 'Bookkeeping records and ledger materials', href: '/programs/bookkeeping',
+    image: '/images/bookkeeping-training-vibrant-2026.webp', alt: 'Illustrative bookkeeping learner and mentor', href: '/programs/bookkeeping',
   },
   {
     slug: 'business', title: 'Business & Entrepreneurship',
     description: 'Develop a business plan and practical skills in budgeting, marketing, customer service, operations and business administration.',
-    image: '/images/pages/business-meeting.webp', alt: 'Business professionals collaborating at a meeting', href: '/programs/business-administration',
+    image: '/images/business-training-vibrant-2026.webp', alt: 'Illustrative business planning collaboration', href: '/programs/business-administration',
   },
 ] as const;
 

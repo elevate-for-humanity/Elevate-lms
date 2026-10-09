@@ -49,13 +49,14 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     marketingBlurb:
       'A family-oriented Main Street barbershop serving New Palestine with classic cuts, modern grooming, and an apprenticeship training environment.',
     media: [
+      { src: '/videos/partners/kountry-kutz-tour.mp4', alt: 'Kountry Kutz Barbershop video introduction and tour', kind: 'video' },
       {
-        src: '/images/partners/kountry-kutz/interior-empty.webp',
+        src: '/images/partners/kountry-kutz/interior-empty-enhanced-2026.webp',
         alt: 'Kountry Kutz Barbershop interior and apprenticeship training stations',
         kind: 'photo',
       },
       {
-        src: '/images/partners/kountry-kutz/interior-active.webp',
+        src: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp',
         alt: 'Barbers and clients inside Kountry Kutz Barbershop in New Palestine',
         kind: 'photo',
       },
@@ -109,11 +110,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         alt: 'Top Shelf Barber Lounge modern fringe haircut with tapered sides',
         kind: 'photo',
       },
-      {
-        src: 'https://d2ugbn5gb88fyp.cloudfront.net/1265883/0_0.jpg',
-        alt: 'Top Shelf Barber Lounge barber providing a haircut',
-        kind: 'photo',
-      },
+
       {
         src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-and-beard.jpg',
         alt: 'Top Shelf Barber Lounge fade haircut and full beard shaping',
@@ -137,11 +134,12 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     marketingBlurb:
       'A full-service Indianapolis barber studio offering precision cuts, grooming, hair-loss consultation, and professional mentorship in a working shop environment.',
     media: [
-      {
-        src: '/images/partners/cals-kutz-official.webp',
-        alt: 'Cals Kutz Studio professional barber shop and apprenticeship host image',
-        kind: 'photo',
-      },
+      { src: '/images/partners/cals-kutz/cut-profile-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced fade and beard profile photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/curly-cut-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced curly haircut photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/beard-cut-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced beard and precision cut photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/client-cut-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced client haircut photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/interior-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced studio interior photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/storefront-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced storefront photograph', kind: 'photo' },
       {
         src: '/images/partners/cals-kutz-confidence-restored.webp',
         alt: 'Cals Kutz Studio Confidence Restored hair replacement promotion',
@@ -215,8 +213,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'A traditional New Castle barbershop known for classic barber services including haircuts, razor line-ups, fades, and straight-razor shaves.',
     media: [
       {
-        src: '/images/partners/b52s-official.webp',
-        alt: "B-52's Barbershop in New Castle, Indiana",
+        src: '/images/pages/barber-shop-interior.webp',
+        alt: 'Representative barber training environment; not a photograph of B-52s',
         kind: 'photo',
       },
     ],
@@ -239,8 +237,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'A community salon and barber shop in downtown Sullivan offering hair services and traditional barbering in a local, client-focused setting.',
     media: [
       {
-        src: '/images/partners/style-and-scissor-salon/pink-nail-work.webp',
-        alt: 'Professional pink nail designs completed at Style and Scissor Salon',
+        src: '/images/partners/style-and-scissor-salon/logo.webp',
+        alt: 'Style and Scissor Salon business logo',
         kind: 'photo',
       },
       {
@@ -282,8 +280,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'An independent Martinsville hair business located inside Cat Eye Collective and participating in the Elevate apprenticeship host-shop network.',
     media: [
       {
-        src: '/images/partners/generations-hair/color-transformation.webp',
-        alt: 'Generations Hair LLC dimensional color transformation',
+        src: '/images/partners/generations-hair/premium-curls.jpg',
+        alt: 'Generations Hair highlighted curls portfolio',
         kind: 'photo',
       },
       {

@@ -41,7 +41,7 @@ const DEPLOYMENT_HOST_SUFFIXES = ['.northflank.app', '.run.app'] as const;
 
 const STORE_RUNTIME_ALLOWED_PREFIXES = [
   '/store', '/login', '/signup', '/register', '/forgot-password', '/reset-password', '/auth',
-  '/api/store', '/api/webhooks/store', '/api/webhooks/stripe', '/api/auth', '/api/ping', '/api/health', '/api/ready', '/api/version',
+  '/api/store', '/api/webhooks/store', '/api/webhooks/stripe', '/api/auth', '/api/ping', '/api/health', '/api/ready',
 ] as const;
 
 function isProtectedPortal(pathname: string) {

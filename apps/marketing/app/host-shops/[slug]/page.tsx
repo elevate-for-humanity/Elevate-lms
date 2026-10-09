@@ -111,7 +111,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   }
 
   const address = [approved.address, approved.city, approved.state, approved.zip].filter(Boolean).join(', ');
-  const externalUrl = profile.website_url || profile.website;
+  const externalUrl = profile.website_url || profile.website || getFeaturedHostPartnerBySlug(slug)?.websiteUrl;
   const mapUrl = approved.googleMapsUrl || (address ? directionsUrl(address) : undefined);
   const gallery = Array.isArray(profile.media_gallery) ? profile.media_gallery : [];
   const featuredFallback = getFeaturedHostPartnerBySlug(slug);
@@ -123,9 +123,9 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   const videoScript = featuredFallbackVideoMedia?.script;
   const items = dedupeMedia([
     ...gallery,
+    ...featuredFallbackImages,
     ...(profile.logo_url ? [{ url: profile.logo_url, alt: `${approved.name} logo`, source: profile.source_url || externalUrl || undefined }] : []),
     ...(profile.flyer_url ? [{ url: profile.flyer_url, alt: `${approved.name} flyer`, source: profile.source_url || externalUrl || undefined }] : []),
-    ...featuredFallbackImages,
   ]);
   const programs = approved.programs;
   const canonical = `${SITE_URL}/host-shops/${profile.public_slug}`;
@@ -170,7 +170,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
             </div>
           </div>
           <div className="min-w-0">
-            {items.length || profile.video_url ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={profile.video_url || featuredFallbackVideo || undefined} /> : address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:rounded-3xl"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+            {items.length || profile.video_url || featuredFallbackVideo ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={profile.video_url || featuredFallbackVideo || undefined} /> : address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:rounded-3xl"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
           </div>
         </div>
       </section>
@@ -378,10 +378,13 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {shop.phone ? <a href={`tel:${shop.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-sm font-extrabold text-white"><Phone className="h-4 w-4" /> Call {shop.phone}</a> : null}
               <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold"><Navigation className="h-4 w-4" /> Map & directions</a>
+              {shop.socialUrl ? <a href={shop.socialUrl} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold">View social portfolio ↗</a> : null}
+              {shop.bookingUrl ? <a href={shop.bookingUrl} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold">Book a service ↗</a> : null}
+              {shop.onlineListingUrl ? <a href={shop.onlineListingUrl} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold">Business listing ↗</a> : null}
               {shop.websiteUrl ? <a href={shop.websiteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold">Shop website <ExternalLink className="h-4 w-4" /></a> : null}
             </div>
           </div>
-          <HostShopMediaCarousel shopName={shop.dba ?? shop.name} items={imageItems} />
+          <div className="order-first lg:order-none"><HostShopMediaCarousel shopName={shop.dba ?? shop.name} items={imageItems} /></div>
         </div>
       </section>
 

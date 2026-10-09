@@ -45,7 +45,7 @@ const guide = [
   },
   {
     title: 'Immediate administrator assistance',
-    body: 'Callers can press 0 or dial extension 100 for the administrator. The administrator PWA rings first. Only that administrator extension may fall back to 317-760-7908; all other extensions remain PWA-only. If the administrator is unavailable, PARIS securely collects the request.',
+    body: 'Call Administration at (317) 999-9620 and use extension 0 for Elizabeth Greene. Confirm current routing in the live directory. If the administrator is unavailable, review the callback options shown in the phone workspace.',
   },
   {
     title: 'Privacy and emergencies',

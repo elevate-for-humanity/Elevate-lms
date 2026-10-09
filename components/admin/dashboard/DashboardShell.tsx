@@ -1,6 +1,7 @@
 // Server component. Operational Admin dashboard using canonical routes and live data only.
 
 import Link from 'next/link';
+import LogoImage from '@/components/site/LogoImage';
 import Image from 'next/image';
 import type { DashboardHeroAsset } from '@/lib/admin/dashboard/get-hero-assets';
 import {
@@ -266,6 +267,7 @@ export function AdminDashboardContent({
         className={`mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm ${heroAssets.length ? 'grid lg:grid-cols-[1.1fr_1fr]' : ''}`}
       >
         <div className="p-5 sm:p-8">
+          <LogoImage alt="Elevate for Humanity" width={180} height={100} className="mb-5 h-24 max-w-full object-contain" />
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-wider text-emerald-900">
               <ShieldCheck className="h-4 w-4" /> Admin session protected

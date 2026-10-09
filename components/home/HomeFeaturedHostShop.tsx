@@ -16,7 +16,7 @@ const FEATURED_SHOPS = [
   {
     name: 'Kountry Kutz Barbershop',
     program: 'Barber',
-    image: '/images/partners/kountry-kutz/interior-active.webp',
+    image: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp',
     imageAlt: 'Barbers and customers inside Kountry Kutz Barbershop',
     imagePosition: '50% 50%',
     location: 'New Palestine, IN',
@@ -31,6 +31,10 @@ export function HomeFeaturedHostShop() {
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-red-700">Earn while you learn</p>
         <h2 id="featured-host-shop-heading" className="mt-2 text-2xl font-bold tracking-tight text-slate-950 sm:text-4xl">Real shops. Real experience.</h2>
         <p className="mt-3 max-w-2xl text-base leading-6 text-slate-700">Explore our featured apprenticeship host shops. Placement and availability are confirmed during enrollment.</p>
+        <article className="mt-6 grid overflow-hidden rounded-2xl bg-slate-950 text-white sm:grid-cols-2">
+          <div className="relative aspect-[1145/1374] bg-black"><Image src="/images/partners/cals-kutz-enhanced-promotion-2026.webp" alt="Cal Kutz Studio enhanced apprenticeship promotional collage" fill sizes="(min-width: 640px) 50vw, 100vw" className="object-contain" /></div>
+          <div className="flex flex-col justify-center p-6 sm:p-8"><p className="text-sm font-bold uppercase tracking-widest text-amber-300">Featured barber partner</p><h3 className="mt-3 text-3xl font-black">Cal’s Kutz Studio</h3><p className="mt-4 text-base leading-7 text-slate-200">Turn your interest in barbering into your next step. Explore the shop’s work, meet the training environment, and ask about apprenticeship enrollment and available payment plans.</p><Link href="/host-shops/cals-kutz-studio" className="mt-5 inline-flex min-h-12 items-center justify-center rounded-xl bg-amber-300 px-5 py-3 font-bold text-slate-950">Explore Cal’s Kutz Studio</Link><Link href="/programs/barber-apprenticeship" className="mt-3 inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-5 py-3 font-bold">Start your barber journey</Link></div>
+        </article>
         <div data-mobile-grid="2" data-featured-shops className="mt-6 grid max-w-3xl grid-cols-2 items-stretch gap-3 sm:gap-5">
           {FEATURED_SHOPS.map((shop) => (
             <article key={shop.name} data-featured-shop={shop.name} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">

@@ -157,6 +157,7 @@ COPY --from=builder --chown=nextjs:nodejs /workspace/remotion-src/ /app/apps/adm
 # remotion-src. Next standalone tracing does not include runtime Webpack inputs.
 COPY --from=builder --chown=nextjs:nodejs /workspace/lib/ultimate-course-builder/instructional/teaching-presentation.ts /app/apps/admin/lib/ultimate-course-builder/instructional/teaching-presentation.ts
 COPY --from=builder --chown=nextjs:nodejs /workspace/lib/ultimate-course-builder/instructional/teaching-visual.ts /app/apps/admin/lib/ultimate-course-builder/instructional/teaching-visual.ts
+COPY --from=builder --chown=nextjs:nodejs /workspace/lib/ultimate-course-builder/instructional/reviewed-scene-evidence.ts /app/apps/admin/lib/ultimate-course-builder/instructional/reviewed-scene-evidence.ts
 COPY --from=builder --chown=nextjs:nodejs /workspace/node_modules /app/node_modules
 RUN set -eux; \
     test -f /app/apps/admin/server.js; \
@@ -168,6 +169,7 @@ RUN set -eux; \
     test -f /app/apps/admin/remotion-src/Root.tsx; \
     test -f /app/apps/admin/lib/ultimate-course-builder/instructional/teaching-presentation.ts; \
     test -f /app/apps/admin/lib/ultimate-course-builder/instructional/teaching-visual.ts; \
+    test -f /app/apps/admin/lib/ultimate-course-builder/instructional/reviewed-scene-evidence.ts; \
     test -d /app/node_modules/sharp; \
     test -d /app/node_modules/@napi-rs/canvas; \
     test -d /app/node_modules/fontkit; \

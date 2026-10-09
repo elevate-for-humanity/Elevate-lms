@@ -146,6 +146,7 @@ RUN groupadd --system --gid 1001 nodejs && \
 # Keep Next.js's generated standalone launcher. Do not overwrite it with the
 # repository's custom development/server harness.
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/standalone/ /app/
+COPY --from=builder --chown=nextjs:nodejs /workspace/workers/admin-speech-cache.mjs /app/apps/admin/workers/admin-speech-cache.mjs
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/static/ /app/apps/admin/.next/static/
 COPY --from=builder --chown=nextjs:nodejs /workspace/public/ /app/apps/admin/public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/public/ /app/apps/admin/public/
@@ -210,6 +211,10 @@ RUN set -eux; \
     trap - EXIT
 
 USER nextjs
+# Populate the narrator cache under the same identity and package paths used by the live server.
+RUN node /app/apps/admin/workers/admin-speech-cache.mjs
+# A second process must narrate with networking disabled; a runtime model download cannot pass.
+RUN --network=none node /app/apps/admin/workers/admin-speech-cache.mjs
 EXPOSE 3000
 
 HEALTHCHECK \

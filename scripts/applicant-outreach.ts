@@ -20,9 +20,9 @@ export async function runApplicantOutreach(mode:string){
  const db=await requireAdminClient();
  function sourceQuery(table:string,columns:string){return db.from(table).select(columns);}
  type Query=ReturnType<typeof sourceQuery>;
- async function all<T=Row>(table:string,columns:string,filter?: (q:Query)=>Query){
+ async function all<T=Row>(table:string,columns:string,filter?: (q:Query)=>Query,orderColumn='id'){
   const rows:T[]=[];
-  for(let offset=0;;offset+=500){let q=sourceQuery(table,columns).order('id').range(offset,offset+499);if(filter)q=filter(q);const result=await q;fail(result.error);rows.push(...result.data as unknown as T[]);if(result.data.length<500)return rows;}
+  for(let offset=0;;offset+=500){let q=sourceQuery(table,columns).order(orderColumn).range(offset,offset+499);if(filter)q=filter(q);const result=await q;fail(result.error);rows.push(...result.data as unknown as T[]);if(result.data.length<500)return rows;}
  }
  if(mode==='prepare'){
   const [applications,holders,leads,crm,programs,evidence,suppressions]=await Promise.all([
@@ -62,7 +62,7 @@ export async function runApplicantOutreach(mode:string){
  const incoming=await all<Inbound>('communication_email_messages','id,inbound_event_id,sender_email,subject,text_body,received_at,to_addresses',q=>q.eq('direction','inbound').gte('received_at',earliest).ilike('subject',`%${APPLICANT_OUTREACH_SUBJECT}%`));
  const byEmail=new Map(contacts.map(c=>[c.email,c]));let classified=0;
  for(const m of incoming.sort((a,b)=>String(a.received_at).localeCompare(b.received_at))){const c=byEmail.get(normalize(m.sender_email));if(!c||!(m.to_addresses||[]).includes(FROM)||m.received_at<c.sent_at)continue;const outcome=classifyApplicantReply(m.text_body||'');const r=await db.rpc('record_applicant_outreach_reply',{p_message_id:m.id,p_contact_id:c.id,p_outcome:outcome});fail(r.error);if(r.data)classified++;}
- const pending=await all<Reply>('applicant_outreach_replies','*',q=>q.eq('followup_status','pending'));let followedUp=0;
+ const pending=await all<Reply>('applicant_outreach_replies','*',q=>q.eq('followup_status','pending'),'message_id');let followedUp=0;
  for(const r of pending){const c=contacts.find(c=>c.id===r.contact_id);if(!c)continue;const current=await db.from('applicant_outreach_contacts').select('interest,archived_at').eq('id',c.id).single();fail(current.error);if(current.data.interest!=='interested'||current.data.archived_at){const skipped=await db.from('applicant_outreach_replies').update({followup_status:'not_required'}).eq('message_id',r.message_id);fail(skipped.error);continue;}
   const claim=await db.from('applicant_outreach_replies').update({followup_status:'sending'}).eq('message_id',r.message_id).eq('followup_status','pending').select('message_id');fail(claim.error);if(!claim.data?.length)continue;
   const text=applicantOutreachText(c.first_name,c.programs,true);let result:Awaited<ReturnType<typeof sendEmail>>;try{result=await sendEmail({to:c.email,from:`PARIS · Elevate Admissions <${FROM}>`,replyTo:FROM,subject:`Re: ${APPLICANT_OUTREACH_SUBJECT}`,text,html:html(text)});}catch{result={success:false};}

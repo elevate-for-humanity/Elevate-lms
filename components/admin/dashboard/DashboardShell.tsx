@@ -287,18 +287,15 @@ export function AdminDashboardContent({
         </div>
         {heroAssets.length > 0 && (
           <div className="grid min-h-64 grid-cols-2 gap-1 bg-slate-950 lg:min-h-80">
-            {heroAssets.map((asset, index) => (
-              <div
-                key={asset.id}
-                className={`relative min-h-64 ${heroAssets.length === 1 ? 'col-span-2' : ''}`}
-              >
+            {heroAssets.slice(0, 1).map((asset, index) => (
+              <div key={asset.id} className={`relative min-h-64 col-span-2`}>
                 <Image
                   src={asset.url}
                   alt={asset.alt}
                   fill
                   unoptimized
                   priority={index === 0}
-                  sizes="(min-width: 1024px) 25vw, 50vw"
+                  sizes="(min-width: 1024px) 50vw, 100vw"
                   className="object-cover"
                 />
               </div>

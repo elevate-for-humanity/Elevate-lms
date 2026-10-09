@@ -18,7 +18,7 @@ export async function getAdminDashboardHeroAssets(): Promise<DashboardHeroAsset[
       .is('deleted_at', null)
       .contains('tags', ['admin-dashboard-hero'])
       .order('updated_at', { ascending: false })
-      .limit(2)
+      .limit(1)
       .abortSignal(AbortSignal.timeout(8000));
     if (error) return [];
     return (data ?? []).flatMap((asset) => {

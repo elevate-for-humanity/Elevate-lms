@@ -24,7 +24,7 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
-import { ENCHANTED_HEARTS, getEnchantedHeartsProgram } from '@/lib/partners/enchanted-hearts';
+import { ENCHANTED_HEARTS } from '@/lib/partners/enchanted-hearts';
 import { resolveQuickBooksProgramPromotion } from '@/lib/payments/quickbooks-program-promotion';
 
 type FundingSource = 'self_pay' | 'workone' | 'wioa' | 'grant' | 'employer';
@@ -80,7 +80,9 @@ export async function POST(request: NextRequest) {
     // Get program details
     const { data: program, error: programError } = await supabase
       .from('programs')
-      .select('id, title, slug, price, tuition, total_cost, status, funding_eligible, funding_confirmed, wioa_approved, etpl_listed, is_free')
+      .select(
+        'id, title, slug, price, tuition, total_cost, status, funding_eligible, funding_confirmed, wioa_approved, etpl_listed, is_free',
+      )
       .eq('id', program_id)
       .maybeSingle();
 
@@ -115,7 +117,10 @@ export async function POST(request: NextRequest) {
     const stickerPrice = Number(program.price ?? program.tuition ?? program.total_cost ?? 0);
     if (funding_source === 'self_pay' && stickerPrice <= 0 && program.is_free !== true) {
       return NextResponse.json(
-        { error: 'Tuition is not published for this program yet. Contact admissions before checkout.' },
+        {
+          error:
+            'Tuition is not published for this program yet. Contact admissions before checkout.',
+        },
         { status: 409 },
       );
     }
@@ -127,7 +132,10 @@ export async function POST(request: NextRequest) {
       !program.etpl_listed
     ) {
       return NextResponse.json(
-        { error: 'This program does not have a verified agency-funded checkout path. Choose self-pay or contact admissions.' },
+        {
+          error:
+            'This program does not have a verified agency-funded checkout path. Choose self-pay or contact admissions.',
+        },
         { status: 409 },
       );
     }
@@ -137,14 +145,40 @@ export async function POST(request: NextRequest) {
 
     const admin = await requireAdminClient();
     const partnerProgram =
-      partner_key === 'enchanted-hearts' ? getEnchantedHeartsProgram(program.slug) : null;
-    if (partner_key === 'enchanted-hearts' && !partnerProgram) {
+      ENCHANTED_HEARTS.programs.find((item) => item.programId === program.id) ?? null;
+    if (
+      ['enchanted-hearts', 'healthcare-training'].includes(partner_key || '') &&
+      !partnerProgram
+    ) {
       return NextResponse.json(
         { error: 'This program is not assigned to that partner.' },
         { status: 400 },
       );
     }
-    let fullAmountCents = Math.round(amountToCharge * 100);
+    if (
+      partnerProgram &&
+      !agencyFundingRequested &&
+      (payment_plan !== 'full' || coupon_code.trim())
+    ) {
+      return NextResponse.json(
+        { error: 'This program requires full tuition payment without a promotion code.' },
+        { status: 400 },
+      );
+    }
+    if (partnerProgram && !agencyFundingRequested) {
+      // The school's previous checkout currently redirects to a no-payment application page.
+      // Do not collect tuition until an active school checkout and payment confirmation are connected.
+      return NextResponse.json(
+        {
+          error:
+            'Online tuition payment is awaiting the school’s active checkout link. Please contact Elevate for enrollment assistance.',
+        },
+        { status: 409 },
+      );
+    }
+    let fullAmountCents = agencyFundingRequested
+      ? 0
+      : (partnerProgram?.retailPriceCents ?? Math.round(amountToCharge * 100));
     let appliedCoupon: { code: string; discountAmountCents: number } | null = null;
     if (coupon_code.trim() && funding_source === 'self_pay') {
       const result = await resolveQuickBooksProgramPromotion({
@@ -208,10 +242,26 @@ export async function POST(request: NextRequest) {
               email: customerEmail,
               full_name: profile?.full_name || customerEmail,
               funding_source,
-              status: agencyFundingRequested ? 'pending' : amountCents > 0 ? 'checkout_pending' : 'active',
-              payment_status: agencyFundingRequested ? 'authorization_pending' : amountCents > 0 ? 'pending' : 'paid',
-              enrollment_state: agencyFundingRequested ? 'funding_authorization_pending' : amountCents > 0 ? 'payment_pending' : 'active',
-              next_required_action: agencyFundingRequested ? 'FUNDING_AUTHORIZATION' : amountCents > 0 ? 'PAYMENT' : 'ONBOARDING',
+              status: agencyFundingRequested
+                ? 'pending'
+                : amountCents > 0
+                  ? 'checkout_pending'
+                  : 'active',
+              payment_status: agencyFundingRequested
+                ? 'authorization_pending'
+                : amountCents > 0
+                  ? 'pending'
+                  : 'paid',
+              enrollment_state: agencyFundingRequested
+                ? 'funding_authorization_pending'
+                : amountCents > 0
+                  ? 'payment_pending'
+                  : 'active',
+              next_required_action: agencyFundingRequested
+                ? 'FUNDING_AUTHORIZATION'
+                : amountCents > 0
+                  ? 'PAYMENT'
+                  : 'ONBOARDING',
               amount_paid_cents: 0,
               billing_provider: amountCents > 0 ? 'quickbooks' : null,
               program_holder_id: partnerHolderId,

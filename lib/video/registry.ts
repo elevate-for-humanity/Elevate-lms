@@ -47,7 +47,7 @@ export const VIDEO_REGISTRY: Record<string, VideoRecord> = {
     title: 'Medical Assistant program preview',
     description: 'Existing Medical Assistant program preview.',
     video_url: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-medical-assistant.mp4',
-    thumbnail_url: '/images/pages/medical-assistant-hero.webp',
+    thumbnail_url: '/images/pages/medical-assistant-lab.webp',
     duration: 'PT32.28S',
     upload_date: '2026-03-07',
     category: 'Healthcare',

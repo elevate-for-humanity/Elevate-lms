@@ -18,7 +18,7 @@ export default async function ProgramHolderAirScriptPage() {
   return (
     <main className="space-y-6 px-4 py-6 sm:px-6">
       <section className="relative overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
-        <Image src="/images/pages/admin-email-analytics-detail.webp" alt="Program Holder using Elevate communication tools" fill priority sizes="100vw" className="object-cover" />
+        <Image src="/images/pages/admin-email-automation-new-d2.webp" alt="Program Holder using Elevate communication tools" fill priority sizes="100vw" className="object-cover" />
         <div className="relative max-w-3xl bg-slate-950/80 p-6 sm:p-9">
         <MessageSquareText className="h-9 w-9 text-cyan-200" />
         <p className="mt-4 text-xs font-black uppercase tracking-[0.18em] text-cyan-200">AirScript service</p>

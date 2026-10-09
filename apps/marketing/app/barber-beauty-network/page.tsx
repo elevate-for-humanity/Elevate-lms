@@ -64,7 +64,7 @@ export default function BarberBeautyNetworkPage() {
         </div>
         <div className="mt-8 flex flex-wrap gap-4">
           <Link href="/employer" className="font-bold text-blue-700 underline underline-offset-4">Employer resources</Link>
-          <Link href="/barber-and-beauty-apprenticeship" className="font-bold text-blue-700 underline underline-offset-4">Beauty apprenticeships</Link>
+          <Link href="/barber-and-beauty-apprenticeships" className="font-bold text-blue-700 underline underline-offset-4">Beauty apprenticeships</Link>
         </div>
       </section>
     </main>

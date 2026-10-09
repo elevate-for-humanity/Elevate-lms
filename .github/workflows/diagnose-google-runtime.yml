@@ -55,12 +55,15 @@ jobs:
             const revision = service.status.latestCreatedRevisionName;
             const details = JSON.parse(gcloud(['run','revisions','describe',revision,'--project='+project,'--region=us-central1','--format=json']));
             report({component, revision, startupProbe:details.spec.containers[0].startupProbe,
+              command:details.spec.containers[0].command,args:details.spec.containers[0].args,
+              bindEnvironment:(details.spec.containers[0].env || []).filter(x=>['HOSTNAME','PORT'].includes(x.name)),
               conditions:(details.status.conditions || []).map(x=>({type:x.type,status:x.status,reason:x.reason,message:x.message}))});
             const logs = JSON.parse(gcloud(['logging','read',
               'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration" AND resource.labels.revision_name="'+revision+'"',
-              '--project='+project,'--freshness=2h','--limit=50','--format=json']));
+              '--project='+project,'--freshness=2h','--limit=200','--format=json']));
+            report({revision,logCount:logs.length,logTypes:[...new Set(logs.map(x=>x.logName))]});
             for (const row of logs) {
-              const message = String(row.textPayload || row.jsonPayload?.message || '');
+              const message = String(row.textPayload || row.jsonPayload?.message || row.jsonPayload?.text || '');
               const safe = message.replace(/Bearer\s+\S+/gi,'Bearer [REDACTED]')
                 .replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[REDACTED JWT]')
                 .replace(/((?:api[_-]?key|token|password|secret)\s*[:=]\s*)\S+/gi,'$1[REDACTED]');

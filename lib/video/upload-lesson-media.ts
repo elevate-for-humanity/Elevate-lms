@@ -9,7 +9,7 @@
  */
 
 import { execFile } from 'child_process';
-import { mkdtemp, readFile, rm, stat, unlink, writeFile } from 'fs/promises';
+import { mkdtemp, readFile, rm, unlink, writeFile } from 'fs/promises';
 import { promisify } from 'util';
 import os from 'os';
 import path from 'path';
@@ -347,43 +347,15 @@ export async function uploadLessonFileFromDisk(
   lessonId: string,
   ext: 'mp3' | 'mp4',
 ): Promise<string> {
-  let uploadPath = filePath;
-  let compressedPath: string | null = null;
-  if (ext === 'mp4' && (await stat(filePath)).size > SUPABASE_SAFE_VIDEO_BYTES) {
-    compressedPath = filePath.replace(/\.mp4$/i, '.upload.mp4');
-    await execFileAsync(
-      'ffmpeg',
-      [
-        '-y',
-        '-i', filePath,
-        '-vf', 'scale=min(1280\\,iw):-2',
-        ...videoEncoderArgs(27),
-        '-maxrate', '3M', '-bufsize', '6M',
-        '-c:a', 'aac', '-b:a', '128k',
-        '-movflags', '+faststart',
-        compressedPath,
-      ],
-      { timeout: 20 * 60 * 1000, maxBuffer: 2 * 1024 * 1024 },
-    );
-    uploadPath = compressedPath;
-    const uploadBytes = (await stat(uploadPath)).size;
-    if (uploadBytes > SUPABASE_SAFE_VIDEO_BYTES) {
-      throw new Error(
-        `Compressed lesson video is still too large for Supabase (${uploadBytes} bytes)`,
-      );
-    }
-    logger.info('[upload-lesson-media] compressed oversized lesson video', {
-      lessonId,
-      sourceBytes: (await stat(filePath)).size,
-      uploadBytes,
-    });
-  }
-  const buf = await readFile(uploadPath);
+  // Large MP4s use the resumable route in uploadCourseVideosObject. The
+  // single-request ceiling is not an object-size limit and must not trigger
+  // an unnecessary lossy transcode or reject a valid completed lesson.
+  const buf = await readFile(filePath);
+  logger.info('[upload-lesson-media] starting lesson upload', {lessonId, ext, bytes: buf.length});
   const url = await uploadLessonMediaBuffer(buf, lessonId, ext);
-  await Promise.all(
-    [filePath, compressedPath].filter(Boolean).map((target) => unlink(target as string)),
-  ).catch((err) => {
-    logger.debug('[upload-lesson-media] temp file cleanup', { filePath, err });
+  logger.info('[upload-lesson-media] lesson upload saved', {lessonId, ext, bytes: buf.length});
+  await unlink(filePath).catch((err) => {
+    logger.debug('[upload-lesson-media] temp file cleanup', {filePath, err});
   });
   return url;
 }

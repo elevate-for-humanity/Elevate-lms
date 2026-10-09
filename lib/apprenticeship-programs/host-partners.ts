@@ -119,6 +119,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     ],
     websiteUrl: 'https://barbershopelkhart.com/',
     websiteLabel: 'Visit Top Shelf Barber Lounge',
+    socialUrl: 'https://www.instagram.com/topshelfbarberlounge/',
+    socialLabel: 'View Top Shelf Instagram',
   },
   {
     slug: 'cals-kutz-studio',
@@ -422,6 +424,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     ],
     websiteUrl: 'https://tory-103460.square.site/',
     websiteLabel: 'Book / view Salon Saloon online',
+    socialUrl: 'https://www.instagram.com/salonsaloon_/',
+    socialLabel: 'View Salon Saloon Instagram',
   },
 ];
 

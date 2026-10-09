@@ -9,6 +9,7 @@ on:
       - 'apps/marketing/**'
       - 'components/**'
       - 'lib/marketing/**'
+      - 'lib/health/**'
       - 'lib/ai/google-natural-voice.ts'
       - 'lib/ai/natural-voice-route.ts'
       - 'components/voice/**'

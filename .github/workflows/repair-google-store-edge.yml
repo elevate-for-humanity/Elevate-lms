@@ -2,7 +2,7 @@ name: Prepare Google Store domain route
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/repair-google-store-edge.yml']
+    paths: ['.github/workflows/repair-google-store-edge.yml', 'scripts/gcp/repair-store-domain-routing.mjs']
   workflow_dispatch:
 permissions:
   actions: write

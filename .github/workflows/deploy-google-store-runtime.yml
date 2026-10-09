@@ -2,7 +2,7 @@ name: Deploy Google Store runtime identity
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/deploy-google-store-runtime.yml']
+    paths: ['.github/workflows/deploy-google-store-runtime.yml', 'lib/health/public-runtime-service.ts']
   workflow_dispatch:
 permissions:
   actions: write
@@ -32,6 +32,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
+      - uses: pnpm/action-setup@v4
+        with: {version: 10.28.2}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Typecheck shared application before Docker build
+        run: |
+          pnpm install --frozen-lockfile --strict-peer-dependencies=false
+          pnpm exec tsc --noEmit --project apps/marketing/tsconfig.json
       - name: Verify Store and Marketing identity contracts
         run: node --experimental-strip-types --test scripts/gcp/public-runtime-service.test.mjs scripts/gcp/verify-public-health.test.mjs scripts/gcp/verify-runtime-readiness.test.mjs
       - name: Build shared commerce application for Store

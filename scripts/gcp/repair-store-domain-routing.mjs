@@ -4,7 +4,7 @@ import {googleFailureCode} from './runtime-config.mjs';
 const project='elegant-racer-299721',region='us-central1';
 function cli(args) {
  try {return execFileSync('gcloud',[...args,'--project='+project,'--quiet','--format=json'],{encoding:'utf8',timeout:90000,stdio:['ignore','pipe','pipe']}).trim();}
- catch(error){const code=googleFailureCode(String(error.stderr||''));throw Object.assign(new Error(args.slice(0,3).join(' ')+': '+code),{code});}
+ catch(error){const safe=String(error.stderr||'').replace(/Bearer\\s+\\S+/gi,'Bearer [REDACTED]').replace(/eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+/g,'[REDACTED JWT]');console.error(JSON.stringify({operation:args.slice(0,3).join(' '),detail:safe.slice(0,2000)}));const code=googleFailureCode(safe);throw Object.assign(new Error(args.slice(0,3).join(' ')+': '+code),{code});}
 }
 const read=args=>JSON.parse(cli(args));
 function existing(args){try{return read(args);}catch(error){if(error.code==='not_found')return null;throw error;}}
@@ -13,6 +13,17 @@ assert.ok(before.defaultService.endsWith('/elevate-marketing-backend'));
 const store=read(['run','services','describe','elevate-store-migration','--region='+region]);
 assert.ok(store.status.conditions.some(x=>x.type==='Ready'&&x.status==='True'));
 const template=read(['compute','backend-services','describe','elevate-marketing-backend','--global']);
+const access=execFileSync('gcloud',['auth','print-access-token'],{encoding:'utf8',timeout:20000,stdio:['ignore','pipe','pipe']}).trim();
+for(const path of ['certificateMaps/elevate-cert-map/certificateMapEntries','certificates','dnsAuthorizations']) {
+ const response=await fetch('https://certificatemanager.googleapis.com/v1/projects/'+project+'/locations/global/'+path,{headers:{Authorization:'Bearer '+access},signal:AbortSignal.timeout(20000)});
+ const b=await response.json();
+ console.log(JSON.stringify({certificateResource:path,status:response.status,error:b.error?.status,entries:(b.certificateMapEntries||[]).map(x=>({name:x.name,hostname:x.hostname,certificates:x.certificates,state:x.state})),certificates:(b.certificates||[]).map(x=>({name:x.name,domains:x.managed?.domains,state:x.managed?.state})),authorizations:(b.dnsAuthorizations||[]).map(x=>({name:x.name,domain:x.domain,record:x.dnsResourceRecord}))}));
+}
+try {
+ const r=await fetch('https://rdap.org/domain/elevateforhumanity.org',{signal:AbortSignal.timeout(20000)});
+ const b=await r.json();
+ console.log(JSON.stringify({registryStatus:r.status,registrar:(b.entities||[]).filter(x=>x.roles?.includes('registrar')).map(x=>({handle:x.handle,name:x.vcardArray?.[1]?.find(v=>v[0]==='fn')?.[3],links:x.links?.map(v=>v.href)}))}));
+}catch{console.log(JSON.stringify({registryRead:'unavailable'}));}
 let neg=existing(['compute','network-endpoint-groups','describe','elevate-store-neg','--region='+region]);
 if(!neg) {
  cli(['compute','network-endpoint-groups','create','elevate-store-neg','--region='+region,'--network-endpoint-type=serverless','--cloud-run-service=elevate-store-migration']);
@@ -40,15 +51,4 @@ for(const matcher of before.pathMatchers||[]) assert.ok(after.pathMatchers.some(
 const rule=after.hostRules.find(x=>x.hosts.includes('store.elevateforhumanity.org'));
 assert.ok(after.pathMatchers.find(x=>x.name===rule.pathMatcher).defaultService.endsWith('/elevate-store-backend'));
 console.log(JSON.stringify({storeGoogleRoute:'verified',hostRule:rule,backend:backend.name,neg:neg.name,otherRoutes:'preserved'}));
-const access=execFileSync('gcloud',['auth','print-access-token'],{encoding:'utf8',timeout:20000,stdio:['ignore','pipe','pipe']}).trim();
-for(const path of ['certificateMaps/elevate-cert-map/certificateMapEntries','certificates','dnsAuthorizations']) {
- const response=await fetch('https://certificatemanager.googleapis.com/v1/projects/'+project+'/locations/global/'+path,{headers:{Authorization:'Bearer '+access},signal:AbortSignal.timeout(20000)});
- const b=await response.json();
- console.log(JSON.stringify({certificateResource:path,status:response.status,error:b.error?.status,entries:(b.certificateMapEntries||[]).map(x=>({name:x.name,hostname:x.hostname,certificates:x.certificates,state:x.state})),certificates:(b.certificates||[]).map(x=>({name:x.name,domains:x.managed?.domains,state:x.managed?.state})),authorizations:(b.dnsAuthorizations||[]).map(x=>({name:x.name,domain:x.domain,record:x.dnsResourceRecord}))}));
-}
-try {
- const r=await fetch('https://rdap.org/domain/elevateforhumanity.org',{signal:AbortSignal.timeout(20000)});
- const b=await r.json();
- console.log(JSON.stringify({registryStatus:r.status,registrar:(b.entities||[]).filter(x=>x.roles?.includes('registrar')).map(x=>({handle:x.handle,name:x.vcardArray?.[1]?.find(v=>v[0]==='fn')?.[3],links:x.links?.map(v=>v.href)}))}));
-}catch{console.log(JSON.stringify({registryRead:'unavailable'}));}
 console.log(JSON.stringify({dnsChangeRequired:{type:'CNAME',name:'store',target:'www.elevateforhumanity.org',oldTarget:'store.elevateforhumanity.org.elev-5vfk.dns.northflank.app'},publicCutover:'not_verified_until_DNS_and_TLS_pass'}));

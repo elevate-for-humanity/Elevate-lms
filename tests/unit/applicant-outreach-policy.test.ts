@@ -7,6 +7,9 @@ describe('applicant outreach intent and program routing',()=>{
   expect(classifyApplicantReply('Yes, but I am not interested in CDL')).toBe('needs_follow_up');
   expect(classifyApplicantReply('Maybe later, I am interested')).toBe('needs_follow_up');
   expect(classifyApplicantReply('I cannot get started now')).toBe('needs_follow_up');
+  expect(classifyApplicantReply('Not interested in CDL, but I want barber training')).toBe('needs_follow_up');
+  expect(classifyApplicantReply('Interested in barber training')).toBe('interested');
+  expect(classifyApplicantReply('Interested if the program is free')).toBe('needs_follow_up');
  });
  it('keeps self-pay out of WorkOne and never promises financing approval',()=>{
   const text=applicantOutreachText('Alex',[{slug:'barber-apprenticeship',title:'Barber Apprenticeship',funded:false}],true);

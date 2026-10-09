@@ -6,9 +6,11 @@ export type OutreachProgram = { slug: string; title: string; funded: boolean };
 /** Classify only the applicant's new text, never quoted instructions or history. */
 export function classifyApplicantReply(text: string): ApplicantInterest {
  const fresh = text.split(/\n\s*(?:On .+wrote:|From:|[-_]{3,}|>)/i)[0].trim().toLowerCase();
- if (!fresh || fresh.length>1500 || /\b(?:maybe|not sure|unsure|not yet|later|next year|what if|if i|if you|unless)\b/.test(fresh)) return 'needs_follow_up';
+ if (!fresh || fresh.length>1500 || /\b(?:maybe|not sure|unsure|not yet|later|next year|if|unless)\b/.test(fresh)) return 'needs_follow_up';
  const decline = /\b(?:not interested|no longer interested|do not (?:want|wish)|don't (?:want|wish)|unsubscribe|remove me|stop (?:emailing|contacting)|no thanks|no thank you)\b/.test(fresh);
- const accept = /^(?:interested|yes)[.!\s]*$/.test(fresh) || /\b(?:i(?:'m| am) interested|still interested|yes|i want to (?:start|get started|enroll)|ready to (?:start|get started|enroll)|let'?s get started)\b/.test(fresh);
+ const accept = /^(?:interested|yes)\b/.test(fresh) || /\b(?:i(?:'m| am) interested|still interested|yes|i want to (?:start|get started|enroll)|ready to (?:start|get started|enroll)|let'?s get started)\b/.test(fresh);
+ // A decline of one program is not a withdrawal from every selected program.
+ if (decline && /\b(?:but|instead|another|other|only|not interested in)\b/.test(fresh)) return 'needs_follow_up';
  if (decline && accept && !/\bno longer interested\b/.test(fresh)) return 'needs_follow_up';
  if (decline) return 'not_interested';
  if (accept && !/\b(?:not|don't|do not|can't|cannot)\b/.test(fresh)) return 'interested';

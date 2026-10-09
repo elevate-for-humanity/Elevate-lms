@@ -11,17 +11,17 @@ jobs:
     outputs:
       should_notify: ${{ steps.check.outputs.should_notify }}
     steps:
+      - uses: actions/checkout@v4
       - name: Check deployment state
         id: check
         run: |
-          STATE="${{ github.event.deployment_status.state }}"
-          if [ "$STATE" = "success" ] || [ "$STATE" = "failure" ]; then
-            echo "should_notify=true" >> $GITHUB_OUTPUT
-            echo "Deployment state is $STATE - will send notification"
-          else
-            echo "should_notify=false" >> $GITHUB_OUTPUT
-            echo "Deployment state is $STATE - skipping notification"
-          fi
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          import { classifyDeploymentEvent } from './scripts/deployment-notification-event.mjs';
+          const result = classifyDeploymentEvent(JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')));
+          appendFileSync(process.env.GITHUB_OUTPUT, `should_notify=${result.notify}\n`);
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, result.reason + '\n');
+          NODE
 
   notify:
     runs-on: ubuntu-latest
@@ -35,21 +35,17 @@ jobs:
       - name: Get deployment info
         id: deployment
         run: |
-          echo "environment=${{ github.event.deployment.environment }}" >> $GITHUB_OUTPUT
-          RAW_URL="${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}"
-          case "$RAW_URL" in
-            https://www.elevateforhumanity.org*|https://app.elevateforhumanity.org*|https://admin.elevateforhumanity.org*)
-              BASE_URL="${RAW_URL%%\?*}"
-              BASE_URL="${BASE_URL%/}"
-              ;;
-            *)
-              echo "::error::Deployment status did not provide an approved production service URL: $RAW_URL"
-              exit 1
-              ;;
-          esac
-          echo "url=$BASE_URL" >> $GITHUB_OUTPUT
-          echo "state=${{ github.event.deployment_status.state }}" >> $GITHUB_OUTPUT
-          echo "commit=${{ github.event.deployment.sha }}" >> $GITHUB_OUTPUT
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          import { classifyDeploymentEvent } from './scripts/deployment-notification-event.mjs';
+          const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
+          const result = classifyDeploymentEvent(event);
+          for (const [key, value] of Object.entries({environment: event.deployment.environment,
+            url: result.origin, state: event.deployment_status.state, commit: event.deployment.sha})) {
+            if (/[\r\n]/.test(String(value))) throw new Error('Invalid deployment metadata');
+            appendFileSync(process.env.GITHUB_OUTPUT, `${key}=${value}\n`);
+          }
+          NODE
 
       - name: Run health check
         if: github.event.deployment_status.state == 'success'

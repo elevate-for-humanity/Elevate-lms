@@ -2,7 +2,7 @@ name: Student Career Services Production Acceptance
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: [Deploy LMS]
+    workflows: [Deploy repaired Google services]
     types: [completed]
 permissions:
   contents: read

@@ -118,6 +118,19 @@ jobs:
         with:
           skip_install: true
 
+      - name: Diagnose production natural voice
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud run services describe elevate-marketing-migration --project=elegant-racer-299721 --region=us-central1 --format='yaml(spec.template.spec.serviceAccountName,status.latestReadyRevisionName)'
+          gcloud services list --enabled --project=elegant-racer-299721 --filter='config.name=texttospeech.googleapis.com' --format='value(config.name)'
+          curl -sS --max-time 45 -D /tmp/voice-headers -o /tmp/voice-body -w 'Voice status: %{http_code}; bytes: %{size_download}\n' -H 'Content-Type: application/json' -d '{"text":"Welcome to Elevate for Humanity.","style":"assistant","rate":1}' https://www.elevateforhumanity.org/api/voice/natural
+          if grep -qi 'application/json' /tmp/voice-headers; then
+            cat /tmp/voice-body
+            gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-marketing-migration" AND textPayload:"[natural-voice]"' --project=elegant-racer-299721 --freshness=1h --limit=8 --format='value(timestamp,textPayload)'
+          fi
+
       - name: Guard shared regional capacity
         shell: bash
         run: |

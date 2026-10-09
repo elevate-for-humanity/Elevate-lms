@@ -127,7 +127,9 @@ export async function ensureDeviceCredential(input: {
       provider_credential_id: credentialId,
       sip_username: sipUsername,
       status: 'active',
-      last_seen_at: now,
+      // Issuing a credential is not proof of a connected WebRTC socket.
+      // Preserve the last confirmed presence until the client reports readiness.
+      last_seen_at: stored?.last_seen_at ?? null,
       updated_at: now,
     },
     { onConflict: 'profile_id,device_id' },

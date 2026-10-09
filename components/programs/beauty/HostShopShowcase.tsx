@@ -62,6 +62,7 @@ export default function HostShopShowcase({
   enableNarration = true,
   narration,
   narrationSrc,
+  narrationSources,
   mediaOverrides,
   mediaSequence,
   tourScripts,
@@ -81,6 +82,8 @@ export default function HostShopShowcase({
   narration?: string;
   /** Pre-rendered narration removes runtime voice-generation delay. */
   narrationSrc?: string;
+  /** Recorded scripts matched to the active shop media. */
+  narrationSources?: Record<string, string>;
   /** Page-specific media without changing another surface such as the homepage. */
   mediaOverrides?: Record<string, ShowcaseMedia>;
   /** Explicit media order for a surface that needs more than one slide per shop. */
@@ -232,7 +235,7 @@ export default function HostShopShowcase({
       ref={sectionRef}
       aria-labelledby="host-shop-showcase-heading"
       data-scroll-narration={enableNarration ? true : undefined}
-      data-narration-src={enableNarration ? narrationSrc : undefined}
+      data-narration-src={enableNarration ? (narrationSources?.[image.src] ?? narrationSrc) : undefined}
       data-narration={
         enableNarration
           ? (tourScripts?.[image.src] ??

@@ -192,7 +192,7 @@ Return JSON matching this exact schema (no markdown, no commentary):
           "lesson_order": 1,
           "lesson_objectives": ["string"],
           "lesson_summary": "string (1-2 sentences describing what this lesson teaches)",
-          "job_tasks_covered": ["string (from O*NET task list — exact match preferred)"]
+          "job_tasks_covered": ["string (maps to an O*NET task; equivalent wording is allowed when the required task and technical meaning are preserved)"]
         }
       ]
     }

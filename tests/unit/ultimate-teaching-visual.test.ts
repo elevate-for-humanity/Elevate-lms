@@ -9,6 +9,18 @@ import {
 import { prepareUltimateStoryboardInput } from '@/lib/ultimate-course-builder/adapters/platform-renderer';
 import { directMedia } from '@/lib/video/media-director';
 describe('script-bound teaching producer', () => {
+  it('accepts equivalent teaching captions without requiring a verbatim copy', () => {
+    expect(() => validateTeachingVisual({kind:'sequence',steps:[{
+      label:'Haircut',value:'Trim the customer hair with shears',
+      narrationQuote:'Cut the client hair with scissors.'
+    }]}, 'Cut the client hair with scissors.')).not.toThrow();
+  });
+  it('rejects changed technical instructions despite similar wording', () => {
+    expect(() => validateTeachingVisual({kind:'sequence',steps:[{
+      label:'Connection',value:'Disconnect the inlet hose',
+      narrationQuote:'Connect the inlet hose.'
+    }]}, 'Connect the inlet hose.')).toThrow('NOT_SCRIPT_BOUND');
+  });
   it('cannot invent an approval while citing an unrelated valid sentence', () => {
     expect(() => validateTeachingVisual({kind:'record',steps:[{
       label:'Review',value:'Approved',narrationQuote:'Ask the designated reviewer to check the entry.'

@@ -1,6 +1,8 @@
 /** Renderer-authored labels and examples are separate from licensed stock.
  * The stock provides the scene context; it is never presumed to contain UI,
  * a training record, a quiz, or an instructional diagram. */
+import { compatibleVisualTask } from './reviewed-scene-evidence';
+
 export interface TeachingVisual {
   kind: 'sequence' | 'record' | 'choices' | 'comparison' | 'terms';
   steps: Array<{ label: string; value: string; narrationQuote: string }>;
@@ -51,7 +53,9 @@ export function validateTeachingVisual(plan: TeachingVisual, narration: string) 
       step.label.length > 55 ||
       step.value.length > 160 ||
       !step.narrationQuote?.trim() ||
-      normalize(step.value) !== normalize(step.narrationQuote) ||
+      (normalize(step.value) !== normalize(step.narrationQuote) &&
+        !(compatibleVisualTask(step.value, step.narrationQuote) &&
+          compatibleVisualTask(step.narrationQuote, step.value))) ||
       !normalize(narration).includes(normalize(step.narrationQuote))
     )
       throw new Error('BLUEPRINT_TEACHING_VISUAL_NOT_SCRIPT_BOUND');

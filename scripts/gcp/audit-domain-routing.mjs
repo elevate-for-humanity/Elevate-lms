@@ -4,7 +4,7 @@ const report=value=>console.log(JSON.stringify(value));
 const domains={marketing:['elevateforhumanity.org','www.elevateforhumanity.org'],admin:['admin.elevateforhumanity.org'],lms:['app.elevateforhumanity.org'],store:['store.elevateforhumanity.org']};
 const cli=args=>JSON.parse(execFileSync('gcloud',[...args,'--project=elegant-racer-299721','--format=json'],{encoding:'utf8',timeout:20000,stdio:['ignore','pipe','pipe']}));
 let token=process.env.CLOUDFLARE_API_TOKEN,zone=process.env.CLOUDFLARE_ZONE_ID;
-for(const component of ['marketing','admin']) {
+for(const component of ['marketing','admin','lms','store','studio-browser','ultimate-worker']) {
  try {
   const config=loadGoogleConfig(component).runtimeEnvironment;
   token ||= config.CLOUDFLARE_API_TOKEN;zone ||= config.CLOUDFLARE_ZONE_ID;
@@ -41,11 +41,16 @@ for(const args of [
  ['beta','run','domain-mappings','list','--region=us-central1'],
  ['compute','url-maps','list'],
  ['compute','backend-services','list'],
- ['compute','forwarding-rules','list']
+ ['compute','forwarding-rules','list'],
+ ['compute','target-https-proxies','list'],
+ ['compute','ssl-certificates','list'],
+ ['certificate-manager','maps','list'],
+ ['run','services','list','--region=us-central1'],
+ ['run','jobs','list','--region=us-central1']
 ]) {
  try {
   const data=cli(args);
-  report({resource:args.slice(0,-1).join(' '),items:data.map(x=>({name:x.name,service:x.spec?.routeName,defaultService:x.defaultService,hostRules:x.hostRules,pathMatchers:x.pathMatchers,backends:x.backends,target:x.target,IPAddress:x.IPAddress,region:x.region,conditions:x.status?.conditions,records:x.status?.resourceRecords}))});
+  report({resource:args.slice(0,-1).join(' '),items:data.map(x=>({name:x.name,service:x.spec?.routeName,defaultService:x.defaultService,hostRules:x.hostRules,pathMatchers:x.pathMatchers,backends:x.backends,target:x.target,IPAddress:x.IPAddress,region:x.region,conditions:x.status?.conditions,records:x.status?.resourceRecords,sslCertificates:x.sslCertificates,certificateMap:x.certificateMap,managed:x.managed,cloudRun:x.cloudRun,labels:x.metadata?.labels,url:x.status?.url}))});
  }catch{report({resource:args.join(' '),read:'unavailable'});}
 }
 const nfToken=process.env.NORTHFLANK_API_TOKEN;

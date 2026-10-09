@@ -22,8 +22,8 @@ for file in "$LMS_DOCKERFILE" "$ADMIN_DOCKERFILE"; do
   [[ -f "$file" ]] || fail "$file missing"
   grep -q '/api/ping' "$file" || fail "$file must healthcheck /api/ping"
 done
-grep -q 'apps/admin/server\.js' "$ADMIN_DOCKERFILE" || fail "Admin image must serve Admin"
-grep -q 'apps/lms/server\.js' "$LMS_DOCKERFILE" || fail "LMS image must serve LMS"
+grep -Fq 'apps/admin/server.js' "$ADMIN_DOCKERFILE" || fail "Admin image must serve Admin"
+grep -Fq 'apps/lms/server.js' "$LMS_DOCKERFILE" || fail "LMS image must serve LMS"
 pass "Google Admin and LMS container applications remain separate"
 
 # 2) Require the actual Google deployment path, not retired source workflows.
@@ -36,11 +36,11 @@ for file in "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; do
 done
 grep -q 'gcloud run services update elevate-admin-migration' "$ADMIN_WF" || fail "Admin deployment must target its Google service"
 grep -q 'Dockerfile.northflank-admin' "$ADMIN_WF" || fail "Admin deployment must build its own image"
-grep -q 'lms\) FILE=Dockerfile.northflank-lms' "$IMAGE_WF" || fail "Google LMS build must use its own image"
-grep -q 'loadGoogleConfig\(component\)' "$STAGE_SCRIPT" || fail "Staging must load component-scoped Google configuration"
+grep -Fq 'lms) FILE=Dockerfile.northflank-lms' "$IMAGE_WF" || fail "Google LMS build must use its own image"
+grep -Fq 'loadGoogleConfig(component)' "$STAGE_SCRIPT" || fail "Staging must load component-scoped Google configuration"
 grep -Fq 'elevate-${component}-migration' "$STAGE_SCRIPT" || fail "Staging must use a component-scoped Google service"
-grep -q 'stage-web\.mjs' "$STAGE_WF" || fail "Google staging workflow must use the reviewed staging implementation"
-if grep -q 'NORTHFLANK_API_TOKEN|configure-services\.ts|api\.northflank\.com' "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; then
+grep -Fq 'stage-web.mjs' "$STAGE_WF" || fail "Google staging workflow must use the reviewed staging implementation"
+if grep -Eq 'NORTHFLANK_API_TOKEN|configure-services[.]ts|api[.]northflank[.]com' "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; then
   fail "Active Google deployment must not depend on a retired source control plane"
 fi
 pass "Google deployment keeps Admin and LMS images, services and configuration separate"

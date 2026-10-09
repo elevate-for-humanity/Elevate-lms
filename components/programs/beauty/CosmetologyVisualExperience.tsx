@@ -7,14 +7,14 @@ import { useCallback, useEffect, useState } from 'react';
 
 const slides = [
   {
-    src: '/images/partners/generations-hair/dimensional-color.webp',
+    src: '/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp',
     alt: 'Dimensional color work created at Generations Hair LLC',
     title: 'Build salon-ready technique',
     copy: 'Practice texture, finishing, client consultation, and professional service inside a supervised salon environment.',
   },
   {
-    src: '/images/partners/generations-hair/extensions.webp',
-    alt: 'Professional extension work by Generations Hair Co',
+    src: '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp',
+    alt: 'Generations Hair stylist working with a client',
     title: 'Develop creative color confidence',
     copy: 'Connect classroom theory to color formulation, application, safety, and finished results.',
   },
@@ -25,8 +25,8 @@ const slides = [
     copy: 'Strengthen workplace habits, client care, time management, and documented on-the-job learning.',
   },
   {
-    src: '/images/partners/generations-hair/look-book.webp',
-    alt: 'Professional cosmetology look book by Generations Hair Co',
+    src: '/images/partners/generations-hair/dimensional-color-before-enhanced-2026.webp',
+    alt: 'Generations Hair client before color service',
     title: 'Work toward a professional standard',
     copy: 'See the range of technical outcomes apprentices build toward through structured practice and coaching.',
   },
@@ -34,17 +34,17 @@ const slides = [
 
 const supportingImages = [
   {
-    src: '/images/partners/generations-hair/cutting.webp',
-    alt: 'Professional haircut portfolio by Generations Hair Co',
+    src: '/images/partners/generations-hair/premium-curls.jpg',
+    alt: 'Finished curls by Generations Hair',
     label: 'Texture & finishing',
   },
   {
-    src: '/images/partners/generations-hair/brunettes.webp',
-    alt: 'Brunette color portfolio by Generations Hair Co',
+    src: '/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp',
+    alt: 'Finished dimensional color by Generations Hair',
     label: 'Color formulation',
   },
   {
-    src: '/images/partners/generations-hair/color-transformation.webp',
+    src: '/images/partners/generations-hair/dimensional-color-before-enhanced-2026.webp',
     alt: 'Dimensional color transformation by Generations Hair LLC',
     label: 'Styling & client service',
   },

@@ -57,8 +57,7 @@ jobs:
           import { healthPassed } from './scripts/gcp/audit-runtime-parity.mjs';
           let failed = false;
           const component=process.env.COMPONENT;
-          // Store deliberately uses Dockerfile.marketing in the migration image workflow.
-          const application=component==='store'?'marketing':component;
+          const application=component;
           const service='elevate-'+component+'-migration';
           const base='https://'+service+'-aabnh2y32a-uc.a.run.app';
           const gcloud=args=>execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
@@ -101,7 +100,7 @@ jobs:
               if(storefront.status!==200) failed=true;
             } catch {report({component,storefrontError:'storefront_probe_failed'});failed=true;}
           }
-          const publicBases={marketing:'https://www.elevateforhumanity.org',admin:'https://admin.elevateforhumanity.org',lms:'https://app.elevateforhumanity.org'};
+          const publicBases={marketing:'https://www.elevateforhumanity.org',admin:'https://admin.elevateforhumanity.org',lms:'https://app.elevateforhumanity.org',store:'https://store.elevateforhumanity.org'};
           if(publicBases[component]) {
             try {
               const direct=await fetch(base+'/api/health',{signal:AbortSignal.timeout(30000)});
@@ -122,7 +121,7 @@ jobs:
             const token=process.env.CLOUDFLARE_API_TOKEN, zone=process.env.CLOUDFLARE_ZONE_ID;
             report({cloudflareTokenPresent:Boolean(token),cloudflareZonePresent:Boolean(zone)});
             if(token && /^[a-f0-9]{32}$/.test(zone || '')) {
-              for(const name of ['elevateforhumanity.org','www.elevateforhumanity.org','admin.elevateforhumanity.org','app.elevateforhumanity.org']) {
+              for(const name of ['elevateforhumanity.org','www.elevateforhumanity.org','admin.elevateforhumanity.org','app.elevateforhumanity.org','store.elevateforhumanity.org']) {
                 const r=await fetch('https://api.cloudflare.com/client/v4/zones/'+zone+'/dns_records?name='+encodeURIComponent(name),{headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(20000)});
                 const b=await r.json();
                 report({dnsName:name,httpStatus:r.status,success:b.success,records:Array.isArray(b.result)?b.result.map(x=>({type:x.type,name:x.name,content:x.content,proxied:x.proxied,ttl:x.ttl})):[]});

@@ -3,8 +3,10 @@ import { execFileSync } from 'node:child_process';
 
 const sha = process.env.GITHUB_SHA;
 assert.match(sha ?? '', /^[a-f0-9]{40}$/);
-const image = `elevate-marketing:${sha}`;
-const name = `marketing-smoke-${process.env.GITHUB_RUN_ID || process.pid}`;
+const component = process.env.COMPONENT || 'marketing';
+assert.ok(['marketing','store'].includes(component));
+const image = `elevate-${component}:${sha}`;
+const name = `${component}-smoke-${process.env.GITHUB_RUN_ID || process.pid}`;
 const docker = args => execFileSync('docker', args, { encoding: 'utf8', timeout: 30000, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 let started = false;
 try {
@@ -20,6 +22,8 @@ try {
   `]);
   docker(['run', '-d', '--name', name, '-p', '127.0.0.1::3000',
     '--env', 'PORT=3000', '--env', 'HOSTNAME=0.0.0.0',
+    '--env', `K_SERVICE=elevate-${component}-migration`,
+    '--env', `STORE_ONLY_RUNTIME=${component === 'store'}`,
     '--env', 'NEXT_PUBLIC_SUPABASE_URL', '--env', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', image]);
   started = true;
   const port = docker(['port', name, '3000/tcp']).split(':').at(-1);
@@ -32,7 +36,7 @@ try {
     try {
       const response = await fetch(root + '/api/ping', { redirect: 'manual', signal: AbortSignal.timeout(5000) });
       const body = await response.json();
-      ready = response.status === 200 && body.ok === true && body.service === 'marketing' && body.commit === sha;
+      ready = response.status === 200 && body.ok === true && body.service === component && body.commit === sha;
       if (ready) break;
     } catch { /* A bounded wait allows the real server to initialize. */ }
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -44,11 +48,16 @@ try {
       if (path === '/api/health') assert.ok([200, 503].includes(response.status), 'Dependency health must return its real status');
       else assert.equal(response.status, 200, `${host}${path} must reach the service endpoint`);
       const body = await response.json();
-      assert.equal(body.service, 'marketing');
+      assert.equal(body.service, component);
       assert.equal(body.commit, sha);
       assert.equal(path === '/api/ping' ? body.ok : body.ready, true);
     }
   }
+  const runtimeVersion = await fetch(root + '/api/version', { signal: AbortSignal.timeout(10000) });
+  assert.equal(runtimeVersion.status, 200);
+  const identity = await runtimeVersion.json();
+  assert.equal(identity.service, component);
+  assert.equal(identity.commitSha, sha);
   const version = await fetch(root + '/version.json', { signal: AbortSignal.timeout(10000) });
   assert.equal(version.status, 200);
   assert.equal((await version.json()).commit, sha);

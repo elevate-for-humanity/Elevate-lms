@@ -1,0 +1,112 @@
+name: Deploy Google Store runtime identity
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/deploy-google-store-runtime.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: google-runtime-operations
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 120
+    env:
+      COMPONENT: store
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Verify Store and Marketing identity contracts
+        run: node --experimental-strip-types --test scripts/gcp/public-runtime-service.test.mjs scripts/gcp/verify-public-health.test.mjs scripts/gcp/verify-runtime-readiness.test.mjs
+      - name: Build shared commerce application for Store
+        run: |
+          set -euo pipefail
+          docker build -f Dockerfile.marketing -t "elevate-store:$GITHUB_SHA" \
+            --build-arg NODE_IMAGE=mirror.gcr.io/library/node:22-alpine \
+            --build-arg "NF_GIT_SHA=$GITHUB_SHA" \
+            --build-arg "BUILD_TIMESTAMP=$(date -u +%FT%TZ)" \
+            --build-arg NEXT_PUBLIC_SUPABASE_URL --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY .
+      - name: Test actual Store container identity and health routing
+        timeout-minutes: 5
+        run: node scripts/gcp/smoke-marketing-container.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Upload tested Store image
+        run: |
+          set -euo pipefail
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/store:$GITHUB_SHA"
+          docker tag "elevate-store:$GITHUB_SHA" "$IMAGE"
+          docker push "$IMAGE"
+      - name: Deploy Store with HTTP probes and one warm instance
+        id: deploy
+        timeout-minutes: 15
+        run: |
+          set -euo pipefail
+          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/store"
+          DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
+          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          SUFFIX="r${GITHUB_SHA:0:8}-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          echo "revision=elevate-store-migration-$SUFFIX" >> "$GITHUB_OUTPUT"
+          gcloud run services update elevate-store-migration --project=elegant-racer-299721 --region=us-central1 \
+            --image="$IMAGE@$DIGEST" --revision-suffix="$SUFFIX" \
+            --update-env-vars=STORE_ONLY_RUNTIME=true --min-instances=1 --max-instances=1 \
+            --startup-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' \
+            --liveness-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=3,periodSeconds=30,timeoutSeconds=5' --quiet
+      - name: Collect exact failed Store revision logs
+        if: ${{ failure() && steps.deploy.outcome == 'failure' }}
+        timeout-minutes: 3
+        env:
+          FAILED_SERVICE: elevate-store-migration
+          FAILED_REVISION: ${{ steps.deploy.outputs.revision }}
+        run: node scripts/gcp/collect-marketing-revision-diagnostics.mjs
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() && steps.deploy.outcome == 'failure' }}
+        with:
+          name: store-revision-${{ github.run_id }}
+          path: deployment-diagnostics/marketing-revision.json
+          if-no-files-found: warn
+      - name: Verify Store identity, dependencies, storefront and traffic
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {execFileSync} from 'node:child_process';
+          const base='https://elevate-store-migration-aabnh2y32a-uc.a.run.app';
+          for(let sample=0;sample<3;sample++) {
+            for(const path of ['/api/ping','/api/ready','/api/health','/api/version']) {
+              const r=await fetch(base+path,{signal:AbortSignal.timeout(20000)});
+              const b=await r.json();
+              console.log(JSON.stringify({path,status:r.status,service:b.service,commit:b.commit||b.commitSha,healthy:b.healthy,ready:b.ready}));
+              assert.equal(r.status,200);assert.equal(b.service,'store');
+              assert.equal(b.commit||b.commitSha,process.env.GITHUB_SHA);
+              if(path==='/api/health') assert.ok(b.healthy&&b.dependencies?.supabase?.ok);
+              if(path==='/api/ready') assert.ok(b.ready);
+            }
+          }
+          const page=await fetch(base+'/store',{signal:AbortSignal.timeout(30000)});
+          assert.equal(page.status,200);
+          const service=JSON.parse(execFileSync('gcloud',['run','services','describe','elevate-store-migration','--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',timeout:20000}));
+          const latest=service.status.latestReadyRevisionName;
+          assert.equal((service.status.traffic||[]).filter(x=>x.revisionName===latest).reduce((n,x)=>n+Number(x.percent||0),0),100);
+          console.log(JSON.stringify({revision:latest,traffic:service.status.traffic,storefrontStatus:page.status}));
+          const marketing=await fetch('https://www.elevateforhumanity.org/api/health',{signal:AbortSignal.timeout(20000)});
+          const health=await marketing.json();assert.equal(marketing.status,200);assert.equal(health.service,'marketing');assert.ok(health.healthy);
+          const publicStore=await fetch('https://store.elevateforhumanity.org/api/health',{signal:AbortSignal.timeout(30000)});
+          const publicBody=await publicStore.json();
+          console.log(JSON.stringify({publicStoreStatus:publicStore.status,service:publicBody.service,commit:publicBody.commit}));
+          assert.equal(publicStore.status,200);assert.equal(publicBody.service,'store');assert.equal(publicBody.commit,process.env.GITHUB_SHA);
+          NODE

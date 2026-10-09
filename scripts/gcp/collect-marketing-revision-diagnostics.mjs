@@ -2,7 +2,9 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 
 const revision = process.env.FAILED_REVISION;
-if (!/^elevate-marketing-migration-[a-z0-9-]+$/.test(revision || '')) throw new Error('Missing exact attempted revision');
+const service = process.env.FAILED_SERVICE || 'elevate-marketing-migration';
+if (!['elevate-marketing-migration','elevate-store-migration'].includes(service) ||
+    !new RegExp('^'+service+'-[a-z0-9-]+$').test(revision || '')) throw new Error('Missing exact attempted revision');
 const project = 'elegant-racer-299721';
 const report = { revision, metadata: null, logs: [], errors: [] };
 function redact(value) {
@@ -28,7 +30,7 @@ try {
 // delay without hanging the failed release or replacing its original verdict.
 for (let attempt = 1; attempt <= 3; attempt++) {
   try {
-    const rows = read(['logging', 'read', `resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-marketing-migration" AND resource.labels.revision_name="${revision}"`, '--freshness=2h', '--limit=100', '--order=asc']);
+    const rows = read(['logging', 'read', `resource.type="cloud_run_revision" AND resource.labels.service_name="${service}" AND resource.labels.revision_name="${revision}"`, '--freshness=2h', '--limit=100', '--order=asc']);
     report.logs = rows.map(row => ({ timestamp: row.timestamp, severity: row.severity,
       message: redact(row.textPayload || row.jsonPayload?.message || row.jsonPayload?.text || row.protoPayload?.status?.message || '').slice(0, 2000) }));
     if (rows.length) break;

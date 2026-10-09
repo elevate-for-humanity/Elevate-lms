@@ -11,8 +11,7 @@ export const sites = {
 export async function verifySite(component, request = fetch) {
   const base = sites[component];
   if (!base) throw new Error('Unknown public service');
-  // Store uses the Marketing Dockerfile and reports its actual process identity.
-  const processService = component === 'store' ? 'marketing' : component;
+  const processService = component;
   const results = [];
   for (const path of ['/api/ping', '/api/health', '/api/ready']) {
     try {

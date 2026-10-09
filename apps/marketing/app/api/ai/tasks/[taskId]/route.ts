@@ -54,6 +54,7 @@ export async function PATCH(
   { params }: { params: Promise<{ taskId: string }> }
 ) {
   try {
+    await apiRequireDevStudio(request);
     const { taskId } = await params;
     const body = await request.json();
     const orchestrator = getTaskOrchestrator();

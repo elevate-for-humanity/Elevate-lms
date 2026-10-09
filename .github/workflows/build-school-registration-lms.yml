@@ -18,3 +18,5 @@ jobs:
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/build-google-migration-images.yml/dispatches" --input - <<'JSON'
           {"ref":"main","inputs":{"component":"lms"}}
           JSON
+
+# Rebuild after concurrent shared component changes, preserving release ancestry.

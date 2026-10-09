@@ -85,16 +85,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid funding_source' }, { status: 400 });
     }
 
-    // Get program details
-    const { data: program, error: programError } = await supabase
+    // Read the same published catalog available to anonymous visitors. Keep
+    // authentication and student-owned enrollment checks on the session client.
+    const admin = await requireAdminClient();
+    const { data: program, error: programError } = await admin
       .from('programs')
       .select(
         'id, title, slug, price, tuition, total_cost, status, funding_eligible, funding_confirmed, wioa_approved, etpl_listed, is_free',
       )
       .eq('id', program_id)
+      .eq('published', true)
+      .eq('is_active', true)
       .maybeSingle();
 
-    if (programError || !program) {
+    if (programError) {
+      logger.error('Enrollment catalog lookup failed', programError);
+      return NextResponse.json(
+        { error: 'Program details are temporarily unavailable. Please try again.' },
+        { status: 503 },
+      );
+    }
+    if (!program) {
       return NextResponse.json({ error: 'Program not found' }, { status: 404 });
     }
 
@@ -151,7 +162,6 @@ export async function POST(request: NextRequest) {
     // pending until staff records the agency's written authorization.
     const amountToCharge = agencyFundingRequested ? 0 : stickerPrice;
 
-    const admin = await requireAdminClient();
     const partnerProgram =
       ENCHANTED_HEARTS.programs.find((item) => item.programId === program.id) ?? null;
     if (

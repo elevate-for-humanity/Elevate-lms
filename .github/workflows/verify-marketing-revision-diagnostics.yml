@@ -32,7 +32,7 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
-      - name: Select an existing failed Marketing revision
+      - name: Select an existing Marketing revision for collector verification
         id: revision
         run: |
           node --input-type=module <<'NODE'
@@ -41,11 +41,14 @@ jobs:
           const args=['run','revisions','list','--service=elevate-marketing-migration','--project=elegant-racer-299721','--region=us-central1','--sort-by=~metadata.creationTimestamp','--limit=20','--format=json'];
           const revisions=JSON.parse(execFileSync('gcloud',args,{encoding:'utf8',timeout:20000,stdio:['ignore','pipe','pipe']}));
           const failed=revisions.find(r=>(r.status?.conditions||[]).some(c=>c.type==='Ready'&&c.status==='False'));
-          if(!failed) throw new Error('No failed Marketing revision available for diagnostic verification');
-          const revision=failed.metadata.name;
+          // Prefer failure evidence; a live revision still verifies actual log
+          // access when Google no longer lists a failed revision.
+          const selected=failed||revisions[0];
+          if(!selected) throw new Error('No Marketing revision available for diagnostic verification');
+          const revision=selected.metadata.name;
           if(!/^elevate-marketing-migration-[a-z0-9-]+$/.test(revision)) throw new Error('Unexpected revision name');
           appendFileSync(process.env.GITHUB_OUTPUT,'name='+revision+'\n');
-          console.log('Verifying failed revision: '+revision);
+          console.log('Verifying revision: '+revision+'; failed='+Boolean(failed));
           NODE
       - name: Verify actual revision metadata and log collection
         timeout-minutes: 3

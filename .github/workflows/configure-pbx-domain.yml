@@ -23,4 +23,4 @@ jobs:
             exit 1
           fi
           echo "DNS verified. Checking TLS and HTTPS without modifying phone service."
-          curl --silent --show-error --fail --max-time 15 --output /dev/null "https://$host/"
+          curl --silent --show-error --fail --max-time 15 --output /dev/null "https://$host/healthz"

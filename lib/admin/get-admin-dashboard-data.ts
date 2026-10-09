@@ -20,6 +20,26 @@ import { requireRole } from '@/lib/auth/require-role';
 
 const DASHBOARD_SOURCE_TIMEOUT_MS = 8_000;
 
+async function loadDashboardApplications(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+  const rows: any[] = [];
+  const pageSize = 500;
+  const signal = AbortSignal.timeout(DASHBOARD_SOURCE_TIMEOUT_MS);
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await db
+      .from('applications')
+      .select(
+        'id,first_name,last_name,full_name,email,status,program_interest,program_slug,created_at,submitted_at',
+      )
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(offset, offset + pageSize - 1)
+      .abortSignal(signal);
+    if (error) return { data: null, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < pageSize) return { data: rows, error: null };
+  }
+}
+
 function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<T>((resolve) => {
@@ -34,9 +54,7 @@ function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promis
   });
 
   return Promise.race([
-    Promise.resolve(source).catch(
-      (error) => ({ data: null, error } as T),
-    ),
+    Promise.resolve(source).catch((error) => ({ data: null, error }) as T),
     timeout,
   ]).finally(() => {
     if (timer) clearTimeout(timer);
@@ -139,38 +157,29 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   ] = await Promise.all([
     timeboxDashboardQuery(
       userId
-      ? db.from('profiles').select('full_name,role').eq('id', userId).maybeSingle()
-      : Promise.resolve({ data: null, error: null }),
+        ? db.from('profiles').select('full_name,role').eq('id', userId).maybeSingle()
+        : Promise.resolve({ data: null, error: null }),
       'profile',
     ),
+    timeboxDashboardQuery(loadDashboardApplications(db), 'applications'),
     timeboxDashboardQuery(
       db
-      .from('applications')
-      .select(
-        'id,first_name,last_name,full_name,email,status,program_interest,program_slug,created_at,submitted_at',
-      )
-      .order('created_at', { ascending: false })
-      .limit(300),
-      'applications',
-    ),
-    timeboxDashboardQuery(
-      db
-      .from('program_enrollments')
-      .select(
-        'id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at,updated_at,amount_paid_cents,your_revenue_cents,funding_source,access_granted_at,revoked_at',
-      )
-      .order('created_at', { ascending: false })
-      .limit(1000),
+        .from('program_enrollments')
+        .select(
+          'id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at,updated_at,amount_paid_cents,your_revenue_cents,funding_source,access_granted_at,revoked_at',
+        )
+        .order('created_at', { ascending: false })
+        .limit(1000),
       'enrollments',
     ),
     timeboxDashboardQuery(
       db
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
-      .eq('role', 'student')
-      .like('email', '%@%')
-      .not('email', 'ilike', '%@qa.invalid')
-      .not('full_name', 'ilike', '[QA%'),
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('role', 'student')
+        .like('email', '%@%')
+        .not('email', 'ilike', '%@qa.invalid')
+        .not('full_name', 'ilike', '[QA%'),
       'student count',
     ),
     timeboxDashboardQuery(
@@ -179,118 +188,112 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     ),
     timeboxDashboardQuery(
       db
-      .from('program_holder_applications')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'pending'),
+        .from('program_holder_applications')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
       'program-holder applications',
     ),
     timeboxDashboardQuery(
       db
-      .from('program_holder_documents')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'pending'),
+        .from('program_holder_documents')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
       'program-holder documents',
     ),
     timeboxDashboardQuery(
       db
-      .from('program_enrollments')
-      .select(
-        'id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at',
-      )
-      .order('created_at', { ascending: false })
-      .limit(25),
+        .from('program_enrollments')
+        .select(
+          'id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at',
+        )
+        .order('created_at', { ascending: false })
+        .limit(25),
       'recent enrollments',
     ),
     timeboxDashboardQuery(
       db
-      .from('admin_alerts')
-      .select('id,alert_type,severity,message,created_at,resolved')
-      .eq('resolved', false)
-      .order('created_at', { ascending: false })
-      .limit(50),
+        .from('admin_alerts')
+        .select('id,alert_type,severity,message,created_at,resolved')
+        .eq('resolved', false)
+        .order('created_at', { ascending: false })
+        .limit(50),
       'compliance alerts',
     ),
     timeboxDashboardQuery(
       db
-      .from('crm_leads')
-      .select('id,full_name,email,status,updated_at')
-      .order('updated_at', { ascending: true })
-      .limit(100),
+        .from('crm_leads')
+        .select('id,full_name,email,status,updated_at')
+        .order('updated_at', { ascending: true })
+        .limit(100),
       'CRM leads',
     ),
     timeboxDashboardQuery(
       db
-      .from('documents')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'pending')
-      .ilike('document_type', '%wioa%'),
+        .from('documents')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending')
+        .ilike('document_type', '%wioa%'),
       'WIOA documents',
     ),
     timeboxDashboardQuery(
       db
-      .from('step_submissions')
-      .select('id,user_id,course_lesson_id,step_type,status,created_at')
-      .eq('status', 'pending')
-      .limit(100),
+        .from('step_submissions')
+        .select('id,user_id,course_lesson_id,step_type,status,created_at')
+        .eq('status', 'pending')
+        .limit(100),
       'step submissions',
     ),
     timeboxDashboardQuery(
       db
-      .from('programs')
-      .select('id,title,slug,status,is_active,updated_at')
-      .order('title')
-      .limit(300),
+        .from('programs')
+        .select('id,title,slug,status,is_active,updated_at')
+        .order('title')
+        .limit(300),
       'programs',
     ),
     timeboxDashboardQuery(
       db
-      .from('stripe_sessions_staging')
-      .select('session_id,email,amount,program_slug,kind,payment_status,created_at')
-      .in('payment_status', ['paid', 'completed'])
-      .order('created_at', { ascending: false })
-      .limit(100),
+        .from('stripe_sessions_staging')
+        .select('session_id,email,amount,program_slug,kind,payment_status,created_at')
+        .in('payment_status', ['paid', 'completed'])
+        .order('created_at', { ascending: false })
+        .limit(100),
       'historical payment sessions',
     ),
     timeboxDashboardQuery(
       db
-      .from('barber_subscriptions')
-      .select('id,customer_email,customer_name,amount_paid_at_checkout,created_at')
-      .gt('amount_paid_at_checkout', 0)
-      .order('created_at', { ascending: false })
-      .limit(100),
+        .from('barber_subscriptions')
+        .select('id,customer_email,customer_name,amount_paid_at_checkout,created_at')
+        .gt('amount_paid_at_checkout', 0)
+        .order('created_at', { ascending: false })
+        .limit(100),
       'barber subscriptions',
     ),
     timeboxDashboardQuery(
       db
-      .from('cosmetology_subscriptions')
-      .select('id,customer_email,customer_name,amount_paid_at_checkout,created_at')
-      .gt('amount_paid_at_checkout', 0)
-      .order('created_at', { ascending: false })
-      .limit(100),
+        .from('cosmetology_subscriptions')
+        .select('id,customer_email,customer_name,amount_paid_at_checkout,created_at')
+        .gt('amount_paid_at_checkout', 0)
+        .order('created_at', { ascending: false })
+        .limit(100),
       'cosmetology subscriptions',
     ),
     timeboxDashboardQuery(
       db
-      .from('barber_payments')
-      .select('id,amount_paid,payment_date,created_at')
-      .gt('amount_paid', 0)
-      .order('created_at', { ascending: false })
-      .limit(100),
+        .from('barber_payments')
+        .select('id,amount_paid,payment_date,created_at')
+        .gt('amount_paid', 0)
+        .order('created_at', { ascending: false })
+        .limit(100),
       'barber payments',
     ),
     timeboxDashboardQuery(
       db.from('ita_vouchers').select('payments_to_date').gt('payments_to_date', 0),
       'ITA vouchers',
     ),
-    timeboxDashboardQuery(
-      db.rpc('get_revenue_all_time'),
-      'all-time revenue',
-    ),
-    timeboxDashboardQuery(
-      db.rpc('get_revenue_this_month'),
-      'monthly revenue',
-    ),
-    timeboxDashboardHealth(getSystemHealth(db))
+    timeboxDashboardQuery(db.rpc('get_revenue_all_time'), 'all-time revenue'),
+    timeboxDashboardQuery(db.rpc('get_revenue_this_month'), 'monthly revenue'),
+    timeboxDashboardHealth(getSystemHealth(db)),
   ]);
 
   const applications = safeRows(applicationsRes, degradedSections, 'dashboard_data').filter(
@@ -532,6 +535,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     }));
 
   const blockedPrograms = programRows
+    .filter((row: any) => row.status !== 'archived' && !isTestRecord(row.title, row.slug))
     .filter((row: any) => row.status !== 'published' || row.is_active === false)
     .map((row: any) => ({
       id: row.id,
@@ -664,7 +668,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       value: revenueThisMonthCents,
       delta: 0,
       deltaLabel: 'Database aggregate',
-      href: '/integrations/stripe',
+      href: '/integrations/quickbooks',
       urgent: false,
       sub: `$${(revenueAllTimeCents / 100).toLocaleString('en-US')} tracked all time`,
     },

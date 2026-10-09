@@ -1,14 +1,17 @@
 /**
  * Orchestrates "Publish & Update Website" from the admin dashboard:
  * 1. Bust ISR/cache on the public LMS (via cron revalidate endpoint)
- * 2. Trigger Northflank builds for LMS + Admin (latest main image)
+ * 2. Dispatch the Google Marketing release workflow.
  */
 
 import 'server-only';
 
 import { logger } from '@/lib/logger';
 import { PUBLIC_REVALIDATE_PATHS } from '@/lib/public-revalidate-paths';
-import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
+import {
+  dispatchGoogleDeployment,
+  isGoogleDeploymentConfigured,
+} from '@/lib/gcp/dispatch-production-workflow';
 
 export type NorthflankDeployResult = {
   service: string;
@@ -80,10 +83,20 @@ export async function revalidatePublicLmsSite(): Promise<RevalidateLmsResult> {
     try {
       json = JSON.parse(text) as RevalidateResponse;
     } catch {
-      return { ok: false, status: res.status, error: 'Cache endpoint returned invalid JSON', paths: PUBLIC_REVALIDATE_PATHS };
+      return {
+        ok: false,
+        status: res.status,
+        error: 'Cache endpoint returned invalid JSON',
+        paths: PUBLIC_REVALIDATE_PATHS,
+      };
     }
     if (json.ok !== true || !Array.isArray(json.revalidated)) {
-      return { ok: false, status: res.status, error: json.error || 'Cache endpoint rejected the refresh contract', paths: PUBLIC_REVALIDATE_PATHS };
+      return {
+        ok: false,
+        status: res.status,
+        error: json.error || 'Cache endpoint rejected the refresh contract',
+        paths: PUBLIC_REVALIDATE_PATHS,
+      };
     }
     return {
       ok: true,
@@ -101,19 +114,24 @@ export async function revalidatePublicLmsSite(): Promise<RevalidateLmsResult> {
 export async function triggerProductionDeploys(): Promise<NorthflankDeployResult[]> {
   try {
     const result = await dispatchGoogleDeployment('marketing');
-    return [{
-      service: result.target,
-      key: result.target,
-      status: 'triggered',
-      detail: 'Google Cloud Run workflow dispatched; exact live revision still requires verification',
-    }];
+    return [
+      {
+        service: result.target,
+        key: result.target,
+        status: 'triggered',
+        detail:
+          'Google Cloud Run workflow dispatched; exact live revision still requires verification',
+      },
+    ];
   } catch (error) {
-    return [{
-      service: 'marketing',
-      key: 'marketing',
-      status: 'failed',
-      detail: error instanceof Error ? error.message : 'Google Marketing dispatch failed',
-    }];
+    return [
+      {
+        service: 'marketing',
+        key: 'marketing',
+        status: 'failed',
+        detail: error instanceof Error ? error.message : 'Google Marketing dispatch failed',
+      },
+    ];
   }
 }
 
@@ -132,11 +150,10 @@ export async function publishAndUpdateWebsite(
     ? await revalidatePublicLmsSite()
     : { ok: true, paths: PUBLIC_REVALIDATE_PATHS, error: 'skipped' };
 
-  const deployResults: NorthflankDeployResult[] = deploy
-    ? await triggerProductionDeploys()
-    : [];
+  const deployResults: NorthflankDeployResult[] = deploy ? await triggerProductionDeploys() : [];
 
-  const deployOk = deployResults.length === 0 || deployResults.every((r) => r.status === 'triggered');
+  const deployOk =
+    deployResults.length === 0 || deployResults.every((r) => r.status === 'triggered');
   const ok = (revalidate ? revalidateResult.ok : true) && deployOk;
 
   return {
@@ -149,6 +166,7 @@ export async function publishAndUpdateWebsite(
 }
 
 export type PublishWebsiteStatus = {
+  googleReady: boolean;
   northflankReady: boolean;
   liveSiteUrl: string;
   services: Array<{
@@ -164,25 +182,46 @@ export type PublishWebsiteStatus = {
 
 export async function getPublishWebsiteStatus(): Promise<PublishWebsiteStatus> {
   const targets = [
-    { key: 'marketing', id: 'elevate-marketing-migration', label: 'Marketing', url: 'https://elevate-marketing-migration-aabnh2y32a-uc.a.run.app' },
-    { key: 'admin', id: 'elevate-admin-migration', label: 'Admin', url: 'https://elevate-admin-migration-aabnh2y32a-uc.a.run.app' },
-    { key: 'lms', id: 'elevate-lms-migration', label: 'LMS', url: 'https://elevate-lms-migration-aabnh2y32a-uc.a.run.app' },
+    {
+      key: 'marketing',
+      id: 'elevate-marketing-migration',
+      label: 'Marketing',
+      url: 'https://elevate-marketing-migration-aabnh2y32a-uc.a.run.app',
+    },
+    {
+      key: 'admin',
+      id: 'elevate-admin-migration',
+      label: 'Admin',
+      url: 'https://elevate-admin-migration-aabnh2y32a-uc.a.run.app',
+    },
+    {
+      key: 'lms',
+      id: 'elevate-lms-migration',
+      label: 'LMS',
+      url: 'https://elevate-lms-migration-aabnh2y32a-uc.a.run.app',
+    },
   ];
-  const services = await Promise.all(targets.map(async (target) => {
-    let status = 'unreachable';
-    try {
-      const response = await fetch(target.url + '/api/health', {
-        cache: 'no-store',
-        signal: AbortSignal.timeout(8000),
-      });
-      const payload = await response.json().catch(() => null) as { healthy?: boolean } | null;
-      status = response.ok && payload?.healthy === true
-        ? 'healthy (revision not verified)'
-        : 'unhealthy (HTTP ' + response.status + ')';
-    } catch { /* Do not treat a failed probe as healthy. */ }
-    return { ...target, status, lastDeployedAt: null };
-  }));
+  const services = await Promise.all(
+    targets.map(async (target) => {
+      let status = 'unreachable';
+      try {
+        const response = await fetch(target.url + '/api/health', {
+          cache: 'no-store',
+          signal: AbortSignal.timeout(8000),
+        });
+        const payload = (await response.json().catch(() => null)) as { healthy?: boolean } | null;
+        status =
+          response.ok && payload?.healthy === true
+            ? 'healthy (revision not verified)'
+            : 'unhealthy (HTTP ' + response.status + ')';
+      } catch {
+        /* Do not treat a failed probe as healthy. */
+      }
+      return { ...target, status, lastDeployedAt: null };
+    }),
+  );
   return {
+    googleReady: await isGoogleDeploymentConfigured(),
     northflankReady: false,
     liveSiteUrl: lmsOrigin(),
     services,

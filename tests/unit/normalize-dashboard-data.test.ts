@@ -2,16 +2,35 @@ import { describe, expect, it } from 'vitest';
 import { normalizeAdminDashboardData } from '@/lib/admin/normalize-dashboard-data';
 
 describe('normalizeAdminDashboardData', () => {
+  it('does not invent application identities or submission dates', () => {
+    const normalized = normalizeAdminDashboardData({
+      recentApplications: [
+        { id: '', full_name: 'Invalid record' },
+        { id: 'saved-id', full_name: 'Saved record', created_at: null },
+      ] as any,
+    });
+    expect(normalized.recentApplications).toHaveLength(1);
+    expect(normalized.recentApplications[0].id).toBe('saved-id');
+    expect(normalized.recentApplications[0].created_at).toBe('');
+  });
   it('preserves live QuickBooks health and does not report an absent health source as healthy', () => {
     const missing = normalizeAdminDashboardData(null).systemHealth;
     expect(missing.quickBooksWebhookOk).toBe(false);
     expect(missing.quickBooksBillingOk).toBe(false);
     expect(missing.degraded).toBe(true);
-    const health = normalizeAdminDashboardData({ systemHealth: {
-      quickBooksWebhookOk: true, quickBooksBillingOk: false, buildEnvOk: true,
-      staleJobs: 0, degraded: true, missingDocuments: 0, missingCertifications: 0,
-      unresolvedFlags: 0, alerts: [],
-    } }).systemHealth;
+    const health = normalizeAdminDashboardData({
+      systemHealth: {
+        quickBooksWebhookOk: true,
+        quickBooksBillingOk: false,
+        buildEnvOk: true,
+        staleJobs: 0,
+        degraded: true,
+        missingDocuments: 0,
+        missingCertifications: 0,
+        unresolvedFlags: 0,
+        alerts: [],
+      },
+    }).systemHealth;
     expect(health.quickBooksWebhookOk).toBe(true);
     expect(health.quickBooksBillingOk).toBe(false);
     expect(health).not.toHaveProperty('stripeWebhookOk');
@@ -117,7 +136,11 @@ describe('normalizeAdminDashboardData', () => {
         alerts: [
           null,
           { code: 'stale_jobs', severity: 'warning', message: '2 stuck' },
-          { code: 'bad', severity: 'urgent' as 'critical', message: undefined as unknown as string },
+          {
+            code: 'bad',
+            severity: 'urgent' as 'critical',
+            message: undefined as unknown as string,
+          },
         ],
       } as unknown as import('@/components/admin/dashboard/types').AdminDashboardData['systemHealth'],
     });
@@ -152,8 +175,24 @@ describe('normalizeAdminDashboardData', () => {
   it('drops recent students without ids', () => {
     const normalized = normalizeAdminDashboardData({
       recentStudents: [
-        { id: '', full_name: 'Bad', email: null, enrollment_status: null, created_at: null, program_name: null, href: '/x' },
-        { id: 'abc', full_name: 'Good', email: null, enrollment_status: null, created_at: null, program_name: null, href: '/admin/students/abc' },
+        {
+          id: '',
+          full_name: 'Bad',
+          email: null,
+          enrollment_status: null,
+          created_at: null,
+          program_name: null,
+          href: '/x',
+        },
+        {
+          id: 'abc',
+          full_name: 'Good',
+          email: null,
+          enrollment_status: null,
+          created_at: null,
+          program_name: null,
+          href: '/admin/students/abc',
+        },
       ],
     });
 

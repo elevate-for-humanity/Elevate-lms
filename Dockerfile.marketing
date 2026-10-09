@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.7
+# Use Docker BuildKit's bundled frontend; this file needs no external syntax features.
 ARG NODE_IMAGE=node:22-alpine
 FROM ${NODE_IMAGE} AS base
 

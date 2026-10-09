@@ -1,3 +1,7 @@
+import {
+  authenticatePartnerPortalGuidance,
+  executePortalReadCommand,
+} from '@/lib/paris/portal-read-tools';
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -15,9 +19,9 @@ export const maxDuration = 60;
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
-const verifiedFundingList = VERIFIED_WORKFORCE_FUNDED_PROGRAMS
-  .map((program) => `${program.title}: ${program.description}`)
-  .join('\n- ');
+const verifiedFundingList = VERIFIED_WORKFORCE_FUNDED_PROGRAMS.map(
+  (program) => `${program.title}: ${program.description}`,
+).join('\n- ');
 
 const PARIS_SYSTEM_PROMPT = `You are PARIS, the AI assistant for ${PLATFORM_DEFAULTS.orgName}.
 
@@ -76,7 +80,9 @@ SCOPE AND LEARNER-SAFETY RULES:
 
 async function hasAuthenticatedPortalSession(): Promise<boolean> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   return Boolean(user);
 }
 
@@ -90,6 +96,8 @@ REGISTERED BEAUTY APPRENTICESHIP FACTS — 2Exclusive LLC-S, 2025-IN-132301:
 - Never call 500 hours graduation. Never substitute traditional school-hour rules for the registered apprenticeship standard.
 
 PORTAL OPERATING RULES:
+- For applicant/student counts, pending-hour counts or a dashboard summary, the dedicated record tool answers before you are called. Never invent counts or claim to query records yourself.
+- When asked to send, update, approve, enroll, sign or pay, clearly state that you have not performed the action. Draft requested text and link the correct dashboard form for review and submission.
 - Help the signed-in user navigate their dashboard, understand required red to-dos, organize onboarding, draft notes and student outreach, and prepare progress updates.
 - You may draft or prefill proposed text, checklists, and next steps. Clearly label drafts.
 - Never claim you submitted, approved, signed, certified, paid, enrolled, messaged, or changed a record unless a dedicated tool confirms it.
@@ -99,7 +107,9 @@ PORTAL OPERATING RULES:
 
 async function loadTrustedLearnerContext(): Promise<TrustedLearnerContext | null> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return null;
 
   const { data: enrollment } = await supabase
@@ -142,13 +152,17 @@ async function loadTrustedLearnerContext(): Promise<TrustedLearnerContext | null
     courseId: String(course.id),
     courseTitle: String(course.title || 'Current course'),
     nextLessonTitle: nextLesson?.title ? String(nextLesson.title) : null,
-    courseProgress: totalLessons > 0 ? Math.min(100, Math.round((completedLessons / totalLessons) * 100)) : 0,
+    courseProgress:
+      totalLessons > 0 ? Math.min(100, Math.round((completedLessons / totalLessons) * 100)) : 0,
     completedLessons,
     totalLessons,
   };
 }
 
-function getSmartFallback(userMessage: string, learnerContext?: TrustedLearnerContext | null): string {
+function getSmartFallback(
+  userMessage: string,
+  learnerContext?: TrustedLearnerContext | null,
+): string {
   if (learnerContext) {
     if (learnerContext.nextLessonTitle) {
       return `Your current course is **${learnerContext.courseTitle}**. You have completed ${learnerContext.completedLessons} of ${learnerContext.totalLessons} published lessons (${learnerContext.courseProgress}%). Your next lesson is **${learnerContext.nextLessonTitle}**. Open it from your learner dashboard. I can help you study the concepts, but I cannot complete graded work for you.`;
@@ -166,7 +180,12 @@ function getSmartFallback(userMessage: string, learnerContext?: TrustedLearnerCo
     return `Start at https://${PLATFORM_DEFAULTS.canonicalDomain}/apply and choose the exact program and payment or funding pathway you want reviewed. An application is not an enrollment or funding guarantee. For help, call ${PLATFORM_DEFAULTS.supportPhone}.`;
   }
 
-  if (lower.includes('free') || lower.includes('cost') || lower.includes('pay') || lower.includes('fund')) {
+  if (
+    lower.includes('free') ||
+    lower.includes('cost') ||
+    lower.includes('pay') ||
+    lower.includes('fund')
+  ) {
     const titles = VERIFIED_WORKFORCE_FUNDED_PROGRAMS.map((program) => program.title).join(', ');
     return `Funding is program- and participant-specific and is not guaranteed by the website or application. Elevate's current public funding registry contains: ${titles || 'no published program-level funding records'}. Review https://${PLATFORM_DEFAULTS.canonicalDomain}/funding, then submit the exact program through https://${PLATFORM_DEFAULTS.canonicalDomain}/apply.`;
   }
@@ -184,7 +203,10 @@ Ask about the exact program so staff can verify the correct requirements.`;
   return `I can help you find the correct program, application, funding guidance, or apprenticeship information. I will not guess about eligibility, funding awards, placement, wages, licensing, or program approvals. Start at https://${PLATFORM_DEFAULTS.canonicalDomain}/programs, or tell me the exact program you are asking about.`;
 }
 
-async function callAnthropic(messages: any[], systemPrompt: string): Promise<{ reply: string; provider: string } | null> {
+async function callAnthropic(
+  messages: any[],
+  systemPrompt: string,
+): Promise<{ reply: string; provider: string } | null> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return null;
 
@@ -201,7 +223,7 @@ async function callAnthropic(messages: any[], systemPrompt: string): Promise<{ r
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
         system: systemPrompt,
-        messages: messages.filter(m => m.role !== 'system'),
+        messages: messages.filter((m) => m.role !== 'system'),
       }),
     });
 
@@ -215,7 +237,10 @@ async function callAnthropic(messages: any[], systemPrompt: string): Promise<{ r
   }
 }
 
-async function callOpenAI(messages: any[], systemPrompt: string): Promise<{ reply: string; provider: string } | null> {
+async function callOpenAI(
+  messages: any[],
+  systemPrompt: string,
+): Promise<{ reply: string; provider: string } | null> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
 
@@ -244,7 +269,10 @@ async function callOpenAI(messages: any[], systemPrompt: string): Promise<{ repl
   }
 }
 
-async function callGroq(messages: any[], systemPrompt: string): Promise<{ reply: string; provider: string } | null> {
+async function callGroq(
+  messages: any[],
+  systemPrompt: string,
+): Promise<{ reply: string; provider: string } | null> {
   if (!process.env.GROQ_API_KEY) return null;
   try {
     const response = await getGroqClient().chat.completions.create({
@@ -288,15 +316,37 @@ async function _POST(req: NextRequest) {
         { status: 403 },
       );
     }
-    if (portalRequested && !(await hasAuthenticatedPortalSession())) {
-      return NextResponse.json({ error: 'Authenticated portal session is unavailable.' }, { status: 403 });
+    if (portalRequested) {
+      const commandReply = await executePortalReadCommand(
+        messages.at(-1)?.content || '',
+        String(body.context?.page || ''),
+      );
+      if (commandReply)
+        return NextResponse.json({ reply: commandReply, provider: 'portal-records' });
     }
-    const systemPrompt = learnerContext ? learnerSystemPrompt(learnerContext) : portalRequested ? PORTAL_SYSTEM_PROMPT : PARIS_SYSTEM_PROMPT;
+    if (
+      portalRequested &&
+      !(await authenticatePartnerPortalGuidance(String(body.context?.page || ''))) &&
+      !(await hasAuthenticatedPortalSession())
+    ) {
+      return NextResponse.json(
+        { error: 'Authenticated portal session is unavailable.' },
+        { status: 403 },
+      );
+    }
+    const systemPrompt = learnerContext
+      ? learnerSystemPrompt(learnerContext)
+      : portalRequested
+        ? PORTAL_SYSTEM_PROMPT
+        : PARIS_SYSTEM_PROMPT;
 
     // Try PARIS AI (Anthropic) first
     const anthropicResult = await callAnthropic(messages, systemPrompt);
     if (anthropicResult) {
-      return NextResponse.json({ reply: anthropicResult.reply, provider: anthropicResult.provider });
+      return NextResponse.json({
+        reply: anthropicResult.reply,
+        provider: anthropicResult.provider,
+      });
     }
 
     // Fall back to OpenAI
@@ -315,9 +365,10 @@ async function _POST(req: NextRequest) {
     if (portalRequested) {
       const role = String(body.context?.portalRole || '').toLowerCase();
       const page = String(body.context?.page || '');
-      const portalReply = role.includes('program_holder') || role.includes('program holder')
-        ? `I can still provide verified Program Holder guidance while the live AI provider reconnects. Use Applications to work routed applicants, Students for enrolled learners, Phone to connect extension 105 and manage calls, and the red to-do list for required actions. Current page: ${page || '/program-holder/dashboard'}. I will not claim that an official record was submitted or changed unless the dashboard confirms it.`
-        : `I can still provide verified portal navigation while the live AI provider reconnects. Use the dashboard's current records and red to-do list for required actions. Current page: ${page || 'portal dashboard'}. I will not claim an official record was submitted or changed unless the dashboard confirms it.`;
+      const portalReply =
+        role.includes('program_holder') || role.includes('program holder')
+          ? `I can still provide verified Program Holder guidance while the live AI provider reconnects. Use Applications to work routed applicants, Students for enrolled learners, Phone for your assigned line, and the red to-do list for required actions. Ask for applicant counts or a dashboard summary to read current assigned records. Current page: ${page || '/program-holder/dashboard'}. I will not claim that an official record was submitted or changed unless the dashboard confirms it.`
+          : `I can still provide verified portal navigation while the live AI provider reconnects. Use the dashboard's current records and red to-do list for required actions. Current page: ${page || 'portal dashboard'}. I will not claim an official record was submitted or changed unless the dashboard confirms it.`;
       return NextResponse.json({ reply: portalReply, provider: 'verified-portal-fallback' });
     }
 
@@ -333,9 +384,16 @@ async function _POST(req: NextRequest) {
 
     return NextResponse.json({ reply: fallbackReply, provider: 'demo' });
   } catch (error) {
-    logger.error('Chat API error', normalizeError(error, 'Chat API failed'), getErrorContext(error));
+    logger.error(
+      'Chat API error',
+      normalizeError(error, 'Chat API failed'),
+      getErrorContext(error),
+    );
     if (learnerRequested || portalRequested) {
-      return NextResponse.json({ error: 'Learner guidance is temporarily unavailable.' }, { status: 503 });
+      return NextResponse.json(
+        { error: 'Learner guidance is temporarily unavailable.' },
+        { status: 503 },
+      );
     }
     const fallbackReply = `I'm having technical difficulties. Please call ${PLATFORM_DEFAULTS.supportPhone} or visit ${PLATFORM_DEFAULTS.canonicalDomain}/apply to get started!`;
     return NextResponse.json({ reply: fallbackReply, provider: 'demo' });

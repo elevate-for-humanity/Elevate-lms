@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import { usePathname, useRouter } from 'next/navigation';
+import { resolvePortalNavigation } from '@/lib/paris/portal-navigation';
 import type { PortalSupportIssue } from '@/lib/paris/portal-support';
 import {
   createBrowserSpeechRecognition,
@@ -63,107 +64,6 @@ const PATHWAYS = [
   { id: 'beauty', label: 'Barber & Beauty', icon: Scissors },
   { id: 'testing', label: 'Testing & Credentials', icon: FileCheck },
 ] as const;
-
-function resolvePortalNavigation(command: string, pathname: string) {
-  const text = command.toLowerCase();
-  if (!/\b(open|show|go to|take me|manage|change|update|view|send)\b/.test(text)) return null;
-  if (/\b(card|payment method)\b/.test(text)) {
-    return { href: '/account/payment-methods', label: 'billing and payment options' };
-  }
-
-  const prefix = pathname.startsWith('/program-holder')
-    ? '/program-holder'
-    : pathname.startsWith('/host-shop')
-      ? '/host-shop/dashboard'
-      : pathname.startsWith('/employer')
-        ? '/employer'
-        : pathname.startsWith('/apprentice')
-          ? '/apprentice'
-          : pathname.startsWith('/workforce')
-            ? '/workforce'
-            : pathname.startsWith('/creator')
-              ? '/creator'
-              : '/account';
-
-  const routeMap: Record<string, Record<string, string>> = {
-    '/program-holder': {
-      settings: '/settings',
-      profile: '/settings',
-      students: '/students',
-      programs: '/programs',
-      documents: '/documents',
-      reports: '/reports',
-      hours: '/hours',
-      payouts: '/payouts',
-      applicants: '/students/pending',
-      meetings: '/meetings',
-      inbox: '/inbox',
-      compliance: '/compliance',
-      orientation: '/how-to-use',
-      agreement: '/sign-mou',
-      dashboard: '/dashboard',
-    },
-    '/host-shop/dashboard': {
-      settings: '/settings',
-      profile: '/profile',
-      students: '/students',
-      programs: '/programs',
-      documents: '/documents',
-      reports: '/reports',
-      hours: '/hours',
-      dashboard: '',
-    },
-    '/employer': {
-      settings: '/settings',
-      profile: '/company',
-      students: '/apprentices',
-      programs: '/programs',
-      documents: '/documents',
-      reports: '/reports',
-      hours: '/hours',
-      dashboard: '/dashboard',
-    },
-    '/apprentice': {
-      profile: '/profile',
-      programs: '/rti',
-      documents: '/documents',
-      hours: '/hours',
-      dashboard: '/dashboard',
-    },
-    '/workforce': { students: '/participants', reports: '/dashboard', dashboard: '/dashboard' },
-    '/creator': { programs: '/products', dashboard: '' },
-    '/account': { settings: '/settings', profile: '/profile', dashboard: '' },
-  };
-  const destinations = [
-    {
-      key: 'settings',
-      words: ['notification', 'alert', 'preference', 'setting'],
-      label: 'notification settings',
-    },
-    { key: 'profile', words: ['profile', 'picture', 'photo'], label: 'your profile' },
-    {
-      key: 'students',
-      words: ['student', 'learner', 'email', 'message', 'text'],
-      label: 'student communications',
-    },
-    { key: 'applicants', words: ['applicant', 'application'], label: 'applicants' },
-    { key: 'meetings', words: ['meeting', 'appointment', 'calendar', 'schedule'], label: 'team meetings' },
-    { key: 'inbox', words: ['inbox', 'office mail', 'internal mail'], label: 'office mail' },
-    { key: 'compliance', words: ['compliance', 'requirement', 'readiness'], label: 'compliance requirements' },
-    { key: 'orientation', words: ['orientation', 'how to use', 'training guide'], label: 'orientation' },
-    { key: 'agreement', words: ['agreement', 'mou', 'contract'], label: 'your agreement' },
-    { key: 'programs', words: ['program', 'course'], label: 'your assigned programs' },
-    { key: 'documents', words: ['document', 'upload'], label: 'documents' },
-    { key: 'reports', words: ['report'], label: 'reports' },
-    { key: 'hours', words: ['hour', 'attendance', 'time'], label: 'training hours' },
-    { key: 'payouts', words: ['payment', 'payout', 'bank'], label: 'payouts' },
-    { key: 'dashboard', words: ['dashboard', 'home'], label: 'your dashboard' },
-  ];
-  const destination = destinations.find(({ words }) => words.some((word) => text.includes(word)));
-  const suffix = destination ? routeMap[prefix]?.[destination.key] : undefined;
-  if (!destination || suffix === undefined) return null;
-  return { href: `${prefix}${suffix}`, label: destination.label };
-}
 
 const PUBLIC_GREETING: Message = {
   role: 'assistant',
@@ -394,7 +294,7 @@ export default function ParisChat({
         if (portalSurface) {
           const command = resolvePortalNavigation(trimmed, pathname);
           if (command) {
-            const reply = `Done — I opened ${command.label}.`;
+            const reply = `Opening ${command.label}.`;
             setMessages((previous) => [...previous, { role: 'assistant', content: reply }]);
             if (autoSpeak)
               void voice.play(plainTextForSpeech(reply), {
@@ -641,7 +541,31 @@ export default function ParisChat({
           </div>
         )}
 
-        {!isLoading && messages.length === 1 && !learnerSurface && !storeSurface && (
+        {!isLoading && messages.length === 1 && portalSurface && (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {[
+              pathname.startsWith('/host-shop')
+                ? 'Show my shop status'
+                : 'Show my dashboard summary',
+              pathname.startsWith('/host-shop')
+                ? 'How many pending hours need review?'
+                : 'How many pending applicants do I have?',
+              'Open email',
+              'Draft an applicant follow-up message for me to review.',
+            ].map((prompt) => (
+              <button
+                type="button"
+                key={prompt}
+                onClick={() => void sendToApi(prompt)}
+                className="min-h-12 rounded-xl border border-slate-300 bg-white px-4 py-3 text-left font-semibold text-slate-950 hover:bg-slate-100"
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {!isLoading && messages.length === 1 && surface === 'public' && (
           <div className="grid gap-2 sm:grid-cols-2">
             {PATHWAYS.map(({ id, label, icon: Icon }) => (
               <button
@@ -745,7 +669,9 @@ export default function ParisChat({
                 ? 'Ask about your course or next lesson…'
                 : storeSurface
                   ? 'Tell PARIS about your business or ask a platform question…'
-                  : 'Ask about a program, funding, testing, or apprenticeship…'
+                  : portalSurface
+                    ? 'Ask for applicant counts, shop status, hours, a draft, or open a dashboard page…'
+                    : 'Ask about a program, funding, testing, or apprenticeship…'
             }
             style={{ width: 0, minWidth: 0, maxWidth: '100%', flex: '1 1 0%' }}
             className="min-h-11 max-h-28 min-w-0 flex-1 resize-none rounded-2xl border-2 border-slate-300 px-3 py-2.5 text-base text-slate-950 focus:border-brand-blue-700 focus:outline-none focus:ring-2 focus:ring-brand-blue-200 sm:min-h-[52px] sm:max-h-40 sm:px-4 sm:py-3 sm:text-sm"

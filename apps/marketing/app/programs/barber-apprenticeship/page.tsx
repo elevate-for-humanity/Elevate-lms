@@ -125,12 +125,6 @@ export default async function BarberApprenticeshipPage() {
         />
       </section>
 
-      <section className="border-b border-slate-200 bg-white px-4 py-5">
-        <div className="mx-auto max-w-6xl">
-          <BeautyEnrollmentPromotion compact programLabel="Barber Apprenticeship" />
-        </div>
-      </section>
-
       <div data-scroll-narration data-narration={KOUNTRY_KUTZ_HERO_TRANSCRIPT}>
         <KountryKutzTourSlideshow />
       </div>
@@ -215,8 +209,17 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
-      <ApprenticeshipExperienceGuide programTitle={program.title} applyHref={program.cta.applyHref} />
+      <ApprenticeshipExperienceGuide
+        programTitle={program.title}
+        applyHref={program.cta.applyHref}
+      />
       <HostShopPlacementGuide programSlug="barber-apprenticeship" />
+
+      <section className="border-b border-slate-200 bg-white px-4 py-5">
+        <div className="mx-auto max-w-6xl">
+          <BeautyEnrollmentPromotion compact programLabel="Barber Apprenticeship" />
+        </div>
+      </section>
 
       <section
         data-scroll-narration

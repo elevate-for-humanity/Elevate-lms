@@ -1,5 +1,8 @@
 name: Diagnose finite Google Course Builder execution
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/diagnose-google-course-job.yml']
   workflow_dispatch:
     inputs:
       execution:
@@ -9,10 +12,19 @@ on:
         type: string
 permissions:
   contents: read
+  actions: write
   id-token: write
 jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch read-only Google diagnostic
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/diagnose-google-course-job.yml/dispatches" -f ref=main
   diagnose:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 10
@@ -50,7 +62,7 @@ jobs:
           console.log(JSON.stringify({logCount:logs.length,logTypes:[...new Set(logs.map(x=>x.logName))]}));
           for(const item of logs) {
             const message=String(item.textPayload ?? item.jsonPayload?.message ?? '');
-            if(!/error|failed|exception|ultimate_|claim|complete|starting|polling|once|narration/i.test(message)) continue;
+            if(!/error|failed|exception|ultimate_|claim|complete|starting|polling|once|narration|render|bundl|mp4/i.test(message)) continue;
             const safe=message.replace(/Bearer\s+\S+/gi,'Bearer [redacted]').replace(/(token|password|secret|api[_-]?key)\s*[:=]\s*\S+/gi,'$1=[redacted]').slice(0,1500);
             console.log(JSON.stringify({timestamp:item.timestamp,severity:item.severity,message:safe}));
           }

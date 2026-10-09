@@ -148,7 +148,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     ],
     websiteUrl: 'https://booksy.com/en-us/211056_cal-s-kutz-studio_barber-shop_19577_indianapolis',
     websiteLabel: 'Book / view Cals Kutz online',
-    socialUrl: 'https://www.instagram.com/calskutzstudio/',
+    socialUrl: 'https://www.instagram.com/cal_kutz/',
     socialLabel: 'View Cals Kutz photos',
   },
   {
@@ -426,7 +426,14 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
 ];
 
 export function getFeaturedHostPartnerBySlug(slug: string) {
-  return FEATURED_BEAUTY_HOST_PARTNERS.find((shop) => shop.slug === slug);
+  const normalized = slug.trim().toLowerCase().replace(/-[a-f0-9]{8}$/, '');
+  const aliases: Record<string, string> = {
+    'b-52-s-barber-shop-llc': 'b-52s-barber-shop',
+    'style-and-scissors-salon': 'style-and-scissor-salon',
+    'generations-hair-llc-dba-generations-wedding-co': 'generations-hair-llc',
+  };
+  const canonical = aliases[normalized] ?? normalized;
+  return FEATURED_BEAUTY_HOST_PARTNERS.find((shop) => shop.slug === canonical);
 }
 
 export const PARTNER_BRAND_ALIASES = {

@@ -339,7 +339,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
               <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">{hostLabel}</p>
               <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">{shop.dba ?? shop.name}</h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">{shop.marketingBlurb ?? shop.note}</p>
-              <p className="mt-4 text-sm font-bold leading-6 text-slate-600">Listen to the page guide for the full shop and apprenticeship introduction. The tour video remains muted by default so two audio tracks never compete.</p>
+              <p className="mt-4 text-sm font-bold leading-6 text-slate-600">Listen to the page guide for the full shop and apprenticeship introduction. Play the shop tour when you are ready, and use fullscreen for a larger view.</p>
             </div>
             <div className="grid min-w-0 gap-4 sm:grid-cols-2 sm:items-center">
               {imageItems[0] ? (
@@ -347,8 +347,8 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
                   <Image src={imageItems[0].url} alt={imageItems[0].alt ?? `${shop.dba ?? shop.name} shop image`} fill sizes="(max-width: 640px) 100vw, 28vw" className="object-contain" />
                 </div>
               ) : null}
-              <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-lg">
-                <video src={videoUrl} autoPlay muted playsInline loop preload="auto" className="aspect-[9/16] max-h-[560px] w-full object-contain" aria-label={`${shop.dba ?? shop.name} ${hostLabel} video`} />
+              <div className="mx-auto flex w-full max-w-[280px] items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-lg">
+                <video src={videoUrl} controls playsInline preload="metadata" className="h-auto w-auto max-h-[320px] max-w-full object-scale-down" aria-label={`${shop.dba ?? shop.name} ${hostLabel} video`} />
               </div>
             </div>
           </div>

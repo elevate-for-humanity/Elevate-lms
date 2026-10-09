@@ -1,0 +1,53 @@
+name: Verify Marketing revision diagnostic collection
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/verify-marketing-revision-diagnostics.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  diagnose:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Select an existing failed Marketing revision
+        id: revision
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { appendFileSync } from 'node:fs';
+          const args=['run','revisions','list','--service=elevate-marketing-migration','--project=elegant-racer-299721','--region=us-central1','--sort-by=~metadata.creationTimestamp','--limit=20','--format=json'];
+          const revisions=JSON.parse(execFileSync('gcloud',args,{encoding:'utf8',timeout:20000,stdio:['ignore','pipe','pipe']}));
+          const failed=revisions.find(r=>(r.status?.conditions||[]).some(c=>c.type==='Ready'&&c.status==='False'));
+          if(!failed) throw new Error('No failed Marketing revision available for diagnostic verification');
+          const revision=failed.metadata.name;
+          if(!/^elevate-marketing-migration-[a-z0-9-]+$/.test(revision)) throw new Error('Unexpected revision name');
+          appendFileSync(process.env.GITHUB_OUTPUT,'name='+revision+'\n');
+          console.log('Verifying failed revision: '+revision);
+          NODE
+      - name: Verify actual revision metadata and log collection
+        timeout-minutes: 3
+        env:
+          FAILED_REVISION: ${{ steps.revision.outputs.name }}
+        run: node scripts/gcp/collect-marketing-revision-diagnostics.mjs
+      - name: Preserve diagnostic verification evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: marketing-diagnostic-verification-${{ github.run_id }}
+          path: deployment-diagnostics/marketing-revision.json
+          if-no-files-found: warn
+          retention-days: 7

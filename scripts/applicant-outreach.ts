@@ -18,10 +18,11 @@ export async function runApplicantOutreach(mode:string){
  if(!['prepare','send','replies'].includes(mode))throw new Error('Invalid outreach mode');
  await hydrateProcessEnv();
  const db=await requireAdminClient();
- type Query=ReturnType<ReturnType<typeof db.from>['select']>;
+ function sourceQuery(table:string,columns:string){return db.from(table).select(columns);}
+ type Query=ReturnType<typeof sourceQuery>;
  async function all<T=Row>(table:string,columns:string,filter?: (q:Query)=>Query){
   const rows:T[]=[];
-  for(let offset=0;;offset+=500){let q=db.from(table).select(columns).order('id').range(offset,offset+499);if(filter)q=filter(q);const result=await q;fail(result.error);rows.push(...result.data as unknown as T[]);if(result.data.length<500)return rows;}
+  for(let offset=0;;offset+=500){let q=sourceQuery(table,columns).order('id').range(offset,offset+499);if(filter)q=filter(q);const result=await q;fail(result.error);rows.push(...result.data as unknown as T[]);if(result.data.length<500)return rows;}
  }
  if(mode==='prepare'){
   const [applications,holders,leads,crm,programs,evidence,suppressions]=await Promise.all([

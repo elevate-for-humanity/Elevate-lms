@@ -2,7 +2,7 @@ name: Audit Google domains and legacy routing
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/audit-google-domain-routing.yml']
+    paths: ['.github/workflows/audit-google-domain-routing.yml', 'scripts/gcp/audit-domain-routing.mjs']
   workflow_dispatch:
 permissions:
   actions: write

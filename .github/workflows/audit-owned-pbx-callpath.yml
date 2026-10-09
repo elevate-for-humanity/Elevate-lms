@@ -1,0 +1,97 @@
+name: Audit independent Elevate PBX call path
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-owned-pbx-callpath.yml'
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: google-pbx-infrastructure
+  cancel-in-progress: false
+jobs:
+  audit:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify independent calling code boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f infra/pbx/asterisk/extensions.conf
+          test -f infra/pbx/asterisk/pjsip.conf
+          test -f lib/phone/webrtc.ts
+          if grep -q 'telephonyCredentials.create' lib/phone/webrtc.ts; then
+            echo "::warning::PWA credential provisioning currently uses Telnyx; Asterisk WebRTC registration is not proven."
+          fi
+          if ! test -f infra/pbx/asterisk/voicemail.conf; then
+            echo "::warning::Owned Asterisk voicemail configuration file missing in repository."
+          fi
+          if ! grep -Eq '^exten[[:space:]]*=>[[:space:]]*0,' infra/pbx/asterisk/extensions.conf; then
+            echo "::warning::Owned Asterisk dialplan does not explicitly define operator extension 0."
+          fi
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify VM identity and readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT=elegant-racer-299721
+          ZONE=us-central1-a
+          VM=elevate-pbx
+          test "$(gcloud compute instances describe "$VM" --project="$PROJECT" --zone="$ZONE" --format='value(status)')" = RUNNING
+          test "$(gcloud compute instances describe "$VM" --project="$PROJECT" --zone="$ZONE" --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+      - name: Read-only inspection of Asterisk and gateway
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Never print running configuration, endpoint credentials, environment, or call details.
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
+            --command='sudo bash -s' <<'REMOTE'
+          set -euo pipefail
+          docker inspect pbx_asterisk_1 --format '{{.State.Running}}' | grep -qx true
+          echo 'ASTERISK_CONTAINER_RUNNING=true'
+          docker exec pbx_asterisk_1 asterisk -rx 'core show uptime' >/dev/null
+          echo 'ASTERISK_CLI_READY=true'
+          if docker exec pbx_asterisk_1 asterisk -rx 'dialplan show 0@internal' 2>/dev/null | grep -Eq '0@internal|\[ Context .internal. \]'; then
+            echo 'OPERATOR_EXTENSION_ROUTE=present'
+          else
+            echo '::warning::OPERATOR_EXTENSION_ROUTE=not_proven'
+          fi
+          if docker exec pbx_asterisk_1 asterisk -rx 'voicemail show users' 2>/dev/null | grep -Eq 'elevate|users configured'; then
+            echo 'VOICEMAIL_CONFIG=present'
+          else
+            echo '::warning::VOICEMAIL_CONFIG=not_proven'
+          fi
+          if curl --silent --show-error --fail --max-time 5 http://127.0.0.1:8088/httpstatus >/dev/null; then
+            echo 'ASTERISK_HTTP_READY=true'
+          else
+            echo '::error::ASTERISK_HTTP_READY=false'
+            exit 1
+          fi
+          if curl --silent --show-error --fail --max-time 8 --resolve phone.elevateforhumanity.org:443:127.0.0.1 https://phone.elevateforhumanity.org/healthz >/dev/null; then
+            echo 'OWNED_TLS_GATEWAY_READY=true'
+          else
+            echo '::error::OWNED_TLS_GATEWAY_READY=false'
+            exit 1
+          fi
+          REMOTE
+      - name: Public SIP transport check
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --max-time 15 --output /dev/null https://phone.elevateforhumanity.org/healthz
+          echo 'PBX_TLS_READY=true; authenticated registration and audio still require a separate controlled test.'

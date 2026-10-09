@@ -32,10 +32,7 @@ export default function HostShopMediaCarousel({
   compact?: boolean;
 }) {
   const media = useMemo(() => {
-    const candidates: MediaItem[] = [
-      ...(videoUrl ? [{ url: videoUrl, alt: `${shopName} video`, type: 'video' as const }] : []),
-      ...items,
-    ];
+    const candidates = items.filter((item) => item.type !== 'video');
     const seen = new Set<string>();
     return candidates.filter((item) => {
       if (!item?.url) return false;
@@ -63,7 +60,7 @@ export default function HostShopMediaCarousel({
 
   return (
     <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg sm:rounded-3xl">
-      <div className={`relative flex w-full items-center justify-center bg-slate-950 ${compact ? "aspect-[16/10]" : "aspect-[4/3] sm:aspect-[16/10] lg:max-h-[560px]"}`}>
+      <div className={`relative flex w-full items-center justify-center bg-slate-950 ${compact ? "aspect-[16/10]" : "aspect-[4/3]"}`}>
         {active.type === 'video' ? (
           <video key={active.url} src={active.url} controls playsInline preload="metadata" onPlay={() => setVideoPlaying(true)} onPause={() => setVideoPlaying(false)} onEnded={() => setVideoPlaying(false)} onError={() => setVideoPlaying(false)} className="host-shop-media-enter mx-auto h-auto w-auto max-h-[240px] object-scale-down bg-black sm:max-h-[320px]" style={{ maxWidth: 'min(100%, 480px)' }} aria-label={active.alt || `${shopName} video`} />
         ) : (
@@ -77,6 +74,12 @@ export default function HostShopMediaCarousel({
         ) : null}
         {active.type === 'video' ? <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1.5 text-xs font-black text-white"><span className="inline-flex items-center gap-1.5"><PlayCircle className="h-4 w-4" /> Video</span></div> : null}
       </div>
+      {videoUrl ? (
+        <div className="border-t border-slate-200 bg-slate-950 p-4">
+          <p className="mb-3 text-sm font-bold text-white">Watch the {shopName} shop video</p>
+          <video src={videoUrl} controls playsInline preload="metadata" onPlay={() => setVideoPlaying(true)} onPause={() => setVideoPlaying(false)} onEnded={() => setVideoPlaying(false)} className="mx-auto block h-auto max-h-[320px] w-auto max-w-full object-contain" aria-label={`${shopName} shop video`} />
+        </div>
+      ) : null}
       <div className="flex min-h-12 flex-wrap items-center justify-between gap-2 border-t border-slate-200 px-4 py-3 text-sm text-slate-600">
         {media.length > 1 ? <button type="button" onClick={() => setPlaying((current) => !current)} className="min-h-11 font-bold text-slate-900" aria-label={playing ? 'Pause slideshow' : 'Play slideshow'}>{playing ? 'Pause slideshow' : 'Play slideshow'}</button> : null}
         <span>{media.length > 1 ? `${safeIndex + 1} of ${media.length}` : active.alt?.startsWith('Representative') ? 'Representative training image' : 'Shop portfolio'}</span>

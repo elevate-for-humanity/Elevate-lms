@@ -116,13 +116,13 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   const gallery = Array.isArray(profile.media_gallery) ? profile.media_gallery : [];
   const featuredFallback = getFeaturedHostPartnerBySlug(slug);
   const featuredFallbackImages = (featuredFallback?.media ?? [])
-    .filter((media) => media.kind !== 'video')
+    .filter((media) => media.kind !== 'video' && !(slug.startsWith('razors-image') && media.kind === 'flyer'))
     .map((media) => ({ url: media.src, alt: media.alt }));
   const featuredFallbackVideoMedia = featuredFallback?.media?.find((media) => media.kind === 'video');
   const featuredFallbackVideo = featuredFallbackVideoMedia?.src;
-  const videoScript = featuredFallbackVideoMedia?.script;
+  const videoScript = featuredFallbackVideoMedia?.script || `Welcome to ${approved.name}. ${approved.description || featuredFallback?.marketingBlurb || ''} Explore this shop’s portfolio, contact the team, and ask Elevate about ${approved.programs.map(programLabel).join(' or ')} placement and available payment plans. Placement is confirmed during enrollment.`;
   const items = dedupeMedia([
-    ...gallery,
+    ...gallery.filter((item) => !slug.startsWith('razors-image') || !item.url.includes('/2020/')),
     ...featuredFallbackImages,
     ...(profile.logo_url ? [{ url: profile.logo_url, alt: `${approved.name} logo`, source: profile.source_url || externalUrl || undefined }] : []),
     ...(profile.flyer_url ? [{ url: profile.flyer_url, alt: `${approved.name} flyer`, source: profile.source_url || externalUrl || undefined }] : []),
@@ -243,7 +243,7 @@ function ApprovedHostShopProfile({ shop }: { shop: HostShop }) {
   return (
     <main className="overflow-x-hidden bg-white text-slate-950">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
-      <section className="border-b border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-blue-950 px-4 py-16 text-white sm:px-6 sm:py-24">
+      <section data-scroll-narration data-narration={`Welcome to ${shop.name}. ${shop.description} Explore the approved training location and apply through Elevate to ask about current placement availability.`} className="border-b border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-blue-950 px-4 py-16 text-white sm:px-6 sm:py-24">
         <div className="mx-auto max-w-6xl">
           <p className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-emerald-950"><ShieldCheck className="h-4 w-4" /> Approved Elevate Host Site</p>
           <h1 className="mt-5 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">{shop.name}</h1>
@@ -367,7 +367,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
         </section>
       ) : null}
 
-      <section className="border-b border-slate-200 bg-slate-50">
+      <section className="border-b border-slate-200 bg-slate-50" data-scroll-narration data-narration={videoUrl ? undefined : videoScript}>
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-12 lg:py-16">
           <div className="min-w-0">
             <p className="inline-flex rounded-full bg-brand-blue-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-brand-blue-800">Elevate apprenticeship Host Shop partner</p>

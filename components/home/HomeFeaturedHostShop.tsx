@@ -16,8 +16,8 @@ const FEATURED_SHOPS = [
   {
     name: "Razor’s Image Barbershop",
     program: 'Barber',
-    image: '/images/partners/razors-image/owner-portrait-enhanced-2026.webp',
-    imageAlt: 'Aaron Brown of Razor’s Image Barbershop introducing his host shop',
+    image: '/images/partners/razors-image-logo.jpg',
+    imageAlt: 'Razor’s Image Barbershop logo',
     imagePosition: '50% 50%',
     location: 'Bloomington, IN',
     shopHref: '/host-shops/razors-image-barbershop-deedb623',
@@ -49,7 +49,7 @@ export function HomeFeaturedHostShop() {
             <article key={shop.name} data-featured-shop={shop.name} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
               <Link href={shop.shopHref} className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700">
                 <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                  <Image src={shop.image} alt={shop.imageAlt} fill sizes="(min-width: 800px) 374px, (min-width: 640px) calc((100vw - 52px) / 2), calc((100vw - 44px) / 2)" loading="lazy" className="object-cover" style={{ objectPosition: shop.imagePosition }} />
+                  <Image src={shop.image} alt={shop.imageAlt} fill sizes="(min-width: 800px) 374px, (min-width: 640px) calc((100vw - 52px) / 2), calc((100vw - 44px) / 2)" loading="lazy" className={shop.name.includes("Razor") ? "object-contain bg-black" : "object-cover"} style={{ objectPosition: shop.imagePosition }} />
                 </div>
                 <div className="flex flex-1 flex-col p-3 sm:p-4">
                   <p className="text-xs font-semibold text-brand-red-700">{shop.program}</p>

@@ -2,6 +2,15 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { generateGoogleNaturalVoice } from '@/lib/ai/google-natural-voice';
 afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
 describe('Google website narration', () => {
+  it('preserves the failure reason while excluding provider messages and credentials', async () => {
+    vi.stubEnv('K_SERVICE', '');
+    vi.stubEnv('GOOGLE_CLOUD_API_KEY', 'test-key');
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ error: {
+      status: 'PERMISSION_DENIED', message: 'private provider detail',
+      details: [{ reason: 'SERVICE_DISABLED' }],
+    } }, { status: 403 })));
+    await expect(generateGoogleNaturalVoice('private narration text')).rejects.toThrow('HTTP 403 (SERVICE_DISABLED)');
+  });
   it('uses the attached Cloud Run identity instead of the rejected API key', async () => {
     vi.stubEnv('K_SERVICE', 'elevate-marketing-migration');
     vi.stubEnv('GOOGLE_CLOUD_API_KEY', 'unused-key');

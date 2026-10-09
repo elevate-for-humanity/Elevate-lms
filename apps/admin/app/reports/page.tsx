@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
+import { excludeQaProfiles } from '@/lib/admin/operational-profile-query';
 import Link from 'next/link';
 import {
   Users,
@@ -70,7 +71,9 @@ export default async function ReportsPage() {
     { count: totalEnrollments, error: enrollmentsError },
     { count: totalCerts, error: certificatesError },
   ] = await Promise.all([
-    db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+    excludeQaProfiles(
+      db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+    ),
     db.from('program_enrollments').select('*', { count: 'exact', head: true }),
     db.from('program_completion_certificates').select('*', { count: 'exact', head: true }),
   ]);

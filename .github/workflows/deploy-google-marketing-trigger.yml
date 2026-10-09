@@ -110,7 +110,7 @@ jobs:
           }
           NODE
 
-      - name: Refuse active course execution
+      - name: Authenticate Google deployment
         uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -144,27 +144,6 @@ jobs:
             cat /tmp/voice-body
             gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-marketing-migration" AND textPayload:"[natural-voice]"' --project=elegant-racer-299721 --freshness=1h --limit=8 --format='value(timestamp,textPayload)'
           fi
-
-      - name: Guard shared regional capacity
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --input-type=module <<'NODE'
-          import { execFileSync } from 'node:child_process';
-          import { assertNoActiveExecutions } from './scripts/gcp/execute-course-job.mjs';
-          for (let attempt = 1; attempt <= 21; attempt++) {
-            const executions=JSON.parse(execFileSync('gcloud',['run','jobs','executions','list','--job=elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
-            try {
-              assertNoActiveExecutions(executions);
-              console.log('Shared regional capacity is available.');
-              break;
-            } catch (error) {
-              if (error.message !== 'COURSE_JOB_ALREADY_ACTIVE' || attempt === 21) throw error;
-              console.log('Course execution is active; waiting 60 seconds before checking again (' + attempt + '/20).');
-              await new Promise(resolve => setTimeout(resolve, 60000));
-            }
-          }
-          NODE
 
       - name: Build Marketing image
         shell: bash

@@ -6,7 +6,7 @@ on:
         description: Service to update; other services keep their current images
         type: choice
         required: true
-        options: [marketing, admin, lms, all]
+        options: [marketing, admin, lms, store, all]
       image_sha:
         description: Full commit SHA of the successfully uploaded image
         type: string
@@ -123,7 +123,12 @@ jobs:
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='value(metadata.name)'
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          if [[ "$COMPONENT" == store ]]; then
+            # Preserve the Store runtime flags, secrets, and approved capacity.
+            gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --quiet
+          else
           gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --cpu=4 --memory=8Gi --min-instances=1 --max-instances=1 --startup-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' --liveness-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=3,periodSeconds=30,timeoutSeconds=5' --quiet
+          fi
       - uses: google-github-actions/auth@v3
         id: health_auth
         with:
@@ -160,7 +165,7 @@ jobs:
             }
             const dependency=body.dependencies?.supabase;
             const result={component,attempt,httpStatus:response.status,
-              correctService:body.service===component, healthy:body.healthy===true,
+              correctService:body.service===(component === 'store' ? 'marketing' : component), healthy:body.healthy===true,
               ready:body.ready===true, supabase:dependency?.ok===true,
               dependencyStatus:dependency?.status, dependencyLatencyMs:dependency?.latencyMs,
               dependencyTimeout:dependency?.error==='TimeoutError',

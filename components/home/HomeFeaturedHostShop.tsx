@@ -63,7 +63,7 @@ export function HomeFeaturedHostShop() {
             </article>
             {shop.name.includes('Razor') ? (
               <article data-host-shop-recruitment className="overflow-hidden rounded-2xl border border-brand-red-200 bg-slate-950 text-white">
-                <Link href="/partners/host-shop/apply" className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700">
+                <Link href="/partners/host-shops" className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700">
                   <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
                     <Image src="/images/partners/kountry-kutz/interior-active-enhanced-2026.webp" alt="Barbers serving clients inside participating Host Shop Kountry Kutz" fill sizes="(min-width: 1024px) 280px, calc((100vw - 44px) / 2)" loading="lazy" className="object-cover" />
                   </div>
@@ -71,7 +71,7 @@ export function HomeFeaturedHostShop() {
                     <p className="text-xs font-semibold text-amber-300">For shop owners</p>
                     <h3 className="mt-1 text-base font-bold leading-snug sm:text-lg">Become a Host Shop</h3>
                     <p className="mt-2 text-sm leading-5 text-slate-200">Employ and mentor apprentices. Elevate supports instruction and training records.</p>
-                    <span className="mt-auto inline-flex min-h-11 items-center gap-2 pt-3 text-sm font-bold text-amber-300">Apply at no cost <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" /></span>
+                    <span className="mt-auto inline-flex min-h-11 items-center gap-2 pt-3 text-sm font-bold text-amber-300">Learn how to join <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" /></span>
                   </div>
                 </Link>
               </article>

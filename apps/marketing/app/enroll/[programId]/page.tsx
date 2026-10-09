@@ -47,6 +47,7 @@ export default function EnrollPage() {
   const [licenseKey, setLicenseKey] = useState('');
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'quickbooks' | 'affirm'>('quickbooks');
   const [message, setMessage] = useState('');
   const [couponCode, setCouponCode] = useState(
     () => getClientSearchParam('coupon')?.toUpperCase() || '',
@@ -149,7 +150,8 @@ export default function EnrollPage() {
           body: JSON.stringify({
             program_id: program?.id || programId,
             funding_source: 'self_pay',
-            payment_plan: onlineSchoolProgram ? 'full' : paymentPlan,
+            payment_method: paymentMethod,
+            payment_plan: onlineSchoolProgram || paymentMethod === 'affirm' ? 'full' : paymentPlan,
             coupon_code: onlineSchoolProgram ? undefined : couponCode.trim() || undefined,
             partner_key: getClientSearchParam('partner') || undefined,
           }),
@@ -180,30 +182,9 @@ export default function EnrollPage() {
         const data = await response.json();
 
         if (!response.ok) {
-          // If checkout fails for free programs, fall back to direct enrollment
-          const applyResponse = await fetch('/api/enroll/apply', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              firstName: user.user_metadata?.first_name || '',
-              lastName: user.user_metadata?.last_name || '',
-              email: user.email,
-              preferredProgramId: program?.id || programId,
-              licenseKey: licenseKey || null,
-            }),
-          });
-
-          const applyData = await applyResponse.json();
-
-          if (!applyResponse.ok) {
-            throw new Error(applyData.message || 'Enrollment failed');
-          }
-
-          setMessage(applyData.message || 'Enrollment successful! Redirecting...');
-          setTimeout(() => {
-            router.push('/enroll/success');
-          }, 2000);
-          return;
+          throw new Error(
+            data.error || 'Enrollment could not be completed. Please contact Elevate.',
+          );
         }
 
         if (data.url) {
@@ -391,7 +372,36 @@ export default function EnrollPage() {
 
               {!program.is_free && (program.price || program.total_cost) ? (
                 <>
-                  {!onlineSchoolProgram ? (
+                  <fieldset className="mb-6 rounded-xl border border-slate-200 bg-white p-4">
+                    <legend className="px-1 font-black text-slate-950">
+                      How would you like to pay?
+                    </legend>
+                    <label className="mt-3 flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value="quickbooks"
+                        checked={paymentMethod === 'quickbooks'}
+                        onChange={() => setPaymentMethod('quickbooks')}
+                      />{' '}
+                      Pay online through QuickBooks
+                    </label>
+                    <label className="mt-3 flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value="affirm"
+                        checked={paymentMethod === 'affirm'}
+                        onChange={() => setPaymentMethod('affirm')}
+                      />{' '}
+                      Apply for Affirm Buy Now, Pay Later
+                    </label>
+                    <p className="mt-3 text-sm text-slate-600">
+                      Affirm approval and repayment terms are determined by Affirm. Your payment is
+                      recorded against your Elevate QuickBooks invoice.
+                    </p>
+                  </fieldset>
+                  {!onlineSchoolProgram && paymentMethod !== 'affirm' ? (
                     <fieldset className="mb-4 rounded-xl border border-slate-200 bg-white p-4 sm:mb-6">
                       <legend className="px-1 text-sm font-black text-slate-950">
                         Payment schedule

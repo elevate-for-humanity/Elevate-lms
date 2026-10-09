@@ -24,6 +24,10 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
+import { affirm } from '@/lib/affirm/client';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { isAffirmInvoiceAmount } from '@/lib/billing/invoice-checkout';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ENCHANTED_HEARTS } from '@/lib/partners/enchanted-hearts';
 import { resolveQuickBooksProgramPromotion } from '@/lib/payments/quickbooks-program-promotion';
 
@@ -35,6 +39,7 @@ interface CheckoutRequest {
   payment_plan?: 'full' | 'installments';
   coupon_code?: string;
   partner_key?: string;
+  payment_method?: 'quickbooks' | 'affirm';
 }
 
 export async function POST(request: NextRequest) {
@@ -53,6 +58,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body: CheckoutRequest = await request.json();
+    const paymentMethod = body.payment_method ?? 'quickbooks';
+    if (!['quickbooks', 'affirm'].includes(paymentMethod))
+      return NextResponse.json({ error: 'Choose a supported payment method.' }, { status: 400 });
     const {
       program_id,
       funding_source = 'self_pay',
@@ -288,6 +296,25 @@ export async function POST(request: NextRequest) {
     }
 
     if (!customerEmail) throw new Error('An email address is required for a QuickBooks invoice.');
+    if (paymentMethod === 'affirm' && payment_plan !== 'full')
+      return NextResponse.json(
+        { error: 'Choose full tuition for Affirm checkout.' },
+        { status: 400 },
+      );
+    if (paymentMethod === 'affirm') {
+      if (!isAffirmInvoiceAmount(amountCents))
+        return NextResponse.json(
+          { error: 'This amount is not eligible for Affirm financing.' },
+          { status: 400 },
+        );
+      await hydrateProcessEnv();
+      affirm.tryLateConfig();
+      if (!affirm.isConfigured())
+        return NextResponse.json(
+          { error: 'Affirm is temporarily unavailable. Please choose QuickBooks payment.' },
+          { status: 503 },
+        );
+    }
     const invoice = await createQuickBooksBillingProvider(admin).createManualInvoice({
       idempotencyKey: `program:${pending.data.id}`,
       customer: {
@@ -321,7 +348,7 @@ export async function POST(request: NextRequest) {
         },
       },
     });
-    if (!invoice.paymentUrl)
+    if (!invoice.paymentUrl && paymentMethod === 'quickbooks')
       throw new Error('QuickBooks created the invoice but online payment links are not enabled.');
     if (partnerProgram && partnerHolderId) {
       const { data: existingPayout } = await admin
@@ -389,7 +416,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      url: invoice.paymentUrl,
+      url:
+        paymentMethod === 'affirm'
+          ? `https://app.${PLATFORM_DEFAULTS.canonicalDomain}/account/payment-methods`
+          : invoice.paymentUrl,
       invoice_id: invoice.providerInvoiceId,
       coupon: appliedCoupon,
     });

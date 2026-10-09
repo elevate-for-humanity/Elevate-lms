@@ -5,6 +5,8 @@ import { syncLicenseFromSaasEntitlements } from '@/lib/platform/sync-license-fro
 import type { BasePlanId, BillingInterval } from '@/lib/store/platform-pricing';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { TESTING_CENTER } from '@/lib/testing/testing-config';
+import { testingAppointmentLabel, testingCalendarUrl } from '@/lib/testing/booking-calendar';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { notifyAdminOfStudentPayment } from '@/lib/billing/notify-student-payment';
 
 type Database = any;
@@ -250,44 +252,30 @@ export async function fulfillPaidBillingInvoice(
   }
 
   if (job.fulfillment_type === 'testing_booking') {
-    const names = String(payload.customer_name || 'Customer')
-      .trim()
-      .split(/\s+/);
-    const firstName = names.shift() || 'Customer';
-    const lastName = names.join(' ');
-    const code = confirmationCode();
-    const result = await db.from('exam_bookings').insert({
-      exam_type: payload.exam_type,
-      exam_name: payload.exam_name,
-      booking_type: payload.booking_type,
-      first_name: firstName,
-      last_name: lastName,
-      email: payload.customer_email,
-      participant_count: payload.participant_count,
-      status: 'pending',
-      payment_status: 'paid',
-      fee_cents: payload.amount_cents,
-      confirmation_code: code,
-      add_on: Boolean(payload.add_on),
-      add_on_paid: Boolean(payload.add_on),
-      slot_id: payload.slot_id,
-      provider: 'quickbooks',
-      provider_invoice_id: job.billing_invoice_id,
+    const reserved = await db.rpc('fulfill_paid_testing_booking', { p_invoice_id: job.billing_invoice_id });
+    if (reserved.error) throw new Error(reserved.error.message);
+    const booking = reserved.data?.booking;
+    if (!booking) throw new Error('Testing reservation was not returned.');
+    if (!reserved.data.created) return;
+    const slot = await db.from('testing_slots').select('start_time,end_time,location').eq('id', booking.slot_id).single();
+    if (slot.error) throw new Error(slot.error.message);
+    const appointment = testingAppointmentLabel(slot.data.start_time);
+    const calendar = testingCalendarUrl({
+      examName: booking.exam_name, confirmationCode: booking.confirmation_code,
+      start: slot.data.start_time, end: slot.data.end_time,
+      location: slot.data.location || TESTING_CENTER.address,
     });
-    if (result.error) throw new Error(result.error.message);
-    if (payload.slot_id) {
-      for (let seat = 0; seat < Number(payload.participant_count || 1); seat += 1) {
-        const increment = await db.rpc('increment_slot_booked_count', { slot_id: payload.slot_id });
-        if (increment.error) throw new Error(increment.error.message);
-      }
-    }
-    if (payload.customer_email) {
+    const confirmation = new URL('/testing/book', PLATFORM_DEFAULTS.siteUrl);
+    confirmation.searchParams.set('invoice_id', job.billing_invoice_id);
+    confirmation.searchParams.set('booking_token', String(payload.booking_token || ''));
+    const escape = (value: unknown) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!);
+    if (booking.email) {
       await sendEmail({
-        to: payload.customer_email,
+        to: booking.email,
         from: 'Elevate Testing Center <testing@elevateforhumanity.org>',
-        subject: `Exam Booking Confirmed — ${code} | Elevate Testing Center`,
-        html: `<p>Hi ${firstName}, your paid testing appointment for <strong>${payload.exam_name}</strong> is confirmed.</p><p>Confirmation code: <strong>${code}</strong></p><p>Testing Center: ${TESTING_CENTER.address}</p><p>Questions: ${TESTING_CENTER.phone}</p>`,
-      }).catch(() => undefined);
+        subject: `Exam Booking Confirmed — ${booking.confirmation_code} | Elevate Testing Center`,
+        html: `<p>Hi ${escape(booking.first_name)}, your paid testing appointment for <strong>${escape(booking.exam_name)}</strong> is reserved.</p><p><strong>${escape(appointment)}</strong></p><p>Confirmation code: <strong>${escape(booking.confirmation_code)}</strong></p><p>Testing Center: ${escape(slot.data.location || TESTING_CENTER.address)}</p><p><a href="${escape(confirmation.href)}">View your private booking confirmation</a></p><p><a href="${escape(calendar)}">Add your reserved appointment to Google Calendar</a></p><p>Questions: ${escape(TESTING_CENTER.phone)}</p>`,
+      });
     }
     return;
   }

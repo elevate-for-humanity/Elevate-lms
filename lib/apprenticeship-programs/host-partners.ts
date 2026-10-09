@@ -271,6 +271,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
   {
     slug: 'generations-hair-llc',
     name: 'Generations Hair LLC DBA Generations Wedding Co',
+    dba: 'Generations Hair / Cat Eye Collective',
     businessType: 'HairSalon',
     city: 'Martinsville',
     state: 'IN',
@@ -287,7 +288,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         kind: 'photo',
       },
       {
-        src: '/images/partners/generations-hair/dimensional-color.webp',
+        src: '/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp',
         alt: 'Generations Hair LLC dimensional brunette and blonde color work',
         kind: 'photo',
       },
@@ -297,7 +298,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         kind: 'photo',
       },
       {
-        src: '/images/partners/generations-hair/stylist-at-work.webp',
+        src: '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp',
         alt: 'Generations Hair LLC stylist working with a salon guest',
         kind: 'photo',
       },

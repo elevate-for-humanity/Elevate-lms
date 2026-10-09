@@ -1,3 +1,5 @@
+import HeroPicture from '@/components/marketing/HeroPicture';
+import { getProgramHeroImage } from '@/lib/images/programImages';
 import { notFound } from 'next/navigation';
 
 import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';
@@ -50,6 +52,7 @@ export default async function CosmetologyApprenticeshipPage() {
       <ProgramDetailPage
         program={program}
         banner={banner}
+        heroOverride={<HeroPicture src={getProgramHeroImage('cosmetology-apprenticeship')} alt="Salon Saloon team inside their South Bend salon" imageFit="contain" analyticsName="cosmetology-apprenticeship" />}
         afterHero={<BeautyEnrollmentPromotion compact programLabel={program.title} />}
         visualContent={<CosmetologyVisualExperience />}
         featuredContent={

@@ -245,7 +245,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   'cosmetology-apprenticeship': {
     card: `${P}/cosmetology.webp`,
-    hero: '/images/partners/salon-saloon/team-interior.webp',
+    hero: '/images/partners/salon-saloon/team-interior-enhanced-2026.webp',
     alt: 'Cosmetology student practicing hair styling techniques',
   },
   esthetician: {

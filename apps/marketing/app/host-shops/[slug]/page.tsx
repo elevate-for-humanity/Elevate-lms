@@ -1,3 +1,4 @@
+import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -121,12 +122,12 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   const featuredFallbackVideoMedia = featuredFallback?.media?.find((media) => media.kind === 'video');
   const featuredFallbackVideo = featuredFallbackVideoMedia?.src;
   const videoScript = featuredFallbackVideoMedia?.script || `Welcome to ${approved.name}. ${approved.description || featuredFallback?.marketingBlurb || ''} Explore this shop’s portfolio, contact the team, and ask Elevate about ${approved.programs.map(programLabel).join(' or ')} placement and available payment plans. Placement is confirmed during enrollment.`;
-  const items = dedupeMedia([
+  const items = curateShopGallery(slug, dedupeMedia([
     ...gallery.filter((item) => !slug.startsWith('razors-image') || !item.url.includes('/2020/')),
     ...featuredFallbackImages,
     ...(profile.logo_url ? [{ url: profile.logo_url, alt: `${approved.name} logo`, source: profile.source_url || externalUrl || undefined }] : []),
     ...(profile.flyer_url ? [{ url: profile.flyer_url, alt: `${approved.name} flyer`, source: profile.source_url || externalUrl || undefined }] : []),
-  ]);
+  ]));
   const programs = approved.programs;
   const canonical = `${SITE_URL}/host-shops/${profile.public_slug}`;
   const jsonLd = {

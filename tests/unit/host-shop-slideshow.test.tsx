@@ -17,14 +17,15 @@ describe('host shop slideshow playback', () => {
     act(() => vi.advanceTimersByTime(5000));
     expect(screen.getByAltText('First photo')).toBeInTheDocument();
   });
-  it('does not get stuck on an unplayed video, and waits while a video plays', () => {
+  it('keeps the video separate from rotating photos and pauses photos during playback', () => {
     const {container} = render(<HostShopMediaCarousel shopName="Shop" items={items} videoUrl="/tour.mp4" />);
     act(() => vi.advanceTimersByTime(5000));
-    expect(screen.getByAltText('First photo')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button',{name:'Previous image'}));
+    expect(screen.getByAltText('Second photo')).toBeInTheDocument();
+    const video = container.querySelector('video')!;
     fireEvent.play(container.querySelector('video')!);
     act(() => vi.advanceTimersByTime(10000));
-    expect(container.querySelector('video')).not.toBeNull();
+    expect(container.querySelector('video')).toBe(video);
+    expect(screen.getByAltText('Second photo')).toBeInTheDocument();
     fireEvent.ended(container.querySelector('video')!);
     act(() => vi.advanceTimersByTime(5000));
     expect(screen.getByAltText('First photo')).toBeInTheDocument();

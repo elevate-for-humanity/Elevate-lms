@@ -60,7 +60,7 @@ export default function HostShopMediaCarousel({
 
   return (
     <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg sm:rounded-3xl">
-      <div className={`relative flex w-full items-center justify-center bg-slate-950 ${compact ? "aspect-[16/10]" : "aspect-[4/3]"}`}>
+      <div className={`relative flex w-full items-center justify-center bg-slate-950 ${compact ? "aspect-[4/3]" : shopName.toLowerCase().includes("generations") ? "aspect-[2/3] max-h-[720px]" : "aspect-[4/3]"}`}>
         {active.type === 'video' ? (
           <video key={active.url} src={active.url} controls playsInline preload="metadata" onPlay={() => setVideoPlaying(true)} onPause={() => setVideoPlaying(false)} onEnded={() => setVideoPlaying(false)} onError={() => setVideoPlaying(false)} className="host-shop-media-enter mx-auto h-auto w-auto max-h-[240px] object-scale-down bg-black sm:max-h-[320px]" style={{ maxWidth: 'min(100%, 480px)' }} aria-label={active.alt || `${shopName} video`} />
         ) : (

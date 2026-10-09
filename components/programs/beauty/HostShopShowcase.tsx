@@ -35,7 +35,7 @@ const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
     kind: 'photo',
   },
   'razors-image-barbershop': {
-    src: '/images/partners/razors-image-video-poster.webp',
+    src: '/images/partners/razors-image-logo.jpg',
     alt: "Razor's Image Barbershop in Bloomington, Indiana",
     kind: 'photo',
   },
@@ -306,8 +306,8 @@ export default function HostShopShowcase({
         </div>
 
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
-          <div className={`grid ${shop.slug === 'razors-image-barbershop' ? 'lg:grid-cols-[1.45fr_0.55fr]' : 'lg:grid-cols-[1.1fr_0.9fr]'}`}>
-            <div className={`relative aspect-[4/3] min-h-0 overflow-hidden bg-slate-100 sm:aspect-[16/10] lg:aspect-auto ${shop.slug === 'razors-image-barbershop' ? 'lg:min-h-[500px]' : 'lg:min-h-[390px]'}`}>
+          <div className="grid lg:grid-cols-2">
+            <div className="relative aspect-[4/3] min-h-0 overflow-hidden bg-slate-950 lg:aspect-auto lg:min-h-[420px]">
               {image?.kind === 'video' && !failedVideos.has(image.src) ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
                   {image.backdropSrc ? (
@@ -376,14 +376,6 @@ export default function HostShopShowcase({
                 </div>
               ) : image && !failedImages.has(image.src) ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
-                  <Image
-                    src={image.src}
-                    alt=""
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 58vw"
-                    className="-z-10 scale-110 object-cover opacity-40 blur-xl"
-                    aria-hidden="true"
-                  />
                   <Image
                     key={image.src}
                     src={image.src}

@@ -38,6 +38,7 @@ export interface HeroPictureProps {
   /** Render the complete artwork at its native 4:3 ratio instead of cropping it. */
   preserveAspectRatio?: boolean;
   priority?: boolean;
+  imageFit?: 'cover' | 'contain';
 }
 
 export default function HeroPicture({
@@ -56,6 +57,7 @@ export default function HeroPicture({
   heightStyle,
   preserveAspectRatio = false,
   priority = true,
+  imageFit = 'cover',
 }: HeroPictureProps) {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
@@ -86,7 +88,7 @@ export default function HeroPicture({
             alt={alt}
             fill
             sizes="100vw"
-            className="object-cover object-center"
+            className={imageFit === 'contain' ? 'object-contain object-center' : 'object-cover object-center'}
             priority={priority}
             placeholder="empty"
           />

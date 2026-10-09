@@ -1,4 +1,5 @@
 import 'server-only';
+import { queuePaidDropshipOrder } from '@/lib/store/queue-paid-dropship-order';
 import { randomBytes } from 'node:crypto';
 import { getOrganizationFeatures } from '@/lib/platform/organization-features';
 import { syncLicenseFromSaasEntitlements } from '@/lib/platform/sync-license-from-saas';
@@ -381,6 +382,7 @@ export async function fulfillPaidBillingInvoice(
       throw new Error('Store order payment does not match its pending snapshot.');
     const now = new Date().toISOString();
     const items = Array.isArray(order.items) ? order.items : [];
+    await queuePaidDropshipOrder(db, { id: order.id, items });
     for (const item of items.filter((row: any) => !row.requires_shipping)) {
       const values = {
         name: item.name,

@@ -332,6 +332,10 @@ export default function ParisChat({
         });
 
         const data = await response.json().catch(() => ({}));
+        if (!response.ok && response.status === 503 && typeof data.error === 'string') {
+          setMessages((previous) => [...previous, { role: 'assistant', content: data.error }]);
+          return;
+        }
         if (!response.ok || typeof data.reply !== 'string') {
           throw new Error('PARIS unavailable');
         }

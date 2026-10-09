@@ -173,7 +173,9 @@ export class ElevateProvider implements AIProvider {
         max_tokens: elevateCompletionBudget(options),
         ...(requestsJson(options) ? { response_format: { type: 'json_object' } } : {}),
       }),
-      signal: AbortSignal.timeout(requestTimeoutMs()),
+      signal: options.signal
+        ? AbortSignal.any([options.signal, AbortSignal.timeout(requestTimeoutMs())])
+        : AbortSignal.timeout(requestTimeoutMs()),
     });
 
     const payload = (await response.json().catch(() => ({}))) as OpenAIChatResponse;

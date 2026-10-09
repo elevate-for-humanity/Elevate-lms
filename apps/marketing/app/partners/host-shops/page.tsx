@@ -75,8 +75,10 @@ export default async function HostShopsPage() {
       <HostShopShowcase
         shops={HOST_SHOP_HERO_SHOPS}
         asHero
+        portraitTour
         videoTourShopSlug="salon-saloon"
         autoPlayVideoOnVisible
+        narrationSrc="/audio/narration/host-shop.mp3"
         mediaSequence={[
           { shopSlug: 'salon-saloon', media: { src: '/videos/partners/salon-saloon-tour.mp4', alt: 'Walk-through tour of participating apprenticeship Host Shop Salon Saloon', kind: 'video', backdropSrc: '/images/partners/salon-saloon/team-sign.webp' } },
           { shopSlug: 'salon-saloon', media: { src: '/images/partners/salon-saloon/team-sign.webp', alt: 'Salon Saloon team at an Elevate participating Host Salon', kind: 'photo' } },

@@ -137,7 +137,10 @@ for (const file of [
   requireText(file, 'gcloud run services update', 'Release must update Google Cloud Run.');
   forbidText(file, 'api.northflank.com', 'Never trigger Northflank from a Google release.');
 }
-requireText('.github/workflows/deploy-admin.yml', 'body.commit===process.env.GITHUB_SHA', 'Admin live exact commit verification is required.');
+requireText('.github/workflows/deploy-admin.yml', 'node scripts/gcp/verify-admin-revision.mjs', 'Admin release must execute the live exact revision verifier.');
+requireText('scripts/gcp/verify-admin-revision.mjs', 'verifyAdminRevision(process.env.GOOGLE_ADMIN_URL, process.env.GITHUB_SHA)', 'Admin verifier must receive the Google URL and exact release SHA.');
+requireText('scripts/gcp/verify-admin-revision.mjs', "response.status === 200 && body.service === 'admin' && body.commit === commit && body.healthy === true && body.dependencies?.supabase?.ok === true", 'Admin verifier must require the exact commit, Admin identity and healthy Supabase.');
+requireText('scripts/gcp/verify-admin-revision.mjs', 'process.exitCode = 1', 'Admin verification failures must fail the release.');
 requireText('.github/workflows/deploy-google-marketing-trigger.yml', 'git merge-base --is-ancestor', 'Marketing SHA must belong to main.');
 requireText('.github/workflows/deploy-google-marketing-trigger.yml', 'sha===process.env.GITHUB_SHA', 'Marketing public exact commit verification is required.');
 for (const old of ['northflank-trigger-dispatch.yml','deploy-lms.yml','deploy-marketing.yml','recover-marketing.yml','elevate-production-deploy.yml']) {

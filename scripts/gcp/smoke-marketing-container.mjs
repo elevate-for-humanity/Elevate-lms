@@ -60,7 +60,9 @@ try {
   assert.equal(identity.commitSha, sha);
   const version = await fetch(root + '/version.json', { signal: AbortSignal.timeout(10000) });
   assert.equal(version.status, 200);
-  assert.equal((await version.json()).commit, sha);
+  const packagedVersion = await version.json();
+  assert.equal(packagedVersion.commit, sha);
+  assert.equal(packagedVersion.service, component);
   console.log('Final Marketing image dependencies, assets, startup and internal-host health routing verified.');
 } catch (error) {
   // Do not export raw application logs or runtime environment values from CI.

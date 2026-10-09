@@ -13,7 +13,9 @@ function compile(path, imports = {}) {
   return exports;
 }
 const routing = compile('lib/tenant/middleware-tenant-routing.ts');
+const identity = compile('lib/health/public-runtime-service.ts');
 const { middleware } = compile('apps/marketing/middleware.ts', {
+  '@/lib/health/public-runtime-service': identity,
   '@/lib/tenant/middleware-tenant-routing': routing,
   '@/lib/routing/portal-map': { LMS_HOST: 'https://app.elevateforhumanity.org', MARKETING_HOST: 'https://www.elevateforhumanity.org' },
   '@/lib/supabase/middleware': { createMiddlewareSupabaseClient: () => { throw new Error('Probe must not use authentication'); } },
@@ -34,3 +36,28 @@ for (const path of ['/api/ping-extra', '/api/health/private', '/products']) {
     assert.equal(new URL(response.headers.get('x-middleware-rewrite')).pathname, '/tenant-site' + path);
   });
 }
+
+async function withRuntime(service, work) {
+ const oldService=process.env.K_SERVICE,oldFlag=process.env.STORE_ONLY_RUNTIME;
+ process.env.K_SERVICE=service;process.env.STORE_ONLY_RUNTIME='true';
+ try {await work();} finally {
+  if(oldService===undefined)delete process.env.K_SERVICE;else process.env.K_SERVICE=oldService;
+  if(oldFlag===undefined)delete process.env.STORE_ONLY_RUNTIME;else process.env.STORE_ONLY_RUNTIME=oldFlag;
+ }
+}
+test('Store version stays on the Store service',async()=>withRuntime('elevate-store-migration',async()=>{
+ const host='elevate-store-migration-example.run.app';
+ const response=await middleware(new NextRequest('https://'+host+'/api/version',{headers:{host}}));
+ assert.equal(response.headers.get('x-middleware-next'),'1');
+ assert.equal(response.headers.get('location'),null);
+}));
+test('Store root goes to the storefront',async()=>withRuntime('elevate-store-migration',async()=>{
+ const host='elevate-store-migration-example.run.app';
+ const response=await middleware(new NextRequest('https://'+host+'/',{headers:{host}}));
+ assert.equal(new URL(response.headers.get('location')).pathname,'/store');
+}));
+test('Marketing root stays Marketing despite a stale Store flag',async()=>withRuntime('elevate-marketing-migration',async()=>{
+ const host='www.elevateforhumanity.org';
+ const response=await middleware(new NextRequest('https://'+host+'/',{headers:{host}}));
+ assert.equal(response.headers.get('x-middleware-next'),'1');assert.equal(response.headers.get('location'),null);
+}));

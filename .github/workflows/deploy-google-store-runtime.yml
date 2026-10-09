@@ -2,7 +2,7 @@ name: Deploy Google Store runtime identity
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/deploy-google-store-runtime.yml', 'lib/health/public-runtime-service.ts']
+    paths: ['.github/workflows/deploy-google-store-runtime.yml', 'lib/health/public-runtime-service.ts', 'apps/marketing/middleware.ts', 'Dockerfile.marketing']
   workflow_dispatch:
 permissions:
   actions: write
@@ -46,6 +46,7 @@ jobs:
         run: |
           set -euo pipefail
           docker build -f Dockerfile.marketing -t "elevate-store:$GITHUB_SHA" \
+            --build-arg APPLICATION_SERVICE=store \
             --build-arg NODE_IMAGE=mirror.gcr.io/library/node:22-alpine \
             --build-arg "NF_GIT_SHA=$GITHUB_SHA" \
             --build-arg "BUILD_TIMESTAMP=$(date -u +%FT%TZ)" \

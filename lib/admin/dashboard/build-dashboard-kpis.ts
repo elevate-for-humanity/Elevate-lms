@@ -29,9 +29,11 @@ export function buildDashboardKpis(input: BuildDashboardKpisInput): KPICard[] {
       value: input.totalPending,
       delta: appsVolumeMoM.delta,
       deltaLabel: appsVolumeMoM.deltaLabel,
-      href: '/applications?status=submitted,pending,in_review,pending_admin_review',
+      href: '/applications?status=awaiting_review',
       urgent: input.totalPending > 0,
-      sub: input.oldestAppSub ?? (input.totalPending > 0 ? 'Review intake queue' : 'No pending applications'),
+      sub:
+        input.oldestAppSub ??
+        (input.totalPending > 0 ? 'Review intake queue' : 'No pending applications'),
     },
     {
       label: 'Active Enrollments',

@@ -1,4 +1,5 @@
 import 'server-only';
+import { APPLICATION_REVIEW_STATUSES } from './application-filters';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
@@ -306,13 +307,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const leadRows = leadsRes.error ? [] : (leadsRes.data ?? []);
   const submissionRows = submissionsRes.error ? [] : (submissionsRes.data ?? []);
 
-  const pendingStatuses = new Set([
-    'pending',
-    'submitted',
-    'in_review',
-    'under_review',
-    'pending_admin_review',
-  ]);
+  const pendingStatuses = new Set<string>(APPLICATION_REVIEW_STATUSES);
   const pendingApplications: RecentApplication[] = applications
     .filter((row: any) => pendingStatuses.has(String(row.status ?? 'submitted')))
     .map((row: any) => {

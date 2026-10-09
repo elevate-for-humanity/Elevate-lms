@@ -168,7 +168,8 @@ async function playbookStaleImage(dryRun: boolean, options: Record<string, unkno
       await dispatchGoogleDeployment(service);
       actions.push(ok('google-deploy', service + ' workflow dispatched (live revision not yet verified)'));
     } catch (err) {
-      actions.push(error('google-deploy', err instanceof Error ? err.message : 'Google dispatch failed'));
+      console.error('Google deployment dispatch failed', err);
+      actions.push(error('google-deploy', 'Google dispatch failed; inspect server logs for details'));
     }
   }
   return actions;

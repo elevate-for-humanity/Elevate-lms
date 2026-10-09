@@ -77,7 +77,7 @@ for (const file of googleOwnedEntrypoints) {
     continue;
   }
   const source = readFileSync(file, 'utf8');
-  if (/api\\.northflank\\.com|triggerNorthflankBuild|trigger-northflank\\.sh|scripts\\/northflank\\/(?:trigger|deploy|restart)/i.test(source)) {
+  if (/api\.northflank\.com|triggerNorthflankBuild|trigger-northflank\.sh|scripts\/northflank\/(?:trigger|deploy|restart)/i.test(source)) {
     console.error('Legacy Northflank execution path in Google-owned entrypoint: ' + file);
     failed = true;
   }

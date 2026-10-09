@@ -25,7 +25,7 @@ for candidate in /ws /asterisk/ws; do
     -H 'Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==' \
     -H 'Sec-WebSocket-Version: 13' -H 'Sec-WebSocket-Protocol: sip' \
     "http://127.0.0.1:8088$candidate" || true)"
-  if [[ "$status" == 101 || "$status" == 400 || "$status" == 426 ]]; then
+  if [[ "$status" == 101 ]]; then
     WS_PATH="$candidate"; break
   fi
 done
@@ -60,6 +60,12 @@ phone.elevateforhumanity.org {
 CADDY
 docker pull caddy:2.10.2
 docker run --rm --network host -v "$CONF_DIR/Caddyfile:/etc/caddy/Caddyfile:ro" --entrypoint caddy caddy:2.10.2 validate --config /etc/caddy/Caddyfile --adapter caddyfile
+# Avoid replacing a healthy managed gateway just to refresh configuration.
+if docker ps --format '{{.Names}}' | grep -qx "$NAME" && \
+   curl -fsS --max-time 8 --resolve "$HOST:443:127.0.0.1" "https://$HOST/healthz" | grep -qx ok; then
+  echo "Existing TLS gateway healthy; preserving running container."
+  exit 0
+fi
 # Replace only our own proxy; never touch the healthy PBX container.
 if docker ps -a --format '{{.Names}}' | grep -qx "$NAME"; then
   docker rm -f "$NAME"

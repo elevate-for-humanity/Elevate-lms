@@ -56,8 +56,13 @@ jobs:
             const details = JSON.parse(gcloud(['run','revisions','describe',revision,'--project='+project,'--region=us-central1','--format=json']));
             report({component, revision, startupProbe:details.spec.containers[0].startupProbe,
               command:details.spec.containers[0].command,args:details.spec.containers[0].args,
+              ports:details.spec.containers[0].ports,runtimeIdentity:details.spec.serviceAccountName,
               bindEnvironment:(details.spec.containers[0].env || []).filter(x=>['HOSTNAME','PORT'].includes(x.name)),
               conditions:(details.status.conditions || []).map(x=>({type:x.type,status:x.status,reason:x.reason,message:x.message}))});
+            try {
+              const exclusions = JSON.parse(gcloud(['logging','exclusions','list','--project='+project,'--format=json']));
+              report({component,loggingExclusions:exclusions.map(x=>({name:x.name,disabled:x.disabled,filter:x.filter}))});
+            } catch {report({component,loggingExclusionMetadataUnavailable:true});}
             const logs = JSON.parse(gcloud(['logging','read',
               'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration" AND resource.labels.revision_name="'+revision+'"',
               '--project='+project,'--freshness=2h','--limit=200','--format=json']));

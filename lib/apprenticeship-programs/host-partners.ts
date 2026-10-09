@@ -86,33 +86,33 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       "An Elkhart barbershop offering fades, shape ups, beard trims, children's haircuts, shear cuts, and supervised barber apprenticeship experience.",
     media: [
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge precision fade and professional barbering work',
         kind: 'photo',
       },
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge clean fade and textured haircut',
         kind: 'photo',
       },
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-textured-crop.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-textured-crop-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge textured crop and blended fade',
         kind: 'photo',
       },
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-wave-and-beard.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-wave-and-beard-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge wave haircut, lineup, and beard grooming',
         kind: 'photo',
       },
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge modern fringe haircut with tapered sides',
         kind: 'photo',
       },
 
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-and-beard.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-and-beard-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge fade haircut and full beard shaping',
         kind: 'photo',
       },

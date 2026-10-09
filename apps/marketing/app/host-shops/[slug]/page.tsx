@@ -139,7 +139,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
     telephone: approved.phone || undefined,
     image: items.map((item) => absoluteMediaUrl(item.url)),
     address: address ? { '@type': 'PostalAddress', streetAddress: approved.address || undefined, addressLocality: approved.city || undefined, addressRegion: approved.state || undefined, postalCode: approved.zip || undefined, addressCountry: 'US' } : undefined,
-    sameAs: [externalUrl].filter(Boolean),
+    sameAs: [externalUrl, featuredFallback?.socialUrl, featuredFallback?.bookingUrl].filter(Boolean),
     hasMap: mapUrl,
     parentOrganization: { '@id': `${SITE_URL}/#organization` },
     knowsAbout: programs.map(programLabel),
@@ -166,6 +166,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {approved.phone ? <a href={`tel:${approved.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-sm font-extrabold text-white sm:justify-start"><Phone className="h-4 w-4" /> Call {approved.phone}</a> : null}
               {mapUrl ? <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start"><Navigation className="h-4 w-4" /> Approved Worksite Map</a> : null}
+              {featuredFallback?.socialUrl ? <a href={featuredFallback.socialUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">{featuredFallback.socialUrl.includes('instagram.com/') ? 'View shop Instagram' : 'View shop social pages'} <ExternalLink className="h-4 w-4" /></a> : null}
               {externalUrl ? <a href={externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">Shop website <ExternalLink className="h-4 w-4" /></a> : null}
             </div>
           </div>

@@ -392,7 +392,865 @@ export async function ProgramHolderWorkspaceView({
       {texasLaunchKit}
       {regionalAssignment && customMou ? (
         <section className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm sm:p-6">
-          <p class…10891 tokens truncated…">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
+            Regional operating assignment
+          </p>
+          <h2 className="mt-2 text-2xl font-black text-slate-950">
+            {String(holderFeatures.approved_role || 'Regional Site Coordinator')}
+          </h2>
+          <p className="mt-2 text-sm text-slate-700">
+            Territory: <strong>{String(regionalAssignment.scope || 'Assigned region')}</strong>.
+            Your dashboard is linked to the assigned regional team while preserving your individual
+            login and audit history.
+          </p>
+          {coordinatorRole === 'Gary Regional Site Coordinator' && (
+            <Link href="/program-holder/gary-launch" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-blue-800 px-4 py-2 text-sm font-black text-white">
+              Open your Gary step-by-step launch guide
+            </Link>
+          )}
+          <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
+            <strong>Applicant routing:</strong> Your regional queue includes applicants across
+            all Elevate programs whose residence is within the assigned regional service area
+            when no local Program Holder controls that applicant/program. Applicants outside your
+            regional territory must not be worked from this dashboard. When an approved local
+            Program Holder is assigned, Elevate may transfer the program-specific applicant to that
+            holder while preserving the regional audit history.
+          </div>
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <h3 className="font-black text-slate-950">How the role works</h3>
+              <p className="mt-2 text-sm text-slate-700">
+                Recruit qualified Program Holders for every program offered in the region. Until an
+                approved holder is assigned, the Site Coordinators remain responsible for
+                coordinating that program, applicants, students, WorkOne steps, records,
+                communication, progress, and closeout.
+              </p>
+              <p className="mt-2 text-sm text-slate-700">
+                Use PARIS and the interactive office to open workspaces, call or message people,
+                record notes and outcomes, manage tasks and documents, monitor learners, submit
+                reports, and review payout readiness.
+              </p>
+            </div>
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+              <h3 className="font-black text-emerald-950">Compensation</h3>
+              <p className="mt-2 text-sm text-emerald-950">
+                Compensation terms are recorded in the current signed coordinator agreement.
+                Review the agreement and payout schedule for the applicable amounts and milestones.
+              </p>
+              <p className="mt-2 text-xs text-emerald-900">
+                A lead, incomplete application, unverified enrollment, or unverified completion does
+                not by itself trigger payment.
+              </p>
+              <p className="mt-2 text-sm font-bold text-rose-800">
+                {String(
+                  customMou.payout_contact_requirement ||
+                    'No payout credit is earned until you make a documented call/contact on the assigned applicant and record the outcome in the system.',
+                )}
+              </p>
+              <p className="mt-2 text-xs text-rose-700">
+                {String(
+                  customMou.uncontacted_alert_rule ||
+                    'Applicants without a documented contact outcome for five days are escalated to the admin dashboard.',
+                )}
+              </p>
+            </div>
+          </div>
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            <div>
+              <h3 className="font-black text-slate-950">Required setup and operating checklist</h3>
+              <div className="mt-2 space-y-2 text-sm text-slate-700">
+                {coordinatorRequirements.map((item) => {
+                  const normalized = item.toLowerCase();
+                  const href =
+                    normalized.includes('mou') || normalized.includes('agreement') ? '/program-holder/sign-mou' :
+                    normalized.includes('document') || normalized.includes('w-9') || normalized.includes('insurance') || normalized.includes('license') ? '/program-holder/documents' :
+                    normalized.includes('payment') || normalized.includes('payout') || normalized.includes('bank') ? '/program-holder/payouts' :
+                    normalized.includes('phone') || normalized.includes('extension') || normalized.includes('call') ? '/program-holder/phone' :
+                    normalized.includes('applicant') || normalized.includes('workone') || normalized.includes('outreach') ? '/program-holder/students/pending' :
+                    normalized.includes('student') || normalized.includes('learner') ? '/program-holder/students' :
+                    normalized.includes('hour') || normalized.includes('attendance') ? '/program-holder/hours' :
+                    normalized.includes('report') ? '/program-holder/reports' :
+                    normalized.includes('program') || normalized.includes('catalog') ? '/program-holder/programs' :
+                    isGaryRegionalCoordinator ? '/program-holder/gary-launch' : '/program-holder/how-to-use';
+                  return (
+                    <Link key={item} href={href} className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 font-semibold hover:border-blue-300 hover:bg-blue-50">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-black text-amber-900" aria-hidden="true">!</span>
+                      <span className="min-w-0 flex-1">{item}</span>
+                      <span className="shrink-0 text-xs font-black text-blue-800">Open →</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+            <div>
+              <h3 className="font-black text-slate-950">Required training</h3>
+              <ul className="mt-2 space-y-2 text-sm text-slate-700">
+                {coordinatorTrainingTopics.map((item) => (
+                  <li key={item} className="flex gap-2">
+                    <span aria-hidden="true">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+      ) : null}
+      <section className="rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <span className="rounded-xl bg-indigo-100 p-3 text-indigo-700">
+              <Phone className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-indigo-700">
+                Your Elevate phone line
+              </p>
+              {data.phoneLine ? (
+                <>
+                  <a
+                    href={`tel:${data.phoneLine.e164}`}
+                    className="mt-1 block text-2xl font-black text-slate-950 hover:text-indigo-700"
+                  >
+                    {formatUsPhone(data.phoneLine.e164)}
+                  </a>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">
+                    {data.phoneLine.label}
+                    {data.phoneLine.extension ? ` · Extension ${data.phoneLine.extension}` : ''}
+                    {' · '}
+                    {data.phoneLine.status === 'active' ? 'Active' : 'Setup in progress'}
+                  </p>
+                  {data.programs.length && !regionalAssignment?.all_programs_in_region ? (
+                    <div className="mt-3">
+                      <p className="text-xs font-black uppercase tracking-wider text-slate-500">
+                        Programs on this extension
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {data.programs.map((program) => (
+                          <span
+                            key={program.id}
+                            className="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-bold text-indigo-800"
+                          >
+                            {program.title || program.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </>
+              ) : (
+                <>
+                  <h2 className="mt-1 text-xl font-black text-slate-950">
+                    Line assignment pending
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-600">
+                    Your business number and extension will appear here after an administrator
+                    assigns them.
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+          <Link
+            href="/program-holder/phone"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl border border-indigo-300 px-4 py-2 text-sm font-black text-indigo-900"
+          >
+            Open new phone dashboard
+          </Link>
+        </div>
+      </section>
+      <section className="rounded-2xl border border-violet-200 bg-violet-50 p-5 shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-violet-700">
+              New here?
+            </p>
+            <h2 className="mt-1 text-xl font-black text-slate-950">
+              {isGaryRegionalCoordinator ? 'Start with your Gary coordinator launch guide' : 'Start with Elizabeth and Paris'}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              {isGaryRegionalCoordinator
+                ? 'Follow the coordinator steps in order: account setup, program review, WorkOne outreach, Program Holder recruitment, employer outreach, applicant routing, and weekly operations.'
+                : <>Review Elizabeth Greene&apos;s expectations, take the Paris dashboard walkthrough, and learn what is required for payment.</>}
+            </p>
+          </div>
+          <Link
+            href={isGaryRegionalCoordinator ? '/program-holder/gary-launch' : '/program-holder/how-to-use'}
+            className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-black text-white"
+          >
+            Start orientation
+          </Link>
+        </div>
+      </section>
+      {!data.holder?.mou_signed ? (
+        <section
+          role="alert"
+          className="rounded-2xl border-2 border-amber-400 bg-amber-50 p-5 shadow-sm sm:p-6"
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">
+                Required agreement
+              </p>
+              <h2 className="mt-1 text-xl font-black text-amber-950">
+                Your Program Holder MOU is ready to review and sign
+              </h2>
+              <p className="mt-2 text-sm font-semibold leading-6 text-amber-900">
+                Read the full agreement and complete the electronic signature. The signed record
+                will be saved to your compliance file.
+              </p>
+            </div>
+            <Link
+              href="/program-holder/sign-mou"
+              className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-amber-900 px-5 py-3 text-sm font-black text-white hover:bg-amber-950"
+            >
+              Open and sign MOU
+            </Link>
+          </div>
+        </section>
+      ) : null}
+      <DashboardHero
+        title={data.holder?.organization_name || data.holder?.name || 'Program Holder'}
+        programLabel={primaryProgramLabel}
+        status={data.holder?.status || 'active'}
+        complianceScore={complianceScore}
+        heroImage={dashboardHero.src}
+        isPortrait={dashboardHero.isPortrait}
+      />
+      <PortalStartChecklist role="program-holder" />
+      <BusinessNetworkCard href="/program-holder/community" label="Program Holder network" />
+      <section className="overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm">
+        <div className="relative isolate overflow-hidden px-5 py-7 text-white sm:px-7">
+          <Image
+            src="/images/pages/community-page-2.webp"
+            alt="Elevate school and workforce community"
+            fill
+            sizes="100vw"
+            className="-z-20 object-cover object-center"
+          />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-blue-950/90 to-violet-950/55" />
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-200">
+            School, Career &amp; Community
+          </p>
+          <h2 className="mt-2 text-2xl font-black">Keep your students connected beyond class</h2>
+          <p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-100">
+            Open the community hub, connect students to career opportunities, and keep up with
+            school events without leaving your Program Holder workspace.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              href="/program-holder/community"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-black text-slate-950"
+            >
+              <MessageSquare className="h-4 w-4" aria-hidden="true" /> Community hub
+            </Link>
+            <Link
+              href="/program-holder/career"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/50 bg-white/10 px-4 py-2.5 text-sm font-black text-white backdrop-blur"
+            >
+              <BriefcaseBusiness className="h-4 w-4" aria-hidden="true" /> Career services
+            </Link>
+            <Link
+              href="/program-holder/meetings"
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/50 bg-white/10 px-4 py-2.5 text-sm font-black text-white backdrop-blur"
+            >
+              <CalendarDays className="h-4 w-4" aria-hidden="true" /> School events
+            </Link>
+          </div>
+        </div>
+        <div className="p-5 sm:p-6">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
+                Live career feed
+              </p>
+              <h3 className="mt-1 text-xl font-black text-slate-950">
+                Opportunities to share with students
+              </h3>
+            </div>
+            <Link href="/program-holder/career" className="text-sm font-black text-blue-800 underline">
+              Open full career center
+            </Link>
+          </div>
+          {careerJobs.length > 0 ? (
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
+              {careerJobs.map((job) => (
+                <JobCard key={job.id} job={job} href="/program-holder/career" />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-5 rounded-2xl bg-slate-50 p-5 text-sm text-slate-700">
+              New employer opportunities will appear here as they are published. Career coaching and
+              placement support remain available now.
+            </div>
+          )}
+        </div>
+      </section>
+      {data.requiresEnchantedHeartsTerms ? (
+        <section className="rounded-2xl border border-fuchsia-200 bg-white p-4 shadow-sm sm:p-6">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-fuchsia-700">
+            Enchanted Hearts pricing and payout
+          </p>
+          <h2 className="mt-1 text-xl font-black text-slate-950">
+            Approved student prices and provider shares
+          </h2>
+          <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-600">
+            Students enroll and pay through Elevate using a student-specific QuickBooks invoice.
+            Enchanted Hearts receives the provider share shown below after payment clears and all
+            agreement, tax, payout-account, and delivery requirements are approved. Any coupon can
+            reduce only Elevate&apos;s portion; it cannot reduce the provider share.
+          </p>
+          <div className="mt-5 overflow-x-auto rounded-xl border border-slate-200">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-slate-950 text-white">
+                <tr>
+                  <th className="px-4 py-3 font-black">Program</th>
+                  <th className="px-4 py-3 text-right font-black">Provider share</th>
+                  <th className="px-4 py-3 text-right font-black">Elevate portion</th>
+                  <th className="px-4 py-3 text-right font-black">Student price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ENCHANTED_HEARTS.programs.map((program) => (
+                  <tr key={program.slug} className="border-t border-slate-200">
+                    <td className="px-4 py-3 font-bold text-slate-900">{program.title}</td>
+                    <td className="px-4 py-3 text-right text-slate-700">
+                      {formatUsd(program.providerShareCents)}
+                    </td>
+                    <td className="px-4 py-3 text-right text-slate-700">
+                      {formatUsd(program.retailPriceCents - program.providerShareCents)}
+                    </td>
+                    <td className="px-4 py-3 text-right font-black text-slate-950">
+                      {formatUsd(program.retailPriceCents)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <Link
+              href="/program-holder/documents"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-fuchsia-700 px-4 py-2 text-sm font-black text-white"
+            >
+              Review and sign agreement
+            </Link>
+            <Link
+              href="/program-holder/payouts"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-fuchsia-300 px-4 py-2 text-sm font-black text-fuchsia-900"
+            >
+              Complete payout setup
+            </Link>
+          </div>
+        </section>
+      ) : null}
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <Metric
+          label="Enrolled Students"
+          value={data.enrollments.length}
+          helper="Canonical program enrollments"
+        />
+        <Metric
+          label="Active Students"
+          value={active.length}
+          helper={`Currently enrolled in ${primaryProgramLabel}`}
+        />
+        <Metric label="At-Risk Students" value={atRisk.length} helper="Flagged for follow-up" />
+        <Metric
+          label="Pending Verifications"
+          value={pendingHours.length}
+          helper="Training-hour reviews"
+        />
+      </section>
+      {(!payoutReady || missingRequirements > 0) && (
+        <section
+          role="alert"
+          className="rounded-2xl border-2 border-red-300 bg-red-50 p-4 shadow-sm sm:p-6"
+        >
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-6 w-6 shrink-0 text-red-700" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-red-700">
+                Payment action required
+              </p>
+              <h2 className="mt-1 text-xl font-black text-red-950">
+                Complete setup before Elevate can release payment
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-red-900">
+                {missingRequirements} onboarding requirements remain incomplete.{' '}
+                {payoutReady
+                  ? 'Your payout account is connected.'
+                  : 'Your debit card or bank account is not ready for payouts.'}
+              </p>
+              <p className="mt-2 rounded-xl bg-red-100 p-3 text-sm font-black text-red-950">
+                You will not be able to receive funds until every required to-do below is completed
+                and approved.
+              </p>
+              <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                {complianceItems
+                  .filter((item) => item.required && !item.complete)
+                  .map((item) => (
+                    <li
+                      key={item.label}
+                      className="flex items-center gap-2 rounded-lg border border-red-200 bg-white p-3 text-sm font-bold text-red-950"
+                    >
+                      <AlertTriangle className="h-4 w-4 shrink-0 text-red-700" /> {item.label}
+                    </li>
+                  ))}
+                {!payoutReady && (
+                  <li className="flex items-center gap-2 rounded-lg border border-red-200 bg-white p-3 text-sm font-bold text-red-950">
+                    <AlertTriangle className="h-4 w-4 shrink-0 text-red-700" /> Debit card or bank
+                    payout account
+                  </li>
+                )}
+              </ul>
+              {studentCloseoutGaps.length > 0 && (
+                <div className="mt-4 rounded-xl border-2 border-red-300 bg-white p-4">
+                  <h3 className="font-black text-red-950">Student completion paperwork</h3>
+                  <p className="mt-1 text-sm text-red-900">
+                    Complete every item below for each graduated student before payment can be
+                    released.
+                  </p>
+                  <ul className="mt-3 space-y-3">
+                    {studentCloseoutGaps.map((student) => (
+                      <li key={student.id} className="rounded-lg bg-red-100 p-3 text-red-950">
+                        <p className="font-black">{student.name}</p>
+                        <p className="mt-1 text-sm font-semibold">
+                          Missing: {student.missing.join(', ')}.
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <Link
+                  href="/program-holder/documents"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl bg-red-700 px-4 py-2 text-sm font-black text-white"
+                >
+                  Complete documents
+                </Link>
+                {!data.holder?.mou_signed && (
+                  <Link
+                    href="/program-holder/sign-mou"
+                    className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900"
+                  >
+                    Read and sign MOU
+                  </Link>
+                )}
+                <Link
+                  href="/program-holder/compliance"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900"
+                >
+                  Review every requirement
+                </Link>
+                <Link
+                  href="/program-holder/payouts"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900"
+                >
+                  Add debit card or bank
+                </Link>
+                {incompleteBackWork.length > 0 && (
+                  <Link
+                    href="/program-holder/students"
+                    className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900"
+                  >
+                    Complete prior student records
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+      <section aria-labelledby="program-holder-actions-heading">
+        <div className="mb-4">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
+            Your workspace
+          </p>
+          <h2
+            id="program-holder-actions-heading"
+            className="mt-1 text-xl font-black text-slate-950 sm:text-2xl"
+          >
+            Run the program from one place
+          </h2>
+          <p className="mt-1 text-sm text-slate-600">
+            Open the work that needs attention without searching through the menu.
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <ActionLink
+            href="/program-holder/students/pending"
+            icon={<Users className="h-5 w-5" />}
+            title="Review applicants"
+            detail={`${data.applicants.length} waiting for review`}
+            tone="amber"
+          />
+          <ActionLink
+            href="/program-holder/hours"
+            icon={<Clock className="h-5 w-5" />}
+            title="Record training"
+            detail={`${pendingHours.length} logs awaiting verification`}
+            tone="blue"
+          />
+          <ActionLink
+            href="/program-holder/documents"
+            icon={<FileText className="h-5 w-5" />}
+            title="Complete documents"
+            detail={`${data.documents.length} documents on file`}
+            tone="violet"
+          />
+          <ActionLink
+            href="/program-holder/compliance"
+            icon={<ShieldCheck className="h-5 w-5" />}
+            title="Resolve compliance"
+            detail={`${missingRequirements} requirements incomplete`}
+            tone="emerald"
+          />
+          <ActionLink
+            href="/program-holder/programs"
+            icon={<BookOpen className="h-5 w-5" />}
+            title="Open program delivery"
+            detail={`${data.courseAssignments.length} course assignments`}
+            tone="blue"
+          />
+          <ActionLink
+            href="/program-holder/payouts"
+            icon={<CheckCircle2 className="h-5 w-5" />}
+            title="Manage payouts"
+            detail={String(data.holder?.payout_status || 'Setup required').replaceAll('_', ' ')}
+            tone="emerald"
+          />
+        </div>
+      </section>
+      <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+        <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-black text-slate-950">Program readiness</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                {completedRequirements} of {requiredComplianceItems.length} applicable requirements
+                complete.
+              </p>
+            </div>
+            <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-black text-blue-800">
+              {complianceScore}%
+            </span>
+          </div>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            {complianceItems.map((item) => (
+              <div
+                key={item.label}
+                className="flex min-w-0 items-center gap-2 rounded-xl border border-slate-200 p-3"
+              >
+                {item.complete ? (
+                  <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
+                ) : (
+                  <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" />
+                )}
+                <span className="min-w-0 text-sm font-bold text-slate-800">
+                  {item.label}
+                  <span className="mt-0.5 block text-xs font-medium text-slate-500">
+                    {item.required ? 'Required' : 'Recommended'} · Owner: {item.owner}
+                  </span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </article>
+        <article className="rounded-2xl border border-slate-200 bg-slate-950 p-4 text-white shadow-sm sm:p-6">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-300">
+            Next best action
+          </p>
+          <h2 className="mt-2 text-xl font-black">Finish onboarding for payment readiness</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-300">
+            Upload required business and training records, complete acknowledgements, and connect
+            the delivery course before funds can be released.
+          </p>
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+            <Link
+              href="/program-holder/documents"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950"
+            >
+              Upload documents
+            </Link>
+            <Link
+              href="/program-holder/compliance"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-600 px-4 py-2 text-sm font-black text-white"
+            >
+              View requirements
+            </Link>
+          </div>
+        </article>
+      </section>
+      <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+        <article className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">
+                Call and enrollment queue
+              </p>
+              <h2 className="mt-1 text-xl font-black text-slate-950">
+                People who still need follow-up
+              </h2>
+              <p className="mt-1 text-sm text-slate-600">
+                {callQueue.length} applicants have no completed call outcome and{' '}
+                {data.applicants.length} are not enrolled.
+              </p>
+            </div>
+            <Link
+              href="/program-holder/students/pending"
+              className="inline-flex min-h-10 items-center rounded-xl bg-amber-100 px-4 py-2 text-sm font-black text-amber-950"
+            >
+              Open full queue
+            </Link>
+            <WorkOneOutreachButton count={data.applicants.length} />
+          </div>
+          <div className="mt-4 grid gap-2">
+            {callQueue.slice(0, 6).map((row) => (
+              <div
+                key={row.id}
+                className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 p-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="min-w-0">
+                  <p className="break-words font-black text-slate-950">
+                    {row.applicant_name || 'Applicant'}
+                  </p>
+                  <p className="break-all text-xs text-slate-500">
+                    {row.applicant_email || 'No email on file'}
+                  </p>
+                  <p className="mt-1 text-xs font-bold text-slate-700">
+                    {row.applicant_phone || 'No phone on file'}
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-black text-red-800">
+                    Not enrolled
+                  </span>
+                  {row.applicant_email && (
+                    <a
+                      href={`mailto:${row.applicant_email}`}
+                      className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900"
+                    >
+                      Email
+                    </a>
+                  )}
+                  {row.applicant_phone ? (
+                    <a
+                      href={`tel:${row.applicant_phone}`}
+                      className="inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-black text-white"
+                    >
+                      Call
+                    </a>
+                  ) : (
+                    <span className="text-xs font-bold text-slate-500">Phone missing</span>
+                  )}
+                </div>
+              </div>
+            ))}
+            {!callQueue.length && (
+              <p className="rounded-xl bg-emerald-50 p-4 text-sm font-bold text-emerald-900">
+                Every applicant has a recorded call outcome.
+              </p>
+            )}
+          </div>
+        </article>
+        <div className="min-w-0">{payoutPanel}</div>
+      </section>
+      <section className="grid gap-4 lg:grid-cols-2">
+        <article className="rounded-2xl border border-blue-200 bg-white p-4 shadow-sm sm:p-6">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
+            Current semester
+          </p>
+          <h2 className="mt-1 text-xl font-black text-slate-950">Current and incoming students</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            Only names and training dates are shown here. Voucher and funding documents remain
+            private.
+          </p>
+          <div className="mt-4 grid gap-2">
+            {data.upcomingEnrollments.length ? (
+              data.upcomingEnrollments.map((row) => (
+                <div key={row.id} className="rounded-xl border border-slate-200 p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="font-black text-slate-950">
+                      {row.full_name || 'Incoming student'}
+                    </p>
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-black ${row.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}
+                    >
+                      {row.status === 'active' ? 'In progress' : 'Starting soon'}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-slate-700">
+                    Start:{' '}
+                    {row.training_start_date ||
+                      row.student_start_date ||
+                      row.start_date ||
+                      'Not set'}{' '}
+                    · End: {row.training_end_date || row.expected_end_date || 'Not set'}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="rounded-xl bg-slate-50 p-4 text-sm font-bold text-slate-600">
+                No current or future-dated enrollments are linked yet.
+              </p>
+            )}
+          </div>
+        </article>
+        <ProgramHolderNotificationPreferences
+          initial={data.notificationPreferences}
+          phone={data.profile?.phone || data.holder?.contact_phone || ''}
+        />
+      </section>
+      <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm sm:p-6">
+        <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">
+          Weekly student oversight
+        </p>
+        <h2 className="mt-1 text-xl font-black text-slate-950">
+          Progress reports due every Friday
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-slate-700">
+          Complete one report for each active student. Record lessons learned, skills practiced,
+          attendance and hours, assignments and scores, supporting evidence, checks performed,
+          barriers, authorized parent or guardian communication, and next-week goals.
+        </p>
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <Link
+            href="/program-holder/reports"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-4 py-2 text-sm font-black text-white"
+          >
+            Start weekly progress report
+          </Link>
+          <Link
+            href="/program-holder/reports"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-emerald-300 bg-white px-4 py-2 text-sm font-black text-emerald-950"
+          >
+            Review submitted reports
+          </Link>
+        </div>
+        <p className="mt-3 text-xs font-bold text-emerald-950">
+          Paris can guide each field and flag missing information, but the Program Holder must
+          verify and submit the report.
+        </p>
+      </section>
+      <section aria-labelledby="program-holder-programs-heading">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <h2 id="program-holder-programs-heading" className="text-xl font-black text-slate-950">
+              {regionalAssignment?.all_programs_in_region ? 'Regional program coverage' : 'Your programs'}
+            </h2>
+            <p className="mt-1 text-sm text-slate-600">
+              {regionalAssignment?.all_programs_in_region
+                ? `${data.programs.length} active pathways in your regional coordination scope. Local Program Holder assignments still control delivery.`
+                : 'Approved training pathways connected to this Program Holder account.'}
+            </p>
+          </div>
+          <Link href="/program-holder/programs" className="text-sm font-bold text-blue-700">
+            View details
+          </Link>
+        </div>
+        <ProgramCards
+          programs={regionalAssignment?.all_programs_in_region ? data.programs.slice(0, 4) : data.programs}
+          courseAssignments={data.courseAssignments}
+          compact
+        />
+      </section>
+      <section className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-black">Enrolled {primaryProgramLabel} students</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Only confirmed enrollments appear here. Applicants stay in the separate Applicants
+                queue.
+              </p>
+            </div>
+            <Link
+              href="/program-holder/students"
+              className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-bold text-white"
+            >
+              Manage Students
+            </Link>
+            <AlumniCareerOutreachButton count={completed.length} />
+          </div>
+          <EnrollmentTable rows={data.enrollments.slice(0, 8)} programs={data.programs} />
+        </div>
+        <div className="space-y-6">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="font-black">Required actions</h2>
+            <p className="mt-2 text-sm text-slate-600">
+              {data.applicants.length} applicants awaiting enrollment review · {pendingHours.length}{' '}
+              hour entries awaiting verification.
+            </p>
+            <Link
+              href="/program-holder/reports"
+              className="mt-4 inline-flex rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold"
+            >
+              Submit Reports
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Hero({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <section className="min-w-0 overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-blue-950 to-blue-800 p-5 text-white shadow-lg sm:rounded-3xl sm:p-7">
+      <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-200">{eyebrow}</p>
+      <h1 className="mt-2 break-words text-2xl font-black sm:text-4xl">{title}</h1>
+      <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-blue-50 sm:text-base">
+        {description}
+      </p>
+    </section>
+  );
+}
+
+function DashboardHero({
+  title,
+  programLabel,
+  status,
+  complianceScore,
+  heroImage,
+  isPortrait,
+}: {
+  title: string;
+  programLabel: string;
+  status: string;
+  complianceScore: number;
+  heroImage: string;
+  isPortrait: boolean;
+}) {
+  return (
+    <section className="relative min-h-[300px] min-w-0 overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl sm:min-h-[380px] sm:rounded-3xl">
+      <Image
+        src={heroImage}
+        alt={`${title} dashboard`}
+        fill
+        priority
+        sizes="100vw"
+        className={`object-cover opacity-60 ${isPortrait ? 'object-top' : 'object-center'}`}
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/60" />
+      <div className="relative grid gap-5 p-5 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div className="min-w-0">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-200">
+            Program Holder Command Center
+          </p>
+          <h1 className="mt-2 break-words text-2xl font-black leading-tight sm:text-4xl">
+            {title}
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-200 sm:text-base">
             Manage enrollment, instruction, compliance, records, reporting, and payouts for{' '}
             {programLabel}.
           </p>

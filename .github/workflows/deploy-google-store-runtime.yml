@@ -5,14 +5,23 @@ on:
     paths: ['.github/workflows/deploy-google-store-runtime.yml']
   workflow_dispatch:
 permissions:
+  actions: write
   contents: read
   id-token: write
 concurrency:
   group: google-runtime-operations
   cancel-in-progress: false
 jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch through approved Google identity event
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-store-runtime.yml/dispatches" -f ref=main
   deploy:
-    if: github.ref == 'refs/heads/main'
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 120

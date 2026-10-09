@@ -1,10 +1,12 @@
 import type { UltimateRenderPort } from '../core/ports';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { materializeInstructionalVisualAssets } from './instructional-visual-assets';
 import { MIN_LESSON_VIDEO_SCENES, type MediaDirectorInput } from '@/lib/video/media-director';
 
 type RecordLike = Record<string, any>;
 
 type VisualCandidate = {
+  ownedInstructional?: boolean;
   assetId?: string;
   url: string;
   kind: 'image' | 'video';
@@ -89,8 +91,27 @@ function visualCandidates(input: any): VisualCandidate[] {
     const row = record(asset);
     const url = publicCourseMediaUrl(row.public_url);
     const kind = url ? mediaKind(url, row.mime_type) : null;
-    if (!url || !kind || !row.entitlement_id) continue;
+    const ownedAssignment = assignment.assignments?.find(
+      (a: any) =>
+        a.sceneId === row.instructional_scene_id &&
+        a.assetId === row.id &&
+        a.assetId === `instructional:${a.sceneId}` &&
+        a.assignmentMethod === 'instructional-render' &&
+        a.generatedInstructionalVisual === true,
+    );
+    if (
+      !url ||
+      !kind ||
+      (!row.entitlement_id &&
+        !(
+          row.owned_instructional_visual === true &&
+          row.provider === 'remotion' &&
+          ownedAssignment
+        ))
+    )
+      continue;
     candidates.push({
+      ownedInstructional: row.owned_instructional_visual === true && Boolean(ownedAssignment),
       assetId: String(row.id ?? ''),
       url,
       kind,
@@ -220,7 +241,11 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
       ...(candidate
         ? {
             resolved_provider: candidate.provider,
-            resolved_model: candidate.kind === 'video' ? 'licensed-video' : 'licensed-image',
+            resolved_model: candidate.ownedInstructional
+              ? 'script-bound-instructional-image'
+              : candidate.kind === 'video'
+                ? 'licensed-video'
+                : 'licensed-image',
             source_provider_item_id: candidate.providerItemId,
             source_license_evidence_url: candidate.licenseEvidenceUrl,
           }
@@ -258,8 +283,13 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
   constructor(private db?: SupabaseClient) {}
 
   async render(input: any) {
+    const { uploadCourseVideosObject } = await import('@/lib/video/upload-lesson-media');
+    const materialized = await materializeInstructionalVisualAssets(
+      input,
+      uploadCourseVideosObject,
+    );
     const prepared = prepareUltimateStoryboardInput(
-      this.db ? await refreshLicensedVisualUrls(input, this.db) : input,
+      this.db ? await refreshLicensedVisualUrls(materialized, this.db) : materialized,
     );
     const [{ directMedia }, { renderStoryboardVideo }] = await Promise.all([
       import('@/lib/video/media-director'),

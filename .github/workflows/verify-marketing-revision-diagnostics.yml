@@ -6,10 +6,19 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: write
   id-token: write
 jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch trusted diagnostic verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-marketing-revision-diagnostics.yml/dispatches" -f ref=main
   diagnose:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 5

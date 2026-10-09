@@ -36,7 +36,7 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
     const controller = new AbortController();
     setLoading(true);
     setError('');
-    void fetch('/api/admin/ultimate-course-builder?buildId=' + encodeURIComponent(buildId), {
+    void fetch('/api/admin/ultimate-course-builder?view=checkpoints&buildId=' + encodeURIComponent(buildId), {
       cache: 'no-store', signal: controller.signal,
     }).then(async response => {
       const payload = await response.json().catch(() => ({}));

@@ -8,6 +8,7 @@ import { TESTING_CENTER } from '@/lib/testing/testing-config';
 import { testingAppointmentLabel, testingCalendarUrl } from '@/lib/testing/booking-calendar';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { notifyAdminOfStudentPayment } from '@/lib/billing/notify-student-payment';
+import { recordSchoolInvoiceOrder } from '@/lib/billing/school-invoice-order';
 
 type Database = any;
 
@@ -347,13 +348,14 @@ export async function fulfillPaidBillingInvoice(
   }
 
   if (job.fulfillment_type === 'program_enrollment') {
+    const schoolOrder = await recordSchoolInvoiceOrder(db, job.billing_invoice_id, payload);
     const result = await db
       .from('program_enrollments')
       .update({
-        status: 'active',
+        status: schoolOrder ? 'pending' : 'active',
         payment_status: 'paid',
-        enrollment_state: 'active',
-        next_required_action: 'ONBOARDING',
+        enrollment_state: schoolOrder ? 'onboarding' : 'active',
+        next_required_action: schoolOrder ? 'SCHOOL_REGISTRATION' : 'ONBOARDING',
         amount_paid_cents: payload.amount_cents,
         billing_provider: 'quickbooks',
         updated_at: new Date().toISOString(),
@@ -362,6 +364,10 @@ export async function fulfillPaidBillingInvoice(
       .eq('payment_status', 'pending');
     if (result.error) throw new Error(result.error.message);
     await notifyAdminOfStudentPayment(db, job.billing_invoice_id, payload);
+    if (schoolOrder) {
+      const { sendSchoolRegistrationEmail } = await import('@/lib/billing/school-registration-email');
+      await sendSchoolRegistrationEmail(db, job.billing_invoice_id, payload);
+    }
     return;
   }
 

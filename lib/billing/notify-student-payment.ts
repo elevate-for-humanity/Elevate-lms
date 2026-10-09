@@ -1,4 +1,5 @@
 import { sendEmail } from '@/lib/email/sendgrid';
+import { schoolInvoiceSnapshot } from './school-invoice-order';
 
 const escapeHtml = (value: unknown) =>
   String(value ?? '').replace(
@@ -42,6 +43,7 @@ export async function notifyAdminOfStudentPayment(
   const amount = Number(payload.amount_cents);
   if (!Number.isSafeInteger(amount) || amount <= 0)
     throw new Error('Invalid confirmed payment amount.');
+  const school = payload.program_holder_id ? schoolInvoiceSnapshot(payload) : null;
   const message = await sendEmail({
     to: recipient,
     subject,
@@ -51,6 +53,7 @@ export async function notifyAdminOfStudentPayment(
       <p><strong>Amount received:</strong> $${(amount / 100).toFixed(2)}</p>
       <p><strong>Invoice reference:</strong> ${escapeHtml(invoiceId)}</p>
       <p><strong>Enrollment reference:</strong> ${escapeHtml(payload.enrollment_id)}</p>
+      ${school ? `<p><strong>School invoice amount:</strong> $${(school.schoolAmountCents / 100).toFixed(2)}. <strong>Elevate amount:</strong> $${(school.elevateAmountCents / 100).toFixed(2)}.</p><p>The school invoice remains unpaid until payment is confirmed. The student receives a registration link; a school seat and start date still require confirmation.</p><p><a href="https://admin.elevateforhumanity.org/enrollments/school-invoices">Open school invoice orders</a></p>` : ''}
       <p>Action required: review the student's enrollment, complete any outstanding requirements,
       confirm the training provider and start date, and send the student their enrollment confirmation.
       If already enrolled, reconcile this payment with their balance and payment plan.

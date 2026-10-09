@@ -183,17 +183,6 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    if (partnerProgram && !agencyFundingRequested) {
-      // The school's previous checkout currently redirects to a no-payment application page.
-      // Do not collect tuition until an active school checkout and payment confirmation are connected.
-      return NextResponse.json(
-        {
-          error:
-            'Online tuition payment is awaiting the school’s active checkout link. Please contact Elevate for enrollment assistance.',
-        },
-        { status: 409 },
-      );
-    }
     let fullAmountCents = agencyFundingRequested
       ? 0
       : (partnerProgram?.retailPriceCents ?? Math.round(amountToCharge * 100));
@@ -360,29 +349,8 @@ export async function POST(request: NextRequest) {
     });
     if (!invoice.paymentUrl && paymentMethod === 'quickbooks')
       throw new Error('QuickBooks created the invoice but online payment links are not enabled.');
-    if (partnerProgram && partnerHolderId) {
-      const { data: existingPayout } = await admin
-        .from('payout_schedules')
-        .select('id')
-        .eq('enrollment_id', pending.data.id)
-        .maybeSingle();
-      if (!existingPayout) {
-        const payout = await admin.from('payout_schedules').insert({
-          enrollment_id: pending.data.id,
-          user_id: user.id,
-          program_id: program.id,
-          program_holder_id: partnerHolderId,
-          total_payout_cents: partnerProgram.providerShareCents,
-          increment_1_cents: partnerProgram.providerShareCents,
-          increment_2_cents: 0,
-          increment_1_status: 'pending',
-          increment_2_status: 'not_required',
-          notes: `Provider share for ${program.title}; release requires cleared payment and approval.`,
-        });
-        if (payout.error)
-          throw new Error(`Partner payout schedule failed: ${payout.error.message}`);
-      }
-    }
+    // School invoice liabilities are recorded by confirmed-payment fulfillment,
+    // separately from the graduation/PayPal payout workflow.
     if (payment_plan === 'installments') {
       const next = new Date();
       next.setUTCMonth(next.getUTCMonth() + 1);

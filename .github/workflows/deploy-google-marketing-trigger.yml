@@ -78,6 +78,13 @@ jobs:
           node scripts/check-public-claims.mjs
           node scripts/check-public-address-integrity.mjs
 
+      - name: Verify PARIS source bundle and private API behavior
+        run: |
+          set -euo pipefail
+          node scripts/verify-paris-release-source.mjs
+          node scripts/test-tax-calculation-failures.mjs apps/marketing/app/api/tax/returns/calculate/route.ts
+          node scripts/test-tax-w2-validation.mjs apps/marketing/app/api/tax/w2/confirm/route.ts
+
       - name: Preflight homepage release content and image assets
         shell: bash
         run: |
@@ -241,6 +248,27 @@ jobs:
             echo "Production: https://www.elevateforhumanity.org"
             echo "Cloud Run service: elevate-marketing-migration (us-central1)"
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify live PARIS entry and authenticated tax boundaries
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const root='https://www.elevateforhumanity.org';
+          for(const path of ['/tax','/tax-software','/tax-software/features','/tax-software/pricing','/tax-software/about','/tax-software/bank-products','/tax-software/contact','/tax-software/professional','/tax-software/demo','/tax-software/login','/tax-software/self-file','/tax-software/self-file/return','/tax-software/self-file/w2/confirm']) {
+            const res=await fetch(root+path,{cache:'no-store',signal:AbortSignal.timeout(20000)});
+            assert.equal(res.status,200,path+' must be available');
+          }
+          const home=await (await fetch(root+'/',{cache:'no-store'})).text();
+          assert.ok(home.includes('href="/tax"'),'Homepage must link to the tax page');
+          const tax=await (await fetch(root+'/tax',{cache:'no-store'})).text();
+          assert.ok(tax.includes('PARIS ASSISTANT'),'Tax landing page must render PARIS');
+          for(const [path,method] of [['/api/tax/returns','GET'],['/api/tax/interview','GET'],['/api/tax/returns','POST'],['/api/tax/w2/confirm','POST'],['/api/tax/returns/calculate','POST']]) {
+            const res=await fetch(root+path,{method,headers:method==='POST'?{'content-type':'application/json'}:{},...(method==='POST'?{body:'{}'}:{}),signal:AbortSignal.timeout(20000)});
+            assert.equal(res.status,401,path+' must require authentication');
+          }
+          console.log('PARIS public pages, homepage link and private API boundaries verified.');
+          NODE
 
       - name: Publish failed release notice
         if: ${{ failure() }}

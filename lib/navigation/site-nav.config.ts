@@ -572,7 +572,7 @@ export const footerNavigation = {
       { label: 'Reels', href: '/reels' },
       { label: 'Share', href: '/share' },
       { label: 'Social', href: '/social' },
-      { label: 'Community Tax Support', href: '/tax' },
+      { label: 'PARIS Tax Software', href: '/tax' },
       { label: 'Microclasses', href: '/microclasses' },
       { label: 'Educator Hub', href: '/educatorhub' },
       { label: 'Funding Impact', href: '/funding' },

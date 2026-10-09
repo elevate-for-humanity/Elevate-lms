@@ -36,11 +36,11 @@ for file in "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; do
 done
 grep -q 'gcloud run services update elevate-admin-migration' "$ADMIN_WF" || fail "Admin deployment must target its Google service"
 grep -q 'Dockerfile.northflank-admin' "$ADMIN_WF" || fail "Admin deployment must build its own image"
-grep -q 'lms\) FILE=Dockerfile.northflank-lms' "$IMAGE_WF" || fail "Google LMS build must use its own image"
-grep -q 'loadGoogleConfig\(component\)' "$STAGE_SCRIPT" || fail "Staging must load component-scoped Google configuration"
+grep -Fq 'lms) FILE=Dockerfile.northflank-lms' "$IMAGE_WF" || fail "Google LMS build must use its own image"
+grep -Fq 'loadGoogleConfig(component)' "$STAGE_SCRIPT" || fail "Staging must load component-scoped Google configuration"
 grep -Fq 'elevate-${component}-migration' "$STAGE_SCRIPT" || fail "Staging must use a component-scoped Google service"
 grep -q 'stage-web\.mjs' "$STAGE_WF" || fail "Google staging workflow must use the reviewed staging implementation"
-if grep -q 'NORTHFLANK_API_TOKEN|configure-services\.ts|api\.northflank\.com' "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; then
+if grep -Eq 'NORTHFLANK_API_TOKEN|configure-services\.ts|api\.northflank\.com' "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; then
   fail "Active Google deployment must not depend on a retired source control plane"
 fi
 pass "Google deployment keeps Admin and LMS images, services and configuration separate"

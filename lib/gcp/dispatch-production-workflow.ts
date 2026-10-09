@@ -20,8 +20,11 @@ async function deploymentToken(): Promise<string> {
   const token = process.env.GITHUB_TOKEN?.trim();
   if (token) return token;
   const db = await requireAdminClient();
-  const { data, error } = await db.from('platform_secrets')
-    .select('value_enc').eq('key', 'GITHUB_TOKEN').maybeSingle();
+  const { data, error } = await db
+    .from('platform_secrets')
+    .select('value_enc')
+    .eq('key', 'GITHUB_TOKEN')
+    .maybeSingle();
   if (error || !data?.value_enc?.trim()) {
     throw new Error('Google deployment dispatch token is not configured');
   }
@@ -51,10 +54,20 @@ export async function dispatchGoogleDeployment(target: GoogleDeployTarget) {
     throw new Error(`Google GitHub dispatch refused: HTTP ${response.status}`);
   }
   return {
-    target, workflow, provider: 'google-cloud-run' as const,
+    target,
+    workflow,
+    provider: 'google-cloud-run' as const,
     project: 'elegant-racer-299721',
     status: 'dispatched' as const,
     verifiedLive: false,
     actionsUrl: `https://github.com/${REPOSITORY}/actions/workflows/${workflow}`,
   };
+}
+
+export async function isGoogleDeploymentConfigured(): Promise<boolean> {
+  try {
+    return Boolean(await deploymentToken());
+  } catch {
+    return false;
+  }
 }

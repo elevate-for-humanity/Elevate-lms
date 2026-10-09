@@ -39,9 +39,10 @@ try {
   }
   assert.ok(ready, 'Packaged server did not start within 120 seconds');
   for (const host of ['169.254.1.1:3000', '10.0.0.2:3000', 'customer.example', 'acme.app.elevateforhumanity.org']) {
-    for (const path of ['/api/ping', '/api/ready']) {
+    for (const path of ['/api/ping', '/api/ready', '/api/health']) {
       const response = await fetch(root + path, { headers: { host }, redirect: 'manual', signal: AbortSignal.timeout(10000) });
-      assert.equal(response.status, 200, `${host}${path} must reach the service endpoint`);
+      if (path === '/api/health') assert.ok([200, 503].includes(response.status), 'Dependency health must return its real status');
+      else assert.equal(response.status, 200, `${host}${path} must reach the service endpoint`);
       const body = await response.json();
       assert.equal(body.service, 'marketing');
       assert.equal(body.commit, sha);

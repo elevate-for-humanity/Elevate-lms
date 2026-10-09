@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1.7
-FROM node:22-alpine AS base
+ARG NODE_IMAGE=node:22-alpine
+FROM ${NODE_IMAGE} AS base
 
 # Invalidate Northflank's runtime image after the September 20 production 502 incident.
 RUN echo "nf-cache-invalidate-marketing-2026-09-20-runtime-recovery"
@@ -105,7 +106,7 @@ RUN pnpm --filter @elevate/marketing build
 RUN test -d /workspace/apps/marketing/.next
 RUN test -f /workspace/apps/marketing/.next/BUILD_ID
 
-FROM node:22-alpine AS runner
+FROM ${NODE_IMAGE} AS runner
 
 WORKDIR /app
 

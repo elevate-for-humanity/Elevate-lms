@@ -51,6 +51,24 @@ jobs:
             scaling: Object.fromEntries(Object.entries(service.spec.template.metadata.annotations || {}).filter(([k]) => /Scale|cpu-throttling/.test(k))),
             latestReadyRevision:service.status.latestReadyRevisionName, latestCreatedRevision:service.status.latestCreatedRevisionName,
             traffic:service.status.traffic, conditions:(service.status.conditions || []).map(x=>({type:x.type,status:x.status,reason:x.reason}))});
+          if (component === 'admin') {
+            const revision = service.status.latestCreatedRevisionName;
+            const details = JSON.parse(gcloud(['run','revisions','describe',revision,'--project='+project,'--region=us-central1','--format=json']));
+            report({component, revision, startupProbe:details.spec.containers[0].startupProbe,
+              conditions:(details.status.conditions || []).map(x=>({type:x.type,status:x.status,reason:x.reason,message:x.message}))});
+            const logs = JSON.parse(gcloud(['logging','read',
+              'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration" AND resource.labels.revision_name="'+revision+'"',
+              '--project='+project,'--freshness=2h','--limit=50','--format=json']));
+            for (const row of logs) {
+              const message = String(row.textPayload || row.jsonPayload?.message || '');
+              const safe = message.replace(/Bearer\s+\S+/gi,'Bearer [REDACTED]')
+                .replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[REDACTED JWT]')
+                .replace(/((?:api[_-]?key|token|password|secret)\s*[:=]\s*)\S+/gi,'$1[REDACTED]');
+              if (/startup|listen|ready|port|heap|memory|error|cannot find|failed|exception|next\.js|signal|killed/i.test(safe)) {
+                report({revision,timestamp:row.timestamp,severity:row.severity,message:safe.slice(0,2000)});
+              }
+            }
+          }
           report({component, expectedSupabase:env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/,'') === 'https://cuxzzpsyufcewtmicszk.supabase.co',
             anonPresent:Boolean(env.NEXT_PUBLIC_SUPABASE_ANON_KEY), serviceRolePresent:Boolean(env.SUPABASE_SERVICE_ROLE_KEY)});
           if (component === 'marketing') {

@@ -4,7 +4,8 @@ on:
     inputs:
       execution:
         description: Existing course execution name to inspect
-        required: true
+        required: false
+        default: latest
         type: string
 permissions:
   contents: read
@@ -32,9 +33,14 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import {execFileSync} from 'node:child_process';
-          const execution=process.env.COURSE_EXECUTION;
-          if(!/^elevate-course-builder-[a-z0-9]+$/.test(execution)) throw new Error('COURSE_EXECUTION_NAME_INVALID');
+          let execution=process.env.COURSE_EXECUTION || 'latest';
           const call=args=>JSON.parse(execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          if(execution === 'latest') {
+            const executions=call(['run','jobs','executions','list','--job=elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--limit=20','--format=json']);
+            const active=executions.find(x=>!x.status?.completionTime);
+            execution=(active || executions[0])?.metadata?.name;
+          }
+          if(!/^elevate-course-builder-[a-z0-9]+$/.test(execution)) throw new Error('COURSE_EXECUTION_NAME_INVALID');
           const run=call(['run','jobs','executions','describe',execution,'--project=elegant-racer-299721','--region=us-central1','--format=json']);
           console.log(JSON.stringify({execution,status:run.status,image:run.spec?.template?.spec?.containers?.[0]?.image}));
           const filter='resource.type="cloud_run_job" AND resource.labels.job_name="elevate-course-builder" AND labels."run.googleapis.com/execution_name"="'+execution+'"';

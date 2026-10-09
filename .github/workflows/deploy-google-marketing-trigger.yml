@@ -121,6 +121,17 @@ jobs:
         with:
           skip_install: true
 
+      - name: Ensure Google Text-to-Speech is enabled
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          ENABLED="$(gcloud services list --enabled --project=elegant-racer-299721 --filter='config.name=texttospeech.googleapis.com' --format='value(config.name)')"
+          if [ "$ENABLED" != "texttospeech.googleapis.com" ]; then
+            gcloud services enable texttospeech.googleapis.com --project=elegant-racer-299721 --quiet
+          fi
+          gcloud services list --enabled --project=elegant-racer-299721 --filter='config.name=texttospeech.googleapis.com' --format='value(config.name)' | grep -Fx texttospeech.googleapis.com
+
       - name: Diagnose production natural voice
         timeout-minutes: 3
         shell: bash

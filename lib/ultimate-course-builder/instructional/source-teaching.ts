@@ -13,6 +13,20 @@ export function spokenText(value: unknown): string {
     .replace(/https?:\/\/\S+/g, '').replace(/\s+/g, ' ')
     .replace(/\.\s*\./g, '.').trim();
 }
+/** Shared authored paragraphs can occur in several source lessons. Speak each
+ * substantial sentence once while retaining all distinct source statements. */
+export function consolidateSourceSections(items: string[]): string {
+  const seen = new Set<string>();
+  return items.filter(Boolean).flatMap(item => item.split(/(?<=[.!?])\s+|\n+/))
+    .filter(sentence => {
+      const words = sentence.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+      if (words.length < 6) return true;
+      const key = words.join(' ');
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).join(' ').trim();
+}
 type Source = { id: string; text: string };
 type Question = { question: string; options: string[]; correct: number; explanation: string };
 export function sourceTeaching(sources: Source[], title: string) {
@@ -78,7 +92,7 @@ export function sourceTeaching(sources: Source[], title: string) {
       }
     }
   }
-  const clean = (items: string[]) => [...new Set(items.filter(Boolean))].join(' ');
+  const clean = (items: string[]) => consolidateSourceSections(items);
   const body = clean(teaching);
   if (!body) throw new Error('ULTIMATE_SUBSTANTIVE_AUTHORED_TEACHING_REQUIRED');
   const steps = clean(procedure), precautions = clean(safety), practice = clean(exercises);

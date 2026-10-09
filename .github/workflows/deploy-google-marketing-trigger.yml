@@ -75,6 +75,7 @@ jobs:
           set -euo pipefail
           pnpm install --frozen-lockfile --strict-peer-dependencies=false
           pnpm exec tsc --noEmit --project apps/marketing/tsconfig.json
+          node --test scripts/gcp/marketing-health-routing.test.cjs
           node scripts/audit-geo-claims.mjs
           node scripts/check-public-claims.mjs
           node scripts/check-public-address-integrity.mjs
@@ -150,6 +151,10 @@ jobs:
             --build-arg NEXT_PUBLIC_SUPABASE_URL \
             --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY .
 
+      - name: Test final Marketing container before release
+        timeout-minutes: 5
+        run: node scripts/gcp/smoke-marketing-container.mjs
+
       - name: Push Marketing image
         shell: bash
         run: |
@@ -160,17 +165,38 @@ jobs:
           docker push "$IMAGE"
 
       - name: Deploy exact image to Google Cloud Run
+        id: deploy
+        timeout-minutes: 15
         shell: bash
         run: |
           set -euo pipefail
           IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing"
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          SUFFIX="r${GITHUB_SHA:0:8}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "revision=elevate-marketing-migration-$SUFFIX" >> "$GITHUB_OUTPUT"
           gcloud run services update elevate-marketing-migration \
             --project=elegant-racer-299721 \
             --region=us-central1 \
             --image="$IMAGE@$DIGEST" \
+            --revision-suffix="$SUFFIX" \
             --quiet
+
+      - name: Collect exact failed revision diagnostics
+        if: ${{ failure() && steps.deploy.outcome == 'failure' }}
+        timeout-minutes: 3
+        env:
+          FAILED_REVISION: ${{ steps.deploy.outputs.revision }}
+        run: node scripts/gcp/collect-marketing-revision-diagnostics.mjs
+
+      - name: Preserve failed revision diagnostics
+        if: ${{ always() && steps.deploy.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: marketing-revision-${{ github.run_id }}-${{ github.run_attempt }}
+          path: deployment-diagnostics/marketing-revision.json
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Verify live Marketing revision
         shell: bash
@@ -237,6 +263,27 @@ jobs:
           throw new Error('Public website failed exact-revision/homepage acceptance: '+last);
           NODE
 
+      - name: Verify live PARIS entry and authenticated tax boundaries
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          const root='https://www.elevateforhumanity.org';
+          for(const path of ['/tax','/tax-software','/tax-software/features','/tax-software/pricing','/tax-software/about','/tax-software/bank-products','/tax-software/contact','/tax-software/professional','/tax-software/demo','/tax-software/login','/tax-software/self-file','/tax-software/self-file/return','/tax-software/self-file/w2/confirm']) {
+            const res=await fetch(root+path,{cache:'no-store',signal:AbortSignal.timeout(20000)});
+            assert.equal(res.status,200,path+' must be available');
+          }
+          const home=await (await fetch(root+'/',{cache:'no-store'})).text();
+          assert.ok(home.includes('href="/tax"'),'Homepage must link to the tax page');
+          const tax=await (await fetch(root+'/tax',{cache:'no-store'})).text();
+          assert.ok(tax.includes('PARIS ASSISTANT'),'Tax landing page must render PARIS');
+          for(const [path,method] of [['/api/tax/returns','GET'],['/api/tax/interview','GET'],['/api/tax/returns','POST'],['/api/tax/w2/confirm','POST'],['/api/tax/returns/calculate','POST']]) {
+            const res=await fetch(root+path,{method,headers:method==='POST'?{'content-type':'application/json'}:{},...(method==='POST'?{body:'{}'}:{}),signal:AbortSignal.timeout(20000)});
+            assert.equal(res.status,401,path+' must require authentication');
+          }
+          console.log('PARIS public pages, homepage link and private API boundaries verified.');
+          NODE
+
       - name: Publish verified live deployment status
         if: ${{ success() }}
         env:
@@ -259,27 +306,6 @@ jobs:
             echo "Production: https://www.elevateforhumanity.org"
             echo "Cloud Run service: elevate-marketing-migration (us-central1)"
           } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Verify live PARIS entry and authenticated tax boundaries
-        run: |
-          set -euo pipefail
-          node --input-type=module <<'NODE'
-          import assert from 'node:assert/strict';
-          const root='https://www.elevateforhumanity.org';
-          for(const path of ['/tax','/tax-software','/tax-software/features','/tax-software/pricing','/tax-software/about','/tax-software/bank-products','/tax-software/contact','/tax-software/professional','/tax-software/demo','/tax-software/login','/tax-software/self-file','/tax-software/self-file/return','/tax-software/self-file/w2/confirm']) {
-            const res=await fetch(root+path,{cache:'no-store',signal:AbortSignal.timeout(20000)});
-            assert.equal(res.status,200,path+' must be available');
-          }
-          const home=await (await fetch(root+'/',{cache:'no-store'})).text();
-          assert.ok(home.includes('href="/tax"'),'Homepage must link to the tax page');
-          const tax=await (await fetch(root+'/tax',{cache:'no-store'})).text();
-          assert.ok(tax.includes('PARIS ASSISTANT'),'Tax landing page must render PARIS');
-          for(const [path,method] of [['/api/tax/returns','GET'],['/api/tax/interview','GET'],['/api/tax/returns','POST'],['/api/tax/w2/confirm','POST'],['/api/tax/returns/calculate','POST']]) {
-            const res=await fetch(root+path,{method,headers:method==='POST'?{'content-type':'application/json'}:{},...(method==='POST'?{body:'{}'}:{}),signal:AbortSignal.timeout(20000)});
-            assert.equal(res.status,401,path+' must require authentication');
-          }
-          console.log('PARIS public pages, homepage link and private API boundaries verified.');
-          NODE
 
       - name: Publish failed release notice
         if: ${{ failure() }}

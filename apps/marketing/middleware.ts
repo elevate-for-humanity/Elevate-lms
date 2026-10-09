@@ -132,6 +132,11 @@ function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextRespons
 
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
+  // Infrastructure probes use internal hosts as well as public domains. These
+  // exact service endpoints must never enter tenant, auth or canonical routing.
+  if (['/api/ping', '/api/ready', '/api/health'].includes(pathname)) {
+    return NextResponse.next();
+  }
   if (isStaticRequest(pathname)) return NextResponse.next();
 
   const storeRuntimeResponse = handleStoreOnlyRuntime(req, pathname);

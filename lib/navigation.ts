@@ -3,6 +3,7 @@
 
 import type { NavItem, NavSubItem } from '@/types/navigation';
 import { ROUTES } from '@/lib/navigation/routes';
+import { siteUrls } from '@/lib/utils/site-urls';
 
 export type { NavItem, NavSubItem } from '@/types/navigation';
 
@@ -106,7 +107,7 @@ export const NAV_ITEMS: NavItem[] = [
     subItems: [
       { name: 'Network Home', href: '/barber-beauty-network', isSectionLink: true },
       { name: 'Join the Community', href: '/community', isSectionLink: true },
-      { name: 'Member Community', href: 'https://app.elevateforhumanity.org/community', isSectionLink: true },
+      { name: 'Member Community', href: `${siteUrls.app}/community`, isSectionLink: true },
       { name: 'Host Shop Directory', href: '/partners/host-shops', isSectionLink: true },
       { name: 'Job Board', href: '/jobs', isSectionLink: true },
       { name: 'Join & Showcase Your Work', href: '/host-shop/apply', isSectionLink: true },

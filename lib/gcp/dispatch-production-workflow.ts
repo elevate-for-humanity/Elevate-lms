@@ -7,10 +7,11 @@ import 'server-only';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
-export type GoogleDeployTarget = 'admin' | 'marketing';
+export type GoogleDeployTarget = 'admin' | 'marketing' | 'course-builder';
 const WORKFLOWS: Record<GoogleDeployTarget, string> = {
   admin: 'deploy-admin.yml',
   marketing: 'deploy-google-marketing-trigger.yml',
+  'course-builder': 'dispatch-google-course-job.yml',
 };
 const REPOSITORY = 'elevate-for-humanity/Elevate-lms';
 

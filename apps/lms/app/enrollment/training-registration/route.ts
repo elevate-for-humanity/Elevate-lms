@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   const session = await createClient();
   const { data: { user } } = await session.auth.getUser();
   if (!user) {
-    const login = new URL('/login', request.url);
+    const login = new URL('/login', 'https://app.elevateforhumanity.org');
     login.searchParams.set('redirect', `/enrollment/training-registration?enrollment_id=${id}`);
     return NextResponse.redirect(login);
   }

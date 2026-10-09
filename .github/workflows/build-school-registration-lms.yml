@@ -1,0 +1,20 @@
+name: Build corrected school registration LMS
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/build-school-registration-lms.yml']
+permissions:
+  contents: read
+  actions: write
+jobs:
+  dispatch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch existing Google image build without deploying
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/build-google-migration-images.yml/dispatches" --input - <<'JSON'
+          {"ref":"main","inputs":{"component":"lms"}}
+          JSON

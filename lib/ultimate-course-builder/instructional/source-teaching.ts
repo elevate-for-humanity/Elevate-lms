@@ -94,7 +94,7 @@ export function sourceTeaching(sources: Source[], title: string) {
     instructor_example: clean(examples) || `Consider applying ${title} at work. Describe the situation, identify what you need to know, and explain how the taught information changes your decision.`,
     demonstration: steps || `Here is the information to check before making your decision. ${body}`,
     guided_practice: practice || `Work through the demonstrated steps with your instructor. Explain each action before you perform it. Ask for feedback and repeat any step that does not match the demonstration.`,
-    independent_practice: `Now apply ${title} without the prompts. ${practice || 'Write or demonstrate your response to the situation discussed in the lesson. Record what you did and why.'} Compare your result with the lesson and identify anything you need to correct.`,
+    independent_practice: `Now apply ${title} without the prompts. ${practice ? 'Complete the authored exercise from guided practice on your own. Record your actions and explain the evidence supporting each decision.' : 'Write or demonstrate your response to the situation discussed in the lesson. Record what you did and why.'} Compare your result with the lesson and identify anything you need to correct.`,
     knowledge_check: questionText(first),
     mistake_and_correction: precautions || `A response is incomplete if it omits a required part of the taught information. Compare each part of your response with the lesson, identify the missing part, and correct it before proceeding.`,
     assessment: questionText(alternate),

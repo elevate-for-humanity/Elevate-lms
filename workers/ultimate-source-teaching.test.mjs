@@ -36,3 +36,42 @@ test('malformed transport and absent substantive instruction fail closed',()=>{
  assert.throws(()=>sourceTeaching([{id:'x',text:'Authorized course content: {}'}],'Title'),/SUBSTANTIVE_AUTHORED/);
  assert.equal(spokenText('<script>bad()</script><p>Teach &amp; learn.</p>'),'Teach & learn.');
 });
+
+test('guided and independent practice retain the authored exercise without duplicate narration', async()=>{
+ const raw = stripTypeScriptTypes(await readFile(new URL('../lib/video/instructional-quality-gate.ts', import.meta.url), 'utf8'));
+ const {instructionalQualityFailures}=await import(data(raw));
+ const exercise={title:'Practice infection prevention with assigned sanitation supplies.',instructions:['Inspect the work area and separate clean tools from used equipment.'],expectedArtifact:'A documented sanitation check with the label instruction recorded.'};
+ const text='Authorized course content: '+JSON.stringify({
+  html:'<p>Use the product label to set the required wet contact time.</p>',
+  scenario:'A service area contains one clean station beside a used instrument tray.',
+  experience:{
+   glossary:[{term:'Sanitation',definition:'Cleaning reduces contaminants before disinfection begins.'}],
+   exercises:[exercise],
+   practicalTask:'Show the safe cleaning sequence and record which surface was treated.',
+   readingGuide:{keyTakeaways:['Maintain separate zones for clean and used equipment throughout the service.']},
+   knowledgeChecks:[
+    {question:'Which record establishes the required wet contact time?',options:['The product label','The service schedule','The room sign'],correct:0,explanation:"Determine the contact time from the disinfectant manufacturer's approved product label."},
+    {question:'How should used implements be handled after the service?',options:['In the designated container','On the clean tray','In a pocket'],correct:0,explanation:'Place used implements in the designated container until the cleaning sequence begins.'},
+   ],
+  },
+ });
+ const result=sourceTeaching([{id:'course:practice',text}],'Sanitation');
+ assert.match(result.stageText.guided_practice,/Inspect the work area and separate clean tools/);
+ assert.match(result.stageText.guided_practice,/A documented sanitation check/);
+ assert.match(result.stageText.independent_practice,/without the prompts/);
+ const sceneTypes={concept_explanation:'mental_model',instructor_example:'worked_example',knowledge_check:'knowledge_check',recap:'memory_recap'};
+ const scenes=result.sequence.map(stage=>({
+  dialogue:result.stageText[stage],action:result.stageText[stage],
+  requiredVisualEvidence:result.stageText[stage],sceneType:sceneTypes[stage]||'system_diagram',
+  shotSize:'close-up',referenceImageUrl:'https://example.com/source.png',
+ }));
+ const checked=instructionalQualityFailures({courseTitle:'Cosmetology',lessonTitle:'Sanitation',script:scenes.map(s=>s.dialogue).join('\n\n'),storyboard:{scenes},instructor:{id:'ultimate',title:'Instructor',specialty:'Cosmetology'}});
+ assert.equal(checked.evidence.repeatedNarrationSegments,0);
+ assert.equal(checked.evidence.repeatedSceneDialogues,0);
+});
+
+test('duplicate narration repairs the source blueprint rather than rerendering the rejected film',async()=>{
+ const raw=stripTypeScriptTypes(await readFile(new URL('../lib/ultimate-course-builder/core/repair-router.ts',import.meta.url),'utf8'));
+ const {routeSelectiveRepairs}=await import(data(raw));
+ assert.deepEqual(routeSelectiveRepairs([{step:'finished_media_qa',severity:'error',code:'NARRATION_DUPLICATION',message:'Repeated practice narration'}]),[{step:'learning_objectives',codes:['NARRATION_DUPLICATION'],rebuildOnlyThisStage:true}]);
+});

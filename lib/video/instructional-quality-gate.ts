@@ -66,6 +66,10 @@ function duplicateCount(values: string[]): number {
   return [...counts.values()].reduce((total, count) => total + Math.max(0, count - 1), 0);
 }
 
+export function repeatedTeachingSegments(value: string): number {
+  return duplicateCount(normalizedTeachingSegments(value));
+}
+
 function domain(courseTitle: string): InstructionalQualityEvidence['courseDomain'] {
   const title = courseTitle.toLowerCase();
   if (/cosmetolog|beauty/.test(title)) return 'cosmetology';
@@ -177,7 +181,7 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
   );
   const objectiveCoverage = objectivesCoverage(learningObjectives, input.script);
   const sceneNarrationAlignment = sceneAlignment(input.storyboard);
-  const repeatedNarrationSegments = duplicateCount(normalizedTeachingSegments(input.script));
+  const repeatedNarrationSegments = repeatedTeachingSegments(input.script);
   const repeatedSceneDialogues = duplicateCount(
     input.storyboard.scenes.flatMap((scene) =>
       scene.dialogue ? normalizedTeachingSegments(scene.dialogue) : [],

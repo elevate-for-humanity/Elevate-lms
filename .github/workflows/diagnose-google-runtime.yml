@@ -63,12 +63,12 @@ jobs:
               '--project='+project,'--freshness=2h','--limit=200','--format=json']));
             report({revision,logCount:logs.length,logTypes:[...new Set(logs.map(x=>x.logName))]});
             for (const row of logs) {
-              const message = String(row.textPayload || row.jsonPayload?.message || row.jsonPayload?.text || '');
+              const message = String(row.textPayload || row.jsonPayload?.message || row.jsonPayload?.text || row.protoPayload?.status?.message || '');
               const safe = message.replace(/Bearer\s+\S+/gi,'Bearer [REDACTED]')
                 .replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[REDACTED JWT]')
                 .replace(/((?:api[_-]?key|token|password|secret)\s*[:=]\s*)\S+/gi,'$1[REDACTED]');
-              if (/startup|listen|ready|port|heap|memory|error|cannot find|failed|exception|next\.js|signal|killed/i.test(safe)) {
-                report({revision,timestamp:row.timestamp,severity:row.severity,message:safe.slice(0,2000)});
+              if (safe) {
+                report({revision,timestamp:row.timestamp,severity:row.severity,payloadKeys:Object.keys(row),message:safe.slice(0,2000)});
               }
             }
           }

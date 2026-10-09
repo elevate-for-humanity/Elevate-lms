@@ -13,15 +13,33 @@ pass() {
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+# CI images do not all include ripgrep; preserve the same checks with grep.
+if command -v rg >/dev/null 2>&1; then
+  search() { rg "$@"; }
+else
+  search() {
+    local args=() pattern="" path=""
+    for arg in "$@"; do
+      case "$arg" in
+        -q|-Fq|-n) args+=("$arg");;
+        -g) shift;;
+        "*.tsx") ;;
+        *) if [[ -z "$pattern" ]]; then pattern="$arg"; else path="$arg"; fi;;
+      esac
+    done
+    if [[ -n "$path" ]]; then grep -R "${args[@]}" -- "$pattern" "$path"; else grep "${args[@]}" -- "$pattern"; fi
+  }
+fi
+
 # 1) The separate Google container images must serve their own applications.
 LMS_DOCKERFILE="Dockerfile.northflank-lms"
 ADMIN_DOCKERFILE="Dockerfile.northflank-admin"
 for file in "$LMS_DOCKERFILE" "$ADMIN_DOCKERFILE"; do
   [[ -f "$file" ]] || fail "$file missing"
-  rg -q '/api/ping' "$file" || fail "$file must healthcheck /api/ping"
+  grep -q '/api/ping' "$file" || fail "$file must healthcheck /api/ping"
 done
-rg -q 'apps/admin/server\.js' "$ADMIN_DOCKERFILE" || fail "Admin image must serve Admin"
-rg -q 'apps/lms/server\.js' "$LMS_DOCKERFILE" || fail "LMS image must serve LMS"
+grep -q 'apps/admin/server\.js' "$ADMIN_DOCKERFILE" || fail "Admin image must serve Admin"
+grep -q 'apps/lms/server\.js' "$LMS_DOCKERFILE" || fail "LMS image must serve LMS"
 pass "Google Admin and LMS container applications remain separate"
 
 # 2) Require the actual Google deployment path, not retired source workflows.
@@ -32,13 +50,13 @@ STAGE_SCRIPT="scripts/gcp/stage-web.mjs"
 for file in "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; do
   [[ -f "$file" ]] || fail "$file missing"
 done
-rg -q 'gcloud run services update elevate-admin-migration' "$ADMIN_WF" || fail "Admin deployment must target its Google service"
-rg -q 'Dockerfile.northflank-admin' "$ADMIN_WF" || fail "Admin deployment must build its own image"
-rg -q 'lms\) FILE=Dockerfile.northflank-lms' "$IMAGE_WF" || fail "Google LMS build must use its own image"
-rg -q 'loadGoogleConfig\(component\)' "$STAGE_SCRIPT" || fail "Staging must load component-scoped Google configuration"
-rg -Fq 'elevate-${component}-migration' "$STAGE_SCRIPT" || fail "Staging must use a component-scoped Google service"
-rg -q 'stage-web\.mjs' "$STAGE_WF" || fail "Google staging workflow must use the reviewed staging implementation"
-if rg -q 'NORTHFLANK_API_TOKEN|configure-services\.ts|api\.northflank\.com' "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; then
+grep -q 'gcloud run services update elevate-admin-migration' "$ADMIN_WF" || fail "Admin deployment must target its Google service"
+grep -q 'Dockerfile.northflank-admin' "$ADMIN_WF" || fail "Admin deployment must build its own image"
+grep -q 'lms\) FILE=Dockerfile.northflank-lms' "$IMAGE_WF" || fail "Google LMS build must use its own image"
+grep -q 'loadGoogleConfig\(component\)' "$STAGE_SCRIPT" || fail "Staging must load component-scoped Google configuration"
+grep -Fq 'elevate-${component}-migration' "$STAGE_SCRIPT" || fail "Staging must use a component-scoped Google service"
+grep -q 'stage-web\.mjs' "$STAGE_WF" || fail "Google staging workflow must use the reviewed staging implementation"
+if grep -q 'NORTHFLANK_API_TOKEN|configure-services\.ts|api\.northflank\.com' "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; then
   fail "Active Google deployment must not depend on a retired source control plane"
 fi
 pass "Google deployment keeps Admin and LMS images, services and configuration separate"
@@ -64,7 +82,7 @@ pass "Admin nav does not include legacy applicants path"
 
 # 5) Legacy app-detail links should use canonical review route.
 if [[ -d apps/admin/app/admin ]]; then
-  rg -n -g '*.tsx' -F '/admin/applications/${' apps/admin/app/admin >/tmp/legacy_app_links_raw.txt || true
+  grep -RnF --include='*.tsx' '/admin/applications/${' apps/admin/app/admin >/tmp/legacy_app_links_raw.txt || true
 else
   : >/tmp/legacy_app_links_raw.txt
 fi

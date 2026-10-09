@@ -42,9 +42,9 @@ jobs:
           with socket.create_connection((host, 443), timeout=10) as tcp:
               with ssl.create_default_context().wrap_socket(tcp, server_hostname=host) as tls:
                   tls.settimeout(12)
-                  tls.sendall(('\\r\\n'.join(lines)).encode())
+                  tls.sendall(((chr(13) + chr(10)).join(lines)).encode())
                   response = tls.recv(4096).decode('latin1')
-                  status = response.split('\\r\\n', 1)[0]
+                  status = response.split(chr(13) + chr(10), 1)[0]
                   if not status.startswith('HTTP/1.1 101 '):
                       raise SystemExit('SIP WebSocket handshake failed: ' + status)
           print('Trusted SIP WebSocket upgrade succeeded. Live calling requires separate acceptance.')

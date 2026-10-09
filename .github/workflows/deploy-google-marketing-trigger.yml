@@ -16,6 +16,7 @@ on:
       - 'content/heroBanners.ts'
       - 'lib/video/registry.ts'
       - 'public/data/hero-banners.json'
+      - 'config/paris-release-source.json'
       - 'Dockerfile.marketing'
       - 'next.config.mjs'
       - 'package.json'

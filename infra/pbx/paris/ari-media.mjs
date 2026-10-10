@@ -40,7 +40,7 @@ function required(){
 }
 function authHeader(){return 'Basic '+Buffer.from(config.user+':'+config.password).toString('base64');}
 async function ari(path,method='GET',data){
-  const response=await fetch(config.ari+path,{method,headers:{Authorization:authHeader(),...(data?{'Content-Type':'application/json'}:{})},body:data?JSON.stringify(data):undefined,signal:AbortSignal.timeout(10000)});
+  const url=new URL(config.ari+path);\n  if(data)for(const [key,value] of Object.entries(data))url.searchParams.set(key,String(value));\n  const response=await fetch(url,{method,headers:{Authorization:authHeader()},signal:AbortSignal.timeout(10000)});
   if(!response.ok)throw Error('ARI_'+method+'_'+response.status);
   const txt=await response.text();
   return txt?JSON.parse(txt):{};
@@ -146,7 +146,7 @@ async function begin(call){
     const bridge=await ari('/bridges','POST',{type:'mixing',name:'paris-'+session.id});
     session.bridgeId=bridge.id;
     const host=config.advertised+':'+socket.address().port;
-    const external=await ari('/channels/externalMedia','POST',{app:config.app,external_host:host,format:'ulaw',direction:'both',transport:'udp',encapsulation:'rtp',connection_type:'client'});
+    const external=await ari('/channels/externalMedia','POST',{app:config.app,external_host:host,format:'ulaw',direction:'both',transport:'udp',encapsulation:'rtp',connection_type:'client',appArgs:'external'});
     session.externalId=external.id;
     await ari('/bridges/'+encode(bridge.id)+'/addChannel?channel='+encode(callId+','+external.id),'POST');
   }catch(e){

@@ -17,8 +17,9 @@ permissions:
   actions: write
   id-token: write
 concurrency:
-  group: google-pbx-infrastructure
+  group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('google-pbx-checks-{0}-{1}', github.workflow, github.ref) }}
   cancel-in-progress: false
+  queue: max
 jobs:
   contract:
     if: github.event_name == 'pull_request'

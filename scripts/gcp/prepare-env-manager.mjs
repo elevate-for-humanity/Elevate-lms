@@ -43,5 +43,5 @@ export function prepareEnvManager(component = 'admin', run = google) {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try { console.log(JSON.stringify(prepareEnvManager(process.argv[2] ?? 'admin'))); }
-  catch (error) { console.error(`Google Env Manager preparation failed: ${error.message}`); process.exitCode = 1; }
+  catch (error) { console.error(`Google Env Manager preparation failed [${error.code || 'validation_failed'}]: ${error.message}`); process.exitCode = 1; }
 }

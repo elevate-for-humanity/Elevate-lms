@@ -40,3 +40,27 @@ cannot synthesize a working receptionist by itself.
 
 Contract smoke tests: `node --test infra/pbx/paris/ari-media.test.mjs`.
 These tests verify packet/boundary behavior only; they do NOT certify a live call.
+
+## Phase 2: real Google voice turns (source implemented, NOT deployed)
+
+`turn-adapter.mjs` now performs actual Google Speech-to-Text recognition for
+MULAW/8000 caller audio, a constrained Vertex Gemini conversational response,
+and Google Text-to-Speech synthesis of 8 kHz PCM converted to PCMU RTP payload.
+The adapter binds **127.0.0.1:8091** and exposes only
+`POST /internal/paris/turn`. It requires a 32+ byte `PARIS_TURN_TOKEN`
+from Secret Manager; the gateway requires the same secret and a **private HTTPS**
+proxy destination in `PARIS_TURN_URL`. ARI credentials are independent of this
+secret. No plain HTTP/public turn service is authorized.
+
+Required prerequisites: Google VM service identity has only the needed Speech,
+Vertex AI and Text-to-Speech permissions; those APIs are enabled; the private TLS
+reverse proxy is configured; audio retention/consent and transcripts are reviewed.
+Run: `node --test infra/pbx/paris/*.test.mjs`. The mocked adapter tests are
+contract checks and cannot establish an actual call.
+
+**Remaining blockers:** Turn-taking/echo cancellation needs live acoustic tuning,
+caller speech recording consent is not implemented, transcripts/call outcomes do
+not yet persist to Supabase, the model is not yet grounded in the approved live
+program catalog, and tool-mediated booking/transfer/voicemail are not implemented.
+Neither file is wired into the production dialplan; no existing Telnyx numbers
+or 24 extensions have been changed. DO NOT activate in production yet.

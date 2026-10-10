@@ -32,14 +32,14 @@ export async function hydrateUltimateProfileSources(
     : [];
   const { data: lessons, error } = await db
     .from('course_lessons')
-    .select('id,title,learning_objectives,content')
+    .select('id,slug,title,learning_objectives,content,content_json')
     .eq('course_id', courseId)
     .order('order_index');
   if (error) throw error;
 
   const competencyIds = new Set(profile.competencies.map((competency) => competency.id));
   const canonicalSources = (lessons ?? [])
-    .filter((lesson: any) => competencyIds.has(lesson.id))
+    .filter((lesson: any) => competencyIds.has(lesson.id) || competencyIds.has(lesson.content_json?.competencyId) || competencyIds.has(lesson.slug))
     .map((lesson: any) => {
       const objectives = Array.isArray(lesson.learning_objectives)
         ? lesson.learning_objectives.filter(Boolean).join('; ')
@@ -57,7 +57,7 @@ export async function hydrateUltimateProfileSources(
       ]
         .filter(Boolean)
         .join('\n');
-      return text.trim() ? { id: `course-lesson:${lesson.id}`, text } : null;
+      return text.trim() ? { id: `course-lesson:${lesson.content_json?.competencyId || lesson.slug || lesson.id}`, text } : null;
     })
     .filter((source): source is { id: string; text: string } => Boolean(source));
 

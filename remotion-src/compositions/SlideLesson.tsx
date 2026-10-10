@@ -28,10 +28,13 @@ import {
   useVideoConfig,
   Sequence,
   staticFile,
+  cancelRender,
 } from 'remotion';
+import { useLayoutEffect, useRef } from 'react';
 import { BlueprintTeachingGraphic } from './BlueprintTeachingGraphic';
 import { instructionalLayoutForScene, type InstructionalLayout } from '../instructional-layout';
 import { type TeachingVisual } from '../../lib/ultimate-course-builder/instructional/teaching-visual';
+import { FOOTAGE_TITLE_BOX } from '../footage-title-layout.mjs';
 
 // ââ Types âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
@@ -446,6 +449,32 @@ function InstructionalGraphic({
 
 // ââ Scene slide âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
+function FootageTitle({ title, bright, color }: { title: string; bright: boolean; color: string }) {
+  const text = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const element = text.current;
+    if (!element) return;
+    // Never clip an authored heading into a superficially readable partial title.
+    if (element.scrollWidth > element.clientWidth ||
+        element.getBoundingClientRect().height > FOOTAGE_TITLE_BOX.height - 2 * FOOTAGE_TITLE_BOX.paddingY) {
+      cancelRender(new Error('MEDIA_TITLE_LAYOUT_OVERFLOW'));
+    }
+  }, [title]);
+  return (
+    <div style={{
+      position: 'absolute', left: FOOTAGE_TITLE_BOX.left, top: FOOTAGE_TITLE_BOX.top,
+      width: FOOTAGE_TITLE_BOX.width, height: FOOTAGE_TITLE_BOX.height,
+      boxSizing: 'border-box', display: 'flex', alignItems: 'center',
+      padding: `${FOOTAGE_TITLE_BOX.paddingY}px ${FOOTAGE_TITLE_BOX.paddingX}px`,
+      borderLeft: `${FOOTAGE_TITLE_BOX.borderWidth}px solid ${color}`, background: bright ? '#f8fafc' : '#0f172a',
+      color: bright ? '#0f172a' : '#fff', fontSize: FOOTAGE_TITLE_BOX.fontSize,
+      fontWeight: 900, fontFamily: 'sans-serif', lineHeight: 1.2,
+    }}>
+      <div ref={text} style={{ width: '100%' }}>{title}</div>
+    </div>
+  );
+}
+
 function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProps }) {
   const { fps } = useVideoConfig();
   // useCurrentFrame() is local to the surrounding Sequence. Passing the
@@ -458,6 +487,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
     action: scene.narration,
     sceneType: scene.sceneType,
   });
+  const footageTitle = !scene.strictBlueprint && !scene.teachingVisual && !instructionalLayout;
   const instructionalBackgroundPosition = `${50 + Math.sin(frame / (fps * 2)) * 30}% ${50 + Math.cos(frame / (fps * 2.5)) * 20}%`;
   const sceneProgress = interpolate(frame, [0, Math.max(1, scene.durationFrames - 1)], [0, 1], {
     extrapolateLeft: 'clamp',
@@ -578,11 +608,13 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
         Scene {scene.scene_number}
       </div>
 
-      {/* Content panel */}
+      {footageTitle && <FootageTitle title={scene.title} bright={bright} color={props.primaryColor} />}
+
+      {/* Content panel. Footage headings have their own measured band above it. */}
       <div
         style={{
           position: 'absolute',
-          top: 80,
+          top: footageTitle ? FOOTAGE_TITLE_BOX.top + FOOTAGE_TITLE_BOX.height + FOOTAGE_TITLE_BOX.contentGap : 80,
           left: 60,
           right: instructionalLayout || scene.teachingVisual ? 60 : '50%',
           bottom: 100,
@@ -593,7 +625,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
         }}
       >
         {/* Scene title */}
-        <div
+        {!footageTitle && <div
           style={{
             opacity: fadeIn(frame, 8, 22),
             transform: `translateY(${slideUp(frame, fps, 8)}px)`,
@@ -608,7 +640,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
           }}
         >
           {scene.title}
-        </div>
+        </div>}
 
         {scene.teachingVisual ? (
           <BlueprintTeachingGraphic plan={scene.teachingVisual} seconds={frame/fps}

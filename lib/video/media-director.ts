@@ -85,6 +85,8 @@ export interface MediaScene {
   sceneType?: InstructionalSceneType;
   memoryAnchor?: string;
   teachingVisual?: import('../ultimate-course-builder/instructional/teaching-visual').TeachingVisual;
+  /** Written by the renderer only when the encoded scene uses this measured title box. */
+  titleLayout?: 'footage-title-v1';
   mediaSource: 'pexels' | 'elevate-owned' | 'elevate-motion';
   overlayTemplate: string;
   contentHash: string;

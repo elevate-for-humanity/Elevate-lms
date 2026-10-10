@@ -37,6 +37,7 @@ import {
 } from './gpu-video-client';
 import type { SceneData, SlideLessonProps } from '@/remotion-src/compositions/SlideLesson';
 import { instructionalLayoutForScene } from '@/remotion-src/instructional-layout';
+import { FOOTAGE_TITLE_LAYOUT } from '@/remotion-src/footage-title-layout.mjs';
 import { deriveInstructionalVisualIntent } from '@/server/video-generator/visual-intelligence';
 
 export function cpuOnlyCourseMedia(env: NodeJS.ProcessEnv = process.env): boolean {
@@ -803,6 +804,11 @@ export async function renderStoryboardVideo(
           (clipUrl ? 'stock-video' : imageUrl ? 'still-image' : undefined);
       resolvedStoryboard.scenes[index] = {
         ...currentScene,
+        titleLayout: !input.ultimateStrict && !scene.teachingVisual && !instructionalLayoutForScene({
+          title: scene.subject, action: narration, sceneType: scene.sceneType,
+        })
+          ? FOOTAGE_TITLE_LAYOUT
+          : undefined,
         ...(imageUrl ? { referenceImageUrl: imageUrl } : {}),
         ...(clipUrl ? { sourceVideoUrl: clipUrl } : {}),
         ...(resolvedProvider ? { resolvedProvider } : {}),

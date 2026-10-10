@@ -1,6 +1,10 @@
 'use client';
 
-import type { Call, TelnyxRTC as TelnyxRTCType } from '@telnyx/webrtc';
+import {
+  createPhoneClient,
+  type PhoneCall as BrowserPhoneCall,
+  type PhoneClient,
+} from '@/lib/phone/browser-client';
 import { Mic, MicOff, Phone, PhoneCall, PhoneOff } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -29,25 +33,31 @@ export function ProgramHolderPhoneReceiver() {
   const [number, setNumber] = useState('');
   const [state, setState] = useState<'idle' | 'ringing' | 'active'>('idle');
   const [muted, setMuted] = useState(false);
-  const clientRef = useRef<TelnyxRTCType | null>(null);
-  const callRef = useRef<Call | null>(null);
+  const [error, setError] = useState('');
+  const clientRef = useRef<PhoneClient | null>(null);
+  const callRef = useRef<BrowserPhoneCall | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (phonePage) return;
     let active = true;
     let heartbeat: ReturnType<typeof setInterval> | null = null;
-    let client: TelnyxRTCType | null = null;
+    let client: PhoneClient | null = null;
     let ready = false;
     const id = currentDeviceId();
 
     async function ping() {
       if (!ready) return;
-      await fetch('/api/program-holder/phone', {
+      const response = await fetch('/api/program-holder/phone', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'heartbeat', deviceId: id }),
+        body: JSON.stringify({
+          action: 'heartbeat',
+          deviceId: id,
+          inCall: Boolean(callRef.current),
+        }),
       }).catch(() => undefined);
+      if (active) setOnline(Boolean(response?.ok));
     }
 
     async function start() {
@@ -63,26 +73,25 @@ export function ProgramHolderPhoneReceiver() {
       });
       if (!tokenResponse.ok || !active) return;
       const token = await tokenResponse.json();
-      const { TelnyxRTC } = await import('@telnyx/webrtc');
-      client = new TelnyxRTC({
-        login_token: token.token,
-        keepConnectionAliveOnSocketClose: true,
-        hangupOnBeforeUnload: false,
-      });
+      if (!audioRef.current) return;
+      client = await createPhoneClient(token, audioRef.current);
       clientRef.current = client;
-      client.on('telnyx.ready', () => {
+      client.on('ready', () => {
         if (active) {
           ready = true;
-          setOnline(true);
           void ping();
         }
       });
-      client.on('telnyx.error', () => {
+      client.on('offline', () => {
         ready = false;
         if (active) setOnline(false);
       });
-      client.on('telnyx.notification', (notification: any) => {
-        const call = notification?.call as Call | undefined;
+      client.on('error', () => {
+        ready = false;
+        if (active) setOnline(false);
+      });
+      client.on('call', (notification: any) => {
+        const call = notification?.call as BrowserPhoneCall | undefined;
         if (!call || !active) return;
         const callState = String(call.state || '');
         if (callState === 'ringing' && String(call.direction) === 'inbound') {
@@ -153,7 +162,12 @@ export function ProgramHolderPhoneReceiver() {
     if (!call) return;
     call.stopRingtone();
     navigator.vibrate?.(0);
-    await call.answer({ audio: true, remoteElement: audioRef.current || undefined } as any);
+    try {
+      await call.answer({ audio: true, remoteElement: audioRef.current || undefined });
+      setError('');
+    } catch {
+      setError('Allow microphone access, then answer again.');
+    }
   }
 
   async function hangup() {
@@ -194,6 +208,11 @@ export function ProgramHolderPhoneReceiver() {
             {state === 'ringing' ? 'Incoming Elevate call' : 'Call connected'}
           </p>
           <h2 className="mt-2 text-3xl font-black">{friendlyNumber(number)}</h2>
+          {error && (
+            <p role="alert" className="mt-3 text-sm text-amber-200">
+              {error}
+            </p>
+          )}
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             {state === 'ringing' ? (
               <button

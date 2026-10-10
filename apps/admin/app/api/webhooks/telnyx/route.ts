@@ -508,6 +508,8 @@ async function routeToExtension(
     .select('sip_username,last_seen_at')
     .eq('extension_id', extension.id)
     .eq('status', 'active')
+    .eq('provider', 'telnyx')
+    .eq('connection_state', 'connected')
     .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString())
     .order('last_seen_at', { ascending: false })
     .limit(1)

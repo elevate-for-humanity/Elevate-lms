@@ -1,4 +1,4 @@
-import { logger } from '@/lib/logger';
+import { randomUUID } from 'node:crypto';
 /**
  * Notification Queue Processor
  *
@@ -12,8 +12,8 @@ import { getTemplate } from './templates';
 import type { TemplateKey } from './templates';
 
 const DEFAULT_FROM = process.env.EMAIL_FROM || 'notifications@elevateforhumanity.org';
-const MAX_BATCH_SIZE = 50;
-const MAX_RETRIES = 5;
+const MAX_BATCH_SIZE = 4; // Bounded by the route deadline and per-send timeout.
+export const NOTIFICATION_DELIVERY_CONTRACT = 2;
 
 interface QueuedNotification {
   id: string;
@@ -43,93 +43,69 @@ function resolveTemplate(notification: QueuedNotification) {
  */
 export async function processNotificationQueue(): Promise<ProcessResult> {
   const supabase = await requireAdminClient();
-  if (!supabase) {
-    return {
-      processed: 0,
-      sent: 0,
-      failed: 0,
-      errors: [{ id: 'system', error: 'Database unavailable' }],
-    };
-  }
-
-  const result: ProcessResult = {
-    processed: 0,
-    sent: 0,
-    failed: 0,
-    errors: [],
-  };
-
-  // Claim a batch: atomically move queued → processing to prevent double-pickup
-  const now = new Date().toISOString();
-  const { data: claimed, error: claimError } = await supabase
-    .from('notification_outbox')
-    .update({ status: 'processing', processed_at: now })
-    .eq('status', 'queued')
-    .lte('scheduled_for', now)
-    .lt('attempts', MAX_RETRIES)
-    .order('created_at', { ascending: true })
-    .limit(MAX_BATCH_SIZE)
-    .select('*');
-
-  if (claimError) {
-    logger.error('Failed to claim notifications:', claimError);
-    return { ...result, errors: [{ id: 'claim', error: claimError.message }] };
-  }
-
-  if (!claimed || claimed.length === 0) {
-    return result;
-  }
-
+  const result: ProcessResult = { processed: 0, sent: 0, failed: 0, errors: [] };
+  if (!supabase) throw new Error('Notification database unavailable');
+  const claimToken = randomUUID();
+  const { data: claimed, error: claimError } = await supabase.rpc('claim_notification_outbox', {
+    p_claim_token: claimToken,
+    p_limit: MAX_BATCH_SIZE,
+  });
+  if (claimError || !Array.isArray(claimed)) throw new Error('Notification claim failed');
   result.processed = claimed.length;
 
-  // Process each claimed notification
+  async function persist(id: string, patch: Record<string, unknown>) {
+    const { data, error } = await supabase
+      .from('notification_outbox')
+      .update(patch)
+      .eq('id', id)
+      .eq('status', 'processing')
+      .eq('claim_token', claimToken)
+      .select('id')
+      .single();
+    if (error || !data) throw new Error('Notification state was not confirmed');
+  }
+
   for (const notification of claimed as QueuedNotification[]) {
     try {
       const template = resolveTemplate(notification);
-
-      const sendResult = await sendEmailViaProvider({
+      // Confirm durable ownership immediately before any network side effect.
+      await persist(notification.id, {
+        delivery_started_at: new Date().toISOString(),
+        attempts: notification.attempts + 1,
+      });
+      const sent = await sendEmailViaProvider({
         to: notification.to_email,
         subject: template.subject,
         html: template.html,
         text: template.text,
       });
-
-      if (sendResult.success) {
-        await supabase
-          .from('notification_outbox')
-          .update({
-            status: 'sent',
-            sent_at: new Date().toISOString(),
-            attempts: notification.attempts + 1,
-          })
-          .eq('id', notification.id);
-
-        result.sent++;
-      } else {
-        throw new Error(sendResult.error || 'Send failed');
-      }
-    } catch (error: any) {
-      const newAttempts = notification.attempts + 1;
-      const exhausted = newAttempts >= notification.max_attempts;
-
-      await supabase
-        .from('notification_outbox')
-        .update({
-          status: exhausted ? 'failed' : 'queued',
-          attempts: newAttempts,
-          last_error: 'Operation failed',
-          dead_letter: exhausted ? true : undefined,
-          scheduled_for: !exhausted
-            ? new Date(Date.now() + Math.pow(2, newAttempts) * 60000).toISOString()
-            : undefined,
-        })
-        .eq('id', notification.id);
-
+      if (!sent.success) throw new Error('Provider did not confirm acceptance');
+      await persist(notification.id, {
+        status: 'sent',
+        sent_at: new Date().toISOString(),
+        provider_message_id: sent.data?.messageId || null,
+        last_error: null,
+        claim_token: null,
+      });
+      // `sent` means provider acceptance persisted, never claimed inbox delivery.
+      result.sent++;
+    } catch {
       result.failed++;
-      result.errors.push({ id: notification.id, error: 'Operation failed' });
+      result.errors.push({ id: notification.id, error: 'Notification requires review' });
+      // A timeout can occur after the provider accepted a message. Preserve the
+      // row and never automatically resend an uncertain or unpersisted send.
+      try {
+        await persist(notification.id, {
+          review_required: true,
+          review_reason: 'delivery_outcome_requires_reconciliation',
+          last_error: 'Notification requires review',
+        });
+      } catch {
+        // The claim remains processing; stale-claim reconciliation also holds it.
+        result.errors.push({ id: notification.id, error: 'Review state could not be confirmed' });
+      }
     }
   }
-
   return result;
 }
 
@@ -142,7 +118,7 @@ async function sendEmailViaProvider(params: {
   subject: string;
   html: string;
   text: string;
-}): Promise<{ success: boolean; error?: string }> {
+}): Promise<{ success: boolean; error?: string; data?: { messageId?: string } }> {
   const { sendEmail: sgSend } = await import('@/lib/email/sendgrid');
 
   const result = await sgSend({
@@ -151,6 +127,7 @@ async function sendEmailViaProvider(params: {
     html: params.html,
     text: params.text,
     from: DEFAULT_FROM,
+    singleAttempt: true,
   });
 
   return result;
@@ -165,43 +142,68 @@ export async function getQueueStats(): Promise<{
   sent: number;
   failed: number;
   dead_letter: number;
+  review_required: number;
   oldest_queued?: string;
 }> {
   const supabase = await requireAdminClient();
   if (!supabase) {
-    return { queued: 0, processing: 0, sent: 0, failed: 0, dead_letter: 0 };
+    throw new Error('Notification database unavailable');
   }
 
-  const [queuedResult, processingResult, sentResult, failedResult, deadLetterResult, oldestResult] =
-    await Promise.all([
-      supabase
-        .from('notification_outbox')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'queued'),
-      supabase
-        .from('notification_outbox')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'processing'),
-      supabase
-        .from('notification_outbox')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'sent'),
-      supabase
-        .from('notification_outbox')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'failed'),
-      supabase
-        .from('notification_outbox')
-        .select('id', { count: 'exact', head: true })
-        .eq('dead_letter', true),
-      supabase
-        .from('notification_outbox')
-        .select('created_at')
-        .eq('status', 'queued')
-        .order('created_at', { ascending: true })
-        .limit(1)
-        .maybeSingle(),
-    ]);
+  const [
+    queuedResult,
+    processingResult,
+    sentResult,
+    failedResult,
+    deadLetterResult,
+    oldestResult,
+    reviewResult,
+  ] = await Promise.all([
+    supabase
+      .from('notification_outbox')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'queued'),
+    supabase
+      .from('notification_outbox')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'processing'),
+    supabase
+      .from('notification_outbox')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'sent'),
+    supabase
+      .from('notification_outbox')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'failed'),
+    supabase
+      .from('notification_outbox')
+      .select('id', { count: 'exact', head: true })
+      .eq('dead_letter', true),
+    supabase
+      .from('notification_outbox')
+      .select('created_at')
+      .eq('status', 'queued')
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from('notification_outbox')
+      .select('id', { count: 'exact', head: true })
+      .eq('review_required', true),
+  ]);
+  if (
+    [
+      queuedResult,
+      processingResult,
+      sentResult,
+      failedResult,
+      deadLetterResult,
+      oldestResult,
+      reviewResult,
+    ].some((r) => r.error)
+  ) {
+    throw new Error('Notification statistics unavailable');
+  }
 
   return {
     queued: queuedResult.count || 0,
@@ -209,6 +211,7 @@ export async function getQueueStats(): Promise<{
     sent: sentResult.count || 0,
     failed: failedResult.count || 0,
     dead_letter: deadLetterResult.count || 0,
+    review_required: reviewResult.count || 0,
     oldest_queued: oldestResult.data?.created_at,
   };
 }

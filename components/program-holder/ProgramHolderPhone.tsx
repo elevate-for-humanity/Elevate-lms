@@ -1,6 +1,11 @@
 'use client';
 
-import type { Call, TelnyxRTC as TelnyxRTCType } from '@telnyx/webrtc';
+import {
+  createPhoneClient,
+  phoneDestination,
+  type PhoneCall as BrowserPhoneCall,
+  type PhoneClient,
+} from '@/lib/phone/browser-client';
 import {
   Bell,
   BellRing,
@@ -56,6 +61,7 @@ type PhoneData = {
     externalFallbackEnabled: boolean;
     externalFallbackNumber: string;
     presenceStatus: string;
+    provider: 'telnyx' | 'asterisk';
   };
   inbox: InboxItem[];
 };
@@ -96,7 +102,10 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', roleLabel = 'Program Holder' }: { apiBase?: string; roleLabel?: string } = {}) {
+export function ProgramHolderPhone({
+  apiBase = '/api/program-holder/phone',
+  roleLabel = 'Program Holder',
+}: { apiBase?: string; roleLabel?: string } = {}) {
   const [data, setData] = useState<PhoneData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -107,10 +116,11 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
   const [incomingNumber, setIncomingNumber] = useState('');
   const [callState, setCallState] = useState<'idle' | 'ringing' | 'active' | 'calling'>('idle');
   const [muted, setMuted] = useState(false);
+  const [held, setHeld] = useState(false);
   const [returnNumber, setReturnNumber] = useState('');
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const clientRef = useRef<TelnyxRTCType | null>(null);
-  const callRef = useRef<Call | null>(null);
+  const clientRef = useRef<PhoneClient | null>(null);
+  const callRef = useRef<BrowserPhoneCall | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const ringModeRef = useRef<RingMode>('ring');
@@ -130,7 +140,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
       setError('');
     }
     setLoading(false);
-  }, []);
+  }, [apiBase]);
 
   useEffect(() => {
     void load();
@@ -145,12 +155,22 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
   }, [load]);
 
   const heartbeat = useCallback(async () => {
-    await fetch(apiBase, {
+    const response = await fetch(apiBase, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'heartbeat', deviceId: deviceId() }),
+      body: JSON.stringify({
+        action: 'heartbeat',
+        deviceId: deviceId(),
+        inCall: Boolean(callRef.current),
+      }),
     }).catch(() => undefined);
-  }, []);
+    if (!response?.ok) {
+      setConnected(false);
+      setError('The server could not verify this phone connection. Reconnect the phone.');
+    } else {
+      setConnected(true);
+    }
+  }, [apiBase]);
 
   const disconnect = useCallback(async () => {
     if (heartbeatRef.current) clearInterval(heartbeatRef.current);
@@ -170,7 +190,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
     callRef.current = null;
     setConnected(false);
     setCallState('idle');
-  }, []);
+  }, [apiBase]);
 
   useEffect(() => {
     return () => {
@@ -184,6 +204,10 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
     setConnecting(true);
     setError('');
     try {
+      if (heartbeatRef.current) clearInterval(heartbeatRef.current);
+      heartbeatRef.current = null;
+      await clientRef.current?.disconnect().catch(() => undefined);
+      clientRef.current = null;
       const tokenResponse = await fetch('/api/program-holder/phone/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -191,29 +215,28 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
       });
       const tokenData = await tokenResponse.json().catch(() => ({}));
       if (!tokenResponse.ok) throw new Error(tokenData.error || 'The phone could not connect.');
-      const { TelnyxRTC } = await import('@telnyx/webrtc');
-      const client = new TelnyxRTC({
-        login_token: tokenData.token,
-        keepConnectionAliveOnSocketClose: true,
-        hangupOnBeforeUnload: false,
-      });
+      if (!remoteAudioRef.current) throw new Error('The call audio player is unavailable.');
+      const client = await createPhoneClient(tokenData, remoteAudioRef.current);
       let ready = false;
-      client.on('telnyx.ready', () => {
+      client.on('ready', () => {
         ready = true;
-        setConnected(true);
         setConnecting(false);
-        setMessage('Phone is online and ready for calls.');
+        setMessage('Registration established. Verifying reachability…');
         void heartbeat();
       });
-      client.on('telnyx.error', (event: any) => {
+      client.on('offline', () => {
+        ready = false;
+        setConnected(false);
+      });
+      client.on('error', (event: any) => {
         ready = false;
         setConnected(false);
         setError(
           event?.error?.message || event?.message || 'The phone connection reported an error.',
         );
       });
-      client.on('telnyx.notification', (notification: any) => {
-        const call = notification?.call as Call | undefined;
+      client.on('call', (notification: any) => {
+        const call = notification?.call as BrowserPhoneCall | undefined;
         if (!call) return;
         const state = String(call.state || '');
         if (state === 'ringing' && String(call.direction) === 'inbound') {
@@ -234,6 +257,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
           callRef.current = call;
           setCallState('active');
           setMuted(false);
+          setHeld(false);
           navigator.vibrate?.(0);
         } else if (state === 'hangup' || state === 'destroy' || state === 'purge') {
           if (callRef.current?.id === call.id) {
@@ -288,7 +312,7 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
         externalFallbackEnabled: data.extension.externalFallbackEnabled,
         externalFallbackNumber: data.extension.externalFallbackNumber,
         emailMissedCalls: data.notifications.emailMissedCalls,
-          smsMissedCalls: data.notifications.smsMissedCalls,
+        smsMissedCalls: data.notifications.smsMissedCalls,
       }),
     });
     const result = await response.json().catch(() => ({}));
@@ -323,7 +347,11 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
     if (!call) return;
     call.stopRingtone();
     navigator.vibrate?.(0);
-    await call.answer({ audio: true, remoteElement: remoteAudioRef.current || undefined } as any);
+    try {
+      await call.answer({ audio: true, remoteElement: remoteAudioRef.current || undefined });
+    } catch {
+      setError('The call could not be answered. Allow microphone access and try again.');
+    }
   }
 
   async function hangup() {
@@ -344,34 +372,44 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
     setMuted(!muted);
   }
 
-  function returnCall(number = returnNumber) {
+  async function toggleHold() {
+    const call = callRef.current;
+    if (!call?.hold || !call.unhold) return;
+    try {
+      if (held) await call.unhold();
+      else await call.hold();
+      setHeld(!held);
+    } catch {
+      setError('The hold request could not be completed.');
+    }
+  }
+
+  async function returnCall(number = returnNumber) {
     if (data?.readOnly) return;
-    const digits = number.replace(/\D/g, '');
-    const destination =
-      digits.length === 10
-        ? `+1${digits}`
-        : digits.length === 11 && digits[0] === '1'
-          ? `+${digits}`
-          : '';
+    const destination = phoneDestination(number, data?.extension.provider || 'telnyx');
     if (!destination || !clientRef.current || !remoteAudioRef.current) {
       setError(
         !connected
           ? 'Connect the phone before returning a call.'
-          : 'Enter a valid 10-digit number.',
+          : 'Enter a valid phone number or an enabled three-digit extension.',
       );
       return;
     }
-    const call = clientRef.current.newCall({
-      destinationNumber: destination,
-      callerNumber: data?.phoneNumber,
-      callerName: data?.extension.displayName,
-      audio: true,
-      remoteElement: remoteAudioRef.current,
-    });
-    callRef.current = call;
-    setIncomingNumber(destination);
-    setCallState('calling');
-    setError('');
+    try {
+      const call = await clientRef.current.newCall({
+        destinationNumber: destination,
+        callerNumber: data?.phoneNumber,
+        callerName: data?.extension.displayName,
+        audio: true,
+        remoteElement: remoteAudioRef.current,
+      });
+      callRef.current = call;
+      setIncomingNumber(destination);
+      setCallState('calling');
+      setError('');
+    } catch {
+      setError('The call could not be placed. Check microphone permission and try again.');
+    }
   }
 
   async function setTaskStatus(id: string, status: InboxItem['status']) {
@@ -418,7 +456,9 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
       <audio ref={remoteAudioRef} autoPlay playsInline />
       {data.readOnly && (
         <p className="rounded-2xl border border-blue-200 bg-blue-50 p-4 font-bold text-blue-950">
-          Administrator preview: this {roleLabel} extension, settings, and PARIS call inbox are shown read-only. Sign in as the {roleLabel} to connect the PWA, change settings, return calls, or update callback status.
+          Administrator preview: this {roleLabel} extension, settings, and PARIS call inbox are
+          shown read-only. Sign in as the {roleLabel} to connect the PWA, change settings, return
+          calls, or update callback status.
         </p>
       )}
       <header className="rounded-3xl bg-gradient-to-br from-blue-950 via-blue-800 to-cyan-700 p-6 text-white shadow-xl sm:p-8">
@@ -447,7 +487,9 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
             <button
               onClick={connected ? disconnect : connect}
               disabled={
-                data.readOnly || connecting || ['offline', 'do_not_disturb'].includes(data.extension.ringMode)
+                data.readOnly ||
+                connecting ||
+                ['offline', 'do_not_disturb'].includes(data.extension.ringMode)
               }
               className="mt-3 min-h-11 rounded-xl bg-white px-5 font-black text-blue-900 disabled:opacity-50"
             >
@@ -517,6 +559,14 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
               <PhoneOff className="mr-2 inline h-5 w-5" />
               {callState === 'ringing' ? 'Decline' : 'Hang up'}
             </button>
+            {callState === 'active' && callRef.current?.hold && (
+              <button
+                onClick={toggleHold}
+                className="min-h-12 rounded-full bg-slate-700 px-6 font-black"
+              >
+                {held ? 'Resume call' : 'Hold'}
+              </button>
+            )}
           </div>
         </section>
       )}
@@ -528,14 +578,17 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
             Availability and ringing
           </h2>
           <p className="mt-1 text-sm leading-6 text-slate-600">
-            Your extension rings in the PWA first. You may also add your own phone number as a fallback for your extension.
+            Your extension rings in the PWA first. You may also add your own phone number as a
+            fallback for your extension.
           </p>
           <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
             <label className="flex items-center gap-3 text-sm font-bold text-blue-950">
               <input
                 type="checkbox"
                 checked={data.extension.externalFallbackEnabled}
-                onChange={(event) => updateExtension({ externalFallbackEnabled: event.target.checked })}
+                onChange={(event) =>
+                  updateExtension({ externalFallbackEnabled: event.target.checked })
+                }
                 disabled={data.readOnly}
                 className="h-5 w-5 accent-blue-700"
               />
@@ -548,7 +601,9 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
                   type="tel"
                   inputMode="tel"
                   value={data.extension.externalFallbackNumber}
-                  onChange={(event) => updateExtension({ externalFallbackNumber: event.target.value })}
+                  onChange={(event) =>
+                    updateExtension({ externalFallbackNumber: event.target.value })
+                  }
                   placeholder="(317) 555-0123"
                   disabled={data.readOnly}
                   className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-3 font-normal"
@@ -556,7 +611,8 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
               </label>
             )}
             <p className="mt-2 text-xs leading-5 text-slate-600">
-              This does not change your extension or business caller ID. It gives the phone system a verified fallback destination when your PWA cannot take the call.
+              This does not change your extension or business caller ID. It gives the phone system a
+              verified fallback destination when your PWA cannot take the call.
             </p>
           </div>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -730,12 +786,26 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
               checked={data.notifications.smsMissedCalls}
               disabled={!data.notifications.smsPhone}
               onChange={(event) =>
-                setData((current) => current ? { ...current, notifications: { ...current.notifications, smsMissedCalls: event.target.checked } } : current)
+                setData((current) =>
+                  current
+                    ? {
+                        ...current,
+                        notifications: {
+                          ...current.notifications,
+                          smsMissedCalls: event.target.checked,
+                        },
+                      }
+                    : current,
+                )
               }
               className="mt-0.5 h-5 w-5 shrink-0 accent-blue-700"
             />
             <span>
-              Text me a privacy-safe alert when PARIS takes a call{data.notifications.smsPhone ? ` at ${friendlyNumber(data.notifications.smsPhone)}` : '. Add an SMS phone number in notification settings first'}.
+              Text me a privacy-safe alert when PARIS takes a call
+              {data.notifications.smsPhone
+                ? ` at ${friendlyNumber(data.notifications.smsPhone)}`
+                : '. Add an SMS phone number in notification settings first'}
+              .
             </span>
           </label>
           <p className="mt-4 text-xs leading-5 text-slate-500">
@@ -746,12 +816,16 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-xl font-black text-slate-950">Return a call</h2>
+          <h2 className="text-xl font-black text-slate-950">
+            {data.extension.provider === 'asterisk' ? 'Call an extension' : 'Return a call'}
+          </h2>
           <p className="mt-1 text-sm text-slate-600">
-            The caller sees the Elevate business number, not your personal number.
+            {data.extension.provider === 'asterisk'
+              ? 'Enter a three-digit extension or 0 for the administrator.'
+              : 'The caller sees the Elevate business number, not your personal number.'}
           </p>
           <div className="mt-4 grid grid-cols-3 gap-2">
-            {['1','2','3','4','5','6','7','8','9','*','0','#'].map((digit) => (
+            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'].map((digit) => (
               <button
                 key={digit}
                 type="button"
@@ -768,7 +842,9 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
               onChange={(event) => setReturnNumber(event.target.value)}
               type="tel"
               inputMode="tel"
-              placeholder="317-555-0123"
+              placeholder={
+                data.extension.provider === 'asterisk' ? 'Extension or 0' : '317-555-0123'
+              }
               className="min-h-12 min-w-0 flex-1 rounded-xl border border-slate-300 px-3"
             />
             <button
@@ -781,8 +857,20 @@ export function ProgramHolderPhone({ apiBase = '/api/program-holder/phone', role
             </button>
           </div>
           <div className="mt-2 flex gap-2">
-            <button type="button" onClick={() => setReturnNumber((current) => current.slice(0, -1))} className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold">Delete</button>
-            <button type="button" onClick={() => setReturnNumber('')} className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold">Clear</button>
+            <button
+              type="button"
+              onClick={() => setReturnNumber((current) => current.slice(0, -1))}
+              className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold"
+            >
+              Delete
+            </button>
+            <button
+              type="button"
+              onClick={() => setReturnNumber('')}
+              className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold"
+            >
+              Clear
+            </button>
           </div>
           <div className="mt-6 rounded-xl border border-violet-200 bg-violet-50 p-4">
             <h3 className="flex items-center gap-2 font-black text-violet-950">

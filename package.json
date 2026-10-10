@@ -147,6 +147,7 @@
     "server-only": "^0.0.1",
     "sharp": "0.35.5",
     "signature_pad": "5.1.3",
+    "sip.js": "0.21.2",
     "sitemap": "9.0.1",
     "slugify": "1.6.9",
     "socket.io-client": "4.8.3",

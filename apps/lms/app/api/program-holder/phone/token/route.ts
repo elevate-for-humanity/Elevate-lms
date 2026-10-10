@@ -1,8 +1,9 @@
-// pre-auth-registry: exempt - requireProgramHolder verifies the holder before a scoped Telnyx token is minted.
+// pre-auth-registry: exempt - requireCommunicationActor verifies the owner before provider-scoped credentials are issued.
 import { NextResponse } from 'next/server';
 import { requireCommunicationActor } from '@/lib/communications/actor';
 import { ensureDeviceCredential } from '@/lib/phone/webrtc';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { provisionAsteriskDevice, asteriskDeviceId } from '@/lib/phone/asterisk';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -48,18 +49,32 @@ export async function POST(request: Request) {
     .maybeSingle();
   if (!system)
     return NextResponse.json({ error: 'The phone system is not active.' }, { status: 503 });
-  const { data: primaryNumber, error: numberError } = await ctx.db
-    .from('phone_numbers')
-    .select('e164')
-    .eq('phone_system_id', system.id)
-    .eq('status', 'active')
-    .eq('is_primary', true)
-    .maybeSingle();
-  if (numberError || !primaryNumber?.e164) {
-    return NextResponse.json({ error: 'The phone system has no active primary caller ID.' }, { status: 503 });
-  }
   try {
     await hydrateProcessEnv();
+    if (extension.webrtc_provider === 'asterisk') {
+      const credential = await provisionAsteriskDevice(ctx.db, {
+        profileId: ctx.user.id,
+        deviceId: asteriskDeviceId(deviceId),
+        extensionId: extension.id,
+      });
+      return NextResponse.json(
+        { ...credential, callerId: extension.extension },
+        { headers: { 'Cache-Control': 'no-store, private', Pragma: 'no-cache' } },
+      );
+    }
+    const { data: primaryNumber, error: numberError } = await ctx.db
+      .from('phone_numbers')
+      .select('e164')
+      .eq('phone_system_id', system.id)
+      .eq('status', 'active')
+      .eq('is_primary', true)
+      .maybeSingle();
+    if (numberError || !primaryNumber?.e164) {
+      return NextResponse.json(
+        { error: 'The phone system has no active primary caller ID.' },
+        { status: 503 },
+      );
+    }
     const credential = await ensureDeviceCredential({
       db: ctx.db,
       system,
@@ -75,6 +90,8 @@ export async function POST(request: Request) {
       .select('id', { count: 'exact', head: true })
       .eq('extension_id', extension.id)
       .eq('status', 'active')
+      .eq('provider', 'telnyx')
+      .eq('connection_state', 'connected')
       .neq('device_id', deviceId)
       .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString());
     if (!otherLiveDevices) {
@@ -84,16 +101,19 @@ export async function POST(request: Request) {
         .eq('id', extension.id)
         .eq('profile_id', ctx.user.id);
     }
-    return NextResponse.json({
-      token: credential.token,
-      sipUsername: credential.sipUsername,
-      extension: extension.extension,
-      callerId: primaryNumber.e164,
-    });
-  } catch (cause) {
-    console.error('WebRTC credential provisioning failed:', cause);
     return NextResponse.json(
-      { error: cause instanceof Error ? cause.message : 'The phone device could not connect.' },
+      {
+        provider: 'telnyx',
+        token: credential.token,
+        sipUsername: credential.sipUsername,
+        extension: extension.extension,
+        callerId: primaryNumber.e164,
+      },
+      { headers: { 'Cache-Control': 'no-store, private', Pragma: 'no-cache' } },
+    );
+  } catch (cause) {
+    return NextResponse.json(
+      { error: 'The phone device could not connect. Please retry or contact the administrator.' },
       { status: 502 },
     );
   }

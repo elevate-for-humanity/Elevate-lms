@@ -51,7 +51,8 @@ async function main() {
       '--env-vars-file',environment,'--quiet']);
     const job=JSON.parse(gcloud(['run','jobs','describe','elevate-course-builder','--project',project,'--region',region,'--format=json']));
     const container=job.spec.template.spec.template.spec.containers[0];
-    if(container.image!==`${image}@${digest}` || !container.env.some(v=>v.name==='ULTIMATE_WORKER_ONCE'&&v.value==='true'))
+    if(job.spec.template.spec.template.spec.serviceAccountName!==`elevate-worker-runtime@${project}.iam.gserviceaccount.com` ||
+      container.image!==`${image}@${digest}` || !container.env.some(v=>v.name==='ULTIMATE_WORKER_ONCE'&&v.value==='true'))
       throw new Error('Worker deployment readback mismatch');
     console.log('Finite Course Builder job deployed. No execution or queue mutation performed.');
   } finally {rmSync(directory,{recursive:true,force:true});}

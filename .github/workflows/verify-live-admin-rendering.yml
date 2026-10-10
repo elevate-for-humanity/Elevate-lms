@@ -91,6 +91,8 @@ jobs:
               console.log(JSON.stringify({activeJobExecutions:true,region,job:j.metadata.name,executions:executions.filter(e=>!e.status?.completionTime&&!e.status?.conditions?.some(c=>c.type==='Completed'&&['True','False'].includes(c.status))).map(e=>({name:e.metadata.name,created:e.metadata.creationTimestamp,started:e.status?.startTime,running:e.status?.runningCount,resources:e.spec?.template?.spec?.containers?.map(c=>c.resources?.limits)}))}));
             }
           }
+          const backend=JSON.parse(safeExecFileSync('gcloud',['compute','backend-services','describe','elevate-marketing-backend','--global',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          console.log(JSON.stringify({marketingBackend:true,name:backend.name,groups:backend.backends?.map(b=>b.group)}));
           const token=safeExecFileSync('gcloud',['auth','print-access-token'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
           const end=new Date(),start=new Date(end.getTime()-15*60*1000);
           const usageURL=new URL('https://monitoring.googleapis.com/v3/projects/elegant-racer-299721/timeSeries');

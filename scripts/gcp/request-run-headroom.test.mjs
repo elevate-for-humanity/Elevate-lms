@@ -40,7 +40,7 @@ test('ambiguous contacts stop instead of selecting someone arbitrarily', () => {
 test('default creates only the bounded preferences and preserves provider checks', async () => {
   const api = provider();
   const results = await requestHeadroom('token', 'owner@example.test', api.request);
-  assert.deepEqual(api.writes.map(x => x.body.quotaConfig.preferredValue), ['256000', '549755813888']);
+  assert.deepEqual(api.writes.map(x => x.body.quotaConfig.preferredValue), ['768000', '1649267441664']);
   assert(api.writes.every(x => x.options.method === 'POST' && x.body.dimensions.region === 'us-central1'));
   assert(api.reads.includes('/v1/' + resource('elevate-run-memory-us-central1')));
   assert(results.every(x => x.accepted === false));
@@ -168,12 +168,12 @@ test('reports accepted versus effective and granted values with sanitized provid
   assert(!/private|owner@example|hidden-value|hidden-secret/.test(JSON.stringify(results)));
 });
 
-test('finite 256 CPU and 512 GiB request replaces previously declined unlimited preference', async () => {
+test('finite 768 CPU and 1536 GiB request replaces previously declined unlimited preference', async () => {
   const api = provider({preferences: Object.fromEntries(targets.map(t => [t.id,
     preference(t, {quotaConfig: {preferredValue: '-1', grantedValue: t.quotaId.startsWith('Cpu') ? '20000' : '42949672960'}})])),
     mutate: ({body}) => response({quotaConfig: {preferredValue: body.quotaConfig.preferredValue, grantedValue: '20000'}})});
   const results = await requestHeadroom('token', 'owner@example.test', api.request);
-  assert.deepEqual(api.writes.map(x => x.body.quotaConfig.preferredValue), ['256000', '549755813888']);
+  assert.deepEqual(api.writes.map(x => x.body.quotaConfig.preferredValue), ['768000', '1649267441664']);
   assert(api.writes.every(x => x.options.method === 'PATCH'));
   assert(results.every(x => x.accepted && x.effectiveValue === '20000'));
 });

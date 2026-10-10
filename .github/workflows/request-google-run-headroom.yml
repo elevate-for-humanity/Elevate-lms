@@ -16,12 +16,28 @@ on:
 permissions:
   contents: read
   id-token: write
+  actions: write
 concurrency:
   group: google-run-quota-request
   cancel-in-progress: false
 jobs:
+  dispatch:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch quota request using authorized workflow_dispatch identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          if [ "$latest" != "$GITHUB_SHA" ]; then
+            echo "Superseded quota request: current main $latest"
+            exit 0
+          fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/request-google-run-headroom.yml/dispatches" -f ref=main -F 'inputs[request_maximum]=false'
   request:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 10

@@ -16,6 +16,8 @@ on:
       - 'workers/admin-speech-cache.mjs'
       - '.github/workflows/deploy-google-course-worker.yml'
   workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
 permissions:
   contents: read
   actions: write
@@ -34,7 +36,7 @@ jobs:
     concurrency:
       group: google-course-worker-image
       cancel-in-progress: true
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: github.event_name != 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:

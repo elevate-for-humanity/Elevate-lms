@@ -32,6 +32,24 @@ const config = {
 };
 const UUIDISH=/^[a-zA-Z0-9._:-]{1,128}$/;
 const sessions=new Map();
+const EXTERNAL_PREFIX='paris-media-';
+export function isCallerStart(event){
+  // externalMedia emits StasisStart too, with no appArgs in Asterisk 20.
+  // Its event can arrive before the HTTP creation response. Reject by both the
+  // preallocated ID namespace and the actual channel technology, not arguments.
+  return event?.type==='StasisStart' && UUIDISH.test(event.channel?.id||'') &&
+    !event.channel.id.startsWith(EXTERNAL_PREFIX) &&
+    /^(PJSIP|Local)\//.test(event.channel?.name||'');
+}
+export async function createExternalChannel(session,host,request=ari){
+  session.externalId=EXTERNAL_PREFIX+session.id;
+  const external=await request('/channels/externalMedia','POST',{
+    channelId:session.externalId,app:config.app,external_host:host,format:'ulaw',
+    direction:'both',transport:'udp',encapsulation:'rtp',connection_type:'client',
+  });
+  if(external.id!==session.externalId)throw Error('EXTERNAL_CHANNEL_ID_MISMATCH');
+  return external;
+}
 function required(){
   if (!config.user || !config.password || !config.token || !config.adapter) throw Error('PARIS_RUNTIME_CONFIG_INCOMPLETE');
   for(const [raw,protocol] of [[config.ari,'http:'],[config.ws,'ws:']]){
@@ -157,8 +175,7 @@ async function begin(call){
     const bridge=await ari('/bridges','POST',{type:'mixing',name:'paris-'+session.id});
     session.bridgeId=bridge.id;
     const host=config.advertised+':'+socket.address().port;
-    const external=await ari('/channels/externalMedia','POST',{app:config.app,external_host:host,format:'ulaw',direction:'both',transport:'udp',encapsulation:'rtp',connection_type:'client',appArgs:'external'});
-    session.externalId=external.id;
+    const external=await createExternalChannel(session,host);
     await ari('/bridges/'+encode(bridge.id)+'/addChannel?channel='+encode(callId+','+external.id),'POST');
   }catch(e){
     process.stderr.write('PARIS_BRIDGE_FAILED\n');
@@ -179,7 +196,7 @@ export async function serveGateway(){
       await new Promise(resolve=>{
         socket.addEventListener('message',event=>{
           let payload;try{payload=JSON.parse(event.data);}catch{return;}
-          if(payload.type==='StasisStart' && payload.channel?.id && !payload.args?.includes('external'))void begin(payload.channel);
+          if(isCallerStart(payload))void begin(payload.channel);
           if(payload.type==='StasisEnd' && payload.channel?.id){const s=sessions.get(payload.channel.id);if(s)void end(s);}
         });
         socket.addEventListener('close',resolve,{once:true});

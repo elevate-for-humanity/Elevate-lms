@@ -22,7 +22,7 @@ permissions:
   id-token: write
 jobs:
   dispatch:
-    if: github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch' && false
     runs-on: ubuntu-24.04
     steps:
       - name: Dispatch Google-trusted workflow event

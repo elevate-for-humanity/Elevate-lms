@@ -46,6 +46,14 @@ jobs:
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
           export EXPECTED_IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing@$DIGEST"
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > /tmp/service.json
+          node <<'NODE'
+          const s=JSON.parse(require('fs').readFileSync('/tmp/service.json'));
+          console.log(JSON.stringify({latest:s.status.latestCreatedRevisionName,resources:s.spec.template.spec.containers[0].resources,scaling:s.spec.template.metadata.annotations,traffic:s.status.traffic.map(t=>({revision:t.revisionName,percent:t.percent,tag:t.tag}))}));
+          NODE
+          gcloud run services update-traffic "$SERVICE" --project="$PROJECT" --region="$REGION" --remove-tags=release-verified,host-shop-verify --quiet
+          export REVISION="elevate-marketing-migration-h7996edf4-$GITHUB_RUN_ID"
+          gcloud run services update "$SERVICE" --project="$PROJECT" --region="$REGION" --image="$EXPECTED_IMAGE" --revision-suffix="h7996edf4-$GITHUB_RUN_ID" --cpu=1 --memory=2Gi --max-instances=2 --no-cpu-boost --no-traffic --tag=host-shop-verify --quiet
+          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > /tmp/service.json
           gcloud run revisions describe "$REVISION" --project="$PROJECT" --region="$REGION" --format=json > /tmp/revision.json
           node <<'NODE'
           const fs=require('fs'),assert=require('assert/strict');
@@ -94,7 +102,7 @@ jobs:
           fi
       - name: Diagnose candidate if activation fails
         if: failure()
-        run: gcloud run revisions describe elevate-marketing-migration-r7996edf4-38031382259-1 --project=elegant-racer-299721 --region=us-central1 --format='yaml(metadata.name,status.conditions)'
+        run: gcloud run services describe elevate-marketing-migration --project=elegant-racer-299721 --region=us-central1 --format='yaml(status.conditions,status.latestCreatedRevisionName,status.latestReadyRevisionName)'
       - name: Remove superseded host-shop verification runs
         if: always()
         env:

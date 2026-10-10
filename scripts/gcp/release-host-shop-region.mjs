@@ -50,7 +50,8 @@ const permissionToken=cli(['auth','print-access-token']);
 const permissionResponse=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/'+project+':testIamPermissions',{method:'POST',headers:{authorization:'Bearer '+permissionToken,'content-type':'application/json'},body:JSON.stringify({permissions:['run.services.setIamPolicy','compute.backendServices.update','compute.networkEndpointGroups.create']}),signal:AbortSignal.timeout(30000)});
 const permissionData=await permissionResponse.json();assert(permissionResponse.ok,'Permission readback failed');
 console.log(JSON.stringify({deploymentPermissions:permissionData.permissions||[]}));
-if(!permissionData.permissions?.includes('run.services.setIamPolicy')){
+const publicProbe=await fetch(east.status.url+'/api/version',{signal:AbortSignal.timeout(30000)});
+if(!publicProbe.ok&&!permissionData.permissions?.includes('run.services.setIamPolicy')){
  regionalIdentity=cli(['auth','print-identity-token','--audiences='+east.status.url]);
  await acceptance(east.status.url);
  console.log(JSON.stringify({authenticatedRegionalRuntimeVerified:true,region,url:east.status.url,commit,missingPermission:'run.services.setIamPolicy'}));

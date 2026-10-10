@@ -60,3 +60,5 @@ jobs:
               gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$run/cancel"
             fi
           done
+
+# Verify the prepared regional runtime and its precise publication boundary.

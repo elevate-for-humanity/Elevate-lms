@@ -76,3 +76,5 @@ jobs:
           done
 
 # Verify the prepared regional runtime and its precise publication boundary.
+
+# Prepare the validated regional gateway before the owner public-access action.

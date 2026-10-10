@@ -8,9 +8,6 @@ permissions:
   contents: read
   actions: write
   id-token: write
-concurrency:
-  group: google-runtime-operations
-  cancel-in-progress: false
 jobs:
   dispatch:
     if: github.event_name == 'push'
@@ -20,6 +17,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/publish-built-host-shop.yml/dispatches" -f ref=main
   publish:
+    concurrency:
+      group: google-marketing-runtime-operations
+      cancel-in-progress: false
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     environment: production

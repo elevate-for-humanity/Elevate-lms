@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { UltimateJobQueue } from '@/lib/ultimate-course-builder/worker/job-queue';
+import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
+import { safeInternalError } from '@/lib/api/safe-error';
 import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
 
 export const runtime = 'nodejs';
@@ -177,7 +179,8 @@ export async function POST(req: NextRequest) {
     return error ? databaseFailure(error) : NextResponse.json({ ok: true, build: data });
   }
 
-  if (body.action === 'queue-course') {
+  // Keep the legacy action as a compatibility alias; both actions start a worker.
+  if (body.action === 'start-course' || body.action === 'queue-course') {
     const courseId = String(body.courseId || '').trim();
     if (!courseId) {
       return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
@@ -249,10 +252,19 @@ export async function POST(req: NextRequest) {
     const job = await new UltimateJobQueue(db as any).enqueue(build.id, {
       requestedBy: auth.id,
     });
+    if (!job) return NextResponse.json({ error: 'No runnable build job was saved' }, { status: 409 });
+    let dispatch;
+    try {
+      dispatch = await dispatchGoogleDeployment('course-builder');
+    } catch (error) {
+      return safeInternalError(error, 'Worker launch failed. The saved build can be resumed.');
+    }
     return NextResponse.json(
       {
         ok: true,
-        queued: true,
+        dispatched: true,
+        executionVerified: false,
+        actionsUrl: dispatch.actionsUrl,
         reused: Boolean(activeBuild),
         build,
         buildId: build.id,

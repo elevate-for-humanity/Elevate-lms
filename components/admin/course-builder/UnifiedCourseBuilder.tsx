@@ -36,6 +36,7 @@ type UltimateBuildRow = {
     last_error?: string | null;
     created_at: string;
     heartbeat_at?: string | null;
+    lease_expires_at?: string | null;
   }>;
 };
 
@@ -535,8 +536,16 @@ export function UltimateBuildPanel({
   const jobs = [...(latest?.ultimate_build_jobs ?? [])].sort((a, b) =>
     b.created_at.localeCompare(a.created_at),
   );
-  const activeJob = jobs.find((job) => ['queued', 'running'].includes(job.status));
-  const workerJob = activeJob ?? jobs[0];
+  const observedJobs = jobs.map(job => {
+    if (job.status !== 'running') return job;
+    const heartbeat = Date.parse(job.heartbeat_at ?? '');
+    const leaseEnd = Date.parse(job.lease_expires_at ?? '');
+    const active = Number.isFinite(heartbeat) && Date.now() - heartbeat < 90_000 &&
+      Number.isFinite(leaseEnd) && leaseEnd > Date.now();
+    return active ? job : {...job, status: 'stalled', last_error: 'Worker heartbeat is missing or stale. Resume the saved build; Google prevents overlapping executions.'};
+  });
+  const activeJob = observedJobs.find((job) => ['queued', 'running'].includes(job.status));
+  const workerJob = activeJob ?? observedJobs[0];
 
   async function refresh(requestedCourseId = course.id) {
     const token = ++refreshToken.current;

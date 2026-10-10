@@ -17,7 +17,7 @@ export function directoryPages(entries: DirectoryEntry[]): string[] {
     // Bound each utterance, never the number of people in the directory.
     const name = String(entry.display_name || 'Staff member').slice(0, 120);
     const department = String(entry.department || '').slice(0, 160);
-    const number = String(entry.extension).split('').join(' ');
+    const number = String(entry.extension).replace(/[^0-9]/g, '');
     const line = `${name}${department ? `, ${department}` : ''}. Extension ${number}.`;
     if (page && page.length + line.length + 1 > 500) {
       pages.push(page);

@@ -295,7 +295,7 @@ export const STORE_FEATURE_PROOFS: Partial<Record<PlatformFeatureKey, StoreFeatu
     access: 'public-demo',
     sourcePaths: [
       'apps/admin/app/apprenticeships/page.tsx',
-      'apps/admin/app/api/admin/apprenticeships/hours/[id]/approve/route.ts',
+      'apps/admin/app/api/admin/apprenticeships/hours/approve/route.ts',
     ],
   },
   [PlatformFeature.EMPLOYER_PORTAL]: {

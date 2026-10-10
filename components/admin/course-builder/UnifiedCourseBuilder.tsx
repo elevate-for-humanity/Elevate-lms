@@ -281,6 +281,68 @@ export default function UnifiedCourseBuilder({
   );
 }
 
+type CourseIntegrityCheck = {
+  name: string;
+  passed: boolean;
+  message: string;
+  issues?: Array<{ courseId: string; title: string; issues: string[] }>;
+};
+
+export function CourseIntegrityChecks({ onOpen }: { onOpen: (id: string) => void }) {
+  const [checks, setChecks] = useState<CourseIntegrityCheck[]>([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  async function refresh() {
+    setLoading(true);
+    setError('');
+    setChecks([]);
+    try {
+      const response = await fetch('/api/admin/courses/health', { cache: 'no-store' });
+      const payload = await readJson(response);
+      // An unavailable capability can still include actionable failed checks.
+      if ((!response.ok && response.status !== 503) || !Array.isArray(payload?.checks)) {
+        throw new Error(payload?.error || `Course checks failed (${response.status})`);
+      }
+      setChecks(payload.checks);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Course checks are unavailable');
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => { void refresh(); }, []);
+  return (
+    <section aria-label="Course integrity" className="mb-5 rounded-2xl border border-slate-800 bg-slate-900 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="font-bold">Course checks</h2>
+        <button type="button" disabled={loading} onClick={() => void refresh()} className="rounded-lg border border-slate-600 px-3 py-2 text-sm disabled:opacity-50">
+          {loading ? 'Checking courses…' : 'Refresh course checks'}
+        </button>
+      </div>
+      {error && <p role="alert" className="mt-3 text-red-200">{error}</p>}
+      <ul className="mt-3 space-y-3">
+        {checks.map(check => (
+          <li key={check.name}>
+            <p className={check.passed ? 'text-emerald-300' : 'text-amber-200'}>
+              <strong>{check.name}:</strong> {check.message}
+            </p>
+            {check.issues?.length ? (
+              <ul className="mt-2 space-y-2">
+                {check.issues.map(issue => (
+                  <li key={issue.courseId} className="rounded-lg border border-amber-900/60 p-3">
+                    <button type="button" onClick={() => onOpen(issue.courseId)} className="font-semibold text-cyan-300 underline">Open {issue.title}</button>
+                    <p className="mt-1 text-sm text-slate-300">{issue.issues.join('; ')}</p>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function CourseCatalog({
   courses,
   programs,
@@ -309,6 +371,8 @@ function CourseCatalog({
   );
 
   return (
+    <>
+    <CourseIntegrityChecks onOpen={onOpen} />
     <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,26.25rem)]">
       <section className="min-w-0 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
         <h2 className="text-lg font-bold">Course inventory</h2>
@@ -388,6 +452,7 @@ function CourseCatalog({
       </section>
       <CreateCoursePanel programs={programs} onCreated={onCreated} />
     </div>
+    </>
   );
 }
 

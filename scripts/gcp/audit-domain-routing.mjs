@@ -65,9 +65,10 @@ if(nfToken) {
 for (const name of ['store','portal','dashboard','testing','dev-studio'].map(x=>x+'.elevateforhumanity.org')) {
  try {
   const result=execFileSync('curl',['--silent','--show-error','--connect-timeout','10','--max-time','25','--resolve',name+':443:34.110.235.233','--write-out','\\nHTTP_STATUS:%{http_code}','https://'+name+'/api/health'],{encoding:'utf8',timeout:30000,stdio:['ignore','pipe','pipe']});
-  const marker=result.lastIndexOf('\\nHTTP_STATUS:');
+  const marker=result.lastIndexOf('HTTP_STATUS:');
+  if(marker<0)throw Error('curl status marker missing');
   const body=result.slice(0,marker);let health={};try{health=JSON.parse(body);}catch{}
-  report({googleEdgeTLS:name,verified:true,httpStatus:result.slice(marker+13),service:health.service,healthy:health.healthy,commit:health.commit});
+  report({googleEdgeTLS:name,verified:true,httpStatus:Number(result.slice(marker+'HTTP_STATUS:'.length).trim()),service:health.service,healthy:health.healthy,commit:health.commit});
  } catch(error){report({googleEdgeTLS:name,verified:false,exitCode:error.status,reason:String(error.stderr||'').replace(/\\n/g,' ').slice(0,350)});}
 }
 for(const args of [['compute','instances','list'],['compute','disks','list']]){

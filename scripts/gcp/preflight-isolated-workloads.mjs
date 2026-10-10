@@ -11,6 +11,39 @@ export const PERMISSION_GROUPS = {
   quota: ['serviceusage.quotas.get', 'serviceusage.quotas.update', 'cloudquotas.quotas.get', 'cloudquotas.quotas.update'],
 };
 
+// Billing metadata is read-only. Neither billingEnabled nor open identifies a
+// Free Trial/Paid account or a Customer Care subscription in the public API.
+export async function inspectProjectBilling(token, request = fetch) {
+  const result = {observedAt: new Date().toISOString(), billingEnabled: null,
+    linkedAccountSuffix: null, accountOpen: null, currencyCode: null,
+    billableStatus: 'UNVERIFIED', supportPlan: 'UNVERIFIED', reads: []};
+  async function get(path, operation) {
+    try {
+      const response = await request('https://cloudbilling.googleapis.com/v1/' + path, {
+        method: 'GET', headers: {authorization: 'Bearer ' + token}, signal: AbortSignal.timeout(30000),
+      });
+      const body = await response.json();
+      const errorStatus = body?.error?.status;
+      result.reads.push({operation, httpStatus: response.status,
+        ...(!response.ok ? {errorStatus: /^[A-Z_]{1,60}$/.test(errorStatus || '') ? errorStatus : 'READ_FAILED'} : {})});
+      return response.ok ? body : null;
+    } catch {result.reads.push({operation, errorStatus: 'READ_FAILED'}); return null;}
+  }
+  const project = await get('projects/' + PROJECT + '/billingInfo', 'projectBilling');
+  if (typeof project?.billingEnabled === 'boolean') result.billingEnabled = project.billingEnabled;
+  const name = project?.billingAccountName;
+  if (typeof name === 'string' && /^billingAccounts\/[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}$/.test(name)) {
+    // Avoid exposing the full account identifier or account owner in CI logs.
+    result.linkedAccountSuffix = name.slice(-6);
+    const account = await get(name, 'linkedBillingAccount');
+    if (account?.name === name) {
+      if (typeof account.open === 'boolean') result.accountOpen = account.open;
+      if (/^[A-Z]{3}$/.test(account.currencyCode || '')) result.currencyCode = account.currencyCode;
+    }
+  }
+  return result;
+}
+
 // Quota metadata and pending adjustments only; never create preferences or grant access.
 export async function inspectRunQuotaOptions(token, request = fetch) {
   const parent = 'https://cloudquotas.googleapis.com/v1/projects/484736877039/locations/global';
@@ -115,6 +148,7 @@ export async function runPreflight() {
     report.permissionChecks[name] = await inspectPermissionBoundary(token, 'project', permissions);
   }
   report.runQuotaOptions = await inspectRunQuotaOptions(token);
+  report.billing = await inspectProjectBilling(token);
   for (const region of REGIONS) {
     try {
       const services = read(['run', 'services', 'list', '--region=' + region]);

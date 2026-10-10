@@ -84,7 +84,7 @@ export class UltimateJobQueue {
     // wake_ultimate_media_dependency RPC is responsible for resumption.
     const { error } = await this.db.from('ultimate_build_jobs').update({
       status: 'failed',
-      pending_dependency_resume: true,
+      pending_dependency_resume: { reason: 'external_dependency', awaitingWakeup: true },
       lease_owner: null,
       lease_expires_at: null,
       last_error: message,

@@ -4,16 +4,16 @@ const run=(args)=>execFileSync('gcloud',[...args,'--project='+project],{encoding
 const read=args=>JSON.parse(run([...args,'--format=json']));
 for(const component of ['marketing','admin']){
  const service='elevate-'+component+'-migration',image='us-central1-docker.pkg.dev/'+project+'/elevate/'+component;
- let before;
+ let before,candidate;
  for(let attempt=0;attempt<20;attempt++){
   before=read(['run','services','describe',service,'--region=us-central1']);
-  if(before.status.latestCreatedRevisionName===before.status.latestReadyRevisionName)break;
+  candidate=read(['run','revisions','describe',before.status.latestCreatedRevisionName,'--region=us-central1']);
+  if(candidate.status.conditions.some(c=>c.type==='Ready'&&c.status==='True'))break;
   if(attempt===19)throw Error(component+' concurrent release did not become ready');
   console.log(JSON.stringify({component,waitingForConcurrentRelease:true,attempt}));
   await new Promise(resolve=>setTimeout(resolve,15000));
  }
  const revision=before.status.latestCreatedRevisionName;
- const candidate=read(['run','revisions','describe',revision,'--region=us-central1']);
  const deployedImage=candidate.spec.containers[0].image;
  if(!new RegExp('^'+image+'@sha256:[a-f0-9]{64}$').test(deployedImage))throw Error('Unexpected release image repository/digest');
  if(!candidate.status.conditions.some(c=>c.type==='Ready'&&c.status==='True'))throw Error('Candidate revision not ready');

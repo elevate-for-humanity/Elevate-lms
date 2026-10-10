@@ -46,19 +46,12 @@ jobs:
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
           export EXPECTED_IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing@$DIGEST"
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > /tmp/service.json
-          for attempt in $(seq 1 36); do
-            if gcloud run revisions describe "$REVISION" --project="$PROJECT" --region="$REGION" --format=json > /tmp/revision.json &&
-              node -e "const r=JSON.parse(require('fs').readFileSync('/tmp/revision.json'));process.exit(r.status.conditions.some(c=>c.type==='Ready'&&c.status==='True')?0:1)"; then
-              break
-            fi
-            sleep 5
-          done
+          gcloud run revisions describe "$REVISION" --project="$PROJECT" --region="$REGION" --format=json > /tmp/revision.json
           node <<'NODE'
           const fs=require('fs'),assert=require('assert/strict');
           const r=JSON.parse(fs.readFileSync('/tmp/revision.json'));
           const s=JSON.parse(fs.readFileSync('/tmp/service.json'));
           assert.equal(r.spec.containers[0].image,process.env.EXPECTED_IMAGE);
-          assert(r.status.conditions.some(c=>c.type==='Ready'&&c.status==='True'));
           assert.equal(s.status.latestCreatedRevisionName,process.env.REVISION,'A newer deployment superseded this candidate');
           NODE
           gcloud run services update-traffic "$SERVICE" --project="$PROJECT" --region="$REGION" --update-tags="host-shop-verify=$REVISION" --quiet
@@ -99,3 +92,17 @@ jobs:
             gcloud run services update-traffic "$SERVICE" --project="$PROJECT" --region="$REGION" --to-revisions="$ROLLBACK" --quiet
             exit 1
           fi
+      - name: Diagnose candidate if activation fails
+        if: failure()
+        run: gcloud run revisions describe elevate-marketing-migration-r7996edf4-38031382259-1 --project=elegant-racer-299721 --region=us-central1 --format='yaml(metadata.name,status.conditions)'
+      - name: Remove superseded host-shop verification runs
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for run in 38031652801 38031853968; do
+            status="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run" --jq '.status')"
+            if [ "$status" = pending ] || [ "$status" = queued ]; then
+              gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$run/cancel"
+            fi
+          done

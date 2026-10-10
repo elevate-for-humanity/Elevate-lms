@@ -990,8 +990,8 @@ export async function renderStoryboardVideo(
       // quoting. Never mark the lesson complete unless assembly succeeds.
       const manifestPath = path.join(paths.outputDir, 'segments.ffconcat');
       await writeFile(manifestPath, 'ffconcat version 1.0\n' +
-        chunkPaths.map(p => "file '" + p.replace(/'/g, "'\\\\''") + "'").join('\n') + '\n');
-      await execFileAsync('ffmpeg', [
+        chunkPaths.map(p => "file '" + p.replace(/'/g, "'\\''") + "'").join('\n') + '\n');
+            await execFileAsync('ffmpeg', [
         '-y', '-f', 'concat', '-safe', '0', '-i', manifestPath,
         '-c', 'copy', '-movflags', '+faststart', paths.videoPath,
       ], {timeout: 600_000, maxBuffer: 2_000_000});

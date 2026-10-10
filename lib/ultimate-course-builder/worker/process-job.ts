@@ -15,8 +15,9 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
   if (!job) return { claimed: false };
+  console.info('[UltimateWorker] job claimed', { jobId: job.id, buildId: job.build_id, workerId });
   let timer: ReturnType<typeof setInterval> | null = setInterval(
-    () => void queue.heartbeat(job.id, workerId, 300).catch(() => {}),
+    () => void queue.heartbeat(job.id, workerId, 300).then(() => console.info('[UltimateWorker] heartbeat acknowledged', { jobId: job.id })).catch((error) => console.error('[UltimateWorker] heartbeat failed', { jobId: job.id, error: String(error) })),
     60000,
   );
   try {
@@ -39,10 +40,13 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         .eq('id', build.id);
       if (profileError) throw profileError;
     }
+    console.info('[UltimateWorker] profile hydrated', { jobId: job.id, competencies: profile.competencies.length });
     const runtime = await createUltimateRuntime(db);
+    console.info('[UltimateWorker] runtime ready', { jobId: job.id });
     const handlers = createProductionHandlers(runtime);
     const payload = (job.payload ?? {}) as any;
     const targeted = Boolean(payload.competencyId || payload.lessonBuildId || payload.acceptance);
+    console.info('[UltimateWorker] lesson processing started', { jobId: job.id, targeted, competencyId: payload.competencyId ?? null });
     const result = await runUltimateCourse(
       {
         buildId: build.id,
@@ -58,6 +62,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       runtime.persistence,
       runtime.artifacts,
     );
+    console.info('[UltimateWorker] lesson processing returned', { jobId: job.id, completed: result.completed, findings: result.findings.length });
     if (!targeted) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {

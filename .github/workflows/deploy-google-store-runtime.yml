@@ -19,8 +19,8 @@ jobs:
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-store-runtime.yml/dispatches" -f ref=main
   deploy:
     concurrency:
-      group: google-runtime-operations
-      cancel-in-progress: false
+      group: google-production-store
+      cancel-in-progress: true
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production

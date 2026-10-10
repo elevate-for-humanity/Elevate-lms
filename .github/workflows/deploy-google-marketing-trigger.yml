@@ -1,7 +1,7 @@
 name: Deploy Google Marketing on trigger
 
-# Production is an explicitly approved release, never a side effect of each push.
-# Automatically deploy only after the full release has been validated.
+# Changes on main release automatically after validation and final-container tests.
+# Each service releases independently; a newer release supersedes its older run.
 on:
   push:
     branches: [main]
@@ -37,8 +37,8 @@ permissions:
   deployments: write
 
 concurrency:
-  group: google-runtime-operations
-  cancel-in-progress: false
+  group: google-production-marketing
+  cancel-in-progress: true
 
 jobs:
   deploy:

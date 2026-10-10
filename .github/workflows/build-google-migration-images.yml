@@ -1,5 +1,10 @@
 name: Build migration images for Google
 on:
+  workflow_call:
+    inputs:
+      component:
+        type: string
+        required: true
   workflow_dispatch:
     inputs:
       component:

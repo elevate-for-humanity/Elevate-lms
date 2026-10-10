@@ -118,6 +118,11 @@ function OperationalShortcuts() {
       href: '/portals',
     },
     {
+      title: 'Website Traffic',
+      description: 'View most visited pages, traffic sources, Google Analytics, and visitor locations.',
+      href: '/analytics/traffic',
+    },
+    {
       title: 'Reports',
       description: 'Open enrollment, completion, payment, and compliance reporting.',
       href: '/reports',

@@ -290,7 +290,7 @@
     "dev": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' next dev --turbopack",
     "build:lms:compile": "pnpm --filter @elevate/lms build",
     "start": "node server.js",
-    "lint": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' eslint . --ext .js,.jsx,.ts,.tsx --cache --cache-location .eslintcache --quiet",
+    "lint": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' eslint . --ext .js,.jsx,.ts,.tsx --cache --cache-strategy content --cache-location .eslintcache --quiet",
     "healthcheck": "bash scripts/run-full-healthcheck.sh .",
     "lint:brand": "node scripts/reviewer.js src",
     "lint:brand:all": "node scripts/reviewer.js",

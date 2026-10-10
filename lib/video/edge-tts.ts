@@ -228,13 +228,16 @@ function kokoroNarrationChunks(text: string, maxCharacters = 420): string[] {
 async function getKokoroModel(): Promise<KokoroModel> {
   if (!kokoroModelPromise) {
     kokoroModelPromise = import('kokoro-js').then(async ({ KokoroTTS }) => {
-      const model = await KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
-        dtype: 'q8',
-        device: 'cpu',
-        // The image preloads Kokoro at build time. Never download model files
-        // while rendering lessons: remote 429s must not fail production jobs.
+      // Preserve the runtime-local-only request without relying on an
+      // unsupported excess-property declaration in kokoro-js 1.2.1 types.
+      const offlineModelOptions = {
+        dtype: 'q8' as const,
+        device: 'cpu' as const,
+        // The image preloads Kokoro at build time; production must not
+        // depend on a live model download during narration.
         local_files_only: true,
-      });
+      };
+      const model = await KokoroTTS.from_pretrained(KOKORO_MODEL_ID, offlineModelOptions);
       return model as unknown as KokoroModel;
     });
   }

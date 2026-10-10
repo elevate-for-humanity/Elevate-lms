@@ -18,3 +18,10 @@ create table public.notification_outbox (
 );
 grant all on public.notification_outbox to service_role;
 insert into public.notification_outbox(to_email,template_key) values ('backlog@example.invalid','enrollment_welcome');
+
+create schema auth;
+create function auth.uid() returns uuid language sql as $$ select null::uuid $$;
+create table public.profiles (id uuid primary key);
+create table public.phone_callback_tasks (id uuid primary key, status text, read_at timestamptz, recording_url text, assigned_profile_id uuid);
+create table public.voicemails (id uuid primary key, status text, is_read boolean, recording_url text, assigned_profile_id uuid);
+grant all on public.phone_callback_tasks,public.voicemails to authenticated;

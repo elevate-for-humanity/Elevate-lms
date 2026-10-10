@@ -81,7 +81,7 @@ failures still require an authorized device session to distinguish.
 
 ## Migration and deployment order
 
-1. Review the two new migrations and current live schema; retain the default
+1. Review the three new migrations and current live schema; retain the default
    `webrtc_provider=telnyx` for all existing extensions. Apply through the approved
    Supabase migration path. No production migration has been applied by this PR.
 2. Deploy and verify the LMS revision before the Admin consumer starts requiring
@@ -98,7 +98,7 @@ failures still require an authorized device session to distinguish.
    public Telnyx number into the independent system. Require real call acceptance
    before any separately approved public cutover.
 
-Rollback keeps both migrations and all records: restore the old app revisions,
+Rollback keeps all three migrations and all records: restore the old app revisions,
 keep or restore Telnyx extension selection, stop the new worker if needed, and
 preserve held notifications until reconciliation. Revoke only generated pilot
 endpoints and restore reviewed PBX/Caddy snapshots with validated reloads. Do not
@@ -142,3 +142,45 @@ must not be replaced by a one-way audio demonstration or a passing health URL.
   (the sparse checkout emits an unrelated Pages-directory configuration notice).
 - The dedicated CI migration contract passed on PostgreSQL 17 (job 114157565721).
   Full GitHub CI/build results must be reviewed before marking this draft ready.
+
+## Follow-up inspection at 07:11–07:24 UTC
+
+The readiness workflow was rerun against live Google resources (attempt 2 of
+38031986044). All four complete deployment gates still failed. Public health,
+Supabase, authoritative application DNS, TLS and URL-map routing again passed.
+LMS 00015-fnj now reports HealthCheckContainerError; Admin 00040-d9b is retired;
+Marketing h7996edf4-38032584649 failed while g2-4bc83a58-38029790057 still serves.
+Store remains on the earlier healthy revision. These are fresh observations,
+not deployment success. Job 114156447330 explicitly reports regional CPU quota
+exhaustion during revision creation and traffic activation. Other releases are
+concurrently changing Google capacity; no competing traffic changes were made.
+
+Additional source repairs:
+- Recording downloads accept only the existing Telnyx recording host/bucket,
+  reject redirects, bound download size/time, and finish before marking read.
+  Live metadata showed 46 recording references in that provider bucket; no
+  recording audio or private signed URL was printed or copied into this report.
+- Authenticated clients lose blanket UPDATE authority over voicemail/callback
+  rows. Read-state/status columns remain writable; recording locations and
+  recipient assignments remain server-controlled.
+- Phone notification attempts have durable unique claims per task, recipient,
+  message kind and channel. Acceptance, partial device acceptance, failed or
+  uncertain persistence, and review requirements are explicit. No automatic
+  retry occurs after an ambiguous send. Existing preferences remain enforced.
+- Push requests have a deadline; SMS/push operational logs omit recipients,
+  private endpoints and provider response contents.
+- Browser connection setup is cancelled on navigation, and successful heartbeat
+  recovery clears the previous warning.
+- PBX runtime audit now requires explicit extension 0, actual mailbox count,
+  loaded ARI/RTP/SRTP/WebSocket modules, and secure generated endpoint profiles.
+  Public transport checks include authoritative phone DNS, trusted hostname TLS
+  and a validated SIP WebSocket upgrade. These checks never claim real audio.
+
+Local source verification: 44 affected Vitest tests, 8 provisioner Node tests,
+2 Python evidence-parser tests, Admin/LMS TypeScript, scoped source ESLint,
+and three migrations with RLS/column-authority assertions in isolated PGlite.
+Migration lint passed (1293 files). GitHub must rerun checks on this added patch.
+The previous PR head df4c692 passed required CI, all three TypeScript checks,
+lint, migration checks and all three canonical container builds. Advisory
+accessibility/integrity/procurement failures still need review; no gate was
+removed or bypassed. No production schema or phone traffic was changed here.

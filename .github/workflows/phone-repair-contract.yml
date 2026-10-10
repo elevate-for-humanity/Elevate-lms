@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'lib/phone/**'
+      - 'scripts/gcp/*pbx*'
       - 'lib/notifications/processor.ts'
       - 'lib/email/sendgrid.ts'
       - 'infra/pbx/provisioner/**'
@@ -11,6 +12,7 @@ on:
       - 'components/program-holder/ProgramHolderPhone*'
       - 'supabase/migrations/*independent_pbx_device_registration.sql'
       - 'supabase/migrations/*notification_delivery_claims.sql'
+      - 'supabase/migrations/*phone_message_delivery_evidence.sql'
       - 'tests/integration/phone-delivery/**'
       - '.github/workflows/phone-repair-contract.yml'
   workflow_dispatch:
@@ -31,7 +33,8 @@ jobs:
           version: 10.28.2
       - run: pnpm install --frozen-lockfile
       - run: node --test infra/pbx/provisioner/server.test.mjs
-      - run: pnpm exec vitest run tests/unit/asterisk-device.test.ts tests/unit/asterisk-browser-client.test.ts tests/unit/notification-delivery.test.ts tests/unit/notification-route.test.ts tests/unit/phone-call-flow.test.ts tests/unit/phone-routing.test.ts tests/unit/program-holder-phone-availability.test.ts tests/unit/host-shop-communications-contract.test.ts
+      - run: python3 scripts/gcp/test-audit-pbx-runtime.py
+      - run: pnpm exec vitest run tests/unit/phone-notification-delivery.test.ts tests/unit/phone-recordings.test.ts tests/unit/asterisk-device.test.ts tests/unit/asterisk-browser-client.test.ts tests/unit/notification-delivery.test.ts tests/unit/notification-route.test.ts tests/unit/phone-call-flow.test.ts tests/unit/phone-routing.test.ts tests/unit/program-holder-phone-availability.test.ts tests/unit/host-shop-communications-contract.test.ts
   migration-contract:
     runs-on: ubuntu-24.04
     services:
@@ -63,4 +66,5 @@ jobs:
             -f tests/integration/phone-delivery/schema.sql \
             -f supabase/migrations/20261010065054_independent_pbx_device_registration.sql \
             -f supabase/migrations/20261010065105_notification_delivery_claims.sql \
+            -f supabase/migrations/20261010071559_phone_message_delivery_evidence.sql \
             -f tests/integration/phone-delivery/assertions.sql

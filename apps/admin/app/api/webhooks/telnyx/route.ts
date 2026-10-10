@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { resend } from '@/lib/resend';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { deliverPhoneNotification } from '@/lib/phone/notification-delivery';
 import { PushNotificationService } from '@/lib/notifications/push-service';
 import { sendSMS } from '@/lib/notifications/sms';
 import { isExtensionReachable } from '@/lib/phone/availability';
@@ -111,7 +112,11 @@ async function notifyRecipient(
     ? new URL('/phone/inbox', process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org').toString()
     : input.profileId ? appUrl('/program-holder/phone') : appUrl('/phone/inbox');
   const messageType = input.source === 'voicemail' ? 'a voicemail' : 'details with PARIS';
-  if (input.profileId) await push.sendToUserWithDatabase(db, input.profileId, {
+  if (!input.profileId || !input.taskId) return;
+  const identity = { taskId: input.taskId, profileId: input.profileId, kind: input.source || 'paris' as const };
+  const deliveries: Array<Promise<unknown>> = [];
+  const sendPush = () => deliverPhoneNotification(db, { ...identity, channel: 'push' }, async () => {
+    const acceptedDeviceCount = await push.sendToUserWithDatabase(db, input.profileId!, {
     title: input.adminCopy ? 'Admin copy: new phone message' : input.urgency === 'urgent' ? 'Urgent call for your extension' : 'New call to return',
     body: `${input.caller} left ${messageType}. ${input.adminCopy ? 'The assigned holder remains responsible for follow-up.' : 'Open your secure phone inbox.'}`,
     icon: '/icon-192x192.png',
@@ -121,13 +126,19 @@ async function notifyRecipient(
     requireInteraction: input.urgency === 'urgent',
     vibrate: [200, 100, 200],
   });
+    return { accepted: acceptedDeviceCount > 0, acceptedDeviceCount };
+  });
 
-  const [{ data: profile }, { data: preferences }] = input.profileId
+  const [profileResult, preferencesResult] = input.profileId
     ? await Promise.all([
         db.from('profiles').select('email,full_name').eq('id', input.profileId).maybeSingle(),
         db.from('notification_preferences').select('email_missed_calls,sms_missed_calls,sms_phone').eq('user_id', input.profileId).maybeSingle(),
       ])
-    : [{ data: null }, { data: null }];
+    : [{ data: null, error: null }, { data: null, error: null }];
+  if (profileResult.error || preferencesResult.error) throw new Error('Phone notification preferences unavailable');
+  const profile = profileResult.data;
+  const preferences = preferencesResult.data;
+  deliveries.push(sendPush());
   const detailLines = [
     input.adminCopy ? 'Admin oversight copy — callback responsibility remains with the assigned holder.' : '',
     input.source === 'voicemail' ? 'A voicemail was left. Open the secure inbox to listen.' : '',
@@ -144,26 +155,28 @@ async function notifyRecipient(
   ].filter(Boolean);
   const readableDetails = detailLines.join('\n');
   if (preferences?.sms_missed_calls === true && preferences?.sms_phone) {
-    const smsResult = await sendSMS(
-      preferences.sms_phone,
-      `${input.urgency === 'urgent' ? 'URGENT: ' : ''}${input.caller}${input.callbackNumber ? ` (${input.callbackNumber})` : ''}${input.program ? ` — ${input.program}` : ''}${input.reason ? `: ${input.reason}` : ' left details with PARIS.'} ${url}`.slice(0, 1200),
-    );
-    if (!smsResult.success) console.error('Missed-call SMS delivery failed:', smsResult.error);
+    deliveries.push(deliverPhoneNotification(db, { ...identity, channel: 'sms' }, async () => {
+      const result = await sendSMS(preferences.sms_phone,
+        `${input.urgency === 'urgent' ? 'URGENT: ' : ''}A new phone message is in your secure Elevate inbox. ${url}`);
+      return { accepted: result.success, providerMessageId: result.messageId };
+    }));
   }
-  if (!profile?.email || preferences?.email_missed_calls === false) return;
-  try {
-    await resend.emails.send({
-      from: 'Elevate Phone <noreply@elevateforhumanity.org>',
-      to: profile.email,
-      subject:
-        input.adminCopy ? 'Admin copy: phone message and callback follow-up' : input.urgency === 'urgent'
-          ? 'Urgent call requires follow-up'
-          : 'New call in your Elevate Phone inbox',
-      text: `${readableDetails}\n\nFull call record: ${url}`,
-      html: `<p><strong>Call details</strong></p><pre style="white-space:pre-wrap;font-family:Arial,sans-serif">${escapeHtml(readableDetails)}</pre><p><a href="${escapeHtml(url)}">Open the full call record</a></p>`,
-    });
-  } catch (error) {
-    console.error('Missed-call email delivery failed:', error);
+  if (profile?.email && preferences?.email_missed_calls !== false) {
+    deliveries.push(deliverPhoneNotification(db, { ...identity, channel: 'email' }, async () => {
+      const result = await sendEmail({
+        from: 'Elevate Phone <noreply@elevateforhumanity.org>', to: profile.email,
+        subject: input.adminCopy ? 'Admin copy: phone message and callback follow-up' : input.urgency === 'urgent'
+          ? 'Urgent call requires follow-up' : 'New call in your Elevate Phone inbox',
+        text: `${readableDetails}\n\nFull call record: ${url}`,
+        html: `<p><strong>Call details</strong></p><pre style="white-space:pre-wrap;font-family:Arial,sans-serif">${escapeHtml(readableDetails)}</pre><p><a href="${escapeHtml(url)}">Open the full call record</a></p>`,
+        singleAttempt: true,
+      });
+      return { accepted: result.success, providerMessageId: result.data?.messageId };
+    }));
+  }
+  const results = await Promise.allSettled(deliveries);
+  if (results.some(result => result.status === 'rejected' || result.value === 'review_required')) {
+    throw new Error('Phone notification requires delivery review');
   }
 }
 
@@ -180,7 +193,7 @@ async function notifyAssignee(db: any, input: Parameters<typeof notifyRecipient>
   // One recipient's delivery failure must not prevent the other recipient's
   // notification. The shared call/task remains the durable inbox copy.
   for (const result of await Promise.allSettled(recipients)) {
-    if (result.status === 'rejected') console.error('Phone message notification failed:', result.reason);
+    if (result.status === 'rejected') console.error('Phone message notification requires review; inspect durable delivery evidence.');
   }
 }
 

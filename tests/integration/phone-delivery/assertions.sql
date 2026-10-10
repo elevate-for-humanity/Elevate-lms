@@ -32,3 +32,20 @@ do $$ begin
  if (select count(*) from phone_webrtc_devices where connection_state='disconnected' and last_seen_at is null) <> 2 then
   raise exception 'Issuance manufactured presence or removed carrier records'; end if;
 end $$;
+
+-- Recording locations/assignments cannot be rewritten using a user's JWT.
+do $$ begin
+ if has_column_privilege('authenticated','public.voicemails','recording_url','update')
+    or has_column_privilege('authenticated','public.phone_callback_tasks','assigned_profile_id','update') then
+  raise exception 'Phone recording authority is mutable by client';
+ end if;
+ if not has_column_privilege('authenticated','public.voicemails','is_read','update') then
+  raise exception 'Read-state update permission lost';
+ end if;
+ if has_table_privilege('authenticated','public.phone_notification_deliveries','insert') then
+  raise exception 'Client can fabricate notification evidence';
+ end if;
+ if not exists (select 1 from pg_class where oid='public.phone_notification_deliveries'::regclass and relrowsecurity) then
+  raise exception 'Delivery evidence RLS is disabled';
+ end if;
+end $$;

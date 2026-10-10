@@ -123,6 +123,7 @@ export function ProgramHolderPhone({
   const callRef = useRef<BrowserPhoneCall | null>(null);
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const connectionAbortRef = useRef<AbortController | null>(null);
   const ringModeRef = useRef<RingMode>('ring');
   const autoConnectAttemptedRef = useRef(false);
 
@@ -166,13 +167,16 @@ export function ProgramHolderPhone({
     }).catch(() => undefined);
     if (!response?.ok) {
       setConnected(false);
-      setError('The server could not verify this phone connection. Reconnect the phone.');
+      setError('Registration reachability is not yet verified. The phone will check again automatically.');
     } else {
       setConnected(true);
+      setError('');
+      setMessage('Phone registration and reachability verified.');
     }
   }, [apiBase]);
 
   const disconnect = useCallback(async () => {
+    connectionAbortRef.current?.abort();
     if (heartbeatRef.current) clearInterval(heartbeatRef.current);
     heartbeatRef.current = null;
     try {
@@ -194,6 +198,7 @@ export function ProgramHolderPhone({
 
   useEffect(() => {
     return () => {
+      connectionAbortRef.current?.abort();
       if (heartbeatRef.current) clearInterval(heartbeatRef.current);
       void clientRef.current?.disconnect();
     };
@@ -203,12 +208,16 @@ export function ProgramHolderPhone({
     if (connected || connecting || !data || data.readOnly) return;
     setConnecting(true);
     setError('');
+    connectionAbortRef.current?.abort();
+    const controller = new AbortController();
+    connectionAbortRef.current = controller;
     try {
       if (heartbeatRef.current) clearInterval(heartbeatRef.current);
       heartbeatRef.current = null;
       await clientRef.current?.disconnect().catch(() => undefined);
       clientRef.current = null;
       const tokenResponse = await fetch('/api/program-holder/phone/token', {
+        signal: controller.signal,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ deviceId: deviceId() }),
@@ -217,18 +226,22 @@ export function ProgramHolderPhone({
       if (!tokenResponse.ok) throw new Error(tokenData.error || 'The phone could not connect.');
       if (!remoteAudioRef.current) throw new Error('The call audio player is unavailable.');
       const client = await createPhoneClient(tokenData, remoteAudioRef.current);
+      if (controller.signal.aborted) { await client.disconnect(); return; }
       let ready = false;
       client.on('ready', () => {
+        if (controller.signal.aborted) return;
         ready = true;
         setConnecting(false);
         setMessage('Registration established. Verifying reachability…');
         void heartbeat();
       });
       client.on('offline', () => {
+        if (controller.signal.aborted) return;
         ready = false;
         setConnected(false);
       });
       client.on('error', (event: any) => {
+        if (controller.signal.aborted) return;
         ready = false;
         setConnected(false);
         setError(
@@ -236,6 +249,7 @@ export function ProgramHolderPhone({
         );
       });
       client.on('call', (notification: any) => {
+        if (controller.signal.aborted) return;
         const call = notification?.call as BrowserPhoneCall | undefined;
         if (!call) return;
         const state = String(call.state || '');
@@ -271,10 +285,12 @@ export function ProgramHolderPhone({
       });
       clientRef.current = client;
       await client.connect();
+      if (controller.signal.aborted) { await client.disconnect(); return; }
       heartbeatRef.current = setInterval(() => {
         if (ready) void heartbeat();
       }, 45_000);
     } catch (cause) {
+      if (controller.signal.aborted) return;
       setError(cause instanceof Error ? cause.message : 'The phone could not connect.');
       setConnecting(false);
       await disconnect();

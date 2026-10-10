@@ -41,6 +41,7 @@ export function ProgramHolderPhoneReceiver() {
   useEffect(() => {
     if (phonePage) return;
     let active = true;
+    const controller = new AbortController();
     let heartbeat: ReturnType<typeof setInterval> | null = null;
     let client: PhoneClient | null = null;
     let ready = false;
@@ -61,12 +62,13 @@ export function ProgramHolderPhoneReceiver() {
     }
 
     async function start() {
-      const settingsResponse = await fetch('/api/program-holder/phone', { cache: 'no-store' });
+      const settingsResponse = await fetch('/api/program-holder/phone', { cache: 'no-store', signal: controller.signal });
       if (!settingsResponse.ok || !active) return;
       const settings = await settingsResponse.json();
       const ringMode = String(settings?.extension?.ringMode || 'offline');
       if (['offline', 'do_not_disturb'].includes(ringMode)) return;
       const tokenResponse = await fetch('/api/program-holder/phone/token', {
+        signal: controller.signal,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ deviceId: id }),
@@ -75,6 +77,7 @@ export function ProgramHolderPhoneReceiver() {
       const token = await tokenResponse.json();
       if (!audioRef.current) return;
       client = await createPhoneClient(token, audioRef.current);
+      if (!active) { await client.disconnect(); return; }
       clientRef.current = client;
       client.on('ready', () => {
         if (active) {
@@ -122,6 +125,7 @@ export function ProgramHolderPhoneReceiver() {
         }
       });
       await client.connect();
+      if (!active) { await client.disconnect(); return; }
       heartbeat = setInterval(() => void ping(), 45_000);
     }
 
@@ -142,6 +146,7 @@ export function ProgramHolderPhoneReceiver() {
     });
     return () => {
       active = false;
+      controller.abort();
       if (heartbeat) clearInterval(heartbeat);
       void client?.disconnect();
       clientRef.current = null;

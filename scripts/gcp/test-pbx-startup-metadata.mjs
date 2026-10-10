@@ -6,7 +6,7 @@ import { digest,LEGACY_SHA256,planUpdate,repair } from './repair-pbx-startup-met
 const replacement=readFileSync('infra/pbx/google-startup.sh','utf8');
 const old='#!/usr/bin/env bash\nlegacy bootstrap\n';
 const instance=(script=old)=>({name:'elevate-pbx',id:'instance',status:'RUNNING',lastStartTimestamp:'unchanged',
-  zone:'https://compute.googleapis.com/compute/v1/projects/elegant-racer-299721/zones/us-central1-a',
+  zone:'https://www.googleapis.com/compute/v1/projects/elegant-racer-299721/zones/us-central1-a',
   networkInterfaces:[{accessConfigs:[{natIP:'107.178.216.162'}]}],
   metadata:{fingerprint:'lease',items:[{key:'ssh-keys',value:'private unchanged fixture'},{key:'startup-script',value:script}]}});
 test('updates only the known bootstrap while preserving metadata and fingerprint',()=>{
@@ -27,6 +27,15 @@ test('rejects startup URL scripts at instance or project level',()=>{
 test('rejects mismatched VM identity, stopped VM and missing metadata',()=>{
   for(const current of [{...instance(),name:'other'},{...instance(),status:'STOPPED'},{...instance(),metadata:{items:[]}}]) {
     assert.throws(()=>planUpdate(current,{},replacement,digest(old)));
+  }
+});
+test('accepts both Google resource self-link hosts while rejecting other projects and zones',()=>{
+  const current=instance(replacement);
+  assert.equal(planUpdate(current,{},replacement).changed,false);
+  current.zone=current.zone.replace('www.googleapis.com','compute.googleapis.com');
+  assert.equal(planUpdate(current,{},replacement).changed,false);
+  for(const zone of [current.zone.replace('elegant-racer-299721','other'),current.zone+'?override=true',current.zone.replace('us-central1-a','us-central1-b')]) {
+    assert.throws(()=>planUpdate({...current,zone},{},replacement),/identity_or_state/);
   }
 });
 test('already guarded metadata is verified without a write or restart',async()=>{

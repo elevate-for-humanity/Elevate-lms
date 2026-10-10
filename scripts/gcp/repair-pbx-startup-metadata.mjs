@@ -14,7 +14,8 @@ export const LEGACY_SHA256 = '5260f33b417d1b8019253713bec039038f5b6f7ea43f5a676d
 export const digest = value => createHash('sha256').update(value).digest('hex');
 
 export function planUpdate(instance, project, replacement, legacyHash = LEGACY_SHA256) {
-  if (instance.name !== VM || instance.zone !== `${API}/zones/${ZONE}` ||
+  const zones = [`${API}/zones/${ZONE}`,`https://www.googleapis.com/compute/v1/projects/${PROJECT}/zones/${ZONE}`];
+  if (instance.name !== VM || !zones.includes(instance.zone) ||
       instance.status !== 'RUNNING' || !instance.id || !instance.lastStartTimestamp ||
       instance.networkInterfaces?.[0]?.accessConfigs?.[0]?.natIP !== '107.178.216.162') {
     throw new Error('vm_identity_or_state_mismatch');

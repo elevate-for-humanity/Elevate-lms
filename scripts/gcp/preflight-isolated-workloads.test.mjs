@@ -47,3 +47,14 @@ test('VM preparation includes resource creation and runtime identity attachment'
   assert(PERMISSION_GROUPS.vm.includes('compute.disks.create'));
   assert(!Object.values(PERMISSION_GROUPS).flat().includes('resourcemanager.projects.setIamPolicy'));
 });
+
+test('secret permissions are checked at the existing resource without reading its payload', async () => {
+  const r = await inspectPermissionBoundary('token', 'secret:elevate-studio-browser-runtime-config', ['secretmanager.secrets.setIamPolicy'], async (url, init) => {
+    assert.equal(url, 'https://secretmanager.googleapis.com/v1/projects/elegant-racer-299721/secrets/elevate-studio-browser-runtime-config:testIamPermissions');
+    assert.equal(init.method, 'POST');
+    assert(!url.includes('versions'));
+    return {ok: true, status: 200, json: async () => ({permissions: []})};
+  });
+  assert.equal(r.checked, true);
+  assert.equal(r.allowed, false);
+});

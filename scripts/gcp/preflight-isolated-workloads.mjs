@@ -31,7 +31,9 @@ export function summarizeRevision(revision) {
 }
 
 export async function inspectPermissionBoundary(token, resource, permissions, request = fetch) {
-  const endpoint = resource === 'project'
+  const endpoint = resource.startsWith('secret:')
+    ? `https://secretmanager.googleapis.com/v1/projects/${PROJECT}/secrets/${encodeURIComponent(resource.slice(7))}:testIamPermissions`
+    : resource === 'project'
     ? `https://cloudresourcemanager.googleapis.com/v1/projects/${PROJECT}:testIamPermissions`
     : `https://iam.googleapis.com/v1/projects/-/serviceAccounts/${encodeURIComponent(resource)}:testIamPermissions`;
   try {
@@ -102,6 +104,34 @@ export async function runPreflight() {
   const identities = [...new Set(report.services.flatMap(s => s.servingRevisions.map(r => r.runtimeIdentity)).filter(Boolean))];
   report.runtimeIdentityAttachment = [];
   for (const identity of identities) report.runtimeIdentityAttachment.push({identity, ...await inspectPermissionBoundary(token, identity, ['iam.serviceAccounts.actAs'])});
+  const studioIdentity = `elevate-admin-runtime@${PROJECT}.iam.gserviceaccount.com`;
+  const studioConfig = 'elevate-studio-browser-runtime-config';
+  report.studioSecretPermissions = await inspectPermissionBoundary(token, 'secret:' + studioConfig, ['secretmanager.secrets.getIamPolicy', 'secretmanager.secrets.setIamPolicy']);
+  try {
+    const policy = read(['secrets', 'get-iam-policy', studioConfig]);
+    const projectPolicy = read(['projects', 'get-iam-policy', PROJECT]);
+    const member = 'serviceAccount:' + studioIdentity;
+    const hasAccessor = p => (p.bindings || []).some(b => b.role === 'roles/secretmanager.secretAccessor' && !b.condition && (b.members || []).includes(member));
+    report.studioRuntimeConfig = {secret: studioConfig, runtimeIdentity: studioIdentity, resourceAccessorBinding: hasAccessor(policy), projectAccessorBinding: hasAccessor(projectPolicy), effectiveAccessVerified: false};
+  } catch (error) {report.errors.push({operation: error.message});}
+  report.renderMetrics = [];
+  if (report.permissionChecks.monitoring.allowed) {
+    for (const kind of ['memory', 'cpu']) {
+      const endpoint = new URL(`https://monitoring.googleapis.com/v3/projects/${PROJECT}/timeSeries`);
+      endpoint.searchParams.set('filter', `metric.type="run.googleapis.com/container/${kind}/utilizations" AND resource.type="cloud_run_job" AND resource.labels.job_name="elevate-course-builder"`);
+      endpoint.searchParams.set('interval.startTime', new Date(Date.now() - 2 * 3600000).toISOString());
+      endpoint.searchParams.set('interval.endTime', new Date().toISOString());
+      endpoint.searchParams.set('aggregation.alignmentPeriod', '60s');
+      endpoint.searchParams.set('aggregation.perSeriesAligner', 'ALIGN_PERCENTILE_99');
+      endpoint.searchParams.set('pageSize', '100');
+      try {
+        const response = await fetch(endpoint, {headers: {authorization: 'Bearer ' + token}, signal: AbortSignal.timeout(30000)});
+        const body = await response.json();
+        const values = (body.timeSeries || []).flatMap(s => (s.points || []).map(p => p.value?.doubleValue)).filter(Number.isFinite);
+        report.renderMetrics.push({kind, readSucceeded: response.ok, httpStatus: response.status, samples: values.length, maxAlignedP99Utilization: values.length ? Math.max(...values) : null, morePages: Boolean(body.nextPageToken)});
+      } catch {report.renderMetrics.push({kind, readSucceeded: false, reason: 'request_failed'});}
+    }
+  }
   try {
     const region = read(['compute', 'regions', 'describe', 'us-central1']);
     report.computeQuota = (region.quotas || []).filter(q => /CPUS|DISKS_TOTAL_GB|IN_USE_ADDRESSES/.test(q.metric)).map(q => ({metric: q.metric, limit: q.limit, usage: q.usage}));

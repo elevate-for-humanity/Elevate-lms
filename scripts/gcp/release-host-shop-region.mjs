@@ -39,6 +39,7 @@ if(!east){
  writeFileSync('/tmp/marketing-east-service.json',JSON.stringify(resource),{mode:0o600});
  cli(['run','services','replace','/tmp/marketing-east-service.json','--region='+region],900000);
  const policy=read(['run','services','get-iam-policy',service,'--region='+sourceRegion]);
+ delete policy.etag;
  writeFileSync('/tmp/marketing-east-policy.json',JSON.stringify(policy),{mode:0o600});
  cli(['run','services','set-iam-policy',service,'/tmp/marketing-east-policy.json','--region='+region]);
  east=read(['run','services','describe',service,'--region='+region]);

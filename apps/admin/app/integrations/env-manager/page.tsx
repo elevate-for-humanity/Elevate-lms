@@ -31,7 +31,7 @@ export default async function EnvManagerPage() {
         <p className="mt-3 text-sm font-medium text-slate-700">
           Admin runtime:{' '}
           <code className="rounded bg-slate-100 px-1">admin.elevateforhumanity.org</code>. After
-          changing a Northflank runtime variable, redeploy the owning service when a fresh container
+          changing a Google Cloud Run runtime variable, redeploy the owning service when a fresh container
           is required.
         </p>
         <div className="mt-3 flex flex-wrap gap-4 text-sm font-bold">

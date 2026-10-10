@@ -196,19 +196,6 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     ],
   },
   {
-    label: 'Northflank',
-    keys: [
-      'NORTHFLANK_API_TOKEN',
-      'NORTHFLANK_TEAM_ID',
-      'NORTHFLANK_PROJECT_ID',
-      'NORTHFLANK_LMS_SERVICE_ID',
-      'NORTHFLANK_ADMIN_SERVICE_ID',
-      'NORTHFLANK_SECRET_GROUP_ID',
-      'NORTHFLANK_DEPLOYMENT_PLAN',
-      'NORTHFLANK_BUILD_PLAN',
-    ],
-  },
-  {
     label: 'GitHub',
     keys: [
       'GITHUB_TOKEN',

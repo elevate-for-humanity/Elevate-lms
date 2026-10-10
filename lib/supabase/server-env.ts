@@ -21,7 +21,7 @@ export function getServerSupabaseEnvMisconfigurationReason(): string | null {
   if (!url?.trim()) return 'NEXT_PUBLIC_SUPABASE_URL (or SUPABASE_URL) is missing';
   if (!anonKey?.trim()) return 'NEXT_PUBLIC_SUPABASE_ANON_KEY (or SUPABASE_ANON_KEY) is missing';
   if (isPlaceholderSupabaseConfig(url, anonKey)) {
-    return 'Supabase URL or anon key is still a build placeholder — set real project credentials in Northflank secret group';
+    return 'Supabase URL or anon key is still a build placeholder — set real project credentials in Google Secret Manager bindings';
   }
   return null;
 }

@@ -1,7 +1,7 @@
 /**
  * GET /api/health
  *
- * Dependency-aware service health. Northflank readiness uses /api/ready so a
+ * Dependency-aware service health. Container readiness uses /api/ready so a
  * downstream outage is reported truthfully without evicting every runnable pod.
  */
 
@@ -26,6 +26,7 @@ export async function GET() {
       canonicalDashboard: '/lms/dashboard',
       healthContract: 'lms-v4',
       commit: readiness.commit,
+      revision: readiness.revision,
       buildId: readiness.buildId,
       builtAt: readiness.builtAt,
       configuration: {

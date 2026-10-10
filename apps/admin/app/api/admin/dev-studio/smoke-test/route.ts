@@ -3,8 +3,7 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getSecret } from '@/lib/secrets';
-import { getAdminUrl } from '@/lib/utils/siteUrl';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getGoogleService, getGoogleServices } from '@/lib/google/runtime';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -55,8 +54,6 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl;
-  const adminUrl = getAdminUrl();
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -67,36 +64,20 @@ export async function GET(request: NextRequest) {
       write(`Started ${new Date().toISOString()}`);
       write('');
 
-      results.push(
-        await check('Marketing health', async () => {
-          const response = await fetch(`${baseUrl}/api/v1/health`, {
-            signal: AbortSignal.timeout(8000),
-            cache: 'no-store',
-          });
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          const payload = await response.json().catch(() => ({}));
-          return typeof payload?.status === 'string' ? payload.status : 'reachable';
-        }),
-      );
-      write(fmt(results.at(-1)!));
+      for (const service of getGoogleServices()) {
+        results.push(await check(`${service.label} health`, async () => {
+          const health = await getGoogleService(service);
+          if (!health.healthy) throw new Error('Service identity, readiness, configuration or Supabase verification failed');
+          return `Google runtime verified at ${health.commit}`;
+        }));
+        write(fmt(results.at(-1)!));
+      }
 
       results.push(
         await check('OpenHands engineering', async () => {
           const apiKey = await resolveSecret('OPENHANDS_API_KEY');
           if (!apiKey) throw new Error('OpenHands authorization missing');
           return 'authorized credential configured';
-        }),
-      );
-      write(fmt(results.at(-1)!));
-
-      results.push(
-        await check('Admin health', async () => {
-          const response = await fetch(`${adminUrl}/api/health`, {
-            signal: AbortSignal.timeout(8000),
-            cache: 'no-store',
-          });
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          return 'reachable';
         }),
       );
       write(fmt(results.at(-1)!));
@@ -156,15 +137,6 @@ export async function GET(request: NextRequest) {
           const resend = await resolveSecret('RESEND_API_KEY');
           if (!resend) throw new Error('RESEND_API_KEY missing');
           return 'Resend configured';
-        }),
-      );
-      write(fmt(results.at(-1)!));
-
-      results.push(
-        await check('Northflank configuration', async () => {
-          const token = await resolveSecret('NORTHFLANK_API_TOKEN');
-          if (!token) return 'token not configured; VCS deploy checks only';
-          return 'API token configured';
         }),
       );
       write(fmt(results.at(-1)!));

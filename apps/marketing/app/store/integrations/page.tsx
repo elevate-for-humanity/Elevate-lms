@@ -152,7 +152,7 @@ export default async function IntegrationsPage() {
               { icon: CreditCard, name: 'Stripe', description: 'Payment processing and subscriptions', color: 'blue' },
               { icon: Mail, name: 'Resend', description: 'Transactional email delivery', color: 'green' },
               { icon: Database, name: 'Supabase', description: 'PostgreSQL database and auth', color: 'emerald' },
-              { icon: Code, name: 'Northflank', description: 'Container hosting and deployment', color: 'teal' },
+              { icon: Code, name: 'Google Cloud Run', description: 'Container hosting and deployment', color: 'teal' },
               
               { icon: Zap, name: 'Twilio', description: 'SMS notifications (optional)', color: 'red' },
             ].map((integration, idx) => (

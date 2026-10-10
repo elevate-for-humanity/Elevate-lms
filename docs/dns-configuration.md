@@ -13,9 +13,23 @@ The October 10, 2026 recursive DNS audit returned `ns1.systemdns.com`, `ns2.syst
 | app.elevateforhumanity.org | CNAME www.elevateforhumanity.org | elevate-lms-migration |
 | admin.elevateforhumanity.org | CNAME www.elevateforhumanity.org | elevate-admin-migration |
 | store.elevateforhumanity.org | CNAME www.elevateforhumanity.org | elevate-store-migration |
+| lms.elevateforhumanity.org | CNAME www.elevateforhumanity.org | elevate-lms-migration |
 | phone.elevateforhumanity.org | A 107.178.216.162 | elevate-pbx, us-central1-a |
 
 The application hostnames share the Google HTTPS load balancer, with the `elevate-public-routes` URL map and separate serverless network endpoint groups. A CNAME to www does not make LMS/Admin/Store the Marketing application: HTTP host routing must independently select the correct backend. TLS is terminated by the Google edge for applications and the PBX gateway for phone. Keep phone DNS-only if a proxy provider is introduced; validate SIP WebSocket and media requirements before any proxy change.
+
+## Remaining legacy aliases — October 10, 2026
+
+Audit run `38047162413` found these aliases still resolving through Northflank and returning HTTP 503. The Google edge at `34.110.235.233` already passed trusted TLS and health checks for each hostname with its intended application identity.
+
+| Host | Existing CNAME target | Required CNAME target | Google backend |
+|---|---|---|---|
+| dev-studio | dev-studio.elevateforhumanity.org.elev-5vfk.dns.northflank.app | www.elevateforhumanity.org | elevate-admin-migration |
+| portal | portal.elevateforhumanity.org.elev-5vfk.dns.northflank.app | www.elevateforhumanity.org | elevate-lms-migration |
+| dashboard | dashboard.elevateforhumanity.org.elev-5vfk.dns.northflank.app | www.elevateforhumanity.org | elevate-lms-migration |
+| testing | testing.elevateforhumanity.org.elev-5vfk.dns.northflank.app | www.elevateforhumanity.org | elevate-marketing-migration |
+
+All host names in this table are under `elevateforhumanity.org`. Apply these four replacements, with TTL 300, through the authoritative SystemDNS/Durable domain account, then repeat authoritative DNS and public HTTPS verification. The audit connection has no credential for that account. These changes remain outstanding; this document does not establish a completed DNS cutover. Preserve the known-good Google rollback revisions and unrelated DNS records.
 
 ## Read-only verification
 

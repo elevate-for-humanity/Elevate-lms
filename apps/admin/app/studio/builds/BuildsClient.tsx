@@ -93,7 +93,7 @@ export default function BuildsClient() {
               Builds & Deploy
             </h1>
             <p className="text-amber-100 text-lg mt-2 max-w-2xl">
-              Trigger, monitor, and track Northflank deployments in real time.
+              Trigger, monitor, and track Google Cloud Run deployments in real time.
             </p>
           </div>
         </div>

@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
       return json(
         {
           error:
-            'Admin authentication is misconfigured on this server. Contact engineering to update the Supabase public auth configuration in Northflank.',
+            'Admin authentication is misconfigured on this server. Contact engineering to update the Supabase public auth configuration in Google Cloud Run.',
         },
         503,
       );

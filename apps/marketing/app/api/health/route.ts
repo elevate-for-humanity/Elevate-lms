@@ -1,7 +1,7 @@
 /**
  * GET /api/health
  *
- * Dependency-aware service health. Northflank readiness uses /api/ready so a
+ * Dependency-aware service health. Container readiness uses /api/ready so a
  * downstream outage is reported truthfully without evicting every runnable pod.
  */
 
@@ -26,6 +26,7 @@ export async function GET() {
       ready: readiness.ready,
       healthContract: `${getPublicRuntimeService()}-v4`,
       commit: readiness.commit,
+      revision: readiness.revision,
       github: process.env.GITHUB_SHA ?? 'unknown',
       publicCommit: process.env.NEXT_PUBLIC_GIT_SHA ?? 'unknown',
       buildId: readiness.buildId,

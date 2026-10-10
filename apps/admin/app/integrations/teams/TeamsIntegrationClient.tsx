@@ -109,7 +109,7 @@ export default function TeamsIntegrationClient({ isConfigured, webhookConfigured
               <li>Create the webhook and copy the URL</li>
               <li>
                 Set <code className="bg-slate-100 px-1 rounded text-xs">TEAMS_WEBHOOK_URL</code> in
-                Northflank runtime environment
+                Google Cloud Run runtime environment
               </li>
               <li>Redeploy — notifications will be active immediately</li>
             </ol>

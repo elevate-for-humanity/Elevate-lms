@@ -32,6 +32,24 @@ const config = {
 };
 const UUIDISH=/^[a-zA-Z0-9._:-]{1,128}$/;
 const sessions=new Map();
+const EXTERNAL_PREFIX='paris-media-';
+export function isCallerStart(event){
+  // externalMedia emits StasisStart too, with no appArgs in Asterisk 20.
+  // Its event can arrive before the HTTP creation response. Reject by both the
+  // preallocated ID namespace and the actual channel technology, not arguments.
+  return event?.type==='StasisStart' && UUIDISH.test(event.channel?.id||'') &&
+    !event.channel.id.startsWith(EXTERNAL_PREFIX) &&
+    /^(PJSIP|Local)\//.test(event.channel?.name||'');
+}
+export async function createExternalChannel(session,host,request=ari){
+  session.externalId=EXTERNAL_PREFIX+session.id;
+  const external=await request('/channels/externalMedia','POST',{
+    channelId:session.externalId,app:config.app,external_host:host,format:'ulaw',
+    direction:'both',transport:'udp',encapsulation:'rtp',connection_type:'client',
+  });
+  if(external.id!==session.externalId)throw Error('EXTERNAL_CHANNEL_ID_MISMATCH');
+  return external;
+}
 function required(){
   if (!config.user || !config.password || !config.token || !config.adapter) throw Error('PARIS_RUNTIME_CONFIG_INCOMPLETE');
   for(const [raw,protocol] of [[config.ari,'http:'],[config.ws,'ws:']]){
@@ -45,7 +63,7 @@ function authHeader(){return 'Basic '+Buffer.from(config.user+':'+config.passwor
 async function ari(path,method='GET',data){
   const url=new URL(config.ari+path);
   if(data)for(const [key,value] of Object.entries(data))url.searchParams.set(key,String(value));
-  const response=await fetch(url,{method,headers:{Authorization:authHeader()},signal:AbortSignal.timeout(10000)});
+  const response=await fetch(url,{method,headers:{Authorization:authHeader()},signal:AbortSignal.timeout(10000),redirect:'error'});
   if(!response.ok)throw Error('ARI_'+method+'_'+response.status);
   const txt=await response.text();
   return txt?JSON.parse(txt):{};
@@ -56,6 +74,18 @@ export async function routeOperator(callId,route,request=ari){
   await request('/channels/'+encode(callId)+'/continue','POST',{
     context:'internal',extension:'0',priority:1,
   });
+}
+export async function releaseCaller(callId,disposition,request=ari){
+  if(!UUIDISH.test(callId||'') || !['continue','hangup'].includes(disposition))throw Error('CALL_RELEASE_NOT_ALLOWED');
+  if(disposition==='continue'){
+    try{
+      // Resume after the original Stasis application, where the reviewed
+      // dialplan owns fallback. Never invent a destination or leave a silent leg.
+      await request('/channels/'+encode(callId)+'/continue','POST');
+      return;
+    }catch{ /* If fallback cannot resume, terminate only this owned caller leg. */ }
+  }
+  await request('/channels/'+encode(callId),'DELETE');
 }
 function ulawDecode(byte){
   byte=(~byte)&255;
@@ -107,38 +137,55 @@ async function turn(session){
   session.busy=true;
   try{
     const body=await privateTurn(config.adapter,{callId:session.callId,sessionId:session.id,sequence:session.turn++,encoding:'PCMU',sampleRate:8000,audioBase64:voice.toString('base64')},config.token);
+    if(session.closed)return;
     if(typeof body.replyAudioUlawBase64!=='string')throw Error('PARIS_TURN_AUDIO_MISSING');
     await speak(session,body.replyAudioUlawBase64);
+    if(session.closed)return;
     if(body.requestedRoute?.type==='operator') {
       // Operator 0 must first exist in the reviewed live Asterisk dialplan.
       // Resume the allowlisted dialplan route without changing channel technology.
       await routeOperator(session.callId,body.requestedRoute);
       await end(session);
-    } else if(body.endCall===true) await end(session);
+    } else if(body.endCall===true) await end(session,'hangup');
   }catch(e){
     // Fail closed: do not claim the caller was served when the AI is unavailable.
     process.stderr.write('PARIS_TURN_FAILED\n');
-    await end(session);
+    await end(session,'continue');
   }finally{session.busy=false;}
 }
-async function end(s){
-  if(s.closed)return;s.closed=true;sessions.delete(s.callId);
-  s.socket.close();
+async function cleanupMedia(s){
   for(const id of [s.externalId,s.bridgeId]) {
     if(!id)continue;
     try{await ari(id===s.bridgeId?'/bridges/'+encode(id):'/channels/'+encode(id),'DELETE');}catch{ /* Best-effort ARI cleanup; original hangup remains dialplan-owned. */ }
   }
-  // Leave the original channel's hangup handling to the owning dialplan.
+}
+async function end(s,disposition='released'){
+  if(s.closed)return;s.closed=true;sessions.delete(s.callId);
+  clearTimeout(s.deadline);
+  try{s.socket.close();}catch{ /* Binding may have failed before cleanup. */ }
+  await cleanupMedia(s);
+  if(disposition!=='released'){
+    try{await releaseCaller(s.callId,disposition);}
+    catch{process.stderr.write('PARIS_CALL_RELEASE_FAILED\n');}
+  }
 }
 async function begin(call){
   const callId=call?.id;
   if(!UUIDISH.test(callId||'') || sessions.has(callId))return;
+  if(sessions.size>=16){
+    try{await releaseCaller(callId,'continue');}catch{process.stderr.write('PARIS_CALL_RELEASE_FAILED\n');}
+    return;
+  }
   const socket=createSocket('udp4');
   const session={id:randomBytes(12).toString('hex'),callId,socket,closed:false,busy:false,playing:false,
     frames:[],quiet:0,heard:false,remote:null,seq:randomBytes(2).readUInt16BE(0),
     timestamp:randomBytes(4).readUInt32BE(0),ssrc:randomBytes(4).readUInt32BE(0),turn:0};
   sessions.set(callId,session);
+  session.deadline=setTimeout(()=>void end(session,'continue'),15*60*1000);
+  session.deadline.unref();
   try{
+    if(call.state!=='Up')await ari('/channels/'+encode(callId)+'/answer','POST');
+    if(session.closed)return;
     await new Promise((resolve,reject)=>{socket.once('error',reject);socket.bind(0,config.bind,resolve);});
     socket.on('message',(packet,rinfo)=>{
       if(session.closed || session.playing || session.busy)return;
@@ -156,13 +203,14 @@ async function begin(call){
     });
     const bridge=await ari('/bridges','POST',{type:'mixing',name:'paris-'+session.id});
     session.bridgeId=bridge.id;
+    if(session.closed){await cleanupMedia(session);return;}
     const host=config.advertised+':'+socket.address().port;
-    const external=await ari('/channels/externalMedia','POST',{app:config.app,external_host:host,format:'ulaw',direction:'both',transport:'udp',encapsulation:'rtp',connection_type:'client',appArgs:'external'});
-    session.externalId=external.id;
+    const external=await createExternalChannel(session,host);
+    if(session.closed){await cleanupMedia(session);return;}
     await ari('/bridges/'+encode(bridge.id)+'/addChannel?channel='+encode(callId+','+external.id),'POST');
   }catch(e){
     process.stderr.write('PARIS_BRIDGE_FAILED\n');
-    await end(session);
+    await end(session,'continue');
   }
 }
 export async function serveGateway(){
@@ -179,13 +227,13 @@ export async function serveGateway(){
       await new Promise(resolve=>{
         socket.addEventListener('message',event=>{
           let payload;try{payload=JSON.parse(event.data);}catch{return;}
-          if(payload.type==='StasisStart' && payload.channel?.id && !payload.args?.includes('external'))void begin(payload.channel);
+          if(isCallerStart(payload))void begin(payload.channel);
           if(payload.type==='StasisEnd' && payload.channel?.id){const s=sessions.get(payload.channel.id);if(s)void end(s);}
         });
         socket.addEventListener('close',resolve,{once:true});
       });
     }catch{process.stderr.write('PARIS_ARI_DISCONNECTED\n');}
-    for(const s of [...sessions.values()])await end(s);
+    for(const s of [...sessions.values()])await end(s,'continue');
     await sleep(2000);
   }
 }

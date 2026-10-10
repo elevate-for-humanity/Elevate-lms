@@ -2,8 +2,9 @@
 
 This repair is incomplete. The follow-up change is a **draft**, not a completed
 telephone replacement or authority to switch carrier traffic. No Telnyx number,
-trunk, authoritative DNS record, production database row or recording was modified
-in preparing it. Local test fixtures are isolated and are not production evidence.
+trunk, authoritative DNS record or recording was changed. No direct production
+SQL write or DDL was performed. A later authenticated browser check used the
+application's normal device connection/disconnection path, as documented below. Local test fixtures are isolated and are not production evidence.
 
 ## Merged readiness repair
 
@@ -335,3 +336,39 @@ failed authentication, disconnected, slept or lost microphone permission.
 No device status was rewritten by this audit. Last-24-hour aggregate carrier event
 counts included answer, recording and PARIS-history receipts, but receipt presence
 is not proof of a successful live acceptance conversation or recipient delivery.
+
+
+## Authenticated desktop phone check and lifecycle repair
+
+The existing signed-in browser session successfully loaded the production LMS
+phone dashboard and its assigned extension. The current carrier client connected,
+and an aggregate Supabase check at **08:25:41 UTC** showed one newly created real
+browser-device record and one recent heartbeat (15 total records, compared with
+14 before opening the page). This was the application's normal live registration
+path, not a fabricated database fixture or an Asterisk acceptance test. The test
+browser was explicitly disconnected and closed; existing phone histories,
+callbacks, voicemail and other device records were preserved. No outbound call
+was placed and no callback or notification was submitted.
+
+**PASS — Authenticated dashboard access and current carrier connection UI.**
+**NOT TESTED — Actual incoming ringing or two-way audio.** Independent registration
+still requires the staged Asterisk provisioner, scoped GSM bindings and permitted
+live call participants. An existing authenticated browser is available; credentials
+are not the blocker for this specific dashboard-access check.
+
+**FAIL — Deployed disconnect status:** after disconnect, the live page displayed
+both “Connect phone” and “Phone is online and ready for calls.” The follow-up
+source now clears that stale success message, distinguishes local disconnect
+from failed server presence acknowledgment and fences heartbeat responses to the
+current registration epoch. A late heartbeat cannot promote a disconnected or
+closed provider connection back online. Three actual React lifecycle tests pass;
+LMS TypeScript and scoped ESLint pass. These source fixes are not deployed.
+
+PBX startup preservation was isolated into merged PRs **1698** and **1699**.
+Live run **38037901924** verified unchanged PBX and TLS gateway container IDs,
+running state and start times. Startup metadata replacement stopped with
+`unrecognized_startup_script_preserved`; no metadata was changed by that run.
+PR **1700** pins the separately reviewed original repository bootstrap as another
+exact recognized source. Unknown/custom scripts remain blocked. The original
+source's Git blob is `3b34247ddef19178e3bcdc1c94cdc5d46ac2f06f`; no runtime
+script contents, credentials or caller details were copied to this report.

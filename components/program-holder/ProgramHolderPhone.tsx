@@ -124,6 +124,8 @@ export function ProgramHolderPhone({
   const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const connectionAbortRef = useRef<AbortController | null>(null);
+  const registrationEpochRef = useRef(0);
+  const registeredRef = useRef(false);
   const ringModeRef = useRef<RingMode>('ring');
   const autoConnectAttemptedRef = useRef(false);
 
@@ -156,7 +158,11 @@ export function ProgramHolderPhone({
   }, [load]);
 
   const heartbeat = useCallback(async () => {
+    const controller = connectionAbortRef.current;
+    const epoch = registrationEpochRef.current;
+    if (!controller || controller.signal.aborted || !registeredRef.current) return;
     const response = await fetch(apiBase, {
+      signal: controller.signal,
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -165,8 +171,10 @@ export function ProgramHolderPhone({
         inCall: Boolean(callRef.current),
       }),
     }).catch(() => undefined);
+    if (controller.signal.aborted || epoch !== registrationEpochRef.current || !registeredRef.current) return;
     if (!response?.ok) {
       setConnected(false);
+      setMessage('');
       setError('Registration reachability is not yet verified. The phone will check again automatically.');
     } else {
       setConnected(true);
@@ -177,6 +185,12 @@ export function ProgramHolderPhone({
 
   const disconnect = useCallback(async () => {
     connectionAbortRef.current?.abort();
+    registrationEpochRef.current += 1;
+    registeredRef.current = false;
+    setConnected(false);
+    setConnecting(false);
+    setError('');
+    setMessage('Phone disconnected.');
     if (heartbeatRef.current) clearInterval(heartbeatRef.current);
     heartbeatRef.current = null;
     try {
@@ -184,12 +198,13 @@ export function ProgramHolderPhone({
     } catch {
       // The presence timeout is the fallback when a socket has already closed.
     }
-    await fetch(apiBase, {
+    const response = await fetch(apiBase, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'disconnect', deviceId: deviceId() }),
       keepalive: true,
     }).catch(() => undefined);
+    if (!response?.ok) setError('Phone disconnected locally. Server presence could not yet be confirmed.');
     clientRef.current = null;
     callRef.current = null;
     setConnected(false);
@@ -199,6 +214,8 @@ export function ProgramHolderPhone({
   useEffect(() => {
     return () => {
       connectionAbortRef.current?.abort();
+      registrationEpochRef.current += 1;
+      registeredRef.current = false;
       if (heartbeatRef.current) clearInterval(heartbeatRef.current);
       void clientRef.current?.disconnect();
     };
@@ -230,6 +247,8 @@ export function ProgramHolderPhone({
       let ready = false;
       client.on('ready', () => {
         if (controller.signal.aborted) return;
+        registrationEpochRef.current += 1;
+        registeredRef.current = true;
         ready = true;
         setConnecting(false);
         setMessage('Registration established. Verifying reachability…');
@@ -237,13 +256,19 @@ export function ProgramHolderPhone({
       });
       client.on('offline', () => {
         if (controller.signal.aborted) return;
+        registrationEpochRef.current += 1;
+        registeredRef.current = false;
         ready = false;
         setConnected(false);
+        setMessage('Phone is offline.');
       });
       client.on('error', (event: any) => {
         if (controller.signal.aborted) return;
+        registrationEpochRef.current += 1;
+        registeredRef.current = false;
         ready = false;
         setConnected(false);
+        setMessage('');
         setError(
           event?.error?.message || event?.message || 'The phone connection reported an error.',
         );
@@ -291,9 +316,9 @@ export function ProgramHolderPhone({
       }, 45_000);
     } catch (cause) {
       if (controller.signal.aborted) return;
-      setError(cause instanceof Error ? cause.message : 'The phone could not connect.');
       setConnecting(false);
       await disconnect();
+      setError(cause instanceof Error ? cause.message : 'The phone could not connect.');
     }
   }, [connected, connecting, data, disconnect, heartbeat]);
 

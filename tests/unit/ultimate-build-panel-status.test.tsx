@@ -27,6 +27,8 @@ function show(jobStatus: string, buildStatus = 'running') {
                 id: 'persisted-job',
                 status: jobStatus,
                 created_at: '2026-10-03T00:00:00Z',
+                heartbeat_at: new Date().toISOString(),
+                lease_expires_at: new Date(Date.now()+300_000).toISOString(),
                 last_error: jobStatus === 'failed' ? 'SCENE_COVERAGE_REQUIRED' : null,
               },
             ],

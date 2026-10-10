@@ -1,6 +1,29 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { summarizeRevision, inspectPermissionBoundary, PERMISSION_GROUPS } from './preflight-isolated-workloads.mjs';
+import { summarizeRevision, inspectPermissionBoundary, inspectRunQuotaOptions, PERMISSION_GROUPS } from './preflight-isolated-workloads.mjs';
+
+test('quota audit follows read-only pages without exposing contact information or credentials', async () => {
+  let calls = 0;
+  const result = await inspectRunQuotaOptions('private-token', async (url, init) => {
+    assert.equal(init.method, undefined);
+    calls++;
+    const body = url.pathname.endsWith('/quotaInfos')
+      ? {quotaInfos: [{service: 'run.googleapis.com', quotaId: 'CpuAllocPerProjectRegion', metric: 'run.googleapis.com/cpu_allocation', isFixed: false}], ...(calls === 1 ? {nextPageToken: 'next'} : {})}
+      : {quotaPreferences: [{service: 'run.googleapis.com', quotaId: 'CpuAllocPerProjectRegion', contactEmail: 'private@example.invalid', justification: 'private-context', quotaConfig: {preferredValue: '32000', grantedValue: '20000'}, reconciling: true}]};
+    return {ok: true, status: 200, json: async () => body};
+  });
+  assert.equal(calls, 3);
+  assert.equal(result.preferences[0].preferredValue, '32000');
+  assert(!JSON.stringify(result).includes('private'));
+});
+
+test('quota API denial stays visible without leaking the error body', async () => {
+  const result = await inspectRunQuotaOptions('token', async () => ({ok: false, status: 403,
+    json: async () => ({error: {status: 'PERMISSION_DENIED', message: 'private-response', details: [{reason: 'SERVICE_DISABLED'}]}})}));
+  assert.equal(result.reads.length, 2);
+  assert.equal(result.reads[0].errorReasons[0], 'SERVICE_DISABLED');
+  assert(!JSON.stringify(result).includes('private-response'));
+});
 
 test('serving revision summary preserves its own resource limits without exposing credentials', () => {
   const revision = {metadata: {name: 'admin-serving', annotations: {'run.googleapis.com/cpu-throttling': 'false'}}, spec: {serviceAccountName: 'runtime@example.invalid', containers: [{image: 'image@sha256:abc', resources: {limits: {cpu: '4', memory: '8Gi'}}, env: [{name: 'SUPABASE_SERVICE_ROLE_KEY', value: 'private-value'}, {name: 'DISABLE_ADMIN_VIDEO_WORKER', value: 'false'}]}]}};

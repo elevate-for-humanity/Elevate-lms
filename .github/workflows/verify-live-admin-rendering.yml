@@ -4,6 +4,13 @@ on:
     branches: [main]
     paths: ['.github/workflows/verify-live-admin-rendering.yml']
   workflow_dispatch:
+    inputs:
+      region:
+        description: Google region of the video renderer
+        type: choice
+        options: [us-east1, us-central1]
+        default: us-east1
+        required: true
 permissions:
   contents: read
   actions: write
@@ -31,30 +38,34 @@ jobs:
         with:
           skip_install: true
       - name: Inspect effective runtime and sanitized render failure categories
+        env:
+          RENDER_REGION: ${{ inputs.region || 'us-east1' }}
         run: |
           node --input-type=module <<'NODE'
           import {execFileSync} from 'node:child_process';
+          const renderRegion=process.env.RENDER_REGION;
+          if(!['us-east1','us-central1'].includes(renderRegion))throw new Error('Unsupported render region');
           const base=['--project=elegant-racer-299721','--format=json'];
           const service=JSON.parse(execFileSync('gcloud',['run','services','describe','elevate-admin-migration','--region=us-central1',...base],{encoding:'utf8'}));
           const spec=service.spec.template.spec;
           const env=Object.fromEntries((spec.containers[0].env||[]).filter(x=>typeof x.value==='string').map(x=>[x.name,x.value]));
           console.log(JSON.stringify({latestReadyRevision:service.status.latestReadyRevisionName,traffic:service.status.traffic,resources:spec.containers[0].resources,scaling:service.spec.template.metadata.annotations,narrationProvider:['kokoro','local','cloudflare'].includes(env.AI_NARRATION_PROVIDER)?env.AI_NARRATION_PROVIDER:'other',workerDisabled:env.DISABLE_ADMIN_VIDEO_WORKER==='true'}));
           try {
-            const job=JSON.parse(execFileSync('gcloud',['run','jobs','describe','elevate-video-render','--region=us-central1',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            const job=JSON.parse(execFileSync('gcloud',['run','jobs','describe','elevate-video-render','--region='+renderRegion,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             const task=job.spec.template.spec.template.spec;
             const videoContainer=task.containers[0];
             const videoEnv=Object.fromEntries((videoContainer.env||[]).filter(x=>typeof x.value==='string').map(x=>[x.name,x.value]));
             const safe=text=>String(text||'').replace(/https?:\/\/[^\s"']+/g,'[url]').replace(/Bearer\s+\S+/gi,'Bearer [redacted]').replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[token]').slice(0,2000);
             const conditions=items=>(items||[]).map(x=>({type:x.type,status:x.status,reason:x.reason,message:safe(x.message)}));
-            console.log(JSON.stringify({videoJobPresent:true,resources:videoContainer.resources,conditions:conditions(job.status?.conditions),videoJobImage:videoContainer.image,videoJobIdentity:task.serviceAccountName,videoJobRetries:task.maxRetries,videoJobTimeout:task.timeoutSeconds,command:videoContainer.command,args:(videoContainer.args||[]).map((x,i)=>i<2?x:{characters:x.length,hasMainCall:x.includes('await runFiniteVideoRender();')}),envPresent:Object.fromEntries(['SUPABASE_SERVICE_ROLE_KEY','CRON_SECRET','VIDEO_JOB_ID','VIDEO_COURSE_ID'].map(x=>[x,Boolean(videoEnv[x])])),expectedDatabase:videoEnv.NEXT_PUBLIC_SUPABASE_URL==='https://cuxzzpsyufcewtmicszk.supabase.co'}));
-            const executions=JSON.parse(execFileSync('gcloud',['run','jobs','executions','list','--job=elevate-video-render','--region=us-central1',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
-            console.log(JSON.stringify({videoExecutions:executions.slice(0,3).map(x=>({name:x.metadata.name,started:x.status?.startTime,completed:x.status?.completionTime,running:x.status?.runningCount,succeeded:x.status?.succeededCount,failed:x.status?.failedCount,conditions:conditions(x.status?.conditions)}))}));
+            console.log(JSON.stringify({videoJobPresent:true,region:renderRegion,resources:videoContainer.resources,conditions:conditions(job.status?.conditions),videoJobImage:videoContainer.image,videoJobIdentity:task.serviceAccountName,videoJobRetries:task.maxRetries,videoJobTimeout:task.timeoutSeconds,command:videoContainer.command,args:(videoContainer.args||[]).map((x,i)=>i<2?x:{characters:x.length,hasMainCall:x.includes('await runFiniteVideoRender();')}),envPresent:Object.fromEntries(['SUPABASE_SERVICE_ROLE_KEY','CRON_SECRET','VIDEO_JOB_ID','VIDEO_COURSE_ID'].map(x=>[x,Boolean(videoEnv[x])])),expectedDatabase:videoEnv.NEXT_PUBLIC_SUPABASE_URL==='https://cuxzzpsyufcewtmicszk.supabase.co'}));
+            const executions=JSON.parse(execFileSync('gcloud',['run','jobs','executions','list','--job=elevate-video-render','--region='+renderRegion,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            console.log(JSON.stringify({region:renderRegion,videoExecutions:executions.slice(0,3).map(x=>({name:x.metadata.name,started:x.status?.startTime,completed:x.status?.completionTime,running:x.status?.runningCount,succeeded:x.status?.succeededCount,failed:x.status?.failedCount,conditions:conditions(x.status?.conditions)}))}));
             for(const execution of executions.slice(0,2)) {
               const name=execution.metadata.name;
-              const tasks=JSON.parse(execFileSync('gcloud',['run','jobs','executions','tasks','list','--execution='+name,'--region=us-central1',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+              const tasks=JSON.parse(execFileSync('gcloud',['run','jobs','executions','tasks','list','--execution='+name,'--region='+renderRegion,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
               console.log(JSON.stringify({execution:name,tasks:tasks.map(t=>({name:t.metadata.name,started:t.status?.startTime,completed:t.status?.completionTime,conditions:conditions(t.status?.conditions),lastAttemptResult:t.status?.lastAttemptResult,retried:t.status?.retried,resources:t.spec?.containers?.map(c=>c.resources)}))}));
             }
-            const jobFilter='resource.type="cloud_run_job" AND resource.labels.job_name="elevate-video-render" AND severity>=WARNING';
+            const jobFilter='resource.type="cloud_run_job" AND resource.labels.job_name="elevate-video-render" AND resource.labels.location="'+renderRegion+'" AND severity>=WARNING';
             const logs=JSON.parse(execFileSync('gcloud',['logging','read',jobFilter,'--freshness=3d','--limit=30',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             for(const row of logs) {
               let message=row.textPayload||row.jsonPayload?.message||row.protoPayload?.status?.message||'';

@@ -6,6 +6,53 @@ trunk, authoritative DNS record or recording was changed. No direct production
 SQL write or DDL was performed. A later authenticated browser check used the
 application's normal device connection/disconnection path, as documented below. Local test fixtures are isolated and are not production evidence.
 
+## Latest verified state
+
+**PASS — Installed PBX startup protection.** Merged PRs
+[1698](https://github.com/elevate-for-humanity/Elevate-lms/pull/1698),
+[1699](https://github.com/elevate-for-humanity/Elevate-lms/pull/1699) and
+[1700](https://github.com/elevate-for-humanity/Elevate-lms/pull/1700) produced
+[live run 38038427507](https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/38038427507),
+job 114173656826. Google readback at **08:38:01 UTC** confirmed replacement of
+the exact reviewed original startup script with the guarded script. The VM
+identity/start time, unrelated metadata and both PBX/gateway container identities
+and start times were unchanged. The workflow did not execute the bootstrap,
+reboot the VM or reload Asterisk. **NOT TESTED — Reboot acceptance.** This
+supersedes the earlier historical warning that installed metadata was unprotected.
+
+- Original script SHA-256: `299c9c79d276021e334cef3c9ffb08d97f6b9126eeb1b07984584c0f376e94b7`.
+- Verified installed SHA-256: `fa3ec23d8f5bc5274bc1baf747c03b7ea70ff2364bc49fa11b6581fdad39e4e1`.
+
+The draft phone repair at `d7c5fb9d8cad21f5e3be043472dbe03635f755e2`
+passed CI Required Gate, all three canonical container builds, TypeScript, lint,
+**74** phone unit checks at that head and the PostgreSQL 17 phone migration
+contract. Nonrequired Accessibility, Integrity and Procurement checks failed;
+no failing check was disabled. Enrollment E2E was still running when inspected.
+
+A subsequent source inspection reproduced **six false-success paths** in the
+actual webhook: failed device-leg writes, an unknown leg outcome treated as
+unanswered, an unbound recording callback and a zero-row recording update.
+The patch requires persisted rows, scopes leg/callback access to the current
+call and stops fallback execution when a leg outcome is unknown. Nine added
+regression/positive-path cases pass; the complete affected suite now has **83
+passing tests across 14 files**. Fresh Admin TypeScript and source lint pass.
+These remain source-test results, not proof of voicemail delivery or real calls.
+
+**BLOCKED — Independent runtime activation:** the existing deployment identity
+cannot create/bind the required GSM secrets or grant runtime access; the PBX
+identity lacks the required Google API scope. A Google administrator must prepare
+the specific provisioning/Supabase secret bindings and a reviewed runtime identity
+or controlled scope maintenance. Regional CPU quota still blocks observed Cloud
+Run activation attempts; alternative public activation requires owner-controlled
+invoker access. No IAM, VM scope or carrier changes were made to bypass this.
+
+**FAIL — Independent PARIS and voicemail implementation:** the duplex media/action
+bridge and independent recording-to-inbox integration remain incomplete. These
+are implementation gaps, not merely missing acceptance evidence. All four staged
+migrations, the provisioner and the revised phone handlers remain undeployed.
+The signed-in desktop browser works; real audio participants and supported mobile
+devices are still needed for controlled ringing/audio/voicemail acceptance.
+
 ## Merged readiness repair
 
 [PR 1691](https://github.com/elevate-for-humanity/Elevate-lms/pull/1691) merged at

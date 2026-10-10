@@ -841,7 +841,7 @@ async function handleEvent(
 
   if (state.phase === 'webrtc_leg' || state.phase === 'external_fallback') {
     if (type === 'call.initiated') {
-      await db.from('phone_call_legs').upsert(
+      await persistPhoneRow(db.from('phone_call_legs').upsert(
         {
           call_id: call.id,
           provider_call_id: payload.call_control_id,
@@ -852,37 +852,42 @@ async function handleEvent(
           updated_at: new Date().toISOString(),
         },
         { onConflict: 'provider_call_id' },
-      );
+      ));
       return;
     }
     if (type === 'call.answered') {
       await Promise.all([
-        db
+        persistPhoneRow(db
           .from('phone_call_legs')
           .update({
             status: 'answered',
             answered_at: event.data.occurred_at,
             updated_at: new Date().toISOString(),
           })
-          .eq('provider_call_id', payload.call_control_id),
-        db
+          .eq('provider_call_id', payload.call_control_id)
+          .eq('call_id', call.id)),
+        persistPhoneRow(db
           .from('phone_calls')
           .update({
             status: 'answered',
             answered_at: event.data.occurred_at,
             updated_at: new Date().toISOString(),
           })
-          .eq('id', call.id),
+          .eq('id', call.id)),
       ]);
       return;
     }
     if (type === 'call.hangup') {
-      const { data: leg } = await db
+      const { data: leg, error: legError } = await db
         .from('phone_call_legs')
         .select('answered_at')
         .eq('provider_call_id', payload.call_control_id)
+        .eq('call_id', call.id)
         .maybeSingle();
-      await db
+      // Unknown persistence is not evidence that nobody answered. Preserve the
+      // event for retry; never start PARIS or another ring leg on that guess.
+      if (legError || !leg) throw new Error('Phone leg outcome unavailable');
+      await persistPhoneRow(db
         .from('phone_call_legs')
         .update({
           status: 'completed',
@@ -890,7 +895,8 @@ async function handleEvent(
           hangup_cause: payload.hangup_cause || null,
           updated_at: new Date().toISOString(),
         })
-        .eq('provider_call_id', payload.call_control_id);
+        .eq('provider_call_id', payload.call_control_id)
+        .eq('call_id', call.id));
       if (state.extensionId) {
         await db
           .from('communication_extensions')
@@ -1021,7 +1027,7 @@ async function handleEvent(
       await persistPhoneRow(db
         .from('phone_callback_tasks')
         .update({ transcript, updated_at: new Date().toISOString() })
-        .eq('id', state.taskId));
+        .eq('id', state.taskId).eq('call_id', call.id));
     }
     return;
   }
@@ -1031,11 +1037,10 @@ async function handleEvent(
     const program = String(partial.program_interest || partial.program_or_department || '').trim();
     const route = await resolveProgramRoute(db, system, program);
     if (route) {
-      const { error } = await db.from('phone_callback_tasks').update({
+      await persistPhoneRow(db.from('phone_callback_tasks').update({
         extension_id: route.extensionId, assigned_profile_id: route.profileId,
         program_or_department: program.slice(0, 300), updated_at: new Date().toISOString(),
-      }).eq('id', state.taskId);
-      if (error) throw error;
+      }).eq('id', state.taskId).eq('call_id', call.id));
     }
     return;
   }
@@ -1043,7 +1048,7 @@ async function handleEvent(
   if (type === 'call.ai_gather.ended' && state.taskId) {
     const result = aiResult(payload.result);
     const { data: existingTask, error: taskLookupError } = await db.from('phone_callback_tasks').select('extension_id,assigned_profile_id')
-      .eq('id', state.taskId).maybeSingle();
+      .eq('id', state.taskId).eq('call_id', call.id).maybeSingle();
     if (taskLookupError || !existingTask) throw new Error('Callback task unavailable');
     const savedState = { ...state, extensionId: existingTask?.extension_id || state.extensionId,
       profileId: existingTask?.assigned_profile_id || state.profileId };
@@ -1101,7 +1106,7 @@ async function handleEvent(
         status: 'new',
         updated_at: new Date().toISOString(),
       })
-      .eq('id', state.taskId));
+      .eq('id', state.taskId).eq('call_id', call.id));
     const { data: attemptedExtension } = assignedState.extensionId
       ? await db.from('communication_extensions').select('extension').eq('id', assignedState.extensionId).maybeSingle()
       : { data: null };
@@ -1109,6 +1114,7 @@ async function handleEvent(
       .from('phone_callback_tasks')
       .select('transcript')
       .eq('id', state.taskId)
+      .eq('call_id', call.id)
       .maybeSingle();
     await notifyAssignee(db, {
       profileId: assignedState.profileId,
@@ -1164,21 +1170,20 @@ async function handleEvent(
   ) {
     const recordingUrl = payload.recording_urls.mp3 || payload.recording_urls.wav;
     const { data: recordingTask, error: taskLookupError } = state.taskId
-      ? await db.from('phone_callback_tasks').select('source,transcript,summary,extension_id,assigned_profile_id').eq('id', state.taskId).maybeSingle()
+      ? await db.from('phone_callback_tasks').select('source,transcript,summary,extension_id,assigned_profile_id')
+          .eq('id', state.taskId).eq('call_id', call.id).maybeSingle()
       : { data: null, error: null };
-    if (taskLookupError) throw taskLookupError;
+    if (taskLookupError || (state.taskId && !recordingTask)) throw new Error('Recording callback unavailable');
     if (state.taskId && recordingUrl) {
-      const { error } = await db
+      await persistPhoneRow(db
         .from('phone_callback_tasks')
         .update({ recording_url: recordingUrl, updated_at: new Date().toISOString() })
-        .eq('id', state.taskId);
-      if (error) throw error;
+        .eq('id', state.taskId).eq('call_id', call.id));
     }
-    const { error: recordingError } = await db
+    await persistPhoneRow(db
       .from('phone_calls')
       .update({ recording_url: recordingUrl, updated_at: new Date().toISOString() })
-      .eq('id', call.id);
-    if (recordingError) throw recordingError;
+      .eq('id', call.id));
     // Telnyx may retain the prompt state on recording.saved. The persisted
     // callback source identifies the voicemail even when action state lags.
     if ((recordingTask?.source === 'voicemail' || ['voicemail_recording', 'voicemail_prompt'].includes(state.phase)) && recordingUrl) {
@@ -1201,8 +1206,7 @@ async function handleEvent(
         summary: recordingTask?.summary || null,
       };
       if (!existingVoicemail) {
-        const { error } = await db.from('voicemails').insert(voicemail);
-        if (error) throw error;
+        await persistPhoneRow(db.from('voicemails').insert(voicemail));
       }
       await notifyAssignee(db, {
         profileId: recordingTask?.assigned_profile_id || state.profileId,
@@ -1225,7 +1229,7 @@ async function handleEvent(
           summary: payload.transcription_text.slice(0, 1000),
           updated_at: new Date().toISOString(),
         })
-        .eq('id', state.taskId));
+        .eq('id', state.taskId).eq('call_id', call.id));
     }
     const { error: transcriptionError } = await db
       .from('voicemails')
@@ -1244,8 +1248,9 @@ async function handleEvent(
         .from('phone_callback_tasks')
         .select('summary,callback_number,assigned_profile_id')
         .eq('id', state.taskId)
+        .eq('call_id', call.id)
         .maybeSingle();
-      if (taskLookupError) throw new Error('Callback task unavailable');
+      if (taskLookupError || !unfinished) throw new Error('Callback task unavailable');
       if (unfinished && !unfinished.summary) {
         await persistPhoneRow(db
           .from('phone_callback_tasks')
@@ -1253,7 +1258,7 @@ async function handleEvent(
             summary: 'Caller disconnected before PARIS finished the interview.',
             updated_at: new Date().toISOString(),
           })
-          .eq('id', state.taskId));
+          .eq('id', state.taskId).eq('call_id', call.id));
         await notifyAssignee(db, {
           profileId: unfinished.assigned_profile_id || state.profileId,
           taskId: state.taskId,

@@ -74,3 +74,9 @@ test('cleanup errors do not hide the activation failure',async()=>{
  f.options.read=args=>{const state=read(args);if(args.some(x=>x.startsWith('--update-tags=')))throw Error('original quota error');if(args.some(x=>x.startsWith('--remove-tags=')))throw Error('cleanup error');return state;};
  await assert.rejects(activateTestedRevision(f.options),/original quota error/);
 });
+
+test('legacy startup-test tag is retired only after its revision stops serving',()=>{
+ const tagged={revisionName:'former-serving',tag:'startup-gen2'};
+ assert.deepEqual(unusedCandidateTags({status:{traffic:[tagged,{revisionName:'former-serving',percent:100}]}}),[]);
+ assert.deepEqual(unusedCandidateTags({status:{traffic:[tagged,{revisionName:'new-serving',percent:100}]}}),['startup-gen2']);
+});

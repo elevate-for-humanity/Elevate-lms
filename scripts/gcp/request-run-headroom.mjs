@@ -107,7 +107,8 @@ export async function requestHeadroom(token, contactEmail, request = fetch, {req
     results.push({quotaId: target.quotaId, previousValue: value,
       desiredValue: desired, requestedValue: desired, effectiveValue, effectiveReadFailed,
       httpStatus: response.status, accepted: response.ok, name, ...providerState(body, secrets),
-      errorStatus: safeCode(body.error?.status), errorReasons: (body.error?.details || []).map(x => safeCode(x.reason)).filter(Boolean)});
+      errorStatus: safeCode(body.error?.status), errorMessage: sanitizeText(body.error?.message, secrets),
+      errorReasons: (body.error?.details || []).map(x => safeCode(x.reason)).filter(Boolean)});
   }
   return results;
 }

@@ -6,15 +6,17 @@ const commit='7996edf490a00d69d2de895b111b2c0b88ef2df0';
 const imageBase='us-central1-docker.pkg.dev/'+project+'/elevate/marketing';
 function cli(args,timeout=180000){return execFileSync('gcloud',[...args,'--project='+project,'--quiet'],{encoding:'utf8',timeout,stdio:['ignore','pipe','pipe']}).trim();}
 function read(args){return JSON.parse(cli([...args,'--format=json']));}
-async function version(root){const r=await fetch(root+'/api/version',{cache:'no-store',signal:AbortSignal.timeout(30000)});assert.equal(r.status,200);const v=await r.json();assert.equal(v.commitSha||v.commit||v.sha,commit);}
+let regionalIdentity;
+function request(url,options={}){return fetch(url,{...options,headers:{...options.headers,...(regionalIdentity&&url.includes('.run.app')?{authorization:'Bearer '+regionalIdentity}:{})}});}
+async function version(root){const r=await request(root+'/api/version',{cache:'no-store',signal:AbortSignal.timeout(30000)});assert.equal(r.status,200);const v=await r.json();assert.equal(v.commitSha||v.commit||v.sha,commit);}
 async function acceptance(root){
  await version(root);
- const health=await fetch(root+'/api/health',{signal:AbortSignal.timeout(45000)});assert.equal(health.status,200);assert.equal((await health.json()).healthy,true);
- const page=await fetch(root+'/',{signal:AbortSignal.timeout(45000)});assert.equal(page.status,200);const html=await page.text();
+ const health=await request(root+'/api/health',{signal:AbortSignal.timeout(45000)});assert.equal(health.status,200);assert.equal((await health.json()).healthy,true);
+ const page=await request(root+'/',{signal:AbortSignal.timeout(45000)});assert.equal(page.status,200);const html=await page.text();
  for(const text of ['Top Shelf Barber Lounge','Grow your team','Join the Host Shop network','bg-sky-50']) assert(html.includes(text),'Missing '+text);
  assert(!html.includes('Razor’s Image Barbershop'));
- for(const path of ['/host-shops/top-shelf-barber-lounge','/partners/host-shops','/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade-enhanced-2026.webp','/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp']){const r=await fetch(root+path,{signal:AbortSignal.timeout(45000)});assert.equal(r.status,200,path);}
- const privateRoute=await fetch(root+'/api/tax/returns',{signal:AbortSignal.timeout(30000)});assert.equal(privateRoute.status,401,'Private tax API must retain authentication');
+ for(const path of ['/host-shops/top-shelf-barber-lounge','/partners/host-shops','/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade-enhanced-2026.webp','/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp']){const r=await request(root+path,{signal:AbortSignal.timeout(45000)});assert.equal(r.status,200,path);}
+ const privateRoute=await request(root+'/api/tax/returns',{signal:AbortSignal.timeout(30000)});assert.equal(privateRoute.status,401,'Private tax API must retain authentication');
 }
 const original=read(['compute','backend-services','describe',backend,'--global']);
 const map=read(['compute','url-maps','describe','elevate-public-routes','--global']);
@@ -43,6 +45,16 @@ if(!east){
  writeFileSync('/tmp/marketing-east-policy.json',JSON.stringify(policy),{mode:0o600});
  cli(['run','services','set-iam-policy',service,'/tmp/marketing-east-policy.json','--region='+region]);
  east=read(['run','services','describe',service,'--region='+region]);
+}
+const permissionToken=cli(['auth','print-access-token']);
+const permissionResponse=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/'+project+':testIamPermissions',{method:'POST',headers:{authorization:'Bearer '+permissionToken,'content-type':'application/json'},body:JSON.stringify({permissions:['run.services.setIamPolicy','compute.backendServices.update','compute.networkEndpointGroups.create']}),signal:AbortSignal.timeout(30000)});
+const permissionData=await permissionResponse.json();assert(permissionResponse.ok,'Permission readback failed');
+console.log(JSON.stringify({deploymentPermissions:permissionData.permissions||[]}));
+if(!permissionData.permissions?.includes('run.services.setIamPolicy')){
+ regionalIdentity=cli(['auth','print-identity-token','--audiences='+east.status.url]);
+ await acceptance(east.status.url);
+ console.log(JSON.stringify({authenticatedRegionalRuntimeVerified:true,region,url:east.status.url,commit,missingPermission:'run.services.setIamPolicy'}));
+ throw Error('Regional runtime verified; owner must copy public invoker access before website cutover.');
 }
 assert.equal(east.spec.template.spec.containers[0].image,image,'Regional service contains a different release');
 assert(east.status.conditions.some(c=>c.type==='Ready'&&c.status==='True'));

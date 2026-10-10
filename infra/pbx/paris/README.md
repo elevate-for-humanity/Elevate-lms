@@ -20,9 +20,9 @@ The endpoint URL must be private HTTPS. Credentials must be supplied at runtime
 from Google Secret Manager; never commit or print them. The turn processor must
 accept `{callId,sessionId,sequence,encoding:'PCMU',sampleRate:8000,audioBase64}`
 and return `{replyAudioUlawBase64,endCall?}` where the reply is 8 kHz PCMU.
-An actual authenticated PARIS conversation/ASR/TTS processor implementing this
-contract is still required. The service fails closed when it is missing; it
-cannot synthesize a working receptionist by itself.
+The Google ASR/TTS turn adapter implementing this contract is described below.
+Its required private TLS route, identity, secrets and running processes must be
+verified before enabling a controlled test extension.
 
 ## Next gates before release
 
@@ -43,7 +43,7 @@ These tests verify packet/boundary behavior only; they do NOT certify a live cal
 
 ## Phase 2: real Google voice turns (source implemented, NOT deployed)
 
-`turn-adapter.mjs` now performs actual Google Speech-to-Text recognition for
+`turn-adapter.mjs` implements Google Speech-to-Text recognition for
 MULAW/8000 caller audio, a constrained Vertex Gemini conversational response,
 and Google Text-to-Speech synthesis of 8 kHz PCM converted to PCMU RTP payload.
 The adapter binds **127.0.0.1:8091** and exposes only
@@ -51,6 +51,35 @@ The adapter binds **127.0.0.1:8091** and exposes only
 from Secret Manager; the gateway requires the same secret and a **private HTTPS**
 proxy destination in `PARIS_TURN_URL`. ARI credentials are independent of this
 secret. No plain HTTP/public turn service is authorized.
+
+## Runtime startup wiring
+
+The systemd units run as a dedicated `elevate-paris` OS account. Install the two
+units, `paris/*.mjs`, and `runtime-secrets.mjs` under `/opt/elevate-pbx/`, keeping
+the same directory layout. They require `/usr/bin/node` version 22 or later.
+`launch.mjs` loads role-specific secrets from Compute workload identity before
+importing the gateway or adapter; no password belongs in the unit or config file.
+The root-owned `/etc/elevate-pbx/paris.conf` supplies these nonsecret settings:
+
+- `PARIS_ARI_USER=elevate-paris` (must match a reviewed runtime ARI user)
+- `PARIS_ARI_PASSWORD_SECRET`: pinned GSM version resource from the bootstrap report
+- `PARIS_TURN_TOKEN_SECRET`: pinned GSM version resource from the bootstrap report
+- `PARIS_TURN_URL=https://phone.elevateforhumanity.org/internal/paris/turn`
+
+Merge `Caddyfile.fragment` into the existing hostname block, validate the complete
+Caddy configuration, and reload without recreating its container. `private-turn.mjs`
+connects directly to 127.0.0.1:443, retaining the public hostname for TLS certificate
+verification and SNI. The proxy route accepts loopback clients only; the adapter
+retains its independent bearer-token check. No external turn endpoint is opened.
+
+`scripts/gcp/prepare-pbx-secrets.mjs --apply` creates/reuses four owned GSM secrets,
+copies the existing LMS Supabase service key in memory, and grants per-secret
+runtime access. It checks required permissions before writing anything and never
+rotates existing enabled versions. Run it from the repository root using Node 22+
+and an authorized project administrator's gcloud session when the WIF identity
+reports missing permissions. Do not grant project-wide Secret Manager Admin as a
+shortcut. This preparation does not change Telnyx, select extensions, install
+mailboxes, or claim live call acceptance.
 
 Required prerequisites: Google VM service identity has only the needed Speech,
 Vertex AI and Text-to-Speech permissions; those APIs are enabled; the private TLS

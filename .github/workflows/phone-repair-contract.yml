@@ -38,7 +38,7 @@ jobs:
           version: 10.28.2
       - run: pnpm install --frozen-lockfile
       - run: node --test infra/pbx/provisioner/server.test.mjs
-      - run: node --test infra/pbx/paris/ari-media.test.mjs infra/pbx/paris/turn-adapter.test.mjs
+      - run: node --test infra/pbx/paris/*.test.mjs infra/pbx/runtime-secrets.test.mjs
       - run: python3 scripts/gcp/test-audit-pbx-runtime.py
       - run: python3 scripts/gcp/test-pbx-bootstrap.py
       - run: python3 scripts/gcp/test-pbx-tls-preservation.py

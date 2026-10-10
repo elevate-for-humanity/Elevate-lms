@@ -33,6 +33,8 @@ jobs:
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Traffic scope and unavailable-data regression tests
         run: node --test tests/unit/traffic-report.test.mjs
+      - name: Google runtime settings regression tests
+        run: pnpm exec vitest run tests/unit/google-container-env.test.ts
       - name: Block retired Admin UI routes
         run: node scripts/verify-no-retired-admin-ui-routes.mjs
       - name: Recovery hardening regression check

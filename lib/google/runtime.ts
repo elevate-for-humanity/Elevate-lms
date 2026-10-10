@@ -17,5 +17,5 @@ export function isGoogleRuntimeReady(){return Boolean(process.env.GOOGLE_CLOUD_P
 export async function getGoogleService(service:GoogleServiceSummary){
  const response=await fetch(service.url.replace(/\/$/,'')+service.healthPath,{cache:'no-store',signal:AbortSignal.timeout(8000)});
  const body=await response.json().catch(()=>({}));
- return {status:response.ok?'healthy':'unhealthy',commit:body.commit||body.commitSha||null,ready:body.ready===true,healthy:body.healthy===true};
+ return {status:response.ok?'healthy':'unhealthy',commit:body.commit||body.commitSha||null,ready:body.ready===true,healthy:response.ok && body.service===service.key && body.healthy===true && body.configuration?.ok===true && body.dependencies?.supabase?.ok===true};
 }

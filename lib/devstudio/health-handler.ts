@@ -3,19 +3,14 @@ import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
-import {
-  getNorthflankProjectId,
-  getNorthflankServices,
-  isNorthflankReady,
-} from '@/lib/northflank/runtime';
-import { hydrateNorthflankEnv } from '@/lib/secrets';
+import { getGoogleServices, isGoogleRuntimeReady, googleProjectId } from '@/lib/google/runtime';
 import { getGitHubToken } from '@/lib/devstudio/github-token';
 import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 
 /**
  * Canonical Admin-owned Dev Studio health implementation.
  *
- * Master Studio execution uses the Admin control plane and the unified Northflank Studio runtime. The legacy Studio Shell was removed and
+ * Master Studio execution uses the Admin control plane and the Google Studio runtime. The legacy Studio Shell was removed and
  * is explicitly forbidden by scripts/verify-no-studio-shell.mjs, so health must
  * never require STUDIO_SHELL_* variables or advertise a separate shell service.
  */
@@ -36,7 +31,6 @@ export async function handleDevStudioHealth(req: NextRequest) {
       checkedAt: new Date().toISOString(),
     })),
   ]);
-  await hydrateNorthflankEnv().catch(() => undefined);
   const { groq: hasGroq, xai: hasXAI, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic } = ai.providers;
   const hasCloudflare = cloudflareProbe.reachable;
   const githubToken = await getGitHubToken();
@@ -57,16 +51,6 @@ export async function handleDevStudioHealth(req: NextRequest) {
   const activeProvider = ai.activeProvider;
   const hasElevate = ai.elevate;
   const aiConfigured = ai.anyConfigured;
-  const northflankServices = getNorthflankServices().map((service) => ({
-    key: service.key,
-    id: service.id,
-    configured: Boolean(service.id),
-  }));
-  const northflankTokenPresent = Boolean(
-    process.env.NORTHFLANK_API_TOKEN || process.env.NORTHFLANK_API_KEY || process.env.NF_API_TOKEN,
-  );
-  const northflankProjectIdPresent = Boolean(getNorthflankProjectId());
-
   let nextVersion = 'unknown';
   try {
     nextVersion = require('next/package.json').version;
@@ -113,11 +97,10 @@ export async function handleDevStudioHealth(req: NextRequest) {
       repositoryWritesReady: githubTokenValid,
       legacyShellRemoved: true,
     },
-    northflank: {
-      ready: isNorthflankReady(),
-      tokenPresent: northflankTokenPresent,
-      projectIdPresent: northflankProjectIdPresent,
-      services: northflankServices,
+    google: {
+      provider: 'google-cloud', ready: isGoogleRuntimeReady(), project: googleProjectId(),
+      deploymentDispatchReady: githubTokenValid,
+      services: getGoogleServices().map(({ key, id }) => ({ key, id })),
     },
     runtime: 'nodejs',
     service: 'admin',

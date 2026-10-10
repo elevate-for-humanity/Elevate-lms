@@ -5,8 +5,8 @@ import { Activity, AlertTriangle, ExternalLink, Loader2, RefreshCw, Server } fro
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
-const NorthflankStatusPanel = dynamic(
-  () => import('@/components/studio/NorthflankStatusPanel').then((m) => m.default || m),
+const ServicesPanel = dynamic(
+  () => import('@/components/studio/ServicesPanel').then((m) => m.default || m),
   { ssr: false },
 );
 
@@ -26,11 +26,7 @@ type HealthPayload = Record<string, unknown> & {
     repositoryWritesReady?: boolean;
     legacyShellRemoved?: boolean;
   };
-  northflank?: {
-    ready?: boolean;
-    tokenPresent?: boolean;
-    projectIdPresent?: boolean;
-  };
+  google?: { ready?: boolean; project?: string; deploymentDispatchReady?: boolean };
 };
 
 function flag(ok: boolean | undefined) {
@@ -85,8 +81,8 @@ export default function DevStudioHealthPanel() {
               ? 'container token invalid — connected GitHub plugin is separate'
               : 'needs container GitHub token',
         ],
-        ['Northflank API', flag(health.northflank?.tokenPresent)],
-        ['Northflank project', flag(health.northflank?.projectIdPresent)],
+        ['Google runtime', flag(health.google?.ready)],
+        ['Google project', health.google?.project ?? 'unavailable'],
       ]
     : [];
 
@@ -138,24 +134,13 @@ export default function DevStudioHealthPanel() {
           </div>
         )}
 
-        {health?.northflank &&
-          (!health.northflank.tokenPresent || !health.northflank.projectIdPresent) && (
-            <p className="text-xs leading-relaxed text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-              Dev Studio no longer uses the legacy Studio Shell. Container and deployment controls
-              use Northflank directly. Configure{' '}
-              <code className="rounded bg-white px-1">NORTHFLANK_API_TOKEN</code> and{' '}
-              <code className="rounded bg-white px-1">NORTHFLANK_PROJECT_ID</code> in the Admin
-              runtime to enable live service controls.
-            </p>
-          )}
-
         <div className="rounded-xl border border-slate-200">
           <div className="flex items-center gap-2 border-b border-slate-200 px-3 py-2">
             <Server className="h-4 w-4 text-slate-500" />
-            <span className="text-xs font-semibold text-slate-800">Northflank services</span>
+            <span className="text-xs font-semibold text-slate-800">Google Cloud services</span>
           </div>
           <div className="max-h-[320px] overflow-auto">
-            <NorthflankStatusPanel />
+            <ServicesPanel />
           </div>
         </div>
 

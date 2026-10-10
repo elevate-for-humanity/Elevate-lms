@@ -8,6 +8,7 @@ on:
       - 'services/studio-browser/**'
       - 'Dockerfile.studio-browser'
       - 'scripts/gcp/preflight-studio-browser-permissions.mjs'
+      - 'scripts/test-studio-browser-cutover.mjs'
   workflow_dispatch:
 permissions:
   contents: read
@@ -45,6 +46,8 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
+      - name: Verify cutover, encryption-key preservation and exact revision diagnostics
+        run: node --test scripts/test-studio-browser-cutover.mjs
       - name: Check provisioning permissions before building
         run: node scripts/gcp/preflight-studio-browser-permissions.mjs
       - name: Build actual immutable Studio browser container

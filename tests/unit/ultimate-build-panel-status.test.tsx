@@ -10,7 +10,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function show(jobStatus: string, buildStatus = 'running') {
+function show(jobStatus: string, buildStatus = 'running', expired = false) {
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue({
@@ -27,6 +27,8 @@ function show(jobStatus: string, buildStatus = 'running') {
                 id: 'persisted-job',
                 status: jobStatus,
                 created_at: '2026-10-03T00:00:00Z',
+                heartbeat_at: new Date(Date.now() - (expired ? 600_000 : 0)).toISOString(),
+                lease_expires_at: new Date(Date.now() + (expired ? -300_000 : 300_000)).toISOString(),
                 last_error: jobStatus === 'failed' ? 'SCENE_COVERAGE_REQUIRED' : null,
               },
             ],
@@ -75,4 +77,12 @@ it('does not present a completed worker job as a completed course or offer publi
   expect(
     screen.queryByRole('button', { name: 'Publish Ultimate release' }),
   ).not.toBeInTheDocument();
+});
+
+it('shows an expired running job as stalled and enables recovery instead of falsely confirming a worker', async()=>{
+ show('running','running',true);
+ expect(await screen.findByText('stalled · persisted-job')).toBeInTheDocument();
+ expect(screen.getByRole('button',{name:'Resume Ultimate build'})).toBeEnabled();
+ expect(screen.getByRole('alert')).toHaveTextContent('heartbeat is missing or stale');
+ expect(screen.queryByRole('button',{name:'Ultimate build running'})).not.toBeInTheDocument();
 });

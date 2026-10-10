@@ -80,7 +80,7 @@ test('unlimited effective quota is sufficient for finite and maximum requests', 
 });
 
 test('matching or larger prior requests are idempotent without treating them as granted', async () => {
-  for (const preferredValue of ['999999999999']) {
+  for (const preferredValue of ['999999999999999']) {
     const api = provider({preferences: Object.fromEntries(targets.map(t => [t.id,
       preference(t, {quotaConfig: {preferredValue, grantedValue: '20000'}})]))});
     const results = await requestHeadroom('token', 'owner@example.test', api.request);

@@ -13,6 +13,7 @@ on:
       - 'Dockerfile.ultimate-worker'
       - 'tsconfig.ultimate-worker.json'
       - 'scripts/gcp/deploy-course-job.mjs'
+      - 'workers/admin-speech-cache.mjs'
       - '.github/workflows/deploy-google-course-worker.yml'
   workflow_dispatch:
 permissions:

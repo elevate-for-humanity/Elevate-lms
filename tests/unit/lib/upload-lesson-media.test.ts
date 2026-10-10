@@ -1,6 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import {mkdtemp,writeFile,readFile,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   SUPABASE_SAFE_VIDEO_BYTES,
+  uploadLessonFileFromDisk,
   resolveCourseVideoStorageBackend,
   shouldUploadCourseMediaToElevateMedia,
 } from '@/lib/video/upload-lesson-media';
@@ -119,4 +123,44 @@ describe('upload-lesson-media routing', () => {
     const buf = Buffer.alloc(6 * 1024 * 1024);
     expect(shouldUploadCourseMediaToElevateMedia(buf, 'video/mp4')).toBe(true);
   });
+});
+
+describe('completed MP4 disk upload',()=>{
+ it('uploads an MP4 above the old request ceiling in resumable chunks without changing its bytes',async()=>{
+  const directory=await mkdtemp(path.join(tmpdir(),'lesson-upload-test-'));
+  const file=path.join(directory,'lesson.mp4');
+  const buffer=Buffer.alloc(46*1024*1024,7);
+  const previous={...process.env};
+  process.env.COURSE_VIDEO_STORAGE_BACKEND='supabase';
+  process.env.NEXT_PUBLIC_SUPABASE_URL='https://test-project.supabase.co';
+  process.env.SUPABASE_SERVICE_ROLE_KEY='test-only';
+  let offset=0;const chunks:Uint8Array[]=[];
+  vi.stubGlobal('fetch',vi.fn(async(url:string,options:RequestInit)=>{
+   if(options.method==='POST'){
+    expect(url).toContain('test-project.storage.supabase.co/storage/v1/upload/resumable');
+    expect((options.headers as Record<string,string>)['Upload-Length']).toBe(String(buffer.length));
+    return new Response(null,{status:201,headers:{location:'/storage/v1/upload/resumable/test', 'upload-offset':'0'}});
+   }
+   expect(options.method).toBe('PATCH');
+   expect((options.headers as Record<string,string>)['Upload-Offset']).toBe(String(offset));
+   const chunk=options.body as Uint8Array;chunks.push(chunk);offset+=chunk.length;
+   return new Response(null,{status:204,headers:{'upload-offset':String(offset)}});
+  }));
+  try{
+   await writeFile(file,buffer);
+   const url=await uploadLessonFileFromDisk(file,'barber-test','mp4');
+   expect(url).toContain('/object/public/course-videos/generated-lessons/lesson-barber-test-');
+   expect(chunks.length).toBe(8);
+   expect(Buffer.concat(chunks).equals(buffer)).toBe(true);
+   await expect(readFile(file)).rejects.toThrow();
+  }finally{process.env=previous;vi.unstubAllGlobals();await rm(directory,{recursive:true,force:true});}
+ });
+ it('keeps the rendered MP4 when the upload session fails',async()=>{
+  const directory=await mkdtemp(path.join(tmpdir(),'lesson-upload-test-'));const file=path.join(directory,'lesson.mp4');
+  const buffer=Buffer.alloc(7*1024*1024,3);const previous={...process.env};
+  process.env.COURSE_VIDEO_STORAGE_BACKEND='supabase';process.env.NEXT_PUBLIC_SUPABASE_URL='https://test-project.supabase.co';process.env.SUPABASE_SERVICE_ROLE_KEY='test-only';
+  vi.stubGlobal('fetch',vi.fn(async()=>new Response('storage unavailable',{status:503})));
+  try{await writeFile(file,buffer);await expect(uploadLessonFileFromDisk(file,'barber-test','mp4')).rejects.toThrow(/session failed/);expect((await readFile(file)).equals(buffer)).toBe(true);}
+  finally{process.env=previous;vi.unstubAllGlobals();await rm(directory,{recursive:true,force:true});}
+ });
 });

@@ -20,11 +20,11 @@ test('HTTP success cannot conceal a disconnected billing provider', async () => 
   assert.equal(JSON.stringify(result).includes('secret'), false);
 });
 
-test('Store is monitored independently with its actual Marketing container identity', async () => {
+test('Store is monitored independently with its own runtime identity', async () => {
   const seen = [];
   const request = async url => {
     seen.push(url);
-    return { status: 200, json: async () => ({ service: 'marketing', ok: true, ready: true, healthy: true, dependencies: { supabase: { ok: true } } }) };
+    return { status: 200, json: async () => ({ service: 'store', ok: true, ready: true, healthy: true, dependencies: { supabase: { ok: true } } }) };
   };
   const result = await verifySite('store', request);
   assert.equal(result.length, 3);
@@ -32,4 +32,9 @@ test('Store is monitored independently with its actual Marketing container ident
   assert.equal(seen.every(url => url.startsWith('https://store.elevateforhumanity.org/')), true);
   const failed = await verifySite('store', async () => ({ status: 503, json: async () => ({}) }));
   assert.equal(failed.some(x => x.passed), false);
+});
+
+test('Store rejects a healthy response from Marketing', async () => {
+ const result = await verifySite('store', async () => ({status:200,json:async () => ({service:'marketing',ok:true,ready:true,healthy:true,dependencies:{supabase:{ok:true}}})}));
+ assert.equal(result.some(x=>x.passed),false);
 });

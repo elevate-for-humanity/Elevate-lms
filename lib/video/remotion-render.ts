@@ -15,7 +15,7 @@ import path from 'path';
 import { renderConcurrency } from './render-concurrency.mjs';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
-import { mkdir, readFile, writeFile, unlink, rm } from 'fs/promises';
+import { mkdir, readFile, writeFile, unlink, rm, stat } from 'fs/promises';
 import { generateEdgeTTS, buildLessonScript, EDGE_TTS_VOICES, type EdgeTTSVoice } from './edge-tts';
 import { getPexelsImage, getPexelsVideoClip } from './pexels';
 import { logger } from '@/lib/logger';
@@ -938,6 +938,7 @@ export async function renderStoryboardVideo(
     const { renderMedia, selectComposition } = await import('@remotion/renderer');
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
     const renderSlideLesson = async (inputProps: SlideLessonProps & Record<string, unknown>) => {
+      logger.info('[RemotionRender] selecting storyboard composition', {lessonId: input.lessonId, totalFrames});
       const selected = await selectComposition({
         serveUrl: bundleUrl,
         ...(browserExecutable ? { browserExecutable } : {}),
@@ -945,6 +946,9 @@ export async function renderStoryboardVideo(
         inputProps,
       });
       const composition = { ...selected, durationInFrames: totalFrames };
+      logger.info('[RemotionRender] storyboard encoding started', {lessonId: input.lessonId, totalFrames, fps: composition.fps, concurrency: renderConcurrency()});
+      let lastPercent = -5;
+      let lastLogAt = 0;
       await renderMedia({
         composition,
         serveUrl: bundleUrl,
@@ -954,7 +958,19 @@ export async function renderStoryboardVideo(
         inputProps,
         concurrency: renderConcurrency(),
         crf: 20,
+        onProgress: ({progress, renderedFrames, encodedFrames}) => {
+          const percent = Math.floor(progress * 100);
+          const now = Date.now();
+          if (percent >= lastPercent + 5 || now - lastLogAt >= 30_000) {
+            logger.info('[RemotionRender] storyboard progress', {lessonId: input.lessonId, percent, renderedFrames, encodedFrames, totalFrames});
+            lastPercent = percent;
+            lastLogAt = now;
+          }
+        },
       });
+      const output = await stat(paths.videoPath);
+      if (!output.size) throw new Error('REMOTION_MP4_EMPTY');
+      logger.info('[RemotionRender] storyboard MP4 written', {lessonId: input.lessonId, bytes: output.size});
     };
 
     try {
@@ -970,6 +986,7 @@ export async function renderStoryboardVideo(
       // corrected, source-locked job is retried.
       throw new Error('MEDIA_VISUAL_SERIALIZATION_FAILED', { cause: error });
     }
+    logger.info('[RemotionRender] uploading storyboard captions and transcript', {lessonId: input.lessonId});
     const captionUrl = await uploadCourseVideosObject(
       Buffer.from(buildStoryboardWebVtt(scenes), 'utf8'),
       `generated-lessons/lesson-${input.lessonId}-${Date.now()}.vtt`,
@@ -982,7 +999,9 @@ export async function renderStoryboardVideo(
     );
     resolvedStoryboard.captionUrl = captionUrl;
     resolvedStoryboard.transcriptUrl = transcriptUrl;
+    logger.info('[RemotionRender] uploading storyboard MP4', {lessonId: input.lessonId});
     const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4');
+    logger.info('[RemotionRender] storyboard MP4 saved', {lessonId: input.lessonId});
     await rm(paths.outputDir, { recursive: true, force: true }).catch(() => {});
     return {
       success: true,

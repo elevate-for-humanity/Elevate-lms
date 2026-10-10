@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Plus, ExternalLink, Pencil, Globe2, Upload, Sparkles, X } from 'lucide-react';
+import { PromptWebsiteCreator } from '@/components/website-builder/PromptWebsiteCreator';
 import { ParisWebsiteInterview } from '@/components/store/ParisWebsiteInterview';
 
 type WebsiteRow = {
@@ -59,7 +60,7 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
             <p className="text-sm font-bold uppercase tracking-widest text-brand-red-700">Elevate Apps</p>
             <h1 className="mt-1 text-3xl font-black text-slate-900">AI Website Builder</h1>
             <p className="mt-2 max-w-2xl text-slate-600">
-              PARIS interviews you, turns your answers into a website brief, generates the first draft, and opens it in the editor for review and publishing.
+              Describe the website you want. PARIS creates a saved draft that you can preview, edit with plain-language instructions, and publish.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -93,7 +94,10 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
                 </button>
               </div>
             ) : null}
+            <PromptWebsiteCreator />
+            <details className="mt-6 rounded-2xl bg-white p-5"><summary className="cursor-pointer font-bold text-slate-800">Prefer guided questions? Open the detailed interview</summary>
             <ParisWebsiteInterview onCreated={(website) => { setWebsites((current) => [website, ...current]); setShowInterview(false); }} />
+            </details>
           </section>
         ) : null}
 
@@ -144,8 +148,8 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
         <div className="mt-10 grid gap-5 md:grid-cols-2">
           <div className="rounded-2xl border border-brand-red-200 bg-brand-red-50 p-6">
             <div className="flex items-center gap-2 text-brand-red-700"><Sparkles className="h-5 w-5" /><h2 className="text-lg font-black">Build another site with PARIS</h2></div>
-            <p className="mt-2 text-sm leading-6 text-slate-700">Run the interview again for another business, program, service, or campaign. PARIS creates a separate draft instead of overwriting an existing site.</p>
-            <button type="button" onClick={() => setShowInterview(true)} className="mt-4 inline-flex font-black text-brand-red-700 hover:underline">Start another interview →</button>
+            <p className="mt-2 text-sm leading-6 text-slate-700">Describe another business, program, service, or campaign. PARIS creates a separate draft instead of overwriting an existing site.</p>
+            <button type="button" onClick={() => setShowInterview(true)} className="mt-4 inline-flex font-black text-brand-red-700 hover:underline">Create another website →</button>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-6">
             <h2 className="text-lg font-black text-slate-900">Need more sites or advanced capacity?</h2>

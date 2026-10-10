@@ -10,7 +10,7 @@ export default async function LearnerWorkspaceLayout({
   children: React.ReactNode;
   showLearnerNotices?: boolean;
 }) {
-  const { user, profile } = await requireRole(['student', 'learner', 'admin', 'staff']);
+  const { user, profile } = await requireRole(['student', 'learner', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice', 'admin', 'staff']);
   const supabase = await createClient();
   const { data: photoProfile } = await supabase.from('profiles').select('avatar_url').eq('id', user.id).maybeSingle();
 

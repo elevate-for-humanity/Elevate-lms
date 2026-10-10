@@ -2,6 +2,7 @@ import type { UltimateBuildStep } from './types';
 import type { UltimateInstructionalFinding } from './execution-policy';
 
 const PREFIX_ROUTES: Array<[RegExp, UltimateBuildStep]> = [
+  [/^NARRATION_DUPLICATION$/, 'learning_objectives'],
   [/^MEDIA_TEXT_UNREADABLE/, 'scene_construction'],
   [/^MEDIA_TEACHING_STATE_NOT_VISIBLE/, 'scene_construction'],
   [/^MEDIA_SCENE_NARRATION_MISMATCH/, 'synchronization'],

@@ -12,6 +12,11 @@ export async function runWorkerLoop({ processJob, delay, isStopping, once = fals
     }
     onResult(result);
     if (once) {
+      // A durable cursor can advance after a failed lesson. That continuation
+      // must not turn a failed instructional run into a successful Cloud task.
+      if (result.result?.findings?.some(finding => finding.severity === 'error')) {
+        throw new Error('ULTIMATE_TASK_REPAIR_REQUIRED');
+      }
       if (result.claimed && !result.completed && !result.continuing) {
         throw new Error('ULTIMATE_TASK_INCOMPLETE');
       }

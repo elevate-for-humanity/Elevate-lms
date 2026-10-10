@@ -14,6 +14,9 @@ describe('PARIS public navigation', () => {
   });
 
   it('makes plain internal routes tappable without altering external links', () => {
+    expect(linkifyParisRoutes('Review [applicants](/program-holder/students/pending).')).toBe(
+      'Review [applicants](/program-holder/students/pending).',
+    );
     expect(linkifyParisRoutes('Review /programs/barber-apprenticeship.')).toBe(
       'Review [/programs/barber-apprenticeship](/programs/barber-apprenticeship).',
     );

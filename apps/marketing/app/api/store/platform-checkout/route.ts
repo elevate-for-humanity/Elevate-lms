@@ -61,6 +61,18 @@ export async function POST(request: NextRequest) {
     );
 
   const admin = await requireAdminClient();
+  // Verify delivery can resolve the selected catalog before taking payment.
+  const deliveryPlan = await admin.from('subscription_plans')
+    .select('id').eq('slug', plan.id).eq('active', true).maybeSingle();
+  if (deliveryPlan.error || !deliveryPlan.data?.id)
+    return NextResponse.json({ error: 'This plan is not ready for access activation.' }, { status: 503 });
+  const addonCodes = addonSlugs.map(normalizeAddonCode);
+  if (addonCodes.length) {
+    const deliveryAddons = await admin.from('saas_addon_catalog')
+      .select('code').in('code', addonCodes).eq('active', true);
+    if (deliveryAddons.error || addonCodes.some((code) => !deliveryAddons.data?.some((row) => row.code === code)))
+      return NextResponse.json({ error: 'A selected add-on is not ready for access activation.' }, { status: 503 });
+  }
   const tenantId = await resolveTenantIdForUser(user.id);
   if (!tenantId)
     return NextResponse.json(
@@ -138,7 +150,7 @@ export async function POST(request: NextRequest) {
         tenant_id: tenantId,
         plan_id: plan.id,
         billing_interval: interval,
-        addon_codes: addonSlugs.map(normalizeAddonCode),
+        addon_codes: addonCodes,
         amount_cents: totalCents,
       },
     },
@@ -157,6 +169,15 @@ export async function POST(request: NextRequest) {
       cadence: interval === 'annual' ? 'annual' : 'monthly',
       next_invoice_date: nextPeriod(interval),
       status: 'active',
+      fulfillment_type: 'platform_subscription',
+      fulfillment_payload: {
+        organization_id: billingOrganizationId,
+        tenant_id: tenantId,
+        plan_id: plan.id,
+        billing_interval: interval,
+        addon_codes: addonCodes,
+        amount_cents: totalCents,
+      },
     },
     { onConflict: 'provider,customer_external_key,canonical_product_key' },
   );

@@ -726,7 +726,17 @@ export async function measureNarrationCaptions(
         (i > 0 && w.start < words[i - 1].start),
     )
   )
-    throw new Error('ULTIMATE_RECOGNIZED_WORD_TIMINGS_REQUIRED');
+    throw new Error(`ULTIMATE_RECOGNIZED_WORD_TIMINGS_REQUIRED:${JSON.stringify({
+      durationSeconds,
+      wordCount: Array.isArray(words) ? words.length : 0,
+      invalid: Array.isArray(words) ? words.map((w, i) => ({
+        index: i, start: w.start, end: w.end,
+        previousStart: i > 0 ? words[i - 1].start : null,
+        empty: typeof w.word !== 'string' || !w.word.trim(),
+      })).filter((w) => w.empty || !Number.isFinite(w.start) || !Number.isFinite(w.end) ||
+        w.start < 0 || w.end <= w.start || w.end > durationSeconds + 0.2 ||
+        (w.previousStart !== null && w.start < w.previousStart)).slice(0, 3) : [],
+    })}`);
   if (narrationCoverage(expectedScript, words.map((w) => w.word).join(' ')) < 0.9)
     throw new Error('ULTIMATE_CAPTION_NARRATION_COVERAGE_FAILED');
   const cues: MeasuredCaptionCue[] = [];

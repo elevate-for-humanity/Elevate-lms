@@ -39,11 +39,15 @@ async function _POST(request: NextRequest) {
         .from('blog_posts')
         .select('id,title,slug,excerpt,content,social_post_caption')
         .eq('id', candidate.source_id)
+        .eq('published', true)
+        .eq('share_to_social', true)
         .single();
       if (blogError || !blog) throw new Error('BLOG_SOURCE_MISSING: Published source article was not found.');
 
       const generated = await generateBlogSocialPackage(blog);
-      const message = `${generated.package.caption}\n\n${generated.package.hashtags.join(' ')}`;
+      // Publish the exact caption the administrator reviewed, not regenerated copy.
+      const message = candidate.caption?.trim();
+      if (!message) throw new Error('PUBLICATION_APPROVAL_REQUIRED: Review and approve the final caption before publishing.');
       const canonicalLink = new URL(candidate.link_url || `/blog/${blog.slug}`, 'https://www.elevateforhumanity.org').toString();
 
       if (candidate.destination_type === 'facebook_personal_draft') {

@@ -1,17 +1,29 @@
-name: Dispatch queued Google course work
+name: Dispatch and recover Google course work
 on:
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/dispatch-course-job.mjs', 'scripts/gcp/dispatch-course-job.test.mjs', '.github/workflows/dispatch-google-course-job.yml']
   workflow_dispatch:
   schedule:
     - cron: '*/5 * * * *'
 permissions:
   contents: read
+  actions: write
   id-token: write
 concurrency:
-  group: google-runtime-operations
+  group: google-course-runtime-operations
   cancel-in-progress: false
 jobs:
+  request-dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Request Google-trusted recovery dispatch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/dispatch-google-course-job.yml/dispatches" -f ref=main
   dispatch:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name != 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 15
@@ -20,7 +32,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs
+      - run: node --test scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs lib/video/supabase-resumable-upload.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -31,7 +43,9 @@ jobs:
           skip_install: true
       - name: Verify runner-supplied Google SDK compatibility
         run: node scripts/gcp/verify-sdk.mjs
-      - name: Dispatch only queued work without overlapping executions
+      - name: Configure bounded long-lesson rendering without cancelling existing executions
+        run: gcloud run jobs update elevate-course-builder --project=elegant-racer-299721 --region=us-central1 --task-timeout=10800 --update-env-vars=REMOTION_RENDER_CONCURRENCY=4 --quiet
+      - name: Dispatch queued or expired work without overlapping executions
         env:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         shell: bash

@@ -1,6 +1,8 @@
-// pre-auth-registry: exempt - requireProgramHolder verifies the authenticated holder and every query is profile-scoped.
+// pre-auth-registry: exempt - phoneActorResponse wraps requireCommunicationActor; all queries are scoped to its verified profile.
 import { NextResponse } from 'next/server';
-import { requireCommunicationActor } from '@/lib/communications/actor';
+import { phoneActorResponse } from '@/lib/phone/actor-response';
+import { asteriskDeviceStatus, asteriskDeviceId } from '@/lib/phone/asterisk';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import {
   DEFAULT_AVAILABILITY_SCHEDULE,
   type AvailabilitySchedule,
@@ -16,8 +18,7 @@ const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DEVICE_ID = /^[A-Za-z0-9_-]{16,100}$/;
 
-async function phoneContext() {
-  const ctx = await requireCommunicationActor();
+async function phoneContext(ctx: NonNullable<Awaited<ReturnType<typeof phoneActorResponse>>['actor']>) {
   const { data: extension } = await ctx.db
     .from('communication_extensions')
     .select('*,communication_workspaces!inner(id,phone_system_id)')
@@ -70,18 +71,33 @@ function safeSchedule(value: unknown): AvailabilitySchedule | null {
 }
 
 export async function GET() {
-  const { ctx, extension, system, phoneNumber } = await phoneContext();
+  const { actor: ctx, response: actorError } = await phoneActorResponse();
+  if (actorError) return actorError;
+  const { extension, system, phoneNumber } = await phoneContext(ctx);
   if (!extension || !system || !phoneNumber) {
     return NextResponse.json(
       { error: 'An administrator has not assigned a phone extension to this account.' },
       { status: 404 },
     );
   }
-  const [{ data: inbox, error: inboxError }, { data: notificationPreferences, error: preferencesError }, { count: liveDevices }] = await Promise.all([
+  const [
+    { data: inbox, error: inboxError },
+    { data: voicemails, error: voicemailError },
+    { data: notificationPreferences, error: preferencesError },
+    { count: liveDevices },
+  ] = await Promise.all([
     ctx.db
       .from('phone_callback_tasks')
       .select(
         'id,source,caller_name,callback_number,reason,program_or_department,urgency,preferred_callback_time,transcript,summary,status,read_at,created_at,recording_url',
+      )
+      .eq('assigned_profile_id', ctx.user.id)
+      .order('created_at', { ascending: false })
+      .limit(100),
+    ctx.db
+      .from('voicemails')
+      .select(
+        'id,call_id,phone_number,duration_seconds,is_read,status,transcription,summary,created_at,recording_url',
       )
       .eq('assigned_profile_id', ctx.user.id)
       .order('created_at', { ascending: false })
@@ -96,17 +112,23 @@ export async function GET() {
       .select('id', { count: 'exact', head: true })
       .eq('extension_id', extension.id)
       .eq('status', 'active')
+      .eq('provider', extension.webrtc_provider || 'telnyx')
+      .eq('connection_state', 'connected')
       .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString()),
   ]);
   // The phone itself must remain usable if callback history or notification
   // preferences are temporarily unavailable. Those are secondary features.
   const warnings: string[] = [];
   if (inboxError) {
-    console.error('[program-holder/phone] callback inbox query failed', inboxError);
+    console.error('[program-holder/phone] callback inbox query failed');
     warnings.push('Callback history is temporarily unavailable.');
   }
+  if (voicemailError) {
+    console.error('[program-holder/phone] voicemail inbox query failed');
+    warnings.push('Voicemail history is temporarily unavailable.');
+  }
   if (preferencesError) {
-    console.error('[program-holder/phone] notification preferences query failed', preferencesError);
+    console.error('[program-holder/phone] notification preferences query failed');
     warnings.push('Notification preferences are temporarily unavailable.');
   }
   return NextResponse.json({
@@ -132,6 +154,18 @@ export async function GET() {
       externalFallbackEnabled: extension.admin_external_fallback === true,
       externalFallbackNumber: extension.external_fallback_number || '',
       presenceStatus: (liveDevices ?? 0) > 0 ? extension.presence_status : 'offline',
+      provider: extension.webrtc_provider || 'telnyx',
+    },
+    voicemail: {
+      unreadCount: (voicemails || []).filter((item: any) => !item.is_read).length,
+      items: (voicemails || []).map((item: any) => ({
+        ...item,
+        hasRecording: Boolean(item.recording_url),
+        recording_url: undefined,
+        recordingUrl: item.recording_url
+          ? `/api/program-holder/phone/voicemail/${item.id}/recording`
+          : null,
+      })),
     },
     inbox: (inbox || []).map((item: any) => ({
       ...item,
@@ -145,14 +179,27 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const { ctx, extension } = await phoneContext();
+  const { actor: ctx, response: actorError } = await phoneActorResponse();
+  if (actorError) return actorError;
+  const { extension } = await phoneContext(ctx);
   if (ctx.previewing) {
     return NextResponse.json(
-      { error: 'Administrator portal previews are read-only. Sign in as the Program Holder to change phone settings.' },
+      {
+        error:
+          'Administrator portal previews are read-only. Sign in as the Program Holder to change phone settings.',
+      },
       { status: 403 },
     );
   }
   const phoneSettingsRoles = [
+    'super_admin',
+    'admin',
+    'org_admin',
+    'staff',
+    'instructor',
+    'case_manager',
+    'counselor',
+    'advisor',
     'program_holder',
     'programholder',
     'site_coordinator',
@@ -163,16 +210,22 @@ export async function PATCH(request: Request) {
     'employer',
   ];
   if (!ctx.roles.some((role) => phoneSettingsRoles.includes(role))) {
-    return NextResponse.json({ error: 'An assigned communications account is required.' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'An assigned communications account is required.' },
+      { status: 403 },
+    );
   }
   if (!extension) {
     return NextResponse.json({ error: 'No phone extension is assigned.' }, { status: 404 });
   }
   const body = await request.json().catch(() => ({}));
   const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  const provider = extension.webrtc_provider || 'telnyx';
   if (body.action === 'heartbeat') {
-    const deviceId = String(body.deviceId || '');
-    if (!DEVICE_ID.test(deviceId)) {
+    const requestedDeviceId = String(body.deviceId || '');
+    const deviceId =
+      provider === 'asterisk' ? asteriskDeviceId(requestedDeviceId) : requestedDeviceId;
+    if (!DEVICE_ID.test(requestedDeviceId)) {
       return NextResponse.json(
         { error: 'A valid PWA device identifier is required.' },
         { status: 400 },
@@ -184,40 +237,118 @@ export async function PATCH(request: Request) {
       .eq('profile_id', ctx.user.id)
       .eq('extension_id', extension.id)
       .eq('device_id', deviceId)
+      .eq('provider', provider)
       .eq('status', 'active')
       .maybeSingle();
     if (deviceError || !registeredDevice) {
-      return NextResponse.json({ error: 'Connect this PWA phone before reporting availability.' }, { status: 409 });
+      return NextResponse.json(
+        { error: 'Connect this PWA phone before reporting availability.' },
+        { status: 409 },
+      );
     }
-    patch.last_presence_at = new Date().toISOString();
+    let verifiedAt = new Date().toISOString();
+    if (provider === 'asterisk') {
+      try {
+        await hydrateProcessEnv();
+        const evidence = await asteriskDeviceStatus({
+          profileId: ctx.user.id,
+          extensionId: extension.id,
+          deviceId,
+        });
+        if (!evidence.registered || evidence.connectionState !== 'connected') {
+          const { error: statusError } = await ctx.db
+            .from('phone_webrtc_devices')
+            .update({
+              registration_state: evidence.registered ? 'registered' : 'unregistered',
+              connection_state: 'disconnected',
+              registration_verified_at: evidence.observedAt,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', registeredDevice.id);
+          return NextResponse.json(
+            {
+              error: statusError
+                ? 'Registration evidence could not be saved.'
+                : 'The SIP registration is not currently reachable.',
+            },
+            { status: statusError ? 500 : 409 },
+          );
+        }
+        verifiedAt = evidence.observedAt;
+      } catch {
+        await ctx.db
+          .from('phone_webrtc_devices')
+          .update({
+            registration_state: 'unregistered',
+            connection_state: 'disconnected',
+            registration_verified_at: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', registeredDevice.id);
+        return NextResponse.json(
+          { error: 'Asterisk has not confirmed a reachable SIP registration.' },
+          { status: 409 },
+        );
+      }
+    }
+    patch.last_presence_at = verifiedAt;
     patch.presence_status = ['do_not_disturb', 'offline'].includes(extension.ring_mode)
       ? extension.ring_mode
-      : 'available';
-    await ctx.db
+      : body.inCall === true
+        ? 'busy'
+        : 'available';
+    const { error: heartbeatError } = await ctx.db
       .from('phone_webrtc_devices')
-      .update({ last_seen_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+      .update({
+        last_seen_at: verifiedAt,
+        registration_state: 'registered',
+        connection_state: 'connected',
+        registration_verified_at: verifiedAt,
+        updated_at: new Date().toISOString(),
+      })
       .eq('profile_id', ctx.user.id)
       .eq('device_id', deviceId)
+      .eq('provider', provider)
       .eq('status', 'active');
+    if (heartbeatError)
+      return NextResponse.json(
+        { error: 'The device heartbeat could not be saved.' },
+        { status: 500 },
+      );
   } else if (body.action === 'disconnect') {
-    const deviceId = String(body.deviceId || '');
-    if (!DEVICE_ID.test(deviceId)) {
+    const requestedDeviceId = String(body.deviceId || '');
+    const deviceId =
+      provider === 'asterisk' ? asteriskDeviceId(requestedDeviceId) : requestedDeviceId;
+    if (!DEVICE_ID.test(requestedDeviceId)) {
       return NextResponse.json(
         { error: 'A valid PWA device identifier is required.' },
         { status: 400 },
       );
     }
-    await ctx.db
+    const { error: disconnectError } = await ctx.db
       .from('phone_webrtc_devices')
-      .update({ last_seen_at: '1970-01-01T00:00:00.000Z', updated_at: new Date().toISOString() })
+      .update({
+        registration_state: 'unregistered',
+        connection_state: 'disconnected',
+        registration_verified_at: null,
+        updated_at: new Date().toISOString(),
+      })
       .eq('profile_id', ctx.user.id)
       .eq('device_id', deviceId)
+      .eq('provider', provider)
       .eq('status', 'active');
+    if (disconnectError)
+      return NextResponse.json(
+        { error: 'The device disconnection could not be saved.' },
+        { status: 500 },
+      );
     const { count: otherOnlineDevices } = await ctx.db
       .from('phone_webrtc_devices')
       .select('id', { count: 'exact', head: true })
       .eq('profile_id', ctx.user.id)
       .eq('status', 'active')
+      .eq('provider', provider)
+      .eq('connection_state', 'connected')
       .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString());
     patch.presence_status = (otherOnlineDevices ?? 0) > 0 ? 'available' : 'offline';
     patch.last_presence_at = new Date().toISOString();
@@ -229,7 +360,12 @@ export async function PATCH(request: Request) {
     const voicemailGreeting = String(body.voicemailGreeting || '').trim();
     const externalFallbackEnabled = body.externalFallbackEnabled === true;
     const externalDigits = String(body.externalFallbackNumber || '').replace(/\D/g, '');
-    const externalFallbackNumber = externalDigits.length === 10 ? `+1${externalDigits}` : externalDigits.length === 11 && externalDigits.startsWith('1') ? `+${externalDigits}` : '';
+    const externalFallbackNumber =
+      externalDigits.length === 10
+        ? `+1${externalDigits}`
+        : externalDigits.length === 11 && externalDigits.startsWith('1')
+          ? `+${externalDigits}`
+          : '';
     if (!RING_MODES.has(ringMode) || !AVAILABILITY_SOURCES.has(availabilitySource)) {
       return NextResponse.json(
         { error: 'Choose a valid phone and availability mode.' },
@@ -240,7 +376,10 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'Schedule or ring duration is invalid.' }, { status: 400 });
     }
     if (externalFallbackEnabled && !externalFallbackNumber) {
-      return NextResponse.json({ error: 'Enter a valid 10-digit fallback phone number.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Enter a valid 10-digit fallback phone number.' },
+        { status: 400 },
+      );
     }
     if (voicemailGreeting.length > 600) {
       return NextResponse.json(
@@ -263,8 +402,12 @@ export async function PATCH(request: Request) {
       const { error: preferenceError } = await ctx.db.from('notification_preferences').upsert(
         {
           user_id: ctx.user.id,
-          ...(typeof body.emailMissedCalls === 'boolean' ? { email_missed_calls: body.emailMissedCalls } : {}),
-          ...(typeof body.smsMissedCalls === 'boolean' ? { sms_missed_calls: body.smsMissedCalls } : {}),
+          ...(typeof body.emailMissedCalls === 'boolean'
+            ? { email_missed_calls: body.emailMissedCalls }
+            : {}),
+          ...(typeof body.smsMissedCalls === 'boolean'
+            ? { sms_missed_calls: body.smsMissedCalls }
+            : {}),
           updated_at: new Date().toISOString(),
         },
         { onConflict: 'user_id' },

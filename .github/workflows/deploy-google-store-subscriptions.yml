@@ -1,0 +1,51 @@
+name: Deploy Google Store subscription delivery
+on:
+  workflow_dispatch:
+    inputs:
+      image_sha:
+        description: Full repaired Admin image SHA already deployed and verified on Google
+        type: string
+        required: true
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: google-runtime-operations
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: google-github-actions/auth@v3
+        id: admin_auth
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-admin-migration-aabnh2y32a-uc.a.run.app
+          id_token_include_email: true
+      - uses: google-github-actions/auth@v3
+        id: marketing_auth
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-marketing-migration-aabnh2y32a-uc.a.run.app
+          id_token_include_email: true
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: node scripts/gcp/verify-sdk.mjs
+      - name: Deploy scoped dispatcher and verify payment boundary before scheduling
+        env:
+          IMAGE_SHA: ${{ inputs.image_sha }}
+          GOOGLE_ADMIN_TOKEN: ${{ steps.admin_auth.outputs.id_token }}
+          GOOGLE_MARKETING_TOKEN: ${{ steps.marketing_auth.outputs.id_token }}
+        run: node scripts/gcp/deploy-store-subscriptions.mjs

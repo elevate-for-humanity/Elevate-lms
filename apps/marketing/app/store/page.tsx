@@ -11,9 +11,8 @@ import { GuidedProductInterview } from '@/components/store/GuidedProductIntervie
 import { StoreGlossary } from '@/components/store/StoreGlossary';
 import WebsiteBuilderCommercial from '@/components/store/WebsiteBuilderCommercial';
 import { StandaloneBuildPackages } from '@/components/store/StandaloneBuildPackages';
-import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
+import Image from 'next/image';
 import StoreDemoVideo from './StoreDemoVideo';
-const STORE_VIDEO = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4';
 
 export const metadata: Metadata = {
   title: 'Store | AI Business, Workforce & Education Platform',
@@ -63,7 +62,7 @@ export default function StorePage() {
             <p className="mt-4 text-sm font-semibold text-slate-600">14 days · no card required · source-backed proof and limits available before checkout</p>
           </div>
           <div className="relative h-[280px] min-w-0 overflow-hidden rounded-2xl bg-slate-950 shadow-xl ring-1 ring-slate-200 sm:h-[500px] sm:rounded-3xl sm:shadow-2xl">
-            <SafeHeroVideo src={STORE_VIDEO} poster="/images/pages/platform-page-1.webp" ariaLabel="Elevate connected business and workforce platform" className="absolute inset-0 h-full w-full object-cover" />
+            <Image src="/images/pages/platform-page-1.webp" alt="Elevate business and workforce platform" fill priority sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover" />
             <div className="absolute inset-x-0 bottom-0 z-20 bg-slate-950/80 p-4 text-sm font-bold text-white backdrop-blur-sm">Website, CRM, LMS, workforce, apprenticeship, testing, and compliance—one connected workspace.</div>
           </div>
         </div>

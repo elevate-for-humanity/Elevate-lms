@@ -30,6 +30,7 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Dashboard', href: '/dashboard' },
       { label: 'At-Risk Learners', href: '/at-risk' },
       { label: 'Analytics', href: '/analytics' },
+      { label: 'Website Traffic', href: '/analytics/traffic' },
       { label: 'Analytics — Engagement', href: '/analytics/engagement' },
       { label: 'Analytics — Learning', href: '/analytics/learning' },
       { label: 'Program Analytics', href: '/analytics/programs' },

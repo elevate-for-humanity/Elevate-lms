@@ -61,6 +61,7 @@ overrides:
   fast-uri: 3.1.7
   browserslist: 4.28.8
   sharp: 0.35.5
+  'onnxruntime-node>adm-zip': 0.6.1
   'onnxruntime-node>tar': 7.5.21
   'onnxruntime-web>protobufjs': 7.6.5
   '@huggingface/transformers>sharp': 0.35.5

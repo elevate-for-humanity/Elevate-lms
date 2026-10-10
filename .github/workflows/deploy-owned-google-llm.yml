@@ -1,0 +1,76 @@
+name: Deploy and verify Elevate owned model on Google
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/deploy-owned-google-llm.yml', 'scripts/gcp/deploy-owned-llm.mjs', 'services/llm-gpu-worker/Dockerfile.google', 'services/llm-gpu-worker/bake_model.py', 'services/llm-gpu-worker/entrypoint.google.sh']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: google-owned-model-deployment
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-owned-google-llm.yml/dispatches" -f ref=main
+  prepare:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/deploy-owned-llm.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: node scripts/gcp/verify-sdk.mjs
+      - name: Prepare only the dedicated identity and model token before allocating compute
+        env: {IMAGE_SHA: '${{ github.sha }}', PREPARE_ONLY: 'true'}
+        run: node scripts/gcp/deploy-owned-llm.mjs
+  deploy:
+    needs: prepare
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/deploy-owned-llm.test.mjs
+      - name: Make room for the existing 7B checkpoint on the ephemeral runner
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h /
+      - name: Build approved checkpoint with verified weight hashes
+        run: docker build -f services/llm-gpu-worker/Dockerfile.google -t "elevate-owned-llm:$GITHUB_SHA" .
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: node scripts/gcp/verify-sdk.mjs
+      - name: Upload immutable model image
+        run: |
+          set -euo pipefail
+          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/owned-llm:$GITHUB_SHA"
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker tag "elevate-owned-llm:$GITHUB_SHA" "$IMAGE"
+          docker push "$IMAGE"
+      - name: Deploy bounded GPU service and verify auth, inference and tools before connecting Admin
+        env: {IMAGE_SHA: '${{ github.sha }}'}
+        run: node scripts/gcp/deploy-owned-llm.mjs

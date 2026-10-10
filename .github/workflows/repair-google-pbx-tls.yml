@@ -1,0 +1,83 @@
+name: Repair existing Google PBX TLS gateway
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Deploy TLS gateway to existing PBX without touching Asterisk/Telnyx'
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: google-pbx-infrastructure
+  cancel-in-progress: false
+jobs:
+  tls-gateway:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 25
+    steps:
+      - name: Reject inspection-only run as deployment
+        shell: bash
+        env:
+          APPLY: ${{ inputs.apply }}
+        run: |
+          if [[ "$APPLY" != 'true' ]]; then
+            echo '::error::apply=true required; inspection-only runs must not be reported as deployed.'
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify existing VM and public DNS
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(status)')" = RUNNING
+          test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+          test "$(dig +short A phone.elevateforhumanity.org @8.8.8.8 | head -1)" = 107.178.216.162
+      - name: Deploy gateway on existing VM
+        if: inputs.apply
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud compute scp scripts/gcp/repair-existing-pbx-tls.sh elevate-pbx:/tmp/repair-existing-pbx-tls.sh \
+            --project=elegant-racer-299721 --zone=us-central1-a --quiet
+          gcloud compute ssh elevate-pbx \
+            --project=elegant-racer-299721 --zone=us-central1-a --quiet \
+            --command='sudo bash /tmp/repair-existing-pbx-tls.sh'
+      - name: Verify public HTTPS and refuse false success
+        if: inputs.apply
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(curl --silent --show-error --max-time 15 --output /dev/null --write-out '%{http_code}' https://phone.elevateforhumanity.org/healthz)" = 200
+          python3 - <<'PY'
+          import base64, os, socket, ssl
+          host = 'phone.elevateforhumanity.org'
+          key = base64.b64encode(os.urandom(16)).decode()
+          request = (f'GET /ws HTTP/1.1\r\nHost: {host}\r\nUpgrade: websocket\r\n'
+                     f'Connection: Upgrade\r\nSec-WebSocket-Key: {key}\r\n'
+                     'Sec-WebSocket-Version: 13\r\nSec-WebSocket-Protocol: sip\r\n\r\n')
+          with socket.create_connection((host,443),timeout=10) as conn:
+              with ssl.create_default_context().wrap_socket(conn,server_hostname=host) as tls:
+                  tls.settimeout(12)
+                  tls.sendall(request.encode())
+                  response = tls.recv(4096).decode('latin1')
+                  status = response.split('\r\n',1)[0]
+                  if not status.startswith('HTTP/1.1 101 ') and not status.startswith('HTTP/2 101 '):
+                      raise SystemExit(f'WebRTC WSS upgrade failed: {status}')
+                  print('Trusted TLS and SIP WebSocket upgrade confirmed; calls not yet tested.')
+          PY
+          echo "TLS and SIP WebSocket handshake verified. PWA/PARIS calling still requires an end-to-end call test."

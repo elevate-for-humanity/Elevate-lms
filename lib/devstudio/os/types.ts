@@ -63,7 +63,7 @@ export interface CommandCenterSnapshot {
   }>;
   buildStatus: {
     lastBuild: { id: string; status: string; kind: string } | null;
-    northflankConfigured: boolean;
+    googleConfigured: boolean;
   };
   health: {
     website: boolean;

@@ -1,0 +1,156 @@
+{
+  "repository": "elevate-for-humanity/next-platform-starter",
+  "commit": "fb2ce99454fd54a60c2ff4f86db7332425b1dd83",
+  "files": [
+    {
+      "source": "app/tax/page.tsx",
+      "target": "apps/marketing/app/tax/page.tsx",
+      "sha256": "822b3f5d64b755432f21a1b691dc5eb5f76fdfb1f3ab123dca70df8a1655880b"
+    },
+    {
+      "source": "app/tax-software/_components/TaxSiteShell.tsx",
+      "target": "apps/marketing/app/tax-software/_components/TaxSiteShell.tsx",
+      "sha256": "d6ed0f04f3daa6e77cc274fa76cee76443266877622bf44d6f32598842273301"
+    },
+    {
+      "source": "app/tax-software/about/page.tsx",
+      "target": "apps/marketing/app/tax-software/about/page.tsx",
+      "sha256": "19531e4ea9c4591f9a3ca38c8a431627b4572983518058b141965b68fd640439"
+    },
+    {
+      "source": "app/tax-software/bank-products/page.tsx",
+      "target": "apps/marketing/app/tax-software/bank-products/page.tsx",
+      "sha256": "8cb4a19353836e13a8fe17c0e8e23814fa7ea3f15ed1a0a32e86f1efa17b2d68"
+    },
+    {
+      "source": "app/tax-software/contact/page.tsx",
+      "target": "apps/marketing/app/tax-software/contact/page.tsx",
+      "sha256": "90f12399734d66aa66ebe6adf35dcb00431814f8e5500d862f2d1f6fec5453dc"
+    },
+    {
+      "source": "app/tax-software/demo/page.tsx",
+      "target": "apps/marketing/app/tax-software/demo/page.tsx",
+      "sha256": "66f6adea7f5207c15638e6dd6151e6cddfd2dbb5b2635981bbfd0acc6eec2cfc"
+    },
+    {
+      "source": "app/tax-software/features/page.tsx",
+      "target": "apps/marketing/app/tax-software/features/page.tsx",
+      "sha256": "84328a80ec33aa372c58e7e7e806d38e251b712342aeaf61216a5ee039d89ffc"
+    },
+    {
+      "source": "app/tax-software/login/layout.tsx",
+      "target": "apps/marketing/app/tax-software/login/layout.tsx",
+      "sha256": "7c47d81f288d520a28cd2dd8650e21dbaf3552d5272b445356f1c2dcfd0dc96b"
+    },
+    {
+      "source": "app/tax-software/login/page.tsx",
+      "target": "apps/marketing/app/tax-software/login/page.tsx",
+      "sha256": "4b785738468b84a0653efd33e5cae719d889ee1fb793a96115b8091106d07b7d"
+    },
+    {
+      "source": "app/tax-software/page.tsx",
+      "target": "apps/marketing/app/tax-software/page.tsx",
+      "sha256": "2e9a3679173ded5c370550af1d181b0d6ef3cb5a70be1f91fbdb7600cb9700fa"
+    },
+    {
+      "source": "app/tax-software/pricing/page.tsx",
+      "target": "apps/marketing/app/tax-software/pricing/page.tsx",
+      "sha256": "207a937aaee36a68978fd3157d942e428c8ca1677f7a5b7b661e5255faddfc57"
+    },
+    {
+      "source": "app/tax-software/professional/page.tsx",
+      "target": "apps/marketing/app/tax-software/professional/page.tsx",
+      "sha256": "b2a4831b330ae831a329d9aacaa6db848d9a0f39bbe37e0d0225cfe1da49996b"
+    },
+    {
+      "source": "app/tax-software/self-file/layout.tsx",
+      "target": "apps/marketing/app/tax-software/self-file/layout.tsx",
+      "sha256": "cdcbe5844e8c911740cbd3c3609b6ee559c8d71b606692ab08bf80bb66bbf6ed"
+    },
+    {
+      "source": "app/tax-software/self-file/page.tsx",
+      "target": "apps/marketing/app/tax-software/self-file/page.tsx",
+      "sha256": "5ecf286f97f30d3c1e6e0682fc42514cbc5c9d4bb307e4712cf3227551b4f77c"
+    },
+    {
+      "source": "app/tax-software/self-file/return/page.tsx",
+      "target": "apps/marketing/app/tax-software/self-file/return/page.tsx",
+      "sha256": "28a894d18c16a7b6de13e7a34b25b7fe7190e8640653f5b6f13b3ac86371b635"
+    },
+    {
+      "source": "app/tax-software/self-file/w2/confirm/page.tsx",
+      "target": "apps/marketing/app/tax-software/self-file/w2/confirm/page.tsx",
+      "sha256": "4ed9e6b2479c160077fdfe282668ec804f23fad9c358e2b5bed0791b659f538d"
+    },
+    {
+      "source": "app/api/tax/interview/route.ts",
+      "target": "apps/marketing/app/api/tax/interview/route.ts",
+      "sha256": "f2c4205a5c654b39d8a30ab7b9053d418f21e1575a517452772d88295f8f034e"
+    },
+    {
+      "source": "app/api/tax/returns/calculate/route.ts",
+      "target": "apps/marketing/app/api/tax/returns/calculate/route.ts",
+      "sha256": "37304588d0ad4e552a1f9c2b7f576887873ea0ae55ba12a803cc103d0fc4cc2f"
+    },
+    {
+      "source": "app/api/tax/returns/route.ts",
+      "target": "apps/marketing/app/api/tax/returns/route.ts",
+      "sha256": "84082d60ef407642080bc07dfd971b4a6489c36bff0da490e8cdbf387a0e1c55"
+    },
+    {
+      "source": "app/api/tax/w2/confirm/route.ts",
+      "target": "apps/marketing/app/api/tax/w2/confirm/route.ts",
+      "sha256": "c051ff647c759bbca601492adfed324a45e844e8729054c5ffe4046bdd2b0670"
+    },
+    {
+      "source": "app/api/ocr/extract/route.ts",
+      "target": "apps/marketing/app/api/ocr/extract/route.ts",
+      "sha256": "ea9463cdc4bd4801118eb5c56eb47e985bc79bdb8d9336f41fd745c37526f56f"
+    },
+    {
+      "source": "lib/tax-software/calculation/ty2026-base-1040.ts",
+      "target": "lib/tax-software/calculation/ty2026-base-1040.ts",
+      "sha256": "c5c8d5dff55f54117098a8efa9965a00c69bb2d328dd1183b4ed1abe4fa47068"
+    },
+    {
+      "source": "lib/tax-software/diagnostics/return-diagnostics.ts",
+      "target": "lib/tax-software/diagnostics/return-diagnostics.ts",
+      "sha256": "c8b88a996244500d8286f36831054bb53c219e1bf801da664a4fdaf7366f12fe"
+    },
+    {
+      "source": "lib/tax-software/document-extraction.ts",
+      "target": "lib/tax-software/document-extraction.ts",
+      "sha256": "699c0b1fea5c4506d6674a50cb70ebeccaad789948eea57265933c923bde1baf"
+    },
+    {
+      "source": "lib/tax-software/form-registry-2026.ts",
+      "target": "lib/tax-software/form-registry-2026.ts",
+      "sha256": "ddf592b6b822b4a63ab71aedd8fe6d1a3149d95392e5926835cdba722d3ea11a"
+    },
+    {
+      "source": "lib/tax-software/mef-readiness.ts",
+      "target": "lib/tax-software/mef-readiness.ts",
+      "sha256": "0921468264849007bb8e19edf14184fabbdb59b39828d23ee6170fafecd2af3c"
+    },
+    {
+      "source": "lib/tax-software/paris-interview.ts",
+      "target": "lib/tax-software/paris-interview.ts",
+      "sha256": "90c17b439e4a5f5ba52b77c00191996c410da0d53e79401d639e3778f1bedfad"
+    },
+    {
+      "source": "lib/tax-software/self-file-pricing.ts",
+      "target": "lib/tax-software/self-file-pricing.ts",
+      "sha256": "6d1d79ab71a2c02f691c2b4eccea98ff08b973dedecbb3fb6565fe44f0024d78"
+    },
+    {
+      "source": "lib/tax-software/transmission/adapters/certification-export.ts",
+      "target": "lib/tax-software/transmission/adapters/certification-export.ts",
+      "sha256": "5f6867666c2a0c4facd92322fc579e92f29e3e9877086780d4ffbf0a7af9c7af"
+    },
+    {
+      "source": "lib/tax-software/transmission/hub.ts",
+      "target": "lib/tax-software/transmission/hub.ts",
+      "sha256": "9bc9973640ccc8aa09f17a67178cd3c14a85a84159cd1b9406769f011b22e187"
+    }
+  ]
+}

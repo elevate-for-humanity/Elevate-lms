@@ -1,5 +1,5 @@
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { generateCloudflareNaturalVoice } from '@/lib/ai/cloudflare-natural-voice';
+import { generateGoogleNaturalVoice } from '@/lib/ai/google-natural-voice';
 import { hydrateProcessEnv } from '@/lib/secrets';
 
 export async function handleNaturalVoiceRequest(request: Request) {
@@ -16,7 +16,7 @@ export async function handleNaturalVoiceRequest(request: Request) {
   await hydrateProcessEnv();
 
   try {
-    const audio = await generateCloudflareNaturalVoice(text);
+    const audio = await generateGoogleNaturalVoice(text);
     return new Response(audio, {
       headers: {
         'Content-Type': 'audio/mpeg',
@@ -25,7 +25,7 @@ export async function handleNaturalVoiceRequest(request: Request) {
       },
     });
   } catch (cause) {
-    console.error('[natural-voice] Cloudflare speech generation failed', cause);
+    console.error('[natural-voice] Google speech generation failed', cause);
 
     return Response.json(
       {

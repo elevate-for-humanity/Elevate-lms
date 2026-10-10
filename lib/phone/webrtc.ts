@@ -88,6 +88,7 @@ export async function ensureDeviceCredential(input: {
     .select('*')
     .eq('profile_id', profileId)
     .eq('device_id', deviceId)
+    .eq('provider', 'telnyx')
     .eq('status', 'active')
     .maybeSingle();
 
@@ -124,10 +125,14 @@ export async function ensureDeviceCredential(input: {
       extension_id: extension.id,
       profile_id: profileId,
       device_id: deviceId,
+      provider: 'telnyx',
       provider_credential_id: credentialId,
       sip_username: sipUsername,
       status: 'active',
-      last_seen_at: now,
+      registration_state: 'unregistered',
+      connection_state: 'disconnected',
+      registration_verified_at: null,
+      last_seen_at: stored?.last_seen_at || null,
       updated_at: now,
     },
     { onConflict: 'profile_id,device_id' },

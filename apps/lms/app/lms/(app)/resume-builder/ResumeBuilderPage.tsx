@@ -13,8 +13,14 @@ export function ResumeBuilderPage() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { setMessage('Sign in again to save your resume.'); return; }
-      const { error } = await supabase.from('resumes').upsert({ user_id: user.id, resume_data: resumeData, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+      const { data: existing, error: readError } = await supabase.from('resumes').select('id').eq('user_id', user.id).maybeSingle();
+      if (readError) { setMessage(`Resume could not be loaded: ${readError.message}`); throw readError; }
+      const payload = { user_id: user.id, resume_data: resumeData, updated_at: new Date().toISOString() };
+      const { error } = existing
+        ? await supabase.from('resumes').update(payload).eq('id', existing.id).eq('user_id', user.id)
+        : await supabase.from('resumes').insert(payload);
       setMessage(error ? `Resume could not be saved: ${error.message}` : 'Resume saved.');
+      if (error) throw error;
     }} />
   </div>;
 }

@@ -1,14 +1,10 @@
 services:
   asterisk:
-    image: andrius/asterisk:20-current
+    image: mlan/asterisk:xtra-1.1.13
     restart: unless-stopped
     network_mode: host
     volumes:
-      - ./asterisk/pjsip.conf:/etc/asterisk/pjsip.conf:ro
-      - ./asterisk/extensions.conf:/etc/asterisk/extensions.conf:ro
-      - ./asterisk/rtp.conf:/etc/asterisk/rtp.conf:ro
-      - ./asterisk/http.conf:/etc/asterisk/http.conf:ro
-      - ./asterisk/ari.conf:/etc/asterisk/ari.conf:ro
+      - ./asterisk:/etc/asterisk:ro
       - asterisk-data:/var/lib/asterisk
       - asterisk-logs:/var/log/asterisk
 volumes:

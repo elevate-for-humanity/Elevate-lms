@@ -4,6 +4,15 @@ import { verifyRegisteredProfile } from '../../lib/ultimate-course-builder/crede
 import { hydrateUltimateProfileSources } from '../../lib/ultimate-course-builder/core/course-profile';
 
 describe('Barber standards lock', () => {
+  it('accepts reordered competencies and equivalent wording with the same registered requirements', async () => {
+    const profile = await new UltimateAppendixAStandardsSource().load({programSlug:'barber-apprenticeship'});
+    const supplied = {...profile, competencies: [...profile.competencies].reverse().map(c => ({
+      ...c, title: 'Supplied teaching competency',
+      description: c.id === profile.competencies[0].id ? c.description.replace(/using/g, 'with') : c.description,
+    }))};
+    expect(verifyRegisteredProfile(supplied).rapidsCode).toBe('0030CB');
+    expect(() => verifyRegisteredProfile({...supplied, competencies: supplied.competencies.slice(1)})).toThrow('ULTIMATE_REGISTERED_PROFILE_MISMATCH');
+  });
   it('matches the registered Appendix A contract and rejects altered competencies', async () => {
     const profile = await new UltimateAppendixAStandardsSource().load({programSlug:'barber-apprenticeship'});
     expect(verifyRegisteredProfile(profile).rapidsCode).toBe('0030CB');

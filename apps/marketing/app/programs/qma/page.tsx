@@ -1,23 +1,9 @@
-import { loadProgramForPage } from "@/lib/programs/load-program-page";
-import ProgramDetailPage from "@/components/programs/ProgramDetailPage";
-import heroBanners from "@/content/heroBanners";
-import { QMA } from "@/data/programs/qma";
-
-export const revalidate = 3600;
-
-export default async function QmaPage() {
-  const loaded = await loadProgramForPage("qma");
-  const p = loaded?.program ?? QMA;
-  const banner = heroBanners["qma"] ?? null;
-  return <ProgramDetailPage program={p} banner={banner} />;
+import HealthcareProgramPage, {
+  generateMetadata as healthcareMetadata,
+} from '../healthcare-training/[slug]/page';
+export default function ProgramPage() {
+  return HealthcareProgramPage({ params: Promise.resolve({ slug: 'qma' }) });
 }
-
-export async function generateMetadata() {
-  const loaded = await loadProgramForPage("qma");
-  const p = loaded?.program ?? QMA;
-  return {
-    title: p.metaTitle ?? p.title ?? "QMA",
-    description: p.metaDescription ?? p.subtitle ?? "",
-    alternates: { canonical: "https://www.elevateforhumanity.org/programs/qma" },
-  };
+export function generateMetadata() {
+  return healthcareMetadata({ params: Promise.resolve({ slug: 'qma' }) });
 }

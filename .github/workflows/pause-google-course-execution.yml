@@ -1,0 +1,60 @@
+name: Pause one Google course execution for a release
+on:
+  workflow_dispatch:
+    inputs:
+      execution:
+        description: Exact course execution to pause; saved queue and media checkpoints are retained
+        type: string
+        required: true
+      image_sha:
+        description: Full commit of the expected deployed worker image
+        type: string
+        required: true
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: google-course-runtime-operations
+  cancel-in-progress: false
+jobs:
+  pause:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - run: node scripts/gcp/verify-sdk.mjs
+      - name: Verify exact image and pause only the requested execution
+        env:
+          COURSE_EXECUTION: ${{ inputs.execution }}
+          WORKER_IMAGE_SHA: ${{ inputs.image_sha }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { assertNoActiveExecutions } from './scripts/gcp/execute-course-job.mjs';
+          const name=process.env.COURSE_EXECUTION, sha=process.env.WORKER_IMAGE_SHA;
+          if(!/^elevate-course-builder-[a-z0-9]+$/.test(name) || !/^[a-f0-9]{40}$/.test(sha)) throw new Error('EXACT_EXECUTION_AND_IMAGE_REQUIRED');
+          const scope=['--project=elegant-racer-299721','--region=us-central1'];
+          const call=args=>execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']});
+          const describe=()=>JSON.parse(call(['run','jobs','executions','describe',name,...scope,'--format=json']));
+          const image='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker';
+          const digest=call(['artifacts','docker','images','describe',image+':'+sha,'--project=elegant-racer-299721','--format=value(image_summary.digest)']).trim();
+          if(!/^sha256:[a-f0-9]{64}$/.test(digest) || describe().spec?.template?.spec?.containers?.[0]?.image!==image+'@'+digest) throw new Error('EXECUTION_IMAGE_MISMATCH');
+          const active=run=>{try{assertNoActiveExecutions([run]);return false;}catch(error){if(error.message==='COURSE_JOB_ALREADY_ACTIVE')return true;throw error;}};
+          if(active(describe())) call(['run','jobs','executions','cancel',name,...scope,'--quiet']);
+          for(let attempt=0;attempt<60;attempt++) {
+            const run=describe();
+            if(!active(run)) { console.log(JSON.stringify({execution:name,terminal:true,status:run.status,checkpointsRetained:true})); process.exit(0); }
+            await new Promise(resolve=>setTimeout(resolve,5000));
+          }
+          throw new Error('EXECUTION_STOP_NOT_CONFIRMED');
+          NODE

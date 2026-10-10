@@ -1,0 +1,72 @@
+name: Diagnose finite Google Course Builder execution
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/diagnose-google-course-job.yml']
+  workflow_dispatch:
+    inputs:
+      execution:
+        description: Existing course execution name to inspect
+        required: false
+        default: latest
+        type: string
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch read-only Google diagnostic
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/diagnose-google-course-job.yml/dispatches" -f ref=main
+  diagnose:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - run: node scripts/gcp/verify-sdk.mjs
+      - name: Inspect existing execution without mutation
+        env:
+          COURSE_EXECUTION: ${{ inputs.execution }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {execFileSync} from 'node:child_process';
+          let execution=process.env.COURSE_EXECUTION || 'latest';
+          const call=args=>JSON.parse(execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          if(execution === 'latest') {
+            const executions=call(['run','jobs','executions','list','--job=elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--limit=100','--sort-by=~metadata.creationTimestamp','--format=json']);
+            console.log(JSON.stringify({executionInventory:executions.slice(0,8).map(x=>({name:x.metadata?.name,created:x.metadata?.creationTimestamp,completed:x.status?.conditions?.find(c=>c.type==='Completed')}))}));
+            const active=executions.find(x=>!x.status?.completionTime && !['True','False'].includes(x.status?.conditions?.find(c=>c.type==='Completed')?.status));
+            execution=(active || executions[0])?.metadata?.name;
+          }
+          if(!/^elevate-course-builder-[a-z0-9]+$/.test(execution)) throw new Error('COURSE_EXECUTION_NAME_INVALID');
+          const run=call(['run','jobs','executions','describe',execution,'--project=elegant-racer-299721','--region=us-central1','--format=json']);
+          const task=run.spec?.template?.spec ?? {};
+          const container=task.containers?.[0] ?? {};
+          console.log(JSON.stringify({execution,status:run.status,image:container.image,timeoutSeconds:task.timeoutSeconds,maxRetries:task.maxRetries,mode:(container.env || []).filter(x=>['ULTIMATE_WORKER_ONCE','AI_NARRATION_PROVIDER','AI_TRANSCRIPTION_PROVIDER'].includes(x.name))}));
+          const filter='resource.type="cloud_run_job" AND resource.labels.job_name="elevate-course-builder" AND labels."run.googleapis.com/execution_name"="'+execution+'"';
+          const logs=call(['logging','read',filter,'--project=elegant-racer-299721','--freshness=2h','--limit=200','--format=json']);
+          console.log(JSON.stringify({logCount:logs.length,logTypes:[...new Set(logs.map(x=>x.logName))]}));
+          for(const item of logs) {
+            const message=String(item.textPayload ?? item.jsonPayload?.message ?? '');
+            if(!/error|failed|exception|ultimate_|claim|complete|starting|polling|once|narration|render|bundl|mp4/i.test(message)) continue;
+            const safe=message.replace(/Bearer\s+\S+/gi,'Bearer [redacted]').replace(/(token|password|secret|api[_-]?key)\s*[:=]\s*\S+/gi,'$1=[redacted]').slice(0,1500);
+            const context=item.jsonPayload?.context ?? {};
+            const render=Object.fromEntries(['lessonId','percent','renderedFrames','encodedFrames','totalFrames','fps','concurrency','bytes'].filter(k=>context[k]!==undefined).map(k=>[k,context[k]]));
+            console.log(JSON.stringify({timestamp:item.timestamp,severity:item.severity,message:safe,render}));
+          }
+          NODE

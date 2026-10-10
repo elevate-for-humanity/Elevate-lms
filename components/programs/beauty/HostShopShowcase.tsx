@@ -35,7 +35,7 @@ const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
     kind: 'photo',
   },
   'razors-image-barbershop': {
-    src: '/images/partners/razors-image-video-poster.webp',
+    src: '/images/partners/razors-image-logo.jpg',
     alt: "Razor's Image Barbershop in Bloomington, Indiana",
     kind: 'photo',
   },
@@ -62,10 +62,12 @@ export default function HostShopShowcase({
   enableNarration = true,
   narration,
   narrationSrc,
+  narrationSources,
   mediaOverrides,
   mediaSequence,
   tourScripts,
   asHero = false,
+  portraitTour = false,
 }: {
   shops: FeaturedHostPartner[];
   /** Limit video playback to the designated tour while retaining other shops as still slides. */
@@ -80,6 +82,8 @@ export default function HostShopShowcase({
   narration?: string;
   /** Pre-rendered narration removes runtime voice-generation delay. */
   narrationSrc?: string;
+  /** Recorded scripts matched to the active shop media. */
+  narrationSources?: Record<string, string>;
   /** Page-specific media without changing another surface such as the homepage. */
   mediaOverrides?: Record<string, ShowcaseMedia>;
   /** Explicit media order for a surface that needs more than one slide per shop. */
@@ -88,6 +92,8 @@ export default function HostShopShowcase({
   tourScripts?: Record<string, string>;
   /** Render the lead heading as the page's primary heading. */
   asHero?: boolean;
+  /** Give vertical shop tours a full-height frame without cropping the video. */
+  portraitTour?: boolean;
 }) {
   // Shops without verified media remain in the directory below, but do not
   // become empty decorative slides in the rotating gallery.
@@ -113,6 +119,7 @@ export default function HostShopShowcase({
   }, [mediaOverrides, mediaSequence, shops, videoTourShopSlug]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
   const [interacting, setInteracting] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
@@ -131,15 +138,12 @@ export default function HostShopShowcase({
   }, []);
 
   useEffect(() => {
-    if (paused || interacting || reduceMotion || slides.length < 2) return;
-    const activeMedia = slides[activeIndex]?.media;
-    // Video tours control their own advancement so they always play to completion.
-    if (activeMedia?.kind === 'video') return;
+    if (paused || interacting || reduceMotion || videoPlaying || slides.length < 2) return;
     const timer = window.setTimeout(() => {
       setActiveIndex((current) => (current + 1) % slides.length);
     }, ROTATION_MS);
     return () => window.clearTimeout(timer);
-  }, [activeIndex, interacting, paused, reduceMotion, slides]);
+  }, [activeIndex, interacting, paused, reduceMotion, videoPlaying, slides]);
 
   useEffect(() => {
     if (!autoPlayVideoOnVisible) return;
@@ -184,6 +188,7 @@ export default function HostShopShowcase({
 
   useEffect(() => {
     userEnabledSoundRef.current = false;
+    setVideoPlaying(false);
   }, [activeIndex]);
 
   useEffect(() => {
@@ -230,7 +235,7 @@ export default function HostShopShowcase({
       ref={sectionRef}
       aria-labelledby="host-shop-showcase-heading"
       data-scroll-narration={enableNarration ? true : undefined}
-      data-narration-src={enableNarration ? narrationSrc : undefined}
+      data-narration-src={enableNarration ? (narrationSources?.[image.src] ?? narrationSrc) : undefined}
       data-narration={
         enableNarration
           ? (tourScripts?.[image.src] ??
@@ -307,8 +312,8 @@ export default function HostShopShowcase({
         </div>
 
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
-          <div className={`grid ${shop.slug === 'razors-image-barbershop' ? 'lg:grid-cols-[1.45fr_0.55fr]' : 'lg:grid-cols-[1.1fr_0.9fr]'}`}>
-            <div className={`relative aspect-[4/3] min-h-0 overflow-hidden bg-slate-100 sm:aspect-[16/10] lg:aspect-auto ${shop.slug === 'razors-image-barbershop' ? 'lg:min-h-[500px]' : 'lg:min-h-[390px]'}`}>
+          <div className="grid lg:grid-cols-2">
+            <div className={`relative min-h-0 overflow-hidden bg-slate-950 lg:aspect-auto ${portraitTour ? 'aspect-[9/16] sm:aspect-[3/4] lg:min-h-[640px]' : 'aspect-[4/3] lg:min-h-[420px]'}`}>
               {image?.kind === 'video' && !failedVideos.has(image.src) ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
                   {image.backdropSrc ? (
@@ -329,7 +334,9 @@ export default function HostShopShowcase({
                     muted={autoPlayVideoOnVisible}
                     data-host-shop-tour
                     poster={image.backdropSrc}
+                    onPause={() => setVideoPlaying(false)}
                     onPlay={(event) => {
+                      setVideoPlaying(true);
                       event.currentTarget.defaultPlaybackRate = 1;
                       event.currentTarget.playbackRate = 1;
                       if (!event.currentTarget.muted) {
@@ -347,8 +354,8 @@ export default function HostShopShowcase({
                       if (userEnabledSoundRef.current) stopAllNaturalVoicePlayback();
                     }}
                     onEnded={(event) => {
-                      // Hold the final frame. The tour is never cut short, sped up,
-                      // reset, or advanced automatically.
+                      // Resume photo rotation only after the full tour finishes.
+                      setVideoPlaying(false);
                       event.currentTarget.pause();
                     }}
                     onError={() =>
@@ -375,14 +382,6 @@ export default function HostShopShowcase({
                 </div>
               ) : image && !failedImages.has(image.src) ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
-                  <Image
-                    src={image.src}
-                    alt=""
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 58vw"
-                    className="-z-10 scale-110 object-cover opacity-40 blur-xl"
-                    aria-hidden="true"
-                  />
                   <Image
                     key={image.src}
                     src={image.src}

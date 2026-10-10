@@ -615,6 +615,7 @@ export default async function ApprenticePortalPage() {
   );
 
   const actions = [
+    { title: 'My Website Traffic', text: 'See views, visitor sources, and locations for your connected website.', href: '/apprentice/analytics', image: '/images/pages/training-classroom.webp' },
     {
       title: 'Clock work hours',
       text: 'Record geofenced supervised work time for Host Shop review. OJL hours remain evidence; competency verification controls competency-based progression.',

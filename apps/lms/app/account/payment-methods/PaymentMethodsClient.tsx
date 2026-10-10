@@ -131,7 +131,7 @@ export function PaymentMethodsClient({
                         href={paymentUrl}
                         rel="noopener noreferrer"
                       >
-                        Pay with PayPal or card
+                        Pay through QuickBooks
                       </a>
                     ) : null}
                     {payable && invoice.amountCents >= 5_000 && invoice.amountCents <= 3_000_000 ? (

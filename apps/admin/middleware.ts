@@ -22,7 +22,7 @@ const PUBLIC_PATHS = [
   '/api/auth/admin-login',
   '/api/health',
   '/api/ping',
-  // Northflank and release automation must evaluate readiness before login.
+  // Google Cloud Run and release automation must evaluate readiness before login.
   // The endpoint exposes configuration state only; it does not expose data.
   '/api/ready',
   '/api/version',

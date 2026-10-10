@@ -63,7 +63,7 @@ export default function EmployerDemoPage() {
       {notice && <div className="fixed right-4 top-24 z-50 rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-xl">{notice}</div>}
 
       <div className="mx-auto max-w-7xl px-4 py-8">
-        <TalkingDemoGuide productName="Elevate Employer Portal" steps={demoSteps} onStepChange={syncGuide} />
+        <TalkingDemoGuide productName="Elevate Employer Portal" steps={demoSteps} onStepChange={syncGuide} activeIndex={["dashboard", "jobs", "candidates", "messages"].indexOf(tab)} />
 
         <nav className="mb-6 mt-6 flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-white p-2">
           {[

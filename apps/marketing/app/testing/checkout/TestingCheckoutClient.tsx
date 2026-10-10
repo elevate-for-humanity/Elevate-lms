@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { testingAppointmentLabel } from '@/lib/testing/booking-calendar';
 import { CalendarDays, Check, CreditCard, Loader2, Sparkles, Tag } from 'lucide-react';
 
 type Provider = {
@@ -59,6 +60,7 @@ export default function TestingCheckoutClient({
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
+  const checkoutAttempt = useRef<{ selection: string; requestId: string } | null>(null);
 
   const provider = useMemo(() => providers.find((p) => p.key === providerKey) ?? null, [providers, providerKey]);
   const exam = useMemo(
@@ -108,6 +110,16 @@ export default function TestingCheckoutClient({
     setLoading(true);
     setError('');
     try {
+      const selection = JSON.stringify([provider.key, exam.name, quantity, addOn, slotId, customerName.trim(), customerEmail.trim().toLowerCase()]);
+      if (checkoutAttempt.current?.selection !== selection) {
+        let saved: { selection?: string; requestId?: string } = {};
+        try { saved = JSON.parse(sessionStorage.getItem('testingCheckoutAttempt') || '{}'); } catch { /* Start a fresh attempt if storage is damaged. */ }
+        checkoutAttempt.current = {
+          selection,
+          requestId: saved.selection === selection && saved.requestId ? saved.requestId : crypto.randomUUID(),
+        };
+        sessionStorage.setItem('testingCheckoutAttempt', JSON.stringify(checkoutAttempt.current));
+      }
       const response = await fetch('/api/testing/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -120,11 +132,12 @@ export default function TestingCheckoutClient({
           slotId,
           name: customerName.trim(),
           email: customerEmail.trim(),
+          requestId: checkoutAttempt.current.requestId,
         }),
       });
       const data = await response.json();
       if (!response.ok || !data.url) throw new Error(data.error || 'Unable to start checkout.');
-      sessionStorage.setItem('testingCheckout', JSON.stringify({ invoiceId: data.invoiceId, email: customerEmail.trim() }));
+      sessionStorage.setItem('testingCheckout', JSON.stringify({ invoiceId: data.invoiceId, bookingToken: data.bookingToken }));
       window.location.href = data.url;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to start checkout.');
@@ -207,7 +220,7 @@ export default function TestingCheckoutClient({
             <option value="">{slotsLoading ? 'Loading appointments…' : slots.length ? 'Select an appointment' : 'No appointments currently available'}</option>
             {slots.map((slot) => (
               <option key={slot.id} value={slot.id}>
-                {new Date(slot.startTime).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' })}
+                {testingAppointmentLabel(slot.startTime)}
                 {slot.location ? ` — ${slot.location}` : ''} ({slot.spotsRemaining} open)
               </option>
             ))}

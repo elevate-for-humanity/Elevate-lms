@@ -12,7 +12,7 @@ import {
 
 const STANDARD_DOWN_PAYMENT = MIN_SETUP_FEE_CENTS / 100;
 const OCTOBER_PROMO_DOWN_PAYMENT = 300;
-const OCTOBER_PROMO_CODE = '50OFFOCT';
+const OCTOBER_PROMO_CODE = 'OCT300';
 
 export default function BarberPaymentPlanner() {
   const [downPayment, setDownPayment] = useState(STANDARD_DOWN_PAYMENT);
@@ -55,7 +55,7 @@ export default function BarberPaymentPlanner() {
           50% off the standard startup deposit
         </p>
         <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">
-          For a limited time, start with a $300 deposit instead of $600. Enter coupon code <strong>50OFFOCT</strong>.
+          For a limited time, start with a $300 deposit instead of $600. Enter coupon code <strong>OCT300</strong>.
         </p>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
           <label htmlFor="barber-coupon" className="sr-only">Coupon code</label>
@@ -129,7 +129,7 @@ export default function BarberPaymentPlanner() {
         </Link>
       </div>
 
-      <Link href={couponApplied ? "/programs/barber-apprenticeship/payment-setup?coupon=50OFFOCT" : "/programs/barber-apprenticeship/payment-setup"} className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3.5 text-center font-black text-white hover:bg-brand-red-700">
+      <Link href={couponApplied ? "/programs/barber-apprenticeship/payment-setup?coupon=OCT300" : "/programs/barber-apprenticeship/payment-setup"} className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3.5 text-center font-black text-white hover:bg-brand-red-700">
         Continue to Secure Payment Setup
       </Link>
       <p className="mt-3 flex items-center justify-center gap-2 text-center text-xs font-bold text-slate-600">

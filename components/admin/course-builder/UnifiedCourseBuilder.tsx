@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Award, BookOpen, Bot, Loader2, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
+import UltimateStageInspector from '@/components/admin/course-builder/UltimateStageInspector';
 import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
 
 type Tab = 'courses' | 'ultimate' | 'registry';
@@ -35,6 +36,7 @@ type UltimateBuildRow = {
     last_error?: string | null;
     created_at: string;
     heartbeat_at?: string | null;
+    lease_expires_at?: string | null;
   }>;
 };
 
@@ -48,7 +50,7 @@ async function readJson(response: Response) {
   return response.json().catch(() => ({}));
 }
 
-async function queueUltimateCourse(input: {
+async function startUltimateCourse(input: {
   course: CourseRow;
   programSlug: string;
   topic?: string;
@@ -58,7 +60,7 @@ async function queueUltimateCourse(input: {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      action: 'queue-course',
+      action: 'start-course',
       courseId: input.course.id,
       programSlug: input.programSlug,
       title: input.course.title,
@@ -68,8 +70,10 @@ async function queueUltimateCourse(input: {
   });
   const payload = await readJson(response);
   if (!response.ok || !payload?.buildId) {
-    throw new Error(payload?.error || payload?.message || 'Ultimate build could not be queued');
+    throw new Error(payload?.error || payload?.message || 'Ultimate build could not be started');
   }
+  if (payload?.dispatched !== true)
+    throw new Error('Worker launch was not accepted. Resume the saved build.');
   return payload;
 }
 
@@ -238,6 +242,12 @@ export default function UnifiedCourseBuilder({
       </div>
 
       <main className="mx-auto min-w-0 max-w-[1600px] p-3 pb-24 sm:p-4 sm:pb-24">
+        {tab !== 'courses' && inventoryError ? (
+          <div role="alert" className="mb-4 rounded-lg bg-red-950/60 p-3 text-red-100">
+            Course inventory could not load: {inventoryError}{' '}
+            <button type="button" onClick={() => void loadCourses()} className="underline">Retry course inventory</button>
+          </div>
+        ) : null}
         {tab === 'courses' && (
           <CourseCatalog
             courses={courses}
@@ -423,7 +433,7 @@ function CreateCoursePanel({
       if (!createResponse.ok || !course?.id) {
         throw new Error(course?.error || 'Unable to create the canonical course shell');
       }
-      await queueUltimateCourse({
+      await startUltimateCourse({
         course,
         programSlug: selectedProgram.slug,
         topic,
@@ -442,7 +452,7 @@ function CreateCoursePanel({
       onSubmit={submit}
       className="mx-auto min-w-0 max-w-3xl space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-6"
     >
-      <h2 className="text-xl font-bold">Create and queue in Ultimate</h2>
+      <h2 className="text-xl font-bold">Create and start in Ultimate</h2>
       <p className="text-sm text-slate-400">
         Creates only the canonical course shell, then hands all generation to Ultimate Course
         Builder.
@@ -494,7 +504,7 @@ function CreateCoursePanel({
         className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50"
       >
         {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Rocket className="h-4 w-4" />}
-        {saving ? 'Queuing Ultimate build…' : 'Create and queue Ultimate build'}
+        {saving ? 'Starting Ultimate build…' : 'Create and start Ultimate build'}
       </button>
     </form>
   );
@@ -515,12 +525,22 @@ export function UltimateBuildPanel({
   const [error, setError] = useState('');
   const refreshToken = useRef(0);
   const latest = buildsCourseId === course.id ? (builds[0] ?? null) : null;
-  const statusLoading = loading || buildsCourseId !== course.id;
+  const statusLoading = loading;
+  const statusLoaded = buildsCourseId === course.id;
+  const [notice, setNotice] = useState('');
   const jobs = [...(latest?.ultimate_build_jobs ?? [])].sort((a, b) =>
     b.created_at.localeCompare(a.created_at),
   );
-  const activeJob = jobs.find((job) => ['queued', 'running'].includes(job.status));
-  const workerJob = activeJob ?? jobs[0];
+  const observedJobs = jobs.map(job => {
+    if (job.status !== 'running') return job;
+    const heartbeat = Date.parse(job.heartbeat_at ?? '');
+    const leaseEnd = Date.parse(job.lease_expires_at ?? '');
+    const active = Number.isFinite(heartbeat) && Date.now() - heartbeat < 90_000 &&
+      Number.isFinite(leaseEnd) && leaseEnd > Date.now();
+    return active ? job : {...job, status: 'stalled', last_error: 'Worker heartbeat is missing or stale. Resume the saved build; Google prevents overlapping executions.'};
+  });
+  const activeJob = observedJobs.find((job) => ['queued', 'running'].includes(job.status));
+  const workerJob = activeJob ?? observedJobs[0];
 
   async function refresh(requestedCourseId = course.id) {
     const token = ++refreshToken.current;
@@ -559,14 +579,26 @@ export function UltimateBuildPanel({
     return () => window.clearInterval(timer);
   }, [latest?.id, latest?.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function queue() {
+  async function startBuild() {
     setBusy(true);
     setError('');
     try {
-      await queueUltimateCourse({ course, programSlug });
+      setNotice('');
+      if (latest) {
+        const response = await fetch('/api/admin/ultimate-course-builder/run', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ buildId: latest.id }),
+        });
+        const payload = await readJson(response);
+        if (!response.ok || payload?.dispatched !== true) throw new Error(payload?.error || 'Google worker could not be started');
+        setNotice('Google worker dispatch accepted. The stages below show actual build progress.');
+      } else {
+        await startUltimateCourse({ course, programSlug });
+        setNotice('Build saved and Google worker dispatch accepted. Check the stages for progress.');
+      }
       await refresh();
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : 'Unable to queue Ultimate build');
+      setError(reason instanceof Error ? reason.message : 'Unable to start Ultimate build');
     } finally {
       setBusy(false);
     }
@@ -601,7 +633,7 @@ export function UltimateBuildPanel({
           </p>
           <h2 className="mt-1 text-2xl font-black text-white">{course.title}</h2>
           <p className="mt-2 text-sm text-slate-400">
-            Program authority: {programSlug || 'course-defined'} · durable Northflank worker · 20
+            Program authority: {programSlug || 'course-defined'} · Google Course Builder worker · 20
             checkpointed stages
           </p>
         </div>
@@ -619,7 +651,7 @@ export function UltimateBuildPanel({
         <div className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-500">Worker job</p>
           <p className="mt-1 text-sm font-bold text-slate-200">
-            {workerJob?.status ?? 'not queued'} · {workerJob?.id ?? 'No persisted job'}
+            {workerJob?.status === 'queued' ? 'Awaiting worker assignment' : (workerJob?.status ?? 'Not started')} · {workerJob?.id ?? 'No persisted job'}
           </p>
           {workerJob?.last_error ? (
             <p role="alert" className="mt-2 break-words text-sm text-amber-200">
@@ -647,19 +679,19 @@ export function UltimateBuildPanel({
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-500">Status</p>
           <p className="mt-1 text-lg font-black text-white">
-            {statusLoading ? 'loading…' : (latest?.status ?? 'not queued')}
+            {statusLoading ? 'loading…' : !statusLoaded ? 'Unavailable' : (latest?.status === 'queued' ? 'Awaiting worker assignment' : (latest?.status ?? 'not started'))}
           </p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-500">Current stage</p>
           <p className="mt-1 break-words text-lg font-black text-white">
-            {statusLoading ? 'loading…' : (latest?.current_step ?? 'standards_lock')}
+            {statusLoading ? 'loading…' : !statusLoaded ? 'Unavailable' : (latest?.current_step ?? 'Not started')}
           </p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-500">Build ID</p>
           <p className="mt-1 break-all text-sm font-bold text-slate-200">
-            {statusLoading ? 'Loading course build…' : (latest?.id ?? 'Created when queued')}
+            {statusLoading ? 'Loading course build…' : !statusLoaded ? 'Unavailable' : (latest?.id ?? 'Created when started')}
           </p>
         </div>
       </div>
@@ -678,28 +710,14 @@ export function UltimateBuildPanel({
         </div>
       )}
 
-      <ol className="mt-5 grid gap-2 text-sm text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          'Standards lock',
-          'Instruction design',
-          'Media + narration',
-          'Assessment alignment',
-          'Finished-media QA',
-          'Learner run-through',
-          'Selective repair',
-          'Credential release',
-        ].map((step) => (
-          <li key={step} className="rounded-lg border border-slate-800 bg-slate-950/70 px-3 py-2">
-            {step}
-          </li>
-        ))}
-      </ol>
+      {notice ? <p role="status" className="mt-4 text-sm text-cyan-200">{notice}</p> : null}
+      {latest ? <UltimateStageInspector buildId={latest.id} updatedAt={latest.updated_at} /> : null}
 
       <div className="mt-6 flex flex-wrap gap-3">
         <button
           type="button"
-          onClick={() => void queue()}
-          disabled={busy || statusLoading || Boolean(activeJob)}
+          onClick={() => void startBuild()}
+          disabled={busy || statusLoading || !statusLoaded || activeJob?.status === 'running'}
           className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-black text-slate-950 disabled:opacity-50"
         >
           {busy || statusLoading ? (
@@ -709,13 +727,15 @@ export function UltimateBuildPanel({
           )}
           {statusLoading
             ? 'Loading build status…'
+            : !statusLoaded
+              ? 'Build status unavailable'
             : workerJob?.status === 'queued'
-              ? 'Ultimate build queued'
+              ? 'Start Google worker'
               : workerJob?.status === 'running'
                 ? 'Ultimate build running'
                 : latest
                   ? 'Resume Ultimate build'
-                  : 'Queue Ultimate build'}
+                  : 'Start Ultimate build'}
         </button>
         {latest?.status === 'built' ? (
           <button

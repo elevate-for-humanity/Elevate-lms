@@ -39,13 +39,19 @@ export default function EnrollPage() {
   const params = useParams();
   const router = useRouter();
   const programId = params.programId as string;
+  const onlineSchoolProgram = ['healthcare-training', 'enchanted-hearts'].includes(
+    getClientSearchParam('partner') || '',
+  );
 
   const [program, setProgram] = useState<Program | null>(null);
   const [licenseKey, setLicenseKey] = useState('');
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'quickbooks' | 'affirm'>('quickbooks');
   const [message, setMessage] = useState('');
-  const [couponCode, setCouponCode] = useState(() => getClientSearchParam('coupon')?.toUpperCase() || '');
+  const [couponCode, setCouponCode] = useState(
+    () => getClientSearchParam('coupon')?.toUpperCase() || '',
+  );
   const [paymentPlan, setPaymentPlan] = useState<'full' | 'installments'>(() =>
     getClientSearchParam('payment_plan') === 'installments' ? 'installments' : 'full',
   );
@@ -60,19 +66,11 @@ export default function EnrollPage() {
   const loadProgram = async () => {
     setLoading(true);
     try {
-      // Try slug first (public-friendly), fall back to UUID
-      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        programId,
-      );
-      const column = isUUID ? 'id' : 'slug';
-
-      const { data, error } = await supabase
-        .from('programs')
-        .select('*')
-        .eq(column, programId)
-        .single();
-
-      if (error) throw error;
+      const response = await fetch(`/api/enroll/program/${encodeURIComponent(programId)}`);
+      const result = await response.json();
+      if (!response.ok || !result.program)
+        throw new Error(result.error || 'Unable to load program.');
+      const data = result.program;
 
       // Apprenticeships require approval flow - redirect to application
       const isApprenticeship =
@@ -129,7 +127,8 @@ export default function EnrollPage() {
       } = await supabase.auth.getUser();
       if (!user) {
         setMessage('Please sign in to enroll');
-        router.push(`/login?redirect=/enroll/${programId}`);
+        const destination = `/enroll/${programId}${onlineSchoolProgram ? '?partner=healthcare-training' : ''}`;
+        router.push(`/login?redirect=${encodeURIComponent(destination)}`);
         return;
       }
 
@@ -151,8 +150,9 @@ export default function EnrollPage() {
           body: JSON.stringify({
             program_id: program?.id || programId,
             funding_source: 'self_pay',
-            payment_plan: paymentPlan,
-            coupon_code: couponCode.trim() || undefined,
+            payment_method: paymentMethod,
+            payment_plan: onlineSchoolProgram || paymentMethod === 'affirm' ? 'full' : paymentPlan,
+            coupon_code: onlineSchoolProgram ? undefined : couponCode.trim() || undefined,
             partner_key: getClientSearchParam('partner') || undefined,
           }),
         });
@@ -182,30 +182,9 @@ export default function EnrollPage() {
         const data = await response.json();
 
         if (!response.ok) {
-          // If checkout fails for free programs, fall back to direct enrollment
-          const applyResponse = await fetch('/api/enroll/apply', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              firstName: user.user_metadata?.first_name || '',
-              lastName: user.user_metadata?.last_name || '',
-              email: user.email,
-              preferredProgramId: program?.id || programId,
-              licenseKey: licenseKey || null,
-            }),
-          });
-
-          const applyData = await applyResponse.json();
-
-          if (!applyResponse.ok) {
-            throw new Error(applyData.message || 'Enrollment failed');
-          }
-
-          setMessage(applyData.message || 'Enrollment successful! Redirecting...');
-          setTimeout(() => {
-            router.push('/enroll/success');
-          }, 2000);
-          return;
+          throw new Error(
+            data.error || 'Enrollment could not be completed. Please contact Elevate.',
+          );
         }
 
         if (data.url) {
@@ -393,70 +372,119 @@ export default function EnrollPage() {
 
               {!program.is_free && (program.price || program.total_cost) ? (
                 <>
-                  <fieldset className="mb-4 rounded-xl border border-slate-200 bg-white p-4 sm:mb-6">
-                    <legend className="px-1 text-sm font-black text-slate-950">Payment schedule</legend>
-                    <div className="mt-2 grid gap-3 sm:grid-cols-2">
-                      <label className={`cursor-pointer rounded-xl border-2 p-4 ${
-                        paymentPlan === 'full' ? 'border-blue-600 bg-blue-50' : 'border-slate-200'
-                      }`}>
-                        <input
-                          type="radio"
-                          name="payment-plan"
-                          value="full"
-                          checked={paymentPlan === 'full'}
-                          onChange={() => setPaymentPlan('full')}
-                          className="mr-2"
-                        />
-                        <span className="font-bold text-slate-950">Pay in full</span>
-                        <span className="mt-1 block text-xs text-slate-600">One QuickBooks invoice</span>
-                      </label>
-                      <label className={`cursor-pointer rounded-xl border-2 p-4 ${
-                        paymentPlan === 'installments'
-                          ? 'border-blue-600 bg-blue-50'
-                          : 'border-slate-200'
-                      }`}>
-                        <input
-                          type="radio"
-                          name="payment-plan"
-                          value="installments"
-                          checked={paymentPlan === 'installments'}
-                          onChange={() => setPaymentPlan('installments')}
-                          className="mr-2"
-                        />
-                        <span className="font-bold text-slate-950">Four installments</span>
-                        <span className="mt-1 block text-xs text-slate-600">
-                          Initial invoice, then three monthly invoices
-                        </span>
-                      </label>
-                    </div>
-                    <p className="mt-3 text-xs leading-5 text-slate-600">
-                      QuickBooks shows the online card or ACH methods enabled for your invoice.
-                      This installment schedule is not third-party BNPL.
+                  <fieldset className="mb-6 rounded-xl border border-slate-200 bg-white p-4">
+                    <legend className="px-1 font-black text-slate-950">
+                      How would you like to pay?
+                    </legend>
+                    <label className="mt-3 flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value="quickbooks"
+                        checked={paymentMethod === 'quickbooks'}
+                        onChange={() => setPaymentMethod('quickbooks')}
+                      />{' '}
+                      Pay online through QuickBooks
+                    </label>
+                    <label className="mt-3 flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value="affirm"
+                        checked={paymentMethod === 'affirm'}
+                        onChange={() => setPaymentMethod('affirm')}
+                      />{' '}
+                      Apply for Affirm Buy Now, Pay Later
+                    </label>
+                    <p className="mt-3 text-sm text-slate-600">
+                      Affirm approval and repayment terms are determined by Affirm. Your payment is
+                      recorded against your Elevate QuickBooks invoice.
                     </p>
                   </fieldset>
+                  {!onlineSchoolProgram && paymentMethod !== 'affirm' ? (
+                    <fieldset className="mb-4 rounded-xl border border-slate-200 bg-white p-4 sm:mb-6">
+                      <legend className="px-1 text-sm font-black text-slate-950">
+                        Payment schedule
+                      </legend>
+                      <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                        <label
+                          className={`cursor-pointer rounded-xl border-2 p-4 ${
+                            paymentPlan === 'full'
+                              ? 'border-blue-600 bg-blue-50'
+                              : 'border-slate-200'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="payment-plan"
+                            value="full"
+                            checked={paymentPlan === 'full'}
+                            onChange={() => setPaymentPlan('full')}
+                            className="mr-2"
+                          />
+                          <span className="font-bold text-slate-950">Pay in full</span>
+                          <span className="mt-1 block text-xs text-slate-600">
+                            One QuickBooks invoice
+                          </span>
+                        </label>
+                        <label
+                          className={`cursor-pointer rounded-xl border-2 p-4 ${
+                            paymentPlan === 'installments'
+                              ? 'border-blue-600 bg-blue-50'
+                              : 'border-slate-200'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="payment-plan"
+                            value="installments"
+                            checked={paymentPlan === 'installments'}
+                            onChange={() => setPaymentPlan('installments')}
+                            className="mr-2"
+                          />
+                          <span className="font-bold text-slate-950">Four installments</span>
+                          <span className="mt-1 block text-xs text-slate-600">
+                            Initial invoice, then three monthly invoices
+                          </span>
+                        </label>
+                      </div>
+                      <p className="mt-3 text-xs leading-5 text-slate-600">
+                        QuickBooks shows the online card or ACH methods enabled for your invoice.
+                        This installment schedule is not third-party BNPL.
+                      </p>
+                    </fieldset>
+                  ) : (
+                    <p className="mb-4 text-sm font-bold">
+                      Tuition must be confirmed before class registration. Eligible learners can
+                      request Affirm Buy Now, Pay Later for their Elevate invoice; approval and
+                      repayment terms are determined by Affirm.
+                    </p>
+                  )}
 
-                  <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4 sm:mb-6">
-                  <label
-                    htmlFor="enrollment-coupon"
-                    className="flex items-center gap-2 text-sm font-black text-blue-950"
-                  >
-                    <Tag className="h-5 w-5 text-blue-700" /> Coupon or promotion code
-                  </label>
-                  <input
-                    id="enrollment-coupon"
-                    type="text"
-                    value={couponCode}
-                    onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
-                    placeholder="Enter coupon code"
-                    autoComplete="off"
-                    className="mt-3 block w-full rounded-lg border border-blue-300 bg-white px-3 py-3 font-semibold uppercase tracking-wide text-slate-950 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  />
-                  <p className="mt-2 text-xs leading-5 text-blue-800">
-                    Active Elevate codes are validated securely before the QuickBooks invoice is
-                    created. For partner programs, a coupon can reduce only Elevate&apos;s portion;
-                    the training provider&apos;s approved share remains protected.
-                  </p>
-                  </div>
+                  {!onlineSchoolProgram ? (
+                    <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4 sm:mb-6">
+                      <label
+                        htmlFor="enrollment-coupon"
+                        className="flex items-center gap-2 text-sm font-black text-blue-950"
+                      >
+                        <Tag className="h-5 w-5 text-blue-700" /> Coupon or promotion code
+                      </label>
+                      <input
+                        id="enrollment-coupon"
+                        type="text"
+                        value={couponCode}
+                        onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
+                        placeholder="Enter coupon code"
+                        autoComplete="off"
+                        className="mt-3 block w-full rounded-lg border border-blue-300 bg-white px-3 py-3 font-semibold uppercase tracking-wide text-slate-950 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      />
+                      <p className="mt-2 text-xs leading-5 text-blue-800">
+                        Active Elevate codes are validated securely before the QuickBooks invoice is
+                        created. For partner programs, a coupon can reduce only Elevate&apos;s
+                        portion; the training provider&apos;s approved share remains protected.
+                      </p>
+                    </div>
+                  ) : null}
                 </>
               ) : null}
 

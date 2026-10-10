@@ -83,18 +83,18 @@ export function ScrollNarrator() {
       // Mobile layouts frequently have spacing between narrated sections.
       // Keep the active script playing through that gap instead of cutting a
       // sentence off merely because the visitor continued scrolling.
-      return;
+      return false;
     }
 
     const text = narrationFor(section);
-    if (!text) return;
+    if (!text) return false;
     const source = narrationSourceFor(section);
     if (
       lastNarrationRef.current?.section === section &&
       lastNarrationRef.current.text === text &&
       lastNarrationRef.current.source === source
     )
-      return;
+      return true;
 
     lastNarrationRef.current = { section, text, source };
     pauseOtherAudibleMedia();
@@ -107,10 +107,11 @@ export function ScrollNarrator() {
     });
     if (!started) {
       lastNarrationRef.current = null;
-      setNotice('Narration will begin with your first touch.');
+      setNotice('Narration could not start. Tap the speaker to retry.');
     } else {
       setNotice(null);
     }
+    return started;
   }, [play]);
 
   useEffect(() => {
@@ -236,8 +237,8 @@ export function ScrollNarrator() {
       setNotice(null);
       lastNarrationRef.current = null;
       void narrateVisibleSection()
-        .then(() => {
-          unlocked = true;
+        .then((started) => {
+          unlocked = started;
         })
         .finally(() => {
           retrying = false;
@@ -246,16 +247,13 @@ export function ScrollNarrator() {
 
     window.addEventListener('pointerdown', beginFromNaturalInteraction, {
       capture: true,
-      once: true,
     });
     window.addEventListener('touchstart', beginFromNaturalInteraction, {
       capture: true,
-      once: true,
       passive: true,
     });
     window.addEventListener('keydown', beginFromNaturalInteraction, {
       capture: true,
-      once: true,
     });
 
     return () => {

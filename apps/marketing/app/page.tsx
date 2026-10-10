@@ -1,12 +1,11 @@
 // Keep the homepage focused on training, the featured shops, and enrollment.
 // Detailed platform operations remain on the dedicated platform pages.
 import type { Metadata } from 'next';
-import { HomeTrustBar } from '@/components/home/HomeTrustBar';
+import Link from 'next/link';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
-import { HomeNetworks } from '@/components/home/HomeNetworks';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
@@ -23,14 +22,14 @@ export const metadata: Metadata = {
     url: 'https://www.elevateforhumanity.org',
     siteName: PLATFORM_DEFAULTS.orgName,
     locale: 'en_US',
-    images: [{ url: '/images/pages/comp-home-hero.webp', width: 1200, height: 630, alt: `${PLATFORM_DEFAULTS.orgName} career training and workforce programs` }],
+    images: [{ url: 'https://www.elevateforhumanity.org/images/social/elevate-career-training-20261009.jpg', width: 1200, height: 630, type: 'image/jpeg', alt: `${PLATFORM_DEFAULTS.orgName} career training and workforce programs` }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: `${PLATFORM_DEFAULTS.orgName} | Career Training & Apprenticeships`,
     description: 'Explore career training, registered apprenticeships, Host Shops, and employer-connected pathways across Indiana.',
-    images: ['/images/pages/comp-home-hero.webp'],
+    images: ['https://www.elevateforhumanity.org/images/social/elevate-career-training-20261009.jpg'],
   },
   robots: { index: true, follow: true },
 };
@@ -44,6 +43,14 @@ export default function HomePage() {
         <PlatformHubHero />
         <HomeFeaturedHostShop />
         <HomeCareerPathways />
+        <section className="bg-slate-50 px-5 py-12" aria-labelledby="tax-home-cta">
+          <div className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-white p-8">
+            <p className="text-sm font-semibold text-sky-800">Supersonic Fast Cash · PARIS</p>
+            <h2 id="tax-home-cta" className="mt-3 text-3xl font-bold text-slate-950">Explore our tax preparation software</h2>
+            <p className="mt-4 max-w-2xl text-slate-600">Start a return, organize your interview answers, and review confirmed W-2 information in your secure workspace.</p>
+            <Link href="/tax" className="mt-6 inline-flex rounded-xl bg-sky-800 px-6 py-3 font-semibold text-white">Open PARIS tax software</Link>
+          </div>
+        </section>
         <section className="border-y border-slate-200 bg-slate-50 px-4 py-6" aria-labelledby="workone-home-cta">
           <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -55,9 +62,7 @@ export default function HomePage() {
             </a>
           </div>
         </section>
-        <HomeNetworks />
         <HomeFinalCTA />
-        <HomeTrustBar />
       </main>
     </>
   );

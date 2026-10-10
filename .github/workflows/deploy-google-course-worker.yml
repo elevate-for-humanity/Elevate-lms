@@ -36,7 +36,7 @@ jobs:
     concurrency:
       group: google-course-worker-image
       cancel-in-progress: true
-    if: github.event_name != 'push' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:

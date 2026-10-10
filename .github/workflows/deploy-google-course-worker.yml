@@ -16,8 +16,6 @@ on:
       - 'workers/admin-speech-cache.mjs'
       - '.github/workflows/deploy-google-course-worker.yml'
   workflow_dispatch:
-  schedule:
-    - cron: '17 * * * *'
 permissions:
   contents: read
   actions: write

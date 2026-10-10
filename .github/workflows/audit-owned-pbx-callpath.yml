@@ -6,14 +6,23 @@ on:
     paths:
       - '.github/workflows/audit-owned-pbx-callpath.yml'
 permissions:
+  actions: write
   contents: read
   id-token: write
 concurrency:
   group: google-pbx-infrastructure
   cancel-in-progress: false
 jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Start read-only PBX audit through approved Google identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/audit-owned-pbx-callpath.yml/dispatches" -f ref=main
   audit:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment: production
@@ -54,6 +63,16 @@ jobs:
           VM=elevate-pbx
           test "$(gcloud compute instances describe "$VM" --project="$PROJECT" --zone="$ZONE" --format='value(status)')" = RUNNING
           test "$(gcloud compute instances describe "$VM" --project="$PROJECT" --zone="$ZONE" --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+      - name: Verify phone DNS against the running Google VM
+        shell: bash
+        run: |
+          set -euo pipefail
+          ACTUAL="$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')"
+          DNS="$(dig +short A phone.elevateforhumanity.org @8.8.8.8 | tail -1)"
+          echo "Google PBX IP: $ACTUAL; public phone DNS: $DNS"
+          test "$ACTUAL" = "$DNS"
+          dig +short CNAME phone.elevateforhumanity.org @8.8.8.8
+          curl --fail --silent --show-error --connect-timeout 10 --max-time 15 https://phone.elevateforhumanity.org/healthz
       - name: Read-only inspection of Asterisk and gateway
         shell: bash
         run: |

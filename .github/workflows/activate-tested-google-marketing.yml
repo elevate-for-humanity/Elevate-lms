@@ -1,4 +1,5 @@
 name: Activate already-tested Google Marketing revision
+# Recovery retry: candidate tags now fit Google's 46-character combined limit.
 on:
   push:
     branches: [main]

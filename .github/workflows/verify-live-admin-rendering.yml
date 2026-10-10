@@ -64,6 +64,20 @@ jobs:
             const revisions=JSON.parse(execFileSync('gcloud',['run','revisions','list','--service=elevate-admin-migration','--region=us-central1','--limit=5',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             console.log(JSON.stringify({adminImages:revisions.map(r=>({name:r.metadata.name,image:r.spec.containers[0].image,digest:r.status?.imageDigest,conditions:conditions(r.status?.conditions)}))}));
           } catch(error) {console.log(JSON.stringify({videoJobInspectionSucceeded:false,exitStatus:error.status}));throw new Error('Video job diagnostics failed; inspect Google access before retrying');}
+          for(const region of ['us-central1','us-east1']) {
+            const services=JSON.parse(execFileSync('gcloud',['run','services','list','--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            const jobs=JSON.parse(execFileSync('gcloud',['run','jobs','list','--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            console.log(JSON.stringify({capacityInventory:true,region,services:services.map(s=>({name:s.metadata.name,configuredResources:s.spec.template.spec.containers.map(c=>c.resources?.limits),configuredScaling:Object.fromEntries(Object.entries(s.spec.template.metadata.annotations||{}).filter(([k])=>/Scale|cpu-throttling/.test(k))),traffic:s.status?.traffic?.map(t=>({revision:t.revisionName,percent:t.percent}))})),jobs:jobs.map(j=>({name:j.metadata.name,resources:j.spec.template.spec.template.spec.containers.map(c=>c.resources?.limits),executionCount:j.status?.executionCount,latestExecution:j.status?.latestCreatedExecution}))}));
+          }
+          const token=execFileSync('gcloud',['auth','print-access-token'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+          const end=new Date(),start=new Date(end.getTime()-15*60*1000);
+          const usageURL=new URL('https://monitoring.googleapis.com/v3/projects/elegant-racer-299721/timeSeries');
+          usageURL.searchParams.set('filter','metric.type="serviceruntime.googleapis.com/quota/allocation/usage" AND resource.labels.service="run.googleapis.com"');
+          usageURL.searchParams.set('interval.startTime',start.toISOString());usageURL.searchParams.set('interval.endTime',end.toISOString());
+          usageURL.searchParams.set('pageSize','100');
+          const usageResponse=await fetch(usageURL,{headers:{authorization:'Bearer '+token},signal:AbortSignal.timeout(30000)});
+          const usage=await usageResponse.json();
+          console.log(JSON.stringify({quotaUsageHttpStatus:usageResponse.status,errorStatus:usage.error?.status,series:(usage.timeSeries||[]).map(t=>({metric:t.metric,resource:t.resource,latest:t.points?.[0]}))}));
           const filter='resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration"';
           let rows;
           try {rows=JSON.parse(execFileSync('gcloud',['logging','read',filter,'--freshness=30m','--limit=500',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));}

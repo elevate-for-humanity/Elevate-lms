@@ -69,6 +69,24 @@ secret. No plain HTTP/public turn service is authorized.
 
 ## Runtime startup wiring
 
+`Stage independent PBX runtime prerequisites` stages the same Node 22 binary used
+by protected CI plus the reviewed provisioner/PARIS source and systemd units. Its
+bundle has a strict file allowlist, per-file SHA-256 hashes and source commit;
+the VM verifies hashes, executable compatibility and JavaScript syntax before
+installation. Existing different files, symlinks, active units or insecure parent
+directories require review. It creates an unprivileged PARIS service account,
+validates units, and leaves them **inactive**. No credentials or environment files
+are packaged, no Asterisk/Caddy configuration is changed, and no service is enabled
+or started. It verifies existing PBX container identities and start times afterward.
+
+This is installation evidence only. The full post-install audit must still fail
+until real secret references, reviewed runtime includes/routes and functional
+acceptance are present. A failed installation removes only newly created,
+hash-matching files while units remain inactive. Existing files are never replaced.
+For later rollback, stop and verify any activated service first; use the retained
+source commit/file manifest to identify only this runtime's files. Never remove
+existing PBX configuration, recordings or Supabase phone records.
+
 The systemd units run as a dedicated `elevate-paris` OS account. Install the two
 units, `paris/*.mjs`, and `runtime-secrets.mjs` under `/opt/elevate-pbx/`, keeping
 the same directory layout. They require `/usr/bin/node` version 22 or later.

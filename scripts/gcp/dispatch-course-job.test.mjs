@@ -39,3 +39,22 @@ test('container launch without a durable claim fails instead of reporting starte
   await assert.rejects(dispatchQueuedCourseJob(s.options),/COURSE_WORKER_ASSIGNMENT_TIMEOUT/);
   assert.equal(s.calls.length,2);
 });
+
+test('expired running lease starts a recovery worker and requires its fresh heartbeat',async()=>{
+ const s=setup([],[{id:'queued',attempts:1,max_attempts:5,heartbeat_at:'2026-10-06T09:00:00Z'}]);
+ const base=s.options.request;
+ s.options.request=async url=>{
+  if(!url.searchParams.has('id')){
+   assert.equal(url.searchParams.has('status'),false);
+   assert.match(url.searchParams.get('or'),/status.eq.running,lease_expires_at.lt/);
+  }
+  return base(url);
+ };
+ assert.equal((await dispatchQueuedCourseJob(s.options)).status,'assigned');
+ assert.equal(s.calls.length,2);
+});
+test('exhausted candidates do not launch a recovery worker',async()=>{
+ const s=setup([],[{id:'queued',attempts:5,max_attempts:5}]);
+ assert.equal((await dispatchQueuedCourseJob(s.options)).status,'empty');
+ assert.equal(s.calls.length,1);
+});

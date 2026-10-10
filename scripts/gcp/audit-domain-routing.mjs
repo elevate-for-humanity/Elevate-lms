@@ -1,7 +1,7 @@
 import {execFileSync} from 'node:child_process';
 import {loadGoogleConfig} from './runtime-config.mjs';
 const report=value=>console.log(JSON.stringify(value));
-const domains={marketing:['elevateforhumanity.org','www.elevateforhumanity.org'],admin:['admin.elevateforhumanity.org'],lms:['app.elevateforhumanity.org'],store:['store.elevateforhumanity.org']};
+const domains={marketing:['elevateforhumanity.org','www.elevateforhumanity.org'],admin:['admin.elevateforhumanity.org','dev-studio.elevateforhumanity.org'],lms:['app.elevateforhumanity.org','lms.elevateforhumanity.org','portal.elevateforhumanity.org','dashboard.elevateforhumanity.org'],store:['store.elevateforhumanity.org'],testing:['testing.elevateforhumanity.org']};
 const cli=args=>JSON.parse(execFileSync('gcloud',[...args,'--project=elegant-racer-299721','--format=json'],{encoding:'utf8',timeout:20000,stdio:['ignore','pipe','pipe']}));
 let token=process.env.CLOUDFLARE_API_TOKEN,zone=process.env.CLOUDFLARE_ZONE_ID;
 for(const component of ['marketing','admin','lms','store','studio-browser','ultimate-worker']) {
@@ -14,7 +14,7 @@ for(const component of ['marketing','admin','lms','store','studio-browser','ulti
 }
 report({dnsCredentials:{tokenPresent:Boolean(token),zonePresent:Boolean(zone)}});
 for(const [component,names] of Object.entries(domains)) {
- const service=cli(['run','services','describe','elevate-'+component+'-migration','--region=us-central1']);
+ const service=cli(['run','services','describe','elevate-'+(component==='testing'?'marketing':component)+'-migration','--region=us-central1']);
  const c=service.spec.template.spec.containers[0];
  report({component,url:service.status.url,revision:service.status.latestReadyRevisionName,traffic:service.status.traffic,image:c.image,startupProbe:c.startupProbe,livenessProbe:c.livenessProbe,storeOnly:(c.env||[]).find(x=>x.name==='STORE_ONLY_RUNTIME')?.value});
  for(const name of names) {
@@ -61,3 +61,18 @@ if(nfToken) {
   report({northflankStatus:r.status,services:Array.isArray(items)?items.map(x=>({id:x.id,name:x.name,status:x.status,type:x.type,ports:(x.ports||[]).map(p=>({name:p.name,public:p.public,dns:p.dns,domain:p.domain}))})):[]});
  }catch{report({northflankRead:'unavailable'});}
 }else report({northflankTokenPresent:false});
+
+for (const name of ['store','portal','dashboard','testing','dev-studio'].map(x=>x+'.elevateforhumanity.org')) {
+ try {
+  const result=execFileSync('curl',['--silent','--show-error','--connect-timeout','10','--max-time','25','--resolve',name+':443:34.110.235.233','--write-out','\\nHTTP_STATUS:%{http_code}','https://'+name+'/api/health'],{encoding:'utf8',timeout:30000,stdio:['ignore','pipe','pipe']});
+  const marker=result.lastIndexOf('\\nHTTP_STATUS:');
+  const body=result.slice(0,marker);let health={};try{health=JSON.parse(body);}catch{}
+  report({googleEdgeTLS:name,verified:true,httpStatus:result.slice(marker+13),service:health.service,healthy:health.healthy,commit:health.commit});
+ } catch(error){report({googleEdgeTLS:name,verified:false,exitCode:error.status,reason:String(error.stderr||'').replace(/\\n/g,' ').slice(0,350)});}
+}
+for(const args of [['compute','instances','list'],['compute','disks','list']]){
+ try{report({resource:args.join(' '),items:cli(args).map(x=>({name:x.name,status:x.status,zone:x.zone,disks:x.disks?.map(d=>({source:d.source,boot:d.boot,autoDelete:d.autoDelete})),users:x.users}))});}catch{report({resource:args.join(' '),read:'unavailable'});}
+}
+if(nfToken) for(const id of ['elevate-lms','elevate-admin','elevate-marketing','elevate-store','elevate-studio-browser','elevate-ultimate-worker']){
+ try{const response=await fetch('https://api.northflank.com/v1/projects/elevate-platform/services/'+id+'/ports',{headers:{Authorization:'Bearer '+nfToken},signal:AbortSignal.timeout(15000)});const b=await response.json();report({legacyPortService:id,status:response.status,ports:(b.data?.ports||b.ports||[]).map(p=>({name:p.name,dns:p.dns,domains:p.domains}))});}catch{report({legacyPortService:id,read:'unavailable'});}
+}

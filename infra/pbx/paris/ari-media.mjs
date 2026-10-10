@@ -124,7 +124,7 @@ async function end(s){
   s.socket.close();
   for(const id of [s.externalId,s.bridgeId]) {
     if(!id)continue;
-    try{await ari(id===s.bridgeId?'/bridges/'+encode(id):'/channels/'+encode(id),'DELETE');}catch{}
+    try{await ari(id===s.bridgeId?'/bridges/'+encode(id):'/channels/'+encode(id),'DELETE');}catch{ /* Best-effort ARI cleanup; original hangup remains dialplan-owned. */ }
   }
   // Leave the original channel's hangup handling to the owning dialplan.
 }

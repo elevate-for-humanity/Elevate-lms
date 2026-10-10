@@ -29,7 +29,7 @@ export async function inspectRunQuotaOptions(token, request = fetch) {
         if (!response.ok) break;
         const entries = key === 'quotaInfos' ? body.quotaInfos : body.quotaPreferences;
         for (const entry of entries || []) {
-          if (entry.service !== 'run.googleapis.com' || !/cpu|memory|mem_allocation/i.test(entry.metric + ' ' + entry.quotaId)) continue;
+          if (entry.service !== 'run.googleapis.com' || !/cpu|memory|mem_?alloc/i.test(entry.metric + ' ' + entry.quotaId)) continue;
           if (key === 'quotaInfos') result.quotaInfos.push({quotaId: entry.quotaId, metric: entry.metric,
             dimensions: entry.dimensions, dimensionsInfos: entry.dimensionsInfos,
             isFixed: entry.isFixed, quotaIncreaseEligibility: entry.quotaIncreaseEligibility});

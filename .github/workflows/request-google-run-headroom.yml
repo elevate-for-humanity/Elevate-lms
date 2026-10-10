@@ -1,6 +1,12 @@
-name: Request bounded Google Cloud Run deployment headroom
+name: Request Google Cloud Run deployment quota
 on:
   workflow_dispatch:
+    inputs:
+      request_maximum:
+        description: Request unlimited CPU/memory preferences; Google decides the approved limits
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
   id-token: write
@@ -27,3 +33,5 @@ jobs:
         with:
           skip_install: true
       - run: node scripts/gcp/request-run-headroom.mjs
+        env:
+          REQUEST_MAXIMUM: ${{ inputs.request_maximum }}

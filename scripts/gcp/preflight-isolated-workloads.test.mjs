@@ -25,6 +25,19 @@ test('quota API denial stays visible without leaking the error body', async () =
   assert(!JSON.stringify(result).includes('private-response'));
 });
 
+test('quota audit retains CPU and memory preferences when the API omits metric', async () => {
+  const result = await inspectRunQuotaOptions('token', async url => ({ok: true, status: 200,
+    json: async () => url.pathname.endsWith('/quotaInfos') ? {quotaInfos: []} : {quotaPreferences: [
+      {service: 'run.googleapis.com', quotaId: 'CpuAllocPerProjectRegion', quotaConfig: {preferredValue: '32000', grantedValue: '20000'}},
+      {service: 'run.googleapis.com', quotaId: 'MemAllocPerProjectRegion', quotaConfig: {preferredValue: '68719476736', grantedValue: '42949672960'}},
+      {service: 'run.googleapis.com', quotaId: 'NvidiaL4GpuAllocPerProjectRegion', quotaConfig: {preferredValue: '1'}},
+    ]}}));
+  assert.deepEqual(result.preferences.map(x => [x.quotaId, x.preferredValue, x.grantedValue]), [
+    ['CpuAllocPerProjectRegion', '32000', '20000'],
+    ['MemAllocPerProjectRegion', '68719476736', '42949672960'],
+  ]);
+});
+
 test('serving revision summary preserves its own resource limits without exposing credentials', () => {
   const revision = {metadata: {name: 'admin-serving', annotations: {'run.googleapis.com/cpu-throttling': 'false'}}, spec: {serviceAccountName: 'runtime@example.invalid', containers: [{image: 'image@sha256:abc', resources: {limits: {cpu: '4', memory: '8Gi'}}, env: [{name: 'SUPABASE_SERVICE_ROLE_KEY', value: 'private-value'}, {name: 'DISABLE_ADMIN_VIDEO_WORKER', value: 'false'}]}]}};
   const report = summarizeRevision(revision);

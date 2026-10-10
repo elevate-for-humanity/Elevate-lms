@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
 
   let query = db
     .from('ultimate_course_builds')
-    .select('*,ultimate_build_jobs(id,status,last_error,created_at,heartbeat_at)')
+    .select('*,ultimate_build_jobs(id,status,last_error,created_at,heartbeat_at,lease_expires_at)')
     .order('created_at', { ascending: false })
     .limit(50);
   if (courseId) query = query.eq('course_id', courseId);

@@ -8,7 +8,41 @@ export const PERMISSION_GROUPS = {
   vm: ['compute.instances.create', 'compute.instances.get', 'compute.instances.setMetadata', 'compute.instances.setServiceAccount', 'compute.disks.create', 'compute.disks.use', 'compute.subnetworks.use', 'compute.subnetworks.useExternalIp'],
   routing: ['compute.addresses.create', 'compute.addresses.use', 'compute.firewalls.create', 'compute.healthChecks.create', 'compute.backendServices.create', 'compute.backendServices.update', 'compute.urlMaps.update'],
   monitoring: ['monitoring.timeSeries.list', 'logging.logEntries.list'],
+  quota: ['serviceusage.quotas.get', 'serviceusage.quotas.update', 'cloudquotas.quotas.get', 'cloudquotas.quotas.update'],
 };
+
+// Quota metadata and pending adjustments only; never create preferences or grant access.
+export async function inspectRunQuotaOptions(token, request = fetch) {
+  const parent = 'https://cloudquotas.googleapis.com/v1/projects/484736877039/locations/global';
+  const result = {observedAt: new Date().toISOString(), quotaInfos: [], preferences: [], reads: []};
+  for (const [path, key] of [['services/run.googleapis.com/quotaInfos', 'quotaInfos'], ['quotaPreferences', 'preferences']]) {
+    let pageToken = '';
+    do {
+      const endpoint = new URL(parent + '/' + path);
+      endpoint.searchParams.set('pageSize', '100');
+      if (pageToken) endpoint.searchParams.set('pageToken', pageToken);
+      try {
+        const response = await request(endpoint, {headers: {authorization: 'Bearer ' + token}, signal: AbortSignal.timeout(30000)});
+        const body = await response.json();
+        result.reads.push({path, httpStatus: response.status, errorStatus: body.error?.status,
+          errorReasons: (body.error?.details || []).map(x => x.reason).filter(Boolean)});
+        if (!response.ok) break;
+        const entries = key === 'quotaInfos' ? body.quotaInfos : body.quotaPreferences;
+        for (const entry of entries || []) {
+          if (entry.service !== 'run.googleapis.com' || !/cpu|memory|mem_allocation/i.test(entry.metric + ' ' + entry.quotaId)) continue;
+          if (key === 'quotaInfos') result.quotaInfos.push({quotaId: entry.quotaId, metric: entry.metric,
+            dimensions: entry.dimensions, dimensionsInfos: entry.dimensionsInfos,
+            isFixed: entry.isFixed, quotaIncreaseEligibility: entry.quotaIncreaseEligibility});
+          else result.preferences.push({name: entry.name, quotaId: entry.quotaId,
+            dimensions: entry.dimensions, preferredValue: entry.quotaConfig?.preferredValue,
+            grantedValue: entry.quotaConfig?.grantedValue, reconciling: entry.reconciling});
+        }
+        pageToken = body.nextPageToken || '';
+      } catch {result.reads.push({path, errorStatus: 'READ_FAILED'}); break;}
+    } while (pageToken);
+  }
+  return result;
+}
 
 export function summarizeRevision(revision) {
   const spec = revision.spec || {};
@@ -80,6 +114,7 @@ export async function runPreflight() {
   for (const [name, permissions] of Object.entries(PERMISSION_GROUPS)) {
     report.permissionChecks[name] = await inspectPermissionBoundary(token, 'project', permissions);
   }
+  report.runQuotaOptions = await inspectRunQuotaOptions(token);
   for (const region of REGIONS) {
     try {
       const services = read(['run', 'services', 'list', '--region=' + region]);

@@ -1,0 +1,80 @@
+name: Phone repair contract
+on:
+  pull_request:
+    paths:
+      - 'lib/phone/**'
+      - 'tests/unit/phone-*.test.ts'
+      - 'tests/unit/phone-*.test.tsx'
+      - 'tests/unit/asterisk-*.test.ts'
+      - 'scripts/gcp/*pbx*'
+      - 'lib/notifications/processor.ts'
+      - 'lib/email/sendgrid.ts'
+      - 'infra/pbx/**'
+      - 'apps/admin/app/api/webhooks/telnyx/**'
+      - 'apps/**/api/program-holder/phone/**'
+      - 'apps/**/api/cron/process-notifications/**'
+      - 'components/program-holder/ProgramHolderPhone*'
+      - 'supabase/migrations/*independent_pbx_device_registration.sql'
+      - 'supabase/migrations/*notification_delivery_claims.sql'
+      - 'supabase/migrations/*phone_message_delivery_evidence.sql'
+      - 'supabase/migrations/*durable_telnyx_event_processing.sql'
+      - 'tests/integration/phone-delivery/**'
+      - '.github/workflows/phone-repair-contract.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  runtime-boundaries:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - run: pnpm install --frozen-lockfile
+      - run: node --test infra/pbx/provisioner/server.test.mjs
+      - run: python3 scripts/gcp/test-audit-pbx-runtime.py
+      - run: python3 scripts/gcp/test-pbx-bootstrap.py
+      - run: python3 scripts/gcp/test-pbx-tls-preservation.py
+      - run: bash -n infra/pbx/google-startup.sh scripts/gcp/repair-existing-pbx-tls.sh
+      - run: pnpm exec vitest run tests/unit/phone-connection-lifecycle.test.tsx tests/unit/phone-event-processing.test.ts tests/unit/phone-webhook-persistence.test.ts tests/unit/phone-actor-response.test.ts tests/unit/phone-notification-delivery.test.ts tests/unit/phone-recordings.test.ts tests/unit/asterisk-device.test.ts tests/unit/asterisk-browser-client.test.ts tests/unit/notification-delivery.test.ts tests/unit/notification-route.test.ts tests/unit/phone-call-flow.test.ts tests/unit/phone-routing.test.ts tests/unit/program-holder-phone-availability.test.ts tests/unit/host-shop-communications-contract.test.ts
+  migration-contract:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: efh_phone_test
+          POSTGRES_USER: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d efh_phone_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate staged migrations in isolated PostgreSQL
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: '5432'
+          PGDATABASE: efh_phone_test
+          PGUSER: postgres
+        run: |
+          set -euo pipefail
+          test "$PGDATABASE" = efh_phone_test
+          psql -v ON_ERROR_STOP=1 \
+            -f tests/integration/phone-delivery/schema.sql \
+            -f supabase/migrations/20261010065054_independent_pbx_device_registration.sql \
+            -f supabase/migrations/20261010065105_notification_delivery_claims.sql \
+            -f supabase/migrations/20261010071559_phone_message_delivery_evidence.sql \
+            -f supabase/migrations/20261010075456_durable_telnyx_event_processing.sql \
+            -f tests/integration/phone-delivery/assertions.sql \
+            -f tests/integration/phone-delivery/event-assertions.sql

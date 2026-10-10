@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { resend } from '@/lib/resend';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { deliverPhoneNotification } from '@/lib/phone/notification-delivery';
+import { persistPhoneRow, processTelnyxEvent } from '@/lib/phone/event-processing';
 import { PushNotificationService } from '@/lib/notifications/push-service';
 import { sendSMS } from '@/lib/notifications/sms';
 import { isExtensionReachable } from '@/lib/phone/availability';
@@ -111,7 +113,11 @@ async function notifyRecipient(
     ? new URL('/phone/inbox', process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org').toString()
     : input.profileId ? appUrl('/program-holder/phone') : appUrl('/phone/inbox');
   const messageType = input.source === 'voicemail' ? 'a voicemail' : 'details with PARIS';
-  if (input.profileId) await push.sendToUserWithDatabase(db, input.profileId, {
+  if (!input.profileId || !input.taskId) return;
+  const identity = { taskId: input.taskId, profileId: input.profileId, kind: input.source || 'paris' as const };
+  const deliveries: Array<Promise<unknown>> = [];
+  const sendPush = () => deliverPhoneNotification(db, { ...identity, channel: 'push' }, async () => {
+    const acceptedDeviceCount = await push.sendToUserWithDatabase(db, input.profileId!, {
     title: input.adminCopy ? 'Admin copy: new phone message' : input.urgency === 'urgent' ? 'Urgent call for your extension' : 'New call to return',
     body: `${input.caller} left ${messageType}. ${input.adminCopy ? 'The assigned holder remains responsible for follow-up.' : 'Open your secure phone inbox.'}`,
     icon: '/icon-192x192.png',
@@ -121,13 +127,19 @@ async function notifyRecipient(
     requireInteraction: input.urgency === 'urgent',
     vibrate: [200, 100, 200],
   });
+    return { accepted: acceptedDeviceCount > 0, acceptedDeviceCount };
+  });
 
-  const [{ data: profile }, { data: preferences }] = input.profileId
+  const [profileResult, preferencesResult] = input.profileId
     ? await Promise.all([
         db.from('profiles').select('email,full_name').eq('id', input.profileId).maybeSingle(),
         db.from('notification_preferences').select('email_missed_calls,sms_missed_calls,sms_phone').eq('user_id', input.profileId).maybeSingle(),
       ])
-    : [{ data: null }, { data: null }];
+    : [{ data: null, error: null }, { data: null, error: null }];
+  if (profileResult.error || preferencesResult.error) throw new Error('Phone notification preferences unavailable');
+  const profile = profileResult.data;
+  const preferences = preferencesResult.data;
+  deliveries.push(sendPush());
   const detailLines = [
     input.adminCopy ? 'Admin oversight copy — callback responsibility remains with the assigned holder.' : '',
     input.source === 'voicemail' ? 'A voicemail was left. Open the secure inbox to listen.' : '',
@@ -144,26 +156,28 @@ async function notifyRecipient(
   ].filter(Boolean);
   const readableDetails = detailLines.join('\n');
   if (preferences?.sms_missed_calls === true && preferences?.sms_phone) {
-    const smsResult = await sendSMS(
-      preferences.sms_phone,
-      `${input.urgency === 'urgent' ? 'URGENT: ' : ''}${input.caller}${input.callbackNumber ? ` (${input.callbackNumber})` : ''}${input.program ? ` — ${input.program}` : ''}${input.reason ? `: ${input.reason}` : ' left details with PARIS.'} ${url}`.slice(0, 1200),
-    );
-    if (!smsResult.success) console.error('Missed-call SMS delivery failed:', smsResult.error);
+    deliveries.push(deliverPhoneNotification(db, { ...identity, channel: 'sms' }, async () => {
+      const result = await sendSMS(preferences.sms_phone,
+        `${input.urgency === 'urgent' ? 'URGENT: ' : ''}A new phone message is in your secure Elevate inbox. ${url}`);
+      return { accepted: result.success, providerMessageId: result.messageId };
+    }));
   }
-  if (!profile?.email || preferences?.email_missed_calls === false) return;
-  try {
-    await resend.emails.send({
-      from: 'Elevate Phone <noreply@elevateforhumanity.org>',
-      to: profile.email,
-      subject:
-        input.adminCopy ? 'Admin copy: phone message and callback follow-up' : input.urgency === 'urgent'
-          ? 'Urgent call requires follow-up'
-          : 'New call in your Elevate Phone inbox',
-      text: `${readableDetails}\n\nFull call record: ${url}`,
-      html: `<p><strong>Call details</strong></p><pre style="white-space:pre-wrap;font-family:Arial,sans-serif">${escapeHtml(readableDetails)}</pre><p><a href="${escapeHtml(url)}">Open the full call record</a></p>`,
-    });
-  } catch (error) {
-    console.error('Missed-call email delivery failed:', error);
+  if (profile?.email && preferences?.email_missed_calls !== false) {
+    deliveries.push(deliverPhoneNotification(db, { ...identity, channel: 'email' }, async () => {
+      const result = await sendEmail({
+        from: 'Elevate Phone <noreply@elevateforhumanity.org>', to: profile.email,
+        subject: input.adminCopy ? 'Admin copy: phone message and callback follow-up' : input.urgency === 'urgent'
+          ? 'Urgent call requires follow-up' : 'New call in your Elevate Phone inbox',
+        text: `${readableDetails}\n\nFull call record: ${url}`,
+        html: `<p><strong>Call details</strong></p><pre style="white-space:pre-wrap;font-family:Arial,sans-serif">${escapeHtml(readableDetails)}</pre><p><a href="${escapeHtml(url)}">Open the full call record</a></p>`,
+        singleAttempt: true,
+      });
+      return { accepted: result.success, providerMessageId: result.data?.messageId };
+    }));
+  }
+  const results = await Promise.allSettled(deliveries);
+  if (results.some(result => result.status === 'rejected' || result.value === 'review_required')) {
+    throw new Error('Phone notification requires delivery review');
   }
 }
 
@@ -180,7 +194,7 @@ async function notifyAssignee(db: any, input: Parameters<typeof notifyRecipient>
   // One recipient's delivery failure must not prevent the other recipient's
   // notification. The shared call/task remains the durable inbox copy.
   for (const result of await Promise.allSettled(recipients)) {
-    if (result.status === 'rejected') console.error('Phone message notification failed:', result.reason);
+    if (result.status === 'rejected') console.error('Phone message notification requires review; inspect durable delivery evidence.');
   }
 }
 
@@ -188,7 +202,7 @@ async function findContext(db: any, event: TelnyxCallEvent) {
   const payload = event.data.payload;
   const state = decodeCallState(payload.client_state) as CallState;
   if (state.systemId) {
-    const [{ data: system }, { data: call }] = await Promise.all([
+    const [{ data: system, error: systemError }, { data: call, error: callError }] = await Promise.all([
       db.from('phone_systems').select('*').eq('id', state.systemId).maybeSingle(),
       state.callId
         ? db.from('phone_calls').select('*').eq('id', state.callId).maybeSingle()
@@ -199,17 +213,22 @@ async function findContext(db: any, event: TelnyxCallEvent) {
             .eq('provider_call_id', payload.call_control_id)
             .maybeSingle(),
     ]);
+    if (systemError || callError) throw new Error('Phone context unavailable');
+    if (call && (call.phone_system_id !== system?.id || call.provider !== 'telnyx')) {
+      throw new Error('Phone context mismatch');
+    }
     return { system: system as System | null, call, phoneNumber: null, state };
   }
-  const { data: phoneNumber } = await db
+  const { data: phoneNumber, error: numberError } = await db
     .from('phone_numbers')
     .select('id,phone_system_id')
     .eq('e164', payload.to)
     .eq('provider', 'telnyx')
     .eq('status', 'active')
     .maybeSingle();
+  if (numberError) throw new Error('Phone number lookup unavailable');
   if (!phoneNumber) return { system: null, call: null, phoneNumber: null, state };
-  const [{ data: system }, { data: call }] = await Promise.all([
+  const [{ data: system, error: systemError }, { data: call, error: callError }] = await Promise.all([
     db.from('phone_systems').select('*').eq('id', phoneNumber.phone_system_id).maybeSingle(),
     db
       .from('phone_calls')
@@ -218,6 +237,8 @@ async function findContext(db: any, event: TelnyxCallEvent) {
       .eq('provider_call_id', payload.call_control_id)
       .maybeSingle(),
   ]);
+  if (systemError || callError) throw new Error('Phone context unavailable');
+  if (call && call.phone_system_id !== system?.id) throw new Error('Phone context mismatch');
   return { system: system as System | null, call, phoneNumber, state };
 }
 
@@ -475,7 +496,7 @@ Do not repeat the extension directory or tell the caller again to enter an exten
       client_state: encodeCallState(state),
     });
   } catch (error) {
-    console.error('PARIS gather unavailable; falling back to voicemail:', error);
+    console.error('PARIS gather unavailable; attempting configured voicemail fallback.');
     await startVoicemail(db, system, call, callControlId, `${eventId}-fallback`, route, RECOVERY_VOICE);
   }
 }
@@ -508,6 +529,8 @@ async function routeToExtension(
     .select('sip_username,last_seen_at')
     .eq('extension_id', extension.id)
     .eq('status', 'active')
+    .eq('provider', 'telnyx')
+    .eq('connection_state', 'connected')
     .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString())
     .order('last_seen_at', { ascending: false })
     .limit(1)
@@ -780,7 +803,10 @@ async function handleEvent(
       (call?.ended_at || ['call_hangup', 'cancelled', 'cancelled_amd'].includes(String(payload.status)))) return;
 
   if (type === 'call.initiated' && payload.direction === 'incoming') {
-    const { data: created } = await db
+    // Retried initiation must not reset an answered/completed call to ringing.
+    const { data: created, error: createError } = call?.id
+      ? { data: call, error: null }
+      : await db
       .from('phone_calls')
       .upsert(
         {
@@ -795,10 +821,12 @@ async function handleEvent(
           started_at: event.data.occurred_at,
           updated_at: new Date().toISOString(),
         },
-        { onConflict: 'provider,provider_call_id' },
+        { onConflict: 'provider,provider_call_id', ignoreDuplicates: true },
       )
       .select('id')
       .single();
+    if (createError || !created?.id) throw new Error('Call persistence unavailable');
+    if (created.ended_at) return;
     await client.calls.actions.answer(payload.call_control_id, {
       command_id: `${eventId}-answer`,
       client_state: encodeCallState({
@@ -813,7 +841,7 @@ async function handleEvent(
 
   if (state.phase === 'webrtc_leg' || state.phase === 'external_fallback') {
     if (type === 'call.initiated') {
-      await db.from('phone_call_legs').upsert(
+      await persistPhoneRow(db.from('phone_call_legs').upsert(
         {
           call_id: call.id,
           provider_call_id: payload.call_control_id,
@@ -824,37 +852,42 @@ async function handleEvent(
           updated_at: new Date().toISOString(),
         },
         { onConflict: 'provider_call_id' },
-      );
+      ));
       return;
     }
     if (type === 'call.answered') {
       await Promise.all([
-        db
+        persistPhoneRow(db
           .from('phone_call_legs')
           .update({
             status: 'answered',
             answered_at: event.data.occurred_at,
             updated_at: new Date().toISOString(),
           })
-          .eq('provider_call_id', payload.call_control_id),
-        db
+          .eq('provider_call_id', payload.call_control_id)
+          .eq('call_id', call.id)),
+        persistPhoneRow(db
           .from('phone_calls')
           .update({
             status: 'answered',
             answered_at: event.data.occurred_at,
             updated_at: new Date().toISOString(),
           })
-          .eq('id', call.id),
+          .eq('id', call.id)),
       ]);
       return;
     }
     if (type === 'call.hangup') {
-      const { data: leg } = await db
+      const { data: leg, error: legError } = await db
         .from('phone_call_legs')
         .select('answered_at')
         .eq('provider_call_id', payload.call_control_id)
+        .eq('call_id', call.id)
         .maybeSingle();
-      await db
+      // Unknown persistence is not evidence that nobody answered. Preserve the
+      // event for retry; never start PARIS or another ring leg on that guess.
+      if (legError || !leg) throw new Error('Phone leg outcome unavailable');
+      await persistPhoneRow(db
         .from('phone_call_legs')
         .update({
           status: 'completed',
@@ -862,7 +895,8 @@ async function handleEvent(
           hangup_cause: payload.hangup_cause || null,
           updated_at: new Date().toISOString(),
         })
-        .eq('provider_call_id', payload.call_control_id);
+        .eq('provider_call_id', payload.call_control_id)
+        .eq('call_id', call.id));
       if (state.extensionId) {
         await db
           .from('communication_extensions')
@@ -886,14 +920,14 @@ async function handleEvent(
   }
 
   if (type === 'call.answered') {
-    await db
+    await persistPhoneRow(db
       .from('phone_calls')
       .update({
         status: 'answered',
         answered_at: event.data.occurred_at,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', call.id);
+      .eq('id', call.id));
     if (system.routing_mode === 'menu') {
       await mainMenu(db, system, call, payload.call_control_id, eventId);
     } else if (system.default_destination_id) {
@@ -990,10 +1024,10 @@ async function handleEvent(
   if (type === 'call.ai_gather.message_history_updated' && state.taskId) {
     const transcript = transcriptFromHistory(payload.message_history);
     if (transcript) {
-      await db
+      await persistPhoneRow(db
         .from('phone_callback_tasks')
         .update({ transcript, updated_at: new Date().toISOString() })
-        .eq('id', state.taskId);
+        .eq('id', state.taskId).eq('call_id', call.id));
     }
     return;
   }
@@ -1003,19 +1037,19 @@ async function handleEvent(
     const program = String(partial.program_interest || partial.program_or_department || '').trim();
     const route = await resolveProgramRoute(db, system, program);
     if (route) {
-      const { error } = await db.from('phone_callback_tasks').update({
+      await persistPhoneRow(db.from('phone_callback_tasks').update({
         extension_id: route.extensionId, assigned_profile_id: route.profileId,
         program_or_department: program.slice(0, 300), updated_at: new Date().toISOString(),
-      }).eq('id', state.taskId);
-      if (error) throw error;
+      }).eq('id', state.taskId).eq('call_id', call.id));
     }
     return;
   }
 
   if (type === 'call.ai_gather.ended' && state.taskId) {
     const result = aiResult(payload.result);
-    const { data: existingTask } = await db.from('phone_callback_tasks').select('extension_id,assigned_profile_id')
-      .eq('id', state.taskId).maybeSingle();
+    const { data: existingTask, error: taskLookupError } = await db.from('phone_callback_tasks').select('extension_id,assigned_profile_id')
+      .eq('id', state.taskId).eq('call_id', call.id).maybeSingle();
+    if (taskLookupError || !existingTask) throw new Error('Callback task unavailable');
     const savedState = { ...state, extensionId: existingTask?.extension_id || state.extensionId,
       profileId: existingTask?.assigned_profile_id || state.profileId };
     if (payload.status !== 'valid') {
@@ -1050,7 +1084,7 @@ async function handleEvent(
       .filter(Boolean)
       .join(': ')
       .slice(0, 1000);
-    await db
+    await persistPhoneRow(db
       .from('phone_callback_tasks')
       .update({
         extension_id: assignedState.extensionId || null,
@@ -1072,7 +1106,7 @@ async function handleEvent(
         status: 'new',
         updated_at: new Date().toISOString(),
       })
-      .eq('id', state.taskId);
+      .eq('id', state.taskId).eq('call_id', call.id));
     const { data: attemptedExtension } = assignedState.extensionId
       ? await db.from('communication_extensions').select('extension').eq('id', assignedState.extensionId).maybeSingle()
       : { data: null };
@@ -1080,6 +1114,7 @@ async function handleEvent(
       .from('phone_callback_tasks')
       .select('transcript')
       .eq('id', state.taskId)
+      .eq('call_id', call.id)
       .maybeSingle();
     await notifyAssignee(db, {
       profileId: assignedState.profileId,
@@ -1094,8 +1129,8 @@ async function handleEvent(
       preferredCallbackTime: String(result.preferred_callback_time || '').trim() || undefined,
       urgency,
     }, system);
-    await db.from('phone_calls').update({ assigned_extension_id: assignedState.extensionId || null,
-      assigned_profile_id: assignedState.profileId || null }).eq('id', call.id);
+    await persistPhoneRow(db.from('phone_calls').update({ assigned_extension_id: assignedState.extensionId || null,
+      assigned_profile_id: assignedState.profileId || null }).eq('id', call.id));
     return parisNextStep(system, call, payload.call_control_id, eventId,
       { ...assignedState, intakeComplete: String(intakeCompleted(payload.status, result)) }, false);
   }
@@ -1135,21 +1170,20 @@ async function handleEvent(
   ) {
     const recordingUrl = payload.recording_urls.mp3 || payload.recording_urls.wav;
     const { data: recordingTask, error: taskLookupError } = state.taskId
-      ? await db.from('phone_callback_tasks').select('source,transcript,summary,extension_id,assigned_profile_id').eq('id', state.taskId).maybeSingle()
+      ? await db.from('phone_callback_tasks').select('source,transcript,summary,extension_id,assigned_profile_id')
+          .eq('id', state.taskId).eq('call_id', call.id).maybeSingle()
       : { data: null, error: null };
-    if (taskLookupError) throw taskLookupError;
+    if (taskLookupError || (state.taskId && !recordingTask)) throw new Error('Recording callback unavailable');
     if (state.taskId && recordingUrl) {
-      const { error } = await db
+      await persistPhoneRow(db
         .from('phone_callback_tasks')
         .update({ recording_url: recordingUrl, updated_at: new Date().toISOString() })
-        .eq('id', state.taskId);
-      if (error) throw error;
+        .eq('id', state.taskId).eq('call_id', call.id));
     }
-    const { error: recordingError } = await db
+    await persistPhoneRow(db
       .from('phone_calls')
       .update({ recording_url: recordingUrl, updated_at: new Date().toISOString() })
-      .eq('id', call.id);
-    if (recordingError) throw recordingError;
+      .eq('id', call.id));
     // Telnyx may retain the prompt state on recording.saved. The persisted
     // callback source identifies the voicemail even when action state lags.
     if ((recordingTask?.source === 'voicemail' || ['voicemail_recording', 'voicemail_prompt'].includes(state.phase)) && recordingUrl) {
@@ -1172,8 +1206,7 @@ async function handleEvent(
         summary: recordingTask?.summary || null,
       };
       if (!existingVoicemail) {
-        const { error } = await db.from('voicemails').insert(voicemail);
-        if (error) throw error;
+        await persistPhoneRow(db.from('voicemails').insert(voicemail));
       }
       await notifyAssignee(db, {
         profileId: recordingTask?.assigned_profile_id || state.profileId,
@@ -1189,40 +1222,43 @@ async function handleEvent(
 
   if (type === 'call.recording.transcription.saved' && payload.transcription_text) {
     if (state.taskId) {
-      await db
+      await persistPhoneRow(db
         .from('phone_callback_tasks')
         .update({
           transcript: payload.transcription_text,
           summary: payload.transcription_text.slice(0, 1000),
           updated_at: new Date().toISOString(),
         })
-        .eq('id', state.taskId);
+        .eq('id', state.taskId).eq('call_id', call.id));
     }
-    await db
+    const { error: transcriptionError } = await db
       .from('voicemails')
       .update({
         transcription: payload.transcription_text,
         summary: payload.transcription_text.slice(0, 1000),
       })
       .eq('call_id', call.id);
+    if (transcriptionError) throw new Error('Voicemail transcription persistence unavailable');
     return;
   }
 
   if (type === 'call.hangup') {
     if (state.taskId && state.profileId) {
-      const { data: unfinished } = await db
+      const { data: unfinished, error: taskLookupError } = await db
         .from('phone_callback_tasks')
         .select('summary,callback_number,assigned_profile_id')
         .eq('id', state.taskId)
+        .eq('call_id', call.id)
         .maybeSingle();
+      if (taskLookupError || !unfinished) throw new Error('Callback task unavailable');
       if (unfinished && !unfinished.summary) {
-        await db
+        await persistPhoneRow(db
           .from('phone_callback_tasks')
           .update({
             summary: 'Caller disconnected before PARIS finished the interview.',
             updated_at: new Date().toISOString(),
           })
-          .eq('id', state.taskId);
+          .eq('id', state.taskId).eq('call_id', call.id));
         await notifyAssignee(db, {
           profileId: unfinished.assigned_profile_id || state.profileId,
           taskId: state.taskId,
@@ -1231,7 +1267,7 @@ async function handleEvent(
         }, system);
       }
     }
-    await db
+    await persistPhoneRow(db
       .from('phone_calls')
       .update({
         status: 'completed',
@@ -1241,7 +1277,7 @@ async function handleEvent(
           : null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', call.id);
+      .eq('id', call.id));
   }
 }
 
@@ -1251,33 +1287,18 @@ export async function POST(request: Request) {
   try {
     event = await verifyTelnyxWebhook(body, request.headers);
   } catch (error) {
-    console.warn('Rejected Telnyx webhook:', error instanceof Error ? error.message : error);
+    console.warn('Rejected Telnyx webhook: signature verification failed.');
     return NextResponse.json({ error: 'Invalid webhook signature.' }, { status: 401 });
   }
-  const db = await requireAdminClient();
-  const context = await findContext(db, event);
-  if (!context.system) return NextResponse.json({ received: true, ignored: 'unknown number' });
-  const { error: ledgerError } = await db.from('phone_call_events').insert({
-    phone_system_id: context.system.id,
-    call_id: context.call?.id ?? null,
-    provider: 'telnyx',
-    provider_event_id: event.data.id,
-    event_type: event.data.event_type,
-    occurred_at: event.data.occurred_at,
-    payload: event.data.payload,
-  });
-  if (ledgerError?.code === '23505') return NextResponse.json({ received: true, duplicate: true });
-  if (ledgerError) return NextResponse.json({ error: 'Unable to persist event.' }, { status: 500 });
   try {
-    await handleEvent(db, event, context.system, context.call, context.phoneNumber, context.state);
-    return NextResponse.json({ received: true });
-  } catch (error) {
-    console.error('Telnyx event processing failed:', error);
-    await db
-      .from('phone_call_events')
-      .delete()
-      .eq('provider', 'telnyx')
-      .eq('provider_event_id', event.data.id);
-    return NextResponse.json({ error: 'Event processing failed.' }, { status: 500 });
+    const db = await requireAdminClient();
+    const context = await findContext(db, event);
+    if (!context.system) return NextResponse.json({ received: true, ignored: 'unknown number' });
+    const result = await processTelnyxEvent(db, event, context, () =>
+      handleEvent(db, event, context.system!, context.call, context.phoneNumber, context.state));
+    return NextResponse.json({ received: true, ...(result === 'duplicate' ? { duplicate: true } : {}) });
+  } catch {
+    console.error('Telnyx event processing requires retry or review; inspect protected event evidence.');
+    return NextResponse.json({ error: 'Event processing unavailable.' }, { status: 503 });
   }
 }

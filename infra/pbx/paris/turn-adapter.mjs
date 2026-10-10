@@ -79,10 +79,13 @@ export function makeTurnHandler({stt=recognize,llm=converse,tts=synthesize,token
       for await(const chunk of req){bytes+=chunk.length;if(bytes>MAX_BODY)return fail('INPUT_TOO_LARGE',413);chunks.push(chunk);}
       const body=JSON.parse(Buffer.concat(chunks).toString());
       if(!/^[a-f0-9]{24}$/.test(body.sessionId||'')||!Number.isSafeInteger(body.sequence)||body.sequence<0||body.encoding!=='PCMU'||body.sampleRate!==8000) return fail('INVALID_TURN',400);
-      const audio=Buffer.from(body.audioBase64||'','base64');
+      if(typeof body.callId!=='string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(body.callId))return fail('INVALID_CALL',400);
+      if(typeof body.audioBase64!=='string' || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(body.audioBase64))return fail('INVALID_AUDIO',400);
+      const audio=Buffer.from(body.audioBase64,'base64');
       if(audio.length<160||audio.length>100000||audio.length%160) return fail('INVALID_AUDIO',400);
       const key=body.sessionId;
-      const prior=sessions.get(key)||{history:[],sequence:-1,locked:false,updated:Date.now()};
+      const prior=sessions.get(key)||{history:[],sequence:-1,locked:false,updated:Date.now(),callId:body.callId};
+      if(prior.callId!==body.callId)return fail('CALL_SESSION_MISMATCH',409);
       if(prior.locked||body.sequence!==prior.sequence+1)return fail('SEQUENCE_CONFLICT',409);
       prior.locked=true;sessions.set(key,prior);
       try{

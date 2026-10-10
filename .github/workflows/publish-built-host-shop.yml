@@ -1,0 +1,92 @@
+name: Verify and publish built host-shop release
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-built-host-shop.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: google-production-marketing
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/publish-built-host-shop.yml/dispatches" -f ref=main
+  publish:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Verify exact built candidate, test tagged runtime, then publish
+        shell: bash
+        env:
+          EXPECTED_SHA: 97a6397dbed488354f7f3f8aa8e63353281f57c5
+          REVISION: elevate-marketing-migration-r97a6397d-38030538876-1
+          EXPECTED_IMAGE: us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing@sha256:7add6893bce8ca07c8e3eb948f8dd708636bcec5ade3455eb6c8b96e6000b4b6
+        run: |
+          set -euo pipefail
+          SERVICE=elevate-marketing-migration
+          PROJECT=elegant-racer-299721
+          REGION=us-central1
+          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > /tmp/service.json
+          gcloud run revisions describe "$REVISION" --project="$PROJECT" --region="$REGION" --format=json > /tmp/revision.json
+          node <<'NODE'
+          const fs=require('fs'),assert=require('assert/strict');
+          const r=JSON.parse(fs.readFileSync('/tmp/revision.json'));
+          const s=JSON.parse(fs.readFileSync('/tmp/service.json'));
+          assert.equal(r.spec.containers[0].image,process.env.EXPECTED_IMAGE);
+          assert(r.status.conditions.some(c=>c.type==='Ready'&&c.status==='True'));
+          assert.equal(s.status.latestCreatedRevisionName,process.env.REVISION,'A newer deployment superseded this candidate');
+          NODE
+          gcloud run services update-traffic "$SERVICE" --project="$PROJECT" --region="$REGION" --set-tags="host-shop-verify=$REVISION" --quiet
+          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > /tmp/tagged.json
+          export CANDIDATE_URL="$(node -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/tagged.json')).status.traffic.find(t=>t.tag==='host-shop-verify').url)")"
+          node <<'NODE'
+          const assert=require('assert/strict');
+          (async()=>{
+            const root=process.env.CANDIDATE_URL;
+            const v=await fetch(root+'/api/version',{signal:AbortSignal.timeout(60000)});assert.equal(v.status,200);
+            const data=await v.json();assert.equal(data.commitSha||data.commit||data.sha,process.env.EXPECTED_SHA);
+            const health=await fetch(root+'/api/health',{signal:AbortSignal.timeout(60000)});assert.equal(health.status,200);assert.equal((await health.json()).healthy,true);
+            const res=await fetch(root+'/',{signal:AbortSignal.timeout(60000)});assert.equal(res.status,200);
+            const html=await res.text();
+            for(const text of ['Top Shelf Barber Lounge','Grow your team','Join the Host Shop network','bg-sky-50']) assert(html.includes(text),'Missing '+text);
+            assert(!html.includes('Razor’s Image Barbershop'));assert(!html.includes("Razor&#x27;s Image Barbershop"));
+            console.log('Exact candidate version, health, and host-shop content passed.');
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.latestCreatedRevisionName)' > /tmp/latest
+          test "$(cat /tmp/latest)" = "$REVISION"
+          ROLLBACK="$(node -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/service.json')).status.traffic.filter(t=>t.percent).map(t=>t.revisionName+'='+t.percent).join(','))")"
+          gcloud run services update-traffic "$SERVICE" --project="$PROJECT" --region="$REGION" --to-revisions="$REVISION=100" --quiet
+          if ! node <<'NODE'
+          const assert=require('assert/strict');
+          (async()=>{
+            const root='https://www.elevateforhumanity.org';
+            const v=await fetch(root+'/api/version?host-shop-release='+process.env.EXPECTED_SHA,{signal:AbortSignal.timeout(60000),cache:'no-store'});assert.equal(v.status,200);
+            const data=await v.json();assert.equal(data.commitSha||data.commit||data.sha,process.env.EXPECTED_SHA);
+            const h=await fetch(root+'/api/health',{signal:AbortSignal.timeout(60000)});assert.equal(h.status,200);assert.equal((await h.json()).healthy,true);
+            const page=await fetch(root+'/',{signal:AbortSignal.timeout(60000)});assert.equal(page.status,200);
+            const html=await page.text();for(const text of ['Top Shelf Barber Lounge','Grow your team','Join the Host Shop network']) assert(html.includes(text));
+            for(const path of ['/host-shops/top-shelf-barber-lounge','/partners/host-shops','/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade-enhanced-2026.webp','/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp']) {const r=await fetch(root+path,{signal:AbortSignal.timeout(30000)});assert.equal(r.status,200,path);}
+            console.log('Verified live public revision, healthy service, host-shop content, images and links.');
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+          then
+            gcloud run services update-traffic "$SERVICE" --project="$PROJECT" --region="$REGION" --to-revisions="$ROLLBACK" --quiet
+            exit 1
+          fi

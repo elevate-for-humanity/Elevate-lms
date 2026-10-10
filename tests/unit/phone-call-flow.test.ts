@@ -14,12 +14,12 @@ describe('phone call flow', () => {
     const pages = directoryPages(entries);
     expect(pages.length).toBeGreaterThan(1);
     expect(pages.every((p) => p.length <= 500)).toBe(true);
-    for (const e of entries) expect(pages.join(' ')).toContain(`${e.display_name}, ${e.department}. Extension ${e.extension.split('').join(' ')}.`);
+    for (const e of entries) expect(pages.join(' ')).toContain(`${e.display_name}, ${e.department}, extension ${e.extension}.`);
   });
   it('announces one extension per person without a competing menu shortcut', () => {
     const legacyEntry = { extension: '103', display_name: 'Doreen Hawkins', menu_digit: 3 };
     const speech = directoryPages([legacyEntry]).join(' ');
-    expect(speech).toContain('Extension 1 0 3.');
+    expect(speech).toContain('extension 103.');
     expect(speech).not.toMatch(/or press|press 3/i);
   });
   it('never treats timeout, provider failure, or unconfirmed intake as completed', () => {

@@ -52,6 +52,12 @@ jobs:
           set -euo pipefail
           docker build -f Dockerfile.ultimate-worker -t "elevate-ultimate-worker:$GITHUB_SHA" .
       # Google credentials must be created after Docker has consumed its context.
+      - name: Show federated identity claim context
+        run: |
+          echo "repository=$GITHUB_REPOSITORY"
+          echo "ref=$GITHUB_REF"
+          echo "event=$GITHUB_EVENT_NAME"
+          echo "workflow_ref=$GITHUB_WORKFLOW_REF"
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -72,7 +78,7 @@ jobs:
           docker push "$IMAGE"
   deploy:
     needs: build
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     concurrency:

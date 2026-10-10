@@ -4,31 +4,21 @@
  * Never fall back to Northflank or to GitHub Contents API source mutations.
  */
 import 'server-only';
-import { hydrateProcessEnv } from '@/lib/secrets';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { getGitHubToken } from '@/lib/devstudio/github-token';
 
-export type GoogleDeployTarget = 'admin' | 'marketing' | 'course-builder';
+export type GoogleDeployTarget = 'admin' | 'marketing' | 'lms' | 'course-builder';
 const WORKFLOWS: Record<GoogleDeployTarget, string> = {
   admin: 'deploy-admin.yml',
+  lms: 'deploy-google-lms-trigger.yml',
   marketing: 'deploy-google-marketing-trigger.yml',
   'course-builder': 'dispatch-google-course-job.yml',
 };
 const REPOSITORY = 'elevate-for-humanity/Elevate-lms';
 
 async function deploymentToken(): Promise<string> {
-  await hydrateProcessEnv();
-  const token = process.env.GITHUB_TOKEN?.trim();
-  if (token) return token;
-  const db = await requireAdminClient();
-  const { data, error } = await db
-    .from('platform_secrets')
-    .select('value_enc')
-    .eq('key', 'GITHUB_TOKEN')
-    .maybeSingle();
-  if (error || !data?.value_enc?.trim()) {
-    throw new Error('Google deployment dispatch token is not configured');
-  }
-  return data.value_enc.trim();
+  const token = await getGitHubToken();
+  if (!token) throw new Error('Google deployment dispatch token is not configured');
+  return token;
 }
 
 export async function dispatchGoogleDeployment(target: GoogleDeployTarget) {

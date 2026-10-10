@@ -25,14 +25,19 @@ export function PwaInstallBanner({
   const { canInstall, isInstalled, promptInstall, dismiss, platform } = usePwaInstall();
   const [showIosHelp, setShowIosHelp] = useState(false);
   const [pageSettled, setPageSettled] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setPageSettled(true), 8000);
     return () => window.clearTimeout(timer);
   }, []);
 
-  if (!pageSettled || isInstalled) return null;
-  if (typeof window !== 'undefined' && localStorage.getItem(storageKey)) return null;
+  useEffect(() => {
+    try { setBannerDismissed(Boolean(window.localStorage.getItem(storageKey))); }
+    catch { setBannerDismissed(false); }
+  }, [storageKey]);
+
+  if (!pageSettled || isInstalled || bannerDismissed) return null;
 
   const isIos = platform === 'ios';
   if (!canInstall && !isIos) return null;
@@ -40,7 +45,8 @@ export function PwaInstallBanner({
   const dismissBanner = () => {
     dismiss();
     setShowIosHelp(false);
-    if (typeof window !== 'undefined') localStorage.setItem(storageKey, '1');
+    setBannerDismissed(true);
+    try { window.localStorage.setItem(storageKey, '1'); } catch { /* Dismiss for this session when storage is unavailable. */ }
   };
 
   return (

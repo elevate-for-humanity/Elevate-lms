@@ -60,7 +60,7 @@ async function startUltimateCourse(input: {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      action: 'start-course',
+      action: 'queue-course',
       courseId: input.course.id,
       programSlug: input.programSlug,
       title: input.course.title,

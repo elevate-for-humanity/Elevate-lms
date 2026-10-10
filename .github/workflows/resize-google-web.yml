@@ -1,4 +1,4 @@
-name: Restore Northflank web container sizing
+name: Restore Google Cloud web container sizing
 on:
   workflow_dispatch:
 permissions:

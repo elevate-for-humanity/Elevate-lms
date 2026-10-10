@@ -9,7 +9,7 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
       { url: '/images/partners/generations-hair/dimensional-color-before-enhanced-2026.webp', alt: 'Generations Hair client before dimensional color service' },
       { url: '/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp', alt: 'Generations Hair finished dimensional color and styling' },
     ];
-    if (generations && item.url.endsWith('/stylist-at-work.webp')) return [{ ...item, url: '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp' }];
+    if (generations && item.url.split('/').at(-1) === 'stylist-at-work.webp') return [{ ...item, url: '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp' }];
     return [item];
   }).filter((item) => {
     const key = item.url.trim();

@@ -49,12 +49,8 @@ export async function runFiniteVideoRender() {
   }
   await event('finite_video_session_booting');
   const port = '3100';
-  const server = spawn(process.execPath, ['apps/admin/server.js'], {
-    env: { ...process.env, PORT: port, HOSTNAME: '0.0.0.0', DISABLE_ADMIN_VIDEO_WORKER: 'true', VIDEO_RENDER_GLOBAL_CONCURRENCY: '3' },
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
+  let server;
   let diagnostic = '';
-  for (const stream of [server.stdout, server.stderr]) stream.on('data', chunk => { diagnostic = (diagnostic + chunk.toString()).slice(-16000); });
   const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
   const deadline = Date.now() + 55 * 60 * 1000;
   let stage = 'runtime_start';
@@ -70,6 +66,34 @@ export async function runFiniteVideoRender() {
     return rows[0];
   }
   try {
+    stage = 'narration_preflight';
+    // The helper is baked and tested offline by the Admin image build. Run it
+    // under the actual job identity before starting a renderer or claiming work.
+    try {
+      execFileSync(process.execPath, ['apps/admin/workers/admin-speech-cache.mjs'], {
+        timeout: 180000, stdio: ['ignore', 'pipe', 'pipe'],
+      });
+    } catch (error) {
+      diagnostic = String(error.stderr || '').slice(-16000);
+      throw new Error('Packaged narration cache verification failed');
+    }
+    await event('finite_video_narration_verified');
+    if (process.env.VIDEO_VALIDATE_ONLY === 'true') {
+      const job = await readJob();
+      await event('finite_video_runtime_verified', { jobStatus: job.status });
+      console.log(JSON.stringify({ runtimeVerified: true, narrationVerified: true, courseId, jobId, jobStatus: job.status }));
+      return;
+    }
+    const initial = await readJob();
+    if (initial.status === 'failed') throw new Error('Exact video is failed; an explicit canonical retry is required before execution');
+    stage = 'runtime_start';
+    server = spawn(process.execPath, ['apps/admin/server.js'], {
+      env: { ...process.env, PORT: port, HOSTNAME: '0.0.0.0', ELEVATE_SERVICE: 'video-render',
+        DISABLE_ADMIN_VIDEO_WORKER: 'true', VIDEO_RENDER_GLOBAL_CONCURRENCY: '3' },
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    for (const stream of [server.stdout, server.stderr]) stream.on('data', chunk => { diagnostic = (diagnostic + chunk.toString()).slice(-16000); });
+    server.on('error', error => { diagnostic += '\nRenderer spawn failed: ' + error.code; });
     let ready = false;
     for (let attempt = 0; attempt < 60; attempt++) {
       if (server.exitCode !== null) throw new Error('Packaged renderer exited before acceptance');
@@ -124,7 +148,7 @@ export async function runFiniteVideoRender() {
       safeDiagnostic = safeDiagnostic.split(value).join('[redacted]');
     }
     const code = error.cause?.code || error.code;
-    await event('finite_video_session_failed', { stage, connectionCode: ['UND_ERR_SOCKET','ECONNRESET','ECONNREFUSED','ETIMEDOUT','ENOTFOUND','UND_ERR_CONNECT_TIMEOUT'].includes(code) ? code : null, errorName: ['Error','TimeoutError','AbortError','TypeError'].includes(error.name) ? error.name : 'runtime_error', message: message.slice(0,500), diagnostic: safeDiagnostic.slice(-4000), childExitCode: server.exitCode, childSignal: server.signalCode, categories, runtimeStarted: /Ready in|Listening|started server/i.test(diagnostic) });
+    await event('finite_video_session_failed', { stage, connectionCode: ['UND_ERR_SOCKET','ECONNRESET','ECONNREFUSED','ETIMEDOUT','ENOTFOUND','UND_ERR_CONNECT_TIMEOUT'].includes(code) ? code : null, errorName: ['Error','TimeoutError','AbortError','TypeError'].includes(error.name) ? error.name : 'runtime_error', message: message.slice(0,500), diagnostic: safeDiagnostic.slice(-4000), childExitCode: server?.exitCode, childSignal: server?.signalCode, categories, runtimeStarted: /Ready in|Listening|started server/i.test(diagnostic) });
     throw error;
-  } finally { server.kill('SIGTERM'); }
+  } finally { server?.kill('SIGTERM'); }
 }

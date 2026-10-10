@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { activateTestedRevision } from './gcp/activate-tested-public-revision.mjs';
+import { activateTestedRevision, unusedCandidateTags } from './gcp/activate-tested-public-revision.mjs';
 const commit='a'.repeat(40),service='elevate-marketing-migration',revision=service+'-candidate-a';
 function fixture(state={healthy:true,commit},status=200){
  const calls=[];const f={calls};
@@ -32,4 +32,45 @@ test('configured region is used for every revision and traffic operation',async(
  const f=fixture();await activateTestedRevision(f.options);
  const expected=process.env.CANDIDATE_REGION||'us-central1';
  for(const args of f.calls)assert.ok(args.includes('--region='+expected));
+});
+
+test('only unused owned tags are selected; custom and serving revision tags stay',()=>{
+ const rows=[
+  {revisionName:'serving',percent:100},
+  {revisionName:'serving',tag:'c-111111111111'},
+  {revisionName:'old',tag:'c-222222222222'},
+  {revisionName:'old',tag:'release-verified'},
+  {revisionName:'target',tag:'c-aaaaaaaaaaaa'},
+ ];
+ assert.deepEqual(unusedCandidateTags({status:{traffic:rows}},'c-aaaaaaaaaaaa'),['c-222222222222']);
+ assert.deepEqual(unusedCandidateTags({spec:{traffic:[{revisionName:'old',percent:100}]},status:{traffic:rows}},'c-aaaaaaaaaaaa'),[]);
+});
+
+test('stale owned tags are removed in the same operation that adds the candidate',async()=>{
+ const f=fixture(),read=f.read;
+ f.options.read=args=>{const state=read(args);if(args[1]==='services'&&args[2]==='describe')state.status.traffic.push({revisionName:service+'-retired',tag:'c-222222222222'});return state;};
+ await activateTestedRevision(f.options);
+ const add=f.calls.find(a=>a.some(x=>x.startsWith('--update-tags=')));
+ assert.ok(add.includes('--remove-tags=c-222222222222'));
+});
+
+test('failed candidate provisioning removes its retained zero-traffic tag',async()=>{
+ const f=fixture(),read=f.read;
+ f.options.read=args=>{const state=read(args);if(args.some(x=>x.startsWith('--update-tags=')))throw Error('quota exceeded');return state;};
+ await assert.rejects(activateTestedRevision(f.options),/quota exceeded/);
+ assert.ok(f.calls.some(a=>a.includes('--remove-tags=c-aaaaaaaaaaaa')));
+ assert.equal(f.calls.some(a=>a.some(x=>x.startsWith('--to-revisions='))),false);
+});
+
+test('failure cleanup preserves a candidate that became serving',async()=>{
+ const f=fixture({healthy:false,commit},503),read=f.read;
+ f.options.read=args=>{const state=read(args);if(args[1]==='services'&&args[2]==='describe')state.status.traffic[0].percent=100;return state;};
+ await assert.rejects(activateTestedRevision(f.options),/failed runtime health/);
+ assert.equal(f.calls.some(a=>a.includes('--remove-tags=c-aaaaaaaaaaaa')),false);
+});
+
+test('cleanup errors do not hide the activation failure',async()=>{
+ const f=fixture(),read=f.read;
+ f.options.read=args=>{const state=read(args);if(args.some(x=>x.startsWith('--update-tags=')))throw Error('original quota error');if(args.some(x=>x.startsWith('--remove-tags=')))throw Error('cleanup error');return state;};
+ await assert.rejects(activateTestedRevision(f.options),/original quota error/);
 });

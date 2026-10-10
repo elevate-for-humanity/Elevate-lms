@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-const project='elegant-racer-299721',region='us-central1';
+const project='elegant-racer-299721',region=process.env.CANDIDATE_REGION||'us-central1';
+if(!['us-central1','us-east1'].includes(region))throw Error('Unsupported public runtime region');
 function gcloud(args){const result=execFileSync('gcloud',[...args,'--project='+project,'--format=json'],{encoding:'utf8',timeout:180000,stdio:['ignore','pipe','pipe']});return result.trim()?JSON.parse(result):{};}
 export async function activateTestedRevision({service,revision,commit,read=gcloud,fetcher=fetch,attempts=12,pause=()=>new Promise(resolve=>setTimeout(resolve,2000))}){
  if(!['elevate-marketing-migration','elevate-store-migration'].includes(service)||!new RegExp('^'+service+'-[a-z0-9-]+$').test(revision||'')||!/^[a-f0-9]{40}$/.test(commit||''))throw Error('Exact service, revision and immutable commit required');

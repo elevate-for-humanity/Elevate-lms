@@ -32,13 +32,18 @@ jobs:
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
       - name: Inspect regional quota and existing runtime allocations
-        continue-on-error: true
+        env:
+          CLOUDSDK_CORE_DISABLE_PROMPTS: '1'
         shell: bash
         run: |
           gcloud run services list --project=elegant-racer-299721 --region=us-central1 --format=json > /tmp/services.json
           node -e "const s=JSON.parse(require('fs').readFileSync('/tmp/services.json'));console.log(JSON.stringify(s.map(x=>({name:x.metadata.name,resources:x.spec.template.spec.containers[0].resources,scaling:x.spec.template.metadata.annotations,traffic:x.status.traffic.map(t=>({revision:t.revisionName,percent:t.percent,tag:t.tag}))}))))"
+          gcloud components install alpha beta --quiet
           gcloud alpha services quota list --consumer=projects/484736877039 --service=run.googleapis.com --format=json --quiet > /tmp/run-quota.json
           node -e "const q=JSON.parse(require('fs').readFileSync('/tmp/run-quota.json'));console.log(JSON.stringify(q.filter(x=>/cpu|memory/i.test(x.metric+' '+x.displayName))))"
+          gcloud services enable cloudquotas.googleapis.com --project=elegant-racer-299721 --quiet
+          gcloud beta quotas info list --service=run.googleapis.com --project=elegant-racer-299721 --format=json > /tmp/quota-info.json
+          node -e "const q=JSON.parse(require('fs').readFileSync('/tmp/quota-info.json'));console.log(JSON.stringify(q.filter(x=>/cpu/i.test(x.metric+' '+x.quotaId))))"
       - name: Verify exact built candidate, test tagged runtime, then publish
         if: false
         shell: bash

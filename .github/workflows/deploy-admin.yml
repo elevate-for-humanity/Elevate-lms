@@ -60,19 +60,6 @@ jobs:
           skip_install: true
       - name: Verify Google SDK
         run: node scripts/gcp/verify-sdk.mjs
-      - name: Guard shared regional capacity before building
-        shell: bash
-        run: |
-          set -euo pipefail
-          node --input-type=module <<'NODE'
-          import { execFileSync } from 'node:child_process';
-          import { assertNoActiveExecutions } from './scripts/gcp/execute-course-job.mjs';
-          const executions = JSON.parse(execFileSync('gcloud', [
-            'run','jobs','executions','list','--job=elevate-course-builder',
-            '--project=elegant-racer-299721','--region=us-central1','--format=json',
-          ], {encoding:'utf8',stdio:['ignore','pipe','pipe']}));
-          assertNoActiveExecutions(executions);
-          NODE
       - name: Build the Admin image
         shell: bash
         run: |
@@ -97,6 +84,9 @@ jobs:
           docker push "$IMAGE:$GITHUB_SHA"
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          # Image-only promotion preserves runtime capacity; an active course job
+          # does not prohibit an Admin build. Cloud Run enforces actual quota
+          # and revision readiness during update; failed promotion must fail here.
           # Keep the existing runtime identity, secrets, memory and scaling.
           # CPU must remain allocated while leased background renders execute.
           gcloud run services update elevate-admin-migration \

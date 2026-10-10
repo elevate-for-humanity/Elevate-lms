@@ -42,7 +42,7 @@ jobs:
           SERVICE=elevate-marketing-migration
           PROJECT=elegant-racer-299721
           REGION=us-central1
-          DIGEST="$(gcloud artifacts docker images describe \"us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing:$EXPECTED_SHA\" --project=\"$PROJECT\" --format='value(image_summary.digest)')"
+          DIGEST="$(gcloud artifacts docker images describe "us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing:$EXPECTED_SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
           export EXPECTED_IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing@$DIGEST"
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > /tmp/service.json

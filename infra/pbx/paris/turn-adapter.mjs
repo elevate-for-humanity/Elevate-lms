@@ -108,9 +108,9 @@ export function makeTurnHandler({stt=recognize,llm=converse,tts=synthesize,token
         res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});
         res.end(JSON.stringify({replyAudioUlawBase64:audioReply,endCall:false,...(route?{requestedRoute:route}:{})}));
       }finally{prior.locked=false;}
-    }catch(err){
+    }catch{
       // Log stable error codes, not caller speech, audio, credentials, or model output.
-      process.stderr.write('PARIS_TURN_ERROR '+String(err?.message||'UNEXPECTED').replace(/[^A-Z0-9_ -]/gi,'').slice(0,70)+'\n');
+      process.stderr.write('PARIS_TURN_ERROR\n');
       return fail('VOICE_PROCESSING_UNAVAILABLE',503);
     }
   };

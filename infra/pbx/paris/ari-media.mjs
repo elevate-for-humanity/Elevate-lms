@@ -12,6 +12,7 @@
 import { createSocket } from 'node:dgram';
 import { randomBytes } from 'node:crypto';
 import { setTimeout as sleep } from 'node:timers/promises';
+import {privateTurn,privateTurnOptions} from './private-turn.mjs';
 
 const ULAW_SILENCE=0xff, FRAME=160, RATE_MS=20;
 const config = {
@@ -33,10 +34,12 @@ const UUIDISH=/^[a-zA-Z0-9._:-]{1,128}$/;
 const sessions=new Map();
 function required(){
   if (!config.user || !config.password || !config.token || !config.adapter) throw Error('PARIS_RUNTIME_CONFIG_INCOMPLETE');
-  if (!config.ari.startsWith('http://127.0.0.1:') || !config.ws.startsWith('ws://127.0.0.1:')) throw Error('ARI_MUST_BE_LOOPBACK');
+  for(const [raw,protocol] of [[config.ari,'http:'],[config.ws,'ws:']]){
+    const endpoint=new URL(raw);
+    if(endpoint.protocol!==protocol || endpoint.hostname!=='127.0.0.1' || endpoint.username || endpoint.password)throw Error('ARI_MUST_BE_LOOPBACK');
+  }
   if (config.bind !== '127.0.0.1' || config.advertised !== '127.0.0.1') throw Error('RTP_MUST_BE_LOOPBACK');
-  const u=new URL(config.adapter);
-  if(u.protocol!=='https:' || u.username || u.password) throw Error('TURN_ADAPTER_REQUIRES_PRIVATE_HTTPS');
+  privateTurnOptions(config.adapter,config.token);
 }
 function authHeader(){return 'Basic '+Buffer.from(config.user+':'+config.password).toString('base64');}
 async function ari(path,method='GET',data){
@@ -103,12 +106,7 @@ async function turn(session){
   if(voice.length<config.minFrames*FRAME)return;
   session.busy=true;
   try{
-    const response=await fetch(config.adapter,{method:'POST',redirect:'error',
-      headers:{'Content-Type':'application/json',Authorization:'Bearer '+config.token},
-      body:JSON.stringify({callId:session.callId,sessionId:session.id,sequence:session.turn++,encoding:'PCMU',sampleRate:8000,audioBase64:voice.toString('base64')}),
-      signal:AbortSignal.timeout(30000)});
-    if(!response.ok)throw Error('PARIS_TURN_HTTP_'+response.status);
-    const body=await response.json();
+    const body=await privateTurn(config.adapter,{callId:session.callId,sessionId:session.id,sequence:session.turn++,encoding:'PCMU',sampleRate:8000,audioBase64:voice.toString('base64')},config.token);
     if(typeof body.replyAudioUlawBase64!=='string')throw Error('PARIS_TURN_AUDIO_MISSING');
     await speak(session,body.replyAudioUlawBase64);
     if(body.requestedRoute?.type==='operator') {
@@ -119,7 +117,7 @@ async function turn(session){
     } else if(body.endCall===true) await end(session);
   }catch(e){
     // Fail closed: do not claim the caller was served when the AI is unavailable.
-    process.stderr.write('PARIS_TURN_FAILED '+String(e?.message||'unknown')+'\n');
+    process.stderr.write('PARIS_TURN_FAILED\n');
     await end(session);
   }finally{session.busy=false;}
 }
@@ -163,11 +161,11 @@ async function begin(call){
     session.externalId=external.id;
     await ari('/bridges/'+encode(bridge.id)+'/addChannel?channel='+encode(callId+','+external.id),'POST');
   }catch(e){
-    process.stderr.write('PARIS_BRIDGE_FAILED '+String(e?.message||'unknown')+'\n');
+    process.stderr.write('PARIS_BRIDGE_FAILED\n');
     await end(session);
   }
 }
-async function main(){
+export async function serveGateway(){
   required();
   while(true){
     const url=new URL(config.ws);url.searchParams.set('app',config.app);
@@ -186,10 +184,10 @@ async function main(){
         });
         socket.addEventListener('close',resolve,{once:true});
       });
-    }catch(e){process.stderr.write('PARIS_ARI_DISCONNECTED '+String(e?.message||'unknown')+'\n');}
+    }catch{process.stderr.write('PARIS_ARI_DISCONNECTED\n');}
     for(const s of [...sessions.values()])await end(s);
     await sleep(2000);
   }
 }
-if(process.argv[1] && import.meta.url===new URL('file://'+process.argv[1]).href) main().catch(e=>{console.error(e.message);process.exitCode=1;});
+if(process.argv[1] && import.meta.url===new URL('file://'+process.argv[1]).href) serveGateway().catch(()=>{console.error('PARIS_RUNTIME_STARTUP_FAILED');process.exitCode=1;});
 export {parseRtp,rtp,isSpeech,required};

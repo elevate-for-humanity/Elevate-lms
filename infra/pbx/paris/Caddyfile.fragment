@@ -1,0 +1,17 @@
+# Merge into the EXISTING trusted phone hostname block before the catch-all.
+# The gateway uses TLS SNI/Host for phone.elevateforhumanity.org over loopback.
+# External callers must not match this route. Never publish a plaintext turn port.
+@parisTurn {
+  path /internal/paris/turn
+  remote_ip 127.0.0.1 ::1
+}
+handle @parisTurn {
+  request_body {
+    max_size 220KB
+  }
+  reverse_proxy 127.0.0.1:8091 {
+    transport http {
+      response_header_timeout 30s
+    }
+  }
+}

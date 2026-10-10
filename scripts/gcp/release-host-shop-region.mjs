@@ -52,7 +52,7 @@ const permissionData=await permissionResponse.json();assert(permissionResponse.o
 console.log(JSON.stringify({deploymentPermissions:permissionData.permissions||[]}));
 const publicProbe=await fetch(east.status.url+'/api/version',{signal:AbortSignal.timeout(30000)});
 if(!publicProbe.ok&&!permissionData.permissions?.includes('run.services.setIamPolicy')){
- regionalIdentity=cli(['auth','print-identity-token','--audiences='+east.status.url]);
+ regionalIdentity=process.env.REGIONAL_ID_TOKEN||cli(['auth','print-identity-token','--audiences='+east.status.url]);
  await acceptance(east.status.url);
  console.log(JSON.stringify({authenticatedRegionalRuntimeVerified:true,region,url:east.status.url,commit,missingPermission:'run.services.setIamPolicy'}));
  throw Error('Regional runtime verified; owner must copy public invoker access before website cutover.');

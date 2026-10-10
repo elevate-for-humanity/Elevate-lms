@@ -13,15 +13,17 @@ export async function dispatchQueuedCourseJob({run = execFileSync, request = fet
   const token = env.SUPABASE_SERVICE_ROLE_KEY;
   if (!token) throw new Error('SUPABASE_SERVICE_ROLE_KEY_REQUIRED');
   const url = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
-  url.searchParams.set('select','id,heartbeat_at');
+  url.searchParams.set('select','id,heartbeat_at,attempts,max_attempts');
   url.searchParams.set('order','priority.asc,available_at.asc,created_at.asc');
-  url.searchParams.set('status','eq.queued');
-  url.searchParams.set('available_at','lte.' + now.toISOString());
-  url.searchParams.set('limit','1');
+  // A stopped execution leaves an expired running lease. Claim RPC performs
+  // recovery, but it cannot run unless the dispatcher launches a worker.
+  url.searchParams.set('or', '(and(status.eq.queued,available_at.lte.' + now.toISOString() + '),and(status.eq.running,lease_expires_at.lt.' + now.toISOString() + '))');
+  url.searchParams.set('limit','50');
   const response = await request(url, {headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
   if (!response.ok) throw new Error('COURSE_QUEUE_READ_HTTP_' + response.status);
-  const queued = await response.json();
-  if (!Array.isArray(queued)) throw new Error('COURSE_QUEUE_RESPONSE_INVALID');
+  const candidates = await response.json();
+  if (!Array.isArray(candidates)) throw new Error('COURSE_QUEUE_RESPONSE_INVALID');
+  const queued = candidates.filter(job => job.max_attempts === undefined || job.attempts < job.max_attempts);
   if (queued.length === 0) return {status:'empty'};
   run('gcloud',['run','jobs','execute','elevate-course-builder',...scope,'--tasks=1','--async','--quiet'],{stdio:'inherit'});
   // Launch is not assignment. Require a fresh durable heartbeat from the selected job.

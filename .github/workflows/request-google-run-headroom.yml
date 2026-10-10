@@ -1,5 +1,11 @@
 name: Request Google Cloud Run deployment quota
 on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/gcp/request-run-headroom.mjs
+      - scripts/gcp/request-run-headroom.test.mjs
+      - .github/workflows/request-google-run-headroom.yml
   workflow_dispatch:
     inputs:
       request_maximum:

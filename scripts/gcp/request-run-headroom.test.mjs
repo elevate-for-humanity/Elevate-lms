@@ -40,7 +40,7 @@ test('ambiguous contacts stop instead of selecting someone arbitrarily', () => {
 test('default creates only the bounded preferences and preserves provider checks', async () => {
   const api = provider();
   const results = await requestHeadroom('token', 'owner@example.test', api.request);
-  assert.deepEqual(api.writes.map(x => x.body.quotaConfig.preferredValue), ['32000', '68719476736']);
+  assert.deepEqual(api.writes.map(x => x.body.quotaConfig.preferredValue), ['128000', '274877906944']);
   assert(api.writes.every(x => x.options.method === 'POST' && x.body.dimensions.region === 'us-central1'));
   assert(api.reads.includes('/v1/' + resource('elevate-run-memory-us-central1')));
   assert(results.every(x => x.accepted === false));
@@ -80,7 +80,7 @@ test('unlimited effective quota is sufficient for finite and maximum requests', 
 });
 
 test('matching or larger prior requests are idempotent without treating them as granted', async () => {
-  for (const preferredValue of ['999999999999', '-1']) {
+  for (const preferredValue of ['999999999999']) {
     const api = provider({preferences: Object.fromEntries(targets.map(t => [t.id,
       preference(t, {quotaConfig: {preferredValue, grantedValue: '20000'}})]))});
     const results = await requestHeadroom('token', 'owner@example.test', api.request);
@@ -166,4 +166,14 @@ test('reports accepted versus effective and granted values with sanitized provid
   assert(results.every(x => x.traceId === 'trace-123' && x.stateDetail.startsWith('Denied')));
   assert.equal(api.reads.filter(x => x.includes('/quotaInfos/')).length, 4);
   assert(!/private|owner@example|hidden-value|hidden-secret/.test(JSON.stringify(results)));
+});
+
+test('finite 128 CPU and 256 GiB request replaces previously declined unlimited preference', async () => {
+  const api = provider({preferences: Object.fromEntries(targets.map(t => [t.id,
+    preference(t, {quotaConfig: {preferredValue: '-1', grantedValue: t.quotaId.startsWith('Cpu') ? '20000' : '42949672960'}})])),
+    mutate: ({body}) => response({quotaConfig: {preferredValue: body.quotaConfig.preferredValue, grantedValue: '20000'}})});
+  const results = await requestHeadroom('token', 'owner@example.test', api.request);
+  assert.deepEqual(api.writes.map(x => x.body.quotaConfig.preferredValue), ['128000', '274877906944']);
+  assert(api.writes.every(x => x.options.method === 'PATCH'));
+  assert(results.every(x => x.accepted && x.effectiveValue === '20000'));
 });

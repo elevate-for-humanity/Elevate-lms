@@ -29,6 +29,17 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
+      - name: Remove the exposed diagnostic failure log while retaining its run metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --input-type=module <<'NODE'
+          const response=await fetch('https://api.github.com/repos/'+process.env.GITHUB_REPOSITORY+'/actions/runs/38065381571/logs',{
+            method:'DELETE',headers:{authorization:'Bearer '+process.env.GH_TOKEN,accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},signal:AbortSignal.timeout(30000)
+          });
+          console.log(JSON.stringify({incidentRun:38065381571,logRemovalHttpStatus:response.status}));
+          if(![204,404].includes(response.status))throw new Error('Exposed diagnostic log removal failed');
+          NODE
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -43,15 +54,16 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import {execFileSync} from 'node:child_process';
+          const safeExecFileSync=(...args)=>{try{return execFileSync(...args);}catch(error){console.log(JSON.stringify({diagnosticCommandFailed:true,code:error.code||null,exitStatus:error.status}));throw new Error('Google diagnostic command failed; captured output suppressed');}};
           const renderRegion=process.env.RENDER_REGION;
           if(!['us-east1','us-central1'].includes(renderRegion))throw new Error('Unsupported render region');
           const base=['--project=elegant-racer-299721','--format=json'];
-          const service=JSON.parse(execFileSync('gcloud',['run','services','describe','elevate-admin-migration','--region=us-central1',...base],{encoding:'utf8'}));
+          const service=JSON.parse(safeExecFileSync('gcloud',['run','services','describe','elevate-admin-migration','--region=us-central1',...base],{encoding:'utf8'}));
           const spec=service.spec.template.spec;
           const env=Object.fromEntries((spec.containers[0].env||[]).filter(x=>typeof x.value==='string').map(x=>[x.name,x.value]));
           console.log(JSON.stringify({latestReadyRevision:service.status.latestReadyRevisionName,traffic:service.status.traffic,resources:spec.containers[0].resources,scaling:service.spec.template.metadata.annotations,narrationProvider:['kokoro','local','cloudflare'].includes(env.AI_NARRATION_PROVIDER)?env.AI_NARRATION_PROVIDER:'other',workerDisabled:env.DISABLE_ADMIN_VIDEO_WORKER==='true'}));
           try {
-            const job=JSON.parse(execFileSync('gcloud',['run','jobs','describe','elevate-video-render','--region='+renderRegion,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            const job=JSON.parse(safeExecFileSync('gcloud',['run','jobs','describe','elevate-video-render','--region='+renderRegion,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             const task=job.spec.template.spec.template.spec;
             const videoContainer=task.containers[0];
             console.log(JSON.stringify({videoHealthChecks:true,region:renderRegion,startupProbe:videoContainer.startupProbe||null,livenessProbe:videoContainer.livenessProbe||null}));
@@ -59,38 +71,38 @@ jobs:
             const safe=text=>String(text||'').replace(/https?:\/\/[^\s"']+/g,'[url]').replace(/Bearer\s+\S+/gi,'Bearer [redacted]').replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[token]').slice(0,2000);
             const conditions=items=>(items||[]).map(x=>({type:x.type,status:x.status,reason:x.reason,message:safe(x.message)}));
             console.log(JSON.stringify({videoJobPresent:true,region:renderRegion,resources:videoContainer.resources,conditions:conditions(job.status?.conditions),videoJobImage:videoContainer.image,videoJobIdentity:task.serviceAccountName,videoJobRetries:task.maxRetries,videoJobTimeout:task.timeoutSeconds,command:videoContainer.command,args:(videoContainer.args||[]).map((x,i)=>i<2?x:{characters:x.length,hasMainCall:x.includes('await runFiniteVideoRender();')}),envPresent:Object.fromEntries(['SUPABASE_SERVICE_ROLE_KEY','CRON_SECRET','VIDEO_JOB_ID','VIDEO_COURSE_ID'].map(x=>[x,Boolean(videoEnv[x])])),expectedDatabase:videoEnv.NEXT_PUBLIC_SUPABASE_URL==='https://cuxzzpsyufcewtmicszk.supabase.co'}));
-            const executions=JSON.parse(execFileSync('gcloud',['run','jobs','executions','list','--job=elevate-video-render','--region='+renderRegion,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            const executions=JSON.parse(safeExecFileSync('gcloud',['run','jobs','executions','list','--job=elevate-video-render','--region='+renderRegion,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             console.log(JSON.stringify({region:renderRegion,videoExecutions:executions.slice(0,3).map(x=>({name:x.metadata.name,started:x.status?.startTime,completed:x.status?.completionTime,running:x.status?.runningCount,succeeded:x.status?.succeededCount,failed:x.status?.failedCount,conditions:conditions(x.status?.conditions)}))}));
             for(const execution of executions.slice(0,2)) {
               const name=execution.metadata.name;
-              const tasks=JSON.parse(execFileSync('gcloud',['run','jobs','executions','tasks','list','--execution='+name,'--region='+renderRegion,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+              const tasks=JSON.parse(safeExecFileSync('gcloud',['run','jobs','executions','tasks','list','--execution='+name,'--region='+renderRegion,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
               console.log(JSON.stringify({execution:name,tasks:tasks.map(t=>({name:t.metadata.name,started:t.status?.startTime,completed:t.status?.completionTime,conditions:conditions(t.status?.conditions),lastAttemptResult:t.status?.lastAttemptResult,retried:t.status?.retried,resources:t.spec?.containers?.map(c=>c.resources)}))}));
             }
             const jobFilter='resource.type="cloud_run_job" AND resource.labels.job_name="elevate-video-render" AND resource.labels.location="'+renderRegion+'" AND severity>=WARNING';
-            const logs=JSON.parse(execFileSync('gcloud',['logging','read',jobFilter,'--freshness=3d','--limit=30',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            const logs=JSON.parse(safeExecFileSync('gcloud',['logging','read',jobFilter,'--freshness=3d','--limit=30',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             for(const row of logs) {
               let message=row.textPayload||row.jsonPayload?.message||row.protoPayload?.status?.message||'';
               for(const value of Object.values(videoEnv))if(value.length>=8)message=message.split(value).join('[runtime-value]');
               console.log(JSON.stringify({jobLog:true,timestamp:row.timestamp,severity:row.severity,execution:row.labels?.['run.googleapis.com/execution_name'],message:safe(message)}));
             }
-            const revisions=JSON.parse(execFileSync('gcloud',['run','revisions','list','--service=elevate-admin-migration','--region=us-central1','--limit=5',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            const revisions=JSON.parse(safeExecFileSync('gcloud',['run','revisions','list','--service=elevate-admin-migration','--region=us-central1','--limit=5',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             console.log(JSON.stringify({adminImages:revisions.map(r=>({name:r.metadata.name,image:r.spec.containers[0].image,digest:r.status?.imageDigest,conditions:conditions(r.status?.conditions)}))}));
           } catch(error) {console.log(JSON.stringify({videoJobInspectionSucceeded:false,exitStatus:error.status}));throw new Error('Video job diagnostics failed; inspect Google access before retrying');}
           for(const region of ['us-central1','us-east1']) {
-            const services=JSON.parse(execFileSync('gcloud',['run','services','list','--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
-            const jobs=JSON.parse(execFileSync('gcloud',['run','jobs','list','--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            const services=JSON.parse(safeExecFileSync('gcloud',['run','services','list','--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            const jobs=JSON.parse(safeExecFileSync('gcloud',['run','jobs','list','--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             console.log(JSON.stringify({capacityInventory:true,region,services:services.map(s=>({name:s.metadata.name,configuredResources:s.spec.template.spec.containers.map(c=>c.resources?.limits),configuredScaling:Object.fromEntries(Object.entries(s.spec.template.metadata.annotations||{}).filter(([k])=>/Scale|cpu-throttling/.test(k))),traffic:s.status?.traffic?.map(t=>({revision:t.revisionName,percent:t.percent}))})),jobs:jobs.map(j=>({name:j.metadata.name,resources:j.spec.template.spec.template.spec.containers.map(c=>c.resources?.limits),executionCount:j.status?.executionCount,latestExecution:j.status?.latestCreatedExecution}))}));
-            const revisions=JSON.parse(execFileSync('gcloud',['run','revisions','list','--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            const revisions=JSON.parse(safeExecFileSync('gcloud',['run','revisions','list','--region='+region,base[0],'--format=json(metadata.name,metadata.labels,metadata.annotations,spec.containers.resources,spec.containers.startupProbe,spec.containers.livenessProbe,status.conditions)'],{encoding:'utf8',maxBuffer:8*1024*1024,stdio:['ignore','pipe','pipe']}));
             const referenced=new Set(services.flatMap(s=>[s.status?.latestCreatedRevisionName,...(s.status?.traffic||[]).map(t=>t.revisionName)]).filter(Boolean));
             for(const r of revisions.filter(r=>referenced.has(r.metadata.name)||r.status?.conditions?.some(c=>c.type==='Active'&&c.status==='True'))) {
               console.log(JSON.stringify({revisionCapacity:true,region,revision:r.metadata.name,service:r.metadata.labels?.['serving.knative.dev/service'],resources:r.spec.containers.map(c=>c.resources?.limits),scaling:Object.fromEntries(Object.entries(r.metadata.annotations||{}).filter(([k])=>/Scale|cpu-throttling|startup-cpu-boost/.test(k))),healthChecks:r.spec.containers.map(c=>({startupProbe:c.startupProbe||null,livenessProbe:c.livenessProbe||null})),conditions:r.status?.conditions?.map(c=>({type:c.type,status:c.status,reason:c.reason}))}));
             }
             for(const j of jobs) {
-              const executions=JSON.parse(execFileSync('gcloud',['run','jobs','executions','list','--job='+j.metadata.name,'--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+              const executions=JSON.parse(safeExecFileSync('gcloud',['run','jobs','executions','list','--job='+j.metadata.name,'--region='+region,base[0],'--format=json(metadata.name,metadata.creationTimestamp,status,spec.template.spec.containers.resources)'],{encoding:'utf8',maxBuffer:8*1024*1024,stdio:['ignore','pipe','pipe']}));
               console.log(JSON.stringify({activeJobExecutions:true,region,job:j.metadata.name,executions:executions.filter(e=>!e.status?.completionTime&&!e.status?.conditions?.some(c=>c.type==='Completed'&&['True','False'].includes(c.status))).map(e=>({name:e.metadata.name,created:e.metadata.creationTimestamp,started:e.status?.startTime,running:e.status?.runningCount,resources:e.spec?.template?.spec?.containers?.map(c=>c.resources?.limits)}))}));
             }
           }
-          const token=execFileSync('gcloud',['auth','print-access-token'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+          const token=safeExecFileSync('gcloud',['auth','print-access-token'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
           const end=new Date(),start=new Date(end.getTime()-15*60*1000);
           const usageURL=new URL('https://monitoring.googleapis.com/v3/projects/elegant-racer-299721/timeSeries');
           usageURL.searchParams.set('filter','metric.type="serviceruntime.googleapis.com/quota/allocation/usage" AND resource.labels.service="run.googleapis.com"');
@@ -101,7 +113,7 @@ jobs:
           console.log(JSON.stringify({quotaUsageHttpStatus:usageResponse.status,errorStatus:usage.error?.status,series:(usage.timeSeries||[]).map(t=>({metric:t.metric,resource:t.resource,latest:t.points?.[0]}))}));
           const filter='resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration"';
           let rows;
-          try {rows=JSON.parse(execFileSync('gcloud',['logging','read',filter,'--freshness=30m','--limit=500',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));}
+          try {rows=JSON.parse(safeExecFileSync('gcloud',['logging','read',filter,'--freshness=30m','--limit=500',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));}
           catch (error) {
             const stderr=String(error.stderr||'');
             const category=/PERMISSION_DENIED|permission.*denied/i.test(stderr)?'PERMISSION_DENIED':/unrecognized arguments|Invalid choice/i.test(stderr)?'SDK_ARGUMENT_ERROR':/RESOURCE_EXHAUSTED/i.test(stderr)?'RESOURCE_EXHAUSTED':'OTHER';

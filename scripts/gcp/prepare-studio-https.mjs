@@ -1,4 +1,4 @@
-import {execFileSync} from 'node:child_process';
+import {execFileSync,spawnSync} from 'node:child_process';
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import {googleFailureCode} from './runtime-config.mjs';
@@ -12,7 +12,7 @@ const image='us-central1-docker.pkg.dev/'+project+'/elevate/studio-browser@sha25
 const commit='ce624a5dc01b2fcb8f633c04b22c32b1e0c749f0';
 const purpose='Persistent isolated Studio browser; tested by run 38035943205';
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-function cli(args,input,timeout=90000){try{return execFileSync('gcloud',[...args,'--project='+project,'--quiet'],{input,encoding:'utf8',timeout,maxBuffer:8*1024*1024,stdio:['pipe','pipe','pipe']}).trim();}catch(e){throw Error(args.slice(0,3).join(' ')+': '+googleFailureCode(String(e.stderr||'')));}}
+function cli(args,input,timeout=90000){try{return execFileSync('gcloud',[...args,'--project='+project,'--quiet'],{input,encoding:'utf8',timeout,maxBuffer:8*1024*1024,stdio:['pipe','pipe','pipe']}).trim();}catch(e){throw Error(args.slice(0,3).join(' ')+': '+(e.code==='ETIMEDOUT'?'operation_timed_out':googleFailureCode(String(e.stderr||''))));}}
 function read(args){return JSON.parse(cli([...args,'--format=json']));}
 function ssh(script,input,timeout=90000){return cli(['compute','ssh','studio_deploy@'+vm,'--zone='+zone,'--ssh-key-file='+process.env.RUNNER_TEMP+'/studio-public-key','--ssh-key-expire-after=30m','--strict-host-key-checking=yes','--command='+script,'--ssh-flag=-oConnectTimeout=10'],input,timeout);}
 
@@ -29,6 +29,14 @@ export function checkHostRoute(map){
 export function publicUnit(privateIp){
   if(!/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(privateIp)||privateIp.split('.').some(x=>Number(x)>255))throw Error('Expected a private Google network address');
   return unitFile(image).replace('ExecStartPre=-/usr/bin/docker rm studio-browser','ExecStartPre=/usr/local/sbin/elevate-studio-firewall\nExecStartPre=-/usr/bin/docker rm studio-browser').replace('--publish=127.0.0.1:3100:3100','--publish=127.0.0.1:3100:3100 --publish='+privateIp+':3100:3100');
+}
+
+export function edgeStatus(address,secret,run=spawnSync){
+  const config='url = '+JSON.stringify('https://'+host+'/workspace/files')+'\nresolve = '+JSON.stringify(host+':443:'+address)+'\n'+(secret?'header = '+JSON.stringify('x-studio-browser-secret: '+secret)+'\n':'');
+  const result=run('curl',['--config','-','--silent','--show-error','--max-time','20','--output','/dev/null','--write-out','%{http_code}'],{input:config,encoding:'utf8',timeout:25000,stdio:['pipe','pipe','pipe']});
+  // stdout contains only the HTTP status. Never include stderr, stdin, headers
+  // or a response body in the result, including on config or network errors.
+  return {exitCode:result.status??null,httpStatus:/^[1-5]\d\d$/.test(result.stdout?.trim()||'')?Number(result.stdout.trim()):null,timedOut:result.error?.code==='ETIMEDOUT'};
 }
 
 export const hostFirewall=`#!/usr/bin/env bash
@@ -77,6 +85,8 @@ export async function prepare(){
     if(!connected)throw Error('Verified SSH unavailable');
     const before=JSON.parse(ssh('curl --silent --fail http://127.0.0.1:3100/health'));
     if(before.commit!==commit||!before.ready||!before.providerAuthStorage?.persistent)throw Error('Previously tested browser is not healthy');
+    report.credentialMatchesAdmin=JSON.parse(ssh('sudo docker exec -i studio-browser node --input-type=module','console.log(JSON.stringify(process.env.STUDIO_BROWSER_SECRET === '+JSON.stringify(secret)+'));'));
+    if(!report.credentialMatchesAdmin)throw Error('Stored browser key differs from Admin; refusing key rotation');
     const ip=instance.networkInterfaces?.[0]?.networkIP;
     ssh('sudo install -m 700 /dev/stdin /usr/local/sbin/elevate-studio-firewall',hostFirewall);
     ssh('sudo install -m 644 /dev/stdin /etc/systemd/system/elevate-studio.service',publicUnit(ip));
@@ -96,22 +106,23 @@ export async function prepare(){
     if(!checks.length)cli(['compute','health-checks','create','http',health,'--global','--port=3100','--request-path=/health','--check-interval=10s','--timeout=5s','--description='+purpose]);
     else if(checks.length!==1||checks[0].description!==purpose)throw Error('Existing health check requires review');
     const existing=read(['compute','backend-services','list','--filter=name='+backend]);
-    if(!existing.length)cli(['compute','backend-services','create',backend,'--global','--protocol=HTTP','--port-name=http','--health-checks='+health,'--timeout=3600s','--load-balancing-scheme='+(rules[0].loadBalancingScheme||'EXTERNAL'),'--description='+purpose]);
+    if(!existing.length)cli(['compute','backend-services','create',backend,'--global','--protocol=HTTP','--port-name=http','--health-checks='+health,'--global-health-checks','--timeout=3600s','--load-balancing-scheme='+(rules[0].loadBalancingScheme||'EXTERNAL'),'--description='+purpose],undefined,300000);
     const service=read(['compute','backend-services','describe',backend,'--global']);
     if(service.description!==purpose||(service.backends||[]).some(b=>!b.group.endsWith('/'+group)))throw Error('Existing browser backend requires review');
-    if(!service.backends?.length)cli(['compute','backend-services','add-backend',backend,'--global','--instance-group='+group,'--instance-group-zone='+zone,'--balancing-mode=UTILIZATION','--max-utilization=0.8']);
+    if(!service.backends?.length)cli(['compute','backend-services','add-backend',backend,'--global','--instance-group='+group,'--instance-group-zone='+zone,'--balancing-mode=UTILIZATION','--max-utilization=0.8'],undefined,300000);
     let healthy=false;for(let n=0;n<30;n++){const state=read(['compute','backend-services','get-health',backend,'--global']);if(state.some(s=>s.status?.healthStatus?.some(h=>h.healthState==='HEALTHY'))){healthy=true;break;}await pause(10000);}
     if(!healthy)throw Error('Google browser backend did not become healthy');report.backendHealthy=true;
     const currentMap=read(['compute','url-maps','describe','elevate-public-routes','--global']);
     if(!checkHostRoute(currentMap))cli(['compute','url-maps','add-path-matcher','elevate-public-routes','--global','--path-matcher-name=studio-browser','--default-service='+backend,'--new-hosts='+host]);
     report.browserRoutePrepared=true;
     // curl stdin config carries the shared secret, never command arguments.
-    const config='url = '+JSON.stringify('https://'+host+'/workspace/files')+'\nresolve = '+JSON.stringify(host+':443:'+addresses[0])+'\nheader = '+JSON.stringify('x-studio-browser-secret: '+secret)+'\n';
     let edgeReady=false;for(let n=0;n<30;n++){try{const body=execFileSync('curl',['--silent','--show-error','--fail','--max-time','15','--resolve',host+':443:'+addresses[0],'https://'+host+'/health'],{encoding:'utf8',timeout:20000,stdio:['ignore','pipe','pipe']});const state=JSON.parse(body);if(state.ready&&state.commit===commit&&state.providerAuthStorage?.persistent){edgeReady=true;break;}}catch{}await pause(10000);}
     if(!edgeReady)throw Error('Exact Studio image is not ready through Google HTTPS');
-    execFileSync('curl',['--config','-','--silent','--show-error','--fail','--max-time','20','--output','/dev/null'],{input:config,encoding:'utf8',timeout:25000,stdio:['pipe','pipe','pipe']});
-    const denied=execFileSync('curl',['--silent','--show-error','--max-time','15','--resolve',host+':443:'+addresses[0],'--output','/dev/null','--write-out','%{http_code}','https://'+host+'/workspace/files'],{encoding:'utf8',timeout:20000,stdio:['ignore','pipe','pipe']});
-    if(denied!=='401')throw Error('Anonymous browser workspace access was not denied');
+    report.edgeHealthVerified=true;
+    report.authorizedProbe=edgeStatus(addresses[0],secret);
+    report.anonymousProbe=edgeStatus(addresses[0]);
+    if(report.authorizedProbe.exitCode!==0||report.authorizedProbe.httpStatus!==200)throw Error('Authenticated HTTPS probe failed; inspect its nonsecret status');
+    if(report.anonymousProbe.exitCode!==0||report.anonymousProbe.httpStatus!==401)throw Error('Anonymous browser workspace access was not denied');
     report.authorizedHttps=true;report.anonymousDenied=true;
     const nat=instance.networkInterfaces?.[0]?.accessConfigs?.[0]?.natIP;
     let directBlocked=false;try{const r=await fetch('http://'+nat+':3100/health',{signal:AbortSignal.timeout(5000)});await r.body?.cancel();}catch{directBlocked=true;}

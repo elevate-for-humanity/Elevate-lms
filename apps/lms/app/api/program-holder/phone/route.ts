@@ -1,6 +1,6 @@
 // pre-auth-registry: exempt - requireProgramHolder verifies the authenticated holder and every query is profile-scoped.
 import { NextResponse } from 'next/server';
-import { requireCommunicationActor } from '@/lib/communications/actor';
+import { phoneActorResponse } from '@/lib/phone/actor-response';
 import { asteriskDeviceStatus, asteriskDeviceId } from '@/lib/phone/asterisk';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import {
@@ -19,7 +19,8 @@ const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DEVICE_ID = /^[A-Za-z0-9_-]{16,100}$/;
 
 async function phoneContext() {
-  const ctx = await requireCommunicationActor();
+  const { actor: ctx, response: actorError } = await phoneActorResponse();
+  if (actorError) return actorError;
   const { data: extension } = await ctx.db
     .from('communication_extensions')
     .select('*,communication_workspaces!inner(id,phone_system_id)')

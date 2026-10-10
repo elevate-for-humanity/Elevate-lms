@@ -1,13 +1,14 @@
-// pre-auth-registry: exempt - requireCommunicationActor and assigned_profile_id scope recording access.
+// pre-auth-registry: exempt - phoneActorResponse (requireCommunicationActor) and assigned_profile_id scope recording access.
 import { NextResponse } from 'next/server';
-import { requireCommunicationActor } from '@/lib/communications/actor';
+import { phoneActorResponse } from '@/lib/phone/actor-response';
 import { loadPhoneRecording } from '@/lib/phone/recordings';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const ctx = await requireCommunicationActor();
+  const { actor: ctx, response: actorError } = await phoneActorResponse();
+  if (actorError) return actorError;
   const { id } = await params;
   const { data: item, error } = await ctx.db.from('voicemails')
     .select('recording_url').eq('id', id).eq('assigned_profile_id', ctx.user.id).maybeSingle();

@@ -1,6 +1,6 @@
 // pre-auth-registry: exempt - requireCommunicationActor verifies the owner before provider-scoped credentials are issued.
 import { NextResponse } from 'next/server';
-import { requireCommunicationActor } from '@/lib/communications/actor';
+import { phoneActorResponse } from '@/lib/phone/actor-response';
 import { ensureDeviceCredential } from '@/lib/phone/webrtc';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { provisionAsteriskDevice, asteriskDeviceId } from '@/lib/phone/asterisk';
@@ -11,7 +11,8 @@ export const dynamic = 'force-dynamic';
 const DEVICE_ID = /^[A-Za-z0-9_-]{16,100}$/;
 
 export async function POST(request: Request) {
-  const ctx = await requireCommunicationActor();
+  const { actor: ctx, response: actorError } = await phoneActorResponse();
+  if (actorError) return actorError;
   if (ctx.previewing) {
     return NextResponse.json(
       { error: 'Administrator portal previews cannot connect or place calls.' },

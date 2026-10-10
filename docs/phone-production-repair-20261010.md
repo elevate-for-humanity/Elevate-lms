@@ -184,3 +184,23 @@ The previous PR head df4c692 passed required CI, all three TypeScript checks,
 lint, migration checks and all three canonical container builds. Advisory
 accessibility/integrity/procurement failures still need review; no gate was
 removed or bypassed. No production schema or phone traffic was changed here.
+
+## Authorization and deployment follow-up
+
+All five LMS phone endpoints now preserve signed-out/forbidden responses as
+401/403; unexpected authorization failures return a generic, non-cacheable 503.
+This repairs an unhandled-error path without bypassing the existing actor,
+extension ownership or preview checks. The updated local suite passed 48 tests
+across 11 files; LMS TypeScript and scoped source lint also passed.
+
+The read-only runtime audit is separately reviewable in
+[PR 1695](https://github.com/elevate-for-humanity/Elevate-lms/pull/1695) so actual
+PBX capabilities can be established before any provisioning service activation.
+It changes no live configuration and sends no SIP call.
+
+Google Marketing activation run 38034588592 failed at 07:29 UTC because
+`us-central1` CPU quota prevented tagged-revision activation. Regional publish
+run 38034405331 verified its authenticated regional runtime, then stopped because
+public invoker access requires the owner to grant the intended permission.
+Neither run proves a completed public deployment. No IAM or traffic changes were
+made to work around these failures.

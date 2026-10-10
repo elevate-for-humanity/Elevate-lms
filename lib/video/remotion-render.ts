@@ -953,27 +953,48 @@ export async function renderStoryboardVideo(
       });
       const composition = { ...selected, durationInFrames: totalFrames };
       logger.info('[RemotionRender] storyboard encoding started', {lessonId: input.lessonId, totalFrames, fps: composition.fps, concurrency: renderConcurrency()});
-      let lastPercent = -5;
-      let lastLogAt = 0;
-      await renderMedia({
-        composition,
-        serveUrl: bundleUrl,
-        ...(browserExecutable ? { browserExecutable } : {}),
-        codec: 'h264',
-        outputLocation: paths.videoPath,
-        inputProps,
-        concurrency: renderConcurrency(),
-        crf: 20,
-        onProgress: ({progress, renderedFrames, encodedFrames}) => {
-          const percent = Math.floor(progress * 100);
-          const now = Date.now();
-          if (percent >= lastPercent + 5 || now - lastLogAt >= 30_000) {
-            logger.info('[RemotionRender] storyboard progress', {lessonId: input.lessonId, percent, renderedFrames, encodedFrames, totalFrames});
-            lastPercent = percent;
-            lastLogAt = now;
-          }
-        },
-      });
+      // Bound Chromium lifetime by rendering frame ranges independently.
+      // Keep the original composition timeline so scene transitions, captions,
+      // and audio remain aligned with their absolute frame positions.
+      const framesPerChunk = 900; // 30 seconds at 30 fps
+      const chunkPaths: string[] = [];
+      for (let start = 0; start < totalFrames; start += framesPerChunk) {
+        const end = Math.min(totalFrames - 1, start + framesPerChunk - 1);
+        const chunkPath = path.join(paths.outputDir, `segment-${String(start).padStart(8, '0')}.mp4`);
+        const existing = await stat(chunkPath).catch(() => null);
+        if (!existing?.size) {
+          logger.info('[RemotionRender] segment started', {lessonId: input.lessonId, start, end});
+          await renderMedia({
+            composition,
+            serveUrl: bundleUrl,
+            ...(browserExecutable ? { browserExecutable } : {}),
+            codec: 'h264',
+            outputLocation: chunkPath,
+            inputProps,
+            frameRange: [start, end],
+            concurrency: renderConcurrency(),
+            crf: 20,
+            onProgress: ({renderedFrames, encodedFrames}) => {
+              logger.info('[RemotionRender] segment progress', {
+                lessonId: input.lessonId, start, end, renderedFrames, encodedFrames,
+              });
+            },
+          });
+          const written = await stat(chunkPath);
+          if (!written.size) throw new Error(`REMOTION_SEGMENT_EMPTY:${start}-${end}`);
+          logger.info('[RemotionRender] segment complete', {lessonId: input.lessonId, start, end, bytes: written.size});
+        }
+        chunkPaths.push(chunkPath);
+      }
+      // FFmpeg concat demuxer accepts absolute paths with safe shell-independent
+      // quoting. Never mark the lesson complete unless assembly succeeds.
+      const manifestPath = path.join(paths.outputDir, 'segments.ffconcat');
+      await writeFile(manifestPath, 'ffconcat version 1.0\\n' +
+        chunkPaths.map(p => "file '" + p.replace(/'/g, "'\\\\''") + "'").join('\\n') + '\\n');
+      await execFileAsync('ffmpeg', [
+        '-y', '-f', 'concat', '-safe', '0', '-i', manifestPath,
+        '-c', 'copy', '-movflags', '+faststart', paths.videoPath,
+      ], {timeout: 600_000, maxBuffer: 2_000_000});
       const output = await stat(paths.videoPath);
       if (!output.size) throw new Error('REMOTION_MP4_EMPTY');
       logger.info('[RemotionRender] storyboard MP4 written', {lessonId: input.lessonId, bytes: output.size});

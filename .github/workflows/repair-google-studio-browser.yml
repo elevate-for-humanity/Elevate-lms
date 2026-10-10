@@ -7,6 +7,7 @@ on:
       - 'scripts/gcp/repair-studio-browser-cloud-run.mjs'
       - 'services/studio-browser/**'
       - 'Dockerfile.studio-browser'
+      - 'scripts/gcp/preflight-studio-browser-permissions.mjs'
   workflow_dispatch:
 permissions:
   contents: read
@@ -36,6 +37,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Check provisioning permissions before building
+        run: node scripts/gcp/preflight-studio-browser-permissions.mjs
       - name: Build actual immutable Studio browser container
         run: docker build -f Dockerfile.studio-browser --build-arg "NF_GIT_SHA=$GITHUB_SHA" -t "studio-browser:$GITHUB_SHA" .
       - name: Verify direct CDP and browser authorization contracts
@@ -45,14 +56,31 @@ jobs:
           -v "$PWD/services/studio-browser:/tests:ro"
           --entrypoint sh "studio-browser:$GITHUB_SHA"
           -c 'test "$(id -u)" = 1001 && test -x "$STUDIO_BROWSER_EXECUTABLE_PATH" && cp -f /tests/*.test.mjs /app/ && node --test --test-concurrency=1 /app/*.test.mjs'
-      - uses: google-github-actions/auth@v3
-        with:
-          project_id: elegant-racer-299721
-          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
-          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
-      - uses: google-github-actions/setup-gcloud@v3
-        with:
-          skip_install: true
+      - name: Prove actual server startup, persistent storage and authorization
+        run: |
+          set -euo pipefail
+          AUTH_DIR="$RUNNER_TEMP/studio-auth-test"
+          mkdir -p "$AUTH_DIR"
+          sudo chown 1001:1001 "$AUTH_DIR"
+          docker run -d --init --name studio-startup -p 127.0.0.1:3100:3100 \
+            -e STUDIO_BROWSER_SECRET=container-test-secret-no-production-access \
+            -e STUDIO_BROWSER_AUTH_STATE_DIR=/var/lib/studio-browser-auth \
+            -v "$AUTH_DIR:/var/lib/studio-browser-auth" "studio-browser:$GITHUB_SHA"
+          trap 'docker logs studio-startup; docker rm -f studio-startup' EXIT
+          node --input-type=module <<'NODE'
+          const base='http://127.0.0.1:3100';
+          let state;
+          for(let attempt=0;attempt<30;attempt++){
+            try{const response=await fetch(base+'/health',{signal:AbortSignal.timeout(2000)});state=await response.json();if(response.ok&&state.ready)break;}catch{}
+            await new Promise(resolve=>setTimeout(resolve,1000));
+          }
+          if(!state?.ready||state.commit!==process.env.GITHUB_SHA||!state.providerAuthStorage?.persistent)throw Error('Actual container startup/persistence proof failed');
+          const anonymous=await fetch(base+'/workspace/files');
+          if(anonymous.status!==401)throw Error('Anonymous workspace access must be denied');
+          const authorized=await fetch(base+'/workspace/files',{headers:{'x-studio-browser-secret':'container-test-secret-no-production-access'}});
+          if(!authorized.ok)throw Error('Authenticated workspace must respond');
+          console.log(JSON.stringify({commit:state.commit,ready:state.ready,persistent:true,anonymousDenied:true,authorized:true}));
+          NODE
       - name: Publish tested browser image
         run: |
           set -euo pipefail
@@ -64,3 +92,11 @@ jobs:
         env:
           IMAGE_SHA: ${{ github.sha }}
         run: node scripts/gcp/repair-studio-browser-cloud-run.mjs
+      - name: Preserve exact failed browser revision diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-browser-startup-${{ github.run_id }}
+          path: reports/studio-browser
+          if-no-files-found: ignore
+          retention-days: 7

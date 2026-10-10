@@ -40,7 +40,9 @@ function required(){
 }
 function authHeader(){return 'Basic '+Buffer.from(config.user+':'+config.password).toString('base64');}
 async function ari(path,method='GET',data){
-  const url=new URL(config.ari+path);\n  if(data)for(const [key,value] of Object.entries(data))url.searchParams.set(key,String(value));\n  const response=await fetch(url,{method,headers:{Authorization:authHeader()},signal:AbortSignal.timeout(10000)});
+  const url=new URL(config.ari+path);
+  if(data)for(const [key,value] of Object.entries(data))url.searchParams.set(key,String(value));
+  const response=await fetch(url,{method,headers:{Authorization:authHeader()},signal:AbortSignal.timeout(10000)});
   if(!response.ok)throw Error('ARI_'+method+'_'+response.status);
   const txt=await response.text();
   return txt?JSON.parse(txt):{};

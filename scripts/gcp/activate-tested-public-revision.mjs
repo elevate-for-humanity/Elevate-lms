@@ -7,7 +7,7 @@ function trafficRows(state){return [...(state.spec?.traffic||[]),...(state.statu
 export function unusedCandidateTags(state,exceptTag){
  const rows=trafficRows(state),serving=new Set(rows.filter(t=>t.percent>0).map(t=>t.revisionName));
  const tags=new Map();
- // startup-gen2 was the temporary test URL created by recover-startup-runtime.mjs.
+ // Keep recognizing the legacy startup-gen2 tag after deleting its recovery workflow.
  for(const row of rows){if((!/^c-[a-f0-9]{12}$/.test(row.tag||'')&&row.tag!=='startup-gen2')||!row.revisionName)continue;const revisions=tags.get(row.tag)||new Set();revisions.add(row.revisionName);tags.set(row.tag,revisions);}
  return [...tags].filter(([tag,revisions])=>tag!==exceptTag&&revisions.size===1&&![...revisions].some(r=>serving.has(r))).map(([tag])=>tag);
 }

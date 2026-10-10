@@ -62,7 +62,7 @@ export async function converse(history,request=googleJson){
 // No external dial string or arbitrary extension can be routed by this service.
 export function callerRouteIntent(transcript){
   const text=String(transcript||'').toLowerCase().trim();
-  const asked=/(?:\\b(?:transfer|connect|speak|talk|reach|put me through)\\b.{0,48}\\b(?:operator|administrator|human|person|representative|front desk)\\b|\\b(?:operator|administrator)\\b.{0,28}\\bplease\\b)/i;
+  const asked=/(?:\b(?:transfer|connect|speak|talk|reach|put me through)\b.{0,48}\b(?:operator|administrator|human|person|representative|front desk)\b|\b(?:operator|administrator)\b.{0,28}\bplease\b)/i;
   return asked.test(text)?{type:'operator',extension:'0'}:null;
 }
 

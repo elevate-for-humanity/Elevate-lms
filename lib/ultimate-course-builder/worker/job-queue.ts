@@ -79,6 +79,20 @@ export class UltimateJobQueue {
     if (error) throw error;
   }
 
+  async waitForDependency(jobId: string, workerId: string, message: string) {
+    // Do not burn attempts for externally blocked assets. The existing
+    // wake_ultimate_media_dependency RPC is responsible for resumption.
+    const { error } = await this.db.from('ultimate_build_jobs').update({
+      status: 'failed',
+      pending_dependency_resume: true,
+      lease_owner: null,
+      lease_expires_at: null,
+      last_error: message,
+      updated_at: new Date().toISOString(),
+    }).eq('id', jobId).eq('lease_owner', workerId);
+    if (error) throw error;
+  }
+
   async requeueForRepair(jobId: string, workerId: string, message: string) {
     const { error } = await this.db
       .from('ultimate_build_jobs')

@@ -48,6 +48,12 @@ async function ari(path,method='GET',data){
   return txt?JSON.parse(txt):{};
 }
 const encode=encodeURIComponent;
+export async function routeOperator(callId,route,request=ari){
+  if(!UUIDISH.test(callId||'') || route?.type!=='operator' || route.extension!=='0')throw Error('ROUTE_NOT_ALLOWED');
+  await request('/channels/'+encode(callId)+'/continue','POST',{
+    context:'internal',extension:'0',priority:1,
+  });
+}
 function ulawDecode(byte){
   byte=(~byte)&255;
   const sign=byte&128, exponent=(byte>>4)&7, mantissa=byte&15;
@@ -107,10 +113,8 @@ async function turn(session){
     await speak(session,body.replyAudioUlawBase64);
     if(body.requestedRoute?.type==='operator') {
       // Operator 0 must first exist in the reviewed live Asterisk dialplan.
-      // The ARI redirect is deliberately limited to the internal context.
-      if(body.requestedRoute.extension!=='0') throw Error('ROUTE_NOT_ALLOWED');
-      const path='/channels/'+encode(session.callId)+'/redirect?endpoint='+encode('Local/0@internal');
-      await ari(path,'POST');
+      // Resume the allowlisted dialplan route without changing channel technology.
+      await routeOperator(session.callId,body.requestedRoute);
       await end(session);
     } else if(body.endCall===true) await end(session);
   }catch(e){

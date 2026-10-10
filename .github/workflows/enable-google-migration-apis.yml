@@ -35,3 +35,13 @@ jobs:
           }
           console.log('Secret Manager, Cloud Scheduler and Cloud Billing APIs are enabled. Billing account assignment, plan, payment settings and IAM are unchanged.');
           NODE
+      - name: Read linked billing metadata after enabling the API
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { inspectProjectBilling } from './scripts/gcp/preflight-isolated-workloads.mjs';
+          const token = execFileSync('gcloud', ['auth', 'print-access-token'], {encoding: 'utf8', timeout: 30000, stdio: ['ignore', 'pipe', 'pipe']}).trim();
+          const report = await inspectProjectBilling(token);
+          console.log(JSON.stringify(report));
+          if (report.reads.some(read => read.httpStatus !== 200)) process.exitCode = 1;
+          NODE

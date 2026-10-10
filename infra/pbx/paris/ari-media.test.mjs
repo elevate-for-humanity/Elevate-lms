@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parseRtp,rtp,isSpeech,routeOperator,isCallerStart,createExternalChannel} from './ari-media.mjs';
+import {parseRtp,rtp,isSpeech,routeOperator,isCallerStart,createExternalChannel,releaseCaller} from './ari-media.mjs';
 
 test('PCMU RTP round trip maintains packetization and sequence',()=>{
  const state={seq:65535,timestamp:100,ssrc:123};
@@ -67,4 +67,21 @@ test('only caller channel technologies enter PARIS, including when media events 
 });
 test('external channel response must match the preallocated cleanup identity',async()=>{
   await assert.rejects(createExternalChannel({id:'b'.repeat(24)},'127.0.0.1:19000',async()=>({id:'unexpected'})),/EXTERNAL_CHANNEL_ID_MISMATCH/);
+});
+test('voice processing failure returns the caller to its owning dialplan without a fabricated route',async()=>{
+  const calls=[];
+  await releaseCaller('call-1','continue',async(...args)=>calls.push(args));
+  assert.deepEqual(calls,[['/channels/call-1/continue','POST']]);
+});
+test('failed fallback or requested call termination hangs up only the owned caller leg',async()=>{
+  const calls=[];
+  await releaseCaller('call-1','continue',async(...args)=>{
+    calls.push(args);if(args[1]==='POST')throw Error('ARI_POST_409');
+  });
+  assert.deepEqual(calls,[['/channels/call-1/continue','POST'],['/channels/call-1','DELETE']]);
+  const hangups=[];
+  await releaseCaller('call-2','hangup',async(...args)=>hangups.push(args));
+  assert.deepEqual(hangups,[['/channels/call-2','DELETE']]);
+  await assert.rejects(releaseCaller('call-2','hangup',async()=>{throw Error('ARI_DELETE_403');}),/ARI_DELETE_403/);
+  await assert.rejects(releaseCaller('../other','hangup',async()=>assert.fail('must not request')),/CALL_RELEASE_NOT_ALLOWED/);
 });

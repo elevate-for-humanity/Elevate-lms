@@ -21,6 +21,14 @@ response. Asterisk 20 externalMedia does not support the `appArgs` parameter;
 using an argument marker alone would let media channels recursively create more
 bridges. The channel-ID response is verified before bridging.
 
+The gateway answers caller legs that are not already answered. Failed voice
+processing or ARI disconnection returns the caller to the next priority after
+its original Stasis application; the reviewed dialplan must provide the fallback
+there. If that continuation fails, only that caller leg is hung up. A successful
+operator handoff is not hung up by media cleanup. Sessions are bounded to 16
+concurrent calls and 15 minutes each; capacity/time limits use the same fallback.
+Resource creation completed after caller hangup is cleaned up on response.
+
 Required server-side environment: `PARIS_ARI_USER`, `PARIS_ARI_PASSWORD`,
 `PARIS_ARI_URL`, `PARIS_ARI_WS`, `PARIS_TURN_URL`, `PARIS_TURN_TOKEN`.
 The endpoint URL must be private HTTPS. Credentials must be supplied at runtime

@@ -57,14 +57,20 @@ export async function executeFiniteVideoJob({ configuration = 'saved', validateO
     Object.assign(expected.template.spec.template.spec.containers[0], {
       image, command: ['node'], args: ['--input-type=module', '-e', runner],
     });
-    if (!isDeepStrictEqual(expected, updated.spec)) {
+    // gcloud changes this bookkeeping nonce on every update. It is not a
+    // runtime setting; all resource, secret, network and identity fields must match.
+    const actual = structuredClone(updated.spec);
+    for (const spec of [expected, actual]) {
+      if (spec.template.metadata?.labels) delete spec.template.metadata.labels['client.knative.dev/nonce'];
+    }
+    if (!isDeepStrictEqual(expected, actual)) {
       const changedPaths = (left, right, path = 'spec') => {
         if (isDeepStrictEqual(left, right)) return [];
         if (!left || !right || typeof left !== 'object' || typeof right !== 'object') return [path];
         return [...new Set([...Object.keys(left), ...Object.keys(right)])]
           .flatMap(key => changedPaths(left[key], right[key], path + '.' + key));
       };
-      log({ unexpectedSettingPaths: changedPaths(expected, updated.spec),
+      log({ unexpectedSettingPaths: changedPaths(expected, actual),
         resourcesBefore: task.containers[0].resources?.limits,
         resourcesAfter: updated.spec.template.spec.template.spec.containers[0].resources?.limits });
       throw new Error('Saved job settings changed unexpectedly; execution stopped');

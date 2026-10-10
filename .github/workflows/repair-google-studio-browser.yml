@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/repair-google-studio-browser.yml'
       - 'scripts/gcp/repair-studio-browser-cloud-run.mjs'
+      - 'services/studio-browser/**'
+      - 'Dockerfile.studio-browser'
   workflow_dispatch:
 permissions:
   contents: read

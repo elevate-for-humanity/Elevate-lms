@@ -3,6 +3,7 @@
 
 import type { NavItem, NavSubItem } from '@/types/navigation';
 import { ROUTES } from '@/lib/navigation/routes';
+import { siteUrls } from '@/lib/utils/site-urls';
 
 export type { NavItem, NavSubItem } from '@/types/navigation';
 
@@ -11,11 +12,11 @@ export const NAV_ITEMS: NavItem[] = [
   {
     id: 'students',
     name: 'Students',
-    href: '/learner/dashboard',
+    href: ROUTES.studentPortal,
     subItems: [
-      { name: 'Student Dashboard', href: '/learner/dashboard', isSectionLink: true, isAuth: true },
+      { name: 'Student Dashboard', href: ROUTES.studentPortal, isSectionLink: true, isAuth: true },
       { name: 'Apply for Training', href: ROUTES.apply, isSectionLink: true },
-      { name: 'My Courses', href: '/lms/dashboard', isSectionLink: true, isAuth: true },
+      { name: 'My Courses', href: ROUTES.lmsPortal, isSectionLink: true, isAuth: true },
       { name: 'Check Eligibility', href: ROUTES.eligibility, isSectionLink: true },
       { name: 'Student Support', href: '/student-support', isSectionLink: true },
     ],
@@ -102,9 +103,13 @@ export const NAV_ITEMS: NavItem[] = [
   {
     id: 'barber-beauty-network',
     name: 'Barber & Beauty Network',
-    href: '/partners/host-shops',
+    href: '/barber-beauty-network',
     subItems: [
-      { name: 'Explore the Network', href: '/partners/host-shops', isSectionLink: true },
+      { name: 'Network Home', href: '/barber-beauty-network', isSectionLink: true },
+      { name: 'Join the Community', href: '/community', isSectionLink: true },
+      { name: 'Member Community', href: `${siteUrls.app}/community`, isSectionLink: true },
+      { name: 'Host Shop Directory', href: '/partners/host-shops', isSectionLink: true },
+      { name: 'Job Board', href: '/jobs', isSectionLink: true },
       { name: 'Join & Showcase Your Work', href: '/host-shop/apply', isSectionLink: true },
       { name: 'Barber Apprenticeship', href: ROUTES.programsBarber, isSectionLink: true },
       { name: 'Cosmetology', href: ROUTES.programsCosmetology, isSectionLink: true },

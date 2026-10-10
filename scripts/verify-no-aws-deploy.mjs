@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * CI guard: production deploy must be Northflank-only (no AWS ECS artifacts or workflows).
+ * CI guard: production deploy must be Google Cloud Run only (no AWS ECS artifacts or workflows).
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -22,7 +22,7 @@ const forbiddenRepoPaths = [
   'aws/buildspec-admin.yml',
   '.github/workflows/deploy-aws.yml',
   'Dockerfile.package',
-  // Dockerfile.admin is allowed - standard Dockerfile for local dev / Northflank (not AWS ECS)
+  // Dockerfile.admin is allowed for standard Docker container builds.
 ];
 
 let failed = false;
@@ -45,14 +45,51 @@ for (const path of forbiddenRepoPaths) {
 }
 
 const required = [
-  '.github/workflows/deploy-lms.yml',
   '.github/workflows/deploy-admin.yml',
-  'Dockerfile.northflank-lms',
+  '.github/workflows/deploy-google-marketing-trigger.yml',
   'Dockerfile.northflank-admin',
 ];
 for (const path of required) {
   if (!existsSync(path)) {
-    console.error(`❌ missing required Northflank artifact: ${path}`);
+    console.error(`❌ missing required Google deployment artifact: ${path}`);
+    failed = true;
+  }
+}
+
+// Google ownership contract: an operational deployment entrypoint must never
+// reintroduce a Northflank API call or the removed production webhook path.
+// Migration inventories are intentionally retained until cutover acceptance.
+const googleOwnedEntrypoints = [
+  '.github/workflows/deploy-admin.yml',
+  '.github/workflows/deploy-google-marketing-trigger.yml',
+  'apps/admin/app/api/admin/env-vars/deploy/route.ts',
+  'apps/admin/app/api/admin/dev-studio/builds/route.ts',
+  'apps/admin/app/api/admin/dev-studio/shell/route.ts',
+  'apps/admin/app/api/admin/dev-studio/autofix/route.ts',
+  'lib/admin/publish-website.ts',
+  'lib/gcp/dispatch-production-workflow.ts',
+  'supabase/functions/autopilot-worker/index.ts',
+];
+for (const file of googleOwnedEntrypoints) {
+  if (!existsSync(file)) {
+    console.error('Missing canonical Google-owned entrypoint: ' + file);
+    failed = true;
+    continue;
+  }
+  const source = readFileSync(file, 'utf8');
+  if (/api\.northflank\.com|triggerNorthflankBuild|trigger-northflank\.sh|scripts\/northflank\/(?:trigger|deploy|restart)/i.test(source)) {
+    console.error('Legacy Northflank execution path in Google-owned entrypoint: ' + file);
+    failed = true;
+  }
+}
+for (const legacy of [
+  'northflank-trigger-dispatch.yml', 'deploy-lms.yml', 'deploy-marketing.yml',
+  'recover-marketing.yml', 'elevate-production-deploy.yml',
+  'force-admin-remotion-deploy.yml', 'restart-admin-renderer.yml',
+  'repair-llm-runtime.yml', 'wait-admin-video-runtime.yml',
+]) {
+  if (existsSync(join(workflowDir, legacy))) {
+    console.error('Retired Northflank deployment workflow reintroduced: ' + legacy);
     failed = true;
   }
 }
@@ -60,4 +97,4 @@ for (const path of required) {
 if (failed) {
   process.exit(1);
 }
-console.log('✅ No AWS ECS deploy artifacts; Northflank deploy workflows present.');
+console.log('✅ No AWS ECS deploy artifacts; Google deployment workflows present.');

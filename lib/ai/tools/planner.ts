@@ -127,6 +127,12 @@ export function planAIToolFromCommand(
   }
 
   const lower = command.toLowerCase();
+  // The plan's platform snapshot command must resolve to a read-only tool.
+  if (
+    /^(?:get|show|inspect|check)\s+(?:(?:the|live|current)\s+)*(?:platform|system)\s+(?:state|health|status)\b/.test(lower)
+  ) {
+    return { name: 'system.health', input: {} };
+  }
   const contextId = typeof context.id === 'string' ? context.id : null;
   const id = contextId ?? extractUuid(command);
 

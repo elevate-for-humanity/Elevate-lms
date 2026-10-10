@@ -37,6 +37,27 @@ jobs:
           ZONE=us-central1-a
           gcloud compute instances describe elevate-pbx --project="$PROJECT" --zone="$ZONE" --format=json || true
           gcloud compute addresses describe elevate-pbx-ip --project="$PROJECT" --region=us-central1 --format=json || true
+      - name: Inspect existing VM readiness without changing Telnyx
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT=elegant-racer-299721
+          ZONE=us-central1-a
+          VM=elevate-pbx
+          STATUS="$(gcloud compute instances describe "$VM" --project="$PROJECT" --zone="$ZONE" --format='value(status)' 2>/dev/null || true)"
+          if [[ -z "$STATUS" ]]; then
+            echo "::warning::PBX VM not found. Provisioning requires apply=true."
+            exit 0
+          fi
+          echo "PBX VM status: $STATUS"
+          if [[ "$STATUS" != RUNNING ]]; then
+            echo "::error::PBX VM exists but is not running."
+            exit 1
+          fi
+          IP="$(gcloud compute instances describe "$VM" --project="$PROJECT" --zone="$ZONE" --format='value(networkInterfaces[0].accessConfigs[0].natIP)')"
+          echo "PBX public IP: $IP"
+          gcloud compute instances get-serial-port-output "$VM" --project="$PROJECT" --zone="$ZONE" --port=1 --start=0 2>&1 | tail -n 50 || true
+          echo "Existing VM not restarted or rewritten; DNS/TLS/WebRTC must be independently verified."
       - name: Provision PBX host
         if: inputs.apply
         shell: bash

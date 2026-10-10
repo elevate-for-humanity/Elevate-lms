@@ -2,7 +2,7 @@
 
 /**
  * Admin dashboard — one-click publish & update for the public LMS.
- * Refreshes ISR cache on www + triggers Northflank builds (LMS + Admin).
+ * Refreshes public content and dispatches the Google Marketing release.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -27,7 +27,7 @@ type ServiceStatus = {
 };
 
 type PublishStatus = {
-  northflankReady: boolean;
+  googleReady: boolean;
   deployRelayReady?: boolean;
   liveSiteUrl: string;
   revalidatePathCount: number;
@@ -96,7 +96,11 @@ export function PublishWebsitePanel() {
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ confirm: 'PUBLISH', revalidate: true, deploy: status?.northflankReady === true }),
+        body: JSON.stringify({
+          confirm: 'PUBLISH',
+          revalidate: true,
+          deploy: status?.googleReady === true,
+        }),
       });
       const json = await res.json();
       if (!res.ok && !json.deploy) throw new Error(json.error ?? `HTTP ${res.status}`);
@@ -130,9 +134,9 @@ export function PublishWebsitePanel() {
           <p className="mt-2 text-sm text-slate-600 max-w-xl leading-relaxed">
             Pushes live content updates to{' '}
             <strong>{status?.liveSiteUrl ?? 'www.elevateforhumanity.org'}</strong>: refreshes{' '}
-            {status?.revalidatePathCount ?? '40+'} public marketing pages (programs, funding,
-            Indianapolis SEO hubs, blog) and triggers Northflank rebuilds for the main site and admin
-            dashboard when deploy credentials or the GitHub deploy relay are available.
+            {status?.revalidatePathCount ?? '—'} public marketing pages (programs, funding,
+            Indianapolis SEO hubs, blog) and dispatches the Google Marketing release when deployment
+            access is configured.
           </p>
 
           {status?.content &&
@@ -166,7 +170,7 @@ export function PublishWebsitePanel() {
                 >
                   <p className="font-semibold text-slate-800">{svc.label}</p>
                   <p className="text-slate-500 mt-0.5">
-                    Status: {svc.status ?? (status.northflankReady ? 'unknown' : 'not configured')}
+                    Status: {svc.status ?? (status.googleReady ? 'unknown' : 'not configured')}
                   </p>
                   <p className="text-slate-400">Last deploy: {formatWhen(svc.lastDeployedAt)}</p>
                 </div>
@@ -199,7 +203,8 @@ export function PublishWebsitePanel() {
               </p>
               <ul className="mt-2 space-y-1 text-xs">
                 <li>
-                  Cache refresh: {result.revalidate.ok ? 'OK' : result.revalidate.error ?? 'failed'}
+                  Cache refresh:{' '}
+                  {result.revalidate.ok ? 'OK' : (result.revalidate.error ?? 'failed')}
                 </li>
                 {result.deploy.map((d) => (
                   <li key={d.service}>
@@ -209,8 +214,13 @@ export function PublishWebsitePanel() {
                 ))}
               </ul>
               <p className="mt-2 text-[11px] opacity-80">
-                Builds take 15–25 minutes on Northflank. Verify at{' '}
-                <a href={result.liveSiteUrl} className="underline font-medium" target="_blank" rel="noopener noreferrer">
+                A dispatched Google release still needs a verified live revision. Check the{' '}
+                <a
+                  href={result.liveSiteUrl}
+                  className="underline font-medium"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   live site
                 </a>
                 .
@@ -264,9 +274,10 @@ export function PublishWebsitePanel() {
           >
             Refresh status
           </button>
-          {!status?.northflankReady && !loading && (
+          {!status?.googleReady && !loading && (
             <p className="text-[11px] text-amber-700 max-w-[220px]">
-              Direct Northflank deploy is not configured here. This button will still refresh public content; use Dev Studio Deploy All for GitHub Actions deploys.
+              Google deployment access is not configured. This button can refresh public content;
+              deployment remains unavailable until access is configured.
             </p>
           )}
         </div>

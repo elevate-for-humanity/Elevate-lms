@@ -228,13 +228,13 @@ if (unauthorizedBrowserSpeech.length) {
 }
 
 const naturalRoute = fs.readFileSync(path.join(rootDir, 'lib/ai/natural-voice-route.ts'), 'utf8');
-const cloudflareVoice = fs.readFileSync(path.join(rootDir, 'lib/ai/cloudflare-natural-voice.ts'), 'utf8');
-if (!naturalRoute.includes('generateCloudflareNaturalVoice')) {
-  fail('Natural voice handler is not using the shared Cloudflare natural-voice provider');
-} else if (!cloudflareVoice.includes("const DEFAULT_CLOUDFLARE_TTS_MODEL = '@cf/")) {
-  fail('Cloudflare natural-voice provider has no production model default');
+const googleVoice = fs.readFileSync(path.join(rootDir, 'lib/ai/google-natural-voice.ts'), 'utf8');
+if (!naturalRoute.includes('generateGoogleNaturalVoice')) {
+  fail('Natural voice handler is not using the shared Google natural-voice provider');
+} else if (!googleVoice.includes("https://texttospeech.googleapis.com/v1/text:synthesize") || !googleVoice.includes("en-US-Neural2-F")) {
+  fail('Google natural-voice provider has no production speech endpoint or voice');
 } else {
-  pass('Shared natural AI voice handler is configured with the Cloudflare provider');
+  pass('Shared natural AI voice handler is configured with the Google provider');
 }
 
 console.log('\n────────────────────────────');

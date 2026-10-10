@@ -194,7 +194,7 @@ describe('canonical Course Factory media architecture', () => {
     expect(manager).toContain('microclipStateMismatches === 0');
   });
 
-  it('treats media as part of one draft course build instead of publishing from the worker', () => {
+  it('publishes the complete course through automated verification from the worker', () => {
     const factory = read('lib/course-factory/factory.ts');
     const lifecycle = read('lib/course-builder/build-lifecycle.ts');
     const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
@@ -203,8 +203,10 @@ describe('canonical Course Factory media architecture', () => {
       "completionState: input.videoMode === 'off' ? 'content_only' : 'media_pending'",
     );
     expect(lifecycle).toContain('finalizeUnifiedCourseBuildWithClient');
-    expect(lifecycle).toContain("state: 'ready_for_review'");
-    expect(lifecycle).not.toContain('publishPersistedCourseWithClient');
+    expect(lifecycle).toContain('publishPersistedCourseWithClient');
+    expect(lifecycle).toContain('if (!media.completePackage)');
+    expect(lifecycle).toContain('if (!contract.pass)');
+    expect(lifecycle).toContain('actorId: null');
     expect(worker).toContain('finalizeUnifiedCourseBuildWithClient');
     expect(worker).not.toContain('finalizeCourseAutomaticallyIfReadyWithClient');
   });

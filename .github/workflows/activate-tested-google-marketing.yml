@@ -1,0 +1,72 @@
+name: Activate already-tested Google Marketing revision
+# Recovery retry: candidate tags now fit Google's 46-character combined limit.
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/activate-tested-google-marketing.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch trusted main recovery
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/activate-tested-google-marketing.yml/dispatches" -f ref=main
+  activate:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    concurrency:
+      group: google-marketing-runtime-operations
+      cancel-in-progress: false
+    env:
+      IMAGE_SHA: 97a6397dbed488354f7f3f8aa8e63353281f57c5
+      CANDIDATE_REVISION: elevate-marketing-migration-r97a6397d-38030538876-1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test exact-revision activation guards
+        run: node --test scripts/test-public-revision-activation.mjs
+      - name: Verify prior actual-container proof and prevent downgrading a newer release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --input-type=module <<'NODE'
+          const response=await fetch('https://api.github.com/repos/'+process.env.GITHUB_REPOSITORY+'/actions/runs/38030538876/jobs',{headers:{authorization:'Bearer '+process.env.GH_TOKEN,accept:'application/vnd.github+json'},signal:AbortSignal.timeout(15000)});
+          if(!response.ok)throw Error('Prior container proof unavailable');
+          const body=await response.json();
+          if(!body.jobs?.some(job=>job.steps?.some(step=>step.name==='Test final Marketing container before release'&&step.conclusion==='success')))throw Error('Prior actual-container test did not pass');
+          const live=await fetch('https://www.elevateforhumanity.org/api/version?recovery='+process.env.IMAGE_SHA,{cache:'no-store',signal:AbortSignal.timeout(15000)});
+          const version=await live.json();const commit=version.commitSha||version.commit||version.sha;
+          if(!live.ok||!['4bc83a5833306f63145f97066c55ceb25c4c5eb1',process.env.IMAGE_SHA].includes(commit))throw Error('A different release is serving; refusing outdated recovery');
+          console.log(JSON.stringify({priorContainerVerified:true,publicCommit:commit,candidateCommit:process.env.IMAGE_SHA}));
+          NODE
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Warm exact tested revision and switch traffic after runtime proof
+        run: node scripts/gcp/activate-tested-public-revision.mjs
+      - name: Verify public website receives exact recovered revision
+        run: |
+          node --input-type=module <<'NODE'
+          const response=await fetch('https://www.elevateforhumanity.org/api/version?recovery='+process.env.IMAGE_SHA,{cache:'no-store',signal:AbortSignal.timeout(20000)});
+          const version=await response.json();const commit=version.commitSha||version.commit||version.sha;
+          if(!response.ok||commit!==process.env.IMAGE_SHA)throw Error('Public recovery not confirmed');
+          console.log(JSON.stringify({publicCommit:commit,verified:true}));
+          NODE

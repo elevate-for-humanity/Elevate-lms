@@ -32,9 +32,8 @@ interface DispatchResult {
 }
 
 const DEFAULT_WORKFLOWS: WorkflowButton[] = [
-  { key: 'deploy-all', label: 'Deploy All', description: 'Build and deploy LMS plus Admin on Northflank from main' },
-  { key: 'deploy-lms', label: 'Deploy Website', description: 'Build and deploy the public website service on Northflank' },
-  { key: 'deploy-admin', label: 'Deploy Admin', description: 'Build and deploy the admin dashboard service on Northflank' },
+  { key: 'deploy-google-marketing-trigger', label: 'Deploy Marketing', description: 'Build and verify Google Cloud Run Marketing from main' },
+  { key: 'deploy-admin', label: 'Deploy Admin', description: 'Deploy Google Admin from main' },
   { key: 'ci', label: 'Run CI', description: 'Run the validation pipeline before deployment' },
   { key: 'lint', label: 'Run Lint', description: 'Run lint checks against the repository' },
 ];
@@ -137,13 +136,13 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
       const res = await fetch('/api/admin/dev-studio/shell', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ workflow: 'deploy-production-dispatch', confirmation: 'CONFIRM DEPLOY' }),
+        body: JSON.stringify({ workflow: 'deploy-google-marketing-trigger', confirmation: 'CONFIRM DEPLOY' }),
       });
       const data = await res.json().catch(() => ({})) as DispatchResult;
       if (!res.ok || data.error) throw new Error(data.error || `Deploy failed with HTTP ${res.status}`);
       setLastResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not trigger Northflank deploy');
+      setError(err instanceof Error ? err.message : 'Could not trigger Google deployment');
     } finally {
       setDeployAllState('idle');
     }
@@ -167,10 +166,10 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <Rocket className="h-4 w-4" style={{ color: '#4ec9b0' }} />
-              <h2 className="text-sm font-semibold text-white">Northflank Deploy Control</h2>
+              <h2 className="text-sm font-semibold text-white">Google Cloud Run Deploy Control</h2>
             </div>
             <p className="mt-1 text-[11px]" style={{ color: '#858585' }}>
-              Dispatch GitHub Actions workflows that build and deploy on Northflank.
+              Dispatch GitHub Actions workflows for Google Cloud Run.
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
@@ -180,7 +179,7 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
             </button>
             <button type="button" onClick={() => void deployAll()} disabled={deployAllState === 'loading'} className="inline-flex h-8 items-center gap-1.5 rounded px-2 text-[11px] font-semibold disabled:opacity-50" style={{ background: deployAllState === 'confirm' ? '#f59e0b' : '#0078d4', color: deployAllState === 'confirm' ? '#111827' : '#ffffff' }}>
               {deployAllState === 'loading' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Rocket className="h-3.5 w-3.5" />}
-              {deployAllState === 'confirm' ? 'Confirm Deploy All' : 'Deploy All'}
+              {deployAllState === 'confirm' ? 'Confirm Marketing Deploy' : 'Deploy Marketing'}
             </button>
             <button type="button" onClick={() => void refreshRun()} disabled={!lastResult?.runId} className="inline-flex h-8 items-center gap-1.5 rounded border px-2 text-[11px] disabled:opacity-40" style={{ borderColor: '#3c3c3c', color: '#cccccc' }}>
               <RefreshCw className="h-3.5 w-3.5" /> Refresh

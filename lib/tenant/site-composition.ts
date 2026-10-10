@@ -22,6 +22,9 @@ const SECTION_TYPES: TenantSiteSectionType[] = [
   'cta',
   'contact_form',
   'booking',
+  'assessment',
+  'journal',
+  'events',
 ];
 
 function id(prefix: string) {

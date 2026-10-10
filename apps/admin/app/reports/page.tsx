@@ -1,18 +1,65 @@
 import { Metadata } from 'next';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
+import { excludeQaProfiles } from '@/lib/admin/operational-profile-query';
 import Link from 'next/link';
-import { Users, GraduationCap, TrendingUp, DollarSign, FileText, HeartHandshake, Download, ChevronRight, ArrowRight } from 'lucide-react';
+import {
+  Users,
+  GraduationCap,
+  TrendingUp,
+  DollarSign,
+  FileText,
+  HeartHandshake,
+  Download,
+  ChevronRight,
+  ArrowRight,
+} from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 const REPORTS = [
-  { title: 'Student Roster',       desc: 'All enrolled students with contact info and program',    href: '/reports/users',        icon: Users,          format: 'CSV / PDF' },
-  { title: 'Enrollment Summary',   desc: 'Enrollment counts by program, status, and date range',  href: '/reports/enrollment',   icon: TrendingUp,     format: 'CSV / PDF' },
-  { title: 'Completion Report',    desc: 'Graduates, certificates issued, pass rates',             href: '/external-course-completions',          icon: GraduationCap,  format: 'CSV / PDF' },
-  { title: 'WIOA Performance',     desc: 'DOL-required outcomes: employment, earnings, retention', href: '/reports/wioa',         icon: HeartHandshake, format: 'PDF' },
-  { title: 'Revenue & Payments',   desc: 'Payments received, refunds, funding by source',         href: '/reports/financial',    icon: DollarSign,     format: 'CSV / PDF' },
-  { title: 'Attendance Report',    desc: 'Daily attendance records by program and instructor',    href: '/reports/caseload',     icon: FileText,       format: 'CSV / PDF' },
+  {
+    title: 'Student Roster',
+    desc: 'All enrolled students with contact info and program',
+    href: '/reports/users',
+    icon: Users,
+    format: 'CSV / PDF',
+  },
+  {
+    title: 'Enrollment Summary',
+    desc: 'Enrollment counts by program, status, and date range',
+    href: '/reports/enrollment',
+    icon: TrendingUp,
+    format: 'CSV / PDF',
+  },
+  {
+    title: 'Completion Report',
+    desc: 'Graduates, certificates issued, pass rates',
+    href: '/external-course-completions',
+    icon: GraduationCap,
+    format: 'CSV / PDF',
+  },
+  {
+    title: 'WIOA Performance',
+    desc: 'DOL-required outcomes: employment, earnings, retention',
+    href: '/reports/wioa',
+    icon: HeartHandshake,
+    format: 'PDF',
+  },
+  {
+    title: 'Revenue & Payments',
+    desc: 'Payments received, refunds, funding by source',
+    href: '/reports/financial',
+    icon: DollarSign,
+    format: 'CSV / PDF',
+  },
+  {
+    title: 'Attendance Report',
+    desc: 'Attendance hours by date range and cohort',
+    href: '/staff-portal/attendance/export',
+    icon: FileText,
+    format: 'CSV',
+  },
 ];
 
 export default async function ReportsPage() {
@@ -20,11 +67,13 @@ export default async function ReportsPage() {
   const db = await requireAdminClient();
 
   const [
-    { count: totalStudents },
-    { count: totalEnrollments },
-    { count: totalCerts },
+    { count: totalStudents, error: studentsError },
+    { count: totalEnrollments, error: enrollmentsError },
+    { count: totalCerts, error: certificatesError },
   ] = await Promise.all([
-    db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+    excludeQaProfiles(
+      db.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+    ),
     db.from('program_enrollments').select('*', { count: 'exact', head: true }),
     db.from('program_completion_certificates').select('*', { count: 'exact', head: true }),
   ]);
@@ -33,26 +82,50 @@ export default async function ReportsPage() {
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b border-slate-200 px-6 py-5">
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
-          <Link href="/dashboard" className="hover:text-slate-700">Admin</Link>
+          <Link href="/dashboard" className="hover:text-slate-700">
+            Admin
+          </Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-slate-900 font-medium">Reports</span>
         </nav>
         <h1 className="text-2xl font-bold text-slate-900">Reports</h1>
-        <p className="text-sm text-slate-500 mt-1">Generate and export operational, compliance, and performance reports</p>
+        <p className="text-sm text-slate-500 mt-1">
+          Generate and export operational, compliance, and performance reports
+        </p>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-
         {/* Live counts */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {[
-            { label: 'Students',     value: totalStudents ?? 0,    icon: Users,         color: 'text-brand-blue-600', bg: 'bg-brand-blue-50' },
-            { label: 'Enrollments',  value: totalEnrollments ?? 0, icon: TrendingUp,    color: 'text-green-600',      bg: 'bg-green-50' },
-            { label: 'Certificates', value: totalCerts ?? 0,       icon: GraduationCap, color: 'text-amber-600',      bg: 'bg-amber-50' },
+            {
+              label: 'Students',
+              value: studentsError ? 'Unavailable' : (totalStudents ?? 'Unavailable'),
+              icon: Users,
+              color: 'text-brand-blue-600',
+              bg: 'bg-brand-blue-50',
+            },
+            {
+              label: 'Enrollments',
+              value: enrollmentsError ? 'Unavailable' : (totalEnrollments ?? 'Unavailable'),
+              icon: TrendingUp,
+              color: 'text-green-600',
+              bg: 'bg-green-50',
+            },
+            {
+              label: 'Certificates',
+              value: certificatesError ? 'Unavailable' : (totalCerts ?? 'Unavailable'),
+              icon: GraduationCap,
+              color: 'text-amber-600',
+              bg: 'bg-amber-50',
+            },
           ].map((s) => {
             const Icon = s.icon;
             return (
-              <div key={s.label} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+              <div
+                key={s.label}
+                className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"
+              >
                 <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mb-3`}>
                   <Icon className={`w-4 h-4 ${s.color}`} />
                 </div>
@@ -72,8 +145,11 @@ export default async function ReportsPage() {
             {REPORTS.map((r) => {
               const Icon = r.icon;
               return (
-                <Link key={r.href} href={r.href}
-                  className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors group">
+                <Link
+                  key={r.href}
+                  href={r.href}
+                  className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors group"
+                >
                   <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
                     <Icon className="w-4 h-4 text-slate-500" />
                   </div>
@@ -81,7 +157,9 @@ export default async function ReportsPage() {
                     <p className="font-semibold text-slate-900 text-sm">{r.title}</p>
                     <p className="text-xs text-slate-500 mt-0.5">{r.desc}</p>
                   </div>
-                  <span className="text-xs text-slate-400 font-medium flex-shrink-0 hidden sm:block">{r.format}</span>
+                  <span className="text-xs text-slate-400 font-medium flex-shrink-0 hidden sm:block">
+                    {r.format}
+                  </span>
                   <Download className="w-4 h-4 text-slate-300 group-hover:text-brand-blue-500 transition-colors flex-shrink-0" />
                 </Link>
               );

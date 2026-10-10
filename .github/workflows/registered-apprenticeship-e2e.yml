@@ -16,7 +16,7 @@ on:
       - 'scripts/qa/provision-remaining-portal-e2e.mjs'
   workflow_run:
     workflows:
-      - Deploy LMS
+      - Deploy repaired Google services
       - Deploy Admin
     types:
       - completed

@@ -10,7 +10,9 @@ import { WORKONE_INDY_INTAKE_URL } from '@/lib/programs/funding-registry';
 import { ProgramsExplorer } from './ProgramsExplorer';
 import { HomeProgramShowcase } from '@/components/home/HomeProgramShowcase';
 
-// Cache the public catalog briefly so every visit does not block on a fresh database query.\n// Published changes still reach the page within one minute.\nexport const revalidate = 60;
+// Cache the public catalog briefly so every visit does not block on a fresh database query.
+// Published changes still reach the page within one minute.
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildProgramsListingMetadata();

@@ -1,0 +1,65 @@
+name: Verify Marketing revision diagnostic collection
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/verify-marketing-revision-diagnostics.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch trusted diagnostic verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-marketing-revision-diagnostics.yml/dispatches" -f ref=main
+  diagnose:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Select an existing Marketing revision for collector verification
+        id: revision
+        run: |
+          node --input-type=module <<'NODE'
+          import { execFileSync } from 'node:child_process';
+          import { appendFileSync } from 'node:fs';
+          const args=['run','revisions','list','--service=elevate-marketing-migration','--project=elegant-racer-299721','--region=us-central1','--sort-by=~metadata.creationTimestamp','--limit=20','--format=json'];
+          const revisions=JSON.parse(execFileSync('gcloud',args,{encoding:'utf8',timeout:20000,stdio:['ignore','pipe','pipe']}));
+          const failed=revisions.find(r=>(r.status?.conditions||[]).some(c=>c.type==='Ready'&&c.status==='False'));
+          // Prefer failure evidence; a live revision still verifies actual log
+          // access when Google no longer lists a failed revision.
+          const selected=failed||revisions[0];
+          if(!selected) throw new Error('No Marketing revision available for diagnostic verification');
+          const revision=selected.metadata.name;
+          if(!/^elevate-marketing-migration-[a-z0-9-]+$/.test(revision)) throw new Error('Unexpected revision name');
+          appendFileSync(process.env.GITHUB_OUTPUT,'name='+revision+'\n');
+          console.log('Verifying revision: '+revision+'; failed='+Boolean(failed));
+          NODE
+      - name: Verify actual revision metadata and log collection
+        timeout-minutes: 3
+        env:
+          FAILED_REVISION: ${{ steps.revision.outputs.name }}
+        run: node scripts/gcp/collect-marketing-revision-diagnostics.mjs
+      - name: Preserve diagnostic verification evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: marketing-diagnostic-verification-${{ github.run_id }}
+          path: deployment-diagnostics/marketing-revision.json
+          if-no-files-found: warn
+          retention-days: 7

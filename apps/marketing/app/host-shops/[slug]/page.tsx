@@ -1,3 +1,4 @@
+import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -111,22 +112,22 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   }
 
   const address = [approved.address, approved.city, approved.state, approved.zip].filter(Boolean).join(', ');
-  const externalUrl = profile.website_url || profile.website;
+  const externalUrl = profile.website_url || profile.website || getFeaturedHostPartnerBySlug(slug)?.websiteUrl;
   const mapUrl = approved.googleMapsUrl || (address ? directionsUrl(address) : undefined);
   const gallery = Array.isArray(profile.media_gallery) ? profile.media_gallery : [];
   const featuredFallback = getFeaturedHostPartnerBySlug(slug);
   const featuredFallbackImages = (featuredFallback?.media ?? [])
-    .filter((media) => media.kind !== 'video')
+    .filter((media) => media.kind !== 'video' && !(slug.startsWith('razors-image') && media.kind === 'flyer'))
     .map((media) => ({ url: media.src, alt: media.alt }));
   const featuredFallbackVideoMedia = featuredFallback?.media?.find((media) => media.kind === 'video');
   const featuredFallbackVideo = featuredFallbackVideoMedia?.src;
-  const videoScript = featuredFallbackVideoMedia?.script;
-  const items = dedupeMedia([
-    ...gallery,
+  const videoScript = featuredFallbackVideoMedia?.script || `Welcome to ${approved.name}. ${approved.description || featuredFallback?.marketingBlurb || ''} Explore this shop’s portfolio, contact the team, and ask Elevate about ${approved.programs.map(programLabel).join(' or ')} placement and available payment plans. Placement is confirmed during enrollment.`;
+  const items = curateShopGallery(slug, dedupeMedia([
+    ...gallery.filter((item) => !slug.startsWith('razors-image') || !item.url.includes('/2020/')),
+    ...featuredFallbackImages,
     ...(profile.logo_url ? [{ url: profile.logo_url, alt: `${approved.name} logo`, source: profile.source_url || externalUrl || undefined }] : []),
     ...(profile.flyer_url ? [{ url: profile.flyer_url, alt: `${approved.name} flyer`, source: profile.source_url || externalUrl || undefined }] : []),
-    ...featuredFallbackImages,
-  ]);
+  ]));
   const programs = approved.programs;
   const canonical = `${SITE_URL}/host-shops/${profile.public_slug}`;
   const jsonLd = {
@@ -139,7 +140,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
     telephone: approved.phone || undefined,
     image: items.map((item) => absoluteMediaUrl(item.url)),
     address: address ? { '@type': 'PostalAddress', streetAddress: approved.address || undefined, addressLocality: approved.city || undefined, addressRegion: approved.state || undefined, postalCode: approved.zip || undefined, addressCountry: 'US' } : undefined,
-    sameAs: [externalUrl].filter(Boolean),
+    sameAs: [externalUrl, featuredFallback?.socialUrl, featuredFallback?.bookingUrl].filter(Boolean),
     hasMap: mapUrl,
     parentOrganization: { '@id': `${SITE_URL}/#organization` },
     knowsAbout: programs.map(programLabel),
@@ -166,11 +167,12 @@ export default async function HostShopProfilePage({ params }: PageProps) {
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {approved.phone ? <a href={`tel:${approved.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-sm font-extrabold text-white sm:justify-start"><Phone className="h-4 w-4" /> Call {approved.phone}</a> : null}
               {mapUrl ? <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start"><Navigation className="h-4 w-4" /> Approved Worksite Map</a> : null}
+              {featuredFallback?.socialUrl ? <a href={featuredFallback.socialUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">{featuredFallback.socialUrl.includes('instagram.com/') ? 'View shop Instagram' : 'View shop social pages'} <ExternalLink className="h-4 w-4" /></a> : null}
               {externalUrl ? <a href={externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">Shop website <ExternalLink className="h-4 w-4" /></a> : null}
             </div>
           </div>
           <div className="min-w-0">
-            {items.length || profile.video_url ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={profile.video_url || featuredFallbackVideo || undefined} /> : address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:rounded-3xl"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+            {items.length || profile.video_url || featuredFallbackVideo ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={profile.video_url || featuredFallbackVideo || undefined} /> : address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:rounded-3xl"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
           </div>
         </div>
       </section>
@@ -242,7 +244,7 @@ function ApprovedHostShopProfile({ shop }: { shop: HostShop }) {
   return (
     <main className="overflow-x-hidden bg-white text-slate-950">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
-      <section className="border-b border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-blue-950 px-4 py-16 text-white sm:px-6 sm:py-24">
+      <section data-scroll-narration data-narration={`Welcome to ${shop.name}. ${shop.description} Explore the approved training location and apply through Elevate to ask about current placement availability.`} className="border-b border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-blue-950 px-4 py-16 text-white sm:px-6 sm:py-24">
         <div className="mx-auto max-w-6xl">
           <p className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-emerald-950"><ShieldCheck className="h-4 w-4" /> Approved Elevate Host Site</p>
           <h1 className="mt-5 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">{shop.name}</h1>
@@ -339,7 +341,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
               <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">{hostLabel}</p>
               <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">{shop.dba ?? shop.name}</h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">{shop.marketingBlurb ?? shop.note}</p>
-              <p className="mt-4 text-sm font-bold leading-6 text-slate-600">Listen to the page guide for the full shop and apprenticeship introduction. The tour video remains muted by default so two audio tracks never compete.</p>
+              <p className="mt-4 text-sm font-bold leading-6 text-slate-600">Listen to the page guide for the full shop and apprenticeship introduction. Play the shop tour when you are ready, and use fullscreen for a larger view.</p>
             </div>
             <div className="grid min-w-0 gap-4 sm:grid-cols-2 sm:items-center">
               {imageItems[0] ? (
@@ -347,8 +349,8 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
                   <Image src={imageItems[0].url} alt={imageItems[0].alt ?? `${shop.dba ?? shop.name} shop image`} fill sizes="(max-width: 640px) 100vw, 28vw" className="object-contain" />
                 </div>
               ) : null}
-              <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-lg">
-                <video src={videoUrl} autoPlay muted playsInline loop preload="auto" className="aspect-[9/16] max-h-[560px] w-full object-contain" aria-label={`${shop.dba ?? shop.name} ${hostLabel} video`} />
+              <div className="mx-auto flex w-full max-w-[280px] items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-lg">
+                <video src={videoUrl} controls playsInline preload="metadata" className="h-auto w-auto max-h-[320px] max-w-full object-scale-down" aria-label={`${shop.dba ?? shop.name} ${hostLabel} video`} />
               </div>
             </div>
           </div>
@@ -366,7 +368,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
         </section>
       ) : null}
 
-      <section className="border-b border-slate-200 bg-slate-50">
+      <section className="border-b border-slate-200 bg-slate-50" data-scroll-narration data-narration={videoUrl ? undefined : videoScript}>
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-12 lg:py-16">
           <div className="min-w-0">
             <p className="inline-flex rounded-full bg-brand-blue-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-brand-blue-800">Elevate apprenticeship Host Shop partner</p>
@@ -378,10 +380,13 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {shop.phone ? <a href={`tel:${shop.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-sm font-extrabold text-white"><Phone className="h-4 w-4" /> Call {shop.phone}</a> : null}
               <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold"><Navigation className="h-4 w-4" /> Map & directions</a>
+              {shop.socialUrl ? <a href={shop.socialUrl} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold">View social portfolio ↗</a> : null}
+              {shop.bookingUrl ? <a href={shop.bookingUrl} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold">Book a service ↗</a> : null}
+              {shop.onlineListingUrl ? <a href={shop.onlineListingUrl} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold">Business listing ↗</a> : null}
               {shop.websiteUrl ? <a href={shop.websiteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold">Shop website <ExternalLink className="h-4 w-4" /></a> : null}
             </div>
           </div>
-          <HostShopMediaCarousel shopName={shop.dba ?? shop.name} items={imageItems} />
+          <div className="order-first lg:order-none"><HostShopMediaCarousel shopName={shop.dba ?? shop.name} items={imageItems} /></div>
         </div>
       </section>
 

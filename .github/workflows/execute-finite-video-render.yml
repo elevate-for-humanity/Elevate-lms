@@ -1,0 +1,73 @@
+name: Execute finite Google video rendering
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/execute-finite-video-render.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: finite-video-render-acceptance
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/execute-finite-video-render.yml/dispatches" -f ref=main
+  render:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Test terminal render evidence
+        run: node --test scripts/gcp/finite-video-render.test.mjs
+      - name: Deploy and execute one durable verified video session
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync,mkdtempSync,writeFileSync,rmSync} from 'node:fs';
+          import {tmpdir} from 'node:os';
+          import {join} from 'node:path';
+          import {google,loadGoogleConfig,PROJECT} from './scripts/gcp/runtime-config.mjs';
+          const scope=['--project='+PROJECT,'--region=us-central1'];
+          const service=JSON.parse(google(['run','services','describe','elevate-admin-migration',...scope,'--format=json']));
+          const spec=service.spec.template.spec;
+          const container=spec.containers[0];
+          if(!/^us-central1-docker.pkg.dev\/elegant-racer-299721\/elevate\/admin@sha256:[a-f0-9]{64}$/.test(container.image))throw new Error('Exact deployed Google Admin digest required');
+          if(!spec.serviceAccountName)throw new Error('Verified runtime identity required');
+          if((container.env||[]).some(x=>x.valueFrom))throw new Error('Referenced runtime secrets require explicit job binding');
+          const config=loadGoogleConfig('admin');
+          if(config.volumes.length||Object.keys(config.runtimeFiles).length)throw new Error('Stateful Admin runtime cannot be substituted');
+          const env={...config.runtimeEnvironment,...Object.fromEntries((container.env||[]).filter(x=>typeof x.value==='string').map(x=>[x.name,x.value]))};
+          for(const name of ['PORT','K_SERVICE','K_REVISION','K_CONFIGURATION'])delete env[name];
+          Object.assign(env,{NODE_ENV:'production',AI_NARRATION_PROVIDER:'kokoro',DISABLE_ADMIN_VIDEO_WORKER:'true',VIDEO_COURSE_ID:'2c723bfa-8c40-4acc-b961-98d917710ffc',VIDEO_JOB_ID:'1611e77d-8744-4152-98e1-34e637701d62'});
+          if(!env.SUPABASE_SERVICE_ROLE_KEY||!env.CRON_SECRET)throw new Error('Complete renderer credentials required');
+          const source=readFileSync('scripts/gcp/finite-video-render.mjs','utf8')+'\nawait runFiniteVideoRender();';
+          if(source.includes('~'))throw new Error('Unsupported runner argument delimiter');
+          const directory=mkdtempSync(join(tmpdir(),'finite-video-session-'));
+          try {
+            const environment=join(directory,'environment.json');
+            writeFileSync(environment,JSON.stringify(env),{mode:0o600});
+            google(['run','jobs','deploy','elevate-video-render',...scope,'--image='+container.image,'--service-account='+spec.serviceAccountName,'--cpu=4','--memory=8Gi','--tasks=1','--parallelism=1','--max-retries=0','--task-timeout=3600s','--command=node','--args=^~^--input-type=module~-e~'+source,'--env-vars-file='+environment,'--quiet']);
+            console.log(JSON.stringify({deployed:true,image:container.image,runtimeIdentity:spec.serviceAccountName,retries:0}));
+            google(['run','jobs','execute','elevate-video-render',...scope,'--tasks=1','--wait','--quiet']);
+            console.log(JSON.stringify({executionSucceeded:true,courseId:env.VIDEO_COURSE_ID,jobId:env.VIDEO_JOB_ID}));
+          } finally {rmSync(directory,{recursive:true,force:true});}
+          NODE

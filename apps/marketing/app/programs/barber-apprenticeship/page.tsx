@@ -94,7 +94,6 @@ export default async function BarberApprenticeshipPage() {
 
   return (
     <main className="min-h-screen bg-white text-slate-950">
-      <BeautyEnrollmentPromotion />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -210,8 +209,17 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
-      <ApprenticeshipExperienceGuide programTitle={program.title} applyHref={program.cta.applyHref} />
+      <ApprenticeshipExperienceGuide
+        programTitle={program.title}
+        applyHref={program.cta.applyHref}
+      />
       <HostShopPlacementGuide programSlug="barber-apprenticeship" />
+
+      <section className="border-b border-slate-200 bg-white px-4 py-5">
+        <div className="mx-auto max-w-6xl">
+          <BeautyEnrollmentPromotion compact programLabel="Barber Apprenticeship" />
+        </div>
+      </section>
 
       <section
         data-scroll-narration

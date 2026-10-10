@@ -23,7 +23,8 @@ export default async function SubscriptionSuccessPage() {
         .eq('organization_id', organizationId).maybeSingle()
     : { data: null };
 
-  const active = subscription?.status === 'active' || subscription?.status === 'trialing';
+  const active = ['active', 'trialing'].includes(subscription?.status || '') &&
+    Date.parse(subscription?.current_period_end || '') > Date.now();
   if (!active) return <Pending />;
 
   const planJoin:any = subscription.subscription_plans;
@@ -46,5 +47,5 @@ export default async function SubscriptionSuccessPage() {
 }
 
 function Pending() {
-  return <main className="min-h-[65vh] bg-slate-50 px-4 py-16"><div className="mx-auto max-w-xl rounded-2xl border border-amber-200 bg-white p-8 text-center shadow-sm"><h1 className="text-2xl font-black">Payment received — activation pending</h1><p className="mt-3 text-slate-600">The billing webhook activates access automatically after the payment is confirmed. Refresh shortly or open Billing to review the invoice.</p><Link href="/billing" className="mt-6 inline-flex rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white">Open Billing</Link></div></main>;
+  return <main className="min-h-[65vh] bg-slate-50 px-4 py-16"><div className="mx-auto max-w-xl rounded-2xl border border-amber-200 bg-white p-8 text-center shadow-sm"><h1 className="text-2xl font-black">Subscription is not active yet</h1><p className="mt-3 text-slate-600">Access activates after the billing system confirms payment. Open Billing to check your invoice and subscription status.</p><Link href="/billing" className="mt-6 inline-flex rounded-xl bg-slate-900 px-5 py-3 font-semibold text-white">Open Billing</Link></div></main>;
 }

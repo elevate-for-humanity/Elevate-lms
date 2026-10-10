@@ -1,3 +1,4 @@
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -35,7 +36,7 @@ async function loadOwnedSite(supabase: Awaited<ReturnType<typeof requireAdminCli
     .eq('id', websiteId)
     .maybeSingle();
   if (error) return { site: null, error };
-  if (!site || site.user_id !== userId) return { site: null, error: null };
+  if (!site || !(await canManageHostedWebsite(supabase, websiteId, userId))) return { site: null, error: null };
   return { site: site as SiteRow, error: null };
 }
 
@@ -115,7 +116,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const reason = body.publish === true ? 'publish' : body.publish === false ? 'unpublish' : 'save';
   await snapshotRevision(admin, site, user.id, reason);
 
-  const { data: saved, error: saveError } = await admin.from('user_websites').update(update).eq('id', websiteId).eq('user_id', user.id).select('id, site_name, subdomain, is_published, site_config').maybeSingle();
+  const { data: saved, error: saveError } = await admin.from('user_websites').update(update).eq('id', websiteId).select('id, site_name, subdomain, is_published, site_config').maybeSingle();
   if (saveError || !saved) return NextResponse.json({ error: saveError?.message || 'Could not save website' }, { status: 500 });
 
   validation = validateSiteConfig(saved.site_config as TenantSiteConfig);
@@ -137,7 +138,7 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
   if (readError) return NextResponse.json({ error: readError.message }, { status: 500 });
   if (!site) return NextResponse.json({ error: 'Website not found' }, { status: 404 });
 
-  const { error } = await admin.from('user_websites').delete().eq('id', websiteId).eq('user_id', user.id);
+  const { error } = await admin.from('user_websites').delete().eq('id', websiteId);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }

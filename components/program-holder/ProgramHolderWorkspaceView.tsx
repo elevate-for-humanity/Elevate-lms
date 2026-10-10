@@ -31,11 +31,21 @@ import { StudentReadyForTestingButton } from './StudentReadyForTestingButton';
 import { getActiveJobs } from '@/lib/data/jobs';
 import JobCard from '@/components/jobs/JobCard';
 import { TexasCoordinatorLaunchKit } from './TexasCoordinatorLaunchKit';
+import { PortalStartChecklist } from '@/components/portal/PortalStartChecklist';
+import { BusinessNetworkCard } from '@/components/portal/BusinessNetworkCard';
 
 function resolveDashboardHero(
   avatarUrl: string | null | undefined,
-  program: { hero_image_url?: string | null; image_url?: string | null; cover_image_url?: string | null; slug?: string } | undefined,
+  program:
+    | {
+        hero_image_url?: string | null;
+        image_url?: string | null;
+        cover_image_url?: string | null;
+        slug?: string;
+      }
+    | undefined,
 ) {
+  if (avatarUrl?.trim()) return { src: avatarUrl.trim(), isPortrait: true };
   const programPhoto = program?.hero_image_url || program?.image_url || program?.cover_image_url;
   // Some legacy database image paths point to files that were never published.
   // Use the maintained program image map for local paths; keep hosted program photos.
@@ -43,7 +53,6 @@ function resolveDashboardHero(
     return { src: programPhoto.trim(), isPortrait: false };
   }
   if (program?.slug) return { src: getProgramHeroImage(program.slug), isPortrait: false };
-  if (avatarUrl?.trim()) return { src: avatarUrl.trim(), isPortrait: true };
   return {
     src: '/images/pages/community-page-2.webp',
     isPortrait: false,
@@ -71,7 +80,8 @@ export async function ProgramHolderWorkspaceView({
   payoutPanel?: React.ReactNode;
 }) {
   const data = await getProgramHolderWorkspace();
-  const coordinatorRole = data.mode === 'holder' ? String(data.holder?.features?.approved_role || '') : '';
+  const coordinatorRole =
+    data.mode === 'holder' ? String(data.holder?.features?.approved_role || '') : '';
   const isTexasStateCoordinator = coordinatorRole === 'Texas State Site Coordinator';
   const isGaryRegionalCoordinator = coordinatorRole === 'Gary Regional Site Coordinator';
   if (data.mode === 'admin') return <AdminBoundary />;
@@ -161,10 +171,15 @@ export async function ProgramHolderWorkspaceView({
       required: true,
       owner: 'Shared',
     },
-    ...(isHvac ? [{ label: 'HVAC program assignment', complete: true,
-          required: true,
-          owner: 'Elevate' as const,
-        }]
+    ...(isHvac
+      ? [
+          {
+            label: 'HVAC program assignment',
+            complete: true,
+            required: true,
+            owner: 'Elevate' as const,
+          },
+        ]
       : []),
     ...(isHvac
       ? [
@@ -312,13 +327,7 @@ export async function ProgramHolderWorkspaceView({
   const dashboardHero = resolveDashboardHero(data.profile?.avatar_url, data.programs[0]);
 
   if (section === 'students')
-    return (
-      <Students
-        title="Enrolled Students"
-        rows={data.enrollments}
-        programs={data.programs}
-      />
-    );
+    return <Students title="Enrolled Students" rows={data.enrollments} programs={data.programs} />;
   if (section === 'at-risk')
     return <Students title="At-Risk Students" rows={atRisk} programs={data.programs} />;
   if (section === 'pending')
@@ -327,6 +336,7 @@ export async function ProgramHolderWorkspaceView({
         rows={data.applicants}
         programs={data.programs}
         contactAccessGranted={data.contactAccessGranted}
+        namesOnly={data.requiresEnchantedHeartsTerms}
       />
     );
   if (section === 'programs') return <Programs data={data} />;
@@ -368,23 +378,96 @@ export async function ProgramHolderWorkspaceView({
     <div className="space-y-6 sm:space-y-8">
       <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div><p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">This week</p><h2 className="mt-1 text-2xl font-black text-slate-950">Your weekly responsibilities</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">This list is calculated from your live applicants, students, hours, reports, compliance record, agreement, and payout setup. Open an item to finish the work; do not mark work complete unless the record supports it.</p></div>
-          <span className="rounded-full bg-white px-3 py-2 text-sm font-black text-emerald-900">{[
-            callQueue.length === 0,
-            pendingHours.length === 0,
-            atRisk.length === 0,
-            missingRequirements === 0,
-            Boolean(data.holder?.mou_signed),
-          ].filter(Boolean).length}/5 core checks clear</span>
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">
+              This week
+            </p>
+            <h2 className="mt-1 text-2xl font-black text-slate-950">
+              Your weekly responsibilities
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              This list is calculated from your live applicants, students, hours, reports,
+              compliance record, agreement, and payout setup. Open an item to finish the work; do
+              not mark work complete unless the record supports it.
+            </p>
+          </div>
+          <span className="rounded-full bg-white px-3 py-2 text-sm font-black text-emerald-900">
+            {
+              [
+                callQueue.length === 0,
+                pendingHours.length === 0,
+                atRisk.length === 0,
+                missingRequirements === 0,
+                Boolean(data.holder?.mou_signed),
+              ].filter(Boolean).length
+            }
+            /5 core checks clear
+          </span>
         </div>
         <div className="mt-5 grid gap-3 lg:grid-cols-2">
           {[
-            { label: 'Contact every new applicant', detail: callQueue.length ? `${callQueue.length} applicant${callQueue.length === 1 ? '' : 's'} still need a documented call/outcome.` : 'Every routed applicant has a documented call/outcome.', done: callQueue.length === 0, href: '/program-holder/students/pending' },
-            { label: 'Review and verify training hours', detail: pendingHours.length ? `${pendingHours.length} hour entr${pendingHours.length === 1 ? 'y' : 'ies'} need review.` : 'No submitted training-hour records are waiting for review.', done: pendingHours.length === 0, href: '/program-holder/hours' },
-            { label: 'Follow up with students needing attention', detail: atRisk.length ? `${atRisk.length} student${atRisk.length === 1 ? '' : 's'} currently need intervention or follow-up.` : 'No active students are currently flagged at risk.', done: atRisk.length === 0, href: '/program-holder/students/at-risk' },
-            { label: 'Clear documents and compliance', detail: missingRequirements ? `${missingRequirements} required compliance item${missingRequirements === 1 ? '' : 's'} remain incomplete.` : 'Required compliance checks are currently complete.', done: missingRequirements === 0, href: '/program-holder/compliance' },
-            { label: 'Review your actual agreement and payment readiness', detail: data.holder?.mou_signed ? 'Your MOU is recorded as signed. Review payout milestones and payment history against that agreement.' : 'Your assigned MOU still requires signature before agreement-controlled payment milestones can be completed.', done: Boolean(data.holder?.mou_signed), href: data.holder?.mou_signed ? '/program-holder/payouts' : '/program-holder/sign-mou' },
-          ].map((item) => <Link key={item.label} href={item.href} className="flex min-w-0 gap-3 rounded-2xl border border-emerald-100 bg-white p-4 hover:border-emerald-300"><span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-black ${item.done ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}`}>{item.done ? '✓' : '!'}</span><span className="min-w-0"><span className="block font-black text-slate-950">{item.label}</span><span className="mt-1 block text-sm leading-5 text-slate-600">{item.detail}</span><span className="mt-2 block text-xs font-black text-blue-800">{item.done ? 'Review record' : 'Open required action'} →</span></span></Link>)}
+            {
+              label: 'Contact every new applicant',
+              detail: callQueue.length
+                ? `${callQueue.length} applicant${callQueue.length === 1 ? '' : 's'} still need a documented call/outcome.`
+                : 'Every routed applicant has a documented call/outcome.',
+              done: callQueue.length === 0,
+              href: '/program-holder/students/pending',
+            },
+            {
+              label: 'Review and verify training hours',
+              detail: pendingHours.length
+                ? `${pendingHours.length} hour entr${pendingHours.length === 1 ? 'y' : 'ies'} need review.`
+                : 'No submitted training-hour records are waiting for review.',
+              done: pendingHours.length === 0,
+              href: '/program-holder/hours',
+            },
+            {
+              label: 'Follow up with students needing attention',
+              detail: atRisk.length
+                ? `${atRisk.length} student${atRisk.length === 1 ? '' : 's'} currently need intervention or follow-up.`
+                : 'No active students are currently flagged at risk.',
+              done: atRisk.length === 0,
+              href: '/program-holder/students/at-risk',
+            },
+            {
+              label: 'Clear documents and compliance',
+              detail: missingRequirements
+                ? `${missingRequirements} required compliance item${missingRequirements === 1 ? '' : 's'} remain incomplete.`
+                : 'Required compliance checks are currently complete.',
+              done: missingRequirements === 0,
+              href: '/program-holder/compliance',
+            },
+            {
+              label: 'Review your actual agreement and payment readiness',
+              detail: data.holder?.mou_signed
+                ? 'Your MOU is recorded as signed. Review payout milestones and payment history against that agreement.'
+                : 'Your assigned MOU still requires signature before agreement-controlled payment milestones can be completed.',
+              done: Boolean(data.holder?.mou_signed),
+              href: data.holder?.mou_signed
+                ? '/program-holder/payouts'
+                : '/program-holder/sign-mou',
+            },
+          ].map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="flex min-w-0 gap-3 rounded-2xl border border-emerald-100 bg-white p-4 hover:border-emerald-300"
+            >
+              <span
+                className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-black ${item.done ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}`}
+              >
+                {item.done ? '✓' : '!'}
+              </span>
+              <span className="min-w-0">
+                <span className="block font-black text-slate-950">{item.label}</span>
+                <span className="mt-1 block text-sm leading-5 text-slate-600">{item.detail}</span>
+                <span className="mt-2 block text-xs font-black text-blue-800">
+                  {item.done ? 'Review record' : 'Open required action'} →
+                </span>
+              </span>
+            </Link>
+          ))}
         </div>
       </section>
       {texasLaunchKit}
@@ -402,17 +485,20 @@ export async function ProgramHolderWorkspaceView({
             login and audit history.
           </p>
           {coordinatorRole === 'Gary Regional Site Coordinator' && (
-            <Link href="/program-holder/gary-launch" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-blue-800 px-4 py-2 text-sm font-black text-white">
+            <Link
+              href="/program-holder/gary-launch"
+              className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-blue-800 px-4 py-2 text-sm font-black text-white"
+            >
               Open your Gary step-by-step launch guide
             </Link>
           )}
           <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
-            <strong>Applicant routing:</strong> Your regional queue includes applicants across
-            all Elevate programs whose residence is within the assigned regional service area
-            when no local Program Holder controls that applicant/program. Applicants outside your
-            regional territory must not be worked from this dashboard. When an approved local
-            Program Holder is assigned, Elevate may transfer the program-specific applicant to that
-            holder while preserving the regional audit history.
+            <strong>Applicant routing:</strong> Your regional queue includes applicants across all
+            Elevate programs whose residence is within the assigned regional service area when no
+            local Program Holder controls that applicant/program. Applicants outside your regional
+            territory must not be worked from this dashboard. When an approved local Program Holder
+            is assigned, Elevate may transfer the program-specific applicant to that holder while
+            preserving the regional audit history.
           </div>
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             <div className="rounded-xl border border-slate-200 bg-white p-4">
@@ -432,8 +518,8 @@ export async function ProgramHolderWorkspaceView({
             <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
               <h3 className="font-black text-emerald-950">Compensation</h3>
               <p className="mt-2 text-sm text-emerald-950">
-                Compensation terms are recorded in the current signed coordinator agreement.
-                Review the agreement and payout schedule for the applicable amounts and milestones.
+                Compensation terms are recorded in the current signed coordinator agreement. Review
+                the agreement and payout schedule for the applicable amounts and milestones.
               </p>
               <p className="mt-2 text-xs text-emerald-900">
                 A lead, incomplete application, unverified enrollment, or unverified completion does
@@ -460,19 +546,49 @@ export async function ProgramHolderWorkspaceView({
                 {coordinatorRequirements.map((item) => {
                   const normalized = item.toLowerCase();
                   const href =
-                    normalized.includes('mou') || normalized.includes('agreement') ? '/program-holder/sign-mou' :
-                    normalized.includes('document') || normalized.includes('w-9') || normalized.includes('insurance') || normalized.includes('license') ? '/program-holder/documents' :
-                    normalized.includes('payment') || normalized.includes('payout') || normalized.includes('bank') ? '/program-holder/payouts' :
-                    normalized.includes('phone') || normalized.includes('extension') || normalized.includes('call') ? '/program-holder/phone' :
-                    normalized.includes('applicant') || normalized.includes('workone') || normalized.includes('outreach') ? '/program-holder/students/pending' :
-                    normalized.includes('student') || normalized.includes('learner') ? '/program-holder/students' :
-                    normalized.includes('hour') || normalized.includes('attendance') ? '/program-holder/hours' :
-                    normalized.includes('report') ? '/program-holder/reports' :
-                    normalized.includes('program') || normalized.includes('catalog') ? '/program-holder/programs' :
-                    isGaryRegionalCoordinator ? '/program-holder/gary-launch' : '/program-holder/how-to-use';
+                    normalized.includes('mou') || normalized.includes('agreement')
+                      ? '/program-holder/sign-mou'
+                      : normalized.includes('document') ||
+                          normalized.includes('w-9') ||
+                          normalized.includes('insurance') ||
+                          normalized.includes('license')
+                        ? '/program-holder/documents'
+                        : normalized.includes('payment') ||
+                            normalized.includes('payout') ||
+                            normalized.includes('bank')
+                          ? '/program-holder/payouts'
+                          : normalized.includes('phone') ||
+                              normalized.includes('extension') ||
+                              normalized.includes('call')
+                            ? '/program-holder/phone'
+                            : normalized.includes('applicant') ||
+                                normalized.includes('workone') ||
+                                normalized.includes('outreach')
+                              ? '/program-holder/students/pending'
+                              : normalized.includes('student') || normalized.includes('learner')
+                                ? '/program-holder/students'
+                                : normalized.includes('hour') || normalized.includes('attendance')
+                                  ? '/program-holder/hours'
+                                  : normalized.includes('report')
+                                    ? '/program-holder/reports'
+                                    : normalized.includes('program') ||
+                                        normalized.includes('catalog')
+                                      ? '/program-holder/programs'
+                                      : isGaryRegionalCoordinator
+                                        ? '/program-holder/gary-launch'
+                                        : '/program-holder/how-to-use';
                   return (
-                    <Link key={item} href={href} className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 font-semibold hover:border-blue-300 hover:bg-blue-50">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-black text-amber-900" aria-hidden="true">!</span>
+                    <Link
+                      key={item}
+                      href={href}
+                      className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 font-semibold hover:border-blue-300 hover:bg-blue-50"
+                    >
+                      <span
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-black text-amber-900"
+                        aria-hidden="true"
+                      >
+                        !
+                      </span>
                       <span className="min-w-0 flex-1">{item}</span>
                       <span className="shrink-0 text-xs font-black text-blue-800">Open →</span>
                     </Link>
@@ -564,16 +680,27 @@ export async function ProgramHolderWorkspaceView({
               New here?
             </p>
             <h2 className="mt-1 text-xl font-black text-slate-950">
-              {isGaryRegionalCoordinator ? 'Start with your Gary coordinator launch guide' : 'Start with Elizabeth and Paris'}
+              {isGaryRegionalCoordinator
+                ? 'Start with your Gary coordinator launch guide'
+                : 'Start with Elizabeth and Paris'}
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-700">
-              {isGaryRegionalCoordinator
-                ? 'Follow the coordinator steps in order: account setup, program review, WorkOne outreach, Program Holder recruitment, employer outreach, applicant routing, and weekly operations.'
-                : <>Review Elizabeth Greene&apos;s expectations, take the Paris dashboard walkthrough, and learn what is required for payment.</>}
+              {isGaryRegionalCoordinator ? (
+                'Follow the coordinator steps in order: account setup, program review, WorkOne outreach, Program Holder recruitment, employer outreach, applicant routing, and weekly operations.'
+              ) : (
+                <>
+                  Review Elizabeth Greene&apos;s expectations, take the Paris dashboard walkthrough,
+                  and learn what is required for payment.
+                </>
+              )}
             </p>
           </div>
           <Link
-            href={isGaryRegionalCoordinator ? '/program-holder/gary-launch' : '/program-holder/how-to-use'}
+            href={
+              isGaryRegionalCoordinator
+                ? '/program-holder/gary-launch'
+                : '/program-holder/how-to-use'
+            }
             className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-black text-white"
           >
             Start orientation
@@ -615,6 +742,8 @@ export async function ProgramHolderWorkspaceView({
         heroImage={dashboardHero.src}
         isPortrait={dashboardHero.isPortrait}
       />
+      <PortalStartChecklist role="program-holder" />
+      <BusinessNetworkCard href="/program-holder/community" label="Program Holder network" />
       <section className="overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm">
         <div className="relative isolate overflow-hidden px-5 py-7 text-white sm:px-7">
           <Image
@@ -664,7 +793,10 @@ export async function ProgramHolderWorkspaceView({
                 Opportunities to share with students
               </h3>
             </div>
-            <Link href="/program-holder/career" className="text-sm font-black text-blue-800 underline">
+            <Link
+              href="/program-holder/career"
+              className="text-sm font-black text-blue-800 underline"
+            >
               Open full career center
             </Link>
           </div>
@@ -682,6 +814,33 @@ export async function ProgramHolderWorkspaceView({
           )}
         </div>
       </section>
+      {data.requiresEnchantedHeartsTerms &&
+      Array.isArray(data.holder?.features?.partner_document_receipts) ? (
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-black">Documents already received by email</h2>
+          <p className="mt-2 text-sm text-slate-600">
+            These receipts do not mean documents have passed review. Please provide an updated
+            flyer; the existing flyer is historical.
+          </p>
+          <ul className="mt-4 space-y-2">
+            {data.holder.features.partner_document_receipts.map(
+              (item: { name: string; state: string }) => (
+                <li key={item.name} className="rounded-xl bg-slate-50 p-3 text-sm">
+                  <strong>{item.name}</strong> — {item.state}
+                </li>
+              ),
+            )}
+          </ul>
+          <a
+            href={ENCHANTED_HEARTS.trainingUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-4 inline-flex font-bold text-blue-700"
+          >
+            Training website
+          </a>
+        </section>
+      ) : null}
       {data.requiresEnchantedHeartsTerms ? (
         <section className="rounded-2xl border border-fuchsia-200 bg-white p-4 shadow-sm sm:p-6">
           <p className="text-xs font-black uppercase tracking-[0.16em] text-fuchsia-700">
@@ -980,77 +1139,81 @@ export async function ProgramHolderWorkspaceView({
         </article>
       </section>
       <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-        <article className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">
-                Call and enrollment queue
-              </p>
-              <h2 className="mt-1 text-xl font-black text-slate-950">
-                People who still need follow-up
-              </h2>
-              <p className="mt-1 text-sm text-slate-600">
-                {callQueue.length} applicants have no completed call outcome and{' '}
-                {data.applicants.length} are not enrolled.
-              </p>
-            </div>
-            <Link
-              href="/program-holder/students/pending"
-              className="inline-flex min-h-10 items-center rounded-xl bg-amber-100 px-4 py-2 text-sm font-black text-amber-950"
-            >
-              Open full queue
-            </Link>
-            <WorkOneOutreachButton count={data.applicants.length} />
-          </div>
-          <div className="mt-4 grid gap-2">
-            {callQueue.slice(0, 6).map((row) => (
-              <div
-                key={row.id}
-                className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 p-3 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div className="min-w-0">
-                  <p className="break-words font-black text-slate-950">
-                    {row.applicant_name || 'Applicant'}
-                  </p>
-                  <p className="break-all text-xs text-slate-500">
-                    {row.applicant_email || 'No email on file'}
-                  </p>
-                  <p className="mt-1 text-xs font-bold text-slate-700">
-                    {row.applicant_phone || 'No phone on file'}
-                  </p>
-                </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-black text-red-800">
-                    Not enrolled
-                  </span>
-                  {row.applicant_email && (
-                    <a
-                      href={`mailto:${row.applicant_email}`}
-                      className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900"
-                    >
-                      Email
-                    </a>
-                  )}
-                  {row.applicant_phone ? (
-                    <a
-                      href={`tel:${row.applicant_phone}`}
-                      className="inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-black text-white"
-                    >
-                      Call
-                    </a>
-                  ) : (
-                    <span className="text-xs font-bold text-slate-500">Phone missing</span>
-                  )}
-                </div>
+        {data.requiresEnchantedHeartsTerms ? (
+          <ApplicantsByProgram rows={data.applicants} programs={data.programs} />
+        ) : (
+          <article className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">
+                  Call and enrollment queue
+                </p>
+                <h2 className="mt-1 text-xl font-black text-slate-950">
+                  People who still need follow-up
+                </h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  {callQueue.length} applicants have no completed call outcome and{' '}
+                  {data.applicants.length} are not enrolled.
+                </p>
               </div>
-            ))}
-            {!callQueue.length && (
-              <p className="rounded-xl bg-emerald-50 p-4 text-sm font-bold text-emerald-900">
-                Every applicant has a recorded call outcome.
-              </p>
-            )}
-          </div>
-        </article>
+              <Link
+                href="/program-holder/students/pending"
+                className="inline-flex min-h-10 items-center rounded-xl bg-amber-100 px-4 py-2 text-sm font-black text-amber-950"
+              >
+                Open full queue
+              </Link>
+              <WorkOneOutreachButton count={data.applicants.length} />
+            </div>
+            <div className="mt-4 grid gap-2">
+              {callQueue.slice(0, 6).map((row) => (
+                <div
+                  key={row.id}
+                  className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 p-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div className="min-w-0">
+                    <p className="break-words font-black text-slate-950">
+                      {row.applicant_name || 'Applicant'}
+                    </p>
+                    <p className="break-all text-xs text-slate-500">
+                      {row.applicant_email || 'No email on file'}
+                    </p>
+                    <p className="mt-1 text-xs font-bold text-slate-700">
+                      {row.applicant_phone || 'No phone on file'}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-black text-red-800">
+                      Not enrolled
+                    </span>
+                    {row.applicant_email && (
+                      <a
+                        href={`mailto:${row.applicant_email}`}
+                        className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900"
+                      >
+                        Email
+                      </a>
+                    )}
+                    {row.applicant_phone ? (
+                      <a
+                        href={`tel:${row.applicant_phone}`}
+                        className="inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-black text-white"
+                      >
+                        Call
+                      </a>
+                    ) : (
+                      <span className="text-xs font-bold text-slate-500">Phone missing</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {!callQueue.length && (
+                <p className="rounded-xl bg-emerald-50 p-4 text-sm font-bold text-emerald-900">
+                  Every applicant has a recorded call outcome.
+                </p>
+              )}
+            </div>
+          </article>
+        )}
         <div className="min-w-0">{payoutPanel}</div>
       </section>
       <section className="grid gap-4 lg:grid-cols-2">
@@ -1134,7 +1297,9 @@ export async function ProgramHolderWorkspaceView({
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
             <h2 id="program-holder-programs-heading" className="text-xl font-black text-slate-950">
-              {regionalAssignment?.all_programs_in_region ? 'Regional program coverage' : 'Your programs'}
+              {regionalAssignment?.all_programs_in_region
+                ? 'Regional program coverage'
+                : 'Your programs'}
             </h2>
             <p className="mt-1 text-sm text-slate-600">
               {regionalAssignment?.all_programs_in_region
@@ -1147,7 +1312,9 @@ export async function ProgramHolderWorkspaceView({
           </Link>
         </div>
         <ProgramCards
-          programs={regionalAssignment?.all_programs_in_region ? data.programs.slice(0, 4) : data.programs}
+          programs={
+            regionalAssignment?.all_programs_in_region ? data.programs.slice(0, 4) : data.programs
+          }
           courseAssignments={data.courseAssignments}
           compact
         />
@@ -1263,7 +1430,13 @@ function DashboardHero({
         <div className="flex flex-col items-center gap-3">
           {isPortrait ? (
             <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-white/80 bg-white shadow-xl">
-              <Image src={heroImage} alt={title} fill sizes="96px" className="object-cover object-top" />
+              <Image
+                src={heroImage}
+                alt={title}
+                fill
+                sizes="96px"
+                className="object-cover object-top"
+              />
             </div>
           ) : null}
           <Link
@@ -1592,15 +1765,58 @@ function Students({ title, rows, programs }: { title: string; rows: any[]; progr
     </div>
   );
 }
+function ApplicantsByProgram({ rows, programs }: { rows: any[]; programs: any[] }) {
+  const groups = new Map<string, any[]>();
+  for (const row of rows) {
+    const title = programTitle(programs, row.program_id, row.program_slug);
+    groups.set(title, [...(groups.get(title) || []), row]);
+  }
+  return (
+    <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div>
+        <h2 className="text-xl font-black text-slate-950">Applicants by program</h2>
+        <p className="mt-2 text-sm text-slate-600">
+          {rows.length} applicant records. Elevate coordinates student outreach. Email addresses,
+          phone numbers, and other contact details remain private.
+        </p>
+      </div>
+      {[...groups.entries()]
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([title, applicants]) => (
+          <details key={title} open className="rounded-xl border border-slate-200 p-4">
+            <summary className="cursor-pointer font-black text-slate-950">
+              {title} ({applicants.length})
+            </summary>
+            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+              {[...applicants]
+                .sort((a, b) =>
+                  String(a.applicant_name || '').localeCompare(String(b.applicant_name || '')),
+                )
+                .map((row) => (
+                  <li key={row.id} className="rounded-lg bg-slate-50 p-3 text-sm font-bold">
+                    {row.applicant_name || 'Applicant'}
+                  </li>
+                ))}
+            </ul>
+          </details>
+        ))}
+      {!rows.length && <p className="text-sm text-slate-600">No applicants are assigned yet.</p>}
+    </section>
+  );
+}
+
 function Applicants({
   rows,
   programs,
   contactAccessGranted,
+  namesOnly = false,
 }: {
   rows: any[];
   programs: any[];
   contactAccessGranted: boolean;
+  namesOnly?: boolean;
 }) {
+  if (namesOnly) return <ApplicantsByProgram rows={rows} programs={programs} />;
   return (
     <div className="space-y-6">
       <Hero
@@ -1722,7 +1938,8 @@ function formatProgramFunding(program: any) {
       ? `No student tuition; ${fundingTags.join(', ')} eligibility rules may apply`
       : 'No student tuition charged';
   }
-  if (fundingTags.length) return `${fundingTags.join(', ')} may be available; verify written approval`;
+  if (fundingTags.length)
+    return `${fundingTags.join(', ')} may be available; verify written approval`;
   if (program.wioa_approved || program.etpl_listed || program.funding_eligible) {
     return 'Funding may be available; verify written approval';
   }
@@ -1734,7 +1951,13 @@ function formatProgramFunding(program: any) {
 
 function formatCareerPay(program: any) {
   const usd = (value: unknown) =>
-    Number(value) > 0 ? Number(value).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) : null;
+    Number(value) > 0
+      ? Number(value).toLocaleString('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          maximumFractionDigits: 0,
+        })
+      : null;
   const low = usd(program.salary_min);
   const high = usd(program.salary_max);
   return low || high
@@ -1798,36 +2021,50 @@ function ProgramCards({
                     />
                     <Row label="Published amount" value={formatProgramAmount(program)} />
                     <Row label="Funding path" value={formatProgramFunding(program)} />
-                    <Row
-                      label="Career pay"
-                      value={formatCareerPay(program)}
-                    />
+                    <Row label="Career pay" value={formatCareerPay(program)} />
                     <Row label="Course assignments" value={String(courses.length)} />
-                    <Row label="Delivery" value={program.delivery_method || 'Confirm with the program team'} />
-                    <Row label="Duration" value={program.estimated_weeks ? `${program.estimated_weeks} estimated weeks` : 'Confirm schedule with the program team'} />
+                    <Row
+                      label="Delivery"
+                      value={program.delivery_method || 'Confirm with the program team'}
+                    />
+                    <Row
+                      label="Duration"
+                      value={
+                        program.estimated_weeks
+                          ? `${program.estimated_weeks} estimated weeks`
+                          : 'Confirm schedule with the program team'
+                      }
+                    />
                   </dl>
                   <p className="mt-5 text-sm leading-6 text-slate-700">
-                    {program.full_description || program.description || program.short_description || 'Ask the program team for the approved course outline before recruiting.'}
+                    {program.full_description ||
+                      program.description ||
+                      program.short_description ||
+                      'Ask the program team for the approved course outline before recruiting.'}
                   </p>
                   {Array.isArray(program.what_you_learn) && program.what_you_learn.length > 0 && (
                     <div className="mt-3 text-sm text-slate-700">
                       <p className="font-bold">What students learn</p>
                       <ul className="mt-1 list-disc space-y-1 pl-5">
-                        {program.what_you_learn.map((topic: string, index: number) => <li key={`${program.id}-${index}`}>{topic}</li>)}
+                        {program.what_you_learn.map((topic: string, index: number) => (
+                          <li key={`${program.id}-${index}`}>{topic}</li>
+                        ))}
                       </ul>
                     </div>
                   )}
                   <p className="mt-3 text-xs font-bold text-slate-600">
-                    Indiana WIOA status: {program.etpl_listed || program.wioa_approved
+                    Indiana WIOA status:{' '}
+                    {program.etpl_listed || program.wioa_approved
                       ? 'Internal record has a funding flag; confirm this exact program and location on Indiana INTraining before offering a funded seat.'
                       : 'Indiana ETPL approval has not been verified in this workspace. Treat as self-pay until WorkOne confirms eligibility in writing.'}
                   </p>
                   <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
-                    <strong>Student payment conversation:</strong> confirm whether Elevate has documented
-                    funding approval before describing a program as funded. Otherwise explain the published
-                    self-pay amount. Students may use the payment options shown at checkout; eligible applicants
-                    can request a buy-now-pay-later decision, including Affirm when offered. Approval is made by
-                    the payment provider, not by the Program Holder.
+                    <strong>Student payment conversation:</strong> confirm whether Elevate has
+                    documented funding approval before describing a program as funded. Otherwise
+                    explain the published self-pay amount. Students may use the payment options
+                    shown at checkout; eligible applicants can request a buy-now-pay-later decision,
+                    including Affirm when offered. Approval is made by the payment provider, not by
+                    the Program Holder.
                   </div>
                   {!courses.length && (
                     <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900">

@@ -55,7 +55,13 @@ const FALLBACK_SYSTEM_HEALTH: AdminDashboardData['systemHealth'] = {
   missingDocuments: 0,
   missingCertifications: 0,
   unresolvedFlags: 0,
-  alerts: [{ code: 'system_health_unavailable', severity: 'warning', message: 'System health status is unavailable.' }],
+  alerts: [
+    {
+      code: 'system_health_unavailable',
+      severity: 'warning',
+      message: 'System health status is unavailable.',
+    },
+  ],
 };
 
 const FALLBACK_COUNTS: DashboardCounts = {
@@ -100,18 +106,27 @@ function normalizeOperational(
   return {
     needsReview: asCount(raw.needsReview, FALLBACK_OPERATIONAL.needsReview),
     needsReviewDetail:
-      typeof raw.needsReviewDetail === 'string' ? raw.needsReviewDetail : FALLBACK_OPERATIONAL.needsReviewDetail,
+      typeof raw.needsReviewDetail === 'string'
+        ? raw.needsReviewDetail
+        : FALLBACK_OPERATIONAL.needsReviewDetail,
     atRisk: asCount(raw.atRisk, FALLBACK_OPERATIONAL.atRisk),
     complianceAlerts: asCount(raw.complianceAlerts, FALLBACK_OPERATIONAL.complianceAlerts),
     complianceAlertsSeverity:
-      typeof raw.complianceAlertsSeverity === 'string' ? raw.complianceAlertsSeverity : FALLBACK_OPERATIONAL.complianceAlertsSeverity,
+      typeof raw.complianceAlertsSeverity === 'string'
+        ? raw.complianceAlertsSeverity
+        : FALLBACK_OPERATIONAL.complianceAlertsSeverity,
     newToday: asCount(raw.newToday, FALLBACK_OPERATIONAL.newToday),
     newTodayDetail:
-      typeof raw.newTodayDetail === 'string' ? raw.newTodayDetail : FALLBACK_OPERATIONAL.newTodayDetail,
+      typeof raw.newTodayDetail === 'string'
+        ? raw.newTodayDetail
+        : FALLBACK_OPERATIONAL.newTodayDetail,
     newAppsToday: asCount(raw.newAppsToday, FALLBACK_OPERATIONAL.newAppsToday),
     newLeadsToday: asCount(raw.newLeadsToday, FALLBACK_OPERATIONAL.newLeadsToday),
     newEnrollmentsToday: asCount(raw.newEnrollmentsToday, FALLBACK_OPERATIONAL.newEnrollmentsToday),
-    revenueThisMonthCents: asCount(raw.revenueThisMonthCents, FALLBACK_OPERATIONAL.revenueThisMonthCents),
+    revenueThisMonthCents: asCount(
+      raw.revenueThisMonthCents,
+      FALLBACK_OPERATIONAL.revenueThisMonthCents,
+    ),
   };
 }
 
@@ -135,7 +150,10 @@ function normalizeSystemHealth(
     staleJobs: asCount(raw.staleJobs, FALLBACK_SYSTEM_HEALTH.staleJobs),
     degraded: raw.degraded === true || alerts.some((a) => a.severity === 'critical'),
     missingDocuments: asCount(raw.missingDocuments, FALLBACK_SYSTEM_HEALTH.missingDocuments),
-    missingCertifications: asCount(raw.missingCertifications, FALLBACK_SYSTEM_HEALTH.missingCertifications),
+    missingCertifications: asCount(
+      raw.missingCertifications,
+      FALLBACK_SYSTEM_HEALTH.missingCertifications,
+    ),
     unresolvedFlags: asCount(raw.unresolvedFlags, FALLBACK_SYSTEM_HEALTH.unresolvedFlags),
     alerts: alerts.length ? alerts : FALLBACK_SYSTEM_HEALTH.alerts,
   };
@@ -160,9 +178,7 @@ function normalizeSitePreviewTargets(
       const url = typeof target.url === 'string' ? target.url.trim() : '';
       if (!url) return null;
       const label =
-        typeof target.label === 'string' && target.label.trim()
-          ? target.label.trim()
-          : url;
+        typeof target.label === 'string' && target.label.trim() ? target.label.trim() : url;
       return { label, url };
     })
     .filter((row): row is SitePreviewTarget => row != null);
@@ -237,23 +253,22 @@ function normalizeTopPrograms(programs: TopProgramPoint[] | null | undefined): T
 function normalizeRecentApplications(
   applications: RecentApplication[] | null | undefined,
 ): RecentApplication[] {
-  return asObjectArray(applications).map((app) => ({
-    id: String(app.id ?? `app-${Math.random().toString(36).slice(2)}`),
-    first_name: typeof app.first_name === 'string' ? app.first_name : null,
-    last_name: typeof app.last_name === 'string' ? app.last_name : null,
-    full_name: typeof app.full_name === 'string' ? app.full_name : null,
-    email: typeof app.email === 'string' ? app.email : null,
-    program_interest: typeof app.program_interest === 'string' ? app.program_interest : null,
-    status: typeof app.status === 'string' ? app.status : 'submitted',
-    created_at: typeof app.created_at === 'string' ? app.created_at : new Date().toISOString(),
-    submitted_at: typeof app.submitted_at === 'string' ? app.submitted_at : null,
-    age_days: asCount(app.age_days),
-    urgent: app.urgent === true,
-    href:
-      typeof app.href === 'string' && app.href.startsWith('/')
-        ? app.href
-        : '/applications',
-  }));
+  return asObjectArray(applications)
+    .filter((app) => typeof app.id === 'string' && app.id.trim())
+    .map((app) => ({
+      id: app.id,
+      first_name: typeof app.first_name === 'string' ? app.first_name : null,
+      last_name: typeof app.last_name === 'string' ? app.last_name : null,
+      full_name: typeof app.full_name === 'string' ? app.full_name : null,
+      email: typeof app.email === 'string' ? app.email : null,
+      program_interest: typeof app.program_interest === 'string' ? app.program_interest : null,
+      status: typeof app.status === 'string' ? app.status : 'submitted',
+      created_at: typeof app.created_at === 'string' ? app.created_at : '',
+      submitted_at: typeof app.submitted_at === 'string' ? app.submitted_at : null,
+      age_days: asCount(app.age_days),
+      urgent: app.urgent === true,
+      href: typeof app.href === 'string' && app.href.startsWith('/') ? app.href : '/applications',
+    }));
 }
 
 function normalizeCounts(
@@ -264,9 +279,15 @@ function normalizeCounts(
   return {
     pendingApplications: asCount(raw.pendingApplications, pendingApplicationsListLength),
     activeEnrollments: asCount(raw.activeEnrollments, FALLBACK_COUNTS.activeEnrollments),
-    revenueThisMonthCents: asCount(raw.revenueThisMonthCents, FALLBACK_COUNTS.revenueThisMonthCents),
+    revenueThisMonthCents: asCount(
+      raw.revenueThisMonthCents,
+      FALLBACK_COUNTS.revenueThisMonthCents,
+    ),
     certificatesIssued: asCount(raw.certificatesIssued, FALLBACK_COUNTS.certificatesIssued),
-    pendingProgramHolders: asCount(raw.pendingProgramHolders, FALLBACK_COUNTS.pendingProgramHolders),
+    pendingProgramHolders: asCount(
+      raw.pendingProgramHolders,
+      FALLBACK_COUNTS.pendingProgramHolders,
+    ),
     pendingDocuments: asCount(raw.pendingDocuments, FALLBACK_COUNTS.pendingDocuments),
   };
 }
@@ -275,37 +296,38 @@ function normalizeCounts(
 export function normalizeAdminDashboardData(
   input: Partial<AdminDashboardData> | null | undefined,
 ): AdminDashboardData {
-  if (!input) return {
-    counts: FALLBACK_COUNTS,
-    revenueAllTimeCents: 0,
-    totalStudents: 0,
-    recentPayments: [],
-    operational: FALLBACK_OPERATIONAL,
-    priorities: [],
-    kpis: [],
-    enrollmentTrend: [],
-    studentStatuses: [],
-    topPrograms: [],
-    recentActivity: [],
-    recentStudents: [],
-    recentApplications: [],
-    pendingApplications: [],
-    blockedPrograms: [],
-    inactiveLearners: [],
-    pendingSubmissions: [],
-    complianceAlerts: [],
-    staleLeads: [],
-    pendingWioaDocs: 0,
-    stalledApplications: [],
-    noOutcomeEnrollments: [],
-    missingFundingEnrollments: [],
-    profile: null,
-    generatedAt: new Date().toISOString(),
-    sitePreviewTargets: FALLBACK_SITE_PREVIEW,
-    degradedSections: [],
-    systemHealth: FALLBACK_SYSTEM_HEALTH,
-    isSuperAdmin: false,
-  };
+  if (!input)
+    return {
+      counts: FALLBACK_COUNTS,
+      revenueAllTimeCents: 0,
+      totalStudents: 0,
+      recentPayments: [],
+      operational: FALLBACK_OPERATIONAL,
+      priorities: [],
+      kpis: [],
+      enrollmentTrend: [],
+      studentStatuses: [],
+      topPrograms: [],
+      recentActivity: [],
+      recentStudents: [],
+      recentApplications: [],
+      pendingApplications: [],
+      blockedPrograms: [],
+      inactiveLearners: [],
+      pendingSubmissions: [],
+      complianceAlerts: [],
+      staleLeads: [],
+      pendingWioaDocs: 0,
+      stalledApplications: [],
+      noOutcomeEnrollments: [],
+      missingFundingEnrollments: [],
+      profile: null,
+      generatedAt: new Date().toISOString(),
+      sitePreviewTargets: FALLBACK_SITE_PREVIEW,
+      degradedSections: [],
+      systemHealth: FALLBACK_SYSTEM_HEALTH,
+      isSuperAdmin: false,
+    };
 
   const pendingApplications = normalizeRecentApplications(
     input.pendingApplications as RecentApplication[] | undefined,
@@ -326,8 +348,7 @@ export function normalizeAdminDashboardData(
     recentActivity: asObjectArray(input.recentActivity).map((item) => ({
       id: String(item.id ?? 'activity'),
       title: typeof item.title === 'string' ? item.title : 'Activity',
-      timestamp:
-        typeof item.timestamp === 'string' ? item.timestamp : new Date().toISOString(),
+      timestamp: typeof item.timestamp === 'string' ? item.timestamp : new Date().toISOString(),
     })),
     recentStudents: normalizeRecentStudents(input.recentStudents),
     recentApplications,

@@ -1,5 +1,5 @@
 import { enforceMediaQuality } from '@/lib/video/media-quality-gate';
-import { instructionalQualityFailures } from '@/lib/video/instructional-quality-gate';
+import { instructionalQualityFailures, repeatedTeachingSegments } from '@/lib/video/instructional-quality-gate';
 import { verifyRegisteredProfile } from '../credential/verify-registered-profile';
 import type { StepHandler } from './build-runner';
 import type { UltimateRuntime } from './runtime';
@@ -244,15 +244,27 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
         }),
       },
     }),
-    lesson_film_render: async (ctx) => ({
-      artifacts: {
-        render: await runtime.renderer.render({
-          lessonId: comp(ctx).id,
-          courseTitle: ctx.profile.title,
-          artifacts: ctx.artifacts,
-        }),
-      },
-    }),
+    lesson_film_render: async (ctx) => {
+      const script = String((ctx.artifacts.instructor_script as any)?.script?.script ?? '');
+      const repeated = repeatedTeachingSegments(script);
+      if (repeated > 0)
+        return {
+          passed: false,
+          findings: [{
+            step: 'lesson_film_render', severity: 'error', code: 'NARRATION_DUPLICATION',
+            message: `Narration repeats ${repeated} substantial teaching segment(s); repair the source before rendering.`,
+          }],
+        };
+      return {
+        artifacts: {
+          render: await runtime.renderer.render({
+            lessonId: comp(ctx).id,
+            courseTitle: ctx.profile.title,
+            artifacts: ctx.artifacts,
+          }),
+        },
+      };
+    },
     finished_media_qa: async (ctx) => {
       const render: any = ctx.artifacts.lesson_film_render?.render;
       const script: any = (ctx.artifacts.instructor_script as any)?.script;
@@ -269,6 +281,12 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       if (quality.failures.length)
         return {
           passed: false,
+          findings: quality.failures.map((message) => ({
+            step: 'finished_media_qa' as const,
+            severity: 'error' as const,
+            code: /^(narration|storyboard) repeats/.test(message) ? 'NARRATION_DUPLICATION' : 'INSTRUCTIONAL_QUALITY_FAILED',
+            message,
+          })),
           artifacts: { mediaQA: { pass: false, failures: quality.failures } },
         };
       const inspection = await enforceMediaQuality({

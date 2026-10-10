@@ -82,3 +82,22 @@ test('owner-preprovisioned empty secret can be initialized without project-wide 
   assert.equal(calls.some(a => a[1] === 'create' || a[1] === 'list'), false);
   assert.ok(payload);
 });
+
+for (const changed of [false, true]) {
+  test('existing Google ownership verification ' + (changed ? 'rejects changed credentials without writes' : 'accepts exact credentials without writes'), async () => {
+    const current = config();
+    if (changed) current.runtimeEnvironment.TOKEN = 'different';
+    let mutations = 0;
+    const operation = importRuntimeConfig('store', {
+      env: { NORTHFLANK_API_TOKEN: 'test', VERIFY_EXISTING_GOOGLE_CONFIG: 'true' },
+      request: async url => ({ ok: true, json: async () => ({data: url.includes('runtime-environment') ? config() : {volumes: []}}) }),
+      run: args => {
+        if (args[1] === 'create' || args[2] === 'add') mutations++;
+        return args[2] === 'access' ? JSON.stringify(current) : 'existing';
+      },
+    });
+    if (changed) await assert.rejects(operation, /does not match complete source inventory/);
+    else assert.equal((await operation).existingConfigurationVerified, true);
+    assert.equal(mutations, 0);
+  });
+}

@@ -4,6 +4,8 @@
  * Only active application/portal routes belong here. Do not add legacy aliases.
  */
 export const APP_ROUTE_PREFIXES = [
+  '/tax',
+  '/tax-software',
   '/lms',
   '/admin',
   '/instructor',

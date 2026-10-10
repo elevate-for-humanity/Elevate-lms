@@ -1,0 +1,107 @@
+name: Deploy Google Course Builder on source changes
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'workers/**'
+      - 'lib/ultimate-course-builder/**'
+      - 'lib/video/**'
+      - 'lib/ai/**'
+      - 'lib/storage/**'
+      - 'remotion-src/**'
+      - 'packages/ultimate-course-worker/**'
+      - 'Dockerfile.ultimate-worker'
+      - 'tsconfig.ultimate-worker.json'
+      - 'scripts/gcp/deploy-course-job.mjs'
+      - '.github/workflows/deploy-google-course-worker.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch Google-trusted workflow event
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-course-worker.yml/dispatches" -f ref=main
+  build:
+    concurrency:
+      group: google-course-worker-image
+      cancel-in-progress: true
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify finite worker and speech boundaries
+        run: node --test workers/ultimate-source-teaching.test.mjs workers/worker-loop.test.mjs lib/video/local-transcription.test.mjs lib/video/local-transcription-worker.test.mjs scripts/gcp/deploy-course-job.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs
+      - name: Build existing CPU Course Builder image
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -f Dockerfile.ultimate-worker -t "elevate-ultimate-worker:$GITHUB_SHA" .
+      # Google credentials must be created after Docker has consumed its context.
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify Google SDK
+        run: node scripts/gcp/verify-sdk.mjs
+      - name: Upload immutable worker image
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker:$GITHUB_SHA"
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker tag "elevate-ultimate-worker:$GITHUB_SHA" "$IMAGE"
+          docker push "$IMAGE"
+  deploy:
+    needs: build
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    concurrency:
+      group: google-course-runtime-operations
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify Google SDK
+        run: node scripts/gcp/verify-sdk.mjs
+      # Updating the job template does not cancel existing executions: their
+      # tasks retain their execution's image digest. Keep the launch overlap
+      # guard in the dispatcher, so deployment cannot launch a second worker.
+      - name: Deploy exact finite worker and verify configuration readback
+        env:
+          IMAGE_SHA: ${{ github.sha }}
+        run: node scripts/gcp/deploy-course-job.mjs
+      - name: Dispatch queued work through the existing overlap guard
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/gcp/dispatch-course-job.mjs
+      - name: Record deployment boundary
+        run: |
+          echo 'Exact CPU worker image deployed and dispatcher invoked. Course completion still requires persisted lesson and learner acceptance evidence.' >> "$GITHUB_STEP_SUMMARY"

@@ -20,12 +20,7 @@ import { spawn } from 'child_process';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import {
-  getNorthflankProjectId,
-  getNorthflankServices,
-  isNorthflankReady,
-  triggerNorthflankBuild,
-} from '@/lib/northflank/runtime';
+import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -118,27 +113,13 @@ async function playbookAuthGap(dryRun: boolean): Promise<ActionResult[]> {
   return actions;
 }
 
-/**
- * env-gap: verify Northflank API configuration is present.
- */
+/** Google deployment configuration check, never source-host dispatch. */
 async function playbookEnvGap(_dryRun: boolean): Promise<ActionResult[]> {
-  const actions: ActionResult[] = [];
-  const projectId = getNorthflankProjectId();
-
-  if (!projectId) {
-    actions.push(error('northflank-project', 'NORTHFLANK_PROJECT_ID is not configured'));
-    return actions;
-  }
-
-  if (!isNorthflankReady()) {
-    actions.push(error('northflank-token', 'NORTHFLANK_API_TOKEN is not configured'));
-    return actions;
-  }
-
-  actions.push(ok('northflank-env', `Northflank env sync can run for project ${projectId}`));
-  actions.push(skipped('secret-values', 'Secret values are not printed or audited from this endpoint'));
-
-  return actions;
+  return [{
+    action: 'google-deploy-config',
+    status: 'skipped',
+    detail: 'Google Cloud Run deploys use authenticated GitHub workflows; a live dispatch verifies credentials. No Northflank credential is required.',
+  }];
 }
 
 /**
@@ -162,7 +143,7 @@ async function playbookDevcontainerReadonly(dryRun: boolean): Promise<ActionResu
   }
 
   if (!dryRun) {
-    actions.push(skipped('set-mode', 'Set DEVSTUDIO_DEVCONTAINER_MODE=github-only in the Northflank secret group, then redeploy'));
+    actions.push(skipped('set-mode', 'Set DEVSTUDIO_DEVCONTAINER_MODE=github-only in Google Secret Manager, then deploy Google Admin'));
   } else {
     actions.push(skipped('set-mode', `dry-run: would set DEVSTUDIO_DEVCONTAINER_MODE=github-only (currently: ${currentMode})`));
   }
@@ -170,35 +151,27 @@ async function playbookDevcontainerReadonly(dryRun: boolean): Promise<ActionResu
   return actions;
 }
 
-/**
- * stale-image: trigger Northflank builds for LMS/Admin.
- */
+/** Dispatch only the approved Google build workflows. */
 async function playbookStaleImage(dryRun: boolean, options: Record<string, unknown>): Promise<ActionResult[]> {
+  const requested = Array.isArray(options.services) ? options.services : ['admin'];
   const actions: ActionResult[] = [];
-  const projectId = getNorthflankProjectId();
-  if (!projectId || !isNorthflankReady()) {
-    actions.push(error('northflank-config', 'Northflank API credentials are not configured'));
-    return actions;
-  }
-
-  const requested = (options.services as string[] | undefined)?.length
-    ? (options.services as string[])
-    : getNorthflankServices().map((service) => service.id);
-
-  for (const svc of requested) {
-    if (!dryRun) {
-      try {
-        await triggerNorthflankBuild(projectId, svc);
-        actions.push(ok('northflank-build', `${svc} build triggered`));
-      } catch (err) {
-        const msg = 'Unknown error';
-        actions.push(error('northflank-build', `${svc} failed: ${msg.slice(0, 200)}`));
-      }
-    } else {
-      actions.push(skipped('northflank-build', `dry-run: would trigger build for ${svc}`));
+  for (const service of requested) {
+    if (service !== 'admin' && service !== 'marketing') {
+      actions.push(error('google-deploy', 'Unsupported Google self-build target: ' + String(service)));
+      continue;
+    }
+    if (dryRun) {
+      actions.push(skipped('google-deploy', 'dry-run: would dispatch Google ' + service));
+      continue;
+    }
+    try {
+      await dispatchGoogleDeployment(service);
+      actions.push(ok('google-deploy', service + ' workflow dispatched (live revision not yet verified)'));
+    } catch (err) {
+      console.error('Google deployment dispatch failed', err);
+      actions.push(error('google-deploy', 'Google dispatch failed; inspect server logs for details'));
     }
   }
-
   return actions;
 }
 
@@ -269,10 +242,10 @@ export async function GET(request: NextRequest) {
     method: 'POST',
     playbooks: {
       'auth-gap':              'Scan for unprotected API routes; mark with TODO in non-dry-run',
-      'env-gap':               'Check Northflank env sync configuration',
-      'devcontainer-readonly': 'Verify GITHUB_TOKEN and remind operator to set github-only mode in Northflank',
-      'stale-image':           'Trigger Northflank builds for services',
-      'northflank-env':        'Read-only Northflank env readiness check',
+      'env-gap':               'Check Google deployment configuration',
+      'devcontainer-readonly': 'Verify GITHUB_TOKEN and set github-only mode in Google',
+      'stale-image':           'Dispatch approved Google Cloud Run build workflows',
+      'northflank-env':        'Read-only Google deployment readiness guidance',
     },
     body: {
       playbook: 'string (required)',

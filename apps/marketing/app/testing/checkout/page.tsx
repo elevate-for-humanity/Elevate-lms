@@ -67,14 +67,14 @@ export default async function TestingCheckoutPage({
             <ShieldCheck className="mt-1 h-7 w-7 shrink-0 text-emerald-600" />
             <div>
               <p className="text-sm font-bold uppercase tracking-widest text-emerald-700">
-                Server-authoritative checkout
+                Secure exam checkout
               </p>
               <h1 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">
                 Choose the exact exam you are taking.
               </h1>
               <p className="mt-3 max-w-3xl text-lg leading-relaxed text-slate-600">
-                Every exam shown here has a positive configured retail amount in the canonical testing registry.
-                The server re-resolves that amount before it creates the payment invoice, so the browser cannot set the price.
+                Choose your exam and testing day, review the total, and pay securely through QuickBooks.
+                After payment is confirmed, we will email your reserved time and a link to add it to Google Calendar.
               </p>
             </div>
           </div>

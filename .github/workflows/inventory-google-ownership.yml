@@ -1,12 +1,24 @@
 name: Inventory Google ownership and persistence
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/inventory-google-ownership.yml']
   workflow_dispatch:
 permissions:
   contents: read
+  actions: write
   id-token: write
 jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Launch read-only Google ownership inventory
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/inventory-google-ownership.yml/dispatches" -f ref=main
   inventory:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 15
@@ -23,7 +35,10 @@ jobs:
         with: {skip_install: true}
       - run: node scripts/gcp/verify-sdk.mjs
       - name: Inspect Google runtime, persistence and ownership metadata
-        run: node scripts/gcp/inventory-google-ownership.mjs
+        run: |
+          node scripts/gcp/inventory-google-ownership.mjs || result=$?
+          cat google-ownership-inventory.json
+          exit "${result:-0}"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

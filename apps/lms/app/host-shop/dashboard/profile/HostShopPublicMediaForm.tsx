@@ -14,11 +14,12 @@ type Props = {
 export default function HostShopPublicMediaForm({ logoUrl, flyerUrl, videoUrl, publicProfileUrl }: Props) {
   const [logo, setLogo] = useState(logoUrl || '');
   const [flyer, setFlyer] = useState(flyerUrl || '');
+  const [photo, setPhoto] = useState('');
   const [video, setVideo] = useState(videoUrl || '');
-  const [busy, setBusy] = useState<'logo' | 'flyer' | 'video' | null>(null);
+  const [busy, setBusy] = useState<'logo' | 'flyer' | 'photo' | 'video' | null>(null);
   const [message, setMessage] = useState('');
 
-  async function upload(kind: 'logo' | 'flyer' | 'video', file?: File) {
+  async function upload(kind: 'logo' | 'flyer' | 'photo' | 'video', file?: File) {
     if (!file) return;
     setBusy(kind);
     setMessage('');
@@ -31,8 +32,9 @@ export default function HostShopPublicMediaForm({ logoUrl, flyerUrl, videoUrl, p
       if (!response.ok || !data.ok) throw new Error(data.error || 'Upload failed.');
       if (kind === 'logo') setLogo(data.url);
       else if (kind === 'flyer') setFlyer(data.url);
+      else if (kind === 'photo') setPhoto(data.url);
       else setVideo(data.url);
-      setMessage(`${kind === 'logo' ? 'Logo' : kind === 'flyer' ? 'Flyer' : 'Video'} published successfully.`);
+      setMessage(`${kind === 'logo' ? 'Logo' : kind === 'flyer' ? 'Flyer' : kind === 'photo' ? 'Photo' : 'Video'} published successfully.`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Upload failed.');
     } finally {
@@ -45,14 +47,15 @@ export default function HostShopPublicMediaForm({ logoUrl, flyerUrl, videoUrl, p
       <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-black text-slate-950">Public Host Shop media</h2>
-          <p className="mt-1 break-words text-sm text-slate-600">Upload your shop logo, flyer, and a short promotional video. Approved media becomes part of your public network profile.</p>
+          <p className="mt-1 break-words text-sm text-slate-600">Upload your shop logo, flyer, portfolio photos, and a short promotional video. New photos are added to your gallery. Approved media becomes part of your public network profile.</p>
         </div>
         {publicProfileUrl ? <a href={publicProfileUrl} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold">View public profile</a> : null}
       </div>
 
-      <div className="mt-5 grid min-w-0 gap-5 md:grid-cols-3">
+      <div className="mt-5 grid min-w-0 gap-5 md:grid-cols-2">
         <MediaCard title="Shop logo" url={logo} kind="logo" busy={busy} onUpload={upload} />
         <MediaCard title="Shop flyer" url={flyer} kind="flyer" busy={busy} onUpload={upload} />
+        <MediaCard title="Portfolio photo" url={photo} kind="photo" busy={busy} onUpload={upload} />
         <MediaCard title="Shop video" url={video} kind="video" busy={busy} onUpload={upload} />
       </div>
       {message ? <p className="mt-4 text-sm font-semibold text-slate-700">{message}</p> : null}
@@ -63,9 +66,9 @@ export default function HostShopPublicMediaForm({ logoUrl, flyerUrl, videoUrl, p
 function MediaCard({ title, url, kind, busy, onUpload }: {
   title: string;
   url: string;
-  kind: 'logo' | 'flyer' | 'video';
-  busy: 'logo' | 'flyer' | 'video' | null;
-  onUpload: (kind: 'logo' | 'flyer' | 'video', file?: File) => void;
+  kind: 'logo' | 'flyer' | 'photo' | 'video';
+  busy: 'logo' | 'flyer' | 'photo' | 'video' | null;
+  onUpload: (kind: 'logo' | 'flyer' | 'photo' | 'video', file?: File) => void;
 }) {
   return (
     <div className="min-w-0 max-w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-4">

@@ -13,50 +13,37 @@ pass() {
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-# 1) Northflank Dockerfiles and service config must keep service roles separated.
+# Use portable grep checks on GitHub runner images without ripgrep.
+
+# 1) The separate Google container images must serve their own applications.
 LMS_DOCKERFILE="Dockerfile.northflank-lms"
 ADMIN_DOCKERFILE="Dockerfile.northflank-admin"
-NF_CONFIG="scripts/northflank/configure-services.ts"
-[[ -f "$LMS_DOCKERFILE" ]] || fail "$LMS_DOCKERFILE missing"
-[[ -f "$ADMIN_DOCKERFILE" ]] || fail "$ADMIN_DOCKERFILE missing"
-[[ -f "$NF_CONFIG" ]] || fail "$NF_CONFIG missing"
+for file in "$LMS_DOCKERFILE" "$ADMIN_DOCKERFILE"; do
+  [[ -f "$file" ]] || fail "$file missing"
+  grep -q '/api/ping' "$file" || fail "$file must healthcheck /api/ping"
+done
+grep -q 'apps/admin/server\.js' "$ADMIN_DOCKERFILE" || fail "Admin image must serve Admin"
+grep -q 'apps/lms/server\.js' "$LMS_DOCKERFILE" || fail "LMS image must serve LMS"
+pass "Google Admin and LMS container applications remain separate"
 
-# The configurator declares each service's role once and runtimeEnvironmentFor()
-# maps that role to SERVICE_ROLE. Validate the actual implementation instead of
-# requiring duplicated literal SERVICE_ROLE strings inside each config object.
-grep -q "role: 'lms'" "$NF_CONFIG" || fail "Northflank config must declare the LMS role"
-grep -q "role: 'admin'" "$NF_CONFIG" || fail "Northflank config must declare the Admin role"
-grep -q 'SERVICE_ROLE: service.role' "$NF_CONFIG" || fail "Northflank runtime config must map service.role to SERVICE_ROLE"
-grep -q '/api/ping' "$LMS_DOCKERFILE" || fail "LMS Dockerfile must healthcheck /api/ping"
-grep -q '/api/ping' "$ADMIN_DOCKERFILE" || fail "Admin Dockerfile must healthcheck /api/ping"
-pass "Northflank Dockerfile and service config separation looks correct"
-
-# 2) Deployment workflows must stay separated.
+# 2) Require the actual Google deployment path, not retired source workflows.
 ADMIN_WF=".github/workflows/deploy-admin.yml"
-LMS_WF=".github/workflows/deploy-lms.yml"
-[[ -f "$ADMIN_WF" ]] || fail "$ADMIN_WF missing"
-[[ -f "$LMS_WF" ]] || fail "$LMS_WF missing"
-
-grep -q 'elevate-admin' "$ADMIN_WF" || fail "deploy-admin must target elevate-admin"
-grep -q 'elevate-lms' "$LMS_WF" || fail "deploy-lms must target elevate-lms"
-grep -q 'Dockerfile.northflank-admin' "$ADMIN_WF" || fail "deploy-admin must reference admin Dockerfile"
-grep -q 'Dockerfile.northflank-lms' "$LMS_WF" || fail "deploy-lms must reference LMS Dockerfile"
-if grep -q 'Dockerfile.northflank-admin' "$LMS_WF"; then
-  fail "deploy-lms should not reference admin Dockerfile"
+IMAGE_WF=".github/workflows/build-google-migration-images.yml"
+STAGE_WF=".github/workflows/stage-google-web.yml"
+STAGE_SCRIPT="scripts/gcp/stage-web.mjs"
+for file in "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; do
+  [[ -f "$file" ]] || fail "$file missing"
+done
+grep -q 'gcloud run services update elevate-admin-migration' "$ADMIN_WF" || fail "Admin deployment must target its Google service"
+grep -q 'Dockerfile.northflank-admin' "$ADMIN_WF" || fail "Admin deployment must build its own image"
+grep -Fq 'lms) FILE=Dockerfile.northflank-lms' "$IMAGE_WF" || fail "Google LMS build must use its own image"
+grep -Fq 'loadGoogleConfig(component)' "$STAGE_SCRIPT" || fail "Staging must load component-scoped Google configuration"
+grep -Fq 'elevate-${component}-migration' "$STAGE_SCRIPT" || fail "Staging must use a component-scoped Google service"
+grep -q 'stage-web\.mjs' "$STAGE_WF" || fail "Google staging workflow must use the reviewed staging implementation"
+if grep -Eq 'NORTHFLANK_API_TOKEN|configure-services\.ts|api\.northflank\.com' "$ADMIN_WF" "$IMAGE_WF" "$STAGE_WF" "$STAGE_SCRIPT"; then
+  fail "Active Google deployment must not depend on a retired source control plane"
 fi
-if grep -q 'configure-services.ts --execute' "$ADMIN_WF" && ! grep -q 'NORTHFLANK_ADMIN_SERVICE_ID" --execute' "$ADMIN_WF"; then
-  fail "deploy-admin must scope configure-services to admin only"
-fi
-if grep -q 'configure-services.ts --execute' "$LMS_WF" && ! grep -q 'NORTHFLANK_LMS_SERVICE_ID" --execute' "$LMS_WF"; then
-  fail "deploy-lms must scope configure-services to LMS only"
-fi
-if grep -q 'verify-health-checks.ts"$' "$ADMIN_WF" || grep -q 'verify-health-checks.ts$' "$ADMIN_WF"; then
-  fail "deploy-admin must pass service id to verify-health-checks"
-fi
-if grep -q 'verify-health-checks.ts"$' "$LMS_WF" || grep -q 'verify-health-checks.ts$' "$LMS_WF"; then
-  fail "deploy-lms must pass service id to verify-health-checks"
-fi
-pass "Northflank deploy workflow split looks correct"
+pass "Google deployment keeps Admin and LMS images, services and configuration separate"
 
 # 3) Keep one canonical admin dashboard implementation.
 # The Admin app is mounted on the admin origin, so its canonical dashboard URL
@@ -78,7 +65,11 @@ fi
 pass "Admin nav does not include legacy applicants path"
 
 # 5) Legacy app-detail links should use canonical review route.
-grep -R --line-number --include='*.tsx' '/admin/applications/${' apps/admin/app/admin >/tmp/legacy_app_links_raw.txt || true
+if [[ -d apps/admin/app/admin ]]; then
+  grep -RnF --include='*.tsx' '/admin/applications/${' apps/admin/app/admin >/tmp/legacy_app_links_raw.txt || true
+else
+  : >/tmp/legacy_app_links_raw.txt
+fi
 grep -v '/admin/applications/review/' /tmp/legacy_app_links_raw.txt | grep -v '/api/admin/applications/' >/tmp/legacy_app_links.txt || true
 if [[ -s /tmp/legacy_app_links.txt ]]; then
   echo "Legacy links found:"

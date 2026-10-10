@@ -1,3 +1,4 @@
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
@@ -28,7 +29,7 @@ export default async function WebsiteAnalyticsPage({ params }: Props) {
     .select('id, user_id, site_name')
     .eq('id', websiteId)
     .maybeSingle();
-  if (!site || site.user_id !== user.id) notFound();
+  if (!site || !(await canManageHostedWebsite(supabase, websiteId, user.id))) notFound();
 
   const db = await requireAdminClient();
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();

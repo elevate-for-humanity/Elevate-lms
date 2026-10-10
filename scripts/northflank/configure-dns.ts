@@ -51,6 +51,7 @@ async function getNorthflankDomains(serviceId: string): Promise<string[]> {
 }
 
 async function main() {
+  throw new Error('Retired: production DNS and domain ownership use Google Cloud. See docs/dns-configuration.md; no legacy network operation is allowed.');
   console.log('\n=== DNS CONFIGURATION: Cloudflare -> Northflank ===\n');
   console.log('STEP 1: In Cloudflare DNS, configure these CNAME records:\n');
 
@@ -86,4 +87,4 @@ async function main() {
   console.log('elevateforhumanity.org       -> 301/308 redirect to https://www.elevateforhumanity.org\n');
 }
 
-main().catch(console.error);
+main().catch(() => { console.error('Retired Northflank DNS entry point. Use Google production verification.'); process.exitCode = 1; });

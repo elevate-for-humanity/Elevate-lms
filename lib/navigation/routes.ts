@@ -17,6 +17,7 @@ export const ROUTES = {
   login: `${LMS_HOST}/login`,
   studentPortal: `${LMS_HOST}/lms/dashboard`,
   lmsPortal: `${LMS_HOST}/lms/dashboard`,
+  lmsCommunity: `${LMS_HOST}/lms/community`,
   employerPortal: `${LMS_HOST}/employer/dashboard`,
   apprenticePortal: `${LMS_HOST}/apprentice`,
   parentPortal: `${LMS_HOST}/parent-portal/dashboard`,

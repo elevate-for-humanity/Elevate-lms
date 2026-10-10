@@ -7,6 +7,11 @@
       "service": "elevate-admin-migration",
       "identity": "elevate-admin-runtime@elegant-racer-299721.iam.gserviceaccount.com",
       "keys": [
+        "AGENT_MEMORY_API_KEY",
+        "AGENT_MEMORY_BASE_URL",
+        "AGENT_MEMORY_STORE_ID",
+        "AI_PROVIDER",
+        "ANTHROPIC_API_KEY",
         "CAREERONESTOP_API_KEY",
         "CAREERONESTOP_TOKEN",
         "CAREERONESTOP_USER_ID",
@@ -66,7 +71,8 @@
         "TELNYX_PUBLIC_KEY",
         "ULTIMATE_LEARNER_RUNTHROUGH_SECRET",
         "USAJOBS_API_KEY",
-        "USAJOBS_USER_AGENT_EMAIL"
+        "USAJOBS_USER_AGENT_EMAIL",
+        "XAI_API_KEY"
       ]
     },
     "lms": {

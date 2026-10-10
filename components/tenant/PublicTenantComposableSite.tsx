@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import type { PublishedTenantSite, TenantSitePage, TenantSiteSection } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig, normalizePageSlug } from '@/lib/tenant/site-composition';
+import { TenantAssessment, TenantEvents, TenantJournal } from '@/components/tenant/TenantInteractiveSections';
 import {
   TenantCustomLeadForm,
   TenantLeadForm,
@@ -93,14 +94,14 @@ function Section({ section, primary, secondary, basePath }: { section: TenantSit
     const image = text(c.image);
     return (
       <section className="border-b border-black/5">
-        <div className={`mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 sm:px-6 lg:py-24 ${image ? 'lg:grid-cols-2' : ''}`}>
+        <div className={`mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 sm:px-6 lg:py-28 ${image ? 'lg:grid-cols-2' : ''}`}>
           <div className={centered || !image ? 'text-center' : ''}>
             {text(c.eyebrow) ? <p className="text-sm font-black uppercase tracking-[0.18em]" style={{ color: secondary }}>{text(c.eyebrow)}</p> : null}
-            <h1 className="mt-3 text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">{text(c.title)}</h1>
+            <h1 className="mt-4 text-4xl font-black leading-[1.05] tracking-[-0.035em] sm:text-5xl lg:text-6xl">{text(c.title)}</h1>
             {text(c.text) ? <p className={`mt-5 text-lg leading-8 text-slate-600 ${centered || !image ? 'mx-auto max-w-3xl' : 'max-w-2xl'}`}>{text(c.text)}</p> : null}
             {text(c.buttonText) ? <div className={`mt-8 ${centered || !image ? 'flex justify-center' : ''}`}><ActionLink href={text(c.buttonHref) || '/contact'} primary={primary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}
           </div>
-          {image ? <div className="overflow-hidden rounded-[2rem] bg-slate-100 shadow-xl"><img src={image} alt={text(c.imageAlt) || text(c.title)} className={section.settings?.imageFit === 'contain' ? 'h-full min-h-80 w-full object-contain' : 'h-full min-h-80 w-full object-cover'} /></div> : null}
+          {image ? <div className="overflow-hidden rounded-[2rem] bg-slate-100 shadow-2xl ring-1 ring-black/5"><img src={image} alt={text(c.imageAlt) || text(c.title)} className={section.settings?.imageFit === 'contain' ? 'h-full min-h-80 w-full object-contain' : 'h-full min-h-80 w-full object-cover'} /></div> : null}
         </div>
       </section>
     );
@@ -118,7 +119,7 @@ function Section({ section, primary, secondary, basePath }: { section: TenantSit
         {text(c.title) ? <h2 className="mt-2 text-3xl font-black">{text(c.title)}</h2> : null}
         {text(c.text) ? <p className="mt-3 max-w-3xl leading-7 text-slate-600">{text(c.text)}</p> : null}
         <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {items.map((item, index) => <article key={`${text(item.title) || text(item.name)}-${index}`} className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm">{text(item.image) ? <img src={text(item.image)} alt={text(item.imageAlt) || text(item.title) || text(item.name)} className="aspect-[16/10] w-full object-cover" /> : null}<div className="p-6"><h3 className="text-xl font-black">{text(item.title) || text(item.name)}</h3>{text(item.role) ? <p className="mt-1 text-sm font-bold" style={{ color: primary }}>{text(item.role)}</p> : null}{text(item.price) ? <p className="mt-2 text-2xl font-black" style={{ color: primary }}>{text(item.price)}</p> : null}<p className="mt-3 leading-7 text-slate-600">{text(item.description) || text(item.text)}</p>{text(item.href) ? <div className="mt-5"><ActionLink href={text(item.href)} primary={primary} basePath={basePath}>{text(item.buttonText) || 'Learn more'}</ActionLink></div> : null}</div></article>)}
+          {items.map((item, index) => <article key={`${text(item.title) || text(item.name)}-${index}`} className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">{text(item.image) ? <img src={text(item.image)} alt={text(item.imageAlt) || text(item.title) || text(item.name)} className="aspect-[16/10] w-full object-cover" /> : null}<div className="p-6"><h3 className="text-xl font-black">{text(item.title) || text(item.name)}</h3>{text(item.role) ? <p className="mt-1 text-sm font-bold" style={{ color: primary }}>{text(item.role)}</p> : null}{text(item.price) ? <p className="mt-2 text-2xl font-black" style={{ color: primary }}>{text(item.price)}</p> : null}<p className="mt-3 leading-7 text-slate-600">{text(item.description) || text(item.text)}</p>{text(item.href) ? <div className="mt-5"><ActionLink href={text(item.href)} primary={primary} basePath={basePath}>{text(item.buttonText) || 'Learn more'}</ActionLink></div> : null}</div></article>)}
         </div>
       </section>
     );
@@ -161,13 +162,17 @@ function Section({ section, primary, secondary, basePath }: { section: TenantSit
   }
 
   if (section.type === 'cta') {
-    return <section className="mx-auto max-w-6xl px-5 py-14 sm:px-6"><div className="rounded-[2rem] px-8 py-12 text-center text-white" style={{ backgroundColor: primary }}><h2 className="text-3xl font-black">{text(c.title)}</h2>{text(c.text) ? <p className="mx-auto mt-4 max-w-2xl text-white/85">{text(c.text)}</p> : null}{text(c.buttonText) ? <div className="mt-7"><ActionLink href={text(c.buttonHref) || '/contact'} primary={secondary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}</div></section>;
+    return <section className="mx-auto max-w-6xl px-5 py-14 sm:px-6"><div className="rounded-[2rem] px-8 py-14 text-center text-white shadow-xl" style={{ backgroundColor: primary }}><h2 className="text-3xl font-black">{text(c.title)}</h2>{text(c.text) ? <p className="mx-auto mt-4 max-w-2xl text-white/85">{text(c.text)}</p> : null}{text(c.buttonText) ? <div className="mt-7"><ActionLink href={text(c.buttonHref) || '/contact'} primary={secondary} basePath={basePath}>{text(c.buttonText)}</ActionLink></div> : null}</div></section>;
   }
 
   if (section.type === 'booking') {
     const href = text(c.url) || text(c.bookingUrl);
     return <section className="mx-auto max-w-4xl px-5 py-14 text-center sm:px-6"><h2 className="text-3xl font-black">{text(c.title) || 'Book an appointment'}</h2>{text(c.text) ? <p className="mt-4 text-slate-600">{text(c.text)}</p> : null}{href ? <div className="mt-7"><ActionLink href={href} primary={primary} basePath={basePath} eventName="booking_click">{text(c.buttonText) || 'Book now'}</ActionLink></div> : null}</section>;
   }
+
+  if (section.type === 'assessment') return <TenantAssessment content={c} accent={primary} />;
+  if (section.type === 'journal') return <TenantJournal content={c} accent={primary} />;
+  if (section.type === 'events') return <TenantEvents content={c} accent={primary} />;
 
   if (section.type === 'contact_form') {
     const fields = customFields(c.fields);
@@ -194,13 +199,13 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
   const navigation = (config.pages || []).filter((item) => item.showInNavigation !== false);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: background, color: textColor }}>
+    <div className="min-h-screen antialiased" style={{ backgroundColor: background, color: textColor }}>
       {config.homepage.announcement ? <div className="px-4 py-2 text-center text-sm font-black text-white" style={{ backgroundColor: primary }}>{config.homepage.announcement}</div> : null}
-      <header className="sticky top-0 z-20 border-b border-black/10 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-4 py-4 sm:px-6">
-          <Link href={hrefFor('/', basePath)} className="flex min-w-0 items-center gap-3">{config.branding.logoImage ? <img src={config.branding.logoImage} alt={`${config.branding.logoText} logo`} className="h-10 w-auto max-w-36 object-contain" /> : null}<span className="truncate text-lg font-black" style={{ color: primary }}>{config.branding.logoText || site.siteName}</span></Link>
-          <nav className="hidden items-center gap-5 text-sm font-bold md:flex">{navigation.slice(0, 8).map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === page.slug ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === page.slug ? { color: primary } : undefined}>{item.navLabel || item.title}</Link>)}</nav>
-          {navigation.some((item) => item.slug === '/contact') ? <Link href={hrefFor('/contact', basePath)} className="rounded-full px-4 py-2 text-sm font-black text-white" style={{ backgroundColor: primary }}>Contact</Link> : null}
+      <header className="sticky top-0 z-20 border-b border-black/10 bg-white/95 shadow-sm backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-4 py-4 sm:px-6">
+          <Link href={hrefFor('/', basePath)} className="flex min-w-0 items-center gap-3 transition-opacity hover:opacity-80">{config.branding.logoImage ? <img src={config.branding.logoImage} alt={`${config.branding.logoText} logo`} className="h-12 w-auto max-w-44 object-contain" /> : null}<span className="truncate text-lg font-black" style={{ color: primary }}>{config.branding.logoText || site.siteName}</span></Link>
+          <nav className="order-last flex w-full flex-wrap items-center gap-5 text-sm font-bold md:order-none md:w-auto">{navigation.slice(0, 8).map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === page.slug ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === page.slug ? { color: primary } : undefined}>{item.navLabel || item.title}</Link>)}</nav>
+          {navigation.some((item) => item.slug === '/contact') ? <Link href={hrefFor('/contact', basePath)} className="rounded-full px-5 py-2.5 text-sm font-black text-white shadow-sm transition-transform hover:-translate-y-0.5" style={{ backgroundColor: primary }}>Contact</Link> : null}
         </div>
       </header>
       <main>{page.sections.map((section) => <Section key={section.id} section={section} primary={primary} secondary={secondary} basePath={basePath} />)}</main>

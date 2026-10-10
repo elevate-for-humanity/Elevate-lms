@@ -6,6 +6,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
 import { checkDependencies } from '@/lib/health/dependency-checks';
 
 export const runtime = 'nodejs';
@@ -17,7 +18,7 @@ export async function GET() {
 
   return NextResponse.json(
     {
-      service: process.env.SERVICE_NAME || 'marketing',
+      service: getPublicRuntimeService(),
       dependencies: checks,
       timestamp: new Date().toISOString(),
     },

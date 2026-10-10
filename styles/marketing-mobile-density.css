@@ -61,3 +61,13 @@
     display: none !important;
   }
 }
+
+@media print {
+  details[data-responsive-details]::details-content {
+    display: block !important;
+    content-visibility: visible !important;
+  }
+  details[data-responsive-details] > .responsive-details-panel {
+    display: block !important;
+  }
+}

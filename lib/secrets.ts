@@ -7,7 +7,10 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
  * Precedence (highest -> lowest):
  *   1. platform_secrets where scope='runtime' (canonical Admin/Studio source)
  *   2. app_secrets where scope='runtime' (legacy fallback during migration)
- *   3. process.env (Northflank/container injection)
+ *   3. process.env (container injection)
+ *
+ * Runtimes explicitly switched to Google Secret Manager use only their bound
+ * values. Enable that authority only after the service inventory is complete.
  *
  * Build-only and unused Studio values must never be copied into process.env.
  */
@@ -24,6 +27,10 @@ const SECRETS_READ_ATTEMPTS = Math.max(
   1,
   Number.parseInt(process.env.SUPABASE_READ_MAX_ATTEMPTS || '3', 10) || 3,
 );
+
+function usesGoogleRuntimeBindings(): boolean {
+  return process.env.ELEVATE_RUNTIME_CONFIG_PROVIDER === 'google-secret-manager';
+}
 
 function retryableSecretRead(error: { code?: string; message?: string } | null | undefined): boolean {
   if (!error) return false;
@@ -72,6 +79,7 @@ function acceptSecret(target: Record<string, string>, key: unknown, value: unkno
 }
 
 async function loadSecrets(): Promise<Record<string, string>> {
+  if (usesGoogleRuntimeBindings()) return {};
   if (cache && Date.now() - cacheTimestamp < CACHE_TTL_MS) return cache;
 
   const client = getBootstrapClient();
@@ -128,6 +136,7 @@ async function loadSecrets(): Promise<Record<string, string>> {
 
 /** Merge canonical runtime secrets into process.env. */
 export async function hydrateProcessEnv(): Promise<void> {
+  if (usesGoogleRuntimeBindings()) return;
   if (hydrated && Date.now() - cacheTimestamp < CACHE_TTL_MS) return;
 
   const secrets = await loadSecrets();
@@ -155,6 +164,7 @@ export async function getSecrets<K extends string>(
 
 /** Synchronous read after hydration; process.env remains the final fallback. */
 export function getCachedSecret(key: string): string | undefined {
+  if (usesGoogleRuntimeBindings()) return process.env[key];
   return cache?.[key] ?? process.env[key];
 }
 
@@ -175,6 +185,7 @@ export async function refreshSecrets(): Promise<void> {
  * that can decrypt value_enc.
  */
 export async function getDecryptedPlatformSecret(key: string): Promise<string | undefined> {
+  if (usesGoogleRuntimeBindings()) return process.env[key];
   const client = getBootstrapClient();
   if (!client) return process.env[key];
 

@@ -7,6 +7,8 @@ on:
     paths:
       - '.github/workflows/course-builder-production-kick.yml'
   workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
 
 permissions:
   contents: read

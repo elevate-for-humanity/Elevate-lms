@@ -42,7 +42,7 @@ describe('homepage scroll narration lifecycle', () => {
   });
 
   it('uses the next ordinary page interaction when mobile autoplay is blocked', () => {
-    expect(source).toContain('Narration will begin with your first touch.');
+    expect(source).toContain('Narration could not start. Tap the speaker to retry.');
     expect(source).toContain("window.addEventListener('pointerdown', beginFromNaturalInteraction");
     expect(source).toContain("window.addEventListener('keydown', beginFromNaturalInteraction");
   });

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { executeFiniteVideoJob } from './execute-finite-video-render.mjs';
+import { readFileSync } from 'node:fs';
+import { executeFiniteVideoJob, requiredRegionalAllocation } from './execute-finite-video-render.mjs';
 const image = 'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/admin@sha256:' + 'a'.repeat(64);
 function fixture({ active = [], outcome = 'True', altered = false } = {}) {
   let job = { spec: { template: { metadata: { labels: { 'client.knative.dev/nonce': 'before' } }, spec: { taskCount: 1, parallelism: 1, template: { spec: {
@@ -70,4 +71,48 @@ test('validation refuses legacy runners that could accidentally render', async (
   const f = fixture(); f.job.spec.template.spec.template.spec.containers[0].args = ['old-runner'];
   await assert.rejects(executeFiniteVideoJob({ ...f.options, validateOnly: true }), /Refresh the runner/);
   assert.equal(f.calls.some(c => c[2] === 'execute'), false);
+});
+
+const targetService = { spec: { template: { metadata: { annotations: { 'autoscaling.knative.dev/maxScale': '2' } }, spec: { containers: [{ resources: { limits: { cpu: '2', memory: '4Gi' } } }] } } } };
+test('regional capacity accounts for every target service at its configured maximum', () => {
+  assert.deepEqual(requiredRegionalAllocation([targetService], fixture().job.spec.template.spec.template.spec), { cpu: 12000, memory: 40 * 2 ** 30 });
+  assert.throws(() => requiredRegionalAllocation([{ spec: { template: { metadata: {}, spec: { containers: [] } } } }], fixture().job.spec.template.spec.template.spec), /bounded maximum/);
+});
+function migrationFixture({ memoryQuota = 40 * 2 ** 30, realSourceRender = false } = {}) {
+  const f = fixture(); let target; let cancelled = false; let submitted = false;
+  const source = structuredClone(f.job);
+  const run = args => {
+    const east = args.includes('--region=us-east1');
+    const command = args.slice(0, 4).join(' ');
+    f.calls.push(args);
+    if (args[0] === 'auth') return 'test-token';
+    if (command.startsWith('run jobs list')) return '[]';
+    if (command.startsWith('run services list')) return JSON.stringify([targetService]);
+    if (command === 'run jobs describe elevate-video-render') return JSON.stringify(east ? target : source);
+    if (command === 'run jobs executions list') return JSON.stringify([{ metadata: { name: 'elevate-video-render-validation' }, spec: { template: { spec: { containers: [{ env: [{ name: 'VIDEO_VALIDATE_ONLY', value: realSourceRender ? 'false' : 'true' }] }] } } } }]);
+    if (args.slice(0, 3).join(' ') === 'run jobs replace') { target = JSON.parse(readFileSync(args[3], 'utf8')); return '{}'; }
+    if (command === 'run jobs executions cancel') { cancelled = true; return '{}'; }
+    if (command === 'run jobs execute elevate-video-render') submitted = true;
+    return f.options.run(args);
+  };
+  const request = async () => ({ ok: true, json: async () => ({ dimensionsInfos: [{ dimensions: { region: 'us-east1' }, details: { value: String(request.count++ === 0 ? 20000 : memoryQuota) } }] }) });
+  request.count = 0;
+  return { ...f, options: { ...f.options, run, request, configuration: 'redeploy', validateOnly: true, region: 'us-east1', sourceRegion: 'us-central1' }, state: () => ({ target, cancelled, submitted }) };
+}
+test('regional validation copies the saved job within approved quota and cancels only its old validation', async () => {
+  const f = migrationFixture(); await executeFiniteVideoJob(f.options);
+  assert.equal(f.state().cancelled, true); assert.equal(f.state().submitted, true);
+  assert.deepEqual(f.state().target.spec.template.spec.template.spec.containers[0].env, f.before.spec.template.spec.template.spec.containers[0].env);
+  assert.deepEqual(f.state().target.spec.template.spec.template.spec.containers[0].resources.limits, { cpu: '8000m', memory: '32Gi' });
+  assert.ok(f.calls.filter(c => c[1] === 'revisions').every(c => c.includes('--region=us-central1')));
+});
+test('insufficient regional quota prevents creation, cancellation and execution', async () => {
+  const f = migrationFixture({ memoryQuota: 32 * 2 ** 30 });
+  await assert.rejects(executeFiniteVideoJob(f.options), /does not cover/);
+  assert.deepEqual(f.state(), { target: undefined, cancelled: false, submitted: false });
+});
+test('regional placement never cancels a real source render', async () => {
+  const f = migrationFixture({ realSourceRender: true });
+  await assert.rejects(executeFiniteVideoJob(f.options), /real source render is active/);
+  assert.deepEqual(f.state(), { target: undefined, cancelled: false, submitted: false });
 });

@@ -33,6 +33,7 @@ const adminConfig = {
 
   experimental: {
     webpackMemoryOptimizations: true,
+    webpackBuildWorker: true,
     workerThreads: false,
     cpus: 1,
     parallelServerCompiles: false,

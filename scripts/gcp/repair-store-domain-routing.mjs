@@ -52,3 +52,39 @@ const rule=after.hostRules.find(x=>x.hosts.includes('store.elevateforhumanity.or
 assert.ok(after.pathMatchers.find(x=>x.name===rule.pathMatcher).defaultService.endsWith('/elevate-store-backend'));
 console.log(JSON.stringify({storeGoogleRoute:'verified',hostRule:rule,backend:backend.name,neg:neg.name,otherRoutes:'preserved'}));
 console.log(JSON.stringify({dnsChangeRequired:{type:'CNAME',name:'store',target:'www.elevateforhumanity.org',oldTarget:'store.elevateforhumanity.org.elev-5vfk.dns.northflank.app'},publicCutover:'not_verified_until_DNS_and_TLS_pass'}));
+
+const aliasRoutes=[
+ {hosts:['portal.elevateforhumanity.org','dashboard.elevateforhumanity.org'],owner:'app.elevateforhumanity.org',expected:'lms'},
+ {hosts:['dev-studio.elevateforhumanity.org'],owner:'admin.elevateforhumanity.org',expected:'admin'},
+];
+for(const item of aliasRoutes) {
+ const owner=after.hostRules.find(x=>x.hosts.includes(item.owner));
+ assert.ok(owner,'Missing verified canonical owner '+item.owner);
+ for(const host of item.hosts) {
+  const live=read(['compute','url-maps','describe','elevate-public-routes','--global']);
+  const rule=live.hostRules.find(x=>x.hosts.includes(host));
+  if(rule) assert.equal(rule.pathMatcher,owner.pathMatcher,'Alias has a conflicting owner '+host);
+  else cli(['compute','url-maps','add-host-rule','elevate-public-routes','--global','--hosts='+host,'--path-matcher-name='+owner.pathMatcher]);
+ }
+}
+let live=read(['compute','url-maps','describe','elevate-public-routes','--global']);
+const testing=live.hostRules.find(x=>x.hosts.includes('testing.elevateforhumanity.org'));
+if(!testing) cli(['compute','url-maps','add-path-matcher','elevate-public-routes','--global','--path-matcher-name=testing-public','--default-service=elevate-marketing-backend','--new-hosts=testing.elevateforhumanity.org']);
+live=read(['compute','url-maps','describe','elevate-public-routes','--global']);
+for(const original of after.hostRules) assert.ok(live.hostRules.some(x=>JSON.stringify(x)===JSON.stringify(original)),'Original host rule changed');
+for(const original of after.pathMatchers) assert.ok(live.pathMatchers.some(x=>JSON.stringify(x)===JSON.stringify(original)),'Original matcher changed');
+for(const [host,expected] of [
+ ['store.elevateforhumanity.org','store'],['portal.elevateforhumanity.org','lms'],['dashboard.elevateforhumanity.org','lms'],['testing.elevateforhumanity.org','marketing'],['dev-studio.elevateforhumanity.org','admin']
+]) {
+ let verified=false;
+ for(let attempt=0;attempt<12&&!verified;attempt++){
+  try{
+   const output=execFileSync('curl',['--silent','--show-error','--connect-timeout','10','--max-time','20','--resolve',host+':443:34.110.235.233','--write-out','HTTP_STATUS:%{http_code}','https://'+host+'/api/health'],{encoding:'utf8',timeout:25000,stdio:['ignore','pipe','pipe']});
+   const marker=output.lastIndexOf('HTTP_STATUS:');const status=Number(output.slice(marker+12));const body=JSON.parse(output.slice(0,marker).trim());
+   verified=status===200&&body.service===expected&&body.healthy===true;
+   console.log(JSON.stringify({googleAlias:host,expected,status,service:body.service,healthy:body.healthy,tlsVerified:true,verified}));
+  }catch{console.log(JSON.stringify({googleAlias:host,verified:false,attempt}));}
+  if(!verified)await new Promise(resolve=>setTimeout(resolve,5000));
+ }
+ assert.ok(verified,'Google alias did not pass strict TLS and identity '+host);
+}

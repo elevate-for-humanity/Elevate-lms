@@ -17,109 +17,39 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/publish-built-host-shop.yml/dispatches" -f ref=main
   publish:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 25
     concurrency:
       group: google-marketing-runtime-operations
       cancel-in-progress: false
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-24.04
-    environment: production
-    timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify prior final-container proof
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --input-type=module <<'NODE'
+          const r=await fetch('https://api.github.com/repos/'+process.env.GITHUB_REPOSITORY+'/actions/runs/38031382259/jobs',{headers:{authorization:'Bearer '+process.env.GH_TOKEN},signal:AbortSignal.timeout(15000)});
+          if(!r.ok)throw Error('Container proof unavailable');
+          const data=await r.json();
+          if(!data.jobs.some(j=>j.steps.some(s=>s.name==='Test final Marketing container before release'&&s.conclusion==='success')))throw Error('Actual container test did not pass');
+          console.log('Immutable Marketing container passed startup and asset tests.');
+          NODE
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
-      - name: Inspect regional quota and existing runtime allocations
-        env:
-          CLOUDSDK_CORE_DISABLE_PROMPTS: '1'
-        shell: bash
-        run: |
-          gcloud run services list --project=elegant-racer-299721 --region=us-central1 --format=json > /tmp/services.json
-          node -e "const s=JSON.parse(require('fs').readFileSync('/tmp/services.json'));console.log(JSON.stringify(s.map(x=>({name:x.metadata.name,resources:x.spec.template.spec.containers[0].resources,scaling:x.spec.template.metadata.annotations,traffic:x.status.traffic.map(t=>({revision:t.revisionName,percent:t.percent,tag:t.tag}))}))))"
-          gcloud components install alpha beta --quiet
-          gcloud alpha services quota list --consumer=projects/484736877039 --service=run.googleapis.com --format=json --quiet > /tmp/run-quota.json
-          node -e "const q=JSON.parse(require('fs').readFileSync('/tmp/run-quota.json'));console.log(JSON.stringify(q.filter(x=>/cpu|memory/i.test(x.metric+' '+x.displayName))))"
-          gcloud services enable cloudquotas.googleapis.com --project=elegant-racer-299721 --quiet
-          gcloud beta quotas info list --service=run.googleapis.com --project=elegant-racer-299721 --format=json > /tmp/quota-info.json
-          node -e "const q=JSON.parse(require('fs').readFileSync('/tmp/quota-info.json'));console.log(JSON.stringify(q.filter(x=>/cpu/i.test(x.metric+' '+x.quotaId))))"
-      - name: Verify exact built candidate, test tagged runtime, then publish
-        if: false
-        shell: bash
-        env:
-          EXPECTED_SHA: 7996edf490a00d69d2de895b111b2c0b88ef2df0
-          REVISION: elevate-marketing-migration-r7996edf4-38031382259-1
-          EXPECTED_IMAGE: us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing@sha256:7add6893bce8ca07c8e3eb948f8dd708636bcec5ade3455eb6c8b96e6000b4b6
-        run: |
-          set -euo pipefail
-          SERVICE=elevate-marketing-migration
-          PROJECT=elegant-racer-299721
-          REGION=us-central1
-          DIGEST="$(gcloud artifacts docker images describe "us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing:$EXPECTED_SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
-          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
-          export EXPECTED_IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing@$DIGEST"
-          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > /tmp/service.json
-          node <<'NODE'
-          const s=JSON.parse(require('fs').readFileSync('/tmp/service.json'));
-          console.log(JSON.stringify({latest:s.status.latestCreatedRevisionName,resources:s.spec.template.spec.containers[0].resources,scaling:s.spec.template.metadata.annotations,traffic:s.status.traffic.map(t=>({revision:t.revisionName,percent:t.percent,tag:t.tag}))}));
-          NODE
-          gcloud run services update-traffic "$SERVICE" --project="$PROJECT" --region="$REGION" --remove-tags=release-verified,host-shop-verify --quiet || true
-          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > /tmp/untagged.json
-          node -e "const s=JSON.parse(require('fs').readFileSync('/tmp/untagged.json'));if(s.spec.traffic.some(t=>['release-verified','host-shop-verify'].includes(t.tag)))throw Error('Unused candidate tags remain')"
-          export REVISION="elevate-marketing-migration-h7996edf4-$GITHUB_RUN_ID"
-          gcloud run services update "$SERVICE" --project="$PROJECT" --region="$REGION" --image="$EXPECTED_IMAGE" --revision-suffix="h7996edf4-$GITHUB_RUN_ID" --cpu=1 --memory=2Gi --min-instances=0 --max-instances=2 --no-cpu-boost --no-traffic --tag=host-shop-verify --quiet
-          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > /tmp/service.json
-          gcloud run revisions describe "$REVISION" --project="$PROJECT" --region="$REGION" --format=json > /tmp/revision.json
-          node <<'NODE'
-          const fs=require('fs'),assert=require('assert/strict');
-          const r=JSON.parse(fs.readFileSync('/tmp/revision.json'));
-          const s=JSON.parse(fs.readFileSync('/tmp/service.json'));
-          assert.equal(r.spec.containers[0].image,process.env.EXPECTED_IMAGE);
-          assert.equal(s.status.latestCreatedRevisionName,process.env.REVISION,'A newer deployment superseded this candidate');
-          NODE
-          gcloud run services update-traffic "$SERVICE" --project="$PROJECT" --region="$REGION" --update-tags="host-shop-verify=$REVISION" --quiet
-          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > /tmp/tagged.json
-          export CANDIDATE_URL="$(node -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/tagged.json')).status.traffic.find(t=>t.tag==='host-shop-verify').url)")"
-          node <<'NODE'
-          const assert=require('assert/strict');
-          (async()=>{
-            const root=process.env.CANDIDATE_URL;
-            const v=await fetch(root+'/api/version',{signal:AbortSignal.timeout(60000)});assert.equal(v.status,200);
-            const data=await v.json();assert.equal(data.commitSha||data.commit||data.sha,process.env.EXPECTED_SHA);
-            const health=await fetch(root+'/api/health',{signal:AbortSignal.timeout(60000)});assert.equal(health.status,200);assert.equal((await health.json()).healthy,true);
-            const res=await fetch(root+'/',{signal:AbortSignal.timeout(60000)});assert.equal(res.status,200);
-            const html=await res.text();
-            for(const text of ['Top Shelf Barber Lounge','Grow your team','Join the Host Shop network','bg-sky-50']) assert(html.includes(text),'Missing '+text);
-            assert(!html.includes('Razor’s Image Barbershop'));assert(!html.includes("Razor&#x27;s Image Barbershop"));
-            console.log('Exact candidate version, health, and host-shop content passed.');
-          })().catch(e=>{console.error(e);process.exit(1)});
-          NODE
-          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.latestCreatedRevisionName)' > /tmp/latest
-          test "$(cat /tmp/latest)" = "$REVISION"
-          ROLLBACK="$(node -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/service.json')).status.traffic.filter(t=>t.percent).map(t=>t.revisionName+'='+t.percent).join(','))")"
-          gcloud run services update-traffic "$SERVICE" --project="$PROJECT" --region="$REGION" --to-revisions="$REVISION=100" --quiet
-          if ! node <<'NODE'
-          const assert=require('assert/strict');
-          (async()=>{
-            const root='https://www.elevateforhumanity.org';
-            const v=await fetch(root+'/api/version?host-shop-release='+process.env.EXPECTED_SHA,{signal:AbortSignal.timeout(60000),cache:'no-store'});assert.equal(v.status,200);
-            const data=await v.json();assert.equal(data.commitSha||data.commit||data.sha,process.env.EXPECTED_SHA);
-            const h=await fetch(root+'/api/health',{signal:AbortSignal.timeout(60000)});assert.equal(h.status,200);assert.equal((await h.json()).healthy,true);
-            const page=await fetch(root+'/',{signal:AbortSignal.timeout(60000)});assert.equal(page.status,200);
-            const html=await page.text();for(const text of ['Top Shelf Barber Lounge','Grow your team','Join the Host Shop network']) assert(html.includes(text));
-            for(const path of ['/host-shops/top-shelf-barber-lounge','/partners/host-shops','/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade-enhanced-2026.webp','/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp']) {const r=await fetch(root+path,{signal:AbortSignal.timeout(30000)});assert.equal(r.status,200,path);}
-            console.log('Verified live public revision, healthy service, host-shop content, images and links.');
-          })().catch(e=>{console.error(e);process.exit(1)});
-          NODE
-          then
-            gcloud run services update-traffic "$SERVICE" --project="$PROJECT" --region="$REGION" --to-revisions="$ROLLBACK" --quiet
-            exit 1
-          fi
-      - name: Diagnose candidate if activation fails
-        if: failure()
-        run: gcloud run services describe elevate-marketing-migration --project=elegant-racer-299721 --region=us-central1 --format='yaml(status.conditions,status.latestCreatedRevisionName,status.latestReadyRevisionName)'
-      - name: Remove superseded host-shop verification runs
+        with:
+          skip_install: true
+      - name: Verify regional runtime and publish existing Google website
+        run: node scripts/gcp/release-host-shop-region.mjs
+      - name: Remove superseded verification runs
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}

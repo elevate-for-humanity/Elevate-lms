@@ -48,8 +48,9 @@ jobs:
           let execution=process.env.COURSE_EXECUTION || 'latest';
           const call=args=>JSON.parse(execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
           if(execution === 'latest') {
-            const executions=call(['run','jobs','executions','list','--job=elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--limit=20','--format=json']);
-            const active=executions.find(x=>!x.status?.completionTime);
+            const executions=call(['run','jobs','executions','list','--job=elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--limit=100','--sort-by=~metadata.creationTimestamp','--format=json']);
+            console.log(JSON.stringify({executionInventory:executions.slice(0,8).map(x=>({name:x.metadata?.name,created:x.metadata?.creationTimestamp,completed:x.status?.conditions?.find(c=>c.type==='Completed')}))}));
+            const active=executions.find(x=>!x.status?.completionTime && !['True','False'].includes(x.status?.conditions?.find(c=>c.type==='Completed')?.status));
             execution=(active || executions[0])?.metadata?.name;
           }
           if(!/^elevate-course-builder-[a-z0-9]+$/.test(execution)) throw new Error('COURSE_EXECUTION_NAME_INVALID');

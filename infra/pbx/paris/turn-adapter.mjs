@@ -11,7 +11,7 @@ export function pcm16ToUlaw(sample) {
   let magnitude=Math.min(32635,Math.abs(sample));
   magnitude+=132;
   let exponent=7;
-  for(let expMask=0x4000;exponent>0 && !(magnitude&expMask);exponent--,expMask>>=1){}
+  for(let expMask=0x4000;exponent>0 && !(magnitude&expMask);exponent--,expMask>>=1){ /* Find the first set magnitude bit. */ }
   const mantissa=(magnitude>>(exponent+3))&15;
   return (~((negative?0x80:0)|(exponent<<4)|mantissa))&255;
 }

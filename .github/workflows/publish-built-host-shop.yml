@@ -9,7 +9,7 @@ permissions:
   actions: write
   id-token: write
 concurrency:
-  group: google-production-marketing
+  group: google-runtime-operations
   cancel-in-progress: false
 jobs:
   dispatch:
@@ -34,8 +34,8 @@ jobs:
       - name: Verify exact built candidate, test tagged runtime, then publish
         shell: bash
         env:
-          EXPECTED_SHA: 7996edf490a00d69d2de895b111b2c0b88ef2df0
-          REVISION: elevate-marketing-migration-r7996edf4-38031382259-1
+          EXPECTED_SHA: 97a6397dbed488354f7f3f8aa8e63353281f57c5
+          REVISION: elevate-marketing-migration-r97a6397d-38030538876-1
           EXPECTED_IMAGE: us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing@sha256:7add6893bce8ca07c8e3eb948f8dd708636bcec5ade3455eb6c8b96e6000b4b6
         run: |
           set -euo pipefail

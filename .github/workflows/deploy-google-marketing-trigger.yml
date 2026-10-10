@@ -90,6 +90,7 @@ jobs:
           pnpm install --frozen-lockfile --strict-peer-dependencies=false
           pnpm exec tsc --noEmit --project apps/marketing/tsconfig.json
           node --test scripts/gcp/marketing-health-routing.test.cjs
+          node --experimental-strip-types --test scripts/test-hosted-website-management.mjs
           node scripts/audit-geo-claims.mjs
           node scripts/check-public-claims.mjs
           node scripts/check-public-address-integrity.mjs

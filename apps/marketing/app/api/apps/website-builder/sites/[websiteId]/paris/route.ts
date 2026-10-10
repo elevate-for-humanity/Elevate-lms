@@ -1,3 +1,4 @@
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const { data: site, error: readError } = await supabase.from('user_websites').select('id, user_id, site_name, site_config, is_published').eq('id', websiteId).maybeSingle();
   if (readError) return NextResponse.json({ error: readError.message }, { status: 500 });
-  if (!site || site.user_id !== user.id) return NextResponse.json({ error: 'Website not found' }, { status: 404 });
+  if (!site || !(await canManageHostedWebsite(supabase, websiteId, user.id))) return NextResponse.json({ error: 'Website not found' }, { status: 404 });
 
   const body = await request.json().catch(() => ({}));
   const instruction = safeString(body.instruction, 5000);
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const nextConfig = applySiteOperations(currentConfig, operations);
   const nextSiteName = safeString(generated.siteName, 120) || site.site_name || 'My Website';
-  const { data: saved, error: saveError } = await supabase.from('user_websites').update({ site_name: nextSiteName, site_config: nextConfig, updated_at: new Date().toISOString() }).eq('id', websiteId).eq('user_id', user.id).select('id, site_name, subdomain, is_published, site_config').maybeSingle();
+  const { data: saved, error: saveError } = await supabase.from('user_websites').update({ site_name: nextSiteName, site_config: nextConfig, updated_at: new Date().toISOString() }).eq('id', websiteId).select('id, site_name, subdomain, is_published, site_config').maybeSingle();
 
   if (saveError || !saved) return NextResponse.json({ error: saveError?.message || 'Could not save PARIS changes', creditsCharged: credit.charged, creditsRemaining: credit.balance }, { status: 500 });
 

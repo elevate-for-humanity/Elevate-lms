@@ -146,11 +146,12 @@ test('quota read and owned preference read failures never turn into creation', a
 
 test('etag rejection is reported without retrying or overwriting another update', async () => {
   const api = provider({preferences: Object.fromEntries(targets.map(t => [t.id, preference(t)])),
-    mutate: () => response({error: {status: 'ABORTED', message: 'private conflict context'}}, 409)});
+    mutate: () => response({error: {status: 'ABORTED', message: 'etag conflict for owner@example.test; token=private-token'}}, 409)});
   const results = await requestHeadroom('token', 'owner@example.test', api.request, {requestMaximum: true});
   assert.equal(api.writes.length, 2);
   assert(results.every(x => x.accepted === false && x.errorStatus === 'ABORTED'));
-  assert(!JSON.stringify(results).includes('private conflict context'));
+  assert(results.every(x => x.errorMessage.startsWith('etag conflict')));
+  assert(!/owner@example|private-token/.test(JSON.stringify(results)));
 });
 
 test('reports accepted versus effective and granted values with sanitized provider diagnostics', async () => {

@@ -43,6 +43,8 @@ jobs:
           import { activateTestedRevision } from './scripts/gcp/activate-tested-public-revision.mjs';
           const expected='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/admin@sha256:2406f752dc811ac94f03f0c10bc1534f01ef45ea9151005223f7f80d16379a68';
           const rows=JSON.parse(execFileSync('gcloud',['run','revisions','list','--service=elevate-admin-migration','--region=us-central1','--project=elegant-racer-299721','--format=json'],{encoding:'utf8'}));
+          const state=JSON.parse(execFileSync('gcloud',['run','services','describe','elevate-admin-migration','--region=us-central1','--project=elegant-racer-299721','--format=json'],{encoding:'utf8'}));
+          console.log(JSON.stringify({serviceAnnotations:state.metadata.annotations,templateAnnotations:state.spec.template.metadata.annotations,resources:state.spec.template.spec.containers.map(c=>c.resources),traffic:state.status.traffic,revisions:rows.map(r=>({name:r.metadata.name,annotations:r.metadata.annotations,resources:r.spec.containers.map(c=>c.resources),ready:r.status.conditions?.find(c=>c.type==='Ready')}))}));
           const candidates=rows.filter(r=>r.spec?.containers?.[0]?.image===expected);
           if(candidates.length!==1)throw Error('Exactly one matching immutable Admin revision required');
           console.log(JSON.stringify(await activateTestedRevision({service:'elevate-admin-migration',revision:candidates[0].metadata.name,commit:process.env.IMAGE_SHA})));

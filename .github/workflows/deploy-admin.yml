@@ -17,6 +17,11 @@ on:
       - 'pnpm-lock.yaml'
       - '.github/workflows/deploy-admin.yml'
   workflow_dispatch:
+    inputs:
+      requested_sha:
+        description: Exact main commit requested by the trusted dispatch
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -27,13 +32,22 @@ permissions:
 jobs:
   dispatch:
     if: github.event_name == 'push'
+    concurrency:
+      group: google-admin-dispatch-main
+      cancel-in-progress: true
     runs-on: ubuntu-24.04
     steps:
       - name: Dispatch Google-trusted workflow event
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-admin.yml/dispatches" -f ref=main
+          set -euo pipefail
+          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          if test "$latest" != "$GITHUB_SHA"; then
+            echo "::notice::Superseded admin dispatch. Current main is $latest; requested $GITHUB_SHA."
+            exit 0
+          fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-admin.yml/dispatches" -f ref=main -f "inputs[requested_sha]=$GITHUB_SHA"
   deploy-admin:
     concurrency:
       group: google-admin-runtime-operations
@@ -50,6 +64,22 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Reject superseded deployment requests before building
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_SHA: ${{ inputs.requested_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -n "$REQUESTED_SHA" && ! [[ "$REQUESTED_SHA" =~ ^[a-f0-9]{40}$ ]]; then
+            echo "::error::Invalid requested_sha"
+            exit 1
+          fi
+          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          if test "$latest" != "$GITHUB_SHA" || { test -n "$REQUESTED_SHA" && test "$REQUESTED_SHA" != "$GITHUB_SHA"; }; then
+            echo "::error::Superseded release; do not deploy an older Admin revision."
+            exit 1
+          fi
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721

@@ -1,8 +1,8 @@
-import { execFileSync } from 'node:child_process';
+import { google } from './runtime-config.mjs';
 import { pathToFileURL } from 'node:url';
 const project='elegant-racer-299721',region=process.env.CANDIDATE_REGION||'us-central1';
 if(!['us-central1','us-east1'].includes(region))throw Error('Unsupported public runtime region');
-function gcloud(args){const result=execFileSync('gcloud',[...args,'--project='+project,'--format=json'],{encoding:'utf8',timeout:180000,stdio:['ignore','pipe','pipe']});return result.trim()?JSON.parse(result):{};}
+function gcloud(args){const result=google([...args,'--project='+project,'--format=json']);return result.trim()?JSON.parse(result):{};}
 function trafficRows(state){return [...(state.spec?.traffic||[]),...(state.status?.traffic||[])];}
 export function unusedCandidateTags(state,exceptTag){
  const rows=trafficRows(state),serving=new Set(rows.filter(t=>t.percent>0).map(t=>t.revisionName));

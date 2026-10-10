@@ -4,34 +4,13 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 import { google, PROJECT } from './runtime-config.mjs';
+import { inspectRegionalCapacity, isTerminalExecution as terminal } from './regional-capacity.mjs';
 
 const JOB = 'elevate-video-render';
 const scope = region => ['--project=' + PROJECT, '--region=' + region, '--format=json'];
 const REGIONS = ['us-central1', 'us-east1'];
 const STARTUP_PROBE = { httpGet: { path: '/ready', port: 3101 }, timeoutSeconds: 5, periodSeconds: 10, failureThreshold: 60 };
 
-export function allocation(limits) {
-  const cpu = String(limits?.cpu || '');
-  const memory = String(limits?.memory || '').match(/^(\d+)(Gi|Mi)$/);
-  if (!/^(?:\d+|\d+m)$/.test(cpu) || !memory) throw new Error('Unrecognized resource allocation');
-  return { cpu: cpu.endsWith('m') ? Number(cpu.slice(0, -1)) : Number(cpu) * 1000,
-    memory: Number(memory[1]) * (memory[2] === 'Gi' ? 2 ** 30 : 2 ** 20) };
-}
-
-export function requiredRegionalAllocation(services, task) {
-  const required = allocation(task.containers[0].resources?.limits);
-  for (const service of services) {
-    const max = Number(service.spec.template.metadata.annotations?.['autoscaling.knative.dev/maxScale']);
-    if (!Number.isInteger(max) || max < 1) throw new Error('Target service needs a bounded maximum before placing the renderer');
-    for (const container of service.spec.template.spec.containers) {
-      const size = allocation(container.resources?.limits);
-      required.cpu += size.cpu * max; required.memory += size.memory * max;
-    }
-  }
-  return required;
-}
-const terminal = execution => Boolean(execution.status?.completionTime ||
-  ['True', 'False'].includes(execution.status?.conditions?.find(c => c.type === 'Completed')?.status));
 export function executionSummary(execution) {
   return { execution: execution.metadata?.name, started: execution.status?.startTime,
     completed: execution.status?.completionTime, running: execution.status?.runningCount,
@@ -76,22 +55,10 @@ export async function executeFiniteVideoJob({ configuration = 'saved', validateO
     sourceValidations = read(['run', 'jobs', 'executions', 'list', '--job=' + JOB], sourceRegion).filter(x => !terminal(x));
     if (sourceValidations.some(x => !x.spec?.template?.spec?.containers?.[0]?.env?.some(e => e.name === 'VIDEO_VALIDATE_ONLY' && e.value === 'true')))
       throw new Error('A real source render is active; regional placement stopped');
-    const services = read(['run', 'services', 'list']);
-    const required = requiredRegionalAllocation(services, task);
-    const token = run(['auth', 'print-access-token']);
-    const granted = {};
-    for (const [key, quotaId] of [['cpu', 'CpuAllocPerProjectRegion'], ['memory', 'MemAllocPerProjectRegion']]) {
-      const response = await request('https://cloudquotas.googleapis.com/v1/projects/484736877039/locations/global/services/run.googleapis.com/quotaInfos/' + quotaId,
-        { headers: { authorization: 'Bearer ' + token }, signal: AbortSignal.timeout(30000) });
-      if (!response.ok) throw new Error('Unable to verify approved target-region quota');
-      const info = await response.json();
-      const value = info.dimensionsInfos?.find(x => x.dimensions?.region === region)?.details?.value;
-      if (!/^(?:-1|\d+)$/.test(String(value))) throw new Error('Target-region quota is unavailable');
-      granted[key] = Number(value);
-      if (granted[key] !== -1 && required[key] > granted[key]) throw new Error('Approved target-region quota does not cover bounded workloads');
-    }
-    log({ targetRegionCapacity: region, required, granted });
   }
+  const capacity = await inspectRegionalCapacity({ region, task, run, request });
+  log({ regionalCapacity: capacity });
+  if (!capacity.fits) throw new Error('Approved target-region quota does not cover bounded workloads');
   if (configuration === 'redeploy') {
     const service = read(['run', 'services', 'describe', 'elevate-admin-migration'], 'us-central1');
     const traffic = (service.status?.traffic || []).filter(x => x.percent > 0);

@@ -4,7 +4,7 @@ const project='elegant-racer-299721',region=process.env.CANDIDATE_REGION||'us-ce
 if(!['us-central1','us-east1'].includes(region))throw Error('Unsupported public runtime region');
 function gcloud(args){const result=execFileSync('gcloud',[...args,'--project='+project,'--format=json'],{encoding:'utf8',timeout:180000,stdio:['ignore','pipe','pipe']});return result.trim()?JSON.parse(result):{};}
 export async function activateTestedRevision({service,revision,commit,read=gcloud,fetcher=fetch,attempts=12,pause=()=>new Promise(resolve=>setTimeout(resolve,2000))}){
- if(!['elevate-marketing-migration','elevate-store-migration'].includes(service)||!new RegExp('^'+service+'-[a-z0-9-]+$').test(revision||'')||!/^[a-f0-9]{40}$/.test(commit||''))throw Error('Exact service, revision and immutable commit required');
+ if(!['elevate-marketing-migration','elevate-store-migration','elevate-admin-migration'].includes(service)||!new RegExp('^'+service+'-[a-z0-9-]+$').test(revision||'')||!/^[a-f0-9]{40}$/.test(commit||''))throw Error('Exact service, revision and immutable commit required');
  const metadata=read(['run','revisions','describe',revision,'--region='+region]);
  if(!/@sha256:[a-f0-9]{64}$/.test(metadata.spec?.containers?.[0]?.image||''))throw Error('Candidate image must be immutable');
  const tag='c-'+commit.slice(0,12);

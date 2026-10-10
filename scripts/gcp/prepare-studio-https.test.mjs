@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {checkHostRoute,publicUnit,hostFirewall} from './prepare-studio-https.mjs';
+test('an unrelated hostname cannot be replaced with the browser backend',()=>{const map={name:'elevate-public-routes',hostRules:[{hosts:['admin.elevateforhumanity.org'],pathMatcher:'admin'}],pathMatchers:[]};assert.equal(checkHostRoute(map),false);map.hostRules.push({hosts:['browser.elevateforhumanity.org'],pathMatcher:'admin'});assert.throws(()=>checkHostRoute(map),/requires review/);});
+test('accept only the owned browser route',()=>{const map={name:'elevate-public-routes',hostRules:[{hosts:['browser.elevateforhumanity.org'],pathMatcher:'studio-browser'}],pathMatchers:[{name:'studio-browser',defaultService:'global/backendServices/elevate-studio-browser-backend'}]};assert.equal(checkHostRoute(map),true);map.pathMatchers[0].pathRules=[{paths:['/*']}];assert.throws(()=>checkHostRoute(map),/review/);});
+test('private publication installs the source firewall before the container starts',()=>{const unit=publicUnit('10.128.0.3');assert.ok(unit.includes('--publish=10.128.0.3:3100:3100'));assert.ok(unit.includes('ExecStartPre=/usr/local/sbin/elevate-studio-firewall'));assert.ok(!unit.includes('--publish=0.0.0.0'));assert.throws(()=>publicUnit('8.8.8.8'),/private/);assert.ok(hostFirewall.includes('-j DROP'));execFileSync('bash',['-n'],{input:hostFirewall});});

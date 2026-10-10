@@ -231,6 +231,9 @@ async function getKokoroModel(): Promise<KokoroModel> {
       const model = await KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
         dtype: 'q8',
         device: 'cpu',
+        // The image preloads Kokoro at build time. Never download model files
+        // while rendering lessons: remote 429s must not fail production jobs.
+        local_files_only: true,
       });
       return model as unknown as KokoroModel;
     });

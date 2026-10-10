@@ -1,4 +1,4 @@
-// pre-auth-registry: exempt - requireProgramHolder verifies the authenticated holder and every query is profile-scoped.
+// pre-auth-registry: exempt - phoneActorResponse wraps requireCommunicationActor; all queries are scoped to its verified profile.
 import { NextResponse } from 'next/server';
 import { phoneActorResponse } from '@/lib/phone/actor-response';
 import { asteriskDeviceStatus, asteriskDeviceId } from '@/lib/phone/asterisk';
@@ -18,9 +18,7 @@ const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DEVICE_ID = /^[A-Za-z0-9_-]{16,100}$/;
 
-async function phoneContext() {
-  const { actor: ctx, response: actorError } = await phoneActorResponse();
-  if (actorError) return actorError;
+async function phoneContext(ctx: NonNullable<Awaited<ReturnType<typeof phoneActorResponse>>['actor']>) {
   const { data: extension } = await ctx.db
     .from('communication_extensions')
     .select('*,communication_workspaces!inner(id,phone_system_id)')
@@ -73,7 +71,9 @@ function safeSchedule(value: unknown): AvailabilitySchedule | null {
 }
 
 export async function GET() {
-  const { ctx, extension, system, phoneNumber } = await phoneContext();
+  const { actor: ctx, response: actorError } = await phoneActorResponse();
+  if (actorError) return actorError;
+  const { extension, system, phoneNumber } = await phoneContext(ctx);
   if (!extension || !system || !phoneNumber) {
     return NextResponse.json(
       { error: 'An administrator has not assigned a phone extension to this account.' },
@@ -179,7 +179,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const { ctx, extension } = await phoneContext();
+  const { actor: ctx, response: actorError } = await phoneActorResponse();
+  if (actorError) return actorError;
+  const { extension } = await phoneContext(ctx);
   if (ctx.previewing) {
     return NextResponse.json(
       {

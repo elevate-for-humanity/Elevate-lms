@@ -1,6 +1,8 @@
 name: Audit independent Elevate PBX call path
 on:
   workflow_dispatch:
+  pull_request:
+    paths: ['.github/workflows/audit-owned-pbx-callpath.yml', 'scripts/gcp/*pbx*']
   push:
     branches: [main]
     paths:
@@ -15,6 +17,17 @@ concurrency:
   group: google-pbx-infrastructure
   cancel-in-progress: false
 jobs:
+  audit-contract:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python3 scripts/gcp/test-audit-pbx-runtime.py
+      - run: node --check scripts/gcp/verify-pbx-transport.mjs
   dispatch:
     if: github.event_name == 'push'
     runs-on: ubuntu-24.04

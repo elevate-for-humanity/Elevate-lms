@@ -204,3 +204,16 @@ run 38034405331 verified its authenticated regional runtime, then stopped becaus
 public invoker access requires the owner to grant the intended permission.
 Neither run proves a completed public deployment. No IAM or traffic changes were
 made to work around these failures.
+
+The audit prerequisite PR 1695 merged at
+`e0cfc9a089c43bceeed1f15b0ca293e662187c2a` after the required gate and its parser
+contract passed. The live audit still must finish before runtime findings can
+be classified. Browser inspection confirmed that the public homepage has main
+telephone links matching the active primary Telnyx number in Supabase (aggregate
+query; no customer data). This verifies link configuration, not an actual call.
+
+Handler-level authorization tests additionally exposed and corrected error
+propagation through both phone settings handlers. All five endpoint files now
+have signed-out handler coverage, with 401/403/503 checks on the GET/PATCH
+context consumers. The targeted authorization/Host Shop rerun passed 16 tests;
+LMS TypeScript was rerun without incremental cache and passed.

@@ -117,7 +117,7 @@ test('Admin verification preserves authorization, reviewed hours, ledger and aud
       -- verification trigger itself must reject a forged client claim.
       GRANT UPDATE ON progress_entries TO authenticated;
     `);
-    const migration = await fs.readFile(new URL('../../supabase/migrations/20261010171742_admin_hours_preserve_verification_triggers.sql', import.meta.url), 'utf8');
+    const migration = await fs.readFile(new URL('../../supabase/migrations/20261010172521_admin_hours_preserve_verification_triggers.sql', import.meta.url), 'utf8');
     await db.exec(migration);
     await db.exec(migration); // CREATE OR REPLACE and privilege changes are replay-safe.
     await db.exec(`CREATE TRIGGER trg_lock_verification_fields

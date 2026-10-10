@@ -12,6 +12,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import type { MediaStoryboard } from './media-director';
 import type { InstructionalQualityEvidence } from './instructional-quality-gate';
 import { configuredNarrationProvider } from './edge-tts';
+import { MIN_TITLE_WORD_COVERAGE, readEncodedTitle } from './title-readability.mjs';
 
 export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v7';
 
@@ -26,7 +27,7 @@ const MIN_ASR_NARRATION_COVERAGE = 0.9;
 export interface MediaQualityEvidence {
   mediaSha256?: string;
   actualTranscript?: string;
-  readability?: Array<{ scene: number; width: number; wordCoverage: number }>;
+  readability?: Array<{ scene: number; width: number; wordCoverage: number; ocrMode?: 'full-frame' | 'title-region' }>;
   teachingVisualEvidence?: Array<{sceneId:string;step:number;width:number;time:number;expected:string;decoded:string;wordCoverage:number;ocrMode?:'sparse'|'block'}>;
   sceneNarrationEvidence?: Array<{sceneId:string;startSeconds:number;endSeconds:number;actualTranscript:string;coverage:number}>;
   gateVersion: typeof MEDIA_QUALITY_GATE_VERSION;
@@ -532,7 +533,7 @@ export async function enforceMediaQuality(input: {
 
     // OCR the encoded title at desktop and a phone-sized delivery width.
     // Metadata about font sizes cannot establish that the final picture is readable.
-    const readability: Array<{ scene: number; width: number; wordCoverage: number }> = [];
+    const readability: NonNullable<MediaQualityEvidence['readability']> = [];
     const teachingVisualEvidence: NonNullable<MediaQualityEvidence['teachingVisualEvidence']> = [];
     const sceneNarrationEvidence: NonNullable<MediaQualityEvidence['sceneNarrationEvidence']> = [];
     let sceneStart = 3;
@@ -556,21 +557,11 @@ export async function enforceMediaQuality(input: {
           ],
           { timeout: 30000, maxBuffer: 1000000 },
         );
-        const { stdout: ocr } = await execFileAsync('tesseract', [frame, 'stdout', '--psm', '11'], {
-          timeout: 30000,
-          maxBuffer: 1000000,
+        const { wordCoverage, ocrMode } = await readEncodedTitle({
+          frame, expectedTitle: scene.subject, titleLayout: scene.titleLayout,
         });
-        const titleWords: string[] =
-          String(scene.subject)
-            .toLowerCase()
-            .match(/[a-z0-9]+/g) ?? [];
-        const expected = [...new Set(titleWords.filter((w) => w.length > 2))];
-        const decoded = new Set(ocr.toLowerCase().match(/[a-z0-9]+/g) ?? []);
-        const wordCoverage = expected.length
-          ? expected.filter((w) => decoded.has(w)).length / expected.length
-          : 0;
-        readability.push({ scene: index + 1, width, wordCoverage });
-        if (wordCoverage < 0.75) throw new Error(`MEDIA_TEXT_UNREADABLE:${index + 1}:${width}`);
+        readability.push({ scene: index + 1, width, wordCoverage, ocrMode });
+        if (wordCoverage < MIN_TITLE_WORD_COVERAGE) throw new Error(`MEDIA_TEXT_UNREADABLE:${index + 1}:${width}`);
       }
       // Inspect every authored teaching state in the encoded movie, including
       // phone delivery. A diagram or record listed in metadata is not evidence

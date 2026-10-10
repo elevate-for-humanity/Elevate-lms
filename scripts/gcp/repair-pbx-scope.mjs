@@ -1,7 +1,8 @@
 import {readFileSync,writeFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import {setTimeout as delay} from 'node:timers/promises';
-import {google,PROJECT} from './runtime-config.mjs';
+import {spawnSync} from 'node:child_process';
+import {google,googleFailureCode,PROJECT} from './runtime-config.mjs';
 import {digest} from './repair-pbx-startup-metadata.mjs';
 
 export const ZONE='us-central1-a', VM='elevate-pbx';
@@ -9,6 +10,17 @@ const BASE=`https://compute.googleapis.com/compute/v1/projects/${PROJECT}`;
 export const INSTANCE=`${BASE}/zones/${ZONE}/instances/${VM}`;
 export const CLOUD_SCOPE='https://www.googleapis.com/auth/cloud-platform';
 export const VM_PERMISSIONS=['compute.instances.get','compute.instances.stop','compute.instances.start','compute.instances.setServiceAccount'];
+
+export function guardResult(result){
+  let report;
+  try{report=JSON.parse(result.stdout);}catch{ /* Raw SSH/CLI errors are never emitted. */ }
+  if(result.status===0 && report?.result==='PASS')return report;
+  const allowed=new Set(['active_calls_or_channels_not_zero','configured_endpoints_require_maintenance_review',
+    'legacy_sip_state_requires_review','runtime_readback_failed','expected_container_not_running',
+    'container_restart_policy_requires_review','configuration_mount_requires_review','container_set_requires_review',
+    'post_restart_configuration_or_container_changed','restart_guard_unavailable']);
+  throw Error(allowed.has(report?.code)?report.code:`restart_guard_${googleFailureCode(result.stderr)}`);
+}
 
 export function validateInstance(vm,project,addresses,startup){
   if(vm.name!==VM || !vm.id || vm.status!=='RUNNING' || !vm.zone?.endsWith(`/projects/${PROJECT}/zones/${ZONE}`) ||
@@ -101,8 +113,8 @@ if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href){
       if(!r.ok)throw Error(`google_http_${r.status}`);
       return r.json();
     };
-    const guard=async phase=>JSON.parse(google(['compute','ssh',VM,'--project',PROJECT,'--zone',ZONE,'--quiet',
-      `--command=sudo python3 - ${phase}`],readFileSync('scripts/gcp/pbx-restart-guard.py','utf8')));
+    const guard=async phase=>guardResult(spawnSync('gcloud',['compute','ssh',VM,'--project',PROJECT,'--zone',ZONE,'--quiet',
+      `--command=sudo python3 - ${phase}`],{input:readFileSync('scripts/gcp/pbx-restart-guard.py','utf8'),encoding:'utf8',timeout:120000,maxBuffer:1048576}));
     const report=await repairScope({request,guard,startup:readFileSync('infra/pbx/google-startup.sh','utf8'),apply:process.argv.includes('--apply'),
       save:data=>writeFileSync('pbx-scope-rollback-evidence.json',JSON.stringify(data,null,2))});
     writeFileSync(output,JSON.stringify(report,null,2));console.log(JSON.stringify(report));

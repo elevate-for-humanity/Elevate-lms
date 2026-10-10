@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {repairScope,validateInstance,VM_PERMISSIONS,CLOUD_SCOPE,INSTANCE} from './repair-pbx-scope.mjs';
+import {repairScope,validateInstance,guardResult,VM_PERMISSIONS,CLOUD_SCOPE,INSTANCE} from './repair-pbx-scope.mjs';
 const startup='#!/bin/bash\n# preserved bootstrap\n';
 function fixture({missing=false,failSet=false,concurrent=false,active=false}={}){
   const vm={id:'1',name:'elevate-pbx',status:'RUNNING',zone:'https://compute.googleapis.com/compute/v1/projects/elegant-racer-299721/zones/us-central1-a',
@@ -56,4 +56,8 @@ test('unreserved IP, changed bootstrap, or unexpected VM cannot be restarted',()
 test('already scoped VM is not restarted',async()=>{
   const f=fixture();f.vm.serviceAccounts[0].scopes.push(CLOUD_SCOPE);
   const result=await repairScope(f);assert.equal(result.result,'PASS');assert.equal(result.changed,false);assert.deepEqual(f.mutations,[]);
+});
+test('remote guard failures retain exact allowlisted causes without leaking CLI output',()=>{
+  assert.throws(()=>guardResult({status:1,stdout:JSON.stringify({result:'BLOCKED',code:'configured_endpoints_require_maintenance_review'})}),/configured_endpoints_require_maintenance_review/);
+  assert.throws(()=>guardResult({status:1,stdout:'private credentials',stderr:'Permission denied: private details'}),/^Error: restart_guard_permission_denied$/);
 });

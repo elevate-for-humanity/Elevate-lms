@@ -33,6 +33,21 @@ test('billing audit distinguishes unreadable from disabled and excludes raw erro
   assert(!JSON.stringify(result).includes('private'));
 });
 
+test('billing denial identifies disabled API without exposing unrelated error metadata', async () => {
+  const result = await inspectProjectBilling('private-token', async () => ({ok: false, status: 403,
+    json: async () => ({error: {status: 'PERMISSION_DENIED', message: 'private-message', details: [
+      {'@type': 'type.googleapis.com/google.rpc.ErrorInfo', reason: 'SERVICE_DISABLED', metadata: {
+        service: 'cloudbilling.googleapis.com', consumer: 'projects/484736877039', account: 'private-account',
+        permission: 'resourcemanager.projects.get',
+      }},
+    ]}})}));
+  assert.equal(result.reads[0].reason, 'SERVICE_DISABLED');
+  assert.equal(result.reads[0].service, 'cloudbilling.googleapis.com');
+  assert.equal(result.reads[0].targetProjectConsumer, true);
+  assert.equal(result.reads[0].permission, 'resourcemanager.projects.get');
+  assert(!/private|484736877039/.test(JSON.stringify(result)));
+});
+
 test('billing audit does not follow an invalid account resource or expose transport errors', async () => {
   let count = 0;
   const result = await inspectProjectBilling('private-token', async () => {

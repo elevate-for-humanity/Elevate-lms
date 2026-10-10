@@ -29,17 +29,6 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - name: Remove the exposed diagnostic failure log while retaining its run metadata
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          node --input-type=module <<'NODE'
-          const response=await fetch('https://api.github.com/repos/'+process.env.GITHUB_REPOSITORY+'/actions/runs/38065381571/logs',{
-            method:'DELETE',headers:{authorization:'Bearer '+process.env.GH_TOKEN,accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},signal:AbortSignal.timeout(30000)
-          });
-          console.log(JSON.stringify({incidentRun:38065381571,logRemovalHttpStatus:response.status}));
-          if(![204,404].includes(response.status))throw new Error('Exposed diagnostic log removal failed');
-          NODE
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -92,13 +81,13 @@ jobs:
             const services=JSON.parse(safeExecFileSync('gcloud',['run','services','list','--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             const jobs=JSON.parse(safeExecFileSync('gcloud',['run','jobs','list','--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             console.log(JSON.stringify({capacityInventory:true,region,services:services.map(s=>({name:s.metadata.name,configuredResources:s.spec.template.spec.containers.map(c=>c.resources?.limits),configuredScaling:Object.fromEntries(Object.entries(s.spec.template.metadata.annotations||{}).filter(([k])=>/Scale|cpu-throttling/.test(k))),traffic:s.status?.traffic?.map(t=>({revision:t.revisionName,percent:t.percent}))})),jobs:jobs.map(j=>({name:j.metadata.name,resources:j.spec.template.spec.template.spec.containers.map(c=>c.resources?.limits),executionCount:j.status?.executionCount,latestExecution:j.status?.latestCreatedExecution}))}));
-            const revisions=JSON.parse(safeExecFileSync('gcloud',['run','revisions','list','--region='+region,base[0],'--format=json(metadata.name,metadata.labels,metadata.annotations,spec.containers.resources,spec.containers.startupProbe,spec.containers.livenessProbe,status.conditions)'],{encoding:'utf8',maxBuffer:8*1024*1024,stdio:['ignore','pipe','pipe']}));
+            const revisions=JSON.parse(safeExecFileSync('gcloud',['run','revisions','list','--region='+region,...base],{encoding:'utf8',maxBuffer:8*1024*1024,stdio:['ignore','pipe','pipe']}));
             const referenced=new Set(services.flatMap(s=>[s.status?.latestCreatedRevisionName,...(s.status?.traffic||[]).map(t=>t.revisionName)]).filter(Boolean));
             for(const r of revisions.filter(r=>referenced.has(r.metadata.name)||r.status?.conditions?.some(c=>c.type==='Active'&&c.status==='True'))) {
               console.log(JSON.stringify({revisionCapacity:true,region,revision:r.metadata.name,service:r.metadata.labels?.['serving.knative.dev/service'],resources:r.spec.containers.map(c=>c.resources?.limits),scaling:Object.fromEntries(Object.entries(r.metadata.annotations||{}).filter(([k])=>/Scale|cpu-throttling|startup-cpu-boost/.test(k))),healthChecks:r.spec.containers.map(c=>({startupProbe:c.startupProbe||null,livenessProbe:c.livenessProbe||null})),conditions:r.status?.conditions?.map(c=>({type:c.type,status:c.status,reason:c.reason}))}));
             }
             for(const j of jobs) {
-              const executions=JSON.parse(safeExecFileSync('gcloud',['run','jobs','executions','list','--job='+j.metadata.name,'--region='+region,base[0],'--format=json(metadata.name,metadata.creationTimestamp,status,spec.template.spec.containers.resources)'],{encoding:'utf8',maxBuffer:8*1024*1024,stdio:['ignore','pipe','pipe']}));
+              const executions=JSON.parse(safeExecFileSync('gcloud',['run','jobs','executions','list','--job='+j.metadata.name,'--region='+region,...base],{encoding:'utf8',maxBuffer:8*1024*1024,stdio:['ignore','pipe','pipe']}));
               console.log(JSON.stringify({activeJobExecutions:true,region,job:j.metadata.name,executions:executions.filter(e=>!e.status?.completionTime&&!e.status?.conditions?.some(c=>c.type==='Completed'&&['True','False'].includes(c.status))).map(e=>({name:e.metadata.name,created:e.metadata.creationTimestamp,started:e.status?.startTime,running:e.status?.runningCount,resources:e.spec?.template?.spec?.containers?.map(c=>c.resources?.limits)}))}));
             }
           }

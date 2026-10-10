@@ -3,12 +3,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { executeFiniteVideoJob, requiredRegionalAllocation } from './execute-finite-video-render.mjs';
 const image = 'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/admin@sha256:' + 'a'.repeat(64);
+const source = 'VIDEO_VALIDATE_ONLY;startRenderHealthCheck';
+const probe = { httpGet: { path: '/ready', port: 3101 }, timeoutSeconds: 5, periodSeconds: 10, failureThreshold: 60 };
 function fixture({ active = [], outcome = 'True', altered = false } = {}) {
   let job = { spec: { template: { metadata: { labels: { 'client.knative.dev/nonce': 'before' } }, spec: { taskCount: 1, parallelism: 1, template: { spec: {
     serviceAccountName: 'runtime', maxRetries: 0, timeoutSeconds: '3600',
-    containers: [{ image: image.replace(/a{64}$/, 'b'.repeat(64)), command: ['node'], args: ['VIDEO_VALIDATE_ONLY'],
+    containers: [{ image: image.replace(/a{64}$/, 'b'.repeat(64)), command: ['node'], args: [source], startupProbe: structuredClone(probe),
       resources: { limits: { cpu: '8000m', memory: '32Gi' } },
-      env: [{ name: 'VIDEO_JOB_ID', value: 'saved-id' }, { name: 'SECRET', valueFrom: { secretKeyRef: { name: 'bound-secret', key: 'latest' } } }] }],
+      env: [{ name: 'VIDEO_JOB_ID', value: 'saved-id' }, { name: 'SECRET', valueFrom: { secretKeyRef: { name: 'bound-secret', key: 'latest' } } }, { name: 'VIDEO_HEALTH_PORT', value: '3101' }] }],
   } } } } } };
   const before = structuredClone(job);
   const calls = [], logs = [];
@@ -24,7 +26,10 @@ function fixture({ active = [], outcome = 'True', altered = false } = {}) {
     if (command === 'run revisions describe serving') return JSON.stringify({ spec: { serviceAccountName: 'runtime' }, status: { imageDigest: image, conditions: [{ type: 'Ready', status: 'True' }] } });
     if (command === 'run jobs update elevate-video-render') {
       job.spec.template.metadata.labels['client.knative.dev/nonce'] = 'after';
-      Object.assign(job.spec.template.spec.template.spec.containers[0], { image, command: ['node'], args: ['--input-type=module', '-e', 'VIDEO_VALIDATE_ONLY\nawait runFiniteVideoRender();'] });
+      const container = job.spec.template.spec.template.spec.containers[0];
+      Object.assign(container, { image, command: ['node'], args: args.find(x => x.startsWith('--args=')).slice('--args=^~^'.length).split('~') });
+      if (args.some(x => x.startsWith('--startup-probe='))) container.startupProbe = structuredClone(probe);
+      if (!container.env.some(e => e.name === 'VIDEO_HEALTH_PORT')) container.env.push({ name: 'VIDEO_HEALTH_PORT', value: '3101' });
       if (altered) job.spec.template.spec.template.spec.containers[0].resources.limits.memory = '8Gi';
       return '{}';
     }
@@ -33,7 +38,7 @@ function fixture({ active = [], outcome = 'True', altered = false } = {}) {
     if (command === 'run jobs executions tasks') return JSON.stringify([{ metadata: { name: 'task0' }, status: { lastAttemptResult: { status: { code: 14, message: 'Internal error running task.' } } } }]);
     throw new Error('Unexpected command: ' + command);
   };
-  return { calls, logs, before, job, options: { run, log: x => logs.push(x), source: 'VIDEO_VALIDATE_ONLY' } };
+  return { calls, logs, before, job, options: { run, log: x => logs.push(x), source } };
 }
 test("refresh tolerates Google's changed nonce while preserving 8 CPU/32 GiB, exact IDs, secrets and retry settings", async () => {
   const f = fixture();
@@ -45,6 +50,23 @@ test("refresh tolerates Google's changed nonce while preserving 8 CPU/32 GiB, ex
   assert.deepEqual(task.containers[0].env, f.before.spec.template.spec.template.spec.containers[0].env);
   assert.ok(f.calls.some(c => c.join(' ').includes('run revisions describe serving')));
   assert.ok(f.calls.find(c => c[2] === 'execute').includes('--update-env-vars=VIDEO_VALIDATE_ONLY=true'));
+  assert.deepEqual(task.containers[0].startupProbe, probe);
+});
+test('refresh adds a configured HTTP probe and its port without changing saved identities or resources', async () => {
+  const f = fixture(); const container = f.job.spec.template.spec.template.spec.containers[0];
+  delete container.startupProbe; container.env = container.env.filter(e => e.name !== 'VIDEO_HEALTH_PORT');
+  await executeFiniteVideoJob({ ...f.options, configuration: 'redeploy', validateOnly: true });
+  assert.deepEqual(container.startupProbe, probe);
+  const update = f.calls.find(c => c[2] === 'update');
+  assert.ok(update.includes('--startup-probe=httpGet.path=/ready,httpGet.port=3101,timeoutSeconds=5,periodSeconds=10,failureThreshold=60'));
+  assert.ok(update.includes('--update-env-vars=VIDEO_HEALTH_PORT=3101'));
+  assert.deepEqual(container.resources.limits, { cpu: '8000m', memory: '32Gi' });
+  assert.deepEqual(container.env, f.before.spec.template.spec.template.spec.containers[0].env);
+});
+test('saved execution refuses a missing or mismatched startup health check', async () => {
+  const f = fixture(); f.job.spec.template.spec.template.spec.containers[0].startupProbe.httpGet.port = 8080;
+  await assert.rejects(executeFiniteVideoJob(f.options), /startup health check/);
+  assert.equal(f.calls.some(c => c[2] === 'execute'), false);
 });
 test('saved mode never updates the job and explicitly clears validation-only on actual rendering', async () => {
   const f = fixture(); await executeFiniteVideoJob(f.options);

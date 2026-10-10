@@ -12,6 +12,29 @@ function gcloud(args) {
   return result.trim() ? JSON.parse(result) : {};
 }
 
+function trafficRows(state) {
+  return [...(state.spec?.traffic || []), ...(state.status?.traffic || [])].map(item => ({
+    ...item, revisionName: item.revisionName || (item.latestRevision ? state.status?.latestCreatedRevisionName : undefined),
+  }));
+}
+
+export function unusedCandidateTags(state, exceptTag, protectedRevisions = []) {
+  const rows = trafficRows(state);
+  const serving = new Set(rows.filter(item => item.percent > 0).map(item => item.revisionName));
+  const protectedNames = new Set(protectedRevisions);
+  const tags = new Map();
+  // startup-gen2 is the temporary test tag created by recover-startup-runtime.mjs.
+  for (const item of rows) {
+    if ((!/^c-[a-f0-9]{12}$/.test(item.tag || '') && item.tag !== 'startup-gen2') || !item.revisionName) continue;
+    const revisions = tags.get(item.tag) || new Set();
+    revisions.add(item.revisionName);
+    tags.set(item.tag, revisions);
+  }
+  return [...tags].filter(([tag, revisions]) => tag !== exceptTag && revisions.size === 1 &&
+    ![...revisions].some(name => serving.has(name) || protectedNames.has(name)),
+  ).map(([tag]) => tag);
+}
+
 function servingTraffic(state) {
   const totals = new Map();
   for (const item of state.status?.traffic || []) {
@@ -42,37 +65,27 @@ export async function activateTestedRevision({
   const metadata = read(['run', 'revisions', 'describe', revision, '--region=' + region]);
   if (!/@sha256:[a-f0-9]{64}$/.test(metadata.spec?.containers?.[0]?.image || '')) throw Error('Candidate image must be immutable');
   const describe = () => read(['run', 'services', 'describe', service, '--region=' + region]);
-  const update = flag => read(['run', 'services', 'update-traffic', service, '--region=' + region, flag, '--quiet']);
+  const update = (...flags) => read(['run', 'services', 'update-traffic', service, '--region=' + region, ...flags, '--quiet']);
   const before = describe();
   if (servingTraffic(before).reduce((sum, [, percent]) => sum + percent, 0) !== 100) {
     throw Error('Existing serving traffic must be fully resolved before activation');
   }
-  const serving = new Set(servingTraffic(before).map(([name]) => name));
-  // Revision-level minimum instances also run for zero-percent tagged revisions.
-  // Release only obsolete tags created by this routine. Keep the revision/image
-  // for rollback, manual tags, serving revisions, and another release's latest revision.
-  const obsoleteTags = (before.status?.traffic || []).filter(item =>
-    /^c-[a-f0-9]{12}$/.test(item.tag || '') && !(item.percent > 0) &&
-    item.revisionName !== revision && !serving.has(item.revisionName) &&
-    item.revisionName !== before.status?.latestCreatedRevisionName,
-  ).map(item => item.tag);
-  if (obsoleteTags.length) {
-    update('--remove-tags=' + [...new Set(obsoleteTags)].join(','));
-    assertTrafficUnchanged(before, describe());
-  }
-
   const tag = 'c-' + commit.slice(0, 12);
+  // Revision-level minimum instances also run for zero-percent tagged revisions.
+  // Keep images for rollback, custom tags, serving/requested traffic, and a newer
+  // release's latest revision. Ambiguous spec/status mappings are never removed.
+  const obsoleteTags = unusedCandidateTags(before, tag, [revision, before.status?.latestCreatedRevisionName]);
   const releaseFailedTag = () => {
     const current = describe();
-    const inUse = servingTraffic(current).some(([name]) => name === revision);
-    if (!inUse && current.status?.traffic?.some(item => item.tag === tag && item.revisionName === revision && !(item.percent > 0))) {
+    const mappings = trafficRows(current).filter(item => item.tag === tag);
+    if (mappings.length && mappings.every(item => item.revisionName === revision) && unusedCandidateTags(current).includes(tag)) {
       update('--remove-tags=' + tag);
       assertTrafficUnchanged(current, describe());
     }
   };
   try {
     // A pinned latest-ready revision is not proof that this exact candidate works.
-    update('--update-tags=' + tag + '=' + revision);
+    update(...(obsoleteTags.length ? ['--remove-tags=' + obsoleteTags.join(',')] : []), '--update-tags=' + tag + '=' + revision);
     const tagged = describe();
     assertTrafficUnchanged(before, tagged);
     const candidate = tagged.status?.traffic?.find(item => item.tag === tag && item.revisionName === revision);
@@ -111,12 +124,20 @@ export async function activateTestedRevision({
     if (JSON.stringify(servingTraffic(after)) !== JSON.stringify([[revision, 100]])) {
       throw Error('Exact candidate traffic assignment not confirmed');
     }
-    return { service, revision, commit, candidateUrl: candidate.url, candidateHealthy: true, traffic: 100, retiredCandidateTags: obsoleteTags };
+    // After verified promotion, the formerly serving generated/startup test tag
+    // can be released without deleting its rollback revision.
+    const retiredTags = unusedCandidateTags(after, tag, [after.status?.latestCreatedRevisionName]);
+    if (retiredTags.length) {
+      update('--remove-tags=' + retiredTags.join(','));
+      assertTrafficUnchanged(after, describe());
+    }
+    return { service, revision, commit, candidateUrl: candidate.url, candidateHealthy: true, traffic: 100,
+      retiredCandidateTags: [...new Set([...obsoleteTags, ...retiredTags])] };
   } catch (error) {
     // Cloud Run can apply the tag even when the command subsequently reports a
     // startup/quota failure. Read it back and release only our non-serving tag.
     try { releaseFailedTag(); } catch (cleanupError) {
-      throw new AggregateError([error, cleanupError], 'Activation failed and candidate tag cleanup needs retry');
+      throw new AggregateError([error, cleanupError], error.message + '; candidate tag cleanup also needs retry');
     }
     throw error;
   }

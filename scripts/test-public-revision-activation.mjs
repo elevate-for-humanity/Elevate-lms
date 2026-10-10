@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { activateTestedRevision } from './gcp/activate-tested-public-revision.mjs';
+import { activateTestedRevision, unusedCandidateTags } from './gcp/activate-tested-public-revision.mjs';
 
 const commit = 'a'.repeat(40), service = 'elevate-marketing-migration', revision = service + '-candidate-a';
 const healthy = { revision, service: 'marketing', healthy: true, ready: true, configuration: { ok: true }, dependencies: { supabase: { ok: true } }, commit };
@@ -13,7 +13,7 @@ function fixture(state = healthy, status = 200, component = 'marketing') {
     calls.push(args);
     if (args[1] === 'revisions') return { spec: { containers: [{ image: 'registry/image@sha256:' + 'a'.repeat(64) }] } };
     if (args[2] === 'update-traffic') {
-      const flag = args.find(x => /^--(remove-tags|update-tags|to-revisions)=/.test(x));
+      for (const flag of args.filter(x => /^--(remove-tags|update-tags|to-revisions)=/.test(x))) {
       if (flag.startsWith('--remove-tags=')) {
         const tags = flag.slice('--remove-tags='.length).split(',');
         f.traffic = f.traffic.flatMap(item => tags.includes(item.tag) ? (item.percent > 0 ? [{ revisionName: item.revisionName, percent: item.percent }] : []) : [item]);
@@ -23,8 +23,9 @@ function fixture(state = healthy, status = 200, component = 'marketing') {
       } else {
         f.traffic = f.traffic.map(item => ({ ...item, percent: item.revisionName === revision ? 100 : 0 }));
       }
+      }
     }
-    return { status: { latestReadyRevisionName: service + '-old', latestCreatedRevisionName: f.latest, traffic: structuredClone(f.traffic) } };
+    return { spec: f.spec, status: { latestReadyRevisionName: service + '-old', latestCreatedRevisionName: f.latest, traffic: structuredClone(f.traffic) } };
   };
   f.fetcher = async () => ({ ok: status === 200, async json() { return state; } });
   f.options = { service, revision, commit, read: f.read, fetcher: f.fetcher, attempts: 1 };
@@ -72,13 +73,13 @@ test('only obsolete generated zero-percent tags are removed before candidate sta
     { tag: 'c-dddddddddddd', revisionName: f.latest },
   );
   const result = await activateTestedRevision(f.options);
-  assert.deepEqual(result.retiredCandidateTags, ['c-bbbbbbbbbbbb']);
+  assert.deepEqual(result.retiredCandidateTags, ['c-bbbbbbbbbbbb', 'c-cccccccccccc']);
   assert.ok(f.traffic.some(x => x.tag === 'manual-rollback'));
-  assert.ok(f.traffic.some(x => x.tag === 'c-cccccccccccc'));
+  assert.equal(f.traffic.some(x => x.tag === 'c-cccccccccccc'), false);
   assert.ok(f.traffic.some(x => x.tag === 'c-dddddddddddd'));
   const removal = f.calls.findIndex(a => a.includes('--remove-tags=c-bbbbbbbbbbbb'));
   const tagging = f.calls.findIndex(a => a.some(x => x.startsWith('--update-tags=')));
-  assert.ok(removal < tagging);
+  assert.equal(removal, tagging);
   assert.equal(f.calls.some(a => a.includes('delete')), false);
 });
 test('failed tag command is read back and released without changing public traffic', async () => {
@@ -113,3 +114,50 @@ for (const component of ['admin', 'lms', 'store']) {
     assert.equal(result.traffic, 100); assert.equal(f.promoted(), true);
   });
 }
+
+
+test('spec and status traffic both protect serving tags, and ambiguous mappings stay', () => {
+  const rows = [
+    { revisionName: 'serving', percent: 100 },
+    { revisionName: 'serving', tag: 'c-111111111111' },
+    { revisionName: 'old', tag: 'c-222222222222' },
+    { revisionName: 'old', tag: 'release-verified' },
+  ];
+  assert.deepEqual(unusedCandidateTags({ status: { traffic: rows } }), ['c-222222222222']);
+  assert.deepEqual(unusedCandidateTags({ spec: { traffic: [{ revisionName: 'old', percent: 100 }] }, status: { traffic: rows } }), []);
+  assert.deepEqual(unusedCandidateTags({ spec: { traffic: [{ revisionName: 'other', tag: 'c-222222222222' }] }, status: { traffic: rows } }), []);
+});
+test('legacy startup test tag is retired only after successful promotion', async () => {
+  const f = fixture(); f.traffic[0].tag = 'startup-gen2';
+  await activateTestedRevision(f.options);
+  assert.equal(f.traffic.some(item => item.tag === 'startup-gen2'), false);
+  const promotion = f.calls.findIndex(args => args.some(flag => flag.startsWith('--to-revisions=')));
+  const removal = f.calls.findIndex(args => args.includes('--remove-tags=startup-gen2'));
+  assert.ok(removal > promotion);
+});
+test('failure cleanup preserves a candidate requested to serve in spec', async () => {
+  const f = fixture({ ...healthy, healthy: false }, 503);
+  f.options.fetcher = async () => {
+    f.spec = { traffic: [{ revisionName: revision, percent: 100, tag: 'c-aaaaaaaaaaaa' }] };
+    return { ok: false, json: async () => ({ ...healthy, healthy: false }) };
+  };
+  await assert.rejects(activateTestedRevision(f.options), /failed runtime health/);
+  assert.equal(f.calls.some(args => args.includes('--remove-tags=c-aaaaaaaaaaaa')), false);
+});
+test('failed cleanup reports the original failure and the cleanup failure', async () => {
+  const f = fixture(); const read = f.read; f.failTag = true;
+  f.options.read = args => {
+    if (args.some(flag => flag.startsWith('--remove-tags='))) throw Error('cleanup denied');
+    return read(args);
+  };
+  await assert.rejects(activateTestedRevision(f.options), error =>
+    error instanceof AggregateError && /CPU quota/.test(error.message) && error.errors.some(cause => cause.message === 'cleanup denied'));
+});
+
+test('a pending latest-revision traffic assignment protects its candidate tag', () => {
+  const state = { spec: { traffic: [{ latestRevision: true, percent: 100 }] }, status: {
+    latestCreatedRevisionName: revision,
+    traffic: [{ revisionName: service + '-old', percent: 100 }, { revisionName: revision, tag: 'c-aaaaaaaaaaaa' }],
+  } };
+  assert.deepEqual(unusedCandidateTags(state), []);
+});

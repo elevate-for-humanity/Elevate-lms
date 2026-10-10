@@ -199,6 +199,18 @@ jobs:
             --region=us-central1 \
             --image="$IMAGE@$DIGEST" \
             --revision-suffix="$SUFFIX" \
+            --remove-env-vars=GIT_SHA,GITHUB_SHA,NEXT_PUBLIC_GIT_SHA,NEXT_PUBLIC_COMMIT_SHA,NEXT_PUBLIC_BUILD_ID,NF_GIT_SHA,BUILD_TIMESTAMP \
+            --quiet
+          # Runtime labels inherited from an earlier release must not override
+          # the immutable image identity. Explicitly serve the ready revision;
+          # image updates alone preserve a previously pinned traffic target.
+          REVISION="elevate-marketing-migration-$SUFFIX"
+          READY="$(gcloud run services describe elevate-marketing-migration --project=elegant-racer-299721 --region=us-central1 --format='value(status.latestReadyRevisionName)')"
+          test "$READY" = "$REVISION"
+          gcloud run services update-traffic elevate-marketing-migration \
+            --project=elegant-racer-299721 \
+            --region=us-central1 \
+            --to-revisions="$REVISION=100" \
             --quiet
 
       - name: Collect exact failed revision diagnostics

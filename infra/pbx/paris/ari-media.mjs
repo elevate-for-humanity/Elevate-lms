@@ -137,8 +137,10 @@ async function turn(session){
   session.busy=true;
   try{
     const body=await privateTurn(config.adapter,{callId:session.callId,sessionId:session.id,sequence:session.turn++,encoding:'PCMU',sampleRate:8000,audioBase64:voice.toString('base64')},config.token);
+    if(session.closed)return;
     if(typeof body.replyAudioUlawBase64!=='string')throw Error('PARIS_TURN_AUDIO_MISSING');
     await speak(session,body.replyAudioUlawBase64);
+    if(session.closed)return;
     if(body.requestedRoute?.type==='operator') {
       // Operator 0 must first exist in the reviewed live Asterisk dialplan.
       // Resume the allowlisted dialplan route without changing channel technology.

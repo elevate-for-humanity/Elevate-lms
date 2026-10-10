@@ -32,7 +32,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs lib/video/supabase-resumable-upload.test.mjs
+      - run: node --test scripts/gcp/regional-capacity.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs lib/video/supabase-resumable-upload.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -43,8 +43,6 @@ jobs:
           skip_install: true
       - name: Verify runner-supplied Google SDK compatibility
         run: node scripts/gcp/verify-sdk.mjs
-      - name: Configure bounded long-lesson rendering without cancelling existing executions
-        run: gcloud run jobs update elevate-course-builder --project=elegant-racer-299721 --region=us-central1 --task-timeout=10800 --update-env-vars=REMOTION_RENDER_CONCURRENCY=4 --quiet
       - name: Dispatch queued or expired work without overlapping executions
         env:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

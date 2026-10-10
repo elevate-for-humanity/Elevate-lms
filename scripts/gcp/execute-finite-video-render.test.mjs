@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { executeFiniteVideoJob, requiredRegionalAllocation } from './execute-finite-video-render.mjs';
+import { executeFiniteVideoJob } from './execute-finite-video-render.mjs';
 const image = 'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/admin@sha256:' + 'a'.repeat(64);
 const source = 'VIDEO_VALIDATE_ONLY;startRenderHealthCheck';
 const probe = { httpGet: { path: '/ready', port: 3101 }, timeoutSeconds: 5, periodSeconds: 10, failureThreshold: 60 };
@@ -17,6 +17,8 @@ function fixture({ active = [], outcome = 'True', altered = false } = {}) {
   const run = args => {
     calls.push(args);
     const command = args.slice(0, 4).join(' ');
+    if (args[0] === 'auth') return 'test-token';
+    if (['run services list', 'run revisions list', 'run jobs list'].includes(args.slice(0, 3).join(' '))) return '[]';
     if (command === 'run jobs describe elevate-video-render') return JSON.stringify(job);
     if (command === 'run jobs executions list') return JSON.stringify(active);
     if (command === 'run services describe elevate-admin-migration') return JSON.stringify({
@@ -38,7 +40,8 @@ function fixture({ active = [], outcome = 'True', altered = false } = {}) {
     if (command === 'run jobs executions tasks') return JSON.stringify([{ metadata: { name: 'task0' }, status: { lastAttemptResult: { status: { code: 14, message: 'Internal error running task.' } } } }]);
     throw new Error('Unexpected command: ' + command);
   };
-  return { calls, logs, before, job, options: { run, log: x => logs.push(x), source } };
+  const request = async url => ({ ok: true, json: async () => ({ dimensionsInfos: [{ dimensions: { region: 'us-central1' }, details: { value: String(url.endsWith('CpuAllocPerProjectRegion') ? 20000 : 40 * 2 ** 30) } }] }) });
+  return { calls, logs, before, job, options: { run, request, log: x => logs.push(x), source } };
 }
 test("refresh tolerates Google's changed nonce while preserving 8 CPU/32 GiB, exact IDs, secrets and retry settings", async () => {
   const f = fixture();
@@ -79,6 +82,14 @@ test('active Google task blocks updates and duplicate execution with visible ide
   assert.equal(f.calls.some(c => ['update', 'execute'].includes(c[2])), false);
   assert.equal(f.logs[0].activeExecution.execution, 'elevate-video-render-active');
 });
+test('an existing job also checks granted quota before changing settings or executing', async () => {
+  const f = fixture();
+  f.options.request = async () => ({ ok: true, json: async () => ({ dimensionsInfos: [
+    { dimensions: { region: 'us-central1' }, details: { value: '0' } },
+  ] }) });
+  await assert.rejects(executeFiniteVideoJob({ ...f.options, configuration: 'redeploy' }), /does not cover/);
+  assert.equal(f.calls.some(c => ['update', 'execute', 'cancel'].includes(c[2])), false);
+});
 test('terminal platform error is a failure, and task code 14 survives reporting', async () => {
   const f = fixture({ outcome: 'False' });
   await assert.rejects(executeFiniteVideoJob(f.options), /execution failed/);
@@ -95,11 +106,8 @@ test('validation refuses legacy runners that could accidentally render', async (
   assert.equal(f.calls.some(c => c[2] === 'execute'), false);
 });
 
-const targetService = { spec: { template: { metadata: { annotations: { 'autoscaling.knative.dev/maxScale': '2' } }, spec: { containers: [{ resources: { limits: { cpu: '2', memory: '4Gi' } } }] } } } };
-test('regional capacity accounts for every target service at its configured maximum', () => {
-  assert.deepEqual(requiredRegionalAllocation([targetService], fixture().job.spec.template.spec.template.spec), { cpu: 12000, memory: 40 * 2 ** 30 });
-  assert.throws(() => requiredRegionalAllocation([{ spec: { template: { metadata: {}, spec: { containers: [] } } } }], fixture().job.spec.template.spec.template.spec), /bounded maximum/);
-});
+const targetService = { metadata: { name: 'marketing' }, status: { traffic: [{ revisionName: 'marketing-live', percent: 100 }] } };
+const targetRevision = { metadata: { name: 'marketing-live', annotations: { 'autoscaling.knative.dev/maxScale': '2' } }, spec: { containers: [{ resources: { limits: { cpu: '2', memory: '4Gi' } } }] } };
 function migrationFixture({ memoryQuota = 40 * 2 ** 30, realSourceRender = false } = {}) {
   const f = fixture(); let target; let cancelled = false; let submitted = false;
   const source = structuredClone(f.job);
@@ -110,6 +118,7 @@ function migrationFixture({ memoryQuota = 40 * 2 ** 30, realSourceRender = false
     if (args[0] === 'auth') return 'test-token';
     if (command.startsWith('run jobs list')) return '[]';
     if (command.startsWith('run services list')) return JSON.stringify([targetService]);
+    if (command.startsWith('run revisions list')) return JSON.stringify([targetRevision]);
     if (command === 'run jobs describe elevate-video-render') return JSON.stringify(east ? target : source);
     if (command === 'run jobs executions list') return JSON.stringify([{ metadata: { name: 'elevate-video-render-validation' }, spec: { template: { spec: { containers: [{ env: [{ name: 'VIDEO_VALIDATE_ONLY', value: realSourceRender ? 'false' : 'true' }] }] } } } }]);
     if (args.slice(0, 3).join(' ') === 'run jobs replace') { target = JSON.parse(readFileSync(args[3], 'utf8')); return '{}'; }
@@ -126,7 +135,7 @@ test('regional validation copies the saved job within approved quota and cancels
   assert.equal(f.state().cancelled, true); assert.equal(f.state().submitted, true);
   assert.deepEqual(f.state().target.spec.template.spec.template.spec.containers[0].env, f.before.spec.template.spec.template.spec.containers[0].env);
   assert.deepEqual(f.state().target.spec.template.spec.template.spec.containers[0].resources.limits, { cpu: '8000m', memory: '32Gi' });
-  assert.ok(f.calls.filter(c => c[1] === 'revisions').every(c => c.includes('--region=us-central1')));
+  assert.ok(f.calls.filter(c => c[1] === 'revisions' && c[2] === 'describe').every(c => c.includes('--region=us-central1')));
 });
 test('insufficient regional quota prevents creation, cancellation and execution', async () => {
   const f = migrationFixture({ memoryQuota: 32 * 2 ** 30 });

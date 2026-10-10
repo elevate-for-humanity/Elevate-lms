@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { executeFiniteVideoJob } from './execute-finite-video-render.mjs';
 const image = 'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/admin@sha256:' + 'a'.repeat(64);
 function fixture({ active = [], outcome = 'True', altered = false } = {}) {
-  let job = { spec: { template: { spec: { taskCount: 1, parallelism: 1, template: { spec: {
+  let job = { spec: { template: { metadata: { labels: { 'client.knative.dev/nonce': 'before' } }, spec: { taskCount: 1, parallelism: 1, template: { spec: {
     serviceAccountName: 'runtime', maxRetries: 0, timeoutSeconds: '3600',
     containers: [{ image: image.replace(/a{64}$/, 'b'.repeat(64)), command: ['node'], args: ['VIDEO_VALIDATE_ONLY'],
       resources: { limits: { cpu: '8000m', memory: '32Gi' } },
@@ -22,6 +22,7 @@ function fixture({ active = [], outcome = 'True', altered = false } = {}) {
     });
     if (command === 'run revisions describe serving') return JSON.stringify({ spec: { serviceAccountName: 'runtime' }, status: { imageDigest: image, conditions: [{ type: 'Ready', status: 'True' }] } });
     if (command === 'run jobs update elevate-video-render') {
+      job.spec.template.metadata.labels['client.knative.dev/nonce'] = 'after';
       Object.assign(job.spec.template.spec.template.spec.containers[0], { image, command: ['node'], args: ['--input-type=module', '-e', 'VIDEO_VALIDATE_ONLY\nawait runFiniteVideoRender();'] });
       if (altered) job.spec.template.spec.template.spec.containers[0].resources.limits.memory = '8Gi';
       return '{}';
@@ -33,7 +34,7 @@ function fixture({ active = [], outcome = 'True', altered = false } = {}) {
   };
   return { calls, logs, before, job, options: { run, log: x => logs.push(x), source: 'VIDEO_VALIDATE_ONLY' } };
 }
-test('refresh uses the serving immutable image and preserves 8 CPU/32 GiB, exact IDs, secret bindings and retry settings', async () => {
+test("refresh tolerates Google's changed nonce while preserving 8 CPU/32 GiB, exact IDs, secrets and retry settings", async () => {
   const f = fixture();
   await executeFiniteVideoJob({ ...f.options, configuration: 'redeploy', validateOnly: true });
   const update = f.calls.find(c => c[2] === 'update');

@@ -182,6 +182,8 @@ RUN set -eux; \
 RUN node --input-type=module -e "import {bundle} from '@remotion/bundler'; await bundle({entryPoint:'/app/apps/admin/remotion-src/index.ts',outDir:'/tmp/admin-remotion-smoke'});" \
     && rm -rf /tmp/admin-remotion-smoke
 
+# Verify startup as the same unprivileged user used in production.
+USER nextjs
 RUN set -eux; \
     LOG=/tmp/admin-runtime-smoke.log; \
     SMOKE_PORT=3100; \
@@ -212,7 +214,6 @@ RUN set -eux; \
     wait "${PID}" || true; \
     trap - EXIT
 
-USER nextjs
 # Populate the narrator cache under the same identity and package paths used by the live server.
 RUN node /app/apps/admin/workers/admin-speech-cache.mjs
 # A second process must narrate with networking disabled; a runtime model download cannot pass.

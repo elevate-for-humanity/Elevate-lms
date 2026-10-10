@@ -65,6 +65,8 @@ jobs:
             const message=String(item.textPayload ?? item.jsonPayload?.message ?? '');
             if(!/error|failed|exception|ultimate_|claim|complete|starting|polling|once|narration|render|bundl|mp4/i.test(message)) continue;
             const safe=message.replace(/Bearer\s+\S+/gi,'Bearer [redacted]').replace(/(token|password|secret|api[_-]?key)\s*[:=]\s*\S+/gi,'$1=[redacted]').slice(0,1500);
-            console.log(JSON.stringify({timestamp:item.timestamp,severity:item.severity,message:safe}));
+            const context=item.jsonPayload?.context ?? {};
+            const render=Object.fromEntries(['lessonId','percent','renderedFrames','encodedFrames','totalFrames','fps','concurrency','bytes'].filter(k=>context[k]!==undefined).map(k=>[k,context[k]]));
+            console.log(JSON.stringify({timestamp:item.timestamp,severity:item.severity,message:safe,render}));
           }
           NODE

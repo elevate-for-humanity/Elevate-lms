@@ -27,11 +27,14 @@ export function requiredRegionalAllocation(services, task, revisions, executions
   for (const service of services) {
     if (service.metadata?.annotations?.['run.googleapis.com/scalingMode'] === 'manual')
       throw new Error('Manual service scaling requires explicit capacity review');
-    const names = new Set((service.status?.traffic || []).filter(t => t.percent > 0 || t.tag).map(t => t.revisionName));
-    for (const revision of revisions) {
-      if (revision.metadata?.labels?.['serving.knative.dev/service'] === service.metadata?.name &&
-          revision.status?.conditions?.some(c => c.type === 'Active' && c.status === 'True')) names.add(revision.metadata.name);
-    }
+    // Only revisions receiving traffic or retained by a live traffic tag can
+    // scale to the configured maximum. Historical revisions can remain marked
+    // Active after traffic has moved; counting all of them double-counts
+    // regional capacity and blocks the course worker unnecessarily.
+    const names = new Set((service.status?.traffic || [])
+      .filter(t => t.percent > 0 || t.tag)
+      .map(t => t.revisionName || (t.latestRevision ? service.status?.latestReadyRevisionName : null))
+      .filter(Boolean));
     if (!names.size) throw new Error('Service effective revision is unavailable');
     for (const name of names) {
       const revision = revisions.find(r => r.metadata?.name === name);

@@ -37,6 +37,12 @@ const FEATURED_SHOPS = [
 ] as const;
 
 export function HomeFeaturedHostShop() {
+  const seen = new Set<string>();
+  const shops = FEATURED_SHOPS.filter((shop) => {
+    if (shop.shopHref.includes('razors-image') || seen.has(shop.shopHref)) return false;
+    seen.add(shop.shopHref);
+    return true;
+  });
   return (
     <section className="bg-white px-4 py-8 sm:py-12" aria-labelledby="featured-host-shop-heading">
       <div className="mx-auto max-w-6xl">
@@ -48,7 +54,7 @@ export function HomeFeaturedHostShop() {
           <div className="flex flex-col justify-center p-6 sm:p-8"><p className="text-sm font-bold uppercase tracking-widest text-brand-red-700">Featured barber partner</p><h3 className="mt-3 text-3xl font-black">Cal’s Kutz Studio</h3><p className="mt-4 text-base leading-7 text-slate-700">Turn your interest in barbering into your next step. Explore the shop’s work, meet the training environment, and ask about apprenticeship enrollment and available payment plans.</p><Link href="/host-shops/cals-kutz-studio" className="mt-5 inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700">Explore Cal’s Kutz Studio</Link><Link href="/programs/barber-apprenticeship" className="mt-3 inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-slate-50 px-5 py-3 font-bold text-slate-950 hover:bg-slate-100">Start your barber journey</Link></div>
         </article>
         <div data-mobile-grid="2" data-featured-shops className="mt-6 grid grid-cols-2 items-stretch gap-3 lg:grid-cols-4 sm:gap-5">
-          {FEATURED_SHOPS.map((shop) => (
+          {shops.map((shop) => (
             <article key={shop.name} data-featured-shop={shop.name} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
               <Link href={shop.shopHref} className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700">
                 <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">

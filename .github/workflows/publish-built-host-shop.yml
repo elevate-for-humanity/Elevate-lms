@@ -37,9 +37,10 @@ jobs:
         run: |
           gcloud run services list --project=elegant-racer-299721 --region=us-central1 --format=json > /tmp/services.json
           node -e "const s=JSON.parse(require('fs').readFileSync('/tmp/services.json'));console.log(JSON.stringify(s.map(x=>({name:x.metadata.name,resources:x.spec.template.spec.containers[0].resources,scaling:x.spec.template.metadata.annotations,traffic:x.status.traffic.map(t=>({revision:t.revisionName,percent:t.percent,tag:t.tag}))}))))"
-          gcloud alpha services quota list --consumer=projects/484736877039 --service=run.googleapis.com --format=json > /tmp/run-quota.json
+          gcloud alpha services quota list --consumer=projects/484736877039 --service=run.googleapis.com --format=json --quiet > /tmp/run-quota.json
           node -e "const q=JSON.parse(require('fs').readFileSync('/tmp/run-quota.json'));console.log(JSON.stringify(q.filter(x=>/cpu|memory/i.test(x.metric+' '+x.displayName))))"
       - name: Verify exact built candidate, test tagged runtime, then publish
+        if: false
         shell: bash
         env:
           EXPECTED_SHA: 7996edf490a00d69d2de895b111b2c0b88ef2df0

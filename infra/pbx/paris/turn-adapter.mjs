@@ -58,6 +58,14 @@ export async function converse(history,request=googleJson){
   if(!result)throw Error('EMPTY_PARIS_ANSWER');
   return result.slice(0,1200);
 }
+// Routing is driven by a caller's explicit request, not by generated model text.
+// No external dial string or arbitrary extension can be routed by this service.
+export function callerRouteIntent(transcript){
+  const text=String(transcript||'').toLowerCase().trim();
+  const asked=/(?:\\b(?:transfer|connect|speak|talk|reach|put me through)\\b.{0,48}\\b(?:operator|administrator|human|person|representative|front desk)\\b|\\b(?:operator|administrator)\\b.{0,28}\\bplease\\b)/i;
+  return asked.test(text)?{type:'operator',extension:'0'}:null;
+}
+
 export async function synthesize(text,request=googleJson){
   const data=await request('https://texttospeech.googleapis.com/v1/text:synthesize',{input:{text},voice:{languageCode:'en-US',name:process.env.PARIS_TTS_VOICE||'en-US-Neural2-F'},audioConfig:{audioEncoding:'LINEAR16',sampleRateHertz:8000}});
   if(!data.audioContent)throw Error('EMPTY_TTS_AUDIO');
@@ -92,12 +100,13 @@ export function makeTurnHandler({stt=recognize,llm=converse,tts=synthesize,token
         const words=await stt(body.audioBase64);
         if(!words)return fail('NO_SPEECH',422);
         const history=[...prior.history,{role:'user',text:words}].slice(-12);
-        const reply=await llm(history);
+        const route=callerRouteIntent(words);
+        const reply=route?'I will connect you to the operator now.':await llm(history);
         const audioReply=await tts(reply);
         prior.history=[...history,{role:'model',text:reply}].slice(-12);
         prior.sequence=body.sequence;prior.updated=Date.now();
         res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});
-        res.end(JSON.stringify({replyAudioUlawBase64:audioReply,endCall:false}));
+        res.end(JSON.stringify({replyAudioUlawBase64:audioReply,endCall:false,...(route?{requestedRoute:route}:{})}));
       }finally{prior.locked=false;}
     }catch(err){
       // Log stable error codes, not caller speech, audio, credentials, or model output.

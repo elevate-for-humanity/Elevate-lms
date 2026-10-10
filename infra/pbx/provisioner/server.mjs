@@ -128,7 +128,7 @@ async function supabaseOwner(identity, config, fetchImpl) {
   const query = new URL('/rest/v1/communication_extensions', config.supabaseUrl);
   query.searchParams.set('id', `eq.${identity.extensionId}`);
   query.searchParams.set('profile_id', `eq.${identity.profileId}`);
-  query.searchParams.set('select', 'id,profile_id,extension,enabled,webrtc_provider,ring_seconds,ring_mode,availability_source,availability_schedule,communication_workspaces!inner(phone_system_id,phone_systems!inner(admin_extension,timezone))');
+  query.searchParams.set('select', 'id,profile_id,extension,enabled,webrtc_provider,ring_seconds,ring_mode,availability_source,availability_schedule,communication_workspaces!inner(phone_system_id,phone_systems!inner(admin_extension,timezone,status))');
   const response = await fetchImpl(query, {
     headers: { apikey: config.supabaseKey, authorization: `Bearer ${config.supabaseKey}` },
     signal: AbortSignal.timeout(10000), redirect: 'error',
@@ -142,7 +142,7 @@ async function supabaseOwner(identity, config, fetchImpl) {
     throw new ProvisioningError('device_not_authorized', 403);
   }
   const system = row.communication_workspaces.phone_systems;
-  if (!system || !EXTENSION.test(system.admin_extension) || !/^[A-Za-z_]+(?:\/[A-Za-z_+-]+)+$/.test(system.timezone)) {
+  if (!system || system.status !== 'active' || !EXTENSION.test(system.admin_extension) || !/^[A-Za-z_]+(?:\/[A-Za-z_+-]+)+$/.test(system.timezone)) {
     throw new ProvisioningError('phone_system_configuration_invalid');
   }
   try { new Intl.DateTimeFormat('en-US', { timeZone: system.timezone }).format(); }

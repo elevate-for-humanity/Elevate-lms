@@ -132,7 +132,7 @@ must not be replaced by a one-way audio demonstration or a passing health URL.
 
 ## Source verification for this draft
 
-- 29 affected Vitest checks passed across device/client boundaries, notification
+- 35 affected Vitest checks passed across device/client boundaries, notification
   delivery, existing call routing and Host Shop communication contracts.
 - 8 Node tests passed for the loopback provisioner, authorization, availability,
   qualified contacts, transactional rollback and lease/owner revocation.
@@ -140,5 +140,5 @@ must not be replaced by a one-way audio demonstration or a passing health URL.
   PGlite 0.5.8 PostgreSQL engine. No test data was inserted in Supabase.
 - LMS TypeScript check passed. Scoped ESLint passed without source warnings
   (the sparse checkout emits an unrelated Pages-directory configuration notice).
-- A dedicated CI workflow also runs the migration contract on PostgreSQL 17.
+- The dedicated CI migration contract passed on PostgreSQL 17 (job 114157565721).
   Full GitHub CI/build results must be reviewed before marking this draft ready.

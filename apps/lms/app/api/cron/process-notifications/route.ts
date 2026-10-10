@@ -24,12 +24,17 @@ async function post(request: NextRequest) {
 
   try {
     const result = await processNotificationQueue();
-    return NextResponse.json({
-      success: true,
-      ...result,
-      runtime: 'lms-failover',
-      timestamp: new Date().toISOString(),
-    });
+    const success = result.errors.length === 0 && result.failed === 0;
+    return NextResponse.json(
+      {
+        success,
+        deliveryContract: NOTIFICATION_DELIVERY_CONTRACT,
+        ...result,
+        runtime: 'lms-failover',
+        timestamp: new Date().toISOString(),
+      },
+      { status: success ? 200 : 503 },
+    );
   } catch {
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
@@ -45,6 +50,7 @@ async function get(request: NextRequest) {
     return NextResponse.json({
       success: true,
       stats,
+      deliveryContract: NOTIFICATION_DELIVERY_CONTRACT,
       runtime: 'lms-failover',
       timestamp: new Date().toISOString(),
     });

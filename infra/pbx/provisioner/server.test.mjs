@@ -54,7 +54,7 @@ async function fixture(t) {
       if (String(url).includes('phone_webrtc_devices')) return [{ id: 'fixture' }];
       return authorized ? [{ id: identity.extensionId, profile_id: identity.profileId, extension: '101',
         enabled: true, webrtc_provider: 'asterisk', ring_seconds: 20, ring_mode: 'ring', availability_source: 'manual',
-        communication_workspaces: { phone_system_id: config.phoneSystemId, phone_systems: { admin_extension: '101', timezone: record.timezone } } }] : [];
+        communication_workspaces: { phone_system_id: config.phoneSystemId, phone_systems: { admin_extension: '101', timezone: record.timezone, status: 'active' } } }] : [];
     } }),
     command: async cmd => {
       if (cmd.endsWith('reload')) return 'Reloaded';

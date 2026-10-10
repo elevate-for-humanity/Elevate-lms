@@ -31,7 +31,7 @@ jobs:
           version: 10.28.2
       - run: pnpm install --frozen-lockfile
       - run: node --test infra/pbx/provisioner/server.test.mjs
-      - run: pnpm exec vitest run tests/unit/asterisk-device.test.ts tests/unit/asterisk-browser-client.test.ts tests/unit/notification-delivery.test.ts tests/unit/phone-call-flow.test.ts tests/unit/phone-routing.test.ts tests/unit/program-holder-phone-availability.test.ts tests/unit/host-shop-communications-contract.test.ts
+      - run: pnpm exec vitest run tests/unit/asterisk-device.test.ts tests/unit/asterisk-browser-client.test.ts tests/unit/notification-delivery.test.ts tests/unit/notification-route.test.ts tests/unit/phone-call-flow.test.ts tests/unit/phone-routing.test.ts tests/unit/program-holder-phone-availability.test.ts tests/unit/host-shop-communications-contract.test.ts
   migration-contract:
     runs-on: ubuntu-24.04
     services:

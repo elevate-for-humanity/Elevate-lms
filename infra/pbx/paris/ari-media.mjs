@@ -103,7 +103,14 @@ async function turn(session){
     const body=await response.json();
     if(typeof body.replyAudioUlawBase64!=='string')throw Error('PARIS_TURN_AUDIO_MISSING');
     await speak(session,body.replyAudioUlawBase64);
-    if(body.endCall===true)await end(session);
+    if(body.requestedRoute?.type==='operator') {
+      // Operator 0 must first exist in the reviewed live Asterisk dialplan.
+      // The ARI redirect is deliberately limited to the internal context.
+      if(body.requestedRoute.extension!=='0') throw Error('ROUTE_NOT_ALLOWED');
+      const path='/channels/'+encode(session.callId)+'/redirect?endpoint='+encode('Local/0@internal');
+      await ari(path,'POST');
+      await end(session);
+    } else if(body.endCall===true) await end(session);
   }catch(e){
     // Fail closed: do not claim the caller was served when the AI is unavailable.
     process.stderr.write('PARIS_TURN_FAILED '+String(e?.message||'unknown')+'\n');

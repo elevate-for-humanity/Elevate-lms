@@ -20,7 +20,7 @@ export function generateMetadata({
   noIndex?: boolean;
 }): Metadata {
   const canonicalUrl = `${SITE_URL}${path}`;
-  const imageUrl = image || `${SITE_URL}/images/og-default.jpg`;
+  const imageUrl = image || `${SITE_URL}/images/partners/salon-saloon/team-sign.webp`;
 
   return {
     title,

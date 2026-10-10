@@ -23,15 +23,15 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with: {skip_install: true}
       - run: node scripts/gcp/verify-sdk.mjs
-      - name: Enable Secret Manager and Google-owned scheduling APIs
-        run: gcloud services enable secretmanager.googleapis.com cloudscheduler.googleapis.com --project=elegant-racer-299721 --quiet
+      - name: Enable configuration, scheduling and billing inspection APIs
+        run: gcloud services enable secretmanager.googleapis.com cloudscheduler.googleapis.com cloudbilling.googleapis.com --project=elegant-racer-299721 --quiet
       - name: Verify enabled API state
         run: |
           node --input-type=module <<'NODE'
           import { google, PROJECT } from './scripts/gcp/runtime-config.mjs';
           const enabled = new Set(JSON.parse(google(['services','list','--enabled','--project',PROJECT,'--format=json'])).map(s=>s.config?.name));
-          for (const service of ['secretmanager.googleapis.com','cloudscheduler.googleapis.com']) {
+          for (const service of ['secretmanager.googleapis.com','cloudscheduler.googleapis.com','cloudbilling.googleapis.com']) {
             if (!enabled.has(service)) throw new Error('Required Google foundation API remains disabled');
           }
-          console.log('Secret Manager and Cloud Scheduler APIs are enabled. Runtime IAM and state transfer remain separate acceptance gates.');
+          console.log('Secret Manager, Cloud Scheduler and Cloud Billing APIs are enabled. Billing account assignment, plan, payment settings and IAM are unchanged.');
           NODE

@@ -19,6 +19,14 @@ test('includes tagged candidates once, even when they also have traffic', () => 
   s.status.traffic.push({ revisionName: 'serving', tag: 'live' }, { revisionName: 'candidate', tag: 'candidate' });
   assert.deepEqual(requiredRegionalAllocation([s], task, [revision(), revision('candidate')]), { cpu: 16000, memory: 48 * 2 ** 30 });
 });
+test('ignores historical active revisions without traffic or tags', () => {
+  const old = revision('historical');
+  old.status = { conditions: [{type:'Active',status:'True'}] };
+  old.spec.containers = [container('8','16Gi')];
+  assert.deepEqual(requiredRegionalAllocation([service], task, [revision(), old]), {
+    cpu: 12000, memory: 40 * 2 ** 30,
+  });
+});
 test('counts older active executions even when the latest execution failed', () => {
   const executions = [
     { spec: { parallelism: 1, template: { spec: { containers: [container('4', '8Gi')] } } }, status: { runningCount: 1 } },

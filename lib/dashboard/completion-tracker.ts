@@ -126,7 +126,7 @@ export const PROGRAM_HOLDER_COMPLETION_CHECKLIST: CompletionItem[] = [
 
 export const ADMIN_COMPLETION_CHECKLIST: CompletionItem[] = [
   { id: 'health', label: 'System Health', description: 'Monitor system health metrics', required: true, category: 'Health', route: '/admin/health', weight: 10 },
-  { id: 'containers', label: 'Container Status', description: 'Check Northflank containers', required: true, category: 'Infrastructure', route: '/admin/containers', weight: 10 },
+  { id: 'containers', label: 'Container Status', description: 'Check Google Cloud Run containers', required: true, category: 'Infrastructure', route: '/admin/containers', weight: 10 },
   { id: 'queue', label: 'Background Jobs', description: 'Monitor job queue status', required: true, category: 'Infrastructure', route: '/admin/queue', weight: 10 },
   { id: 'failed_alerts', label: 'Failed Alerts', description: 'Review and resolve failed alerts', required: true, category: 'Monitoring', route: '/admin/alerts', weight: 10 },
   { id: 'stripe', label: 'Stripe Dashboard', description: 'Monitor payment processing', required: true, category: 'Payments', route: '/admin/stripe', weight: 10 },

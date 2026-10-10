@@ -47,7 +47,7 @@ export default function DashboardError({
             : 'Try a hard refresh first. If it persists, open Dev Studio → System health or confirm '}
           {!chunkHint && (
             <>
-              <code className="font-mono">SUPABASE_SERVICE_ROLE_KEY</code> is set in Northflank.
+              <code className="font-mono">SUPABASE_SERVICE_ROLE_KEY</code> is set in Google Cloud Run.
             </>
           )}
         </p>

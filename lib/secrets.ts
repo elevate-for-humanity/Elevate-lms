@@ -32,10 +32,14 @@ function usesGoogleRuntimeBindings(): boolean {
   return process.env.ELEVATE_RUNTIME_CONFIG_PROVIDER === 'google-secret-manager';
 }
 
-function retryableSecretRead(error: { code?: string; message?: string } | null | undefined): boolean {
+function retryableSecretRead(
+  error: { code?: string; message?: string } | null | undefined,
+): boolean {
   if (!error) return false;
-  return ['PGRST002', 'PGRST000', '57014'].includes(error.code || '') ||
-    /schema cache|retry|timeout|timed out|fetch failed|network/i.test(error.message || '');
+  return (
+    ['PGRST002', 'PGRST000', '57014'].includes(error.code || '') ||
+    /schema cache|retry|timeout|timed out|fetch failed|network/i.test(error.message || '')
+  );
 }
 
 async function readRuntimeSecrets(
@@ -66,7 +70,9 @@ function getBootstrapClient(): SupabaseClient | null {
       fetch: (input, init) => {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), SECRETS_FETCH_TIMEOUT_MS);
-        return fetch(input, { ...init, signal: controller.signal }).finally(() => clearTimeout(timer));
+        return fetch(input, { ...init, signal: controller.signal }).finally(() =>
+          clearTimeout(timer),
+        );
       },
     },
   });
@@ -176,7 +182,6 @@ export async function refreshSecrets(): Promise<void> {
   await hydrateProcessEnv();
 }
 
-
 /**
  * Decrypt one canonical platform secret by exact key.
  *
@@ -192,22 +197,4 @@ export async function getDecryptedPlatformSecret(key: string): Promise<string | 
   const { data, error } = await client.rpc('get_platform_secret', { p_key: key });
   if (error || typeof data !== 'string' || !data.trim()) return process.env[key];
   return data.trim();
-}
-
-/**
- * Hydrate only Northflank control-plane credentials.
- * Values are decrypted by exact key and never returned to a browser response.
- */
-export async function hydrateNorthflankEnv(): Promise<void> {
-  const keys = ['NORTHFLANK_API_TOKEN', 'NORTHFLANK_PROJECT_ID'] as const;
-  const values = await Promise.all(
-    keys.map(async (key) => ({
-      key,
-      value: await getDecryptedPlatformSecret(key),
-    })),
-  );
-
-  for (const { key, value } of values) {
-    if (value) process.env[key] = value;
-  }
 }

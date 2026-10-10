@@ -4,6 +4,7 @@ export type RuntimeReadiness = {
   commit: string;
   buildId: string;
   builtAt: string;
+  revision: string | null;
 };
 
 export type DependencyHealth = {
@@ -41,6 +42,7 @@ export function getRuntimeReadiness(
     commit: commit || 'unknown',
     buildId: buildId || 'unknown',
     builtAt: builtAt || 'unknown',
+    revision: normalized(process.env.K_REVISION) || null,
   };
 }
 

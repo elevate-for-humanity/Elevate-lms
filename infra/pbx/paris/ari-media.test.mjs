@@ -85,3 +85,12 @@ test('failed fallback or requested call termination hangs up only the owned call
   await assert.rejects(releaseCaller('call-2','hangup',async()=>{throw Error('ARI_DELETE_403');}),/ARI_DELETE_403/);
   await assert.rejects(releaseCaller('../other','hangup',async()=>assert.fail('must not request')),/CALL_RELEASE_NOT_ALLOWED/);
 });
+
+test('RTP padding cannot exceed payload and zero-length packets are rejected',()=>{
+ const base=rtp(Buffer.alloc(160,0xff),{seq:0,timestamp:0,ssrc:1});
+ const oversized=Buffer.from(base);oversized[0]|=0x20;oversized[oversized.length-1]=255;
+ assert.equal(parseRtp(oversized),null);
+ const empty=base.subarray(0,12);assert.equal(parseRtp(empty),null);
+ const zeroPad=Buffer.from(base);zeroPad[0]|=0x20;zeroPad[zeroPad.length-1]=0;
+ assert.equal(parseRtp(zeroPad),null);
+});

@@ -8,6 +8,7 @@ import { google, PROJECT } from './runtime-config.mjs';
 const JOB = 'elevate-video-render';
 const scope = region => ['--project=' + PROJECT, '--region=' + region, '--format=json'];
 const REGIONS = ['us-central1', 'us-east1'];
+const STARTUP_PROBE = { httpGet: { path: '/ready', port: 3101 }, timeoutSeconds: 5, periodSeconds: 10, failureThreshold: 60 };
 
 export function allocation(limits) {
   const cpu = String(limits?.cpu || '');
@@ -107,12 +108,17 @@ export async function executeFiniteVideoJob({ configuration = 'saved', validateO
       throw new Error('Saved renderer and serving Admin runtime identities differ');
     const runner = source + '\nawait runFiniteVideoRender();';
     if (runner.includes('~')) throw new Error('Unsupported runner argument delimiter');
-    // Update only the image and entrypoint. Resource allocations, task settings,
+    // Update the image, entrypoint and requested startup health check. Resource allocations, task settings,
     // secret bindings, and exact course/video IDs remain owned by the saved job.
     const expected = structuredClone(job.spec);
-    Object.assign(expected.template.spec.template.spec.containers[0], {
-      image, command: ['node'], args: ['--input-type=module', '-e', runner],
+    const expectedContainer = expected.template.spec.template.spec.containers[0];
+    Object.assign(expectedContainer, {
+      image, command: ['node'], args: ['--input-type=module', '-e', runner], startupProbe: structuredClone(STARTUP_PROBE),
     });
+    const existingHealthPort = (expectedContainer.env || []).find(e => e.name === 'VIDEO_HEALTH_PORT');
+    if (existingHealthPort?.valueFrom) throw new Error('Health-check port conflicts with a saved secret binding');
+    if (existingHealthPort) existingHealthPort.value = '3101';
+    else (expectedContainer.env ||= []).push({ name: 'VIDEO_HEALTH_PORT', value: '3101' });
     if (migrating) {
       const directory = mkdtempSync(join(tmpdir(), 'google-render-region-'));
       try {
@@ -122,7 +128,8 @@ export async function executeFiniteVideoJob({ configuration = 'saved', validateO
       } finally { rmSync(directory, { recursive: true, force: true }); }
     } else {
       run(['run', 'jobs', 'update', JOB, ...scope(region), '--image=' + image, '--command=node',
-        '--args=^~^--input-type=module~-e~' + runner, '--quiet']);
+        '--args=^~^--input-type=module~-e~' + runner, '--update-env-vars=VIDEO_HEALTH_PORT=3101',
+        '--startup-probe=httpGet.path=/ready,httpGet.port=3101,timeoutSeconds=5,periodSeconds=10,failureThreshold=60', '--quiet']);
     }
     const updated = read(['run', 'jobs', 'describe', JOB]);
     // gcloud changes this bookkeeping nonce on every update. It is not a
@@ -155,8 +162,12 @@ export async function executeFiniteVideoJob({ configuration = 'saved', validateO
   const container = job.spec.template.spec.template.spec.containers[0];
   if (validateOnly && !container.args?.some(x => x.includes('VIDEO_VALIDATE_ONLY')))
     throw new Error('Refresh the runner before requesting validation-only execution');
+  if (!isDeepStrictEqual(container.startupProbe, STARTUP_PROBE) ||
+      !container.env?.some(e => e.name === 'VIDEO_HEALTH_PORT' && e.value === '3101') ||
+      !container.args?.some(x => x.includes('startRenderHealthCheck')))
+    throw new Error('Refresh the runner to configure and verify its startup health check');
   log({ configuration, region, validateOnly, resources: container.resources?.limits,
-    taskCount: job.spec.template.spec.taskCount, retries: task.maxRetries });
+    startupProbe: container.startupProbe, taskCount: job.spec.template.spec.taskCount, retries: task.maxRetries });
   const started = read(['run', 'jobs', 'execute', JOB, '--quiet', '--async',
     '--update-env-vars=VIDEO_VALIDATE_ONLY=' + validateOnly]);
   const name = started.metadata?.name;

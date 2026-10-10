@@ -6,13 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       configuration:
-        description: Use the saved Google job settings or redeploy the Admin image
+        description: Use saved settings or refresh the serving Admin image and startup health check
         type: choice
         options: [saved, redeploy]
         default: saved
         required: true
       validate_only:
-        description: Verify packaged narration and exact video state without rendering
+        description: Verify the configured startup probe, packaged narration and exact video state without rendering
         type: boolean
         default: false
         required: true

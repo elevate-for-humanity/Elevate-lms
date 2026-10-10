@@ -17,7 +17,16 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   if (!job) return { claimed: false };
   console.info('[UltimateWorker] job claimed', { jobId: job.id, buildId: job.build_id, workerId });
   let timer: ReturnType<typeof setInterval> | null = setInterval(
-    () => void queue.heartbeat(job.id, workerId, 300).then(() => console.info('[UltimateWorker] heartbeat acknowledged', { jobId: job.id })).catch((error) => console.error('[UltimateWorker] heartbeat failed', { jobId: job.id, error: String(error) })),
+    () => void queue.heartbeat(job.id, workerId, 300)
+      .then((renewed) => {
+        if (!renewed) console.error('[UltimateWorker] heartbeat rejected or lease lost', {jobId: job.id, workerId});
+        else console.info('[UltimateWorker] heartbeat acknowledged', {jobId: job.id});
+      })
+      .catch((error) => console.error('[UltimateWorker] heartbeat failed', {
+        jobId: job.id, workerId,
+        error: error instanceof Error ? {message: error.message, stack: error.stack} :
+          (typeof error === 'object' ? JSON.stringify(error) : String(error)),
+      })),
     60000,
   );
   try {

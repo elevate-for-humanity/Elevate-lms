@@ -46,6 +46,15 @@ if(!east){
  cli(['run','services','set-iam-policy',service,'/tmp/marketing-east-policy.json','--region='+region]);
  east=read(['run','services','describe',service,'--region='+region]);
 }
+assert.equal(east.spec.template.spec.containers[0].image,image,'Regional service contains a different release');
+assert(east.status.conditions.some(c=>c.type==='Ready'&&c.status==='True'));
+assert(east.status.url&&east.status.url.startsWith('https://'));
+const negName='elevate-marketing-us-east1-neg';
+let neg;
+try{neg=read(['compute','network-endpoint-groups','describe',negName,'--region='+region]);}catch(error){if(!String(error.stderr).includes('not found')&&!String(error.stderr).includes('NOT_FOUND'))throw error;}
+if(!neg){cli(['compute','network-endpoint-groups','create',negName,'--region='+region,'--network-endpoint-type=serverless','--cloud-run-service='+service]);neg=read(['compute','network-endpoint-groups','describe',negName,'--region='+region]);}
+assert.equal(neg.cloudRun.service,service);assert.equal(neg.networkEndpointType,'SERVERLESS');
+console.log(JSON.stringify({regionalGatewayPrepared:true,region,group:neg.selfLink}));
 const permissionToken=cli(['auth','print-access-token']);
 const permissionResponse=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/'+project+':testIamPermissions',{method:'POST',headers:{authorization:'Bearer '+permissionToken,'content-type':'application/json'},body:JSON.stringify({permissions:['run.services.setIamPolicy','compute.backendServices.update','compute.networkEndpointGroups.create']}),signal:AbortSignal.timeout(30000)});
 const permissionData=await permissionResponse.json();assert(permissionResponse.ok,'Permission readback failed');
@@ -57,16 +66,8 @@ if(!publicProbe.ok&&!permissionData.permissions?.includes('run.services.setIamPo
  console.log(JSON.stringify({authenticatedRegionalRuntimeVerified:true,region,url:east.status.url,commit,missingPermission:'run.services.setIamPolicy'}));
  throw Error('Regional runtime verified; owner must copy public invoker access before website cutover.');
 }
-assert.equal(east.spec.template.spec.containers[0].image,image,'Regional service contains a different release');
-assert(east.status.conditions.some(c=>c.type==='Ready'&&c.status==='True'));
-assert(east.status.url&&east.status.url.startsWith('https://'));
 await acceptance(east.status.url);
 console.log(JSON.stringify({regionalRuntimeVerified:true,region,url:east.status.url,commit,resources:east.spec.template.spec.containers[0].resources}));
-const negName='elevate-marketing-us-east1-neg';
-let neg;
-try{neg=read(['compute','network-endpoint-groups','describe',negName,'--region='+region]);}catch(error){if(!String(error.stderr).includes('not found')&&!String(error.stderr).includes('NOT_FOUND'))throw error;}
-if(!neg){cli(['compute','network-endpoint-groups','create',negName,'--region='+region,'--network-endpoint-type=serverless','--cloud-run-service='+service]);neg=read(['compute','network-endpoint-groups','describe',negName,'--region='+region]);}
-assert.equal(neg.cloudRun.service,service);assert.equal(neg.networkEndpointType,'SERVERLESS');
 const current=read(['compute','backend-services','describe',backend,'--global']);
 assert.equal(current.fingerprint,original.fingerprint,'Backend changed during validation');
 const token=cli(['auth','print-access-token']);

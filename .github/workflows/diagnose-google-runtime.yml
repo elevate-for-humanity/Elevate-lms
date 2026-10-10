@@ -51,7 +51,7 @@ jobs:
             scaling: Object.fromEntries(Object.entries(service.spec.template.metadata.annotations || {}).filter(([k]) => /Scale|cpu-throttling/.test(k))),
             latestReadyRevision:service.status.latestReadyRevisionName, latestCreatedRevision:service.status.latestCreatedRevisionName,
             traffic:service.status.traffic, conditions:(service.status.conditions || []).map(x=>({type:x.type,status:x.status,reason:x.reason}))});
-          if (component === 'admin') {
+          if (['admin', 'lms'].includes(component)) {
             const revision = service.status.latestCreatedRevisionName;
             const details = JSON.parse(gcloud(['run','revisions','describe',revision,'--project='+project,'--region=us-central1','--format=json']));
             report({component, revision, startupProbe:details.spec.containers[0].startupProbe,
@@ -64,7 +64,7 @@ jobs:
               report({component,loggingExclusions:exclusions.map(x=>({name:x.name,disabled:x.disabled,filter:x.filter}))});
             } catch {report({component,loggingExclusionMetadataUnavailable:true});}
             const logs = JSON.parse(gcloud(['logging','read',
-              'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration" AND resource.labels.revision_name="'+revision+'"',
+              'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-'+component+'-migration" AND resource.labels.revision_name="'+revision+'"',
               '--project='+project,'--freshness=2h','--limit=200','--format=json']));
             report({revision,logCount:logs.length,logTypes:[...new Set(logs.map(x=>x.logName))]});
             for (const row of logs) {

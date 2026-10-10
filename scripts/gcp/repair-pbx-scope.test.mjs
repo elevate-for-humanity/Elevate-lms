@@ -58,6 +58,13 @@ test('already scoped VM is not restarted',async()=>{
   const result=await repairScope(f);assert.equal(result.result,'PASS');assert.equal(result.changed,false);assert.deepEqual(f.mutations,[]);
 });
 test('remote guard failures retain exact allowlisted causes without leaking CLI output',()=>{
-  assert.throws(()=>guardResult({status:1,stdout:JSON.stringify({result:'BLOCKED',code:'configured_endpoints_require_maintenance_review'})}),/configured_endpoints_require_maintenance_review/);
+  assert.throws(()=>guardResult({status:1,stdout:'PBX_RESTART_GUARD '+JSON.stringify({result:'BLOCKED',code:'configured_endpoints_require_maintenance_review'})}),/configured_endpoints_require_maintenance_review/);
   assert.throws(()=>guardResult({status:1,stdout:'private credentials',stderr:'Permission denied: private details'}),/^Error: restart_guard_permission_denied$/);
+});
+test('SSH key-generation banners do not hide a successful explicit guard record',()=>{
+  const evidence={result:'PASS',activeCalls:0,endpoints:0};
+  const stdout='Generating public/private rsa key pair.\nPBX_RESTART_GUARD '+JSON.stringify(evidence)+'\n';
+  assert.deepEqual(guardResult({status:0,stdout,stderr:'WARNING: The private SSH key file for gcloud does not exist.'}),evidence);
+  assert.throws(()=>guardResult({status:0,stdout:stdout+stdout}),/ambiguous_evidence/);
+  assert.throws(()=>guardResult({status:0,stdout:'PBX_RESTART_GUARD invalid JSON\n'}),/restart_guard_command_failed/);
 });

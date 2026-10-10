@@ -13,7 +13,11 @@ export const VM_PERMISSIONS=['compute.instances.get','compute.instances.stop','c
 
 export function guardResult(result){
   let report;
-  try{report=JSON.parse(result.stdout);}catch{ /* Raw SSH/CLI errors are never emitted. */ }
+  // First-time gcloud SSH key generation can prepend banner/randomart output.
+  // Accept exactly one explicitly framed guard record, never raw CLI diagnostics.
+  const records=(result.stdout||'').split(/\r?\n/).filter(line=>line.startsWith('PBX_RESTART_GUARD '));
+  if(records.length>1)throw Error('restart_guard_ambiguous_evidence');
+  try{if(records.length===1)report=JSON.parse(records[0].slice('PBX_RESTART_GUARD '.length));}catch{ /* Malformed evidence fails closed below. */ }
   if(result.status===0 && report?.result==='PASS')return report;
   const allowed=new Set(['active_calls_or_channels_not_zero','configured_endpoints_require_maintenance_review',
     'legacy_sip_state_requires_review','runtime_readback_failed','expected_container_not_running',

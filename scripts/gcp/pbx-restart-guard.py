@@ -93,7 +93,7 @@ def main():
         previous = json.loads((BACKUP / 'before.json').read_text())
         if current != previous:
             raise ValueError('post_restart_configuration_or_container_changed')
-    print(json.dumps({'result': 'PASS', **current}))
+    print('PBX_RESTART_GUARD ' + json.dumps({'result': 'PASS', **current}))
 
 
 if __name__ == '__main__':
@@ -101,5 +101,5 @@ if __name__ == '__main__':
         main()
     except Exception as error:
         code = str(error) if isinstance(error, ValueError) and re.fullmatch('[a-z_]+', str(error)) else 'restart_guard_unavailable'
-        print(json.dumps({'result': 'BLOCKED', 'code': code}))
+        print('PBX_RESTART_GUARD ' + json.dumps({'result': 'BLOCKED', 'code': code}))
         raise SystemExit(1)

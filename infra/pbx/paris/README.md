@@ -3,7 +3,7 @@
 This is **not a completed, deployable PARIS receptionist**. The ARI/RTP gateway
 has been added to the repository to establish the media transport boundary.
 It is intentionally disconnected from the production dialplan and public
-Telnyx route. It MUST NOT be enabled for the 24 existing extensions until the
+Telnyx route. It MUST NOT be enabled for existing extensions until the
 remaining integration and live acceptance work is complete.
 
 ## Transport and security
@@ -13,6 +13,21 @@ an externalMedia channel carrying PCMU RTP over a loopback-only UDP socket. A
 Stasis application named `elevate-paris` must be registered. The independent
 PBX must route only a dedicated authorized test call into that application
 following dialplan review. Do not alter the public carrier trunk.
+
+External media channels use a preallocated `paris-media-` channel ID. The event
+handler accepts only PJSIP/Local caller channels and excludes that namespace,
+including when the media channel's `StasisStart` arrives before its HTTP creation
+response. Asterisk 20 externalMedia does not support the `appArgs` parameter;
+using an argument marker alone would let media channels recursively create more
+bridges. The channel-ID response is verified before bridging.
+
+The gateway answers caller legs that are not already answered. Failed voice
+processing or ARI disconnection returns the caller to the next priority after
+its original Stasis application; the reviewed dialplan must provide the fallback
+there. If that continuation fails, only that caller leg is hung up. A successful
+operator handoff is not hung up by media cleanup. Sessions are bounded to 16
+concurrent calls and 15 minutes each; capacity/time limits use the same fallback.
+Resource creation completed after caller hangup is cleaned up on response.
 
 Required server-side environment: `PARIS_ARI_USER`, `PARIS_ARI_PASSWORD`,
 `PARIS_ARI_URL`, `PARIS_ARI_WS`, `PARIS_TURN_URL`, `PARIS_TURN_TOKEN`.
@@ -92,4 +107,4 @@ caller speech recording consent is not implemented, transcripts/call outcomes do
 not yet persist to Supabase, the model is not yet grounded in the approved live
 program catalog, and tool-mediated booking/transfer/voicemail are not implemented.
 Neither file is wired into the production dialplan; no existing Telnyx numbers
-or 24 extensions have been changed. DO NOT activate in production yet.
+or existing extensions have been changed. DO NOT activate in production yet.

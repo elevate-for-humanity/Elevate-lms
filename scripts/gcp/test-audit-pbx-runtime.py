@@ -50,4 +50,20 @@ class RuntimeEvidence(unittest.TestCase):
         result = pbx.vm_secret_scope(Mock(return_value=connection))
         self.assertEqual(result['result'], 'BLOCKED')
         connection.getresponse.return_value.read.assert_not_called()
+    def test_unit_evidence_distinguishes_missing_failed_and_running_processes(self):
+        for state, expected in [('LoadState=not-found\nActiveState=inactive\nSubState=dead', 'FAIL'),
+                                ('LoadState=loaded\nActiveState=failed\nSubState=failed', 'FAIL'),
+                                ('LoadState=loaded\nActiveState=active\nSubState=running', 'PASS')]:
+            self.assertEqual(pbx.service_state(state)['result'], expected)
+        self.assertEqual(pbx.service_state(None)['result'], 'BLOCKED')
+    def test_unit_diagnostics_never_emit_arbitrary_fields_or_values(self):
+        report = pbx.service_state('LoadState=private-value\nEnvironment=private-value\nActiveState=active\nSubState=running')
+        self.assertEqual(report['result'], 'BLOCKED')
+        self.assertNotIn('private-value', str(report))
+        self.assertNotIn('Environment', str(report))
+    def test_runtime_file_checks_report_presence_without_reading_contents(self):
+        exists = Mock(side_effect=[True, False])
+        report = pbx.runtime_files({'entrypoint': '/expected/script', 'environment_file': '/expected/config'}, exists)
+        self.assertEqual(report, {'result': 'FAIL', 'evidence': {'entrypoint': True, 'environment_file': False}})
+        self.assertEqual(exists.call_count, 2)
 if __name__ == '__main__': unittest.main()

@@ -19,6 +19,8 @@ import { mkdir, readFile, writeFile, unlink, rm, stat } from 'fs/promises';
 import { generateEdgeTTS, buildLessonScript, EDGE_TTS_VOICES, type EdgeTTSVoice } from './edge-tts';
 import { getPexelsImage, getPexelsVideoClip } from './pexels';
 import { logger } from '@/lib/logger';
+import { getElevateMediaStorageClient, getElevateMediaStorageConfig, isElevateMediaStorageConfigured } from '@/lib/storage/elevate-media-storage';
+import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 // Type-only import — never bundled, only used for type checking
 import type { ElevateLessonProps } from '@/remotion-src/compositions/ElevateLesson';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -961,7 +963,27 @@ export async function renderStoryboardVideo(
       for (let start = 0; start < totalFrames; start += framesPerChunk) {
         const end = Math.min(totalFrames - 1, start + framesPerChunk - 1);
         const chunkPath = path.join(paths.outputDir, `segment-${String(start).padStart(8, '0')}.mp4`);
-        const existing = await stat(chunkPath).catch(() => null);
+        // Persist each segment in B2 so a new Cloud Run execution can resume.
+        // A storyboard fingerprint prevents reuse after a scene/narration change.
+        const fingerprint = (await import('node:crypto')).createHash('sha256')
+          .update(JSON.stringify({scenes, fps: composition.fps, totalFrames})).digest('hex').slice(0,24);
+        const segmentKey = `course-render-checkpoints/${input.lessonId}/${fingerprint}/${start}-${end}.mp4`;
+        const storageReady = isElevateMediaStorageConfigured();
+        const storage = storageReady ? getElevateMediaStorageClient() : null;
+        const bucket = storageReady ? getElevateMediaStorageConfig().bucket : null;
+        let existing = await stat(chunkPath).catch(() => null);
+        if (!existing?.size && storage && bucket) {
+          try {
+            const object = await storage.send(new GetObjectCommand({Bucket: bucket, Key: segmentKey}));
+            if (object.Body) {
+              await writeFile(chunkPath, Buffer.from(await object.Body.transformToByteArray()));
+              existing = await stat(chunkPath);
+              logger.info('[RemotionRender] restored checkpoint', {lessonId: input.lessonId, start, end});
+            }
+          } catch (error) {
+            if ((error as {name?:string}).name !== 'NoSuchKey' && (error as {name?:string}).name !== 'NotFound') throw error;
+          }
+        }
         if (!existing?.size) {
           logger.info('[RemotionRender] segment started', {lessonId: input.lessonId, start, end});
           await renderMedia({
@@ -982,6 +1004,11 @@ export async function renderStoryboardVideo(
           });
           const written = await stat(chunkPath);
           if (!written.size) throw new Error(`REMOTION_SEGMENT_EMPTY:${start}-${end}`);
+          if (!storage || !bucket) throw new Error('REMOTION_DURABLE_CHECKPOINT_STORAGE_REQUIRED');
+          await storage.send(new PutObjectCommand({
+            Bucket: bucket, Key: segmentKey, Body: await readFile(chunkPath),
+            ContentType: 'video/mp4',
+          }));
           logger.info('[RemotionRender] segment complete', {lessonId: input.lessonId, start, end, bytes: written.size});
         }
         chunkPaths.push(chunkPath);

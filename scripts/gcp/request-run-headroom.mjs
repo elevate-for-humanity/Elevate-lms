@@ -4,8 +4,8 @@ import { pathToFileURL } from 'node:url';
 const project = 'elegant-racer-299721';
 const parent = 'https://cloudquotas.googleapis.com/v1/projects/484736877039/locations/global';
 export const targets = [
-  {quotaId: 'CpuAllocPerProjectRegion', preferredValue: '32000', id: 'elevate-run-cpu-us-central1'},
-  {quotaId: 'MemAllocPerProjectRegion', preferredValue: '68719476736', id: 'elevate-run-memory-us-central1'},
+  {quotaId: 'CpuAllocPerProjectRegion', preferredValue: '128000', id: 'elevate-run-cpu-us-central1'},
+  {quotaId: 'MemAllocPerProjectRegion', preferredValue: '274877906944', id: 'elevate-run-memory-us-central1'},
 ];
 export function quotaContact(policy) {
   const owners = [...new Set((policy.bindings || []).filter(b => b.role === 'roles/owner' && !b.condition)
@@ -68,7 +68,7 @@ export async function requestHeadroom(token, contactEmail, request = fetch, {req
       throw Error('Unable to read owned quota preference; adjustment stopped');
     }
     const alreadySufficient = atLeast(value, desired);
-    const alreadyRequested = atLeast(existing?.quotaConfig?.preferredValue, desired);
+    const alreadyRequested = existing?.quotaConfig?.preferredValue === '-1' && desired !== '-1' ? false : atLeast(existing?.quotaConfig?.preferredValue, desired);
     const alreadyGranted = atLeast(existing?.quotaConfig?.grantedValue, desired);
     if (alreadySufficient || alreadyRequested || alreadyGranted) {
       results.push({quotaId: target.quotaId, name, desiredValue: desired,

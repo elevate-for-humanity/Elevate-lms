@@ -12,6 +12,11 @@ on:
       - 'pnpm-lock.yaml'
       - '.github/workflows/deploy-google-lms-trigger.yml'
   workflow_dispatch:
+    inputs:
+      requested_sha:
+        description: Exact main commit requested by a push dispatch
+        required: false
+        type: string
 permissions:
   contents: read
   actions: write
@@ -19,14 +24,39 @@ permissions:
 jobs:
   dispatch:
     if: github.event_name == 'push'
+    concurrency:
+      group: google-lms-dispatch-main
+      cancel-in-progress: true
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Dispatch Google-trusted release from main
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-lms-trigger.yml/dispatches" -f ref=main
+        run: |
+          set -euo pipefail
+          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          if test "$latest" != "$GITHUB_SHA"; then
+            echo "::notice::Superseded LMS push: $GITHUB_SHA"
+            exit 0
+          fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-lms-trigger.yml/dispatches" -f ref=main -f "inputs[requested_sha]=$GITHUB_SHA"
+  validate:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Reject stale LMS release requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_SHA: ${{ inputs.requested_sha }}
+        run: |
+          set -euo pipefail
+          if test -n "$REQUESTED_SHA" && ! [[ "$REQUESTED_SHA" =~ ^[a-f0-9]{40}$ ]]; then exit 1; fi
+          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          test "$GITHUB_SHA" = "$latest"
+          if test -n "$REQUESTED_SHA"; then test "$REQUESTED_SHA" = "$GITHUB_SHA"; fi
   build:
+    needs: validate
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/build-google-migration-images.yml
     with:

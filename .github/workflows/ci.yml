@@ -31,6 +31,10 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Traffic scope and unavailable-data regression tests
+        run: node --test tests/unit/traffic-report.test.mjs
+      - name: Google runtime settings regression tests
+        run: pnpm exec vitest run tests/unit/google-container-env.test.ts tests/unit/google-deployment-dispatch.test.ts tests/unit/pwa-homepage-hydration.test.tsx tests/unit/pwa-install-prompt-lifecycle.test.ts tests/unit/admin-pwa-navigation-regression.test.ts
       - name: Block retired Admin UI routes
         run: node scripts/verify-no-retired-admin-ui-routes.mjs
       - name: Recovery hardening regression check
@@ -89,6 +93,13 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Restore incremental TypeScript cache
+        uses: actions/cache@v4
+        with:
+          path: apps/${{ matrix.app }}/tsconfig.tsbuildinfo
+          key: types-${{ runner.os }}-${{ matrix.app }}-${{ hashFiles('pnpm-lock.yaml', 'apps/*/tsconfig.json') }}-${{ github.sha }}
+          restore-keys: |
+            types-${{ runner.os }}-${{ matrix.app }}-${{ hashFiles('pnpm-lock.yaml', 'apps/*/tsconfig.json') }}-
       - name: Run typecheck
         run: pnpm run typecheck:${{ matrix.app }}
 
@@ -110,6 +121,13 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Restore content-based ESLint cache
+        uses: actions/cache@v4
+        with:
+          path: .eslintcache
+          key: lint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.*', 'eslint-rules/**') }}-${{ github.sha }}
+          restore-keys: |
+            lint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'eslint.config.*', 'eslint-rules/**') }}-
       - name: Lint repository
         run: pnpm lint
 

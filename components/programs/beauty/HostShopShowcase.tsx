@@ -62,10 +62,12 @@ export default function HostShopShowcase({
   enableNarration = true,
   narration,
   narrationSrc,
+  narrationSources,
   mediaOverrides,
   mediaSequence,
   tourScripts,
   asHero = false,
+  portraitTour = false,
 }: {
   shops: FeaturedHostPartner[];
   /** Limit video playback to the designated tour while retaining other shops as still slides. */
@@ -80,6 +82,8 @@ export default function HostShopShowcase({
   narration?: string;
   /** Pre-rendered narration removes runtime voice-generation delay. */
   narrationSrc?: string;
+  /** Recorded scripts matched to the active shop media. */
+  narrationSources?: Record<string, string>;
   /** Page-specific media without changing another surface such as the homepage. */
   mediaOverrides?: Record<string, ShowcaseMedia>;
   /** Explicit media order for a surface that needs more than one slide per shop. */
@@ -88,6 +92,8 @@ export default function HostShopShowcase({
   tourScripts?: Record<string, string>;
   /** Render the lead heading as the page's primary heading. */
   asHero?: boolean;
+  /** Give vertical shop tours a full-height frame without cropping the video. */
+  portraitTour?: boolean;
 }) {
   // Shops without verified media remain in the directory below, but do not
   // become empty decorative slides in the rotating gallery.
@@ -229,7 +235,7 @@ export default function HostShopShowcase({
       ref={sectionRef}
       aria-labelledby="host-shop-showcase-heading"
       data-scroll-narration={enableNarration ? true : undefined}
-      data-narration-src={enableNarration ? narrationSrc : undefined}
+      data-narration-src={enableNarration ? (narrationSources?.[image.src] ?? narrationSrc) : undefined}
       data-narration={
         enableNarration
           ? (tourScripts?.[image.src] ??
@@ -307,7 +313,7 @@ export default function HostShopShowcase({
 
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
           <div className="grid lg:grid-cols-2">
-            <div className="relative aspect-[4/3] min-h-0 overflow-hidden bg-slate-950 lg:aspect-auto lg:min-h-[420px]">
+            <div className={`relative min-h-0 overflow-hidden bg-slate-950 lg:aspect-auto ${portraitTour ? 'aspect-[9/16] sm:aspect-[3/4] lg:min-h-[640px]' : 'aspect-[4/3] lg:min-h-[420px]'}`}>
               {image?.kind === 'video' && !failedVideos.has(image.src) ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
                   {image.backdropSrc ? (

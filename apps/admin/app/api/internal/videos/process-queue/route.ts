@@ -239,6 +239,20 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // Avoid claim RPCs for courses with no pending or expired work. Failed
+  // jobs require explicit repair; completed jobs never need another claim.
+  let pendingQuery = db.from('video_jobs').select('course_id')
+    .or(`status.eq.queued,and(status.eq.rendering,lease_expires_at.lte.${now.toISOString()})`);
+  if (courseId) pendingQuery = pendingQuery.eq('course_id', courseId);
+  const { data: pendingJobs, error: pendingError } = await pendingQuery;
+  if (pendingError) {
+    return NextResponse.json({ error: 'Unable to inspect pending video work' }, { status: 500 });
+  }
+  const pendingCourseIds = [...new Set((pendingJobs ?? []).map((job) => job.course_id).filter(Boolean))];
+  if (pendingCourseIds.length === 0) {
+    return NextResponse.json({ ok: true, started: 0, reason: 'queue-empty', courseId });
+  }
+
   // Postgres owns the concurrency boundary. FOR UPDATE SKIP LOCKED prevents
   // separate Admin instances from rendering the same canonical asset.
   let claimedRows: VideoJob[] = [];
@@ -289,6 +303,7 @@ export async function POST(request: NextRequest) {
       .from('courses')
       .select('id')
       .eq('generation_paused', false)
+      .in('id', pendingCourseIds)
       .order('updated_at', { ascending: true });
     if (globallyPaused) {
       eligibleCourseQuery = eligibleCourseQuery.in('id', generationControl.allowedCourseIds);

@@ -6,9 +6,25 @@ import {
   produceTeachingVisual,
   type TeachingVisual,
 } from '@/lib/ultimate-course-builder/instructional/teaching-visual';
+import { teachingPresentation } from '@/lib/ultimate-course-builder/instructional/teaching-presentation';
 import { prepareUltimateStoryboardInput } from '@/lib/ultimate-course-builder/adapters/platform-renderer';
 import { directMedia } from '@/lib/video/media-director';
 describe('script-bound teaching producer', () => {
+  it.each([8338, 12854, 13465])('pages long barber narration (%i characters) without dropping words', (length) => {
+    const narration = 'Inspect the client hair and select the correct clean tools. '.repeat(Math.ceil(length / 59));
+    const plan = produceTeachingVisual(narration, 'demonstration');
+    expect(plan.steps.length).toBeGreaterThan(32);
+    expect(plan.steps.map(s => s.value).join(' ')).toBe(narration.trim());
+    expect(() => validateTeachingVisual(plan, narration)).not.toThrow();
+    const seen = [];
+    for (let index = 0; index < plan.steps.length; index++) {
+      const page = teachingPresentation(plan, index + 0.5, plan.steps.length);
+      expect(page.rows).toHaveLength(1);
+      expect(page.activeIndex).toBe(index);
+      seen.push(page.rows[0].value);
+    }
+    expect(seen).toEqual(plan.steps.map(s => s.value));
+  });
   it('accepts equivalent teaching captions without requiring a verbatim copy', () => {
     expect(() => validateTeachingVisual({kind:'sequence',steps:[{
       label:'Haircut',value:'Trim the customer hair with shears',

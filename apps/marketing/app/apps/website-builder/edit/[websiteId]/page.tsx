@@ -1,3 +1,4 @@
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import { redirect, notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -35,7 +36,7 @@ export default async function WebsiteEditorPage({ params }: Props) {
     .eq('id', websiteId)
     .maybeSingle();
 
-  if (!site || site.user_id !== user.id) notFound();
+  if (!site || !(await canManageHostedWebsite(admin, websiteId, user.id))) notFound();
 
   const name = (site.site_name as string | null) ?? 'My Site';
   const base = buildDefaultSiteConfig({ organizationName: name });

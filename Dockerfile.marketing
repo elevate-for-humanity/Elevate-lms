@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.7
+# Use Docker BuildKit's bundled frontend; this file needs no external syntax features.
 ARG NODE_IMAGE=node:22-alpine
 FROM ${NODE_IMAGE} AS base
 
@@ -37,6 +37,9 @@ RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 FROM base AS builder
 
+ARG APPLICATION_SERVICE=marketing
+RUN case "$APPLICATION_SERVICE" in marketing|store) ;; *) exit 1 ;; esac
+
 ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP=unknown
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
@@ -56,7 +59,7 @@ ENV NF_GIT_SHA=$NF_GIT_SHA
 ENV GITHUB_SHA=$NF_GIT_SHA
 ENV GIT_SHA=$NF_GIT_SHA
 ENV NEXT_PUBLIC_GIT_SHA=$NF_GIT_SHA
-ENV NEXT_PUBLIC_BUILD_ID="marketing-$NF_GIT_SHA"
+ENV NEXT_PUBLIC_BUILD_ID="$APPLICATION_SERVICE-$NF_GIT_SHA"
 ENV NEXT_PUBLIC_COMMIT_SHA=$NF_GIT_SHA
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
@@ -93,8 +96,8 @@ RUN EFFECTIVE_SHA="${NF_GIT_SHA}" && \
     test "${EFFECTIVE_SHA}" != "unknown" && \
     echo "${EFFECTIVE_SHA}" | grep -qE '^[a-f0-9]{7,40}$' && \
     echo "Marketing build SHA validated: ${EFFECTIVE_SHA}" && \
-    printf '{"service":"marketing","commit":"%s","builtAt":"%s"}\n' \
-      "${EFFECTIVE_SHA}" "${EFFECTIVE_BUILT_AT}" > /workspace/public/version.json
+    printf '{"service":"%s","commit":"%s","builtAt":"%s"}\n' \
+      "${APPLICATION_SERVICE}" "${EFFECTIVE_SHA}" "${EFFECTIVE_BUILT_AT}" > /workspace/public/version.json
 
 RUN node scripts/stamp-sw.mjs
 
@@ -107,6 +110,8 @@ RUN test -d /workspace/apps/marketing/.next
 RUN test -f /workspace/apps/marketing/.next/BUILD_ID
 
 FROM ${NODE_IMAGE} AS runner
+
+ARG APPLICATION_SERVICE=marketing
 
 WORKDIR /app
 
@@ -121,7 +126,7 @@ ENV NF_GIT_SHA=$NF_GIT_SHA
 ENV GITHUB_SHA=$NF_GIT_SHA
 ENV GIT_SHA=$NF_GIT_SHA
 ENV NEXT_PUBLIC_GIT_SHA=$NF_GIT_SHA
-ENV NEXT_PUBLIC_BUILD_ID="marketing-$NF_GIT_SHA"
+ENV NEXT_PUBLIC_BUILD_ID="$APPLICATION_SERVICE-$NF_GIT_SHA"
 ENV NEXT_PUBLIC_COMMIT_SHA=$NF_GIT_SHA
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 
@@ -150,7 +155,9 @@ COPY --from=builder --chown=nextjs:nodejs /workspace/public ./apps/marketing/pub
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public/data/hero-banners.json ./public/data/hero-banners.json
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public/data/hero-banners.json ./apps/marketing/public/data/hero-banners.json
 
-RUN test -f /app/public/version.json && \
+RUN test -s /app/public/images/social/elevate-career-training-20261009.jpg && \
+    test -s /app/apps/marketing/public/images/social/elevate-career-training-20261009.jpg && \
+    test -f /app/public/version.json && \
     test -f /app/apps/marketing/public/version.json && \
     test -f /app/public/manifest-marketing.json && \
     test -f /app/apps/marketing/public/manifest-marketing.json && \

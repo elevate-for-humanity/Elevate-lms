@@ -1,0 +1,92 @@
+name: Preserve existing Google PBX startup
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/preserve-google-pbx-startup.yml'
+      - 'infra/pbx/google-startup.sh'
+      - 'scripts/gcp/*pbx*'
+      - 'scripts/gcp/fixtures/pbx-legacy-bootstrap.txt'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/preserve-google-pbx-startup.yml'
+      - 'infra/pbx/google-startup.sh'
+      - 'scripts/gcp/repair-pbx-startup-metadata.mjs'
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: google-pbx-infrastructure
+  cancel-in-progress: false
+jobs:
+  preservation-contract:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test scripts/gcp/test-pbx-startup-metadata.mjs
+      - run: node --test scripts/gcp/test-pbx-container-snapshot.mjs
+      - run: python3 scripts/gcp/test-pbx-bootstrap.py
+      - run: python3 scripts/gcp/test-pbx-tls-preservation.py
+      - run: bash -n infra/pbx/google-startup.sh scripts/gcp/repair-existing-pbx-tls.sh
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Apply reviewed startup preservation through the approved Google identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/preserve-google-pbx-startup.yml/dispatches" -f ref=main
+  preserve:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Record current running container identities without reading configuration
+        run: |
+          set -euo pipefail
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
+            --command="sudo docker inspect pbx_asterisk_1 elevate-pbx-wss-proxy --format '{{.Name}} {{.Id}} {{.State.Running}} {{.State.StartedAt}}'" | node scripts/gcp/pbx-container-snapshot.mjs > /tmp/pbx-containers-before
+      - name: Replace only the exact known legacy startup metadata using its fingerprint
+        run: node scripts/gcp/repair-pbx-startup-metadata.mjs
+      - name: Verify existing containers were preserved
+        if: always()
+        run: |
+          set -euo pipefail
+          test -s /tmp/pbx-containers-before
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
+            --command="sudo docker inspect pbx_asterisk_1 elevate-pbx-wss-proxy --format '{{.Name}} {{.Id}} {{.State.Running}} {{.State.StartedAt}}'" | node scripts/gcp/pbx-container-snapshot.mjs > /tmp/pbx-containers-after
+          cmp /tmp/pbx-containers-before /tmp/pbx-containers-after
+          echo 'Existing PBX and gateway container IDs, running state and start times unchanged.'
+      - name: Preserve sanitized metadata evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pbx-startup-preservation-evidence
+          path: pbx-startup-preservation-evidence.json
+          if-no-files-found: warn
+          retention-days: 14

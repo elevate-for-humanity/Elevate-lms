@@ -6,6 +6,7 @@ import {
   tenantSlugFromAppHost,
 } from '@/lib/tenant/middleware-tenant-routing';
 import { LMS_HOST, MARKETING_HOST } from '@/lib/routing/portal-map';
+import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
 
 // These route families are authenticated operational software, not public
 // marketing pages. Protect the complete family so child routes cannot inherit
@@ -41,7 +42,7 @@ const DEPLOYMENT_HOST_SUFFIXES = ['.northflank.app', '.run.app'] as const;
 
 const STORE_RUNTIME_ALLOWED_PREFIXES = [
   '/store', '/login', '/signup', '/register', '/forgot-password', '/reset-password', '/auth',
-  '/api/store', '/api/webhooks/store', '/api/webhooks/stripe', '/api/auth', '/api/ping', '/api/health', '/api/ready',
+  '/api/store', '/api/webhooks/store', '/api/webhooks/stripe', '/api/auth', '/api/version', '/api/ping', '/api/health', '/api/ready',
 ] as const;
 
 function isProtectedPortal(pathname: string) {
@@ -120,7 +121,7 @@ function isStoreRuntimeAllowed(pathname: string): boolean {
 }
 
 function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextResponse | null {
-  if (process.env.STORE_ONLY_RUNTIME !== 'true') return null;
+  if (getPublicRuntimeService() !== 'store') return null;
   if (pathname === '/') {
     const url = req.nextUrl.clone();
     url.pathname = '/store';

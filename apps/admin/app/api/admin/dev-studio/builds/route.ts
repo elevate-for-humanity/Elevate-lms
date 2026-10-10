@@ -3,7 +3,7 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError } from '@/lib/api/safe-error';
 import { requireTypedConfirmation } from '@/lib/security/require-confirmation';
-import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
+import { dispatchGoogleDeployment, isGoogleDeploymentConfigured } from '@/lib/gcp/dispatch-production-workflow';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     builds: data,
     deploymentProvider: 'google-cloud-run',
-    northflankConfigured: false,
+    googleConfigured: await isGoogleDeploymentConfigured(),
   });
 }
 
@@ -31,8 +31,8 @@ export async function POST(req: NextRequest) {
     requiredConfirmation: confirmation.required,
   }, { status: 409 });
   const service = body.service ?? 'admin';
-  if (service !== 'admin' && service !== 'marketing') return NextResponse.json({
-    error: 'No approved self-building Google workflow for this target. Northflank is disabled.',
+  if (service !== 'admin' && service !== 'marketing' && service !== 'lms') return NextResponse.json({
+    error: 'Unsupported Google deployment target.',
     deploymentProvider: 'google-cloud-run',
   }, { status: 409 });
   const db = await requireAdminClient();

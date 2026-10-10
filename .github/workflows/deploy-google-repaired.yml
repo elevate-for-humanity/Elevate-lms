@@ -1,5 +1,13 @@
 name: Deploy repaired Google services
 on:
+  workflow_call:
+    inputs:
+      component:
+        type: string
+        required: true
+      image_sha:
+        type: string
+        required: true
   workflow_dispatch:
     inputs:
       component:
@@ -18,76 +26,7 @@ concurrency:
   group: google-runtime-operations
   cancel-in-progress: false
 jobs:
-  capacity:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - uses: google-github-actions/auth@v3
-        with:
-          project_id: elegant-racer-299721
-          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
-          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
-      - uses: google-github-actions/setup-gcloud@v3
-        with:
-          skip_install: true
-      - name: Verify runner-supplied Google SDK compatibility
-        run: node scripts/gcp/verify-sdk.mjs
-      - name: Refuse an active course execution before changing runtime capacity
-        run: |
-          node --input-type=module <<'NODE'
-          import { execFileSync } from 'node:child_process';
-          import { assertNoActiveExecutions } from './scripts/gcp/execute-course-job.mjs';
-          const executions=JSON.parse(execFileSync('gcloud',['run','jobs','executions','list','--job=elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
-          assertNoActiveExecutions(executions);
-          NODE
-      - name: Require regional capacity before changing any revision
-        run: |
-          node --input-type=module <<'NODE'
-          import { execFileSync } from 'node:child_process';
-          const token=execFileSync('gcloud',['auth','print-access-token'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
-          const required = {'run.googleapis.com/cpu_allocation':16000,'run.googleapis.com/mem_allocation':34359738368};
-          // Three services x one instance, plus one service's old/new revision overlap.
-          // This is the approved 4-vCPU/8-GiB web topology, not a worker capacity budget.
-          // This launch budget is valid only after all three services have been resized.
-          for(const component of ['marketing','admin','lms']) {
-            const service=JSON.parse(execFileSync('gcloud',['run','services','describe','elevate-'+component+'-migration','--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
-            const template=service.spec.template;
-            const resources=template.spec.containers[0].resources.limits;
-            if(resources.cpu!=='4' || resources.memory!=='8Gi' || template.metadata.annotations?.['autoscaling.knative.dev/maxScale']!=='1')
-              throw new Error(component+': run the sequential launch sizing workflow before deploying images');
-          }
-          const limits = {};
-          let pageToken='';
-          do {
-            const url=new URL('https://serviceusage.googleapis.com/v1beta1/projects/484736877039/services/run.googleapis.com/consumerQuotaMetrics');
-            url.searchParams.set('view','FULL');
-            url.searchParams.set('pageSize','200');
-            if(pageToken) url.searchParams.set('pageToken',pageToken);
-            const r=await fetch(url,{headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(30000)});
-            if(!r.ok) throw new Error('Cannot verify regional quota: HTTP '+r.status);
-            const body=await r.json();
-            for(const metric of body.metrics || []) {
-              if(!(metric.metric in required)) continue;
-              const buckets=(metric.consumerQuotaLimits || []).flatMap(x=>x.quotaBuckets || []);
-              const bucket=buckets.find(x=>x.dimensions?.region==='us-central1') ||
-                buckets.find(x=>!Object.keys(x.dimensions || {}).length);
-              if(bucket) limits[metric.metric]=Number(bucket.effectiveLimit);
-            }
-            pageToken=body.nextPageToken || '';
-          } while(pageToken);
-          let insufficient=false;
-          for(const [metric,needed] of Object.entries(required)) {
-            const available=limits[metric];
-            const ok=Number.isFinite(available) && (available===-1 || available>=needed);
-            console.log(JSON.stringify({metric,available,required:needed,ok}));
-            if(!ok) insufficient=true;
-          }
-          if(insufficient) throw new Error('Regional quota cannot support the approved web capacity and serialized revision overlap. Request 16 vCPU and 32 GiB minimum before deployment; no service was changed.');
-          NODE
   deploy:
-    needs: capacity
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -123,12 +62,9 @@ jobs:
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region=us-central1 --format='value(metadata.name)'
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
-          if [[ "$COMPONENT" == store ]]; then
-            # Preserve the Store runtime flags, secrets, and approved capacity.
-            gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --quiet
-          else
-          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --cpu=4 --memory=8Gi --min-instances=1 --max-instances=1 --startup-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' --liveness-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=3,periodSeconds=30,timeoutSeconds=5' --quiet
-          fi
+          # An image release preserves capacity, probes, identities and secret bindings.
+          # Cloud Run enforces actual regional quota during revision creation.
+          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --quiet
       - uses: google-github-actions/auth@v3
         id: health_auth
         with:
@@ -165,7 +101,7 @@ jobs:
             }
             const dependency=body.dependencies?.supabase;
             const result={component,attempt,httpStatus:response.status,
-              correctService:body.service===(component === 'store' ? 'marketing' : component), healthy:body.healthy===true,
+              correctService:body.service===component, healthy:body.healthy===true,
               ready:body.ready===true, supabase:dependency?.ok===true,
               dependencyStatus:dependency?.status, dependencyLatencyMs:dependency?.latencyMs,
               dependencyTimeout:dependency?.error==='TimeoutError',
@@ -193,7 +129,7 @@ jobs:
           });
           const readiness=await readinessResponse.json();
           const readyResult={component,httpStatus:readinessResponse.status,ready:readiness.ready===true,
-            correctService:readiness.service===(component === 'store' ? 'marketing' : component),
+            correctService:readiness.service===component,
             correctCommit:readiness.commit===process.env.IMAGE_SHA,
             executorReady:component!=='admin' || readiness.agenticExecutorReady===true};
           console.log(JSON.stringify(readyResult));

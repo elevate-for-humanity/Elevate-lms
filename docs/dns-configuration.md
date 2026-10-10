@@ -1,87 +1,40 @@
-# DNS Configuration Guide
+# Production DNS and routing
 
-## Production architecture
+Production application deployment is Google Cloud only: project `elegant-racer-299721`, region `us-central1`. Never restore Northflank CNAMEs or attach these domains to legacy services.
 
-```text
-User Request
-     |
-     v
-Cloudflare authoritative DNS
-     |
-     v
-Northflank Load Balancer
-     |
-     +---> www.elevateforhumanity.org    ---> elevate-marketing
-     +---> app.elevateforhumanity.org    ---> elevate-lms
-     +---> admin.elevateforhumanity.org ---> elevate-admin
-```
+## Ownership and destinations
 
-Cloudflare owns DNS. Northflank owns the application services and custom-domain TLS. Durable, Vercel, and Netlify are not production origins for these hostnames.
+The October 10, 2026 recursive DNS audit returned `ns1.systemdns.com`, `ns2.systemdns.com`, and `ns3.systemdns.com` as the authoritative nameservers. Do not assume Cloudflare owns this zone because an old API token exists. Query the delegation and each authoritative server before any change. Recursive results alone are not authoritative verification.
 
-## Required Cloudflare DNS records
+| Host | Observed DNS | Intended destination |
+|---|---|---|
+| elevateforhumanity.org | A 34.110.235.233 | Google public edge; permanent HTTPS redirect to www |
+| www.elevateforhumanity.org | A 34.110.235.233 | elevate-marketing-migration |
+| app.elevateforhumanity.org | CNAME www.elevateforhumanity.org | elevate-lms-migration |
+| admin.elevateforhumanity.org | CNAME www.elevateforhumanity.org | elevate-admin-migration |
+| store.elevateforhumanity.org | CNAME www.elevateforhumanity.org | elevate-store-migration |
+| phone.elevateforhumanity.org | A 107.178.216.162 | elevate-pbx, us-central1-a |
 
-| Service | Type | Host | Target | Proxy during verification |
-|---|---|---|---|---|
-| Marketing | CNAME | `www` | `www.elevateforhumanity.org.elev-5vfk.dns.northflank.app` | DNS only |
-| LMS | CNAME | `app` | `app.elevateforhumanity.org.elev-5vfk.dns.northflank.app` | DNS only |
-| Admin | CNAME | `admin` | `admin.elevateforhumanity.org.elev-5vfk.dns.northflank.app` | DNS only |
+The application hostnames share the Google HTTPS load balancer, with the `elevate-public-routes` URL map and separate serverless network endpoint groups. A CNAME to www does not make LMS/Admin/Store the Marketing application: HTTP host routing must independently select the correct backend. TLS is terminated by the Google edge for applications and the PBX gateway for phone. Keep phone DNS-only if a proxy provider is introduced; validate SIP WebSocket and media requirements before any proxy change.
 
-Use Cloudflare TTL Auto. Keep the records DNS-only until Northflank reports each custom domain verified and its certificate is provisioned. Cloudflare proxying may be enabled afterward only if it is intentionally part of the production edge design and origin/TLS behavior has been verified.
+## Read-only verification
 
-The apex `elevateforhumanity.org` must permanently redirect to `https://www.elevateforhumanity.org`. Do not attach the apex to LMS or Admin.
+`.github/workflows/verify-google-cutover.yml` independently verifies Marketing, LMS, Admin and Store. It records service readiness, latest-created revision readiness, created/ready equality, reconciled generations, active traffic, startup/liveness probes, immutable image identity, artifact digest for the observed application commit, Supabase readiness, public identity/commit, Google URL-map/backend/NEG ownership, every authoritative DNS answer, and trusted TLS hostname/date validation.
 
-## Northflank domain ownership
+The workflow fails if the previous deployment remains healthy while the latest deployment failed or has no traffic. A ready retired candidate can be considered for a separate controlled promotion, but is not a completed production deployment. A concurrent rollout invalidates the acceptance snapshot and requires a fresh run.
 
-- `elevate-marketing` owns `www.elevateforhumanity.org`
-- `elevate-lms` owns `app.elevateforhumanity.org`
-- `elevate-admin` owns `admin.elevateforhumanity.org`
+The PBX transport audit is `.github/workflows/audit-owned-pbx-callpath.yml`. DNS, trusted TLS, health and WebSocket handshake evidence do not establish registration, ringing, two-way audio, operator routing, voicemail delivery or PARIS conversation acceptance; those need controlled real calls.
 
-A production hostname must never be attached to more than one service.
+## Change and rollback procedure
 
-## Runtime contract
+1. Read authoritative records and TTLs; save the exact prior record set and Google routing configuration securely.
+2. Verify replacement Google service/revision and intended commit, Supabase, host routing and trusted TLS against the replacement address before changing DNS.
+3. Make only the reviewed hostname change at the actual authoritative provider. Never change unrelated MX/TXT/verification records.
+4. Verify all authoritative servers, recursive DNS, HTTPS destination, application identity and commit after propagation.
+5. If acceptance fails, restore the saved record and traffic configuration; retain the known-good Google revision.
 
-All three services use the canonical Northflank configuration in `scripts/northflank/configure-services.ts`:
+No authoritative DNS changes are performed by the verification workflow. Legacy `scripts/northflank/configure-dns.ts` and `configure-domains.ts` entry points are retired and fail before network access. Historical code remains for incident evidence.
 
-- public HTTP port `site`
-- internal port `3000`
-- `HOSTNAME=0.0.0.0`
-- distinct `SERVICE_ROLE` values for Marketing, LMS, and Admin
-- startup `/api/ping`
-- readiness `/api/health`
-- liveness `/api/ping`
-- zero-downtime rollout with `maxUnavailable=0` and `maxSurge=1`
+## Telephone carrier continuity
 
-Shared production URLs are synchronized by `scripts/northflank/sync-env.ts`:
-
-- `NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org`
-- `NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org`
-- `NEXT_PUBLIC_LMS_URL=https://app.elevateforhumanity.org`
-- `NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org`
-
-## Verification
-
-Run:
-
-```bash
-npx tsx scripts/northflank/configure-dns.ts
-npx tsx scripts/northflank/configure-domains.ts --dry-run
-```
-
-Then test:
-
-```bash
-curl -sI https://www.elevateforhumanity.org/
-curl -sI https://app.elevateforhumanity.org/
-curl -sI https://admin.elevateforhumanity.org/
-curl -sI https://elevateforhumanity.org/
-```
-
-Expected results are a successful HTTP response or an intentional application redirect. The apex should redirect to `www`.
-
-## Failure interpretation
-
-- DNS resolution failure: verify the Cloudflare CNAME and nameserver/zone ownership.
-- Northflank custom-domain verification failure: temporarily keep the record DNS-only and verify the exact CNAME target Northflank provides.
-- 502/503 or `no healthy upstream`: DNS may be correct; inspect Northflank pod health, `/api/ping`, `/api/health`, and container port `3000`.
-- Redirect loop: compare the request host against `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_LMS_URL`, `NEXT_PUBLIC_ADMIN_URL`, `next.config.mjs`, and middleware host routing.
-- TLS error: verify Northflank certificate status before enabling Cloudflare proxying.
+Telnyx remains the production carrier and existing public number route. The independent Asterisk registration/PARIS path must pass authenticated registration and controlled real-call acceptance before any separately authorized telephone traffic cutover. Never reuse Telnyx SIP credentials for Asterisk or claim PBX readiness from a health response.

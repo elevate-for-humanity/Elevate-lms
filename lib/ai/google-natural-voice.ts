@@ -29,7 +29,18 @@ export async function generateGoogleNaturalVoice(text: string): Promise<ArrayBuf
     }),
     signal: AbortSignal.timeout(12000),
   });
-  if (!response.ok) throw new Error(`Google Cloud speech returned HTTP ${response.status}`);
+  if (!response.ok) {
+    // Keep Google's machine-readable reason, without logging credentials or input text.
+    const failure = await response.json().catch(() => null);
+    const details = Array.isArray(failure?.error?.details) ? failure.error.details : [];
+    const reason = details.find((detail: { reason?: unknown }) => typeof detail.reason === 'string')?.reason;
+    const safeReason = typeof reason === 'string' && /^[A-Z_]{1,80}$/.test(reason)
+      ? reason
+      : typeof failure?.error?.status === 'string' && /^[A-Z_]{1,80}$/.test(failure.error.status)
+        ? failure.error.status
+        : 'UNKNOWN';
+    throw new Error(`Google Cloud speech returned HTTP ${response.status} (${safeReason})`);
+  }
   const body = await response.json();
   if (typeof body.audioContent !== 'string' || !body.audioContent)
     throw new Error('Google Cloud speech returned no audio');

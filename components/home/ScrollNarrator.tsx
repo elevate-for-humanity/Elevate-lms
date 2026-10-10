@@ -107,7 +107,7 @@ export function ScrollNarrator() {
     });
     if (!started) {
       lastNarrationRef.current = null;
-      setNotice('Narration will begin with your first touch.');
+      setNotice('Narration could not start. Tap the speaker to retry.');
     } else {
       setNotice(null);
     }

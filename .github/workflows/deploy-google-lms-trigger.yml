@@ -1,0 +1,41 @@
+name: Deploy LMS automatically on Google
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/lms/**'
+      - 'lib/**'
+      - 'components/**'
+      - 'packages/**'
+      - 'Dockerfile.northflank-lms'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/deploy-google-lms-trigger.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch Google-trusted release from main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-lms-trigger.yml/dispatches" -f ref=main
+  build:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/build-google-migration-images.yml
+    with:
+      component: lms
+    secrets: inherit
+  deploy:
+    needs: build
+    uses: ./.github/workflows/deploy-google-repaired.yml
+    with:
+      component: lms
+      image_sha: ${{ github.sha }}
+    secrets: inherit

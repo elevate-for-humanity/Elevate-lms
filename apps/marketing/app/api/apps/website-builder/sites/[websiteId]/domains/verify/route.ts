@@ -1,7 +1,7 @@
 /** Force a fresh Domainee verification/status check for an owned domain. */
 import { NextRequest, NextResponse } from 'next/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { createClient } from '@/lib/supabase/server';
+import { resolveOwnedSite } from '@/lib/domainee/site-resolver';
 import { getDomain, isDomaineeConfigured } from '@/lib/domainee/client';
 
 export const runtime = 'nodejs';
@@ -13,9 +13,9 @@ export async function POST(
 ) {
   await hydrateProcessEnv().catch(() => undefined);
   const { websiteId } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user?.id) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const resolved = await resolveOwnedSite(websiteId);
+  if ('error' in resolved) return resolved.error;
+  const { supabase } = resolved;
 
   const body = await request.json().catch(() => ({}));
   const domainId = String(body.domainId ?? '');
@@ -26,7 +26,6 @@ export async function POST(
     .select('*')
     .eq('id', domainId)
     .eq('website_id', websiteId)
-    .eq('user_id', user.id)
     .maybeSingle();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!row) return NextResponse.json({ error: 'Domain not found' }, { status: 404 });

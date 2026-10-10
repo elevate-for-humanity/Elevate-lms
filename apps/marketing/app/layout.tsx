@@ -15,7 +15,7 @@ import Header from '@/components/site/Header';
 import { SiteFooter } from '@/components/site-footer';
 import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 import { I18nProvider } from '@/lib/i18n/context';
-import { ChunkRecovery } from '@/components/system/ChunkRecovery';
+import { chunkRecoveryBootstrap } from '@/lib/browser/chunk-recovery-bootstrap';
 import { MarketingPwaClient } from '@/components/pwa/MarketingPwaClient';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
@@ -31,6 +31,7 @@ import { MediaPlaybackCoordinator } from '@/components/media/MediaPlaybackCoordi
 
 const siteUrl = 'https://www.elevateforhumanity.org';
 const logoUrl = `${siteUrl}/images/logo.png`;
+const shareImageUrl = `${siteUrl}/images/social/elevate-career-training-20261009.jpg`;
 
 export const metadata: Metadata = {
   title: {
@@ -67,8 +68,9 @@ export const metadata: Metadata = {
     title: 'Elevate for Humanity | Career Training & Registered Apprenticeships',
     description:
       'Find a career path, understand your training and funding options, and connect with apprenticeship and employer opportunities in one place.',
-    images: [{ url: logoUrl, width: 256, height: 256, alt: 'Elevate for Humanity logo' }],
+    images: [{ url: shareImageUrl, width: 1200, height: 630, type: 'image/jpeg', alt: 'Elevate for Humanity career training' }],
   },
+  twitter: { card: 'summary_large_image', images: [shareImageUrl] },
   robots: {
     index: true,
     follow: true,
@@ -126,6 +128,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        <script id="marketing-chunk-recovery" dangerouslySetInnerHTML={{ __html: chunkRecoveryBootstrap() }} />
         <SupabasePublicConfigScript />
         <script
           type="application/ld+json"
@@ -136,7 +139,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SkipToContent />
         <SupabaseConfigBootstrap />
         <MarketingPwaClient />
-        <ChunkRecovery />
         <GoogleAnalytics />
         <Suspense fallback={null}><FacebookPixel /></Suspense>
         <Suspense fallback={null}><FirstPartyTraffic /></Suspense>

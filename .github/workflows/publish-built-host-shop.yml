@@ -1,0 +1,80 @@
+name: Verify and publish built host-shop release
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-built-host-shop.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/publish-built-host-shop.yml/dispatches" -f ref=main
+  publish:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 25
+    concurrency:
+      group: google-marketing-runtime-operations
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify prior final-container proof
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --input-type=module <<'NODE'
+          const r=await fetch('https://api.github.com/repos/'+process.env.GITHUB_REPOSITORY+'/actions/runs/38031382259/jobs',{headers:{authorization:'Bearer '+process.env.GH_TOKEN},signal:AbortSignal.timeout(15000)});
+          if(!r.ok)throw Error('Container proof unavailable');
+          const data=await r.json();
+          if(!data.jobs.some(j=>j.steps.some(s=>s.name==='Test final Marketing container before release'&&s.conclusion==='success')))throw Error('Actual container test did not pass');
+          console.log('Immutable Marketing container passed startup and asset tests.');
+          NODE
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Authenticate prepared regional service
+        id: regional_identity
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-marketing-migration-aabnh2y32a-ue.a.run.app
+          id_token_include_email: true
+          create_credentials_file: false
+          export_environment_variables: false
+      - name: Verify regional runtime and publish existing Google website
+        env:
+          REGIONAL_ID_TOKEN: ${{ steps.regional_identity.outputs.id_token }}
+        run: node scripts/gcp/release-host-shop-region.mjs
+      - name: Remove superseded verification runs
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for run in 38031652801 38031853968; do
+            status="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run" --jq '.status')"
+            if [ "$status" = pending ] || [ "$status" = queued ]; then
+              gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$run/cancel"
+            fi
+          done
+
+# Verify the prepared regional runtime and its precise publication boundary.
+
+# Prepare the validated regional gateway before the owner public-access action.

@@ -19,7 +19,7 @@ export default function BuildsClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [triggering, setTriggering] = useState(false);
-  const [northflankConfigured, setNorthflankConfigured] = useState(false);
+  const [googleConfigured, setGoogleConfigured] = useState(false);
 
   async function fetchBuilds() {
     setLoading(true);
@@ -28,7 +28,7 @@ export default function BuildsClient() {
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
       setBuilds(json.builds ?? []);
-      setNorthflankConfigured(json.northflankConfigured === true);
+      setGoogleConfigured(json.googleConfigured === true);
       setError(null);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to load');
@@ -38,7 +38,7 @@ export default function BuildsClient() {
   }
 
   async function triggerBuild(service: string) {
-    if (!northflankConfigured) return;
+    if (!googleConfigured) return;
     if (!window.confirm(`Deploy ${service} to production?`)) return;
     setTriggering(true);
     try {
@@ -105,14 +105,14 @@ export default function BuildsClient() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => triggerBuild('admin')}
-              disabled={triggering || !northflankConfigured}
+              disabled={triggering || !googleConfigured}
               className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:opacity-50 transition shadow-sm"
             >
               <Play className="h-4 w-4" /> Deploy Admin
             </button>
             <button
               onClick={() => triggerBuild('lms')}
-              disabled={triggering || !northflankConfigured}
+              disabled={triggering || !googleConfigured}
               className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-50 transition shadow-sm"
             >
               <Play className="h-4 w-4" /> Deploy LMS
@@ -126,9 +126,9 @@ export default function BuildsClient() {
           </button>
         </div>
 
-        {!northflankConfigured && (
+        {!googleConfigured && (
           <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-700 mb-6">
-            Deployment is disabled until NORTHFLANK_API_TOKEN and NORTHFLANK_PROJECT_ID are configured.
+            Google deployment requires a valid GitHub Actions dispatch token.
           </div>
         )}
 

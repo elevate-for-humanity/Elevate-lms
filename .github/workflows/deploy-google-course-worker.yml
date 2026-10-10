@@ -91,14 +91,9 @@ jobs:
           skip_install: true
       - name: Verify Google SDK
         run: node scripts/gcp/verify-sdk.mjs
-      - name: Preserve active execution before changing job
-        run: |
-          node --input-type=module <<'NODE'
-          import { execFileSync } from 'node:child_process';
-          import { assertNoActiveExecutions } from './scripts/gcp/execute-course-job.mjs';
-          const args=['run','jobs','executions','list','--job=elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--format=json'];
-          assertNoActiveExecutions(JSON.parse(execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']})));
-          NODE
+      # Updating the job template does not cancel existing executions: their
+      # tasks retain their execution's image digest. Keep the launch overlap
+      # guard in the dispatcher, so deployment cannot launch a second worker.
       - name: Deploy exact finite worker and verify configuration readback
         env:
           IMAGE_SHA: ${{ github.sha }}

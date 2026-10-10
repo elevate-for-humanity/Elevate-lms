@@ -6,7 +6,6 @@ const VM='elevate-studio-browser';
 const DISK='elevate-studio-browser-auth';
 const IMAGE_SHA=process.env.IMAGE_SHA;
 if(!/^[a-f0-9]{40}$/.test(IMAGE_SHA||'')) throw new Error('Full Studio image SHA required');
-if(!process.env.NORTHFLANK_API_TOKEN) throw new Error('Northflank source connection required');
 
 function gcloud(args){
   const r=spawnSync('gcloud',args,{encoding:'utf8',maxBuffer:4*1024*1024});

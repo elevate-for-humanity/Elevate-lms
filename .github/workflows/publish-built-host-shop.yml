@@ -46,7 +46,13 @@ jobs:
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
           export EXPECTED_IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing@$DIGEST"
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > /tmp/service.json
-          gcloud run revisions describe "$REVISION" --project="$PROJECT" --region="$REGION" --format=json > /tmp/revision.json
+          for attempt in $(seq 1 36); do
+            if gcloud run revisions describe "$REVISION" --project="$PROJECT" --region="$REGION" --format=json > /tmp/revision.json &&
+              node -e "const r=JSON.parse(require('fs').readFileSync('/tmp/revision.json'));process.exit(r.status.conditions.some(c=>c.type==='Ready'&&c.status==='True')?0:1)"; then
+              break
+            fi
+            sleep 5
+          done
           node <<'NODE'
           const fs=require('fs'),assert=require('assert/strict');
           const r=JSON.parse(fs.readFileSync('/tmp/revision.json'));
@@ -55,7 +61,7 @@ jobs:
           assert(r.status.conditions.some(c=>c.type==='Ready'&&c.status==='True'));
           assert.equal(s.status.latestCreatedRevisionName,process.env.REVISION,'A newer deployment superseded this candidate');
           NODE
-          gcloud run services update-traffic "$SERVICE" --project="$PROJECT" --region="$REGION" --set-tags="host-shop-verify=$REVISION" --quiet
+          gcloud run services update-traffic "$SERVICE" --project="$PROJECT" --region="$REGION" --update-tags="host-shop-verify=$REVISION" --quiet
           gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > /tmp/tagged.json
           export CANDIDATE_URL="$(node -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/tagged.json')).status.traffic.find(t=>t.tag==='host-shop-verify').url)")"
           node <<'NODE'

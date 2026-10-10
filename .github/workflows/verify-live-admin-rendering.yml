@@ -54,6 +54,7 @@ jobs:
             const job=JSON.parse(execFileSync('gcloud',['run','jobs','describe','elevate-video-render','--region='+renderRegion,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             const task=job.spec.template.spec.template.spec;
             const videoContainer=task.containers[0];
+            console.log(JSON.stringify({videoHealthChecks:true,region:renderRegion,startupProbe:videoContainer.startupProbe||null,livenessProbe:videoContainer.livenessProbe||null}));
             const videoEnv=Object.fromEntries((videoContainer.env||[]).filter(x=>typeof x.value==='string').map(x=>[x.name,x.value]));
             const safe=text=>String(text||'').replace(/https?:\/\/[^\s"']+/g,'[url]').replace(/Bearer\s+\S+/gi,'Bearer [redacted]').replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[token]').slice(0,2000);
             const conditions=items=>(items||[]).map(x=>({type:x.type,status:x.status,reason:x.reason,message:safe(x.message)}));
@@ -79,6 +80,15 @@ jobs:
             const services=JSON.parse(execFileSync('gcloud',['run','services','list','--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             const jobs=JSON.parse(execFileSync('gcloud',['run','jobs','list','--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
             console.log(JSON.stringify({capacityInventory:true,region,services:services.map(s=>({name:s.metadata.name,configuredResources:s.spec.template.spec.containers.map(c=>c.resources?.limits),configuredScaling:Object.fromEntries(Object.entries(s.spec.template.metadata.annotations||{}).filter(([k])=>/Scale|cpu-throttling/.test(k))),traffic:s.status?.traffic?.map(t=>({revision:t.revisionName,percent:t.percent}))})),jobs:jobs.map(j=>({name:j.metadata.name,resources:j.spec.template.spec.template.spec.containers.map(c=>c.resources?.limits),executionCount:j.status?.executionCount,latestExecution:j.status?.latestCreatedExecution}))}));
+            const revisions=JSON.parse(execFileSync('gcloud',['run','revisions','list','--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            const referenced=new Set(services.flatMap(s=>[s.status?.latestCreatedRevisionName,...(s.status?.traffic||[]).map(t=>t.revisionName)]).filter(Boolean));
+            for(const r of revisions.filter(r=>referenced.has(r.metadata.name)||r.status?.conditions?.some(c=>c.type==='Active'&&c.status==='True'))) {
+              console.log(JSON.stringify({revisionCapacity:true,region,revision:r.metadata.name,service:r.metadata.labels?.['serving.knative.dev/service'],resources:r.spec.containers.map(c=>c.resources?.limits),scaling:Object.fromEntries(Object.entries(r.metadata.annotations||{}).filter(([k])=>/Scale|cpu-throttling|startup-cpu-boost/.test(k))),healthChecks:r.spec.containers.map(c=>({startupProbe:c.startupProbe||null,livenessProbe:c.livenessProbe||null})),conditions:r.status?.conditions?.map(c=>({type:c.type,status:c.status,reason:c.reason}))}));
+            }
+            for(const j of jobs) {
+              const executions=JSON.parse(execFileSync('gcloud',['run','jobs','executions','list','--job='+j.metadata.name,'--region='+region,...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+              console.log(JSON.stringify({activeJobExecutions:true,region,job:j.metadata.name,executions:executions.filter(e=>!e.status?.completionTime&&!e.status?.conditions?.some(c=>c.type==='Completed'&&['True','False'].includes(c.status))).map(e=>({name:e.metadata.name,created:e.metadata.creationTimestamp,started:e.status?.startTime,running:e.status?.runningCount,resources:e.spec?.template?.spec?.containers?.map(c=>c.resources?.limits)}))}));
+            }
           }
           const token=execFileSync('gcloud',['auth','print-access-token'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
           const end=new Date(),start=new Date(end.getTime()-15*60*1000);

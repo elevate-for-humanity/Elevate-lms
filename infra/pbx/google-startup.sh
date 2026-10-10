@@ -2,6 +2,32 @@
 set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
+# Bootstrap only a new host. Compute startup metadata runs again on reboot;
+# resetting this checkout would replace reviewed runtime configuration and
+# Compose could recreate the active PBX. Recovery is an explicit operation.
+if command -v docker >/dev/null 2>&1; then
+  if ! docker info >/dev/null 2>&1; then
+    echo "Docker state unavailable; refusing PBX bootstrap or configuration replacement." >&2
+    exit 1
+  fi
+  if docker inspect pbx_asterisk_1 >/dev/null 2>&1; then
+    if [[ "$(docker inspect pbx_asterisk_1 --format '{{.State.Running}}')" != true ]]; then
+      echo "Existing PBX is stopped; preserve it for explicit recovery." >&2
+      exit 1
+    fi
+    if ! docker exec pbx_asterisk_1 asterisk -rx 'core show uptime' >/dev/null 2>&1; then
+      echo "Existing PBX did not answer its CLI; preserving its configuration and container." >&2
+      exit 1
+    fi
+    echo "Existing PBX preserved; bootstrap made no configuration or image changes."
+    exit 0
+  fi
+fi
+if [[ -e /opt/elevate-pbx/repo || -e /var/lib/elevate-pbx-tls ]]; then
+  echo "Existing PBX state requires reviewed recovery; refusing fresh bootstrap." >&2
+  exit 1
+fi
+
 apt-get update
 apt-get install -y docker.io git ca-certificates
 
@@ -14,12 +40,7 @@ fi
 systemctl enable --now docker
 install -d -m 0755 /opt/elevate-pbx
 
-if [[ ! -d /opt/elevate-pbx/repo/.git ]]; then
-  git clone --depth=1 https://github.com/elevate-for-humanity/Elevate-lms.git /opt/elevate-pbx/repo
-else
-  git -C /opt/elevate-pbx/repo fetch origin main --depth=1
-  git -C /opt/elevate-pbx/repo reset --hard origin/main
-fi
+git clone --depth=1 https://github.com/elevate-for-humanity/Elevate-lms.git /opt/elevate-pbx/repo
 
 cd /opt/elevate-pbx/repo/infra/pbx
 

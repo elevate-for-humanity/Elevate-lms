@@ -25,3 +25,12 @@ create table public.profiles (id uuid primary key);
 create table public.phone_callback_tasks (id uuid primary key, status text, read_at timestamptz, recording_url text, assigned_profile_id uuid);
 create table public.voicemails (id uuid primary key, status text, is_read boolean, recording_url text, assigned_profile_id uuid);
 grant all on public.phone_callback_tasks,public.voicemails to authenticated;
+create table public.phone_call_events (
+ id uuid primary key default gen_random_uuid(), phone_system_id uuid not null,
+ call_id uuid, provider text not null default 'telnyx', provider_event_id text,
+ event_type text not null, occurred_at timestamptz, payload jsonb not null default '{}',
+ created_at timestamptz not null default now(), unique(provider,provider_event_id)
+);
+grant all on public.phone_call_events to service_role;
+insert into public.phone_call_events(phone_system_id,provider_event_id,event_type,occurred_at)
+values ('11111111-1111-4111-8111-111111111111','historical','call.hangup','2026-10-01T00:00:00Z');

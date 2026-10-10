@@ -120,15 +120,15 @@ export async function GET() {
   // preferences are temporarily unavailable. Those are secondary features.
   const warnings: string[] = [];
   if (inboxError) {
-    console.error('[program-holder/phone] callback inbox query failed', inboxError);
+    console.error('[program-holder/phone] callback inbox query failed');
     warnings.push('Callback history is temporarily unavailable.');
   }
   if (voicemailError) {
-    console.error('[program-holder/phone] voicemail inbox query failed', voicemailError);
+    console.error('[program-holder/phone] voicemail inbox query failed');
     warnings.push('Voicemail history is temporarily unavailable.');
   }
   if (preferencesError) {
-    console.error('[program-holder/phone] notification preferences query failed', preferencesError);
+    console.error('[program-holder/phone] notification preferences query failed');
     warnings.push('Notification preferences are temporarily unavailable.');
   }
   return NextResponse.json({

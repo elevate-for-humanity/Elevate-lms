@@ -38,11 +38,9 @@ async function auditSMSDelivery(
         ...metadata,
       },
     });
-    if (error) logger.warn('[SMS] delivery audit insert failed', { error: error.message });
+    if (error) logger.warn('[SMS] delivery audit insert failed');
   } catch (error) {
-    logger.warn('[SMS] delivery audit unavailable', {
-      error: error instanceof Error ? error.message : String(error),
-    });
+    logger.warn('[SMS] delivery audit unavailable');
   }
 }
 

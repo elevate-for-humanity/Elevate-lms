@@ -47,7 +47,21 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
+      - name: Authenticate prepared regional service
+        id: regional_identity
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+          token_format: id_token
+          id_token_audience: https://elevate-marketing-migration-aabnh2y32a-ue.a.run.app
+          id_token_include_email: true
+          create_credentials_file: false
+          export_environment_variables: false
       - name: Verify regional runtime and publish existing Google website
+        env:
+          REGIONAL_ID_TOKEN: ${{ steps.regional_identity.outputs.id_token }}
         run: node scripts/gcp/release-host-shop-region.mjs
       - name: Remove superseded verification runs
         if: always()

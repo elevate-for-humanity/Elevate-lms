@@ -11,9 +11,12 @@ const INSTANCE = `${API}/zones/${ZONE}/instances/${VM}`;
 // Exact repository bootstrap before preservation; no arbitrary script replacement.
 // Rollback source: e586835f6386fae8143d8e8b42d2ce06856b56d9:infra/pbx/google-startup.sh
 export const LEGACY_SHA256 = '5260f33b417d1b8019253713bec039038f5b6f7ea43f5a676d99175f84ef93a4';
+// Original VM bootstrap, before the Debian Compose packaging correction.
+// Rollback source: 03df6678c5c5c9eef39ff465382c3fdc97809d14:infra/pbx/google-startup.sh
+export const ORIGINAL_SHA256 = '299c9c79d276021e334cef3c9ffb08d97f6b9126eeb1b07984584c0f376e94b7';
 export const digest = value => createHash('sha256').update(value).digest('hex');
 
-export function planUpdate(instance, project, replacement, legacyHash = LEGACY_SHA256) {
+export function planUpdate(instance, project, replacement, legacyHashes = [LEGACY_SHA256,ORIGINAL_SHA256]) {
   const zones = [`${API}/zones/${ZONE}`,`https://www.googleapis.com/compute/v1/projects/${PROJECT}/zones/${ZONE}`];
   if (instance.name !== VM || !zones.includes(instance.zone) ||
       instance.status !== 'RUNNING' || !instance.id || !instance.lastStartTimestamp ||
@@ -32,7 +35,7 @@ export function planUpdate(instance, project, replacement, legacyHash = LEGACY_S
   const beforeHash = digest(scripts[0].value);
   const afterHash = digest(replacement);
   if (beforeHash === afterHash) return { beforeHash,afterHash,changed:false };
-  if (beforeHash !== legacyHash) throw new Error('unrecognized_startup_script_preserved');
+  if (!legacyHashes.includes(beforeHash)) throw new Error(`unrecognized_startup_script_preserved_${beforeHash}`);
   return { beforeHash,afterHash,changed:true,metadata: {
     fingerprint:instance.metadata.fingerprint,
     items:items.map(item => item.key === 'startup-script' ? {...item,value:replacement} : item),

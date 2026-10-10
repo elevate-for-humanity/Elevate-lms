@@ -4,6 +4,13 @@ on:
     branches: [main]
     paths: ['.github/workflows/execute-finite-video-render.yml']
   workflow_dispatch:
+    inputs:
+      configuration:
+        description: Use the saved Google job settings or redeploy the Admin image
+        type: choice
+        options: [saved, redeploy]
+        default: saved
+        required: true
 permissions:
   contents: read
   actions: write
@@ -37,9 +44,42 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
+      - name: Execute the saved Google render job without changing its configuration
+        if: inputs.configuration == 'saved'
+        run: |
+          node --input-type=module <<'NODE'
+          import {google,PROJECT} from './scripts/gcp/runtime-config.mjs';
+          const jobName='elevate-video-render';
+          const scope=['--project='+PROJECT,'--region=us-central1','--format=json'];
+          const inspect=()=>JSON.parse(google(['run','jobs','describe',jobName,...scope]));
+          const job=inspect();
+          const task=job.spec.template.spec.template.spec;
+          console.log(JSON.stringify({configuration:'saved',job:jobName,resources:task.containers.map(c=>c.resources?.limits),taskCount:job.spec.template.spec.taskCount,parallelism:job.spec.template.spec.parallelism,timeoutSeconds:task.timeoutSeconds,maxRetries:task.maxRetries}));
+          const executions=JSON.parse(google(['run','jobs','executions','list','--job='+jobName,...scope]));
+          const active=executions.filter(x=>!x.status?.completionTime&&!['True','False'].includes(x.status?.conditions?.find(c=>c.type==='Completed')?.status));
+          if(active.length)throw new Error('An existing render execution is active; duplicate execution refused');
+          const started=JSON.parse(google(['run','jobs','execute',jobName,...scope,'--quiet']));
+          const name=started.metadata?.name;
+          if(!/^elevate-video-render-[a-z0-9]+$/.test(name||''))throw new Error('Google did not return a verifiable render execution name');
+          console.log(JSON.stringify({executionStarted:name,configurationUnchanged:JSON.stringify(job.spec)===JSON.stringify(inspect().spec)}));
+          const deadline=Date.now()+65*60*1000;
+          while(Date.now()<deadline){
+            const current=JSON.parse(google(['run','jobs','executions','describe',name,...scope]));
+            const completed=current.status?.conditions?.find(c=>c.type==='Completed');
+            if(current.status?.completionTime||['True','False'].includes(completed?.status)){
+              console.log(JSON.stringify({execution:name,started:current.status?.startTime,completed:current.status?.completionTime,succeeded:current.status?.succeededCount,failed:current.status?.failedCount,conditions:(current.status?.conditions||[]).map(c=>({type:c.type,status:c.status,reason:c.reason}))}));
+              if(completed?.status!=='True')throw new Error('Saved Google render execution did not complete successfully');
+              process.exit(0);
+            }
+            await new Promise(resolve=>setTimeout(resolve,15000));
+          }
+          throw new Error('Render remains active beyond the verification window; inspect its execution before retrying');
+          NODE
       - name: Test terminal render evidence
+        if: inputs.configuration == 'redeploy'
         run: node --test scripts/gcp/finite-video-render.test.mjs
       - name: Deploy and execute one durable verified video session
+        if: inputs.configuration == 'redeploy'
         run: |
           node --input-type=module <<'NODE'
           import {readFileSync,mkdtempSync,writeFileSync,rmSync} from 'node:fs';

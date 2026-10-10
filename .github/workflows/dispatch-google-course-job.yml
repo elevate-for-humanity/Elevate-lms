@@ -1,4 +1,4 @@
-name: Dispatch queued Google course work
+name: Dispatch and recover Google course work
 on:
   push:
     branches: [main]
@@ -32,7 +32,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs
+      - run: node --test scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs lib/video/supabase-resumable-upload.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721

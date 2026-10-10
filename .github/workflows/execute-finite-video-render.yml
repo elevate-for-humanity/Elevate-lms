@@ -16,12 +16,23 @@ on:
         type: boolean
         default: false
         required: true
+      region:
+        description: Google region for the renderer
+        type: choice
+        options: [us-east1, us-central1]
+        default: us-east1
+        required: true
+      source_region:
+        description: Existing region to copy only when creating a validation job in an empty target region
+        type: string
+        default: ''
+        required: false
 permissions:
   contents: read
   actions: write
   id-token: write
 concurrency:
-  group: finite-video-render-acceptance
+  group: finite-video-render-${{ inputs.region || 'us-central1' }}
   cancel-in-progress: false
 jobs:
   dispatch:
@@ -30,7 +41,7 @@ jobs:
     steps:
       - env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/execute-finite-video-render.yml/dispatches" -f ref=main -f 'inputs[configuration]=redeploy' -F 'inputs[validate_only]=true'
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/execute-finite-video-render.yml/dispatches" -f ref=main -f 'inputs[configuration]=redeploy' -F 'inputs[validate_only]=true' -f 'inputs[region]=us-east1' -f 'inputs[source_region]=us-central1'
   render:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -53,6 +64,8 @@ jobs:
         run: node --test scripts/gcp/execute-finite-video-render.test.mjs scripts/gcp/finite-video-render.test.mjs
       - name: Execute and verify the bounded Google render job
         env:
+          RENDER_REGION: ${{ inputs.region }}
+          RENDER_SOURCE_REGION: ${{ inputs.source_region }}
           RENDER_CONFIGURATION: ${{ inputs.configuration }}
           VALIDATE_ONLY: ${{ inputs.validate_only }}
         run: node scripts/gcp/execute-finite-video-render.mjs

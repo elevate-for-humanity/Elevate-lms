@@ -2,35 +2,69 @@ name: Verify Google public cutover prerequisites
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/verify-google-cutover.yml']
+    paths:
+      - '.github/workflows/verify-google-cutover.yml'
+      - 'scripts/gcp/verify-google-cutover.mjs'
+      - 'scripts/gcp/verify-cutover-state.mjs'
+      - 'scripts/gcp/verify-production-dns.mjs'
   workflow_run:
-    workflows: ['Deploy Admin', 'Deploy Google Marketing on trigger', 'Deploy repaired Google services', 'Deploy Google Store subscription delivery']
+    workflows: ['Deploy Admin', 'Deploy Google Marketing on trigger', 'Deploy LMS automatically on Google', 'Deploy repaired Google services', 'Deploy Google Store subscription delivery']
     types: [completed]
   workflow_dispatch:
+    inputs:
+      expected_component:
+        description: Optional component whose new release must be verified
+        type: choice
+        options: ['', marketing, admin, lms, store]
+        default: ''
+      expected_commit:
+        description: Exact 40-character release commit for expected_component
+        type: string
+        default: ''
 permissions:
   actions: write
   contents: read
   id-token: write
 jobs:
   dispatch:
-    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    # A successful dispatch-only push job is not a successful deployment.
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-24.04
     steps:
       - name: Dispatch trusted production acceptance
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-google-cutover.yml/dispatches" -f ref=main
+          SOURCE_NAME: ${{ github.event.workflow_run.name }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          component=''
+          case "$SOURCE_NAME" in
+            'Deploy Admin') component=admin ;;
+            'Deploy Google Marketing on trigger') component=marketing ;;
+            'Deploy LMS automatically on Google') component=lms ;;
+          esac
+          if test -n "$component"; then
+            gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-google-cutover.yml/dispatches" -f ref=main -f "inputs[expected_component]=$component" -f "inputs[expected_commit]=$SOURCE_SHA"
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-google-cutover.yml/dispatches" -f ref=main
+          fi
   inspect:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
-    timeout-minutes: 10
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
         component: [marketing, admin, lms, store]
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check verifier regression cases
+        run: node --test scripts/gcp/verify-cutover-state.test.mjs
       - uses: google-github-actions/auth@v3
         id: auth
         with:
@@ -45,88 +79,18 @@ jobs:
           skip_install: true
       - name: Verify runner-supplied Google SDK compatibility
         run: node scripts/gcp/verify-sdk.mjs
-      - name: Read readiness, public access, domain mappings and DNS
+      - name: Verify each mandatory production condition independently
         env:
           COMPONENT: ${{ matrix.component }}
           TOKEN: ${{ steps.auth.outputs.id_token }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-        run: |
-          node --input-type=module <<'NODE'
-          import { execFileSync } from 'node:child_process';
-          import { healthPassed } from './scripts/gcp/audit-runtime-parity.mjs';
-          let failed = false;
-          const component=process.env.COMPONENT;
-          const application=component;
-          const service='elevate-'+component+'-migration';
-          const base='https://'+service+'-aabnh2y32a-uc.a.run.app';
-          const gcloud=args=>execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
-          const report=x=>console.log(JSON.stringify(x));
-          const metadata=JSON.parse(gcloud(['run','services','describe',service,'--project=elegant-racer-299721','--region=us-central1','--format=json']));
-          report({component,url:metadata.status.url,revision:metadata.status.latestReadyRevisionName,
-            ingress:metadata.metadata.annotations?.['run.googleapis.com/ingress'],
-            startupProbe:metadata.spec.template.spec.containers[0].startupProbe,
-            resources:metadata.spec.template.spec.containers[0].resources,
-            min:metadata.spec.template.metadata.annotations?.['autoscaling.knative.dev/minScale'],
-            max:metadata.spec.template.metadata.annotations?.['autoscaling.knative.dev/maxScale']});
-          try {
-            const policy=JSON.parse(gcloud(['run','services','get-iam-policy',service,'--project=elegant-racer-299721','--region=us-central1','--format=json']));
-            report({component,publicInvoker:(policy.bindings || []).some(b=>b.role==='roles/run.invoker' && b.members?.includes('allUsers'))});
-          } catch {report({component,iamRead:'unavailable'});}
-          for(const path of ['/api/health','/api/ready','/']) {
-            try {
-              const r=await fetch(base+path,{headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},redirect:'manual',signal:AbortSignal.timeout(30000)});
-              const b=path==='/'?{}:await r.json().catch(()=>({}));
-              report({component,path,status:r.status,contentType:r.headers.get('content-type'),
-                ready:b.ready,healthy:b.healthy,commit:b.commit,executorReady:b.agenticExecutorReady,
-                supabaseOK:b.dependencies?.supabase?.ok});
-              if (path !== '/' && !healthPassed(application,path,r.status,b)) failed=true;
-              if (path === '/' && ![200,302,303,307,308].includes(r.status)) failed=true;
-            } catch {report({component,path,error:'probe_failed'});failed=true;}
-          }
-          const readyRevision=metadata.status.latestReadyRevisionName;
-          const traffic=(metadata.status.traffic || []).filter(t=>t.revisionName===readyRevision).reduce((sum,t)=>sum+Number(t.percent || 0),0);
-          const revision=JSON.parse(gcloud(['run','revisions','describe',readyRevision,'--project=elegant-racer-299721','--region=us-central1','--format=json']));
-          const image=revision.spec.containers[0].image;
-          const correctImage=image.startsWith('us-central1-docker.pkg.dev/elegant-racer-299721/elevate/'+component+'@');
-          const revisionReady=(metadata.status.conditions || []).some(c=>c.type==='Ready' && c.status==='True');
-          const immutable=/@sha256:[a-f0-9]{64}$/.test(image);
-          report({component,readyRevision,traffic,image,revisionReady,immutable});
-          if(!revisionReady || traffic!==100 || !immutable || !correctImage) failed=true;
-          if(component==='store') {
-            try {
-              const storefront=await fetch(base+'/store',{signal:AbortSignal.timeout(30000)});
-              report({component,storefrontStatus:storefront.status,application});
-              if(storefront.status!==200) failed=true;
-            } catch {report({component,storefrontError:'storefront_probe_failed'});failed=true;}
-          }
-          const publicBases={marketing:'https://www.elevateforhumanity.org',admin:'https://admin.elevateforhumanity.org',lms:'https://app.elevateforhumanity.org',store:'https://store.elevateforhumanity.org'};
-          if(publicBases[component]) {
-            try {
-              const direct=await fetch(base+'/api/health',{signal:AbortSignal.timeout(30000)});
-              const directBody=await direct.json();
-              const publicResponse=await fetch(publicBases[component]+'/api/health?acceptance='+Date.now(),{cache:'no-store',redirect:'manual',signal:AbortSignal.timeout(30000)});
-              const publicBody=await publicResponse.json();
-              const sameCommit=Boolean(directBody.commit) && directBody.commit===publicBody.commit;
-              const publicHealthy=healthPassed(component,'/api/health',publicResponse.status,publicBody);
-              report({component,publicUrl:publicBases[component],publicStatus:publicResponse.status,directCommit:directBody.commit,publicCommit:publicBody.commit,sameCommit,publicHealthy});
-              if(!sameCommit || !publicHealthy) failed=true;
-            } catch {report({component,publicError:'public_revision_probe_failed'});failed=true;}
-          }
-          if(component==='marketing') {
-            try {
-              const mappings=JSON.parse(gcloud(['run','domain-mappings','list','--project=elegant-racer-299721','--region=us-central1','--format=json']));
-              report({domainMappings:mappings.map(x=>({domain:x.metadata?.name,service:x.spec?.routeName,conditions:x.status?.conditions,records:x.status?.resourceRecords}))});
-            } catch {report({domainMappings:'unavailable'});}
-            const token=process.env.CLOUDFLARE_API_TOKEN, zone=process.env.CLOUDFLARE_ZONE_ID;
-            report({cloudflareTokenPresent:Boolean(token),cloudflareZonePresent:Boolean(zone)});
-            if(token && /^[a-f0-9]{32}$/.test(zone || '')) {
-              for(const name of ['elevateforhumanity.org','www.elevateforhumanity.org','admin.elevateforhumanity.org','app.elevateforhumanity.org','store.elevateforhumanity.org']) {
-                const r=await fetch('https://api.cloudflare.com/client/v4/zones/'+zone+'/dns_records?name='+encodeURIComponent(name),{headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(20000)});
-                const b=await r.json();
-                report({dnsName:name,httpStatus:r.status,success:b.success,records:Array.isArray(b.result)?b.result.map(x=>({type:x.type,name:x.name,content:x.content,proxied:x.proxied,ttl:x.ttl})):[]});
-              }
-            }
-          }
-          if(failed) process.exitCode=1;
-          NODE
+          EXPECTED_COMPONENT: ${{ inputs.expected_component }}
+          EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+        run: node scripts/gcp/verify-google-cutover.mjs
+      - name: Preserve sanitized live verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: google-cutover-${{ matrix.component }}-${{ github.run_id }}
+          path: google-cutover-${{ matrix.component }}.json
+          if-no-files-found: error
+          retention-days: 30

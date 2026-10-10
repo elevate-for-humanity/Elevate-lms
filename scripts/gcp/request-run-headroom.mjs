@@ -4,8 +4,8 @@ import { pathToFileURL } from 'node:url';
 const project = 'elegant-racer-299721';
 const parent = 'https://cloudquotas.googleapis.com/v1/projects/484736877039/locations/global';
 export const targets = [
-  {quotaId: 'CpuAllocPerProjectRegion', preferredValue: '256000', id: 'elevate-run-cpu-us-central1'},
-  {quotaId: 'MemAllocPerProjectRegion', preferredValue: '549755813888', id: 'elevate-run-memory-us-central1'},
+  {quotaId: 'CpuAllocPerProjectRegion', preferredValue: '768000', id: 'elevate-run-cpu-us-central1'},
+  {quotaId: 'MemAllocPerProjectRegion', preferredValue: '1649267441664', id: 'elevate-run-memory-us-central1'},
 ];
 export function quotaContact(policy) {
   const owners = [...new Set((policy.bindings || []).filter(b => b.role === 'roles/owner' && !b.condition)

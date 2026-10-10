@@ -18,7 +18,7 @@ export function executionSummary(execution) {
     conditions: (execution.status?.conditions || []).map(c => ({ type: c.type, status: c.status,
       reason: c.reason, message: String(c.message || '').replace(/https?:\/\/\S+/g, '[url]').slice(0, 1000) })) };
 }
-export async function executeFiniteVideoJob({ configuration = 'saved', validateOnly = false,
+export async function executeFiniteVideoJob({ configuration = 'saved', validateOnly = false, configureOnly = false,
   region = 'us-central1', sourceRegion = '', request = fetch,
   run = google, log = value => console.log(JSON.stringify(value)),
   pause = ms => new Promise(resolve => setTimeout(resolve, ms)), now = Date.now,
@@ -26,6 +26,8 @@ export async function executeFiniteVideoJob({ configuration = 'saved', validateO
 } = {}) {
   if (!['saved', 'redeploy'].includes(configuration) || typeof validateOnly !== 'boolean')
     throw new Error('Explicit saved/redeploy configuration and boolean validation mode required');
+  if (typeof configureOnly !== 'boolean' || (configureOnly && (configuration !== 'redeploy' || !validateOnly || sourceRegion)))
+    throw new Error('Configuration-only requires an existing job refresh without migration or execution');
   if (!REGIONS.includes(region) || (sourceRegion && (!REGIONS.includes(sourceRegion) || sourceRegion === region)))
     throw new Error('Unsupported target or source region');
   const read = (args, location = region) => JSON.parse(run([...args, ...scope(location)]));
@@ -43,10 +45,15 @@ export async function executeFiniteVideoJob({ configuration = 'saved', validateO
       Number(job.spec.template.spec.parallelism || 1) !== 1 || Number(task.maxRetries) !== 0)
     throw new Error('Finite renderer requires one task, parallelism one, and zero automatic retries');
   const active = migrating ? [] : read(['run', 'jobs', 'executions', 'list', '--job=' + JOB]).filter(x => !terminal(x));
-  if (active.length) {
+  if (active.length && !configureOnly) {
     active.forEach(x => log({ activeExecution: executionSummary(x) }));
     throw new Error('Render is already active; inspect the reported execution before retrying');
   }
+  const executionSnapshots = configureOnly ? active.map(x => {
+    const execution = read(['run', 'jobs', 'executions', 'describe', x.metadata.name]);
+    if (!execution.spec) throw new Error('Active execution configuration is unavailable');
+    return { name: x.metadata.name, spec: execution.spec };
+  }) : [];
   let sourceValidations = [];
   if (migrating) {
     const annotations = job.spec.template.metadata?.annotations || {};
@@ -56,9 +63,11 @@ export async function executeFiniteVideoJob({ configuration = 'saved', validateO
     if (sourceValidations.some(x => !x.spec?.template?.spec?.containers?.[0]?.env?.some(e => e.name === 'VIDEO_VALIDATE_ONLY' && e.value === 'true')))
       throw new Error('A real source render is active; regional placement stopped');
   }
-  const capacity = await inspectRegionalCapacity({ region, task, run, request });
-  log({ regionalCapacity: capacity });
-  if (!capacity.fits) throw new Error('Approved target-region quota does not cover bounded workloads');
+  if (!configureOnly) {
+    const capacity = await inspectRegionalCapacity({ region, task, run, request });
+    log({ regionalCapacity: capacity });
+    if (!capacity.fits) throw new Error('Approved target-region quota does not cover bounded workloads');
+  }
   if (configuration === 'redeploy') {
     const service = read(['run', 'services', 'describe', 'elevate-admin-migration'], 'us-central1');
     const traffic = (service.status?.traffic || []).filter(x => x.percent > 0);
@@ -133,6 +142,17 @@ export async function executeFiniteVideoJob({ configuration = 'saved', validateO
       !container.env?.some(e => e.name === 'VIDEO_HEALTH_PORT' && e.value === '3101') ||
       !container.args?.some(x => x.includes('startRenderHealthCheck')))
     throw new Error('Refresh the runner to configure and verify its startup health check');
+  if (configureOnly) {
+    // Cloud Run executions are immutable snapshots. Updating the saved job
+    // configures future runs; it must not start, cancel, or change the current one.
+    for (const snapshot of executionSnapshots) {
+      const current = read(['run', 'jobs', 'executions', 'describe', snapshot.name]);
+      if (!isDeepStrictEqual(current.spec, snapshot.spec)) throw new Error('Active execution configuration changed unexpectedly');
+    }
+    const result = { configured: true, region, startupProbe: container.startupProbe,
+      activeExecutionsPreserved: executionSnapshots.length, executionStarted: false };
+    log(result); return result;
+  }
   log({ configuration, region, validateOnly, resources: container.resources?.limits,
     startupProbe: container.startupProbe, taskCount: job.spec.template.spec.taskCount, retries: task.maxRetries });
   const started = read(['run', 'jobs', 'execute', JOB, '--quiet', '--async',

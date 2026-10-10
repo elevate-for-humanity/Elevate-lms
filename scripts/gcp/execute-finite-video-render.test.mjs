@@ -82,6 +82,24 @@ test('active Google task blocks updates and duplicate execution with visible ide
   assert.equal(f.calls.some(c => ['update', 'execute'].includes(c[2])), false);
   assert.equal(f.logs[0].activeExecution.execution, 'elevate-video-render-active');
 });
+test('configuration-only refresh preserves an active execution and never launches or cancels work', async () => {
+  const execution = { metadata: { name: 'elevate-video-render-active' }, spec: { immutable: 'original' }, status: { runningCount: 1 } };
+  const f = fixture({ active: [execution] });
+  const original = f.options.run;
+  f.options.run = args => args.slice(0, 4).join(' ') === 'run jobs executions describe' ? JSON.stringify(execution) : original(args);
+  const result = await executeFiniteVideoJob({ ...f.options, configuration: 'redeploy', validateOnly: true, configureOnly: true });
+  assert.equal(result.configured, true);
+  assert.equal(result.activeExecutionsPreserved, 1);
+  assert.deepEqual(result.startupProbe, probe);
+  assert.equal(f.calls.some(c => c.includes('execute') || c.includes('cancel')), false);
+  assert.equal(f.logs.some(l => l.regionalCapacity), false);
+});
+test('configuration-only mode cannot be combined with a regional migration or saved execution', async () => {
+  const f = fixture();
+  await assert.rejects(executeFiniteVideoJob({ ...f.options, configureOnly: true }), /Configuration-only/);
+  await assert.rejects(executeFiniteVideoJob({ ...f.options, configuration: 'redeploy', validateOnly: true, configureOnly: true, sourceRegion: 'us-east1' }), /Configuration-only/);
+  assert.equal(f.calls.length, 0);
+});
 test('an existing job also checks granted quota before changing settings or executing', async () => {
   const f = fixture();
   f.options.request = async () => ({ ok: true, json: async () => ({ dimensionsInfos: [

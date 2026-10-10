@@ -10,7 +10,7 @@ const sentence="Before cutting hair, wash your hands and clean the tools. Check 
 const text=sentence+" Place a clean cape around the shoulders and adjust the chair. Choose the correct guard before starting the first section. Keep the clipper moving with steady pressure. Stop immediately if the skin becomes irritated. After the haircut, brush away loose hair, show the finished shape in a mirror, and disinfect every reusable tool."
 const directory=await mkdtemp(join(tmpdir(),'course-speech-smoke-'));
 try {
-  const narrator=await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:'q8',device:'cpu'});
+  const narrator=await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:'q8',device:'cpu',local_files_only:true});
   const audio=await narrator.generate(text,{voice:'af_heart',speed:1});
   const samples=audio.audio ?? audio.data;
   if (!samples?.length || audio.sampling_rate!==24000) throw new Error('SMOKE_NARRATION_INVALID');

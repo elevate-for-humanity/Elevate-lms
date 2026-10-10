@@ -91,6 +91,7 @@ jobs:
           pnpm exec tsc --noEmit --project apps/marketing/tsconfig.json
           node --test scripts/gcp/marketing-health-routing.test.cjs
           node --experimental-strip-types --test scripts/test-hosted-website-management.mjs scripts/test-hosted-domain-management.mjs scripts/test-hosted-website-claims.mjs
+          node --test scripts/test-public-revision-activation.mjs
           node scripts/audit-geo-claims.mjs
           node scripts/check-public-claims.mjs
           node scripts/check-public-address-integrity.mjs
@@ -205,13 +206,7 @@ jobs:
           # the immutable image identity. Explicitly serve the ready revision;
           # image updates alone preserve a previously pinned traffic target.
           REVISION="elevate-marketing-migration-$SUFFIX"
-          READY="$(gcloud run services describe elevate-marketing-migration --project=elegant-racer-299721 --region=us-central1 --format='value(status.latestReadyRevisionName)')"
-          test "$READY" = "$REVISION"
-          gcloud run services update-traffic elevate-marketing-migration \
-            --project=elegant-racer-299721 \
-            --region=us-central1 \
-            --to-revisions="$REVISION=100" \
-            --quiet
+          CANDIDATE_REVISION="$REVISION" IMAGE_SHA="$GITHUB_SHA" node scripts/gcp/activate-tested-public-revision.mjs
 
       - name: Collect exact failed revision diagnostics
         if: ${{ failure() && steps.deploy.outcome == 'failure' }}

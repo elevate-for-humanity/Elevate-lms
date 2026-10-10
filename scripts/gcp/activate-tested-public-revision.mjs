@@ -6,7 +6,7 @@ export async function activateTestedRevision({service,revision,commit,read=gclou
  if(!['elevate-marketing-migration','elevate-store-migration'].includes(service)||!new RegExp('^'+service+'-[a-z0-9-]+$').test(revision||'')||!/^[a-f0-9]{40}$/.test(commit||''))throw Error('Exact service, revision and immutable commit required');
  const metadata=read(['run','revisions','describe',revision,'--region='+region]);
  if(!/@sha256:[a-f0-9]{64}$/.test(metadata.spec?.containers?.[0]?.image||''))throw Error('Candidate image must be immutable');
- const tag='candidate-'+revision.slice(service.length+1);
+ const tag='c-'+commit.slice(0,12);
  // A pinned serving revision makes latestReadyRevisionName unsuitable as a
  // pre-activation gate. A zero-percent tag starts only the exact candidate.
  read(['run','services','update-traffic',service,'--region='+region,'--update-tags='+tag+'='+revision,'--quiet']);

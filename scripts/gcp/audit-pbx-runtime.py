@@ -2,6 +2,7 @@
 """Read-only remote PBX audit. Never emit CLI/config contents or caller details."""
 import json
 import http.client
+from pathlib import Path
 import re
 import subprocess
 
@@ -26,6 +27,31 @@ def mailbox_count(output):
         return 0
     match = re.search(r'(\d+)\s+voicemail users? configured', output or '', re.I)
     return int(match[1]) if match else None
+
+
+def service_state(output):
+    """Whitelist state labels. Never return unit Environment, command lines or errors."""
+    if output is None:
+        return {'result': 'BLOCKED', 'evidence': {'reason': 'unit_state_unavailable'}}
+    allowed = {
+        'LoadState': {'loaded', 'not-found', 'error', 'masked', 'bad-setting', 'merged', 'stub'},
+        'ActiveState': {'active', 'reloading', 'inactive', 'failed', 'activating', 'deactivating', 'maintenance', 'refreshing'},
+        'SubState': {'running', 'dead', 'failed', 'exited', 'start', 'stop', 'auto-restart', 'start-pre', 'start-post', 'stop-sigterm', 'stop-post'},
+    }
+    raw = dict(line.split('=', 1) for line in output.splitlines() if '=' in line)
+    states = {key: raw.get(key) if raw.get(key) in values else 'unknown' for key, values in allowed.items()}
+    ready = states == {'LoadState': 'loaded', 'ActiveState': 'active', 'SubState': 'running'}
+    result = 'PASS' if ready else ('BLOCKED' if 'unknown' in states.values() else 'FAIL')
+    return {'result': result, 'evidence': {**states, 'scope': 'systemd_process_only; listener_and_call_checks_separate'}}
+
+
+def runtime_files(paths, exists=lambda p: Path(p).is_file()):
+    # Presence only: no environment/config contents or secret values are read.
+    try:
+        present = {name: bool(exists(filename)) for name, filename in paths.items()}
+        return {'result': 'PASS' if all(present.values()) else 'FAIL', 'evidence': present}
+    except OSError:
+        return {'result': 'BLOCKED', 'evidence': {'reason': 'runtime_file_presence_unavailable'}}
 
 
 def private_listener(port, path, connect=http.client.HTTPConnection):
@@ -85,6 +111,20 @@ def audit():
         'result': 'BLOCKED' if count is None else ('PASS' if count > 0 else 'FAIL'),
         'evidence': {'configured_mailboxes': count}}
     checks['VM_SECRET_MANAGER_SCOPE'] = vm_secret_scope()
+    services = {
+        'PWA_PROVISIONER': ('elevate-pbx-provisioner.service', '/opt/elevate-pbx/provisioner/server.mjs', '/etc/elevate-pbx/provisioner.conf'),
+        'PARIS_TURN': ('elevate-paris-turn.service', '/opt/elevate-pbx/paris/launch.mjs', '/etc/elevate-pbx/paris.conf'),
+        'PARIS_GATEWAY': ('elevate-paris-gateway.service', '/opt/elevate-pbx/paris/launch.mjs', '/etc/elevate-pbx/paris.conf'),
+    }
+    for name, (unit, entrypoint, environment) in services.items():
+        checks[name + '_UNIT'] = service_state(command('systemctl', 'show', unit, '--no-pager',
+                                                     '--property=LoadState,ActiveState,SubState'))
+        checks[name + '_FILES'] = runtime_files({'entrypoint': entrypoint, 'environment_file': environment})
+    node_present = Path('/usr/bin/node').is_file()
+    node_version = command('/usr/bin/node', '--version') if node_present else None
+    node_match = re.fullmatch(r'v([0-9]+)\.[0-9]+\.[0-9]+\s*', node_version or '')
+    checks['NODE_RUNTIME'] = {'result': ('PASS' if int(node_match[1]) >= 22 else 'FAIL') if node_match else ('BLOCKED' if node_present else 'FAIL'),
+                              'evidence': {'binary_present': node_present, 'major_version': int(node_match[1]) if node_match else None}}
     checks['PWA_PROVISIONER_LISTENER'] = private_listener(8090, '/internal/pbx/devices')
     checks['PARIS_TURN_LISTENER'] = private_listener(8091, '/internal/paris/turn')
     endpoints = cli('pjsip show endpoints')

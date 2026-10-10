@@ -12,7 +12,7 @@ for(const key of keys) {
  if(key.endsWith('URL') && v?.value) {
   const url=new URL(v.value);
   report.hostname=url.hostname;
-  report.legacyProvider=url.hostname.endsWith('.northflank.app');
+  report.legacyProvider=url.hostname.endsWith('.northflank.app') || url.hostname.endsWith('.code.run');
   try {const r=await fetch(new URL('/health',url),{signal:AbortSignal.timeout(15000),redirect:'manual'});report.healthStatus=r.status;}catch(e){report.healthError=e.name;}
  }
  console.log(JSON.stringify(report));

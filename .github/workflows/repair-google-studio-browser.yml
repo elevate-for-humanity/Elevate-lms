@@ -1,0 +1,64 @@
+name: Repair Google Studio browser runtime
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/repair-google-studio-browser.yml'
+      - 'scripts/gcp/repair-studio-browser-cloud-run.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch through trusted Google workflow identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/repair-google-studio-browser.yml/dispatches" -f ref=main
+  repair:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 45
+    concurrency:
+      group: google-studio-browser
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build actual immutable Studio browser container
+        run: docker build -f Dockerfile.studio-browser --build-arg "NF_GIT_SHA=$GITHUB_SHA" -t "studio-browser:$GITHUB_SHA" .
+      - name: Verify direct CDP and browser authorization contracts
+        run: >-
+          docker run --rm --init
+          -e STUDIO_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
+          -v "$PWD/services/studio-browser:/tests:ro"
+          --entrypoint sh "studio-browser:$GITHUB_SHA"
+          -c 'test "$(id -u)" = 1001 && test -x "$STUDIO_BROWSER_EXECUTABLE_PATH" && cp -f /tests/*.test.mjs /app/ && node --test --test-concurrency=1 /app/*.test.mjs'
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Publish tested browser image
+        run: |
+          set -euo pipefail
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/studio-browser:$GITHUB_SHA"
+          docker tag "studio-browser:$GITHUB_SHA" "$IMAGE"
+          docker push "$IMAGE"
+      - name: Restore browser and persistent encrypted provider storage before Admin cutover
+        env:
+          IMAGE_SHA: ${{ github.sha }}
+        run: node scripts/gcp/repair-studio-browser-cloud-run.mjs

@@ -335,7 +335,6 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
       title: 'Platform health',
       command: 'Check current platform health status',
       status: 'pending',
-      depends_on: ['s1'],
       expected_output: 'Current platform health result',
       verification_rule: 'The read-only platform health tool must return a current result.',
     },
@@ -346,7 +345,6 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
       command:
         'Inspect current Studio workflow status. Read-only: do not modify, start, stop, deploy, publish, send, upload, or delete anything.',
       status: 'pending',
-      depends_on: ['s2'],
       expected_output: 'Current workflow state from a registered read-only tool',
       verification_rule: 'The read-only workflow inspector must return evidence without mutation.',
     },

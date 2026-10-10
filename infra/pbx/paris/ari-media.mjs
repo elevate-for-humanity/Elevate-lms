@@ -104,7 +104,8 @@ function parseRtp(packet){
   let offset=12+cc*4;if(offset>packet.length)return null;
   if(extension){if(offset+4>packet.length)return null;offset+=4+packet.readUInt16BE(offset+2)*4;}
   const pad=(packet[0]&32)?packet[packet.length-1]:0;
-  if(offset>packet.length-pad)return null;
+  if((packet[0]&32) && (pad===0 || pad>packet.length-offset))return null;
+  if(offset>=packet.length-pad)return null;
   const payloadType=packet[1]&127;
   if(payloadType!==0)return null; // PCMU payload type 0 only.
   return {payload:packet.subarray(offset,packet.length-pad),ssrc:packet.readUInt32BE(8)};

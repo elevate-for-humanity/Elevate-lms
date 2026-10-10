@@ -15,7 +15,7 @@ import Header from '@/components/site/Header';
 import { SiteFooter } from '@/components/site-footer';
 import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 import { I18nProvider } from '@/lib/i18n/context';
-import { ChunkRecovery } from '@/components/system/ChunkRecovery';
+import { chunkRecoveryBootstrap } from '@/lib/browser/chunk-recovery-bootstrap';
 import { MarketingPwaClient } from '@/components/pwa/MarketingPwaClient';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
@@ -128,6 +128,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        <script id="marketing-chunk-recovery" dangerouslySetInnerHTML={{ __html: chunkRecoveryBootstrap() }} />
         <SupabasePublicConfigScript />
         <script
           type="application/ld+json"
@@ -138,7 +139,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SkipToContent />
         <SupabaseConfigBootstrap />
         <MarketingPwaClient />
-        <ChunkRecovery />
         <GoogleAnalytics />
         <Suspense fallback={null}><FacebookPixel /></Suspense>
         <Suspense fallback={null}><FirstPartyTraffic /></Suspense>

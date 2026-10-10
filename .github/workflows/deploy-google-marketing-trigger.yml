@@ -1,7 +1,8 @@
 name: Deploy Google Marketing on trigger
 
 # Changes on main release automatically after validation and final-container tests.
-# Each service releases independently; a newer release supersedes its older run.
+# Each service releases independently. Finish an active release before the
+# latest pending revision starts, so new pushes do not discard completed builds.
 on:
   push:
     branches: [main]
@@ -38,7 +39,7 @@ permissions:
 
 concurrency:
   group: google-production-marketing
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:

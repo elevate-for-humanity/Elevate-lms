@@ -6,6 +6,10 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/course-builder-production-kick.yml'
+      - 'Dockerfile.ultimate-worker'
+      - 'lib/video/edge-tts.ts'
+      - 'workers/local-speech-smoke.mjs'
+      - 'workers/admin-speech-cache.mjs'
   workflow_dispatch:
   schedule:
     - cron: '*/30 * * * *'

@@ -23,8 +23,8 @@ export default function BarberBeautyNetworkPage() {
   return (
     <main className="min-h-screen bg-white text-slate-950">
       <section className="relative isolate overflow-hidden bg-slate-950 text-white">
-        <SafeHeroVideo src="/videos/partners/kountry-kutz/shop-tour.mp4" poster="/images/partners/kountry-kutz/interior-active-enhanced-2026.webp" priority loop ariaLabel="A tour of participating Host Shop Kountry Kutz" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/70 to-slate-950/30" />
+        <div className="absolute inset-0 -z-10"><SafeHeroVideo src="/videos/partners/kountry-kutz/shop-tour.mp4" poster="/images/partners/kountry-kutz/interior-active-enhanced-2026.webp" priority loop ariaLabel="A tour of participating Host Shop Kountry Kutz" className="absolute inset-0 h-full w-full object-cover" /></div>
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/90 via-slate-950/70 to-slate-950/30" />
         <div className="relative mx-auto max-w-6xl px-5 py-20 sm:py-28">
           <p className="text-sm font-black uppercase tracking-[.16em] text-blue-200">Elevate Professional Network</p>
           <h1 className="mt-4 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">Barber & Beauty Network</h1>

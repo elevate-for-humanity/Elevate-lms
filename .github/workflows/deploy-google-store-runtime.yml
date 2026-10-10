@@ -4,6 +4,11 @@ on:
     branches: [main]
     paths: ['.github/workflows/deploy-google-store-runtime.yml', 'lib/health/public-runtime-service.ts', 'apps/marketing/middleware.ts', 'Dockerfile.marketing']
   workflow_dispatch:
+    inputs:
+      requested_sha:
+        description: Exact main commit requested by a push dispatch
+        required: false
+        type: string
 permissions:
   actions: write
   contents: read
@@ -11,16 +16,26 @@ permissions:
 jobs:
   dispatch:
     if: github.event_name == 'push'
+    concurrency:
+      group: google-store-dispatch-main
+      cancel-in-progress: true
     runs-on: ubuntu-24.04
     steps:
       - name: Dispatch through approved Google identity event
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-store-runtime.yml/dispatches" -f ref=main
+        run: |
+          set -euo pipefail
+          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          if test "$latest" != "$GITHUB_SHA"; then
+            echo "::notice::Superseded Store push: $GITHUB_SHA"
+            exit 0
+          fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-store-runtime.yml/dispatches" -f ref=main -f "inputs[requested_sha]=$GITHUB_SHA"
   deploy:
     concurrency:
       group: google-production-store
-      cancel-in-progress: true
+      cancel-in-progress: false
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
@@ -32,6 +47,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
+      - name: Reject superseded Store deployments before building
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_SHA: ${{ inputs.requested_sha }}
+        run: |
+          set -euo pipefail
+          if test -n "$REQUESTED_SHA" && ! [[ "$REQUESTED_SHA" =~ ^[a-f0-9]{40}$ ]]; then exit 1; fi
+          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
+          test "$latest" = "$GITHUB_SHA"
+          if test -n "$REQUESTED_SHA"; then test "$REQUESTED_SHA" = "$GITHUB_SHA"; fi
       - uses: pnpm/action-setup@v4
         with: {version: 10.28.2}
       - uses: actions/setup-node@v4

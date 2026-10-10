@@ -27,12 +27,16 @@ let secret=variable?.value;
 if(!secret && variable?.valueFrom?.secretKeyRef){const ref=variable.valueFrom.secretKeyRef;secret=command(['secrets','versions','access',ref.key||'latest','--secret='+ref.name,'--project='+project]);}
 if(!secret || secret.length<16)throw Error('Existing Studio secret unavailable; refusing unauthenticated deployment or credential rotation');
 const existing=JSON.parse(gc(['secrets','list','--filter=name:'+secretName]));
-if(!existing.length){command(['secrets','create',secretName,'--replication-policy=automatic','--project='+project]);command(['secrets','versions','add',secretName,'--data-file=-','--project='+project],secret);}
+if(!existing.length)command(['secrets','create',secretName,'--replication-policy=automatic','--project='+project]);
+// Scope the deployment reader to this secret, so later releases can verify the
+// existing encryption key without project-wide secret access or key rotation.
+command(['secrets','add-iam-policy-binding',secretName,'--member=serviceAccount:elevate-github-deploy@'+project+'.iam.gserviceaccount.com','--role=roles/secretmanager.secretAccessor','--project='+project,'--quiet']);
+if(!existing.length)command(['secrets','versions','add',secretName,'--data-file=-','--project='+project],secret);
 else if(command(['secrets','versions','access','latest','--secret='+secretName,'--project='+project])!==secret)throw Error('Studio secret mismatch; refusing credential rotation');
 command(['secrets','add-iam-policy-binding',secretName,'--member=serviceAccount:'+identity,'--role=roles/secretmanager.secretAccessor','--project='+project,'--quiet']);
 const buckets=JSON.parse(gc(['storage','buckets','list','--filter=name:'+bucket]));
 if(!buckets.length)command(['storage','buckets','create','gs://'+bucket,'--location='+region,'--uniform-bucket-level-access','--public-access-prevention','--project='+project]);
-command(['storage','buckets','add-iam-policy-binding','gs://'+bucket,'--member=serviceAccount:'+identity,'--role=roles/storage.objectAdmin','--quiet']);
+command(['storage','buckets','add-iam-policy-binding','gs://'+bucket,'--member=serviceAccount:'+identity,'--role=roles/storage.objectUser','--quiet']);
 const sha=process.env.IMAGE_SHA;if(!/^[a-f0-9]{40}$/.test(sha||''))throw Error('Immutable image SHA required');
 const image='us-central1-docker.pkg.dev/'+project+'/elevate/studio-browser';
 const digest=command(['artifacts','docker','images','describe',image+':'+sha,'--project='+project,'--format=value(image_summary.digest)']);

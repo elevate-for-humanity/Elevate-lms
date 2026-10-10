@@ -55,7 +55,7 @@ jobs:
           -e STUDIO_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
           -v "$PWD/services/studio-browser:/tests:ro"
           --entrypoint sh "studio-browser:$GITHUB_SHA"
-          -c 'test "$(id -u)" = 1001 && test -x "$STUDIO_BROWSER_EXECUTABLE_PATH" && cp -f /tests/*.test.mjs /app/ && node --test --test-concurrency=1 /app/*.test.mjs'
+          -c 'test "$(id -u)" = 1001 && test -x "$STUDIO_BROWSER_EXECUTABLE_PATH" && cp -f /tests/*.test.mjs /app/ && node --test --test-concurrency=1 /app/*.test.mjs && for attempt in 1 2; do node --test /app/cdp-browser.integration.test.mjs; done'
       - name: Prove actual server startup, persistent storage and authorization
         run: |
           set -euo pipefail

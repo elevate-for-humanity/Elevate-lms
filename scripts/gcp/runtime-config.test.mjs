@@ -8,6 +8,11 @@ test('deployment loads only Google-owned configuration and preserves exact value
   const result = loadGoogleConfig('store', args => { calls++; assert.equal(args[0], 'secrets'); return JSON.stringify(config()); });
   assert.equal(calls, 1); assert.deepEqual(result, config());
 });
+test('Course Builder cannot redeploy a retired Northflank learner endpoint', () => {
+  const c = config(); c.component = 'ultimate-worker';
+  c.runtimeEnvironment.ULTIMATE_LEARNER_RUNTHROUGH_URL = 'https://browser--retired.code.run/learner/runthrough';
+  assert.throws(() => loadGoogleConfig('ultimate-worker', () => JSON.stringify(c)), /retired Northflank learner endpoint/);
+});
 test('rejects wrong component, unresolved templates and incomplete persistence inventory', () => {
   assert.throws(() => validateConfig(config(), 'admin'));
   const c = config(); c.runtimeEnvironment.TOKEN = '${unresolved}'; assert.throws(() => validateConfig(c, 'store'));

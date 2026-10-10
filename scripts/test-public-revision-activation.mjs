@@ -27,3 +27,9 @@ test('mutable image is refused before adding candidate tag',async()=>{
 });
 
 test('candidate tag and service name fit Google limit',()=>{assert.ok(('c-'+commit.slice(0,12)+service).length<=46);});
+
+test('configured region is used for every revision and traffic operation',async()=>{
+ const f=fixture();await activateTestedRevision(f.options);
+ const expected=process.env.CANDIDATE_REGION||'us-central1';
+ for(const args of f.calls)assert.ok(args.includes('--region='+expected));
+});

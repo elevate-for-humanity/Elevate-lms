@@ -1,6 +1,13 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
+import { loadAdminHours } from '@/lib/apprenticeship/admin-hours';
+import {
+  formatHoursDate,
+  roundHours,
+  summarizeHoursLedger,
+} from '@/lib/apprenticeship/admin-hours-model';
+import ApprenticeshipHoursClient from '../apprenticeships/ApprenticeshipHoursClient';
 import { Clock, CheckCircle2, AlertCircle, TrendingUp, User } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -11,8 +18,8 @@ function pct(completed: number, required: number) {
 
 function barColor(p: number) {
   if (p >= 100) return 'bg-green-500';
-  if (p >= 50)  return 'bg-blue-500';
-  if (p >= 25)  return 'bg-yellow-500';
+  if (p >= 50) return 'bg-blue-500';
+  if (p >= 25) return 'bg-yellow-500';
   return 'bg-red-400';
 }
 
@@ -21,8 +28,8 @@ function statusBadge(status: string) {
     verified: 'bg-green-100 text-green-800',
     approved: 'bg-green-100 text-green-800',
     submitted: 'bg-yellow-100 text-yellow-800',
-    pending:   'bg-yellow-100 text-yellow-800',
-    rejected:  'bg-red-100 text-red-800',
+    pending: 'bg-yellow-100 text-yellow-800',
+    rejected: 'bg-red-100 text-red-800',
   };
   return map[status] ?? 'bg-slate-100 text-slate-700';
 }
@@ -31,92 +38,13 @@ export default async function StudentHoursPage() {
   await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
 
-  // Load all hour entries
-  const { data: entries } = await db
-    .from('apprenticeship_hours')
-    .select('id, student_id, submitted_by, date_worked, week_ending, hours_worked, hours, program_id, category, notes, approved, status, approved_at, rejection_reason, created_at')
-    .order('date_worked', { ascending: false });
-
-  const rows = entries ?? [];
-
-  // Collect all user IDs to hydrate names
-  const allIds = [...new Set([
-    ...rows.map((r: any) => r.student_id),
-    ...rows.map((r: any) => r.submitted_by),
-  ].filter(Boolean))];
-
-  const [{ data: profiles }, { data: apprenticeRequirements }] = allIds.length
-    ? await Promise.all([
-        db.from('profiles').select('id, full_name, email').in('id', allIds),
-        db.from('apprentices').select('user_id, total_hours_required').in('user_id', allIds),
-      ])
-    : [{ data: [] }, { data: [] }];
-  const nameMap: Record<string, string> = {};
-  (profiles ?? []).forEach((p: any) => { nameMap[p.id] = p.full_name?.trim() || p.email || p.id.slice(0, 8); });
-  const apprenticeRequirementMap: Record<string, number> = {};
-  (apprenticeRequirements ?? []).forEach((row: any) => {
-    const hours = Number(row.total_hours_required);
-    if (row.user_id && Number.isFinite(hours) && hours > 0) apprenticeRequirementMap[row.user_id] = hours;
-  });
-
-  // Resolve program slugs from program_id (stored as UUID in this table)
-  const programIds = [...new Set(rows.map((r: any) => r.program_id).filter(Boolean))];
-  const { data: programs } = programIds.length
-    ? await db.from('programs').select('id, slug, title, total_hours, training_hours, estimated_hours').in('id', programIds.map((id: string) => id.toLowerCase()))
-    : { data: [] };
-  const programMap: Record<string, { slug: string; title: string; total_hours?: number; training_hours?: number; estimated_hours?: number }> = {};
-  (programs ?? []).forEach((p: any) => { programMap[p.id.toLowerCase()] = p; });
-
-  // Aggregate by student
-  type StudentSummary = {
-    student_id: string;
-    name: string;
-    program_slug: string;
-    program_title: string;
-    required_hours: number;
-    total_hours: number;
-    approved_hours: number;
-    pending_hours: number;
-    entries: any[];
-  };
-
-  const byStudent: Record<string, StudentSummary> = {};
-  rows.forEach((r: any) => {
-    const sid = r.student_id;
-    if (!sid) return;
-    const hrs = r.hours_worked ?? r.hours ?? 0;
-    const prog = programMap[r.program_id?.toLowerCase()] ?? { slug: 'barber-apprenticeship', title: 'Barber Apprenticeship' };
-    if (!byStudent[sid]) {
-      byStudent[sid] = {
-        student_id: sid,
-        name: nameMap[sid] || sid.slice(0, 8),
-        program_slug: prog.slug,
-        program_title: prog.title,
-        required_hours:
-          apprenticeRequirementMap[sid] ??
-          Number(prog.total_hours || prog.training_hours || prog.estimated_hours || 0),
-        total_hours: 0,
-        approved_hours: 0,
-        pending_hours: 0,
-        entries: [],
-      };
-    }
-    byStudent[sid].total_hours += hrs;
-    if (r.status === 'verified' || r.approved) byStudent[sid].approved_hours += hrs;
-    else byStudent[sid].pending_hours += hrs;
-    byStudent[sid].entries.push(r);
-  });
-
-  const students = Object.values(byStudent).sort((a, b) => b.total_hours - a.total_hours);
-
-  // Summary stats
-  const totalStudents = students.length;
-  const totalApproved = students.reduce((s, st) => s + st.approved_hours, 0);
-  const pendingEntries = rows.filter((r: any) => r.status === 'submitted' || (!r.approved && r.status !== 'verified')).length;
+  const { entries: rows, summaries: students, ledger, programs } = await loadAdminHours(db);
+  const totalStudents = new Set(students.map((s) => s.student_id)).size;
+  const totalApproved = roundHours(students.reduce((sum, s) => sum + s.approved_hours, 0));
+  const pendingEntries = rows.filter((r) => r.status === 'submitted' && r.hours_worked > 0).length;
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-8">
-
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -140,20 +68,28 @@ export default async function StudentHoursPage() {
           <p className="text-3xl font-bold text-slate-900 mt-1">{totalStudents}</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Total Approved Hrs</p>
+          <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">
+            Verified OJT Hrs
+          </p>
           <p className="text-3xl font-bold text-green-600 mt-1">{totalApproved.toLocaleString()}</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Pending Review</p>
+          <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">
+            Pending Review
+          </p>
           <p className="text-3xl font-bold text-yellow-600 mt-1">{pendingEntries}</p>
           <p className="text-xs text-slate-400 mt-0.5">entries</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Program Requirements</p>
+          <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">
+            Program Requirements
+          </p>
           <p className="text-3xl font-bold text-slate-900 mt-1">Dynamic</p>
           <p className="text-xs text-slate-400 mt-0.5">per apprentice/program</p>
         </div>
       </div>
+
+      <ApprenticeshipHoursClient />
 
       {/* Per-student cards */}
       {students.length === 0 ? (
@@ -165,12 +101,23 @@ export default async function StudentHoursPage() {
       ) : (
         <div className="space-y-6">
           {students.map((student) => {
-            const p = student.required_hours > 0 ? pct(student.approved_hours, student.required_hours) : 0;
-            const remaining = Math.max(0, student.required_hours - student.approved_hours);
+            const p =
+              student.required_hours > 0 ? pct(student.approved_hours, student.required_hours) : 0;
+            const credit = summarizeHoursLedger(
+              ledger,
+              student.student_id,
+              programs.find((p) => p.id === student.program_key)?.slug,
+            );
+            const remaining = student.required_hours
+              ? Math.max(0, student.required_hours - student.approved_hours)
+              : 0;
             const weeksLeft = remaining > 0 ? Math.ceil(remaining / 40) : 0;
 
             return (
-              <div key={student.student_id} className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+              <div
+                key={student.key}
+                className="rounded-xl border border-slate-200 bg-white overflow-hidden"
+              >
                 {/* Student header */}
                 <div className="flex items-start justify-between gap-4 p-5 border-b border-slate-100">
                   <div className="flex items-center gap-3">
@@ -185,10 +132,15 @@ export default async function StudentHoursPage() {
                   <div className="text-right flex-shrink-0">
                     <p className="text-2xl font-bold text-slate-900">
                       {student.approved_hours.toLocaleString()}
-                      <span className="text-sm font-normal text-slate-400"> / {student.required_hours.toLocaleString()} hrs</span>
+                      <span className="text-sm font-normal text-slate-400">
+                        {' '}
+                        / {student.required_hours?.toLocaleString() ?? '?'} hrs
+                      </span>
                     </p>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      {p}% complete · {remaining > 0 ? `${remaining.toLocaleString()} hrs remaining` : 'Complete!'}
+                      {student.required_hours
+                        ? `${p}% complete · ${remaining > 0 ? `${roundHours(remaining).toLocaleString()} hrs remaining` : 'Complete!'}`
+                        : 'Program requirement not configured'}
                     </p>
                   </div>
                 </div>
@@ -202,12 +154,14 @@ export default async function StudentHoursPage() {
                         style={{ width: `${p}%` }}
                       />
                     </div>
-                    <span className="text-xs font-semibold text-slate-600 w-10 text-right">{p}%</span>
+                    <span className="text-xs font-semibold text-slate-600 w-10 text-right">
+                      {p}%
+                    </span>
                   </div>
                   <div className="flex gap-6 mt-2 text-xs text-slate-500">
                     <span className="flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3 text-green-500" />
-                      {student.approved_hours} approved
+                      {student.approved_hours} verified OJT · {credit.approved} ledger credit
                     </span>
                     {student.pending_hours > 0 && (
                       <span className="flex items-center gap-1">
@@ -217,8 +171,8 @@ export default async function StudentHoursPage() {
                     )}
                     {weeksLeft > 0 && (
                       <span className="flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3 text-blue-500" />
-                        ~{weeksLeft} weeks at 40 hrs/wk
+                        <TrendingUp className="w-3 h-3 text-blue-500" />~{weeksLeft} weeks at 40
+                        hrs/wk
                       </span>
                     )}
                   </div>
@@ -229,7 +183,7 @@ export default async function StudentHoursPage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="text-xs text-slate-500 border-b border-slate-100">
-                        <th className="text-left px-5 py-2 font-medium">Week of</th>
+                        <th className="text-left px-5 py-2 font-medium">Work date</th>
                         <th className="text-right px-5 py-2 font-medium">Hours</th>
                         <th className="text-left px-5 py-2 font-medium">Notes</th>
                         <th className="text-left px-5 py-2 font-medium">Status</th>
@@ -238,32 +192,35 @@ export default async function StudentHoursPage() {
                     </thead>
                     <tbody>
                       {student.entries
-                        .sort((a: any, b: any) => new Date(b.date_worked).getTime() - new Date(a.date_worked).getTime())
-                        .map((entry: any) => (
-                          <tr key={entry.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                        .sort((a, b) => b.work_date.localeCompare(a.work_date))
+                        .map((entry) => (
+                          <tr
+                            key={entry.id}
+                            className="border-b border-slate-50 hover:bg-slate-50 transition-colors"
+                          >
                             <td className="px-5 py-2.5 text-slate-700 whitespace-nowrap">
-                              {new Date(entry.date_worked).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              {formatHoursDate(entry.work_date)}
                               {entry.week_ending && (
                                 <span className="text-slate-400 text-xs ml-1">
-                                  – {new Date(entry.week_ending).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                  · Week ending {formatHoursDate(entry.week_ending)}
                                 </span>
                               )}
                             </td>
                             <td className="px-5 py-2.5 text-right font-semibold text-slate-900">
-                              {entry.hours_worked ?? entry.hours}
+                              {entry.hours_worked}
                             </td>
                             <td className="px-5 py-2.5 text-slate-500 text-xs max-w-xs truncate">
-                              {entry.notes || entry.category || '—'}
+                              {entry.notes || entry.tasks_completed || '—'}
                             </td>
                             <td className="px-5 py-2.5">
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusBadge(entry.status)}`}>
+                              <span
+                                className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusBadge(entry.status)}`}
+                              >
                                 {entry.status ?? 'submitted'}
                               </span>
                             </td>
                             <td className="px-5 py-2.5 text-xs text-slate-400">
-                              {entry.approved_at
-                                ? new Date(entry.approved_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                                : '—'}
+                              {entry.verified_at ? formatHoursDate(entry.verified_at) : '—'}
                             </td>
                           </tr>
                         ))}

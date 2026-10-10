@@ -80,7 +80,8 @@ export async function requestHeadroom(token, contactEmail, request = fetch, {req
       throw Error('Owned quota preference etag required before update');
     // -1 requests unlimited quota under Google's normal review; it does not
     // promise a grant. Never bypass safety checks or replace another preference.
-    const payload = {quotaConfig: {preferredValue: desired}, contactEmail,
+    const payload = {service: 'run.googleapis.com', quotaId: target.quotaId,
+      dimensions: {region: 'us-central1'}, quotaConfig: {preferredValue: desired}, contactEmail,
       justification: requestMaximum
         ? 'The project owner requests the largest Cloud Run CPU and memory quota Google will approve in us-central1, using the documented unlimited preference. Current web services and rendering jobs exhaust 20 vCPU and 40 GiB and block rolling deployments. Google determines the approved limit; no container sizes or autoscaling settings are changed.'
         : 'Production web services reserve 16 vCPU and 32 GiB. An active course-rendering job uses 4 vCPU and 8 GiB, exhausting the current 20 vCPU and 40 GiB limits and blocking a verified rolling deployment. Request deployment headroom for current services and bounded worker concurrency; no container sizes or autoscaling settings are changed.'};
@@ -90,7 +91,6 @@ export async function requestHeadroom(token, contactEmail, request = fetch, {req
       payload.etag = existing.etag;
       url.searchParams.set('updateMask', 'quotaConfig.preferredValue,justification,contactEmail');
     } else {
-      Object.assign(payload, {service: 'run.googleapis.com', quotaId: target.quotaId, dimensions: {region: 'us-central1'}});
       url.searchParams.set('quotaPreferenceId', target.id);
     }
     const response = await request(url, {

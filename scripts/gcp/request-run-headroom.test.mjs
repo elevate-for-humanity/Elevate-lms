@@ -54,7 +54,10 @@ test('explicit maximum patches exact owned preferences using their etags and a n
     assert.equal(write.options.method, 'PATCH');
     assert.equal(write.url.pathname, '/v1/' + resource(targets[index].id));
     assert.equal(write.url.searchParams.get('updateMask'), 'quotaConfig.preferredValue,justification,contactEmail');
-    assert.deepEqual(Object.keys(write.body).sort(), ['contactEmail', 'etag', 'justification', 'name', 'quotaConfig']);
+    assert.deepEqual(Object.keys(write.body).sort(), ['contactEmail', 'dimensions', 'etag', 'justification', 'name', 'quotaConfig', 'quotaId', 'service']);
+    assert.equal(write.body.service, 'run.googleapis.com');
+    assert.equal(write.body.quotaId, targets[index].quotaId);
+    assert.deepEqual(write.body.dimensions, {region: 'us-central1'});
     assert.equal(write.body.etag, 'version-1');
     assert.equal(write.body.quotaConfig.preferredValue, '-1');
   }

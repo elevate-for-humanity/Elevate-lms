@@ -34,6 +34,7 @@ jobs:
         with:
           node-version: '22'
       - run: node --test scripts/gcp/test-pbx-startup-metadata.mjs
+      - run: node --test scripts/gcp/test-pbx-container-snapshot.mjs
       - run: python3 scripts/gcp/test-pbx-bootstrap.py
       - run: python3 scripts/gcp/test-pbx-tls-preservation.py
       - run: bash -n infra/pbx/google-startup.sh scripts/gcp/repair-existing-pbx-tls.sh
@@ -69,8 +70,7 @@ jobs:
         run: |
           set -euo pipefail
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
-            --command="sudo docker inspect pbx_asterisk_1 elevate-pbx-wss-proxy --format '{{.Name}} {{.Id}} {{.State.Running}} {{.State.StartedAt}}'" > /tmp/pbx-containers-before
-          test "$(grep -c ' true ' /tmp/pbx-containers-before)" = 2
+            --command="sudo docker inspect pbx_asterisk_1 elevate-pbx-wss-proxy --format '{{.Name}} {{.Id}} {{.State.Running}} {{.State.StartedAt}}'" | node scripts/gcp/pbx-container-snapshot.mjs > /tmp/pbx-containers-before
       - name: Replace only the exact known legacy startup metadata using its fingerprint
         run: node scripts/gcp/repair-pbx-startup-metadata.mjs
       - name: Verify existing containers were preserved
@@ -79,7 +79,7 @@ jobs:
           set -euo pipefail
           test -s /tmp/pbx-containers-before
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
-            --command="sudo docker inspect pbx_asterisk_1 elevate-pbx-wss-proxy --format '{{.Name}} {{.Id}} {{.State.Running}} {{.State.StartedAt}}'" > /tmp/pbx-containers-after
+            --command="sudo docker inspect pbx_asterisk_1 elevate-pbx-wss-proxy --format '{{.Name}} {{.Id}} {{.State.Running}} {{.State.StartedAt}}'" | node scripts/gcp/pbx-container-snapshot.mjs > /tmp/pbx-containers-after
           cmp /tmp/pbx-containers-before /tmp/pbx-containers-after
           echo 'Existing PBX and gateway container IDs, running state and start times unchanged.'
       - name: Preserve sanitized metadata evidence

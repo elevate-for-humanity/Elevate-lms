@@ -9,6 +9,7 @@ export const PERMISSION_GROUPS = {
   routing: ['compute.addresses.create', 'compute.addresses.use', 'compute.firewalls.create', 'compute.healthChecks.create', 'compute.backendServices.create', 'compute.backendServices.update', 'compute.urlMaps.update'],
   monitoring: ['monitoring.timeSeries.list', 'logging.logEntries.list'],
   quota: ['serviceusage.quotas.get', 'serviceusage.quotas.update', 'cloudquotas.quotas.get', 'cloudquotas.quotas.update'],
+  billingInspection: ['resourcemanager.projects.get', 'serviceusage.services.get', 'serviceusage.services.use', 'serviceusage.services.enable'],
 };
 
 // Billing metadata is read-only. Neither billingEnabled nor open identifies a
@@ -24,8 +25,14 @@ export async function inspectProjectBilling(token, request = fetch) {
       });
       const body = await response.json();
       const errorStatus = body?.error?.status;
+      const info = body?.error?.details?.find(x => x['@type'] === 'type.googleapis.com/google.rpc.ErrorInfo');
       result.reads.push({operation, httpStatus: response.status,
-        ...(!response.ok ? {errorStatus: /^[A-Z_]{1,60}$/.test(errorStatus || '') ? errorStatus : 'READ_FAILED'} : {})});
+        ...(!response.ok ? {errorStatus: /^[A-Z_]{1,60}$/.test(errorStatus || '') ? errorStatus : 'READ_FAILED',
+          reason: /^[A-Z_]{1,60}$/.test(info?.reason || '') ? info.reason : undefined,
+          service: ['cloudbilling.googleapis.com', 'serviceusage.googleapis.com'].includes(info?.metadata?.service) ? info.metadata.service : undefined,
+          permission: [...PERMISSION_GROUPS.billingInspection, 'billing.accounts.get'].includes(info?.metadata?.permission) ? info.metadata.permission : undefined,
+          targetProjectConsumer: info?.metadata?.consumer ? ['projects/484736877039', 'projects/' + PROJECT].includes(info.metadata.consumer) : undefined,
+        } : {})});
       return response.ok ? body : null;
     } catch {result.reads.push({operation, errorStatus: 'READ_FAILED'}); return null;}
   }

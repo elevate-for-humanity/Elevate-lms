@@ -11,6 +11,11 @@ on:
         options: [saved, redeploy]
         default: saved
         required: true
+      validate_only:
+        description: Verify packaged narration and exact video state without rendering
+        type: boolean
+        default: false
+        required: true
 permissions:
   contents: read
   actions: write
@@ -25,7 +30,7 @@ jobs:
     steps:
       - env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/execute-finite-video-render.yml/dispatches" -f ref=main
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/execute-finite-video-render.yml/dispatches" -f ref=main -f 'inputs[configuration]=redeploy' -F 'inputs[validate_only]=true'
   render:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -44,70 +49,10 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
-      - name: Execute the saved Google render job without changing its configuration
-        if: inputs.configuration == 'saved'
-        run: |
-          node --input-type=module <<'NODE'
-          import {google,PROJECT} from './scripts/gcp/runtime-config.mjs';
-          const jobName='elevate-video-render';
-          const scope=['--project='+PROJECT,'--region=us-central1','--format=json'];
-          const inspect=()=>JSON.parse(google(['run','jobs','describe',jobName,...scope]));
-          const job=inspect();
-          const task=job.spec.template.spec.template.spec;
-          console.log(JSON.stringify({configuration:'saved',job:jobName,resources:task.containers.map(c=>c.resources?.limits),taskCount:job.spec.template.spec.taskCount,parallelism:job.spec.template.spec.parallelism,timeoutSeconds:task.timeoutSeconds,maxRetries:task.maxRetries}));
-          const executions=JSON.parse(google(['run','jobs','executions','list','--job='+jobName,...scope]));
-          const active=executions.filter(x=>!x.status?.completionTime&&!['True','False'].includes(x.status?.conditions?.find(c=>c.type==='Completed')?.status));
-          if(active.length)throw new Error('An existing render execution is active; duplicate execution refused');
-          const started=JSON.parse(google(['run','jobs','execute',jobName,...scope,'--quiet']));
-          const name=started.metadata?.name;
-          if(!/^elevate-video-render-[a-z0-9]+$/.test(name||''))throw new Error('Google did not return a verifiable render execution name');
-          console.log(JSON.stringify({executionStarted:name,configurationUnchanged:JSON.stringify(job.spec)===JSON.stringify(inspect().spec)}));
-          const deadline=Date.now()+65*60*1000;
-          while(Date.now()<deadline){
-            const current=JSON.parse(google(['run','jobs','executions','describe',name,...scope]));
-            const completed=current.status?.conditions?.find(c=>c.type==='Completed');
-            if(current.status?.completionTime||['True','False'].includes(completed?.status)){
-              console.log(JSON.stringify({execution:name,started:current.status?.startTime,completed:current.status?.completionTime,succeeded:current.status?.succeededCount,failed:current.status?.failedCount,conditions:(current.status?.conditions||[]).map(c=>({type:c.type,status:c.status,reason:c.reason}))}));
-              if(completed?.status!=='True')throw new Error('Saved Google render execution did not complete successfully');
-              process.exit(0);
-            }
-            await new Promise(resolve=>setTimeout(resolve,15000));
-          }
-          throw new Error('Render remains active beyond the verification window; inspect its execution before retrying');
-          NODE
-      - name: Test terminal render evidence
-        if: inputs.configuration == 'redeploy'
-        run: node --test scripts/gcp/finite-video-render.test.mjs
-      - name: Deploy and execute one durable verified video session
-        if: inputs.configuration == 'redeploy'
-        run: |
-          node --input-type=module <<'NODE'
-          import {readFileSync,mkdtempSync,writeFileSync,rmSync} from 'node:fs';
-          import {tmpdir} from 'node:os';
-          import {join} from 'node:path';
-          import {google,loadGoogleConfig,PROJECT} from './scripts/gcp/runtime-config.mjs';
-          const scope=['--project='+PROJECT,'--region=us-central1'];
-          const service=JSON.parse(google(['run','services','describe','elevate-admin-migration',...scope,'--format=json']));
-          const spec=service.spec.template.spec;
-          const container=spec.containers[0];
-          if(!/^us-central1-docker.pkg.dev\/elegant-racer-299721\/elevate\/admin@sha256:[a-f0-9]{64}$/.test(container.image))throw new Error('Exact deployed Google Admin digest required');
-          if(!spec.serviceAccountName)throw new Error('Verified runtime identity required');
-          if((container.env||[]).some(x=>x.valueFrom))throw new Error('Referenced runtime secrets require explicit job binding');
-          const config=loadGoogleConfig('admin');
-          if(config.volumes.length||Object.keys(config.runtimeFiles).length)throw new Error('Stateful Admin runtime cannot be substituted');
-          const env={...config.runtimeEnvironment,...Object.fromEntries((container.env||[]).filter(x=>typeof x.value==='string').map(x=>[x.name,x.value]))};
-          for(const name of ['PORT','K_SERVICE','K_REVISION','K_CONFIGURATION'])delete env[name];
-          Object.assign(env,{NODE_ENV:'production',AI_NARRATION_PROVIDER:'kokoro',DISABLE_ADMIN_VIDEO_WORKER:'true',VIDEO_COURSE_ID:'2c723bfa-8c40-4acc-b961-98d917710ffc',VIDEO_JOB_ID:'1611e77d-8744-4152-98e1-34e637701d62'});
-          if(!env.SUPABASE_SERVICE_ROLE_KEY||!env.CRON_SECRET)throw new Error('Complete renderer credentials required');
-          const source=readFileSync('scripts/gcp/finite-video-render.mjs','utf8')+'\nawait runFiniteVideoRender();';
-          if(source.includes('~'))throw new Error('Unsupported runner argument delimiter');
-          const directory=mkdtempSync(join(tmpdir(),'finite-video-session-'));
-          try {
-            const environment=join(directory,'environment.json');
-            writeFileSync(environment,JSON.stringify(env),{mode:0o600});
-            google(['run','jobs','deploy','elevate-video-render',...scope,'--image='+container.image,'--service-account='+spec.serviceAccountName,'--cpu=4','--memory=8Gi','--tasks=1','--parallelism=1','--max-retries=0','--task-timeout=3600s','--command=node','--args=^~^--input-type=module~-e~'+source,'--env-vars-file='+environment,'--quiet']);
-            console.log(JSON.stringify({deployed:true,image:container.image,runtimeIdentity:spec.serviceAccountName,retries:0}));
-            google(['run','jobs','execute','elevate-video-render',...scope,'--tasks=1','--wait','--quiet']);
-            console.log(JSON.stringify({executionSucceeded:true,courseId:env.VIDEO_COURSE_ID,jobId:env.VIDEO_JOB_ID}));
-          } finally {rmSync(directory,{recursive:true,force:true});}
-          NODE
+      - name: Test bounded execution and terminal render evidence
+        run: node --test scripts/gcp/execute-finite-video-render.test.mjs scripts/gcp/finite-video-render.test.mjs
+      - name: Execute and verify the bounded Google render job
+        env:
+          RENDER_CONFIGURATION: ${{ inputs.configuration }}
+          VALIDATE_ONLY: ${{ inputs.validate_only }}
+        run: node scripts/gcp/execute-finite-video-render.mjs

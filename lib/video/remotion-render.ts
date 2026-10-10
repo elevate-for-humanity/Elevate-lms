@@ -989,8 +989,8 @@ export async function renderStoryboardVideo(
       // FFmpeg concat demuxer accepts absolute paths with safe shell-independent
       // quoting. Never mark the lesson complete unless assembly succeeds.
       const manifestPath = path.join(paths.outputDir, 'segments.ffconcat');
-      await writeFile(manifestPath, 'ffconcat version 1.0\\n' +
-        chunkPaths.map(p => "file '" + p.replace(/'/g, "'\\\\''") + "'").join('\\n') + '\\n');
+      await writeFile(manifestPath, 'ffconcat version 1.0\n' +
+        chunkPaths.map(p => "file '" + p.replace(/'/g, "'\\\\''") + "'").join('\n') + '\n');
       await execFileAsync('ffmpeg', [
         '-y', '-f', 'concat', '-safe', '0', '-i', manifestPath,
         '-c', 'copy', '-movflags', '+faststart', paths.videoPath,

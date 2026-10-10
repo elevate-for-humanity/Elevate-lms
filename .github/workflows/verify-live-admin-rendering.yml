@@ -44,10 +44,26 @@ jobs:
             const task=job.spec.template.spec.template.spec;
             const videoContainer=task.containers[0];
             const videoEnv=Object.fromEntries((videoContainer.env||[]).filter(x=>typeof x.value==='string').map(x=>[x.name,x.value]));
-            console.log(JSON.stringify({videoJobPresent:true,videoJobImage:videoContainer.image,videoJobIdentity:task.serviceAccountName,videoJobRetries:task.maxRetries,videoJobTimeout:task.timeoutSeconds,command:videoContainer.command,args:(videoContainer.args||[]).map((x,i)=>i<2?x:{characters:x.length,hasMainCall:x.includes('await runFiniteVideoRender();')}),envPresent:Object.fromEntries(['SUPABASE_SERVICE_ROLE_KEY','CRON_SECRET','VIDEO_JOB_ID','VIDEO_COURSE_ID'].map(x=>[x,Boolean(videoEnv[x])])),expectedDatabase:videoEnv.NEXT_PUBLIC_SUPABASE_URL==='https://cuxzzpsyufcewtmicszk.supabase.co'}));
+            const safe=text=>String(text||'').replace(/https?:\/\/[^\s"']+/g,'[url]').replace(/Bearer\s+\S+/gi,'Bearer [redacted]').replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[token]').slice(0,2000);
+            const conditions=items=>(items||[]).map(x=>({type:x.type,status:x.status,reason:x.reason,message:safe(x.message)}));
+            console.log(JSON.stringify({videoJobPresent:true,resources:videoContainer.resources,conditions:conditions(job.status?.conditions),videoJobImage:videoContainer.image,videoJobIdentity:task.serviceAccountName,videoJobRetries:task.maxRetries,videoJobTimeout:task.timeoutSeconds,command:videoContainer.command,args:(videoContainer.args||[]).map((x,i)=>i<2?x:{characters:x.length,hasMainCall:x.includes('await runFiniteVideoRender();')}),envPresent:Object.fromEntries(['SUPABASE_SERVICE_ROLE_KEY','CRON_SECRET','VIDEO_JOB_ID','VIDEO_COURSE_ID'].map(x=>[x,Boolean(videoEnv[x])])),expectedDatabase:videoEnv.NEXT_PUBLIC_SUPABASE_URL==='https://cuxzzpsyufcewtmicszk.supabase.co'}));
             const executions=JSON.parse(execFileSync('gcloud',['run','jobs','executions','list','--job=elevate-video-render','--region=us-central1',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
-            console.log(JSON.stringify({videoExecutions:executions.slice(0,3).map(x=>({name:x.metadata.name,started:x.status?.startTime,completed:x.status?.completionTime,running:x.status?.runningCount,succeeded:x.status?.succeededCount,failed:x.status?.failedCount,conditions:(x.status?.conditions||[]).map(y=>({type:y.type,status:y.status,reason:y.reason}))}))}));
-          } catch {console.log(JSON.stringify({videoJobInspectionSucceeded:false}));}
+            console.log(JSON.stringify({videoExecutions:executions.slice(0,3).map(x=>({name:x.metadata.name,started:x.status?.startTime,completed:x.status?.completionTime,running:x.status?.runningCount,succeeded:x.status?.succeededCount,failed:x.status?.failedCount,conditions:conditions(x.status?.conditions)}))}));
+            for(const execution of executions.slice(0,2)) {
+              const name=execution.metadata.name;
+              const tasks=JSON.parse(execFileSync('gcloud',['run','jobs','executions','tasks','list','--execution='+name,'--region=us-central1',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+              console.log(JSON.stringify({execution:name,tasks:tasks.map(t=>({name:t.metadata.name,started:t.status?.startTime,completed:t.status?.completionTime,conditions:conditions(t.status?.conditions),lastAttemptResult:t.status?.lastAttemptResult,retried:t.status?.retried,resources:t.spec?.containers?.map(c=>c.resources)}))}));
+            }
+            const jobFilter='resource.type="cloud_run_job" AND resource.labels.job_name="elevate-video-render" AND severity>=WARNING';
+            const logs=JSON.parse(execFileSync('gcloud',['logging','read',jobFilter,'--freshness=3d','--limit=30',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            for(const row of logs) {
+              let message=row.textPayload||row.jsonPayload?.message||row.protoPayload?.status?.message||'';
+              for(const value of Object.values(videoEnv))if(value.length>=8)message=message.split(value).join('[runtime-value]');
+              console.log(JSON.stringify({jobLog:true,timestamp:row.timestamp,severity:row.severity,execution:row.labels?.['run.googleapis.com/execution_name'],message:safe(message)}));
+            }
+            const revisions=JSON.parse(execFileSync('gcloud',['run','revisions','list','--service=elevate-admin-migration','--region=us-central1','--limit=5',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+            console.log(JSON.stringify({adminImages:revisions.map(r=>({name:r.metadata.name,image:r.spec.containers[0].image,digest:r.status?.imageDigest,conditions:conditions(r.status?.conditions)}))}));
+          } catch(error) {console.log(JSON.stringify({videoJobInspectionSucceeded:false,exitStatus:error.status}));throw new Error('Video job diagnostics failed; inspect Google access before retrying');}
           const filter='resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration"';
           let rows;
           try {rows=JSON.parse(execFileSync('gcloud',['logging','read',filter,'--freshness=30m','--limit=500',...base],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));}

@@ -125,7 +125,7 @@ export class UltimateJobQueue {
    * attempt. The persisted cursor resumes the same job and lets other courses run. */
   async yieldProgress(jobId: string, workerId: string, payload: unknown) {
     const { data: updated, error } = await this.db.from('ultimate_build_jobs').update({
-      status: 'queued', payload, attempts: 0,
+      status: 'queued', payload,
       available_at: new Date(Date.now() + 1000).toISOString(),
       lease_owner: null, lease_expires_at: null, last_error: null,
       updated_at: new Date().toISOString(),

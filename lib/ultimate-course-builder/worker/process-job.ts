@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { UltimateJobQueue } from './job-queue';
+import { createLeaseDeadline } from './runtime-guards.mjs';
 import { createUltimateRuntime } from '../core/runtime-factory';
 import { createProductionHandlers } from '../core/production-handlers';
 import { UltimateBuildRunner } from '../core/build-runner';
@@ -22,10 +23,8 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   console.info('[UltimateWorker] job claimed', { jobId: job.id, buildId: job.build_id, workerId, generation });
   let leaseLost = false;
   let heartbeatInFlight = false;
-  let lastHeartbeat = Date.now();
-  const assertActive = () => {
-    if (leaseLost || Date.now() - lastHeartbeat >= 300000) throw new Error('ULTIMATE_JOB_LEASE_LOST:' + job.id);
-  };
+  const deadline = createLeaseDeadline(job.id, {onLost: () => { leaseLost = true; }});
+  const assertActive = () => deadline.assertActive();
   let timer: ReturnType<typeof setInterval> | null = setInterval(
     () => {
       if (heartbeatInFlight || leaseLost) return;
@@ -33,10 +32,10 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       void queue.heartbeat(job.id, workerId, 300)
       .then((renewed) => {
         if (!renewed) {
-          leaseLost = true;
+          deadline.lose();
           console.error('[UltimateWorker] heartbeat rejected or lease lost', {jobId: job.id, workerId});
         } else {
-          lastHeartbeat = Date.now();
+          if (!deadline.renew()) return;
           console.info('[UltimateWorker] heartbeat acknowledged', {jobId: job.id});
         }
       })
@@ -49,6 +48,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     },
     60000,
   );
+  const work = async () => {
   try {
     const { data: build, error } = await db
       .from('ultimate_course_builds')
@@ -158,5 +158,17 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   } finally {
     if (timer) clearInterval(timer);
     timer = null;
+    deadline.dispose();
+  }
+  };
+  try {
+    return await deadline.race(work());
+  } catch (error) {
+    if (leaseLost) return {claimed:true,completed:false,jobId:job.id,error:'ULTIMATE_JOB_LEASE_LOST:' + job.id};
+    throw error;
+  } finally {
+    if (timer) clearInterval(timer);
+    timer = null;
+    deadline.dispose();
   }
 }

@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: '22'
       - name: Verify finite worker and speech boundaries
-        run: node --test tests/unit/ultimate-renderer-assignments.test.mjs workers/ultimate-source-teaching.test.mjs workers/worker-loop.test.mjs workers/ultimate-progress-lease.test.mjs lib/video/local-transcription.test.mjs lib/video/local-transcription-worker.test.mjs scripts/gcp/deploy-course-job.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs
+        run: node --test workers/ultimate-runtime-guards.test.mjs workers/process-job-state.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs workers/ultimate-source-teaching.test.mjs workers/worker-loop.test.mjs workers/ultimate-progress-lease.test.mjs lib/video/local-transcription.test.mjs lib/video/local-transcription-worker.test.mjs scripts/gcp/deploy-course-job.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs
       - name: Build existing CPU Course Builder image
         shell: bash
         run: |

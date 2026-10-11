@@ -22,35 +22,11 @@ export function setStudioVoiceMode(mode: StudioVoiceMode): void {
   } catch {
     // Text mode remains the safe fallback.
   }
-
-  if (mode === 'text') stopStudioSpeech();
 }
 
 export function shouldStudioSpeak(): boolean {
   return getStudioVoiceMode() === 'voice';
 }
 
-export function stopStudioSpeech(): void {
-  if (typeof window === 'undefined') return;
-
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-  }
-}
-
-export function speakStudioResponse(text: string): void {
-  if (typeof window === 'undefined') return;
-  if (!shouldStudioSpeak()) return;
-  if (!('speechSynthesis' in window)) return;
-
-  const content = text.trim();
-  if (!content) return;
-
-  window.speechSynthesis.cancel();
-
-  const utterance = new SpeechSynthesisUtterance(content);
-  utterance.lang = 'en-US';
-  utterance.rate = 1;
-
-  window.speechSynthesis.speak(utterance);
-}
+// Speech playback is owned by the shared natural voice hook.
+// Do not invoke browser SpeechSynthesis outside that provider.

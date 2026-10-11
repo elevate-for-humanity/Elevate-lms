@@ -1428,6 +1428,11 @@ async function broadcastFrame(session) {
   }
 }
 
+export function browserReadiness(lifecycle, providerAuthStorage, activeSessions, sessionLimit) {
+  const ready = providerAuthStorage.ready && lifecycle.browserState === 'ready' && lifecycle.browserConnected;
+  return { ready, admissionAvailable: activeSessions < sessionLimit };
+}
+
 function streamFrames(req, res, session) {
   session.lastSeen = Date.now();
   res.writeHead(200, {
@@ -1501,11 +1506,9 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && url.pathname === '/health') {
       const lifecycle = browserManager.health();
       const providerAuthStorage = await providerSessions.checkReadiness();
-      const ready =
-        providerAuthStorage.ready &&
-        lifecycle.browserState === 'ready' &&
-        lifecycle.browserConnected &&
-        sessions.size < maxSessions;
+      // Capacity is enforced by session admission, not browser liveness.
+      // A full service must still let an owner reattach their existing session.
+      const { ready, admissionAvailable } = browserReadiness(lifecycle, providerAuthStorage, sessions.size, maxSessions);
       return json(res, ready ? 200 : 503, {
         ok: ready,
         service: 'studio-browser',
@@ -1515,6 +1518,7 @@ const server = http.createServer(async (req, res) => {
         ...lifecycle,
         activeSessions: sessions.size,
         maxSessions,
+        admissionAvailable,
         ready,
       });
     }

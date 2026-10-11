@@ -463,6 +463,13 @@ test.describe('Studio single-session access and composer', () => {
     const access = page.getByRole('region', { name: 'Course and media access' });
     await expect(access.getByRole('link', { name: 'Open Course Builder' })).toHaveAttribute('href', '/studio/courses');
     await expect(page.getByRole('navigation', { name: 'Course tools' }).getByRole('link', { name: 'Course Builder', exact: true })).toBeVisible();
+    // Clean up the exact disposable browser session independently of UI state.
+    const createdSessions: Promise<{id:string;token:string;publicUrl:string} | null>[] = [];
+    const captureSession = (response: import('@playwright/test').Response) => {
+      if (response.request().method() === 'POST' && response.url().endsWith('/api/admin/dev-studio/browser/session'))
+        createdSessions.push(response.json().then(body => body.id && body.token && body.publicUrl ? body : null).catch(() => null));
+    };
+    page.on('response', captureSession);
     await access.getByRole('link', { name: 'Enter Envato credentials' }).click();
     // Envato may require its own provider login, but Studio must reuse the Admin session.
     await expect(page).not.toHaveURL(/\/login(?:\?|$)/);
@@ -514,14 +521,14 @@ test.describe('Studio single-session access and composer', () => {
     expect(geometry.right).toBeLessThanOrEqual(geometry.viewport);
     await page.screenshot({ path: testInfo.outputPath('studio-external-browser-tools.png') });
     } finally {
-      // A failed assertion must not leave an isolated Chromium session running.
-      const browserPane = page.getByRole('button', { name: 'Browser', exact: true });
-      if (await browserPane.isVisible()) await browserPane.click();
-      const controls = page.getByRole('button', { name: 'Browser controls', exact: true });
-      if (await controls.isVisible() && await controls.getAttribute('aria-expanded') === 'false')
-        await controls.click();
-      const stop = page.getByTitle('Stop', { exact: true });
-      if (await stop.isVisible() && await stop.isEnabled()) await stop.click();
+      page.off('response', captureSession);
+      for (const session of await Promise.all(createdSessions)) {
+        if (!session) continue;
+        const stopped = await page.request.delete(`${session.publicUrl}/sessions/${encodeURIComponent(session.id)}`, {
+          headers: {Authorization: `Bearer ${session.token}`},
+        });
+        expect([200,410]).toContain(stopped.status());
+      }
     }
   });
 });

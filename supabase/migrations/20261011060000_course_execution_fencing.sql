@@ -14,9 +14,7 @@ NOT NULL DEFAULT 0;
 CREATE TABLE IF NOT EXISTS public.ultimate_job_attempt_history (
     id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 
-    job_id uuid NOT NULL
-      REFERENCES public.ultimate_build_jobs(id)
-      ON DELETE RESTRICT,
+    job_id uuid NOT NULL REFERENCES public.ultimate_build_jobs(id) ON DELETE RESTRICT,
 
     execution_generation bigint NOT NULL,
 

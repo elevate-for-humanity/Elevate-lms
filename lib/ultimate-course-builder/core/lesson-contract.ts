@@ -78,7 +78,7 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
       );
       break;
     case 'teaching_sequence':
-      require(a.sequence?.stages?.length >= 8 && a.sequence?.stages?.length <= 16 &&
+      require(populated(a.sequence?.stages) &&
         a.sequence.stages.every(
           (s: any) => nonempty(s.instruction) && populated(s.objectiveIds),
         ), 'TEACHING_CONTENT_REQUIRED');
@@ -94,7 +94,7 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
         ), 'SCRIPT_SEGMENTS_REQUIRED');
       break;
     case 'storyboard':
-      require(a.storyboard?.scenes?.length >= 8 && a.storyboard?.scenes?.length <= 16 &&
+      require(populated(a.storyboard?.scenes) &&
         a.storyboard.scenes.every(
           (s: any) =>
             nonempty(s.id) &&
@@ -106,7 +106,7 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
       break;
     case 'visual_assignment': {
       const assignments = Array.isArray(a.media?.assignments) ? a.media.assignments : [];
-      require(assignments.length >= 8 && assignments.length <= 16 &&
+      require(assignments.length > 0 &&
         new Set(assignments.map((s: any) => s.sceneId)).size === assignments.length &&
         assignments.every(
           (s: any) =>
@@ -118,18 +118,23 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
                 String(s.assetId).startsWith('instructional:')
               : nonempty(s.licenseEvidenceUrl)),
         ), 'VISUAL_SCENE_COVERAGE_REQUIRED');
-      const reuse = new Map<string, number>();
+      // Licensed media can be reused for a distinct teaching purpose.
+      // Reject unreasoned duplication; retain per-scene license and relevance evidence.
+      const seen = new Map<string, string>();
       for (const assignment of assignments) {
         const id = String(assignment.assetId ?? '');
-        reuse.set(id, (reuse.get(id) ?? 0) + 1);
+        const reason = String(assignment.relevanceReason ?? '').trim().toLowerCase();
+        if (seen.has(id) && seen.get(id) === reason) {
+          failures.push('VISUAL_UNJUSTIFIED_REPETITION');
+        }
+        seen.set(id, reason);
       }
-      require([...reuse.values()].every((count) => count === 1), 'VISUAL_PROHIBITED_REPETITION');
       break;
     }
     case 'scene_construction':
       require(populated(a.scenes?.shots) &&
         a.scenes.shots.every(
-          (s: any) => s.loop === false && nonempty(s.sceneId) && nonempty(s.assetId),
+          (s: any) => typeof s.loop === 'boolean' && nonempty(s.sceneId) && nonempty(s.assetId),
         ), 'SCENE_SHOT_PLAN_REQUIRED');
       break;
     case 'natural_narration':

@@ -80,6 +80,21 @@ test('rejects session-mismatched responses and redacts protocol errors', async (
   g.connection.close();
 });
 
+test('browser-scoped CDP errors reject a target request without closing other sessions', async () => {
+  const f = fixture();
+  const rejected = assert.rejects(
+    f.connection.send('Target.setAutoAttach', {}, 'target-a'),
+    (error) => error.message === 'CDP command failed (-32001)',
+  );
+  const valid = f.connection.send('Runtime.evaluate', {}, 'target-b');
+  f.reply({ id: f.frames[0].id, error: { code: -32001, message: 'sensitive browser error' } });
+  f.reply({ id: f.frames[1].id, sessionId: 'target-b', result: { value: 42 } });
+  await rejected;
+  assert.deepEqual(await valid, { value: 42 });
+  assert.equal(f.connection.connected, true);
+  f.connection.close();
+});
+
 test('launch rejects debugging or profile overrides', async () => {
   for (const argument of [
     '--remote-debugging-port=9222',

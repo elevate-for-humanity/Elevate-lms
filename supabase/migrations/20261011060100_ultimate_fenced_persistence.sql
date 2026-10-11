@@ -62,11 +62,13 @@ BEGIN
        findings=coalesce(p_data->'findings','[]'::jsonb),updated_at=now()
      WHERE id=p_target;
    END IF;
- ELSIF p_action IN ('update_build','record_finding') THEN
+ ELSIF p_action IN ('update_build','record_finding','update_profile') THEN
    IF p_target IS DISTINCT FROM v_build THEN
      RAISE EXCEPTION 'ULTIMATE_FENCE_BUILD_MISMATCH';
    END IF;
-   IF p_action = 'record_finding' THEN
+   IF p_action = 'update_profile' THEN
+     UPDATE public.ultimate_course_builds SET profile=p_data->'profile',updated_at=now() WHERE id=v_build;
+   ELSIF p_action = 'record_finding' THEN
      UPDATE public.ultimate_course_builds
      SET findings=coalesce(findings,'[]'::jsonb) || jsonb_build_array(p_data->'finding'),
          updated_at=now()

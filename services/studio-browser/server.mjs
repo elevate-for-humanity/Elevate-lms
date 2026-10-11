@@ -22,7 +22,7 @@ const port = Number(process.env.PORT || 3100);
 const sharedSecret = process.env.STUDIO_BROWSER_SECRET || '';
 const adminOrigin =
   process.env.STUDIO_BROWSER_ADMIN_ORIGIN || 'https://admin.elevateforhumanity.org';
-const sessionTtlMs = Number(process.env.STUDIO_BROWSER_SESSION_TTL_MS || 15 * 60_000);
+const sessionTtlMs = Math.min(8 * 60 * 60_000, Math.max(15 * 60_000, Number(process.env.STUDIO_BROWSER_SESSION_TTL_MS || 60 * 60_000)));
 const maxSessions = Number(process.env.STUDIO_BROWSER_MAX_SESSIONS || 4);
 const heartbeatIntervalMs = Math.max(
   5_000,

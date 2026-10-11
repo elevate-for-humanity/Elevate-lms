@@ -15,7 +15,11 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
   if (!job) return { claimed: false };
-  console.info('[UltimateWorker] job claimed', { jobId: job.id, buildId: job.build_id, workerId });
+  const generation = Number(job.execution_generation);
+  if (!Number.isSafeInteger(generation) || generation < 1)
+    throw new Error('ULTIMATE_EXECUTION_GENERATION_REQUIRED');
+  const fence = {jobId: job.id, workerId, generation};
+  console.info('[UltimateWorker] job claimed', { jobId: job.id, buildId: job.build_id, workerId, generation });
   let leaseLost = false;
   let heartbeatInFlight = false;
   let lastHeartbeat = Date.now();
@@ -59,14 +63,14 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     if (
       JSON.stringify(profile) !== JSON.stringify(storedProfile)
     ) {
-      const { error: profileError } = await db
-        .from('ultimate_course_builds')
-        .update({ profile })
-        .eq('id', build.id);
+      const { error: profileError } = await db.rpc('ultimate_fenced_write', {
+        p_job: job.id, p_worker: workerId, p_generation: generation,
+        p_action: 'update_profile', p_target: build.id, p_data: {profile},
+      });
       if (profileError) throw profileError;
     }
     console.info('[UltimateWorker] profile hydrated', { jobId: job.id, competencies: profile.competencies.length });
-    const runtime = await createUltimateRuntime(db);
+    const runtime = await createUltimateRuntime(db, fence);
     console.info('[UltimateWorker] runtime ready', { jobId: job.id });
     const handlers = createProductionHandlers(runtime);
     const payload = (job.payload ?? {}) as any;

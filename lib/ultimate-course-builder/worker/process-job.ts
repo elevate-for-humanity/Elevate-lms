@@ -101,7 +101,10 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         return { claimed: true, completed: false, continuing: true, jobId: job.id, result };
       }
       if (continuation.unresolved?.length) {
-        // A missing dependency is a blocked prerequisite, not a failed render.\n        // Preserve the cursor and await an explicit dependency wake-up instead\n        // of exhausting attempts or continuously retrying missing media.\n        await queue.waitForDependency(job.id,workerId,`ULTIMATE_DEPENDENCIES_UNRESOLVED:${continuation.unresolved.join(',')}`,generation);
+        // A missing dependency is a blocked prerequisite, not a failed render.
+        // Preserve the cursor and await an explicit dependency wake-up instead
+        // of exhausting attempts or continuously retrying missing media.
+        await queue.waitForDependency(job.id,workerId,`ULTIMATE_DEPENDENCIES_UNRESOLVED:${continuation.unresolved.join(',')}`,generation);
         return {claimed:true,completed:false,jobId:job.id,result};
       }
     }

@@ -3,14 +3,15 @@ import type {SupabaseClient} from '@supabase/supabase-js';
 import {UltimateJobQueue} from '@/lib/ultimate-course-builder/worker/job-queue';
 import {UltimateReleaseService} from '@/lib/ultimate-course-builder/release/release-service';
 import {buildUltimateProfile} from '@/lib/ultimate-course-builder/core/course-profile';
+import {dispatchGoogleDeployment} from '@/lib/gcp/dispatch-production-workflow';
 
 export class DevStudioUltimateCourseControl {
   constructor(private db:SupabaseClient) {}
-  async queueCourse(input:{courseId:string;programSlug:string;actorId:string;title?:string;state?:string;goal?:string}) {
+  async queueCourse(input:{courseId:string;programSlug:string;actorId:string;title?:string;state?:string;goal?:string;fresh?:boolean}) {
     const {data:course,error:courseError}=await this.db.from('courses').select('id,title')
       .eq('id',input.courseId).single();
     if(courseError || !course)throw courseError ?? new Error('ULTIMATE_COURSE_NOT_FOUND');
-    const {data:existing,error:existingError}=await this.db.from('ultimate_course_builds')
+    const {data:existing,error:existingError}=input.fresh ? {data:null,error:null} : await this.db.from('ultimate_course_builds')
       .select('id,status,current_step').eq('course_id',course.id).neq('status','published')
       .order('created_at',{ascending:false}).limit(1).maybeSingle();
     if(existingError)throw existingError;
@@ -24,7 +25,8 @@ export class DevStudioUltimateCourseControl {
       build=created.data;
     }
     const queued=await this.queue(build.id,input.actorId);
-    return {build,job:queued.job,course,reused:Boolean(existing)};
+    const dispatch=await dispatchGoogleDeployment('course-builder');
+    return {build,job:queued.job,course,reused:Boolean(existing),dispatch};
   }
   async queue(buildId:string,requestedBy?:string|null) {
     const {data:build,error}=await this.db.from('ultimate_course_builds').select('id,course_id,status').eq('id',buildId).single();

@@ -463,7 +463,7 @@ const TOOLS: any[] = [
         properties: {
           course_id: {
             type: 'string',
-            description: 'Existing canonical course UUID to refresh in place',
+            description: 'Optional existing course UUID. Omit to create a new draft course.',
           },
           program_id: {
             type: 'string',
@@ -485,7 +485,7 @@ const TOOLS: any[] = [
           state: { type: 'string', description: 'State/jurisdiction when relevant' },
           credential: { type: 'string', description: 'Credential or license target when relevant' },
         },
-        required: ['course_id', 'program_slug', 'title'],
+        required: ['program_slug', 'title'],
       },
     },
   },
@@ -1213,13 +1213,37 @@ async function execTool(
       const db = await requireAdminClient();
       const requestedCourseId = String(args.course_id || '').trim();
       const programSlug = String(args.program_slug || '').trim();
-      if (!requestedCourseId) return 'course_id is required for an Ultimate build';
       if (!programSlug) return 'program_slug is required for an Ultimate build';
+      const requestedTitle = String(args.title || '').trim();
+      if (!requestedTitle) return 'title is required for an Ultimate build';
 
-      const { data: course, error: courseError } = await db
-        .from('courses').select('id,title,program_id').eq('id', requestedCourseId).maybeSingle();
-      if (courseError) throw courseError;
-      if (!course) return `Canonical course not found: ${requestedCourseId}`;
+      let course: { id: string; title: string; program_id: string | null } | null = null;
+      if (requestedCourseId) {
+        const result = await db.from('courses').select('id,title,program_id')
+          .eq('id', requestedCourseId).maybeSingle();
+        if (result.error) throw result.error;
+        if (!result.data) return `Canonical course not found: ${requestedCourseId}`;
+        course = result.data;
+      } else {
+        // A natural-language request must create a fresh canonical draft first.
+        // Resolve program ownership from the canonical program registry, not an AI-generated UUID.
+        const { data: program, error: programError } = await db.from('programs')
+          .select('id,slug').eq('slug', programSlug).maybeSingle();
+        if (programError) throw programError;
+        if (!program) return `Canonical program not found: ${programSlug}`;
+        const { randomUUID } = await import('node:crypto');
+        const slug = `${requestedTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 70)}-${randomUUID().slice(0, 8)}`;
+        const created = await db.from('courses').insert({
+          title: requestedTitle,
+          slug,
+          program_id: program.id,
+          status: 'draft',
+          created_by: actorUserId,
+          description: String(args.description || ''),
+        }).select('id,title,program_id').single();
+        if (created.error || !created.data) throw created.error ?? new Error('ULTIMATE_COURSE_CREATE_FAILED');
+        course = created.data;
+      }
 
       const queued=await new DevStudioUltimateCourseControl(db).queueCourse({
         courseId:course.id,programSlug,actorId:actorUserId,title:String(args.title || course.title),

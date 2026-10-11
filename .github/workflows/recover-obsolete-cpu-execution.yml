@@ -1,8 +1,8 @@
 name: Recover obsolete CPU course execution
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/recover-obsolete-cpu-execution.yml']
+  workflow_run:
+    workflows: ['Deploy Google Course Builder on source changes']
+    types: [completed]
   workflow_dispatch:
 permissions:
   contents: read
@@ -11,17 +11,22 @@ permissions:
 concurrency:
   # Cancellation of one verified execution cannot change the worker template.
   # The queue coordinator observes its terminal state before launching work.
-  group: recover-exact-course-execution-dpw52
+  group: recover-exact-course-execution-6j5l5
   cancel-in-progress: false
 jobs:
   dispatch:
-    if: github.event_name == 'push'
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main'
     runs-on: ubuntu-24.04
     steps:
       - name: Dispatch exact incident recovery through trusted main identity
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/recover-obsolete-cpu-execution.yml/dispatches" -f ref=main
+        run: |
+          released='${{ github.event.workflow_run.head_sha }}'
+          [[ "$released" =~ ^[a-f0-9]{40}$ ]] || exit 1
+          status=$(gh api "repos/$GITHUB_REPOSITORY/compare/c2c2723daaf42e6d81256c33fd6183951dc20fb6...$released" --jq .status)
+          [[ "$status" == identical || "$status" == ahead ]] || exit 1
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/recover-obsolete-cpu-execution.yml/dispatches" -f ref=main
   recover:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -42,8 +47,8 @@ jobs:
       - run: node scripts/gcp/verify-sdk.mjs
       - name: Verify exact image and pause only the requested execution
         env:
-          COURSE_EXECUTION: elevate-course-builder-dpw52
-          WORKER_IMAGE_SHA: d4bdf0ba99e3c99c659f1d80fd9ec91179ffbf88
+          COURSE_EXECUTION: elevate-course-builder-6j5l5
+          WORKER_IMAGE_SHA: b7d9308974fea2df8217e1431ae1b03c612faed6
         run: |
           node --input-type=module <<'NODE'
           import { execFileSync } from 'node:child_process';

@@ -571,7 +571,7 @@ async function routeToExtension(
   if (!connectionId) throw new Error('TELNYX_CONNECTION_ID is not configured.');
   const response = await (await telnyxClient()).calls.dial({
     connection_id: connectionId,
-    from: publicPhoneNumber(),
+    from: await publicPhoneNumber(),
     to: `sip:${device.sip_username}@sip.telnyx.com;secure=srtp`,
     link_to: callControlId,
     bridge_intent: true,
@@ -683,7 +683,7 @@ async function dialExtensionFallback(
   const fallbackState = { ...state, phase: 'external_fallback' };
   const response = await (await telnyxClient()).calls.dial({
     connection_id: connectionId,
-    from: publicPhoneNumber(),
+    from: await publicPhoneNumber(),
     to: extension.external_fallback_number,
     link_to: state.parentCallControlId,
     bridge_intent: true,

@@ -42,6 +42,7 @@ export interface UltimateRunContext {
     artifacts: Record<string, unknown>;
   }) => Promise<void>;
   passedSteps?: Set<UltimateBuildStep>;
+  assertActive?: () => void;
 }
 
 export class UltimateBuildRunner {
@@ -55,6 +56,7 @@ export class UltimateBuildRunner {
     }> = [];
     let index = 0;
     while (index < ULTIMATE_BUILD_STEPS.length) {
+      ctx.assertActive?.();
       const step = ULTIMATE_BUILD_STEPS[index];
       const inputHash = stepInputHash(step, ctx.profile, ctx.artifacts);
       if (ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], inputHash)) {
@@ -66,13 +68,16 @@ export class UltimateBuildRunner {
         ctx.passedSteps?.delete(dependent);
         delete ctx.artifacts[dependent];
       }
+      ctx.assertActive?.();
       await ctx.persistStep?.({ step, state: 'running' });
       let failures: UltimateInstructionalFinding[] = [];
       let artifacts: Record<string, unknown> = {};
       try {
         const handler = this.handlers[step];
         if (!handler) throw new Error(`HANDLER_NOT_IMPLEMENTED:${step}`);
+        ctx.assertActive?.();
         const result = await handler(ctx);
+        ctx.assertActive?.();
         artifacts = artifactPayload(result.artifacts ?? {});
         if (step === 'selective_repair')
           artifacts = {
@@ -108,6 +113,7 @@ export class UltimateBuildRunner {
           passed: failures.length === 0,
           checkedAt: new Date().toISOString(),
         };
+        ctx.assertActive?.();
         ctx.artifacts[step] = artifacts;
         await ctx.persistArtifact?.({ step, artifacts });
         if (!failures.length) {
@@ -137,6 +143,7 @@ export class UltimateBuildRunner {
             : message.split(':')[0];
         failures = [{ step, severity: 'error', code, message }];
       }
+      ctx.assertActive?.();
       await ctx.persistStep?.({ step, state: 'failed', artifacts, findings: failures });
       for (const finding of failures) await ctx.persistFinding?.(finding);
       const route = routeSelectiveRepairs(failures)[0];

@@ -32,7 +32,7 @@ export async function loadAdminHours(db: Awaited<ReturnType<typeof requireAdminC
       db
         .from('progress_entries')
         .select(
-          'id,apprentice_id,program_id,status,work_date,week_ending,hours_worked,notes,tasks_completed,clock_in_at,clock_out_at,verified_by,verified_at',
+          'id,apprentice_id,partner_id,program_id,status,work_date,week_ending,hours_worked,max_hours_per_week,notes,tasks_completed,clock_in_at,clock_out_at,verified_by,verified_at',
         )
         .order('work_date', { ascending: false })
         .order('id')

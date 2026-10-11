@@ -14,8 +14,9 @@ permissions:
   contents: read
   id-token: write
 concurrency:
-  group: google-pbx-infrastructure
+  group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('google-pbx-checks-{0}-{1}', github.workflow, github.ref) }}
   cancel-in-progress: false
+  queue: max
 jobs:
   audit-contract:
     if: github.event_name == 'pull_request'
@@ -65,6 +66,9 @@ jobs:
       - name: Verify authoritative phone DNS, trusted TLS and SIP transport
         if: always()
         run: node scripts/gcp/verify-pbx-transport.mjs
+      - name: Inspect deployment identity access without reading secret payloads
+        if: always()
+        run: node scripts/gcp/diagnose-access.mjs
       - name: Inspect actual PBX capabilities without exposing runtime configuration
         if: always()
         shell: bash
@@ -77,6 +81,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pbx-runtime-evidence
-          path: pbx-*-evidence.json
+          path: |
+            pbx-*-evidence.json
+            google-access-diagnostic.json
           if-no-files-found: error
           retention-days: 14

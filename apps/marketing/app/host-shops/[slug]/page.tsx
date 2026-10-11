@@ -280,9 +280,9 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
   const hostLabel = isBarberShop ? 'Elevate Host Shop' : 'Elevate Host Salon';
   const trainingSetting = isBarberShop ? 'barbershop' : 'salon';
   const address = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
-  const imageItems = (shop.media ?? [])
+  const imageItems = curateShopGallery(shop.slug, (shop.media ?? [])
     .filter((media) => media.kind !== 'video')
-    .map((media) => ({ url: media.src, alt: media.alt }));
+    .map((media) => ({ url: media.src, alt: media.alt })));
   const videoMedia = shop.media?.find((media) => media.kind === 'video');
   const videoUrl = videoMedia?.src;
   const videoScript =
@@ -343,12 +343,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">{shop.marketingBlurb ?? shop.note}</p>
               <p className="mt-4 text-sm font-bold leading-6 text-slate-600">Listen to the page guide for the full shop and apprenticeship introduction. Play the shop tour when you are ready, and use fullscreen for a larger view.</p>
             </div>
-            <div className="grid min-w-0 gap-4 sm:grid-cols-2 sm:items-center">
-              {imageItems[0] ? (
-                <div className="relative aspect-square overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
-                  <Image src={imageItems[0].url} alt={imageItems[0].alt ?? `${shop.dba ?? shop.name} shop image`} fill sizes="(max-width: 640px) 100vw, 28vw" className="object-contain" />
-                </div>
-              ) : null}
+            <div className="min-w-0">
               <div className="mx-auto flex w-full max-w-[280px] items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-lg">
                 <video src={videoUrl} controls playsInline preload="metadata" className="h-auto w-auto max-h-[320px] max-w-full object-scale-down" aria-label={`${shop.dba ?? shop.name} ${hostLabel} video`} />
               </div>
@@ -372,8 +367,8 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-12 lg:py-16">
           <div className="min-w-0">
             <p className="inline-flex rounded-full bg-brand-blue-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-brand-blue-800">Elevate apprenticeship Host Shop partner</p>
-            <h2 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-4xl">Meet {shop.dba ?? shop.name}</h2>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">{shop.marketingBlurb ?? shop.note}</p>
+            <h2 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-4xl">{videoUrl ? 'Explore the shop portfolio' : `Meet ${shop.dba ?? shop.name}`}</h2>
+            {!videoUrl ? <p className="mt-5 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">{shop.marketingBlurb ?? shop.note}</p> : null}
             <div className="mt-5 flex flex-wrap gap-2">
               {shop.programs.map((program) => <span key={program} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-black text-slate-800 shadow-sm">{programLabel(program)}</span>)}
             </div>

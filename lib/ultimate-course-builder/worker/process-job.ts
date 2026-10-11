@@ -15,8 +15,38 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
   if (!job) return { claimed: false };
+  const generation = Number(job.execution_generation);
+  if (!Number.isSafeInteger(generation) || generation < 1)
+    throw new Error('ULTIMATE_EXECUTION_GENERATION_REQUIRED');
+  const fence = {jobId: job.id, workerId, generation};
+  console.info('[UltimateWorker] job claimed', { jobId: job.id, buildId: job.build_id, workerId, generation });
+  let leaseLost = false;
+  let heartbeatInFlight = false;
+  let lastHeartbeat = Date.now();
+  const assertActive = () => {
+    if (leaseLost || Date.now() - lastHeartbeat >= 300000) throw new Error('ULTIMATE_JOB_LEASE_LOST:' + job.id);
+  };
   let timer: ReturnType<typeof setInterval> | null = setInterval(
-    () => void queue.heartbeat(job.id, workerId, 300).catch(() => {}),
+    () => {
+      if (heartbeatInFlight || leaseLost) return;
+      heartbeatInFlight = true;
+      void queue.heartbeat(job.id, workerId, 300)
+      .then((renewed) => {
+        if (!renewed) {
+          leaseLost = true;
+          console.error('[UltimateWorker] heartbeat rejected or lease lost', {jobId: job.id, workerId});
+        } else {
+          lastHeartbeat = Date.now();
+          console.info('[UltimateWorker] heartbeat acknowledged', {jobId: job.id});
+        }
+      })
+      .catch((error) => console.error('[UltimateWorker] heartbeat failed', {
+        jobId: job.id, workerId,
+        error: error instanceof Error ? {message: error.message, stack: error.stack} :
+          (typeof error === 'object' ? JSON.stringify(error) : String(error)),
+      }))
+      .finally(() => { heartbeatInFlight = false; });
+    },
     60000,
   );
   try {
@@ -33,16 +63,19 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     if (
       JSON.stringify(profile) !== JSON.stringify(storedProfile)
     ) {
-      const { error: profileError } = await db
-        .from('ultimate_course_builds')
-        .update({ profile })
-        .eq('id', build.id);
+      const { error: profileError } = await db.rpc('ultimate_fenced_write', {
+        p_job: job.id, p_worker: workerId, p_generation: generation,
+        p_action: 'update_profile', p_target: build.id, p_data: {profile},
+      });
       if (profileError) throw profileError;
     }
-    const runtime = await createUltimateRuntime(db);
+    console.info('[UltimateWorker] profile hydrated', { jobId: job.id, competencies: profile.competencies.length });
+    const runtime = await createUltimateRuntime(db, fence);
+    console.info('[UltimateWorker] runtime ready', { jobId: job.id });
     const handlers = createProductionHandlers(runtime);
     const payload = (job.payload ?? {}) as any;
     const targeted = Boolean(payload.competencyId || payload.lessonBuildId || payload.acceptance);
+    console.info('[UltimateWorker] lesson processing started', { jobId: job.id, targeted, competencyId: payload.competencyId ?? null });
     const result = await runUltimateCourse(
       {
         buildId: build.id,
@@ -57,15 +90,21 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       () => new UltimateBuildRunner(handlers as any),
       runtime.persistence,
       runtime.artifacts,
+      assertActive,
     );
+    assertActive();
+    console.info('[UltimateWorker] lesson processing returned', { jobId: job.id, completed: result.completed, findings: result.findings.length });
     if (!targeted) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {
-        await queue.yieldProgress(job.id, workerId, continuation.payload);
+        await queue.yieldProgress(job.id, workerId, continuation.payload, generation);
         return { claimed: true, completed: false, continuing: true, jobId: job.id, result };
       }
       if (continuation.unresolved?.length) {
-        await queue.fail(job.id,workerId,`ULTIMATE_DEPENDENCIES_UNRESOLVED:${continuation.unresolved.join(',')}`,false);
+        // A missing dependency is a blocked prerequisite, not a failed render.
+        // Preserve the cursor and await an explicit dependency wake-up instead
+        // of exhausting attempts or continuously retrying missing media.
+        await queue.waitForDependency(job.id,workerId,`ULTIMATE_DEPENDENCIES_UNRESOLVED:${continuation.unresolved.join(',')}`,generation);
         return {claimed:true,completed:false,jobId:job.id,result};
       }
     }
@@ -77,6 +116,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         job.id,
         workerId,
         `ULTIMATE_REPAIR_REQUIRED:${JSON.stringify(result.findings.map(f => ({step:f.step,code:f.code,message:f.message}))).slice(0,4000)}`,
+        generation,
       );
       return { claimed: true, completed: false, repairQueued: true, jobId: job.id, result };
     }
@@ -93,6 +133,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       }
       const releaseActor = await resolveReleaseActor(db, build.course_id, profile.mediaAcquisitionOwnerId);
       await runtime.persistence.updateBuild({buildId:build.id,status:'built',currentStep:'credential_release'});
+      assertActive();
       await new UltimateReleaseService(db).publish(build.id, releaseActor);
     }
     if (targeted) {
@@ -103,16 +144,16 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         buildId: build.id, status: 'blocked', currentStep: 'selective_repair',
       });
     }
-    await queue.complete(job.id, workerId);
+    assertActive();
+    await queue.complete(job.id, workerId, generation);
     return { claimed: true, completed: true, jobId: job.id, result };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    await queue.fail(
-      job.id,
-      workerId,
-      message,
-      true,
-    );
+    if (leaseLost || message.startsWith('ULTIMATE_JOB_LEASE_LOST')) {
+      console.error('[UltimateWorker] lease lost; not changing job state', {jobId: job.id, message});
+      return {claimed:true,completed:false,jobId:job.id,error:message};
+    }
+    await queue.fail(job.id, workerId, message, generation, true);
     return { claimed: true, completed: false, jobId: job.id, error: message };
   } finally {
     if (timer) clearInterval(timer);

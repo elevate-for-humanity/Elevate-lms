@@ -391,6 +391,23 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       };
     },
     credential_release: async (ctx) => {
+      // A persisted release certificate is not proof that the current movie
+      // passed QA. Never release against stale or missing upstream evidence.
+      const render = (ctx.artifacts.lesson_film_render as any)?.render;
+      const mediaQA = (ctx.artifacts.finished_media_qa as any)?.mediaQA;
+      if (!render || !mediaQA || mediaQA.pass !== true ||
+          !ctx.passedSteps?.has('lesson_film_render') ||
+          !ctx.passedSteps?.has('finished_media_qa')) {
+        return {
+          passed: false,
+          findings: [{
+            step: 'credential_release' as const,
+            severity: 'error' as const,
+            code: 'FINISHED_MEDIA_ACCEPTANCE_REQUIRED',
+            message: 'Current render and finished-media QA must pass before credential release.',
+          }],
+        };
+      }
       const c = comp(ctx);
       const objectives: any[] = (ctx.artifacts.learning_objectives as any)?.objectives ?? [];
       const script: any = (ctx.artifacts.instructor_script as any)?.script;

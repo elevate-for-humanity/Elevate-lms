@@ -31,7 +31,7 @@ import { MediaPlaybackCoordinator } from '@/components/media/MediaPlaybackCoordi
 
 const siteUrl = 'https://www.elevateforhumanity.org';
 const logoUrl = `${siteUrl}/images/logo.png`;
-const shareImageUrl = `${siteUrl}/images/social/elevate-career-training-20261009.jpg`;
+const shareImageUrl = `${siteUrl}/images/partners/salon-saloon/team-sign.webp`;
 
 export const metadata: Metadata = {
   title: {
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     title: 'Elevate for Humanity | Career Training & Registered Apprenticeships',
     description:
       'Find a career path, understand your training and funding options, and connect with apprenticeship and employer opportunities in one place.',
-    images: [{ url: shareImageUrl, width: 1200, height: 630, type: 'image/jpeg', alt: 'Elevate for Humanity career training' }],
+    images: [{ url: shareImageUrl, alt: 'Elevate for Humanity career training' }],
   },
   twitter: { card: 'summary_large_image', images: [shareImageUrl] },
   robots: {

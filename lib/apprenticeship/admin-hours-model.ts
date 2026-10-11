@@ -1,11 +1,13 @@
 export interface ProgressHoursEntry {
   id: string;
   apprentice_id: string;
+  partner_id: string | null;
   program_id: string;
   status: string;
   work_date: string;
   week_ending: string;
   hours_worked: number | string;
+  max_hours_per_week: number | string | null;
   notes: string | null;
   tasks_completed: string | null;
   clock_in_at: string | null;
@@ -115,6 +117,27 @@ export function hydrateAdminHours(
         entry.approval_blocker =
           'Multiple entries for this student, program and work date — review before approval';
     }
+  }
+  // Mirror the database cap trigger, including raw identity references and its
+  // SQL NULL equality behavior. Historical and draft hours also count there.
+  const transfer = (entry: ProgressHoursEntry) =>
+    ['TRANSFER CREDIT', 'PRIOR TRAINING CREDIT', 'TRANSFER HOURS', 'PRIOR HOURS'].includes(
+      (entry.tasks_completed ?? '').toUpperCase(),
+    );
+  const weekKey = (entry: ProgressHoursEntry) =>
+    JSON.stringify([entry.apprentice_id, entry.partner_id, entry.program_id, entry.week_ending]);
+  const weekTotals = new Map<string, number>();
+  for (const entry of entries) {
+    if (!entry.partner_id || transfer(entry)) continue;
+    const key = weekKey(entry);
+    weekTotals.set(key, roundHours((weekTotals.get(key) ?? 0) + entry.hours_worked));
+  }
+  for (const entry of entries) {
+    if (entry.approval_blocker || transfer(entry)) continue;
+    const total = entry.partner_id ? (weekTotals.get(weekKey(entry)) ?? 0) : entry.hours_worked;
+    const cap = Number(entry.max_hours_per_week ?? 40); // Existing database default.
+    if (total > cap)
+      entry.approval_blocker = `${total}h exceeds the configured ${cap}h weekly limit — review before approval`;
   }
   return entries;
 }

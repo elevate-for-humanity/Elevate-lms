@@ -1,6 +1,66 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { summarizeRevision, inspectPermissionBoundary, inspectRunQuotaOptions, PERMISSION_GROUPS } from './preflight-isolated-workloads.mjs';
+import { summarizeRevision, inspectPermissionBoundary, inspectRunQuotaOptions, inspectProjectBilling, PERMISSION_GROUPS } from './preflight-isolated-workloads.mjs';
+
+test('billing audit reads only the linked account and never infers a paid plan from enabled billing', async () => {
+  const calls = [];
+  const result = await inspectProjectBilling('private-token', async (url, init) => {
+    assert.equal(init.method, 'GET');
+    assert.equal(init.body, undefined);
+    calls.push(url);
+    return {ok: true, status: 200, json: async () => url.endsWith('/billingInfo')
+      ? {billingEnabled: true, billingAccountName: 'billingAccounts/AAAAAA-BBBBBB-CCCCCC'}
+      : {name: 'billingAccounts/AAAAAA-BBBBBB-CCCCCC', open: true, currencyCode: 'USD', displayName: 'private-owner'}};
+  });
+  assert.deepEqual(calls, ['https://cloudbilling.googleapis.com/v1/projects/elegant-racer-299721/billingInfo',
+    'https://cloudbilling.googleapis.com/v1/billingAccounts/AAAAAA-BBBBBB-CCCCCC']);
+  assert.equal(result.billingEnabled, true);
+  assert.equal(result.accountOpen, true);
+  assert.equal(result.linkedAccountSuffix, 'CCCCCC');
+  assert.equal(result.currencyCode, 'USD');
+  assert.equal(result.billableStatus, 'UNVERIFIED');
+  assert.equal(result.supportPlan, 'UNVERIFIED');
+  assert(!/private|AAAAAA|BBBBBB/.test(JSON.stringify(result)));
+});
+
+test('billing audit distinguishes unreadable from disabled and excludes raw error messages', async () => {
+  const result = await inspectProjectBilling('private-token', async () => ({ok: false, status: 403,
+    json: async () => ({error: {status: 'PERMISSION_DENIED', message: 'private-owner'}})}));
+  assert.equal(result.billingEnabled, null);
+  assert.equal(result.accountOpen, null);
+  assert.equal(result.reads.length, 1);
+  assert.equal(result.reads[0].errorStatus, 'PERMISSION_DENIED');
+  assert(!JSON.stringify(result).includes('private'));
+});
+
+test('billing denial identifies disabled API without exposing unrelated error metadata', async () => {
+  const result = await inspectProjectBilling('private-token', async () => ({ok: false, status: 403,
+    json: async () => ({error: {status: 'PERMISSION_DENIED', message: 'private-message', details: [
+      {'@type': 'type.googleapis.com/google.rpc.ErrorInfo', reason: 'SERVICE_DISABLED', metadata: {
+        service: 'cloudbilling.googleapis.com', consumer: 'projects/484736877039', account: 'private-account',
+        permission: 'resourcemanager.projects.get',
+      }},
+    ]}})}));
+  assert.equal(result.reads[0].reason, 'SERVICE_DISABLED');
+  assert.equal(result.reads[0].service, 'cloudbilling.googleapis.com');
+  assert.equal(result.reads[0].targetProjectConsumer, true);
+  assert.equal(result.reads[0].permission, 'resourcemanager.projects.get');
+  assert(!/private|484736877039/.test(JSON.stringify(result)));
+});
+
+test('billing audit does not follow an invalid account resource or expose transport errors', async () => {
+  let count = 0;
+  const result = await inspectProjectBilling('private-token', async () => {
+    count++;
+    return {ok: true, status: 200, json: async () => ({billingEnabled: false, billingAccountName: '../unrelated'})};
+  });
+  assert.equal(count, 1);
+  assert.equal(result.billingEnabled, false);
+  assert.equal(result.linkedAccountSuffix, null);
+  const unavailable = await inspectProjectBilling('private-token', async () => {throw new Error('private-token');});
+  assert.equal(unavailable.reads[0].errorStatus, 'READ_FAILED');
+  assert(!JSON.stringify(unavailable).includes('private-token'));
+});
 
 test('quota audit follows read-only pages without exposing contact information or credentials', async () => {
   let calls = 0;
@@ -23,6 +83,19 @@ test('quota API denial stays visible without leaking the error body', async () =
   assert.equal(result.reads.length, 2);
   assert.equal(result.reads[0].errorReasons[0], 'SERVICE_DISABLED');
   assert(!JSON.stringify(result).includes('private-response'));
+});
+
+test('quota audit retains CPU and memory preferences when the API omits metric', async () => {
+  const result = await inspectRunQuotaOptions('token', async url => ({ok: true, status: 200,
+    json: async () => url.pathname.endsWith('/quotaInfos') ? {quotaInfos: []} : {quotaPreferences: [
+      {service: 'run.googleapis.com', quotaId: 'CpuAllocPerProjectRegion', quotaConfig: {preferredValue: '32000', grantedValue: '20000'}},
+      {service: 'run.googleapis.com', quotaId: 'MemAllocPerProjectRegion', quotaConfig: {preferredValue: '68719476736', grantedValue: '42949672960'}},
+      {service: 'run.googleapis.com', quotaId: 'NvidiaL4GpuAllocPerProjectRegion', quotaConfig: {preferredValue: '1'}},
+    ]}}));
+  assert.deepEqual(result.preferences.map(x => [x.quotaId, x.preferredValue, x.grantedValue]), [
+    ['CpuAllocPerProjectRegion', '32000', '20000'],
+    ['MemAllocPerProjectRegion', '68719476736', '42949672960'],
+  ]);
 });
 
 test('serving revision summary preserves its own resource limits without exposing credentials', () => {

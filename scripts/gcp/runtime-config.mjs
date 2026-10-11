@@ -40,5 +40,12 @@ export function loadGoogleConfig(component, run = google) {
   const raw = run(['secrets', 'versions', 'access', 'latest', '--secret', name, '--project', PROJECT]);
   let config;
   try { config = JSON.parse(raw); } catch { throw new Error('Invalid Google configuration payload'); }
-  return validateConfig(config, component);
+  validateConfig(config, component);
+  const learnerEndpoint = config.runtimeEnvironment.ULTIMATE_LEARNER_RUNTHROUGH_URL;
+  if (component === 'ultimate-worker' && learnerEndpoint) {
+    const host = new URL(learnerEndpoint).hostname.toLowerCase().replace(/\.$/, '');
+    if (['code.run', 'northflank.app', 'northflank.com'].some(domain => host === domain || host.endsWith('.' + domain)))
+      throw new Error('Course Builder has a retired Northflank learner endpoint; run the verified Google learner cutover');
+  }
+  return config;
 }

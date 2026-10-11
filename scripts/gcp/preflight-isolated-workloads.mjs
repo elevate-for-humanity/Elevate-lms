@@ -9,7 +9,47 @@ export const PERMISSION_GROUPS = {
   routing: ['compute.addresses.create', 'compute.addresses.use', 'compute.firewalls.create', 'compute.healthChecks.create', 'compute.backendServices.create', 'compute.backendServices.update', 'compute.urlMaps.update'],
   monitoring: ['monitoring.timeSeries.list', 'logging.logEntries.list'],
   quota: ['serviceusage.quotas.get', 'serviceusage.quotas.update', 'cloudquotas.quotas.get', 'cloudquotas.quotas.update'],
+  billingInspection: ['resourcemanager.projects.get', 'serviceusage.services.get', 'serviceusage.services.use', 'serviceusage.services.enable'],
 };
+
+// Billing metadata is read-only. Neither billingEnabled nor open identifies a
+// Free Trial/Paid account or a Customer Care subscription in the public API.
+export async function inspectProjectBilling(token, request = fetch) {
+  const result = {observedAt: new Date().toISOString(), billingEnabled: null,
+    linkedAccountSuffix: null, accountOpen: null, currencyCode: null,
+    billableStatus: 'UNVERIFIED', supportPlan: 'UNVERIFIED', reads: []};
+  async function get(path, operation) {
+    try {
+      const response = await request('https://cloudbilling.googleapis.com/v1/' + path, {
+        method: 'GET', headers: {authorization: 'Bearer ' + token}, signal: AbortSignal.timeout(30000),
+      });
+      const body = await response.json();
+      const errorStatus = body?.error?.status;
+      const info = body?.error?.details?.find(x => x['@type'] === 'type.googleapis.com/google.rpc.ErrorInfo');
+      result.reads.push({operation, httpStatus: response.status,
+        ...(!response.ok ? {errorStatus: /^[A-Z_]{1,60}$/.test(errorStatus || '') ? errorStatus : 'READ_FAILED',
+          reason: /^[A-Z_]{1,60}$/.test(info?.reason || '') ? info.reason : undefined,
+          service: ['cloudbilling.googleapis.com', 'serviceusage.googleapis.com'].includes(info?.metadata?.service) ? info.metadata.service : undefined,
+          permission: [...PERMISSION_GROUPS.billingInspection, 'billing.accounts.get'].includes(info?.metadata?.permission) ? info.metadata.permission : undefined,
+          targetProjectConsumer: info?.metadata?.consumer ? ['projects/484736877039', 'projects/' + PROJECT].includes(info.metadata.consumer) : undefined,
+        } : {})});
+      return response.ok ? body : null;
+    } catch {result.reads.push({operation, errorStatus: 'READ_FAILED'}); return null;}
+  }
+  const project = await get('projects/' + PROJECT + '/billingInfo', 'projectBilling');
+  if (typeof project?.billingEnabled === 'boolean') result.billingEnabled = project.billingEnabled;
+  const name = project?.billingAccountName;
+  if (typeof name === 'string' && /^billingAccounts\/[A-Z0-9]{6}-[A-Z0-9]{6}-[A-Z0-9]{6}$/.test(name)) {
+    // Avoid exposing the full account identifier or account owner in CI logs.
+    result.linkedAccountSuffix = name.slice(-6);
+    const account = await get(name, 'linkedBillingAccount');
+    if (account?.name === name) {
+      if (typeof account.open === 'boolean') result.accountOpen = account.open;
+      if (/^[A-Z]{3}$/.test(account.currencyCode || '')) result.currencyCode = account.currencyCode;
+    }
+  }
+  return result;
+}
 
 // Quota metadata and pending adjustments only; never create preferences or grant access.
 export async function inspectRunQuotaOptions(token, request = fetch) {
@@ -29,7 +69,7 @@ export async function inspectRunQuotaOptions(token, request = fetch) {
         if (!response.ok) break;
         const entries = key === 'quotaInfos' ? body.quotaInfos : body.quotaPreferences;
         for (const entry of entries || []) {
-          if (entry.service !== 'run.googleapis.com' || !/cpu|memory|mem_allocation/i.test(entry.metric + ' ' + entry.quotaId)) continue;
+          if (entry.service !== 'run.googleapis.com' || !/cpu|memory|mem_?alloc/i.test(entry.metric + ' ' + entry.quotaId)) continue;
           if (key === 'quotaInfos') result.quotaInfos.push({quotaId: entry.quotaId, metric: entry.metric,
             dimensions: entry.dimensions, dimensionsInfos: entry.dimensionsInfos,
             isFixed: entry.isFixed, quotaIncreaseEligibility: entry.quotaIncreaseEligibility});
@@ -115,6 +155,7 @@ export async function runPreflight() {
     report.permissionChecks[name] = await inspectPermissionBoundary(token, 'project', permissions);
   }
   report.runQuotaOptions = await inspectRunQuotaOptions(token);
+  report.billing = await inspectProjectBilling(token);
   for (const region of REGIONS) {
     try {
       const services = read(['run', 'services', 'list', '--region=' + region]);

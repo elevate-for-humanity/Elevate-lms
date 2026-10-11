@@ -32,35 +32,30 @@ export async function hydrateUltimateProfileSources(
     : [];
   const { data: lessons, error } = await db
     .from('course_lessons')
-    .select('id,title,learning_objectives,content')
+    .select('id,slug,title,learning_objectives,content,content_json')
     .eq('course_id', courseId)
     .order('order_index');
   if (error) throw error;
 
   const competencyIds = new Set(profile.competencies.map((competency) => competency.id));
   const canonicalSources = (lessons ?? [])
-    .filter((lesson: any) => competencyIds.has(lesson.id))
-    .map((lesson: any) => {
+    .flatMap((lesson: any) => {
+      // Preserve the exact competency identifier used by the instructional
+      // generator. A canonical UUID, slug, and content_json key may differ.
+      const keys = [lesson.id, lesson.slug, lesson.content_json?.competencyId]
+        .filter((key): key is string => typeof key === 'string' && competencyIds.has(key));
+      if (!keys.length) return [];
       const objectives = Array.isArray(lesson.learning_objectives)
-        ? lesson.learning_objectives.filter(Boolean).join('; ')
-        : '';
-      const content =
-        typeof lesson.content === 'string'
-          ? lesson.content
-          : lesson.content
-            ? JSON.stringify(lesson.content)
-            : '';
-      const text = [
-        lesson.title ? `Lesson: ${lesson.title}` : '',
+        ? lesson.learning_objectives.filter(Boolean).join('; ') : '';
+      const content = typeof lesson.content === 'string' ? lesson.content
+        : lesson.content ? JSON.stringify(lesson.content) : '';
+      // Titles and objectives alone are not an authorized teaching source.
+      if (!content.trim()) return [];
+      const text = [lesson.title ? `Lesson: ${lesson.title}` : '',
         objectives ? `Learning objectives: ${objectives}` : '',
-        content ? `Authorized course content: ${content}` : '',
-      ]
-        .filter(Boolean)
-        .join('\n');
-      return text.trim() ? { id: `course-lesson:${lesson.id}`, text } : null;
-    })
-    .filter((source): source is { id: string; text: string } => Boolean(source));
-
+        `Authorized course content: ${content}`].filter(Boolean).join('\\n');
+      return [...new Set(keys)].map(key => ({ id: `course-lesson:${key}`, text }));
+    });
   if (!canonicalSources.length && !registeredSources.length) return profile;
   const sources = new Map(registeredSources.map((source) => [source.id, source]));
   for (const source of profile.instructionalSources ?? []) sources.set(source.id, source);

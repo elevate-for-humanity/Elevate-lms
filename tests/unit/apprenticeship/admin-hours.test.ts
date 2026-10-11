@@ -33,11 +33,13 @@ const profile = { id: 'user-id', full_name: 'Example Student', email: 'student@e
 const entry = (overrides: Partial<ProgressHoursEntry> = {}): ProgressHoursEntry => ({
   id: 'entry-1',
   apprentice_id: 'apprentice-id',
+  partner_id: 'partner-id',
   program_id: 'program-id',
   status: 'submitted',
   work_date: '2026-10-06',
   week_ending: '2026-10-11',
   hours_worked: '7.25',
+  max_hours_per_week: 40,
   notes: null,
   tasks_completed: null,
   clock_in_at: null,
@@ -119,6 +121,53 @@ describe('admin hours identities and totals', () => {
   });
   it('formats database work dates without a browser time zone shift', () => {
     expect(formatHoursDate('2026-10-06')).toBe('Oct 6, 2026');
+  });
+  it('keeps a week over its recorded cap out of the approval batch', () => {
+    const rows = hydrate([
+      entry({ hours_worked: 11 }),
+      entry({ id: 'earlier', work_date: '2026-10-05', hours_worked: 33, status: 'verified' }),
+    ]);
+    expect(rows[0].approval_blocker).toContain('44h exceeds the configured 40h weekly limit');
+  });
+  it('uses the configured weekly cap and allows its exact boundary', () => {
+    const rows = hydrate([
+      entry({ hours_worked: 12, max_hours_per_week: 48 }),
+      entry({ id: 'earlier', work_date: '2026-10-05', hours_worked: 36, status: 'verified' }),
+    ]);
+    expect(rows[0].approval_blocker).toBeNull();
+  });
+  it('excludes transfer credits and different partners from the weekly cap', () => {
+    const rows = hydrate([
+      entry({ hours_worked: 8 }),
+      entry({
+        id: 'credit',
+        work_date: '2026-10-01',
+        hours_worked: 200,
+        tasks_completed: 'TRANSFER CREDIT',
+        status: 'verified',
+      }),
+      entry({
+        id: 'other-partner',
+        work_date: '2026-10-02',
+        hours_worked: 40,
+        partner_id: 'other-partner',
+        status: 'verified',
+      }),
+    ]);
+    expect(rows[0].approval_blocker).toBeNull();
+  });
+  it('matches database equality for legacy rows without a partner', () => {
+    const rows = hydrate([
+      entry({ hours_worked: 8, partner_id: null }),
+      entry({
+        id: 'earlier',
+        work_date: '2026-10-05',
+        hours_worked: 40,
+        partner_id: null,
+        status: 'verified',
+      }),
+    ]);
+    expect(rows[0].approval_blocker).toBeNull();
   });
 });
 

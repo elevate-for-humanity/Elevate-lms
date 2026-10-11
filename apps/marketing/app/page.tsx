@@ -22,14 +22,14 @@ export const metadata: Metadata = {
     url: 'https://www.elevateforhumanity.org',
     siteName: PLATFORM_DEFAULTS.orgName,
     locale: 'en_US',
-    images: [{ url: 'https://www.elevateforhumanity.org/images/social/elevate-career-training-20261009.jpg', width: 1200, height: 630, type: 'image/jpeg', alt: `${PLATFORM_DEFAULTS.orgName} career training and workforce programs` }],
+    images: [{ url: 'https://www.elevateforhumanity.org/images/partners/salon-saloon/team-sign.webp', alt: `${PLATFORM_DEFAULTS.orgName} career training and workforce programs` }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: `${PLATFORM_DEFAULTS.orgName} | Career Training & Apprenticeships`,
     description: 'Explore career training, registered apprenticeships, Host Shops, and employer-connected pathways across Indiana.',
-    images: ['https://www.elevateforhumanity.org/images/social/elevate-career-training-20261009.jpg'],
+    images: ['https://www.elevateforhumanity.org/images/partners/salon-saloon/team-sign.webp'],
   },
   robots: { index: true, follow: true },
 };

@@ -44,9 +44,9 @@ jobs:
           COURSE_EXECUTION: ${{ inputs.execution }}
         run: |
           node --input-type=module <<'NODE'
-          import {execFileSync} from 'node:child_process';
+          import {google} from './scripts/gcp/runtime-config.mjs';
           let execution=process.env.COURSE_EXECUTION || 'latest';
-          const call=args=>JSON.parse(execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          const call=args=>JSON.parse(google(args));
           if(execution === 'latest') {
             const executions=call(['run','jobs','executions','list','--job=elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--limit=100','--sort-by=~metadata.creationTimestamp','--format=json']);
             console.log(JSON.stringify({executionInventory:executions.slice(0,8).map(x=>({name:x.metadata?.name,created:x.metadata?.creationTimestamp,completed:x.status?.conditions?.find(c=>c.type==='Completed')}))}));
@@ -64,7 +64,9 @@ jobs:
           for(const item of logs) {
             const message=String(item.textPayload ?? item.jsonPayload?.message ?? '');
             if(!/error|failed|exception|ultimate_|claim|complete|starting|polling|once|narration|render|bundl|mp4/i.test(message)) continue;
-            const safe=message.replace(/Bearer\s+\S+/gi,'Bearer [redacted]').replace(/(token|password|secret|api[_-]?key)\s*[:=]\s*\S+/gi,'$1=[redacted]').slice(0,1500);
+            let safe=message;
+            for(const entry of container.env||[])if(/KEY|TOKEN|SECRET|PASSWORD|URL/i.test(entry.name)&&entry.value?.length>5)safe=safe.split(entry.value).join('[redacted]');
+            safe=safe.replace(/https?:\/\/\S+/g,'[url]').replace(/Bearer\s+\S+/gi,'Bearer [redacted]').replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[token]').replace(/(token|password|secret|api[_-]?key)\s*[:=]\s*\S+/gi,'$1=[redacted]').slice(0,1500);
             const context=item.jsonPayload?.context ?? {};
             const render=Object.fromEntries(['lessonId','percent','renderedFrames','encodedFrames','totalFrames','fps','concurrency','bytes'].filter(k=>context[k]!==undefined).map(k=>[k,context[k]]));
             console.log(JSON.stringify({timestamp:item.timestamp,severity:item.severity,message:safe,render}));

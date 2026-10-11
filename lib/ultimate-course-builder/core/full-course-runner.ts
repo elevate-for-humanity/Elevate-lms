@@ -20,7 +20,10 @@ export async function runUltimateCourse(
   makeRunner: (competencyId: string) => UltimateBuildRunner,
   persistence: UltimatePersistencePort,
   artifactStore?: UltimateArtifactPort,
+  assertActive?: () => void,
 ) {
+  console.info('[UltimateCourse] build started', {buildId: plan.buildId, startIndex: plan.startIndex, maxLessons: plan.maxLessons});
+  assertActive?.();
   await persistence.updateBuild({
     buildId: plan.buildId,
     status: 'running',
@@ -35,6 +38,8 @@ export async function runUltimateCourse(
   if (plan.targetCompetencyId && !competencies.length)
     throw new Error('ULTIMATE_TARGET_COMPETENCY_NOT_FOUND');
   for (const competency of competencies) {
+    assertActive?.();
+    console.info('[UltimateCourse] competency started', {buildId: plan.buildId, competencyId: competency.id});
     const lesson = plan.targetLessonBuildId
       ? { id: plan.targetLessonBuildId }
       : await persistence.createLesson({
@@ -42,7 +47,9 @@ export async function runUltimateCourse(
           lessonKey: competency.id,
           competencyId: competency.id,
         });
+    console.info('[UltimateCourse] checkpoint loading', {lessonBuildId: lesson.id, competencyId: competency.id});
     const checkpoint = await persistence.loadLessonCheckpoint({ lessonBuildId: lesson.id });
+    console.info('[UltimateCourse] checkpoint loaded', {lessonBuildId: lesson.id, passedSteps: checkpoint.passedSteps.length});
     const restoredPassed: UltimateBuildStep[] = [];
     for (const step of ULTIMATE_BUILD_STEPS) {
       if (!checkpoint.passedSteps.includes(step)) break;
@@ -59,7 +66,10 @@ export async function runUltimateCourse(
       artifacts: restoredArtifacts as UltimateRunContext['artifacts'],
       findings: checkpoint.findings.filter((f) => restoredPassed.includes(f.step)),
       passedSteps: new Set(restoredPassed),
+      assertActive,
       persistStep: async (input) => {
+        assertActive?.();
+        console.info('[UltimateCourse] step transition', {lessonBuildId: lesson.id, step: input.step, state: input.state});
         await persistence.updateBuild({
           buildId: plan.buildId,
           status: 'running',
@@ -67,10 +77,13 @@ export async function runUltimateCourse(
         });
         await persistence.recordStep({ lessonBuildId: lesson.id, ...input });
       },
-      persistFinding: async (finding) =>
-        persistence.recordFinding({ buildId: plan.buildId, finding }),
+      persistFinding: async (finding) => {
+        assertActive?.();
+        return persistence.recordFinding({ buildId: plan.buildId, finding });
+      },
       persistArtifact: artifactStore
         ? async ({ step, artifacts }) => {
+            assertActive?.();
             await persistence.saveArtifact({
               lessonBuildId: lesson.id,
               artifacts: context.artifacts,
@@ -88,7 +101,10 @@ export async function runUltimateCourse(
           }
         : undefined,
     };
+    console.info('[UltimateCourse] runner started', {lessonBuildId: lesson.id});
     const result = await makeRunner(competency.id).run(context);
+    console.info('[UltimateCourse] runner returned', {lessonBuildId: lesson.id, findings: result.findings.length});
+    assertActive?.();
     await persistence.finishLesson({
       lessonBuildId: lesson.id,
       status: result.findings.some((f) => f.severity === 'error') ? 'built_with_findings' : 'built',
@@ -100,6 +116,7 @@ export async function runUltimateCourse(
   const findings = lessons.flatMap((x) => x.result.findings);
   const hasErrors = findings.some((f) => f.severity === 'error');
   const completed = !hasErrors && lessons.length === competencies.length;
+  assertActive?.();
   await persistence.updateBuild({
     buildId: plan.buildId,
     // Repairable quality findings remain in the automatic production lifecycle.

@@ -66,14 +66,15 @@ export default function HostShopMediaCarousel({
         ) : (
           <img key={active.url} src={active.url} alt={active.alt || `${shopName} promotional image`} className="host-shop-media-enter h-full w-full object-contain" loading="lazy" decoding="async" />
         )}
-        {media.length > 1 ? (
-          <>
-            <button type="button" onClick={previous} aria-label="Previous image" className="absolute left-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-slate-900 shadow-md ring-1 ring-black/10 backdrop-blur hover:bg-white sm:left-3"><ChevronLeft className="h-5 w-5" /></button>
-            <button type="button" onClick={next} aria-label="Next image" className="absolute right-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-slate-900 shadow-md ring-1 ring-black/10 backdrop-blur hover:bg-white sm:right-3"><ChevronRight className="h-5 w-5" /></button>
-          </>
-        ) : null}
         {active.type === 'video' ? <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1.5 text-xs font-black text-white"><span className="inline-flex items-center gap-1.5"><PlayCircle className="h-4 w-4" /> Video</span></div> : null}
       </div>
+      {media.length > 1 ? (
+        <div className="flex w-full items-center justify-between gap-4 border-t border-slate-200 bg-white px-4 py-2">
+          <button type="button" onClick={previous} aria-label="Previous image" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-900 ring-1 ring-slate-300 hover:bg-slate-200"><ChevronLeft className="h-5 w-5" /></button>
+          <span className="text-sm font-medium text-slate-600" aria-live="polite">{safeIndex + 1} of {media.length}</span>
+          <button type="button" onClick={next} aria-label="Next image" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-900 ring-1 ring-slate-300 hover:bg-slate-200"><ChevronRight className="h-5 w-5" /></button>
+        </div>
+      ) : null}
       {videoUrl ? (
         <div className="border-t border-slate-200 bg-slate-950 p-4">
           <p className="mb-3 text-sm font-bold text-white">Watch the {shopName} shop video</p>

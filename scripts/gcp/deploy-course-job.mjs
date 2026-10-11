@@ -23,7 +23,7 @@ export function courseJobEnvironment(source, service) {
   result.AI_PROVIDER = 'none';
   result.AI_NARRATION_PROVIDER = 'kokoro';
   result.AI_TRANSCRIPTION_PROVIDER = 'local_whisper';
-  result.REMOTION_RENDER_CONCURRENCY = '4';
+  result.REMOTION_RENDER_CONCURRENCY = '1';
   return result;
 }
 

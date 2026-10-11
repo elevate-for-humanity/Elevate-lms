@@ -1,8 +1,9 @@
-import { execFileSync } from 'node:child_process';
+import { google } from './runtime-config.mjs';
+import { inspectRegionalCapacity } from './regional-capacity.mjs';
 import { pathToFileURL } from 'node:url';
 import { assertNoActiveExecutions } from './execute-course-job.mjs';
 
-export async function dispatchQueuedCourseJob({run = execFileSync, request = fetch, env = process.env, now = new Date(), delay = ms => new Promise(resolve => setTimeout(resolve, ms)), assignmentAttempts = 60} = {}) {
+export async function dispatchQueuedCourseJob({run = (_command, args) => google(args), capacityCheck = inspectRegionalCapacity, request = fetch, env = process.env, now = new Date(), delay = ms => new Promise(resolve => setTimeout(resolve, ms)), assignmentAttempts = 60} = {}) {
   const scope = ['--project=elegant-racer-299721', '--region=us-central1'];
   const executions = JSON.parse(run('gcloud', ['run','jobs','executions','list','--job=elevate-course-builder',...scope,'--format=json'], {encoding:'utf8',stdio:['ignore','pipe','pipe']}));
   try { assertNoActiveExecutions(executions); }
@@ -25,6 +26,11 @@ export async function dispatchQueuedCourseJob({run = execFileSync, request = fet
   if (!Array.isArray(candidates)) throw new Error('COURSE_QUEUE_RESPONSE_INVALID');
   const queued = candidates.filter(job => job.max_attempts === undefined || job.attempts < job.max_attempts);
   if (queued.length === 0) return {status:'empty'};
+  const job = JSON.parse(run('gcloud', ['run','jobs','describe','elevate-course-builder',...scope,'--format=json'], {encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+  const task = job.spec?.template?.spec?.template?.spec;
+  if (!task?.containers?.length) throw new Error('COURSE_JOB_CONFIGURATION_UNAVAILABLE');
+  const capacity = await capacityCheck({region:'us-central1', task, run: args => run('gcloud', args, {encoding:'utf8',stdio:['ignore','pipe','pipe']})});
+  if (!capacity.fits) return {status:'capacity_wait', ...capacity};
   run('gcloud',['run','jobs','execute','elevate-course-builder',...scope,'--tasks=1','--async','--quiet'],{stdio:'inherit'});
   // Launch is not assignment. Require a fresh durable heartbeat from the selected job.
   const jobId = queued[0].id;

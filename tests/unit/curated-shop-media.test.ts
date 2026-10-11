@@ -2,6 +2,18 @@ import { describe, expect, it } from 'vitest';
 import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 
 describe('shop portfolio curation', () => {
+  it('shows each Kountry Kutz photograph once when legacy and enhanced imports overlap', () => {
+    const gallery = curateShopGallery('kountry-kutz-barbershop', [
+      { url: '/images/partners/kountry-kutz/interior-active.webp' },
+      { url: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp' },
+      { url: 'https://www.elevateforhumanity.org/images/partners/kountry-kutz/interior-active-enhanced-2026.webp?version=2' },
+      { url: '/images/partners/kountry-kutz/interior-empty.webp' },
+    ]);
+    expect(gallery.map((item) => item.url)).toEqual([
+      '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp',
+      '/images/partners/kountry-kutz/interior-empty-enhanced-2026.webp',
+    ]);
+  });
   it('separates Generations before and after and removes repeated images', () => {
     const gallery = curateShopGallery('generations-hair-llc', [
       { url: '/images/partners/generations-hair/color-transformation.webp' },

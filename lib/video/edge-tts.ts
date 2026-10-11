@@ -233,7 +233,8 @@ async function getKokoroModel(): Promise<KokoroModel> {
         device: 'cpu',
         // The image preloads Kokoro at build time. Never download model files
         // while rendering lessons: remote 429s must not fail production jobs.
-        local_files_only: true,
+        // Offline availability is enforced by the preloaded model image and
+        // runtime network policy, not by an unsupported KokoroJS option.
       });
       return model as unknown as KokoroModel;
     });

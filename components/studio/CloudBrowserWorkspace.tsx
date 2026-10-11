@@ -791,7 +791,7 @@ export default function CloudBrowserWorkspace({
           className="min-h-12 rounded-lg border border-slate-300 px-3 text-base">Exit sign-in view</button> : null}
       </div>
       {session ? (
-        <div role="toolbar" aria-label="Browser view controls" className={`${mobilePane !== 'browser' ? 'hidden lg:flex' : 'flex'} shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-2 py-1`}>
+        <div role="toolbar" aria-label="Browser view controls" className={`${mobilePane === 'tools' ? 'hidden lg:flex' : 'flex'} shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-2 py-1`}>
           <button type="button" aria-label="Zoom browser out" disabled={imageZoom <= 0.25}
             onClick={() => setImageZoom((zoom) => Math.max(0.25, zoom > 1 ? zoom - 0.5 : zoom - 0.25))}
             className="min-h-11 min-w-11 rounded border border-slate-300 text-xl disabled:opacity-40">−</button>
@@ -1220,7 +1220,7 @@ export default function CloudBrowserWorkspace({
                     void sendSecureInput();
                   }
                 }}
-                className="min-h-11 w-full min-w-0 rounded border border-emerald-300 bg-slate-50 px-3 py-2 text-base"
+                className="min-h-12 w-full min-w-0 rounded border border-emerald-300 bg-slate-50 px-3 py-2 text-xl"
               />
               {secureInputKind === 'email' ? (
                 <button

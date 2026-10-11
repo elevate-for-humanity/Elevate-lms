@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { logger } from '@/lib/logger';
+import { browserConfiguration } from '@/lib/devstudio/browser-configuration';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function configuration() {
-  const internalUrl = (process.env.STUDIO_BROWSER_URL || '').replace(/\/$/, '');
-  const publicUrl = (
-    process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL ||
-    process.env.STUDIO_BROWSER_PUBLIC_URL ||
-    ''
-  ).replace(/\/$/, '');
-  const secret = process.env.STUDIO_BROWSER_SECRET || '';
-  return { internalUrl, publicUrl, secret, configured: !!(internalUrl && publicUrl && secret) };
+  return browserConfiguration(process.env);
 }
 
 export async function GET(req: NextRequest) {

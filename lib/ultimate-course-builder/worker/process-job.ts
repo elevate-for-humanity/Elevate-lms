@@ -16,17 +16,33 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const job = await queue.claim(workerId, 300);
   if (!job) return { claimed: false };
   console.info('[UltimateWorker] job claimed', { jobId: job.id, buildId: job.build_id, workerId });
+  let leaseLost = false;
+  let heartbeatInFlight = false;
+  let lastHeartbeat = Date.now();
+  const assertActive = () => {
+    if (leaseLost || Date.now() - lastHeartbeat >= 300000) throw new Error('ULTIMATE_JOB_LEASE_LOST:' + job.id);
+  };
   let timer: ReturnType<typeof setInterval> | null = setInterval(
-    () => void queue.heartbeat(job.id, workerId, 300)
+    () => {
+      if (heartbeatInFlight || leaseLost) return;
+      heartbeatInFlight = true;
+      void queue.heartbeat(job.id, workerId, 300)
       .then((renewed) => {
-        if (!renewed) console.error('[UltimateWorker] heartbeat rejected or lease lost', {jobId: job.id, workerId});
-        else console.info('[UltimateWorker] heartbeat acknowledged', {jobId: job.id});
+        if (!renewed) {
+          leaseLost = true;
+          console.error('[UltimateWorker] heartbeat rejected or lease lost', {jobId: job.id, workerId});
+        } else {
+          lastHeartbeat = Date.now();
+          console.info('[UltimateWorker] heartbeat acknowledged', {jobId: job.id});
+        }
       })
       .catch((error) => console.error('[UltimateWorker] heartbeat failed', {
         jobId: job.id, workerId,
         error: error instanceof Error ? {message: error.message, stack: error.stack} :
           (typeof error === 'object' ? JSON.stringify(error) : String(error)),
-      })),
+      }))
+      .finally(() => { heartbeatInFlight = false; });
+    },
     60000,
   );
   try {
@@ -70,7 +86,9 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       () => new UltimateBuildRunner(handlers as any),
       runtime.persistence,
       runtime.artifacts,
+      assertActive,
     );
+    assertActive();
     console.info('[UltimateWorker] lesson processing returned', { jobId: job.id, completed: result.completed, findings: result.findings.length });
     if (!targeted) {
       const continuation = nextCourseWork(payload, result);
@@ -107,6 +125,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       }
       const releaseActor = await resolveReleaseActor(db, build.course_id, profile.mediaAcquisitionOwnerId);
       await runtime.persistence.updateBuild({buildId:build.id,status:'built',currentStep:'credential_release'});
+      assertActive();
       await new UltimateReleaseService(db).publish(build.id, releaseActor);
     }
     if (targeted) {
@@ -117,16 +136,16 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         buildId: build.id, status: 'blocked', currentStep: 'selective_repair',
       });
     }
+    assertActive();
     await queue.complete(job.id, workerId);
     return { claimed: true, completed: true, jobId: job.id, result };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    await queue.fail(
-      job.id,
-      workerId,
-      message,
-      true,
-    );
+    if (leaseLost || message.startsWith('ULTIMATE_JOB_LEASE_LOST')) {
+      console.error('[UltimateWorker] lease lost; not changing job state', {jobId: job.id, message});
+      return {claimed:true,completed:false,jobId:job.id,error:message};
+    }
+    await queue.fail(job.id, workerId, message, true);
     return { claimed: true, completed: false, jobId: job.id, error: message };
   } finally {
     if (timer) clearInterval(timer);

@@ -227,13 +227,14 @@ function kokoroNarrationChunks(text: string, maxCharacters = 420): string[] {
 
 async function getKokoroModel(): Promise<KokoroModel> {
   if (!kokoroModelPromise) {
-    kokoroModelPromise = import('kokoro-js').then(async ({ KokoroTTS }) => {
+    kokoroModelPromise = import('@huggingface/transformers').then(async ({ env }) => {
+      // Fail closed if the image did not preload the model. Kokoro's
+      // from_pretrained options do not support local_files_only.
+      env.allowRemoteModels = false;
+      const { KokoroTTS } = await import('kokoro-js');
       const model = await KokoroTTS.from_pretrained(KOKORO_MODEL_ID, {
         dtype: 'q8',
         device: 'cpu',
-        // The image preloads Kokoro at build time. Never download model files
-        // while rendering lessons: remote 429s must not fail production jobs.
-        local_files_only: true,
       });
       return model as unknown as KokoroModel;
     });

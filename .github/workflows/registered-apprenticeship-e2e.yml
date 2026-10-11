@@ -53,10 +53,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify runtime Studio browser URL precedence
-        run: node --test scripts/test-studio-browser-configuration.mjs
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+      - name: Verify runtime Studio browser URL precedence
+        run: node --test scripts/test-studio-browser-configuration.mjs
       - name: Verify production LMS is ready
         shell: bash
         run: |

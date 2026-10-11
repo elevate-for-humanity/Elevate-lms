@@ -124,8 +124,13 @@ function visualCandidates(input: any): VisualCandidate[] {
   const seen = new Set<string>();
   return candidates
     .filter((candidate) => {
-      if (seen.has(candidate.url)) return false;
-      seen.add(candidate.url);
+      // Assignments bind an asset record, not a URL. Several approved lesson
+      // records can reference the same licensed file; dropping their IDs makes
+      // a valid saved assignment impossible to resolve. Distinct-shot quality
+      // remains enforced against the rendered URLs by requireResolvedVisualEvidence.
+      const identity = candidate.assetId || candidate.url;
+      if (seen.has(identity)) return false;
+      seen.add(identity);
       return true;
     })
     .sort((left, right) => Number(right.kind === 'image') - Number(left.kind === 'image'));

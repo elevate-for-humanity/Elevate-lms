@@ -55,6 +55,8 @@ jobs:
           node-version: '22'
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+      - name: Verify runtime Studio browser URL precedence
+        run: node --test scripts/test-studio-browser-configuration.mjs
       - name: Verify production LMS is ready
         shell: bash
         run: |

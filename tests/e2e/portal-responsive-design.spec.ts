@@ -507,7 +507,7 @@ test.describe('Studio single-session access and composer', () => {
     await expect.poll(() => stream.evaluate(el => el.getBoundingClientRect().width)).toBeLessThan(normalWidth);
     await page.getByRole('button', { name: 'Fit screen' }).click();
     if ((page.viewportSize()?.width || 1280) < 1024)
-      await page.getByRole('button', { name: 'Sign-in & tools' }).click();
+      await page.getByRole('button', { name: 'Email / password' }).click();
     const input = page.getByLabel('Secure browser input');
     await expect(input).toBeVisible();
     const geometry = await input.evaluate(el => {

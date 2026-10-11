@@ -92,7 +92,7 @@ jobs:
           pnpm exec tsc --noEmit --project apps/marketing/tsconfig.json
           node --test scripts/gcp/marketing-health-routing.test.cjs
           node --experimental-strip-types --test scripts/test-hosted-website-management.mjs scripts/test-hosted-domain-management.mjs scripts/test-hosted-website-claims.mjs
-          node --test scripts/test-public-revision-activation.mjs
+          node --test scripts/test-public-revision-activation.mjs scripts/gcp/wait-ready-public-revision.test.mjs
           node scripts/audit-geo-claims.mjs
           node scripts/check-public-claims.mjs
           node scripts/check-public-address-integrity.mjs
@@ -202,11 +202,12 @@ jobs:
             --image="$IMAGE@$DIGEST" \
             --revision-suffix="$SUFFIX" \
             --remove-env-vars=GIT_SHA,GITHUB_SHA,NEXT_PUBLIC_GIT_SHA,NEXT_PUBLIC_COMMIT_SHA,NEXT_PUBLIC_BUILD_ID,NF_GIT_SHA,BUILD_TIMESTAMP \
-            --quiet
+            --no-traffic --async --quiet
           # Runtime labels inherited from an earlier release must not override
           # the immutable image identity. Explicitly serve the ready revision;
           # image updates alone preserve a previously pinned traffic target.
           REVISION="elevate-marketing-migration-$SUFFIX"
+          CANDIDATE_REVISION="$REVISION" node scripts/gcp/wait-ready-public-revision.mjs
           CANDIDATE_REVISION="$REVISION" IMAGE_SHA="$GITHUB_SHA" node scripts/gcp/activate-tested-public-revision.mjs
 
       - name: Collect exact failed revision diagnostics

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { stripTypeScriptTypes } from 'node:module';
 
-const source = stripTypeScriptTypes(await readFile(new URL('../lib/ultimate-course-builder/worker/job-queue.ts', import.meta.url), 'utf8'));
+const source = stripTypeScriptTypes(await readFile(new URL('../lib/ultimate-course-builder/worker/job-queue.ts', import.meta.url), 'utf8'), { mode: 'transform' });
 const { UltimateJobQueue } = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
 
 function database(owned) {

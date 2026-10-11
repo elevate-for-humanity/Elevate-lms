@@ -20,14 +20,11 @@ export async function GET() {
       config.realmId,
     );
     const webhookVerifierConfigured = Boolean(process.env.QB_WEBHOOK_VERIFIER_TOKEN);
-    if (!configured || !webhookVerifierConfigured) {
+    if (!configured) {
       return NextResponse.json(
         {
-          service: 'quickbooks',
-          ready: false,
-          configured,
-          webhookVerifierConfigured,
-          connected: false,
+          service: 'quickbooks', ready: false, configured: false,
+          webhookVerifierConfigured, connected: false, reason: 'oauth_configuration_missing',
         },
         { status: 503, headers: { 'Cache-Control': 'no-store' } },
       );
@@ -36,12 +33,13 @@ export async function GET() {
     return NextResponse.json(
       {
         service: 'quickbooks',
-        ready: true,
+        ready: webhookVerifierConfigured,
         configured: true,
-        webhookVerifierConfigured: true,
+        webhookVerifierConfigured,
         connected: true,
+        ...(webhookVerifierConfigured ? {} : { reason: 'webhook_verifier_missing' }),
       },
-      { headers: { 'Cache-Control': 'no-store' } },
+      { status: webhookVerifierConfigured ? 200 : 503, headers: { 'Cache-Control': 'no-store' } },
     );
   } catch {
     return NextResponse.json(

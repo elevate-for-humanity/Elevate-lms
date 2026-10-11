@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import { getAdminDashboardData } from '@/lib/admin/get-admin-dashboard-data';
 import { normalizeAdminDashboardData } from '@/lib/admin/normalize-dashboard-data';
 import { AdminDashboardContent } from '@/components/admin/dashboard/DashboardShell';
@@ -43,6 +44,16 @@ export default async function AdminDashboardPage() {
       <div className="px-3 pt-4 sm:px-5 lg:px-6">
         <EmailAccountNotice href="/phone/email" />
       </div>
+      <nav aria-label="Separate training dashboard management" className="grid gap-3 px-3 pt-4 sm:grid-cols-2 sm:px-5 lg:px-6">
+        <Link href="/students" className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:border-blue-500">
+          <span className="text-lg font-bold text-slate-950">Learner Dashboards</span>
+          <p className="mt-1 text-sm text-slate-600">Regular training learners, including HVAC attendance and class clock-in.</p>
+        </Link>
+        <Link href="/apprenticeships" className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:border-blue-500">
+          <span className="text-lg font-bold text-slate-950">Apprentice Dashboards</span>
+          <p className="mt-1 text-sm text-slate-600">Registered apprenticeships, OJL, RTI, and employer approvals only.</p>
+        </Link>
+      </nav>
       <AdminDashboardContent
         data={data}
         heroAssets={heroAssets}

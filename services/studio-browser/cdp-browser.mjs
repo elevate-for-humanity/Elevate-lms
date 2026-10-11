@@ -118,6 +118,10 @@ class CdpBrowser extends EventEmitter {
             frame.sessionId = p.sessionId;
             page.frameMap.set(frame.id, frame);
             this.frameSessions.set(p.sessionId, { page, frame });
+            // A detached OOPIF may reject any startup command, not only
+            // Target.setAutoAttach. Treat -32001 as a stale iframe session
+            // while preserving the parent page and other browser contexts.
+            try {
             for (const method of ['Page.enable', 'Runtime.enable', 'Network.enable'])
               await this.connection.send(method, {}, p.sessionId);
             await this.connection.send(
@@ -134,6 +138,11 @@ class CdpBrowser extends EventEmitter {
                 { autoAttach: true, waitForDebuggerOnStart: true, flatten: true },
                 p.sessionId,
               );
+            } catch (error) {
+              if (error?.code !== -32001) throw error;
+              this.frameSessions.delete(p.sessionId);
+              if (frame.sessionId === p.sessionId) frame.sessionId = undefined;
+            }
             } catch (error) {
               if (error?.code !== -32001) throw error;
               this.frameSessions.delete(p.sessionId);

@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import '@/apps/admin/styles/studio-mobile-safety.css';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -183,13 +184,9 @@ export default function StudioCommandWorkspace({
       Boolean(explicitUrl) || /\b(envato|browser|website|download|sign[ -]?in)\b/i.test(command);
     setBrowserTarget(explicitUrl || (/\benvato\b/i.test(command) ? 'https://app.envato.com' : ''));
     setBrowserCommand(browserIntent ? command : '');
-    setSurface(
-      browserIntent
-        ? 'browser'
-        : /\b(course|lesson|curriculum|quiz|assessment|learning object|media)\b/i.test(command)
-          ? 'course'
-          : 'commands',
-    );
+    // Submitting a command must not navigate away from the conversation.
+    // Course Builder and Browser remain explicit user-selected surfaces.
+    setSurface('commands');
   };
 
   const activeWorkspace = useMemo(

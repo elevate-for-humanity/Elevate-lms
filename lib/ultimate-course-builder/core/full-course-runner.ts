@@ -21,6 +21,7 @@ export async function runUltimateCourse(
   persistence: UltimatePersistencePort,
   artifactStore?: UltimateArtifactPort,
 ) {
+  console.info('[UltimateCourse] build started', {buildId: plan.buildId, startIndex: plan.startIndex, maxLessons: plan.maxLessons});
   await persistence.updateBuild({
     buildId: plan.buildId,
     status: 'running',
@@ -35,6 +36,7 @@ export async function runUltimateCourse(
   if (plan.targetCompetencyId && !competencies.length)
     throw new Error('ULTIMATE_TARGET_COMPETENCY_NOT_FOUND');
   for (const competency of competencies) {
+    console.info('[UltimateCourse] competency started', {buildId: plan.buildId, competencyId: competency.id});
     const lesson = plan.targetLessonBuildId
       ? { id: plan.targetLessonBuildId }
       : await persistence.createLesson({
@@ -42,7 +44,9 @@ export async function runUltimateCourse(
           lessonKey: competency.id,
           competencyId: competency.id,
         });
+    console.info('[UltimateCourse] checkpoint loading', {lessonBuildId: lesson.id, competencyId: competency.id});
     const checkpoint = await persistence.loadLessonCheckpoint({ lessonBuildId: lesson.id });
+    console.info('[UltimateCourse] checkpoint loaded', {lessonBuildId: lesson.id, passedSteps: checkpoint.passedSteps.length});
     const restoredPassed: UltimateBuildStep[] = [];
     for (const step of ULTIMATE_BUILD_STEPS) {
       if (!checkpoint.passedSteps.includes(step)) break;
@@ -60,6 +64,7 @@ export async function runUltimateCourse(
       findings: checkpoint.findings.filter((f) => restoredPassed.includes(f.step)),
       passedSteps: new Set(restoredPassed),
       persistStep: async (input) => {
+        console.info('[UltimateCourse] step transition', {lessonBuildId: lesson.id, step: input.step, state: input.state});
         await persistence.updateBuild({
           buildId: plan.buildId,
           status: 'running',
@@ -88,7 +93,9 @@ export async function runUltimateCourse(
           }
         : undefined,
     };
+    console.info('[UltimateCourse] runner started', {lessonBuildId: lesson.id});
     const result = await makeRunner(competency.id).run(context);
+    console.info('[UltimateCourse] runner returned', {lessonBuildId: lesson.id, findings: result.findings.length});
     await persistence.finishLesson({
       lessonBuildId: lesson.id,
       status: result.findings.some((f) => f.severity === 'error') ? 'built_with_findings' : 'built',

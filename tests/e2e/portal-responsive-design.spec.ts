@@ -441,9 +441,9 @@ test.describe('Authenticated portal responsive design certification', () => {
   );
 });
 
-test.describe('Studio readable sign-in and composer', () => {
+test.describe('Studio single-session access and composer', () => {
   test.skip(!creds.admin[0] || !creds.admin[1], 'Disposable admin identity is required');
-  test('sign-in controls and chat text remain usable on the active device', async ({ page }, testInfo) => {
+  test('Admin session opens Studio and optional external browser tools remain usable on the active device', async ({ page }, testInfo) => {
     await login(page, ADMIN_BASE, creds.admin[0], creds.admin[1]);
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
@@ -464,7 +464,9 @@ test.describe('Studio readable sign-in and composer', () => {
     await expect(access.getByRole('link', { name: 'Open Course Builder' })).toHaveAttribute('href', '/studio/courses');
     await expect(page.getByRole('navigation', { name: 'Course tools' }).getByRole('link', { name: 'Course Builder', exact: true })).toBeVisible();
     await access.getByRole('link', { name: 'Enter Envato credentials' }).click();
-    await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    // Envato may require its own provider login, but Studio must reuse the Admin session.
+    await expect(page).not.toHaveURL(/\/login(?:\?|$)/);
+    await expect(page.getByRole('heading', { name: /sign in to elevate/i })).toHaveCount(0);
     const stream = page.getByAltText('Live isolated Chromium browser');
     try {
     await expect(stream).toBeVisible({ timeout: 30_000 });
@@ -510,7 +512,7 @@ test.describe('Studio readable sign-in and composer', () => {
     expect(geometry.height).toBeGreaterThanOrEqual(48);
     expect(geometry.width).toBeGreaterThanOrEqual(250);
     expect(geometry.right).toBeLessThanOrEqual(geometry.viewport);
-    await page.screenshot({ path: testInfo.outputPath('studio-readable-sign-in.png') });
+    await page.screenshot({ path: testInfo.outputPath('studio-external-browser-tools.png') });
     } finally {
       // A failed assertion must not leave an isolated Chromium session running.
       const browserPane = page.getByRole('button', { name: 'Browser', exact: true });

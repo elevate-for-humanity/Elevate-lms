@@ -129,6 +129,9 @@ export class UltimateJobQueue {
   async yieldProgress(jobId: string, workerId: string, payload: unknown, generation: number) {
     const { data: updated, error } = await this.db.from('ultimate_build_jobs').update({
       status: 'queued', payload,
+      // A checkpoint continuation starts new work; it is not a failed retry.
+      // Per-lesson repair limits remain in the preserved payload.
+      attempts: 0,
       available_at: new Date(Date.now() + 1000).toISOString(),
       lease_owner: null, lease_expires_at: null, last_error: null,
       updated_at: new Date().toISOString(),

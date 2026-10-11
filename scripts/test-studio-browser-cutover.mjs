@@ -23,7 +23,7 @@ async function execute(overrides={}){
   process:{env:{IMAGE_SHA:sha}},
   console:{log(){},error(){}},
   async fetch(url,options){
-   if(url.endsWith('/health'))return {ok:true,async json(){return f.state;}};
+   if(url.endsWith('/health'))return {ok:true,status:200,headers:{get(name){return name.toLowerCase()==='content-type'?'application/json; charset=utf-8':null;}},async json(){return f.state;}};
    const status=options?.headers?f.authorized:f.anonymous;
    return {status,ok:status>=200&&status<300};
   },

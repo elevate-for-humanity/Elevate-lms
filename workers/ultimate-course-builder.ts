@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { createWorkerSupabaseFetch } from '../lib/ultimate-course-builder/worker/runtime-guards.mjs';
 import { runWorkerLoop } from './worker-loop.mjs';
 import {createClient} from '@supabase/supabase-js';
 import {processUltimateJob} from '../lib/ultimate-course-builder/worker/process-job';
@@ -9,7 +10,7 @@ const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
 console.log('[UltimateWorker] boot',{supabaseUrlPresent:Boolean(url),serviceRolePresent:Boolean(key),nodeEnv:process.env.NODE_ENV??null});
 if(!url||!key)throw new Error('ULTIMATE_WORKER_SUPABASE_CONFIG_REQUIRED');
 
-const db=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
+const db=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false},global:{fetch:createWorkerSupabaseFetch()}});
 const workerId=`${process.env.ULTIMATE_WORKER_ID ?? 'ultimate'}-${randomUUID()}`;
 const pollMs=Math.max(1000,Number(process.env.ULTIMATE_WORKER_POLL_MS??5000));
 let stopping=false;

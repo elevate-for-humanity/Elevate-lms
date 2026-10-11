@@ -3,6 +3,9 @@ on:
   push:
     branches: [main]
     paths: ['scripts/gcp/dispatch-course-job.mjs', 'scripts/gcp/dispatch-course-job.test.mjs', 'scripts/gcp/continue-course-queue.mjs', 'scripts/gcp/continue-course-queue.test.mjs', '.github/workflows/dispatch-google-course-job.yml']
+  workflow_run:
+    workflows: ['Deploy Google Course Builder on source changes']
+    types: [completed]
   workflow_dispatch:
   schedule:
     - cron: '*/5 * * * *'
@@ -10,12 +13,9 @@ permissions:
   contents: read
   actions: write
   id-token: write
-concurrency:
-  group: google-course-runtime-operations
-  cancel-in-progress: false
 jobs:
   request-dispatch:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-24.04
     steps:
       - name: Request Google-trusted recovery dispatch
@@ -23,7 +23,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/dispatch-google-course-job.yml/dispatches" -f ref=main
   dispatch:
-    if: github.event_name != 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+    concurrency:
+      group: google-course-runtime-operations
+      cancel-in-progress: false
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 35

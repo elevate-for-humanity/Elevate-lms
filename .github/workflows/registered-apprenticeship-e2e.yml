@@ -93,8 +93,10 @@ jobs:
       - name: Certify Studio sign-in and fonts on all devices
         run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Run authenticated production functional E2E
+        if: ${{ !cancelled() }}
         run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --project=desktop-chrome
       - name: Run authenticated cross-device responsive design certification
+        if: ${{ !cancelled() }}
         run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Clean Employer + Instructor + Staff + Case Manager + Admin identities
         if: always()

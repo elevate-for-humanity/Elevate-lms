@@ -10,7 +10,7 @@ cd "$ROOT"
 failures=0
 check(){ local label="$1"; shift; if "$@"; then printf 'PASS %s\n' "$label"; else printf 'BLOCKED %s\n' "$label"; failures=$((failures+1)); fi; }
 echo 'PBX READINESS AUDIT — no production writes'
-check auth gcloud auth print-access-token
+check auth bash -c 'gcloud auth print-access-token >/dev/null 2>&1'
 check correct-project bash -c '[ "$(gcloud config get-value project 2>/dev/null)" = elegant-racer-299721 ]'
 check vm-running bash -c '[ "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format=value\(status\))" = RUNNING ]'
 for secret in elevate-pbx-provisioning-token elevate-pbx-supabase-service-role elevate-paris-turn-token elevate-paris-ari-password; do

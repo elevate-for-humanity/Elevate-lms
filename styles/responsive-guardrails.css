@@ -154,7 +154,7 @@ body {
     min-width: 0;
   }
 
-  main :where(img, video, iframe, canvas) {
+  main :where(img, video, iframe, canvas):not([data-nimg='fill']):not(.absolute) {
     width: auto;
     max-width: 100%;
     height: auto;

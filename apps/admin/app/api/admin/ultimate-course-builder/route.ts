@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { UltimateJobQueue } from '@/lib/ultimate-course-builder/worker/job-queue';
+import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
+import { safeInternalError } from '@/lib/api/safe-error';
 import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
 
 export const runtime = 'nodejs';
@@ -40,7 +42,9 @@ export async function GET(req: NextRequest) {
   if (buildId) {
     const { data, error } = await db
       .from('ultimate_course_builds')
-      .select('*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
+      .select(req.nextUrl.searchParams.get('view') === 'checkpoints'
+        ? 'id,course_id,status,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,status,ultimate_lesson_steps(step,state,findings,completed_at))'
+        : '*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
       .eq('id', buildId)
       .single();
     return error ? databaseFailure(error) : NextResponse.json({ build: data });
@@ -48,7 +52,7 @@ export async function GET(req: NextRequest) {
 
   let query = db
     .from('ultimate_course_builds')
-    .select('*,ultimate_build_jobs(id,status,last_error,created_at,heartbeat_at)')
+    .select('*,ultimate_build_jobs(id,status,last_error,created_at,heartbeat_at,lease_expires_at)')
     .order('created_at', { ascending: false })
     .limit(50);
   if (courseId) query = query.eq('course_id', courseId);
@@ -175,7 +179,8 @@ export async function POST(req: NextRequest) {
     return error ? databaseFailure(error) : NextResponse.json({ ok: true, build: data });
   }
 
-  if (body.action === 'queue-course') {
+  // Keep the legacy action as a compatibility alias; both actions start a worker.
+  if (body.action === 'start-course' || body.action === 'queue-course') {
     const courseId = String(body.courseId || '').trim();
     if (!courseId) {
       return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
@@ -247,10 +252,19 @@ export async function POST(req: NextRequest) {
     const job = await new UltimateJobQueue(db as any).enqueue(build.id, {
       requestedBy: auth.id,
     });
+    if (!job) return NextResponse.json({ error: 'No runnable build job was saved' }, { status: 409 });
+    let dispatch;
+    try {
+      dispatch = await dispatchGoogleDeployment('course-builder');
+    } catch (error) {
+      return safeInternalError(error, 'Worker launch failed. The saved build can be resumed.');
+    }
     return NextResponse.json(
       {
         ok: true,
-        queued: true,
+        dispatched: true,
+        executionVerified: false,
+        actionsUrl: dispatch.actionsUrl,
         reused: Boolean(activeBuild),
         build,
         buildId: build.id,

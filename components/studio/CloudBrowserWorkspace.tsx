@@ -75,7 +75,7 @@ export default function CloudBrowserWorkspace({
   const [imageZoom, setImageZoom] = useState(1);
   const [signInView, setSignInView] = useState(initialSignIn);
   const [controlsOpen, setControlsOpen] = useState(false);
-  const [mobilePane, setMobilePane] = useState<'browser' | 'tools'>('browser');
+  const [mobilePane, setMobilePane] = useState<'browser' | 'tools' | 'signin'>(initialSignIn ? 'signin' : 'browser');
   const [target, setTarget] = useState(initialTarget);
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
@@ -127,7 +127,7 @@ export default function CloudBrowserWorkspace({
   const autoRunCommandRef = useRef('');
 
   useEffect(() => {
-    if (initialSignIn) setSignInView(true);
+    if (initialSignIn) { setSignInView(true); setMobilePane('signin'); }
   }, [initialSignIn]);
 
   const endpoint = session ? `${session.publicUrl}/sessions/${session.id}` : '';
@@ -333,7 +333,7 @@ export default function CloudBrowserWorkspace({
   async function openSignIn() {
     setSignInView(true);
     setImageZoom(1);
-    setMobilePane('browser');
+    setMobilePane('signin');
     setControlsOpen(false);
     if (session) await action({ type: 'viewport', width: 390, height: 780 });
     else if (runtimeReady === true && target.trim()) await start(target, true);
@@ -777,7 +777,7 @@ export default function CloudBrowserWorkspace({
 
   return (
     <div ref={workspaceRef} className="flex h-full min-h-0 flex-col bg-white text-lg leading-7 text-slate-950">
-      <div className={`${mobilePane === 'tools' ? 'hidden lg:flex' : 'flex'} shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white p-2`}>
+      <div className={`${mobilePane !== 'browser' ? 'hidden lg:flex' : 'flex'} shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white p-2`}>
         <strong className="flex-1 text-lg">Studio browser</strong>
         <button type="button" onClick={() => void openSignIn()} aria-pressed={signInView}
           className="min-h-12 rounded-lg bg-emerald-700 px-4 text-lg font-bold text-white">
@@ -791,7 +791,7 @@ export default function CloudBrowserWorkspace({
           className="min-h-12 rounded-lg border border-slate-300 px-3 text-base">Exit sign-in view</button> : null}
       </div>
       {session ? (
-        <div role="toolbar" aria-label="Browser view controls" className={`${mobilePane === 'tools' ? 'hidden lg:flex' : 'flex'} shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-2 py-1`}>
+        <div role="toolbar" aria-label="Browser view controls" className={`${mobilePane !== 'browser' ? 'hidden lg:flex' : 'flex'} shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-2 py-1`}>
           <button type="button" aria-label="Zoom browser out" disabled={imageZoom <= 0.25}
             onClick={() => setImageZoom((zoom) => Math.max(0.25, zoom > 1 ? zoom - 0.5 : zoom - 0.25))}
             className="min-h-11 min-w-11 rounded border border-slate-300 text-xl disabled:opacity-40">−</button>
@@ -1033,16 +1033,17 @@ export default function CloudBrowserWorkspace({
         </button>
         <button
           type="button"
-          aria-pressed={mobilePane === 'tools'}
-          onClick={() => setMobilePane('tools')}
+          aria-pressed={mobilePane === 'signin'}
+          onClick={() => setMobilePane('signin')}
           className="min-h-11 flex-1 rounded-lg border border-slate-400 px-3 text-base font-semibold aria-pressed:bg-cyan-100"
         >
-          Sign-in &amp; tools
+          Email / password
         </button>
+        <button type="button" onClick={() => setMobilePane('tools')} aria-pressed={mobilePane === 'tools'} className="min-h-11 rounded-lg border border-slate-400 px-3 text-base">Tools</button>
       </nav>
-      <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className={`grid min-h-0 min-w-0 flex-1 ${mobilePane === 'signin' ? 'grid-rows-[minmax(80px,35%)_minmax(0,1fr)] lg:grid-rows-1' : ''} lg:grid-cols-[minmax(0,1fr)_340px]`}>
         <div
-          className={`${mobilePane === 'browser' ? 'flex' : 'hidden lg:flex'} relative min-h-0 items-start ${imageZoom > 1 ? 'justify-start' : 'justify-center'} overflow-auto overscroll-contain bg-slate-100`}
+          className={`${mobilePane !== 'tools' ? 'flex' : 'hidden lg:flex'} relative min-h-0 items-start ${imageZoom > 1 ? 'justify-start' : 'justify-center'} overflow-auto overscroll-contain bg-slate-100`}
         >
           {session ? (
             <img
@@ -1174,11 +1175,11 @@ export default function CloudBrowserWorkspace({
           )}
         </div>
         <aside
-          className={`${mobilePane === 'tools' ? 'flex' : 'hidden lg:flex'} min-h-0 flex-col overflow-y-auto border-t border-slate-200 bg-white lg:border-l lg:border-t-0`}
+          className={`${mobilePane !== 'browser' ? 'flex' : 'hidden lg:flex'} min-h-0 flex-col overflow-y-auto border-t border-slate-200 bg-white lg:border-l lg:border-t-0`}
         >
           <div className="shrink-0 border-b border-slate-200 p-3">
-            <p className="mb-2 text-xl font-bold text-emerald-800">Sign in securely</p>
-            <p className="mb-2 text-base leading-6 text-slate-700">
+            <p className="mb-2 text-base font-bold text-emerald-800">Sign in securely</p>
+            <p className="mb-2 text-sm leading-5 text-slate-700">
               1. Select the email or password field on the website. 2. Enter it below. 3. Select Type securely, then Enter. Your entry clears immediately and stays out of the chat.
             </p>
             <div className="mb-2 flex flex-wrap gap-2">
@@ -1190,7 +1191,7 @@ export default function CloudBrowserWorkspace({
                   onClick={() => {
                     if (secureInputRef.current) secureInputRef.current.value = '';
                     setSecureInputKind(kind);
-                    secureInputRef.current?.focus();
+                    window.requestAnimationFrame(() => secureInputRef.current?.focus());
                   }}
                   className="min-h-12 rounded border border-emerald-300 px-4 text-base aria-pressed:bg-emerald-100"
                 >
@@ -1219,7 +1220,7 @@ export default function CloudBrowserWorkspace({
                     void sendSecureInput();
                   }
                 }}
-                className="min-h-12 w-full min-w-0 rounded border border-emerald-300 bg-slate-50 px-3 py-3 text-xl"
+                className="min-h-11 w-full min-w-0 rounded border border-emerald-300 bg-slate-50 px-3 py-2 text-base"
               />
               {secureInputKind === 'email' ? (
                 <button
@@ -1266,6 +1267,7 @@ export default function CloudBrowserWorkspace({
               Replace the selected browser field
             </label>
           </div>
+          <div className={`${mobilePane === 'signin' ? 'hidden lg:block' : 'contents'}`}>
           <div className="border-b border-slate-200 p-3">
             <p className="mb-1 flex items-center gap-2 text-xs font-black text-cyan-800">
               <Download className="h-4 w-4" /> Envato licensed downloads
@@ -1464,6 +1466,7 @@ export default function CloudBrowserWorkspace({
                 Console errors, failed requests, and HTTP failures will appear here.
               </p>
             )}
+          </div>
           </div>
         </aside>
       </div>

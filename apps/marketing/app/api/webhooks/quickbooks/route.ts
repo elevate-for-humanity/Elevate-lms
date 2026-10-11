@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       const result = await quickBooksRequest<any>(
         db,
         config,
-        `invoice/${encodeURIComponent(invoiceId)}`,
+        `invoice/${encodeURIComponent(invoiceId)}?include=invoiceLink`,
       );
       const invoice = result.Invoice;
       const status = normalizeQuickBooksInvoiceStatus(invoice);
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
           invoice_number: invoice.DocNumber || null,
           status,
           paid_at: status === 'paid' ? new Date().toISOString() : null,
-          payment_url: invoice.InvoiceLink || null,
+          ...(invoice.InvoiceLink ? { payment_url: invoice.InvoiceLink } : {}),
           provider_payload: invoice,
           updated_at: new Date().toISOString(),
         })

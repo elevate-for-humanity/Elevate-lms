@@ -13,7 +13,13 @@ const commonOptions = [
   ['student_video', 'Student training video'],
 ] as const;
 
-export function ProgramHolderDocumentUpload({ isHvac = false }: { isHvac?: boolean }) {
+export function ProgramHolderDocumentUpload({
+  isHvac = false,
+  invoiceOnly = false,
+}: {
+  isHvac?: boolean;
+  invoiceOnly?: boolean;
+}) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -30,15 +36,20 @@ export function ProgramHolderDocumentUpload({ isHvac = false }: { isHvac?: boole
       setBusy(false);
       return;
     }
-    setMessage('Uploaded for compliance review.');
+    setMessage(
+      invoiceOnly ? 'Invoice submitted to Elevate for review.' : 'Uploaded for compliance review.',
+    );
     window.setTimeout(() => window.location.reload(), 600);
   }
   return (
     <form onSubmit={submit} className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
-      <h2 className="text-lg font-black text-blue-950">Upload an onboarding document</h2>
+      <h2 className="text-lg font-black text-blue-950">
+        {invoiceOnly ? 'Submit your training invoice to Elevate' : 'Upload an onboarding document'}
+      </h2>
       <p className="mt-1 text-sm text-blue-900">
-        PDF, JPG, or PNG up to 10 MB; MP4 video up to 50 MB. Identity documents remain in protected
-        storage.
+        {invoiceOnly
+          ? 'PDF, JPG, or PNG up to 10 MB. Include the student, training dates, amount, and invoice number. Submission does not mark the invoice paid.'
+          : 'PDF, JPG, or PNG up to 10 MB; MP4 video up to 50 MB. Identity documents remain in protected storage.'}
       </p>
       <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
         <select
@@ -47,15 +58,18 @@ export function ProgramHolderDocumentUpload({ isHvac = false }: { isHvac?: boole
           className="min-h-11 rounded-xl border border-blue-200 bg-white px-3 text-sm"
         >
           <option value="">Select document type</option>
-          {[
-            ...commonOptions,
-            ...(isHvac
-              ? ([
-                  ['epa_608', 'EPA Section 608 certification'],
-                  ['hvac_training_plan', 'HVAC syllabus and training plan'],
-                ] as const)
-              : []),
-          ].map(([value, label]) => (
+          {(invoiceOnly
+            ? [['provider_invoice', 'Training invoice — include student name and invoice number']]
+            : [
+                ...commonOptions,
+                ...(isHvac
+                  ? ([
+                      ['epa_608', 'EPA Section 608 certification'],
+                      ['hvac_training_plan', 'HVAC syllabus and training plan'],
+                    ] as const)
+                  : []),
+              ]
+          ).map(([value, label]) => (
             <option key={value} value={value}>
               {label}
             </option>
@@ -65,7 +79,11 @@ export function ProgramHolderDocumentUpload({ isHvac = false }: { isHvac?: boole
           name="file"
           type="file"
           required
-          accept="application/pdf,image/jpeg,image/png,video/mp4"
+          accept={
+            invoiceOnly
+              ? 'application/pdf,image/jpeg,image/png'
+              : 'application/pdf,image/jpeg,image/png,video/mp4'
+          }
           className="min-h-11 rounded-xl border border-blue-200 bg-white p-2 text-sm"
         />
         <button

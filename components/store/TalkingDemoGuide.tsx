@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Pause, Play, Volume2, VolumeX } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
@@ -14,18 +14,22 @@ export function TalkingDemoGuide({
   productName,
   steps,
   onStepChange,
+  activeIndex,
 }: {
   productName: string;
   steps: DemoStep[];
   onStepChange?: (index: number) => void;
+  activeIndex?: number;
 }) {
-  const [index, setIndex] = useState(0);
+  const [localIndex, setIndex] = useState(0);
+  const index = Math.max(0, Math.min(steps.length - 1, activeIndex ?? localIndex));
   const [muted, setMuted] = useState(false);
   const naturalVoice = useNaturalVoice();
   const step = steps[index];
   const speaking = naturalVoice.isPlaying || naturalVoice.isPaused || naturalVoice.isLoading;
 
-  const stop = () => naturalVoice.stop();
+  const stop = naturalVoice.stop;
+  useEffect(() => { stop(); }, [index, stop]);
 
   const speak = () => {
     if (muted || !step) return;

@@ -208,6 +208,7 @@ async function configureService(
 }
 
 async function main() {
+  throw new Error('Retired: production DNS and domain ownership use Google Cloud. See docs/dns-configuration.md; no legacy network operation is allowed.');
   const dryRun = !process.argv.includes('--execute');
   const projectId = resolveProjectId();
   const marketingId = resolveMarketingServiceId();

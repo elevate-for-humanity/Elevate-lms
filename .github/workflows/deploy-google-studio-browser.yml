@@ -30,5 +30,4 @@ jobs:
       - name: Reconcile stateful Studio runtime
         env:
           IMAGE_SHA: ${{ inputs.image_sha }}
-          NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
         run: node scripts/gcp/deploy-studio-browser.mjs

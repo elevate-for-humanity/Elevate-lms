@@ -75,8 +75,13 @@ export default async function HostShopsPage() {
       <HostShopShowcase
         shops={HOST_SHOP_HERO_SHOPS}
         asHero
+        portraitTour
         videoTourShopSlug="salon-saloon"
         autoPlayVideoOnVisible
+        narrationSources={{
+          '/videos/partners/salon-saloon-tour.mp4': '/audio/narration/salon-saloon-host-tour.mp3',
+          '/images/partners/salon-saloon/team-sign.webp': '/audio/narration/salon-saloon-host-tour.mp3',
+        }}
         mediaSequence={[
           { shopSlug: 'salon-saloon', media: { src: '/videos/partners/salon-saloon-tour.mp4', alt: 'Walk-through tour of participating apprenticeship Host Shop Salon Saloon', kind: 'video', backdropSrc: '/images/partners/salon-saloon/team-sign.webp' } },
           { shopSlug: 'salon-saloon', media: { src: '/images/partners/salon-saloon/team-sign.webp', alt: 'Salon Saloon team at an Elevate participating Host Salon', kind: 'photo' } },
@@ -86,7 +91,8 @@ export default async function HostShopsPage() {
           { shopSlug: 'generations-hair-llc', media: { src: '/images/partners/generations-hair/salon-service.webp', alt: 'Professional salon service inside an Indiana apprenticeship Host Shop', kind: 'photo' } },
         ]}
         tourScripts={{
-          '/videos/partners/salon-saloon-tour.mp4': 'Are you a licensed salon, spa, nail studio, esthetics business, or barbershop in Indiana? Elevate is looking for Host Shops like Salon Saloon. Becoming a Host Shop is free. You can grow your team, mentor an apprentice, keep normal service revenue, and receive support with instruction, records, progress tracking, and apprenticeship compliance. Apply now to join the Barber and Beauty Host Shop Network.',
+          '/videos/partners/salon-saloon-tour.mp4': "Welcome to Salon Saloon in South Bend, Indiana, an Elevate apprenticeship Host Salon. Explore the salon where apprentices build skills in hair care, styling, sanitation and client service under licensed supervision. The shop employs and mentors apprentices; Elevate supports instruction and records. Own a salon or barbershop? Apply free to become a Host Shop.",
+          '/images/partners/salon-saloon/team-sign.webp': "Welcome to Salon Saloon in South Bend, Indiana, an Elevate apprenticeship Host Salon. Explore the salon where apprentices build skills in hair care, styling, sanitation and client service under licensed supervision. The shop employs and mentors apprentices; Elevate supports instruction and records. Own a salon or barbershop? Apply free to become a Host Shop.",
           '/videos/partners/kountry-kutz-tour.mp4': 'Indiana barbershops: we have apprentices looking for professional places to train. Join Kountry Kutz and other participating businesses in the Elevate Barber Network. There is no Host Shop application or placement fee. Your shop provides employment, licensed supervision, and hands-on experience; Elevate supports related instruction, documentation, progress tracking, and program compliance. Select Apply Free to Become a Host Shop.',
         }}
         narration="Welcome to Salon Saloon in South Bend, Indiana, a participating Elevate Cosmetology Apprenticeship Host Salon. This page shows licensed salons, spas, nail studios, esthetics businesses, and barbershops how to become a Host Shop at no cost. Salon Saloon demonstrates how an approved workplace can employ and supervise apprentices while they build real skills in client service, sanitation, hair care, styling, safety, and professional salon routines. Elevate supports related instruction, attendance, hour and competency records, progress tracking, and apprenticeship compliance. The Host Shop employs, pays, and supervises the apprentice and keeps its normal service revenue. Continue down the page to review requirements, possible WorkOne wage reimbursement, required documents, and the free Host Shop application."
@@ -114,7 +120,7 @@ export default async function HostShopsPage() {
               <p className="text-sm font-black uppercase tracking-wider text-emerald-800">Host Site cost</p>
               <h3 className="mt-2 text-3xl font-black text-emerald-950">$0 to apply or participate</h3>
               <p className="mt-3 text-sm leading-6 text-emerald-950">
-                No application or placement fee. The employer covers wages, insurance, tools, supplies, and normal business expenses.
+                No application or placement fee. The host shop covers wages, insurance, and normal business expenses. Students are responsible for their personal tools and supplies.
               </p>
             </article>
             <article className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
@@ -171,6 +177,12 @@ export default async function HostShopsPage() {
         </div>
       </section>
 
+      <section className="bg-red-50 px-4 py-10">
+        <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-2 md:items-center">
+          <img src="/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile.jpg" alt="Professional barbering work at Top Shelf Barber Lounge" className="aspect-[16/10] w-full rounded-3xl object-cover" loading="lazy" />
+          <div><p className="text-sm font-black uppercase text-red-700">Your next chapter starts here</p><h2 className="mt-2 text-3xl font-black">Become a barber. Build a career.</h2><p className="mt-3 leading-7">Explore the program, apply through Elevate, and tell us which host shop interests you. Admissions confirms placement and helps you review a payment plan before enrollment.</p><p className="mt-3 text-sm leading-6">Payment plans are available for self-pay barber apprentices. Students provide their personal tools and supplies. Deposits are non-refundable administrative fees used to enroll.</p><div className="mt-5 flex flex-col gap-3 sm:flex-row"><Link href="/programs/barber-apprenticeship" className="rounded-xl bg-red-700 px-5 py-3 text-center font-black text-white">Explore Barber Apprenticeship</Link><Link href="/programs/barber-apprenticeship/payment-setup" className="rounded-xl border border-red-700 bg-white px-5 py-3 text-center font-black">Review Payment Plans</Link></div></div>
+        </div>
+      </section>
       <section id="network-directory" className="border-b border-slate-200 bg-slate-950 px-4 py-14 text-white">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
@@ -212,8 +224,8 @@ export default async function HostShopsPage() {
           </div>
           <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-xl">
             <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-blue-800">Free network membership</p>
-            <h3 className="mt-2 text-2xl font-black">Get discovered first.</h3>
-            <p className="mt-3 leading-7 text-slate-700">Build a public profile, share portfolio work, link your booking and social channels, and tell visitors whether you are accepting clients or apprentices. Use the Store only when a paid business tool makes sense for you.</p>
+            <img src="/images/partners/generations-hair/premium-curls.jpg" alt="Hair styling portfolio in the Barber & Beauty Network" className="mb-5 aspect-[16/10] w-full rounded-2xl object-cover" loading="lazy" /><h3 className="mt-2 text-2xl font-black">Get discovered. Show your work.</h3>
+            <p className="mt-3 leading-7 text-slate-700">Build a public profile, share portfolio work, link your booking and social channels, and tell visitors whether you are accepting clients or apprentices. Customers can explore your work and find your booking links. Students can discover apprenticeship host shops.</p><Link href="/barber-beauty-network#join" className="mt-5 inline-flex min-h-12 rounded-xl bg-brand-red-600 px-5 py-3 font-black text-white">Explore &amp; Join the Free Network</Link>
           </div>
         </div>
       </section>

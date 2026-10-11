@@ -233,6 +233,14 @@ export class UltimateReleaseService {
         .eq(l.canonicalLessonId ? 'id' : 'slug', l.canonicalLessonId ?? l.slug)
         .maybeSingle();
       if (ee) throw ee;
+      if (!e) throw new Error('ULTIMATE_CANONICAL_DRAFT_REQUIRED');
+      // Record the already rendered, fully verified Ultimate film for the
+      // canonical publication guard. This never queues the retired renderer.
+      const mediaJobId = await this.recordApprovedFilm(p, l, e.id, actorId, now);
+      row.video_job_id = mediaJobId;
+      row.video_status = 'complete';
+      row.media_quality_status = 'approved';
+      row.media_quality_evidence = l.contractArtifacts.finished_media_qa.mediaQA.inspection;
       if (e?.module_id && e.module_id !== m!.id) {
         const { error: publishError } = await this.db.from('course_modules')
           .update({ is_published: true, is_draft: false }).eq('id', e.module_id);
@@ -337,6 +345,46 @@ export class UltimateReleaseService {
       .eq('id', courseId);
     if (u.error) throw u.error;
     return n.data;
+  }
+  private async recordApprovedFilm(p: any, l: any, lessonId: string, actorId: string, now: string) {
+    // Approval derives from current evidence for all twenty steps, including
+    // delivered-MP4 inspection and the learner runthrough.
+    assertCompleteLesson(l.contractArtifacts, p.profile);
+    const film = l.contractArtifacts.lesson_film_render.render;
+    if (film.videoUrl !== l.videoUrl) throw new Error('ULTIMATE_RELEASE_FILM_MISMATCH');
+    const { data: existing, error: lookupError } = await this.db.from('video_jobs')
+      .select('id,status,lease_expires_at')
+      .eq('course_id', p.courseId).eq('lesson_id', lessonId)
+      .eq('asset_kind', 'lesson').is('asset_key', null).maybeSingle();
+    if (lookupError) throw lookupError;
+    if (existing?.status === 'rendering' ||
+        (existing?.lease_expires_at && new Date(existing.lease_expires_at).getTime() > Date.now()))
+      throw new Error('ULTIMATE_PRIMARY_MEDIA_JOB_ACTIVE');
+    const media = {
+      course_id: p.courseId, lesson_id: lessonId, lesson_title: l.title,
+      asset_kind: 'lesson', asset_key: null, status: 'complete',
+      provider: film.provider ?? 'remotion', video_url: film.videoUrl,
+      script: l.script, scene_data: l.storyboard,
+      duration_seconds: Math.ceil(film.duration),
+      scene_count: l.storyboard?.scenes?.length ?? l.segments.length,
+      completed_at: now, review_status: 'approved', reviewed_by: actorId,
+      reviewed_at: now,
+      review_notes: 'Current Ultimate twenty-step contract passed before canonical publication.',
+      quality_evidence: {
+        ...l.contractArtifacts.finished_media_qa.mediaQA.inspection,
+        ultimateBuildId: p.buildId,
+        sourceLessonBuildId: l.sourceLessonBuildId,
+        contractVersion: p.contractVersion,
+      },
+    };
+    const query = existing
+      ? this.db.from('video_jobs').update(media).eq('id', existing.id)
+          .eq('status', existing.status).is('lease_token', null)
+      : this.db.from('video_jobs').insert(media);
+    const { data: recorded, error: writeError } = await query.select('id').maybeSingle();
+    if (writeError) throw writeError;
+    if (!recorded) throw new Error('ULTIMATE_PRIMARY_MEDIA_JOB_CHANGED');
+    return recorded.id;
   }
   private async nextVersion(courseId: string) {
     const { data } = await this.db

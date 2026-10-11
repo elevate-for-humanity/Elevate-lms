@@ -440,10 +440,15 @@ export async function POST(req: NextRequest) {
                 verificationRule: step.verification_rule,
               });
 
-              if (evaluation.status === 'FAIL_RETRYABLE') {
-                const tool = task.tool_name ? getAITool(String(task.tool_name)) : null;
-                const safelyRetryable = !tool || tool.idempotent;
-                if (safelyRetryable && Number(task.attempts ?? 1) < (step.max_attempts ?? 2)) {
+              const retryTool = task.tool_name ? getAITool(String(task.tool_name)) : null;
+              // Retry the canonical task only when its registered tool is idempotent.
+              // Unknown tools must never be re-executed on an assumed safety contract.
+              let recoveryAttempts = Number(task.attempts ?? 1);
+              while (
+                evaluation.status === 'FAIL_RETRYABLE' &&
+                retryTool?.idempotent === true &&
+                recoveryAttempts < (step.max_attempts ?? 2)
+              ) {
                   write(
                     `${DIM}Retrying safely after evaluator classified the result as retryable.${RST}`,
                   );
@@ -455,6 +460,13 @@ export async function POST(req: NextRequest) {
                     appOrigin,
                   });
                   task = await currentTask(db, step.task_id);
+                  if (!task) throw new Error('Recovery task record could not be reloaded');
+                  const recordedAttempts = Number(task.attempts ?? recoveryAttempts);
+                  if (recordedAttempts <= recoveryAttempts) {
+                    throw new Error('Recovery did not advance the durable attempt counter');
+                  }
+                  recoveryAttempts = recordedAttempts;
+                  if (task.status === 'running' || task.status === 'awaiting_approval') break;
                   evaluation = evaluateExecution({
                     tool: String(task?.tool_name ?? 'advisory'),
                     result: taskEvidence(task),
@@ -464,7 +476,24 @@ export async function POST(req: NextRequest) {
                     expectedOutput: step.expected_output,
                     verificationRule: step.verification_rule,
                   });
-                }
+              }
+
+              // A retry may start asynchronous work or require approval. Preserve
+              // that checkpoint instead of treating its acceptance as a failure.
+              if (task?.status === 'running' || task?.status === 'awaiting_approval') {
+                const approvalPending = task.status === 'awaiting_approval';
+                step.status = approvalPending ? 'awaiting_approval' : 'running';
+                step.evaluation = approvalPending ? 'REQUIRES_HUMAN_REVIEW' : undefined;
+                step.output = JSON.stringify({
+                  task_id: step.task_id,
+                  tool: task.tool_name ?? null,
+                  status: task.status,
+                });
+                plan.status = approvalPending ? 'awaiting_approval' : 'running';
+                awaitingApproval = approvalPending;
+                await persistPlan(db, plan, auth.id, tenantId);
+                if (approvalPending) break;
+                continue;
               }
 
               step.evaluation = evaluation.status;
@@ -608,3 +637,4 @@ export async function POST(req: NextRequest) {
     },
   });
 }
+

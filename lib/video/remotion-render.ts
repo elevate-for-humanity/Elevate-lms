@@ -15,10 +15,12 @@ import path from 'path';
 import { renderConcurrency } from './render-concurrency.mjs';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
-import { mkdir, readFile, writeFile, unlink, rm } from 'fs/promises';
+import { mkdir, readFile, writeFile, unlink, rm, stat } from 'fs/promises';
 import { generateEdgeTTS, buildLessonScript, EDGE_TTS_VOICES, type EdgeTTSVoice } from './edge-tts';
 import { getPexelsImage, getPexelsVideoClip } from './pexels';
 import { logger } from '@/lib/logger';
+import { getElevateMediaStorageClient, getElevateMediaStorageConfig, isElevateMediaStorageConfigured } from '@/lib/storage/elevate-media-storage';
+import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 // Type-only import — never bundled, only used for type checking
 import type { ElevateLessonProps } from '@/remotion-src/compositions/ElevateLesson';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -37,6 +39,7 @@ import {
 } from './gpu-video-client';
 import type { SceneData, SlideLessonProps } from '@/remotion-src/compositions/SlideLesson';
 import { instructionalLayoutForScene } from '@/remotion-src/instructional-layout';
+import { FOOTAGE_TITLE_LAYOUT } from '@/remotion-src/footage-title-layout.mjs';
 import { deriveInstructionalVisualIntent } from '@/server/video-generator/visual-intelligence';
 
 export function cpuOnlyCourseMedia(env: NodeJS.ProcessEnv = process.env): boolean {
@@ -803,6 +806,11 @@ export async function renderStoryboardVideo(
           (clipUrl ? 'stock-video' : imageUrl ? 'still-image' : undefined);
       resolvedStoryboard.scenes[index] = {
         ...currentScene,
+        titleLayout: !input.ultimateStrict && !scene.teachingVisual && !instructionalLayoutForScene({
+          title: scene.subject, action: narration, sceneType: scene.sceneType,
+        })
+          ? FOOTAGE_TITLE_LAYOUT
+          : undefined,
         ...(imageUrl ? { referenceImageUrl: imageUrl } : {}),
         ...(clipUrl ? { sourceVideoUrl: clipUrl } : {}),
         ...(resolvedProvider ? { resolvedProvider } : {}),
@@ -938,6 +946,7 @@ export async function renderStoryboardVideo(
     const { renderMedia, selectComposition } = await import('@remotion/renderer');
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
     const renderSlideLesson = async (inputProps: SlideLessonProps & Record<string, unknown>) => {
+      logger.info('[RemotionRender] selecting storyboard composition', {lessonId: input.lessonId, totalFrames});
       const selected = await selectComposition({
         serveUrl: bundleUrl,
         ...(browserExecutable ? { browserExecutable } : {}),
@@ -945,16 +954,77 @@ export async function renderStoryboardVideo(
         inputProps,
       });
       const composition = { ...selected, durationInFrames: totalFrames };
-      await renderMedia({
-        composition,
-        serveUrl: bundleUrl,
-        ...(browserExecutable ? { browserExecutable } : {}),
-        codec: 'h264',
-        outputLocation: paths.videoPath,
-        inputProps,
-        concurrency: renderConcurrency(),
-        crf: 20,
-      });
+      logger.info('[RemotionRender] storyboard encoding started', {lessonId: input.lessonId, totalFrames, fps: composition.fps, concurrency: renderConcurrency()});
+      // Bound Chromium lifetime by rendering frame ranges independently.
+      // Keep the original composition timeline so scene transitions, captions,
+      // and audio remain aligned with their absolute frame positions.
+      const framesPerChunk = 900; // 30 seconds at 30 fps
+      const chunkPaths: string[] = [];
+      for (let start = 0; start < totalFrames; start += framesPerChunk) {
+        const end = Math.min(totalFrames - 1, start + framesPerChunk - 1);
+        const chunkPath = path.join(paths.outputDir, `segment-${String(start).padStart(8, '0')}.mp4`);
+        // Persist each segment in B2 so a new Cloud Run execution can resume.
+        // A storyboard fingerprint prevents reuse after a scene/narration change.
+        const fingerprint = (await import('node:crypto')).createHash('sha256')
+          .update(JSON.stringify({scenes, fps: composition.fps, totalFrames})).digest('hex').slice(0,24);
+        const segmentKey = `course-render-checkpoints/${input.lessonId}/${fingerprint}/${start}-${end}.mp4`;
+        const storageReady = isElevateMediaStorageConfigured();
+        const storage = storageReady ? getElevateMediaStorageClient() : null;
+        const bucket = storageReady ? getElevateMediaStorageConfig().bucket : null;
+        let existing = await stat(chunkPath).catch(() => null);
+        if (!existing?.size && storage && bucket) {
+          try {
+            const object = await storage.send(new GetObjectCommand({Bucket: bucket, Key: segmentKey}));
+            if (object.Body) {
+              await writeFile(chunkPath, Buffer.from(await object.Body.transformToByteArray()));
+              existing = await stat(chunkPath);
+              logger.info('[RemotionRender] restored checkpoint', {lessonId: input.lessonId, start, end});
+            }
+          } catch (error) {
+            if ((error as {name?:string}).name !== 'NoSuchKey' && (error as {name?:string}).name !== 'NotFound') throw error;
+          }
+        }
+        if (!existing?.size) {
+          logger.info('[RemotionRender] segment started', {lessonId: input.lessonId, start, end});
+          await renderMedia({
+            composition,
+            serveUrl: bundleUrl,
+            ...(browserExecutable ? { browserExecutable } : {}),
+            codec: 'h264',
+            outputLocation: chunkPath,
+            inputProps,
+            frameRange: [start, end],
+            concurrency: renderConcurrency(),
+            crf: 20,
+            onProgress: ({renderedFrames, encodedFrames}) => {
+              logger.info('[RemotionRender] segment progress', {
+                lessonId: input.lessonId, start, end, renderedFrames, encodedFrames,
+              });
+            },
+          });
+          const written = await stat(chunkPath);
+          if (!written.size) throw new Error(`REMOTION_SEGMENT_EMPTY:${start}-${end}`);
+          if (!storage || !bucket) throw new Error('REMOTION_DURABLE_CHECKPOINT_STORAGE_REQUIRED');
+          await storage.send(new PutObjectCommand({
+            Bucket: bucket, Key: segmentKey, Body: await readFile(chunkPath),
+            ContentType: 'video/mp4',
+          }));
+          logger.info('[RemotionRender] segment complete', {lessonId: input.lessonId, start, end, bytes: written.size});
+        }
+        chunkPaths.push(chunkPath);
+      }
+      // FFmpeg concat demuxer accepts absolute paths with safe shell-independent
+      // quoting. Never mark the lesson complete unless assembly succeeds.
+      const manifestPath = path.join(paths.outputDir, 'segments.ffconcat');
+      await writeFile(manifestPath, 'ffconcat version 1.0\n' +
+        chunkPaths.map(p => "file '" + p.replace(/'/g, "'\\''") + "'").join('\n') + '\n');
+      await execFileAsync('ffmpeg', [
+        '-y', '-f', 'concat', '-safe', '0', '-i', manifestPath,
+        '-c', 'copy', '-movflags', '+faststart', paths.videoPath,
+      ], {timeout: 600_000, maxBuffer: 2_000_000});
+      const output = await stat(paths.videoPath);
+      if (!output.size) throw new Error('REMOTION_MP4_EMPTY');
+      logger.info('[RemotionRender] storyboard MP4 written', {lessonId: input.lessonId, bytes: output.size});
     };
 
     try {
@@ -970,6 +1040,7 @@ export async function renderStoryboardVideo(
       // corrected, source-locked job is retried.
       throw new Error('MEDIA_VISUAL_SERIALIZATION_FAILED', { cause: error });
     }
+    logger.info('[RemotionRender] uploading storyboard captions and transcript', {lessonId: input.lessonId});
     const captionUrl = await uploadCourseVideosObject(
       Buffer.from(buildStoryboardWebVtt(scenes), 'utf8'),
       `generated-lessons/lesson-${input.lessonId}-${Date.now()}.vtt`,
@@ -982,7 +1053,9 @@ export async function renderStoryboardVideo(
     );
     resolvedStoryboard.captionUrl = captionUrl;
     resolvedStoryboard.transcriptUrl = transcriptUrl;
+    logger.info('[RemotionRender] uploading storyboard MP4', {lessonId: input.lessonId});
     const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4');
+    logger.info('[RemotionRender] storyboard MP4 saved', {lessonId: input.lessonId});
     await rm(paths.outputDir, { recursive: true, force: true }).catch(() => {});
     return {
       success: true,

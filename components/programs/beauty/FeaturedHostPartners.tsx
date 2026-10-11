@@ -4,10 +4,8 @@ import { ExternalLink, MapPin, Navigation, Phone } from 'lucide-react';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
 import {
   FEATURED_BEAUTY_HOST_PARTNERS,
-  type FeaturedHostPartnerMedia,
 } from '@/lib/apprenticeship-programs/host-partners';
 
-const RAZORS_VIDEO_HEADING = "Welcome to Razor's Image Barbershop";
 
 function programLabel(program: string) {
   return program
@@ -149,119 +147,24 @@ export default function FeaturedHostPartners({
                       }
                     : shop.slug === 'generations-hair-llc'
                         ? {
-                            src: '/images/partners/generations-hair/highlighted-curls-card.webp',
+                            src: '/images/partners/generations-hair/premium-curls.jpg',
                             alt: 'Highlighted dimensional curls created by Generations Hair LLC',
                             kind: 'photo' as const,
                           }
                         : (stillMedia[1] ?? stillMedia[0]);
-                const video: FeaturedHostPartnerMedia | undefined =
-                  shop.slug === 'razors-image-barbershop'
-                    ? undefined
-                    : shop.media?.find((media) => media.kind === 'video');
                 const fullAddress = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
                 return (
                   <article
                     key={shop.slug}
-                    className={`overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm ${shop.slug === 'razors-image-barbershop' ? 'lg:col-span-2' : ''}`}
+                    className="flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
                   >
-                    {shop.slug === 'razors-image-barbershop' ? (
-                      <p className="bg-slate-950 px-6 py-4 text-lg font-black text-white">
-                        {RAZORS_VIDEO_HEADING}
-                      </p>
-                    ) : null}
-                    {video ? (
-                      <div
-                        className="bg-slate-950 px-4 py-5 sm:px-6"
-                        data-scroll-narration
-                        data-narration={video.script}
-                        data-narration-rate="0.84"
-                        data-narration-style="instructor"
-                      >
-                        <div>
-                          <div className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
-                            {image ? (
-                              <Image
-                                src={image.src}
-                                alt=""
-                                fill
-                                sizes="(max-width: 640px) 100vw, 36vw"
-                                className="object-cover opacity-90"
-                                aria-hidden="true"
-                              />
-                            ) : null}
-                            <video
-                              controls
-                              playsInline
-                              preload="metadata"
-                              poster={image?.src}
-                              aria-label={video.alt}
-                              className="relative z-10 mx-auto aspect-[9/16] max-h-[460px] w-full bg-transparent object-contain sm:max-h-[520px]"
-                            >
-                              <source src={video.src} type="video/mp4" />
-                              Your browser does not support embedded video.
-                            </video>
-                          </div>
-                          {stillMedia.length ? (
-                            <div className="mx-auto mt-4 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-3">
-                              {stillMedia.map((media) => (
-                                <div
-                                  key={media.src}
-                                  className="relative aspect-[4/3] overflow-hidden rounded-xl border border-white/15 bg-white"
-                                >
-                                  <Image
-                                    src={media.src}
-                                    alt={media.alt}
-                                    fill
-                                    unoptimized={media.src.startsWith('http')}
-                                    sizes="(max-width: 640px) 50vw, 220px"
-                                    className="object-contain"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          ) : null}
-                        </div>
-                        <div className="mx-auto mt-4 max-w-xl text-center text-white">
-                          <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-red-300">
-                            Participating host{' '}
-                            {shop.businessType === 'BarberShop' ? 'barbershop' : 'salon'}
-                          </p>
-                          <p className="mt-2 text-sm font-semibold leading-6 text-slate-200">
-                            {shop.name} provides a supervised workplace training environment for the{' '}
-                            {programSlug ? programLabel(programSlug) : 'selected'} pathway.
-                            Enrollment, placement, wages, and licensing remain subject to the
-                            applicable program, employer, and state requirements.
-                          </p>
-                        </div>
-                        {video.script ? (
-                          <details className="mx-auto mt-4 max-w-xl rounded-xl border border-white/20 bg-slate-950/30 p-4 text-white">
-                            <summary className="cursor-pointer text-sm font-black">
-                              {shop.dba === 'Salon Saloon'
-                                ? 'Read the Salon Saloon video script'
-                                : `Read the ${shop.dba ?? shop.name} video script`}
-                            </summary>
-                            <p className="mt-3 text-sm font-medium leading-6 text-slate-100">
-                              {video.script}
-                            </p>
-                          </details>
-                        ) : null}
-                      </div>
-                    ) : image ? (
-                      <div className="bg-white">
-                        <div className="relative aspect-[4/3] max-h-[440px] overflow-hidden bg-white sm:aspect-[16/10]">
-                          <Image
-                            src={image.src}
-                            alt={image.alt}
-                            fill
-                            unoptimized={image.src.startsWith('http')}
-                            sizes="(max-width: 1024px) 100vw, 50vw"
-                            className="object-contain bg-white"
-                          />
-                        </div>
+                    {image ? (
+                      <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-slate-950">
+                        <Image src={image.src} alt={image.alt} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain" />
                       </div>
                     ) : null}
 
-                    <div className="p-6 sm:p-7">
+                    <div className="flex flex-1 flex-col p-6 sm:p-7">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
                           <h3 className="text-2xl font-black tracking-tight text-slate-950">

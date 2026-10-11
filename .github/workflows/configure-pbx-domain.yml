@@ -1,0 +1,57 @@
+name: Verify Elevate PBX domain (Durable DNS)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/configure-pbx-domain.yml'
+  schedule:
+    - cron: '23 * * * *'
+permissions:
+  contents: read
+jobs:
+  verify-domain:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 5
+    steps:
+      - name: Verify externally managed DNS and HTTPS
+        shell: bash
+        run: |
+          set -euo pipefail
+          host=phone.elevateforhumanity.org
+          expected=107.178.216.162
+          resolved="$(dig +short A "$host" | grep -E '^[0-9]+(\.[0-9]+){3}$' || true)"
+          echo "A records: $resolved"
+          if ! printf '%s\n' "$resolved" | grep -Fxq "$expected"; then
+            echo "::error::Durable DNS A record for $host must point to $expected"
+            exit 1
+          fi
+          echo "DNS verified. Checking TLS and HTTPS without modifying phone service."
+          curl --silent --show-error --fail --max-time 15 --output /dev/null "https://$host/healthz"
+
+      - name: Verify trusted SIP WebSocket upgrade
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64, os, socket, ssl
+          host = 'phone.elevateforhumanity.org'
+          key = base64.b64encode(os.urandom(16)).decode()
+          lines = [
+              'GET /ws HTTP/1.1', 'Host: ' + host,
+              'Upgrade: websocket', 'Connection: Upgrade',
+              'Sec-WebSocket-Key: ' + key, 'Sec-WebSocket-Version: 13',
+              'Sec-WebSocket-Protocol: sip', '', ''
+          ]
+          with socket.create_connection((host, 443), timeout=10) as tcp:
+              with ssl.create_default_context().wrap_socket(tcp, server_hostname=host) as tls:
+                  tls.settimeout(12)
+                  tls.sendall(((chr(13) + chr(10)).join(lines)).encode())
+                  response = tls.recv(4096).decode('latin1')
+                  status = response.split(chr(13) + chr(10), 1)[0]
+                  if not status.startswith('HTTP/1.1 101 '):
+                      raise SystemExit('SIP WebSocket handshake failed: ' + status)
+          print('Trusted SIP WebSocket upgrade succeeded. Live calling requires separate acceptance.')
+          PY

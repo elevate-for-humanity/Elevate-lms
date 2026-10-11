@@ -21,9 +21,73 @@ interface AdminPageShellProps {
   children: React.ReactNode;
 }
 
-// No shell wrapper — renders children directly.
-export function AdminPageShell({ children }: AdminPageShellProps) {
-  return <>{children}</>;
+export function AdminPageShell({
+  title,
+  description,
+  breadcrumbs,
+  stats,
+  actions,
+  children,
+}: AdminPageShellProps) {
+  return (
+    <section className="min-h-screen bg-slate-50">
+      <header className="bg-slate-900 px-4 py-6 text-white sm:px-6">
+        {breadcrumbs?.length ? (
+          <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap gap-2 text-sm text-slate-300">
+            {breadcrumbs.map((item, index) => (
+              <React.Fragment key={`${item.label}-${index}`}>
+                {index > 0 && <span aria-hidden="true">/</span>}
+                {item.href ? (
+                  <Link href={item.href} className="hover:text-white">
+                    {item.label}
+                  </Link>
+                ) : (
+                  <span aria-current="page">{item.label}</span>
+                )}
+              </React.Fragment>
+            ))}
+          </nav>
+        ) : null}
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">{title}</h1>
+            {description && <p className="mt-2 text-sm text-slate-300">{description}</p>}
+          </div>
+          {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
+        </div>
+      </header>
+      <div className="space-y-5 px-4 py-6 sm:px-6">
+        {stats?.length ? (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {stats.map((stat) => {
+              const Icon = stat.icon;
+              const content = (
+                <>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-medium text-slate-600">{stat.label}</span>
+                    {Icon && <Icon aria-hidden="true" className="h-5 w-5 text-slate-500" />}
+                  </div>
+                  <p className="mt-2 text-2xl font-bold text-slate-950">{stat.value}</p>
+                  {stat.sub && <p className="mt-1 text-xs text-slate-500">{stat.sub}</p>}
+                </>
+              );
+              const className = `rounded-xl border bg-white p-4 ${stat.alert ? 'border-amber-300' : 'border-slate-200'}`;
+              return stat.href ? (
+                <Link key={stat.label} href={stat.href} className={className}>
+                  {content}
+                </Link>
+              ) : (
+                <div key={stat.label} className={className}>
+                  {content}
+                </div>
+              );
+            })}
+          </div>
+        ) : null}
+        {children}
+      </div>
+    </section>
+  );
 }
 
 export function AdminFilterBar({ children }: { children: React.ReactNode }) {

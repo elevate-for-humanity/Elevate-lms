@@ -8,6 +8,10 @@ import { getHostShopBoard, HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { provisionPartnerFromBarberApplication } from '@/lib/partners/provision-barber-partner';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
+import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
+import { PortalStartChecklist } from '@/components/portal/PortalStartChecklist';
+import { BusinessNetworkCard } from '@/components/portal/BusinessNetworkCard';
+import { HostShopProgramGuide } from '@/components/portal/HostShopProgramGuide';
 import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
 import {
   HOST_SHOP_PREVIEW_SESSION_COOKIE,
@@ -390,17 +394,22 @@ export default async function HostShopDashboardView() {
     ? await db
         .from('public_host_shops')
         .select('media_gallery,video_url,logo_url,flyer_url')
-        .ilike('display_name', `%${partnerName}%`)
+        .eq('id', board.partner.id)
         .limit(1)
         .maybeSingle()
     : { data: null };
   const publicMedia = Array.isArray(publicProfile?.media_gallery)
     ? publicProfile.media_gallery.filter((item: any) => item && typeof item.url === 'string')
     : [];
-  const heroImage = publicMedia[0]?.url || publicProfile?.logo_url || publicProfile?.flyer_url || (/salon saloon/i.test(partnerName) ? '/images/partners/salon-saloon/team-interior.webp' : '/images/pages/workforce-board-page-7.webp');
+  const networkShop = (await getHostShopNetwork()).find((shop) => shop.id === board.partner.id);
+  const heroIsLogo = Boolean(publicProfile?.logo_url);
+  const heroImage = publicProfile?.logo_url || publicMedia[0]?.url || networkShop?.image || publicProfile?.flyer_url || '/images/logo.png';
 
   return (
     <main className="w-full max-w-none px-4 py-8 sm:px-6">
+      <PortalStartChecklist role="host-shop" />
+      <BusinessNetworkCard href="/host-shop/dashboard/community" label="Barber & Beauty Network" />
+      <HostShopProgramGuide />
       <section className="mb-5 flex flex-col gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="font-black text-slate-950">Host Shop app</p>
@@ -537,7 +546,7 @@ export default async function HostShopDashboardView() {
               alt={`${partnerName || 'Host Shop'} supervised apprenticeship workspace`}
               fill
               priority
-              className="object-cover"
+              className={heroIsLogo || heroImage === '/images/logo.png' ? 'bg-white object-contain p-6' : 'object-cover'}
               sizes="(max-width: 1024px) 100vw, 42vw"
             />
           </div>

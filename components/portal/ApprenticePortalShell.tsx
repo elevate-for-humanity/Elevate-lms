@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { ApprenticeProgramGuide } from './ApprenticeProgramGuide';
 import {
   Scissors,
   Clock,
@@ -360,6 +361,7 @@ export function ApprenticePortalShell({
       <RtiCourseCard config={config} rti={rti} />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+        <ApprenticeProgramGuide />
         {/* Payment alert — no subscription at all */}
         {showPaymentSetupAlert && (
           <div className="rounded-xl border border-red-200 bg-red-50 overflow-hidden">

@@ -1,4 +1,6 @@
 import { pathToFileURL } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
+import { compareEnvironments } from './audit-runtime-parity.mjs';
 import { configSecret, validateConfig, google, PROJECT } from './runtime-config.mjs';
 
 // One-time compatibility boundary. Deployment consumers never call Northflank.
@@ -49,7 +51,14 @@ export async function importRuntimeConfig(component, { request = fetch, run = go
   }
   if (exists) {
     const versions = invoke('destination_inventory', ['secrets', 'versions', 'list', secret, '--project', PROJECT, '--limit=1', '--format=value(name)']);
-    if (versions) throw new Error('Google configuration already exists; use Google-owned configuration management');
+    if (versions) {
+      if (env.VERIFY_EXISTING_GOOGLE_CONFIG !== 'true') throw new Error('Google configuration already exists; use Google-owned configuration management');
+      const current = validateConfig(JSON.parse(invoke('destination_readback', ['secrets', 'versions', 'access', 'latest', '--secret', secret, '--project', PROJECT])), component);
+      const parity = compareEnvironments(config.runtimeEnvironment, Object.entries(current.runtimeEnvironment).map(([name,value]) => ({name,value})), component === 'ultimate-worker' ? 'job' : 'service');
+      const persistenceVerified = isDeepStrictEqual(current.runtimeFiles, config.runtimeFiles) && config.volumes.every(volume => current.volumes.some(saved => saved.id === volume.id));
+      if (!parity.passed || !persistenceVerified) throw new Error('Existing Google configuration does not match complete source inventory');
+      return { component, runtimeKeys: Object.keys(config.runtimeEnvironment).sort(), volumes: config.volumes.length, runtimeFiles: Object.keys(config.runtimeFiles).length, configurationOwner: 'Google Secret Manager', existingConfigurationVerified: true };
+    }
   } else {
     invoke('destination_create', ['secrets', 'create', secret, '--project', PROJECT, '--replication-policy=automatic']);
   }
@@ -61,7 +70,7 @@ export async function importRuntimeConfig(component, { request = fetch, run = go
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   importRuntimeConfig(process.env.COMPONENT).then(result => console.log(JSON.stringify(result))).catch(error => {
-    const known = ['Source connection required for one-time import', 'Complete resolved runtime inventory required', 'Google configuration already exists; use Google-owned configuration management', 'Google configuration readback mismatch', 'Invalid Google runtime configuration', 'Invalid runtime variable', 'Runtime persistence inventory required', 'Configuration exceeds Secret Manager payload limit; split secrets before import'];
+    const known = ['Existing Google configuration does not match complete source inventory', 'Source connection required for one-time import', 'Complete resolved runtime inventory required', 'Google configuration already exists; use Google-owned configuration management', 'Google configuration readback mismatch', 'Invalid Google runtime configuration', 'Invalid runtime variable', 'Runtime persistence inventory required', 'Configuration exceeds Secret Manager payload limit; split secrets before import'];
     const reason = known.includes(error.message) || /^Runtime import failed at (destination_inventory|destination_create|destination_write|destination_readback): (api_disabled|permission_denied|not_found|authentication_failed|quota_exceeded|command_failed)$/.test(error.message) || /^Source configuration HTTP [0-9]{3}$/.test(error.message) ? error.message : 'unrecognized_response';
     console.error(`Runtime import failed: ${reason}; no deployment or cutover performed`); process.exitCode = 1;
   });

@@ -23,3 +23,9 @@ test('authentication and routing failures fail immediately', async () => {
 test('Admin must still demonstrate executor readiness', async () => {
   await assert.rejects(verifyRuntimeReadiness('admin', base, 'test', { attempts: 1, request: async () => ({ status: 200, json: async () => ({ ...good, service: 'admin' }) }) }), /budget exhausted/);
 });
+
+test('Store accepts its own identity and rejects Marketing', async () => {
+ const request=service=>async()=>({status:200,json:async()=>({...good,service})});
+ assert.equal((await verifyRuntimeReadiness('store',base,'test',{attempts:1,request:request('store')})).passed,true);
+ await assert.rejects(verifyRuntimeReadiness('store',base,'test',{attempts:1,request:request('marketing')}),/budget exhausted/);
+});

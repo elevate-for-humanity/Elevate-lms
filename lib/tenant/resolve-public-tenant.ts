@@ -13,6 +13,17 @@ const RESERVED_ELEVATE_HOSTS = new Set([
   'testing.elevateforhumanity.org',
 ]);
 
+/** Public path previews must resolve to the same published site as its custom host. */
+export function tenantSlugFromSiteReferrer(host: string, referrer: string | null): string | null {
+  if (!RESERVED_ELEVATE_HOSTS.has(host) || !referrer) return null;
+  try {
+    const url = new URL(referrer);
+    if (url.protocol !== 'https:' || url.hostname.toLowerCase() !== host) return null;
+    const match = url.pathname.match(/^\/sites\/([a-z0-9][a-z0-9-]{0,62})(?:\/|$)/i);
+    return match ? match[1].toLowerCase() : null;
+  } catch { return null; }
+}
+
 function requestHost(request: NextRequest) {
   const forwarded = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
   return (forwarded || request.headers.get('host') || '').split(':')[0].toLowerCase();
@@ -55,7 +66,7 @@ export async function resolvePublishedTenantFromRequest(
   if (!host) return null;
   const db = await requireAdminClient();
 
-  const slug = tenantSlugFromAppHost(host);
+  const slug = tenantSlugFromAppHost(host) || tenantSlugFromSiteReferrer(host, request.headers.get('referer'));
   if (slug) {
     const { data } = await db
       .from('user_websites')

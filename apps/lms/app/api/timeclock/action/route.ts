@@ -8,7 +8,6 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { checkBarberSuspension } from '@/lib/barber/suspension';
 import { sendEmail } from '@/lib/email/service';
 import { emitEvent } from '@/lib/events/emit';
-import { syncProgressEntryToHourEntries } from '@/lib/timeclock/sync-to-hour-entries';
 import { evaluateIdentityClockEligibility } from '@/lib/identity/clock-eligibility';
 import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 import { getTimeclockWeekEnding, getTimeclockWorkDate } from '@/lib/timeclock/work-date';
@@ -741,7 +740,7 @@ async function _POST(request: NextRequest) {
       });
     }
 
-    const { error: clockOutError } = await db
+    const { data: completedEntry, error: clockOutError } = await db
       .from('progress_entries')
       .update({
         clock_out_at: serverNow,
@@ -752,8 +751,10 @@ async function _POST(request: NextRequest) {
         last_known_lng: lng,
         last_location_at: serverNow,
       })
-      .eq('id', entry.id);
-    if (clockOutError) return NextResponse.json({ error: 'Failed to clock out' }, { status: 500 });
+      .eq('id', entry.id)
+      .select('hours_worked')
+      .single();
+    if (clockOutError || !completedEntry) return NextResponse.json({ error: 'Failed to clock out' }, { status: 500 });
 
     await emitGeofenceEvidence({
       userId: user.id,
@@ -770,28 +771,16 @@ async function _POST(request: NextRequest) {
       accepted: true,
     });
 
-    const syncResult = await syncProgressEntryToHourEntries(db, entry.id);
-    if (!syncResult) logger.warn('[Timeclock] completed shift did not sync to hour_entries', { progress_entry_id: entry.id });
-
-    if (syncResult?.hoursWorked && apprentice.id) {
-      fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/api/rapids/safe-update`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          apprentice_id: apprentice.id,
-          trigger: 'clock_out',
-          progress_entry_id: entry.id,
-          hours_worked: syncResult.hoursWorked,
-        }),
-      }).catch((error) => logger.warn('[Timeclock] RAPIDS update failed (non-blocking)', error));
-    }
+    // The database trigger writes the linked pending ledger entry atomically.
+    // Return its persisted fractional hours; approval belongs to the review queue.
+    const hoursWorked = Number(completedEntry.hours_worked);
 
     return NextResponse.json({
       success: true,
       action: 'clock_out',
       progress_entry_id: entry.id,
       clock_out_at: serverNow,
-      hours_worked: syncResult?.hoursWorked ?? 0,
+      hours_worked: hoursWorked,
       geofence_verified: true,
       distance_m: distanceM,
       radius_m: radiusM,

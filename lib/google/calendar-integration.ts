@@ -2,15 +2,15 @@
  * Google Calendar Integration using googleapis
  */
 
-import { google } from 'googleapis';
+import { calendar as createCalendar, auth as googleAuth } from 'googleapis/build/src/apis/calendar/index.js';
 
-const calendar = google.calendar('v3');
+const calendar = createCalendar('v3');
 
 /**
  * Create OAuth2 client
  */
 function getOAuth2Client() {
-  return new google.auth.OAuth2(
+  return new googleAuth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
     process.env.GOOGLE_REDIRECT_URI,

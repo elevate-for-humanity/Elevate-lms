@@ -5,7 +5,7 @@ export async function verifyRuntimeReadiness(component, base, token, { request =
   if (url.protocol !== 'https:' || !url.hostname.endsWith('.run.app') || url.username || url.password || url.search || url.hash || url.pathname !== '/') throw new Error('Invalid Google runtime URL');
   if (!['marketing', 'admin', 'lms', 'store'].includes(component)) throw new Error('Unknown Google service');
   if (!Number.isInteger(attempts) || attempts < 1 || attempts > 8) throw new Error('Invalid readiness attempt budget');
-  const processService = component === 'store' ? 'marketing' : component;
+  const processService = component;
   for (const path of ['/api/health', '/api/ready']) {
     let passed = false;
     for (let attempt = 1; attempt <= attempts; attempt++) {

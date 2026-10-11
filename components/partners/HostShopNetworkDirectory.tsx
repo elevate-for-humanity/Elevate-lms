@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { MapPin, Search, ShieldCheck } from 'lucide-react';
+import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 import { PROGRAM_LABELS } from '@/lib/programs/host-shops';
 
@@ -72,19 +73,10 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
               key={shop.id}
               className="group flex h-full min-h-0 flex-col overflow-visible rounded-2xl border border-white/15 bg-white text-slate-950 shadow-xl"
             >
-              {                <div className="relative aspect-[16/10] overflow-hidden rounded-t-2xl bg-slate-950">
-                  <img
-                    src={shop.image ?? representativeShopImage(shop)}
-                    alt={
-                      shop.image
-                        ? `${shop.name} Host Shop`
-                        : `Representative ${shop.programs.includes('barber-apprenticeship') ? 'barber' : 'beauty'} apprenticeship training environment`
-                    }
-                    className="h-full w-full object-contain"
-                    loading="lazy"
-                  />
+              {                <div className="relative overflow-hidden rounded-t-2xl bg-slate-950">
+                  <HostShopMediaCarousel shopName={shop.name} compact videoUrl={shop.videoUrl} items={shop.gallery?.length ? shop.gallery : [{ url: shop.image ?? representativeShopImage(shop), alt: shop.image ? `${shop.name} portfolio` : 'Representative training environment' }]} />
                   <span
-                    className={`absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black shadow ${shop.approval === 'approved' ? 'bg-emerald-100 text-emerald-950' : 'bg-blue-100 text-blue-950'}`}
+                    className={`pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black shadow ${shop.approval === 'approved' ? 'bg-emerald-100 text-emerald-950' : 'bg-blue-100 text-blue-950'}`}
                   >
                     <ShieldCheck className="h-4 w-4" />{' '}
                     {shop.approval === 'approved'
@@ -98,7 +90,7 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-red-700" /> {shop.city},{' '}
                   {shop.state}
                 </p>
-                <h3 className="mt-3 text-2xl font-black leading-tight text-slate-950">
+                <h3 className="mt-3 text-xl sm:text-2xl font-black leading-tight text-slate-950">
                   {shop.name}
                 </h3>
                 <p className="mt-3 text-sm leading-6 text-slate-700">
@@ -114,9 +106,10 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
                     </span>
                   ))}
                 </div>
+                {shop.website ? <a href={shop.website} target="_blank" rel="noopener noreferrer" className="mt-4 text-sm font-bold text-red-700">Visit shop website ↗</a> : null}
                 <Link
                   href={`/host-shops/${shop.slug}`}
-                  className="mt-auto inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 pt-2.5 text-sm font-black text-white hover:bg-red-700"
+                  className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 pt-2.5 text-sm font-black text-white hover:bg-red-700"
                 >
                   View shop profile
                 </Link>

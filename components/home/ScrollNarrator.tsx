@@ -72,31 +72,38 @@ export function ScrollNarrator() {
   const [enabled, setEnabled] = useState(true);
   const [hasNarration, setHasNarration] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const narratedRef = useRef(new Set<string>());
+  const pendingRef = useRef<string | null>(null);
+  const playbackGenerationRef = useRef(0);
   const lastNarrationRef = useRef<{ section: HTMLElement; text: string; source?: string } | null>(
     null,
   );
   const { play, prepare, stop, isLoading, isPlaying } = useNaturalVoice();
 
-  const narrateVisibleSection = useCallback(async () => {
+  const narrateVisibleSection = useCallback(async (replay = false) => {
     const section = mostVisiblePageSection();
     if (!section) {
       // Mobile layouts frequently have spacing between narrated sections.
       // Keep the active script playing through that gap instead of cutting a
       // sentence off merely because the visitor continued scrolling.
-      return;
+      return false;
     }
 
     const text = narrationFor(section);
-    if (!text) return;
+    if (!text) return false;
     const source = narrationSourceFor(section);
-    if (
+    const key = JSON.stringify([text, source || '']);
+    if (!replay && (narratedRef.current.has(key) || pendingRef.current === key)) return true;
+    if (!replay && (
       lastNarrationRef.current?.section === section &&
       lastNarrationRef.current.text === text &&
       lastNarrationRef.current.source === source
-    )
-      return;
+    ))
+      return true;
 
     lastNarrationRef.current = { section, text, source };
+    pendingRef.current = key;
+    const generation = ++playbackGenerationRef.current;
     pauseOtherAudibleMedia();
     const started = await play(text, {
       src: source,
@@ -105,12 +112,16 @@ export function ScrollNarrator() {
       rate: narrationRateFor(section),
       allowBrowserFallback: true,
     });
+    if (generation !== playbackGenerationRef.current) return false;
+    pendingRef.current = null;
     if (!started) {
       lastNarrationRef.current = null;
-      setNotice('Narration will begin with your first touch.');
+      setNotice('Narration could not start. Tap the speaker to retry.');
     } else {
+      narratedRef.current.add(key);
       setNotice(null);
     }
+    return started;
   }, [play]);
 
   useEffect(() => {
@@ -138,6 +149,9 @@ export function ScrollNarrator() {
   }, []);
 
   useEffect(() => {
+    playbackGenerationRef.current += 1;
+    pendingRef.current = null;
+    narratedRef.current.clear();
     lastNarrationRef.current = null;
     stop();
     const narrationSections = document.querySelectorAll(
@@ -230,14 +244,14 @@ export function ScrollNarrator() {
     // but it is never required to start the guided page experience.
     let retrying = false;
     let unlocked = false;
-    const beginFromNaturalInteraction = () => {
+    const beginFromNaturalInteraction = (event: Event) => {
+      if (event.target instanceof Element && event.target.closest('[data-page-narrator-control]')) return;
       if (retrying || unlocked) return;
       retrying = true;
       setNotice(null);
-      lastNarrationRef.current = null;
       void narrateVisibleSection()
-        .then(() => {
-          unlocked = true;
+        .then((started) => {
+          unlocked = started;
         })
         .finally(() => {
           retrying = false;
@@ -246,16 +260,13 @@ export function ScrollNarrator() {
 
     window.addEventListener('pointerdown', beginFromNaturalInteraction, {
       capture: true,
-      once: true,
     });
     window.addEventListener('touchstart', beginFromNaturalInteraction, {
       capture: true,
-      once: true,
       passive: true,
     });
     window.addEventListener('keydown', beginFromNaturalInteraction, {
       capture: true,
-      once: true,
     });
 
     return () => {
@@ -274,10 +285,13 @@ export function ScrollNarrator() {
     }
 
     setNotice(null);
-    setEnabled(true);
     window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'on');
+    if (!enabled) {
+      setEnabled(true);
+      return;
+    }
     lastNarrationRef.current = null;
-    void narrateVisibleSection();
+    void narrateVisibleSection(true);
   };
 
   // The Bookkeeping hero is a dense, full-width informational graphic. Keep
@@ -287,6 +301,7 @@ export function ScrollNarrator() {
   return (
     <div className="fixed bottom-24 left-3 z-[80] sm:bottom-6 sm:left-6">
       <button
+        data-page-narrator-control
         type="button"
         onClick={toggle}
         aria-pressed={enabled}

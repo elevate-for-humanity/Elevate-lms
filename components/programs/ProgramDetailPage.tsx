@@ -17,6 +17,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import HeroPicture from '@/components/marketing/HeroPicture';
+import HeroVideo from '@/components/marketing/HeroVideo';
 import ProgramApplyForm from '@/components/programs/ProgramApplyForm';
 import { PayNowButton } from '@/components/programs/PayNowButton';
 import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
@@ -66,6 +67,8 @@ interface Props {
   heroOverride?: React.ReactNode;
   /** Route-specific content rendered after the complete hero and program summary. */
   afterHero?: React.ReactNode;
+  /** Photography or demonstrations shown before the detailed program text. */
+  visualContent?: React.ReactNode;
   /** Route-specific proof shown immediately after the decision panel. */
   featuredContent?: React.ReactNode;
   /** Supplemental compliance, instructor, or authority content shown after the core template. */
@@ -77,6 +80,7 @@ export default function ProgramDetailPage({
   banner: bannerProp,
   heroOverride,
   afterHero,
+  visualContent,
   featuredContent,
   children,
 }: Props) {
@@ -110,7 +114,12 @@ export default function ProgramDetailPage({
     : 'WIOA may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment.';
   const selfPayNumeric = Number((p.selfPayCost || '').replace(/[^0-9.]/g, '')) || 0;
   const isApprenticeship = p.programType === 'apprenticeship';
-  const octoberCouponCode = '50OFFOCT';
+  const octoberCouponCode = 'OCT300';
+  const isEstheticsApprenticeship = p.slug === 'esthetician-apprenticeship';
+  const weeklyHoursLabel =
+    p.hoursPerWeekMin === p.hoursPerWeekMax
+      ? `${p.hoursPerWeekMin} hrs/week`
+      : `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`;
   const bnplDepositStart = isApprenticeship
     ? 300
     : p.depositAmount
@@ -138,7 +147,7 @@ export default function ProgramDetailPage({
       intent: 'enrollment',
       funding: 'self_pay',
       payment: mode,
-      ...(isApprenticeship ? { coupon: octoberCouponCode } : {}),
+      ...(isApprenticeship ? { coupon: mode === 'full' ? 'PAYFULL600' : octoberCouponCode } : {}),
     }).toString()}`;
   const employerPartners = Array.isArray(p.employerPartners) ? p.employerPartners : [];
   const isTaxPreparationProgram = p.slug === 'tax-preparation';
@@ -152,7 +161,7 @@ export default function ProgramDetailPage({
     .map((credential) => credential.name)
     .join(', ');
   const programHeroNarration = isApprenticeship
-    ? `Welcome to ${p.title}. This is an earn-while-you-learn path that connects classroom instruction with supervised experience at an approved Host Site. Picture yourself learning a skill, practicing it with a qualified professional, and seeing your progress build week by week. The full pathway is ${durationLabel}, usually ${p.hoursPerWeekMin} to ${p.hoursPerWeekMax} hours each week. You will grow through areas such as ${narrationCurriculum || 'the skills required for this occupation'}, while working toward ${narrationCredentials || 'the program completion requirements'}. Your first step is simple: apply and complete intake. We will then help confirm your Host Site, schedule, and funding or payment path before training begins. Move through this page at your own pace. You will see what to expect, what it costs, and exactly how to apply.`
+    ? `Welcome to ${p.title}. This is an earn-while-you-learn path that connects classroom instruction with supervised experience at an approved Host Site. Picture yourself learning a skill, practicing it with a qualified professional, and seeing your progress build week by week. The full pathway is ${durationLabel}, usually ${weeklyHoursLabel.replace("hrs/week", "hours each week")}. You will grow through areas such as ${narrationCurriculum || 'the skills required for this occupation'}, while working toward ${narrationCredentials || 'the program completion requirements'}. Your first step is simple: apply and complete intake. We will then help confirm your Host Site, schedule, and funding or payment path before training begins. Move through this page at your own pace. You will see what to expect, what it costs, and exactly how to apply.`
     : `Welcome to ${p.title}. This program is designed to help you move from interest to real, usable career skills. The ${durationLabel} experience is ${p.deliveryMode === 'hybrid' ? 'a blend of flexible online learning and scheduled hands-on practice' : p.deliveryMode === 'online' ? 'available online, so you can build skills with a flexible learning routine' : 'taught in person, with direct guidance and practical learning'}. Along the way, you will build confidence in areas such as ${narrationCurriculum || 'the program skills'} and prepare for ${narrationCredentials || 'the program credentials'}. Start by applying and completing intake. That gives admissions what they need to confirm your schedule, requirements, and best enrollment path. ${isWorkforceFunded ? 'Your training may be free if you qualify and receive written approval from the workforce agency before enrollment.' : 'You will also find clear payment choices on this page.'} Take your time, review the details, and use the application link when you are ready.`;
 
   const pathwaySteps = [
@@ -226,8 +235,23 @@ export default function ProgramDetailPage({
               const bannerCtas = [banner.primaryCta, banner.secondaryCta].filter(
                 (cta): cta is NonNullable<typeof cta> => Boolean(cta?.href && cta.label),
               );
-              // Program pages use a clear picture-first hero. Primary copy and
-              // actions render below the image so no dark overlay obscures the media.
+              // Keep configured motion on every shared program route. A real
+              // photograph stays beneath the video if delivery or autoplay fails.
+              if (banner.videoSrcDesktop || banner.videoSrcMobile) {
+                return (
+                  <HeroVideo
+                    videoSrcDesktop={banner.videoSrcDesktop}
+                    videoSrcMobile={banner.videoSrcMobile}
+                    posterImage={heroPosterSrc}
+                    microLabel={banner.microLabel}
+                    analyticsName={banner.analyticsName}
+                    heightClassName="h-[clamp(260px,42svh,480px)]"
+                    overlayMode="none"
+                    narrateTranscript={false}
+                    preloadTranscriptVoice={false}
+                  />
+                );
+              }
               return (
                 <HeroPicture
                   src={heroPosterSrc}
@@ -315,24 +339,6 @@ export default function ProgramDetailPage({
           </section>
         ) : null}
 
-        {isApprenticeship && !afterHero ? (
-          <div className="border-y border-red-200 bg-red-700 px-4 py-4 text-white">
-            <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-red-100">
-                  October enrollment special
-                </p>
-                <p className="mt-1 text-lg font-black">
-                  50% off the standard startup deposit — start for $300.
-                </p>
-              </div>
-              <div className="shrink-0 rounded-xl border border-white/30 bg-white/10 px-4 py-2 text-sm font-black">
-                Coupon: <span className="font-mono">50OFFOCT</span>
-              </div>
-            </div>
-          </div>
-        ) : null}
-
         {/* Hero content panel — below image, no overlay */}
         <div className="bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
@@ -391,7 +397,7 @@ export default function ProgramDetailPage({
                     },
                     {
                       icon: <BookOpen className="w-3.5 h-3.5" />,
-                      val: `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`,
+                      val: weeklyHoursLabel,
                     },
                     {
                       icon: <Award aria-label="award" className="w-3.5 h-3.5" />,
@@ -428,13 +434,18 @@ export default function ProgramDetailPage({
               {/* CTA card */}
               <div className="lg:w-64 flex-shrink-0">
                 <div className="bg-white rounded-2xl shadow-xl p-5">
-                  {/* Cost */}
-                  <p className="text-2xl font-extrabold text-slate-900 mb-0.5">{p.selfPayCost}</p>
-
-                  {/* Funding — only verified options, no fallback text */}
-                  <div className="mb-4 mt-2">
-                    <FundingSection fundingOptions={publicFundingOptions} />
-                  </div>
+                  <p className="text-lg font-extrabold text-slate-900">
+                    Your next step starts here
+                  </p>
+                  <p className="mb-4 mt-2 text-sm leading-6 text-slate-600">
+                    Explore the training, then apply or ask admissions a question.
+                  </p>
+                  <Link
+                    href="#enrollment-options"
+                    className="mb-4 inline-flex min-h-11 items-center text-sm font-bold text-brand-blue-700"
+                  >
+                    Review funding and costs ↓
+                  </Link>
 
                   {primaryCTA && (
                     <>
@@ -487,7 +498,7 @@ export default function ProgramDetailPage({
         </div>
       </section>
 
-      {afterHero ? <div>{afterHero}</div> : null}
+      {visualContent ? <div>{visualContent}</div> : null}
 
       <section
         id="program-overview"
@@ -521,7 +532,7 @@ export default function ProgramDetailPage({
                 <div>
                   <dt className="font-bold text-slate-500">Weekly schedule</dt>
                   <dd className="mt-1 font-black text-slate-950">
-                    {p.schedule || `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hours per week`}
+                    {p.schedule || weeklyHoursLabel.replace("hrs/week", "hours per week")}
                   </dd>
                 </div>
                 <div>
@@ -707,6 +718,8 @@ export default function ProgramDetailPage({
 
       <ProgramExperienceGuide program={p} />
 
+      {afterHero ? <div>{afterHero}</div> : null}
+
       {/* DECISION PANEL — answers the questions visitors need before applying */}
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-12 sm:py-16">
         <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.05fr_.95fr]">
@@ -735,7 +748,7 @@ export default function ProgramDetailPage({
               <DecisionFact label="Length" value={durationLabel} />
               <DecisionFact
                 label="Schedule"
-                value={`${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`}
+                value={weeklyHoursLabel}
               />
               <DecisionFact
                 label="Training"
@@ -776,7 +789,9 @@ export default function ProgramDetailPage({
                 <span className="block text-xs font-black uppercase tracking-wider text-orange-300">
                   Pay in full
                 </span>
-                <span className="mt-1 block text-xl font-black text-white">{p.selfPayCost}</span>
+                <span className="mt-1 block text-xl font-black text-white">
+                  {isEstheticsApprenticeship ? '$5,400 with PAYFULL600' : p.selfPayCost}
+                </span>
                 <span className="mt-1 block text-xs leading-5 text-slate-300">
                   One payment after application approval
                 </span>

@@ -2,6 +2,19 @@
 # Run with the Google project administrator identity. No credential payloads
 # are read or written here, and no runtime is created or made public.
 set -euo pipefail
+# Require an explicitly selected administrator session before any mutation.
+ACTIVE_ACCOUNT="$(gcloud auth list --filter=status:ACTIVE --format='value(account)' 2>/dev/null)" || {
+  printf 'Google authentication could not be inspected. Run gcloud auth login, then retry.\n' >&2
+  exit 1
+}
+if [[ -z "$ACTIVE_ACCOUNT" ]]; then
+  printf 'No active Google account. Run gcloud auth login with the project administrator account, then retry.\n' >&2
+  exit 1
+fi
+if ! gcloud auth print-access-token >/dev/null 2>&1; then
+  printf 'Google credentials are unavailable or expired. Run gcloud auth login, then retry.\n' >&2
+  exit 1
+fi
 PROJECT=elegant-racer-299721
 DEPLOY="serviceAccount:elevate-github-deploy@$PROJECT.iam.gserviceaccount.com"
 gcloud services enable secretmanager.googleapis.com --project="$PROJECT" --quiet

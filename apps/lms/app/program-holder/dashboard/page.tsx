@@ -4,6 +4,7 @@ import { ProgramHolderWorkspaceView } from '@/components/program-holder/ProgramH
 import { PayoutAccessPanel } from '@/components/program-holder/PayoutAccessPanel';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { EmailAccountNotice } from '@/components/communications/EmailAccountNotice';
+import { ProgramHolderDocumentUpload } from '@/components/program-holder/ProgramHolderDocumentUpload';
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Program Holder Dashboard',
@@ -14,8 +15,58 @@ export const metadata: Metadata = {
 export default async function Page() {
   const context = await requireProgramHolder();
   if (context.mode === 'admin') return <AdminProgramHolderPreview />;
+  const { data: holder } = await context.db
+    .from('program_holders')
+    .select('organization_name')
+    .eq('id', context.holderId)
+    .maybeSingle();
+  const isCdlAcademy = holder?.organization_name === 'The CDL Academy';
   return (
     <>
+      {isCdlAcademy && (
+        <section className="m-4 overflow-hidden rounded-3xl bg-sky-100 sm:m-6">
+          <img
+            src="/images/cdl-partner/road.jpg"
+            alt="Commercial tractor-trailer"
+            className="h-48 w-full object-cover sm:h-72"
+          />
+          <div className="p-6">
+            <p className="font-bold uppercase tracking-widest text-blue-800">
+              CDL partner workspace
+            </p>
+            <h1 className="mt-2 text-3xl font-black text-slate-950">
+              Training, applicants, and next steps in one place.
+            </h1>
+            <p className="mt-3 text-slate-700">
+              Use your roster and application records to follow up on WorkOne appointments, funding
+              decisions, and enrollment readiness.
+            </p>
+            <div className="mt-5 rounded-2xl bg-white p-5">
+              <h2 className="text-lg font-black text-slate-950">Tuition and provider invoices</h2>
+              <p className="mt-2 text-slate-700">
+                Students pay Elevate through their student-specific invoice. CDL Academy invoices
+                Elevate for the agreed training amount. Elevate records approved provider payments
+                in the dashboard and reconciles them against the academy invoice.
+              </p>
+              <Link
+                href="/program-holder/payouts"
+                className="mt-3 inline-flex font-bold text-blue-800 underline"
+              >
+                Review payment status
+              </Link>
+              <div className="mt-4">
+                <ProgramHolderDocumentUpload invoiceOnly />
+              </div>
+            </div>
+            <Link
+              href="https://www.elevateforhumanity.org/programs/cdl-training"
+              className="mt-4 inline-flex rounded-xl bg-blue-700 px-5 py-3 font-bold text-white"
+            >
+              View the Elevate CDL program page
+            </Link>
+          </div>
+        </section>
+      )}
       <div className="px-4 pt-5 sm:px-6">
         <EmailAccountNotice
           href="/program-holder/email"

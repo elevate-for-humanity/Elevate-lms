@@ -12,13 +12,13 @@ export const BEAUTY_PROMOTION = {
   endsOn: 'October 31, 2026',
 } as const;
 
-export function BeautyEnrollmentPromotion({ compact = false }: { compact?: boolean }) {
+export function BeautyEnrollmentPromotion({ compact = false, programLabel }: { compact?: boolean; programLabel?: string }) {
   return (
     <section className={compact ? '' : 'border-y border-amber-200 bg-amber-50 px-4 py-8'}>
       <div className={compact ? 'rounded-2xl border-2 border-amber-300 bg-amber-50 p-5' : 'mx-auto max-w-6xl rounded-3xl border-2 border-amber-300 bg-white p-6 shadow-sm sm:p-8'}>
         <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-900">Limited-time enrollment promotion</p>
         <h2 className="mt-2 text-2xl font-black text-slate-950 sm:text-3xl">$300 to start through October 31</h2>
-        <p className="mt-2 text-sm font-semibold text-slate-700">Barber • Cosmetology • Nail Technician • Esthetician. First come, first served.</p>
+        <p className="mt-2 text-sm font-semibold text-slate-700">{programLabel ? `${programLabel}. First come, first served.` : 'Barber • Cosmetology • Nail Technician • Esthetician. First come, first served.'}</p>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <p className="text-xs font-black uppercase tracking-wider text-slate-600">Deposit promotion</p>

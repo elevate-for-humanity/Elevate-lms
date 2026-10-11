@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Award, BookOpen, CheckCircle, Clock, Play } from 'lucide-react';
 import { TalkingDemoGuide } from '@/components/store/TalkingDemoGuide';
+import { getBrowserPublicStorageUrl } from '@/lib/supabase/public-config';
 
 const courses = [
   { id: 'barber', title: 'Barber Fundamentals', progress: 65, duration: '15 weeks' },
@@ -34,12 +35,14 @@ const demoSteps = [
 ];
 
 export default function StudentDemoPage() {
+  const [guideIndex, setGuideIndex] = useState(0);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [completed, setCompleted] = useState<Record<string, boolean>>({});
   const [notice, setNotice] = useState('');
   const selected = courses.find((course) => course.id === selectedCourse);
 
   const startLesson = (lesson: number) => {
+    setGuideIndex(2);
     const key = `${selectedCourse}-${lesson}`;
     setCompleted((current) => ({ ...current, [key]: true }));
     setNotice(`Sample lesson ${lesson} completed in demo mode`);
@@ -47,6 +50,7 @@ export default function StudentDemoPage() {
   };
 
   const guideStep = (index: number) => {
+    setGuideIndex(index);
     if (index >= 1 && !selectedCourse) setSelectedCourse('barber');
     if (index === 0) setSelectedCourse(null);
     if (index === 2) setNotice('Try any lesson below. Completion is local to this demo.');
@@ -67,7 +71,7 @@ export default function StudentDemoPage() {
       {notice && <div className="fixed right-4 top-24 z-50 rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-xl">{notice}</div>}
 
       <div className="mx-auto max-w-6xl px-4 py-8">
-        <TalkingDemoGuide productName="Elevate Student Portal" steps={demoSteps} onStepChange={guideStep} />
+        <TalkingDemoGuide productName="Elevate Student Portal" steps={demoSteps} onStepChange={guideStep} activeIndex={guideIndex} />
 
         <section className="mb-8 mt-6 rounded-2xl border border-slate-200 bg-white p-7">
           <div className="flex items-center gap-4"><div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 font-black text-blue-700">JD</div><div><h2 className="text-2xl font-black">Demo Learner</h2><p className="text-slate-500">Interactive sample account</p></div></div>
@@ -82,26 +86,26 @@ export default function StudentDemoPage() {
                   <div className="flex items-start justify-between gap-3"><div><BookOpen className="h-6 w-6 text-blue-600" /><h3 className="mt-3 text-xl font-black">{course.title}</h3></div><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold">{course.progress}%</span></div>
                   <div className="mt-4 flex items-center gap-2 text-sm text-slate-500"><Clock className="h-4 w-4" />{course.duration}</div>
                   <div className="mt-4 h-2 rounded-full bg-slate-200"><div className="h-2 rounded-full bg-blue-600" style={{ width: `${course.progress}%` }} /></div>
-                  <button onClick={() => setSelectedCourse(course.id)} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 py-3 font-bold text-white"><Play className="h-4 w-4" />Continue learning</button>
+                  <button onClick={() => { setSelectedCourse(course.id); setGuideIndex(1); }} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 py-3 font-bold text-white"><Play className="h-4 w-4" />Continue learning</button>
                 </article>
               ))}
             </div>
           </section>
         ) : (
           <section className="rounded-2xl border border-slate-200 bg-white p-6">
-            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><div><h2 className="text-2xl font-black">{selected.title}</h2><p className="text-sm text-slate-500">Five interactive sample lessons</p></div><button onClick={() => setSelectedCourse(null)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold">Back to courses</button></div>
+            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><div><h2 className="text-2xl font-black">{selected.title}</h2><p className="text-sm text-slate-500">Five interactive sample lessons</p></div><button onClick={() => { setSelectedCourse(null); setGuideIndex(0); }} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold">Back to courses</button></div>
             <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950">
               <video
-                className="aspect-[8/3] w-full bg-black object-cover"
+                className="aspect-video w-full bg-black object-contain"
                 controls
                 playsInline
                 preload="metadata"
-                aria-label={`${selected.title} sample lesson video`}
+                aria-label="HVAC course video — sample of the learner experience"
               >
-                <source src="/videos/courses/elevate-esb-hero.mp4" type="video/mp4" />
+                <source src={getBrowserPublicStorageUrl('course-videos', 'hvac/hvac-module1-lesson1.mp4')} type="video/mp4" />
                 Your browser does not support HTML video. The lesson activities remain available below.
               </video>
-              <p className="px-4 py-3 text-sm font-semibold text-slate-200">Sample Elevate lesson video · playback is optional and lesson controls remain accessible.</p>
+              <p className="px-4 py-3 text-sm font-semibold text-slate-200">HVAC Module 1, Lesson 1 · A real video sample of the platform. The activities below use sample data for your selected course.</p>
             </div>
             <div className="mt-6 space-y-3">{[1,2,3,4,5].map((lesson) => { const done = completed[`${selected.id}-${lesson}`]; return <div key={lesson} className="flex flex-col justify-between gap-3 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center"><div className="flex items-center gap-3">{done ? <CheckCircle className="h-6 w-6 text-green-600" /> : <Play className="h-6 w-6 text-blue-600" />}<div><p className="font-bold">Lesson {lesson}: Sample learning activity</p><p className="text-sm text-slate-500">Lesson activity + knowledge check · demo only</p></div></div><button onClick={() => startLesson(lesson)} className={`rounded-lg px-4 py-2 text-sm font-bold ${done ? 'bg-green-100 text-green-800' : 'bg-blue-700 text-white'}`}>{done ? 'Replay sample' : 'Start lesson'}</button></div>; })}</div>
           </section>

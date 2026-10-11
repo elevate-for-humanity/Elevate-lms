@@ -1,7 +1,15 @@
 name: Upgrade Authored Course Experience
 
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/upgrade-authored-course.yml']
   workflow_dispatch:
+    inputs:
+      course_slug:
+        type: choice
+        default: barber-apprenticeship
+        options: [barber-apprenticeship, cosmetology-apprenticeship]
 
 permissions:
   contents: read
@@ -13,21 +21,15 @@ concurrency:
 jobs:
   upgrade:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        course_id:
-          - '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17'
-          - '9ca9fb50-7119-46ea-ab81-9b0193c29c31'
     timeout-minutes: 360
     env:
       NODE_ENV: production
       SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
+      ADMIN_URL: 'https://elevate-admin-migration-aabnh2y32a-uc.a.run.app'
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
-      COURSE_ID: ${{ matrix.course_id }}
+      COURSE_SLUG: ${{ inputs.course_slug || 'barber-apprenticeship' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -49,8 +51,14 @@ jobs:
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
           test -n "$CRON_SECRET"
 
+      - name: Resolve the current canonical course identity
+        run: |
+          node --test scripts/course-factory/resolve-course-id.test.mjs
+          COURSE_ID="$(node scripts/course-factory/resolve-course-id.mjs "$COURSE_SLUG")"
+          echo "COURSE_ID=$COURSE_ID" >> "$GITHUB_ENV"
+
       - name: Install locked dependencies
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false --prod=false
+        run: pnpm install --ignore-scripts --frozen-lockfile --strict-peer-dependencies=false --prod=false
 
       - name: Prove the complete Barber blueprint compiles
         run: pnpm vitest run tests/unit/course-factory/authored-content-compiler.test.ts

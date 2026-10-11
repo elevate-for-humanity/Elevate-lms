@@ -1,0 +1,44 @@
+name: Applicant outreach and PARIS reply follow-up
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Prepare recipients, send saved campaign, or process replies
+        type: choice
+        required: true
+        options: [prepare, send, replies]
+  schedule:
+    - cron: '*/15 * * * *'
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: applicant-outreach
+  cancel-in-progress: false
+jobs:
+  outreach:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: pnpm/action-setup@v4
+        with: {version: 10.28.2}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm exec vitest run tests/unit/applicant-outreach-policy.test.ts
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: node scripts/gcp/verify-sdk.mjs
+      - name: Run the selected audited outreach operation
+        env:
+          OUTREACH_MODE: ${{ inputs.mode || 'replies' }}
+        run: node scripts/gcp/run-applicant-outreach.mjs "$OUTREACH_MODE"

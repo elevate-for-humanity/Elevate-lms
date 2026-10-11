@@ -784,7 +784,7 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
         .filter(Boolean)
         .join(' '),
       instructionalQuality,
-      narrationProviderClass: ['cloudflare', 'elevenlabs', 'gemini', 'openai'].includes(String(process.env.AI_NARRATION_PROVIDER || '').trim().toLowerCase())
+      narrationProviderClass: ['cloudflare', 'elevenlabs', 'gemini', 'openai', 'kokoro'].includes(String(process.env.AI_NARRATION_PROVIDER || '').trim().toLowerCase())
         ? 'professional'
         : ['edge', 'local'].includes(String(process.env.AI_NARRATION_PROVIDER || '').trim().toLowerCase())
           ? 'diagnostic'

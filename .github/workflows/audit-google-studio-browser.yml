@@ -1,0 +1,43 @@
+name: Audit Google Studio browser connection
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-google-studio-browser.yml'
+      - 'scripts/gcp/audit-studio-browser.mjs'
+  workflow_dispatch:
+permissions:
+  actions: write
+  contents: read
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch through approved Google identity event
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/audit-google-studio-browser.yml/dispatches" -f ref=main
+  audit:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Trace the actual browser endpoint and durable Google runtime
+        run: node scripts/gcp/audit-studio-browser.mjs

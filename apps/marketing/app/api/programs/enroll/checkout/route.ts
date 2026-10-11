@@ -24,7 +24,11 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
-import { ENCHANTED_HEARTS, getEnchantedHeartsProgram } from '@/lib/partners/enchanted-hearts';
+import { affirm } from '@/lib/affirm/client';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { isAffirmInvoiceAmount } from '@/lib/billing/invoice-checkout';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { ENCHANTED_HEARTS } from '@/lib/partners/enchanted-hearts';
 import { resolveQuickBooksProgramPromotion } from '@/lib/payments/quickbooks-program-promotion';
 
 type FundingSource = 'self_pay' | 'workone' | 'wioa' | 'grant' | 'employer';
@@ -35,6 +39,7 @@ interface CheckoutRequest {
   payment_plan?: 'full' | 'installments';
   coupon_code?: string;
   partner_key?: string;
+  payment_method?: 'quickbooks' | 'affirm';
 }
 
 export async function POST(request: NextRequest) {
@@ -53,6 +58,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body: CheckoutRequest = await request.json();
+    const paymentMethod = body.payment_method ?? 'quickbooks';
+    if (!['quickbooks', 'affirm'].includes(paymentMethod))
+      return NextResponse.json({ error: 'Choose a supported payment method.' }, { status: 400 });
     const {
       program_id,
       funding_source = 'self_pay',
@@ -77,14 +85,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid funding_source' }, { status: 400 });
     }
 
-    // Get program details
-    const { data: program, error: programError } = await supabase
+    // Read the same published catalog available to anonymous visitors. Keep
+    // authentication and student-owned enrollment checks on the session client.
+    const admin = await requireAdminClient();
+    const { data: program, error: programError } = await admin
       .from('programs')
-      .select('id, title, slug, price, tuition, total_cost, status, funding_eligible, funding_confirmed, wioa_approved, etpl_listed, is_free')
+      .select(
+        'id, title, slug, price, tuition, total_cost, status, funding_eligible, funding_confirmed, wioa_approved, etpl_listed, is_free',
+      )
       .eq('id', program_id)
+      .eq('published', true)
+      .eq('is_active', true)
       .maybeSingle();
 
-    if (programError || !program) {
+    if (programError) {
+      logger.error('Enrollment catalog lookup failed', programError);
+      return NextResponse.json(
+        { error: 'Program details are temporarily unavailable. Please try again.' },
+        { status: 503 },
+      );
+    }
+    if (!program) {
       return NextResponse.json({ error: 'Program not found' }, { status: 404 });
     }
 
@@ -115,7 +136,10 @@ export async function POST(request: NextRequest) {
     const stickerPrice = Number(program.price ?? program.tuition ?? program.total_cost ?? 0);
     if (funding_source === 'self_pay' && stickerPrice <= 0 && program.is_free !== true) {
       return NextResponse.json(
-        { error: 'Tuition is not published for this program yet. Contact admissions before checkout.' },
+        {
+          error:
+            'Tuition is not published for this program yet. Contact admissions before checkout.',
+        },
         { status: 409 },
       );
     }
@@ -127,7 +151,10 @@ export async function POST(request: NextRequest) {
       !program.etpl_listed
     ) {
       return NextResponse.json(
-        { error: 'This program does not have a verified agency-funded checkout path. Choose self-pay or contact admissions.' },
+        {
+          error:
+            'This program does not have a verified agency-funded checkout path. Choose self-pay or contact admissions.',
+        },
         { status: 409 },
       );
     }
@@ -135,16 +162,30 @@ export async function POST(request: NextRequest) {
     // pending until staff records the agency's written authorization.
     const amountToCharge = agencyFundingRequested ? 0 : stickerPrice;
 
-    const admin = await requireAdminClient();
     const partnerProgram =
-      partner_key === 'enchanted-hearts' ? getEnchantedHeartsProgram(program.slug) : null;
-    if (partner_key === 'enchanted-hearts' && !partnerProgram) {
+      ENCHANTED_HEARTS.programs.find((item) => item.programId === program.id) ?? null;
+    if (
+      ['enchanted-hearts', 'healthcare-training'].includes(partner_key || '') &&
+      !partnerProgram
+    ) {
       return NextResponse.json(
         { error: 'This program is not assigned to that partner.' },
         { status: 400 },
       );
     }
-    let fullAmountCents = Math.round(amountToCharge * 100);
+    if (
+      partnerProgram &&
+      !agencyFundingRequested &&
+      (payment_plan !== 'full' || coupon_code.trim())
+    ) {
+      return NextResponse.json(
+        { error: 'This program requires full tuition payment without a promotion code.' },
+        { status: 400 },
+      );
+    }
+    let fullAmountCents = agencyFundingRequested
+      ? 0
+      : (partnerProgram?.retailPriceCents ?? Math.round(amountToCharge * 100));
     let appliedCoupon: { code: string; discountAmountCents: number } | null = null;
     if (coupon_code.trim() && funding_source === 'self_pay') {
       const result = await resolveQuickBooksProgramPromotion({
@@ -208,10 +249,26 @@ export async function POST(request: NextRequest) {
               email: customerEmail,
               full_name: profile?.full_name || customerEmail,
               funding_source,
-              status: agencyFundingRequested ? 'pending' : amountCents > 0 ? 'checkout_pending' : 'active',
-              payment_status: agencyFundingRequested ? 'authorization_pending' : amountCents > 0 ? 'pending' : 'paid',
-              enrollment_state: agencyFundingRequested ? 'funding_authorization_pending' : amountCents > 0 ? 'payment_pending' : 'active',
-              next_required_action: agencyFundingRequested ? 'FUNDING_AUTHORIZATION' : amountCents > 0 ? 'PAYMENT' : 'ONBOARDING',
+              status: agencyFundingRequested
+                ? 'pending'
+                : amountCents > 0
+                  ? 'checkout_pending'
+                  : 'active',
+              payment_status: agencyFundingRequested
+                ? 'authorization_pending'
+                : amountCents > 0
+                  ? 'pending'
+                  : 'paid',
+              enrollment_state: agencyFundingRequested
+                ? 'funding_authorization_pending'
+                : amountCents > 0
+                  ? 'payment_pending'
+                  : 'active',
+              next_required_action: agencyFundingRequested
+                ? 'FUNDING_AUTHORIZATION'
+                : amountCents > 0
+                  ? 'PAYMENT'
+                  : 'ONBOARDING',
               amount_paid_cents: 0,
               billing_provider: amountCents > 0 ? 'quickbooks' : null,
               program_holder_id: partnerHolderId,
@@ -238,6 +295,25 @@ export async function POST(request: NextRequest) {
     }
 
     if (!customerEmail) throw new Error('An email address is required for a QuickBooks invoice.');
+    if (paymentMethod === 'affirm' && payment_plan !== 'full')
+      return NextResponse.json(
+        { error: 'Choose full tuition for Affirm checkout.' },
+        { status: 400 },
+      );
+    if (paymentMethod === 'affirm') {
+      if (!isAffirmInvoiceAmount(amountCents))
+        return NextResponse.json(
+          { error: 'This amount is not eligible for Affirm financing.' },
+          { status: 400 },
+        );
+      await hydrateProcessEnv();
+      affirm.tryLateConfig();
+      if (!affirm.isConfigured())
+        return NextResponse.json(
+          { error: 'Affirm is temporarily unavailable. Please choose QuickBooks payment.' },
+          { status: 503 },
+        );
+    }
     const invoice = await createQuickBooksBillingProvider(admin).createManualInvoice({
       idempotencyKey: `program:${pending.data.id}`,
       customer: {
@@ -271,31 +347,10 @@ export async function POST(request: NextRequest) {
         },
       },
     });
-    if (!invoice.paymentUrl)
+    if (!invoice.paymentUrl && paymentMethod === 'quickbooks')
       throw new Error('QuickBooks created the invoice but online payment links are not enabled.');
-    if (partnerProgram && partnerHolderId) {
-      const { data: existingPayout } = await admin
-        .from('payout_schedules')
-        .select('id')
-        .eq('enrollment_id', pending.data.id)
-        .maybeSingle();
-      if (!existingPayout) {
-        const payout = await admin.from('payout_schedules').insert({
-          enrollment_id: pending.data.id,
-          user_id: user.id,
-          program_id: program.id,
-          program_holder_id: partnerHolderId,
-          total_payout_cents: partnerProgram.providerShareCents,
-          increment_1_cents: partnerProgram.providerShareCents,
-          increment_2_cents: 0,
-          increment_1_status: 'pending',
-          increment_2_status: 'not_required',
-          notes: `Provider share for ${program.title}; release requires cleared payment and approval.`,
-        });
-        if (payout.error)
-          throw new Error(`Partner payout schedule failed: ${payout.error.message}`);
-      }
-    }
+    // School invoice liabilities are recorded by confirmed-payment fulfillment,
+    // separately from the graduation/PayPal payout workflow.
     if (payment_plan === 'installments') {
       const next = new Date();
       next.setUTCMonth(next.getUTCMonth() + 1);
@@ -339,7 +394,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      url: invoice.paymentUrl,
+      url:
+        paymentMethod === 'affirm'
+          ? `https://app.${PLATFORM_DEFAULTS.canonicalDomain}/account/payment-methods`
+          : invoice.paymentUrl,
       invoice_id: invoice.providerInvoiceId,
       coupon: appliedCoupon,
     });

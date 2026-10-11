@@ -279,6 +279,10 @@ async function execAiAction(config: Record<string, unknown>, ctx: RunContext) {
       ],
     });
 
+    if (typeof response.content !== 'string' || !response.content.trim()) {
+      return { ok: false, output: { error: 'AI action did not produce usable content' } };
+    }
+
     const persistTable = typeof config.persist_table === 'string' ? config.persist_table.trim() : '';
     const persistMatch = config.persist_match as Record<string, unknown> | string | undefined;
     const persistField = typeof config.persist_field === 'string' ? config.persist_field.trim() : '';
@@ -296,16 +300,20 @@ async function execAiAction(config: Record<string, unknown>, ctx: RunContext) {
       } catch {
         return { ok: false, output: { error: 'ai_action persist_match must be valid JSON' } };
       }
-      if (!Object.keys(matchObj).length) {
+      if (!matchObj || typeof matchObj !== 'object' || Array.isArray(matchObj) || !Object.keys(matchObj).length) {
         return { ok: false, output: { error: 'ai_action persist_match must be non-empty' } };
       }
 
       const db = await requireAdminClient();
-      const { error } = await db
+      const { data, error } = await db
         .from(persistTable)
         .update({ [persistField]: response.content })
-        .match(interpolateObj(matchObj, ctx.triggerPayload));
+        .match(interpolateObj(matchObj, ctx.triggerPayload))
+        .select(persistField);
       if (error) return { ok: false, output: { error: error.message } };
+      if (!data?.length || data.some(row => row[persistField] !== response.content)) {
+        return { ok: false, output: { error: 'AI action persistence could not be verified' } };
+      }
     }
 
     return {

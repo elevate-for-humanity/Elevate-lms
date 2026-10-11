@@ -38,11 +38,9 @@ async function auditSMSDelivery(
         ...metadata,
       },
     });
-    if (error) logger.warn('[SMS] delivery audit insert failed', { error: error.message });
+    if (error) logger.warn('[SMS] delivery audit insert failed');
   } catch (error) {
-    logger.warn('[SMS] delivery audit unavailable', {
-      error: error instanceof Error ? error.message : String(error),
-    });
+    logger.warn('[SMS] delivery audit unavailable');
   }
 }
 
@@ -74,7 +72,6 @@ export class SMSService {
 
     if (!this.isEnabled()) {
       logger.error('SMS not sent — Telnyx messaging is not configured.', new Error('SMS service unavailable'), {
-        to: formattedPhone,
         messageLength: notification.message.length,
       });
       const result = { success: false, error: 'SMS service unavailable — Telnyx API key or sending number is missing.' };
@@ -96,10 +93,9 @@ export class SMSService {
       const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        const error = data?.errors?.[0]?.detail || data?.errors?.[0]?.title || 'SMS send failed';
+        const error = 'SMS provider did not confirm acceptance';
         logger.error('Telnyx SMS failed', new Error(error), {
-          to: formattedPhone,
-          status: response.status,
+            status: response.status,
         });
         const result = { success: false, error };
         await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
@@ -107,13 +103,13 @@ export class SMSService {
       }
 
       if (!data?.data?.id) throw new Error('Telnyx accepted the request without a message ID');
-      logger.info('SMS accepted by Telnyx', { to: formattedPhone, messageId: data.data.id });
+      logger.info('SMS accepted by Telnyx');
       const result = { success: true, messageId: data.data.id };
       await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
       return result;
     } catch (error) {
-      logger.error('SMS send exception', error as Error, { to: formattedPhone });
-      const result = { success: false, error: (error as Error).message };
+      logger.error('SMS send outcome could not be confirmed');
+      const result = { success: false, error: 'SMS send outcome could not be confirmed' };
       await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
       return result;
     }

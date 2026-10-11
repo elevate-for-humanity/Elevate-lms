@@ -10,7 +10,7 @@ permissions:
   contents: read
   id-token: write
 concurrency:
-  group: google-runtime-operations
+  group: google-course-runtime-operations
   cancel-in-progress: false
 jobs:
   deploy:

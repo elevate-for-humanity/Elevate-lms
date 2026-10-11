@@ -74,7 +74,9 @@ export function ProgramIntegrityPanel() {
     }
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const programs = data?.programs ?? [];
   const critical = programs.filter((p) => p.integrity_score < 60);
@@ -104,6 +106,7 @@ export function ProgramIntegrityPanel() {
         </div>
         <div className="flex items-center gap-3">
           <button
+            aria-label="Refresh program integrity"
             onClick={fetchData}
             disabled={loading}
             className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-700 transition-colors disabled:opacity-50"
@@ -125,7 +128,8 @@ export function ProgramIntegrityPanel() {
           <div>
             <p className="text-sm font-semibold text-amber-900">Live fallback audit active</p>
             <p className="text-xs text-amber-800 mt-0.5">
-              The database view is not available, so the dashboard computed integrity from live program, module, lesson, enrollment, certificate, and completion-rule tables.
+              The database view is not available, so the dashboard computed integrity from live
+              program, module, lesson, enrollment, certificate, and completion-rule tables.
             </p>
           </div>
         </div>
@@ -143,9 +147,7 @@ export function ProgramIntegrityPanel() {
           ))}
         </div>
       ) : programs.length === 0 ? (
-        <div className="px-6 py-5 text-sm text-slate-500">
-          All programs pass integrity checks.
-        </div>
+        <div className="px-6 py-5 text-sm text-slate-500">All programs pass integrity checks.</div>
       ) : (
         <>
           <div className="divide-y divide-slate-100">
@@ -181,7 +183,9 @@ export function ProgramIntegrityPanel() {
                   )}
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0 ml-4">
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${scoreBadge(p.integrity_score)}`}>
+                  <span
+                    className={`text-xs font-bold px-2 py-0.5 rounded-full ${scoreBadge(p.integrity_score)}`}
+                  >
                     {p.integrity_score}/100
                   </span>
                   <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-600 transition-colors" />

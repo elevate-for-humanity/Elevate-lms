@@ -281,7 +281,6 @@ export default function HeroVideo({
               alt={slide.alt}
               fill
               priority={index < 2}
-              unoptimized
               sizes="100vw"
               aria-hidden={index !== demoActiveSlideIndex}
               className={`absolute inset-0 z-0 h-full w-full ${mediaClass} transform-gpu object-center transition-[opacity,transform] duration-1000 ease-in-out motion-reduce:transition-none ${mediaClassName} ${slide.className || ''} ${
@@ -295,7 +294,6 @@ export default function HeroVideo({
             alt=""
             fill
             priority
-            unoptimized
             sizes="100vw"
             className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center ${mediaClassName}`}
             aria-hidden="true"

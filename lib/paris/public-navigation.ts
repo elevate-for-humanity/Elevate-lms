@@ -39,8 +39,8 @@ export function resolvePublicNavigation(command: string): ParisPublicDestination
 
 /** Convert plain, safe same-origin routes returned by PARIS into tappable Markdown links. */
 export function linkifyParisRoutes(content: string): string {
-  return content
+  return content.split(/(\[[^\]]*\]\([^)]+\))/g).map((part, index) => index % 2 ? part : part
     .replace(/\*\*(\/[a-z0-9/_-]+)\*\*/gi, '[$1]($1)')
     .replace(/(^|[\s(])(https?:\/\/[^\s)<>]+)/gi, '$1[$2]($2)')
-    .replace(/(^|[\s(])(\/[a-z0-9][a-z0-9/_-]*)(?=$|[\s.,!?;:)])/gim, '$1[$2]($2)');
+    .replace(/(^|[\s(])(\/[a-z0-9][a-z0-9/_-]*)(?=$|[\s.,!?;:)])/gim, '$1[$2]($2)')).join('');
 }

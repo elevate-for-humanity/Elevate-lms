@@ -64,3 +64,7 @@ tests
 # Markdown (keep README for tooling that expects it)
 *.md
 !README.md
+
+# Google workload-identity credentials must never enter any build context.
+gha-creds-*.json
+**/gha-creds-*.json

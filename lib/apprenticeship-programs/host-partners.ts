@@ -49,13 +49,14 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     marketingBlurb:
       'A family-oriented Main Street barbershop serving New Palestine with classic cuts, modern grooming, and an apprenticeship training environment.',
     media: [
+      { src: '/videos/partners/kountry-kutz-tour.mp4', alt: 'Kountry Kutz Barbershop video introduction and tour', kind: 'video' },
       {
-        src: '/images/partners/kountry-kutz/interior-empty.webp',
+        src: '/images/partners/kountry-kutz/interior-empty-enhanced-2026.webp',
         alt: 'Kountry Kutz Barbershop interior and apprenticeship training stations',
         kind: 'photo',
       },
       {
-        src: '/images/partners/kountry-kutz/interior-active.webp',
+        src: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp',
         alt: 'Barbers and clients inside Kountry Kutz Barbershop in New Palestine',
         kind: 'photo',
       },
@@ -85,43 +86,41 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       "An Elkhart barbershop offering fades, shape ups, beard trims, children's haircuts, shear cuts, and supervised barber apprenticeship experience.",
     media: [
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge precision fade and professional barbering work',
         kind: 'photo',
       },
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge clean fade and textured haircut',
         kind: 'photo',
       },
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-textured-crop.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-textured-crop-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge textured crop and blended fade',
         kind: 'photo',
       },
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-wave-and-beard.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-wave-and-beard-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge wave haircut, lineup, and beard grooming',
         kind: 'photo',
       },
       {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge modern fringe haircut with tapered sides',
         kind: 'photo',
       },
+
       {
-        src: 'https://d2ugbn5gb88fyp.cloudfront.net/1265883/0_0.jpg',
-        alt: 'Top Shelf Barber Lounge barber providing a haircut',
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-and-beard.jpg',
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-and-beard-enhanced-2026.webp',
         alt: 'Top Shelf Barber Lounge fade haircut and full beard shaping',
         kind: 'photo',
       },
     ],
     websiteUrl: 'https://barbershopelkhart.com/',
     websiteLabel: 'Visit Top Shelf Barber Lounge',
+    socialUrl: 'https://www.instagram.com/topshelfbarberlounge/',
+    socialLabel: 'View Top Shelf Instagram',
   },
   {
     slug: 'cals-kutz-studio',
@@ -137,11 +136,12 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     marketingBlurb:
       'A full-service Indianapolis barber studio offering precision cuts, grooming, hair-loss consultation, and professional mentorship in a working shop environment.',
     media: [
-      {
-        src: '/images/partners/cals-kutz-official.webp',
-        alt: 'Cals Kutz Studio professional barber shop and apprenticeship host image',
-        kind: 'photo',
-      },
+      { src: '/images/partners/cals-kutz/cut-profile-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced fade and beard profile photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/curly-cut-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced curly haircut photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/beard-cut-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced beard and precision cut photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/client-cut-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced client haircut photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/interior-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced studio interior photograph', kind: 'photo' },
+      { src: '/images/partners/cals-kutz/storefront-enhanced-2026.webp', alt: 'Cal’s Kutz Studio enhanced storefront photograph', kind: 'photo' },
       {
         src: '/images/partners/cals-kutz-confidence-restored.webp',
         alt: 'Cals Kutz Studio Confidence Restored hair replacement promotion',
@@ -150,7 +150,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     ],
     websiteUrl: 'https://booksy.com/en-us/211056_cal-s-kutz-studio_barber-shop_19577_indianapolis',
     websiteLabel: 'Book / view Cals Kutz online',
-    socialUrl: 'https://www.instagram.com/calskutzstudio/',
+    socialUrl: 'https://www.instagram.com/cal_kutz/',
     socialLabel: 'View Cals Kutz photos',
   },
   {
@@ -215,8 +215,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'A traditional New Castle barbershop known for classic barber services including haircuts, razor line-ups, fades, and straight-razor shaves.',
     media: [
       {
-        src: '/images/partners/b52s-official.webp',
-        alt: "B-52's Barbershop in New Castle, Indiana",
+        src: '/images/pages/barber-shop-interior.webp',
+        alt: 'Representative barber training environment; not a photograph of B-52s',
         kind: 'photo',
       },
     ],
@@ -239,8 +239,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'A community salon and barber shop in downtown Sullivan offering hair services and traditional barbering in a local, client-focused setting.',
     media: [
       {
-        src: '/images/partners/style-and-scissor-salon/pink-nail-work.webp',
-        alt: 'Professional pink nail designs completed at Style and Scissor Salon',
+        src: '/images/partners/style-and-scissor-salon/logo.webp',
+        alt: 'Style and Scissor Salon business logo',
         kind: 'photo',
       },
       {
@@ -271,6 +271,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
   {
     slug: 'generations-hair-llc',
     name: 'Generations Hair LLC DBA Generations Wedding Co',
+    dba: 'Generations Hair / Cat Eye Collective',
     businessType: 'HairSalon',
     city: 'Martinsville',
     state: 'IN',
@@ -282,12 +283,12 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'An independent Martinsville hair business located inside Cat Eye Collective and participating in the Elevate apprenticeship host-shop network.',
     media: [
       {
-        src: '/images/partners/generations-hair/color-transformation.webp',
-        alt: 'Generations Hair LLC dimensional color transformation',
+        src: '/images/partners/generations-hair/premium-curls.jpg',
+        alt: 'Generations Hair highlighted curls portfolio',
         kind: 'photo',
       },
       {
-        src: '/images/partners/generations-hair/dimensional-color.webp',
+        src: '/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp',
         alt: 'Generations Hair LLC dimensional brunette and blonde color work',
         kind: 'photo',
       },
@@ -297,7 +298,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         kind: 'photo',
       },
       {
-        src: '/images/partners/generations-hair/stylist-at-work.webp',
+        src: '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp',
         alt: 'Generations Hair LLC stylist working with a salon guest',
         kind: 'photo',
       },
@@ -424,11 +425,20 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     ],
     websiteUrl: 'https://tory-103460.square.site/',
     websiteLabel: 'Book / view Salon Saloon online',
+    socialUrl: 'https://www.instagram.com/salonsaloon_/',
+    socialLabel: 'View Salon Saloon Instagram',
   },
 ];
 
 export function getFeaturedHostPartnerBySlug(slug: string) {
-  return FEATURED_BEAUTY_HOST_PARTNERS.find((shop) => shop.slug === slug);
+  const normalized = slug.trim().toLowerCase().replace(/-[a-f0-9]{8}$/, '');
+  const aliases: Record<string, string> = {
+    'b-52-s-barber-shop-llc': 'b-52s-barber-shop',
+    'style-and-scissors-salon': 'style-and-scissor-salon',
+    'generations-hair-llc-dba-generations-wedding-co': 'generations-hair-llc',
+  };
+  const canonical = aliases[normalized] ?? normalized;
+  return FEATURED_BEAUTY_HOST_PARTNERS.find((shop) => shop.slug === canonical);
 }
 
 export const PARTNER_BRAND_ALIASES = {

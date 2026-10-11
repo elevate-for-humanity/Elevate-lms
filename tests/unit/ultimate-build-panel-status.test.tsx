@@ -1,5 +1,5 @@
 import React from 'react';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { UltimateBuildPanel } from '@/components/admin/course-builder/UnifiedCourseBuilder';
 vi.mock('@/components/admin/course-builder/CredentialRegistryPanel', () => ({
@@ -10,7 +10,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function show(jobStatus: string, buildStatus = 'running') {
+function show(jobStatus: string, buildStatus = 'running', expired = false) {
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue({
@@ -27,6 +27,8 @@ function show(jobStatus: string, buildStatus = 'running') {
                 id: 'persisted-job',
                 status: jobStatus,
                 created_at: '2026-10-03T00:00:00Z',
+                heartbeat_at: new Date(Date.now() - (expired ? 600_000 : 0)).toISOString(),
+                lease_expires_at: new Date(Date.now() + (expired ? -300_000 : 300_000)).toISOString(),
                 last_error: jobStatus === 'failed' ? 'SCENE_COVERAGE_REQUIRED' : null,
               },
             ],
@@ -52,14 +54,22 @@ it('shows a failed durable job and allows resuming an existing build whose aggre
   expect(screen.queryByRole('button', { name: 'Ultimate build running' })).not.toBeInTheDocument();
 });
 
-it.each(['queued', 'running'])(
-  'uses the durable %s job to prevent a duplicate start',
-  async (status) => {
-    show(status);
-    expect(await screen.findByText(`${status} · persisted-job`)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: `Ultimate build ${status}` })).toBeDisabled();
-  },
-);
+it('prevents another start while the durable worker job is running', async () => {
+  show('running');
+  expect(await screen.findByText('running · persisted-job')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Ultimate build running' })).toBeDisabled();
+});
+
+it('starts the Google worker for the existing queued build without creating a duplicate course build', async () => {
+  show('queued');
+  expect(await screen.findByText('queued · persisted-job')).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Start Google worker' }));
+  await waitFor(() => expect(fetch).toHaveBeenCalledWith('/api/admin/ultimate-course-builder/run', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ buildId: 'existing-build' }),
+  }));
+  expect(vi.mocked(fetch).mock.calls.filter(([url, options]) => url === '/api/admin/ultimate-course-builder' && options?.method === 'POST')).toHaveLength(0);
+});
 
 it('does not present a completed worker job as a completed course or offer publication before acceptance', async () => {
   show('completed');
@@ -67,4 +77,12 @@ it('does not present a completed worker job as a completed course or offer publi
   expect(
     screen.queryByRole('button', { name: 'Publish Ultimate release' }),
   ).not.toBeInTheDocument();
+});
+
+it('shows an expired running job as stalled and enables recovery instead of falsely confirming a worker', async()=>{
+ show('running','running',true);
+ expect(await screen.findByText('stalled · persisted-job')).toBeInTheDocument();
+ expect(screen.getByRole('button',{name:'Resume Ultimate build'})).toBeEnabled();
+ expect(screen.getByRole('alert')).toHaveTextContent('heartbeat is missing or stale');
+ expect(screen.queryByRole('button',{name:'Ultimate build running'})).not.toBeInTheDocument();
 });

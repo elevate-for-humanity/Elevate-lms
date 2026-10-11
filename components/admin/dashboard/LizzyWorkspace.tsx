@@ -73,7 +73,7 @@ export function LizzyWorkspace({
           const active = panel === id;
           return <button key={id} type="button" onClick={() => openPanel(id)} className="inline-flex h-8 items-center gap-1.5 rounded border px-2.5 text-[11px] font-medium" style={{ borderColor: active ? '#0078d4' : '#3c3c3c', background: active ? '#094771' : 'transparent', color: active ? '#fff' : '#ccc' }}><Icon className="h-3.5 w-3.5" />{label}</button>;
         })}
-        <span className="ml-auto hidden items-center gap-2 text-[10px] text-[#858585] sm:flex"><Rocket className="h-3 w-3" />GitHub → Northflank <Server className="h-3 w-3" />{health ? 'Health loaded' : 'Health…'}</span>
+        <span className="ml-auto hidden items-center gap-2 text-[10px] text-[#858585] sm:flex"><Rocket className="h-3 w-3" />GitHub → Google Cloud Run <Server className="h-3 w-3" />{health ? 'Health loaded' : 'Health…'}</span>
       </div>
       <div className="min-h-0 flex-1 overflow-hidden">
         <DashboardPanelErrorBoundary name={`Lizzy ${panel}`}>

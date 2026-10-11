@@ -18,6 +18,11 @@ import {
 } from '@/lib/email/communication-mailbox';
 import { safeAttachmentName } from '@/lib/email/sendgrid-inbound';
 import { normalizeRoles } from '@/lib/rbac/role-matrix';
+import {
+  applicantConversationSubject,
+  programConversationRoute,
+} from './program-conversation-routing';
+import { storeInboundCommunicationEmail } from './communication-inbound';
 
 const ATTACHMENT_BUCKET = 'communication-email-attachments';
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
@@ -171,7 +176,7 @@ export async function handleCommunicationEmailGet(
     const { data: messageRows, error: messageError } = await context.db
       .from('communication_email_messages')
       .select(
-        'id,direction,status,sender_email,sender_name,to_addresses,cc_addresses,subject,text_body,sent_at,received_at,created_at,attachments:communication_email_attachments(id,file_name,mime_type,size_bytes)',
+        'id,direction,status,sender_email,sender_name,reply_to,to_addresses,cc_addresses,subject,text_body,sent_at,received_at,created_at,attachments:communication_email_attachments(id,file_name,mime_type,size_bytes)',
       )
       .eq('mailbox_id', selectedMailbox.id)
       .eq('thread_id', selectedThread.id)
@@ -224,7 +229,10 @@ export async function handleCommunicationEmailPost(
   if (context instanceof NextResponse) return context;
   if (context.previewing) {
     return NextResponse.json(
-      { error: 'Administrator portal previews are read-only. Sign in as the Program Holder to send email.' },
+      {
+        error:
+          'Administrator portal previews are read-only. Sign in as the Program Holder to send email.',
+      },
       { status: 403 },
     );
   }
@@ -251,6 +259,12 @@ export async function handleCommunicationEmailPost(
     return NextResponse.json({ error: 'Write a message or attach a file.' }, { status: 400 });
   }
 
+  const route =
+    !bcc.length && !cc.length
+      ? await programConversationRoute(context.db, to, [mailbox.address])
+      : null;
+  const replyTo = route?.replyTo || mailbox.address;
+
   let thread: any = null;
   if (requestedThreadId) {
     const { data } = await context.db
@@ -270,7 +284,9 @@ export async function handleCommunicationEmailPost(
       .insert({
         mailbox_id: mailbox.id,
         subject,
-        normalized_subject: normalizeEmailSubject(subject),
+        normalized_subject: route
+          ? applicantConversationSubject(subject, route.applicantEmail)
+          : normalizeEmailSubject(subject),
         message_count: 0,
       })
       .select('id,subject,message_count')
@@ -293,7 +309,7 @@ export async function handleCommunicationEmailPost(
     to_addresses: to,
     cc_addresses: cc,
     bcc_addresses: bcc,
-    reply_to: mailbox.address,
+    reply_to: replyTo,
     subject,
     text_body: bodyText,
     html_body: htmlBody,
@@ -344,7 +360,7 @@ export async function handleCommunicationEmailPost(
     to: [...to, ...cc],
     bcc,
     from: `${safeMailboxDisplayName(mailbox.displayName)} <${mailbox.address}>`,
-    replyTo: mailbox.address,
+    replyTo,
     subject,
     text: bodyText,
     html: htmlBody,
@@ -376,6 +392,37 @@ export async function handleCommunicationEmailPost(
       { error: 'SendGrid did not accept the email. The failed attempt is saved.' },
       { status: 502 },
     );
+  }
+  if (route) {
+    const copyAddresses = route.addresses.filter((address) => address !== mailbox.address);
+    let copies: { mailboxCount: number } | null = null;
+    try {
+      copies = await storeInboundCommunicationEmail(
+        {
+          from: `${safeMailboxDisplayName(mailbox.displayName)} <${mailbox.address}>`,
+          to: copyAddresses.join(','),
+          envelopeRecipients: copyAddresses,
+          replyTo: route.applicantEmail,
+          subject,
+          text: bodyText,
+          html: htmlBody,
+          eventId: `interoffice-outbound:${messageId}`,
+          attachments: files,
+        },
+        { applicantEmail: route.applicantEmail, internalCopy: true },
+      );
+    } catch {
+      // Sending already succeeded. Report the copy failure without inviting a duplicate send.
+    }
+    if (copies?.mailboxCount !== copyAddresses.length) {
+      return NextResponse.json({
+        ok: true,
+        threadId: thread.id,
+        messageId,
+        warning:
+          'Email sent, but an interoffice copy could not be saved. Do not resend; contact admin.',
+      });
+    }
   }
   return NextResponse.json({ ok: true, threadId: thread.id, messageId });
 }

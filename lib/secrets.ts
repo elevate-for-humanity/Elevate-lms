@@ -7,7 +7,10 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
  * Precedence (highest -> lowest):
  *   1. platform_secrets where scope='runtime' (canonical Admin/Studio source)
  *   2. app_secrets where scope='runtime' (legacy fallback during migration)
- *   3. process.env (Northflank/container injection)
+ *   3. process.env (container injection)
+ *
+ * Runtimes explicitly switched to Google Secret Manager use only their bound
+ * values. Enable that authority only after the service inventory is complete.
  *
  * Build-only and unused Studio values must never be copied into process.env.
  */
@@ -25,10 +28,18 @@ const SECRETS_READ_ATTEMPTS = Math.max(
   Number.parseInt(process.env.SUPABASE_READ_MAX_ATTEMPTS || '3', 10) || 3,
 );
 
-function retryableSecretRead(error: { code?: string; message?: string } | null | undefined): boolean {
+function usesGoogleRuntimeBindings(): boolean {
+  return process.env.ELEVATE_RUNTIME_CONFIG_PROVIDER === 'google-secret-manager';
+}
+
+function retryableSecretRead(
+  error: { code?: string; message?: string } | null | undefined,
+): boolean {
   if (!error) return false;
-  return ['PGRST002', 'PGRST000', '57014'].includes(error.code || '') ||
-    /schema cache|retry|timeout|timed out|fetch failed|network/i.test(error.message || '');
+  return (
+    ['PGRST002', 'PGRST000', '57014'].includes(error.code || '') ||
+    /schema cache|retry|timeout|timed out|fetch failed|network/i.test(error.message || '')
+  );
 }
 
 async function readRuntimeSecrets(
@@ -59,7 +70,9 @@ function getBootstrapClient(): SupabaseClient | null {
       fetch: (input, init) => {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), SECRETS_FETCH_TIMEOUT_MS);
-        return fetch(input, { ...init, signal: controller.signal }).finally(() => clearTimeout(timer));
+        return fetch(input, { ...init, signal: controller.signal }).finally(() =>
+          clearTimeout(timer),
+        );
       },
     },
   });
@@ -72,6 +85,7 @@ function acceptSecret(target: Record<string, string>, key: unknown, value: unkno
 }
 
 async function loadSecrets(): Promise<Record<string, string>> {
+  if (usesGoogleRuntimeBindings()) return {};
   if (cache && Date.now() - cacheTimestamp < CACHE_TTL_MS) return cache;
 
   const client = getBootstrapClient();
@@ -128,6 +142,7 @@ async function loadSecrets(): Promise<Record<string, string>> {
 
 /** Merge canonical runtime secrets into process.env. */
 export async function hydrateProcessEnv(): Promise<void> {
+  if (usesGoogleRuntimeBindings()) return;
   if (hydrated && Date.now() - cacheTimestamp < CACHE_TTL_MS) return;
 
   const secrets = await loadSecrets();
@@ -155,6 +170,7 @@ export async function getSecrets<K extends string>(
 
 /** Synchronous read after hydration; process.env remains the final fallback. */
 export function getCachedSecret(key: string): string | undefined {
+  if (usesGoogleRuntimeBindings()) return process.env[key];
   return cache?.[key] ?? process.env[key];
 }
 
@@ -166,7 +182,6 @@ export async function refreshSecrets(): Promise<void> {
   await hydrateProcessEnv();
 }
 
-
 /**
  * Decrypt one canonical platform secret by exact key.
  *
@@ -175,28 +190,11 @@ export async function refreshSecrets(): Promise<void> {
  * that can decrypt value_enc.
  */
 export async function getDecryptedPlatformSecret(key: string): Promise<string | undefined> {
+  if (usesGoogleRuntimeBindings()) return process.env[key];
   const client = getBootstrapClient();
   if (!client) return process.env[key];
 
   const { data, error } = await client.rpc('get_platform_secret', { p_key: key });
   if (error || typeof data !== 'string' || !data.trim()) return process.env[key];
   return data.trim();
-}
-
-/**
- * Hydrate only Northflank control-plane credentials.
- * Values are decrypted by exact key and never returned to a browser response.
- */
-export async function hydrateNorthflankEnv(): Promise<void> {
-  const keys = ['NORTHFLANK_API_TOKEN', 'NORTHFLANK_PROJECT_ID'] as const;
-  const values = await Promise.all(
-    keys.map(async (key) => ({
-      key,
-      value: await getDecryptedPlatformSecret(key),
-    })),
-  );
-
-  for (const { key, value } of values) {
-    if (value) process.env[key] = value;
-  }
 }

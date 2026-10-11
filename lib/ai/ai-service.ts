@@ -191,8 +191,8 @@ function resolveImageProvider(): AIImageProvider {
 export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
   // Elevate-owned inference is part of the platform runtime and must not require
   // paid-inference authorization. Metered/external providers retain the paid gate.
-  if (options.providerPolicy !== 'owned-only') requirePaidInferenceContext('ai-chat');
   let provider = resolveConfiguredChatProvider(options);
+  if (provider.name !== 'elevate') requirePaidInferenceContext('ai-chat');
   const allowCircuitRecoveryWait = process.env.AI_CIRCUIT_RECOVERY_WAIT === '1';
   const passes = allowCircuitRecoveryWait ? 2 : 1;
 
@@ -237,7 +237,8 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
 }
 
 export async function* aiChatStream(options: ChatCompletionOptions): AsyncIterable<string> {
-  const provider = resolveChatProvider();
+  const provider = resolveConfiguredChatProvider(options);
+  if (provider.name !== 'elevate') requirePaidInferenceContext('ai-chat-stream');
   if (
     'chatStream' in provider &&
     typeof (provider as { chatStream?: unknown }).chatStream === 'function'

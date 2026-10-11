@@ -1,7 +1,9 @@
+import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 import 'server-only';
 
 import {
   FEATURED_BEAUTY_HOST_PARTNERS,
+  getFeaturedHostPartnerBySlug,
   type FeaturedHostPartner,
 } from '@/lib/apprenticeship-programs/host-partners';
 import { getApprovedShops, type HostShop } from '@/lib/programs/host-shops';
@@ -44,6 +46,8 @@ function approvedAddress(shop: HostShop) {
 }
 
 function sameBusiness(approved: HostShop, featured: FeaturedHostPartner) {
+  const knownProfile = getFeaturedHostPartnerBySlug(approved.publicSlug ?? '');
+  if (knownProfile?.slug === featured.slug) return true;
   const sameName =
     identityKey(approved.name) === identityKey(featured.name) ||
     (featured.dba ? identityKey(approved.name) === identityKey(featured.dba) : false);
@@ -91,9 +95,9 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
         featured?.marketingBlurb ||
         shop.description ||
         `${shop.name} participates in Elevate's apprenticeship Host Site network.`,
-      image: featured
-        ? firstImage(featured)
-        : shop.logoUrl || shop.flyerUrl || shop.mediaGallery?.[0]?.url,
+      image: shop.mediaGallery?.[0]?.url || shop.logoUrl || shop.flyerUrl || (featured ? firstImage(featured) : undefined),
+      videoUrl: shop.videoUrl || featured?.media?.find((item) => item.kind === 'video')?.src,
+      gallery: curateShopGallery(featured?.slug ?? shop.publicSlug ?? '', [...(shop.mediaGallery ?? []), ...(featured?.media?.filter((item) => item.kind !== 'video').map((item) => ({ url: item.src, alt: item.alt })) ?? [])]),
       website: featured?.websiteUrl || shop.website,
       social: featured?.socialUrl,
       booking: featured?.bookingUrl,
@@ -118,6 +122,8 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
         shop.note ||
         `${shop.name} is listed in Elevate's Host Shop network.`,
       image: firstImage(shop),
+      videoUrl: shop.media?.find((item) => item.kind === 'video')?.src,
+      gallery: shop.media?.filter((item) => item.kind !== 'video').map((item) => ({ url: item.src, alt: item.alt })),
       website: shop.websiteUrl,
       social: shop.socialUrl,
       booking: shop.bookingUrl,

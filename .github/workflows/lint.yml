@@ -1,9 +1,7 @@
-name: Lint
+name: Manual Lint Diagnostics
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches: [main]
 
 concurrency:
   group: lint-${{ github.event.pull_request.number || github.ref }}

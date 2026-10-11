@@ -1,183 +1,49 @@
-name: Google Unified Production Deployment
+name: Google Deployment Coordination
 
+# Existing service-specific workflows already deploy automatically when a PR
+# reaches main. Do not launch a second copy of those workflows here.
 on:
   push:
-    branches:
-      - main
-
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
-  actions: write
+  actions: read
 
 concurrency:
-  group: elevate-unified-production
-  cancel-in-progress: false
+  group: google-deployment-coordination
+  cancel-in-progress: true
 
 jobs:
-
-  detect:
-    name: Detect Changed Services
-    runs-on: ubuntu-latest
-
-    outputs:
-      admin: ${{ steps.changes.outputs.admin }}
-      marketing: ${{ steps.changes.outputs.marketing }}
-      lms: ${{ steps.changes.outputs.lms }}
-      store: ${{ steps.changes.outputs.store }}
-      studio: ${{ steps.changes.outputs.studio }}
-      course: ${{ steps.changes.outputs.course }}
-
+  coordinate:
+    name: Verify automatic production deployment coverage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - name: Detect changed files
-        id: changes
+      - name: Verify each production service has its own automatic trigger
         shell: bash
         run: |
           set -euo pipefail
-
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            for service in admin marketing lms store studio course; do
-              echo "$service=true" >> "$GITHUB_OUTPUT"
-            done
-            exit 0
-          fi
-
-          git diff --name-only HEAD^ HEAD > /tmp/changed.txt
-
-          detect() {
-            local name="$1"
-            local pattern="$2"
-
-            if grep -Eq "$pattern" /tmp/changed.txt; then
-              echo "$name=true" >> "$GITHUB_OUTPUT"
-            else
-              echo "$name=false" >> "$GITHUB_OUTPUT"
-            fi
+          python3 - <<'PY'
+          from pathlib import Path
+          services = {
+              'admin': '.github/workflows/deploy-admin.yml',
+              'marketing': '.github/workflows/deploy-google-marketing-trigger.yml',
+              'lms': '.github/workflows/deploy-google-lms-trigger.yml',
+              'store': '.github/workflows/deploy-google-store-runtime.yml',
+              'studio': '.github/workflows/repair-google-studio-browser.yml',
+              'course': '.github/workflows/deploy-google-course-worker.yml',
           }
-
-          detect admin '^(apps/admin/|lib/devstudio/|components/studio/)'
-          detect marketing '^(apps/marketing/|app/|components/marketing/)'
-          detect lms '^(apps/lms/|lib/lms/)'
-          detect store '^(apps/store/|lib/store/)'
-          detect studio '^(services/studio-browser/|Dockerfile.studio-browser)'
-          detect course '^(lib/ultimate-course-builder/|services/ultimate-worker/|Dockerfile.ultimate-worker)'
-
-  deploy-admin:
-    name: Deploy Admin
-    needs: detect
-    if: needs.detect.outputs.admin == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Dispatch Admin deployment
-        env:
-          GH_TOKEN: ${{ github.token }}
+          for name, file in services.items():
+              content = Path(file).read_text()
+              if 'push:' not in content or 'workflow_dispatch:' not in content or 'main' not in content:
+                  raise SystemExit(f'{name}: automatic main trigger missing in {file}')
+              print(f'{name}: automatic main trigger verified ({file})')
+          PY
+      - name: Record deployment boundaries
         run: |
-          gh workflow run deploy-admin.yml \
-            --repo "$GITHUB_REPOSITORY" \
-            --ref main
-
-  deploy-marketing:
-    name: Deploy Marketing
-    needs: detect
-    if: needs.detect.outputs.marketing == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Locate Marketing deployment
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh workflow list --repo "$GITHUB_REPOSITORY"
-
-  deploy-lms:
-    name: Deploy LMS
-    needs: detect
-    if: needs.detect.outputs.lms == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Locate LMS deployment
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh workflow list --repo "$GITHUB_REPOSITORY"
-
-  deploy-store:
-    name: Deploy Store
-    needs: detect
-    if: needs.detect.outputs.store == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Locate Store deployment
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh workflow list --repo "$GITHUB_REPOSITORY"
-
-  deploy-studio:
-    name: Deploy Studio Browser
-    needs: detect
-    if: needs.detect.outputs.studio == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Dispatch Studio deployment
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh workflow run repair-google-studio-browser.yml \
-            --repo "$GITHUB_REPOSITORY" \
-            --ref main
-
-  deploy-course:
-    name: Deploy Course Builder
-    needs: detect
-    if: needs.detect.outputs.course == 'true'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Dispatch Course Builder deployment
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh workflow run deploy-google-course-worker.yml \
-            --repo "$GITHUB_REPOSITORY" \
-            --ref main
-
-  summary:
-    name: Deployment Summary
-    needs:
-      - detect
-      - deploy-admin
-      - deploy-marketing
-      - deploy-lms
-      - deploy-store
-      - deploy-studio
-      - deploy-course
-
-    if: always()
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Show deployment results
-        run: |
-          echo "================================"
-          echo " ELEVATE GOOGLE DEPLOYMENT"
-          echo "================================"
-
           echo "Commit: $GITHUB_SHA"
-
-          echo "Admin: ${{ needs.deploy-admin.result }}"
-          echo "Marketing: ${{ needs.deploy-marketing.result }}"
-          echo "LMS: ${{ needs.deploy-lms.result }}"
-          echo "Store: ${{ needs.deploy-store.result }}"
-          echo "Studio: ${{ needs.deploy-studio.result }}"
-          echo "Course Builder: ${{ needs.deploy-course.result }}"
+          echo "Each existing service workflow owns its build, QA, deployment and rollback."
+          echo "This coordinator will not report a dispatched job as a completed deployment."

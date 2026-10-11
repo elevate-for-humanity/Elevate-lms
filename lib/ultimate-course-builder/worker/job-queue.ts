@@ -66,7 +66,7 @@ export class UltimateJobQueue {
   }
 
   async complete(jobId: string, workerId: string) {
-    const { error } = await this.db
+    const { data: updated, error } = await this.db
       .from('ultimate_build_jobs')
       .update({
         status: 'completed',
@@ -75,26 +75,32 @@ export class UltimateJobQueue {
         updated_at: new Date().toISOString(),
       })
       .eq('id', jobId)
-      .eq('lease_owner', workerId);
+      .eq('lease_owner', workerId)
+      .eq('status', 'running')
+      .select('id');
     if (error) throw error;
+    if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
   }
 
   async waitForDependency(jobId: string, workerId: string, message: string) {
     // Do not burn attempts for externally blocked assets. The existing
     // wake_ultimate_media_dependency RPC is responsible for resumption.
-    const { error } = await this.db.from('ultimate_build_jobs').update({
+    const { data: updated, error } = await this.db.from('ultimate_build_jobs').update({
       status: 'failed',
       pending_dependency_resume: { reason: 'external_dependency', awaitingWakeup: true },
       lease_owner: null,
       lease_expires_at: null,
       last_error: message,
       updated_at: new Date().toISOString(),
-    }).eq('id', jobId).eq('lease_owner', workerId);
+    }).eq('id', jobId).eq('lease_owner', workerId)
+      .eq('status', 'running')
+      .select('id');
     if (error) throw error;
+    if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
   }
 
   async requeueForRepair(jobId: string, workerId: string, message: string) {
-    const { error } = await this.db
+    const { data: updated, error } = await this.db
       .from('ultimate_build_jobs')
       .update({
         status: 'queued',
@@ -105,20 +111,26 @@ export class UltimateJobQueue {
         updated_at: new Date().toISOString(),
       })
       .eq('id', jobId)
-      .eq('lease_owner', workerId);
+      .eq('lease_owner', workerId)
+      .eq('status', 'running')
+      .select('id');
     if (error) throw error;
+    if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
   }
 
   /** Yield between lessons. A successful checkpoint is progress, not a failed
    * attempt. The persisted cursor resumes the same job and lets other courses run. */
   async yieldProgress(jobId: string, workerId: string, payload: unknown) {
-    const { error } = await this.db.from('ultimate_build_jobs').update({
+    const { data: updated, error } = await this.db.from('ultimate_build_jobs').update({
       status: 'queued', payload, attempts: 0,
       available_at: new Date(Date.now() + 1000).toISOString(),
       lease_owner: null, lease_expires_at: null, last_error: null,
       updated_at: new Date().toISOString(),
-    }).eq('id', jobId).eq('lease_owner', workerId);
+    }).eq('id', jobId).eq('lease_owner', workerId)
+      .eq('status', 'running')
+      .select('id');
     if (error) throw error;
+    if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
   }
 
   async fail(jobId: string, workerId: string, errorMessage: string, retry = true) {

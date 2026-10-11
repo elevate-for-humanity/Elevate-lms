@@ -68,7 +68,7 @@ export default async function SmsDeliveryPage() {
         </p>
       </div>
 
-      <SmsComposer enabled={smsService.isEnabled()} recipients={(recipientRows ?? []).filter((row: any) => String(row.phone || '').replace(/\D/g, '').length >= 10)} />
+      <SmsComposer enabled={await smsService.isEnabled()} recipients={(recipientRows ?? []).filter((row: any) => String(row.phone || '').replace(/\D/g, '').length >= 10)} />
 
       <section className="grid gap-4 sm:grid-cols-3" aria-label="SMS delivery summary">
         {[

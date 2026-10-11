@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { telnyxClient } from '@/lib/phone/telnyx';
+import { resolveSendingNumber } from '@/lib/phone/sending-number';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,8 +12,10 @@ export async function GET() {
   await hydrateProcessEnv();
   const db = await requireAdminClient();
   try {
-    const required = ['TELNYX_API_KEY','TELNYX_PUBLIC_KEY','TELNYX_PHONE_NUMBER'] as const;
-    const missing = required.filter((key) => !process.env[key]?.trim());
+    const required = ['TELNYX_API_KEY','TELNYX_PUBLIC_KEY'] as const;
+    const missing: string[] = required.filter((key) => !process.env[key]?.trim());
+    const sendingNumber = await resolveSendingNumber(db);
+    if (!sendingNumber) missing.push('ACTIVE_PRIMARY_PROVIDER_NUMBER');
     if (missing.length) {
       return NextResponse.json({ service:'telnyx', ready:false, configured:false, missing }, { status:503, headers:{'Cache-Control':'no-store'} });
     }
@@ -22,8 +25,8 @@ export async function GET() {
       : { data:null };
     const client = await telnyxClient();
     let carrierNumberActive = false;
-    for await (const item of client.phoneNumbers.list({ filter: { phone_number: process.env.TELNYX_PHONE_NUMBER! }, 'page[size]': 20 })) {
-      if (item.phone_number === process.env.TELNYX_PHONE_NUMBER) { carrierNumberActive = true; break; }
+    for await (const item of client.phoneNumbers.list({ filter: { phone_number: sendingNumber! }, 'page[size]': 20 })) {
+      if (item.phone_number === sendingNumber) { carrierNumberActive = true; break; }
     }
     const ready = Boolean(system?.webrtc_connection_id && system?.webrtc_connection_status==='configured' && number?.status==='active' && carrierNumberActive);
     return NextResponse.json({ service:'telnyx', ready, configured:true, carrierNumberActive, primaryNumberActive:number?.status==='active', webrtcConfigured:system?.webrtc_connection_status==='configured' }, { status:ready?200:503, headers:{'Cache-Control':'no-store'} });

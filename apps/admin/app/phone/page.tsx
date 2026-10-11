@@ -7,6 +7,7 @@ import { formatUsPhone, parseBusinessHours } from '@/lib/phone/config';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { telnyxClient } from '@/lib/phone/telnyx';
+import { resolveSendingNumber } from '@/lib/phone/sending-number';
 import {
   CapabilityGuide,
   NewSystemNotice,
@@ -165,7 +166,7 @@ export default async function PhonePage() {
   let carrierRuntimeReady = false;
   try {
     const client = await telnyxClient();
-    const configuredNumber = process.env.TELNYX_PHONE_NUMBER?.trim();
+    const configuredNumber = await resolveSendingNumber(db);
     if (configuredNumber) {
       for await (const item of client.phoneNumbers.list({
         filter: { phone_number: configuredNumber },

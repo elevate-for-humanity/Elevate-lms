@@ -2,6 +2,7 @@
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { resolveSendingNumber } from '@/lib/phone/sending-number';
 
 export interface SMSNotification {
   to: string;
@@ -55,8 +56,16 @@ export class SMSService {
     return SMSService.instance;
   }
 
-  isEnabled(): boolean {
-    return Boolean(process.env.TELNYX_API_KEY?.trim() && process.env.TELNYX_PHONE_NUMBER?.trim());
+  async sendingNumber(): Promise<string | null> {
+    await hydrateProcessEnv();
+    if (!process.env.TELNYX_API_KEY?.trim()) return null;
+    const { getAdminClient } = await import('@/lib/supabase/admin');
+    const db = await getAdminClient();
+    return db ? resolveSendingNumber(db) : null;
+  }
+
+  async isEnabled(): Promise<boolean> {
+    return Boolean(await this.sendingNumber());
   }
 
   async send(notification: SMSNotification): Promise<SMSResult> {
@@ -70,7 +79,8 @@ export class SMSService {
 
     const formattedPhone = cleanPhone.startsWith('1') ? `+${cleanPhone}` : `+1${cleanPhone}`;
 
-    if (!this.isEnabled()) {
+    const sendingNumber = await this.sendingNumber();
+    if (!sendingNumber) {
       logger.error('SMS not sent — Telnyx messaging is not configured.', new Error('SMS service unavailable'), {
         messageLength: notification.message.length,
       });
@@ -86,7 +96,7 @@ export class SMSService {
           Authorization: `Bearer ${process.env.TELNYX_API_KEY!.trim()}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ to: formattedPhone, from: process.env.TELNYX_PHONE_NUMBER!.trim(), text: notification.message }),
+        body: JSON.stringify({ to: formattedPhone, from: sendingNumber, text: notification.message }),
         signal: AbortSignal.timeout(15_000),
       });
 

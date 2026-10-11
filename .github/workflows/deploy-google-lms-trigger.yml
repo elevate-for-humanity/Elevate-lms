@@ -37,11 +37,8 @@ jobs:
         run: |
           set -euo pipefail
           latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
-          if test "$latest" != "$GITHUB_SHA"; then
-            echo "::notice::Superseded LMS push: $GITHUB_SHA"
-            exit 0
-          fi
-          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-lms-trigger.yml/dispatches" -f ref=main -f "inputs[requested_sha]=$GITHUB_SHA"
+          [[ "$latest" =~ ^[a-f0-9]{40}$ ]]
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-lms-trigger.yml/dispatches" -f ref=main -f "inputs[requested_sha]=$latest"
   validate:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04

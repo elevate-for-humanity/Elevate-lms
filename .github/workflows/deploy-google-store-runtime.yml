@@ -27,11 +27,8 @@ jobs:
         run: |
           set -euo pipefail
           latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
-          if test "$latest" != "$GITHUB_SHA"; then
-            echo "::notice::Superseded Store push: $GITHUB_SHA"
-            exit 0
-          fi
-          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-store-runtime.yml/dispatches" -f ref=main -f "inputs[requested_sha]=$GITHUB_SHA"
+          [[ "$latest" =~ ^[a-f0-9]{40}$ ]]
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-store-runtime.yml/dispatches" -f ref=main -f "inputs[requested_sha]=$latest"
   deploy:
     concurrency:
       group: google-production-store

@@ -48,7 +48,7 @@ const PATHWAYS = [
     title: 'Nail Technician Apprenticeship',
     href: '/programs/nail-technician-apprenticeship',
     applyHref: '/apply/student?program=nail-technician-apprenticeship',
-    image: '/images/pexels/nail-tech.webp',
+    image: '/images/pages/barber-gallery-1.webp',
     imageAlt: 'Nail technician apprentice completing supervised salon training',
     badge: 'Beauty Apprenticeship Pathway',
     description: 'Supervised nail-services training covering sanitation, manicuring, client care, service skills, and documented training progress.',

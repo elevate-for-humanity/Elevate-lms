@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const action = text(body.action) ?? 'start';
   const studioRunId = text(body.studioRunId);
+  const fresh = body.fresh === true || /\b(?:new|fresh|from scratch)\b/i.test(text(body.goal) ?? '');
   const studioRunStepId = text(body.studioRunStepId);
 
   let resumedCourseId: string | null = null;
@@ -144,15 +145,35 @@ export async function POST(req: NextRequest) {
     if(error)throw error;
     if(!ownedRun)return NextResponse.json({error:'Studio run is not owned by this operator'},{status:403});
   }
+  if (fresh) {
+    const {data:source,error:sourceError}=await db.from('courses').select('*').eq('id',courseId).single();
+    if(sourceError || !source)throw sourceError ?? new Error('ULTIMATE_SOURCE_COURSE_NOT_FOUND');
+    const {data:newCourse,error:createError}=await db.from('courses').insert({
+      program_id:source.program_id,
+      title:text(body.title) ?? `New ${source.title}`,
+      slug:`${source.slug}-fresh-${crypto.randomUUID().slice(0,8)}`,
+      description:source.description,
+      short_description:source.short_description,
+      status:'draft',is_active:false,
+      metadata:{...(source.metadata ?? {}),source_course_id:source.id,devian_fresh_test:true},
+      compliance_profile_key:source.compliance_profile_key,
+      governing_body:source.governing_body,
+      governing_region:source.governing_region,
+      governing_standard_version:source.governing_standard_version,
+    }).select('id,slug').single();
+    if(createError || !newCourse)throw createError ?? new Error('ULTIMATE_FRESH_COURSE_CREATE_FAILED');
+    courseId=newCourse.id;
+    programSlug=text(source.slug) ?? programSlug;
+  }
   const queued=await new DevStudioUltimateCourseControl(db).queueCourse({
-    courseId,programSlug,actorId:auth.id,goal,
+    courseId,programSlug,actorId:auth.id,goal,fresh,
   });
   if(studioRunId)await recordMasterStudioArtifact(db,{runId:studioRunId,
     stepId:studioRunStepId ?? undefined,type:'ultimate-course-command',name:goal,status:'generated',
-    metadata:{courseId,buildId:queued.build.id,jobId:queued.job.id,status:queued.job.status},
+    metadata:{courseId,buildId:queued.build.id,jobId:queued.job.id,status:queued.job.status,dispatch:queued.dispatch.status},
     evidence:[{source:'ultimate-build-jobs',captured_at:new Date().toISOString()}]});
   return NextResponse.json({ok:true,queued:true,authority:'ultimate-course-builder',
-    courseId,buildId:queued.build.id,jobId:queued.job.id,reused:queued.reused,status:queued.job.status},
+    courseId,buildId:queued.build.id,jobId:queued.job.id,reused:queued.reused,status:queued.job.status,dispatch:queued.dispatch},
     {status:202});
 }
 

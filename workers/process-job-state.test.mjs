@@ -13,7 +13,7 @@ function scenario(payload, completed = true) {
   const q = { select: () => q, eq: () => q, single: async () => ({ data: build, error: null }) };
   const db = { from: () => q };
   class Queue {
-    async claim() { return { id: 'job', build_id: 'build', payload }; }
+    async claim() { return { id: 'job', build_id: 'build', execution_generation: 1, payload }; }
     async heartbeat() { return true; }
     async complete() { events.push('complete'); }
     async fail() { events.push('fail'); }

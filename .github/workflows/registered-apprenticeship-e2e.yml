@@ -18,6 +18,7 @@ on:
     workflows:
       - Deploy repaired Google services
       - Deploy Admin
+      - Repair Google Studio browser runtime
     types:
       - completed
 
@@ -34,7 +35,8 @@ concurrency:
 
 jobs:
   production-authenticated-e2e:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    # Dispatch-only success proves the deployment ran, not just that it was queued.
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch')
     name: Full portal authenticated persistence and responsive design
     runs-on: ubuntu-latest
     environment: production

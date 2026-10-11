@@ -11,13 +11,22 @@ on:
     - cron: '*/15 * * * *'
 permissions:
   contents: read
+  actions: write
   id-token: write
 concurrency:
   group: applicant-outreach
   cancel-in-progress: false
 jobs:
+  scheduled-dispatch:
+    if: github.event_name == 'schedule' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch reply processing through protected main identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/applicant-outreach.yml/dispatches" -f ref=main -f 'inputs[mode]=replies'
   outreach:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 30

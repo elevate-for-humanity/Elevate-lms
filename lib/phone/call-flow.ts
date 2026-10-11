@@ -1,5 +1,6 @@
 /** Pure decisions shared by the signed Telnyx webhook and its regression tests. */
-// Use one clear production voice for menus, names, extensions, and recovery so\n// callers do not hear abrupt voice changes or unclear proper-name pronunciation.\nexport const PHONE_VOICE = 'AWS.Polly.Joanna';
+// Use one clear production voice for menus, names, extensions, and recovery so
+// callers do not hear abrupt voice changes or unclear proper-name pronunciation.\nexport const PHONE_VOICE = 'AWS.Polly.Joanna';
 export const RECOVERY_VOICE = PHONE_VOICE;
 export const MENU_INPUT = {
   minimum_digits: 1,

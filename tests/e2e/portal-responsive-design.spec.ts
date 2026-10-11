@@ -470,12 +470,12 @@ test.describe('Studio single-session access and composer', () => {
         createdSessions.push(response.json().then(body => body.id && body.token && body.publicUrl ? body : null).catch(() => null));
     };
     page.on('response', captureSession);
+    try {
     await access.getByRole('link', { name: 'Enter Envato credentials' }).click();
     // Envato may require its own provider login, but Studio must reuse the Admin session.
     await expect(page).not.toHaveURL(/\/login(?:\?|$)/);
     await expect(page.getByRole('heading', { name: /sign in to elevate/i })).toHaveCount(0);
     const stream = page.getByAltText('Live isolated Chromium browser');
-    try {
     await expect(stream).toBeVisible({ timeout: 30_000 });
     await expect.poll(() => stream.evaluate(el => (el as HTMLImageElement).naturalWidth), { timeout: 30_000 }).toBeGreaterThan(0);
     const initialWidth = await stream.evaluate(el => el.getBoundingClientRect().width);

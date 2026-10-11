@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { getAdminUrl } from '@/lib/config/admin-url';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
+import { getStudioVoiceMode, setStudioVoiceMode } from '@/lib/devstudio/studio-voice-preferences';
 import {
   studioUserFacingError,
   studioUserFacingToolName,
@@ -675,7 +676,10 @@ export default function UnifiedEllieChat({
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const [listening, setListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
-  const [voiceOutputEnabled, setVoiceOutputEnabled] = useState(true);
+  const [voiceOutputEnabled, setVoiceOutputEnabled] = useState(false);
+  useEffect(() => {
+    setVoiceOutputEnabled(getStudioVoiceMode() === 'voice');
+  }, []);
   const [attachment, setAttachment] = useState<{
     id: string;
     name: string;
@@ -1555,6 +1559,7 @@ export default function UnifiedEllieChat({
               onClick={() => {
                 setVoiceOutputEnabled((enabled) => {
                   if (enabled) naturalVoice.stop();
+                  setStudioVoiceMode(enabled ? 'text' : 'voice');
                   return !enabled;
                 });
               }}

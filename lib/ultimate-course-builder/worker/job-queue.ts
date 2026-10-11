@@ -77,6 +77,7 @@ export class UltimateJobQueue {
       .eq('id', jobId)
       .eq('lease_owner', workerId)
       .eq('status', 'running')
+      .gt('lease_expires_at', new Date().toISOString())
       .select('id');
     if (error) throw error;
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
@@ -94,6 +95,7 @@ export class UltimateJobQueue {
       updated_at: new Date().toISOString(),
     }).eq('id', jobId).eq('lease_owner', workerId)
       .eq('status', 'running')
+      .gt('lease_expires_at', new Date().toISOString())
       .select('id');
     if (error) throw error;
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
@@ -113,6 +115,7 @@ export class UltimateJobQueue {
       .eq('id', jobId)
       .eq('lease_owner', workerId)
       .eq('status', 'running')
+      .gt('lease_expires_at', new Date().toISOString())
       .select('id');
     if (error) throw error;
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
@@ -128,6 +131,7 @@ export class UltimateJobQueue {
       updated_at: new Date().toISOString(),
     }).eq('id', jobId).eq('lease_owner', workerId)
       .eq('status', 'running')
+      .gt('lease_expires_at', new Date().toISOString())
       .select('id');
     if (error) throw error;
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
@@ -139,10 +143,12 @@ export class UltimateJobQueue {
       .select('attempts,max_attempts,build_id')
       .eq('id', jobId)
       .eq('lease_owner', workerId)
+      .eq('status', 'running')
+      .gt('lease_expires_at', new Date().toISOString())
       .single();
     if (error) throw error;
     const canRetry = retry && data.attempts < data.max_attempts;
-    const { error: updateError } = await this.db
+    const { data: updated, error: updateError } = await this.db
       .from('ultimate_build_jobs')
       .update({
         status: canRetry ? 'queued' : 'failed',
@@ -157,8 +163,12 @@ export class UltimateJobQueue {
         updated_at: new Date().toISOString(),
       })
       .eq('id', jobId)
-      .eq('lease_owner', workerId);
+      .eq('lease_owner', workerId)
+      .eq('status', 'running')
+      .gt('lease_expires_at', new Date().toISOString())
+      .select('id');
     if (updateError) throw updateError;
+    if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
     // The database transition atomically blocks or requeues the build. A
     // separate update here could overwrite a concurrently arriving media wakeup.
   }

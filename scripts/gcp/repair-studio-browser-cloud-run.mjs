@@ -52,7 +52,7 @@ url=service.status.url;
 async function readHealth(){
   const response=await fetch(url+'/health',{redirect:'manual',signal:AbortSignal.timeout(20000)});
   const type=response.headers.get('content-type')||'';
-  if(!response.ok || !/\\bapplication\\/json\\b/i.test(type)){
+  if(!response.ok || type.split(';')[0].trim().toLowerCase()!=='application/json'){
     throw new Error('Studio health endpoint returned HTTP '+response.status+
       ' with content-type '+(type.split(';')[0]||'missing')+
       '; expected 200 application/json (Admin not switched)');

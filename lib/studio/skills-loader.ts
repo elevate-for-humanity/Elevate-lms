@@ -79,7 +79,6 @@ Use docker commands for operations.`,
 - Managing pods, services, and deployments
 - Debugging Kubernetes issues
 - Helm chart management
-- Northflank Kubernetes operations
 
 Use kubectl for operations when available.`,
     icon: 'layers',

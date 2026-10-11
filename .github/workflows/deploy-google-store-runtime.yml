@@ -2,7 +2,7 @@ name: Deploy Google Store runtime identity
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/deploy-google-store-runtime.yml', 'lib/health/public-runtime-service.ts', 'apps/marketing/middleware.ts', 'Dockerfile.marketing']
+    paths: ['.github/workflows/deploy-google-store-runtime.yml', 'apps/marketing/**', 'components/**', 'lib/**', 'packages/**', 'Dockerfile.marketing', 'next.config.mjs', 'package.json', 'pnpm-lock.yaml', 'scripts/gcp/activate-tested-public-revision.mjs']
   workflow_dispatch:
     inputs:
       requested_sha:
@@ -121,6 +121,14 @@ jobs:
           name: store-revision-${{ github.run_id }}
           path: deployment-diagnostics/marketing-revision.json
           if-no-files-found: warn
+      - name: Verify and activate the exact Store candidate
+        env:
+          CANDIDATE_SERVICE: elevate-store-migration
+          CANDIDATE_REVISION: ${{ steps.deploy.outputs.revision }}
+          IMAGE_SHA: ${{ github.sha }}
+        run: |
+          node --test scripts/test-public-revision-activation.mjs
+          node scripts/gcp/activate-tested-public-revision.mjs
       - name: Verify Store identity, dependencies, storefront and traffic
         timeout-minutes: 5
         run: |

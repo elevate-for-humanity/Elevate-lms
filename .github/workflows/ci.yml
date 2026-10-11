@@ -35,6 +35,10 @@ jobs:
         run: node --test tests/unit/traffic-report.test.mjs
       - name: Google runtime settings regression tests
         run: pnpm exec vitest run tests/unit/google-container-env.test.ts tests/unit/google-deployment-dispatch.test.ts tests/unit/pwa-homepage-hydration.test.tsx tests/unit/pwa-install-prompt-lifecycle.test.ts tests/unit/admin-pwa-navigation-regression.test.ts
+      - name: Google activation and dependency health regression tests
+        run: |
+          node --test scripts/test-public-revision-activation.mjs
+          pnpm exec vitest run tests/unit/google-service-health.test.ts tests/unit/google-health-revision.test.ts tests/unit/google-runtime-configuration.test.ts tests/unit/admin-google-services.test.ts tests/unit/elevate-media-runtime-sync.test.ts tests/unit/platform-hosting.test.ts tests/unit/health-activation.test.ts tests/unit/course-integrity-checks.test.tsx tests/unit/course-builder-health-contract.test.ts
       - name: Block retired Admin UI routes
         run: node scripts/verify-no-retired-admin-ui-routes.mjs
       - name: Recovery hardening regression check

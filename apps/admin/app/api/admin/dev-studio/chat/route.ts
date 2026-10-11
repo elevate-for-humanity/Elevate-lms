@@ -457,7 +457,7 @@ const TOOLS: any[] = [
       description:
         'Queue durable generation through the Ultimate Course Builder 20-stage production pipeline, including instructional depth, media, narration, assessment, QA, repair, and LMS release evidence. ' +
         'Use when the user says "build a course", "create a course", "make a course about", or "generate a course". ' +
-        'Returns a durable Ultimate build/job identity; the Northflank Ultimate worker claims and checkpoints the build.',
+        'Returns a durable Ultimate build/job identity; the Google Cloud Run Ultimate worker claims and checkpoints the build.',
       parameters: {
         type: 'object',
         properties: {

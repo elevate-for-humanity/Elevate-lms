@@ -10,6 +10,7 @@ on:
       - 'Dockerfile.northflank-lms'
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'scripts/gcp/activate-tested-public-revision.mjs'
       - '.github/workflows/deploy-google-lms-trigger.yml'
   workflow_dispatch:
     inputs:

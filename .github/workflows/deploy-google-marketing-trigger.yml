@@ -26,6 +26,7 @@ on:
       - 'next.config.mjs'
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'scripts/gcp/activate-tested-public-revision.mjs'
       - '.github/workflows/deploy-google-marketing-trigger.yml'
       - '.deploy-google-marketing'
   workflow_dispatch:

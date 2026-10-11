@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import {
   getProductionHostingPlatform,
-  NORTHFLANK_SERVICES,
+  GOOGLE_CLOUD_SERVICES,
   PRODUCTION_HOSTING_PLATFORM,
 } from '@/lib/platform/hosting';
 
 describe('platform hosting', () => {
-  it('production platform is northflank', () => {
-    expect(PRODUCTION_HOSTING_PLATFORM).toBe('northflank');
-    expect(getProductionHostingPlatform()).toBe('northflank');
+  it('production platform is google-cloud-run', () => {
+    expect(PRODUCTION_HOSTING_PLATFORM).toBe('google-cloud-run');
+    expect(getProductionHostingPlatform()).toBe('google-cloud-run');
   });
 
-  it('exposes Northflank service ids', () => {
-    expect(NORTHFLANK_SERVICES.lms).toBe('elevate-lms');
-    expect(NORTHFLANK_SERVICES.admin).toBe('elevate-admin');
+  it('exposes Google Cloud Run service ids', () => {
+    expect(GOOGLE_CLOUD_SERVICES.lms).toBe('elevate-lms-migration');
+    expect(GOOGLE_CLOUD_SERVICES.admin).toBe('elevate-admin-migration');
   });
 });

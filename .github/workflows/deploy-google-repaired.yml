@@ -64,7 +64,17 @@ jobs:
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
           # An image release preserves capacity, probes, identities and secret bindings.
           # Cloud Run enforces actual regional quota during revision creation.
-          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --quiet
+          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --no-traffic --quiet
+      - name: Verify and activate the exact candidate before moving public traffic
+        env:
+          COMPONENT: ${{ matrix.component }}
+          IMAGE_SHA: ${{ inputs.image_sha }}
+        run: |
+          set -euo pipefail
+          export CANDIDATE_SERVICE="elevate-$COMPONENT-migration"
+          export CANDIDATE_REVISION="$(gcloud run services describe "$CANDIDATE_SERVICE" --project=elegant-racer-299721 --region=us-central1 --format='value(status.latestCreatedRevisionName)')"
+          node --test scripts/test-public-revision-activation.mjs
+          node scripts/gcp/activate-tested-public-revision.mjs
       - uses: google-github-actions/auth@v3
         id: health_auth
         with:

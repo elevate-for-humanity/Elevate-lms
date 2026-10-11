@@ -4,6 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {stripTypeScriptTypes} from 'node:module';
 const uri=value=>`data:text/javascript;base64,${Buffer.from(value).toString('base64')}`;
 const types=uri(stripTypeScriptTypes(await readFile(new URL('../lib/ultimate-course-builder/core/types.ts',import.meta.url),'utf8')));
+const {ULTIMATE_BUILD_STEPS}=await import(types);
 const source=stripTypeScriptTypes(await readFile(new URL('../lib/ultimate-course-builder/core/lesson-contract.ts',import.meta.url),'utf8')).replace("'./types'",JSON.stringify(types));
 const {stepInputHash,contractHash,artifactPayload,currentEvidence,ULTIMATE_LESSON_CONTRACT_VERSION}=await import(uri(source));
 const profile={id:'course',competencies:[{id:'lesson'}]};
@@ -26,4 +27,9 @@ test('dependent stages invalidate when corrected teaching changes',()=>{
  const first={...prior,learning_objectives:{blueprint:{segments:[{text:'old clipped excerpt'}]}}};
  const corrected={...prior,learning_objectives:{blueprint:{segments:[{text:'complete authored procedure'}]}}};
  assert.notEqual(stepInputHash('instructor_script',profile,first),stepInputHash('instructor_script',profile,corrected));
+});
+test('prior visual assignments are rebuilt after stored-file identity is corrected',()=>{
+ const dependencies=ULTIMATE_BUILD_STEPS.slice(0,ULTIMATE_BUILD_STEPS.indexOf('visual_assignment')).map(step=>[step,contractHash({})]);
+ const old=legacyHash('visual_assignment',dependencies);
+ assert.notEqual(stepInputHash('visual_assignment',profile,{}),old);
 });

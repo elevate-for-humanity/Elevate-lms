@@ -48,14 +48,15 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
   const candidates = assets.filter(
     (a) => a.public_url && a.entitlement_id && a.license_evidence_url,
   );
-  // Distinct ready course-video assets may represent different inspected shots
-  // from the same licensed source item. Treat the actual attached asset as the
-  // assignment identity so valid segments can cover separate scenes. Exact
-  // duplicate bytes remain the same identity when a content hash is available.
+  // Separate records do not establish separate shots. Prefer verified bytes,
+  // then the stored object, then the file URL without its expiring signature.
+  // Truly distinct attached segments retain their own object paths/hashes.
   const identity = (asset: any) =>
     asset.content_sha256
       ? `hash:${asset.content_sha256}`
-      : `asset:${asset.id}`;
+      : asset.storage_path
+        ? `object:${asset.storage_path}`
+        : `url:${String(asset.public_url).split(/[?#]/)[0]}`;
   const choices = scenes.map((scene) => {
     const explicit = configured.find((a) => a.sceneId === scene.id);
     const requirement = String(scene.visualRequirement ?? '')

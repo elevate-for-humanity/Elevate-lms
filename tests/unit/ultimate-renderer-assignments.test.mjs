@@ -9,6 +9,11 @@ const minimum = Number(mediaDirector.match(/export const MIN_LESSON_VIDEO_SCENES
 source = source.replace(/^import .*materializeInstructionalVisualAssets.*;$/m, '');
 source = source.replace(/^import .*MIN_LESSON_VIDEO_SCENES.*;$/m, `const MIN_LESSON_VIDEO_SCENES = ${minimum};`);
 const { prepareUltimateStoryboardInput, requireResolvedVisualEvidence } = await import('data:text/javascript;base64,' + Buffer.from(stripTypeScriptTypes(source, { mode: 'transform' })).toString('base64'));
+const uri = value => 'data:text/javascript;base64,' + Buffer.from(value).toString('base64');
+const licensed = uri(stripTypeScriptTypes((await readFile(new URL('../../lib/media/licensed-course-media.ts', import.meta.url), 'utf8')).replace("import 'server-only';", '')));
+const evidence = uri(stripTypeScriptTypes(await readFile(new URL('../../lib/ultimate-course-builder/instructional/reviewed-scene-evidence.ts', import.meta.url), 'utf8')));
+const assignmentsSource = stripTypeScriptTypes(await readFile(new URL('../../lib/ultimate-course-builder/instructional/scene-assignments.ts', import.meta.url), 'utf8')).replace("'@/lib/media/licensed-course-media'", JSON.stringify(licensed)).replace("'./reviewed-scene-evidence'", JSON.stringify(evidence));
+const { buildSceneAssignments } = await import(uri(assignmentsSource));
 test('saved assignments survive other asset records referencing the same licensed files', () => {
   const scenes = Array.from({ length: minimum }, (_, i) => ({ id: `scene-${i}`, dialogue: `Teach ${i}` }));
   const asset = (i, id) => ({ id, public_url: `https://media.example/shot-${i}.mp4`, mime_type: 'video/mp4', entitlement_id: `license-${i}` });
@@ -24,4 +29,12 @@ test('saved assignments survive other asset records referencing the same license
 });
 test('preserving record IDs does not certify repeated shots as distinct visuals', () => {
   assert.throws(() => requireResolvedVisualEvidence({ scenes: Array.from({ length: minimum }, () => ({ sourceVideoUrl: 'https://media.example/same.mp4' })) }), /DISTINCT_VISUALS_REQUIRED/);
+});
+test('copies of one stored file use the existing instructional producer for remaining scenes', () => {
+  const scenes = Array.from({ length: minimum }, (_, i) => ({ id: `scene-${i}`, visualRequirement: 'A client consultation' }));
+  const assets = scenes.map((_, i) => ({ id: `copy-${i}`, public_url: `https://media.example/file.mp4?token=${i}`, entitlement_id: 'license', license_evidence_url: 'https://media.example/license', visual_coverage_verified: true, visual_requirements: ['A client consultation'] }));
+  const result = buildSceneAssignments(scenes, assets);
+  assert.equal(result.assignments.filter(a => a.assignmentMethod !== 'instructional-render').length, 1);
+  assert.equal(result.assignments.filter(a => a.assignmentMethod === 'instructional-render').length, minimum - 1);
+  assert.deepEqual(result.gaps, []);
 });

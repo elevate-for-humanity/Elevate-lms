@@ -39,6 +39,7 @@ export function stepInputHash(
     // stages are rebuilt from the new teaching artifact by the runner.
     ...(step === 'learning_objectives' ? { instructionalProducer: 'complete-authored-sections-v2' } : {}),
     ...(step === 'instructor_script' ? { scriptProducer: 'stage-aligned-scenes-v1' } : {}),
+    ...(step === 'visual_assignment' ? { visualAssignmentProducer: 'distinct-stored-files-v2' } : {}),
     dependencies: dependencies.map((s) => [s, contractHash(artifactPayload(prior[s] ?? {}))]),
   });
 }

@@ -133,11 +133,7 @@ class CdpBrowser extends EventEmitter {
               'Target.setAutoAttach',
               { autoAttach: true, waitForDebuggerOnStart: true, flatten: true },
               p.sessionId,
-            ); catch (error) {
-              if (error?.code !== -32001) throw error;
-              this.frameSessions.delete(p.sessionId);
-              if (frame.sessionId === p.sessionId) frame.sessionId = undefined;
-            }
+            );
             } catch (error) {
               if (error?.code !== -32001) throw error;
               this.frameSessions.delete(p.sessionId);

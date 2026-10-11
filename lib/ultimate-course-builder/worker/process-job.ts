@@ -97,11 +97,11 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     if (!targeted) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {
-        await queue.yieldProgress(job.id, workerId, continuation.payload);
+        await queue.yieldProgress(job.id, workerId, continuation.payload, generation);
         return { claimed: true, completed: false, continuing: true, jobId: job.id, result };
       }
       if (continuation.unresolved?.length) {
-        // A missing dependency is a blocked prerequisite, not a failed render.\n        // Preserve the cursor and await an explicit dependency wake-up instead\n        // of exhausting attempts or continuously retrying missing media.\n        await queue.waitForDependency(job.id,workerId,`ULTIMATE_DEPENDENCIES_UNRESOLVED:${continuation.unresolved.join(',')}`);
+        // A missing dependency is a blocked prerequisite, not a failed render.\n        // Preserve the cursor and await an explicit dependency wake-up instead\n        // of exhausting attempts or continuously retrying missing media.\n        await queue.waitForDependency(job.id,workerId,`ULTIMATE_DEPENDENCIES_UNRESOLVED:${continuation.unresolved.join(',')}`,generation);
         return {claimed:true,completed:false,jobId:job.id,result};
       }
     }
@@ -113,6 +113,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         job.id,
         workerId,
         `ULTIMATE_REPAIR_REQUIRED:${JSON.stringify(result.findings.map(f => ({step:f.step,code:f.code,message:f.message}))).slice(0,4000)}`,
+        generation,
       );
       return { claimed: true, completed: false, repairQueued: true, jobId: job.id, result };
     }
@@ -141,7 +142,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       });
     }
     assertActive();
-    await queue.complete(job.id, workerId);
+    await queue.complete(job.id, workerId, generation);
     return { claimed: true, completed: true, jobId: job.id, result };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -149,7 +150,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       console.error('[UltimateWorker] lease lost; not changing job state', {jobId: job.id, message});
       return {claimed:true,completed:false,jobId:job.id,error:message};
     }
-    await queue.fail(job.id, workerId, message, true);
+    await queue.fail(job.id, workerId, message, generation, true);
     return { claimed: true, completed: false, jobId: job.id, error: message };
   } finally {
     if (timer) clearInterval(timer);

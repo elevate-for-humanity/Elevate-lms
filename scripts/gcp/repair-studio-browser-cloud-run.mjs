@@ -46,9 +46,37 @@ try {
 command(['run','deploy',name,'--project='+project,'--region='+region,'--image='+image+'@'+digest,'--service-account='+identity,'--port=3100','--cpu=2','--memory=4Gi','--min-instances=1','--max-instances=1','--concurrency=20','--no-cpu-throttling','--timeout=3600','--execution-environment=gen2','--allow-unauthenticated','--set-env-vars=STUDIO_BROWSER_AUTH_STATE_DIR=/var/lib/studio-browser-auth,STUDIO_BROWSER_ADMIN_ORIGIN=https://admin.elevateforhumanity.org','--set-secrets=STUDIO_BROWSER_SECRET='+secretName+':latest','--add-volume=mount-path=/var/lib/studio-browser-auth,type=cloud-storage,bucket='+bucket+',mount-options=uid=1001;gid=1001;file-mode=600;dir-mode=700','--startup-probe=httpGet.path=/health,httpGet.port=3100,initialDelaySeconds=5,periodSeconds=10,timeoutSeconds=5,failureThreshold=24','--quiet']);
 const service=JSON.parse(gc(['run','services','describe',name,'--region='+region]));
 url=service.status.url;
-const health=await fetch(url+'/health',{signal:AbortSignal.timeout(20000)});
-state=await health.json();
-if(!health.ok||state.commit!==sha||!state.ready||!state.providerAuthStorage?.persistent)throw Error('Browser or durable encrypted auth storage not ready; Admin was not switched');
+// The new Cloud Run revision can briefly serve an HTML Google Frontend error
+// during startup. Never parse an unverified response as JSON or switch Admin
+// until the exact deployed revision proves its readiness and persistence.
+async function readHealth(){
+  const response=await fetch(url+'/health',{redirect:'manual',signal:AbortSignal.timeout(20000)});
+  const type=response.headers.get('content-type')||'';
+  if(!response.ok || !/\\bapplication\\/json\\b/i.test(type)){
+    throw new Error('Studio health endpoint returned HTTP '+response.status+
+      ' with content-type '+(type.split(';')[0]||'missing')+
+      '; expected 200 application/json (Admin not switched)');
+  }
+  let body;
+  try{body=await response.json();}
+  catch{throw new Error('Studio health endpoint returned invalid JSON (Admin not switched)');}
+  if(!body||typeof body!=='object')throw new Error('Studio health endpoint returned invalid readiness data');
+  return body;
+}
+let healthError;
+for(let attempt=0;attempt<12;attempt++){
+  try{
+    state=await readHealth();
+    if(state.commit!==sha||!state.ready||!state.providerAuthStorage?.persistent)
+      throw new Error('Browser revision or durable encrypted auth storage not ready');
+    healthError=undefined;
+    break;
+  }catch(error){
+    healthError=error;
+    if(attempt<11)await new Promise(resolve=>setTimeout(resolve,5000));
+  }
+}
+if(healthError)throw healthError;
 const unauthorized=await fetch(url+'/workspace/files',{signal:AbortSignal.timeout(20000)});
 if(unauthorized.status!==401)throw Error('Browser service authorization boundary failed; Admin was not switched');
 const authorized=await fetch(url+'/workspace/files',{headers:{'x-studio-browser-secret':secret},signal:AbortSignal.timeout(20000)});

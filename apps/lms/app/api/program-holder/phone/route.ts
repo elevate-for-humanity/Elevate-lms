@@ -80,7 +80,6 @@ export async function GET() {
       { status: 404 },
     );
   }
-  const [{ data: inbox, error: inboxError }, { data: voicemails, error: voicemailError }, { data: notificationPreferences, error: preferencesError }, { count: liveDevices }] = await Promise.all([
   const [
     { data: inbox, error: inboxError },
     { data: voicemails, error: voicemailError },
@@ -97,7 +96,6 @@ export async function GET() {
       .limit(100),
     ctx.db
       .from('voicemails')
-      .select('id,phone_number,duration_seconds,transcription,summary,is_read,created_at,recording_url')
       .select(
         'id,call_id,phone_number,duration_seconds,is_read,status,transcription,summary,created_at,recording_url',
       )
@@ -126,8 +124,6 @@ export async function GET() {
     warnings.push('Callback history is temporarily unavailable.');
   }
   if (voicemailError) {
-    console.error('[program-holder/phone] voicemail query failed', voicemailError);
-    warnings.push('Voicemail is temporarily unavailable.');
     console.error('[program-holder/phone] voicemail inbox query failed');
     warnings.push('Voicemail history is temporarily unavailable.');
   }

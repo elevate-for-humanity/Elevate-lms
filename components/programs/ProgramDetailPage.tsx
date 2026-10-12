@@ -1350,7 +1350,7 @@ export default function ProgramDetailPage({
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="rounded-xl border border-slate-200 bg-white p-5">
               <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">
-                Named Employer Partners
+                Employer and Host Site Context
               </p>
               <ul className="space-y-2">
                 {employerPartners.length > 0 ? (

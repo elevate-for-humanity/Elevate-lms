@@ -1,0 +1,432 @@
+{
+  "scanned": 941,
+  "damaged": [
+    {
+      "file": "public/images/hero-poster.webp",
+      "error": "cannot identify image file 'public/images/hero-poster.webp'",
+      "referenced_by": [],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/logo-small.png",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/media/verified-image-aliases.mjs",
+        "components/site/logo.tsx"
+      ],
+      "verified_alias": "/images/logo.png",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/icon-72.png",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "components/push-notification-settings.tsx",
+        "lib/media/verified-image-aliases.mjs",
+        "components/NotificationSettings.tsx"
+      ],
+      "verified_alias": "/icon-72.png",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/icon-192.png",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/media/verified-image-aliases.mjs",
+        "components/NotificationSettings.tsx",
+        "components/pwa/PushNotifications.tsx"
+      ],
+      "verified_alias": "/icon-192.png",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/logo.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/utils/url-factory.ts",
+        "lib/media/verified-image-aliases.mjs",
+        "components/ui/Logo.tsx"
+      ],
+      "verified_alias": "/images/logo.png",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/clear-path-main-image.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "components/home/Assurance.tsx",
+        "lib/media/verified-image-aliases.mjs"
+      ],
+      "verified_alias": "/images/pages/workforce-training.webp",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/icon-192x192.png",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/media/verified-image-aliases.mjs",
+        "components/push-notification-settings.tsx"
+      ],
+      "verified_alias": "/icon-192x192.png",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/testimonials-hq/person-4.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "components/home/SuccessStoriesGallery.tsx",
+        "components/TestimonialCarousel.tsx"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/testimonials-hq/person-1.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "components/home/SuccessStoriesGallery.tsx",
+        "components/TestimonialCarousel.tsx"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/testimonials-hq/person-3.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "components/home/SuccessStoriesGallery.tsx",
+        "components/TestimonialCarousel.tsx"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/testimonials-hq/person-2.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "components/home/SuccessStoriesGallery.tsx",
+        "components/TestimonialCarousel.tsx"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/partners/razors-image-storefront.webp",
+      "error": "could not create decoder object",
+      "referenced_by": [
+        "lib/partners/curated-shop-media.ts",
+        "lib/media/verified-image-aliases.mjs"
+      ],
+      "verified_alias": "/images/partners/razors-image-storefront-2026.jpg",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/partners/microsoft-logo.png",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/heroes/workforce-partner-5.webp",
+      "error": "could not create decoder object",
+      "referenced_by": [
+        "lib/media/verified-image-aliases.mjs"
+      ],
+      "verified_alias": "/images/business/team-4.webp",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/pages/programs-{slug}-hero.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/programs/og-images.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/pages/{slug}-hero.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/programs/og-images.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/pages/nail-tech-hero.webp",
+      "error": "could not create decoder object",
+      "referenced_by": [
+        "lib/media/verified-image-aliases.mjs",
+        "lib/programs/og-images.ts"
+      ],
+      "verified_alias": "/images/pages/nail-technician.webp",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/pages/barber-hero-main.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/content/archetypes.ts",
+        "lib/programs/programs.data.ts",
+        "lib/programs/og-images.ts",
+        "lib/media/verified-image-aliases.mjs"
+      ],
+      "verified_alias": "/images/pages/barber-hero-main.webp",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/pages/card-{slug}.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/programs/og-images.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/testimonials/tamika.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "components/home/GraduateTestimonials.tsx"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/testimonials/marcus.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/testimonials/sarah.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "components/home/GraduateTestimonials.tsx"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/testimonials/michael.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "components/home/GraduateTestimonials.tsx"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/testimonials/derek.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "components/home/GraduateTestimonials.tsx"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/testimonials/james.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "components/home/GraduateTestimonials.tsx",
+        "components/home/SuccessStoriesGallery.tsx"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/healthcare/video-thumbnail-dental-assistant.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/program-data.ts",
+        "lib/images/programImages.ts",
+        "lib/media/verified-image-aliases.mjs",
+        "components/store/WebsiteBuilderCommercial.tsx"
+      ],
+      "verified_alias": "/images/pages/healthcare-hero.webp",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/healthcare/healthcare-professional-portrait-2.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/program-data.ts",
+        "lib/media/verified-image-aliases.mjs"
+      ],
+      "verified_alias": "/images/healthcare/hero-program-patient-care.webp",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/healthcare/video-thumbnail-phlebotomy.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/program-data.ts",
+        "lib/video/registry.ts",
+        "lib/media/verified-image-aliases.mjs"
+      ],
+      "verified_alias": "/images/pages/phlebotomy-real.webp",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/healthcare/program-healthcare-overview.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/program-data.ts",
+        "lib/images/programImages.ts",
+        "lib/media/verified-image-aliases.mjs"
+      ],
+      "verified_alias": "/images/pages/healthcare-hero.webp",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/healthcare/program-medical-assistant.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/program-data.ts",
+        "lib/images/programImages.ts",
+        "lib/media/verified-image-aliases.mjs"
+      ],
+      "verified_alias": "/images/pages/medical-assistant-real.webp",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/healthcare/program-cna-training.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/program-data.ts",
+        "lib/media/verified-image-aliases.mjs",
+        "apps/marketing/app/programs/healthcare-training/page.tsx",
+        "apps/marketing/app/programs/healthcare-training/[slug]/page.tsx"
+      ],
+      "verified_alias": "/images/pages/cna-nursing-real.webp",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/healthcare/healthcare-professional-portrait-1.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/program-data.ts",
+        "lib/images/programImages.ts",
+        "lib/media/verified-image-aliases.mjs"
+      ],
+      "verified_alias": "/images/healthcare/hero-program-medical-assistant.webp",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/instructors/darnell-hayes.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/curriculum/blueprints/electrical.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/instructors/james-holloway.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/curriculum/blueprints/cdl-training.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/instructors/lisa-martinez.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/video/remotion-render.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/instructors/diana-torres.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/curriculum/blueprints/medical-assistant.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/instructors/angela-thompson.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/video/remotion-render.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/instructors/business-coach.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/curriculum/blueprints/retail-industry-fundamentals.ts",
+        "lib/curriculum/blueprints/entrepreneurship.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/instructors/marcus-washington.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/curriculum/blueprints/it-help-desk.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/instructors/kevin-marsh.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/curriculum/blueprints/plumbing.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/instructors/marcus-webb.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/curriculum/blueprints/welding.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/instructors/lisa-thompson.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/curriculum/blueprints/cna.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    },
+    {
+      "file": "public/images/trades/hero-program-hvac.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/programs-data.ts",
+        "lib/media/verified-image-aliases.mjs"
+      ],
+      "verified_alias": "/images/pages/hvac-technician.webp",
+      "classification": "existing canonical alias"
+    },
+    {
+      "file": "public/images/team/instructors/instructor-safety.jpg",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "lib/ai-instructors.ts"
+      ],
+      "verified_alias": null,
+      "classification": "legacy file requiring source/photo review"
+    }
+  ],
+  "scope": "941 public raster files decoded locally; external uploads and SVG files are outside this decoder pass. A damaged legacy file is not proof that the live route fails when a canonical alias resolves it."
+}

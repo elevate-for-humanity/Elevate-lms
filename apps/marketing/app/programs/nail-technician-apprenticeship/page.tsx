@@ -35,6 +35,7 @@ export default async function NailTechnicianApprenticeshipPage() {
       ctas={[banner.primaryCta, banner.secondaryCta].filter(Boolean) as any}
       trustIndicators={banner.trustIndicators}
       transcript={banner.transcript}
+      narrateTranscript
     />
   ) : undefined;
 

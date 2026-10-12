@@ -1,3 +1,4 @@
+import { apprenticeshipPaymentError } from '@/lib/programs/apprenticeship-payment-policy';
 export type ApplicationInterviewLocale = 'en' | 'es';
 
 export type ApplicationInterviewField =
@@ -211,7 +212,7 @@ export function getRequiredInterviewFields(
   answers: ApplicationInterviewAnswers,
 ): ApplicationInterviewField[] {
   const fields = [...BASE_REQUIRED];
-  if (requiresWorkOne(answers.fundingSource)) {
+  if (!isApprenticeshipProgram(answers.program) && requiresWorkOne(answers.fundingSource)) {
     fields.push('hasWorkOneReferral');
     if (normalized(answers.hasWorkOneReferral) === 'yes') fields.push('workoneCenter');
   }
@@ -238,7 +239,9 @@ export function calculateApplicationInterviewProgress(state: ApplicationIntervie
   const complete = required.filter((field) => {
     const value = state.answers[field];
     return (
-      Boolean(value?.trim()) && (!CRITICAL_FIELDS.has(field) || state.confirmed.includes(field))
+      Boolean(value?.trim()) &&
+      !(field === 'fundingSource' && apprenticeshipPaymentError(state.answers.program, value)) &&
+      (!CRITICAL_FIELDS.has(field) || state.confirmed.includes(field))
     );
   });
   const missing = required.filter((field) => !complete.includes(field));
@@ -246,7 +249,7 @@ export function calculateApplicationInterviewProgress(state: ApplicationIntervie
   return { percent, required, complete, missing };
 }
 
-function questionOptions(field: ApplicationInterviewField, locale: ApplicationInterviewLocale) {
+function questionOptions(field: ApplicationInterviewField, locale: ApplicationInterviewLocale, answers: ApplicationInterviewAnswers) {
   const es = locale === 'es';
   switch (field) {
     case 'preferredContact':
@@ -256,6 +259,7 @@ function questionOptions(field: ApplicationInterviewField, locale: ApplicationIn
         { value: 'email', label: es ? 'Correo electrónico' : 'Email' },
       ];
     case 'fundingSource':
+      if (isApprenticeshipProgram(answers.program)) return [{ value: 'self_pay', label: es ? 'Pago personal solamente' : 'Self-pay only' }];
       return [
         { value: 'wioa', label: 'WIOA / WorkOne' },
         { value: 'wrg', label: 'Workforce Ready Grant' },
@@ -316,13 +320,14 @@ export function getNextApplicationInterviewQuestion(
   const next = required.find(
     (field) =>
       !state.answers[field]?.trim() ||
+      (field === 'fundingSource' && Boolean(apprenticeshipPaymentError(state.answers.program, state.answers.fundingSource))) ||
       (CRITICAL_FIELDS.has(field) && !state.confirmed.includes(field)),
   );
   if (!next) return null;
 
   const help =
     next === 'fundingSource'
-      ? TEXT[state.locale].fundingHelp
+      ? isApprenticeshipProgram(state.answers.program) ? state.locale === 'es' ? 'La matrícula del aprendizaje se paga por cuenta propia. Revise el precio y las condiciones de pago antes de inscribirse.' : 'Apprenticeship tuition is self-pay only. Review the published tuition and payment terms before enrollment.' : TEXT[state.locale].fundingHelp
       : next === 'transferHours'
         ? TEXT[state.locale].transferHelp
         : next === 'applicationCertification'
@@ -335,7 +340,7 @@ export function getNextApplicationInterviewQuestion(
     help,
     required: true,
     critical: CRITICAL_FIELDS.has(next),
-    options: questionOptions(next, state.locale),
+    options: questionOptions(next, state.locale, state.answers),
   };
 }
 
@@ -347,6 +352,7 @@ export function applyInterviewAnswer(
 ): ApplicationInterviewState {
   const value = rawValue.trim();
   if (!value) return state;
+  if (field === 'fundingSource' && apprenticeshipPaymentError(state.answers.program, value)) return { ...state, answers: { ...state.answers, fundingSource: '' }, confirmed: state.confirmed.filter((item) => item !== 'fundingSource'), pendingConfirmation: null, lastQuestionField: field };
 
   if (field === 'applicationCertification' && normalized(value) !== 'yes') {
     return {
@@ -420,7 +426,7 @@ export function interviewStateToApplicationPayload(state: ApplicationInterviewSt
   const a = state.answers;
   const transferHours = claimedTransferHours(a.transferHours);
   const apprenticeship = isApprenticeshipProgram(a.program);
-  const workOne = requiresWorkOne(a.fundingSource);
+  const workOne = !apprenticeship && requiresWorkOne(a.fundingSource);
   const hasWorkOneReferral = normalized(a.hasWorkOneReferral);
   const needsWorkOneAppointment = workOne && hasWorkOneReferral === 'no';
   return {
@@ -438,8 +444,8 @@ export function interviewStateToApplicationPayload(state: ApplicationInterviewSt
     program: a.program,
     programSlug: a.program,
     goals: a.goals,
-    fundingType: a.fundingSource,
-    funding: a.fundingSource,
+    fundingType: apprenticeship ? 'self_pay' : a.fundingSource,
+    funding: apprenticeship ? 'self_pay' : a.fundingSource,
     fundingEligibilityStatus: needsWorkOneAppointment ? 'needs_appointment' : undefined,
     hasWorkOneReferral: workOne ? a.hasWorkOneReferral : undefined,
     workoneCenter: workOne ? a.workoneCenter : undefined,

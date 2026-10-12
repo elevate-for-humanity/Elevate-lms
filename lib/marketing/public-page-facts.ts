@@ -1,3 +1,4 @@
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 export type PublicPageFact = { question: string; answer: string; href: string; link: string };
 export type PublicPageFacts = { title: string; imageProgram?: string; facts: PublicPageFact[] };
 
@@ -10,8 +11,10 @@ const apprenticeshipFacts: PublicPageFact[] = [
 
 export function getPublicPageFacts(pathname: string): PublicPageFacts {
   const programSlug = pathname.match(/^\/programs\/([^/]+)/)?.[1];
-  if (/apprenticeship/.test(pathname) || ['/programs/esthetician', '/programs/nail-technician'].includes(pathname)) {
-    return { title: 'Apprenticeship facts before you apply', imageProgram: programSlug || 'barber-apprenticeship', facts: apprenticeshipFacts };
+  if (/apprenticeship/.test(pathname)) {
+    const contract = programSlug ? getRegisteredProgramStandard(programSlug) : null;
+    const facts = contract ? [...apprenticeshipFacts.slice(0, 3), { question: 'What are the completion requirements for this occupation?', answer: `${contract.standard.occupationTitle} requires ${contract.completion.competencyCount} verified occupational competencies and ${contract.completion.requiredRtiHours} hours of related technical instruction, with supervised Host Shop practice. Work hours are training evidence, not a fixed graduation denominator. Apprenticeship completion and Indiana licensing requirements are separate steps.`, href: `/programs/${programSlug}`, link: 'Review the complete occupation requirements' }] : apprenticeshipFacts;
+    return { title: 'Apprenticeship facts before you apply', imageProgram: programSlug || 'barber-apprenticeship', facts };
   }
   if (/host-shop|barber-beauty-network/.test(pathname)) return {
     title: 'Host Shop and network questions', imageProgram: 'barber-apprenticeship', facts: [

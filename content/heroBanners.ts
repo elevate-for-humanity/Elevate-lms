@@ -250,7 +250,7 @@ function normalizeBanner(
       ...normalized,
       microLabel: 'DOL Registered Apprenticeship',
       belowHeroHeadline: 'Indiana Barber registered-apprenticeship pathway.',
-      belowHeroSubheadline: `Complete the approved competency-based registered-apprenticeship standard, including ${barber.relatedInstructionHours} verified Related Technical Instruction hours. Indiana licensing requirements and approval are controlled separately by the applicable state authority.`,
+      belowHeroSubheadline: `Complete the approved competency-based registered-apprenticeship standard, including ${barber.competencyCount} verified occupational competencies and ${barber.relatedInstructionHours} verified Related Technical Instruction hours. Indiana licensing requirements and approval are controlled separately by the applicable state authority.`,
       primaryCta: { label: 'Enroll Now', href: '/programs/barber-apprenticeship/apply' },
       secondaryCta: { label: 'Request Information', href: '/programs/barber-apprenticeship/request-info', variant: 'secondary' },
       // Keep the audited JSON transcript as the single content authority. This

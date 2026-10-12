@@ -1,3 +1,4 @@
+import { apprenticeshipPaymentError, isSelfPayApprenticeship } from '@/lib/programs/apprenticeship-payment-policy';
 // PUBLIC ROUTE: public program application submission
 
 // app/api/applications/route.ts
@@ -175,25 +176,11 @@ async function _POST(req: Request) {
 
     const normalizedProgram = String(body.program || '').trim().toLowerCase();
     const normalizedFunding = String(body.fundingType || '').trim().toLowerCase();
-    const isApprenticeshipApplication = normalizedProgram.includes('apprenticeship');
-    const isNonSelfPayApprenticeship =
-      isApprenticeshipApplication &&
-      normalizedFunding !== '' &&
-      !normalizedFunding.startsWith('self_pay') &&
-      !normalizedFunding.startsWith('self-pay');
-
-    if (
-      isNonSelfPayApprenticeship &&
-      body.apprenticeshipFundingApprovalAcknowledged !== true
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            'Apprenticeship funding is not currently available. Choose self-pay unless you already have written approval or Elevate specifically told you funding is available.',
-        },
-        { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) },
-      );
+    const paymentError = apprenticeshipPaymentError(normalizedProgram, normalizedFunding);
+    if (paymentError) {
+      return NextResponse.json({ error: paymentError }, { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) });
     }
+    if (isSelfPayApprenticeship(normalizedProgram) && normalizedFunding) body.fundingType = 'self_pay';
 
     const rawModalityPreference = body.modalityPreference ?? body.modality_preference;
     const modalityPreference = normalizeApplicationModalityPreference(rawModalityPreference);

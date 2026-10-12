@@ -22,7 +22,9 @@ for(const [index,frame] of [150,360,600].entries()) {
   for(const scale of [1,0.2]) {
     const path=`${output}/step-${index}-${scale===1?'desktop':'mobile'}.png`;
     await renderStill({serveUrl,composition,inputProps,browserExecutable,frame,scale,output:path});
-    const decoded=execFileSync('tesseract',[path,'stdout','--psm','11'],{encoding:'utf8'}).toLowerCase();
+    const teachingPath=path.replace('.png','-teaching.png');
+    execFileSync('ffmpeg',['-hide_banner','-loglevel','error','-y','-i',path,'-vf','crop=iw:ih*0.7:0:0',teachingPath]);
+    const decoded=execFileSync('tesseract',[teachingPath,'stdout','--psm','11'],{encoding:'utf8'}).toLowerCase();
     const expected=(steps[index].label+' '+steps[index].value).toLowerCase().match(/[a-z]+/g);
     const found=new Set(decoded.match(/[a-z]+/g));
     const coverage=expected.filter(word=>found.has(word)).length/expected.length;

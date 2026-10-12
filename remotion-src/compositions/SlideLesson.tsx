@@ -507,7 +507,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
   return (
     <AbsoluteFill
       style={{
-        background: instructionalLayout
+        background: instructionalLayout || (scene.imageIsInstructional && bright)
           ? 'linear-gradient(120deg, #eef2f7 0%, #dbeafe 45%, #f8fafc 100%)'
           : props.backgroundColor,
         backgroundSize: instructionalLayout ? '200% 200%' : undefined,
@@ -619,7 +619,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
           top: footageTitle ? FOOTAGE_TITLE_BOX.top + FOOTAGE_TITLE_BOX.height + FOOTAGE_TITLE_BOX.contentGap : 80,
           left: 60,
           right: instructionalLayout || scene.teachingVisual ? 60 : '50%',
-          bottom: 100,
+          bottom: scene.strictBlueprint && scene.teachingVisual ? 300 : 100,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',

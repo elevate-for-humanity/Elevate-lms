@@ -24,4 +24,13 @@ describe('shop portfolio curation', () => {
     expect(gallery[1].alt).toContain('finished');
     expect(gallery[0].url).not.toBe(gallery[1].url);
   });
+  it('normalizes owned image imports for optimization and keeps one slide per asset', () => {
+    const items = curateShopGallery('shop', [
+      { url: 'https://www.elevateforhumanity.org/images/partners/sample.webp' },
+      { url: '/images/partners/sample.webp' },
+      { url: 'https://elevateforhumanity.org/images/partners/sample.webp?version=2' },
+    ]);
+    expect(items).toEqual([{ url: '/images/partners/sample.webp' }]);
+  });
+
 });

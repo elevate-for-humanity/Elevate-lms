@@ -88,7 +88,7 @@ export default function KountryKutzTourSlideshow() {
             <button
               type="button"
               onClick={() => select(active - 1)}
-              className="absolute left-3 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-black/70 text-white"
+              className="absolute left-3 top-1/2 grid h-12 w-12 -translate-y-1/2 p-0 place-items-center rounded-full bg-black/70 text-white"
               aria-label="Previous Kountry Kutz photo"
             >
               <ChevronLeft className="h-6 w-6" aria-hidden="true" />
@@ -96,7 +96,7 @@ export default function KountryKutzTourSlideshow() {
             <button
               type="button"
               onClick={() => select(active + 1)}
-              className="absolute right-3 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-black/70 text-white"
+              className="absolute right-3 top-1/2 grid h-12 w-12 -translate-y-1/2 p-0 place-items-center rounded-full bg-black/70 text-white"
               aria-label="Next Kountry Kutz photo"
             >
               <ChevronRight className="h-6 w-6" aria-hidden="true" />
@@ -112,19 +112,24 @@ export default function KountryKutzTourSlideshow() {
                     key={slide.src}
                     type="button"
                     onClick={() => select(index)}
-                    className={`h-3 rounded-full transition-all ${
-                      index === active ? 'w-9 bg-red-500' : 'w-3 bg-slate-500'
-                    }`}
+                    className="flex h-11 w-11 items-center justify-center rounded-full p-0"
                     aria-label={`Show photo ${index + 1}: ${slide.label}`}
                     aria-current={index === active ? 'true' : undefined}
-                  />
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`h-3 rounded-full transition-all ${index === active ? 'w-6 bg-red-500' : 'w-3 bg-slate-500'}`}
+                    />
+                  </button>
                 ))}
               </div>
               <button
                 type="button"
                 onClick={() => setPaused((value) => !value)}
                 className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/30 px-4 py-2 text-sm font-black"
-                aria-label={paused ? 'Resume Kountry Kutz slideshow' : 'Pause Kountry Kutz slideshow'}
+                aria-label={
+                  paused ? 'Resume Kountry Kutz slideshow' : 'Pause Kountry Kutz slideshow'
+                }
                 aria-pressed={paused}
               >
                 {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}

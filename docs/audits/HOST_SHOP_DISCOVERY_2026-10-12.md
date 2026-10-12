@@ -1,11 +1,11 @@
 # Host Shop discovery, image loading, and student clarity
 
 ## Changes
-- Photos, business names, and profile buttons open the same individual shop destination across network and program directories.
+- Business names and profile buttons open the same individual shop destination across network and program directories. Card photos have independent slideshow controls.
 - The Barber & Beauty Network contains the actual searchable shop directory, contact/booking/directions links, free host recruitment, business benefits, and conditional paid apprenticeship messaging.
 - Consolidates historical records sharing a public shop slug, retaining their approved occupations.
 - Keeps a loaded gallery image visible while the requested image loads. Preloads gallery photos, prioritizes the first photo, and retains usable images when another photo fails.
-- Optimizes Paola Petit Studio's externally published images as local WebP assets. Identical source images share one asset; source attribution is preserved. No generated images represent real shops.
+- Optimizes Paola Petit Studio's externally published images as local WebP assets. Identical source images share one asset; source attribution is preserved. Published shop photographs are preserved. The B-52s interior crop is AI-enhanced from its published portfolio and explicitly labeled in the slideshow.
 - Smaller shop galleries (480px maximum width, 320px maximum image height), more compact showcases, two-column mobile shop cards, and smaller FAQ illustrations.
 - Shows free inquiry, enrollment application, and confirmed enrollment as distinct stages. Payment and application submission alone do not confirm enrollment or placement.
 - Explains self-pay tuition, published totals/deposits/supplies, pay-in-full, program plans when offered, and third-party BNPL approval and repayment.

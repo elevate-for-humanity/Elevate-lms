@@ -6,6 +6,7 @@ User requirements: free setup accounts; no subscription requirement or negotiati
 |---|---|---|---|---|
 | CJdropshipping | Hair clippers, beauty tools, makeup brushes and grooming kits | Official basic service pages state no registration/monthly fee; product/shipping and optional services remain payable | Dropshipping service; stock, delivery to Indiana, kit completeness and professional suitability must be checked per SKU | Free-account candidate for individual tools; complete professional student kit not verified |
 | ProStylingTools | Professional barber/beauty tools, hair care, skincare and supplies | Official wholesale page explicitly states free account, no enrollment/annual fee, no buying minimum | FAQ's "Drop Ship" label means manufacturer-to-buyer shipping; it does not by itself prove an Elevate reseller fulfillment agreement | Free wholesale candidate; reseller-direct fulfillment and feed access unverified |
+| Nutrívamos Pro | Professional skincare and retail gift sets for esthetics | Official wholesale page states no membership fees or minimum order; license/business verification required | FAQ permits supplier dropshipping on select items, an approved professional website, and supplier pricing rules | Additional free-account candidate for skincare; complete student kit, website approval and integration not verified |
 | FragranceX | Aftershave, body care, cologne and fragrance | Official dropship page states no hidden fees/minimums to register | Official service offers unbranded direct-to-customer shipments after account approval | Supplementary supply candidate, not a student-kit supplier |
 | Printful | Branded apparel/accessories | Official free plan has no setup/monthly fee | Print-on-demand fulfillment | Optional uniforms; not a student-kit supplier |
 | Beauty Kit Solutions | Ready-made barber, cosmetology, esthetics and manicure kits | Wholesale application requires first order over $400, resale certificate and owner ID | Blind dropshipping not established by public documentation | Does not satisfy the no-upfront-purchase path; do not sign up or buy |
@@ -29,6 +30,8 @@ User requirements: free setup accounts; no subscription requirement or negotiati
 - https://www.burmax.com/catalog/student-kits
 - https://mybeautysite.com/pages/pricing
 - https://greendropship.com/membership-account/membership-levels/
+
+Additional verified official sources: https://www.nutrivamospro.com/new-wholesale and https://www.nutrivamospro.com/faq. The FAQ restricts approved sales channels and minimum resale pricing; a free wholesale account does not remove those conditions.
 
 ## Import and fulfillment release requirements
 

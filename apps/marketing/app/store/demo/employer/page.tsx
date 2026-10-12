@@ -2,14 +2,11 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { DEMO_CANDIDATES as candidates } from '@/lib/store/demo-preview-data';
 import { ArrowLeft, Briefcase, MessageCircle, Search, Users } from 'lucide-react';
 import { TalkingDemoGuide } from '@/components/store/TalkingDemoGuide';
 
-const candidates = [
-  { name: 'Marcus Sample', program: 'Barber Apprenticeship', skills: ['Fades', 'Customer Service'] },
-  { name: 'Sarah Sample', program: 'HVAC Technician', skills: ['EPA 608', 'Diagnostics'] },
-  { name: 'David Sample', program: 'Medical Assistant', skills: ['Patient Care', 'CPR'] },
-];
+
 
 const demoSteps = [
   {
@@ -63,7 +60,7 @@ export default function EmployerDemoPage() {
       {notice && <div className="fixed right-4 top-24 z-50 rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-xl">{notice}</div>}
 
       <div className="mx-auto max-w-7xl px-4 py-8">
-        <TalkingDemoGuide productName="Elevate Employer Portal" steps={demoSteps} onStepChange={syncGuide} activeIndex={["dashboard", "jobs", "candidates", "messages"].indexOf(tab)} />
+        <TalkingDemoGuide compact productName="Elevate Employer Portal" steps={demoSteps} onStepChange={syncGuide} activeIndex={["dashboard", "jobs", "candidates", "messages"].indexOf(tab)} />
 
         <nav className="mb-6 mt-6 flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-white p-2">
           {[

@@ -72,3 +72,21 @@ Supplier signup and kit fulfillment remain blocked. The repository contained res
 ## Deployed hero data parity
 
 Post-deployment inspection found that the Docker image explicitly copies apps/marketing/public/data/hero-banners.json over the canonical public/data copy. Updating only the canonical file left the live nail hero on old text even though the new FAQ was correct. Both tracked JSON files now match. A unit regression checks parsed parity, and the existing hero-banner audit checks byte parity. The final hero correction must be verified after this data-parity release.
+
+## Compact store demos and media follow-up
+
+- Repair 40891a091b093d8c7de65d94eb3ea7c6e62b9a15 was verified live in Google Marketing revision elevate-marketing-migration-r40891a09-38303127074-1, with 100% traffic and matching /api/version.
+- Move generic heading, link and button defaults into Tailwind’s base layer so explicit component sizes and CTA colors apply consistently. Remove the mobile rule that added 40px above and below every main section.
+- Store role cards and demo landing previews use the same clearly labeled public sample records as the existing demos. Illustrative repository photos frame the landing pages; previews are rendered UI, not claimed product screenshots.
+- Collapse the demo advisor until requested, load it lazily, disable its automatic voice greeting, and retain compact opt-in step narration. No customer, enrollment, order or payment records are changed.
+- Normalize first-party gallery URLs to local paths before deduplication, allowing responsive image optimization and avoiding duplicate absolute/path entries. Slideshow controls retain 44px tap targets without oversized default button padding.
+- B-52s has a second portfolio slide: an AI-enhanced crop of its published interior, with visible disclosure. It does not claim to be an unedited new shop photo.
+- Supplier research is documented separately. Supplier accounts and student-kit fulfillment are not activated.
+- This follow-up requires its own production release and browser verification.
+- Final follow-up checks: 72 tests passed across 18 files; Marketing TypeScript and changed-code ESLint passed. CSS layer behavior is checked with PostCSS; the full Marketing production build passed, including static generation.
+
+### Browser audit findings retained for follow-up
+
+- Live cosmetology page: five approved salons are listed and linked, including J Noelle Collective. Salon Saloon opens its own profile and displays a shop-specific written tour and service links.
+- Shared program pages still label a curriculum/RTI subtotal as total training hours and retain inconsistent application/payment promises. Those items require a further content correction; they are not declared complete by this visual release.
+- Physical-phone visual review and supplier account activation remain unverified.

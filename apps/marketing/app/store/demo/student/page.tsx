@@ -2,14 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { DEMO_COURSES as courses } from '@/lib/store/demo-preview-data';
 import { ArrowLeft, Award, BookOpen, CheckCircle, Clock, Play } from 'lucide-react';
 import { TalkingDemoGuide } from '@/components/store/TalkingDemoGuide';
 import { getBrowserPublicStorageUrl } from '@/lib/supabase/public-config';
 
-const courses = [
-  { id: 'barber', title: 'Barber Fundamentals', progress: 65, duration: '15 weeks' },
-  { id: 'hvac', title: 'HVAC Technician', progress: 30, duration: '12 weeks' },
-];
+
 
 const demoSteps = [
   {
@@ -71,7 +69,7 @@ export default function StudentDemoPage() {
       {notice && <div className="fixed right-4 top-24 z-50 rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-xl">{notice}</div>}
 
       <div className="mx-auto max-w-6xl px-4 py-8">
-        <TalkingDemoGuide productName="Elevate Student Portal" steps={demoSteps} onStepChange={guideStep} activeIndex={guideIndex} />
+        <TalkingDemoGuide compact productName="Elevate Student Portal" steps={demoSteps} onStepChange={guideStep} activeIndex={guideIndex} />
 
         <section className="mb-8 mt-6 rounded-2xl border border-slate-200 bg-white p-7">
           <div className="flex items-center gap-4"><div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 font-black text-blue-700">JD</div><div><h2 className="text-2xl font-black">Demo Learner</h2><p className="text-slate-500">Interactive sample account</p></div></div>

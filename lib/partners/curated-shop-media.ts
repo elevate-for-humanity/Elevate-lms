@@ -11,7 +11,15 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
   const seen = new Set<string>();
   return items.flatMap((original) => {
     const localUrl = LOCAL_SHOP_MEDIA[original.url];
-    const item = localUrl ? { ...original, url: localUrl, source: original.source || original.url } : original;
+    let item = localUrl ? { ...original, url: localUrl, source: original.source || original.url } : original;
+    // First-party imports must use the local image optimizer too. Normalize them
+    // before deduplication so an absolute URL and its repository path form one slide.
+    try {
+      const parsed = new URL(item.url, 'https://www.elevateforhumanity.org');
+      if (parsed.hostname === 'www.elevateforhumanity.org' || parsed.hostname === 'elevateforhumanity.org') {
+        item = { ...item, url: parsed.pathname + parsed.search };
+      }
+    } catch { return []; }
     if (item.url === '/images/partners/salon-saloon/team-interior.webp') return [{ ...item, url: '/images/partners/salon-saloon/team-interior-enhanced-2026.webp' }];
     if (kountry) {
       const filename = item.url.split('/').at(-1)?.split('?')[0];

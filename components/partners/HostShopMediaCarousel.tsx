@@ -125,7 +125,7 @@ export default function HostShopMediaCarousel({
                 aria-hidden={item.url !== active.url}
                 className="absolute inset-0 h-full w-full object-contain transition-opacity duration-300"
                 style={{ opacity: item.url === active.url && !failedUrls.has(item.url) ? 1 : 0 }}
-                loading={compact ? "lazy" : "eager"}
+                loading={compact ? 'lazy' : 'eager'}
                 decoding="async"
                 fetchPriority={compact ? 'auto' : itemIndex === 0 ? 'high' : 'low'}
                 onLoad={() => {
@@ -143,6 +143,11 @@ export default function HostShopMediaCarousel({
             ) : null}
           </>
         )}
+        {active.alt?.startsWith('AI-enhanced') ? (
+          <span className="absolute bottom-2 left-2 right-2 rounded bg-slate-950/85 px-2 py-1 text-center text-xs font-bold text-white">
+            AI-enhanced from shop portfolio
+          </span>
+        ) : null}
         {active.type === 'video' ? (
           <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1.5 text-xs font-black text-white">
             <span className="inline-flex items-center gap-1.5">
@@ -153,18 +158,28 @@ export default function HostShopMediaCarousel({
       </div>
       {compact && media.length > 1 ? (
         <div className="grid grid-cols-3 border-t border-slate-200 text-xs font-bold">
-          <button type="button" onClick={previous} aria-label="Previous image" className="min-h-11">
+          <button
+            type="button"
+            onClick={previous}
+            aria-label="Previous image"
+            className="min-h-11 p-0 text-xs"
+          >
             ‹
           </button>
           <button
             type="button"
             onClick={() => setPlaying((current) => !current)}
             aria-label={playing ? 'Pause slideshow' : 'Play slideshow'}
-            className="min-h-11"
+            className="min-h-11 p-0 text-xs"
           >
             {playing ? 'Pause' : 'Play'} · {displayIndex + 1}/{media.length}
           </button>
-          <button type="button" onClick={next} aria-label="Next image" className="min-h-11">
+          <button
+            type="button"
+            onClick={next}
+            aria-label="Next image"
+            className="min-h-11 p-0 text-xs"
+          >
             ›
           </button>
         </div>
@@ -174,7 +189,7 @@ export default function HostShopMediaCarousel({
             type="button"
             onClick={previous}
             aria-label="Previous image"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-900 ring-1 ring-slate-300 hover:bg-slate-200"
+            className="flex h-11 w-11 shrink-0 p-0 items-center justify-center rounded-full bg-slate-100 text-slate-900 ring-1 ring-slate-300 hover:bg-slate-200"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -185,7 +200,7 @@ export default function HostShopMediaCarousel({
             type="button"
             onClick={next}
             aria-label="Next image"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-900 ring-1 ring-slate-300 hover:bg-slate-200"
+            className="flex h-11 w-11 shrink-0 p-0 items-center justify-center rounded-full bg-slate-100 text-slate-900 ring-1 ring-slate-300 hover:bg-slate-200"
           >
             <ChevronRight className="h-5 w-5" />
           </button>
@@ -222,7 +237,7 @@ export default function HostShopMediaCarousel({
             <button
               type="button"
               onClick={() => setPlaying((current) => !current)}
-              className="min-h-11 font-bold text-slate-900"
+              className="min-h-11 p-0 text-sm font-bold text-slate-900"
               aria-label={playing ? 'Pause slideshow' : 'Play slideshow'}
             >
               {playing ? 'Pause slideshow' : 'Play slideshow'}

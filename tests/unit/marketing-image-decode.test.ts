@@ -23,6 +23,14 @@ const damagedPublicImages = [
 ];
 
 describe('public image delivery', () => {
+  it('decodes the enhanced shop interior used by the slideshow', async () => {
+    const { data, info } = await sharp('public/images/partners/b-52s/interior-derived-2026.png')
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    expect(data.byteLength).toBeGreaterThan(0);
+    expect(info.width).toBeGreaterThan(640);
+    expect(info.height).toBeGreaterThan(480);
+  });
   it.each(damagedPublicImages)('provides real decodable pixels for %s', async (url) => {
     const destination = VERIFIED_IMAGE_ALIASES[url];
     expect(destination).toBeTruthy();

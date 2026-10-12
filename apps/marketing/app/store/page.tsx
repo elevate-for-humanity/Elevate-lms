@@ -12,6 +12,7 @@ import { StoreGlossary } from '@/components/store/StoreGlossary';
 import WebsiteBuilderCommercial from '@/components/store/WebsiteBuilderCommercial';
 import { StandaloneBuildPackages } from '@/components/store/StandaloneBuildPackages';
 import Image from 'next/image';
+import StoreDemoPreview from '@/components/store/StoreDemoPreview';
 import StoreDemoVideo from './StoreDemoVideo';
 
 export const metadata: Metadata = {
@@ -61,8 +62,8 @@ export default function StorePage() {
             </div>
             <p className="mt-4 text-sm font-semibold text-slate-600">14 days · no card required · source-backed proof and limits available before checkout</p>
           </div>
-          <div className="relative aspect-[4/3] min-w-0 overflow-hidden rounded-2xl bg-slate-950 shadow-xl ring-1 ring-slate-200 sm:rounded-3xl sm:shadow-2xl">
-            <Image src="/images/pages/store-digital-detail1.webp" alt="Business analytics displayed on a tablet" fill priority sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover" />
+          <div className="relative aspect-[16/10] min-w-0 overflow-hidden rounded-2xl bg-slate-950 shadow-xl ring-1 ring-slate-200 sm:rounded-3xl sm:shadow-2xl">
+            <Image src="/images/business-training-vibrant-2026.webp" alt="Illustrative business team working together with Elevate-style workflows" fill priority sizes="(min-width: 1024px) 55vw, 100vw" className="object-contain" />
             <div className="absolute inset-x-0 bottom-0 z-20 bg-slate-950/80 p-4 text-sm font-bold text-white backdrop-blur-sm">Website, CRM, LMS, workforce, apprenticeship, testing, and compliance—one connected workspace.</div>
           </div>
         </div>
@@ -154,14 +155,14 @@ export default function StorePage() {
               unless explicitly labeled as an interactive sandbox.
             </p>
           </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
             {ROLE_DEMOS.map((demo) => (
               <Link
                 key={demo.href}
                 href={demo.href}
-                className="rounded-2xl border border-slate-300 bg-white p-5 shadow-sm hover:border-brand-red-300 hover:shadow-md"
+                className="rounded-2xl border border-slate-300 bg-white p-3 shadow-sm hover:border-brand-red-300 hover:shadow-md"
               >
-                <PlayCircle className="h-6 w-6 text-brand-red-700" />
+                <StoreDemoPreview compact role={demo.label === "Student" ? "learner" : demo.label === "Institutional" ? "workforce" : demo.label.toLowerCase()} />
                 <h3 className="mt-3 text-lg font-black">{demo.label} Demo</h3>
                 <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
                   {demo.description}

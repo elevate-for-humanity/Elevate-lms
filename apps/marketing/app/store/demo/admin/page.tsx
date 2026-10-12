@@ -2,14 +2,11 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { DEMO_STUDENTS as students } from '@/lib/store/demo-preview-data';
 import { ArrowLeft, BarChart3, BookOpen, FileText, Search, Users } from 'lucide-react';
 import { TalkingDemoGuide } from '@/components/store/TalkingDemoGuide';
 
-const students = [
-  { name: 'Jordan Sample', program: 'Barber Apprenticeship', status: 'Active', progress: 65 },
-  { name: 'Maria Sample', program: 'HVAC Technician', status: 'Active', progress: 42 },
-  { name: 'Alex Sample', program: 'Medical Assistant', status: 'Review', progress: 18 },
-];
+
 
 const demoSteps = [
   {
@@ -68,7 +65,7 @@ export default function AdminDemoPage() {
           </div>
           <div className="flex gap-2">
             <Link href="/store/plans" className="hidden rounded-lg border border-white/20 px-4 py-2 text-sm font-bold hover:bg-white/10 sm:block">View Plans</Link>
-            <Link href="/store/trial" className="rounded-lg bg-brand-red-600 px-4 py-2 text-sm font-bold hover:bg-brand-red-700">Start Trial</Link>
+            <Link href="/store/trial" className="rounded-lg bg-brand-red-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-red-700">Start Trial</Link>
           </div>
         </div>
       </header>
@@ -76,7 +73,7 @@ export default function AdminDemoPage() {
       {notice && <div className="fixed right-4 top-24 z-50 rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-xl">{notice}</div>}
 
       <div className="mx-auto max-w-7xl px-4 py-8">
-        <TalkingDemoGuide productName="Elevate Admin Platform" steps={demoSteps} onStepChange={syncGuideToTab} activeIndex={["overview", "students", "courses", "compliance"].indexOf(tab)} />
+        <TalkingDemoGuide compact productName="Elevate Admin Platform" steps={demoSteps} onStepChange={syncGuideToTab} activeIndex={["overview", "students", "courses", "compliance"].indexOf(tab)} />
 
         <nav className="mb-6 mt-6 flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-white p-2">
           {[

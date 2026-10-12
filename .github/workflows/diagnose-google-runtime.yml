@@ -1,12 +1,24 @@
 name: Diagnose Google runtime and capacity
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/diagnose-google-runtime.yml']
   workflow_dispatch:
 permissions:
+  actions: write
   contents: read
   id-token: write
 jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Dispatch trusted read-only Google diagnostics
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/diagnose-google-runtime.yml/dispatches" -f ref=main
   diagnose:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     strategy:
@@ -80,6 +92,23 @@ jobs:
           report({component, expectedSupabase:env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/,'') === 'https://cuxzzpsyufcewtmicszk.supabase.co',
             anonPresent:Boolean(env.NEXT_PUBLIC_SUPABASE_ANON_KEY), serviceRolePresent:Boolean(env.SUPABASE_SERVICE_ROLE_KEY)});
           if (component === 'marketing') {
+            try {
+              const billing = JSON.parse(gcloud(['billing','projects','describe',project,'--format=json']));
+              report({billingEnabled:billing.billingEnabled,billingAccountLinked:Boolean(billing.billingAccountName)});
+            } catch { report({billingRead:'unavailable'}); }
+            for (const [label,args] of [
+              ['services',['run','services','list','--region=us-central1','--format=json']],
+              ['executions',['run','jobs','executions','list','--region=us-central1','--format=json']]
+            ]) {
+              try {
+                const items=JSON.parse(gcloud(args));
+                report({capacityInventory:label,items:items.map(x=>({name:x.metadata?.name,
+                  resources:x.spec?.template?.spec?.containers?.[0]?.resources,
+                  scaling:x.spec?.template?.metadata?.annotations,
+                  conditions:x.status?.conditions,
+                  runningCount:x.status?.runningCount,completionTime:x.status?.completionTime}))});
+              } catch {report({capacityInventory:label,read:'unavailable'});}
+            }
             const access = gcloud(['auth','print-access-token']);
             let pageToken = '';
             do {

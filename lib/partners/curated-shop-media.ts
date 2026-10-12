@@ -5,6 +5,8 @@ export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[]
   const razor = slug.startsWith('razors-image');
   const seen = new Set<string>();
   return items.flatMap((item) => {
+    if (item.url === '/images/partners/razors-image-storefront.webp') return [{ ...item, url: '/images/partners/razors-image-storefront-2026.jpg' }];
+    if (item.url === '/images/partners/salon-saloon/team-interior.webp') return [{ ...item, url: '/images/partners/salon-saloon/team-interior-enhanced-2026.webp' }];
     if (kountry) {
       const filename = item.url.split('/').at(-1)?.split('?')[0];
       if (filename === 'interior-empty.webp' || filename === 'kountry-kutz-interior.webp') return [{ ...item, url: '/images/partners/kountry-kutz/interior-empty-enhanced-2026.webp' }];

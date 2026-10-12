@@ -1,10 +1,11 @@
 import Image from 'next/image';
+import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
+import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
+import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
+import type { FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-partners';
 import Link from 'next/link';
 import { ExternalLink, MapPin, Navigation, Phone } from 'lucide-react';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
-import {
-  FEATURED_BEAUTY_HOST_PARTNERS,
-} from '@/lib/apprenticeship-programs/host-partners';
 
 
 function programLabel(program: string) {
@@ -22,27 +23,34 @@ function phoneHref(phone: string) {
   return `tel:${phone.replace(/[^0-9+]/g, '')}`;
 }
 
-export default function FeaturedHostPartners({
+export default async function FeaturedHostPartners({
   programSlug,
   showDirectory = true,
 }: {
   programSlug?: string;
   showDirectory?: boolean;
 }) {
-  // Program enrollment is the source of truth. Some verified partners operate
-  // combined salon/barber businesses, so businessType must not hide a host that
-  // is explicitly approved for this pathway.
-  const matchingShops = programSlug
-    ? FEATURED_BEAUTY_HOST_PARTNERS.filter((shop) => shop.programs.includes(programSlug))
-    : FEATURED_BEAUTY_HOST_PARTNERS;
-  const shops =
-    programSlug === 'barber-apprenticeship'
-      ? [...matchingShops].sort((left, right) => {
-          if (left.slug === 'razors-image-barbershop') return -1;
-          if (right.slug === 'razors-image-barbershop') return 1;
-          return 0;
-        })
-      : matchingShops;
+  // Every public pathway uses the same live directory and exact occupation filter.
+  const network = await getHostShopNetwork();
+  const shops: FeaturedHostPartner[] = network
+    .filter((shop) => !programSlug || matchesHostShopProgram(shop, programSlug))
+    .map((shop) => ({
+      slug: shop.slug,
+      name: shop.name,
+      city: shop.city,
+      state: shop.state,
+      zip: '',
+      address: shop.address,
+      programs: programSlug ? [programSlug] : shop.programs,
+      phone: shop.phone,
+      marketingBlurb: shop.description,
+      websiteUrl: shop.website,
+      bookingUrl: shop.booking,
+      socialUrl: shop.social,
+      media: (programSlug === 'nail-technician-apprenticeship'
+        ? [...(shop.gallery ?? [])].sort((a, b) => Number(/nail/i.test(b.url)) - Number(/nail/i.test(a.url)))
+        : shop.gallery ?? []).map((item) => ({ src: item.url, alt: item.alt || `${shop.name} portfolio`, kind: 'photo' as const })),
+    }));
 
   // Show every verified barber host in one directory, including Kountry Kutz.
   // The prior exclusion made the featured shop disappear from the network list.
@@ -50,20 +58,17 @@ export default function FeaturedHostPartners({
 
   if (!shops.length) {
     const pathway = programLabel(programSlug ?? 'beauty-apprenticeship');
-    const image =
-      programSlug === 'esthetician-apprenticeship'
-        ? '/images/pexels/esthetician.webp'
-        : '/images/pages/nail-tech-hero.webp';
+    const image = getProgramHeroImage(programSlug ?? 'cosmetology-apprenticeship');
     return (
       <section
         id="host-shops"
         className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
       >
         <div className="grid lg:grid-cols-2 lg:items-stretch">
-          <div className="relative min-h-[280px] bg-slate-100 lg:min-h-[420px]">
+          <div className="relative aspect-[4/3] bg-slate-100 lg:self-center">
             <Image
               src={image}
-              alt={`${pathway} supervised workplace training`}
+              alt={getProgramImageAlt(programSlug ?? 'cosmetology-apprenticeship')}
               fill
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -74,12 +79,12 @@ export default function FeaturedHostPartners({
               {pathway} Host Shops
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-              Placement is matched and verified before training begins.
+              We're looking for new Host Shops.
             </h2>
             <p className="mt-4 leading-7 text-slate-700">
-              No public Host Shop is currently assigned to this pathway. Elevate confirms occupation
-              approval, supervisor qualifications, location, and available placement before
-              presenting a shop to an applicant.
+              Licensed {pathway.toLowerCase()} businesses: help the next generation build real skills.
+              Apply free to become a Host Shop and showcase your business in the Elevate network.
+              Apprentice placement and supervision are confirmed before training begins.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
@@ -89,7 +94,7 @@ export default function FeaturedHostPartners({
                 Apply for this pathway
               </Link>
               <Link
-                href="/partners/host-shops"
+                href="/host-shop/apply"
                 className="inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-brand-blue-700 px-5 py-2.5 text-sm font-extrabold text-brand-blue-900 hover:bg-sky-50"
               >
                 Become a Host Shop
@@ -138,21 +143,8 @@ export default function FeaturedHostPartners({
             <div className="mt-6 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {directoryShops.map((shop) => {
                 const stillMedia = shop.media?.filter((media) => media.kind !== 'video') ?? [];
-                const image =
-                  shop.slug === 'razors-image-barbershop'
-                    ? {
-                        src: '/images/partners/razors-image-logo.jpg',
-                        alt: "Razor's Image Barbershop official logo",
-                        kind: 'photo' as const,
-                      }
-                    : shop.slug === 'generations-hair-llc'
-                        ? {
-                            src: '/images/partners/generations-hair/premium-curls.jpg',
-                            alt: 'Highlighted dimensional curls created by Generations Hair LLC',
-                            kind: 'photo' as const,
-                          }
-                        : (stillMedia[1] ?? stillMedia[0]);
-                const fullAddress = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
+                const image = stillMedia[0];
+                const fullAddress = shop.address;
                 return (
                   <article
                     key={shop.slug}
@@ -160,7 +152,7 @@ export default function FeaturedHostPartners({
                   >
                     {image ? (
                       <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-slate-950">
-                        <Image src={image.src} alt={image.alt} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-contain" />
+                        <Image src={image.src} alt={image.alt} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
                       </div>
                     ) : null}
 

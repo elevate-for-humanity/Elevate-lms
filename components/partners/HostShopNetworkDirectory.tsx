@@ -2,30 +2,22 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import { MapPin, Search, ShieldCheck } from 'lucide-react';
-import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
-import { PROGRAM_LABELS } from '@/lib/programs/host-shops';
+import { PROGRAM_LABELS, matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
 
 type Props = { shops: HostShopNetworkEntry[] };
-
-function representativeShopImage(shop: HostShopNetworkEntry) {
-  return shop.programs.includes('barber-apprenticeship')
-    ? '/images/pages/barber-shop-interior.webp'
-    : '/images/beauty/program-beauty-training.webp';
-}
 
 export default function HostShopNetworkDirectory({ shops }: Props) {
   const [query, setQuery] = useState('');
   const [program, setProgram] = useState('all');
-  const programs = useMemo(
-    () => [...new Set(shops.flatMap((shop) => shop.programs))].sort(),
-    [shops],
-  );
+  const programs = Object.keys(PROGRAM_LABELS);
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return shops.filter((shop) => {
-      const matchesProgram = program === 'all' || shop.programs.includes(program);
+      const matchesProgram = program === 'all' || matchesHostShopProgram(shop, program);
       const haystack =
         `${shop.name} ${shop.city} ${shop.state} ${shop.address} ${shop.programs.map((slug) => PROGRAM_LABELS[slug] ?? slug).join(' ')}`.toLowerCase();
       return matchesProgram && (!needle || haystack.includes(needle));
@@ -74,7 +66,11 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
               className="group flex h-full min-h-0 flex-col overflow-visible rounded-2xl border border-white/15 bg-white text-slate-950 shadow-xl"
             >
               {                <div className="relative overflow-hidden rounded-t-2xl bg-slate-950">
-                  <HostShopMediaCarousel shopName={shop.name} compact videoUrl={shop.videoUrl} items={shop.gallery?.length ? shop.gallery : [{ url: shop.image ?? representativeShopImage(shop), alt: shop.image ? `${shop.name} portfolio` : 'Representative training environment' }]} />
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
+                    <Image src={shop.gallery?.[0]?.url || shop.image || getProgramHeroImage(shop.primaryProgram ?? shop.programs[0] ?? 'cosmetology-apprenticeship')}
+                      alt={shop.gallery?.[0]?.alt || (shop.image ? `${shop.name} portfolio` : getProgramImageAlt(shop.primaryProgram ?? shop.programs[0] ?? 'cosmetology-apprenticeship'))}
+                      fill sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw" loading="lazy" className="object-cover" />
+                  </div>
                   <span
                     className={`pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black shadow ${shop.approval === 'approved' ? 'bg-emerald-100 text-emerald-950' : 'bg-blue-100 text-blue-950'}`}
                   >
@@ -109,7 +105,7 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
                 {shop.website ? <a href={shop.website} target="_blank" rel="noopener noreferrer" className="mt-4 text-sm font-bold text-red-700">Visit shop website ↗</a> : null}
                 <Link
                   href={`/host-shops/${shop.slug}`}
-                  className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 pt-2.5 text-sm font-black text-white hover:bg-red-700"
+                  className="mt-auto inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white hover:bg-red-700"
                 >
                   View shop profile
                 </Link>
@@ -118,8 +114,12 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
             ))}
         </div>
       ) : (
-        <div className="mt-5 rounded-2xl border border-white/15 bg-white/5 p-8 text-center text-slate-200">
-          No network shops match this search. Clear the filters or apply to add a new location.
+        <div className="mt-5 grid overflow-hidden rounded-2xl border border-white/15 bg-white text-slate-950 sm:grid-cols-2">
+          <div className="relative aspect-[4/3] overflow-hidden bg-slate-100"><Image src={getProgramHeroImage(program === 'all' ? 'cosmetology-apprenticeship' : program)} alt={getProgramImageAlt(program === 'all' ? 'cosmetology-apprenticeship' : program)} fill sizes="(min-width: 640px) 50vw, 100vw" loading="lazy" className="object-cover" /></div>
+          <div className="flex flex-col justify-center p-6"><h3 className="text-2xl font-black">{query ? 'No shops match this search.' : "We're looking for new Host Shops."}</h3><p className="mt-3 text-sm leading-6 text-slate-600">Join the network, showcase your business, and help future professionals build skills through supervised training.</p>
+            <Link href="/host-shop/apply" className="mt-5 inline-flex min-h-12 items-center justify-center rounded-xl bg-red-700 px-5 py-3 font-bold text-white">Apply free to become a Host Shop</Link>
+            <button type="button" onClick={() => { setQuery(''); setProgram('all'); }} className="mt-3 min-h-11 font-bold text-blue-800">Show all Host Shops</button>
+          </div>
         </div>
       )}
     </div>

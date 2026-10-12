@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
@@ -29,8 +30,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
-const BARBER_HERO_IMAGE =
-  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/barber-hero-new.webp';
+const BARBER_HERO_IMAGE = getProgramHeroImage('barber-apprenticeship');
 const BARBER_RTI_HOURS = 260;
 const KOUNTRY_KUTZ_HERO_TRANSCRIPT =
   'Welcome to Kountry Kutz Barbershop in New Palestine, Indiana. As the video moves through the shop, notice the professional stations, working barbershop environment, and approved Host Shop where eligible apprentices may build supervised barbering skills.';
@@ -399,6 +399,10 @@ export default async function BarberApprenticeshipPage() {
       <BeautyApprenticeshipAuthority program={program} />
 
       <section className="border-t border-sky-200 bg-white px-4 py-14 text-slate-950">
+        <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-2">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
+            <Image src={getProgramHeroImage('barber-apprenticeship')} alt={getProgramImageAlt('barber-apprenticeship')} fill sizes="(min-width: 1024px) 50vw, 100vw" loading="lazy" className="object-cover" />
+          </div>
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-black sm:text-4xl">
             Ready to start the barber apprenticeship?
@@ -421,6 +425,7 @@ export default async function BarberApprenticeshipPage() {
               Host a Barber Apprentice
             </Link>
           </div>
+        </div>
         </div>
       </section>
     </main>

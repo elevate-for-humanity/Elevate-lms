@@ -243,7 +243,9 @@ export function useNaturalVoice() {
   const resume = useCallback(async () => {
     if (audioRef.current && audioRef.current.paused) {
       const audio = audioRef.current;
+      const position = audio.currentTime;
       stopAllNaturalVoicePlayback();
+      audio.currentTime = position;
       audioRef.current = audio;
       document.querySelectorAll<HTMLMediaElement>('audio, video').forEach((media) => {
         if (!media.paused && !media.muted && media.volume > 0) media.pause();

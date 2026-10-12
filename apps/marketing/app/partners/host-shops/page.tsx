@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
+import { PROGRAM_LABELS, matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
+import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import HostShopNetworkDirectory from '@/components/partners/HostShopNetworkDirectory';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
@@ -85,9 +88,9 @@ export default async function HostShopsPage() {
         mediaSequence={[
           { shopSlug: 'salon-saloon', media: { src: '/videos/partners/salon-saloon-tour.mp4', alt: 'Walk-through tour of participating apprenticeship Host Shop Salon Saloon', kind: 'video', backdropSrc: '/images/partners/salon-saloon/team-sign.webp' } },
           { shopSlug: 'salon-saloon', media: { src: '/images/partners/salon-saloon/team-sign.webp', alt: 'Salon Saloon team at an Elevate participating Host Salon', kind: 'photo' } },
-          { shopSlug: 'kountry-kutz-barbershop', media: { src: '/images/partners/kountry-kutz/interior-active.webp', alt: 'Barbers and clients inside approved Indiana apprenticeship Host Shop Kountry Kutz', kind: 'photo' } },
+          { shopSlug: 'kountry-kutz-barbershop', media: { src: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp', alt: 'Barbers and clients inside approved Indiana apprenticeship Host Shop Kountry Kutz', kind: 'photo' } },
           { shopSlug: 'kountry-kutz-barbershop', media: { src: '/videos/partners/kountry-kutz-tour.mp4', alt: 'Video introduction and tour of Kountry Kutz apprenticeship host barbershop', kind: 'video', backdropSrc: '/images/partners/kountry-kutz-official.webp' } },
-          { shopSlug: 'generations-hair-llc', media: { src: '/images/partners/generations-hair/stylist-at-work.webp', alt: 'Licensed salon professional working with a guest at an Indiana apprenticeship Host Shop', kind: 'photo' } },
+          { shopSlug: 'generations-hair-llc', media: { src: '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp', alt: 'Licensed salon professional working with a guest at an Indiana apprenticeship Host Shop', kind: 'photo' } },
           { shopSlug: 'generations-hair-llc', media: { src: '/images/partners/generations-hair/salon-service.webp', alt: 'Professional salon service inside an Indiana apprenticeship Host Shop', kind: 'photo' } },
         ]}
         tourScripts={{
@@ -97,6 +100,26 @@ export default async function HostShopsPage() {
         }}
         narration="Welcome to Salon Saloon in South Bend, Indiana, a participating Elevate Cosmetology Apprenticeship Host Salon. This page shows licensed salons, spas, nail studios, esthetics businesses, and barbershops how to become a Host Shop at no cost. Salon Saloon demonstrates how an approved workplace can employ and supervise apprentices while they build real skills in client service, sanitation, hair care, styling, safety, and professional salon routines. Elevate supports related instruction, attendance, hour and competency records, progress tracking, and apprenticeship compliance. The Host Shop employs, pays, and supervises the apprentice and keeps its normal service revenue. Continue down the page to review requirements, possible WorkOne wage reimbursement, required documents, and the free Host Shop application."
       />
+
+      <section className="bg-white px-4 py-10 sm:py-14" aria-labelledby="host-trades-heading">
+        <div className="mx-auto max-w-6xl">
+          <h2 id="host-trades-heading" className="text-3xl font-black">Barbering. Cosmetology. Nails. Esthetics.</h2>
+          <p className="mt-3 max-w-3xl leading-7 text-slate-700">Discover your training community or help the next generation grow. We're looking for new Host Shops in every pathway.</p>
+          <div className="mt-6 grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {Object.entries(PROGRAM_LABELS).map(([slug, label]) => {
+              const count = networkShops.filter((shop) => matchesHostShopProgram(shop, slug)).length;
+              return <article key={slug} className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100"><Image src={getProgramHeroImage(slug)} alt={getProgramImageAlt(slug)} fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" loading="lazy" className="object-cover" /></div>
+                <div className="flex flex-1 flex-col p-4"><h3 className="text-lg font-black">{label.replace(' Apprenticeship', '')}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{count ? `${count} participating ${count === 1 ? 'location' : 'locations'}. Explore the shops and start your journey.` : "We're looking for new Host Shops. Bring your licensed business into the network."}</p>
+                  <Link href={`/programs/${slug}`} className="mt-4 inline-flex min-h-11 items-center font-bold text-red-700">Explore this pathway →</Link>
+                  <Link href="/host-shop/apply" className="mt-auto inline-flex min-h-11 items-center font-bold text-blue-800">Become a Host Shop →</Link>
+                </div>
+              </article>;
+            })}
+          </div>
+        </div>
+      </section>
 
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-14">
         <div className="mx-auto max-w-6xl">
@@ -231,11 +254,11 @@ export default async function HostShopsPage() {
       </section>
 
       <section className="border-y border-brand-red-200 bg-brand-red-50 px-4 py-14 text-center text-slate-950">
-        <div className="mx-auto max-w-4xl">
+        <div className="mx-auto grid max-w-6xl items-center gap-8 md:grid-cols-2"><div className="relative aspect-[4/3] overflow-hidden rounded-2xl"><Image src="/images/pages/barber-hands-on-bright.webp" alt="Barber training and mentorship" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" /></div><div>
           <h2 className="text-3xl font-black">Want your business in the Host Site network?</h2>
           <p className="mx-auto mt-4 max-w-2xl leading-7 text-slate-700">Submit one application. Elevate verifies the worksite, supervisor, licenses, insurance, and program fit before a location is published or assigned apprentices.</p>
           <Link href={HOST_SITE_APPLY_HREF} className="mt-7 inline-flex rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white">Start Host Site Application</Link>
-        </div>
+        </div></div>
       </section>
     </main>
   );

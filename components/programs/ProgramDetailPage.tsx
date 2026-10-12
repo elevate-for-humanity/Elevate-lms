@@ -1418,7 +1418,11 @@ export default function ProgramDetailPage({
 
       {/* CTA */}
       <section className="py-16 bg-slate-900">
-        <div className="max-w-3xl mx-auto px-4 text-center">
+        <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 lg:grid-cols-2">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-800">
+            <Image src={heroPosterSrc} alt={heroAlt} fill sizes="(min-width: 1024px) 50vw, 100vw" loading="lazy" className="object-cover" />
+          </div>
+        <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
             Ready to Start Your {p.title} Career?
           </h2>
@@ -1478,6 +1482,7 @@ export default function ProgramDetailPage({
           >
             Questions? Talk to an Advisor
           </Link>
+        </div>
         </div>
       </section>
 

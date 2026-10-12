@@ -62,11 +62,11 @@ export default function HostShopMediaCarousel({
 
   return (
     <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg sm:rounded-3xl">
-      <div className={`relative flex w-full items-center justify-center bg-slate-950 aspect-[4/3]`}>
+      <div className={`relative flex w-full items-center justify-center overflow-hidden bg-slate-950 aspect-[4/3]`}>
         {active.type === 'video' ? (
           <video key={active.url} src={active.url} controls playsInline preload="metadata" onPlay={() => setVideoPlaying(true)} onPause={() => setVideoPlaying(false)} onEnded={() => setVideoPlaying(false)} onError={() => setVideoPlaying(false)} className="host-shop-media-enter mx-auto h-auto w-auto max-h-[240px] object-scale-down bg-black sm:max-h-[320px]" style={{ maxWidth: 'min(100%, 480px)' }} aria-label={active.alt || `${shopName} video`} />
         ) : (
-          <img key={active.url} src={active.url} alt={active.alt || `${shopName} promotional image`} className="host-shop-media-enter h-full w-full object-contain" loading="lazy" decoding="async" />
+          <img key={active.url} src={active.url} alt={active.alt || `${shopName} promotional image`} className="host-shop-media-enter absolute inset-0 h-full w-full object-contain" loading="lazy" decoding="async" />
         )}
         {active.type === 'video' ? <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1.5 text-xs font-black text-white"><span className="inline-flex items-center gap-1.5"><PlayCircle className="h-4 w-4" /> Video</span></div> : null}
       </div>

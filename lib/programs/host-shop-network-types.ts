@@ -7,6 +7,7 @@ export type HostShopNetworkEntry = {
   address: string;
   phone?: string;
   programs: string[];
+  primaryProgram?: string;
   description: string;
   image?: string;
   videoUrl?: string;

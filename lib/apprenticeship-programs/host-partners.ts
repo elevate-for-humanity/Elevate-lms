@@ -19,6 +19,7 @@ export type FeaturedHostPartner = {
   zip: string;
   address: string;
   programs: string[];
+  primaryProgram?: string;
   note?: string;
   marketingBlurb?: string;
   media?: FeaturedHostPartnerMedia[];
@@ -35,6 +36,22 @@ export type FeaturedHostPartner = {
 };
 
 export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
+  {
+    slug: 'prestige-elevation-barber-and-beauty-institute',
+    name: 'Prestige Elevation Barber and Beauty Institute LLC',
+    businessType: 'BarberShop',
+    city: 'Indianapolis',
+    state: 'IN',
+    zip: '46220',
+    address: '6331 N Keystone Ave, Suite D',
+    programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
+    primaryProgram: 'barber-apprenticeship',
+    marketingBlurb: 'An Indianapolis barber and beauty business offering haircuts, beard grooming, styling and client care. Explore the shop portfolio and contact Elevate about supervised apprenticeship placement.',
+    media: [{ src: '/images/partners/prestige-elevation/official-portfolio-2026.jpg', alt: 'Haircut portfolio published by Prestige Elevation Barber and Beauty Institute', kind: 'photo' }],
+    websiteUrl: 'https://booksy.com/en-us/1766191_prestige-elevation-barber-and-beauty-institute_barber-shop_19577_indianapolis',
+    websiteLabel: 'Explore services and book with Prestige Elevation',
+    bookingUrl: 'https://booksy.com/en-us/1766191_prestige-elevation-barber-and-beauty-institute_barber-shop_19577_indianapolis',
+  },
   {
     slug: 'kountry-kutz-barbershop',
     name: 'Kountry Kutz Barbershop',

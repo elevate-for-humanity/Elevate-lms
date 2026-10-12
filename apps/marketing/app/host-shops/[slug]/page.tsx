@@ -1,3 +1,4 @@
+import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -109,7 +110,24 @@ export default async function HostShopProfilePage({ params }: PageProps) {
     const featured = getFeaturedHostPartnerBySlug(slug);
     if (!featured && approved) return <ApprovedHostShopProfile shop={approved} />;
     if (!featured) return notFound();
-    return <FeaturedHostShopProfile shop={featured} />;
+    const currentMedia = approved?.mediaGallery?.length
+      ? curateShopGallery(featured.slug, [...approved.mediaGallery, ...(featured.media ?? []).filter((media) => media.kind !== 'video').map((media) => ({ url: media.src, alt: media.alt }))])
+      : null;
+    const shop: FeaturedHostPartner = approved ? {
+      ...featured,
+      programs: approved.programs,
+      address: approved.address || featured.address,
+      city: approved.city || featured.city,
+      state: approved.state || featured.state,
+      zip: approved.zip || featured.zip,
+      phone: approved.phone || featured.phone,
+      websiteUrl: approved.website || featured.websiteUrl,
+      media: currentMedia ? [
+        ...currentMedia.map((media) => ({ src: media.url, alt: media.alt || `${featured.name} portfolio`, kind: 'photo' as const })),
+        ...(featured.media ?? []).filter((media) => media.kind === 'video'),
+      ] : featured.media,
+    } : featured;
+    return <FeaturedHostShopProfile shop={shop} />;
   }
 
   const address = [approved.address, approved.city, approved.state, approved.zip].filter(Boolean).join(', ');
@@ -158,7 +176,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
         data-narration-rate={videoScript ? '0.82' : undefined}
         data-narration-style={videoScript ? 'instructor' : undefined}
       >
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-12 lg:py-16">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-12 lg:py-12">
           <div className="min-w-0">
             <p className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-800"><ShieldCheck className="h-4 w-4" /> Approved Elevate apprenticeship Host Site</p>
             <h1 className="mt-4 break-words text-4xl font-black tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">{approved.name}</h1>
@@ -205,7 +223,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
 
       <section className="border-y border-slate-200 bg-slate-50 px-4 py-10 text-center sm:px-6 sm:py-12">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-3xl font-black">Train at {approved.name}</h2>
+          <div className="relative mx-auto mb-6 aspect-[4/3] max-w-lg overflow-hidden rounded-2xl"><Image src={items[0]?.url || getProgramHeroImage(approved.primaryProgram ?? programs[0])} alt={items[0]?.alt || "Representative training illustration"} fill sizes="(min-width: 768px) 512px, 100vw" className="object-cover" /></div><h2 className="text-3xl font-black">Train at {approved.name}</h2>
           <p className="mx-auto mt-4 max-w-3xl leading-7 text-slate-700">Apply through Elevate and identify this approved Host Site. Admissions and apprenticeship staff confirm the correct occupation and current placement availability.</p>
           <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
             {programs.map((program) => <Link key={program} href={applyHref(program, approved.name, approved.id)} className="rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white">Apply — {programLabel(program)}</Link>)}
@@ -218,6 +236,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
 }
 
 function ApprovedHostShopProfile({ shop }: { shop: HostShop }) {
+  const illustrationProgram = shop.primaryProgram ?? shop.programs[0] ?? 'barber-apprenticeship';
   const address = [shop.address, shop.city, shop.state, shop.zip].filter(Boolean).join(', ');
   const canonical = `${SITE_URL}/host-shops/${shop.publicSlug}`;
   const mapUrl = address ? directionsUrl(address) : undefined;
@@ -247,6 +266,7 @@ function ApprovedHostShopProfile({ shop }: { shop: HostShop }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <section data-scroll-narration data-narration={`Welcome to ${shop.name}. ${shop.description} Explore the approved training location and apply through Elevate to ask about current placement availability.`} className="border-b border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-blue-950 px-4 py-16 text-white sm:px-6 sm:py-24">
         <div className="mx-auto max-w-6xl">
+          <figure className="mb-7"><div className="relative h-[clamp(260px,42svh,480px)] overflow-hidden rounded-2xl"><Image src={getProgramHeroImage(illustrationProgram)} alt={getProgramImageAlt(illustrationProgram)} fill sizes="100vw" className="object-cover" priority /></div><figcaption className="mt-2 text-xs text-slate-300">Training illustration. Shop portfolio photos are being added.</figcaption></figure>
           <p className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-emerald-950"><ShieldCheck className="h-4 w-4" /> Approved Elevate Host Site</p>
           <h1 className="mt-5 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">{shop.name}</h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-200">{shop.description}</p>
@@ -268,7 +288,7 @@ function ApprovedHostShopProfile({ shop }: { shop: HostShop }) {
         </div>
       </section>
       <section className="border-y border-slate-200 bg-slate-50 px-4 py-12 text-center sm:px-6">
-        <div className="mx-auto max-w-4xl"><h2 className="text-3xl font-black">Explore opportunities with {shop.name}</h2><p className="mx-auto mt-4 max-w-2xl leading-7 text-slate-700">Apply through Elevate and select this Host Site. Staff will confirm the program and current placement availability.</p><div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">{shop.programs.map((program) => <Link key={program} href={applyHref(program, shop.name, shop.id)} className="rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white">Apply — {programLabel(program)}</Link>)}<Link href="/partners/host-shops" className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-black">View network</Link></div></div>
+        <div className="mx-auto max-w-4xl"><div className="relative mx-auto mb-6 aspect-[4/3] max-w-lg overflow-hidden rounded-2xl"><Image src={getProgramHeroImage(illustrationProgram)} alt={getProgramImageAlt(illustrationProgram)} fill sizes="(min-width: 768px) 512px, 100vw" className="object-cover" /></div><h2 className="text-3xl font-black">Explore opportunities with {shop.name}</h2><p className="mx-auto mt-4 max-w-2xl leading-7 text-slate-700">Apply through Elevate and select this Host Site. Staff will confirm the program and current placement availability.</p><div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">{shop.programs.map((program) => <Link key={program} href={applyHref(program, shop.name, shop.id)} className="rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white">Apply — {programLabel(program)}</Link>)}<Link href="/partners/host-shops" className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-black">View network</Link></div></div>
       </section>
     </main>
   );
@@ -349,7 +369,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
       ) : null}
 
       <section className="border-b border-slate-200 bg-slate-50" data-scroll-narration data-narration={videoUrl ? undefined : videoScript}>
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-12 lg:py-16">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-12 lg:py-12">
           <div className="min-w-0">
             <p className="inline-flex rounded-full bg-brand-blue-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-brand-blue-800">Elevate apprenticeship Host Shop partner</p>
             <h2 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-4xl">{videoUrl ? 'Explore the shop portfolio' : `Meet ${shop.dba ?? shop.name}`}</h2>
@@ -385,7 +405,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
 
       <section className="border-y border-slate-200 bg-slate-50 px-4 py-10 text-center sm:px-6 sm:py-12">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-3xl font-black">Interested in training with {shop.dba ?? shop.name}?</h2>
+          <div className="relative mx-auto mb-6 aspect-[4/3] max-w-lg overflow-hidden rounded-2xl"><Image src={shop.media?.find((media) => media.kind !== "video")?.src || getProgramHeroImage(shop.programs[0])} alt={`${shop.dba ?? shop.name} training pathway`} fill sizes="(min-width: 768px) 512px, 100vw" className="object-cover" /></div><h2 className="text-3xl font-black">Interested in training with {shop.dba ?? shop.name}?</h2>
           <p className="mx-auto mt-4 max-w-3xl leading-7 text-slate-700">Apply through Elevate and identify this Host Shop. Admissions staff will confirm the correct occupation and current placement availability.</p>
           <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
             {shop.programs.map((program) => <Link key={program} href={`/programs/${program}/apply?hostShop=${encodeURIComponent(shop.dba ?? shop.name)}`} className="rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white">Apply — {programLabel(program)}</Link>)}

@@ -82,6 +82,12 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
       sameBusiness(shop, candidate),
     );
     if (featured) matchedFeatured.add(featured.slug);
+    const gallery = curateShopGallery(featured?.slug ?? shop.publicSlug ?? '', [
+      ...(shop.mediaGallery ?? []),
+      ...(featured?.media?.filter((item) => item.kind !== 'video').map((item) => ({ url: item.src, alt: item.alt })) ?? []),
+      ...(shop.logoUrl ? [{ url: shop.logoUrl, alt: `${shop.name} official business image` }] : []),
+      ...(shop.flyerUrl ? [{ url: shop.flyerUrl, alt: `${shop.name} official announcement` }] : []),
+    ]);
     return {
       id: shop.id,
       slug: featured?.slug ?? shop.publicSlug!,
@@ -90,15 +96,16 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
       state: shop.state || featured?.state || 'IN',
       address: approvedAddress(shop) || (featured ? featuredAddress(featured) : ''),
       phone: featured?.phone || shop.phone || undefined,
-      programs: shop.programs.length ? shop.programs : (featured?.programs ?? []),
+      programs: shop.programs,
+      primaryProgram: shop.primaryProgram ?? shop.programs[0],
       description:
-        featured?.marketingBlurb ||
         shop.description ||
+        featured?.marketingBlurb ||
         `${shop.name} participates in Elevate's apprenticeship Host Site network.`,
-      image: shop.mediaGallery?.[0]?.url || shop.logoUrl || shop.flyerUrl || (featured ? firstImage(featured) : undefined),
+      image: gallery[0]?.url,
       videoUrl: shop.videoUrl || featured?.media?.find((item) => item.kind === 'video')?.src,
-      gallery: curateShopGallery(featured?.slug ?? shop.publicSlug ?? '', [...(shop.mediaGallery ?? []), ...(featured?.media?.filter((item) => item.kind !== 'video').map((item) => ({ url: item.src, alt: item.alt })) ?? [])]),
-      website: featured?.websiteUrl || shop.website,
+      gallery,
+      website: shop.website || featured?.websiteUrl,
       social: featured?.socialUrl,
       booking: featured?.bookingUrl,
       approval: 'approved',
@@ -117,6 +124,7 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
       address: featuredAddress(shop),
       phone: shop.phone,
       programs: shop.programs,
+      primaryProgram: shop.primaryProgram ?? shop.programs[0],
       description:
         shop.marketingBlurb ||
         shop.note ||

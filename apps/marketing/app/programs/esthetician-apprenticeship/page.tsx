@@ -4,7 +4,8 @@ import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollm
 import { normalizePublicProgram } from '@/data/programs';
 import { ESTHETICIAN_APPRENTICESHIP } from '@/data/programs/esthetician-apprenticeship';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
-import HeroVideo from '@/components/marketing/HeroVideo';
+import HeroPicture from '@/components/marketing/HeroPicture';
+import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import BeautyApprenticeshipAuthority, {
   buildBeautyProgramStructuredData,
 } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
@@ -92,21 +93,11 @@ export default async function EstheticianApprenticeshipPage() {
     : null;
 
   const structuredData = buildBeautyProgramStructuredData(program);
-  const heroOverride = safeBanner?.videoSrcDesktop ? (
-    <HeroVideo
-      videoSrcDesktop={safeBanner.videoSrcDesktop}
-      videoSrcMobile={safeBanner.videoSrcMobile ?? safeBanner.videoSrcDesktop}
-      posterImage={safeBanner.posterImage || program.heroImage}
-      voiceoverSrc={safeBanner.voiceoverSrc}
-      microLabel={SAFE_HERO_COPY.microLabel}
-      analyticsName={safeBanner.analyticsName}
-      belowHeroHeadline={SAFE_HERO_COPY.belowHeroHeadline}
-      belowHeroSubheadline={SAFE_HERO_COPY.belowHeroSubheadline}
-      ctas={[safeBanner.primaryCta, safeBanner.secondaryCta].filter(Boolean) as any}
-      trustIndicators={[...SAFE_HERO_COPY.trustIndicators]}
-      transcript={SAFE_HERO_COPY.transcript}
-    />
-  ) : undefined;
+  const heroOverride = (
+    <HeroPicture src={getProgramHeroImage('esthetician-apprenticeship')}
+      alt={getProgramImageAlt('esthetician-apprenticeship')}
+      analyticsName="esthetician-apprenticeship" transcript={SAFE_HERO_COPY.transcript} />
+  );
 
   return (
     <>

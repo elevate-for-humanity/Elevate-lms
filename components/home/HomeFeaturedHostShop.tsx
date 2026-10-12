@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 
 // Homepage curation only. Removing a feature must never remove a partner record.
 const FEATURED_SHOPS = [
+  { name: "Cal’s Kutz Studio", program: 'Barber', image: '/images/partners/cals-kutz-enhanced-promotion-2026.webp', imageAlt: 'Cal Kutz Studio enhanced apprenticeship promotional collage', imagePosition: '50% 50%', location: 'Indianapolis, IN', description: 'Explore hands-on barbering and apprenticeship opportunities in a working studio.', shopHref: '/host-shops/cals-kutz-studio' },
   {
     name: 'Kountry Kutz Barbershop',
     program: 'Barber',
@@ -51,16 +52,12 @@ export function HomeFeaturedHostShop() {
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-red-700">Earn while you learn</p>
         <h2 id="featured-host-shop-heading" className="mt-2 text-2xl font-bold tracking-tight text-slate-950 sm:text-4xl">Real shops. Real experience.</h2>
         <p className="mt-3 max-w-2xl text-base leading-6 text-slate-700">Host Shops are working barbershops and salons where apprentices build hands-on skills with licensed supervision. Elevate supports instruction and training records. Explore a shop or join the network; placement and availability are confirmed during enrollment.</p>
-        <article className="mt-6 grid overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-950 sm:grid-cols-2">
-          <div className="relative aspect-[4/3] bg-black"><Image src="/images/partners/cals-kutz-enhanced-promotion-2026.webp" alt="Cal Kutz Studio enhanced apprenticeship promotional collage" fill sizes="(min-width: 640px) 50vw, 100vw" className="object-contain" /></div>
-          <div className="flex flex-col justify-center p-6 sm:p-8"><p className="text-sm font-bold uppercase tracking-widest text-brand-red-700">Featured barber partner</p><h3 className="mt-3 text-3xl font-black">Cal’s Kutz Studio</h3><p className="mt-4 text-base leading-7 text-slate-700">Turn your interest in barbering into your next step. Explore the shop’s work, meet the training environment, and ask about apprenticeship enrollment and available payment plans.</p><Link href="/host-shops/cals-kutz-studio" className="mt-5 inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700">Explore Cal’s Kutz Studio</Link><Link href="/programs/barber-apprenticeship" className="mt-3 inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-slate-50 px-5 py-3 font-bold text-slate-950 hover:bg-slate-100">Start your barber journey</Link></div>
-        </article>
-        <div data-mobile-grid="2" data-featured-shops className="mt-6 grid grid-cols-2 items-stretch gap-3 lg:grid-cols-4 sm:gap-5">
+        <div data-mobile-grid="2" data-featured-shops className="mt-6 grid grid-cols-2 auto-rows-fr items-stretch gap-3 lg:grid-cols-4 sm:gap-5">
           {shops.map((shop) => (
             <article key={shop.name} data-featured-shop={shop.name} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
               <Link href={shop.shopHref} className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700">
                 <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                  <Image src={shop.image} alt={shop.imageAlt} fill sizes="(min-width: 1024px) 280px, calc((100vw - 44px) / 2)" loading="lazy" className="object-cover" style={{ objectPosition: shop.imagePosition }} />
+                  <Image src={shop.image} alt={shop.imageAlt} fill sizes="(min-width: 1024px) 280px, calc((100vw - 44px) / 2)" loading="lazy" className={shop.name === "Cal’s Kutz Studio" ? "object-contain bg-black" : "object-cover"} style={{ objectPosition: shop.imagePosition }} />
                 </div>
                 <div className="flex flex-1 flex-col p-3 sm:p-4">
                   <p className="text-xs font-semibold text-brand-red-700">{shop.program} Host Shop</p>
@@ -72,29 +69,17 @@ export function HomeFeaturedHostShop() {
               </Link>
             </article>
           ))}
-          <article data-host-shop-recruitment className="overflow-hidden rounded-2xl border border-slate-200 bg-sky-50">
-            <Link href="/partners/host-shops" className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700">
-              <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                <Image src="/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp" alt="Generations Hair stylist providing hands-on client service" fill sizes="(min-width: 1024px) 280px, calc((100vw - 44px) / 2)" loading="lazy" className="object-cover" style={{ objectPosition: '50% 35%' }} />
-              </div>
-              <div className="flex flex-1 flex-col p-3 sm:p-4">
-                <p className="text-xs font-semibold text-brand-red-700">For shop owners</p>
-                <h3 className="mt-1 text-base font-bold leading-snug text-slate-950 sm:text-lg">Become a Host Shop</h3>
-                <p className="mt-2 text-sm leading-5 text-slate-700">Grow your team by employing and mentoring an apprentice. Keep your service revenue while Elevate supports instruction, training records, and progress tracking.</p>
-                <span className="mt-auto inline-flex min-h-11 items-center gap-2 pt-3 text-sm font-bold text-brand-red-700">Join the Host Shop network <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" /></span>
-              </div>
+          {[
+            { name: 'Become a Host Shop', label: 'For shop owners', image: '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp', alt: 'Generations Hair stylist providing hands-on client service', href: '/partners/host-shops', text: 'Grow your team by mentoring an apprentice. Apply free to join the network.', action: 'Join the network' },
+            { name: 'Esthetics Apprenticeship', label: 'Skincare careers', image: '/images/programs/esthetician-host-recruitment-2026.webp', alt: 'Illustrative esthetics instructor mentoring adult apprentices', href: '/programs/esthetician-apprenticeship', text: 'Build skincare, sanitation and client care skills through supervised practice.', action: 'Explore esthetics' },
+            { name: 'Nail Technician Apprenticeship', label: 'Nail careers', image: '/images/pexels/nail-tech.webp', alt: 'Illustrative nail technician training', href: '/programs/nail-technician-apprenticeship', text: 'Explore nail services, manicuring, sanitation and professional client care.', action: 'Explore nail technology' },
+            { name: 'Find your next pathway', label: 'Career training', image: '/images/pages/barber-hands-on-bright.webp', alt: 'Hands-on career training', href: '/programs', text: 'Discover hands-on programs and the support to take your next step.', action: 'View all programs' },
+          ].map((card) => <article key={card.name} className="overflow-hidden rounded-2xl border border-slate-200 bg-sky-50">
+            <Link href={card.href} className="group flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-red-700">
+              <div className="relative aspect-[4/3] overflow-hidden bg-slate-100"><Image src={card.image} alt={card.alt} fill sizes="(min-width: 1024px) 280px, calc((100vw - 44px) / 2)" loading="lazy" className="object-cover" /></div>
+              <div className="flex flex-1 flex-col p-3 sm:p-4"><p className="text-xs font-semibold text-brand-red-700">{card.label}</p><h3 className="mt-1 text-base font-bold leading-snug text-slate-950 sm:text-lg">{card.name}</h3><p className="mt-3 text-sm leading-5 text-slate-700">{card.text}</p><span className="mt-auto inline-flex min-h-11 items-center gap-2 pt-3 text-sm font-bold text-brand-red-700">{card.action} <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" /></span></div>
             </Link>
-          </article>
-        </div>
-        <div className="mt-7 grid gap-3 sm:grid-cols-2">
-          <Link href="/programs/esthetician-apprenticeship" className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-            <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-lg"><Image src="/images/pexels/esthetician.webp" alt="Esthetics training and skincare practice" fill sizes="192px" loading="lazy" className="object-cover" /></div>
-            <div><h3 className="font-bold text-slate-950">Esthetics Apprenticeship</h3><p className="mt-1 text-sm text-slate-700">Skincare, sanitation, client care and supervised practice.</p><span className="text-sm font-bold text-brand-red-700">Explore program →</span></div>
-          </Link>
-          <Link href="/programs/nail-technician-apprenticeship" className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-            <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-lg"><Image src="/images/pexels/nail-tech.webp" alt="Nail technician training and supervised salon practice" fill sizes="192px" loading="lazy" className="object-cover" /></div>
-            <div><h3 className="font-bold text-slate-950">Nail Technician Apprenticeship</h3><p className="mt-1 text-sm text-slate-700">Manicuring, nail services, sanitation and client care.</p><span className="text-sm font-bold text-brand-red-700">Explore program →</span></div>
-          </Link>
+          </article>)}
         </div>
         <Link href="/partners/host-shops" className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-brand-red-700">Find or become a Host Shop <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
         <div />

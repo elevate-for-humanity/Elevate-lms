@@ -12,17 +12,17 @@ export default function NarratedShopTour({ src, script, shopName, onPlaybackChan
   onPlaybackChange?: (playing: boolean) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { play, pause, resume, stop, isPaused, isLoading, error } = useNaturalVoice();
+  const { play, pause, resume, stop, isPaused, isLoading, isPlaying, error } = useNaturalVoice();
 
   return <div className={`${showScript ? '' : 'h-full'} w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-950`}>
     <div className="flex aspect-[4/3] items-center justify-center">
-      <video ref={videoRef} src={src} controls muted playsInline preload="metadata"
+      <video ref={videoRef} src={src} controls muted playsInline preload="metadata" loop={isPlaying || isLoading}
         data-narrated-tour aria-label={`${shopName} narrated tour`}
         className="h-full w-full object-contain"
         onPlay={() => {
           onPlaybackChange?.(true);
           if (isPaused) { void resume(); return; }
-          void play(script, { style: 'instructor', rate: 1 }).then((started) => {
+          void play(script, { style: 'instructor', rate: 1, onEnded: () => videoRef.current?.pause() }).then((started) => {
             if (started && videoRef.current?.paused) pause();
           });
         }}
@@ -37,7 +37,7 @@ export default function NarratedShopTour({ src, script, shopName, onPlaybackChan
         }} />
     </div>
     {showScript ? <div className="bg-white p-4">
-      <p className="text-sm font-semibold text-slate-700">Play the tour to hear about {shopName}.</p>
+      <p role="status" className="text-sm font-semibold text-slate-700">{isLoading ? "Preparing tour narration…" : isPlaying ? `Narrating ${shopName}. The video repeats until the script finishes.` : isPaused ? "Tour narration paused. Play the video to continue." : `Play the tour to hear about ${shopName}.`}</p>
       {error ? <p role="status" className="mt-2 text-sm text-red-700">Tour audio is unavailable. You can read the full script below.</p> : null}
       <details className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3" open>
         <summary className="cursor-pointer font-bold text-blue-900">{shopName} tour script</summary>

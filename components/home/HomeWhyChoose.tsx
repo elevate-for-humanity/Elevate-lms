@@ -20,7 +20,7 @@ const PARTNER_LOGOS = [
   { src: '/images/heroes/hero-homepage.webp', alt: 'WorkOne Indiana', href: '/workforce-partners' },
   { src: '/images/heroes/hero-homepage.webp', alt: 'Next Level Jobs', href: '/eligibility' },
   { src: '/images/heroes/hero-homepage.webp', alt: 'OSHA Authorized', href: '/compliance' },
-  { src: '/images/partners/microsoft-logo.png', alt: 'Microsoft training partner', href: '/programs/technology' },
+  { src: '/images/partners/microsoft-logo.svg', alt: 'Microsoft training partner', href: '/programs/technology' },
   { src: '/images/partners/certiport.svg', alt: 'Certiport authorized testing', href: '/programs/technology' },
   { src: '/images/partners/act-workkeys.svg', alt: 'ACT WorkKeys assessment partner', href: '/testing' },
 ];

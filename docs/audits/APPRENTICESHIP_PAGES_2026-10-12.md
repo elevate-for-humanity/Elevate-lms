@@ -21,3 +21,14 @@ Focused tests, lint, and Marketing type/build checks were run. Refer to final re
 
 ## Data safety
 No applications, enrollments, financial records, suppliers, or shop approvals were created or changed. No live payment or form was submitted. Automatic approval review rejected a broader private-application/metadata query; the audit continued using narrower approved-record reads. Supplier account activation and student-kit fulfillment remain incomplete from the earlier task.
+
+
+## Follow-up release and public entry verification — 2026-10-12, 14:45 Eastern
+- Deployed Marketing commit: 665deba2ac1c7c88ec91d70ed2eb1cdace51a618. Google workflow 38291286488 completed successfully. Ready revision elevate-marketing-migration-r665deba2-38291286488-1 serves 100% of traffic; the public version and homepage checks returned that exact SHA.
+- Corrected the global image default that overrode explicit heights. Host-shop photos use positioned 4:3 frames; the shared program template restores a primary heading beneath custom hero media and removes obsolete weekly/deposit and universal discounted-price promises.
+- Removed the stale release assertion requiring a universal $5,400 esthetics price. Release checks now validate the actual published self-pay information and public entry paths.
+- Fixed the missing HTTP listener on the existing reserved Google public address 34.110.235.233. HTTP uses a dedicated redirect-only map/proxy and port-80 forwarding rule; the established HTTPS URL map remained unchanged. Both apex and www return permanent HTTPS redirects with paths and queries retained.
+- HTTP repair workflow 38292587780 passed, including three redirect/guard unit tests and ten direct public checks. The same ten public checks passed again against the released Marketing SHA: four entry variants, live version, four apprenticeship pages/pricing endpoints, and the approved J Noelle profile.
+- Verified tuition/first monthly invoice: barber $4,980/$1,245; cosmetology, esthetics and nails $6,000/$1,500 each. Actual terms remain subject to the displayed checkout and enrollment requirements.
+- Marketing type validation, production build, final container checks, public route checks, and authenticated tax API boundaries passed. Natural speech returned HTTP 200, audio/mpeg, and 34,752 bytes of MP3 audio.
+- Fresh mobile visual verification could not run in this follow-up because the selected coding/browser environment failed to initialize. The HTTP/content checks do not measure rendered card dimensions or replace that visual review. Authenticated enrollment flows and real payment processing were not exercised. Supplier account activation and kit fulfillment remain incomplete.

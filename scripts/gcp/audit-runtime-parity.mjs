@@ -109,7 +109,7 @@ export async function main() {
           const inventory=await northflank('/services/'+item.id+'/containers');
           const containers=Array.isArray(inventory)?inventory:inventory.containers;
           entry.sourceContainerCount=Array.isArray(containers)?containers.length:null;
-          entry.sourceFilesystemExportAvailable=Array.isArray(containers)&&containers.length>0;
+          entry.sourceFilesystemExportAvailable=Number(entry.sourceInstances)>0&&Array.isArray(containers)&&containers.length>0;
         } catch {entry.sourceFilesystemExportAvailable=false;entry.sourceContainerInventory='unavailable';}
       }
       entry.sourceHealth = (service.healthChecks ?? []).map(x => ({ type: x.type, path: x.path, port: x.port }));

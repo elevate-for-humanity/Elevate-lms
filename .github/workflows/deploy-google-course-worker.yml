@@ -36,7 +36,11 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
-      - name: Read existing worker authoring access without permission changes
+      - name: Prepare minimal prediction access for the existing course identity
+        run: |
+          node --test scripts/gcp/prepare-course-authoring-access.test.mjs
+          node scripts/gcp/prepare-course-authoring-access.mjs
+      - name: Read existing worker authoring access
         run: |
           node --test scripts/gcp/audit-course-production.test.mjs
           node scripts/gcp/audit-course-production.mjs

@@ -64,7 +64,7 @@ def prepare_storage(run=command):
     if dropin.exists() and dropin.read_text()!=body:
         # Correct only the exact malformed override created by our first repair.
         # All unrelated existing overrides remain protected.
-        if dropin.stat().st_uid != 0 or dropin.read_text()!=body.replace('\\n','\\\\n'):
+        if dropin.stat().st_uid != 0 or dropin.read_text()!=body.replace(chr(10),chr(92)+'n'):
             raise ValueError('existing_storage_dropin_requires_review')
         with tempfile.NamedTemporaryFile(mode='w',dir=dropin.parent,delete=False) as output:
             output.write(body)

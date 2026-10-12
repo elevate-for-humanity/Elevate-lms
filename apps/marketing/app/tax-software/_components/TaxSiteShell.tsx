@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type { ReactNode } from 'react';
 export const taxNav = [
   ['Prepare your taxes', '/tax-software/self-file'],
@@ -18,12 +19,17 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
           <Link
             href="/tax"
             aria-label="Supersonic Fast Cash home"
-            className="min-w-0 max-w-full text-lg font-black leading-tight text-[#073ca2] sm:text-xl"
+            className="block w-[220px] max-w-[70%] sm:w-[300px]"
           >
-            SUPERSONIC <span className="text-[#c8102e]">FAST CASH</span>
-            <span className="mt-1 block text-[10px] tracking-[.08em] text-slate-600 sm:tracking-[.18em]">
-              TAX PREPARATION & BUSINESS TRAINING
-            </span>
+            <Image
+              src="/images/tax/supersonic-fast-cash-logo.webp"
+              alt="Supersonic Fast Cash LLC — Tax Preparation Service"
+              width={900}
+              height={600}
+              sizes="(max-width: 639px) 220px, 300px"
+              className="h-auto w-full object-contain"
+              priority
+            />
           </Link>
           <Link
             href="/tax-software/login"

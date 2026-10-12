@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { X, MessageCircle, Mic } from 'lucide-react';
-import ParisChat from './ParisChat';
 import type { ParisLearnerContext } from './ParisFloatingWrapper';
 import { PARIS_PORTAL_ISSUE_EVENT, type PortalSupportIssue } from '@/lib/paris/portal-support';
+
+const ParisChat = lazy(() => import('./ParisChat'));
 
 export function ParisFloatingButton({
   surface = 'public',
@@ -141,6 +142,7 @@ export function ParisFloatingButton({
             </div>
 
             <div className="min-h-0 min-w-0 max-w-full flex-1 overflow-hidden">
+              <Suspense fallback={<p role="status" className="p-6 text-sm text-slate-600">Opening PARIS…</p>}>
               <ParisChat
                 showHeader={false}
                 surface={surface}
@@ -152,6 +154,7 @@ export function ParisFloatingButton({
                 portalIssue={portalIssue}
                 voiceEnabled
               />
+              </Suspense>
             </div>
           </div>
         </div>

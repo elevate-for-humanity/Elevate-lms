@@ -2,6 +2,8 @@ import {NextRequest,NextResponse} from 'next/server';
 import {createClient} from '@/lib/supabase/server';
 import {applyRateLimit} from '@/lib/api/withRateLimit';
 import {calculateBase1040_2026,STANDARD_DEDUCTION_2026,type FilingStatus} from '@/lib/tax-software/calculation/ty2026-base-1040';
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 export async function POST(req:NextRequest){const limited=await applyRateLimit(req,'api');if(limited)return limited;const supabase=await createClient();const {data:{user}}=await supabase.auth.getUser();if(!user)return NextResponse.json({error:'Unauthorized'},{status:401});const body=await req.json().catch(()=>null);const returnId=body?.returnId;if(typeof returnId!=='string'||!returnId.trim())return NextResponse.json({error:'returnId is required'},{status:400});
 const {data:r,error:returnError}=await supabase.from('tax_returns').select('id,created_by_user_id,filing_status,tax_year,return_json').eq('id',returnId).eq('created_by_user_id',user.id).eq('service_type','self_file').maybeSingle();if(returnError)return NextResponse.json({error:'Unable to load tax return'},{status:500});if(!r)return NextResponse.json({error:'Return not found'},{status:404});if(Number(r.tax_year)!==2026)return NextResponse.json({error:'This calculation engine is for tax year 2026'},{status:400});
 if(!Object.prototype.hasOwnProperty.call(STANDARD_DEDUCTION_2026,r.filing_status))return NextResponse.json({error:'Select a supported filing status before calculating'},{status:400});

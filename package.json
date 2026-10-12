@@ -225,7 +225,6 @@
     "web-vitals": "5.3.0"
   },
   "scripts": {
-    "preinstall": "corepack enable || true",
     "test": "vitest run --passWithNoTests",
     "gen:types": "node scripts/gen-db-types.cjs",
     "lint:migrations": "node scripts/lint-migrations.cjs",
@@ -288,7 +287,8 @@
     "autopilot:bg": "node workers/start-autopilot.js &",
     "dev:with-autopilot": "pnpm autopilot:bg && pnpm dev",
     "predev": "bash scripts/setup-env-auto.sh",
-    "dev": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' next dev --turbopack",
+    "dev": "pnpm --filter @elevate/marketing dev",
+    "build": "pnpm run build:all",
     "build:lms:compile": "pnpm --filter @elevate/lms build",
     "start": "node server.js",
     "lint": "npx cross-env NODE_OPTIONS='--max-old-space-size=4096' eslint . --ext .js,.jsx,.ts,.tsx --cache --cache-strategy content --cache-location .eslintcache --quiet",

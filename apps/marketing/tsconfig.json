@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "tsBuildInfoFile": ".next/cache/tsbuildinfo.json",
     "baseUrl": ".",
     "paths": {
       "@/lib/stripe/handlers/checkout-session-completed": [

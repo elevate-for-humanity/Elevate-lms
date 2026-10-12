@@ -125,6 +125,7 @@ export default tseslint.config(
       'test-env.js',
       'next-env.d.ts',
       'apps/admin/next-env.d.ts',
+      'apps/marketing/next-env.d.ts',
       'lib/dynamic-imports.ts',
       'lib/ocr/**',
     ],

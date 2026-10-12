@@ -1,6 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
+import {loadGoogleConfig} from './runtime-config.mjs';
+import {isDeepStrictEqual} from 'node:util';
 
 const project = 'elegant-racer-299721';
 const region = 'us-central1';
@@ -15,7 +17,7 @@ export const targets = {
 };
 
 // Values stay in memory. Reports contain names and comparison results only.
-export function compareEnvironments(source, target, kind) {
+export function compareEnvironments(source, target, kind, {component} = {}) {
   if (!source || typeof source !== 'object' || Array.isArray(source))
     throw new Error('Resolved source environment unavailable');
   const actual = new Map((target ?? []).map(row => [row.name, row]));
@@ -32,6 +34,12 @@ export function compareEnvironments(source, target, kind) {
     if (key === 'HOSTNAME' && row.value === '0.0.0.0') { result.adapted.push(key); continue; }
     const workerOverrides = { AI_PROVIDER: 'none', AI_NARRATION_PROVIDER: 'kokoro', AI_TRANSCRIPTION_PROVIDER: 'local_whisper' };
     if (kind === 'job' && workerOverrides[key] === row.value) { result.adapted.push(key); continue; }
+    const adapted = component === 'admin' && (
+      key === 'AI_NARRATION_PROVIDER' && row.value === 'kokoro' ||
+      ['STUDIO_BROWSER_URL','STUDIO_BROWSER_PUBLIC_URL'].includes(key) && ['https://browser.elevateforhumanity.org','https://elevate-studio-browser-aabnh2y32a-uc.a.run.app'].includes(row.value)
+    ) || component === 'ultimate-worker' && key === 'ULTIMATE_LEARNER_RUNTHROUGH_URL' &&
+      row.value === 'https://browser.elevateforhumanity.org/learner/runthrough';
+    if(adapted) {result.adapted.push(key);continue;}
     result.different.push(key);
   }
   result.passed = ![result.missing, result.different, result.secretReferences, result.unresolved].some(x => x.length);
@@ -94,7 +102,7 @@ export async function main() {
       const { spec, container } = runtimeContainer(resource, kind);
       const service = await northflank(`/services/${item.id}`);
       const environment = await northflank(`/services/${item.id}/runtime-environment?show=all&replaceTemplatedValues=true`);
-      entry.environment = compareEnvironments(environment.runtimeEnvironment, container.env, kind);
+      entry.environment = compareEnvironments(environment.runtimeEnvironment, container.env, kind, {component:item.id.replace(/^elevate-/,'')});
       entry.sourceHealth = (service.healthChecks ?? []).map(x => ({ type: x.type, path: x.path, port: x.port }));
       entry.googleHealth = { startup: Boolean(container.startupProbe), liveness: Boolean(container.livenessProbe) };
       entry.volumeCounts = { source: (service.deployment?.volumes ?? service.volumes ?? []).length, google: (spec.volumes ?? []).length };
@@ -124,7 +132,18 @@ export async function main() {
       const items = Array.isArray(body) ? body : body[resource];
       if (!Array.isArray(items)) throw new Error('Unknown resource response');
       report.sourceResources[resource] = items.map(x => ({ id: x.id, name: x.name }));
-      if (items.length) report.failures.push({ resource, error: 'resource_contents_and_target_mapping_not_verified', count: items.length });
+      if (resource === 'secrets' && items.length) {
+        const archive=loadGoogleConfig('admin').sourceSecretGroupArchive;
+        const verified=[];
+        for(const item of items) {
+          const saved=archive?.groups?.find(group=>group.project===decodeURIComponent(sourceProject)&&group.sourceGroup===item.id);
+          const current=await northflank('/secrets/'+encodeURIComponent(item.id)+'/details');
+          if(saved && isDeepStrictEqual(saved.secrets,current.secrets)) verified.push(item.id);
+        }
+        report.sourceSecretArchive={googleSecret:'elevate-admin-runtime-config',verifiedGroups:verified,total:items.length,
+          passed:verified.length===items.length};
+        if(verified.length!==items.length)report.failures.push({resource,error:'source_secret_archive_mismatch',count:items.length-verified.length});
+      } else if (items.length) report.failures.push({ resource, error: 'resource_contents_and_target_mapping_not_verified', count: items.length });
     } catch { report.failures.push({ resource, error: 'resource_inventory_unavailable' }); }
   }
   report.passed = report.services.every(x => x.passed) && report.failures.length === 0;

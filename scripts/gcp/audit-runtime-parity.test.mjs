@@ -30,3 +30,10 @@ test('all six source services have explicit mappings; malformed runtime cannot p
   assert.throws(() => runtimeContainer({ spec: { template: { spec: { containers: [{}, {}] } } } }, 'service'), /topology/);
   assert.throws(() => compareEnvironments(null, [], 'service'), /unavailable/);
 });
+
+test('accepts only the explicit Google learner and browser cutover endpoints',()=>{
+ const old={ULTIMATE_LEARNER_RUNTHROUGH_URL:'https://old.code.run/learner/runthrough'};
+ assert.equal(compareEnvironments(old,[{name:'ULTIMATE_LEARNER_RUNTHROUGH_URL',value:'https://browser.elevateforhumanity.org/learner/runthrough'}],'job',{component:'ultimate-worker'}).passed,true);
+ assert.equal(compareEnvironments(old,[{name:'ULTIMATE_LEARNER_RUNTHROUGH_URL',value:'https://unreviewed.example/learner/runthrough'}],'job',{component:'ultimate-worker'}).passed,false);
+ assert.equal(compareEnvironments({STUDIO_BROWSER_URL:'https://old.code.run'},[{name:'STUDIO_BROWSER_URL',value:'https://browser.elevateforhumanity.org'}],'service',{component:'admin'}).passed,true);
+});

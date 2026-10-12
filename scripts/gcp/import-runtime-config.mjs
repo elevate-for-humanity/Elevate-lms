@@ -54,7 +54,7 @@ export async function importRuntimeConfig(component, { request = fetch, run = go
     if (versions) {
       if (env.VERIFY_EXISTING_GOOGLE_CONFIG !== 'true') throw new Error('Google configuration already exists; use Google-owned configuration management');
       const current = validateConfig(JSON.parse(invoke('destination_readback', ['secrets', 'versions', 'access', 'latest', '--secret', secret, '--project', PROJECT])), component);
-      const parity = compareEnvironments(config.runtimeEnvironment, Object.entries(current.runtimeEnvironment).map(([name,value]) => ({name,value})), component === 'ultimate-worker' ? 'job' : 'service');
+      const parity = compareEnvironments(config.runtimeEnvironment, Object.entries(current.runtimeEnvironment).map(([name,value]) => ({name,value})), component === 'ultimate-worker' ? 'job' : 'service', {component});
       const persistenceVerified = isDeepStrictEqual(current.runtimeFiles, config.runtimeFiles) && config.volumes.every(volume => current.volumes.some(saved => saved.id === volume.id));
       if (!parity.passed || !persistenceVerified) throw new Error('Existing Google configuration does not match complete source inventory');
       return { component, runtimeKeys: Object.keys(config.runtimeEnvironment).sort(), volumes: config.volumes.length, runtimeFiles: Object.keys(config.runtimeFiles).length, configurationOwner: 'Google Secret Manager', existingConfigurationVerified: true };

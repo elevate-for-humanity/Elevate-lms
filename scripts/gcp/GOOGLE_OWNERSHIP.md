@@ -1,3 +1,26 @@
+# Current Google migration observations — 2026-10-12 UTC
+
+- Public DNS and HTTPS routing verified for root/www, Admin, dev-studio, app/LMS, portal, dashboard, Store and testing. Root redirects to www; host routing selects the appropriate Google backend.
+- Google billing is enabled and linked to a billing account. This does not verify payment balance.
+- Regional Cloud Run limits remain 20 vCPU and 40 GiB. LMS and Store now use zero minimum instances; 8 GiB of guaranteed idle reservation was removed without changing their container images or per-instance memory.
+- Marketing, Admin, LMS, Store and Studio Cloud Run services are present. Google Course Builder execution and recovery are scheduled through dispatch-google-course-job.yml. Supabase cron metadata contains no Northflank or code.run references.
+- All 23 source secret groups across elevate-platform and elevate-media-gpu were verified in the Google-owned Admin runtime configuration archive. This is an inert preservation archive; it is not automatically injected into every application.
+- Google-owned saved configurations for Marketing, Admin, LMS, Store and Studio passed the source inventory comparison. The worker uses a deliberately migrated Google learner endpoint, which must be checked as an explicit adaptation rather than overwritten with the old endpoint.
+- Admin currently reaches the Google Cloud Run Studio browser. The browser public gateway uses the Google Studio VM. These are separate live boundaries and must both be considered when verifying authenticated provider state.
+- Persistent source authentication files, original workspace edits, backup recovery and real provider/learner acceptance remain unverified. A healthy empty Google volume is not proof of content migration.
+- Studio engineering main-release code and compatibility deployment tools now target main and Google. Runtime diagnostics and Telnyx operational credential lookup were replaced with Google equivalents.
+
+Evidence:
+- DNS audit: actions/runs/38202344160.
+- Capacity reduction with exact-image health activation: actions/runs/38202638106.
+- Source configuration and 23 secret-group preservation: actions/runs/38203358726 (overall run failed on the worker endpoint comparison; the individual preservation report passed).
+- Studio topology: actions/runs/38203692739.
+- Main release gate: issue #674. Historical issue closure never waives an unmet acceptance requirement.
+
+The observations below are historical evidence, not current operational instructions.
+
+---
+
 # Google ownership audit
 
 The repository review and the live observations below are separate acceptance evidence. Do not retire Northflank based on source-code checks alone.

@@ -4,6 +4,7 @@ import { registeredInstructionalSources } from '../credential/registered-instruc
 import { getRegisteredProgramStandardByProfileId } from '@/lib/apprenticeship/registered-program-contract';
 import type { UltimateCredentialProfile } from './types';
 import { classifyCompetency } from '../instructional/competency-classification.mjs';
+import { approvedPresentationForCourse } from '../instructional/approved-presentation.mjs';
 
 type CompetencyRow = {
   competency_key?: string | null;
@@ -27,6 +28,8 @@ export async function hydrateUltimateProfileSources(
   courseId: string,
   profile: UltimateCredentialProfile,
 ): Promise<UltimateCredentialProfile> {
+  const presentation = approvedPresentationForCourse(courseId);
+  if (presentation) profile = { ...profile, lessonPresentation: presentation };
   const registeredContract = getRegisteredProgramStandardByProfileId(profile.id);
   // Teaching modality does not waive the registered mentor performance requirement.
   if (registeredContract) {

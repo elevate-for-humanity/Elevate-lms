@@ -1,0 +1,32 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {approvedPresentationForCourse,narrationSceneSeconds,presentationBookendFrames,assertNarratedScenes,assertPremiumSpeechSignal} from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
+test('approved format is limited to the two existing course IDs',()=>{
+  assert.equal(approvedPresentationForCourse('2c723bfa-8c40-4acc-b961-98d917710ffc'),'approved-premium-v1');
+  assert.equal(approvedPresentationForCourse('9ca9fb50-7119-46ea-ab81-9b0193c29c31'),'approved-premium-v1');
+  assert.equal(approvedPresentationForCourse('unrelated'),undefined);
+});
+test('short and fractional speech receives only frame quantization, no added dead time',()=>{
+  for(const seconds of [.2,3.2,10.051,60.01]) {
+    const duration=narrationSceneSeconds(seconds,true);
+    assert.ok(duration>=seconds && duration-seconds<1/30);
+    assert.ok(Math.abs(duration*30-Math.round(duration*30))<1e-8);
+  }
+  assert.throws(()=>narrationSceneSeconds(0,true));
+  assert.throws(()=>narrationSceneSeconds(NaN,true));
+  assert.deepEqual(presentationBookendFrames(true),{intro:0,outro:0});
+  assert.deepEqual(presentationBookendFrames(false),{intro:90,outro:60});
+});
+test('reject a teaching scene with missing speech or missing visible media',()=>{
+  const scene={scene_number:1,narration:'Inspect the guard.',audioSrc:'audio.mp3',imageUrl:'guard.png'};
+  assert.doesNotThrow(()=>assertNarratedScenes([scene]));
+  assert.throws(()=>assertNarratedScenes([{...scene,audioSrc:null}]),/NARRATION_MISSING/);
+  assert.throws(()=>assertNarratedScenes([{...scene,narration:' '}]),/NARRATION_MISSING/);
+  assert.throws(()=>assertNarratedScenes([{...scene,imageUrl:null}]),/VISUAL_MISSING/);
+});
+test('audible duration metadata cannot disguise a silent track or dropout',()=>{
+  assert.doesNotThrow(()=>assertPremiumSpeechSignal('max_volume: -6.0 dB'));
+  assert.throws(()=>assertPremiumSpeechSignal('max_volume: -91.0 dB'),/INAUDIBLE/);
+  assert.throws(()=>assertPremiumSpeechSignal('max_volume: -6.0 dB\nsilence_start: 4.2'),/SILENT_GAP/);
+  assert.throws(()=>assertPremiumSpeechSignal(''),/INAUDIBLE/);
+});

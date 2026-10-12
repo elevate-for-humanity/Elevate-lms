@@ -54,7 +54,7 @@
     {
       "source": "app/tax-software/page.tsx",
       "target": "apps/marketing/app/tax-software/page.tsx",
-      "sha256": "1cd54bd2549438afe5190be437a706b8e3e35ff6dbdd894f104b93b113e2002b",
+      "sha256": "934025e02a7df8c3fcd6a1ca27b6f989d75c8e04fd9d850b12f874fee24aff80",
       "sourceSha256": "2e9a3679173ded5c370550af1d181b0d6ef3cb5a70be1f91fbdb7600cb9700fa"
     },
     {
@@ -66,7 +66,7 @@
     {
       "source": "app/tax-software/professional/page.tsx",
       "target": "apps/marketing/app/tax-software/professional/page.tsx",
-      "sha256": "661674c9358fe996714b95f7edb61a19257d4f6a07318ceeadd43be298cec271",
+      "sha256": "6f12a6e21183572fb7cc3396c3563a50ad8421c1aec39f5977361f9e7aaa247c",
       "sourceSha256": "b2a4831b330ae831a329d9aacaa6db848d9a0f39bbe37e0d0225cfe1da49996b"
     },
     {

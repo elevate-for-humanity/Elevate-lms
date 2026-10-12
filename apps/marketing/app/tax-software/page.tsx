@@ -48,7 +48,7 @@ export default function TaxSoftwarePage() {
               <p className="text-sm font-bold uppercase tracking-wider text-white">
                 Supersonic Fast Cash
               </p>
-              <h1 className="mt-4 text-4xl font-black leading-tight tracking-tight sm:text-5xl">
+              <h1 className="mt-4 text-4xl font-black !text-white leading-tight tracking-tight sm:text-5xl">
                 Get your taxes prepared.
                 <span className="mt-2 block text-white">Build your next chapter.</span>
               </h1>
@@ -56,7 +56,7 @@ export default function TaxSoftwarePage() {
                 Do it yourself, hire a professional, or start your own tax business. Choose the
                 option that fits you.
               </p>
-              <Link href="#options" className={taxButton + ' mt-6 bg-white text-[#be185d]'}>
+              <Link href="#options" className={taxButton + ' mt-6 bg-white !text-[#be185d]'}>
                 Choose my option →
               </Link>
             </div>

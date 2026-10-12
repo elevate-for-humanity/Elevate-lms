@@ -16,14 +16,14 @@ export default function ProfessionalPage() {
             <p className="text-sm font-bold uppercase tracking-wide text-white">
               YOUR NEXT BUSINESS
             </p>
-            <h1 className="mt-4 text-4xl font-black leading-tight sm:text-5xl">
+            <h1 className="mt-4 text-4xl font-black !text-white leading-tight sm:text-5xl">
               Do you want to start your own tax business?
             </h1>
             <p className="mt-5 text-lg leading-7 text-white">
               Turn tax preparation skills into a plan for your own office. Explore training, client
               service and business setup through Supersonic Fast Cash.
             </p>
-            <Link href="#enroll" className={taxButton + ' mt-6 bg-white text-[#be185d]'}>
+            <Link href="#enroll" className={taxButton + ' mt-6 bg-white !text-[#be185d]'}>
               Explore enrollment →
             </Link>
           </div>

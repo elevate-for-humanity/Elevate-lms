@@ -4,6 +4,7 @@ import {
   currentEvidence,
   stepInputHash,
   validateStepOutput,
+  practicalVisualFailures,
   ULTIMATE_LESSON_CONTRACT_VERSION,
   MAX_TARGETED_REPAIRS,
 } from './lesson-contract';
@@ -59,7 +60,10 @@ export class UltimateBuildRunner {
       ctx.assertActive?.();
       const step = ULTIMATE_BUILD_STEPS[index];
       const inputHash = stepInputHash(step, ctx.profile, ctx.artifacts);
-      if (ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], inputHash)) {
+      const competency = ctx.profile.competencies.find(c => ctx.buildId.endsWith(':' + c.id)) ?? ctx.profile.competencies[0];
+      if (ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], inputHash) &&
+          !validateStepOutput(step, ctx.artifacts[step] ?? {}).length &&
+          (step !== 'visual_assignment' || !practicalVisualFailures(ctx.artifacts, competency).length)) {
         index++;
         continue;
       }
@@ -92,7 +96,9 @@ export class UltimateBuildRunner {
           };
         const findings = result.findings ?? [];
         failures = findings.filter((f) => f.severity === 'error');
-        for (const code of validateStepOutput(step, artifacts))
+        const contractFailures = validateStepOutput(step, artifacts);
+        if (step === 'visual_assignment') contractFailures.push(...practicalVisualFailures({...ctx.artifacts, visual_assignment: artifacts}, competency));
+        for (const code of contractFailures)
           failures.push({
             step,
             severity: 'error',

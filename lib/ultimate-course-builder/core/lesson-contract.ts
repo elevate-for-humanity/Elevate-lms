@@ -233,7 +233,12 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
 export function assertCompleteLesson(
   artifacts: Partial<Record<UltimateBuildStep, Artifact>>,
   profile?: unknown,
+  competencyId?: string,
 ): void {
+  const competencies = (profile as any)?.competencies ?? [];
+  const competency = competencies.find((c: any) => c.id === competencyId) ?? (competencies.length === 1 ? competencies[0] : undefined);
+  if (practicalVisualFailures(artifacts, competency).length)
+    throw new Error('ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED');
   for (const step of ULTIMATE_BUILD_STEPS) {
     const a = artifacts[step];
     if (
@@ -242,4 +247,20 @@ export function assertCompleteLesson(
     )
       throw new Error(`ULTIMATE_CURRENT_CONTRACT_EVIDENCE_REQUIRED:${step}`);
   }
+}
+
+/** Recheck saved assignments without invalidating usable media checkpoints. */
+export function practicalVisualFailures(artifacts: Partial<Record<UltimateBuildStep, Artifact>>, competency: any): string[] {
+  if (competency?.requiresPracticalEvidence !== true) return [];
+  const scenes = artifacts.storyboard?.storyboard?.scenes ?? [];
+  const media = artifacts.visual_assignment?.media ?? {};
+  const physical = scenes.filter((scene: any) => [scene.stage, scene.title, scene.sceneType, scene.scene_type].some(value =>
+    /^(demonstration|guided_practice|independent_practice|mistake_and_correction|mistake and correction)$/.test(String(value ?? '').trim().toLowerCase())));
+  return physical.some((scene: any) => {
+    const assignment = media.assignments?.find((a: any) => a.sceneId === scene.id);
+    const asset = media.readyAssets?.find((a: any) => a.id === assignment?.assetId);
+    return !assignment || assignment.generatedInstructionalVisual || assignment.assignmentMethod === 'instructional-render' ||
+      !asset?.entitlement_id || !assignment.licenseEvidenceUrl ||
+      !(String(asset.mime_type ?? '').startsWith('video/') || /\.(mp4|webm|mov)(?:[?#]|$)/i.test(String(asset.public_url ?? '')));
+  }) ? ['ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED'] : [];
 }

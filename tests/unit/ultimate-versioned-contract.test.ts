@@ -5,6 +5,7 @@ import {
   currentEvidence,
   stepInputHash,
   validateStepOutput,
+  practicalVisualFailures,
   ULTIMATE_LESSON_CONTRACT_VERSION,
   MAX_TARGETED_REPAIRS,
 } from '../../lib/ultimate-course-builder/core/lesson-contract';
@@ -37,6 +38,15 @@ const context = (): UltimateRunContext => ({
 });
 const standards = { requirements: { competencies: profile.competencies, version: '1' } };
 describe('versioned lesson contract', () => {
+  it('rechecks practical graphics checkpoints while retaining actual licensed footage', () => {
+    const artifacts: any={storyboard:{storyboard:{scenes:[{id:'demo',stage:'demonstration'}]}},
+      visual_assignment:{media:{assignments:[{sceneId:'demo',assetId:'clip',licenseEvidenceUrl:'https://media.example/license'}],
+        readyAssets:[{id:'clip',entitlement_id:'license',mime_type:'video/mp4',public_url:'https://media.example/video'}]}}};
+    expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:true})).toEqual([]);
+    artifacts.visual_assignment.media.assignments[0].generatedInstructionalVisual=true;
+    expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:true})).toEqual(['ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED']);
+    expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:false})).toEqual([]);
+  });
   it('rejects label-only QA and empty objectives', () => {
     expect(
       validateStepOutput('finished_media_qa', { mediaQA: { pass: true, distinctShots: 7 } }),

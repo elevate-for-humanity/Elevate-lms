@@ -2,13 +2,14 @@ name: Audit independent Elevate PBX call path
 on:
   workflow_dispatch:
   pull_request:
-    paths: ['.github/workflows/audit-owned-pbx-callpath.yml', 'scripts/gcp/*pbx*']
+    paths: ['.github/workflows/audit-owned-pbx-callpath.yml', 'scripts/gcp/*pbx*', 'scripts/gcp/pbx-one-command-readiness.sh']
   push:
     branches: [main]
     paths:
       - '.github/workflows/audit-owned-pbx-callpath.yml'
       - 'scripts/gcp/audit-pbx-runtime.py'
       - 'scripts/gcp/verify-pbx-transport.mjs'
+      - 'scripts/gcp/pbx-one-command-readiness.sh'
 permissions:
   actions: write
   contents: read

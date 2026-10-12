@@ -30,6 +30,12 @@ test('saved assignments survive other asset records referencing the same license
 test('preserving record IDs does not certify repeated shots as distinct visuals', () => {
   assert.throws(() => requireResolvedVisualEvidence({ scenes: Array.from({ length: minimum }, () => ({ sourceVideoUrl: 'https://media.example/same.mp4' })) }), /DISTINCT_VISUALS_REQUIRED/);
 });
+test('missing scene mapping cannot substitute an arbitrary licensed clip', () => {
+  assert.throws(() => prepareUltimateStoryboardInput({artifacts:{
+    storyboard:{storyboard:{scenes:Array.from({length:minimum},(_,i)=>({id:`unmapped-${i}`,dialogue:'Teach this competency'}))}},
+    visual_assignment:{media:{assignments:[],readyAssets:[{id:'unrelated',public_url:'https://media.example/stock.mp4',mime_type:'video/mp4',entitlement_id:'license'}]}},
+  }}), /ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED/);
+});
 test('copies of one stored file use the existing instructional producer for remaining scenes', () => {
   const scenes = Array.from({ length: minimum }, (_, i) => ({ id: `scene-${i}`, visualRequirement: 'A client consultation' }));
   const assets = scenes.map((_, i) => ({ id: `copy-${i}`, public_url: `https://media.example/file.mp4?token=${i}`, entitlement_id: 'license', license_evidence_url: 'https://media.example/license', visual_coverage_verified: true, visual_requirements: ['A client consultation'] }));

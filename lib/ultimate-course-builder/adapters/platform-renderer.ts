@@ -220,8 +220,11 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
     const candidate = assignment
       ? candidates.find((c) => c.assetId === assignment.assetId)
       : undefined;
-    // Missing saved assignments may use a licensed candidate; renderer still verifies resolved visuals.
-    const resolvedCandidate = candidate ?? candidates[index % Math.max(candidates.length, 1)];
+    // Scene-to-asset evidence is an authority boundary. A missing mapping
+    // cannot be repaired by rotating through unrelated licensed stock.
+    if (!assignment || !candidate)
+      throw new Error(`ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED:${scene.id}`);
+    const resolvedCandidate = candidate;
     if (!resolvedCandidate) throw new Error(`ULTIMATE_RENDER_VISUAL_ASSETS_MISSING:${scene.id}`);
     return {
       ...scene,

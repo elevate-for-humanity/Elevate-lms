@@ -22,7 +22,7 @@ async function request(apiKey: string, path: string, options: RequestInit = {}) 
 
 async function main() {
   const config = loadGoogleConfig('admin');
-  const apiKey = process.env.TELNYX_API_KEY?.trim() || config.TELNYX_API_KEY;
+  const apiKey = process.env.TELNYX_API_KEY?.trim() || config.runtimeEnvironment.TELNYX_API_KEY;
   if (!apiKey) throw new Error('TELNYX_API_KEY is unavailable');
 
   const before = await request(apiKey, `/call_control_applications/${connectionId}`);

@@ -40,7 +40,9 @@ for (const [slug, tuition, installment] of programs) {
     const response = await fetch(canonical + '/programs/' + slug + '?entryAudit=' + Date.now(), { signal: AbortSignal.timeout(20000), cache: 'no-store' });
     assert.equal(response.status, 200);
     const html = await response.text();
-    assert.equal((html.match(/<h1(?:\s|>)/g) || []).length, 1, 'Program must have one main heading');
+    // Suspense streams the fallback and its replacement; the browser removes the fallback.
+    const headings=[...html.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/g)].map(match=>match[1].replace(/<[^>]*>/g,'').trim());
+    assert.equal(new Set(headings).size,1,'Program must expose one distinct main heading');
     assert.ok(html.toLowerCase().includes('self-pay'), 'Program must explain self-pay tuition');
     assert.ok(!html.includes('lowers the startup deposit'), 'Retired deposit promise must remain removed');
     assert.ok(!html.includes('Estimated from $110 per week'), 'Retired weekly apprenticeship estimate must remain removed');

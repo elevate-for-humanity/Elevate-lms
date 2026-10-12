@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
 import {createLeaseDeadline} from '../lib/ultimate-course-builder/worker/runtime-guards.mjs';
+const repairSource = stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/core/repair-router.ts', import.meta.url),'utf8'));
+const {isDurableExternalBlocker} = await import('data:text/javascript;base64,'+Buffer.from(repairSource).toString('base64'));
 
 const productionPath = process.env.PROCESS_JOB_SOURCE || new URL('../lib/ultimate-course-builder/worker/process-job.ts', import.meta.url);
 const source = stripTypeScriptTypes(readFileSync(productionPath, 'utf8'))
@@ -18,10 +20,11 @@ function scenario(payload, completed = true, options = {}) {
     async heartbeat() { return true; }
     async complete() { events.push('complete'); }
     async fail() { events.push('fail'); }
+    async waitForDependency() { events.push('dependency'); }
   }
   const runtime = { persistence: { updateBuild: async value => events.push(value) }, artifacts: {} };
-  const names = ['createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft'];
-  const values = [options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class {}, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile];
+  const names = ['createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
+  const values = [options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class {}, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
   const worker = new Function(...names, source + '\nreturn processUltimateJob;')(...values);
   return { events, run: () => worker(db, 'owner') };
 }
@@ -41,6 +44,10 @@ test('an incomplete targeted lesson stays in the existing repair queue instead o
   assert.equal(result.completed, false);
   assert.equal(result.repairQueued, true);
   assert.deepEqual(s.events, ['fail']);
+});
+test('missing Google permission waits for a dependency without consuming repair retries',async()=>{
+ const s=scenario({acceptance:true},false,{runCourse:async()=>({completed:false,findings:[{code:'ULTIMATE_GOOGLE_AUTHORING_HTTP_403',message:'Permission missing'}],lessons:[]})});
+ const result=await s.run();assert.equal(result.awaitingDependency,true);assert.deepEqual(s.events,['dependency']);
 });
 
 test('a media task that never returns loses its lease without completing or changing the job',async()=>{

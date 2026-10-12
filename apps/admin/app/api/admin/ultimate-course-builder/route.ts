@@ -8,6 +8,7 @@ import { UltimateJobQueue } from '@/lib/ultimate-course-builder/worker/job-queue
 import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
+import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/instructional/google-lesson-author';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -218,17 +219,28 @@ export async function POST(req: NextRequest) {
       audience: String(body.audience || ''),
       state: String(body.state || ''),
     });
-    const profile = { ...generatedProfile, mediaAcquisitionOwnerId: auth.id };
+    const authoring = body.instructionalAuthoring;
+    if (authoring && (authoring.provider !== 'google' || !/^gemini-[a-z0-9.-]+$/.test(authoring.model || '') || (authoring.location && !['us','eu','global','us-central1'].includes(authoring.location))))
+      return NextResponse.json({error:'Google authoring requires an explicitly selected Gemini model'}, {status:400});
+    const profile = { ...generatedProfile, mediaAcquisitionOwnerId: auth.id,
+      ...(authoring ? {instructionalAuthoring:{provider:'google' as const, model:authoring.model, ...(authoring.location ? {location:authoring.location} : {}), version:GOOGLE_LESSON_AUTHOR_VERSION}} : {}),
+    };
 
-    const { data: activeBuild, error: activeError } = await db
+    if (body.acceptanceBuild === true && !authoring)
+      return NextResponse.json({error:'A separate teaching acceptance build requires an explicit Google model'}, {status:400});
+    const activeQuery = db
       .from('ultimate_course_builds')
       .select('id,course_id,status,current_step,profile,created_at,updated_at')
       .eq('course_id', course.id)
       .in('status', ['initializing', 'queued', 'running'])
       .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .limit(1);
+    if (body.acceptanceBuild === true)
+      activeQuery.contains('profile', {instructionalAuthoring: profile.instructionalAuthoring});
+    const {data:activeBuild,error:activeError}=await activeQuery.maybeSingle();
     if (activeError) throw activeError;
+    if (activeBuild && authoring && JSON.stringify((activeBuild.profile as any)?.instructionalAuthoring) !== JSON.stringify(profile.instructionalAuthoring))
+      return NextResponse.json({error:'The active build has different locked authoring inputs. Preserve it and use a separate acceptance build.'}, {status:409});
 
     let build = activeBuild;
     if (!build) {

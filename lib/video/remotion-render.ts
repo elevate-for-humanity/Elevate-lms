@@ -851,6 +851,7 @@ export async function renderStoryboardVideo(
         clip_keyword: query,
         clipUrl,
         imageUrl,
+        imageIsInstructional: scene.resolvedModel === 'script-bound-instructional-image' && Boolean(scene.teachingVisual),
         audioSrc,
         captionCues: approvedAudio?.captions,
         durationFrames: Math.ceil(durationSeconds * STORYBOARD_RENDER_FPS),
@@ -858,6 +859,7 @@ export async function renderStoryboardVideo(
         memoryAnchor: scene.memoryAnchor,
         strictBlueprint: input.ultimateStrict,
         teachingVisual: scene.teachingVisual,
+        physicalDemonstration: scene.physicalDemonstration,
       });
     }
 

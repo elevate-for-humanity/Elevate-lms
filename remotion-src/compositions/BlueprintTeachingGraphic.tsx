@@ -1,4 +1,5 @@
-import React, { type CSSProperties } from 'react';
+import React, {type CSSProperties,useLayoutEffect,useRef} from 'react';
+import {cancelRender} from 'remotion';
 import type { TeachingVisual } from '../../lib/ultimate-course-builder/instructional/teaching-visual';
 import { teachingPresentation } from '../../lib/ultimate-course-builder/instructional/teaching-presentation';
 
@@ -8,6 +9,19 @@ export function BlueprintTeachingGraphic({ plan, seconds, duration, color }: {
   plan: TeachingVisual; seconds: number; duration: number; color: string;
 }) {
   const state = teachingPresentation(plan, seconds, duration);
+  const cardRef=useRef<HTMLDivElement>(null);
+  useLayoutEffect(()=>{
+    const element=cardRef.current;
+    if(!element) return;
+    const parent=element.parentElement;
+    const bounds=parent?.getBoundingClientRect();
+    // Remotion mounts a zero-sized offscreen composition to collect metadata.
+    // Only the initialized delivery canvas establishes layout evidence.
+    if(!bounds || bounds.width<=0 || bounds.height<=0 || bounds.y<0) return;
+    if(element.scrollHeight>element.clientHeight+2 || element.getBoundingClientRect().bottom>bounds.bottom+2)
+      cancelRender(new Error('ULTIMATE_TEACHING_GRAPHIC_OVERFLOW:'+JSON.stringify({scrollHeight:element.scrollHeight,clientHeight:element.clientHeight,
+        card:element.getBoundingClientRect().toJSON(),parent:parent?.getBoundingClientRect().toJSON()})));
+  },[seconds,state.activeIndex]);
   const card: CSSProperties = {
     background: 'rgba(255,255,255,0.97)', borderRadius: 18, padding: '12px 16px',
     width: '100%', maxHeight: '100%', minWidth: 0, boxSizing: 'border-box',
@@ -19,10 +33,10 @@ export function BlueprintTeachingGraphic({ plan, seconds, duration, color }: {
     border: `4px solid ${active ? color : '#cbd5e1'}`, borderRadius: 12,
     padding: '10px 12px', minWidth: 0, overflowWrap: 'anywhere', background: active ? '#f1f5f9' : '#fff',
   });
-  const label: CSSProperties = { fontSize: 38, fontWeight: 900, lineHeight: 1.12 };
-  const value: CSSProperties = { fontSize: 36, lineHeight: 1.14, marginTop: 6 };
+  const label: CSSProperties = { fontSize: 64, fontWeight: 900, lineHeight: 1.12 };
+  const value: CSSProperties = { fontSize: 60, lineHeight: 1.14, marginTop: 6 };
   const rows = state.rows;
-  return <div style={card} data-teaching-kind={state.kind} data-teaching-step={state.activeIndex}>
+  return <div ref={cardRef} style={card} data-teaching-kind={state.kind} data-teaching-step={state.activeIndex}>
     {state.kind === 'record' ? (
       <dl style={{ display: 'grid', gap: 8, margin: 0 }}>
         {rows.map(row => <div key={row.index} style={{ ...rowStyle(row.active), display: 'grid', gridTemplateColumns: '35% minmax(0,1fr)', gap: 12 }}>

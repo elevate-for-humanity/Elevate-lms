@@ -33,4 +33,12 @@ describe('composed blueprint teaching states', () => {
   it('rejects unusable timing', () => {
     expect(() => teachingPresentation({kind:'record',steps},0,0)).toThrow('TIMING_REQUIRED');
   });
+  it('gives longer authored fields their own readable state without dropping text',()=>{
+    const plan:TeachingVisual={kind:'record',steps:steps.map(step=>({...step,value:'An authorized instructional field with enough detail to require its own readable screen state.'}))};
+    for(let index=0;index<plan.steps.length;index++){
+      const state=teachingPresentation(plan,index*10+5,40);
+      expect(state.rows).toHaveLength(1);
+      expect(state.rows[0].value).toBe(plan.steps[index].value);
+    }
+  });
 });

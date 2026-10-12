@@ -185,7 +185,10 @@ export function requireResolvedVisualEvidence(sceneData: unknown): {
   if (missing.length) {
     throw new Error(`ULTIMATE_RENDER_VISUAL_ASSETS_MISSING:${missing.join(',')}`);
   }
-  const distinctShots = new Set(urls).size;
+  // Expiring signatures do not turn one stored clip into distinct footage.
+  const distinctShots = new Set(urls.map(url => url!.split(/[?#]/)[0])).size;
+  if (distinctShots < MIN_LESSON_VIDEO_SCENES)
+    throw new Error(`ULTIMATE_RENDER_DISTINCT_VISUALS_REQUIRED:${distinctShots}:${MIN_LESSON_VIDEO_SCENES}`);
   return { visualAssetCount: urls.length, distinctShots };
 }
 
@@ -217,11 +220,20 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
     const candidate = assignment
       ? candidates.find((c) => c.assetId === assignment.assetId)
       : undefined;
-    // Missing saved assignments may use a licensed candidate; renderer still verifies resolved visuals.
-    const resolvedCandidate = candidate ?? candidates[index % Math.max(candidates.length, 1)];
+    // Scene-to-asset evidence is an authority boundary. A missing mapping
+    // cannot be repaired by rotating through unrelated licensed stock.
+    if (!assignment || !candidate)
+      throw new Error(`ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED:${scene.id}`);
+    const physicalDemonstration = (input.requiresPhysicalDemonstration ?? input.requiresPracticalEvidence) === true &&
+      [scene.stage, scene.title, scene.sceneType, scene.scene_type].some(value =>
+        /^(demonstration|guided_practice|independent_practice|mistake_and_correction|mistake and correction)$/.test(String(value ?? '').trim().toLowerCase()));
+    if (physicalDemonstration && candidate.kind !== 'video')
+      throw new Error(`ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED:${scene.id}`);
+    const resolvedCandidate = candidate;
     if (!resolvedCandidate) throw new Error(`ULTIMATE_RENDER_VISUAL_ASSETS_MISSING:${scene.id}`);
     return {
       ...scene,
+      physical_demonstration: physicalDemonstration,
       subject: String(scene.title ?? scene.subject ?? input.courseTitle ?? 'Lesson'),
       action: teachingPoint || visualRequirement,
       dialogue: teachingPoint || visualRequirement,

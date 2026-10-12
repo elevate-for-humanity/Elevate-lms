@@ -1,3 +1,4 @@
+import { isDurableExternalBlocker } from '../core/repair-router';
 /** One durable job, bounded lesson work, and a finite failed-lesson repair pass.
  * An unresolved dependency must not starve the other lessons or other courses. */
 export function nextCourseWork(payload: any, result: any, maximumRepairs = 3) {
@@ -10,10 +11,16 @@ export function nextCourseWork(payload: any, result: any, maximumRepairs = 3) {
     if (index >= 0) retries.splice(index, 1);
   }
   if (!result.completed && competencyId) {
+    if (result.findings?.some(isDurableExternalBlocker)) {
+      const index = retries.indexOf(competencyId);
+      if (index >= 0) retries.splice(index,1);
+      if (!exhausted.includes(competencyId)) exhausted.push(competencyId);
+    } else {
     counts[competencyId] = (counts[competencyId] ?? 0) + 1;
     if (counts[competencyId] < maximumRepairs) {
       if (!retries.includes(competencyId)) retries.push(competencyId);
     } else if (!exhausted.includes(competencyId)) exhausted.push(competencyId);
+    }
   }
   const next = { ...payload, lessonRepairCounts: counts, repairCompetencyIds: retries,
     unresolvedCompetencyIds: exhausted, repairCompetencyId: undefined };

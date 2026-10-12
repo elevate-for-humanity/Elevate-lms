@@ -3,6 +3,7 @@ import { UltimateAppendixAStandardsSource } from '../credential/appendix-a-sourc
 import { registeredInstructionalSources } from '../credential/registered-instructional-sources';
 import { getRegisteredProgramStandardByProfileId } from '@/lib/apprenticeship/registered-program-contract';
 import type { UltimateCredentialProfile } from './types';
+import { classifyCompetency } from '../instructional/competency-classification.mjs';
 
 type CompetencyRow = {
   competency_key?: string | null;
@@ -12,7 +13,7 @@ type CompetencyRow = {
 };
 
 function competencyType(row: CompetencyRow, regulated: boolean) {
-  if (!regulated) return 'knowledge' as const;
+  if (!regulated) return classifyCompetency(row.category || row.source_label).type;
   const value = `${row.category ?? ''} ${row.source_label ?? ''}`;
   if (/trim|clean|covering|cut|shav|sanit|disinfect|chemical|color/i.test(value)) {
     return 'practical_skill' as const;
@@ -47,7 +48,10 @@ export async function hydrateUltimateProfileSources(
       if (!keys.length) return [];
       const objectives = Array.isArray(lesson.learning_objectives)
         ? lesson.learning_objectives.filter(Boolean).join('; ') : '';
-      const content = typeof lesson.content === 'string' ? lesson.content
+      // The source reader consumes a JSON envelope. Plain authored text must
+      // enter that same schema instead of becoming invalid transport on resume.
+      const content = typeof lesson.content === 'string'
+        ? (lesson.content.trim() ? JSON.stringify({html:lesson.content}) : '')
         : lesson.content ? JSON.stringify(lesson.content) : '';
       // Titles and objectives alone are not an authorized teaching source.
       if (!content.trim()) return [];
@@ -166,13 +170,10 @@ export async function buildUltimateProfile(
       description: row.description || row.source_label || `Demonstrate competency ${index + 1}`,
       type: competencyType(row, Boolean(standard)),
       authorityRequirementIds: standard && row.competency_key ? [row.competency_key] : [],
-      requiresDemonstration: Boolean(standard),
-      requiresPracticalEvidence: Boolean(standard),
-      criticalSafetyCompetency: standard
-        ? /clean|sanit|disinfect|protective|safety/i.test(
-            `${row.category ?? ''} ${row.description ?? ''}`,
-          )
-        : false,
+      requiresDemonstration: Boolean(standard) || classifyCompetency(row.category || row.source_label).requiresDemonstration,
+      requiresPracticalEvidence: Boolean(standard) || classifyCompetency(row.category || row.source_label).requiresPracticalEvidence,
+      criticalSafetyCompetency: classifyCompetency(row.category || row.source_label).criticalSafetyCompetency ||
+        Boolean(standard && /clean|sanit|disinfect|protective|safety/i.test(`${row.category ?? ''} ${row.description ?? ''}`)),
     })),
   });
 }

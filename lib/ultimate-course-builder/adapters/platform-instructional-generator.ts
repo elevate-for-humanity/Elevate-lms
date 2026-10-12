@@ -5,6 +5,7 @@ import { contractHash, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/lesson-c
 import { ULTIMATE_TEACHING_SEQUENCE } from '../instructional/teaching-sequence';
 import { produceTeachingVisual } from '../instructional/teaching-visual';
 import { sourceTeaching, narrationChunks } from '../instructional/source-teaching';
+import { authorGoogleLesson, generateVertexLessonJson, validateGoogleAuthoringEvidence, GOOGLE_LESSON_AUTHOR_VERSION } from '../instructional/google-lesson-author';
 
 type Evidence = {
   profile: UltimateCredentialProfile & {
@@ -50,14 +51,19 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     const e = value as Evidence;
     if (!e?.competency?.id || !e.profile?.authority)
       throw new Error('ULTIMATE_STANDARDS_EVIDENCE_REQUIRED');
+    const lessonSources = e.profile.instructionalSources?.filter(s =>
+      [e.competency.id, `course-lesson:${e.competency.id}`, `course:${e.competency.id}`].includes(s.id) ||
+      e.competency.authorityRequirementIds.includes(s.id)) ?? [];
     const approved = e.profile.lessonBlueprints?.[e.competency.id];
     if (approved) {
       validateLessonBlueprint(approved, e.competency);
+      if (e.profile.instructionalAuthoring?.provider === 'google') validateGoogleAuthoringEvidence(approved, lessonSources);
       return approved;
     }
     const existing = e.prior?.learning_objectives?.blueprint;
     if (existing) {
       validateLessonBlueprint(existing, e.competency);
+      if (e.profile.instructionalAuthoring?.provider === 'google') validateGoogleAuthoringEvidence(existing, lessonSources);
       return existing;
     }
     const key = contractHash({
@@ -84,6 +90,13 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     );
     if (!sources?.length || sources.some((s) => !s.id || !s.text?.trim()))
       throw new Error('ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED');
+
+    if (e.profile.instructionalAuthoring?.provider === 'google') {
+      const config = e.profile.instructionalAuthoring;
+      if (config.version !== GOOGLE_LESSON_AUTHOR_VERSION) throw new Error('ULTIMATE_AUTHORING_VERSION_REQUIRED');
+      return authorGoogleLesson({ profile: e.profile, competency: e.competency, sources },
+        (system, input) => generateVertexLessonJson(config.model, system, input, config.location));
+    }
 
     // Active Course Builder is deterministic and source-bound. The archived
     // Elevate GPU/LLM runtime is intentionally not part of this production path.

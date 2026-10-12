@@ -23,6 +23,8 @@ export const ULTIMATE_BUILD_STEPS = [
 export type UltimateBuildStep = (typeof ULTIMATE_BUILD_STEPS)[number];
 export type UltimateStepState = 'pending' | 'running' | 'passed' | 'failed' | 'blocked';
 export interface UltimateCredentialProfile {
+  /** Opt-in, immutable authoring configuration for new acceptance builds. */
+  instructionalAuthoring?: { provider: 'google'; model: string; location?: string; version: string };
   id: string;
   title: string;
   /** Learner audience carried from the canonical course record into lesson generation. */

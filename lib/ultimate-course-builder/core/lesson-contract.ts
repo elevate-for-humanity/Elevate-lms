@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from './types';
+import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
 
 /** Changing this version invalidates every checkpoint and release certificate. */
 export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-05.1';
@@ -185,7 +186,7 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
         populated(a.assessment.reassessment), 'ASSESSMENT_SCORING_REMEDIATION_REQUIRED');
       break;
     case 'lesson_film_render':
-      require(nonempty(a.render?.videoUrl) &&
+      require(renderPlaybackUrl(a.render) && renderMediaUrl(a.render) &&
         a.render.duration > 0 &&
         nonempty(a.render.captionsUrl) &&
         nonempty(a.render.transcriptUrl), 'RENDER_DELIVERY_ASSETS_REQUIRED');
@@ -232,7 +233,12 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
 export function assertCompleteLesson(
   artifacts: Partial<Record<UltimateBuildStep, Artifact>>,
   profile?: unknown,
+  competencyId?: string,
 ): void {
+  const competencies = (profile as any)?.competencies ?? [];
+  const competency = competencies.find((c: any) => c.id === competencyId) ?? (competencies.length === 1 ? competencies[0] : undefined);
+  if (practicalVisualFailures(artifacts, competency).length)
+    throw new Error('ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED');
   for (const step of ULTIMATE_BUILD_STEPS) {
     const a = artifacts[step];
     if (
@@ -241,4 +247,20 @@ export function assertCompleteLesson(
     )
       throw new Error(`ULTIMATE_CURRENT_CONTRACT_EVIDENCE_REQUIRED:${step}`);
   }
+}
+
+/** Recheck saved assignments without invalidating usable media checkpoints. */
+export function practicalVisualFailures(artifacts: Partial<Record<UltimateBuildStep, Artifact>>, competency: any): string[] {
+  if (competency?.requiresPracticalEvidence !== true || (competency.type && competency.type !== 'practical_skill')) return [];
+  const scenes = artifacts.storyboard?.storyboard?.scenes ?? [];
+  const media = artifacts.visual_assignment?.media ?? {};
+  const physical = scenes.filter((scene: any) => [scene.stage, scene.title, scene.sceneType, scene.scene_type].some(value =>
+    /^(demonstration|guided_practice|independent_practice|mistake_and_correction|mistake and correction)$/.test(String(value ?? '').trim().toLowerCase())));
+  return physical.some((scene: any) => {
+    const assignment = media.assignments?.find((a: any) => a.sceneId === scene.id);
+    const asset = media.readyAssets?.find((a: any) => a.id === assignment?.assetId);
+    return !assignment || assignment.generatedInstructionalVisual || assignment.assignmentMethod === 'instructional-render' ||
+      !asset?.entitlement_id || !assignment.licenseEvidenceUrl ||
+      !(String(asset.mime_type ?? '').startsWith('video/') || /\.(mp4|webm|mov)(?:[?#]|$)/i.test(String(asset.public_url ?? '')));
+  }) ? ['ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED'] : [];
 }

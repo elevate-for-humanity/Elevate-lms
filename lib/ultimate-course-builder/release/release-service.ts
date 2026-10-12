@@ -1,6 +1,7 @@
 import 'server-only';
 import { assertCompleteLesson, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/lesson-contract';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
 const slug = (v: string) =>
   v
     .toLowerCase()
@@ -35,7 +36,7 @@ export class UltimateReleaseService {
       new Set(ls.map((l: any) => l.competency_id)).size !== ls.length
     )
       throw new Error('ULTIMATE_ALL_COMPETENCIES_REQUIRED');
-    for (const lesson of ls) assertCompleteLesson(lesson.artifacts as any, b.profile);
+    for (const lesson of ls) assertCompleteLesson(lesson.artifacts as any, b.profile, lesson.competency_id);
     const p: any = b.profile,
       cm = new Map((p.competencies ?? []).map((c: any) => [String(c.id), c]));
     return {
@@ -63,7 +64,7 @@ export class UltimateReleaseService {
           assessment: a.assessment_alignment?.assessment ?? a.assessment_alignment ?? {},
           remediation: a.selective_repair ?? {},
           traceability: a.credential_release?.release?.rows ?? [],
-          videoUrl: r.videoUrl ?? r.outputPath ?? null,
+          videoUrl: renderPlaybackUrl(r),
           script: a.instructor_script?.script?.script ?? null,
           segments: a.instructor_script?.script?.segments ?? [],
           timeline: a.synchronization?.timeline,
@@ -78,7 +79,7 @@ export class UltimateReleaseService {
   async applyPackage(p: any, actorId: string) {
     if (p.contractVersion !== ULTIMATE_LESSON_CONTRACT_VERSION || !p.lessons?.length)
       throw new Error('ULTIMATE_RELEASE_CONTRACT_REQUIRED');
-    for (const lesson of p.lessons) assertCompleteLesson(lesson.contractArtifacts, p.profile);
+    for (const lesson of p.lessons) assertCompleteLesson(lesson.contractArtifacts, p.profile, lesson.competencyId);
     const now = new Date().toISOString();
     const { data: existingModule, error: me } = await this.db
       .from('course_modules')
@@ -214,7 +215,8 @@ export class UltimateReleaseService {
           },
           contractVersion: p.contractVersion,
           film: {
-            videoUrl: l.videoUrl,
+            videoUrl: renderMediaUrl(l.contractArtifacts.lesson_film_render.render),
+            playbackUrl: l.videoUrl,
             captionsUrl: l.captionsUrl,
             transcriptUrl: l.transcriptUrl,
           },
@@ -349,9 +351,9 @@ export class UltimateReleaseService {
   private async recordApprovedFilm(p: any, l: any, lessonId: string, actorId: string, now: string) {
     // Approval derives from current evidence for all twenty steps, including
     // delivered-MP4 inspection and the learner runthrough.
-    assertCompleteLesson(l.contractArtifacts, p.profile);
+    assertCompleteLesson(l.contractArtifacts, p.profile, l.competencyId);
     const film = l.contractArtifacts.lesson_film_render.render;
-    if (film.videoUrl !== l.videoUrl) throw new Error('ULTIMATE_RELEASE_FILM_MISMATCH');
+    if (renderPlaybackUrl(film) !== l.videoUrl) throw new Error('ULTIMATE_RELEASE_FILM_MISMATCH');
     const { data: existing, error: lookupError } = await this.db.from('video_jobs')
       .select('id,status,lease_expires_at')
       .eq('course_id', p.courseId).eq('lesson_id', lessonId)
@@ -363,7 +365,7 @@ export class UltimateReleaseService {
     const media = {
       course_id: p.courseId, lesson_id: lessonId, lesson_title: l.title,
       asset_kind: 'lesson', asset_key: null, status: 'complete',
-      provider: film.provider ?? 'remotion', video_url: film.videoUrl,
+      provider: film.provider ?? 'remotion', video_url: renderPlaybackUrl(film),
       script: l.script, scene_data: l.storyboard,
       duration_seconds: Math.ceil(film.duration),
       scene_count: l.storyboard?.scenes?.length ?? l.segments.length,

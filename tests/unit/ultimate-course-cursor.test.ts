@@ -2,6 +2,14 @@ import {describe,it,expect} from 'vitest';
 import {nextCourseWork} from '@/lib/ultimate-course-builder/worker/course-cursor';
 const result=(id:string,passed:boolean,remaining:boolean,index:number)=>({completed:passed,hasRemaining:remaining,nextIndex:index,lessons:[{competencyId:id}]});
 describe('durable course queue fairness',()=>{
+ it('continues other lessons without consuming repairs for missing Google permission',()=>{
+  const blocked={...result('a',false,true,1),findings:[{code:'ULTIMATE_GOOGLE_AUTHORING_HTTP_403'}]};
+  const work=nextCourseWork({lessonRepairCounts:{a:2}},blocked);
+  expect(work.payload.lessonRepairCounts.a).toBe(2);
+  expect(work.payload.repairCompetencyIds).toEqual([]);
+  expect(work.payload.unresolvedCompetencyIds).toEqual(['a']);
+  expect(work.payload.nextCompetencyIndex).toBe(1);
+ });
  it('continues past one failed lesson and defers its repair',()=>{
   const work=nextCourseWork({},result('a',false,true,1));
   expect(work.payload.nextCompetencyIndex).toBe(1);

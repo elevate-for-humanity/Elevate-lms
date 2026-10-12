@@ -2,6 +2,7 @@ import { assertCompleteLesson } from '../core/lesson-contract';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { UltimateLmsCoursePackage } from './lms-package';
 import { validateLmsCoursePackage } from './lms-package';
+import { renderPlaybackUrl } from '../media/playback-source.mjs';
 export class UltimateLmsPublisher {
   constructor(private db: SupabaseClient) {}
   async publish(courseId: string, p: UltimateLmsCoursePackage) {
@@ -13,7 +14,7 @@ export class UltimateLmsPublisher {
         .from('course_lessons')
         .update({
           learning_objectives: lesson.objectives,
-          video_url: lesson.film.videoUrl,
+          video_url: renderPlaybackUrl(lesson.film),
           content_json: {
             ultimate: true,
             learningObjects: lesson.learningObjects,

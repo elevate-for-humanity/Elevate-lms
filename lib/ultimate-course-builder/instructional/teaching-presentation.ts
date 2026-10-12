@@ -6,7 +6,8 @@ export function teachingPresentation(plan: TeachingVisual, seconds: number, dura
   if (!Number.isFinite(seconds) || !Number.isFinite(duration) || duration <= 0 || !plan.steps.length)
     throw new Error('TEACHING_PRESENTATION_TIMING_REQUIRED');
   const activeIndex = teachingVisualStepIndex(seconds, duration, plan.steps.length);
-  const pageSize = plan.kind === 'sequence' ? 1 : 2;
+  const pageSize = plan.kind === 'sequence' || plan.steps.some(step =>
+    step.label.length > 28 || step.label.length + step.value.length > 100) ? 1 : 2;
   const pageStart = Math.floor(activeIndex / pageSize) * pageSize;
   const rows = plan.steps.slice(pageStart, activeIndex + 1).map((step, offset) => ({
     ...step, index: pageStart + offset, active: pageStart + offset === activeIndex,

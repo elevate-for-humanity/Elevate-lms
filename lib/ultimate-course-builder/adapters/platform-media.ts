@@ -206,6 +206,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       scenes,
       readyAssets,
       input.profile?.sceneAssignments?.[input.competency?.id] ?? [],
+      {requiresPracticalEvidence: input.competency?.requiresPracticalEvidence === true, competencyType:input.competency?.type},
     );
     if (gaps.length) {
       const workspaceId = firstRecord(

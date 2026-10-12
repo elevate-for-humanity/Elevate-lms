@@ -12,6 +12,7 @@ import { nextCourseWork } from './course-cursor';
 import { resolveReleaseActor } from './release-actor';
 import { hydrateUltimateProfileSources } from '../core/course-profile';
 import { materializeUltimateDraft } from './materialize-draft';
+import { isDurableExternalBlocker } from '../core/repair-router';
 export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
@@ -109,6 +110,10 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       }
     }
     if (!result.completed) {
+      if (result.findings.some(isDurableExternalBlocker)) {
+        await queue.waitForDependency(job.id,workerId,JSON.stringify(result.findings.map(f=>({code:f.code,message:f.message}))).slice(0,4000),generation);
+        return {claimed:true,completed:false,awaitingDependency:true,jobId:job.id,result};
+      }
       // Quality findings are repair work, not a terminal queue state. Requeue
       // the durable build so the worker resumes from its persisted checkpoint
       // and selective-repair plan instead of stranding the entire course.
@@ -153,7 +158,9 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       console.error('[UltimateWorker] lease lost; not changing job state', {jobId: job.id, message});
       return {claimed:true,completed:false,jobId:job.id,error:message};
     }
-    await queue.fail(job.id, workerId, message, generation, true);
+    if (isDurableExternalBlocker({code:message.split(':')[0],step:'learning_objectives',severity:'error',message}))
+      await queue.waitForDependency(job.id,workerId,message,generation);
+    else await queue.fail(job.id, workerId, message, generation, true);
     return { claimed: true, completed: false, jobId: job.id, error: message };
   } finally {
     if (timer) clearInterval(timer);

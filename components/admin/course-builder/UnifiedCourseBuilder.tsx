@@ -55,6 +55,9 @@ async function startUltimateCourse(input: {
   programSlug: string;
   topic?: string;
   audience?: string;
+  googleModel?: string;
+  googleLocation?: string;
+  acceptanceBuild?: boolean;
 }) {
   const response = await fetch('/api/admin/ultimate-course-builder', {
     method: 'POST',
@@ -66,6 +69,8 @@ async function startUltimateCourse(input: {
       title: input.course.title,
       topic: input.topic ?? input.course.description ?? '',
       audience: input.audience ?? '',
+      ...(input.googleModel?.trim() ? {instructionalAuthoring: {provider:'google', model:input.googleModel.trim(), location:input.googleLocation || 'us'}} : {}),
+      ...(input.acceptanceBuild ? {acceptanceBuild:true} : {}),
     }),
   });
   const payload = await readJson(response);
@@ -475,6 +480,10 @@ function CreateCoursePanel({
       const title = String(data.get('title') ?? '').trim();
       const topic = String(data.get('topic') ?? '').trim();
       const audience = String(data.get('audience') ?? '').trim();
+      const googleModel = String(data.get('googleModel') ?? '').trim();
+      const googleLocation = String(data.get('googleLocation') || 'us');
+      if (googleModel && !/^gemini-[a-z0-9.-]+$/.test(googleModel))
+        throw new Error('Enter a supported Google model ID for source-grounded teaching');
       const programId = String(data.get('programId') ?? '').trim();
       const selectedProgram = programs.find((program) => program.id === programId);
       if (!selectedProgram?.slug) throw new Error('The selected program needs a canonical slug');
@@ -503,6 +512,8 @@ function CreateCoursePanel({
         programSlug: selectedProgram.slug,
         topic,
         audience,
+        googleModel,
+        googleLocation,
       });
       await onCreated(course.id);
     } catch (reason) {
@@ -558,6 +569,12 @@ function CreateCoursePanel({
             </option>
           ))}
       </select>
+      <label className="block space-y-2 text-sm">
+        <span>Google model for source-grounded teaching (optional)</span>
+        <input name="googleModel" placeholder="Verified model ID" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" />
+        <select name="googleLocation" defaultValue="us" aria-label="Google authoring location" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"><option value="us">United States multi-region</option><option value="us-central1">Iowa region (supported models)</option><option value="global">Global</option></select>
+        <span className="block text-slate-400">Use a model verified for this worker's Google region. Authorized teaching sources and all media acceptance checks remain required.</span>
+      </label>
       {error ? (
         <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
           {error}
@@ -593,6 +610,8 @@ export function UltimateBuildPanel({
   const statusLoading = loading;
   const statusLoaded = buildsCourseId === course.id;
   const [notice, setNotice] = useState('');
+  const [googleModel, setGoogleModel] = useState('');
+  const [googleLocation,setGoogleLocation]=useState('us');
   const jobs = [...(latest?.ultimate_build_jobs ?? [])].sort((a, b) =>
     b.created_at.localeCompare(a.created_at),
   );
@@ -658,7 +677,7 @@ export function UltimateBuildPanel({
         if (!response.ok || payload?.dispatched !== true) throw new Error(payload?.error || 'Google worker could not be started');
         setNotice('Google worker dispatch accepted. The stages below show actual build progress.');
       } else {
-        await startUltimateCourse({ course, programSlug });
+        await startUltimateCourse({ course, programSlug, googleModel, googleLocation });
         setNotice('Build saved and Google worker dispatch accepted. Check the stages for progress.');
       }
       await refresh();
@@ -667,6 +686,19 @@ export function UltimateBuildPanel({
     } finally {
       setBusy(false);
     }
+  }
+
+  async function startAcceptanceBuild() {
+    setBusy(true);
+    setError('');
+    try {
+      if (!/^gemini-[a-z0-9.-]+$/.test(googleModel.trim())) throw new Error('Enter a supported Google model ID');
+      await startUltimateCourse({course,programSlug,googleModel,googleLocation,acceptanceBuild:true});
+      setNotice('Separate acceptance build queued for this course. Previous builds and media remain preserved.');
+      await refresh();
+    } catch(reason) {
+      setError(reason instanceof Error ? reason.message : 'Unable to start the acceptance build');
+    } finally {setBusy(false);}
   }
 
   async function publish() {
@@ -778,7 +810,21 @@ export function UltimateBuildPanel({
       {notice ? <p role="status" className="mt-4 text-sm text-cyan-200">{notice}</p> : null}
       {latest ? <UltimateStageInspector buildId={latest.id} updatedAt={latest.updated_at} /> : null}
 
+      {statusLoaded && (!latest || ['blocked','failed','built_with_findings'].includes(latest.status)) ? (
+        <label className="mt-4 block space-y-2 text-sm">
+          <span>Google model for source-grounded teaching (optional)</span>
+          <input value={googleModel} onChange={(event) => setGoogleModel(event.target.value)} placeholder="Verified model ID" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" />
+          <select value={googleLocation} onChange={event=>setGoogleLocation(event.target.value)} aria-label="Google authoring location" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"><option value="us">United States multi-region</option><option value="us-central1">Iowa region (supported models)</option><option value="global">Global</option></select>
+          <span className="block text-slate-400">Set before starting this build. Authorized teaching sources and all media acceptance checks remain required.</span>
+        </label>
+      ) : null}
+
       <div className="mt-6 flex flex-wrap gap-3">
+        {latest && ['blocked','failed','built_with_findings'].includes(latest.status) ? (
+          <button type="button" onClick={()=>void startAcceptanceBuild()} disabled={busy || !googleModel.trim() || activeJob?.status === 'running'} className="rounded-lg bg-indigo-600 px-4 py-2 font-bold text-white disabled:opacity-50">
+            Start source-grounded acceptance build
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={() => void startBuild()}

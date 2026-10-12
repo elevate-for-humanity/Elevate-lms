@@ -28,11 +28,14 @@ COPY lib/logger.ts lib/secrets.ts ./lib/
 COPY server/video-generator/visual-intelligence.ts ./server/video-generator/visual-intelligence.ts
 COPY remotion-src ./remotion-src
 COPY public ./public
+COPY tests/integration/google-lesson-author.test.ts ./tests/integration/google-lesson-author.test.ts
+COPY docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json ./docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json
 # The standalone worker is a plain Node runtime, not a React Server Component.
 # Strip Next's compile-time-only marker inside this image so Remotion receives
 # the standard React export (including createContext).
 RUN find lib server -type f -name '*.ts' -exec sed -i "/^import 'server-only';$/d" {} +
 RUN node -e "require.resolve('@supabase/supabase-js');require.resolve('@remotion/renderer');require.resolve('tsx')"  && test ! -d node_modules/stripe && test ! -d node_modules/next && test ! -d node_modules/@sentry
+RUN node --test lib/ultimate-course-builder/instructional/competency-classification.test.mjs lib/ultimate-course-builder/media/playback-source.test.mjs && node --import=tsx --test tests/integration/google-lesson-author.test.ts
 # Download the narrator at build time, then fail closed to offline-only inference.\n# The runtime image must never reach Hugging Face while rendering a lesson.
 RUN HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 node --input-type=module -e "const {KokoroTTS}=await import('kokoro-js');await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:'q8',device:'cpu'})"
 # Cache CPU speech recognition so captions and rendered-audio QA do not depend on API quotas.

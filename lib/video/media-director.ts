@@ -85,6 +85,7 @@ export interface MediaScene {
   sceneType?: InstructionalSceneType;
   memoryAnchor?: string;
   teachingVisual?: import('../ultimate-course-builder/instructional/teaching-visual').TeachingVisual;
+  physicalDemonstration?: boolean;
   /** Written by the renderer only when the encoded scene uses this measured title box. */
   titleLayout?: 'footage-title-v1';
   mediaSource: 'pexels' | 'elevate-owned' | 'elevate-motion';
@@ -488,6 +489,7 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
             stringValue((raw.teaching_model as Record<string, unknown> | undefined)?.memory_anchor),
           ) || undefined,
         teachingVisual: scene.teachingVisual as MediaScene['teachingVisual'],
+        physicalDemonstration: scene.physical_demonstration === true || scene.physicalDemonstration === true,
         mediaSource,
         overlayTemplate,
         contentHash: stringValue(scene.content_hash ?? scene.contentHash, contentHash),

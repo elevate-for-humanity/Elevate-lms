@@ -86,7 +86,7 @@ export default function StagedLessonExperience({
   return (
     <div ref={root} className="space-y-6" data-testid="staged-lesson">
       <InteractiveVideoPlayer
-        videoUrl={snapshot.render.videoUrl}
+        videoUrl={snapshot.render.playbackUrl || snapshot.render.videoUrl}
         captionsUrl={snapshot.render.captionsUrl}
         title={snapshot.title}
         initialPositionSeconds={Number(initialProgress.position ?? 0)}

@@ -30,11 +30,27 @@ test('saved assignments survive other asset records referencing the same license
 test('preserving record IDs does not certify repeated shots as distinct visuals', () => {
   assert.throws(() => requireResolvedVisualEvidence({ scenes: Array.from({ length: minimum }, () => ({ sourceVideoUrl: 'https://media.example/same.mp4' })) }), /DISTINCT_VISUALS_REQUIRED/);
 });
+test('missing scene mapping cannot substitute an arbitrary licensed clip', () => {
+  assert.throws(() => prepareUltimateStoryboardInput({artifacts:{
+    storyboard:{storyboard:{scenes:Array.from({length:minimum},(_,i)=>({id:`unmapped-${i}`,dialogue:'Teach this competency'}))}},
+    visual_assignment:{media:{assignments:[],readyAssets:[{id:'unrelated',public_url:'https://media.example/stock.mp4',mime_type:'video/mp4',entitlement_id:'license'}]}},
+  }}), /ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED/);
+});
 test('copies of one stored file use the existing instructional producer for remaining scenes', () => {
-  const scenes = Array.from({ length: minimum }, (_, i) => ({ id: `scene-${i}`, visualRequirement: 'A client consultation' }));
+  const scenes = Array.from({ length: minimum }, (_, i) => ({ id: `scene-${i}`, visualRequirement: 'A client consultation', teachingVisual:{kind:'sequence',steps:[{label:'Clarify',value:'Clarify the client request'}]} }));
   const assets = scenes.map((_, i) => ({ id: `copy-${i}`, public_url: `https://media.example/file.mp4?token=${i}`, entitlement_id: 'license', license_evidence_url: 'https://media.example/license', visual_coverage_verified: true, visual_requirements: ['A client consultation'] }));
   const result = buildSceneAssignments(scenes, assets);
   assert.equal(result.assignments.filter(a => a.assignmentMethod !== 'instructional-render').length, 1);
   assert.equal(result.assignments.filter(a => a.assignmentMethod === 'instructional-render').length, minimum - 1);
   assert.deepEqual(result.gaps, []);
+});
+test('checkpointed graphics cannot replace required practical demonstrations', () => {
+  const scenes = Array.from({length:minimum},(_,i)=>({id:`physical-${i}`,stage:'demonstration',dialogue:'Demonstrate the technique'}));
+  const input={requiresPracticalEvidence:true,artifacts:{
+    storyboard:{storyboard:{scenes}},visual_assignment:{media:{
+      assignments:scenes.map(s=>({sceneId:s.id,assetId:`instructional:${s.id}`,assignmentMethod:'instructional-render',generatedInstructionalVisual:true})),
+      readyAssets:scenes.map(s=>({id:`instructional:${s.id}`,instructional_scene_id:s.id,public_url:`https://media.example/${s.id}.png`,mime_type:'image/png',owned_instructional_visual:true,provider:'remotion'})),
+    }},
+  }};
+  assert.throws(()=>prepareUltimateStoryboardInput(input), /ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED/);
 });

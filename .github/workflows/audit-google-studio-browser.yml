@@ -39,5 +39,5 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
-      - name: Trace the actual browser endpoint and durable Google runtime
+      - name: Verify active Google browser endpoint and persistent state topology
         run: node scripts/gcp/audit-studio-browser.mjs

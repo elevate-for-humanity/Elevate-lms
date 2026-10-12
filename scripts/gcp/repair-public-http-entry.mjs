@@ -45,7 +45,7 @@ async function repair() {
  const existingMap=read(['compute','url-maps','list']).find(m=>m.name===mapName);
  assert.ok(!existingMap||existingMap.description===redirectMap().description,'Do not overwrite an unrecognized map');
  const file='/tmp/elevate-public-http-redirect.json';writeFileSync(file,JSON.stringify(redirectMap(),null,2));
- mutate(['compute','url-maps','validate','--source='+file]);
+ mutate(['compute','url-maps','validate','--source='+file,'--global','--load-balancing-scheme='+frontend.scheme]);
  mutate(['compute','url-maps','import',mapName,'--source='+file,'--global']);
  if(!existingProxy) mutate(['compute','target-http-proxies','create',proxyName,'--url-map='+mapName,'--global']);
  if(!occupied.length) mutate(['compute','forwarding-rules','create',ruleName,'--load-balancing-scheme='+frontend.scheme,'--address='+frontend.addressName,'--network-tier=PREMIUM','--global','--target-http-proxy='+proxyName,'--ports=80']);

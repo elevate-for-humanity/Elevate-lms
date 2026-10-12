@@ -20,7 +20,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test scripts/gcp/inspect-course-media.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -36,4 +35,5 @@ jobs:
           IMAGE='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@sha256:dbf06927683878e6602bd313f231780061c4a5afad1ead43e55b27c30421b52d'
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
           docker pull "$IMAGE"
+          docker run --rm --entrypoint node -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "$IMAGE" --test /app/scripts/gcp/inspect-course-media.test.mjs
           gcloud secrets versions access latest --secret=elevate-ultimate-worker-runtime-config --project=elegant-racer-299721 | docker run --rm -i --entrypoint node -e COURSE_MEDIA_DEEP_AUDIT=true -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "$IMAGE" --import=tsx /app/scripts/gcp/audit-course-storage.ts

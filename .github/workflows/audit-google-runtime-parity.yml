@@ -42,7 +42,7 @@ jobs:
           skip_install: true
       - name: Verify runner-supplied Google SDK compatibility
         run: node scripts/gcp/verify-sdk.mjs
-      - name: Read source inventory and verify Google replacements without source deployment writes
+      - name: Verify source container export availability and Google migration evidence
         env:
           NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
           NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID }}

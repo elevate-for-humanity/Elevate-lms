@@ -103,6 +103,15 @@ export async function main() {
       const service = await northflank(`/services/${item.id}`);
       const environment = await northflank(`/services/${item.id}/runtime-environment?show=all&replaceTemplatedValues=true`);
       entry.environment = compareEnvironments(environment.runtimeEnvironment, container.env, kind, {component:item.id.replace(/^elevate-/,'')});
+      entry.sourceInstances = service.deployment?.instances ?? service.instances ?? null;
+      if(item.id==='elevate-studio-browser') {
+        try {
+          const inventory=await northflank('/services/'+item.id+'/containers');
+          const containers=Array.isArray(inventory)?inventory:inventory.containers;
+          entry.sourceContainerCount=Array.isArray(containers)?containers.length:null;
+          entry.sourceFilesystemExportAvailable=Array.isArray(containers)&&containers.length>0;
+        } catch {entry.sourceFilesystemExportAvailable=false;entry.sourceContainerInventory='unavailable';}
+      }
       entry.sourceHealth = (service.healthChecks ?? []).map(x => ({ type: x.type, path: x.path, port: x.port }));
       entry.googleHealth = { startup: Boolean(container.startupProbe), liveness: Boolean(container.livenessProbe) };
       entry.volumeCounts = { source: (service.deployment?.volumes ?? service.volumes ?? []).length, google: (spec.volumes ?? []).length };

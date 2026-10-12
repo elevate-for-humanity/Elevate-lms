@@ -29,7 +29,7 @@ for(const [index,frame] of [150,360,600].entries()) {
     const found=new Set(decoded.match(/[a-z]+/g));
     const coverage=expected.filter(word=>found.has(word)).length/expected.length;
     evidence.push({step:index,scale,wordCoverage:coverage});
-    if(coverage<0.85) throw new Error(`Layout regression OCR below 85% at step ${index}, scale ${scale}`);
+    if(coverage<0.85) throw new Error(`Layout regression OCR below 85%:${JSON.stringify({step:index,scale,coverage,expected,decoded})}`);
   }
 }
 await writeFile(`${output}/evidence.json`,JSON.stringify({purpose:'layout-regression-only',evidence},null,2));

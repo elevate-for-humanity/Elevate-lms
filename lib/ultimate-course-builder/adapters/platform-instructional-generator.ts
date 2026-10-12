@@ -95,7 +95,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       const config = e.profile.instructionalAuthoring;
       if (config.version !== GOOGLE_LESSON_AUTHOR_VERSION) throw new Error('ULTIMATE_AUTHORING_VERSION_REQUIRED');
       return authorGoogleLesson({ profile: e.profile, competency: e.competency, sources },
-        (system, input) => generateVertexLessonJson(config.model, system, input));
+        (system, input) => generateVertexLessonJson(config.model, system, input, config.location));
     }
 
     // Active Course Builder is deterministic and source-bound. The archived

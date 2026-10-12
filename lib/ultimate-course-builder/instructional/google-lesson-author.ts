@@ -85,10 +85,10 @@ Grounding is an array with one entry per segment: {segmentId, sourceId, excerpt}
 /** Uses the existing Cloud Run service identity; no browser credentials or
  * production keys are copied into the course record or authoring artifact.
  */
-export async function generateVertexLessonJson(model: string, system: string, input: unknown) {
+export async function generateVertexLessonJson(model: string, system: string, input: unknown, location?: string) {
   if (!/^gemini-[a-z0-9.-]+$/.test(model)) throw new Error('ULTIMATE_GOOGLE_MODEL_REQUIRED');
   const project = process.env.GOOGLE_CLOUD_PROJECT || process.env.GCP_PROJECT_ID || 'elegant-racer-299721';
-  const region = process.env.ULTIMATE_GOOGLE_REGION || 'us-central1';
+  const region = location || process.env.ULTIMATE_GOOGLE_REGION || 'us-central1';
   if (!project || !/^[a-z][a-z0-9-]+$/.test(project) || !/^[a-z0-9-]+$/.test(region))
     throw new Error('ULTIMATE_GOOGLE_PROJECT_REQUIRED');
   const tokenResponse = await fetch('http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token', {
@@ -97,7 +97,7 @@ export async function generateVertexLessonJson(model: string, system: string, in
   if (!tokenResponse.ok) throw new Error('ULTIMATE_GOOGLE_SERVICE_IDENTITY_UNAVAILABLE');
   const token = await tokenResponse.json();
   if (!token.access_token) throw new Error('ULTIMATE_GOOGLE_SERVICE_IDENTITY_UNAVAILABLE');
-  const host = region === 'global' ? 'aiplatform.googleapis.com' : `${region}-aiplatform.googleapis.com`;
+  const host = region === 'global' ? 'aiplatform.googleapis.com' : ['us','eu'].includes(region) ? `aiplatform.${region}.rep.googleapis.com` : `${region}-aiplatform.googleapis.com`;
   const response = await fetch(`https://${host}/v1/projects/${project}/locations/${region}/publishers/google/models/${model}:generateContent`, {
     method: 'POST', headers: { Authorization: `Bearer ${token.access_token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: JSON.stringify(input) }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 16384, responseMimeType: 'application/json' } }),

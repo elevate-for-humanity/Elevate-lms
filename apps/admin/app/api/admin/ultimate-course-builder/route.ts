@@ -220,10 +220,10 @@ export async function POST(req: NextRequest) {
       state: String(body.state || ''),
     });
     const authoring = body.instructionalAuthoring;
-    if (authoring && (authoring.provider !== 'google' || !/^gemini-[a-z0-9.-]+$/.test(authoring.model || '')))
+    if (authoring && (authoring.provider !== 'google' || !/^gemini-[a-z0-9.-]+$/.test(authoring.model || '') || (authoring.location && !['us','eu','global','us-central1'].includes(authoring.location))))
       return NextResponse.json({error:'Google authoring requires an explicitly selected Gemini model'}, {status:400});
     const profile = { ...generatedProfile, mediaAcquisitionOwnerId: auth.id,
-      ...(authoring ? {instructionalAuthoring:{provider:'google' as const, model:authoring.model, version:GOOGLE_LESSON_AUTHOR_VERSION}} : {}),
+      ...(authoring ? {instructionalAuthoring:{provider:'google' as const, model:authoring.model, ...(authoring.location ? {location:authoring.location} : {}), version:GOOGLE_LESSON_AUTHOR_VERSION}} : {}),
     };
 
     if (body.acceptanceBuild === true && !authoring)

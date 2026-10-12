@@ -3,6 +3,9 @@ on:
   push:
     branches: [main]
     paths:
+      - 'tests/integration/google-lesson-author.test.ts'
+      - 'tests/unit/ultimate-registered-profile.test.ts'
+      - 'tests/worker/**'
       - 'workers/**'
       - 'lib/ultimate-course-builder/**'
       - 'lib/video/**'

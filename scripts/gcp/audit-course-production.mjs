@@ -28,6 +28,16 @@ export function auditCourseProduction(run=google) {
       timeoutSeconds:task?.timeoutSeconds};
   } catch(error) {report.failures.push({operation:'job_readback',code:error.code??'read_failed'});}
   try {
+    const policy=JSON.parse(run(['projects','get-iam-policy',PROJECT,'--format=json']));
+    const principal='serviceAccount:' + (report.job?.serviceAccount || 'elevate-worker-runtime@' + PROJECT + '.iam.gserviceaccount.com');
+    report.authoringAccess={principal,projectRoles:(policy.bindings || []).filter(binding=>
+      binding.members?.includes(principal)).map(binding=>({role:binding.role,conditional:Boolean(binding.condition)}))};
+  } catch(error) {report.failures.push({operation:'authoring_iam_readback',code:error.code??'read_failed'});}
+  try {
+    const services=JSON.parse(run(['services','list','--enabled','--project',PROJECT,'--format=json']));
+    report.vertexApiEnabled=services.some(service=>service.config?.name==='aiplatform.googleapis.com');
+  } catch(error) {report.failures.push({operation:'authoring_api_readback',code:error.code??'read_failed'});}
+  try {
     const logs=JSON.parse(run(['logging','read','resource.type="cloud_run_job" AND resource.labels.job_name="elevate-course-builder" AND severity>=ERROR','--project',PROJECT,'--freshness=24h','--limit=50','--format=json']));
     report.runtimeErrors=logs.map(entry=>({timestamp:entry.timestamp,categories:courseErrorCategories(entry)}));
   } catch(error) {report.failures.push({operation:'worker_error_logs',code:error.code??'read_failed'});}

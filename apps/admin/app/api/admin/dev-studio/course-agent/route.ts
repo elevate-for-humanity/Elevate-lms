@@ -1,4 +1,5 @@
 import {DevStudioUltimateCourseControl} from '@/lib/devstudio/ultimate-course-control';
+import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
@@ -99,6 +100,7 @@ export async function POST(req: NextRequest) {
   let programId = text(body.programId);
   let programSlug = text(body.programSlug);
   let courseId = resumedCourseId || text(body.courseId);
+  const freshRequested = action === 'start' && (body.fresh === true || /\b(?:new|fresh|from scratch)\b/i.test(goal ?? ''));
   if (!goal) return NextResponse.json({ error: 'A course build goal is required.' }, { status: 400 });
 
   const db = await requireAdminClient();
@@ -136,6 +138,41 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // A fresh Devian command resolves a reference course but never reuses its ID.
+  // Keep the canonical program, compliance standards and competency metadata.
+  if (freshRequested) {
+    const referenceId = courseId;
+    if (!referenceId) return NextResponse.json(
+      { error: 'No unambiguous reference course found for the new course. Specify its program name.' },
+      { status: 422 },
+    );
+    const { data: reference, error: referenceError } = await db.from('courses')
+      .select('id,title,slug,program_id,description,short_description,metadata,org_id,compliance_profile_key,governing_body,governing_region,governing_standard_version,duration_hours')
+      .eq('id', referenceId).single();
+    if (referenceError || !reference) return NextResponse.json(
+      { error: 'Reference course unavailable' }, { status: 404 },
+    );
+    const newTitle = text(body.title) ?? (
+      /prestige.*barber/i.test(goal) ? 'New Prestige Barber Course — Production Test' : `New ${reference.title}`
+    );
+    const newSlug = `${reference.slug}-devian-${crypto.randomUUID().slice(0, 12)}`;
+    const { data: created, error: createError } = await db.from('courses').insert({
+      title: newTitle, slug: newSlug, program_id: reference.program_id,
+      description: reference.description, short_description: reference.short_description,
+      org_id: reference.org_id, status: 'draft', is_active: false,
+      compliance_profile_key: reference.compliance_profile_key,
+      governing_body: reference.governing_body,
+      governing_region: reference.governing_region,
+      governing_standard_version: reference.governing_standard_version,
+      duration_hours: reference.duration_hours,
+      metadata: { ...(reference.metadata ?? {}), devian_fresh_course: true, reference_course_id: reference.id },
+    }).select('id,slug').single();
+    if (createError || !created) throw createError ?? new Error('DEVIAN_COURSE_CREATION_FAILED');
+    courseId = created.id;
+    programId = reference.program_id;
+    programSlug = reference.slug;
+  }
+
   if (!courseId || !programSlug) return NextResponse.json(
     {error:'Select the canonical course and program before queuing the Ultimate builder.'},{status:400});
   if (studioRunId) {
@@ -147,12 +184,21 @@ export async function POST(req: NextRequest) {
   const queued=await new DevStudioUltimateCourseControl(db).queueCourse({
     courseId,programSlug,actorId:auth.id,goal,
   });
+  let dispatch;
+  try {
+    dispatch = await dispatchGoogleDeployment('course-builder');
+  } catch (error) {
+    return NextResponse.json({
+      error: 'Course and build saved, but worker dispatch failed; resume using the saved build.',
+      courseId, buildId: queued.build.id, jobId: queued.job.id,
+    }, { status: 503 });
+  }
   if(studioRunId)await recordMasterStudioArtifact(db,{runId:studioRunId,
     stepId:studioRunStepId ?? undefined,type:'ultimate-course-command',name:goal,status:'generated',
     metadata:{courseId,buildId:queued.build.id,jobId:queued.job.id,status:queued.job.status},
     evidence:[{source:'ultimate-build-jobs',captured_at:new Date().toISOString()}]});
   return NextResponse.json({ok:true,queued:true,authority:'ultimate-course-builder',
-    courseId,buildId:queued.build.id,jobId:queued.job.id,reused:queued.reused,status:queued.job.status},
+    courseId,buildId:queued.build.id,jobId:queued.job.id,reused:queued.reused,status:queued.job.status,dispatch,executionVerified:false},
     {status:202});
 }
 

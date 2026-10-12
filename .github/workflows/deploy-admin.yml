@@ -145,3 +145,5 @@ jobs:
           set -euo pipefail
           export GOOGLE_ADMIN_URL="$(gcloud run services describe elevate-admin-migration --project=elegant-racer-299721 --region=us-central1 --format='value(status.url)')"
           node scripts/gcp/verify-admin-revision.mjs
+
+# Release readable voicemail emails with the verified current main revision.

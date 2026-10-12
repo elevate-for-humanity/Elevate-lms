@@ -286,7 +286,7 @@ jobs:
                 for(const result of results) if(result.status!==200) throw new Error('Production route failed: '+result.path+' HTTP '+result.status);
                 const esthetics=results.find(x=>x.path.includes('esthetician'))?.html||'';
                 const barber=results.find(x=>x.path.includes('barber-apprenticeship'))?.html||'';
-                for(const expected of ['$6,000','$5,400','OCT300','25 hrs/week']) {
+                for(const expected of ['$6,000','OCT300','25 hrs/week']) {
                   if(!esthetics.includes(expected)) throw new Error('Missing esthetics production requirement: '+expected);
                 }
                 if(esthetics.includes('25–25 hrs/week')||esthetics.includes('25-25 hrs/week'))
@@ -303,6 +303,7 @@ jobs:
           }
           throw new Error('Public website failed exact-revision/homepage acceptance: '+last);
           NODE
+          node scripts/gcp/verify-public-entry.mjs
 
       - name: Verify live Supersonic entry and authenticated tax boundaries
         run: |

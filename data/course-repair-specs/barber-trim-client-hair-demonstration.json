@@ -113,5 +113,37 @@
         "explanation": "Quality checks and infection-control procedures complete the service."
       }
     ]
+  },
+  "selected_reference_clips": [
+    {
+      "role": "continuous clipper demonstration",
+      "source": "pexels",
+      "url": "https://www.pexels.com/video/a-close-up-of-a-man-getting-a-haircut-7424087/",
+      "pexels_id": 7424087,
+      "verification": "source page identified; original downloadable file and instructional accuracy not yet verified"
+    },
+    {
+      "role": "scissor comb technique",
+      "source": "pexels",
+      "url": "https://www.pexels.com/video/a-barber-cutting-a-man-s-hair-4178112/",
+      "pexels_id": 4178112,
+      "verification": "source page identified; original downloadable file and instructional accuracy not yet verified"
+    },
+    {
+      "role": "clipper closeup",
+      "source": "pexels",
+      "url": "https://www.pexels.com/video/close-up-of-professional-hair-clipper-in-action-34039157/",
+      "pexels_id": 34039157,
+      "verification": "source page identified; original downloadable file and instructional accuracy not yet verified"
+    }
+  ],
+  "production_gates": {
+    "media_downloads_verified": false,
+    "blade_guard_instruction_covered": false,
+    "continuous_cutting_verified": false,
+    "scissor_combing_verified": false,
+    "quiz_lms_integrated": false,
+    "final_mp4_rendered": false,
+    "ready_for_publication": false
   }
 }

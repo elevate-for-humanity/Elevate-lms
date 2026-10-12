@@ -45,8 +45,10 @@ async function repair() {
  const existingMap=read(['compute','url-maps','list']).find(m=>m.name===mapName);
  assert.ok(!existingMap||existingMap.description===redirectMap().description,'Do not overwrite an unrecognized map');
  const file='/tmp/elevate-public-http-redirect.json';writeFileSync(file,JSON.stringify(redirectMap(),null,2));
- mutate(['compute','url-maps','validate','--source='+file,'--global','--load-balancing-scheme='+frontend.scheme]);
+ // Create the unattached map first: this API validates a named existing resource.
+ // Validate before connecting either a target proxy or the public HTTP listener.
  mutate(['compute','url-maps','import',mapName,'--source='+file,'--global']);
+ mutate(['compute','url-maps','validate','--source='+file,'--global','--load-balancing-scheme='+frontend.scheme]);
  if(!existingProxy) mutate(['compute','target-http-proxies','create',proxyName,'--url-map='+mapName,'--global']);
  if(!occupied.length) mutate(['compute','forwarding-rules','create',ruleName,'--load-balancing-scheme='+frontend.scheme,'--address='+frontend.addressName,'--network-tier=PREMIUM','--global','--target-http-proxy='+proxyName,'--ports=80']);
  assert.equal(read(['compute','url-maps','describe','elevate-public-routes','--global']).fingerprint,map.fingerprint,'HTTPS routing must remain unchanged');

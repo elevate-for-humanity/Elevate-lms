@@ -16,13 +16,13 @@ const inputProps={courseTitle:'Layout regression',lessonTitle:'Instructional dis
 }]};
 const serveUrl=await bundle({entryPoint:'/app/remotion-src/index.ts'});
 const browserExecutable=process.env.REMOTION_BROWSER_EXECUTABLE;
-const composition=await selectComposition({serveUrl,id:'SlideLesson',inputProps,browserExecutable});
 // A solid owned test pattern checks compositor geometry, not instruction or licensing.
 execFileSync('ffmpeg',['-hide_banner','-loglevel','error','-y','-f','lavfi','-i','color=c=0xc82038:s=960x540:r=30:d=20','-c:v','libx264','-preset','ultrafast','-pix_fmt','yuv420p',`${output}/synthetic-layout-pattern.mp4`]);
 const pattern='data:video/mp4;base64,'+(await readFile(`${output}/synthetic-layout-pattern.mp4`)).toString('base64');
 const evidence=[];
 for(const mode of ['theory','physical']) {
   const props=mode==='theory'?inputProps:{...inputProps,scenes:[{...inputProps.scenes[0],clipUrl:pattern,imageUrl:null,imageIsInstructional:false,physicalDemonstration:true}]};
+  const composition=await selectComposition({serveUrl,id:'SlideLesson',inputProps:props,browserExecutable});
 for(const [index,frame] of [150,360,600].entries()) {
   for(const scale of [1,0.2]) {
     const path=`${output}/${mode}-step-${index}-${scale===1?'desktop':'mobile'}.png`;

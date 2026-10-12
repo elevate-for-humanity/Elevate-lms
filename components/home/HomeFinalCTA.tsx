@@ -9,8 +9,8 @@ export function HomeFinalCTA() {
       <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl bg-slate-950 text-white sm:grid sm:grid-cols-2">
         <div className="relative aspect-[16/9] sm:aspect-auto sm:min-h-80">
           <Image
-            src="/images/hero/hero-hands-on-training.webp"
-            alt="Hands-on career training at Elevate for Humanity"
+            src="/images/tax/supersonic-tax-training-2026.webp"
+            alt="Illustrative instructor supporting adult career learners"
             fill
             sizes="(max-width: 640px) 100vw, 50vw"
             className="object-cover"

@@ -11,7 +11,7 @@ export default function ProfessionalPage() {
   return (
     <TaxSiteShell>
       <main>
-        <section className="grid items-center gap-7 bg-[#be185d] text-white px-5 py-10 sm:p-10 xl:grid-cols-2">
+        <section className="grid items-center gap-7 bg-[#082b66] text-white px-5 py-10 sm:p-10 xl:grid-cols-2">
           <div>
             <p className="text-sm font-bold uppercase tracking-wide text-white">
               YOUR NEXT BUSINESS
@@ -23,18 +23,18 @@ export default function ProfessionalPage() {
               Turn tax preparation skills into a plan for your own office. Explore training, client
               service and business setup through Supersonic Fast Cash.
             </p>
-            <Link href="#enroll" className={taxButton + ' mt-6 bg-white !text-[#be185d]'}>
+            <Link href="#enroll" className={taxButton + ' mt-6 bg-white !text-[#082b66]'}>
               Explore enrollment →
             </Link>
           </div>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
+          <div className="order-first relative aspect-[16/9] xl:order-last overflow-hidden rounded-3xl">
             <Image
-              src="/images/pexels/bookkeeping.webp"
-              alt="Professionals reviewing financial documents together"
+              src="/images/tax/supersonic-tax-training-2026.webp"
+              alt="Illustrative tax business instructor mentoring adult learners"
               fill
               priority
               sizes="(min-width: 1280px) 450px, 100vw"
-              className="object-cover contrast-[1.1] saturate-[1.18]"
+              className="object-cover"
             />
           </div>
         </section>

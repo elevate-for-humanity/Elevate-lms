@@ -18,10 +18,10 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
           <Link
             href="/tax"
             aria-label="Supersonic Fast Cash home"
-            className="text-xl font-black text-[#073ca2]"
+            className="min-w-0 max-w-full text-lg font-black leading-tight text-[#073ca2] sm:text-xl"
           >
             SUPERSONIC <span className="text-[#c8102e]">FAST CASH</span>
-            <span className="mt-1 block text-[10px] tracking-[.18em] text-slate-600">
+            <span className="mt-1 block text-[10px] tracking-[.08em] text-slate-600 sm:tracking-[.18em]">
               TAX PREPARATION & BUSINESS TRAINING
             </span>
           </Link>

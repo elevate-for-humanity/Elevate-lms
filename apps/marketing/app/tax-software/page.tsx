@@ -11,7 +11,10 @@ export const metadata: Metadata = {
     title: 'Supersonic Fast Cash',
     description: 'Prepare your taxes. Hire a professional. Start your tax business.',
     images: [
-      { url: '/images/business/team-3.webp', alt: 'Professionals reviewing documents together' },
+      {
+        url: '/images/tax/supersonic-tax-hero-2026.webp',
+        alt: 'Professionals reviewing documents together',
+      },
     ],
   },
 };
@@ -42,7 +45,7 @@ export default function TaxSoftwarePage() {
   return (
     <TaxSiteShell>
       <main>
-        <section className="bg-[#be185d] px-5 py-9 text-white sm:p-10">
+        <section className="bg-[#082b66] px-5 py-9 text-white sm:p-10">
           <div className="grid items-center gap-7 xl:grid-cols-2">
             <div>
               <p className="text-sm font-bold uppercase tracking-wider text-white">
@@ -56,18 +59,18 @@ export default function TaxSoftwarePage() {
                 Do it yourself, hire a professional, or start your own tax business. Choose the
                 option that fits you.
               </p>
-              <Link href="#options" className={taxButton + ' mt-6 bg-white !text-[#be185d]'}>
+              <Link href="#options" className={taxButton + ' mt-6 bg-white !text-[#082b66]'}>
                 Choose my option →
               </Link>
             </div>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-white">
+            <div className="order-first relative aspect-[16/9] xl:order-last overflow-hidden rounded-3xl bg-white">
               <Image
-                src="/images/business/team-3.webp"
-                alt="Business professionals reviewing documents together at a laptop"
+                src="/images/tax/supersonic-tax-hero-2026.webp"
+                alt="Illustrative tax professional reviewing documents with a client"
                 fill
                 priority
                 sizes="(min-width: 1280px) 450px, 100vw"
-                className="object-cover contrast-[1.1] saturate-[1.18]"
+                className="object-cover"
               />
             </div>
           </div>

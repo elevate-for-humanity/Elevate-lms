@@ -10,7 +10,7 @@
     {
       "source": "app/tax-software/_components/TaxSiteShell.tsx",
       "target": "apps/marketing/app/tax-software/_components/TaxSiteShell.tsx",
-      "sha256": "945463ed797d36d922bf9ac25f3ee8aa094bbe5a204fd5796dccde9734657e1e",
+      "sha256": "a671281d63cc0a22a2b5013e704a42540c9de63a9ca8f3c7de9df7c8b8a81e0a",
       "sourceSha256": "d6ed0f04f3daa6e77cc274fa76cee76443266877622bf44d6f32598842273301"
     },
     {
@@ -54,7 +54,7 @@
     {
       "source": "app/tax-software/page.tsx",
       "target": "apps/marketing/app/tax-software/page.tsx",
-      "sha256": "934025e02a7df8c3fcd6a1ca27b6f989d75c8e04fd9d850b12f874fee24aff80",
+      "sha256": "f3bd148ab41437d72f1d10003e04d6c3f93d6375dfd12fee449186bf85138a7f",
       "sourceSha256": "2e9a3679173ded5c370550af1d181b0d6ef3cb5a70be1f91fbdb7600cb9700fa"
     },
     {
@@ -66,18 +66,19 @@
     {
       "source": "app/tax-software/professional/page.tsx",
       "target": "apps/marketing/app/tax-software/professional/page.tsx",
-      "sha256": "6f12a6e21183572fb7cc3396c3563a50ad8421c1aec39f5977361f9e7aaa247c",
+      "sha256": "882dca6f8f981f5d77a9b0d5636181526abeff05eb0adeb009991d0fb158c9d5",
       "sourceSha256": "b2a4831b330ae831a329d9aacaa6db848d9a0f39bbe37e0d0225cfe1da49996b"
     },
     {
       "source": "app/tax-software/self-file/layout.tsx",
       "target": "apps/marketing/app/tax-software/self-file/layout.tsx",
-      "sha256": "cdcbe5844e8c911740cbd3c3609b6ee559c8d71b606692ab08bf80bb66bbf6ed"
+      "sha256": "d49c246b2ce522ca92aca62b65e524e54c5978bdaefcbe4c35deb1ab3fdd8d99",
+      "sourceSha256": "cdcbe5844e8c911740cbd3c3609b6ee559c8d71b606692ab08bf80bb66bbf6ed"
     },
     {
       "source": "app/tax-software/self-file/page.tsx",
       "target": "apps/marketing/app/tax-software/self-file/page.tsx",
-      "sha256": "7dd32063fe675f87ab1ec0942b1a49e00def0d66fa46c7b6f23baf10a0fa4545",
+      "sha256": "dfd70447bc4078d61ed787a153bf9129c4eade3b209dfbe4cdd1e3b3fd29733d",
       "sourceSha256": "5ecf286f97f30d3c1e6e0682fc42514cbc5c9d4bb307e4712cf3227551b4f77c"
     },
     {
@@ -104,7 +105,8 @@
     {
       "source": "app/api/tax/returns/route.ts",
       "target": "apps/marketing/app/api/tax/returns/route.ts",
-      "sha256": "84082d60ef407642080bc07dfd971b4a6489c36bff0da490e8cdbf387a0e1c55"
+      "sha256": "7ca77d891d1fae9c0bd8696bb0ebeccad6f4a7abf90ba317dab7307978cabe57",
+      "sourceSha256": "84082d60ef407642080bc07dfd971b4a6489c36bff0da490e8cdbf387a0e1c55"
     },
     {
       "source": "app/api/tax/w2/confirm/route.ts",

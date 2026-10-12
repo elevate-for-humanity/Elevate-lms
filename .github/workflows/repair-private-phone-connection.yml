@@ -1,0 +1,74 @@
+name: Repair private phone app and Paris connection
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/repair-private-phone-connection.yml']
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('phone-connection-{0}', github.ref) }}
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/repair-private-phone-connection.yml/dispatches" -f ref=main
+  repair:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify current gateway source and stage code only
+        run: |
+          set -euo pipefail
+          test "$(sha256sum infra/pbx/paris/ari-media.mjs | cut -d ' ' -f 1)" = 0ecf9d0c8e9f0e3d79b95ec10513150714e1ca1efd036c2a16e020c52f76cfd3
+          test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+          gcloud compute scp infra/pbx/paris/ari-media.mjs "elevate-pbx:/tmp/elevate-paris-gateway-$GITHUB_SHA.mjs" --project=elegant-racer-299721 --zone=us-central1-a --quiet
+      - name: Repair private ARI credential and prove actual Paris subscription
+        run: |
+          set -euo pipefail
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command="sudo python3 - /tmp/elevate-paris-gateway-$GITHUB_SHA.mjs $GITHUB_SHA" < scripts/gcp/repair-private-paris.py | tee phone-private-connection-evidence.json
+      - name: Connect the existing Google app to the authenticated provisioner
+        run: |
+          node --input-type=module <<'NODE'
+          import {loadGoogleConfig,validateConfig,google,PROJECT} from './scripts/gcp/runtime-config.mjs';
+          const url='https://phone.elevateforhumanity.org';
+          const probe=await fetch(url+'/internal/pbx/devices',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(10000),redirect:'error'});
+          if(probe.status!==401)throw Error('Provisioning proxy is not verified');
+          const config=loadGoogleConfig('lms');
+          const token=google(['secrets','versions','access','latest','--secret','elevate-pbx-provisioning-token','--project',PROJECT]);
+          if(token.length<32 || /[\r\n]/.test(token))throw Error('Invalid existing provisioner credential');
+          const env=config.runtimeEnvironment;
+          if(env.PBX_CONTROL_URL && env.PBX_CONTROL_URL!==url)throw Error('Existing control URL requires review');
+          if(env.PBX_PROVISIONING_TOKEN && env.PBX_PROVISIONING_TOKEN!==token)throw Error('Existing control credential requires review');
+          env.PBX_CONTROL_URL=url;env.PBX_PROVISIONING_TOKEN=token;
+          validateConfig(config,'lms');
+          const version=google(['secrets','versions','add','elevate-lms-runtime-config','--project',PROJECT,'--data-file=-','--format=value(name)'],JSON.stringify(config));
+          const verified=JSON.parse(google(['secrets','versions','access',version.split('/').at(-1),'--secret','elevate-lms-runtime-config','--project',PROJECT]));
+          if(verified.runtimeEnvironment.PBX_CONTROL_URL!==url || verified.runtimeEnvironment.PBX_PROVISIONING_TOKEN!==token)throw Error('Phone configuration write was not verified');
+          console.log(JSON.stringify({result:'PASS',scope:'app_provisioning_configuration',secretVersion:version,carrierRoutingChanged:false}));
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: private-phone-connection
+          path: phone-*-evidence.json
+          retention-days: 14

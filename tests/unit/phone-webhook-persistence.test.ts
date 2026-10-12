@@ -1,13 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-const mocks = vi.hoisted(() => ({ admin:vi.fn(), verify:vi.fn(), answer:vi.fn(), speak:vi.fn() }));
+const mocks = vi.hoisted(() => ({ admin:vi.fn(), verify:vi.fn(), answer:vi.fn(), speak:vi.fn(), email:vi.fn(), push:vi.fn() }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient:mocks.admin }));
 vi.mock('@/lib/phone/telnyx', () => ({
   verifyTelnyxWebhook:mocks.verify, telnyxClient:async () => ({ calls:{actions:{answer:mocks.answer,speak:mocks.speak}} }),
   decodeCallState:(value?: string) => value ? JSON.parse(value) : ({}), encodeCallState:JSON.stringify, publicPhoneNumber:() => 'unused',
 }));
-vi.mock('@/lib/email/sendgrid', () => ({sendEmail:vi.fn()}));
+vi.mock('@/lib/email/sendgrid', () => ({sendEmail:mocks.email}));
 vi.mock('@/lib/notifications/sms', () => ({sendSMS:vi.fn()}));
-vi.mock('@/lib/notifications/push-service', () => ({PushNotificationService:class {}}));
+vi.mock('@/lib/notifications/push-service', () => ({PushNotificationService:class {sendToUserWithDatabase=mocks.push;}}));
+vi.mock('@/lib/phone/notification-delivery', async (original)=>({...await original<typeof import('@/lib/phone/notification-delivery')>(),deliverPhoneNotification:async (_db:unknown,_identity:unknown,send:()=>Promise<unknown>)=>{await send();return 'accepted';}}));
 import { POST } from '@/apps/admin/app/api/webhooks/telnyx/route';
 const event = { data: { id:'event',event_type:'call.initiated',occurred_at:'2026-10-10T00:00:00Z',
   payload:{call_control_id:'provider-call',direction:'incoming',to:'test-destination'} } };
@@ -134,5 +135,36 @@ describe('carrier webhook persistence boundary', () => {
     expect(filters.filter(f => f.table==='phone_callback_tasks' && f.key==='call_id')).toHaveLength(2);
     expect(writes.filter(w => w.row.recording_url)).toHaveLength(2);
     expect(writes.at(-1).row.processing_state).toBe('completed');
+  });
+});
+
+describe('voicemail transcript emails',()=>{
+  beforeEach(()=>{mocks.email.mockResolvedValue({success:true,data:{messageId:'receipt'}});mocks.push.mockResolvedValue(1);});
+  const voicemailEvent=(type:string,extra:Record<string,unknown>={})=>({data:{...event.data,event_type:type,payload:{...event.data.payload,
+    client_state:JSON.stringify({taskId:'task',profileId:'recipient',phase:'voicemail_recording'}),...extra}}});
+  const recipientRows={profiles:[ok({full_name:'Assigned recipient'}),ok({full_name:'Assigned recipient',email:'recipient@example.invalid'})],
+    notification_preferences:[ok({email_missed_calls:true})]};
+  it('does not send an unreadable email before the transcript arrives',async()=>{
+    mocks.verify.mockResolvedValue(voicemailEvent('call.recording.saved',{recording_urls:{mp3:'https://s3.amazonaws.com/telephony-recorder-prod/test.mp3'}}));
+    database({...recipientRows,phone_systems:[ok({id:'system',voicemail_transcription_enabled:true})],
+      phone_calls:[ok({id:'call',phone_system_id:'system',provider:'telnyx'}),ok({id:'call'})],
+      phone_callback_tasks:[ok({source:'voicemail',assigned_profile_id:'recipient'}),ok({id:'task'})],
+      voicemails:[ok(null),ok({id:'voicemail'})]});
+    expect((await POST(request())).status).toBe(200);
+    expect(mocks.email).not.toHaveBeenCalled();
+  });
+  it('puts the persisted transcript in plain text and escaped HTML email',async()=>{
+    const transcript='Please call me back about enrollment. <script>caller text</script>';
+    mocks.verify.mockResolvedValue(voicemailEvent('call.recording.transcription.saved',{transcription_text:transcript}));
+    const {writes}=database({...recipientRows,phone_systems:[ok({id:'system',voicemail_transcription_enabled:true})],
+      phone_calls:[ok({id:'call',phone_system_id:'system',provider:'telnyx'})],
+      phone_callback_tasks:[ok({id:'task'}),ok({source:'voicemail',assigned_profile_id:'recipient'})],
+      voicemails:[ok({id:'voicemail'})]});
+    expect((await POST(request())).status).toBe(200);
+    expect(writes.some(w=>w.table==='voicemails'&&w.row.transcription===transcript)).toBe(true);
+    expect(mocks.email).toHaveBeenCalledTimes(1);
+    expect(mocks.email.mock.calls[0][0].text).toContain(transcript);
+    expect(mocks.email.mock.calls[0][0].html).toContain('&lt;script&gt;caller text&lt;/script&gt;');
+    expect(mocks.email.mock.calls[0][0].html).not.toContain('<script>');
   });
 });

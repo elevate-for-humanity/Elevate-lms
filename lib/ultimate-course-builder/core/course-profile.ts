@@ -29,7 +29,7 @@ export async function hydrateUltimateProfileSources(
   profile: UltimateCredentialProfile,
 ): Promise<UltimateCredentialProfile> {
   const presentation = approvedPresentationForCourse(courseId);
-  if (presentation) profile = { ...profile, lessonPresentation: presentation };
+  if (presentation === 'approved-premium-v1') profile = { ...profile, lessonPresentation: presentation };
   const registeredContract = getRegisteredProgramStandardByProfileId(profile.id);
   // Teaching modality does not waive the registered mentor performance requirement.
   if (registeredContract) {

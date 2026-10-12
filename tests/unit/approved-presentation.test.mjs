@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {measuredTeachingStep} from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
 import {approvedPresentationForCourse,narrationSceneSeconds,presentationBookendFrames,assertNarratedScenes,assertPremiumSpeechSignal} from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
 test('approved format is limited to the two existing course IDs',()=>{
   assert.equal(approvedPresentationForCourse('2c723bfa-8c40-4acc-b961-98d917710ffc'),'approved-premium-v1');
@@ -29,4 +30,11 @@ test('audible duration metadata cannot disguise a silent track or dropout',()=>{
   assert.throws(()=>assertPremiumSpeechSignal('max_volume: -91.0 dB'),/INAUDIBLE/);
   assert.throws(()=>assertPremiumSpeechSignal('max_volume: -6.0 dB\nsilence_start: 4.2'),/SILENT_GAP/);
   assert.throws(()=>assertPremiumSpeechSignal(''),/INAUDIBLE/);
+});
+test('instructions follow spoken cue timing rather than equal divisions of the scene',()=>{
+  const steps=[{narrationQuote:'Inspect the blade'},{narrationQuote:'Attach the guard'}];
+  const cues=[{text:'Inspect the blade.',startSeconds:0},{text:'After checking it, attach',startSeconds:8},{text:'the guard.',startSeconds:9}];
+  assert.equal(measuredTeachingStep(steps,cues,7),0);
+  assert.equal(measuredTeachingStep(steps,cues,8),1);
+  assert.throws(()=>measuredTeachingStep([{narrationQuote:'Cut without a guard'}],cues,2),/NOT_ALIGNED/);
 });

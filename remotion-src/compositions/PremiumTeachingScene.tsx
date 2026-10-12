@@ -1,6 +1,6 @@
 import { AbsoluteFill, Audio, Img, Video, interpolate, useCurrentFrame, useVideoConfig } from 'remotion';
 import type { SceneData, SlideLessonProps } from './SlideLesson';
-import { teachingVisualStepIndex } from '../../lib/ultimate-course-builder/instructional/teaching-visual';
+import { measuredTeachingStep } from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
 
 /** One whole visual and its explanation. The licensed demonstration remains
  * muted so it cannot overlap the approved instructor voice. */
@@ -9,7 +9,8 @@ export function PremiumTeachingScene({ scene, props }: { scene: SceneData; props
   const { fps } = useVideoConfig();
   const fade = (delay: number) => interpolate(frame, [delay, delay + fps * .75], [.35, 1], {extrapolateLeft:'clamp',extrapolateRight:'clamp'});
   const steps = scene.teachingVisual?.steps ?? scene.bullets.map((value, i) => ({label:`Step ${i+1}`,value}));
-  const step = steps[teachingVisualStepIndex(frame/fps, scene.durationFrames/fps, Math.max(1,steps.length))];
+  const stepIndex = measuredTeachingStep(steps,scene.captionCues ?? [],frame/fps);
+  const step = steps[stepIndex];
   const caption = scene.captionCues?.find(c => frame/fps >= c.startSeconds && frame/fps < c.endSeconds)?.text ?? '';
   const mediaStyle = { width:'100%',height:'100%',objectFit:'contain' as const };
   return <AbsoluteFill style={{background:'#171717',color:'#fff',fontFamily:'Arial, sans-serif'}}>
@@ -24,7 +25,7 @@ export function PremiumTeachingScene({ scene, props }: { scene: SceneData; props
     <div style={{position:'absolute',left:1220,right:54,top:225,height:680,display:'flex',flexDirection:'column',justifyContent:'center',gap:28,opacity:fade(fps*.3)}}>
       <div style={{fontSize:32,color:'#cdb79e',lineHeight:1.25}}>{step?.label}</div>
       <div style={{fontSize:38,lineHeight:1.4}}>{step?.value}</div>
-      <div style={{fontSize:23,color:'#cdb79e'}}>Teaching point {Math.min(steps.length,teachingVisualStepIndex(frame/fps,scene.durationFrames/fps,Math.max(1,steps.length))+1)} of {steps.length}</div>
+      <div style={{fontSize:23,color:'#cdb79e'}}>Teaching point {stepIndex+1} of {steps.length}</div>
     </div>
     <div style={{position:'absolute',bottom:0,left:0,right:0,height:125,background:'#080808',borderTop:'2px solid #cdb79e',display:'flex',alignItems:'center',justifyContent:'center',padding:'14px 70px',boxSizing:'border-box',fontSize:36,lineHeight:1.3,textAlign:'center'}}>{caption}</div>
     {scene.audioSrc && <Audio src={scene.audioSrc} volume={1}/>}

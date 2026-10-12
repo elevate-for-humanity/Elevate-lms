@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, CalendarPlus, MonitorUp, ShieldCheck, Users, Video } from 'lucide-react';
+import { ArrowLeft, MonitorUp, ShieldCheck, Users, Video } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { createMeeting } from '../actions';
+import {NewMeetingForm} from './NewMeetingForm';
+import {MeetingLinks} from './MeetingLinks';
+import {hydrateProcessEnv} from '@/lib/secrets';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { liveKitReadiness } from '@/lib/communications/livekit';
 
@@ -43,6 +45,7 @@ export default async function MeetingsPage() {
         .order('scheduled_at', { ascending: false })
         .limit(20)
     : { data: [] };
+  await hydrateProcessEnv();
   const readiness = liveKitReadiness();
   const serviceReady = readiness.ready;
 
@@ -68,30 +71,7 @@ export default async function MeetingsPage() {
             </p>
           </div>
           {serviceReady ? (
-            <form action={createMeeting} className="flex flex-wrap items-center gap-2">
-              <input
-                name="title"
-                required
-                minLength={3}
-                maxLength={120}
-                placeholder="Meeting title"
-                className="rounded-xl border border-slate-300 px-3 py-2.5 text-sm"
-              />
-              <select
-                name="roomType"
-                className="rounded-xl border border-slate-300 px-3 py-2.5 text-sm"
-              >
-                <option value="meeting">Meeting</option>
-                <option value="team_huddle">Team huddle</option>
-                <option value="classroom">Classroom</option>
-                <option value="webinar">Webinar</option>
-                <option value="support">Support</option>
-              </select>
-              <button className="inline-flex items-center gap-2 rounded-xl bg-indigo-700 px-4 py-2.5 text-sm font-black text-white">
-                <CalendarPlus className="h-4 w-4" />
-                New meeting
-              </button>
-            </form>
+            <NewMeetingForm />
           ) : null}
         </div>
       </div>
@@ -153,6 +133,7 @@ export default async function MeetingsPage() {
                     Join
                   </Link>
                 ) : null}
+                {room.status !== 'cancelled' && <MeetingLinks roomId={room.id} title={room.title} scheduledAt={room.scheduled_at} />}
               </div>
             ))}
           </div>

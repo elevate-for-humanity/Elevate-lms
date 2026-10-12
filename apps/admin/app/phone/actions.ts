@@ -93,6 +93,10 @@ async function requireWorkspace() {
 }
 
 export async function createMeeting(formData: FormData): Promise<void> {
+  await hydrateProcessEnv();
+  const scheduledInput=String(formData.get('scheduledAt')||'');
+  const scheduledAt=scheduledInput?new Date(scheduledInput):null;
+  if(scheduledAt && (!Number.isFinite(scheduledAt.getTime()) || scheduledAt.getTime()<Date.now()-60000))throw new Error('Choose a future meeting date and time.');
   const title = String(formData.get('title') ?? '').trim();
   const roomType = String(formData.get('roomType') ?? 'meeting');
   if (title.length < 3 || title.length > 120)
@@ -114,7 +118,8 @@ export async function createMeeting(formData: FormData): Promise<void> {
     room_type: roomType,
     host_profile_id: auth.profile.id,
     status: 'open',
-    started_at: new Date().toISOString(),
+    scheduled_at: scheduledAt?.toISOString() || null,
+    started_at: scheduledAt ? null : new Date().toISOString(),
     max_participants: 50,
     allow_screen_share: true,
     allow_chat: true,
@@ -575,4 +580,8 @@ export async function destinationActionResult(_state:PhoneActionState,formData:F
   if(command==='test'){await testDestination(formData);return {ok:true,message:'Test call requested. Answer the destination and verify two-way audio.'};}
   return {ok:false,message:'Choose a valid phone action.'};
  }catch(error){return failure(error,'The phone action could not be completed.');}
+}
+
+export async function createMeetingResult(_state:PhoneActionState,formData:FormData):Promise<PhoneActionState>{
+ try{await createMeeting(formData);return {ok:true,message:'Meeting saved. Copy or share its link from the meeting list below.'};}catch(error){return failure(error,'The meeting could not be created.');}
 }

@@ -2,7 +2,7 @@ name: Phone repair contract
 on:
   push:
     branches: [main]
-    paths: ['lib/phone/**', 'infra/pbx/**', 'apps/admin/app/api/webhooks/telnyx/**', 'tests/unit/phone-*.test.ts', '.github/workflows/phone-repair-contract.yml']
+    paths: ['lib/phone/**', 'infra/pbx/**', 'apps/admin/app/api/webhooks/telnyx/**', 'tests/unit/phone-*.test.ts', 'apps/admin/app/phone/**', 'components/communications/**', 'components/program-holder/ProgramHolderPhone.tsx', 'lib/communications/meeting-calendar*', '.github/workflows/phone-repair-contract.yml']
   pull_request:
     paths:
       - 'lib/phone/**'
@@ -40,13 +40,14 @@ jobs:
         with:
           version: 10.28.2
       - run: pnpm install --frozen-lockfile
+      - run: node --test lib/communications/meeting-calendar.test.mjs
       - run: node --test infra/pbx/provisioner/server.test.mjs
       - run: node --test infra/pbx/paris/*.test.mjs infra/pbx/runtime-secrets.test.mjs
       - run: python3 scripts/gcp/test-audit-pbx-runtime.py
       - run: python3 scripts/gcp/test-pbx-bootstrap.py
       - run: python3 scripts/gcp/test-pbx-tls-preservation.py
       - run: bash -n infra/pbx/google-startup.sh scripts/gcp/repair-existing-pbx-tls.sh
-      - run: pnpm exec vitest run tests/unit/phone-connection-lifecycle.test.tsx tests/unit/phone-event-processing.test.ts tests/unit/phone-webhook-persistence.test.ts tests/unit/phone-actor-response.test.ts tests/unit/phone-notification-delivery.test.ts tests/unit/phone-recordings.test.ts tests/unit/asterisk-device.test.ts tests/unit/asterisk-browser-client.test.ts tests/unit/notification-delivery.test.ts tests/unit/notification-route.test.ts tests/unit/phone-call-flow.test.ts tests/unit/phone-routing.test.ts tests/unit/program-holder-phone-availability.test.ts tests/unit/host-shop-communications-contract.test.ts
+      - run: pnpm exec vitest run tests/unit/meeting-controls.test.tsx tests/unit/phone-connection-lifecycle.test.tsx tests/unit/phone-event-processing.test.ts tests/unit/phone-webhook-persistence.test.ts tests/unit/phone-actor-response.test.ts tests/unit/phone-notification-delivery.test.ts tests/unit/phone-recordings.test.ts tests/unit/asterisk-device.test.ts tests/unit/asterisk-browser-client.test.ts tests/unit/notification-delivery.test.ts tests/unit/notification-route.test.ts tests/unit/phone-call-flow.test.ts tests/unit/phone-routing.test.ts tests/unit/program-holder-phone-availability.test.ts tests/unit/host-shop-communications-contract.test.ts
   migration-contract:
     runs-on: ubuntu-24.04
     services:

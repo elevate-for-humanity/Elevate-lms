@@ -76,6 +76,17 @@ jobs:
           set -euo pipefail
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
             --command='sudo python3 -' < scripts/gcp/audit-pbx-runtime.py | tee pbx-runtime-evidence.json
+      - name: Inspect meeting connection and existing VM capacity
+        if: always()
+        run: |
+          node --input-type=module <<'NODE'
+          import {loadGoogleConfig} from './scripts/gcp/runtime-config.mjs';
+          import {execFileSync} from 'node:child_process';
+          const env=loadGoogleConfig('admin').runtimeEnvironment;
+          console.log(JSON.stringify({meetingConfiguration:Object.fromEntries(['LIVEKIT_URL','LIVEKIT_API_KEY','LIVEKIT_API_SECRET'].map(key=>[key,Boolean(env[key])]))}));
+          const instances=JSON.parse(execFileSync('gcloud',['compute','instances','list','--project=elegant-racer-299721','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          console.log(JSON.stringify({communicationsInstances:instances.filter(x=>/pbx|livekit|meeting/i.test(x.name)).map(x=>({name:x.name,status:x.status,machineType:x.machineType.split('/').pop()}))}));
+          NODE
       - name: Preserve sanitized runtime and transport evidence
         if: always()
         uses: actions/upload-artifact@v4

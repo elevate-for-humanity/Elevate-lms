@@ -30,6 +30,6 @@ if(browserUrl) {
   } catch(e) {console.log(JSON.stringify({browserReachable:false,error:e.name}));}
 }
 const instances=read(['compute','instances','list']);
-console.log(JSON.stringify({studioInstances:instances.filter(x=>/studio|browser/i.test(x.name)).map(x=>({name:x.name,status:x.status,zone:x.zone.split('/').pop(),internalIp:x.networkInterfaces?.[0]?.networkIP,authDisk:x.disks?.some(d=>d.deviceName==='elevate-studio-browser-auth')}))}));
-const disks=read(['compute','disks','list','--filter=name=elevate-studio-browser-auth']);
-console.log(JSON.stringify({durableAuthDisks:disks.map(x=>({name:x.name,status:x.status,zone:x.zone.split('/').pop()}))}));
+console.log(JSON.stringify({studioInstances:instances.filter(x=>/studio|browser/i.test(x.name)).map(x=>({name:x.name,status:x.status,zone:x.zone.split('/').pop(),internalIp:x.networkInterfaces?.[0]?.networkIP,authDisks:(x.disks || []).filter(d=>/^elevate-studio-browser-auth(?:-|$)/.test(d.deviceName || '') || /\/elevate-studio-browser-auth(?:-|$)/.test(d.source || '')).map(d=>({deviceName:d.deviceName,sourceName:d.source?.split('/').pop(),boot:Boolean(d.boot),autoDelete:Boolean(d.autoDelete)}))}))}));
+const disks=read(['compute','disks','list']).filter(x=>/^elevate-studio-browser-auth(?:-|$)/.test(x.name));
+console.log(JSON.stringify({durableAuthDisks:disks.map(x=>({name:x.name,status:x.status,zone:x.zone?.split('/').pop(),attachedInstances:(x.users || []).map(u=>u.split('/').pop())}))}));

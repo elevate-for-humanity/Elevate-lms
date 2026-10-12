@@ -81,7 +81,7 @@ jobs:
         shell: bash
         run: |
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' <<'PY'
-          import json, re, urllib.request, urllib.error, subprocess
+          import json, re, urllib.request, urllib.error, subprocess, base64, hashlib
           from pathlib import Path
           def request(url, headers={}, data=None):
               try:
@@ -107,6 +107,12 @@ jobs:
                       report['secrets'][key]={'validReference':False};continue
                   code,result=request('https://secretmanager.googleapis.com/v1/'+value+':access',{'Authorization':'Bearer '+token})
                   report['secrets'][key]={'validReference':True,'httpStatus':code,'payloadPresent':bool(result.get('payload',{}).get('data'))}
+                  if name=='paris' and key=='PARIS_ARI_PASSWORD_SECRET' and code==200:
+                      password=base64.b64decode(result['payload']['data']).decode().strip()
+                      authorization=base64.b64encode((values.get('PARIS_ARI_USER','')+':'+password).encode()).decode()
+                      status,applications=request('http://127.0.0.1:8088/ari/applications',{'Authorization':'Basic '+authorization})
+                      report['ariApplication']={'httpStatus':status,'registered':isinstance(applications,list) and any(app.get('name')=='elevate-paris' for app in applications)}
+                      report['gatewaySourceSha256']=hashlib.sha256(Path('/opt/elevate-pbx/paris/ari-media.mjs').read_bytes()).hexdigest()
               if name=='provisioner':
                   root=values.get('PBX_GENERATED_ROOT','')
                   safe=bool(re.fullmatch(r'/(opt|var/lib)/elevate-pbx/[A-Za-z0-9/_-]+',root))
@@ -139,6 +145,8 @@ jobs:
             const result=await response.json().catch(()=>({}));
             console.log(JSON.stringify({meetingService:{host:endpoint.hostname,status:response.status,roomCount:Array.isArray(result.rooms)?result.rooms.length:null}}));
           } catch(error) {console.log(JSON.stringify({meetingService:{host:endpoint.hostname,reachable:false,error:error.code||error.cause?.code||error.name}}));process.exitCode=1;}
+          const lms=loadGoogleConfig('lms').runtimeEnvironment;
+          console.log(JSON.stringify({ownedPhoneApplicationConfiguration:Object.fromEntries(['PBX_CONTROL_URL','PBX_PROVISIONING_TOKEN','PBX_TURN_URLS','PBX_TURN_SHARED_SECRET'].map(key=>[key,Boolean(lms[key])]))}));
           const instances=JSON.parse(execFileSync('gcloud',['compute','instances','list','--project=elegant-racer-299721','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
           console.log(JSON.stringify({communicationsInstances:instances.filter(x=>/pbx|livekit|meeting/i.test(x.name)).map(x=>({name:x.name,status:x.status,machineType:x.machineType.split('/').pop()}))}));
           NODE

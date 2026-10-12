@@ -121,8 +121,8 @@ const organizationJsonLd = {
   ],
 };
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// Public pages can prerender or revalidate. Authenticated route layouts and
+// request-dependent pages retain their own dynamic rendering boundaries.
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -137,7 +137,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="efh-contrast">
         <SkipToContent />
-        <CookieConsent />
         <SupabaseConfigBootstrap />
         <MarketingPwaClient />
         <GoogleAnalytics />
@@ -146,7 +145,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AssociateFormLabels />
         <Suspense fallback={null}><SpeechCanceller /></Suspense>
         <I18nProvider>
-          <Suspense fallback={<div id="main-content" className="min-h-dvh">{children}</div>}>
+          <Suspense fallback={<div id="main-content" role="status" className="min-h-dvh p-6">Loading page…</div>}>
           <MarketingChromeBoundary
             header={<Header />}
             footer={<SiteFooter />}
@@ -158,6 +157,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </I18nProvider>
         <MediaPlaybackCoordinator />
         <Suspense fallback={null}><ScrollNarrator /></Suspense>
+        <CookieConsent />
       </body>
     </html>
   );

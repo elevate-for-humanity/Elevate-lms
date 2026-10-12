@@ -8,7 +8,7 @@
     "build": "node --require ../../scripts/next-fs-rm-retry.cjs ../../node_modules/next/dist/bin/next build",
     "prestart": "node ../../scripts/sync-pwa-public.mjs marketing",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "node ../../node_modules/eslint/bin/eslint.js . --ext .js,.jsx,.ts,.tsx --quiet"
   },
   "dependencies": {
     "buffer": "^6.0.3",

@@ -1,6 +1,7 @@
 import HeroPicture from '@/components/marketing/HeroPicture';
 import { getProgramHeroImage } from '@/lib/images/programImages';
 import { notFound } from 'next/navigation';
+import { connection } from 'next/server';
 
 import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
@@ -18,6 +19,8 @@ import { getStaticProgram } from '@/data/programs';
 export const revalidate = 3600;
 
 export default async function CosmetologyApprenticeshipPage() {
+  // Host-shop approvals use runtime-only credentials and must stay current.
+  await connection();
   const loaded = await loadProgramForPage('cosmetology-apprenticeship');
   const program = loaded?.program ?? getStaticProgram('cosmetology-apprenticeship');
   if (!program) return notFound();

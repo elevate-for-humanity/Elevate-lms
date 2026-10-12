@@ -1,6 +1,8 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {createClient} from '@/lib/supabase/server';
 import {applyRateLimit} from '@/lib/api/withRateLimit';
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 const money=(v:unknown)=>{const n=Number(v);return Number.isFinite(n)?n:null};
 export async function POST(req:NextRequest){

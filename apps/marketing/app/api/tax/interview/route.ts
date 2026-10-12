@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { deriveInterviewTriggers, PARIS_SECTIONS } from '@/lib/tax-software/paris-interview';
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 export async function GET(req: NextRequest) {
   const s = await createClient(); const { data: { user } } = await s.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

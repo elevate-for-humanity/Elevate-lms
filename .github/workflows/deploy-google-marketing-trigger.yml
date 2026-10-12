@@ -29,6 +29,7 @@ on:
       - 'scripts/gcp/preflight-billing.test.mjs'
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
       - 'scripts/gcp/activate-tested-public-revision.mjs'
       - '.github/workflows/deploy-google-marketing-trigger.yml'
       - '.deploy-google-marketing'

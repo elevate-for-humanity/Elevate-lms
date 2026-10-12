@@ -8,7 +8,7 @@
     "build": "node --require ../../scripts/next-fs-rm-retry.cjs ../../node_modules/next/dist/bin/next build",
     "prestart": "node ../../scripts/sync-pwa-public.mjs admin",
     "start": "node server.js",
-    "lint": "next lint"
+    "lint": "node ../../node_modules/eslint/bin/eslint.js . --ext .js,.jsx,.ts,.tsx --quiet"
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.80",

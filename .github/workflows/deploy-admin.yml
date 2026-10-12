@@ -18,6 +18,7 @@ on:
       - '.github/workflows/build-google-migration-images.yml'
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
       - 'scripts/gcp/activate-tested-public-revision.mjs'
       - '.github/workflows/deploy-admin.yml'
   workflow_dispatch:

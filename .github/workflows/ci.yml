@@ -100,10 +100,12 @@ jobs:
       - name: Restore incremental TypeScript cache
         uses: actions/cache@v4
         with:
-          path: apps/${{ matrix.app }}/tsconfig.tsbuildinfo
-          key: types-${{ runner.os }}-${{ matrix.app }}-${{ hashFiles('pnpm-lock.yaml', 'apps/*/tsconfig.json') }}-${{ github.sha }}
+          path: |
+            apps/${{ matrix.app }}/.next/cache/tsbuildinfo.json
+            apps/${{ matrix.app }}/tsconfig.tsbuildinfo
+          key: types-${{ runner.os }}-${{ matrix.app }}-${{ hashFiles('pnpm-lock.yaml', 'tsconfig.json', 'apps/*/tsconfig.json') }}-${{ github.sha }}
           restore-keys: |
-            types-${{ runner.os }}-${{ matrix.app }}-${{ hashFiles('pnpm-lock.yaml', 'apps/*/tsconfig.json') }}-
+            types-${{ runner.os }}-${{ matrix.app }}-${{ hashFiles('pnpm-lock.yaml', 'tsconfig.json', 'apps/*/tsconfig.json') }}-
       - name: Run typecheck
         run: pnpm run typecheck:${{ matrix.app }}
 

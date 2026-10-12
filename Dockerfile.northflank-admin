@@ -159,6 +159,12 @@ COPY --from=builder --chown=nextjs:nodejs /workspace/lib/ultimate-course-builder
 COPY --from=builder --chown=nextjs:nodejs /workspace/lib/ultimate-course-builder/instructional/teaching-visual.ts /app/apps/admin/lib/ultimate-course-builder/instructional/teaching-visual.ts
 COPY --from=builder --chown=nextjs:nodejs /workspace/lib/ultimate-course-builder/instructional/reviewed-scene-evidence.ts /app/apps/admin/lib/ultimate-course-builder/instructional/reviewed-scene-evidence.ts
 COPY --from=builder --chown=nextjs:nodejs /workspace/node_modules /app/node_modules
+# Measure the two largest dependency copies before any pruning. The standalone
+# output and root modules both have runtime consumers (Remotion and native libs).
+# Keep this diagnostic read-only until a dependency trace proves safe removal.
+RUN set -eux; \
+    du -sh /app/node_modules /app/apps/admin/node_modules /app/apps/admin/.next /app/apps/admin/remotion-src 2>/dev/null || true; \
+    find /app -type f \( -name '*.log' -o -name '*.tsbuildinfo' \) -print | head -30
 RUN set -eux; \
     test -f /app/apps/admin/server.js; \
     test -d /app/apps/admin/.next/static; \

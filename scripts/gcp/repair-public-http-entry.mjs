@@ -21,7 +21,6 @@ export function redirectMap() {
 }
 export function selectFrontend(map,proxies,rules,addresses) {
  assert.equal(map.name,'elevate-public-routes');
- assert.ok((map.hostRules||[]).some(r=>(r.hosts||[]).some(h=>['www.elevateforhumanity.org','*.elevateforhumanity.org'].includes(h))),'Established map must serve www');
  const active=proxies.filter(p=>p.urlMap===map.selfLink);
  const matching=rules.filter(r=>active.some(p=>p.selfLink===r.target)&&hasPort(r,443)&&/^\d+\.\d+\.\d+\.\d+$/.test(r.IPAddress||''));
  const ips=[...new Set(matching.map(r=>r.IPAddress))];assert.equal(ips.length,1,'Require one established IPv4 HTTPS frontend');
@@ -37,6 +36,9 @@ async function repair() {
  console.log(JSON.stringify({discovery:frontend,httpRules:occupied.map(r=>({name:r.name,target:r.target}))}));
  const dns=await fetch('https://dns.google/resolve?name=www.elevateforhumanity.org&type=A',{signal:AbortSignal.timeout(15000)});
  assert.ok(dns.ok);assert.ok(((await dns.json()).Answer||[]).some(a=>a.type===1&&a.data===frontend.ip),'Public www DNS must use the established Google frontend');
+ const version=await fetch('https://www.elevateforhumanity.org/api/version',{signal:AbortSignal.timeout(15000),cache:'no-store'});
+ assert.equal(version.status,200,'Verify the TLS-protected public site before changing its HTTP entry');
+ assert.equal((await version.json()).service,'marketing','Require the existing public Marketing runtime');
  assert.ok(occupied.every(r=>r.name===ruleName&&r.target.endsWith('/targetHttpProxies/'+proxyName)),'Do not replace an unrelated port-80 listener');
  const existingProxy=read(['compute','target-http-proxies','list']).find(p=>p.name===proxyName);
  assert.ok(!existingProxy||existingProxy.urlMap.endsWith('/urlMaps/'+mapName),'Do not repurpose another URL map');

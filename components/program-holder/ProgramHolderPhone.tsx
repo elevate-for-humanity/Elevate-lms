@@ -453,7 +453,7 @@ export function ProgramHolderPhone({
         const response=await fetch('/api/communications/phone/dial',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({extension:number.trim()})});
         const target=await response.json();
         if(!response.ok){setError(target.error || 'The extension is unavailable.');return;}
-        if(typeof target.destination!=='string' || !/^sip:[A-Za-z0-9._-]{1,128}@sip\\.telnyx\\.com$/.test(target.destination)){setError('The extension destination could not be verified.');return;}
+        if(typeof target.destination!=='string' || !/^sip:[A-Za-z0-9._-]{1,128}@sip[.]telnyx[.]com$/.test(target.destination)){setError('The extension destination could not be verified.');return;}
         destination=target.destination;
       } catch {setError('The extension could not be reached. Try again.');return;}
     }

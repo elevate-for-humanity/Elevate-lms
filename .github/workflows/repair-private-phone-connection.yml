@@ -74,6 +74,17 @@ jobs:
           if(verified.runtimeEnvironment.PBX_CONTROL_URL!==url || verified.runtimeEnvironment.PBX_PROVISIONING_TOKEN!==token)throw Error('Phone configuration write was not verified');
           console.log(JSON.stringify({result:'PASS',scope:'app_provisioning_configuration',secretVersion:version,carrierRoutingChanged:false}));
           NODE
+      - name: Preserve verified private services across VM restarts
+        run: |
+          set -euo pipefail
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo bash -s' <<'SH'
+          set -euo pipefail
+          for unit in elevate-pbx-provisioner elevate-paris-turn elevate-paris-gateway; do
+            systemctl is-active --quiet "$unit"
+          done
+          systemctl enable elevate-pbx-provisioner elevate-paris-turn elevate-paris-gateway >/dev/null
+          echo '{"result":"PASS","scope":"verified_private_service_boot_persistence","carrierRoutingChanged":false}'
+          SH
       - uses: actions/upload-artifact@v4
         if: always()
         with:

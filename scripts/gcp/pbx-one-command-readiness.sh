@@ -30,10 +30,8 @@ if gcloud compute ssh "$VM" --project="$PROJECT" --zone="$ZONE" --quiet --comman
   for name in paris.conf provisioner.conf; do
     if sudo test -f "/etc/elevate-pbx/$name"; then echo "PRESENT $name"; else echo "MISSING $name"; fi
   done
-  sudo docker exec "$C" asterisk -rx "core show channels count"
-  sudo docker exec "$C" asterisk -rx "pjsip show endpoints" | tail -3
-  sudo docker exec "$C" asterisk -rx "dialplan show 0@internal" || true
-  sudo docker exec "$C" asterisk -rx "voicemail show users" || true
+  # Runtime details are inspected by the structured, redacted audit below.
+  # Do not print endpoint names, internal dialplans or mailbox identifiers.
   sudo ss -lnt | grep -E ":(8090|8091)[[:space:]]" || true
 '; then echo 'PASS VM inspected'; else echo 'BLOCKED VM inspection'; failures=$((failures+1)); fi
 echo 'AUTHORITATIVE AUDIT (status can be nonzero while transport is healthy)'

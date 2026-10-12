@@ -233,6 +233,7 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
     if (!resolvedCandidate) throw new Error(`ULTIMATE_RENDER_VISUAL_ASSETS_MISSING:${scene.id}`);
     return {
       ...scene,
+      physical_demonstration: physicalDemonstration,
       subject: String(scene.title ?? scene.subject ?? input.courseTitle ?? 'Lesson'),
       action: teachingPoint || visualRequirement,
       dialogue: teachingPoint || visualRequirement,

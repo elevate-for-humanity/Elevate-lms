@@ -42,6 +42,7 @@ Return JSON {blueprint, grounding}. Use the supplied competency and authorized s
 Preserve every competency and requirement ID. Teach the specific competency, not an adjacent topic. Use progressive explanation, a concrete worked example, observable step-by-step demonstration when required, guided practice, independent practice, realistic mistakes and corrections, and aligned assessments with feedback.
 Manage cognitive load with short focused scenes and scaffolded practice. Include all thirteen stages in the given order. Use 13-16 segments, 3-5 meaningful questions and at least two distinct reassessment questions. Every objective must be taught and assessed. Practical lessons need a competency-specific practicalRubric with observable criteria and safety stop conditions.
 Every segment needs an explicit teachingVisual with 1-4 concise steps. Its kind is sequence, record, choices, comparison or terms. Each label is at most 55 characters; each value is at most 160 characters and is supported by narrationQuote, an exact excerpt of that segment's spoken text. Do not put full narration paragraphs on a slide. In practical demonstration scenes, visualRequirement must specify the actual observable physical technique and tools; teaching graphics supplement that footage and cannot substitute for it.
+For competencies requiring practical evidence, during demonstration, guided_practice, independent_practice and mistake_and_correction use labels of at most 28 characters and values of at most 90 characters so the physical technique stays visible beside its instruction.
 Grounding is an array with one entry per segment: {segmentId, sourceId, excerpt}. Each excerpt must be an exact substantive passage from the supplied source supporting that segment. Do not use only a title as evidence. If sources cannot support the lesson, return {blocked:true,reason:"specific missing instructional evidence"}. Output only JSON.`;
   const result = await generate(system, { courseTitle: input.profile.title, audience: input.profile.audience || 'Adult career learners', competency: input.competency, sequence: ULTIMATE_TEACHING_SEQUENCE, sources: input.sources, blueprintSchema: schema });
   if (result?.blocked) throw new Error('ULTIMATE_AUTHORING_SOURCE_GAP:' + String(result.reason).slice(0, 300));
@@ -53,6 +54,9 @@ Grounding is an array with one entry per segment: {segmentId, sourceId, excerpt}
     if (stage < previousStage || stage < 0) throw new Error('ULTIMATE_TEACHING_SEQUENCE_ORDER_REQUIRED');
     previousStage = stage;
     if (!segment.teachingVisual || segment.teachingVisual.steps.length > 4)
+      throw new Error('ULTIMATE_CONCISE_TEACHING_VISUAL_REQUIRED:' + segment.id);
+    if (input.competency.requiresPracticalEvidence && ['demonstration','guided_practice','independent_practice','mistake_and_correction'].includes(segment.stage) &&
+        segment.teachingVisual.steps.some(step=>step.label.length>28 || step.value.length>90))
       throw new Error('ULTIMATE_CONCISE_TEACHING_VISUAL_REQUIRED:' + segment.id);
   }
   if (blueprint.assessment.questions.length < 3 || blueprint.assessment.reassessment.length < 2)

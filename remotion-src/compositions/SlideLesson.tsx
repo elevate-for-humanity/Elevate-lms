@@ -50,6 +50,7 @@ export interface SceneData {
   imageUrl: string | null;
   /** The live blueprint draws this instructional graphic once, over a clean background. */
   imageIsInstructional?: boolean;
+  physicalDemonstration?: boolean;
   /** Absolute path to per-scene MP3 audio */
   audioSrc: string | null;
   /** Duration in frames at the SlideLesson composition frame rate. */
@@ -507,7 +508,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
   return (
     <AbsoluteFill
       style={{
-        background: instructionalLayout || (scene.imageIsInstructional && bright)
+        background: instructionalLayout || ((scene.imageIsInstructional || scene.physicalDemonstration) && bright)
           ? 'linear-gradient(120deg, #eef2f7 0%, #dbeafe 45%, #f8fafc 100%)'
           : props.backgroundColor,
         backgroundSize: instructionalLayout ? '200% 200%' : undefined,
@@ -547,6 +548,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
             transform: mediaTransform,
             transformOrigin: scene.scene_number % 2 ? '45% 52%' : '55% 48%',
             willChange: 'transform',
+            ...(scene.physicalDemonstration ? {inset:undefined,left:'50%',top:120,width:'50%',height:660,objectFit:'contain' as const,transform:undefined} : {}),
           }}
           muted
         />
@@ -618,7 +620,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
           position: 'absolute',
           top: footageTitle ? FOOTAGE_TITLE_BOX.top + FOOTAGE_TITLE_BOX.height + FOOTAGE_TITLE_BOX.contentGap : 80,
           left: 60,
-          right: instructionalLayout || scene.teachingVisual ? 60 : '50%',
+          right: scene.physicalDemonstration ? '54%' : instructionalLayout || scene.teachingVisual ? 60 : '50%',
           bottom: scene.strictBlueprint && scene.teachingVisual ? 300 : 100,
           display: 'flex',
           flexDirection: 'column',
@@ -631,7 +633,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
           style={{
             opacity: fadeIn(frame, 8, 22),
             transform: `translateY(${slideUp(frame, fps, 8)}px)`,
-            fontSize: scene.strictBlueprint ? 80 : instructionalLayout ? 42 : 44,
+            fontSize: scene.physicalDemonstration ? 64 : scene.strictBlueprint ? 80 : instructionalLayout ? 42 : 44,
             fontWeight: 900,
             color: instructionalLayout || bright ? '#0f172a' : '#fff',
             fontFamily: 'sans-serif',

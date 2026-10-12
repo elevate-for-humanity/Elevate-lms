@@ -859,6 +859,7 @@ export async function renderStoryboardVideo(
         memoryAnchor: scene.memoryAnchor,
         strictBlueprint: input.ultimateStrict,
         teachingVisual: scene.teachingVisual,
+        physicalDemonstration: scene.physicalDemonstration,
       });
     }
 

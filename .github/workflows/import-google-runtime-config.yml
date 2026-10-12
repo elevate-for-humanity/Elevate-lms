@@ -47,7 +47,7 @@ jobs:
         with:
           skip_install: true
       - run: node scripts/gcp/verify-sdk.mjs
-      - name: Import once and verify encrypted Google configuration
+      - name: Verify all Google-owned configuration and preserve every source secret group
         env:
           COMPONENT: ${{ inputs.component }}
           VERIFY_EXISTING_GOOGLE_CONFIG: 'true'

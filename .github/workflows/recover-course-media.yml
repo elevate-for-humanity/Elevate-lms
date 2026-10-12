@@ -1,0 +1,39 @@
+name: Inspect existing Barber and Cosmetology media
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/gcp/audit-course-storage.ts'
+      - 'scripts/gcp/inspect-course-media.mjs'
+      - '.github/workflows/recover-course-media.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  inspect:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test scripts/gcp/inspect-course-media.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Inspect through the already validated worker image and existing identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@sha256:dbf06927683878e6602bd313f231780061c4a5afad1ead43e55b27c30421b52d'
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker pull "$IMAGE"
+          gcloud secrets versions access latest --secret=elevate-ultimate-worker-runtime-config --project=elegant-racer-299721 | docker run --rm -i --entrypoint node -e COURSE_MEDIA_DEEP_AUDIT=true -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "$IMAGE" --import=tsx /app/scripts/gcp/audit-course-storage.ts

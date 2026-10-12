@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getPushNotificationClient } from '@/lib/notifications/push-client';
+import { PhoneRecordingPlayer } from '@/components/communications/PhoneRecordingPlayer';
 import { ProgramHolderPhoneIntroduction } from '@/components/program-holder/ProgramHolderPhoneIntroduction';
 
 type RingMode = 'ring' | 'vibrate' | 'silent' | 'do_not_disturb' | 'offline';
@@ -64,6 +65,7 @@ type PhoneData = {
     provider: 'telnyx' | 'asterisk';
   };
   inbox: InboxItem[];
+  voicemail?: { items: Array<{id: string; phone_number: string | null; transcription: string | null; summary: string | null; created_at: string; recordingUrl: string | null}> };
 };
 
 const DAYS = [
@@ -368,6 +370,24 @@ export function ProgramHolderPhone({
     else if (!connected) await connect();
   }
 
+  async function applyRingMode(mode: RingMode) {
+    if (!data || data.readOnly || saving) return;
+    setSaving(true);
+    try {
+      const response = await fetch(apiBase, {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ringMode:mode})});
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'The alert mode could not be saved.');
+      ringModeRef.current = mode;
+      setData(current => current ? {...current, extension:{...current.extension, ringMode:mode}} : current);
+      if (mode !== 'ring') callRef.current?.stopRingtone();
+      if (mode !== 'vibrate') navigator.vibrate?.(0);
+      if (mode === 'vibrate' && !navigator.vibrate) setMessage('Vibrate selected. This browser does not support vibration; incoming calls still appear onscreen.');
+      else setMessage(mode === 'ring' ? 'Incoming call sound is on.' : mode === 'vibrate' ? 'Incoming calls will vibrate.' : 'Incoming call sound is muted.');
+      setError('');
+    } catch (cause) {setError(cause instanceof Error ? cause.message : 'The alert mode could not be saved.');}
+    finally {setSaving(false);}
+  }
+
   async function enableNotifications() {
     if (data?.readOnly) return;
     setError('');
@@ -557,6 +577,85 @@ export function ProgramHolderPhone({
         </p>
       )}
 
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <h2 className="text-xl font-black text-slate-950">
+            Dial pad
+          </h2>
+          <p className="mt-1 text-sm text-slate-600">
+            {data.extension.provider === 'asterisk'
+              ? 'Enter a three-digit extension or 0 for the administrator.'
+              : 'The caller sees the Elevate business number, not your personal number.'}
+          </p>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'].map((digit) => (
+              <button
+                key={digit}
+                type="button"
+                onClick={() => setReturnNumber((current) => (current + digit).slice(0, 20))}
+                className="min-h-12 rounded-xl border border-slate-300 bg-slate-50 text-xl font-black text-slate-950 active:bg-slate-200"
+              >
+                {digit}
+              </button>
+            ))}
+          </div>
+          <div className="mt-3 flex gap-2">
+            <input
+              value={returnNumber}
+              onChange={(event) => setReturnNumber(event.target.value)}
+              type="tel"
+              inputMode="tel"
+              placeholder={
+                data.extension.provider === 'asterisk' ? 'Extension or 0' : '317-555-0123'
+              }
+              className="min-h-12 min-w-0 flex-1 rounded-xl border border-slate-300 px-3"
+            />
+            <button
+              onClick={() => returnCall()}
+              disabled={data.readOnly}
+              className="min-h-12 rounded-xl bg-emerald-700 px-4 font-black text-white"
+            >
+              <PhoneCall className="h-5 w-5" />
+              <span className="sr-only">Call</span>
+            </button>
+          </div>
+          <div className="mt-2 flex gap-2">
+            <button
+              type="button"
+              onClick={() => setReturnNumber((current) => current.slice(0, -1))}
+              className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold"
+            >
+              Delete
+            </button>
+            <button
+              type="button"
+              onClick={() => setReturnNumber('')}
+              className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold"
+            >
+              Clear
+            </button>
+          </div>
+          <div className="mt-6 rounded-xl border border-violet-200 bg-violet-50 p-4">
+            <h3 className="flex items-center gap-2 font-black text-violet-950">
+              <BellRing className="h-5 w-5" />
+              What happens when you miss a call
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-violet-900">
+              PARIS tells the caller you are unavailable, asks their name, callback number, reason,
+              program, urgency, and preferred callback time, then puts the interview in your inbox
+              below.
+            </p>
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-2" aria-label="Incoming call alert mode">
+            {([['ring','Ring on'],['vibrate','Vibrate'],['silent','Ring muted']] as const).map(([mode,label]) => (
+              <button key={mode} type="button" disabled={saving || data.readOnly} aria-pressed={data.extension.ringMode === mode}
+                onClick={() => void applyRingMode(mode)}
+                className={`min-h-12 rounded-xl border px-3 font-bold ${data.extension.ringMode === mode ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-300 bg-white text-slate-900'} disabled:opacity-50`}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </section>
+
       {callState !== 'idle' && (
         <section className="rounded-3xl border-2 border-cyan-300 bg-slate-950 p-7 text-center text-white shadow-2xl">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-cyan-500/20">
@@ -612,7 +711,7 @@ export function ProgramHolderPhone({
         </section>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+      <div className="grid gap-6">
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <h2 className="flex items-center gap-2 text-xl font-black text-slate-950">
             <Headphones className="h-5 w-5 text-blue-700" />
@@ -856,90 +955,20 @@ export function ProgramHolderPhone({
           </p>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-xl font-black text-slate-950">
-            {data.extension.provider === 'asterisk' ? 'Call an extension' : 'Return a call'}
-          </h2>
-          <p className="mt-1 text-sm text-slate-600">
-            {data.extension.provider === 'asterisk'
-              ? 'Enter a three-digit extension or 0 for the administrator.'
-              : 'The caller sees the Elevate business number, not your personal number.'}
-          </p>
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'].map((digit) => (
-              <button
-                key={digit}
-                type="button"
-                onClick={() => setReturnNumber((current) => (current + digit).slice(0, 20))}
-                className="min-h-12 rounded-xl border border-slate-300 bg-slate-50 text-xl font-black text-slate-950 active:bg-slate-200"
-              >
-                {digit}
-              </button>
-            ))}
-          </div>
-          <div className="mt-3 flex gap-2">
-            <input
-              value={returnNumber}
-              onChange={(event) => setReturnNumber(event.target.value)}
-              type="tel"
-              inputMode="tel"
-              placeholder={
-                data.extension.provider === 'asterisk' ? 'Extension or 0' : '317-555-0123'
-              }
-              className="min-h-12 min-w-0 flex-1 rounded-xl border border-slate-300 px-3"
-            />
-            <button
-              onClick={() => returnCall()}
-              disabled={data.readOnly}
-              className="min-h-12 rounded-xl bg-emerald-700 px-4 font-black text-white"
-            >
-              <PhoneCall className="h-5 w-5" />
-              <span className="sr-only">Call</span>
-            </button>
-          </div>
-          <div className="mt-2 flex gap-2">
-            <button
-              type="button"
-              onClick={() => setReturnNumber((current) => current.slice(0, -1))}
-              className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold"
-            >
-              Delete
-            </button>
-            <button
-              type="button"
-              onClick={() => setReturnNumber('')}
-              className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-3 font-bold"
-            >
-              Clear
-            </button>
-          </div>
-          <div className="mt-6 rounded-xl border border-violet-200 bg-violet-50 p-4">
-            <h3 className="flex items-center gap-2 font-black text-violet-950">
-              <BellRing className="h-5 w-5" />
-              What happens when you miss a call
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-violet-900">
-              PARIS tells the caller you are unavailable, asks their name, callback number, reason,
-              program, urgency, and preferred callback time, then puts the interview in your inbox
-              below.
-            </p>
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs font-bold">
-            <div className="rounded-xl bg-blue-50 p-3">
-              <Volume2 className="mx-auto mb-1 h-5 w-5 text-blue-700" />
-              Ring
-            </div>
-            <div className="rounded-xl bg-amber-50 p-3">
-              <Phone className="mx-auto mb-1 h-5 w-5 text-amber-700" />
-              Vibrate
-            </div>
-            <div className="rounded-xl bg-slate-100 p-3">
-              <VolumeX className="mx-auto mb-1 h-5 w-5 text-slate-700" />
-              Silent
-            </div>
-          </div>
-        </section>
+
       </div>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <h2 className="text-xl font-black">Voicemail</h2>
+        {data.voicemail?.items?.length ? data.voicemail.items.map(item => (
+          <article key={item.id} className="mt-3 rounded-xl border p-4">
+            <p className="font-bold">{friendlyNumber(item.phone_number)}</p>
+            <p className="text-sm text-slate-600">{formatDate(item.created_at)}</p>
+            <p className="mt-2">{item.transcription || item.summary || 'Voice message'}</p>
+            {item.recordingUrl ? <PhoneRecordingPlayer url={item.recordingUrl} /> : <p className="mt-2 text-sm">Audio is not available for this message.</p>}
+          </article>
+        )) : <p className="mt-3 text-sm text-slate-600">No voicemail messages.</p>}
+      </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex items-center justify-between gap-3">
@@ -1020,7 +1049,7 @@ export function ProgramHolderPhone({
                 </details>
               )}
               {item.recordingUrl && (
-                <audio controls preload="none" src={item.recordingUrl} className="mt-3 w-full" />
+                <PhoneRecordingPlayer url={item.recordingUrl} />
               )}
               {item.callback_number && (
                 <button

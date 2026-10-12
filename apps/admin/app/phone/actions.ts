@@ -6,6 +6,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { businessHoursFromForm, normalizeUsPhone, validMenuDigit } from '@/lib/phone/config';
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
+import {hydrateProcessEnv} from '@/lib/secrets';
 import { telnyxClient } from '@/lib/phone/telnyx';
 
 export type PhoneActionState = { ok: boolean; message: string };
@@ -384,6 +385,7 @@ export async function removeDestination(formData: FormData): Promise<void> {
 }
 
 export async function testDestination(formData: FormData): Promise<void> {
+  await hydrateProcessEnv();
   const { db, id } = await requireSystemId();
   const destinationId = String(formData.get('destinationId') ?? '');
   const [{ data: destination }, { data: number }] = await Promise.all([
@@ -410,14 +412,15 @@ export async function testDestination(formData: FormData): Promise<void> {
     if (!destination.extension_id) throw new Error('This PWA route has no assigned extension.');
     const { data: device } = await db
       .from('phone_webrtc_devices')
-      .select('sip_username')
+      .select('sip_username,provider,connection_state')
       .eq('extension_id', destination.extension_id)
       .eq('status', 'active')
       .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString())
       .order('last_seen_at', { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (!device?.sip_username) {
+    if (device?.provider === 'asterisk') throw new Error('This extension uses Elevate Phone. Open your dial pad to test it; carrier test calling is not connected to this PBX yet.');
+    if (!device?.sip_username || device.connection_state !== 'connected') {
       throw new Error('That Program Holder must connect Phone in the PWA before a test call.');
     }
     target = `sip:${device.sip_username}@sip.telnyx.com;secure=srtp`;
@@ -562,4 +565,14 @@ export async function toggleExtension(formData: FormData): Promise<void> {
     .eq('workspace_id', workspace.id);
   if (error) throw new Error(error.message);
   revalidatePath('/phone');
+}
+
+export async function destinationActionResult(_state:PhoneActionState,formData:FormData):Promise<PhoneActionState>{
+ try{
+  const command=String(formData.get('command')||'');
+  if(command==='default'){await setDefaultDestination(formData);return {ok:true,message:'Default call route saved.'};}
+  if(command==='toggle'){await toggleDestination(formData);return {ok:true,message:String(formData.get('enabled'))==='true'?'Call route enabled.':'Call route paused.'};}
+  if(command==='test'){await testDestination(formData);return {ok:true,message:'Test call requested. Answer the destination and verify two-way audio.'};}
+  return {ok:false,message:'Choose a valid phone action.'};
+ }catch(error){return failure(error,'The phone action could not be completed.');}
 }

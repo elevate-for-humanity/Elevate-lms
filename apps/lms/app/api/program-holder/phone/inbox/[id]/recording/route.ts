@@ -11,11 +11,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   if (actorError) return actorError;
   const { id } = await params;
   const { data: item, error } = await ctx.db.from('phone_callback_tasks')
-    .select('recording_url').eq('id', id).eq('assigned_profile_id', ctx.user.id).maybeSingle();
+    .select('recording_url,call_id').eq('id', id).eq('assigned_profile_id', ctx.user.id).maybeSingle();
   if (error) return new NextResponse('Recording lookup unavailable', { status: 503 });
   if (!item?.recording_url) return new NextResponse('Recording not found', { status: 404 });
   try {
-    const recording = await loadPhoneRecording(item.recording_url);
+    const recording = await loadPhoneRecording(item.recording_url,item.call_id?{db:ctx.db,callId:item.call_id}:undefined);
     return recording;
   } catch {
     return new NextResponse('Recording unavailable', { status: 502 });

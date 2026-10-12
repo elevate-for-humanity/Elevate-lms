@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import {PhoneRecordingPlayer} from '@/components/communications/PhoneRecordingPlayer';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
@@ -12,8 +13,8 @@ function date(value?: string) {
 function owner(item: any) {
   return item.extension ? `${item.extension.display_name || 'Assigned holder'} · extension ${item.extension.extension}` : 'Unassigned';
 }
-function Recording({ url }: { url?: string }) {
-  return url ? <audio controls preload="none" src={url} className="mt-3 w-full" aria-label="Play voicemail or call recording" /> : null;
+function Recording({kind,id,available}:{kind:string;id:string;available:boolean}) {
+ return available ? <PhoneRecordingPlayer url={`/api/communications/recordings/${kind}/${id}`} /> : null;
 }
 
 export default async function PhoneInboxPage({ searchParams }: { searchParams?: Promise<{ page?: string }> }) {
@@ -54,7 +55,7 @@ export default async function PhoneInboxPage({ searchParams }: { searchParams?: 
             <p>Voicemail: {item.voicemails?.length ? 'Message saved' : 'No voicemail saved'}</p>
             {item.duration_seconds != null && <p>Duration: {item.duration_seconds} seconds</p>}
             {(item.callbacks ?? []).map((task: any) => <p key={task.id}>Callback: <strong>{task.status}</strong> · {task.source === 'voicemail' ? 'Voicemail task' : 'PARIS task'} · Updated {date(task.updated_at)} ET</p>)}
-            <Recording url={item.recording_url} />
+            <Recording kind="call" id={item.id} available={Boolean(item.recording_url)} />
           </article>
         )) : <p className="text-sm text-slate-500">No calls on this page.</p>}</div>
       </section>
@@ -72,7 +73,7 @@ export default async function PhoneInboxPage({ searchParams }: { searchParams?: 
               <p className="mt-2 whitespace-pre-wrap break-words">{item.summary || item.reason || 'Awaiting caller details'}</p>
               {item.transcript && <details className="mt-2 rounded-lg border bg-white p-2"><summary className="cursor-pointer font-bold">Read message transcript</summary><p className="mt-2 whitespace-pre-wrap break-words">{item.transcript}</p></details>}
               <p className="mt-2 text-slate-600">Linked call: {item.call_id} · Initiated {date(item.call?.started_at)} ET</p>
-              <Recording url={item.recording_url} />
+              <Recording kind="callback" id={item.id} available={Boolean(item.recording_url)} />
             </article>
           )) : <p className="text-sm text-slate-500">No callback items on this page.</p>}</div>
         </div>
@@ -86,7 +87,7 @@ export default async function PhoneInboxPage({ searchParams }: { searchParams?: 
               <p className="mt-2 whitespace-pre-wrap break-words">{item.transcription || item.summary || 'Voicemail received; transcript not yet available.'}</p>
               <p className="mt-2 text-slate-600">Linked call: {item.call_id || 'Legacy voicemail'} · Initiated {date(item.call?.started_at)} ET</p>
               {(item.call?.callbacks ?? []).filter((task: any) => task.source === 'voicemail').map((task: any) => <p key={task.id}>Callback: <strong>{task.status}</strong> · Updated {date(task.updated_at)} ET</p>)}
-              <Recording url={item.recording_url} />
+              <Recording kind="voicemail" id={item.id} available={Boolean(item.recording_url)} />
             </article>
           )) : <p className="text-sm text-slate-500">No voicemail on this page.</p>}</div>
         </div>

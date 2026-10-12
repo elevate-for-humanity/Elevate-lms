@@ -11,11 +11,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   if (actorError) return actorError;
   const { id } = await params;
   const { data: item, error } = await ctx.db.from('voicemails')
-    .select('recording_url').eq('id', id).eq('assigned_profile_id', ctx.user.id).maybeSingle();
+    .select('recording_url,call_id').eq('id', id).eq('assigned_profile_id', ctx.user.id).maybeSingle();
   if (error) return new NextResponse('Recording lookup unavailable', { status: 503 });
   if (!item?.recording_url) return new NextResponse('Recording not found', { status: 404 });
   try {
-    const recording = await loadPhoneRecording(item.recording_url);
+    const recording = await loadPhoneRecording(item.recording_url,item.call_id?{db:ctx.db,callId:item.call_id}:undefined);
     const { error: readError } = await ctx.db.from('voicemails')
       .update({ is_read: true, status: 'read' }).eq('id', id).eq('assigned_profile_id', ctx.user.id);
     if (readError) return new NextResponse('Recording read state unavailable', { status: 503 });

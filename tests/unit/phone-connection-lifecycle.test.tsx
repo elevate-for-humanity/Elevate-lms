@@ -28,6 +28,27 @@ beforeEach(()=>{
 afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 async function connected(){render(<ProgramHolderPhone/>);await screen.findByRole('button',{name:'Disconnect'});}
 describe('phone connection lifecycle',()=>{
+  it('renders the actual voicemail audio returned by the API',async()=>{
+    vi.mocked(fetch).mockImplementationOnce(async()=>Response.json({...data,readOnly:true,voicemail:{items:[{id:'message',phone_number:null,created_at:'2026-10-12T12:00:00Z',transcription:'Saved voice message',summary:null,recordingUrl:'/api/program-holder/phone/voicemail/message/recording'}]}}));
+    render(<ProgramHolderPhone/>);
+    await screen.findByText('Saved voice message');
+    expect(screen.getByLabelText('Play voicemail or call recording').getAttribute('src')).toBe('/api/program-holder/phone/voicemail/message/recording');
+  });
+  it('opens to the dial pad before availability settings',async()=>{
+    await connected();
+    const dial=screen.getByRole('heading',{name:'Dial pad'});const settings=screen.getByRole('heading',{name:'Availability and ringing'});
+    expect(Boolean(dial.compareDocumentPosition(settings)&Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+    expect(screen.getByRole('button',{name:'Ring on'}).getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByRole('button',{name:'Vibrate'})).toBeTruthy();
+  });
+  it('saves ring mode through the real phone settings API',async()=>{
+    await connected();
+    const fetchMock=vi.mocked(fetch);fetchMock.mockImplementationOnce(async()=>Response.json({}));
+    fireEvent.click(screen.getByRole('button',{name:'Ring muted'}));
+    await screen.findByText('Incoming call sound is muted.');
+    expect(fetchMock).toHaveBeenCalledWith('/api/program-holder/phone',expect.objectContaining({method:'PATCH',body:JSON.stringify({ringMode:'silent'})}));
+    expect(screen.getByRole('button',{name:'Ring muted'}).getAttribute('aria-pressed')).toBe('true');
+  });
   it('clears online messaging and cannot be reconnected by a late heartbeat after disconnect',async()=>{
     await connected();
     await act(async()=>{mock.handlers.ready();});

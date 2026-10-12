@@ -76,6 +76,40 @@ jobs:
           set -euo pipefail
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
             --command='sudo python3 -' < scripts/gcp/audit-pbx-runtime.py | tee pbx-runtime-evidence.json
+      - name: Diagnose private service configuration and existing secret access
+        if: always()
+        shell: bash
+        run: |
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' <<'PY'
+          import json, re, urllib.request, urllib.error
+          from pathlib import Path
+          def request(url, headers={}, data=None):
+              try:
+                  with urllib.request.urlopen(urllib.request.Request(url,headers=headers,data=data),timeout=10) as r:
+                      return r.status,json.loads(r.read(1048576))
+              except urllib.error.HTTPError as e: return e.code,{}
+              except Exception: return None,{}
+          status,metadata=request('http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/token',{'Metadata-Flavor':'Google'})
+          token=metadata.get('access_token','')
+          reports={}
+          for name,filename,keys in [
+              ('provisioner','/etc/elevate-pbx/provisioner.conf',['PBX_PROVISIONING_TOKEN_SECRET','SUPABASE_SERVICE_ROLE_KEY_SECRET','SUPABASE_URL','PBX_PHONE_SYSTEM_ID','PBX_ASTERISK_CONTAINER','PBX_ASTERISK_GID','PBX_GENERATED_ROOT']),
+              ('paris','/etc/elevate-pbx/paris.conf',['PARIS_ARI_PASSWORD_SECRET','PARIS_TURN_TOKEN_SECRET'])]:
+              values={}
+              for line in Path(filename).read_text().splitlines():
+                  match=re.fullmatch(r'([A-Z_0-9]+)=(.*)',line.strip())
+                  if match: values[match[1]]=match[2].strip().strip('"').strip("'")
+              report={'configuration':{key:bool(values.get(key)) for key in keys},'secrets':{}}
+              for key in keys:
+                  if not key.endswith('_SECRET'): continue
+                  value=values.get(key,'')
+                  if not re.fullmatch(r'projects/(elegant-racer-299721|484736877039)/secrets/[A-Za-z0-9_-]+/versions/([0-9]+|latest)',value):
+                      report['secrets'][key]={'validReference':False};continue
+                  code,result=request('https://secretmanager.googleapis.com/v1/'+value+':access',{'Authorization':'Bearer '+token})
+                  report['secrets'][key]={'validReference':True,'httpStatus':code,'payloadPresent':bool(result.get('payload',{}).get('data'))}
+              reports[name]=report
+          print(json.dumps({'privateRuntimeConfiguration':reports}))
+          PY
       - name: Inspect meeting connection and existing VM capacity
         if: always()
         run: |

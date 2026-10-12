@@ -24,7 +24,7 @@ const damagedPublicImages = [
 
 describe('public image delivery', () => {
   it('decodes the enhanced shop interior used by the slideshow', async () => {
-    const { data, info } = await sharp('public/images/partners/b-52s/interior-derived-2026.png')
+    const { data, info } = await sharp('public/images/partners/b-52s/interior-derived-2026.webp')
       .raw()
       .toBuffer({ resolveWithObject: true });
     expect(data.byteLength).toBeGreaterThan(0);

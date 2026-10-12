@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { TUITION_CENTS } from '@/lib/barber/pricing';
-import { APPENDIX_A_STANDARDS } from '@/lib/compliance/appendix-a-standards';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -33,7 +33,8 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
 const BARBER_HERO_IMAGE = getProgramHeroImage('barber-apprenticeship');
-const BARBER_RTI_HOURS = APPENDIX_A_STANDARDS.barber.relatedInstructionHours;
+const BARBER_STANDARD = getRegisteredProgramStandard('barber-apprenticeship')!.standard;
+const BARBER_RTI_HOURS = BARBER_STANDARD.relatedInstructionHours;
 const KOUNTRY_KUTZ_HERO_TRANSCRIPT =
   'Welcome to Kountry Kutz Barbershop in New Palestine, Indiana. As the video moves through the shop, notice the professional stations, working barbershop environment, and approved Host Shop where eligible apprentices may build supervised barbering skills.';
 const FLOW = [
@@ -144,8 +145,8 @@ export default async function BarberApprenticeshipPage() {
             </div>
             <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6">
               <p className="font-black">
-                {APPENDIX_A_STANDARDS.barber.totalOjlHours.toLocaleString()} OJL hours +{' '}
-                {BARBER_RTI_HOURS} RTI hours · Self-pay only
+                {BARBER_STANDARD.totalOjlHours.toLocaleString()} OJL hours + {BARBER_RTI_HOURS} RTI
+                hours · Self-pay only
               </p>
               <p>
                 ${(TUITION_CENTS / 100).toLocaleString()} tuition: pay in full or four invoices of $
@@ -199,7 +200,7 @@ export default async function BarberApprenticeshipPage() {
           <Fact
             icon={ShieldCheck}
             label="On-the-job learning"
-            value={`${APPENDIX_A_STANDARDS.barber.totalOjlHours.toLocaleString()} OJL hours`}
+            value={`${BARBER_STANDARD.totalOjlHours.toLocaleString()} OJL hours`}
           />
           <Fact icon={BookOpen} label="Required RTI" value={`${BARBER_RTI_HOURS} verified hours`} />
           <Fact icon={Scissors} label="Training setting" value="Approved host shop" />

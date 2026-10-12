@@ -68,3 +68,7 @@ Supplier signup and kit fulfillment remain blocked. The repository contained res
 - Removed the stale $600 cosmetology deposit claim without changing configured tuition, Stripe prices, or checkout amounts. Applicants review the current deposit and repayment terms in enrollment.
 - Extended raster audit: 941 files decoded; 44 damaged legacy files recorded in DECODED_IMAGE_AUDIT_2026-10-12.json. Existing canonical aliases account for many of these paths. Several portrait references belong to unused legacy testimonial components; unknown real-person photos were not fabricated. Source corruption is distinguished from actual live delivery failure.
 - Final combined suite: 89 tests passed across 20 files, covering the application policy, interview drafts, registered hero requirements, FAQs, host categories, media and narration. Marketing TypeScript and changed-file ESLint passed; the final Marketing build passed. The earlier 60-test repair suite remains recorded above.
+
+## Deployed hero data parity
+
+Post-deployment inspection found that the Docker image explicitly copies apps/marketing/public/data/hero-banners.json over the canonical public/data copy. Updating only the canonical file left the live nail hero on old text even though the new FAQ was correct. Both tracked JSON files now match. A unit regression checks parsed parity, and the existing hero-banner audit checks byte parity. The final hero correction must be verified after this data-parity release.

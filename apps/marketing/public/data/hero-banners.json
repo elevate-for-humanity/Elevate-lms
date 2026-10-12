@@ -786,25 +786,25 @@
     "credentialLabel": "Indiana Barber License",
     "durationLabel": "260 RTI hours + 14 competencies",
     "salaryRangeLabel": "$28,000 to $52,000",
-    "belowHeroHeadline": "Earn your Indiana Barber License while getting paid.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. Complete 14 verified occupational competencies and 260 hours of related instruction, plus supervised host-shop practice toward the Indiana Barber License.",
+    "belowHeroHeadline": "Build your future in barbering.",
+    "belowHeroSubheadline": "Complete 14 verified occupational competencies and 260 hours of related instruction, plus supervised Host Shop practice. Apprenticeship tuition is self-pay only.",
     "primaryCta": {
       "label": "Enroll Now",
       "href": "/programs/barber-apprenticeship/apply",
       "variant": "primary"
     },
     "secondaryCta": {
-      "label": "Request Information",
-      "href": "/programs/barber-apprenticeship/request-info",
+      "label": "Explore Host Shops",
+      "href": "/partners/host-shops",
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered Apprenticeship",
-      "Earn wages from day one",
-      "Indiana Barber License",
-      "Barbershop Business Certificate"
+      "Registered Apprenticeship",
+      "Self-pay only",
+      "14 competencies · 260 RTI hours",
+      "Placement confirmed before training"
     ],
-    "transcript": "Elevate's registered, competency-based Barber Apprenticeship leads toward the Indiana Barber License through 260 RTI hours + 14 competencies, plus supervised host-shop practice. Kountry Kutz in New Palestine is a participating host shop. Eligible funding may help after written approval; payment-plan options are subject to provider terms.",
+    "transcript": "Prepare for the Indiana Barber License through 260 RTI hours + 14 competencies and supervised Host Shop practice. Kountry Kutz is a participating Host Shop. Tuition is self-pay only. Employment and placement are confirmed individually; Indiana licensing approval is a separate step.",
     "analyticsName": "barber-apprenticeship",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4"
   },
@@ -813,27 +813,27 @@
     "voiceoverSrc": "/audio/heroes/cosmetology.mp3",
     "microLabel": "DOL Registered Apprenticeship",
     "credentialLabel": "Indiana Cosmetology License",
-    "durationLabel": "2,000 hours",
+    "durationLabel": "2,000–2,500-hour term + 154 RTI hours",
     "salaryRangeLabel": "$26,000 to $48,000",
-    "belowHeroHeadline": "Earn your Indiana Cosmetology License while getting paid.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. 2,000 hours of supervised salon training under a licensed cosmetologist. Earn wages from day one.",
+    "belowHeroHeadline": "Build your future in cosmetology.",
+    "belowHeroSubheadline": "Follow the registered hybrid 2,000–2,500-hour term with 154 hours of related instruction and supervised salon practice. Apprenticeship tuition is self-pay only.",
     "primaryCta": {
       "label": "Enroll Now",
       "href": "/apply?program=cosmetology-apprenticeship",
       "variant": "primary"
     },
     "secondaryCta": {
-      "label": "Request Information",
-      "href": "/programs/cosmetology-apprenticeship/request-info",
+      "label": "Explore Host Shops",
+      "href": "/partners/host-shops",
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered Apprenticeship",
-      "Earn wages from day one",
-      "Indiana Cosmetology License",
-      "Salon-based training"
+      "Registered Apprenticeship",
+      "Self-pay only",
+      "Hybrid term · 154 RTI hours",
+      "Placement confirmed before training"
     ],
-    "transcript": "Earn Indiana Cosmetology License through a DOL Registered Apprenticeship of 2,000 hours of supervised training in a licensed salon. Cosmetologists commonly earn $26,000 to $48,000 depending on clientele and setting. Wages begin on day one. The Indiana Cosmetology License is required to work in any Indiana salon.",
+    "transcript": "Prepare for the Indiana Cosmetology License through a hybrid 2,000–2,500-hour term + 154 RTI hours and supervised hair care, cutting, coloring and styling practice. Tuition is self-pay only. Placement and wages are confirmed individually; Indiana licensing approval is a separate step.",
     "analyticsName": "cosmetology-apprenticeship",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cosmetology-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cosmetology-hero.mp4",
@@ -844,26 +844,26 @@
     "voiceoverSrc": "/audio/heroes/nail-tech.mp3",
     "microLabel": "DOL Registered Apprenticeship",
     "credentialLabel": "Indiana Nail Technician License",
-    "durationLabel": "2,000 hours",
+    "durationLabel": "210 RTI hours + 19 competencies",
     "salaryRangeLabel": "$24,000 to $42,000",
-    "belowHeroHeadline": "Earn your Indiana Nail Technician License while getting paid.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. 2,000 OJL hours of supervised training in a licensed salon. Manicure, pedicure, acrylics, and gel nails. Earn wages from day one.",
+    "belowHeroHeadline": "Build your future in nail technology.",
+    "belowHeroSubheadline": "Complete 19 verified Manicurist competencies and 210 hours of related instruction, with supervised salon practice. Apprenticeship tuition is self-pay only.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/programs/nail-technician-apprenticeship/apply"
     },
     "secondaryCta": {
-      "label": "Find a Host Salon",
-      "href": "/partners/nail-technician-apprenticeship/apply",
+      "label": "Explore Host Shops",
+      "href": "/partners/host-shops",
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered Apprenticeship",
-      "Earn wages from day one",
-      "Indiana Nail Technician License",
-      "2,000 OJL hours — registered apprenticeship pathway"
+      "Registered Apprenticeship",
+      "Self-pay only",
+      "19 competencies · 210 RTI hours",
+      "Placement confirmed before training"
     ],
-    "transcript": "Earn an Indiana Nail Technician License through a DOL Registered Apprenticeship requiring 2,000 hours of on-the-job learning. Training covers manicures, pedicures, acrylics, gel nails, sanitation, client service, and professional salon practice at an approved licensed salon.",
+    "transcript": "Prepare for the Indiana Nail Technician License through 210 RTI hours + 19 competencies and supervised nail services, sanitation and client care. Tuition is self-pay only. Placement and employment are confirmed individually; Indiana licensing approval is a separate step.",
     "analyticsName": "nail-technician-apprenticeship",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/nail-tech-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/nail-tech-hero.mp4",
@@ -2487,26 +2487,26 @@
     "pageKey": "esthetician-apprenticeship",
     "microLabel": "DOL Registered Apprenticeship",
     "credentialLabel": "Indiana Esthetician License",
-    "durationLabel": "1,500 hours",
+    "durationLabel": "300 RTI hours + 20 competencies",
     "salaryRangeLabel": "$32,000 to $52,000",
-    "belowHeroHeadline": "Esthetician Apprenticeship — earn while you train.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. Hands-on training at a licensed salon. Graduate with your Indiana Esthetician License and a paying clientele.",
+    "belowHeroHeadline": "Start your future in esthetics.",
+    "belowHeroSubheadline": "Complete 20 verified occupational competencies and 300 hours of related instruction, with supervised skincare practice. Apprenticeship tuition is self-pay only.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/apply?program=esthetician-apprenticeship"
     },
     "secondaryCta": {
-      "label": "Check Eligibility",
-      "href": "/check-eligibility",
+      "label": "Explore Host Shops",
+      "href": "/partners/host-shops",
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered Apprenticeship",
-      "Earn wages from day one",
-      "Indiana Esthetician License",
-      "Licensed salon training"
+      "Registered Apprenticeship",
+      "Self-pay only",
+      "20 competencies · 300 RTI hours",
+      "Placement confirmed before training"
     ],
-    "transcript": "Train for the Indiana Esthetician License through a DOL Registered Apprenticeship of 1,500 hours at a licensed salon. Apprentices earn wages while completing supervised skin care, sanitation, client service, and exam preparation. Licensed estheticians commonly earn $32,000 to $52,000.",
+    "transcript": "Prepare for the Indiana Esthetician License through 300 RTI hours + 20 competencies and supervised skincare, sanitation and client care. Tuition is self-pay only. We are recruiting new esthetics Host Shops; placement and Indiana licensing approval are confirmed separately.",
     "analyticsName": "esthetician-apprenticeship",
     "_pexelsVideoId": 7423537,
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/esthetician-hero.mp4",

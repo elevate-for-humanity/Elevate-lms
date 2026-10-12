@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import heroBanners from '@/content/heroBanners';
 import { PROGRAMS } from '@/lib/programs/canonical-data';
@@ -5,6 +6,11 @@ import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-pr
 import { getPublicPageFacts } from '@/lib/marketing/public-page-facts';
 
 describe('registered apprenticeship hero facts', () => {
+  it('keeps the deployed Marketing JSON identical to the canonical source', () => {
+    const canonical = JSON.parse(readFileSync('public/data/hero-banners.json', 'utf8'));
+    const deployed = JSON.parse(readFileSync('apps/marketing/public/data/hero-banners.json', 'utf8'));
+    expect(deployed).toEqual(canonical);
+  });
   it.each(['barber-apprenticeship', 'esthetician-apprenticeship', 'nail-technician-apprenticeship'])('matches the registered completion model for %s', (slug) => {
     const contract = getRegisteredProgramStandard(slug);
     expect(contract).not.toBeNull();

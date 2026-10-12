@@ -81,7 +81,7 @@ jobs:
         shell: bash
         run: |
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' <<'PY'
-          import json, re, urllib.request, urllib.error
+          import json, re, urllib.request, urllib.error, subprocess
           from pathlib import Path
           def request(url, headers={}, data=None):
               try:
@@ -107,6 +107,13 @@ jobs:
                       report['secrets'][key]={'validReference':False};continue
                   code,result=request('https://secretmanager.googleapis.com/v1/'+value+':access',{'Authorization':'Bearer '+token})
                   report['secrets'][key]={'validReference':True,'httpStatus':code,'payloadPresent':bool(result.get('payload',{}).get('data'))}
+              if name=='provisioner':
+                  root=values.get('PBX_GENERATED_ROOT','')
+                  safe=bool(re.fullmatch(r'/(opt|var/lib)/elevate-pbx/[A-Za-z0-9/_-]+',root))
+                  output=subprocess.run(['systemctl','show','elevate-pbx-provisioner.service','--property=ReadWritePaths','--value'],capture_output=True,text=True).stdout
+                  report['generatedRoot']={'validPath':safe,'path':root if safe else None,'exists':Path(root).is_dir() if safe else False,'unitAllowsWrite':any(root==p or root.startswith(p.rstrip('/')+'/') for p in output.split())}
+                  report['phoneSystemMatches']=values.get('PBX_PHONE_SYSTEM_ID')=='341f59a3-b1d6-4360-8463-0ce0402f86fe'
+                  report['supabaseMatches']=values.get('SUPABASE_URL','').rstrip('/')=='https://cuxzzpsyufcewtmicszk.supabase.co'
               reports[name]=report
           print(json.dumps({'privateRuntimeConfiguration':reports}))
           PY

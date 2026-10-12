@@ -15,6 +15,7 @@ import path from 'path';
 import { renderConcurrency } from './render-concurrency.mjs';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import { installRemotionHostCompatibility } from './remotion-host-compat.mjs';
 import { mkdir, readFile, writeFile, unlink, rm, stat } from 'fs/promises';
 import { generateEdgeTTS, buildLessonScript, EDGE_TTS_VOICES, type EdgeTTSVoice } from './edge-tts';
 import { getPexelsImage, getPexelsVideoClip } from './pexels';
@@ -382,6 +383,7 @@ function getOutputPaths(lessonId: string) {
 let _bundleUrl: string | null = null;
 
 async function getBundleUrl(): Promise<string> {
+  installRemotionHostCompatibility();
   if (_bundleUrl) return _bundleUrl;
 
   logger.info('[RemotionRender] Bundling Remotion composition...');

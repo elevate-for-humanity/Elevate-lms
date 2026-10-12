@@ -49,3 +49,21 @@ test('full-narration graphics cannot silently replace a concise visual plan', as
   delete result.blueprint.segments[0].teachingVisual;
   await assert.rejects(authorGoogleLesson(input, async () => result), /ULTIMATE_CONCISE_TEACHING_VISUAL_REQUIRED/);
 });
+test('authoring schema includes mandatory activities, reassessment and practical evidence', async () => {
+  const { input, result } = fixture();
+  input.competency.requiresPracticalEvidence = true;
+  result.blueprint.assessment.practicalRubric = { criteria: ['Observed performance'] };
+  let calls = 0;
+  await authorGoogleLesson(input, async (_system, request: any) => {
+    if (++calls === 1) {
+      assert.deepEqual(request.blueprintSchema.activities.map((a: any) => a.type),
+        ['guided_practice','independent_practice','knowledge_check','remediation','reassessment']);
+      assert.equal(request.blueprintSchema.stages.length, 13);
+      assert.deepEqual(request.blueprintSchema.stages.map((s: any) => s.stage), request.sequence);
+      assert.ok(request.blueprintSchema.assessment.reassessment[0].explanation);
+      assert.ok(request.blueprintSchema.assessment.practicalRubric.criteria.length);
+      return result;
+    }
+    return {pass:true, findings:[], competencyId:input.competency.id, blueprintHash:request.blueprintHash};
+  });
+});

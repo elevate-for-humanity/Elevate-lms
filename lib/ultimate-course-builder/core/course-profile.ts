@@ -28,6 +28,14 @@ export async function hydrateUltimateProfileSources(
   profile: UltimateCredentialProfile,
 ): Promise<UltimateCredentialProfile> {
   const registeredContract = getRegisteredProgramStandardByProfileId(profile.id);
+  // Teaching modality does not waive the registered mentor performance requirement.
+  if (registeredContract) {
+    const authority = new Map(registeredContract.standard.competencies.map(c => [c.id, c]));
+    profile = {...profile, competencies: profile.competencies.map(c => {
+      const standard = authority.get(c.id);
+      return standard ? {...c, type: competencyType({category:standard.category}, true)} : c;
+    })};
+  }
   const registeredSources = registeredContract
     ? registeredInstructionalSources(registeredContract.canonicalProgramSlug)
     : [];

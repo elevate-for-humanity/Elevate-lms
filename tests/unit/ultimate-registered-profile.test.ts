@@ -4,6 +4,19 @@ import { verifyRegisteredProfile } from '../../lib/ultimate-course-builder/crede
 import { hydrateUltimateProfileSources } from '../../lib/ultimate-course-builder/core/course-profile';
 
 describe('Barber standards lock', () => {
+  it('separates teaching modality from mandatory registered mentor evidence, including old profiles', async () => {
+    const profile = await new UltimateAppendixAStandardsSource().load({programSlug:'barber-apprenticeship'});
+    expect(profile.competencies.find(c=>c.id==='barber-g')?.type).toBe('knowledge');
+    expect(profile.competencies.find(c=>c.id==='barber-e')?.type).toBe('decision');
+    expect(profile.competencies.find(c=>c.id==='barber-a')?.type).toBe('practical_skill');
+    const old = {...profile, competencies:profile.competencies.map(c=>({...c,type:'practical_skill' as const}))};
+    const db = {from:()=>({select:()=>({eq:()=>({order:async()=>({data:[],error:null})})})})};
+    const hydrated = await hydrateUltimateProfileSources(db as never,'course',old);
+    expect(hydrated.competencies.find(c=>c.id==='barber-g')?.type).toBe('knowledge');
+    expect(hydrated.competencies.every(c=>c.requiresPracticalEvidence&&c.requiresDemonstration)).toBe(true);
+    expect(hydrated.competencies.map(c=>c.authorityRequirementIds)).toEqual(old.competencies.map(c=>c.authorityRequirementIds));
+    expect(verifyRegisteredProfile(hydrated).rapidsCode).toBe('0030CB');
+  });
   it('accepts reordered competencies and equivalent wording with the same registered requirements', async () => {
     const profile = await new UltimateAppendixAStandardsSource().load({programSlug:'barber-apprenticeship'});
     const supplied = {...profile, competencies: [...profile.competencies].reverse().map(c => ({

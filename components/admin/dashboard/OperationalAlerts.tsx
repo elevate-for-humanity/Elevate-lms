@@ -75,7 +75,7 @@ export function OperationalAlerts({ data }: { data: AdminDashboardData }) {
         <span className="text-xs font-bold bg-amber-100 text-amber-700 rounded-full px-2 py-0.5">{totalAlerts}</span>
       </div>
 
-      <AlertSection icon={<Clock className="h-4 w-4 text-amber-600" />} title="Applications stalled 7+ days" count={stalledApplications.length} viewAllHref="/applications?status=submitted">
+      <AlertSection icon={<Clock className="h-4 w-4 text-amber-600" />} title="Applications stalled 7+ days" count={stalledApplications.length} viewAllHref="/applications?status=awaiting_review">
         {stalledApplications.slice(0, ALERT_PREVIEW_LIMIT).map((app: any) => {
           const name = app.full_name || [app.first_name, app.last_name].filter(Boolean).join(' ') || app.email || 'Unknown';
           const ageDays = Math.floor((Date.now() - new Date(app.submitted_at || app.created_at).getTime()) / 86400000);

@@ -15,7 +15,7 @@ export default function NarratedShopTour({ src, script, shopName, onPlaybackChan
   const { play, pause, resume, stop, isPaused, isLoading, isPlaying, error } = useNaturalVoice();
 
   return <div className={`${showScript ? '' : 'h-full'} w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-950`}>
-    <div className="flex aspect-[4/3] items-center justify-center">
+    <div className="flex aspect-[16/10] max-h-[320px] items-center justify-center">
       <video ref={videoRef} src={src} controls muted playsInline preload="metadata" loop={isPlaying || isLoading}
         data-narrated-tour aria-label={`${shopName} narrated tour`}
         className="h-full w-full object-contain"

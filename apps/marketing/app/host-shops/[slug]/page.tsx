@@ -176,10 +176,10 @@ export default async function HostShopProfilePage({ params }: PageProps) {
         data-narration-rate={videoScript ? '0.82' : undefined}
         data-narration-style={videoScript ? 'instructor' : undefined}
       >
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-12 lg:py-12">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-8 lg:py-10">
           <div className="min-w-0">
             <p className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-800"><ShieldCheck className="h-4 w-4" /> Approved Elevate apprenticeship Host Site</p>
-            <h1 className="mt-4 break-words text-4xl font-black tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">{approved.name}</h1>
+            <h1 className="mt-4 break-words text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{approved.name}</h1>
             {approved.description ? <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">{approved.description}</p> : null}
             {programs.length ? <div className="mt-5 flex flex-wrap gap-2">{programs.map((program) => <span key={program} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-black text-slate-800 shadow-sm">{programLabel(program)}</span>)}</div> : null}
             {approved.supervisor ? <p className="mt-4 text-sm font-semibold text-slate-600">Approved supervisor: <span className="text-slate-950">{approved.supervisor}</span></p> : null}
@@ -210,7 +210,8 @@ export default async function HostShopProfilePage({ params }: PageProps) {
       <section className="px-4 py-10 sm:px-6 sm:py-14">
         <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8">
           <div className="min-w-0">
-            <h2 className="text-2xl font-black">Approved Training Worksite</h2>
+            <h2 className="text-2xl font-black">Visit {approved.name}</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">Explore the shop portfolio and contact the business for services, prices, appointments, and current hours. Call the shop to confirm walk-in availability before visiting.</p>
             <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
               {address ? <p className="flex items-start gap-3 font-bold"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-red-700" /><span className="break-words">{address}</span></p> : null}
               {approved.phone ? <a href={`tel:${approved.phone.replace(/[^0-9+]/g, '')}`} className="mt-4 flex items-center gap-3 font-bold"><Phone className="h-5 w-5 shrink-0 text-brand-red-700" /> {approved.phone}</a> : null}
@@ -357,7 +358,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
           <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">{hostLabel}</p>
-              <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">{shop.dba ?? shop.name}</h1>
+              <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{shop.dba ?? shop.name}</h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">{shop.marketingBlurb ?? shop.note}</p>
               <p className="mt-4 text-sm font-bold leading-6 text-slate-600">Play the tour to hear the introduction to this shop. Read the script beside the video or use fullscreen for a larger view.</p>
             </div>
@@ -369,10 +370,10 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
       ) : null}
 
       <section className="border-b border-slate-200 bg-slate-50" data-scroll-narration data-narration={videoUrl ? undefined : videoScript}>
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-12 lg:py-12">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-8 lg:py-10">
           <div className="min-w-0">
             <p className="inline-flex rounded-full bg-brand-blue-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-brand-blue-800">Elevate apprenticeship Host Shop partner</p>
-            <h2 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-4xl">{videoUrl ? 'Explore the shop portfolio' : `Meet ${shop.dba ?? shop.name}`}</h2>
+            {videoUrl ? <h2 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-4xl">Explore the shop portfolio</h2> : <h1 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-4xl">{shop.dba ?? shop.name}</h1>}
             {!videoUrl ? <p className="mt-5 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">{shop.marketingBlurb ?? shop.note}</p> : null}
             <div className="mt-5 flex flex-wrap gap-2">
               {shop.programs.map((program) => <span key={program} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-black text-slate-800 shadow-sm">{programLabel(program)}</span>)}
@@ -393,7 +394,8 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
       <section className="px-4 py-10 sm:px-6 sm:py-14">
         <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8">
           <div className="min-w-0">
-            <h2 className="text-2xl font-black">Host Shop location</h2>
+            <h2 className="text-2xl font-black">Visit {shop.dba ?? shop.name}</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">Explore the portfolio and use the shop’s booking, website, or phone links to plan your visit. Contact the shop to confirm current hours and walk-in availability.</p>
             <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
               <p className="flex items-start gap-3 font-bold"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-red-700" /><span>{address}</span></p>
             </div>

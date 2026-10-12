@@ -1,10 +1,18 @@
+// Optimized copies of the shop’s published portfolio; source URLs remain credited.
+const LOCAL_SHOP_MEDIA: Record<string, string> = {
+  "https://bucket.setmore.com/files/img/fRYGyv7MVdze/f942496e-3d23-4bc1-8368-e8347feef0c0.jpeg": "/images/partners/paola-petit/official-portfolio-1-2026.webp",
+  "https://bucket.setmore.com/files/img/foUM2ORMO8wH/4769cf9f-8ad1-4281-8183-5f81ff6ba582.jpeg": "/images/partners/paola-petit/official-portfolio-2-2026.webp",
+  "https://bucket.setmore.com/files/img/fp0P2PShLRhm/4a14954f-69d2-4990-ac2e-9f0300d29a1f.jpeg": "/images/partners/paola-petit/official-portfolio-2-2026.webp"
+};
 type ShopMedia = { url: string; alt?: string; source?: string };
 export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[] {
   const generations = slug.startsWith('generations');
   const kountry = slug.startsWith('kountry-kutz');
   const razor = slug.startsWith('razors-image');
   const seen = new Set<string>();
-  return items.flatMap((item) => {
+  return items.flatMap((original) => {
+    const localUrl = LOCAL_SHOP_MEDIA[original.url];
+    const item = localUrl ? { ...original, url: localUrl, source: original.source || original.url } : original;
     if (item.url === '/images/partners/razors-image-storefront.webp') return [{ ...item, url: '/images/partners/razors-image-storefront-2026.jpg' }];
     if (item.url === '/images/partners/salon-saloon/team-interior.webp') return [{ ...item, url: '/images/partners/salon-saloon/team-interior-enhanced-2026.webp' }];
     if (kountry) {

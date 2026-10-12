@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { PROGRAM_LABELS, matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
+import HostShopBenefits from '@/components/partners/HostShopBenefits';
 import HostShopNetworkDirectory from '@/components/partners/HostShopNetworkDirectory';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
@@ -202,12 +203,13 @@ export default async function HostShopsPage() {
           <div><p className="text-sm font-black uppercase text-red-700">Your next chapter starts here</p><h2 className="mt-2 text-3xl font-black">Become a barber. Build a career.</h2><p className="mt-3 leading-7">Explore the program, apply through Elevate, and tell us which host shop interests you. Admissions confirms placement and helps you review a payment plan before enrollment.</p><p className="mt-3 text-sm leading-6">Payment plans are available for self-pay barber apprentices. Students provide their personal tools and supplies. Deposits are non-refundable administrative fees used to enroll.</p><div className="mt-5 flex flex-col gap-3 sm:flex-row"><Link href="/programs/barber-apprenticeship" className="rounded-xl bg-red-700 px-5 py-3 text-center font-black text-white">Explore Barber Apprenticeship</Link><Link href="/programs/barber-apprenticeship/payment-setup" className="rounded-xl border border-red-700 bg-white px-5 py-3 text-center font-black">Review Payment Plans</Link></div></div>
         </div>
       </section>
+      <HostShopBenefits />
       <section id="network-directory" className="border-b border-slate-200 bg-slate-950 px-4 py-14 text-white">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
             <p className="text-sm font-black uppercase tracking-[0.14em] text-red-400">Elevate Host Shop Network</p>
-            <h2 className="mt-2 text-3xl font-black sm:text-4xl">Find a participating shop by city or occupation.</h2>
-            <p className="mt-3 leading-7 text-slate-300">Each listing gives the business a permanent, shareable profile while helping apprentices and customers discover participating Indiana shops. Approval and current apprentice capacity are confirmed separately.</p>
+            <h2 className="mt-2 text-3xl font-black sm:text-4xl">Find your next barber, salon, or beauty professional.</h2>
+            <p className="mt-3 leading-7 text-slate-300">Explore real shop portfolios, get directions, and contact or book directly with the business. Ask the shop about hours and walk-ins before visiting. Students can explore participating training locations; apprentice capacity is confirmed separately.</p>
           </div>
           <HostShopNetworkDirectory shops={networkShops} />
         </div>

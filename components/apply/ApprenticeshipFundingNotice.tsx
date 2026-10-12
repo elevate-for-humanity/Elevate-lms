@@ -8,8 +8,9 @@ export default function ApprenticeshipFundingNotice() {
         <div>
           <p className="font-black">Apprenticeship enrollment is self-pay only.</p>
           <p className="mt-1 text-sm font-semibold leading-6">
-            Review the published tuition and available payment terms before applying. Apprentices pay their own program tuition.
+            Review the total tuition, deposit, what is due now, and payment terms. Pay in full or use a program payment plan when offered. BNPL, when displayed, requires separate provider approval and repayment.
           </p>
+          <p className="mt-2 text-sm leading-6">A free inquiry requests information. An enrollment application requests admission; payment and submission alone do not confirm enrollment, placement, or a training start date.</p>
         </div>
       </div>
     </div>

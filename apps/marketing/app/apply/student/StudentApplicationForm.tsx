@@ -443,6 +443,7 @@ export default function StudentApplicationForm({
 
   return (
     <form onSubmit={handleSubmit} className="rounded-xl border border-slate-300 bg-white p-6 sm:p-8">
+      <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50 p-4"><h3 className="font-black text-slate-950">{applicationIntent === 'enrollment' ? 'Enrollment application — request for admission' : 'Free inquiry — request information'}</h3><p className="mt-2 text-sm leading-6 text-slate-700">{applicationIntent === 'enrollment' ? 'Complete the verified payment step and required documents. Submission does not automatically enroll you. Elevate confirms admission, agreements, payment arrangements, and any required placement before training starts.' : 'Ask questions and let admissions help you compare programs. No payment is required for this inquiry. It does not enroll you or reserve a Host Shop placement.'}</p></div>
       {showResume && savedData && (
         <div className="mb-6 rounded-xl border border-blue-300 bg-blue-50 p-4 text-slate-950">
           <p className="font-black">You have a saved application</p>

@@ -59,13 +59,13 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
       </p>
 
       {visible.length ? (
-        <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div data-mobile-grid="2" className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
           {visible.map((shop) => (
             <article
               key={shop.id}
               className="group flex h-full min-h-0 flex-col overflow-visible rounded-2xl border border-white/15 bg-white text-slate-950 shadow-xl"
             >
-              {                <div className="relative overflow-hidden rounded-t-2xl bg-slate-950">
+              {                <Link href={`/host-shops/${shop.slug}`} aria-label={`View ${shop.name} shop profile`} className="relative block overflow-hidden rounded-t-2xl bg-slate-950 focus-visible:ring-4 focus-visible:ring-red-500">
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
                     <Image src={shop.gallery?.[0]?.url || shop.image || getProgramHeroImage(shop.primaryProgram ?? shop.programs[0] ?? 'cosmetology-apprenticeship')}
                       alt={shop.gallery?.[0]?.alt || (shop.image ? `${shop.name} portfolio` : getProgramImageAlt(shop.primaryProgram ?? shop.programs[0] ?? 'cosmetology-apprenticeship'))}
@@ -79,17 +79,17 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
                       ? 'Approved Host Site'
                       : 'Published Network Partner'}
                   </span>
-                </div>
+                </Link>
               }
-              <div className="flex flex-1 flex-col p-5">
+              <div className="flex flex-1 flex-col p-3 sm:p-5">
                 <p className="flex items-start gap-2 text-sm font-bold text-slate-600">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-red-700" /> {shop.city},{' '}
                   {shop.state}
                 </p>
-                <h3 className="mt-3 text-xl sm:text-2xl font-black leading-tight text-slate-950">
-                  {shop.name}
+                <h3 className="mt-3 text-base sm:text-xl font-black leading-tight text-slate-950">
+                  <Link href={`/host-shops/${shop.slug}`} className="hover:text-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-700">{shop.name}</Link>
                 </h3>
-                <p className="mt-3 text-sm leading-6 text-slate-700">
+                <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-700">
                   {shop.description}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -101,6 +101,11 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
                       {PROGRAM_LABELS[slug] ?? slug}
                     </span>
                   ))}
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${shop.name} ${shop.address}`)}`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 px-3 text-sm font-bold">Get directions</a>
+                  {shop.phone ? <a href={`tel:${shop.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 px-3 text-sm font-bold">Call the shop</a> : null}
+                  {shop.booking ? <a href={shop.booking} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded-lg bg-red-700 px-3 text-sm font-bold text-white">Book a service ↗</a> : null}
                 </div>
                 {shop.website ? <a href={shop.website} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-10 items-center text-sm font-bold text-red-700">Visit shop website ↗</a> : null}
                 <Link

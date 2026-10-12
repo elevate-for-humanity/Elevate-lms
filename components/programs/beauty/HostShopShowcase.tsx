@@ -315,7 +315,7 @@ export default function HostShopShowcase({
 
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
           <div className="grid lg:grid-cols-2">
-            <div className="relative aspect-[4/3] min-h-0 overflow-hidden bg-slate-950">
+            <div className="relative aspect-[16/10] max-h-[320px] min-h-0 overflow-hidden bg-slate-950">
               {image?.kind === 'video' && !failedVideos.has(image.src) ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
                   {image.backdropSrc ? (
@@ -374,7 +374,7 @@ export default function HostShopShowcase({
                       })
                     }
                     preload="metadata"
-                    className="relative z-10 aspect-[9/16] h-full max-h-[640px] w-auto max-w-full object-contain shadow-2xl"
+                    className="relative z-10 aspect-[9/16] h-full max-h-[320px] w-auto max-w-full object-contain shadow-2xl"
                     aria-label={image.alt}
                   />
                   )}
@@ -421,7 +421,7 @@ export default function HostShopShowcase({
             </div>
 
             <div
-              className="flex flex-col justify-center p-7 text-slate-950 sm:p-9 lg:p-10"
+              className="flex flex-col justify-center p-4 text-slate-950 sm:p-5 lg:p-6"
               aria-live="polite"
             >
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-red-700">

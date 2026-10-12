@@ -56,7 +56,7 @@ export default function HostShopPlacementGuideClient({
         </div>
 
         {filtered.length ? (
-          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div data-mobile-grid="2" className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
             {filtered.map((shop) => {
               const address = shop.address || [shop.city, shop.state].filter(Boolean).join(', ');
               const directions = address
@@ -64,17 +64,17 @@ export default function HostShopPlacementGuideClient({
                 : undefined;
               return (
                 <article key={shop.id} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                  <div className="aspect-[16/10] bg-slate-100">
+                  <Link href={`/host-shops/${shop.slug}`} aria-label={`View ${shop.name} shop profile`} className="block aspect-[4/3] bg-slate-100 focus-visible:ring-4 focus-visible:ring-brand-red-700">
                     {shop.image ? (
                       <img src={shop.image} alt={shop.name} className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full items-center justify-center"><Building2 className="h-12 w-12 text-slate-300" /></div>
                     )}
-                  </div>
-                  <div className="p-5">
+                  </Link>
+                  <div className="p-3 sm:p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <h3 className="text-xl font-black text-slate-950">{shop.name}</h3>
+                        <h3 className="text-base sm:text-xl font-black text-slate-950"><Link href={`/host-shops/${shop.slug}`} className="hover:text-brand-red-700">{shop.name}</Link></h3>
                         <p className="mt-1 flex items-start gap-2 text-sm text-slate-600">
                           <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
                           <span>{address || 'Location available during placement review'}</span>
@@ -103,7 +103,7 @@ export default function HostShopPlacementGuideClient({
         ) : (
           <div className="mt-8 rounded-3xl border-2 border-dashed border-slate-300 bg-slate-50 p-7 text-center">
             <MapPin className="mx-auto h-9 w-9 text-slate-400" />
-            <h3 className="mt-3 text-xl font-black text-slate-950">No matching Host Shop is listed in that area yet.</h3>
+            <h3 className="mt-3 text-base sm:text-xl font-black text-slate-950">No matching Host Shop is listed in that area yet.</h3>
             <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-700">
               That does not end your apprenticeship path. You can suggest a licensed shop in your area for Elevate to review, or join the Host Shop placement waitlist.
             </p>

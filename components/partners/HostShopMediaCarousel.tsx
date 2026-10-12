@@ -26,6 +26,7 @@ export default function HostShopMediaCarousel({
   items,
   videoUrl,
   videoScript,
+  compact = false,
 }: {
   shopName: string;
   items: MediaItem[];
@@ -45,6 +46,9 @@ export default function HostShopMediaCarousel({
     });
   }, [items]);
   const [index, setIndex] = useState(0);
+  const [loadedUrls, setLoadedUrls] = useState<Set<string>>(() => new Set());
+  const [failedUrls, setFailedUrls] = useState<Set<string>>(() => new Set());
+  const [lastLoadedUrl, setLastLoadedUrl] = useState<string>();
   const [playing, setPlaying] = useState(true);
   const [videoPlaying, setVideoPlaying] = useState(false);
   useEffect(() => setVideoPlaying(false), [index]);
@@ -54,26 +58,44 @@ export default function HostShopMediaCarousel({
     return () => window.clearInterval(timer);
   }, [playing, videoPlaying, media, index]);
 
+  const requestedUrl = media[Math.min(index, media.length - 1)]?.url;
+  useEffect(() => {
+    if (requestedUrl && loadedUrls.has(requestedUrl) && !failedUrls.has(requestedUrl)) setLastLoadedUrl(requestedUrl);
+  }, [requestedUrl, loadedUrls, failedUrls]);
+
   if (!media.length) return null;
   const safeIndex = Math.min(index, media.length - 1);
-  const active = media[safeIndex]!;
+  const requested = media[safeIndex]!;
+  // Keep a decoded shop photo on screen while the next photo downloads.
+  const active = loadedUrls.has(requested.url) && !failedUrls.has(requested.url) ? requested
+    : media.find((item) => item.url === lastLoadedUrl && !failedUrls.has(item.url))
+      ?? media.find((item) => !failedUrls.has(item.url)) ?? requested;
+  const displayIndex = media.indexOf(active);
   const previous = () => setIndex((current) => (current - 1 + media.length) % media.length);
   const next = () => setIndex((current) => (current + 1) % media.length);
 
   return (
-    <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg sm:rounded-3xl">
-      <div className={`relative flex w-full items-center justify-center overflow-hidden bg-slate-950 aspect-[4/3]`}>
+    <div className="mx-auto w-full max-w-[480px] min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg sm:rounded-3xl">
+      <div className={`relative flex w-full items-center justify-center overflow-hidden bg-slate-950 ${compact ? 'aspect-[16/10] max-h-[240px]' : 'aspect-[16/10] max-h-[300px] sm:max-h-[320px]'} `}>
         {active.type === 'video' ? (
           <video key={active.url} src={active.url} controls playsInline preload="metadata" onPlay={() => setVideoPlaying(true)} onPause={() => setVideoPlaying(false)} onEnded={() => setVideoPlaying(false)} onError={() => setVideoPlaying(false)} className="host-shop-media-enter mx-auto h-auto w-auto max-h-[240px] object-scale-down bg-black sm:max-h-[320px]" style={{ maxWidth: 'min(100%, 480px)' }} aria-label={active.alt || `${shopName} video`} />
         ) : (
-          <img key={active.url} src={active.url} alt={active.alt || `${shopName} promotional image`} className="host-shop-media-enter absolute inset-0 h-full w-full object-contain" loading="lazy" decoding="async" />
+          <>
+            {media.map((item, itemIndex) => <img key={item.url} src={item.url} alt={item.alt || `${shopName} promotional image`}
+              aria-hidden={item.url !== active.url} className="absolute inset-0 h-full w-full object-contain transition-opacity duration-300"
+              style={{ opacity: item.url === active.url && !failedUrls.has(item.url) ? 1 : 0 }}
+              loading="eager" decoding="async" fetchPriority={itemIndex === 0 ? 'high' : 'low'}
+              onLoad={() => { setLoadedUrls((current) => new Set(current).add(item.url)); if (item.url === requested.url || !lastLoadedUrl) setLastLoadedUrl(item.url); }}
+              onError={() => setFailedUrls((current) => new Set(current).add(item.url))} />)}
+            {failedUrls.size === media.length ? <p className="relative px-6 text-center text-sm text-white" role="status">The shop photos could not load. Please use the shop website link below to view its portfolio.</p> : null}
+          </>
         )}
         {active.type === 'video' ? <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/75 px-3 py-1.5 text-xs font-black text-white"><span className="inline-flex items-center gap-1.5"><PlayCircle className="h-4 w-4" /> Video</span></div> : null}
       </div>
       {media.length > 1 ? (
         <div className="flex w-full items-center justify-between gap-4 border-t border-slate-200 bg-white px-4 py-2">
           <button type="button" onClick={previous} aria-label="Previous image" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-900 ring-1 ring-slate-300 hover:bg-slate-200"><ChevronLeft className="h-5 w-5" /></button>
-          <span className="text-sm font-medium text-slate-600" aria-live="polite">{safeIndex + 1} of {media.length}</span>
+          <span className="text-sm font-medium text-slate-600" aria-live="polite">{displayIndex + 1} of {media.length}</span>
           <button type="button" onClick={next} aria-label="Next image" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-900 ring-1 ring-slate-300 hover:bg-slate-200"><ChevronRight className="h-5 w-5" /></button>
         </div>
       ) : null}
@@ -87,7 +109,7 @@ export default function HostShopMediaCarousel({
       ) : null}
       <div className="flex min-h-12 flex-wrap items-center justify-between gap-2 border-t border-slate-200 px-4 py-3 text-sm text-slate-600">
         {media.length > 1 ? <button type="button" onClick={() => setPlaying((current) => !current)} className="min-h-11 font-bold text-slate-900" aria-label={playing ? 'Pause slideshow' : 'Play slideshow'}>{playing ? 'Pause slideshow' : 'Play slideshow'}</button> : null}
-        <span>{media.length > 1 ? `${safeIndex + 1} of ${media.length}` : active.alt?.startsWith('Representative') ? 'Representative training image' : 'Shop portfolio'}</span>
+        <span>{media.length > 1 ? `${displayIndex + 1} of ${media.length}` : active.alt?.startsWith('Representative') ? 'Representative training image' : 'Shop portfolio'}</span>
         {active.source ? <a href={active.source} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-bold text-slate-900 hover:underline">Media source <ExternalLink className="h-3.5 w-3.5" /></a> : null}
       </div>
       <style jsx>{`

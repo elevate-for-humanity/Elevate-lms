@@ -1,3 +1,6 @@
+import HostShopBenefits from '@/components/partners/HostShopBenefits';
+import HostShopNetworkDirectory from '@/components/partners/HostShopNetworkDirectory';
+import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -7,7 +10,7 @@ import { ArrowRight, BriefcaseBusiness, MessageCircle, Scissors, Users } from 'l
 
 export const metadata: Metadata = {
   title: 'Barber & Beauty Network | Elevate for Humanity',
-  description: 'Connect with barbers, stylists, nail technicians, estheticians, licensed host shops and beauty employers. Explore the directory, community and hiring opportunities.',
+  description: 'Find Indiana barbershops and salons, explore real portfolios, and contact or book directly. Licensed shops join free to showcase their business and develop apprentices. Earn while you learn through approved paid employment.',
   openGraph: { images: [{ url: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp', alt: 'Inside an Elevate barber apprenticeship host shop' }] },
   alternates: { canonical: 'https://www.elevateforhumanity.org/barber-beauty-network' },
 };
@@ -19,22 +22,27 @@ const pathways = [
   { title: 'Employers & Host Shops', description: 'Connect your business to apprentices and talent, apply to host apprentices, and access employer hiring tools.', href: '/host-shop/apply', action: 'Join as a host shop', icon: Users },
 ] as const;
 
-export default function BarberBeautyNetworkPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function BarberBeautyNetworkPage() {
+  const shops = await getHostShopNetwork();
   return (
     <main className="min-h-screen bg-white text-slate-950">
       <section className="relative isolate overflow-hidden bg-slate-950 text-white">
         <div className="absolute inset-0 -z-10"><SafeHeroVideo src="/videos/partners/kountry-kutz/shop-tour.mp4" poster="/images/partners/kountry-kutz/interior-active-enhanced-2026.webp" priority loop ariaLabel="A tour of participating Host Shop Kountry Kutz" className="absolute inset-0 h-full w-full object-cover" /></div>
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/90 via-slate-950/70 to-slate-950/30" />
-        <div className="relative mx-auto max-w-6xl px-5 py-20 sm:py-28">
+        <div className="relative mx-auto max-w-6xl px-5 py-12 sm:py-16">
           <p className="text-sm font-black uppercase tracking-[.16em] text-blue-200">Elevate Professional Network</p>
-          <h1 className="mt-4 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">Barber & Beauty Network</h1>
+          <h1 className="mt-4 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl">Barber & Beauty Network</h1>
           <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-100">A professional community for barbers, cosmetologists, estheticians, nail technicians, students, host shops and hiring businesses. Build connections, find opportunities and showcase the beauty industry.</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="https://app.elevateforhumanity.org/community" className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-red-700 px-6 py-3 font-bold text-white hover:bg-red-600">Join the Community <ArrowRight className="h-4 w-4" /></Link>
-            <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-white/60 px-6 py-3 font-bold text-white hover:bg-white/10">Browse Directory <ArrowRight className="h-4 w-4" /></Link>
+            <Link href="/host-shop/apply" className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-red-700 px-6 py-3 font-bold text-white hover:bg-red-600">Join Free as a Host Shop <ArrowRight className="h-4 w-4" /></Link>
+            <Link href="#shop-directory" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-white/60 px-6 py-3 font-bold text-white hover:bg-white/10">Find a Shop <ArrowRight className="h-4 w-4" /></Link>
           </div>
         </div>
       </section>
+      <HostShopBenefits />
+      <section id="shop-directory" className="bg-slate-950 px-5 py-10 text-white sm:py-14"><div className="mx-auto max-w-6xl"><h2 className="text-3xl font-black">Discover local shops. Support local talent.</h2><p className="mt-3 max-w-3xl leading-7 text-slate-300">Browse portfolios, choose a shop, and use its directions, contact, or booking links. Contact the shop to confirm hours and walk-in availability.</p><HostShopNetworkDirectory shops={shops} /></div></section>
       <section id="join" className="bg-red-50 px-5 py-10 sm:py-16">
         <div className="mx-auto grid max-w-6xl gap-7 lg:grid-cols-2 lg:items-center">
           <HostShopMediaCarousel shopName="Elevate Barber & Beauty Network" items={[

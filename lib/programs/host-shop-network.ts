@@ -139,7 +139,23 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
     }),
   );
 
-  return [...operational, ...publishedOnly].sort(
+  // Multiple historical approval records can refer to the same public shop.
+  // Keep one destination and preserve its independently approved pathways.
+  const unique = new Map<string, HostShopNetworkEntry>();
+  for (const shop of [...operational, ...publishedOnly]) {
+    const existing = unique.get(shop.slug);
+    unique.set(shop.slug, existing ? {
+      ...existing,
+      programs: [...new Set([...existing.programs, ...shop.programs])],
+      primaryProgram: existing.primaryProgram ?? shop.primaryProgram,
+      description: existing.programs.length ? existing.description : shop.description,
+      website: existing.website || shop.website,
+      phone: existing.phone || shop.phone,
+      booking: existing.booking || shop.booking,
+      social: existing.social || shop.social,
+    } : shop);
+  }
+  return [...unique.values()].sort(
     (left, right) => left.city.localeCompare(right.city) || left.name.localeCompare(right.name),
   );
 }

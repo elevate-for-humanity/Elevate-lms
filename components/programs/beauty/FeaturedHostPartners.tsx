@@ -140,7 +140,7 @@ export default async function FeaturedHostPartners({
               apprenticeship opportunities.
             </p>
 
-            <div className="mt-6 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div data-mobile-grid="2" className="mt-6 grid grid-cols-2 items-stretch gap-3 sm:gap-4 lg:grid-cols-3">
               {directoryShops.map((shop) => {
                 const stillMedia = shop.media?.filter((media) => media.kind !== 'video') ?? [];
                 const image = stillMedia[0];
@@ -151,16 +151,16 @@ export default async function FeaturedHostPartners({
                     className="flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
                   >
                     {image ? (
-                      <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-slate-950">
+                      <Link href={`/host-shops/${shop.slug}`} aria-label={`View ${shop.dba ?? shop.name} shop profile`} className="relative block aspect-[4/3] shrink-0 overflow-hidden bg-slate-950 focus-visible:ring-4 focus-visible:ring-brand-red-700">
                         <Image src={image.src} alt={image.alt} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
-                      </div>
+                      </Link>
                     ) : null}
 
-                    <div className="flex flex-1 flex-col p-4 sm:p-5">
+                    <div className="flex flex-1 flex-col p-3 sm:p-5">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
-                          <h3 className="text-xl font-black tracking-tight text-slate-950">
-                            {shop.dba ?? shop.name}
+                          <h3 className="text-base font-black tracking-tight text-slate-950 sm:text-xl">
+                            <Link href={`/host-shops/${shop.slug}`} className="hover:text-brand-red-700">{shop.dba ?? shop.name}</Link>
                           </h3>
                           {shop.dba ? (
                             <p className="mt-1 text-sm font-semibold text-slate-600">

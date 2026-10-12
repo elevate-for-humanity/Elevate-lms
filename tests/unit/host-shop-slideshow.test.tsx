@@ -30,4 +30,25 @@ describe('host shop slideshow playback', () => {
     act(() => vi.advanceTimersByTime(5000));
     expect(screen.getByAltText('First photo')).toBeInTheDocument();
   });
+  it('keeps the decoded first picture visible until the next one is ready', () => {
+    render(<HostShopMediaCarousel shopName="Shop" items={items} />);
+    const first = screen.getByAltText('First photo');
+    const second = screen.getByAltText('Second photo');
+    fireEvent.load(first);
+    act(() => vi.advanceTimersByTime(5000));
+    expect(first).toHaveStyle({ opacity: '1' });
+    expect(second).toHaveStyle({ opacity: '0' });
+    fireEvent.load(second);
+    expect(second).toHaveStyle({ opacity: '1' });
+    expect(first).toHaveStyle({ opacity: '0' });
+  });
+  it('keeps a working photo when a later shop photo fails', () => {
+    render(<HostShopMediaCarousel shopName="Shop" items={items} />);
+    fireEvent.load(screen.getByAltText('First photo'));
+    fireEvent.error(screen.getByAltText('Second photo'));
+    act(() => vi.advanceTimersByTime(5000));
+    expect(screen.getByAltText('First photo')).toHaveStyle({ opacity: '1' });
+    expect(screen.getByAltText('Second photo')).toHaveStyle({ opacity: '0' });
+  });
+
 });

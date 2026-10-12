@@ -9,7 +9,7 @@
 .husky
 terminals
 
-# Dependencies & build outputs (never send to Northflank builder)
+# Dependencies & build outputs (never send to production builders)
 node_modules
 **/node_modules
 .pnpm-store
@@ -82,3 +82,17 @@ gha-creds-*.json
 **/*.map
 **/.DS_Store
 **/Thumbs.db
+
+# Include only the standalone instructional acceptance test and its source fixture.
+!tests
+tests/*
+!tests/integration
+tests/integration/*
+!tests/integration/google-lesson-author.test.ts
+!docs
+docs/*
+!docs/ultimate-course-builder
+docs/ultimate-course-builder/*
+!docs/ultimate-course-builder/lessons
+docs/ultimate-course-builder/lessons/*
+!docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json

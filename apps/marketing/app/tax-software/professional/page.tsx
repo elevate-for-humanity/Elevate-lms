@@ -29,7 +29,7 @@ export default function ProfessionalPage() {
           </div>
           <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
             <Image
-              src="/images/business/collaboration-1.webp"
+              src="/images/pexels/bookkeeping.webp"
               alt="Professionals reviewing financial documents together"
               fill
               priority

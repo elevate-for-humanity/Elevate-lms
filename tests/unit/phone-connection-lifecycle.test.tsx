@@ -46,7 +46,7 @@ describe('phone connection lifecycle',()=>{
     const fetchMock=vi.mocked(fetch);fetchMock.mockImplementationOnce(async()=>Response.json({}));
     fireEvent.click(screen.getByRole('button',{name:'Ring muted'}));
     await screen.findByText('Incoming call sound is muted.');
-    expect(fetchMock).toHaveBeenCalledWith('/api/program-holder/phone',expect.objectContaining({method:'PATCH',body:JSON.stringify({ringMode:'silent'})}));
+    expect(fetchMock).toHaveBeenCalledWith('/api/program-holder/phone',expect.objectContaining({method:'PATCH',body:JSON.stringify({action:'ring_mode',ringMode:'silent'})}));
     expect(screen.getByRole('button',{name:'Ring muted'}).getAttribute('aria-pressed')).toBe('true');
   });
   it('clears online messaging and cannot be reconnected by a late heartbeat after disconnect',async()=>{

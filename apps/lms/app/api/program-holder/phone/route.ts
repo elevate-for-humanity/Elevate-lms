@@ -360,6 +360,12 @@ export async function PATCH(request: Request) {
       .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString());
     patch.presence_status = (otherOnlineDevices ?? 0) > 0 ? 'available' : 'offline';
     patch.last_presence_at = new Date().toISOString();
+  } else if (body.action === 'ring_mode') {
+    const ringMode = String(body.ringMode || '') as RingMode;
+    if (!['ring','vibrate','silent'].includes(ringMode)) return NextResponse.json({error:'Choose ring, vibrate, or silent.'},{status:400});
+    // Quick alert controls change only ringing. Preserve schedules, forwarding,
+    // voicemail, notifications and verified connection presence.
+    patch.ring_mode = ringMode;
   } else {
     const ringMode = String(body.ringMode || '') as RingMode;
     const availabilitySource = String(body.availabilitySource || '') as AvailabilitySource;

@@ -374,7 +374,7 @@ export function ProgramHolderPhone({
     if (!data || data.readOnly || saving) return;
     setSaving(true);
     try {
-      const response = await fetch(apiBase, {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ringMode:mode})});
+      const response = await fetch(apiBase, {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({action:'ring_mode',ringMode:mode})});
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.error || 'The alert mode could not be saved.');
       ringModeRef.current = mode;

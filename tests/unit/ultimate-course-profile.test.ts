@@ -4,10 +4,18 @@ vi.mock('@/lib/ultimate-course-builder/credential/appendix-a-source',()=>({Ultim
  async load(){return {id:'registered',title:'Registered',authority:'DOL',standardVersion:'1',sourceDocuments:['Appendix A'],competencies:[{id:'lesson-1',title:'Client consultation',description:'Consult before proceeding',type:'practical_skill',authorityRequirementIds:['lesson-1'],requiresDemonstration:true,requiresPracticalEvidence:true}]};}
 }}));
 import {buildUltimateProfile} from '@/lib/ultimate-course-builder/core/course-profile';
-function dbWithLesson(failure=false) {
- return {from(table:string){let columns=''; const q={select(value:string){columns=value;return q;},eq(){return q;},limit(){return q;},async maybeSingle(){return {data:null,error:failure?new Error('database unavailable'):null};},order(){return table==='apprenticeship_standard_versions'?q:Promise.resolve({data:[{id:'lesson-1',title:'Client consultation',learning_objectives:['Ask before proceeding'],content:{html:'Pause the service and consult the supervisor.',scenario:{correctAction:'consult'}}}],error:null});}};return q;}};
+function dbWithLesson(failure=false, content:any={html:'Pause the service and consult the supervisor.',scenario:{correctAction:'consult'}}) {
+ return {from(table:string){let columns=''; const q={select(value:string){columns=value;return q;},eq(){return q;},limit(){return q;},async maybeSingle(){return {data:null,error:failure?new Error('database unavailable'):null};},order(){return table==='apprenticeship_standard_versions'?q:Promise.resolve({data:[{id:'lesson-1',title:'Client consultation',learning_objectives:['Ask before proceeding'],content}],error:null});}};return q;}};
 }
 describe('shared Ultimate profile used by Studio and builder',()=>{
+ it('teaches the current correction while retaining historical evidence in storage',async()=>{
+  const content={html:'Follow the product label contact time.',production_content_repairs:[{previous_html:'Incorrect archived contact time.'}],previous_sanitation_html:'Incorrect archived instruction.'};
+  const p=await buildUltimateProfile(dbWithLesson(false,content) as never,{courseId:'course',programSlug:'registered-course',title:'Registered course'});
+  const source=p.instructionalSources?.[0]?.text;
+  expect(source).toContain('Follow the product label contact time.');
+  expect(source).not.toContain('Incorrect archived');
+  expect(content.production_content_repairs).toHaveLength(1);
+ });
  it('preserves lesson-scoped instructional content and canonical lesson identities',async()=>{
   const p=await buildUltimateProfile(dbWithLesson() as never,{courseId:'course',programSlug:'cosmetology-apprenticeship',title:'Cosmetology'});
   expect(p.competencies[0].id).toBe('lesson-1');

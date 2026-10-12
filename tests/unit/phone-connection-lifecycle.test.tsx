@@ -1,6 +1,6 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-const mock = vi.hoisted(() => ({ create:vi.fn(), handlers:{} as Record<string,(value?: any)=>void> }));
+const mock = vi.hoisted(() => ({ create:vi.fn(), newCall:vi.fn(), handlers:{} as Record<string,(value?: any)=>void> }));
 vi.mock('@/lib/phone/browser-client',()=>({createPhoneClient:mock.create,phoneDestination:(value:string)=>value}));
 vi.mock('@/lib/notifications/push-client',()=>({getPushNotificationClient:vi.fn()}));
 vi.mock('@/components/program-holder/ProgramHolderPhoneIntroduction',()=>({ProgramHolderPhoneIntroduction:()=>null}));
@@ -14,8 +14,9 @@ let laterHeartbeat:(response:Response)=>void;
 let disconnectOk:boolean;
 beforeEach(()=>{
   mock.handlers={};disconnectOk=true;let heartbeats=0;
+  mock.newCall.mockResolvedValue({id:'outbound-call'});
   mock.create.mockResolvedValue({on:(event:string,callback:any)=>{mock.handlers[event]=callback;},
-    connect:async()=>{mock.handlers.ready();},disconnect:vi.fn().mockResolvedValue(undefined)});
+    newCall:mock.newCall,connect:async()=>{mock.handlers.ready();},disconnect:vi.fn().mockResolvedValue(undefined)});
   vi.stubGlobal('fetch',vi.fn(async(_url:string,init?:RequestInit)=>{
     if(!init?.method)return Response.json(data);
     if(init.method==='POST')return Response.json({provider:'asterisk'});
@@ -71,4 +72,23 @@ describe('phone connection lifecycle',()=>{
     await waitFor(()=>expect(screen.getByText('Phone disconnected locally. Server presence could not yet be confirmed.')).toBeTruthy());
     expect(screen.getByRole('button',{name:'Connect phone'})).toBeTruthy();
   });
+});
+
+describe('dial pad call behavior',()=>{
+ it('sends keypad digits to the active call rather than editing the destination',async()=>{
+  await connected();
+  const dtmf=vi.fn().mockResolvedValue(undefined);
+  await act(async()=>mock.handlers.call({call:{id:'active-call',state:'active',direction:'outbound',dtmf}}));
+  fireEvent.click(screen.getByRole('button',{name:'9',exact:true}));
+  await waitFor(()=>expect(dtmf).toHaveBeenCalledWith('9'));
+  expect((screen.getByLabelText('Phone number or extension') as HTMLInputElement).value).toBe('');
+ });
+ it('calls the verified SIP identity returned for a staff extension',async()=>{
+  vi.mocked(fetch).mockImplementationOnce(async()=>Response.json({...data,extension:{...data.extension,provider:'telnyx'}}));
+  await connected();
+  vi.mocked(fetch).mockImplementationOnce(async()=>Response.json({destination:'sip:verified_phone@sip.telnyx.com'}));
+  fireEvent.change(screen.getByLabelText('Phone number or extension'),{target:{value:'101'}});
+  fireEvent.click(screen.getByRole('button',{name:'Call',exact:true}));
+  await waitFor(()=>expect(mock.newCall).toHaveBeenCalledWith(expect.objectContaining({destinationNumber:'sip:verified_phone@sip.telnyx.com'})));
+ });
 });

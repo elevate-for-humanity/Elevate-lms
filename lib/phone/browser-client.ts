@@ -13,6 +13,7 @@ export type PhoneCall = {
   unmuteAudio(): void;
   hold?(): Promise<unknown>;
   unhold?(): Promise<unknown>;
+  dtmf?(digit:string): Promise<unknown> | void;
   playRingtone(): void;
   stopRingtone(): void;
 };
@@ -145,6 +146,7 @@ export async function createPhoneClient(
         unmuteAudio: () => manager.unmute(session),
         hold: () => manager.hold(session),
         unhold: () => manager.unhold(session),
+        dtmf: (digit) => manager.sendDTMF(session,digit),
         playRingtone: () => tone.play(),
         stopRingtone: () => tone.stop(),
       };
@@ -170,6 +172,7 @@ export async function createPhoneClient(
     reconnectionAttempts: 5,
     reconnectionDelay: 4,
     registrationRetry: true,
+    sendDTMFUsingSessionDescriptionHandler: true,
     registrationRetryInterval: 5,
     registererOptions: { expires: 120 },
     optionsPingInterval: 45,

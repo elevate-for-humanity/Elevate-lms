@@ -6,6 +6,7 @@ const state = vi.hoisted(() => ({ options: null as any, manager: null as any }))
 vi.mock('sip.js/lib/platform/web', () => ({
   SessionManager: class {
     connect = vi.fn().mockResolvedValue(undefined);
+    sendDTMF = vi.fn().mockResolvedValue(undefined);
     register = vi.fn().mockResolvedValue(undefined);
     unregister = vi.fn().mockResolvedValue(undefined);
     disconnect = vi.fn().mockResolvedValue(undefined);
@@ -82,4 +83,15 @@ describe('Asterisk browser registration', () => {
     expect(phoneDestination('102@untrusted.example', 'asterisk')).toBeNull();
     expect(phoneDestination('(317) 555-0100', 'telnyx')).toBe('+13175550100');
   });
+});
+
+describe('owned phone menu tones',()=>{
+ it('sends DTMF on the registered SIP session using RTP',async()=>{
+  const client=await createPhoneClient(credential,document.createElement('audio'));
+  const registration=client.connect();state.options.delegate.onRegistered();await registration;
+  const call=await client.newCall({destinationNumber:'102',audio:true,remoteElement:document.createElement('audio')});
+  await call.dtmf?.('9');
+  expect(state.options.sendDTMFUsingSessionDescriptionHandler).toBe(true);
+  expect(state.manager.sendDTMF).toHaveBeenCalledWith(expect.objectContaining({id:'test-session'}),'9');
+ });
 });

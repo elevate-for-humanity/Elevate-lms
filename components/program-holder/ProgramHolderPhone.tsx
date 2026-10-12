@@ -445,6 +445,16 @@ export function ProgramHolderPhone({
     }
   }
 
+  async function pressDialDigit(digit:string) {
+    if(callState==='active' && callRef.current) {
+      if(!callRef.current.dtmf){setError('This phone connection cannot send menu choices.');return;}
+      try {await callRef.current.dtmf(digit);setError('');}
+      catch {setError('The menu choice could not be sent. Try again.');}
+      return;
+    }
+    setReturnNumber(current=>(current+digit).slice(0,20));
+  }
+
   async function returnCall(number = returnNumber) {
     if (data?.readOnly) return;
     let destination = phoneDestination(number, data?.extension.provider || 'telnyx');
@@ -600,7 +610,7 @@ export function ProgramHolderPhone({
               <button
                 key={digit}
                 type="button"
-                onClick={() => setReturnNumber((current) => (current + digit).slice(0, 20))}
+                onClick={() => void pressDialDigit(digit)}
                 className="min-h-12 rounded-xl border border-slate-300 bg-slate-50 text-xl font-black text-slate-950 active:bg-slate-200"
               >
                 {digit}
@@ -612,9 +622,10 @@ export function ProgramHolderPhone({
               value={returnNumber}
               onChange={(event) => setReturnNumber(event.target.value)}
               type="tel"
+              aria-label="Phone number or extension"
               inputMode="tel"
               placeholder={
-                data.extension.provider === 'asterisk' ? 'Extension or 0' : '317-555-0123'
+                data.extension.provider === 'asterisk' ? 'Extension or 0' : 'Phone number or extension'
               }
               className="min-h-12 min-w-0 flex-1 rounded-xl border border-slate-300 px-3"
             />

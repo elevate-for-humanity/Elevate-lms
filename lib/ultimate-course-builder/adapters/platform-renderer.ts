@@ -227,13 +227,8 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
       dialogue: teachingPoint || visualRequirement,
       required_visual_evidence: visualRequirement || teachingPoint,
       scene_type: scene.scene_type ?? scene.sceneType ?? sceneType(index, board.scenes.length),
-      media_source: resolvedCandidate
-        ? 'elevate-owned'
-        : ['worked_example', 'memory_recap'].includes(
-              String(scene.scene_type ?? scene.sceneType ?? sceneType(index, board.scenes.length)),
-            )
-          ? 'elevate-motion'
-          : 'pexels',
+      // Never fall back to generic stock footage when a licensed asset is unavailable.
+      media_source: 'elevate-owned',
       review_status: resolvedCandidate ? 'approved' : 'draft',
       ...(resolvedCandidate?.kind === 'video' ? { source_video_url: resolvedCandidate.url } : {}),
       ...(resolvedCandidate?.kind === 'image' ? { reference_image_url: resolvedCandidate.url } : {}),

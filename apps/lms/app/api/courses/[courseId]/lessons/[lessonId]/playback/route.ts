@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
 import { signedLessonPlayback } from '@/lib/storage/lesson-playback';
+import { renderMediaUrl } from '@/lib/ultimate-course-builder/media/playback-source.mjs';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const headers = { 'Cache-Control': 'private, no-store', 'Referrer-Policy': 'no-referrer' };
@@ -24,7 +25,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{cour
     const {data:lesson,error} = await query.maybeSingle();
     if (error) throw error;
     if (!lesson) return NextResponse.json({error:'Lesson not found'}, {status:404, headers});
-    const source = lesson.content_json?.film?.videoUrl || lesson.video_url;
+    const source = renderMediaUrl(lesson.content_json?.film) || lesson.video_url;
     if (!source) return NextResponse.json({error:'Video unavailable'}, {status:404, headers});
     const location = await signedLessonPlayback(db, source);
     return new NextResponse(null, {status:307, headers:{...headers, Location:location}});

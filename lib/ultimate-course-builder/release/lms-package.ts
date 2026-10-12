@@ -4,7 +4,7 @@ export interface UltimateLmsLessonPackage {
   title: string;
   objectives: string[];
   contractArtifacts?: import('../core/build-runner').UltimateRunContext['artifacts'];
-  film: { videoUrl?: string; playbackUrl?: string; captionsUrl?: string; transcript?: string };
+  film: { mediaUrl?: string; videoUrl?: string; playbackUrl?: string; captionsUrl?: string; transcript?: string };
   learningObjects: unknown[];
   assessment: unknown;
   remediation: unknown;

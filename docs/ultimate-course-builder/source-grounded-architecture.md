@@ -29,6 +29,10 @@ runthrough remain required.
 The render contract accepts HTTPS playback endpoints as well as asset URLs. Delivery
 references are resolved consistently by QA and release. They do not certify media.
 Managed lesson media uses `/api/courses/:courseId/lessons/:lessonId/playback`.
+The render retains a worker-readable HTTPS media source separately from its
+learner playback reference; neither reference requires an MP4 filename suffix.
+QA inspects the source before publication, and release preserves that source
+for signing. A relative learner route alone is insufficient render evidence.
 The route checks authenticated lesson access or the existing signed administrator
 preview, course association and publication before issuing a short-lived storage
 URL. Object references come only from the saved lesson. Arbitrary redirect targets

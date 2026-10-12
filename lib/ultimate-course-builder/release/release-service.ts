@@ -1,7 +1,7 @@
 import 'server-only';
 import { assertCompleteLesson, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/lesson-contract';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { renderPlaybackUrl } from '../media/playback-source.mjs';
+import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
 const slug = (v: string) =>
   v
     .toLowerCase()
@@ -215,7 +215,8 @@ export class UltimateReleaseService {
           },
           contractVersion: p.contractVersion,
           film: {
-            videoUrl: l.videoUrl,
+            videoUrl: renderMediaUrl(l.contractArtifacts.lesson_film_render.render),
+            playbackUrl: l.videoUrl,
             captionsUrl: l.captionsUrl,
             transcriptUrl: l.transcriptUrl,
           },

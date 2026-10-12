@@ -1,3 +1,55 @@
-import type { Metadata } from 'next';import Link from 'next/link';import {ArrowRight,GraduationCap,Building2,Bot} from 'lucide-react';import {TaxSiteShell} from '../_components/TaxSiteShell';
-export const metadata:Metadata={title:'About Supersonic Fast Cash',description:'Learn about Supersonic Fast Cash and its vision for AI-assisted tax preparation and workforce education.'};
-export default function About(){return <TaxSiteShell><section className="bg-sky-50 px-5 py-20"><div className="mx-auto max-w-7xl"><p className="text-sm font-bold uppercase tracking-widest text-sky-700">Our mission</p><h1 className="mt-4 max-w-4xl text-5xl font-black">Technology that helps people prepare—and professionals build.</h1><p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600">Supersonic Fast Cash is developing a unified tax preparation experience combining guided taxpayer workflows, PARIS AI assistance, professional software and education-driven opportunities for future tax office operators.</p></div></section><section className="mx-auto grid max-w-7xl gap-6 px-5 py-16 md:grid-cols-3">{[[GraduationCap,'Education & entrepreneurship','Support tax preparation education and pathways toward running a tax business.'],[Bot,'AI-assisted guidance','Use PARIS to make interviews and document intake more understandable.'],[Building2,'Professional operations','Connect preparation workflows with office management and provider-ready architecture.']].map(([Icon,title,desc]:any)=><article key={title} className="rounded-2xl border p-7"><Icon className="h-8 w-8 text-sky-700"/><h2 className="mt-5 text-xl font-black">{title}</h2><p className="mt-3 leading-7 text-slate-600">{desc}</p></article>)}</section><section className="mx-auto max-w-7xl px-5 pb-16"><Link href="/tax-software/demo" className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-6 py-3 font-bold text-white">Explore the platform <ArrowRight className="h-4 w-4"/></Link></section></TaxSiteShell>}
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { TaxSiteShell, taxButton } from '../_components/TaxSiteShell';
+export const metadata: Metadata = {
+  title: 'About Supersonic Fast Cash',
+  description:
+    'Tax preparation for individuals and businesses, plus training for people who want to start their own tax office.',
+};
+export default function About() {
+  return (
+    <TaxSiteShell>
+      <main className="px-5 py-10 sm:p-10">
+        <p className="text-sm font-bold uppercase tracking-wide text-[#073ca2]">
+          SUPERSONIC FAST CASH LLC
+        </p>
+        <h1 className="mt-4 text-4xl font-black leading-tight sm:text-5xl">
+          Tax preparation. A path to your own business.
+        </h1>
+        <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-700">
+          Supersonic Fast Cash serves individuals, self-employed clients and businesses seeking tax
+          preparation help. We also support people interested in learning tax preparation and
+          planning their own tax office.
+        </p>
+        <div className="mt-8 grid gap-5 md:grid-cols-2">
+          <section className="rounded-2xl border p-6">
+            <h2 className="text-2xl font-bold">For taxpayers</h2>
+            <p className="mt-4 leading-7 text-slate-600">
+              Choose your own tax workspace or talk with our team about personal taxes, business
+              returns and amendments.
+            </p>
+            <Link
+              href="/tax-software/contact"
+              className={taxButton + ' mt-6 bg-[#073ca2] text-white'}
+            >
+              Get tax help →
+            </Link>
+          </section>
+          <section className="rounded-2xl border p-6">
+            <h2 className="text-2xl font-bold">For future business owners</h2>
+            <p className="mt-4 leading-7 text-slate-600">
+              Explore tax preparation training, office setup, client service and marketing. Review
+              the enrollment steps and costs before you commit.
+            </p>
+            <Link
+              href="/tax-software/professional#enroll"
+              className={taxButton + ' mt-6 bg-[#073ca2] text-white'}
+            >
+              Start your tax business →
+            </Link>
+          </section>
+        </div>
+      </main>
+    </TaxSiteShell>
+  );
+}

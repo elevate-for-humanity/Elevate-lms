@@ -46,10 +46,10 @@ export default function HomePage() {
         <HomeCareerPathways />
         <section className="bg-slate-50 px-5 py-12" aria-labelledby="tax-home-cta">
           <div className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-white p-8">
-            <p className="text-sm font-semibold text-sky-800">Supersonic Fast Cash · PARIS</p>
-            <h2 id="tax-home-cta" className="mt-3 text-3xl font-bold text-slate-950">Explore our tax preparation software</h2>
-            <p className="mt-4 max-w-2xl text-slate-600">Start a return, organize your interview answers, and review confirmed W-2 information in your secure workspace.</p>
-            <Link href="/tax" className="mt-6 inline-flex rounded-xl bg-sky-800 px-6 py-3 font-semibold text-white">Open PARIS tax software</Link>
+            <p className="text-sm font-semibold text-sky-800">Supersonic Fast Cash</p>
+            <h2 id="tax-home-cta" className="mt-3 text-3xl font-bold text-slate-950">Get your taxes prepared. Start your own tax office.</h2>
+            <p className="mt-4 max-w-2xl text-slate-600">Get help with your taxes, ask about free tax preparation eligibility, or explore how to build your own tax business.</p>
+            <Link href="/tax" className="mt-6 inline-flex rounded-xl bg-sky-800 px-6 py-3 font-semibold text-white">Explore Supersonic Fast Cash</Link>
           </div>
         </section>
         <section className="border-y border-slate-200 bg-slate-50 px-4 py-6" aria-labelledby="workone-home-cta">

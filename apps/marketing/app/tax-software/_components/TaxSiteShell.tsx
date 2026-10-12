@@ -1,5 +1,95 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { ArrowRight } from 'lucide-react';
-export const taxNav=[['Home','/tax-software'],['File Taxes','/tax-software/self-file'],['Professional Software','/tax-software/professional'],['Features','/tax-software/features'],['Bank Products','/tax-software/bank-products'],['Pricing','/tax-software/pricing'],['About','/tax-software/about'],['Contact','/tax-software/contact']];
-export function TaxSiteShell({children}:{children:ReactNode}){return <div className="min-h-screen bg-white text-slate-950"><div className="bg-[#073ca2] px-4 py-2 text-center text-xs font-bold uppercase tracking-widest text-white">Supersonic Fast Cash LLC · Tax Preparation Service</div><header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur"><div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4"><Link href="/tax-software" className="text-xl font-black tracking-tight text-[#073ca2]">SUPERSONIC <span className="text-[#e11937]">FAST CASH</span><span className="block text-[10px] tracking-[.2em] text-slate-600">TAX PREPARATION SERVICE</span></Link><nav aria-label="Supersonic website" className="flex flex-wrap gap-x-4 gap-y-2 text-xs font-bold lg:text-sm">{taxNav.map(([label,href])=><Link className="hover:text-[#e11937]" key={href} href={href}>{label}</Link>)}</nav><Link href="/tax-software/demo" className="inline-flex items-center gap-2 rounded-lg bg-[#e11937] px-5 py-3 text-sm font-bold text-white">See Software <ArrowRight className="h-4 w-4"/></Link></div></header>{children}<footer className="bg-[#073ca2] px-5 py-14 text-white"><div className="mx-auto max-w-7xl"><h2 className="text-2xl font-black">SUPERSONIC FAST CASH</h2><p className="mt-2 text-sm text-blue-100">Tax Preparation Service · Professional Tax Software</p><div className="mt-8 flex flex-wrap gap-5 text-sm">{taxNav.map(([label,href])=><Link key={href} href={href} className="hover:underline">{label}</Link>)}<Link href="/tax-software/demo">Demo</Link></div><p className="mt-8 max-w-3xl text-xs leading-6 text-blue-100">Production IRS electronic filing and EPS bank-product processing require applicable external approval and certification. No unapproved transmission is offered.</p></div></footer></div>}
+export const taxNav = [
+  ['Prepare your taxes', '/tax-software/self-file'],
+  ['Hire a professional', '/tax-software/contact'],
+  ['Enroll to start your tax business', '/tax-software/professional#enroll'],
+  ['Free preparation options', '/tax-software/contact#free-preparation'],
+  ['Pricing', '/tax-software/pricing'],
+  ['Sign in', '/tax-software/login'],
+];
+export const taxButton =
+  'inline-flex min-h-12 items-center justify-center rounded-full px-6 py-3 text-center text-sm font-bold transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4';
+export function TaxSiteShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="min-h-screen bg-white text-slate-950">
+      <header className="border-b border-slate-200 bg-white px-5 py-5">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
+          <Link
+            href="/tax"
+            aria-label="Supersonic Fast Cash home"
+            className="text-xl font-black text-[#073ca2]"
+          >
+            SUPERSONIC <span className="text-[#c8102e]">FAST CASH</span>
+            <span className="mt-1 block text-[10px] tracking-[.18em] text-slate-600">
+              TAX PREPARATION & BUSINESS TRAINING
+            </span>
+          </Link>
+          <Link
+            href="/tax-software/login"
+            className="rounded-full border border-blue-200 px-5 py-3 text-sm font-bold text-[#073ca2]"
+          >
+            Sign in
+          </Link>
+        </div>
+      </header>
+      <div className="mx-auto grid max-w-7xl lg:grid-cols-[230px_minmax(0,1fr)]">
+        <aside className="border-b border-slate-200 bg-slate-50 p-5 lg:border-b-0 lg:border-r">
+          <details open className="lg:sticky lg:top-5">
+            <summary className="cursor-pointer text-sm font-bold text-[#073ca2]">
+              Your tax options
+            </summary>
+            <nav
+              aria-label="Supersonic side navigation"
+              className="mt-4 flex flex-wrap gap-2 lg:flex-col"
+            >
+              {taxNav.map(([label, href]) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold leading-5 hover:border-blue-400 hover:text-[#073ca2]"
+                >
+                  {label}
+                </Link>
+              ))}
+              <Link
+                href="/tax-software/contact"
+                className="px-4 py-3 text-sm font-bold text-[#073ca2]"
+              >
+                Contact us →
+              </Link>
+            </nav>
+          </details>
+        </aside>
+        <div className="min-w-0">{children}</div>
+      </div>
+      <footer className="border-t border-slate-200 bg-slate-50 px-5 py-9">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-wrap justify-between gap-5">
+            <div>
+              <p className="font-black text-[#073ca2]">Supersonic Fast Cash LLC</p>
+              <p className="mt-2 text-sm text-slate-600">
+                Your taxes. Your next business opportunity.
+              </p>
+            </div>
+            <a href="tel:+13179999620" className="font-bold text-[#073ca2]">
+              (317) 999-9620
+            </a>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-5 text-sm">
+            <Link href="/tax-software/contact">Contact</Link>
+            <Link href="/privacy">Privacy</Link>
+            <Link href="/terms-of-service">Terms</Link>
+            <Link href="/">Elevate for Humanity</Link>
+          </div>
+          <p className="mt-5 max-w-3xl text-xs leading-6 text-slate-600">
+            Free preparation eligibility, return scope and appointment availability must be
+            confirmed. Training and business setup have separate costs and requirements. The online
+            preparation workspace does not currently submit returns to the IRS or process bank
+            products.
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}

@@ -1,4 +1,89 @@
-import type { Metadata } from 'next';import Link from 'next/link';import {ArrowRight,CheckCircle2} from 'lucide-react';import {TaxSiteShell} from '../_components/TaxSiteShell';
-export const metadata:Metadata={title:'Pricing & Access | Supersonic Fast Cash',description:'Explore individual and professional tax preparation software access. Final pricing is provided before purchase.'};
-const offers=[{name:'Individual filing',desc:'For people preparing their own tax return.',points:['Guided tax interview','Supported document upload','Field-by-field confirmation','Return review'],href:'/tax-software/self-file',cta:'Explore self-file'},{name:'Professional software',desc:'For tax preparers, EROs and offices.',points:['Professional workflow overview','Preparer and office concepts','Document and review process','Software-provider demonstration'],href:'/tax-software/professional',cta:'Explore professional edition'}];
-export default function Pricing(){return <TaxSiteShell><section className="bg-sky-50 px-5 py-20"><div className="mx-auto max-w-7xl"><p className="text-sm font-bold uppercase tracking-widest text-sky-700">Pricing & access</p><h1 className="mt-4 text-5xl font-black">Choose the right way to prepare.</h1><p className="mt-5 max-w-3xl text-lg text-slate-600">Pricing is not published until applicable plans, form fees and payment terms are confirmed. No charge will be represented as final on this page.</p></div></section><section className="mx-auto grid max-w-7xl gap-6 px-5 py-16 lg:grid-cols-2">{offers.map(o=><article key={o.name} className="rounded-3xl border p-8 shadow-sm"><h2 className="text-3xl font-black">{o.name}</h2><p className="mt-3 text-slate-600">{o.desc}</p><p className="mt-6 text-sm font-bold uppercase tracking-wide text-sky-700">Pricing: To be confirmed</p><div className="mt-7 space-y-3">{o.points.map(p=><p key={p} className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-emerald-600"/>{p}</p>)}</div><Link href={o.href} className="mt-8 inline-flex items-center gap-2 rounded-xl bg-slate-950 px-6 py-3 font-bold text-white">{o.cta}<ArrowRight className="h-4 w-4"/></Link></article>)}</section></TaxSiteShell>}
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { SELF_FILE_BASE_PRICE, SELF_FILE_FORM_CHARGES } from '@/lib/tax-software/self-file-pricing';
+import { TaxSiteShell, taxButton } from '../_components/TaxSiteShell';
+export const metadata: Metadata = {
+  title: 'Tax Preparation Pricing | Supersonic Fast Cash',
+  description:
+    'Free base federal preparation, additional form charges and professional tax preparation options.',
+};
+export default function Pricing() {
+  return (
+    <TaxSiteShell>
+      <main>
+        <section className="bg-[#f1f6ff] px-5 py-10 sm:p-10">
+          <h1 className="text-4xl font-black sm:text-5xl">Know your options. Know the cost.</h1>
+          <p className="mt-5 max-w-xl text-lg leading-7 text-slate-700">
+            Start your own return for free. Review any additional preparation charges as your return
+            needs change.
+          </p>
+          <p className="mt-6 text-5xl font-black text-[#073ca2]">${SELF_FILE_BASE_PRICE}</p>
+          <p className="mt-2 font-semibold">Starting a return & base federal preparation</p>
+          <Link
+            href="/tax-software/self-file"
+            className={taxButton + ' mt-6 bg-[#c8102e] text-white'}
+          >
+            Start my return →
+          </Link>
+        </section>
+        <section className="px-5 py-10 sm:px-10">
+          <h2 className="text-3xl font-bold">Additional preparation charges</h2>
+          <p className="mt-4 text-sm leading-6 text-slate-600">
+            Only the additions identified for your return appear in your estimate. These are
+            software preparation charges; they do not indicate IRS submission.
+          </p>
+          <table className="mt-6 w-full text-left text-sm">
+            <caption className="sr-only">Self-preparation form pricing</caption>
+            <thead>
+              <tr className="border-b border-slate-200">
+                <th scope="col" className="py-3 pr-4">
+                  Form or service
+                </th>
+                <th scope="col" className="py-3 text-right">
+                  Price
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {SELF_FILE_FORM_CHARGES.map((c) => (
+                <tr key={c.code} className="border-b border-slate-100">
+                  <th scope="row" className="py-4 pr-4 font-medium">
+                    {c.label}
+                  </th>
+                  <td className="py-4 text-right">${c.price}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            <article className="rounded-2xl bg-slate-50 p-6">
+              <h2 className="text-xl font-bold">Hire a professional</h2>
+              <p className="mt-3 text-sm leading-6 text-slate-600">
+                Discuss your return and request a quote. Ask about free preparation eligibility
+                before choosing paid service.
+              </p>
+              <Link
+                href="/tax-software/contact"
+                className="mt-4 inline-block font-bold text-[#073ca2]"
+              >
+                Get tax help →
+              </Link>
+            </article>
+            <article className="rounded-2xl bg-slate-50 p-6">
+              <h2 className="text-xl font-bold">Start a tax business</h2>
+              <p className="mt-3 text-sm leading-6 text-slate-600">
+                Review tuition, software and office setup costs with our team before enrolling.
+              </p>
+              <Link
+                href="/tax-software/professional#enroll"
+                className="mt-4 inline-block font-bold text-[#073ca2]"
+              >
+                Explore enrollment →
+              </Link>
+            </article>
+          </div>
+        </section>
+      </main>
+    </TaxSiteShell>
+  );
+}

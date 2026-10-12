@@ -1,5 +1,11 @@
 import Link from 'next/link';
-import { BriefcaseBusiness, CheckCircle2, ClipboardCheck, GraduationCap, WalletCards } from 'lucide-react';
+import {
+  BriefcaseBusiness,
+  CheckCircle2,
+  ClipboardCheck,
+  GraduationCap,
+  WalletCards,
+} from 'lucide-react';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { resolveProgramFundingStatus } from '@/lib/programs/funding-visibility';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
@@ -66,19 +72,28 @@ export default function ProgramExperienceGuide({ program }: { program: ProgramSc
       ];
 
   return (
-    <section className="border-b border-slate-200 bg-white px-4 py-12 sm:py-16" aria-labelledby={`${program.slug}-guide`}>
+    <section
+      className="border-b border-slate-200 bg-white px-4 py-12 sm:py-16"
+      aria-labelledby={`${program.slug}-guide`}
+    >
       <div className="mx-auto max-w-6xl">
         <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">
           {program.title} — program guide
         </p>
-        <h2 id={`${program.slug}-guide`} className="mt-2 max-w-4xl text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+        <h2
+          id={`${program.slug}-guide`}
+          className="mt-2 max-w-4xl text-3xl font-black tracking-tight text-slate-950 sm:text-4xl"
+        >
           How this program works from application to completion
         </h2>
         <p className="mt-4 max-w-4xl text-base font-medium leading-7 text-slate-700 sm:text-lg">
-          This is the complete enrollment flow. Follow the steps in order so you know who is responsible, when payment is selected, and what must be completed.
+          This is the complete enrollment flow. Follow the steps in order so you know who is
+          responsible, when payment is selected, and what must be completed.
         </p>
 
-        <div className={`mt-8 grid gap-4 ${steps.length === 4 ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}>
+        <div
+          className={`mt-8 grid gap-4 ${steps.length === 4 ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}
+        >
           {steps.map(({ icon: Icon, title, body }) => (
             <article key={title} className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
               <Icon className="h-7 w-7 text-brand-blue-700" aria-hidden="true" />
@@ -92,29 +107,47 @@ export default function ProgramExperienceGuide({ program }: { program: ProgramSc
           <div>
             <div className="flex items-center gap-3">
               <WalletCards className="h-7 w-7 text-brand-blue-800" aria-hidden="true" />
-              <h3 className="text-2xl font-black text-slate-950">{funding.showWorkforceFundingProcess ? 'Funding first. Payment options if needed.' : 'Self-pay and payment options'}</h3>
+              <h3 className="text-2xl font-black text-slate-950">
+                {funding.showWorkforceFundingProcess
+                  ? 'Funding first. Payment options if needed.'
+                  : 'Self-pay and payment options'}
+              </h3>
             </div>
             <p className="mt-3 max-w-4xl text-sm font-medium leading-6 text-slate-700 sm:text-base">
               {funding.showWorkforceFundingProcess
                 ? 'Free to those who qualify. Apply first, then complete the required WorkOne or workforce-agency intake. The agency determines eligibility and must provide written authorization. If you do not qualify or choose self-pay, you can then review pay-in-full, installment, employer-sponsored, or available Buy Now Pay Later options. BNPL is a separate provider decision and is not workforce funding.'
-                : 'Apply first. After your program and enrollment details are confirmed, choose pay-in-full, an available installment plan, employer sponsorship, or an available Buy Now Pay Later option. BNPL is reviewed by an outside payment provider, is not guaranteed, and is not workforce funding.'}
+                : isApprenticeship
+                  ? 'Apprenticeships are self-pay only. Review tuition and payment requirements when applying. Choose pay-in-full, an available installment plan, or an available Buy Now Pay Later option. BNPL requires separate provider approval and repayment; it is not workforce funding. Enrollment and Host Shop placement must be confirmed before training begins.'
+                  : 'Apply first. After your program and enrollment details are confirmed, choose pay-in-full, an available installment plan, employer sponsorship, or an available Buy Now Pay Later option. BNPL is reviewed by an outside payment provider, is not guaranteed, and is not workforce funding.'}
             </p>
             {isApprenticeship ? (
               <p className="mt-3 text-sm font-bold leading-6 text-slate-800">
-                The Host Site employs, pays, and supervises the apprentice. Tuition is paid through Elevate’s approved enrollment checkout—not to the Host Site.
+                The Host Site employs, pays, and supervises the apprentice. Tuition is paid through
+                Elevate’s approved enrollment checkout—not to the Host Site.
               </p>
             ) : null}
           </div>
           <div className="flex flex-col gap-3">
             {funding.showWorkforceFundingProcess ? (
-              <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-emerald-700 px-6 py-3 text-center font-black text-white hover:bg-emerald-800">
+              <a
+                href={WORKONE_INDY_BOOKING_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl bg-emerald-700 px-6 py-3 text-center font-black text-white hover:bg-emerald-800"
+              >
                 Schedule WorkOne Intake
               </a>
             ) : null}
-            <Link href={paymentPlanHref} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-blue-700 px-6 py-3 text-center font-black text-white hover:bg-brand-blue-800">
+            <Link
+              href={paymentPlanHref}
+              className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-blue-700 px-6 py-3 text-center font-black text-white hover:bg-brand-blue-800"
+            >
               Review payment options
             </Link>
-            <Link href={program.cta.applyHref || `/apply?program=${program.slug}`} className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-6 py-3 text-center font-black text-slate-950 hover:bg-slate-50">
+            <Link
+              href={program.cta.applyHref || `/apply?program=${program.slug}`}
+              className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-6 py-3 text-center font-black text-slate-950 hover:bg-slate-50"
+            >
               Start application
             </Link>
           </div>

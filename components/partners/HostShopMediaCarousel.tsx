@@ -110,31 +110,35 @@ export default function HostShopMediaCarousel({
           />
         ) : (
           <>
-            {media.map((item, itemIndex) => (
-              <Image
-                key={item.url}
-                src={item.url}
-                fill
-                unoptimized={!item.url.startsWith('/')}
-                sizes={
-                  compact
-                    ? '(max-width: 767px) 45vw, (max-width: 1279px) 30vw, 260px'
-                    : '(max-width: 640px) 90vw, 480px'
-                }
-                alt={item.alt || `${shopName} promotional image`}
-                aria-hidden={item.url !== active.url}
-                className="absolute inset-0 h-full w-full object-contain transition-opacity duration-300"
-                style={{ opacity: item.url === active.url && !failedUrls.has(item.url) ? 1 : 0 }}
-                loading={compact ? 'lazy' : 'eager'}
-                decoding="async"
-                fetchPriority={compact ? 'auto' : itemIndex === 0 ? 'high' : 'low'}
-                onLoad={() => {
-                  setLoadedUrls((current) => new Set(current).add(item.url));
-                  if (item.url === requested.url || !lastLoadedUrl) setLastLoadedUrl(item.url);
-                }}
-                onError={() => setFailedUrls((current) => new Set(current).add(item.url))}
-              />
-            ))}
+            {media.map((item, itemIndex) =>
+              itemIndex === safeIndex ||
+              itemIndex === (safeIndex + 1) % media.length ||
+              item.url === active.url ? (
+                <Image
+                  key={item.url}
+                  src={item.url}
+                  fill
+                  unoptimized={!item.url.startsWith('/')}
+                  sizes={
+                    compact
+                      ? '(max-width: 767px) 45vw, (max-width: 1279px) 30vw, 260px'
+                      : '(max-width: 640px) 90vw, 480px'
+                  }
+                  alt={item.alt || `${shopName} promotional image`}
+                  aria-hidden={item.url !== active.url}
+                  className="absolute inset-0 h-full w-full object-contain transition-opacity duration-300"
+                  style={{ opacity: item.url === active.url && !failedUrls.has(item.url) ? 1 : 0 }}
+                  loading={compact ? 'lazy' : 'eager'}
+                  decoding="async"
+                  fetchPriority={compact ? 'auto' : itemIndex === 0 ? 'high' : 'low'}
+                  onLoad={() => {
+                    setLoadedUrls((current) => new Set(current).add(item.url));
+                    if (item.url === requested.url || !lastLoadedUrl) setLastLoadedUrl(item.url);
+                  }}
+                  onError={() => setFailedUrls((current) => new Set(current).add(item.url))}
+                />
+              ) : null,
+            )}
             {failedUrls.size === media.length ? (
               <p className="relative px-6 text-center text-sm text-white" role="status">
                 The shop photos could not load. Please use the shop website link below to view its

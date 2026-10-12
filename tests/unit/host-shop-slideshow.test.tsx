@@ -12,6 +12,28 @@ describe('host shop slideshow playback', () => {
     { url: '/one.jpg', alt: 'First photo' },
     { url: '/two.jpg', alt: 'Second photo' },
   ];
+  it('defers distant photos while retaining the loaded photo during a transition', () => {
+    render(
+      <HostShopMediaCarousel
+        shopName="Shop"
+        items={[
+          ...items,
+          { url: '/three.jpg', alt: 'Third photo' },
+          { url: '/four.jpg', alt: 'Fourth photo' },
+        ]}
+      />,
+    );
+    const first = screen.getByAltText('First photo');
+    fireEvent.load(first);
+    expect(screen.queryByAltText('Third photo')).not.toBeInTheDocument();
+    expect(screen.queryByAltText('Fourth photo')).not.toBeInTheDocument();
+    act(() => vi.advanceTimersByTime(5000));
+    expect(first).toBeInTheDocument();
+    expect(screen.getByAltText('Third photo')).toBeInTheDocument();
+    expect(screen.queryByAltText('Fourth photo')).not.toBeInTheDocument();
+    fireEvent.load(screen.getByAltText('Second photo'));
+    expect(screen.queryByAltText('First photo')).not.toBeInTheDocument();
+  });
   it('rotates automatically, pauses, and resumes', () => {
     render(<HostShopMediaCarousel shopName="Shop" items={items} />);
     act(() => vi.advanceTimersByTime(5000));

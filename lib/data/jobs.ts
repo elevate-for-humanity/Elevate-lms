@@ -56,7 +56,7 @@ function normalizeJob(row: Record<string, unknown>): JobPosting {
   };
 }
 
-export async function getActiveJobs(opts: { limit?: number; remote?: boolean; jobType?: string } = {}): Promise<JobPosting[]> {
+export async function getActiveJobs(opts: { limit?: number; remote?: boolean; jobType?: string; throwOnError?: boolean } = {}): Promise<JobPosting[]> {
   const db = createPublicClient();
   let query = db
     .from('job_postings')
@@ -71,6 +71,7 @@ export async function getActiveJobs(opts: { limit?: number; remote?: boolean; jo
   const { data, error } = await query;
   if (error) {
     logger.error('[jobs] getActiveJobs error:', error.message);
+    if (opts.throwOnError) throw new Error('Job listings are temporarily unavailable');
     return [];
   }
 

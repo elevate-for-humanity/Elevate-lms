@@ -14,6 +14,7 @@ import ProgramCohortFlyer from '@/components/programs/ProgramCohortFlyer';
 import ProgramExperienceGuide from '@/components/programs/ProgramExperienceGuide';
 
 import Image from 'next/image';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import HeroPicture from '@/components/marketing/HeroPicture';
@@ -114,6 +115,8 @@ export default function ProgramDetailPage({
     : 'WIOA may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment.';
   const selfPayNumeric = Number((p.selfPayCost || '').replace(/[^0-9.]/g, '')) || 0;
   const isApprenticeship = p.programType === 'apprenticeship';
+  const registeredProgram = isApprenticeship ? getRegisteredProgramStandard(p.slug) : null;
+  const instructionHours = registeredProgram?.completion.requiredRtiHours ?? totalHours;
   const octoberCouponCode = 'OCT300';
   const ProgramTitle = heroOverride ? 'h1' : 'h2';
   const weeklyHoursLabel =
@@ -161,7 +164,7 @@ export default function ProgramDetailPage({
     .map((credential) => credential.name)
     .join(', ');
   const programHeroNarration = isApprenticeship
-    ? `Welcome to ${p.title}. This is an earn-while-you-learn path that connects classroom instruction with supervised experience at an approved Host Site. Picture yourself learning a skill, practicing it with a qualified professional, and seeing your progress build week by week. The full pathway is ${durationLabel}, usually ${weeklyHoursLabel.replace("hrs/week", "hours each week")}. You will grow through areas such as ${narrationCurriculum || 'the skills required for this occupation'}, while working toward ${narrationCredentials || 'the program completion requirements'}. Your first step is simple: apply and complete intake. We will then help confirm your Host Site, schedule, and self-pay tuition before training begins. Move through this page at your own pace. You will see what to expect, what it costs, and exactly how to apply.`
+    ? `Welcome to ${p.title}. This is an earn-while-you-learn path that connects classroom instruction with supervised experience at an approved Host Site. Picture yourself learning a skill, practicing it with a qualified professional, and seeing your progress build week by week. The full pathway is ${durationLabel}, usually ${weeklyHoursLabel.replace('hrs/week', 'hours each week')}. You will grow through areas such as ${narrationCurriculum || 'the skills required for this occupation'}, while working toward ${narrationCredentials || 'the program completion requirements'}. Your first step is simple: apply and complete intake. We will then help confirm your Host Site, schedule, and self-pay tuition before training begins. Move through this page at your own pace. You will see what to expect, what it costs, and exactly how to apply.`
     : `Welcome to ${p.title}. This program is designed to help you move from interest to real, usable career skills. The ${durationLabel} experience is ${p.deliveryMode === 'hybrid' ? 'a blend of flexible online learning and scheduled hands-on practice' : p.deliveryMode === 'online' ? 'available online, so you can build skills with a flexible learning routine' : 'taught in person, with direct guidance and practical learning'}. Along the way, you will build confidence in areas such as ${narrationCurriculum || 'the program skills'} and prepare for ${narrationCredentials || 'the program credentials'}. Start by applying and completing intake. That gives admissions what they need to confirm your schedule, requirements, and best enrollment path. ${isWorkforceFunded ? 'Your training may be free if you qualify and receive written approval from the workforce agency before enrollment.' : 'You will also find clear payment choices on this page.'} Take your time, review the details, and use the application link when you are ready.`;
 
   const pathwaySteps = [
@@ -532,7 +535,7 @@ export default function ProgramDetailPage({
                 <div>
                   <dt className="font-bold text-slate-500">Weekly schedule</dt>
                   <dd className="mt-1 font-black text-slate-950">
-                    {p.schedule || weeklyHoursLabel.replace("hrs/week", "hours per week")}
+                    {p.schedule || weeklyHoursLabel.replace('hrs/week', 'hours per week')}
                   </dd>
                 </div>
                 <div>
@@ -580,7 +583,11 @@ export default function ProgramDetailPage({
               id="payment-options"
               className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm"
             >
-              <h3 className="text-xl font-black text-slate-950">{isApprenticeship ? 'Self-pay tuition and payment options' : 'Funding and payment options'}</h3>
+              <h3 className="text-xl font-black text-slate-950">
+                {isApprenticeship
+                  ? 'Self-pay tuition and payment options'
+                  : 'Funding and payment options'}
+              </h3>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
                 {isWorkforceFunded ? (
                   <li>
@@ -598,12 +605,15 @@ export default function ProgramDetailPage({
                   into installments; deposit and terms are shown before acceptance.
                 </li>
                 <li>
-                  <strong className="text-slate-950">Buy Now Pay Later:</strong> This is an optional self-pay financing method with separate provider approval and repayment terms.
+                  <strong className="text-slate-950">Buy Now Pay Later:</strong> This is an optional
+                  self-pay financing method with separate provider approval and repayment terms.
                 </li>
-                {!isApprenticeship ? <li>
-                  <strong className="text-slate-950">Employer-sponsored:</strong> An employer may
-                  pay eligible costs when an arrangement is approved.
-                </li> : null}
+                {!isApprenticeship ? (
+                  <li>
+                    <strong className="text-slate-950">Employer-sponsored:</strong> An employer may
+                    pay eligible costs when an arrangement is approved.
+                  </li>
+                ) : null}
               </ul>
             </div>
           </div>
@@ -744,13 +754,10 @@ export default function ProgramDetailPage({
             </div>
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <DecisionFact label="Length" value={durationLabel} />
+              <DecisionFact label="Schedule" value={weeklyHoursLabel} />
               <DecisionFact
-                label="Schedule"
-                value={weeklyHoursLabel}
-              />
-              <DecisionFact
-                label="Training"
-                value={totalHours > 0 ? `${totalHours} hours` : hoursRange}
+                label={registeredProgram ? 'Related instruction' : 'Training'}
+                value={instructionHours > 0 ? `${instructionHours} hours` : hoursRange}
               />
               <DecisionFact label="Credential" value={`${p.credentials.length} included`} />
             </div>
@@ -785,9 +792,7 @@ export default function ProgramDetailPage({
                 <span className="block text-xs font-black uppercase tracking-wider text-orange-300">
                   Pay in full
                 </span>
-                <span className="mt-1 block text-xl font-black text-white">
-                  {p.selfPayCost}
-                </span>
+                <span className="mt-1 block text-xl font-black text-white">{p.selfPayCost}</span>
                 <span className="mt-1 block text-xs leading-5 text-slate-300">
                   One payment after application approval
                 </span>
@@ -853,9 +858,15 @@ export default function ProgramDetailPage({
             </div>
             <div>
               <div className="text-2xl font-extrabold text-slate-900">
-                {totalHours > 0 ? `${totalHours} hrs` : hoursRange}
+                {instructionHours > 0 ? `${instructionHours} hrs` : hoursRange}
               </div>
-              <div className="text-xs text-slate-500 mt-0.5">Total training hours</div>
+              <div className="text-xs text-slate-500 mt-0.5">
+                {registeredProgram
+                  ? 'Related instruction hours; workplace training is separate'
+                  : isApprenticeship
+                    ? 'Listed course hours; review workplace requirements separately'
+                    : 'Total training hours'}
+              </div>
             </div>
             <div>
               <div className="text-2xl font-extrabold text-slate-900">
@@ -1400,8 +1411,9 @@ export default function ProgramDetailPage({
               Start Your {p.title} Journey
             </h2>
             <p className="text-slate-500 text-base">
-              Free to apply · No payment required · An advisor will contact you within 1 business
-              day
+              {isApprenticeship
+                ? 'An inquiry is free. Your enrollment application includes tuition and payment review. Approval, agreements and Host Shop placement are confirmed separately.'
+                : 'Free to apply · No payment required · An advisor will contact you within 1 business day'}
             </p>
           </div>
           <ProgramApplyForm
@@ -1416,69 +1428,80 @@ export default function ProgramDetailPage({
       <section className="py-16 bg-slate-900">
         <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 lg:grid-cols-2">
           <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-800">
-            <Image src={heroPosterSrc} alt={heroAlt} fill sizes="(min-width: 1024px) 50vw, 100vw" loading="lazy" className="object-cover" />
+            <Image
+              src={heroPosterSrc}
+              alt={heroAlt}
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              loading="lazy"
+              className="object-cover"
+            />
           </div>
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
-            Ready to Start Your {p.title} Career?
-          </h2>
-          <p className="text-slate-300 text-base max-w-xl mx-auto mb-8 leading-relaxed">
-            {p.fundingStatement}
-          </p>
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
+              Ready to Start Your {p.title} Career?
+            </h2>
+            <p className="text-slate-300 text-base max-w-xl mx-auto mb-8 leading-relaxed">
+              {p.fundingStatement}
+            </p>
 
-          {/* Enrollment pipeline */}
-          <EnrollmentPipeline
-            applyHref={p.cta.applyHref || `/apply?program=${p.slug}`}
-            showCta={false}
-            className="mb-8 text-left"
-          />
+            {/* Enrollment pipeline */}
+            <EnrollmentPipeline
+              applyHref={p.cta.applyHref || `/apply?program=${p.slug}`}
+              showCta={false}
+              className="mb-8 text-left"
+            />
 
-          {/* Two distinct paths — applicant vs enrolled */}
-          <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-4">
-            {/* Primary CTA — driven by enrollmentType */}
-            {primaryCTA && (
-              <div className="flex flex-col items-center gap-1.5">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  {primaryCTA.external ? 'Enrollment' : 'New Applicant'}
-                </span>
-                <Link
-                  href={primaryCTA.href}
-                  target={primaryCTA.external ? '_blank' : '_self'}
-                  rel={primaryCTA.external ? 'noopener noreferrer' : undefined}
-                  className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
-                >
-                  {primaryCTA.external ? primaryCTA.label : 'Apply to This Program'}
-                </Link>
-                {!primaryCTA.external && (
-                  <span className="text-slate-400 text-xs">Free to apply · takes 5 min</span>
-                )}
-              </div>
-            )}
+            {/* Two distinct paths — applicant vs enrolled */}
+            <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-4">
+              {/* Primary CTA — driven by enrollmentType */}
+              {primaryCTA && (
+                <div className="flex flex-col items-center gap-1.5">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    {primaryCTA.external ? 'Enrollment' : 'New Applicant'}
+                  </span>
+                  <Link
+                    href={primaryCTA.href}
+                    target={primaryCTA.external ? '_blank' : '_self'}
+                    rel={primaryCTA.external ? 'noopener noreferrer' : undefined}
+                    className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
+                  >
+                    {primaryCTA.external ? primaryCTA.label : 'Apply to This Program'}
+                  </Link>
+                  {!primaryCTA.external && (
+                    <span className="text-slate-400 text-xs">
+                      {isApprenticeship
+                        ? 'Review tuition and enrollment requirements before applying'
+                        : 'Free to apply · takes 5 min'}
+                    </span>
+                  )}
+                </div>
+              )}
 
-            {/* Already enrolled — only render when an LMS course exists for this program */}
-            {p.cta.enrollHref && (
-              <div className="flex flex-col items-center gap-1.5">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Already Enrolled
-                </span>
-                <Link
-                  href={p.cta.enrollHref}
-                  className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
-                >
-                  Go to My Courses
-                </Link>
-                <span className="text-slate-400 text-xs">Log in to access your training</span>
-              </div>
-            )}
+              {/* Already enrolled — only render when an LMS course exists for this program */}
+              {p.cta.enrollHref && (
+                <div className="flex flex-col items-center gap-1.5">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    Already Enrolled
+                  </span>
+                  <Link
+                    href={p.cta.enrollHref}
+                    className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-4 rounded-xl font-extrabold text-base transition-colors whitespace-nowrap"
+                  >
+                    Go to My Courses
+                  </Link>
+                  <span className="text-slate-400 text-xs">Log in to access your training</span>
+                </div>
+              )}
+            </div>
+
+            <Link
+              href={p.cta.advisorHref || '/contact'}
+              className="inline-block border-2 border-slate-600 hover:border-slate-400 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors mt-2"
+            >
+              Questions? Talk to an Advisor
+            </Link>
           </div>
-
-          <Link
-            href={p.cta.advisorHref || '/contact'}
-            className="inline-block border-2 border-slate-600 hover:border-slate-400 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-colors mt-2"
-          >
-            Questions? Talk to an Advisor
-          </Link>
-        </div>
         </div>
       </section>
 

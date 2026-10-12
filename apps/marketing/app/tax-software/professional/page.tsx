@@ -11,7 +11,7 @@ export default function ProfessionalPage() {
   return (
     <TaxSiteShell>
       <main>
-        <section className="grid items-center gap-7 bg-[#073ca2] text-white px-5 py-10 sm:p-10 xl:grid-cols-2">
+        <section className="grid items-center gap-7 bg-[#be185d] text-white px-5 py-10 sm:p-10 xl:grid-cols-2">
           <div>
             <p className="text-sm font-bold uppercase tracking-wide text-white">
               YOUR NEXT BUSINESS
@@ -23,7 +23,7 @@ export default function ProfessionalPage() {
               Turn tax preparation skills into a plan for your own office. Explore training, client
               service and business setup through Supersonic Fast Cash.
             </p>
-            <Link href="#enroll" className={taxButton + ' mt-6 bg-[#c8102e] text-white'}>
+            <Link href="#enroll" className={taxButton + ' mt-6 bg-white text-[#be185d]'}>
               Explore enrollment →
             </Link>
           </div>

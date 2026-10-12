@@ -42,7 +42,7 @@ export default function TaxSoftwarePage() {
   return (
     <TaxSiteShell>
       <main>
-        <section className="bg-[#073ca2] px-5 py-9 text-white sm:p-10">
+        <section className="bg-[#be185d] px-5 py-9 text-white sm:p-10">
           <div className="grid items-center gap-7 xl:grid-cols-2">
             <div>
               <p className="text-sm font-bold uppercase tracking-wider text-white">
@@ -56,7 +56,7 @@ export default function TaxSoftwarePage() {
                 Do it yourself, hire a professional, or start your own tax business. Choose the
                 option that fits you.
               </p>
-              <Link href="#options" className={taxButton + ' mt-6 bg-[#c8102e] text-white'}>
+              <Link href="#options" className={taxButton + ' mt-6 bg-white text-[#be185d]'}>
                 Choose my option →
               </Link>
             </div>

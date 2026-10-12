@@ -183,52 +183,6 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     socialLabel: 'View Cals Kutz photos',
   },
   {
-    slug: 'razors-image-barbershop',
-    name: "Razor's Image Barbershop",
-    businessType: 'BarberShop',
-    city: 'Bloomington',
-    state: 'IN',
-    zip: '47408',
-    address: '155 S Kingston Dr',
-    phone: '(812) 287-7166',
-    programs: ['barber-apprenticeship'],
-    note: 'Approved barber apprenticeship host shop in Bloomington.',
-    marketingBlurb:
-      'A multicultural Bloomington barbershop focused on professional grooming, customer service, hair and scalp care, and hands-on barber development.',
-    media: [
-      {
-        src: '/images/partners/razors-image-logo.jpg',
-        alt: "Razor's Image Barbershop official logo",
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/razors-image-storefront-2026.jpg',
-        alt: "Razor's Image Barbershop storefront in Bloomington, Indiana",
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/razors-image-apprenticeship-flyer.webp',
-        alt: "Original Razor's Image Barber Apprenticeship Program artwork",
-        kind: 'flyer',
-      },
-      {
-        src: '/videos/partners/razors-image-host-barbershop.mp4',
-        alt: "Razor's Image owner introducing the Bloomington barber apprenticeship Host Shop",
-        kind: 'video',
-        script:
-          "Welcome to Razor's Image Barbershop in Bloomington, Indiana. Razor's Image is a multicultural working barbershop and an approved Elevate Barber Apprenticeship Host Shop. Apprentices may build supervised skills in professional grooming, sanitation, client consultation, hair and scalp care, customer service, shop operations, and barbering technique while completing related instruction and documented training hours. Apply through Elevate first. Placement, employment, wages, supervision, schedule, enrollment, and licensing requirements are confirmed before training begins.",
-      },
-    ],
-    resourceUrl:
-      'https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:8be7070f-ef4e-42b8-b646-1806801ac9b3',
-    resourceLabel: "View Razor's Image apprenticeship document",
-    websiteUrl: 'https://razorsimage.com',
-    websiteLabel: "Visit Razor's Image website",
-    bookingUrl: 'https://razorsimage.com/schedule-now/',
-    socialUrl: 'https://www.instagram.com/razors.image/',
-    socialLabel: "View Razor's Image photos",
-  },
-  {
     slug: 'b-52s-barber-shop',
     name: "B-52's Barber Shop LLC",
     dba: 'B-52s Barbershop',

@@ -102,7 +102,7 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
                     </span>
                   ))}
                 </div>
-                {shop.website ? <a href={shop.website} target="_blank" rel="noopener noreferrer" className="mt-4 text-sm font-bold text-red-700">Visit shop website ↗</a> : null}
+                {shop.website ? <a href={shop.website} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-10 items-center text-sm font-bold text-red-700">Visit shop website ↗</a> : null}
                 <Link
                   href={`/host-shops/${shop.slug}`}
                   className="mt-auto inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white hover:bg-red-700"

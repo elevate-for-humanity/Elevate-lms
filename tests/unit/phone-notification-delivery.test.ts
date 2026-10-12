@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 vi.mock('server-only', () => ({}));
-import { deliverPhoneNotification } from '@/lib/phone/notification-delivery';
+import { deliverPhoneNotification, phoneEmailReady } from '@/lib/phone/notification-delivery';
 const identity = { taskId:'task',profileId:'recipient',kind:'voicemail' as const,channel:'email' as const };
 function database(claim: any = { data:{id:'claim'},error:null }, save: any = { data:{id:'claim'},error:null }) {
   const writes: any[] = [];
@@ -36,5 +36,17 @@ describe('phone delivery evidence', () => {
     const {db,writes}=database(undefined,{error:{code:'unavailable'}});
     expect(await deliverPhoneNotification(db,identity,async()=>({accepted}))).toBe('review_required');
     expect(writes.at(-1)).toMatchObject({status:'review_required'});
+  });
+});
+
+describe('readable voicemail email timing',()=>{
+  it('leaves the email claim unconsumed while voicemail transcription is pending',()=>{
+    expect(phoneEmailReady({source:'voicemail',awaitingTranscript:true})).toBe(false);
+    expect(phoneEmailReady({source:'voicemail',awaitingTranscript:true,transcript:'   '})).toBe(false);
+    expect(phoneEmailReady({source:'voicemail',awaitingTranscript:true,transcript:'Please call me back.'})).toBe(true);
+  });
+  it('preserves recording notices when transcription is disabled and PARIS notices',()=>{
+    expect(phoneEmailReady({source:'voicemail',awaitingTranscript:false})).toBe(true);
+    expect(phoneEmailReady({source:'paris',awaitingTranscript:true})).toBe(true);
   });
 });

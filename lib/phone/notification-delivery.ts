@@ -40,3 +40,8 @@ export async function deliverPhoneNotification(
     return 'review_required';
   }
 }
+
+/** Keep the email claim available until the readable voicemail transcript arrives. */
+export function phoneEmailReady(input: {source?: 'voicemail' | 'paris';awaitingTranscript?: boolean;transcript?: string}) {
+  return input.source !== 'voicemail' || !input.awaitingTranscript || Boolean(input.transcript?.trim());
+}

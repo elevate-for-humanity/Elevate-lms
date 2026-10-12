@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
-import { deliverPhoneNotification } from '@/lib/phone/notification-delivery';
+import { deliverPhoneNotification, phoneEmailReady } from '@/lib/phone/notification-delivery';
 import { persistPhoneRow, processTelnyxEvent } from '@/lib/phone/event-processing';
 import { PushNotificationService } from '@/lib/notifications/push-service';
 import { sendSMS } from '@/lib/notifications/sms';
@@ -107,11 +107,12 @@ async function notifyRecipient(
     adminCopy?: boolean;
     source?: 'voicemail' | 'paris';
     responsibleHolder?: string;
+    awaitingTranscript?: boolean;
   },
 ) {
   const url = input.adminCopy
     ? new URL('/phone/inbox', process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org').toString()
-    : input.profileId ? appUrl('/program-holder/phone') : appUrl('/phone/inbox');
+    : input.profileId ? appUrl('/communications/phone') : appUrl('/phone/inbox');
   const messageType = input.source === 'voicemail' ? 'a voicemail' : 'details with PARIS';
   if (!input.profileId || !input.taskId) return;
   const identity = { taskId: input.taskId, profileId: input.profileId, kind: input.source || 'paris' as const };
@@ -151,7 +152,7 @@ async function notifyRecipient(
     input.program ? `Program/department: ${input.program}` : '',
     input.reason ? `Reason: ${input.reason}` : '',
     input.preferredCallbackTime ? `Preferred callback: ${input.preferredCallbackTime}` : '',
-    input.summary ? `PARIS summary: ${input.summary}` : '',
+    input.summary ? `${input.source === 'voicemail' ? 'Voicemail' : 'PARIS'} summary: ${input.summary}` : '',
     input.transcript ? `Transcript: ${input.transcript}` : '',
   ].filter(Boolean);
   const readableDetails = detailLines.join('\n');
@@ -162,12 +163,12 @@ async function notifyRecipient(
       return { accepted: result.success, providerMessageId: result.messageId };
     }));
   }
-  if (profile?.email && preferences?.email_missed_calls !== false) {
+  if (profile?.email && preferences?.email_missed_calls !== false && phoneEmailReady(input)) {
     deliveries.push(deliverPhoneNotification(db, { ...identity, channel: 'email' }, async () => {
       const result = await sendEmail({
         from: 'Elevate Phone <noreply@elevateforhumanity.org>', to: profile.email,
         subject: input.adminCopy ? 'Admin copy: phone message and callback follow-up' : input.urgency === 'urgent'
-          ? 'Urgent call requires follow-up' : 'New call in your Elevate Phone inbox',
+          ? 'Urgent call requires follow-up' : input.source === 'voicemail' ? 'New voicemail — transcript inside' : 'New call in your Elevate Phone inbox',
         text: `${readableDetails}\n\nFull call record: ${url}`,
         html: `<p><strong>Call details</strong></p><pre style="white-space:pre-wrap;font-family:Arial,sans-serif">${escapeHtml(readableDetails)}</pre><p><a href="${escapeHtml(url)}">Open the full call record</a></p>`,
         singleAttempt: true,
@@ -1234,6 +1235,7 @@ async function handleEvent(
         urgency: 'normal',
         source: 'voicemail',
         transcript: recordingTask?.transcript || undefined,
+        awaitingTranscript: system.voicemail_transcription_enabled && !recordingTask?.transcript,
       }, system);
     }
     return;
@@ -1258,6 +1260,18 @@ async function handleEvent(
       })
       .eq('call_id', call.id);
     if (transcriptionError) throw new Error('Voicemail transcription persistence unavailable');
+    if (state.taskId) {
+      const {data: task,error: taskError}=await db.from('phone_callback_tasks')
+        .select('source,assigned_profile_id').eq('id',state.taskId).eq('call_id',call.id).maybeSingle();
+      if(taskError || !task) throw new Error('Voicemail notification assignment unavailable');
+      if(task.source === 'voicemail') {
+        await notifyAssignee(db,{
+          profileId:task.assigned_profile_id || state.profileId,
+          taskId:state.taskId,caller:call.from_number || 'A caller',
+          urgency:'normal',source:'voicemail',transcript:payload.transcription_text,
+        },system);
+      }
+    }
     return;
   }
 

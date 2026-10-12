@@ -142,11 +142,11 @@ describe('voicemail transcript emails',()=>{
   beforeEach(()=>{mocks.email.mockResolvedValue({success:true,data:{messageId:'receipt'}});mocks.push.mockResolvedValue(1);});
   const voicemailEvent=(type:string,extra:Record<string,unknown>={})=>({data:{...event.data,event_type:type,payload:{...event.data.payload,
     client_state:JSON.stringify({taskId:'task',profileId:'recipient',phase:'voicemail_recording'}),...extra}}});
-  const recipientRows={profiles:[ok({full_name:'Assigned recipient'}),ok({full_name:'Assigned recipient',email:'recipient@example.invalid'})],
-    notification_preferences:[ok({email_missed_calls:true})]};
+  const recipientRows=()=>({profiles:[ok({full_name:'Assigned recipient'}),ok({full_name:'Assigned recipient',email:'recipient@example.invalid'})],
+    notification_preferences:[ok({email_missed_calls:true})]});
   it('does not send an unreadable email before the transcript arrives',async()=>{
     mocks.verify.mockResolvedValue(voicemailEvent('call.recording.saved',{recording_urls:{mp3:'https://s3.amazonaws.com/telephony-recorder-prod/test.mp3'}}));
-    database({...recipientRows,phone_systems:[ok({id:'system',voicemail_transcription_enabled:true})],
+    database({...recipientRows(),phone_systems:[ok({id:'system',voicemail_transcription_enabled:true})],
       phone_calls:[ok({id:'call',phone_system_id:'system',provider:'telnyx'}),ok({id:'call'})],
       phone_callback_tasks:[ok({source:'voicemail',assigned_profile_id:'recipient'}),ok({id:'task'})],
       voicemails:[ok(null),ok({id:'voicemail'})]});
@@ -156,7 +156,7 @@ describe('voicemail transcript emails',()=>{
   it('puts the persisted transcript in plain text and escaped HTML email',async()=>{
     const transcript='Please call me back about enrollment. <script>caller text</script>';
     mocks.verify.mockResolvedValue(voicemailEvent('call.recording.transcription.saved',{transcription_text:transcript}));
-    const {writes}=database({...recipientRows,phone_systems:[ok({id:'system',voicemail_transcription_enabled:true})],
+    const {writes}=database({...recipientRows(),phone_systems:[ok({id:'system',voicemail_transcription_enabled:true})],
       phone_calls:[ok({id:'call',phone_system_id:'system',provider:'telnyx'})],
       phone_callback_tasks:[ok({id:'task'}),ok({source:'voicemail',assigned_profile_id:'recipient'})],
       voicemails:[ok({id:'voicemail'})]});

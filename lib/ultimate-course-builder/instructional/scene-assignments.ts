@@ -6,7 +6,7 @@ import { compatibleVisualTask, reviewedSceneEvidence } from './reviewed-scene-ev
  * Automatic assignment never treats a title alone as proof: the asset must
  * have entitlement/license evidence and either explicit reviewed coverage or
  * a persisted lesson match with positive semantic overlap to the scene. */
-export function buildSceneAssignments(scenes: any[], assets: any[], configured: any[] = [], options: {requiresPracticalEvidence?: boolean} = {}) {
+export function buildSceneAssignments(scenes: any[], assets: any[], configured: any[] = [], options: {requiresPracticalEvidence?: boolean; competencyType?: string} = {}) {
   const assignments: any[] = [];
   const gaps: any[] = [];
 
@@ -64,7 +64,7 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
     }
   });
   const identity = (asset: any) => `source:${root(candidates.indexOf(asset))}`;
-  const physicalScene = (scene: any) => options.requiresPracticalEvidence !== false &&
+  const physicalScene = (scene: any) => (options.competencyType ? options.competencyType === 'practical_skill' : options.requiresPracticalEvidence !== false) &&
     [scene.stage, scene.title, scene.sceneType, scene.scene_type].some(value =>
       /^(demonstration|guided_practice|independent_practice|mistake_and_correction|mistake and correction)$/.test(String(value ?? '').trim().toLowerCase()));
   const choices = scenes.map((scene) => {

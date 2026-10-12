@@ -224,7 +224,7 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
     // cannot be repaired by rotating through unrelated licensed stock.
     if (!assignment || !candidate)
       throw new Error(`ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED:${scene.id}`);
-    const physicalDemonstration = input.requiresPracticalEvidence === true &&
+    const physicalDemonstration = (input.requiresPhysicalDemonstration ?? input.requiresPracticalEvidence) === true &&
       [scene.stage, scene.title, scene.sceneType, scene.scene_type].some(value =>
         /^(demonstration|guided_practice|independent_practice|mistake_and_correction|mistake and correction)$/.test(String(value ?? '').trim().toLowerCase()));
     if (physicalDemonstration && candidate.kind !== 'video')

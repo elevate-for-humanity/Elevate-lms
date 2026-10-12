@@ -251,7 +251,7 @@ export function assertCompleteLesson(
 
 /** Recheck saved assignments without invalidating usable media checkpoints. */
 export function practicalVisualFailures(artifacts: Partial<Record<UltimateBuildStep, Artifact>>, competency: any): string[] {
-  if (competency?.requiresPracticalEvidence !== true) return [];
+  if (competency?.requiresPracticalEvidence !== true || (competency.type && competency.type !== 'practical_skill')) return [];
   const scenes = artifacts.storyboard?.storyboard?.scenes ?? [];
   const media = artifacts.visual_assignment?.media ?? {};
   const physical = scenes.filter((scene: any) => [scene.stage, scene.title, scene.sceneType, scene.scene_type].some(value =>

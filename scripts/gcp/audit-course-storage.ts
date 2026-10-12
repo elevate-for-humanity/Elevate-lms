@@ -55,7 +55,7 @@ async function main(){
         if(reference.bytes>0){
           const prefix=await client.send(new GetObjectCommand({Bucket:config.bucket,Key:key,Range:'bytes=0-63'}));
           const bytes=await prefix.Body?.transformToByteArray();
-          reference.mp4HeaderPresent=Boolean(bytes && Buffer.from(bytes).subarray(4,8).toString('ascii')==='ftyp');
+          reference.isoBmffHeaderPresent=Boolean(bytes && Buffer.from(bytes).subarray(4,8).toString('ascii')==='ftyp');
         }
       }catch(error:any){reference.readStatus=error?.$metadata?.httpStatusCode??'read_failed';}
       report.objects.push(reference);

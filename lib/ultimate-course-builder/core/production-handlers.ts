@@ -261,7 +261,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
           render: await runtime.renderer.render({
             lessonId: comp(ctx).id,
             courseTitle: ctx.profile.title,
-            requiresPracticalEvidence: comp(ctx).requiresPracticalEvidence,
+            requiresPhysicalDemonstration: comp(ctx).type === 'practical_skill',
             artifacts: ctx.artifacts,
           }),
         },

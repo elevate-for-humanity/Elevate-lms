@@ -46,6 +46,7 @@ describe('versioned lesson contract', () => {
     artifacts.visual_assignment.media.assignments[0].generatedInstructionalVisual=true;
     expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:true})).toEqual(['ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED']);
     expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:false})).toEqual([]);
+    expect(practicalVisualFailures(artifacts,{requiresPracticalEvidence:true,type:'knowledge'})).toEqual([]);
   });
   it('rejects label-only QA and empty objectives', () => {
     expect(

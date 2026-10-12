@@ -18,6 +18,9 @@ describe('automatic licensed scene assignment', () => {
     const theory = buildSceneAssignments([scene], [], [], {requiresPracticalEvidence:false});
     expect(theory.gaps).toEqual([]);
     expect(theory.assignments[0].generatedInstructionalVisual).toBe(true);
+    const recordTeaching=buildSceneAssignments([scene],[],[],{requiresPracticalEvidence:true,competencyType:'knowledge'});
+    expect(recordTeaching.gaps).toEqual([]);
+    expect(recordTeaching.assignments[0].generatedInstructionalVisual).toBe(true);
   });
   it('uses inspected visible actions instead of a misleading title for semantic assignment', () => {
     const inspected = {

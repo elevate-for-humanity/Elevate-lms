@@ -19,7 +19,7 @@ export function PremiumTeachingScene({ scene, props }: { scene: SceneData; props
       <span style={{fontSize:42,color:'#cdb79e',opacity:fade(0)}}>{String(scene.scene_number).padStart(2,'0')}</span>
       <h1 style={{fontSize:46,lineHeight:1.15,margin:0,opacity:fade(fps*.15)}}>{scene.title}</h1>
     </div>
-    <div style={{position:'absolute',left:54,top:210,width:1120,height:710,background:'#eee7dd',borderRadius:12,overflow:'hidden'}}>
+    <div style={{position:'absolute',left:54,top:210,width:1120,height:710,background:'#eee7dd',borderRadius:12,overflow:'hidden',opacity:fade(0)}}>
       {scene.clipUrl ? <Video src={scene.clipUrl} muted style={mediaStyle}/> : scene.imageUrl ? <Img src={scene.imageUrl} style={mediaStyle}/> : null}
     </div>
     <div style={{position:'absolute',left:1220,right:54,top:225,height:680,display:'flex',flexDirection:'column',justifyContent:'center',gap:28,opacity:fade(fps*.3)}}>

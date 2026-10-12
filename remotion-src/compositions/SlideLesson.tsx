@@ -48,6 +48,8 @@ export interface SceneData {
   clipUrl: string | null;
   /** Resolved Pexels/Pollinations image URL */
   imageUrl: string | null;
+  /** The live blueprint draws this instructional graphic once, over a clean background. */
+  imageIsInstructional?: boolean;
   /** Absolute path to per-scene MP3 audio */
   audioSrc: string | null;
   /** Duration in frames at the SlideLesson composition frame rate. */
@@ -548,7 +550,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
           }}
           muted
         />
-      ) : scene.imageUrl ? (
+      ) : scene.imageUrl && !scene.imageIsInstructional ? (
         <Img
           src={scene.imageUrl}
           style={{

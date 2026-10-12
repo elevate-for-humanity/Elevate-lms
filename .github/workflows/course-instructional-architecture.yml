@@ -8,6 +8,9 @@ on:
       - 'tests/integration/google-lesson-author.test.ts'
       - 'Dockerfile.ultimate-worker'
       - '.dockerignore'
+      - 'remotion-src/**'
+      - 'lib/video/remotion-render.ts'
+      - 'scripts/gcp/render-course-layout-acceptance.mjs'
       - '.github/workflows/course-instructional-architecture.yml'
   workflow_dispatch:
 permissions:
@@ -30,3 +33,12 @@ jobs:
         run: node --test workers/worker-loop.test.mjs workers/ultimate-runtime-guards.test.mjs workers/process-job-state.test.mjs workers/ultimate-progress-lease.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs lib/ultimate-course-builder/instructional/competency-classification.test.mjs lib/ultimate-course-builder/media/playback-source.test.mjs
       - name: Build and test the exact standalone course image without production access
         run: docker build -f Dockerfile.ultimate-worker -t elevate-course-architecture:${{ github.sha }} .
+      - name: Render desktop and mobile teaching states with the production compositor
+        run: |
+          mkdir -p layout-acceptance
+          docker run --rm --entrypoint node -v "$PWD/layout-acceptance:/tmp/render-acceptance" -v "$PWD/scripts/gcp/render-course-layout-acceptance.mjs:/app/render-course-layout-acceptance.mjs:ro" elevate-course-architecture:${{ github.sha }} /app/render-course-layout-acceptance.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: course-layout-regression
+          path: layout-acceptance/

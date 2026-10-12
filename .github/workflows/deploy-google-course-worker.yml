@@ -13,6 +13,8 @@ on:
       - 'lib/storage/**'
       - 'remotion-src/**'
       - 'packages/ultimate-course-worker/**'
+      - 'scripts/gcp/preflight-billing.mjs'
+      - 'scripts/gcp/preflight-billing.test.mjs'
       - 'Dockerfile.ultimate-worker'
       - 'tsconfig.ultimate-worker.json'
       - 'scripts/gcp/deploy-course-job.mjs'
@@ -76,12 +78,7 @@ jobs:
           node-version: '22'
       - name: Verify finite worker and speech boundaries
         run: node --test tests/worker/dependency-wait.test.mjs workers/ultimate-runtime-guards.test.mjs workers/process-job-state.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs workers/ultimate-source-teaching.test.mjs workers/worker-loop.test.mjs workers/ultimate-progress-lease.test.mjs lib/video/local-transcription.test.mjs lib/video/local-transcription-worker.test.mjs scripts/gcp/deploy-course-job.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs
-      - name: Build existing CPU Course Builder image
-        shell: bash
-        run: |
-          set -euo pipefail
-          docker build -f Dockerfile.ultimate-worker -t "elevate-ultimate-worker:$GITHUB_SHA" .
-      # Google credentials must be created after Docker has consumed its context.
+      # .dockerignore excludes federation credential files from the build context.
       - name: Show federated identity claim context
         run: |
           echo "repository=$GITHUB_REPOSITORY"
@@ -98,6 +95,20 @@ jobs:
           skip_install: true
       - name: Verify Google SDK
         run: node scripts/gcp/verify-sdk.mjs
+      - name: Check billing before building worker image
+        run: node scripts/gcp/preflight-billing.mjs
+      - name: Build existing CPU Course Builder image
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -f Dockerfile.ultimate-worker -t "elevate-ultimate-worker:$GITHUB_SHA" .
+      # Builds can outlive the federated token; refresh only after build acceptance.
+      - name: Refresh Google credentials after build
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - name: Upload immutable worker image
         shell: bash
         run: |

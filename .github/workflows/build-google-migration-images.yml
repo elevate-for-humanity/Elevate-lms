@@ -17,7 +17,7 @@ permissions:
   id-token: write
 concurrency:
   group: google-image-${{ inputs.component }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   image:
     if: github.ref == 'refs/heads/main'
@@ -30,6 +30,19 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
+      # .dockerignore excludes federation credential files from the build context.
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify runner-supplied Google SDK compatibility
+        run: node scripts/gcp/verify-sdk.mjs
+      - name: Check billing before building an image
+        run: node scripts/gcp/preflight-billing.mjs
       - name: Build existing Dockerfile without server secrets
         shell: bash
         run: |
@@ -54,17 +67,13 @@ jobs:
             --build-arg "BUILD_TIMESTAMP=$(date -u +%FT%TZ)" \
             --build-arg NEXT_PUBLIC_SUPABASE_URL \
             --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY .
-      # Authenticate after build to keep the credential file outside the build context.
-      - uses: google-github-actions/auth@v3
+      # Builds can outlive the federated token; refresh only after build acceptance.
+      - name: Refresh Google credentials after build
+        uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
-      - uses: google-github-actions/setup-gcloud@v3
-        with:
-          skip_install: true
-      - name: Verify runner-supplied Google SDK compatibility
-        run: node scripts/gcp/verify-sdk.mjs
       - name: Upload versioned image
         shell: bash
         run: |

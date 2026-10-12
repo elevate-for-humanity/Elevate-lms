@@ -23,6 +23,8 @@ on:
       - 'config/paris-release-source.json'
       - 'Dockerfile.marketing'
       - 'next.config.mjs'
+      - 'scripts/gcp/preflight-billing.mjs'
+      - 'scripts/gcp/preflight-billing.test.mjs'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'scripts/gcp/activate-tested-public-revision.mjs'
@@ -70,6 +72,20 @@ jobs:
           set -euo pipefail
           git fetch --depth=50 origin main
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+
+      - name: Authenticate Google deployment
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+
+      - name: Check billing before installing or building
+        run: node scripts/gcp/preflight-billing.mjs
 
       - name: Configure pnpm
         uses: pnpm/action-setup@v4
@@ -123,17 +139,6 @@ jobs:
           }
           NODE
 
-      - name: Authenticate Google deployment
-        uses: google-github-actions/auth@v3
-        with:
-          project_id: elegant-racer-299721
-          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
-          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
-
-      - uses: google-github-actions/setup-gcloud@v3
-        with:
-          skip_install: true
-
       - name: Ensure Google Text-to-Speech is enabled
         timeout-minutes: 3
         shell: bash
@@ -175,6 +180,13 @@ jobs:
         timeout-minutes: 5
         run: node scripts/gcp/smoke-marketing-container.mjs
 
+      # Builds can outlive the federated token; refresh only after build acceptance.
+      - name: Refresh Google credentials after build
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - name: Push Marketing image
         shell: bash
         run: |

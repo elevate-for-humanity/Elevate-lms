@@ -1,7 +1,7 @@
 # Current Google migration observations — 2026-10-12 UTC
 
 - Public DNS and HTTPS routing verified for root/www, Admin, dev-studio, app/LMS, portal, dashboard, Store and testing. Root redirects to www; host routing selects the appropriate Google backend.
-- Google billing is enabled and linked to a billing account. This does not verify payment balance.
+- Billing previously blocked image upload in run 38237944228. Later course-worker run 38267938913 uploaded and deployed successfully. Check current project billing before new builds; successful authentication alone does not verify billing or payment balance.
 - Regional Cloud Run limits remain 20 vCPU and 40 GiB. LMS and Store now use zero minimum instances; 8 GiB of guaranteed idle reservation was removed without changing their container images or per-instance memory.
 - Marketing, Admin, LMS, Store and Studio Cloud Run services are present. Google Course Builder execution and recovery are scheduled through dispatch-google-course-job.yml. Supabase cron metadata contains no Northflank or code.run references.
 - All 23 source secret groups across elevate-platform and elevate-media-gpu were verified in the Google-owned Admin runtime configuration archive. This is an inert preservation archive; it is not automatically injected into every application.

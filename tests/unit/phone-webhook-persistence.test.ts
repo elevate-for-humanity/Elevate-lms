@@ -168,3 +168,20 @@ describe('voicemail transcript emails',()=>{
     expect(mocks.email.mock.calls[0][0].html).not.toContain('<script>');
   });
 });
+
+describe('voicemail callback recovery',()=>{
+  it('recovers the recipient from the scoped voicemail task when carrier client state is missing',async()=>{
+    mocks.email.mockResolvedValue({success:true,data:{messageId:'receipt'}});mocks.push.mockResolvedValue(1);
+    mocks.verify.mockResolvedValue({data:{...event.data,event_type:'call.recording.transcription.saved',
+      payload:{...event.data.payload,transcription_text:'Please call me about the program.'}}});
+    const {filters}=database({phone_systems:[ok({id:'system'})],
+      phone_calls:[ok({id:'call',phone_system_id:'system',provider:'telnyx'})],
+      phone_callback_tasks:[ok({id:'task'}),ok({id:'task'}),ok({source:'voicemail',assigned_profile_id:'recipient'})],
+      voicemails:[ok({id:'voicemail'})],profiles:[ok({full_name:'Assigned recipient'}),ok({email:'recipient@example.invalid'})],
+      notification_preferences:[ok({email_missed_calls:true})]});
+    expect((await POST(request())).status).toBe(200);
+    expect(filters).toContainEqual({table:'phone_callback_tasks',key:'source',value:'voicemail'});
+    expect(filters).toContainEqual({table:'phone_callback_tasks',key:'call_id',value:'call'});
+    expect(mocks.email).toHaveBeenCalledTimes(1);
+  });
+});

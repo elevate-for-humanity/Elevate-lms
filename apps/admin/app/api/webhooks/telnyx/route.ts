@@ -1242,7 +1242,14 @@ async function handleEvent(
   }
 
   if (type === 'call.recording.transcription.saved' && payload.transcription_text) {
-    if (state.taskId) {
+    let transcriptTaskId=state.taskId;
+    if(!transcriptTaskId) {
+      const {data: recordedTask,error: recordedTaskError}=await db.from('phone_callback_tasks')
+        .select('id').eq('call_id',call.id).eq('source','voicemail').maybeSingle();
+      if(recordedTaskError) throw new Error('Voicemail transcription assignment unavailable');
+      transcriptTaskId=recordedTask?.id;
+    }
+    if (transcriptTaskId) {
       await persistPhoneRow(db
         .from('phone_callback_tasks')
         .update({
@@ -1250,7 +1257,7 @@ async function handleEvent(
           summary: payload.transcription_text.slice(0, 1000),
           updated_at: new Date().toISOString(),
         })
-        .eq('id', state.taskId).eq('call_id', call.id));
+        .eq('id', transcriptTaskId).eq('call_id', call.id));
     }
     const { error: transcriptionError } = await db
       .from('voicemails')
@@ -1260,14 +1267,14 @@ async function handleEvent(
       })
       .eq('call_id', call.id);
     if (transcriptionError) throw new Error('Voicemail transcription persistence unavailable');
-    if (state.taskId) {
+    if (transcriptTaskId) {
       const {data: task,error: taskError}=await db.from('phone_callback_tasks')
-        .select('source,assigned_profile_id').eq('id',state.taskId).eq('call_id',call.id).maybeSingle();
+        .select('source,assigned_profile_id').eq('id',transcriptTaskId).eq('call_id',call.id).maybeSingle();
       if(taskError || !task) throw new Error('Voicemail notification assignment unavailable');
       if(task.source === 'voicemail') {
         await notifyAssignee(db,{
           profileId:task.assigned_profile_id || state.profileId,
-          taskId:state.taskId,caller:call.from_number || 'A caller',
+          taskId:transcriptTaskId,caller:call.from_number || 'A caller',
           urgency:'normal',source:'voicemail',transcript:payload.transcription_text,
         },system);
       }
@@ -1279,12 +1286,12 @@ async function handleEvent(
     if (state.taskId && state.profileId) {
       const { data: unfinished, error: taskLookupError } = await db
         .from('phone_callback_tasks')
-        .select('summary,callback_number,assigned_profile_id')
+        .select('source,summary,callback_number,assigned_profile_id')
         .eq('id', state.taskId)
         .eq('call_id', call.id)
         .maybeSingle();
       if (taskLookupError || !unfinished) throw new Error('Callback task unavailable');
-      if (unfinished && !unfinished.summary) {
+      if (unfinished && unfinished.source !== 'voicemail' && !unfinished.summary) {
         await persistPhoneRow(db
           .from('phone_callback_tasks')
           .update({

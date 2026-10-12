@@ -70,7 +70,7 @@ export function HomeFeaturedHostShop() {
             </article>
           ))}
           {[
-            { name: 'Become a Host Shop', label: 'For shop owners', image: '/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp', alt: 'Generations Hair stylist providing hands-on client service', href: '/partners/host-shops', text: 'Grow your team by mentoring an apprentice. Apply free to join the network.', action: 'Join the network' },
+            { name: 'Become a Host Shop', label: 'For shop owners', image: '/images/partners/generations-hair/salon-service.webp', alt: 'Stylist working with a client in a salon', href: '/partners/host-shops', text: 'Grow your team by mentoring an apprentice. Apply free to join the network.', action: 'Join the network' },
             { name: 'Esthetics Apprenticeship', label: 'Skincare careers', image: '/images/programs/esthetician-host-recruitment-2026.webp', alt: 'Illustrative esthetics instructor mentoring adult apprentices', href: '/programs/esthetician-apprenticeship', text: 'Build skincare, sanitation and client care skills through supervised practice.', action: 'Explore esthetics' },
             { name: 'Nail Technician Apprenticeship', label: 'Nail careers', image: '/images/pexels/nail-tech.webp', alt: 'Illustrative nail technician training', href: '/programs/nail-technician-apprenticeship', text: 'Explore nail services, manicuring, sanitation and professional client care.', action: 'Explore nail technology' },
             { name: 'Find your next pathway', label: 'Career training', image: '/images/pages/barber-hands-on-bright.webp', alt: 'Hands-on career training', href: '/programs', text: 'Discover hands-on programs and the support to take your next step.', action: 'View all programs' },

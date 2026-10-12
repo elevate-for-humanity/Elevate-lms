@@ -125,4 +125,11 @@ describe('versioned lesson contract', () => {
     await new UltimateBuildRunner({ standards_lock: handler }).run(c);
     expect(handler).toHaveBeenCalledTimes(1);
   });
+  it.each(['ULTIMATE_INSTRUCTIONAL_SOURCES_REQUIRED','ULTIMATE_SCENE_LICENSE_RELEVANCE_ASSIGNMENT_REQUIRED'])('defers %s without consuming internal repair attempts',async(code)=>{
+    const handler=vi.fn(async()=>{throw new Error(code);});
+    const c=context();await new UltimateBuildRunner({standards_lock:handler}).run(c);
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect((c.artifacts.selective_repair as any).repair.attempts).toEqual([]);
+    expect(c.findings[0].code).toBe(code);
+  });
 });

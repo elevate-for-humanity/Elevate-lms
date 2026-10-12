@@ -1,36 +1,90 @@
-import { readFileSync } from 'node:fs';
-import { stripTypeScriptTypes } from 'node:module';
-import vm from 'node:vm';
+import { existsSync } from 'node:fs';
+import { compileTaxRoute, loadTaxRoute } from './tax-route-test-harness.mjs';
 import assert from 'node:assert/strict';
 
 // Exercise the route's HTTP contract with database failures at each boundary.
-const path = process.argv[2] || 'app/api/tax/returns/calculate/route.ts';
-const source = stripTypeScriptTypes(readFileSync(path, 'utf8').replace(/^import .*;\s*$/gm, '').replace('export async function POST', 'async function POST'));
+const path =
+  process.argv[2] ||
+  (existsSync('apps/marketing/app/api/tax/returns/calculate/route.ts')
+    ? 'apps/marketing/app/api/tax/returns/calculate/route.ts'
+    : 'app/api/tax/returns/calculate/route.ts');
+const source = compileTaxRoute(path);
 async function invoke(fault, malformed = false) {
   const writes = [];
-  const db = { auth: { getUser: async () => ({ data: { user: { id: 'owner' } } }) }, from(table) {
-    let operation = 'read';
-    const query = {
-      select() { return query; }, eq() { return query; },
-      insert() { operation = 'insert'; writes.push(table); return query; },
-      update() { operation = 'update'; writes.push(table); return query; },
-      maybeSingle() { return query; },
-      then(resolve, reject) {
-        const error = (fault === table || fault === `${table}:${operation}`) ? { message: 'database failure' } : null;
-        const data = table === 'tax_returns' ? { id: 'return-1', tax_year: 2026, filing_status: fault === 'status' ? 'invalid' : 'single' } : table === 'tax_itemized_deductions' ? null : [];
-        return Promise.resolve({ data: fault === 'missing-update' && operation === 'update' ? null : data, error }).then(resolve, reject);
-      },
-    };
-    return query;
-  }};
-  const context = vm.createContext({
-    NextResponse: { json: (body, options) => ({ body, status: options?.status || 200 }) },
-    createClient: async () => db, applyRateLimit: async () => null,
-    STANDARD_DEDUCTION_2026: { single: 16100 },
-    calculateBase1040_2026: () => ({ totalIncome: 0, adjustedGrossIncome: 0, taxableIncome: 0, incomeTax: 0, totalTax: 0, totalPayments: 0, refundAmount: 0, amountOwed: 0 }),
+  const db = {
+    auth: { getUser: async () => ({ data: { user: { id: 'owner' } } }) },
+    from(table) {
+      let operation = 'read';
+      const query = {
+        select() {
+          return query;
+        },
+        eq() {
+          return query;
+        },
+        insert() {
+          operation = 'insert';
+          writes.push(table);
+          return query;
+        },
+        update() {
+          operation = 'update';
+          writes.push(table);
+          return query;
+        },
+        maybeSingle() {
+          return query;
+        },
+        then(resolve, reject) {
+          const error =
+            fault === table || fault === `${table}:${operation}`
+              ? { message: 'database failure' }
+              : null;
+          const data =
+            table === 'tax_returns'
+              ? {
+                  id: 'return-1',
+                  tax_year: 2026,
+                  filing_status: fault === 'status' ? 'invalid' : 'single',
+                }
+              : table === 'tax_itemized_deductions'
+                ? null
+                : [];
+          return Promise.resolve({
+            data: fault === 'missing-update' && operation === 'update' ? null : data,
+            error,
+          }).then(resolve, reject);
+        },
+      };
+      return query;
+    },
+  };
+  const handler = loadTaxRoute(source, {
+    'next/server': {
+      NextResponse: { json: (body, options) => ({ body, status: options?.status || 200 }) },
+    },
+    '@/lib/supabase/server': { createClient: async () => db },
+    '@/lib/api/withRateLimit': { applyRateLimit: async () => null },
+    '@/lib/tax-software/calculation/ty2026-base-1040': {
+      STANDARD_DEDUCTION_2026: { single: 16100 },
+      calculateBase1040_2026: () => ({
+        totalIncome: 0,
+        adjustedGrossIncome: 0,
+        taxableIncome: 0,
+        incomeTax: 0,
+        totalTax: 0,
+        totalPayments: 0,
+        refundAmount: 0,
+        amountOwed: 0,
+      }),
+    },
   });
-  vm.runInContext(source + '\nthis.handler=POST;', context);
-  const response = await context.handler({ json: async () => { if (malformed) throw Error('invalid JSON'); return { returnId: 'return-1' }; } });
+  const response = await handler({
+    json: async () => {
+      if (malformed) throw Error('invalid JSON');
+      return { returnId: 'return-1' };
+    },
+  });
   return { response, writes };
 }
 const cases = [
@@ -54,6 +108,9 @@ for (const [name, fault, malformed, status] of cases) {
     assert.equal(response.body.success === true, status === 200);
     if (status === 400 || name.includes('read failed')) assert.equal(writes.length, 0);
     console.log(`PASS ${name}`);
-  } catch (error) { failures++; console.error(`FAIL ${name}: ${error.message}`); }
+  } catch (error) {
+    failures++;
+    console.error(`FAIL ${name}: ${error.message}`);
+  }
 }
 if (failures) process.exitCode = 1;

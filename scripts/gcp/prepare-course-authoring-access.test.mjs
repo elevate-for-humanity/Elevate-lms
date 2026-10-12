@@ -5,7 +5,9 @@ const identity='elevate-worker-runtime@elegant-racer-299721.iam.gserviceaccount.
 function mock({wrongIdentity=false,existing=false,mismatch=false,bound=false}={}) {
  const calls=[]; const run=args=>{calls.push(args);
  if(args[0]==='run')return JSON.stringify({spec:{template:{spec:{template:{spec:{serviceAccountName:wrongIdentity?'other':identity}}}}}});
- if(args[0]==='iam'&&args[2]==='list')return JSON.stringify(existing?[{name:'projects/elegant-racer-299721/roles/elevateCourseLessonAuthor',includedPermissions:mismatch?['*']:['aiplatform.endpoints.predict','serviceusage.services.use']}]:[]);
+ const role={name:'projects/elegant-racer-299721/roles/elevateCourseLessonAuthor',includedPermissions:mismatch?['*']:['aiplatform.endpoints.predict','serviceusage.services.use']};
+ if(args[0]==='iam'&&args[2]==='list')return JSON.stringify(existing?[role]:[]);
+ if(args[0]==='iam'&&args[2]==='describe')return JSON.stringify(role);
  if(args[1]==='get-iam-policy')return JSON.stringify({bindings:bound?[{role:'projects/elegant-racer-299721/roles/elevateCourseLessonAuthor',members:['serviceAccount:'+identity]}]:[]});return '';};return{run,calls};
 }
 test('only existing course identity receives two exact prediction permissions',()=>{const m=mock();const result=prepareCourseAuthoringAccess(m.run);assert.deepEqual(result.permissions,['aiplatform.endpoints.predict','serviceusage.services.use']);const grant=m.calls.find(a=>a[1]==='add-iam-policy-binding');assert.ok(grant.includes('--member=serviceAccount:'+identity));});

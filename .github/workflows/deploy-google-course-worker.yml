@@ -13,6 +13,10 @@ on:
       - 'Dockerfile.ultimate-worker'
       - 'tsconfig.ultimate-worker.json'
       - 'scripts/gcp/deploy-course-job.mjs'
+      - 'scripts/gcp/prepare-course-authoring-access.mjs'
+      - 'scripts/gcp/prepare-course-authoring-access.test.mjs'
+      - 'scripts/gcp/audit-course-production.mjs'
+      - 'scripts/gcp/audit-course-production.test.mjs'
       - 'workers/admin-speech-cache.mjs'
       - '.github/workflows/deploy-google-course-worker.yml'
   workflow_dispatch:

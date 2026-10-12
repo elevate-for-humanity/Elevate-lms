@@ -5,13 +5,14 @@ import { aiChat } from '@/lib/ai/ai-service';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { getGitHubHeaders } from '@/lib/devstudio/github-token';
 import { logger } from '@/lib/logger';
+import { publishTaskToMain } from '@/lib/devstudio/main-release.mjs';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
 const REPOSITORY = process.env.GITHUB_REPO?.trim() || 'elevate-for-humanity/Elevate-lms';
-const BASE_BRANCH = process.env.GITHUB_BRANCH?.trim() || 'main';
+const BASE_BRANCH = 'main';
 const GH_API = 'https://api.github.com';
 const MAX_TURNS = 14;
 const MAX_WRITES = 6;
@@ -206,29 +207,6 @@ function parseAction(value: Record<string, unknown>): AgentAction {
   throw new Error(`Unsupported engineering action: ${type || 'missing'}`);
 }
 
-async function createPullRequest(branch: string, title: string, body: string) {
-  try {
-    return await githubJson('/pulls', {
-      method: 'POST',
-      body: JSON.stringify({
-        title: title.slice(0, 240),
-        head: branch,
-        base: BASE_BRANCH,
-        body: body.slice(0, 20_000),
-        maintainer_can_modify: true,
-      }),
-    });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    if (!message.includes('422')) throw error;
-    const pulls = await githubJson(
-      `/pulls?state=open&head=${encodeURIComponent(REPOSITORY.split('/')[0] + ':' + branch)}&base=${encodeURIComponent(BASE_BRANCH)}`,
-    );
-    if (Array.isArray(pulls) && pulls[0]) return pulls[0];
-    throw error;
-  }
-}
-
 export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
@@ -380,29 +358,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const pr = await createPullRequest(
-      branch,
-      `Studio: ${task.slice(0, 180)}`,
-      [
-        'Automated Elevate-owned Dev Studio engineering task.',
-        '',
-        `Task: ${task}`,
-        '',
-        `Summary: ${summary || 'Repository changes prepared for CI review.'}`,
-        '',
-        'Changed files:',
-        ...[...changedFiles].map((path) => `- ${path}`),
-        '',
-        'This PR must pass canonical CI before merge or deployment.',
-      ].join('\n'),
-    );
+    const release = await publishTaskToMain({baseSha,branchSha,githubJson});
 
-    logger.info('[studio-engineering] internal task branch prepared', {
+    logger.info('[studio-engineering] internal task published to main', {
       taskId,
       branch,
       branchSha,
       changedFiles: [...changedFiles],
-      pullRequest: pr?.number ?? null,
+      mainSha: release.sha,
     });
 
     return NextResponse.json({
@@ -414,15 +377,9 @@ export async function POST(request: NextRequest) {
       base_sha: baseSha,
       changed_files: [...changedFiles],
       commits,
-      pull_request: pr
-        ? {
-            number: pr.number,
-            url: pr.html_url,
-            state: pr.state,
-            head_sha: pr.head?.sha ?? branchSha,
-          }
-        : null,
-      summary: summary || 'Repository changes prepared on a Studio branch for CI review.',
+      pull_request: null,
+      release,
+      summary: summary || 'Repository changes committed to main; deployment validation is pending.',
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

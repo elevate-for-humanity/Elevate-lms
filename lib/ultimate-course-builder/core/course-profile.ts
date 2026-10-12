@@ -50,9 +50,15 @@ export async function hydrateUltimateProfileSources(
         ? lesson.learning_objectives.filter(Boolean).join('; ') : '';
       // The source reader consumes a JSON envelope. Plain authored text must
       // enter that same schema instead of becoming invalid transport on resume.
-      const content = typeof lesson.content === 'string'
-        ? (lesson.content.trim() ? JSON.stringify({html:lesson.content}) : '')
-        : lesson.content ? JSON.stringify(lesson.content) : '';
+      // Historical repair evidence remains stored, but must not become a
+      // competing teaching source after the current lesson has been corrected.
+      const currentContent = lesson.content && typeof lesson.content === 'object'
+        ? Object.fromEntries(Object.entries(lesson.content).filter(([key]) =>
+          !['production_content_repairs', 'previous_sanitation_html'].includes(key)))
+        : lesson.content;
+      const content = typeof currentContent === 'string'
+        ? (currentContent.trim() ? JSON.stringify({html:currentContent}) : '')
+        : currentContent ? JSON.stringify(currentContent) : '';
       // Titles and objectives alone are not an authorized teaching source.
       if (!content.trim()) return [];
       const text = [lesson.title ? `Lesson: ${lesson.title}` : '',

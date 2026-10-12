@@ -81,7 +81,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gcloud secrets versions access latest --secret=elevate-ultimate-worker-runtime-config --project=elegant-racer-299721 | docker run --rm -i --entrypoint node -v "$PWD/scripts/gcp/audit-course-storage.ts:/app/scripts/gcp/audit-course-storage.ts:ro" "elevate-ultimate-worker:$GITHUB_SHA" --import=tsx /app/scripts/gcp/audit-course-storage.ts
+          docker run --rm --entrypoint node -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "elevate-ultimate-worker:$GITHUB_SHA" --test /app/scripts/gcp/inspect-course-media.test.mjs
+          gcloud secrets versions access latest --secret=elevate-ultimate-worker-runtime-config --project=elegant-racer-299721 | docker run --rm -i --entrypoint node -e COURSE_MEDIA_DEEP_AUDIT=true -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "elevate-ultimate-worker:$GITHUB_SHA" --import=tsx /app/scripts/gcp/audit-course-storage.ts
   deploy:
     needs: build
     if: github.ref == 'refs/heads/main'

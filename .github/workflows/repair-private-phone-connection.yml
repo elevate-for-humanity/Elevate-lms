@@ -36,6 +36,8 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
+      - name: Validate repair syntax before touching the existing server
+        run: python3 -m py_compile scripts/gcp/repair-private-paris.py
       - name: Verify current gateway source and stage code only
         run: |
           set -euo pipefail

@@ -15,7 +15,8 @@ export function BlueprintTeachingGraphic({ plan, seconds, duration, color }: {
     if(!element) return;
     const parent=element.parentElement;
     if(element.scrollHeight>element.clientHeight+2 || (parent && element.getBoundingClientRect().bottom>parent.getBoundingClientRect().bottom+2))
-      cancelRender(new Error('ULTIMATE_TEACHING_GRAPHIC_OVERFLOW'));
+      cancelRender(new Error('ULTIMATE_TEACHING_GRAPHIC_OVERFLOW:'+JSON.stringify({scrollHeight:element.scrollHeight,clientHeight:element.clientHeight,
+        card:element.getBoundingClientRect().toJSON(),parent:parent?.getBoundingClientRect().toJSON()})));
   },[state.activeIndex]);
   const card: CSSProperties = {
     background: 'rgba(255,255,255,0.97)', borderRadius: 18, padding: '12px 16px',

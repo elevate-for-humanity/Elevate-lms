@@ -4,6 +4,10 @@ The Google authoring path is an explicit configuration on a new build profile:
 `instructionalAuthoring: {provider: "google", model: "<verified-model-id>", version: "source-grounded-teaching-1"}`.
 The `queue-course` API accepts the provider and model. It refuses to change these
 inputs on an active build. Existing production builds retain their locked inputs.
+For a blocked course, the explicit `acceptanceBuild: true` action creates a
+separate build on the same course ID and authoritative lessons, or reuses an
+active acceptance build with the identical authoring configuration. It neither
+retires earlier builds nor changes their media, retry history or student records.
 
 ## Instruction authority
 

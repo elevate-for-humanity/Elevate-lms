@@ -226,14 +226,18 @@ export async function POST(req: NextRequest) {
       ...(authoring ? {instructionalAuthoring:{provider:'google' as const, model:authoring.model, version:GOOGLE_LESSON_AUTHOR_VERSION}} : {}),
     };
 
-    const { data: activeBuild, error: activeError } = await db
+    if (body.acceptanceBuild === true && !authoring)
+      return NextResponse.json({error:'A separate teaching acceptance build requires an explicit Google model'}, {status:400});
+    const activeQuery = db
       .from('ultimate_course_builds')
       .select('id,course_id,status,current_step,profile,created_at,updated_at')
       .eq('course_id', course.id)
       .in('status', ['initializing', 'queued', 'running'])
       .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .limit(1);
+    if (body.acceptanceBuild === true)
+      activeQuery.contains('profile', {instructionalAuthoring: profile.instructionalAuthoring});
+    const {data:activeBuild,error:activeError}=await activeQuery.maybeSingle();
     if (activeError) throw activeError;
     if (activeBuild && authoring && JSON.stringify((activeBuild.profile as any)?.instructionalAuthoring) !== JSON.stringify(profile.instructionalAuthoring))
       return NextResponse.json({error:'The active build has different locked authoring inputs. Preserve it and use a separate acceptance build.'}, {status:409});

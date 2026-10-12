@@ -32,7 +32,7 @@ export async function authorGoogleLesson(input: {
     objectives: [{ id: 'objective-id', text: 'observable outcome', sourceRequirementIds: input.competency.authorityRequirementIds.length ? input.competency.authorityRequirementIds : [`course:${input.competency.id}`] }],
     prerequisites: { checks: [{ prompt: 'prior knowledge question', expectedAnswer: 'answer' }], reviewRequired: false },
     stages: ULTIMATE_TEACHING_SEQUENCE.map(stage => ({ stage, instruction: 'complete teaching, not directions to an author', objectiveIds: ['objective-id'] })),
-    segments: [{ id: 'segment-id', stage: 'stage name', text: 'spoken instruction', objectiveIds: ['objective-id'], sourceRequirementIds: ['requirement-id'], visualRequirement: 'observable teaching action and required tools; do not invent an asset or license', sceneType: 'worked_example' }],
+    segments: [{ id: 'segment-id', stage: 'stage name', text: 'spoken instruction', objectiveIds: ['objective-id'], sourceRequirementIds: ['requirement-id'], visualRequirement: 'observable teaching action and required tools; do not invent an asset or license', sceneType: 'worked_example', teachingVisual: {kind:'sequence',steps:[{label:'short action label',value:'concise on-screen instruction',narrationQuote:'exact supporting excerpt from this segment'}]} }],
     activities: [{ id: 'activity-id', type: 'guided_practice', prompt: 'specific learner task', feedback: 'specific correct and incorrect feedback', objectiveIds: ['objective-id'] }],
     mistakes: [{ mistake: 'specific error', correction: 'specific recovery', reason: 'why', objectiveIds: ['objective-id'] }],
     assessment: { questions: [{ id: 'question-id', prompt: 'content-aligned question', choices: ['choice one', 'choice two', 'choice three'], answerIndex: 0, explanation: 'why correct', remediation: 'why incorrect and where to revisit', objectiveIds: ['objective-id'] }], reassessment: [], passingScore: 80 },
@@ -41,6 +41,7 @@ export async function authorGoogleLesson(input: {
 Return JSON {blueprint, grounding}. Use the supplied competency and authorized sources only. Do not invent standards, safety timings, licensing evidence, URLs or credentials.
 Preserve every competency and requirement ID. Teach the specific competency, not an adjacent topic. Use progressive explanation, a concrete worked example, observable step-by-step demonstration when required, guided practice, independent practice, realistic mistakes and corrections, and aligned assessments with feedback.
 Manage cognitive load with short focused scenes and scaffolded practice. Include all thirteen stages in the given order. Use 13-16 segments, 3-5 meaningful questions and at least two distinct reassessment questions. Every objective must be taught and assessed. Practical lessons need a competency-specific practicalRubric with observable criteria and safety stop conditions.
+Every segment needs an explicit teachingVisual with 1-4 concise steps. Its kind is sequence, record, choices, comparison or terms. Each label is at most 55 characters; each value is at most 160 characters and is supported by narrationQuote, an exact excerpt of that segment's spoken text. Do not put full narration paragraphs on a slide. In practical demonstration scenes, visualRequirement must specify the actual observable physical technique and tools; teaching graphics supplement that footage and cannot substitute for it.
 Grounding is an array with one entry per segment: {segmentId, sourceId, excerpt}. Each excerpt must be an exact substantive passage from the supplied source supporting that segment. Do not use only a title as evidence. If sources cannot support the lesson, return {blocked:true,reason:"specific missing instructional evidence"}. Output only JSON.`;
   const result = await generate(system, { courseTitle: input.profile.title, audience: input.profile.audience || 'Adult career learners', competency: input.competency, sequence: ULTIMATE_TEACHING_SEQUENCE, sources: input.sources, blueprintSchema: schema });
   if (result?.blocked) throw new Error('ULTIMATE_AUTHORING_SOURCE_GAP:' + String(result.reason).slice(0, 300));
@@ -51,6 +52,8 @@ Grounding is an array with one entry per segment: {segmentId, sourceId, excerpt}
     const stage = ULTIMATE_TEACHING_SEQUENCE.indexOf(segment.stage as any);
     if (stage < previousStage || stage < 0) throw new Error('ULTIMATE_TEACHING_SEQUENCE_ORDER_REQUIRED');
     previousStage = stage;
+    if (!segment.teachingVisual || segment.teachingVisual.steps.length > 4)
+      throw new Error('ULTIMATE_CONCISE_TEACHING_VISUAL_REQUIRED:' + segment.id);
   }
   if (blueprint.assessment.questions.length < 3 || blueprint.assessment.reassessment.length < 2)
     throw new Error('ULTIMATE_SUBSTANTIVE_ASSESSMENT_REQUIRED');

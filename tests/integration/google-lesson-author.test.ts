@@ -6,6 +6,7 @@ import { contractHash } from '../../lib/ultimate-course-builder/core/lesson-cont
 
 function fixture() {
   const blueprint = JSON.parse(readFileSync(new URL('../../docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json', import.meta.url), 'utf8'));
+  for (const segment of blueprint.segments) segment.teachingVisual.steps = segment.teachingVisual.steps.slice(0,4);
   const competency: any = { id: blueprint.competencyId, title: 'Welcome to Cosmetology Apprenticeship', type: 'knowledge', authorityRequirementIds: [], requiresDemonstration: false, requiresPracticalEvidence: false };
   const sources = [{ id: `course-lesson:${competency.id}`, text: blueprint.segments.map((segment: any) => segment.text).join('\n') }];
   const input: any = { profile: { title: 'Cosmetology', authority: 'course-defined' }, competency, sources };
@@ -42,4 +43,9 @@ test('a critical reviewer finding blocks the blueprint', async () => {
 test('missing sources never produce a generic successful lesson', async () => {
   const { input } = fixture(); input.sources = [];
   await assert.rejects(authorGoogleLesson(input, async () => { throw new Error('must not call provider'); }), /ULTIMATE_INSTRUCTIONAL_SOURCES_REQUIRED/);
+});
+test('full-narration graphics cannot silently replace a concise visual plan', async () => {
+  const {input,result} = fixture();
+  delete result.blueprint.segments[0].teachingVisual;
+  await assert.rejects(authorGoogleLesson(input, async () => result), /ULTIMATE_CONCISE_TEACHING_VISUAL_REQUIRED/);
 });

@@ -1,9 +1,10 @@
+import { renderPlaybackUrl } from '../media/playback-source.mjs';
 export interface UltimateLmsLessonPackage {
   id: string;
   title: string;
   objectives: string[];
   contractArtifacts?: import('../core/build-runner').UltimateRunContext['artifacts'];
-  film: { videoUrl: string; captionsUrl?: string; transcript?: string };
+  film: { videoUrl?: string; playbackUrl?: string; captionsUrl?: string; transcript?: string };
   learningObjects: unknown[];
   assessment: unknown;
   remediation: unknown;
@@ -35,7 +36,7 @@ export function validateLmsCoursePackage(p: UltimateLmsCoursePackage) {
 
   for (const lesson of p.lessons ?? []) {
     if (!lesson.id) missing.push('lesson.id');
-    if (!lesson.film?.videoUrl) missing.push(`lesson.${lesson.id || 'unknown'}.film.videoUrl`);
+    if (!renderPlaybackUrl(lesson.film)) missing.push(`lesson.${lesson.id || 'unknown'}.film.playback`);
     if (!lesson.objectives?.length) missing.push(`lesson.${lesson.id || 'unknown'}.objectives`);
     if (!lesson.learningObjects?.length)
       missing.push(`lesson.${lesson.id || 'unknown'}.learningObjects`);

@@ -14,10 +14,14 @@ export function BlueprintTeachingGraphic({ plan, seconds, duration, color }: {
     const element=cardRef.current;
     if(!element) return;
     const parent=element.parentElement;
-    if(element.scrollHeight>element.clientHeight+2 || (parent && element.getBoundingClientRect().bottom>parent.getBoundingClientRect().bottom+2))
+    const bounds=parent?.getBoundingClientRect();
+    // Remotion mounts a zero-sized offscreen composition to collect metadata.
+    // Only the initialized delivery canvas establishes layout evidence.
+    if(!bounds || bounds.width<=0 || bounds.height<=0 || bounds.y<0) return;
+    if(element.scrollHeight>element.clientHeight+2 || element.getBoundingClientRect().bottom>bounds.bottom+2)
       cancelRender(new Error('ULTIMATE_TEACHING_GRAPHIC_OVERFLOW:'+JSON.stringify({scrollHeight:element.scrollHeight,clientHeight:element.clientHeight,
         card:element.getBoundingClientRect().toJSON(),parent:parent?.getBoundingClientRect().toJSON()})));
-  },[state.activeIndex]);
+  },[seconds,state.activeIndex]);
   const card: CSSProperties = {
     background: 'rgba(255,255,255,0.97)', borderRadius: 18, padding: '12px 16px',
     width: '100%', maxHeight: '100%', minWidth: 0, boxSizing: 'border-box',

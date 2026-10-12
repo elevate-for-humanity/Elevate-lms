@@ -66,7 +66,7 @@ export default async function MeetingsPage() {
             </p>
             <h1 className="mt-1 text-3xl font-black">Team Meetings</h1>
             <p className="mt-1 text-sm text-slate-600">
-              Video meetings, team huddles, guest invitations, screen sharing, chat, and attendance
+              Video meetings, team huddles, meeting invitations, screen sharing, chat, and attendance
               inside the dashboard.
             </p>
           </div>
@@ -91,7 +91,7 @@ export default async function MeetingsPage() {
         {[
           [Video, 'Browser video', 'Join without leaving the Elevate dashboard.'],
           [MonitorUp, 'Screen sharing', 'Present a browser tab, application, or screen.'],
-          [Users, 'Team and guests', 'Invite employees, learners, partners, or outside guests.'],
+          [Users, 'Meeting invitations', 'Share links with employees, learners, and partners who have an Elevate account.'],
           [
             ShieldCheck,
             'Tenant isolation',

@@ -76,6 +76,12 @@ jobs:
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
           docker tag "elevate-ultimate-worker:$GITHUB_SHA" "$IMAGE"
           docker push "$IMAGE"
+      - name: Inspect existing target B2 media through the authorized runtime connection
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud secrets versions access latest --secret=elevate-ultimate-worker-runtime-config --project=elegant-racer-299721 | docker run --rm -i --entrypoint node -v "$PWD/scripts/gcp/audit-course-storage.ts:/app/scripts/gcp/audit-course-storage.ts:ro" "elevate-ultimate-worker:$GITHUB_SHA" --import=tsx /app/scripts/gcp/audit-course-storage.ts
   deploy:
     needs: build
     if: github.ref == 'refs/heads/main'

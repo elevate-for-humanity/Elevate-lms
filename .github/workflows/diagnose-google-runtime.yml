@@ -63,7 +63,7 @@ jobs:
             scaling: Object.fromEntries(Object.entries(service.spec.template.metadata.annotations || {}).filter(([k]) => /Scale|cpu-throttling/.test(k))),
             latestReadyRevision:service.status.latestReadyRevisionName, latestCreatedRevision:service.status.latestCreatedRevisionName,
             traffic:service.status.traffic, conditions:(service.status.conditions || []).map(x=>({type:x.type,status:x.status,reason:x.reason}))});
-          if (['admin', 'lms'].includes(component)) {
+          if (['admin', 'lms', 'marketing'].includes(component)) {
             const revision = service.status.latestCreatedRevisionName;
             const details = JSON.parse(gcloud(['run','revisions','describe',revision,'--project='+project,'--region=us-central1','--format=json']));
             report({component, revision, startupProbe:details.spec.containers[0].startupProbe,

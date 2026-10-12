@@ -185,7 +185,10 @@ export function requireResolvedVisualEvidence(sceneData: unknown): {
   if (missing.length) {
     throw new Error(`ULTIMATE_RENDER_VISUAL_ASSETS_MISSING:${missing.join(',')}`);
   }
-  const distinctShots = new Set(urls).size;
+  // Expiring signatures do not turn one stored clip into distinct footage.
+  const distinctShots = new Set(urls.map(url => url!.split(/[?#]/)[0])).size;
+  if (distinctShots < MIN_LESSON_VIDEO_SCENES)
+    throw new Error(`ULTIMATE_RENDER_DISTINCT_VISUALS_REQUIRED:${distinctShots}:${MIN_LESSON_VIDEO_SCENES}`);
   return { visualAssetCount: urls.length, distinctShots };
 }
 

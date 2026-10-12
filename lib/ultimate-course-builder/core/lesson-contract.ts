@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from './types';
+import { renderPlaybackUrl } from '../media/playback-source.mjs';
 
 /** Changing this version invalidates every checkpoint and release certificate. */
 export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-05.1';
@@ -185,7 +186,7 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
         populated(a.assessment.reassessment), 'ASSESSMENT_SCORING_REMEDIATION_REQUIRED');
       break;
     case 'lesson_film_render':
-      require(nonempty(a.render?.videoUrl) &&
+      require(renderPlaybackUrl(a.render) &&
         a.render.duration > 0 &&
         nonempty(a.render.captionsUrl) &&
         nonempty(a.render.transcriptUrl), 'RENDER_DELIVERY_ASSETS_REQUIRED');

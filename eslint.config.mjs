@@ -101,6 +101,7 @@ export default tseslint.config(
       '.archive/**',
       'archive/**',
       '.next/**',
+      '**/.next/**',
       'deployment-ready/**',
       'supabase/functions/**',
       'workers/**',

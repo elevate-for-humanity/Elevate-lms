@@ -44,6 +44,21 @@ export function sourceTeaching(sources: Source[], title: string) {
       const sections = experience.readingGuide?.sections;
       // HTML is the complete canonical teaching body; the reading guide may be
       // an abbreviated summary, so it must not replace the actual lesson.
+      // Recover authored procedures and safety sections from canonical HTML.
+      // Keeping all HTML only in the explanation silently replaced the actual
+      // demonstration with a generic "work through a decision" instruction.
+      const html = typeof payload.html === 'string' ? payload.html : '';
+      const headings = [...html.matchAll(/<h[1-6]\b[^>]*>([\s\S]*?)<\/h[1-6]>/gi)];
+      for (let i = 0; i < headings.length; i++) {
+        const heading = spokenText(headings[i][1]);
+        const start = headings[i].index! + headings[i][0].length;
+        const section = spokenText(html.slice(start, headings[i + 1]?.index ?? html.length));
+        if (!section) continue;
+        if (/procedure|demonstration|step.by.step|visual cues/i.test(heading)) procedure.push(section);
+        else if (/safety|sanitation|disinfection|contraindication|failure|mistake|correction/i.test(heading)) safety.push(section);
+        else if (/tools|equipment|materials|terminology/i.test(heading)) terminology.push(section);
+        else if (/worked example|case study|client assessment/i.test(heading)) examples.push(section);
+      }
       const body = spokenText(payload.html);
       if (body) teaching.push(body);
       else if (Array.isArray(sections))
@@ -115,7 +130,7 @@ export function sourceTeaching(sources: Source[], title: string) {
     remediation: `If your answer differed from the explanation, return to that part of the lesson. Explain the reason for the correct answer, work through another example with your instructor, and attempt a different question.`,
     recap: clean(recap) || `You have worked through ${title}, practiced applying it, and checked your response. Explain the steps and the reasons for your decisions. Use the lesson to check any point you cannot yet explain.`,
   };
-  return { stageText, questions, precautions, sequence: ULTIMATE_TEACHING_SEQUENCE };
+  return { stageText, questions, precautions, procedureEvidence: steps, sequence: ULTIMATE_TEACHING_SEQUENCE };
 }
 // Keep source sentences intact while bounding individual narration/ASR work.
 export function narrationChunks(text: string, maximumWords = 160): string[] {

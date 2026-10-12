@@ -1,6 +1,7 @@
 import 'server-only';
 import { assertCompleteLesson, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/lesson-contract';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { renderPlaybackUrl } from '../media/playback-source.mjs';
 const slug = (v: string) =>
   v
     .toLowerCase()
@@ -63,7 +64,7 @@ export class UltimateReleaseService {
           assessment: a.assessment_alignment?.assessment ?? a.assessment_alignment ?? {},
           remediation: a.selective_repair ?? {},
           traceability: a.credential_release?.release?.rows ?? [],
-          videoUrl: r.videoUrl ?? r.outputPath ?? null,
+          videoUrl: renderPlaybackUrl(r),
           script: a.instructor_script?.script?.script ?? null,
           segments: a.instructor_script?.script?.segments ?? [],
           timeline: a.synchronization?.timeline,
@@ -351,7 +352,7 @@ export class UltimateReleaseService {
     // delivered-MP4 inspection and the learner runthrough.
     assertCompleteLesson(l.contractArtifacts, p.profile);
     const film = l.contractArtifacts.lesson_film_render.render;
-    if (film.videoUrl !== l.videoUrl) throw new Error('ULTIMATE_RELEASE_FILM_MISMATCH');
+    if (renderPlaybackUrl(film) !== l.videoUrl) throw new Error('ULTIMATE_RELEASE_FILM_MISMATCH');
     const { data: existing, error: lookupError } = await this.db.from('video_jobs')
       .select('id,status,lease_expires_at')
       .eq('course_id', p.courseId).eq('lesson_id', lessonId)
@@ -363,7 +364,7 @@ export class UltimateReleaseService {
     const media = {
       course_id: p.courseId, lesson_id: lessonId, lesson_title: l.title,
       asset_kind: 'lesson', asset_key: null, status: 'complete',
-      provider: film.provider ?? 'remotion', video_url: film.videoUrl,
+      provider: film.provider ?? 'remotion', video_url: renderPlaybackUrl(film),
       script: l.script, scene_data: l.storyboard,
       duration_seconds: Math.ceil(film.duration),
       scene_count: l.storyboard?.scenes?.length ?? l.segments.length,

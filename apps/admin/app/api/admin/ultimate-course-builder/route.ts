@@ -8,6 +8,7 @@ import { UltimateJobQueue } from '@/lib/ultimate-course-builder/worker/job-queue
 import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
+import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/instructional/google-lesson-author';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -218,7 +219,12 @@ export async function POST(req: NextRequest) {
       audience: String(body.audience || ''),
       state: String(body.state || ''),
     });
-    const profile = { ...generatedProfile, mediaAcquisitionOwnerId: auth.id };
+    const authoring = body.instructionalAuthoring;
+    if (authoring && (authoring.provider !== 'google' || !/^gemini-[a-z0-9.-]+$/.test(authoring.model || '')))
+      return NextResponse.json({error:'Google authoring requires an explicitly selected Gemini model'}, {status:400});
+    const profile = { ...generatedProfile, mediaAcquisitionOwnerId: auth.id,
+      ...(authoring ? {instructionalAuthoring:{provider:'google' as const, model:authoring.model, version:GOOGLE_LESSON_AUTHOR_VERSION}} : {}),
+    };
 
     const { data: activeBuild, error: activeError } = await db
       .from('ultimate_course_builds')
@@ -229,6 +235,8 @@ export async function POST(req: NextRequest) {
       .limit(1)
       .maybeSingle();
     if (activeError) throw activeError;
+    if (activeBuild && authoring && JSON.stringify((activeBuild.profile as any)?.instructionalAuthoring) !== JSON.stringify(profile.instructionalAuthoring))
+      return NextResponse.json({error:'The active build has different locked authoring inputs. Preserve it and use a separate acceptance build.'}, {status:409});
 
     let build = activeBuild;
     if (!build) {

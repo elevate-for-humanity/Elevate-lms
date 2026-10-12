@@ -10,6 +10,7 @@ import LessonProgressClient from './LessonProgressClient';
 import LessonFocusShell from '@/components/lms/LessonFocusShell';
 import InteractiveVideoPlayer, { type Checkpoint } from '@/components/lms/InteractiveVideoPlayer';
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
+import { managedLessonPlaybackUrl } from '@/lib/storage/lesson-playback';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -331,7 +332,7 @@ export default async function LessonPage({
             </summary>
             <div className="border-t border-cyan-100 p-3">
               <InteractiveVideoPlayer
-                videoUrl={lesson.video_url}
+                videoUrl={managedLessonPlaybackUrl(lesson.video_url, course.id, lesson.id)}
                 title={lesson.title}
                 lessonId={lesson.id}
                 courseId={course.id}

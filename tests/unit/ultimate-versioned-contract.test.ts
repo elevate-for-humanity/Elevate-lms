@@ -42,7 +42,7 @@ describe('versioned lesson contract', () => {
       validateStepOutput('finished_media_qa', { mediaQA: { pass: true, distinctShots: 7 } }),
     ).toContain('ENCODED_MP4_INSPECTION_REQUIRED');
     expect(validateStepOutput('learning_objectives', { objectives: [] })).toContain(
-      'OBJECTIVE_SOURCE_MAPPING_REQUIRED',
+      'OBJECTIVE_EVIDENCE_MAPPING_REQUIRED',
     );
     expect(validateStepOutput('learner_runthrough', { learnerQA: { pass: true } })).toContain(
       'BROWSER_RUNTHROUGH_REQUIRED',
@@ -57,7 +57,7 @@ describe('versioned lesson contract', () => {
       prerequisites: downstream,
     }).run(c);
     expect(downstream).not.toHaveBeenCalled();
-    expect(c.findings.some((f) => f.code === 'OBJECTIVE_SOURCE_MAPPING_REQUIRED')).toBe(true);
+    expect(c.findings.some((f) => f.code === 'OBJECTIVE_EVIDENCE_MAPPING_REQUIRED')).toBe(true);
   });
   it('error findings block even if a handler claims passed', async () => {
     const downstream = vi.fn();

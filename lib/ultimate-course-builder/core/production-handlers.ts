@@ -11,6 +11,7 @@ import { auditTraceability, type TraceabilityRow } from '../release/traceability
 import { evaluateAccessibility } from '../accessibility/accessibility-contract';
 import { executableRepairTargets, type CourseRepairPlan } from '../repair/course-repair-plan';
 import { instructionalDepthFor } from '../instructional/depth-contract';
+import { renderPlaybackUrl } from '../media/playback-source.mjs';
 const comp = (ctx: any) =>
   ctx.profile.competencies.find((c: any) => String(ctx.buildId).endsWith(':' + c.id)) ??
   ctx.profile.competencies[0];
@@ -290,7 +291,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
           artifacts: { mediaQA: { pass: false, failures: quality.failures } },
         };
       const inspection = await enforceMediaQuality({
-        videoUrl: render.videoUrl,
+        videoUrl: renderPlaybackUrl(render),
         expectedDurationSeconds: render.duration,
         expectedSceneCount: render.sceneData.scenes.length,
         sceneData: render.sceneData,
@@ -338,7 +339,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       const render: any = ctx.artifacts.lesson_film_render?.render;
       const inspection: any = (ctx.artifacts.finished_media_qa as any)?.mediaQA?.inspection;
       const metrics = await analyzeNarrationAudio({
-        audioUrl: render.videoUrl,
+        audioUrl: renderPlaybackUrl(render),
         transcript: inspection.actualTranscript,
         deliveredMp4: true,
       });
@@ -356,7 +357,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
         lessonBuildId: ctx.lessonBuildId ?? '',
         courseId: ctx.courseId,
         lessonId: String(comp(ctx).id),
-        videoUrl: render.videoUrl,
+        videoUrl: renderPlaybackUrl(render),
       });
       const results: any = (learnerRuntimeEvidence.evidence as any).results ?? {};
       const learnerQA = { ...evaluateLearnerRunthrough(results), results };

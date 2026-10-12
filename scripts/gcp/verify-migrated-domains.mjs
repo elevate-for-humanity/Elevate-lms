@@ -38,10 +38,22 @@ for (const host of hosts) {
   }
 }
 try {
-  const res = await fetch('https://app.elevateforhumanity.org/program-holder/dashboard?audit=' + Date.now(), { redirect: 'manual', headers: { 'Cache-Control': 'no-cache, no-store', Pragma: 'no-cache' }, signal: AbortSignal.timeout(12000) });
+  const audit = String(Date.now());
+  const res = await fetch('https://app.elevateforhumanity.org/program-holder/dashboard?audit=' + audit, { redirect: 'manual', headers: { 'Cache-Control': 'no-cache, no-store', Pragma: 'no-cache' }, signal: AbortSignal.timeout(12000) });
   const location = res.headers.get('location') || '';
   const parsed = new URL(location, 'https://app.elevateforhumanity.org');
-  check('PROGRAM_HOLDER_LOGIN_REDIRECT', 'app.elevateforhumanity.org', [302,303,307,308].includes(res.status) && parsed.origin === 'https://app.elevateforhumanity.org' && parsed.pathname === '/login' && parsed.searchParams.get('redirect') === '/program-holder/dashboard', { status: res.status, location: location.slice(0, 150) });
+  const redirectedTo = parsed.searchParams.get('redirect') || '';
+  // The dashboard guard may preserve the cache-busting query inside the
+  // encoded login destination. Require the exact same-origin route and reject
+  // unrelated query parameters, fragments and external redirect destinations.
+  const destination = redirectedTo.startsWith('/') && !redirectedTo.startsWith('//')
+    ? new URL(redirectedTo, parsed.origin) : null;
+  const validDestination = destination?.origin === parsed.origin
+    && destination.pathname === '/program-holder/dashboard'
+    && !destination.hash
+    && (destination.searchParams.size === 0
+      || (destination.searchParams.size === 1 && destination.searchParams.get('audit') === audit));
+  check('PROGRAM_HOLDER_LOGIN_REDIRECT', 'app.elevateforhumanity.org', [302,303,307,308].includes(res.status) && parsed.origin === 'https://app.elevateforhumanity.org' && parsed.pathname === '/login' && validDestination, { status: res.status, location: location.slice(0, 150) });
   await res.body?.cancel();
 } catch (e) { check('PROGRAM_HOLDER_LOGIN_REDIRECT', 'app.elevateforhumanity.org', false, { error: e.cause?.code || e.code || 'PROBE_FAILED' }); }
 const pass = record.every(c => c.status === 'PASS');

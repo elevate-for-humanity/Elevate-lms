@@ -5,7 +5,13 @@ import assert from 'node:assert/strict';
 
 // Exercise the route's HTTP contract with database failures at each boundary.
 const path = process.argv[2] || 'app/api/tax/returns/calculate/route.ts';
-const source = stripTypeScriptTypes(readFileSync(path, 'utf8').replace(/^import .*;\s*$/gm, '').replace('export async function POST', 'async function POST'));
+const routeSource = readFileSync(path, 'utf8');
+// The isolated VM evaluates the POST implementation, not Next.js route metadata.
+// Keep this narrow: any unexpected export must still fail the contract tests.
+const source = stripTypeScriptTypes(routeSource
+  .replace(/^import .*;\s*$/gm, '')
+  .replace(/^export const (?:dynamic|runtime)\s*=\s*['"][^'"]+['"];\s*$/gm, '')
+  .replace('export async function POST', 'async function POST'));
 async function invoke(fault, malformed = false) {
   const writes = [];
   const db = { auth: { getUser: async () => ({ data: { user: { id: 'owner' } } }) }, from(table) {

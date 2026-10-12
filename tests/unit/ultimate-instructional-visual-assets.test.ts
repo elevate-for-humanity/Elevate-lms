@@ -72,6 +72,6 @@ describe('materialized instructional assets', () => {
     );
   });
   it('cannot approve a placeholder instructional ID without an uploaded image', () => {
-    expect(() => prepareUltimateStoryboardInput(input())).toThrow('VISUALS_REQUIRED');
+    expect(() => prepareUltimateStoryboardInput(input())).toThrow('ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED');
   });
 });

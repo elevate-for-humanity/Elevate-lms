@@ -18,6 +18,13 @@ accuracy, demonstration specificity, practice progression and assessment alignme
 The source hash and reviewed blueprint hash persist with the artifact. Changes
 invalidate authoring evidence. No generic fallback is used if Google authoring fails.
 
+Uncovered scenes can use source-bound instructional graphics for conceptual
+teaching. Required physical demonstrations, guided and independent practice,
+and mistake corrections cannot substitute graphics for video. Missing verified
+footage produces a durable acquisition dependency. The renderer also rejects
+old checkpointed graphics in these scenes. Assets sharing an item, bytes or
+stored file are grouped as one source during distinct scene assignment.
+
 Objectives, narration, storyboard, activities and assessments derive from that
 blueprint. Authoring does not approve licenses, finished videos, learner mastery,
 publication or credentials. The existing twenty-stage production engine, Supabase

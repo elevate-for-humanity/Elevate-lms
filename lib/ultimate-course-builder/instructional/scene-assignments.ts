@@ -6,7 +6,7 @@ import { compatibleVisualTask, reviewedSceneEvidence } from './reviewed-scene-ev
  * Automatic assignment never treats a title alone as proof: the asset must
  * have entitlement/license evidence and either explicit reviewed coverage or
  * a persisted lesson match with positive semantic overlap to the scene. */
-export function buildSceneAssignments(scenes: any[], assets: any[], configured: any[] = []) {
+export function buildSceneAssignments(scenes: any[], assets: any[], configured: any[] = [], options: {requiresPracticalEvidence?: boolean} = {}) {
   const assignments: any[] = [];
   const gaps: any[] = [];
 
@@ -51,12 +51,22 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
   // Separate records do not establish separate shots. Prefer verified bytes,
   // then the stored object, then the file URL without its expiring signature.
   // Truly distinct attached segments retain their own object paths/hashes.
-  const identity = (asset: any) =>
-    asset.content_sha256
-      ? `hash:${asset.content_sha256}`
-      : asset.storage_path
-        ? `object:${asset.storage_path}`
-        : `url:${String(asset.public_url).split(/[?#]/)[0]}`;
+  const parents = candidates.map((_, index) => index);
+  const root = (index: number): number => parents[index] === index ? index : (parents[index] = root(parents[index]));
+  const keys = new Map<string, number>();
+  candidates.forEach((asset, index) => {
+    for (const key of [asset.provider_item_id && `item:${asset.provider_item_id}`,
+      asset.content_sha256 && `hash:${asset.content_sha256}`, asset.storage_path && `object:${asset.storage_path}`,
+      `url:${String(asset.public_url).split(/[?#]/)[0]}`].filter(Boolean) as string[]) {
+      const existing = keys.get(key);
+      if (existing !== undefined) parents[root(index)] = root(existing);
+      else keys.set(key, index);
+    }
+  });
+  const identity = (asset: any) => `source:${root(candidates.indexOf(asset))}`;
+  const physicalScene = (scene: any) => options.requiresPracticalEvidence !== false &&
+    [scene.stage, scene.title, scene.sceneType, scene.scene_type].some(value =>
+      /^(demonstration|guided_practice|independent_practice|mistake_and_correction|mistake and correction)$/.test(String(value ?? '').trim().toLowerCase()));
   const choices = scenes.map((scene) => {
     const explicit = configured.find((a) => a.sceneId === scene.id);
     const requirement = String(scene.visualRequirement ?? '')
@@ -87,7 +97,7 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
           reason = `Inspected source shows ${visualEvidence.matchedActions.join('; ')}. ` +
             `This supports the scene's contextual visual task through compatible action coverage. ${visualEvidence.scope}`;
           method = 'reviewed-action-coverage';
-        } else if (asset.lesson_match_verified === true && !asset.visual_observation) {
+        } else if (asset.lesson_match_verified === true && !asset.visual_observation && !physicalScene(scene)) {
           // A failed inspected-action comparison must not fall back to a weaker
           // lesson keyword match (including a demonstration or stale hash).
           const evidence = overlapEvidence(scene, asset);
@@ -132,9 +142,13 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
   for (const [index, scene] of scenes.entries()) {
     const choice = selected.get(index);
     if (!choice) {
-      // Instructional stages do not require stock footage to be valid. Preserve
-      // licensed B-roll where relevance is proven, and self-heal uncovered
-      // scenes with deterministic renderer-owned instructional visuals.
+      if (physicalScene(scene) || !scene.teachingVisual?.steps?.length) {
+        gaps.push({sceneId:scene.id, visualRequirement:scene.visualRequirement,
+          reason: 'No distinct licensed asset has verified lesson/scene relevance evidence', licensedAssetCount:candidates.length});
+        continue;
+      }
+      // Source-derived graphics support conceptual teaching. They cannot stand
+      // in for required observable physical techniques.
       assignments.push({
         sceneId: scene.id,
         assetId: `instructional:${scene.id}`,

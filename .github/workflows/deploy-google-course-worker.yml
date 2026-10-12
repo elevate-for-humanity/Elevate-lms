@@ -112,3 +112,7 @@ jobs:
       - name: Record deployment boundary
         run: |
           echo 'Exact CPU worker image deployed and dispatcher invoked. Course completion still requires persisted lesson and learner acceptance evidence.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Read worker resource and failure evidence without exposing credentials
+        run: |
+          node --test scripts/gcp/audit-course-production.test.mjs
+          node scripts/gcp/audit-course-production.mjs

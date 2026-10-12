@@ -1,0 +1,117 @@
+{
+  "course_id": "2c723bfa-8c40-4acc-b961-98d917710ffc",
+  "lesson_id": "320aed93-7e5e-49cc-911b-0001399d8e2f",
+  "video_job_id": "1611e77d-8744-4152-98e1-34e637701d62",
+  "title": "Trim Client Hair",
+  "state": "repair_blueprint_only_not_rendered_or_published",
+  "instructional_mode": "hands_on_demonstration",
+  "requirements": {
+    "show_real_cutting": true,
+    "continuity": true,
+    "voice_tracks_visible_actions": true,
+    "close_up_blade_and_hand_position": true,
+    "licensed_footage_required": true,
+    "large_legible_overlays": true,
+    "keep_usable_intro": true,
+    "no_generic_broll_substitution": true,
+    "quiz_after_video": true,
+    "never_auto_approve": true
+  },
+  "steps": [
+    {
+      "title": "Client consultation and safe setup",
+      "demonstration": "Ask desired length, assess hair, drape and sanitize tools; demonstrate clean blades and setup."
+    },
+    {
+      "title": "Blades and clipper guards",
+      "demonstration": "Show guarded and unguarded clipper blades, guard sizes, attachment and safe blade checks on camera; explain what each changes."
+    },
+    {
+      "title": "Grip, angles, direction, pressure",
+      "demonstration": "Close-up of hand holding the clipper, blade-to-hair relationship, cutting direction, controlled pressure and safe motion."
+    },
+    {
+      "title": "Cut hair in a continuous pass",
+      "demonstration": "Show the barber making a sustained, uninterrupted actual cutting pass from start to result, narrating the visible motion."
+    },
+    {
+      "title": "Guard progression and blending",
+      "demonstration": "Demonstrate successive guards, lever adjustments when relevant, and actual visible blending on the same haircut."
+    },
+    {
+      "title": "Clipper-over-comb and scissor-over-comb",
+      "demonstration": "Close-up of hand, comb, blades/scissors; visibly remove hair while describing coordination and safety."
+    },
+    {
+      "title": "Outline and refine",
+      "demonstration": "Demonstrate safe edging and detail work, then show symmetry and balance checks."
+    },
+    {
+      "title": "Sanitize and evaluate result",
+      "demonstration": "Show finished haircut, cleanup, blade care and disinfection following product directions."
+    }
+  ],
+  "assessment": {
+    "after_video": true,
+    "type": "multiple_choice",
+    "passing_percent": 80,
+    "feedback_per_question": true,
+    "questions": [
+      {
+        "question": "Before using a clipper guard, what should the barber verify?",
+        "options": [
+          "That it is firmly seated and the blade is clean and safe",
+          "That the clipper is at maximum speed",
+          "That the client’s hair is wet in every case",
+          "That the blade is pressed flat against bare skin"
+        ],
+        "correct_index": 0,
+        "explanation": "A secure guard and properly maintained blade reduce unintended cutting and safety risks."
+      },
+      {
+        "question": "Why begin with a longer guard when the requested length is uncertain?",
+        "options": [
+          "It always makes a closer fade",
+          "It reduces the risk of removing too much hair",
+          "It replaces client consultation",
+          "It eliminates the need to blend"
+        ],
+        "correct_index": 1,
+        "explanation": "Starting conservatively allows length to be reduced intentionally."
+      },
+      {
+        "question": "What must students see during the main demonstration?",
+        "options": [
+          "Only a barber shop montage",
+          "A close-up of a clipper box",
+          "A sustained cutting pass showing hand placement, clipper motion and hair being removed",
+          "Only text explaining blade sizes"
+        ],
+        "correct_index": 2,
+        "explanation": "The core skill must be visibly demonstrated rather than narrated over unrelated footage."
+      },
+      {
+        "question": "What is the purpose of clipper-over-comb?",
+        "options": [
+          "To disinfect scissors",
+          "To control hair length and blending using the comb as a guide",
+          "To avoid using guards on every haircut",
+          "To replace client instructions"
+        ],
+        "correct_index": 1,
+        "explanation": "The comb presents and controls hair to be trimmed, supporting controlled blending."
+      },
+      {
+        "question": "What should happen after finishing the cut?",
+        "options": [
+          "Immediately reuse tools",
+          "Skip checking symmetry",
+          "Check the result with the client and clean/disinfect tools according to product instructions",
+          "Turn off the camera before evaluating the cut"
+        ],
+        "correct_index": 2,
+        "explanation": "Quality checks and infection-control procedures complete the service."
+      }
+    ]
+  }
+}

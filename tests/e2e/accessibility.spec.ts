@@ -124,7 +124,11 @@ test.describe('Accessibility - WCAG 2.2 AA public journeys', () => {
 
   test('apply form controls have programmatic labels', async ({ page }) => {
     await page.goto('/apply');
-    await page.waitForLoadState('domcontentloaded');
+    // /apply redirects through /apply/student to the canonical PARIS intake.
+    // Wait for that route to settle before evaluating DOM nodes, otherwise
+    // navigation can destroy the evaluation context mid-assertion.
+    await expect(page).toHaveURL(/\/apply\/student\/interview(?:\?|$)/);
+    await expect(page.locator('main').first()).toBeVisible();
 
     const unlabeledControls = await page
       .locator('main input:not([type="hidden"]), main select, main textarea')

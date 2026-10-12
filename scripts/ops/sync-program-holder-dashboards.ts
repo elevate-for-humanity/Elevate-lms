@@ -5,7 +5,7 @@
  *   pnpm tsx --env-file=.env.local scripts/ops/sync-program-holder-dashboards.ts
  *   pnpm tsx --env-file=.env.local scripts/ops/sync-program-holder-dashboards.ts --dry-run
  */
-import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { pathToFileURL } from 'node:url';
 
 const DRY_RUN = process.argv.includes('--dry-run');
@@ -60,12 +60,6 @@ const HOLDER_PROGRAMS: Record<string, string[]> = {
   ],
 };
 
-const PRESTIGE_PARTNER = {
-  email: 'info@prestigeelevation.com',
-  partnerId: '9dffa854-1002-42e7-bad3-a8d626326d6e',
-  name: 'Elizabeth L. Greene',
-};
-
 export async function syncProgramHolderDashboards(db: SupabaseClient, dryRun = false) {
   const allSlugs = [...new Set(Object.values(HOLDER_PROGRAMS).flatMap(canonicalProgramSlugs))];
   const { data: programs } = await db.from('programs').select('id, slug').in('slug', allSlugs).throwOnError();
@@ -77,11 +71,16 @@ export async function syncProgramHolderDashboards(db: SupabaseClient, dryRun = f
     const slugs = canonicalProgramSlugs(configuredSlugs);
     const { data: holder } = await db
       .from('program_holders')
-      .select('id, organization_name')
+      .select('id, organization_name, status')
       .eq('contact_email', email)
       .maybeSingle().throwOnError();
     if (!holder) {
       console.warn(`Skip ${email} — no program_holders row`);
+      continue;
+    }
+
+    if (!['active', 'approved', 'approved_pending_mou'].includes(holder.status)) {
+      console.info(`Skip ${holder.organization_name} — holder is ${holder.status}`);
       continue;
     }
 
@@ -110,54 +109,8 @@ export async function syncProgramHolderDashboards(db: SupabaseClient, dryRun = f
     }
   }
 
-  // Prestige — barber host partner dashboard (Elizabeth Greene)
-  console.info('\n=== Prestige barber partner ===');
-  const { data: prestigeUser } = await db
-    .from('profiles')
-    .select('id, role')
-    .eq('email', PRESTIGE_PARTNER.email)
-    .maybeSingle().throwOnError();
-  let userId = prestigeUser?.id;
-  if (!userId) {
-    const { data: listed, error: listError } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
-    if (listError) throw listError;
-    const users: User[] = listed?.users ?? [];
-    userId = users.find((user) => user.email?.toLowerCase() === PRESTIGE_PARTNER.email)?.id;
-  }
-  if (!userId) {
-    console.warn('Prestige auth user not found');
-  } else if (!dryRun) {
-    await db.from('profiles').upsert(
-      {
-        id: userId,
-        email: PRESTIGE_PARTNER.email,
-        full_name: PRESTIGE_PARTNER.name,
-        role: 'partner',
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'id' },
-    ).throwOnError();
-    const { error: authError } = await db.auth.admin.updateUserById(userId, { app_metadata: { role: 'partner' } });
-    if (authError) throw authError;
-    await db.from('partners').update({ partner_type: 'barber', type: 'barber' }).eq('id', PRESTIGE_PARTNER.partnerId).throwOnError();
-    const { data: existingPu } = await db
-      .from('partner_users')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('partner_id', PRESTIGE_PARTNER.partnerId)
-      .maybeSingle().throwOnError();
-    if (!existingPu) {
-      await db.from('partner_users').insert({
-        user_id: userId,
-        partner_id: PRESTIGE_PARTNER.partnerId,
-        role: 'owner',
-        status: 'active',
-      }).throwOnError();
-    }
-    console.info('✅ Prestige partner wired for', PRESTIGE_PARTNER.email);
-  } else {
-    console.info('[dry-run] Would wire Prestige partner');
-  }
+  // Archived Prestige remains untouched. Holder mapping repair must never
+  // provision partner access or replace an existing administrator role.
 
   // A legacy signed flag is not a digital signature. Report missing evidence;
   // never invent signer data, consent, or a signing timestamp during account repair.

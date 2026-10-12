@@ -86,3 +86,5 @@ jobs:
             google-access-diagnostic.json
           if-no-files-found: error
           retention-days: 14
+
+# Recheck live readiness before retaining Telnyx number routing on the owned PBX.

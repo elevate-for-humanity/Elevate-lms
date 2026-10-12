@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { syncProgramHolderDashboards } from '../../scripts/ops/sync-program-holder-dashboards';
 
-function fixture(failRead = false) {
+function fixture(failRead = false, inactive = false) {
   const writes: string[] = [];
   const db = {
     from(table: string) {
@@ -20,7 +20,7 @@ function fixture(failRead = false) {
         throwOnError: async () => {
           if (failRead) throw new Error('database unavailable');
           if (table === 'programs') return { data: slugs.map(slug => ({ id: slug, slug })) };
-          if (table === 'program_holders') return { data: single ? null : [
+          if (table === 'program_holders') return { data: single ? (inactive ? { id: 'archived-holder', organization_name: 'Archived holder', status: 'inactive' } : null) : [
             { id: 'legacy-holder', user_id: 'legacy-user', contact_email: 'holder@example.test' },
           ] };
           return { data: null };
@@ -34,6 +34,13 @@ function fixture(failRead = false) {
 }
 
 describe('holder repair failure and consent boundaries', () => {
+  it('leaves inactive holders and partner account roles untouched', async () => {
+    const { db, writes } = fixture(false, true);
+    const provision = vi.spyOn(db.auth.admin, 'listUsers');
+    await syncProgramHolderDashboards(db);
+    expect(writes).toEqual([]);
+    expect(provision).not.toHaveBeenCalled();
+  });
   it('rejects a failed catalog read before making any writes', async () => {
     const { db, writes } = fixture(true);
     await expect(syncProgramHolderDashboards(db)).rejects.toThrow('database unavailable');

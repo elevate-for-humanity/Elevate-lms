@@ -1,6 +1,7 @@
 import importlib.util
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 spec=importlib.util.spec_from_file_location('activation',Path(__file__).with_name('activate-private-phone.py'))
 module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
 class GuardTests(unittest.TestCase):
@@ -15,7 +16,7 @@ class GuardTests(unittest.TestCase):
             if args[0]=='docker': return 'true' if args[1]=='inspect' else '0 active calls'
             if args[1]=='show': return 'LoadState=loaded\nActiveState='+('active' if args[2]==module.UNITS[0] else 'inactive')+'\nSubState='+('running' if args[2]==module.UNITS[0] else 'dead')
             return ''
-        with self.assertRaisesRegex(ValueError,'private_services_not_healthy'):
+        with patch.object(module,'prepare_storage'), self.assertRaisesRegex(ValueError,'private_services_not_healthy'):
             module.activate(run=run,probe=lambda *_:False,wait=lambda _:None)
         stopped=[args[2] for args in calls if args[:2]==['systemctl','stop']]
         self.assertEqual(stopped,list(reversed(module.UNITS[1:])))

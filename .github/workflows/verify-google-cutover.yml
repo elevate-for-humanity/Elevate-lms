@@ -7,6 +7,7 @@ on:
       - 'scripts/gcp/verify-google-cutover.mjs'
       - 'scripts/gcp/verify-cutover-state.mjs'
       - 'scripts/gcp/verify-production-dns.mjs'
+      - 'scripts/gcp/verify-migrated-domains.mjs'
   workflow_run:
     workflows: ['Deploy Admin', 'Deploy Google Marketing on trigger', 'Deploy LMS automatically on Google', 'Deploy repaired Google services', 'Deploy Google Store subscription delivery']
     types: [completed]
@@ -93,4 +94,32 @@ jobs:
           name: google-cutover-${{ matrix.component }}-${{ github.run_id }}
           path: google-cutover-${{ matrix.component }}.json
           if-no-files-found: error
+          retention-days: 30
+
+  migrated-domains:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify migrated hostnames and Program Holder redirect
+        run: node scripts/gcp/verify-migrated-domains.mjs
+      - name: Preserve public routing evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: migrated-domains-${{ github.run_id }}
+          path: migrated-domains-verification.json
+          if-no-files-found: warn
           retention-days: 30

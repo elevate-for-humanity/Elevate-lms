@@ -57,7 +57,7 @@ def prepare_storage(run=command):
     if not any(mount.get('Type')=='bind' and mount.get('Source')==str(root.parent) and mount.get('Destination')=='/etc/asterisk' for mount in mounts):
         raise ValueError('asterisk_configuration_mount_unverified')
     dropin = Path('/etc/systemd/system/elevate-pbx-provisioner.service.d/runtime-storage.conf')
-    body = '[Service]\\nReadWritePaths='+expected+'\\n'
+    body = '[Service]\nReadWritePaths='+expected+'\n'
     if dropin.is_symlink() or (dropin.exists() and dropin.read_text()!=body):
         raise ValueError('existing_storage_dropin_requires_review')
     root.mkdir(mode=0o750,exist_ok=True)

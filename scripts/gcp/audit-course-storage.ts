@@ -1,16 +1,23 @@
 import {createHash} from 'node:crypto';
+import {createWriteStream} from 'node:fs';
+import {mkdtemp as tempDirectory,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {pipeline} from 'node:stream/promises';
 import {createClient} from '@supabase/supabase-js';
 import {ListObjectsV2Command,HeadObjectCommand,GetObjectCommand} from '@aws-sdk/client-s3';
 import {getElevateMediaStorageConfig,getElevateMediaStorageClient} from '../../lib/storage/elevate-media-storage';
 
 // Read-only production recovery audit. Never print credentials, signed URLs,
-// raw storage keys, learner data, or raw provider errors.
+// private storage keys, learner data, or raw provider errors. A candidate URL
+// is emitted only for a known lesson identifier and existing public delivery.
 async function main(){
   let input='';for await(const part of process.stdin) input+=part;
   const env=JSON.parse(input).runtimeEnvironment;
   if(!env || typeof env!=='object') throw new Error('RUNTIME_CONFIGURATION_REQUIRED');
   for(const [key,value] of Object.entries(env)) if(typeof value==='string' && /^(ELEVATE_MEDIA_|S3_|R2_|CLOUDFLARE_R2_|AWS_|CLOUDFLARE_ACCOUNT_ID$)/.test(key)) process.env[key]=value;
   const config=getElevateMediaStorageConfig();
+  const deep=process.env.COURSE_MEDIA_DEEP_AUDIT==='true';
   const report:any={purpose:'course-media-recovery-audit',bucket:'elevate-course-media',mediaAcceptanceVerified:false,failures:[]};
   if(config.bucket!==report.bucket || config.provider!=='backblaze-b2' || !config.endpoint ||
       !/^https:\/\/s3\.[a-z0-9-]+\.backblazeb2\.com\/?$/.test(config.endpoint) || !config.accessKeyId || !config.secretAccessKey){
@@ -49,6 +56,15 @@ async function main(){
     for(const object of objects.slice(0,200)){
       const key=object.Key!;
       const reference:any={keySha256:createHash('sha256').update(key).digest('hex'),bytes:object.Size??0};
+      const lessonToken=tokens.find(token=>new RegExp('^(?:course-videos/)?generated-lessons/lesson-'+token+'(?:-[a-z0-9]+)?\\.mp4$','i').test(key));
+      if(lessonToken){
+        reference.lessonToken=lessonToken;
+        try{
+          const base=new URL(config.publicUrl);
+          if(base.protocol==='https:'&&!base.username&&!base.password&&!base.search&&!base.hash)
+            reference.publicDeliveryCandidate=base.href.replace(/\/$/,'')+'/'+key;
+        }catch{/* Private objects remain private; never emit a signed URL. */}
+      }
       try{
         const head=await client.send(new HeadObjectCommand({Bucket:config.bucket,Key:key}));
         reference.bytes=head.ContentLength??reference.bytes;reference.contentType=head.ContentType;
@@ -56,6 +72,18 @@ async function main(){
           const prefix=await client.send(new GetObjectCommand({Bucket:config.bucket,Key:key,Range:'bytes=0-63'}));
           const bytes=await prefix.Body?.transformToByteArray();
           reference.isoBmffHeaderPresent=Boolean(bytes && Buffer.from(bytes).subarray(4,8).toString('ascii')==='ftyp');
+          if(deep && reference.isoBmffHeaderPresent && reference.bytes<=1024*1024*1024){
+            const directory=await tempDirectory(join(tmpdir(),'course-recovery-'));
+            try{
+              const file=join(directory,'candidate.mp4');
+              const download=await client.send(new GetObjectCommand({Bucket:config.bucket,Key:key}),{abortSignal:AbortSignal.timeout(120000)});
+              if(!download.Body) throw new Error('OBJECT_BODY_REQUIRED');
+              await pipeline(download.Body as any,createWriteStream(file));
+              const {inspectCourseMedia}=await import('./inspect-course-media.mjs');
+              reference.technical=await inspectCourseMedia(file);
+            }catch{reference.technicalInspectionStatus='failed';}
+            finally{await rm(directory,{recursive:true,force:true});}
+          }
         }
       }catch(error:any){reference.readStatus=error?.$metadata?.httpStatusCode??'read_failed';}
       report.objects.push(reference);

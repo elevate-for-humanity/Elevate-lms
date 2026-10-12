@@ -21,6 +21,25 @@ permissions:
   actions: write
   id-token: write
 jobs:
+  authoring-access:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Read existing worker authoring access without permission changes
+        run: |
+          node --test scripts/gcp/audit-course-production.test.mjs
+          node scripts/gcp/audit-course-production.mjs
   dispatch:
     if: github.event_name == 'workflow_dispatch' && false
     runs-on: ubuntu-24.04

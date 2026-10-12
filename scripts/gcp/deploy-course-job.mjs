@@ -27,6 +27,17 @@ export function courseJobEnvironment(source, service) {
   return result;
 }
 
+/** Deployment changes the image, not the approved rendering capacity. */
+export function courseJobResources(job) {
+  const limits = job?.spec?.template?.spec?.template?.spec?.containers?.[0]?.resources?.limits;
+  const cpuMatch = String(limits?.cpu ?? '').match(/^(\d+)(m)?$/);
+  const cpu = cpuMatch ? Number(cpuMatch[1]) / (cpuMatch[2] ? 1000 : 1) : NaN;
+  const memory = String(limits?.memory ?? '');
+  if (!Number.isInteger(cpu) || cpu < 1 || cpu > 8 || !/^\d+(?:Mi|Gi)$/.test(memory))
+    throw new Error('Existing worker resource configuration must be inspected before deployment');
+  return {cpu:String(cpu),memory};
+}
+
 async function main() {
   const sha = process.env.IMAGE_SHA;
   if (!/^[a-f0-9]{40}$/.test(sha ?? '')) throw new Error('Full worker image commit required');
@@ -39,6 +50,8 @@ async function main() {
     return r.stdout.trim();
   }
   const image=`us-central1-docker.pkg.dev/${project}/elevate/ultimate-worker`;
+  const before=JSON.parse(gcloud(['run','jobs','describe','elevate-course-builder','--project',project,'--region',region,'--format=json']));
+  const resources=courseJobResources(before);
   const digest=gcloud(['artifacts','docker','images','describe',`${image}:${sha}`,'--project',project,'--format=value(image_summary.digest)']);
   if(!/^sha256:[a-f0-9]{64}$/.test(digest))throw new Error('Uploaded worker digest required');
   const directory=mkdtempSync(join(tmpdir(),'elevate-course-job-'));
@@ -47,12 +60,14 @@ async function main() {
     writeFileSync(environment,JSON.stringify(vars),{mode:0o600});
     gcloud(['run','jobs','deploy','elevate-course-builder','--project',project,'--region',region,
       '--image',`${image}@${digest}`,'--service-account',`elevate-worker-runtime@${project}.iam.gserviceaccount.com`,
-      '--cpu','4','--memory','8Gi','--tasks','1','--parallelism','1','--max-retries','0','--task-timeout','10800s',
+      '--cpu',resources.cpu,'--memory',resources.memory,'--tasks','1','--parallelism','1','--max-retries','0','--task-timeout','10800s',
       '--env-vars-file',environment,'--quiet']);
     const job=JSON.parse(gcloud(['run','jobs','describe','elevate-course-builder','--project',project,'--region',region,'--format=json']));
     const container=job.spec.template.spec.template.spec.containers[0];
+    const afterResources=courseJobResources(job);
     if(job.spec.template.spec.template.spec.serviceAccountName!==`elevate-worker-runtime@${project}.iam.gserviceaccount.com` ||
-      container.image!==`${image}@${digest}` || !container.env.some(v=>v.name==='ULTIMATE_WORKER_ONCE'&&v.value==='true'))
+      container.image!==`${image}@${digest}` || afterResources.cpu!==resources.cpu || afterResources.memory!==resources.memory ||
+      !container.env.some(v=>v.name==='ULTIMATE_WORKER_ONCE'&&v.value==='true'))
       throw new Error('Worker deployment readback mismatch');
     console.log('Finite Course Builder job deployed. No execution or queue mutation performed.');
   } finally {rmSync(directory,{recursive:true,force:true});}

@@ -42,17 +42,17 @@ export default function TaxSoftwarePage() {
   return (
     <TaxSiteShell>
       <main>
-        <section className="bg-[#f1f6ff] px-5 py-9 sm:p-10">
+        <section className="bg-[#073ca2] px-5 py-9 text-white sm:p-10">
           <div className="grid items-center gap-7 xl:grid-cols-2">
             <div>
-              <p className="text-sm font-bold uppercase tracking-wider text-[#073ca2]">
+              <p className="text-sm font-bold uppercase tracking-wider text-white">
                 Supersonic Fast Cash
               </p>
               <h1 className="mt-4 text-4xl font-black leading-tight tracking-tight sm:text-5xl">
                 Get your taxes prepared.
-                <span className="mt-2 block text-[#073ca2]">Build your next chapter.</span>
+                <span className="mt-2 block text-white">Build your next chapter.</span>
               </h1>
-              <p className="mt-5 text-lg leading-7 text-slate-700">
+              <p className="mt-5 text-lg leading-7 text-white">
                 Do it yourself, hire a professional, or start your own tax business. Choose the
                 option that fits you.
               </p>
@@ -67,7 +67,7 @@ export default function TaxSoftwarePage() {
                 fill
                 priority
                 sizes="(min-width: 1280px) 450px, 100vw"
-                className="object-cover"
+                className="object-cover contrast-[1.1] saturate-[1.18]"
               />
             </div>
           </div>
@@ -78,7 +78,7 @@ export default function TaxSoftwarePage() {
             {choices.map((c) => (
               <article
                 key={c.title}
-                className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                className="flex flex-col rounded-2xl border border-blue-200 border-t-4 border-t-[#073ca2] bg-white p-6 shadow-md"
               >
                 <p className="text-xs font-bold tracking-wide text-[#073ca2]">{c.label}</p>
                 <h3 className="mt-3 text-2xl font-bold leading-tight">{c.title}</h3>

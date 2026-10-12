@@ -34,7 +34,7 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <div className="mx-auto grid max-w-7xl lg:grid-cols-[230px_minmax(0,1fr)]">
-        <aside className="border-b border-slate-200 bg-slate-50 p-5 lg:border-b-0 lg:border-r">
+        <aside className="border-b border-slate-200 bg-[#e7efff] p-5 lg:border-b-0 lg:border-r">
           <details open className="lg:sticky lg:top-5">
             <summary className="cursor-pointer text-sm font-bold text-[#073ca2]">
               Your tax options
@@ -47,7 +47,7 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
                 <Link
                   key={href}
                   href={href}
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold leading-5 hover:border-blue-400 hover:text-[#073ca2]"
+                  className="rounded-xl border border-blue-200 bg-white px-4 py-3 text-sm font-semibold leading-5 hover:border-blue-400 hover:text-[#073ca2]"
                 >
                   {label}
                 </Link>

@@ -11,15 +11,15 @@ export default function ProfessionalPage() {
   return (
     <TaxSiteShell>
       <main>
-        <section className="grid items-center gap-7 bg-[#f1f6ff] px-5 py-10 sm:p-10 xl:grid-cols-2">
+        <section className="grid items-center gap-7 bg-[#073ca2] text-white px-5 py-10 sm:p-10 xl:grid-cols-2">
           <div>
-            <p className="text-sm font-bold uppercase tracking-wide text-[#073ca2]">
+            <p className="text-sm font-bold uppercase tracking-wide text-white">
               YOUR NEXT BUSINESS
             </p>
             <h1 className="mt-4 text-4xl font-black leading-tight sm:text-5xl">
               Do you want to start your own tax business?
             </h1>
-            <p className="mt-5 text-lg leading-7 text-slate-700">
+            <p className="mt-5 text-lg leading-7 text-white">
               Turn tax preparation skills into a plan for your own office. Explore training, client
               service and business setup through Supersonic Fast Cash.
             </p>
@@ -34,7 +34,7 @@ export default function ProfessionalPage() {
               fill
               priority
               sizes="(min-width: 1280px) 450px, 100vw"
-              className="object-cover"
+              className="object-cover contrast-[1.1] saturate-[1.18]"
             />
           </div>
         </section>

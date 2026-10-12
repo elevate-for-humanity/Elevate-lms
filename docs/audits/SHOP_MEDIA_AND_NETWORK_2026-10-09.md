@@ -8,7 +8,6 @@
 - The shop upload endpoint only accepted logo, flyer and video, despite marketing copy inviting portfolio uploads.
 - Latest supplied Cal Kutz batch: October 9, 2026, 6:05 AM Eastern; collage uploaded again at 6:10 AM. Prior enhanced promotional designs: September 29, 2026, about 7:22–7:23 PM Eastern. Original Cal photos were supplied September 24, 2026, about 8:30 PM Eastern.
 - Top Shelf's six repository portfolio images were added September 19, 2026. All six current production asset URLs returned HTTP 200.
-- Razor Image: three gallery entries in the database and a repository video. Production video asset returned HTTP 200. Its missing database video URL was repaired.
 - Website voice endpoint returned HTTP 503 during the earlier probe. It is still tied to Cloudflare natural voice. TTS is not repaired by this media change.
 
 ## Implemented source changes
@@ -28,7 +27,7 @@
 - Sent 11 individualized network announcement emails; Gmail returned SENT message IDs for each. Delivery to recipient inboxes is not independently verified.
 - Two shops have pending host-site approval; emails correctly separate community membership from host approval.
 - Test and archived shop records were excluded. Existing approval status and user privacy preferences were preserved.
-- Top Shelf's live gallery now contains all six newer repository photos. Razor Image's live partner record now links its existing video.
+- Top Shelf's live gallery now contains all six newer repository photos.
 
 ## Validation and limits
 

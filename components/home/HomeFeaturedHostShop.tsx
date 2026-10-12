@@ -41,7 +41,7 @@ export function HomeFeaturedHostShop() {
   const seen = new Set<string>();
   const seenImages = new Set<string>();
   const shops = FEATURED_SHOPS.filter((shop) => {
-    if (shop.shopHref.includes('razors-image') || seen.has(shop.shopHref) || seenImages.has(shop.image)) return false;
+    if (seen.has(shop.shopHref) || seenImages.has(shop.image)) return false;
     seen.add(shop.shopHref);
     seenImages.add(shop.image);
     return true;

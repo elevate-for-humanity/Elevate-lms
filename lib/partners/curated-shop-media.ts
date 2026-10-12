@@ -8,19 +8,16 @@ type ShopMedia = { url: string; alt?: string; source?: string };
 export function curateShopGallery(slug: string, items: ShopMedia[]): ShopMedia[] {
   const generations = slug.startsWith('generations');
   const kountry = slug.startsWith('kountry-kutz');
-  const razor = slug.startsWith('razors-image');
   const seen = new Set<string>();
   return items.flatMap((original) => {
     const localUrl = LOCAL_SHOP_MEDIA[original.url];
     const item = localUrl ? { ...original, url: localUrl, source: original.source || original.url } : original;
-    if (item.url === '/images/partners/razors-image-storefront.webp') return [{ ...item, url: '/images/partners/razors-image-storefront-2026.jpg' }];
     if (item.url === '/images/partners/salon-saloon/team-interior.webp') return [{ ...item, url: '/images/partners/salon-saloon/team-interior-enhanced-2026.webp' }];
     if (kountry) {
       const filename = item.url.split('/').at(-1)?.split('?')[0];
       if (filename === 'interior-empty.webp' || filename === 'kountry-kutz-interior.webp') return [{ ...item, url: '/images/partners/kountry-kutz/interior-empty-enhanced-2026.webp' }];
       if (filename === 'interior-active.webp' || filename === 'kountry-kutz-active.webp') return [{ ...item, url: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp' }];
     }
-    if (razor && (item.url.includes('/2020/') || item.url.includes('apprenticeship-flyer') || item.url.includes('video-poster') || item.url.includes('owner-portrait'))) return [];
     if (generations && (item.url.includes('color-transformation.webp') || item.url.includes('dimensional-color.webp'))) return [
       { url: '/images/partners/generations-hair/dimensional-color-before-enhanced-2026.webp', alt: 'Generations Hair client before dimensional color service' },
       { url: '/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp', alt: 'Generations Hair finished dimensional color and styling' },

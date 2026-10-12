@@ -137,6 +137,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="efh-contrast">
         <SkipToContent />
+        <CookieConsent />
         <SupabaseConfigBootstrap />
         <MarketingPwaClient />
         <GoogleAnalytics />
@@ -157,7 +158,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </I18nProvider>
         <MediaPlaybackCoordinator />
         <Suspense fallback={null}><ScrollNarrator /></Suspense>
-        <CookieConsent />
       </body>
     </html>
   );

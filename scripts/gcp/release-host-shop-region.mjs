@@ -14,7 +14,6 @@ async function acceptance(root){
  const health=await request(root+'/api/health',{signal:AbortSignal.timeout(45000)});assert.equal(health.status,200);assert.equal((await health.json()).healthy,true);
  const page=await request(root+'/',{signal:AbortSignal.timeout(45000)});assert.equal(page.status,200);const html=await page.text();
  for(const text of ['Top Shelf Barber Lounge','Grow your team','Join the Host Shop network','bg-sky-50']) assert(html.includes(text),'Missing '+text);
- assert(!html.includes('Razor’s Image Barbershop'));
  for(const path of ['/host-shops/top-shelf-barber-lounge','/partners/host-shops','/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade-enhanced-2026.webp','/images/partners/generations-hair/stylist-at-work-enhanced-2026.webp']){const r=await request(root+path,{signal:AbortSignal.timeout(45000)});assert.equal(r.status,200,path);}
  const privateRoute=await request(root+'/api/tax/returns',{signal:AbortSignal.timeout(30000)});assert.equal(privateRoute.status,401,'Private tax API must retain authentication');
 }

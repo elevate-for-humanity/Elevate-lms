@@ -198,8 +198,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'A traditional New Castle barbershop known for classic barber services including haircuts, razor line-ups, fades, and straight-razor shaves.',
     media: [
       {
-        src: '/images/pages/barber-shop-interior.webp',
-        alt: 'Representative barber training environment; not a photograph of B-52s',
+        src: '/images/partners/b52s-official.webp',
+        alt: 'B-52s Barbershop published shop and haircut portfolio',
         kind: 'photo',
       },
     ],

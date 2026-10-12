@@ -88,6 +88,13 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
       ...(shop.logoUrl ? [{ url: shop.logoUrl, alt: `${shop.name} official business image` }] : []),
       ...(shop.flyerUrl ? [{ url: shop.flyerUrl, alt: `${shop.name} official announcement` }] : []),
     ]);
+    // Lead with the shop's current curated photography, retaining its full portfolio.
+    const preferredPhoto = featured?.slug === 'cals-kutz-studio'
+      ? '/images/partners/cals-kutz/storefront-enhanced-2026.webp'
+      : featured?.slug === 'top-shelf-barber-lounge'
+        ? '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe-enhanced-2026.webp'
+        : featured?.slug === 'b-52s-barber-shop' ? '/images/partners/b52s-official.webp' : undefined;
+    if (preferredPhoto) gallery.sort((a, b) => Number(b.url === preferredPhoto) - Number(a.url === preferredPhoto));
     return {
       id: shop.id,
       slug: featured?.slug ?? shop.publicSlug!,

@@ -5,7 +5,6 @@
       "file": "public/images/hero-poster.webp",
       "error": "cannot identify image file 'public/images/hero-poster.webp'",
       "referenced_by": [],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -78,7 +77,6 @@
         "components/home/SuccessStoriesGallery.tsx",
         "components/TestimonialCarousel.tsx"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -88,7 +86,6 @@
         "components/home/SuccessStoriesGallery.tsx",
         "components/TestimonialCarousel.tsx"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -98,7 +95,6 @@
         "components/home/SuccessStoriesGallery.tsx",
         "components/TestimonialCarousel.tsx"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -108,24 +104,12 @@
         "components/home/SuccessStoriesGallery.tsx",
         "components/TestimonialCarousel.tsx"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
-    },
-    {
-      "file": "public/images/partners/razors-image-storefront.webp",
-      "error": "could not create decoder object",
-      "referenced_by": [
-        "lib/partners/curated-shop-media.ts",
-        "lib/media/verified-image-aliases.mjs"
-      ],
-      "verified_alias": "/images/partners/razors-image-storefront-2026.jpg",
-      "classification": "existing canonical alias"
     },
     {
       "file": "public/images/partners/microsoft-logo.png",
       "error": "broken data stream when reading image file",
       "referenced_by": [],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -143,7 +127,6 @@
       "referenced_by": [
         "lib/programs/og-images.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -152,7 +135,6 @@
       "referenced_by": [
         "lib/programs/og-images.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -183,7 +165,6 @@
       "referenced_by": [
         "lib/programs/og-images.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -192,14 +173,12 @@
       "referenced_by": [
         "components/home/GraduateTestimonials.tsx"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
       "file": "public/images/testimonials/marcus.jpg",
       "error": "broken data stream when reading image file",
       "referenced_by": [],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -208,7 +187,6 @@
       "referenced_by": [
         "components/home/GraduateTestimonials.tsx"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -217,7 +195,6 @@
       "referenced_by": [
         "components/home/GraduateTestimonials.tsx"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -226,7 +203,6 @@
       "referenced_by": [
         "components/home/GraduateTestimonials.tsx"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -236,7 +212,6 @@
         "components/home/GraduateTestimonials.tsx",
         "components/home/SuccessStoriesGallery.tsx"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -323,7 +298,6 @@
       "referenced_by": [
         "lib/curriculum/blueprints/electrical.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -332,7 +306,6 @@
       "referenced_by": [
         "lib/curriculum/blueprints/cdl-training.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -341,7 +314,6 @@
       "referenced_by": [
         "lib/video/remotion-render.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -350,7 +322,6 @@
       "referenced_by": [
         "lib/curriculum/blueprints/medical-assistant.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -359,7 +330,6 @@
       "referenced_by": [
         "lib/video/remotion-render.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -369,7 +339,6 @@
         "lib/curriculum/blueprints/retail-industry-fundamentals.ts",
         "lib/curriculum/blueprints/entrepreneurship.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -378,7 +347,6 @@
       "referenced_by": [
         "lib/curriculum/blueprints/it-help-desk.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -387,7 +355,6 @@
       "referenced_by": [
         "lib/curriculum/blueprints/plumbing.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -396,7 +363,6 @@
       "referenced_by": [
         "lib/curriculum/blueprints/welding.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -405,7 +371,6 @@
       "referenced_by": [
         "lib/curriculum/blueprints/cna.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     },
     {
@@ -424,7 +389,6 @@
       "referenced_by": [
         "lib/ai-instructors.ts"
       ],
-      "verified_alias": null,
       "classification": "legacy file requiring source/photo review"
     }
   ],

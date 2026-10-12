@@ -512,7 +512,6 @@ Frequently reused images:
   components/programs/HomepageProgramsTeaser.tsx
   lib/content/archetype-content.ts
   lib/pageVisuals.ts
-- /images/partners/razors-image-logo.jpg: 3 files
   components/programs/beauty/FeaturedHostPartners.tsx
   components/programs/beauty/HostShopShowcase.tsx
   lib/apprenticeship-programs/host-partners.ts

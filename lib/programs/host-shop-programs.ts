@@ -36,12 +36,10 @@ export function normalizeHostShopProgram(value: unknown): string | null {
   return PROGRAM_ALIASES[normalized] ?? null;
 }
 
-
-/** Marketing categories stay separate even when a shop holds multiple approvals. */
-export function matchesHostShopProgram(shop: { programs: string[]; primaryProgram?: string }, programSlug: string) {
-  if (!shop.programs.includes(programSlug)) return false;
-  const primary = shop.primaryProgram ?? shop.programs[0];
-  if (programSlug === PROGRAM_SLUGS.barber) return primary !== PROGRAM_SLUGS.cosmetology;
-  if (programSlug === PROGRAM_SLUGS.cosmetology) return primary !== PROGRAM_SLUGS.barber;
-  return true;
+/** List a business only for its explicitly approved occupations, including dual approvals. */
+export function matchesHostShopProgram(
+  shop: { programs: string[]; primaryProgram?: string },
+  programSlug: string,
+) {
+  return shop.programs.includes(programSlug);
 }

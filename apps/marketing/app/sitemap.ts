@@ -171,7 +171,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...databaseBlogRoutes,
     ...hostShopRoutes,
   ].filter((entry) => {
-    if (/razors?-image|razorsimage/i.test(entry.url)) return false;
     if (seen.has(entry.url)) return false;
     seen.add(entry.url);
     return true;

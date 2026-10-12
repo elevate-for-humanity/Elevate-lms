@@ -5,7 +5,7 @@
 - Standardized oversized hero height settings in Marketing pages and shared templates to clamp(260px,42svh,480px). Source audit oversized findings fell from 49 to 7.
 - Unified relevant homepage, host-shop directory and program image frames at 4:3. The large Cal's Kutz homepage promotion now has the same frame ratio. Portrait artwork and videos are contained rather than distorted.
 - Corrected the mobile responsive guard that replaced h-full media sizing with auto sizing.
-- Added homepage duplicate-image protection alongside existing shop deduplication. The live homepage observed at audit time already omitted Razor's Image and listed Kountry Kutz once; partner records were preserved.
+- Added homepage duplicate-image protection alongside existing shop deduplication. The live homepage observed at audit time listed Kountry Kutz once; partner records were preserved.
 - Connected verified host-shop video scripts to play/pause controls in both database-backed profiles and featured shop showcases. Salon Saloon's full shop-specific script remains visible with the video.
 - Added global generation checks for late natural-voice requests and standalone playback; scrolling respects user-started audible media and narrated tours. Extended the narration text limit to avoid truncating the salon script.
 - Reduced oversized barber tour frames and reorganized the host-shop directory into consistent responsive cards.
@@ -22,7 +22,7 @@
 - Six focused test files: 23 tests passed, covering exclusive natural audio, pending audio cancellation, video/page narration ownership, shop-tour play/pause/resume, shop photo deduplication and media dimensions.
 - Final Marketing production build: passed. Existing Supabase Edge Runtime Node API warnings remain.
 - Public media/navigation source audit: passed its deterministic blocking checks; review warnings remain.
-- Image inventory: 425 references initially; no missing referenced local images detected by the initial size/signature scan. Follow-up full decoding identified two damaged legacy files: razors-image-storefront.webp and microsoft-logo.png. Razor gallery URLs now resolve to its verified 2026 storefront photo; Microsoft display components now use a valid SVG. Thirty groups of identical image binaries were found; these are documented, not all removed. Identical bytes with different program labels require editorial review, not blind file deletion.
+- Image inventory: 425 references initially; no missing referenced local images detected by the initial size/signature scan. Follow-up decoding identified a damaged legacy microsoft-logo.png; Microsoft display components now use a valid SVG. Thirty groups of identical image binaries were found; these are documented, not all removed. Identical bytes with different program labels require editorial review, not blind file deletion.
 - git diff --check: passed.
 
 ## Verification limits and remaining work

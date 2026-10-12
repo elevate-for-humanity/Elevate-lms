@@ -24,10 +24,4 @@ describe('shop portfolio curation', () => {
     expect(gallery[1].alt).toContain('finished');
     expect(gallery[0].url).not.toBe(gallery[1].url);
   });
-  it('hides Razor legacy imports without hiding another shop’s portfolio', () => {
-    const old = { url: 'https://razorsimage.com/wp-content/uploads/2020/10/6.jpg' };
-    const logo = { url: '/images/partners/razors-image-logo.jpg' };
-    expect(curateShopGallery('razors-image-barbershop', [old, logo])).toEqual([logo]);
-    expect(curateShopGallery('other-shop', [old])).toEqual([old]);
-  });
 });

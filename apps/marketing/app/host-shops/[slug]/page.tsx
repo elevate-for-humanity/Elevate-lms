@@ -49,7 +49,6 @@ function dedupeMedia(items: Array<{ url: string; alt?: string; source?: string }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  if (slug.startsWith('razors-image') || slug.startsWith('razor-image')) return notFound();
   const [profile, approved] = await Promise.all([getPublicHostShopBySlug(slug), getApprovedShopByPublicSlug(slug)]);
   if (!approved) return {};
   if (!profile || !approved) {
@@ -107,7 +106,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function HostShopProfilePage({ params }: PageProps) {
   const { slug } = await params;
-  if (slug.startsWith('razors-image') || slug.startsWith('razor-image')) return notFound();
   const [profile, approved] = await Promise.all([getPublicHostShopBySlug(slug), getApprovedShopByPublicSlug(slug)]);
   if (!approved) return notFound();
   if (!profile || !approved) {
@@ -140,13 +138,13 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   const gallery = Array.isArray(profile.media_gallery) ? profile.media_gallery : [];
   const featuredFallback = getFeaturedHostPartnerBySlug(slug);
   const featuredFallbackImages = (featuredFallback?.media ?? [])
-    .filter((media) => media.kind !== 'video' && !(slug.startsWith('razors-image') && media.kind === 'flyer'))
+    .filter((media) => media.kind !== 'video')
     .map((media) => ({ url: media.src, alt: media.alt }));
   const featuredFallbackVideoMedia = featuredFallback?.media?.find((media) => media.kind === 'video');
   const featuredFallbackVideo = featuredFallbackVideoMedia?.src;
   const videoScript = featuredFallbackVideoMedia?.script || `Welcome to ${approved.name}. ${approved.description || featuredFallback?.marketingBlurb || ''} Explore this shop’s portfolio, contact the team, and ask Elevate about ${approved.programs.map(programLabel).join(' or ')} placement and available payment plans. Placement is confirmed during enrollment.`;
   const items = curateShopGallery(slug, dedupeMedia([
-    ...gallery.filter((item) => !slug.startsWith('razors-image') || !item.url.includes('/2020/')),
+    ...gallery,
     ...featuredFallbackImages,
     ...(profile.logo_url ? [{ url: profile.logo_url, alt: `${approved.name} logo`, source: profile.source_url || externalUrl || undefined }] : []),
     ...(profile.flyer_url ? [{ url: profile.flyer_url, alt: `${approved.name} flyer`, source: profile.source_url || externalUrl || undefined }] : []),

@@ -12,7 +12,6 @@ const damagedPublicImages = [
   '/images/healthcare/program-healthcare-overview.jpg',
   '/images/trades/hero-program-hvac.jpg',
   '/images/heroes/workforce-partner-5.webp',
-  '/images/partners/razors-image-storefront.webp',
   '/images/logo-small.png',
   '/images/logo.jpg',
   '/images/clear-path-main-image.jpg',

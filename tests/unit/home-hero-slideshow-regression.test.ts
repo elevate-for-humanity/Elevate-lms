@@ -13,15 +13,15 @@ describe('homepage hero slideshow rendering', () => {
 
     expect(homepageHero).toContain('SafeHeroVideo');
     expect(homepageHero).toContain('hero-home-fast.mp4');
-    expect(homepageHero).toContain('showPosterBeforePlayback');
+    expect(homepageHero).toContain('priority');
     expect(homepageHero).toContain('loop');
-    expect(homepageHero).toContain('Barber and Cosmetology apprenticeship programs');
-    expect(homepageHero).toContain('Training may be free if you qualify for workforce funding');
-    expect(homepageHero).toContain('press the orange Schedule WorkOne Orientation button');
-    expect(homepageHero).toContain('press Start Elevate Funding Intake');
+    expect(homepageHero).toContain('hero-home-first-frame.webp');
+    expect(homepageHero).toContain('Apprenticeship tuition is self-pay only.');
+    expect(homepageHero).toContain('href="/programs"');
+    expect(homepageHero).toContain('href="/apprenticeships"');
+    expect(homepageHero).toContain('href="/partners/host-shops"');
     expect(homepageHero).not.toContain('data-narration-src="/audio/narration/home-hero.mp3"');
-    expect(homepageHero).toContain('className="order-1 flex items-center');
-    expect(homepageHero).toContain('className="relative order-2');
+
   });
 
   it('loops only the homepage hero visual while narration remains separate', () => {
@@ -36,13 +36,13 @@ describe('homepage hero slideshow rendering', () => {
     expect(safeHeroVideo).toContain('video.loop = loop');
   });
 
-  it('keeps scripts attached to the Salon Saloon, Razor Image, and Kountry Kutz videos', () => {
+  it('keeps scripts attached to the Salon Saloon and Kountry Kutz videos', () => {
     const hostProfiles = fs.readFileSync(
       path.resolve('apps/marketing/app/host-shops/[slug]/page.tsx'),
       'utf8',
     );
     const featuredHosts = fs.readFileSync(
-      path.resolve('components/programs/beauty/FeaturedHostPartners.tsx'),
+      path.resolve('lib/apprenticeship-programs/host-partners.ts'),
       'utf8',
     );
     const barberPage = fs.readFileSync(
@@ -52,8 +52,8 @@ describe('homepage hero slideshow rendering', () => {
 
     expect(hostProfiles).toContain('data-narration={videoScript}');
     expect(hostProfiles).toContain('tour script');
-    expect(featuredHosts).toContain("Welcome to Razor's Image Barbershop");
-    expect(featuredHosts).toContain('data-narration={video.script}');
+    expect(featuredHosts).toContain('Welcome to Salon Saloon in South Bend, Indiana.');
+    expect(hostProfiles).toContain('videoScript={videoScript}');
     expect(barberPage).toContain('KOUNTRY_KUTZ_HERO_TRANSCRIPT');
     expect(barberPage).toContain('As the video moves through the shop');
   });
@@ -87,7 +87,6 @@ describe('homepage hero slideshow rendering', () => {
     expect(source).toContain('Employers looking to fill open jobs');
     expect(source).toContain('build a website');
     expect(source).toContain('narrateTranscript');
-    expect(source).not.toContain('razors-image-storefront-2026.jpg');
     expect(source).not.toContain('style-and-scissor-salon/contact-card.webp');
     expect(source).not.toContain('Learn by doing, build real confidence');
   });
@@ -103,7 +102,7 @@ describe('homepage hero slideshow rendering', () => {
     expect(salonSlide).toBeLessThan(kountrySlide);
     expect(source).toContain('className="relative z-20 order-1');
     expect(source).toContain('className="relative order-2 w-full');
-    expect(source).toContain('h-[clamp(520px,72svh,860px)]');
+    expect(source).toContain('h-[clamp(260px,42svh,480px)]');
     expect(source).not.toContain("src: '/images/partners/generations-hair/salon-service.webp'");
     expect(source).toContain('narrateTranscript');
     expect(source).toContain('soundButtonVariant="prominent"');

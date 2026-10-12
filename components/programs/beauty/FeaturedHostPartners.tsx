@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
@@ -6,7 +7,6 @@ import type { FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-par
 import Link from 'next/link';
 import { ExternalLink, MapPin, Navigation, Phone } from 'lucide-react';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
-
 
 function programLabel(program: string) {
   return program
@@ -48,8 +48,15 @@ export default async function FeaturedHostPartners({
       bookingUrl: shop.booking,
       socialUrl: shop.social,
       media: (programSlug === 'nail-technician-apprenticeship'
-        ? [...(shop.gallery ?? [])].sort((a, b) => Number(/nail/i.test(b.url)) - Number(/nail/i.test(a.url)))
-        : shop.gallery ?? []).map((item) => ({ src: item.url, alt: item.alt || `${shop.name} portfolio`, kind: 'photo' as const })),
+        ? [...(shop.gallery ?? [])].sort(
+            (a, b) => Number(/nail/i.test(b.url)) - Number(/nail/i.test(a.url)),
+          )
+        : (shop.gallery ?? [])
+      ).map((item) => ({
+        src: item.url,
+        alt: item.alt || `${shop.name} portfolio`,
+        kind: 'photo' as const,
+      })),
     }));
 
   // Show every verified barber host in one directory, including Kountry Kutz.
@@ -82,9 +89,9 @@ export default async function FeaturedHostPartners({
               We're looking for new Host Shops.
             </h2>
             <p className="mt-4 leading-7 text-slate-700">
-              Licensed {pathway.toLowerCase()} businesses: help the next generation build real skills.
-              Apply free to become a Host Shop and showcase your business in the Elevate network.
-              Apprentice placement and supervision are confirmed before training begins.
+              Licensed {pathway.toLowerCase()} businesses: help the next generation build real
+              skills. Apply free to become a Host Shop and showcase your business in the Elevate
+              network. Apprentice placement and supervision are confirmed before training begins.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
@@ -140,27 +147,35 @@ export default async function FeaturedHostPartners({
               apprenticeship opportunities.
             </p>
 
-            <div data-mobile-grid="2" className="mt-6 grid grid-cols-2 items-stretch gap-3 sm:gap-4 lg:grid-cols-3">
+            <div
+              data-mobile-grid="2"
+              className="mt-6 grid grid-cols-2 items-stretch gap-3 md:grid-cols-3 xl:grid-cols-4"
+            >
               {directoryShops.map((shop) => {
                 const stillMedia = shop.media?.filter((media) => media.kind !== 'video') ?? [];
-                const image = stillMedia[0];
+
                 const fullAddress = shop.address;
                 return (
                   <article
                     key={shop.slug}
                     className="flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
                   >
-                    {image ? (
-                      <Link href={`/host-shops/${shop.slug}`} aria-label={`View ${shop.dba ?? shop.name} shop profile`} className="relative block aspect-[4/3] shrink-0 overflow-hidden bg-slate-950 focus-visible:ring-4 focus-visible:ring-brand-red-700">
-                        <Image src={image.src} alt={image.alt} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
-                      </Link>
-                    ) : null}
+                    <HostShopMediaCarousel
+                      shopName={shop.dba ?? shop.name}
+                      compact
+                      items={stillMedia.map((item) => ({ url: item.src, alt: item.alt }))}
+                    />
 
-                    <div className="flex flex-1 flex-col p-3 sm:p-5">
+                    <div className="flex flex-1 flex-col p-3">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
-                          <h3 className="text-base font-black tracking-tight text-slate-950 sm:text-xl">
-                            <Link href={`/host-shops/${shop.slug}`} className="hover:text-brand-red-700">{shop.dba ?? shop.name}</Link>
+                          <h3 className="text-base font-black tracking-tight text-slate-950 sm:text-base">
+                            <Link
+                              href={`/host-shops/${shop.slug}`}
+                              className="hover:text-brand-red-700"
+                            >
+                              {shop.dba ?? shop.name}
+                            </Link>
                           </h3>
                           {shop.dba ? (
                             <p className="mt-1 text-sm font-semibold text-slate-600">
@@ -173,11 +188,11 @@ export default async function FeaturedHostPartners({
                         </span>
                       </div>
 
-                      <p className="mt-4 text-sm font-medium leading-6 text-slate-700">
+                      <p className="mt-3 line-clamp-2 text-xs font-medium leading-5 text-slate-700">
                         {shop.marketingBlurb ?? shop.note}
                       </p>
 
-                      <div className="mt-5 space-y-3 border-y border-slate-100 py-5">
+                      <div className="mt-3 space-y-2 border-y border-slate-100 py-3">
                         <p className="flex items-start gap-2 text-sm font-bold text-slate-800">
                           <MapPin
                             className="mt-0.5 h-4 w-4 shrink-0 text-brand-red-700"

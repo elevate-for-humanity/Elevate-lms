@@ -95,7 +95,7 @@ export default async function EstheticianApprenticeshipPage() {
   const structuredData = buildBeautyProgramStructuredData(program);
   const heroOverride = (
     <HeroPicture src={getProgramHeroImage('esthetician-apprenticeship')}
-      alt={getProgramImageAlt('esthetician-apprenticeship')}
+      alt={getProgramImageAlt('esthetician-apprenticeship')} imageFit="contain"
       heightStyle="h-[clamp(220px,32svh,360px)]" analyticsName="esthetician-apprenticeship" transcript={SAFE_HERO_COPY.transcript} />
   );
 

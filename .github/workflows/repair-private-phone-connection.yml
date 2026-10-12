@@ -37,7 +37,7 @@ jobs:
         with:
           skip_install: true
       - name: Validate repair syntax before touching the existing server
-        run: python3 -m py_compile scripts/gcp/repair-private-paris.py
+        run: python3 -m py_compile scripts/gcp/repair-private-paris.py scripts/gcp/repair-pbx-device-proxy.py
       - name: Verify current gateway source and stage code only
         run: |
           set -euo pipefail
@@ -48,6 +48,12 @@ jobs:
         run: |
           set -euo pipefail
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command="sudo python3 - /tmp/elevate-paris-gateway-$GITHUB_SHA.mjs $GITHUB_SHA" < scripts/gcp/repair-private-paris.py | tee phone-private-connection-evidence.json
+      - name: Add bounded authenticated provisioning routes to the established TLS gateway
+        run: |
+          set -euo pipefail
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/repair-pbx-device-proxy.py | tee phone-device-proxy-evidence.json
+      - name: Verify preserved TLS and SIP transport
+        run: node scripts/gcp/verify-pbx-transport.mjs
       - name: Connect the existing Google app to the authenticated provisioner
         run: |
           node --input-type=module <<'NODE'

@@ -52,6 +52,12 @@ def repair(source,revision):
     password=base64.b64decode(secret['payload']['data']).decode().strip()
     if not 32<=len(password)<=1024 or any(character in password for character in [chr(0),chr(10),chr(13)]):
         raise ValueError('private_ari_credential_invalid')
+    authorization='Basic '+base64.b64encode((user+':'+password).encode()).decode()
+    if digest(TARGET)==DESIRED:
+        try: existing=request('http://127.0.0.1:8088/ari/applications',{'Authorization':authorization})
+        except Exception: existing=[]
+        if isinstance(existing,list) and any(app.get('name')=='elevate-paris' for app in existing):
+            return {'result':'PASS','changed':False,'scope':'private_ari_gateway_only','ariApplicationRegistered':True,'carrierRoutingChanged':False}
     parser=configparser.ConfigParser(interpolation=None)
     parser.read_string(CONFIG.read_text())
     if not parser.has_section('general') or parser.get('general','enabled',fallback='')!='yes':

@@ -9,6 +9,7 @@ import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
+import { ROUTES } from '@/lib/navigation/routes';
 
 export const revalidate = 300;
 
@@ -60,6 +61,27 @@ export default function HomePage() {
             <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-center text-sm font-bold text-white hover:bg-slate-800">
               Schedule WorkOne Appointment
             </a>
+          </div>
+        </section>
+        <section className="border-y border-slate-200 bg-white px-5 py-12 sm:py-16" aria-labelledby="workforce-platform-heading">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-sm font-semibold uppercase tracking-wide text-sky-800">The Elevate workforce platform</p>
+            <h2 id="workforce-platform-heading" className="mt-3 max-w-4xl text-3xl font-bold text-slate-950 sm:text-4xl">Training, apprenticeships, employers, and workforce operations in one coordinated platform.</h2>
+            <p className="mt-5 max-w-3xl text-lg leading-relaxed text-slate-700">Elevate combines career training with workspaces for learners, host shops, program partners, employers, and staff. Explore a career pathway or see how the platform supports the people who deliver training.</p>
+            <ul className="mt-8 grid list-disc gap-x-10 gap-y-5 pl-5 text-base leading-relaxed text-slate-700 md:grid-cols-2">
+              <li><strong className="text-slate-950">Learning and progress:</strong> courses, lessons, assessments, and learner records.</li>
+              <li><strong className="text-slate-950">Apprenticeship coordination:</strong> training hours, supervisor review, competencies, and host-shop records.</li>
+              <li><strong className="text-slate-950">Partner and employer workspaces:</strong> program coordination, participant records, and employer relationships.</li>
+              <li><strong className="text-slate-950">Workforce administration:</strong> documents, credentials, reporting, and evidence for authorized review.</li>
+              <li><strong className="text-slate-950">Operational tools:</strong> communications, meetings, and payroll records within supported workflows.</li>
+              <li><strong className="text-slate-950">Creation tools:</strong> explore website-building products and course-building workspaces.</li>
+            </ul>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href={ROUTES.programs} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-sky-800 px-6 py-3 font-semibold text-white hover:bg-sky-900">Get Training</Link>
+              <Link href={ROUTES.employers} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-slate-950 px-6 py-3 font-semibold text-white hover:bg-slate-800">Partner With Elevate</Link>
+              <Link href="/platform" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 px-6 py-3 font-semibold text-slate-950 hover:bg-slate-50">Explore the Platform</Link>
+            </div>
+            <p className="mt-5 text-sm leading-relaxed text-slate-600">Workspace access depends on your assigned role and available services. Apprenticeship programs are self-pay; funding for other training depends on the specific program and applicant eligibility.</p>
           </div>
         </section>
         <HomeFinalCTA />

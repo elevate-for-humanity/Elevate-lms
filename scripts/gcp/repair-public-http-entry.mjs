@@ -59,7 +59,7 @@ async function repair() {
     const path='/programs/barber-apprenticeship?source=entry';
     const response=await fetch('http://'+host+path,{redirect:'manual',signal:AbortSignal.timeout(15000)});
     const location=response.headers.get('location');await response.body?.cancel();
-    assert.equal(response.status,301);assert.equal(location,'https://www.elevateforhumanity.org'+path);
+    assert.equal(response.status,301);assert.ok(location,'HTTP entry must supply a redirect target');assert.equal(new URL(location).href,'https://www.elevateforhumanity.org'+path);
     console.log(JSON.stringify({host,status:response.status,location,attempt:attempt+1}));
    }
    console.log('HTTP entry verified. Existing HTTPS routing retained.');return;

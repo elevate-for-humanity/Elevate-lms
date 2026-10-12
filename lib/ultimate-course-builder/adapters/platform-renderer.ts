@@ -205,9 +205,6 @@ function sceneType(index: number, total: number) {
 export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
   const board = rawStoryboard(input);
   const candidates = visualCandidates(input);
-  if (candidates.length < board.scenes.length) {
-    throw new Error(`ULTIMATE_ENVATO_VISUALS_REQUIRED:${candidates.length}:${board.scenes.length}`);
-  }
   const scenes = board.scenes.map((value: unknown, index: number) => {
     const scene = record(value);
     const teachingPoint = String(

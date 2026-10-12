@@ -4,7 +4,7 @@ import { loadGoogleConfig } from '../gcp/runtime-config.mjs';
 type Json = Record<string, any>;
 async function main(){
  const config=loadGoogleConfig('admin');
- const apiKey=process.env.TELNYX_API_KEY?.trim()||config.TELNYX_API_KEY;
+ const apiKey=process.env.TELNYX_API_KEY?.trim()||config.runtimeEnvironment.TELNYX_API_KEY;
  if(!apiKey) throw new Error('TELNYX_API_KEY is unavailable');
  const endpoints=[
   ['account','/account'],

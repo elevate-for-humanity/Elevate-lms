@@ -84,12 +84,15 @@ export class UltimateJobQueue {
     if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
   }
 
-  async waitForDependency(jobId: string, workerId: string, message: string, generation: number) {
+  async waitForDependency(jobId: string, workerId: string, message: string, generation: number, resumePayload?: unknown) {
     // Do not burn attempts for externally blocked assets. The existing
     // wake_ultimate_media_dependency RPC is responsible for resumption.
     const { data: updated, error } = await this.db.from('ultimate_build_jobs').update({
       status: 'failed',
-      pending_dependency_resume: { reason: 'external_dependency', awaitingWakeup: true },
+      // This field belongs to actual dependency-arrival events. Writing wait
+      // metadata here makes the wakeup trigger replace the entire job payload
+      // on its next transition. Preserve an arrival already recorded by the RPC.
+      ...(resumePayload === undefined ? {} : { payload: resumePayload }),
       lease_owner: null,
       lease_expires_at: null,
       last_error: message,

@@ -33,6 +33,11 @@ def private_listener(port, route):
     finally:
         connection.close()
 
+class ActivationFailure(ValueError):
+    def __init__(self, diagnostic):
+        super().__init__('private_services_not_healthy')
+        self.diagnostic = diagnostic
+
 def activate(run=command, probe=private_listener, wait=time.sleep):
     running = run(['docker','inspect','pbx_asterisk_1','--format','{{.State.Running}}']).strip()
     if running != 'true':
@@ -53,7 +58,15 @@ def activate(run=command, probe=private_listener, wait=time.sleep):
             if all(state(unit,run) == ('loaded','active','running') for unit in UNITS) and probe(8090,'/internal/pbx/devices') and probe(8091,'/internal/paris/turn'):
                 return {'result':'PASS','scope':'existing_private_services_only','startedServices':started,'carrierRoutingChanged':False,'callAcceptance':'NOT TESTED'}
             wait(1)
-        raise ValueError('private_services_not_healthy')
+        diagnostics = {unit: {'state': list(state(unit,run))} for unit in UNITS}
+        for unit in UNITS:
+            log = run(['journalctl','-u',unit,'--since','-2 minutes','--no-pager','--output=cat'])
+            diagnostics[unit]['knownStartupMarkers'] = [marker for marker in [
+                'PARIS_RUNTIME_STARTUP_FAILED','PBX provisioner startup failed','EACCES','EROFS','ENOENT',
+                'ERR_MODULE_NOT_FOUND','ECONNREFUSED','status=203/EXEC','status=217/USER'
+            ] if marker in log]
+        diagnostics['listeners'] = {'provisioner':probe(8090,'/internal/pbx/devices'),'parisTurn':probe(8091,'/internal/paris/turn')}
+        raise ActivationFailure(diagnostics)
     except Exception:
         # Restore only units started by this invocation; preserve previously active services.
         for unit in reversed(started):
@@ -65,5 +78,6 @@ if __name__ == '__main__':
         report = activate()
     except Exception as error:
         report = {'result':'BLOCKED','code':str(error) if isinstance(error,ValueError) and re.fullmatch('[a-z_]+',str(error)) else 'private_activation_unavailable','carrierRoutingChanged':False}
+        if isinstance(error,ActivationFailure): report['diagnostic']=error.diagnostic
     print(json.dumps(report))
     raise SystemExit(0 if report['result']=='PASS' else 1)

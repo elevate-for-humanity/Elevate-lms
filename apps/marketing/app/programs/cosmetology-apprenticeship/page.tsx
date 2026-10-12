@@ -52,8 +52,8 @@ export default async function CosmetologyApprenticeshipPage() {
       <ProgramDetailPage
         program={program}
         banner={banner}
-        heroOverride={<HeroPicture src={getProgramHeroImage('cosmetology-apprenticeship')} alt="Salon Saloon team inside their South Bend salon" imageFit="contain" analyticsName="cosmetology-apprenticeship" />}
-        afterHero={<BeautyEnrollmentPromotion compact programLabel={program.title} />}
+        heroOverride={<HeroPicture src={getProgramHeroImage('cosmetology-apprenticeship')} alt="Salon Saloon team inside their South Bend salon" imageFit="contain" heightStyle="h-[clamp(220px,32svh,360px)]" analyticsName="cosmetology-apprenticeship" />}
+        afterHero={<BeautyEnrollmentPromotion compact programSlug="cosmetology-apprenticeship" programLabel={program.title} />}
         visualContent={<CosmetologyVisualExperience />}
         featuredContent={
           <>
@@ -61,7 +61,7 @@ export default async function CosmetologyApprenticeshipPage() {
               programTitle={program.title}
               applyHref={program.cta.applyHref}
             />
-            <FeaturedHostPartners programSlug="cosmetology-apprenticeship" />
+            <FeaturedHostPartners programSlug="cosmetology-apprenticeship" showDirectory={false} />
             <HostShopPlacementGuide programSlug="cosmetology-apprenticeship" />
           </>
         }

@@ -7,19 +7,14 @@ import { useEffect, useState } from 'react';
 
 const slides = [
   {
-    src: '/images/partners/kountry-kutz/interior-empty.webp',
+    src: '/images/partners/kountry-kutz/interior-empty-enhanced-2026.webp',
     alt: 'Training stations inside Kountry Kutz Barbershop in New Palestine',
     label: 'Professional training stations',
   },
   {
-    src: '/images/partners/kountry-kutz/interior-active.webp',
+    src: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp',
     alt: 'Barbers and clients inside Kountry Kutz Barbershop',
     label: 'A real working barbershop',
-  },
-  {
-    src: '/images/partners/kountry-kutz-apprenticeship-flyer.webp',
-    alt: 'Kountry Kutz barber apprenticeship host-shop announcement',
-    label: 'An approved apprenticeship Host Shop',
   },
 ] as const;
 
@@ -47,8 +42,8 @@ export default function KountryKutzTourSlideshow() {
       data-narration-rate="0.95"
       data-narration-style="instructor"
     >
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mx-auto grid max-w-6xl items-center gap-6 lg:grid-cols-2">
+        <div className="flex flex-col gap-4">
           <div className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
               Featured Host Shop
@@ -75,7 +70,7 @@ export default function KountryKutzTourSlideshow() {
           aria-roledescription="carousel"
           aria-label="Kountry Kutz photo tour"
         >
-          <div className="relative aspect-[4/3] max-h-[480px]">
+          <div className="relative aspect-[16/10] max-h-[320px]">
             {slides.map((slide, index) => (
               <Image
                 key={slide.src}
@@ -139,7 +134,7 @@ export default function KountryKutzTourSlideshow() {
           </div>
         </div>
 
-        <p className="mx-auto mt-5 max-w-4xl text-center text-sm leading-6 text-slate-300">
+        <p className="mx-auto mt-2 max-w-4xl text-center lg:col-span-2 text-sm leading-6 text-slate-300">
           56 W Main St, Suite A, New Palestine, Indiana. Placement, employment, schedule,
           supervision, and enrollment approval are confirmed before training begins.
         </p>

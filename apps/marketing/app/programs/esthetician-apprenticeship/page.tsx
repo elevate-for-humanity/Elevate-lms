@@ -96,7 +96,7 @@ export default async function EstheticianApprenticeshipPage() {
   const heroOverride = (
     <HeroPicture src={getProgramHeroImage('esthetician-apprenticeship')}
       alt={getProgramImageAlt('esthetician-apprenticeship')}
-      analyticsName="esthetician-apprenticeship" transcript={SAFE_HERO_COPY.transcript} />
+      heightStyle="h-[clamp(220px,32svh,360px)]" analyticsName="esthetician-apprenticeship" transcript={SAFE_HERO_COPY.transcript} />
   );
 
   return (
@@ -111,14 +111,14 @@ export default async function EstheticianApprenticeshipPage() {
         program={program}
         banner={safeBanner}
         heroOverride={heroOverride}
-        afterHero={<BeautyEnrollmentPromotion compact programLabel={program.title} />}
+        afterHero={<BeautyEnrollmentPromotion compact programSlug="esthetician-apprenticeship" programLabel={program.title} />}
         featuredContent={
           <>
             <ApprenticeshipExperienceGuide
               programTitle={program.title}
               applyHref={program.cta.applyHref}
             />
-            <FeaturedHostPartners programSlug="esthetician-apprenticeship" />
+            <FeaturedHostPartners programSlug="esthetician-apprenticeship" showDirectory={false} />
             <HostShopPlacementGuide programSlug="esthetician-apprenticeship" />
           </>
         }

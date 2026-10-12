@@ -71,29 +71,28 @@ export default function CosmetologyVisualExperience() {
         aria-roledescription="carousel"
         aria-label="Cosmetology apprenticeship experience"
         data-scroll-narration
-        data-narration="The cosmetology apprenticeship combines related instruction with supervised salon training. Apply and complete intake, confirm funding or a payment option, secure an approved host salon, complete orientation, then track hours and competencies in your portal. Apprentices learn sanitation, client consultation, hair cutting, texture, color, styling, professional service, and workplace habits. Host-site availability, wages, funding, registration, and licensing are confirmed for each participant and are not guaranteed by an application."
-        data-narration-src="/audio/heroes/cosmetology.mp3"
+        data-narration="The cosmetology apprenticeship combines related instruction with supervised salon training. Apply and complete intake, confirm self-pay tuition and a payment option, secure an approved host salon, complete orientation, then track hours and competencies in your portal. Apprentices learn sanitation, client consultation, hair cutting, texture, color, styling, professional service, and workplace habits. Host-site availability, wages, registration, and licensing are confirmed for each participant and are not guaranteed by an application."
         data-narration-rate="0.84"
         data-narration-style="instructor"
       >
         <div className="mx-auto grid max-w-7xl lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
-          <div className="order-2 flex items-center px-5 py-7 lg:order-1 sm:px-8 sm:py-16 lg:px-10 lg:py-20">
+          <div className="order-2 flex items-center px-5 py-7 lg:order-1 sm:px-8 sm:py-8 lg:px-8 lg:py-10">
             <div className="max-w-2xl">
               <p className="text-xs font-black uppercase tracking-[0.2em] text-brand-red-700">
                 Cosmetology apprenticeship pathway
               </p>
-              <h1 className="mt-4 text-4xl font-black leading-[1.02] tracking-tight sm:text-5xl lg:text-6xl">
-                Earn your Indiana cosmetology license while getting paid.
-              </h1>
+              <h2 className="mt-4 text-2xl font-black leading-tight tracking-tight sm:text-3xl">
+                Build skills in a real salon.
+              </h2>
               <p className="mt-5 max-w-2xl text-lg font-semibold leading-8 text-slate-700">
                 {slide.title}. {slide.copy}
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/apply/student?program=cosmetology-apprenticeship"
+                  href="/programs/cosmetology-apprenticeship/apply"
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
                 >
-                  Enroll now <ArrowRight className="h-5 w-5" />
+                  Start an application <ArrowRight className="h-5 w-5" />
                 </Link>
                 <Link
                   href="/partners/host-shop/apply?program=cosmetology"
@@ -104,7 +103,7 @@ export default function CosmetologyVisualExperience() {
               </div>
               <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-slate-700">
                 {[
-                  '2,000 supervised hours',
+                  '2,000–2,500-hour hybrid term + 154 RTI hours',
                   'Paid on-the-job learning',
                   'Progress tracked in your portal',
                 ].map((item) => (
@@ -116,7 +115,7 @@ export default function CosmetologyVisualExperience() {
               </div>
             </div>
           </div>
-          <div className="order-1 relative min-h-[300px] bg-white sm:min-h-[460px] lg:order-2 lg:min-h-[680px]">
+          <div className="order-1 relative aspect-[16/10] max-h-[320px] bg-white lg:order-2">
             {slides.map((item, index) => (
               <Image
                 key={item.src}

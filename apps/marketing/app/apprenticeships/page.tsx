@@ -48,7 +48,7 @@ const PATHWAYS = [
     title: 'Nail Technician Apprenticeship',
     href: '/programs/nail-technician-apprenticeship',
     applyHref: '/apply/student?program=nail-technician-apprenticeship',
-    image: '/images/pages/barber-gallery-1.webp',
+    image: '/images/pexels/nail-tech.webp',
     imageAlt: 'Nail technician apprentice completing supervised salon training',
     badge: 'Beauty Apprenticeship Pathway',
     description: 'Supervised nail-services training covering sanitation, manicuring, client care, service skills, and documented training progress.',
@@ -104,7 +104,7 @@ export default function ApprenticeshipsPage() {
             <p className="mt-4 text-base font-medium leading-7 text-slate-700 sm:text-lg">Each pathway has its own requirements, tuition, licensing objective, and enrollment record. Open the program that fits what you want to do.</p>
           </div>
 
-          <div className="mt-9 grid gap-6 md:grid-cols-2">
+          <div data-mobile-grid="2" className="mt-6 grid grid-cols-2 gap-3 sm:gap-5">
             {PATHWAYS.map((pathway) => (
               <article key={pathway.href} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
                 <Link href={pathway.href} className="block">
@@ -113,8 +113,8 @@ export default function ApprenticeshipsPage() {
                     <span className="absolute left-4 top-4 rounded-full bg-white px-3 py-1.5 text-xs font-black uppercase tracking-wide text-slate-950 shadow">{pathway.badge}</span>
                   </div>
                 </Link>
-                <div className="p-6">
-                  <h3 className="text-2xl font-black text-slate-950 sm:text-3xl">{pathway.title}</h3>
+                <div className="p-3 sm:p-5">
+                  <h3 className="text-lg font-black text-slate-950 sm:text-2xl">{pathway.title}</h3>
                   <p className="mt-3 text-sm font-medium leading-6 text-slate-700 sm:text-base">{pathway.description}</p>
                   <div className="mt-5 grid grid-cols-2 gap-3">
                     <Link href={pathway.href} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-4 py-3 text-sm font-black text-white hover:bg-slate-800">Program</Link>
@@ -130,7 +130,7 @@ export default function ApprenticeshipsPage() {
       <section className="border-y border-orange-200 bg-gradient-to-br from-orange-50 via-white to-sky-50 px-4 py-14 text-slate-950 sm:py-20">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-            <div className="relative min-h-[340px] overflow-hidden rounded-3xl sm:min-h-[440px]">
+            <div className="relative aspect-[16/10] max-h-[320px] overflow-hidden rounded-2xl">
               <Image src="/images/pages/apprenticeship-sponsor-page-1.webp" alt="Apprentice working with an on-site supervisor" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
             </div>
             <div>

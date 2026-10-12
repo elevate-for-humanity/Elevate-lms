@@ -119,7 +119,7 @@ function approvedDescription(shop: HostShop) {
 export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]> {
   const db = await requireAdminClient();
 
-  const [barberResult, hostResult, publicResult] = await Promise.all([
+  const [barberResult, hostResult, publicResult, activeShopResult, archivedPartnerResult] = await Promise.all([
     db
       .from('barbershop_partner_applications')
       .select(
@@ -138,9 +138,13 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       .select(
         'id, public_slug, display_name, description, logo_url, flyer_url, website_url, website, phone, address_line1, address_line2, city, state, zip, programs, media_gallery, video_url, source_url',
       ),
+    db.from('host_shops')
+      .select('id,name,address,city,state,zip_code,phone,website,image_url,description,services,specializations')
+      .eq('is_approved', true).eq('shop_status', 'active').order('name'),
+    db.from('partners').select('name,shop_name,dba').or('status.in.(archived,inactive),account_status.eq.archived'),
   ]);
 
-  for (const result of [barberResult, hostResult, publicResult]) {
+  for (const result of [barberResult, hostResult, publicResult, activeShopResult, archivedPartnerResult]) {
     if (result.error) throw new Error(`HOST_SHOP_DIRECTORY_QUERY_FAILED:${result.error.message}`);
   }
   const barberRows = barberResult.data;
@@ -282,7 +286,19 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     })
     .filter(isPubliclyListedHostShop);
 
-  const all = [...applicationBacked, ...directoryBacked];
+  const existing = [...applicationBacked, ...directoryBacked];
+  const activeShopBacked: HostShop[] = (activeShopResult.data ?? [])
+    .filter((row) => !existing.some((shop) => businessKey(shop.name) === businessKey(row.name)))
+    .map((row) => {
+      const slug = publicSlug(row.name, row.id);
+      const featured = getFeaturedHostPartnerBySlug(slug);
+      const programs = [...new Set([...(Array.isArray(row.specializations) ? row.specializations : []), ...(Array.isArray(row.services) ? row.services : []), ...(featured?.programs ?? [])]
+        .map(normalizeHostShopProgram).filter((value): value is string => Boolean(value)))];
+      return { id: row.id, name: row.name, address: row.address ?? '', city: row.city ?? '', state: row.state === 'Indiana' ? 'IN' : row.state || 'IN', zip: row.zip_code ?? '', phone: row.phone ?? '', email: '', supervisor: '', programs, primaryProgram: programs[0], badge: 'partner', publicSlug: featured?.slug ?? slug, website: row.website || featured?.websiteUrl, description: row.description || featured?.marketingBlurb || `${row.name} participates in Elevate’s approved Host Shop network. Occupation and placement availability are confirmed by Elevate.`, mediaGallery: row.image_url ? [{url: row.image_url, alt: `${row.name} shop photo`}] : undefined };
+    });
+  const archivedNames = new Set((archivedPartnerResult.data ?? []).flatMap((row) => [row.name, row.shop_name, row.dba]).filter(Boolean).map(businessKey));
+  const all = [...existing, ...activeShopBacked].filter((shop) => !archivedNames.has(businessKey(shop.name)));
+
 
   if (program) {
     const slug = PROGRAM_SLUGS[program];

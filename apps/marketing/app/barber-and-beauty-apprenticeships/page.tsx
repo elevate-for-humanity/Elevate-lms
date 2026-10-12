@@ -128,10 +128,10 @@ export default function BarberBeautyProgramsPage() {
           <div className="rounded-xl bg-amber-50 border border-amber-200 p-6">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-amber-700" />
-              <h2 className="font-bold text-amber-950">Funding and licensure disclosure</h2>
+              <h2 className="font-bold text-amber-950">Tuition and licensing facts</h2>
             </div>
             <p className="text-sm text-amber-950 mt-3 leading-relaxed">
-              Funding, wages, licensing eligibility, completion requirements, and employer placement
+              Wages, licensing eligibility, completion requirements, and employer placement
               are not guaranteed by this page. Applicants receive the requirements applicable to
               their exact program and enrollment pathway during intake.
             </p>
@@ -146,15 +146,13 @@ export default function BarberBeautyProgramsPage() {
           <p className="mt-4 text-base font-medium leading-7 text-slate-700">
             It is free to apply to join Elevate’s Host Shop network. Approved employers can grow service capacity by hiring and training apprentices, developing future licensed talent, and earning revenue from the apprentice’s supervised work in accordance with wage, licensing, supervision, and program requirements.
           </p>
-          <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
-            Eligible employers may also qualify for workforce reimbursement or training-cost support through WorkOne, WIOA, on-the-job training, or another workforce partner. Reimbursement is not automatic or guaranteed; the employer, apprentice, occupation, costs, and funding authorization must be approved by the responsible workforce agency before costs are incurred.
-          </p>
+          <p className="mt-3 text-sm font-medium leading-6 text-slate-600">Apprenticeship tuition is self-pay only. Host Shops provide employment, wages, and licensed supervision; Elevate supports related instruction and training records.</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-emerald-700 px-6 py-3 font-black text-white hover:bg-emerald-800">
               Become a Host Shop — Free
             </Link>
-            <Link href="/funding/wioa" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-emerald-700 bg-white px-6 py-3 font-black text-emerald-800 hover:bg-emerald-50">
-              Review workforce funding
+            <Link href="/apprenticeships" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-emerald-700 bg-white px-6 py-3 font-black text-emerald-800 hover:bg-emerald-50">
+              Review self-pay apprenticeship programs
             </Link>
           </div>
         </div>

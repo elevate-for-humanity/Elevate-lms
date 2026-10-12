@@ -37,6 +37,18 @@ export type FeaturedHostPartner = {
 
 export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
   {
+    slug: 'j-noelle-co', name: 'J Noelle & Co.', dba: 'J Noelle Collective', businessType: 'HairSalon',
+    city: 'West Lafayette', state: 'IN', zip: '47906', address: '1020 Gemini Ln, Suite 120', phone: '(765) 413-0606',
+    programs: ['cosmetology-apprenticeship'], primaryProgram: 'cosmetology-apprenticeship',
+    marketingBlurb: 'A West Lafayette salon offering hair, extensions, brows, lashes, makeup, and skincare services. Explore the salon, book directly with the team, and ask Elevate about cosmetology apprenticeship placement.',
+    media: [
+      { src: '/images/partners/j-noelle/official-salon-2026.webp', alt: 'Styling stations and mirrors inside J Noelle Collective in West Lafayette', kind: 'photo' },
+      { src: '/images/partners/j-noelle/official-brand-2026.webp', alt: 'J Noelle Collective official salon branding', kind: 'photo' },
+    ],
+    websiteUrl: 'https://jnoellecollective.com/', bookingUrl: 'https://www.vagaro.com/jnoelleandco',
+  },
+
+  {
     slug: 'prestige-elevation-barber-and-beauty-institute',
     name: 'Prestige Elevation Barber and Beauty Institute LLC',
     businessType: 'BarberShop',
@@ -450,6 +462,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
 export function getFeaturedHostPartnerBySlug(slug: string) {
   const normalized = slug.trim().toLowerCase().replace(/-[a-f0-9]{8}$/, '');
   const aliases: Record<string, string> = {
+    'j-noelle-co': 'j-noelle-co',
     'b-52-s-barber-shop-llc': 'b-52s-barber-shop',
     'style-and-scissors-salon': 'style-and-scissor-salon',
     'generations-hair-llc-dba-generations-wedding-co': 'generations-hair-llc',

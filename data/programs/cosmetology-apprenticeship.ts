@@ -5,7 +5,7 @@ export const COSMETOLOGY: ProgramSchema = {
   slug: 'cosmetology-apprenticeship',
   title: 'Cosmetology Apprenticeship',
   subtitle:
-    'Earn your Indiana cosmetology license through a registered apprenticeship. 2,000 hours of supervised training in a licensed salon.',
+    'Build cosmetology skills through the registered 2,000–2,500-hour hybrid term, 154 RTI hours, and supervised salon practice. Indiana licensing is a separate step.',
   sector: 'personal-services',
   category: 'Cosmetology',
   programType: 'apprenticeship',
@@ -17,7 +17,7 @@ export const COSMETOLOGY: ProgramSchema = {
   durationWeeks: 52,
   hoursPerWeekMin: 35,
   hoursPerWeekMax: 40,
-  hoursBreakdown: { onlineInstruction: 200, handsOnLab: 1600, examPrep: 100, careerPlacement: 100 },
+  hoursBreakdown: { onlineInstruction: 154, handsOnLab: 0, examPrep: 0, careerPlacement: 0 },
   schedule: 'Full-time, Mon–Sat (varies by salon)',
   cohortSize: '1–3 apprentices per salon',
   fundingStatement: 'Apprenticeship enrollment is self-pay only. Review the published tuition and available payment terms before applying.',
@@ -49,10 +49,10 @@ export const COSMETOLOGY: ProgramSchema = {
       statement: 'Perform haircuts, coloring, and chemical services on live clients',
       assessedAt: 'Ongoing',
     },
-    { statement: 'Complete 2,000 hours of supervised salon training', assessedAt: 'Month 12' },
+    { statement: 'Complete the registered 2,000–2,500-hour hybrid term and 154 RTI hours', assessedAt: 'Registered-program completion' },
     {
       statement: 'Pass Indiana cosmetology theory and practical exams',
-      assessedAt: 'After 2,000 hours',
+      assessedAt: 'After registered completion and state eligibility review',
     },
     { statement: 'Maintain sanitation and infection control standards', assessedAt: 'Ongoing' },
     {
@@ -163,7 +163,7 @@ export const COSMETOLOGY: ProgramSchema = {
   complianceAlignment: [
     {
       standard: 'Indiana IPLA Cosmetology Standards',
-      description: 'Apprenticeship meets Indiana 2,000-hour cosmetology training requirements.',
+      description: 'Registered hybrid completion and applicable Indiana examination and licensing requirements are reviewed separately.',
     },
     {
       standard: 'Federal registration disclosure',
@@ -258,7 +258,7 @@ export const COSMETOLOGY: ProgramSchema = {
   facilityInfo: 'Partner salons in Indianapolis area',
   employerPartners: ['Licensed salons in Indianapolis area'],
   pricingIncludes: [
-    '2,000 hours supervised training',
+    '2,000–2,500-hour hybrid term plus 154 RTI hours',
     'Related instruction',
     'Infection control certification',
     'CPR/First Aid',
@@ -286,7 +286,7 @@ export const COSMETOLOGY: ProgramSchema = {
       label: 'Milady Standard Cosmetology',
       partnerName: 'Milady/Cengage',
       credentialIssued: 'Cosmetology Certificate',
-      duration: '1,500 hours RTI',
+      duration: '154 registered RTI hours; curriculum assigned by Elevate',
       required: true,
       enrollmentUrl: 'https://www.milady.com/cosmetology',
     },
@@ -307,7 +307,7 @@ export const COSMETOLOGY: ProgramSchema = {
     {
       question: 'How is this different from cosmetology school?',
       answer:
-        'An apprenticeship lets you earn while you learn in a real salon. You complete the same 2,000 hours required by Indiana but get paid and gain real-world experience from day one.',
+        'An apprenticeship lets you earn while you learn in a real salon. The registered term is 2,000–2,500 hours with 154 RTI hours. Approved host-salon employment and its wage arrangement are confirmed before training. Tuition is self-pay only.',
     },
     {
       question: 'Do I get paid during the apprenticeship?',
@@ -326,5 +326,5 @@ export const COSMETOLOGY: ProgramSchema = {
   ],
   metaTitle: 'Cosmetology Apprenticeship | Indiana Licensed | Indianapolis',
   metaDescription:
-    'Earn your Indiana cosmetology license through a paid apprenticeship. 2,000 hours of supervised salon training. Earn while you learn. Indianapolis.',
+    'Explore a registered hybrid cosmetology apprenticeship with a 2,000–2,500-hour term, 154 RTI hours, self-pay tuition, and supervised Host Salon training.',
 };

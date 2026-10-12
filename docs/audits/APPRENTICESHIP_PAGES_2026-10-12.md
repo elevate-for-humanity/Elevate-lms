@@ -1,0 +1,23 @@
+# Apprenticeship page audit — 2026-10-12
+
+## Scope
+46 Marketing page files containing apprenticeship/applicant routes were reviewed at source level, along with their shared program, payment, media, and directory components. Inventory is in APPRENTICESHIP_PAGE_INVENTORY_2026-10-12.json. All literal image references in those pages exist, and image references used by beauty components/featured partners decode successfully.
+
+## Repairs
+- Separates barber/nail hero media from page headings and controls so a fixed media height cannot crop enrollment text. Hero frames are 220–360px; supplementary salon/photo tours are capped at 320px.
+- Removes duplicate program shop directories. Searchable placement listings remain available once; map uses the same occupation-filtered records as the directory.
+- Adds active approved host_shops records missed by the former application-only loader. Includes J Noelle Collective in the cosmetology category, with its real interior/brand images from its official site, website, and booking link.
+- Archived/inactive partner records are excluded from public approved listings and cannot reappear through curated fallback profiles. No record was unarchived.
+- Removes contradictory free-funding and universal price/deposit promotions from apprenticeship pages. Tuition is self-pay; coupon eligibility and the final amount are confirmed by payment checkout.
+- Aligns public apprenticeship pricing with programs.price/tuition, the authority used by invoice checkout. Verified published tuition: barber $4,980; cosmetology/esthetics/nails $6,000. Invoice installment descriptions use the actual four-invoice path rather than obsolete weekly estimators.
+- Corrects residual cosmetology 1,500 RTI / 2,000-only / day-one-pay claims, stale nail deposit/kit promises, the nail category's barber photograph, and confirmation-page $500 copy.
+- Replaces enrollment-success GET-side status updates and guessed next-Monday dates with a read-only status presentation scoped to the authenticated applicant and exact program. Paid/pending/approved records are not described as confirmed enrollment.
+
+## Image provenance
+J Noelle Collective: https://jnoellecollective.com/ matches the approved operational business at 1020 Gemini Ln, West Lafayette, Indiana. Official salon interior: Websitebuilder/20260526193402.jpg; branding: Websitebuilder/20251021175950.jpeg on the salon website's own RackCDN origin. Optimized WebP copies are retained under public/images/partners/j-noelle. No image was generated to impersonate a real shop.
+
+## Validation and limits
+Focused tests, lint, and Marketing type/build checks were run. Refer to final release evidence for terminal results; a running or empty log does not imply success. Source review is not equivalent to visual review of every protected page. The live barber page was inspected and showed cropped hero content, duplicate directories, incorrect funding promotion, and mixed-occupation map pins before the repair. Actual mobile and authenticated enrollment pages still require visual release verification.
+
+## Data safety
+No applications, enrollments, financial records, suppliers, or shop approvals were created or changed. No live payment or form was submitted. Automatic approval review rejected a broader private-application/metadata query; the audit continued using narrower approved-record reads. Supplier account activation and student-kit fulfillment remain incomplete from the earlier task.

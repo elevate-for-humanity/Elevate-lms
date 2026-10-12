@@ -30,10 +30,8 @@ export default async function NailTechnicianApprenticeshipPage() {
       posterImage={banner.posterImage || program.heroImage}
       microLabel={banner.microLabel}
       analyticsName={banner.analyticsName}
-      belowHeroHeadline={banner.belowHeroHeadline}
-      belowHeroSubheadline={banner.belowHeroSubheadline}
-      ctas={[banner.primaryCta, banner.secondaryCta].filter(Boolean) as any}
-      trustIndicators={banner.trustIndicators}
+      overlayMode="none"
+      heightClassName="h-[clamp(220px,32svh,360px)]"
       transcript={banner.transcript}
       narrateTranscript
     />
@@ -51,7 +49,7 @@ export default async function NailTechnicianApprenticeshipPage() {
         program={program}
         banner={banner}
         heroOverride={heroOverride}
-        afterHero={<BeautyEnrollmentPromotion compact programLabel={program.title} />}
+        afterHero={<BeautyEnrollmentPromotion compact programSlug="nail-technician-apprenticeship" programLabel={program.title} />}
         visualContent={<NailDesignShowcase program="nail-technician" />}
         featuredContent={
           <>
@@ -59,7 +57,7 @@ export default async function NailTechnicianApprenticeshipPage() {
               programTitle={program.title}
               applyHref={program.cta.applyHref}
             />
-            <FeaturedHostPartners programSlug="nail-technician-apprenticeship" />
+            <FeaturedHostPartners programSlug="nail-technician-apprenticeship" showDirectory={false} />
             <HostShopPlacementGuide programSlug="nail-technician-apprenticeship" />
           </>
         }

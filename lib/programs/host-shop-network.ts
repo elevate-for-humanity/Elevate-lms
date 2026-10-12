@@ -113,7 +113,7 @@ export async function getHostShopNetwork(): Promise<HostShopNetworkEntry[]> {
   });
 
   const publishedOnly = FEATURED_BEAUTY_HOST_PARTNERS.filter(
-    (shop) => !matchedFeatured.has(shop.slug),
+    (shop) => !matchedFeatured.has(shop.slug) && approved.some((record) => sameBusiness(record, shop)),
   ).map(
     (shop): HostShopNetworkEntry => ({
       id: `featured:${shop.slug}`,

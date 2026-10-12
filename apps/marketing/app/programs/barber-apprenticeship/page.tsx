@@ -13,11 +13,11 @@ import {
 } from 'lucide-react';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
-import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import HostShopPlacementGuide from '@/components/programs/beauty/HostShopPlacementGuide';
 import ApprenticeshipExperienceGuide from '@/components/programs/beauty/ApprenticeshipExperienceGuide';
+import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
-import BarberPaymentPlanner from '@/components/programs/beauty/BarberPaymentPlanner';
+import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
 import KountryKutzTourSlideshow from '@/components/programs/beauty/KountryKutzTourSlideshow';
 import BeautyApprenticeshipAuthority, {
   buildBeautyProgramStructuredData,
@@ -86,6 +86,7 @@ export default async function BarberApprenticeshipPage() {
   if (!loaded) return notFound();
 
   const program = loaded.program;
+  const shops = await getHostShopNetwork();
   const heroBanner = heroBanners['barber-apprenticeship'];
   const structuredData = buildBeautyProgramStructuredData({
     ...program,
@@ -115,19 +116,12 @@ export default async function BarberApprenticeshipPage() {
           transcript={heroBanner.transcript}
           narrateTranscript={false}
           analyticsName="barber-apprenticeship"
-          heightClassName="h-[clamp(260px,42svh,480px)]"
+          heightClassName="h-[clamp(220px,32svh,360px)]"
           mediaFit="cover"
-          overlayMode="default"
-          ctas={[heroBanner.primaryCta, heroBanner.secondaryCta].filter(Boolean) as any}
-          trustIndicators={heroBanner.trustIndicators}
-          belowHeroHeadline={heroBanner.belowHeroHeadline}
-          belowHeroSubheadline={heroBanner.belowHeroSubheadline}
+          overlayMode="none"
         />
       </section>
 
-      <div data-scroll-narration data-narration={KOUNTRY_KUTZ_HERO_TRANSCRIPT}>
-        <KountryKutzTourSlideshow />
-      </div>
 
       <section
         data-scroll-narration
@@ -139,7 +133,7 @@ export default async function BarberApprenticeshipPage() {
             <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">
               Registered Barber Apprenticeship
             </p>
-            <h1 className="mt-3 text-3xl font-black leading-tight tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
+            <h1 className="mt-3 text-3xl font-black leading-tight tracking-tight text-slate-950 sm:text-4xl lg:text-4xl">
               Learn the trade where the work happens.
             </h1>
             <p className="mt-4 max-w-3xl text-base font-medium leading-7 text-slate-700 sm:text-lg sm:leading-8">
@@ -187,7 +181,7 @@ export default async function BarberApprenticeshipPage() {
       <section
         data-scroll-narration
         data-narration="Explore the barber Host Shop network. Approved shops provide the supervised work setting, while placement availability is confirmed during enrollment."
-        className="border-b border-slate-200 bg-sky-50 px-4 py-10 sm:py-14"
+        id="host-shops" className="border-b border-slate-200 bg-sky-50 px-4 py-8 sm:py-10"
       >
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 max-w-3xl">
@@ -202,9 +196,9 @@ export default async function BarberApprenticeshipPage() {
               verified during enrollment and is not implied by a public listing.
             </p>
           </div>
-          <FeaturedHostPartners programSlug="barber-apprenticeship" />
+          <HostShopPlacementGuide programSlug="barber-apprenticeship" />
           <div className="mt-10">
-            <BarberWorkforceNetworkMap />
+            <details className="rounded-xl border border-slate-200 bg-white p-4"><summary className="cursor-pointer py-2 font-bold">View the barber Host Shop map</summary><BarberWorkforceNetworkMap shops={shops} /></details>
           </div>
         </div>
       </section>
@@ -213,11 +207,14 @@ export default async function BarberApprenticeshipPage() {
         programTitle={program.title}
         applyHref={program.cta.applyHref}
       />
-      <HostShopPlacementGuide programSlug="barber-apprenticeship" />
+
+      <div data-scroll-narration data-narration={KOUNTRY_KUTZ_HERO_TRANSCRIPT}>
+        <KountryKutzTourSlideshow />
+      </div>
 
       <section className="border-b border-slate-200 bg-white px-4 py-5">
         <div className="mx-auto max-w-6xl">
-          <BeautyEnrollmentPromotion compact programLabel="Barber Apprenticeship" />
+          <BeautyEnrollmentPromotion compact programSlug="barber-apprenticeship" programLabel="Barber Apprenticeship" />
         </div>
       </section>
 
@@ -331,7 +328,7 @@ export default async function BarberApprenticeshipPage() {
               id="barber-payment-heading"
               className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl"
             >
-              Can’t afford to pay {program.selfPayCost} in full? See if you qualify.
+              Understand your self-pay payment choices.
             </h2>
             <p className="mt-4 max-w-3xl text-base leading-7 text-slate-700 sm:text-lg">
               Buy Now, Pay Later lets an approved financing provider split tuition into smaller
@@ -360,7 +357,7 @@ export default async function BarberApprenticeshipPage() {
               </Link>
             </div>
           </div>
-          <BarberPaymentPlanner />
+          <PaymentPlanCalculator programSlug="barber-apprenticeship" />
         </div>
       </section>
 

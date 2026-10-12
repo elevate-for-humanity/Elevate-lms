@@ -34,7 +34,7 @@ export function PlatformHubHero() {
           Explore hands-on pathways in barbering, cosmetology, esthetics, nail technology, HVAC, CDL, bookkeeping and business. Compare programs, find a host shop, and take your next step.
         </p>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-100">
-          Apprenticeship wages depend on an eligible paid placement. Workforce funding may be available to qualified applicants with agency approval.
+          Apprenticeship tuition is self-pay only. Wages depend on an eligible paid placement.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link href="/programs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-300 px-6 py-3 font-bold text-slate-950 hover:bg-amber-200">

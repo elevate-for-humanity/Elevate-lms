@@ -20,8 +20,7 @@ export const COSMETOLOGY: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 200, handsOnLab: 1600, examPrep: 100, careerPlacement: 100 },
   schedule: 'Full-time, Mon–Sat (varies by salon)',
   cohortSize: '1–3 apprentices per salon',
-  fundingStatement:
-    'Paid apprenticeship track available. For self-pay enrollment, BNPL starts at a $600 deposit with weekly payment options.',
+  fundingStatement: 'Apprenticeship enrollment is self-pay only. Review the published tuition and available payment terms before applying.',
   selfPayCost: '$6,000',
   badge: 'Earn & Learn',
   badgeColor: 'purple',
@@ -170,11 +169,7 @@ export const COSMETOLOGY: ProgramSchema = {
       standard: 'Federal registration disclosure',
       description: 'Cosmetology is not included in Elevate’s current canonical Registered Apprenticeship occupation standards.',
     },
-    {
-      standard: 'WIOA Title I — Supportive Services Only',
-      description:
-        'This program is NOT on the Indiana ETPL and is not eligible for WIOA tuition funding. Enrolled apprentices who are WIOA-eligible may access WIOA supportive services (transportation, childcare, tools) through their WorkOne case manager. Tuition is not covered by WIOA.',
-    },
+
   ],
   trainingPhases: [
     {
@@ -276,10 +271,10 @@ export const COSMETOLOGY: ProgramSchema = {
   deliveryModel: 'partner',
   deliveryModelDetail: 'hybrid',
   partnerProvider: 'milady',
-  fundingOptions: ['impact', 'employer_paid', 'self_pay'],
+  fundingOptions: ['self_pay'],
   funding: {
-    fssa_eligible: true,
-    snap_et_eligible: true,
+    fssa_eligible: false,
+    snap_et_eligible: false,
     wioa_eligible: false,   // NOT on Indiana ETPL — tuition not covered by WIOA
     etpl_approved: false,
     wrg_eligible: false,

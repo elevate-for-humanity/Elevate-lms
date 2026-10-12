@@ -161,7 +161,7 @@ export default function ProgramDetailPage({
     .map((credential) => credential.name)
     .join(', ');
   const programHeroNarration = isApprenticeship
-    ? `Welcome to ${p.title}. This is an earn-while-you-learn path that connects classroom instruction with supervised experience at an approved Host Site. Picture yourself learning a skill, practicing it with a qualified professional, and seeing your progress build week by week. The full pathway is ${durationLabel}, usually ${weeklyHoursLabel.replace("hrs/week", "hours each week")}. You will grow through areas such as ${narrationCurriculum || 'the skills required for this occupation'}, while working toward ${narrationCredentials || 'the program completion requirements'}. Your first step is simple: apply and complete intake. We will then help confirm your Host Site, schedule, and funding or payment path before training begins. Move through this page at your own pace. You will see what to expect, what it costs, and exactly how to apply.`
+    ? `Welcome to ${p.title}. This is an earn-while-you-learn path that connects classroom instruction with supervised experience at an approved Host Site. Picture yourself learning a skill, practicing it with a qualified professional, and seeing your progress build week by week. The full pathway is ${durationLabel}, usually ${weeklyHoursLabel.replace("hrs/week", "hours each week")}. You will grow through areas such as ${narrationCurriculum || 'the skills required for this occupation'}, while working toward ${narrationCredentials || 'the program completion requirements'}. Your first step is simple: apply and complete intake. We will then help confirm your Host Site, schedule, and self-pay tuition before training begins. Move through this page at your own pace. You will see what to expect, what it costs, and exactly how to apply.`
     : `Welcome to ${p.title}. This program is designed to help you move from interest to real, usable career skills. The ${durationLabel} experience is ${p.deliveryMode === 'hybrid' ? 'a blend of flexible online learning and scheduled hands-on practice' : p.deliveryMode === 'online' ? 'available online, so you can build skills with a flexible learning routine' : 'taught in person, with direct guidance and practical learning'}. Along the way, you will build confidence in areas such as ${narrationCurriculum || 'the program skills'} and prepare for ${narrationCredentials || 'the program credentials'}. Start by applying and completing intake. That gives admissions what they need to confirm your schedule, requirements, and best enrollment path. ${isWorkforceFunded ? 'Your training may be free if you qualify and receive written approval from the workforce agency before enrollment.' : 'You will also find clear payment choices on this page.'} Take your time, review the details, and use the application link when you are ready.`;
 
   const pathwaySteps = [
@@ -325,7 +325,7 @@ export default function ProgramDetailPage({
                 </h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-200 sm:text-base">
                   Apply first. Elevate confirms program requirements, Host Site or employer
-                  placement, schedule, related instruction, wages, and any available funding before
+                  placement, schedule, related instruction, wages, and self-pay tuition before
                   training begins.
                 </p>
               </div>
@@ -444,7 +444,7 @@ export default function ProgramDetailPage({
                     href="#enrollment-options"
                     className="mb-4 inline-flex min-h-11 items-center text-sm font-bold text-brand-blue-700"
                   >
-                    Review funding and costs ↓
+                    {isApprenticeship ? 'Review self-pay tuition ↓' : 'Review funding and costs ↓'}
                   </Link>
 
                   {primaryCTA && (
@@ -559,7 +559,7 @@ export default function ProgramDetailPage({
               <ol className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
                 <li>
                   <strong className="text-slate-950">1. Apply:</strong> Select this program and
-                  submit your contact, readiness, and funding information.
+                  submit your contact, readiness, and enrollment information.
                 </li>
                 <li>
                   <strong className="text-slate-950">2. Complete intake:</strong> Admissions
@@ -580,7 +580,7 @@ export default function ProgramDetailPage({
               id="payment-options"
               className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm"
             >
-              <h3 className="text-xl font-black text-slate-950">Funding and payment options</h3>
+              <h3 className="text-xl font-black text-slate-950">{isApprenticeship ? 'Self-pay tuition and payment options' : 'Funding and payment options'}</h3>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
                 {isWorkforceFunded ? (
                   <li>
@@ -598,14 +598,12 @@ export default function ProgramDetailPage({
                   into installments; deposit and terms are shown before acceptance.
                 </li>
                 <li>
-                  <strong className="text-slate-950">Buy Now Pay Later:</strong> If workforce
-                  funding is not approved, this is one optional payment alternative. It is not free
-                  training, is not funding, and requires separate provider approval.
+                  <strong className="text-slate-950">Buy Now Pay Later:</strong> This is an optional self-pay financing method with separate provider approval and repayment terms.
                 </li>
-                <li>
+                {!isApprenticeship ? <li>
                   <strong className="text-slate-950">Employer-sponsored:</strong> An employer may
                   pay eligible costs when an arrangement is approved.
-                </li>
+                </li> : null}
               </ul>
             </div>
           </div>

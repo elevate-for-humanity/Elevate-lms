@@ -155,7 +155,7 @@ export default function ServerFooter() {
             <span>WorkOne Workforce Partner</span>
           </div>
           <p className="mt-3 text-xs text-slate-400 max-w-2xl">
-            <strong className="text-white">Funding notice:</strong> Program-specific funding eligibility (WIOA, Workforce Ready Grant, etc.) varies by individual program, participant eligibility, and local workforce-board authorization. Contact admissions or your WorkOne office to confirm available options.
+            <strong className="text-white">Funding notice:</strong> Apprenticeship programs are self-pay only. Program-specific funding eligibility (WIOA, Workforce Ready Grant, etc.) varies by individual program, participant eligibility, and local workforce-board authorization. Contact admissions or your WorkOne office to confirm available options.
           </p>
           <p className="mt-3 text-xs text-slate-400 max-w-2xl">
             HQ: {formatHeadquartersLine()} — administrative and enrollment support. Hands-on training

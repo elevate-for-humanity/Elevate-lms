@@ -20,10 +20,9 @@ export const NAIL_TECH: ProgramSchema = {
   hoursBreakdown: { onlineInstruction: 210, handsOnLab: 0, examPrep: 0, careerPlacement: 0 },
   schedule: 'Competency-based progression through 19 Appendix A competencies, with 210 required RTI hours and supervised host-site practice. Work hours are documented as training evidence rather than used as a fixed completion denominator.',
   cohortSize: '1–3 apprentices per salon',
-  fundingStatement:
-    'Paid apprenticeship track available. For self-pay enrollment, BNPL starts at a $600 deposit with weekly payment options.',
+  fundingStatement: 'Apprenticeship enrollment is self-pay only. Review the published tuition and available payment terms before applying.',
   selfPayCost: '$5,000',
-  fundingOptions: ['impact', 'employer_paid', 'self_pay'],
+  fundingOptions: ['self_pay'],
   badge: 'Earn & Learn',
   badgeColor: 'purple',
   credentials: [
@@ -259,9 +258,9 @@ export const NAIL_TECH: ProgramSchema = {
 
   funding: {
     wioa_eligible: false,
-    fssa_eligible: true,
+    fssa_eligible: false,
     wrg_eligible: false,
     jobReadyIndyEligible: false,
-    fundingNotes: 'Registered Manicurist occupation 2090CB. Any FSSA IMPACT, WIOA, employer, or other funding requires individual eligibility and written authorization.',
+    fundingNotes: 'Apprenticeship enrollment is self-pay only.',
   },
 };

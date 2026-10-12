@@ -57,7 +57,7 @@ export default async function EstheticianApprenticeshipPage() {
     schedule:
       'Competency-based progression through 20 Appendix A competencies, with 300 required related-instruction hours and supervised host-site practice.',
     fundingStatement:
-      'Self-pay enrollment is available. Any employer or workforce funding must be confirmed in writing for the individual participant before enrollment.',
+      'Apprenticeship enrollment is self-pay only. Review the published tuition and payment terms.',
     fundingOptions: ['self_pay'],
     complianceAlignment: [
       {
@@ -141,13 +141,7 @@ export default async function EstheticianApprenticeshipPage() {
                 talent, and earning revenue from the apprentice’s supervised work in accordance with
                 wage, licensing, supervision, and program requirements.
               </p>
-              <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
-                Eligible employers may also qualify for workforce reimbursement or training-cost
-                support through WorkOne, WIOA, on-the-job training, or another workforce partner.
-                Reimbursement is not automatic or guaranteed; the employer, apprentice, occupation,
-                costs, and funding authorization must be approved by the responsible workforce
-                agency before costs are incurred.
-              </p>
+
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <a
                   href="/partners/host-shop/apply?program=esthetician"
@@ -155,12 +149,7 @@ export default async function EstheticianApprenticeshipPage() {
                 >
                   Become a Host Shop — Free
                 </a>
-                <a
-                  href="/funding/wioa"
-                  className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-emerald-700 bg-white px-6 py-3 font-black text-emerald-800 hover:bg-emerald-50"
-                >
-                  Review workforce funding
-                </a>
+
               </div>
             </div>
           </section>

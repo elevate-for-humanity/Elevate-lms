@@ -66,7 +66,6 @@ const CALLER_CHECKLIST = [
   'Confirm the shop can employ, pay, supervise, and retain the apprentice and keep payroll and training records.',
   'Submit the no-cost Host Site application.',
   'Meet with Elevate for document verification, worksite review, training-plan setup, and portal onboarding.',
-  'Before hiring, ask the local WorkOne office to screen the candidate and employer for OJT reimbursement eligibility and obtain written authorization.',
 ] as const;
 
 
@@ -98,7 +97,7 @@ export default async function HostShopsPage() {
           '/images/partners/salon-saloon/team-sign.webp': "Welcome to Salon Saloon in South Bend, Indiana, an Elevate apprenticeship Host Salon. Explore the salon where apprentices build skills in hair care, styling, sanitation and client service under licensed supervision. The shop employs and mentors apprentices; Elevate supports instruction and records. Own a salon or barbershop? Apply free to become a Host Shop.",
           '/videos/partners/kountry-kutz-tour.mp4': 'Indiana barbershops: we have apprentices looking for professional places to train. Join Kountry Kutz and other participating businesses in the Elevate Barber Network. There is no Host Shop application or placement fee. Your shop provides employment, licensed supervision, and hands-on experience; Elevate supports related instruction, documentation, progress tracking, and program compliance. Select Apply Free to Become a Host Shop.',
         }}
-        narration="Welcome to Salon Saloon in South Bend, Indiana, a participating Elevate Cosmetology Apprenticeship Host Salon. This page shows licensed salons, spas, nail studios, esthetics businesses, and barbershops how to become a Host Shop at no cost. Salon Saloon demonstrates how an approved workplace can employ and supervise apprentices while they build real skills in client service, sanitation, hair care, styling, safety, and professional salon routines. Elevate supports related instruction, attendance, hour and competency records, progress tracking, and apprenticeship compliance. The Host Shop employs, pays, and supervises the apprentice and keeps its normal service revenue. Continue down the page to review requirements, possible WorkOne wage reimbursement, required documents, and the free Host Shop application."
+        narration="Welcome to Salon Saloon in South Bend, Indiana, a participating Elevate Cosmetology Apprenticeship Host Salon. This page shows licensed salons, spas, nail studios, esthetics businesses, and barbershops how to become a Host Shop at no cost. Salon Saloon demonstrates how an approved workplace can employ and supervise apprentices while they build real skills in client service, sanitation, hair care, styling, safety, and professional salon routines. Elevate supports related instruction, attendance, hour and competency records, progress tracking, and apprenticeship compliance. The Host Shop employs, pays, and supervises the apprentice and keeps its normal service revenue. Continue down the page to review requirements, required documents, and the free Host Shop application."
       />
 
       <section className="bg-white px-4 py-10 sm:py-14" aria-labelledby="host-trades-heading">
@@ -150,7 +149,7 @@ export default async function HostShopsPage() {
               <p className="text-sm font-black uppercase tracking-wider text-brand-red-700">Apprentice enrollment</p>
               <h3 className="mt-2 text-2xl font-black">Elevate handles tuition and payment setup</h3>
               <p className="mt-3 text-sm leading-6 text-slate-700">
-                Apprentices review program-specific tuition, funding, full-payment, and available BNPL options on their program page. The Host Site does not collect tuition or approve financing.
+                Apprentices review program-specific self-pay tuition, full-payment, and available BNPL options on their program page. The Host Site does not collect tuition or approve financing.
               </p>
             </article>
             <article className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
@@ -164,13 +163,10 @@ export default async function HostShopsPage() {
 
           <div className="mt-8 grid gap-6 lg:grid-cols-2">
             <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <p className="text-sm font-black uppercase tracking-wider text-brand-blue-800">Workforce reimbursement</p>
-              <h3 className="mt-2 text-2xl font-black text-slate-950">Eligible shops may receive an OJT wage reimbursement.</h3>
-              <p className="mt-3 leading-7 text-slate-700">Qualifying employers may receive reimbursement for up to 50% of eligible wages during approved training. WorkOne approval is required before covered work begins.</p>
-              <p className="mt-3 text-sm font-bold leading-6 text-slate-800">Eligibility is not automatic. The employer and apprentice must qualify and retain payroll and training records.</p>
-              <a href="https://www.in.gov/dwd/business-services/grants-credits-and-reimbursements/on-the-job-training/" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex rounded-xl border-2 border-brand-blue-700 bg-white px-5 py-3 text-sm font-black text-brand-blue-900">
-                Review Indiana OJT reimbursement
-              </a>
+              <p className="text-sm font-black uppercase tracking-wider text-brand-blue-800">Apprenticeship tuition</p>
+              <h3 className="mt-2 text-2xl font-black text-slate-950">Self-pay enrollment only.</h3>
+              <p className="mt-3 leading-7 text-slate-700">Apprentices pay the tuition published on their program page. The Host Shop provides employment, wages and licensed supervision; Elevate supports related instruction and training records.</p>
+              <Link href="/apprenticeships" className="mt-5 inline-flex min-h-11 rounded-xl border-2 border-brand-blue-700 px-5 py-3 font-black text-brand-blue-900">Review apprenticeship tuition</Link>
             </article>
 
             <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

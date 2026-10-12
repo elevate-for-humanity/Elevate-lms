@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import PublicPageFacts from '@/components/marketing/PublicPageFacts';
 import { siteConfig } from '@/content/site';
 import { siteConfig as contactConfig } from '@/lib/config/site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -20,9 +21,11 @@ const legalLinkClass = 'inline-flex min-h-11 items-center hover:text-slate-950 h
 
 export function SiteFooter() {
   return (
+    <>
+    <PublicPageFacts />
     <footer data-public-footer className="border-t border-slate-200 bg-slate-50 text-slate-950">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
-        <p className="mb-7 max-w-4xl text-sm leading-6 text-slate-700"><strong className="text-slate-950">Funding notice:</strong> Individual programs may be eligible for WIOA, Workforce Ready Grant, or other funding. Eligibility and availability vary by program and participant; funding is not guaranteed.</p>
+        <p className="mb-7 max-w-4xl text-sm leading-6 text-slate-700"><strong className="text-slate-950">Funding notice:</strong> Apprenticeship programs are self-pay only. Individual programs may be eligible for WIOA, Workforce Ready Grant, or other funding. Eligibility and availability vary by program and participant; funding is not guaranteed.</p>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5 lg:gap-7">
           <div>
             <p className="text-lg font-bold text-slate-950">{siteConfig.name}</p>
@@ -68,5 +71,6 @@ export function SiteFooter() {
         </div>
       </div>
     </footer>
+    </>
   );
 }

@@ -42,17 +42,6 @@ const TESTIMONIALS: Testimonial[] = [
     imageUrl: '/images/testimonials/tamika.jpg',
   },
   {
-    id: '3',
-    name: 'Marcus L.',
-    program: 'Barbering Apprenticeship',
-    graduationYear: 2022,
-    quote: "I came out of prison with nothing. Elevate gave me a chance when nobody else would. They helped me get WIOA funding and placed me at a shop that believed in second chances. Now I own my own barbershop and employ three people.",
-    beforeStatus: 'Justice-involved, unemployed',
-    afterStatus: 'Owner, Precision Cuts Barbershop',
-    afterSalary: '$85,000/year',
-    imageUrl: '/images/testimonials/marcus.jpg',
-  },
-  {
     id: '4',
     name: 'James R.',
     program: 'HVAC Technician',

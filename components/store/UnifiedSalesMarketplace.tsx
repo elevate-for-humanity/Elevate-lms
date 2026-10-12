@@ -56,12 +56,36 @@ const previewImages: Record<CapabilityCategory, { src: string; alt: string }> = 
   enterprise: { src: '/images/pages/store-addons-analytics-hero.webp', alt: 'Business reporting on a laptop' },
 };
 
+// Distinct repository photographs illustrate each offer; these are not UI screenshots.
+const offerImages: Record<string, { src: string; alt: string }> = {
+  website_builder: { src: '/images/pages/store-trial-detail.jpg', alt: 'Developer building a website at a desktop workspace' },
+  crm: { src: '/images/pages/store-guide-1.webp', alt: 'Business professionals collaborating at a laptop' },
+  booking: { src: '/images/pages/booking-page-1.webp', alt: 'Professional meeting with a client' },
+  forms: { src: '/images/pages/store-compliance-wcag-hero.jpg', alt: 'Person reviewing and completing documents' },
+  email_marketing: { src: '/images/pages/admin-email-marketing-d2.webp', alt: 'Marketing team planning a campaign together' },
+  sms: { src: '/images/pages/store-cart-hero.jpg', alt: 'Person using a mobile device' },
+  invoicing: { src: '/images/pages/store-compliance-hero.jpg', alt: 'Business calculations beside a notebook' },
+  seo_autopilot: { src: '/images/pages/store-digital-detail1.webp', alt: 'Website performance charts displayed on a tablet' },
+  marketing_autopilot: { src: '/images/pages/admin-email-analytics-detail.webp', alt: 'Team reviewing a marketing presentation' },
+  ai_paris: { src: '/images/pages/store-guides-capital-hero.jpg', alt: 'Business advisor at a desk' },
+  ai_ellie: { src: '/images/pages/store-courses-hero.jpg', alt: 'Learners working together with study materials' },
+  ai_lizzy: { src: '/images/pages/store-checkout-cancel-hero.webp', alt: 'Organized office workspace with documents and equipment' },
+  ai_zora: { src: '/images/pages/store-guides-licensing-hero.jpg', alt: 'Professional reviewing a checklist' },
+  ai_orchestrator: { src: '/images/pages/store-addons-hero.jpg', alt: 'Software code displayed on a screen' },
+  course_builder: { src: '/images/pages/admin-email-automation-new-d2.webp', alt: 'Instructor leading a collaborative lesson' },
+  course_factory: { src: '/images/pages/store-trial-hero.jpg', alt: 'Software development code on a screen' },
+  lms: { src: '/images/pages/store-compliance-wioa-detail.webp', alt: 'Learners collaborating in a classroom' },
+  student_management: { src: '/images/pages/store-success-hero.webp', alt: 'Education team working together' },
+  workforce: { src: '/images/pages/store-recommendations.webp', alt: 'Skilled trades professionals in a workshop' },
+  apprenticeship: { src: '/images/pages/barber-hands-on-bright.webp', alt: 'Supervised hands-on barber training' },
+};
+
 function interactiveDemoHref(capability: PlatformCapability): string | null {
   return capability.demoHref?.trim() || null;
 }
 
 function ProductPreview({ capability, name }: { capability: PlatformCapability; name: string }) {
-  const image = previewImages[capability.category];
+  const image = offerImages[capability.key] ?? previewImages[capability.category];
   return (
     <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
       <Image src={image.src} alt={image.alt} fill loading="lazy"

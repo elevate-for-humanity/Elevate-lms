@@ -80,13 +80,7 @@ export default async function NailTechnicianApprenticeshipPage() {
                 talent, and earning revenue from the apprentice’s supervised work in accordance with
                 wage, licensing, supervision, and program requirements.
               </p>
-              <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
-                Eligible employers may also qualify for workforce reimbursement or training-cost
-                support through WorkOne, WIOA, on-the-job training, or another workforce partner.
-                Reimbursement is not automatic or guaranteed; the employer, apprentice, occupation,
-                costs, and funding authorization must be approved by the responsible workforce
-                agency before costs are incurred.
-              </p>
+
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <a
                   href="/partners/host-shop/apply?program=nail"
@@ -94,12 +88,7 @@ export default async function NailTechnicianApprenticeshipPage() {
                 >
                   Become a Host Shop — Free
                 </a>
-                <a
-                  href="/funding/wioa"
-                  className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-emerald-700 bg-white px-6 py-3 font-black text-emerald-800 hover:bg-emerald-50"
-                >
-                  Review workforce funding
-                </a>
+
               </div>
             </div>
           </section>
@@ -128,7 +117,7 @@ export async function generateMetadata() {
     openGraph: {
       title: 'Nail Technician Apprenticeship Program | Indiana',
       description:
-        'Complete supervised salon/spa training and related instruction through Elevate’s nail technician apprenticeship pathway. Funding eligibility varies and is reviewed before enrollment.',
+        'Complete supervised salon/spa training and related instruction through Elevate’s nail technician apprenticeship pathway. Apprenticeship enrollment is self-pay only.',
       url: 'https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship',
       type: 'website',
     },

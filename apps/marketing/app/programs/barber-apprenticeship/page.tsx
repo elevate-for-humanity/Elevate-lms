@@ -318,7 +318,7 @@ export default async function BarberApprenticeshipPage() {
 
       <section
         data-scroll-narration
-        data-narration="Before checkout, compare available payment and funding paths. Approval terms come from the selected provider, and Elevate can help explain the next step before you enroll."
+        data-narration="Before checkout, review self-pay tuition and payment terms. Approval terms come from the selected provider, and Elevate can help explain the next step before you enroll."
         className="border-y border-orange-200 bg-orange-50 px-4 py-14 sm:py-18"
         aria-labelledby="barber-payment-heading"
       >
@@ -408,8 +408,7 @@ export default async function BarberApprenticeshipPage() {
             Ready to start the barber apprenticeship?
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base font-semibold leading-7 text-slate-700 sm:text-lg">
-            Apply as an apprentice or start the host-shop process. Funding and placement are
-            verified separately before enrollment is finalized.
+            Apply as an apprentice or start the host-shop process. Apprenticeship tuition is self-pay only. Host-shop placement is confirmed before training begins.
           </p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link

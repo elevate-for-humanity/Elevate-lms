@@ -41,3 +41,14 @@ jobs:
           skip_install: true
       - name: Verify active Google browser endpoint and persistent state topology
         run: node scripts/gcp/audit-studio-browser.mjs
+      - name: Diagnose anonymous tax route boundary
+        run: |
+          node --input-type=module <<'NODE'
+          for(const path of ['/api/tax/returns','/api/tax/interview']) {
+            const r=await fetch('https://www.elevateforhumanity.org'+path,{cache:'no-store',signal:AbortSignal.timeout(15000)});
+            const body=await r.text();
+            console.log(JSON.stringify({path,status:r.status,contentType:r.headers.get('content-type'),
+              bodyKind:body.startsWith('{')?'json':body.includes('<html')?'html':'text',
+              errorClass:(body.match(/(?:TypeError|ReferenceError|MODULE_NOT_FOUND|Unauthorized|Internal Server Error)/)||[])[0]}));
+          }
+          NODE

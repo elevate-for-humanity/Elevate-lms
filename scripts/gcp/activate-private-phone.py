@@ -6,6 +6,7 @@ import re
 import subprocess
 import time
 import os
+import tempfile
 from pathlib import Path
 
 UNITS = ['elevate-paris-turn.service', 'elevate-pbx-provisioner.service', 'elevate-paris-gateway.service']
@@ -58,8 +59,18 @@ def prepare_storage(run=command):
         raise ValueError('asterisk_configuration_mount_unverified')
     dropin = Path('/etc/systemd/system/elevate-pbx-provisioner.service.d/runtime-storage.conf')
     body = '[Service]\nReadWritePaths='+expected+'\n'
-    if dropin.is_symlink() or (dropin.exists() and dropin.read_text()!=body):
+    if dropin.is_symlink():
         raise ValueError('existing_storage_dropin_requires_review')
+    if dropin.exists() and dropin.read_text()!=body:
+        # Correct only the exact malformed override created by our first repair.
+        # All unrelated existing overrides remain protected.
+        if dropin.stat().st_uid != 0 or dropin.read_text()!=body.replace('\\n','\\\\n'):
+            raise ValueError('existing_storage_dropin_requires_review')
+        with tempfile.NamedTemporaryFile(mode='w',dir=dropin.parent,delete=False) as output:
+            output.write(body)
+            replacement=Path(output.name)
+        replacement.chmod(0o644)
+        os.replace(replacement,dropin)
     root.mkdir(mode=0o750,exist_ok=True)
     os.chown(root,0,int(gid_text))
     dropin.parent.mkdir(mode=0o755,exist_ok=True)

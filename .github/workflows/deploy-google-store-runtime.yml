@@ -32,7 +32,7 @@ jobs:
   deploy:
     concurrency:
       group: google-production-store
-      cancel-in-progress: false
+      cancel-in-progress: true
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
@@ -90,7 +90,7 @@ jobs:
           IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/store:$GITHUB_SHA"
           docker tag "elevate-store:$GITHUB_SHA" "$IMAGE"
           docker push "$IMAGE"
-      - name: Deploy Store with HTTP probes and one warm instance
+      - name: Deploy Store with HTTP probes and idle scale-to-zero
         id: deploy
         timeout-minutes: 15
         run: |
@@ -102,7 +102,7 @@ jobs:
           echo "revision=elevate-store-migration-$SUFFIX" >> "$GITHUB_OUTPUT"
           gcloud run services update elevate-store-migration --project=elegant-racer-299721 --region=us-central1 \
             --image="$IMAGE@$DIGEST" --revision-suffix="$SUFFIX" \
-            --update-env-vars=STORE_ONLY_RUNTIME=true --cpu=2 --memory=4Gi --min-instances=1 --max-instances=1 \
+            --update-env-vars=STORE_ONLY_RUNTIME=true --cpu=2 --memory=4Gi --min=0 --min-instances=0 --max-instances=1 \
             --startup-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' \
             --liveness-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=3,periodSeconds=30,timeoutSeconds=5' --quiet
       - name: Collect exact failed Store revision logs

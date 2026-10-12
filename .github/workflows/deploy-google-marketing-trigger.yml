@@ -1,8 +1,7 @@
 name: Deploy Google Marketing on trigger
 
 # Changes on main release automatically after validation and final-container tests.
-# Each service releases independently. Finish an active release before the
-# latest pending revision starts, so new pushes do not discard completed builds.
+# Each service releases independently; newer main releases supersede stale builds.
 on:
   push:
     branches: [main]
@@ -30,8 +29,6 @@ on:
       - '.github/workflows/deploy-google-marketing-trigger.yml'
       - '.deploy-google-marketing'
   workflow_dispatch:
-  schedule:
-    - cron: '17 * * * *'
 
 permissions:
   contents: read
@@ -39,13 +36,12 @@ permissions:
   deployments: write
   actions: write
 
-concurrency:
-  group: google-production-marketing
-  cancel-in-progress: false
-
 jobs:
   dispatch:
-    if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+    concurrency:
+      group: google-marketing-dispatch-main
+      cancel-in-progress: true
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     steps:
       - name: Dispatch trusted main Marketing release
@@ -53,6 +49,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-marketing-trigger.yml/dispatches" -f ref=main
   deploy:
+    concurrency:
+      group: google-production-marketing
+      cancel-in-progress: true
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production

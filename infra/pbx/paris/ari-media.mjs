@@ -118,16 +118,20 @@ function rtp(payload,session){
   session.seq=(session.seq+1)&0xffff;session.timestamp=(session.timestamp+payload.length)>>>0;
   return out;
 }
-async function speak(session,encoded){
+export async function speak(session,encoded,{clock=()=>performance.now(),wait=sleep}={}){
   const bytes=Buffer.from(encoded,'base64');
   if(bytes.length<FRAME || bytes.length>160000 || bytes.length%FRAME!==0)throw Error('INVALID_ULAW_AUDIO');
   if(!session.remote)throw Error('NO_RTP_PEER');
   session.playing=true;
+  const startedAt=clock();
   try{
     for(let i=0;i<bytes.length&&!session.closed;i+=FRAME){
       const part=rtp(bytes.subarray(i,i+FRAME),session);
       await new Promise((resolve,reject)=>session.socket.send(part,session.remote.port,session.remote.address,e=>e?reject(e):resolve()));
-      await sleep(RATE_MS);
+      // Send complete 20ms audio frames against a monotonic timeline. Socket
+      // callbacks and event-loop work must not add delay to every frame.
+      const delay=startedAt+(i/FRAME+1)*RATE_MS-clock();
+      if(delay>0)await wait(delay);
     }
   }finally{session.playing=false;}
 }
@@ -214,12 +218,19 @@ async function begin(call){
     await end(session,'continue');
   }
 }
+export function createEventSocket(settings,Socket=WebSocket){
+  const url=new URL(settings.ws);
+  if(url.protocol!=='ws:' || url.hostname!=='127.0.0.1' || url.username || url.password || !settings.user || !settings.password)throw Error('ARI_MUST_BE_LOOPBACK');
+  url.searchParams.set('app',settings.app);
+  // Native Node WebSocket follows the browser constructor and has no header
+  // option. ARI supports api_key authentication on its private event socket.
+  url.searchParams.set('api_key',settings.user+':'+settings.password);
+  return new Socket(url);
+}
 export async function serveGateway(){
   required();
   while(true){
-    const url=new URL(config.ws);url.searchParams.set('app',config.app);
-    // ARI WebSocket Basic auth; credentials stay server-side, never logged.
-    const socket=new WebSocket(url,{headers:{Authorization:authHeader()}});
+    const socket=createEventSocket(config);
     try{
       await new Promise((resolve,reject)=>{
         socket.addEventListener('open',resolve,{once:true});

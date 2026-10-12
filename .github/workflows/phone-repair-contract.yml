@@ -1,5 +1,8 @@
 name: Phone repair contract
 on:
+  push:
+    branches: [main]
+    paths: ['lib/phone/**', 'infra/pbx/**', 'apps/admin/app/api/webhooks/telnyx/**', 'tests/unit/phone-*.test.ts', '.github/workflows/phone-repair-contract.yml']
   pull_request:
     paths:
       - 'lib/phone/**'

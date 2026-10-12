@@ -30,7 +30,6 @@ export const metadata: Metadata = {
 const HOST_SITE_APPLY_HREF = '/host-shop/apply';
 
 const HOST_SHOP_HERO_ORDER = [
-  'razors-image-barbershop',
   'top-shelf-barber-lounge',
   'salon-saloon',
   'kountry-kutz-barbershop',

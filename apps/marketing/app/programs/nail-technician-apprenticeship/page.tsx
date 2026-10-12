@@ -1,3 +1,4 @@
+import { connection } from 'next/server';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 
 import { BeautyEnrollmentPromotion } from '@/components/promotions/BeautyEnrollmentPromotion';
@@ -17,6 +18,8 @@ import { getStaticProgram } from '@/data/programs';
 export const revalidate = 3600;
 
 export default async function NailTechnicianApprenticeshipPage() {
+  // Live approved host-shop galleries and placement guides require runtime credentials.
+  await connection();
   const loaded = await loadProgramForPage('nail-technician-apprenticeship');
   const program = loaded?.program ?? getStaticProgram('nail-technician-apprenticeship');
   if (!program) return notFound();

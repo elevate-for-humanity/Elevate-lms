@@ -1,4 +1,3 @@
-import { connection } from 'next/server';
 import Image from 'next/image';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { matchesHostShopProgram } from '@/lib/programs/host-shop-programs';
@@ -31,8 +30,6 @@ export default async function FeaturedHostPartners({
   programSlug?: string;
   showDirectory?: boolean;
 }) {
-  // Approved host shops require current runtime credentials, never a build-time service key.
-  await connection();
   // Every public pathway uses the same live directory and exact occupation filter.
   const network = await getHostShopNetwork();
   const shops: FeaturedHostPartner[] = network

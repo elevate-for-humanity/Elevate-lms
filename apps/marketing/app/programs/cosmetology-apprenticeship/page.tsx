@@ -1,3 +1,4 @@
+import { connection } from 'next/server';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import { getProgramHeroImage } from '@/lib/images/programImages';
 import { notFound } from 'next/navigation';
@@ -18,6 +19,8 @@ import { getStaticProgram } from '@/data/programs';
 export const revalidate = 3600;
 
 export default async function CosmetologyApprenticeshipPage() {
+  // Live approved host-shop galleries and placement guides require runtime credentials.
+  await connection();
   const loaded = await loadProgramForPage('cosmetology-apprenticeship');
   const program = loaded?.program ?? getStaticProgram('cosmetology-apprenticeship');
   if (!program) return notFound();

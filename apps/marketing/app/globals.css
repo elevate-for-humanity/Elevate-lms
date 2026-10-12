@@ -233,7 +233,7 @@ body {
   }
 
   /* Only apply to non-Next.js images */
-  img:not([data-nimg]):not(.absolute) {
+  :where(img:not([data-nimg]):not(.absolute)) {
     max-width: 100%;
     height: auto;
   }
@@ -1419,11 +1419,7 @@ a {
   text-underline-offset: 3px;
 }
 
-/* 5) Images: prevent "cheap" stretching - exclude Next.js Image */
-img:not([data-nimg]):not(.absolute) {
-  max-width: 100%;
-  height: auto;
-}
+/* Image defaults live in @layer base above so fixed card/media sizes can win. */
 
 /* Header CSS removed - component controls all header styles */
 

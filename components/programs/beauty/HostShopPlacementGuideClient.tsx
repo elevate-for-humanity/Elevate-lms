@@ -64,9 +64,9 @@ export default function HostShopPlacementGuideClient({
                 : undefined;
               return (
                 <article key={shop.id} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                  <Link href={`/host-shops/${shop.slug}`} aria-label={`View ${shop.name} shop profile`} className="block aspect-[4/3] bg-slate-100 focus-visible:ring-4 focus-visible:ring-brand-red-700">
+                  <Link href={`/host-shops/${shop.slug}`} aria-label={`View ${shop.name} shop profile`} className="relative block aspect-[4/3] overflow-hidden bg-slate-100 focus-visible:ring-4 focus-visible:ring-brand-red-700">
                     {shop.image ? (
-                      <img src={shop.image} alt={shop.name} className="h-full w-full object-cover" />
+                      <img src={shop.image} alt={shop.name} className="absolute inset-0 h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full items-center justify-center"><Building2 className="h-12 w-12 text-slate-300" /></div>
                     )}

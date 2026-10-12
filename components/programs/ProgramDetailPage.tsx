@@ -115,13 +115,13 @@ export default function ProgramDetailPage({
   const selfPayNumeric = Number((p.selfPayCost || '').replace(/[^0-9.]/g, '')) || 0;
   const isApprenticeship = p.programType === 'apprenticeship';
   const octoberCouponCode = 'OCT300';
-  const isEstheticsApprenticeship = p.slug === 'esthetician-apprenticeship';
+  const ProgramTitle = heroOverride ? 'h1' : 'h2';
   const weeklyHoursLabel =
     p.hoursPerWeekMin === p.hoursPerWeekMax
       ? `${p.hoursPerWeekMin} hrs/week`
       : `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`;
   const bnplDepositStart = isApprenticeship
-    ? 300
+    ? null
     : p.depositAmount
       ? Number(p.depositAmount.replace(/[^0-9.]/g, ''))
       : null;
@@ -381,9 +381,9 @@ export default function ProgramDetailPage({
                   )}
                   {p.deliveryModelDetail && <DeliveryBadge model={p.deliveryModelDetail} />}
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
+                <ProgramTitle className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
                   {p.title}
-                </h2>
+                </ProgramTitle>
                 <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
                   {p.subtitle}
                 </p>
@@ -767,9 +767,7 @@ export default function ProgramDetailPage({
             </p>
             {bnplDepositStart && (
               <p className="mt-2 text-sm font-semibold text-slate-200">
-                {isApprenticeship
-                  ? `October coupon ${octoberCouponCode} lowers the startup deposit to ${bnplDepositStart.toLocaleString()}.`
-                  : `Payment plans start with an estimated ${bnplDepositStart.toLocaleString()} deposit.`}
+                {`Payment plans start with an estimated ${bnplDepositStart.toLocaleString()} deposit.`}
               </p>
             )}
             {estimatedWeeklyAfterDeposit && (
@@ -788,7 +786,7 @@ export default function ProgramDetailPage({
                   Pay in full
                 </span>
                 <span className="mt-1 block text-xl font-black text-white">
-                  {isEstheticsApprenticeship ? '$5,400 with PAYFULL600' : p.selfPayCost}
+                  {p.selfPayCost}
                 </span>
                 <span className="mt-1 block text-xs leading-5 text-slate-300">
                   One payment after application approval

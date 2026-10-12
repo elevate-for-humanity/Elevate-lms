@@ -10,12 +10,14 @@
     {
       "source": "app/tax-software/_components/TaxSiteShell.tsx",
       "target": "apps/marketing/app/tax-software/_components/TaxSiteShell.tsx",
-      "sha256": "d6ed0f04f3daa6e77cc274fa76cee76443266877622bf44d6f32598842273301"
+      "sha256": "5bedb383c09ad3845d3e6c08d6068f2d87dc6f9a7a2e6237c17e9a153f80ff59",
+      "sourceSha256": "d6ed0f04f3daa6e77cc274fa76cee76443266877622bf44d6f32598842273301"
     },
     {
       "source": "app/tax-software/about/page.tsx",
       "target": "apps/marketing/app/tax-software/about/page.tsx",
-      "sha256": "19531e4ea9c4591f9a3ca38c8a431627b4572983518058b141965b68fd640439"
+      "sha256": "fba09019a0efa6c76b5afba6bf42668c69f313a3bfc9df625ce0b4c73677f9ab",
+      "sourceSha256": "19531e4ea9c4591f9a3ca38c8a431627b4572983518058b141965b68fd640439"
     },
     {
       "source": "app/tax-software/bank-products/page.tsx",
@@ -25,7 +27,8 @@
     {
       "source": "app/tax-software/contact/page.tsx",
       "target": "apps/marketing/app/tax-software/contact/page.tsx",
-      "sha256": "90f12399734d66aa66ebe6adf35dcb00431814f8e5500d862f2d1f6fec5453dc"
+      "sha256": "492ed08bd44af2c2b36ddc120974f5fe6c0aa1f4eeaf1ea784355f5eeb684ea5",
+      "sourceSha256": "90f12399734d66aa66ebe6adf35dcb00431814f8e5500d862f2d1f6fec5453dc"
     },
     {
       "source": "app/tax-software/demo/page.tsx",
@@ -45,22 +48,26 @@
     {
       "source": "app/tax-software/login/page.tsx",
       "target": "apps/marketing/app/tax-software/login/page.tsx",
-      "sha256": "4b785738468b84a0653efd33e5cae719d889ee1fb793a96115b8091106d07b7d"
+      "sha256": "5bc39165632af011ed10ea6af3af11fc44c286324f79aaaf54ad38912ddb0728",
+      "sourceSha256": "4b785738468b84a0653efd33e5cae719d889ee1fb793a96115b8091106d07b7d"
     },
     {
       "source": "app/tax-software/page.tsx",
       "target": "apps/marketing/app/tax-software/page.tsx",
-      "sha256": "2e9a3679173ded5c370550af1d181b0d6ef3cb5a70be1f91fbdb7600cb9700fa"
+      "sha256": "266fdb277f225f9b23b091325d96ccc0e6ce4b8e959fb43721686dbc69fa0cdb",
+      "sourceSha256": "2e9a3679173ded5c370550af1d181b0d6ef3cb5a70be1f91fbdb7600cb9700fa"
     },
     {
       "source": "app/tax-software/pricing/page.tsx",
       "target": "apps/marketing/app/tax-software/pricing/page.tsx",
-      "sha256": "207a937aaee36a68978fd3157d942e428c8ca1677f7a5b7b661e5255faddfc57"
+      "sha256": "1f9631ccd4b5e39ded65942f769608a1a2922c10341b484d20749127464e52a0",
+      "sourceSha256": "207a937aaee36a68978fd3157d942e428c8ca1677f7a5b7b661e5255faddfc57"
     },
     {
       "source": "app/tax-software/professional/page.tsx",
       "target": "apps/marketing/app/tax-software/professional/page.tsx",
-      "sha256": "b2a4831b330ae831a329d9aacaa6db848d9a0f39bbe37e0d0225cfe1da49996b"
+      "sha256": "1e7d60d9b0bb8591f6445bdbd7365bbf540d1ff34a5aee95705c12a4c0ae5a07",
+      "sourceSha256": "b2a4831b330ae831a329d9aacaa6db848d9a0f39bbe37e0d0225cfe1da49996b"
     },
     {
       "source": "app/tax-software/self-file/layout.tsx",
@@ -70,12 +77,14 @@
     {
       "source": "app/tax-software/self-file/page.tsx",
       "target": "apps/marketing/app/tax-software/self-file/page.tsx",
-      "sha256": "5ecf286f97f30d3c1e6e0682fc42514cbc5c9d4bb307e4712cf3227551b4f77c"
+      "sha256": "7dd32063fe675f87ab1ec0942b1a49e00def0d66fa46c7b6f23baf10a0fa4545",
+      "sourceSha256": "5ecf286f97f30d3c1e6e0682fc42514cbc5c9d4bb307e4712cf3227551b4f77c"
     },
     {
       "source": "app/tax-software/self-file/return/page.tsx",
       "target": "apps/marketing/app/tax-software/self-file/return/page.tsx",
-      "sha256": "28a894d18c16a7b6de13e7a34b25b7fe7190e8640653f5b6f13b3ac86371b635"
+      "sha256": "deb47a15cccdc64c911ea90ac333a46ab6431c16fd7eb55ddfb3cab0f9e0ea4b",
+      "sourceSha256": "28a894d18c16a7b6de13e7a34b25b7fe7190e8640653f5b6f13b3ac86371b635"
     },
     {
       "source": "app/tax-software/self-file/w2/confirm/page.tsx",

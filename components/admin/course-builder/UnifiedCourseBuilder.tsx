@@ -55,6 +55,7 @@ async function startUltimateCourse(input: {
   programSlug: string;
   topic?: string;
   audience?: string;
+  googleModel?: string;
 }) {
   const response = await fetch('/api/admin/ultimate-course-builder', {
     method: 'POST',
@@ -66,6 +67,7 @@ async function startUltimateCourse(input: {
       title: input.course.title,
       topic: input.topic ?? input.course.description ?? '',
       audience: input.audience ?? '',
+      ...(input.googleModel?.trim() ? {instructionalAuthoring: {provider:'google', model:input.googleModel.trim()}} : {}),
     }),
   });
   const payload = await readJson(response);
@@ -475,6 +477,9 @@ function CreateCoursePanel({
       const title = String(data.get('title') ?? '').trim();
       const topic = String(data.get('topic') ?? '').trim();
       const audience = String(data.get('audience') ?? '').trim();
+      const googleModel = String(data.get('googleModel') ?? '').trim();
+      if (googleModel && !/^gemini-[a-z0-9.-]+$/.test(googleModel))
+        throw new Error('Enter a supported Google model ID for source-grounded teaching');
       const programId = String(data.get('programId') ?? '').trim();
       const selectedProgram = programs.find((program) => program.id === programId);
       if (!selectedProgram?.slug) throw new Error('The selected program needs a canonical slug');
@@ -503,6 +508,7 @@ function CreateCoursePanel({
         programSlug: selectedProgram.slug,
         topic,
         audience,
+        googleModel,
       });
       await onCreated(course.id);
     } catch (reason) {
@@ -558,6 +564,11 @@ function CreateCoursePanel({
             </option>
           ))}
       </select>
+      <label className="block space-y-2 text-sm">
+        <span>Google model for source-grounded teaching (optional)</span>
+        <input name="googleModel" placeholder="Verified model ID" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" />
+        <span className="block text-slate-400">Use a model verified for this worker's Google region. Authorized teaching sources and all media acceptance checks remain required.</span>
+      </label>
       {error ? (
         <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
           {error}
@@ -593,6 +604,7 @@ export function UltimateBuildPanel({
   const statusLoading = loading;
   const statusLoaded = buildsCourseId === course.id;
   const [notice, setNotice] = useState('');
+  const [googleModel, setGoogleModel] = useState('');
   const jobs = [...(latest?.ultimate_build_jobs ?? [])].sort((a, b) =>
     b.created_at.localeCompare(a.created_at),
   );
@@ -658,7 +670,7 @@ export function UltimateBuildPanel({
         if (!response.ok || payload?.dispatched !== true) throw new Error(payload?.error || 'Google worker could not be started');
         setNotice('Google worker dispatch accepted. The stages below show actual build progress.');
       } else {
-        await startUltimateCourse({ course, programSlug });
+        await startUltimateCourse({ course, programSlug, googleModel });
         setNotice('Build saved and Google worker dispatch accepted. Check the stages for progress.');
       }
       await refresh();
@@ -777,6 +789,14 @@ export function UltimateBuildPanel({
 
       {notice ? <p role="status" className="mt-4 text-sm text-cyan-200">{notice}</p> : null}
       {latest ? <UltimateStageInspector buildId={latest.id} updatedAt={latest.updated_at} /> : null}
+
+      {statusLoaded && !latest ? (
+        <label className="mt-4 block space-y-2 text-sm">
+          <span>Google model for source-grounded teaching (optional)</span>
+          <input value={googleModel} onChange={(event) => setGoogleModel(event.target.value)} placeholder="Verified model ID" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" />
+          <span className="block text-slate-400">Set before starting this build. Authorized teaching sources and all media acceptance checks remain required.</span>
+        </label>
+      ) : null}
 
       <div className="mt-6 flex flex-wrap gap-3">
         <button

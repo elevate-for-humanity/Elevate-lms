@@ -447,7 +447,16 @@ export function ProgramHolderPhone({
 
   async function returnCall(number = returnNumber) {
     if (data?.readOnly) return;
-    const destination = phoneDestination(number, data?.extension.provider || 'telnyx');
+    let destination = phoneDestination(number, data?.extension.provider || 'telnyx');
+    if(data?.extension.provider!=='asterisk' && /^(0|[0-9]{3})$/.test(number.trim())) {
+      try {
+        const response=await fetch('/api/communications/phone/dial',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({extension:number.trim()})});
+        const target=await response.json();
+        if(!response.ok){setError(target.error || 'The extension is unavailable.');return;}
+        if(typeof target.destination!=='string' || !/^sip:[A-Za-z0-9._-]{1,128}@sip\\.telnyx\\.com$/.test(target.destination)){setError('The extension destination could not be verified.');return;}
+        destination=target.destination;
+      } catch {setError('The extension could not be reached. Try again.');return;}
+    }
     if (!destination || !clientRef.current || !remoteAudioRef.current) {
       setError(
         !connected
@@ -465,7 +474,7 @@ export function ProgramHolderPhone({
         remoteElement: remoteAudioRef.current,
       });
       callRef.current = call;
-      setIncomingNumber(destination);
+      setIncomingNumber(number);
       setCallState('calling');
       setError('');
     } catch {

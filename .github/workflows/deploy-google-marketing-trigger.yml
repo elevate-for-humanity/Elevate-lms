@@ -13,6 +13,8 @@ on:
       - 'lib/ai/google-natural-voice.ts'
       - 'lib/ai/natural-voice-route.ts'
       - 'components/voice/**'
+      - 'lib/images/**'
+      - 'lib/media/**'
       - 'lib/programs/**'
       - 'lib/apprenticeship-programs/**'
       - 'lib/navigation/**'

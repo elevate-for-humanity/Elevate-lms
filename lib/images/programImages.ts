@@ -254,9 +254,9 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Esthetics learner practicing professional skincare and client services',
   },
   'esthetician-apprenticeship': {
-    card: '/images/programs/esthetician-host-recruitment-2026.webp',
+    card: '/images/programs/efh-esthetician-client-services-card.jpg',
     hero: '/images/programs/esthetician-host-recruitment-2026.webp',
-    alt: 'Illustrative esthetics instructor mentoring adult apprentices in a skincare studio',
+    alt: 'Esthetics skincare instruction and professional client services',
   },
   'nail-technician-apprenticeship': {
     card: `${P}/nail-technician.webp`,

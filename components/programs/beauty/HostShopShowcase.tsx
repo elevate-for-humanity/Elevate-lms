@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import NarratedShopTour from '@/components/partners/NarratedShopTour';
 import Link from 'next/link';
 import {
   ChevronLeft,
@@ -234,14 +235,14 @@ export default function HostShopShowcase({
     <section
       ref={sectionRef}
       aria-labelledby="host-shop-showcase-heading"
-      data-scroll-narration={enableNarration ? true : undefined}
+      data-scroll-narration={enableNarration && image.kind !== 'video' ? true : undefined}
       data-narration-src={enableNarration ? (narrationSources?.[image.src] ?? narrationSrc) : undefined}
       data-narration={
         enableNarration
           ? (tourScripts?.[image.src] ??
             image.script ??
             narration ??
-            'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.')
+            `Meet ${shop.dba ?? shop.name} in ${shop.city}, ${shop.state}. ${shop.marketingBlurb ?? shop.note}`)
           : undefined
       }
       data-narration-rate="0.84"
@@ -326,6 +327,12 @@ export default function HostShopShowcase({
                       aria-hidden="true"
                     />
                   ) : null}
+                  {tourScripts?.[image.src] || image.script ? (
+                    <div className="relative z-10 h-full w-full">
+                      <NarratedShopTour src={image.src} script={tourScripts?.[image.src] ?? image.script!}
+                        shopName={shop.dba ?? shop.name} showScript={false} onPlaybackChange={setVideoPlaying} />
+                    </div>
+                  ) : (
                   <video
                     key={image.src}
                     src={image.src}
@@ -369,6 +376,7 @@ export default function HostShopShowcase({
                     className="relative z-10 aspect-[9/16] h-full max-h-[640px] w-auto max-w-full object-contain shadow-2xl"
                     aria-label={image.alt}
                   />
+                  )}
                 </div>
               ) : image?.kind === 'video' && image.backdropSrc ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">

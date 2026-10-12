@@ -34,7 +34,7 @@ export function HomeCareerPathways() {
         <div data-mobile-grid="2" className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PATHWAYS.map(({ slug, title, description, image, alt, href }) => (
             <article key={slug} className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <Link href={href} className="relative block aspect-[16/10] overflow-hidden bg-slate-100" aria-label={`Explore ${title}`}>
+              <Link href={href} className="relative block aspect-[4/3] overflow-hidden bg-slate-100" aria-label={`Explore ${title}`}>
                 <Image src={image} alt={alt} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" loading="lazy" className="object-cover" />
               </Link>
               <div className="flex flex-1 flex-col p-4 sm:p-5">

@@ -61,12 +61,14 @@ export default function StorePage() {
             </div>
             <p className="mt-4 text-sm font-semibold text-slate-600">14 days · no card required · source-backed proof and limits available before checkout</p>
           </div>
-          <div className="relative h-[280px] min-w-0 overflow-hidden rounded-2xl bg-slate-950 shadow-xl ring-1 ring-slate-200 sm:h-[500px] sm:rounded-3xl sm:shadow-2xl">
-            <Image src="/images/pages/platform-page-1.webp" alt="Elevate business and workforce platform" fill priority sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover" />
+          <div className="relative aspect-[4/3] min-w-0 overflow-hidden rounded-2xl bg-slate-950 shadow-xl ring-1 ring-slate-200 sm:rounded-3xl sm:shadow-2xl">
+            <Image src="/images/pages/store-digital-detail1.webp" alt="Business analytics displayed on a tablet" fill priority sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover" />
             <div className="absolute inset-x-0 bottom-0 z-20 bg-slate-950/80 p-4 text-sm font-bold text-white backdrop-blur-sm">Website, CRM, LMS, workforce, apprenticeship, testing, and compliance—one connected workspace.</div>
           </div>
         </div>
       </section>
+
+      <UnifiedSalesMarketplace />
 
       <section className="border-b border-slate-200 bg-white px-4 py-12 sm:px-6 sm:py-16">
         <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-[0.82fr_1.18fr]">
@@ -173,7 +175,6 @@ export default function StorePage() {
         </div>
       </section>
 
-      <UnifiedSalesMarketplace />
 
       <StandaloneBuildPackages compact />
 

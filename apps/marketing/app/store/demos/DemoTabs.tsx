@@ -132,11 +132,11 @@ export default function DemoTabs() {
 
       <div className="grid gap-7 lg:grid-cols-5">
         <div className="lg:col-span-3">
-          <div className="flex aspect-video flex-col items-center justify-center overflow-hidden rounded-2xl bg-slate-950 px-8 text-center text-white shadow-xl">
+          <div className="flex min-h-[320px] flex-col items-center justify-center overflow-hidden rounded-2xl bg-slate-950 px-5 py-8 text-center text-white shadow-xl">
             <active.icon className="h-16 w-16 text-brand-red-400" />
             <span className="mt-4 rounded bg-white/10 px-3 py-1 text-xs font-bold">Interactive sample workspace</span>
             <h2 className="mt-4 text-3xl font-black">{active.label}</h2>
-            <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-slate-300">Open the working sample portal and use its guided controls. No missing video or prerecorded screen is required.</p>
+            <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-slate-300">Open the working sample portal and use its guided controls. Try the guided controls with sample data.</p>
             <Link href={active.liveHref} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-black hover:bg-brand-red-500">
               <Play className="h-5 w-5" /> Launch interactive demo
             </Link>

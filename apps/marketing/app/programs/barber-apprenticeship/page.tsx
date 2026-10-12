@@ -115,7 +115,7 @@ export default async function BarberApprenticeshipPage() {
           transcript={heroBanner.transcript}
           narrateTranscript={false}
           analyticsName="barber-apprenticeship"
-          heightClassName="h-[clamp(520px,72svh,860px)]"
+          heightClassName="h-[clamp(260px,42svh,480px)]"
           mediaFit="cover"
           overlayMode="default"
           ctas={[heroBanner.primaryCta, heroBanner.secondaryCta].filter(Boolean) as any}

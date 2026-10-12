@@ -27,6 +27,16 @@ async function advance(ms: number) { await act(async () => { vi.advanceTimersByT
 describe('automatic page narration', () => {
   beforeEach(() => { vi.useFakeTimers(); vi.clearAllMocks(); localStorage.clear(); visible = 'a'; voice.play.mockResolvedValue(true); voice.prepare.mockResolvedValue(true); });
   afterEach(() => { cleanup(); document.querySelectorAll('main').forEach((node) => node.remove()); vi.useRealTimers(); });
+  it('does not interrupt a user-started audible video on scroll', async () => {
+    setup();
+    const video = document.createElement('video');
+    Object.defineProperty(video, 'paused', { value: false });
+    video.muted = false; video.volume = 1;
+    document.querySelector('main')!.append(video);
+    await advance(1400);
+    visible = 'b'; fireEvent.scroll(window); await advance(850);
+    expect(voice.play).not.toHaveBeenCalled();
+  });
   it('does not restart an autoplayed script on the first touch', async () => {
     setup(); await advance(1400);
     await act(async () => { fireEvent.pointerDown(document.body); });

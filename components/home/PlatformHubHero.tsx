@@ -25,7 +25,7 @@ export function PlatformHubHero() {
         />
       </div>
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/25" aria-hidden="true" />
-      <div className="mx-auto flex min-h-[540px] max-w-6xl flex-col justify-center px-5 py-16 sm:min-h-[600px] sm:px-8 lg:min-h-[620px]">
+      <div className="mx-auto flex min-h-[360px] max-w-6xl flex-col justify-center px-5 py-16 sm:min-h-[440px] sm:px-8 lg:min-h-[480px]">
         <p className="mb-4 text-sm font-bold uppercase tracking-[0.18em] text-amber-300">Career training • Apprenticeships • Employer connections</p>
         <h2 className="max-w-3xl text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-6xl">
           Build a career. <span className="text-amber-300">Earn while you learn.</span>

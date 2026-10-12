@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-const EMPLOYER_PORTAL = 'https://app.elevateforhumanity.org/employer';
+const EMPLOYER_PORTAL = 'https://app.elevateforhumanity.org/employer/post-job';
 
 export const metadata: Metadata = {
   title: 'Post a Job | Elevate for Humanity',

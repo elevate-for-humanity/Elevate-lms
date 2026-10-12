@@ -135,7 +135,7 @@ export default function FeaturedHostPartners({
               apprenticeship opportunities.
             </p>
 
-            <div className="mt-10 grid gap-6 lg:grid-cols-2">
+            <div className="mt-6 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {directoryShops.map((shop) => {
                 const stillMedia = shop.media?.filter((media) => media.kind !== 'video') ?? [];
                 const image =
@@ -164,10 +164,10 @@ export default function FeaturedHostPartners({
                       </div>
                     ) : null}
 
-                    <div className="flex flex-1 flex-col p-6 sm:p-7">
+                    <div className="flex flex-1 flex-col p-4 sm:p-5">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
-                          <h3 className="text-2xl font-black tracking-tight text-slate-950">
+                          <h3 className="text-xl font-black tracking-tight text-slate-950">
                             {shop.dba ?? shop.name}
                           </h3>
                           {shop.dba ? (
@@ -219,7 +219,7 @@ export default function FeaturedHostPartners({
                         ))}
                       </div>
 
-                      <div className="mt-6 flex flex-wrap gap-3">
+                      <div className="mt-auto flex flex-wrap gap-3 pt-6">
                         <Link
                           href={`/host-shops/${shop.slug}`}
                           className="inline-flex min-h-10 items-center justify-center rounded-xl bg-brand-red-600 px-4 py-2 text-sm font-extrabold text-white transition hover:bg-brand-red-700"

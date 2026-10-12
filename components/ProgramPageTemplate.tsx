@@ -60,7 +60,7 @@ export default function ProgramPageTemplate({
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Banner */}
-      <section className="relative h-[clamp(520px,72svh,860px)] flex items-center">
+      <section className="relative h-[clamp(260px,42svh,480px)] flex items-center">
         <div className="absolute inset-0">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
           <Image

@@ -29,7 +29,7 @@ export default function SkilledTradesPageClient({ programs }: { programs: Progra
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative flex h-[clamp(520px,72svh,860px)] w-full items-center overflow-hidden bg-slate-900">
+      <section className="relative flex h-[clamp(260px,42svh,480px)] w-full items-center overflow-hidden bg-slate-900">
         <UltraVideoPlayer
           src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/videos/hvac-hero-final.mp4"
           className="absolute inset-0 w-full h-full object-cover brightness-110"

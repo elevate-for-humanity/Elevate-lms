@@ -15,7 +15,7 @@ const NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration';
 const LEGACY_NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration:v2';
 
 function narrationFor(section: HTMLElement) {
-  return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 900) ?? '';
+  return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 2400) ?? '';
 }
 
 function narrationSourceFor(section: HTMLElement) {
@@ -81,6 +81,10 @@ export function ScrollNarrator() {
   const { play, prepare, stop, isLoading, isPlaying } = useNaturalVoice();
 
   const narrateVisibleSection = useCallback(async (replay = false) => {
+    // User-started media owns the sound until it finishes or is paused.
+    if (Array.from(document.querySelectorAll<HTMLMediaElement>('audio, video')).some(
+      (media) => !media.paused && (!media.muted && media.volume > 0 || media.hasAttribute('data-narrated-tour')),
+    )) return false;
     const section = mostVisiblePageSection();
     if (!section) {
       // Mobile layouts frequently have spacing between narrated sections.

@@ -75,7 +75,7 @@ export default function KountryKutzTourSlideshow() {
           aria-roledescription="carousel"
           aria-label="Kountry Kutz photo tour"
         >
-          <div className="relative aspect-[4/3] min-h-[300px] sm:aspect-[16/9] sm:min-h-[420px]">
+          <div className="relative aspect-[4/3] max-h-[480px]">
             {slides.map((slide, index) => (
               <Image
                 key={slide.src}

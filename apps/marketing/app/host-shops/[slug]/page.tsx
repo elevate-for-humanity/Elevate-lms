@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ExternalLink, MapPin, Navigation, Phone, ShieldCheck } from 'lucide-react';
+import NarratedShopTour from '@/components/partners/NarratedShopTour';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { getFeaturedHostPartnerBySlug, type FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-partners';
 import { getPublicHostShopBySlug } from '@/lib/partners/public-host-shops';
@@ -152,7 +153,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
 
       <section
         className="border-b border-slate-200 bg-gradient-to-b from-white to-slate-50"
-        data-scroll-narration={videoScript ? '' : undefined}
+        data-scroll-narration={!profile.video_url && !featuredFallbackVideo ? '' : undefined}
         data-narration={videoScript}
         data-narration-rate={videoScript ? '0.82' : undefined}
         data-narration-style={videoScript ? 'instructor' : undefined}
@@ -172,12 +173,12 @@ export default async function HostShopProfilePage({ params }: PageProps) {
             </div>
           </div>
           <div className="min-w-0">
-            {items.length || profile.video_url || featuredFallbackVideo ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={profile.video_url || featuredFallbackVideo || undefined} /> : address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:rounded-3xl"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+            {items.length || profile.video_url || featuredFallbackVideo ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={profile.video_url || featuredFallbackVideo || undefined} videoScript={videoScript} /> : address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:rounded-3xl"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
           </div>
         </div>
       </section>
 
-      {videoScript ? (
+      {videoScript && !profile.video_url && !featuredFallbackVideo ? (
         <section className="border-b border-slate-200 bg-white px-4 py-5 sm:px-6">
           <details className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
             <summary className="cursor-pointer text-sm font-black text-brand-blue-900">
@@ -331,35 +332,19 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
       {videoUrl ? (
         <section
           className="border-b border-slate-200 bg-white px-4 py-8 sm:px-6 sm:py-12"
-          data-scroll-narration
-          data-narration={videoScript}
-          data-narration-rate="0.82"
-          data-narration-style="instructor"
+
         >
           <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">{hostLabel}</p>
               <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">{shop.dba ?? shop.name}</h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">{shop.marketingBlurb ?? shop.note}</p>
-              <p className="mt-4 text-sm font-bold leading-6 text-slate-600">Listen to the page guide for the full shop and apprenticeship introduction. Play the shop tour when you are ready, and use fullscreen for a larger view.</p>
+              <p className="mt-4 text-sm font-bold leading-6 text-slate-600">Play the tour to hear the introduction to this shop. Read the script beside the video or use fullscreen for a larger view.</p>
             </div>
             <div className="min-w-0">
-              <div className="mx-auto flex w-full max-w-[280px] items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-lg">
-                <video src={videoUrl} controls playsInline preload="metadata" className="h-auto w-auto max-h-[320px] max-w-full object-scale-down" aria-label={`${shop.dba ?? shop.name} ${hostLabel} video`} />
-              </div>
+              <NarratedShopTour src={videoUrl} script={videoScript} shopName={shop.dba ?? shop.name} />
             </div>
           </div>
-        </section>
-      ) : null}
-
-      {videoUrl ? (
-        <section className="border-b border-slate-200 bg-white px-4 py-5 sm:px-6">
-          <details className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
-            <summary className="cursor-pointer text-sm font-black text-brand-blue-900">
-              Read the {shop.dba ?? shop.name} tour script
-            </summary>
-            <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-700">{videoScript}</p>
-          </details>
         </section>
       ) : null}
 

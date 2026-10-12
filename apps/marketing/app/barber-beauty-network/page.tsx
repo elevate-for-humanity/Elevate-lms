@@ -55,17 +55,18 @@ export default function BarberBeautyNetworkPage() {
         <p className="mt-3 max-w-3xl leading-7 text-slate-700">Choose where you want to go. Community conversations require a member account; directory listings and job opportunities are shown separately.</p>
         <div className="mt-8 grid gap-5 sm:grid-cols-2">
           {pathways.map(({ title, description, href, action, icon: Icon }, index) => (
-            <article key={title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="relative mb-5 aspect-[16/10] overflow-hidden rounded-xl"><Image fill sizes="(min-width: 640px) 50vw, 100vw" src={['/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp', '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile-enhanced-2026.webp', '/images/partners/kountry-kutz/interior-empty-enhanced-2026.webp', '/images/partners/salon-saloon/team-interior-enhanced-2026.webp'][index]} alt={title} className="object-cover" loading="lazy" /></div>
+            <article key={title} className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+              <div className="relative mb-5 aspect-[4/3] overflow-hidden rounded-xl"><Image fill sizes="(min-width: 640px) 50vw, 100vw" src={['/images/partners/generations-hair/dimensional-color-after-enhanced-2026.webp', '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile-enhanced-2026.webp', '/images/partners/kountry-kutz/interior-empty-enhanced-2026.webp', '/images/partners/salon-saloon/team-interior-enhanced-2026.webp'][index]} alt={title} className="object-cover" loading="lazy" /></div>
               <Icon aria-hidden="true" className="h-8 w-8 text-blue-700" />
               <h3 className="mt-4 text-2xl font-bold">{title}</h3>
               <p className="mt-3 leading-7 text-slate-700">{description}</p>
-              <Link href={href} className="mt-5 inline-flex min-h-11 items-center gap-2 font-bold text-red-700">{action} <ArrowRight className="h-4 w-4" /></Link>
+              <Link href={href} className="mt-auto inline-flex min-h-11 items-center gap-2 pt-5 font-bold text-red-700">{action} <ArrowRight className="h-4 w-4" /></Link>
             </article>
           ))}
         </div>
         <div className="mt-8 flex flex-wrap gap-4">
-          <Link href="/employer" className="font-bold text-blue-700 underline underline-offset-4">Employer resources</Link>
+          <Link href="/employers/post-job" className="font-bold text-blue-700 underline underline-offset-4">Post a job</Link>
+          <Link href="/employers/directory" className="font-bold text-blue-700 underline underline-offset-4">Employer directory</Link>
           <Link href="/barber-and-beauty-apprenticeships" className="font-bold text-blue-700 underline underline-offset-4">Beauty apprenticeships</Link>
         </div>
       </section>

@@ -1,16 +1,17 @@
 import { google } from './runtime-config.mjs';
 import { inspectRegionalCapacity } from './regional-capacity.mjs';
 import { pathToFileURL } from 'node:url';
-import { assertNoActiveExecutions } from './execute-course-job.mjs';
 
 export async function dispatchQueuedCourseJob({run = (_command, args) => google(args), capacityCheck = inspectRegionalCapacity, request = fetch, env = process.env, now = new Date(), delay = ms => new Promise(resolve => setTimeout(resolve, ms)), assignmentAttempts = 60} = {}) {
   const scope = ['--project=elegant-racer-299721', '--region=us-central1'];
+  // An active Cloud Run execution must not block unrelated queued builds.
+  // Atomic database leases prevent two tasks from claiming the same job.
   const executions = JSON.parse(run('gcloud', ['run','jobs','executions','list','--job=elevate-course-builder',...scope,'--format=json'], {encoding:'utf8',stdio:['ignore','pipe','pipe']}));
-  try { assertNoActiveExecutions(executions); }
-  catch (error) {
-    if (error.message === 'COURSE_JOB_ALREADY_ACTIVE') return {status:'busy'};
-    throw error;
-  }
+  if (!Array.isArray(executions)) throw new Error('EXECUTION_LIST_INVALID');
+  const active = executions.filter(execution => {
+    const condition = execution.status?.conditions?.find(item => item.type === 'Completed');
+    return !execution.status?.completionTime && !['True','False'].includes(condition?.status);
+  });
   const token = env.SUPABASE_SERVICE_ROLE_KEY;
   if (!token) throw new Error('SUPABASE_SERVICE_ROLE_KEY_REQUIRED');
   const url = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
@@ -36,8 +37,11 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   // course behind the first running lesson. Keep a bounded default for quota.
   const configured = Number(env.COURSE_WORKER_PARALLELISM ?? 2);
   const limit = Number.isSafeInteger(configured) ? Math.min(4, Math.max(1, configured)) : 2;
-  const tasks = Math.min(limit, queued.length);
-  run('gcloud',['run','jobs','execute','elevate-course-builder',...scope,`--tasks=${tasks}`,`--parallelism=${tasks}`,'--async','--quiet'],{stdio:'inherit'});
+  // Bound new tasks to configured concurrency, including existing executions.
+  const slots = Math.max(0, limit - active.reduce((sum, execution) => sum + Math.max(1, Number(execution.spec?.taskCount ?? execution.status?.taskCount ?? 1)), 0));
+  if (!slots) return {status:'busy',activeExecutions:active.length};
+  const tasks = Math.min(slots, queued.length);
+  run('gcloud',['run','jobs','execute','elevate-course-builder',...scope,`--tasks=${tasks}`,'--async','--quiet'],{stdio:'inherit'});
   // Launch is not assignment. Require fresh durable claims for every task.
   const pending = new Map(queued.slice(0,tasks).map(item => [item.id, item.heartbeat_at || '']));
   const assignmentUrl = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');

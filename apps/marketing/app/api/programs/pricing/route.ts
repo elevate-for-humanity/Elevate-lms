@@ -62,11 +62,22 @@ export async function GET(request: NextRequest) {
     // Apprenticeship pricing must agree with the canonical invoice checkout,
     // which reads programs.price/tuition, not a stale legacy pricing row.
     if (slug.includes('apprenticeship')) {
-      const {data: program, error: programError} = await supabase.from('programs')
-        .select('title,price,tuition,total_cost').eq('slug',slug).eq('published',true).eq('is_active',true).maybeSingle();
-      if (programError) throw new Error('APPRENTICESHIP_PRICING_LOOKUP_FAILED');
-      const tuitionCents = Math.round(Number(program?.price ?? program?.tuition ?? program?.total_cost ?? 0) * 100);
-      if (program && tuitionCents > 0) return NextResponse.json({program_slug:slug,program_name:program.title,tuition_cents:tuitionCents,deposit_min_cents:Math.ceil(tuitionCents/4),deposit_default_cents:Math.ceil(tuitionCents/4),payment_frequency:'monthly',payment_weeks:16,stripe_deposit_url:null,stripe_full_url:null,source:'programs',notes:'Pay in full or four monthly invoices. Final payment terms are shown before payment; provider-approved BNPL is separate.'});
+      // Bound the live lookup and retain the published static price when the
+      // database is slow or temporarily unavailable. Never expose raw HTML/JSON errors.
+      const lookup = supabase.from('programs')
+        .select('title,price,tuition,total_cost').eq('slug',slug)
+        .eq('published',true).eq('is_active',true).maybeSingle();
+      const { data: program, error: programError } = await Promise.race([
+        Promise.resolve(lookup),
+        new Promise<{ data: null; error: { message: string } }>((resolve) => {
+          setTimeout(() => resolve({ data: null, error: { message: 'Pricing lookup timed out' } }), 2500);
+        }),
+      ]);
+      if (!programError && program) {
+        const tuitionCents = Math.round(Number(program.price ?? program.tuition ?? program.total_cost ?? 0) * 100);
+        if (Number.isFinite(tuitionCents) && tuitionCents > 0)
+          return NextResponse.json({program_slug:slug,program_name:program.title,tuition_cents:tuitionCents,deposit_min_cents:Math.ceil(tuitionCents/4),deposit_default_cents:Math.ceil(tuitionCents/4),payment_frequency:'monthly',payment_weeks:16,source:'programs',notes:'Pay in full or four monthly invoices. Final payment terms are shown before payment; provider-approved BNPL is separate.'});
+      }
       const fallback = buildStaticPricing(slug);
       return fallback ? NextResponse.json(fallback) : safeError('Pricing not found',404);
     }

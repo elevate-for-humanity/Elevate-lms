@@ -9,7 +9,8 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
  const frame=useCurrentFrame(),{fps}=useVideoConfig(),seconds=frame/fps;
  const fade=(start:number)=>interpolate(seconds,[start,start+.75],[0,1],{extrapolateLeft:'clamp',extrapolateRight:'clamp'});
  const steps=scene.teachingVisual?.steps??scene.bullets.map((value,i)=>({label:'Step '+(i+1),value,narrationQuote:value}));
- const stepIndex=measuredTeachingStep(steps,scene.captionCues??[],seconds);
+ const speechCues=scene.wordAlignment?.map(w=>({text:w.word,startSeconds:w.start,endSeconds:w.end}))??scene.captionCues??[];
+ const stepIndex=measuredTeachingStep(steps,speechCues,seconds);
  const step=steps[stepIndex];
  const recap=scene.recapStartSeconds!==undefined&&seconds>=scene.recapStartSeconds;
  const caption=scene.captionCues?.find(c=>seconds>=c.startSeconds&&seconds<c.endSeconds)?.text??'';
@@ -19,7 +20,7 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
  const whole={width:'100%',height:'100%',objectFit:'contain' as const};
  const demonstration=Boolean(scene.clipUrl)&&Boolean(scene.motionCue)&&seconds>=scene.motionCue!.startSeconds&&seconds<scene.motionCue!.endSeconds&&!recap;
  const photo=(url:string,opacity=1)=><Img src={url} style={{...whole,position:'absolute',inset:0,opacity}}/>;
- const textStart=recap?scene.recapStartSeconds!:step?.narrationQuote?quoteStartSeconds(step.narrationQuote,scene.captionCues??[]):0;
+ const textStart=recap?scene.recapStartSeconds!:step?.narrationQuote?quoteStartSeconds(step.narrationQuote,speechCues):0;
  return <AbsoluteFill style={{background:'#171717',color:'#fff',fontFamily:'Arial, sans-serif'}}>
   <div style={{position:'absolute',top:30,left:54,color:'#cdb795',fontSize:22,letterSpacing:2}}>{props.courseTitle}</div>
   <div style={{position:'absolute',top:78,left:54,right:54,display:'flex',gap:24,alignItems:'center'}}>

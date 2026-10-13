@@ -135,6 +135,7 @@ export interface StoryboardRenderInput {
     text: string;
     audioUrl: string;
     durationSeconds: number;
+    wordAlignment?: Array<{word:string;start:number;end:number}>;
     parts?: Array<{text:string;isRecap:boolean;startSeconds:number;durationSeconds:number;audioUrl:string}>;
     captions?: Array<{ startSeconds: number; endSeconds: number; text: string }>;
   }>;
@@ -855,7 +856,7 @@ export async function renderStoryboardVideo(
         if(premium) {
           const photos=input.teachingPhotos?.[index];
           const primaryEnd=approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds;
-          const timed=pictureTimeline(photos,approvedAudio?.captions??[],durationSeconds,primaryEnd);
+          const timed=pictureTimeline(photos,approvedAudio?.wordAlignment?.map(w=>({text:w.word,startSeconds:w.start,endSeconds:w.end}))??approvedAudio?.captions??[],durationSeconds,primaryEnd);
           motionCue=motionExcerptWindow(timed,input.motionEvidence?.[index],sourceSeconds,primaryEnd);
         } else if (!sourceSeconds || sourceSeconds < durationSeconds)
           throw new Error(`ULTIMATE_VISUAL_DURATION_INSUFFICIENT:${index + 1}`);
@@ -881,6 +882,7 @@ export async function renderStoryboardVideo(
         imageIsInstructional: scene.resolvedModel === 'script-bound-instructional-image' && Boolean(scene.teachingVisual),
         audioSrc,
         captionCues: approvedAudio?.captions,
+        wordAlignment: approvedAudio?.wordAlignment,
         durationFrames: Math.ceil(durationSeconds * STORYBOARD_RENDER_FPS),
         sceneType: scene.sceneType,
         memoryAnchor: scene.memoryAnchor,
@@ -890,7 +892,7 @@ export async function renderStoryboardVideo(
         motionCue,
         recapStartSeconds: approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds,
         recapText: approvedAudio?.parts?.find(p=>p.isRecap)?.text,
-        ...(premium ? {pictureCues: pictureTimeline(input.teachingPhotos?.[index],approvedAudio?.captions??[],durationSeconds,approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds)} : {}),
+        ...(premium ? {pictureCues: pictureTimeline(input.teachingPhotos?.[index],approvedAudio?.wordAlignment?.map(w=>({text:w.word,startSeconds:w.start,endSeconds:w.end}))??approvedAudio?.captions??[],durationSeconds,approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds)} : {}),
       });
     }
 

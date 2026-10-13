@@ -16,7 +16,7 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
   try{
    const segments=[];
    for(const [index,segment] of approved.entries()){
-    const parts=[],captions:any[]=[];
+    const parts=[],captions:any[]=[],wordAlignment:any[]=[];
     let cursor=0;
     const recordings=segment.narrationParts??[{text:segment.text,isRecap:false}];
     const files=[];
@@ -30,7 +30,7 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
      const durationSeconds=Number(stdout.trim());
      if(!(durationSeconds>0))throw Error('ULTIMATE_NARRATION_DURATION_REQUIRED');
      const bytes=await readFile(pcm);
-     const measured=await measureNarrationCaptions(bytes,recording.text,durationSeconds);
+     const measured=await measureNarrationCaptions(bytes,recording.text,durationSeconds,words=>wordAlignment.push(...words.map(w=>({...w,start:cursor+w.start,end:cursor+w.end}))));
      captions.push(...measured.map((c:any)=>({...c,startSeconds:cursor+c.startSeconds,endSeconds:cursor+c.endSeconds})));
      const encoded=join(directory,index+'-'+partIndex+'-delivery.mp3');
      await execute('ffmpeg',['-v','error','-y','-i',pcm,'-c:a','libmp3lame','-b:a','128k',encoded]);
@@ -44,7 +44,7 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
     const delivery=join(directory,index+'-master.mp3');
     await execute('ffmpeg',['-v','error','-y','-i',master,'-c:a','libmp3lame','-b:a','128k',delivery]);
     const audioUrl=await uploadLessonMediaBuffer(await readFile(delivery),input.lessonId+'-'+segment.id.replace(/[^a-zA-Z0-9-]/g,'-'),'mp3');
-    segments.push({segmentId:segment.id,text:parts.map(p=>p.text).join('\n\n'),audioUrl,durationSeconds:cursor,captions,parts});
+    segments.push({segmentId:segment.id,text:parts.map(p=>p.text).join('\n\n'),audioUrl,durationSeconds:cursor,captions,wordAlignment,parts});
    }
    return {provider:configuredNarrationProvider(),segments,transcript:segments.map(s=>s.text).join('\n\n'),durationSeconds:segments.reduce((sum,s)=>sum+s.durationSeconds,0)};
   }finally{await rm(directory,{recursive:true,force:true});}

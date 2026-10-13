@@ -681,6 +681,7 @@ export async function measureNarrationCaptions(
   audio: Buffer,
   expectedScript: string,
   durationSeconds: number,
+  onWordAlignment?: (words:Array<{word:string;start:number;end:number}>)=>void,
 ): Promise<MeasuredCaptionCue[]> {
   let words: Array<{ word: string; start: number; end: number }>;
   if (process.env.AI_TRANSCRIPTION_PROVIDER === 'local_whisper') {
@@ -730,6 +731,7 @@ export async function measureNarrationCaptions(
     })}`);
   if (narrationCoverage(expectedScript, words.map((w) => w.word).join(' ')) < 0.9)
     throw new Error('ULTIMATE_CAPTION_NARRATION_COVERAGE_FAILED');
+  onWordAlignment?.(words);
   const cues: MeasuredCaptionCue[] = [];
   for (let index = 0; index < words.length; index += 8) {
     const phrase = words.slice(index, index + 8);

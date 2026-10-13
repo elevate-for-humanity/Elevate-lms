@@ -60,13 +60,14 @@ async function main() {
     writeFileSync(environment,JSON.stringify(vars),{mode:0o600});
     gcloud(['run','jobs','deploy','elevate-course-builder','--project',project,'--region',region,
       '--image',`${image}@${digest}`,'--service-account',`elevate-worker-runtime@${project}.iam.gserviceaccount.com`,
-      '--cpu',resources.cpu,'--memory',resources.memory,'--tasks','1','--parallelism','1','--max-retries','0','--task-timeout','10800s',
+      '--cpu',resources.cpu,'--memory',resources.memory,'--tasks','2','--parallelism','2','--max-retries','1','--task-timeout','10800s',
       '--env-vars-file',environment,'--quiet']);
     const job=JSON.parse(gcloud(['run','jobs','describe','elevate-course-builder','--project',project,'--region',region,'--format=json']));
     const container=job.spec.template.spec.template.spec.containers[0];
     const afterResources=courseJobResources(job);
     if(job.spec.template.spec.template.spec.serviceAccountName!==`elevate-worker-runtime@${project}.iam.gserviceaccount.com` ||
       container.image!==`${image}@${digest}` || afterResources.cpu!==resources.cpu || afterResources.memory!==resources.memory ||
+      Number(job.spec.template.spec.parallelism)!==2 || Number(job.spec.template.spec.taskCount)!==2 ||
       !container.env.some(v=>v.name==='ULTIMATE_WORKER_ONCE'&&v.value==='true'))
       throw new Error('Worker deployment readback mismatch');
     console.log('Finite Course Builder job deployed. No execution or queue mutation performed.');

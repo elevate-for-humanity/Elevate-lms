@@ -17,7 +17,7 @@ const identity = compile('lib/health/public-runtime-service.ts');
 const { middleware } = compile('apps/marketing/middleware.ts', {
   '@/lib/health/public-runtime-service': identity,
   '@/lib/tenant/middleware-tenant-routing': routing,
-  '@/lib/routing/portal-map': { LMS_HOST: 'https://app.elevateforhumanity.org', MARKETING_HOST: 'https://www.elevateforhumanity.org' },
+  '@/lib/routing/portal-map': compile('lib/routing/portal-map.ts', { '@/lib/rbac/role-matrix': compile('lib/rbac/role-matrix.ts') }),
   '@/lib/supabase/middleware': { createMiddlewareSupabaseClient: () => { throw new Error('Probe must not use authentication'); } },
 });
 for (const host of ['169.254.1.1:3000', '10.0.0.2:3000', 'customer.example', 'acme.app.elevateforhumanity.org', 'elevateforhumanity.org']) {

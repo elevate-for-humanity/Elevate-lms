@@ -1,0 +1,31 @@
+name: Build requested Hospitality course
+on:
+  push:
+    branches: [main]
+    paths: ['scripts/course-factory/build-requested-hospitality.ts', '.github/workflows/build-requested-hospitality.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hospitality-canonical-course-build
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 60
+    env:
+      NODE_OPTIONS: --conditions=react-server
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: pnpm/action-setup@v4
+        with: {version: 10.28.2}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Build authored course and queue media without publishing
+        run: pnpm exec tsx scripts/course-factory/build-requested-hospitality.ts

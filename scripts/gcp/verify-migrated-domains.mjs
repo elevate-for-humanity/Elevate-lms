@@ -3,7 +3,7 @@ import { writeFileSync } from 'node:fs';
 import { verifyDns, verifyTls } from './verify-production-dns.mjs';
 
 const project = 'elegant-racer-299721';
-const hosts = ['portal', 'dashboard', 'testing', 'dev-studio'].map(x => x + '.elevateforhumanity.org');
+const hosts = ['portal', 'dashboard', 'testing', 'dev-studio', 'lms', 'browser'].map(x => x + '.elevateforhumanity.org');
 const read = args => JSON.parse(execFileSync('gcloud', [...args, '--project=' + project, '--format=json'], { encoding: 'utf8', timeout: 30000 }));
 const record = [];
 const check = (name, host, pass, evidence = {}) => record.push({ name, host, status: pass ? 'PASS' : 'FAIL', evidence });
@@ -26,7 +26,7 @@ for (const host of hosts) {
   catch (e) { check('AUTHORITATIVE_DNS', host, false, { error: e.code || 'LOOKUP_FAILED' }); }
   const tls = await verifyTls(host);
   check('PUBLIC_TLS', host, tls.passed, tls);
-  for (const path of ['/api/health', '/api/version']) {
+  for (const path of (host.startsWith('browser.') ? ['/health'] : ['/api/health', '/api/version'])) {
     try {
       const url = new URL('https://' + host + path);
       url.searchParams.set('audit', String(Date.now()));
@@ -56,6 +56,19 @@ try {
   check('PROGRAM_HOLDER_LOGIN_REDIRECT', 'app.elevateforhumanity.org', [302,303,307,308].includes(res.status) && parsed.origin === 'https://app.elevateforhumanity.org' && parsed.pathname === '/login' && validDestination, { status: res.status, location: location.slice(0, 150) });
   await res.body?.cancel();
 } catch (e) { check('PROGRAM_HOLDER_LOGIN_REDIRECT', 'app.elevateforhumanity.org', false, { error: e.cause?.code || e.code || 'PROBE_FAILED' }); }
+// The SIP endpoint has its own Google address, separate from the web load balancer.
+const phone = 'phone.elevateforhumanity.org';
+try {
+  const dns = verifyDns(phone, ['107.178.216.162']);
+  check('AUTHORITATIVE_DNS', phone, dns.passed, dns);
+} catch (e) { check('AUTHORITATIVE_DNS', phone, false, { error: e.code || 'LOOKUP_FAILED' }); }
+const phoneTls = await verifyTls(phone);
+check('PUBLIC_TLS', phone, phoneTls.passed, phoneTls);
+try {
+  const response = await fetch('https://' + phone + '/healthz', { redirect: 'manual', signal: AbortSignal.timeout(15000) });
+  check('PHONE_HEALTH', phone, response.ok, { status: response.status });
+  await response.body?.cancel();
+} catch (e) { check('PHONE_HEALTH', phone, false, { error: e.cause?.code || e.code || 'PROBE_FAILED' }); }
 const pass = record.every(c => c.status === 'PASS');
 writeFileSync('migrated-domains-verification.json', JSON.stringify({ project, checkedAt: new Date().toISOString(), pass, checks: record }, null, 2));
 for (const row of record) console.log(JSON.stringify(row));

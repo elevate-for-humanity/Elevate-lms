@@ -69,6 +69,7 @@ export interface SlideLessonProps {
   courseTitle: string;
   lessonTitle: string;
   scenes: SceneData[];
+  visualStyle?: {cropMode?: 'contain' | 'cover-safe'; transition?: 'cut' | 'crossfade'};
   /** Absolute path to full-lesson MP3 (used when per-scene audio is absent) */
   fullAudioSrc?: string;
   // Brand
@@ -546,7 +547,7 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
             inset: 0,
             width: '100%',
             height: '100%',
-            objectFit: 'cover',
+            objectFit: props.visualStyle?.cropMode === 'contain' ? 'contain' : 'cover',
             filter: bright ? 'brightness(1.1) saturate(1.06) contrast(1.02)' : undefined,
             transform: mediaTransform,
             transformOrigin: scene.scene_number % 2 ? '45% 52%' : '55% 48%',

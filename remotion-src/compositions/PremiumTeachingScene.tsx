@@ -12,7 +12,7 @@ export function PremiumTeachingScene({ scene, props }: { scene: SceneData; props
   const stepIndex = measuredTeachingStep(steps,scene.captionCues ?? [],frame/fps);
   const step = steps[stepIndex];
   const caption = scene.captionCues?.find(c => frame/fps >= c.startSeconds && frame/fps < c.endSeconds)?.text ?? '';
-  const mediaStyle = { width:'100%',height:'100%',objectFit:'contain' as const };
+  const mediaStyle = { width:'100%',height:'100%',objectFit:(props.visualStyle?.cropMode === 'cover-safe' ? 'cover' : 'contain') as 'cover' | 'contain' };
   return <AbsoluteFill style={{background:'#171717',color:'#fff',fontFamily:'Arial, sans-serif'}}>
     <div style={{position:'absolute',top:30,left:54,color:'#cdb79e',fontSize:22,letterSpacing:2}}>{props.courseTitle}</div>
     <div style={{position:'absolute',top:78,left:54,right:54,display:'flex',gap:24,alignItems:'center'}}>

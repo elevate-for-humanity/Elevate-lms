@@ -6,7 +6,7 @@ CUSTOM = {
  "protectant":"P R AH T EH K T AH N T", "perms":"P ER M Z",
  "relaxers":"R IH L AE K S ER Z", "updos":"AH P D UW Z",
  "hairstyling":"HH EH R S T AY L IH NG",
- "substantiating":"S AH B S T AE N SH I EY T IH NG",
+ "substantiating":"S AH B S T AE N SH IY EY T IH NG",
  "hvac":"HH EY CH V AE K",
 }
 PHONES=set("AA AE AH AO AW AY B CH D DH EH ER EY F G HH IH IY JH K L M N NG OW OY P R S SH T TH UH UW V W Y Z ZH".split())
@@ -25,6 +25,8 @@ def install_pronunciations(decoder, words, predict=None):
             if not tokens or any(p not in PHONES for p in tokens):
                 raise ValueError("FORCED_ALIGNMENT_UNSUPPORTED_PRONUNCIATION:"+word)
             phones=" ".join(tokens)
+        if any(phone not in PHONES for phone in phones.split()):
+            raise ValueError("FORCED_ALIGNMENT_UNSUPPORTED_PRONUNCIATION:"+word)
         decoder.add_word(word,phones)
         added.append(word)
     return added

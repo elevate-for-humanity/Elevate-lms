@@ -343,7 +343,8 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
     const visualEvidence = requireResolvedVisualEvidence(result.sceneData);
     return {
       ...result,
-      layoutVersion: input.lessonPresentation === 'approved-premium-v1' ? 3 : 2,
+      layoutVersion: input.lessonPresentation === 'approved-premium-v1' ? 4 : 2,
+      ...(input.lessonPresentation === 'approved-premium-v1' ? {presentationVersion:'approved-moment-cues-v2'} : {}),
       provider: 'remotion',
       providerModel: 'SlideLesson-blueprint-v3',
       captionsUrl: result.sceneData?.captionUrl,

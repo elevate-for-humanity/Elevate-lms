@@ -30,7 +30,7 @@ async function main() {
     const revision=read(['run','revisions','describe',live.revisionName]);
     const image=revision.spec.containers[0].image;
     if(!/@sha256:[a-f0-9]{64}$/.test(image))throw Error('Immutable serving image required');
-    if(before.spec.template.spec.containers[0].image!==image)throw Error('New image candidate exists; retry after release completes');
+    if(before.spec.template.spec.containers[0].image!==image)console.log(JSON.stringify({component,replacingUnactivatedTemplate:true,servingImageRetained:true}));
     const response=await fetch(origin+'/api/health',{signal:AbortSignal.timeout(30000)});
     const health=await response.json();
     const commit=health.commit||health.commitSha;

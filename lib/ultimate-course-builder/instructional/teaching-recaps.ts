@@ -1,8 +1,8 @@
 import { generateVertexLessonJson } from './google-lesson-author';
 import { repeatedTeachingSegments } from '@/lib/video/instructional-quality-gate';
 import { contractHash } from '../core/lesson-contract';
-export async function addFreshTeachingRecaps(blueprint:any,profile:any,sources:any[]){
- const result=await generateVertexLessonJson(profile.instructionalAuthoring?.model??'gemini-3.8-flash',
+export async function addFreshTeachingRecaps(blueprint:any,profile:any,sources:any[],generate=generateVertexLessonJson){
+ const result=await generate(profile.instructionalAuthoring?.model??'gemini-3.8-flash',
   'Return JSON {recaps:[{segmentId,text}]}. Write one fresh concise 1-2 sentence recap of at most forty words and 360 characters for EVERY supplied teaching moment. Ground it only in that moment and the authorized sources. Paraphrase the lesson conclusion; do not repeat any original sentence. Preserve safety negations, guard manufacturer and lengths, and all standards. Never invent facts, measurements or approvals.',
   {segments:blueprint.segments,sources},profile.instructionalAuthoring?.location??'us');
  if(!Array.isArray(result.recaps)||result.recaps.length!==blueprint.segments.length)throw Error('EVERY_TEACHING_MOMENT_RECAP_REQUIRED');
@@ -17,7 +17,7 @@ export async function addFreshTeachingRecaps(blueprint:any,profile:any,sources:a
  const {authoringEvidence:previousEvidence,...base}=blueprint;
  const payload={...base,segments,presentationEvidence:{version:'approved-moment-cues-v2',recapHash:contractHash(segments)}};
  const hash=contractHash(payload);
- const review=await generateVertexLessonJson(profile.instructionalAuthoring?.model??'gemini-3.8-flash',
+ const review=await generate(profile.instructionalAuthoring?.model??'gemini-3.8-flash',
   'Return JSON {pass,findings,hash,competencyId,blueprintHash}. Independently review the complete blueprint, its instruction and assessments against the sources; check that every recap is supported by its teaching moment and the authorized sources, preserves safety and technical conditions, is freshly worded, and introduces no facts or measurements. Any failure means pass:false. Echo hash, blueprintHash and competencyId exactly.',
   {blueprint:payload,segments,sources,hash,blueprintHash:hash,competencyId:blueprint.competencyId,presentationContract:profile.presentationContract},profile.instructionalAuthoring?.location??'us');
  if(review.pass!==true||review.hash!==hash||review.blueprintHash!==hash||review.competencyId!==blueprint.competencyId||!Array.isArray(review.findings)||review.findings.length)

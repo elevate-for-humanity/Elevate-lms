@@ -27,7 +27,7 @@ const PROGRAMS = [
   {
     title: 'Business & Entrepreneurship',
     href: '/programs/business-administration',
-    image: '/images/pages/business-meeting.webp',
+    image: '/images/business-collaboration-vibrant-2026.webp',
     alt: 'Business learners collaborating around a conference table',
     field: 'Business',
     summary:
@@ -36,7 +36,7 @@ const PROGRAMS = [
   {
     title: 'Bookkeeping',
     href: '/programs/bookkeeping',
-    image: '/images/pages/bookkeeping-ledger.webp',
+    image: '/images/bookkeeping-training-vibrant-2026.webp',
     alt: 'Bookkeeping learner reviewing financial records',
     field: 'Business & Finance',
     summary:

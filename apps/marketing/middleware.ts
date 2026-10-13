@@ -1,11 +1,11 @@
-import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
+import { createMiddlewareSupabaseClient, hasSupabaseAuthCookie } from '@/lib/supabase/middleware';
 import { NextResponse, type NextRequest } from 'next/server';
 import {
   rewriteCustomDomainRequest,
   rewriteTenantAppHostRequest,
   tenantSlugFromAppHost,
 } from '@/lib/tenant/middleware-tenant-routing';
-import { LMS_HOST, MARKETING_HOST } from '@/lib/routing/portal-map';
+import { ADMIN_HOST, LMS_HOST, MARKETING_HOST, getPortalKeyFromPath, PORTAL_MAP } from '@/lib/routing/portal-map';
 import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
 
 // These route families are authenticated operational software, not public
@@ -15,6 +15,7 @@ const PROTECTED_PORTAL_PREFIXES = [
   '/case-manager',
   '/workforce-board',
   '/provider',
+  '/tax-software/self-file',
 ] as const;
 
 // Competency forms are operational apprenticeship records. They used to be
@@ -138,7 +139,7 @@ export async function middleware(req: NextRequest) {
   if (['/api/ping', '/api/ready', '/api/health'].includes(pathname)) {
     return NextResponse.next();
   }
-  if (isStaticRequest(pathname)) return NextResponse.next();
+  if (isStaticRequest(pathname) && !isProtectedPortal(pathname) && !getPortalKeyFromPath(pathname) && !pathname.startsWith('/admin/') && !pathname.startsWith('/cosmetology-host-shop/')) return NextResponse.next();
 
   const storeRuntimeResponse = handleStoreOnlyRuntime(req, pathname);
   if (storeRuntimeResponse) return storeRuntimeResponse;
@@ -174,6 +175,40 @@ export async function middleware(req: NextRequest) {
     return response;
   }
 
+  const legacyStudentPaths: Record<string, string> = {
+    '/student': '/lms/dashboard',
+    '/student-portal': '/lms/dashboard',
+    '/student/dashboard': '/lms/dashboard',
+    '/student/login': '/login',
+  };
+  const studentDestination = legacyStudentPaths[pathname];
+  if (studentDestination) {
+    const destination = new URL(studentDestination, LMS_HOST);
+    destination.search = search;
+    const response = NextResponse.redirect(destination, 307);
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    return response;
+  }
+
+  // Operational portal URLs on www must never render marketing catch-all
+  // pages. Resolve ownership from the same registry used by portal links.
+  const portalKey = getPortalKeyFromPath(pathname);
+  const portal = portalKey ? PORTAL_MAP[portalKey] : null;
+  const legacyAdmin = pathname === '/admin' || pathname.startsWith('/admin/') || pathname === '/dashboard' || pathname.startsWith('/dashboard/') || pathname === '/studio' || pathname.startsWith('/studio/');
+  const legacyHostShop = pathname === '/cosmetology-host-shop' || pathname.startsWith('/cosmetology-host-shop/');
+  if ((portal && portal.subdomain !== 'marketing') || legacyAdmin || legacyHostShop) {
+    const destination = new URL(
+      legacyHostShop ? pathname.replace('/cosmetology-host-shop', '/host-shop') : pathname,
+      legacyAdmin ? ADMIN_HOST : portal?.host || LMS_HOST,
+    );
+    destination.search = search;
+    const response = NextResponse.redirect(destination, 307);
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    return response;
+  }
+
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', `${pathname}${search}`);
 
@@ -198,6 +233,18 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
+  const loginRedirect = () => {
+    const taxWorkspace = pathname === '/tax-software/self-file' || pathname.startsWith('/tax-software/self-file/');
+    const loginUrl = new URL(taxWorkspace ? '/tax-software/login' : '/login', taxWorkspace ? MARKETING_HOST : LMS_HOST);
+    loginUrl.searchParams.set('redirect', taxWorkspace ? `${pathname}${search}` : `${MARKETING_HOST}${pathname}${search}`);
+    const result = NextResponse.redirect(loginUrl);
+    result.headers.set('Cache-Control', 'private, no-store, max-age=0');
+    result.headers.set('Vary', 'Cookie');
+    result.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    return result;
+  };
+  if (!hasSupabaseAuthCookie(req)) return loginRedirect();
+
   let response = NextResponse.next({ request: { headers: requestHeaders } });
   const supabase = createMiddlewareSupabaseClient(req, (cookiesToSet) => {
     cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
@@ -209,12 +256,11 @@ export async function middleware(req: NextRequest) {
 
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) {
-    const loginUrl = new URL('/login', LMS_HOST);
-    loginUrl.searchParams.set('redirect', `${MARKETING_HOST}${pathname}${search}`);
-    return NextResponse.redirect(loginUrl);
+    return loginRedirect();
   }
 
   response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+  response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
   response.cookies.set('__efh_pathname', `${pathname}${search}`, {
     httpOnly: false,
     secure: process.env.NODE_ENV === 'production',

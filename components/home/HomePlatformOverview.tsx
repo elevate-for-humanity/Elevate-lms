@@ -12,7 +12,7 @@ const FEATURES = [
   {
     title: 'Run Apprenticeships',
     body: 'Apprentice, host-site, OJL, RTI, document, competency, and progress workflows built around real program operations.',
-    image: '/images/pages/apprenticeship-sponsor-page-1.webp',
+    image: '/images/pages/barber-styling-hair.webp',
     href: '/apprenticeships',
   },
   {

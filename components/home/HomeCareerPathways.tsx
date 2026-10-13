@@ -7,7 +7,7 @@ const PATHWAYS = [
   { slug:'hvac-technician', title:'HVAC Technician', description:'Build hands-on heating, cooling, safety, diagnostics, installation, and service skills.', image:'/images/hvac-hero.webp', imageAlt:'HVAC technician working on an air-conditioning system', ctaHref:'/programs/hvac-technician', cta:'View HVAC Program' },
   { slug:'cdl-training', title:'CDL Training', description:'Prepare for commercial driving through permit, safety, inspection, and road-training requirements.', image:'/images/pages/cdl-loading-dock.webp', imageAlt:'Commercial truck at a loading dock for CDL training', ctaHref:'/programs/cdl-training', cta:'View CDL Program' },
   { slug:'bookkeeping', title:'Bookkeeping', description:'Learn practical bookkeeping, QuickBooks, payroll, financial records, and business-office workflows.', image:'/images/pages/bookkeeping.webp', imageAlt:'Bookkeeping learner working with financial records', ctaHref:'/programs/bookkeeping', cta:'View Bookkeeping Program' },
-  { slug:'business', title:'Business & Entrepreneurship', description:'Learn how to organize, launch, market, operate, and grow a business.', image:'/images/pages/business-meeting.webp', imageAlt:'Entrepreneurs collaborating on a business plan', ctaHref:'/programs/business', cta:'View Business Program' },
+  { slug:'business', title:'Business & Entrepreneurship', description:'Learn how to organize, launch, market, operate, and grow a business.', image:'/images/business-collaboration-vibrant-2026.webp', imageAlt:'Entrepreneurs collaborating on a business plan', ctaHref:'/programs/business', cta:'View Business Program' },
 ] as const;
 
 export function HomeCareerPathways() {
@@ -27,7 +27,7 @@ export function HomeCareerPathways() {
                   <Image src={p.image} alt={p.imageAlt} fill className="object-cover brightness-105 contrast-105 saturate-110 transition duration-500 group-hover:scale-[1.04]" sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 20vw" loading="lazy" />
                 </div>
                 <div className="flex flex-1 flex-col p-6">
-                  <h3 className="text-xl font-black leading-tight text-slate-950">{p.title}</h3>
+                  <h3 className="text-xl font-black leading-tight text-slate-950">{p.slug === 'business' ? <>Business & <span className="sm:hidden">Entrepre&shy;neurship</span><span className="hidden sm:inline">Entrepreneurship</span></> : p.slug === 'bookkeeping' ? <span className="whitespace-nowrap">Bookkeeping</span> : p.title}</h3>
                   <p className="mt-3 text-sm leading-6 text-slate-700">{p.description}</p>
                   <span className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-extrabold text-brand-red-700">{p.cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
                 </div>

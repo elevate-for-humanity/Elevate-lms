@@ -12,7 +12,7 @@ const source = compileTaxRoute(path);
 async function invoke(fault, malformed = false) {
   const writes = [];
   const db = {
-    auth: { getUser: async () => ({ data: { user: { id: 'owner' } } }) },
+    auth: { getUser: async () => ({ data: { user: fault === 'anonymous' ? null : { id: 'owner' } } }) },
     from(table) {
       let operation = 'read';
       const query = {
@@ -46,9 +46,14 @@ async function invoke(fault, malformed = false) {
                   id: 'return-1',
                   tax_year: 2026,
                   filing_status: fault === 'status' ? 'invalid' : 'single',
+                  return_json: { interview: { answers: fault === 'unsupported-interview' ? { hasCapitalGains: true } : {} } },
                 }
               : table === 'tax_itemized_deductions'
                 ? null
+                : table === 'tax_w2_income' && fault === 'malformed-income' ? [{ wages: 'NaN', federal_withholding: 0 }]
+                : table === 'tax_1099_income' && fault === '1099-nec' ? [{ form_type: 'NEC', amount: 2000, federal_withholding: 0 }]
+                : table === 'tax_1099_income' && fault === 'dividends' ? [{ form_type: 'DIV', amount: 2000, federal_withholding: 0 }]
+                : table === 'tax_schedule_c' && fault === 'business-income' ? [{ net_profit: 1000 }]
                 : [];
           return Promise.resolve({
             data: fault === 'missing-update' && operation === 'update' ? null : data,
@@ -89,6 +94,12 @@ async function invoke(fault, malformed = false) {
 }
 const cases = [
   ['malformed JSON', null, true, 400],
+  ['anonymous request', 'anonymous', false, 401],
+  ['malformed stored income', 'malformed-income', false, 422],
+  ['1099 business income remains available', '1099-nec', false, 200],
+  ['business profit remains available as an estimate', 'business-income', false, 200],
+  ['dividend income remains available as an estimate', 'dividends', false, 200],
+  ['interview answers do not block preparation', 'unsupported-interview', false, 200],
   ['unsupported filing status', 'status', false, 400],
   ['return read failed', 'tax_returns:read', false, 500],
   ['W-2 read failed', 'tax_w2_income', false, 500],

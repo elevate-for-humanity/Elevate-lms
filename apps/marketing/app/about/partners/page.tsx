@@ -121,7 +121,7 @@ export default function PartnersPage() {
               </div>
             </div>
             <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl">
-              <Image src="/images/pages/business-meeting.webp" alt="Business partnership" fill className="object-cover" sizes="100vw" />
+              <Image src="/images/business-collaboration-vibrant-2026.webp" alt="Business partnership" fill className="object-cover" sizes="100vw" />
             </div>
           </div>
         </div>

@@ -25,7 +25,7 @@ interface ProgramImageEntry {
 export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   'business-administration': {
     card: '/images/pexels/business.webp',
-    hero: '/hero-images/business-hero.webp',
+    hero: '/images/business-collaboration-vibrant-2026.webp',
     alt: 'Business administration learners collaborating in a professional setting',
   },
   'financial-literacy': {
@@ -314,8 +314,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Technology learner building practical IT and digital skills',
   },
   'tax-preparation': {
-    card: `${P}/bookkeeping.webp`,
-    hero: `${P}/admin-analytics-hero.webp`,
+    card: '/images/tax/supersonic-tax-training-2026.webp',
+    hero: '/images/tax/supersonic-tax-hero-2026.webp',
     alt: 'Tax preparer working with a client on financial documents',
   },
   bookkeeping: {

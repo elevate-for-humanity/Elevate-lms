@@ -25,8 +25,8 @@ const PROTECTED_PREFIXES = [
   // explicitly exempted in isProtectedPath so onboarding, MOU, orientation,
   // resources, and any future child route fail closed before React renders.
   '/host-shop',
-  '/parent-portal/dashboard',
-  '/parent-portal/student',
+  '/parent-portal',
+  '/cosmetology-host-shop',
   '/employer',
   '/workforce',
   '/program-holder',
@@ -46,7 +46,7 @@ function isProtectedPath(pathname: string) {
 
   // Any route explicitly named as a dashboard is private even if a new role
   // namespace is added and forgotten in PROTECTED_PREFIXES.
-  if (pathname === '/dashboard' || pathname.includes('/dashboard/')) return true;
+  if (pathname === '/dashboard' || pathname.endsWith('/dashboard') || pathname.includes('/dashboard/')) return true;
   return PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
@@ -90,15 +90,15 @@ function redirectToLogin(req: NextRequest, pathname: string) {
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
-  if (
+  const protectedPath = isProtectedPath(pathname);
+
+  if (!protectedPath && (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
     /\.[a-z0-9]+$/i.test(pathname)
-  ) {
+  )) {
     return NextResponse.next();
   }
-
-  const protectedPath = isProtectedPath(pathname);
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', pathname);
 

@@ -722,7 +722,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Small Business Grants'],
     duration: '8-12 Weeks • 100 Hours',
-    image: '/hero-images/business-hero.webp',
+    image: '/images/business-collaboration-vibrant-2026.webp',
     etplApproved: true,
   },
   {

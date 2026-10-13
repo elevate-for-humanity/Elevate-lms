@@ -45,7 +45,7 @@ function isPublicPath(pathname: string): boolean {
     ) ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
-    /[a-z0-9]+\.[a-z]+$/i.test(pathname)
+    /^\/[^/]+\.(?:png|jpe?g|webp|svg|ico|json|webmanifest|js|css|txt)$/i.test(pathname)
   );
 }
 

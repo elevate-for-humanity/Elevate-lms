@@ -1,50 +1,20 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getPublicPageFacts } from '@/lib/marketing/public-page-facts';
-import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 
 export default function PublicPageFacts() {
   const pathname = usePathname() || '/';
   const content = getPublicPageFacts(pathname);
-  const slug = content.imageProgram || 'business-administration';
-  const store = pathname.startsWith('/store');
-  const home = pathname === '/';
+  // The homepage already ends with its own illustrated enrollment CTA.
+  if (pathname === '/') return null;
   return (
     <section
       aria-labelledby="page-facts-heading"
       className="border-t border-slate-200 bg-white px-4 py-10 sm:py-14"
     >
-      <div className="mx-auto grid max-w-6xl items-start gap-7 md:grid-cols-[0.8fr_1.2fr]">
-        <div>
-          <div className="relative mx-auto max-w-[300px] aspect-[16/10] overflow-hidden rounded-2xl bg-slate-100">
-            <Image
-              src={
-                home
-                  ? '/images/tax/supersonic-tax-training-2026.webp'
-                  : store
-                    ? '/images/pages/store-guide-1.webp'
-                    : getProgramHeroImage(slug)
-              }
-              alt={
-                home
-                  ? 'Illustrative instructor helping adult learners plan their next step'
-                  : store
-                    ? 'Business professionals collaborating at a laptop'
-                    : getProgramImageAlt(slug)
-              }
-              fill
-              sizes="(min-width: 768px) 40vw, 100vw"
-              loading="lazy"
-              className="object-cover"
-            />
-          </div>
-          <p className="mt-3 text-sm text-slate-600">
-            Find the facts and your next step in one place.
-          </p>
-        </div>
+      <div className="mx-auto max-w-6xl">
         <div>
           <h2 id="page-facts-heading" className="text-2xl font-black sm:text-3xl">
             {content.title}

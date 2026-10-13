@@ -81,6 +81,13 @@ const nextConfig = {
       // can point directly at one canonical implementation. Next preserves
       // incoming query parameters for these redirects when the destination
       // does not replace them.
+      // Resolve old duplicated path segments before rendering a page. This
+      // produces an HTTP redirect rather than a streamed client redirect.
+      { source: '/about/mission/mission', destination: '/about', permanent: true },
+      { source: '/hire-graduates/hire-graduates', destination: '/employers', permanent: true },
+      { source: '/accreditation/accreditation', destination: '/approvals', permanent: true },
+      { source: '/for-students/for-students', destination: '/programs', permanent: true },
+      { source: '/merigoldround', destination: '/sites/meri-gold-round', permanent: true },
       { source: '/apply/status', destination: '/apply/track', permanent: true },
       { source: '/course-factory', destination: '/ai/course-factory', permanent: true },
       { source: '/compare', destination: '/store#marketplace', permanent: true },
@@ -89,7 +96,7 @@ const nextConfig = {
       { source: '/wioa-funded-training', destination: '/wioa-eligibility', permanent: false },
       { source: '/programs/wioa', destination: '/wioa-eligibility', permanent: false },
       { source: '/programs/wioa-funding', destination: '/wioa-eligibility', permanent: false },
-      { source: '/programs/construction', destination: '/programs/skilled-trades', permanent: false },
+      { source: '/programs/construction', destination: '/programs', permanent: false },
       { source: '/programs/drug-test', destination: '/programs/drug-collector', permanent: false },
       { source: '/programs/hvac-technician/apply', destination: '/apply/student?program=hvac-technician', permanent: true },
       { source: '/governance/security', destination: '/legal/disclosures', permanent: false },
@@ -102,10 +109,7 @@ const nextConfig = {
       { source: '/apprenticeships/ipla-exam', destination: '/testing', permanent: true },
       { source: '/partners/barber-host-shop', destination: '/partners/host-shops', permanent: true },
       { source: '/partners/barber-host-shop/apply', destination: '/partners/host-shop/apply', permanent: true },
-      { source: '/admin', destination: 'https://admin.elevateforhumanity.org/login', permanent: true },
-      { source: '/student/login', destination: 'https://app.elevateforhumanity.org/login', permanent: true },
       { source: '/videos/cna-hero', destination: '/programs/cna', permanent: true },
-      { source: '/student-portal', destination: '/platform/student-portal', permanent: true },
     ];
   },
 

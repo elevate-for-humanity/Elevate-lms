@@ -87,7 +87,7 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
       <main className="mx-auto max-w-6xl space-y-6 p-4 sm:p-8">
         <section className="relative min-h-[300px] overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
           <Image
-            src="/images/pages/business-meeting.webp"
+            src="/images/business-collaboration-vibrant-2026.webp"
             alt="Team members collaborating in a video meeting"
             fill
             priority

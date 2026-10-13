@@ -35,8 +35,15 @@ if(!capacity.fits)throw Error('APPROVED_REGIONAL_CAPACITY_UNAVAILABLE');
 // Fence only the affected jobs; never cancel the shared execution or cosmetology.
 for(const j of jobs){
  const build=builds.find(b=>b.id===j.build_id);
+ const payload=structuredClone(j.payload??{});
+ if(j.build_id==='078529f7-3cb3-4863-8afa-9d6bcaf167dd'){
+  payload.repairCompetencyId='barber-b';
+  payload.repairCompetencyIds=['barber-b',...(payload.repairCompetencyIds??[]).filter(id=>id!=='barber-b')];
+  payload.unresolvedCompetencyIds=(payload.unresolvedCompetencyIds??[]).filter(id=>id!=='barber-b');
+  payload.lessonRepairCounts={...(payload.lessonRepairCounts??{}),'barber-b':0};
+ }
  const changed=await rest('ultimate_build_jobs?id=eq.'+j.id+'&execution_generation=eq.'+j.execution_generation,'PATCH',{
-  status:'queued',execution_generation:j.execution_generation+1,attempts:0,lease_owner:null,lease_expires_at:null,
+  payload,status:'queued',execution_generation:j.execution_generation+1,attempts:0,lease_owner:null,lease_expires_at:null,
   priority:allowed.indexOf(build.course_id),available_at:new Date().toISOString(),
   last_error:null,updated_at:new Date().toISOString()
  });

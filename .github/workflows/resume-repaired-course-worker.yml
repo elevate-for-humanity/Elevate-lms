@@ -10,7 +10,7 @@ permissions:
   id-token: write
 jobs:
   dispatch:
-    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == 'e1f1a9b244a3f91c1342d5cd6f36639630e9017e'
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == '398a0671d436412cc01cbed927a3f63afbd35392'
     runs-on: ubuntu-24.04
     steps:
       - env:

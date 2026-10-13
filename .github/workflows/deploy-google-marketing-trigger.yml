@@ -214,21 +214,39 @@ jobs:
           docker tag "elevate-marketing:$GITHUB_SHA" "$IMAGE"
           docker push "$IMAGE"
 
+      - name: Prepare encrypted taxpayer storage
+        id: tax_key
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/gcp/ensure-tax-encryption.mjs > /tmp/elevate-tax-encryption.json
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const result=JSON.parse(readFileSync('/tmp/elevate-tax-encryption.json','utf8'));
+          if(result.configured!==true || typeof result.binding!=='string' || (result.binding && !/^TAX_DATA_ENCRYPTION_KEY=elevate-marketing-tax-data-encryption-key:\d+$/.test(result.binding))) throw new Error('Invalid taxpayer key binding');
+          appendFileSync(process.env.GITHUB_OUTPUT,'binding='+result.binding+'\n');
+          console.log(JSON.stringify({configured:true,created:result.created}));
+          NODE
       - name: Deploy exact image to Google Cloud Run
         id: deploy
         timeout-minutes: 15
+        env:
+          TAX_ENCRYPTION_BINDING: ${{ steps.tax_key.outputs.binding }}
         shell: bash
         run: |
           set -euo pipefail
           IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing"
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          TAX_ARGS=()
+          if [[ -n "$TAX_ENCRYPTION_BINDING" ]]; then TAX_ARGS+=(--update-secrets="$TAX_ENCRYPTION_BINDING"); fi
           SUFFIX="r${GITHUB_SHA:0:8}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "revision=elevate-marketing-migration-$SUFFIX" >> "$GITHUB_OUTPUT"
           gcloud run services update elevate-marketing-migration \
             --project=elegant-racer-299721 \
             --region=us-central1 \
             --cpu=4 --memory=8Gi \
+            "${TAX_ARGS[@]}" \
             --image="$IMAGE@$DIGEST" \
             --revision-suffix="$SUFFIX" \
             --remove-env-vars=GIT_SHA,GITHUB_SHA,NEXT_PUBLIC_GIT_SHA,NEXT_PUBLIC_COMMIT_SHA,NEXT_PUBLIC_BUILD_ID,NF_GIT_SHA,BUILD_TIMESTAMP \

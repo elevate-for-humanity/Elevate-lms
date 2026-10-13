@@ -4,7 +4,7 @@ import {tmpdir} from 'node:os';
 import {google,PROJECT} from './runtime-config.mjs';
 import {inspectRegionalCapacity,isTerminalExecution} from './regional-capacity.mjs';
 const region='us-east1',name='elevate-course-builder-parallel';
-const expectedSha='5b9e79ab037ce5d7af0766a501a2da38c584aa2d';
+const expectedSha='6a7690e1da6d4be7eb8359c15ece1a1aeb6fdf4f';
 const read=(args,r=region)=>JSON.parse(google([...args,'--project='+PROJECT,'--region='+r,'--format=json']));
 const source=read(['run','jobs','describe','elevate-course-builder'],'us-central1');
 const task=source.spec.template.spec.template.spec;

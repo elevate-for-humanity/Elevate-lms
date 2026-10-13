@@ -128,6 +128,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
           docker build -f Dockerfile.ultimate-worker -t "elevate-ultimate-worker:$GITHUB_SHA" .
       - name: Verify worker boundaries inside the actual photo-capable image
         shell: bash

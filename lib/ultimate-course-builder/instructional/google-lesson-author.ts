@@ -1,3 +1,4 @@
+import { parseVertexLessonResponse } from './vertex-response.mjs';
 import type { UltimateCompetency, UltimateCredentialProfile } from '../core/types';
 import { contractHash } from '../core/lesson-contract';
 import { validateLessonBlueprint, type LessonBlueprint } from './lesson-blueprint';
@@ -125,14 +126,19 @@ export async function generateVertexLessonJson(model: string, system: string, in
   const token = await tokenResponse.json();
   if (!token.access_token) throw new Error('ULTIMATE_GOOGLE_SERVICE_IDENTITY_UNAVAILABLE');
   const host = region === 'global' ? 'aiplatform.googleapis.com' : ['us','eu'].includes(region) ? `aiplatform.${region}.rep.googleapis.com` : `${region}-aiplatform.googleapis.com`;
+  for(let attempt=0;attempt<3;attempt++) {
   const response = await fetch(`https://${host}/v1/projects/${project}/locations/${region}/publishers/google/models/${model}:generateContent`, {
     method: 'POST', headers: { Authorization: `Bearer ${token.access_token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: JSON.stringify(input) }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 16384, responseMimeType: 'application/json' } }),
     signal: AbortSignal.timeout(180000),
   });
+  if ([429,500,502,503,504].includes(response.status)&&attempt<2) {await new Promise(r=>setTimeout(r,15000*2**attempt));continue;}
   if (!response.ok) throw new Error(`ULTIMATE_GOOGLE_AUTHORING_HTTP_${response.status}`);
   const output = await response.json();
-  if (output.candidates?.[0]?.finishReason !== 'STOP') throw new Error('ULTIMATE_GOOGLE_AUTHORING_INCOMPLETE');
-  const text = output.candidates[0].content?.parts?.map((part: any) => part.text || '').join('');
-  try { return JSON.parse(text); } catch { throw new Error('ULTIMATE_GOOGLE_AUTHORING_JSON_INVALID'); }
+  try {return parseVertexLessonResponse(output);}
+  catch(error) {
+   if(attempt===2 || !['ULTIMATE_GOOGLE_AUTHORING_JSON_INVALID','ULTIMATE_GOOGLE_AUTHORING_INCOMPLETE'].includes((error as Error).message)) throw error;
+  }
+  }
+  throw Error('ULTIMATE_GOOGLE_AUTHORING_RETRIES_EXHAUSTED');
 }

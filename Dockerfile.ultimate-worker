@@ -2,7 +2,9 @@ FROM node:22-bookworm-slim
 WORKDIR /app
 ENV NODE_ENV=production REMOTION_BROWSER_EXECUTABLE=/usr/bin/chromium HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 RUN apt-get update && apt-get install -y --no-install-recommends chromium ffmpeg tesseract-ocr ca-certificates python3 python3-venv && rm -rf /var/lib/apt/lists/*
-RUN python3 -m venv /opt/course-alignment && /opt/course-alignment/bin/pip install --no-cache-dir pocketsphinx==5.0.4
+RUN python3 -m venv /opt/course-alignment && /opt/course-alignment/bin/pip install --no-cache-dir pocketsphinx==5.0.4 g2p_en==2.1.0 nltk==3.9.1 numpy==1.26.4
+ENV NLTK_DATA=/opt/course-alignment/nltk_data
+RUN /opt/course-alignment/bin/python -c "import nltk; [nltk.download(name, download_dir='/opt/course-alignment/nltk_data', raise_on_error=True) for name in ['cmudict','averaged_perceptron_tagger','averaged_perceptron_tagger_eng']]"
 # Standalone worker dependency contract: do not load the monorepo workspace/root manifest.
 COPY packages/ultimate-course-worker/package.json ./package.json
 RUN npm install --omit=dev --ignore-scripts --no-audit --no-fund
@@ -42,7 +44,7 @@ RUN node --test lib/ultimate-course-builder/instructional/competency-classificat
 RUN HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 node --input-type=module -e "const {KokoroTTS}=await import('kokoro-js');await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX',{dtype:'q8',device:'cpu'})"
 # Cache CPU speech recognition so captions and rendered-audio QA do not depend on API quotas.
 RUN HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 node --input-type=module -e "const {loadLocalTranscriber}=await import('./lib/video/local-transcription.mjs');await loadLocalTranscriber()"
-RUN node workers/local-speech-smoke.mjs
+RUN /opt/course-alignment/bin/python lib/video/alignment-vocabulary-preflight.py && node workers/local-speech-smoke.mjs
 # Lazy media adapters are the worker's production boundary. Resolve them in the
 # image build so a missing shared renderer file cannot reach a live course job.
 RUN node --import=tsx -e "await Promise.all([import('./lib/ultimate-course-builder/adapters/platform-narration.ts'),import('./lib/ultimate-course-builder/adapters/platform-renderer.ts'),import('./lib/video/media-director.ts'),import('./lib/video/remotion-render.ts'),import('kokoro-js')])"

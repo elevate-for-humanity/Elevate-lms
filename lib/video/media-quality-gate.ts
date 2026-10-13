@@ -295,7 +295,7 @@ async function requireCloudflareTranscriptionCredentials(): Promise<{
 async function transcribeRenderedAudio(videoPath: string, workDir: string): Promise<string> {
   if (process.env.AI_TRANSCRIPTION_PROVIDER === 'local_whisper') {
     const { transcribeLocalAudio } = await import('./local-transcription.mjs');
-    return (await transcribeLocalAudio(videoPath)).text;
+    return (await transcribeLocalAudio(videoPath,{wordTimings:false})).text;
   }
   const model = resolveCloudflareTranscriptionModel();
 

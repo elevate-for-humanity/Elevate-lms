@@ -1,6 +1,7 @@
 """Align known recorded narration without inventing word times."""
 import json,re,subprocess,sys
 from pocketsphinx import Decoder
+from alignment_lexicon import install_pronunciations
 audio,script=sys.argv[1:3]
 text=open(script).read()
 if re.search(r"\d",text):
@@ -8,10 +9,7 @@ if re.search(r"\d",text):
 words=re.findall(r"[a-z]+(?:'[a-z]+)?",text.lower())
 if not words: raise ValueError("FORCED_ALIGNMENT_EMPTY_SCRIPT")
 decoder=Decoder(samprate=16000)
-for word,phones in {"disinfected":"D IH S IH N F EH K T IH D","signoff":"S AY N AO F"}.items():
-    if not decoder.lookup_word(word): decoder.add_word(word,phones)
-missing=sorted({word for word in words if not decoder.lookup_word(word)})
-if missing: raise ValueError("FORCED_ALIGNMENT_MISSING_PRONUNCIATION:"+str(missing))
+install_pronunciations(decoder, words)
 pcm=subprocess.check_output(["ffmpeg","-v","error","-i",audio,"-f","s16le","-ac","1","-ar","16000","pipe:1"])
 duration=len(pcm)/32000
 decoder.set_align_text(" ".join(words))

@@ -72,6 +72,16 @@ jobs:
         run: |
           node --test scripts/gcp/audit-course-production.test.mjs
           node scripts/gcp/audit-course-production.mjs
+
+      - name: Check generated-photo runtime credential presence without exposing values
+        run: |
+          node --input-type=module <<'NODE'
+          import {execFileSync} from 'node:child_process';
+          const job=JSON.parse(execFileSync('gcloud',['run','jobs','describe','elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          const env=job.spec.template.spec.template.spec.containers[0].env??[];
+          const configured=env.some(entry=>entry.name==='OPENAI_API_KEY'&&Boolean(entry.value||entry.valueFrom?.secretKeyRef));
+          console.log(JSON.stringify({teachingPhotoCredentialConfigured:configured}));
+          NODE
   dispatch:
     if: github.event_name == 'workflow_dispatch' && false
     runs-on: ubuntu-24.04

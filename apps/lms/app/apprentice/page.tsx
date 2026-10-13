@@ -419,7 +419,7 @@ export default async function ApprenticePortalPage() {
       {
         label: invoiceAccess.accessExemptUntil ? 'Billing access approved by sponsor' : 'Choose a payment method or financing option',
         done: billingConfigured,
-        href: '/apprentice/billing',
+        href: '/account/payment-methods',
         icon: CreditCard,
       },
       {

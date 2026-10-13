@@ -6,6 +6,12 @@ import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
+import { HomePlatformOverview } from '@/components/home/HomePlatformOverview';
+import { HomeNetworks } from '@/components/home/HomeNetworks';
+import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
+import { HomeFunding } from '@/components/home/HomeFunding';
+import { HomeWebsiteBuilderSales } from '@/components/home/HomeWebsiteBuilderSales';
+import { HomeInstitutionalGateway } from '@/components/home/HomeInstitutionalGateway';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
@@ -63,6 +69,15 @@ export default function HomePage() {
             </a>
           </div>
         </section>
+        <PlatformHubHero />
+        <HomeFeaturedHostShop />
+        <HomeCareerPathways />
+        <HomeFunding />
+        <HomeNetworks />
+        <HomeEmployerStrip />
+        <HomeInstitutionalGateway />
+        <HomeWebsiteBuilderSales />
+        <HomePlatformOverview />
         <section className="border-y border-slate-200 bg-white px-5 py-12 sm:py-16" aria-labelledby="workforce-platform-heading">
           <div className="mx-auto max-w-6xl">
             <p className="text-sm font-semibold uppercase tracking-wide text-sky-800">The Elevate workforce platform</p>

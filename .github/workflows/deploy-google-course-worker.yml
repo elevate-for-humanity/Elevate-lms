@@ -24,6 +24,7 @@ on:
       - 'scripts/gcp/execute-course-job.mjs'
       - 'tests/integration/google-lesson-author.test.ts'
       - 'tests/unit/ultimate-registered-profile.test.ts'
+      - 'tests/unit/ultimate-renderer-assignments.test.mjs'
       - 'tests/worker/**'
       - 'workers/**'
       - 'lib/ultimate-course-builder/**'

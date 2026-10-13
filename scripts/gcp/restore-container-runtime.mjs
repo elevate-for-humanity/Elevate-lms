@@ -128,7 +128,7 @@ async function reportAndRequestQuota() {
     const url=current?'https://cloudquotas.googleapis.com/v1/'+current.name+'?updateMask=quotaConfig,justification,contactEmail':base+'/quotaPreferences';
     const result=await fetch(url,{method:current?'PATCH':'POST',headers,body:JSON.stringify(payload),signal:AbortSignal.timeout(30000)});
     const outcome=await result.json();
-    console.log(JSON.stringify({...report,requestSubmitted:result.ok,httpStatus:result.status,pending:result.ok?outcome.reconciling:undefined,
+    console.log(JSON.stringify({...report,previousPreferred:current?.quotaConfig?.preferredValue,requestSubmitted:result.ok,httpStatus:result.status,pending:result.ok?outcome.reconciling===true:undefined,preferenceGranted:outcome.quotaConfig?.grantedValue,stateDetail:outcome.quotaConfig?.stateDetail,
       reason:result.ok?undefined:outcome.error?.status||'quota_request_failed'}));
   }
 }

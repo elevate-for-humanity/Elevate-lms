@@ -1,0 +1,94 @@
+name: Configure owned operator and readable voicemail
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/configure-owned-voicemail.yml']
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('voicemail-setup-{0}', github.ref) }}
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/configure-owned-voicemail.yml/dispatches" -f ref=main
+  configure:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate installer and worker
+        run: |
+          python3 -m py_compile scripts/gcp/configure-owned-voicemail.py
+          node --check infra/pbx/voicemail/worker.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Enable existing speech processing service
+        run: gcloud services enable speech.googleapis.com --project=elegant-racer-299721 --quiet
+      - name: Bind the existing private PBX identity to voicemail ingestion
+        run: |
+          node --input-type=module <<'NODE'
+          import {loadGoogleConfig,validateConfig,google,PROJECT} from './scripts/gcp/runtime-config.mjs';
+          const config=loadGoogleConfig('admin');
+          const token=google(['secrets','versions','access','latest','--secret','elevate-pbx-provisioning-token','--project',PROJECT]);
+          const system='341f59a3-b1d6-4360-8463-0ce0402f86fe';
+          if(token.length<32)throw Error('Existing PBX credential is invalid');
+          if(config.runtimeEnvironment.PBX_PROVISIONING_TOKEN && config.runtimeEnvironment.PBX_PROVISIONING_TOKEN!==token)throw Error('Existing private phone credential requires review');
+          if(config.runtimeEnvironment.PBX_PHONE_SYSTEM_ID && config.runtimeEnvironment.PBX_PHONE_SYSTEM_ID!==system)throw Error('Existing phone system requires review');
+          config.runtimeEnvironment.PBX_PROVISIONING_TOKEN=token;
+          config.runtimeEnvironment.PBX_PHONE_SYSTEM_ID=system;
+          validateConfig(config,'admin');
+          const version=google(['secrets','versions','add','elevate-admin-runtime-config','--project',PROJECT,'--data-file=-','--format=value(name)'],JSON.stringify(config));
+          console.log(JSON.stringify({result:'PASS',scope:'owned_voicemail_configuration',version,carrierRoutingChanged:false}));
+          NODE
+      - name: Configure real operator and enabled mailboxes
+        run: |
+          set -euo pipefail
+          test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' < scripts/gcp/configure-owned-voicemail.py | tee phone-owned-mailbox-evidence.json
+      - name: Install bounded voicemail worker without changing Asterisk containers
+        run: |
+          set -euo pipefail
+          gcloud compute scp infra/pbx/voicemail/worker.mjs elevate-pbx:/tmp/elevate-voicemail-worker.mjs --project=elegant-racer-299721 --zone=us-central1-a --quiet
+          gcloud compute scp infra/pbx/voicemail/elevate-voicemail-worker.service elevate-pbx:/tmp/elevate-voicemail-worker.service --project=elegant-racer-299721 --zone=us-central1-a --quiet
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo bash -s' <<'SH'
+          set -euo pipefail
+          install -d -m 0755 /opt/elevate-pbx/voicemail
+          install -d -m 0700 /var/lib/elevate-pbx/voicemail
+          test ! -L /opt/elevate-pbx/voicemail/worker.mjs
+          if test -f /opt/elevate-pbx/voicemail/worker.mjs; then cmp -s /opt/elevate-pbx/voicemail/worker.mjs /tmp/elevate-voicemail-worker.mjs; fi
+          if test -f /etc/systemd/system/elevate-voicemail-worker.service; then cmp -s /etc/systemd/system/elevate-voicemail-worker.service /tmp/elevate-voicemail-worker.service; fi
+          install -m 0644 /tmp/elevate-voicemail-worker.mjs /opt/elevate-pbx/voicemail/worker.mjs
+          install -m 0644 /tmp/elevate-voicemail-worker.service /etc/systemd/system/elevate-voicemail-worker.service
+          /usr/bin/node --check /opt/elevate-pbx/voicemail/worker.mjs
+          systemctl daemon-reload
+          systemctl enable --now elevate-voicemail-worker >/dev/null
+          systemctl is-active --quiet elevate-voicemail-worker
+          echo '{"result":"PASS","scope":"voicemail_worker_only","carrierRoutingChanged":false}'
+          SH
+      - name: Preserve authoritative DNS and SIP transport
+        if: always()
+        run: node scripts/gcp/verify-pbx-transport.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: owned-voicemail-setup
+          path: phone-*-evidence.json
+          retention-days: 14

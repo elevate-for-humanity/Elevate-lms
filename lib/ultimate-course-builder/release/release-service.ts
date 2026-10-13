@@ -230,12 +230,22 @@ export class UltimateReleaseService {
       };
       const { data: e, error: ee } = await this.db
         .from('course_lessons')
-        .select('id,module_id,slug')
+        .select('id,module_id,slug,content_json,quiz_questions')
         .eq('course_id', p.courseId)
         .eq(l.canonicalLessonId ? 'id' : 'slug', l.canonicalLessonId ?? l.slug)
         .maybeSingle();
       if (ee) throw ee;
       if (!e) throw new Error('ULTIMATE_CANONICAL_DRAFT_REQUIRED');
+      // Retain existing assessments and their stable IDs; new source-reviewed
+      // checks may be added, but video regeneration never deletes old checks.
+      const oldChecks=(e.content_json as any)?.experience?.knowledgeChecks??[];
+      const newChecks=row.content_json.experience.knowledgeChecks;
+      const existingIds=new Set(oldChecks.map((q:any)=>q.id).filter(Boolean));
+      row.content_json={...(e.content_json as any),...row.content_json,experience:{...(e.content_json as any)?.experience,...row.content_json.experience,
+        knowledgeChecks:[...oldChecks,...newChecks.filter((q:any)=>!existingIds.has(q.id))]}};
+      const oldReassessment=(e.content_json as any)?.experience?.reassessment??[];
+      const oldRetryIds=new Set(oldReassessment.map((q:any)=>q.id).filter(Boolean));
+      row.content_json.experience.reassessment=[...oldReassessment,...row.content_json.experience.reassessment.filter((q:any)=>!oldRetryIds.has(q.id))];
       // Record the already rendered, fully verified Ultimate film for the
       // canonical publication guard. This never queues the retired renderer.
       const mediaJobId = await this.recordApprovedFilm(p, l, e.id, actorId, now);

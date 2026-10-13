@@ -68,6 +68,7 @@ async function main() {
     if(job.spec.template.spec.template.spec.serviceAccountName!==`elevate-worker-runtime@${project}.iam.gserviceaccount.com` ||
       container.image!==`${image}@${digest}` || afterResources.cpu!==resources.cpu || afterResources.memory!==resources.memory ||
       Number(job.spec.template.spec.parallelism)!==2 || Number(job.spec.template.spec.taskCount)!==2 ||
+      Number(job.spec.template.spec.template.spec.maxRetries)!==1 ||
       !container.env.some(v=>v.name==='ULTIMATE_WORKER_ONCE'&&v.value==='true'))
       throw new Error('Worker deployment readback mismatch');
     console.log('Finite Course Builder job deployed. No execution or queue mutation performed.');

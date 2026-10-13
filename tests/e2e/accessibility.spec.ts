@@ -125,6 +125,12 @@ test.describe('Accessibility - WCAG 2.2 AA public journeys', () => {
   test('apply form controls have programmatic labels', async ({ page }) => {
     await page.goto('/apply');
     await page.waitForURL(/\/apply\/student\/interview/);\n    await page.waitForLoadState('domcontentloaded');\n    await expect(page.locator('main')).toBeVisible();\n\n    const unlabeledControls = await page
+    // /apply redirects through the canonical student entry after streaming.
+    // Inspect the actual intake once its controls have mounted.
+    await expect(page).toHaveURL(/\/apply\/student\/interview/);
+    await expect(page.getByPlaceholder(/Type your answer|Escriba su respuesta/i)).toBeVisible({ timeout: 20_000 });
+
+    const unlabeledControls = await page
       .locator('main input:not([type="hidden"]), main select, main textarea')
       .evaluateAll((controls) =>
         controls

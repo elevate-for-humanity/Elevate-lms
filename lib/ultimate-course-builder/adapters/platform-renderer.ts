@@ -309,6 +309,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       storyboard,
       instructorId: instructorFor(courseTitle),
       ultimateStrict: true,
+      lessonPresentation: input.lessonPresentation,
       requireVisualEvidence: true,
       narrationSegments: input.artifacts?.natural_narration?.narration?.segments,
     });
@@ -318,7 +319,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
     const visualEvidence = requireResolvedVisualEvidence(result.sceneData);
     return {
       ...result,
-      layoutVersion: 2,
+      layoutVersion: input.lessonPresentation === 'approved-premium-v1' ? 3 : 2,
       provider: 'remotion',
       providerModel: 'SlideLesson-blueprint-v3',
       captionsUrl: result.sceneData?.captionUrl,

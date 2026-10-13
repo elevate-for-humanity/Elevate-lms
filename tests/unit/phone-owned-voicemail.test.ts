@@ -41,3 +41,20 @@ describe('owned voicemail boundary',()=>{
 });
 
 afterEach(()=>{vi.unstubAllGlobals();vi.unstubAllEnvs();});
+
+describe('non-delivering voicemail acceptance',()=>{
+ it('verifies speech without storing audio, creating calls, or sending notices',async()=>{
+  const {writes,upload}=database();
+  const probe=new Request('https://example.invalid/api/internal/phone/voicemail',{method:'POST',headers:{Authorization:'Bearer '+secret},body:JSON.stringify({...body,validateOnly:true})});
+  const response=await POST(probe);
+  expect(await response.json()).toMatchObject({validated:true,transcriptAvailable:true});
+  expect(writes).toHaveLength(0);expect(upload).not.toHaveBeenCalled();expect(mock.notice).not.toHaveBeenCalled();
+ });
+ it('reports a stable speech permission error without exposing provider bodies',async()=>{
+  database();
+  vi.mocked(fetch).mockImplementation(async(url:any)=>String(url).includes('169.254')?Response.json({access_token:'fixture-token'}):new Response('private provider details',{status:403}));
+  const response=await POST(request());expect(response.status).toBe(503);
+  expect(await response.json()).toMatchObject({code:'speech_http_403'});
+  expect(mock.notice).not.toHaveBeenCalled();
+ });
+});

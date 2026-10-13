@@ -29,7 +29,7 @@ export async function hydrateUltimateProfileSources(
   courseId: string,
   profile: UltimateCredentialProfile,
 ): Promise<UltimateCredentialProfile> {
-  const presentation = approvedPresentationForCourse(courseId);
+  const presentation = profile.lessonPresentation ?? approvedPresentationForCourse(courseId);
   if (presentation === 'approved-premium-v1') {
     const assetId = '9ae74de2-2fd2-45df-9c54-59c9e3c5c07c';
     const storagePath = '2c723bfa-8c40-4acc-b961-98d917710ffc/1791848294710-Barber_LMS_Sample.mp4';
@@ -49,6 +49,7 @@ export async function hydrateUltimateProfileSources(
       visualStyle: { cropMode: 'contain', transition: 'crossfade' },
       instructions: [
         'Use the owner-approved reference as the presentation standard, never as reusable lesson footage.',
+        'Use charcoal backgrounds, crisp white text and warm champagne accents; no blue screens.',
         'Show whole large photos with concise explanations; preserve hands, tools, and heads without cropping.',
         'Use multiple changing generated photographs within EVERY teaching moment, bound to specific spoken instructions. Generated photographs are illustrations; inspected licensed Envato footage demonstrates actual motion.',
         'Use numbered side instructions with independent fades and finish EVERY teaching moment with a separately recorded, freshly worded source-reviewed recap.',
@@ -74,6 +75,7 @@ export async function hydrateUltimateProfileSources(
   const registeredSources = registeredContract
     ? registeredInstructionalSources(registeredContract.canonicalProgramSlug)
     : [];
+  if ((profile as any).sourcePolicy === 'frozen-reference-v1') return profile;
   const { data: lessons, error } = await db
     .from('course_lessons')
     .select('id,slug,title,learning_objectives,content,content_json')

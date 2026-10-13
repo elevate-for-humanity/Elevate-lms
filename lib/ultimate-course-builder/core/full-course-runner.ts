@@ -1,3 +1,4 @@
+import { assertCompleteLesson } from './lesson-contract';
 import { UltimateBuildRunner, type UltimateRunContext } from './build-runner';
 import {
   ULTIMATE_BUILD_STEPS,
@@ -105,6 +106,12 @@ export async function runUltimateCourse(
     const result = await makeRunner(competency.id).run(context);
     console.info('[UltimateCourse] runner returned', {lessonBuildId: lesson.id, findings: result.findings.length});
     assertActive?.();
+    if (!result.findings.some((f) => f.severity === 'error')) {
+      try { assertCompleteLesson(result.artifacts, plan.profile, competency.id); }
+      catch (error) {
+        result.findings.push({step:'credential_release',severity:'error',code:'FULL_LESSON_ACCEPTANCE_REQUIRED',message:error instanceof Error?error.message:String(error)});
+      }
+    }
     await persistence.finishLesson({
       lessonBuildId: lesson.id,
       status: result.findings.some((f) => f.severity === 'error') ? 'built_with_findings' : 'built',
@@ -112,6 +119,7 @@ export async function runUltimateCourse(
       findings: result.findings,
     });
     lessons.push({ competencyId: competency.id, lessonBuildId: lesson.id, result });
+    if (result.findings.some((f) => f.severity === 'error')) break;
   }
   const findings = lessons.flatMap((x) => x.result.findings);
   const hasErrors = findings.some((f) => f.severity === 'error');
@@ -126,5 +134,5 @@ export async function runUltimateCourse(
     findings,
   });
   return { buildId: plan.buildId, courseId: plan.courseId, lessons, findings, completed,
-    nextIndex: startIndex + competencies.length, hasRemaining: startIndex + competencies.length < eligible.length };
+    nextIndex: startIndex + lessons.length, hasRemaining: startIndex + lessons.length < eligible.length };
 }

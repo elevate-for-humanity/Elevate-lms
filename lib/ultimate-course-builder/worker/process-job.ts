@@ -58,9 +58,16 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       .single();
     if (error || !build) throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
     const storedProfile = build.profile as UltimateCredentialProfile;
+    if ((storedProfile as any).ownerPaused === true) {
+      await queue.waitForDependency(job.id,workerId,'OWNER_PAUSED_REFERENCE_BUILD',generation);
+      return {claimed:true,completed:false,ownerPaused:true,jobId:job.id};
+    }
     if (!storedProfile?.competencies?.length) throw new Error('ULTIMATE_PROFILE_REPAIR_REQUIRED');
+    const payload = (job.payload ?? {}) as any;
+    const currentCompetencyId = payload.competencyId ?? payload.repairCompetencyId ??
+      storedProfile.competencies[Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0]?.id;
     const profile = await materializeUltimateDraft(db, build.course_id,
-      await hydrateUltimateProfileSources(db, build.course_id, storedProfile));
+      await hydrateUltimateProfileSources(db, build.course_id, storedProfile), [currentCompetencyId]);
     if (
       JSON.stringify(profile) !== JSON.stringify(storedProfile)
     ) {
@@ -74,7 +81,6 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     const runtime = await createUltimateRuntime(db, fence);
     console.info('[UltimateWorker] runtime ready', { jobId: job.id });
     const handlers = createProductionHandlers(runtime);
-    const payload = (job.payload ?? {}) as any;
     const targeted = Boolean(payload.competencyId || payload.lessonBuildId || payload.acceptance);
     console.info('[UltimateWorker] lesson processing started', { jobId: job.id, targeted, competencyId: payload.competencyId ?? null });
     const result = await runUltimateCourse(
@@ -139,7 +145,11 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       const releaseActor = await resolveReleaseActor(db, build.course_id, profile.mediaAcquisitionOwnerId);
       await runtime.persistence.updateBuild({buildId:build.id,status:'built',currentStep:'credential_release'});
       assertActive();
-      await new UltimateReleaseService(db).publish(build.id, releaseActor);
+      if ((profile as any).publicationPolicy === 'owner-review-required') {
+      await queue.waitForDependency(job.id,workerId,'OWNER_COURSE_REVIEW_REQUIRED',generation);
+      return {claimed:true,completed:false,awaitingOwnerReview:true,jobId:job.id,result};
+    }
+    await new UltimateReleaseService(db).publish(build.id, releaseActor);
     }
     if (targeted) {
       // A lesson acceptance/repair job does not complete or publish the course.

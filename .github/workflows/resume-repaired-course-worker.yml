@@ -1,8 +1,5 @@
 name: Resume repaired course worker
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/resume-repaired-course-worker.yml']
   workflow_run:
     workflows: ['Deploy Google Course Builder on source changes']
     types: [completed]
@@ -13,7 +10,7 @@ permissions:
   id-token: write
 jobs:
   dispatch:
-    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == '398a0671d436412cc01cbed927a3f63afbd35392')
+    if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == '8edfd8c603572656a42d1d242ec7b608178ef4c3')
     runs-on: ubuntu-24.04
     steps:
       - env:

@@ -36,8 +36,12 @@ async function restore(component) {
   const profile=profiles[component],before=read(['run','services','describe',profile.name]);
   const spec=before.spec.template.spec,container=spec.containers[0];
   if(spec.containers.length!==1||!/@sha256:[a-f0-9]{64}$/.test(container.image))throw Error('Immutable single-container service required');
-  const servesCurrent=before.status.traffic?.some(t=>t.percent===100&&t.revisionName===before.status.latestCreatedRevisionName);
-  const changed=!servesCurrent||container.resources?.limits?.cpu!==profile.cpu||container.resources?.limits?.memory!==profile.memory;
+  const serving=before.status.traffic?.find(t=>t.percent===100&&t.revisionName);
+  const live=serving?read(['run','revisions','describe',serving.revisionName]):null;
+  const liveContainer=live?.spec?.containers?.[0];
+  const capacityMatched=liveContainer?.resources?.limits?.cpu===profile.cpu&&liveContainer?.resources?.limits?.memory===profile.memory;
+  console.log(JSON.stringify({component,servingRevision:serving?.revisionName,servingCpu:liveContainer?.resources?.limits?.cpu,servingMemory:liveContainer?.resources?.limits?.memory,capacityMatched}));
+  const changed=!capacityMatched;
   const extra=[];let directory;
   if(component==='studio-browser') {
     const config=loadGoogleConfig(component);
@@ -118,7 +122,7 @@ async function reportAndRequestQuota() {
     const list=await listed.json();
     if(!listed.ok){console.log(JSON.stringify({...report,reason:'quota_request_permission_unavailable',httpStatus:listed.status}));continue;}
     const current=list.quotaPreferences?.find(p=>p.service==='run.googleapis.com'&&p.quotaId===quotaId&&p.dimensions?.region==='us-central1');
-    if(current&&Number(current.quotaConfig?.preferredValue)>=desired){console.log(JSON.stringify({...report,existingRequest:true,pending:current.reconciling}));continue;}
+    if(current&&Number(current.quotaConfig?.preferredValue)>=desired){console.log(JSON.stringify({...report,existingRequest:true,pending:current.reconciling===true,preferenceGranted:current.quotaConfig?.grantedValue,stateDetail:current.quotaConfig?.stateDetail}));continue;}
     const payload={service:'run.googleapis.com',quotaId,dimensions:{region:'us-central1'},quotaConfig:{preferredValue:String(desired)},contactEmail:contact,
       justification:'Restore migrated Elevate platform containers to their original Northflank 4 CPU and 8 GiB configuration, with bounded browser and course-worker capacity and safe revision overlap.'};
     const url=current?'https://cloudquotas.googleapis.com/v1/'+current.name+'?updateMask=quotaConfig,justification,contactEmail':base+'/quotaPreferences';
@@ -141,3 +145,4 @@ async function main() {
   if(failed)process.exitCode=1;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)main().catch(()=>{console.error('Runtime restoration failed; inspect provider status.');process.exitCode=1;});
+

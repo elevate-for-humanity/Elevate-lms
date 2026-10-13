@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { approvedDeliveryFailures } from '../instructional/approved-delivery.mjs';
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from './types';
 import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
 
@@ -42,6 +43,8 @@ export function stepInputHash(
     ...(step === 'natural_narration' ? { narrationProducer: 'separate-pcm-parts-immutable-mp3-word-alignment-v2' } : {}),
     ...(step === 'instructor_script' ? { scriptProducer: 'stage-aligned-scenes-v1' } : {}),
     ...(step === 'visual_assignment' ? { visualAssignmentProducer: 'canonical-entitlement-source-paths-v3' } : {}),
+    ...(step === 'finished_media_qa' ? { approvedDeliveryValidator: 'approved-delivery-v1' } : {}),
+    ...(step === 'lesson_film_render' ? { renderProducer: 'approved-pcm-timeline-supported-image-formats-v1' } : {}),
     dependencies: dependencies.map((s) => [s, contractHash(artifactPayload(prior[s] ?? {}))]),
   });
 }
@@ -236,6 +239,18 @@ export function assertCompleteLesson(
   profile?: unknown,
   competencyId?: string,
 ): void {
+  if ((profile as any)?.lessonPresentation === 'approved-premium-v1') {
+    const failures = approvedDeliveryFailures(artifacts.lesson_film_render?.render,
+      artifacts.natural_narration?.narration, (profile as any).presentationContract);
+    if (failures.length) throw new Error(failures.join(';'));
+    const encoded = artifacts.finished_media_qa?.mediaQA?.inspection?.approvedPresentationInspection;
+    const sceneCount = artifacts.lesson_film_render?.render?.sceneData?.scenes?.length ?? 0;
+    if (encoded?.pass !== true || encoded.backgrounds?.length !== sceneCount ||
+        encoded.backgrounds.some((row:any)=>row.passed!==true) ||
+        !(encoded.captions?.length >= sceneCount*2) ||
+        encoded.captions.some((row:any)=>row.wordCoverage<0.85))
+      throw new Error('APPROVED_ENCODED_PRESENTATION_INSPECTION_REQUIRED');
+  }
   const competencies = (profile as any)?.competencies ?? [];
   const competency = competencies.find((c: any) => c.id === competencyId) ?? (competencies.length === 1 ? competencies[0] : undefined);
   if (practicalVisualFailures(artifacts, competency).length)
@@ -265,3 +280,4 @@ export function practicalVisualFailures(artifacts: Partial<Record<UltimateBuildS
       !(String(asset.mime_type ?? '').startsWith('video/') || /\.(mp4|webm|mov)(?:[?#]|$)/i.test(String(asset.public_url ?? '')));
   }) ? ['ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED'] : [];
 }
+

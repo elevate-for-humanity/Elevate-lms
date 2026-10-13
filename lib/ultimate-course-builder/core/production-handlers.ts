@@ -13,6 +13,7 @@ import { executableRepairTargets, type CourseRepairPlan } from '../repair/course
 import { instructionalDepthFor } from '../instructional/depth-contract';
 import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
 import { narrationSceneSeconds } from '../instructional/approved-presentation.mjs';
+import { approvedDeliveryFailures } from '../instructional/approved-delivery.mjs';
 const comp = (ctx: any) =>
   ctx.profile.competencies.find((c: any) => String(ctx.buildId).endsWith(':' + c.id)) ??
   ctx.profile.competencies[0];
@@ -296,6 +297,9 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
     finished_media_qa: async (ctx) => {
       const render: any = ctx.artifacts.lesson_film_render?.render;
       if(ctx.profile.lessonPresentation === 'approved-premium-v1') {
+        const failures = approvedDeliveryFailures(render,
+          (ctx.artifacts.natural_narration as any)?.narration, ctx.profile.presentationContract);
+        if (failures.length) throw new Error(failures.join(';'));
         if(render.presentationVersion !== 'approved-moment-cues-v2') throw new Error('APPROVED_MOMENT_PRESENTATION_REQUIRED');
         for(const scene of render.sceneData?.scenes??[]) {
           const cues=scene.pictureCues;
@@ -502,3 +506,4 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
     },
   };
 }
+

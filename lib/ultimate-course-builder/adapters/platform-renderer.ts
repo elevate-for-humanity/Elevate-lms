@@ -1,4 +1,5 @@
 import type { UltimateRenderPort } from '../core/ports';
+import { storedLicensedMediaMetadata } from '@/lib/media/licensed-course-media';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { materializeInstructionalVisualAssets } from './instructional-visual-assets';
 import { MIN_LESSON_VIDEO_SCENES, type MediaDirectorInput } from '@/lib/video/media-director';
@@ -52,6 +53,13 @@ export async function refreshLicensedVisualUrls(input: any, db: SupabaseClient):
   const readyAssets = await Promise.all(
     assignment.readyAssets.map(async (value: unknown) => {
       const asset = record(value);
+      if(asset.entitlement_id) {
+        const {data:entitlement,error:lookupError}=await db.from('licensed_media_entitlements')
+          .select('metadata').eq('id',asset.entitlement_id).single();
+        if(lookupError || !entitlement) throw new Error('ULTIMATE_LICENSED_VISUAL_ENTITLEMENT_REFRESH_FAILED:'+String(asset.id));
+        const current=storedLicensedMediaMetadata(entitlement.metadata);
+        if(current) asset.storage_path=current.storage_path;
+      }
       if (!asset.storage_path) {
         if (typeof asset.public_url === 'string' && asset.public_url.includes('/object/sign/')) {
           throw new Error(
@@ -371,3 +379,4 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
     };
   }
 }
+

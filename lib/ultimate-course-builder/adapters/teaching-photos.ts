@@ -55,12 +55,20 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         String(input.courseTitle), String(scene.visualRequirement), String(step.narrationQuote), step.view,
       ].join('\n');
       const requestHash = createHash('sha256').update(JSON.stringify({version:'approved-picture-cues-v1',lesson:input.lessonId,scene:scene.id,index,prompt})).digest('hex');
-      const storagePath = 'approved-teaching-photos/'+requestHash+'.png';
+      let storagePath = 'approved-teaching-photos/'+requestHash+'.png';
       let {data:file} = await db.storage.from('course_videos').download(storagePath);
+      if(!file) for(const extension of ['jpg','webp']) {
+        const candidate='approved-teaching-photos/'+requestHash+'.'+extension;
+        const cached=await db.storage.from('course_videos').download(candidate);
+        if(cached.data){file=cached.data;storagePath=candidate;break;}
+      }
       if (!file) {
         const generated = await generateTeachingPhoto(prompt);
         const bytes = generated.bytes;
-        const {error} = await db.storage.from('course_videos').upload(storagePath,bytes,{contentType:'image/png',upsert:false});
+        const mimeType=generated.mimeType;
+        const extension=mimeType==='image/jpeg'?'jpg':mimeType==='image/webp'?'webp':'png';
+        storagePath='approved-teaching-photos/'+requestHash+'.'+extension;
+        const {error} = await db.storage.from('course_videos').upload(storagePath,bytes,{contentType:mimeType,upsert:false});
         if(error && !/already exists|duplicate/i.test(error.message)) throw error;
         const downloaded=await db.storage.from('course_videos').download(storagePath);
         if(downloaded.error||!downloaded.data) throw new Error('TEACHING_PHOTO_READBACK_FAILED');
@@ -75,3 +83,4 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
   }
   return {...input,teachingPhotos:photos};
 }
+

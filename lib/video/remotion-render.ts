@@ -836,7 +836,9 @@ export async function renderStoryboardVideo(
       };
       const estimatedNarrationSeconds = Math.ceil((narration.split(/\s+/).length / 140) * 60);
       const narrationSeconds = premium
-        ? Math.ceil((measuredNarrationSeconds ?? estimatedNarrationSeconds) * STORYBOARD_RENDER_FPS) / STORYBOARD_RENDER_FPS
+        // MP3 encoder padding is not an instructional hold. Use the measured
+        // PCM speech timeline shared by captions, pictures and synchronization.
+        ? Math.ceil(approvedAudio!.durationSeconds * STORYBOARD_RENDER_FPS) / STORYBOARD_RENDER_FPS
         : Math.ceil(measuredNarrationSeconds ?? estimatedNarrationSeconds) + 1;
       // A lesson's instructional seat time includes reading, practice, checks,
       // and review; it must not become one continuous hour-long MP4. Time each
@@ -1171,3 +1173,4 @@ export function inferDomainKey(courseName: string, lessonTitle = ''): string {
 
   return 'default';
 }
+

@@ -1,4 +1,6 @@
 import 'server-only';
+import { generatedTeachingPhoto } from '../ultimate-course-builder/instructional/approved-delivery.mjs';
+import { captionSampleGroups, captionWordCoverage, charcoalPixelsMatch } from '../ultimate-course-builder/instructional/approved-frame-checks.mjs';
 import {quoteStartSeconds} from '../ultimate-course-builder/instructional/picture-timeline.mjs';
 import { teachingPresentation } from '@/lib/ultimate-course-builder/instructional/teaching-presentation';
 import { createHash } from 'node:crypto';
@@ -15,7 +17,7 @@ import type { InstructionalQualityEvidence } from './instructional-quality-gate'
 import { configuredNarrationProvider } from './edge-tts';
 import { MIN_TITLE_WORD_COVERAGE, readEncodedTitle } from './title-readability.mjs';
 
-export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v7';
+export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v8';
 
 const execFileAsync = promisify(execFile);
 const MIN_BYTES = 100_000;
@@ -26,6 +28,7 @@ const MAX_BLACK_SECONDS = 0.75;
 const MIN_ASR_NARRATION_COVERAGE = 0.9;
 
 export interface MediaQualityEvidence {
+  approvedPresentationInspection?: {pass: boolean; backgrounds: Array<{sceneId:string;passed:boolean}>; captions: Array<{sceneId:string;width:number;time:number;expected:string;decoded:string;wordCoverage:number}>};
   mediaSha256?: string;
   actualTranscript?: string;
   readability?: Array<{ scene: number; width: number; wordCoverage: number; ocrMode?: 'full-frame' | 'title-region' }>;
@@ -440,8 +443,7 @@ export async function enforceMediaQuality(input: {
     const sourcedScenes = input.sceneData.scenes.filter((scene) =>
       Boolean(scene.resolvedProvider && scene.resolvedModel),
     );
-    const ownedGeneratedPhoto=(scene:any)=>scene.resolvedProvider==='google'&&scene.resolvedModel==='generated-teaching-photograph'&&scene.physicalDemonstration!==true&&
-      Array.isArray(scene.pictureCues)&&scene.pictureCues.length>=2&&scene.pictureCues.every((cue:any)=>cue.illustration===true&&/^[a-f0-9]{64}$/i.test(cue.sha256)&&String(cue.storagePath??'').startsWith('approved-teaching-photos/'));
+    const ownedGeneratedPhoto=generatedTeachingPhoto;
     const licensedScenes = input.sceneData.scenes.filter((scene) =>
       Boolean(
         scene.resolvedProvider &&
@@ -542,9 +544,27 @@ export async function enforceMediaQuality(input: {
     const teachingVisualEvidence: NonNullable<MediaQualityEvidence['teachingVisualEvidence']> = [];
     const sceneNarrationEvidence: NonNullable<MediaQualityEvidence['sceneNarrationEvidence']> = [];
     const premium=input.lessonPresentation==='approved-premium-v1';
+    const approvedPresentationInspection: NonNullable<MediaQualityEvidence['approvedPresentationInspection']> = {pass:false,backgrounds:[],captions:[]};
     let sceneStart = premium ? 0 : 3;
     for (const [index, scene] of input.sceneData.scenes.entries()) {
       const time = sceneStart + Math.min(2, scene.durationSeconds / 2);
+      if(premium) {
+        const pixels=await execFileAsync('ffmpeg',['-v','error','-ss',String(time),'-i',videoPath,'-frames:v','1','-vf','crop=2:2:0:0,format=rgb24','-f','rawvideo','pipe:1'],{encoding:'buffer',timeout:30000,maxBuffer:1000000});
+        const passed=charcoalPixelsMatch(pixels.stdout);
+        approvedPresentationInspection.backgrounds.push({sceneId:scene.id,passed});
+        if(!passed)throw new Error('APPROVED_ENCODED_CHARCOAL_BACKGROUND_REQUIRED:'+scene.id);
+        const samples=captionSampleGroups((scene as any).wordAlignment,(scene as any).recapStartSeconds);
+        if(!samples.length)throw new Error('APPROVED_ENCODED_CAPTION_SAMPLES_REQUIRED:'+scene.id);
+        for(const [sampleIndex,sample] of samples.entries()) for(const width of [1280,390]) {
+          const captionTime=sceneStart+(sample.startSeconds+sample.endSeconds)/2;
+          const frame=join(workDir,`caption-${index}-${sampleIndex}-${width}.png`);
+          await execFileAsync('ffmpeg',['-y','-ss',String(captionTime),'-i',videoPath,'-frames:v','1','-vf',`scale=${width}:-1,crop=iw:ih/6:0:ih*5/6`,frame],{timeout:30000,maxBuffer:1000000});
+          const decoded=await execFileAsync('tesseract',[frame,'stdout','--psm','6'],{timeout:30000,maxBuffer:1000000});
+          const wordCoverage=captionWordCoverage(sample.text,decoded.stdout);
+          approvedPresentationInspection.captions.push({sceneId:scene.id,width,time:captionTime,expected:sample.text,decoded:decoded.stdout,wordCoverage});
+          if(wordCoverage<0.85)throw new Error(`APPROVED_ENCODED_BOTTOM_CAPTIONS_REQUIRED:${scene.id}:${width}`);
+        }
+      }
       for (const width of [1280, 390]) {
         const frame = join(workDir, `readability-${index}-${width}.png`);
         await execFileAsync(
@@ -615,6 +635,7 @@ export async function enforceMediaQuality(input: {
       sceneStart += scene.durationSeconds;
     }
     const evidence: MediaQualityEvidence = {
+      ...(premium?{approvedPresentationInspection:{...approvedPresentationInspection,pass:true}}:{}),
       gateVersion: MEDIA_QUALITY_GATE_VERSION,
       mediaSha256: createHash('sha256').update(buffer).digest('hex'),
       actualTranscript,
@@ -754,3 +775,4 @@ export async function measureNarrationCaptions(
   }
   return cues;
 }
+

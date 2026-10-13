@@ -2,6 +2,10 @@ import { generateVertexLessonJson } from './google-lesson-author';
 import { repeatedTeachingSegments } from '@/lib/video/instructional-quality-gate';
 import { contractHash } from '../core/lesson-contract';
 export async function addFreshTeachingRecaps(blueprint:any,profile:any,sources:any[],generate=generateVertexLessonJson){
+ // Recap rewrites cannot repair repetition in the original teaching script.
+ // Diagnose its actual producer before spending another generation attempt.
+ if(repeatedTeachingSegments(blueprint.segments.map((s:any)=>s.text).join('\n\n')))
+  throw Error('NARRATION_DUPLICATION');
  let lastFailure:any;
  for(let attempt=0;attempt<3;attempt++) {
  try {

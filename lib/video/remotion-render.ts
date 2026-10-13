@@ -900,7 +900,7 @@ export async function renderStoryboardVideo(
     // Final trust boundary before Chromium. Runtime provider and storage values
     // must be normalized even when their SDK declarations claim strings.
     const normalizedScenes = normalizeSlideLessonScenes(scenes);
-    if(premium) resolvedStoryboard.scenes.forEach((scene:any,i:number)=>{scene.motionCue=normalizedScenes[i].motionCue;scene.pictureCues=normalizedScenes[i].pictureCues;scene.recapStartSeconds=normalizedScenes[i].recapStartSeconds;scene.recapText=normalizedScenes[i].recapText;});
+    if(premium) resolvedStoryboard.scenes.forEach((scene:any,i:number)=>{scene.wordAlignment=normalizedScenes[i].wordAlignment;scene.motionCue=normalizedScenes[i].motionCue;scene.pictureCues=normalizedScenes[i].pictureCues;scene.recapStartSeconds=normalizedScenes[i].recapStartSeconds;scene.recapText=normalizedScenes[i].recapText;});
     if (input.requireVisualEvidence) {
       const primaryVisuals = normalizedScenes.map((scene) => scene.clipUrl || scene.imageUrl);
       const missing = primaryVisuals

@@ -329,6 +329,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
           artifacts: { mediaQA: { pass: false, failures: quality.failures } },
         };
       const inspection = await enforceMediaQuality({
+        lessonPresentation: ctx.profile.lessonPresentation,
         videoUrl: renderMediaUrl(render),
         expectedDurationSeconds: render.duration,
         expectedSceneCount: render.sceneData.scenes.length,

@@ -1,4 +1,5 @@
 import 'server-only';
+import {quoteStartSeconds} from '../ultimate-course-builder/instructional/picture-timeline.mjs';
 import { teachingPresentation } from '@/lib/ultimate-course-builder/instructional/teaching-presentation';
 import { createHash } from 'node:crypto';
 
@@ -372,6 +373,7 @@ async function transcribeRenderedAudio(videoPath: string, workDir: string): Prom
 }
 
 export async function enforceMediaQuality(input: {
+  lessonPresentation?: 'approved-premium-v1';
   videoUrl: string;
   expectedDurationSeconds: number;
   expectedSceneCount: number;
@@ -536,7 +538,8 @@ export async function enforceMediaQuality(input: {
     const readability: NonNullable<MediaQualityEvidence['readability']> = [];
     const teachingVisualEvidence: NonNullable<MediaQualityEvidence['teachingVisualEvidence']> = [];
     const sceneNarrationEvidence: NonNullable<MediaQualityEvidence['sceneNarrationEvidence']> = [];
-    let sceneStart = 3;
+    const premium=input.lessonPresentation==='approved-premium-v1';
+    let sceneStart = premium ? 0 : 3;
     for (const [index, scene] of input.sceneData.scenes.entries()) {
       const time = sceneStart + Math.min(2, scene.durationSeconds / 2);
       for (const width of [1280, 390]) {
@@ -566,14 +569,19 @@ export async function enforceMediaQuality(input: {
       // Inspect every authored teaching state in the encoded movie, including
       // phone delivery. A diagram or record listed in metadata is not evidence
       // that the compositor actually rendered it.
-      for (const [stepIndex, step] of (scene.teachingVisual?.steps ?? []).entries()) {
-        const time = sceneStart + (stepIndex + 0.5) * scene.durationSeconds / scene.teachingVisual!.steps.length;
+      const speechCues=(scene as any).wordAlignment?.map((w:any)=>({text:w.word,startSeconds:w.start,endSeconds:w.end}))??[];
+      const states=(scene.teachingVisual?.steps??[]).map((step:any,index:number)=>({step,index,start:premium?quoteStartSeconds(step.narrationQuote,speechCues):index*scene.durationSeconds/scene.teachingVisual!.steps.length}));
+      if(premium) states.push({step:{label:'Fresh recap',value:(scene as any).recapText},index:states.length,start:(scene as any).recapStartSeconds});
+      for (const [stateIndex,state] of states.entries()) {
+        const stepIndex=state.index;
+        const localTime=state.start+Math.min(1,(states[stateIndex+1]?.start??scene.durationSeconds)-state.start>0 ? ((states[stateIndex+1]?.start??scene.durationSeconds)-state.start)/2 : 0);
+        const time = sceneStart + localTime;
         for (const width of [1280,390]) {
           const frame=join(workDir,`teaching-${index}-${stepIndex}-${width}.png`);
-          await execFileAsync('ffmpeg',['-y','-ss',String(time),'-i',videoPath,'-frames:v','1','-vf',`scale=${width}:-1`,frame],{timeout:30000,maxBuffer:1000000});
+          await execFileAsync('ffmpeg',['-y','-ss',String(time),'-i',videoPath,'-frames:v','1','-vf',premium?`scale=${width}:-1,crop=${Math.floor(width*646/1920)}:${Math.floor(width*640/1920)}:${Math.floor(width*1220/1920)}:${Math.floor(width*225/1920)}`:`scale=${width}:-1`,frame],{timeout:30000,maxBuffer:1000000});
           let {stdout:decoded}=await execFileAsync('tesseract',[frame,'stdout','--psm','11'],{timeout:30000,maxBuffer:1000000});
           let ocrMode: 'sparse' | 'block' = 'sparse';
-          const expected=teachingPresentation(scene.teachingVisual!, time-sceneStart, scene.durationSeconds).expectedText;
+          const expected=premium?state.step.label+' '+state.step.value:teachingPresentation(scene.teachingVisual!, time-sceneStart, scene.durationSeconds).expectedText;
           const words=[...new Set(normalizedWords(expected).filter(w=>w.length>2))];
           const coverageOf = (text: string) => {
             const observed = new Set(normalizedWords(text));

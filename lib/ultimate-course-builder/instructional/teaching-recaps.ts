@@ -3,12 +3,12 @@ import { repeatedTeachingSegments } from '@/lib/video/instructional-quality-gate
 import { contractHash } from '../core/lesson-contract';
 export async function addFreshTeachingRecaps(blueprint:any,profile:any,sources:any[],generate=generateVertexLessonJson){
  const result=await generate(profile.instructionalAuthoring?.model??'gemini-3.8-flash',
-  'Return JSON {recaps:[{segmentId,text}]}. Write one fresh concise 1-2 sentence recap of at most forty words and 360 characters for EVERY supplied teaching moment. Ground it only in that moment and the authorized sources. Paraphrase the lesson conclusion; do not repeat any original sentence. Preserve safety negations, guard manufacturer and lengths, and all standards. Never invent facts, measurements or approvals.',
+  'Return JSON {recaps:[{segmentId,text}]}. Write one fresh concise 1-2 sentence recap of at most twenty-four words and 140 characters for EVERY supplied teaching moment. Ground it only in that moment and the authorized sources. Paraphrase the lesson conclusion; do not repeat any original sentence. Preserve safety negations, guard manufacturer and lengths, and all standards. Never invent facts, measurements or approvals.',
   {segments:blueprint.segments,sources},profile.instructionalAuthoring?.location??'us');
  if(!Array.isArray(result.recaps)||result.recaps.length!==blueprint.segments.length)throw Error('EVERY_TEACHING_MOMENT_RECAP_REQUIRED');
  const segments=blueprint.segments.map((s:any)=>{
   const matches=result.recaps.filter((r:any)=>r.segmentId===s.id);
-  if(matches.length!==1||typeof matches[0].text!=='string'||matches[0].text.trim().split(/\s+/).length<6||matches[0].text.length>360)
+  if(matches.length!==1||typeof matches[0].text!=='string'||matches[0].text.trim().split(/\s+/).length<6||matches[0].text.length>140)
    throw Error('FRESH_TEACHING_RECAP_REQUIRED');
   return {...s,recapText:matches[0].text.trim()};
  });

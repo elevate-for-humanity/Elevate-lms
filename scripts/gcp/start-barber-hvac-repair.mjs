@@ -53,8 +53,8 @@ try{
  google(['run','jobs','execute',name,'--project='+PROJECT,'--region='+region,'--tasks='+tasks,'--async','--quiet']);
  const pending=new Map(jobs.map(j=>[j.id,String(j.heartbeat_at??'')]));
  for(let i=0;i<60;i++){
-  const rows=await rest('ultimate_build_jobs?select=id,status,heartbeat_at,lease_owner,last_error&id=in.('+jobs.map(j=>j.id).join(',')+')');
-  for(const row of rows)if(row.heartbeat_at>pending.get(row.id)&&row.lease_owner)pending.delete(row.id);
+  const rows=await rest('ultimate_build_jobs?select=id,status,heartbeat_at,lease_owner,last_error,execution_generation&id=in.('+jobs.map(j=>j.id).join(',')+')');
+  for(const row of rows){const previous=jobs.find(j=>j.id===row.id);if(row.heartbeat_at>pending.get(row.id)&&row.lease_owner&&row.lease_owner!==previous.lease_owner&&row.execution_generation>previous.execution_generation)pending.delete(row.id);}
   if(!pending.size){
  const untouched=await rest('ultimate_build_jobs?select=execution_generation,lease_owner&id=eq.'+cosmo.id);
  if(untouched[0]?.execution_generation!==cosmo.execution_generation||untouched[0]?.lease_owner!==cosmo.lease_owner)throw Error('COSMETOLOGY_LEASE_CHANGED_DURING_RESTART');

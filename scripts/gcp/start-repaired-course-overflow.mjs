@@ -7,7 +7,7 @@ const region='us-east1',name='elevate-course-builder-overflow';
 const read=(args,r=region)=>JSON.parse(google([...args,'--project='+PROJECT,'--region='+r,'--format=json']));
 const source=read(['run','jobs','describe','elevate-course-builder'],'us-central1');
 const task=source.spec.template.spec.template.spec;
-const expected=JSON.parse(google(['artifacts','docker','images','describe','us-central1-docker.pkg.dev/'+PROJECT+'/elevate/ultimate-worker:b2ffe62197fc155466bfed9593f1a31b2009a47b','--format=json']));
+const expected=JSON.parse(google(['artifacts','docker','images','describe','us-central1-docker.pkg.dev/'+PROJECT+'/elevate/ultimate-worker:ef56e7bb6da390091a98e076b92c36d7925ebbc8','--format=json']));
 if(!task.containers[0].image.endsWith('@'+expected.image_summary.digest))throw Error('REPAIRED_WORKER_DEPLOYMENT_REQUIRED');
 const token=process.env.SUPABASE_SERVICE_ROLE_KEY;
 if(!token)throw Error('DATABASE_AUTH_REQUIRED');

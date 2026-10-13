@@ -277,6 +277,7 @@ jobs:
         run: |
           set -euo pipefail
           node --input-type=module <<'NODE'
+          import { normalizeHomepageText } from './scripts/gcp/homepage-content.mjs';
           const root='https://www.elevateforhumanity.org';
           const required=['Esthetics Apprenticeship','Nail Technician Apprenticeship','HVAC Technician','CDL Training','Bookkeeping','Business & Entrepreneurship','Find or become a Host Shop'];
           const forbidden=['Workforce systems and public-sector alignment'];
@@ -289,9 +290,9 @@ jobs:
               const sha=data.commitSha||data.commit||data.sha||'';
               const page=await fetch(root+'/?release='+process.env.GITHUB_SHA,{cache:'no-store',signal:AbortSignal.timeout(20000)});
               const html=await page.text();
-              const normalizedHtml=html.replace(/&amp;/g,'&').replace(/&#0*38;/g,'&').replace(/&#x0*26;/gi,'&');
+              const normalizedHtml=normalizeHomepageText(html);
               const missing=required.filter(t=>!normalizedHtml.includes(t));
-              const present=forbidden.filter(t=>html.includes(t));
+              const present=forbidden.filter(t=>normalizedHtml.includes(t));
               last=JSON.stringify({versionStatus:version.status,homepageStatus:page.status,sha,expected:process.env.GITHUB_SHA,missing,unwanted:present});
               console.log(last);
               if(version.ok && sha===process.env.GITHUB_SHA && page.ok && !missing.length && !present.length) {

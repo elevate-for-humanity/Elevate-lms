@@ -242,7 +242,7 @@ export async function uploadCourseVideosObject(
       logger.warn('[upload-lesson-media] Elevate Media Storage upload failed, falling back to Supabase', { err });
     }
   }
-  if (contentType.startsWith('video/') && buffer.length > SUPABASE_SAFE_VIDEO_BYTES) {
+  if (!options?.forceSupabase && contentType.startsWith('video/') && buffer.length > SUPABASE_SAFE_VIDEO_BYTES) {
     throw new Error('COURSE_MEDIA_LARGE_VIDEO_REQUIRES_PUBLIC_OBJECT_STORAGE: ' +
       'configure Elevate Media Storage public delivery instead of sending oversized MP4 to Supabase');
   }
@@ -259,10 +259,11 @@ export async function uploadLessonMediaBuffer(
   buffer: Buffer,
   lessonId: string,
   ext: 'mp3' | 'mp4',
+  options?: {forceSupabase?:boolean},
 ): Promise<string> {
   const storagePath = lessonMediaStoragePath(lessonId, ext);
   const contentType = ext === 'mp3' ? 'audio/mpeg' : 'video/mp4';
-  return uploadCourseVideosObject(buffer, storagePath, contentType);
+  return uploadCourseVideosObject(buffer, storagePath, contentType, options);
 }
 
 /** Temp paths for Remotion/ffmpeg — always under os.tmpdir(), never public/. */
@@ -279,13 +280,14 @@ export async function uploadLessonFileFromDisk(
   filePath: string,
   lessonId: string,
   ext: 'mp3' | 'mp4',
+  options?: {forceSupabase?:boolean},
 ): Promise<string> {
   // Large MP4s use the resumable route in uploadCourseVideosObject. The
   // single-request ceiling is not an object-size limit and must not trigger
   // an unnecessary lossy transcode or reject a valid completed lesson.
   const buf = await readFile(filePath);
   logger.info('[upload-lesson-media] starting lesson upload', {lessonId, ext, bytes: buf.length});
-  const url = await uploadLessonMediaBuffer(buf, lessonId, ext);
+  const url = await uploadLessonMediaBuffer(buf, lessonId, ext, options);
   logger.info('[upload-lesson-media] lesson upload saved', {lessonId, ext, bytes: buf.length});
   await unlink(filePath).catch((err) => {
     logger.debug('[upload-lesson-media] temp file cleanup', {filePath, err});

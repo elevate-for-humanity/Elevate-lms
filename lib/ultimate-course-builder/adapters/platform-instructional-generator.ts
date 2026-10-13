@@ -62,7 +62,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       return approved;
     }
     const existing = e.prior?.learning_objectives?.blueprint;
-    if (existing && (e.profile.lessonPresentation !== 'approved-premium-v1' || (existing as any).presentationEvidence?.version === 'approved-moment-cues-v2')) {
+    if (existing && (e.profile.lessonPresentation !== 'approved-premium-v1' || existing.segments?.every((s:any)=>s.recapText?.trim()))) {
       validateLessonBlueprint(existing, e.competency);
       if (e.profile.instructionalAuthoring?.provider === 'google') validateGoogleAuthoringEvidence(existing, lessonSources);
       return existing;

@@ -4,6 +4,15 @@ on:
   push:
     branches: [main]
     paths:
+      - 'components/**'
+      - 'public/**'
+      - 'content/**'
+      - 'config/**'
+      - 'next.config.mjs'
+      - 'tsconfig.json'
+      - 'tsconfig.*.json'
+      - '.dockerignore'
+      - 'workers/admin-speech-cache.mjs'
       - 'apps/admin/**'
       - 'lib/**'
       - 'remotion-src/**'

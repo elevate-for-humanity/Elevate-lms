@@ -6,6 +6,18 @@ on:
   push:
     branches: [main]
     paths:
+      - 'lib/**'
+      - 'packages/**'
+      - 'public/**'
+      - 'content/**'
+      - 'config/**'
+      - 'tsconfig.json'
+      - 'tsconfig.*.json'
+      - '.dockerignore'
+      - 'apps/admin/package.json'
+      - 'apps/lms/package.json'
+      - 'scripts/stamp-sw.mjs'
+      - 'scripts/verify-portal-production-contracts.mjs'
       - 'apps/marketing/**'
       - 'components/**'
       - 'lib/marketing/**'

@@ -2,7 +2,7 @@ name: Deploy Google Store runtime identity
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/deploy-google-store-runtime.yml', 'apps/marketing/**', 'components/**', 'lib/**', 'packages/**', 'Dockerfile.marketing', 'next.config.mjs', 'package.json', 'pnpm-lock.yaml', 'scripts/gcp/activate-tested-public-revision.mjs']
+    paths: ['.github/workflows/deploy-google-store-runtime.yml', 'apps/marketing/**', 'components/**', 'lib/**', 'packages/**', 'Dockerfile.marketing', 'next.config.mjs', 'package.json', 'pnpm-lock.yaml', 'scripts/gcp/activate-tested-public-revision.mjs', 'public/**', 'content/**', 'config/**', 'pnpm-workspace.yaml', 'tsconfig.json', 'tsconfig.*.json', '.dockerignore', 'apps/admin/package.json', 'apps/lms/package.json', 'scripts/stamp-sw.mjs', 'scripts/verify-portal-production-contracts.mjs']
   workflow_dispatch:
     inputs:
       requested_sha:

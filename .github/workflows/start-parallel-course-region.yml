@@ -21,7 +21,7 @@ jobs:
     environment: production
     timeout-minutes: 15
     concurrency:
-      group: google-course-runtime-operations
+      group: google-course-parallel-us-east1
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4

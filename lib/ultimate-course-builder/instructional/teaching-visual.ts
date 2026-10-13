@@ -56,9 +56,12 @@ export function validateTeachingVisual(plan: TeachingVisual, narration: string) 
       step.label.length > 55 ||
       step.value.length > 160 ||
       !step.narrationQuote?.trim() ||
-      (normalize(step.value) !== normalize(step.narrationQuote) &&
-        !(compatibleVisualTask(step.value, step.narrationQuote) &&
-          compatibleVisualTask(step.narrationQuote, step.value))) ||
+      // The approved narrated-slideshow reference allows a concise visual
+      // instruction to paraphrase the supporting spoken passage. Require
+      // semantic compatibility in both directions rather than literal text
+      // equality, while still rejecting unsupported claims and wrong actions.
+      !compatibleVisualTask(step.value, step.narrationQuote) ||
+      !compatibleVisualTask(step.narrationQuote, step.value) ||
       !normalize(narration).includes(normalize(step.narrationQuote))
     )
       throw new Error('BLUEPRINT_TEACHING_VISUAL_NOT_SCRIPT_BOUND');

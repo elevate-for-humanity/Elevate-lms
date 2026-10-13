@@ -13,6 +13,14 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-24.04
     steps:
+      - name: Release the old queue monitor for the authorized reference regeneration
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RUN_STATE="$(gh api repos/$GITHUB_REPOSITORY/actions/runs/38355789743 --jq '.status')"
+          if [ "$RUN_STATE" = "in_progress" ]; then
+            gh api --method POST repos/$GITHUB_REPOSITORY/actions/runs/38355789743/cancel
+          fi
       - env:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/regenerate-approved-course-videos.yml/dispatches" -f ref=main

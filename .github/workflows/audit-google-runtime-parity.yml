@@ -3,7 +3,7 @@ name: Audit complete Google migration parity
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/audit-google-runtime-parity.yml']
+    paths: ['.github/workflows/audit-google-runtime-parity.yml', 'scripts/gcp/audit-runtime-parity.mjs']
   workflow_dispatch:
 permissions:
   contents: read

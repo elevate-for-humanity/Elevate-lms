@@ -312,7 +312,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
     if(input.lessonPresentation === 'approved-premium-v1') storyboard.scenes.forEach((scene:any,index:number)=>{
       if(!scene.sourceVideoUrl) {
         scene.referenceImageUrl=teachingPhotos[index]?.[0]?.imageUrl;
-        scene.resolvedProvider='openai';scene.resolvedModel='generated-teaching-photograph';
+        scene.resolvedProvider='google';scene.resolvedModel='generated-teaching-photograph';
         delete scene.sourceProviderItemId;delete scene.sourceLicenseEvidenceUrl;
       }
     });

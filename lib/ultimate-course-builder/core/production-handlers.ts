@@ -248,6 +248,25 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       },
     }),
     lesson_film_render: async (ctx) => {
+      // Enforce the approved-video production contract at the actual rendering
+      // boundary. A missing scene, source, license or narration must never be
+      // silently replaced with a generic slideshow or placeholder clip.
+      requireLicensedVisualCoverage(ctx);
+      const assigned = (ctx.artifacts.visual_assignment as any)?.media?.assignments ?? [];
+      const storyboard = (ctx.artifacts.storyboard as any)?.storyboard?.scenes ?? [];
+      const narration = (ctx.artifacts.natural_narration as any)?.narration;
+      const timeline = (ctx.artifacts.synchronization as any)?.timeline;
+      if (!Array.isArray(storyboard) || !storyboard.length ||
+          !Array.isArray(assigned) || assigned.length !== storyboard.length ||
+          !Array.isArray(narration?.segments) || !narration.segments.length ||
+          !Array.isArray(timeline?.segments) || !timeline.segments.length ||
+          !(Number(timeline.durationSeconds) > 0))
+        throw new Error('ULTIMATE_RENDER_PRODUCTION_DEPENDENCIES_REQUIRED');
+      if (timeline.segments.some((segment: any) =>
+          !Number.isFinite(segment.startSeconds) ||
+          !Number.isFinite(segment.endSeconds) ||
+          segment.endSeconds <= segment.startSeconds))
+        throw new Error('ULTIMATE_RENDER_NARRATION_TIMELINE_INVALID');
       const script = String((ctx.artifacts.instructor_script as any)?.script?.script ?? '');
       const repeated = repeatedTeachingSegments(script);
       if (repeated > 0)

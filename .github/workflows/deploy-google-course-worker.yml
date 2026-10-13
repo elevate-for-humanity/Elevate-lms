@@ -73,14 +73,13 @@ jobs:
           node --test scripts/gcp/audit-course-production.test.mjs
           node scripts/gcp/audit-course-production.mjs
 
-      - name: Check generated-photo runtime credential presence without exposing values
+      - name: Check generated-photo service identity without exposing credentials
         run: |
           node --input-type=module <<'NODE'
           import {execFileSync} from 'node:child_process';
           const job=JSON.parse(execFileSync('gcloud',['run','jobs','describe','elevate-course-builder','--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
-          const env=job.spec.template.spec.template.spec.containers[0].env??[];
-          const configured=env.some(entry=>entry.name==='OPENAI_API_KEY'&&Boolean(entry.value||entry.valueFrom?.secretKeyRef));
-          console.log(JSON.stringify({teachingPhotoCredentialConfigured:configured}));
+          const task=job.spec.template.spec.template.spec;
+          console.log(JSON.stringify({teachingPhotoProvider:'google',courseServiceIdentityConfigured:Boolean(task.serviceAccountName)}));
           NODE
   dispatch:
     if: github.event_name == 'workflow_dispatch' && false
@@ -106,7 +105,7 @@ jobs:
         with:
           node-version: '22'
       - name: Verify finite worker and speech boundaries
-        run: node --test tests/worker/approved-picture-timeline.test.mjs tests/worker/dependency-wait.test.mjs workers/ultimate-runtime-guards.test.mjs workers/process-job-state.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs workers/ultimate-source-teaching.test.mjs workers/worker-loop.test.mjs workers/ultimate-progress-lease.test.mjs lib/video/local-transcription.test.mjs lib/video/local-transcription-worker.test.mjs scripts/gcp/deploy-course-job.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs
+        run: node --test tests/worker/google-teaching-photo.test.mjs tests/worker/approved-picture-timeline.test.mjs tests/worker/dependency-wait.test.mjs workers/ultimate-runtime-guards.test.mjs workers/process-job-state.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs workers/ultimate-source-teaching.test.mjs workers/worker-loop.test.mjs workers/ultimate-progress-lease.test.mjs lib/video/local-transcription.test.mjs lib/video/local-transcription-worker.test.mjs scripts/gcp/deploy-course-job.test.mjs scripts/gcp/dispatch-course-job.test.mjs scripts/gcp/execute-course-job.test.mjs
       # .dockerignore excludes federation credential files from the build context.
       - name: Show federated identity claim context
         run: |

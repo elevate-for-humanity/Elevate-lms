@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ScrollNarrator } from '@/components/home/ScrollNarrator';
 
@@ -27,6 +27,18 @@ async function advance(ms: number) { await act(async () => { vi.advanceTimersByT
 describe('automatic page narration', () => {
   beforeEach(() => { vi.useFakeTimers(); vi.clearAllMocks(); localStorage.clear(); visible = 'a'; voice.play.mockResolvedValue(true); voice.prepare.mockResolvedValue(true); });
   afterEach(() => { cleanup(); document.querySelectorAll('main').forEach((node) => node.remove()); vi.useRealTimers(); });
+  it('can stop the guided mode after narration fails, without starting another request', async () => {
+    voice.play.mockResolvedValue(false);
+    setup(); await advance(1400);
+    expect(screen.getByRole('status')).toHaveTextContent('Narration could not start');
+    const requests = voice.play.mock.calls.length;
+    fireEvent.click(screen.getByRole('button', { name: 'Stop page narration' }));
+    expect(localStorage.getItem('elevate:scroll-narration')).toBe('off');
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    visible = 'b'; fireEvent.scroll(window); await advance(3000);
+    expect(voice.play).toHaveBeenCalledTimes(requests);
+    expect(screen.getByRole('button', { name: 'Play narration for this section' })).toHaveAttribute('aria-pressed', 'false');
+  });
   it('does not interrupt a user-started audible video on scroll', async () => {
     setup();
     const video = document.createElement('video');

@@ -61,8 +61,17 @@ test.describe('Canonical application flow', () => {
       maxRedirects: 0,
       failOnStatusCode: false,
     });
-    expect(login.status()).toBe(307);
-    const target = new URL(login.headers().location);
+    // Next.js can send this redirect as HTTP 307 or as a streamed HTML
+    // refresh after the shared layout has committed its response headers.
+    expect([200, 307]).toContain(login.status());
+    let destination = login.headers().location;
+    if (login.status() === 200) {
+      const html = await login.text();
+      const refresh = html.match(/<meta[^>]*http-equiv="refresh"[^>]*content="[^"]*url=([^"]+)"/i);
+      expect(refresh, 'streamed login response must contain a redirect').not.toBeNull();
+      destination = refresh![1].replace(/&amp;/g, '&');
+    }
+    const target = new URL(destination);
     expect(target.origin).toBe(new URL(siteUrls.app).origin);
     expect(target.pathname).toBe('/login');
     expect(target.searchParams.get('next')).toBe('/lms');

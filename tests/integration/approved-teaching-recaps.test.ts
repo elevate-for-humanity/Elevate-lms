@@ -21,7 +21,18 @@ test('blank, missing and replayed narration cannot become a recap',async()=>{
   await assert.rejects(addFreshTeachingRecaps(blueprint,{},sources,async()=>({recaps:invalid})),/RECAP|REPEATS/);
  }
 });
-test('unsupported recap review cannot certify the presentation',async()=>{
+test('unsupported recap review cannot certify the presentation after bounded repair',async()=>{
  let calls=0;
- await assert.rejects(addFreshTeachingRecaps(blueprint,{},sources,async()=>++calls===1?{recaps}:{pass:false,findings:['Unsupported instruction']}),/SOURCE_REVIEW_REQUIRED/);
+ await assert.rejects(addFreshTeachingRecaps(blueprint,{},sources,async(_model,system)=>{calls++;return system.includes('recaps:')?{recaps}:{pass:false,findings:['Unsupported instruction']};}),/SOURCE_REVIEW_REQUIRED/);
+ assert.equal(calls,6);
+});
+
+test('review failure is returned to author for a bounded source-grounded repair',async()=>{
+ let reviews=0, repairs=0;
+ const result=await addFreshTeachingRecaps(blueprint,{},sources,async(_model,system,input)=>{
+  if(system.includes('recaps:')){if(input.repair)repairs++;return {recaps};}
+  reviews++;
+  return {pass:reviews>1,findings:reviews>1?[]:['Unsupported instruction'],hash:input.hash,blueprintHash:input.hash,competencyId:input.competencyId};
+ });
+ assert.equal(reviews,2);assert.equal(repairs,1);assert.equal(result.segments.length,2);
 });

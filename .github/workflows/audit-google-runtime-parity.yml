@@ -1,4 +1,5 @@
 name: Audit complete Google migration parity
+# Compare the saved Northflank topology with the current Google production setup.
 on:
   push:
     branches: [main]

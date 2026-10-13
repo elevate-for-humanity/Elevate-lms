@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {profiles,mergedBrowserEnvironment,unusedBrowserVolumes} from './restore-container-runtime.mjs';
+import {profiles,mergedBrowserEnvironment,unusedBrowserVolumes,quotaContactEmail} from './restore-container-runtime.mjs';
 test('web services retain original 8 GiB headroom for the 4 GiB Node heap',()=>{
  for(const name of ['marketing','admin','lms','store'])assert.deepEqual([profiles[name].cpu,profiles[name].memory],['4','8Gi']);
 });
@@ -15,4 +15,9 @@ test('only unmounted duplicates of the verified browser bucket are removed',()=>
  const volume=(name,bucket)=>({name,csi:{driver:'gcsfuse.run.googleapis.com',volumeAttributes:{bucketName:bucket}}});
  const spec={containers:[{volumeMounts:[{name:'active',mountPath:'/var/lib/studio-browser-auth'}]}],volumes:[volume('active','owned'),volume('stale','owned'),volume('other','unrelated'),{name:'memory',emptyDir:{}}]};
  assert.deepEqual(unusedBrowserVolumes(spec,'owned'),['stale']);
+});
+
+test('valid quota contacts are accepted and malformed contacts are rejected',()=>{
+ assert.equal(quotaContactEmail([undefined,'person@example.org']),'person@example.org');
+ for(const value of ['person example.org','person@@example.org',' person@example.org','person@example.','@example.org'])assert.equal(quotaContactEmail([value]),undefined);
 });

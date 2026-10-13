@@ -281,10 +281,13 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
             message: `Narration repeats ${repeated} substantial teaching segment(s); repair the source before rendering.`,
           }],
         };
+      const canonicalLessonId = ctx.profile.canonicalLessonIds?.[comp(ctx).id];
+      if ((ctx.profile as any).sourcePolicy === 'frozen-reference-v1' && !canonicalLessonId)
+        throw new Error('FRESH_CANONICAL_LESSON_ID_REQUIRED');
       return {
         artifacts: {
           render: await runtime.renderer.render({
-            lessonId: comp(ctx).id,
+            lessonId: canonicalLessonId ?? comp(ctx).id,
             courseTitle: ctx.profile.title,
             lessonPresentation: ctx.profile.lessonPresentation,
             presentationContract: ctx.profile.presentationContract,

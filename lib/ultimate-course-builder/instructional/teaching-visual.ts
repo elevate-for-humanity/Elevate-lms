@@ -56,9 +56,12 @@ export function validateTeachingVisual(plan: TeachingVisual, narration: string) 
       step.label.length > 55 ||
       step.value.length > 160 ||
       !step.narrationQuote?.trim() ||
+      // The approved narrated slideshow permits concise slide text to quote
+      // or safely paraphrase narration. A shortened visual need not repeat
+      // every word spoken, but its action, subject and qualifiers must be
+      // supported by the actual narration excerpt.
       (normalize(step.value) !== normalize(step.narrationQuote) &&
-        !(compatibleVisualTask(step.value, step.narrationQuote) &&
-          compatibleVisualTask(step.narrationQuote, step.value))) ||
+        !compatibleVisualTask(step.value, step.narrationQuote)) ||
       !normalize(narration).includes(normalize(step.narrationQuote))
     )
       throw new Error('BLUEPRINT_TEACHING_VISUAL_NOT_SCRIPT_BOUND');

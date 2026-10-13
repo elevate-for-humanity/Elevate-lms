@@ -22,7 +22,7 @@ const SECRET_PATTERNS = [
 ];
 
 function isSecret(key: string): boolean {
-  return key.startsWith('AGENT_MEMORY_') || key === 'ELEVATE_MEDIA_ACCESS_KEY_ID' ||
+  return key.startsWith('IRS_') || key.startsWith('AGENT_MEMORY_') || key === 'ELEVATE_MEDIA_ACCESS_KEY_ID' ||
     SECRET_PATTERNS.some((pattern) => pattern.test(key));
 }
 

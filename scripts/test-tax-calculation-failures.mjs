@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { compileTaxRoute, loadTaxRoute } from './tax-route-test-harness.mjs';
 import assert from 'node:assert/strict';
@@ -12,7 +13,9 @@ const source = compileTaxRoute(path);
 async function invoke(fault, malformed = false) {
   const writes = [];
   const db = {
-    auth: { getUser: async () => ({ data: { user: fault === 'anonymous' ? null : { id: 'owner' } } }) },
+    auth: {
+      getUser: async () => ({ data: { user: fault === 'anonymous' ? null : { id: 'owner' } } }),
+    },
     from(table) {
       let operation = 'read';
       const query = {
@@ -46,15 +49,23 @@ async function invoke(fault, malformed = false) {
                   id: 'return-1',
                   tax_year: 2026,
                   filing_status: fault === 'status' ? 'invalid' : 'single',
-                  return_json: { interview: { answers: fault === 'unsupported-interview' ? { hasCapitalGains: true } : {} } },
+                  return_json: {
+                    interview: {
+                      answers: fault === 'unsupported-interview' ? { hasCapitalGains: true } : {},
+                    },
+                  },
                 }
               : table === 'tax_itemized_deductions'
                 ? null
-                : table === 'tax_w2_income' && fault === 'malformed-income' ? [{ wages: 'NaN', federal_withholding: 0 }]
-                : table === 'tax_1099_income' && fault === '1099-nec' ? [{ form_type: 'NEC', amount: 2000, federal_withholding: 0 }]
-                : table === 'tax_1099_income' && fault === 'dividends' ? [{ form_type: 'DIV', amount: 2000, federal_withholding: 0 }]
-                : table === 'tax_schedule_c' && fault === 'business-income' ? [{ net_profit: 1000 }]
-                : [];
+                : table === 'tax_w2_income' && fault === 'malformed-income'
+                  ? [{ wages: 'NaN', federal_withholding: 0 }]
+                  : table === 'tax_1099_income' && fault === '1099-nec'
+                    ? [{ form_type: 'NEC', amount: 2000, federal_withholding: 0 }]
+                    : table === 'tax_1099_income' && fault === 'dividends'
+                      ? [{ form_type: 'DIV', amount: 2000, federal_withholding: 0 }]
+                      : table === 'tax_schedule_c' && fault === 'business-income'
+                        ? [{ net_profit: 1000 }]
+                        : [];
           return Promise.resolve({
             data: fault === 'missing-update' && operation === 'update' ? null : data,
             error,
@@ -65,11 +76,33 @@ async function invoke(fault, malformed = false) {
     },
   };
   const handler = loadTaxRoute(source, {
+    'node:crypto': { createHash },
+    '@/lib/tax-software/security/return-digest': {
+      taxReturnSourceDigest: (v) => createHash('sha256').update(JSON.stringify(v)).digest('hex'),
+    },
     'next/server': {
       NextResponse: { json: (body, options) => ({ body, status: options?.status || 200 }) },
     },
     '@/lib/supabase/server': { createClient: async () => db },
     '@/lib/api/withRateLimit': { applyRateLimit: async () => null },
+    '@/lib/tax-software/calculation/input-schema': {
+      federalInputSchema: { safeParse: (value) => ({ success: true, data: value }) },
+    },
+    '@/lib/tax-software/calculation/financial-inputs': {
+      prepareStoredFederalReturn2026: () => ({
+        calculation: {
+          totalIncome: 0,
+          adjustedGrossIncome: 0,
+          taxableIncome: 0,
+          incomeTax: 0,
+          totalTax: 0,
+          totalPayments: 0,
+          refundAmount: 0,
+          amountOwed: 0,
+        },
+      }),
+    },
+    '@/lib/tax-software/calculation/federal-1040-2026': {},
     '@/lib/tax-software/calculation/ty2026-base-1040': {
       STANDARD_DEDUCTION_2026: { single: 16100 },
       calculateBase1040_2026: () => ({

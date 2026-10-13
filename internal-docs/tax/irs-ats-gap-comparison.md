@@ -2,19 +2,19 @@
 
 Scope: Elevate-lms and next-platform-starter, tax year 2026 / processing year 2027. This is an implementation comparison, not IRS approval.
 
-| IRS requirement | Repository before repair | Implemented in this change | Remaining work |
-|---|---|---|---|
-| Authenticated taxpayer workspace | Return APIs checked ownership; marketing middleware omitted self-file | Protected self-file namespace, private caching, safe login return URL | Verify live Google release |
-| Accurate supported return calculations | Ordinary-income estimator only | Saved estimate, income validation, Schedule C double-count correction | Full forms, credits, special rates, SE tax, state calculations |
-| IRS test scenarios | No sourced fixture set | Six current core 1040 PDFs, source URLs and SHA-256 checks | Applicable extension/SS/NR and additional cases based on declared software scope; computed assertion tests |
-| Submission identifiers and practitioner signature data | No validated ATS helpers | Submission ID, synthetic SSN, PIN and date validation | Connect actual signed authorization workflow |
-| Official XML schemas | No local validation tooling | Offline XSD validation with entity/network access disabled | Download matching official schemas through authorized SOR; generate each supported IRS return |
-| IRS business rules | No engine | Audit reports missing implementation | Load current official rules and implement rule evaluation |
-| ZIP/MIME IFA transmission package | Export adapter claimed sent without an artifact | Actual ZIP/MIME builder, PDF attachment checks, offline validation command, export artifact with exported status | Supply official XML, manifest and SOAP envelope; verify against current package |
-| A2A transport | Missing | Audit reports missing implementation | Enrolled system, approved certificates, official WSDL, transport and acknowledgment retrieval |
-| IRS acceptance | No verified acknowledgments | All generated reports explicitly retain atsAccepted=false | Submit synthetic test packages and reconcile actual IRS acknowledgments |
+| IRS requirement | Main and starter implementation | Verification / actual limitation |
+|---|---|---|
+| Private taxpayer workspace | Authenticated self-file routes; owner checks and private responses | Anonymous boundaries tested; live deployment must serve the new revision |
+| Federal 1040 calculation | TY2026 brackets/table, standard/dependent deductions, capital gains, taxable Social Security, owner-specific self-employment, Medicare/NIIT and saved input worksheets | Official core ATS case 5 calculates tax $3,883 and refund $6,385; state returns and specialized forms are not automatically calculated |
+| Credit worksheets | Child/other-dependent credit, ACTC, EIC, education and dependent care calculations with eligibility inputs | Eligibility attestations do not replace supporting IRS forms or evidence |
+| Signature and identity protection | AES-256-GCM identity/PIN storage bound to owner and return; authorization binds both calculation and source documents | Encryption key must be provisioned in secure runtime configuration; concurrent saves reject stale writes |
+| Official XML | Application mapping for 1040/W-2/8888; calculated Schedule 1/2/SE for supported self-employment data; official field ordering and offline XSD validation | Wage/refund and self-employment XML passed downloaded TY2026 v4.0 schema; specialized credit/deduction source documents still require implementation/review |
+| Business rules | Published local payment, wage, deposit and consistency rules | IRS identity/file-history rules require actual IRS processing; this is not a full evaluation of every published rule |
+| Test fixtures and packaging | Six core scenario PDFs with source/hash checks; submission identifiers and actual ZIP/MIME export tooling | Other applicable scenarios require software scope declarations and computed assertions; no fabricated acceptance |
+| A2A transmission | Official PY2027 WSDL downloaded and preserved | Enrollment/certificates and actual transport/acknowledgment flow are not yet operational |
+| IRS approval | Firm/provider registration verified | Software Products showed zero records; no package registration, upload or IRS acceptance has been completed |
 
-Nine original tax-core modules were identical in both repositories. The starter does not contain a more complete hidden filing engine. Core scenario coverage currently exposes 17 absent form-registry names; adding names alone would not implement calculations or IRS XML.
+Both repositories now contain the calculation, secure profile, connected worksheets and IRS XML modules. The starter previously held the same nine tax core modules; it did not contain a separate complete filing engine.
 
 ## Official starting points
 
@@ -55,4 +55,12 @@ Validation: four unit tests passed; the downloaded official 2026v4.0 1040 XSD co
 
 Install offline tool dependencies with `python3 -m pip install -r scripts/requirements-tax-ats.txt`.
 
-The IRS IFA Transmit Test File page listed both associated ETINs. Selecting the active developer test ETIN and continuing returned a site-served Access Denied page from the IRS edge gateway. No file was uploaded or transmitted, and no test acknowledgment was obtained. This browser restriction is separate from the successful SOR download and the unfinished filing engine.
+The IRS IFA Transmit Test File page listed both associated ETINs. Selecting the active developer test ETIN and continuing returned a site-served Access Denied page from the IRS edge gateway. No file was uploaded or transmitted, and no test acknowledgment was obtained. This browser restriction is separate from the successful SOR download and the software package registration and additional form coverage still required before production filing.
+
+## Connected implementation and validation
+
+Taxpayer identity and signature data is stored only as an authenticated encryption envelope. Required runtime configuration is TAX_DATA_ENCRYPTION_KEY (64 hex characters; existing SSN_ENCRYPTION_KEY may be used), IRS_SOFTWARE_ID and IRS_EFIN. Keys and real identifiers must be provisioned through the secure runtime secret store, never committed or supplied as public fixture data. Export recomputes the return and verifies both its calculation and source-document digests against the authorization.
+
+The self-file UI now saves federal income/deduction/payment worksheets, household and credit eligibility inputs, dependent care expense limits, additional taxpayer/spouse business income, taxpayer/spouse details and signature authorization. W-2 confirmation captures the employer mailing address and income owner. XML is downloaded as a draft artifact; downloading does not transmit to IRS.
+
+Validation: federal/credit, encryption, return mapping, local rule, authorization and profile-route tests; calculation route failure checks; downloaded official XSD checks for the wage/refund case and self-employment schedules. The IRS schema check is structural validation, not IRS ATS acceptance. Do not enable production transmission until the product is registered, its declared forms are implemented, applicable ATS cases pass, and actual acknowledgments are reconciled.

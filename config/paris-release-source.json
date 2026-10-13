@@ -77,26 +77,30 @@
     {
       "source": "app/tax-software/self-file/return/page.tsx",
       "target": "apps/marketing/app/tax-software/self-file/return/page.tsx",
-      "sha256": "8a7aa8d0a914286b7435b118195601c5926d6084930cc426d51f6f31fe1913d6",
+      "sha256": "c248c8257072d4433b1c059cbea7afb4a593d2584245742f7be76d62e9b4327b",
       "sourceSha256": "deb47a15cccdc64c911ea90ac333a46ab6431c16fd7eb55ddfb3cab0f9e0ea4b",
-      "localRevisionReason": "Authorized portal security, saved estimate workflow, and auditable tax export repairs"
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation."
     },
     {
       "source": "app/tax-software/self-file/w2/confirm/page.tsx",
       "target": "apps/marketing/app/tax-software/self-file/w2/confirm/page.tsx",
-      "sha256": "4ed9e6b2479c160077fdfe282668ec804f23fad9c358e2b5bed0791b659f538d"
+      "sha256": "0d8d82364d6c7d79645f4397a46ec5fc9d06d5b630d374cde69973b87d22f28d",
+      "sourceSha256": "4ed9e6b2479c160077fdfe282668ec804f23fad9c358e2b5bed0791b659f538d",
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation."
     },
     {
       "source": "app/api/tax/interview/route.ts",
       "target": "apps/marketing/app/api/tax/interview/route.ts",
-      "sha256": "160b55896475b8aefdb8847d1d7b361b0a2e19db7a018ad3a9133ac54dbd26a3"
+      "sha256": "8789d334beea2446fe2c108dba8af7759080fe65f6a7e754e09336dd28d7c026",
+      "sourceSha256": "160b55896475b8aefdb8847d1d7b361b0a2e19db7a018ad3a9133ac54dbd26a3",
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation."
     },
     {
       "source": "app/api/tax/returns/calculate/route.ts",
       "target": "apps/marketing/app/api/tax/returns/calculate/route.ts",
-      "sha256": "f62c97452d1c70a1fd9196b08585edd62df1934ab07f0d9eb3e2c4fd88fdefdb",
+      "sha256": "8e46980d0bb71b63bee8bb33a543f550564b4fd85b0715e1e9eb402b37cbfbe1",
       "sourceSha256": "4abe0d40e8551ecb71e3ef731fe56f27c3af6a93e7c929c9e4a4ce77de732bd1",
-      "localRevisionReason": "Authorized portal security, saved estimate workflow, and auditable tax export repairs"
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation."
     },
     {
       "source": "app/api/tax/returns/route.ts",
@@ -106,7 +110,9 @@
     {
       "source": "app/api/tax/w2/confirm/route.ts",
       "target": "apps/marketing/app/api/tax/w2/confirm/route.ts",
-      "sha256": "4747d469384b4bad80336f73f855d70e409ac966a62aa65e253be67811a904bf"
+      "sha256": "2ac78a774ef2e43dab742b7aa3c4ee80fdaf9d43e5ae3c727d307e831356a3d5",
+      "sourceSha256": "4747d469384b4bad80336f73f855d70e409ac966a62aa65e253be67811a904bf",
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation."
     },
     {
       "source": "app/api/ocr/extract/route.ts",

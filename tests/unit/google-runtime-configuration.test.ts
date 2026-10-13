@@ -168,6 +168,24 @@ describe('Google scoped runtime configuration', () => {
       ]),
     ).toThrow(/invalid_or_masked/);
   });
+  it('validates tax runtime identifiers and encryption keys before storing them', () => {
+    expect(() =>
+      validateRuntimeEntries('marketing', [{ key: 'TAX_DATA_ENCRYPTION_KEY', value: 'short' }]),
+    ).toThrow('invalid_tax_encryption_key');
+    expect(() =>
+      validateRuntimeEntries('marketing', [{ key: 'IRS_SOFTWARE_ID', value: '00000000' }]),
+    ).toThrow('invalid_irs_software_id');
+    expect(() => validateRuntimeEntries('marketing', [{ key: 'IRS_EFIN', value: '123' }])).toThrow(
+      'invalid_irs_efin',
+    );
+    expect(() =>
+      validateRuntimeEntries('marketing', [
+        { key: 'TAX_DATA_ENCRYPTION_KEY', value: 'ab'.repeat(32) },
+        { key: 'IRS_SOFTWARE_ID', value: '12345678' },
+        { key: 'IRS_EFIN', value: '123456' },
+      ]),
+    ).not.toThrow();
+  });
   it('uses the known CRC32C vector for integrity checks', () => {
     expect(payloadChecksum(Buffer.from('123456789'))).toBe('3808858755');
   });

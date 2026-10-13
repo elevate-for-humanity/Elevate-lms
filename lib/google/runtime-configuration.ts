@@ -36,6 +36,9 @@ export function validateRuntimeEntries(component: RuntimeComponent, entries: Run
     runtimeSecretName(component, entry.key);
     if (seen.has(entry.key) || !entry.value.trim() || /^[•*]{4,}$/.test(entry.value.trim()) || Buffer.byteLength(entry.value, 'utf8') > 16384)
       fail('invalid_or_masked_value', 'validation');
+    if (entry.key === 'TAX_DATA_ENCRYPTION_KEY' && !/^[a-f0-9]{64}$/i.test(entry.value)) fail('invalid_tax_encryption_key', 'validation');
+    if (entry.key === 'IRS_EFIN' && !/^\d{6}$/.test(entry.value)) fail('invalid_irs_efin', 'validation');
+    if (entry.key === 'IRS_SOFTWARE_ID' && (!/^\d{8}$/.test(entry.value) || entry.value === '00000000')) fail('invalid_irs_software_id', 'validation');
     seen.add(entry.key);
   }
 }

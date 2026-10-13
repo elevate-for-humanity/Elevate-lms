@@ -143,6 +143,8 @@
         "EMAIL_FROM",
         "EMAIL_PROVIDER",
         "EMAIL_REPLY_TO",
+        "IRS_EFIN",
+        "IRS_SOFTWARE_ID",
         "LIVEKIT_API_KEY",
         "LIVEKIT_API_SECRET",
         "LIVEKIT_URL",
@@ -166,7 +168,8 @@
         "SENDGRID_KEY",
         "SUPABASE_SERVICE_KEY",
         "SUPABASE_SERVICE_ROLE_KEY",
-        "SUPABASE_URL"
+        "SUPABASE_URL",
+        "TAX_DATA_ENCRYPTION_KEY"
       ]
     },
     "store": {

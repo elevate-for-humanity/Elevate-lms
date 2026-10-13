@@ -1,11 +1,14 @@
+import { taxReturnSourceDigest } from '@/lib/tax-software/security/return-digest';
+import { createHash } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import {
-  calculateBase1040_2026,
   STANDARD_DEDUCTION_2026,
   type FilingStatus,
 } from '@/lib/tax-software/calculation/ty2026-base-1040';
+import { calculateFederal1040_2026 } from '@/lib/tax-software/calculation/federal-1040-2026';
+import { prepareStoredFederalReturn2026 } from '@/lib/tax-software/calculation/financial-inputs';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export async function POST(req: NextRequest) {
@@ -41,10 +44,7 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   const sources = await Promise.all([
-    supabase
-      .from('tax_w2_income')
-      .select('wages,federal_withholding')
-      .eq('tax_return_id', returnId),
+    supabase.from('tax_w2_income').select('*').eq('tax_return_id', returnId),
     supabase
       .from('tax_1099_income')
       .select('form_type,amount,federal_withholding')
@@ -78,48 +78,43 @@ export async function POST(req: NextRequest) {
       { status: 422 },
     );
   }
-  const wages = (w2 || []).reduce((s, x) => s + Number(x.wages || 0), 0);
-  const withholding =
-    (w2 || []).reduce((s, x) => s + Number(x.federal_withholding || 0), 0) +
-    (i1099 || []).reduce((s, x) => s + Number(x.federal_withholding || 0), 0);
-  const interest = (i1099 || [])
-    .filter((x) => x.form_type === 'INT')
-    .reduce((s, x) => s + Number(x.amount || 0), 0);
-  const dividends = (i1099 || [])
-    .filter((row) => row.form_type === 'DIV')
-    .reduce((sum, row) => sum + Number(row.amount || 0), 0);
-  const other = (i1099 || [])
-    .filter((row) => !['INT', 'DIV', 'NEC'].includes(row.form_type))
-    .reduce((sum, row) => sum + Number(row.amount || 0), 0);
-  // A completed Schedule C already includes its business receipts. Do not add
-  // the associated 1099-NEC gross income to that net profit a second time.
-  const business =
-    (sc || []).length > 0
-      ? (sc || []).reduce((sum, row) => sum + Number(row.net_profit || 0), 0)
-      : (i1099 || [])
-          .filter((row) => row.form_type === 'NEC')
-          .reduce((sum, row) => sum + Number(row.amount || 0), 0);
-  const result = calculateBase1040_2026({
-    filingStatus: r.filing_status as FilingStatus,
-    wages,
-    interest,
-    dividends,
-    businessIncome: business,
-    otherIncome: other,
-    itemizedDeductions: Number(itemized?.total_itemized || 0),
-    federalWithholding: withholding,
-  });
+  const withholding = [...(w2 || []), ...(i1099 || [])].reduce(
+    (sum, row) => sum + Number(row.federal_withholding ?? 0),
+    0,
+  );
+  let result: ReturnType<typeof calculateFederal1040_2026>;
+  try {
+    result = prepareStoredFederalReturn2026({
+      filingStatus: r.filing_status as FilingStatus,
+      extra: r.return_json?.federalInputs,
+      w2: w2 ?? [],
+      income1099: i1099 ?? [],
+      scheduleC: sc ?? [],
+      itemized: itemized ?? null,
+    }).calculation;
+  } catch {
+    return NextResponse.json(
+      { error: 'Check the saved income, dividend and deduction amounts before calculating.' },
+      { status: 422 },
+    );
+  }
   const estimateMetadata = {
-    calculationVersion: 'ty2026-base-1040-v2',
-    scope: 'federal_ordinary_income_estimate',
+    sourceDigest: taxReturnSourceDigest({
+      filingStatus: r.filing_status,
+      extra: r.return_json?.federalInputs ?? {},
+      w2: w2 ?? [],
+      income1099: i1099 ?? [],
+      scheduleC: sc ?? [],
+      itemized: itemized ?? null,
+    }),
+    calculationVersion: 'ty2026-federal-1040-v3',
+    calculationDigest: createHash('sha256').update(JSON.stringify(result)).digest('hex'),
+    scope: 'federal_1040_draft',
     filingReady: false,
-    excludedCalculations: [
-      'tax tables',
-      'self-employment tax and qualified-dividend treatment',
-      'credits',
-      'additional deductions and taxes',
-      'state returns',
+    reviewRequired: [
+      'Confirm all required forms, credit eligibility and signature information before filing.',
     ],
+    excludedCalculations: ['state returns'],
   };
   const { error: calculationError } = await supabase.from('tax_calculations').insert({
     user_id: user.id,

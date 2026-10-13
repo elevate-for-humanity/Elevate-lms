@@ -4,7 +4,10 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { deriveInterviewTriggers } from '@/lib/tax-software/paris-interview';
 import { formsForTriggers } from '@/lib/tax-software/form-registry-2026';
-import type { calculateBase1040_2026 } from '@/lib/tax-software/calculation/ty2026-base-1040';
+import type { calculateFederal1040_2026 } from '@/lib/tax-software/calculation/federal-1040-2026';
+import { FilingExportButton } from '../../_components/FilingExportButton';
+import { TaxpayerDetailsEditor } from '../../_components/TaxpayerDetailsEditor';
+import { FederalFormsEditor } from '../../_components/FederalFormsEditor';
 import { quoteSelfFile } from '@/lib/tax-software/self-file-pricing';
 const questions = [
   ['hasW2', 'Did you receive a W-2?'],
@@ -28,7 +31,9 @@ function Workspace() {
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [estimate, setEstimate] = useState<ReturnType<typeof calculateBase1040_2026> | null>(null);
+  const [estimate, setEstimate] = useState<ReturnType<typeof calculateFederal1040_2026> | null>(
+    null,
+  );
   useEffect(() => {
     let active = true;
     if (!id) {
@@ -180,39 +185,67 @@ function Workspace() {
                 >
                   Add or import a W-2 →
                 </Link>
+                <FederalFormsEditor
+                  returnId={id!}
+                  initialInputs={record.return_json?.federalInputs ?? {}}
+                  onSaved={(inputs) => {
+                    setRecord((current: any) => ({
+                      ...current,
+                      return_json: { ...current.return_json, federalInputs: inputs },
+                    }));
+                    setEstimate(null);
+                  }}
+                />
+                <TaxpayerDetailsEditor
+                  returnId={id!}
+                  joint={record.filing_status === 'married_joint'}
+                  onSaved={() =>
+                    setRecord((current: any) => ({
+                      ...current,
+                      return_json: { ...current.return_json, privateProfileComplete: true },
+                    }))
+                  }
+                />
               </section>
               <aside className="space-y-5">
                 <section className="rounded-2xl bg-white p-6">
-                  <h2 className="text-xl font-bold">Federal income estimate</h2>
+                  <h2 className="text-xl font-bold">Federal return calculation</h2>
                   <p className="mt-3 text-sm text-slate-600">
-                    Ordinary-income estimate using your saved income and deductions. Credits,
-                    self-employment tax, qualified-dividend treatment, additional deductions and
-                    taxes, final tax tables, and state returns are excluded.
+                    Calculates your saved federal income, deductions, credits, payments and
+                    additional taxes. Complete and review every supporting form before filing.
                   </p>
                   <button
                     onClick={() => void calculateEstimate()}
                     disabled={busy}
                     className="mt-4 rounded-xl bg-sky-800 px-5 py-3 font-semibold text-white disabled:opacity-50"
                   >
-                    {busy ? 'Working…' : 'Calculate federal estimate'}
+                    {busy ? 'Working…' : 'Calculate federal return'}
                   </button>
                   {estimate && (
                     <div role="status" className="mt-4 space-y-2 text-sm">
                       <dl className="space-y-2">
                         <div>
-                          <dt>Estimated ordinary income tax</dt>
+                          <dt>Federal income tax</dt>
                           <dd className="font-semibold">${estimate.incomeTax.toFixed(2)}</dd>
                         </div>
                         <div>
-                          <dt>Federal withholding saved</dt>
+                          <dt>Total federal payments</dt>
                           <dd className="font-semibold">${estimate.totalPayments.toFixed(2)}</dd>
                         </div>
                       </dl>
                       <p className="pt-2 text-slate-600">
-                        This estimate is not a completed return or an IRS filing.
+                        Calculation saved. Your return has not been submitted to the IRS.
                       </p>
                     </div>
                   )}
+                </section>
+                <section className="rounded-2xl bg-white p-6">
+                  <h2 className="text-xl font-bold">Filing export</h2>
+                  <p className="mt-3 text-sm text-slate-600">
+                    Download the IRS XML after reviewing your calculation and saving taxpayer
+                    details and signature. The download does not submit your return.
+                  </p>
+                  <FilingExportButton returnId={id!} />
                 </section>
                 <section className="rounded-2xl bg-white p-6">
                   <h2 className="text-xl font-bold">Forms identified</h2>

@@ -1,0 +1,49 @@
+name: Regenerate approved course videos
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/regenerate-approved-course-videos.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/regenerate-approved-course-videos.yml/dispatches" -f ref=main
+  regenerate:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      group: google-course-runtime-operations
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - run: node --check scripts/gcp/regenerate-approved-course-videos.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify reference and prepare fresh fenced builds
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/gcp/regenerate-approved-course-videos.mjs
+      - name: Start two regenerated courses in available region
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/gcp/start-parallel-course-region.mjs
+      - name: Start remaining regenerated course
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          COURSE_WORKER_PARALLELISM: '1'
+        run: node scripts/gcp/dispatch-course-job.mjs

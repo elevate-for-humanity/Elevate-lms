@@ -23,6 +23,12 @@ export const ULTIMATE_BUILD_STEPS = [
 export type UltimateBuildStep = (typeof ULTIMATE_BUILD_STEPS)[number];
 export type UltimateStepState = 'pending' | 'running' | 'passed' | 'failed' | 'blocked';
 export interface UltimateCredentialProfile {
+  presentationContract?: {
+    version: string;
+    approvedReferenceVideo: { assetId: string; storagePath: string; sha256: string; approvedAt: string; permittedUses: string[] };
+    visualStyle: { cropMode: 'contain'; transition: 'crossfade' };
+    instructions: string[];
+  };
   lessonPresentation?: 'approved-premium-v1';
   /** Opt-in, immutable authoring configuration for new acceptance builds. */
   instructionalAuthoring?: { provider: 'google'; model: string; location?: string; version: string };

@@ -295,6 +295,17 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
     },
     finished_media_qa: async (ctx) => {
       const render: any = ctx.artifacts.lesson_film_render?.render;
+      if(ctx.profile.lessonPresentation === 'approved-premium-v1') {
+        if(render.presentationVersion !== 'approved-moment-cues-v2') throw new Error('APPROVED_MOMENT_PRESENTATION_REQUIRED');
+        for(const scene of render.sceneData?.scenes??[]) {
+          const cues=scene.pictureCues;
+          if(!Array.isArray(cues)||cues.length<2||new Set(cues.map((cue:any)=>cue.sha256)).size<2||
+              !scene.recapText?.trim()||!(scene.recapStartSeconds>0&&scene.recapStartSeconds<scene.durationSeconds)||
+              cues[0].startSeconds!==0||Math.abs(cues[cues.length-1].endSeconds-scene.durationSeconds)>0.05||
+              cues.some((cue:any,i:number)=>cue.endSeconds<=cue.startSeconds||i>0&&Math.abs(cue.startSeconds-cues[i-1].endSeconds)>0.05))
+            throw new Error('APPROVED_PICTURE_RECAP_TIMELINE_EVIDENCE_REQUIRED');
+        }
+      }
       const script: any = (ctx.artifacts.instructor_script as any)?.script;
       const objectives: any[] = (ctx.artifacts.learning_objectives as any)?.objectives ?? [];
       const quality = instructionalQualityFailures({

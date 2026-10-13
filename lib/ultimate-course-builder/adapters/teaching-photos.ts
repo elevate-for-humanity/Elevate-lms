@@ -18,6 +18,8 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
     const requests = steps.length === 1 ? [
       {...steps[0], view:'full workstation view'}, {...steps[0], view:'close detail view with complete hands and tools'},
     ] : steps.map((step: any) => ({...step,view:'complete action view'}));
+    if(!scene.recapText?.trim()) throw new Error('TEACHING_MOMENT_RECAP_REQUIRED');
+    requests.push({label:'Recap',value:scene.recapText,narrationQuote:scene.recapText,view:'fresh summary illustration'});
     photos[scene.id] = [];
     for (const [index, step] of requests.entries()) {
       const prompt = [

@@ -39,3 +39,11 @@ test('continuous mode retries poll errors and keeps polling until stopped', asyn
   await runWorkerLoop({ processJob:async()=>{calls++;if(calls===1)throw new Error('transient');stop=true;return {claimed:true,completed:true};}, delay:async()=>{delays++;}, isStopping:()=>stop });
   assert.equal(calls,2);assert.equal(delays,1);
 });
+
+test('persisted dependency wait exits normally without claiming lesson completion', async () => {
+  const result = {claimed:true,completed:false,awaitingDependency:true,jobId:'blocked-job'};
+  assert.equal(await runWorkerLoop(options(async () => result)),result);
+});
+test('non-persisted incomplete lesson still fails Cloud Run task', async () => {
+  await assert.rejects(runWorkerLoop(options(async () => ({claimed:true,completed:false}))),/ULTIMATE_TASK_INCOMPLETE/);
+});

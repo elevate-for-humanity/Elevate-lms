@@ -44,3 +44,15 @@ The Software Products page returned zero records on this inspection. No new pack
 Downloaded through the authorized SOR session: September 24, 2026 IMF release and MeF WSDL 10.A for processing year 2027. The TY2026 v4.0 return-schema bundle contains 753 XSD files and 235 globally declared IRS document elements; these include shared and dependency documents, not 235 independently supported return products. The 1040 workbook has 1,846 Active, 18 Verbiage Change, 50 New, 169 Disabled and 115 Deleted rows. Status interpretation and applicability must follow the official release instructions; counting Active rows alone is insufficient.
 
 Use `python3 scripts/tax-irs-package-inventory.py --schemas=/private/2026v4.0 --rules=/private/1040_Business_Rules_2026v4.0.xlsm --repo=.` for a local field/rule inventory. The reader does not execute workbook macros. Private SOR files and IRS identifiers are intentionally excluded from the public repository.
+
+## Schema-driven XML generation added
+
+`python3 scripts/tax-irs-xml.py --input=/private/irs-field-values.json --xsd=/private/2026v4.0/IndividualIncomeTax/Ind1040/Return1040.xsd --package-root=/private/2026v4.0 --out=/private/return.xml`
+
+This generates XML from official IRS field-name JSON, orders elements using the installed XSD, handles repeated elements and XML escaping, rejects unknown fields, and validates the entire output before saving with private permissions. It does not calculate tax or map the application's interview answers into IRS fields. Input uses `@attributes` for XML attributes and arrays for repeated elements. Schema includes must remain inside the supplied package directory; remote schema loading is disabled. Error output omits document values.
+
+Validation: four unit tests passed; the downloaded official 2026v4.0 1040 XSD compiled with 702 reachable global element declarations. A deliberately incomplete synthetic return was rejected. No IRS transmission or acceptance occurred.
+
+Install offline tool dependencies with `python3 -m pip install -r scripts/requirements-tax-ats.txt`.
+
+The IRS IFA Transmit Test File page listed both associated ETINs. Selecting the active developer test ETIN and continuing returned a site-served Access Denied page from the IRS edge gateway. No file was uploaded or transmitted, and no test acknowledgment was obtained. This browser restriction is separate from the successful SOR download and the unfinished filing engine.

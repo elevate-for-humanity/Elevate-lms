@@ -1,5 +1,6 @@
 import type { UltimateRenderPort } from '../core/ports';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { prepareTeachingPhotos } from './teaching-photos';
 import { materializeInstructionalVisualAssets } from './instructional-visual-assets';
 import { MIN_LESSON_VIDEO_SCENES, type MediaDirectorInput } from '@/lib/video/media-director';
 
@@ -294,8 +295,9 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
          !/^[a-f0-9]{64}$/i.test(input.presentationContract?.approvedReferenceVideo?.sha256 ?? '')))
       throw new Error('ULTIMATE_APPROVED_REFERENCE_REQUIRED');
     const { uploadCourseVideosObject } = await import('@/lib/video/upload-lesson-media');
+    const photographed = this.db ? await prepareTeachingPhotos(input,this.db) : input;
     const materialized = await materializeInstructionalVisualAssets(
-      input,
+      photographed,
       uploadCourseVideosObject,
     );
     const prepared = prepareUltimateStoryboardInput(
@@ -306,6 +308,10 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       import('@/lib/video/remotion-render'),
     ]);
     const storyboard = directMedia(prepared);
+    const teachingPhotos = rawStoryboard(materialized).scenes.map((scene:any)=>materialized.teachingPhotos?.[scene.id]);
+    if(input.lessonPresentation === 'approved-premium-v1') storyboard.scenes.forEach((scene:any,index:number)=>{
+      if(!scene.sourceVideoUrl) scene.referenceImageUrl=teachingPhotos[index]?.[0]?.imageUrl;
+    });
     // Presentation instructions are course data, never a barber-specific constant.
     // Preserve the owner's approved reference identity through the render result.
     const presentation = record(input.presentationContract ?? input.artifacts?.presentation_contract);
@@ -327,6 +333,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       ultimateStrict: true,
       lessonPresentation: input.lessonPresentation,
       visualStyle,
+      teachingPhotos,
       requireVisualEvidence: true,
       narrationSegments: input.artifacts?.natural_narration?.narration?.segments,
     });

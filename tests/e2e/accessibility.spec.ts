@@ -124,9 +124,7 @@ test.describe('Accessibility - WCAG 2.2 AA public journeys', () => {
 
   test('apply form controls have programmatic labels', async ({ page }) => {
     await page.goto('/apply');
-    await page.waitForLoadState('domcontentloaded');
-
-    const unlabeledControls = await page
+    await page.waitForURL(/\/apply\/student\/interview/);\n    await page.waitForLoadState('domcontentloaded');\n    await expect(page.locator('main')).toBeVisible();\n\n    const unlabeledControls = await page
       .locator('main input:not([type="hidden"]), main select, main textarea')
       .evaluateAll((controls) =>
         controls

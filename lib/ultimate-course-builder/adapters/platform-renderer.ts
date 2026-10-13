@@ -289,6 +289,10 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
   constructor(private db?: SupabaseClient) {}
 
   async render(input: any) {
+    if (input.lessonPresentation === 'approved-premium-v1' &&
+        (!input.presentationContract?.approvedReferenceVideo?.assetId ||
+         !/^[a-f0-9]{64}$/i.test(input.presentationContract?.approvedReferenceVideo?.sha256 ?? '')))
+      throw new Error('ULTIMATE_APPROVED_REFERENCE_REQUIRED');
     const { uploadCourseVideosObject } = await import('@/lib/video/upload-lesson-media');
     const materialized = await materializeInstructionalVisualAssets(
       input,

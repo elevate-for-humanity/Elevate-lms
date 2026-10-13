@@ -1,6 +1,5 @@
 import type { UltimateRenderPort } from '../core/ports';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { prepareTeachingPhotos } from './teaching-photos';
 import { materializeInstructionalVisualAssets } from './instructional-visual-assets';
 import { MIN_LESSON_VIDEO_SCENES, type MediaDirectorInput } from '@/lib/video/media-director';
 
@@ -295,6 +294,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
          !/^[a-f0-9]{64}$/i.test(input.presentationContract?.approvedReferenceVideo?.sha256 ?? '')))
       throw new Error('ULTIMATE_APPROVED_REFERENCE_REQUIRED');
     const { uploadCourseVideosObject } = await import('@/lib/video/upload-lesson-media');
+    const { prepareTeachingPhotos } = await import('./teaching-photos');
     const photographed = this.db ? await prepareTeachingPhotos(input,this.db) : input;
     const materialized = await materializeInstructionalVisualAssets(
       photographed,

@@ -7,7 +7,6 @@ import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
 import { HomePlatformOverview } from '@/components/home/HomePlatformOverview';
-import { HomeNetworks } from '@/components/home/HomeNetworks';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeWebsiteBuilderSales } from '@/components/home/HomeWebsiteBuilderSales';
@@ -46,7 +45,6 @@ export default function HomePage() {
     <>
       <StructuredData />
       <main data-homepage-curation="20261004" className="[&_a]:no-underline [&_a:hover]:no-underline">
-        <h1 className="sr-only">Elevate for Humanity career training and apprenticeships</h1>
         <PlatformHubHero />
         <HomeFeaturedHostShop />
         <HomeCareerPathways />
@@ -69,11 +67,7 @@ export default function HomePage() {
             </a>
           </div>
         </section>
-        <PlatformHubHero />
-        <HomeFeaturedHostShop />
-        <HomeCareerPathways />
         <HomeFunding />
-        <HomeNetworks />
         <HomeEmployerStrip />
         <HomeInstitutionalGateway />
         <HomeWebsiteBuilderSales />

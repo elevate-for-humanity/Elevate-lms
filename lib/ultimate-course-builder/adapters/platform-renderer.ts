@@ -319,8 +319,11 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       if(!scene.physicalDemonstration) {
         scene.sourceVideoUrl=undefined;
         scene.referenceImageUrl=teachingPhotos[index]?.[0]?.imageUrl;
-        scene.resolvedProvider='google';scene.resolvedModel='generated-teaching-photograph';
-        delete scene.sourceProviderItemId;delete scene.sourceLicenseEvidenceUrl;
+        const photo=teachingPhotos[index]?.[0];
+        scene.resolvedProvider=photo?.provider??'google';
+        scene.resolvedModel=photo?.providerItemId?'licensed-teaching-photograph':'generated-teaching-photograph';
+        scene.sourceProviderItemId=photo?.providerItemId;
+        scene.sourceLicenseEvidenceUrl=photo?.licenseEvidenceUrl;
       }
     });
     // Presentation instructions are course data, never a barber-specific constant.

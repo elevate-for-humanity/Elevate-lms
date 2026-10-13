@@ -1,3 +1,5 @@
+import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
+import { compatibleVisualTask } from '../instructional/reviewed-scene-evidence';
 import { createHash } from 'node:crypto';
 import { generateTeachingPhoto } from './google-teaching-photo.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -19,7 +21,20 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
     if(!scene.recapText?.trim()) throw new Error('TEACHING_MOMENT_RECAP_REQUIRED');
     requests.push({label:'Recap',value:scene.recapText,narrationQuote:scene.recapText,view:'fresh summary illustration'});
     photos[scene.id] = [];
+    const usedLicensedPhotos = new Set<string>();
     for (const [index, step] of requests.entries()) {
+      const licensed = selectReviewedTeachingPhoto(input.artifacts?.visual_assignment?.media?.readyAssets ?? [], step.narrationQuote, usedLicensedPhotos, compatibleVisualTask);
+      if (licensed) {
+        const downloaded = await db.storage.from('course_videos').download(licensed.storage_path);
+        if(downloaded.error || !downloaded.data) throw new Error('LICENSED_TEACHING_PHOTO_READBACK_FAILED');
+        const sha256=createHash('sha256').update(Buffer.from(await downloaded.data.arrayBuffer())).digest('hex');
+        if(sha256!==licensed.content_sha256) throw new Error('LICENSED_TEACHING_PHOTO_HASH_MISMATCH');
+        const signed=await db.storage.from('course_videos').createSignedUrl(licensed.storage_path,3600);
+        if(signed.error || !signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
+        usedLicensedPhotos.add(sha256);
+        photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:licensed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),illustration:true,provider:licensed.provider,providerItemId:licensed.provider_item_id,licenseEvidenceUrl:licensed.license_evidence_url});
+        continue;
+      }
       const prompt = [
         'Photorealistic instructional illustration, not proof of a performed practical procedure.',
         'Show complete hands, tools and relevant subject, uncropped, no printed text, no logos, no invented measurements.',

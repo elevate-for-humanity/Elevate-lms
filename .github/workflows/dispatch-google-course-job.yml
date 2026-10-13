@@ -2,7 +2,7 @@ name: Dispatch and recover Google course work
 on:
   push:
     branches: [main]
-    paths: ['scripts/gcp/dispatch-course-job.mjs', 'scripts/gcp/dispatch-course-job.test.mjs', 'scripts/gcp/continue-course-queue.mjs', 'scripts/gcp/continue-course-queue.test.mjs', '.github/workflows/dispatch-google-course-job.yml']
+    paths: ['scripts/gcp/dispatch-course-job.mjs', 'scripts/gcp/dispatch-course-job.test.mjs', 'scripts/gcp/continue-course-queue.mjs', 'scripts/gcp/continue-course-queue.test.mjs', 'scripts/gcp/continue-approved-regional-courses.mjs', '.github/workflows/dispatch-google-course-job.yml']
   workflow_run:
     workflows: ['Deploy Google Course Builder on source changes']
     types: [completed]
@@ -56,4 +56,4 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          node scripts/gcp/continue-course-queue.mjs
+          node scripts/gcp/continue-approved-regional-courses.mjs

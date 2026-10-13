@@ -5,12 +5,12 @@ test('Google identity generates PNG illustrations without an external API key',a
  const calls=[];
  const result=await generateTeachingPhoto('Show the complete clean comb',{env:{},request:async(url,options)=>{
   calls.push({url,options});
-  return calls.length===1?{ok:true,json:async()=>({access_token:'test-token'})}:{ok:true,json:async()=>({predictions:[{mimeType:'image/png',bytesBase64Encoded:Buffer.from('image bytes').toString('base64')}]})};
+  return calls.length===1?{ok:true,json:async()=>({access_token:'test-token'})}:{ok:true,json:async()=>({candidates:[{content:{parts:[{inlineData:{mimeType:'image/png',data:Buffer.from('image bytes').toString('base64')}}]}}]})};
  }});
  assert.equal(result.provider,'google');
  assert.equal(calls[0].options.headers['Metadata-Flavor'],'Google');
  assert.equal(calls[1].options.headers.Authorization,'Bearer test-token');
- assert.equal(JSON.parse(calls[1].options.body).parameters.aspectRatio,'16:9');
+ assert.equal(JSON.parse(calls[1].options.body).generationConfig.imageConfig.aspectRatio,'16:9');
  assert.equal(result.bytes.toString(),'image bytes');
 });
 test('blocked or missing generation never substitutes a diagram or unrelated stock',async()=>{

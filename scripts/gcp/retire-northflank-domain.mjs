@@ -36,6 +36,21 @@ async function main() {
   if(check.status!==404)throw Error('Northflank domain deletion not verified');
   console.log(JSON.stringify({kind:'domainRetirement',domain,removed:true,googleHealthVerified:true,durableDnsUnchanged:true}));
  } else console.log(JSON.stringify({kind:'domainRetirement',domain,alreadyAbsent:true}));
+ const inventory=await request('/domains?per_page=100');
+ const listed=inventory.body.data??inventory.body;
+ if(!Array.isArray(listed.domains)||inventory.body.pagination?.hasNextPage)throw Error('Complete remaining domain inventory required');
+ for(const row of listed.domains.filter(d=>d.name===domain||d.name.endsWith('.'+domain))) {
+  const host=row.name;let ips;try{ips=await resolver.resolve4(host);}catch(e){if(!['ENOTFOUND','ENODATA'].includes(e.code))throw e;ips=[];}
+  const expected=host==='phone.'+domain?'107.178.216.162':'34.110.235.233';
+  if(ips.some(ip=>ip!==expected))throw Error('Remaining domain has unverified routing: '+host);
+  for(const name of ['www','app','admin','store']) {
+   const r=await fetch('https://'+name+'.'+domain+'/api/health',{signal:AbortSignal.timeout(120000)});
+   const b=await r.json();if(!r.ok||!b.healthy)throw Error('Google health failed; remaining registration retained');
+  }
+  await request('/domains/'+encodeURIComponent(host),'DELETE');
+  if((await request('/domains/'+encodeURIComponent(host))).status!==404)throw Error('Remaining registration deletion not verified');
+  console.log(JSON.stringify({kind:'domainRetirement',domain:host,removed:true,durableDnsUnchanged:true}));
+ }
  const files=execFileSync('git',['ls-files','apps','components','lib','services','config','.github/workflows'],{encoding:'utf8'}).split('\n').filter(Boolean);
  const fs=await import('node:fs');let hits=0;
  for(const file of files) {

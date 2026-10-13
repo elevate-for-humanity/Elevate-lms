@@ -50,7 +50,7 @@ try{
  for(const j of jobs){
   const changed=await rest('ultimate_build_jobs?id=eq.'+j.id+'&execution_generation=eq.'+j.execution_generation,'PATCH',{
    status:'queued',execution_generation:j.execution_generation+1,attempts:0,lease_owner:null,lease_expires_at:null,available_at:new Date().toISOString(),
-   payload:{...j.payload,nextCompetencyIndex:0,completeLessonImage:expectedSha},last_error:null,updated_at:new Date().toISOString()
+   payload:{...j.payload,nextCompetencyIndex:Number.isInteger(j.payload?.nextCompetencyIndex)?j.payload.nextCompetencyIndex:0,completeLessonImage:expectedSha},last_error:null,updated_at:new Date().toISOString()
   });
   if(changed.length!==1)throw Error('FRESH_JOB_GENERATION_CHANGED');
  }

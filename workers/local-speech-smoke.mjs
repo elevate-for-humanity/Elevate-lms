@@ -1,3 +1,4 @@
+import { alignRecordedNarration } from '../lib/video/forced-alignment.mjs';
 import { KokoroTTS } from 'kokoro-js';
 import { transcribeLocalAudio } from '../lib/video/local-transcription.mjs';
 import { execFile } from 'node:child_process';
@@ -19,6 +20,9 @@ try {
   const path=join(directory,'voice.f32');
   await writeFile(path,pcm);
   const {stdout}=await execute('ffmpeg',['-hide_banner','-loglevel','error','-f','f32le','-ar','24000','-ac','1','-i',path,'-f','mp3','pipe:1'],{encoding:'buffer',timeout:60000,maxBuffer:8*1024*1024});
+  const recorded=join(directory,'voice.mp3');await writeFile(recorded,stdout);
+  const forced=await alignRecordedNarration(recorded,text);
+  if(forced.length<10 || forced.at(-1).end<samples.length/audio.sampling_rate*0.8) throw Error('SMOKE_FORCED_ALIGNMENT_FAILED');
   const result=await transcribeLocalAudio(stdout);
   const tokens=value=>value.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(/\s+/);
   const actual=tokens(result.text);

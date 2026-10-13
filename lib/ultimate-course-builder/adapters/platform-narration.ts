@@ -1,3 +1,4 @@
+import { alignRecordedNarration } from '@/lib/video/forced-alignment.mjs';
 import { measureNarrationCaptions } from '@/lib/video/media-quality-gate';
 import type { UltimateNarrationPort } from '../core/ports';
 import { configuredNarrationProvider, generateEdgeTTS } from '@/lib/video/edge-tts';
@@ -30,7 +31,20 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
      const durationSeconds=Number(stdout.trim());
      if(!(durationSeconds>0))throw Error('ULTIMATE_NARRATION_DURATION_REQUIRED');
      const bytes=await readFile(pcm);
-     const measured=await measureNarrationCaptions(bytes,recording.text,durationSeconds,words=>wordAlignment.push(...words.map(w=>({...w,start:cursor+w.start,end:cursor+w.end}))));
+     // Numeral scripts retain the existing measured recognizer until their intended
+     // pronunciation is explicitly supplied. Never guess guard lengths.
+     let measured;
+     if (/\d/.test(recording.text)) {
+      measured=await measureNarrationCaptions(bytes,recording.text,durationSeconds,words=>wordAlignment.push(...words.map(w=>({...w,start:cursor+w.start,end:cursor+w.end}))));
+     } else {
+      const words=await alignRecordedNarration(pcm,recording.text);
+      wordAlignment.push(...words.map((w:any)=>({...w,start:cursor+w.start,end:cursor+w.end})));
+      measured=[];
+      for(let i=0;i<words.length;i+=8) {
+       const group=words.slice(i,i+8);
+       measured.push({text:group.map((w:any)=>w.word).join(' '),startSeconds:group[0].start,endSeconds:group.at(-1).end});
+      }
+     }
      captions.push(...measured.map((c:any)=>({...c,startSeconds:cursor+c.startSeconds,endSeconds:cursor+c.endSeconds})));
      const encoded=join(directory,index+'-'+partIndex+'-delivery.mp3');
      await execute('ffmpeg',['-v','error','-y','-i',pcm,'-c:a','libmp3lame','-b:a','128k',encoded]);

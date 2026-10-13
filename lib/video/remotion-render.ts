@@ -594,6 +594,7 @@ export async function renderStoryboardVideo(
       enabled(process.env.ENABLE_GPU_LESSON_SCENES) &&
       (await gpuVideoAvailable());
     const resolvedStoryboard: MediaStoryboard = structuredClone(input.storyboard);
+    const premium = input.lessonPresentation === 'approved-premium-v1';
 
     for (const [index, scene] of input.storyboard.scenes.entries()) {
       const narration = scene.dialogue?.trim() || scene.action.trim();
@@ -834,7 +835,6 @@ export async function renderStoryboardVideo(
         ...(resolvedModel ? { resolvedModel } : {}),
       };
       const estimatedNarrationSeconds = Math.ceil((narration.split(/\s+/).length / 140) * 60);
-      const premium = input.lessonPresentation === 'approved-premium-v1';
       const narrationSeconds = premium
         ? Math.ceil((measuredNarrationSeconds ?? estimatedNarrationSeconds) * STORYBOARD_RENDER_FPS) / STORYBOARD_RENDER_FPS
         : Math.ceil(measuredNarrationSeconds ?? estimatedNarrationSeconds) + 1;

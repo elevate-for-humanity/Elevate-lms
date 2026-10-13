@@ -40,20 +40,22 @@ jobs:
             return json.loads(p.stdout)
           def scaling(annotations):
             return {k:v for k,v in annotations.items() if any(t in k.lower() for t in ['scaling','cpu-throttling','startup-cpu','execution-environment'])}
+          def runtime(containers):
+            return [{'command':c.get('command'), 'heapArgs':[a for a in c.get('args',[]) if a.startswith('--max-old-space-size=')], 'nodeOptions':next((e.get('value') for e in c.get('env',[]) if e.get('name')=='NODE_OPTIONS'),None)} for c in containers]
           revisions={}
           services=read(['run','services','list'])
           for s in services:
             name=s['metadata']['name']
             template=s['spec']['template']
             traffic=s.get('status',{}).get('traffic',[])
-            print(json.dumps({'kind':'service','name':name,'serviceScaling':scaling(s['metadata'].get('annotations',{})),'templateScaling':scaling(template['metadata'].get('annotations',{})),'templateResources':[c.get('resources',{}).get('limits',{}) for c in template['spec']['containers']],'concurrency':template['spec'].get('containerConcurrency'),'traffic':[{'revision':t.get('revisionName'),'percent':t.get('percent',0),'tag':t.get('tag')} for t in traffic]}))
+            print(json.dumps({'kind':'service','name':name,'serviceScaling':scaling(s['metadata'].get('annotations',{})),'templateScaling':scaling(template['metadata'].get('annotations',{})),'runtime':runtime(template['spec']['containers']),'templateResources':[c.get('resources',{}).get('limits',{}) for c in template['spec']['containers']],'concurrency':template['spec'].get('containerConcurrency'),'traffic':[{'revision':t.get('revisionName'),'percent':t.get('percent',0),'tag':t.get('tag')} for t in traffic]}))
             rows=read(['run','revisions','list','--service='+name])
             for r in rows:
               rev=r['metadata']['name'];revisions[rev]=r
               ann=r['metadata'].get('annotations',{})
               linked=[t for t in traffic if t.get('revisionName')==rev]
               if linked or int(ann.get('autoscaling.knative.dev/minScale','0'))>0:
-                print(json.dumps({'kind':'revision','service':name,'revision':rev,'resources':[c.get('resources',{}).get('limits',{}) for c in r['spec']['containers']],'scaling':scaling(ann),'concurrency':r['spec'].get('containerConcurrency'),'traffic':sum(t.get('percent',0) for t in linked),'tags':[t['tag'] for t in linked if t.get('tag')],'ready':next((c.get('status') for c in r.get('status',{}).get('conditions',[]) if c.get('type')=='Ready'),None)}))
+                print(json.dumps({'kind':'revision','service':name,'revision':rev,'runtime':runtime(r['spec']['containers']),'resources':[c.get('resources',{}).get('limits',{}) for c in r['spec']['containers']],'scaling':scaling(ann),'concurrency':r['spec'].get('containerConcurrency'),'traffic':sum(t.get('percent',0) for t in linked),'tags':[t['tag'] for t in linked if t.get('tag')],'ready':next((c.get('status') for c in r.get('status',{}).get('conditions',[]) if c.get('type')=='Ready'),None)}))
           for job in read(['run','jobs','list']):
             name=job['metadata']['name']
             task=job.get('spec',{}).get('template',{}).get('spec',{})

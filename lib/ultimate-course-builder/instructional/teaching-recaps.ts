@@ -14,11 +14,13 @@ export async function addFreshTeachingRecaps(blueprint:any,profile:any,sources:a
  });
  if(repeatedTeachingSegments(segments.flatMap((s:any)=>[s.text,s.recapText]).join('\n\n')))
   throw Error('TEACHING_RECAP_REPEATS_NARRATION');
- const hash=contractHash(segments);
+ const {authoringEvidence:previousEvidence,...base}=blueprint;
+ const payload={...base,segments,presentationEvidence:{version:'approved-moment-cues-v2',recapHash:contractHash(segments)}};
+ const hash=contractHash(payload);
  const review=await generateVertexLessonJson(profile.instructionalAuthoring?.model??'gemini-3.8-flash',
-  'Return JSON {pass,findings,hash}. Independently check that every recap is supported by its teaching moment and the authorized sources, preserves safety and technical conditions, is freshly worded, and introduces no facts or measurements. Any failure means pass:false. Echo hash exactly.',
-  {segments,sources,hash});
- if(review.pass!==true||review.hash!==hash||!Array.isArray(review.findings)||review.findings.length)
+  'Return JSON {pass,findings,hash,competencyId,blueprintHash}. Independently review the complete blueprint, its instruction and assessments against the sources; check that every recap is supported by its teaching moment and the authorized sources, preserves safety and technical conditions, is freshly worded, and introduces no facts or measurements. Any failure means pass:false. Echo hash exactly.',
+  {blueprint:payload,segments,sources,hash,blueprintHash:hash,competencyId:blueprint.competencyId,presentationContract:profile.presentationContract});
+ if(review.pass!==true||review.hash!==hash||review.blueprintHash!==hash||review.competencyId!==blueprint.competencyId||!Array.isArray(review.findings)||review.findings.length)
   throw Error('TEACHING_RECAP_SOURCE_REVIEW_REQUIRED');
- return {...blueprint,segments,presentationEvidence:{version:'approved-moment-cues-v2',recapHash:hash,review}};
+ return {...payload,authoringEvidence:{version:'source-grounded-teaching-1',sourceHash:contractHash(sources),blueprintHash:hash,grounding:previousEvidence?.grounding??[],review}};
 }

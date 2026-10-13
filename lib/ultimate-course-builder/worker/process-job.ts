@@ -208,5 +208,6 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     if (timer) clearInterval(timer);
     timer = null;
     deadline.dispose();
+    progressWatch.dispose();
   }
 }

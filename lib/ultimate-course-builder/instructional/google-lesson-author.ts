@@ -1,6 +1,7 @@
 import type { UltimateCompetency, UltimateCredentialProfile } from '../core/types';
 import { contractHash } from '../core/lesson-contract';
 import { validateLessonBlueprint, type LessonBlueprint } from './lesson-blueprint';
+import { validateTeachingVisual } from './teaching-visual';
 import { ULTIMATE_TEACHING_SEQUENCE } from './teaching-sequence';
 
 export const GOOGLE_LESSON_AUTHOR_VERSION = 'source-grounded-teaching-1';
@@ -49,7 +50,23 @@ Grounding is an array with one entry per segment: {segmentId, sourceId, excerpt}
   const presentationRequirements = input.profile.lessonPresentation === 'approved-premium-v1'
     ? 'Use focused PowerPoint-style teaching moments. Explain the required tools and exact numbered guard lengths when supported by the source. Within each teaching moment include a fresh brief recap or practice question, never repeat its spoken passage. Change the visual for the next technique. Whole pictures stay visible beside concise demonstration instructions, with word-aligned bottom captions. Use unique task-relevant images; do not reuse a photo or loop as filler. Do not invent technical measurements or substitute illustrative photos for an actual required physical demonstration.'
     : undefined;
-  const result = await generate(system, { courseTitle: input.profile.title, audience: input.profile.audience || 'Adult career learners', competency: input.competency, sequence: ULTIMATE_TEACHING_SEQUENCE, sources: input.sources, blueprintSchema: schema, ...(presentationRequirements ? {presentationRequirements, presentationContract: input.profile.presentationContract} : {}) });
+  const authorRequest = { courseTitle: input.profile.title, audience: input.profile.audience || 'Adult career learners', competency: input.competency, sequence: ULTIMATE_TEACHING_SEQUENCE, sources: input.sources, blueprintSchema: schema, ...(presentationRequirements ? {presentationRequirements, presentationContract: input.profile.presentationContract} : {}) };
+  let result = await generate(system, authorRequest);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (result?.blocked) break;
+    try { validateLessonBlueprint(result?.blueprint, input.competency); break; }
+    catch (error) {
+      if (!(error instanceof Error) || error.message !== 'BLUEPRINT_TEACHING_VISUAL_NOT_SCRIPT_BOUND' || attempt === 2) throw error;
+      const invalidVisuals = (result?.blueprint?.segments ?? []).flatMap((segment: any) => {
+        try { if (segment.teachingVisual) validateTeachingVisual(segment.teachingVisual, segment.text); return []; }
+        catch { return [{segmentId: segment.id, narration: segment.text, teachingVisual: segment.teachingVisual}]; }
+      });
+      result = await generate(system, {...authorRequest, repair: {
+        code: error.message, previousResult: result, invalidVisuals,
+        instructions: 'Repair the invalid teaching visuals. Return the full {blueprint, grounding}. Preserve spoken narration, source citations, objectives and assessments. Each value and narrationQuote must be the SAME short contiguous exact excerpt from that segment narration; no paraphrase. Use 1-4 meaningful steps, labels <=28 characters and values <=90 characters. Preserve negations and technical conditions. Never claim validation or approval yourself.',
+      }});
+    }
+  }
   if (result?.blocked) throw new Error('ULTIMATE_AUTHORING_SOURCE_GAP:' + String(result.reason).slice(0, 300));
   const blueprint = result?.blueprint as LessonBlueprint;
   validateLessonBlueprint(blueprint, input.competency);

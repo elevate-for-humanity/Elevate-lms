@@ -41,6 +41,9 @@ import { presentationBookendFrames, assertNarratedScenes } from '../../lib/ultim
 // ââ Types âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 export interface SceneData {
+  pictureCues?: Array<{imageUrl:string;startSeconds:number;endSeconds:number;sha256:string;stepIndex:number}>;
+  recapStartSeconds?: number;
+  recapText?: string;
   scene_number: number;
   title: string;
   bullets: string[];

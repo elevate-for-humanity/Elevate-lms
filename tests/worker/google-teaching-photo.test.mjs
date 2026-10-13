@@ -1,6 +1,24 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {generateTeachingPhoto} from '../../lib/ultimate-course-builder/adapters/google-teaching-photo.mjs';
+test('transient image timeout retries before discarding lesson progress',async()=>{
+ let calls=0,retries=0;
+ const result=await generateTeachingPhoto('prompt',{env:{},delay:async()=>{retries++;},request:async()=>{
+  calls++;
+  if(calls===1)return {ok:true,json:async()=>({access_token:'token'})};
+  if(calls===2)throw new DOMException('timed out','TimeoutError');
+  return {ok:true,json:async()=>({candidates:[{content:{parts:[{inlineData:{mimeType:'image/png',data:Buffer.from('photo').toString('base64')}}]}}]})};
+ }});
+ assert.equal(result.bytes.toString(),'photo');assert.equal(calls,3);assert.equal(retries,1);
+});
+test('persistent image timeout exhausts six attempts without a substitute',async()=>{
+ let calls=0;
+ await assert.rejects(generateTeachingPhoto('prompt',{env:{},delay:async()=>{},request:async()=>{
+  if(++calls===1)return {ok:true,json:async()=>({access_token:'token'})};
+  throw new DOMException('timed out','TimeoutError');
+ }}),/timed out/);
+ assert.equal(calls,7);
+});
 test('Google identity generates PNG illustrations without an external API key',async()=>{
  const calls=[];
  const result=await generateTeachingPhoto('Show the complete clean comb',{env:{},request:async(url,options)=>{

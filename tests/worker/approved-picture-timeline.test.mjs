@@ -18,3 +18,16 @@ test('missing reference pictures, spoken cue or fresh recap cannot pass',()=>{
  assert.throws(()=>pictureTimeline(photos,cues,12,0),/RECAP_TIMING/);
  assert.throws(()=>pictureTimeline([{...photos[0],narrationQuote:'Invent a guard length'},photos[1]],cues,12,8),/NOT_ALIGNED/);
 });
+
+test('recap picture starts at audio part boundary even when its first word starts later',()=>{
+ const delayed=cues.map((c,i)=>i===2?{...c,startSeconds:8.32}:c);
+ const timeline=pictureTimeline(photos.map((p,i)=>({...p,isRecap:i===2})),delayed,12,8);
+ assert.equal(timeline[2].startSeconds,8);
+ assert.equal(timeline[1].endSeconds,8);
+ assert.equal(activePictureCue(timeline,8.1).imageUrl,'c');
+});
+test('explicit recap identity survives reordered photo input',()=>{
+ const timeline=pictureTimeline([{...photos[2],isRecap:true},photos[0],photos[1]],cues,12,8);
+ assert.equal(timeline.at(-1).imageUrl,'c');
+ assert.equal(timeline.at(-1).startSeconds,8);
+});

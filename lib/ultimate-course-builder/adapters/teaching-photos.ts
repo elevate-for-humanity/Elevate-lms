@@ -35,7 +35,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(sha256!==placed.metadata.sha256) throw new Error('PLACED_TEACHING_PHOTO_HASH_MISMATCH');
         const signed=await db.storage.from('course_videos').createSignedUrl(placed.storage_path,3600);
         if(signed.error||!signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
-        photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),illustration:true,provider:'openai'});
+        photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:'openai'});
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
@@ -48,7 +48,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         const signed=await db.storage.from('course_videos').createSignedUrl(licensed.storage_path,3600);
         if(signed.error || !signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
         usedLicensedPhotos.add(sha256);
-        photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:licensed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),illustration:true,provider:licensed.provider,providerItemId:licensed.provider_item_id,licenseEvidenceUrl:licensed.license_evidence_url});
+        photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:licensed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:licensed.provider,providerItemId:licensed.provider_item_id,licenseEvidenceUrl:licensed.license_evidence_url});
         continue;
       }
       const prompt = [
@@ -80,7 +80,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       const sha256=createHash('sha256').update(Buffer.from(await file.arrayBuffer())).digest('hex');
       const signed=await db.storage.from('course_videos').createSignedUrl(storagePath,3600);
       if(signed.error||!signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
-      photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,stepIndex:steps.indexOf(step)>=0?steps.indexOf(step):Math.min(index,steps.length-1),illustration:true});
+      photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,stepIndex:steps.indexOf(step)>=0?steps.indexOf(step):Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true});
       reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
     }
     if(new Set(photos[scene.id].map(p=>p.sha256)).size<2) throw new Error('TEACHING_PHOTOS_MUST_BE_DISTINCT');

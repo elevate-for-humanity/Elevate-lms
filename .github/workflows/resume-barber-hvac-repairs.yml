@@ -10,7 +10,7 @@ permissions:
   id-token: write
 jobs:
   dispatch:
-    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == 'a4e10cab3789ac1e8216139fd5519f2de51595f6'
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == '3927868c1e27252017948994e5e0283dd3b6565c'
     runs-on: ubuntu-24.04
     steps:
       - env:
@@ -36,5 +36,5 @@ jobs:
           skip_install: true
       - env:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          REPAIRED_IMAGE_SHA: 'a4e10cab3789ac1e8216139fd5519f2de51595f6'
+          REPAIRED_IMAGE_SHA: '3927868c1e27252017948994e5e0283dd3b6565c'
         run: node scripts/gcp/start-barber-hvac-repair.mjs

@@ -3,14 +3,6 @@ import { compileTaxRoute, loadTaxRoute } from './tax-route-test-harness.mjs';
 import assert from 'node:assert/strict';
 
 // Exercise the route's HTTP contract with database failures at each boundary.
-const path = process.argv[2] || 'app/api/tax/returns/calculate/route.ts';
-const routeSource = readFileSync(path, 'utf8');
-// The isolated VM evaluates the POST implementation, not Next.js route metadata.
-// Keep this narrow: any unexpected export must still fail the contract tests.
-const source = stripTypeScriptTypes(routeSource
-  .replace(/^import .*;\s*$/gm, '')
-  .replace(/^export const (?:dynamic|runtime)\s*=\s*['"][^'"]+['"];\s*$/gm, '')
-  .replace('export async function POST', 'async function POST'));
 const path =
   process.argv[2] ||
   (existsSync('apps/marketing/app/api/tax/returns/calculate/route.ts')

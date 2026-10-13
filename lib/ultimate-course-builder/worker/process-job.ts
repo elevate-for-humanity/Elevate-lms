@@ -106,7 +106,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         // Preserve the cursor and await an explicit dependency wake-up instead
         // of exhausting attempts or continuously retrying missing media.
         await queue.waitForDependency(job.id,workerId,`ULTIMATE_DEPENDENCIES_UNRESOLVED:${continuation.unresolved.join(',')}`,generation,continuation.payload);
-        return {claimed:true,completed:false,jobId:job.id,result};
+        return {claimed:true,completed:false,awaitingDependency:true,jobId:job.id,result};
       }
     }
     if (!result.completed) {

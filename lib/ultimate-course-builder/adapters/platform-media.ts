@@ -202,9 +202,16 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
     );
 
     const scenes = input.storyboard?.storyboard?.scenes ?? [];
+    const inspectedAssets = input.profile?.lessonPresentation === 'approved-premium-v1' ? readyAssets.filter((asset:any)=>{
+      const observation=asset.visual_observation;
+      return observation?.method === 'sampled-frame-inspection' &&
+        /^[a-f0-9]{64}$/i.test(String(asset.content_sha256??'')) && observation.contentSha256===asset.content_sha256 &&
+        Number.isFinite(Date.parse(observation.reviewedAt)) && Array.isArray(observation.sampleFractions) && observation.sampleFractions.length>0 &&
+        observation.sampleFractions.every((fraction:any)=>typeof fraction==='number'&&fraction>=0&&fraction<=1);
+    }) : readyAssets;
     const { assignments, gaps } = buildSceneAssignments(
       scenes,
-      readyAssets,
+      inspectedAssets,
       input.profile?.sceneAssignments?.[input.competency?.id] ?? [],
       {requiresPracticalEvidence: input.competency?.requiresPracticalEvidence === true, competencyType:input.competency?.type},
     );

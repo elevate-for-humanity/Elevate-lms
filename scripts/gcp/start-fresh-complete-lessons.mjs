@@ -17,11 +17,11 @@ async function rest(path,method='GET',body){
  const r=await fetch('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/'+path,{method,headers,body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(30000)});
  if(!r.ok)throw Error('DATABASE_HTTP_'+r.status);return r.status===204?[]:r.json();
 }
-const ids=["40cf8fbf-57b5-4206-8cb9-b6538f59da8b","01a0deea-3c07-4026-90db-47a9db1a4045","a9b85487-5465-4bc0-bed0-9fc3411c4e50"];
-const builds=await rest('ultimate_course_builds?select=id,profile&id=in.(d535e31f-10e6-43dd-b60a-e7e5538d764a,b400834e-15e3-4ef0-ae20-33cd9f82e950,572cca43-6bd6-4a91-b385-a8b576209c4e)');
-if(builds.length!==3||builds.some(b=>b.profile.lessonCompletionPolicy!=='complete-before-advance-v1'||b.profile.sourcePolicy!=='frozen-reference-v1'))throw Error('FRESH_COMPLETE_LESSON_CONTRACT_REQUIRED');
+const ids=['a9b85487-5465-4bc0-bed0-9fc3411c4e50'];
+const builds=await rest('ultimate_course_builds?select=id,profile&id=in.(572cca43-6bd6-4a91-b385-a8b576209c4e)');
+if(builds.length!==1||builds.some(b=>b.profile.lessonCompletionPolicy!=='complete-before-advance-v1'||b.profile.sourcePolicy!=='frozen-reference-v1'))throw Error('FRESH_COMPLETE_LESSON_CONTRACT_REQUIRED');
 const jobs=await rest('ultimate_build_jobs?id=in.('+ids.join(',')+')');
-if(jobs.length!==3)throw Error('EXACT_FRESH_JOBS_REQUIRED');
+if(jobs.length!==1)throw Error('EXACT_FRESH_JOBS_REQUIRED');
 if(jobs.every(j=>j.payload?.completeLessonImage===expectedSha)){console.log(JSON.stringify({status:'fresh_courses_already_activated'}));process.exit(0);}
 const otherLive=await rest('ultimate_build_jobs?select=id&status=eq.running&lease_expires_at=gt.'+encodeURIComponent(new Date().toISOString()));
 if(otherLive.some(j=>!ids.includes(j.id)))throw Error('OTHER_ACTIVE_COURSE_LEASES_REQUIRE_REVIEW');
@@ -32,7 +32,7 @@ for(const j of inventory.filter(j=>['elevate-course-builder-parallel','elevate-c
  for(const e of read(['run','jobs','executions','list','--job='+j.metadata.name]).filter(e=>!isTerminalExecution(e)))
   google(['run','jobs','executions','cancel',e.metadata.name,'--project='+PROJECT,'--region='+region,'--quiet']);
 }
-const tasks=3;
+const tasks=1;
 let capacity;
 for(let i=0;i<12;i++){
  capacity=await inspectRegionalCapacity({region,task:{...task,containers:Array.from({length:tasks},()=>task.containers[0])}});
@@ -54,7 +54,7 @@ try{
   });
   if(changed.length!==1)throw Error('FRESH_JOB_GENERATION_CHANGED');
  }
- google(['run','jobs','execute',name,'--project='+PROJECT,'--region='+region,'--tasks=3','--async','--quiet']);
+ google(['run','jobs','execute',name,'--project='+PROJECT,'--region='+region,'--tasks=1','--async','--quiet']);
  const pending=new Set(ids);
  for(let i=0;i<90;i++){
   const rows=await rest('ultimate_build_jobs?select=id,status,lease_owner,heartbeat_at,last_error&id=in.('+ids.join(',')+')');

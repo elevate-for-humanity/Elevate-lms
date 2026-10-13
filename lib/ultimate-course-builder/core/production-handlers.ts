@@ -12,6 +12,7 @@ import { evaluateAccessibility } from '../accessibility/accessibility-contract';
 import { executableRepairTargets, type CourseRepairPlan } from '../repair/course-repair-plan';
 import { instructionalDepthFor } from '../instructional/depth-contract';
 import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
+import { narrationSceneSeconds } from '../instructional/approved-presentation.mjs';
 const comp = (ctx: any) =>
   ctx.profile.competencies.find((c: any) => String(ctx.buildId).endsWith(':' + c.id)) ??
   ctx.profile.competencies[0];
@@ -208,11 +209,12 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       };
     },
     synchronization: async (ctx) => {
-      let cursor = 3;
+      const premium = ctx.profile.lessonPresentation === 'approved-premium-v1';
+      let cursor = premium ? 0 : 3;
       const narration: any = (ctx.artifacts.natural_narration as any)?.narration;
       const segments = narration.segments.map((s: any) => {
         const startSeconds = cursor;
-        cursor += Math.max(4, Math.ceil(s.durationSeconds) + 1);
+        cursor += narrationSceneSeconds(s.durationSeconds, premium);
         return {
           ...s,
           startSeconds,
@@ -224,7 +226,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
           })),
         };
       });
-      return { artifacts: { timeline: { segments, fps: 30, durationSeconds: cursor + 2 } } };
+      return { artifacts: { timeline: { segments, fps: 30, durationSeconds: cursor + (premium ? 0 : 2) } } };
     },
     active_teaching: async (ctx) => ({
       artifacts: {
@@ -261,6 +263,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
           render: await runtime.renderer.render({
             lessonId: comp(ctx).id,
             courseTitle: ctx.profile.title,
+            lessonPresentation: ctx.profile.lessonPresentation,
             requiresPhysicalDemonstration: comp(ctx).type === 'practical_skill',
             artifacts: ctx.artifacts,
           }),

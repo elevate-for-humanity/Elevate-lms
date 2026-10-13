@@ -33,6 +33,8 @@ jobs:
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Traffic scope and unavailable-data regression tests
         run: node --test tests/unit/traffic-report.test.mjs
+      - name: Public narration lifecycle regression tests
+        run: pnpm exec vitest run tests/unit/scroll-narrator-playback.test.tsx tests/unit/home-scroll-narrator-regression.test.ts tests/unit/natural-voice-pacing.test.ts
       - name: Google runtime settings regression tests
         run: pnpm exec vitest run tests/unit/program-holder-sync.test.ts tests/unit/google-container-env.test.ts tests/unit/google-deployment-dispatch.test.ts tests/unit/pwa-homepage-hydration.test.tsx tests/unit/pwa-install-prompt-lifecycle.test.ts tests/unit/admin-pwa-navigation-regression.test.ts
       - name: Google activation and dependency health regression tests

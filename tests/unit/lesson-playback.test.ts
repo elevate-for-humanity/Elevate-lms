@@ -20,6 +20,17 @@ describe('server-bound lesson playback delivery', () => {
     expect(signed).toHaveBeenCalledWith('course-videos/film.mp4',3600);
     await expect(signedLessonPlayback({},'https://attacker.example/film.mp4')).rejects.toThrow('LESSON_MEDIA_STORAGE_REFERENCE_REQUIRED');
   });
+  it('routes and signs private manually uploaded lessons without exposing the bucket', async () => {
+    const createSignedUrl = vi.fn().mockResolvedValue({data:{signedUrl:'https://signed.example/upload'},error:null});
+    const db = {storage:{from:vi.fn(() => ({createSignedUrl}))}};
+    const source = 'https://project.supabase.co/storage/v1/object/public/course_videos/course/lesson.mp4';
+    expect(managedLessonPlaybackUrl(source,'course','lesson')).toBe('/api/courses/course/lessons/lesson/playback');
+    expect(await signedLessonPlayback(db,source)).toBe('https://signed.example/upload');
+    expect(db.storage.from).toHaveBeenCalledWith('course_videos');
+    expect(createSignedUrl).toHaveBeenCalledWith('course/lesson.mp4',3600);
+    await expect(signedLessonPlayback(db,'https://project.supabase.co/storage/v1/object/public/course_videos/%2e%2e/private.mp4')).rejects.toThrow('LESSON_MEDIA_REFERENCE_INVALID');
+    expect(createSignedUrl).toHaveBeenCalledTimes(1);
+  });
   it('rejects encoded traversal before signing', async () => {
     await expect(signedLessonPlayback({},'https://media.example/course-media/%2e%2e/private.mp4')).rejects.toThrow('LESSON_MEDIA_REFERENCE_INVALID');
     expect(signed).not.toHaveBeenCalled();

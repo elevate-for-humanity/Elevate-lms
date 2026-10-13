@@ -35,6 +35,8 @@ import { BlueprintTeachingGraphic } from './BlueprintTeachingGraphic';
 import { instructionalLayoutForScene, type InstructionalLayout } from '../instructional-layout';
 import { type TeachingVisual } from '../../lib/ultimate-course-builder/instructional/teaching-visual';
 import { FOOTAGE_TITLE_BOX } from '../footage-title-layout.mjs';
+import { PremiumTeachingScene } from './PremiumTeachingScene';
+import { presentationBookendFrames, assertNarratedScenes } from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
 
 // ââ Types âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
@@ -63,6 +65,7 @@ export interface SceneData {
 }
 
 export interface SlideLessonProps {
+  lessonPresentation?: 'approved-premium-v1';
   courseTitle: string;
   lessonTitle: string;
   scenes: SceneData[];
@@ -804,6 +807,11 @@ function BrandedOutro({ props, frame }: { props: SlideLessonProps; frame: number
 export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
   const { fps } = useVideoConfig();
   const frame = useCurrentFrame();
+  const premium = props.lessonPresentation === 'approved-premium-v1';
+  const bookends = presentationBookendFrames(premium);
+  if (premium) assertNarratedScenes(props.scenes);
+  if (props.fullAudioSrc && props.scenes.some(scene => scene.audioSrc))
+    throw new Error('LESSON_OVERLAPPING_NARRATION_TRACKS');
 
   // Build sequence offsets
   let offset = 0;
@@ -830,29 +838,29 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
       )}
 
       {/* Branded intro */}
-      <Sequence from={preRollFrames} durationInFrames={INTRO_FRAMES}>
+      {!premium && <Sequence from={preRollFrames} durationInFrames={bookends.intro}>
         <BrandedIntro props={props} frame={frame} />
-      </Sequence>
+      </Sequence>}
 
       {/* Scenes */}
       {props.scenes.map((scene, i) => (
         <Sequence
           key={scene.scene_number}
-          from={preRollFrames + INTRO_FRAMES + sceneOffsets[i]}
+          from={preRollFrames + bookends.intro + sceneOffsets[i]}
           durationInFrames={scene.durationFrames}
         >
-          <SceneSlide scene={scene} props={props} />
+          {premium ? <PremiumTeachingScene scene={scene} props={props}/> : <SceneSlide scene={scene} props={props} />}
         </Sequence>
       ))}
 
       {/* Branded outro */}
-      <Sequence from={preRollFrames + INTRO_FRAMES + offset} durationInFrames={OUTRO_FRAMES}>
+      {!premium && <Sequence from={preRollFrames + bookends.intro + offset} durationInFrames={bookends.outro}>
         <BrandedOutro props={props} frame={frame} />
-      </Sequence>
+      </Sequence>}
 
       {props.postRollUrl && (
         <Sequence
-          from={preRollFrames + INTRO_FRAMES + offset + OUTRO_FRAMES}
+          from={preRollFrames + bookends.intro + offset + bookends.outro}
           durationInFrames={postRollFrames}
         >
           <Video
@@ -872,12 +880,14 @@ export function calcSlideLessonFrames(
   scenes: Pick<SceneData, 'durationFrames'>[],
   preRollDurationFrames = 0,
   postRollDurationFrames = 0,
+  premium = false,
 ): number {
+  const bookends = presentationBookendFrames(premium);
   return (
     preRollDurationFrames +
-    INTRO_FRAMES +
+    bookends.intro +
     scenes.reduce((sum, s) => sum + s.durationFrames, 0) +
-    OUTRO_FRAMES +
+    bookends.outro +
     postRollDurationFrames
   );
 }

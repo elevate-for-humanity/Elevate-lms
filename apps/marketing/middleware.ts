@@ -143,6 +143,17 @@ export async function middleware(req: NextRequest) {
   const storeRuntimeResponse = handleStoreOnlyRuntime(req, pathname);
   if (storeRuntimeResponse) return storeRuntimeResponse;
 
+  // Redirect unauthenticated entry at the edge: do not rely on a page render
+  // or client navigation to return the canonical login redirect status.
+  if (pathname === '/login' && getPublicRuntimeService() !== 'store') {
+    const target = new URL('/login', 'https://app.elevateforhumanity.org');
+    for (const key of ['next', 'redirect', 'reason']) {
+      const value = req.nextUrl.searchParams.get(key);
+      if (value) target.searchParams.set(key, value);
+    }
+    return NextResponse.redirect(target, 307);
+  }
+
   const host = requestHost(req);
 
   if (host === 'elevateforhumanity.org') {

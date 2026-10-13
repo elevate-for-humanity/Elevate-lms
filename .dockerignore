@@ -96,3 +96,6 @@ docs/ultimate-course-builder/*
 !docs/ultimate-course-builder/lessons
 docs/ultimate-course-builder/lessons/*
 !docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json
+
+# Worker acceptance checks for the owner-approved teaching format.
+!tests/integration/approved-teaching-recaps.test.ts

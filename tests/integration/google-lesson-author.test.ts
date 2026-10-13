@@ -67,3 +67,30 @@ test('authoring schema includes mandatory activities, reassessment and practical
     return {pass:true, findings:[], competencyId:input.competency.id, blueprintHash:request.blueprintHash};
   });
 });
+
+test('invalid visual receives targeted repair and still requires independent review', async () => {
+  const {input,result}=fixture();
+  const invalid=structuredClone(result);
+  invalid.blueprint.segments[0].teachingVisual.steps[0].value='Disconnect the energized compressor';
+  let calls=0;
+  const output=await authorGoogleLesson(input,async (_system,request:any)=>{
+    calls++;
+    if(calls===1)return invalid;
+    if(calls===2){
+      assert.equal(request.repair.code,'BLUEPRINT_TEACHING_VISUAL_NOT_SCRIPT_BOUND');
+      assert.equal(request.repair.invalidVisuals[0].segmentId,result.blueprint.segments[0].id);
+      assert.deepEqual(request.sources,input.sources);
+      return result;
+    }
+    return {pass:true,findings:[],competencyId:input.competency.id,blueprintHash:request.blueprintHash};
+  });
+  assert.equal(calls,3);
+  validateGoogleAuthoringEvidence(output,input.sources);
+});
+test('repeated unsupported visual cannot bypass validation or reach independent approval',async()=>{
+  const {input,result}=fixture();
+  result.blueprint.segments[0].teachingVisual.steps[0].value='Disconnect the energized compressor';
+  let calls=0;
+  await assert.rejects(authorGoogleLesson(input,async()=>{calls++;return result;}),/BLUEPRINT_TEACHING_VISUAL_NOT_SCRIPT_BOUND/);
+  assert.equal(calls,3);
+});

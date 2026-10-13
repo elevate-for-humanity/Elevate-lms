@@ -31,25 +31,31 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   if (!task?.containers?.length) throw new Error('COURSE_JOB_CONFIGURATION_UNAVAILABLE');
   const capacity = await capacityCheck({region:'us-central1', task, run: args => run('gcloud', args, {encoding:'utf8',stdio:['ignore','pipe','pipe']})});
   if (!capacity.fits) return {status:'capacity_wait', ...capacity};
-  run('gcloud',['run','jobs','execute','elevate-course-builder',...scope,'--tasks=1','--async','--quiet'],{stdio:'inherit'});
-  // Launch is not assignment. Require a fresh durable heartbeat from the selected job.
-  const jobId = queued[0].id;
-  const previousHeartbeat = queued[0].heartbeat_at || '';
+  // One Cloud Run task claims one job via the existing atomic Supabase RPC.
+  // Start independent tasks for waiting builds instead of serializing every
+  // course behind the first running lesson. Keep a bounded default for quota.
+  const configured = Number(env.COURSE_WORKER_PARALLELISM ?? 2);
+  const limit = Number.isSafeInteger(configured) ? Math.min(4, Math.max(1, configured)) : 2;
+  const tasks = Math.min(limit, queued.length);
+  run('gcloud',['run','jobs','execute','elevate-course-builder',...scope,`--tasks=${tasks}`,`--parallelism=${tasks}`,'--async','--quiet'],{stdio:'inherit'});
+  // Launch is not assignment. Require fresh durable claims for every task.
+  const pending = new Map(queued.slice(0,tasks).map(item => [item.id, item.heartbeat_at || '']));
   const assignmentUrl = new URL('https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs');
   assignmentUrl.searchParams.set('select', 'id,status,lease_owner,heartbeat_at,last_error');
-  assignmentUrl.searchParams.set('id', 'eq.' + jobId);
+  assignmentUrl.searchParams.set('id', 'in.(' + [...pending.keys()].join(',') + ')');
   for (let attempt = 0; attempt < assignmentAttempts; attempt++) {
     const check = await request(assignmentUrl, {headers:{apikey:token,Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
     if (!check.ok) throw new Error('COURSE_ASSIGNMENT_READ_HTTP_' + check.status);
     const rows = await check.json();
-    const job = rows?.[0];
-    if (job?.heartbeat_at && job.heartbeat_at > previousHeartbeat && job.heartbeat_at >= now.toISOString()) {
-      if (job.status === 'failed') throw new Error('COURSE_WORKER_FAILED_AFTER_ASSIGNMENT');
-      return {status:'assigned',jobId,workerId:job.lease_owner || null,heartbeatAt:job.heartbeat_at};
+    for (const job of rows ?? []) {
+      if (!pending.has(job.id)) continue;
+      if (job.status === 'failed') throw new Error('COURSE_WORKER_FAILED_AFTER_ASSIGNMENT:' + job.id);
+      if (job.lease_owner && job.heartbeat_at && job.heartbeat_at > pending.get(job.id) && job.heartbeat_at >= now.toISOString()) pending.delete(job.id);
     }
+    if (!pending.size) return {status:'assigned',tasks,jobIds:queued.slice(0,tasks).map(item=>item.id)};
     if (attempt + 1 < assignmentAttempts) await delay(5000);
   }
-  throw new Error('COURSE_WORKER_ASSIGNMENT_TIMEOUT:' + jobId);
+  throw new Error('COURSE_WORKER_ASSIGNMENT_TIMEOUT:' + [...pending.keys()].join(','));
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

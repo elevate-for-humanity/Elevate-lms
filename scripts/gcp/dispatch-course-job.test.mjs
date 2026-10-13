@@ -66,3 +66,12 @@ test('insufficient approved regional capacity leaves queued work untouched and d
   assert.equal(result.status,'capacity_wait');
   assert.equal(s.calls.some(c=>c.includes('execute')),false);
 });
+
+test('two eligible builds request two parallel Google Cloud Run worker tasks',async()=>{
+ const s=setup([],[{id:'queued',attempts:0,max_attempts:5},{id:'queued-2',attempts:0,max_attempts:5}]);
+ s.options.request=async url=>({ok:true,status:200,json:async()=>url.searchParams.has('id') ? [{id:'queued',status:'running',lease_owner:'worker-a',heartbeat_at:'2026-10-06T10:00:01Z'},{id:'queued-2',status:'running',lease_owner:'worker-b',heartbeat_at:'2026-10-06T10:00:01Z'}] : [{id:'queued',attempts:0,max_attempts:5},{id:'queued-2',attempts:0,max_attempts:5}]});
+ const result=await dispatchQueuedCourseJob(s.options);
+ assert.equal(result.tasks,2);
+ assert.ok(s.calls[2].includes('--tasks=2'));
+ assert.ok(s.calls[2].includes('--parallelism=2'));
+});

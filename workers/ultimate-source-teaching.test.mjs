@@ -88,3 +88,20 @@ test('questionless and single-question lessons do not repeat teaching across fal
   assert.notEqual(result.stageText.knowledge_check,result.stageText.assessment);
  }
 });
+
+test('canonical body and dedicated safety/procedure sections speak each substantial sentence once',async()=>{
+ const raw=stripTypeScriptTypes(await readFile(new URL('../lib/video/instructional-quality-gate.ts',import.meta.url),'utf8'));
+ const {repeatedTeachingSegments}=await import(data(raw));
+ const procedure='Inspect the clean cape before placing it on the client.';
+ const safety='Stop the service when damaged skin or an open wound is observed.';
+ const text='Authorized course content: '+JSON.stringify({
+  html:'<h1>Prepare the service</h1><p>Explain the service plan and confirm the requested result with the client.</p><h2>Procedure</h2><p>'+procedure+'</p><h2>Safety</h2><p>'+safety+'</p>',
+  experience:{practicalTask:procedure,readingGuide:{keyTakeaways:[safety]}}
+ });
+ const result=sourceTeaching([{id:'production',text}],'Service preparation');
+ assert.match(result.stageText.demonstration,/Inspect the clean cape/);
+ assert.match(result.stageText.mistake_and_correction,/Stop the service/);
+ assert.match(result.stageText.concept_explanation,/confirm the requested result/);
+ assert.equal(repeatedTeachingSegments(Object.values(result.stageText).join('\\n\\n')),0);
+ assert.equal(result.sequence.every(stage=>result.stageText[stage].trim()),true);
+});

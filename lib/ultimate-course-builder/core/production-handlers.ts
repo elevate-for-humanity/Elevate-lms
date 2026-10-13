@@ -99,7 +99,7 @@ async function findMediaWithTransientRetry(runtime: UltimateRuntime, request: an
 export function createProductionHandlers(runtime: UltimateRuntime): Record<string, StepHandler> {
   return {
     standards_lock: async (ctx) => {
-      const registered = /[0-9]{4}[a-z]{2}/i.test(ctx.profile.id);
+      const registered = !ctx.profile.id.startsWith('course:') && /[0-9]{4}[a-z]{2}/i.test(ctx.profile.id);
       const declaredCourseDefined =
         !registered &&
         (ctx.profile.authority === 'course-defined' ||

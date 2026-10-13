@@ -36,7 +36,8 @@ async function restore(component) {
   const profile=profiles[component],before=read(['run','services','describe',profile.name]);
   const spec=before.spec.template.spec,container=spec.containers[0];
   if(spec.containers.length!==1||!/@sha256:[a-f0-9]{64}$/.test(container.image))throw Error('Immutable single-container service required');
-  const changed=container.resources?.limits?.cpu!==profile.cpu||container.resources?.limits?.memory!==profile.memory;
+  const servesCurrent=before.status.traffic?.some(t=>t.percent===100&&t.revisionName===before.status.latestCreatedRevisionName);
+  const changed=!servesCurrent||container.resources?.limits?.cpu!==profile.cpu||container.resources?.limits?.memory!==profile.memory;
   const extra=[];let directory;
   if(component==='studio-browser') {
     const config=loadGoogleConfig(component);
@@ -80,7 +81,8 @@ async function restore(component) {
         google(['run','services','update-traffic',profile.name,...scope,'--to-revisions='+candidate+'=100','--quiet']);
       } finally {google(['run','services','update-traffic',profile.name,...scope,'--remove-tags=runtime-check','--quiet']);}
     } else {
-      const original=await fetch(before.status.url+'/api/version',{signal:AbortSignal.timeout(20000)});
+      const origins={marketing:'https://www.elevateforhumanity.org',admin:'https://admin.elevateforhumanity.org',lms:'https://app.elevateforhumanity.org',store:'https://store.elevateforhumanity.org'};
+      const original=await fetch(origins[component]+'/api/version',{signal:AbortSignal.timeout(60000)});
       const version=await original.json();const commit=version.commitSha||version.commit;
       if(!/^[a-f0-9]{40}$/.test(commit||''))throw Error('Serving image identity unavailable');
       await activateTestedRevision({service:profile.name,revision:candidate,commit});
@@ -92,12 +94,17 @@ async function restore(component) {
     return {component,changed:true,cpu:limits.cpu,memory:limits.memory,revision:candidate,imagePreserved:true,healthVerified:true};
   } finally {if(directory)rmSync(directory,{recursive:true,force:true});}
 }
+export function quotaContactEmail(values) {
+  return values.find(v=>typeof v==='string' && v===v.trim() &&
+    !Array.from(v).some(ch=>ch.trim()==='') && v.split('@').length===2 &&
+    Boolean(v.split('@')[0]) && v.split('@')[1].includes('.') && !v.endsWith('.'));
+}
 async function reportAndRequestQuota() {
   const token=google(['auth','print-access-token']);
   const base='https://cloudquotas.googleapis.com/v1/projects/484736877039/locations/global';
   const headers={Authorization:'Bearer '+token,'Content-Type':'application/json'};
   const admin=loadGoogleConfig('admin').runtimeEnvironment;
-  const contact=[process.env.QUOTA_CONTACT_EMAIL,admin.NEXT_PUBLIC_SUPPORT_EMAIL,admin.SUPPORT_EMAIL,admin.CONTACT_EMAIL].find(v=>typeof v==='string'&&/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(v));
+  const contact=quotaContactEmail([process.env.QUOTA_CONTACT_EMAIL,admin.NEXT_PUBLIC_SUPPORT_EMAIL,admin.SUPPORT_EMAIL,admin.CONTACT_EMAIL]);
   for(const [quotaId,desired] of [['MemAllocPerProjectRegion',64*2**30],['CpuAllocPerProjectRegion',32000]]) {
     const response=await fetch(base+'/services/run.googleapis.com/quotaInfos/'+quotaId,{headers,signal:AbortSignal.timeout(30000)});
     const info=await response.json();
@@ -129,7 +136,7 @@ async function main() {
   let failed=false;
   for(const component of components) {
     try{console.log(JSON.stringify(await restore(component)));}
-    catch(e){failed=true;console.error(JSON.stringify({component,restored:false,reason:e.code||'runtime_restore_failed'}));}
+    catch(e){failed=true;console.error(JSON.stringify({component,restored:false,reason:e.code||'runtime_restore_failed',detail:e.message}));}
   }
   if(failed)process.exitCode=1;
 }

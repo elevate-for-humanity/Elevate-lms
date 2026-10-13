@@ -10,7 +10,7 @@ permissions:
   id-token: write
 jobs:
   dispatch:
-    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == '3f6468961757949c813e25223172acd6de36eebe'
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == '00146b61006c8f2a8f505afbb38e5045ed132cee'
     runs-on: ubuntu-24.04
     steps:
       - env:
@@ -36,5 +36,5 @@ jobs:
           skip_install: true
       - env:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          COMPLETE_LESSON_IMAGE_SHA: '3f6468961757949c813e25223172acd6de36eebe'
+          COMPLETE_LESSON_IMAGE_SHA: '00146b61006c8f2a8f505afbb38e5045ed132cee'
         run: node scripts/gcp/start-fresh-complete-lessons.mjs

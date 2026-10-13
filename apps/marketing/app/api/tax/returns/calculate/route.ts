@@ -78,10 +78,6 @@ export async function POST(req: NextRequest) {
       { status: 422 },
     );
   }
-  const withholding = [...(w2 || []), ...(i1099 || [])].reduce(
-    (sum, row) => sum + Number(row.federal_withholding ?? 0),
-    0,
-  );
   let result: ReturnType<typeof calculateFederal1040_2026>;
   try {
     result = prepareStoredFederalReturn2026({
@@ -126,7 +122,7 @@ export async function POST(req: NextRequest) {
     taxable_income: result.taxableIncome,
     federal_tax: result.incomeTax,
     total_tax: result.totalTax,
-    federal_withholding: withholding,
+    federal_withholding: result.federalWithholding,
     estimated_refund: result.refundAmount,
     is_refund: result.refundAmount > 0,
     calculation_data: { ...result, returnId, ...estimateMetadata },

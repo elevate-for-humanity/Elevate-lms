@@ -12,6 +12,7 @@ const path =
 const source = compileTaxRoute(path);
 async function invoke(fault, malformed = false) {
   const writes = [];
+  const savedCalculations = [];
   const db = {
     auth: {
       getUser: async () => ({ data: { user: fault === 'anonymous' ? null : { id: 'owner' } } }),
@@ -25,7 +26,8 @@ async function invoke(fault, malformed = false) {
         eq() {
           return query;
         },
-        insert() {
+        insert(value) {
+          if (table === 'tax_calculations') savedCalculations.push(value);
           operation = 'insert';
           writes.push(table);
           return query;
@@ -96,6 +98,7 @@ async function invoke(fault, malformed = false) {
           taxableIncome: 0,
           incomeTax: 0,
           totalTax: 0,
+          federalWithholding: fault === 'extra-withholding' ? 500 : 0,
           totalPayments: 0,
           refundAmount: 0,
           amountOwed: 0,
@@ -123,7 +126,7 @@ async function invoke(fault, malformed = false) {
       return { returnId: 'return-1' };
     },
   });
-  return { response, writes };
+  return { response, writes, savedCalculations };
 }
 const cases = [
   ['malformed JSON', null, true, 400],
@@ -143,14 +146,16 @@ const cases = [
   ['return save failed', 'tax_returns:update', false, 500],
   ['return update matched no row', 'missing-update', false, 500],
   ['successful persistence', null, false, 200],
+  ['additional federal withholding persists', 'extra-withholding', false, 200],
 ];
 let failures = 0;
 for (const [name, fault, malformed, status] of cases) {
   try {
-    const { response, writes } = await invoke(fault, malformed);
+    const { response, writes, savedCalculations } = await invoke(fault, malformed);
     assert.equal(response.status, status);
     assert.equal(response.body.success === true, status === 200);
     if (status === 400 || name.includes('read failed')) assert.equal(writes.length, 0);
+    if (fault === 'extra-withholding') assert.equal(savedCalculations[0].federal_withholding, 500);
     console.log(`PASS ${name}`);
   } catch (error) {
     failures++;

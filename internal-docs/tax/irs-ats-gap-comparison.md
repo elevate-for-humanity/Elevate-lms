@@ -34,3 +34,13 @@ Nine original tax-core modules were identical in both repositories. The starter 
 `node scripts/tax-ats.mjs package --input=/path/package.json --out=/private/output`
 
 The package specification supplies submissionId, processingYear, returnXml/returnXsd, manifestXml/manifestXsd, soapEnvelopeXml/soapEnvelopeXsd and optional attachments with name/path. File paths are relative to the specification. Packages remain local; no command submits to IRS. Never commit identifiers, certificates, credentials, taxpayer XML or private SOR files.
+
+## Verified IRS account and package findings
+
+The signed-in IRS account shows HOTT KAMODITTY as legal name and Supersonic fast cash as DBA. The e-file application is Completed; Electronic Return Originator, Software Developer and Transmitter provider options are Accepted. EFIN is Active, and both a production transmitter ETIN and test developer ETIN are Active. These are account authorizations, separate from a specific software package passing ATS.
+
+The Software Products page returned zero records on this inspection. No new package was submitted, and no acceptance was inferred from the completed firm application.
+
+Downloaded through the authorized SOR session: September 24, 2026 IMF release and MeF WSDL 10.A for processing year 2027. The TY2026 v4.0 return-schema bundle contains 753 XSD files and 235 globally declared IRS document elements; these include shared and dependency documents, not 235 independently supported return products. The 1040 workbook has 1,846 Active, 18 Verbiage Change, 50 New, 169 Disabled and 115 Deleted rows. Status interpretation and applicability must follow the official release instructions; counting Active rows alone is insufficient.
+
+Use `python3 scripts/tax-irs-package-inventory.py --schemas=/private/2026v4.0 --rules=/private/1040_Business_Rules_2026v4.0.xlsm --repo=.` for a local field/rule inventory. The reader does not execute workbook macros. Private SOR files and IRS identifiers are intentionally excluded from the public repository.

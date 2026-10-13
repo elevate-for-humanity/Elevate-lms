@@ -45,7 +45,9 @@
     {
       "source": "app/tax-software/login/page.tsx",
       "target": "apps/marketing/app/tax-software/login/page.tsx",
-      "sha256": "5bc39165632af011ed10ea6af3af11fc44c286324f79aaaf54ad38912ddb0728"
+      "sha256": "8bce277e954f87ec2fc177dc9ffdc9831a17669fed1481836731efed7d04990a",
+      "sourceSha256": "5bc39165632af011ed10ea6af3af11fc44c286324f79aaaf54ad38912ddb0728",
+      "localRevisionReason": "Authorized portal security, saved estimate workflow, and auditable tax export repairs"
     },
     {
       "source": "app/tax-software/page.tsx",
@@ -75,7 +77,9 @@
     {
       "source": "app/tax-software/self-file/return/page.tsx",
       "target": "apps/marketing/app/tax-software/self-file/return/page.tsx",
-      "sha256": "deb47a15cccdc64c911ea90ac333a46ab6431c16fd7eb55ddfb3cab0f9e0ea4b"
+      "sha256": "8a7aa8d0a914286b7435b118195601c5926d6084930cc426d51f6f31fe1913d6",
+      "sourceSha256": "deb47a15cccdc64c911ea90ac333a46ab6431c16fd7eb55ddfb3cab0f9e0ea4b",
+      "localRevisionReason": "Authorized portal security, saved estimate workflow, and auditable tax export repairs"
     },
     {
       "source": "app/tax-software/self-file/w2/confirm/page.tsx",
@@ -90,7 +94,9 @@
     {
       "source": "app/api/tax/returns/calculate/route.ts",
       "target": "apps/marketing/app/api/tax/returns/calculate/route.ts",
-      "sha256": "4abe0d40e8551ecb71e3ef731fe56f27c3af6a93e7c929c9e4a4ce77de732bd1"
+      "sha256": "f62c97452d1c70a1fd9196b08585edd62df1934ab07f0d9eb3e2c4fd88fdefdb",
+      "sourceSha256": "4abe0d40e8551ecb71e3ef731fe56f27c3af6a93e7c929c9e4a4ce77de732bd1",
+      "localRevisionReason": "Authorized portal security, saved estimate workflow, and auditable tax export repairs"
     },
     {
       "source": "app/api/tax/returns/route.ts",
@@ -145,12 +151,16 @@
     {
       "source": "lib/tax-software/transmission/adapters/certification-export.ts",
       "target": "lib/tax-software/transmission/adapters/certification-export.ts",
-      "sha256": "5f6867666c2a0c4facd92322fc579e92f29e3e9877086780d4ffbf0a7af9c7af"
+      "sha256": "246dfdc1b0a50852451e82b92cffcacad32dec961fc04f3fa3647e8c5d4827b5",
+      "sourceSha256": "5f6867666c2a0c4facd92322fc579e92f29e3e9877086780d4ffbf0a7af9c7af",
+      "localRevisionReason": "Authorized portal security, saved estimate workflow, and auditable tax export repairs"
     },
     {
       "source": "lib/tax-software/transmission/hub.ts",
       "target": "lib/tax-software/transmission/hub.ts",
-      "sha256": "9bc9973640ccc8aa09f17a67178cd3c14a85a84159cd1b9406769f011b22e187"
+      "sha256": "a86cfdbf224337691719db7064de50f3d7f94eba1b5fec33fa1b05745eacb8d6",
+      "sourceSha256": "9bc9973640ccc8aa09f17a67178cd3c14a85a84159cd1b9406769f011b22e187",
+      "localRevisionReason": "Authorized portal security, saved estimate workflow, and auditable tax export repairs"
     },
     {
       "source": "app/tax-software/_components/TaxSecurityVerification.tsx",

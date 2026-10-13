@@ -1,4 +1,6 @@
 name: Verify Google public cutover prerequisites
+# Durable manages the authoritative DNS. Verify the Google load balancer,
+# public certificates and application routing without changing email records.
 on:
   push:
     branches: [main]

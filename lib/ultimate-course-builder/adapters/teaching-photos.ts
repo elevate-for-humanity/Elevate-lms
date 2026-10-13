@@ -11,6 +11,8 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
   const scenes = input.artifacts?.storyboard?.storyboard?.scenes;
   if (!Array.isArray(scenes)) throw new Error('TEACHING_PHOTO_STORYBOARD_REQUIRED');
   const photos: Record<string, any[]> = {};
+  const {data:placedPhotos,error:placementError}=await db.from('media_assets').select('id,storage_path,metadata').eq('lesson_id',input.lessonId).eq('asset_type','image').eq('storage_bucket','course_videos').eq('status','active');
+  if(placementError) throw placementError;
 
   for (const scene of scenes) {
     const steps = scene.teachingVisual?.steps;
@@ -23,6 +25,17 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
     photos[scene.id] = [];
     const usedLicensedPhotos = new Set<string>();
     for (const [index, step] of requests.entries()) {
+      const placed=placedPhotos?.find((p:any)=>p.metadata?.source==='openai-generated-illustration' && p.metadata?.reviewedIllustration===true && p.metadata?.sceneId===scene.id && p.metadata?.cueIndex===index && p.metadata?.narrationQuote===step.narrationQuote && /^[a-f0-9]{64}$/i.test(p.metadata?.sha256??'') && String(p.storage_path).startsWith('approved-teaching-photos/'));
+      if(placed){
+        const downloaded=await db.storage.from('course_videos').download(placed.storage_path);
+        if(downloaded.error||!downloaded.data) throw new Error('PLACED_TEACHING_PHOTO_READBACK_FAILED');
+        const sha256=createHash('sha256').update(Buffer.from(await downloaded.data.arrayBuffer())).digest('hex');
+        if(sha256!==placed.metadata.sha256) throw new Error('PLACED_TEACHING_PHOTO_HASH_MISMATCH');
+        const signed=await db.storage.from('course_videos').createSignedUrl(placed.storage_path,3600);
+        if(signed.error||!signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
+        photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),illustration:true,provider:'openai'});
+        continue;
+      }
       const licensed = selectReviewedTeachingPhoto(input.artifacts?.visual_assignment?.media?.readyAssets ?? [], step.narrationQuote, usedLicensedPhotos, compatibleVisualTask);
       if (licensed) {
         const downloaded = await db.storage.from('course_videos').download(licensed.storage_path);

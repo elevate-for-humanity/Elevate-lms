@@ -69,9 +69,6 @@ export default function HomePage() {
             </a>
           </div>
         </section>
-        <PlatformHubHero />
-        <HomeFeaturedHostShop />
-        <HomeCareerPathways />
         <HomeFunding />
         <HomeNetworks />
         <HomeEmployerStrip />

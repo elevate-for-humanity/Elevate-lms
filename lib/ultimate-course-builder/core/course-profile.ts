@@ -44,13 +44,16 @@ export async function hydrateUltimateProfileSources(
     if (previous?.assetId === assetId && previous.sha256 && previous.sha256 !== sha256)
       throw new Error('APPROVED_REFERENCE_VIDEO_CHANGED');
     profile = { ...profile, lessonPresentation: presentation, presentationContract: {
-      version: 'owner-approved-video-2026-10-12.2',
+      version: 'owner-approved-video-2026-10-13.3',
       approvedReferenceVideo: { assetId, storagePath, sha256, approvedAt: '2026-10-12', permittedUses: ['presentation-reference'] },
       visualStyle: { cropMode: 'contain', transition: 'crossfade' },
       instructions: [
         'Use the owner-approved reference as the presentation standard, never as reusable lesson footage.',
         'Show whole large photos with concise explanations; preserve hands, tools, and heads without cropping.',
-        'Use restrained transitions and unique task-relevant visuals; no generic filler or repeated photo loops.',
+        'Use multiple changing generated photographs within EVERY teaching moment, bound to specific spoken instructions. Generated photographs are illustrations; inspected licensed Envato footage demonstrates actual motion.',
+        'Use numbered side instructions with independent fades and finish EVERY teaching moment with a separately recorded, freshly worded source-reviewed recap.',
+        'Include tools and source-verified manufacturer-specific numbered guard lengths, consultation, hand hygiene, neck strip, draping, cutting, blending, finishing and cleanup where applicable.',
+        'Use restrained transitions inside the speech timeline and unique task-relevant visuals; no generic filler or repeated photo loops.',
         'Narration is the timing master: synchronize visuals, teaching text and persistent captions.',
         'No duplicate or overlapping narration, silent blank delays, or audible source-clip speech.',
         'Teach prerequisites and tools, preparation, step-by-step demonstration, finished-result inspection and sanitation.',

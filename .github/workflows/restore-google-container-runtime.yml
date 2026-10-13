@@ -4,6 +4,11 @@ on:
     branches: [main]
     paths: ['scripts/gcp/restore-container-runtime.mjs', 'scripts/gcp/restore-container-runtime.test.mjs', '.github/workflows/restore-google-container-runtime.yml']
   workflow_dispatch:
+    inputs:
+      quota_contact_email:
+        description: Contact email for Google quota review
+        required: false
+        type: string
 permissions:
   contents: read
   actions: write
@@ -37,4 +42,6 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with: {skip_install: true}
       - name: Restore original capacity and browser environment without rebuilding images
+        env:
+          QUOTA_CONTACT_EMAIL: ${{ inputs.quota_contact_email }}
         run: node scripts/gcp/restore-container-runtime.mjs

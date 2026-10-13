@@ -109,7 +109,7 @@ async function reportAndRequestQuota() {
   const headers={Authorization:'Bearer '+token,'Content-Type':'application/json'};
   const admin=loadGoogleConfig('admin').runtimeEnvironment;
   const contact=quotaContactEmail([process.env.QUOTA_CONTACT_EMAIL,admin.NEXT_PUBLIC_SUPPORT_EMAIL,admin.SUPPORT_EMAIL,admin.CONTACT_EMAIL]);
-  for(const [quotaId,desired] of [['MemAllocPerProjectRegion',64*2**30],['CpuAllocPerProjectRegion',32000]]) {
+  for(const [quotaId,desired] of [['MemAllocPerProjectRegion',48*2**30],['CpuAllocPerProjectRegion',24000]]) {
     const response=await fetch(base+'/services/run.googleapis.com/quotaInfos/'+quotaId,{headers,signal:AbortSignal.timeout(30000)});
     const info=await response.json();
     if(!response.ok){console.log(JSON.stringify({quotaId,readStatus:response.status,requestSubmitted:false}));continue;}

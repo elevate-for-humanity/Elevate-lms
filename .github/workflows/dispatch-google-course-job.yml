@@ -9,6 +9,7 @@ on:
   workflow_dispatch:
   schedule:
     # One-minute fallback if the immediate dispatch is lost or delayed.
+    # Recovery kick: resume the existing Barber build after its validator deployment.
     - cron: '* * * * *'
 permissions:
   contents: read

@@ -4,6 +4,7 @@ import { validateLessonBlueprint, type LessonBlueprint } from '../instructional/
 import { contractHash, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/lesson-contract';
 import { ULTIMATE_TEACHING_SEQUENCE } from '../instructional/teaching-sequence';
 import { produceTeachingVisual } from '../instructional/teaching-visual';
+import { addFreshTeachingRecaps } from '../instructional/teaching-recaps';
 import { sourceTeaching, narrationChunks } from '../instructional/source-teaching';
 import { authorGoogleLesson, generateVertexLessonJson, validateGoogleAuthoringEvidence, GOOGLE_LESSON_AUTHOR_VERSION } from '../instructional/google-lesson-author';
 
@@ -61,7 +62,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       return approved;
     }
     const existing = e.prior?.learning_objectives?.blueprint;
-    if (existing) {
+    if (existing && (e.profile.lessonPresentation !== 'approved-premium-v1' || (existing as any).presentationEvidence?.version === 'approved-moment-cues-v2')) {
       validateLessonBlueprint(existing, e.competency);
       if (e.profile.instructionalAuthoring?.provider === 'google') validateGoogleAuthoringEvidence(existing, lessonSources);
       return existing;
@@ -94,8 +95,9 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     if (e.profile.instructionalAuthoring?.provider === 'google') {
       const config = e.profile.instructionalAuthoring;
       if (config.version !== GOOGLE_LESSON_AUTHOR_VERSION) throw new Error('ULTIMATE_AUTHORING_VERSION_REQUIRED');
-      return authorGoogleLesson({ profile: e.profile, competency: e.competency, sources },
+      const authored = await authorGoogleLesson({ profile: e.profile, competency: e.competency, sources },
         (system, input) => generateVertexLessonJson(config.model, system, input, config.location));
+      return e.profile.lessonPresentation === 'approved-premium-v1' ? addFreshTeachingRecaps(authored,e.profile,sources) : authored;
     }
 
     // Active Course Builder is deterministic and source-bound. The archived
@@ -213,7 +215,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       },
     };
     validateLessonBlueprint(blueprint, e.competency);
-    return blueprint;
+    return e.profile.lessonPresentation === 'approved-premium-v1' ? addFreshTeachingRecaps(blueprint,e.profile,sources) : blueprint;
   }
   async objectives(input: unknown) {
     return (await this.blueprint(input)).objectives;
@@ -226,7 +228,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
   }
   async instructorScript(input: unknown) {
     const b = await this.blueprint(input);
-    const segments = storyboardSegments(b.segments);
+    const segments = storyboardSegments(b.segments).map((s:any)=>s.recapText ? {...s,teachingText:s.text,text:s.text+'\n\n'+s.recapText,narrationParts:[{text:s.text,isRecap:false},{text:s.recapText,isRecap:true}]} : s);
     return {
       script: segments.map((s) => s.text).join('\n\n'),
       segments,
@@ -243,8 +245,9 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       scenes: storyboardSegments(b.segments).map((s) => ({
         id: `scene:${s.id}`,
         scriptSegmentId: s.id,
-        dialogue: s.text,
-        teachingPoint: s.text,
+        dialogue: (s as any).recapText ? s.text+'\n\n'+(s as any).recapText : s.text,
+        teachingPoint: (s as any).recapText ? s.text+'\n\n'+(s as any).recapText : s.text,
+        recapText: (s as any).recapText,
         title: s.stage.replace(/_/g, ' '),
         stage: s.stage,
         objectiveIds: s.objectiveIds,

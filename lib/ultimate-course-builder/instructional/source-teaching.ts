@@ -130,6 +130,28 @@ export function sourceTeaching(sources: Source[], title: string) {
     remediation: `If your answer differed from the explanation, return to that part of the lesson. Explain the reason for the correct answer, work through another example with your instructor, and attempt a different question.`,
     recap: clean(recap) || `You have worked through ${title}, practiced applying it, and checked your response. Explain the steps and the reasons for your decisions. Use the lesson to check any point you cannot yet explain.`,
   };
+  // Canonical HTML often includes the same procedure/safety passage supplied
+  // separately for its teaching stage. Give those stages ownership, then remove
+  // exact substantial sentence duplicates from the explanation and recap.
+  // This preserves every distinct source statement and the safety/procedure
+  // sequence; it does not relax the delivered-audio duplication check.
+  const seenNarration = new Set<string>();
+  const ownership = ['demonstration','mistake_and_correction','terminology','instructor_example',
+    'concept_explanation','guided_practice','knowledge_check','assessment','recap',
+    'why_it_matters','activate_prior_knowledge','independent_practice','remediation'];
+  for (const stage of ownership) {
+    const sentences = stageText[stage].split(/(?<=[.!?])\\s+|\\n+/);
+    stageText[stage] = sentences.filter(sentence => {
+      const words = sentence.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+      if (words.length < 6) return true;
+      const key = words.join(' ');
+      if (seenNarration.has(key)) return false;
+      seenNarration.add(key);
+      return true;
+    }).join(' ').trim();
+    if (!stageText[stage]) stageText[stage] =
+      `For ${stage.replace(/_/g, ' ')} in ${title}, explain the taught information in your own words and check your response against the lesson.`;
+  }
   return { stageText, questions, precautions, procedureEvidence: steps, sequence: ULTIMATE_TEACHING_SEQUENCE };
 }
 // Keep source sentences intact while bounding individual narration/ASR work.

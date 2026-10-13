@@ -30,4 +30,12 @@ async function main(){
     onResult:result=>{if(result.claimed||once)console.log('[UltimateWorker] processed',result);},
   });
 }
-main().catch(error=>{console.error('[UltimateWorker] fatal',error);process.exit(1);});
+main().catch(error=>{
+  // Log the failure class and stack without serializing request/config objects,
+  // which can contain runtime credentials.
+  const failure = error instanceof Error
+    ? {name:error.name,message:error.message,stack:error.stack}
+    : {name:'UnknownError',message:String(error)};
+  console.error('[UltimateWorker] fatal',JSON.stringify(failure));
+  process.exitCode=1;
+});

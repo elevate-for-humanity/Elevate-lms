@@ -32,14 +32,18 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
      const bytes=await readFile(pcm);
      const measured=await measureNarrationCaptions(bytes,recording.text,durationSeconds);
      captions.push(...measured.map((c:any)=>({...c,startSeconds:cursor+c.startSeconds,endSeconds:cursor+c.endSeconds})));
-     const audioUrl=await uploadLessonMediaBuffer(bytes,input.lessonId+'-'+index+'-'+partIndex,'wav');
+     const encoded=join(directory,index+'-'+partIndex+'-delivery.mp3');
+     await execute('ffmpeg',['-v','error','-y','-i',pcm,'-c:a','libmp3lame','-b:a','128k',encoded]);
+     const audioUrl=await uploadLessonMediaBuffer(await readFile(encoded),input.lessonId+'-'+index+'-'+partIndex,'mp3');
      parts.push({text:recording.text,isRecap:recording.isRecap===true,startSeconds:cursor,durationSeconds,audioUrl});
      files.push(pcm);cursor+=durationSeconds;
     }
     const list=join(directory,index+'-concat.txt'),master=join(directory,index+'-master.wav');
     await writeFile(list,files.map(file=>"file '"+file.replace(/'/g,"'\\''")+"'").join('\n'));
     await execute('ffmpeg',['-v','error','-y','-f','concat','-safe','0','-i',list,'-c:a','pcm_s16le',master]);
-    const audioUrl=await uploadLessonMediaBuffer(await readFile(master),input.lessonId+'-'+segment.id.replace(/[^a-zA-Z0-9-]/g,'-'),'wav');
+    const delivery=join(directory,index+'-master.mp3');
+    await execute('ffmpeg',['-v','error','-y','-i',master,'-c:a','libmp3lame','-b:a','128k',delivery]);
+    const audioUrl=await uploadLessonMediaBuffer(await readFile(delivery),input.lessonId+'-'+segment.id.replace(/[^a-zA-Z0-9-]/g,'-'),'mp3');
     segments.push({segmentId:segment.id,text:parts.map(p=>p.text).join('\n\n'),audioUrl,durationSeconds:cursor,captions,parts});
    }
    return {provider:configuredNarrationProvider(),segments,transcript:segments.map(s=>s.text).join('\n\n'),durationSeconds:segments.reduce((sum,s)=>sum+s.durationSeconds,0)};

@@ -160,11 +160,15 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       courseScopedData.map(async (asset: RecordLike) => {
         const entitlement = firstRecord(asset.licensed_media_entitlements);
         const metadata = firstRecord(entitlement.metadata);
-        let publicUrl = typeof asset.video_url === 'string' ? asset.video_url : '';
-        if (!publicUrl && asset.storage_path) {
+        // The entitlement owns the current private source. A historical lesson
+        // URL must not override a replacement uploaded under the same item.
+        const stored = storedLicensedMediaMetadata(metadata);
+        const storagePath = stored?.storage_path ?? asset.storage_path;
+        let publicUrl = stored ? '' : (typeof asset.video_url === 'string' ? asset.video_url : '');
+        if (!publicUrl && storagePath) {
           const { data: signed, error: signedError } = await this.db.storage
             .from('course_videos')
-            .createSignedUrl(String(asset.storage_path), 60 * 60 * 24);
+            .createSignedUrl(String(storagePath), 60 * 60 * 24);
           if (signedError) throw signedError;
           publicUrl = signed?.signedUrl ?? '';
         }
@@ -174,6 +178,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
         return {
           ...asset,
           id: String(asset.id),
+          storage_path: storagePath,
           public_url: publicUrl,
           mime_type: metadata.mime_type,
           provider: entitlement.provider ?? 'envato',

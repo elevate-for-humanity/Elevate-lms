@@ -122,7 +122,7 @@ async function reportAndRequestQuota() {
     const list=await listed.json();
     if(!listed.ok){console.log(JSON.stringify({...report,reason:'quota_request_permission_unavailable',httpStatus:listed.status}));continue;}
     const current=list.quotaPreferences?.find(p=>p.service==='run.googleapis.com'&&p.quotaId===quotaId&&p.dimensions?.region==='us-central1');
-    if(current&&Number(current.quotaConfig?.preferredValue)>=desired){console.log(JSON.stringify({...report,existingRequest:true,pending:current.reconciling===true,preferenceGranted:current.quotaConfig?.grantedValue,stateDetail:current.quotaConfig?.stateDetail}));continue;}
+    if(current&&Number(current.quotaConfig?.preferredValue)>=desired&&current.reconciling===true){console.log(JSON.stringify({...report,existingRequest:true,pending:true,preferenceGranted:current.quotaConfig?.grantedValue}));continue;}
     const payload={service:'run.googleapis.com',quotaId,dimensions:{region:'us-central1'},quotaConfig:{preferredValue:String(desired)},contactEmail:contact,
       justification:'Restore migrated Elevate platform containers to their original Northflank 4 CPU and 8 GiB configuration, with bounded browser and course-worker capacity and safe revision overlap.'};
     const url=current?'https://cloudquotas.googleapis.com/v1/'+current.name+'?updateMask=quotaConfig,justification,contactEmail':base+'/quotaPreferences';

@@ -1,3 +1,4 @@
+import {spawnSync} from 'node:child_process';
 import {google,PROJECT} from './runtime-config.mjs';
 import {activateTestedRevision} from './activate-tested-public-revision.mjs';
 const scope=['--project='+PROJECT,'--region=us-central1'];
@@ -10,7 +11,8 @@ async function main() {
     const before=state(name);
     const stale=(before.status.traffic||[]).filter(t=>t.tag&&!t.percent&&t.revisionName!==before.status.latestCreatedRevisionName&&(/^(c-[a-f0-9]{12}|runtime-check|host-shop-verify)$/.test(t.tag)));
     if(stale.length) {
-      google(['run','services','update-traffic',name,...scope,'--remove-tags='+stale.map(t=>t.tag).join(','),'--quiet']);
+      const operation=spawnSync('gcloud',['run','services','update-traffic',name,...scope,'--remove-tags='+stale.map(t=>t.tag).join(','),'--quiet'],{encoding:'utf8'});
+      if(operation.status!==0){console.log(JSON.stringify({service:name,tagCleanupFailed:true,quotaDetails:(operation.stderr||'').split('\n').filter(line=>/quota|memory|cpu|allocation|maximum|limit/i.test(line)).slice(0,12)}));continue;}
       if(!equal(serving(before),serving(state(name))))throw Error('Concurrent traffic change; stop');
     }
     console.log(JSON.stringify({service:name,removedUnusedTags:stale.map(t=>t.tag)}));

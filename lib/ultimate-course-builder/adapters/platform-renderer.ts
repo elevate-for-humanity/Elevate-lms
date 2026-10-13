@@ -310,7 +310,11 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
     const storyboard = directMedia(prepared);
     const teachingPhotos = rawStoryboard(materialized).scenes.map((scene:any)=>materialized.teachingPhotos?.[scene.id]);
     if(input.lessonPresentation === 'approved-premium-v1') storyboard.scenes.forEach((scene:any,index:number)=>{
-      if(!scene.sourceVideoUrl) scene.referenceImageUrl=teachingPhotos[index]?.[0]?.imageUrl;
+      if(!scene.sourceVideoUrl) {
+        scene.referenceImageUrl=teachingPhotos[index]?.[0]?.imageUrl;
+        scene.resolvedProvider='openai';scene.resolvedModel='generated-teaching-photograph';
+        delete scene.sourceProviderItemId;delete scene.sourceLicenseEvidenceUrl;
+      }
     });
     // Presentation instructions are course data, never a barber-specific constant.
     // Preserve the owner's approved reference identity through the render result.

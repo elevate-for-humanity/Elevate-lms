@@ -42,4 +42,4 @@ jobs:
           FORCE_COURSE_RESTART: '1'
         run: node scripts/gcp/start-repaired-course-overflow.mjs
 
-# Authorized course restart: 2026-10-13T13:03Z.
+# Authorized course restart: 2026-10-13T13:05Z; verified deployment 5be332c.

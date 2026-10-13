@@ -322,6 +322,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       instructorId: instructorFor(courseTitle),
       ultimateStrict: true,
       lessonPresentation: input.lessonPresentation,
+      visualStyle,
       requireVisualEvidence: true,
       narrationSegments: input.artifacts?.natural_narration?.narration?.segments,
     });

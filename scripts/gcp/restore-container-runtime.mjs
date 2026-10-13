@@ -97,7 +97,7 @@ async function reportAndRequestQuota() {
   const base='https://cloudquotas.googleapis.com/v1/projects/484736877039/locations/global';
   const headers={Authorization:'Bearer '+token,'Content-Type':'application/json'};
   const admin=loadGoogleConfig('admin').runtimeEnvironment;
-  const contact=[admin.NEXT_PUBLIC_SUPPORT_EMAIL,admin.SUPPORT_EMAIL,admin.CONTACT_EMAIL].find(v=>typeof v==='string'&&/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(v));
+  const contact=[process.env.QUOTA_CONTACT_EMAIL,admin.NEXT_PUBLIC_SUPPORT_EMAIL,admin.SUPPORT_EMAIL,admin.CONTACT_EMAIL].find(v=>typeof v==='string'&&/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(v));
   for(const [quotaId,desired] of [['MemAllocPerProjectRegion',64*2**30],['CpuAllocPerProjectRegion',32000]]) {
     const response=await fetch(base+'/services/run.googleapis.com/quotaInfos/'+quotaId,{headers,signal:AbortSignal.timeout(30000)});
     const info=await response.json();

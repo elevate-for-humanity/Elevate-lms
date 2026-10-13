@@ -598,6 +598,7 @@ export async function renderStoryboardVideo(
     for (const [index, scene] of input.storyboard.scenes.entries()) {
       const narration = scene.dialogue?.trim() || scene.action.trim();
       const approvedAudio = input.narrationSegments?.[index];
+      if(premium&&!approvedAudio?.wordAlignment?.length) throw new Error('APPROVED_MEASURED_WORD_ALIGNMENT_REQUIRED');
       if (input.ultimateStrict && (!approvedAudio || approvedAudio.text !== narration))
         throw new Error('ULTIMATE_RENDER_APPROVED_AUDIO_REQUIRED');
       let audioSrc: string;

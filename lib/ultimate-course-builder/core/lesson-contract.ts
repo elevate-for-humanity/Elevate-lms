@@ -39,6 +39,7 @@ export function stepInputHash(
     // fix, while retaining the unchanged standards checkpoint. Downstream
     // stages are rebuilt from the new teaching artifact by the runner.
     ...(step === 'learning_objectives' ? { instructionalProducer: 'approved-moment-photos-and-fresh-recaps-v4' } : {}),
+    ...(step === 'natural_narration' ? { narrationProducer: 'separate-pcm-parts-immutable-mp3-word-alignment-v2' } : {}),
     ...(step === 'instructor_script' ? { scriptProducer: 'stage-aligned-scenes-v1' } : {}),
     ...(step === 'visual_assignment' ? { visualAssignmentProducer: 'distinct-stored-files-v2' } : {}),
     dependencies: dependencies.map((s) => [s, contractHash(artifactPayload(prior[s] ?? {}))]),

@@ -140,7 +140,7 @@ export function sourceTeaching(sources: Source[], title: string) {
     'concept_explanation','guided_practice','knowledge_check','assessment','recap',
     'why_it_matters','activate_prior_knowledge','independent_practice','remediation'];
   for (const stage of ownership) {
-    const sentences = stageText[stage].split(/(?<=[.!?])\\s+|\\n+/);
+    const sentences = stageText[stage].split(/(?<=[.!?])\s+|\n+/);
     stageText[stage] = sentences.filter(sentence => {
       const words = sentence.toLowerCase().match(/[a-z0-9]+/g) ?? [];
       if (words.length < 6) return true;

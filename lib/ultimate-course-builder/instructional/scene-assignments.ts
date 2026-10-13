@@ -6,7 +6,7 @@ import { compatibleVisualTask, reviewedSceneEvidence } from './reviewed-scene-ev
  * Automatic assignment never treats a title alone as proof: the asset must
  * have entitlement/license evidence and either explicit reviewed coverage or
  * a persisted lesson match with positive semantic overlap to the scene. */
-export function buildSceneAssignments(scenes: any[], assets: any[], configured: any[] = [], options: {requiresPracticalEvidence?: boolean; competencyType?: string} = {}) {
+export function buildSceneAssignments(scenes: any[], assets: any[], configured: any[] = [], options: {requiresPracticalEvidence?: boolean; competencyType?: string; allowInspectedMotionExcerpts?: boolean} = {}) {
   const assignments: any[] = [];
   const gaps: any[] = [];
 
@@ -93,6 +93,13 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
             asset.relevance_reason ??
             `Verified visual coverage is compatible with the scene requirement: ${scene.visualRequirement}`;
           method = 'verified-coverage';
+        } else if (physicalScene(scene) && options.allowInspectedMotionExcerpts &&
+          String(asset.mime_type??'').startsWith('video/') &&
+          asset.visual_observation?.method === 'sampled-frame-inspection' &&
+          asset.visual_observation.contentSha256 === asset.content_sha256) {
+          const quotes=scene.teachingVisual?.steps?.map((step:any)=>step.narrationQuote)??[];
+          const supported=quotes.find((quote:string)=>(asset.visual_observation.visibleActions??[]).some((action:string)=>compatibleVisualTask(quote,action)));
+          if(supported){reason='Inspected motion excerpt supports the spoken action: '+supported;method='inspected-motion-excerpt';}
         } else if ((visualEvidence = reviewedSceneEvidence(scene, asset))) {
           reason = `Inspected source shows ${visualEvidence.matchedActions.join('; ')}. ` +
             `This supports the scene's contextual visual task through compatible action coverage. ${visualEvidence.scope}`;

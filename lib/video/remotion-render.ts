@@ -12,9 +12,11 @@
 import 'server-only';
 
 import path from 'path';
+import {createHash} from 'node:crypto';
 import { renderConcurrency } from './render-concurrency.mjs';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import { motionExcerptWindow } from '../ultimate-course-builder/instructional/motion-excerpt.mjs';
 import { pictureTimeline } from '../ultimate-course-builder/instructional/picture-timeline.mjs';
 import { assertPremiumSpeechSignal } from '../ultimate-course-builder/instructional/approved-presentation.mjs';
 import { installRemotionHostCompatibility } from './remotion-host-compat.mjs';
@@ -113,6 +115,7 @@ async function measuredAudioDurationSeconds(audioPath: string): Promise<number |
 
 export interface StoryboardRenderInput {
   teachingPhotos?: any[][];
+  motionEvidence?: Array<{visibleActions:string[];contentSha256?:string}>;
   lessonPresentation?: 'approved-premium-v1';
   visualStyle?: {cropMode?: 'contain' | 'cover-safe'; transition?: 'cut' | 'crossfade'};
   lessonId: string;
@@ -839,13 +842,22 @@ export async function renderStoryboardVideo(
       // keep Chromium encoding indefinitely.
       const durationSeconds = premium ? narrationSeconds : Math.max(narrationSeconds, 4);
       resolvedStoryboard.scenes[index].durationSeconds = durationSeconds;
+      let motionCue:any;
       if (input.ultimateStrict && clipUrl) {
         const response = await fetch(clipUrl, { signal: AbortSignal.timeout(60000) });
         if (!response.ok) throw new Error(`Licensed visual returned HTTP ${response.status}`);
         const visualPath = path.join(paths.outputDir, `visual-${index}.mp4`);
-        await writeFile(visualPath, Buffer.from(await response.arrayBuffer()));
+        const clipBytes=Buffer.from(await response.arrayBuffer());
+        if(premium&&createHash('sha256').update(clipBytes).digest('hex')!==input.motionEvidence?.[index]?.contentSha256)
+          throw new Error('INSPECTED_MOTION_BYTES_CHANGED');
+        await writeFile(visualPath,clipBytes);
         const sourceSeconds = await measuredAudioDurationSeconds(visualPath);
-        if (!sourceSeconds || sourceSeconds < (approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds ?? durationSeconds))
+        if(premium) {
+          const photos=input.teachingPhotos?.[index];
+          const primaryEnd=approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds;
+          const timed=pictureTimeline(photos,approvedAudio?.captions??[],durationSeconds,primaryEnd);
+          motionCue=motionExcerptWindow(timed,input.motionEvidence?.[index],sourceSeconds,primaryEnd);
+        } else if (!sourceSeconds || sourceSeconds < durationSeconds)
           throw new Error(`ULTIMATE_VISUAL_DURATION_INSUFFICIENT:${index + 1}`);
       }
       const bullets = narration
@@ -875,6 +887,7 @@ export async function renderStoryboardVideo(
         strictBlueprint: input.ultimateStrict,
         teachingVisual: scene.teachingVisual,
         physicalDemonstration: scene.physicalDemonstration,
+        motionCue,
         recapStartSeconds: approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds,
         recapText: approvedAudio?.parts?.find(p=>p.isRecap)?.text,
         ...(premium ? {pictureCues: pictureTimeline(input.teachingPhotos?.[index],approvedAudio?.captions??[],durationSeconds,approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds)} : {}),
@@ -884,7 +897,7 @@ export async function renderStoryboardVideo(
     // Final trust boundary before Chromium. Runtime provider and storage values
     // must be normalized even when their SDK declarations claim strings.
     const normalizedScenes = normalizeSlideLessonScenes(scenes);
-    if(premium) resolvedStoryboard.scenes.forEach((scene:any,i:number)=>{scene.pictureCues=normalizedScenes[i].pictureCues;scene.recapStartSeconds=normalizedScenes[i].recapStartSeconds;scene.recapText=normalizedScenes[i].recapText;});
+    if(premium) resolvedStoryboard.scenes.forEach((scene:any,i:number)=>{scene.motionCue=normalizedScenes[i].motionCue;scene.pictureCues=normalizedScenes[i].pictureCues;scene.recapStartSeconds=normalizedScenes[i].recapStartSeconds;scene.recapText=normalizedScenes[i].recapText;});
     if (input.requireVisualEvidence) {
       const primaryVisuals = normalizedScenes.map((scene) => scene.clipUrl || scene.imageUrl);
       const missing = primaryVisuals

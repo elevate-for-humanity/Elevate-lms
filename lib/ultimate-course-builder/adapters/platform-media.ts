@@ -213,7 +213,7 @@ export class UltimatePlatformMedia implements UltimateMediaPort {
       scenes,
       inspectedAssets,
       input.profile?.sceneAssignments?.[input.competency?.id] ?? [],
-      {requiresPracticalEvidence: input.competency?.requiresPracticalEvidence === true, competencyType:input.competency?.type},
+      {requiresPracticalEvidence: input.competency?.requiresPracticalEvidence === true, competencyType:input.competency?.type,allowInspectedMotionExcerpts:input.profile?.presentationContract?.version==='owner-approved-video-2026-10-13.3'},
     );
     if (gaps.length) {
       const workspaceId = firstRecord(

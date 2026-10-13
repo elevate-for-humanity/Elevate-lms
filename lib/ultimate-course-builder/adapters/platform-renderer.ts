@@ -309,8 +309,15 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
     ]);
     const storyboard = directMedia(prepared);
     const teachingPhotos = rawStoryboard(materialized).scenes.map((scene:any)=>materialized.teachingPhotos?.[scene.id]);
+    const motionEvidence=rawStoryboard(materialized).scenes.map((scene:any)=>{
+      const media=visualAssignment(materialized);
+      const assignment=media.assignments?.find((a:any)=>a.sceneId===scene.id);
+      const asset=media.readyAssets?.find((a:any)=>a.id===assignment?.assetId);
+      return {visibleActions:asset?.visual_observation?.visibleActions??[],contentSha256:asset?.content_sha256};
+    });
     if(input.lessonPresentation === 'approved-premium-v1') storyboard.scenes.forEach((scene:any,index:number)=>{
-      if(!scene.sourceVideoUrl) {
+      if(!scene.physicalDemonstration) {
+        scene.sourceVideoUrl=undefined;
         scene.referenceImageUrl=teachingPhotos[index]?.[0]?.imageUrl;
         scene.resolvedProvider='google';scene.resolvedModel='generated-teaching-photograph';
         delete scene.sourceProviderItemId;delete scene.sourceLicenseEvidenceUrl;
@@ -338,6 +345,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       lessonPresentation: input.lessonPresentation,
       visualStyle,
       teachingPhotos,
+      motionEvidence,
       requireVisualEvidence: true,
       narrationSegments: input.artifacts?.natural_narration?.narration?.segments,
     });

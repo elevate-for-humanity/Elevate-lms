@@ -1,4 +1,4 @@
-import { AbsoluteFill, Audio, Img, Video, interpolate, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Audio, Img, Video, Sequence, interpolate, useCurrentFrame, useVideoConfig } from 'remotion';
 import type { SceneData, SlideLessonProps } from './SlideLesson';
 import { measuredTeachingStep } from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
 import { activePictureCue, quoteStartSeconds } from '../../lib/ultimate-course-builder/instructional/picture-timeline.mjs';
@@ -17,7 +17,7 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
  const cue=cues?.length?activePictureCue(cues,seconds):null;
  const cueIndex=cue?cues!.indexOf(cue):-1,previous=cueIndex>0?cues![cueIndex-1]:null;
  const whole={width:'100%',height:'100%',objectFit:'contain' as const};
- const demonstration=Boolean(scene.clipUrl)&&!recap;
+ const demonstration=Boolean(scene.clipUrl)&&Boolean(scene.motionCue)&&seconds>=scene.motionCue!.startSeconds&&seconds<scene.motionCue!.endSeconds&&!recap;
  const photo=(url:string,opacity=1)=><Img src={url} style={{...whole,position:'absolute',inset:0,opacity}}/>;
  const textStart=recap?scene.recapStartSeconds!:step?.narrationQuote?quoteStartSeconds(step.narrationQuote,scene.captionCues??[]):0;
  return <AbsoluteFill style={{background:'#171717',color:'#fff',fontFamily:'Arial, sans-serif'}}>
@@ -28,7 +28,9 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
   </div>
   <div style={{position:'absolute',left:54,top:210,width:1120,height:710,background:'#171717',borderRadius:12,overflow:'hidden'}}>
    {demonstration?<div style={{position:'absolute',top:0,left:0,right:0,height:cue?490:710}}>
-     <Video src={scene.clipUrl!} muted style={whole}/>
+     <Sequence from={Math.round(scene.motionCue!.startSeconds*fps)} durationInFrames={Math.max(1,Math.round((scene.motionCue!.endSeconds-scene.motionCue!.startSeconds)*fps))}>
+      <Video src={scene.clipUrl!} muted style={whole}/>
+     </Sequence>
     </div>:null}
    <div style={{position:'absolute',top:demonstration&&cue?510:0,left:0,right:0,height:demonstration&&cue?200:710}}>
     {cue?<>
@@ -40,7 +42,7 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
   <div style={{position:'absolute',left:1220,right:54,top:225,height:680,display:'flex',flexDirection:'column',justifyContent:'center',gap:28,opacity:fade(textStart)}}>
    <div style={{fontSize:32,color:'#cdb795',lineHeight:1.25}}>{recap?'Fresh recap':String(stepIndex+1).padStart(2,'0')+'  '+step?.label}</div>
    <div style={{fontSize:recap?32:38,lineHeight:1.35}}>{recap?scene.recapText:step?.value}</div>
-   <div style={{fontSize:22,color:'#cdb795'}}>Illustrations support learning; complete observed practice with your instructor.</div>
+   <div style={{fontSize:22,color:'#cdb795'}}>{demonstration?'Inspected motion demonstration excerpt.':'Illustrations support learning; complete observed practice with your instructor.'}</div>
   </div>
   <div style={{position:'absolute',bottom:0,left:0,right:0,height:125,background:'#080808',borderTop:'2px solid #cdb795',display:'flex',alignItems:'center',justifyContent:'center',padding:'14px 70px',boxSizing:'border-box',fontSize:36,lineHeight:1.3,textAlign:'center'}}>{caption}</div>
   {scene.audioSrc&&<Audio src={scene.audioSrc} volume={1}/>}

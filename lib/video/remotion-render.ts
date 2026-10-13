@@ -112,6 +112,7 @@ async function measuredAudioDurationSeconds(audioPath: string): Promise<number |
 
 export interface StoryboardRenderInput {
   lessonPresentation?: 'approved-premium-v1';
+  visualStyle?: {cropMode?: 'contain' | 'cover-safe'; transition?: 'cut' | 'crossfade'};
   lessonId: string;
   courseTitle: string;
   storyboard: MediaStoryboard;
@@ -935,6 +936,7 @@ export async function renderStoryboardVideo(
       courseTitle: input.courseTitle,
       lessonTitle: input.storyboard.title,
       scenes: normalizedScenes,
+      visualStyle: input.visualStyle,
       primaryColor: instructor.topBarColor,
       accentColor: instructor.accentColor,
       backgroundColor: '#f8fafc',
@@ -983,7 +985,7 @@ export async function renderStoryboardVideo(
         // Persist each segment in B2 so a new Cloud Run execution can resume.
         // A storyboard fingerprint prevents reuse after a scene/narration change.
         const fingerprint = (await import('node:crypto')).createHash('sha256')
-          .update(JSON.stringify({scenes, fps: composition.fps, totalFrames, lessonPresentation: input.lessonPresentation ?? 'legacy', layoutVersion: 3})).digest('hex').slice(0,24);
+          .update(JSON.stringify({scenes, fps: composition.fps, totalFrames, lessonPresentation: input.lessonPresentation ?? 'legacy', visualStyle: input.visualStyle, layoutVersion: 4})).digest('hex').slice(0,24);
         const segmentKey = `course-render-checkpoints/${input.lessonId}/${fingerprint}/${start}-${end}.mp4`;
         const storageReady = isElevateMediaStorageConfigured();
         const storage = storageReady ? getElevateMediaStorageClient() : null;

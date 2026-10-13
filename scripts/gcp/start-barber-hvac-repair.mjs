@@ -25,6 +25,7 @@ const allJobs=await rest('ultimate_build_jobs?build_id=in.('+builds.map(b=>b.id)
 const jobs=allJobs.filter(j=>j.build_id!=='d1d4ed9b-d45b-410e-8d89-53e751daa510');
 const cosmo=allJobs.find(j=>j.build_id==='d1d4ed9b-d45b-410e-8d89-53e751daa510');
 if(jobs.length!==2||!cosmo)throw Error('EXACT_BARBER_HVAC_JOBS_REQUIRED');
+if(jobs.every(j=>j.payload?.workerRepairVersion===expectedSha)){console.log(JSON.stringify({status:'repair_already_activated'}));process.exit(0);}
 if(!jobs.length){console.log(JSON.stringify({status:'no_runnable_regeneration'}));process.exit(0);}
 const queued=await rest('ultimate_build_jobs?select=id&status=eq.queued&available_at=lte.'+encodeURIComponent(new Date().toISOString()));
 if(queued.some(j=>!jobs.some(target=>target.id===j.id)))throw Error('UNRELATED_QUEUED_WORK_PRESENT');
@@ -36,6 +37,7 @@ if(!capacity.fits)throw Error('APPROVED_REGIONAL_CAPACITY_UNAVAILABLE');
 for(const j of jobs){
  const build=builds.find(b=>b.id===j.build_id);
  const payload=structuredClone(j.payload??{});
+ payload.workerRepairVersion=expectedSha;
  if(j.build_id==='078529f7-3cb3-4863-8afa-9d6bcaf167dd'){
   payload.repairCompetencyId='barber-b';
   payload.repairCompetencyIds=['barber-b',...(payload.repairCompetencyIds??[]).filter(id=>id!=='barber-b')];
@@ -51,6 +53,12 @@ for(const j of jobs){
 }
 const directory=mkdtempSync(join(tmpdir(),'course-repaired-'));
 try{
+ const parallel=read(['run','jobs','describe','elevate-course-builder-parallel']);
+ parallel.spec.template.spec.template.spec.containers[0].image=task.containers[0].image;
+ const parallelFile=join(directory,'parallel.json');
+ writeFileSync(parallelFile,JSON.stringify({apiVersion:'run.googleapis.com/v1',kind:'Job',metadata:{name:'elevate-course-builder-parallel',namespace:PROJECT},spec:parallel.spec}),{mode:0o600});
+ google(['run','jobs','replace',parallelFile,'--project='+PROJECT,'--region='+region,'--quiet']);
+ if(read(['run','jobs','describe','elevate-course-builder-parallel']).spec.template.spec.template.spec.containers[0].image!==task.containers[0].image)throw Error('CONTINUATION_IMAGE_READBACK_MISMATCH');
  const job={apiVersion:'run.googleapis.com/v1',kind:'Job',metadata:{name,namespace:PROJECT},spec:structuredClone(source.spec)};
  job.spec.template.spec.taskCount=tasks;job.spec.template.spec.parallelism=tasks;
  const file=join(directory,'job.json');writeFileSync(file,JSON.stringify(job),{mode:0o600});

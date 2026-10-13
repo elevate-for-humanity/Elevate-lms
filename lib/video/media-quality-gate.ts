@@ -440,10 +440,12 @@ export async function enforceMediaQuality(input: {
     const sourcedScenes = input.sceneData.scenes.filter((scene) =>
       Boolean(scene.resolvedProvider && scene.resolvedModel),
     );
+    const ownedGeneratedPhoto=(scene:any)=>scene.resolvedProvider==='google'&&scene.resolvedModel==='generated-teaching-photograph'&&scene.physicalDemonstration!==true&&
+      Array.isArray(scene.pictureCues)&&scene.pictureCues.length>=2&&scene.pictureCues.every((cue:any)=>cue.illustration===true&&/^[a-f0-9]{64}$/i.test(cue.sha256)&&String(cue.storagePath??'').startsWith('approved-teaching-photos/'));
     const licensedScenes = input.sceneData.scenes.filter((scene) =>
       Boolean(
         scene.resolvedProvider &&
-        !['remotion', 'elevate-owned', 'elevate-motion'].includes(scene.resolvedProvider),
+        !ownedGeneratedPhoto(scene) && !['remotion', 'elevate-owned', 'elevate-motion'].includes(scene.resolvedProvider),
       ),
     );
     const licensedScenesWithEvidence = licensedScenes.filter((scene) =>
@@ -474,6 +476,7 @@ export async function enforceMediaQuality(input: {
     );
     const verifiedExactScenes = exactScenes.filter((scene) => {
       const provider = scene.resolvedProvider ?? '';
+      if(ownedGeneratedPhoto(scene)) return true;
       if (['wan', 'ltx', 'remotion'].includes(provider)) return true;
       return Boolean(provider && scene.sourceLicenseEvidenceUrl);
     });

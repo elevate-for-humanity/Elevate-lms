@@ -8,7 +8,8 @@ on:
     types: [completed]
   workflow_dispatch:
   schedule:
-    - cron: '*/5 * * * *'
+    # One-minute fallback if the immediate dispatch is lost or delayed.
+    - cron: '* * * * *'
 permissions:
   contents: read
   actions: write

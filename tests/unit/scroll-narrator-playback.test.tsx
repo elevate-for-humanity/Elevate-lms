@@ -10,7 +10,7 @@ vi.mock('@/components/voice/useNaturalVoice', () => ({
 }));
 
 let visible = 'a';
-function setup() {
+function appendSections() {
   const main = document.createElement('main');
   for (const id of ['a', 'b']) {
     const section = document.createElement('section');
@@ -20,6 +20,9 @@ function setup() {
     main.append(section);
   }
   document.body.append(main);
+}
+function setup() {
+  appendSections();
   render(<ScrollNarrator />);
 }
 async function advance(ms: number) { await act(async () => { vi.advanceTimersByTime(ms); }); }
@@ -27,6 +30,32 @@ async function advance(ms: number) { await act(async () => { vi.advanceTimersByT
 describe('automatic page narration', () => {
   beforeEach(() => { vi.useFakeTimers(); vi.clearAllMocks(); localStorage.clear(); visible = 'a'; voice.play.mockResolvedValue(true); voice.prepare.mockResolvedValue(true); });
   afterEach(() => { cleanup(); document.querySelectorAll('main').forEach((node) => node.remove()); vi.useRealTimers(); });
+  it('discovers late streamed sections and does not restart for unrelated DOM changes', async () => {
+    render(<ScrollNarrator />);
+    expect(screen.queryByRole('button', { name: 'Stop page narration' })).not.toBeInTheDocument();
+    await act(async () => { appendSections(); });
+    expect(screen.getByRole('button', { name: 'Stop page narration' })).toBeVisible();
+    await advance(1400);
+    expect(voice.play).toHaveBeenCalledTimes(1);
+    await act(async () => { document.querySelector('main')!.append(document.createElement('p')); });
+    await advance(2000);
+    expect(voice.play).toHaveBeenCalledTimes(1);
+  });
+  it('keeps an explicit opt-out when narrated sections arrive late', async () => {
+    localStorage.setItem('elevate:scroll-narration', 'off');
+    render(<ScrollNarrator />);
+    await act(async () => { appendSections(); });
+    expect(screen.getByRole('button', { name: 'Play narration for this section' })).toHaveAttribute('aria-pressed', 'false');
+    await advance(3000);
+    expect(voice.play).not.toHaveBeenCalled();
+  });
+  it('stops narration when the last narrated section is removed', async () => {
+    setup(); await advance(1400);
+    voice.stop.mockClear();
+    await act(async () => { document.querySelector('main')!.replaceChildren(); });
+    expect(screen.queryByRole('button', { name: 'Stop page narration' })).not.toBeInTheDocument();
+    expect(voice.stop).toHaveBeenCalled();
+  });
   it('can stop the guided mode after narration fails, without starting another request', async () => {
     voice.play.mockResolvedValue(false);
     setup(); await advance(1400);

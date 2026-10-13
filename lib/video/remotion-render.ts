@@ -15,6 +15,7 @@ import path from 'path';
 import { renderConcurrency } from './render-concurrency.mjs';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import { pictureTimeline } from '../ultimate-course-builder/instructional/picture-timeline.mjs';
 import { assertPremiumSpeechSignal } from '../ultimate-course-builder/instructional/approved-presentation.mjs';
 import { installRemotionHostCompatibility } from './remotion-host-compat.mjs';
 import { mkdir, readFile, writeFile, unlink, rm, stat } from 'fs/promises';
@@ -111,6 +112,7 @@ async function measuredAudioDurationSeconds(audioPath: string): Promise<number |
 }
 
 export interface StoryboardRenderInput {
+  teachingPhotos?: any[][];
   lessonPresentation?: 'approved-premium-v1';
   visualStyle?: {cropMode?: 'contain' | 'cover-safe'; transition?: 'cut' | 'crossfade'};
   lessonId: string;
@@ -130,6 +132,7 @@ export interface StoryboardRenderInput {
     text: string;
     audioUrl: string;
     durationSeconds: number;
+    parts?: Array<{text:string;isRecap:boolean;startSeconds:number;durationSeconds:number;audioUrl:string}>;
     captions?: Array<{ startSeconds: number; endSeconds: number; text: string }>;
   }>;
 }
@@ -842,7 +845,7 @@ export async function renderStoryboardVideo(
         const visualPath = path.join(paths.outputDir, `visual-${index}.mp4`);
         await writeFile(visualPath, Buffer.from(await response.arrayBuffer()));
         const sourceSeconds = await measuredAudioDurationSeconds(visualPath);
-        if (!sourceSeconds || sourceSeconds < durationSeconds)
+        if (!sourceSeconds || sourceSeconds < (approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds ?? durationSeconds))
           throw new Error(`ULTIMATE_VISUAL_DURATION_INSUFFICIENT:${index + 1}`);
       }
       const bullets = narration
@@ -872,12 +875,16 @@ export async function renderStoryboardVideo(
         strictBlueprint: input.ultimateStrict,
         teachingVisual: scene.teachingVisual,
         physicalDemonstration: scene.physicalDemonstration,
+        recapStartSeconds: approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds,
+        recapText: approvedAudio?.parts?.find(p=>p.isRecap)?.text,
+        ...(premium ? {pictureCues: pictureTimeline(input.teachingPhotos?.[index],approvedAudio?.captions??[],durationSeconds,approvedAudio?.parts?.find(p=>p.isRecap)?.startSeconds)} : {}),
       });
     }
 
     // Final trust boundary before Chromium. Runtime provider and storage values
     // must be normalized even when their SDK declarations claim strings.
     const normalizedScenes = normalizeSlideLessonScenes(scenes);
+    if(premium) resolvedStoryboard.scenes.forEach((scene:any,i:number)=>{scene.pictureCues=normalizedScenes[i].pictureCues;scene.recapStartSeconds=normalizedScenes[i].recapStartSeconds;scene.recapText=normalizedScenes[i].recapText;});
     if (input.requireVisualEvidence) {
       const primaryVisuals = normalizedScenes.map((scene) => scene.clipUrl || scene.imageUrl);
       const missing = primaryVisuals

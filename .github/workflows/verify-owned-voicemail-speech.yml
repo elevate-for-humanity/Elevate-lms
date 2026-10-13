@@ -32,6 +32,8 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
+      - name: Install audio decoder from the runner's official Ubuntu repository
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Prepare public narration sample as telephone WAV
         run: ffmpeg -v error -y -i public/audio/narration/salon-saloon-host-tour.mp3 -t 10 -ar 8000 -ac 1 -c:a pcm_s16le /tmp/voicemail-speech-probe.wav
       - name: Prove live speech without storing calls or sending messages

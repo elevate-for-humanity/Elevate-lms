@@ -1,6 +1,5 @@
 import { createHash } from 'node:crypto';
-import { OpenAIProvider } from '@/lib/ai/providers/openai';
-import { runWithPaidInferenceContext } from '@/lib/ai/paid-inference-context';
+import { generateTeachingPhoto } from './google-teaching-photo.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 /** Private, reusable photographs tied to exact spoken teaching points.
@@ -10,8 +9,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
   const scenes = input.artifacts?.storyboard?.storyboard?.scenes;
   if (!Array.isArray(scenes)) throw new Error('TEACHING_PHOTO_STORYBOARD_REQUIRED');
   const photos: Record<string, any[]> = {};
-  const provider = new OpenAIProvider();
-  if (!provider.isAvailable()) throw new Error('TEACHING_PHOTO_PROVIDER_NOT_CONFIGURED');
+
   for (const scene of scenes) {
     const steps = scene.teachingVisual?.steps;
     if (!steps?.length) throw new Error('TEACHING_PHOTO_SCRIPT_CUES_REQUIRED');
@@ -32,10 +30,8 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       const storagePath = 'approved-teaching-photos/'+requestHash+'.png';
       let {data:file} = await db.storage.from('course_videos').download(storagePath);
       if (!file) {
-        const generated = await runWithPaidInferenceContext('course-video:'+input.lessonId+':'+requestHash, () =>
-          provider.generateImage({prompt,size:'1792x1024',style:'natural',format:'b64_json',count:1}));
-        if (!generated[0]?.b64Json) throw new Error('TEACHING_PHOTO_GENERATION_EMPTY');
-        const bytes = Buffer.from(generated[0].b64Json,'base64');
+        const generated = await generateTeachingPhoto(prompt);
+        const bytes = generated.bytes;
         const {error} = await db.storage.from('course_videos').upload(storagePath,bytes,{contentType:'image/png',upsert:false});
         if(error && !/already exists|duplicate/i.test(error.message)) throw error;
         const downloaded=await db.storage.from('course_videos').download(storagePath);

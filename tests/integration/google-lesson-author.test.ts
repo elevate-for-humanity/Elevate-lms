@@ -94,3 +94,18 @@ test('repeated unsupported visual cannot bypass validation or reach independent 
   await assert.rejects(authorGoogleLesson(input,async()=>{calls++;return result;}),/BLUEPRINT_TEACHING_VISUAL_NOT_SCRIPT_BOUND/);
   assert.equal(calls,3);
 });
+
+test('missing scene objective evidence is repaired before a lesson can be reviewed',async()=>{
+ const {input,result}=fixture();
+ const invalid=structuredClone(result);
+ invalid.blueprint.segments[0].objectiveIds=['invented-objective'];
+ let calls=0;
+ const output=await authorGoogleLesson(input,async(_system,request:any)=>{
+  calls++;
+  if(calls===1)return invalid;
+  if(calls===2){assert.equal(request.repair.code,'BLUEPRINT_SCRIPT_SCENES_REQUIRED');return result;}
+  return {pass:true,findings:[],competencyId:input.competency.id,blueprintHash:request.blueprintHash};
+ });
+ assert.equal(calls,3);
+ validateGoogleAuthoringEvidence(output,input.sources);
+});

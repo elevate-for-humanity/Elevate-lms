@@ -147,7 +147,9 @@ jobs:
             console.log(JSON.stringify({meetingService:{host:endpoint.hostname,status:response.status,roomCount:Array.isArray(result.rooms)?result.rooms.length:null}}));
           } catch(error) {console.log(JSON.stringify({meetingService:{host:endpoint.hostname,reachable:false,error:error.code||error.cause?.code||error.name}}));process.exitCode=1;}
           const lms=loadGoogleConfig('lms').runtimeEnvironment;
-          console.log(JSON.stringify({ownedPhoneApplicationConfiguration:Object.fromEntries(['PBX_CONTROL_URL','PBX_PROVISIONING_TOKEN','PBX_TURN_URLS','PBX_TURN_SHARED_SECRET'].map(key=>[key,Boolean(lms[key])]))}));
+          const phoneConfig=Object.fromEntries(['PBX_CONTROL_URL','PBX_PROVISIONING_TOKEN','PBX_TURN_URLS','PBX_TURN_SHARED_SECRET'].map(key=>[key,Boolean(lms[key])]));
+          console.log(JSON.stringify({ownedPhoneApplicationConfiguration:phoneConfig}));
+          if (!Object.values(phoneConfig).every(Boolean)) {console.error('PBX application readiness blocked: required LMS phone settings missing');process.exitCode=1;}
           const instances=JSON.parse(execFileSync('gcloud',['compute','instances','list','--project=elegant-racer-299721','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
           console.log(JSON.stringify({communicationsInstances:instances.filter(x=>/pbx|livekit|meeting/i.test(x.name)).map(x=>({name:x.name,status:x.status,machineType:x.machineType.split('/').pop()}))}));
           NODE

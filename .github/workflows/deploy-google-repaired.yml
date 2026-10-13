@@ -64,7 +64,7 @@ jobs:
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
           # An image release preserves capacity, probes, identities and secret bindings.
           # Cloud Run enforces actual regional quota during revision creation.
-          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --no-traffic --quiet
+          gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --cpu=4 --memory=8Gi --no-traffic --quiet
       - name: Verify and activate the exact candidate before moving public traffic
         env:
           COMPONENT: ${{ matrix.component }}

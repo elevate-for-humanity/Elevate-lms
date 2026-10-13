@@ -13,7 +13,7 @@ async function execute(overrides={}){
   if(args[0]==='secrets'&&args[1]==='versions'&&args[2]==='access')return f.storedKey||key;
   if(args[0]==='storage'&&args[1]==='buckets'&&args[2]==='list')return '[]';
   if(args[0]==='artifacts')return 'sha256:'+sha+sha.slice(0,24);
-  if(args[0]==='run'&&args[1]==='services'&&args[2]==='describe')return JSON.stringify({status:{url:'https://browser.example.test'}});
+  if(args[0]==='run'&&args[1]==='services'&&args[2]==='describe')return JSON.stringify({status:{url:'https://browser.example.test'},spec:{template:{spec:f.browserSpec}}});
   return '';
  };
  globalThis.__studioCutoverFixture={
@@ -57,4 +57,15 @@ test('existing encryption key mismatch never rotates key or deploys browser',asy
  assert.match(f.error.message,/refusing credential rotation/);assert.equal(switched(f),false);
  assert.equal(f.commands.some(a=>a[0]==='run'&&a[1]==='deploy'),false);
  assert.equal(f.commands.some(a=>a[0]==='secrets'&&a[1]==='versions'&&a[2]==='add'),false);
+});
+
+test('browser releases preserve mounted storage and restored runtime settings',async()=>{
+ const bucket='elegant-racer-299721-studio-browser-auth';
+ const f=await execute({browserSpec:{containers:[{volumeMounts:[{name:'active',mountPath:'/var/lib/studio-browser-auth'}]}],
+ volumes:[{name:'active',csi:{driver:'gcsfuse.run.googleapis.com',volumeAttributes:{bucketName:bucket}}},{name:'stale',csi:{driver:'gcsfuse.run.googleapis.com',volumeAttributes:{bucketName:bucket}}}]}});
+ assert.equal(f.error,undefined);
+ const deploy=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy');
+ assert.ok(deploy.some(a=>a.startsWith('--update-env-vars=')));
+ assert.ok(!deploy.some(a=>a.startsWith('--set-env-vars=')||a.startsWith('--add-volume=')));
+ assert.ok(deploy.includes('--remove-volume=stale'));
 });

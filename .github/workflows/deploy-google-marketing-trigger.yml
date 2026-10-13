@@ -228,6 +228,7 @@ jobs:
           gcloud run services update elevate-marketing-migration \
             --project=elegant-racer-299721 \
             --region=us-central1 \
+            --cpu=4 --memory=8Gi \
             --image="$IMAGE@$DIGEST" \
             --revision-suffix="$SUFFIX" \
             --remove-env-vars=GIT_SHA,GITHUB_SHA,NEXT_PUBLIC_GIT_SHA,NEXT_PUBLIC_COMMIT_SHA,NEXT_PUBLIC_BUILD_ID,NF_GIT_SHA,BUILD_TIMESTAMP \

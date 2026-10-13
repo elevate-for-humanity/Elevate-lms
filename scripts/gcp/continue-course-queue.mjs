@@ -10,7 +10,11 @@ export async function courseReleasePending({request = fetch, env = process.env} 
   if (!response.ok) throw new Error('COURSE_RELEASE_CHECK_HTTP_' + response.status);
   const data = await response.json();
   if (!Array.isArray(data.workflow_runs)) throw new Error('COURSE_RELEASE_INVENTORY_INVALID');
-  return data.workflow_runs.some(run => run.head_branch === 'main' && run.status !== 'completed');
+  // Only an active deployment should own the runtime lane. A workflow that is
+  // merely queued may be waiting behind this coordinator; yielding to it can
+  // strand runnable course jobs indefinitely. The shared GitHub concurrency
+  // lock still prevents overlap when the deployment actually starts.
+  return data.workflow_runs.some(run => run.head_branch === 'main' && run.status === 'in_progress');
 }
 
 /** A bounded coordinator, not a rendering worker. The workflow's existing

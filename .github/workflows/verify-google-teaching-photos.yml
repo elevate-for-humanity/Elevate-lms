@@ -36,4 +36,4 @@ jobs:
       - run: node scripts/gcp/probe-course-photo-provider.mjs
       - name: Read sanitized image-provider evidence
         if: always()
-        run: gcloud logging read 'resource.type="cloud_run_job" AND resource.labels.job_name="elevate-course-photo-probe"' --project=elegant-racer-299721 --limit=15 --format='value(textPayload)'
+        run: gcloud logging read 'resource.type="cloud_run_job" AND resource.labels.job_name="elevate-course-photo-probe"' --project=elegant-racer-299721 --limit=16 --format='value(textPayload)'

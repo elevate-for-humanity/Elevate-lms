@@ -19,7 +19,7 @@ async function speech(audio:Buffer){
  if(!identity.ok)throw Error('voice_identity_unavailable');
  const token=(await identity.json()).access_token;if(typeof token!=='string')throw Error('voice_identity_unavailable');
  const response=await fetch('https://speech.googleapis.com/v1/speech:recognize',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({config:{languageCode:'en-US',model:'phone_call',enableAutomaticPunctuation:true},audio:{content:audio.toString('base64')}}),redirect:'error',signal:AbortSignal.timeout(45000)});
- if(!response.ok)throw Error('voice_transcription_unavailable');
+ if(!response.ok)throw Error('speech_http_'+response.status);
  const result=await response.json();return (result.results||[]).map((part:any)=>part.alternatives?.[0]?.transcript||'').join(' ').trim().slice(0,20000);
 }
 export async function POST(request:Request){
@@ -67,5 +67,5 @@ export async function POST(request:Request){
   if(taskError)throw Error('callback_persistence_unavailable');
   await notifyAssignee(db,{profileId:extension.profile_id,taskId:body.id,caller,urgency:'normal',source:'voicemail',transcript:transcript||undefined,summary:transcript?undefined:'No speech was detected. Open the recording to listen.'},system);
   return NextResponse.json({saved:true,transcriptAvailable:Boolean(transcript)});
- }catch{return NextResponse.json({error:'Voicemail processing is unavailable; retry without discarding the original recording.'},{status:503});}
+ }catch(error){const code=error instanceof Error && /^speech_http_[0-9]{3}$/.test(error.message)?error.message:'voicemail_processing_unavailable';return NextResponse.json({error:'Voicemail processing is unavailable; retry without discarding the original recording.',code},{status:503});}
 }

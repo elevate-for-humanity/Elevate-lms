@@ -62,6 +62,14 @@ async function loadCarrierRecording(location: string): Promise<Response> {
 
 /** The caller must first authorize the recording row and its associated call. */
 export async function loadPhoneRecording(location:string,context?:{db:any;callId:string}):Promise<Response>{
+ if(location.startsWith('supabase://')){
+  if(!context || !/^[0-9a-f-]{36}$/i.test(context.callId) || location!=='supabase://phone-voicemails/'+context.callId+'.wav')throw Error('Untrusted private recording location');
+  const {data:blob,error}=await context.db.storage.from('phone-voicemails').download(context.callId+'.wav');
+  if(error||!blob||blob.size<44||blob.size>1100000)throw Error('Private voicemail recording unavailable');
+  const audio=new Uint8Array(await blob.arrayBuffer());
+  if(Buffer.from(audio).toString('ascii',0,4)!=='RIFF'||Buffer.from(audio).toString('ascii',8,12)!=='WAVE')throw Error('Private recording is not WAV audio');
+  return new Response(audio,{headers:{'Content-Type':'audio/wav','Content-Length':String(audio.length),'Cache-Control':'private, no-store, max-age=0','Content-Disposition':'inline','X-Content-Type-Options':'nosniff'}});
+ }
  try{return await loadCarrierRecording(location);}catch(error){
   if(!context || !/^[0-9a-f-]{36}$/i.test(context.callId))throw error;
   const {data:events,error:lookupError}=await context.db.from('phone_call_events').select('payload').eq('call_id',context.callId).eq('event_type','call.recording.saved').order('created_at',{ascending:false}).limit(10);

@@ -15,6 +15,7 @@ import path from 'path';
 import { renderConcurrency } from './render-concurrency.mjs';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
+import { assertPremiumSpeechSignal } from '../ultimate-course-builder/instructional/approved-presentation.mjs';
 import { installRemotionHostCompatibility } from './remotion-host-compat.mjs';
 import { mkdir, readFile, writeFile, unlink, rm, stat } from 'fs/promises';
 import { generateEdgeTTS, buildLessonScript, EDGE_TTS_VOICES, type EdgeTTSVoice } from './edge-tts';
@@ -110,6 +111,7 @@ async function measuredAudioDurationSeconds(audioPath: string): Promise<number |
 }
 
 export interface StoryboardRenderInput {
+  lessonPresentation?: 'approved-premium-v1';
   lessonId: string;
   courseTitle: string;
   storyboard: MediaStoryboard;
@@ -175,8 +177,8 @@ function vttTimestamp(seconds: number): string {
   );
 }
 
-export function buildStoryboardWebVtt(scenes: SceneData[]): string {
-  let cursor = 3;
+export function buildStoryboardWebVtt(scenes: SceneData[], introSeconds = 3): string {
+  let cursor = introSeconds;
   const cues: string[] = [];
   for (const scene of scenes) {
     const timed = scene.captionCues ?? [
@@ -601,6 +603,10 @@ export async function renderStoryboardVideo(
         const sceneAudioPath = path.join(paths.outputDir, `scene-${index + 1}.mp3`);
         await writeFile(sceneAudioPath, audio);
         measuredNarrationSeconds = await measuredAudioDurationSeconds(sceneAudioPath);
+        if (input.lessonPresentation === 'approved-premium-v1') {
+          const { stderr } = await execFileAsync('ffmpeg', ['-hide_banner','-i',sceneAudioPath,'-af','silencedetect=noise=-40dB:d=1.5,volumedetect','-f','null','-'], {timeout:120000,maxBuffer:2000000});
+          assertPremiumSpeechSignal(String(stderr));
+        }
         if (
           !measuredNarrationSeconds ||
           Math.abs(measuredNarrationSeconds - approvedAudio.durationSeconds) > 0.1
@@ -819,12 +825,15 @@ export async function renderStoryboardVideo(
         ...(resolvedModel ? { resolvedModel } : {}),
       };
       const estimatedNarrationSeconds = Math.ceil((narration.split(/\s+/).length / 140) * 60);
-      const narrationSeconds = Math.ceil(measuredNarrationSeconds ?? estimatedNarrationSeconds) + 1;
+      const premium = input.lessonPresentation === 'approved-premium-v1';
+      const narrationSeconds = premium
+        ? Math.ceil((measuredNarrationSeconds ?? estimatedNarrationSeconds) * STORYBOARD_RENDER_FPS) / STORYBOARD_RENDER_FPS
+        : Math.ceil(measuredNarrationSeconds ?? estimatedNarrationSeconds) + 1;
       // A lesson's instructional seat time includes reading, practice, checks,
       // and review; it must not become one continuous hour-long MP4. Time each
       // visual to its spoken narration so malformed blueprint durations cannot
       // keep Chromium encoding indefinitely.
-      const durationSeconds = Math.max(narrationSeconds, 4);
+      const durationSeconds = premium ? narrationSeconds : Math.max(narrationSeconds, 4);
       resolvedStoryboard.scenes[index].durationSeconds = durationSeconds;
       if (input.ultimateStrict && clipUrl) {
         const response = await fetch(clipUrl, { signal: AbortSignal.timeout(60000) });
@@ -930,6 +939,10 @@ export async function renderStoryboardVideo(
       accentColor: instructor.accentColor,
       backgroundColor: '#f8fafc',
       surfaceMode: 'bright',
+      ...(input.lessonPresentation === 'approved-premium-v1' ? {
+        lessonPresentation: input.lessonPresentation,
+        primaryColor: '#cdb79e', accentColor: '#e9dccb', backgroundColor: '#171717', surfaceMode: 'dark' as const,
+      } : {}),
       logoText: 'Elevate LMS',
       openingImageUrl,
       preRollUrl: normalizeRemotionMediaUrl(input.preRollUrl),
@@ -944,7 +957,7 @@ export async function renderStoryboardVideo(
     const totalFrames =
       (props.preRollDurationFrames ?? 0) +
       (props.postRollDurationFrames ?? 0) +
-      STORYBOARD_RENDER_FPS * 5 +
+      STORYBOARD_RENDER_FPS * (input.lessonPresentation === 'approved-premium-v1' ? 0 : 5) +
       normalizedScenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
     const bundleUrl = await getBundleUrl();
     const { renderMedia, selectComposition } = await import('@remotion/renderer');
@@ -970,7 +983,7 @@ export async function renderStoryboardVideo(
         // Persist each segment in B2 so a new Cloud Run execution can resume.
         // A storyboard fingerprint prevents reuse after a scene/narration change.
         const fingerprint = (await import('node:crypto')).createHash('sha256')
-          .update(JSON.stringify({scenes, fps: composition.fps, totalFrames})).digest('hex').slice(0,24);
+          .update(JSON.stringify({scenes, fps: composition.fps, totalFrames, lessonPresentation: input.lessonPresentation ?? 'legacy', layoutVersion: 3})).digest('hex').slice(0,24);
         const segmentKey = `course-render-checkpoints/${input.lessonId}/${fingerprint}/${start}-${end}.mp4`;
         const storageReady = isElevateMediaStorageConfigured();
         const storage = storageReady ? getElevateMediaStorageClient() : null;
@@ -1046,7 +1059,7 @@ export async function renderStoryboardVideo(
     }
     logger.info('[RemotionRender] uploading storyboard captions and transcript', {lessonId: input.lessonId});
     const captionUrl = await uploadCourseVideosObject(
-      Buffer.from(buildStoryboardWebVtt(scenes), 'utf8'),
+      Buffer.from(buildStoryboardWebVtt(scenes, input.lessonPresentation === 'approved-premium-v1' ? 0 : 3), 'utf8'),
       `generated-lessons/lesson-${input.lessonId}-${Date.now()}.vtt`,
       'text/vtt',
     );

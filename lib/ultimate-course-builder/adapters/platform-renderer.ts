@@ -302,6 +302,18 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       import('@/lib/video/remotion-render'),
     ]);
     const storyboard = directMedia(prepared);
+    // Presentation instructions are course data, never a barber-specific constant.
+    // Preserve the owner's approved reference identity through the render result.
+    const presentation = record(input.presentationContract ?? input.artifacts?.presentation_contract);
+    const reference = record(presentation.approvedReferenceVideo);
+    if (Object.keys(reference).length &&
+        (!String(reference.assetId ?? '').trim() || !String(reference.sha256 ?? '').match(/^[a-f0-9]{64}$/i)))
+      throw new Error('ULTIMATE_APPROVED_REFERENCE_ASSET_ID_AND_HASH_REQUIRED');
+    const visualStyle = record(presentation.visualStyle);
+    if (Object.keys(visualStyle).length &&
+        (visualStyle.cropMode && !['contain','cover-safe'].includes(visualStyle.cropMode) ||
+         visualStyle.transition && !['cut','crossfade'].includes(visualStyle.transition)))
+      throw new Error('ULTIMATE_APPROVED_VISUAL_STYLE_UNSUPPORTED');
     const courseTitle = String(input.courseTitle ?? prepared.title);
     const result = await renderStoryboardVideo({
       lessonId: String(input.lessonId),
@@ -326,6 +338,8 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       transcriptUrl: result.sceneData?.transcriptUrl,
       ...visualEvidence,
       licensedFirst: true,
+      ...(reference.assetId ? {approvedReferenceAssetId: String(reference.assetId), approvedReferenceSha256: String(reference.sha256)} : {}),
+      ...(Object.keys(visualStyle).length ? {requestedVisualStyle: visualStyle} : {}),
     };
   }
 }

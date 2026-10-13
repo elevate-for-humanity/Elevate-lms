@@ -118,13 +118,12 @@ export const shouldUploadCourseMediaToObjectStorage = shouldUploadCourseMediaToE
 /** @deprecated Compatibility alias. */
 export const shouldUploadCourseMediaToR2 = shouldUploadCourseMediaToElevateMedia;
 
-export function lessonMediaStoragePath(lessonId: string, ext: 'mp3' | 'mp4' | 'wav'): string {
-  // Rendered MP4s are immutable candidates. Reusing the same public object key
+export function lessonMediaStoragePath(lessonId: string, ext: 'mp3' | 'mp4'): string {
+  // Generated audio and video are immutable candidates. Reusing the same public object key
   // across retries can make the quality gate or learner CDN read the previous
   // render after an upsert, producing false duration/transcript failures and
-  // potentially serving stale media after approval. Narration MP3s can retain
-  // their stable key because they are consumed inside the same render attempt.
-  const version = ext === 'mp4' ? `-${Date.now().toString(36)}` : '';
+  // potentially serving stale narration or media after approval.
+  const version = `-${Date.now().toString(36)}-${crypto.randomUUID()}`;
   return `generated-lessons/lesson-${lessonId}${version}.${ext}`;
 }
 
@@ -259,10 +258,10 @@ export async function uploadCourseVideosObject(
 export async function uploadLessonMediaBuffer(
   buffer: Buffer,
   lessonId: string,
-  ext: 'mp3' | 'mp4' | 'wav',
+  ext: 'mp3' | 'mp4',
 ): Promise<string> {
   const storagePath = lessonMediaStoragePath(lessonId, ext);
-  const contentType = ext === 'mp3' ? 'audio/mpeg' : ext === 'wav' ? 'audio/wav' : 'video/mp4';
+  const contentType = ext === 'mp3' ? 'audio/mpeg' : 'video/mp4';
   return uploadCourseVideosObject(buffer, storagePath, contentType);
 }
 
@@ -279,7 +278,7 @@ export function lessonRenderTempPaths(lessonId: string) {
 export async function uploadLessonFileFromDisk(
   filePath: string,
   lessonId: string,
-  ext: 'mp3' | 'mp4' | 'wav',
+  ext: 'mp3' | 'mp4',
 ): Promise<string> {
   // Large MP4s use the resumable route in uploadCourseVideosObject. The
   // single-request ceiling is not an object-size limit and must not trigger

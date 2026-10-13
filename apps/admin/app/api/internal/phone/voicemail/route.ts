@@ -49,6 +49,7 @@ export async function POST(request:Request){
   const {data:previous,error:previousError}=await db.from('voicemails').select('transcription').eq('id',body.id).maybeSingle();
   if(previousError)throw Error('voicemail_lookup_unavailable');
   const transcript=previous?.transcription||await speech(audio);
+  if(body.validateOnly===true)return NextResponse.json({validated:true,transcriptAvailable:Boolean(transcript)});
   const {data:bucket,error:bucketLookupError}=await db.storage.getBucket('phone-voicemails');
   if(bucketLookupError && !bucket){
     const {error:createError}=await db.storage.createBucket('phone-voicemails',{public:false,fileSizeLimit:1100000,allowedMimeTypes:['audio/wav']});

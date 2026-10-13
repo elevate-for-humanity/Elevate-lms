@@ -1,3 +1,4 @@
+import {reportCourseProgress,courseProgressSignal} from '../ultimate-course-builder/worker/progress-watch.mjs';
 /**
  * lib/video/remotion-render.ts
  *
@@ -495,7 +496,7 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     const bundleUrl = await getBundleUrl();
 
     // Dynamic imports — keep Remotion renderer out of Next.js webpack bundle
-    const { renderMedia, selectComposition } = await import('@remotion/renderer');
+    const { renderMedia, selectComposition, makeCancelSignal } = await import('@remotion/renderer');
     const { registerUsageEvent } = await import('@remotion/licensing');
 
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
@@ -987,7 +988,7 @@ export async function renderStoryboardVideo(
       STORYBOARD_RENDER_FPS * (input.lessonPresentation === 'approved-premium-v1' ? 0 : 5) +
       normalizedScenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
     const bundleUrl = await getBundleUrl();
-    const { renderMedia, selectComposition } = await import('@remotion/renderer');
+    const { renderMedia, selectComposition, makeCancelSignal } = await import('@remotion/renderer');
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
     const renderSlideLesson = async (inputProps: SlideLessonProps & Record<string, unknown>) => {
       logger.info('[RemotionRender] selecting storyboard composition', {lessonId: input.lessonId, totalFrames});
@@ -1030,7 +1031,12 @@ export async function renderStoryboardVideo(
         }
         if (!existing?.size) {
           logger.info('[RemotionRender] segment started', {lessonId: input.lessonId, start, end});
+          const cancellation=makeCancelSignal();
+          const signal=courseProgressSignal();
+          signal?.throwIfAborted();
+          signal?.addEventListener('abort',cancellation.cancel,{once:true});
           await renderMedia({
+            cancelSignal:cancellation.cancelSignal,
             composition,
             serveUrl: bundleUrl,
             ...(browserExecutable ? { browserExecutable } : {}),
@@ -1041,11 +1047,12 @@ export async function renderStoryboardVideo(
             concurrency: renderConcurrency(),
             crf: 20,
             onProgress: ({renderedFrames, encodedFrames}) => {
+              reportCourseProgress('render-frames:'+start,renderedFrames+encodedFrames,(end-start+1)*2);
               logger.info('[RemotionRender] segment progress', {
                 lessonId: input.lessonId, start, end, renderedFrames, encodedFrames,
               });
             },
-          });
+          }).finally(()=>signal?.removeEventListener('abort',cancellation.cancel));
           const written = await stat(chunkPath);
           if (!written.size) throw new Error(`REMOTION_SEGMENT_EMPTY:${start}-${end}`);
           if (!storage || !bucket) throw new Error('REMOTION_DURABLE_CHECKPOINT_STORAGE_REQUIRED');
@@ -1055,6 +1062,7 @@ export async function renderStoryboardVideo(
           }));
           logger.info('[RemotionRender] segment complete', {lessonId: input.lessonId, start, end, bytes: written.size});
         }
+        reportCourseProgress('render-checkpoint',end,totalFrames);
         chunkPaths.push(chunkPath);
       }
       // FFmpeg concat demuxer accepts absolute paths with safe shell-independent

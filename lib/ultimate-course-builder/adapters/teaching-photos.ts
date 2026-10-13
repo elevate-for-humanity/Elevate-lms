@@ -1,3 +1,4 @@
+import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watch.mjs';
 import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
 import { compatibleVisualTask } from '../instructional/reviewed-scene-evidence';
 import { createHash } from 'node:crypto';
@@ -25,6 +26,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
     photos[scene.id] = [];
     const usedLicensedPhotos = new Set<string>();
     for (const [index, step] of requests.entries()) {
+      courseProgressSignal()?.throwIfAborted();
       const placed=placedPhotos?.find((p:any)=>p.metadata?.source==='openai-generated-illustration' && p.metadata?.reviewedIllustration===true && p.metadata?.sceneId===scene.id && p.metadata?.cueIndex===index && p.metadata?.narrationQuote===step.narrationQuote && /^[a-f0-9]{64}$/i.test(p.metadata?.sha256??'') && String(p.storage_path).startsWith('approved-teaching-photos/'));
       if(placed){
         const downloaded=await db.storage.from('course_videos').download(placed.storage_path);
@@ -34,6 +36,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         const signed=await db.storage.from('course_videos').createSignedUrl(placed.storage_path,3600);
         if(signed.error||!signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
         photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),illustration:true,provider:'openai'});
+        reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
       const licensed = selectReviewedTeachingPhoto(input.artifacts?.visual_assignment?.media?.readyAssets ?? [], step.narrationQuote, usedLicensedPhotos, compatibleVisualTask);
@@ -78,6 +81,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       const signed=await db.storage.from('course_videos').createSignedUrl(storagePath,3600);
       if(signed.error||!signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
       photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,stepIndex:steps.indexOf(step)>=0?steps.indexOf(step):Math.min(index,steps.length-1),illustration:true});
+      reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
     }
     if(new Set(photos[scene.id].map(p=>p.sha256)).size<2) throw new Error('TEACHING_PHOTOS_MUST_BE_DISTINCT');
   }

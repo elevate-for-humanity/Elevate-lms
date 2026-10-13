@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { UltimateJobQueue } from './job-queue';
+import {createCourseProgressWatch,reportCourseProgress} from './progress-watch.mjs';
 import { createLeaseDeadline } from './runtime-guards.mjs';
 import { createUltimateRuntime } from '../core/runtime-factory';
 import { createProductionHandlers } from '../core/production-handlers';
@@ -49,6 +50,18 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     },
     60000,
   );
+  const progressWatch=createCourseProgressWatch({
+    onProgress:async(progress:any)=>{
+      const {data,error}=await db.from('ultimate_build_jobs').update({payload:{...job.payload,progress}}).eq('id',job.id).eq('lease_owner',workerId).eq('execution_generation',generation).eq('status','running').gt('lease_expires_at',new Date().toISOString()).select('id');
+      if(error)throw error;
+      if(!data?.length)throw Error('ULTIMATE_JOB_LEASE_LOST:'+job.id);
+    },
+    onStall:async(progress:any)=>{
+      console.error('[UltimateWorker] progress stalled', {jobId:job.id,...progress});
+      await queue.fail(job.id,workerId,'ULTIMATE_PROGRESS_STALLED:'+JSON.stringify(progress),generation,true);
+      leaseLost=true;deadline.lose();
+    },
+  });
   const work = async () => {
   try {
     const { data: build, error } = await db
@@ -80,7 +93,13 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     console.info('[UltimateWorker] profile hydrated', { jobId: job.id, competencies: profile.competencies.length });
     const runtime = await createUltimateRuntime(db, fence);
     console.info('[UltimateWorker] runtime ready', { jobId: job.id });
-    const handlers = createProductionHandlers(runtime);
+    const originalHandlers = createProductionHandlers(runtime);
+    const handlers = Object.fromEntries(Object.entries(originalHandlers).map(([step,handler])=>[step,async(ctx:any)=>{
+      reportCourseProgress('stage:'+step);
+      const result=await handler(ctx);
+      reportCourseProgress('finished:'+step,1,1);
+      return result;
+    }]));
     const targeted = Boolean(payload.competencyId || payload.lessonBuildId || payload.acceptance);
     console.info('[UltimateWorker] lesson processing started', { jobId: job.id, targeted, competencyId: payload.competencyId ?? null });
     const result = await runUltimateCourse(
@@ -176,11 +195,13 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     if (timer) clearInterval(timer);
     timer = null;
     deadline.dispose();
+    progressWatch.dispose();
   }
   };
   try {
-    return await deadline.race(work());
+    return await progressWatch.race(deadline.race(progressWatch.run(work)));
   } catch (error) {
+    if (progressWatch.signal.aborted) return {claimed:true,completed:false,jobId:job.id,stalled:true,error:'ULTIMATE_PROGRESS_STALLED'};
     if (leaseLost) return {claimed:true,completed:false,jobId:job.id,error:'ULTIMATE_JOB_LEASE_LOST:' + job.id};
     throw error;
   } finally {

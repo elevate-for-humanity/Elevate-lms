@@ -8,10 +8,10 @@ function setup(executions, queued, httpStatus=200) {
   const request=async url=>({ok:httpStatus===200,status:httpStatus,json:async()=>url.searchParams.has('id') ? [{id:'queued',status:'running',lease_owner:'worker-test',heartbeat_at:'2026-10-06T10:00:01Z'}] : queued});
   return {calls,options:{run,request,capacityCheck:async()=>({fits:true}),env:{SUPABASE_SERVICE_ROLE_KEY:'test-fixture'},now:new Date('2026-10-06T10:00:00Z')}};
 }
-test('busy worker does not claim or launch overlapping work',async()=>{
+test('active worker allows another execution when a worker slot remains',async()=>{
   const s=setup([{status:{}}],[{id:'queued'}]);
-  assert.equal((await dispatchQueuedCourseJob(s.options)).status,'busy');
-  assert.equal(s.calls.length,1);
+  assert.equal((await dispatchQueuedCourseJob(s.options)).status,'assigned');
+  assert.ok(s.calls.some(c=>c.includes('execute')));
 });
 test('empty queue does not start a paid execution',async()=>{
   const s=setup([],[]);
@@ -73,5 +73,5 @@ test('two eligible builds request two parallel Google Cloud Run worker tasks',as
  const result=await dispatchQueuedCourseJob(s.options);
  assert.equal(result.tasks,2);
  assert.ok(s.calls[2].includes('--tasks=2'));
- assert.ok(s.calls[2].includes('--parallelism=2'));
+ assert.equal(s.calls[2].some(arg=>arg.startsWith('--parallelism=')),false);
 });

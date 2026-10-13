@@ -113,7 +113,22 @@ export async function main() {
         } catch {entry.sourceFilesystemExportAvailable=false;entry.sourceContainerInventory='unavailable';}
       }
       entry.sourceHealth = (service.healthChecks ?? []).map(x => ({ type: x.type, path: x.path, port: x.port }));
-      entry.googleHealth = { startup: Boolean(container.startupProbe), liveness: Boolean(container.livenessProbe) };
+      entry.googleHealth = { startup: Boolean(container.startupProbe), liveness: Boolean(container.livenessProbe),
+        probes: [container.startupProbe, container.livenessProbe].filter(Boolean).map(p => ({
+          type: p === container.startupProbe ? 'startup' : 'liveness',
+          path: p.httpGet?.path, port: p.httpGet?.port, timeoutSeconds: p.timeoutSeconds,
+          periodSeconds: p.periodSeconds, failureThreshold: p.failureThreshold
+        })) };
+      entry.sourceComputePlan = service.billing?.deploymentPlan ?? null;
+      entry.sourceBuildPlan = service.billing?.buildPlan ?? null;
+      entry.sourceBuildEngine = service.buildSettings?.buildEngine ?? service.buildEngine ?? null;
+      entry.sourceDockerfile = service.buildSettings?.dockerfile?.dockerFilePath ?? service.buildSettings?.dockerfile?.dockerfilePath ?? null;
+      entry.googleContainer = { image: container.image, ports: container.ports, identity: spec.serviceAccountName,
+        commandOverride: Boolean(container.command?.length), argumentOverride: Boolean(container.args?.length),
+        mounts: (container.volumeMounts ?? []).map(m => ({name:m.name,path:m.mountPath})),
+        volumes: (spec.volumes ?? []).map(v => ({name:v.name,kind:v.csi?'csi':v.cloudStorage?'cloudStorage':v.secret?'secret':v.emptyDir?'emptyDir':'other'})),
+        annotations: resource.spec?.template?.metadata?.annotations ?? {}
+      };
       entry.volumeCounts = { source: (service.deployment?.volumes ?? service.volumes ?? []).length, google: (spec.volumes ?? []).length };
       entry.runtimeFileCount = Object.keys(environment.runtimeFiles ?? {}).length;
       entry.commandOverride = Boolean(service.deployment?.command || service.runtime?.command || service.config?.command);
@@ -155,6 +170,24 @@ export async function main() {
       } else if (items.length) report.failures.push({ resource, error: 'resource_contents_and_target_mapping_not_verified', count: items.length });
     } catch { report.failures.push({ resource, error: 'resource_inventory_unavailable' }); }
   }
+  try {
+    const gpuResponse = await fetch('https://api.northflank.com/v1/projects/elevate-media-gpu/services', {
+      headers: {Authorization: 'Bearer ' + token}, signal: AbortSignal.timeout(30000)
+    });
+    if (!gpuResponse.ok) throw Error('source_gpu_read_failed');
+    const raw = await gpuResponse.json(); const data = raw.data ?? raw;
+    report.sourceGpuServices = (Array.isArray(data) ? data : data.services).map(s => ({
+      id:s.id,name:s.name,buildSource:s.buildSource,computePlan:s.billing?.deploymentPlan,
+      instances:s.deployment?.instances,status:s.status?.deployment?.status
+    }));
+    report.googleGpuServices = googleServices.filter(s => /gpu|llm/.test(s.metadata?.name ?? '')).map(s => ({
+      name:s.metadata.name,readyRevision:s.status?.latestReadyRevisionName,
+      resources:s.spec?.template?.spec?.containers?.[0]?.resources?.limits
+    }));
+    const archive = JSON.parse(gcloud(['secrets','versions','access','latest','--secret','elevate-gpu-archive-config']));
+    report.gpuArchive = {transferComplete:archive.transferComplete,computeEnabled:archive.profile?.computeEnabled,
+      volumes:(archive.sourcePersistence ?? []).map(v=>({id:v.id,bytesVerified:v.bytesVerified,deletionAllowed:v.deletionAllowed}))};
+  } catch { report.gpuInventoryRead = 'unavailable'; }
   report.passed = report.services.every(x => x.passed) && report.failures.length === 0;
   writeFileSync('google-runtime-parity.json', JSON.stringify(report, null, 2), { mode: 0o600 });
   console.log(JSON.stringify(report));

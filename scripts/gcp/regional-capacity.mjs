@@ -10,6 +10,18 @@ export function allocation(limits) {
 export const isTerminalExecution = execution => Boolean(execution.status?.completionTime ||
   ['True', 'False'].includes(execution.status?.conditions?.find(c => c.type === 'Completed')?.status));
 
+// Completed tasks cannot run again within this immutable execution. Include
+// pending tasks as well as running tasks; runningCount alone is not a safe bound.
+export function executionAllocationCount(execution) {
+  const total=Number(execution.spec?.taskCount ?? execution.spec?.parallelism ?? 1);
+  const parallel=Number(execution.spec?.parallelism ?? total);
+  const finished=['succeededCount','failedCount','cancelledCount'].map(key=>Number(execution.status?.[key]??0));
+  if(!Number.isInteger(total)||total<1||!Number.isInteger(parallel)||parallel<1||
+     finished.some(count=>!Number.isInteger(count)||count<0)||finished.reduce((a,b)=>a+b,0)>total)
+    throw Error('Execution task allocation is unavailable');
+  return Math.min(parallel,total-finished.reduce((a,b)=>a+b,0));
+}
+
 // A service template can describe an unsuccessful deployment. Only effective
 // revisions and nonterminal execution specs describe the resources still used.
 // This is a conservative allocation bound, not a utilization measurement.
@@ -44,8 +56,10 @@ export function requiredRegionalAllocation(services, task, revisions, executions
       add(revision.spec?.containers, max);
     }
   }
-  for (const execution of executions.filter(e => !isTerminalExecution(e)))
-    add(execution.spec?.template?.spec?.containers, Number(execution.spec?.parallelism || execution.spec?.taskCount || 1));
+  for (const execution of executions.filter(e => !isTerminalExecution(e))) {
+    const count=executionAllocationCount(execution);
+    if(count>0)add(execution.spec?.template?.spec?.containers,count);
+  }
   return required;
 }
 

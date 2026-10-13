@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { requiredRegionalAllocation, inspectRegionalCapacity } from './regional-capacity.mjs';
+import { requiredRegionalAllocation, inspectRegionalCapacity, executionAllocationCount } from './regional-capacity.mjs';
 
 const container = (cpu, memory) => ({ resources: { limits: { cpu, memory } } });
 const task = { containers: [container('8', '32Gi')] };
@@ -57,4 +57,18 @@ test('reads approved regional limits and reports insufficient memory without mut
   assert.equal(result.fits, false);
   assert.equal(result.required.memory, 40 * 2 ** 30);
   assert.ok(calls.every(c => c.includes('list') || c[0] === 'auth'));
+});
+
+test('completed tasks release their slots while pending tasks remain budgeted',()=>{
+ assert.equal(executionAllocationCount({spec:{taskCount:3,parallelism:3},status:{succeededCount:1,runningCount:2}}),2);
+ assert.equal(executionAllocationCount({spec:{taskCount:3,parallelism:2},status:{runningCount:0}}),2);
+ assert.equal(executionAllocationCount({spec:{taskCount:3,parallelism:3},status:{succeededCount:1,failedCount:1,cancelledCount:1}}),0);
+ assert.equal(executionAllocationCount({spec:{taskCount:3,parallelism:3},status:{retriedCount:2}}),3);
+});
+test('invalid task totals fail closed',()=>{
+ for(const status of [{succeededCount:4},{failedCount:-1}])assert.throws(()=>executionAllocationCount({spec:{taskCount:3},status}),/allocation/);
+});
+test('regional budget retains only remaining slots of an active execution',()=>{
+ const executions=[{spec:{taskCount:3,parallelism:3,template:{spec:{containers:[container('4','8Gi')]}}},status:{succeededCount:1,runningCount:2}}];
+ assert.deepEqual(requiredRegionalAllocation([], {containers:[container('4','8Gi'),container('4','8Gi')]}, [],executions),{cpu:16000,memory:32*2**30});
 });

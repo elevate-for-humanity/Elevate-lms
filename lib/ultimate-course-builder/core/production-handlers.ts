@@ -283,6 +283,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
             lessonId: comp(ctx).id,
             courseTitle: ctx.profile.title,
             lessonPresentation: ctx.profile.lessonPresentation,
+            presentationContract: ctx.profile.presentationContract,
             requiresPhysicalDemonstration: comp(ctx).type === 'practical_skill',
             artifacts: ctx.artifacts,
           }),
@@ -432,6 +433,11 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
           }],
         };
       }
+      const expectedReference = ctx.profile.presentationContract?.approvedReferenceVideo;
+      if (ctx.profile.lessonPresentation === 'approved-premium-v1' &&
+          (!expectedReference || render.approvedReferenceAssetId !== expectedReference.assetId ||
+           render.approvedReferenceSha256 !== expectedReference.sha256))
+        throw new Error('APPROVED_REFERENCE_RELEASE_EVIDENCE_REQUIRED');
       const c = comp(ctx);
       const objectives: any[] = (ctx.artifacts.learning_objectives as any)?.objectives ?? [];
       const script: any = (ctx.artifacts.instructor_script as any)?.script;

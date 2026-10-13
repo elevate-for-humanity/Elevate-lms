@@ -7,7 +7,6 @@ import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
 import { HomePlatformOverview } from '@/components/home/HomePlatformOverview';
-import { HomeNetworks } from '@/components/home/HomeNetworks';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeWebsiteBuilderSales } from '@/components/home/HomeWebsiteBuilderSales';
@@ -69,11 +68,7 @@ export default function HomePage() {
             </a>
           </div>
         </section>
-        <PlatformHubHero />
-        <HomeFeaturedHostShop />
-        <HomeCareerPathways />
         <HomeFunding />
-        <HomeNetworks />
         <HomeEmployerStrip />
         <HomeInstitutionalGateway />
         <HomeWebsiteBuilderSales />

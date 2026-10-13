@@ -74,7 +74,10 @@ function isTransientMediaDiscoveryError(error: unknown): boolean {
     message.includes('network error') ||
     message.includes('econnreset') ||
     message.includes('etimedout') ||
-    message.includes('socket hang up')
+    message.includes('socket hang up') ||
+    message.includes('operation was aborted') ||
+    message.includes('aborterror') ||
+    message.includes('timeouterror')
   );
 }
 

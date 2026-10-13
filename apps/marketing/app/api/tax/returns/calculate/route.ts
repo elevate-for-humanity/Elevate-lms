@@ -101,6 +101,7 @@ export async function POST(req: NextRequest) {
   const estimateMetadata = {
     sourceDigest: taxReturnSourceDigest({
       filingStatus: r.filing_status,
+      supportingDocuments: r.return_json?.irsSupportingDocuments ?? {},
       extra: r.return_json?.federalInputs ?? {},
       w2: w2 ?? [],
       income1099: i1099 ?? [],

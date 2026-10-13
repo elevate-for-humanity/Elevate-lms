@@ -86,6 +86,7 @@ export async function GET(req: NextRequest) {
   try {
     const sourceDigest = taxReturnSourceDigest({
       filingStatus: r.filing_status,
+      supportingDocuments: r.return_json?.irsSupportingDocuments ?? {},
       extra: r.return_json?.federalInputs ?? {},
       w2: w2.data ?? [],
       income1099: income.data ?? [],

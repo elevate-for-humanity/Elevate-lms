@@ -1,4 +1,5 @@
-import {resolve4} from 'node:dns/promises';
+import {Resolver} from 'node:dns/promises';
+const resolver=new Resolver({timeout:3000,tries:2});
 import {writeFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 const domain='elevateforhumanity.org',base='https://api.northflank.com/v1';
@@ -16,13 +17,16 @@ async function main() {
   const hosts=[domain,...d.subdomains.map(s=>s.fullName)];
   for(const host of [...new Set(hosts)]) {
    if(host!==domain&&!host.endsWith('.'+domain))throw Error('Unexpected domain; no deletion');
-   const ips=await resolve4(host);
+   if(host.startsWith('*.'))continue;
+   console.log(JSON.stringify({kind:'checkingDns',host}));
+   let ips;try{ips=await resolver.resolve4(host);}catch(e){if(['ENODATA','ENOTFOUND'].includes(e.code)){console.log(JSON.stringify({kind:'dns',host,alreadyUnrouted:true}));continue;}throw e;}
    const expected=host==='phone.'+domain?'107.178.216.162':'34.110.235.233';
    if(!ips.length||ips.some(ip=>ip!==expected))throw Error('Domain not verified on Google: '+host);
    console.log(JSON.stringify({kind:'dns',host,ips,googleVerified:true}));
   }
   for(const host of ['www','app','admin','store']) {
-   const r=await fetch('https://'+host+'.'+domain+'/api/health',{signal:AbortSignal.timeout(30000)});
+   console.log(JSON.stringify({kind:'checkingHealth',host}));
+   const r=await fetch('https://'+host+'.'+domain+'/api/health',{signal:AbortSignal.timeout(120000)});
    const b=await r.json();if(!r.ok||!b.healthy)throw Error('Google website health failed; no deletion');
   }
   writeFileSync('northflank-domain-inventory.json',JSON.stringify({domain:d.name,status:d.status,subdomains:d.subdomains},null,2));

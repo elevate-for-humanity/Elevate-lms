@@ -17,7 +17,7 @@ export async function runWorkerLoop({ processJob, delay, isStopping, once = fals
       if (result.result?.findings?.some(finding => finding.severity === 'error')) {
         throw new Error('ULTIMATE_TASK_REPAIR_REQUIRED');
       }
-      if (result.claimed && !result.completed && !result.continuing) {
+      // An explicitly persisted external dependency is a terminal task outcome,\n      // not a render success. The database remains blocked until its wake-up RPC.\n      if (result.claimed && !result.completed && !result.continuing && !result.awaitingDependency) {
         throw new Error('ULTIMATE_TASK_INCOMPLETE');
       }
       return result;

@@ -1,5 +1,8 @@
 name: Resume repaired course worker
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/resume-repaired-course-worker.yml']
   workflow_run:
     workflows: ['Deploy Google Course Builder on source changes']
     types: [completed]
@@ -10,7 +13,7 @@ permissions:
   id-token: write
 jobs:
   dispatch:
-    if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == '30663bcdaf9214a76a118174828f361bb0226463')
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == '30663bcdaf9214a76a118174828f361bb0226463')
     runs-on: ubuntu-24.04
     steps:
       - env:
@@ -39,4 +42,4 @@ jobs:
           FORCE_COURSE_RESTART: '1'
         run: node scripts/gcp/start-repaired-course-overflow.mjs
 
-# Authorized course restart: 2026-10-13T11:26Z.
+# Authorized course restart: 2026-10-13T13:03Z.

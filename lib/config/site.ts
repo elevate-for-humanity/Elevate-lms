@@ -19,6 +19,11 @@ export const siteConfig = {
 
   // Contact
   phone: {
+    display: PLATFORM_DEFAULTS.mainPhone,
+    href: 'tel:+13179999620',
+    e164: '+13179999620',
+  },
+  technicalSupport: {
     display: PLATFORM_DEFAULTS.supportPhone,
     href: 'tel:+13173143757',
     e164: '+13173143757',

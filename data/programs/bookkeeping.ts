@@ -5,7 +5,7 @@ export const BOOKKEEPING: ProgramSchema = {
   slug: 'bookkeeping',
   title: 'Bookkeeping & QuickBooks',
   subtitle:
-    'Master small business accounting and prepare for the QuickBooks Certified User exam in 5 weeks.',
+    'Build practical financial confidence, bookkeeping, Excel, and QuickBooks skills in one 8-week Accounting & Financial Empowerment Career Pathway.',
   sector: 'business',
   category: 'Accounting & Finance',
   programType: 'workforce',
@@ -16,7 +16,7 @@ export const BOOKKEEPING: ProgramSchema = {
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
-  durationWeeks: 5,
+  durationWeeks: 8,
   hoursPerWeekMin: 15,
   hoursPerWeekMax: 20,
   hoursBreakdown: {
@@ -25,7 +25,7 @@ export const BOOKKEEPING: ProgramSchema = {
     examPrep: 10,
     careerPlacement: 5,
   },
-  schedule: 'Mon–Thu, 15–20 hours per week',
+  schedule: '8-week hybrid pathway, 15–20 hours per week',
   eveningSchedule: 'Evening sessions available Tue/Thu 6–9 PM.',
   cohortSize: '10–15 participants per cohort',
   fundingStatement: 'Self-pay program. Payment plans available.',
@@ -123,8 +123,8 @@ export const BOOKKEEPING: ProgramSchema = {
       competencyMilestone: 'Process a payroll cycle and calculate employer tax obligations',
     },
     {
-      week: 'Week 5',
-      title: 'Exam Prep & Career Placement',
+      week: 'Weeks 5–8',
+      title: 'Financial Empowerment, Excel, Exam Prep & Career Placement',
       competencyMilestone: 'Pass QuickBooks Certified User practice exam with 80%+ score',
     },
   ],
@@ -229,8 +229,8 @@ export const BOOKKEEPING: ProgramSchema = {
     {
       phase: 4,
       title: 'Certification Exam & Career Prep',
-      weeks: 'Week 5',
-      focus: 'QuickBooks Certified User exam preparation, Excel skills, and career placement.',
+      weeks: 'Weeks 5–8',
+      focus: 'Personal financial empowerment, QuickBooks Certified User exam preparation, Excel skills, and career placement.',
       labCompetencies: [
         'Score 80%+ on QuickBooks Certified User practice exam',
         'Build a budget spreadsheet with formulas and pivot tables in Excel',
@@ -241,13 +241,13 @@ export const BOOKKEEPING: ProgramSchema = {
 
   credentialPipeline: [
     {
-      training: 'QuickBooks Online mastery (Weeks 2–5)',
+      training: 'QuickBooks Online mastery (Weeks 2–8)',
       certification: 'QuickBooks Certified User',
       certBody: 'Intuit / Certiport',
       jobRole: 'Bookkeeper / Accounts Clerk',
     },
     {
-      training: 'Excel for accounting (Weeks 4–5)',
+      training: 'Excel for accounting and business finance (Weeks 4–8)',
       certification: 'Microsoft Office Specialist: Excel',
       certBody: 'Microsoft / Certiport',
       jobRole: 'Financial Analyst / Data Entry',
@@ -299,7 +299,7 @@ export const BOOKKEEPING: ProgramSchema = {
   pricingIncludes: [
     'QuickBooks Certified User exam voucher',
     'Microsoft Excel MOS exam voucher',
-    'QuickBooks Online subscription (5 weeks)',
+    'QuickBooks Online subscription (8 weeks)',
     'All training materials and workbooks',
     'Career placement support',
   ],
@@ -343,7 +343,7 @@ export const BOOKKEEPING: ProgramSchema = {
 
   metaTitle: 'Bookkeeping & QuickBooks | Certified User | Indianapolis',
   metaDescription:
-    'Prepare for the QuickBooks Certified User exam. 5-week program. Bookkeepers earn $45,860/year in Indiana. Payment plans available.',
+    '8-week Accounting & Financial Empowerment Career Pathway combining personal finance, bookkeeping, Excel, and QuickBooks certification preparation.',
 
 
   funding: {

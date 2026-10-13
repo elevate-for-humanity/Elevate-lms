@@ -1,3 +1,4 @@
+import { studentContactProjection } from './contact-privacy';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { calculateDistanceMiles, geocodeAddress, isGeocodingResult } from '@/lib/geo/geocode';
 
@@ -128,13 +129,14 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const holderName = `${holderRes.data?.organization_name || ''} ${holderRes.data?.name || ''}`;
   const requiresEnchantedHeartsTerms = /enchanted hearts/i.test(holderName);
   const signedTypes = new Set(acknowledgements.map((item: any) => item.document_type));
-  const contactAccessGranted =
-    signedTypes.has('non_compete') &&
-    (!requiresEnchantedHeartsTerms || signedTypes.has('enchanted_hearts_referral_terms'));
-  // PII is excluded from the database projection until the required agreements are signed.
-  // This is an authorization boundary, not a presentational hide/show control.
-  const enrollmentContactColumns = contactAccessGranted ? ',email,phone' : '';
-  const applicantContactColumns = contactAccessGranted ? ',applicant_email,applicant_phone' : '';
+  const contactProjection = studentContactProjection(
+    requiresEnchantedHeartsTerms,
+    signedTypes.has('non_compete'),
+  );
+  const contactAccessGranted = contactProjection.granted;
+  const enrollmentContactColumns = contactProjection.enrollment;
+  const applicantContactColumns = contactProjection.applicant;
+  const applicantNotesColumns = contactProjection.notes;
   const allApplicantAccess = holderRes.data?.features?.all_applicant_access === true;
   const regionalAssignment =
     holderRes.data?.features?.regional_assignment &&
@@ -145,7 +147,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     holderRes.data?.features?.approved_role === 'Gary Regional Site Coordinator' &&
     regionalAssignment?.shared_team_key === 'gary-indiana-regional-team' &&
     regionalAssignment?.all_programs_in_region === true;
-  const garyHub = { latitude: 41.5863, longitude: -87.3510 };
+  const garyHub = { latitude: 41.5863, longitude: -87.351 };
   const garyRadiusMiles = Number(regionalAssignment?.radius_miles || 40);
   const [
     programsRes,
@@ -168,14 +170,18 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     programIds.length
       ? db
           .from('programs')
-          .select('id,name,title,slug,status,is_active,credential_name,total_hours,tuition,total_cost,price,is_free,funding,funding_tags,funding_eligibility,funding_eligible,wioa_approved,etpl_listed,hero_image_url,image_url,cover_image_url,short_description,description,full_description,what_you_learn,career_outcomes,salary_min,salary_max,estimated_weeks,delivery_method')
+          .select(
+            'id,name,title,slug,status,is_active,credential_name,total_hours,tuition,total_cost,price,is_free,funding,funding_tags,funding_eligibility,funding_eligible,wioa_approved,etpl_listed,hero_image_url,image_url,cover_image_url,short_description,description,full_description,what_you_learn,career_outcomes,salary_min,salary_max,estimated_weeks,delivery_method',
+          )
           .in('id', programIds)
           .order('title')
       : Promise.resolve({ data: [] }),
     isGaryRegionalCoordinator
       ? db
           .from('applications')
-          .select('id,user_id,full_name,first_name,last_name,email,phone,address,city,state,zip,zip_code,program_id,program_slug,program_interest,status,created_at')
+          .select(
+            'id,user_id,full_name,first_name,last_name,email,phone,address,city,state,zip,zip_code,program_id,program_slug,program_interest,status,created_at',
+          )
           .in('status', ['submitted', 'under_review', 'pending', 'applied'])
           .order('created_at', { ascending: false })
       : Promise.resolve({ data: [] }),
@@ -205,7 +211,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       ? db
           .from('program_holder_students')
           .select(
-            `id,applicant_name,status,application_status,program_id,created_at,label,call_notes,call_date,call_outcome,next_follow_up,work_start_date,work_site${applicantContactColumns}`,
+            `id,applicant_name,status,application_status,program_id,created_at,label${applicantNotesColumns},call_date,call_outcome,next_follow_up,work_start_date,work_site${applicantContactColumns}`,
           )
           .eq('program_holder_id', holderId)
           .in('program_id', programIds)
@@ -216,7 +222,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       ? db
           .from('program_holder_students')
           .select(
-            `id,user_id,applicant_name,status,application_status,program_id,label,call_notes,call_date,call_outcome,work_start_date,completion_date,work_progress,hours_taught,hours_required,work_site,expected_payout_cents,expected_payout_status,updated_at${applicantContactColumns}`,
+            `id,user_id,applicant_name,status,application_status,program_id,label${applicantNotesColumns},call_date,call_outcome,work_start_date,completion_date,work_progress,hours_taught,hours_required,work_site,expected_payout_cents,expected_payout_status,updated_at${applicantContactColumns}`,
           )
           .eq('program_holder_id', holderId)
           .in('program_id', programIds)
@@ -295,13 +301,25 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
 
   // Surface database failures instead of showing an apparently empty dashboard.
   for (const [name, result] of Object.entries({
-    holder: holderRes, acknowledgements: acknowledgementsRes, imageRelease: imageReleaseRes,
-    programs: programsRes, regionalApplicants: regionalApplicantsRes,
-    enrollments: enrollmentsRes, upcoming: upcomingRes, applicants: applicantsRes,
-    convertedStudents: convertedStudentsRes, hours: hoursRes, documents: documentsRes,
-    reports: reportsRes, courses: coursesRes, progressEntries: progressEntriesRes,
-    payout: payoutRes, schedules: schedulesRes, notifications: notificationRes,
-    phoneLine: phoneLineRes, extension: extensionRes,
+    holder: holderRes,
+    acknowledgements: acknowledgementsRes,
+    imageRelease: imageReleaseRes,
+    programs: programsRes,
+    regionalApplicants: regionalApplicantsRes,
+    enrollments: enrollmentsRes,
+    upcoming: upcomingRes,
+    applicants: applicantsRes,
+    convertedStudents: convertedStudentsRes,
+    hours: hoursRes,
+    documents: documentsRes,
+    reports: reportsRes,
+    courses: coursesRes,
+    progressEntries: progressEntriesRes,
+    payout: payoutRes,
+    schedules: schedulesRes,
+    notifications: notificationRes,
+    phoneLine: phoneLineRes,
+    extension: extensionRes,
   })) {
     const error = (result as { error?: { message: string } }).error;
     if (error) throw new Error(`Program Holder ${name} could not load: ${error.message}`);
@@ -309,7 +327,11 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
 
   const rosterUserIds: string[] = Array.from(
     new Set(
-      [...(enrollmentsRes.data ?? []), ...(upcomingRes.data ?? []), ...(convertedStudentsRes.data ?? [])]
+      [
+        ...(enrollmentsRes.data ?? []),
+        ...(upcomingRes.data ?? []),
+        ...(convertedStudentsRes.data ?? []),
+      ]
         .map((row: any) => row.user_id)
         .filter((value: unknown): value is string => typeof value === 'string' && value.length > 0),
     ),
@@ -317,36 +339,59 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   const { data: rosterProfiles, error: rosterProfilesError } = rosterUserIds.length
     ? await db.from('profiles').select('id,role,email').in('id', rosterUserIds)
     : { data: [], error: null };
-  if (rosterProfilesError) throw new Error(`Program Holder roster profiles could not load: ${rosterProfilesError.message}`);
+  if (rosterProfilesError)
+    throw new Error(
+      `Program Holder roster profiles could not load: ${rosterProfilesError.message}`,
+    );
   const eligibleRosterUserIds = new Set(
     (rosterProfiles ?? [])
       .filter(
         (row: any) =>
           ['student', 'learner', 'apprentice'].includes(String(row.role || '').toLowerCase()) &&
-          !String(row.email || '').toLowerCase().endsWith('@qa.invalid'),
+          !String(row.email || '')
+            .toLowerCase()
+            .endsWith('@qa.invalid'),
       )
       .map((row: any) => row.id),
   );
   const verifiedHoursByUser = new Map<string, number>();
   const firstClockDateByUser = new Map<string, string>();
   for (const entry of hoursRes.data ?? []) {
-    if (!entry.user_id || !['approved', 'verified', 'complete', 'completed'].includes(String(entry.approval_status || entry.status || '').toLowerCase())) continue;
-    verifiedHoursByUser.set(entry.user_id, (verifiedHoursByUser.get(entry.user_id) ?? 0) + Number(entry.hours_claimed ?? entry.hours ?? 0));
+    if (
+      !entry.user_id ||
+      !['approved', 'verified', 'complete', 'completed'].includes(
+        String(entry.approval_status || entry.status || '').toLowerCase(),
+      )
+    )
+      continue;
+    verifiedHoursByUser.set(
+      entry.user_id,
+      (verifiedHoursByUser.get(entry.user_id) ?? 0) +
+        Number(entry.hours_claimed ?? entry.hours ?? 0),
+    );
   }
   for (const entry of progressEntriesRes.data ?? []) {
     if (!entry.apprentice_id) continue;
     const hours = Number(entry.hours_worked || 0);
-    if (hours > 0) verifiedHoursByUser.set(entry.apprentice_id, (verifiedHoursByUser.get(entry.apprentice_id) ?? 0) + hours);
+    if (hours > 0)
+      verifiedHoursByUser.set(
+        entry.apprentice_id,
+        (verifiedHoursByUser.get(entry.apprentice_id) ?? 0) + hours,
+      );
     if (entry.work_date) {
       const existing = firstClockDateByUser.get(entry.apprentice_id);
-      if (!existing || entry.work_date < existing) firstClockDateByUser.set(entry.apprentice_id, entry.work_date);
+      if (!existing || entry.work_date < existing)
+        firstClockDateByUser.set(entry.apprentice_id, entry.work_date);
     }
   }
   const enrolledRoster = (enrollmentsRes.data ?? [])
     .filter((row: any) => eligibleRosterUserIds.has(row.user_id))
     .map((row: any) => ({
       ...row,
-      total_hours_completed: Math.max(Number(row.total_hours_completed || 0), verifiedHoursByUser.get(row.user_id) ?? 0),
+      total_hours_completed: Math.max(
+        Number(row.total_hours_completed || 0),
+        verifiedHoursByUser.get(row.user_id) ?? 0,
+      ),
       training_start_date: row.training_start_date || firstClockDateByUser.get(row.user_id) || null,
     }));
   const upcomingRoster = (upcomingRes.data ?? []).filter((row: any) =>
@@ -381,23 +426,28 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
 
   const holderApplicantRows = applicantsRes.data ?? [];
   const distanceCheckedRegionalApplicants = isGaryRegionalCoordinator
-    ? (await Promise.all((regionalApplicantsRes.data ?? []).map(async (row: any) => {
-        const address = [row.address, row.city, row.state || 'IN', row.zip_code || row.zip]
-          .filter(Boolean)
-          .join(', ');
-        if (!address) return null;
-        const cityCenter = getGaryRegionalCityCenter(row.city);
-        const geocodedLocation = cityCenter ? null : await geocodeAddress(address);
-        const location = cityCenter || (isGeocodingResult(geocodedLocation) ? geocodedLocation : null);
-        if (!location) return null;
-        const distanceMiles = calculateDistanceMiles(
-          garyHub.latitude,
-          garyHub.longitude,
-          location.latitude,
-          location.longitude,
-        );
-        return distanceMiles <= garyRadiusMiles ? { ...row, distanceMiles } : null;
-      }))).filter(Boolean)
+    ? (
+        await Promise.all(
+          (regionalApplicantsRes.data ?? []).map(async (row: any) => {
+            const address = [row.address, row.city, row.state || 'IN', row.zip_code || row.zip]
+              .filter(Boolean)
+              .join(', ');
+            if (!address) return null;
+            const cityCenter = getGaryRegionalCityCenter(row.city);
+            const geocodedLocation = cityCenter ? null : await geocodeAddress(address);
+            const location =
+              cityCenter || (isGeocodingResult(geocodedLocation) ? geocodedLocation : null);
+            if (!location) return null;
+            const distanceMiles = calculateDistanceMiles(
+              garyHub.latitude,
+              garyHub.longitude,
+              location.latitude,
+              location.longitude,
+            );
+            return distanceMiles <= garyRadiusMiles ? { ...row, distanceMiles } : null;
+          }),
+        )
+      ).filter(Boolean)
     : [];
   const regionalApplicantRows = isGaryRegionalCoordinator
     ? distanceCheckedRegionalApplicants.map((row: any) => ({
@@ -405,7 +455,8 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         application_id: row.id,
         user_id: row.user_id,
         enrollment_id: null,
-        applicant_name: row.full_name || [row.first_name, row.last_name].filter(Boolean).join(' ') || 'Applicant',
+        applicant_name:
+          row.full_name || [row.first_name, row.last_name].filter(Boolean).join(' ') || 'Applicant',
         applicant_email: contactAccessGranted ? row.email : undefined,
         applicant_phone: contactAccessGranted ? row.phone : undefined,
         status: 'applied',
@@ -423,25 +474,30 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       }))
     : [];
   const applicantRows = isGaryRegionalCoordinator ? regionalApplicantRows : holderApplicantRows;
-  const deduplicatedApplicants = (allApplicantAccess || isGaryRegionalCoordinator)
-    ? applicantRows.filter((row: any, index: number, rows: any[]) => {
-        const key =
-          row.application_id ||
-          [row.user_id || '', row.applicant_email?.toLowerCase() || '', row.program_id || ''].join(':');
-        return (
-          rows.findIndex((candidate: any) => {
-            const candidateKey =
-              candidate.application_id ||
-              [
-                candidate.user_id || '',
-                candidate.applicant_email?.toLowerCase() || '',
-                candidate.program_id || '',
-              ].join(':');
-            return candidateKey === key;
-          }) === index
-        );
-      })
-    : applicantRows;
+  const deduplicatedApplicants =
+    allApplicantAccess || isGaryRegionalCoordinator
+      ? applicantRows.filter((row: any, index: number, rows: any[]) => {
+          const key =
+            row.application_id ||
+            [
+              row.user_id || '',
+              row.applicant_email?.toLowerCase() || '',
+              row.program_id || '',
+            ].join(':');
+          return (
+            rows.findIndex((candidate: any) => {
+              const candidateKey =
+                candidate.application_id ||
+                [
+                  candidate.user_id || '',
+                  candidate.applicant_email?.toLowerCase() || '',
+                  candidate.program_id || '',
+                ].join(':');
+              return candidateKey === key;
+            }) === index
+          );
+        })
+      : applicantRows;
 
   const canonicalEnrollmentIds = new Set(enrolledRoster.map((row: any) => row.id).filter(Boolean));
   const canonicalEnrollmentUserIds = new Set(

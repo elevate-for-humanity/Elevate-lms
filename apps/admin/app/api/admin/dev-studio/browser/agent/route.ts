@@ -4,8 +4,11 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createAiTask } from '@/lib/devstudio/os/task-runner';
 import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
+import { runWithPaidInferenceContext } from '@/lib/ai/paid-inference-context';
+import { findAcquisitionBrowserCheckpoint } from '@/lib/devstudio/browser-acquisition-checkpoint';
 import {
   browserActionRecords,
+  browserTurnRequiresAuthentication,
   browserTaskMatches,
   planBrowserTurn,
   type BrowserActionRecord,
@@ -35,15 +38,67 @@ export async function POST(req: NextRequest) {
   const command = String(body.task || '').trim();
   const sessionId = String(body.sessionId || '');
   const sessionToken = String(body.sessionToken || '');
-  const requestedTaskId = String(body.taskId || '');
+  let requestedTaskId = String(body.taskId || '');
   const conversationId = String(body.conversationId || '').trim();
+  const acquisitionRunId = String(body.acquisitionRunId || '').trim();
   if (!command || !sessionId || !sessionToken) {
     return NextResponse.json({ error: 'Task and browser session are required' }, { status: 400 });
   }
 
+  await hydrateProcessEnv().catch(() => undefined);
+  const workerUrl = (process.env.STUDIO_BROWSER_URL || '').replace(/\/$/, '');
+  if (!workerUrl) {
+    return NextResponse.json(
+      { error: 'Studio browser runtime is not configured' },
+      { status: 503 },
+    );
+  }
+  const identityResponse = await fetch(`${workerUrl}/sessions/${sessionId}/identity`, {
+    headers: { Authorization: `Bearer ${sessionToken}` },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(10000),
+  }).catch(() => null);
+  const identity = await identityResponse?.json().catch(() => ({}));
+  if (!identityResponse?.ok)
+    return NextResponse.json(
+      { error: identity?.error || 'Browser connection is unavailable' },
+      { status: identityResponse?.status || 503 },
+    );
+  if (identity?.ownerId !== auth.id)
+    return NextResponse.json(
+      { error: 'Browser session does not belong to this administrator' },
+      { status: 403 },
+    );
+
   const db = await requireAdminClient();
+  if (acquisitionRunId) {
+    const { data: acquisition, error: acquisitionError } = await db
+      .from('studio_runs')
+      .select('id,command,context')
+      .eq('id', acquisitionRunId)
+      .eq('user_id', auth.id)
+      .maybeSingle();
+    if (acquisitionError)
+      return NextResponse.json({ error: 'Media request lookup failed' }, { status: 503 });
+    if (
+      !acquisition ||
+      acquisition.command !== command ||
+      acquisition.context?.acquisition_mode !== 'envato-workspace-batch'
+    ) {
+      return NextResponse.json(
+        { error: 'Media request does not match this owner or exact command' },
+        { status: 403 },
+      );
+    }
+  }
   const tenantId = await resolveTenantIdForUser(auth.id).catch(() => null);
   let task: Record<string, any> | null = null;
+  let runningRecently = false;
+
+  if (!requestedTaskId && acquisitionRunId) {
+    const saved = await findAcquisitionBrowserCheckpoint(db, auth.id, acquisitionRunId, command);
+    requestedTaskId = String(saved?.id ?? '');
+  }
 
   if (requestedTaskId) {
     const { data } = await db
@@ -54,7 +109,36 @@ export async function POST(req: NextRequest) {
       .eq('tool_name', 'browser.execute')
       .maybeSingle();
     task = data;
-    if (!browserTaskMatches(task, { command, sessionId })) {
+    runningRecently = task?.status === 'running' &&
+      Date.now() - Date.parse(String(task.updated_at ?? '')) < 150_000;
+    // A restarted worker has a new ephemeral session ID. Rebind only after
+    // proving both the task and live browser belong to the same administrator
+    // and the exact original command remains unchanged.
+    const priorSessionId = String(task?.tool_input?.sessionId || '');
+    if (
+      task &&
+      priorSessionId !== sessionId &&
+      browserTaskMatches(task, { command, sessionId: priorSessionId }) &&
+      (!acquisitionRunId || task.studio_run_id === acquisitionRunId)
+    ) {
+      const toolInput = { ...task.tool_input, sessionId };
+      const { data: rebound, error: rebindError } = await db
+        .from('ai_tasks')
+        .update({ tool_input: toolInput, updated_at: new Date().toISOString() })
+        .eq('id', requestedTaskId)
+        .eq('requested_by', auth.id)
+        .select('*').single();
+      if (rebindError)
+        return NextResponse.json(
+          { error: 'Could not reconnect the browser checkpoint' },
+          { status: 503 },
+        );
+      task = rebound;
+    }
+    if (
+      !browserTaskMatches(task, { command, sessionId }) ||
+      (acquisitionRunId && task?.studio_run_id !== acquisitionRunId)
+    ) {
       return NextResponse.json(
         { error: 'Browser task does not match this session or command' },
         { status: 403 },
@@ -72,6 +156,7 @@ export async function POST(req: NextRequest) {
         toolInput: { task: command, sessionId },
         executionMode: 'interactive',
         conversationId: conversationId || undefined,
+        studioRunId: acquisitionRunId || undefined,
       },
       {
         actorRoles: auth.effectiveRoles,
@@ -86,6 +171,10 @@ export async function POST(req: NextRequest) {
   }
 
   if (!task) return NextResponse.json({ error: 'Could not create browser task' }, { status: 503 });
+  if (runningRecently) {
+    return NextResponse.json({ error: 'This browser task is already running. Resume its checkpoint when the current request finishes.',
+      taskId: task.id, running: true }, { status: 409 });
+  }
   if (task.status === 'cancelled') {
     return NextResponse.json(
       { error: 'This browser task was cancelled', taskId: task.id },
@@ -104,14 +193,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  await hydrateProcessEnv().catch(() => undefined);
-  const workerUrl = (process.env.STUDIO_BROWSER_URL || '').replace(/\/$/, '');
-  if (!workerUrl) {
-    return NextResponse.json(
-      { error: 'Studio browser runtime is not configured' },
-      { status: 503 },
-    );
-  }
   const workerHeaders = {
     Authorization: `Bearer ${sessionToken}`,
     'content-type': 'application/json',
@@ -139,11 +220,85 @@ export async function POST(req: NextRequest) {
     if (data?.status === 'cancelled') throw new Error('Browser task cancelled by administrator');
   };
 
+  const pauseForAuthentication = async (
+    reason: string,
+    steps: BrowserStep[],
+    history: BrowserHistoryEntry[],
+    totalTokens: number,
+    provider?: string,
+    model?: string,
+    mode: 'authentication' | 'interaction' = 'authentication',
+  ) => {
+    await db
+      .from('ai_task_steps')
+      .update({
+        status: 'pending',
+        error_message: null,
+        completed_at: null,
+      })
+      .eq('task_id', taskId)
+      .eq('action_type', 'execute');
+    await updateTask({
+      status: 'queued',
+      completed_at: null,
+      error_message: null,
+      result_json: {
+        ok: true,
+        status: mode === 'authentication' ? 'awaiting_authentication' : 'awaiting_interaction',
+        authenticationRequired: mode === 'authentication',
+        interactionRequired: mode === 'interaction',
+        reason,
+        steps,
+        history,
+        usage: { totalTokens },
+      },
+      tool_output: {
+        status: mode === 'authentication' ? 'awaiting_authentication' : 'awaiting_interaction',
+        authenticationRequired: mode === 'authentication',
+        interactionRequired: mode === 'interaction',
+        reason,
+        steps,
+        provider,
+        model,
+        usage: { totalTokens },
+      },
+    });
+    await appendLog(
+      mode === 'authentication'
+        ? 'Browser workflow paused for secure authentication and can resume from its persisted checkpoint.'
+        : 'Browser workflow paused for the administrator to answer a dialog or choose files; the same task can resume.',
+      'warn',
+    );
+  };
+
+  // A page reload or second tab must not execute the same checkpoint twice.
+  let claim = db.from('ai_tasks').update({
+    status: 'running', started_at: task.started_at || new Date().toISOString(),
+    attempts: Number(task.attempts ?? 0) + 1, completed_at: null,
+    error_message: null, updated_at: new Date().toISOString(),
+  }).eq('id', taskId).eq('requested_by', auth.id);
+  claim = task.updated_at ? claim.eq('updated_at', task.updated_at) : claim.is('updated_at', null);
+  const { data: claimed, error: claimError } = await claim.select('id').maybeSingle();
+  if (claimError) return NextResponse.json({
+    error: 'Could not claim the browser checkpoint.',
+  }, { status: 503 });
+  if (!claimed) return NextResponse.json({
+    error: 'This browser checkpoint is being used by another request.', taskId, running: true,
+  }, { status: 409 });
+
+  // Transport lifetime must not invalidate the action already submitted to the
+  // worker. Finish its checkpoint, then release this same task for resumption.
+  let disconnected = req.signal.aborted;
+  const disconnect = () => { disconnected = true; };
+  req.signal.addEventListener('abort', disconnect, { once: true });
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     start(controller) {
-      const emit = (event: Record<string, unknown>) =>
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ ...event, taskId })}\n\n`));
+      const emit = (event: Record<string, unknown>) => {
+        if (disconnected) return;
+        try { controller.enqueue(encoder.encode(`data: ${JSON.stringify({ ...event, taskId })}\n\n`)); }
+        catch { disconnect(); }
+      };
       void (async () => {
         const steps: BrowserStep[] = Array.isArray(task.result_json?.steps)
           ? task.result_json.steps
@@ -153,11 +308,6 @@ export async function POST(req: NextRequest) {
           : [];
         let totalTokens = Number(task.result_json?.usage?.totalTokens || 0);
         try {
-          await updateTask({
-            status: 'running',
-            started_at: task.started_at || new Date().toISOString(),
-            attempts: Number(task.attempts ?? 0) + 1,
-          });
           await db
             .from('ai_task_steps')
             .update({ status: 'completed', completed_at: new Date().toISOString() })
@@ -172,8 +322,59 @@ export async function POST(req: NextRequest) {
           emit({ type: 'status', message: 'Planning browser workflow…' });
           if (steps.length)
             await appendLog(`Browser workflow resumed from checkpoint ${steps.length}.`);
-          for (let turn = steps.length; turn < 20; turn++) {
+          const requestStartedAt = Date.now();
+          const batchStart = steps.length;
+          const maxTaskSteps = Math.min(
+            2000,
+            Math.max(100, Number(process.env.STUDIO_BROWSER_MAX_TASK_STEPS) || 400),
+          );
+          const continueFromCheckpoint = async () => {
+            await updateTask({
+              status: 'queued',
+              completed_at: null,
+              error_message: null,
+              result_json: {
+                ok: true,
+                status: 'continuing',
+                steps,
+                history,
+                usage: { totalTokens },
+              },
+            });
+            emit({
+              type: 'continue',
+              message: 'Continuing the same browser task from its saved checkpoint.',
+            });
+          };
+          const pauseIfDisconnected = async () => {
+            if (!disconnected) return false;
             await assertNotCancelled();
+            await continueFromCheckpoint();
+            await appendLog('Browser client disconnected; the same task is queued at its persisted checkpoint.');
+            return true;
+          };
+          for (let turn = batchStart; turn < batchStart + 20; turn++) {
+            if (await pauseIfDisconnected()) return;
+            if (steps.length >= maxTaskSteps) {
+              const reason = `Review the browser task after ${maxTaskSteps} checkpoints and narrow the command or increase its configured budget.`;
+              await pauseForAuthentication(
+                reason,
+                steps,
+                history,
+                totalTokens,
+                undefined,
+                undefined,
+                'interaction',
+              );
+              emit({ type: 'interaction_required', message: reason });
+              return;
+            }
+            if (Date.now() - requestStartedAt > 55000) {
+              await continueFromCheckpoint();
+              return;
+            }
+            await assertNotCancelled();
+            if (await pauseIfDisconnected()) return;
             const snapshotResponse = await fetch(`${workerUrl}/sessions/${sessionId}/snapshot`, {
               headers: { Authorization: `Bearer ${sessionToken}` },
               cache: 'no-store',
@@ -184,19 +385,55 @@ export async function POST(req: NextRequest) {
               .catch(() => ({}))) as BrowserSnapshot & {
               error?: string;
             };
+            if (!snapshotResponse.ok && snapshot.error === 'human_verification_required') {
+              const reason = 'The website is asking you to verify you are human in the existing Studio browser. Complete the verification, then resume this same task.';
+              await pauseForAuthentication(reason, steps, history, totalTokens,
+                undefined, undefined, 'interaction');
+              emit({ type: 'interaction_required', message: reason });
+              return;
+            }
+            if (!snapshotResponse.ok && snapshot.error === 'interaction_required') {
+              const reason =
+                'Respond to the browser dialog or choose files in the workspace, then resume this task.';
+              await pauseForAuthentication(
+                reason,
+                steps,
+                history,
+                totalTokens,
+                undefined,
+                undefined,
+                'interaction',
+              );
+              emit({ type: 'interaction_required', message: reason });
+              return;
+            }
+            if (!snapshotResponse.ok && snapshot.error === 'authentication_required') {
+              const reason = 'Sign in securely in the existing Studio browser to resume this task.';
+              await pauseForAuthentication(reason, steps, history, totalTokens);
+              emit({ type: 'authentication_required', message: reason, steps });
+              return;
+            }
             if (!snapshotResponse.ok) {
               throw new Error(snapshot.error || 'Could not read the current browser page');
             }
-            const plan = await planBrowserTurn({
-              command,
-              instructions,
-              snapshot,
-              history,
-            });
+            // The canonical browser task is the authorization boundary for its
+            // planner calls. Preserve that boundary while allowing the planner
+            // to use Studio's configured provider instead of hard-coding the
+            // optional Elevate-owned gateway.
+            if (await pauseIfDisconnected()) return;
+            const plan = await runWithPaidInferenceContext(taskId, () =>
+              planBrowserTurn({
+                command,
+                instructions,
+                snapshot,
+                history,
+              }),
+            );
             totalTokens += plan.usage?.totalTokens || 0;
             await appendLog(
               `Browser plan ${turn + 1}: ${plan.status} via ${plan.provider}/${plan.model}.`,
             );
+            if (await pauseIfDisconnected()) return;
             if (plan.status === 'complete') {
               const completedAt = new Date().toISOString();
               await db
@@ -246,6 +483,23 @@ export async function POST(req: NextRequest) {
               return;
             }
             if (plan.status === 'blocked') {
+              if (browserTurnRequiresAuthentication(plan)) {
+                const reason = plan.reason || plan.summary;
+                await pauseForAuthentication(
+                  reason,
+                  steps,
+                  history,
+                  totalTokens,
+                  plan.provider,
+                  plan.model,
+                );
+                emit({
+                  type: 'authentication_required',
+                  message: reason,
+                  steps,
+                });
+                return;
+              }
               throw new Error(`Browser workflow blocked: ${plan.reason || plan.summary}`);
             }
             const actions = plan.actions;
@@ -255,10 +509,11 @@ export async function POST(req: NextRequest) {
               actions: actions.length,
               message: `Running browser step ${turn + 1}…`,
             });
+            if (await pauseIfDisconnected()) return;
             const actionResponse = await fetch(`${workerUrl}/sessions/${sessionId}/actions`, {
               method: 'POST',
               headers: workerHeaders,
-              body: JSON.stringify({ actions }),
+              body: JSON.stringify({ actions, actor: 'automation' }),
               signal: AbortSignal.timeout(35_000),
             });
             const actionMetrics = (await actionResponse.json().catch(() => ({}))) as {
@@ -266,6 +521,30 @@ export async function POST(req: NextRequest) {
               durationMs?: number;
               url?: string;
             };
+            if (!actionResponse.ok && actionMetrics.error === 'manual_control_active') {
+              const reason = 'You took control of the Studio browser. Finish your input, then resume this same task.';
+              await pauseForAuthentication(reason, steps, history, totalTokens, undefined, undefined, 'interaction');
+              emit({ type: 'interaction_required', message: reason, steps });
+              return;
+            }
+            if (!actionResponse.ok && actionMetrics.error === 'authentication_required') {
+              const reason =
+                'The licensed-media provider session requires secure authentication before this browser task can continue.';
+              await pauseForAuthentication(
+                reason,
+                steps,
+                history,
+                totalTokens,
+                plan.provider,
+                plan.model,
+              );
+              emit({ type: 'authentication_required', message: reason, steps });
+              return;
+            }
+            if (!actionResponse.ok && actionMetrics.error === 'stale_control') {
+              await appendLog('A popup changed the active tab; rebuilding the control snapshot.');
+              continue;
+            }
             if (!actionResponse.ok) throw new Error(actionMetrics.error || 'Browser action failed');
             const step: BrowserStep = {
               turn: turn + 1,
@@ -309,7 +588,8 @@ export async function POST(req: NextRequest) {
               `Browser checkpoint ${turn + 1} persisted (${actions.length} actions).`,
             );
           }
-          throw new Error('AI browser reached the 20-step safety limit');
+          await continueFromCheckpoint();
+          return;
         } catch (error) {
           const message = error instanceof Error ? error.message : 'AI browser task failed';
           const cancelled = message.includes('cancelled');
@@ -332,10 +612,18 @@ export async function POST(req: NextRequest) {
           await appendLog(message, cancelled ? 'warn' : 'error');
           emit({ type: 'error', error: message, steps });
         } finally {
-          controller.close();
+          req.signal.removeEventListener('abort', disconnect);
+          if (!disconnected) {
+            try { controller.close(); } catch { disconnect(); }
+          }
         }
-      })();
+      })().catch(error => {
+        // Persistence failures remain failures; never let a detached SSE task
+        // produce an unhandled rejection or overwrite its last saved checkpoint.
+        console.error('[studio-browser-agent] stream task failed', error instanceof Error ? error.message : 'Unknown error');
+      });
     },
+    cancel() { disconnect(); },
   });
   return new Response(stream, {
     headers: {

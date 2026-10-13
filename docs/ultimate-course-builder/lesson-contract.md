@@ -33,7 +33,7 @@ The authenticated admin endpoint `/api/admin/ultimate-course-builder` supports a
 
 A competency title or Appendix A work-process label is not the full instructional curriculum. Without an authored blueprint or full authorized source text, the builder returns `ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED`.
 
-Source-based generation and delivered-instruction review use the existing owned inference provider through `ELEVATE_LLM_URL` and `ELEVATE_LLM_SECRET`. No paid-provider fallback is added. Missing configuration blocks the stage.
+The active Ultimate Course Builder is deterministic and source-bound. It does not use the archived Elevate LLM runtime, `ELEVATE_LLM_URL`, or `ELEVATE_LLM_SECRET`. Lesson generation and delivered-instruction review operate from authorized curriculum sources and persisted lesson-contract evidence.
 
 ## Worker requirements
 

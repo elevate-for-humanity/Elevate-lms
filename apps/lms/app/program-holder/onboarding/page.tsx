@@ -17,7 +17,7 @@ export default async function ProgramHolderOnboardingPage() {
     .eq('id', context.holderId)
     .maybeSingle();
 
-  if (!holder || !holder.approved_at || !['approved', 'active'].includes(String(holder.status || ''))) {
+  if (!holder || !holder.approved_at || !['approved', 'active', 'approved_pending_mou'].includes(String(holder.status || ''))) {
     redirect('/program-holder/dashboard?onboarding=pending-approval');
   }
 

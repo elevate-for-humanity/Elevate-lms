@@ -6,7 +6,7 @@ import { telnyxClient } from '@/lib/phone/telnyx';
 type DatabaseClient = any;
 
 export async function ensureWebrtcConnection(db: DatabaseClient, system: any, callerId: string) {
-  const client = telnyxClient();
+  const client = await telnyxClient();
   if (system.webrtc_connection_id) {
     try {
       const existing = await client.credentialConnections.retrieve(system.webrtc_connection_id);
@@ -82,12 +82,13 @@ export async function ensureDeviceCredential(input: {
   callerId: string;
 }) {
   const { db, system, extension, profileId, deviceId, callerId } = input;
-  const client = telnyxClient();
+  const client = await telnyxClient();
   const { data: stored } = await db
     .from('phone_webrtc_devices')
     .select('*')
     .eq('profile_id', profileId)
     .eq('device_id', deviceId)
+    .eq('provider', 'telnyx')
     .eq('status', 'active')
     .maybeSingle();
 
@@ -124,10 +125,14 @@ export async function ensureDeviceCredential(input: {
       extension_id: extension.id,
       profile_id: profileId,
       device_id: deviceId,
+      provider: 'telnyx',
       provider_credential_id: credentialId,
       sip_username: sipUsername,
       status: 'active',
-      last_seen_at: now,
+      registration_state: 'unregistered',
+      connection_state: 'disconnected',
+      registration_verified_at: null,
+      last_seen_at: stored?.last_seen_at || null,
       updated_at: now,
     },
     { onConflict: 'profile_id,device_id' },

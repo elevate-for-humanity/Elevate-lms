@@ -15,7 +15,7 @@ const NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration';
 const LEGACY_NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration:v2';
 
 function narrationFor(section: HTMLElement) {
-  return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 900) ?? '';
+  return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 2400) ?? '';
 }
 
 function narrationSourceFor(section: HTMLElement) {
@@ -72,31 +72,42 @@ export function ScrollNarrator() {
   const [enabled, setEnabled] = useState(true);
   const [hasNarration, setHasNarration] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const narratedRef = useRef(new Set<string>());
+  const pendingRef = useRef<string | null>(null);
+  const playbackGenerationRef = useRef(0);
   const lastNarrationRef = useRef<{ section: HTMLElement; text: string; source?: string } | null>(
     null,
   );
-  const { play, prepare, stop, isLoading, isPlaying } = useNaturalVoice();
+  const { play, prepare, stop } = useNaturalVoice();
 
-  const narrateVisibleSection = useCallback(async () => {
+  const narrateVisibleSection = useCallback(async (replay = false) => {
+    // User-started media owns the sound until it finishes or is paused.
+    if (Array.from(document.querySelectorAll<HTMLMediaElement>('audio, video')).some(
+      (media) => !media.paused && (!media.muted && media.volume > 0 || media.hasAttribute('data-narrated-tour')),
+    )) return false;
     const section = mostVisiblePageSection();
     if (!section) {
       // Mobile layouts frequently have spacing between narrated sections.
       // Keep the active script playing through that gap instead of cutting a
       // sentence off merely because the visitor continued scrolling.
-      return;
+      return false;
     }
 
     const text = narrationFor(section);
-    if (!text) return;
+    if (!text) return false;
     const source = narrationSourceFor(section);
-    if (
+    const key = JSON.stringify([text, source || '']);
+    if (!replay && (narratedRef.current.has(key) || pendingRef.current === key)) return true;
+    if (!replay && (
       lastNarrationRef.current?.section === section &&
       lastNarrationRef.current.text === text &&
       lastNarrationRef.current.source === source
-    )
-      return;
+    ))
+      return true;
 
     lastNarrationRef.current = { section, text, source };
+    pendingRef.current = key;
+    const generation = ++playbackGenerationRef.current;
     pauseOtherAudibleMedia();
     const started = await play(text, {
       src: source,
@@ -105,12 +116,16 @@ export function ScrollNarrator() {
       rate: narrationRateFor(section),
       allowBrowserFallback: true,
     });
+    if (generation !== playbackGenerationRef.current) return false;
+    pendingRef.current = null;
     if (!started) {
       lastNarrationRef.current = null;
-      setNotice('Narration will begin with your first touch.');
+      setNotice('Narration could not start. Turn narration off and on to retry.');
     } else {
+      narratedRef.current.add(key);
       setNotice(null);
     }
+    return started;
   }, [play]);
 
   useEffect(() => {
@@ -138,23 +153,38 @@ export function ScrollNarrator() {
   }, []);
 
   useEffect(() => {
+    // Marketing pages stream after the shared layout. Watch for their sections
+    // instead of assuming the main content exists when this component mounts.
+    const updateNarrationAvailability = () => {
+      setHasNarration(
+        document.querySelector(
+          'main [data-scroll-narration]:not([data-narration-disabled="true"])',
+        ) !== null,
+      );
+    };
+    updateNarrationAvailability();
+    const observer = new MutationObserver(updateNarrationAvailability);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [pathname]);
+
+  useEffect(() => {
+    playbackGenerationRef.current += 1;
+    pendingRef.current = null;
+    narratedRef.current.clear();
     lastNarrationRef.current = null;
     stop();
-    const narrationSections = document.querySelectorAll(
-      'main [data-scroll-narration]:not([data-narration-disabled="true"])',
-    );
-    setHasNarration(narrationSections.length > 0);
-    if (!enabled) return;
+    if (!enabled || !hasNarration) return;
     // Give the page and opening visual time to settle before narration begins.
     // This prevents the hero, route transition, and first scroll section from
     // competing to speak during initial render.
     const timer = window.setTimeout(() => void narrateVisibleSection(), 1400);
     return () => window.clearTimeout(timer);
-  }, [enabled, narrateVisibleSection, pathname, stop]);
+  }, [enabled, hasNarration, narrateVisibleSection, pathname, stop]);
 
   useEffect(() => {
-    // Do not fetch narration audio until the visitor explicitly enables it.
-    if (!enabled) return;
+    // Warm scripts only when narration is enabled and streamed content exists.
+    if (!enabled || !hasNarration) return;
 
     const sections = Array.from(
       document.querySelectorAll<HTMLElement>('main [data-scroll-narration]'),
@@ -194,7 +224,7 @@ export function ScrollNarrator() {
 
     sections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();
-  }, [enabled, pathname, prepare]);
+  }, [enabled, hasNarration, pathname, prepare]);
 
   useEffect(() => {
     let timer = 0;
@@ -230,14 +260,14 @@ export function ScrollNarrator() {
     // but it is never required to start the guided page experience.
     let retrying = false;
     let unlocked = false;
-    const beginFromNaturalInteraction = () => {
+    const beginFromNaturalInteraction = (event: Event) => {
+      if (event.target instanceof Element && event.target.closest('[data-page-narrator-control]')) return;
       if (retrying || unlocked) return;
       retrying = true;
       setNotice(null);
-      lastNarrationRef.current = null;
       void narrateVisibleSection()
-        .then(() => {
-          unlocked = true;
+        .then((started) => {
+          unlocked = started;
         })
         .finally(() => {
           retrying = false;
@@ -246,16 +276,13 @@ export function ScrollNarrator() {
 
     window.addEventListener('pointerdown', beginFromNaturalInteraction, {
       capture: true,
-      once: true,
     });
     window.addEventListener('touchstart', beginFromNaturalInteraction, {
       capture: true,
-      once: true,
       passive: true,
     });
     window.addEventListener('keydown', beginFromNaturalInteraction, {
       capture: true,
-      once: true,
     });
 
     return () => {
@@ -266,18 +293,17 @@ export function ScrollNarrator() {
   }, [enabled, narrateVisibleSection]);
 
   const toggle = () => {
-    if (enabled && (isPlaying || isLoading)) {
+    if (enabled) {
       setEnabled(false);
+      setNotice(null);
       window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'off');
       stop();
       return;
     }
 
     setNotice(null);
-    setEnabled(true);
     window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'on');
-    lastNarrationRef.current = null;
-    void narrateVisibleSection();
+    setEnabled(true);
   };
 
   // The Bookkeeping hero is a dense, full-width informational graphic. Keep
@@ -285,45 +311,34 @@ export function ScrollNarrator() {
   if (pathname === '/programs/bookkeeping' || !hasNarration) return null;
 
   return (
-    <div className="fixed bottom-24 left-4 z-[80] sm:bottom-6 sm:left-6">
+    <div className="fixed bottom-24 left-3 z-[80] sm:bottom-6 sm:left-6">
       <button
+        data-page-narrator-control
         type="button"
         onClick={toggle}
         aria-pressed={enabled}
         aria-label={
-          enabled
-            ? isLoading
-              ? 'Natural narration is preparing. Tap to stop.'
-              : isPlaying
-                ? 'Stop page narration'
-                : 'Play narration for this section'
-            : 'Play narration for this section'
+          enabled ? 'Stop page narration' : 'Play narration for this section'
         }
-        title={isPlaying || isLoading ? 'Stop narration' : 'Play section narration'}
+        title={enabled ? 'Stop narration' : 'Play section narration'}
         className={`inline-flex h-12 w-12 min-h-0 min-w-0 touch-manipulation items-center justify-center rounded-full border-2 border-white p-0 text-white shadow-xl transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 ${
           enabled ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-blue-700 hover:bg-blue-800'
         }`}
         style={{ minHeight: '3rem', minWidth: '3rem', padding: 0 }}
       >
-        {isPlaying || isLoading ? (
+        {enabled ? (
           <VolumeX className="h-5 w-5" aria-hidden="true" />
         ) : (
           <Volume2 className="h-5 w-5" aria-hidden="true" />
         )}
         <span className="sr-only">
-          {enabled
-            ? isLoading
-              ? 'Preparing narration'
-              : isPlaying
-                ? 'Stop narration'
-                : 'Play narration'
-            : 'Play narration'}
+          {enabled ? 'Stop narration' : 'Play narration'}
         </span>
       </button>
       {notice && enabled ? (
         <p
           role="status"
-          className="mt-2 max-w-64 rounded-lg bg-white p-2 text-xs font-bold text-red-800 shadow-lg"
+          className="mt-2 max-w-[min(15rem,calc(100vw-5rem))] rounded-lg bg-white px-3 py-2 text-xs font-bold leading-5 text-slate-800 shadow-lg"
         >
           {notice}
         </p>

@@ -1,33 +1,34 @@
 /**
  * Upload generated lesson audio/video to durable storage.
  * - Small assets (MP3, slide JPEG) → Supabase `course-videos`
- * - Large MP4 (when R2 configured) → Cloudflare R2 under `course-videos/` prefix
+ * - Large MP4 → configured Elevate Media Storage when available
  *
- * Avoids writing under public/generated/ on ephemeral containers.
+ * Production Elevate Media Storage can be Backblaze B2, Wasabi, AWS S3, Supabase S3,
+ * Cloudflare R2, or another S3-compatible endpoint. Container disk remains
+ * ephemeral and is used only while rendering.
  */
 
 import { execFile } from 'child_process';
-import { mkdtemp, readFile, rm, stat, unlink, writeFile } from 'fs/promises';
+import { mkdtemp, readFile, rm, unlink, writeFile } from 'fs/promises';
 import { promisify } from 'util';
 import os from 'os';
 import path from 'path';
 import {
-  uploadToR2,
-  isR2Configured,
-  isR2PublicDeliveryConfigured,
-} from '@/lib/cloudflare-r2';
-import { isStorageConfigured } from '@/lib/storage/file-storage';
-import { logger } from '@/lib/logger';
+  uploadToElevateMedia,
+  isElevateMediaStorageConfigured,
+  isElevateMediaPublicDeliveryConfigured,
+} from '../storage/elevate-media-storage';
+import { logger } from '../logger';
+import { uploadSupabaseResumable } from './supabase-resumable-upload.mjs';
 import { videoEncoderArgs } from './ffmpeg-runtime';
 
 const SUPABASE_BUCKET = 'course-videos';
-const R2_KEY_PREFIX = 'course-videos';
+const ELEVATE_MEDIA_KEY_PREFIX = 'course-videos';
 
-export type CourseVideoStorageBackend = 'auto' | 'supabase' | 'r2';
+export type CourseVideoStorageBackend = 'auto' | 'supabase' | 'elevate-media';
 
-const DEFAULT_R2_MIN_BYTES = 5 * 1024 * 1024; // 5 MB
+const DEFAULT_ELEVATE_MEDIA_MIN_BYTES = 5 * 1024 * 1024; // 5 MB
 const SUPABASE_TUS_CHUNK_BYTES = 6 * 1024 * 1024;
-const SUPABASE_TUS_RETRY_DELAYS_MS = [0, 3_000, 5_000, 10_000, 20_000] as const;
 // Keep standard uploads below the production project's effective request
 // ceiling. The bucket metadata permits larger objects, but the Storage API
 // rejects large single-request MP4 uploads with 413 before that bucket limit.
@@ -70,43 +71,59 @@ async function compressVideoBufferForSupabase(buffer: Buffer): Promise<Buffer> {
 
 export function resolveCourseVideoStorageBackend(): CourseVideoStorageBackend {
   const raw = (process.env.COURSE_VIDEO_STORAGE_BACKEND ?? 'auto').toLowerCase().trim();
-  if (raw === 'supabase' || raw === 'r2' || raw === 'auto') return raw;
+  if (raw === 'supabase' || raw === 'auto') return raw;
+  // Legacy "r2" and provider-oriented values map to the Elevate Media backend.
+  if (raw === 'elevate-media' || raw === 'object' || raw === 's3' || raw === 'b2' || raw === 'r2') return 'elevate-media';
   return 'auto';
 }
 
-export function isAnyR2Configured(): boolean {
-  return isR2Configured() || isStorageConfigured();
+export function isAnyElevateMediaStorageConfigured(): boolean {
+  return isElevateMediaStorageConfigured();
 }
 
-/** Whether this buffer should upload to R2 (not Supabase). */
-export function shouldUploadCourseMediaToR2(
+/** @deprecated Compatibility alias for older admin diagnostics. */
+export const isAnyR2Configured = isAnyElevateMediaStorageConfigured;
+
+/** Whether this buffer should upload to Elevate Media Storage instead of Supabase. */
+export function shouldUploadCourseMediaToElevateMedia(
   buffer: Buffer,
   contentType: string,
 ): boolean {
   const backend = resolveCourseVideoStorageBackend();
   if (backend === 'supabase') return false;
-  if (!isR2Configured() || !isR2PublicDeliveryConfigured()) {
-    if (backend === 'r2') {
-      logger.warn('[upload-lesson-media] COURSE_VIDEO_STORAGE_BACKEND=r2 but Cloudflare R2 public delivery is not configured');
+  if (!isElevateMediaStorageConfigured() || !isElevateMediaPublicDeliveryConfigured()) {
+    if (backend === 'elevate-media') {
+      logger.warn(
+        '[upload-lesson-media] COURSE_VIDEO_STORAGE_BACKEND=elevate-media but Elevate Media Storage public delivery is not configured',
+      );
     }
     return false;
   }
 
-  if (backend === 'r2') return true;
+  if (backend === 'elevate-media') return true;
 
-  // auto: large video files → R2; audio/images stay on Supabase
+  // auto: large video files → Elevate Media Storage; audio/images stay on Supabase
   if (!contentType.startsWith('video/')) return false;
-  const minBytes = Number(process.env.COURSE_VIDEO_R2_MIN_BYTES || DEFAULT_R2_MIN_BYTES);
+  const minBytes = Number(
+    process.env.ELEVATE_MEDIA_VIDEO_MIN_BYTES ||
+      process.env.COURSE_VIDEO_OBJECT_MIN_BYTES ||
+      process.env.COURSE_VIDEO_R2_MIN_BYTES ||
+      DEFAULT_ELEVATE_MEDIA_MIN_BYTES,
+  );
   return buffer.length >= minBytes;
 }
 
+/** @deprecated Compatibility alias. */
+export const shouldUploadCourseMediaToObjectStorage = shouldUploadCourseMediaToElevateMedia;
+/** @deprecated Compatibility alias. */
+export const shouldUploadCourseMediaToR2 = shouldUploadCourseMediaToElevateMedia;
+
 export function lessonMediaStoragePath(lessonId: string, ext: 'mp3' | 'mp4'): string {
-  // Rendered MP4s are immutable candidates. Reusing the same public object key
+  // Generated audio and video are immutable candidates. Reusing the same public object key
   // across retries can make the quality gate or learner CDN read the previous
   // render after an upsert, producing false duration/transcript failures and
-  // potentially serving stale media after approval. Narration MP3s can retain
-  // their stable key because they are consumed inside the same render attempt.
-  const version = ext === 'mp4' ? `-${Date.now().toString(36)}` : '';
+  // potentially serving stale narration or media after approval.
+  const version = `-${Date.now().toString(36)}-${crypto.randomUUID()}`;
   return `generated-lessons/lesson-${lessonId}${version}.${ext}`;
 }
 
@@ -116,8 +133,8 @@ export function lessonMediaPublicUrl(storagePath: string): string {
   return `${base}/storage/v1/object/public/${SUPABASE_BUCKET}/${storagePath}`;
 }
 
-function r2KeyForStoragePath(storagePath: string): string {
-  return `${R2_KEY_PREFIX}/${storagePath}`;
+function elevateMediaKeyForStoragePath(storagePath: string): string {
+  return `${ELEVATE_MEDIA_KEY_PREFIX}/${storagePath}`;
 }
 
 async function uploadCourseVideosToSupabase(
@@ -160,22 +177,7 @@ function tusMetadata(value: string): string {
   return Buffer.from(value, 'utf8').toString('base64');
 }
 
-async function resumableOffset(uploadUrl: string, headers: Record<string, string>): Promise<number> {
-  const response = await fetch(uploadUrl, {
-    method: 'HEAD',
-    headers: { ...headers, 'Tus-Resumable': '1.0.0' },
-  });
-  if (!response.ok) throw new Error(`Resumable upload offset check failed: HTTP ${response.status}`);
-  const offset = Number(response.headers.get('upload-offset'));
-  if (!Number.isFinite(offset) || offset < 0) throw new Error('Resumable upload returned an invalid offset');
-  return offset;
-}
-
-/**
- * Supabase Storage's documented TUS path for server-side generated media.
- * Chunks are fixed at 6 MiB, retries resume from the server-confirmed offset,
- * and the direct Storage hostname avoids the API gateway's whole-body ceiling.
- */
+/** Chunked upload with bounded retries and server-confirmed recovery offsets. */
 async function uploadCourseVideosToSupabaseResumable(
   buffer: Buffer,
   storagePath: string,
@@ -184,97 +186,36 @@ async function uploadCourseVideosToSupabaseResumable(
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !serviceKey) throw new Error('Supabase storage credentials are not configured');
-
-  const authHeaders = {
-    Authorization: `Bearer ${serviceKey}`,
-    apikey: serviceKey,
-    'x-upsert': 'true',
-  };
-  const createResponse = await fetch(`${storageDirectUrl(supabaseUrl)}/storage/v1/upload/resumable`, {
-    method: 'POST',
-    headers: {
-      ...authHeaders,
-      'Tus-Resumable': '1.0.0',
-      'Upload-Length': String(buffer.length),
-      'Upload-Metadata': [
+  try {
+    await uploadSupabaseResumable({
+      buffer,
+      endpoint: `${storageDirectUrl(supabaseUrl)}/storage/v1/upload/resumable`,
+      headers: {Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'x-upsert': 'true'},
+      metadata: [
         `bucketName ${tusMetadata(SUPABASE_BUCKET)}`,
         `objectName ${tusMetadata(storagePath)}`,
         `contentType ${tusMetadata(contentType)}`,
         `cacheControl ${tusMetadata('31536000')}`,
       ].join(','),
-    },
-  });
-  if (!createResponse.ok) {
-    const detail = await createResponse.text();
-    throw new Error(`Resumable upload session failed (${storagePath}): HTTP ${createResponse.status} ${detail.slice(0, 200)}`);
+    });
+  } catch (error) {
+    throw new Error(`Resumable upload session failed (${storagePath}, ${buffer.length} bytes): ${error instanceof Error ? error.message : String(error)}`, {cause: error});
   }
-  const location = createResponse.headers.get('location');
-  if (!location) throw new Error(`Resumable upload session returned no location (${storagePath})`);
-  const uploadUrl = new URL(location, storageDirectUrl(supabaseUrl)).toString();
-
-  let offset = Number(createResponse.headers.get('upload-offset') ?? '0');
-  while (offset < buffer.length) {
-    const end = Math.min(offset + SUPABASE_TUS_CHUNK_BYTES, buffer.length);
-    const chunk = buffer.subarray(offset, end);
-    let uploaded = false;
-    let lastError: unknown;
-    for (const delayMs of SUPABASE_TUS_RETRY_DELAYS_MS) {
-      if (delayMs) await new Promise((resolve) => setTimeout(resolve, delayMs));
-      try {
-        const response = await fetch(uploadUrl, {
-          method: 'PATCH',
-          headers: {
-            ...authHeaders,
-            'Tus-Resumable': '1.0.0',
-            'Upload-Offset': String(offset),
-            'Content-Type': 'application/offset+octet-stream',
-          },
-          body: new Uint8Array(chunk),
-        });
-        if (!response.ok) throw new Error(`HTTP ${response.status}: ${(await response.text()).slice(0, 200)}`);
-        const nextOffset = Number(response.headers.get('upload-offset'));
-        if (!Number.isFinite(nextOffset) || nextOffset <= offset) {
-          throw new Error('Resumable upload did not advance the server offset');
-        }
-        offset = nextOffset;
-        uploaded = true;
-        break;
-      } catch (error) {
-        lastError = error;
-        try {
-          offset = await resumableOffset(uploadUrl, authHeaders);
-          if (offset >= end) {
-            uploaded = true;
-            break;
-          }
-        } catch (offsetError) {
-          lastError = offsetError;
-        }
-      }
-    }
-    if (!uploaded) {
-      throw new Error(`Resumable upload failed at byte ${offset}: ${lastError instanceof Error ? lastError.message : String(lastError)}`);
-    }
-  }
-
-  logger.info('[upload-lesson-media] resumable Supabase upload complete', {
-    storagePath,
-    bytes: buffer.length,
-  });
+  logger.info('[upload-lesson-media] resumable Supabase upload complete', {storagePath, bytes: buffer.length});
   return lessonMediaPublicUrl(storagePath);
 }
 
-async function uploadCourseVideosToR2(
+async function uploadCourseVideosToElevateMedia(
   buffer: Buffer,
   storagePath: string,
   contentType: string,
 ): Promise<string> {
-  const key = r2KeyForStoragePath(storagePath);
-  const result = await uploadToR2(buffer, key, contentType);
+  const key = elevateMediaKeyForStoragePath(storagePath);
+  const result = await uploadToElevateMedia(buffer, key, contentType);
   if (!result.success || !result.url) {
-    throw new Error(result.error ?? `R2 upload failed for ${key}`);
+    throw new Error(result.error ?? `Elevate Media Storage upload failed for ${key}`);
   }
-  logger.info('[upload-lesson-media] uploaded to R2', {
+  logger.info('[upload-lesson-media] uploaded to Elevate Media Storage', {
     key,
     bytes: buffer.length,
     url: result.url.slice(0, 80),
@@ -288,12 +229,22 @@ export async function uploadCourseVideosObject(
   contentType: string,
   options?: { forceSupabase?: boolean },
 ): Promise<string> {
-  if (!options?.forceSupabase && shouldUploadCourseMediaToR2(buffer, contentType)) {
+  if (!options?.forceSupabase && shouldUploadCourseMediaToElevateMedia(buffer, contentType)) {
     try {
-      return await uploadCourseVideosToR2(buffer, storagePath, contentType);
+      return await uploadCourseVideosToElevateMedia(buffer, storagePath, contentType);
     } catch (err) {
-      logger.warn('[upload-lesson-media] R2 upload failed, falling back to Supabase', { err });
+      // A large lesson must not silently fall back to Supabase: that path
+      // already returned HTTP 413 and burns expensive render retries.
+      if (contentType.startsWith('video/') && buffer.length > SUPABASE_SAFE_VIDEO_BYTES) {
+        throw new Error('COURSE_MEDIA_OBJECT_UPLOAD_FAILED: ' +
+          (err instanceof Error ? err.message : String(err)), {cause: err});
+      }
+      logger.warn('[upload-lesson-media] Elevate Media Storage upload failed, falling back to Supabase', { err });
     }
+  }
+  if (contentType.startsWith('video/') && buffer.length > SUPABASE_SAFE_VIDEO_BYTES) {
+    throw new Error('COURSE_MEDIA_LARGE_VIDEO_REQUIRES_PUBLIC_OBJECT_STORAGE: ' +
+      'configure Elevate Media Storage public delivery instead of sending oversized MP4 to Supabase');
   }
   if (contentType.startsWith('video/') && buffer.length > SUPABASE_TUS_CHUNK_BYTES) {
     return uploadCourseVideosToSupabaseResumable(buffer, storagePath, contentType);
@@ -329,43 +280,15 @@ export async function uploadLessonFileFromDisk(
   lessonId: string,
   ext: 'mp3' | 'mp4',
 ): Promise<string> {
-  let uploadPath = filePath;
-  let compressedPath: string | null = null;
-  if (ext === 'mp4' && (await stat(filePath)).size > SUPABASE_SAFE_VIDEO_BYTES) {
-    compressedPath = filePath.replace(/\.mp4$/i, '.upload.mp4');
-    await execFileAsync(
-      'ffmpeg',
-      [
-        '-y',
-        '-i', filePath,
-        '-vf', 'scale=min(1280\\,iw):-2',
-        ...videoEncoderArgs(27),
-        '-maxrate', '3M', '-bufsize', '6M',
-        '-c:a', 'aac', '-b:a', '128k',
-        '-movflags', '+faststart',
-        compressedPath,
-      ],
-      { timeout: 20 * 60 * 1000, maxBuffer: 2 * 1024 * 1024 },
-    );
-    uploadPath = compressedPath;
-    const uploadBytes = (await stat(uploadPath)).size;
-    if (uploadBytes > SUPABASE_SAFE_VIDEO_BYTES) {
-      throw new Error(
-        `Compressed lesson video is still too large for Supabase (${uploadBytes} bytes)`,
-      );
-    }
-    logger.info('[upload-lesson-media] compressed oversized lesson video', {
-      lessonId,
-      sourceBytes: (await stat(filePath)).size,
-      uploadBytes,
-    });
-  }
-  const buf = await readFile(uploadPath);
+  // Large MP4s use the resumable route in uploadCourseVideosObject. The
+  // single-request ceiling is not an object-size limit and must not trigger
+  // an unnecessary lossy transcode or reject a valid completed lesson.
+  const buf = await readFile(filePath);
+  logger.info('[upload-lesson-media] starting lesson upload', {lessonId, ext, bytes: buf.length});
   const url = await uploadLessonMediaBuffer(buf, lessonId, ext);
-  await Promise.all(
-    [filePath, compressedPath].filter(Boolean).map((target) => unlink(target as string)),
-  ).catch((err) => {
-    logger.debug('[upload-lesson-media] temp file cleanup', { filePath, err });
+  logger.info('[upload-lesson-media] lesson upload saved', {lessonId, ext, bytes: buf.length});
+  await unlink(filePath).catch((err) => {
+    logger.debug('[upload-lesson-media] temp file cleanup', {filePath, err});
   });
   return url;
 }

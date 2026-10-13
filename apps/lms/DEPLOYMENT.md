@@ -1,7 +1,5 @@
 # LMS Production Deployment
 
-This file documents the canonical LMS production deployment trigger.
+Production uses Google Cloud only. The automatic `main` trigger is `.github/workflows/deploy-google-lms-trigger.yml`; it invokes the shared Google image-build and deployment workflows.
 
-The LMS is deployed from `main` through `.github/workflows/deploy-lms.yml` to the `elevate-lms` Northflank service. Production verification requires `/api/ping` and `/api/health` to return healthy responses and the deployed runtime SHA to match the deployment SHA.
-
-Updated during the 2026-08-14 production recovery to ensure the repaired canonical `main` revision is deployed through the LMS path-filtered workflow.
+Verification requires the immutable image for the requested SHA, a ready Cloud Run revision, healthy `/api/ping` and `/api/health` responses, and the matching live runtime SHA. Do not infer deployment success from a completed build alone.

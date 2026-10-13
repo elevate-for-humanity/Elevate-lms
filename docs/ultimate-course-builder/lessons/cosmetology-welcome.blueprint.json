@@ -133,7 +133,27 @@
         "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
       ],
       "visualRequirement": "An apprentice discussing a request with a supervising stylist; show the request and a pause-before-service decision.",
-      "sceneType": "mental_model"
+      "sceneType": "mental_model",
+      "teachingVisual": {
+        "kind": "choices",
+        "steps": [
+          {
+            "label": "Client request",
+            "value": "a chemical service you have only watched once",
+            "narrationQuote": "a chemical service you have only watched once"
+          },
+          {
+            "label": "Decision",
+            "value": "checking your authorization",
+            "narrationQuote": "checking your authorization"
+          },
+          {
+            "label": "Learning record",
+            "value": "recording the learning you actually completed",
+            "narrationQuote": "recording the learning you actually completed"
+          }
+        ]
+      }
     },
     {
       "id": "welcome-activate_prior_knowledge",
@@ -146,7 +166,27 @@
         "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
       ],
       "visualRequirement": "A client consultation with an apprentice taking notes; highlight listening and clarification.",
-      "sceneType": "worked_example"
+      "sceneType": "worked_example",
+      "teachingVisual": {
+        "kind": "sequence",
+        "steps": [
+          {
+            "label": "Listen",
+            "value": "ask a clarifying question",
+            "narrationQuote": "ask a clarifying question"
+          },
+          {
+            "label": "Explain",
+            "value": "explain a limit",
+            "narrationQuote": "explain a limit"
+          },
+          {
+            "label": "Seek help",
+            "value": "seek help",
+            "narrationQuote": "seek help"
+          }
+        ]
+      }
     },
     {
       "id": "welcome-terminology",
@@ -159,7 +199,32 @@
         "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
       ],
       "visualRequirement": "Four clearly labeled training components with different relevant salon-learning visuals.",
-      "sceneType": "system_diagram"
+      "sceneType": "system_diagram",
+      "teachingVisual": {
+        "kind": "terms",
+        "steps": [
+          {
+            "label": "Workplace learning",
+            "value": "learning through job tasks with an experienced mentor",
+            "narrationQuote": "learning through job tasks with an experienced mentor"
+          },
+          {
+            "label": "Related instruction",
+            "value": "the learning that supports those tasks",
+            "narrationQuote": "the learning that supports those tasks"
+          },
+          {
+            "label": "Apprenticeship credential",
+            "value": "completion of the apprenticeship requirements",
+            "narrationQuote": "completion of the apprenticeship requirements"
+          },
+          {
+            "label": "State license",
+            "value": "authorization governed by the state licensing authority",
+            "narrationQuote": "authorization governed by the state licensing authority"
+          }
+        ]
+      }
     },
     {
       "id": "welcome-concept_explanation",
@@ -172,7 +237,32 @@
         "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
       ],
       "visualRequirement": "An apprentice and mentor reviewing current requirements together; display the verify-before-service sequence.",
-      "sceneType": "system_diagram"
+      "sceneType": "system_diagram",
+      "teachingVisual": {
+        "kind": "sequence",
+        "steps": [
+          {
+            "label": "Identify",
+            "value": "identify the request",
+            "narrationQuote": "identify the request"
+          },
+          {
+            "label": "Verify",
+            "value": "check your verified training and permitted role",
+            "narrationQuote": "check your verified training and permitted role"
+          },
+          {
+            "label": "Consult",
+            "value": "involve the supervisor when authorization is unclear",
+            "narrationQuote": "involve the supervisor when authorization is unclear"
+          },
+          {
+            "label": "Communicate",
+            "value": "explain the next step to the client",
+            "narrationQuote": "explain the next step to the client"
+          }
+        ]
+      }
     },
     {
       "id": "welcome-instructor_example",
@@ -184,8 +274,33 @@
       "sourceRequirementIds": [
         "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
       ],
-      "visualRequirement": "A real client-stylist consultation with a visible request, verification, and supervisor handoff.",
-      "sceneType": "worked_example"
+      "visualRequirement": "Licensed staged client-stylist consultation footage, composited with the scripted request, verification, and supervisor handoff sequence.",
+      "sceneType": "worked_example",
+      "teachingVisual": {
+        "kind": "sequence",
+        "steps": [
+          {
+            "label": "Request",
+            "value": "Can you color my hair now?",
+            "narrationQuote": "Can you color my hair now?"
+          },
+          {
+            "label": "Clarify",
+            "value": "clarifies the requested service",
+            "narrationQuote": "clarifies the requested service"
+          },
+          {
+            "label": "Verify",
+            "value": "within their verified assignment and authorization",
+            "narrationQuote": "within their verified assignment and authorization"
+          },
+          {
+            "label": "Supervisor handoff",
+            "value": "I will check this with my supervisor before we proceed.",
+            "narrationQuote": "I will check this with my supervisor before we proceed."
+          }
+        ]
+      }
     },
     {
       "id": "welcome-demonstration",
@@ -198,7 +313,37 @@
         "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
       ],
       "visualRequirement": "An apprentice documenting an observed consultation on a tablet; show date, activity, actual duration, reviewer.",
-      "sceneType": "worked_example"
+      "sceneType": "worked_example",
+      "teachingVisual": {
+        "kind": "record",
+        "steps": [
+          {
+            "label": "Date and learning activity",
+            "value": "Start with the date and the learning activity.",
+            "narrationQuote": "Start with the date and the learning activity."
+          },
+          {
+            "label": "Activity",
+            "value": "observed a supervised client consultation",
+            "narrationQuote": "observed a supervised client consultation"
+          },
+          {
+            "label": "Accurate scope",
+            "value": "observation is not the same as independently performing a service",
+            "narrationQuote": "observation is not the same as independently performing a service"
+          },
+          {
+            "label": "Duration and reviewer",
+            "value": "Add the actual duration and the designated reviewer.",
+            "narrationQuote": "Add the actual duration and the designated reviewer."
+          },
+          {
+            "label": "Before submitting",
+            "value": "compare the entry with your notes",
+            "narrationQuote": "compare the entry with your notes"
+          }
+        ]
+      }
     },
     {
       "id": "welcome-guided_practice",
@@ -211,7 +356,37 @@
         "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
       ],
       "visualRequirement": "A supervised salon conversation; show three response choices and then the reason for checking.",
-      "sceneType": "knowledge_check"
+      "sceneType": "knowledge_check",
+      "teachingVisual": {
+        "kind": "choices",
+        "steps": [
+          {
+            "label": "Option 1",
+            "value": "promise the service",
+            "narrationQuote": "promise the service"
+          },
+          {
+            "label": "Option 2",
+            "value": "guess based on a video",
+            "narrationQuote": "guess based on a video"
+          },
+          {
+            "label": "Option 3",
+            "value": "check with the supervisor",
+            "narrationQuote": "check with the supervisor"
+          },
+          {
+            "label": "Professional response",
+            "value": "Before we proceed, I need to confirm this service with my supervisor.",
+            "narrationQuote": "Before we proceed, I need to confirm this service with my supervisor."
+          },
+          {
+            "label": "Reason",
+            "value": "observation alone does not verify authorization or independent competence",
+            "narrationQuote": "observation alone does not verify authorization or independent competence"
+          }
+        ]
+      }
     },
     {
       "id": "welcome-knowledge_check",
@@ -224,7 +399,27 @@
         "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
       ],
       "visualRequirement": "An apprentice reviewing learning progress with a mentor; show lesson progress separate from program and licensing requirements.",
-      "sceneType": "knowledge_check"
+      "sceneType": "knowledge_check",
+      "teachingVisual": {
+        "kind": "comparison",
+        "steps": [
+          {
+            "label": "Lesson progress",
+            "value": "evidence of that lesson's learning",
+            "narrationQuote": "evidence of that lesson's learning"
+          },
+          {
+            "label": "Training pathways",
+            "value": "Workplace learning, related instruction, apprenticeship completion, and licensing have distinct requirements.",
+            "narrationQuote": "Workplace learning, related instruction, apprenticeship completion, and licensing have distinct requirements."
+          },
+          {
+            "label": "Next action",
+            "value": "confirm your remaining requirements with the program and the state licensing authority",
+            "narrationQuote": "confirm your remaining requirements with the program and the state licensing authority"
+          }
+        ]
+      }
     },
     {
       "id": "welcome-independent_practice",
@@ -237,7 +432,37 @@
         "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
       ],
       "visualRequirement": "An apprentice independently writing a practice record; distinguish fictional practice from submitted work hours.",
-      "sceneType": "worked_example"
+      "sceneType": "worked_example",
+      "teachingVisual": {
+        "kind": "record",
+        "steps": [
+          {
+            "label": "Fictional practice",
+            "value": "Do not put this fictional event into a real hours log.",
+            "narrationQuote": "Do not put this fictional event into a real hours log."
+          },
+          {
+            "label": "Date",
+            "value": "On Monday",
+            "narrationQuote": "On Monday"
+          },
+          {
+            "label": "Activity and actual duration",
+            "value": "observed a consultation for thirty minutes",
+            "narrationQuote": "observed a consultation for thirty minutes"
+          },
+          {
+            "label": "Reviewer",
+            "value": "designated reviewer",
+            "narrationQuote": "designated reviewer"
+          },
+          {
+            "label": "Review question",
+            "value": "Is this the correct category for observed consultation learning?",
+            "narrationQuote": "Is this the correct category for observed consultation learning?"
+          }
+        ]
+      }
     },
     {
       "id": "welcome-mistake_and_correction",
@@ -250,7 +475,32 @@
         "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
       ],
       "visualRequirement": "A mentor and apprentice reviewing a record; show observed activity replacing the unsupported independent-performance claim.",
-      "sceneType": "worked_example"
+      "sceneType": "worked_example",
+      "teachingVisual": {
+        "kind": "comparison",
+        "steps": [
+          {
+            "label": "Incorrect scope",
+            "value": "a claim of independent performance",
+            "narrationQuote": "a claim of independent performance"
+          },
+          {
+            "label": "Incorrect duration",
+            "value": "a rounded number that did not happen",
+            "narrationQuote": "a rounded number that did not happen"
+          },
+          {
+            "label": "Correct entry",
+            "value": "describe the actual activity and actual time",
+            "narrationQuote": "describe the actual activity and actual time"
+          },
+          {
+            "label": "Correction process",
+            "value": "use your program's correction process",
+            "narrationQuote": "use your program's correction process"
+          }
+        ]
+      }
     },
     {
       "id": "welcome-assessment",
@@ -263,7 +513,37 @@
         "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
       ],
       "visualRequirement": "An apprentice taking a knowledge assessment; show three distinct decision tasks and the knowledge-only scope.",
-      "sceneType": "knowledge_check"
+      "sceneType": "knowledge_check",
+      "teachingVisual": {
+        "kind": "sequence",
+        "steps": [
+          {
+            "label": "Decision task 1",
+            "value": "response to an unverified client-service request",
+            "narrationQuote": "response to an unverified client-service request"
+          },
+          {
+            "label": "Decision task 2",
+            "value": "distinguish a completed lesson from completion of the training and licensing pathways",
+            "narrationQuote": "distinguish a completed lesson from completion of the training and licensing pathways"
+          },
+          {
+            "label": "Decision task 3",
+            "value": "accurate record for an observed activity",
+            "narrationQuote": "accurate record for an observed activity"
+          },
+          {
+            "label": "Passing target",
+            "value": "eighty percent",
+            "narrationQuote": "eighty percent"
+          },
+          {
+            "label": "Knowledge-only scope",
+            "value": "does not certify hands-on performance",
+            "narrationQuote": "does not certify hands-on performance"
+          }
+        ]
+      }
     },
     {
       "id": "welcome-remediation",
@@ -276,7 +556,32 @@
         "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
       ],
       "visualRequirement": "An apprentice reviewing feedback with a mentor and then attempting a different question set.",
-      "sceneType": "worked_example"
+      "sceneType": "worked_example",
+      "teachingVisual": {
+        "kind": "sequence",
+        "steps": [
+          {
+            "label": "Authorization error",
+            "value": "repeat the check-and-supervisor decision sequence",
+            "narrationQuote": "repeat the check-and-supervisor decision sequence"
+          },
+          {
+            "label": "Completion error",
+            "value": "redraw the four-part training map",
+            "narrationQuote": "redraw the four-part training map"
+          },
+          {
+            "label": "Record error",
+            "value": "compare the activity and duration against the scenario",
+            "narrationQuote": "compare the activity and duration against the scenario"
+          },
+          {
+            "label": "Separate reassessment",
+            "value": "different request, training situation, and record",
+            "narrationQuote": "different request, training situation, and record"
+          }
+        ]
+      }
     },
     {
       "id": "welcome-recap",
@@ -289,7 +594,32 @@
         "course:e8df8cf3-74cf-455b-93dd-8ea6ee732cc8"
       ],
       "visualRequirement": "A mentoring conversation with a concise recap of listen, verify, consult, communicate, and record.",
-      "sceneType": "memory_recap"
+      "sceneType": "memory_recap",
+      "teachingVisual": {
+        "kind": "sequence",
+        "steps": [
+          {
+            "label": "Professional routine",
+            "value": "listen, verify, consult the supervisor, communicate the next step, and record accurately",
+            "narrationQuote": "listen, verify, consult the supervisor, communicate the next step, and record accurately"
+          },
+          {
+            "label": "Before next session",
+            "value": "identify your supervising contact",
+            "narrationQuote": "identify your supervising contact"
+          },
+          {
+            "label": "Confirm requirements",
+            "value": "confirm where current program and state requirements are kept",
+            "narrationQuote": "confirm where current program and state requirements are kept"
+          },
+          {
+            "label": "Keep pathways distinct",
+            "value": "workplace learning, related instruction, apprenticeship completion, and licensing",
+            "narrationQuote": "workplace learning, related instruction, apprenticeship completion, and licensing"
+          }
+        ]
+      }
     }
   ],
   "activities": [

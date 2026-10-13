@@ -14,6 +14,7 @@ FROM base AS dependencies
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/lms/package.json ./apps/lms/package.json
 
+COPY packages/bounded-braces ./packages/bounded-braces
 RUN pnpm install --frozen-lockfile
 
 FROM base AS builder

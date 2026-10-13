@@ -1,6 +1,7 @@
 import { ULTIMATE_TEACHING_SEQUENCE } from './teaching-sequence';
 import type { UltimateCompetency } from '../core/types';
 import { contractHash } from '../core/lesson-contract';
+import { validateTeachingVisual, type TeachingVisual } from './teaching-visual';
 export interface LessonBlueprint {
   competencyId: string;
   objectives: Array<{ id: string; text: string; sourceRequirementIds: string[] }>;
@@ -18,6 +19,7 @@ export interface LessonBlueprint {
     stage: string;
     visualRequirement: string;
     sceneType: string;
+    teachingVisual?: TeachingVisual;
   }>;
   activities: Array<{
     id: string;
@@ -88,6 +90,8 @@ export function validateLessonBlueprint(b: LessonBlueprint, c: UltimateCompetenc
   for (const stage of ULTIMATE_TEACHING_SEQUENCE)
     if (!b.segments.some((s) => s.stage === stage))
       throw new Error(`BLUEPRINT_SPOKEN_TEACHING_STAGE_MISSING:${stage}`);
+  for (const segment of b.segments) if (segment.teachingVisual)
+    validateTeachingVisual(segment.teachingVisual, segment.text);
   if (
     b.segments
       .map((s) => s.text)

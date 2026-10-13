@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
     const db = await getAdminClient();
     if (!db) {
-      return NextResponse.json({ ok: false, error: `Staff applications are temporarily unavailable. Please call ${PLATFORM_DEFAULTS.supportPhone}.` }, { status: 503 });
+      return NextResponse.json({ ok: false, error: `Staff applications are temporarily unavailable. Please call ${PLATFORM_DEFAULTS.mainPhone}.` }, { status: 503 });
     }
 
     const fullName = `${firstName} ${lastName}`.trim();
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
       applicantName: fullName,
       applicantEmail: email,
       applicantSubject: 'Employment Application Received | Elevate for Humanity',
-      applicantHtml: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto"><h2>Employment Application Received</h2><p>Hello ${safeName},</p><p>We received your application for <strong>${safePosition}</strong>.</p><p><strong>Reference:</strong> ${safeRef}</p><h3>What happens next</h3><ol><li>Our team reviews your experience and the current staffing need.</li><li>If selected for the next stage, we will contact you about an interview and any required credentials/background documentation.</li><li>Staff portal access is only issued after a hiring/authorization decision; no login is required while your application is under review.</li></ol><p>You do not need to submit another application. Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.</p></div>`,
+      applicantHtml: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto"><h2>Employment Application Received</h2><p>Hello ${safeName},</p><p>We received your application for <strong>${safePosition}</strong>.</p><p><strong>Reference:</strong> ${safeRef}</p><h3>What happens next</h3><ol><li>Our team reviews your experience and the current staffing need.</li><li>If selected for the next stage, we will contact you about an interview and any required credentials/background documentation.</li><li>Staff portal access is only issued after a hiring/authorization decision; no login is required while your application is under review.</li></ol><p>You do not need to submit another application. Questions? Call ${PLATFORM_DEFAULTS.mainPhone}.</p></div>`,
       staffSubject: `[STAFF APPLICATION] ${fullName} — ${position}`,
       staffHtml: `<h2>New Staff Application</h2><p><strong>${safeName}</strong><br>${safeEmail}<br>${escapeHtml(phone || 'No phone')}</p><p><strong>Position:</strong> ${safePosition}</p><p><strong>Reference:</strong> ${safeRef}</p><p><strong>Experience:</strong> ${escapeHtml(experience || 'Not provided')}</p><p>Review and move the applicant to the hiring/onboarding process if selected.</p>`,
       metadata: { position, city },

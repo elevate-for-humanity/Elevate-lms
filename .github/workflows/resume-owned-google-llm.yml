@@ -1,0 +1,47 @@
+name: Resume verified owned model image on Google
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/resume-owned-google-llm.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+concurrency:
+  group: google-owned-model-deployment
+  cancel-in-progress: false
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/resume-owned-google-llm.yml/dispatches" -f ref=main
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/deploy-owned-llm.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - run: node scripts/gcp/verify-sdk.mjs
+      - name: Deploy existing verified image and expose only deployment diagnostics
+        run: |
+          set -euo pipefail
+          # No credential payloads are supplied to this command or printed.
+          # Use the exact digest whose build, weight validation and upload passed.
+          node --input-type=module -e 'import {deploymentArguments} from "./scripts/gcp/deploy-owned-llm.mjs"; import {spawnSync} from "node:child_process"; const result=spawnSync("gcloud",deploymentArguments("sha256:e803354a0ee2018413004ce94dd6eeaeae6b6bdf2b19579bde8a215544336e9c"),{stdio:"inherit"}); process.exit(result.status??1);'
+      - name: Verify bearer authentication, inference, tools and streaming before Admin connection
+        env: {IMAGE_SHA: '09a133aea3cf4edead210eab5252faeadc326040'}
+        run: node scripts/gcp/deploy-owned-llm.mjs

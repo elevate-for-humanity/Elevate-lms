@@ -440,3 +440,95 @@ test.describe('Authenticated portal responsive design certification', () => {
     '/manifest-admin.json',
   );
 });
+
+test.describe('Studio single-session access and composer', () => {
+  test.skip(!creds.admin[0] || !creds.admin[1], 'Disposable admin identity is required');
+  test('Admin session opens Studio and optional external browser tools remain usable on the active device', async ({ page }, testInfo) => {
+    await login(page, ADMIN_BASE, creds.admin[0], creds.admin[1]);
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        await page.goto(`${ADMIN_BASE}/studio`, { waitUntil: 'domcontentloaded' });
+        break;
+      } catch (error) {
+        if (attempt === 1) throw error;
+      }
+    }
+    const composer = page.getByRole('textbox', { name: 'Tell Admin AI what you need done...', exact: true });
+    await expect(composer).toBeVisible();
+    await expect.poll(() => composer.evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(20);
+    await composer.fill('Readability test draft');
+    await page.screenshot({ path: testInfo.outputPath('studio-readable-chat.png') });
+    await composer.clear();
+    await page.goto(`${ADMIN_BASE}/dashboard`);
+    const access = page.getByRole('region', { name: 'Course and media access' });
+    await expect(access.getByRole('link', { name: 'Open Course Builder' })).toHaveAttribute('href', '/studio/courses');
+    await expect(page.getByRole('navigation', { name: 'Course tools' }).getByRole('link', { name: 'Course Builder', exact: true })).toBeVisible();
+    // Clean up the exact disposable browser session independently of UI state.
+    const createdSessions: Promise<{id:string;token:string;publicUrl:string} | null>[] = [];
+    const captureSession = (response: import('@playwright/test').Response) => {
+      if (response.request().method() === 'POST' && response.url().endsWith('/api/admin/dev-studio/browser/session'))
+        createdSessions.push(response.json().then(body => body.id && body.token && body.publicUrl ? body : null).catch(() => null));
+    };
+    page.on('response', captureSession);
+    try {
+    await access.getByRole('link', { name: 'Enter Envato credentials' }).click();
+    // Envato may require its own provider login, but Studio must reuse the Admin session.
+    await expect(page).not.toHaveURL(/\/login(?:\?|$)/);
+    await expect(page.getByRole('heading', { name: /sign in to elevate/i })).toHaveCount(0);
+    const stream = page.getByAltText('Live isolated Chromium browser');
+    await expect(stream).toBeVisible({ timeout: 30_000 });
+    await expect.poll(() => stream.evaluate(el => (el as HTMLImageElement).naturalWidth), { timeout: 30_000 }).toBeGreaterThan(0);
+    const initialWidth = await stream.evaluate(el => el.getBoundingClientRect().width);
+    await page.getByRole('button', { name: 'Zoom browser in' }).click();
+    await expect(page.getByLabel('Browser zoom')).toHaveText('150%');
+    await expect.poll(() => stream.evaluate(el => el.getBoundingClientRect().width)).toBeGreaterThan(initialWidth);
+    const viewport = stream.locator('..');
+    const overflow = await viewport.evaluate(el => ({
+      height: el.scrollHeight, available: el.clientHeight, width: el.scrollWidth, availableWidth: el.clientWidth,
+    }));
+    expect(overflow.height > overflow.available || overflow.width > overflow.availableWidth).toBe(true);
+    if (testInfo.project.name === 'iphone-webkit') {
+      // Playwright mobile WebKit cannot generate mouse-wheel input. Prove its
+      // native scroll range and explicit touch/pinch policy; Chromium projects
+      // additionally certify an actual wheel gesture. Physical iPhone gestures
+      // remain a separate manual acceptance check.
+      expect(await stream.evaluate(el => getComputedStyle(el).touchAction)).toContain('pinch-zoom');
+      await viewport.evaluate(el => el.scrollBy({ top: 300, behavior: 'instant' }));
+    } else {
+      await viewport.hover();
+      await page.mouse.wheel(0, 300);
+    }
+    await expect.poll(() => viewport.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+    await page.getByRole('button', { name: 'Zoom browser out' }).click();
+    await expect.poll(() => stream.evaluate(el => el.getBoundingClientRect().width)).toBeLessThanOrEqual(480);
+    const normalWidth = await stream.evaluate(el => el.getBoundingClientRect().width);
+    await page.getByRole('button', { name: 'Zoom browser out' }).click();
+    await expect(page.getByLabel('Browser zoom')).toHaveText('75%');
+    await expect.poll(() => stream.evaluate(el => el.getBoundingClientRect().width)).toBeLessThan(normalWidth);
+    await page.getByRole('button', { name: 'Fit screen' }).click();
+    if ((page.viewportSize()?.width || 1280) < 1024)
+      await page.getByRole('button', { name: 'Email / password' }).click();
+    const input = page.getByLabel('Secure browser input');
+    await expect(input).toBeVisible();
+    const geometry = await input.evaluate(el => {
+      const rect = el.getBoundingClientRect();
+      return { font: parseFloat(getComputedStyle(el).fontSize), height: rect.height,
+        width: rect.width, right: rect.right, viewport: window.innerWidth };
+    });
+    expect(geometry.font).toBeGreaterThanOrEqual(20);
+    expect(geometry.height).toBeGreaterThanOrEqual(48);
+    expect(geometry.width).toBeGreaterThanOrEqual(250);
+    expect(geometry.right).toBeLessThanOrEqual(geometry.viewport);
+    await page.screenshot({ path: testInfo.outputPath('studio-external-browser-tools.png') });
+    } finally {
+      page.off('response', captureSession);
+      for (const session of await Promise.all(createdSessions)) {
+        if (!session) continue;
+        const stopped = await page.request.delete(`${session.publicUrl}/sessions/${encodeURIComponent(session.id)}`, {
+          headers: {Authorization: `Bearer ${session.token}`},
+        });
+        expect([200,410]).toContain(stopped.status());
+      }
+    }
+  });
+});

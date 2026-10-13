@@ -1,3 +1,4 @@
+import { apprenticeshipPaymentError, isSelfPayApprenticeship } from '@/lib/programs/apprenticeship-payment-policy';
 // PUBLIC ROUTE: public program application submission
 
 // app/api/applications/route.ts
@@ -175,25 +176,11 @@ async function _POST(req: Request) {
 
     const normalizedProgram = String(body.program || '').trim().toLowerCase();
     const normalizedFunding = String(body.fundingType || '').trim().toLowerCase();
-    const isApprenticeshipApplication = normalizedProgram.includes('apprenticeship');
-    const isNonSelfPayApprenticeship =
-      isApprenticeshipApplication &&
-      normalizedFunding !== '' &&
-      !normalizedFunding.startsWith('self_pay') &&
-      !normalizedFunding.startsWith('self-pay');
-
-    if (
-      isNonSelfPayApprenticeship &&
-      body.apprenticeshipFundingApprovalAcknowledged !== true
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            'Apprenticeship funding is not currently available. Choose self-pay unless you already have written approval or Elevate specifically told you funding is available.',
-        },
-        { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) },
-      );
+    const paymentError = apprenticeshipPaymentError(normalizedProgram, normalizedFunding);
+    if (paymentError) {
+      return NextResponse.json({ error: paymentError }, { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) });
     }
+    if (isSelfPayApprenticeship(normalizedProgram) && normalizedFunding) body.fundingType = 'self_pay';
 
     const rawModalityPreference = body.modalityPreference ?? body.modality_preference;
     const modalityPreference = normalizeApplicationModalityPreference(rawModalityPreference);
@@ -273,7 +260,7 @@ async function _POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            `Service temporarily unavailable. Please call ${PLATFORM_DEFAULTS.supportPhone} for immediate assistance.`,
+            `Service temporarily unavailable. Please call ${PLATFORM_DEFAULTS.mainPhone} for immediate assistance.`,
         },
         { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
@@ -357,7 +344,7 @@ async function _POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            `An application for this program was already submitted with this email in the last 24 hours. Please call ${PLATFORM_DEFAULTS.supportPhone} if you need to make changes.`,
+            `An application for this program was already submitted with this email in the last 24 hours. Please call ${PLATFORM_DEFAULTS.mainPhone} if you need to make changes.`,
         },
         { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
@@ -659,7 +646,7 @@ async function _POST(req: Request) {
       });
       return NextResponse.json(
         {
-          error: `Failed to save application. Please call ${PLATFORM_DEFAULTS.supportPhone} for immediate assistance.`,
+          error: `Failed to save application. Please call ${PLATFORM_DEFAULTS.mainPhone} for immediate assistance.`,
           debug: process.env.NODE_ENV === 'development' ? (error as any)?.message : undefined,
         },
         { status: 500 },
@@ -800,7 +787,7 @@ async function _POST(req: Request) {
             <li>You receive your account setup link and onboarding instructions by email</li>
             <li>You begin training</li>
           </ol>
-          <p style="color:#166534;margin-bottom:0;"><strong>Questions?</strong> Call <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color:#ea580c;">${PLATFORM_DEFAULTS.supportPhone}</a> or email <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}" style="color:#ea580c;">info@${PLATFORM_DEFAULTS.canonicalDomain}</a></p>
+          <p style="color:#166534;margin-bottom:0;"><strong>Questions?</strong> Call <a href="tel:${PLATFORM_DEFAULTS.mainPhone}" style="color:#ea580c;">${PLATFORM_DEFAULTS.mainPhone}</a> or email <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}" style="color:#ea580c;">info@${PLATFORM_DEFAULTS.canonicalDomain}</a></p>
         </div>
         ${passwordSection}
       `;
@@ -841,7 +828,7 @@ async function _POST(req: Request) {
                 <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b;">Application ID: ${data.id}</p>
               </div>
 
-              <p>Questions? Call us at <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color: #ea580c; font-weight: bold;">${PLATFORM_DEFAULTS.supportPhone}</a> or email <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}" style="color: #ea580c;">info@${PLATFORM_DEFAULTS.canonicalDomain}</a></p>
+              <p>Questions? Call us at <a href="tel:${PLATFORM_DEFAULTS.mainPhone}" style="color: #ea580c; font-weight: bold;">${PLATFORM_DEFAULTS.mainPhone}</a> or email <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}" style="color: #ea580c;">info@${PLATFORM_DEFAULTS.canonicalDomain}</a></p>
               <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
               <p style="color: #64748b; font-size: 13px; text-align: center;">
                 ${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute<br />
@@ -953,7 +940,7 @@ async function _POST(req: Request) {
     const origin = getRequestOrigin(req);
     return NextResponse.json(
       {
-        error: 'Unexpected error. Please call 317-314-3757 for immediate assistance.',
+        error: 'Unexpected error. Please call 317-999-9620 for immediate assistance.',
       },
       { status: 500, headers: corsHeadersForOrigin(origin, allowedOrigins) },
     );

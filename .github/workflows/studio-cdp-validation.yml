@@ -1,0 +1,56 @@
+name: Studio direct CDP validation
+
+on:
+  pull_request:
+    paths:
+      - 'services/studio-browser/**'
+      - 'Dockerfile.studio-browser'
+      - 'components/studio/CloudBrowserWorkspace.tsx'
+      - '.github/workflows/studio-cdp-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  chromium-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build actual Studio browser image
+        run: docker build -f Dockerfile.studio-browser -t studio-cdp-validation .
+      - name: Exercise native CDP and all browser contracts in Chromium
+        run: >-
+          docker run --rm --init
+          -e STUDIO_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
+          -v "$PWD/services/studio-browser:/tests:ro"
+          --entrypoint sh studio-cdp-validation
+          -c 'test "$(id -u)" = 1001 && test -x "$STUDIO_BROWSER_EXECUTABLE_PATH" && cp -f /tests/*.test.mjs /app/ && node --test --test-concurrency=1 /app/*.test.mjs'
+
+  existing-service-wiring:
+    name: Read-only Ultimate service connections
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.28.2 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Verify Ultimate and browser integration regressions
+        run: pnpm exec vitest run tests/unit/ultimate*.test.ts tests/unit/ultimate*.test.tsx tests/unit/studio-browser*.test.ts tests/unit/studio-browser*.test.tsx tests/unit/devstudio-browser-planner.test.ts tests/unit/course-practical-workflow.test.ts tests/unit/course-builder-practical-verification.test.ts tests/unit/course-practical-review-queue.test.tsx tests/unit/staged-practical*.test.ts tests/unit/staged-practical*.test.tsx
+      - name: Inspect existing connections without deploying
+        run: pnpm tsx scripts/northflank/verify-studio-browser-link.ts --ultimate
+      - name: Inspect existing practical schema without reading learner records
+        run: node scripts/verify-ultimate-media-schema.mjs --existing-practical-only

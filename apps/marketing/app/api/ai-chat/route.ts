@@ -182,7 +182,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('PARIS request error:', error);
     return NextResponse.json({
-      reply: `I cannot verify that information right now. Please use /programs or contact Elevate at ${PLATFORM_DEFAULTS.supportPhone}.`,
+      reply: `I cannot verify that information right now. Please use /programs or contact Elevate at ${PLATFORM_DEFAULTS.mainPhone}.`,
     });
   }
 }

@@ -194,7 +194,7 @@ describe('canonical Course Factory media architecture', () => {
     expect(manager).toContain('microclipStateMismatches === 0');
   });
 
-  it('treats media as part of one draft course build instead of publishing from the worker', () => {
+  it('publishes the complete course through automated verification from the worker', () => {
     const factory = read('lib/course-factory/factory.ts');
     const lifecycle = read('lib/course-builder/build-lifecycle.ts');
     const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
@@ -203,8 +203,10 @@ describe('canonical Course Factory media architecture', () => {
       "completionState: input.videoMode === 'off' ? 'content_only' : 'media_pending'",
     );
     expect(lifecycle).toContain('finalizeUnifiedCourseBuildWithClient');
-    expect(lifecycle).toContain("state: 'ready_for_review'");
-    expect(lifecycle).not.toContain('publishPersistedCourseWithClient');
+    expect(lifecycle).toContain('publishPersistedCourseWithClient');
+    expect(lifecycle).toContain('if (!media.completePackage)');
+    expect(lifecycle).toContain('if (!contract.pass)');
+    expect(lifecycle).toContain('actorId: null');
     expect(worker).toContain('finalizeUnifiedCourseBuildWithClient');
     expect(worker).not.toContain('finalizeCourseAutomaticallyIfReadyWithClient');
   });
@@ -355,16 +357,15 @@ describe('canonical Course Factory media architecture', () => {
     expect(media).toContain("locked_by: 'course_builder'");
     expect(media).toContain("strategy: 'repository_voice'");
     expect(media).toContain('allow_paid_provider: allowPaidNarration');
-    expect(media).toContain("provider: 'cloudflare'");
+    expect(media).toContain("strategy: 'repository_voice'");
     expect(media).toContain("strategy: 'existing_then_pexels'");
     expect(renderer).toContain('applyLockedCourseBuilderMediaPolicy(job)');
-    expect(renderer).toContain("process.env.AI_NARRATION_PROVIDER = 'cloudflare'");
+    expect(renderer).not.toContain("process.env.AI_NARRATION_PROVIDER = 'cloudflare'");
     expect(renderer).toContain('MEDIA_NARRATION_AUTHORIZATION_REQUIRED');
     expect(renderer).not.toContain("process.env.AI_NARRATION_PROVIDER = 'edge'");
     expect(narration).toContain('const provider = configuredNarrationProvider()');
     expect(narration).toContain("provider === 'cloudflare'");
-    expect(narration).toContain("provider === 'edge'");
-    expect(narration).not.toContain("production' && provider === 'edge'");
+    expect(narration).toContain("if (env.NODE_ENV === 'production') return 'kokoro'");
   });
   it('uses the strict credential lesson contract as a production completion gate', () => {
     const gate = read('lib/course-factory/canonical-course-gate.ts');
@@ -393,7 +394,7 @@ describe('canonical Course Factory media architecture', () => {
     const quality = read('lib/video/media-quality-gate.ts');
     const director = read('lib/video/media-director.ts');
     const renderer = read('lib/video/process-video-job.ts');
-    expect(quality).toContain("MEDIA_QUALITY_GATE_VERSION = 'media-quality-v6'");
+    expect(quality).toContain("MEDIA_QUALITY_GATE_VERSION = 'media-quality-v7'");
     expect(quality).toContain('detectBackwardTimelineReplay');
     expect(quality).toContain('backwardTimelineJumpDetected');
     expect(quality).toContain('licenseEvidenceCoverage');

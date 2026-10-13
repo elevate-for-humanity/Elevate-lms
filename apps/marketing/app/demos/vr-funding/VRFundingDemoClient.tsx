@@ -141,7 +141,7 @@ ${new Date().toLocaleDateString()}
 
 LIVE DEMO: https://admin.elevateforhumanity.org
 CONTACT: support@elevateforhumanity.org
-PHONE: (317) 314-3757
+PHONE: (317) 999-9620
 
 ==================================================
 SECTIONS
@@ -554,7 +554,7 @@ BUSINESS
       <footer className="bg-slate-800 border-t border-slate-700 py-8 px-4">
         <div className="max-w-7xl mx-auto text-center text-slate-400">
           <p>Elevate for Humanity • Workforce Development Platform</p>
-          <p className="text-sm mt-2">Contact: support@elevateforhumanity.org • (317) 314-3757</p>
+          <p className="text-sm mt-2">Contact: support@elevateforhumanity.org • (317) 999-9620</p>
         </div>
       </footer>
     </div>

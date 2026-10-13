@@ -1,10 +1,12 @@
 import type { UltimateRenderPort } from '../core/ports';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { materializeInstructionalVisualAssets } from './instructional-visual-assets';
 import { MIN_LESSON_VIDEO_SCENES, type MediaDirectorInput } from '@/lib/video/media-director';
 
 type RecordLike = Record<string, any>;
 
 type VisualCandidate = {
+  ownedInstructional?: boolean;
   assetId?: string;
   url: string;
   kind: 'image' | 'video';
@@ -89,8 +91,27 @@ function visualCandidates(input: any): VisualCandidate[] {
     const row = record(asset);
     const url = publicCourseMediaUrl(row.public_url);
     const kind = url ? mediaKind(url, row.mime_type) : null;
-    if (!url || !kind || !row.entitlement_id) continue;
+    const ownedAssignment = assignment.assignments?.find(
+      (a: any) =>
+        a.sceneId === row.instructional_scene_id &&
+        a.assetId === row.id &&
+        a.assetId === `instructional:${a.sceneId}` &&
+        a.assignmentMethod === 'instructional-render' &&
+        a.generatedInstructionalVisual === true,
+    );
+    if (
+      !url ||
+      !kind ||
+      (!row.entitlement_id &&
+        !(
+          row.owned_instructional_visual === true &&
+          row.provider === 'remotion' &&
+          ownedAssignment
+        ))
+    )
+      continue;
     candidates.push({
+      ownedInstructional: row.owned_instructional_visual === true && Boolean(ownedAssignment),
       assetId: String(row.id ?? ''),
       url,
       kind,
@@ -103,8 +124,13 @@ function visualCandidates(input: any): VisualCandidate[] {
   const seen = new Set<string>();
   return candidates
     .filter((candidate) => {
-      if (seen.has(candidate.url)) return false;
-      seen.add(candidate.url);
+      // Assignments bind an asset record, not a URL. Several approved lesson
+      // records can reference the same licensed file; dropping their IDs makes
+      // a valid saved assignment impossible to resolve. Distinct-shot quality
+      // remains enforced against the rendered URLs by requireResolvedVisualEvidence.
+      const identity = candidate.assetId || candidate.url;
+      if (seen.has(identity)) return false;
+      seen.add(identity);
       return true;
     })
     .sort((left, right) => Number(right.kind === 'image') - Number(left.kind === 'image'));
@@ -159,12 +185,10 @@ export function requireResolvedVisualEvidence(sceneData: unknown): {
   if (missing.length) {
     throw new Error(`ULTIMATE_RENDER_VISUAL_ASSETS_MISSING:${missing.join(',')}`);
   }
-  const distinctShots = new Set(urls).size;
-  if (distinctShots < MIN_LESSON_VIDEO_SCENES) {
-    throw new Error(
-      `ULTIMATE_RENDER_DISTINCT_VISUALS_REQUIRED:${distinctShots}:${MIN_LESSON_VIDEO_SCENES}`,
-    );
-  }
+  // Expiring signatures do not turn one stored clip into distinct footage.
+  const distinctShots = new Set(urls.map(url => url!.split(/[?#]/)[0])).size;
+  if (distinctShots < MIN_LESSON_VIDEO_SCENES)
+    throw new Error(`ULTIMATE_RENDER_DISTINCT_VISUALS_REQUIRED:${distinctShots}:${MIN_LESSON_VIDEO_SCENES}`);
   return { visualAssetCount: urls.length, distinctShots };
 }
 
@@ -179,9 +203,6 @@ function sceneType(index: number, total: number) {
 export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
   const board = rawStoryboard(input);
   const candidates = visualCandidates(input);
-  if (candidates.length < board.scenes.length) {
-    throw new Error(`ULTIMATE_ENVATO_VISUALS_REQUIRED:${candidates.length}:${board.scenes.length}`);
-  }
   const scenes = board.scenes.map((value: unknown, index: number) => {
     const scene = record(value);
     const teachingPoint = String(
@@ -199,30 +220,40 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
     const candidate = assignment
       ? candidates.find((c) => c.assetId === assignment.assetId)
       : undefined;
-    if (!candidate) throw new Error(`ULTIMATE_APPROVED_SCENE_VISUAL_REQUIRED:${scene.id}`);
+    // Scene-to-asset evidence is an authority boundary. A missing mapping
+    // cannot be repaired by rotating through unrelated licensed stock.
+    if (!assignment || !candidate)
+      throw new Error(`ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED:${scene.id}`);
+    const physicalDemonstration = (input.requiresPhysicalDemonstration ?? input.requiresPracticalEvidence) === true &&
+      [scene.stage, scene.title, scene.sceneType, scene.scene_type].some(value =>
+        /^(demonstration|guided_practice|independent_practice|mistake_and_correction|mistake and correction)$/.test(String(value ?? '').trim().toLowerCase()));
+    if (physicalDemonstration && candidate.kind !== 'video')
+      throw new Error(`ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED:${scene.id}`);
+    const resolvedCandidate = candidate;
+    if (!resolvedCandidate) throw new Error(`ULTIMATE_RENDER_VISUAL_ASSETS_MISSING:${scene.id}`);
     return {
       ...scene,
+      physical_demonstration: physicalDemonstration,
       subject: String(scene.title ?? scene.subject ?? input.courseTitle ?? 'Lesson'),
       action: teachingPoint || visualRequirement,
       dialogue: teachingPoint || visualRequirement,
       required_visual_evidence: visualRequirement || teachingPoint,
       scene_type: scene.scene_type ?? scene.sceneType ?? sceneType(index, board.scenes.length),
-      media_source: candidate
-        ? 'elevate-owned'
-        : ['worked_example', 'memory_recap'].includes(
-              String(scene.scene_type ?? scene.sceneType ?? sceneType(index, board.scenes.length)),
-            )
-          ? 'elevate-motion'
-          : 'pexels',
-      review_status: candidate ? 'approved' : 'draft',
-      ...(candidate?.kind === 'video' ? { source_video_url: candidate.url } : {}),
-      ...(candidate?.kind === 'image' ? { reference_image_url: candidate.url } : {}),
-      ...(candidate
+      // Never fall back to generic stock footage when a licensed asset is unavailable.
+      media_source: 'elevate-owned',
+      review_status: resolvedCandidate ? 'approved' : 'draft',
+      ...(resolvedCandidate?.kind === 'video' ? { source_video_url: resolvedCandidate.url } : {}),
+      ...(resolvedCandidate?.kind === 'image' ? { reference_image_url: resolvedCandidate.url } : {}),
+      ...(resolvedCandidate
         ? {
-            resolved_provider: candidate.provider,
-            resolved_model: candidate.kind === 'video' ? 'licensed-video' : 'licensed-image',
-            source_provider_item_id: candidate.providerItemId,
-            source_license_evidence_url: candidate.licenseEvidenceUrl,
+            resolved_provider: resolvedCandidate.provider,
+            resolved_model: resolvedCandidate.ownedInstructional
+              ? 'script-bound-instructional-image'
+              : resolvedCandidate.kind === 'video'
+                ? 'licensed-video'
+                : 'licensed-image',
+            source_provider_item_id: resolvedCandidate.providerItemId,
+            source_license_evidence_url: resolvedCandidate.licenseEvidenceUrl,
           }
         : {}),
     };
@@ -236,6 +267,7 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
     objective: String(board.objective ?? scenes[0]?.action ?? input.courseTitle ?? 'Lesson'),
     script,
     defaultDurationSeconds: 8,
+    requiredSceneCount: 13,
     sceneData: {
       ...board,
       version: '1.0',
@@ -257,14 +289,52 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
   constructor(private db?: SupabaseClient) {}
 
   async render(input: any) {
+    if (input.lessonPresentation === 'approved-premium-v1' &&
+        (!input.presentationContract?.approvedReferenceVideo?.assetId ||
+         !/^[a-f0-9]{64}$/i.test(input.presentationContract?.approvedReferenceVideo?.sha256 ?? '')))
+      throw new Error('ULTIMATE_APPROVED_REFERENCE_REQUIRED');
+    const { uploadCourseVideosObject } = await import('@/lib/video/upload-lesson-media');
+    const { prepareTeachingPhotos } = await import('./teaching-photos');
+    const photographed = this.db ? await prepareTeachingPhotos(input,this.db) : input;
+    const materialized = await materializeInstructionalVisualAssets(
+      photographed,
+      uploadCourseVideosObject,
+    );
     const prepared = prepareUltimateStoryboardInput(
-      this.db ? await refreshLicensedVisualUrls(input, this.db) : input,
+      this.db ? await refreshLicensedVisualUrls(materialized, this.db) : materialized,
     );
     const [{ directMedia }, { renderStoryboardVideo }] = await Promise.all([
       import('@/lib/video/media-director'),
       import('@/lib/video/remotion-render'),
     ]);
     const storyboard = directMedia(prepared);
+    const teachingPhotos = rawStoryboard(materialized).scenes.map((scene:any)=>materialized.teachingPhotos?.[scene.id]);
+    const motionEvidence=rawStoryboard(materialized).scenes.map((scene:any)=>{
+      const media=visualAssignment(materialized);
+      const assignment=media.assignments?.find((a:any)=>a.sceneId===scene.id);
+      const asset=media.readyAssets?.find((a:any)=>a.id===assignment?.assetId);
+      return {visibleActions:asset?.visual_observation?.visibleActions??[],contentSha256:asset?.content_sha256};
+    });
+    if(input.lessonPresentation === 'approved-premium-v1') storyboard.scenes.forEach((scene:any,index:number)=>{
+      if(!scene.physicalDemonstration) {
+        scene.sourceVideoUrl=undefined;
+        scene.referenceImageUrl=teachingPhotos[index]?.[0]?.imageUrl;
+        scene.resolvedProvider='google';scene.resolvedModel='generated-teaching-photograph';
+        delete scene.sourceProviderItemId;delete scene.sourceLicenseEvidenceUrl;
+      }
+    });
+    // Presentation instructions are course data, never a barber-specific constant.
+    // Preserve the owner's approved reference identity through the render result.
+    const presentation = record(input.presentationContract ?? input.artifacts?.presentation_contract);
+    const reference = record(presentation.approvedReferenceVideo);
+    if (Object.keys(reference).length &&
+        (!String(reference.assetId ?? '').trim() || !String(reference.sha256 ?? '').match(/^[a-f0-9]{64}$/i)))
+      throw new Error('ULTIMATE_APPROVED_REFERENCE_ASSET_ID_AND_HASH_REQUIRED');
+    const visualStyle = record(presentation.visualStyle);
+    if (Object.keys(visualStyle).length &&
+        (visualStyle.cropMode && !['contain','cover-safe'].includes(visualStyle.cropMode) ||
+         visualStyle.transition && !['cut','crossfade'].includes(visualStyle.transition)))
+      throw new Error('ULTIMATE_APPROVED_VISUAL_STYLE_UNSUPPORTED');
     const courseTitle = String(input.courseTitle ?? prepared.title);
     const result = await renderStoryboardVideo({
       lessonId: String(input.lessonId),
@@ -272,6 +342,10 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       storyboard,
       instructorId: instructorFor(courseTitle),
       ultimateStrict: true,
+      lessonPresentation: input.lessonPresentation,
+      visualStyle,
+      teachingPhotos,
+      motionEvidence,
       requireVisualEvidence: true,
       narrationSegments: input.artifacts?.natural_narration?.narration?.segments,
     });
@@ -281,11 +355,16 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
     const visualEvidence = requireResolvedVisualEvidence(result.sceneData);
     return {
       ...result,
-      layoutVersion: 2,
+      layoutVersion: input.lessonPresentation === 'approved-premium-v1' ? 4 : 2,
+      ...(input.lessonPresentation === 'approved-premium-v1' ? {presentationVersion:'approved-moment-cues-v2'} : {}),
+      provider: 'remotion',
+      providerModel: 'SlideLesson-blueprint-v3',
       captionsUrl: result.sceneData?.captionUrl,
       transcriptUrl: result.sceneData?.transcriptUrl,
       ...visualEvidence,
       licensedFirst: true,
+      ...(reference.assetId ? {approvedReferenceAssetId: String(reference.assetId), approvedReferenceSha256: String(reference.sha256)} : {}),
+      ...(Object.keys(visualStyle).length ? {requestedVisualStyle: visualStyle} : {}),
     };
   }
 }

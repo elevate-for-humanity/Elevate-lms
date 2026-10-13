@@ -4,6 +4,19 @@ export class UltimateJobQueue {
   constructor(private db: SupabaseClient) {}
 
   async enqueue(buildId: string, payload: unknown = {}) {
+    if ((payload as any)?.dependencyResume === 'licensed_media_attached') {
+      const { data, error } = await this.db.rpc('wake_ultimate_media_dependency', {
+        p_build: buildId, p_payload: payload,
+      });
+      if (error) throw error;
+      if (!data?.[0]) {
+        const { data: build, error: buildError } = await this.db.from('ultimate_course_builds').select('status').eq('id', buildId).single();
+        if (buildError) throw buildError;
+        if (build?.status === 'published') return null;
+        throw new Error('ULTIMATE_DEPENDENCY_WAKEUP_NOT_PERSISTED');
+      }
+      return data[0];
+    }
     const active = () =>
       this.db
         .from('ultimate_build_jobs')
@@ -26,6 +39,10 @@ export class UltimateJobQueue {
       if (concurrent) return concurrent;
     }
     if (error) throw error;
+    const { error: buildError } = await this.db.from('ultimate_course_builds')
+      .update({ status: 'queued', updated_at: new Date().toISOString() })
+      .eq('id', buildId);
+    if (buildError) throw buildError;
     return data;
   }
 
@@ -48,8 +65,8 @@ export class UltimateJobQueue {
     return data === true;
   }
 
-  async complete(jobId: string, workerId: string) {
-    const { error } = await this.db
+  async complete(jobId: string, workerId: string, generation: number) {
+    const { data: updated, error } = await this.db
       .from('ultimate_build_jobs')
       .update({
         status: 'completed',
@@ -58,20 +75,91 @@ export class UltimateJobQueue {
         updated_at: new Date().toISOString(),
       })
       .eq('id', jobId)
-      .eq('lease_owner', workerId);
+      .eq('lease_owner', workerId)
+      .eq('execution_generation', generation)
+      .eq('status', 'running')
+      .gt('lease_expires_at', new Date().toISOString())
+      .select('id');
     if (error) throw error;
+    if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
   }
 
-  async fail(jobId: string, workerId: string, errorMessage: string, retry = true) {
-    const { data, error } = await this.db
+  async waitForDependency(jobId: string, workerId: string, message: string, generation: number, resumePayload?: unknown) {
+    // Do not burn attempts for externally blocked assets. The existing
+    // wake_ultimate_media_dependency RPC is responsible for resumption.
+    const { data: updated, error } = await this.db.from('ultimate_build_jobs').update({
+      status: 'failed',
+      // This field belongs to actual dependency-arrival events. Writing wait
+      // metadata here makes the wakeup trigger replace the entire job payload
+      // on its next transition. Preserve an arrival already recorded by the RPC.
+      ...(resumePayload === undefined ? {} : { payload: resumePayload }),
+      lease_owner: null,
+      lease_expires_at: null,
+      last_error: message,
+      updated_at: new Date().toISOString(),
+    }).eq('id', jobId).eq('lease_owner', workerId)
+      .eq('execution_generation', generation)
+      .eq('status', 'running')
+      .gt('lease_expires_at', new Date().toISOString())
+      .select('id');
+    if (error) throw error;
+    if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
+  }
+
+  async requeueForRepair(jobId: string, workerId: string, message: string, generation: number) {
+    const { data: updated, error } = await this.db
       .from('ultimate_build_jobs')
-      .select('attempts,max_attempts')
+      .update({
+        status: 'queued',
+        available_at: new Date(Date.now() + 60000).toISOString(),
+        lease_owner: null,
+        lease_expires_at: null,
+        last_error: message,
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', jobId)
       .eq('lease_owner', workerId)
+      .eq('execution_generation', generation)
+      .eq('status', 'running')
+      .gt('lease_expires_at', new Date().toISOString())
+      .select('id');
+    if (error) throw error;
+    if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
+  }
+
+  /** Yield between lessons. A successful checkpoint is progress, not a failed
+   * attempt. The persisted cursor resumes the same job and lets other courses run. */
+  async yieldProgress(jobId: string, workerId: string, payload: unknown, generation: number) {
+    const { data: updated, error } = await this.db.from('ultimate_build_jobs').update({
+      status: 'queued', payload,
+      // A checkpoint continuation starts new work; it is not a failed retry.
+      // Per-lesson repair limits remain in the preserved payload.
+      attempts: 0,
+      available_at: new Date(Date.now() + 1000).toISOString(),
+      lease_owner: null, lease_expires_at: null, last_error: null,
+      updated_at: new Date().toISOString(),
+    }).eq('id', jobId).eq('lease_owner', workerId)
+      .eq('execution_generation', generation)
+      .eq('status', 'running')
+      .gt('lease_expires_at', new Date().toISOString())
+      .select('id');
+    if (error) throw error;
+    if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
+  }
+
+  async fail(jobId: string, workerId: string, errorMessage: string, generation: number, retry = true) {
+    const { data, error } = await this.db
+      .from('ultimate_build_jobs')
+      .select('attempts,max_attempts,build_id')
+      .eq('id', jobId)
+      .eq('lease_owner', workerId)
+      .eq('execution_generation', generation)
+      .eq('status', 'running')
+      .gt('lease_expires_at', new Date().toISOString())
       .single();
     if (error) throw error;
     const canRetry = retry && data.attempts < data.max_attempts;
-    const { error: updateError } = await this.db
+    const { data: updated, error: updateError } = await this.db
       .from('ultimate_build_jobs')
       .update({
         status: canRetry ? 'queued' : 'failed',
@@ -86,7 +174,14 @@ export class UltimateJobQueue {
         updated_at: new Date().toISOString(),
       })
       .eq('id', jobId)
-      .eq('lease_owner', workerId);
+      .eq('lease_owner', workerId)
+      .eq('execution_generation', generation)
+      .eq('status', 'running')
+      .gt('lease_expires_at', new Date().toISOString())
+      .select('id');
     if (updateError) throw updateError;
+    if (!updated?.length) throw new Error('ULTIMATE_JOB_LEASE_LOST:'+jobId);
+    // The database transition atomically blocks or requeues the build. A
+    // separate update here could overwrite a concurrently arriving media wakeup.
   }
 }

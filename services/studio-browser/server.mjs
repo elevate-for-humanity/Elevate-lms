@@ -9,8 +9,11 @@ import { execFile, spawn } from 'node:child_process';
 import { pipeline } from 'node:stream/promises';
 import { pathToFileURL } from 'node:url';
 import { promisify } from 'node:util';
-import { chromium } from 'playwright-core';
+import { launchBrowser } from './cdp-browser.mjs';
+import { commandArguments } from './command-arguments.mjs';
 import { ProviderSessionStore } from './provider-session-store.mjs';
+import { requiresHumanVerification, redactBrowserEvidence } from './provider-verification.mjs';
+import { prepareCourseVideoDownload, hasActiveMediaTransfer } from './course-video-download.mjs';
 import { runLearnerTest, credentialMatches, learnerSetupReady } from './learner-runthrough.mjs';
 
 const execFileAsync = promisify(execFile);
@@ -19,7 +22,7 @@ const port = Number(process.env.PORT || 3100);
 const sharedSecret = process.env.STUDIO_BROWSER_SECRET || '';
 const adminOrigin =
   process.env.STUDIO_BROWSER_ADMIN_ORIGIN || 'https://admin.elevateforhumanity.org';
-const sessionTtlMs = Number(process.env.STUDIO_BROWSER_SESSION_TTL_MS || 15 * 60_000);
+const sessionTtlMs = Math.min(8 * 60 * 60_000, Math.max(15 * 60_000, Number(process.env.STUDIO_BROWSER_SESSION_TTL_MS || 60 * 60_000)));
 const maxSessions = Number(process.env.STUDIO_BROWSER_MAX_SESSIONS || 4);
 const heartbeatIntervalMs = Math.max(
   5_000,
@@ -51,8 +54,9 @@ const providerSessions = new ProviderSessionStore({
 });
 let learnerTestRunning = false;
 const learnerTests = new Map();
+const foundationFixtures = new Map();
 const workspaceRoot = process.env.STUDIO_WORKSPACE_ROOT || '/workspace/project';
-const allowedExecCommands = new Set(['git', 'node', 'npm', 'npx', 'pnpm', 'python3', 'bash', 'ls', 'cat', 'grep', 'find', 'pwd']);
+const allowedExecCommands = new Set(['git', 'node', 'npm', 'npx', 'pnpm', 'python3', 'bash', 'ls', 'cat', 'grep', 'rg', 'find', 'pwd']);
 let shuttingDown = false;
 
 function authorizedService(req) {
@@ -132,7 +136,10 @@ async function ensureRepository(body = {}) {
 async function executeWorkspaceCommand(body) {
   const command = String(body.command || '').trim();
   if (!command) throw new BrowserServiceError('command_required', 400);
-  const [binary, ...args] = Array.isArray(body.args) ? [command, ...body.args.map(String)] : command.split(/\s+/);
+  let argv;
+  try { argv = Array.isArray(body.args) ? [command, ...body.args.map(String)] : commandArguments(command); }
+  catch (error) { throw new BrowserServiceError(error.message, 400); }
+  const [binary, ...args] = argv;
   if (!allowedExecCommands.has(binary)) throw new BrowserServiceError('command_not_allowed', 400);
   const cwd = safeWorkspacePath(String(body.cwd || ''));
   const result = await execFileAsync(binary, args, {
@@ -183,7 +190,7 @@ async function withTimeout(promise, timeoutMs, code = 'browser_unavailable') {
 }
 
 export function createBrowserLifecycleManager({
-  launch = (options) => chromium.launch(options),
+  launch = (options) => launchBrowser(options),
   onUnavailable = async () => {},
 } = {}) {
   const lifecycle = {
@@ -201,6 +208,7 @@ export function createBrowserLifecycleManager({
   let recycleInFlight;
   let heartbeatInFlight;
   let intentionalClose = false;
+  let stopped = false;
 
   const connected = () => Boolean(browser?.isConnected?.());
   const fail = (error) => {
@@ -219,18 +227,17 @@ export function createBrowserLifecycleManager({
     }
   };
   const launchBrowser = async () => {
-    if (shuttingDown || lifecycle.state === 'shutting_down')
+    if (stopped || shuttingDown || lifecycle.state === 'shutting_down')
       throw new BrowserServiceError('browser_unavailable', 503);
     if (connected()) return browser;
     if (launchInFlight) return launchInFlight;
     lifecycle.state = 'starting';
     launchInFlight = (async () => {
+      let candidate;
       try {
-        const candidate = await launch({
+        candidate = await launch({
           headless: true,
-          ...(process.env.STUDIO_BROWSER_EXECUTABLE_PATH
-            ? { executablePath: process.env.STUDIO_BROWSER_EXECUTABLE_PATH }
-            : {}),
+          executablePath: process.env.STUDIO_BROWSER_EXECUTABLE_PATH || '/usr/bin/chromium',
           args: [
             '--disable-background-networking',
             '--disable-component-update',
@@ -241,6 +248,7 @@ export function createBrowserLifecycleManager({
           ],
         });
         await withTimeout(verify(candidate), heartbeatTimeoutMs);
+        if (stopped || shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
         browser = candidate;
         lifecycle.generation += 1;
         lifecycle.launchTimestamp = new Date().toISOString();
@@ -250,14 +258,15 @@ export function createBrowserLifecycleManager({
         lifecycle.state = 'ready';
         candidate.on('disconnected', () => {
           if (candidate !== browser || intentionalClose || shuttingDown) return;
-          browser = undefined;
           fail(new Error('Chromium disconnected'));
-          void onUnavailable('browser_disconnected');
-          void recycleBrowser('browser_disconnected');
+          // recycle owns invalidation and records failures; never leave a
+          // rejected automatic restart unobserved by the Node process.
+          void recycleBrowser('browser_disconnected').catch(() => undefined);
         });
         return candidate;
       } catch (error) {
-        fail(error);
+        await candidate?.close?.().catch(() => undefined);
+        if (!stopped) fail(error);
         throw new BrowserServiceError('browser_unavailable', 503, { cause: error });
       } finally {
         launchInFlight = undefined;
@@ -266,33 +275,53 @@ export function createBrowserLifecycleManager({
     return launchInFlight;
   };
   const recycleBrowser = async (reason = 'administrative_recycle') => {
-    if (shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
+    if (stopped || shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
     if (recycleInFlight) return recycleInFlight;
     lifecycle.state = 'recycling';
     recycleInFlight = (async () => {
       const old = browser;
       browser = undefined;
-      await onUnavailable(reason);
-      intentionalClose = true;
-      await old?.close?.().catch(() => undefined);
-      intentionalClose = false;
+      try {
+        await onUnavailable(reason);
+      } finally {
+        intentionalClose = true;
+        await old?.close?.().catch(() => undefined);
+        intentionalClose = false;
+      }
       lifecycle.restartCount += 1;
       return launchBrowser();
-    })().finally(() => {
+    })().catch(error => {
+      if (!stopped && lifecycle.state !== 'failed') fail(error);
+      throw error;
+    }).finally(() => {
       recycleInFlight = undefined;
     });
     return recycleInFlight;
   };
   const heartbeat = async () => {
-    if (heartbeatInFlight || recycleInFlight || lifecycle.state !== 'ready') return false;
+    if (stopped || shuttingDown || heartbeatInFlight || recycleInFlight) return false;
+    // A failed pre-warm must not strand the container in a permanent 503
+    // state. Northflank can keep the process alive after a transient Chromium
+    // launch failure, so the normal heartbeat is also the recovery loop.
+    if (lifecycle.state !== 'ready') {
+      heartbeatInFlight = launchBrowser()
+        .then(() => true)
+        .catch(() => false)
+        .finally(() => {
+          heartbeatInFlight = undefined;
+        });
+      return heartbeatInFlight;
+    }
     heartbeatInFlight = (async () => {
       try {
         if (!connected()) throw new Error('Chromium disconnected');
         await withTimeout(verify(browser), heartbeatTimeoutMs);
+        if (stopped || shuttingDown) return false;
         lifecycle.lastSuccessfulHeartbeat = new Date().toISOString();
         lifecycle.consecutiveFailures = 0;
         return true;
       } catch (error) {
+        if (stopped || shuttingDown) return false;
         fail(error);
         await recycleBrowser('heartbeat_failed').catch(() => undefined);
         return false;
@@ -315,13 +344,15 @@ export function createBrowserLifecycleManager({
     recycling: Boolean(recycleInFlight),
   });
   const shutdown = async () => {
+    stopped = true;
     lifecycle.state = 'shutting_down';
     intentionalClose = true;
     const old = browser;
     browser = undefined;
     await old?.close?.().catch(() => undefined);
+    await Promise.allSettled([launchInFlight, recycleInFlight].filter(Boolean));
   };
-  return { getBrowser: launchBrowser, recycleBrowser, heartbeat, health, shutdown };
+  return { getBrowser: () => recycleInFlight || launchBrowser(), recycleBrowser, heartbeat, health, shutdown };
 }
 
 function json(res, status, body) {
@@ -332,7 +363,7 @@ function json(res, status, body) {
 function corsHeaders() {
   return {
     'access-control-allow-origin': adminOrigin,
-    'access-control-allow-headers': 'authorization,content-type,x-studio-browser-secret',
+    'access-control-allow-headers': 'authorization,content-type,x-studio-browser-secret,x-studio-file-name',
     'access-control-allow-methods': 'GET,POST,PUT,DELETE,OPTIONS',
     'cache-control': 'no-store',
     'x-content-type-options': 'nosniff',
@@ -410,6 +441,7 @@ async function destroySession(id) {
   sessions.delete(id);
   if (session.frameTimer) clearTimeout(session.frameTimer);
   for (const stream of session.streams) stream.end();
+  await session.checkpointProviderState?.();
   await providerSessions.save(session.providerScope, session.context).catch(() => {
     console.warn('Provider session checkpoint failed');
   });
@@ -447,7 +479,7 @@ async function normalizeDownloadedVideo(item) {
     .filter(Boolean)
     .map((match) => ({ size: Number(match[1]), name: match[2] }))
     .sort((left, right) => right.size - left.size)[0];
-  if (!selected) throw new Error('Envato archive did not contain a supported video file');
+  if (!selected) return item; // Keep document/template archives available as ordinary downloads.
   const fileName = safeFileName(path.basename(selected.name));
   const extractedPath = path.join(path.dirname(item.filePath), `${item.id}-${fileName}`);
   const unzip = spawn('unzip', ['-p', item.filePath, selected.name], {
@@ -603,19 +635,243 @@ const browserManager = createBrowserLifecycleManager({
   },
 });
 
+export async function receiveBrowserUpload(session, request, limit = 32 * 1024 * 1024) {
+  if (!session.fileChooser || (session.fileChooserPage && session.fileChooserPage !== session.page)) throw new BrowserServiceError('file_picker_not_found', 409);
+  const id = crypto.randomUUID();
+  const name = safeFileName(decodeURIComponent(String(request.headers['x-studio-file-name'] || 'upload')));
+  const filePath = path.join(session.downloadDir, id, name);
+  await fs.promises.mkdir(path.dirname(filePath), { mode: 0o700 });
+  const file = await fs.promises.open(filePath, 'wx', 0o600);
+  let size = 0;
+  try {
+    for await (const chunk of request) {
+      size += chunk.length;
+      if (size > limit) throw new BrowserServiceError('upload_too_large', 413);
+      await file.write(chunk);
+    }
+    if (!size) throw new BrowserServiceError('empty_upload', 400);
+    session.uploads ||= new Map();
+    session.uploads.set(id, filePath);
+    return { id, size };
+  } catch (error) {
+    await fs.promises.rm(path.dirname(filePath), { recursive: true, force: true });
+    throw error;
+  } finally {
+    await file.close();
+  }
+}
+
+async function runBrowserFoundationTest() {
+  // A fresh context in the existing worker: no learner/provider account is used.
+  const testOwner = `foundation-${crypto.randomUUID()}`;
+  const session = await createSession('about:blank', { width: 390, height: 780 }, [], testOwner);
+  const checks = [];
+  const check = async (name, action) => {
+    try { await action(); checks.push({ name, passed: true }); }
+    catch (error) { checks.push({ name, passed: false, reason: `${sanitizeReason(error)} ${session.events.filter(event => event.type === 'pageerror' || (event.type === 'console' && event.level === 'error')).slice(-3).map(event => event.text).join('; ')}`.slice(0, 2000) }); }
+  };
+  const fixture = `<html><body style="height:2200px"><label>Text<input id="text" ondblclick="this.dataset.doubleclicked='true'"></label><iframe srcdoc="<input placeholder='Embedded lesson form'>"></iframe><button id="popup" onclick="window.open('about:blank')">Open tab</button><input id="file" type="file"><button id="confirm" onclick="document.body.dataset.confirmed=String(confirm('Confirm test'))">Confirm</button><a id="download" href="download" download="acceptance.txt">Download</a><button id="blob-download" onclick="const a=document.createElement('a');a.href=window.URL.createObjectURL(new Blob(['browser acceptance'],{type:'text/plain'}));a.download='acceptance-blob.txt';document.body.appendChild(a);a.click()">Download blob</button></body></html>`;
+  const fixtureNonce = crypto.randomUUID();
+  foundationFixtures.set(fixtureNonce, {html: fixture, expiresAt: Date.now() + 120000});
+  const assert = (condition, reason) => { if (!condition) throw new Error(reason); };
+  try {
+    const page = session.page;
+    // Real HTTP responses exercise the native download pipeline. DevTools
+    // route.fulfill fixtures do not model a streaming attachment transfer.
+    await page.goto(`http://127.0.0.1:${port}/foundation-fixture/${fixtureNonce}/start`);
+    await check('durable_provider_checkpoint', async () => {
+      assert(providerSessions.directory && providerSessions.key, 'provider_checkpoint_not_configured');
+      const scope = providerSessions.scope(testOwner, 'https://app.envato.com');
+      const cookie = {name: 'studio_foundation_probe', value: crypto.randomUUID(), domain: '.envato.com', path: '/', expires: -1, httpOnly: true, secure: true, sameSite: 'Lax'};
+      try {
+        await providerSessions.save(scope, {storageState: async () => ({cookies: [cookie], origins: []})});
+        const restored = await new ProviderSessionStore({secret: sharedSecret, directory: providerSessions.directory}).load(scope);
+        assert(restored.cookies.length === 1 && restored.cookies[0].value === cookie.value, 'durable_provider_restore_mismatch');
+      } finally {
+        providerSessions.states.delete(scope);
+        await fs.promises.rm(providerSessions.file(scope), {force: true});
+      }
+    });
+    await check('session_identity', async () => {
+      const url = `http://127.0.0.1:${port}/sessions/${session.id}/identity`;
+      const response = await fetch(url, {headers: {Authorization: `Bearer ${session.token}`}});
+      assert(response.ok && (await response.json()).ownerId === testOwner, 'session_owner_mismatch');
+      const denied = await fetch(url, {headers: {Authorization: 'Bearer invalid'}});
+      assert(denied.status === 401, 'invalid_session_credential_accepted');
+    });
+    await check('keyboard_and_pointer', async () => {
+      const box = await page.locator('#text').boundingBox();
+      await runActions(session, { actions: [{ type: 'pointer_click', clickCount: 1, x: box.x + 4, y: box.y + 4 }, { type: 'type', text: 'connected browser' }] });
+      assert(await page.locator('#text').inputValue() === 'connected browser', 'keyboard_value_mismatch');
+      await runActions(session, { actions: [{ type: 'keypress', key: 'ControlOrMeta+A' }, { type: 'type', text: 'training@example.com' }] });
+      assert(await page.locator('#text').inputValue() === 'training@example.com', 'email_symbol_or_replacement_failed');
+    });
+    await check('double_click', async () => {
+      const box = await page.locator('#text').boundingBox();
+      await runActions(session, { actions: [{ type: 'pointer_click', clickCount: 1, x: box.x + 4, y: box.y + 4 }, { type: 'pointer_click', clickCount: 2, x: box.x + 4, y: box.y + 4 }] });
+      assert(await page.locator('#text').getAttribute('data-doubleclicked') === 'true', 'double_click_missing');
+    });
+    await check('embedded_frame_controls', async () => {
+      await page.frameLocator('iframe').locator('input').waitFor({ state: 'visible' });
+      const snapshot = await snapshotPage(session);
+      const control = snapshot.controls.find(control => control.placeholder === 'Embedded lesson form');
+      assert(control, 'embedded_control_missing');
+      await runActions(session, { actions: [{ type: 'fill_ref', ref: control.ref, text: 'embedded input works' }, { type: 'press_ref', ref: control.ref, key: 'Enter' }] });
+      assert(await page.frameLocator('iframe').locator('input').inputValue() === 'embedded input works', 'embedded_input_mismatch');
+    });
+    await check('mobile_viewport_and_screenshot', async () => {
+      assert(page.viewportSize().width === 390, 'mobile_viewport_mismatch');
+      assert((await page.screenshot({ type: 'jpeg' })).length > 1000, 'screenshot_empty');
+    });
+    await check('popup_and_tab_switch', async () => {
+      const opener = session.activeTabId;
+      const popupEvent = page.waitForEvent('popup', { timeout: 10000 });
+      await page.locator('#popup').click();
+      const popup = await popupEvent;
+      assert(session.page === popup && session.pages.size === 2, 'popup_not_connected');
+      await runActions(session, { type: 'switch_tab', tabId: opener });
+      assert(session.page === page, 'tab_switch_failed');
+      await popup.close();
+    });
+    await check('file_picker_and_upload', async () => {
+      const chooserEvent = page.waitForEvent('filechooser', { timeout: 10000 });
+      await page.locator('#file').click();
+      await chooserEvent;
+      const content = Buffer.from('browser acceptance');
+      const request = { headers: { 'x-studio-file-name': 'acceptance.txt' }, async *[Symbol.asyncIterator]() { yield content; } };
+      const uploaded = await receiveBrowserUpload(session, request);
+      await runActions(session, { type: 'choose_files', fileIds: [uploaded.id] });
+      assert(await page.locator('#file').evaluate(element => element.files.length) === 1, 'file_not_selected');
+    });
+    await check('browser_dialog_response', async () => {
+      const dialogEvent = page.waitForEvent('dialog', { timeout: 10000 });
+      const clicked = page.locator('#confirm').click();
+      await dialogEvent;
+      await runActions(session, { type: 'dialog', accept: true });
+      await clicked;
+      assert(await page.locator('body').getAttribute('data-confirmed') === 'true', 'dialog_response_missing');
+    });
+    await check('download_bytes', async () => {
+      const downloadEvent = page.waitForEvent('download', { timeout: 10000 });
+      await page.locator('#download').click();
+      await downloadEvent;
+      const deadline = Date.now() + 10000;
+      while (![...session.downloads.values()].some(item => item.status === 'ready') && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 100));
+      const downloaded = [...session.downloads.values()].find(item => item.fileName === 'acceptance.txt' && item.status === 'ready');
+      assert(downloaded && await fs.promises.readFile(downloaded.filePath, 'utf8') === 'browser acceptance', `download_bytes_mismatch:${[...session.downloads.values()].map(item => `${item.status}:${item.error || ''}`).join(',')}`);
+    });
+    await check('blob_download_bytes', async () => {
+      const downloadEvent = page.waitForEvent('download', { timeout: 10000 });
+      await page.locator('#blob-download').click();
+      await downloadEvent;
+      const deadline = Date.now() + 10000;
+      while (![...session.downloads.values()].some(item => item.fileName === 'acceptance-blob.txt' && item.status === 'ready') && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 100));
+      const downloaded = [...session.downloads.values()].find(item => item.fileName === 'acceptance-blob.txt' && item.status === 'ready');
+      assert(downloaded && await fs.promises.readFile(downloaded.filePath, 'utf8') === 'browser acceptance', `blob_download_bytes_mismatch:${[...session.downloads.values()].map(item => `${item.status}:${item.error || ''}`).join(',')}`);
+    });
+    await check('scroll', async () => {
+      await runActions(session, { type: 'scroll', deltaY: 600 });
+      await page.waitForFunction(() => window.scrollY > 0, null, { timeout: 10000 });
+    });
+    await check('navigation_and_history', async () => {
+      // Synthetic local pages exercise real navigation without depending on public DNS.
+      // Public action URL validation remains unchanged and rejects private targets.
+      await page.goto(`http://127.0.0.1:${port}/foundation-fixture/${fixtureNonce}/one`);
+      await page.goto(`http://127.0.0.1:${port}/foundation-fixture/${fixtureNonce}/two`);
+      await runActions(session, { type: 'back' });
+      assert(page.url().endsWith('/one'), 'history_back_failed');
+      await runActions(session, { type: 'forward' });
+      assert(page.url().endsWith('/two'), 'history_forward_failed');
+    });
+    await check('viewport_switch_and_popup_geometry', async () => {
+      await runActions(session, { type: 'viewport', width: 1280, height: 900 });
+      assert(session.page.viewportSize().width === 1280, 'desktop_viewport_mismatch');
+      const popup = await session.context.newPage();
+      assert(popup.viewportSize().width === 1280, 'popup_geometry_mismatch');
+      await popup.close();
+      await runActions(session, { type: 'viewport', width: 390, height: 780 });
+      assert(session.page.viewportSize().width === 390, 'mobile_viewport_restore_failed');
+    });
+  } finally { foundationFixtures.delete(fixtureNonce); await destroySession(session.id); }
+  const evidence = { contract: 'studio-browser-foundation-v1', commit: process.env.GIT_SHA || process.env.COMMIT_SHA || process.env.GIT_COMMIT || '', testedAt: new Date().toISOString(), passed: checks.every(check => check.passed), checks };
+  return { ...evidence, signature: crypto.createHmac('sha256', sharedSecret).update(JSON.stringify(evidence)).digest('hex') };
+}
+
+export function attachBrowserTabs(session, attachPage, saveState = async () => {}) {
+  session.pages = new Map();
+  session.activeTabId = '';
+  let checkpointRequested = false;
+  let checkpoint;
+  const requestCheckpoint = () => {
+    checkpointRequested = true;
+    if (!checkpoint) {
+      checkpoint = (async () => {
+        while (checkpointRequested) {
+          checkpointRequested = false;
+          try { await saveState(); }
+          catch { session.events.push({ type: 'checkpoint_failed', at: new Date().toISOString() }); }
+        }
+      })().finally(() => { checkpoint = undefined; });
+    }
+    return checkpoint;
+  };
+  session.checkpointProviderState = requestCheckpoint;
+  const attach = (page) => {
+    const viewport = session.viewport || session.page?.viewportSize?.();
+    if (viewport) void page.setViewportSize?.(viewport)?.catch(() => undefined);
+    if ([...session.pages.values()].includes(page)) return;
+    const id = crypto.randomUUID();
+    session.pages.set(id, page);
+    session.page = page;
+    session.activeTabId = id;
+    attachPage(page);
+    // OAuth cookies may arrive after the input action has returned. Persist the
+    // completed document state, using the existing encrypted provider store.
+    page.on('domcontentloaded', () => {
+      void requestCheckpoint();
+    });
+    page.on('close', () => {
+      session.pages.delete(id);
+      if (session.activeTabId === id) {
+        const fallback = [...session.pages.entries()].at(-1);
+        session.activeTabId = fallback?.[0] || '';
+        session.page = fallback?.[1];
+      }
+    });
+  };
+  attach(session.page);
+  session.context.on('page', attach);
+}
+
+export function createSessionCapacityGuard(limit, activeCount) {
+  let pending = 0;
+  return async (create) => {
+    if (activeCount() + pending >= limit)
+      throw new BrowserServiceError('session_capacity_reached', 429);
+    pending += 1;
+    try { return await create(); }
+    finally { pending -= 1; }
+  };
+}
+const admitSession = createSessionCapacityGuard(maxSessions, () => sessions.size);
+
 async function createSession(target, viewport, authCookies = [], ownerId) {
   const providerScope = providerSessions.scope(ownerId, target);
   // Reuse the live worker session, including its workspace and downloads.
-  const shared = providerScope && [...sessions.values()].find(s => s.providerScope === providerScope);
+  const shared =
+    providerScope && [...sessions.values()].find((s) => s.providerScope === providerScope);
   if (shared) {
     shared.lastSeen = Date.now();
-    await shared.page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    shared.viewport = viewport;
+    await Promise.all([...(shared.pages?.values() || [shared.page])].map(page => page.setViewportSize(viewport)));
+    // Reattaching a view must preserve an in-progress OAuth flow and workspace.
+    // Deliberate navigation is performed by the existing navigate action.
     return shared;
   }
   if (shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
   const state = browserManager.health().browserState;
   if (state === 'recycling') throw new BrowserServiceError('browser_recycling', 503);
-  if (sessions.size >= maxSessions) throw new BrowserServiceError('session_capacity_reached', 429);
+  return admitSession(async () => {
   const targetUrl = new URL(target);
   const safeAuthCookies = Array.isArray(authCookies)
     ? authCookies
@@ -670,6 +926,8 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
         page,
         target,
         providerScope,
+        ownerId: String(ownerId || ''),
+        viewport,
         createdAt: Date.now(),
         lastSeen: Date.now(),
         streams: new Set(),
@@ -682,55 +940,73 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
         downloadDir,
       };
       const record = (type, data) => {
-        session.events.push({ type, at: new Date().toISOString(), ...data });
+        const evidence = { ...data };
+        for (const key of ['url', 'text', 'error']) {
+          if (typeof evidence[key] === 'string') evidence[key] = redactBrowserEvidence(evidence[key]);
+        }
+        session.events.push({ type, at: new Date().toISOString(), ...evidence });
         if (session.events.length > 500) session.events.shift();
       };
-      page.on('console', (message) =>
-        record('console', { level: message.type(), text: message.text().slice(0, 2000) }),
-      );
-      page.on('pageerror', (error) => record('pageerror', { text: error.message.slice(0, 2000) }));
-      page.on('requestfailed', (request) =>
-        record('requestfailed', {
-          url: request.url(),
-          error: request.failure()?.errorText || 'failed',
-        }),
-      );
-      page.on('response', (response) => {
-        if (response.status() >= 400)
-          record('response', { url: response.url(), status: response.status() });
-      });
-      page.on('download', (download) => {
-        const id = crypto.randomUUID();
-        const fileName = safeFileName(download.suggestedFilename());
-        const filePath = path.join(downloadDir, `${id}-${fileName}`);
-        const item = {
-          id,
-          fileName,
-          filePath,
-          contentType: videoContentType(fileName),
-          size: 0,
-          status: 'downloading',
-          uploadProgress: 0,
-          createdAt: new Date().toISOString(),
-          sourceUrl: page.url(),
-        };
-        session.downloads.set(id, item);
-        record('download', { downloadId: id, fileName, status: 'downloading' });
-        void download
-          .saveAs(filePath)
-          .then(async () => {
-            await normalizeDownloadedVideo(item);
-            const stat = await fs.promises.stat(item.filePath);
-            item.size = stat.size;
-            item.status = 'ready';
-            record('download', { downloadId: id, fileName, size: stat.size, status: 'ready' });
-          })
-          .catch((error) => {
-            item.status = 'failed';
-            item.error = sanitizeReason(error);
-            record('download', { downloadId: id, fileName, status: 'failed', error: item.error });
-          });
-      });
+      const attachPage = (page) => {
+        page.on('filechooser', chooser => { session.fileChooser = chooser; session.fileChooserPage = page; });
+        page.on('dialog', dialog => { session.dialog = dialog; session.dialogPage = page; });
+        page.on('console', (message) =>
+          record('console', { level: message.type(), text: message.text().slice(0, 2000) }),
+        );
+        page.on('pageerror', (error) =>
+          record('pageerror', { text: error.message.slice(0, 2000) }),
+        );
+        page.on('requestfailed', (request) =>
+          record('requestfailed', {
+            url: request.url(),
+            error: request.failure()?.errorText || 'failed',
+          }),
+        );
+        page.on('response', (response) => {
+          if (response.status() >= 400)
+            record('response', { url: response.url(), status: response.status() });
+        });
+        page.on('download', (download) => {
+          const id = crypto.randomUUID();
+          const fileName = safeFileName(download.suggestedFilename());
+          const filePath = path.join(downloadDir, `${id}-${fileName}`);
+          const item = {
+            id,
+            fileName,
+            filePath,
+            contentType: videoContentType(fileName),
+            size: 0,
+            status: 'downloading',
+            uploadProgress: 0,
+            createdAt: new Date().toISOString(),
+            sourceUrl: page.url(),
+          };
+          session.downloads.set(id, item);
+          record('download', { downloadId: id, fileName, status: 'downloading' });
+          void download
+            .saveAs(filePath)
+            .then(async () => {
+              await normalizeDownloadedVideo(item);
+              item.status = 'normalizing';
+              record('download', {
+                downloadId: id,
+                fileName: item.fileName,
+                status: 'normalizing',
+              });
+              await prepareCourseVideoDownload(item);
+              const stat = await fs.promises.stat(item.filePath);
+              item.size = stat.size;
+              item.status = 'ready';
+              record('download', { downloadId: id, fileName, size: stat.size, status: 'ready' });
+            })
+            .catch((error) => {
+              item.status = 'failed';
+              item.error = sanitizeReason(error);
+              record('download', { downloadId: id, fileName, status: 'failed', error: item.error });
+            });
+        });
+      };
+      attachBrowserTabs(session, attachPage, () => providerSessions.save(providerScope, context));
       sessions.set(id, session);
       return session;
     } catch (error) {
@@ -747,26 +1023,73 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
       throw new BrowserServiceError('browser_unavailable', 503, { cause: error });
     }
   }
+  });
 }
 
 async function runAction(session, action) {
   session.lastSeen = Date.now();
   const page = session.page;
-  if (action.type === 'click_ref') {
+  const controlPage = (ref) => {
+    if (session.controlFrames?.has(ref) && session.controlPage !== page) throw new BrowserServiceError('stale_control', 409);
+    return session.controlFrames?.get(ref) || page;
+  };
+  if (action.type === 'viewport') {
+    const width = Number(action.width), height = Number(action.height);
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width < 320 || width > 1920 || height < 480 || height > 1080) throw new BrowserServiceError('invalid_viewport', 400);
+    session.viewport = {width: Math.round(width), height: Math.round(height)};
+    await Promise.all([...(session.pages?.values() || [page])].map(page => page.setViewportSize(session.viewport)));
+  } else if (action.type === 'pointer_click') {
+    const options = {button: ['left', 'right', 'middle'].includes(action.button) ? action.button : 'left', clickCount: Math.min(2, Math.max(1, Number(action.clickCount) || 1))};
+    await page.mouse.move(Number(action.x), Number(action.y));
+    await page.mouse.down(options);
+    await page.mouse.up(options);
+  } else if (action.type === 'switch_tab') {
+    const selected = session.pages?.get(String(action.tabId || ''));
+    if (!selected || selected.isClosed()) throw new BrowserServiceError('tab_not_found', 404);
+    session.page = selected;
+    session.activeTabId = String(action.tabId);
+    await selected.bringToFront();
+  } else if (action.type === 'close_tab') {
+    if (!session.pages || session.pages.size < 2) throw new BrowserServiceError('last_tab', 409);
+    const selected = session.pages.get(String(action.tabId || session.activeTabId));
+    if (!selected) throw new BrowserServiceError('tab_not_found', 404);
+    await selected.close();
+  } else if (action.type === 'new_tab') {
+    const target = await validateTarget(String(action.url || session.target));
+    const opened = await session.context.newPage();
+    await opened.goto(target, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+  } else if (action.type === 'dialog') {
+    if (!session.dialog || (session.dialogPage && session.dialogPage !== session.page)) throw new BrowserServiceError('dialog_not_found', 409);
+    const dialog = session.dialog;
+    if (action.accept === true) await dialog.accept(String(action.text || '').slice(0, 4000));
+    else await dialog.dismiss();
+    session.dialog = undefined;
+  } else if (action.type === 'choose_files') {
+    if (!session.fileChooser || (session.fileChooserPage && session.fileChooserPage !== session.page)) throw new BrowserServiceError('file_picker_not_found', 409);
+    const ids = Array.isArray(action.fileIds) ? action.fileIds : [];
+    if (!ids.length || ids.length > 10 || ids.some(id => !session.uploads?.has(id))) throw new BrowserServiceError('invalid_upload_selection', 400);
+    if (ids.length > 1 && !session.fileChooser.isMultiple()) throw new BrowserServiceError('single_file_required', 400);
+    await session.fileChooser.setFiles(ids.map(id => session.uploads.get(id)));
+    session.fileChooser = undefined;
+  } else if (action.type === 'back') {
+    await page.goBack({ waitUntil: 'domcontentloaded', timeout: 30_000 });
+  } else if (action.type === 'forward') {
+    await page.goForward({ waitUntil: 'domcontentloaded', timeout: 30_000 });
+  } else if (action.type === 'click_ref') {
     const ref = String(action.ref || '').slice(0, 80);
     if (!/^e\d+$/.test(ref)) throw new Error('Invalid browser control reference');
-    await page.locator(`[data-studio-ref="${ref}"]`).first().click({ timeout: 10_000 });
+    await controlPage(ref).locator(`[data-studio-ref="${ref}"]`).first().click({ timeout: 10_000 });
   } else if (action.type === 'fill_ref') {
     const ref = String(action.ref || '').slice(0, 80);
     if (!/^e\d+$/.test(ref)) throw new Error('Invalid browser control reference');
-    await page
+    await controlPage(ref)
       .locator(`[data-studio-ref="${ref}"]`)
       .first()
       .fill(String(action.text || '').slice(0, 4000), { timeout: 10_000 });
   } else if (action.type === 'select_ref') {
     const ref = String(action.ref || '').slice(0, 80);
     if (!/^e\d+$/.test(ref)) throw new Error('Invalid browser control reference');
-    await page
+    await controlPage(ref)
       .locator(`[data-studio-ref="${ref}"]`)
       .first()
       .selectOption(String(action.value || '').slice(0, 1000), { timeout: 10_000 });
@@ -776,7 +1099,7 @@ async function runAction(session, action) {
     if (!key) throw new Error('Browser key is required');
     if (ref) {
       if (!/^e\d+$/.test(ref)) throw new Error('Invalid browser control reference');
-      await page.locator(`[data-studio-ref="${ref}"]`).first().press(key, { timeout: 10_000 });
+      await controlPage(ref).locator(`[data-studio-ref="${ref}"]`).first().press(key, { timeout: 10_000 });
     } else await page.keyboard.press(key);
   } else if (action.type === 'click' || action.type === 'double_click')
     await page.mouse.click(Number(action.x), Number(action.y), {
@@ -819,10 +1142,64 @@ async function runAction(session, action) {
   else throw new Error('Unsupported browser action');
 }
 
-export async function runActions(session, payload) {
+function isEnvatoHost(value) {
+  try {
+    const hostname = new URL(String(value || '')).hostname.toLowerCase();
+    return hostname === 'envato.com' || hostname.endsWith('.envato.com');
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Envato's signed-out application shell can remain mounted while its token
+ * refresh endpoint returns 401. The planner may therefore see ordinary page
+ * controls instead of an explicit sign-in screen. Keep authentication state a
+ * deterministic worker signal rather than requiring the model to infer it.
+ */
+export function sessionRequiresAuthentication(session, now = Date.now()) {
+  const currentUrl = session?.page?.url?.() || '';
+  if (!isEnvatoHost(currentUrl) && !isEnvatoHost(session?.target)) return false;
+  const cutoff = now - 15_000;
+  return (Array.isArray(session?.events) ? session.events : []).some((event) => {
+    if (event?.type !== 'response' || Number(event.status) !== 401) return false;
+    const occurredAt = Date.parse(String(event.at || ''));
+    return Number.isFinite(occurredAt) && occurredAt >= cutoff && isEnvatoHost(event.url);
+  });
+}
+
+export function runActions(session, payload) {
+  if (payload?.actor === 'human') {
+    session.manualControl = true;
+    session.controlRevision = (session.controlRevision || 0) + 1;
+  }
+  // Serialize whole batches across all dashboard/worker HTTP connections.
+  const queued = (session.actionQueue || Promise.resolve()).catch(() => undefined)
+    .then(() => executeActions(session, payload));
+  session.actionQueue = queued;
+  return queued;
+}
+
+async function executeActions(session, payload) {
+  if (payload?.type === 'resume_automation') {
+    session.manualControl = false;
+    return { count: 0, durationMs: 0 };
+  }
+  if (payload?.actor === 'automation' && session.manualControl) throw new BrowserServiceError('manual_control_active', 409);
+  const revision = session.controlRevision || 0;
   const actions = Array.isArray(payload?.actions) ? payload.actions.slice(0, 50) : [payload];
   const startedAt = Date.now();
-  for (const action of actions) await runAction(session, action);
+  try {
+    for (const action of actions) {
+      if (payload?.actor === 'automation' && (session.manualControl || revision !== (session.controlRevision || 0))) throw new BrowserServiceError('manual_control_active', 409);
+      await runAction(session, action);
+    }
+  } catch (error) {
+    if (sessionRequiresAuthentication(session)) {
+      throw new BrowserServiceError('authentication_required', 409, { cause: error });
+    }
+    throw error;
+  }
   return { count: actions.length, durationMs: Date.now() - startedAt };
 }
 
@@ -908,10 +1285,14 @@ export async function auditPage(session) {
 
 export async function snapshotPage(session) {
   session.lastSeen = Date.now();
+  if ((session.dialog && session.dialogPage === session.page) || (session.fileChooser && session.fileChooserPage === session.page)) throw new BrowserServiceError('interaction_required', 409);
+  if (sessionRequiresAuthentication(session)) {
+    throw new BrowserServiceError('authentication_required', 409);
+  }
   await session.page
     .waitForLoadState('domcontentloaded', { timeout: 10_000 })
     .catch(() => undefined);
-  return session.page.evaluate(() => {
+  const readFrame = (frame, offset) => frame.evaluate((offset) => {
     const visible = (element) => {
       const style = window.getComputedStyle(element);
       const rect = element.getBoundingClientRect();
@@ -934,15 +1315,22 @@ export async function snapshotPage(session) {
           element.textContent ||
           element.getAttribute('placeholder'),
       );
+    const queryAll = (selector, root = document) => {
+      const found = [...root.querySelectorAll(selector)];
+      for (const element of root.querySelectorAll('*')) {
+        if (element.shadowRoot) found.push(...queryAll(selector, element.shadowRoot));
+      }
+      return found;
+    };
     const elements = [
-      ...document.querySelectorAll(
+      ...queryAll(
         'button, a[href], input, select, textarea, [role="button"], [contenteditable="true"]',
       ),
     ]
       .filter(visible)
       .slice(0, 80);
     const controls = elements.map((element, index) => {
-      const ref = `e${index + 1}`;
+      const ref = `e${offset + index + 1}`;
       element.setAttribute('data-studio-ref', ref);
       const tag = element.tagName.toLowerCase();
       const explicitRole = element.getAttribute('role');
@@ -958,7 +1346,7 @@ export async function snapshotPage(session) {
         disabled: Boolean(element.disabled || element.getAttribute('aria-disabled') === 'true'),
       };
     });
-    const headings = [...document.querySelectorAll('h1, h2, h3, h4, h5, h6')]
+    const headings = queryAll('h1, h2, h3, h4, h5, h6')
       .filter(visible)
       .slice(0, 40)
       .map((element) => ({
@@ -972,7 +1360,32 @@ export async function snapshotPage(session) {
       headings,
       controls,
     };
-  });
+  }, offset);
+  const frames = session.page.frames?.() || [session.page];
+  session.controlFrames = new Map();
+  session.controlPage = session.page;
+  let result;
+  const frameErrors = [];
+  for (const frame of frames.slice(0, 15)) {
+    let snapshot;
+    try { snapshot = await readFrame(frame, session.controlFrames.size); }
+    catch (error) {
+      if (!result) throw error;
+      frameErrors.push(sanitizeReason(error));
+      continue;
+    }
+    for (const control of snapshot.controls) session.controlFrames.set(control.ref, frame);
+    if (!result) result = snapshot;
+    else {
+      result.controls.push(...snapshot.controls);
+      result.headings.push(...snapshot.headings);
+      result.visibleText = `${result.visibleText}\nFrame: ${snapshot.title}\n${snapshot.visibleText}`.slice(0, 12000);
+    }
+  }
+  if (requiresHumanVerification(result)) {
+    throw new BrowserServiceError('human_verification_required', 409);
+  }
+  return { ...result, ...(frameErrors.length ? { frameErrors } : {}) };
 }
 
 function scheduleFrame(session, delay = frameIntervalMs) {
@@ -984,6 +1397,14 @@ function scheduleFrame(session, delay = frameIntervalMs) {
   session.frameTimer.unref();
 }
 
+export function writeBrowserFrame(stream, image) {
+  // Slow readers receive the newest complete frame after draining, not a backlog.
+  if (stream.destroyed || stream.writableNeedDrain || stream.writableLength > 0) return false;
+  const header = Buffer.from(`--studioframe\r\nContent-Type: image/jpeg\r\nContent-Length: ${image.length}\r\n\r\n`);
+  stream.write(Buffer.concat([header, image, Buffer.from('\r\n')]));
+  return true;
+}
+
 async function broadcastFrame(session) {
   if (session.frameInFlight || !session.streams.size || !sessions.has(session.id)) return;
   session.frameInFlight = true;
@@ -992,18 +1413,11 @@ async function broadcastFrame(session) {
     const image = await session.page.screenshot({
       type: 'jpeg',
       quality: frameQuality,
-      animations: 'disabled',
+      animations: 'allow',
     });
-    const header = `--studioframe\r\nContent-Type: image/jpeg\r\nContent-Length: ${image.length}\r\n\r\n`;
     for (const stream of [...session.streams]) {
-      if (stream.destroyed) {
-        session.streams.delete(stream);
-        continue;
-      }
-      const headerWritable = stream.write(header);
-      const imageWritable = stream.write(image);
-      const boundaryWritable = stream.write('\r\n');
-      if (!(headerWritable && imageWritable && boundaryWritable)) session.framesDropped += 1;
+      if (stream.destroyed) { session.streams.delete(stream); continue; }
+      if (!writeBrowserFrame(stream, image)) session.framesDropped += 1;
     }
     session.framesSent += 1;
   } catch {
@@ -1014,11 +1428,18 @@ async function broadcastFrame(session) {
   }
 }
 
+export function browserReadiness(lifecycle, providerAuthStorage, activeSessions, sessionLimit) {
+  const ready = providerAuthStorage.ready && lifecycle.browserState === 'ready' && lifecycle.browserConnected;
+  return { ready, admissionAvailable: activeSessions < sessionLimit };
+}
+
 function streamFrames(req, res, session) {
   session.lastSeen = Date.now();
   res.writeHead(200, {
     ...corsHeaders(),
     'content-type': 'multipart/x-mixed-replace; boundary=studioframe',
+    'cache-control': 'no-store',
+    'x-accel-buffering': 'no',
     connection: 'keep-alive',
   });
   session.streams.add(res);
@@ -1036,6 +1457,15 @@ const server = http.createServer(async (req, res) => {
   try {
     if (req.method === 'OPTIONS') return json(res, 204, {});
     const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
+    const fixtureMatch = url.pathname.match(/^\/foundation-fixture\/([a-f0-9-]{36})\/(start|download|one|two)$/);
+    if (req.method === 'GET' && fixtureMatch) {
+      const fixture = foundationFixtures.get(fixtureMatch[1]);
+      if (!fixture || fixture.expiresAt < Date.now()) return json(res, 404, {error: 'fixture_expired'});
+      // Ephemeral synthetic bytes only; this path never exposes user files.
+      if (fixtureMatch[2] === 'download') { res.writeHead(200, {'content-type': 'text/plain', 'content-disposition': 'attachment; filename="acceptance.txt"', 'content-length': Buffer.byteLength('browser acceptance'), 'cache-control': 'no-store'}); return res.end('browser acceptance'); }
+      res.writeHead(200, {'content-type': 'text/html', 'cache-control': 'no-store'});
+      return res.end(fixture.html);
+    }
     if (req.method === 'GET' && url.pathname === '/learner/health') {
       const credential = process.env.ULTIMATE_LEARNER_RUNTHROUGH_SECRET;
       if (!credentialMatches(req.headers.authorization?.replace(/^Bearer /, ''), credential)) return json(res, 401, { error: 'unauthorized' });
@@ -1075,18 +1505,20 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'GET' && url.pathname === '/health') {
       const lifecycle = browserManager.health();
-      const ready =
-        lifecycle.browserState === 'ready' &&
-        lifecycle.browserConnected &&
-        sessions.size < maxSessions;
+      const providerAuthStorage = await providerSessions.checkReadiness();
+      // Capacity is enforced by session admission, not browser liveness.
+      // A full service must still let an owner reattach their existing session.
+      const { ready, admissionAvailable } = browserReadiness(lifecycle, providerAuthStorage, sessions.size, maxSessions);
       return json(res, ready ? 200 : 503, {
         ok: ready,
         service: 'studio-browser',
-        engine: 'playwright-chromium',
+        engine: 'direct-cdp-chromium',
+        providerAuthStorage,
         commit: process.env.GIT_SHA || 'MISSING',
         ...lifecycle,
         activeSessions: sessions.size,
         maxSessions,
+        admissionAvailable,
         ready,
       });
     }
@@ -1159,12 +1591,17 @@ const server = http.createServer(async (req, res) => {
       const correlationId = String(body.correlationId || crypto.randomUUID()).slice(0, 100);
       void browserManager.recycleBrowser(
         String(body.reason || 'administrative_recycle').slice(0, 120),
-      );
+      ).catch(() => { /* Lifecycle health records failure; heartbeat retries startup. */ });
       return json(res, 202, {
         status: 'queued',
         correlationId,
         browserGeneration: before.browserGeneration,
       });
+    }
+    if (req.method === 'POST' && url.pathname === '/foundation-test') {
+      if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
+      const evidence = await runBrowserFoundationTest();
+      return json(res, evidence.passed ? 200 : 422, evidence);
     }
     if (req.method === 'POST' && url.pathname === '/sessions') {
       if (!sharedSecret || req.headers['x-studio-browser-secret'] !== sharedSecret)
@@ -1183,6 +1620,7 @@ const server = http.createServer(async (req, res) => {
       try { session = await creation; }
       finally { if (scope && providerSessionCreations.get(scope) === creation) providerSessionCreations.delete(scope); }
       return json(res, 201, {
+        engine: 'direct-cdp-chromium',
         id: session.id,
         token: session.token,
         url: session.page.url(),
@@ -1191,12 +1629,24 @@ const server = http.createServer(async (req, res) => {
       });
     }
     const match = url.pathname.match(
-      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit|downloads|imports|batch-imports))?$/,
+      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit|downloads|imports|batch-imports|uploads|file|identity|cdp))?$/,
     );
     if (!match) return json(res, 404, { error: 'Not found' });
     const session = sessions.get(match[1]);
     if (!session) return json(res, 410, { error: 'session_expired' });
     if (!authorized(req, session, url)) return json(res, 401, { error: 'unauthorized' });
+    if (req.method === 'GET' && match[2] === 'cdp') {
+      await session.page.send('Page.getFrameTree');
+      return json(res, 200, { connected: true, engine: 'direct-cdp-chromium', transport: 'private-pipe', tabId: session.activeTabId });
+    }
+    if (req.method === 'GET' && match[2] === 'identity') return json(res, 200, { ownerId: session.ownerId });
+    if (req.method === 'GET' && match[2] === 'file') {
+      const download = session.downloads.get(url.searchParams.get('id'));
+      if (!download || download.status !== 'ready') throw new BrowserServiceError('download_not_ready', 409);
+      res.writeHead(200, { ...corsHeaders(), 'content-type': 'application/octet-stream', 'content-disposition': `attachment; filename="${safeFileName(download.fileName)}"`, 'content-length': download.size });
+      await pipeline(fs.createReadStream(download.filePath), res);
+      return;
+    }
     if (req.method === 'GET' && match[2] === 'stream') return streamFrames(req, res, session);
     if (req.method === 'GET' && match[2] === 'screenshot') {
       const quality = Math.min(80, Math.max(35, Number(url.searchParams.get('quality') || 65)));
@@ -1213,7 +1663,7 @@ const server = http.createServer(async (req, res) => {
       return res.end(image);
     }
     if (req.method === 'GET' && match[2] === 'events')
-      return json(res, 200, { events: session.events, url: session.page.url() });
+      return json(res, 200, { events: session.events, url: session.page?.url() || '', viewport: session.page?.viewportSize(), filePicker: Boolean(session.fileChooser && session.fileChooserPage === session.page), dialog: session.dialog && session.dialogPage === session.page ? { type: session.dialog.type(), message: session.dialog.message().slice(0, 2000) } : null, activeTabId: session.activeTabId, tabs: [...(session.pages || new Map()).entries()].map(([id, page]) => ({ id, url: page.url() })) });
     if (req.method === 'GET' && match[2] === 'downloads')
       return json(res, 200, {
         downloads: [...session.downloads.values()].map(({ filePath, ...download }) => download),
@@ -1222,10 +1672,13 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, await snapshotPage(session));
     if (req.method === 'GET' && match[2] === 'audit')
       return json(res, 200, await auditPage(session));
+    if (req.method === 'POST' && match[2] === 'uploads')
+      return json(res, 200, await receiveBrowserUpload(session, req));
     if (req.method === 'POST' && match[2] === 'actions') {
       const metrics = await runActions(session, await readBody(req));
-      await providerSessions.save(session.providerScope, session.context);
-      return json(res, 200, { ok: true, url: session.page.url(), ...metrics });
+      // Persist through the same coalesced OAuth checkpoint queue without blocking input.
+      void session.checkpointProviderState?.();
+      return json(res, 200, { ok: true, url: session.page.url(), viewport: session.page.viewportSize(), ...metrics });
     }
     if (req.method === 'POST' && match[2] === 'imports')
       return json(res, 200, await uploadDownloadToSignedStorage(session, await readBody(req)));
@@ -1245,7 +1698,8 @@ const server = http.createServer(async (req, res) => {
 
 const cleanupTimer = setInterval(() => {
   const cutoff = Date.now() - sessionTtlMs;
-  for (const [id, session] of sessions) if (session.lastSeen < cutoff) void destroySession(id);
+  for (const [id, session] of sessions)
+    if (session.lastSeen < cutoff && !hasActiveMediaTransfer(session.downloads)) void destroySession(id);
   for (const [id, test] of learnerTests) if (test.state !== 'running' && test.createdAt < Date.now() - 2 * 60 * 60_000) learnerTests.delete(id);
 }, 30_000).unref();
 
@@ -1273,6 +1727,9 @@ process.on('SIGINT', shutdown);
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   server.listen(port, '0.0.0.0', () => {
     console.info(`Studio browser listening on ${port}`);
+    void providerSessions.checkReadiness().then(status => {
+      if (!status.ready) console.error('Studio provider persistence not ready', status.error);
+    });
     void browserManager
       .getBrowser()
       .catch((error) =>

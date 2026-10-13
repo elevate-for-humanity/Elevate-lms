@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, CalendarPlus, MonitorUp, ShieldCheck, Users, Video } from 'lucide-react';
+import { ArrowLeft, MonitorUp, ShieldCheck, Users, Video } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { createMeeting } from '../actions';
+import {NewMeetingForm} from './NewMeetingForm';
+import {MeetingLinks} from './MeetingLinks';
+import {hydrateProcessEnv} from '@/lib/secrets';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { liveKitReadiness } from '@/lib/communications/livekit';
 
@@ -43,6 +45,7 @@ export default async function MeetingsPage() {
         .order('scheduled_at', { ascending: false })
         .limit(20)
     : { data: [] };
+  await hydrateProcessEnv();
   const readiness = liveKitReadiness();
   const serviceReady = readiness.ready;
 
@@ -63,35 +66,12 @@ export default async function MeetingsPage() {
             </p>
             <h1 className="mt-1 text-3xl font-black">Team Meetings</h1>
             <p className="mt-1 text-sm text-slate-600">
-              Video meetings, team huddles, guest invitations, screen sharing, chat, and attendance
+              Video meetings, team huddles, meeting invitations, screen sharing, chat, and attendance
               inside the dashboard.
             </p>
           </div>
           {serviceReady ? (
-            <form action={createMeeting} className="flex flex-wrap items-center gap-2">
-              <input
-                name="title"
-                required
-                minLength={3}
-                maxLength={120}
-                placeholder="Meeting title"
-                className="rounded-xl border border-slate-300 px-3 py-2.5 text-sm"
-              />
-              <select
-                name="roomType"
-                className="rounded-xl border border-slate-300 px-3 py-2.5 text-sm"
-              >
-                <option value="meeting">Meeting</option>
-                <option value="team_huddle">Team huddle</option>
-                <option value="classroom">Classroom</option>
-                <option value="webinar">Webinar</option>
-                <option value="support">Support</option>
-              </select>
-              <button className="inline-flex items-center gap-2 rounded-xl bg-indigo-700 px-4 py-2.5 text-sm font-black text-white">
-                <CalendarPlus className="h-4 w-4" />
-                New meeting
-              </button>
-            </form>
+            <NewMeetingForm />
           ) : null}
         </div>
       </div>
@@ -111,7 +91,7 @@ export default async function MeetingsPage() {
         {[
           [Video, 'Browser video', 'Join without leaving the Elevate dashboard.'],
           [MonitorUp, 'Screen sharing', 'Present a browser tab, application, or screen.'],
-          [Users, 'Team and guests', 'Invite employees, learners, partners, or outside guests.'],
+          [Users, 'Meeting invitations', 'Share links with employees, learners, and partners who have an Elevate account.'],
           [
             ShieldCheck,
             'Tenant isolation',
@@ -153,6 +133,7 @@ export default async function MeetingsPage() {
                     Join
                   </Link>
                 ) : null}
+                {room.status !== 'cancelled' && <MeetingLinks roomId={room.id} title={room.title} scheduledAt={room.scheduled_at} />}
               </div>
             ))}
           </div>

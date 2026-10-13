@@ -98,8 +98,8 @@
   },
   "healthcare": {
     "pageKey": "healthcare",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "posterImage": "/images/pages/healthcare-hero.webp",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "Healthcare Programs",
@@ -301,7 +301,7 @@
   },
   "hvac-technician": {
     "pageKey": "hvac-technician",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hvac-hero-final.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-hvac-technician.mp4",
     "voiceoverSrc": "/audio/heroes/skilled-trades.mp3",
     "microLabel": "EPA 608 Universal",
     "credentialLabel": "EPA 608 Universal",
@@ -327,7 +327,7 @@
     ],
     "transcript": "Train for EPA 608 Universal certification in 6 weeks at Elevate for Humanity, working on real HVAC systems with hands-on instruction. Graduates also earn OSHA 10, CPR, and Rise Up credentials. HVAC technicians in Indiana commonly earn $38,000 to $55,000. Total program cost is $5,000 — most students pay $0 through the Workforce Ready Grant.",
     "analyticsName": "hvac-technician",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-hvac-technician.mp4"
   },
   "cdl-training": {
     "pageKey": "cdl-training",
@@ -356,7 +356,7 @@
     ],
     "transcript": "Train for CDL Class A licensure in 3 to 6 weeks at Elevate for Humanity in Indianapolis, with behind-the-wheel instruction, pre-trip inspection, and on-site skills testing. CDL drivers commonly earn $50,000 to $65,000. WIOA covers tuition, DOT physical, drug screen, and exam fees for eligible Indiana residents.",
     "analyticsName": "cdl-training",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cdl-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cdl.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
   },
   "electrical": {
@@ -539,8 +539,8 @@
   },
   "cna": {
     "pageKey": "cna",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "posterImage": "/images/pages/cna-hero.jpg",
     "microLabel": "Indiana CNA Certification",
     "credentialLabel": "Indiana CNA certification",
@@ -568,7 +568,7 @@
   },
   "medical-assistant": {
     "pageKey": "medical-assistant",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-medical-assistant.mp4",
     "voiceoverSrc": "/audio/heroes/medical-assistant.mp3",
     "microLabel": "NHA CCMA Certification",
     "credentialLabel": "NHA CCMA",
@@ -593,12 +593,12 @@
     ],
     "transcript": "Train for NHA CCMA and CPT certification in 20 weeks, building skills in clinical procedures, patient intake, EHR documentation, and phlebotomy. Medical assistants commonly earn $35,000 to $45,000. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "medical-assistant",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-medical-assistant.mp4",
     "_pexelsVideoId": 6130025
   },
   "pharmacy-technician": {
     "pageKey": "pharmacy-technician",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "PTCB CPhT Prep",
     "credentialLabel": "PTCB CPhT",
@@ -624,12 +624,12 @@
     ],
     "transcript": "Train for PTCB CPhT certification in 10 weeks, building skills in medication dispensing, pharmacy law, sterile compounding, and inventory management. Pharmacy technicians commonly earn $34,000 to $46,000. Free with WIOA funding for eligible Indiana residents. Self-pay is $4,200 with payment plans available.",
     "analyticsName": "pharmacy-technician",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 8657331
   },
   "phlebotomy": {
     "pageKey": "phlebotomy",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-phlebotomy.mp4",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "NHA CPT Certification",
     "credentialLabel": "NHA CPT",
@@ -654,12 +654,12 @@
     ],
     "transcript": "Train for NHA CPT certification in 4 weeks, completing 120 hours of classroom and clinical training in venipuncture, specimen processing, and patient interaction. Phlebotomy technicians commonly earn $30,000 to $40,000. The NHA CPT is the employer-accepted standard in Indiana. Self-pay is $1,500 with payment plans available.",
     "analyticsName": "phlebotomy",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-phlebotomy.mp4",
     "_pexelsVideoId": 6290542
   },
   "home-health-aide": {
     "pageKey": "home-health-aide",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "Indiana HHA Certification",
     "credentialLabel": "Indiana HHA certification",
@@ -684,7 +684,7 @@
     ],
     "transcript": "Earn Indiana HHA certification and the CCHW credential in 4 weeks, preparing for in-home and community care work with licensed agencies. Home health aides commonly earn $26,000 to $36,000. Free with WIOA or Workforce Ready Grant for eligible Indiana residents.",
     "analyticsName": "home-health-aide",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 7517699
   },
   "emergency-health-safety": {
@@ -712,13 +712,13 @@
     ],
     "transcript": "Earn NREMT Emergency Medical Responder, CPR/AED, First Aid, and OSHA 10 credentials in 4 weeks. Training covers scene safety, patient assessment, emergency communication, and response documentation. Emergency health and safety roles commonly earn $32,000 to $45,000. Free with WIOA or Workforce Ready Grant for eligible Indiana residents. Self-pay is $4,950.",
     "analyticsName": "emergency-health-safety",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 3981771
   },
   "cpr-first-aid": {
     "pageKey": "cpr-first-aid",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "voiceoverSrc": "/audio/heroes/cpr.mp3",
     "microLabel": "HSI Certified",
     "credentialLabel": "HSI-certified CPR, AED, and First Aid",
@@ -744,12 +744,12 @@
     ],
     "transcript": "Earn HSI-certified CPR, AED, and First Aid certification in 1 day from home — a mannequin ships to your door and a live instructor guides the skills session. Accepted for healthcare, education, childcare, and licensed professions. $130 self-pay. Included free with any Elevate training program.",
     "analyticsName": "cpr-first-aid",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 3981738
   },
   "sanitation-infection-control": {
     "pageKey": "sanitation-infection-control",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "ServSafe + Bloodborne",
     "credentialLabel": "ServSafe Food Handler",
@@ -775,7 +775,7 @@
     ],
     "transcript": "Earn ServSafe Food Handler and OSHA-compliant Bloodborne Pathogens certifications in 2 weeks. Both credentials are required for healthcare, food service, and personal services work. Included free with any Elevate training program. Self-pay is $400.",
     "analyticsName": "sanitation-infection-control",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 6151285
   },
   "barber-apprenticeship": {
@@ -786,25 +786,25 @@
     "credentialLabel": "Indiana Barber License",
     "durationLabel": "260 RTI hours + 14 competencies",
     "salaryRangeLabel": "$28,000 to $52,000",
-    "belowHeroHeadline": "Earn your Indiana Barber License while getting paid.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. Complete 14 verified occupational competencies and 260 hours of related instruction, plus supervised host-shop practice toward the Indiana Barber License.",
+    "belowHeroHeadline": "Build your future in barbering.",
+    "belowHeroSubheadline": "Complete 14 verified occupational competencies and 260 hours of related instruction, plus supervised Host Shop practice. Apprenticeship tuition is self-pay only.",
     "primaryCta": {
       "label": "Enroll Now",
       "href": "/programs/barber-apprenticeship/apply",
       "variant": "primary"
     },
     "secondaryCta": {
-      "label": "Request Information",
-      "href": "/programs/barber-apprenticeship/request-info",
+      "label": "Explore Host Shops",
+      "href": "/partners/host-shops",
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered Apprenticeship",
-      "Earn wages from day one",
-      "Indiana Barber License",
-      "Barbershop Business Certificate"
+      "Registered Apprenticeship",
+      "Self-pay only",
+      "14 competencies · 260 RTI hours",
+      "Placement confirmed before training"
     ],
-    "transcript": "Elevate's registered, competency-based Barber Apprenticeship leads toward the Indiana Barber License through 260 RTI hours + 14 competencies, plus supervised host-shop practice. Kountry Kutz in New Palestine is a participating host shop. Eligible funding may help after written approval; payment-plan options are subject to provider terms.",
+    "transcript": "Prepare for the Indiana Barber License through 260 RTI hours + 14 competencies and supervised Host Shop practice. Kountry Kutz is a participating Host Shop. Tuition is self-pay only. Employment and placement are confirmed individually; Indiana licensing approval is a separate step.",
     "analyticsName": "barber-apprenticeship",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4"
   },
@@ -813,27 +813,27 @@
     "voiceoverSrc": "/audio/heroes/cosmetology.mp3",
     "microLabel": "DOL Registered Apprenticeship",
     "credentialLabel": "Indiana Cosmetology License",
-    "durationLabel": "2,000 hours",
+    "durationLabel": "2,000–2,500-hour term + 154 RTI hours",
     "salaryRangeLabel": "$26,000 to $48,000",
-    "belowHeroHeadline": "Earn your Indiana Cosmetology License while getting paid.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. 2,000 hours of supervised salon training under a licensed cosmetologist. Earn wages from day one.",
+    "belowHeroHeadline": "Build your future in cosmetology.",
+    "belowHeroSubheadline": "Follow the registered hybrid 2,000–2,500-hour term with 154 hours of related instruction and supervised salon practice. Apprenticeship tuition is self-pay only.",
     "primaryCta": {
       "label": "Enroll Now",
       "href": "/apply?program=cosmetology-apprenticeship",
       "variant": "primary"
     },
     "secondaryCta": {
-      "label": "Request Information",
-      "href": "/programs/cosmetology-apprenticeship/request-info",
+      "label": "Explore Host Shops",
+      "href": "/partners/host-shops",
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered Apprenticeship",
-      "Earn wages from day one",
-      "Indiana Cosmetology License",
-      "Salon-based training"
+      "Registered Apprenticeship",
+      "Self-pay only",
+      "Hybrid term · 154 RTI hours",
+      "Placement confirmed before training"
     ],
-    "transcript": "Earn Indiana Cosmetology License through a DOL Registered Apprenticeship of 2,000 hours of supervised training in a licensed salon. Cosmetologists commonly earn $26,000 to $48,000 depending on clientele and setting. Wages begin on day one. The Indiana Cosmetology License is required to work in any Indiana salon.",
+    "transcript": "Prepare for the Indiana Cosmetology License through a hybrid 2,000–2,500-hour term + 154 RTI hours and supervised hair care, cutting, coloring and styling practice. Tuition is self-pay only. Placement and wages are confirmed individually; Indiana licensing approval is a separate step.",
     "analyticsName": "cosmetology-apprenticeship",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cosmetology-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cosmetology-hero.mp4",
@@ -844,26 +844,26 @@
     "voiceoverSrc": "/audio/heroes/nail-tech.mp3",
     "microLabel": "DOL Registered Apprenticeship",
     "credentialLabel": "Indiana Nail Technician License",
-    "durationLabel": "2,000 hours",
+    "durationLabel": "210 RTI hours + 19 competencies",
     "salaryRangeLabel": "$24,000 to $42,000",
-    "belowHeroHeadline": "Earn your Indiana Nail Technician License while getting paid.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. 2,000 OJL hours of supervised training in a licensed salon. Manicure, pedicure, acrylics, and gel nails. Earn wages from day one.",
+    "belowHeroHeadline": "Build your future in nail technology.",
+    "belowHeroSubheadline": "Complete 19 verified Manicurist competencies and 210 hours of related instruction, with supervised salon practice. Apprenticeship tuition is self-pay only.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/programs/nail-technician-apprenticeship/apply"
     },
     "secondaryCta": {
-      "label": "Find a Host Salon",
-      "href": "/partners/nail-technician-apprenticeship/apply",
+      "label": "Explore Host Shops",
+      "href": "/partners/host-shops",
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered Apprenticeship",
-      "Earn wages from day one",
-      "Indiana Nail Technician License",
-      "2,000 OJL hours — registered apprenticeship pathway"
+      "Registered Apprenticeship",
+      "Self-pay only",
+      "19 competencies · 210 RTI hours",
+      "Placement confirmed before training"
     ],
-    "transcript": "Earn an Indiana Nail Technician License through a DOL Registered Apprenticeship requiring 2,000 hours of on-the-job learning. Training covers manicures, pedicures, acrylics, gel nails, sanitation, client service, and professional salon practice at an approved licensed salon.",
+    "transcript": "Prepare for the Indiana Nail Technician License through 210 RTI hours + 19 competencies and supervised nail services, sanitation and client care. Tuition is self-pay only. Placement and employment are confirmed individually; Indiana licensing approval is a separate step.",
     "analyticsName": "nail-technician-apprenticeship",
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/nail-tech-hero.mp4",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/nail-tech-hero.mp4",
@@ -1217,8 +1217,8 @@
     ],
     "transcript": "Train for IRS PTIN and AFSP credentials in 8 weeks, building skills in individual and small business tax preparation using real tax software. Tax preparers commonly earn $35,000 to $55,000. Enrolled Agent exam preparation included. Free with WIOA or Next Level Jobs funding for eligible Indiana residents.",
     "analyticsName": "tax-preparation",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-tax-preparation.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-tax-preparation.mp4"
   },
   "bookkeeping": {
     "pageKey": "bookkeeping",
@@ -1395,7 +1395,7 @@
   },
   "peer-recovery-specialist": {
     "pageKey": "peer-recovery-specialist",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "microLabel": "Indiana CPRS Credential",
     "credentialLabel": "Indiana CPRS",
     "durationLabel": "8 weeks",
@@ -1419,7 +1419,7 @@
     ],
     "transcript": "Train for Indiana CPRS certification in 8 weeks, building skills in substance use recovery support, motivational interviewing, and crisis response. Peer recovery specialists commonly earn $32,000 to $45,000. WIOA, FSSA IMPACT, and JRI funding available for eligible Indiana residents.",
     "analyticsName": "peer-recovery-specialist",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 5713016
   },
   "technology": {
@@ -1728,8 +1728,8 @@
     ],
     "transcript": "Indiana CNA certification training is opening soon at Elevate for Humanity. Join the waitlist to be notified when enrollment opens.",
     "analyticsName": "cna-waitlist",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4"
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4"
   },
   "contact": {
     "pageKey": "contact",
@@ -2487,26 +2487,26 @@
     "pageKey": "esthetician-apprenticeship",
     "microLabel": "DOL Registered Apprenticeship",
     "credentialLabel": "Indiana Esthetician License",
-    "durationLabel": "1,500 hours",
+    "durationLabel": "300 RTI hours + 20 competencies",
     "salaryRangeLabel": "$32,000 to $52,000",
-    "belowHeroHeadline": "Esthetician Apprenticeship — earn while you train.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. Hands-on training at a licensed salon. Graduate with your Indiana Esthetician License and a paying clientele.",
+    "belowHeroHeadline": "Start your future in esthetics.",
+    "belowHeroSubheadline": "Complete 20 verified occupational competencies and 300 hours of related instruction, with supervised skincare practice. Apprenticeship tuition is self-pay only.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/apply?program=esthetician-apprenticeship"
     },
     "secondaryCta": {
-      "label": "Check Eligibility",
-      "href": "/check-eligibility",
+      "label": "Explore Host Shops",
+      "href": "/partners/host-shops",
       "variant": "secondary"
     },
     "trustIndicators": [
-      "DOL Registered Apprenticeship",
-      "Earn wages from day one",
-      "Indiana Esthetician License",
-      "Licensed salon training"
+      "Registered Apprenticeship",
+      "Self-pay only",
+      "20 competencies · 300 RTI hours",
+      "Placement confirmed before training"
     ],
-    "transcript": "Train for the Indiana Esthetician License through a DOL Registered Apprenticeship of 1,500 hours at a licensed salon. Apprentices earn wages while completing supervised skin care, sanitation, client service, and exam preparation. Licensed estheticians commonly earn $32,000 to $52,000.",
+    "transcript": "Prepare for the Indiana Esthetician License through 300 RTI hours + 20 competencies and supervised skincare, sanitation and client care. Tuition is self-pay only. We are recruiting new esthetics Host Shops; placement and Indiana licensing approval are confirmed separately.",
     "analyticsName": "esthetician-apprenticeship",
     "_pexelsVideoId": 7423537,
     "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/esthetician-hero.mp4",
@@ -2538,8 +2538,8 @@
     ],
     "transcript": "Prepare for CompTIA Security+ and CySA+ in 12 weeks through hands-on security labs, threat analysis practice, and career coaching. Eligible Indiana residents may use WIOA or Workforce Ready Grant funding. Cybersecurity analyst roles commonly pay $55,000 to $85,000.",
     "analyticsName": "cybersecurity",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cybersecurity.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cybersecurity.mp4"
   },
   "hospitality": {
     "pageKey": "hospitality",
@@ -2570,9 +2570,9 @@
     "microLabel": "Elevate for Humanity",
     "analyticsName": "direct-support-professional",
     "trustIndicators": [],
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "belowHeroHeadline": "Direct Support Professional — Indiana DSP credential in 6 weeks.",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 8400789
   },
   "career-training-indiana": {
@@ -2602,7 +2602,7 @@
   },
   "qma": {
     "pageKey": "qma",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "voiceoverSrc": "/audio/heroes/healthcare.mp3",
     "microLabel": "Indiana QMA Certification",
     "credentialLabel": "Indiana QMA Certificate",
@@ -2627,7 +2627,7 @@
     ],
     "transcript": "Train for the Indiana QMA Certificate in 4 weeks, learning medication administration, documentation, and resident safety under nurse supervision. QMAs in Indiana commonly earn $30,000 to $42,000. WIOA and Workforce Ready Grant funding available for eligible Indiana residents. Self-pay is $1,200.",
     "analyticsName": "qma",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 6130024
   },
   "drug-collector": {
@@ -2635,9 +2635,9 @@
     "microLabel": "Elevate for Humanity",
     "analyticsName": "drug-collector",
     "trustIndicators": [],
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "belowHeroHeadline": "Drug & Alcohol Collector — DOT-compliant certification in 2 weeks.",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "_pexelsVideoId": 7230300
   },
   "beauty": {
@@ -2861,8 +2861,8 @@
   },
   "cna-cert": {
     "pageKey": "cna-cert",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "CNA Certification",
     "subheadline": "Earn your Certified Nursing Assistant credential.",
     "microLabel": "CNA Certification",
@@ -2877,8 +2877,8 @@
   },
   "cna-training": {
     "pageKey": "cna-training",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "CNA Training",
     "subheadline": "Hands-on clinical training for aspiring CNAs.",
     "microLabel": "CNA Training",
@@ -2974,8 +2974,8 @@
   },
   "dental-assistant": {
     "pageKey": "dental-assistant",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "Dental Assistant",
     "subheadline": "Launch your dental career with clinical training.",
     "microLabel": "Dental Assistant",
@@ -3070,8 +3070,8 @@
   },
   "insurance-billing-coding": {
     "pageKey": "insurance-billing-coding",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "Insurance Billing & Coding",
     "subheadline": "Master medical billing and coding for healthcare careers.",
     "microLabel": "Insurance Billing & Coding",
@@ -3231,8 +3231,8 @@
   },
   "nha-medical-assistant": {
     "pageKey": "nha-medical-assistant",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "NHA Medical Assistant",
     "subheadline": "Earn your NHA-certified Medical Assistant credential.",
     "microLabel": "NHA Medical Assistant",
@@ -3247,8 +3247,8 @@
   },
   "nha-phlebotomy": {
     "pageKey": "nha-phlebotomy",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "NHA Phlebotomy",
     "subheadline": "Earn your NHA phlebotomy certification.",
     "microLabel": "NHA Phlebotomy",
@@ -3743,8 +3743,8 @@
   },
   "nha-billing-coding": {
     "pageKey": "nha-billing-coding",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "NHA Billing & Coding",
     "subheadline": "Earn your NHA medical billing and coding credential.",
     "microLabel": "NHA Billing & Coding",
@@ -3775,8 +3775,8 @@
   },
   "nha-ekg-technician": {
     "pageKey": "nha-ekg-technician",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "NHA EKG Technician",
     "subheadline": "Earn your NHA EKG technician certification.",
     "microLabel": "NHA EKG Technician",
@@ -3791,8 +3791,8 @@
   },
   "nha-medical-admin-assistant": {
     "pageKey": "nha-medical-admin-assistant",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "NHA Medical Admin Assistant",
     "subheadline": "Earn your NHA medical administrative assistant credential.",
     "microLabel": "NHA Medical Admin Assistant",
@@ -3803,12 +3803,13 @@
     "ctaSecondary": {
       "label": "Learn More",
       "href": "/programs/nha-medical-admin-assistant"
-    }
+    },
+    "posterImage": "/images/pages/medical-assistant-desk.webp"
   },
   "nha-patient-care-technician": {
     "pageKey": "nha-patient-care-technician",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "NHA Patient Care Technician",
     "subheadline": "Earn your NHA patient care technician certification.",
     "microLabel": "NHA Patient Care Technician",
@@ -3887,8 +3888,8 @@
   },
   "phlebotomy-technician": {
     "pageKey": "phlebotomy-technician",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4",
+    "videoSrcDesktop": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
+    "videoSrcMobile": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/course-previews/course-cna.mp4",
     "headline": "Phlebotomy Technician",
     "subheadline": "Earn your phlebotomy technician certification.",
     "microLabel": "Phlebotomy Technician",

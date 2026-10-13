@@ -41,7 +41,7 @@ export default function SupportChatPage() {
             <div className="flex flex-col gap-2">
               <a href="tel:3173143757" className="inline-flex items-center justify-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 font-medium">
                 <Phone className="w-4 h-4" />
-                Call (317) 314-3757
+                Technical Support: (317) 314-3757
               </a>
               <a href="mailto:support@elevateforhumanity.org" className="inline-flex items-center justify-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 font-medium">
                 <Mail className="w-4 h-4" />

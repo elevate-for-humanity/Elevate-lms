@@ -85,7 +85,7 @@ export default function HeroVideo({
   children,
   mediaFit = 'cover',
   mediaClassName = '',
-  heightClassName = 'h-[clamp(500px,72svh,820px)]',
+  heightClassName = 'h-[clamp(260px,42svh,480px)]',
   overlayMode = 'default',
   soundButtonVariant = 'pill',
   showSoundControl = true,
@@ -281,7 +281,6 @@ export default function HeroVideo({
               alt={slide.alt}
               fill
               priority={index < 2}
-              unoptimized
               sizes="100vw"
               aria-hidden={index !== demoActiveSlideIndex}
               className={`absolute inset-0 z-0 h-full w-full ${mediaClass} transform-gpu object-center transition-[opacity,transform] duration-1000 ease-in-out motion-reduce:transition-none ${mediaClassName} ${slide.className || ''} ${
@@ -295,7 +294,6 @@ export default function HeroVideo({
             alt=""
             fill
             priority
-            unoptimized
             sizes="100vw"
             className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center ${mediaClassName}`}
             aria-hidden="true"

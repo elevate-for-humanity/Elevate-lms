@@ -81,7 +81,7 @@ export function HomeMobileActions() {
           {shared ? 'Shared' : 'Share'}
         </button>
         <a
-          href="tel:+13173143757"
+          href="tel:+13179999620"
           className="inline-flex min-h-14 touch-manipulation flex-col items-center justify-center gap-1 rounded-xl border-2 border-slate-300 bg-white px-2 py-2 text-center text-xs font-black text-slate-900"
         >
           <Phone className="h-5 w-5" aria-hidden="true" />

@@ -348,7 +348,7 @@ export default function AcademicIntegrityPage() {
               <li>• Contact the Dean of Students</li>
               <li>• Submit an anonymous report through the student portal</li>
               <li>• Email: our contact form</li>
-              <li>• Phone: 317-314-3757</li>
+              <li>• Phone: 317-999-9620</li>
             </ul>
             <p className="text-brand-blue-900 text-sm mt-4">
               <strong>Protection:</strong> Students who report violations in good faith will not

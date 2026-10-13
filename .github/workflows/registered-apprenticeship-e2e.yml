@@ -16,8 +16,9 @@ on:
       - 'scripts/qa/provision-remaining-portal-e2e.mjs'
   workflow_run:
     workflows:
-      - Deploy LMS
+      - Deploy repaired Google services
       - Deploy Admin
+      - Repair Google Studio browser runtime
     types:
       - completed
 
@@ -34,7 +35,8 @@ concurrency:
 
 jobs:
   production-authenticated-e2e:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    # Dispatch-only success proves the deployment ran, not just that it was queued.
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch')
     name: Full portal authenticated persistence and responsive design
     runs-on: ubuntu-latest
     environment: production
@@ -55,6 +57,8 @@ jobs:
           node-version: '22'
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+      - name: Verify runtime Studio browser URL precedence
+        run: node --test scripts/test-studio-browser-configuration.mjs
       - name: Verify production LMS is ready
         shell: bash
         run: |
@@ -86,9 +90,13 @@ jobs:
         run: pnpm exec playwright install chromium webkit --with-deps
       - name: Run registered-apprenticeship architecture gate
         run: node scripts/check-registered-apprenticeship-architecture.mjs
+      - name: Certify Studio sign-in and fonts on all devices
+        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --grep "Admin session opens Studio and optional external browser tools remain usable on the active device" --config playwright.config.ts --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Run authenticated production functional E2E
+        if: ${{ !cancelled() }}
         run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --project=desktop-chrome
       - name: Run authenticated cross-device responsive design certification
+        if: ${{ !cancelled() }}
         run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Clean Employer + Instructor + Staff + Case Manager + Admin identities
         if: always()

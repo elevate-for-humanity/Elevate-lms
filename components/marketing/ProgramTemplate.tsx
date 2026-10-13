@@ -72,7 +72,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
       </section>
 
       {/* Hero Section */}
-      <section className="relative h-[clamp(520px,72svh,860px)] overflow-hidden">
+      <section className="relative h-[clamp(260px,42svh,480px)] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
           src={program.heroImage}

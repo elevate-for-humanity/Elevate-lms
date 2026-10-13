@@ -13,7 +13,7 @@ import {
   Terminal,
   Upload,
 } from 'lucide-react';
-import type { WebContainer, WebContainerProcess } from '@webcontainer/api';
+
 
 type TreeNode = {
   name: string;
@@ -56,8 +56,8 @@ export default function RealRepoWorkspace({
   const [terminalOutput, setTerminalOutput] = useState<string[]>([]);
   const terminalRef = useRef<HTMLDivElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
-  const webcontainerRef = useRef<WebContainer | null>(null);
-  const processRef = useRef<WebContainerProcess | null>(null);
+  const terminalSessionRef = useRef('');
+  const cursorRef = useRef(0);
 
   const dirty = content !== savedContent;
 
@@ -90,29 +90,45 @@ export default function RealRepoWorkspace({
 
   useEffect(() => {
     let cancelled = false;
-    void (async () => {
-      try {
-        const { WebContainer } = await import('@webcontainer/api');
-        const instance = await WebContainer.boot();
-        if (cancelled) {
-          instance.teardown();
-          return;
-        }
-        webcontainerRef.current = instance;
-        setRuntimeReady(true);
-        output('Runtime ready — Node/npm/npx execute in the isolated browser workspace.');
-      } catch (error) {
-        output(`Runtime unavailable: ${error instanceof Error ? error.message : 'WebContainer failed to boot'}`);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      processRef.current?.kill();
-      webcontainerRef.current?.teardown();
-      webcontainerRef.current = null;
+    let polling = false;
+    const request = async (body: Record<string, unknown>) => {
+      const response = await fetch('/api/admin/dev-studio/runtime', {method:'POST',
+        headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+      const result=await response.json();
+      if(!response.ok)throw new Error(result.error || `HTTP ${response.status}`);
+      return result;
     };
-  }, [output]);
+    void (async()=>{
+      try {
+        await request({operation:'repository-sync',repoUrl:'https://github.com/elevate-for-humanity/Elevate-lms.git',branch:'main'});
+        const session=await request({operation:'terminal-create'});
+        if(!session.id)throw new Error('Studio terminal session missing');
+        if(cancelled){await request({operation:'terminal-stop',sessionId:session.id});return;}
+        terminalSessionRef.current=session.id;cursorRef.current=0;
+        setRuntimeReady(true);output('Existing Studio container connected to Elevate-lms.');
+      }catch(error){if(!cancelled)output(`Runtime unavailable: ${error instanceof Error?error.message:'Connection failed'}`);}
+    })();
+    const timer=window.setInterval(async()=>{
+      const sessionId=terminalSessionRef.current;
+      if(cancelled || polling || !sessionId)return;
+      polling=true;
+      try {
+        const response=await fetch(`/api/admin/dev-studio/runtime?operation=terminal-output&sessionId=${encodeURIComponent(sessionId)}&after=${cursorRef.current}`,{cache:'no-store'});
+        const result=await response.json();
+        if(!response.ok)throw new Error(result.error || `HTTP ${response.status}`);
+        if(cancelled)return;
+        for(const entry of result.output ?? [])output(String(entry.data));
+        cursorRef.current=result.cursor;
+        if(result.exitCode!==null){setRuntimeReady(false);terminalSessionRef.current='';}
+      }catch(error){if(!cancelled){setRuntimeReady(false);output(`Terminal disconnected: ${error instanceof Error?error.message:'Unknown error'}`);terminalSessionRef.current='';}}
+      finally{polling=false;}
+    },1500);
+    return ()=>{
+      cancelled=true;window.clearInterval(timer);
+      const sessionId=terminalSessionRef.current;terminalSessionRef.current='';
+      if(sessionId)void request({operation:'terminal-stop',sessionId}).catch(()=>undefined);
+    };
+  },[output]);
 
   useEffect(() => {
     if (terminalRef.current) terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
@@ -197,50 +213,26 @@ export default function RealRepoWorkspace({
   }
 
   async function stageActiveFileInRuntime() {
-    const runtime = webcontainerRef.current;
-    if (!runtime) throw new Error('Runtime is not ready');
-    if (!activePath) throw new Error('Select a file first');
-    const runtimePath = activePath.replace(/^\/+/, '');
-    const slash = runtimePath.lastIndexOf('/');
-    if (slash > 0) await runtime.fs.mkdir(runtimePath.slice(0, slash), { recursive: true });
-    await runtime.fs.writeFile(runtimePath, content);
-    return runtimePath;
-  }
-
-  async function streamProcess(process: WebContainerProcess) {
-    const reader = process.output.getReader();
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        String(value).split(/\r?\n/).filter(Boolean).forEach(output);
-      }
-    } finally {
-      reader.releaseLock();
-    }
+    if(!runtimeReady || !activePath)throw new Error('Connect the runtime and select a file first');
+    const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',
+      headers:{'content-type':'application/json'},body:JSON.stringify({operation:'file-write',path:activePath,content})});
+    const result=await response.json();
+    if(!response.ok || !result.ok)throw new Error(result.error || 'Runtime file staging failed');
+    return activePath;
   }
 
   async function runCommand(commandLine: string) {
-    const runtime = webcontainerRef.current;
-    const trimmed = commandLine.trim();
-    if (!runtime || !trimmed || running) return;
-
-    const [command, ...args] = trimmed.split(/\s+/);
-    setRunning(true);
-    output(`$ ${trimmed}`);
+    const sessionId=terminalSessionRef.current;
+    const trimmed=commandLine.trim();
+    if(!sessionId || !trimmed || running)return;
+    setRunning(true);output(`$ ${trimmed}`);
     try {
-      const process = await runtime.spawn(command, args);
-      processRef.current = process;
-      const stream = streamProcess(process);
-      const exitCode = await process.exit;
-      await stream;
-      output(`Process exited with code ${exitCode}`);
-    } catch (error) {
-      output(`Command failed: ${error instanceof Error ? error.message : 'unknown error'}`);
-    } finally {
-      processRef.current = null;
-      setRunning(false);
-    }
+      const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',
+        headers:{'content-type':'application/json'},body:JSON.stringify({operation:'terminal-input',sessionId,data:trimmed+'\n'})});
+      const result=await response.json();
+      if(!response.ok || !result.ok)throw new Error(result.error || 'Command delivery failed');
+    }catch(error){output(`Command failed: ${error instanceof Error?error.message:'Unknown error'}`);}
+    finally{setRunning(false);}
   }
 
   async function runActiveFile() {
@@ -248,9 +240,9 @@ export default function RealRepoWorkspace({
       const runtimePath = await stageActiveFileInRuntime();
       const extension = runtimePath.split('.').pop()?.toLowerCase();
       if (['js', 'mjs', 'cjs'].includes(extension || '')) {
-        await runCommand(`node ${runtimePath}`);
+        await runCommand(`node ${JSON.stringify(runtimePath)}`);
       } else if (['ts', 'tsx'].includes(extension || '')) {
-        await runCommand(`npx tsx ${runtimePath}`);
+        await runCommand(`npx tsx ${JSON.stringify(runtimePath)}`);
       } else {
         output(`No automatic runner for .${extension || 'unknown'}; use the terminal.`);
       }
@@ -259,11 +251,15 @@ export default function RealRepoWorkspace({
     }
   }
 
-  function stopProcess() {
-    processRef.current?.kill();
-    processRef.current = null;
-    setRunning(false);
-    output('Process stopped.');
+  async function stopProcess() {
+    const sessionId=terminalSessionRef.current;
+    if(!sessionId)return;
+    try {
+      const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',
+        headers:{'content-type':'application/json'},body:JSON.stringify({operation:'terminal-stop',sessionId})});
+      if(!response.ok)throw new Error('Terminal stop failed');
+      terminalSessionRef.current='';setRuntimeReady(false);setRunning(false);output('Studio terminal stopped.');
+    }catch(error){output(error instanceof Error?error.message:'Terminal stop failed');}
   }
 
   function renderTree(nodes: TreeNode[], depth = 0) {
@@ -333,7 +329,7 @@ export default function RealRepoWorkspace({
         >
           <Play className="h-3.5 w-3.5" /> Run
         </button>
-        <button type="button" disabled={!running} onClick={stopProcess} className="rounded bg-red-700 p-1.5 disabled:opacity-40" title="Stop">
+        <button type="button" disabled={!runtimeReady} onClick={() => void stopProcess()} className="rounded bg-red-700 p-1.5 disabled:opacity-40" title="Stop">
           <Square className="h-3.5 w-3.5" />
         </button>
       </div>

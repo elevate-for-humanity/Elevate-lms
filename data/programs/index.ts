@@ -174,7 +174,7 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
       ? verifiedFunding?.wrgEligible
         ? 'WIOA or Workforce Ready Grant may be considered. WorkOne or the responsible agency determines participant eligibility, covered costs, and written authorization before funded enrollment. Self-pay remains available.'
         : 'WIOA may be considered. WorkOne or the responsible agency determines participant eligibility, covered costs, and written authorization before funded enrollment. Self-pay remains available.'
-      : 'Regular self-pay program. Review the published price and payment options before applying.',
+      : apprenticeshipLike ? 'Apprenticeship enrollment is self-pay only. Review the published tuition and payment options before applying.' : 'Regular self-pay program. Review the published price and payment options before applying.',
     badge: registered
       ? 'Registered Apprenticeship'
       : workforceFunded
@@ -193,14 +193,14 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
       etpl_approved: Boolean(verifiedFunding?.etplListedFor2Exclusive),
       jobReadyIndyEligible: false,
       fundingNotes:
-        verifiedFunding?.sourceNote ?? 'No verified WIOA/WRG public funding record for this program.',
+        apprenticeshipLike ? 'Apprenticeship enrollment is self-pay only.' : verifiedFunding?.sourceNote ?? 'No verified WIOA/WRG public funding record for this program.',
     },
     enrollmentTracks: undefined,
     cta: {
       ...program.cta,
-      stripeCheckoutHref: hasNumericSelfPayPrice(program)
-        ? '/api/checkout/program'
-        : program.cta.stripeCheckoutHref,
+      quickbooksCheckoutHref: hasNumericSelfPayPrice(program)
+        ? `/programs/${encodeURIComponent(program.slug)}/apply`
+        : program.cta.quickbooksCheckoutHref,
     },
   };
 }

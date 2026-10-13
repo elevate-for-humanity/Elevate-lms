@@ -122,7 +122,7 @@ export default function TutoringPage() {
       </div>
 
       {/* Hero Image */}
-      <section className="relative h-[clamp(520px,72svh,860px)] overflow-hidden">
+      <section className="relative h-[clamp(260px,42svh,480px)] overflow-hidden">
         <Image
           src="/images/pages/tutoring-page-1.webp"
           alt="Students receiving one-on-one tutoring at Elevate training center"

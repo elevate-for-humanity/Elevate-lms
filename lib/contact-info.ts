@@ -4,8 +4,8 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 // Public pages should import from this module instead of hardcoding contact data.
 export const CONTACT_INFO = {
   phone: {
-    display: PLATFORM_DEFAULTS.supportPhone,
-    tel: '+13173143757',
+    display: PLATFORM_DEFAULTS.mainPhone,
+    tel: '+13179999620',
   },
 
   email: {

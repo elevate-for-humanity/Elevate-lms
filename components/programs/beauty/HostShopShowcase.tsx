@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import NarratedShopTour from '@/components/partners/NarratedShopTour';
 import Link from 'next/link';
 import {
   ChevronLeft,
@@ -34,11 +35,6 @@ const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
     alt: 'Cals Kutz Studio apprenticeship host barbershop',
     kind: 'photo',
   },
-  'razors-image-barbershop': {
-    src: '/images/partners/razors-image-video-poster.webp',
-    alt: "Razor's Image Barbershop in Bloomington, Indiana",
-    kind: 'photo',
-  },
   'b-52s-barber-shop': {
     src: '/images/partners/b52s-official.webp',
     alt: "B-52's Barbershop in New Castle",
@@ -62,6 +58,7 @@ export default function HostShopShowcase({
   enableNarration = true,
   narration,
   narrationSrc,
+  narrationSources,
   mediaOverrides,
   mediaSequence,
   tourScripts,
@@ -80,6 +77,8 @@ export default function HostShopShowcase({
   narration?: string;
   /** Pre-rendered narration removes runtime voice-generation delay. */
   narrationSrc?: string;
+  /** Recorded scripts matched to the active shop media. */
+  narrationSources?: Record<string, string>;
   /** Page-specific media without changing another surface such as the homepage. */
   mediaOverrides?: Record<string, ShowcaseMedia>;
   /** Explicit media order for a surface that needs more than one slide per shop. */
@@ -88,6 +87,8 @@ export default function HostShopShowcase({
   tourScripts?: Record<string, string>;
   /** Render the lead heading as the page's primary heading. */
   asHero?: boolean;
+  /** Give vertical shop tours a full-height frame without cropping the video. */
+  portraitTour?: boolean;
 }) {
   // Shops without verified media remain in the directory below, but do not
   // become empty decorative slides in the rotating gallery.
@@ -103,7 +104,9 @@ export default function HostShopShowcase({
     }
 
     return shops.flatMap((shop) => {
-      const featured = mediaOverrides?.[shop.slug] ?? FEATURED_MEDIA_BY_SHOP[shop.slug];
+      const featured = mediaOverrides?.[shop.slug] ??
+        (videoTourShopSlug === shop.slug ? shop.media?.find((item) => item.kind === 'video') : undefined) ??
+        shop.media?.find((item) => item.kind !== 'video') ?? FEATURED_MEDIA_BY_SHOP[shop.slug];
       const media: ShowcaseMedia | undefined =
         featured?.kind !== 'video' || !videoTourShopSlug || shop.slug === videoTourShopSlug
           ? (featured ?? shop.media?.find((item) => item.kind !== 'video'))
@@ -113,6 +116,7 @@ export default function HostShopShowcase({
   }, [mediaOverrides, mediaSequence, shops, videoTourShopSlug]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
   const [interacting, setInteracting] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
@@ -131,15 +135,12 @@ export default function HostShopShowcase({
   }, []);
 
   useEffect(() => {
-    if (paused || interacting || reduceMotion || slides.length < 2) return;
-    const activeMedia = slides[activeIndex]?.media;
-    // Video tours control their own advancement so they always play to completion.
-    if (activeMedia?.kind === 'video') return;
+    if (paused || interacting || reduceMotion || videoPlaying || slides.length < 2) return;
     const timer = window.setTimeout(() => {
       setActiveIndex((current) => (current + 1) % slides.length);
     }, ROTATION_MS);
     return () => window.clearTimeout(timer);
-  }, [activeIndex, interacting, paused, reduceMotion, slides]);
+  }, [activeIndex, interacting, paused, reduceMotion, videoPlaying, slides]);
 
   useEffect(() => {
     if (!autoPlayVideoOnVisible) return;
@@ -184,6 +185,7 @@ export default function HostShopShowcase({
 
   useEffect(() => {
     userEnabledSoundRef.current = false;
+    setVideoPlaying(false);
   }, [activeIndex]);
 
   useEffect(() => {
@@ -229,14 +231,14 @@ export default function HostShopShowcase({
     <section
       ref={sectionRef}
       aria-labelledby="host-shop-showcase-heading"
-      data-scroll-narration={enableNarration ? true : undefined}
-      data-narration-src={enableNarration ? narrationSrc : undefined}
+      data-scroll-narration={enableNarration && image.kind !== 'video' ? true : undefined}
+      data-narration-src={enableNarration ? (narrationSources?.[image.src] ?? narrationSrc) : undefined}
       data-narration={
         enableNarration
           ? (tourScripts?.[image.src] ??
             image.script ??
             narration ??
-            'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.')
+            `Meet ${shop.dba ?? shop.name} in ${shop.city}, ${shop.state}. ${shop.marketingBlurb ?? shop.note}`)
           : undefined
       }
       data-narration-rate="0.84"
@@ -307,8 +309,8 @@ export default function HostShopShowcase({
         </div>
 
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
-          <div className={`grid ${shop.slug === 'razors-image-barbershop' ? 'lg:grid-cols-[1.45fr_0.55fr]' : 'lg:grid-cols-[1.1fr_0.9fr]'}`}>
-            <div className={`relative aspect-[4/3] min-h-0 overflow-hidden bg-slate-100 sm:aspect-[16/10] lg:aspect-auto ${shop.slug === 'razors-image-barbershop' ? 'lg:min-h-[500px]' : 'lg:min-h-[390px]'}`}>
+          <div className="grid lg:grid-cols-2">
+            <div className="relative aspect-[16/10] max-h-[320px] min-h-0 overflow-hidden bg-slate-950">
               {image?.kind === 'video' && !failedVideos.has(image.src) ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
                   {image.backdropSrc ? (
@@ -321,6 +323,12 @@ export default function HostShopShowcase({
                       aria-hidden="true"
                     />
                   ) : null}
+                  {tourScripts?.[image.src] || image.script ? (
+                    <div className="relative z-10 h-full w-full">
+                      <NarratedShopTour src={image.src} script={tourScripts?.[image.src] ?? image.script!}
+                        shopName={shop.dba ?? shop.name} showScript={false} onPlaybackChange={setVideoPlaying} />
+                    </div>
+                  ) : (
                   <video
                     key={image.src}
                     src={image.src}
@@ -329,7 +337,9 @@ export default function HostShopShowcase({
                     muted={autoPlayVideoOnVisible}
                     data-host-shop-tour
                     poster={image.backdropSrc}
+                    onPause={() => setVideoPlaying(false)}
                     onPlay={(event) => {
+                      setVideoPlaying(true);
                       event.currentTarget.defaultPlaybackRate = 1;
                       event.currentTarget.playbackRate = 1;
                       if (!event.currentTarget.muted) {
@@ -347,8 +357,8 @@ export default function HostShopShowcase({
                       if (userEnabledSoundRef.current) stopAllNaturalVoicePlayback();
                     }}
                     onEnded={(event) => {
-                      // Hold the final frame. The tour is never cut short, sped up,
-                      // reset, or advanced automatically.
+                      // Resume photo rotation only after the full tour finishes.
+                      setVideoPlaying(false);
                       event.currentTarget.pause();
                     }}
                     onError={() =>
@@ -359,9 +369,10 @@ export default function HostShopShowcase({
                       })
                     }
                     preload="metadata"
-                    className="relative z-10 aspect-[9/16] h-full max-h-[640px] w-auto max-w-full object-contain shadow-2xl"
+                    className="relative z-10 aspect-[9/16] h-full max-h-[320px] w-auto max-w-full object-contain shadow-2xl"
                     aria-label={image.alt}
                   />
+                  )}
                 </div>
               ) : image?.kind === 'video' && image.backdropSrc ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
@@ -375,14 +386,6 @@ export default function HostShopShowcase({
                 </div>
               ) : image && !failedImages.has(image.src) ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
-                  <Image
-                    src={image.src}
-                    alt=""
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 58vw"
-                    className="-z-10 scale-110 object-cover opacity-40 blur-xl"
-                    aria-hidden="true"
-                  />
                   <Image
                     key={image.src}
                     src={image.src}
@@ -413,7 +416,7 @@ export default function HostShopShowcase({
             </div>
 
             <div
-              className="flex flex-col justify-center p-7 text-slate-950 sm:p-9 lg:p-10"
+              className="flex flex-col justify-center p-4 text-slate-950 sm:p-5 lg:p-6"
               aria-live="polite"
             >
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-red-700">

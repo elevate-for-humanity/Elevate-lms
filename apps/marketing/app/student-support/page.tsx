@@ -185,14 +185,14 @@ export default function StudentSupportPage() {
               <Phone className="w-10 h-10 text-brand-green-600 mx-auto mb-4" />
               <h3 className="font-bold text-slate-900 mb-1">Phone Support</h3>
               <a
-                href="tel:+13173143757"
+                href="tel:+13179999620"
                 className="text-brand-green-600 font-semibold hover:underline"
               >
-                (317) 314-3757
+                (317) 999-9620
               </a>
               <p className="text-sm text-slate-500 mt-1">Mon–Fri 8am–6pm EST</p>
               <Link
-                href="tel:+13173143757"
+                href="tel:+13179999620"
                 className="inline-flex items-center gap-2 mt-4 bg-brand-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-green-700 transition"
               >
                 Call Now

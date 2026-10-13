@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { resend } from '@/lib/resend';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { deliverPhoneNotification, phoneEmailReady } from '@/lib/phone/notification-delivery';
+import { persistPhoneRow, processTelnyxEvent } from '@/lib/phone/event-processing';
 import { PushNotificationService } from '@/lib/notifications/push-service';
 import { sendSMS } from '@/lib/notifications/sms';
 import { isExtensionReachable } from '@/lib/phone/availability';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
+import { directoryPages, intakeCompleted, MENU_INPUT, PARIS_MENU_DESCRIPTION, PHONE_VOICE, programDestination, RECOVERY_VOICE } from '@/lib/phone/call-flow';
 import {
   decodeCallState,
   encodeCallState,
-  menuPrompt,
   publicPhoneNumber,
   telnyxClient,
   verifyTelnyxWebhook,
@@ -88,7 +90,7 @@ function appUrl(path: string) {
   return new URL(path, base).toString();
 }
 
-async function notifyAssignee(
+async function notifyRecipient(
   db: any,
   input: {
     profileId?: string;
@@ -102,12 +104,23 @@ async function notifyAssignee(
     transcript?: string;
     callbackNumber?: string;
     preferredCallbackTime?: string;
+    adminCopy?: boolean;
+    source?: 'voicemail' | 'paris';
+    responsibleHolder?: string;
+    awaitingTranscript?: boolean;
   },
 ) {
-  const url = input.profileId ? appUrl('/program-holder/phone') : appUrl('/phone/inbox');
-  if (input.profileId) await push.sendToUserWithDatabase(db, input.profileId, {
-    title: input.urgency === 'urgent' ? 'Urgent call for your extension' : 'New call to return',
-    body: `${input.caller} left details with PARIS. Open your secure phone inbox.`,
+  const url = input.adminCopy
+    ? new URL('/phone/inbox', process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org').toString()
+    : input.profileId ? appUrl('/communications/phone') : appUrl('/phone/inbox');
+  const messageType = input.source === 'voicemail' ? 'a voicemail' : 'details with PARIS';
+  if (!input.profileId || !input.taskId) return;
+  const identity = { taskId: input.taskId, profileId: input.profileId, kind: input.source || 'paris' as const };
+  const deliveries: Array<Promise<unknown>> = [];
+  const sendPush = () => deliverPhoneNotification(db, { ...identity, channel: 'push' }, async () => {
+    const acceptedDeviceCount = await push.sendToUserWithDatabase(db, input.profileId!, {
+    title: input.adminCopy ? 'Admin copy: new phone message' : input.urgency === 'urgent' ? 'Urgent call for your extension' : 'New call to return',
+    body: `${input.caller} left ${messageType}. ${input.adminCopy ? 'The assigned holder remains responsible for follow-up.' : 'Open your secure phone inbox.'}`,
     icon: '/icon-192x192.png',
     badge: '/icon-72.png',
     url,
@@ -115,45 +128,74 @@ async function notifyAssignee(
     requireInteraction: input.urgency === 'urgent',
     vibrate: [200, 100, 200],
   });
+    return { accepted: acceptedDeviceCount > 0, acceptedDeviceCount };
+  });
 
-  const [{ data: profile }, { data: preferences }] = input.profileId
+  const [profileResult, preferencesResult] = input.profileId
     ? await Promise.all([
         db.from('profiles').select('email,full_name').eq('id', input.profileId).maybeSingle(),
         db.from('notification_preferences').select('email_missed_calls,sms_missed_calls,sms_phone').eq('user_id', input.profileId).maybeSingle(),
       ])
-    : [{ data: null }, { data: null }];
+    : [{ data: null, error: null }, { data: null, error: null }];
+  if (profileResult.error || preferencesResult.error) throw new Error('Phone notification preferences unavailable');
+  const profile = profileResult.data;
+  const preferences = preferencesResult.data;
+  deliveries.push(sendPush());
   const detailLines = [
+    input.adminCopy ? 'Admin oversight copy — callback responsibility remains with the assigned holder.' : '',
+    input.source === 'voicemail' ? 'A voicemail was left. Open the secure inbox to listen.' : '',
+    input.responsibleHolder ? `Responsible holder: ${input.responsibleHolder}` : '',
+    `Callback reference: ${input.taskId}`,
     `Caller: ${input.caller}`,
     input.callbackNumber ? `Callback: ${input.callbackNumber}` : '',
     input.extension ? `Extension attempted: ${input.extension}` : '',
     input.program ? `Program/department: ${input.program}` : '',
     input.reason ? `Reason: ${input.reason}` : '',
     input.preferredCallbackTime ? `Preferred callback: ${input.preferredCallbackTime}` : '',
-    input.summary ? `PARIS summary: ${input.summary}` : '',
+    input.summary ? `${input.source === 'voicemail' ? 'Voicemail' : 'PARIS'} summary: ${input.summary}` : '',
     input.transcript ? `Transcript: ${input.transcript}` : '',
   ].filter(Boolean);
   const readableDetails = detailLines.join('\n');
   if (preferences?.sms_missed_calls === true && preferences?.sms_phone) {
-    const smsResult = await sendSMS(
-      preferences.sms_phone,
-      `${input.urgency === 'urgent' ? 'URGENT: ' : ''}${input.caller}${input.callbackNumber ? ` (${input.callbackNumber})` : ''}${input.program ? ` — ${input.program}` : ''}${input.reason ? `: ${input.reason}` : ' left details with PARIS.'} ${url}`.slice(0, 1200),
-    );
-    if (!smsResult.success) console.error('Missed-call SMS delivery failed:', smsResult.error);
+    deliveries.push(deliverPhoneNotification(db, { ...identity, channel: 'sms' }, async () => {
+      const result = await sendSMS(preferences.sms_phone,
+        `${input.urgency === 'urgent' ? 'URGENT: ' : ''}A new phone message is in your secure Elevate inbox. ${url}`);
+      return { accepted: result.success, providerMessageId: result.messageId };
+    }));
   }
-  if (!profile?.email || preferences?.email_missed_calls === false) return;
-  try {
-    await resend.emails.send({
-      from: 'Elevate Phone <noreply@elevateforhumanity.org>',
-      to: profile.email,
-      subject:
-        input.urgency === 'urgent'
-          ? 'Urgent call requires follow-up'
-          : 'New call in your Elevate Phone inbox',
-      text: `${readableDetails}\n\nFull call record: ${url}`,
-      html: `<p><strong>Call details</strong></p><pre style="white-space:pre-wrap;font-family:Arial,sans-serif">${escapeHtml(readableDetails)}</pre><p><a href="${escapeHtml(url)}">Open the full call record</a></p>`,
-    });
-  } catch (error) {
-    console.error('Missed-call email delivery failed:', error);
+  if (profile?.email && preferences?.email_missed_calls !== false && phoneEmailReady(input)) {
+    deliveries.push(deliverPhoneNotification(db, { ...identity, channel: 'email' }, async () => {
+      const result = await sendEmail({
+        from: 'Elevate Phone <noreply@elevateforhumanity.org>', to: profile.email,
+        subject: input.adminCopy ? 'Admin copy: phone message and callback follow-up' : input.urgency === 'urgent'
+          ? 'Urgent call requires follow-up' : input.source === 'voicemail' ? 'New voicemail — transcript inside' : 'New call in your Elevate Phone inbox',
+        text: `${readableDetails}\n\nFull call record: ${url}`,
+        html: `<p><strong>Call details</strong></p><pre style="white-space:pre-wrap;font-family:Arial,sans-serif">${escapeHtml(readableDetails)}</pre><p><a href="${escapeHtml(url)}">Open the full call record</a></p>`,
+        singleAttempt: true,
+      });
+      return { accepted: result.success, providerMessageId: result.data?.messageId };
+    }));
+  }
+  const results = await Promise.allSettled(deliveries);
+  if (results.some(result => result.status === 'rejected' || result.value === 'review_required')) {
+    throw new Error('Phone notification requires delivery review');
+  }
+}
+
+async function notifyAssignee(db: any, input: Parameters<typeof notifyRecipient>[1], system: System) {
+  const admin = await defaultAdminRoute(db, system);
+  const { data: holder } = input.profileId
+    ? await db.from('profiles').select('full_name').eq('id', input.profileId).maybeSingle()
+    : { data: null };
+  input = { ...input, responsibleHolder: holder?.full_name || input.responsibleHolder };
+  const recipients = [notifyRecipient(db, { ...input, adminCopy: Boolean(admin.profileId && admin.profileId === input.profileId) })];
+  if (admin.profileId && admin.profileId !== input.profileId) {
+    recipients.push(notifyRecipient(db, { ...input, profileId: admin.profileId, adminCopy: true }));
+  }
+  // One recipient's delivery failure must not prevent the other recipient's
+  // notification. The shared call/task remains the durable inbox copy.
+  for (const result of await Promise.allSettled(recipients)) {
+    if (result.status === 'rejected') console.error('Phone message notification requires review; inspect durable delivery evidence.');
   }
 }
 
@@ -161,7 +203,7 @@ async function findContext(db: any, event: TelnyxCallEvent) {
   const payload = event.data.payload;
   const state = decodeCallState(payload.client_state) as CallState;
   if (state.systemId) {
-    const [{ data: system }, { data: call }] = await Promise.all([
+    const [{ data: system, error: systemError }, { data: call, error: callError }] = await Promise.all([
       db.from('phone_systems').select('*').eq('id', state.systemId).maybeSingle(),
       state.callId
         ? db.from('phone_calls').select('*').eq('id', state.callId).maybeSingle()
@@ -172,17 +214,22 @@ async function findContext(db: any, event: TelnyxCallEvent) {
             .eq('provider_call_id', payload.call_control_id)
             .maybeSingle(),
     ]);
+    if (systemError || callError) throw new Error('Phone context unavailable');
+    if (call && (call.phone_system_id !== system?.id || call.provider !== 'telnyx')) {
+      throw new Error('Phone context mismatch');
+    }
     return { system: system as System | null, call, phoneNumber: null, state };
   }
-  const { data: phoneNumber } = await db
+  const { data: phoneNumber, error: numberError } = await db
     .from('phone_numbers')
     .select('id,phone_system_id')
     .eq('e164', payload.to)
     .eq('provider', 'telnyx')
     .eq('status', 'active')
     .maybeSingle();
+  if (numberError) throw new Error('Phone number lookup unavailable');
   if (!phoneNumber) return { system: null, call: null, phoneNumber: null, state };
-  const [{ data: system }, { data: call }] = await Promise.all([
+  const [{ data: system, error: systemError }, { data: call, error: callError }] = await Promise.all([
     db.from('phone_systems').select('*').eq('id', phoneNumber.phone_system_id).maybeSingle(),
     db
       .from('phone_calls')
@@ -191,6 +238,8 @@ async function findContext(db: any, event: TelnyxCallEvent) {
       .eq('provider_call_id', payload.call_control_id)
       .maybeSingle(),
   ]);
+  if (systemError || callError) throw new Error('Phone context unavailable');
+  if (call && call.phone_system_id !== system?.id) throw new Error('Phone context mismatch');
   return { system: system as System | null, call, phoneNumber, state };
 }
 
@@ -238,13 +287,14 @@ async function startVoicemail(
   callControlId: string,
   eventId: string,
   route: { extensionId?: string; profileId?: string } = {},
+  voice = PHONE_VOICE,
 ) {
   if (!route.extensionId) route = await defaultAdminRoute(db, system);
   const greeting = await unavailableGreeting(db, route, system.after_hours_message);
   if (!system.voicemail_enabled) {
-    await telnyxClient().calls.actions.speak(callControlId, {
+    await (await telnyxClient()).calls.actions.speak(callControlId, {
       payload: `${greeting} Please try again later.`,
-      voice: 'Telnyx.KokoroTTS.af',
+      voice,
       command_id: `${eventId}-unavailable`,
       client_state: encodeCallState({
         systemId: system.id,
@@ -279,9 +329,9 @@ async function startVoicemail(
         .select('id')
         .single();
   if (taskError || !task?.id) throw new Error('Unable to create the voicemail callback task.');
-  await telnyxClient().calls.actions.speak(callControlId, {
+  await (await telnyxClient()).calls.actions.speak(callControlId, {
     payload: `${greeting} Your message will be recorded and transcribed. Please leave your name, callback number, and message after the beep.`,
-    voice: 'Telnyx.KokoroTTS.af',
+    voice,
     command_id: `${eventId}-voicemail-prompt`,
     client_state: encodeCallState({
       systemId: system.id,
@@ -301,6 +351,8 @@ async function startParis(
   callControlId: string,
   eventId: string,
   route: { extensionId?: string; profileId?: string } = {},
+  resume = false,
+  voice = PHONE_VOICE,
 ) {
   if (!route.extensionId) route = await defaultAdminRoute(db, system);
   if (!system.paris_intake_enabled) {
@@ -332,6 +384,11 @@ async function startParis(
         .single();
   if (taskError || !created?.id) throw new Error('Unable to create the PARIS callback task.');
   const taskId = created?.id || '';
+  const { error: assignmentError } = await db.from('phone_callback_tasks').update({
+    extension_id: route.extensionId || null, assigned_profile_id: route.profileId || null,
+    updated_at: new Date().toISOString(),
+  }).eq('id', taskId);
+  if (assignmentError) throw assignmentError;
   const greeting = await unavailableGreeting(db, route, 'The person you selected is unavailable.');
   const state = {
     systemId: system.id,
@@ -362,9 +419,28 @@ async function startParis(
           return `${String(program.name).slice(0, 100)} (${String(program.slug).slice(0, 100)}): ${tuition}`;
         })
         .join('; ');
+  let publicWebsiteKnowledge = '';
   try {
-    if (taskId) {
-      await telnyxClient().calls.actions.startRecording(callControlId, {
+    const response = await fetch('https://www.elevateforhumanity.org/llms.txt', {
+      headers: { Accept: 'text/plain' },
+      signal: AbortSignal.timeout(5000),
+      cache: 'no-store',
+    });
+    if (response.ok) publicWebsiteKnowledge = (await response.text()).slice(0, 14000);
+  } catch {
+    publicWebsiteKnowledge = '';
+  }
+  const publicOrganizationFacts = [
+    'Founder and CEO: Elizabeth Greene.',
+    'Public founder page describes Elizabeth Greene as a U.S. Army veteran, IRS Enrolled Agent, licensed Indiana barber, and founder of Elevate for Humanity Career & Technical Institute.',
+    'Elevate publicly serves learners, employers, workforce agencies, Program Holders, Host Shops, and organizations using its workforce technology.',
+    'Program Holders may apply to deliver approved training using Elevate enrollment, compliance, reporting, and learner-support infrastructure.',
+    'Host Shops may participate in supported apprenticeship pathways.',
+  ].join(' ');
+
+  try {
+    if (taskId && !resume) {
+      await (await telnyxClient()).calls.actions.startRecording(callControlId, {
         channels: 'single',
         format: 'mp3',
         recording_track: 'inbound',
@@ -375,10 +451,20 @@ async function startParis(
         client_state: encodeCallState(state),
       });
     }
-    await telnyxClient().calls.actions.gatherUsingAI(callControlId, {
+    const { data: lastHistory } = resume
+      ? await db.from('phone_call_events').select('payload')
+          .eq('call_id', call.id).eq('event_type', 'call.ai_gather.message_history_updated')
+          .order('occurred_at', { ascending: false }).limit(1).maybeSingle()
+      : { data: null };
+    const history = Array.isArray(lastHistory?.payload?.message_history)
+      ? lastHistory.payload.message_history.filter((entry: any) =>
+          ['user', 'assistant'].includes(entry?.role) && typeof entry?.content === 'string')
+      : [];
+    await (await telnyxClient()).calls.actions.gatherUsingAI(callControlId, {
       parameters: {
         type: 'object',
         properties: {
+          conversation_complete: { type: 'boolean', description: 'True only after asking if the caller needs anything else and the caller explicitly confirms they are finished. Pauses, background noise, thank-you, or collecting the intake fields are not confirmation.' },
           caller_name: { type: 'string', description: 'Caller full name' },
           callback_number: {
             type: 'string',
@@ -396,41 +482,42 @@ async function startParis(
             description: 'Whether the caller says help is immediately needed',
           },
           caller_type: { type: 'string', description: 'Prospective student, current learner/apprentice, employer, Host Shop, Program Holder, parent/family, workforce partner, or other' },
-          program_interest: { type: 'string', description: 'Program or career-training area the caller is interested in' },
-          program_questions: { type: 'string', description: 'Questions the caller has about the program' },
+          program_interest: { type: 'string', description: 'Program or career-training area if the caller is asking about training; otherwise leave blank' },
+          program_questions: { type: 'string', description: 'Questions the caller has about a program, service, website feature, platform product, partnership, funding, or organization' },
           funding_preference: { type: 'string', enum: ['funded','self_pay','unsure'], description: 'Whether the caller is seeking workforce-funded training, self-pay training, or is unsure' },
           workone_contacted: { type: 'boolean', description: 'Whether the caller has contacted or visited WorkOne' },
           website_orientation_completed: { type: 'boolean', description: 'Whether a caller seeking workforce-funded training completed the funded-program orientation linked from the Elevate homepage' },
         },
-        required: ['caller_name', 'callback_number', 'reason', 'urgency', 'program_interest', 'funding_preference', 'workone_contacted', 'website_orientation_completed'],
+        required: ['caller_name', 'callback_number', 'reason', 'urgency', 'conversation_complete'],
       },
       assistant: {
-        instructions: `${system.ai_instructions} You are PARIS, the Elevate for Humanity telephone career and admissions assistant. Be warm, concise, and conversational. Tell callers to call 911 for an emergency. Start with a brief overview: Elevate provides career and technical training, Registered Apprenticeship support, industry credentials, and workforce pathways. Explain that some training can be workforce-funded for eligible participants and other training is self-pay.
+        instructions: `${system.ai_instructions} You are PARIS, the Elevate for Humanity phone assistant and platform guide. PARIS stands for the caller-facing assistant available through Elevate's Communications Hub. Explain who you are when asked. You can answer approved questions about Elevate services, help callers navigate the website and platform, explain next steps, collect callback/intake information, and route callers to enabled staff extensions. You do not replace staff judgment or workforce-agency approval. When naming any shop, always identify its verified service type: barber host shop, cosmetology host shop, esthetician host shop, or nail shop, as applicable. Say the shop name, city, and full state name together. Never describe every business only as a host shop. Never infer an unverified specialty or location; ask which city and state the caller wants and explain when location details need confirmation. Be warm, concise, and conversational. Allow callers to finish each thought. A pause, background sound, or thank-you does not mean the caller is finished. Before completing the interview, ask whether there is anything else you can help with and wait for explicit confirmation that they are finished. Never end merely because the intake fields have been collected. Tell callers to call 911 for an emergency. Start with a brief overview of the organization, not only its courses. Elevate provides career and technical training, Registered Apprenticeship and Host Shop support, industry credentials, workforce-funding navigation, online applications and learner/partner dashboards, a Website Builder for managed business websites, a Course Builder/LMS for training content, communications tools including phone/email/video support, business and entrepreneurship services, public partner networks, and related platform services. Explain that some training can be workforce-funded for eligible participants and other services or training may be self-pay. When a caller asks what Elevate does, describe the relevant service categories and ask which one they want to explore.
 
-Current active program names and verified website tuition: ${approvedProgramFacts || 'No current prices are available.'}. Quote a price only when the exact program matches an entry with published tuition. If a caller asks about deposits, fees, payment schedules, or another price not given here, direct them to the current website tuition page or an administrator. Never infer a price from duration, hours, another program, or earlier conversations.
+PUBLIC WEBSITE KNOWLEDGE (use this as current public-safe context; do not expose internal implementation): ${publicWebsiteKnowledge || 'Public website summary is temporarily unavailable.'}\n\nPUBLIC ORGANIZATION FACTS: ${publicOrganizationFacts}\n\nCurrent active program names and verified website tuition: ${approvedProgramFacts || 'No current prices are available.'}. Quote a price only when the exact program matches an entry with published tuition. If a caller asks about deposits, fees, payment schedules, or another price not given here, direct them to the current website tuition page or an administrator. Never infer a price from duration, hours, another program, or earlier conversations.
 
 Funding eligibility varies by program and participant and must be confirmed by the relevant workforce agency. Do not call any program funded or self-pay only without current approved information. For self-pay questions, refer callers to the current website or admissions for payment options and provider terms.
 
-Conduct a real two-way interview, not a field-reading script. Ask what program the caller is interested in. Then explicitly ask, "What questions can I answer for you about that program?" Listen and answer from current approved Elevate website/program information before asking the next relevant question. Invite a follow-up if useful. Do not just record their question for someone else when you have an approved answer.
+Conduct a real two-way conversation, not a program-only field-reading script. Ask what program, service, website feature, platform tool, partnership, funding path, or support need the caller is calling about. Ask, "What questions can I answer for you about that?" If they ask about the Website Builder, explain that Elevate can build and manage business websites through its platform, including published site pages and lead/contact intake where configured; do not redirect that question into career-program intake. If they ask about the Course Builder or LMS, explain the training-content and learner-delivery function at a high level. If they ask about apprenticeships, Host Shops, Program Holders, dashboards, phone/email/video communications, applications, credentials, business services, funding, WorkOne, or public networks, answer the relevant approved platform question first. Listen and answer from current approved Elevate platform information before asking the next relevant question. Do not just record a question for someone else when you have an approved answer.
 
 Ask whether they are seeking workforce-funded training, self-pay training, or are unsure. If they are seeking workforce-funded training, ask whether they have gone to the Elevate website homepage, scrolled to the funded-program orientation section, and completed that orientation. This is an Elevate website orientation for the funded-program process; do not call it a WorkOne orientation and do not ask whether they scheduled a WorkOne orientation. You may separately ask whether they have contacted or visited WorkOne. If they are pursuing a self-pay program, do not require the funded-program website orientation.
 
-Do not repeat the extension directory or tell the caller again to enter an extension during the PARIS interview; they already heard routing instructions before reaching you. Do not invent dates, prices, eligibility, approvals, financing approval, or application status. WorkOne/workforce agencies determine workforce-funding eligibility. If approved information does not establish an answer, say you do not want to give incorrect information and route the question to an administrator. Never request a Social Security number, payment card, password, medical details, or other highly sensitive data. Collect the required intake details naturally and confirm the callback number.`,
+Never pretend the platform offers a feature that is not verified. Distinguish public Website Builder services from internal Admin/Studio tools, and never expose internal credentials, implementation details, or private records. Do not repeat the extension directory or tell the caller again to enter an extension during the PARIS interview; they already heard routing instructions before reaching you. Do not invent dates, prices, eligibility, approvals, financing approval, or application status. WorkOne/workforce agencies determine workforce-funding eligibility. If approved information does not establish an answer, say you do not want to give incorrect information and route the question to an administrator. Never request a Social Security number, payment card, password, medical details, or other highly sensitive data. Do not turn every call into an intake. Answer informational questions naturally first. Collect application/funding intake details only when the caller wants to apply, enroll, pursue funding, request a callback, or needs staff follow-up. For ordinary questions about Elevate, the founder, the website, Website Builder, Course Builder, Store, partnerships, Program Holders, Host Shops, credentials, testing, communications, or services, answer the question without demanding unrelated enrollment fields. When appropriate, explain the value of the relevant Elevate service and give the caller a clear next step, but never use pressure, invent guarantees, or misstate pricing.`,
       },
-      greeting: `Welcome to Elevate for Humanity. We provide career and technical training, Registered Apprenticeship support, industry credentials, and workforce pathways. Some programs may be workforce-funded for eligible participants, while other programs are self-pay with payment and financing options that may be available. I am PARIS, your career and admissions assistant. This call may be recorded and transcribed. I can answer questions about our programs and help you figure out your next step. If this is an emergency, hang up and call 911. May I have your name, and what program or service are you calling about today?`,
+      greeting: resume ? 'I am here. Please continue; you do not need to repeat what you already told me.' : `Welcome to Elevate for Humanity. I am PARIS, Elevate's phone assistant and platform guide. I can answer questions about our training programs, apprenticeships, funding process, Website Builder, Course Builder and LMS, applications and dashboards, Host Shops and Program Holders, credentials, business services, and other Elevate website and platform services. I can also help with next steps or route you to an available staff extension. This call may be recorded and transcribed. If this is an emergency, hang up and call 911. May I have your name, and what can I help you with today?`,
       gather_ended_speech:
-        'Thank you. I saved your message securely and someone will get back to you as soon as possible.',
+        'Let me make sure you have everything you need.',
       language: 'en',
-      voice: 'Telnyx.KokoroTTS.af',
+      voice,
+      message_history: history,
       send_message_history_updates: true,
-      send_partial_results: false,
-      user_response_timeout_ms: 20000,
+      send_partial_results: true,
+      user_response_timeout_ms: 30000,
       command_id: `${eventId}-paris-intake`,
       client_state: encodeCallState(state),
     });
   } catch (error) {
-    console.error('PARIS gather unavailable; falling back to voicemail:', error);
-    await startVoicemail(db, system, call, callControlId, `${eventId}-fallback`, route);
+    console.error('PARIS gather unavailable; attempting configured voicemail fallback.');
+    await startVoicemail(db, system, call, callControlId, `${eventId}-fallback`, route, RECOVERY_VOICE);
   }
 }
 
@@ -449,6 +536,11 @@ async function routeToExtension(
     .maybeSingle();
   if (!extension) return startParis(db, system, call, callControlId, eventId);
   const route = { extensionId: extension.id, profileId: extension.profile_id || undefined };
+  const { error: assignmentError } = await db.from('phone_calls').update({
+    assigned_extension_id: extension.id, assigned_profile_id: extension.profile_id || null,
+    updated_at: new Date().toISOString(),
+  }).eq('id', call.id);
+  if (assignmentError) throw assignmentError;
   if (!extension.enabled) {
     return startParis(db, system, call, callControlId, eventId, route);
   }
@@ -457,6 +549,8 @@ async function routeToExtension(
     .select('sip_username,last_seen_at')
     .eq('extension_id', extension.id)
     .eq('status', 'active')
+    .eq('provider', 'telnyx')
+    .eq('connection_state', 'connected')
     .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString())
     .order('last_seen_at', { ascending: false })
     .limit(1)
@@ -476,9 +570,9 @@ async function routeToExtension(
   }
   const connectionId = process.env.TELNYX_CONNECTION_ID;
   if (!connectionId) throw new Error('TELNYX_CONNECTION_ID is not configured.');
-  const response = await telnyxClient().calls.dial({
+  const response = await (await telnyxClient()).calls.dial({
     connection_id: connectionId,
-    from: publicPhoneNumber(),
+    from: await publicPhoneNumber(),
     to: `sip:${device.sip_username}@sip.telnyx.com;secure=srtp`,
     link_to: callControlId,
     bridge_intent: true,
@@ -588,9 +682,9 @@ async function dialExtensionFallback(
   const connectionId = process.env.TELNYX_CONNECTION_ID;
   if (!connectionId) throw new Error('TELNYX_CONNECTION_ID is not configured.');
   const fallbackState = { ...state, phase: 'external_fallback' };
-  const response = await telnyxClient().calls.dial({
+  const response = await (await telnyxClient()).calls.dial({
     connection_id: connectionId,
-    from: publicPhoneNumber(),
+    from: await publicPhoneNumber(),
     to: extension.external_fallback_number,
     link_to: state.parentCallControlId,
     bridge_intent: true,
@@ -617,6 +711,102 @@ async function dialExtensionFallback(
   return true;
 }
 
+async function gatherMenu(
+  system: System, call: any, callControlId: string, eventId: string,
+  prompt: string, state: CallState = {}, voice = PHONE_VOICE,
+) {
+  await (await telnyxClient()).calls.actions.gatherUsingSpeak(callControlId, {
+    ...MENU_INPUT, payload: prompt, voice,
+    command_id: `${eventId}-menu-${state.phase || 'main_menu'}`,
+    client_state: encodeCallState({
+      systemId: system.id, callId: call.id, parentCallControlId: callControlId,
+      phase: 'main_menu', ...state,
+    }),
+  });
+}
+
+async function mainMenu(db: any, system: System, call: any, callControlId: string, eventId: string, retry = false) {
+  const prompt = retry ? 'Please choose an option.' : system.greeting;
+  return gatherMenu(system, call, callControlId, eventId,
+    `${prompt} For a three digit extension, press star, then enter the extension. Press 8 to hear the full staff and partner directory. ${PARIS_MENU_DESCRIPTION} Press 0 for Elizabeth Greene, Administrator.`,
+    {}, retry ? RECOVERY_VOICE : PHONE_VOICE);
+}
+
+async function readDirectory(db: any, system: System, call: any, callControlId: string, eventId: string, page = 0, fallback = false) {
+  const { data: workspace, error: workspaceError } = await db.from('communication_workspaces')
+    .select('id').eq('phone_system_id', system.id).maybeSingle();
+  if (workspaceError) throw workspaceError;
+  const { data: directory, error } = workspace?.id
+    ? await db.from('communication_extensions').select('extension,display_name,department')
+        .eq('workspace_id', workspace.id).eq('enabled', true).order('extension')
+    : { data: [], error: null };
+  if (error) throw error;
+  const pages = directoryPages(directory || []);
+  const index = Math.min(Math.max(page, 0), Math.max(0, pages.length - 1));
+  const more = index + 1 < pages.length;
+  const prompt = `${index === 0 ? 'Full directory. To dial an extension, press star first. ' : ''}${pages[index] || 'No directory entries are currently available.'} ${more ? 'The directory will continue shortly.' : 'End of directory. Press star to enter an extension, 8 to repeat, 9 to speak with Paris and ask questions, or 0 for the administrator.'}`;
+  await (await telnyxClient()).calls.actions.gatherUsingSpeak(callControlId, {
+    ...MENU_INPUT, payload: prompt, voice: fallback ? RECOVERY_VOICE : PHONE_VOICE,
+    timeout_millis: more ? 1000 : 10000,
+    command_id: `${eventId}-directory-${index}-${fallback ? 'fallback' : 'primary'}`,
+    client_state: encodeCallState({ systemId: system.id, callId: call.id,
+      parentCallControlId: callControlId, phase: 'directory', directoryPage: String(index),
+      directoryMore: String(more), directoryFallback: String(fallback) }),
+  });
+}
+
+async function parisNextStep(system: System, call: any, callControlId: string, eventId: string, state: CallState, failed: boolean) {
+  return gatherMenu(system, call, callControlId, eventId,
+    failed
+      ? 'I am sorry, the voice connection was interrupted. Your call is still connected. Press 1 to continue with PARIS, 2 to leave a voice message, 8 for the directory, or 0 for the administrator.'
+      : 'Do you need anything else? Press 1 to continue with PARIS, 2 if you are finished, 8 for the directory, or 0 for the administrator.',
+    { ...state, phase: failed ? 'paris_recovery' : 'paris_followup' }, RECOVERY_VOICE);
+}
+
+async function resolveProgramRoute(db: any, system: System, program: string) {
+  const { data: options, error } = await db.from('phone_menu_options')
+    .select('destination_id,spoken_keywords').eq('phone_system_id', system.id).eq('enabled', true);
+  if (error) throw error;
+  if (!program.trim()) return null;
+  // Enrich department keywords with the current program-holder assignments.
+  // Only holders attached to this phone system's configured destinations qualify.
+  const { data: configuredDestinations, error: destinationsError } = await db.from('phone_destinations')
+    .select('id,extension_id').eq('phone_system_id', system.id).eq('enabled', true)
+    .in('id', (options || []).map((option: any) => option.destination_id).filter(Boolean));
+  if (destinationsError) throw destinationsError;
+  const { data: configuredExtensions, error: extensionsError } = await db.from('communication_extensions')
+    .select('id,profile_id').eq('enabled', true)
+    .in('id', (configuredDestinations || []).map((destination: any) => destination.extension_id).filter(Boolean));
+  if (extensionsError) throw extensionsError;
+  const { data: holders, error: holdersError } = await db.from('program_holders')
+    .select('id,user_id').in('status', ['active', 'approved'])
+    .in('user_id', (configuredExtensions || []).map((extension: any) => extension.profile_id).filter(Boolean));
+  if (holdersError) throw holdersError;
+  const { data: assignments, error: assignmentsError } = await db.from('program_holder_programs')
+    .select('program_holder_id,program_slug').eq('status', 'active')
+    .in('program_holder_id', (holders || []).map((holder: any) => holder.id));
+  if (assignmentsError) throw assignmentsError;
+  const enrichedOptions = (options || []).map((option: any) => {
+    const destination = configuredDestinations?.find((entry: any) => entry.id === option.destination_id);
+    const extension = configuredExtensions?.find((entry: any) => entry.id === destination?.extension_id);
+    const holderIds = (holders || []).filter((holder: any) => holder.user_id === extension?.profile_id).map((holder: any) => holder.id);
+    return { ...option, spoken_keywords: [...(option.spoken_keywords || []),
+      ...(assignments || []).filter((assignment: any) => holderIds.includes(assignment.program_holder_id))
+        .map((assignment: any) => assignment.program_slug).filter(Boolean)] };
+  });
+  const destinationId = programDestination(program, enrichedOptions);
+  if (!destinationId) return null;
+  const { data: destination } = await db.from('phone_destinations').select('extension_id')
+    .eq('id', destinationId).eq('phone_system_id', system.id).eq('enabled', true).maybeSingle();
+  if (!destination?.extension_id) return null;
+  const { data: workspace } = await db.from('communication_workspaces').select('id')
+    .eq('phone_system_id', system.id).maybeSingle();
+  if (!workspace?.id) return null;
+  const { data: extension } = await db.from('communication_extensions').select('id,profile_id')
+    .eq('id', destination.extension_id).eq('workspace_id', workspace.id).eq('enabled', true).maybeSingle();
+  return extension?.profile_id ? { extensionId: extension.id, profileId: extension.profile_id } : null;
+}
+
 async function handleEvent(
   db: any,
   event: TelnyxCallEvent,
@@ -627,10 +817,16 @@ async function handleEvent(
 ) {
   const { event_type: type, id: eventId } = event.data;
   const payload = event.data.payload;
-  const client = telnyxClient();
+  const client = await telnyxClient();
+
+  if (['call.gather.ended', 'call.ai_gather.ended'].includes(type) &&
+      (call?.ended_at || ['call_hangup', 'cancelled', 'cancelled_amd'].includes(String(payload.status)))) return;
 
   if (type === 'call.initiated' && payload.direction === 'incoming') {
-    const { data: created } = await db
+    // Retried initiation must not reset an answered/completed call to ringing.
+    const { data: created, error: createError } = call?.id
+      ? { data: call, error: null }
+      : await db
       .from('phone_calls')
       .upsert(
         {
@@ -645,10 +841,12 @@ async function handleEvent(
           started_at: event.data.occurred_at,
           updated_at: new Date().toISOString(),
         },
-        { onConflict: 'provider,provider_call_id' },
+        { onConflict: 'provider,provider_call_id', ignoreDuplicates: true },
       )
       .select('id')
       .single();
+    if (createError || !created?.id) throw new Error('Call persistence unavailable');
+    if (created.ended_at) return;
     await client.calls.actions.answer(payload.call_control_id, {
       command_id: `${eventId}-answer`,
       client_state: encodeCallState({
@@ -663,7 +861,7 @@ async function handleEvent(
 
   if (state.phase === 'webrtc_leg' || state.phase === 'external_fallback') {
     if (type === 'call.initiated') {
-      await db.from('phone_call_legs').upsert(
+      await persistPhoneRow(db.from('phone_call_legs').upsert(
         {
           call_id: call.id,
           provider_call_id: payload.call_control_id,
@@ -674,37 +872,42 @@ async function handleEvent(
           updated_at: new Date().toISOString(),
         },
         { onConflict: 'provider_call_id' },
-      );
+      ));
       return;
     }
     if (type === 'call.answered') {
       await Promise.all([
-        db
+        persistPhoneRow(db
           .from('phone_call_legs')
           .update({
             status: 'answered',
             answered_at: event.data.occurred_at,
             updated_at: new Date().toISOString(),
           })
-          .eq('provider_call_id', payload.call_control_id),
-        db
+          .eq('provider_call_id', payload.call_control_id)
+          .eq('call_id', call.id)),
+        persistPhoneRow(db
           .from('phone_calls')
           .update({
             status: 'answered',
             answered_at: event.data.occurred_at,
             updated_at: new Date().toISOString(),
           })
-          .eq('id', call.id),
+          .eq('id', call.id)),
       ]);
       return;
     }
     if (type === 'call.hangup') {
-      const { data: leg } = await db
+      const { data: leg, error: legError } = await db
         .from('phone_call_legs')
         .select('answered_at')
         .eq('provider_call_id', payload.call_control_id)
+        .eq('call_id', call.id)
         .maybeSingle();
-      await db
+      // Unknown persistence is not evidence that nobody answered. Preserve the
+      // event for retry; never start PARIS or another ring leg on that guess.
+      if (legError || !leg) throw new Error('Phone leg outcome unavailable');
+      await persistPhoneRow(db
         .from('phone_call_legs')
         .update({
           status: 'completed',
@@ -712,7 +915,8 @@ async function handleEvent(
           hangup_cause: payload.hangup_cause || null,
           updated_at: new Date().toISOString(),
         })
-        .eq('provider_call_id', payload.call_control_id);
+        .eq('provider_call_id', payload.call_control_id)
+        .eq('call_id', call.id));
       if (state.extensionId) {
         await db
           .from('communication_extensions')
@@ -736,41 +940,16 @@ async function handleEvent(
   }
 
   if (type === 'call.answered') {
-    await db
+    await persistPhoneRow(db
       .from('phone_calls')
       .update({
         status: 'answered',
         answered_at: event.data.occurred_at,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', call.id);
-    const { data: options } = await db
-      .from('phone_menu_options')
-      .select('digit,label')
-      .eq('phone_system_id', system.id)
-      .eq('enabled', true)
-      .order('position');
-    if (system.routing_mode === 'menu' && options?.length) {
-      const { data: workspace } = await db.from('communication_workspaces').select('id').eq('phone_system_id', system.id).maybeSingle();
-      const { data: directory } = workspace?.id ? await db.from('communication_extensions').select('extension,display_name,department').eq('workspace_id', workspace.id).eq('enabled', true).order('extension') : { data: [] };
-      const directoryPrompt = (directory || []).map((entry: any) => entry.extension === '0' ? `For Elizabeth Greene, Administrator, press 0.` : `For ${entry.display_name}${entry.department ? `, ${entry.department}` : ''}, dial extension ${entry.extension}.`).join(' ');
-      await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
-        payload: `${system.greeting} If you know your party's extension, dial it at any time. Press 8 to hear the full staff and partner directory. Press 9 for PARIS. Press 0 for Elizabeth Greene, Administrator.`,
-        voice: 'Telnyx.KokoroTTS.af',
-        minimum_digits: 1,
-        maximum_digits: 3,
-        valid_digits: '0123456789',
-        inter_digit_timeout_millis: 2500,
-        maximum_tries: 2,
-        timeout_millis: 7000,
-        command_id: `${eventId}-menu`,
-        client_state: encodeCallState({
-          systemId: system.id,
-          callId: call.id,
-          parentCallControlId: payload.call_control_id,
-          phase: 'main_menu',
-        }),
-      });
+      .eq('id', call.id));
+    if (system.routing_mode === 'menu') {
+      await mainMenu(db, system, call, payload.call_control_id, eventId);
     } else if (system.default_destination_id) {
       await routeDestination(
         db,
@@ -788,20 +967,42 @@ async function handleEvent(
 
   if (type === 'call.gather.ended') {
     const digits = String(payload.digits ?? '').trim();
-    if (state.phase === 'main_menu' && /^\d{3}$/.test(digits)) {
-      const { data: workspace } = await db
-        .from('communication_workspaces')
-        .select('id')
-        .eq('phone_system_id', system.id)
-        .maybeSingle();
-      const { data: extension } = workspace?.id
-        ? await db.from('communication_extensions').select('id')
-            .eq('workspace_id', workspace.id).eq('extension', digits)
-            .eq('enabled', true).maybeSingle()
-        : { data: null };
-      return extension?.id
-        ? routeToExtension(db, system, call, payload.call_control_id, extension.id, eventId)
-        : startParis(db, system, call, payload.call_control_id, eventId);
+    const route = { extensionId: state.extensionId, profileId: state.profileId };
+    if (state.phase === 'paris_recovery' || state.phase === 'paris_followup') {
+      if (digits === '1') return startParis(db, system, call, payload.call_control_id, eventId, route, true, RECOVERY_VOICE);
+      if (digits === '2' && state.phase === 'paris_recovery') return startVoicemail(db, system, call, payload.call_control_id, eventId, route, RECOVERY_VOICE);
+      if (digits === '2') {
+        await client.calls.actions.speak(payload.call_control_id, {
+          payload: 'Thank you for calling Elevate for Humanity. Goodbye.', voice: RECOVERY_VOICE,
+          command_id: `${eventId}-confirmed-goodbye`,
+          client_state: encodeCallState({ ...state, phase: 'caller_confirmed_end' }),
+        });
+        return;
+      }
+      if (!['0', '8'].includes(digits)) {
+        if (state.reprompted === 'true') return startVoicemail(db, system, call, payload.call_control_id, eventId, route, RECOVERY_VOICE);
+        return parisNextStep(system, call, payload.call_control_id, eventId, { ...state, reprompted: 'true' }, state.phase === 'paris_recovery');
+      }
+    }
+    if (state.phase === 'directory' && !digits) {
+      // Telnyx reports an exhausted no-input gather as invalid. Listening without
+      // pressing a key must advance the directory, not replay its first page.
+      if (payload.status === 'client_error' && state.directoryFallback !== 'true') {
+        return readDirectory(db, system, call, payload.call_control_id, eventId, Number(state.directoryPage) || 0, true);
+      }
+      if (payload.status === 'client_error') return mainMenu(db, system, call, payload.call_control_id, eventId, true);
+      if (state.directoryMore === 'true') return readDirectory(db, system, call, payload.call_control_id, eventId, (Number(state.directoryPage) || 0) + 1, state.directoryFallback === 'true');
+      return mainMenu(db, system, call, payload.call_control_id, eventId, true);
+    }
+    if (digits === '*' && state.phase !== 'extension_menu') {
+      await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
+        payload: 'Please enter the full three digit extension.', voice: PHONE_VOICE,
+        minimum_digits: 3, maximum_digits: 3, maximum_tries: 2,
+        valid_digits: '0123456789', inter_digit_timeout_millis: 5000, timeout_millis: 10000,
+        command_id: `${eventId}-extension-entry`,
+        client_state: encodeCallState({ systemId: system.id, callId: call.id, phase: 'extension_menu' }),
+      });
+      return;
     }
     if (state.phase === 'extension_menu') {
       const { data: workspace } = await db
@@ -821,32 +1022,12 @@ async function handleEvent(
       if (extension?.id) {
         await routeToExtension(db, system, call, payload.call_control_id, extension.id, eventId);
       } else {
-        await startParis(db, system, call, payload.call_control_id, eventId);
+        await mainMenu(db, system, call, payload.call_control_id, eventId, true);
       }
       return;
     }
-    if (digits === '8') {
-      const { data: workspace } = await db.from('communication_workspaces').select('id').eq('phone_system_id', system.id).maybeSingle();
-      const { data: directory } = workspace?.id ? await db.from('communication_extensions').select('extension,display_name,department').eq('workspace_id', workspace.id).eq('enabled', true).order('extension') : { data: [] };
-      const spokenDirectory = (directory || []).map((entry: any) => entry.extension === '0' ? 'Elizabeth Greene, Administrator, extension 0.' : `${entry.display_name}${entry.department ? `, ${entry.department}` : ''}, extension ${entry.extension}.`).join(' ');
-      await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
-        payload: `${spokenDirectory || 'No directory entries are currently available.'} You may enter any listed extension now. Press 8 to hear the directory again, press 9 for PARIS, or press 0 for Elizabeth Greene, Administrator.`,
-        voice: 'Telnyx.KokoroTTS.af',
-        minimum_digits: 3,
-        maximum_digits: 3,
-        valid_digits: '0123456789',
-        maximum_tries: 2,
-        timeout_millis: 7000,
-        command_id: `${eventId}-extension-directory`,
-        client_state: encodeCallState({
-          systemId: system.id,
-          callId: call.id,
-          parentCallControlId: payload.call_control_id,
-          phase: 'main_menu',
-        }),
-      });
-      return;
-    }
+    if (digits === '8') return readDirectory(db, system, call, payload.call_control_id, eventId);
+    if (!/^\d$/.test(digits)) return mainMenu(db, system, call, payload.call_control_id, eventId, true);
     if (digits === '9') {
       await startParis(db, system, call, payload.call_control_id, eventId);
       return;
@@ -855,35 +1036,47 @@ async function handleEvent(
       await routeAdmin(db, system, call, payload.call_control_id, eventId);
       return;
     }
-    const { data: option } = await db
-      .from('phone_menu_options')
-      .select('destination_id')
-      .eq('phone_system_id', system.id)
-      .eq('digit', Number(digits))
-      .eq('enabled', true)
-      .maybeSingle();
-    const destinationId = option?.destination_id || system.default_destination_id;
-    if (destinationId) {
-      await routeDestination(db, system, call, payload.call_control_id, destinationId, eventId);
-    } else {
-      await startParis(db, system, call, payload.call_control_id, eventId);
-    }
-    return;
+    // Holders have one published extension. Retain department keyword mappings
+    // for PARIS, but do not expose a second single-key route to the same holder.
+    return mainMenu(db, system, call, payload.call_control_id, eventId, true);
   }
 
   if (type === 'call.ai_gather.message_history_updated' && state.taskId) {
     const transcript = transcriptFromHistory(payload.message_history);
     if (transcript) {
-      await db
+      await persistPhoneRow(db
         .from('phone_callback_tasks')
         .update({ transcript, updated_at: new Date().toISOString() })
-        .eq('id', state.taskId);
+        .eq('id', state.taskId).eq('call_id', call.id));
+    }
+    return;
+  }
+
+  if (type === 'call.ai_gather.partial_results' && state.taskId) {
+    const partial = aiResult(payload.partial_results);
+    const program = String(partial.program_interest || partial.program_or_department || '').trim();
+    const route = await resolveProgramRoute(db, system, program);
+    if (route) {
+      await persistPhoneRow(db.from('phone_callback_tasks').update({
+        extension_id: route.extensionId, assigned_profile_id: route.profileId,
+        program_or_department: program.slice(0, 300), updated_at: new Date().toISOString(),
+      }).eq('id', state.taskId).eq('call_id', call.id));
     }
     return;
   }
 
   if (type === 'call.ai_gather.ended' && state.taskId) {
     const result = aiResult(payload.result);
+    const { data: existingTask, error: taskLookupError } = await db.from('phone_callback_tasks').select('extension_id,assigned_profile_id')
+      .eq('id', state.taskId).eq('call_id', call.id).maybeSingle();
+    if (taskLookupError || !existingTask) throw new Error('Callback task unavailable');
+    const savedState = { ...state, extensionId: existingTask?.extension_id || state.extensionId,
+      profileId: existingTask?.assigned_profile_id || state.profileId };
+    if (payload.status !== 'valid') {
+      return parisNextStep(system, call, payload.call_control_id, eventId, savedState, true);
+    }
+    const programRoute = await resolveProgramRoute(db, system, String(result.program_interest || result.program_or_department || ''));
+    const assignedState = { ...savedState, ...(programRoute || {}) };
     const urgency = ['low', 'normal', 'high', 'urgent'].includes(String(result.urgency))
       ? String(result.urgency)
       : 'normal';
@@ -911,9 +1104,11 @@ async function handleEvent(
       .filter(Boolean)
       .join(': ')
       .slice(0, 1000);
-    await db
+    await persistPhoneRow(db
       .from('phone_callback_tasks')
       .update({
+        extension_id: assignedState.extensionId || null,
+        assigned_profile_id: assignedState.profileId || null,
         caller_name: callerName,
         callback_number: callbackNumber,
         reason,
@@ -931,17 +1126,18 @@ async function handleEvent(
         status: 'new',
         updated_at: new Date().toISOString(),
       })
-      .eq('id', state.taskId);
-    const { data: attemptedExtension } = state.extensionId
-      ? await db.from('communication_extensions').select('extension').eq('id', state.extensionId).maybeSingle()
+      .eq('id', state.taskId).eq('call_id', call.id));
+    const { data: attemptedExtension } = assignedState.extensionId
+      ? await db.from('communication_extensions').select('extension').eq('id', assignedState.extensionId).maybeSingle()
       : { data: null };
     const { data: savedTask } = await db
       .from('phone_callback_tasks')
       .select('transcript')
       .eq('id', state.taskId)
+      .eq('call_id', call.id)
       .maybeSingle();
     await notifyAssignee(db, {
-      profileId: state.profileId,
+      profileId: assignedState.profileId,
       taskId: state.taskId,
       caller: callerName || callbackNumber || 'A caller',
       callbackNumber: callbackNumber || undefined,
@@ -952,14 +1148,15 @@ async function handleEvent(
       transcript: savedTask?.transcript || undefined,
       preferredCallbackTime: String(result.preferred_callback_time || '').trim() || undefined,
       urgency,
-    });
-    try {
-      await client.calls.actions.hangup(payload.call_control_id, {
-        command_id: `${eventId}-paris-complete-hangup`,
-      });
-    } catch {
-      // The caller may hang up after the closing message.
-    }
+    }, system);
+    await persistPhoneRow(db.from('phone_calls').update({ assigned_extension_id: assignedState.extensionId || null,
+      assigned_profile_id: assignedState.profileId || null }).eq('id', call.id));
+    return parisNextStep(system, call, payload.call_control_id, eventId,
+      { ...assignedState, intakeComplete: String(intakeCompleted(payload.status, result)) }, false);
+  }
+
+  if (type === 'call.speak.ended' && state.phase === 'caller_confirmed_end') {
+    await client.calls.actions.hangup(payload.call_control_id, { command_id: `${eventId}-confirmed-hangup` });
     return;
   }
 
@@ -992,22 +1189,32 @@ async function handleEvent(
     (payload.recording_urls?.mp3 || payload.recording_urls?.wav)
   ) {
     const recordingUrl = payload.recording_urls.mp3 || payload.recording_urls.wav;
+    const { data: recordingTask, error: taskLookupError } = state.taskId
+      ? await db.from('phone_callback_tasks').select('source,transcript,summary,extension_id,assigned_profile_id')
+          .eq('id', state.taskId).eq('call_id', call.id).maybeSingle()
+      : { data: null, error: null };
+    if (taskLookupError || (state.taskId && !recordingTask)) throw new Error('Recording callback unavailable');
     if (state.taskId && recordingUrl) {
-      await db
+      await persistPhoneRow(db
         .from('phone_callback_tasks')
         .update({ recording_url: recordingUrl, updated_at: new Date().toISOString() })
-        .eq('id', state.taskId);
+        .eq('id', state.taskId).eq('call_id', call.id));
     }
-    await db
+    await persistPhoneRow(db
       .from('phone_calls')
       .update({ recording_url: recordingUrl, updated_at: new Date().toISOString() })
-      .eq('id', call.id);
-    if (state.phase === 'voicemail_recording' && recordingUrl) {
-      await db.from('voicemails').insert({
+      .eq('id', call.id));
+    // Telnyx may retain the prompt state on recording.saved. The persisted
+    // callback source identifies the voicemail even when action state lags.
+    if ((recordingTask?.source === 'voicemail' || ['voicemail_recording', 'voicemail_prompt'].includes(state.phase)) && recordingUrl) {
+      const { data: existingVoicemail, error: lookupError } = await db.from('voicemails')
+        .select('id').eq('call_id', call.id).eq('recording_url', recordingUrl).limit(1).maybeSingle();
+      if (lookupError) throw lookupError;
+      const voicemail = {
         phone_system_id: system.id,
         call_id: call?.id ?? null,
-        extension_id: state.extensionId || null,
-        assigned_profile_id: state.profileId || null,
+        extension_id: recordingTask?.extension_id || state.extensionId || null,
+        assigned_profile_id: recordingTask?.assigned_profile_id || state.profileId || null,
         phone_number: call?.from_number || 'unknown',
         recording_url: recordingUrl,
         duration_seconds: payload.duration_millis
@@ -1015,62 +1222,92 @@ async function handleEvent(
           : null,
         is_read: false,
         status: 'new',
-      });
+        transcription: recordingTask?.transcript || null,
+        summary: recordingTask?.summary || null,
+      };
+      if (!existingVoicemail) {
+        await persistPhoneRow(db.from('voicemails').insert(voicemail));
+      }
       await notifyAssignee(db, {
-        profileId: state.profileId,
+        profileId: recordingTask?.assigned_profile_id || state.profileId,
         taskId: state.taskId,
         caller: call?.from_number || 'A caller',
         urgency: 'normal',
-      });
+        source: 'voicemail',
+        transcript: recordingTask?.transcript || undefined,
+        awaitingTranscript: system.voicemail_transcription_enabled && !recordingTask?.transcript,
+      }, system);
     }
     return;
   }
 
   if (type === 'call.recording.transcription.saved' && payload.transcription_text) {
-    if (state.taskId) {
-      await db
+    let transcriptTaskId=state.taskId;
+    if(!transcriptTaskId) {
+      const {data: recordedTask,error: recordedTaskError}=await db.from('phone_callback_tasks')
+        .select('id').eq('call_id',call.id).eq('source','voicemail').maybeSingle();
+      if(recordedTaskError) throw new Error('Voicemail transcription assignment unavailable');
+      transcriptTaskId=recordedTask?.id;
+    }
+    if (transcriptTaskId) {
+      await persistPhoneRow(db
         .from('phone_callback_tasks')
         .update({
           transcript: payload.transcription_text,
           summary: payload.transcription_text.slice(0, 1000),
           updated_at: new Date().toISOString(),
         })
-        .eq('id', state.taskId);
+        .eq('id', transcriptTaskId).eq('call_id', call.id));
     }
-    await db
+    const { error: transcriptionError } = await db
       .from('voicemails')
       .update({
         transcription: payload.transcription_text,
         summary: payload.transcription_text.slice(0, 1000),
       })
       .eq('call_id', call.id);
+    if (transcriptionError) throw new Error('Voicemail transcription persistence unavailable');
+    if (transcriptTaskId) {
+      const {data: task,error: taskError}=await db.from('phone_callback_tasks')
+        .select('source,assigned_profile_id').eq('id',transcriptTaskId).eq('call_id',call.id).maybeSingle();
+      if(taskError || !task) throw new Error('Voicemail notification assignment unavailable');
+      if(task.source === 'voicemail') {
+        await notifyAssignee(db,{
+          profileId:task.assigned_profile_id || state.profileId,
+          taskId:transcriptTaskId,caller:call.from_number || 'A caller',
+          urgency:'normal',source:'voicemail',transcript:payload.transcription_text,
+        },system);
+      }
+    }
     return;
   }
 
   if (type === 'call.hangup') {
     if (state.taskId && state.profileId) {
-      const { data: unfinished } = await db
+      const { data: unfinished, error: taskLookupError } = await db
         .from('phone_callback_tasks')
-        .select('summary,callback_number')
+        .select('source,summary,callback_number,assigned_profile_id')
         .eq('id', state.taskId)
+        .eq('call_id', call.id)
         .maybeSingle();
-      if (unfinished && !unfinished.summary) {
-        await db
+      if (taskLookupError || !unfinished) throw new Error('Callback task unavailable');
+      if (unfinished && unfinished.source !== 'voicemail' && !unfinished.summary) {
+        await persistPhoneRow(db
           .from('phone_callback_tasks')
           .update({
             summary: 'Caller disconnected before PARIS finished the interview.',
             updated_at: new Date().toISOString(),
           })
-          .eq('id', state.taskId);
+          .eq('id', state.taskId).eq('call_id', call.id));
         await notifyAssignee(db, {
-          profileId: state.profileId,
+          profileId: unfinished.assigned_profile_id || state.profileId,
           taskId: state.taskId,
           caller: unfinished.callback_number || call?.from_number || 'A caller',
           urgency: 'normal',
-        });
+        }, system);
       }
     }
-    await db
+    await persistPhoneRow(db
       .from('phone_calls')
       .update({
         status: 'completed',
@@ -1080,7 +1317,7 @@ async function handleEvent(
           : null,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', call.id);
+      .eq('id', call.id));
   }
 }
 
@@ -1090,33 +1327,18 @@ export async function POST(request: Request) {
   try {
     event = await verifyTelnyxWebhook(body, request.headers);
   } catch (error) {
-    console.warn('Rejected Telnyx webhook:', error instanceof Error ? error.message : error);
+    console.warn('Rejected Telnyx webhook: signature verification failed.');
     return NextResponse.json({ error: 'Invalid webhook signature.' }, { status: 401 });
   }
-  const db = await requireAdminClient();
-  const context = await findContext(db, event);
-  if (!context.system) return NextResponse.json({ received: true, ignored: 'unknown number' });
-  const { error: ledgerError } = await db.from('phone_call_events').insert({
-    phone_system_id: context.system.id,
-    call_id: context.call?.id ?? null,
-    provider: 'telnyx',
-    provider_event_id: event.data.id,
-    event_type: event.data.event_type,
-    occurred_at: event.data.occurred_at,
-    payload: event.data.payload,
-  });
-  if (ledgerError?.code === '23505') return NextResponse.json({ received: true, duplicate: true });
-  if (ledgerError) return NextResponse.json({ error: 'Unable to persist event.' }, { status: 500 });
   try {
-    await handleEvent(db, event, context.system, context.call, context.phoneNumber, context.state);
-    return NextResponse.json({ received: true });
-  } catch (error) {
-    console.error('Telnyx event processing failed:', error);
-    await db
-      .from('phone_call_events')
-      .delete()
-      .eq('provider', 'telnyx')
-      .eq('provider_event_id', event.data.id);
-    return NextResponse.json({ error: 'Event processing failed.' }, { status: 500 });
+    const db = await requireAdminClient();
+    const context = await findContext(db, event);
+    if (!context.system) return NextResponse.json({ received: true, ignored: 'unknown number' });
+    const result = await processTelnyxEvent(db, event, context, () =>
+      handleEvent(db, event, context.system!, context.call, context.phoneNumber, context.state));
+    return NextResponse.json({ received: true, ...(result === 'duplicate' ? { duplicate: true } : {}) });
+  } catch {
+    console.error('Telnyx event processing requires retry or review; inspect protected event evidence.');
+    return NextResponse.json({ error: 'Event processing unavailable.' }, { status: 503 });
   }
 }

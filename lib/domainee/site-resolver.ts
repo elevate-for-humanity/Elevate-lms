@@ -1,3 +1,5 @@
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
+import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -42,15 +44,19 @@ export async function resolveOwnedSite(websiteId: string) {
     .eq('id', websiteId)
     .maybeSingle();
   if (error) return { error: NextResponse.json({ error: error.message }, { status: 500 }) };
-  if (!site || site.user_id !== user.id) {
+  if (!site || !(await canManageHostedWebsite(admin, websiteId, user.id))) {
     return { error: NextResponse.json({ error: 'Website not found' }, { status: 404 }) };
   }
 
   const originUrl = site.subdomain
     ? tenantPublicSiteUrl(site.subdomain)
     : process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-  const entitlement = await resolveWebsiteBuilderEntitlement(supabase, user.id);
-  return { user, supabase, site, originUrl, entitlement };
+  const access = await getWebsiteBuilderAccess(user.id, supabase);
+  const entitlement = access.isAdmin
+    ? { allowed: true, plan: 'enterprise', status: 'active' }
+    : await resolveWebsiteBuilderEntitlement(supabase, user.id);
+  // Service access is returned only after exact-site management authorization.
+  return { user, supabase: admin, site, originUrl, entitlement, ownerUserId: site.user_id || user.id };
 }
 
 export function requireCustomDomainEntitlement(entitlement: WebsiteBuilderEntitlement) {

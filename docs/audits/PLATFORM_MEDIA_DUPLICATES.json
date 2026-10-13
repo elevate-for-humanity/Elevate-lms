@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2026-09-21T22:56:06.197Z",
+  "generatedAt": "2026-10-12T21:31:57.582Z",
   "apps": [
     "marketing",
     "lms",
     "admin"
   ],
   "summary": {
-    "routesScanned": 1536,
+    "routesScanned": 1590,
     "withinRouteDuplicates": 0,
     "crossRouteHeroDuplicates": 0,
     "heroRegistryDuplicates": 0,
     "sharedComponentDuplicateAdvisory": 4,
-    "crossRouteImageReuseAdvisory": 89,
-    "binaryAliasGroups": 23
+    "crossRouteImageReuseAdvisory": 93,
+    "binaryAliasGroups": 22
   },
   "blocking": {
     "withinRouteDuplicates": [],
@@ -23,18 +23,19 @@
     "sharedComponentDuplicateAdvisory": [
       {
         "app": "marketing",
-        "route": "/",
-        "fingerprint": "sha256:61e2efd358dfab3d3df826b5f2244dd52dff4174e19e88a70b2afb47971f0d13",
-        "asset": "/images/beauty/esthetics-hero.webp",
+        "route": "/partners/host-shops",
+        "fingerprint": "sha256:509e3fb32702f12cf27e61b1dbdcbd9f1853656a77d2e5883a5ec5dee1edc6b2",
+        "asset": "/images/pages/barber-hands-on-bright.webp",
         "aliases": [
-          "/images/beauty/esthetics-hero.webp",
-          "/images/beauty/program-beauty-training.webp"
+          "/images/pages/barber-hands-on-bright.webp"
         ],
         "locations": [
-          "components/home/HomeBeautyPriority.tsx:27",
-          "components/home/PlatformHubHero.tsx:80"
+          "apps/marketing/app/partners/host-shops/page.tsx:254",
+          "components/partners/HostShopBenefits.tsx:7"
         ],
-        "ownedLocations": []
+        "ownedLocations": [
+          "apps/marketing/app/partners/host-shops/page.tsx:254"
+        ]
       },
       {
         "app": "marketing",
@@ -60,8 +61,8 @@
           "/images/pages/bookkeeping-ledger.webp"
         ],
         "locations": [
-          "components/home/HomeProgramShowcase.tsx:36",
-          "components/home/HomeProgramShowcase.tsx:44"
+          "components/home/HomeProgramShowcase.tsx:39",
+          "components/home/HomeProgramShowcase.tsx:48"
         ],
         "ownedLocations": []
       },
@@ -84,6 +85,60 @@
     ],
     "crossRouteImageReuse": [
       {
+        "fingerprint": "sha256:320fe5fcab981194f59ed317bfa8cc80d509221a3898ec2bdcb84c221201d5b0",
+        "asset": "/images/pages/community-page-2.webp",
+        "aliases": [
+          "/images/pages/community-page-2.webp"
+        ],
+        "routes": [
+          "lms:/lms/dashboard",
+          "lms:/program-holder/community",
+          "lms:/program-holder/compliance",
+          "lms:/program-holder/dashboard",
+          "lms:/program-holder/documents",
+          "lms:/program-holder/gary-launch",
+          "lms:/program-holder/hours",
+          "lms:/program-holder/payouts",
+          "lms:/program-holder/programs",
+          "lms:/program-holder/reports",
+          "lms:/program-holder/settings",
+          "lms:/program-holder/students",
+          "lms:/program-holder/students/at-risk",
+          "lms:/program-holder/students/pending",
+          "marketing:/alumni",
+          "marketing:/business-network",
+          "marketing:/community-services",
+          "marketing:/philanthropy"
+        ]
+      },
+      {
+        "fingerprint": "sha256:02590f9bbfb855e953255c111079dd0a3a57962703dba9f7fc7bd765bdd0303d",
+        "asset": "/images/pages/admin-analytics-hero.webp",
+        "aliases": [
+          "/images/pages/admin-analytics-hero.webp",
+          "/images/pages/admin-email-campaigns-new-detail.webp",
+          "/images/pages/banking-page-1.webp",
+          "/images/pages/certificates-page-1.webp",
+          "/images/pages/compliance-page-1.webp",
+          "/images/pages/program-holder-page-1.webp",
+          "/images/pages/store-recommendations.webp"
+        ],
+        "routes": [
+          "admin:/email-marketing/campaigns/new",
+          "lms:/apprentice",
+          "lms:/apprentice/dashboard",
+          "lms:/host-shop/dashboard",
+          "marketing:/banking",
+          "marketing:/blog/[slug]",
+          "marketing:/certificates",
+          "marketing:/certificates/verify/[certificateId]",
+          "marketing:/services",
+          "marketing:/store/add-ons/analytics-pro",
+          "marketing:/store/compliance/wcag",
+          "marketing:/wioa-eligibility"
+        ]
+      },
+      {
         "fingerprint": "sha256:f0976008753f6a4cc2675f8298754d1f320d40b794f2f81ab41db4ecea52cf16",
         "asset": "/images/programs/irs-enrolled-agent-ea.webp",
         "aliases": [
@@ -92,7 +147,6 @@
         "routes": [
           "marketing:/programs/[program]",
           "marketing:/programs/cdl-training",
-          "marketing:/programs/cna",
           "marketing:/programs/cosmetology-apprenticeship",
           "marketing:/programs/cpr-first-aid",
           "marketing:/programs/electrical",
@@ -101,29 +155,7 @@
           "marketing:/programs/medical-assistant",
           "marketing:/programs/nail-technician-apprenticeship",
           "marketing:/programs/peer-recovery-specialist",
-          "marketing:/programs/plumbing",
-          "marketing:/programs/qma"
-        ]
-      },
-      {
-        "fingerprint": "sha256:61e2efd358dfab3d3df826b5f2244dd52dff4174e19e88a70b2afb47971f0d13",
-        "asset": "/images/beauty/esthetician.webp",
-        "aliases": [
-          "/images/beauty/esthetician.webp",
-          "/images/beauty/esthetics-hero.webp",
-          "/images/beauty/program-beauty-training.webp"
-        ],
-        "routes": [
-          "lms:/apprentice/billing",
-          "marketing:/",
-          "marketing:/portal/barber",
-          "marketing:/portal/cosmetology",
-          "marketing:/portal/culinary",
-          "marketing:/portal/electrical",
-          "marketing:/portal/esthetician",
-          "marketing:/portal/nail-technician",
-          "marketing:/portal/plumbing",
-          "marketing:/programs/healthcare"
+          "marketing:/programs/plumbing"
         ]
       },
       {
@@ -149,28 +181,44 @@
         ]
       },
       {
-        "fingerprint": "sha256:02590f9bbfb855e953255c111079dd0a3a57962703dba9f7fc7bd765bdd0303d",
-        "asset": "/images/pages/admin-analytics-hero.webp",
+        "fingerprint": "sha256:8256545e7bcb75b94e40c00932484e119ca169dcfd7b7b41516b0f4a3f8f4449",
+        "asset": "/images/pages/about-hero.webp",
         "aliases": [
-          "/images/pages/admin-analytics-hero.webp",
-          "/images/pages/admin-email-campaigns-new-detail.webp",
-          "/images/pages/banking-page-1.webp",
-          "/images/pages/certificates-page-1.webp",
-          "/images/pages/compliance-page-1.webp",
-          "/images/pages/program-holder-page-1.webp",
-          "/images/pages/store-recommendations.webp"
+          "/images/pages/about-hero.webp",
+          "/images/pages/business-meeting.webp",
+          "/images/pages/staff-page-13.jpg",
+          "/images/pages/team-collaboration.webp"
         ],
         "routes": [
-          "admin:/email-marketing/campaigns/new",
-          "lms:/host-shop/dashboard",
-          "marketing:/banking",
-          "marketing:/blog/[slug]",
-          "marketing:/certificates",
-          "marketing:/certificates/verify/[certificateId]",
-          "marketing:/services",
-          "marketing:/store/add-ons/analytics-pro",
-          "marketing:/store/compliance/wcag",
-          "marketing:/wioa-eligibility"
+          "admin:/staff-portal/settings",
+          "lms:/lms/dashboard",
+          "lms:/parent-portal",
+          "lms:/program-holder/inbox",
+          "lms:/program-holder/meetings",
+          "marketing:/about/partners",
+          "marketing:/about/team/carlina-wilkes",
+          "marketing:/call-now",
+          "marketing:/career-services",
+          "marketing:/programs"
+        ]
+      },
+      {
+        "fingerprint": "sha256:61e2efd358dfab3d3df826b5f2244dd52dff4174e19e88a70b2afb47971f0d13",
+        "asset": "/images/beauty/esthetician.webp",
+        "aliases": [
+          "/images/beauty/esthetician.webp",
+          "/images/beauty/esthetics-hero.webp"
+        ],
+        "routes": [
+          "lms:/apprentice/billing",
+          "marketing:/portal/barber",
+          "marketing:/portal/cosmetology",
+          "marketing:/portal/culinary",
+          "marketing:/portal/electrical",
+          "marketing:/portal/esthetician",
+          "marketing:/portal/nail-technician",
+          "marketing:/portal/plumbing",
+          "marketing:/programs/healthcare"
         ]
       },
       {
@@ -183,6 +231,24 @@
         "routes": [
           "admin:/applications/review/[id]",
           "lms:/apprentice/billing",
+          "marketing:/portal/barber",
+          "marketing:/portal/cosmetology",
+          "marketing:/portal/culinary",
+          "marketing:/portal/electrical",
+          "marketing:/portal/esthetician",
+          "marketing:/portal/nail-technician",
+          "marketing:/portal/plumbing"
+        ]
+      },
+      {
+        "fingerprint": "sha256:a7f92bd0a910274b014d544df5d95360f21b1b44405d54300adcf27fb025445a",
+        "asset": "/images/pages/barber-hero.webp",
+        "aliases": [
+          "/images/pages/barber-hero.webp"
+        ],
+        "routes": [
+          "lms:/apprentice/billing",
+          "marketing:/booth-rental/apply",
           "marketing:/portal/barber",
           "marketing:/portal/cosmetology",
           "marketing:/portal/culinary",
@@ -212,26 +278,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:8256545e7bcb75b94e40c00932484e119ca169dcfd7b7b41516b0f4a3f8f4449",
-        "asset": "/images/pages/about-hero.webp",
-        "aliases": [
-          "/images/pages/about-hero.webp",
-          "/images/pages/business-meeting.webp",
-          "/images/pages/staff-page-13.jpg",
-          "/images/pages/team-collaboration.webp"
-        ],
-        "routes": [
-          "admin:/staff-portal/settings",
-          "lms:/lms/dashboard",
-          "lms:/parent-portal",
-          "marketing:/",
-          "marketing:/about/partners",
-          "marketing:/call-now",
-          "marketing:/career-services",
-          "marketing:/programs"
-        ]
-      },
-      {
         "fingerprint": "sha256:2ff1aa0333f5b6efdea83c5dacd52260eafe559c8ddfb76fa655bf2307a4651d",
         "asset": "/images/pages/admin-email-analytics-detail.webp",
         "aliases": [
@@ -250,23 +296,6 @@
           "marketing:/store/add-ons/analytics-pro",
           "marketing:/store/compliance/ferpa",
           "marketing:/tutoring"
-        ]
-      },
-      {
-        "fingerprint": "sha256:a7f92bd0a910274b014d544df5d95360f21b1b44405d54300adcf27fb025445a",
-        "asset": "/images/pages/barber-hero.webp",
-        "aliases": [
-          "/images/pages/barber-hero.webp"
-        ],
-        "routes": [
-          "lms:/apprentice/billing",
-          "marketing:/portal/barber",
-          "marketing:/portal/cosmetology",
-          "marketing:/portal/culinary",
-          "marketing:/portal/electrical",
-          "marketing:/portal/esthetician",
-          "marketing:/portal/nail-technician",
-          "marketing:/portal/plumbing"
         ]
       },
       {
@@ -321,6 +350,42 @@
         ]
       },
       {
+        "fingerprint": "sha256:e1924863be2d47785379aed7223ae614d7bc4474d5a1d35b9c10a41a5bc7ebe7",
+        "asset": "/images/pages/training-classroom.webp",
+        "aliases": [
+          "/images/pages/training-classroom.webp"
+        ],
+        "routes": [
+          "lms:/apprentice",
+          "lms:/apprentice/dashboard",
+          "lms:/apprentice/policies/payments",
+          "lms:/host-shop/dashboard",
+          "lms:/lms/dashboard",
+          "lms:/lms/quizzes",
+          "lms:/parent-portal",
+          "marketing:/call-now"
+        ]
+      },
+      {
+        "fingerprint": "sha256:282d8e16866b1ae8383d678852680a56052a024db59972cfe0433ee40e81e570",
+        "asset": "/images/pages/admin-email-automation-new-d2.webp",
+        "aliases": [
+          "/images/pages/admin-email-automation-new-d2.webp",
+          "/images/pages/competency-test-hero.webp",
+          "/images/pages/enrollment-agreement-page-1.webp",
+          "/images/pages/government-4.webp"
+        ],
+        "routes": [
+          "admin:/email-marketing/automation/new",
+          "lms:/apprentice",
+          "lms:/apprentice/dashboard",
+          "lms:/host-shop/dashboard",
+          "lms:/program-holder/airscript",
+          "marketing:/agencies",
+          "marketing:/onboarding/learner/agreements"
+        ]
+      },
+      {
         "fingerprint": "sha256:2b702ed39fb3f4055e9e5b39242553cfe5344a464183124db8ca5e6d89758e31",
         "asset": "/images/pages/career-services-page-1.webp",
         "aliases": [
@@ -334,22 +399,6 @@
           "marketing:/onboarding/learner/agreements",
           "marketing:/services",
           "marketing:/student-support"
-        ]
-      },
-      {
-        "fingerprint": "sha256:e1924863be2d47785379aed7223ae614d7bc4474d5a1d35b9c10a41a5bc7ebe7",
-        "asset": "/images/pages/training-classroom.webp",
-        "aliases": [
-          "/images/pages/training-classroom.webp"
-        ],
-        "routes": [
-          "lms:/apprentice",
-          "lms:/apprentice/policies/payments",
-          "lms:/host-shop/dashboard",
-          "lms:/lms/dashboard",
-          "lms:/lms/quizzes",
-          "lms:/parent-portal",
-          "marketing:/call-now"
         ]
       },
       {
@@ -378,33 +427,30 @@
           "/images/pages/admin-compliance-deletions-detail.webp",
           "/images/pages/admin-email-marketing-d2.webp",
           "/images/pages/admin/staff-portal-page-1.webp",
+          "/images/pages/contact-page-1.webp",
           "/images/pages/events-page-1.webp"
         ],
         "routes": [
-          "admin:/compliance/deletions",
           "admin:/email-marketing",
           "admin:/staff-portal",
           "marketing:/calendar",
+          "marketing:/contact",
           "marketing:/staff",
           "marketing:/store/compliance/grant-reporting"
         ]
       },
       {
-        "fingerprint": "sha256:457a7fd8f5c15872c2f81c54cd6edb05e95e7f334107fc025041daed27da9c3a",
-        "asset": "/images/pages/admin-external-progress-detail.webp",
+        "fingerprint": "sha256:f2ad4fcc1a51825bfcfbbf6d22a52727a1b76061a3a1fdb48876b2e187d6a3ee",
+        "asset": "/images/healthcare/program-cna-training.jpg",
         "aliases": [
-          "/images/pages/admin-external-progress-detail.webp",
-          "/images/pages/bookkeeping.webp",
-          "/images/pages/social-media-1.webp",
-          "/images/pages/verify-page-1.webp"
+          "/images/healthcare/program-cna-training.jpg"
         ],
         "routes": [
-          "admin:/blog/management/[slug]",
-          "admin:/external-progress",
-          "marketing:/",
-          "marketing:/blog/[slug]",
-          "marketing:/tutoring",
-          "marketing:/verify/[certificateId]"
+          "marketing:/programs/cna",
+          "marketing:/programs/healthcare-training",
+          "marketing:/programs/healthcare-training/[slug]",
+          "marketing:/programs/home-health-aide",
+          "marketing:/programs/qma"
         ]
       },
       {
@@ -439,20 +485,20 @@
         ]
       },
       {
-        "fingerprint": "sha256:282d8e16866b1ae8383d678852680a56052a024db59972cfe0433ee40e81e570",
-        "asset": "/images/pages/admin-email-automation-new-d2.webp",
+        "fingerprint": "sha256:457a7fd8f5c15872c2f81c54cd6edb05e95e7f334107fc025041daed27da9c3a",
+        "asset": "/images/pages/admin-external-progress-detail.webp",
         "aliases": [
-          "/images/pages/admin-email-automation-new-d2.webp",
-          "/images/pages/competency-test-hero.webp",
-          "/images/pages/enrollment-agreement-page-1.webp",
-          "/images/pages/government-4.webp"
+          "/images/pages/admin-external-progress-detail.webp",
+          "/images/pages/bookkeeping.webp",
+          "/images/pages/social-media-1.webp",
+          "/images/pages/verify-page-1.webp"
         ],
         "routes": [
-          "admin:/email-marketing/automation/new",
-          "lms:/apprentice",
-          "lms:/host-shop/dashboard",
-          "marketing:/agencies",
-          "marketing:/onboarding/learner/agreements"
+          "admin:/blog/management/[slug]",
+          "admin:/external-progress",
+          "marketing:/blog/[slug]",
+          "marketing:/tutoring",
+          "marketing:/verify/[certificateId]"
         ]
       },
       {
@@ -468,6 +514,33 @@
           "marketing:/onboarding/learner",
           "marketing:/services",
           "marketing:/writing-center"
+        ]
+      },
+      {
+        "fingerprint": "sha256:ae2d13ba1632e64e96b07de64fac30b2948f7c8157ff616a1002c0200f572ddd",
+        "asset": "/images/pages/community-page-1.webp",
+        "aliases": [
+          "/images/pages/community-page-1.webp"
+        ],
+        "routes": [
+          "marketing:/alumni",
+          "marketing:/business-network",
+          "marketing:/business-network/business-owners",
+          "marketing:/community-services",
+          "marketing:/philanthropy"
+        ]
+      },
+      {
+        "fingerprint": "sha256:a341e28ff6a0e0f53059c67c639031fa7b1af07d3173f410609552b827732d36",
+        "asset": "/images/business-training-vibrant-2026.webp",
+        "aliases": [
+          "/images/business-training-vibrant-2026.webp"
+        ],
+        "routes": [
+          "marketing:/",
+          "marketing:/jobs",
+          "marketing:/store/demo",
+          "marketing:/store/demos"
         ]
       },
       {
@@ -513,20 +586,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:f805533ab491d95fa54e2d4611c5f6a8ab5fd1277c58b0bbe464706d1f62ef77",
-        "asset": "/images/pages/admin-employers-hero.webp",
-        "aliases": [
-          "/images/pages/admin-employers-hero.webp",
-          "/images/pages/for-employers-page-1.webp"
-        ],
-        "routes": [
-          "lms:/host-shop/dashboard",
-          "marketing:/",
-          "marketing:/employers",
-          "marketing:/ojt-and-funding"
-        ]
-      },
-      {
         "fingerprint": "sha256:a770bc689040cde59de058054a8770dce9ad8100e0cf47a4e4db9a0ed8beb9a3",
         "asset": "/images/pages/adult-learner.webp",
         "aliases": [
@@ -540,6 +599,20 @@
         ]
       },
       {
+        "fingerprint": "sha256:00cbb1c0e60623e508c8f49a8a156fc919f945cbf6692e3344625f044128ff24",
+        "asset": "/images/pages/apply-employer-hero.jpg",
+        "aliases": [
+          "/images/pages/apply-employer-hero.jpg",
+          "/images/pages/apprenticeships-page-1.webp"
+        ],
+        "routes": [
+          "marketing:/about",
+          "marketing:/employers/post-job",
+          "marketing:/jobs",
+          "marketing:/platform/employer-portal"
+        ]
+      },
+      {
         "fingerprint": "sha256:0ff33c59f9435b60591bb92afd99016d50317d843189f9e995e0953ef9d9a91d",
         "asset": "/images/pages/apprenticeship-structure.webp",
         "aliases": [
@@ -547,9 +620,62 @@
         ],
         "routes": [
           "lms:/apprentice",
+          "lms:/apprentice/dashboard",
           "lms:/parent-portal",
-          "marketing:/",
           "marketing:/compliance/apprenticeship-structure"
+        ]
+      },
+      {
+        "fingerprint": "sha256:81e736fb75b18d8150899f9cec37cb0d1a641f450f8af67e15d915ca9e247283",
+        "asset": "/images/pages/barber-apprentice-learning.webp",
+        "aliases": [
+          "/images/pages/barber-apprentice-learning.webp",
+          "/images/pages/barber-gallery-1.webp"
+        ],
+        "routes": [
+          "lms:/host-shop/dashboard",
+          "lms:/host-shop/orientation",
+          "marketing:/business-network",
+          "marketing:/programs/barber-apprenticeship/apply"
+        ]
+      },
+      {
+        "fingerprint": "sha256:509e3fb32702f12cf27e61b1dbdcbd9f1853656a77d2e5883a5ec5dee1edc6b2",
+        "asset": "/images/pages/barber-hands-on-bright.webp",
+        "aliases": [
+          "/images/pages/barber-hands-on-bright.webp"
+        ],
+        "routes": [
+          "marketing:/",
+          "marketing:/barber-beauty-network",
+          "marketing:/partners/host-shops",
+          "marketing:/programs/barber-apprenticeship"
+        ]
+      },
+      {
+        "fingerprint": "sha256:fb855c2c63434cd922882f6feae251adb0cb6f2f85f9673fb1dee08406a1ea14",
+        "asset": "/images/pages/comp-home-highlight-success.webp",
+        "aliases": [
+          "/images/pages/comp-home-highlight-success.webp"
+        ],
+        "routes": [
+          "lms:/apprentice",
+          "lms:/apprentice/dashboard",
+          "lms:/host-shop/dashboard",
+          "lms:/lms/dashboard"
+        ]
+      },
+      {
+        "fingerprint": "sha256:a6b4c55abd2a6e3fad80831f6e0074b7b2df26ef994da193bd1f78e20c5caebd",
+        "asset": "/images/pages/employer-page-1.webp",
+        "aliases": [
+          "/images/pages/employer-page-1.webp"
+        ],
+        "routes": [
+          "lms:/employer/hours",
+          "marketing:/business-network",
+          "marketing:/employers",
+          "marketing:/platform/employer-portal"
         ]
       },
       {
@@ -563,6 +689,18 @@
           "marketing:/programs/hvac-technician/curriculum",
           "marketing:/store/courses/hvac-technician-course-license",
           "marketing:/tutoring"
+        ]
+      },
+      {
+        "fingerprint": "sha256:00a105ae9effe35747188c705258a97dd0febe111c6aa9226de81340ecebb19e",
+        "asset": "/images/bookkeeping-training-vibrant-2026.webp",
+        "aliases": [
+          "/images/bookkeeping-training-vibrant-2026.webp"
+        ],
+        "routes": [
+          "marketing:/",
+          "marketing:/store/demo",
+          "marketing:/store/demos"
         ]
       },
       {
@@ -602,6 +740,19 @@
           "admin:/blog/management/[slug]",
           "marketing:/agencies",
           "marketing:/founder"
+        ]
+      },
+      {
+        "fingerprint": "sha256:f805533ab491d95fa54e2d4611c5f6a8ab5fd1277c58b0bbe464706d1f62ef77",
+        "asset": "/images/pages/admin-employers-hero.webp",
+        "aliases": [
+          "/images/pages/admin-employers-hero.webp",
+          "/images/pages/for-employers-page-1.webp"
+        ],
+        "routes": [
+          "lms:/host-shop/dashboard",
+          "marketing:/business-network",
+          "marketing:/ojt-and-funding"
         ]
       },
       {
@@ -655,52 +806,15 @@
         ]
       },
       {
-        "fingerprint": "sha256:ae2d13ba1632e64e96b07de64fac30b2948f7c8157ff616a1002c0200f572ddd",
-        "asset": "/images/pages/community-page-1.webp",
+        "fingerprint": "sha256:435a42fcfdfddc0e6506511a6e523c82aefd10ed8698d73de8877a60572234db",
+        "asset": "/images/pages/career-services-page-7.webp",
         "aliases": [
-          "/images/pages/community-page-1.webp"
+          "/images/pages/career-services-page-7.webp"
         ],
         "routes": [
-          "marketing:/alumni",
-          "marketing:/community-services",
-          "marketing:/philanthropy"
-        ]
-      },
-      {
-        "fingerprint": "sha256:320fe5fcab981194f59ed317bfa8cc80d509221a3898ec2bdcb84c221201d5b0",
-        "asset": "/images/pages/community-page-2.webp",
-        "aliases": [
-          "/images/pages/community-page-2.webp"
-        ],
-        "routes": [
-          "marketing:/alumni",
-          "marketing:/community-services",
-          "marketing:/philanthropy"
-        ]
-      },
-      {
-        "fingerprint": "sha256:fb855c2c63434cd922882f6feae251adb0cb6f2f85f9673fb1dee08406a1ea14",
-        "asset": "/images/pages/comp-home-highlight-success.webp",
-        "aliases": [
-          "/images/pages/comp-home-highlight-success.webp"
-        ],
-        "routes": [
-          "lms:/apprentice",
           "lms:/host-shop/dashboard",
-          "lms:/lms/dashboard"
-        ]
-      },
-      {
-        "fingerprint": "sha256:bbaf4d207f28e298a18c93d20f74081bfbc39aaba317f79b98f6dce6d2a17c8b",
-        "asset": "/images/pages/funding-hero.webp",
-        "aliases": [
-          "/images/pages/funding-hero.webp",
-          "/images/pages/funding-page-1.webp"
-        ],
-        "routes": [
-          "marketing:/",
-          "marketing:/banking",
-          "marketing:/store/compliance/grant-reporting"
+          "lms:/lms/progress",
+          "marketing:/services"
         ]
       },
       {
@@ -728,15 +842,27 @@
         ]
       },
       {
-        "fingerprint": "sha256:445cb39842ede6395cba8245ba8309c32f0fb017f5dbbfa1fd178bbba628542a",
-        "asset": "/images/pages/platform-page-1.webp",
+        "fingerprint": "sha256:b7fcebbca7c3fc3a94ecc374e8dfd3c803c60bd5faee1fb6805207a4022f2764",
+        "asset": "/images/pages/orientation-page-1.webp",
         "aliases": [
-          "/images/pages/platform-page-1.webp"
+          "/images/pages/orientation-page-1.webp"
         ],
         "routes": [
-          "marketing:/platform/[slug]",
-          "marketing:/platform/sponsors",
-          "marketing:/store"
+          "lms:/enrollment/orientation",
+          "lms:/host-shop/dashboard",
+          "lms:/orientation/competency-test"
+        ]
+      },
+      {
+        "fingerprint": "sha256:508687a3bc06717e9849c2495ce24c4bf93460a0dd9b349498f12515d403c8d8",
+        "asset": "/images/pages/student-support-page-1.webp",
+        "aliases": [
+          "/images/pages/student-support-page-1.webp"
+        ],
+        "routes": [
+          "lms:/host-shop/dashboard",
+          "marketing:/employment-support",
+          "marketing:/student-support"
         ]
       },
       {
@@ -749,30 +875,6 @@
           "marketing:/store/testing",
           "marketing:/testing",
           "marketing:/testing/[provider]"
-        ]
-      },
-      {
-        "fingerprint": "sha256:064f325acfd26ca9996a807cd5167de5dfe9062c4148f4a676c43013b70aaa59",
-        "asset": "/images/pages/workforce-training.webp",
-        "aliases": [
-          "/images/pages/workforce-training.webp"
-        ],
-        "routes": [
-          "marketing:/",
-          "marketing:/call-now",
-          "marketing:/store/compliance/grant-reporting"
-        ]
-      },
-      {
-        "fingerprint": "sha256:c2b8257365613d122a895d01a1eafcfb9570304528c9421b0c401b42cc9af62b",
-        "asset": "/images/pexels/cosmetology.webp",
-        "aliases": [
-          "/images/pexels/cosmetology.webp"
-        ],
-        "routes": [
-          "marketing:/",
-          "marketing:/apprenticeships",
-          "marketing:/barber-and-beauty-apprenticeships"
         ]
       },
       {
@@ -843,24 +945,13 @@
         ]
       },
       {
-        "fingerprint": "sha256:45d53650db9862cfa821dc2193b87be50e08281a30a050207e6366bbc97f85fc",
-        "asset": "/images/hvac-hero.webp",
+        "fingerprint": "sha256:98df4fe0311213a95326b294ea20025037dab0cb995ec632cbd949c76af507fe",
+        "asset": "/images/hvac-training-vibrant-2026.webp",
         "aliases": [
-          "/images/hvac-hero.webp"
+          "/images/hvac-training-vibrant-2026.webp"
         ],
         "routes": [
           "marketing:/",
-          "marketing:/programs"
-        ]
-      },
-      {
-        "fingerprint": "sha256:f8b36c6f03c18441f5a04447c21b737a763d794dffc7721bedda7f62f862e783",
-        "asset": "/images/pages/admin-activity-hero.webp",
-        "aliases": [
-          "/images/pages/admin-activity-hero.webp"
-        ],
-        "routes": [
-          "admin:/studio/settings",
           "marketing:/store"
         ]
       },
@@ -876,30 +967,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:00cbb1c0e60623e508c8f49a8a156fc919f945cbf6692e3344625f044128ff24",
-        "asset": "/images/pages/apply-employer-hero.jpg",
-        "aliases": [
-          "/images/pages/apply-employer-hero.jpg",
-          "/images/pages/apprenticeships-page-1.webp"
-        ],
-        "routes": [
-          "marketing:/about",
-          "marketing:/platform/employer-portal"
-        ]
-      },
-      {
-        "fingerprint": "sha256:81e736fb75b18d8150899f9cec37cb0d1a641f450f8af67e15d915ca9e247283",
-        "asset": "/images/pages/barber-apprentice-learning.webp",
-        "aliases": [
-          "/images/pages/barber-apprentice-learning.webp",
-          "/images/pages/barber-gallery-1.webp"
-        ],
-        "routes": [
-          "lms:/host-shop/dashboard",
-          "marketing:/programs/barber-apprenticeship/apply"
-        ]
-      },
-      {
         "fingerprint": "sha256:637a194a6550a1627505647a328b8e06bd5c597a816e16e593185744ca6a2fc1",
         "asset": "/images/pages/barber-fade.webp",
         "aliases": [
@@ -911,36 +978,25 @@
         ]
       },
       {
-        "fingerprint": "sha256:7abe755f5ca91c44244d3de93c06e6e8105a187f7b8914f107757809cb4db55d",
-        "asset": "/images/pages/barber-shop-interior.webp",
+        "fingerprint": "sha256:0418a61a8e148a4176fa61ef8a65e53b7c2ec277f289074185fcbf162272b7fc",
+        "asset": "/images/pages/business-sector.webp",
         "aliases": [
-          "/images/pages/barber-shop-interior.webp"
+          "/images/pages/business-sector.webp"
         ],
         "routes": [
-          "marketing:/booth-rental/apply",
-          "marketing:/programs/barber-apprenticeship/apply"
+          "marketing:/business-network",
+          "marketing:/business-network/business-owners"
         ]
       },
       {
-        "fingerprint": "sha256:435a42fcfdfddc0e6506511a6e523c82aefd10ed8698d73de8877a60572234db",
-        "asset": "/images/pages/career-services-page-7.webp",
+        "fingerprint": "sha256:7d34bb06acc760afd9a64978ee5863b03d4d7981f02435bb7aa9461b8d6adcff",
+        "asset": "/images/pages/career-services-page-11.webp",
         "aliases": [
-          "/images/pages/career-services-page-7.webp"
+          "/images/pages/career-services-page-11.webp"
         ],
         "routes": [
-          "lms:/lms/progress",
-          "marketing:/services"
-        ]
-      },
-      {
-        "fingerprint": "sha256:64f7cd35bc07ada765f3b0d68532ddca0212e1145a724fd53b0a213585fa4328",
-        "asset": "/images/pages/cdl-loading-dock.webp",
-        "aliases": [
-          "/images/pages/cdl-loading-dock.webp"
-        ],
-        "routes": [
-          "marketing:/",
-          "marketing:/programs"
+          "lms:/program-holder/career",
+          "marketing:/onboarding/learner"
         ]
       },
       {
@@ -977,14 +1033,14 @@
         ]
       },
       {
-        "fingerprint": "sha256:a6b4c55abd2a6e3fad80831f6e0074b7b2df26ef994da193bd1f78e20c5caebd",
-        "asset": "/images/pages/employer-page-1.webp",
+        "fingerprint": "sha256:bbaf4d207f28e298a18c93d20f74081bfbc39aaba317f79b98f6dce6d2a17c8b",
+        "asset": "/images/pages/funding-page-1.webp",
         "aliases": [
-          "/images/pages/employer-page-1.webp"
+          "/images/pages/funding-page-1.webp"
         ],
         "routes": [
-          "lms:/employer/hours",
-          "marketing:/platform/employer-portal"
+          "marketing:/banking",
+          "marketing:/store/compliance/grant-reporting"
         ]
       },
       {
@@ -1065,17 +1121,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:b7fcebbca7c3fc3a94ecc374e8dfd3c803c60bd5faee1fb6805207a4022f2764",
-        "asset": "/images/pages/orientation-page-1.webp",
-        "aliases": [
-          "/images/pages/orientation-page-1.webp"
-        ],
-        "routes": [
-          "lms:/enrollment/orientation",
-          "lms:/orientation/competency-test"
-        ]
-      },
-      {
         "fingerprint": "sha256:1716d6f588dce4b4bd4ed2d437951f9b475165acca5aabdcd52227ee52bc3a7d",
         "asset": "/images/pages/orientation-page-2.webp",
         "aliases": [
@@ -1095,6 +1140,17 @@
         "routes": [
           "marketing:/banking",
           "marketing:/career-services/resume-building"
+        ]
+      },
+      {
+        "fingerprint": "sha256:445cb39842ede6395cba8245ba8309c32f0fb017f5dbbfa1fd178bbba628542a",
+        "asset": "/images/pages/platform-page-1.webp",
+        "aliases": [
+          "/images/pages/platform-page-1.webp"
+        ],
+        "routes": [
+          "marketing:/platform/[slug]",
+          "marketing:/platform/sponsors"
         ]
       },
       {
@@ -1175,17 +1231,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:508687a3bc06717e9849c2495ce24c4bf93460a0dd9b349498f12515d403c8d8",
-        "asset": "/images/pages/student-support-page-1.webp",
-        "aliases": [
-          "/images/pages/student-support-page-1.webp"
-        ],
-        "routes": [
-          "marketing:/employment-support",
-          "marketing:/student-support"
-        ]
-      },
-      {
         "fingerprint": "sha256:8d83748caaf309c9a697b99b8f5bbc4e4386a33a2e4fb1d8afb4087df231b674",
         "asset": "/images/pages/success-stories-hero.webp",
         "aliases": [
@@ -1219,6 +1264,17 @@
         ]
       },
       {
+        "fingerprint": "sha256:064f325acfd26ca9996a807cd5167de5dfe9062c4148f4a676c43013b70aaa59",
+        "asset": "/images/pages/workforce-training.webp",
+        "aliases": [
+          "/images/pages/workforce-training.webp"
+        ],
+        "routes": [
+          "marketing:/call-now",
+          "marketing:/store/compliance/grant-reporting"
+        ]
+      },
+      {
         "fingerprint": "sha256:44288a99e35a265cd71629828e4f4f3090f4318bf2e67d40b0760b7d06a39bd7",
         "asset": "/images/pages/writing-center-page-1.jpg",
         "aliases": [
@@ -1241,25 +1297,47 @@
         ]
       },
       {
+        "fingerprint": "sha256:98aa94e948841d85d8d477639d237fe6e8e058fe0f495df7a373bfdf82a5179d",
+        "asset": "/images/pexels/esthetician.webp",
+        "aliases": [
+          "/images/pexels/esthetician.webp"
+        ],
+        "routes": [
+          "marketing:/apprenticeships",
+          "marketing:/barber-and-beauty-apprenticeships"
+        ]
+      },
+      {
         "fingerprint": "sha256:98853e8dbcab57ae0a09bd0901b99ac3ad4a909b6d4ac01b6a8481c3630be114",
         "asset": "/images/pexels/nail-tech.webp",
         "aliases": [
           "/images/pexels/nail-tech.webp"
         ],
         "routes": [
-          "marketing:/",
-          "marketing:/apprenticeships"
+          "marketing:/apprenticeships",
+          "marketing:/barber-and-beauty-apprenticeships"
         ]
       },
       {
-        "fingerprint": "sha256:47606638e5600b92c60b33a52efa6a22ba702f4c31212cdfc3776c4375777a8d",
-        "asset": "/images/programs/financial-literacy-flyer.jpg",
+        "fingerprint": "sha256:d5ab104a3b7c710cf89c14c325f7a6b183cb4af66e1fe4ec02c14798486d4265",
+        "asset": "/images/tax/supersonic-tax-hero-2026.webp",
         "aliases": [
-          "/images/programs/financial-literacy-flyer.jpg"
+          "/images/tax/supersonic-tax-hero-2026.webp"
         ],
         "routes": [
-          "marketing:/about/team/carlina-wilkes",
-          "marketing:/programs/financial-literacy"
+          "marketing:/tax",
+          "marketing:/tax-software"
+        ]
+      },
+      {
+        "fingerprint": "sha256:c7003e19b900c3bf2102e166179f1f7acfff76fd194522e28c69bbd0e8fdc365",
+        "asset": "/images/tax/supersonic-tax-training-2026.webp",
+        "aliases": [
+          "/images/tax/supersonic-tax-training-2026.webp"
+        ],
+        "routes": [
+          "marketing:/",
+          "marketing:/tax-software/professional"
         ]
       }
     ],
@@ -1277,6 +1355,8 @@
         ],
         "routes": [
           "admin:/email-marketing/campaigns/new",
+          "lms:/apprentice",
+          "lms:/apprentice/dashboard",
           "lms:/host-shop/dashboard",
           "marketing:/banking",
           "marketing:/blog/[slug]",
@@ -1304,6 +1384,24 @@
           "marketing:/compliance/competency-verification",
           "marketing:/store/add-ons/analytics-pro",
           "marketing:/store/compliance/wcag"
+        ]
+      },
+      {
+        "fingerprint": "sha256:771bb203b074c7e39456fe93f599d139d0999ec48e8fe26a702083164a29e1a3",
+        "aliases": [
+          "/images/pages/admin-compliance-deletions-detail.webp",
+          "/images/pages/admin-email-marketing-d2.webp",
+          "/images/pages/admin/staff-portal-page-1.webp",
+          "/images/pages/contact-page-1.webp",
+          "/images/pages/events-page-1.webp"
+        ],
+        "routes": [
+          "admin:/email-marketing",
+          "admin:/staff-portal",
+          "marketing:/calendar",
+          "marketing:/contact",
+          "marketing:/staff",
+          "marketing:/store/compliance/grant-reporting"
         ]
       },
       {
@@ -1359,8 +1457,10 @@
           "admin:/staff-portal/settings",
           "lms:/lms/dashboard",
           "lms:/parent-portal",
-          "marketing:/",
+          "lms:/program-holder/inbox",
+          "lms:/program-holder/meetings",
           "marketing:/about/partners",
+          "marketing:/about/team/carlina-wilkes",
           "marketing:/call-now",
           "marketing:/career-services",
           "marketing:/programs"
@@ -1383,23 +1483,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:771bb203b074c7e39456fe93f599d139d0999ec48e8fe26a702083164a29e1a3",
-        "aliases": [
-          "/images/pages/admin-compliance-deletions-detail.webp",
-          "/images/pages/admin-email-marketing-d2.webp",
-          "/images/pages/admin/staff-portal-page-1.webp",
-          "/images/pages/events-page-1.webp"
-        ],
-        "routes": [
-          "admin:/compliance/deletions",
-          "admin:/email-marketing",
-          "admin:/staff-portal",
-          "marketing:/calendar",
-          "marketing:/staff",
-          "marketing:/store/compliance/grant-reporting"
-        ]
-      },
-      {
         "fingerprint": "sha256:282d8e16866b1ae8383d678852680a56052a024db59972cfe0433ee40e81e570",
         "aliases": [
           "/images/pages/admin-email-automation-new-d2.webp",
@@ -1410,7 +1493,9 @@
         "routes": [
           "admin:/email-marketing/automation/new",
           "lms:/apprentice",
+          "lms:/apprentice/dashboard",
           "lms:/host-shop/dashboard",
+          "lms:/program-holder/airscript",
           "marketing:/agencies",
           "marketing:/onboarding/learner/agreements"
         ]
@@ -1426,30 +1511,9 @@
         "routes": [
           "admin:/blog/management/[slug]",
           "admin:/external-progress",
-          "marketing:/",
           "marketing:/blog/[slug]",
           "marketing:/tutoring",
           "marketing:/verify/[certificateId]"
-        ]
-      },
-      {
-        "fingerprint": "sha256:61e2efd358dfab3d3df826b5f2244dd52dff4174e19e88a70b2afb47971f0d13",
-        "aliases": [
-          "/images/beauty/esthetician.webp",
-          "/images/beauty/esthetics-hero.webp",
-          "/images/beauty/program-beauty-training.webp"
-        ],
-        "routes": [
-          "lms:/apprentice/billing",
-          "marketing:/",
-          "marketing:/portal/barber",
-          "marketing:/portal/cosmetology",
-          "marketing:/portal/culinary",
-          "marketing:/portal/electrical",
-          "marketing:/portal/esthetician",
-          "marketing:/portal/nail-technician",
-          "marketing:/portal/plumbing",
-          "marketing:/programs/healthcare"
         ]
       },
       {
@@ -1504,6 +1568,24 @@
         ]
       },
       {
+        "fingerprint": "sha256:61e2efd358dfab3d3df826b5f2244dd52dff4174e19e88a70b2afb47971f0d13",
+        "aliases": [
+          "/images/beauty/esthetician.webp",
+          "/images/beauty/esthetics-hero.webp"
+        ],
+        "routes": [
+          "lms:/apprentice/billing",
+          "marketing:/portal/barber",
+          "marketing:/portal/cosmetology",
+          "marketing:/portal/culinary",
+          "marketing:/portal/electrical",
+          "marketing:/portal/esthetician",
+          "marketing:/portal/nail-technician",
+          "marketing:/portal/plumbing",
+          "marketing:/programs/healthcare"
+        ]
+      },
+      {
         "fingerprint": "sha256:c4061741f7d042d0c038864f5e6fa2630de82788a3027ad3ff20539bc51a4ec2",
         "aliases": [
           "/images/jozanna-george.jpg",
@@ -1554,8 +1636,7 @@
         ],
         "routes": [
           "lms:/host-shop/dashboard",
-          "marketing:/",
-          "marketing:/employers",
+          "marketing:/business-network",
           "marketing:/ojt-and-funding"
         ]
       },
@@ -1567,6 +1648,8 @@
         ],
         "routes": [
           "marketing:/about",
+          "marketing:/employers/post-job",
+          "marketing:/jobs",
           "marketing:/platform/employer-portal"
         ]
       },
@@ -1578,6 +1661,8 @@
         ],
         "routes": [
           "lms:/host-shop/dashboard",
+          "lms:/host-shop/orientation",
+          "marketing:/business-network",
           "marketing:/programs/barber-apprenticeship/apply"
         ]
       },
@@ -1593,18 +1678,6 @@
           "marketing:/onboarding/learner",
           "marketing:/services",
           "marketing:/writing-center"
-        ]
-      },
-      {
-        "fingerprint": "sha256:bbaf4d207f28e298a18c93d20f74081bfbc39aaba317f79b98f6dce6d2a17c8b",
-        "aliases": [
-          "/images/pages/funding-hero.webp",
-          "/images/pages/funding-page-1.webp"
-        ],
-        "routes": [
-          "marketing:/",
-          "marketing:/banking",
-          "marketing:/store/compliance/grant-reporting"
         ]
       },
       {
@@ -2580,7 +2653,7 @@
       "app": "marketing",
       "route": "/apprenticeships",
       "page": "apps/marketing/app/apprenticeships/page.tsx",
-      "componentFiles": 4,
+      "componentFiles": 5,
       "imageRefs": 5,
       "imageFingerprints": 5,
       "ownedImageRefs": 5,
@@ -2688,7 +2761,7 @@
       "app": "marketing",
       "route": "/apps/website-builder/edit/[websiteId]",
       "page": "apps/marketing/app/apps/website-builder/edit/[websiteId]/page.tsx",
-      "componentFiles": 11,
+      "componentFiles": 12,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -2700,7 +2773,7 @@
       "app": "marketing",
       "route": "/apps/website-builder/edit/[websiteId]/preview",
       "page": "apps/marketing/app/apps/website-builder/edit/[websiteId]/preview/page.tsx",
-      "componentFiles": 4,
+      "componentFiles": 5,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -2724,7 +2797,7 @@
       "app": "marketing",
       "route": "/apps/website-builder",
       "page": "apps/marketing/app/apps/website-builder/page.tsx",
-      "componentFiles": 5,
+      "componentFiles": 6,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -2808,13 +2881,13 @@
       "app": "marketing",
       "route": "/barber-and-beauty-apprenticeships",
       "page": "apps/marketing/app/barber-and-beauty-apprenticeships/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 1,
-      "imageFingerprints": 1,
-      "ownedImageRefs": 1,
-      "ownedImageFingerprints": 1,
-      "ownedHeroRefs": 1,
-      "ownedHeroFingerprints": 1
+      "componentFiles": 2,
+      "imageRefs": 2,
+      "imageFingerprints": 2,
+      "ownedImageRefs": 2,
+      "ownedImageFingerprints": 2,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
     },
     {
       "app": "marketing",
@@ -2830,8 +2903,32 @@
     },
     {
       "app": "marketing",
+      "route": "/barber-beauty-network",
+      "page": "apps/marketing/app/barber-beauty-network/page.tsx",
+      "componentFiles": 7,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
       "route": "/beauty-checkout",
       "page": "apps/marketing/app/beauty-checkout/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/billing",
+      "page": "apps/marketing/app/billing/page.tsx",
       "componentFiles": 1,
       "imageRefs": 0,
       "imageFingerprints": 0,
@@ -3007,6 +3104,42 @@
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
       "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/business-network/business-owners",
+      "page": "apps/marketing/app/business-network/business-owners/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 2,
+      "imageFingerprints": 2,
+      "ownedImageRefs": 2,
+      "ownedImageFingerprints": 2,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
+    },
+    {
+      "app": "marketing",
+      "route": "/business-network/join",
+      "page": "apps/marketing/app/business-network/join/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/business-network",
+      "page": "apps/marketing/app/business-network/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 6,
+      "imageFingerprints": 6,
+      "ownedImageRefs": 6,
+      "ownedImageFingerprints": 6,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
     },
     {
       "app": "marketing",
@@ -3526,6 +3659,18 @@
     },
     {
       "app": "marketing",
+      "route": "/community",
+      "page": "apps/marketing/app/community/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
       "route": "/community-services/[state]",
       "page": "apps/marketing/app/community-services/[state]/page.tsx",
       "componentFiles": 7,
@@ -3996,13 +4141,13 @@
       "app": "marketing",
       "route": "/contact",
       "page": "apps/marketing/app/contact/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
+      "componentFiles": 2,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
     },
     {
       "app": "marketing",
@@ -4477,12 +4622,12 @@
       "route": "/employers/post-job",
       "page": "apps/marketing/app/employers/post-job/page.tsx",
       "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
     },
     {
       "app": "marketing",
@@ -5004,13 +5149,13 @@
       "app": "marketing",
       "route": "/funding",
       "page": "apps/marketing/app/funding/page.tsx",
-      "componentFiles": 3,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
+      "componentFiles": 4,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
     },
     {
       "app": "marketing",
@@ -5053,6 +5198,18 @@
       "route": "/funding/wrg",
       "page": "apps/marketing/app/funding/wrg/page.tsx",
       "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/gary-indiana",
+      "page": "apps/marketing/app/gary-indiana/page.tsx",
+      "componentFiles": 1,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -5316,7 +5473,7 @@
       "app": "marketing",
       "route": "/host-shops/[slug]",
       "page": "apps/marketing/app/host-shops/[slug]/page.tsx",
-      "componentFiles": 2,
+      "componentFiles": 4,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -5485,12 +5642,12 @@
       "route": "/jobs",
       "page": "apps/marketing/app/jobs/page.tsx",
       "componentFiles": 2,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
+      "imageRefs": 3,
+      "imageFingerprints": 3,
+      "ownedImageRefs": 3,
+      "ownedImageFingerprints": 3,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
     },
     {
       "app": "marketing",
@@ -6012,13 +6169,13 @@
       "app": "marketing",
       "route": "/meri-gold-round",
       "page": "apps/marketing/app/meri-gold-round/page.tsx",
-      "componentFiles": 3,
-      "imageRefs": 4,
-      "imageFingerprints": 4,
-      "ownedImageRefs": 4,
-      "ownedImageFingerprints": 4,
-      "ownedHeroRefs": 1,
-      "ownedHeroFingerprints": 1
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
     },
     {
       "app": "marketing",
@@ -6372,7 +6529,7 @@
       "app": "marketing",
       "route": "/onboarding/learner/verify-identity",
       "page": "apps/marketing/app/onboarding/learner/verify-identity/page.tsx",
-      "componentFiles": 4,
+      "componentFiles": 3,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -6516,9 +6673,9 @@
       "app": "marketing",
       "route": "/",
       "page": "apps/marketing/app/page.tsx",
-      "componentFiles": 13,
-      "imageRefs": 13,
-      "imageFingerprints": 12,
+      "componentFiles": 7,
+      "imageRefs": 9,
+      "imageFingerprints": 9,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -6744,7 +6901,7 @@
       "app": "marketing",
       "route": "/partners/host-shops/indiana/[city]",
       "page": "apps/marketing/app/partners/host-shops/indiana/[city]/page.tsx",
-      "componentFiles": 2,
+      "componentFiles": 1,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -6756,11 +6913,11 @@
       "app": "marketing",
       "route": "/partners/host-shops",
       "page": "apps/marketing/app/partners/host-shops/page.tsx",
-      "componentFiles": 4,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
+      "componentFiles": 7,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
       "ownedHeroRefs": 0,
       "ownedHeroFingerprints": 0
     },
@@ -7260,7 +7417,7 @@
       "app": "marketing",
       "route": "/portal/barber",
       "page": "apps/marketing/app/portal/barber/page.tsx",
-      "componentFiles": 7,
+      "componentFiles": 8,
       "imageRefs": 7,
       "imageFingerprints": 7,
       "ownedImageRefs": 0,
@@ -7272,7 +7429,7 @@
       "app": "marketing",
       "route": "/portal/cosmetology",
       "page": "apps/marketing/app/portal/cosmetology/page.tsx",
-      "componentFiles": 7,
+      "componentFiles": 8,
       "imageRefs": 7,
       "imageFingerprints": 7,
       "ownedImageRefs": 0,
@@ -7284,7 +7441,7 @@
       "app": "marketing",
       "route": "/portal/culinary",
       "page": "apps/marketing/app/portal/culinary/page.tsx",
-      "componentFiles": 7,
+      "componentFiles": 8,
       "imageRefs": 7,
       "imageFingerprints": 7,
       "ownedImageRefs": 0,
@@ -7296,7 +7453,7 @@
       "app": "marketing",
       "route": "/portal/electrical",
       "page": "apps/marketing/app/portal/electrical/page.tsx",
-      "componentFiles": 7,
+      "componentFiles": 8,
       "imageRefs": 7,
       "imageFingerprints": 7,
       "ownedImageRefs": 0,
@@ -7308,7 +7465,7 @@
       "app": "marketing",
       "route": "/portal/esthetician",
       "page": "apps/marketing/app/portal/esthetician/page.tsx",
-      "componentFiles": 7,
+      "componentFiles": 8,
       "imageRefs": 7,
       "imageFingerprints": 7,
       "ownedImageRefs": 0,
@@ -7320,7 +7477,7 @@
       "app": "marketing",
       "route": "/portal/nail-technician",
       "page": "apps/marketing/app/portal/nail-technician/page.tsx",
-      "componentFiles": 7,
+      "componentFiles": 8,
       "imageRefs": 7,
       "imageFingerprints": 7,
       "ownedImageRefs": 0,
@@ -7344,7 +7501,7 @@
       "app": "marketing",
       "route": "/portal/plumbing",
       "page": "apps/marketing/app/portal/plumbing/page.tsx",
-      "componentFiles": 7,
+      "componentFiles": 8,
       "imageRefs": 7,
       "imageFingerprints": 7,
       "ownedImageRefs": 0,
@@ -7620,7 +7777,7 @@
       "app": "marketing",
       "route": "/programs/[program]",
       "page": "apps/marketing/app/programs/[program]/page.tsx",
-      "componentFiles": 11,
+      "componentFiles": 14,
       "imageRefs": 3,
       "imageFingerprints": 3,
       "ownedImageRefs": 2,
@@ -7740,7 +7897,7 @@
       "app": "marketing",
       "route": "/programs/barber-apprenticeship/enrollment-success",
       "page": "apps/marketing/app/programs/barber-apprenticeship/enrollment-success/page.tsx",
-      "componentFiles": 1,
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -7776,7 +7933,7 @@
       "app": "marketing",
       "route": "/programs/barber-apprenticeship",
       "page": "apps/marketing/app/programs/barber-apprenticeship/page.tsx",
-      "componentFiles": 11,
+      "componentFiles": 15,
       "imageRefs": 3,
       "imageFingerprints": 3,
       "ownedImageRefs": 3,
@@ -7860,7 +8017,7 @@
       "app": "marketing",
       "route": "/programs/cdl-training",
       "page": "apps/marketing/app/programs/cdl-training/page.tsx",
-      "componentFiles": 10,
+      "componentFiles": 12,
       "imageRefs": 1,
       "imageFingerprints": 1,
       "ownedImageRefs": 0,
@@ -7908,7 +8065,7 @@
       "app": "marketing",
       "route": "/programs/cna",
       "page": "apps/marketing/app/programs/cna/page.tsx",
-      "componentFiles": 10,
+      "componentFiles": 2,
       "imageRefs": 1,
       "imageFingerprints": 1,
       "ownedImageRefs": 0,
@@ -7968,7 +8125,7 @@
       "app": "marketing",
       "route": "/programs/cosmetology-apprenticeship/enrollment-success",
       "page": "apps/marketing/app/programs/cosmetology-apprenticeship/enrollment-success/page.tsx",
-      "componentFiles": 1,
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -7992,7 +8149,7 @@
       "app": "marketing",
       "route": "/programs/cosmetology-apprenticeship",
       "page": "apps/marketing/app/programs/cosmetology-apprenticeship/page.tsx",
-      "componentFiles": 16,
+      "componentFiles": 23,
       "imageRefs": 1,
       "imageFingerprints": 1,
       "ownedImageRefs": 0,
@@ -8040,7 +8197,7 @@
       "app": "marketing",
       "route": "/programs/cpr-first-aid",
       "page": "apps/marketing/app/programs/cpr-first-aid/page.tsx",
-      "componentFiles": 10,
+      "componentFiles": 12,
       "imageRefs": 1,
       "imageFingerprints": 1,
       "ownedImageRefs": 0,
@@ -8064,9 +8221,93 @@
       "app": "marketing",
       "route": "/programs/electrical",
       "page": "apps/marketing/app/programs/electrical/page.tsx",
-      "componentFiles": 10,
+      "componentFiles": 12,
       "imageRefs": 1,
       "imageFingerprints": 1,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/programs/enchanted-hearts-cna-fast-track",
+      "page": "apps/marketing/app/programs/enchanted-hearts-cna-fast-track/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/programs/enchanted-hearts-cna-qma-remediation",
+      "page": "apps/marketing/app/programs/enchanted-hearts-cna-qma-remediation/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/programs/enchanted-hearts-cpr-certification",
+      "page": "apps/marketing/app/programs/enchanted-hearts-cpr-certification/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/programs/enchanted-hearts-cpr-instructor",
+      "page": "apps/marketing/app/programs/enchanted-hearts-cpr-instructor/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/programs/enchanted-hearts-qma-insulin",
+      "page": "apps/marketing/app/programs/enchanted-hearts-qma-insulin/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/programs/enchanted-hearts-skills-lab",
+      "page": "apps/marketing/app/programs/enchanted-hearts-skills-lab/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/programs/enchanted-hearts-tb-validation",
+      "page": "apps/marketing/app/programs/enchanted-hearts-tb-validation/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -8136,7 +8377,7 @@
       "app": "marketing",
       "route": "/programs/esthetician-apprenticeship/enrollment-success",
       "page": "apps/marketing/app/programs/esthetician-apprenticeship/enrollment-success/page.tsx",
-      "componentFiles": 1,
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -8160,7 +8401,7 @@
       "app": "marketing",
       "route": "/programs/esthetician-apprenticeship",
       "page": "apps/marketing/app/programs/esthetician-apprenticeship/page.tsx",
-      "componentFiles": 17,
+      "componentFiles": 23,
       "imageRefs": 2,
       "imageFingerprints": 2,
       "ownedImageRefs": 0,
@@ -8206,6 +8447,42 @@
     },
     {
       "app": "marketing",
+      "route": "/programs/healthcare-training/[slug]",
+      "page": "apps/marketing/app/programs/healthcare-training/[slug]/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/programs/healthcare-training",
+      "page": "apps/marketing/app/programs/healthcare-training/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/programs/home-health-aide",
+      "page": "apps/marketing/app/programs/home-health-aide/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
       "route": "/programs/hvac-technician/apply/success",
       "page": "apps/marketing/app/programs/hvac-technician/apply/success/page.tsx",
       "componentFiles": 1,
@@ -8232,7 +8509,7 @@
       "app": "marketing",
       "route": "/programs/hvac-technician",
       "page": "apps/marketing/app/programs/hvac-technician/page.tsx",
-      "componentFiles": 10,
+      "componentFiles": 12,
       "imageRefs": 1,
       "imageFingerprints": 1,
       "ownedImageRefs": 0,
@@ -8268,7 +8545,7 @@
       "app": "marketing",
       "route": "/programs/medical-assistant",
       "page": "apps/marketing/app/programs/medical-assistant/page.tsx",
-      "componentFiles": 10,
+      "componentFiles": 12,
       "imageRefs": 1,
       "imageFingerprints": 1,
       "ownedImageRefs": 0,
@@ -8292,7 +8569,7 @@
       "app": "marketing",
       "route": "/programs/nail-technician-apprenticeship",
       "page": "apps/marketing/app/programs/nail-technician-apprenticeship/page.tsx",
-      "componentFiles": 17,
+      "componentFiles": 23,
       "imageRefs": 1,
       "imageFingerprints": 1,
       "ownedImageRefs": 0,
@@ -8340,7 +8617,7 @@
       "app": "marketing",
       "route": "/programs/peer-recovery-specialist",
       "page": "apps/marketing/app/programs/peer-recovery-specialist/page.tsx",
-      "componentFiles": 10,
+      "componentFiles": 12,
       "imageRefs": 1,
       "imageFingerprints": 1,
       "ownedImageRefs": 0,
@@ -8364,7 +8641,7 @@
       "app": "marketing",
       "route": "/programs/plumbing",
       "page": "apps/marketing/app/programs/plumbing/page.tsx",
-      "componentFiles": 10,
+      "componentFiles": 12,
       "imageRefs": 1,
       "imageFingerprints": 1,
       "ownedImageRefs": 0,
@@ -8400,7 +8677,7 @@
       "app": "marketing",
       "route": "/programs/qma",
       "page": "apps/marketing/app/programs/qma/page.tsx",
-      "componentFiles": 10,
+      "componentFiles": 2,
       "imageRefs": 1,
       "imageFingerprints": 1,
       "ownedImageRefs": 0,
@@ -8832,7 +9109,7 @@
       "app": "marketing",
       "route": "/sites/[subdomain]/[[...slug]]",
       "page": "apps/marketing/app/sites/[subdomain]/[[...slug]]/page.tsx",
-      "componentFiles": 3,
+      "componentFiles": 4,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -9685,8 +9962,8 @@
       "route": "/store/demo",
       "page": "apps/marketing/app/store/demo/page.tsx",
       "componentFiles": 6,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
+      "imageRefs": 2,
+      "imageFingerprints": 2,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -9721,12 +9998,12 @@
       "route": "/store/demos",
       "page": "apps/marketing/app/store/demos/page.tsx",
       "componentFiles": 5,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
+      "imageRefs": 2,
+      "imageFingerprints": 2,
+      "ownedImageRefs": 2,
+      "ownedImageFingerprints": 2,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
     },
     {
       "app": "marketing",
@@ -10078,6 +10355,18 @@
     },
     {
       "app": "marketing",
+      "route": "/store/proof",
+      "page": "apps/marketing/app/store/proof/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
       "route": "/store/sam-gov-assistant",
       "page": "apps/marketing/app/store/sam-gov-assistant/page.tsx",
       "componentFiles": 2,
@@ -10306,6 +10595,162 @@
     },
     {
       "app": "marketing",
+      "route": "/tax",
+      "page": "apps/marketing/app/tax/page.tsx",
+      "componentFiles": 3,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/tax-software/about",
+      "page": "apps/marketing/app/tax-software/about/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/tax-software/bank-products",
+      "page": "apps/marketing/app/tax-software/bank-products/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/tax-software/contact",
+      "page": "apps/marketing/app/tax-software/contact/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/tax-software/demo",
+      "page": "apps/marketing/app/tax-software/demo/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/tax-software/features",
+      "page": "apps/marketing/app/tax-software/features/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/tax-software/login",
+      "page": "apps/marketing/app/tax-software/login/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/tax-software",
+      "page": "apps/marketing/app/tax-software/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
+    },
+    {
+      "app": "marketing",
+      "route": "/tax-software/pricing",
+      "page": "apps/marketing/app/tax-software/pricing/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/tax-software/professional",
+      "page": "apps/marketing/app/tax-software/professional/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
+    },
+    {
+      "app": "marketing",
+      "route": "/tax-software/self-file",
+      "page": "apps/marketing/app/tax-software/self-file/page.tsx",
+      "componentFiles": 3,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/tax-software/self-file/return",
+      "page": "apps/marketing/app/tax-software/self-file/return/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/tax-software/self-file/w2/confirm",
+      "page": "apps/marketing/app/tax-software/self-file/w2/confirm/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
       "route": "/team",
       "page": "apps/marketing/app/team/page.tsx",
       "componentFiles": 2,
@@ -10320,7 +10765,7 @@
       "app": "marketing",
       "route": "/tenant-site/[[...slug]]",
       "page": "apps/marketing/app/tenant-site/[[...slug]]/page.tsx",
-      "componentFiles": 3,
+      "componentFiles": 4,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -10476,6 +10921,18 @@
       "app": "marketing",
       "route": "/testing-center",
       "page": "apps/marketing/app/testing-center/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/texas",
+      "page": "apps/marketing/app/texas/page.tsx",
       "componentFiles": 1,
       "imageRefs": 0,
       "imageFingerprints": 0,
@@ -10968,7 +11425,7 @@
       "app": "lms",
       "route": "/account/payment-methods",
       "page": "apps/lms/app/account/payment-methods/page.tsx",
-      "componentFiles": 2,
+      "componentFiles": 4,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -11182,6 +11639,18 @@
     },
     {
       "app": "lms",
+      "route": "/apprentice/analytics",
+      "page": "apps/lms/app/apprentice/analytics/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
       "route": "/apprentice/attendance",
       "page": "apps/lms/app/apprentice/attendance/page.tsx",
       "componentFiles": 1,
@@ -11196,7 +11665,7 @@
       "app": "lms",
       "route": "/apprentice/billing",
       "page": "apps/lms/app/apprentice/billing/page.tsx",
-      "componentFiles": 6,
+      "componentFiles": 9,
       "imageRefs": 7,
       "imageFingerprints": 7,
       "ownedImageRefs": 0,
@@ -11232,9 +11701,9 @@
       "app": "lms",
       "route": "/apprentice/dashboard",
       "page": "apps/lms/app/apprentice/dashboard/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
+      "componentFiles": 4,
+      "imageRefs": 5,
+      "imageFingerprints": 5,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -11316,11 +11785,11 @@
       "app": "lms",
       "route": "/apprentice",
       "page": "apps/lms/app/apprentice/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 4,
-      "imageFingerprints": 4,
-      "ownedImageRefs": 4,
-      "ownedImageFingerprints": 4,
+      "componentFiles": 3,
+      "imageRefs": 5,
+      "imageFingerprints": 5,
+      "ownedImageRefs": 5,
+      "ownedImageFingerprints": 5,
       "ownedHeroRefs": 0,
       "ownedHeroFingerprints": 0
     },
@@ -11328,7 +11797,7 @@
       "app": "lms",
       "route": "/apprentice/policies/payments",
       "page": "apps/lms/app/apprentice/policies/payments/page.tsx",
-      "componentFiles": 2,
+      "componentFiles": 3,
       "imageRefs": 1,
       "imageFingerprints": 1,
       "ownedImageRefs": 1,
@@ -11484,7 +11953,7 @@
       "app": "lms",
       "route": "/billing",
       "page": "apps/lms/app/billing/page.tsx",
-      "componentFiles": 2,
+      "componentFiles": 4,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -11569,6 +12038,30 @@
       "route": "/checkout/success",
       "page": "apps/lms/app/checkout/success/page.tsx",
       "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/communications/phone",
+      "page": "apps/lms/app/communications/phone/page.tsx",
+      "componentFiles": 5,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/community",
+      "page": "apps/lms/app/community/page.tsx",
+      "componentFiles": 3,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -11722,6 +12215,18 @@
     },
     {
       "app": "lms",
+      "route": "/employer/community",
+      "page": "apps/lms/app/employer/community/page.tsx",
+      "componentFiles": 3,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
       "route": "/employer/company",
       "page": "apps/lms/app/employer/company/page.tsx",
       "componentFiles": 1,
@@ -11748,7 +12253,7 @@
       "app": "lms",
       "route": "/employer/dashboard",
       "page": "apps/lms/app/employer/dashboard/page.tsx",
-      "componentFiles": 3,
+      "componentFiles": 4,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -12130,6 +12635,30 @@
     },
     {
       "app": "lms",
+      "route": "/host-shop/dashboard/communications",
+      "page": "apps/lms/app/host-shop/dashboard/communications/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/host-shop/dashboard/community",
+      "page": "apps/lms/app/host-shop/dashboard/community/page.tsx",
+      "componentFiles": 3,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
       "route": "/host-shop/dashboard/competencies",
       "page": "apps/lms/app/host-shop/dashboard/competencies/page.tsx",
       "componentFiles": 1,
@@ -12216,13 +12745,25 @@
       "app": "lms",
       "route": "/host-shop/dashboard",
       "page": "apps/lms/app/host-shop/dashboard/page.tsx",
-      "componentFiles": 4,
-      "imageRefs": 14,
-      "imageFingerprints": 14,
-      "ownedImageRefs": 14,
-      "ownedImageFingerprints": 14,
+      "componentFiles": 10,
+      "imageRefs": 17,
+      "imageFingerprints": 17,
+      "ownedImageRefs": 17,
+      "ownedImageFingerprints": 17,
       "ownedHeroRefs": 1,
       "ownedHeroFingerprints": 1
+    },
+    {
+      "app": "lms",
+      "route": "/host-shop/dashboard/phone",
+      "page": "apps/lms/app/host-shop/dashboard/phone/page.tsx",
+      "componentFiles": 5,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
     },
     {
       "app": "lms",
@@ -12370,6 +12911,18 @@
     },
     {
       "app": "lms",
+      "route": "/host-shop/email",
+      "page": "apps/lms/app/host-shop/email/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
       "route": "/host-shop/login",
       "page": "apps/lms/app/host-shop/login/page.tsx",
       "componentFiles": 1,
@@ -12445,10 +12998,10 @@
       "route": "/host-shop/orientation",
       "page": "apps/lms/app/host-shop/orientation/page.tsx",
       "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
       "ownedHeroRefs": 0,
       "ownedHeroFingerprints": 0
     },
@@ -12541,6 +13094,18 @@
       "route": "/learner/dashboard",
       "page": "apps/lms/app/learner/dashboard/page.tsx",
       "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/learner-testing/[runId]",
+      "page": "apps/lms/app/learner-testing/[runId]/page.tsx",
+      "componentFiles": 3,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -12816,13 +13381,13 @@
       "app": "lms",
       "route": "/lms/dashboard",
       "page": "apps/lms/app/lms/(app)/dashboard/page.tsx",
-      "componentFiles": 5,
-      "imageRefs": 7,
-      "imageFingerprints": 7,
-      "ownedImageRefs": 7,
-      "ownedImageFingerprints": 7,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
+      "componentFiles": 7,
+      "imageRefs": 9,
+      "imageFingerprints": 9,
+      "ownedImageRefs": 9,
+      "ownedImageFingerprints": 9,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
     },
     {
       "app": "lms",
@@ -13018,6 +13583,18 @@
     },
     {
       "app": "lms",
+      "route": "/lms/meetings/[roomId]",
+      "page": "apps/lms/app/lms/(app)/meetings/[roomId]/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
       "route": "/lms/members/[id]",
       "page": "apps/lms/app/lms/(app)/members/[id]/page.tsx",
       "componentFiles": 2,
@@ -13140,7 +13717,7 @@
       "app": "lms",
       "route": "/lms/payments",
       "page": "apps/lms/app/lms/(app)/payments/page.tsx",
-      "componentFiles": 1,
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -13582,6 +14159,18 @@
     },
     {
       "app": "lms",
+      "route": "/partner/dashboard",
+      "page": "apps/lms/app/partner/dashboard/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
       "route": "/partner-learning/[enrollmentId]",
       "page": "apps/lms/app/partner-learning/[enrollmentId]/page.tsx",
       "componentFiles": 1,
@@ -13786,11 +14375,47 @@
     },
     {
       "app": "lms",
+      "route": "/program-holder/airscript",
+      "page": "apps/lms/app/program-holder/airscript/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/career",
+      "page": "apps/lms/app/program-holder/career/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/community",
+      "page": "apps/lms/app/program-holder/community/page.tsx",
+      "componentFiles": 3,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
+    },
+    {
+      "app": "lms",
       "route": "/program-holder/compliance",
       "page": "apps/lms/app/program-holder/compliance/page.tsx",
-      "componentFiles": 14,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
+      "componentFiles": 18,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -13800,9 +14425,9 @@
       "app": "lms",
       "route": "/program-holder/dashboard",
       "page": "apps/lms/app/program-holder/dashboard/page.tsx",
-      "componentFiles": 15,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
+      "componentFiles": 20,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -13824,9 +14449,33 @@
       "app": "lms",
       "route": "/program-holder/documents",
       "page": "apps/lms/app/program-holder/documents/page.tsx",
-      "componentFiles": 14,
+      "componentFiles": 18,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/email",
+      "page": "apps/lms/app/program-holder/email/page.tsx",
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/gary-launch",
+      "page": "apps/lms/app/program-holder/gary-launch/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -13848,9 +14497,9 @@
       "app": "lms",
       "route": "/program-holder/hours",
       "page": "apps/lms/app/program-holder/hours/page.tsx",
-      "componentFiles": 14,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
+      "componentFiles": 18,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -13873,6 +14522,18 @@
       "route": "/program-holder/inbox",
       "page": "apps/lms/app/program-holder/inbox/page.tsx",
       "componentFiles": 2,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/meetings/[roomId]",
+      "page": "apps/lms/app/program-holder/meetings/[roomId]/page.tsx",
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -13885,8 +14546,8 @@
       "route": "/program-holder/meetings",
       "page": "apps/lms/app/program-holder/meetings/page.tsx",
       "componentFiles": 2,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -13918,9 +14579,33 @@
     },
     {
       "app": "lms",
+      "route": "/program-holder",
+      "page": "apps/lms/app/program-holder/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
       "route": "/program-holder/payouts",
       "page": "apps/lms/app/program-holder/payouts/page.tsx",
-      "componentFiles": 15,
+      "componentFiles": 19,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/phone",
+      "page": "apps/lms/app/program-holder/phone/page.tsx",
+      "componentFiles": 5,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -13980,9 +14665,9 @@
       "app": "lms",
       "route": "/program-holder/programs",
       "page": "apps/lms/app/program-holder/programs/page.tsx",
-      "componentFiles": 14,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
+      "componentFiles": 18,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -13992,9 +14677,9 @@
       "app": "lms",
       "route": "/program-holder/reports",
       "page": "apps/lms/app/program-holder/reports/page.tsx",
-      "componentFiles": 14,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
+      "componentFiles": 18,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -14016,9 +14701,9 @@
       "app": "lms",
       "route": "/program-holder/settings",
       "page": "apps/lms/app/program-holder/settings/page.tsx",
-      "componentFiles": 14,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
+      "componentFiles": 18,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -14040,9 +14725,9 @@
       "app": "lms",
       "route": "/program-holder/students/at-risk",
       "page": "apps/lms/app/program-holder/students/at-risk/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
+      "componentFiles": 18,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -14052,9 +14737,9 @@
       "app": "lms",
       "route": "/program-holder/students",
       "page": "apps/lms/app/program-holder/students/page.tsx",
-      "componentFiles": 14,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
+      "componentFiles": 18,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -14064,9 +14749,9 @@
       "app": "lms",
       "route": "/program-holder/students/pending",
       "page": "apps/lms/app/program-holder/students/pending/page.tsx",
-      "componentFiles": 14,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
+      "componentFiles": 18,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,
@@ -14616,7 +15301,7 @@
       "app": "admin",
       "route": "/analytics/traffic",
       "page": "apps/admin/app/analytics/traffic/page.tsx",
-      "componentFiles": 1,
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -14892,7 +15577,7 @@
       "app": "admin",
       "route": "/billing/subscriptions",
       "page": "apps/admin/app/billing/subscriptions/page.tsx",
-      "componentFiles": 4,
+      "componentFiles": 5,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -15181,12 +15866,12 @@
       "route": "/compliance/deletions",
       "page": "apps/admin/app/compliance/deletions/page.tsx",
       "componentFiles": 1,
-      "imageRefs": 1,
-      "imageFingerprints": 1,
-      "ownedImageRefs": 1,
-      "ownedImageFingerprints": 1,
-      "ownedHeroRefs": 1,
-      "ownedHeroFingerprints": 1
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
     },
     {
       "app": "admin",
@@ -15708,7 +16393,7 @@
       "app": "admin",
       "route": "/dashboard",
       "page": "apps/admin/app/dashboard/page.tsx",
-      "componentFiles": 19,
+      "componentFiles": 21,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -16081,6 +16766,18 @@
       "route": "/enrollments",
       "page": "apps/admin/app/enrollments/page.tsx",
       "componentFiles": 6,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "admin",
+      "route": "/enrollments/school-invoices",
+      "page": "apps/admin/app/enrollments/school-invoices/page.tsx",
+      "componentFiles": 1,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -17064,7 +17761,7 @@
       "app": "admin",
       "route": "/instructor/submissions",
       "page": "apps/admin/app/instructor/submissions/page.tsx",
-      "componentFiles": 2,
+      "componentFiles": 3,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -17185,18 +17882,6 @@
       "route": "/integrations/salesforce",
       "page": "apps/admin/app/integrations/salesforce/page.tsx",
       "componentFiles": 3,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/integrations/stripe",
-      "page": "apps/admin/app/integrations/stripe/page.tsx",
-      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -17770,9 +18455,45 @@
     },
     {
       "app": "admin",
+      "route": "/phone/email/accounts",
+      "page": "apps/admin/app/phone/email/accounts/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "admin",
+      "route": "/phone/email",
+      "page": "apps/admin/app/phone/email/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "admin",
+      "route": "/phone/inbox",
+      "page": "apps/admin/app/phone/inbox/page.tsx",
+      "componentFiles": 3,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "admin",
       "route": "/phone/meetings/[roomId]",
       "page": "apps/admin/app/phone/meetings/[roomId]/page.tsx",
-      "componentFiles": 2,
+      "componentFiles": 3,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -17784,7 +18505,7 @@
       "app": "admin",
       "route": "/phone/meetings",
       "page": "apps/admin/app/phone/meetings/page.tsx",
-      "componentFiles": 2,
+      "componentFiles": 4,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -17796,7 +18517,7 @@
       "app": "admin",
       "route": "/phone",
       "page": "apps/admin/app/phone/page.tsx",
-      "componentFiles": 3,
+      "componentFiles": 4,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -18600,7 +19321,7 @@
       "app": "admin",
       "route": "/social-media",
       "page": "apps/admin/app/social-media/page.tsx",
-      "componentFiles": 1,
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -19020,7 +19741,7 @@
       "app": "admin",
       "route": "/student-hours",
       "page": "apps/admin/app/student-hours/page.tsx",
-      "componentFiles": 1,
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -19104,7 +19825,7 @@
       "app": "admin",
       "route": "/studio/browser",
       "page": "apps/admin/app/studio/browser/page.tsx",
-      "componentFiles": 1,
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -19200,7 +19921,7 @@
       "app": "admin",
       "route": "/studio/courses/[courseId]",
       "page": "apps/admin/app/studio/courses/[courseId]/page.tsx",
-      "componentFiles": 17,
+      "componentFiles": 1,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -19224,7 +19945,7 @@
       "app": "admin",
       "route": "/studio/courses/lifecycle",
       "page": "apps/admin/app/studio/courses/lifecycle/page.tsx",
-      "componentFiles": 3,
+      "componentFiles": 1,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -19236,7 +19957,7 @@
       "app": "admin",
       "route": "/studio/courses",
       "page": "apps/admin/app/studio/courses/page.tsx",
-      "componentFiles": 9,
+      "componentFiles": 4,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -19344,7 +20065,7 @@
       "app": "admin",
       "route": "/studio",
       "page": "apps/admin/app/studio/page.tsx",
-      "componentFiles": 5,
+      "componentFiles": 7,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -19380,7 +20101,7 @@
       "app": "admin",
       "route": "/studio/tasks",
       "page": "apps/admin/app/studio/tasks/page.tsx",
-      "componentFiles": 5,
+      "componentFiles": 7,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,

@@ -17,7 +17,7 @@ export default function ProgramFAQ() {
     },
     {
       q: `Why don't I always see ${BNPL_PROVIDER_SUMMARY} at checkout?`,
-      a: "Those options appear automatically only when supported for your total, eligibility, and Stripe settings. If you don't see them, it usually means that option isn't available for that purchase.",
+      a: "Those options appear automatically only when supported for your total, eligibility, and QuickBooks settings. If you don't see them, it usually means that option isn't available for that purchase.",
     },
     {
       q: 'How long does the program take?',

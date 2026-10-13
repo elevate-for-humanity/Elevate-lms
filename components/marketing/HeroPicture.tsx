@@ -38,6 +38,7 @@ export interface HeroPictureProps {
   /** Render the complete artwork at its native 4:3 ratio instead of cropping it. */
   preserveAspectRatio?: boolean;
   priority?: boolean;
+  imageFit?: 'cover' | 'contain';
 }
 
 export default function HeroPicture({
@@ -56,10 +57,11 @@ export default function HeroPicture({
   heightStyle,
   preserveAspectRatio = false,
   priority = true,
+  imageFit = 'cover',
 }: HeroPictureProps) {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
-  const canonicalHeight = 'h-[clamp(520px,72svh,860px)]';
+  const canonicalHeight = 'h-[clamp(260px,42svh,480px)]';
 
   return (
     <div className={`w-full ${className}`}>
@@ -86,7 +88,7 @@ export default function HeroPicture({
             alt={alt}
             fill
             sizes="100vw"
-            className="object-cover object-center"
+            className={imageFit === 'contain' ? 'object-contain object-center' : 'object-cover object-center'}
             priority={priority}
             placeholder="empty"
           />
@@ -148,7 +150,10 @@ export default function HeroPicture({
                 {trustIndicators && trustIndicators.length > 0 && (
                   <ul className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
                     {Array.from(new Set(trustIndicators)).map((item) => (
-                      <li key={item} className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
+                      <li
+                        key={item}
+                        className="flex items-center gap-1.5 text-sm font-semibold text-slate-900"
+                      >
                         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red-600" />
                         {item}
                       </li>
@@ -175,7 +180,10 @@ export default function HeroPicture({
               Image transcript
             </button>
             {transcriptOpen && (
-              <p id={transcriptId} className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-800">
+              <p
+                id={transcriptId}
+                className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-800"
+              >
                 {transcript}
               </p>
             )}

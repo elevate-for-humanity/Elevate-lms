@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { BarChart3, Globe2, MousePointerClick, Users } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
+import TrafficReports from '@/components/analytics/TrafficReports';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
@@ -12,39 +13,18 @@ export default async function TrafficAnalyticsPage() {
   const db = await requireAdminClient();
   const start = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
-  const { data } = await db
-    .from('page_views')
-    .select('path,session_id,referrer,utm_source,utm_medium,utm_campaign,created_at')
-    .gte('created_at', start)
-    .order('created_at', { ascending: false })
-    .limit(10000);
-
-  const rows = data ?? [];
-  const sessions = new Set(rows.map((r) => r.session_id).filter(Boolean));
-  const pageCounts = new Map<string, number>();
-  const sourceCounts = new Map<string, number>();
-  const referrerCounts = new Map<string, number>();
-  const dailyCounts = new Map<string, number>();
-
-  for (const row of rows) {
-    pageCounts.set(row.path, (pageCounts.get(row.path) ?? 0) + 1);
-    const source = row.utm_source || 'direct / unknown';
-    sourceCounts.set(source, (sourceCounts.get(source) ?? 0) + 1);
-    if (row.referrer) referrerCounts.set(row.referrer, (referrerCounts.get(row.referrer) ?? 0) + 1);
-    const day = row.created_at?.slice(0, 10) ?? 'unknown';
-    dailyCounts.set(day, (dailyCounts.get(day) ?? 0) + 1);
-  }
-
-  const topPages = [...pageCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15);
-  const topSources = [...sourceCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
-  const topReferrers = [...referrerCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
-  const daily = [...dailyCounts.entries()].sort(([a], [b]) => a.localeCompare(b));
-
-  const cards = [
-    { label: 'Page views (30d)', value: rows.length, icon: MousePointerClick },
-    { label: 'Sessions (30d)', value: sessions.size, icon: Users },
-    { label: 'Tracked pages', value: pageCounts.size, icon: Globe2 },
-    { label: 'Traffic sources', value: sourceCounts.size, icon: BarChart3 },
+  const { data, error } = await db.rpc('admin_traffic_summary', { p_start: start });
+  type CountRow = { label: string; value: number };
+  const pairs = (values: CountRow[] = []): [string, number][] => values.map(row => [row.label, row.value]);
+  const topPages = pairs(data?.topPages);
+  const topSources = pairs(data?.topSources);
+  const topReferrers = pairs(data?.topReferrers);
+  const daily = pairs(data?.daily);
+  const cards = error ? [] : [
+    { label: 'Page views (30d)', value: data?.views ?? 0, icon: MousePointerClick },
+    { label: 'Sessions (30d)', value: data?.sessions ?? 0, icon: Users },
+    { label: 'Tracked pages', value: data?.pages ?? 0, icon: Globe2 },
+    { label: 'Traffic sources', value: data?.sources ?? 0, icon: BarChart3 },
   ];
 
   return (
@@ -54,10 +34,11 @@ export default async function TrafficAnalyticsPage() {
           <div>
             <Link href="/analytics" className="text-sm font-semibold text-blue-700">← Analytics</Link>
             <h1 className="mt-2 text-3xl font-black text-slate-950">Website Traffic</h1>
-            <p className="mt-1 text-slate-600">First-party page views, sessions, acquisition sources, referrers, and 30-day traffic trends.</p>
+            <p className="mt-1 text-slate-600">First-party traffic across all recorded views. Sources use campaign tags or referral domains. Daily totals use Eastern time.</p>
           </div>
         </div>
 
+        {error && <p role="alert" className="mt-6 rounded border border-red-200 bg-red-50 p-4">Traffic data could not be loaded. Please try again.</p>}
         <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {cards.map(({ label, value, icon: Icon }) => (
             <div key={label} className="rounded-2xl border bg-white p-5 shadow-sm">
@@ -68,7 +49,7 @@ export default async function TrafficAnalyticsPage() {
           ))}
         </section>
 
-        <section className="mt-6 grid gap-6 lg:grid-cols-2">
+        {!error && <section className="mt-6 grid gap-6 lg:grid-cols-2">
           <div className="rounded-2xl border bg-white p-5 shadow-sm">
             <h2 className="font-black text-slate-950">Top pages</h2>
             <div className="mt-4 space-y-2">
@@ -116,7 +97,8 @@ export default async function TrafficAnalyticsPage() {
               )) : <p className="text-sm text-slate-500">No daily trend data yet.</p>}
             </div>
           </div>
-        </section>
+        </section>}
+        <div className="mt-8"><TrafficReports /></div>
       </div>
     </main>
   );

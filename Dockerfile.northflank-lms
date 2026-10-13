@@ -67,6 +67,7 @@ ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 RUN test -x "$FFMPEG_BIN" && "$FFMPEG_BIN" -version >/dev/null
 # Production containers must be reproducible. Never mutate dependency resolution
 # during an image build.
+COPY packages/bounded-braces ./packages/bounded-braces
 RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 # Reassert the pinned pnpm executable after repository lifecycle hooks.
@@ -146,7 +147,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
-ENV NODE_OPTIONS="--max-old-space-size=8192"
+ENV NODE_OPTIONS="--max-old-space-size=6144"
 ENV FFMPEG_BIN=/usr/bin/ffmpeg
 ENV NF_GIT_SHA=$NF_GIT_SHA
 ENV GIT_SHA=$NF_GIT_SHA

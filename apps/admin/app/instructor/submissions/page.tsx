@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import CoursePracticalReviewQueue from '@/components/lms/CoursePracticalReviewQueue';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -120,7 +121,7 @@ export default async function InstructorSubmissionsPage({
 
   if (error) {
     return (
-      <div className="p-8 text-red-600 text-sm">Failed to load submissions. Please try again.</div>
+      <div className="p-8"><p role="alert" className="text-red-600 text-sm">Failed to load assignment submissions. Please try again.</p><CoursePracticalReviewQueue /></div>
     );
   }
 
@@ -190,6 +191,7 @@ export default async function InstructorSubmissionsPage({
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        <CoursePracticalReviewQueue />
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>

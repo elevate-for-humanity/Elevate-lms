@@ -57,7 +57,7 @@ export default function ProgramApplyPage({ program }: Props) {
   const [submitted, setSubmitted] = useState(false);
 
   const [paymentOption, setPaymentOption] = useState<
-    'weekly' | 'full' | 'affirm' | 'sezzle' | 'stripe-bnpl'
+    'weekly' | 'full' | 'affirm' | 'sezzle' | 'provider-bnpl'
   >('weekly');
   const [customWeekly, setCustomWeekly] = useState(minWeekly);
 
@@ -140,7 +140,7 @@ export default function ProgramApplyPage({ program }: Props) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
   const affirmName = ACTIVE_BNPL_PROVIDERS.find((p) => p.id === 'affirm')?.name ?? 'Affirm';
   const sezzleName = ACTIVE_BNPL_PROVIDERS.find((p) => p.id === 'sezzle')?.name ?? 'Sezzle';
-  const stripeBnplNames = ACTIVE_BNPL_PROVIDERS.filter((p) => p.stripeMethodId !== null)
+  const bnplCheckoutNames = ACTIVE_BNPL_PROVIDERS.filter((p) => p.providerMethodId !== null)
     .map((p) => p.name)
     .join(' / ');
 
@@ -282,8 +282,8 @@ export default function ProgramApplyPage({ program }: Props) {
         return;
       }
 
-      // Self-pay — Stripe BNPL options
-      if (paymentOption === 'stripe-bnpl') {
+      // Self-pay — BNPL options
+      if (paymentOption === 'provider-bnpl') {
         const res = await fetch('/api/enroll/payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -307,7 +307,7 @@ export default function ProgramApplyPage({ program }: Props) {
         return;
       }
 
-      // Self-pay — Stripe (full or deposit/weekly)
+      // Self-pay — QuickBooks invoice (full or deposit/weekly)
       const isFullPay = paymentOption === 'full';
       const chargeAmount = isFullPay ? fullPrice : depositAmount;
       const res = await fetch('/api/enroll/payment', {
@@ -318,7 +318,7 @@ export default function ProgramApplyPage({ program }: Props) {
           program: program.slug,
           paymentType: isFullPay ? 'full' : 'deposit',
           description: `${program.title} — ${isFullPay ? 'full payment' : 'deposit'} ($${chargeAmount})`,
-          successUrl: `${siteUrl}/programs/${program.slug}/apply/success?payment=stripe`,
+          successUrl: `${siteUrl}/programs/${program.slug}/apply/success?payment=invoice`,
           cancelUrl: `${siteUrl}/programs/${program.slug}/apply`,
         }),
       });
@@ -720,7 +720,7 @@ export default function ProgramApplyPage({ program }: Props) {
                       { value: 'full', label: `Pay in full — $${fullPrice.toLocaleString()}` },
                       { value: 'affirm', label: `${affirmName} — monthly installments` },
                       { value: 'sezzle', label: `${sezzleName} — pay over time` },
-                      { value: 'stripe-bnpl', label: `BNPL at checkout (${stripeBnplNames})` },
+                      { value: 'provider-bnpl', label: `BNPL at checkout (${bnplCheckoutNames})` },
                     ].map((opt) => (
                       <label key={opt.value} className="flex items-center gap-3 cursor-pointer p-3 rounded-lg border border-slate-200 hover:border-brand-blue-400 transition-colors">
                         <input

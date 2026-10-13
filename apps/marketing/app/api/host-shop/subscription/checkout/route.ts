@@ -183,6 +183,14 @@ export async function POST(request: NextRequest) {
         next_invoice_date: next.toISOString().slice(0, 10),
         status: 'active',
         legacy_stripe_subscription_id: partnership.stripe_subscription_id || null,
+        fulfillment_type: 'host_shop_subscription',
+        fulfillment_payload: {
+          partnership_id: partnership.id,
+          partner_id: partnerId,
+          shop_id: shop?.id || null,
+          tier,
+          amount_cents: amountCents,
+        },
       },
       { onConflict: 'provider,customer_external_key,canonical_product_key' },
     );

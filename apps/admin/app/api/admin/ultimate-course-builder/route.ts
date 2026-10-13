@@ -5,169 +5,74 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { UltimateJobQueue } from '@/lib/ultimate-course-builder/worker/job-queue';
-import { UltimateAppendixAStandardsSource } from '@/lib/ultimate-course-builder/credential/appendix-a-source';
+import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
+import { safeInternalError } from '@/lib/api/safe-error';
+import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
+import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/instructional/google-lesson-author';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function databaseFailure(error: unknown, status = 500) {
   logger.error('Ultimate Course Builder database operation failed', error);
-  return NextResponse.json({ error: 'Course Builder operation failed. Check the server audit log.' }, { status });
-}
-
-type CompetencyRow = {
-  competency_key?: string | null;
-  category?: string | null;
-  source_label?: string | null;
-  description?: string | null;
-};
-
-function competencyType(row: CompetencyRow, regulated: boolean) {
-  if (!regulated) return 'knowledge' as const;
-  const value = `${row.category ?? ''} ${row.source_label ?? ''}`;
-  if (/trim|clean|covering|cut|shav|sanit|disinfect|chemical|color/i.test(value)) {
-    return 'practical_skill' as const;
-  }
-  if (/discuss|recommend|consult|select|decide/i.test(value)) return 'decision' as const;
-  return 'knowledge' as const;
-}
-
-async function buildUltimateProfile(
-  db: Awaited<ReturnType<typeof requireAdminClient>>,
-  input: {
-    courseId: string;
-    programSlug: string;
-    title: string;
-    topic?: string;
-    audience?: string;
-    state?: string;
-  },
-) {
-  const registeredSource = new UltimateAppendixAStandardsSource();
-  if (registeredSource.supports({ programSlug: input.programSlug })) {
-    const profile = await registeredSource.load({ programSlug: input.programSlug });
-    return {
-      ...profile,
-      title: input.title,
-      audience: input.audience?.trim() || undefined,
-    };
-  }
-
-  const { data: standard, error: standardError } = await db
-    .from('apprenticeship_standard_versions')
-    .select('*')
-    .eq('program_slug', input.programSlug)
-    .eq('is_active', true)
-    .order('updated_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (standardError) throw standardError;
-
-  let competencyRows: CompetencyRow[] = [];
-  if (standard) {
-    const competencyResult = await db
-      .from('apprenticeship_standard_competencies')
-      .select('competency_key,category,source_label,description')
-      .eq('standard_key', standard.standard_key)
-      .eq('is_required', true)
-      .order('display_order');
-    if (competencyResult.error) throw competencyResult.error;
-    competencyRows = competencyResult.data ?? [];
-  }
-
-  if (!competencyRows.length) {
-    const { data: lessons, error: lessonError } = await db
-      .from('course_lessons')
-      .select('id,title,learning_objectives')
-      .eq('course_id', input.courseId)
-      .order('order_index');
-    if (lessonError) throw lessonError;
-    competencyRows = (lessons ?? []).map((lesson, index) => ({
-      competency_key: lesson.id,
-      category: lesson.title || `Lesson ${index + 1}`,
-      source_label: lesson.title || `Lesson ${index + 1}`,
-      description:
-        Array.isArray(lesson.learning_objectives) && lesson.learning_objectives.length
-          ? lesson.learning_objectives.join('; ')
-          : `Teach and verify ${lesson.title || `lesson ${index + 1}`}.`,
-    }));
-  }
-
-  if (!competencyRows.length) {
-    competencyRows = [
-      {
-        competency_key: `course-${input.courseId}`,
-        category: input.title,
-        source_label: input.title,
-        description:
-          input.topic?.trim() ||
-          `Build complete learner-ready instruction, practice, assessment, media, accessibility, QA, and release evidence for ${input.title}.`,
-      },
-    ];
-  }
-
-  return {
-    id: standard?.standard_key ?? `course:${input.courseId}`,
-    title: input.title,
-    authority: standard?.source_authority ?? 'course-defined',
-    jurisdiction: input.state?.trim() || standard?.state || 'IN',
-    standardVersion: String(
-      standard?.revision_date || standard?.registration_date || 'course-defined',
-    ),
-    effectiveDate: standard?.revision_date || standard?.registration_date || undefined,
-    sourceDocuments: standard
-      ? ['DOL Appendix A Work Process Schedule', 'Related Instruction Outline']
-      : [],
-    socCodes: standard?.onet_soc_code ? [standard.onet_soc_code] : [],
-    trainingRequirements: {
-      instructionalHours: standard?.related_instruction_hours || undefined,
-    },
-    audience: input.audience?.trim() || undefined,
-    competencies: competencyRows.map((row, index) => ({
-      id: row.competency_key || `competency-${index + 1}`,
-      title: row.category || row.source_label || `Competency ${index + 1}`,
-      description: row.description || row.source_label || `Demonstrate competency ${index + 1}`,
-      type: competencyType(row, Boolean(standard)),
-      authorityRequirementIds: standard && row.competency_key ? [row.competency_key] : [],
-      requiresDemonstration: Boolean(standard),
-      requiresPracticalEvidence: Boolean(standard),
-      criticalSafetyCompetency: standard
-        ? /clean|sanit|disinfect|protective|safety/i.test(
-            `${row.category ?? ''} ${row.description ?? ''}`,
-          )
-        : false,
-    })),
-  };
+  return NextResponse.json(
+    { error: 'Course Builder operation failed. Check the server audit log.' },
+    { status },
+  );
 }
 
 export async function GET(req: NextRequest) {
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
   const db = await requireAdminClient();
+  const acquisitionRunId = req.nextUrl.searchParams.get('acquisitionRunId')?.trim();
+  if (acquisitionRunId) {
+    const { data: run, error } = await db
+      .from('studio_runs')
+      .select('id,command,context,course_id')
+      .eq('id', acquisitionRunId)
+      .eq('user_id', auth.id)
+      .single();
+    if (error || !run)
+      return NextResponse.json({ error: 'Media acquisition request not found' }, { status: 404 });
+    return NextResponse.json({ acquisition: run });
+  }
   const buildId = req.nextUrl.searchParams.get('buildId')?.trim();
   const courseId = req.nextUrl.searchParams.get('courseId')?.trim();
 
   if (buildId) {
     const { data, error } = await db
       .from('ultimate_course_builds')
-      .select('*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
+      .select(req.nextUrl.searchParams.get('view') === 'checkpoints'
+        ? 'id,course_id,status,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,status,ultimate_lesson_steps(step,state,findings,completed_at))'
+        : '*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
       .eq('id', buildId)
       .single();
-    return error
-      ? databaseFailure(error)
-      : NextResponse.json({ build: data });
+    return error ? databaseFailure(error) : NextResponse.json({ build: data });
   }
 
   let query = db
     .from('ultimate_course_builds')
-    .select('*')
+    .select('*,ultimate_build_jobs(id,status,last_error,created_at,heartbeat_at,lease_expires_at)')
     .order('created_at', { ascending: false })
     .limit(50);
   if (courseId) query = query.eq('course_id', courseId);
   const { data, error } = await query;
-  return error
-    ? databaseFailure(error)
-    : NextResponse.json({ builds: data ?? [] });
+  if (error) return databaseFailure(error);
+  let acquisitions: Array<{ id: string; goal: string | null }> = [];
+  if (courseId) {
+    const requests = await db
+      .from('studio_runs')
+      .select('id,goal')
+      .eq('course_id', courseId)
+      .eq('user_id', auth.id)
+      .contains('context', { acquisition_mode: 'envato-workspace-batch' })
+      .neq('status', 'completed')
+      .order('updated_at', { ascending: false });
+    if (requests.error) return databaseFailure(requests.error);
+    acquisitions = requests.data ?? [];
+  }
+  return NextResponse.json({ builds: data ?? [], acquisitions });
 }
 
 export async function POST(req: NextRequest) {
@@ -256,16 +161,14 @@ export async function POST(req: NextRequest) {
       .from('ultimate_course_builds')
       .insert({
         course_id: body.courseId,
-        profile: body.profile,
+        profile: { ...body.profile, mediaAcquisitionOwnerId: auth.id },
         status: 'initializing',
         current_step: 'standards_lock',
         findings: [],
       })
       .select('*')
       .single();
-    return error
-      ? databaseFailure(error)
-      : NextResponse.json({ ok: true, build: data });
+    return error ? databaseFailure(error) : NextResponse.json({ ok: true, build: data });
   }
 
   if (body.action === 'status') {
@@ -274,12 +177,11 @@ export async function POST(req: NextRequest) {
       .select('*')
       .eq('id', body.buildId)
       .single();
-    return error
-      ? databaseFailure(error)
-      : NextResponse.json({ ok: true, build: data });
+    return error ? databaseFailure(error) : NextResponse.json({ ok: true, build: data });
   }
 
-  if (body.action === 'queue-course') {
+  // Keep the legacy action as a compatibility alias; both actions start a worker.
+  if (body.action === 'start-course' || body.action === 'queue-course') {
     const courseId = String(body.courseId || '').trim();
     if (!courseId) {
       return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
@@ -309,7 +211,7 @@ export async function POST(req: NextRequest) {
     if (!programSlug) {
       return NextResponse.json({ error: 'programSlug is required' }, { status: 400 });
     }
-    const profile = await buildUltimateProfile(db, {
+    const generatedProfile = await buildUltimateProfile(db, {
       courseId: course.id,
       programSlug,
       title: String(body.title || course.title),
@@ -317,16 +219,28 @@ export async function POST(req: NextRequest) {
       audience: String(body.audience || ''),
       state: String(body.state || ''),
     });
+    const authoring = body.instructionalAuthoring;
+    if (authoring && (authoring.provider !== 'google' || !/^gemini-[a-z0-9.-]+$/.test(authoring.model || '') || (authoring.location && !['us','eu','global','us-central1'].includes(authoring.location))))
+      return NextResponse.json({error:'Google authoring requires an explicitly selected Gemini model'}, {status:400});
+    const profile = { ...generatedProfile, mediaAcquisitionOwnerId: auth.id,
+      ...(authoring ? {instructionalAuthoring:{provider:'google' as const, model:authoring.model, ...(authoring.location ? {location:authoring.location} : {}), version:GOOGLE_LESSON_AUTHOR_VERSION}} : {}),
+    };
 
-    const { data: activeBuild, error: activeError } = await db
+    if (body.acceptanceBuild === true && !authoring)
+      return NextResponse.json({error:'A separate teaching acceptance build requires an explicit Google model'}, {status:400});
+    const activeQuery = db
       .from('ultimate_course_builds')
       .select('id,course_id,status,current_step,profile,created_at,updated_at')
       .eq('course_id', course.id)
       .in('status', ['initializing', 'queued', 'running'])
       .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .limit(1);
+    if (body.acceptanceBuild === true)
+      activeQuery.contains('profile', {instructionalAuthoring: profile.instructionalAuthoring});
+    const {data:activeBuild,error:activeError}=await activeQuery.maybeSingle();
     if (activeError) throw activeError;
+    if (activeBuild && authoring && JSON.stringify((activeBuild.profile as any)?.instructionalAuthoring) !== JSON.stringify(profile.instructionalAuthoring))
+      return NextResponse.json({error:'The active build has different locked authoring inputs. Preserve it and use a separate acceptance build.'}, {status:409});
 
     let build = activeBuild;
     if (!build) {
@@ -350,10 +264,19 @@ export async function POST(req: NextRequest) {
     const job = await new UltimateJobQueue(db as any).enqueue(build.id, {
       requestedBy: auth.id,
     });
+    if (!job) return NextResponse.json({ error: 'No runnable build job was saved' }, { status: 409 });
+    let dispatch;
+    try {
+      dispatch = await dispatchGoogleDeployment('course-builder');
+    } catch (error) {
+      return safeInternalError(error, 'Worker launch failed. The saved build can be resumed.');
+    }
     return NextResponse.json(
       {
         ok: true,
-        queued: true,
+        dispatched: true,
+        executionVerified: false,
+        actionsUrl: dispatch.actionsUrl,
         reused: Boolean(activeBuild),
         build,
         buildId: build.id,

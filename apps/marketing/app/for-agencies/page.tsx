@@ -233,7 +233,7 @@ export default async function ForAgenciesPage() {
           <div className="w-full md:w-64 bg-slate-800 rounded-xl p-6 shrink-0">
             <h3 className="font-bold text-white mb-4">Agency Contacts</h3>
             <ul className="space-y-3 text-sm">
-              <li className="flex items-center gap-2 text-slate-300"><Phone className="w-4 h-4 text-brand-red-400 shrink-0" /><a href="tel:+13173143757" className="hover:text-white">(317) 314-3757</a></li>
+              <li className="flex items-center gap-2 text-slate-300"><Phone className="w-4 h-4 text-brand-red-400 shrink-0" /><a href="tel:+13179999620" className="hover:text-white">(317) 999-9620</a></li>
               <li className="flex items-center gap-2 text-slate-300"><Mail className="w-4 h-4 text-brand-red-400 shrink-0" /><a href="mailto:agencies@elevateforhumanity.org" className="hover:text-white break-all">agencies@elevateforhumanity.org</a></li>
               <li className="flex items-center gap-2 text-slate-300"><FileText className="w-4 h-4 text-brand-red-400 shrink-0" /><Link href="/agencies" className="hover:text-white">Full agency overview</Link></li>
             </ul>

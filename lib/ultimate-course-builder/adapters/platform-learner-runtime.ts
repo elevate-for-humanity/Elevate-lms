@@ -8,6 +8,7 @@ import { LEARNER_RUNTHROUGH_CHECKS } from '../quality/learner-runthrough';
 export class UltimatePlatformLearnerRuntime implements UltimateLearnerRuntimePort {
   constructor(private db: SupabaseClient) {}
   async verify(input: {
+    lessonBuildId: string;
     courseId: string;
     lessonId: string;
     videoUrl: string;
@@ -18,13 +19,13 @@ export class UltimatePlatformLearnerRuntime implements UltimateLearnerRuntimePor
       throw new Error('ULTIMATE_AUTHENTICATED_BROWSER_WORKER_NOT_CONFIGURED');
     const url = new URL(endpoint);
     if (url.protocol !== 'https:') throw new Error('ULTIMATE_BROWSER_WORKER_HTTPS_REQUIRED');
+    if (!input.lessonBuildId) throw new Error('ULTIMATE_STAGED_LESSON_BUILD_ID_REQUIRED');
     const { data: lesson, error } = await this.db
       .from('ultimate_lesson_builds')
       .select('id,artifacts,ultimate_course_builds!inner(course_id)')
+      .eq('id', input.lessonBuildId)
       .eq('competency_id', input.lessonId)
       .eq('ultimate_course_builds.course_id', input.courseId)
-      .order('created_at', { ascending: false })
-      .limit(1)
       .single();
     if (error || !lesson) throw new Error('ULTIMATE_STAGED_LESSON_TEST_INPUT_REQUIRED');
     const artifacts: any = lesson.artifacts;

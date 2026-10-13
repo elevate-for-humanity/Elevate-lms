@@ -10,6 +10,7 @@ import LessonProgressClient from './LessonProgressClient';
 import LessonFocusShell from '@/components/lms/LessonFocusShell';
 import InteractiveVideoPlayer, { type Checkpoint } from '@/components/lms/InteractiveVideoPlayer';
 import { resolveCoursePreview } from '@/lib/admin/course-preview';
+import { managedLessonPlaybackUrl } from '@/lib/storage/lesson-playback';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -315,23 +316,20 @@ export default async function LessonPage({
           </figure>
         ) : null}
 
-        <AITeachingPlayer
+        {!lesson.video_url ? <AITeachingPlayer
           courseTitle={course.title}
           lessonTitle={lesson.title}
           instructorName={instructorName}
           instructorImage={instructorImage}
           visualImage={lessonVisual?.asset_url ?? lessonVisual?.poster_url ?? undefined}
           slides={slides}
-        />
+        /> : null}
 
         {lesson.video_url ? (
-          <details className="overflow-hidden rounded-3xl border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-orange-50 shadow-lg">
-            <summary className="cursor-pointer px-6 py-4 font-extrabold text-cyan-950">
-              Watch the produced lesson video
-            </summary>
-            <div className="border-t border-cyan-100 p-3">
+          <section aria-label="Instructional lesson video" className="overflow-hidden rounded-3xl border border-neutral-700 bg-neutral-900 shadow-lg">
+            <div className="p-3">
               <InteractiveVideoPlayer
-                videoUrl={lesson.video_url}
+                videoUrl={managedLessonPlaybackUrl(lesson.video_url, course.id, lesson.id)}
                 title={lesson.title}
                 lessonId={lesson.id}
                 courseId={course.id}
@@ -339,7 +337,7 @@ export default async function LessonPage({
                 transcript={videoTranscript}
               />
             </div>
-          </details>
+          </section>
         ) : null}
 
         {objectives.length ? (

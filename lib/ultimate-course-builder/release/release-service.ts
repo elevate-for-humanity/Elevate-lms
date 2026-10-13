@@ -1,6 +1,7 @@
 import 'server-only';
 import { assertCompleteLesson, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/lesson-contract';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
 const slug = (v: string) =>
   v
     .toLowerCase()
@@ -35,7 +36,7 @@ export class UltimateReleaseService {
       new Set(ls.map((l: any) => l.competency_id)).size !== ls.length
     )
       throw new Error('ULTIMATE_ALL_COMPETENCIES_REQUIRED');
-    for (const lesson of ls) assertCompleteLesson(lesson.artifacts as any, b.profile);
+    for (const lesson of ls) assertCompleteLesson(lesson.artifacts as any, b.profile, lesson.competency_id);
     const p: any = b.profile,
       cm = new Map((p.competencies ?? []).map((c: any) => [String(c.id), c]));
     return {
@@ -51,7 +52,8 @@ export class UltimateReleaseService {
           r = a.lesson_film_render?.render ?? a.lesson_film_render ?? {};
         return {
           sourceLessonBuildId: l.id,
-          canonicalLessonId: /^[0-9a-f-]{36}$/i.test(l.competency_id) ? l.competency_id : null,
+          canonicalLessonId: p.canonicalLessonIds?.[l.competency_id] ??
+            (/^[0-9a-f-]{36}$/i.test(l.competency_id) ? l.competency_id : null),
           contractArtifacts: a,
           competencyId: l.competency_id,
           slug: slug(String(l.lesson_key)),
@@ -62,7 +64,7 @@ export class UltimateReleaseService {
           assessment: a.assessment_alignment?.assessment ?? a.assessment_alignment ?? {},
           remediation: a.selective_repair ?? {},
           traceability: a.credential_release?.release?.rows ?? [],
-          videoUrl: r.videoUrl ?? r.outputPath ?? null,
+          videoUrl: renderPlaybackUrl(r),
           script: a.instructor_script?.script?.script ?? null,
           segments: a.instructor_script?.script?.segments ?? [],
           timeline: a.synchronization?.timeline,
@@ -77,7 +79,7 @@ export class UltimateReleaseService {
   async applyPackage(p: any, actorId: string) {
     if (p.contractVersion !== ULTIMATE_LESSON_CONTRACT_VERSION || !p.lessons?.length)
       throw new Error('ULTIMATE_RELEASE_CONTRACT_REQUIRED');
-    for (const lesson of p.lessons) assertCompleteLesson(lesson.contractArtifacts, p.profile);
+    for (const lesson of p.lessons) assertCompleteLesson(lesson.contractArtifacts, p.profile, lesson.competencyId);
     const now = new Date().toISOString();
     const { data: existingModule, error: me } = await this.db
       .from('course_modules')
@@ -88,13 +90,24 @@ export class UltimateReleaseService {
     if (me) throw me;
     let m = existingModule;
     if (!m) {
+      const { data: canonical, error: canonicalError } = await this.db.from('course_lessons')
+        .select('id,module_id').eq('course_id', p.courseId);
+      if (canonicalError) throw canonicalError;
+      const existingLesson = canonical?.find((lesson: any) => lesson.module_id &&
+        p.lessons.some((release: any) => release.canonicalLessonId === lesson.id));
+      if (existingLesson) m = { id: existingLesson.module_id };
+    }
+    if (!m) {
+      const { data: modules, error: modulesError } = await this.db.from('course_modules')
+        .select('order_index').eq('course_id', p.courseId);
+      if (modulesError) throw modulesError;
       const q = await this.db
         .from('course_modules')
         .insert({
           course_id: p.courseId,
           title: p.title,
           slug: 'ultimate-core',
-          order_index: 1,
+          order_index: Math.max(0, ...(modules ?? []).map((module: any) => module.order_index ?? 0)) + 1,
           is_required: true,
           is_published: true,
           is_draft: false,
@@ -105,6 +118,9 @@ export class UltimateReleaseService {
       if (q.error) throw q.error;
       m = q.data;
     }
+    const { error: modulePublishError } = await this.db.from('course_modules')
+      .update({ is_published: true, is_draft: false }).eq('id', m!.id);
+    if (modulePublishError) throw modulePublishError;
     for (const l of p.lessons) {
       const row: any = {
         course_id: p.courseId,
@@ -199,7 +215,8 @@ export class UltimateReleaseService {
           },
           contractVersion: p.contractVersion,
           film: {
-            videoUrl: l.videoUrl,
+            videoUrl: renderMediaUrl(l.contractArtifacts.lesson_film_render.render),
+            playbackUrl: l.videoUrl,
             captionsUrl: l.captionsUrl,
             transcriptUrl: l.transcriptUrl,
           },
@@ -213,15 +230,38 @@ export class UltimateReleaseService {
       };
       const { data: e, error: ee } = await this.db
         .from('course_lessons')
-        .select('id,module_id,slug')
+        .select('id,module_id,slug,content_json,quiz_questions')
         .eq('course_id', p.courseId)
         .eq(l.canonicalLessonId ? 'id' : 'slug', l.canonicalLessonId ?? l.slug)
         .maybeSingle();
       if (ee) throw ee;
+      if (!e) throw new Error('ULTIMATE_CANONICAL_DRAFT_REQUIRED');
+      // Retain existing assessments and their stable IDs; new source-reviewed
+      // checks may be added, but video regeneration never deletes old checks.
+      const oldChecks=(e.content_json as any)?.experience?.knowledgeChecks??[];
+      const newChecks=row.content_json.experience.knowledgeChecks;
+      const existingIds=new Set(oldChecks.map((q:any)=>q.id).filter(Boolean));
+      row.content_json={...(e.content_json as any),...row.content_json,experience:{...(e.content_json as any)?.experience,...row.content_json.experience,
+        knowledgeChecks:[...oldChecks,...newChecks.filter((q:any)=>!existingIds.has(q.id))]}};
+      const oldReassessment=(e.content_json as any)?.experience?.reassessment??[];
+      const oldRetryIds=new Set(oldReassessment.map((q:any)=>q.id).filter(Boolean));
+      row.content_json.experience.reassessment=[...oldReassessment,...row.content_json.experience.reassessment.filter((q:any)=>!oldRetryIds.has(q.id))];
+      // Record the already rendered, fully verified Ultimate film for the
+      // canonical publication guard. This never queues the retired renderer.
+      const mediaJobId = await this.recordApprovedFilm(p, l, e.id, actorId, now);
+      row.video_job_id = mediaJobId;
+      row.video_status = 'complete';
+      row.media_quality_status = 'approved';
+      row.media_quality_evidence = l.contractArtifacts.finished_media_qa.mediaQA.inspection;
+      if (e?.module_id && e.module_id !== m!.id) {
+        const { error: publishError } = await this.db.from('course_modules')
+          .update({ is_published: true, is_draft: false }).eq('id', e.module_id);
+        if (publishError) throw publishError;
+      }
       const q = e
         ? await this.db
             .from('course_lessons')
-            .update({ ...row, module_id: e.module_id, slug: e.slug })
+            .update({ ...row, module_id: e.module_id ?? m!.id, slug: e.slug })
             .eq('id', e.id)
         : await this.db.from('course_lessons').insert(row);
       if (q.error) throw q.error;
@@ -269,6 +309,8 @@ export class UltimateReleaseService {
         status: 'published',
         is_active: true,
         review_status: 'approved',
+        generation_status: 'published',
+        generation_progress: 100,
         published_at: now,
         published_by: actorId,
         version,
@@ -315,6 +357,46 @@ export class UltimateReleaseService {
       .eq('id', courseId);
     if (u.error) throw u.error;
     return n.data;
+  }
+  private async recordApprovedFilm(p: any, l: any, lessonId: string, actorId: string, now: string) {
+    // Approval derives from current evidence for all twenty steps, including
+    // delivered-MP4 inspection and the learner runthrough.
+    assertCompleteLesson(l.contractArtifacts, p.profile, l.competencyId);
+    const film = l.contractArtifacts.lesson_film_render.render;
+    if (renderPlaybackUrl(film) !== l.videoUrl) throw new Error('ULTIMATE_RELEASE_FILM_MISMATCH');
+    const { data: existing, error: lookupError } = await this.db.from('video_jobs')
+      .select('id,status,lease_expires_at')
+      .eq('course_id', p.courseId).eq('lesson_id', lessonId)
+      .eq('asset_kind', 'lesson').is('asset_key', null).maybeSingle();
+    if (lookupError) throw lookupError;
+    if (existing?.status === 'rendering' ||
+        (existing?.lease_expires_at && new Date(existing.lease_expires_at).getTime() > Date.now()))
+      throw new Error('ULTIMATE_PRIMARY_MEDIA_JOB_ACTIVE');
+    const media = {
+      course_id: p.courseId, lesson_id: lessonId, lesson_title: l.title,
+      asset_kind: 'lesson', asset_key: null, status: 'complete',
+      provider: film.provider ?? 'remotion', video_url: renderPlaybackUrl(film),
+      script: l.script, scene_data: l.storyboard,
+      duration_seconds: Math.ceil(film.duration),
+      scene_count: l.storyboard?.scenes?.length ?? l.segments.length,
+      completed_at: now, review_status: 'approved', reviewed_by: actorId,
+      reviewed_at: now,
+      review_notes: 'Current Ultimate twenty-step contract passed before canonical publication.',
+      quality_evidence: {
+        ...l.contractArtifacts.finished_media_qa.mediaQA.inspection,
+        ultimateBuildId: p.buildId,
+        sourceLessonBuildId: l.sourceLessonBuildId,
+        contractVersion: p.contractVersion,
+      },
+    };
+    const query = existing
+      ? this.db.from('video_jobs').update(media).eq('id', existing.id)
+          .eq('status', existing.status).is('lease_token', null)
+      : this.db.from('video_jobs').insert(media);
+    const { data: recorded, error: writeError } = await query.select('id').maybeSingle();
+    if (writeError) throw writeError;
+    if (!recorded) throw new Error('ULTIMATE_PRIMARY_MEDIA_JOB_CHANGED');
+    return recorded.id;
   }
   private async nextVersion(courseId: string) {
     const { data } = await this.db

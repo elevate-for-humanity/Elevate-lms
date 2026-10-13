@@ -6,6 +6,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { businessHoursFromForm, normalizeUsPhone, validMenuDigit } from '@/lib/phone/config';
 import { ensureLiveKitRoom, liveKitReadiness } from '@/lib/communications/livekit';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
+import {hydrateProcessEnv} from '@/lib/secrets';
 import { telnyxClient } from '@/lib/phone/telnyx';
 
 export type PhoneActionState = { ok: boolean; message: string };
@@ -92,6 +93,10 @@ async function requireWorkspace() {
 }
 
 export async function createMeeting(formData: FormData): Promise<void> {
+  await hydrateProcessEnv();
+  const scheduledInput=String(formData.get('scheduledAt')||'');
+  const scheduledAt=scheduledInput?new Date(scheduledInput):null;
+  if(scheduledAt && (!Number.isFinite(scheduledAt.getTime()) || scheduledAt.getTime()<Date.now()-60000))throw new Error('Choose a future meeting date and time.');
   const title = String(formData.get('title') ?? '').trim();
   const roomType = String(formData.get('roomType') ?? 'meeting');
   if (title.length < 3 || title.length > 120)
@@ -113,7 +118,8 @@ export async function createMeeting(formData: FormData): Promise<void> {
     room_type: roomType,
     host_profile_id: auth.profile.id,
     status: 'open',
-    started_at: new Date().toISOString(),
+    scheduled_at: scheduledAt?.toISOString() || null,
+    started_at: scheduledAt ? null : new Date().toISOString(),
     max_participants: 50,
     allow_screen_share: true,
     allow_chat: true,
@@ -384,6 +390,7 @@ export async function removeDestination(formData: FormData): Promise<void> {
 }
 
 export async function testDestination(formData: FormData): Promise<void> {
+  await hydrateProcessEnv();
   const { db, id } = await requireSystemId();
   const destinationId = String(formData.get('destinationId') ?? '');
   const [{ data: destination }, { data: number }] = await Promise.all([
@@ -410,14 +417,15 @@ export async function testDestination(formData: FormData): Promise<void> {
     if (!destination.extension_id) throw new Error('This PWA route has no assigned extension.');
     const { data: device } = await db
       .from('phone_webrtc_devices')
-      .select('sip_username')
+      .select('sip_username,provider,connection_state')
       .eq('extension_id', destination.extension_id)
       .eq('status', 'active')
       .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString())
       .order('last_seen_at', { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (!device?.sip_username) {
+    if (device?.provider === 'asterisk') throw new Error('This extension uses Elevate Phone. Open your dial pad to test it; carrier test calling is not connected to this PBX yet.');
+    if (!device?.sip_username || device.connection_state !== 'connected') {
       throw new Error('That Program Holder must connect Phone in the PWA before a test call.');
     }
     target = `sip:${device.sip_username}@sip.telnyx.com;secure=srtp`;
@@ -425,7 +433,7 @@ export async function testDestination(formData: FormData): Promise<void> {
   if (!target) throw new Error('This route has no callable PWA device.');
   const connectionId = process.env.TELNYX_CONNECTION_ID;
   if (!connectionId) throw new Error('TELNYX_CONNECTION_ID is not configured.');
-  await telnyxClient().calls.dial({
+  await (await telnyxClient()).calls.dial({
     connection_id: connectionId,
     from: number.e164,
     to: target,
@@ -562,4 +570,18 @@ export async function toggleExtension(formData: FormData): Promise<void> {
     .eq('workspace_id', workspace.id);
   if (error) throw new Error(error.message);
   revalidatePath('/phone');
+}
+
+export async function destinationActionResult(_state:PhoneActionState,formData:FormData):Promise<PhoneActionState>{
+ try{
+  const command=String(formData.get('command')||'');
+  if(command==='default'){await setDefaultDestination(formData);return {ok:true,message:'Default call route saved.'};}
+  if(command==='toggle'){await toggleDestination(formData);return {ok:true,message:String(formData.get('enabled'))==='true'?'Call route enabled.':'Call route paused.'};}
+  if(command==='test'){await testDestination(formData);return {ok:true,message:'Test call requested. Answer the destination and verify two-way audio.'};}
+  return {ok:false,message:'Choose a valid phone action.'};
+ }catch(error){return failure(error,'The phone action could not be completed.');}
+}
+
+export async function createMeetingResult(_state:PhoneActionState,formData:FormData):Promise<PhoneActionState>{
+ try{await createMeeting(formData);return {ok:true,message:'Meeting saved. Copy or share its link from the meeting list below.'};}catch(error){return failure(error,'The meeting could not be created.');}
 }

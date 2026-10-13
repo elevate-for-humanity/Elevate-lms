@@ -12,7 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { getDecryptedPlatformSecret, hydrateNorthflankEnv } from '@/lib/secrets';
+import { getDecryptedPlatformSecret } from '@/lib/secrets';
 import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 
 export const dynamic = 'force-dynamic';
@@ -49,7 +49,6 @@ export async function GET(request: NextRequest) {
       keys.map(async (key) => [key, await getDecryptedPlatformSecret(key).catch(() => undefined)]),
     ),
   ) as Record<(typeof keys)[number], string | undefined>;
-  await hydrateNorthflankEnv().catch(() => undefined);
   const [ai, cloudflareProbe] = await Promise.all([
     resolveAIRuntimeState(),
     probeCloudflareWorkersAI(),
@@ -202,29 +201,33 @@ export async function GET(request: NextRequest) {
   });
 
   // ── Upload storage ─────────────────────────────────────────────────────────
-  const hasR2 = Boolean(
-    process.env.R2_ENDPOINT && process.env.R2_ACCESS_KEY && process.env.R2_BUCKET,
+  const hasObjectStorage = Boolean(
+    (process.env.ELEVATE_MEDIA_ENDPOINT || process.env.S3_ENDPOINT || process.env.R2_ENDPOINT) &&
+      (process.env.ELEVATE_MEDIA_ACCESS_KEY_ID ||
+        process.env.S3_ACCESS_KEY_ID ||
+        process.env.R2_ACCESS_KEY ||
+        process.env.CLOUDFLARE_R2_ACCESS_KEY_ID) &&
+      (process.env.ELEVATE_MEDIA_SECRET_ACCESS_KEY ||
+        process.env.S3_SECRET_ACCESS_KEY ||
+        process.env.R2_SECRET_KEY ||
+        process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY) &&
+      (process.env.ELEVATE_MEDIA_BUCKET ||
+        process.env.S3_BUCKET ||
+        process.env.R2_BUCKET ||
+        process.env.CLOUDFLARE_R2_BUCKET_NAME),
   );
   checks.push({
     name: 'Upload Storage',
     status: 'ok',
-    detail: hasR2 ? 'R2/S3 configured' : 'Supabase Storage (default)',
+    detail: hasObjectStorage
+      ? `Elevate Media Storage configured (${process.env.ELEVATE_MEDIA_PROVIDER || 'auto-detected'})`
+      : 'Supabase Storage (safe fallback)',
   });
 
   // ── Deploy identity ────────────────────────────────────────────────────────
-  const hasNorthflank = Boolean(
-    process.env.NORTHFLANK_API_TOKEN && process.env.NORTHFLANK_PROJECT_ID,
-  );
-  const deployReady = hasNorthflank || githubOk;
-
   checks.push({
-    name: 'Deploy Identity',
-    status: deployReady ? 'ok' : 'warn',
-    detail: deployReady
-      ? githubOk
-        ? 'GitHub Actions dispatch available'
-        : 'Northflank API available'
-      : 'no Northflank API token or GitHub token — deploy buttons will fail',
+    name: 'Deploy Identity', status: githubOk ? 'ok' : 'warn',
+    detail: githubOk ? 'Google deployment through GitHub Actions is available' : 'Google deployment workflow dispatch is not configured',
   });
 
   const failCount = checks.filter((c) => c.status === 'fail').length;

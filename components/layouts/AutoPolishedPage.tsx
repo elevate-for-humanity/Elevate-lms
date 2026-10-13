@@ -467,7 +467,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
       </section>
 
       {/* HERO */}
-      <section className="relative h-[clamp(520px,72svh,860px)] w-full overflow-hidden">
+      <section className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
           src={getHeroImage()}

@@ -344,7 +344,7 @@ describe('Ultimate builder recovery', () => {
       artifacts: {
         storyboard: {
           storyboard: {
-            scenes: Array.from({ length: 7 }, (_, index) => ({ id: `scene-${index + 1}` })),
+            scenes: Array.from({ length: 13 }, (_, index) => ({ id: `scene-${index + 1}` })),
           },
         },
         visual_assignment: { media: { readyAssets: [] } },
@@ -353,7 +353,7 @@ describe('Ultimate builder recovery', () => {
     };
 
     await expect(handlers.natural_narration(context as any)).rejects.toThrow(
-      'ULTIMATE_ENVATO_VISUALS_REQUIRED:0:7',
+      'ULTIMATE_SCENE_ASSIGNMENT_COVERAGE_REQUIRED:0:13',
     );
     expect(generate).not.toHaveBeenCalled();
   });

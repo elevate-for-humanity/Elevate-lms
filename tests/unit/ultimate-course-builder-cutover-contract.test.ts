@@ -25,7 +25,8 @@ describe('Ultimate Course Builder production cutover', () => {
     expect(ultimateRoute).toContain('UltimateJobQueue');
     expect(ultimateRoute).toContain("body.action === 'queue-course'");
     expect(ultimateRoute).not.toContain('is_published: false');
-    expect(ultimateRoute).toContain('UltimateAppendixAStandardsSource');
+    expect(ultimateRoute).toContain('buildUltimateProfile');
+    expect(read('lib/ultimate-course-builder/core/course-profile.ts')).toContain('UltimateAppendixAStandardsSource');
     expect(productionHandlers).toContain("ctx.profile.authority === 'course-defined'");
     expect(productionHandlers).toContain("ctx.profile.id.startsWith('course:')");
     expect(productionHandlers).toContain("status: 'course-defined', verified: true");

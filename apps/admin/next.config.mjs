@@ -32,6 +32,8 @@ const adminConfig = {
   eslint: { ignoreDuringBuilds: true },
 
   experimental: {
+    webpackMemoryOptimizations: true,
+    webpackBuildWorker: true,
     workerThreads: false,
     cpus: 1,
     parallelServerCompiles: false,

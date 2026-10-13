@@ -56,8 +56,8 @@ export function BarberApprenticeshipDashboard({
   const ojlPercent = Math.min((totalOjl / requiredOjl) * 100, 100);
   const rtiPercent = Math.min((totalRti / requiredRti) * 100, 100);
 
-  const hasSubscription = !!enrollment?.stripe_subscription_id;
-  const subStatus = enrollment?.stripe_subscription_status ?? null;
+  const hasSubscription = !!enrollment?.quickbooks_subscription_id;
+  const subStatus = enrollment?.quickbooks_subscription_status ?? null;
   const needsPaymentMethod =
     hasSubscription &&
     ['pending_payment_method', 'past_due', 'incomplete', 'incomplete_expired'].includes(

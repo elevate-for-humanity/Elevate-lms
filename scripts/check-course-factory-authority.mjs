@@ -72,8 +72,18 @@ const controller = readRequired('lib/devstudio/course-builder-controller.ts');
 if (!controller.includes('DevStudioUltimateCourseControl'))
   failures.push('Studio Course Builder controller is not backed by Ultimate control plane');
 const studioChat = readRequired(studioChatRoute);
-for (const required of ['DevStudioUltimateCourseControl','ultimate_course_builds','apprenticeship_standard_versions','apprenticeship_standard_competencies']) {
+for (const required of ['DevStudioUltimateCourseControl','ultimate_course_builds']) {
   if (!studioChat.includes(required)) failures.push(`${studioChatRoute}: Ultimate build_course path missing ${required}`);
+}
+// Standards loading belongs to the shared controller/profile builder, not a
+// duplicate implementation in the chat route. Verify the complete delegation.
+const ultimateControl = readRequired('lib/devstudio/ultimate-course-control.ts');
+for (const required of ['buildUltimateProfile', "from '@/lib/ultimate-course-builder/core/course-profile'", 'UltimateJobQueue']) {
+  if (!ultimateControl.includes(required)) failures.push(`Ultimate Studio controller missing ${required}`);
+}
+const ultimateProfile = readRequired('lib/ultimate-course-builder/core/course-profile.ts');
+for (const required of ['apprenticeship_standard_versions', 'apprenticeship_standard_competencies']) {
+  if (!ultimateProfile.includes(required)) failures.push(`Ultimate profile builder missing standards authority ${required}`);
 }
 for (const forbidden of ['process-course-builder-jobs',"from('devstudio_jobs')"]) {
   const buildCase = studioChat.slice(studioChat.indexOf("case 'build_course':"), studioChat.indexOf("case 'generate_videos':"));

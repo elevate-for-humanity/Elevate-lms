@@ -223,7 +223,7 @@ export default function SchedulePage() {
 
         <p className="text-xs text-slate-400 mt-4">
           Need a custom schedule?{' '}
-          <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="underline">Call {PLATFORM_DEFAULTS.supportPhone}</a> to discuss options.
+          <a href={`tel:${PLATFORM_DEFAULTS.mainPhone.replace(/[^0-9]/g, "")}`} className="underline">Call {PLATFORM_DEFAULTS.mainPhone}</a> to discuss options.
         </p>
       </div>
     </div>

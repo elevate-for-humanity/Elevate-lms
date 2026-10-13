@@ -1,4 +1,6 @@
 import 'server-only';
+import {quoteStartSeconds} from '../ultimate-course-builder/instructional/picture-timeline.mjs';
+import { teachingPresentation } from '@/lib/ultimate-course-builder/instructional/teaching-presentation';
 import { createHash } from 'node:crypto';
 
 import { execFile } from 'node:child_process';
@@ -11,8 +13,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import type { MediaStoryboard } from './media-director';
 import type { InstructionalQualityEvidence } from './instructional-quality-gate';
 import { configuredNarrationProvider } from './edge-tts';
+import { MIN_TITLE_WORD_COVERAGE, readEncodedTitle } from './title-readability.mjs';
 
-export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v6';
+export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v7';
 
 const execFileAsync = promisify(execFile);
 const MIN_BYTES = 100_000;
@@ -25,7 +28,9 @@ const MIN_ASR_NARRATION_COVERAGE = 0.9;
 export interface MediaQualityEvidence {
   mediaSha256?: string;
   actualTranscript?: string;
-  readability?: Array<{ scene: number; width: number; wordCoverage: number }>;
+  readability?: Array<{ scene: number; width: number; wordCoverage: number; ocrMode?: 'full-frame' | 'title-region' }>;
+  teachingVisualEvidence?: Array<{sceneId:string;step:number;width:number;time:number;expected:string;decoded:string;wordCoverage:number;ocrMode?:'sparse'|'block'}>;
+  sceneNarrationEvidence?: Array<{sceneId:string;startSeconds:number;endSeconds:number;actualTranscript:string;coverage:number}>;
   gateVersion: typeof MEDIA_QUALITY_GATE_VERSION;
   bytes: number;
   actualDurationSeconds: number;
@@ -288,6 +293,10 @@ async function requireCloudflareTranscriptionCredentials(): Promise<{
 }
 
 async function transcribeRenderedAudio(videoPath: string, workDir: string): Promise<string> {
+  if (process.env.AI_TRANSCRIPTION_PROVIDER === 'local_whisper') {
+    const { transcribeLocalAudio } = await import('./local-transcription.mjs');
+    return (await transcribeLocalAudio(videoPath,{wordTimings:false})).text;
+  }
   const model = resolveCloudflareTranscriptionModel();
 
   // Raw WAV expands long lessons enough to exceed the Workers AI request
@@ -364,6 +373,7 @@ async function transcribeRenderedAudio(videoPath: string, workDir: string): Prom
 }
 
 export async function enforceMediaQuality(input: {
+  lessonPresentation?: 'approved-premium-v1';
   videoUrl: string;
   expectedDurationSeconds: number;
   expectedSceneCount: number;
@@ -430,10 +440,12 @@ export async function enforceMediaQuality(input: {
     const sourcedScenes = input.sceneData.scenes.filter((scene) =>
       Boolean(scene.resolvedProvider && scene.resolvedModel),
     );
+    const ownedGeneratedPhoto=(scene:any)=>scene.resolvedProvider==='google'&&scene.resolvedModel==='generated-teaching-photograph'&&scene.physicalDemonstration!==true&&
+      Array.isArray(scene.pictureCues)&&scene.pictureCues.length>=2&&scene.pictureCues.every((cue:any)=>cue.illustration===true&&/^[a-f0-9]{64}$/i.test(cue.sha256)&&String(cue.storagePath??'').startsWith('approved-teaching-photos/'));
     const licensedScenes = input.sceneData.scenes.filter((scene) =>
       Boolean(
         scene.resolvedProvider &&
-        !['remotion', 'elevate-owned', 'elevate-motion'].includes(scene.resolvedProvider),
+        !ownedGeneratedPhoto(scene) && !['remotion', 'elevate-owned', 'elevate-motion'].includes(scene.resolvedProvider),
       ),
     );
     const licensedScenesWithEvidence = licensedScenes.filter((scene) =>
@@ -464,6 +476,7 @@ export async function enforceMediaQuality(input: {
     );
     const verifiedExactScenes = exactScenes.filter((scene) => {
       const provider = scene.resolvedProvider ?? '';
+      if(ownedGeneratedPhoto(scene)) return true;
       if (['wan', 'ltx', 'remotion'].includes(provider)) return true;
       return Boolean(provider && scene.sourceLicenseEvidenceUrl);
     });
@@ -525,8 +538,11 @@ export async function enforceMediaQuality(input: {
 
     // OCR the encoded title at desktop and a phone-sized delivery width.
     // Metadata about font sizes cannot establish that the final picture is readable.
-    const readability: Array<{ scene: number; width: number; wordCoverage: number }> = [];
-    let sceneStart = 3;
+    const readability: NonNullable<MediaQualityEvidence['readability']> = [];
+    const teachingVisualEvidence: NonNullable<MediaQualityEvidence['teachingVisualEvidence']> = [];
+    const sceneNarrationEvidence: NonNullable<MediaQualityEvidence['sceneNarrationEvidence']> = [];
+    const premium=input.lessonPresentation==='approved-premium-v1';
+    let sceneStart = premium ? 0 : 3;
     for (const [index, scene] of input.sceneData.scenes.entries()) {
       const time = sceneStart + Math.min(2, scene.durationSeconds / 2);
       for (const width of [1280, 390]) {
@@ -547,21 +563,54 @@ export async function enforceMediaQuality(input: {
           ],
           { timeout: 30000, maxBuffer: 1000000 },
         );
-        const { stdout: ocr } = await execFileAsync('tesseract', [frame, 'stdout', '--psm', '11'], {
-          timeout: 30000,
-          maxBuffer: 1000000,
+        const { wordCoverage, ocrMode } = await readEncodedTitle({
+          frame, expectedTitle: scene.subject, titleLayout: scene.titleLayout,
         });
-        const titleWords: string[] =
-          String(scene.subject)
-            .toLowerCase()
-            .match(/[a-z0-9]+/g) ?? [];
-        const expected = [...new Set(titleWords.filter((w) => w.length > 2))];
-        const decoded = new Set(ocr.toLowerCase().match(/[a-z0-9]+/g) ?? []);
-        const wordCoverage = expected.length
-          ? expected.filter((w) => decoded.has(w)).length / expected.length
-          : 0;
-        readability.push({ scene: index + 1, width, wordCoverage });
-        if (wordCoverage < 0.75) throw new Error(`MEDIA_TEXT_UNREADABLE:${index + 1}:${width}`);
+        readability.push({ scene: index + 1, width, wordCoverage, ocrMode });
+        if (wordCoverage < MIN_TITLE_WORD_COVERAGE) throw new Error(`MEDIA_TEXT_UNREADABLE:${index + 1}:${width}`);
+      }
+      // Inspect every authored teaching state in the encoded movie, including
+      // phone delivery. A diagram or record listed in metadata is not evidence
+      // that the compositor actually rendered it.
+      const speechCues=(scene as any).wordAlignment?.map((w:any)=>({text:w.word,startSeconds:w.start,endSeconds:w.end}))??[];
+      const states=(scene.teachingVisual?.steps??[]).map((step:any,index:number)=>({step,index,start:premium?quoteStartSeconds(step.narrationQuote,speechCues):index*scene.durationSeconds/scene.teachingVisual!.steps.length}));
+      if(premium) states.push({step:{label:'Fresh recap',value:(scene as any).recapText},index:states.length,start:(scene as any).recapStartSeconds});
+      for (const [stateIndex,state] of states.entries()) {
+        const stepIndex=state.index;
+        const localTime=state.start+Math.min(1,(states[stateIndex+1]?.start??scene.durationSeconds)-state.start>0 ? ((states[stateIndex+1]?.start??scene.durationSeconds)-state.start)/2 : 0);
+        const time = sceneStart + localTime;
+        for (const width of [1280,390]) {
+          const frame=join(workDir,`teaching-${index}-${stepIndex}-${width}.png`);
+          await execFileAsync('ffmpeg',['-y','-ss',String(time),'-i',videoPath,'-frames:v','1','-vf',premium?`scale=${width}:-1,crop=${Math.floor(width*646/1920)}:${Math.floor(width*640/1920)}:${Math.floor(width*1220/1920)}:${Math.floor(width*225/1920)}`:`scale=${width}:-1`,frame],{timeout:30000,maxBuffer:1000000});
+          let {stdout:decoded}=await execFileAsync('tesseract',[frame,'stdout','--psm','11'],{timeout:30000,maxBuffer:1000000});
+          let ocrMode: 'sparse' | 'block' = 'sparse';
+          const expected=premium?state.step.label+' '+state.step.value:teachingPresentation(scene.teachingVisual!, time-sceneStart, scene.durationSeconds).expectedText;
+          const words=[...new Set(normalizedWords(expected).filter(w=>w.length>2))];
+          const coverageOf = (text: string) => {
+            const observed = new Set(normalizedWords(text));
+            return words.length ? words.filter(word => observed.has(word)).length / words.length : 0;
+          };
+          let wordCoverage = coverageOf(decoded);
+          // Sparse OCR sometimes interprets a bordered form as one graphic.
+          // Re-inspect the same encoded pixels as a text block; the evidence
+          // and required 85% coverage stay unchanged. Never use source text as OCR.
+          if (wordCoverage < 0.85) {
+            const block = await execFileAsync('tesseract', [frame, 'stdout', '--psm', '6'], {timeout:30000,maxBuffer:1000000});
+            const blockCoverage = coverageOf(block.stdout);
+            if (blockCoverage > wordCoverage) { decoded = block.stdout; wordCoverage = blockCoverage; ocrMode = 'block'; }
+          }
+          teachingVisualEvidence.push({sceneId:scene.id,step:stepIndex,width,time,expected,decoded,wordCoverage,ocrMode});
+          if (wordCoverage<0.85) throw new Error(`MEDIA_TEACHING_STATE_NOT_VISIBLE:${scene.id}:${stepIndex}:${width}`);
+        }
+      }
+      if (scene.teachingVisual) {
+        const directory=await mkdtemp(join(workDir,`scene-${index}-`));
+        const audio=join(directory,'rendered-scene.mp3');
+        await execFileAsync('ffmpeg',['-y','-ss',String(sceneStart),'-i',videoPath,'-t',String(scene.durationSeconds),'-vn','-ac','1','-ar','16000',audio],{timeout:60000,maxBuffer:1000000});
+        const transcript=await transcribeRenderedAudio(audio,directory);
+        const coverage=narrationCoverage(scene.dialogue ?? scene.action,transcript);
+        sceneNarrationEvidence.push({sceneId:scene.id,startSeconds:sceneStart,endSeconds:sceneStart+scene.durationSeconds,actualTranscript:transcript,coverage});
+        if (coverage<MIN_ASR_NARRATION_COVERAGE) throw new Error(`MEDIA_SCENE_NARRATION_MISMATCH:${scene.id}:${coverage.toFixed(3)}`);
       }
       sceneStart += scene.durationSeconds;
     }
@@ -570,6 +619,8 @@ export async function enforceMediaQuality(input: {
       mediaSha256: createHash('sha256').update(buffer).digest('hex'),
       actualTranscript,
       readability,
+      teachingVisualEvidence,
+      sceneNarrationEvidence,
       bytes: buffer.length,
       actualDurationSeconds,
       expectedDurationSeconds: input.expectedDurationSeconds,
@@ -635,27 +686,34 @@ export interface MeasuredCaptionCue {
   endSeconds: number;
   text: string;
 }
-/** Cloudflare Whisper exposes real decoded word start/end times. Missing timing
+/** Speech recognition exposes decoded word start/end times. Missing timing
  * data blocks the strict renderer; do not substitute estimated phrase timing. */
 export async function measureNarrationCaptions(
   audio: Buffer,
   expectedScript: string,
   durationSeconds: number,
+  onWordAlignment?: (words:Array<{word:string;start:number;end:number}>)=>void,
 ): Promise<MeasuredCaptionCue[]> {
-  const { accountId, token } = await requireCloudflareTranscriptionCredentials();
-  const model = resolveCloudflareTranscriptionModel();
-  const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
-    {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'audio/mpeg' },
-      body: Uint8Array.from(audio).buffer,
-      signal: AbortSignal.timeout(180000),
-    },
-  );
-  if (!response.ok) throw new Error(`Caption alignment returned HTTP ${response.status}`);
-  const payload = await response.json();
-  const words: Array<{ word: string; start: number; end: number }> = payload.result?.words;
+  let words: Array<{ word: string; start: number; end: number }>;
+  if (process.env.AI_TRANSCRIPTION_PROVIDER === 'local_whisper') {
+    const { transcribeLocalAudio } = await import('./local-transcription.mjs');
+    words = (await transcribeLocalAudio(audio)).words;
+  } else {
+    const { accountId, token } = await requireCloudflareTranscriptionCredentials();
+    const model = resolveCloudflareTranscriptionModel();
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'audio/mpeg' },
+        body: Uint8Array.from(audio).buffer,
+        signal: AbortSignal.timeout(180000),
+      },
+    );
+    if (!response.ok) throw new Error(`Caption alignment returned HTTP ${response.status}`);
+    const payload = await response.json();
+    words = payload.result?.words;
+    }
   if (
     !Array.isArray(words) ||
     !words.length ||
@@ -671,9 +729,20 @@ export async function measureNarrationCaptions(
         (i > 0 && w.start < words[i - 1].start),
     )
   )
-    throw new Error('ULTIMATE_RECOGNIZED_WORD_TIMINGS_REQUIRED');
+    throw new Error(`ULTIMATE_RECOGNIZED_WORD_TIMINGS_REQUIRED:${JSON.stringify({
+      durationSeconds,
+      wordCount: Array.isArray(words) ? words.length : 0,
+      invalid: Array.isArray(words) ? words.map((w, i) => ({
+        index: i, start: w.start, end: w.end,
+        previousStart: i > 0 ? words[i - 1].start : null,
+        empty: typeof w.word !== 'string' || !w.word.trim(),
+      })).filter((w) => w.empty || !Number.isFinite(w.start) || !Number.isFinite(w.end) ||
+        w.start < 0 || w.end <= w.start || w.end > durationSeconds + 0.2 ||
+        (w.previousStart !== null && w.start < w.previousStart)).slice(0, 3) : [],
+    })}`);
   if (narrationCoverage(expectedScript, words.map((w) => w.word).join(' ')) < 0.9)
     throw new Error('ULTIMATE_CAPTION_NARRATION_COVERAGE_FAILED');
+  onWordAlignment?.(words);
   const cues: MeasuredCaptionCue[] = [];
   for (let index = 0; index < words.length; index += 8) {
     const phrase = words.slice(index, index + 8);

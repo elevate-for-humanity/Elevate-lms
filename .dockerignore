@@ -9,7 +9,7 @@
 .husky
 terminals
 
-# Dependencies & build outputs (never send to Northflank builder)
+# Dependencies & build outputs (never send to production builders)
 node_modules
 **/node_modules
 .pnpm-store
@@ -64,3 +64,38 @@ tests
 # Markdown (keep README for tooling that expects it)
 *.md
 !README.md
+
+# Google workload-identity credentials must never enter any build context.
+gha-creds-*.json
+**/gha-creds-*.json
+
+# Nested generated diagnostics, caches, and temporary workspaces
+**/reports
+**/logs
+**/tmp
+**/temp
+**/coverage
+**/playwright-report
+**/test-results
+**/*.log
+**/*.tsbuildinfo
+**/*.map
+**/.DS_Store
+**/Thumbs.db
+
+# Include only the standalone instructional acceptance test and its source fixture.
+!tests
+tests/*
+!tests/integration
+tests/integration/*
+!tests/integration/google-lesson-author.test.ts
+!docs
+docs/*
+!docs/ultimate-course-builder
+docs/ultimate-course-builder/*
+!docs/ultimate-course-builder/lessons
+docs/ultimate-course-builder/lessons/*
+!docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json
+
+# Worker acceptance checks for the owner-approved teaching format.
+!tests/integration/approved-teaching-recaps.test.ts

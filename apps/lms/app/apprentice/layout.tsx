@@ -41,11 +41,13 @@ export default async function Layout({ children }: { children: React.ReactNode }
       .select('id, role, full_name, first_name, last_name, avatar_url')
       .eq('id', subject.userId)
       .maybeSingle(),
-    db
-      .from('profiles')
-      .select('id, role, full_name, first_name, last_name, avatar_url')
-      .eq('id', user!.id)
-      .maybeSingle(),
+    user
+      ? db
+          .from('profiles')
+          .select('id, role, full_name, first_name, last_name, avatar_url')
+          .eq('id', user.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
@@ -63,7 +65,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
   const actorIsAdmin = ['admin', 'super_admin'].includes(String(actorProfile?.role || ''));
   const isDashboard = pathname === '/apprentice' || pathname === '/apprentice/dashboard';
-  if (actorIsAdmin && !isDashboard) {
+  if (actorIsAdmin && !subject.previewing && !isDashboard) {
     const moduleName =
       pathname.split('/').filter(Boolean).pop()?.replace(/-/g, ' ') || 'apprentice module';
     return (
@@ -147,10 +149,10 @@ export default async function Layout({ children }: { children: React.ReactNode }
         <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">
           Apprentice notice
         </p>
-        <h2 className="mt-1 text-lg font-black">Theory coursework opens September 11, 2026.</h2>
+        <h2 className="mt-1 text-lg font-black">Complete your apprentice onboarding</h2>
         <p className="mt-1 text-sm font-semibold leading-6">
-          You can sign in and use your apprentice portal now. Please complete and upload every
-          required document before theory begins.
+          Review your assigned courses, training schedule, and required documents. Course access
+          follows your actual enrollment and onboarding status.
         </p>
         <a
           href="/apprentice/documents"

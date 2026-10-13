@@ -4,6 +4,7 @@ import {
   currentEvidence,
   stepInputHash,
   validateStepOutput,
+  practicalVisualFailures,
   ULTIMATE_LESSON_CONTRACT_VERSION,
   MAX_TARGETED_REPAIRS,
 } from './lesson-contract';
@@ -42,6 +43,7 @@ export interface UltimateRunContext {
     artifacts: Record<string, unknown>;
   }) => Promise<void>;
   passedSteps?: Set<UltimateBuildStep>;
+  assertActive?: () => void;
 }
 
 export class UltimateBuildRunner {
@@ -55,9 +57,13 @@ export class UltimateBuildRunner {
     }> = [];
     let index = 0;
     while (index < ULTIMATE_BUILD_STEPS.length) {
+      ctx.assertActive?.();
       const step = ULTIMATE_BUILD_STEPS[index];
       const inputHash = stepInputHash(step, ctx.profile, ctx.artifacts);
-      if (ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], inputHash)) {
+      const competency = ctx.profile.competencies.find(c => ctx.buildId.endsWith(':' + c.id)) ?? ctx.profile.competencies[0];
+      if (ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], inputHash) &&
+          !validateStepOutput(step, ctx.artifacts[step] ?? {}).length &&
+          (step !== 'visual_assignment' || !practicalVisualFailures(ctx.artifacts, competency).length)) {
         index++;
         continue;
       }
@@ -66,13 +72,16 @@ export class UltimateBuildRunner {
         ctx.passedSteps?.delete(dependent);
         delete ctx.artifacts[dependent];
       }
+      ctx.assertActive?.();
       await ctx.persistStep?.({ step, state: 'running' });
       let failures: UltimateInstructionalFinding[] = [];
       let artifacts: Record<string, unknown> = {};
       try {
         const handler = this.handlers[step];
         if (!handler) throw new Error(`HANDLER_NOT_IMPLEMENTED:${step}`);
+        ctx.assertActive?.();
         const result = await handler(ctx);
+        ctx.assertActive?.();
         artifacts = artifactPayload(result.artifacts ?? {});
         if (step === 'selective_repair')
           artifacts = {
@@ -81,14 +90,15 @@ export class UltimateBuildRunner {
               ...(artifacts.repair as object),
               attempts,
               unresolved: Number(
-                (artifacts.repair as any)?.unresolved ??
-                  ctx.findings.filter((f) => f.severity === 'error').length,
+                (artifacts.repair as any)?.unresolved ?? 0,
               ),
             },
           };
         const findings = result.findings ?? [];
         failures = findings.filter((f) => f.severity === 'error');
-        for (const code of validateStepOutput(step, artifacts))
+        const contractFailures = validateStepOutput(step, artifacts);
+        if (step === 'visual_assignment') contractFailures.push(...practicalVisualFailures({...ctx.artifacts, visual_assignment: artifacts}, competency));
+        for (const code of contractFailures)
           failures.push({
             step,
             severity: 'error',
@@ -109,6 +119,7 @@ export class UltimateBuildRunner {
           passed: failures.length === 0,
           checkedAt: new Date().toISOString(),
         };
+        ctx.assertActive?.();
         ctx.artifacts[step] = artifacts;
         await ctx.persistArtifact?.({ step, artifacts });
         if (!failures.length) {
@@ -120,9 +131,25 @@ export class UltimateBuildRunner {
           continue;
         }
       } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        failures = [{ step, severity: 'error', code: message.split(':')[0], message }];
+        const message =
+          error instanceof Error
+            ? error.message
+            : typeof error === 'string'
+              ? error
+              : (() => {
+                  try {
+                    return JSON.stringify(error);
+                  } catch {
+                    return String(error);
+                  }
+                })();
+        const code =
+          error && typeof error === 'object' && 'code' in error && typeof (error as any).code === 'string'
+            ? (error as any).code
+            : message.split(':')[0];
+        failures = [{ step, severity: 'error', code, message }];
       }
+      ctx.assertActive?.();
       await ctx.persistStep?.({ step, state: 'failed', artifacts, findings: failures });
       for (const finding of failures) await ctx.persistFinding?.(finding);
       const route = routeSelectiveRepairs(failures)[0];
@@ -136,6 +163,13 @@ export class UltimateBuildRunner {
       if (target && attempts.length < MAX_TARGETED_REPAIRS) {
         attempts.push({ failedStep: step, target, codes: failures.map((f) => f.code) });
         index = Math.min(index, ULTIMATE_BUILD_STEPS.indexOf(target));
+        // A routed repair deliberately changes an upstream producer. Its old
+        // passed certificate must not cause the loop to skip that producer and
+        // merely rerun QA against the identical failed movie.
+        for (const dependent of ULTIMATE_BUILD_STEPS.slice(index)) {
+          ctx.passedSteps?.delete(dependent);
+          delete ctx.artifacts[dependent];
+        }
         continue;
       }
       ctx.findings.push(...failures);

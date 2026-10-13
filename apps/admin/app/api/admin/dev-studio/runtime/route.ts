@@ -45,10 +45,23 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
   const body = await request.json().catch(() => ({}));
   const operation = String(body.operation || 'exec');
+  if (!['exec','repository-sync','terminal-create','terminal-input','terminal-stop','file-write'].includes(operation))
+    return NextResponse.json({error:'Unsupported Studio runtime operation'},{status:400});
   const command = String(body.command || '').trim();
   if (operation === 'exec' && !command) return NextResponse.json({ error: 'command is required' }, { status: 400 });
+  const runId = typeof body.studioRunId === 'string' ? body.studioRunId : '';
+  const stepId = typeof body.studioRunStepId === 'string' ? body.studioRunStepId : undefined;
+  if (runId) {
+    const db=await requireAdminClient();
+    const {data:ownedRun,error}=await db.from('studio_runs').select('id')
+      .eq('id',runId).eq('user_id',auth.id).maybeSingle();
+    if(error) return NextResponse.json({error:'Studio run lookup failed'},{status:503});
+    if(!ownedRun) return NextResponse.json({error:'Studio run is not owned by this operator'},{status:403});
+  }
   const { url, secret } = await runtimeConfig();
-  const target = operation === 'repository-sync'
+  const target = operation === 'file-write' ? `${url}/workspace/file`
+    : operation === 'terminal-stop' ? `${url}/workspace/terminal/${encodeURIComponent(String(body.sessionId || ''))}`
+    : operation === 'repository-sync'
     ? `${url}/workspace/repository/sync`
     : operation === 'terminal-create'
       ? `${url}/workspace/terminal`
@@ -56,9 +69,10 @@ export async function POST(request: NextRequest) {
         ? `${url}/workspace/terminal/${encodeURIComponent(String(body.sessionId || ''))}/input`
         : `${url}/workspace/exec`;
   const response = await fetch(target, {
-    method: 'POST',
+    method: operation === 'file-write' ? 'PUT' : operation === 'terminal-stop' ? 'DELETE' : 'POST',
     headers: { 'content-type': 'application/json', 'x-studio-browser-secret': secret },
-    body: JSON.stringify(operation === 'repository-sync'
+    body: operation === 'terminal-stop' ? undefined : JSON.stringify(operation === 'file-write' ? {path:body.path,content:body.content}
+      : operation === 'repository-sync'
       ? { repoUrl: body.repoUrl, branch: body.branch }
       : operation === 'terminal-input'
         ? { data: body.data }
@@ -73,8 +87,6 @@ export async function POST(request: NextRequest) {
     signal: AbortSignal.timeout(120_000),
   });
   const payload = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
-  const runId = typeof body.studioRunId === 'string' ? body.studioRunId : '';
-  const stepId = typeof body.studioRunStepId === 'string' ? body.studioRunStepId : undefined;
   if (response.ok && runId) {
     const db = await requireAdminClient();
     await recordMasterStudioArtifact(db, {
@@ -82,7 +94,8 @@ export async function POST(request: NextRequest) {
       stepId,
       type: operation === 'repository-sync' ? 'repository-checkpoint' : operation.startsWith('terminal') ? 'terminal-checkpoint' : 'runtime-execution',
       name: operation,
-      status: 'verified',
+      status: operation === 'exec' ? (payload.exitCode === 0 ? 'verified' : 'failed')
+        : operation.startsWith('terminal') ? 'generated' : 'verified',
       metadata: {
         operation,
         command: operation === 'exec' ? command : undefined,

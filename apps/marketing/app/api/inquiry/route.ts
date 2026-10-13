@@ -134,7 +134,7 @@ async function _POST(req: Request) {
         </ol>
         <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 20px">
           Not sure if you qualify? Our admissions team can walk you through the eligibility checklist.
-          Call us at <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color:#1a1a1a">${PLATFORM_DEFAULTS.supportPhone}</a> or reply to this email.
+          Call us at <a href="tel:${PLATFORM_DEFAULTS.mainPhone}" style="color:#1a1a1a">${PLATFORM_DEFAULTS.mainPhone}</a> or reply to this email.
         </p>`
       : `
         <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:20px;margin:24px 0">
@@ -153,7 +153,7 @@ async function _POST(req: Request) {
           <li>You'll receive your start date and orientation details by email</li>
         </ol>
         <p style="font-size:14px;color:#555;line-height:1.7;margin:0 0 20px">
-          Questions about cost or payment? Call us at <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color:#1a1a1a">${PLATFORM_DEFAULTS.supportPhone}</a>
+          Questions about cost or payment? Call us at <a href="tel:${PLATFORM_DEFAULTS.mainPhone}" style="color:#1a1a1a">${PLATFORM_DEFAULTS.mainPhone}</a>
           or reply to this email — we'll find a path that works for you.
         </p>`;
 
@@ -179,7 +179,7 @@ async function _POST(req: Request) {
           <div style="border-top:1px solid #e0e0e0;margin-top:32px;padding-top:20px;text-align:center;font-family:Arial,sans-serif;font-size:12px;color:#999">
             <p style="margin:0 0 4px">${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute</p>
             <p style="margin:0 0 4px">${organization.address}</p>
-            <p style="margin:0"><a href="${siteUrl}" style="color:#999;text-decoration:underline">${PLATFORM_DEFAULTS.canonicalDomain}</a> &nbsp;|&nbsp; ${PLATFORM_DEFAULTS.supportPhone}</p>
+            <p style="margin:0"><a href="${siteUrl}" style="color:#999;text-decoration:underline">${PLATFORM_DEFAULTS.canonicalDomain}</a> &nbsp;|&nbsp; ${PLATFORM_DEFAULTS.mainPhone}</p>
           </div>
         </div>
       </div>`;
@@ -229,7 +229,7 @@ async function _POST(req: Request) {
   } catch (error) {
     logger.error('Inquiry error:', error);
     return NextResponse.json(
-      { error: 'Failed to submit inquiry. Please call 317-314-3757.' },
+      { error: 'Failed to submit inquiry. Please call 317-999-9620.' },
       { status: 500 },
     );
   }

@@ -7,11 +7,13 @@ import {
 import { loadQuickBooksConfig, quickBooksRequest } from '@/lib/integrations/quickbooks-client';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
+  await hydrateProcessEnv();
   const rawBody = await request.text();
   const verifier = process.env.QB_WEBHOOK_VERIFIER_TOKEN || '';
   if (!verifyQuickBooksWebhook(rawBody, request.headers.get('intuit-signature'), verifier)) {
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
       const result = await quickBooksRequest<any>(
         db,
         config,
-        `invoice/${encodeURIComponent(invoiceId)}`,
+        `invoice/${encodeURIComponent(invoiceId)}?include=invoiceLink`,
       );
       const invoice = result.Invoice;
       const status = normalizeQuickBooksInvoiceStatus(invoice);
@@ -43,7 +45,7 @@ export async function POST(request: NextRequest) {
           invoice_number: invoice.DocNumber || null,
           status,
           paid_at: status === 'paid' ? new Date().toISOString() : null,
-          payment_url: invoice.InvoiceLink || null,
+          ...(invoice.InvoiceLink ? { payment_url: invoice.InvoiceLink } : {}),
           provider_payload: invoice,
           updated_at: new Date().toISOString(),
         })

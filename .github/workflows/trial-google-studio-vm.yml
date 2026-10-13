@@ -1,0 +1,89 @@
+name: Trial isolated Google Studio VM
+on:
+  pull_request:
+    paths: ['scripts/gcp/deploy-studio-vm-trial*', 'scripts/gcp/studio-vm-startup.sh', '.github/workflows/trial-google-studio-vm.yml']
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/deploy-studio-vm-trial*', 'scripts/gcp/studio-vm-startup.sh', '.github/workflows/trial-google-studio-vm.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test scripts/gcp/deploy-studio-vm-trial.test.mjs
+      - run: bash -n scripts/gcp/studio-vm-startup.sh
+  dispatch:
+    if: github.event_name == 'push'
+    needs: test
+    permissions:
+      actions: write
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/trial-google-studio-vm.yml/dispatches" -f ref=main
+  trial:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    needs: test
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 40
+    concurrency:
+      group: google-studio-browser
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Build immutable Studio image
+        run: docker build -f Dockerfile.studio-browser --build-arg "NF_GIT_SHA=$GITHUB_SHA" -t "studio-browser:$GITHUB_SHA" .
+      - name: Verify actual browser and session contracts
+        run: >-
+          docker run --rm --init --cpus=2 --memory=4g --shm-size=1g
+          --cap-drop=ALL --security-opt=no-new-privileges
+          -e STUDIO_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
+          -v "$PWD/services/studio-browser:/tests:ro"
+          --entrypoint sh "studio-browser:$GITHUB_SHA"
+          -c 'test "$(id -u)" = 1001 && cp -f /tests/*.test.mjs /app/ && node --test --test-concurrency=1 /app/*.test.mjs'
+      - name: Publish tested image
+        run: |
+          set -euo pipefail
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/studio-browser:$GITHUB_SHA"
+          docker tag "studio-browser:$GITHUB_SHA" "$IMAGE"
+          docker push "$IMAGE"
+      - name: Prove isolated VM and encrypted persistence across restart
+        timeout-minutes: 20
+        run: node scripts/gcp/deploy-studio-vm-trial.mjs
+      - name: Stop trial and remove its temporary SSH rule
+        if: always()
+        run: node scripts/gcp/deploy-studio-vm-trial.mjs --cleanup
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: studio-vm-trial-${{ github.run_id }}
+          path: reports/studio-vm/trial.json
+          if-no-files-found: warn
+          retention-days: 7

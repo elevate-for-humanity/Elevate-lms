@@ -81,7 +81,6 @@ for (const file of [
   '.github/workflows/predeploy-check.yml',
   '.github/workflows/design-policy-enforcement.yml',
   '.github/workflows/lockfile-check.yml',
-  '.github/workflows/health-check.yml',
   '.github/workflows/supabase-auto-migrate-seed.yml',
 ]) protectDeterministicGate(file);
 
@@ -126,30 +125,44 @@ forbidText('.github/workflows/promote-to-production.yml', 'git push origin main'
 forbidText('.github/workflows/promote-to-production.yml', 'skipping LMS health check', 'Missing staging health configuration must not be treated as success.');
 forbidText('.github/workflows/promote-to-production.yml', 'skipping Admin health check', 'Missing Admin staging health configuration must not be treated as success.');
 
-requireText('.github/workflows/northflank-trigger-dispatch.yml', 'git merge-base --is-ancestor', 'Production dispatcher must prove requested SHA belongs to main.');
-requireText('.github/workflows/northflank-trigger-dispatch.yml', 'RESOLVED_SHA', 'Production dispatcher must resolve the exact requested commit.');
-
+// Active deployment requirements: Google only, preserving production identity,
+// immutable image selection and fail-closed live revision checks.
 for (const file of [
-  '.github/workflows/deploy-marketing.yml',
   '.github/workflows/deploy-admin.yml',
-  '.github/workflows/deploy-lms.yml',
-  '.github/workflows/recover-marketing.yml',
-  '.github/workflows/elevate-production-deploy.yml',
-]) protectProductionWorkflow(file);
+  '.github/workflows/deploy-google-marketing-trigger.yml',
+]) {
+  requireText(file, 'environment: production', 'Google release must use protected production environment.');
+  requireText(file, 'google-github-actions/auth@v3', 'Google workload identity is required.');
+  requireText(file, 'elegant-racer-299721', 'Google release must use the approved production project.');
+  requireText(file, 'gcloud run services update', 'Release must update Google Cloud Run.');
+  forbidText(file, 'api.northflank.com', 'Never trigger Northflank from a Google release.');
+}
+requireText('.github/workflows/deploy-admin.yml', 'node scripts/gcp/verify-admin-revision.mjs', 'Admin release must execute the live exact revision verifier.');
+requireText('scripts/gcp/verify-admin-revision.mjs', 'verifyAdminRevision(process.env.GOOGLE_ADMIN_URL, process.env.GITHUB_SHA)', 'Admin verifier must receive the Google URL and exact release SHA.');
+requireText('scripts/gcp/verify-admin-revision.mjs', "response.status === 200 && body.service === 'admin' && body.commit === commit && body.healthy === true && body.dependencies?.supabase?.ok === true", 'Admin verifier must require the exact commit, Admin identity and healthy Supabase.');
+requireText('scripts/gcp/verify-admin-revision.mjs', 'process.exitCode = 1', 'Admin verification failures must fail the release.');
+requireText('.github/workflows/deploy-google-marketing-trigger.yml', 'git merge-base --is-ancestor', 'Marketing SHA must belong to main.');
+requireText('.github/workflows/deploy-google-marketing-trigger.yml', 'sha===process.env.GITHUB_SHA', 'Marketing public exact commit verification is required.');
+for (const old of ['northflank-trigger-dispatch.yml','deploy-lms.yml','deploy-marketing.yml','recover-marketing.yml','elevate-production-deploy.yml']) {
+  if (fs.existsSync('.github/workflows/' + old)) failures.push('Retired deployment workflow still present: ' + old);
+}
 
-requireText('.github/workflows/elevate-production-deploy.yml', "inputs.environment }}' == 'production'", 'Canonical production deploy must explicitly enforce production SHA provenance.');
-requireText('.github/workflows/elevate-production-deploy.yml', 'Recovery hardening regression check', 'Canonical deployment must run recovery hardening before publish/deploy.');
-
-requireText('.github/workflows/health-check.yml', 'Require Northflank health credentials', 'Health checks must fail when required credentials are unavailable.');
+// The public Google monitor imports only Node builtins and local modules, so it
+// needs neither provider credentials nor dependency installation. Enforce the
+// actual fail-closed runtime contract instead of a retired Northflank token.
+requireText('.github/workflows/health-check.yml', 'node scripts/gcp/verify-public-health.mjs', 'Health checks must execute the live Google runtime contract.');
+requireText('.github/workflows/health-check.yml', 'node --test scripts/gcp/audit-runtime-parity.test.mjs scripts/gcp/verify-public-health.test.mjs', 'Health checks must prove failure handling before probing production.');
+forbidText('.github/workflows/health-check.yml', 'NORTHFLANK_', 'Health monitoring must not depend on the retired deployment platform.');
+forbidText('.github/workflows/health-check.yml', 'continue-on-error', 'Unhealthy Google services must not produce a green check.');
+requireText('scripts/gcp/verify-public-health.mjs', 'if (results.some(x => !x.passed)) process.exitCode = 1;', 'Any failed Google runtime probe must fail the health check.');
 forbidText('.github/workflows/health-check.yml', 'Skipping health check for now', 'Missing health credentials must not produce a green check.');
 
 forbidText('.github/workflows/supabase-auto-migrate-seed.yml', 'node scripts/db/runMigrations.js', 'Supabase workflow must not automatically apply production migrations.');
 forbidText('.github/workflows/supabase-auto-migrate-seed.yml', 'pnpm db:seed', 'Supabase workflow must not automatically seed production data.');
 requireText('.github/workflows/supabase-auto-migrate-seed.yml', 'This workflow does NOT apply migrations or seed production data.', 'Supabase workflow must remain audit-only during recovery.');
 
-forbidText('.github/workflows/fix-northflank-services.yml', '--all --execute', 'Legacy all-service mutator must remain disabled.');
-forbidText('.github/workflows/fix-northflank-services.yml', 'restart-service.ts', 'Legacy workflow must not restart all production services.');
-requireText('.github/workflows/fix-northflank-services.yml', 'does not mutate or restart production services', 'Northflank legacy fixer must remain audit-only.');
+// Legacy inventory-only scripts may remain for safe migration audits. No
+// historical Northflank workflow is required for a Google production release.
 
 requireText('scripts/check-stripe-integrity.mjs', 'process.exit(1)', 'Stripe violations must remain blocking.');
 forbidText('scripts/check-stripe-integrity.mjs', 'Warn only for now', 'Stripe gate must not regress to warning-only behavior.');

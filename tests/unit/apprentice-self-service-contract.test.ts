@@ -60,5 +60,13 @@ describe('apprentice self-service portal contracts', () => {
     expect(apprenticeDashboard).toContain('automaticBillingActive');
     expect(billingCard).not.toContain('Stripe');
     expect(apprenticeDashboard).not.toContain('stripe_subscription_id');
+    const legacyLoader = source('lib/portal/load-apprentice-portal.ts');
+    const legacyShell = source('components/portal/ApprenticePortalShell.tsx');
+    expect(legacyLoader).not.toContain('stripe_subscription_id');
+    expect(legacyLoader).not.toContain('stripe_subscription_status');
+    expect(legacyShell).not.toContain('Stripe');
+    expect(legacyShell).not.toContain('stripe_subscription_id');
+    expect(legacyShell).toContain('PayPal authorization');
+    expect(legacyShell).toContain('QuickBooks invoice');
   });
 });

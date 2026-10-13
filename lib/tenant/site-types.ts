@@ -36,7 +36,10 @@ export type TenantSiteSectionType =
   | 'pricing'
   | 'cta'
   | 'contact_form'
-  | 'booking';
+  | 'booking'
+  | 'assessment'
+  | 'journal'
+  | 'events';
 
 export type TenantSiteSection = {
   id: string;

@@ -6,6 +6,7 @@ import {
   tenantSlugFromAppHost,
 } from '@/lib/tenant/middleware-tenant-routing';
 import { LMS_HOST, MARKETING_HOST } from '@/lib/routing/portal-map';
+import { getPublicRuntimeService } from '@/lib/health/public-runtime-service';
 
 // These route families are authenticated operational software, not public
 // marketing pages. Protect the complete family so child routes cannot inherit
@@ -37,11 +38,11 @@ const ELEVATE_PUBLIC_HOSTS = new Set([
   'testing.elevateforhumanity.org',
 ]);
 
-const DEPLOYMENT_HOST_SUFFIXES = ['.northflank.app'] as const;
+const DEPLOYMENT_HOST_SUFFIXES = ['.northflank.app', '.run.app'] as const;
 
 const STORE_RUNTIME_ALLOWED_PREFIXES = [
   '/store', '/login', '/signup', '/register', '/forgot-password', '/reset-password', '/auth',
-  '/api/store', '/api/webhooks/store', '/api/webhooks/stripe', '/api/auth', '/api/ping', '/api/health',
+  '/api/store', '/api/webhooks/store', '/api/webhooks/stripe', '/api/auth', '/api/version', '/api/ping', '/api/health', '/api/ready',
 ] as const;
 
 function isProtectedPortal(pathname: string) {
@@ -89,6 +90,7 @@ function isStaticRequest(pathname: string) {
 
 function isCustomTenantHost(host: string) {
   if (!host || host === 'localhost' || host === '127.0.0.1' || host === '::1') return false;
+  if (isDeploymentHost(host)) return false;
   if (ELEVATE_PUBLIC_HOSTS.has(host)) return false;
   if (host.endsWith('.elevateforhumanity.org')) return false;
   return true;
@@ -119,7 +121,7 @@ function isStoreRuntimeAllowed(pathname: string): boolean {
 }
 
 function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextResponse | null {
-  if (process.env.STORE_ONLY_RUNTIME !== 'true') return null;
+  if (getPublicRuntimeService() !== 'store') return null;
   if (pathname === '/') {
     const url = req.nextUrl.clone();
     url.pathname = '/store';
@@ -131,10 +133,26 @@ function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextRespons
 
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
+  // Infrastructure probes use internal hosts as well as public domains. These
+  // exact service endpoints must never enter tenant, auth or canonical routing.
+  if (['/api/ping', '/api/ready', '/api/health'].includes(pathname)) {
+    return NextResponse.next();
+  }
   if (isStaticRequest(pathname)) return NextResponse.next();
 
   const storeRuntimeResponse = handleStoreOnlyRuntime(req, pathname);
   if (storeRuntimeResponse) return storeRuntimeResponse;
+
+  // Redirect unauthenticated entry at the edge: do not rely on a page render
+  // or client navigation to return the canonical login redirect status.
+  if (pathname === '/login' && getPublicRuntimeService() !== 'store') {
+    const target = new URL('/login', 'https://app.elevateforhumanity.org');
+    for (const key of ['next', 'redirect', 'reason']) {
+      const value = req.nextUrl.searchParams.get(key);
+      if (value) target.searchParams.set(key, value);
+    }
+    return NextResponse.redirect(target, 307);
+  }
 
   const host = requestHost(req);
 
@@ -162,7 +180,7 @@ export async function middleware(req: NextRequest) {
   // Build and provider URLs are operational deployment surfaces, not public
   // websites or customer custom domains. Keep them usable for health checks
   // while preventing search engines from indexing a second copy of Marketing.
-  if (isDeploymentHost(host)) {
+  if (isDeploymentHost(host) && !isProtectedPortal(pathname)) {
     return deploymentHostResponse(pathname, search, requestHeaders);
   }
 

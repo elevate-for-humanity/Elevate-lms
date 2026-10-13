@@ -2,6 +2,10 @@ import { randomUUID } from 'node:crypto';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { normalizeEmailSubject, parseEmailList } from '@/lib/email/communication-email';
 import { safeAttachmentName, type ParsedInboundEmail } from '@/lib/email/sendgrid-inbound';
+import {
+  applicantConversationSubject,
+  programConversationRoute,
+} from './program-conversation-routing';
 
 const ATTACHMENT_BUCKET = 'communication-email-attachments';
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
@@ -43,13 +47,19 @@ function textFromInbound(parsed: ParsedInboundEmail): string {
 
 export async function storeInboundCommunicationEmail(
   parsed: ParsedInboundEmail,
+  options: { applicantEmail?: string; internalCopy?: boolean } = {},
 ): Promise<{ stored: boolean; mailboxCount: number }> {
-  const recipients = Array.from(
+  let recipients = Array.from(
     new Set([...parsed.envelopeRecipients, ...parseEmailList(parsed.to)]),
   );
   if (!recipients.length) return { stored: false, mailboxCount: 0 };
 
   const db = await requireAdminClient();
+  const originalSender = parseEmailList(parsed.from)[0];
+  const route = options.internalCopy
+    ? null
+    : await programConversationRoute(db, [originalSender || ''], recipients);
+  if (route) recipients = [...new Set([...recipients, ...route.addresses])];
   const { data: mailboxes, error } = await db
     .from('communication_email_mailboxes')
     .select('id,address')
@@ -57,15 +67,17 @@ export async function storeInboundCommunicationEmail(
     .eq('active', true);
   if (error || !mailboxes?.length) return { stored: false, mailboxCount: 0 };
 
-  const senderEmail =
-    parseEmailList(parsed.replyTo || parsed.from)[0] || parseEmailList(parsed.from)[0];
+  const senderEmail = parseEmailList(parsed.from)[0];
   if (!senderEmail) return { stored: false, mailboxCount: 0 };
   const subject =
     String(parsed.subject || '(no subject)')
       .replace(/[\r\n]+/g, ' ')
       .trim()
       .slice(0, 240) || '(no subject)';
-  const normalizedSubject = normalizeEmailSubject(subject);
+  const applicantEmail = options.applicantEmail || route?.applicantEmail || originalSender;
+  const normalizedSubject = applicantEmail
+    ? applicantConversationSubject(subject, applicantEmail)
+    : normalizeEmailSubject(subject);
   const textBody = textFromInbound(parsed);
   let storedCount = 0;
 
@@ -118,7 +130,7 @@ export async function storeInboundCommunicationEmail(
       to_addresses: recipients,
       cc_addresses: [],
       bcc_addresses: [],
-      reply_to: senderEmail,
+      reply_to: parseEmailList(parsed.replyTo)[0] || senderEmail,
       subject,
       text_body: textBody,
       html_body: parsed.html || null,
@@ -161,5 +173,8 @@ export async function storeInboundCommunicationEmail(
     storedCount += 1;
   }
 
+  if ((route || options.internalCopy) && storedCount !== mailboxes.length) {
+    throw new Error('An assigned interoffice conversation copy could not be stored.');
+  }
   return { stored: storedCount > 0, mailboxCount: storedCount };
 }

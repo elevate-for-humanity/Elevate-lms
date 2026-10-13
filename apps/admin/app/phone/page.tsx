@@ -1,3 +1,4 @@
+import {DestinationControls} from './DestinationControls';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Bot, Mail, MessageSquareText, Phone, PhoneForwarded, Radio, Video, Voicemail, Workflow } from 'lucide-react';
@@ -5,6 +6,9 @@ import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { formatUsPhone, parseBusinessHours } from '@/lib/phone/config';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { telnyxClient } from '@/lib/phone/telnyx';
+import { resolveSendingNumber } from '@/lib/phone/sending-number';
 import {
   CapabilityGuide,
   NewSystemNotice,
@@ -13,11 +17,8 @@ import {
 } from './PhoneSetupForms';
 import {
   dismissCommunicationsAnnouncement,
-  setDefaultDestination,
-  toggleDestination,
   removeExternalNumber,
   removeMenuOption,
-  testDestination,
   toggleExtension,
   assignPhoneNumber,
   saveProgramHolderExtension,
@@ -29,6 +30,7 @@ export const metadata: Metadata = { title: 'Communications Hub' };
 export default async function PhonePage() {
   const auth = await requireRole(PHONE_MANAGER_ROLES);
   const db = await requireAdminClient();
+  await hydrateProcessEnv();
   const tenantId = auth.profile.tenant_id ?? auth.profile.organization_id ?? null;
   const platformAdmin = auth.effectiveRoles.some(
     (role) => role === 'admin' || role === 'super_admin',
@@ -159,9 +161,27 @@ export default async function PhonePage() {
     ['Calls', callsResult.count ?? 0, Workflow],
     ['New voicemail', voicemailResult.count ?? 0, Voicemail],
   ] as const;
-  const carrierReady = numbers.some(
-    (number: any) => number.source === 'provider' && number.status === 'active',
-  );
+  let carrierRuntimeReady = false;
+  try {
+    const client = await telnyxClient();
+    const configuredNumber = await resolveSendingNumber(db);
+    if (configuredNumber) {
+      for await (const item of client.phoneNumbers.list({
+        filter: { phone_number: configuredNumber },
+        'page[size]': 20,
+      })) {
+        if (item.phone_number === configuredNumber) {
+          carrierRuntimeReady = true;
+          break;
+        }
+      }
+    }
+  } catch {
+    carrierRuntimeReady = false;
+  }
+  const carrierReady =
+    carrierRuntimeReady &&
+    numbers.some((number: any) => number.source === 'provider' && number.status === 'active');
   const meetingReady = workspaceResult.data?.status === 'active';
   const primaryNumber = numbers.find(
     (number: any) =>
@@ -176,7 +196,7 @@ export default async function PhonePage() {
     { label: 'Choose call routing', complete: routingReady },
     { label: 'Create extensions', complete: extensions.some((item: any) => item.enabled) },
     { label: 'Connect one PWA phone', complete: (devicesResult.count ?? 0) > 0 },
-    { label: 'Test before activation', complete: (callsResult.count ?? 0) > 0 },
+    { label: 'Call history recorded', complete: (callsResult.count ?? 0) > 0 },
   ];
   const phoneReady =
     Boolean(primaryNumber) && setupSteps.every((step) => step.complete) && carrierReady;
@@ -268,7 +288,7 @@ export default async function PhonePage() {
           </div>
           <p className="mt-1">
             {phoneReady
-              ? 'The carrier, primary number, routing, PWA extensions, and call testing are complete.'
+              ? 'The carrier number and dashboard routes are configured. Verify ringing and two-way audio with a test call.'
               : carrierReady
                 ? 'The carrier is connected, but one or more routing, extension, destination, or testing steps are incomplete.'
                 : 'Dashboard configuration is available, but live calls require a verified carrier number and connection.'}
@@ -288,6 +308,7 @@ export default async function PhonePage() {
           </p>
         </div>
       </div>
+      <Link href="https://app.elevateforhumanity.org/communications/phone" className="inline-flex min-h-12 items-center rounded-xl bg-blue-700 px-5 font-black text-white">Open my phone and dial pad</Link>
       <CapabilityGuide />
       <PhoneSetupForms
         settings={settings}
@@ -386,33 +407,7 @@ export default async function PhonePage() {
                       · rings {item.ring_seconds}s
                     </span>
                   </span>
-                  <div className="flex gap-2">
-                    {system?.default_destination_id !== item.id ? (
-                      <form action={setDefaultDestination}>
-                        <input type="hidden" name="destinationId" value={item.id} />
-                        <button className="min-h-11 rounded-lg border px-3 py-2 text-xs font-bold leading-tight">
-                          Make default
-                        </button>
-                      </form>
-                    ) : (
-                      <span className="rounded-lg bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-800">
-                        Default
-                      </span>
-                    )}
-                    <form action={toggleDestination}>
-                      <input type="hidden" name="destinationId" value={item.id} />
-                      <input type="hidden" name="enabled" value={String(!item.enabled)} />
-                      <button className="rounded-lg border px-2 py-1 text-xs font-bold">
-                        {item.enabled ? 'Pause' : 'Enable'}
-                      </button>
-                    </form>
-                    <form action={testDestination}>
-                      <input type="hidden" name="destinationId" value={item.id} />
-                      <button className="min-h-11 rounded-lg border border-indigo-300 px-3 py-2 text-xs font-bold leading-tight text-indigo-700">
-                        Test call
-                      </button>
-                    </form>
-                  </div>
+                  <DestinationControls id={item.id} enabled={item.enabled} isDefault={system?.default_destination_id === item.id} />
                 </li>
               ))}
             </ul>

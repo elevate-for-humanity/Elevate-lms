@@ -115,10 +115,6 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     ],
   },
   {
-    label: 'Licensed Media — Envato',
-    keys: ['ENVATO_API_TOKEN'],
-  },
-  {
     label: 'OpenAI',
     keys: ['OPENAI_API_KEY', 'AI_IMAGE_PROVIDER'],
   },
@@ -158,7 +154,30 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     ],
   },
   {
-    label: 'Cloudflare R2',
+    label: 'Elevate Media Storage — Backblaze B2',
+    keys: [
+      'ELEVATE_MEDIA_PROVIDER',
+      'ELEVATE_MEDIA_ENDPOINT',
+      'ELEVATE_MEDIA_REGION',
+      'ELEVATE_MEDIA_ACCESS_KEY_ID',
+      'ELEVATE_MEDIA_SECRET_ACCESS_KEY',
+      'ELEVATE_MEDIA_BUCKET',
+      'ELEVATE_MEDIA_PUBLIC_URL',
+      'NEXT_PUBLIC_ELEVATE_MEDIA_URL',
+      'ELEVATE_MEDIA_FORCE_PATH_STYLE',
+      'S3_ENDPOINT',
+      'S3_REGION',
+      'S3_ACCESS_KEY_ID',
+      'S3_SECRET_ACCESS_KEY',
+      'S3_BUCKET',
+      'S3_PUBLIC_URL',
+      'S3_FORCE_PATH_STYLE',
+      'COURSE_VIDEO_STORAGE_BACKEND',
+      'ELEVATE_MEDIA_VIDEO_MIN_BYTES',
+    ],
+  },
+  {
+    label: 'Cloudflare — legacy R2 / AI / Stream',
     keys: [
       'CLOUDFLARE_ACCOUNT_ID',
       'CLOUDFLARE_API_TOKEN',
@@ -174,19 +193,6 @@ const SERVICE_GROUPS: ServiceGroup[] = [
       'R2_BUCKET',
       'R2_ENDPOINT',
       'NEXT_PUBLIC_R2_URL',
-    ],
-  },
-  {
-    label: 'Northflank',
-    keys: [
-      'NORTHFLANK_API_TOKEN',
-      'NORTHFLANK_TEAM_ID',
-      'NORTHFLANK_PROJECT_ID',
-      'NORTHFLANK_LMS_SERVICE_ID',
-      'NORTHFLANK_ADMIN_SERVICE_ID',
-      'NORTHFLANK_SECRET_GROUP_ID',
-      'NORTHFLANK_DEPLOYMENT_PLAN',
-      'NORTHFLANK_BUILD_PLAN',
     ],
   },
   {

@@ -37,6 +37,14 @@ export function ProgramPageWrapper({
       </div>
 
       {children}
+
+      <section className="border-t border-slate-200 bg-slate-50" aria-label="Deposit policy">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <p className="text-sm text-slate-700">
+            <strong>Non-Refundable Deposit Notice:</strong> All deposits are non-refundable. A deposit is an administrative enrollment fee used to process your application, enrollment, and onboarding into the selected program or apprenticeship. Once paid, the deposit will not be refunded, including if you decide not to begin or continue the program. By submitting a deposit, you acknowledge and agree that the deposit is non-refundable.
+          </p>
+        </div>
+      </section>
     </div>
   );
 }

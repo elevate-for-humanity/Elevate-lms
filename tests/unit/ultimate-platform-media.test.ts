@@ -29,8 +29,8 @@ function mockDb() {
       calls.push(['is', ...args]);
       return query;
     },
-    limit: async (...args: unknown[]) => {
-      calls.push(['limit', ...args]);
+    order: async (...args: unknown[]) => {
+      calls.push(['order', ...args]);
       return { data: [], error: null };
     },
   };

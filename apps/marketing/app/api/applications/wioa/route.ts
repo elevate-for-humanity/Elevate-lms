@@ -112,7 +112,7 @@ async function _POST(req: Request) {
         {
           error:
             canonical.error ||
-            `Failed to save application. Please call ${PLATFORM_DEFAULTS.supportPhone} for assistance.`,
+            `Failed to save application. Please call ${PLATFORM_DEFAULTS.mainPhone} for assistance.`,
         },
         { status: canonicalResponse.status || 500 },
       );

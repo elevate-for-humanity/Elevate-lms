@@ -26,40 +26,53 @@ export default async function AdminStorePage() {
   const supabase = await createClient();
 
   const [
-    { data: storeProducts, count: productCount },
-    { data: purchases, count: purchaseCount },
-    { data: licensePurchases, count: licenseCount },
-    { data: recentPurchases },
-    { data: recentLicenses },
+    { data: rawStoreProducts, count: productCount, error: productError },
+    { data: purchases, count: purchaseCount, error: purchaseError },
+    { data: licensePurchases, count: licenseCount, error: licenseError },
+    { data: recentPurchases, error: recentPurchaseError },
+    { data: recentLicenses, error: recentLicenseError },
   ] = await Promise.all([
     supabase
       .from('store_products')
-      .select('id, name, price, is_active, product_type', { count: 'exact' })
+      .select('id, name, status, products(price, is_active, type)', { count: 'exact' })
       .order('created_at', { ascending: false })
       .limit(20),
     supabase
       .from('purchases')
-      .select('id, amount, status, created_at', { count: 'exact' })
+      .select('id, amount_cents, status, created_at', { count: 'exact' })
       .limit(500),
     supabase
       .from('license_purchases')
-      .select('id, amount, status, created_at', { count: 'exact' })
+      .select('id, amount_cents, status, created_at', { count: 'exact' })
       .limit(500),
     supabase
       .from('purchases')
-      .select('id, amount, status, created_at, profiles(full_name, email)')
+      .select('id, amount_cents, status, created_at, email')
       .order('created_at', { ascending: false })
       .limit(10),
     supabase
       .from('license_purchases')
-      .select('id, amount, status, created_at, profiles(full_name, email)')
+      .select('id, amount_cents, status, created_at, contact_name, contact_email')
       .order('created_at', { ascending: false })
       .limit(10),
   ]);
 
+  const storeProducts = (rawStoreProducts || []).map((row) => {
+    const product = Array.isArray(row.products) ? row.products[0] : row.products;
+    return {
+      ...row,
+      price: product?.price ?? null,
+      is_active: product?.is_active ?? row.status === 'active',
+      product_type: product?.type ?? null,
+    };
+  });
+  const inventoryUnavailable = Boolean(
+    productError || purchaseError || licenseError || recentPurchaseError || recentLicenseError,
+  );
+
   const totalRevenue = [...(purchases || []), ...(licensePurchases || [])]
     .filter((p: any) => p.status === 'completed' || p.status === 'succeeded')
-    .reduce((sum: number, p: any) => sum + Number(p.amount || 0), 0);
+    .reduce((sum: number, p: any) => sum + Number(p.amount_cents || 0) / 100, 0);
 
   const activeProducts = (storeProducts || []).filter((p: any) => p.is_active).length;
 
@@ -90,7 +103,7 @@ export default async function AdminStorePage() {
             </div>
             <div className="flex gap-3">
               <Link
-                href="/store"
+                href="https://www.elevateforhumanity.org/store"
                 target="_blank"
                 className="flex items-center gap-2 border border-slate-300 text-slate-900 px-4 py-2 rounded-lg hover:bg-slate-50 text-sm"
               >
@@ -106,13 +119,24 @@ export default async function AdminStorePage() {
           </div>
         </div>
 
+        {inventoryUnavailable ? (
+          <p
+            role="alert"
+            className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-800"
+          >
+            Some store records could not be loaded. Counts and revenue are incomplete; refresh after
+            resolving the data connection.
+          </p>
+        ) : null}
         {/* KPI Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl shadow-sm border p-5">
             <div className="w-10 h-10 bg-brand-blue-50 rounded-lg flex items-center justify-center mb-3">
               <Package className="w-5 h-5 text-brand-blue-600" />
             </div>
-            <p className="text-2xl font-bold text-slate-900">{productCount || 0}</p>
+            <p className="text-2xl font-bold text-slate-900">
+              {productError ? 'Unavailable' : (productCount ?? 0)}
+            </p>
             <p className="text-sm text-slate-700 mt-1">Total Products</p>
             <p className="text-xs text-slate-700 mt-0.5">{activeProducts} active</p>
           </div>
@@ -120,7 +144,9 @@ export default async function AdminStorePage() {
             <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center mb-3">
               <DollarSign className="w-5 h-5 text-green-600" />
             </div>
-            <p className="text-2xl font-bold text-slate-900">${totalRevenue.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-slate-900">
+              {purchaseError || licenseError ? 'Unavailable' : `$${totalRevenue.toLocaleString()}`}
+            </p>
             <p className="text-sm text-slate-700 mt-1">Total Revenue</p>
             <p className="text-xs text-slate-700 mt-0.5">Completed orders</p>
           </div>
@@ -128,14 +154,18 @@ export default async function AdminStorePage() {
             <div className="w-10 h-10 bg-brand-orange-50 rounded-lg flex items-center justify-center mb-3">
               <ShoppingBag className="w-5 h-5 text-brand-orange-600" />
             </div>
-            <p className="text-2xl font-bold text-slate-900">{purchaseCount || 0}</p>
+            <p className="text-2xl font-bold text-slate-900">
+              {purchaseError ? 'Unavailable' : (purchaseCount ?? 0)}
+            </p>
             <p className="text-sm text-slate-700 mt-1">Store Orders</p>
           </div>
           <div className="bg-white rounded-xl shadow-sm border p-5">
             <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center mb-3">
               <Key className="w-5 h-5 text-purple-600" />
             </div>
-            <p className="text-2xl font-bold text-slate-900">{licenseCount || 0}</p>
+            <p className="text-2xl font-bold text-slate-900">
+              {licenseError ? 'Unavailable' : (licenseCount ?? 0)}
+            </p>
             <p className="text-sm text-slate-700 mt-1">License Sales</p>
           </div>
         </div>
@@ -146,7 +176,7 @@ export default async function AdminStorePage() {
             <div className="p-5 border-b flex justify-between items-center">
               <h2 className="text-base font-semibold text-slate-900">Products</h2>
               <Link
-                href="/store"
+                href="https://www.elevateforhumanity.org/store"
                 className="text-sm text-brand-blue-600 hover:text-brand-blue-800 flex items-center gap-1"
               >
                 View store <ArrowRight size={14} />
@@ -163,7 +193,9 @@ export default async function AdminStorePage() {
                       <div>
                         <p className="text-sm font-medium text-slate-900">{prod.name}</p>
                         <p className="text-xs text-slate-700">
-                          ${Number(prod.price || 0).toLocaleString()}
+                          {prod.price === null
+                            ? 'Price not configured'
+                            : `$${Number(prod.price).toLocaleString()}`}
                         </p>
                       </div>
                     </div>
@@ -203,17 +235,18 @@ export default async function AdminStorePage() {
                 recentPurchases.map((p: any) => (
                   <div key={p.id} className="px-5 py-3 flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-slate-900">
-                        {(p.profiles as any)?.full_name || 'Customer'}
-                      </p>
+                      <p className="text-sm font-medium text-slate-900">{'Customer'}</p>
                       <p className="text-xs text-slate-700">
-                        {(p.profiles as any)?.email || '—'} ·{' '}
+                        {p.email || '—'} ·{' '}
                         {p.created_at ? new Date(p.created_at).toLocaleDateString() : '—'}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-semibold text-slate-900">
-                        ${Number(p.amount || 0).toLocaleString()}
+                        $
+                        {(Number(p.amount_cents || 0) / 100).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                        })}
                       </p>
                       <span
                         className={`text-xs px-2 py-0.5 rounded-full capitalize ${purchaseStatusBadge[p.status] || 'bg-slate-100 text-slate-700'}`}
@@ -264,15 +297,14 @@ export default async function AdminStorePage() {
                   {recentLicenses.map((l: any) => (
                     <tr key={l.id} className="hover:bg-slate-50">
                       <td className="px-4 py-3">
-                        <p className="font-medium text-slate-900">
-                          {(l.profiles as any)?.full_name || 'Customer'}
-                        </p>
-                        <p className="text-xs text-slate-700">
-                          {(l.profiles as any)?.email || '—'}
-                        </p>
+                        <p className="font-medium text-slate-900">{l.contact_name || 'Customer'}</p>
+                        <p className="text-xs text-slate-700">{l.contact_email || '—'}</p>
                       </td>
                       <td className="px-4 py-3 font-semibold text-slate-900">
-                        ${Number(l.amount || 0).toLocaleString()}
+                        $
+                        {(Number(l.amount_cents || 0) / 100).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                        })}
                       </td>
                       <td className="px-4 py-3">
                         <span

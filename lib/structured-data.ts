@@ -21,7 +21,7 @@ export function generateOrganizationSchema() {
     },
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+1-317-314-3757',
+      telephone: '+1-317-999-9620',
       contactType: 'Customer Service',
       email: 'info@elevateforhumanity.org',
     },

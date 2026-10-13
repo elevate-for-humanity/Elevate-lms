@@ -1,0 +1,167 @@
+name: Audit independent Elevate PBX call path
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ['.github/workflows/audit-owned-pbx-callpath.yml', 'scripts/gcp/*pbx*', 'scripts/gcp/pbx-one-command-readiness.sh']
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-owned-pbx-callpath.yml'
+      - 'scripts/gcp/audit-pbx-runtime.py'
+      - 'scripts/gcp/verify-pbx-transport.mjs'
+      - 'scripts/gcp/pbx-one-command-readiness.sh'
+permissions:
+  actions: write
+  contents: read
+  id-token: write
+concurrency:
+  group: ${{ github.event_name == 'workflow_dispatch' && 'google-pbx-infrastructure' || format('google-pbx-checks-{0}-{1}', github.workflow, github.ref) }}
+  cancel-in-progress: false
+  queue: max
+jobs:
+  audit-contract:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python3 scripts/gcp/test-audit-pbx-runtime.py
+      - run: node --check scripts/gcp/verify-pbx-transport.mjs
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Start read-only PBX audit through approved Google identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/audit-owned-pbx-callpath.yml/dispatches" -f ref=main
+  audit:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify VM identity and readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT=elegant-racer-299721
+          ZONE=us-central1-a
+          VM=elevate-pbx
+          test "$(gcloud compute instances describe "$VM" --project="$PROJECT" --zone="$ZONE" --format='value(status)')" = RUNNING
+          test "$(gcloud compute instances describe "$VM" --project="$PROJECT" --zone="$ZONE" --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+      - name: Verify authoritative phone DNS, trusted TLS and SIP transport
+        if: always()
+        run: node scripts/gcp/verify-pbx-transport.mjs
+      - name: Inspect deployment identity access without reading secret payloads
+        if: always()
+        run: node scripts/gcp/diagnose-access.mjs
+      - name: Inspect actual PBX capabilities without exposing runtime configuration
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
+            --command='sudo python3 -' < scripts/gcp/audit-pbx-runtime.py | tee pbx-runtime-evidence.json
+      - name: Diagnose private service configuration and existing secret access
+        if: always()
+        shell: bash
+        run: |
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet --command='sudo python3 -' <<'PY'
+          import json, re, urllib.request, urllib.error, subprocess, base64, hashlib
+          from pathlib import Path
+          def request(url, headers={}, data=None):
+              try:
+                  with urllib.request.urlopen(urllib.request.Request(url,headers=headers,data=data),timeout=10) as r:
+                      return r.status,json.loads(r.read(1048576))
+              except urllib.error.HTTPError as e: return e.code,{}
+              except Exception: return None,{}
+          status,metadata=request('http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/token',{'Metadata-Flavor':'Google'})
+          token=metadata.get('access_token','')
+          reports={}
+          for name,filename,keys in [
+              ('provisioner','/etc/elevate-pbx/provisioner.conf',['PBX_PROVISIONING_TOKEN_SECRET','SUPABASE_SERVICE_ROLE_KEY_SECRET','SUPABASE_URL','PBX_PHONE_SYSTEM_ID','PBX_ASTERISK_CONTAINER','PBX_ASTERISK_GID','PBX_GENERATED_ROOT']),
+              ('paris','/etc/elevate-pbx/paris.conf',['PARIS_ARI_PASSWORD_SECRET','PARIS_TURN_TOKEN_SECRET'])]:
+              values={}
+              for line in Path(filename).read_text().splitlines():
+                  match=re.fullmatch(r'([A-Z_0-9]+)=(.*)',line.strip())
+                  if match: values[match[1]]=match[2].strip().strip('"').strip("'")
+              report={'configuration':{key:bool(values.get(key)) for key in keys},'secrets':{}}
+              for key in keys:
+                  if not key.endswith('_SECRET'): continue
+                  value=values.get(key,'')
+                  if not re.fullmatch(r'projects/(elegant-racer-299721|484736877039)/secrets/[A-Za-z0-9_-]+/versions/([0-9]+|latest)',value):
+                      report['secrets'][key]={'validReference':False};continue
+                  code,result=request('https://secretmanager.googleapis.com/v1/'+value+':access',{'Authorization':'Bearer '+token})
+                  report['secrets'][key]={'validReference':True,'httpStatus':code,'payloadPresent':bool(result.get('payload',{}).get('data'))}
+                  if name=='paris' and key=='PARIS_ARI_PASSWORD_SECRET' and code==200:
+                      password=base64.b64decode(result['payload']['data']).decode().strip()
+                      authorization=base64.b64encode((values.get('PARIS_ARI_USER','')+':'+password).encode()).decode()
+                      status,applications=request('http://127.0.0.1:8088/ari/applications',{'Authorization':'Basic '+authorization})
+                      report['ariApplication']={'httpStatus':status,'registered':isinstance(applications,list) and any(app.get('name')=='elevate-paris' for app in applications)}
+                      report['gatewaySourceSha256']=hashlib.sha256(Path('/opt/elevate-pbx/paris/ari-media.mjs').read_bytes()).hexdigest()
+              if name=='provisioner':
+                  root=values.get('PBX_GENERATED_ROOT','')
+                  safe=bool(re.fullmatch(r'/(opt|var/lib)/elevate-pbx/[A-Za-z0-9/_-]+',root))
+                  output=subprocess.run(['systemctl','show','elevate-pbx-provisioner.service','--property=ReadWritePaths','--value'],capture_output=True,text=True).stdout
+                  report['generatedRoot']={'validPath':safe,'path':root if safe else None,'exists':Path(root).is_dir() if safe else False,'unitAllowsWrite':any(root==p or root.startswith(p.rstrip('/')+'/') for p in output.split())}
+                  report['phoneSystemMatches']=values.get('PBX_PHONE_SYSTEM_ID')=='341f59a3-b1d6-4360-8463-0ce0402f86fe'
+                  report['supabaseMatches']=values.get('SUPABASE_URL','').rstrip('/')=='https://cuxzzpsyufcewtmicszk.supabase.co'
+              reports[name]=report
+          print(json.dumps({'privateRuntimeConfiguration':reports}))
+          PY
+      - name: Inspect meeting connection and existing VM capacity
+        if: always()
+        run: |
+          node --input-type=module <<'NODE'
+          import {loadGoogleConfig} from './scripts/gcp/runtime-config.mjs';
+          import {execFileSync} from 'node:child_process';
+          const env=loadGoogleConfig('admin').runtimeEnvironment;
+          console.log(JSON.stringify({meetingConfiguration:Object.fromEntries(['LIVEKIT_URL','LIVEKIT_API_KEY','LIVEKIT_API_SECRET'].map(key=>[key,Boolean(env[key])]))}));
+          const endpoint=new URL(env.LIVEKIT_URL);
+          endpoint.protocol='https:';
+          endpoint.pathname='/twirp/livekit.RoomService/ListRooms';
+          endpoint.search='';
+          const {createHmac}=await import('node:crypto');
+          const encode=value=>Buffer.from(JSON.stringify(value)).toString('base64url');
+          const now=Math.floor(Date.now()/1000);
+          const unsigned=encode({alg:'HS256',typ:'JWT'})+'.'+encode({iss:env.LIVEKIT_API_KEY,sub:'read-only-deployment-audit',iat:now,exp:now+60,video:{roomList:true}});
+          const token=unsigned+'.'+createHmac('sha256',env.LIVEKIT_API_SECRET).update(unsigned).digest('base64url');
+          try {
+            const response=await fetch(endpoint,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000),redirect:'error'});
+            const result=await response.json().catch(()=>({}));
+            console.log(JSON.stringify({meetingService:{host:endpoint.hostname,status:response.status,roomCount:Array.isArray(result.rooms)?result.rooms.length:null}}));
+          } catch(error) {console.log(JSON.stringify({meetingService:{host:endpoint.hostname,reachable:false,error:error.code||error.cause?.code||error.name}}));process.exitCode=1;}
+          const lms=loadGoogleConfig('lms').runtimeEnvironment;
+          const phoneConfig=Object.fromEntries(['PBX_CONTROL_URL','PBX_PROVISIONING_TOKEN','PBX_TURN_URLS','PBX_TURN_SHARED_SECRET'].map(key=>[key,Boolean(lms[key])]));
+          console.log(JSON.stringify({ownedPhoneApplicationConfiguration:phoneConfig}));
+          if (!Object.values(phoneConfig).every(Boolean)) {console.error('PBX application readiness blocked: required LMS phone settings missing');process.exitCode=1;}
+          const instances=JSON.parse(execFileSync('gcloud',['compute','instances','list','--project=elegant-racer-299721','--format=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+          console.log(JSON.stringify({communicationsInstances:instances.filter(x=>/pbx|livekit|meeting/i.test(x.name)).map(x=>({name:x.name,status:x.status,machineType:x.machineType.split('/').pop()}))}));
+          NODE
+      - name: Preserve sanitized runtime and transport evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pbx-runtime-evidence
+          path: |
+            pbx-*-evidence.json
+            google-access-diagnostic.json
+          if-no-files-found: error
+          retention-days: 14
+
+# Recheck live readiness before retaining Telnyx number routing on the owned PBX.

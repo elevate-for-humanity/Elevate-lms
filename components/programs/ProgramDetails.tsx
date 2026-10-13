@@ -242,7 +242,7 @@ export function ProgramDetails({ program }: { program: Program }) {
                     Pay Now / See Payment Options
                   </Link>
                   <p className="text-xs text-center text-black">
-                    {`Stripe • ${BNPL_PROVIDER_NAMES} • Pay in 4 available`}
+                    {`QuickBooks • ${BNPL_PROVIDER_NAMES} • Pay in 4 available`}
                   </p>
                 </div>
 

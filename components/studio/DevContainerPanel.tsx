@@ -235,7 +235,7 @@ export default function DevContainerPanel() {
     }
   }
 
-  async function pushToNorthflank(key: string) {
+  async function pushToGoogle(key: string) {
     setPushingKey(key);
     setStatus(null);
     try {
@@ -245,15 +245,15 @@ export default function DevContainerPanel() {
         body: JSON.stringify({ key }),
       });
       const payload = await readJson(res);
-      if (!res.ok) throw new Error(errorMessage(payload, `Could not push ${key} to Northflank`));
+      if (!res.ok) throw new Error(errorMessage(payload, `Could not push ${key} to Google Cloud`));
       const services = Array.isArray((payload as { updatedServices?: string[] }).updatedServices)
         ? (payload as { updatedServices: string[] }).updatedServices.join(', ')
         : 'configured services';
-      setStatus({ type: 'success', message: `${key} pushed to Northflank: ${services}.` });
+      setStatus({ type: 'success', message: `${key} pushed to Google Cloud: ${services}.` });
     } catch (error) {
       setStatus({
         type: 'error',
-        message: error instanceof Error ? error.message : `Could not push ${key} to Northflank`,
+        message: error instanceof Error ? error.message : `Could not push ${key} to Google Cloud`,
       });
     } finally {
       setPushingKey(null);
@@ -267,7 +267,7 @@ export default function DevContainerPanel() {
           <div className="mr-auto">
             <h2 className="font-bold">Container configuration & deployments</h2>
             <p className="mt-1 text-xs text-slate-500">
-              Canonical Admin APIs only · GitHub configuration · platform_secrets · Northflank sync
+              Canonical Admin APIs only · GitHub configuration · platform_secrets · Google Cloud sync
             </p>
           </div>
           <button
@@ -364,7 +364,7 @@ export default function DevContainerPanel() {
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <h3 className="font-semibold text-slate-900">Add or rotate an environment key</h3>
             <p className="mt-1 text-xs text-slate-500">
-              New writes go only to platform_secrets. Runtime keys can then be synchronized to Northflank.
+              New writes go only to platform_secrets. Runtime keys can then be synchronized to Google Cloud.
             </p>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <input
@@ -447,7 +447,7 @@ export default function DevContainerPanel() {
                       {entry.scope === 'runtime' ? (
                         <button
                           type="button"
-                          onClick={() => void pushToNorthflank(entry.key)}
+                          onClick={() => void pushToGoogle(entry.key)}
                           disabled={pushingKey === entry.key}
                           className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
                         >
@@ -456,7 +456,7 @@ export default function DevContainerPanel() {
                           ) : (
                             <CloudUpload className="h-3.5 w-3.5" />
                           )}
-                          Push to Northflank
+                          Push to Google Cloud
                         </button>
                       ) : null}
                       <button

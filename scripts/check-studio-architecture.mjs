@@ -54,15 +54,22 @@ for (const invariant of [
   }
 }
 
-const browserDeployWorkflow = read('.github/workflows/deploy-studio-browser.yml');
+// Google Cloud Run owns Studio Browser deployment. Do not resurrect the retired
+// Northflank workflow to satisfy an obsolete source-level integrity check.
+const browserDeployWorkflow = read('.github/workflows/deploy-google-studio-browser.yml');
 for (const invariant of [
-  'resolve-studio-browser-secret.ts',
-  'verify-studio-browser-link.ts',
+  'google-github-actions/auth@v3',
+  'elegant-racer-299721',
+  'scripts/gcp/deploy-studio-browser.mjs',
+  'environment: production',
   'cancel-in-progress: false',
 ]) {
   if (!browserDeployWorkflow.includes(invariant)) {
-    fail(`Studio Browser deployment is missing credit-safe invariant: ${invariant}`);
+    fail(`Google Studio Browser deployment is missing required invariant: ${invariant}`);
   }
+}
+if (browserDeployWorkflow.includes('api.northflank.com')) {
+  fail('Studio Browser deployment must not call the legacy deployment API');
 }
 
 const browserAgentRoute = read('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
@@ -107,8 +114,18 @@ for (const forbiddenProviderBypass of [
     fail(`Studio browser agent bypasses the canonical AI provider: ${forbiddenProviderBypass}`);
   }
 }
-if (!browserPlanner.includes("providerPolicy: 'owned-only'")) {
-  fail('Studio browser planner is not restricted to Elevate-owned inference');
+if (!browserPlanner.includes("providerPolicy: 'canonical'")) {
+  fail('Studio browser planner is not routed through canonical configured inference');
+}
+const studioBrowserProvisioner = read('scripts/northflank/create-studio-browser-service.ts');
+for (const providerSessionInvariant of [
+  'STUDIO_BROWSER_AUTH_STATE_DIR',
+  'elevate-studio-browser-auth',
+  'volumesToAttach',
+]) {
+  if (!studioBrowserProvisioner.includes(providerSessionInvariant)) {
+    fail(`Studio Browser deployment is missing durable provider-session invariant: ${providerSessionInvariant}`);
+  }
 }
 for (const providerNeutralInvariant of ['planBrowserTurn', '/snapshot']) {
   if (!browserAgentRoute.includes(providerNeutralInvariant)) {
@@ -368,8 +385,13 @@ for (const interaction of ['Attach a file', 'selectStudioAgent', 'capabilitiesUs
     fail(`canonical Studio chat is missing intelligence interaction: ${interaction}`);
 }
 const studioWorkspace = read('components/studio/StudioCommandWorkspace.tsx');
-if (studioWorkspace.includes('StudioCapabilityRail'))
-  fail('Root Studio still exposes separate agent/capability navigation');
+// Tool navigation stays in the shared conversation; agent selection is automatic.
+for (const override of ['onSpecialistChange', 'preferredAgent', 'setSpecialist']) {
+  if (studioWorkspace.includes(override) || capabilityRail.includes(override) || unifiedChat.includes(override))
+    fail(`Root Studio reintroduced manual agent selection: ${override}`);
+}
+if (!studioWorkspace.includes('onOpenWorkspace={openCapability}'))
+  fail('Studio tools must open in the same conversation workspace');
 if (unifiedChat.includes('agentOverride'))
   fail('Canonical Studio chat still allows a user-selected agent override');
 for (const forbiddenWrite of [
@@ -384,15 +406,25 @@ const buildCourseBlock =
   adminAiChat.match(/case 'build_course': \{([\s\S]*?)case 'generate_videos':/i)?.[1] ?? '';
 for (const invariant of [
   'DevStudioUltimateCourseControl',
-  'ultimate_course_builds',
-  'apprenticeship_standard_versions',
-  'apprenticeship_standard_competencies',
   "__type:'ultimate_course_build_queued'",
   'requestedCourseId',
   'programSlug',
 ]) {
   if (!buildCourseBlock.includes(invariant))
     fail(`build_course is not a one-step governed Course Builder operation: ${invariant}`);
+}
+// Check persistence and standards at their canonical owners, not as duplicate
+// queries in the chat handler. Keep every governance requirement enforced.
+const ultimateControl = read('lib/devstudio/ultimate-course-control.ts');
+const ultimateProfile = read('lib/ultimate-course-builder/core/course-profile.ts');
+for (const [source, invariants] of [
+  [buildCourseBlock, ['.queueCourse({']],
+  [ultimateControl, ["from '@/lib/ultimate-course-builder/core/course-profile'", 'buildUltimateProfile(this.db', ".from('ultimate_course_builds')", 'new UltimateJobQueue(this.db).enqueue']],
+  [ultimateProfile, [".from('apprenticeship_standard_versions')", ".from('apprenticeship_standard_competencies')", 'UltimateAppendixAStandardsSource']],
+]) {
+  for (const invariant of invariants) {
+    if (!source.includes(invariant)) fail(`Canonical Course Builder governance is missing: ${invariant}`);
+  }
 }
 for (const durableFile of [
   'lib/jobs/handlers/course-build.ts',

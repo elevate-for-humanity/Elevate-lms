@@ -1,0 +1,47 @@
+name: Restore Google container runtime parity
+on:
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/restore-container-runtime.mjs', 'scripts/gcp/restore-container-runtime.test.mjs', '.github/workflows/restore-google-container-runtime.yml']
+  workflow_dispatch:
+    inputs:
+      quota_contact_email:
+        description: Contact email for Google quota review
+        required: false
+        type: string
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/restore-google-container-runtime.yml/dispatches" -f ref=main
+  restore:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 30
+    concurrency:
+      group: google-container-runtime-restoration
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/restore-container-runtime.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Restore original capacity and browser environment without rebuilding images
+        env:
+          QUOTA_CONTACT_EMAIL: ${{ inputs.quota_contact_email }}
+        run: node scripts/gcp/restore-container-runtime.mjs

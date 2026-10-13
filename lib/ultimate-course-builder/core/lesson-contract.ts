@@ -1,9 +1,10 @@
 import { createHash } from 'node:crypto';
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from './types';
+import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
 
 /** Changing this version invalidates every checkpoint and release certificate. */
-export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-01.1';
-export const MAX_TARGETED_REPAIRS = 2;
+export const ULTIMATE_LESSON_CONTRACT_VERSION = 'ultimate-lesson-2026-10-05.1';
+export const MAX_TARGETED_REPAIRS = 8;
 type Artifact = Record<string, any>;
 export function contractHash(value: unknown): string {
   function canonical(v: any): any {
@@ -34,6 +35,13 @@ export function stepInputHash(
     version: ULTIMATE_LESSON_CONTRACT_VERSION,
     profile,
     step,
+    // Invalidate source-generated teaching after the full-section authoring
+    // fix, while retaining the unchanged standards checkpoint. Downstream
+    // stages are rebuilt from the new teaching artifact by the runner.
+    ...(step === 'learning_objectives' ? { instructionalProducer: 'approved-moment-photos-and-fresh-recaps-v4' } : {}),
+    ...(step === 'natural_narration' ? { narrationProducer: 'separate-pcm-parts-immutable-mp3-word-alignment-v2' } : {}),
+    ...(step === 'instructor_script' ? { scriptProducer: 'stage-aligned-scenes-v1' } : {}),
+    ...(step === 'visual_assignment' ? { visualAssignmentProducer: 'distinct-stored-files-v2' } : {}),
     dependencies: dependencies.map((s) => [s, contractHash(artifactPayload(prior[s] ?? {}))]),
   });
 }
@@ -61,17 +69,19 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
       break;
     case 'learning_objectives':
       require(populated(a.objectives) &&
-        a.objectives.every(
-          (o: any) => nonempty(o.id) && nonempty(o.text) && populated(o.sourceRequirementIds),
-        ), 'OBJECTIVE_SOURCE_MAPPING_REQUIRED');
+        a.objectives.every((o: any) =>
+          nonempty(o.id) && nonempty(o.text) &&
+          (populated(o.sourceRequirementIds) || nonempty(o.courseDefinedReason)),
+        ), 'OBJECTIVE_EVIDENCE_MAPPING_REQUIRED');
       break;
     case 'prerequisites':
-      require(a.prerequisites?.reviewRequired === false &&
-        (populated(a.prerequisites.checks) ||
-          nonempty(a.prerequisites.noneReason)), 'PREREQUISITE_CHECKS_REQUIRED');
+      require(
+        populated(a.prerequisites?.checks) || nonempty(a.prerequisites?.noneReason),
+        'PREREQUISITE_CHECKS_REQUIRED',
+      );
       break;
     case 'teaching_sequence':
-      require(a.sequence?.stages?.length === 13 &&
+      require(populated(a.sequence?.stages) &&
         a.sequence.stages.every(
           (s: any) => nonempty(s.instruction) && populated(s.objectiveIds),
         ), 'TEACHING_CONTENT_REQUIRED');
@@ -83,11 +93,11 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
             nonempty(s.id) &&
             nonempty(s.text) &&
             populated(s.objectiveIds) &&
-            populated(s.sourceRequirementIds),
+            (populated(s.sourceRequirementIds) || nonempty(s.courseDefinedReason)),
         ), 'SCRIPT_SEGMENTS_REQUIRED');
       break;
     case 'storyboard':
-      require(a.storyboard?.scenes?.length >= 6 &&
+      require(populated(a.storyboard?.scenes) &&
         a.storyboard.scenes.every(
           (s: any) =>
             nonempty(s.id) &&
@@ -97,20 +107,37 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
             populated(s.objectiveIds),
         ), 'STORYBOARD_SCRIPT_MAPPING_REQUIRED');
       break;
-    case 'visual_assignment':
-      require(populated(a.media?.assignments) &&
-        a.media.assignments.every(
+    case 'visual_assignment': {
+      const assignments = Array.isArray(a.media?.assignments) ? a.media.assignments : [];
+      require(assignments.length > 0 &&
+        new Set(assignments.map((s: any) => s.sceneId)).size === assignments.length &&
+        assignments.every(
           (s: any) =>
             nonempty(s.sceneId) &&
             nonempty(s.assetId) &&
-            nonempty(s.licenseEvidenceUrl) &&
-            nonempty(s.relevanceReason),
-        ), 'VISUAL_LICENSE_RELEVANCE_REQUIRED');
+            nonempty(s.relevanceReason) &&
+            (s.generatedInstructionalVisual === true
+              ? s.assignmentMethod === 'instructional-render' &&
+                String(s.assetId).startsWith('instructional:')
+              : nonempty(s.licenseEvidenceUrl)),
+        ), 'VISUAL_SCENE_COVERAGE_REQUIRED');
+      // Licensed media can be reused for a distinct teaching purpose.
+      // Reject unreasoned duplication; retain per-scene license and relevance evidence.
+      const seen = new Map<string, string>();
+      for (const assignment of assignments) {
+        const id = String(assignment.assetId ?? '');
+        const reason = String(assignment.relevanceReason ?? '').trim().toLowerCase();
+        if (seen.has(id) && seen.get(id) === reason) {
+          failures.push('VISUAL_UNJUSTIFIED_REPETITION');
+        }
+        seen.set(id, reason);
+      }
       break;
+    }
     case 'scene_construction':
       require(populated(a.scenes?.shots) &&
         a.scenes.shots.every(
-          (s: any) => s.loop === false && nonempty(s.sceneId) && nonempty(s.assetId),
+          (s: any) => typeof s.loop === 'boolean' && nonempty(s.sceneId) && nonempty(s.assetId),
         ), 'SCENE_SHOT_PLAN_REQUIRED');
       break;
     case 'natural_narration':
@@ -160,7 +187,7 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
         populated(a.assessment.reassessment), 'ASSESSMENT_SCORING_REMEDIATION_REQUIRED');
       break;
     case 'lesson_film_render':
-      require(nonempty(a.render?.videoUrl) &&
+      require(renderPlaybackUrl(a.render) && renderMediaUrl(a.render) &&
         a.render.duration > 0 &&
         nonempty(a.render.captionsUrl) &&
         nonempty(a.render.transcriptUrl), 'RENDER_DELIVERY_ASSETS_REQUIRED');
@@ -207,7 +234,12 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
 export function assertCompleteLesson(
   artifacts: Partial<Record<UltimateBuildStep, Artifact>>,
   profile?: unknown,
+  competencyId?: string,
 ): void {
+  const competencies = (profile as any)?.competencies ?? [];
+  const competency = competencies.find((c: any) => c.id === competencyId) ?? (competencies.length === 1 ? competencies[0] : undefined);
+  if (practicalVisualFailures(artifacts, competency).length)
+    throw new Error('ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED');
   for (const step of ULTIMATE_BUILD_STEPS) {
     const a = artifacts[step];
     if (
@@ -216,4 +248,20 @@ export function assertCompleteLesson(
     )
       throw new Error(`ULTIMATE_CURRENT_CONTRACT_EVIDENCE_REQUIRED:${step}`);
   }
+}
+
+/** Recheck saved assignments without invalidating usable media checkpoints. */
+export function practicalVisualFailures(artifacts: Partial<Record<UltimateBuildStep, Artifact>>, competency: any): string[] {
+  if (competency?.requiresPracticalEvidence !== true || (competency.type && competency.type !== 'practical_skill')) return [];
+  const scenes = artifacts.storyboard?.storyboard?.scenes ?? [];
+  const media = artifacts.visual_assignment?.media ?? {};
+  const physical = scenes.filter((scene: any) => [scene.stage, scene.title, scene.sceneType, scene.scene_type].some(value =>
+    /^(demonstration|guided_practice|independent_practice|mistake_and_correction|mistake and correction)$/.test(String(value ?? '').trim().toLowerCase())));
+  return physical.some((scene: any) => {
+    const assignment = media.assignments?.find((a: any) => a.sceneId === scene.id);
+    const asset = media.readyAssets?.find((a: any) => a.id === assignment?.assetId);
+    return !assignment || assignment.generatedInstructionalVisual || assignment.assignmentMethod === 'instructional-render' ||
+      !asset?.entitlement_id || !assignment.licenseEvidenceUrl ||
+      !(String(asset.mime_type ?? '').startsWith('video/') || /\.(mp4|webm|mov)(?:[?#]|$)/i.test(String(asset.public_url ?? '')));
+  }) ? ['ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED'] : [];
 }

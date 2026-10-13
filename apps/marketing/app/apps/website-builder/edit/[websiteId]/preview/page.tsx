@@ -1,3 +1,4 @@
+import { canManageHostedWebsite } from '@/lib/websites/can-manage-hosted-website';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { buildDefaultSiteConfig, mergeSiteConfig } from '@/lib/tenant/default-site-config';
@@ -24,7 +25,7 @@ export default async function WebsiteResponsivePreviewPage({ params }: Props) {
     .eq('id', websiteId)
     .maybeSingle();
 
-  if (!site || (site.user_id && site.user_id !== user.id)) notFound();
+  if (!site || !(await canManageHostedWebsite(supabase, websiteId, user.id))) notFound();
 
   const siteName = (site.site_name as string | null) ?? 'My Site';
   const base = buildDefaultSiteConfig({ organizationName: siteName });

@@ -1,6 +1,7 @@
 import 'server-only';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { resumeMediaDependency } from '@/lib/ultimate-course-builder/worker/resume-media-dependency';
 
 export type EnvatoWorkspaceManifestItem = {
   providerItemId: string;
@@ -53,5 +54,8 @@ export async function upsertEnvatoWorkspaceManifest(input: {
     ? await input.db.from('studio_run_artifacts').update(payload).eq('id', existing.id).select('*').single()
     : await input.db.from('studio_run_artifacts').insert(payload).select('*').single();
   if (result.error) throw result.error;
+  await resumeMediaDependency(input.db,input.courseId,[...new Set(input.items
+    .filter(item=>item.status==='attached' && item.intendedLessonId)
+    .map(item=>item.intendedLessonId!))]);
   return result.data;
 }

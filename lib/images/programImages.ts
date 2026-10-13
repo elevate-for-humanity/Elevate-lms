@@ -240,12 +240,12 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   'barber-apprenticeship': {
     card: `${P}/barber-fade.webp`,
-    hero: `${P}/barber-apprenticeship-hero.jpg`,
+    hero: `${P}/barber-hands-on-bright.webp`,
     alt: 'Barber apprentice executing a fade cut on a client',
   },
   'cosmetology-apprenticeship': {
     card: `${P}/cosmetology.webp`,
-    hero: '/images/partners/salon-saloon/team-interior.webp',
+    hero: '/images/partners/salon-saloon/team-interior-enhanced-2026.webp',
     alt: 'Cosmetology student practicing hair styling techniques',
   },
   esthetician: {
@@ -254,9 +254,9 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Esthetics learner practicing professional skincare and client services',
   },
   'esthetician-apprenticeship': {
-    card: '/images/beauty/esthetician.webp',
-    hero: '/images/pexels/esthetician.webp',
-    alt: 'Esthetician apprentice providing a professional skincare treatment',
+    card: '/images/programs/efh-esthetician-client-services-card.jpg',
+    hero: '/images/programs/esthetician-host-recruitment-2026.webp',
+    alt: 'Esthetics skincare instruction and professional client services',
   },
   'nail-technician-apprenticeship': {
     card: `${P}/nail-technician.webp`,
@@ -426,6 +426,6 @@ export function getProgramCardImage(slug: string): string {
 export function getProgramHeroImage(slug: string): string {
   return PROGRAM_IMAGES[slug]?.hero ?? `${P}/training-cohort.webp`;
 }
-export function getProgramImageAlt(slug: string, fallback: string): string {
+export function getProgramImageAlt(slug: string, fallback = 'Career training at Elevate for Humanity'): string {
   return PROGRAM_IMAGES[slug]?.alt ?? fallback;
 }

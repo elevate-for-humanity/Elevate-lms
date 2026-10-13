@@ -89,7 +89,7 @@ export default function StaffApplicationForm() {
               <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
               <input type="tel" id="phone" name="phone" value={form.phone} onChange={handleChange}
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-teal-500"
-                placeholder="(317) 314-3757" />
+                placeholder="(317) 999-9620" />
             </div>
           </div>
           <div>

@@ -1,16 +1,174 @@
-# Visual layout audit (heroes, images, text gaps)
+# Visual layout audit — active platform
 
-Generated: 2026-06-03T23:57:47.564Z
+Generated: 2026-10-12T04:55:20.153Z
+
+This report scans the deployed monorepo app trees, not the legacy root `app/` tree.
+
+## Coverage
+
+| Service | TSX/JSX files scanned |
+|---|---:|
+| marketing | 1015 |
+| lms | 457 |
+| admin | 722 |
+| shared | 1333 |
 
 | Category | Critical | High | Medium | Low | Total |
 |----------|----------|------|--------|-----|-------|
-| Oversized heroes | 0 | 47 | 0 | 0 | 47 |
-| Image load cost | 0 | 9 | 416 | 40 | 465 |
-| Layout / text | 0 | 112 | 4 | 0 | 116 |
+| Oversized heroes | 0 | 7 | 0 | 0 | 7 |
+| Image load cost | 0 | 1 | 8 | 0 | 9 |
+| Layout / text | 0 | 208 | 3 | 0 | 211 |
 
-**Canonical hero (design standard):** `h-[38vh] min-h-[220px] max-h-[420px]` or `HeroPicture` / `HeroVideo` from `components/marketing/`.
+**Canonical Marketing hero:** `h-[38vh] min-h-[260px] max-h-[520px]` or a canonical hero renderer.
 
-**Marketing pages with hero markup but not canonical components:** 331
+**Active Marketing pages with hero intent but no canonical hero marker:** 144
+
+## Marketing pages requiring canonicalization
+
+- `apps/marketing/app/(marketing)/paris-ai/page.tsx`
+- `apps/marketing/app/(marketing)/students/page.tsx`
+- `apps/marketing/app/about/partners/page.tsx`
+- `apps/marketing/app/academic-calendar/page.tsx`
+- `apps/marketing/app/academic-integrity/page.tsx`
+- `apps/marketing/app/ai/job-match/page.tsx`
+- `apps/marketing/app/ai/page.tsx`
+- `apps/marketing/app/ai/paris/page.tsx`
+- `apps/marketing/app/alumni/page.tsx`
+- `apps/marketing/app/apply/employer/page.tsx`
+- `apps/marketing/app/apply/staff/page.tsx`
+- `apps/marketing/app/banking/direct-deposit/page.tsx`
+- `apps/marketing/app/blog/[slug]/page.tsx`
+- `apps/marketing/app/booking/page.tsx`
+- `apps/marketing/app/booth-rental/page.tsx`
+- `apps/marketing/app/business-network/page.tsx`
+- `apps/marketing/app/calendar/page.tsx`
+- `apps/marketing/app/career-counseling/page.tsx`
+- `apps/marketing/app/career-services/page.tsx`
+- `apps/marketing/app/certificates/page.tsx`
+- `apps/marketing/app/certificates/verify/[certificateId]/page.tsx`
+- `apps/marketing/app/community-services/page.tsx`
+- `apps/marketing/app/compliance/competency-verification/barber/page.tsx`
+- `apps/marketing/app/compliance/competency-verification/page.tsx`
+- `apps/marketing/app/compliance/credential-partners/page.tsx`
+- `apps/marketing/app/consumer-education/page.tsx`
+- `apps/marketing/app/contracts/page.tsx`
+- `apps/marketing/app/cookies/page.tsx`
+- `apps/marketing/app/create-course/page.tsx`
+- `apps/marketing/app/demos/page.tsx`
+- `apps/marketing/app/directory/page.tsx`
+- `apps/marketing/app/disaster-recovery/page.tsx`
+- `apps/marketing/app/dmca/page.tsx`
+- `apps/marketing/app/docs/page.tsx`
+- `apps/marketing/app/educatorhub/page.tsx`
+- `apps/marketing/app/email/page.tsx`
+- `apps/marketing/app/employment-support/page.tsx`
+- `apps/marketing/app/enroll/page.tsx`
+- `apps/marketing/app/events/page.tsx`
+- `apps/marketing/app/founder/page.tsx`
+- `apps/marketing/app/fssa/page.tsx`
+- `apps/marketing/app/funding/dol/page.tsx`
+- `apps/marketing/app/funding/how-it-works/page.tsx`
+- `apps/marketing/app/grievance/page.tsx`
+- `apps/marketing/app/handbook/page.tsx`
+- `apps/marketing/app/healthcare-training-indianapolis/page.tsx`
+- `apps/marketing/app/help/account/page.tsx`
+- `apps/marketing/app/help/page.tsx`
+- `apps/marketing/app/help/technical/page.tsx`
+- `apps/marketing/app/help/tutorials/page.tsx`
+- `apps/marketing/app/implementation/page.tsx`
+- `apps/marketing/app/inquiry/page.tsx`
+- `apps/marketing/app/instructor-credentials/page.tsx`
+- `apps/marketing/app/jri/page.tsx`
+- `apps/marketing/app/legal-entity-structure/page.tsx`
+- `apps/marketing/app/license/page.tsx`
+- `apps/marketing/app/licenses/page.tsx`
+- `apps/marketing/app/licensing/page.tsx`
+- `apps/marketing/app/microclasses/page.tsx`
+- `apps/marketing/app/mobile/page.tsx`
+- `apps/marketing/app/mobile-app/page.tsx`
+- `apps/marketing/app/news/page.tsx`
+- `apps/marketing/app/offline/page.tsx`
+- `apps/marketing/app/ojt-and-funding/page.tsx`
+- `apps/marketing/app/onboarding/employer/hiring-needs/page.tsx`
+- `apps/marketing/app/onboarding/learner/agreements/page.tsx`
+- `apps/marketing/app/onboarding/learner/handbook/page.tsx`
+- `apps/marketing/app/onboarding/learner/page.tsx`
+- `apps/marketing/app/onboarding/page.tsx`
+- `apps/marketing/app/online-apps/page.tsx`
+- `apps/marketing/app/partner-directory/page.tsx`
+- `apps/marketing/app/partner-operating-model/page.tsx`
+- `apps/marketing/app/partnerships/page.tsx`
+- `apps/marketing/app/philanthropy/page.tsx`
+- `apps/marketing/app/platform/employer-portal/page.tsx`
+- `apps/marketing/app/platform/enterprise/page.tsx`
+- `apps/marketing/app/platform/partner-portal/page.tsx`
+- `apps/marketing/app/platform/partners/page.tsx`
+- `apps/marketing/app/platform/pricing/page.tsx`
+- `apps/marketing/app/platform/sponsors/page.tsx`
+- `apps/marketing/app/platform/standards/page.tsx`
+- `apps/marketing/app/platform/student-portal/handbook/page.tsx`
+- `apps/marketing/app/platform/student-portal/page.tsx`
+- `apps/marketing/app/platform/workforce-analytics/page.tsx`
+- `apps/marketing/app/preview/barber-videos/page.tsx`
+- `apps/marketing/app/pricing/page.tsx`
+- `apps/marketing/app/programs/[program]/training/page.tsx`
+- `apps/marketing/app/programs/cosmetology-apprenticeship/orientation/page.tsx`
+- `apps/marketing/app/programs/healthcare/page.tsx`
+- `apps/marketing/app/resources/page.tsx`
+- `apps/marketing/app/roi/page.tsx`
+- `apps/marketing/app/schedule-consultation/page.tsx`
+- `apps/marketing/app/security/page.tsx`
+- `apps/marketing/app/services/page.tsx`
+- `apps/marketing/app/share/page.tsx`
+- `apps/marketing/app/sites/[subdomain]/[[...slug]]/page.tsx`
+- `apps/marketing/app/skilled-trades-training-indiana/page.tsx`
+- `apps/marketing/app/staff/attendance/export/page.tsx`
+- `apps/marketing/app/store/add-ons/analytics-pro/checkout/page.tsx`
+- `apps/marketing/app/store/add-ons/analytics-pro/page.tsx`
+- `apps/marketing/app/store/add-ons/compliance-automation/checkout/page.tsx`
+- `apps/marketing/app/store/add-ons/compliance-automation/page.tsx`
+- `apps/marketing/app/store/add-ons/grant-contract-suite/page.tsx`
+- `apps/marketing/app/store/ai-studio/page.tsx`
+- `apps/marketing/app/store/checkout/cancel/page.tsx`
+- `apps/marketing/app/store/compliance/ferpa/page.tsx`
+- `apps/marketing/app/store/compliance/grant-reporting/page.tsx`
+- `apps/marketing/app/store/compliance/page.tsx`
+- `apps/marketing/app/store/compliance/wcag/page.tsx`
+- `apps/marketing/app/store/demo/student/page.tsx`
+- `apps/marketing/app/store/digital/page.tsx`
+- `apps/marketing/app/store/guides/capital-readiness/enterprise/page.tsx`
+- `apps/marketing/app/store/guides/capital-readiness/page.tsx`
+- `apps/marketing/app/store/guides/capital-readiness/slides/page.tsx`
+- `apps/marketing/app/store/guides/licensing/page.tsx`
+- `apps/marketing/app/store/guides/page.tsx`
+- `apps/marketing/app/store/licenses/enterprise-license/page.tsx`
+- `apps/marketing/app/store/licenses/pro-license/page.tsx`
+- `apps/marketing/app/store/licenses/school-license/page.tsx`
+- `apps/marketing/app/store/licenses/source-use/page.tsx`
+- `apps/marketing/app/store/licenses/starter-license/page.tsx`
+- `apps/marketing/app/store/licenses/success/page.tsx`
+- `apps/marketing/app/store/practice-tests/page.tsx`
+- `apps/marketing/app/store/sam-gov-assistant/page.tsx`
+- `apps/marketing/app/store/success/page.tsx`
+- `apps/marketing/app/success-stories/page.tsx`
+- `apps/marketing/app/support/page.tsx`
+- `apps/marketing/app/tax-software/page.tsx`
+- `apps/marketing/app/tenant-site/[[...slug]]/page.tsx`
+- `apps/marketing/app/testimonials/page.tsx`
+- `apps/marketing/app/testing/[provider]/page.tsx`
+- `apps/marketing/app/testing/for-employers/page.tsx`
+- `apps/marketing/app/testing/policies/page.tsx`
+- `apps/marketing/app/transparency/page.tsx`
+- `apps/marketing/app/tutoring/page.tsx`
+- `apps/marketing/app/verification-approvals/page.tsx`
+- `apps/marketing/app/verify/[certificateId]/page.tsx`
+- `apps/marketing/app/videos/page.tsx`
+- `apps/marketing/app/volunteer/page.tsx`
+- `apps/marketing/app/webinars/page.tsx`
+- `apps/marketing/app/white-label/page.tsx`
+- `apps/marketing/app/wioa-eligibility/page.tsx`
+- `apps/marketing/app/workforce-partners/page.tsx`
+- `apps/marketing/app/writing-center/page.tsx`
 
 ### Critical findings
 
@@ -18,467 +176,303 @@ _None_
 
 ## Oversized hero / banner patterns
 
-### `app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx` (2)
-- L1648 **max-h-600-plus**: max-height >560px (exceeds design standard) — `max-h-[640px]`
-- L1268 **clamp-max-600-plus**: clamp() max >560px — `clamp(320px,44vw,640px)`
+### `components/home/PlatformHubHero.tsx` (2)
+- L28 **min-h-420-plus**: Large minimum height on hero-like container — `min-h-[440px]`
+- L28 **min-h-420-plus**: Large minimum height on hero-like container — `min-h-[480px]`
 
-### `components/ModerationDashboard.tsx` (2)
-- L319 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[90vh]`
-- L324 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[60vh]`
+### `apps/marketing/app/barber-and-beauty-apprenticeships/page.tsx` (1)
+- L78 **min-h-420-plus**: Large minimum height on hero-like container — `min-h-[420px]`
 
-### `components/admin/dashboard/LizzyContainerWrapper.tsx` (2)
-- L12 **min-h-420-plus**: min-height ≥420px on hero-like container — `min-h-[420px]`
-- L68 **min-h-420-plus**: min-height ≥420px on hero-like container — `min-h-[420px]`
+### `apps/marketing/app/programs/barber-apprenticeship/page.tsx` (1)
+- L231 **min-h-420-plus**: Large minimum height on hero-like container — `min-h-[420px]`
 
-### `app/apprentice/not-found.tsx` (1)
-- L5 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[60vh]`
+### `apps/marketing/app/programs/healthcare/page.tsx` (1)
+- L83 **min-h-420-plus**: Large minimum height on hero-like container — `min-h-[430px]`
 
-### `app/apps/website-builder/WebsiteBuilderApp.tsx` (1)
-- L199 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[90vh]`
+### `apps/marketing/app/testing/page.tsx` (1)
+- L85 **min-h-420-plus**: Large minimum height on hero-like container — `min-h-[430px]`
 
-### `app/employer/not-found.tsx` (1)
-- L5 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[60vh]`
-
-### `app/funding/not-found.tsx` (1)
-- L6 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[60vh]`
-
-### `app/lms/not-found.tsx` (1)
-- L5 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[60vh]`
-
-### `app/loading.tsx` (1)
-- L6 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[60vh]`
-
-### `app/login/not-found.tsx` (1)
-- L5 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[60vh]`
-
-### `app/mentor/not-found.tsx` (1)
-- L5 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[60vh]`
-
-### `app/program-holder/not-found.tsx` (1)
-- L6 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[60vh]`
-
-### `app/programs/loading.tsx` (1)
-- L3 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[60vh]`
-
-### `app/programs/not-found.tsx` (1)
-- L6 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[60vh]`
-
-### `app/store/add-ons/analytics-pro/page.tsx` (1)
-- L98 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[50vh]`
-
-### `app/store/add-ons/compliance-automation/page.tsx` (1)
-- L99 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[50vh]`
-
-### `app/store/not-found.tsx` (1)
-- L5 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[60vh]`
-
-### `components/ContextualHelp.tsx` (1)
-- L206 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[80vh]`
-
-### `components/DataExportDialog.tsx` (1)
-- L323 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[90vh]`
-
-### `components/ElevateChatWidget.tsx` (1)
-- L121 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[85vh]`
-
-### `components/EligibilityModal.tsx` (1)
-- L22 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[90vh]`
-
-### `components/FeedbackWidget.tsx` (1)
-- L99 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[90vh]`
-
-### `components/NotificationBell.tsx` (1)
-- L105 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[80vh]`
-
-### `components/OnboardingFlow.tsx` (1)
-- L49 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[90vh]`
-
-### `components/ProgramPageTemplate.tsx` (1)
-- L63 **min-h-420-plus**: min-height ≥420px on hero-like container — `min-h-[600px]`
-
-### `components/SurveyModal.tsx` (1)
-- L228 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[90vh]`
-
-### `components/TutorialSystem.tsx` (1)
-- L105 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[90vh]`
-
-### `components/admin/AdminNav.tsx` (1)
-- L149 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[75vh]`
-
-### `components/blocks/AccordionSection.tsx` (1)
-- L48 **max-h-600-plus**: max-height >560px (exceeds design standard) — `max-h-[600px]`
-
-### `components/chat/AILiveChat.tsx` (1)
-- L233 **vh-50-plus**: Hero/viewport height ≥50vh (often oversized) — `h-[70vh]`
+### `components/programs/beauty/FeaturedHostPartners.tsx` (1)
+- L63 **min-h-420-plus**: Large minimum height on hero-like container — `min-h-[420px]`
 
 
-## Image performance (LCP / video)
+## Image performance
 
-### `app/government/page.tsx` (10)
-- L141 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L180 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L278 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L300 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L320 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L342 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L438 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L460 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- _+2 more_
+### `apps/marketing/app/store/licenses/school-license/page.tsx` (2)
+- L17 **fill-no-sizes**: next/image fill without sizes may over-fetch — `<Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAA`
+- L278 **fill-no-sizes**: next/image fill without sizes may over-fetch — `<Image sizes="100vw" src={item.img} alt={item.title} fill`
 
-### `app/programs/hvac-technician/course/HvacCourseHome.tsx` (8)
-- L172 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L297 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L444 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L487 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L172 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-            src={MODULE_PHOTO[index] || MODULE_PHOTO[0]}
-  `
-- L297 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/hvac-hero.webp"
-          alt=`
-- L444 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="/images/pages/comp-home-highlight-succ`
-- L487 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                    src={MODULE_PHOTO[i]}
-                 `
+### `apps/marketing/app/enroll/page.tsx` (1)
+- L42 **fill-no-sizes**: next/image fill without sizes may over-fetch — `<Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAA`
 
-### `components/ProgramCTA.tsx` (8)
-- L35 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L53 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L69 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L101 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L118 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L192 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L219 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L246 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
+### `apps/marketing/app/licenses/page.tsx` (1)
+- L19 **fill-no-sizes**: next/image fill without sizes may over-fetch — `<Image sizes="100vw"
+          src="/images/pages/employer-hero.webp"
+          alt="Platform Licens`
 
-### `app/programs/barber-apprenticeship/host-shops/page.tsx` (7)
-- L36 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L53 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L105 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L117 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L53 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-training.webp"
-  `
-- L105 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="/images/pages/barber-gallery-2.webp"
- `
-- L117 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="/images/pages/barber-gallery-3.webp"
- `
+### `components/BeautyAboutSection.tsx` (1)
+- L121 **fill-no-sizes**: next/image fill without sizes may over-fetch — `<Image sizes="100vw"
+                  src="/images/pages/barber-shop-interior.webp"
+               `
 
-### `app/programs/cosmetology-apprenticeship/host-shops/page.tsx` (7)
-- L37 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L55 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L110 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L122 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L55 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="/images/pages/cosmetology-apprenticesh`
-- L110 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology.webp"
-      `
-- L122 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="/images/pages/barber-styling-hair.webp`
+### `components/BeautyBanner.tsx` (1)
+- L140 **fill-no-sizes**: next/image fill without sizes may over-fetch — `<Image sizes="100vw"
+          src={slide.image}
+          alt={slide.title}
+          fill`
 
-### `app/programs/esthetician-apprenticeship/host-shops/page.tsx` (7)
-- L35 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L57 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L89 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L99 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L57 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-hero.webp"
- `
-- L89 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-hero.webp"
- `
-- L99 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/cosmetology-hero.webp"
- `
+### `components/BeautyTestimonials.tsx` (1)
+- L183 **fill-no-sizes**: next/image fill without sizes may over-fetch — `<Image sizes="100vw"
+                        src={t.image}
+                        alt={t.name}
+    `
 
-### `app/programs/nail-technician-apprenticeship/host-shops/page.tsx` (7)
-- L35 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L57 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L86 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L93 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L57 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw" src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-technician.webp"
-                al`
-- L86 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw" src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-technician.webp"
-                al`
-- L93 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw" src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/nail-technician.webp"
-                al`
+### `components/ProgramCard.tsx` (1)
+- L28 **fill-no-sizes**: next/image fill without sizes may over-fetch — `<Image sizes="100vw" src={image} alt={title} fill`
 
-### `app/workone-partner-packet/page.tsx` (6)
-- L171 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L245 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L268 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L291 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L314 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L407 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-
-### `app/calendar/page.tsx` (5)
-- L80 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L101 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L141 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L172 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L264 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-
-### `components/marketing/PartnerLogos.tsx` (5)
-- L17 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L26 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L35 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L44 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L53 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-
-### `app/career-services/courses/my-courses/page.tsx` (4)
-- L113 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L156 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L113 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                      src={purchase.course?.image_url || '/`
-- L156 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                      src={course.image_url || '/images/pag`
-
-### `app/funding/jri/page.tsx` (4)
-- L46 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L233 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L46 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-            src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/jri-hero.webp"
-            a`
-- L233 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-                    src={program.image}
-                   `
-
-### `app/onboarding/page.tsx` (4)
-- L51 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L79 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L120 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L160 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-
-### `app/store/compliance/wioa/page.tsx` (4)
-- L148 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L202 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L235 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L321 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-
-### `app/store/demo/employer/page.tsx` (4)
-- L196 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L288 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L196 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw" src={candidate.image} alt={candidate.name} fill`
-- L288 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw" src={candidate.image} alt={candidate.name} fill`
-
-### `app/store/licenses/page.tsx` (4)
-- L54 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L418 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L54 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-          src="/images/pages/store-licensing-enterprise-her`
-- L418 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/business/team-4.webp"
-          alt=`
-
-### `app/store/licenses/school-license/page.tsx` (4)
-- L27 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L286 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L27 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw"
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/about-hero.webp"
-          alt`
-- L286 **fill-no-sizes**: next/image fill without sizes (may over-fetch) — `<Image sizes="100vw" src={item.img} alt={item.title} fill`
-
-### `app/success/page.tsx` (4)
-- L40 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L64 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L89 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L113 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-
-### `app/tutoring/TutoringClient.tsx` (4)
-- L89 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L110 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L137 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L160 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-
-### `app/wioa-eligibility/page.tsx` (4)
-- L36 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L103 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L158 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
-- L255 **sizes-100vw**: sizes=100vw loads full viewport width image (heavy LCP) — `sizes="100vw"`
+### `components/video/UltraVideoPlayer.tsx` (1)
+- L63 **preload-full-hero**: preloadFull downloads the entire hero video on load — `preloadFull`
 
 
-## Layout & text standard violations
+## Layout, text & contrast standard violations
 
-### `app/lms/(app)/courses/[courseId]/page.tsx` (5)
-- L268 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `heroImage}
-            alt={course.title}
+### `apps/lms/app/lms/(app)/dashboard/page.tsx` (4)
+- L461 **hero-gradient-overlay**: Gradient overlay near hero media — `HeroImage}
+              alt="Students building career skills in class"
+              fill
+         `
+- L548 **hero-gradient-overlay**: Gradient overlay near hero media — `hero.webp"
+              alt="Elevate students learning together"
+              fill
+              p`
+- L555 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/30" />
+         `
+- L671 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent" />
+             `
+
+### `components/admin/EnrollmentVoucherPanel.tsx` (4)
+- L237 **low-contrast-neutral-on-light**: Low-contrast neutral text on a light surface — `className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring`
+- L251 **low-contrast-neutral-on-light**: Low-contrast neutral text on a light surface — `className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring`
+- L266 **low-contrast-neutral-on-light**: Low-contrast neutral text on a light surface — `className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring`
+- L288 **low-contrast-neutral-on-light**: Low-contrast neutral text on a light surface — `className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring`
+
+### `apps/lms/app/apprentice/page.tsx` (3)
+- L476 **hero-gradient-overlay**: Gradient overlay near hero media — `heroImage}
+            alt={`${displayProgram} apprentice training`}
             fill
-            className`
-- L532 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `heroImage}
-          alt={course.title}
-          fill
-          className="obje`
-- L275 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-90`
-- L540 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-slate-90`
-- L633 **invisible-white-on-white**: Possible white text on white background — `bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5`}
-            `
-
-### `app/help/page.tsx` (3)
-- L44 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `hero-training-1.webp"
-            alt="Student receiving personalized help and s`
-- L206 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `hero-training-2.webp"
-                alt="Student using help resources on lapto`
-- L213 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 to-transparent" />
-    `
-
-### `app/program-holder/dashboard/page.tsx` (3)
-- L200 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `Hero */}
-      <div className="relative h-56 sm:h-72 w-full overflow-hidden">
-  `
-- L205 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 flex items-end">
-          <div className="max-w-7xl mx-auto w-`
-- L253 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-brand-blue-950/50" />
-                <div className="absolu`
-
-### `components/programs/VisualProgramTemplate.tsx` (3)
-- L205 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 to-transparent" />
-    `
-- L398 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 to-transparent" />
-    `
-- L467 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-slate-900/70" />
-          <div className="absolute inset-0 `
-
-### `app/partners/training-sites/page.tsx` (2)
-- L199 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `hero.webp"
-          alt={`${PLATFORM_DEFAULTS.orgName} training sites and emplo`
-- L206 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 via-brand-blue-800/40 t`
-
-### `app/programs/building-services-technician/page.tsx` (2)
-- L34 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `hero.jpg"
-          alt="Building Services Technician working on facility mainte`
-- L42 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 via-brand-blue-800/40 t`
-
-### `app/programs/direct-support-professional/page.tsx` (2)
-- L30 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `Hero Banner */}
-      <section className="relative w-full" style={{ height: 'cla`
-- L41 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 via-brand-blue-800/40 t`
-
-### `app/programs/esthetician-apprenticeship/host-shops/page.tsx` (2)
-- L30 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `Hero */}
-      <section className="relative h-[38vh] min-h-[220px] max-h-[420px]`
-- L39 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-brand-blue-900/70 to-transparent" />
-    `
-
-### `app/programs/hvac-technician/course/HvacCourseHome.tsx` (2)
-- L298 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `hero.webp"
-          alt="HVAC technician"
-          fill
-          className="o`
-- L304 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
-   `
-
-### `app/programs/nail-technician-apprenticeship/host-shops/page.tsx` (2)
-- L30 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `Hero */}
-      <section className="relative h-[38vh] min-h-[220px] max-h-[420px]`
-- L39 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-brand-blue-900/70 to-transparent" />
-    `
-
-### `app/scholarships/page.tsx` (2)
-- L189 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `hero.webp"
-          alt="Scholarships and Financial Aid"
-          fill
-       `
-- L195 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 via-brand-blue-800/40 t`
-
-### `app/search/page.tsx` (2)
-- L284 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `hero.webp"
-                alt="Employer partnerships"
-                fill
-    `
-- L296 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),t`
-
-### `app/store/licenses/page.tsx` (2)
-- L55 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `hero.webp"
-          alt="Workforce training platform"
-          fill
+            pr`
+- L483 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-r from-slate-950 via-fuchsia-950/90 to-fuchsia-900/20" />
           `
-- L424 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-zinc-900/90" />
+- L898 **empty-next-image-alt**: Empty Next/Image alt text — `<Image
+                  src={action.image}
+                  alt=""`
 
-        <div className="relative z-10 max-w`
+### `components/beauty/ApprenticeshipHub.tsx` (3)
+- L177 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero Section */}
+      <section className="relative bg-gradient-to`
+- L384 **hero-gradient-overlay**: Gradient overlay near hero media — `hero.webp"
+                  alt="Barber apprenticeship training"
+                  width={600}
+    `
+- L390 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                `
 
-### `app/testing/[provider]/page.tsx` (2)
-- L122 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `heroImg}
-          alt={provider.name}
-          fill
-          className="objec`
-- L130 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t ${accent} via-transparent to-transparent opaci`
+### `components/home/AnimatedHomePage.tsx` (3)
+- L146 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center ov`
+- L289 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-br ${program.color} opacity-0 group-hover:opacity-10 transition-opac`
+- L336 **invisible-white-on-white**: Possible white text on white background — `bg-white rounded-2xl p-8 border border-slate-200 shadow-xl hover:shadow-2xl transition-shadow">
+    `
 
-### `components/HomeHeroWithVoiceover.tsx` (2)
-- L177 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `hero-poster.webp"
-        className="absolute inset-0 w-full h-full object-cover`
-- L194 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 flex items-center">
-          <div className="max-w-7xl mx-auto`
+### `apps/marketing/app/apply/employer/page.tsx` (2)
+- L22 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
+      <div className="relative h-[200px] sm:h-[260px] overflow-hidden bg-slate-900">
+      `
+- L24 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-brand-orange-900" />
+        <div`
 
-### `components/admin/dashboard/DashboardShell.tsx` (2)
-- L455 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `hero.webp"
-          alt=""
-          fill
-          className="object-cover"
-  `
-- L454 **empty-alt**: Empty image alt text — `<Image
-          src="https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp"
-          alt=""`
+### `apps/marketing/app/apprenticeships/host-shop/BrowseHostShopsClient.tsx` (2)
+- L83 **hero-gradient-overlay**: Gradient overlay near hero media — `heroImage(shop)}
+            alt={`${shop.name} apprenticeship host shop`}
+            fill
+        `
+- L89 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+          <div class`
 
-### `components/home/Pathways.tsx` (2)
-- L23 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 " />
-              <div className="absolute bottom-0 left-0 rig`
-- L43 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 " />
-              <div className="absolute bottom-0 left-0 rig`
+### `apps/marketing/app/connect/page.tsx` (2)
+- L402 **low-contrast-neutral-on-light**: Low-contrast neutral text on a light surface — `className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-lg text-sm text-slate-300 hover:bg-`
+- L402 **low-contrast-neutral-on-light-reversed**: Low-contrast neutral text on a light surface — `className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-lg text-sm text-slate-300 hover:bg-`
 
-### `components/lms/LessonPlayer.tsx` (2)
-- L487 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 flex flex-col items-center justify-center pointer-events-none">`
-- L588 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 flex flex-col items-center justify-center bg-black/80">
-       `
+### `apps/marketing/app/demos/page.tsx` (2)
+- L128 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
+      <section className="bg-gradient-to`
+- L194 **invisible-white-on-white**: Possible white text on white background — `bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-sha`
 
-### `components/security/ProtectedImage.tsx` (2)
-- L52 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 z-10"
-        style={{
-          background:
-            'repea`
-- L91 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 z-20 flex items-center justify-center bg-black/80">
-          <`
+### `apps/marketing/app/store/licenses/success/page.tsx` (2)
+- L95 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero Image */}
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidde`
+- L97 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
+        <div className="absolu`
 
-### `components/templates/PageHero.tsx` (2)
-- L13 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `Hero?: string;
-}
+### `apps/marketing/app/videos/page.tsx` (2)
+- L77 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
+      <section className="bg-gradient-to`
+- L111 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 flex items-center justify-center">
+                    <Video className="w-16 h-16 `
 
-export default function PageHero({ title, description, forceHe`
-- L70 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 flex items-center justify-center text-center px-4">
-          <`
+### `apps/lms/app/enrollment/page.tsx` (2)
+- L49 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero Banner */}
+      <section className="relative w-full h-[40vh] min-h-[280px] max-h-[400px] overf`
+- L60 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 flex items-center">
+          <div className="max-w-7xl mx-auto px-4 w-full">
+     `
 
-### `app/apply/ApplyAvatarGuide.tsx` (1)
-- L68 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 flex items-center justify-center pointer-events-none">
+### `apps/lms/app/lms/page.tsx` (2)
+- L15 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
+      <section className="relative w-full h-[45vh] min-h-[320px] max-h-[500px] overflow-hid`
+- L26 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 flex items-center">
+          <div className="max-w-7xl mx-auto px-4 w-full">
+     `
+
+### `apps/lms/app/programs/hvac-technician/course/CanonicalHvacCourseHome.tsx` (2)
+- L70 **hero-gradient-overlay**: Gradient overlay near hero media — `hero.webp"
+          alt="HVAC technician working with heating and cooling equipment"
+          fill`
+- L77 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/45" />
         `
 
-### `app/apply/ApplyHeroVideo.tsx` (1)
-- L25 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 w-full h-full object-cover"
-        autoPlayOnMount
-        thr`
+### `apps/admin/app/applications/review/[id]/page.tsx` (2)
+- L131 **hero-gradient-overlay**: Gradient overlay near hero media — `hero.webp"
+              alt="Admissions team reviewing applications"
+              fill
+           `
+- L137 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/75 to-brand-blue-900/45" />
+      `
 
-### `app/blog/loading.tsx` (1)
-- L6 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `Hero Skeleton */}
-      <div className="bg-gradient-to`
+### `apps/admin/app/studio/agents/AgentsClient.tsx` (2)
+- L71 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero Section */}
+      <div className="relative h-[280px] w-full overflow-hidden">
+        <Image
+  `
+- L81 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-r from-blue-900/80 to-indigo-900/60" />
+        <div className="abso`
 
-### `app/financing/page.tsx` (1)
-- L89 **hero-gradient-overlay**: Gradient overlay near hero (forbidden on hero frame) — `Hero */}
-      <section className="bg-gradient-to`
+### `apps/admin/app/studio/memory/MemoryClient.tsx` (2)
+- L62 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
+      <div className="relative h-[280px] w-full overflow-hidden">
+        <Image
+          `
+- L72 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-r from-teal-900/80 to-cyan-900/60" />
+        <div className="absolu`
 
-### `app/for-agencies/page.tsx` (1)
-- L111 **hero-text-overlay**: Headline/text overlaid on hero media — `absolute inset-0 flex items-end">
-          <div className="max-w-4xl mx-auto px`
+### `apps/admin/app/studio/settings/SettingsClient.tsx` (2)
+- L147 **hero-gradient-overlay**: Gradient overlay near hero media — `hero.webp"
+          alt="System Settings"
+          fill
+          className="object-cover"
+       `
+- L154 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-r from-slate-900/80 to-gray-900/60" />
+        <div className="absol`
+
+### `apps/admin/app/studio/tasks/TasksClient.tsx` (2)
+- L100 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero Section */}
+      {!embedded ? (
+        <div className="relative h-[220px] w-full overflow-hid`
+- L103 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-r from-slate-950 via-violet-950 to-slate-900" />
+          <div clas`
+
+### `apps/admin/app/studio/workflows/[id]/WorkflowDetailClient.tsx` (2)
+- L214 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
+      <div className="relative h-[200px] w-full overflow-hidden">
+        <Image src="/imag`
+- L218 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 flex items-center">
+          <div className="max-w-6xl mx-auto px-6 w-full">
+     `
+
+### `apps/admin/app/studio/workflows/new/PageClient.tsx` (2)
+- L348 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
+      <div className="relative h-[220px] w-full overflow-hidden">
+        <Image src="/imag`
+- L352 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 flex items-center">
+          <div className="max-w-4xl mx-auto px-6 w-full">
+     `
+
+### `apps/admin/app/videos/page.tsx` (2)
+- L66 **hero-gradient-overlay**: Gradient overlay near hero media — `hero.webp" alt="Video management" fill priority sizes="100vw" className="object-cover opacity-35" />`
+- L67 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/75 to-transparent" />
+            `
+
+### `components/dashboards/StateAwareDashboard.tsx` (2)
+- L61 **hero-gradient-overlay**: Gradient overlay near hero media — `heroImage = portalHeroImage(dominantAction.href);
+
+  return (
+    <div className="min-h-screen bg-wh`
+- L108 **hero-gradient-overlay**: Gradient overlay near hero media — `heroImage}
+                alt="Portal work and next-step guidance"
+                fill
+           `
+
+### `components/home/Pathways.tsx` (2)
+- L23 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 " />
+              <div className="absolute bottom-0 left-0 right-0 p-4 text-white`
+- L43 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 " />
+              <div className="absolute bottom-0 left-0 right-0 p-4 text-white`
+
+### `components/lms/LessonInlineInput.tsx` (2)
+- L214 **low-contrast-neutral-on-light**: Low-contrast neutral text on a light surface — `className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 place`
+- L232 **low-contrast-neutral-on-light**: Low-contrast neutral text on a light surface — `className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 place`
+
+### `components/lms/LessonPlayer.tsx` (2)
+- L487 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <div `
+- L588 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 flex flex-col items-center justify-center bg-black/80">
+              <div classNam`
+
+### `components/lms/MarcusInstructor.tsx` (2)
+- L170 **low-contrast-neutral-on-light-reversed**: Low-contrast neutral text on a light surface — `className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition"`
+- L177 **low-contrast-neutral-on-light-reversed**: Low-contrast neutral text on a light surface — `className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition"`
+
+### `components/program-holder/ProgramHolderWorkspaceView.tsx` (2)
+- L1362 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description: st`
+- L1400 **hero-gradient-overlay**: Gradient overlay near hero media — `heroImage}
+        alt={`${title} dashboard`}
+        fill
+        priority
+        sizes="100vw"
+  `
+
+### `components/programs/beauty/HostShopShowcase.tsx` (2)
+- L411 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 flex flex-col justify-end bg-[radial-gradient(circle_at_top_left,rgba(185,28,28,0.3`
+- L321 **empty-next-image-alt**: Empty Next/Image alt text — `<Image
+                      src={image.backdropSrc}
+                      alt=""`
+
+### `components/programs/sections/CTASection.tsx` (2)
+- L31 **hero-gradient-overlay**: Gradient overlay near hero media — `HeroVideo
+            src={videoSrc}
+            poster={videoPoster || '/images/og-default.jpg'}
+  `
+- L40 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-r from-slate-900/95 to-slate-900/80" />
+      </div>
+
+      {/* Cont`
 
 
 
-## Recommended fix order
+## Re-run
 
-1. **Shared components** — `HeroVideo.tsx`, `HeroPicture.tsx`, `page-design-tokens.ts` `hero.imageWrap`, `PageVideoHero.tsx` SIZE map, `PublicLandingPage.tsx`, `HomeTopHero.tsx`
-2. **Remove `preloadFull`** on marketing heroes (use `metadata` preload; home page only may opt in)
-3. **Replace `sizes="100vw"`** with `(max-width: 768px) 100vw, 1200px` on heroes
-4. **Page-by-page** — host-shops, government, store, pathways templates using `h-[60vh] min-h-[450px]`
-5. **text-gray-* → text-slate-*** in touched files
-
-Re-run: `node scripts/audit-visual-layout.mjs` and `node scripts/audit-image-assets.mjs`
+- `node scripts/audit-visual-layout.mjs`
+- `node scripts/audit-image-assets.mjs`
+- `pnpm audit:public-media-nav`
+- `pnpm audit:hero-banners`

@@ -117,7 +117,7 @@ body {
 
   /* High contrast focus for better visibility */
   @media (prefers-contrast: high) {
-      }
+  }
 
   /* Skip to main content link */
   .skip-to-main {
@@ -139,7 +139,7 @@ body {
   html,
   body {
     font-family:
-      var(--font-inter),
+      var(--font-inter, Arial),
       -apple-system,
       BlinkMacSystemFont,
       'Segoe UI',
@@ -233,7 +233,7 @@ body {
   }
 
   /* Only apply to non-Next.js images */
-  img:not([data-nimg]) {
+  :where(img:not([data-nimg]):not(.absolute)) {
     max-width: 100%;
     height: auto;
   }
@@ -282,7 +282,7 @@ body {
 
 /* Tighter section spacing - scoped to marketing content areas only.
    Homepage sections (components/home/) use Tailwind py-* directly. */
-.marketing-content section:not([class*="py-"]) {
+.marketing-content section:not([class*='py-']) {
   width: 100%;
   margin: 0;
   padding: 3rem 0;
@@ -290,7 +290,7 @@ body {
 }
 
 @media (min-width: 768px) {
-  .marketing-content section:not([class*="py-"]) {
+  .marketing-content section:not([class*='py-']) {
     padding: 4rem 0;
   }
 }
@@ -496,8 +496,8 @@ body {
   --brand-space-2xl: 3rem;
 
   --brand-font-sans:
-    var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue',
-    sans-serif;
+    var(--font-inter, Arial), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Helvetica Neue', sans-serif;
 }
 
 /* ============================================
@@ -1413,17 +1413,15 @@ html {
    Previous global overrides forced dark text on hero sections and dark backgrounds. */
 
 /* Links - inherit color, don't force underline on hover (breaks nav/buttons) */
-a {
-  color: inherit;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
+@layer base {
+  :where(a) {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
 }
 
-/* 5) Images: prevent "cheap" stretching - exclude Next.js Image */
-img:not([data-nimg]) {
-  max-width: 100%;
-  height: auto;
-}
+/* Image defaults live in @layer base above so fixed card/media sizes can win. */
 
 /* Header CSS removed - component controls all header styles */
 
@@ -1432,122 +1430,111 @@ img:not([data-nimg]) {
    Elevate For Humanity: Large Screen Optimization
    ============================================================================ */
 
-/* 1️⃣ Expand layout width for larger screens - scoped to main content */
-main .container,
-main .wrapper,
-.main-content {
-  max-width: 90vw;
-  width: 100%;
-  margin: 0 auto;
-  padding-inline: 3vw;
-}
+/* These are defaults only. Component utilities own sizing, spacing and foregrounds. */
+@layer base {
+  /* 1️⃣ Expand layout width for larger screens - scoped to main content */
+  :where(main .container, main .wrapper, .main-content) {
+    max-width: 90vw;
+    width: 100%;
+    margin: 0 auto;
+    padding-inline: 3vw;
+  }
 
-/* 2️⃣ Improve readability - font size only, color in @layer base */
-body {
-  font-size: 16px;
-  line-height: 1.6;
-}
+  /* 2️⃣ Improve readability - font size only, color in @layer base */
+  :where(body) {
+    font-size: 16px;
+    line-height: 1.6;
+  }
 
-/* 3️⃣ Scale text dynamically on very large screens */
-@media screen and (min-width: 1400px) {
-  body {
-    font-size: 18px;
+  /* 3️⃣ Scale text dynamically on very large screens */
+  @media screen and (min-width: 1400px) {
+    :where(body) {
+      font-size: 18px;
+    }
+    :where(h1) {
+      font-size: 2.6rem;
+    }
+    :where(h2) {
+      font-size: 2rem;
+    }
+    :where(h3) {
+      font-size: 1.4rem;
+    }
   }
-  h1 {
-    font-size: 2.6rem;
-  }
-  h2 {
-    font-size: 2rem;
-  }
-  h3 {
-    font-size: 1.4rem;
-  }
-}
 
-/* Section and hero spacing is owned by each component. Global minimum heights and
+  /* Section and hero spacing is owned by each component. Global minimum heights and
    padding created large blank gaps and broke compact mobile navigation journeys. */
 
-/* 6️⃣ Adjust CTA buttons to scale with screen size */
-button,
-.btn,
-a.button {
-  font-size: 1rem;
-  padding: 0.8em 1.6em;
-  border-radius: 6px;
-}
-
-/* 7️⃣ Fix overly small footer text */
-footer {
-  font-size: 0.95rem;
-  line-height: 1.4;
-  padding: 2rem 4vw;
-}
-
-/* 8️⃣ Ensure mobile remains clean */
-@media screen and (max-width: 768px) {
-  /* Scoped to main content - not header */
-  main .container,
-  main .wrapper,
-  .main-content {
-    max-width: 100%;
-    padding-inline: 5vw;
+  /* 6️⃣ Adjust CTA buttons to scale with screen size */
+  :where(button, .btn, a.button) {
+    font-size: 1rem;
+    padding: 0.8em 1.6em;
+    border-radius: 6px;
   }
-  body {
-    font-size: 15px;
-  }
-  main section {
-    padding-top: 2.5rem;
-    padding-bottom: 2.5rem;
-  }
-}
 
-/* ============================================================================
+  /* 7️⃣ Fix overly small footer text */
+  :where(footer) {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    padding: 2rem 4vw;
+  }
+
+  /* 8️⃣ Ensure mobile remains clean */
+  @media screen and (max-width: 768px) {
+    /* Scoped to main content - not header */
+    :where(main .container, main .wrapper, .main-content) {
+      max-width: 100%;
+      padding-inline: 5vw;
+    }
+    :where(body) {
+      font-size: 16px;
+    }
+  }
+
+  /* ============================================================================
    COLOR & CONTRAST ENHANCEMENT (WCAG AA Compliant)
    Scoped to content areas - header/nav use component styles
    ============================================================================ */
 
-/* Headings in content areas */
-main h1,
-main h2,
-main h3,
-main h4,
-main h5,
-main h6,
-section h1,
-section h2,
-section h3,
-section h4,
-section h5,
-section h6,
-article h1,
-article h2,
-article h3,
-article h4,
-article h5,
-article h6 {
-  color: #0f172a; /* Near-black for maximum readability */
-}
+  /* Headings in content areas */
+  :where(
+    main h1,
+    main h2,
+    main h3,
+    main h4,
+    main h5,
+    main h6,
+    section h1,
+    section h2,
+    section h3,
+    section h4,
+    section h5,
+    section h6,
+    article h1,
+    article h2,
+    article h3,
+    article h4,
+    article h5,
+    article h6
+  ) {
+    color: #0f172a; /* Near-black for maximum readability */
+  }
 
-/* Paragraph text in content areas */
-main p,
-section p,
-article p {
-  color: #334155; /* Slate-700 equivalent, WCAG AA compliant */
-}
+  /* Paragraph text in content areas */
+  :where(main p, section p, article p) {
+    color: #334155; /* Slate-700 equivalent, WCAG AA compliant */
+  }
 
-/* Links with better contrast and hover states - scoped to content areas */
-main a,
-section a,
-article a {
-  color: #0369a1; /* Sky-700, accessible blue */
-  text-decoration: none;
-}
+  /* Links with better contrast and hover states - scoped to content areas */
+  :where(main a, section a, article a) {
+    color: inherit; /* Explicit link and CTA utilities own their foreground. */
+    text-decoration: none;
+  }
 
-main a:hover,
-section a:hover,
-article a:hover {
-  color: #0c4a6e; /* Sky-900, darker on hover */
-  text-decoration: underline;
+  :where(main a, section a, article a):hover {
+    color: inherit; /* Keep CTA labels readable while hover utilities apply. */
+    text-decoration: underline;
+  }
 }
 
 /* Button text contrast */
@@ -1973,7 +1960,6 @@ body[data-custom-header-route='true'] [data-marketing-main] {
     transform: translateX(-50%);
   }
 }
-
 
 /* ============================================================================
    RESPONSIVE LAYOUT CONTRACT

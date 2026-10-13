@@ -32,8 +32,8 @@ const SEVERITY_STYLES = {
 
 const CODE_ICONS: Record<string, React.ElementType> = {
   missing_env_vars:              Key,
-  stripe_webhook_secret_missing: Wifi,
-  stripe_issuing_not_enabled:    CreditCard,
+  quickbooks_webhook_config_missing: Wifi,
+  quickbooks_billing_not_ready:    CreditCard,
   stale_jobs:                    Clock,
   missing_documents:             FileText,
   missing_certifications:        Award,
@@ -75,15 +75,15 @@ export function SystemHealthPanel({ health }: Props) {
         <div className="mb-4 grid grid-cols-[repeat(2,minmax(0,1fr))] gap-3 sm:grid-cols-[repeat(3,minmax(0,1fr))]">
           {[
             {
-              label: "Stripe Webhook",
-              ok: health.stripeWebhookOk,
-              href: "/integrations/stripe",
+              label: "QuickBooks Webhook",
+              ok: health.quickBooksWebhookOk,
+              href: "/integrations/quickbooks",
             },
             {
-              label: "Stripe Issuing",
-              ok: health.stripeIssuingOk,
-              value: health.stripeIssuingOk ? undefined : "Not approved",
-              href: "https://dashboard.stripe.com/issuing",
+              label: "QuickBooks Billing",
+              ok: health.quickBooksBillingOk,
+              value: health.quickBooksBillingOk ? undefined : "Not approved",
+              href: "/integrations/quickbooks",
             },
             {
               label: "Build Env",

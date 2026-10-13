@@ -28,7 +28,6 @@ on:
           - ai-operator
           - enrollment-automation
           - stale-applications
-          - process-notifications
           - program-holder-payouts
           - expire-exam-authorizations
           - expire-credentials
@@ -106,8 +105,7 @@ jobs:
     if: >
       github.event_name == 'schedule' && github.event.schedule == '*/5 * * * *'
       || (github.event_name == 'workflow_dispatch' && (
-            github.event.inputs.job == 'process-notifications'
-         || github.event.inputs.job == 'workflow-event-processor'
+            github.event.inputs.job == 'workflow-event-processor'
          || github.event.inputs.job == 'workflow-schedule-processor'
          || github.event.inputs.job == 'ai-operator'
          || github.event.inputs.job == 'video-render-queue'
@@ -115,13 +113,9 @@ jobs:
          || github.event.inputs.job == 'program-holder-payouts'
          ))
     steps:
-      - name: Process notifications
-        run: |
-          curl -sf -X GET "$ADMIN_URL/api/cron/process-notifications" \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            -H "Content-Type: application/json" \
-            --max-time 30 || echo "::warning::process-notifications failed"
-
+      # Notification Queue Worker is the single canonical POST processor.
+      # GET /process-notifications only reads statistics and must never be
+      # counted as delivery. Keeping a second sender invites duplicate claims.
       - name: Release approved Program Holder payments
         run: |
           curl -sf -X GET "$ADMIN_URL/api/cron/program-holder-payouts" \

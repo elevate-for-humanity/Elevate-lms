@@ -64,3 +64,20 @@ describe('private phone recording proxy', () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 });
+
+describe('owned private voicemail playback',()=>{
+ it('downloads only the exact private recording belonging to the authorized call',async()=>{
+  const id='11111111-1111-4111-8111-111111111111';
+  const audio=Buffer.alloc(44);audio.write('RIFF');audio.write('WAVE',8);
+  const download=vi.fn().mockResolvedValue({data:new Blob([audio],{type:'audio/wav'}),error:null});
+  const response=await loadPhoneRecording('supabase://phone-voicemails/'+id+'.wav',{callId:id,db:{storage:{from:()=>({download})}}});
+  expect(download).toHaveBeenCalledWith(id+'.wav');
+  expect(response.headers.get('Cache-Control')).toContain('no-store');
+  expect((await response.arrayBuffer()).byteLength).toBe(44);
+ });
+ it('rejects a different call or arbitrary bucket before downloading audio',async()=>{
+  const id='11111111-1111-4111-8111-111111111111';const from=vi.fn();
+  await expect(loadPhoneRecording('supabase://other-bucket/'+id+'.wav',{callId:id,db:{storage:{from}}})).rejects.toThrow('Untrusted private recording');
+  expect(from).not.toHaveBeenCalled();
+ });
+});

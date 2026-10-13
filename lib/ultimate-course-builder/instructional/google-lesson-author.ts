@@ -56,14 +56,14 @@ Grounding is an array with one entry per segment: {segmentId, sourceId, excerpt}
     if (result?.blocked) break;
     try { validateLessonBlueprint(result?.blueprint, input.competency); break; }
     catch (error) {
-      if (!(error instanceof Error) || error.message !== 'BLUEPRINT_TEACHING_VISUAL_NOT_SCRIPT_BOUND' || attempt === 2) throw error;
+      if (!(error instanceof Error) || !error.message.startsWith('BLUEPRINT_') || attempt === 2) throw error;
       const invalidVisuals = (result?.blueprint?.segments ?? []).flatMap((segment: any) => {
         try { if (segment.teachingVisual) validateTeachingVisual(segment.teachingVisual, segment.text); return []; }
         catch { return [{segmentId: segment.id, narration: segment.text, teachingVisual: segment.teachingVisual}]; }
       });
       result = await generate(system, {...authorRequest, repair: {
         code: error.message, previousResult: result, invalidVisuals,
-        instructions: 'Repair the invalid teaching visuals. Return the full {blueprint, grounding}. Preserve spoken narration, source citations, objectives and assessments. Each value and narrationQuote must be the SAME short contiguous exact excerpt from that segment narration; no paraphrase. Use 1-4 meaningful steps, labels <=28 characters and values <=90 characters. Preserve negations and technical conditions. Never claim validation or approval yourself.',
+        instructions: 'Repair the reported blueprint validation failure using blueprintSchema. Return all required 13-16 segments with nonempty text and visualRequirement, unique segment IDs, objectiveIds that match actual blueprint objectives and sourceRequirementIds matching the supplied competency requirements. Preserve all thirteen stages in order and all required activity and assessment fields. Repair invalid teaching visuals. Return the full {blueprint, grounding}. Preserve spoken narration, source citations, objectives and assessments. Each value and narrationQuote must be the SAME short contiguous exact excerpt from that segment narration; no paraphrase. Use 1-4 meaningful steps, labels <=28 characters and values <=90 characters. Preserve negations and technical conditions. Never claim validation or approval yourself.',
       }});
     }
   }

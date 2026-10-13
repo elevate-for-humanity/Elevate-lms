@@ -27,7 +27,7 @@ const running=[];
 for(const job of inventory.filter(j=>[name,'elevate-course-builder-overflow'].includes(j.metadata.name))){
  for(const e of read(['run','jobs','executions','list','--job='+job.metadata.name]).filter(e=>!isTerminalExecution(e)))running.push(e);
 }
-if(running.length&&running.every(e=>e.spec?.template?.spec?.containers?.[0]?.image===task.containers[0].image)){
+if(process.env.FORCE_COURSE_RESTART!=='1'&&running.length&&running.every(e=>e.spec?.template?.spec?.containers?.[0]?.image===task.containers[0].image)){
  console.log(JSON.stringify({status:'repaired_workers_already_active'}));process.exit(0);
 }
 // Revoke old-image leases before cancellation; retain payload and all evidence.

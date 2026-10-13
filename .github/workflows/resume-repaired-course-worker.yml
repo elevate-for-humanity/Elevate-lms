@@ -10,7 +10,7 @@ permissions:
   id-token: write
 jobs:
   dispatch:
-    if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == '0d4b750327bff2f3d860cb1ff59bd84fcf2c0748')
+    if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_sha == '22df41251efc1b129d809351b2b3c6e700383449')
     runs-on: ubuntu-24.04
     steps:
       - env:
@@ -39,4 +39,4 @@ jobs:
           FORCE_COURSE_RESTART: '1'
         run: node scripts/gcp/start-repaired-course-overflow.mjs
 
-# Authorized course restart: 2026-10-13T13:05Z; verified deployment 5be332c.
+# Resume only after the approved-delivery worker image deploys successfully.

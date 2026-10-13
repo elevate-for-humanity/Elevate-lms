@@ -1,4 +1,4 @@
-import {beforeEach,describe,expect,it,vi} from 'vitest';
+import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest';
 import {randomBytes} from 'node:crypto';
 const mock=vi.hoisted(()=>({admin:vi.fn(),notice:vi.fn(),hydrate:vi.fn()}));
 vi.mock('@/lib/secrets',()=>({hydrateProcessEnv:mock.hydrate}));
@@ -39,3 +39,5 @@ describe('owned voicemail boundary',()=>{
   database(undefined,'voicemails');expect((await POST(request())).status).toBe(503);expect(mock.notice).not.toHaveBeenCalled();
  });
 });
+
+afterEach(()=>{vi.unstubAllGlobals();vi.unstubAllEnvs();});

@@ -1,23 +1,9 @@
-name: Canonical Docker + Northflank Gate
+name: Canonical Docker compatibility gate (no Northflank deploy)
 
 on:
+  # Manual/PR build tests only. Google Cloud owns production deployment.
+  # Never auto-build on release/recovery pushes or call Northflank APIs.
   workflow_dispatch:
-  push:
-    branches:
-      - 'release/production-recovery-*'
-    paths:
-      - 'Dockerfile.marketing'
-      - 'Dockerfile.northflank-lms'
-      - 'Dockerfile.northflank-admin'
-      - 'apps/marketing/**'
-      - 'apps/admin/**'
-      - 'apps/lms/**'
-      - 'packages/**'
-      - 'scripts/northflank/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - '.github/workflows/consolidation-docker-northflank.yml'
   pull_request:
     branches:
       - main

@@ -1,3 +1,4 @@
+import { STORYBOARD_RENDER_PRODUCER } from '../../video/render-checkpoint-contract.mjs';
 import type { UltimateRenderPort } from '../core/ports';
 import { storedLicensedMediaMetadata } from '@/lib/media/licensed-course-media';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -368,6 +369,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       ...result,
       layoutVersion: input.lessonPresentation === 'approved-premium-v1' ? 4 : 2,
       ...(input.lessonPresentation === 'approved-premium-v1' ? {presentationVersion:'approved-moment-cues-v2'} : {}),
+      renderProducer: STORYBOARD_RENDER_PRODUCER,
       provider: 'remotion',
       providerModel: 'SlideLesson-blueprint-v3',
       captionsUrl: result.sceneData?.captionUrl,

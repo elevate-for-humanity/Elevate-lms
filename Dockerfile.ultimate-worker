@@ -6,12 +6,16 @@ COPY workers/ultimate-course-builder.ts workers/worker-loop.mjs ./workers/
 COPY lib/ultimate-course-builder ./lib/ultimate-course-builder
 COPY lib/media/licensed-course-media.ts ./lib/media/licensed-course-media.ts
 COPY lib/video ./lib/video
+COPY remotion-src ./remotion-src
 COPY lib/storage ./lib/storage
 COPY lib/ai ./lib/ai
 COPY docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json ./docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json
 COPY tests/integration/google-lesson-author.test.ts tests/integration/approved-teaching-recaps.test.ts ./tests/integration/
 RUN find lib -type f -name '*.ts' -exec sed -i "/^import 'server-only';$/d" {} +
 RUN node --test lib/ultimate-course-builder/instructional/competency-classification.test.mjs lib/ultimate-course-builder/media/playback-source.test.mjs && node --import=tsx --test tests/integration/google-lesson-author.test.ts tests/integration/approved-teaching-recaps.test.ts
+# Compile the actual copied composition so an inherited renderer cannot silently
+# survive a source release. This is compilation, not learner/media approval.
+RUN node --input-type=module -e "import {bundle} from '@remotion/bundler'; import {rm} from 'node:fs/promises'; const output=await bundle({entryPoint:'/app/remotion-src/index.ts',publicDir:'/app/public'}); await rm(output,{recursive:true,force:true});"
 RUN node workers/local-speech-smoke.mjs
 RUN node --import=tsx -e "await Promise.all([import('./lib/ultimate-course-builder/adapters/platform-narration.ts'),import('./lib/ultimate-course-builder/adapters/platform-renderer.ts'),import('./lib/ultimate-course-builder/core/full-course-runner.ts'),import('./lib/ultimate-course-builder/worker/process-job.ts')])"
 CMD ["node","--import=tsx","workers/ultimate-course-builder.ts"]

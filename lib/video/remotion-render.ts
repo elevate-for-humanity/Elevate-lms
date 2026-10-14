@@ -1,3 +1,4 @@
+import { storyboardRenderFingerprint } from './render-checkpoint-contract.mjs';
 import {createCheckpointFallback,privateCheckpointStorage} from './checkpoint-fallback.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../ultimate-course-builder/worker/progress-watch.mjs';
 /**
@@ -1015,8 +1016,7 @@ export async function renderStoryboardVideo(
         const chunkPath = path.join(paths.outputDir, `segment-${String(start).padStart(8, '0')}.mp4`);
         // Persist each segment in B2 so a new Cloud Run execution can resume.
         // A storyboard fingerprint prevents reuse after a scene/narration change.
-        const fingerprint = (await import('node:crypto')).createHash('sha256')
-          .update(JSON.stringify({scenes, fps: composition.fps, totalFrames, lessonPresentation: input.lessonPresentation ?? 'legacy', visualStyle: input.visualStyle, layoutVersion: 4})).digest('hex').slice(0,24);
+        const fingerprint = storyboardRenderFingerprint({scenes, fps: composition.fps, totalFrames, lessonPresentation: input.lessonPresentation ?? 'legacy', visualStyle: input.visualStyle, layoutVersion: 4});
         const segmentKey = `course-render-checkpoints/${input.lessonId}/${fingerprint}/${start}-${end}.mp4`;
         const storageReady = isElevateMediaStorageConfigured();
         const storage = storageReady ? getElevateMediaStorageClient() : null;

@@ -31,7 +31,7 @@ jobs:
         with: {persist-credentials: false}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - run: node --test scripts/gcp/sync-course-worker-regions.test.mjs
+      - run: node --test scripts/gcp/sync-course-worker-regions.test.mjs scripts/gcp/recover-stale-course-renderer.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -41,6 +41,12 @@ jobs:
         with: {skip_install: true}
       - name: Synchronize immutable image without changing worker resources
         run: node scripts/gcp/sync-course-worker-regions.mjs
+      - name: Safely transition the diagnosed stale renderer execution
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          RENDER_RECOVERY_JOB_ID: a9b85487-5465-4bc0-bed0-9fc3411c4e50
+          RENDER_RECOVERY_GENERATION: '53'
+        run: node scripts/gcp/recover-stale-course-renderer.mjs
       - name: Wake the existing PARIS course coordinator
         env: {GH_TOKEN: '${{ github.token }}'}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/dispatch-google-course-job.yml/dispatches" -f ref=main

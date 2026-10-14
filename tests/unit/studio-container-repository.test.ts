@@ -23,3 +23,12 @@ it('uses structured git arguments and reads the existing container rather than G
  expect(JSON.parse(calls[0].options.body).args).toEqual(['ls-files','--cached','--others','--exclude-standard']);
  vi.unstubAllEnvs();vi.unstubAllGlobals();
 });
+it('opens an untracked container file when the runtime reports a missing git blob as HTTP 500',async()=>{
+ vi.stubEnv('STUDIO_BROWSER_URL','https://studio.example.run.app');vi.stubEnv('STUDIO_BROWSER_SECRET','test-only');
+ vi.stubGlobal('fetch',vi.fn(async(url:string)=>url.includes('/workspace/file?')
+  ?new Response(JSON.stringify({content:'<h1>Preview</h1>',size:16}))
+  :new Response(JSON.stringify({error:'command_failed'}),{status:500})));
+ const result=await readContainerRepository('new.html');
+ expect(result.content).toBe('<h1>Preview</h1>');expect(result.sha).toBe('');
+ vi.unstubAllEnvs();vi.unstubAllGlobals();
+});

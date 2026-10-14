@@ -37,6 +37,8 @@ export async function readContainerRepository(path=''){
  }
  const file=await call('/workspace/file?path='+encodeURIComponent(path));
  if(Buffer.byteLength(file.content??'')>512*1024)throw Error('File exceeds the 512 KB editor limit.');
- const hash=await exec(['rev-parse','HEAD:'+path]);
+ // The runtime returns HTTP 500 when git cannot resolve a new, untracked file.
+ // Its readable workspace buffer must still open; it has no committed blob SHA yet.
+ const hash=await exec(['rev-parse','HEAD:'+path]).catch(()=>({exitCode:1,stdout:''}));
  return {...file,path,sha:hash.exitCode===0?String(hash.stdout??'').trim():'',repo:'elevate-for-humanity/Elevate-lms',branch:'main',source:'container'};
 }

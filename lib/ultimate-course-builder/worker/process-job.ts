@@ -112,6 +112,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
           payload.competencyId ?? payload.repairCompetencyId ?? (payload.acceptance ? profile.competencies?.[0]?.id : undefined),
         startIndex: Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0,
         maxLessons: 1,
+        repairFromStep: payload.checkpointRepair?.competencyId === currentCompetencyId ? payload.checkpointRepair.fromStep : undefined,
       },
       () => new UltimateBuildRunner(handlers as any),
       runtime.persistence,
@@ -123,6 +124,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     if (!targeted) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {
+        if (result.completed) delete continuation.payload.checkpointRepair;
         await queue.yieldProgress(job.id, workerId, continuation.payload, generation);
         return { claimed: true, completed: false, continuing: true, jobId: job.id, result };
       }

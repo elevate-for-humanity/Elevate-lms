@@ -185,7 +185,7 @@ export default function UnifiedCourseBuilder({
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">
               <Bot className="h-4 w-4" /> Ultimate Course Builder
             </div>
-            <p className="mt-1 max-w-3xl text-sm text-slate-400">
+            <p className="mt-1 max-w-3xl text-sm text-slate-200">
               One durable 20-stage authority for standards, instruction, media, narration,
               assessments, QA, repair, and LMS release.
             </p>
@@ -276,7 +276,7 @@ export default function UnifiedCourseBuilder({
               programSlug={selectedProgram?.slug?.trim() || selectedCourse.slug}
             />
           ) : (
-            <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-400">
+            <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-200">
               Select a course, or create a course shell, to start an Ultimate build.
             </div>
           ))}
@@ -381,7 +381,7 @@ function CourseCatalog({
     <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,26.25rem)]">
       <section className="min-w-0 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
         <h2 className="text-lg font-bold">Course inventory</h2>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm text-slate-200">
           Open a canonical course in Ultimate Course Builder. Publishing is available only after the
           Ultimate release gate passes.
         </p>
@@ -435,7 +435,7 @@ function CourseCatalog({
               >
                 {course.title}
               </button>
-              <div className="mt-1 text-xs text-slate-400">
+              <div className="mt-1 text-xs text-slate-200">
                 {course.status ?? 'draft'} · {course.duration_hours ?? '—'} hours
               </div>
               <button
@@ -447,9 +447,9 @@ function CourseCatalog({
               </button>
             </article>
           ))}
-          {loading && <p className="text-sm text-slate-400">Loading course inventory…</p>}
+          {loading && <p className="text-sm text-slate-200">Loading course inventory…</p>}
           {!loading && !inventoryError && !visibleCourses.length && (
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-200">
               {courses.length ? 'No courses match these filters.' : 'No courses exist yet.'}
             </p>
           )}
@@ -529,7 +529,7 @@ function CreateCoursePanel({
       className="mx-auto min-w-0 max-w-3xl space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-6"
     >
       <h2 className="text-xl font-bold">Create and start in Ultimate</h2>
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-slate-200">
         Creates only the canonical course shell, then hands all generation to Ultimate Course
         Builder.
       </p>
@@ -573,7 +573,7 @@ function CreateCoursePanel({
         <span>Google model for source-grounded teaching (optional)</span>
         <input name="googleModel" placeholder="Verified model ID" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" />
         <select name="googleLocation" defaultValue="us" aria-label="Google authoring location" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"><option value="us">United States multi-region</option><option value="us-central1">Iowa region (supported models)</option><option value="global">Global</option></select>
-        <span className="block text-slate-400">Use a model verified for this worker's Google region. Authorized teaching sources and all media acceptance checks remain required.</span>
+        <span className="block text-slate-200">Use a model verified for this worker's Google region. Authorized teaching sources and all media acceptance checks remain required.</span>
       </label>
       {error ? (
         <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
@@ -605,6 +605,7 @@ export function UltimateBuildPanel({
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [statusError, setStatusError] = useState('');
   const refreshToken = useRef(0);
   const latest = buildsCourseId === course.id ? (builds[0] ?? null) : null;
   const statusLoading = loading;
@@ -629,7 +630,7 @@ export function UltimateBuildPanel({
   async function refresh(requestedCourseId = course.id) {
     const token = ++refreshToken.current;
     setLoading(true);
-    setError('');
+    setStatusError('');
     try {
       const response = await fetch(
         `/api/admin/ultimate-course-builder?courseId=${encodeURIComponent(requestedCourseId)}`,
@@ -643,7 +644,7 @@ export function UltimateBuildPanel({
       setBuildsCourseId(requestedCourseId);
     } catch (reason) {
       if (token !== refreshToken.current) return;
-      setError(reason instanceof Error ? reason.message : 'Unable to load Ultimate build status');
+      setStatusError(reason instanceof Error ? reason.message : 'Unable to load Ultimate build status');
     } finally {
       if (token === refreshToken.current) setLoading(false);
     }
@@ -729,7 +730,7 @@ export function UltimateBuildPanel({
             Ultimate Course Builder
           </p>
           <h2 className="mt-1 text-2xl font-black text-white">{course.title}</h2>
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="mt-2 text-sm text-slate-200">
             Program authority: {programSlug || 'course-defined'} · Google Course Builder worker · 20
             checkpointed stages
           </p>
@@ -746,9 +747,9 @@ export function UltimateBuildPanel({
 
       {!statusLoading && latest ? (
         <div className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Worker job</p>
+          <p className="text-xs uppercase tracking-wide text-slate-300">Worker job</p>
           <p className="mt-1 text-sm font-bold text-slate-200">
-            {workerJob?.status === 'queued' ? 'Awaiting worker assignment' : (workerJob?.status ?? 'Not started')} · {workerJob?.id ?? 'No persisted job'}
+            {workerJob?.status === 'queued' ? 'Awaiting worker assignment' : (workerJob?.status ?? 'Not started')}
           </p>
           {workerJob?.last_error ? (
             <p role="alert" className="mt-2 break-words text-sm text-amber-200">
@@ -756,39 +757,39 @@ export function UltimateBuildPanel({
             </p>
           ) : null}
           {workerJob?.status === 'completed' && !['built', 'published'].includes(latest.status) ? (
-            <p className="mt-2 text-sm text-slate-400">
+            <p className="mt-2 text-sm text-slate-200">
               This worker job finished. Course acceptance and release are still required.
             </p>
           ) : null}
         </div>
       ) : null}
 
-      {error ? (
+      {error || statusError ? (
         <p
           role="alert"
           className="mt-4 rounded-lg border border-red-500/40 bg-red-950/40 p-3 text-sm text-red-100"
         >
-          {error}
+          {error || statusError}
         </p>
       ) : null}
 
       <div className="mt-5 grid gap-4 md:grid-cols-3">
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Status</p>
+          <p className="text-xs uppercase tracking-wide text-slate-300">Status</p>
           <p className="mt-1 text-lg font-black text-white">
-            {statusLoading ? 'loading…' : !statusLoaded ? 'Unavailable' : (latest?.status === 'queued' ? 'Awaiting worker assignment' : (latest?.status ?? 'not started'))}
+            {statusLoading ? 'loading…' : !statusLoaded ? 'Unavailable' : (latest?.status === 'queued' ? 'Awaiting worker assignment' : (workerJob?.status === 'stalled' ? 'Worker stalled' : (latest?.status ?? 'not started')))}
           </p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Current stage</p>
+          <p className="text-xs uppercase tracking-wide text-slate-300">Current stage</p>
           <p className="mt-1 break-words text-lg font-black text-white">
-            {statusLoading ? 'loading…' : !statusLoaded ? 'Unavailable' : (latest?.current_step ?? 'Not started')}
+            {statusLoading ? 'loading…' : !statusLoaded ? 'Unavailable' : (latest?.current_step?.replaceAll('_', ' ') ?? 'Not started')}
           </p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Build ID</p>
+          <p className="text-xs uppercase tracking-wide text-slate-300">Saved work</p>
           <p className="mt-1 break-all text-sm font-bold text-slate-200">
-            {statusLoading ? 'Loading course build…' : !statusLoaded ? 'Unavailable' : (latest?.id ?? 'Created when started')}
+            {statusLoading ? 'Loading course build…' : !statusLoaded ? 'Unavailable' : (latest ? 'Lesson checkpoints preserved' : 'Saved when started')}
           </p>
         </div>
       </div>
@@ -815,7 +816,7 @@ export function UltimateBuildPanel({
           <span>Google model for source-grounded teaching (optional)</span>
           <input value={googleModel} onChange={(event) => setGoogleModel(event.target.value)} placeholder="Verified model ID" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" />
           <select value={googleLocation} onChange={event=>setGoogleLocation(event.target.value)} aria-label="Google authoring location" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"><option value="us">United States multi-region</option><option value="us-central1">Iowa region (supported models)</option><option value="global">Global</option></select>
-          <span className="block text-slate-400">Set before starting this build. Authorized teaching sources and all media acceptance checks remain required.</span>
+          <span className="block text-slate-200">Set before starting this build. Authorized teaching sources and all media acceptance checks remain required.</span>
         </label>
       ) : null}
 
@@ -859,7 +860,7 @@ export function UltimateBuildPanel({
           </button>
         ) : null}
       </div>
-      <p className="mt-4 text-xs text-slate-500">
+      <p className="mt-4 text-xs text-slate-300">
         Course Factory generation, blueprint execution, and standalone media queues are not
         available from this surface.
       </p>

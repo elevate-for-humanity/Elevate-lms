@@ -56,7 +56,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     const narrationNeedsRepair = narrationQA?.failures?.some((failure: string) =>
       ['PACE_OUT_OF_RANGE', 'CLIPPED_WORDS'].includes(failure));
     const render = (artifacts.lesson_film_render as any)?.render;
-    const oldLayout = render && render.layoutVersion !== 2;
+    const oldLayout = render && ![2, 4].includes(render.layoutVersion);
     const storyboard = (artifacts.storyboard as any)?.storyboard ?? artifacts.storyboard;
     const insufficientScenes = Array.isArray(storyboard?.scenes) &&
       storyboard.scenes.length < MIN_LESSON_VIDEO_SCENES;

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from '@/lib/ultimate-course-builder/core/types';
 
 type Step = { step: string; state: string; findings?: unknown[]; completed_at?: string | null };
-type Lesson = { id: string; lesson_key: string; status: string; ultimate_lesson_steps?: Step[] };
+type Lesson = { id: string; lesson_key: string; title?: string; status: string; ultimate_lesson_steps?: Step[] };
 type Check = { name: string; passed: boolean; message: string };
 
 function findingText(value: unknown): string {
@@ -23,6 +23,8 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
   const [checking, setChecking] = useState(false);
   const [healthError, setHealthError] = useState('');
   const requestToken = useRef(0);
+  const [actionBusy, setActionBusy] = useState('');
+  const [actionResults, setActionResults] = useState<Record<string, { error?: string; message?: string; diagnostic?: any }>>({});
 
   useEffect(() => {
     setSelected(null);
@@ -42,7 +44,11 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'Unable to load saved lesson checkpoints');
       if (token !== requestToken.current) return;
-      setLessons(Array.isArray(payload.build?.ultimate_lesson_builds) ? payload.build.ultimate_lesson_builds : []);
+      const competencies = payload.build?.profile?.competencies ?? [];
+      setLessons((payload.build?.ultimate_lesson_builds ?? []).map((lesson: any, index: number) => {
+        const c = competencies.find((row: any) => row.id === lesson.competency_id);
+        return { ...lesson, title: c?.title ?? c?.description ?? `Lesson ${index + 1}` };
+      }));
     }).catch(reason => {
       if (!controller.signal.aborted && token === requestToken.current)
         setError(reason instanceof Error ? reason.message : 'Unable to load saved lesson checkpoints');
@@ -69,6 +75,26 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
     } finally {
       setChecking(false);
     }
+  }
+
+  async function checkpointAction(lesson: Lesson, repair: boolean) {
+    if (!selected) return;
+    const key = `${lesson.id}:${selected}`;
+    setActionBusy(key);
+    setActionResults(previous => ({ ...previous, [key]: {} }));
+    const input = { buildId, lessonBuildId: lesson.id, step: selected };
+    try {
+      const response = await fetch('/api/admin/ultimate-course-builder/checkpoint' +
+        (repair ? '' : '?' + new URLSearchParams(input)), repair ? {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input), signal: AbortSignal.timeout(45000),
+      } : { cache: 'no-store', signal: AbortSignal.timeout(30000) });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw Error(result.error || 'The checkpoint action failed. Saved work is preserved.');
+      setActionResults(previous => ({ ...previous, [key]: result }));
+      if (repair) setRetry(value => value + 1);
+    } catch (reason) {
+      setActionResults(previous => ({ ...previous, [key]: { error: reason instanceof Error ? reason.message : 'Checkpoint action failed' } }));
+    } finally { setActionBusy(''); }
   }
 
   return (
@@ -111,10 +137,30 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
             {lessons.map(lesson => {
               const checkpoint = lesson.ultimate_lesson_steps?.find(row => row.step === selected);
               const findings = (checkpoint?.findings ?? []).map(findingText).filter(Boolean);
+              const result = actionResults[`${lesson.id}:${selected}`];
               return <li key={lesson.id} className="rounded-lg border border-slate-800 p-3 text-sm">
-                <strong>{lesson.lesson_key}</strong>
+                <strong>{lesson.title}</strong>
                 <p className="mt-1 text-slate-300">{checkpoint?.state ?? 'Not started'}</p>
                 {findings.map((finding, index) => <p key={index} className="mt-1 text-amber-200">{finding}</p>)}
+                <div className="mt-3 flex flex-wrap gap-3">
+                  <button type="button" disabled={Boolean(actionBusy)} onClick={() => void checkpointAction(lesson, false)}
+                    className="rounded-lg border border-slate-300 bg-white px-4 py-3 font-bold text-slate-950">Diagnose checkpoint & preview</button>
+                  <button type="button" disabled={Boolean(actionBusy)} onClick={() => void checkpointAction(lesson, true)}
+                    className="rounded-lg bg-blue-700 px-4 py-3 font-bold text-white">Fix this checkpoint</button>
+                </div>
+                {actionBusy === `${lesson.id}:${selected}` && <p role="status" className="mt-3">Working on this checkpoint…</p>}
+                {result?.error && <p role="alert" className="mt-3 rounded-lg border border-red-400 bg-red-950 p-3 text-white">{result.error}</p>}
+                {result?.message && <p role="status" className="mt-3 text-white">{result.message}</p>}
+                {result?.diagnostic && <div className="mt-4 space-y-3">
+                  <p>Saved checkpoint: <strong>{result.diagnostic.state.replaceAll('_', ' ')}</strong></p>
+                  <p>Worker: {result.diagnostic.workerStatus}. Last heartbeat: {result.diagnostic.heartbeatAt ? new Date(result.diagnostic.heartbeatAt).toLocaleString() : 'No heartbeat recorded'}.</p>
+                  {result.diagnostic.prerequisites.length > 0 && <p>Prerequisites still required: {result.diagnostic.prerequisites.map((v: string) => v.replaceAll('_', ' ')).join(', ')}.</p>}
+                  {result.diagnostic.missingEvidence.length > 0 && <p>Evidence still required: {result.diagnostic.missingEvidence.join(', ')}.</p>}
+                  {result.diagnostic.videoUrl ? <div>
+                    <p className="mb-2 font-bold">Latest saved video · {result.diagnostic.mediaApproved ? 'Media QA passed' : 'Draft preview — media QA has not passed'}</p>
+                    <video controls preload="metadata" className="w-full rounded-lg bg-black" src={result.diagnostic.videoUrl} aria-label={`${lesson.title} video preview`} />
+                  </div> : <p>No saved video is available yet. The live browser shows website activity; this player shows rendered lesson output.</p>}
+                </div>}
               </li>;
             })}
           </ul> : null}

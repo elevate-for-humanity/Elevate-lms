@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     const { data, error } = await db
       .from('ultimate_course_builds')
       .select(req.nextUrl.searchParams.get('view') === 'checkpoints'
-        ? 'id,course_id,status,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,status,ultimate_lesson_steps(step,state,findings,completed_at))'
+        ? 'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,ultimate_lesson_steps(step,state,findings,completed_at))'
         : '*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
       .eq('id', buildId)
       .single();

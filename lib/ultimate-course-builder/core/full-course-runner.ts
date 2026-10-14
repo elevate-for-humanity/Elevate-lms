@@ -15,6 +15,7 @@ export type UltimateCoursePlan = {
   targetCompetencyId?: string;
   startIndex?: number;
   maxLessons?: number;
+  repairFromStep?: UltimateBuildStep;
 };
 export async function runUltimateCourse(
   plan: UltimateCoursePlan,
@@ -53,13 +54,14 @@ export async function runUltimateCourse(
     console.info('[UltimateCourse] checkpoint loaded', {lessonBuildId: lesson.id, passedSteps: checkpoint.passedSteps.length});
     const restoredPassed: UltimateBuildStep[] = [];
     for (const step of ULTIMATE_BUILD_STEPS) {
+      if (step === plan.repairFromStep) break;
       if (!checkpoint.passedSteps.includes(step)) break;
       restoredPassed.push(step);
     }
     const restoredArtifacts: any = Object.fromEntries(
       restoredPassed.map((step) => [step, checkpoint.artifacts[step]]),
     );
-    if((checkpoint.artifacts as any).__repairState)restoredArtifacts.__repairState=(checkpoint.artifacts as any).__repairState;
+    if(!plan.repairFromStep && (checkpoint.artifacts as any).__repairState)restoredArtifacts.__repairState=(checkpoint.artifacts as any).__repairState;
     const context: UltimateRunContext = {
       buildId: plan.buildId + ':' + competency.id,
       courseId: plan.courseId,

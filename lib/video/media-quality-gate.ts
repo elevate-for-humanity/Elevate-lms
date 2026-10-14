@@ -553,7 +553,7 @@ export async function enforceMediaQuality(input: {
         const passed=charcoalPixelsMatch(pixels.stdout);
         approvedPresentationInspection.backgrounds.push({sceneId:scene.id,passed});
         if(!passed)throw new Error('APPROVED_ENCODED_CHARCOAL_BACKGROUND_REQUIRED:'+scene.id);
-        const samples=captionSampleGroups((scene as any).wordAlignment,(scene as any).recapStartSeconds);
+        const samples=captionSampleGroups((scene as any).wordAlignment,(scene as any).recapStartSeconds,(scene as any).captionCues);
         if(!samples.length)throw new Error('APPROVED_ENCODED_CAPTION_SAMPLES_REQUIRED:'+scene.id);
         for(const [sampleIndex,sample] of samples.entries()) for(const width of [1280,390]) {
           const captionTime=sceneStart+(sample.startSeconds+sample.endSeconds)/2;

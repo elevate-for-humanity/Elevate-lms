@@ -33,6 +33,6 @@ export async function POST(req: NextRequest) {
       executionVerified: false, actionsUrl: dispatch.actionsUrl,
     }, { status: 202 });
   } catch (error) {
-    return safeInternalError(error, 'Build could not be started on Google. Refresh to check the saved job.');
+    return safeInternalError(error, 'Course Builder worker dispatch failed', 'The worker launch failed. Your saved build is preserved. Check deployment access and retry Resume.');
   }
 }

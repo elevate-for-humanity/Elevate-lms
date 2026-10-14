@@ -56,10 +56,10 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
       const competencies = payload.build?.profile?.competencies ?? [];
       setLessons(competencies.map((c: any, index: number) => {
         const lesson = (payload.build?.ultimate_lesson_builds ?? []).find((row: any) => row.competency_id === c.id);
-        return { ...(lesson ?? { id: c.id, lesson_key: c.id, status: 'planned' }), saved: Boolean(lesson), title: c.title ?? c.description ?? `Lesson ${index + 1}` };
+        return { ...(lesson ?? { id: c.id, status: 'planned' }), lesson_key: c.id, saved: Boolean(lesson), title: c.title ?? c.description ?? `Lesson ${index + 1}` };
       }));
       const firstSaved = (payload.build?.ultimate_lesson_builds ?? [])[0];
-      setSelectedLesson(previous => previous || firstSaved?.id || competencies[0]?.id || '');
+      setSelectedLesson(previous => previous || firstSaved?.competency_id || competencies[0]?.id || '');
     }).catch(reason => {
       if (!controller.signal.aborted && token === requestToken.current)
         setError(reason instanceof Error ? reason.message : 'Unable to load saved lesson checkpoints');
@@ -113,6 +113,7 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
       <div data-course-lesson-panes className="grid min-w-[720px] grid-cols-2 items-start gap-4">
       <div className="col-span-2 flex flex-wrap items-center justify-between gap-3">
         <h3 className="font-bold text-white">Lesson checkpoints</h3>
+        <p className="text-sm text-slate-200">Checkpoint controls on the left · lesson preview on the right. Swipe across on a narrow screen.</p>
         <button type="button" onClick={() => void checkHealth()} disabled={checking}
           className="rounded-lg border border-slate-600 px-3 py-2 text-sm disabled:opacity-50">
           {checking ? 'Checking dependencies…' : 'Check Course Builder health'}
@@ -123,9 +124,9 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
         <select id="lesson-preview-selection" value={selectedLesson} onChange={event => setSelectedLesson(event.target.value)}
           className="mt-2 w-full rounded-lg border border-slate-400 bg-slate-900 p-3 text-white">
           <option value="">Choose a lesson to preview…</option>
-          {lessons.map((lesson, index) => <option key={lesson.id} value={lesson.id}>{index + 1}. {lesson.title} — {lesson.status.replaceAll('_', ' ')}</option>)}
+          {lessons.map((lesson, index) => <option key={lesson.lesson_key} value={lesson.lesson_key}>{index + 1}. {lesson.title} — {lesson.status.replaceAll('_', ' ')}</option>)}
         </select>
-        {lessons.filter(lesson => lesson.id === selectedLesson).map(lesson => <div key={lesson.id} className="mt-4 space-y-3">
+        {lessons.filter(lesson => lesson.lesson_key === selectedLesson).map(lesson => <div key={lesson.lesson_key} className="mt-4 space-y-3">
           <h4 className="text-lg font-bold">{lesson.title}</h4>
           <p>Saved lesson status: {lesson.status.replaceAll('_', ' ')}. Draft content updates as checkpoints are saved.</p>
           <SavedVideo lesson={lesson} diagnostic={actionResults[`${lesson.id}:${selected}`]?.diagnostic} />
@@ -165,7 +166,7 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
             className="mt-2 text-sm text-cyan-300 underline">Refresh checkpoints</button>
           {!loading && !error && !lessons.length ? <p className="mt-3 text-sm text-slate-300">This build has no saved lesson checkpoints yet. Start the Google worker to begin processing.</p> : null}
           {!loading && !error ? <ul className="mt-3 space-y-2">
-            {lessons.filter(lesson => !selectedLesson || lesson.id === selectedLesson).map(lesson => {
+            {lessons.filter(lesson => !selectedLesson || lesson.lesson_key === selectedLesson).map(lesson => {
               const checkpoint = lesson.ultimate_lesson_steps?.find(row => row.step === selected);
               const findings = (checkpoint?.findings ?? []).map(findingText).filter(Boolean);
               const result = actionResults[`${lesson.id}:${selected}`];

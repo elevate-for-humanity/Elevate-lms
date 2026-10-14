@@ -87,7 +87,12 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
         <div className="flex min-h-14 min-w-0 items-center gap-1 px-2 py-1 sm:gap-2 sm:px-4 lg:px-6">
           {pathname !== '/dashboard' && (
-            <button type="button" onClick={() => router.back()} aria-label="Go back" className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-950">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              aria-label="Go back"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+            >
               <ArrowLeft className="h-5 w-5" />
             </button>
           )}
@@ -264,13 +269,54 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
           </div>
         </div>
 
-        {NAV.some(section => section.href === '/studio' || section.items.some(item => item.href === '/studio' || item.href === '/studio/courses')) && (
-          <nav aria-label="Course tools" className="flex flex-wrap gap-2 border-t border-slate-200 px-2 py-1">
-            <Link href="/studio/courses" className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-bold text-blue-800 hover:bg-blue-50">Course Builder</Link>
-            <Link href="/studio/browser?provider=envato&signin=1" className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-bold text-emerald-800 hover:bg-emerald-50">Envato credentials</Link>
+        {NAV.some(
+          (section) =>
+            section.href === '/studio' ||
+            section.items.some(
+              (item) => item.href === '/studio' || item.href === '/studio/courses',
+            ),
+        ) && (
+          <nav
+            aria-label="Course tools"
+            className="flex flex-wrap gap-2 border-t border-slate-200 px-2 py-1"
+          >
+            <Link
+              href="/studio/courses"
+              className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-bold text-blue-800 hover:bg-blue-50"
+            >
+              Course Builder
+            </Link>
+            <Link
+              href="/studio/browser?provider=envato&signin=1"
+              className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-bold text-emerald-800 hover:bg-emerald-50"
+            >
+              Envato credentials
+            </Link>
           </nav>
         )}
 
+        <nav
+          aria-label="Full admin navigation"
+          className="flex w-full gap-2 overflow-x-auto overscroll-x-contain border-t border-slate-200 bg-slate-50 px-3 py-2 [scrollbar-width:thin]"
+        >
+          {[
+            ...new Map(
+              NAV.flatMap((section) => [
+                { label: section.label, href: section.href },
+                ...section.items,
+              ]).map((item) => [item.href, item]),
+            ).values(),
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={isActive(pathname, item.href) ? 'page' : undefined}
+              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg border px-3 text-sm font-bold ${isActive(pathname, item.href) ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-200 bg-white text-slate-900 hover:bg-blue-50'}`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
         {/* Horizontal Mobile Nav - Scrollable */}
         <div
           id="admin-all-tools-menu"

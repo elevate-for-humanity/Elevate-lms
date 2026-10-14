@@ -44,6 +44,7 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Communications Hub', href: '/phone' },
       { label: 'Elevate Email', href: '/phone/email' },
       { label: 'Email Accounts', href: '/phone/email/accounts' },
+      { label: 'Text Messages', href: '/phone/texts' },
       { label: 'Team Meetings', href: '/phone/meetings' },
       { label: 'SMS Delivery', href: '/operations/sms-logs' },
       { label: 'Inbox', href: '/inbox' },

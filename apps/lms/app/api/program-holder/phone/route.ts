@@ -18,7 +18,9 @@ const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DEVICE_ID = /^[A-Za-z0-9_-]{16,100}$/;
 
-async function phoneContext(ctx: NonNullable<Awaited<ReturnType<typeof phoneActorResponse>>['actor']>) {
+async function phoneContext(
+  ctx: NonNullable<Awaited<ReturnType<typeof phoneActorResponse>>['actor']>,
+) {
   const { data: extension } = await ctx.db
     .from('communication_extensions')
     .select('*,communication_workspaces!inner(id,phone_system_id)')
@@ -89,7 +91,7 @@ export async function GET() {
     ctx.db
       .from('phone_callback_tasks')
       .select(
-        'id,source,caller_name,callback_number,reason,program_or_department,urgency,preferred_callback_time,transcript,summary,status,read_at,created_at,recording_url',
+        'id,call_id,source,caller_name,callback_number,reason,program_or_department,urgency,preferred_callback_time,transcript,summary,status,read_at,created_at,recording_url',
       )
       .eq('assigned_profile_id', ctx.user.id)
       .order('created_at', { ascending: false })
@@ -169,6 +171,10 @@ export async function GET() {
     },
     inbox: (inbox || []).map((item: any) => ({
       ...item,
+      transcript:
+        item.transcript ||
+        (voicemails || []).find((v: any) => v.call_id === item.call_id)?.transcription ||
+        null,
       hasRecording: Boolean(item.recording_url),
       recording_url: undefined,
       recordingUrl: item.recording_url
@@ -362,7 +368,8 @@ export async function PATCH(request: Request) {
     patch.last_presence_at = new Date().toISOString();
   } else if (body.action === 'ring_mode') {
     const ringMode = String(body.ringMode || '') as RingMode;
-    if (!['ring','vibrate','silent'].includes(ringMode)) return NextResponse.json({error:'Choose ring, vibrate, or silent.'},{status:400});
+    if (!['ring', 'vibrate', 'silent'].includes(ringMode))
+      return NextResponse.json({ error: 'Choose ring, vibrate, or silent.' }, { status: 400 });
     // Quick alert controls change only ringing. Preserve schedules, forwarding,
     // voicemail, notifications and verified connection presence.
     patch.ring_mode = ringMode;

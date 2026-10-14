@@ -110,7 +110,7 @@ export default function RepositoryLivePreview({
   const previewUrl = manualUrl.trim();
   const canOpen = /^https?:\/\//i.test(previewUrl);
   let platformPreview=false;
-  try {platformPreview=['https://www.elevateforhumanity.org','https://elevateforhumanity.org','https://admin.elevateforhumanity.org','https://app.elevateforhumanity.org'].includes(new URL(previewUrl).origin);}catch{}
+  try {platformPreview=['https://www.elevateforhumanity.org','https://elevateforhumanity.org','https://admin.elevateforhumanity.org','https://app.elevateforhumanity.org'].includes(new URL(previewUrl).origin);}catch{platformPreview=false;}
   const interactivePreview=trustedInteractive||platformPreview;
   const modeLabel = sourcePreview
     ? 'Unsaved source preview'

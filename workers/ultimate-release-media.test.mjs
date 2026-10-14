@@ -2,10 +2,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
+import { renderMediaUrl, renderPlaybackUrl } from '../lib/ultimate-course-builder/media/playback-source.mjs';
 const source = stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/release/release-service.ts', import.meta.url), 'utf8'), { mode: 'transform' })
   .replace(/^import .*;\n/gm, '').replace('export class ', 'class ');
-const Service = new Function('assertCompleteLesson', 'ULTIMATE_LESSON_CONTRACT_VERSION', source + '\nreturn UltimateReleaseService;')(
-  a => { if (!a.verified) throw new Error('QA_FAILED'); }, 'current');
+const Service = new Function('assertCompleteLesson', 'ULTIMATE_LESSON_CONTRACT_VERSION', 'renderMediaUrl', 'renderPlaybackUrl', source + '\nreturn UltimateReleaseService;')(
+  a => { if (!a.verified) throw new Error('QA_FAILED'); }, 'current', renderMediaUrl, renderPlaybackUrl);
 const lesson = () => ({
   title: 'Lesson', videoUrl: 'https://media.example/film.mp4', script: 'Verified narration',
   storyboard: { scenes: [{ id: 'scene' }] }, segments: [{ stage: 'problem_hook', text: 'Teaching' }], sourceLessonBuildId: 'lesson-build',

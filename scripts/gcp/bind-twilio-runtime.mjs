@@ -39,6 +39,7 @@ export async function verifiedTwilioBindings(config, fetchImpl = fetch) {
     headers:{Authorization:'Basic '+Buffer.from(`${ACCOUNT}:${values.TWILIO_AUTH_TOKEN}`).toString('base64')},
     redirect:'error',signal:AbortSignal.timeout(15000),
   });
+  let verifiedResponse = response;
   if (!response.ok) {
     console.error(JSON.stringify({twilioNumberVerificationHttpStatus:response.status}));
     if (response.status === 401) {
@@ -56,11 +57,12 @@ export async function verifiedTwilioBindings(config, fetchImpl = fetch) {
           redirect:'error',signal:AbortSignal.timeout(15000),
         });
         console.error(JSON.stringify({savedTwilioApiKeyHttpStatus:alternate.status}));
+        if (alternate.ok) verifiedResponse = alternate;
       }
     }
-    throw Error('Twilio authentication or number verification failed');
+    if (!verifiedResponse.ok) throw Error('Twilio authentication or number verification failed');
   }
-  const number = await response.json();
+  const number = await verifiedResponse.json();
   if (number.account_sid !== ACCOUNT || number.sid !== PHONE_SID || number.phone_number !== NUMBER)
     throw Error('The Twilio number does not belong to the approved account');
   return {...values,TWILIO_PHONE_NUMBER:NUMBER};

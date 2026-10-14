@@ -9,7 +9,7 @@ export function regionalArguments(args) {
 }
 export function scopedCourseQueueUrl(value) {
  const url=new URL(value);
- if(url.pathname.endsWith('/ultimate_build_jobs'))url.searchParams.set('build_id','in.('+builds.join(',')+')');
+ if(url.pathname.endsWith('/ultimate_build_jobs'))url.searchParams.set('and','(or(build_id.in.('+builds.join(',')+'),payload->>requestedBy.not.is.null))');
  return url;
 }
 export async function dispatchApprovedRegionalCourses({env=process.env}={}) {

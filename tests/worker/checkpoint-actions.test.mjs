@@ -20,10 +20,10 @@ function harness({live=false,published=false,race=false,dispatchFails=false,unau
   return query;
  }};
  const response=(body,options={})=>({status:options.status??200,body});
- const api=new Function('NextResponse','apiRequireAdmin','requireAdminClient','ULTIMATE_BUILD_STEPS','validateStepOutput','routeSelectiveRepairs','renderPlaybackUrl','dispatchGoogleDeployment','safeInternalError',source+'\nreturn {GET,POST};')(
+ const api=new Function('NextResponse','apiRequireAdmin','requireAdminClient','ULTIMATE_BUILD_STEPS','validateStepOutput','routeSelectiveRepairs','renderPlaybackUrl','requestCourseWorker','safeInternalError',source+'\nreturn {GET,POST};')(
   {json:response},async()=>unauthorized?{error:response({error:'Unauthorized'},{status:401})}:{id:'owner'},async()=>db,
   ['standards_lock','lesson_film_render','finished_media_qa','credential_release'],()=>['MISSING_EVIDENCE'],()=>[{step:'lesson_film_render'}],()=>null,
-  async()=>{dispatched++;if(dispatchFails)throw Error('DISPATCH_FAILED');},(_e,_context,message)=>response({error:message},{status:500}));
+  async()=>{dispatched++;if(dispatchFails)throw Error('DISPATCH_FAILED');return{dispatched:true,executionVerified:false,message:'Launch requested.'};},(_e,_context,message)=>response({error:message},{status:500}));
  const input={buildId,lessonBuildId:lessonId,step:'finished_media_qa'};
  return{api,writes,job,input,request:{json:async()=>input,nextUrl:{searchParams:new URLSearchParams(input)}},dispatched:()=>dispatched};
 }

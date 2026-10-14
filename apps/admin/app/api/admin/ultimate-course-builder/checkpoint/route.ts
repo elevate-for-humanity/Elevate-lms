@@ -5,7 +5,7 @@ import { ULTIMATE_BUILD_STEPS } from '@/lib/ultimate-course-builder/core/types';
 import { validateStepOutput } from '@/lib/ultimate-course-builder/core/lesson-contract';
 import { routeSelectiveRepairs } from '@/lib/ultimate-course-builder/core/repair-router';
 import { renderPlaybackUrl } from '@/lib/ultimate-course-builder/media/playback-source.mjs';
-import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
+import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { safeInternalError } from '@/lib/api/safe-error';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -74,10 +74,13 @@ export async function POST(req: NextRequest) {
     const build = await db.from('ultimate_course_builds').update({ status: 'queued', current_step: fromStep, updated_at: now })
       .eq('id', c.build.id).eq('status', c.build.status);
     if (build.error) throw build.error;
-    await dispatchGoogleDeployment('course-builder');
-    return NextResponse.json({ queued: true, dispatched: true, executionVerified: false,
-      message: 'Checkpoint repair saved and worker launch requested. Earlier checkpoints are preserved; dependent checks will run again.' }, { status: 202 });
-  } catch (e) { return safeInternalError(e, 'Checkpoint repair dispatch failed', queued
+    const launch = await requestCourseWorker();
+    return NextResponse.json({ queued: true, ...launch,
+      message: 'Checkpoint repair saved. Earlier checkpoints are preserved; dependent checks will run again. ' + launch.message }, { status: 202 });
+  } catch (e) {
+    if (queued && e instanceof Error && e.message === 'Google GitHub dispatch refused: HTTP 401')
+      return safeInternalError(e, 'Checkpoint repair dispatch authentication rejected', 'Repair is saved. Worker launch authentication was rejected. Refresh the GitHub connection in Studio, then Resume.');
+    return safeInternalError(e, 'Checkpoint repair dispatch failed', queued
     ? 'Repair was saved, but the worker launch failed. Use Resume to retry the launch.'
     : 'Checkpoint repair could not be queued. Your saved lesson is preserved.'); }
 }

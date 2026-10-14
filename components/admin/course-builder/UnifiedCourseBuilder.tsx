@@ -77,8 +77,8 @@ async function startUltimateCourse(input: {
   if (!response.ok || !payload?.buildId) {
     throw new Error(payload?.error || payload?.message || 'Ultimate build could not be started');
   }
-  if (payload?.dispatched !== true)
-    throw new Error('Worker launch was not accepted. Resume the saved build.');
+  if (payload?.queued !== true && payload?.dispatched !== true)
+    throw new Error('The worker request was not saved.');
   return payload;
 }
 
@@ -675,11 +675,11 @@ export function UltimateBuildPanel({
           body: JSON.stringify({ buildId: latest.id }),
         });
         const payload = await readJson(response);
-        if (!response.ok || payload?.dispatched !== true) throw new Error(payload?.error || 'Google worker could not be started');
-        setNotice('Google worker dispatch accepted. The stages below show actual build progress.');
+        if (!response.ok || (payload?.queued !== true && payload?.alreadyRunning !== true)) throw new Error(payload?.error || 'The worker request could not be saved');
+        setNotice(payload.message || 'Request saved. Waiting for worker assignment.');
       } else {
-        await startUltimateCourse({ course, programSlug, googleModel, googleLocation });
-        setNotice('Build saved and Google worker dispatch accepted. Check the stages for progress.');
+        const result = await startUltimateCourse({ course, programSlug, googleModel, googleLocation });
+        setNotice(result.message || 'Build saved. Waiting for worker assignment.');
       }
       await refresh();
     } catch (reason) {

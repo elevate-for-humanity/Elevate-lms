@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { UltimateJobQueue } from '@/lib/ultimate-course-builder/worker/job-queue';
-import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
+import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
 import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/instructional/google-lesson-author';
@@ -265,18 +265,12 @@ export async function POST(req: NextRequest) {
       requestedBy: auth.id,
     });
     if (!job) return NextResponse.json({ error: 'No runnable build job was saved' }, { status: 409 });
-    let dispatch;
-    try {
-      dispatch = await dispatchGoogleDeployment('course-builder');
-    } catch (error) {
-      return safeInternalError(error, 'Worker launch failed. The saved build can be resumed.');
-    }
+    const dispatch = await requestCourseWorker();
     return NextResponse.json(
       {
         ok: true,
-        dispatched: true,
-        executionVerified: false,
-        actionsUrl: dispatch.actionsUrl,
+        queued: true,
+        ...dispatch,
         reused: Boolean(activeBuild),
         build,
         buildId: build.id,

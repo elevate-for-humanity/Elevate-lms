@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
       .from('tax_1099_income')
       .select('form_type,amount,federal_withholding')
       .eq('tax_return_id', id),
-    s.from('tax_schedule_c').select('net_profit').eq('tax_return_id', id),
+    s.from('tax_schedule_c').select('*').eq('tax_return_id', id),
     s
       .from('tax_itemized_deductions')
       .select('total_itemized')
@@ -119,10 +119,16 @@ export async function GET(req: NextRequest) {
         { error: 'Unable to capture the filing connection address. Try again from your browser.' },
         { status: 422 },
       );
+    if (prepared.unreviewedBusinessCount > 0)
+      return taxJson(
+        { error: 'Review and save each Schedule C business worksheet before exporting.' },
+        { status: 422 },
+      );
     const mapped = mapFederalReturn2026({
       profile: privateFields.profile,
       financial: prepared.financial,
       creditInputs: prepared.creditInputs,
+      businesses: prepared.businessSchedules,
       w2: (w2.data ?? []).map((w) => ({
         owner: w.income_owner === 'spouse' ? 'spouse' : 'primary',
         wages: Number(w.wages),
@@ -150,6 +156,11 @@ export async function GET(req: NextRequest) {
       refundAllocations: privateFields.refundAllocations,
       additionalIrsDocuments: r.return_json.irsSupportingDocuments ?? {},
     });
+    if (prepared.needsScheduleC && !mapped.irsFields.ReturnData.IRS1040ScheduleC)
+      return taxJson(
+        { error: 'Complete your Schedule C business worksheets before exporting.' },
+        { status: 422 },
+      );
     const checks = validateLocalMefRules(mapped.irsFields);
     if (checks.issues.length)
       return taxJson(

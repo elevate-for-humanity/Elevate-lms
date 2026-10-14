@@ -8,6 +8,7 @@ import type { calculateFederal1040_2026 } from '@/lib/tax-software/calculation/f
 import { FilingExportButton } from '../../_components/FilingExportButton';
 import { TaxpayerDetailsEditor } from '../../_components/TaxpayerDetailsEditor';
 import { FederalFormsEditor } from '../../_components/FederalFormsEditor';
+import { BusinessSchedulesEditor } from '../../_components/BusinessSchedulesEditor';
 import { quoteSelfFile } from '@/lib/tax-software/self-file-pricing';
 const questions = [
   ['hasW2', 'Did you receive a W-2?'],
@@ -185,6 +186,14 @@ function Workspace() {
                 >
                   Add or import a W-2 →
                 </Link>
+                <BusinessSchedulesEditor
+                  returnId={id!}
+                  joint={record.filing_status === 'married_joint'}
+                  onSaved={() => {
+                    setEstimate(null);
+                    setAnswers((v) => ({ ...v, hasSelfEmployment: true }));
+                  }}
+                />
                 <FederalFormsEditor
                   returnId={id!}
                   initialInputs={record.return_json?.federalInputs ?? {}}

@@ -1,6 +1,8 @@
 import type { TaxDependent } from './family-types';
 import type { SavedFederalInputs } from '../calculation/input-schema';
 import { mapFamilyDocuments2026 } from './family-documents';
+import { mapBusinessDocuments2026 } from './business-documents';
+import type { ScheduleCBusiness } from '../calculation/schedule-c-2026';
 import { isIP } from 'node:net';
 import {
   calculateFederal1040_2026,
@@ -75,6 +77,7 @@ export function mapFederalReturn2026(input: {
   configuration: MefConfiguration;
   refundAllocations?: RefundAllocation[];
   creditInputs?: SavedFederalInputs;
+  businesses?: ScheduleCBusiness[];
   additionalIrsDocuments?: Record<string, IrsNode | IrsNode[]>;
 }) {
   const { profile: p, configuration: c, financial: f } = input;
@@ -278,6 +281,12 @@ export function mapFederalReturn2026(input: {
       TotalAdditionalTaxesAmt: l['23'],
     };
   }
+  mapBusinessDocuments2026({
+    profile: p,
+    financial: f,
+    businesses: input.businesses ?? [],
+    documents,
+  });
   mapFamilyDocuments2026({
     profile: p,
     financial: f,
@@ -334,7 +343,7 @@ export function mapFederalReturn2026(input: {
     irsFields: {
       '@attributes': { returnVersion: '2026v4.0' },
       ReturnHeader: header,
-      ReturnData: { '@attributes': { documentCnt: documentCount }, ...documents },
+      ReturnData: { '@attributes': { documentCnt: documentCount }, ...documents } as IrsNode,
     },
     calculation: result,
     atsAccepted: false,

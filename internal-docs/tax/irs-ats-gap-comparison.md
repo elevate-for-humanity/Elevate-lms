@@ -72,3 +72,11 @@ The main Google release verifies an existing taxpayer encryption key and provisi
 Dependent identification and eligibility attestations now enter through the encrypted taxpayer profile. Reviewed counts must match the saved child-credit and earned-income worksheets. Export includes Form 1040 dependent details, Schedule EIC and Schedule 8812, including rounded phaseout amounts and the three-child payroll alternative using actual W-2 Social Security/Medicare withholding and the self-employment deduction. Other specialized payroll-tax/credit lines still require complete form-specific implementation; this does not establish support for every Schedule 8812 scenario. The ordinary no-Form-1062 return now emits Form 1040 line 24c.
 
 Validation: 50 main unit tests passed; the generated three-child return passed the official 2026v4.0 Form 1040 XSD with both dependent schedules. This is structural validation, not an IRS acknowledgement or ATS acceptance.
+
+### Canonical business worksheets and source permissions
+
+Schedule C income and expenses now save in the existing tax_schedule_c table. The business worksheet includes income owner, principal activity, business code, cash/accrual method, filing answers, ordinary expenses, itemized other expenses and inventory costs. Server-derived totals are rechecked before calculation and are mapped into Schedule C, Schedule 1 and Schedule SE. Legacy records require explicit worksheet review before export.
+
+The source-access test found missing authenticated table privileges on Schedule C, 1099 income and itemized deductions. Minimum grants and self-file ownership policies repair the calculation path while retaining RLS and privileged-session MFA. An unrelated synthetic authenticated subject cannot read these records. The calculation/export source queries now include the complete canonical business record, including ownership and worksheet metadata.
+
+Current local evidence: 64 main tests, including eight owner/version API cases and six business calculation/export cases. The business XML passes the official 2026v4.0 XSD. IRS transmission/acceptance remains unverified; specialized depreciation, home-office, loss-limitation and other federal form coverage still requires implementation and verification.

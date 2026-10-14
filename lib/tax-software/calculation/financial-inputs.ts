@@ -1,6 +1,8 @@
+import { irsDollars } from './federal-1040-2026';
 import type { FilingStatus } from './ty2026-base-1040';
 import { federalInputSchema } from './input-schema';
 import { prepareFederalReturn2026 } from './prepare-federal-return';
+import { scheduleCFromRow, calculateScheduleC2026 } from './schedule-c-2026';
 export type TaxSourceRow = Record<string, unknown>;
 export function prepareStoredFederalReturn2026(input: {
   filingStatus: FilingStatus;
@@ -26,9 +28,23 @@ export function prepareStoredFederalReturn2026(input: {
     extra.taxablePensions === undefined
   )
     throw new Error('Review taxable IRA and pension amounts from your 1099-R before calculating');
-  const business = input.scheduleC.length
-    ? input.scheduleC.reduce((sum, r) => sum + amount(r.net_profit, true), 0)
-    : income('NEC');
+  const businessSchedules = input.scheduleC.map(scheduleCFromRow);
+  const businessIncome = input.scheduleC.length
+    ? input.scheduleC.map((row, index) => {
+        const worksheet = businessSchedules[index];
+        const netProfit = worksheet
+          ? calculateScheduleC2026(worksheet).netProfit
+          : amount(row.net_profit, true);
+        if (worksheet && netProfit !== irsDollars(amount(row.net_profit, true)))
+          throw new Error('Review the changed business worksheet before calculating');
+        return {
+          owner: row.income_owner === 'spouse' ? ('spouse' as const) : ('primary' as const),
+          netProfit,
+        };
+      })
+    : income('NEC') !== 0
+      ? [{ owner: 'primary' as const, netProfit: income('NEC') }]
+      : [];
   const other = input.income1099
     .filter((r) => !['INT', 'DIV', 'NEC', 'R'].includes(String(r.form_type)))
     .reduce((s, r) => s + amount(r.amount), 0);
@@ -46,10 +62,7 @@ export function prepareStoredFederalReturn2026(input: {
     })),
     taxableInterest: income('INT') + (extra.additionalInterest ?? 0),
     ordinaryDividends: income('DIV') + (extra.additionalOrdinaryDividends ?? 0),
-    selfEmployment: [
-      ...(business !== 0 ? [{ netProfit: business }] : []),
-      ...(extra.selfEmployment ?? []),
-    ],
+    selfEmployment: [...businessIncome, ...(extra.selfEmployment ?? [])],
     otherSchedule1Income: other + (extra.otherSchedule1Income ?? 0),
     itemizedDeductions: Math.max(
       amount(input.itemized?.total_itemized),
@@ -59,5 +72,11 @@ export function prepareStoredFederalReturn2026(input: {
       input.income1099.reduce((s, r) => s + amount(r.federal_withholding), 0) +
       (extra.otherWithholding ?? 0),
   };
-  return prepareFederalReturn2026(base, extra);
+  return {
+    ...prepareFederalReturn2026(base, extra),
+    businessSchedules: businessSchedules.filter((b): b is NonNullable<typeof b> => b !== null),
+    unreviewedBusinessCount: businessSchedules.filter((b) => b === null).length,
+    needsScheduleC:
+      input.scheduleC.length > 0 || base.selfEmployment.some((b) => b.netProfit !== 0),
+  };
 }

@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       .from('tax_1099_income')
       .select('form_type,amount,federal_withholding')
       .eq('tax_return_id', returnId),
-    supabase.from('tax_schedule_c').select('net_profit').eq('tax_return_id', returnId),
+    supabase.from('tax_schedule_c').select('*').eq('tax_return_id', returnId),
     supabase
       .from('tax_itemized_deductions')
       .select('total_itemized')

@@ -45,7 +45,6 @@ export default function HomePage() {
     <>
       <StructuredData />
       <main data-homepage-curation="20261004" className="[&_a]:no-underline [&_a:hover]:no-underline">
-        <h1 className="sr-only">Elevate for Humanity career training and apprenticeships</h1>
         <PlatformHubHero />
         <HomeFeaturedHostShop />
         <HomeCareerPathways />

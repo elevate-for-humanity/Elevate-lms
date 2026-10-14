@@ -9,6 +9,6 @@ it('returns an actionable safe credential code to the trusted monitor',async()=>
  const response=await POST(new NextRequest('https://admin.example/api/cron/paris-code-repair',{method:'POST',headers:{authorization:'Bearer test-only'},body:JSON.stringify({phase:'tick'})}));expect(response.status).toBe(502);expect(await response.json()).toMatchObject({errorCode:'PARIS_GITHUB_HTTP_401'});
 });
 it('never returns arbitrary internal error content in the monitor response',async()=>{
- vi.stubEnv('CRON_SECRET','test-only');vi.spyOn(console,'error').mockImplementation(()=>{});tick.mockRejectedValue(Error('private-secret-value'));
- const response=await POST(new NextRequest('https://admin.example/api/cron/paris-code-repair',{method:'POST',headers:{authorization:'Bearer test-only'},body:JSON.stringify({phase:'tick'})}));expect(await response.text()).not.toContain('private-secret-value');
+ vi.stubEnv('CRON_SECRET','test-only');vi.spyOn(console,'error').mockImplementation(()=>{});tick.mockRejectedValue(Error('PARIS_PRIVATE_SECRET_VALUE'));
+ const response=await POST(new NextRequest('https://admin.example/api/cron/paris-code-repair',{method:'POST',headers:{authorization:'Bearer test-only'},body:JSON.stringify({phase:'tick'})}));expect(await response.text()).not.toContain('PARIS_PRIVATE_SECRET_VALUE');
 });

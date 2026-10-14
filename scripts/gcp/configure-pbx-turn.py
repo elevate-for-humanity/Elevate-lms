@@ -161,6 +161,16 @@ def main():
     after = json.loads(run(['docker','inspect','pbx_asterisk_1']).stdout)[0]
     if after['Id'] != pbx['Id'] or after['Image'] != pbx['Image'] or not after['State']['Running']:
         raise ValueError('pbx_identity_changed_during_relay_install')
+    probe = payload.get('probeName','')
+    if not re.fullmatch(r'elevate-turn-probe-[0-9]+',probe):
+        raise ValueError('trusted_probe_identity_required')
+    # A temporary private UDP echo peer tests the same relay-to-PBX network
+    # path used by calls. It is outside Asterisk's RTP range and expires even
+    # if the runner disconnects. No public firewall port is opened for it.
+    PHASE = 'private_media_probe'
+    run(['docker','run','-d','--rm','--name',probe,'--network=host','--user=65534:65534',
+         '--cap-drop=ALL','--security-opt=no-new-privileges','--read-only','--memory=32m','--pids-limit=16',
+         '--entrypoint','timeout',image,'120','turnutils_peer','-L',payload['privateIp'],'-p','20001'])
     print(json.dumps({'relayInstalled':True,'pbxContainerPreserved':True,'peerAccess':'owned-pbx-only','authenticationRequired':True}))
 
 if __name__ == '__main__':

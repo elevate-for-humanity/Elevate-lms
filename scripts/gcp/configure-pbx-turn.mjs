@@ -58,7 +58,9 @@ async function main(){
   if(!image)throw Error('official_image_digest_missing');
   phase='relay_install';
   ssh('sudo install -m 600 /dev/stdin /etc/elevate-pbx/managed-turn.py',readFileSync(new URL('./configure-pbx-turn.py',import.meta.url),'utf8'));
-  const installed=JSON.parse(ssh('sudo python3 /etc/elevate-pbx/managed-turn.py',JSON.stringify({image,secret,privateIp:nic.networkIP})));
+  const probeName=`elevate-turn-probe-${process.env.GITHUB_RUN_ID}`;
+  if(!/^elevate-turn-probe-\d+$/.test(probeName))throw Error('trusted_probe_identity_required');
+  const installed=JSON.parse(ssh('sudo python3 /etc/elevate-pbx/managed-turn.py',JSON.stringify({image,secret,privateIp:nic.networkIP,probeName})));
   if(!installed.relayInstalled||!installed.pbxContainerPreserved)throw Error('relay_install_not_verified');
   phase='relay_firewall';
   gc(['compute','instances','add-tags',vm,'--zone',zone,'--tags',tag,'--quiet']);
@@ -68,15 +70,19 @@ async function main(){
   const username=`${Math.floor(Date.now()/1000)+180}:deployment-probe`;
   const password=createHmac('sha1',secret).update(username).digest('base64');
   const evidence=[];
-  for(const transport of ['udp','tcp']){
-    const args=['run','--rm','--network=host','--entrypoint','turnutils_uclient',image,'-y','-c','-m','1','-n','10','-u',username,'-w',password,'-p','3478'];
+  try{for(const transport of ['udp','tcp']){
+    const args=['run','--rm','--network=host','--entrypoint','turnutils_uclient',image,'-e',nic.networkIP,'-r','20001','-c','-m','1','-n','10','-u',username,'-w',password,'-p','3478'];
     if(transport==='tcp')args.push('-t');
     args.push('107.178.216.162');
-    const result=execute('docker',args);
+    const probe=spawnSync('docker',args,{encoding:'utf8',timeout:45000,maxBuffer:1024*1024});
+    const result=(probe.stdout||'')+(probe.stderr||'');
     const received=[...result.matchAll(/(?:tot_recv_msgs|recv_msgs)\s*[=:]\s*(\d+)/g)].map(m=>Number(m[1]));
-    if(!received.some(n=>n>0)||/Total lost packets\s+\d+\s*\(100/.test(result))throw Error('external_authenticated_media_not_verified');
-    evidence.push({transport,receivedMessages:Math.max(...received)});
-  }
+    const sent=[...result.matchAll(/tot_send_msgs\s*[=:]\s*(\d+)/g)].map(m=>Number(m[1]));
+    const count=Math.max(0,...received),sentCount=Math.max(0,...sent);
+    console.log(JSON.stringify({externalRelayProbe:{transport,exitCode:probe.status,sentMessages:sentCount,receivedMessages:count,authenticationRejected:/unauthorized|wrong credentials|error 401/i.test(result),timedOut:probe.error?.code==='ETIMEDOUT'}}));
+    if(probe.status!==0||count<10||sentCount!==count)throw Error('external_authenticated_media_not_verified');
+    evidence.push({transport,sentMessages:sentCount,receivedMessages:count});
+  }}finally{ssh('sudo docker stop '+probeName);}
   phase='encrypted_app_configuration';
   for(const component of ['admin','lms']){
     const name=`elevate-${component}-runtime-config`;

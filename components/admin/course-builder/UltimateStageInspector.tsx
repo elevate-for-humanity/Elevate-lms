@@ -1,5 +1,6 @@
 'use client';
 
+import AssessmentPreview from './AssessmentPreview';
 import { useEffect, useRef, useState } from 'react';
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from '@/lib/ultimate-course-builder/core/types';
 
@@ -148,6 +149,7 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
           {!lesson.saved && <p>This lesson is planned. Its preview will appear when the builder starts saving its content.</p>}
           {lesson.preview?.objectives?.length > 0 && <div><h5 className="font-bold">Learning objectives</h5><ul className="list-disc pl-5">{lesson.preview.objectives.map((text: string, i: number) => <li key={i}>{text}</li>)}</ul></div>}
           {lesson.preview?.segments?.map((segment: any, i: number) => <article key={i} className="rounded-lg border border-slate-600 p-3"><h5 className="font-bold">{segment.title}</h5><p className="mt-2 whitespace-pre-wrap">{segment.text}</p></article>)}
+          <AssessmentPreview key={lesson.id} assessment={lesson.preview?.assessment} />
           {lesson.preview?.scenes?.map((scene: any, i: number) => <details key={i} className="rounded-lg border border-slate-600 p-3"><summary className="cursor-pointer font-bold">Scene {i + 1}: {scene.title}</summary><p className="mt-2 whitespace-pre-wrap">{scene.narration}</p><p className="mt-2">Visual: {scene.visual}</p>{scene.recap && <p className="mt-2">Recap: {scene.recap}</p>}</details>)}
           {lesson.saved && !lesson.preview?.segments?.length && !lesson.preview?.scenes?.length && <p>The lesson is being prepared. Saved instruction will appear here before its final video is ready.</p>}
           <p>Select a checkpoint below to inspect this lesson’s saved evidence and rendered video.</p>

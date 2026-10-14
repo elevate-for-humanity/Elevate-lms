@@ -13,6 +13,7 @@ import time
 
 NAME = 'elevate-pbx-turn'
 CONFIG = Path('/etc/elevate-pbx/turnserver.conf')
+PHASE = 'identity'
 
 def configuration(secret, private_ip):
     if not re.fullmatch(r'[a-f0-9]{64}', secret):
@@ -58,7 +59,21 @@ def run(args, required=True):
         raise ValueError('relay_container_operation_failed')
     return result
 
+def relay_diagnostics(content):
+    state = run(['docker','inspect',NAME], False)
+    if state.returncode:
+        return
+    current = json.loads(state.stdout)[0]
+    result = run(['docker','logs','--tail=80',NAME], False)
+    logs = result.stdout + result.stderr
+    errors = [line.lower() for line in logs.splitlines() if re.search(r'error|unknown|invalid|permission|cannot|failed',line,re.I)]
+    keys = [line.split('=')[0] for line in content.splitlines() if line and not line.startswith('#')]
+    print(json.dumps({'relayDiagnostics':{'running':current['State']['Running'],'exitCode':current['State']['ExitCode'],
+        'permissionDenied':bool(re.search('permission denied',logs,re.I)),
+        'optionNamesInErrors':[key for key in keys if any(key in line for line in errors)]}}))
+
 def main():
+    global PHASE
     if os.geteuid() != 0:
         raise ValueError('root_required')
     payload = json.load(sys.stdin)
@@ -73,18 +88,22 @@ def main():
     if existing.returncode == 0:
         current = json.loads(existing.stdout)[0]
         if CONFIG.is_symlink() or not CONFIG.is_file() or CONFIG.read_text() != content or current['Config']['Image'] != image or not current['State']['Running']:
+            relay_diagnostics(content)
             raise ValueError('existing_relay_requires_review_no_rotation_performed')
     else:
         if CONFIG.exists() and (CONFIG.is_symlink() or CONFIG.read_text() != content):
             raise ValueError('existing_relay_configuration_requires_review')
+        PHASE = 'port_check'
         for kind in [socket.SOCK_STREAM, socket.SOCK_DGRAM]:
             with socket.socket(socket.AF_INET,kind) as probe:
                 probe.bind((payload['privateIp'],3478))
+        PHASE = 'official_image_pull'
         run(['docker','pull',image])
         CONFIG.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
         CONFIG.write_text(content)
         os.chown(CONFIG,0,65534)
         os.chmod(CONFIG,0o640)
+        PHASE = 'start_relay_container'
         run(['docker','run','-d','--name',NAME,'--restart=unless-stopped','--network=host',
              '--user=65534:65534','--read-only','--cap-drop=ALL','--security-opt=no-new-privileges',
              '--pids-limit=64','--memory=256m','--cpus=0.5',
@@ -92,6 +111,7 @@ def main():
              '--tmpfs','/var/lib/coturn:rw,noexec,nosuid,size=8m,uid=65534,gid=65534',
              '--mount',f'type=bind,source={CONFIG},target=/etc/coturn/turnserver.conf,readonly',
              '--entrypoint','turnserver',image,'-c','/etc/coturn/turnserver.conf'])
+    PHASE = 'verify_listener'
     for attempt in range(20):
         try:
             with socket.create_connection((payload['privateIp'],3478),timeout=1):
@@ -99,6 +119,7 @@ def main():
         except OSError:
             time.sleep(1)
     else:
+        relay_diagnostics(content)
         raise ValueError('relay_listener_not_ready')
     after = json.loads(run(['docker','inspect','pbx_asterisk_1']).stdout)[0]
     if after['Id'] != pbx['Id'] or after['Image'] != pbx['Image'] or not after['State']['Running']:
@@ -110,5 +131,5 @@ if __name__ == '__main__':
         main()
     except Exception as error:
         safe = str(error) if isinstance(error,ValueError) and re.fullmatch(r'[a-z_]+',str(error)) else 'protected_relay_install_failed'
-        print(json.dumps({'result':'FAIL','reason':safe}))
+        print(json.dumps({'result':'FAIL','reason':safe,'phase':PHASE}))
         sys.exit(1)

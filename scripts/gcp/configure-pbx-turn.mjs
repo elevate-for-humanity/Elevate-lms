@@ -11,7 +11,16 @@ function execute(command,args,input) {
   return result.stdout.trim();
 }
 const gc=(args,input)=>google([...args,'--project',PROJECT],input);
-function ssh(command,input){return gc(['compute','ssh',vm,'--zone',zone,'--quiet','--command',command],input);}
+function ssh(command,input){
+  const result=spawnSync('gcloud',['compute','ssh',vm,'--zone',zone,'--quiet','--command',command,'--project',PROJECT],{input,encoding:'utf8',timeout:240000,maxBuffer:1024*1024});
+  if(result.status!==0){
+    for(const line of (result.stdout||'').split('\n')){
+      try{const report=JSON.parse(line);if(report.relayDiagnostics)console.error(JSON.stringify({relayDiagnostics:report.relayDiagnostics}));if(report.result==='FAIL'&&/^[a-z_]+$/.test(report.reason||''))console.error(JSON.stringify({relayInstallFailure:report.reason,installPhase:/^[a-z_]+$/.test(report.phase||'')?report.phase:'unknown'}));}catch{}
+    }
+    throw Error('protected_ssh_operation_failed');
+  }
+  return result.stdout.trim();
+}
 function rule(name,allowed,sources,network){
   const all=JSON.parse(gc(['compute','firewall-rules','list','--filter',`name=${name}`,'--format=json']));
   if(all.length){

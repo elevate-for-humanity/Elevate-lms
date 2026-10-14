@@ -17,7 +17,7 @@ export default function HostShopApplicationSuccess() {
           checkout, contact our team so the transaction can be reconciled before any status changes.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link href="/host-shop/apply" className="rounded-xl bg-slate-950 px-5 py-3 font-bold text-white">Host Shop application</Link>
+          <Link href="/partners/host-shop/apply" className="rounded-xl bg-slate-950 px-5 py-3 font-bold text-white">Host Shop application</Link>
           <Link href="/contact" className="rounded-xl border border-slate-300 px-5 py-3 font-bold text-slate-700">Contact Support</Link>
         </div>
       </div>

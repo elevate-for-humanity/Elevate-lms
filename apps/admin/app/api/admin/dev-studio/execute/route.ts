@@ -89,7 +89,7 @@ async function classifyCommand(command: string, agent: AIAgentId): Promise<Plann
   const heuristic = heuristicPlan(command);
   if (heuristic) return heuristic;
 
-  const toolCatalog = getAIToolCatalogForPrompt(agent);
+  const toolCatalog = unifiedToolCatalog();
   const result = await aiChat({
     providerPolicy: 'owned-only',
     messages: [
@@ -111,6 +111,22 @@ async function classifyCommand(command: string, agent: AIAgentId): Promise<Plann
     explanation: typeof parsed?.explanation === 'string' ? parsed.explanation : undefined,
     answer: typeof parsed?.answer === 'string' ? parsed.answer : tool ? undefined : result.content,
   };
+}
+
+/** Dev Studio is one assistant interface; tool owners remain internal execution adapters. */
+function resolveToolAgent(toolName: string): AIAgentId {
+  const allowed = getAITool(toolName)?.allowedAgents ?? [];
+  for (const candidate of ['LIZZY', 'PARIS', 'ELLIE', 'ZORA'] as const) {
+    if (allowed.includes(candidate)) return candidate;
+  }
+  return 'LIZZY';
+}
+
+function unifiedToolCatalog(): string {
+  return (['LIZZY', 'PARIS', 'ELLIE', 'ZORA'] as const)
+    .map((agent) => getAIToolCatalogForPrompt(agent))
+    .filter(Boolean)
+    .join('\\n');
 }
 
 function redactSecrets(value: string): string {
@@ -174,10 +190,8 @@ export async function POST(request: NextRequest) {
 
   const body = asRecord(await request.json().catch(() => ({})));
   const command = typeof body.command === 'string' ? body.command.trim() : '';
-  const requestedAgent = typeof body.agent === 'string' ? body.agent.toUpperCase() : 'LIZZY';
-  const agent: AIAgentId = ['ELLIE', 'LIZZY', 'PARIS'].includes(requestedAgent)
-    ? requestedAgent as AIAgentId
-    : 'LIZZY';
+  // Legacy client-selected agent names do not partition the Admin Studio assistant.
+  const agent: AIAgentId = 'LIZZY';
   if (!command) return Response.json({ error: 'command is required' }, { status: 400 });
 
   try {
@@ -230,7 +244,7 @@ export async function POST(request: NextRequest) {
             ...plan.input,
             ...asRecord(body.toolInput),
           }, {
-            agent,
+            agent: resolveToolAgent(tool.name),
             actorId: auth.id,
             actorRoles: auth.effectiveRoles,
             tenantId: typeof body.tenantId === 'string' ? body.tenantId : null,
@@ -247,7 +261,7 @@ export async function POST(request: NextRequest) {
           } else if (!result.ok) {
             write(`Failed Â· HTTP ${result.httpStatus} Â· Tool execution failed.`);
           } else {
-            write(`Completed Â· ${result.tool} Â· HTTP ${result.httpStatus}`);
+            write(`${result.status === 'accepted' ? 'Running' : 'Completed'} · ${result.tool} · HTTP ${result.httpStatus}`);
             write(summarizePayload(result.tool, result.payload));
           }
         }

@@ -1,6 +1,9 @@
 name: Verify live voicemail speech processing
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ['Deploy Admin']
+    types: [completed]
   push:
     branches: [main]
     paths: ['.github/workflows/verify-owned-voicemail-speech.yml']
@@ -10,10 +13,11 @@ permissions:
   id-token: write
 jobs:
   dispatch:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-24.04
     steps:
-      - env:
+      - name: Dispatch protected acceptance after a successful Admin release
+        env:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-owned-voicemail-speech.yml/dispatches" -f ref=main
   verify:

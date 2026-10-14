@@ -26,7 +26,9 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const candidates = await response.json();
   if (!Array.isArray(candidates)) throw new Error('COURSE_QUEUE_RESPONSE_INVALID');
   const queued = candidates.filter(job => job.max_attempts === undefined || job.attempts < job.max_attempts);
-  if (queued.length === 0) return {status:'empty'};
+  // A leased task can enqueue its next lesson only after finishing the current
+  // one. Keep the coordinator alive across that handoff without launching more tasks.
+  if (queued.length === 0) return active.length ? {status:'busy',activeExecutions:active.length} : {status:'empty'};
   const job = JSON.parse(run('gcloud', ['run','jobs','describe','elevate-course-builder',...scope,'--format=json'], {encoding:'utf8',stdio:['ignore','pipe','pipe']}));
   const task = job.spec?.template?.spec?.template?.spec;
   if (!task?.containers?.length) throw new Error('COURSE_JOB_CONFIGURATION_UNAVAILABLE');

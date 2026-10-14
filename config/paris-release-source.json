@@ -10,9 +10,9 @@
     {
       "source": "app/tax-software/_components/TaxSiteShell.tsx",
       "target": "apps/marketing/app/tax-software/_components/TaxSiteShell.tsx",
-      "sha256": "b9225abbe4f0e418d95c92865cfb778e98967fc3e5fd644730a808443b67e968",
+      "sha256": "4dec05009cf755a609bfba0cafd7b747f8d85cacbb93a3fa8eaf72cbb36cec1b",
       "sourceSha256": "209cc698b65b0207eb05cee1208091e758ee26f4f70a24c02cef6bb30762451b",
-      "localRevisionReason": "Authorized Supersonic recruiting, staff training, local search and payment package presentation"
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
     },
     {
       "source": "app/tax-software/about/page.tsx",
@@ -22,14 +22,16 @@
     {
       "source": "app/tax-software/bank-products/page.tsx",
       "target": "apps/marketing/app/tax-software/bank-products/page.tsx",
-      "sha256": "bb79f7f2ead113d6f3436358905d93806e0e62dac768310215ca2e7fdb3e2359",
+      "sha256": "5e4e37febeb234a291d9f55613ebc4809a1d6e9802eaa95f66777463574c6b97",
       "sourceSha256": "8cb4a19353836e13a8fe17c0e8e23814fa7ea3f15ed1a0a32e86f1efa17b2d68",
-      "localRevisionReason": "Authorized Supersonic recruiting, staff training, local search and payment package presentation"
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
     },
     {
       "source": "app/tax-software/contact/page.tsx",
       "target": "apps/marketing/app/tax-software/contact/page.tsx",
-      "sha256": "492ed08bd44af2c2b36ddc120974f5fe6c0aa1f4eeaf1ea784355f5eeb684ea5"
+      "sha256": "685ca3fca65721a8d26b8bd6e6b0c53b2932610f44bbaf1ed85b798cdbb9acf0",
+      "sourceSha256": "492ed08bd44af2c2b36ddc120974f5fe6c0aa1f4eeaf1ea784355f5eeb684ea5",
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
     },
     {
       "source": "app/tax-software/demo/page.tsx",
@@ -49,30 +51,30 @@
     {
       "source": "app/tax-software/login/page.tsx",
       "target": "apps/marketing/app/tax-software/login/page.tsx",
-      "sha256": "8bce277e954f87ec2fc177dc9ffdc9831a17669fed1481836731efed7d04990a",
+      "sha256": "41f11019cec6948f1b9e29948ad0ee9b39ea973b6cbe85f761fe0bdfc4dbc114",
       "sourceSha256": "5bc39165632af011ed10ea6af3af11fc44c286324f79aaaf54ad38912ddb0728",
-      "localRevisionReason": "Authorized portal security, saved estimate workflow, and auditable tax export repairs"
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
     },
     {
       "source": "app/tax-software/page.tsx",
       "target": "apps/marketing/app/tax-software/page.tsx",
-      "sha256": "053cdfe99637fb28a813c3a4216d27bd751d6a85e64ff06de9dad9eb746d2ad5",
+      "sha256": "d1aabff2cf2d71518d8831a9122ce6b9c95f68ac39bec02fa0ac0f5cfa571f88",
       "sourceSha256": "f3bd148ab41437d72f1d10003e04d6c3f93d6375dfd12fee449186bf85138a7f",
-      "localRevisionReason": "Authorized Supersonic recruiting, staff training, local search and payment package presentation"
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
     },
     {
       "source": "app/tax-software/pricing/page.tsx",
       "target": "apps/marketing/app/tax-software/pricing/page.tsx",
-      "sha256": "07e6c03f6b6a75d9db43ecb9bfd2cc8746da16b3b84cbe9aebc9d04dd9e79ec1",
+      "sha256": "d755d65595c0ddf8f49c4da7796a7cc6649cf24f38c6b969f2bd8b7ea2f80c9b",
       "sourceSha256": "1f9631ccd4b5e39ded65942f769608a1a2922c10341b484d20749127464e52a0",
-      "localRevisionReason": "Authorized Supersonic recruiting, staff training, local search and payment package presentation"
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
     },
     {
       "source": "app/tax-software/professional/page.tsx",
       "target": "apps/marketing/app/tax-software/professional/page.tsx",
-      "sha256": "aaa2804bef66114b150e711188b982675d0e90d4c9657936790401ac6e7889ae",
+      "sha256": "2a278c535d2ac89033393dad45349be38f2184a745109c7e4df7f3c55ddb6154",
       "sourceSha256": "882dca6f8f981f5d77a9b0d5636181526abeff05eb0adeb009991d0fb158c9d5",
-      "localRevisionReason": "Authorized Supersonic recruiting, staff training, local search and payment package presentation"
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
     },
     {
       "source": "app/tax-software/self-file/layout.tsx",

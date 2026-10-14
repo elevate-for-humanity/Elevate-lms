@@ -6,6 +6,10 @@ import {createCourseProgressWatch,reportCourseProgress} from '../lib/ultimate-co
 import {createLeaseDeadline} from '../lib/ultimate-course-builder/worker/runtime-guards.mjs';
 const repairSource = stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/core/repair-router.ts', import.meta.url),'utf8'));
 const {isDurableExternalBlocker} = await import('data:text/javascript;base64,'+Buffer.from(repairSource).toString('base64'));
+const checkpointSource=stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/worker/live-checkpoint-repair.ts',import.meta.url),'utf8')).replace(/^import .*;\n/gm,'');
+const typeSource=stripTypeScriptTypes(readFileSync(new URL('../lib/ultimate-course-builder/core/types.ts',import.meta.url),'utf8'));
+const {ULTIMATE_BUILD_STEPS}=await import('data:text/javascript;base64,'+Buffer.from(typeSource).toString('base64'));
+const {liveCheckpointRepairReader}=new Function('ULTIMATE_BUILD_STEPS',checkpointSource.replace(/export /g,'')+';return {liveCheckpointRepairReader};')(ULTIMATE_BUILD_STEPS);
 
 const productionPath = process.env.PROCESS_JOB_SOURCE || new URL('../lib/ultimate-course-builder/worker/process-job.ts', import.meta.url);
 const source = stripTypeScriptTypes(readFileSync(productionPath, 'utf8'))
@@ -24,9 +28,9 @@ function scenario(payload, completed = true, options = {}) {
     async waitForDependency() { events.push('dependency'); }
   }
   const runtime = { persistence: { updateBuild: async value => events.push(value) }, artifacts: {} };
-  const names = ['liveCheckpointRepairReader','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
-  const values = [() => async () => null,createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class {}, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
-  const worker = new Function(...names, source + '\nreturn processUltimateJob;')(...values);
+  const names = ['createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
+  const values = [createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class {}, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
+  const worker = new Function(...names, 'liveCheckpointRepairReader', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader);
   return { events, run: () => worker(db, 'owner') };
 }
 

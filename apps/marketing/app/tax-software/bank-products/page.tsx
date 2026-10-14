@@ -10,7 +10,7 @@ export default function BankProducts() {
   return (
     <TaxSiteShell>
       <main>
-        <section className="bg-[#082b66] px-5 py-12 text-white sm:px-10">
+        <section className="bg-[#082b66] px-6 py-14 !text-white sm:px-10 lg:px-14">
           <p className="text-sm font-bold uppercase tracking-wide">Supersonic Fast Cash</p>
           <h1 className="mt-3 text-4xl font-black !text-white sm:text-5xl">
             Your preparation. Your payment choice.
@@ -20,7 +20,7 @@ export default function BankProducts() {
             choosing an option.
           </p>
         </section>
-        <section className="px-5 py-10 sm:px-10">
+        <section className="px-6 py-14 sm:px-10 lg:px-14">
           <div className="grid gap-5 lg:grid-cols-3">
             {[
               [
@@ -55,9 +55,9 @@ export default function BankProducts() {
             </ul>
           </section>
           <p className="mt-7 rounded-xl border border-amber-200 bg-amber-50 p-5 leading-7">
-            <strong>Office setup status:</strong> EPS enrollment and live bank-product processing
-            through Drake are not yet verified complete. This page explains the options; it is not a
-            loan application or an offer of immediate funding.
+            <strong>Check availability with our team.</strong> Bank-product processing through this
+            website is not active. We can discuss current office options and applicable terms. This
+            page does not accept loan applications or promise funding.
           </p>
           <Link
             href="/tax-software/contact"

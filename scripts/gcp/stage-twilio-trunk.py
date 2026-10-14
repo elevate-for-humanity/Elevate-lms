@@ -87,7 +87,10 @@ def validate():
         pjsip.write_text(original + '\n#include elevate-twilio.conf\n')
         created = False
         try:
+            # The isolated container cannot reach DNS. Resolve the staged carrier
+            # locally for parsing only; this run cannot establish carrier reachability.
             run(['docker', 'run', '-d', '--name', NAME, '--network=none', '--restart=no',
+                 '--add-host', 'elevate-standalone.pstn.twilio.com:127.0.0.1',
                  '-v', str(staging) + ':/etc/asterisk:ro', '--entrypoint', 'asterisk',
                  live['Image'], '-f', '-C', '/etc/asterisk/asterisk.conf'])
             created = True
@@ -108,6 +111,7 @@ def validate():
                     'transportObserved': bool(re.search(r'Transport:\s+elevate-twilio-tls\b', transport)),
                     'sdesObserved': bool(re.search(r'media_encryption\s*:\s*sdes\b', endpoint, re.I)),
                     'tlsObserved': bool(re.search(r'protocol\s*:\s*tls\b', transport, re.I)),
+                    'pjsipModuleRunning': bool(re.search(r'res_pjsip\.so\s+.*\bRunning\b', run(['docker', 'exec', NAME, 'asterisk', '-rx', 'module show like res_pjsip.so'], False).stdout)),
                     'logSignals': {name: bool(re.search(pattern, combined, re.I)) for name, pattern in {
                         'permissionDenied': 'permission denied', 'missingFile': 'no such file',
                         'configLoadError': 'unable to load|could not create|error parsing|could not find',

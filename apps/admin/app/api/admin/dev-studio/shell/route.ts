@@ -17,6 +17,7 @@
  * trigger in the repo can be dispatched. Repo and branch are read from env.
  */
 
+import { studioRepository } from '@/lib/devstudio/repository';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -29,7 +30,7 @@ import { recordMasterStudioArtifact } from '@/lib/studio/master-runtime';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-function repo()   { return process.env.GITHUB_REPO   ?? 'elevate-for-humanity/Elevate-lms'; }
+function repo()   { return studioRepository(); }
 function branch() { return process.env.GITHUB_BRANCH ?? 'main'; }
 const GH_API = 'https://api.github.com';
 const RETIRED_COURSE_WORKFLOWS=new Set(['dev-studio-course-builder.yml','build-cosmetology-course.yml','regenerate-barber-cosmetology.yml','build-esb-acceptance.yml','business-draft-bootstrap.yml']);

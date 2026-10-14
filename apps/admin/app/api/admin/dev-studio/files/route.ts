@@ -4,6 +4,7 @@
  * Admin-only. Targets the full Elevate-lms repository.
  */
 
+import { studioRepository } from '@/lib/devstudio/repository';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -21,8 +22,7 @@ const MAX_FILE_BYTES = 512 * 1024;
 const BLOCKED_PATTERNS = [/^\.env/, /node_modules/, /\.git\//, /\.next\//];
 
 function getRepo(): string {
-  const repo = (process.env.GITHUB_REPO ?? DEFAULT_REPO).trim();
-  return repo || DEFAULT_REPO;
+  return studioRepository();
 }
 
 function getBranch(): string {

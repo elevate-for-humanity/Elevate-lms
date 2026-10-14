@@ -38,6 +38,7 @@ import {
 import { getApprenticeBillingAccess } from '@/lib/billing/apprentice-invoice-batch';
 import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
 import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
+import { TimeclockAttendanceNotice } from '@/components/timeclock/TimeclockAttendanceNotice';
 
 export const metadata: Metadata = {
   title: 'Apprentice Dashboard',
@@ -471,6 +472,7 @@ export default async function ApprenticePortalPage() {
       (runtime.placement?.id ? beautyProgram?.hostLabel || 'Assigned Host Shop' : 'Not connected');
     return (
       <main className="space-y-7 pb-10">
+        <TimeclockAttendanceNotice />
         <section className="relative min-h-[390px] overflow-hidden rounded-3xl bg-fuchsia-950 shadow-xl ring-1 ring-fuchsia-900/20">
           <Image
             src={heroImage}
@@ -644,6 +646,7 @@ export default async function ApprenticePortalPage() {
 
   return (
     <main className="space-y-7 pb-10">
+      <TimeclockAttendanceNotice />
       <section className="min-h-[320px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:min-h-[400px]">
         <div className="grid min-h-[320px] lg:min-h-[400px] lg:grid-cols-[1.15fr_0.85fr] lg:items-stretch">
           <div className="p-6 sm:p-8">

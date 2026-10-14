@@ -849,7 +849,7 @@ export function UltimateBuildPanel({
 
       {latest && workerJob && <section aria-label="PARIS course autopilot" className="mt-5 rounded-xl border border-cyan-700 bg-slate-950 p-4 text-white">
         <h3 className="font-bold">PARIS course autopilot</h3>
-        <p className="mt-2">One course queue: ELLIE instruction · LIZZY production · ZORA quality checks · PARIS supervision.</p>
+        <p className="mt-2">PARIS combines admissions, instruction, production, quality checks, and supervision in one system.</p>
         <p className="mt-2">{workerJob.monitor?.enabled ? 'Enabled' : 'Disabled'} · {workerJob.monitor?.state?.replaceAll('_',' ') || 'No supervisor observation yet'}</p>
         {workerJob.monitor?.checkedAt && <p>Last supervisor check: {new Date(workerJob.monitor.checkedAt).toLocaleString()}</p>}
         {workerJob.monitor?.enabled && (!workerJob.monitor.checkedAt || Date.now()-Date.parse(workerJob.monitor.checkedAt)>600000) &&

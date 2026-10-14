@@ -299,7 +299,7 @@ export default function CloudBrowserWorkspace({
     setSession(payload);
     if (conversationId && payload.conversationId && payload.conversationId !== conversationId) {
       setSession(null);
-      setError('Browser session context did not match the active LIZZY conversation.');
+      setError('Browser session context did not match the active PARIS conversation.');
       setStatus('Unavailable');
       return;
     }
@@ -920,7 +920,7 @@ export default function CloudBrowserWorkspace({
         </span> : null}
         {unifiedTask ? (
           <span className="max-w-full truncate rounded-full border border-violet-500/50 bg-violet-500/10 px-2 py-1 text-sm font-bold text-violet-800">
-            LIZZY conversation · {unifiedTask.title || unifiedTask.planId}
+            PARIS conversation · {unifiedTask.title || unifiedTask.planId}
           </span>
         ) : null}
       </header>
@@ -1348,9 +1348,9 @@ export default function CloudBrowserWorkspace({
             </div>
           </div>
           <div className="border-b border-slate-200 p-3">
-            <p className="mb-1 text-xs font-black text-violet-800">LIZZY Browser Task</p>
+            <p className="mb-1 text-xs font-black text-violet-800">PARIS Browser Task</p>
             <p className="mb-2 text-sm text-slate-600">
-              Runs as a tool in this LIZZY conversation. Progress, approvals, evidence, and results
+              Runs as a tool in this PARIS conversation. Progress, approvals, evidence, and results
               appear in the conversation timeline.
             </p>
             {activeTaskId && (

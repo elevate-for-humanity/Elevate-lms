@@ -1,3 +1,4 @@
+import { recordParisObservation } from './runtime/supervision';
 import { logger } from '@/lib/logger';
 import { requirePaidInferenceContext } from './paid-inference-context';
 import { withResilience, breakers, CircuitBreaker, CircuitOpenError } from '@/lib/resilience';
@@ -189,6 +190,18 @@ function resolveImageProvider(): AIImageProvider {
 }
 
 export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
+  const started = Date.now();
+  try {
+    const result = await executeConfiguredChat(options);
+    await recordParisObservation({kind:'inference', operation:'ai.chat', status:'completed', durationMs:Date.now()-started, provider:result.provider});
+    return result;
+  } catch (error) {
+    await recordParisObservation({kind:'inference', operation:'ai.chat', status:'failed', durationMs:Date.now()-started, error});
+    throw error;
+  }
+}
+
+async function executeConfiguredChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
   // Elevate-owned inference is part of the platform runtime and must not require
   // paid-inference authorization. Metered/external providers retain the paid gate.
   let provider = resolveConfiguredChatProvider(options);
@@ -237,6 +250,17 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
 }
 
 export async function* aiChatStream(options: ChatCompletionOptions): AsyncIterable<string> {
+  const started = Date.now();
+  try {
+    yield* executeConfiguredStream(options);
+    await recordParisObservation({kind:'inference',operation:'ai.stream',status:'completed',durationMs:Date.now()-started});
+  } catch (error) {
+    await recordParisObservation({kind:'inference',operation:'ai.stream',status:'failed',durationMs:Date.now()-started,error});
+    throw error;
+  }
+}
+
+async function* executeConfiguredStream(options: ChatCompletionOptions): AsyncIterable<string> {
   const provider = resolveConfiguredChatProvider(options);
   if (provider.name !== 'elevate') requirePaidInferenceContext('ai-chat-stream');
   if (

@@ -21,7 +21,7 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     if(['awaiting_assignment','recovering'].includes(observation.state) && dispatchState?.status==='dispatch_failed')
       observation={state:'dispatch_failed',action:'none',reason:dispatchState.reason || 'Worker assignment failed; no execution is confirmed'};
     if(observation.state==='disabled')continue;
-    const monitor={...job.monitor,...observation,coordinator:'PARIS',agents:COURSE_AI_ROLES,checkedAt:now.toISOString(),
+    const monitor={...job.monitor,...observation,reason:observation.reason ?? null,coordinator:'PARIS',agents:COURSE_AI_ROLES,checkedAt:now.toISOString(),
       recoveries:(job.monitor.recoveries??0)+(observation.action==='requeue'?1:0)};
     const target=new URL(root);target.searchParams.set('id','eq.'+job.id);
     target.searchParams.set('status','eq.'+job.status);

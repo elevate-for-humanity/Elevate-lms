@@ -7,7 +7,7 @@ import { emitPlatformEvent } from '@/lib/platform/orchestration/events';
 import { logger } from '@/lib/logger';
 import { getPlatformHealth } from '@/lib/platform/platform-health';
 import { getDecryptedPlatformSecret } from '@/lib/secrets';
-import { getAITool, type AIAgentId, type AIToolDefinition } from './registry';
+import { canAgentUseTool, getAITool, type AIAgentId, type AIToolDefinition } from './registry';
 
 export type AIToolExecutionContext = {
   agent: AIAgentId;
@@ -296,7 +296,7 @@ export async function executeRegisteredAITool(
     };
   }
 
-  if (!tool.allowedAgents.includes(context.agent)) {
+  if (!canAgentUseTool(tool, context.agent)) {
     await emitAuditEvent(tool, context, input, 'blocked', { reason: 'agent_not_authorized' });
     return {
       ok: false,

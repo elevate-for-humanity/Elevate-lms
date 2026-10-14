@@ -64,12 +64,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, message: 'command is too long' }, { status: 400 });
   }
 
-  const agentConfig = AGENT_MAP[agentType] ?? {
+  const capabilityConfig = AGENT_MAP[agentType.toLowerCase()] ?? {
     agent: 'PARIS' as const,
     label: 'PARIS',
     task: 'general_chat' as const,
     role: 'authorized platform assistance',
   };
+  const agentConfig = {...capabilityConfig, agent:'PARIS' as const, label:'PARIS'};
   const correlationId = req.headers.get('x-correlation-id') ?? crypto.randomUUID();
   const respond = (payload: Record<string, unknown>, status = 200) => NextResponse.json(
     { ...payload, correlationId },

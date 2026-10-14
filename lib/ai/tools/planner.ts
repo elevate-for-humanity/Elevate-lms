@@ -127,6 +127,10 @@ export function planAIToolFromCommand(
   }
 
   const lower = command.toLowerCase();
+  if (/\b(paris|combined ai|all (?:the )?ais?|ai system|ai supervision)\b/.test(lower) &&
+      /\b(status|health|monitor|failures?|errors?|working|helping)\b/.test(lower))
+    return {name:'paris.supervision', input:{}};
+
   // The plan's platform snapshot command must resolve to a read-only tool.
   if (
     /^(?:get|show|inspect|check)\s+(?:(?:the|live|current)\s+)*(?:platform|system)\s+(?:state|health|status)\b/.test(lower)

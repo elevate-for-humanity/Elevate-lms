@@ -45,6 +45,12 @@ function queryPath(
 
 export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
   {
+    name:'paris.supervision', description:'Read the combined PARIS AI execution observations, classified failures and course worker supervision.',
+    method:'GET', path:'/api/paris/supervision', classification:'read', risk:'low', scope:'platform',
+    allowedAgents:['PARIS','ELLIE','LIZZY','ZORA'], allowedRoles:PRIVILEGED_ADMIN_ROLES,
+    approvalRequired:false, idempotent:true, timeoutMs:15_000, retryAttempts:1, audit:true,
+  },
+  {
     name: 'studio.runtime.files',
     description: 'List files in the canonical Master Studio Linux workspace.',
     method: 'GET',
@@ -844,8 +850,15 @@ export function getAITool(name: string): AIToolDefinition | null {
   return BY_NAME.get(name) ?? null;
 }
 
+export function canAgentUseTool(tool: AIToolDefinition, agent: AIAgentId): boolean {
+  // PARIS is the union of the four historical capability IDs. Actor roles,
+  // tenant scope, confirmations and tool-specific quality gates still apply.
+  return tool.allowedAgents.includes(agent) || (agent === 'PARIS' &&
+    tool.allowedAgents.some((id) => ['ELLIE', 'LIZZY', 'ZORA'].includes(id)));
+}
+
 export function listAIToolsForAgent(agent: AIAgentId): AIToolDefinition[] {
-  return AI_TOOL_REGISTRY.filter((tool) => tool.allowedAgents.includes(agent));
+  return AI_TOOL_REGISTRY.filter((tool) => canAgentUseTool(tool, agent));
 }
 
 export function getAIToolCatalogForPrompt(agent: AIAgentId): string {

@@ -30,3 +30,10 @@ test('monitor uses fenced changes and never resets attempts or changes worker pa
 test('read or write failures cannot be reported as monitoring success',async()=>{
  await assert.rejects(monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},request:async()=>({ok:false,status:503})}),/HTTP_503/);
 });
+test('fresh running observation clears an obsolete waiting reason',async()=>{
+ const row=job({status:'running',heartbeat_at:'2026-10-14T17:59:50Z',lease_expires_at:'2026-10-14T18:05:00Z',monitor:{enabled:true,reason:'Waiting for a fresh worker heartbeat'}});
+ let body;
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+  request:async(_url,options)=>{if(options.method)body=JSON.parse(options.body);return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};}});
+ assert.equal(body.monitor.state,'running');assert.equal(body.monitor.reason,null);
+});

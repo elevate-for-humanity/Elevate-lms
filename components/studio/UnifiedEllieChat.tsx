@@ -1170,7 +1170,7 @@ export default function UnifiedEllieChat({
         >
           <Sparkles className="h-4 w-4 shrink-0 text-blue-500" aria-hidden="true" />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold">Admin AI</p>
+            <p className="truncate text-sm font-semibold">PARIS</p>
             <p className={`truncate text-[11px] ${mutedTextClass}`}>
               Platform tools · {health}
               {lastRoute ? ` · last: ${ELLIE_ROUTE_LABEL[lastRoute]}` : ''}
@@ -1379,7 +1379,7 @@ export default function UnifiedEllieChat({
                   >
                     {message.role === 'assistant' && (
                       <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-                        {message.agent ?? 'LIZZY'}
+                        PARIS
                         {message.route ? ` · ${ELLIE_ROUTE_LABEL[message.route]}` : ''}
                       </p>
                     )}

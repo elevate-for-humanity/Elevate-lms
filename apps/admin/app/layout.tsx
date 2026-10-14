@@ -1,3 +1,4 @@
+import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 /**
  * Admin application root layout.
  *
@@ -77,6 +78,7 @@ export default async function AdminGroupLayout({ children }: { children: React.R
       </head>
       <body className="admin-portal efh-contrast">
         <SupabaseConfigBootstrap />
+        <CommunicationTodos />
         <AdminPwaRegister />
         <AdminUpdateNotice />
         <I18nProvider>

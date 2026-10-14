@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - officeAccess requires an authenticated MFA session and active office membership before any assessment write.
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { officeAccess, OfficeAccessError } from '@/lib/tax-software/server/office-access';

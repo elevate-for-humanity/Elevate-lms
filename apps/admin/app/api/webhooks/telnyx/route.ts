@@ -1,3 +1,4 @@
+import { storeSmsEvent } from '@/lib/phone/sms-inbound';
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
@@ -1332,6 +1333,10 @@ export async function POST(request: Request) {
   }
   try {
     const db = await requireAdminClient();
+    if (event.data.event_type.startsWith('message.')) {
+      await storeSmsEvent(db, event);
+      return NextResponse.json({ received: true });
+    }
     const context = await findContext(db, event);
     if (!context.system) return NextResponse.json({ received: true, ignored: 'unknown number' });
     const result = await processTelnyxEvent(db, event, context, () =>

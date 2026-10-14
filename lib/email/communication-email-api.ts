@@ -1,3 +1,4 @@
+import { processInterofficeOutbox } from './interoffice-outbox';
 import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -5,6 +6,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { sendEmail, type EmailAttachment } from '@/lib/email/sendgrid';
 import {
+  isActiveEmailProfile,
   cleanEmailSubject,
   normalizeEmailSubject,
   parseEmailList,
@@ -23,6 +25,7 @@ import {
   programConversationRoute,
 } from './program-conversation-routing';
 import { storeInboundCommunicationEmail } from './communication-inbound';
+import { mailViewQuery, validateMailAction } from './mail-management';
 
 const ATTACHMENT_BUCKET = 'communication-email-attachments';
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
@@ -45,6 +48,7 @@ type EmailContext = {
   db: Awaited<ReturnType<typeof requireAdminClient>>;
   mailboxes: ActorMailbox[];
   previewing: boolean;
+  isAdmin: boolean;
 };
 
 export type CommunicationEmailApiOptions = {
@@ -90,6 +94,7 @@ async function emailContext(
           db,
           mailboxes: actorMailboxes,
           previewing: false,
+          isAdmin: true,
         };
       }
     }
@@ -103,6 +108,7 @@ async function emailContext(
       db,
       mailboxes,
       previewing: preview.previewing,
+      isAdmin: false,
     };
   } catch {
     return NextResponse.json({ error: 'Email accounts could not be loaded.' }, { status: 500 });
@@ -148,12 +154,37 @@ export async function handleCommunicationEmailGet(
     return NextResponse.json({ mailboxes: [], threads: [], selectedMailboxId: null });
   }
 
-  const { data: threadRows, error: threadError } = await context.db
+  const view = url.searchParams.get('view') || 'inbox';
+  const search = (url.searchParams.get('q') || '').trim().slice(0, 160);
+  let threadQuery = context.db
     .from('communication_email_threads')
-    .select('id,subject,last_message_at,message_count,created_at')
+    .select('id,subject,last_message_at,message_count,created_at,folder,custom_folder_id,starred')
     .eq('mailbox_id', selectedMailbox.id)
     .order('last_message_at', { ascending: false })
-    .limit(100);
+    .limit(500);
+  threadQuery = mailViewQuery(threadQuery, view);
+  if (view === 'sent') {
+    const { data: sent, error } = await context.db
+      .from('communication_email_messages')
+      .select('thread_id')
+      .eq('mailbox_id', selectedMailbox.id)
+      .eq('direction', 'outbound')
+      .limit(5000);
+    if (error) return NextResponse.json({ error: 'Sent mail unavailable.' }, { status: 500 });
+    threadQuery = threadQuery.in('id', [...new Set((sent || []).map((m: any) => m.thread_id))]);
+  }
+  if (search) {
+    const needle = search.replace(/[,%_()]/g, ' ');
+    const { data: matches, error: searchError } = await context.db
+      .from('communication_email_messages')
+      .select('thread_id')
+      .eq('mailbox_id', selectedMailbox.id)
+      .or(`subject.ilike.%${needle}%,text_body.ilike.%${needle}%,sender_email.ilike.%${needle}%`)
+      .limit(1000);
+    if (searchError) return NextResponse.json({ error: 'Search unavailable.' }, { status: 500 });
+    threadQuery = threadQuery.in('id', [...new Set((matches || []).map((m: any) => m.thread_id))]);
+  }
+  const { data: threadRows, error: threadError } = await threadQuery;
   if (threadError)
     return NextResponse.json({ error: 'Inbox could not be loaded.' }, { status: 500 });
 
@@ -167,6 +198,30 @@ export async function handleCommunicationEmailGet(
     : { data: [] as any[] };
   const readAtByThread = new Map((reads ?? []).map((read: any) => [read.thread_id, read.read_at]));
 
+  const [
+    { data: folders, error: folderError },
+    { data: drafts, error: draftError },
+    { data: filters, error: filterError },
+  ] = await Promise.all([
+    context.db
+      .from('communication_email_folders')
+      .select('id,name')
+      .eq('mailbox_id', selectedMailbox.id)
+      .order('name'),
+    context.db
+      .from('communication_email_drafts')
+      .select('id,thread_id,to_text,cc_text,bcc_text,subject,body,updated_at')
+      .eq('mailbox_id', selectedMailbox.id)
+      .eq('user_id', context.user.id)
+      .order('updated_at', { ascending: false }),
+    context.db
+      .from('communication_email_filters')
+      .select('id,field,contains,action,folder_id,enabled')
+      .eq('mailbox_id', selectedMailbox.id)
+      .order('created_at'),
+  ]);
+  if (folderError || draftError || filterError)
+    return NextResponse.json({ error: 'Mail folders could not be loaded.' }, { status: 500 });
   const selectedThreadId = url.searchParams.get('threadId');
   const selectedThread = selectedThreadId
     ? (threadRows ?? []).find((thread: any) => thread.id === selectedThreadId)
@@ -189,6 +244,10 @@ export async function handleCommunicationEmailGet(
 
   return NextResponse.json({
     mailboxes: context.mailboxes,
+    filters: filters || [],
+    folders: folders || [],
+    drafts: drafts || [],
+    view,
     selectedMailboxId: selectedMailbox.id,
     threads: (threadRows ?? []).map((thread: any) => ({
       ...thread,
@@ -199,6 +258,41 @@ export async function handleCommunicationEmailGet(
     })),
     selectedThread: selectedThread ? { ...selectedThread, messages } : null,
     readOnly: context.previewing,
+    isAdmin: context.isAdmin,
+    meetings: context.isAdmin
+      ? (
+          await context.db
+            .from('communication_rooms')
+            .select('id,title,scheduled_at')
+            .eq('host_profile_id', context.user.id)
+            .in('status', ['open', 'scheduled'])
+            .order('created_at', { ascending: false })
+            .limit(25)
+        ).data || []
+      : [],
+    directory: context.isAdmin
+      ? (
+          await context.db
+            .from('communication_email_mailboxes')
+            .select('id,address,display_name,mailbox_kind')
+            .eq('active', true)
+            .order('display_name')
+        ).data || []
+      : context.mailboxes
+          .map((m) => ({
+            id: m.id,
+            address: m.address,
+            display_name: m.displayName,
+            mailbox_kind: m.mailboxKind,
+          }))
+          .concat([
+            {
+              id: 'admin',
+              address: 'admissions@elevateforhumanity.org',
+              display_name: 'Elevate Admin',
+              mailbox_kind: 'department',
+            },
+          ]),
   });
 }
 
@@ -219,6 +313,89 @@ async function validateFiles(files: File[]): Promise<string | null> {
     }
   }
   return null;
+}
+
+async function inviteEmailMeetings(
+  context: EmailContext,
+  text: string,
+  recipientEmails: string[],
+  profileIds: string[] = [],
+) {
+  if (!context.isAdmin) return;
+  const ids = [
+    ...new Set(
+      Array.from(
+        text.matchAll(/https:\/\/app\.elevateforhumanity\.org\/lms\/meetings\/([0-9a-f-]{36})/gi),
+        (m) => m[1],
+      ),
+    ),
+  ];
+  if (!ids.length) return;
+  const rooms = await context.db
+    .from('communication_rooms')
+    .select('id')
+    .eq('host_profile_id', context.user.id)
+    .in('id', ids)
+    .in('status', ['open', 'scheduled']);
+  if (rooms.error) throw Error('Meeting invitations unavailable');
+  const boxes = await context.db
+    .from('communication_email_mailboxes')
+    .select('id')
+    .eq('active', true)
+    .in('address', recipientEmails);
+  const members = await context.db
+    .from('communication_email_mailbox_members')
+    .select('user_id')
+    .in(
+      'mailbox_id',
+      (boxes.data || []).map((m: any) => m.id),
+    );
+  const direct = await context.db.from('profiles').select('id').in('email', recipientEmails);
+  const users = [
+    ...new Set([
+      ...profileIds,
+      ...(members.data || []).map((m: any) => m.user_id),
+      ...(direct.data || []).map((p: any) => p.id),
+    ]),
+  ];
+  if (!users.length) return;
+  const profiles = await context.db
+    .from('profiles')
+    .select('id,email,full_name,is_active,status')
+    .in('id', users);
+  if (profiles.error || boxes.error || members.error || direct.error)
+    throw Error('Meeting invitees unavailable');
+  for (const room of rooms.data || []) {
+    const existing = await context.db
+      .from('communication_room_participants')
+      .select('profile_id')
+      .eq('room_id', room.id);
+    if (existing.error) throw Error('Meeting invitations unavailable');
+    const already = new Set((existing.data || []).map((p: any) => p.profile_id));
+    const rows = (profiles.data || [])
+      .filter(
+        (p: any) =>
+          !already.has(p.id) &&
+          isActiveEmailProfile({
+            email: p.email,
+            fullName: p.full_name,
+            isActive: p.is_active,
+            status: p.status,
+          }),
+      )
+      .map((p: any) => ({
+        room_id: room.id,
+        profile_id: p.id,
+        email: p.email,
+        display_name: p.full_name || p.email,
+        role: 'participant',
+        invite_status: 'sent',
+      }));
+    if (rows.length) {
+      const saved = await context.db.from('communication_room_participants').insert(rows);
+      if (saved.error) throw Error('Meeting invitation could not be saved');
+    }
+  }
 }
 
 export async function handleCommunicationEmailPost(
@@ -243,6 +420,87 @@ export async function handleCommunicationEmailPost(
   if (!mailbox)
     return NextResponse.json({ error: 'Active mailbox access is required.' }, { status: 403 });
 
+  const broadcast = form.get('broadcast') === 'true';
+  if (broadcast) {
+    if (!context.isAdmin)
+      return NextResponse.json(
+        { error: 'Only administrators may email everyone.' },
+        { status: 403 },
+      );
+    if (form.getAll('attachments').some((f) => f instanceof File && f.size))
+      return NextResponse.json(
+        { error: 'Email everyone supports text messages. Send files individually.' },
+        { status: 400 },
+      );
+    const subject = cleanEmailSubject(form.get('subject'));
+    const body = String(form.get('body') || '')
+      .trim()
+      .slice(0, 100000);
+    const campaign = String(form.get('campaignKey') || '').trim();
+    if (!body || !/^[a-zA-Z0-9_-]{8,100}$/.test(campaign))
+      return NextResponse.json(
+        { error: 'Message and campaign identifier required.' },
+        { status: 400 },
+      );
+    // NULL status means active too. Use the authoritative mailbox membership list as the audience.
+    const members = await context.db
+      .from('communication_email_mailbox_members')
+      .select('user_id,communication_email_mailboxes!inner(active)')
+      .eq('communication_email_mailboxes.active', true);
+    if (members.error)
+      return NextResponse.json({ error: 'Audience unavailable.' }, { status: 503 });
+    const users = await context.db
+      .from('profiles')
+      .select('id,email,full_name,is_active,status,role')
+      .in('id', [...new Set((members.data || []).map((m: any) => m.user_id))]);
+    if (users.error) return NextResponse.json({ error: 'Audience unavailable.' }, { status: 503 });
+    const unique = new Map<string, any>();
+    for (const p of users.data || []) {
+      if (
+        isActiveEmailProfile({
+          email: p.email,
+          fullName: p.full_name,
+          isActive: p.is_active,
+          status: p.status,
+        }) &&
+        parseEmailList(p.email).length
+      )
+        unique.set(p.email.toLowerCase(), p);
+    }
+    const rows = [...unique.values()].map((p) => ({
+      campaign_key: campaign,
+      user_id: p.id,
+      recipient_email: p.email,
+      mailbox_id: mailbox.id,
+      subject,
+      body,
+    }));
+    await inviteEmailMeetings(
+      context,
+      body,
+      [...unique.keys()],
+      [...unique.values()].map((p) => p.id),
+    );
+    const queued = await context.db
+      .from('communication_email_outbox')
+      .upsert(rows, { onConflict: 'campaign_key,recipient_email', ignoreDuplicates: true });
+    if (queued.error)
+      return NextResponse.json({ error: 'Broadcast could not be queued.' }, { status: 500 });
+    await context.db.from('notifications').upsert(
+      [...unique.values()].map((p) => ({
+        user_id: p.id,
+        type: 'message',
+        title: subject,
+        message: body.slice(0, 1000),
+        action_url: 'https://app.elevateforhumanity.org/communications/email',
+        action_label: 'Open interoffice email',
+        idempotency_key: `${campaign}:${p.id}`,
+        read: false,
+      })),
+      { onConflict: 'idempotency_key', ignoreDuplicates: true },
+    );
+    return NextResponse.json({ ok: true, queued: rows.length });
+  }
   const to = parseEmailList(form.get('to'));
   const cc = parseEmailList(form.get('cc'));
   const bcc = parseEmailList(form.get('bcc'));
@@ -259,6 +517,7 @@ export async function handleCommunicationEmailPost(
     return NextResponse.json({ error: 'Write a message or attach a file.' }, { status: 400 });
   }
 
+  await inviteEmailMeetings(context, bodyText, [...to, ...cc, ...bcc]);
   const route =
     !bcc.length && !cc.length
       ? await programConversationRoute(context.db, to, [mailbox.address])
@@ -284,9 +543,10 @@ export async function handleCommunicationEmailPost(
       .insert({
         mailbox_id: mailbox.id,
         subject,
-        normalized_subject: route
-          ? applicantConversationSubject(subject, route.applicantEmail)
-          : normalizeEmailSubject(subject),
+        normalized_subject:
+          to.length === 1 && !cc.length && !bcc.length
+            ? applicantConversationSubject(subject, route?.applicantEmail || to[0])
+            : normalizeEmailSubject(subject),
         message_count: 0,
       })
       .select('id,subject,message_count')
@@ -296,6 +556,7 @@ export async function handleCommunicationEmailPost(
     thread = data;
   }
 
+  const draftId = String(form.get('draftId') || '').trim();
   const messageId = randomUUID();
   const htmlBody = textToEmailHtml(bodyText);
   const { error: messageError } = await context.db.from('communication_email_messages').insert({
@@ -393,6 +654,14 @@ export async function handleCommunicationEmailPost(
       { status: 502 },
     );
   }
+  if (draftId) {
+    await context.db
+      .from('communication_email_drafts')
+      .delete()
+      .eq('id', draftId)
+      .eq('mailbox_id', mailbox.id)
+      .eq('user_id', context.user.id);
+  }
   if (route) {
     const copyAddresses = route.addresses.filter((address) => address !== mailbox.address);
     let copies: { mailboxCount: number } | null = null;
@@ -440,6 +709,191 @@ export async function handleCommunicationEmailPatch(
     );
   }
   const body = await request.json().catch(() => ({}));
+  if (body.action === 'sendQueued') {
+    if (!context.isAdmin)
+      return NextResponse.json({ error: 'Administrator access required.' }, { status: 403 });
+    return NextResponse.json({ ok: true, ...(await processInterofficeOutbox()) });
+  }
+  if (body.action) {
+    const problem = validateMailAction(body);
+    if (problem) return NextResponse.json({ error: problem }, { status: 400 });
+    const mailbox = mailboxFor(context, String(body.mailboxId || ''));
+    if (!mailbox) return NextResponse.json({ error: 'Mailbox access required.' }, { status: 403 });
+    const ok = (error: unknown) =>
+      error
+        ? NextResponse.json({ error: 'Mailbox update failed.' }, { status: 500 })
+        : NextResponse.json({ ok: true });
+    const name = String(body.name || '').trim();
+    if (body.action === 'createFilter') {
+      if (body.filterAction === 'folder') {
+        const { data: folder } = await context.db
+          .from('communication_email_folders')
+          .select('id')
+          .eq('id', body.folderId)
+          .eq('mailbox_id', mailbox.id)
+          .maybeSingle();
+        if (!folder) return NextResponse.json({ error: 'Folder not found.' }, { status: 404 });
+      }
+      const { error } = await context.db.from('communication_email_filters').insert({
+        mailbox_id: mailbox.id,
+        field: body.field,
+        contains: String(body.contains).trim(),
+        action: body.filterAction,
+        folder_id: body.filterAction === 'folder' ? body.folderId : null,
+      });
+      return ok(error);
+    }
+    if (body.action === 'disableFilter') {
+      const { data, error } = await context.db
+        .from('communication_email_filters')
+        .update({ enabled: false })
+        .eq('id', body.filterId)
+        .eq('mailbox_id', mailbox.id)
+        .select('id');
+      if (!error && !data?.length)
+        return NextResponse.json({ error: 'Filter not found.' }, { status: 404 });
+      return ok(error);
+    }
+    if (body.action === 'createFolder') {
+      const { error } = await context.db
+        .from('communication_email_folders')
+        .insert({ mailbox_id: mailbox.id, name });
+      return ok(error);
+    }
+    if (body.action === 'renameFolder' || body.action === 'deleteFolder') {
+      const { data: folder } = await context.db
+        .from('communication_email_folders')
+        .select('id')
+        .eq('id', body.folderId)
+        .eq('mailbox_id', mailbox.id)
+        .maybeSingle();
+      if (!folder) return NextResponse.json({ error: 'Folder not found.' }, { status: 404 });
+      if (body.action === 'renameFolder') {
+        const { error } = await context.db
+          .from('communication_email_folders')
+          .update({ name })
+          .eq('id', folder.id)
+          .eq('mailbox_id', mailbox.id);
+        return ok(error);
+      }
+      const { error: ruleError } = await context.db
+        .from('communication_email_filters')
+        .update({ enabled: false, action: 'archive', folder_id: null })
+        .eq('mailbox_id', mailbox.id)
+        .eq('folder_id', folder.id);
+      if (ruleError) return ok(ruleError);
+      const moved = await context.db
+        .from('communication_email_threads')
+        .update({ custom_folder_id: null, folder: 'inbox' })
+        .eq('mailbox_id', mailbox.id)
+        .eq('custom_folder_id', folder.id);
+      if (moved.error) return ok(moved.error);
+      const { error } = await context.db
+        .from('communication_email_folders')
+        .delete()
+        .eq('id', folder.id)
+        .eq('mailbox_id', mailbox.id);
+      return ok(error);
+    }
+    if (body.action === 'saveDraft' || body.action === 'deleteDraft') {
+      const draftId = String(body.draftId || '');
+      if (draftId) {
+        const { data: draft } = await context.db
+          .from('communication_email_drafts')
+          .select('id')
+          .eq('id', draftId)
+          .eq('mailbox_id', mailbox.id)
+          .eq('user_id', context.user.id)
+          .maybeSingle();
+        if (!draft) return NextResponse.json({ error: 'Draft not found.' }, { status: 404 });
+      }
+      if (body.action === 'deleteDraft') {
+        const { error } = await context.db
+          .from('communication_email_drafts')
+          .delete()
+          .eq('id', draftId)
+          .eq('mailbox_id', mailbox.id)
+          .eq('user_id', context.user.id);
+        return ok(error);
+      }
+      if (body.threadId) {
+        const { data: thread } = await context.db
+          .from('communication_email_threads')
+          .select('id')
+          .eq('id', body.threadId)
+          .eq('mailbox_id', mailbox.id)
+          .maybeSingle();
+        if (!thread)
+          return NextResponse.json({ error: 'Conversation not found.' }, { status: 404 });
+      }
+      const row = {
+        mailbox_id: mailbox.id,
+        user_id: context.user.id,
+        thread_id: body.threadId || null,
+        to_text: String(body.to || '').slice(0, 4000),
+        cc_text: String(body.cc || '').slice(0, 4000),
+        bcc_text: String(body.bcc || '').slice(0, 4000),
+        subject: cleanEmailSubject(body.subject),
+        body: String(body.body || '').slice(0, 100000),
+        updated_at: new Date().toISOString(),
+      };
+      const query = draftId
+        ? context.db
+            .from('communication_email_drafts')
+            .update(row)
+            .eq('id', draftId)
+            .eq('user_id', context.user.id)
+            .eq('mailbox_id', mailbox.id)
+        : context.db.from('communication_email_drafts').insert(row);
+      const { data: draft, error } = await query.select('id').single();
+      return error ? ok(error) : NextResponse.json({ ok: true, draftId: draft.id });
+    }
+    const ids: string[] = [...new Set<string>(body.threadIds)];
+    const { data: threads, error: accessError } = await context.db
+      .from('communication_email_threads')
+      .select('id')
+      .eq('mailbox_id', mailbox.id)
+      .in('id', ids);
+    if (accessError || threads?.length !== ids.length)
+      return NextResponse.json({ error: 'Conversation access denied.' }, { status: 403 });
+    if (body.action === 'read' || body.action === 'unread') {
+      if (body.action === 'unread') {
+        const { error } = await context.db
+          .from('communication_email_thread_reads')
+          .delete()
+          .eq('user_id', context.user.id)
+          .in('thread_id', ids);
+        return ok(error);
+      }
+      const { error } = await context.db.from('communication_email_thread_reads').upsert(
+        ids.map((id) => ({
+          thread_id: id,
+          user_id: context.user.id,
+          read_at: new Date().toISOString(),
+        })),
+      );
+      return ok(error);
+    }
+    if (body.action === 'move' && body.folderId) {
+      const { data: folder } = await context.db
+        .from('communication_email_folders')
+        .select('id')
+        .eq('id', body.folderId)
+        .eq('mailbox_id', mailbox.id)
+        .maybeSingle();
+      if (!folder) return NextResponse.json({ error: 'Folder not found.' }, { status: 404 });
+    }
+    const values =
+      body.action === 'star'
+        ? { starred: body.starred }
+        : { folder: body.folder || 'inbox', custom_folder_id: body.folderId || null };
+    const { error } = await context.db
+      .from('communication_email_threads')
+      .update(values)
+      .eq('mailbox_id', mailbox.id)
+      .in('id', ids);
+    return ok(error);
+  }
   const threadId = String(body.threadId || '');
   const { data: thread } = await context.db
     .from('communication_email_threads')

@@ -35,7 +35,7 @@ describe('portal routing and PARIS inbound email', () => {
     const applicationUrl =
       'https://www.elevateforhumanity.org/apply/program-holder?status=pending';
     expect(holderMou).toContain(applicationUrl);
-    expect(holderOnboarding).toContain(applicationUrl);
+    expect(holderOnboarding).toContain('/program-holder/dashboard?onboarding=pending-approval');
     expect(holderMou).not.toContain("redirect('/apply/program-holder?status=pending')");
     expect(holderOnboarding).not.toContain("redirect('/apply/program-holder?status=pending')");
   });
@@ -46,8 +46,10 @@ describe('portal routing and PARIS inbound email', () => {
   });
 
   it('connects inbound applicant replies to PARIS without self-reply loops', () => {
-    expect(inbound).toContain('/functions/v1/paris-response');
-    expect(inbound).toContain("endsWith('@elevateforhumanity.org')");
+    expect(inbound).toContain('respondToParisMail(parsed)');
+    const filters = fs.readFileSync(path.resolve('lib/email/mail-filters.ts'), 'utf8');
+    expect(filters).toContain('canParisRespond');
+    expect(filters).toContain('isAutomatedMail(sender');
     expect(paris).toContain('getSignupUrl(app.program_interest)');
     expect(paris).toContain('Continue ${programName} signup');
   });

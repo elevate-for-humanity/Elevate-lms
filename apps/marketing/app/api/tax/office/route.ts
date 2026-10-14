@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - officeAccess() authenticates via getUser, requires MFA aal2 and verifies tax-office membership before any POST training-progress write.
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { officeAccess, OfficeAccessError } from '@/lib/tax-software/server/office-access';

@@ -110,7 +110,7 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
 
   return (
     <section className="mt-5 overflow-x-auto" aria-label="Course Builder checkpoints">
-      <div className="grid min-w-[720px] grid-cols-2 items-start gap-4">
+      <div data-course-lesson-panes className="grid min-w-[720px] grid-cols-2 items-start gap-4">
       <div className="col-span-2 flex flex-wrap items-center justify-between gap-3">
         <h3 className="font-bold text-white">Lesson checkpoints</h3>
         <button type="button" onClick={() => void checkHealth()} disabled={checking}

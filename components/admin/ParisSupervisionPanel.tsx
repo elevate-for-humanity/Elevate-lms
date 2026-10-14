@@ -4,6 +4,7 @@ import {useCallback,useEffect,useState} from 'react';
 type Snapshot = {
   observedAt:string;
   events:Array<{id:string;operation:string;status:string;created_at:string;next_action:string|null}>;
+  codeRepair?:{available:boolean;policy:{enabled:boolean;max_daily_repairs:number}|null;repairs:Array<{id:string;status:string;workflow_run_id:number|null;release_sha:string|null;error_code:string|null}>};
   courses:Array<{id:string;status:string;heartbeat_at:string|null;monitor:{state?:string}}>;
 };
 
@@ -32,6 +33,12 @@ export default function ParisSupervisionPanel() {
     {snapshot && <div className="mt-3 text-sm">
       <p>Checked {new Date(snapshot.observedAt).toLocaleString()}. {snapshot.courses.filter(job=>job.status==='running' && job.heartbeat_at && Date.now()-Date.parse(job.heartbeat_at)<90_000).length} course workers with a fresh heartbeat.</p>
       <p className="mt-1 text-slate-700">{snapshot.events.length} recent execution observations; {failures.length} failure or approval observations. These are historical records, not a claim of current service health.</p>
+      {snapshot.codeRepair && <div className="mt-3 rounded-lg border border-slate-300 p-3">
+        <h2 className="font-bold">Code repair autopilot</h2>
+        <p>{!snapshot.codeRepair.available ? 'Repair records unavailable.' : snapshot.codeRepair.policy?.enabled ? `Enabled · up to ${snapshot.codeRepair.policy.max_daily_repairs} repairs per day.` : 'Paused.'}</p>
+        <p>Diagnose → patch → independent tests → main → deployment verification. Course videos still require media QA.</p>
+        {snapshot.codeRepair.repairs.slice(0,5).map(repair=><p key={repair.id} className="mt-2"><strong>{repair.status}</strong>{repair.error_code ? ` · ${repair.error_code}` : ''}{repair.workflow_run_id && <> · <a className="underline" href={`https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/${repair.workflow_run_id}`} target="_blank" rel="noreferrer">Execution log</a></>}</p>)}
+      </div>}
       {failures.length>0 && <details className="mt-3"><summary className="cursor-pointer font-semibold">Review recent failures and next actions</summary>
         <ul className="mt-2 space-y-2">{failures.slice(0,10).map(event=><li key={event.id} className="rounded-lg bg-amber-50 p-3"><strong>{event.operation}</strong> · {event.status}<p>{event.next_action}</p><time>{new Date(event.created_at).toLocaleString()}</time></li>)}</ul>
       </details>}

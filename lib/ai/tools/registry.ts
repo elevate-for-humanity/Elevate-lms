@@ -87,7 +87,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
   {
     name: 'studio.engineering.execute',
     description:
-      'Use Elevate-owned AI to inspect and modify the canonical repository on an isolated Studio task branch, then open a pull request for CI verification.',
+      'Use combined PARIS to diagnose and patch repository code, then run independent tests before non-force main publication and verified deployment.',
     method: 'POST',
     path: '/api/admin/dev-studio/engineering',
     classification: 'write',

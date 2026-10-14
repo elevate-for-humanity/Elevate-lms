@@ -1,7 +1,7 @@
 /** One platform identity. Historical names remain compatibility/capability IDs. */
 export const PARIS_IDENTITY = {
   name: 'PARIS',
-  capabilities: ['admissions', 'instruction', 'operations', 'compliance'] as const,
+  capabilities: ['admissions', 'instruction', 'operations', 'compliance', 'engineering', 'supervision'] as const,
   combinedFrom: ['PARIS', 'ELLIE', 'LIZZY', 'ZORA'] as const,
 };
 

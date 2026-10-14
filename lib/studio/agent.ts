@@ -5,6 +5,7 @@
  * It handles conversation management, tool execution, and skill activation.
  */
 
+import {PARIS_SYSTEM_IDENTITY} from '@/lib/ai/paris-identity';
 import { createClient } from '@/lib/supabase/client';
 
 export interface AgentMessage {
@@ -36,7 +37,9 @@ export interface ConversationSession {
   config: AgentConfig;
 }
 
-const DEFAULT_SYSTEM_PROMPT = `You are Ellie, an AI coding assistant for Elevate for Humanity's Open Studio.
+const DEFAULT_SYSTEM_PROMPT = `${PARIS_SYSTEM_IDENTITY}
+
+You provide the coding capabilities of Elevate Studio.
 
 You help users:
 - Write, debug, and refactor code

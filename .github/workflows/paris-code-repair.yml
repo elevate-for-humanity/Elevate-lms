@@ -1,0 +1,153 @@
+name: PARIS verified code repair
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+    inputs:
+      repair_id:
+        description: Durable owner-authorized PARIS repair ID
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: paris-code-repair
+  cancel-in-progress: false
+jobs:
+  monitor:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          python - <<'PYCODE'
+          import os,json,urllib.request
+          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=json.dumps({'phase':'tick'}).encode(),headers={'Authorization':'Bearer '+os.environ['CRON_SECRET'],'Content-Type':'application/json'})
+          print(urllib.request.urlopen(req,timeout=120).read().decode())
+          PYCODE
+  prepare:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    outputs:
+      sha: ${{ steps.patch.outputs.sha }}
+      base: ${{ steps.patch.outputs.base }}
+    steps:
+      - name: Stage the PARIS patch
+        id: patch
+        env:
+          ADMIN_URL: https://admin.elevateforhumanity.org
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          REPAIR_ID: ${{ inputs.repair_id }}
+        run: |
+          python - <<'PY'
+          import json,os,re,urllib.request
+          if not re.fullmatch(r'[a-f0-9-]{36}',os.environ['REPAIR_ID']): raise SystemExit('Invalid repair ID')
+          body=json.dumps({'phase':'prepare','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
+          req=urllib.request.Request(os.environ['ADMIN_URL']+'/api/cron/paris-code-repair',data=body,headers={'Authorization':'Bearer '+os.environ['CRON_SECRET'],'Content-Type':'application/json'})
+          result=json.load(urllib.request.urlopen(req,timeout=330))
+          if not all(re.fullmatch(r'[a-f0-9]{40}',result.get(k,'')) for k in ['sha','baseSha']): raise SystemExit('Missing candidate evidence')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out: out.write('sha='+result['sha']+'\nbase='+result['baseSha']+'\n')
+          PY
+  validate:
+    needs: prepare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    env:
+      NODE_OPTIONS: --max-old-space-size=6144
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with: {version: 10.28.2}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22',cache: pnpm}
+      - name: Require an application patch and a new regression test
+        env:
+          BASE_SHA: ${{ needs.prepare.outputs.base }}
+          PATCH_SHA: ${{ needs.prepare.outputs.sha }}
+        run: |
+          python - <<'PY'
+          import os,re,subprocess,json
+          changes=subprocess.check_output(['git','diff','--name-status',os.environ['BASE_SHA'],os.environ['PATCH_SHA']],text=True).splitlines()
+          tests=[]
+          for line in changes:
+            status,path=line.split('\t',1)
+            if status not in ['A','M'] or not re.match(r'^(lib|components|apps|remotion-src|workers|tests)/',path): raise SystemExit('Repair outside application scope')
+            if re.search(r'(^|/)(auth|rbac|payments|billing|stripe|security)(/|\.)|secret|credential|quality-gate|approved-delivery|lesson-contract|AGENTS\.md|code-repair|paris-code-engineer|main-release|api-auth|guards|role-matrix',path,re.I): raise SystemExit('Protected repair boundary')
+            if path.startswith('tests/'):
+              if status!='A': raise SystemExit('Existing tests must remain unchanged')
+              if re.search(r'\.test\.(tsx?|mjs)$',path): tests.append(path)
+          if not tests: raise SystemExit('A new regression test is required')
+          open('/tmp/paris-tests.json','w').write(json.dumps(tests))
+          PY
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Run regression and shared PARIS checks
+        run: |
+          python - <<'PY'
+          import json,subprocess
+          tests=json.load(open('/tmp/paris-tests.json'))
+          for args in [['pnpm','exec','vitest','run']+[p for p in tests if not p.endswith('.mjs')],['node','--test']+[p for p in tests if p.endswith('.mjs')]]:
+            if len(args)>(4 if args[0]=='pnpm' else 2): subprocess.run(args,check=True)
+          subprocess.run(['pnpm','exec','vitest','run','tests/unit/course-builder-live-preview.test.tsx','tests/unit/course-builder-assessment-preview.test.tsx','tests/unit/paris-course-integration.test.ts'],check=True)
+          subprocess.run(['node','--test','lib/ai/runtime/code-repair-policy.test.mjs','tests/worker/approved-picture-timeline.test.mjs','lib/video/render-checkpoint-contract.test.mjs'],check=True)
+          PY
+      - name: Type-check production applications
+        run: |
+          pnpm exec tsc -p apps/admin/tsconfig.json --noEmit --incremental false
+          pnpm exec tsc -p apps/lms/tsconfig.json --noEmit --incremental false
+          pnpm exec tsc -p apps/marketing/tsconfig.json --noEmit --incremental false
+      - name: Record exact validated candidate
+        env:
+          PATCH_SHA: ${{ needs.prepare.outputs.sha }}
+          REPAIR_ID: ${{ inputs.repair_id }}
+        run: |
+          python - <<'PYCODE'
+          import json,os
+          open('/tmp/paris-validation.json','w').write(json.dumps({'sha':os.environ['PATCH_SHA'],'repairId':os.environ['REPAIR_ID'],'runId':os.environ['GITHUB_RUN_ID']}))
+          PYCODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paris-validated-${{ inputs.repair_id }}-${{ needs.prepare.outputs.sha }}
+          path: /tmp/paris-validation.json
+          retention-days: 7
+  publish:
+    needs: [prepare,validate]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Publish only the independently validated immutable patch
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          REPAIR_ID: ${{ inputs.repair_id }}
+        run: |
+          python - <<'PY'
+          import os,json,urllib.request
+          data=json.dumps({'phase':'publish','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
+          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=data,headers={'Authorization':'Bearer '+os.environ['CRON_SECRET'],'Content-Type':'application/json'})
+          result=json.load(urllib.request.urlopen(req,timeout=120))
+          print(json.dumps({'status':result.get('status'),'sha':result.get('sha'),'verifiedLive':False}))
+          PY
+  report:
+    if: always() && github.event_name == 'workflow_dispatch' && (needs.prepare.result != 'success' || needs.validate.result != 'success' || needs.publish.result != 'success')
+    needs: [prepare,validate,publish]
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          REPAIR_ID: ${{ inputs.repair_id }}
+        run: |
+          python - <<'PY'
+          import os,json,urllib.request
+          data=json.dumps({'phase':'failure','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
+          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=data,headers={'Authorization':'Bearer '+os.environ['CRON_SECRET'],'Content-Type':'application/json'})
+          urllib.request.urlopen(req,timeout=30).read()
+          PY

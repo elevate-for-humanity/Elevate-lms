@@ -26,6 +26,7 @@ protocol=tls
 bind=0.0.0.0:5061
 method=tlsv1_2
 verify_server=yes
+allow_wildcard_certs=yes
 verify_client=no
 ca_list_file=/etc/ssl/certs/ca-certificates.crt
 external_signaling_address=107.178.216.162
@@ -151,7 +152,8 @@ def validate():
                         'cliUnavailable': 'unable to connect to remote asterisk',
                     }.items()}}}))
                 raise ValueError('isolated_tls_srtp_endpoint_not_loaded')
-            if not re.search(r'verify_server\s*:\s*(?:true|yes)\b', transport):
+            if not re.search(r'verify_server\s*:\s*(?:true|yes)\b', transport, re.I):
+                print(json.dumps({'newTransportVerificationReadback': transport[:2000]}))
                 raise ValueError('isolated_server_certificate_verification_not_enabled')
         finally:
             if created:
@@ -194,7 +196,7 @@ def install_endpoint(root=ROOT, backup=Path('/var/lib/elevate-pbx/twilio-rollbac
         transport = cli('pjsip show transport elevate-twilio-tls')
         if not re.search(r'media_encryption\s*:\s*sdes\b', endpoint) or not re.search(r'protocol\s*:\s*tls\b', transport):
             raise ValueError('live_tls_endpoint_reload_not_confirmed')
-        if not re.search(r'verify_server\s*:\s*(?:true|yes)\b', transport):
+        if not re.search(r'verify_server\s*:\s*(?:true|yes)\b', transport, re.I):
             raise ValueError('live_server_certificate_verification_not_confirmed')
     except Exception:
         main.write_text(previous)

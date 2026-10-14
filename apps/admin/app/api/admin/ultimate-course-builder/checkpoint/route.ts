@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
     const counts = { ...c.job.payload?.lessonRepairCounts }; delete counts[c.lesson.competency_id];
     const now = new Date().toISOString();
     const payload = { ...c.job.payload, nextCompetencyIndex: index, lessonRepairCounts: counts, unresolvedCompetencyIds: [],
+      competencyId: undefined, lessonBuildId: undefined, repairCompetencyId: undefined, repairCompetencyIds: [], acceptance: undefined,
       checkpointRepair: { lessonBuildId: c.lesson.id, competencyId: c.lesson.competency_id, fromStep, requestedBy: auth.id, requestedAt: now } };
     const changed = await db.from('ultimate_build_jobs').update({ status: 'queued', payload, attempts: 0, last_error: null,
       lease_owner: null, lease_expires_at: null, available_at: now, execution_generation: c.job.execution_generation + 1, updated_at: now })

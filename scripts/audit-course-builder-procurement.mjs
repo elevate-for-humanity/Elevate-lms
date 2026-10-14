@@ -6,6 +6,7 @@ const root = process.cwd();
 const failures = [];
 const mustExist = [
   'components/admin/course-builder/UnifiedCourseBuilder.tsx',
+  'components/admin/course-builder/CourseProductionWorkspace.tsx',
   'apps/admin/app/studio/courses/page.tsx',
   'apps/admin/app/api/admin/course-builder/route.ts',
   'lib/course-builder/orchestrator.ts',
@@ -35,7 +36,11 @@ for (const file of mustExist) if (!fs.existsSync(path.join(root, file))) fail(`m
 
 if (failures.length === 0) {
   const studioCourses = read('apps/admin/app/studio/courses/page.tsx');
-  if (!studioCourses.includes('UnifiedCourseBuilder')) fail('/studio/courses is not mounted to UnifiedCourseBuilder');
+  const workspace = read('components/admin/course-builder/CourseProductionWorkspace.tsx');
+  if (!studioCourses.includes('<CourseProductionWorkspace') || !workspace.includes('<UnifiedCourseBuilder'))
+    fail('/studio/courses is not mounted to the canonical UnifiedCourseBuilder workspace');
+  if (!workspace.includes("import('@/components/studio/CloudBrowserWorkspace')") || !workspace.includes('<Browser'))
+    fail('Course production workspace is missing the canonical live Studio browser');
 
   const rootRoute = read('apps/admin/app/api/admin/course-builder/route.ts');
   for (const invariant of [

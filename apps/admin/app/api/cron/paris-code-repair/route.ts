@@ -14,5 +14,12 @@ export async function POST(request:NextRequest){
   if(body.phase==='publish')return NextResponse.json(await publishParisRepair(body.repairId,body.runId));
   if(body.phase==='failure'){await reportParisRepairFailure(body.repairId,body.runId);return NextResponse.json({recorded:true});}
   return NextResponse.json({error:'Unsupported phase'},{status:400});
- }catch(error){console.error('[PARIS] repair phase failed',error instanceof Error?error.message:'unknown');return NextResponse.json({error:'PARIS repair phase failed; see the protected execution log.'},{status:502});}
+ }catch(error){
+  const detail=error as {message?:unknown;code?:unknown}|null;
+  const message=String(detail?.message??'');
+  const errorCode=/^PARIS_[A-Z0-9_]+$/.test(message)?message:/^[A-Z0-9]{5}$/.test(String(detail?.code??''))?'PARIS_DATABASE_'+detail!.code:'PARIS_REPAIR_PHASE_FAILED';
+  console.error('[PARIS] repair phase failed',errorCode);
+  return NextResponse.json({error:'PARIS repair phase failed; see the protected execution log.',errorCode},{status:502});
+ }
+
 }

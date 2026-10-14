@@ -68,7 +68,21 @@ export async function bindRuntime(run = google, fetchImpl = fetch) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  bindRuntime().catch(() => {
+  bindRuntime().catch(error => {
+    const safeReasons = [
+      'Canonical credential store bootstrap is unavailable',
+      'Canonical Twilio credential access failed',
+      'Required Twilio credential is not configured',
+      'Twilio account or credential format does not match the approved account',
+      'Twilio authentication or number verification failed',
+      'The Twilio number does not belong to the approved account',
+      'Existing Twilio credential binding requires review',
+      'Invalid Google runtime configuration',
+      'Invalid runtime variable',
+      'Runtime persistence inventory required',
+      'Configuration exceeds Secret Manager payload limit; split secrets before import',
+    ];
+    console.error(safeReasons.includes(error?.message) ? error.message : 'Runtime binding failed at a protected configuration operation');
     console.error('Twilio runtime binding blocked; no credential values were emitted.');
     process.exitCode = 1;
   });

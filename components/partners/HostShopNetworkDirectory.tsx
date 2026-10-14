@@ -190,7 +190,7 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
               through supervised training.
             </p>
             <Link
-              href="/host-shop/apply"
+              href="/partners/host-shop/apply"
               className="mt-5 inline-flex min-h-12 items-center justify-center rounded-xl bg-red-700 px-5 py-3 font-bold text-white"
             >
               Apply free to become a Host Shop

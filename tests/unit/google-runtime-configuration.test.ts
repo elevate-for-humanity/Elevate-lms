@@ -107,6 +107,14 @@ function harness(
 }
 
 describe('Google scoped runtime configuration', () => {
+  it('permits Twilio credentials only in Admin and LMS and rejects malformed account credentials', () => {
+    const entries = [{key:'TWILIO_ACCOUNT_SID',value:'AC'+'a'.repeat(32)}, {key:'TWILIO_AUTH_TOKEN',value:'b'.repeat(32)}];
+    expect(()=>validateRuntimeEntries('admin',entries)).not.toThrow();
+    expect(()=>validateRuntimeEntries('lms',entries)).not.toThrow();
+    expect(()=>validateRuntimeEntries('marketing',entries)).toThrow(/key_not_allowed/);
+    expect(()=>validateRuntimeEntries('admin',[{key:'TWILIO_AUTH_TOKEN',value:'placeholder'}])).toThrow(/invalid_twilio_credential/);
+    expect(()=>validateRuntimeEntries('admin',[{key:'TWILIO_API_KEY_SID',value:entries[0].value}])).toThrow(/invalid_twilio_api_key_sid/);
+  });
   it('verifies numeric secret bindings on the serving revision and preserves unrelated settings', async () => {
     const h = harness();
     const result = await saveGoogleRuntimeConfiguration(

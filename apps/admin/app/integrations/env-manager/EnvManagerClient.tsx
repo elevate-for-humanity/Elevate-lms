@@ -144,7 +144,11 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     ],
   },
   {
-    label: 'Telnyx phone and messaging',
+    label: 'Twilio phone and messaging',
+    keys: ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_API_KEY_SID', 'TWILIO_API_KEY_SECRET'],
+  },
+  {
+    label: 'Legacy Telnyx — migration history',
     keys: [
       'TELNYX_API_KEY',
       'TELNYX_PUBLIC_KEY',

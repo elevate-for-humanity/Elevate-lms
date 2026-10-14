@@ -27,6 +27,60 @@ export type PublicRouteDefinition = {
 const changed = '2026-08-29T00:00:00-04:00';
 
 export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
+  {
+    path: '/tax',
+    label: 'Supersonic Fast Cash Tax Preparation',
+    category: 'Main',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+    lastModified: '2026-10-14T08:00:00-04:00',
+    index: true,
+  },
+  {
+    path: '/tax-software/professional',
+    label: 'Start Your Own Tax Business Classes',
+    category: 'Main',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+    lastModified: '2026-10-14T08:00:00-04:00',
+    index: true,
+  },
+  {
+    path: '/tax-software/careers',
+    label: 'Supersonic Tax Careers',
+    category: 'Main',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+    lastModified: '2026-10-14T08:00:00-04:00',
+    index: true,
+  },
+  {
+    path: '/tax-software/pricing',
+    label: 'Tax Preparation Pricing',
+    category: 'Main',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+    lastModified: '2026-10-14T08:00:00-04:00',
+    index: true,
+  },
+  {
+    path: '/tax-software/bank-products',
+    label: 'Tax Payment and Refund Options',
+    category: 'Main',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+    lastModified: '2026-10-14T08:00:00-04:00',
+    index: true,
+  },
+  {
+    path: '/tax-software/contact',
+    label: 'Contact Supersonic',
+    category: 'Main',
+    changeFrequency: 'weekly',
+    priority: 0.8,
+    lastModified: '2026-10-14T08:00:00-04:00',
+    index: true,
+  },
   { path: ROUTES.home, label: 'Home', category: 'Main', changeFrequency: 'weekly', priority: 1, lastModified: changed, index: true },
   { path: ROUTES.programs, label: 'All Programs', category: 'Programs', changeFrequency: 'weekly', priority: 0.95, lastModified: changed, index: true },
   { path: ROUTES.apply, label: 'Apply', category: 'Main', changeFrequency: 'monthly', priority: 0.95, lastModified: changed, index: true },
@@ -111,6 +165,9 @@ export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
 ] as const;
 
 export const PRIVATE_ROUTE_PREFIXES = [
+  '/tax-software/office',
+  '/tax-software/self-file',
+  '/tax-software/login',
   '/api/',
   '/admin',
   '/dashboard',

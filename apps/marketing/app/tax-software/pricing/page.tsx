@@ -26,6 +26,52 @@ export default function Pricing() {
             Start my return →
           </Link>
         </section>
+        <section className="px-5 pt-10 sm:px-10" aria-labelledby="service-options">
+          <h2 id="service-options" className="text-3xl font-bold">
+            Choose how much help you want.
+          </h2>
+          <div className="mt-6 grid gap-4 xl:grid-cols-3">
+            {[
+              {
+                title: 'Do it yourself',
+                price: 'Free to start',
+                body: 'Use the guided workspace, confirm your documents and review your estimate. Additional preparation charges are listed below.',
+                cta: 'Open my workspace',
+                href: '/tax-software/self-file',
+              },
+              {
+                title: 'Prepare with a review',
+                price: 'Quote before work begins',
+                body: 'Organize your information, then ask our team to review the return scope, missing documents and preparation needs.',
+                cta: 'Request a review',
+                href: '/tax-software/contact',
+              },
+              {
+                title: 'Let us prepare it',
+                price: 'Quote before work begins',
+                body: 'Work with a preparer on personal, self-employed or business tax needs. Review the included services and full price before committing.',
+                cta: 'Talk to a preparer',
+                href: '/tax-software/contact',
+              },
+            ].map((option) => (
+              <article
+                key={option.title}
+                className="flex flex-col rounded-2xl border border-blue-200 border-t-4 border-t-[#c8102e] bg-white p-6 shadow-sm"
+              >
+                <h3 className="text-2xl font-bold">{option.title}</h3>
+                <p className="mt-4 font-black text-[#073ca2]">{option.price}</p>
+                <p className="mb-6 mt-4 text-sm leading-7 text-slate-600">{option.body}</p>
+                <Link href={option.href} className={taxButton + ' mt-auto bg-[#073ca2] text-white'}>
+                  {option.cta} →
+                </Link>
+              </article>
+            ))}
+          </div>
+          <p className="mt-4 text-sm leading-6 text-slate-600">
+            Starting a workspace does not submit a return. Electronic filing and bank-product
+            availability require separate provider setup and authorization.
+          </p>
+        </section>
         <section className="px-5 py-10 sm:px-10">
           <h2 className="text-3xl font-bold">Additional preparation charges</h2>
           <p className="mt-4 text-sm leading-6 text-slate-600">

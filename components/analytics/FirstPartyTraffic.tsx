@@ -18,9 +18,12 @@ export function FirstPartyTraffic() {
   const pathname = usePathname();
 
   useEffect(() => {
+    if (/^\/tax-software\/(office|self-file|login|careers)(\/|$)/.test(pathname || '')) return;
     const search = new URLSearchParams(window.location.search);
-    const landing = window.sessionStorage.getItem(LANDING_KEY) || `${pathname}${window.location.search}`;
-    if (!window.sessionStorage.getItem(LANDING_KEY)) window.sessionStorage.setItem(LANDING_KEY, landing);
+    const landing =
+      window.sessionStorage.getItem(LANDING_KEY) || `${pathname}${window.location.search}`;
+    if (!window.sessionStorage.getItem(LANDING_KEY))
+      window.sessionStorage.setItem(LANDING_KEY, landing);
 
     const payload = JSON.stringify({
       path: pathname,

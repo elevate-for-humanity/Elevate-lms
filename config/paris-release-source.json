@@ -10,7 +10,9 @@
     {
       "source": "app/tax-software/_components/TaxSiteShell.tsx",
       "target": "apps/marketing/app/tax-software/_components/TaxSiteShell.tsx",
-      "sha256": "209cc698b65b0207eb05cee1208091e758ee26f4f70a24c02cef6bb30762451b"
+      "sha256": "b9225abbe4f0e418d95c92865cfb778e98967fc3e5fd644730a808443b67e968",
+      "sourceSha256": "209cc698b65b0207eb05cee1208091e758ee26f4f70a24c02cef6bb30762451b",
+      "localRevisionReason": "Authorized Supersonic recruiting, staff training, local search and payment package presentation"
     },
     {
       "source": "app/tax-software/about/page.tsx",
@@ -20,7 +22,9 @@
     {
       "source": "app/tax-software/bank-products/page.tsx",
       "target": "apps/marketing/app/tax-software/bank-products/page.tsx",
-      "sha256": "8cb4a19353836e13a8fe17c0e8e23814fa7ea3f15ed1a0a32e86f1efa17b2d68"
+      "sha256": "bb79f7f2ead113d6f3436358905d93806e0e62dac768310215ca2e7fdb3e2359",
+      "sourceSha256": "8cb4a19353836e13a8fe17c0e8e23814fa7ea3f15ed1a0a32e86f1efa17b2d68",
+      "localRevisionReason": "Authorized Supersonic recruiting, staff training, local search and payment package presentation"
     },
     {
       "source": "app/tax-software/contact/page.tsx",
@@ -52,19 +56,23 @@
     {
       "source": "app/tax-software/page.tsx",
       "target": "apps/marketing/app/tax-software/page.tsx",
-      "sha256": "0980624e245b9e686d1a12a0e3e8f9552625c157e8b110de801f55e5a88b096d",
-      "sourceSha256": "f3bd148ab41437d72f1d10003e04d6c3f93d6375dfd12fee449186bf85138a7f"
+      "sha256": "053cdfe99637fb28a813c3a4216d27bd751d6a85e64ff06de9dad9eb746d2ad5",
+      "sourceSha256": "f3bd148ab41437d72f1d10003e04d6c3f93d6375dfd12fee449186bf85138a7f",
+      "localRevisionReason": "Authorized Supersonic recruiting, staff training, local search and payment package presentation"
     },
     {
       "source": "app/tax-software/pricing/page.tsx",
       "target": "apps/marketing/app/tax-software/pricing/page.tsx",
-      "sha256": "1f9631ccd4b5e39ded65942f769608a1a2922c10341b484d20749127464e52a0"
+      "sha256": "07e6c03f6b6a75d9db43ecb9bfd2cc8746da16b3b84cbe9aebc9d04dd9e79ec1",
+      "sourceSha256": "1f9631ccd4b5e39ded65942f769608a1a2922c10341b484d20749127464e52a0",
+      "localRevisionReason": "Authorized Supersonic recruiting, staff training, local search and payment package presentation"
     },
     {
       "source": "app/tax-software/professional/page.tsx",
       "target": "apps/marketing/app/tax-software/professional/page.tsx",
-      "sha256": "5a832eab9fab26d302be68b4fe6d375d141ff9dc80774457c2254054696ad23b",
-      "sourceSha256": "882dca6f8f981f5d77a9b0d5636181526abeff05eb0adeb009991d0fb158c9d5"
+      "sha256": "aaa2804bef66114b150e711188b982675d0e90d4c9657936790401ac6e7889ae",
+      "sourceSha256": "882dca6f8f981f5d77a9b0d5636181526abeff05eb0adeb009991d0fb158c9d5",
+      "localRevisionReason": "Authorized Supersonic recruiting, staff training, local search and payment package presentation"
     },
     {
       "source": "app/tax-software/self-file/layout.tsx",

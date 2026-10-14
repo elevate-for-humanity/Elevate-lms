@@ -7,6 +7,9 @@ export const taxNav = [
   ['Enroll to start your tax business', '/tax-software/professional#enroll'],
   ['Free preparation options', '/tax-software/contact#free-preparation'],
   ['Pricing', '/tax-software/pricing'],
+  ["We're hiring", '/tax-software/careers'],
+  ['Office reports & staff training', '/tax-software/office'],
+  ['Refund and bank options', '/tax-software/bank-products'],
   ['Sign in', '/tax-software/login'],
 ];
 export const taxButton =
@@ -73,7 +76,7 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-wrap justify-between gap-5">
             <div>
-              <p className="font-black text-[#073ca2]">Supersonic Fast Cash LLC</p>
+              <p className="font-black text-[#073ca2]">HOTT KAMODITTY DBA Supersonic Fast Cash</p>
               <p className="mt-2 text-sm text-slate-600">
                 Your taxes. Your next business opportunity.
               </p>

@@ -1,9 +1,10 @@
+import { supersonicBusiness } from '@/lib/tax-software/search-metadata';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { TaxSiteShell, taxButton } from './_components/TaxSiteShell';
 export const metadata: Metadata = {
-  title: { absolute: 'Supersonic Fast Cash | Tax Preparation & Start Your Tax Business' },
+  title: { absolute: 'Indianapolis Tax Preparation & Tax Business Classes | Supersonic Fast Cash' },
   description:
     'Prepare your own taxes, hire a tax professional, or enroll to start your own tax business with Supersonic Fast Cash.',
   alternates: { canonical: '/tax' },
@@ -45,6 +46,12 @@ export default function TaxSoftwarePage() {
   return (
     <TaxSiteShell>
       <main>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(supersonicBusiness).replace(/</g, '\\u003c'),
+          }}
+        />
         <section className="bg-[#082b66] px-5 py-9 text-white sm:p-10">
           <div className="grid items-center gap-7 xl:grid-cols-2">
             <div>
@@ -76,7 +83,14 @@ export default function TaxSoftwarePage() {
           </div>
         </section>
         <section id="options" className="scroll-mt-6 px-5 py-10 sm:px-10">
-          <h2 className="text-3xl font-bold">How can we help you?</h2>
+          <h2 className="text-3xl font-bold">
+            Tax preparation in Indianapolis. A next step that fits you.
+          </h2>
+          <p className="mt-4 leading-7 text-slate-700">
+            Get help with personal and self-employed tax preparation, explore tax business classes,
+            or apply to work with our team. Supersonic Fast Cash serves clients from Indianapolis
+            and offers remote service conversations.
+          </p>
           <div className="mt-6 grid gap-4 xl:grid-cols-3">
             {choices.map((c) => (
               <article
@@ -104,6 +118,24 @@ export default function TaxSoftwarePage() {
               className="font-bold text-[#073ca2] underline"
             >
               Check free preparation options →
+            </Link>
+          </div>
+        </section>
+        <section className="border-y border-blue-100 bg-[#e7efff] px-5 py-8 sm:px-10">
+          <h2 className="text-2xl font-bold">Start a tax business. Join a tax team.</h2>
+          <p className="mt-3 leading-7">
+            Ask about classes and WorkOne funding eligibility, or apply for office-based and remote
+            tax opportunities.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-4">
+            <Link
+              href="/tax-software/professional"
+              className={taxButton + ' bg-[#c8102e] text-white'}
+            >
+              Start classes — ask about WorkOne →
+            </Link>
+            <Link href="/tax-software/careers" className={taxButton + ' bg-[#073ca2] text-white'}>
+              We're hiring →
             </Link>
           </div>
         </section>

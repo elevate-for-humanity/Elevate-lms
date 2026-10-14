@@ -26,7 +26,7 @@ export const layout = {
 } as const;
 
 export const hero = {
-  imageWrap: 'relative h-[72svh] min-h-[520px] max-h-[860px] w-full overflow-hidden',
+  imageWrap: 'relative aspect-video w-full overflow-hidden',
   contentPanel: 'bg-white border-b border-slate-100',
 } as const;
 
@@ -39,7 +39,7 @@ export const card = {
   info: 'bg-white rounded-2xl border border-slate-200 p-6',
   stat: 'bg-slate-800 rounded-2xl p-6 text-center',
   programImage: 'relative aspect-[4/3] shrink-0 overflow-hidden bg-slate-800',
-  programImageFill: 'object-cover object-center contrast-105 saturate-110 w-full h-full',
+  programImageFill: 'object-contain object-center contrast-105 saturate-110 w-full h-full',
 } as const;
 
 export const btn = {

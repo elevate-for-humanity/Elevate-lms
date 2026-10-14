@@ -229,7 +229,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
           alt={config.heroImage.alt}
           fill
           sizes="100vw"
-          className="object-cover"
+          className="object-contain"
           priority placeholder="empty"
         />
       </section>
@@ -312,7 +312,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
             alt={config.sectionImages.overview.alt}
             fill
             sizes="100vw"
-            className="object-cover" placeholder="empty"
+            className="object-contain" placeholder="empty"
           />
         </section>
       )}
@@ -437,7 +437,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
             alt={config.sectionImages.curriculum.alt}
             fill
             sizes="100vw"
-            className="object-cover" placeholder="empty"
+            className="object-contain" placeholder="empty"
           />
         </section>
       )}
@@ -485,7 +485,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
             alt={config.sectionImages.career.alt}
             fill
             sizes="100vw"
-            className="object-cover" placeholder="empty"
+            className="object-contain" placeholder="empty"
           />
         </section>
       )}

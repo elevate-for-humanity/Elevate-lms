@@ -46,8 +46,8 @@ export default function NotificationSettings() {
     const manager = NotificationManager.getInstance();
     await manager.sendNotification('Test Notification', {
       body: 'This is a test notification from Elevate LMS',
-      icon: '/images/icon-192.png',
-      badge: '/images/icon-72.png',
+      icon: '/icon-192.png',
+      badge: '/icon-72.png',
     });
     setTestSent(true);
     setTimeout(() => setTestSent(false), 3000);

@@ -29,7 +29,7 @@ export default function HealthcareTrainingPage() {
             className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
           >
             <Image
-              src="/images/healthcare/program-cna-training.jpg"
+              src="/images/pages/cna-patient-care.jpg"
               alt="Healthcare skills training"
               width={600}
               height={300}

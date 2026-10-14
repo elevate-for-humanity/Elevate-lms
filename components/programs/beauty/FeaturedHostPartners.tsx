@@ -77,7 +77,7 @@ export default async function FeaturedHostPartners({
               src={image}
               alt={getProgramImageAlt(programSlug ?? 'cosmetology-apprenticeship')}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
           </div>

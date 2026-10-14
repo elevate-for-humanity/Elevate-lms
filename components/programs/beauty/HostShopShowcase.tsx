@@ -319,7 +319,7 @@ export default function HostShopShowcase({
                       alt=""
                       fill
                       sizes="(max-width: 1024px) 100vw, 58vw"
-                      className="object-cover opacity-90"
+                      className="object-contain opacity-90"
                       aria-hidden="true"
                     />
                   ) : null}

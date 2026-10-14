@@ -14,7 +14,7 @@ export default function Highlights() {
                 src="/images/pages/comp-home-highlight-biz.webp"
                 alt="Students in training"
                 fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                className="object-contain  transition-transform duration-300"
                 sizes="100vw"
               />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
@@ -38,7 +38,7 @@ export default function Highlights() {
                 src="/images/pages/comp-home-highlight-health.webp"
                 alt="Training programs"
                 fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                className="object-contain  transition-transform duration-300"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
@@ -62,7 +62,7 @@ export default function Highlights() {
                 src="/images/pages/comp-home-highlight-success.webp"
                 alt="Career success"
                 fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                className="object-contain  transition-transform duration-300"
                 sizes="100vw"
               />
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">

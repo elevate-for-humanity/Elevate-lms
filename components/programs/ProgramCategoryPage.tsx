@@ -97,7 +97,7 @@ export default function ProgramCategoryPage({
           enableProgressTracking={false}
           enableResume={false}
           aspectRatio="auto"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-contain"
         />
       </section>
 
@@ -187,7 +187,7 @@ export default function ProgramCategoryPage({
                     src={program.image}
                     alt={program.title}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="object-contain  transition-transform duration-500"
                     quality={85}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
                   />

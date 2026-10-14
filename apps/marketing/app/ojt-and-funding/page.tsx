@@ -43,12 +43,12 @@ const APPRENTICESHIP = [
   {
     title: 'Employer Sponsors',
     desc: 'Your business becomes the training site. We provide the curriculum, credentials, and oversight.',
-    img: '/images/pages/apprenticeships-page-2.jpg',
+    img: '/images/pages/barber-hands-on-bright.webp',
   },
   {
     title: 'Earn While You Learn',
     desc: 'Apprentices earn wages from day one while working toward a nationally recognized credential.',
-    img: '/images/pages/apprenticeship-structure.jpg',
+    img: '/images/pages/apprenticeship-structure.webp',
   },
 ];
 

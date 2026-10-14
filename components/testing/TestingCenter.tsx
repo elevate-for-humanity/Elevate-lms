@@ -1,6 +1,6 @@
 /**
  * PremiumTestingCenter
- * 
+ *
  * Complete premium testing center experience with:
  * - Cinematic hero video
  * - Provider cards with logos
@@ -72,8 +72,8 @@ const PROVIDERS = [
       { name: 'IT Specialist', career: 'IT Support', salary: '$40,000-$60,000/yr' },
     ],
     accent: 'from-red-600 to-orange-600',
-    examFee: CERTIPORT_FEES?.[0]?.amount && CERTIPORT_FEES?.[2]?.amount 
-      ? `$${CERTIPORT_FEES[0].amount} - $${CERTIPORT_FEES[2].amount}` 
+    examFee: CERTIPORT_FEES?.[0]?.amount && CERTIPORT_FEES?.[2]?.amount
+      ? `$${CERTIPORT_FEES[0].amount} - $${CERTIPORT_FEES[2].amount}`
       : '$80 - $200', // Dynamic pricing fallback
     color: 'red',
   },
@@ -90,8 +90,8 @@ const PROVIDERS = [
       { name: 'Platinum Certificate', career: 'Highly Skilled', salary: '+35-40% Earnings' },
     ],
     accent: 'from-emerald-600 to-teal-600',
-    examFee: WORKKEYS_PRICING?.individual?.price && WORKKEYS_PRICING?.ncrc?.price 
-      ? `$${WORKKEYS_PRICING.individual.price} - $${WORKKEYS_PRICING.ncrc.price}` 
+    examFee: WORKKEYS_PRICING?.individual?.price && WORKKEYS_PRICING?.ncrc?.price
+      ? `$${WORKKEYS_PRICING.individual.price} - $${WORKKEYS_PRICING.ncrc.price}`
       : '$55 - $100',
     color: 'green',
   },
@@ -125,7 +125,7 @@ const PROVIDERS = [
     ],
     accent: 'from-purple-600 to-pink-600',
     examFee: NRF_RISEUP_PRICING?.retailFundamentals?.price && NRF_RISEUP_PRICING?.customerServiceSales?.price
-      ? `$${NRF_RISEUP_PRICING.retailFundamentals.price} - $${NRF_RISEUP_PRICING.customerServiceSales.price}` 
+      ? `$${NRF_RISEUP_PRICING.retailFundamentals.price} - $${NRF_RISEUP_PRICING.customerServiceSales.price}`
       : '$45 - $90',
     color: 'purple',
   },
@@ -149,7 +149,7 @@ const PROVIDERS = [
     id: 'ase',
     name: 'ASE',
     fullName: 'ASE Certification (NISE)',
-    logo: '/images/partners/ase-logo.png',
+    logo: '/images/partners/ase-label.svg',
     heroImage: '/images/pages/hvac-technician.webp',
     certifications: [
       { name: 'A1 - Engine Repair', career: 'Auto Technician', salary: '$35,000-$55,000/yr' },
@@ -166,38 +166,38 @@ const PROVIDERS = [
 
 // Career paths for exam finder
 const CAREER_PATHS = [
-  { 
-    name: 'Healthcare', 
+  {
+    name: 'Healthcare',
     icon: '🏥',
     careers: ['Medical Assistant', 'Phlebotomist', 'EKG Tech', 'Pharmacy Tech', 'Nursing'],
     providers: ['nha'],
   },
-  { 
-    name: 'Skilled Trades', 
+  {
+    name: 'Skilled Trades',
     icon: '🔧',
     careers: ['HVAC', 'Electrician', 'Plumber', 'Welder', 'Construction', 'Automotive'],
     providers: ['esco', 'ase'],
   },
-  { 
-    name: 'Business & Technology', 
+  {
+    name: 'Business & Technology',
     icon: '💼',
     careers: ['Office Admin', 'Bookkeeping', 'IT Support', 'Graphic Design'],
     providers: ['certiport'],
   },
-  { 
-    name: 'Retail & Customer Service', 
+  {
+    name: 'Retail & Customer Service',
     icon: '🛒',
     careers: ['Sales Associate', 'Customer Service', 'Retail Management'],
     providers: ['nrf'],
   },
-  { 
-    name: 'Career Readiness', 
+  {
+    name: 'Career Readiness',
     icon: '📋',
     careers: ['Any Industry', 'Job Applications', 'Career Advancement'],
     providers: ['workkeys'],
   },
-  { 
-    name: 'Safety & Compliance', 
+  {
+    name: 'Safety & Compliance',
     icon: '⚠️',
     careers: ['Warehouse', 'Manufacturing', 'Construction', 'OSHA'],
     providers: ['careersafe'],
@@ -223,10 +223,10 @@ const ICONS = {
 function ExamFinder() {
   const [step, setStep] = useState<'career' | 'result'>('career');
   const [selectedCareer, setSelectedCareer] = useState<string | null>(null);
-  
+
   const findProviders = (career: string) => {
-    const path = CAREER_PATHS.find(p => 
-      p.name.toLowerCase() === career.toLowerCase() || 
+    const path = CAREER_PATHS.find(p =>
+      p.name.toLowerCase() === career.toLowerCase() ||
       p.careers.some(c => c.toLowerCase().includes(career.toLowerCase()))
     );
     return path ? PROVIDERS.filter(p => path.providers.includes(p.id)) : [];
@@ -241,7 +241,7 @@ function ExamFinder() {
     <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200">
       <h3 className="text-2xl font-bold text-slate-900 mb-2">Find Your Exam</h3>
       <p className="text-slate-600 mb-6">Answer a few questions to find the right certification</p>
-      
+
       {step === 'career' ? (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {CAREER_PATHS.map((path) => (
@@ -263,11 +263,11 @@ function ExamFinder() {
           >
             ← Back to career selection
           </button>
-          
+
           <p className="text-lg font-semibold text-slate-900 mb-4">
             Recommended certifications for: {selectedCareer}
           </p>
-          
+
           <div className="space-y-4">
             {PROVIDERS.filter(p => {
               const path = CAREER_PATHS.find(cp => cp.name === selectedCareer);
@@ -291,7 +291,7 @@ function ExamFinder() {
                 </Link>
               </div>
             ))}
-            
+
             {selectedCareer && findProviders(selectedCareer).length === 0 && (
               <div className="text-center p-6">
                 <p className="text-slate-600 mb-4">
@@ -327,7 +327,7 @@ function TestingProcess() {
   return (
     <div className="relative">
       <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-1 bg-slate-200 -translate-x-1/2" />
-      
+
       <div className="space-y-8">
         {steps.map((step, i) => (
           <motion.div
@@ -387,7 +387,7 @@ function WhatToExpect() {
           ))}
         </div>
       </div>
-      
+
       <div className="bg-red-50 rounded-2xl p-6 border border-red-200">
         <h3 className="text-xl font-bold text-red-800 mb-4">✗ Do Not Bring</h3>
         <div className="space-y-3">
@@ -493,11 +493,11 @@ function ProviderCard({ provider }: { provider: typeof PROVIDERS[0] }) {
           </div>
         </div>
       </div>
-      
+
       <div className="p-6">
         <h3 className="text-xl font-bold text-slate-900 mb-1">{provider.fullName}</h3>
         <p className="text-sm text-slate-600 mb-4">Exam fee: {provider.examFee}</p>
-        
+
         <div className="space-y-2 mb-6">
           {provider.certifications.slice(0, 2).map((cert, i) => (
             <div key={i} className="flex items-center gap-2 text-sm">
@@ -511,7 +511,7 @@ function ProviderCard({ provider }: { provider: typeof PROVIDERS[0] }) {
             </p>
           )}
         </div>
-        
+
         <div className="flex gap-2">
           <Link
             href={`/testing/${provider.id}#build-package`}
@@ -546,10 +546,10 @@ function EmployerTesting() {
               Employer Testing Partnerships
             </h2>
             <p className="text-xl text-white/80 mb-6">
-              We partner with employers to provide workforce testing, pre-employment assessments, 
+              We partner with employers to provide workforce testing, pre-employment assessments,
               and ongoing certification support.
             </p>
-            
+
             <div className="space-y-4 mb-8">
               {[
                 'Corporate testing programs',
@@ -565,7 +565,7 @@ function EmployerTesting() {
                 </div>
               ))}
             </div>
-            
+
             <Link
               href="/testing/for-employers"
               className="inline-flex items-center px-8 py-4 bg-brand-gold-500 hover:bg-brand-gold-600 text-slate-900 font-bold rounded-lg text-lg transition-colors"
@@ -573,7 +573,7 @@ function EmployerTesting() {
               Become a Testing Partner
             </Link>
           </motion.div>
-          
+
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -657,7 +657,7 @@ function SchoolPartnerships() {
             Partner with us to provide testing access for your students, clients, and workforce programs
           </p>
         </motion.div>
-        
+
         <div className="grid md:grid-cols-5 gap-4 mb-8">
           {['High Schools', 'Colleges', 'Workforce Boards', 'Adult Education', 'Career Centers'].map((partner, i) => (
             <motion.div
@@ -672,7 +672,7 @@ function SchoolPartnerships() {
             </motion.div>
           ))}
         </div>
-        
+
         <div className="text-center">
           <Link
             href="/testing/for-employers"
@@ -692,7 +692,7 @@ export function PremiumTestingCenter() {
 
   return (
     <main className="bg-white">
-      
+
       {/* ===== CINEMATIC HERO ===== */}
       <section className="relative h-[clamp(260px,42svh,480px)] flex items-center overflow-hidden bg-slate-900">
         <div className="absolute inset-0">
@@ -719,7 +719,7 @@ export function PremiumTestingCenter() {
           </video>
           <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/90 via-brand-blue-900/70 to-brand-blue-900/50" />
         </div>
-        
+
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-12 sm:py-16">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -730,16 +730,16 @@ export function PremiumTestingCenter() {
             <span className="inline-block px-4 py-1 bg-brand-gold-500 text-slate-900 text-sm font-bold rounded-full mb-6">
               Authorized Testing Center
             </span>
-            
+
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
               Indiana's Workforce<br />Credential Testing Center
             </h1>
-            
+
             <p className="text-xl text-white/90 mb-8 leading-relaxed">
-              Earn nationally recognized certifications through secure, professionally proctored testing. 
+              Earn nationally recognized certifications through secure, professionally proctored testing.
               NHA, ACT WorkKeys, Certiport, EPA 608, and more.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/testing/book"
@@ -762,7 +762,7 @@ export function PremiumTestingCenter() {
             </div>
           </motion.div>
         </div>
-        
+
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ repeat: Infinity, duration: 2 }}
@@ -798,7 +798,7 @@ export function PremiumTestingCenter() {
             </h2>
             <p className="text-lg text-slate-600">Not sure which exam you need? Let us help.</p>
           </motion.div>
-          
+
           <ExamFinder />
         </div>
       </section>
@@ -819,7 +819,7 @@ export function PremiumTestingCenter() {
               Authorized testing center for industry-leading certification providers
             </p>
           </motion.div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {PROVIDERS.map((provider) => (
               <ProviderCard key={provider.id} provider={provider} />
@@ -844,7 +844,7 @@ export function PremiumTestingCenter() {
               From booking to receiving your credential
             </p>
           </motion.div>
-          
+
           <TestingProcess />
         </div>
       </section>
@@ -862,7 +862,7 @@ export function PremiumTestingCenter() {
               What to Expect on Test Day
             </h2>
           </motion.div>
-          
+
           <WhatToExpect />
         </div>
       </section>
@@ -883,9 +883,9 @@ export function PremiumTestingCenter() {
               We offer multiple preparation resources to help you pass on the first try
             </p>
           </motion.div>
-          
+
           <ExamPreparation />
-          
+
           <div className="text-center mt-8">
             <Link
               href="/programs"
@@ -913,7 +913,7 @@ export function PremiumTestingCenter() {
               Choose your exam and customize with add-ons. See real-time pricing with bundle savings and funding options.
             </p>
           </motion.div>
-          
+
           <PackageBuilderDemo />
         </div>
       </section>
@@ -937,7 +937,7 @@ export function PremiumTestingCenter() {
               Frequently Asked Questions
             </h2>
           </motion.div>
-          
+
           <div className="space-y-4">
             {[
               { q: 'How do I schedule an exam?', a: 'You can book your exam online through our scheduling system, by calling our testing center, or through our AI assistant. We offer multiple dates and times to fit your schedule. All exams are by appointment only.' },
@@ -971,12 +971,12 @@ export function PremiumTestingCenter() {
             <h2 className="text-3xl md:text-4xl font-black mb-6">
               Ready to Earn Your Credential?
             </h2>
-            
+
             <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
-              Whether you're advancing your career, preparing for a new job, or meeting employer requirements, 
+              Whether you're advancing your career, preparing for a new job, or meeting employer requirements,
               we're here to support you from registration through certification.
             </p>
-            
+
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/testing/book"

@@ -204,7 +204,7 @@ export default function ProgramPageLayout({
                 alt={c.heroImageAlt || c.title}
                 fill
                 sizes="100vw"
-                className="object-cover"
+                className="object-contain"
                 priority placeholder="empty"
               />
             </div>
@@ -342,7 +342,7 @@ export default function ProgramPageLayout({
                     alt={c.overviewImageAlt}
                     fill
                     sizes="(max-width: 1024px) 100vw, 40vw"
-                    className="object-cover" placeholder="empty"
+                    className="object-contain" placeholder="empty"
                   />
                 </div>
                 {/* Salary callout */}

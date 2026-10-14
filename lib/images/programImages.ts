@@ -74,7 +74,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Data analytics learner reviewing charts and business metrics',
   },
   'dental-assistant': {
-    card: '/images/healthcare/video-thumbnail-dental-assistant.jpg',
+    card: '/images/pages/healthcare-sector.webp',
     hero: `${P}/programs-medical-apply-hero.webp`,
     alt: 'Dental assistant learner preparing for supervised chairside care',
   },
@@ -84,7 +84,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Drug and alcohol specimen collector following a documented collection process',
   },
   'nha-ekg-technician': {
-    card: '/images/healthcare/healthcare-professional-portrait-1.jpg',
+    card: '/images/pages/medical-assistant-real.webp',
     hero: '/hero-images/healthcare-category.webp',
     alt: 'EKG technician learner preparing equipment for a cardiac test',
   },
@@ -214,7 +214,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Qualified Medication Aide supporting supervised patient medication care',
   },
   'home-health-aide': {
-    card: '/images/healthcare/program-healthcare-overview.jpg',
+    card: '/images/pages/healthcare-classroom.webp',
     hero: `${P}/adult-learner.webp`,
     alt: 'Home Health Aide learner preparing for in-home patient care',
   },
@@ -329,7 +329,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Finance and accounting student reviewing financial statements',
   },
   entrepreneurship: {
-    card: '/images/business/team-2.jpg',
+    card: '/images/business/collaboration-1.webp',
     hero: '/images/hero/hero-business.webp',
     alt: 'Entrepreneur working on a business plan',
   },
@@ -394,7 +394,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Introduction to the Job Ready Indy career-readiness pathway',
   },
   'nha-medical-assistant': {
-    card: '/images/healthcare/program-medical-assistant.jpg',
+    card: '/images/pages/medical-assistant-real.webp',
     hero: '/images/healthcare/hero-program-medical-assistant.webp',
     alt: 'NHA medical assistant learner preparing for clinical work',
   },

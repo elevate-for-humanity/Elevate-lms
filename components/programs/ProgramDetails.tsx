@@ -307,7 +307,7 @@ export function ProgramDetails({ program }: { program: Program }) {
             <UltraVideoPlayer
               src="/videos/hero-home.mp4"
               poster="/images/pages/training-cohort.webp"
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-contain"
             />
           </div>
         </div>

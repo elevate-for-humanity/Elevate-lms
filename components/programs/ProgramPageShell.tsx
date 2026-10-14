@@ -94,7 +94,7 @@ export function ProgramPageShell({
                     alt={title}
                     fill
                     sizes="100vw"
-                    className="object-cover"
+                    className="object-contain"
                     priority placeholder="empty"
                   />
                 </div>

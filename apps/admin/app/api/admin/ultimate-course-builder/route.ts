@@ -42,18 +42,22 @@ export async function GET(req: NextRequest) {
   const courseId = req.nextUrl.searchParams.get('courseId')?.trim();
 
   if (buildId) {
-    const { data, error } = await db
-      .from('ultimate_course_builds')
-      .select(req.nextUrl.searchParams.get('view') === 'checkpoints'
-        ? 'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,artifacts,ultimate_lesson_steps(step,state,findings,completed_at))'
-        : '*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
-      .eq('id', buildId)
-      .single();
+    const checkpoints = req.nextUrl.searchParams.get('view') === 'checkpoints';
+    // Keep each selection literal so the Supabase parser infers its actual shape.
+    const result = checkpoints
+      ? await db.from('ultimate_course_builds')
+          .select('id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,artifacts,ultimate_lesson_steps(step,state,findings,completed_at))')
+          .eq('id', buildId).single()
+      : await db.from('ultimate_course_builds')
+          .select('*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
+          .eq('id', buildId).single();
+    const { data, error } = result;
     if (!error && data && req.nextUrl.searchParams.get('view') === 'checkpoints') {
-      data.ultimate_lesson_builds = (data.ultimate_lesson_builds ?? []).map((lesson: any) => {
+      const lessons = (data.ultimate_lesson_builds ?? []).map((lesson: any) => {
         const { artifacts, ...saved } = lesson;
         return { ...saved, preview: lessonPreview(artifacts) };
       });
+      return NextResponse.json({build: {...data, ultimate_lesson_builds: lessons}});
     }
     return error ? databaseFailure(error) : NextResponse.json({ build: data });
   }

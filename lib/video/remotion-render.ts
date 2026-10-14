@@ -1102,7 +1102,7 @@ export async function renderStoryboardVideo(
     }
     logger.info('[RemotionRender] uploading storyboard captions and transcript', {lessonId: input.lessonId});
     const captionUrl = await uploadCourseVideosObject(
-      Buffer.from(buildStoryboardWebVtt(scenes, input.lessonPresentation === 'approved-premium-v1' ? 0 : 3), 'utf8'),
+      Buffer.from(buildStoryboardWebVtt(scenes, (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS + (input.lessonPresentation === 'approved-premium-v1' ? 0 : 3)), 'utf8'),
       `generated-lessons/lesson-${input.lessonId}-${Date.now()}.vtt`,
       'text/vtt',
     );
@@ -1112,6 +1112,8 @@ export async function renderStoryboardVideo(
       'text/plain',
     );
     resolvedStoryboard.captionUrl = captionUrl;
+    (resolvedStoryboard as any).preRollDurationSeconds = (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS;
+    (resolvedStoryboard as any).scenes.forEach((scene: any, index: number) => { scene.captionCues = scenes[index].captionCues; });
     resolvedStoryboard.transcriptUrl = transcriptUrl;
     logger.info('[RemotionRender] uploading storyboard MP4', {lessonId: input.lessonId});
     const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4', {forceSupabase: checkpointFallbackUsed});

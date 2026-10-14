@@ -545,7 +545,7 @@ export async function enforceMediaQuality(input: {
     const sceneNarrationEvidence: NonNullable<MediaQualityEvidence['sceneNarrationEvidence']> = [];
     const premium=input.lessonPresentation==='approved-premium-v1';
     const approvedPresentationInspection: NonNullable<MediaQualityEvidence['approvedPresentationInspection']> = {pass:false,backgrounds:[],captions:[]};
-    let sceneStart = premium ? 0 : 3;
+    let sceneStart = Number((input.sceneData as any).preRollDurationSeconds ?? 0) + (premium ? 0 : 3);
     for (const [index, scene] of input.sceneData.scenes.entries()) {
       const time = sceneStart + Math.min(2, scene.durationSeconds / 2);
       if(premium) {

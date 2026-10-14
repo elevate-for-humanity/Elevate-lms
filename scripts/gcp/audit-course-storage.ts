@@ -56,7 +56,7 @@ async function main(){
     for(const object of objects.slice(0,200)){
       const key=object.Key!;
       const reference:any={keySha256:createHash('sha256').update(key).digest('hex'),bytes:object.Size??0};
-      const lessonToken=tokens.find(token=>new RegExp('^(?:course-videos/)?generated-lessons/lesson-'+token+'(?:-[a-z0-9]+)?\\.mp4$','i').test(key));
+      const lessonToken=tokens.find(token=>new RegExp('^(?:course-videos/)?generated-lessons/lesson-'+token+'(?:-[a-z0-9]+(?:-[a-f0-9-]{36})?)?\\.mp4$','i').test(key));
       if(lessonToken){
         reference.lessonToken=lessonToken;
         try{

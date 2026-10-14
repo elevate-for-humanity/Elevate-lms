@@ -7,6 +7,9 @@
  * migration/failover targets, not the architectural identity of this module.
  */
 
+import { createHash } from 'node:crypto';
+import { createReadStream } from 'node:fs';
+import { stat } from 'node:fs/promises';
 import { logger } from '../logger';
 import {
   DeleteObjectCommand,
@@ -196,6 +199,7 @@ export function getElevateMediaStorageClient(): S3Client {
     endpoint: config.endpoint,
     region: config.region,
     accessKeyId: config.accessKeyId,
+    credentialVersion: createHash('sha256').update(config.secretAccessKey).digest('hex'),
     forcePathStyle: config.forcePathStyle,
   });
 
@@ -314,13 +318,16 @@ export async function getSignedElevateMediaUrl(
 export async function listElevateMediaKeys(prefix?: string): Promise<string[]> {
   try {
     const config = getElevateMediaStorageConfig();
-    const response = await getElevateMediaStorageClient().send(
-      new ListObjectsV2Command({
-        Bucket: config.bucket,
-        Prefix: prefix,
-      }),
-    );
-    return response.Contents?.map((item) => item.Key).filter((key): key is string => Boolean(key)) ?? [];
+    const keys: string[] = [];
+    let continuation: string | undefined;
+    do {
+      const response = await getElevateMediaStorageClient().send(
+        new ListObjectsV2Command({Bucket: config.bucket, Prefix: prefix, ContinuationToken: continuation}),
+      );
+      keys.push(...(response.Contents?.map(item => item.Key).filter((key): key is string => Boolean(key)) ?? []));
+      continuation = response.NextContinuationToken;
+    } while (continuation);
+    return keys;
   } catch (error) {
     logger.error('Elevate Media Storage list error:', error);
     return [];
@@ -367,4 +374,20 @@ export function getContentType(filename: string): string {
     srt: 'application/x-subrip',
   };
   return types[ext || ''] || 'application/octet-stream';
+}
+
+/** Stream a completed film without allocating its full size in the JS heap. */
+export async function uploadFileToElevateMedia(filePath: string, key: string, contentType: string): Promise<ElevateMediaUploadResult> {
+  const body = createReadStream(filePath);
+  try {
+    const config = getElevateMediaStorageConfig();
+    const info = await stat(filePath);
+    await getElevateMediaStorageClient().send(new PutObjectCommand({
+      Bucket: config.bucket, Key: key, Body: body, ContentLength: info.size,
+      ContentType: contentType, CacheControl: 'public, max-age=31536000, immutable',
+    }));
+    return {success: true, key, url: getElevateMediaPublicUrl(key) ?? undefined};
+  } catch (error) {
+    return {success: false, error: error instanceof Error ? error.message : 'Upload failed'};
+  } finally { body.destroy(); }
 }

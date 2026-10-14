@@ -182,8 +182,8 @@ export default function ParisOSPage() {
         throw new Error(`${data.message || res.statusText || 'Execution failed'} (HTTP ${res.status}, correlation ${traceId})`);
       }
 
-      addMessage('ai', data.message);
-      if (data.actions?.length) {
+      addMessage('ai', data.executed === false ? `Advisory only — no platform action was performed. ${data.message}` : data.status === 'running' ? `Task started, not yet completed. ${data.message}` : data.message);
+      if (data.executed === true && data.status === 'completed' && data.actions?.length) {
         addMessage('narration', 'Actions completed:');
         for (const action of data.actions) addMessage('ai', `✓ ${action}`);
       }

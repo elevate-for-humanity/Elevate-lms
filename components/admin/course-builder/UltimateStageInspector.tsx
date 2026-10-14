@@ -13,9 +13,11 @@ function findingText(value: unknown): string {
   return '';
 }
 function SavedVideo({ lesson, diagnostic }: { lesson: Lesson; diagnostic: any }) {
+  diagnostic = diagnostic ?? lesson.preview;
   if (!diagnostic) return null;
   return diagnostic.videoUrl ? <div>
     <p className="mb-2 font-bold">Latest saved video · {diagnostic.mediaApproved ? 'Media QA passed' : 'Draft preview — media QA has not passed'}</p>
+    {diagnostic.previousRender && <p className="mb-2">Previous saved draft while the updated video is being produced.</p>}
     {diagnostic.historicalVersion && <p className="mb-2">Saved render version {diagnostic.historicalVersion}.</p>}
     <video controls preload="metadata" className="w-full rounded-lg bg-black" src={diagnostic.videoUrl} aria-label={`${lesson.title} video preview`} />
   </div> : <p>The video is still being produced. You can review the saved instruction below now.</p>;
@@ -25,6 +27,7 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
   const [selected, setSelected] = useState<UltimateBuildStep | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [selectedLesson, setSelectedLesson] = useState('');
+  const [followActive, setFollowActive] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
@@ -39,7 +42,9 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
     setSelected(null);
     setLessons([]);
     setSelectedLesson('');
+    setFollowActive(true);
     setError('');
+    setActionResults({});
   }, [buildId]);
 
   useEffect(() => {
@@ -48,18 +53,22 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
     setLoading(true);
     setError('');
     void fetch('/api/admin/ultimate-course-builder?view=checkpoints&buildId=' + encodeURIComponent(buildId), {
-      cache: 'no-store', signal: controller.signal,
+      cache: 'no-store', signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20000)]),
     }).then(async response => {
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || 'Unable to load saved lesson checkpoints');
       if (token !== requestToken.current) return;
       const competencies = payload.build?.profile?.competencies ?? [];
-      setLessons(competencies.map((c: any, index: number) => {
+      setLessons(previous => competencies.map((c: any, index: number) => {
         const lesson = (payload.build?.ultimate_lesson_builds ?? []).find((row: any) => row.competency_id === c.id);
-        return { ...(lesson ?? { id: c.id, status: 'planned' }), lesson_key: c.id, saved: Boolean(lesson), title: c.title ?? c.description ?? `Lesson ${index + 1}` };
+        const lastPreview = previous.find(row => row.lesson_key === c.id)?.preview;
+        const preview = lesson?.preview?.videoUrl || !lastPreview?.videoUrl ? lesson?.preview
+          : {...lesson?.preview, videoUrl:lastPreview.videoUrl, mediaApproved:false, previousRender:true};
+        return { ...(lesson ?? { id: c.id, status: 'planned' }), preview, lesson_key: c.id, saved: Boolean(lesson), title: c.title ?? c.description ?? `Lesson ${index + 1}` };
       }));
+      const activeLesson = (payload.build?.ultimate_lesson_builds ?? []).find((row:any) => row.status === 'running');
       const firstSaved = (payload.build?.ultimate_lesson_builds ?? [])[0];
-      setSelectedLesson(previous => previous || firstSaved?.competency_id || competencies[0]?.id || '');
+      setSelectedLesson(previous => (followActive && activeLesson?.competency_id) || previous || firstSaved?.competency_id || competencies[0]?.id || '');
     }).catch(reason => {
       if (!controller.signal.aborted && token === requestToken.current)
         setError(reason instanceof Error ? reason.message : 'Unable to load saved lesson checkpoints');
@@ -67,7 +76,12 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
       if (!controller.signal.aborted && token === requestToken.current) setLoading(false);
     });
     return () => controller.abort();
-  }, [buildId, selected, updatedAt, retry]);
+  }, [buildId, selected, updatedAt, retry, followActive]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setRetry(value => value + 1), 15000);
+    return () => window.clearInterval(timer);
+  }, [buildId]);
 
   async function checkHealth() {
     setChecking(true);
@@ -121,15 +135,16 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
       </div>
       <div className="col-start-2 row-start-2 row-span-6 rounded-xl border border-slate-600 bg-slate-950 p-4 text-white lg:sticky lg:top-4">
         <label htmlFor="lesson-preview-selection" className="block font-bold">Lesson previews</label>
-        <select id="lesson-preview-selection" value={selectedLesson} onChange={event => setSelectedLesson(event.target.value)}
+        <select id="lesson-preview-selection" value={selectedLesson} onChange={event => {setFollowActive(false);setSelectedLesson(event.target.value);}}
           className="mt-2 w-full rounded-lg border border-slate-400 bg-slate-900 p-3 text-white">
           <option value="">Choose a lesson to preview…</option>
           {lessons.map((lesson, index) => <option key={lesson.lesson_key} value={lesson.lesson_key}>{index + 1}. {lesson.title} — {lesson.status.replaceAll('_', ' ')}</option>)}
         </select>
+        <label className="mt-3 flex items-center gap-2 text-sm"><input type="checkbox" checked={followActive} onChange={event=>setFollowActive(event.target.checked)} />Follow the lesson being built</label>
         {lessons.filter(lesson => lesson.lesson_key === selectedLesson).map(lesson => <div key={lesson.lesson_key} className="mt-4 space-y-3">
           <h4 className="text-lg font-bold">{lesson.title}</h4>
           <p>Saved lesson status: {lesson.status.replaceAll('_', ' ')}. Draft content updates as checkpoints are saved.</p>
-          <SavedVideo lesson={lesson} diagnostic={actionResults[`${lesson.id}:${selected}`]?.diagnostic} />
+          <SavedVideo lesson={lesson} diagnostic={lesson.preview?.videoUrl ? lesson.preview : actionResults[`${lesson.id}:${selected}`]?.diagnostic} />
           {!lesson.saved && <p>This lesson is planned. Its preview will appear when the builder starts saving its content.</p>}
           {lesson.preview?.objectives?.length > 0 && <div><h5 className="font-bold">Learning objectives</h5><ul className="list-disc pl-5">{lesson.preview.objectives.map((text: string, i: number) => <li key={i}>{text}</li>)}</ul></div>}
           {lesson.preview?.segments?.map((segment: any, i: number) => <article key={i} className="rounded-lg border border-slate-600 p-3"><h5 className="font-bold">{segment.title}</h5><p className="mt-2 whitespace-pre-wrap">{segment.text}</p></article>)}

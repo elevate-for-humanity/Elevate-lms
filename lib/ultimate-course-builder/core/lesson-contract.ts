@@ -44,7 +44,7 @@ export function stepInputHash(
     ...(step === 'instructor_script' ? { scriptProducer: 'stage-aligned-scenes-v1' } : {}),
     ...(step === 'visual_assignment' ? { visualAssignmentProducer: 'canonical-entitlement-source-paths-v3' } : {}),
     ...(step === 'finished_media_qa' ? { approvedDeliveryValidator: 'approved-delivery-v1' } : {}),
-    ...(step === 'lesson_film_render' ? { renderProducer: 'approved-pcm-timeline-supported-image-formats-v1' } : {}),
+    ...(step === 'lesson_film_render' ? { renderProducer: 'approved-pcm-timeline-contained-photo-tracking-v2' } : {}),
     dependencies: dependencies.map((s) => [s, contractHash(artifactPayload(prior[s] ?? {}))]),
   });
 }

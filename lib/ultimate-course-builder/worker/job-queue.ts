@@ -28,9 +28,14 @@ export class UltimateJobQueue {
     const { data: existing, error: readError } = await active();
     if (readError) throw readError;
     if (existing) return existing;
+    const { data: previous, error: previousError } = await this.db.from('ultimate_build_jobs')
+      .select('monitor').eq('build_id', buildId).eq('job_type', 'course_build')
+      .order('created_at', {ascending: false}).limit(1).maybeSingle();
+    if (previousError) throw previousError;
     const { data, error } = await this.db
       .from('ultimate_build_jobs')
-      .insert({ build_id: buildId, job_type: 'course_build', status: 'queued', payload })
+      .insert({ build_id: buildId, job_type: 'course_build', status: 'queued', payload,
+        ...(previous?.monitor ? {monitor: previous.monitor} : {}) })
       .select('*')
       .single();
     if (error?.code === '23505') {

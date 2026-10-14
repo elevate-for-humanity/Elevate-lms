@@ -166,6 +166,10 @@ async function dispatchToolRequest(
     );
     return POST(new NextRequest(url, init));
   }
+  if (tool.name === 'courses.status') {
+    const { GET } = await import('@/apps/admin/app/api/admin/ultimate-course-builder/route');
+    return GET(new NextRequest(url, init));
+  }
   if (tool.name === 'courses.generate') {
     const { POST } = await import(
       '@/apps/admin/app/api/admin/dev-studio/course-agent/route'

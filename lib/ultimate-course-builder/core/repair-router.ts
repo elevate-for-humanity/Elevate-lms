@@ -3,6 +3,7 @@ import type { UltimateInstructionalFinding } from './execution-policy';
 
 const PREFIX_ROUTES: Array<[RegExp, UltimateBuildStep]> = [
   [/^(ENCODED_MP4_INSPECTION_REQUIRED|MEDIA_INSPECTION_|TRANSCRIPTION_)/, 'finished_media_qa'],
+  [/^(MEDIA_FREEZE_DETECTED|MEDIA_BLACK_FRAMES|MEDIA_VISUAL_CHANGES_REQUIRED|ULTIMATE_VIDEO_RENDER_FAILED)/, 'lesson_film_render'],
   [/^BLUEPRINT_/, 'learning_objectives'],
   [/^(TEACHING_RECAP_|EVERY_TEACHING_MOMENT_RECAP_REQUIRED|FRESH_TEACHING_RECAP_REQUIRED|ULTIMATE_GOOGLE_AUTHORING_JSON_INVALID|ULTIMATE_GOOGLE_AUTHORING_INCOMPLETE|INSTRUCTIONAL_QUALITY_FAILED)/, 'learning_objectives'],
   [/^(ULTIMATE_CAPTION_NARRATION_COVERAGE_FAILED|APPROVED_WORD_ALIGNMENT_REQUIRED|APPROVED_NARRATION_TEXT_MISMATCH|APPROVED_AUDIO_PART_|APPROVED_SEPARATE_FRESH_RECAP_REQUIRED|APPROVED_SPEECH_TIMELINE_MISMATCH|APPROVED_NARRATION_SCENE_COVERAGE_REQUIRED)/, 'natural_narration'],
@@ -33,7 +34,9 @@ export function routeSelectiveRepairs(findings: UltimateInstructionalFinding[]) 
   const targets = new Map<UltimateBuildStep, string[]>();
   for (const f of findings) {
     if (isDurableExternalBlocker(f)) continue;
-    const target = PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
+    const target = f.code === 'Media quality gate failed'
+      ? (/frozen interval|blank\/black interval|insufficient visual changes/i.test(f.message) ? 'lesson_film_render' : 'finished_media_qa')
+      : PREFIX_ROUTES.find(([re]) => re.test(f.code))?.[1];
     if (!target) continue;
     targets.set(target, [...(targets.get(target) ?? []), f.code]);
   }

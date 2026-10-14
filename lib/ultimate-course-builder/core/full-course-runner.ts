@@ -69,7 +69,9 @@ export async function runUltimateCourse(
       profile: plan.profile,
       lessonBuildId: lesson.id,
       artifacts: restoredArtifacts as UltimateRunContext['artifacts'],
-      findings: checkpoint.findings.filter((f) => restoredPassed.includes(f.step)),
+      // Previous failed findings are historical. A passed checkpoint must not
+      // carry its old error into a newly repaired lesson's acceptance result.
+      findings: checkpoint.findings.filter((f) => f.severity !== 'error' && restoredPassed.includes(f.step)),
       passedSteps: new Set(restoredPassed),
       assertActive,
       beforeCheckpoint: plan.beforeCheckpoint,

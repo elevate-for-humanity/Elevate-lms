@@ -19,7 +19,10 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
  const cueIndex=cue?cues!.indexOf(cue):-1,previous=cueIndex>0?cues![cueIndex-1]:null;
  const whole={width:'100%',height:'100%',objectFit:'contain' as const};
  const demonstration=Boolean(scene.clipUrl)&&Boolean(scene.motionCue)&&seconds>=scene.motionCue!.startSeconds&&seconds<scene.motionCue!.endSeconds&&!recap;
- const photo=(url:string,opacity=1)=><Img src={url} style={{...whole,position:'absolute',inset:0,opacity}}/>;
+ // Keep the whole teaching photograph visible while the camera gently tracks
+ // it. A contained, slightly inset image preserves tools and hands at the edges.
+ const photoMotion=`translate(${Math.sin(seconds/1.35)*1.1}%, ${Math.cos(seconds/1.8)*0.7}%) scale(0.97)`;
+ const photo=(url:string,opacity=1)=><Img src={url} style={{...whole,position:'absolute',inset:0,opacity,transform:photoMotion}}/>;
  const textStart=recap?scene.recapStartSeconds!:step?.narrationQuote?quoteStartSeconds(step.narrationQuote,speechCues):0;
  return <AbsoluteFill style={{background:'#171717',color:'#fff',fontFamily:'Arial, sans-serif'}}>
   <div style={{position:'absolute',top:30,left:54,color:'#cdb795',fontSize:22,letterSpacing:2}}>{props.courseTitle}</div>

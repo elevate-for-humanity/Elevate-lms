@@ -14,6 +14,11 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
 const AGENT_MAP: Record<string, { agent: AIAgentId; label: string; task: AITask; role: string }> = {
+  paris: {agent:'PARIS',label:'PARIS',task:'general_chat',role:'central platform and course production coordinator'},
+  ellie: {agent:'ELLIE',label:'ELLIE',task:'general_chat',role:'instruction, student support, and learning sequence'},
+  lizzy: {agent:'LIZZY',label:'LIZZY',task:'general_chat',role:'Studio operations and production'},
+  zora: {agent:'ZORA',label:'ZORA',task:'diagnostics',role:'independent quality and compliance review'},
+  zura: {agent:'ZORA',label:'ZORA',task:'diagnostics',role:'independent quality and compliance review'},
   'course-orchestrator': { agent: 'LIZZY', label: 'Course Orchestrator', task: 'general_chat', role: 'course operations and curriculum execution' },
   'instructional-designer': { agent: 'LIZZY', label: 'Instructional Designer', task: 'general_chat', role: 'instructional design and curriculum quality' },
   'qa-designer': { agent: 'ZORA', label: 'QA Designer', task: 'diagnostics', role: 'quality assurance, accessibility, and compliance review' },

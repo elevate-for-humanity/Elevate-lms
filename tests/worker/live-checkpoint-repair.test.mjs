@@ -1,3 +1,4 @@
+import {renderMediaUrl,renderPlaybackUrl} from '../../lib/ultimate-course-builder/media/playback-source.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -20,7 +21,7 @@ test('a future checkpoint repair is consumed only when reached; no active stage 
  assert.equal(await reader('credential_release'),null);assert.ok(filters.some(([k,v])=>k==='execution_generation'&&v===7));
 });
 test('preview exposes instruction without returning internal media credentials or QA assertions',()=>{
- const previewSource=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/core/lesson-preview.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/export /g,'');
- const preview=new Function(previewSource+';return lessonPreview;')()({learning_objectives:{objectives:[{text:'Learn sanitation'}]},instructor_script:{script:{segments:[{id:'s',text:'Wash hands'}]}},storyboard:{storyboard:{scenes:[{id:'s',dialogue:'Demonstrate sanitation',visualRequirement:'Clean workstation'}]}},secret:'never',finished_media_qa:{pass:true}});
+ const previewSource=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/core/lesson-preview.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import .*;\n/gm,'').replace(/export /g,'');
+ const preview=new Function('renderMediaUrl','renderPlaybackUrl',previewSource+';return lessonPreview;')(renderMediaUrl,renderPlaybackUrl)({learning_objectives:{objectives:[{text:'Learn sanitation'}]},instructor_script:{script:{segments:[{id:'s',text:'Wash hands'}]}},storyboard:{storyboard:{scenes:[{id:'s',dialogue:'Demonstrate sanitation',visualRequirement:'Clean workstation'}]}},secret:'never',finished_media_qa:{pass:true}});
  assert.equal(preview.segments[0].text,'Wash hands');assert.equal(preview.scenes[0].narration,'Demonstrate sanitation');assert.equal(preview.secret,undefined);assert.equal(preview.pass,undefined);
 });

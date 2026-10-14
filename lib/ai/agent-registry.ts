@@ -14,7 +14,7 @@ import type { AgentConfig, AgentCapabilities, AgentHealthStatus } from './types'
 // ============================================================
 
 const PARIS_CAPABILITIES: AgentCapabilities = {
-  intents: [AgentIntent.ADMISSION],
+  intents: [AgentIntent.ADMISSION, AgentIntent.COURSE_BUILDER, AgentIntent.OPS],
   maxConcurrentTasks: 5,
   timeout: 300000, // 5 minutes
   retryable: true,
@@ -66,7 +66,7 @@ const DEFAULT_AGENTS: AgentConfig[] = [
     status: AgentStatus.ACTIVE,
     metadata: {
       description:
-        'Handles admission interviews, eligibility assessments, and program applications',
+        'Central coordinator for admissions, Studio operations, and supervised course production; uses the shared governed tool registry',
       keywords: ['interview', 'apply', 'program', 'eligibility', 'admission', 'paris'],
     },
   },

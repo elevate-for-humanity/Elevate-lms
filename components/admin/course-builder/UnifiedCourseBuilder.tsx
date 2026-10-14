@@ -37,6 +37,7 @@ type UltimateBuildRow = {
     created_at: string;
     heartbeat_at?: string | null;
     lease_expires_at?: string | null;
+    monitor?: {enabled?: boolean; coordinator?: string; state?: string; checkedAt?: string; reason?: string; recoveries?: number};
     payload?: { progress?: { phase: string; at: string; completed: number; total?: number | null } };
   }>;
 };
@@ -48,7 +49,11 @@ const TABS: Array<{ id: Tab; label: string; icon: any }> = [
 ];
 
 async function readJson(response: Response) {
-  return response.json().catch(() => ({}));
+  return response.json().catch(() => {
+    throw new Error(response.status === 503
+      ? 'Admin service unavailable (HTTP 503). Saved progress is unchanged; waiting for runtime recovery.'
+      : `Course Builder returned an unreadable response (HTTP ${response.status}). Saved progress is unchanged.`);
+  });
 }
 
 async function startUltimateCourse(input: {
@@ -612,6 +617,7 @@ export function UltimateBuildPanel({
   const latest = buildsCourseId === course.id ? (builds[0] ?? null) : null;
   const statusLoading = loading;
   const statusLoaded = buildsCourseId === course.id;
+  const [lastStatusAt, setLastStatusAt] = useState<string | null>(null);
   const [notice, setNotice] = useState('');
   const [googleModel, setGoogleModel] = useState('');
   const [googleLocation,setGoogleLocation]=useState('us');
@@ -648,6 +654,7 @@ export function UltimateBuildPanel({
       setBuilds(Array.isArray(payload?.builds) ? payload.builds : []);
       setAcquisitions(Array.isArray(payload?.acquisitions) ? payload.acquisitions : []);
       setBuildsCourseId(requestedCourseId);
+      setLastStatusAt(new Date().toISOString());
     } catch (reason) {
       if (token !== refreshToken.current) return;
       setStatusError(reason instanceof Error ? reason.message : 'Unable to load Ultimate build status');
@@ -665,10 +672,26 @@ export function UltimateBuildPanel({
   }, [course.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!latest || !['initializing', 'queued', 'running'].includes(latest.status)) return;
+    // Keep retrying read-only status even after a failed initial load or blocked build.
+    // Queue writes and worker dispatch belong to the server coordinator, not polling.
     const timer = window.setInterval(() => void refresh(course.id, true), 15000);
     return () => window.clearInterval(timer);
-  }, [latest?.id, latest?.status]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [course.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function toggleAutopilot() {
+    if (!latest) return;
+    setBusy(true); setError('');
+    try {
+      const response = await fetch('/api/admin/ultimate-course-builder/autopilot', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({buildId:latest.id,enabled:!workerJob?.monitor?.enabled}), signal:AbortSignal.timeout(25000),
+      });
+      const result=await readJson(response);
+      if(!response.ok)throw new Error(result.error || 'Autopilot setting could not be saved');
+      setNotice(result.message); await refresh();
+    } catch(reason) {setError(reason instanceof Error?reason.message:'Autopilot configuration failed');}
+    finally {setBusy(false);}
+  }
 
   async function startBuild() {
     setBusy(true);
@@ -762,7 +785,7 @@ export function UltimateBuildPanel({
               {workerJob.status === 'running' ? 'Previous attempt: ' : ''}{workerJob.last_error}
             </p>
           ) : null}
-          {workerJob?.payload?.progress && <div className="mt-3 space-y-2 text-white">
+          {workerJob?.status === 'running' && !statusError && workerJob?.payload?.progress && <div className="mt-3 space-y-2 text-white">
             <p>Worker activity: {workerJob.payload.progress.phase.replaceAll('_', ' ').replaceAll(':', ' · ')}</p>
             <p className="text-sm">Last progress: {new Date(workerJob.payload.progress.at).toLocaleString()}</p>
             {typeof workerJob.payload.progress.total === 'number' && workerJob.payload.progress.total > 0 && <>
@@ -785,6 +808,7 @@ export function UltimateBuildPanel({
           className="mt-4 rounded-lg border border-red-500/40 bg-red-950/40 p-3 text-sm text-red-100"
         >
           {error || statusError}
+          {statusError && lastStatusAt && <span className="mt-1 block">Showing saved status from {new Date(lastStatusAt).toLocaleTimeString()}. It is not live confirmation.</span>}
         </p>
       ) : null}
 
@@ -792,19 +816,19 @@ export function UltimateBuildPanel({
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-300">Status</p>
           <p className="mt-1 text-lg font-black text-white">
-            {statusLoading ? 'loading…' : !statusLoaded ? 'Unavailable' : (latest?.status === 'queued' ? 'Awaiting worker assignment' : (workerJob?.status === 'stalled' ? 'Worker stalled' : (latest?.status ?? 'not started')))}
+            {statusLoading ? 'loading…' : (!statusLoaded || statusError) ? 'Unavailable' : (latest?.status === 'queued' ? 'Awaiting worker assignment' : (workerJob?.status === 'stalled' ? 'Worker stalled' : (latest?.status ?? 'not started')))}
           </p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-300">Current stage</p>
           <p className="mt-1 break-words text-lg font-black text-white">
-            {statusLoading ? 'loading…' : !statusLoaded ? 'Unavailable' : (latest?.current_step?.replaceAll('_', ' ') ?? 'Not started')}
+            {statusLoading ? 'loading…' : (!statusLoaded || statusError) ? 'Unavailable' : (latest?.current_step?.replaceAll('_', ' ') ?? 'Not started')}
           </p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-300">Saved work</p>
           <p className="mt-1 break-all text-sm font-bold text-slate-200">
-            {statusLoading ? 'Loading course build…' : !statusLoaded ? 'Unavailable' : (latest ? 'Lesson checkpoints preserved' : 'Saved when started')}
+            {statusLoading ? 'Loading course build…' : (!statusLoaded || statusError) ? 'Unavailable' : (latest ? 'Lesson checkpoints preserved' : 'Saved when started')}
           </p>
         </div>
       </div>
@@ -822,6 +846,21 @@ export function UltimateBuildPanel({
           ))}
         </div>
       )}
+
+      {latest && workerJob && <section aria-label="PARIS course autopilot" className="mt-5 rounded-xl border border-cyan-700 bg-slate-950 p-4 text-white">
+        <h3 className="font-bold">PARIS course autopilot</h3>
+        <p className="mt-2">One course queue: ELLIE instruction · LIZZY production · ZORA quality checks · PARIS supervision.</p>
+        <p className="mt-2">{workerJob.monitor?.enabled ? 'Enabled' : 'Disabled'} · {workerJob.monitor?.state?.replaceAll('_',' ') || 'No supervisor observation yet'}</p>
+        {workerJob.monitor?.checkedAt && <p>Last supervisor check: {new Date(workerJob.monitor.checkedAt).toLocaleString()}</p>}
+        {workerJob.monitor?.enabled && (!workerJob.monitor.checkedAt || Date.now()-Date.parse(workerJob.monitor.checkedAt)>600000) &&
+          <p role="alert" className="mt-2 text-amber-200">Supervisor heartbeat is unconfirmed or stale. Monitoring is configured, but automatic execution is not verified.</p>}
+        {workerJob.monitor?.reason && <p className="mt-2">{workerJob.monitor.reason}</p>}
+        <p className="mt-2 text-sm text-slate-200">Repairs preserve saved lessons, respect active worker leases, and stop at retry limits or missing evidence. Publishing requires the existing quality checks.</p>
+        <button type="button" onClick={()=>void toggleAutopilot()} disabled={busy || statusLoading}
+          className="mt-3 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50">
+          {workerJob.monitor?.enabled ? 'Pause PARIS autopilot' : 'Enable PARIS autopilot'}
+        </button>
+      </section>}
 
       {notice ? <p role="status" className="mt-4 text-sm text-cyan-200">{notice}</p> : null}
       {latest ? <UltimateStageInspector buildId={latest.id} updatedAt={latest.updated_at} /> : null}

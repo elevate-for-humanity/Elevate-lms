@@ -347,6 +347,12 @@ export function planAIToolFromCommand(
   if (/\b(issue|generate)\b.*\bcertificate/.test(lower)) {
     return { name: 'certificates.issue', input: asAIRecord(context.toolInput) };
   }
+  if (/\b(course|lesson|builder)\b/.test(lower) && /\b(status|monitor|progress|stalled|health|autopilot)\b/.test(lower) &&
+      !/\b(enable|disable|start|repair|fix|resume|build|create)\b/.test(lower)) {
+    return {name:'courses.status',input:{...(typeof context.courseId === 'string'?{courseId:context.courseId}:{}),
+      ...(typeof context.buildId === 'string'?{buildId:context.buildId}:{})}};
+  }
+
   // Existing course media repair is Course Builder work. Route it before the
   // generic engineering/browser rules so words such as "repair", "endpoint",
   // or "dashboard" cannot accidentally dispatch an unauthorized OpenHands job.

@@ -11,7 +11,9 @@ export async function requestCourseWorker(dispatch = () => dispatchGoogleDeploym
   } catch (error) {
     const reason = error instanceof Error && /HTTP 401/.test(error.message) ? 'authentication_rejected' : 'direct_dispatch_unavailable';
     logger.warn('Course worker launch deferred to durable coordinator', { reason });
-    return { dispatched: false, launchMode: 'scheduled', executionVerified: false,
-      message: 'Saved in the worker queue. The automatic Google dispatcher will pick up the request; execution is not confirmed yet.' };
+    return { dispatched: false, launchMode: 'scheduled', executionVerified: false, dispatchError: reason,
+      message: reason === 'authentication_rejected'
+        ? 'Repair is saved, but direct worker launch was rejected by GitHub (401). The scheduled coordinator may recover it; no worker start is confirmed.'
+        : 'Request saved, but direct worker launch is unavailable. Waiting for the scheduled coordinator; no worker start is confirmed.' };
   }
 }

@@ -26,7 +26,7 @@ export type AIToolDefinition = {
 
 const ADMIN_ROLES = ['admin', 'super_admin', 'staff'] as const;
 const PRIVILEGED_ADMIN_ROLES = ['admin', 'super_admin'] as const;
-const DEVSTUDIO_AGENTS = ['LIZZY', 'ZORA'] as const;
+const DEVSTUDIO_AGENTS = ['PARIS', 'LIZZY', 'ZORA'] as const;
 
 function queryPath(
   path: string,
@@ -216,6 +216,15 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     audit: true,
   },
   {
+    name: 'courses.status',
+    description: 'Read canonical course worker, PARIS monitor, and checkpoint status. Never infer execution from a queue acknowledgment.',
+    method: 'GET',
+    path: input => queryPath('/api/admin/ultimate-course-builder', input, ['courseId','buildId']),
+    classification: 'read', risk: 'low', scope: 'platform',
+    allowedAgents: ['PARIS','ELLIE','LIZZY','ZORA'], allowedRoles: PRIVILEGED_ADMIN_ROLES,
+    approvalRequired: false, idempotent: true, timeoutMs: 25000, retryAttempts: 1, audit: true,
+  },
+  {
     name: 'courses.generate',
     description:
       'Create or resume one complete governed course through the Dev Studio agent and canonical Course Builder, including assessments, lesson media, program mapping, acceptance, and publication readiness.',
@@ -224,7 +233,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     classification: 'write',
     risk: 'medium',
     scope: 'platform',
-    allowedAgents: ['ELLIE', 'LIZZY'],
+    allowedAgents: ['PARIS', 'ELLIE', 'LIZZY'],
     allowedRoles: PRIVILEGED_ADMIN_ROLES,
     requiredInput: ['goal'],
     approvalRequired: true,

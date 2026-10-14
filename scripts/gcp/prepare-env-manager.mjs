@@ -19,10 +19,11 @@ export function prepareEnvManager(component = 'admin', run = google) {
   run(['services', 'enable', 'secretmanager.googleapis.com', 'run.googleapis.com', '--project', PROJECT, '--quiet']);
   function role(id, permissions) {
     const name = `projects/${PROJECT}/roles/${id}`;
-    const roles = JSON.parse(run(['iam', 'roles', 'list', '--project', PROJECT, '--filter', `name=${name}`, '--format=json']));
-    if (roles.length) {
-      const existing = JSON.parse(run(['iam', 'roles', 'describe', id, '--project', PROJECT, '--format=json']));
-      if (roles.length !== 1 || existing.deleted || JSON.stringify([...(existing.includedPermissions ?? [])].sort()) !== JSON.stringify([...permissions].sort())) throw new Error('Existing configuration role differs from the confined permission set.');
+    let existing;
+    try { existing = JSON.parse(run(['iam', 'roles', 'describe', id, '--project', PROJECT, '--format=json'])); }
+    catch (error) { if (error.code !== 'not_found') throw error; }
+    if (existing) {
+      if (existing.deleted || JSON.stringify([...(existing.includedPermissions ?? [])].sort()) !== JSON.stringify([...permissions].sort())) throw new Error('Existing configuration role differs from the confined permission set.');
     } else run(['iam', 'roles', 'create', id, '--project', PROJECT, '--title', id, '--permissions', permissions.join(','), '--stage', 'GA', '--quiet']);
     return name;
   }

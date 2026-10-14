@@ -354,7 +354,7 @@ jobs:
           const home=await (await fetch(root+'/',{cache:'no-store'})).text();
           assert.ok(home.includes('href="/tax"'),'Homepage must link to the tax page');
           const tax=await (await fetch(root+'/tax',{cache:'no-store'})).text();
-          assert.ok(tax.includes('Supersonic side navigation'),'Tax landing page must render Supersonic navigation');
+          assert.ok(tax.includes('Supersonic main navigation'),'Tax landing page must render Supersonic navigation');
           for (const choice of ['Prepare your own taxes','Hire a professional','Start your own tax business']) assert.ok(tax.includes(choice),'Missing Supersonic service choice: '+choice);
           for(const [path,method] of [['/api/tax/returns','GET'],['/api/tax/interview','GET'],['/api/tax/returns','POST'],['/api/tax/w2/confirm','POST'],['/api/tax/returns/calculate','POST']]) {
             const res=await fetch(root+path,{method,headers:method==='POST'?{'content-type':'application/json'}:{},...(method==='POST'?{body:'{}'}:{}),signal:AbortSignal.timeout(20000)});

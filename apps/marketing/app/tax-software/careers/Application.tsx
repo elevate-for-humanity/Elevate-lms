@@ -17,7 +17,11 @@ type Candidate = {
   checklist: string[];
 };
 const button = 'rounded-xl bg-[#073ca2] px-5 py-3 font-bold text-white disabled:opacity-50';
-export function Application() {
+export function Application({
+  initialPreference = 'remote',
+}: {
+  initialPreference?: 'remote' | 'office' | 'either';
+}) {
   const [data, setData] = useState<Candidate | null>(null),
     [error, setError] = useState(''),
     [message, setMessage] = useState(''),
@@ -60,7 +64,24 @@ export function Application() {
       );
       setVersion((v) => v + 1);
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : 'Unable to save');
+      const messages: Record<string, string> = {
+        INVALID_APPLICATION:
+          'Please review your name, location, professional status and experience, and acknowledge the privacy notice.',
+        APPLICATION_ALREADY_EXISTS:
+          'You already have an application. Refresh this page to continue your progress.',
+        PRETEST_REQUIRED: 'Complete the initial skills assessment before starting the lessons.',
+        COMPLETE_TRAINING_FIRST:
+          'Complete all eight lesson knowledge checks before taking the final test.',
+        INVALID_ASSESSMENT: 'Select an answer for every question, then submit again.',
+        APPLICATION_CHANGED_RETRY:
+          'Your progress changed in another session. Refresh this page and try again.',
+        SIGN_IN_REQUIRED: 'Your session has ended. Sign in again to continue your application.',
+      };
+      setMessage(
+        e instanceof Error
+          ? (messages[e.message] ?? 'Your progress could not be saved. Please try again.')
+          : 'Your progress could not be saved. Please try again.',
+      );
     } finally {
       setBusy(false);
     }
@@ -137,11 +158,15 @@ export function Application() {
       <div className="rounded-2xl bg-[#e7efff] p-6">
         <h3 className="text-xl font-bold">Create or use your secure account to apply</h3>
         <p className="mt-3">
-          Your application, assessment and training progress stay connected to your account.
+          Your application, assessment and training progress stay connected to your account. Already
+          have an Elevate account? Use the same sign-in here.
         </p>
         <a
           className={button + ' mt-5 inline-block'}
-          href="/tax-software/login?redirect=%2Ftax-software%2Fcareers%23apply"
+          href={
+            '/tax-software/login?redirect=' +
+            encodeURIComponent('/tax-software/careers?work=' + initialPreference + '#apply')
+          }
         >
           Sign in / create account →
         </a>
@@ -174,7 +199,7 @@ export function Application() {
           </p>
           {[
             ['name', 'Full name'],
-            ['phone', 'Phone'],
+            ['phone', 'Phone (optional)'],
             ['location', 'City and state'],
           ].map(([name, label]) => (
             <label key={name} className="font-semibold">
@@ -189,15 +214,27 @@ export function Application() {
           ))}
           <label className="font-semibold">
             Work preference
-            <select name="preference" className="mt-2 block w-full rounded-lg border p-3">
+            <select
+              defaultValue={initialPreference}
+              name="preference"
+              className="mt-2 block w-full rounded-lg border p-3"
+            >
               <option value="remote">Remote</option>
               <option value="office">Tax office</option>
               <option value="either">Either</option>
             </select>
           </label>
           <label className="font-semibold">
-            Current professional status
-            <select name="credential" className="mt-2 block w-full rounded-lg border p-3">
+            Professional status (self-reported)
+            <select
+              name="credential"
+              required
+              defaultValue=""
+              className="mt-2 block w-full rounded-lg border p-3"
+            >
+              <option value="" disabled>
+                Select your current status
+              </option>
               {['CPA', 'EA', 'Attorney', 'PTIN preparer', 'Trainee'].map((c) => (
                 <option key={c}>{c}</option>
               ))}

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Validate a Twilio TLS/SRTP endpoint in an isolated container before installation.
 
-Uses the running image and copied configuration. Never restarts the live PBX,
-changes its files, attaches numbers, provisions users, or makes telephone calls.
+Uses the running image and copied configuration. Optional --install-endpoint
+installs only the validated endpoint after an idle check, with rollback. Never
+restarts the live PBX, attaches numbers, provisions users, or makes telephone calls.
 """
 import json
 import os
@@ -12,6 +13,7 @@ import shutil
 import subprocess
 import tempfile
 import time
+import sys
 
 CONTAINER = 'pbx_asterisk_1'
 ROOT = Path('/opt/elevate-pbx/repo/infra/pbx/asterisk')
@@ -78,13 +80,22 @@ def validate():
     with tempfile.TemporaryDirectory(prefix='elevate-twilio-', dir='/var/tmp') as directory:
         staging = Path(directory) / 'asterisk'
         shutil.copytree(ROOT, staging, symlinks=False)
+        # copytree preserves modes but not numeric ownership. The image drops
+        # privileges, so preserve the live Asterisk group's read permissions.
+        for copied in [staging, *staging.rglob('*')]:
+            source = ROOT / copied.relative_to(staging)
+            info = source.stat()
+            os.chown(copied, info.st_uid, info.st_gid)
         os.chmod(directory, 0o700)
         pjsip = staging / 'pjsip.conf'
         original = pjsip.read_text()
         if re.search(r'^\[(twilio|twilio-aor|elevate-twilio-tls)\]', original, re.M):
             raise ValueError('existing_twilio_objects_require_review')
         (staging / 'elevate-twilio.conf').write_text(CONFIG)
-        pjsip.write_text(original + '\n#include elevate-twilio.conf\n')
+        os.chmod(staging / 'elevate-twilio.conf', pjsip.stat().st_mode & 0o777)
+        os.chown(staging / 'elevate-twilio.conf', pjsip.stat().st_uid, pjsip.stat().st_gid)
+        if '#include elevate-twilio.conf' not in original.splitlines():
+            pjsip.write_text(original + '\n#include elevate-twilio.conf\n')
         created = False
         try:
             # The isolated container cannot reach DNS. Resolve the staged carrier
@@ -130,9 +141,55 @@ def validate():
             'carrierCallsMade': False, 'liveCallAcceptance': 'NOT TESTED'}
 
 
+def install_endpoint(root=ROOT, backup=Path('/var/lib/elevate-pbx/twilio-rollback'), execute=run):
+    """Add only the validated endpoint; public number and user dialplan stay separate."""
+    main = root / 'pjsip.conf'
+    fragment = root / 'elevate-twilio.conf'
+    if main.is_symlink() or fragment.is_symlink():
+        raise ValueError('carrier_configuration_symlink_requires_review')
+    previous = main.read_text()
+    if fragment.exists() and fragment.read_text() != CONFIG:
+        raise ValueError('existing_carrier_configuration_requires_review')
+    cli = lambda text: execute(['docker', 'exec', CONTAINER, 'asterisk', '-rx', text]).stdout
+    channels = cli('core show channels count')
+    if not all(re.search(r'^0 active ' + kind + r's?$', channels, re.M) for kind in ['call', 'channel']):
+        raise ValueError('active_calls_or_channels_require_deferred_install')
+    backup.mkdir(mode=0o700, parents=True, exist_ok=True)
+    if not (backup / 'pjsip.conf').exists():
+        shutil.copy2(main, backup / 'pjsip.conf')
+        os.chmod(backup / 'pjsip.conf', 0o600)
+    existed = fragment.exists()
+    try:
+        fragment.write_text(CONFIG)
+        os.chmod(fragment, main.stat().st_mode & 0o777)
+        os.chown(fragment, main.stat().st_uid, main.stat().st_gid)
+        include = '#include elevate-twilio.conf'
+        if include not in previous.splitlines():
+            main.write_text(previous + '\n' + include + '\n')
+        cli('pjsip reload')
+        endpoint = cli('pjsip show endpoint twilio')
+        transport = cli('pjsip show transport elevate-twilio-tls')
+        if not re.search(r'media_encryption\s*:\s*sdes\b', endpoint) or not re.search(r'protocol\s*:\s*tls\b', transport):
+            raise ValueError('live_tls_endpoint_reload_not_confirmed')
+        if not re.search(r'verify_server\s*:\s*(?:true|yes)\b', transport):
+            raise ValueError('live_server_certificate_verification_not_confirmed')
+    except Exception:
+        main.write_text(previous)
+        if not existed:
+            fragment.unlink(missing_ok=True)
+        cli('pjsip reload')
+        raise
+    return {'result': 'PASS', 'liveTlsSrtpEndpoint': True, 'publicNumberRoutingChanged': False,
+            'userDialplanChanged': False, 'carrierCallsMade': False, 'liveCallAcceptance': 'NOT TESTED'}
+
+
 if __name__ == '__main__':
     try:
         result = validate()
+        if sys.argv[1:] == ['--install-endpoint']:
+            result = install_endpoint()
+        elif sys.argv[1:]:
+            raise ValueError('invalid_validation_invocation')
     except Exception as error:
         result = {'result': 'BLOCKED', 'code': str(error) if isinstance(error, ValueError) and re.fullmatch('[a-z_]+', str(error)) else 'isolated_trunk_validation_unavailable'}
     print(json.dumps(result))

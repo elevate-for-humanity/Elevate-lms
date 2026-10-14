@@ -4,6 +4,8 @@ export function TextWorkspace() {
   const [data, setData] = useState<any>(null),
     [to, setTo] = useState(''),
     [body, setBody] = useState(''),
+    [picture, setPicture] = useState<File | null>(null),
+    [pictureKey, setPictureKey] = useState(0),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false),
     [requestKey, setKey] = useState('');
@@ -27,14 +29,18 @@ export function TextWorkspace() {
     const key = requestKey || crypto.randomUUID();
     setKey(key);
     try {
+      const payload = new FormData();
+      payload.set('to', to); payload.set('body', body); payload.set('requestKey', key);
+      if (picture) payload.set('picture', picture);
       const r = await fetch('/api/communications/texts', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ to, body, requestKey: key }),
+          body: payload,
         }),
         result = await r.json();
       if (!r.ok || !result.ok) throw Error(result.error || 'Text acceptance unconfirmed');
       setBody('');
+      setPicture(null);
+      setPictureKey((value) => value + 1);
       setKey('');
       await load();
     } catch (e) {
@@ -61,7 +67,8 @@ export function TextWorkspace() {
           {error}
         </p>
       )}
-      {!data?.readOnly && (
+      {data?.messagingNotice && <p className="rounded-xl bg-blue-50 p-4 text-blue-950">{data.messagingNotice}</p>}
+      {!data?.readOnly && data?.sendingEnabled !== false && (
         <form onSubmit={send} className="space-y-3 rounded-2xl border bg-white p-5">
           <label className="block font-bold">
             To
@@ -81,7 +88,7 @@ export function TextWorkspace() {
             Message
             <textarea
               aria-label="Text message"
-              required
+              required={!picture}
               maxLength={1600}
               value={body}
               onChange={(e) => {
@@ -90,6 +97,13 @@ export function TextWorkspace() {
               }}
               className="mt-2 w-full rounded border p-3"
             />
+          </label>
+          <label className="block font-bold">
+            Picture (optional)
+            <input key={pictureKey} type="file" accept="image/jpeg,image/png,image/gif"
+              onChange={(event) => { setPicture(event.target.files?.[0] || null); setKey(''); }}
+              disabled={busy} className="mt-2 block w-full rounded border p-3" />
+            <span className="mt-1 block text-sm font-normal text-slate-600">JPG, PNG, or GIF, up to 3 MB.</span>
           </label>
           <button
             type="submit"
@@ -107,6 +121,10 @@ export function TextWorkspace() {
               {m.direction === 'inbound' ? m.from_number : `To ${m.to_number}`}
             </p>
             <p className="mt-2 whitespace-pre-wrap">{m.body}</p>
+            {Array.isArray(m.media) && m.media.map((_media: unknown, index: number) => (
+              <a key={index} href={`/api/communications/texts/${m.id}/media/${index}`} target="_blank" rel="noopener noreferrer"
+                className="mt-2 block font-bold text-blue-800 underline">Open picture or attachment {index + 1}</a>
+            ))}
             <p className="mt-2 text-xs text-slate-600">
               {m.status} · {new Date(m.created_at).toLocaleString()}
             </p>

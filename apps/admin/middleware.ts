@@ -29,6 +29,8 @@ const PUBLIC_PATHS = [
   // Telnyx cannot present an admin browser session. The route handler verifies
   // every request with Telnyx's Ed25519 signature before processing an event.
   '/api/webhooks/telnyx',
+  // Twilio webhooks verify their account-bound HMAC signature in the handler.
+  '/api/webhooks/twilio/sms',
   // This internal worker authenticates with CRON_SECRET in its route handler.
   // It must bypass session middleware or cron/local worker calls are redirected
   // to /login before bearer authentication can run.

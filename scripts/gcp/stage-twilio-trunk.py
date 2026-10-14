@@ -73,7 +73,9 @@ def require_idle_endpoint_restart(channels, endpoints):
         raise ValueError('active_calls_prevent_carrier_transport_restart')
     names = re.findall(r'Endpoint:\s+([A-Za-z0-9_.-]+)(?:[ /]|$)', endpoints)
     count = re.search(r'Objects found:\s*(\d+)', endpoints)
-    if names != ['twilio'] or not count or count[1] != '1':
+    explicitly_empty = not names and (bool(count and count[1] == '0') or bool(re.search(r'^\s*No objects found\.?\s*$', endpoints, re.M)))
+    only_new_endpoint = names == ['twilio'] and bool(count and count[1] == '1')
+    if not (explicitly_empty or only_new_endpoint):
         raise ValueError('existing_endpoints_prevent_carrier_transport_restart')
 
 

@@ -12,9 +12,10 @@ spec.loader.exec_module(trunk)
 class CarrierInstallation(unittest.TestCase):
     def test_restart_requires_idle_channels_and_only_new_carrier_endpoint(self):
         trunk.require_idle_endpoint_restart('0 active calls\n0 active channels', 'Endpoint: twilio/+14632401404\nObjects found: 1')
+        trunk.require_idle_endpoint_restart('0 active calls\n0 active channels', 'No objects found.')
         for channels, endpoints in [('1 active call\n2 active channels', 'Endpoint: twilio\nObjects found: 1'),
                                     ('0 active calls\n0 active channels', 'Endpoint: twilio\nEndpoint: pwa-existing\nObjects found: 2'),
-                                    ('0 active calls\n0 active channels', 'No objects found.')]:
+                                    ('0 active calls\n0 active channels', 'Endpoint inventory unavailable')]:
             with self.assertRaises(ValueError):
                 trunk.require_idle_endpoint_restart(channels, endpoints)
     def fixture(self, directory):

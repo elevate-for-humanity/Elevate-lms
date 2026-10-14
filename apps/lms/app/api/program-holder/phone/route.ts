@@ -49,7 +49,7 @@ async function phoneContext(
     ctx,
     extension,
     system,
-    phoneNumber: primaryNumber?.e164 || process.env.TELNYX_PHONE_NUMBER?.trim() || '',
+    phoneNumber: primaryNumber?.e164 || '',
   };
 }
 

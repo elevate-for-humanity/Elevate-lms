@@ -46,6 +46,7 @@ export async function storeSmsEvent(db: any, event: any) {
           from_number: from,
           to_number: to,
           body: payload.text || '',
+          media: payload.media || [],
           status: 'received',
           provider_message_id: payload.id,
           provider_event_id: event.data.id,

@@ -512,7 +512,7 @@ export default function ProgramApplyPage({ program }: Props) {
                   value={formData.phone}
                   onChange={(e) => updateField('phone', e.target.value)}
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:outline-none"
-                  placeholder="(317) 314-3757"
+                  placeholder="(463) 240-1404"
                 />
               </div>
 

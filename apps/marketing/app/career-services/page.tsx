@@ -239,7 +239,7 @@ export default function CareerServicesPage() {
               href="tel:+13173141234"
               className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors"
             >
-              <Phone className="mr-2 w-5 h-5" /> Call (317) 999-9620
+              <Phone className="mr-2 w-5 h-5" /> Call (463) 240-1404
             </a>
           </div>
         </div>

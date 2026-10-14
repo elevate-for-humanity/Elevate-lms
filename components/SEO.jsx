@@ -55,7 +55,7 @@ export default function SEO({
           },
           contactPoint: {
             '@type': 'ContactPoint',
-            telephone: '+1-317-999-9620',
+            telephone: '+1-463-240-1404',
             contactType: 'customer service',
             email: 'info@elevateforhumanity.org',
             availableLanguage: ['English'],
@@ -93,7 +93,7 @@ export default function SEO({
             postalCode: '46204',
             addressCountry: 'US',
           },
-          telephone: '+1-317-999-9620',
+          telephone: '+1-463-240-1404',
           url: 'https://www.elevateforhumanity.org',
           email: 'info@elevateforhumanity.org',
           openingHoursSpecification: {

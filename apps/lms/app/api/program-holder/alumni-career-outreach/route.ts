@@ -37,7 +37,7 @@ export async function POST() {
       <p>Please finish your profile, agreements, orientation, required documents, and other onboarding items. Your completed-program status will remain unchanged.</p>
       <p><a href="https://app.elevateforhumanity.org/login" style="display:inline-block;background:#1d4ed8;color:white;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Sign in to complete your dashboard</a></p>
       <p>After signing in, open <a href="https://app.elevateforhumanity.org/lms/career">Career Services</a> to view job and career-support opportunities.</p>
-      <p>If you need help signing in, reply to this email or call Elevate for Humanity at 317-314-3757.</p>
+      <p>If you need help signing in, reply to this email or call Elevate for Humanity at 463-240-1404.</p>
       <p>Thank you,<br>Elevate for Humanity</p>
     </div>`;
 

@@ -35,7 +35,7 @@ const CANONICAL_DOMAIN = canonicalDomain(
 const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'elevate4humanityedu@gmail.com';
 const INFO_EMAIL = process.env.NEXT_PUBLIC_INFO_EMAIL || 'elevate4humanityedu@gmail.com';
 const FROM_EMAIL = process.env.NEXT_PUBLIC_EMAIL_FROM_ADDRESS || 'noreply@elevateforhumanity.org';
-const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '(317) 314-3757';
+const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '(463) 240-1404';
 
 export const siteUrls = {
   site: SITE_URL,

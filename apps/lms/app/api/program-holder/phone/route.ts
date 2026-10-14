@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { phoneActorResponse } from '@/lib/phone/actor-response';
 import { asteriskDeviceStatus, asteriskDeviceId } from '@/lib/phone/asterisk';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { ADMIN_FORWARDING_NUMBER, adminForwardingAllowed } from '@/lib/phone/forwarding-policy';
 import {
   DEFAULT_AVAILABILITY_SCHEDULE,
   type AvailabilitySchedule,
@@ -32,7 +33,7 @@ async function phoneContext(
     ? await Promise.all([
         ctx.db
           .from('phone_systems')
-          .select('id,name,timezone,status')
+          .select('id,name,timezone,status,tenant_id')
           .eq('id', systemId)
           .maybeSingle(),
         ctx.db
@@ -153,8 +154,9 @@ export async function GET() {
       schedule: extension.availability_schedule || DEFAULT_AVAILABILITY_SCHEDULE,
       ringSeconds: extension.ring_seconds,
       voicemailGreeting: extension.voicemail_greeting || '',
-      externalFallbackEnabled: extension.admin_external_fallback === true,
-      externalFallbackNumber: extension.external_fallback_number || '',
+      externalFallbackAllowed: adminForwardingAllowed(system, extension, ctx.roles),
+      externalFallbackEnabled: adminForwardingAllowed(system, extension, ctx.roles) && extension.admin_external_fallback === true,
+      externalFallbackNumber: adminForwardingAllowed(system, extension, ctx.roles) ? ADMIN_FORWARDING_NUMBER : '',
       presenceStatus: (liveDevices ?? 0) > 0 ? extension.presence_status : 'offline',
       provider: extension.webrtc_provider || 'telnyx',
     },
@@ -195,7 +197,7 @@ export async function GET() {
 export async function PATCH(request: Request) {
   const { actor: ctx, response: actorError } = await phoneActorResponse();
   if (actorError) return actorError;
-  const { extension } = await phoneContext(ctx);
+  const { extension, system } = await phoneContext(ctx);
   if (ctx.previewing) {
     return NextResponse.json(
       {
@@ -380,6 +382,9 @@ export async function PATCH(request: Request) {
     const ringSeconds = Number(body.ringSeconds);
     const voicemailGreeting = String(body.voicemailGreeting || '').trim();
     const externalFallbackEnabled = body.externalFallbackEnabled === true;
+    if (externalFallbackEnabled && !adminForwardingAllowed(system, extension, ctx.roles)) {
+      return NextResponse.json({ error: 'Cell-phone forwarding is disabled. Use your Elevate phone or PBX connection.' }, { status: 403 });
+    }
     const externalDigits = String(body.externalFallbackNumber || '').replace(/\D/g, '');
     const externalFallbackNumber =
       externalDigits.length === 10
@@ -396,9 +401,9 @@ export async function PATCH(request: Request) {
     if (!schedule || !Number.isInteger(ringSeconds) || ringSeconds < 5 || ringSeconds > 60) {
       return NextResponse.json({ error: 'Schedule or ring duration is invalid.' }, { status: 400 });
     }
-    if (externalFallbackEnabled && !externalFallbackNumber) {
+    if (externalFallbackEnabled && externalFallbackNumber !== ADMIN_FORWARDING_NUMBER) {
       return NextResponse.json(
-        { error: 'Enter a valid 10-digit fallback phone number.' },
+        { error: 'Only the approved administrator forwarding destination is allowed.' },
         { status: 400 },
       );
     }

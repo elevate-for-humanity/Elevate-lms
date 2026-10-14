@@ -415,7 +415,7 @@ export default function StudentApplicationForm({
         error:
           error instanceof Error
             ? error.message
-            : 'The application service could not be reached. Your progress is saved on this device. Please try again. If the issue continues, call (317) 999-9620.',
+            : 'The application service could not be reached. Your progress is saved on this device. Please try again. If the issue continues, call (463) 240-1404.',
       });
     } finally {
       setSubmitting(false);

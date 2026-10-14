@@ -67,7 +67,7 @@ const partners = [
     program: 'Workforce Development',
     status: 'verified',
     since: '2021',
-    contact: { name: 'WorkOne Central', email: 'info@workoneindy.org', phone: '(317) 999-9620' },
+    contact: { name: 'WorkOne Central', email: 'info@workoneindy.org', phone: '(463) 240-1404' },
     description:
       'State workforce development partner providing WIOA funding coordination and participant referrals.',
   },
@@ -95,7 +95,7 @@ const partners = [
     program: 'Barber Apprenticeship',
     status: 'verified',
     since: '2022',
-    contact: { name: 'IBA Director', email: 'info@indybarbers.com', phone: '(317) 999-9620' },
+    contact: { name: 'IBA Director', email: 'info@indybarbers.com', phone: '(463) 240-1404' },
     description:
       'Network of licensed barbershops providing apprenticeship training hours for DOL-registered program.',
   },
@@ -110,7 +110,7 @@ const partners = [
     contact: {
       name: 'HR Training',
       email: 'careers@franciscanhealth.org',
-      phone: '(317) 999-9620',
+      phone: '(463) 240-1404',
     },
     description:
       'Healthcare system partner providing clinical externship opportunities and hire-back agreements.',
@@ -135,7 +135,7 @@ const partners = [
     program: 'Construction Trades',
     status: 'verified',
     since: '2021',
-    contact: { name: 'ABC Indiana', email: 'info@abcindiana.org', phone: '(317) 999-9620' },
+    contact: { name: 'ABC Indiana', email: 'info@abcindiana.org', phone: '(463) 240-1404' },
     description:
       'Associated Builders and Contractors apprenticeship program for construction and skilled trades.',
   },
@@ -163,7 +163,7 @@ const partners = [
     program: 'Cosmetology & Esthetics Apprenticeship',
     status: 'verified',
     since: '2022',
-    contact: { name: 'BIG HR', email: 'careers@beautyindustry.com', phone: '(317) 999-9620' },
+    contact: { name: 'BIG HR', email: 'careers@beautyindustry.com', phone: '(463) 240-1404' },
     description:
       'Multi-location salon network offering cosmetology and esthetics apprenticeship hours.',
   },
@@ -175,7 +175,7 @@ const partners = [
     program: 'Medical Assistant Pathways',
     status: 'verified',
     since: '2021',
-    contact: { name: 'CHN Education', email: 'education@ecommunity.com', phone: '(317) 999-9620' },
+    contact: { name: 'CHN Education', email: 'education@ecommunity.com', phone: '(463) 240-1404' },
     description:
       'Major healthcare employer with student externship and hire-back program for medical assistants.',
   },

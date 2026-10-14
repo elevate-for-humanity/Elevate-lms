@@ -48,9 +48,8 @@ export const PLATFORM_DEFAULTS = {
     process.env.NEXT_PUBLIC_SITE_URL ?? `https://www.elevateforhumanity.org`,
   supportEmail:
     process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? `elevate4humanityedu@gmail.com`,
-  mainPhone: '(317) 999-9620' as string,
-  supportPhone:
-    process.env.NEXT_PUBLIC_SUPPORT_PHONE ?? `(317) 314-3757`,
+  mainPhone: '(463) 240-1404' as string,
+  supportPhone: '(463) 240-1404' as string,
   emailFromName:
     process.env.NEXT_PUBLIC_EMAIL_FROM_NAME ?? `Elevate for Humanity`,
   emailFromAddress:

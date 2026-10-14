@@ -1,4 +1,5 @@
 import { storeSmsEvent } from '@/lib/phone/sms-inbound';
+import { ADMIN_FORWARDING_NUMBER } from '@/lib/phone/forwarding-policy';
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
@@ -23,6 +24,7 @@ export const dynamic = 'force-dynamic';
 
 type System = {
   id: string;
+  tenant_id: string | null;
   greeting: string;
   after_hours_message: string;
   timezone: string;
@@ -673,10 +675,14 @@ async function dialExtensionFallback(
   state: CallState,
   eventId: string,
 ) {
+  if (system.tenant_id !== null) return false;
   const { data: extension } = await db
     .from('communication_extensions')
-    .select('*')
+    .select('*,communication_workspaces!inner(phone_system_id)')
     .eq('id', state.extensionId)
+    .eq('communication_workspaces.phone_system_id', system.id)
+    .eq('extension', '0')
+    .eq('external_fallback_number', ADMIN_FORWARDING_NUMBER)
     .eq('admin_external_fallback', true)
     .maybeSingle();
   if (!extension?.external_fallback_number || !state.parentCallControlId) return false;

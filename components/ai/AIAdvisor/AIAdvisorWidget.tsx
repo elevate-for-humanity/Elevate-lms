@@ -115,7 +115,7 @@ export function AIAdvisorWidget() {
     }
     
     if (q.includes('help') || q.includes('advisor') || q.includes('talk') || q.includes('human')) {
-      return "I'd love to connect you with a human advisor! You can text us at (317) 314-3757, call us, or schedule a free consultation. Our admissions team can answer any question and help you find the best path for your situation. Would you like me to show you how to reach us?";
+      return "I'd love to connect you with a human advisor! You can text us at (463) 240-1404, call us, or schedule a free consultation. Our admissions team can answer any question and help you find the best path for your situation. Would you like me to show you how to reach us?";
     }
     
     return "I can help with program tuition, duration, credentials, funding pathways, applications, and apprenticeship requirements. For program-specific facts, use the current published program record rather than assuming the same terms apply to every pathway.";

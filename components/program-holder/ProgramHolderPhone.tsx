@@ -62,6 +62,7 @@ type PhoneData = {
     ringSeconds: number;
     voicemailGreeting: string;
     externalFallbackEnabled: boolean;
+    externalFallbackAllowed?: boolean;
     externalFallbackNumber: string;
     presenceStatus: string;
     provider: 'telnyx' | 'asterisk';
@@ -925,10 +926,9 @@ export function ProgramHolderPhone({
             Availability and ringing
           </h2>
           <p className="mt-1 text-sm leading-6 text-slate-600">
-            Your extension rings in the PWA first. You may also add your own phone number as a
-            fallback for your extension.
+            Your extension rings in your Elevate phone. Unanswered calls go to PARIS or voicemail.
           </p>
-          <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
+          {data.extension.externalFallbackAllowed && <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
             <label className="flex items-center gap-3 text-sm font-bold text-blue-950">
               <input
                 type="checkbox"
@@ -939,18 +939,16 @@ export function ProgramHolderPhone({
                 disabled={data.readOnly}
                 className="h-5 w-5 accent-blue-700"
               />
-              Ring my own phone number as an extension fallback
+              Use the approved administrator forwarding destination
             </label>
             {data.extension.externalFallbackEnabled && (
               <label className="mt-3 block text-sm font-bold text-slate-800">
-                My phone number
+                Administrator forwarding destination
                 <input
                   type="tel"
                   inputMode="tel"
                   value={data.extension.externalFallbackNumber}
-                  onChange={(event) =>
-                    updateExtension({ externalFallbackNumber: event.target.value })
-                  }
+                  readOnly
                   placeholder="(317) 555-0123"
                   disabled={data.readOnly}
                   className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-3 font-normal"
@@ -958,10 +956,9 @@ export function ProgramHolderPhone({
               </label>
             )}
             <p className="mt-2 text-xs leading-5 text-slate-600">
-              This does not change your extension or business caller ID. It gives the phone system a
-              verified fallback destination when your PWA cannot take the call.
+              This destination is reserved for the administrator. Other extensions cannot forward to cell phones.
             </p>
-          </div>
+          </div>}
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <label className="text-sm font-bold text-slate-800">
               Phone mode

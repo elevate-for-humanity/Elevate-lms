@@ -68,6 +68,23 @@ export async function POST(request: NextRequest) {
     .select('id')
     .single();
   if (reservation.error?.code === '23505') {
+    // A previously failed or interrupted delivery must not be acknowledged as successful.
+    // Keep it available for explicit reconciliation rather than risking duplicate invoices.
+    const prior = await db
+      .from('billing_provider_events')
+      .select('status')
+      .eq('provider', 'paypal')
+      .eq('provider_event_id', event.id)
+      .maybeSingle();
+    if (prior.error) {
+      return NextResponse.json({ error: 'Unable to verify prior PayPal delivery.' }, { status: 503 });
+    }
+    if (prior.data?.status !== 'completed') {
+      return NextResponse.json(
+        { error: 'PayPal event requires reconciliation before acknowledgement.' },
+        { status: 503 },
+      );
+    }
     return NextResponse.json({ ok: true, duplicate: true });
   }
   if (reservation.error) {

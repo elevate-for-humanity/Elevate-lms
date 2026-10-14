@@ -123,6 +123,10 @@ def validate():
                     'sdesObserved': bool(re.search(r'media_encryption\s*:\s*sdes\b', endpoint, re.I)),
                     'tlsObserved': bool(re.search(r'protocol\s*:\s*tls\b', transport, re.I)),
                     'pjsipModuleRunning': bool(re.search(r'res_pjsip\.so\s+.*\bRunning\b', run(['docker', 'exec', NAME, 'asterisk', '-rx', 'module show like res_pjsip.so'], False).stdout)),
+                    'newConfigErrors': [line[-600:] for line in combined.splitlines()
+                                        if 'elevate-twilio.conf' in line and re.search(r'error|warning|unable|could not', line, re.I)],
+                    'objectCreationErrors': re.findall(r"Could not create an object of type '(transport|endpoint|aor)' with id '(twilio|twilio-aor|elevate-twilio-tls)'", combined),
+                    'invalidOptions': re.findall(r"Could not find option suitable for category '(twilio|twilio-aor|elevate-twilio-tls)' named '([a-z_]+)'", combined),
                     'logSignals': {name: bool(re.search(pattern, combined, re.I)) for name, pattern in {
                         'permissionDenied': 'permission denied', 'missingFile': 'no such file',
                         'configLoadError': 'unable to load|could not create|error parsing|could not find',

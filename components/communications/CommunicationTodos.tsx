@@ -1,7 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-export function CommunicationTodos() {
+export function CommunicationTodos({
+  inboxPath = '/communications/email',
+}: {
+  inboxPath?: string;
+}) {
+  const [signedIn, setSignedIn] = useState(false);
   const [items, setItems] = useState<any[]>([]);
   useEffect(() => {
     let active = true;
@@ -14,7 +19,10 @@ export function CommunicationTodos() {
         data: { user },
       } = await db.auth.getUser();
       if (!user) {
-        if (active) setItems([]);
+        if (active) {
+          setItems([]);
+          setSignedIn(false);
+        }
         return;
       }
       const { data } = await db
@@ -25,7 +33,10 @@ export function CommunicationTodos() {
         .in('type', ['message', 'announcement', 'reminder'])
         .order('created_at', { ascending: false })
         .limit(5);
-      if (active) setItems(data || []);
+      if (active) {
+        setItems(data || []);
+        setSignedIn(true);
+      }
       return user;
     }
     async function setup() {
@@ -54,12 +65,20 @@ export function CommunicationTodos() {
       if (channel) void db.removeChannel(channel);
     };
   }, []);
-  if (!items.length) return null;
+  if (!signedIn) return null;
   return (
     <section
       aria-label="New email and communication to-dos"
       className="mx-auto my-3 max-w-7xl space-y-2 px-4"
     >
+      <nav aria-label="Interoffice communications">
+        <a
+          href={inboxPath}
+          className="inline-flex min-h-11 items-center rounded-xl border border-blue-200 bg-white px-4 font-bold text-blue-900"
+        >
+          Interoffice email
+        </a>
+      </nav>
       {items.map((item) => (
         <article
           key={item.id}
@@ -70,7 +89,11 @@ export function CommunicationTodos() {
             <p className="mt-1 text-sm text-slate-800">{item.message}</p>
           </div>
           <a
-            href={item.action_url || 'https://app.elevateforhumanity.org/communications/email'}
+            href={
+              item.action_url?.endsWith('/communications/email')
+                ? inboxPath
+                : item.action_url || inboxPath
+            }
             className="rounded-lg bg-blue-700 px-4 py-2 font-bold text-white"
           >
             {item.action_label || 'Open email'}

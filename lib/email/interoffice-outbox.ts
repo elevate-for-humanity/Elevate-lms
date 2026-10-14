@@ -82,6 +82,7 @@ export async function processInterofficeOutbox(limit = 20) {
       continue;
     }
     const result = await sendEmail({
+      singleAttempt: true,
       to: row.recipient_email,
       from: `${displayName} <${mailbox.address}>`,
       replyTo: mailbox.address,

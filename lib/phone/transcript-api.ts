@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { phoneActorResponse } from './actor-response';
+import { phoneSpeechChunks } from './speech-audio';
 import { loadPhoneRecording } from './recordings';
 export async function transcribePhoneMessage(
   _request: Request,
@@ -32,7 +33,7 @@ export async function transcribePhoneMessage(
   if (existing) return NextResponse.json({ transcript: existing });
   try {
     const audio = await loadPhoneRecording(row.recording_url, { db: ctx.db, callId: row.call_id });
-    const bytes = Buffer.from(await audio.arrayBuffer());
+    const chunks = await phoneSpeechChunks(Buffer.from(await audio.arrayBuffer()));
     const metadata = await fetch(
       'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token',
       {
@@ -47,22 +48,38 @@ export async function transcribePhoneMessage(
     const identity = await metadata.json();
     const token = identity.access_token;
     if (typeof token !== 'string' || !token) throw Error('Speech authorization unavailable');
-    const speech = await fetch('https://speech.googleapis.com/v1/speech:recognize', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        config: { languageCode: 'en-US', model: 'phone_call', enableAutomaticPunctuation: true },
-        audio: { content: bytes.toString('base64') },
-      }),
-      redirect: 'error',
-      signal: AbortSignal.timeout(45000),
-    });
-    if (!speech.ok) throw Error('Speech service did not accept the recording');
-    const result = await speech.json();
-    const transcript = (result.results || [])
-      .map((r: any) => r.alternatives?.[0]?.transcript || '')
-      .filter(Boolean)
-      .join('\n');
+    const signal = AbortSignal.timeout(40000);
+    const parts: string[] = [];
+    for (let index = 0; index < chunks.length; index += 2) {
+      const batch = await Promise.all(
+        chunks.slice(index, index + 2).map(async (content) => {
+          const speech = await fetch('https://speech.googleapis.com/v1/speech:recognize', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              config: {
+                encoding: 'LINEAR16',
+                sampleRateHertz: 16000,
+                languageCode: 'en-US',
+                model: 'phone_call',
+                enableAutomaticPunctuation: true,
+              },
+              audio: { content: content.toString('base64') },
+            }),
+            redirect: 'error',
+            signal,
+          });
+          if (!speech.ok) throw Error('Speech service did not accept the recording');
+          const result = await speech.json();
+          return (result.results || [])
+            .map((r: any) => r.alternatives?.[0]?.transcript || '')
+            .filter(Boolean)
+            .join('\n');
+        }),
+      );
+      parts.push(...batch);
+    }
+    const transcript = parts.filter(Boolean).join('\n');
     if (!transcript)
       return NextResponse.json(
         { error: 'No speech was detected. Listen to the recording.' },

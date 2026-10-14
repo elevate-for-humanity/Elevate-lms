@@ -443,13 +443,19 @@ export function EmailWorkspace({
           </a>
           <a
             className="shrink-0 rounded-lg border px-3 py-2"
-            href="https://app.elevateforhumanity.org/lms/messages"
+            href={
+              data.isAdmin
+                ? '/staff-portal/messages'
+                : 'https://app.elevateforhumanity.org/lms/messages'
+            }
           >
             Chat
           </a>
           <a
             className="shrink-0 rounded-lg border px-3 py-2"
-            href="https://app.elevateforhumanity.org/lms/calendar"
+            href={
+              data.isAdmin ? '/phone/meetings' : 'https://app.elevateforhumanity.org/lms/calendar'
+            }
           >
             Calendar
           </a>
@@ -619,7 +625,7 @@ export function EmailWorkspace({
               <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 p-3">
                 <input
                   type="checkbox"
-                  aria-label="Select all conversations"
+                  aria-label="Select up to 100 conversations"
                   checked={
                     data.threads.length > 0 &&
                     selected.length === Math.min(100, data.threads.length)
@@ -1145,7 +1151,7 @@ export function EmailWorkspace({
                           subject: compose.subject || meeting.title,
                           body:
                             compose.body +
-                            `\n\nYou are invited to ${meeting.title}.${meeting.scheduled_at ? '\nStart: ' + new Date(meeting.scheduled_at).toLocaleString() : ''}\nJoin: https://app.elevateforhumanity.org/lms/meetings/${meeting.id}\nSign in with your Elevate account.`,
+                            `\n\nYou are invited to ${meeting.title}.${meeting.scheduled_at ? '\nStart: ' + new Date(meeting.scheduled_at).toLocaleString() : ''}\nJoin: https://app.elevateforhumanity.org/communications/meetings/${meeting.id}\nAdmin host link: https://admin.elevateforhumanity.org/phone/meetings/${meeting.id}\nSign in with your Elevate account.`,
                         });
                     }}
                     className="mt-2 w-full rounded-lg border p-3"

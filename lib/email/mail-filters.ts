@@ -61,3 +61,8 @@ export function canParisRespond(mail: {
     !isAutomatedMail(sender, mail.headers, mail.subject)
   );
 }
+
+/** ILIKE must match the actual address; underscores and percent signs are legal email characters. */
+export function emailLikeLiteral(address: string) {
+  return address.replace(/[%_]/g, (character) => String.fromCharCode(92) + character);
+}

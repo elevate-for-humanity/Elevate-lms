@@ -78,7 +78,7 @@ export default async function AdminGroupLayout({ children }: { children: React.R
       </head>
       <body className="admin-portal efh-contrast">
         <SupabaseConfigBootstrap />
-        <CommunicationTodos />
+        <CommunicationTodos inboxPath="/phone/email" />
         <AdminPwaRegister />
         <AdminUpdateNotice />
         <I18nProvider>

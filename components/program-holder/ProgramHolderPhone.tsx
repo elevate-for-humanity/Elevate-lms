@@ -511,6 +511,10 @@ export function ProgramHolderPhone({
   }
 
   async function returnCall(number = returnNumber) {
+    if (callState !== 'idle' || callRef.current || outboundClientRef.current) {
+      setError('Finish the current call before placing another.');
+      return;
+    }
     if (data?.readOnly || callRef.current) return;
     let destination = phoneDestination(number, data?.extension.provider || 'telnyx');
     if (data?.extension.provider !== 'asterisk' && /^(0|[0-9]{3})$/.test(number.trim())) {
@@ -628,7 +632,11 @@ export function ProgramHolderPhone({
       );
       return;
     }
+    if (callRef.current) return;
     try {
+      setIncomingNumber(number);
+      setCallState('calling');
+      setError('');
       const call = await clientRef.current.newCall({
         destinationNumber: destination,
         callerNumber: data?.phoneNumber,
@@ -637,10 +645,8 @@ export function ProgramHolderPhone({
         remoteElement: remoteAudioRef.current,
       });
       callRef.current = call;
-      setIncomingNumber(number);
-      setCallState('calling');
-      setError('');
     } catch {
+      if (!callRef.current) setCallState('idle');
       setError('The call could not be placed. Check microphone permission and try again.');
     }
   }
@@ -801,7 +807,7 @@ export function ProgramHolderPhone({
           />
           <button
             onClick={() => returnCall()}
-            disabled={data.readOnly}
+            disabled={data.readOnly || connecting || callState !== 'idle'}
             className="min-h-12 rounded-xl bg-emerald-700 px-4 font-black text-white"
           >
             <PhoneCall className="h-5 w-5" />
@@ -1259,6 +1265,7 @@ export function ProgramHolderPhone({
               {item.recordingUrl && <PhoneRecordingPlayer url={item.recordingUrl} />}
               {item.callback_number && (
                 <button
+                  disabled={data.readOnly || connecting || callState !== 'idle'}
                   onClick={() => {
                     setReturnNumber(item.callback_number || '');
                     returnCall(item.callback_number || '');

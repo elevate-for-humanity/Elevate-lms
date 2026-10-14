@@ -158,35 +158,44 @@ export async function handleCommunicationEmailGet(
 
   const view = url.searchParams.get('view') || 'inbox';
   const search = (url.searchParams.get('q') || '').trim().slice(0, 160);
+  const directionView = view === 'sent' || view === 'inbox';
+  const projection =
+    'id,subject,last_message_at,message_count,created_at,folder,custom_folder_id,starred' +
+    (directionView ? ',scope_mail:communication_email_messages!inner(id)' : '') +
+    (search ? ',search_mail:communication_email_messages!inner(id)' : '');
   let threadQuery = context.db
     .from('communication_email_threads')
-    .select('id,subject,last_message_at,message_count,created_at,folder,custom_folder_id,starred')
+    .select(projection)
     .eq('mailbox_id', selectedMailbox.id)
     .order('last_message_at', { ascending: false })
     .limit(500);
   threadQuery = mailViewQuery(threadQuery, view);
-  if (view === 'sent') {
-    const { data: sent, error } = await context.db
-      .from('communication_email_messages')
-      .select('thread_id')
-      .eq('mailbox_id', selectedMailbox.id)
-      .eq('direction', 'outbound')
-      .limit(5000);
-    if (error) return NextResponse.json({ error: 'Sent mail unavailable.' }, { status: 500 });
-    threadQuery = threadQuery.in('id', [...new Set((sent || []).map((m: any) => m.thread_id))]);
+  if (directionView) {
+    threadQuery = threadQuery
+      .eq('scope_mail.mailbox_id', selectedMailbox.id)
+      .eq('scope_mail.direction', view === 'sent' ? 'outbound' : 'inbound');
   }
   if (search) {
     const needle = search.replace(/[,%_()]/g, ' ');
-    const { data: matches, error: searchError } = await context.db
-      .from('communication_email_messages')
-      .select('thread_id')
-      .eq('mailbox_id', selectedMailbox.id)
-      .or(`subject.ilike.%${needle}%,text_body.ilike.%${needle}%,sender_email.ilike.%${needle}%`)
-      .limit(1000);
-    if (searchError) return NextResponse.json({ error: 'Search unavailable.' }, { status: 500 });
-    threadQuery = threadQuery.in('id', [...new Set((matches || []).map((m: any) => m.thread_id))]);
+    threadQuery = threadQuery
+      .eq('search_mail.mailbox_id', selectedMailbox.id)
+      .or(`subject.ilike.%${needle}%,text_body.ilike.%${needle}%,sender_email.ilike.%${needle}%`, {
+        referencedTable: 'search_mail',
+      });
   }
-  const { data: threadRows, error: threadError } = await threadQuery;
+  const { data: threadRows, error: threadError } = await threadQuery.overrideTypes<
+    Array<{
+      id: string;
+      subject: string;
+      last_message_at: string;
+      message_count: number;
+      created_at: string;
+      folder: string;
+      custom_folder_id: string | null;
+      starred: boolean;
+    }>,
+    { merge: false }
+  >();
   if (threadError)
     return NextResponse.json({ error: 'Inbox could not be loaded.' }, { status: 500 });
 
@@ -317,6 +326,19 @@ async function validateFiles(files: File[]): Promise<string | null> {
   return null;
 }
 
+async function emailProfiles(db: EmailContext['db'], ids: string[]) {
+  const rows: any[] = [];
+  for (let offset = 0; offset < ids.length; offset += 100) {
+    const result = await db
+      .from('profiles')
+      .select('id,email,full_name,is_active,status,role')
+      .in('id', ids.slice(offset, offset + 100));
+    if (result.error) return { data: rows, error: result.error };
+    rows.push(...(result.data || []));
+  }
+  return { data: rows, error: null };
+}
+
 async function inviteEmailMeetings(
   context: EmailContext,
   text: string,
@@ -327,7 +349,9 @@ async function inviteEmailMeetings(
   const ids = [
     ...new Set(
       Array.from(
-        text.matchAll(/https:\/\/app\.elevateforhumanity\.org\/lms\/meetings\/([0-9a-f-]{36})/gi),
+        text.matchAll(
+          /https:\/\/app\.elevateforhumanity\.org\/(?:lms|communications)\/meetings\/([0-9a-f-]{36})/gi,
+        ),
         (m) => m[1],
       ),
     ),
@@ -361,10 +385,7 @@ async function inviteEmailMeetings(
     ]),
   ];
   if (!users.length) return;
-  const profiles = await context.db
-    .from('profiles')
-    .select('id,email,full_name,is_active,status')
-    .in('id', users);
+  const profiles = await emailProfiles(context.db, users);
   if (profiles.error || boxes.error || members.error || direct.error)
     throw Error('Meeting invitees unavailable');
   for (const room of rooms.data || []) {
@@ -451,10 +472,9 @@ export async function handleCommunicationEmailPost(
       .eq('communication_email_mailboxes.active', true);
     if (members.error)
       return NextResponse.json({ error: 'Audience unavailable.' }, { status: 503 });
-    const users = await context.db
-      .from('profiles')
-      .select('id,email,full_name,is_active,status,role')
-      .in('id', [...new Set((members.data || []).map((m: any) => m.user_id))]);
+    const users = await emailProfiles(context.db, [
+      ...new Set((members.data || []).map((m: any) => m.user_id)),
+    ]);
     if (users.error) return NextResponse.json({ error: 'Audience unavailable.' }, { status: 503 });
     const unique = new Map<string, any>();
     for (const p of users.data || []) {

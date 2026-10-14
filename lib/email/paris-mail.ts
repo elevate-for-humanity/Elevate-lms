@@ -1,7 +1,7 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from './sendgrid';
 import { parseEmailList, textToEmailHtml } from './communication-email';
-import { canParisRespond } from './mail-filters';
+import { canParisRespond, emailLikeLiteral } from './mail-filters';
 import type { ParsedInboundEmail } from './sendgrid-inbound';
 
 export const EMAIL_INTERVIEW_QUESTIONS = [
@@ -62,7 +62,7 @@ export async function respondToParisMail(parsed: ParsedInboundEmail) {
   await db
     .from('onboarding_email_log')
     .update({ status: 'responded', responded_at: new Date().toISOString() })
-    .ilike('applicant_email', sender)
+    .ilike('applicant_email', emailLikeLiteral(sender))
     .in('status', ['sent', 'followed_up']);
   const responseEvent = `${parsed.eventId}:paris-mail`;
   const existing = await db
@@ -76,7 +76,7 @@ export async function respondToParisMail(parsed: ParsedInboundEmail) {
   const { data: app, error: appError } = await db
     .from('applications')
     .select('id,first_name,program_interest,status,interview_responses,interview_completed')
-    .ilike('email', sender)
+    .ilike('email', emailLikeLiteral(sender))
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -149,6 +149,7 @@ export async function respondToParisMail(parsed: ParsedInboundEmail) {
     .single();
   if (recordError || !record) return { responded: false, reason: 'already_claimed_or_failed' };
   const sent = await sendEmail({
+    singleAttempt: true,
     to: sender,
     from: `PARIS — Elevate Virtual Assistant <${mailbox.address}>`,
     replyTo: mailbox.address,

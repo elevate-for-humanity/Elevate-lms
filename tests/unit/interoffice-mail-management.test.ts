@@ -1,3 +1,4 @@
+import { emailLikeLiteral } from '@/lib/email/mail-filters';
 import { describe, it, expect } from 'vitest';
 import { validateMailAction } from '@/lib/email/mail-management';
 import { applyMailFilters, canParisRespond, isRelevantCopy } from '@/lib/email/mail-filters';
@@ -96,4 +97,10 @@ describe('mail organization and copied-message rules', () => {
       }),
     ).toBeNull();
   });
+});
+
+it('matches an exact sender address rather than treating its underscores as a wildcard', () => {
+  expect(emailLikeLiteral('jane_doe@example.org')).toBe(
+    'jane' + String.fromCharCode(92) + '_doe@example.org',
+  );
 });

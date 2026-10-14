@@ -1,3 +1,4 @@
+import {courseSelectedStill} from './selected-course-stills.mjs';
 import {recoverTeachingPhoto} from './photo-repair.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watch.mjs';
 import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
@@ -37,6 +38,12 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         const signed=await db.storage.from('course_videos').createSignedUrl(placed.storage_path,3600);
         if(signed.error||!signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
         photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:'openai'});
+        reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
+        continue;
+      }
+      const selected=await courseSelectedStill(input,db,scene,index,step);
+      if(selected){
+        photos[scene.id].push({...selected,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1});
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }

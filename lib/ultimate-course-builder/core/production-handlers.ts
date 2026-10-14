@@ -297,6 +297,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
         artifacts: {
           render: await runtime.renderer.render({
             lessonId: canonicalLessonId ?? comp(ctx).id,
+            courseId:ctx.courseId,
             courseTitle: ctx.profile.title,
             lessonPresentation: ctx.profile.lessonPresentation,
             presentationContract: ctx.profile.presentationContract,

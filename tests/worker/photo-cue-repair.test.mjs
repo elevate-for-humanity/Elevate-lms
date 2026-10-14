@@ -1,21 +1,27 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {photoResponseDetails,recoverTeachingPhoto} from '../../lib/ultimate-course-builder/adapters/photo-repair.mjs';
-const input={courseTitle:'Cosmetology',scene:{id:'scene:assessment',stage:'assessment',visualRequirement:'Assessment at a training station'},step:{narrationQuote:'Answer each question carefully',view:'full workstation'},index:1,primaryPrompt:'Original abstract narration prompt'};
-test('text-only image response is diagnosed and repaired with a changed observable request',async()=>{
- const prompts=[],diagnostics=[];const result=await recoverTeachingPhoto({...input,persistFailure:async x=>diagnostics.push(x),generate:async(p,opts)=>{
- prompts.push(p);assert.equal(opts.maxAttempts,2);assert.equal(opts.timeoutMs,90000);
- if(prompts.length===1)throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:photoResponseDetails({candidates:[{finishReason:'STOP',content:{parts:[{text:'text-only'}]}}]})});
- return {bytes:Buffer.from('photo'),mimeType:'image/png'};
- }});
- assert.equal(prompts.length,2);assert.notEqual(prompts[0],prompts[1]);assert.match(prompts[1],/assessment sheet/);assert.equal(diagnostics[0].provider.partTypes[0],'text');assert.equal(result.repair.cueIndex,1);
+import test from 'node:test';import assert from 'node:assert/strict';
+import {selectedStillBinding} from '../../lib/ultimate-course-builder/adapters/selected-course-stills.mjs';
+import {recoverTeachingPhoto} from '../../lib/ultimate-course-builder/adapters/photo-repair.mjs';
+const intent={courseId:'course',lessonId:'lesson',sceneId:'scene',cueIndex:1,narrationQuote:'Exact teaching words'};
+const row={id:'source',course_id:'course',storage_path:'private.mp4',licensed_media_entitlements:{metadata:{license_evidence_url:'license.pdf',visual_observation:{method:'sampled-frame-inspection',reviewedAt:'2026-10-03T22:36:32Z',visibleActions:['Learners writing'],sampleFractions:[.35],contentSha256:'a'.repeat(64)},teachingCueSelections:[{...intent,sampleFraction:.35,selectedSourceAssetId:'source'}]}}};
+test('only exact course lesson scene cue and narration selection is used',()=>{
+ assert.equal(selectedStillBinding([row],intent).row.id,'source');
+ for(const key of ['courseId','lessonId','sceneId','cueIndex','narrationQuote'])assert.equal(selectedStillBinding([row],{...intent,[key]:'wrong'}),null);
 });
-test('explicit provider safety block is preserved rather than evaded',async()=>{
- let calls=0;await assert.rejects(recoverTeachingPhoto({...input,generate:async()=>{calls++;throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true,blockReason:'SAFETY'}});}}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED:scene:assessment:cue-1/);assert.equal(calls,1);
+test('unlicensed uninspected or different selected source is rejected',()=>{
+ for(const mutate of [r=>r.licensed_media_entitlements.metadata.license_evidence_url=null,r=>r.licensed_media_entitlements.metadata.visual_observation.sampleFractions=[],r=>r.id='different']){
+ const altered=structuredClone(row);mutate(altered);assert.equal(selectedStillBinding([altered],intent),null);}
 });
-test('exhausted changed request records the precise cue and blocks instead of endless rerender',async()=>{
- const records=[];let calls=0;
- await assert.rejects(recoverTeachingPhoto({...input,persistFailure:async x=>records.push(x),generate:async()=>{calls++;throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{candidateCount:0}});}}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED/);
- assert.equal(calls,2);assert.equal(records[1].sceneId,input.scene.id);assert.equal(records[1].cueIndex,1);
+const request={primaryPrompt:'exact request',scene:{id:'scene'},step:{narrationQuote:'Exact teaching words'},index:1};
+test('failed provider uses selected replacement without arbitrary regenerated request',async()=>{
+ let calls=0;const result=await recoverTeachingPhoto({...request,generate:async()=>{calls++;throw Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED');},selectedReplacement:async()=>({bytes:Buffer.from('selected'),selectedSourceAssetId:'source'})});
+ assert.equal(calls,1);assert.equal(result.repair.sourceAssetId,'source');
 });
-test('successful image does not invoke replacement or redo other cues',async()=>{
- let calls=0;const result=await recoverTeachingPhoto({...input,generate:async()=>{calls++;return {bytes:Buffer.from('saved image')};}});assert.equal(calls,1);assert.equal(result.bytes.toString(),'saved image');
+test('missing selected replacement stops at exact cue',async()=>{
+ await assert.rejects(recoverTeachingPhoto({...request,generate:async()=>{throw Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED');}}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED:scene:cue-1/);
+});
+test('successful provider preserves successful cue',async()=>{
+ const result=await recoverTeachingPhoto({...request,generate:async()=>({bytes:Buffer.from('saved')})});assert.equal(result.bytes.toString(),'saved');
+});
+test('explicit provider safety block is retained',async()=>{
+ await assert.rejects(recoverTeachingPhoto({...request,generate:async()=>{throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true}});},selectedReplacement:async()=>{throw Error('must not bypass');}}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED/);
 });

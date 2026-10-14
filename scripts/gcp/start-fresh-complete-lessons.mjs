@@ -25,6 +25,19 @@ if(jobs.length!==1)throw Error('EXACT_FRESH_JOBS_REQUIRED');
 if(jobs.every(j=>j.payload?.completeLessonImage===expectedSha)){console.log(JSON.stringify({status:'fresh_courses_already_activated'}));process.exit(0);}
 const otherLive=await rest('ultimate_build_jobs?select=id&status=eq.running&lease_expires_at=gt.'+encodeURIComponent(new Date().toISOString()));
 if(otherLive.some(j=>!ids.includes(j.id)))throw Error('OTHER_ACTIVE_COURSE_LEASES_REQUIRE_REVIEW');
+// Updating a template must not cancel an actively progressing saved lesson.
+const productive=jobs.every(j=>j.status==='running'&&Number.isFinite(Date.parse(j.payload?.progress?.at))&&Date.now()-Date.parse(j.payload.progress.at)<600000);
+if(productive){
+ const directory=mkdtempSync(join(tmpdir(),'future-complete-lessons-'));
+ try{
+  const spec=structuredClone(source.spec);spec.template.spec.taskCount=1;spec.template.spec.parallelism=1;
+  const file=join(directory,'job.json');writeFileSync(file,JSON.stringify({apiVersion:'run.googleapis.com/v1',kind:'Job',metadata:{name,namespace:PROJECT},spec}),{mode:0o600});
+  google(['run','jobs','replace',file,'--project='+PROJECT,'--region='+region,'--quiet']);
+  if(read(['run','jobs','describe',name]).spec.template.spec.template.spec.containers[0].image!==task.containers[0].image)throw Error('IMAGE_READBACK_MISMATCH');
+  console.log(JSON.stringify({status:'active_execution_preserved',futureImage:task.containers[0].image,jobIds:ids}));
+ }finally{rmSync(directory,{recursive:true,force:true});}
+ process.exit(0);
+}
 // Owner stopped all three reference jobs. Their old finite executions may
 // remain alive while a provider request drains; cancellation frees those slots.
 const inventory=read(['run','jobs','list']);

@@ -10,14 +10,16 @@
     {
       "source": "app/tax-software/_components/TaxSiteShell.tsx",
       "target": "apps/marketing/app/tax-software/_components/TaxSiteShell.tsx",
-      "sha256": "4dec05009cf755a609bfba0cafd7b747f8d85cacbb93a3fa8eaf72cbb36cec1b",
+      "sha256": "82aae4b9b4aecd80e7ac7aef48063feb96f93f7ad6a7f168361cb85b9d8280ae",
       "sourceSha256": "209cc698b65b0207eb05cee1208091e758ee26f4f70a24c02cef6bb30762451b",
-      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough"
     },
     {
       "source": "app/tax-software/about/page.tsx",
       "target": "apps/marketing/app/tax-software/about/page.tsx",
-      "sha256": "fba09019a0efa6c76b5afba6bf42668c69f313a3bfc9df625ce0b4c73677f9ab"
+      "sha256": "eadcaeea5e302d5fc41639dbee526782d767d6a365eb6e3aeaf7ceffb1ec583a",
+      "sourceSha256": "fba09019a0efa6c76b5afba6bf42668c69f313a3bfc9df625ce0b4c73677f9ab",
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough"
     },
     {
       "source": "app/tax-software/bank-products/page.tsx",
@@ -36,12 +38,16 @@
     {
       "source": "app/tax-software/demo/page.tsx",
       "target": "apps/marketing/app/tax-software/demo/page.tsx",
-      "sha256": "66f6adea7f5207c15638e6dd6151e6cddfd2dbb5b2635981bbfd0acc6eec2cfc"
+      "sha256": "e4b8da7de5620c49552f86015c54ac0a8c6874dec5167cbeb01dbae3a27bee1c",
+      "sourceSha256": "66f6adea7f5207c15638e6dd6151e6cddfd2dbb5b2635981bbfd0acc6eec2cfc",
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough"
     },
     {
       "source": "app/tax-software/features/page.tsx",
       "target": "apps/marketing/app/tax-software/features/page.tsx",
-      "sha256": "84328a80ec33aa372c58e7e7e806d38e251b712342aeaf61216a5ee039d89ffc"
+      "sha256": "1166e13ed4fdd462ff08e655b130db421d9b11948abcd3a579f2063624d3e45c",
+      "sourceSha256": "84328a80ec33aa372c58e7e7e806d38e251b712342aeaf61216a5ee039d89ffc",
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough"
     },
     {
       "source": "app/tax-software/login/layout.tsx",

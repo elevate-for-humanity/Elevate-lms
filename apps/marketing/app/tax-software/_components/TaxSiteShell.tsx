@@ -167,6 +167,8 @@ export function TaxSiteShell({ children }: { children: ReactNode }) {
           <div className="mt-9 border-t border-slate-200 pt-6 text-xs leading-6 text-slate-600">
             <p className="font-semibold">HOTT KAMODITTY DBA Supersonic Fast Cash</p>
             <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
+              <Link href="/tax-software/about">About Supersonic Fast Cash</Link>
+              <Link href="/tax-software/features">How the tax workspace works</Link>
               <Link href="/privacy">Privacy</Link>
               <Link href="/terms-of-service">Terms</Link>
               <Link href="/">Elevate for Humanity</Link>

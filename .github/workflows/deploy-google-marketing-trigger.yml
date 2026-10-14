@@ -1,7 +1,8 @@
 name: Deploy Google Marketing on trigger
 
 # Changes on main release automatically after validation and final-container tests.
-# Each service releases independently; newer main releases supersede stale builds.
+# Complete the active validated release; keep the newest main update queued.
+# Frequent independent changes must not repeatedly cancel the production build.
 on:
   push:
     branches: [main]
@@ -71,7 +72,7 @@ jobs:
   deploy:
     concurrency:
       group: google-production-marketing
-      cancel-in-progress: true
+      cancel-in-progress: false
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production

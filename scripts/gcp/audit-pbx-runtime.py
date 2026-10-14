@@ -29,6 +29,21 @@ def mailbox_count(output):
     return int(match[1]) if match else None
 
 
+def carrier_inventory(transports, endpoints):
+    """Return protocol/bind and carrier-presence evidence, never auth or device IDs."""
+    rows = []
+    for line in (transports or '').splitlines():
+        match = re.fullmatch(r'\s*Transport:\s+[A-Za-z0-9_.-]+\s+(udp|tcp|tls|ws|wss)\s+\d+\s+\d+\s+([0-9.:[\]]+:\d+)\s*', line)
+        if match:
+            rows.append({'protocol': match[1], 'bind': match[2]})
+    names = re.findall(r'^\s*Endpoint:\s+([A-Za-z0-9_.-]+)(?:[ /]|$)', endpoints or '', re.M)
+    return {'result': 'PASS' if transports is not None and endpoints is not None else 'BLOCKED',
+            'evidence': {'transports': rows, 'transport_inventory_parsed': bool(rows),
+                         'twilio_endpoint_present': any('twilio' in name.lower() for name in names),
+                         'telnyx_endpoint_present': any('telnyx' in name.lower() for name in names),
+                         'scope': 'configuration_only; carrier_calls_not_tested'}}
+
+
 def service_state(output):
     """Whitelist state labels. Never return unit Environment, command lines or errors."""
     if output is None:
@@ -128,6 +143,7 @@ def audit():
     checks['PWA_PROVISIONER_LISTENER'] = private_listener(8090, '/internal/pbx/devices')
     checks['PARIS_TURN_LISTENER'] = private_listener(8091, '/internal/paris/turn')
     endpoints = cli('pjsip show endpoints')
+    checks['CARRIER_CONFIGURATION'] = carrier_inventory(cli('pjsip show transports'), endpoints)
     pwa = re.findall(r'Endpoint:\s+(pwa-[0-9a-f]{40})(?:[ /]|$)', endpoints or '', re.M)
     secure = 0
     for endpoint in pwa[:100]:

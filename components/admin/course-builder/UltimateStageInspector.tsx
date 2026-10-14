@@ -158,6 +158,7 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
                   {result.diagnostic.missingEvidence.length > 0 && <p>Evidence still required: {result.diagnostic.missingEvidence.join(', ')}.</p>}
                   {result.diagnostic.videoUrl ? <div>
                     <p className="mb-2 font-bold">Latest saved video · {result.diagnostic.mediaApproved ? 'Media QA passed' : 'Draft preview — media QA has not passed'}</p>
+                    {result.diagnostic.historicalVersion && <p className="mb-2">Saved render version {result.diagnostic.historicalVersion}. This preview remains available while the replacement is being produced.</p>}
                     <video controls preload="metadata" className="w-full rounded-lg bg-black" src={result.diagnostic.videoUrl} aria-label={`${lesson.title} video preview`} />
                   </div> : <p>No saved video is available yet. The live browser shows website activity; this player shows rendered lesson output.</p>}
                 </div>}

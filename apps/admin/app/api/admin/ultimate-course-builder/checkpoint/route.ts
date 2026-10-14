@@ -4,7 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { ULTIMATE_BUILD_STEPS } from '@/lib/ultimate-course-builder/core/types';
 import { validateStepOutput } from '@/lib/ultimate-course-builder/core/lesson-contract';
 import { routeSelectiveRepairs } from '@/lib/ultimate-course-builder/core/repair-router';
-import { renderPlaybackUrl } from '@/lib/ultimate-course-builder/media/playback-source.mjs';
+import { renderMediaUrl, renderPlaybackUrl } from '@/lib/ultimate-course-builder/media/playback-source.mjs';
 import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { safeInternalError } from '@/lib/api/safe-error';
 export const runtime = 'nodejs';
@@ -33,11 +33,27 @@ export async function GET(req: NextRequest) {
     const predecessors = ULTIMATE_BUILD_STEPS.slice(0, ULTIMATE_BUILD_STEPS.indexOf(input.step as any));
     const prerequisites = predecessors.filter(p => !c.steps.some((s: any) => s.step === p && s.state === 'passed'));
     const competency = c.build.profile.competencies?.find((x: any) => x.id === c.lesson.competency_id);
+    let videoUrl = renderMediaUrl(c.lesson.artifacts?.lesson_film_render?.render) ?? renderPlaybackUrl(c.lesson.artifacts?.lesson_film_render?.render);
+    let historicalVersion: number | null = null;
+    if (!videoUrl) {
+      const artifact = await db.from('ultimate_artifacts').select('id').eq('build_id', input.buildId)
+        .eq('lesson_build_id', input.lessonBuildId).eq('stage', 'lesson_film_render').eq('artifact_type', 'stage_output').maybeSingle();
+      if (artifact.error) throw artifact.error;
+      if (artifact.data?.id) {
+        const versions = await db.from('ultimate_artifact_versions').select('version,content')
+          .eq('artifact_id', artifact.data.id).order('version', { ascending: false }).limit(20);
+        if (versions.error) throw versions.error;
+        for (const version of versions.data ?? []) {
+          videoUrl = renderMediaUrl(version.content?.render) ?? renderPlaybackUrl(version.content?.render);
+          if (videoUrl) { historicalVersion = version.version; break; }
+        }
+      }
+    }
     return NextResponse.json({ diagnostic: { lessonTitle: competency?.title ?? competency?.description ?? 'Lesson',
       state: step?.state ?? 'not_started', findings, missingEvidence: missing, prerequisites,
       repairTargets: routeSelectiveRepairs(findings), completedAt: step?.completed_at ?? null,
-      videoUrl: renderPlaybackUrl(c.lesson.artifacts?.lesson_film_render?.render),
-      mediaApproved: c.lesson.artifacts?.finished_media_qa?.mediaQA?.pass === true,
+      videoUrl, historicalVersion,
+      mediaApproved: historicalVersion === null && c.lesson.artifacts?.finished_media_qa?.mediaQA?.pass === true,
       workerStatus: c.job?.status ?? 'not_started', heartbeatAt: c.job?.heartbeat_at ?? null,
     } });
   } catch (e) { return safeInternalError(e, 'Checkpoint diagnostic failed', 'The checkpoint diagnostic could not be loaded. Saved work is unchanged.'); }

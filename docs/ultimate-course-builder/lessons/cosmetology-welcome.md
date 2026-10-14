@@ -116,3 +116,15 @@ Course-defined introductory knowledge; no state licensing eligibility or practic
 - https://www.apprenticeship.gov/career-seekers
 - https://www.in.gov/pla/professions/cosmetology-and-barber-home/
 - Original course-defined scenarios and exercises
+
+## Instructor-led practice and scoring guide
+
+**Activity A — Authorization decision (Objective 1).** The learner receives a fictional consultation card requesting a chemical service not listed in the apprentice's verified assignments. Require the learner to (1) restate the requested service, (2) identify the missing authorization evidence, (3) write a supervisor-escalation sentence, and (4) explain to the client that no service begins until authorization is confirmed. Feedback: passing responses explicitly stop the service and consult the designated supervisor; promising to proceed or relying on observation alone requires remediation.
+
+**Activity B — Training-pathway map (Objective 2).** Ask the learner to arrange these four milestones and identify their distinct evidence: related instruction (lesson records), supervised workplace learning (verified activity/hours), apprenticeship completion (program determination), and state license (state licensing determination). Feedback: a completed online lesson does not independently verify practical competence, apprenticeship completion, or licensing.
+
+**Activity C — Accurate observation log (Objective 3).** Present a fictional 30-minute observed consultation. Require date, activity marked as observed, actual duration, and designated reviewer. Score one point for each field. An entry claiming independent performance or fabricated time fails the accuracy requirement regardless of total points. Never post fictional activity to a production hours ledger.
+
+**Knowledge scoring.** The three existing multiple-choice items each earn one point; the course-level 80% target therefore requires all three correct. On a miss, display the corresponding explanation above, assign the matching activity, and administer the separate reassessment bank. Reassessment questions must not be substituted for the original scored attempt. Hands-on competency is assessed separately by the authorized supervisor using the program's practical rubric.
+
+**Instructor review checklist.** Confirm learner identity and enrollment; verify the learner's responses and the remediation attempt; record completion only when the required score and activities are satisfied; preserve timestamps and evidence; and escalate any licensing or scope-of-practice uncertainty to the designated program authority. This document supplies authored instruction, not video, media licensing, authenticated browser runthrough, or a release certificate.

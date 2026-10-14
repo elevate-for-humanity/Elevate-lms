@@ -114,8 +114,9 @@ def validate():
                 time.sleep(1)
             else:
                 state = json.loads(run(['docker', 'inspect', NAME]).stdout)[0]['State']
-                logs = run(['docker', 'logs', '--tail=100', NAME], False)
+                logs = run(['docker', 'logs', '--tail=1000', NAME], False)
                 combined = logs.stdout + logs.stderr
+                settings = run(['docker', 'exec', NAME, 'asterisk', '-rx', 'core show settings'], False).stdout
                 print(json.dumps({'isolatedDiagnostics': {
                     'running': bool(state['Running']), 'exitCode': int(state['ExitCode']),
                     'endpointObserved': bool(re.search(r'Endpoint:\s+twilio(?:[ /]|$)', endpoint)),
@@ -127,6 +128,12 @@ def validate():
                                         if 'elevate-twilio.conf' in line and re.search(r'error|warning|unable|could not', line, re.I)],
                     'objectCreationErrors': re.findall(r"Could not create an object of type '(transport|endpoint|aor)' with id '(twilio|twilio-aor|elevate-twilio-tls)'", combined),
                     'invalidOptions': re.findall(r"Could not find option suitable for category '(twilio|twilio-aor|elevate-twilio-tls)' named '([a-z_]+)'", combined),
+                    'configurationPaths': re.findall(r'(?im)^\s*(Configuration (?:file|directory)):\s*(/[a-zA-Z0-9/_.-]+)\s*$', settings),
+                    'newFileReadable': run(['docker', 'exec', NAME, 'test', '-r', '/etc/asterisk/elevate-twilio.conf'], False).returncode == 0,
+                    'newIncludePresent': '#include elevate-twilio.conf' in pjsip.read_text(),
+                    'baselineUdpTransportPresent': 'transport-udp' in run(['docker', 'exec', NAME, 'asterisk', '-rx', 'pjsip show transports'], False).stdout,
+                    'originalCommentBlockBalance': original.count(';--') - original.count('--;'),
+                    'mainConfigLoadError': bool(re.search(r'(?:unable to load|error parsing|could not load)[^\n]*pjsip.conf', combined, re.I)),
                     'logSignals': {name: bool(re.search(pattern, combined, re.I)) for name, pattern in {
                         'permissionDenied': 'permission denied', 'missingFile': 'no such file',
                         'configLoadError': 'unable to load|could not create|error parsing|could not find',

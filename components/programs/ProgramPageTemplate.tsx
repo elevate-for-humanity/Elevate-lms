@@ -58,7 +58,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
           alt={program.title}
           fill
           sizes="100vw"
-          className="object-cover"
+          className="object-contain"
           priority
           quality={85} placeholder="empty"
         />
@@ -338,7 +338,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                         src={image}
                         alt={title}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="object-contain  transition-transform duration-500"
                         quality={85}
                         sizes="100vw" placeholder="empty"
                       />

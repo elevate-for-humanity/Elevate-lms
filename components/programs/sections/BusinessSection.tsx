@@ -37,7 +37,7 @@ export function BusinessSection({
             <p className="text-lg text-slate-600 mb-8">
               {subtitle}
             </p>
-            
+
             <div className="space-y-4">
               {items.map((item, i) => (
                 <div key={i} className="flex items-start gap-3">
@@ -61,9 +61,9 @@ export function BusinessSection({
               <img
                 src={imageSrc}
                 alt={imageAlt}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent" />
+
             </motion.div>
           )}
         </div>

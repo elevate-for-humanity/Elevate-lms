@@ -273,7 +273,7 @@ export default function ProgramDetailPage({
                   src={heroPosterSrc}
                   alt={heroAlt}
                   fill
-                  className="object-cover object-center"
+                  className="object-contain object-center"
                   priority
                   sizes="100vw"
                   placeholder="empty"
@@ -1434,7 +1434,7 @@ export default function ProgramDetailPage({
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
               loading="lazy"
-              className="object-cover"
+              className="object-contain"
             />
           </div>
           <div className="max-w-3xl mx-auto text-center">

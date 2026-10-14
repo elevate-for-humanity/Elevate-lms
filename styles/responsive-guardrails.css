@@ -183,3 +183,12 @@ body {
     gap: 1.25rem;
   }
 }
+
+/* Course inspection deliberately keeps controls and lesson output beside each
+ * other. Its section owns horizontal scrolling; the page stays viewport-wide.
+ * Preserve this contract after the generic mobile grid and fixed-width rules. */
+main [data-course-lesson-panes] {
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+  min-width: 720px;
+  max-width: none;
+}

@@ -187,7 +187,7 @@ export default function CosmetologyVisualExperience() {
                     alt={item.alt}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover transition duration-700 group-hover:scale-[1.03]"
+                    className="object-contain transition duration-700 group-hover:scale-[1.03]"
                   />
                 </div>
                 <figcaption className="px-5 py-4 text-lg font-black text-slate-950">

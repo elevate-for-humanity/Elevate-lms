@@ -19,7 +19,7 @@ import { renderConcurrency } from './render-concurrency.mjs';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { motionExcerptWindow } from '../ultimate-course-builder/instructional/motion-excerpt.mjs';
-import { pictureTimeline } from '../ultimate-course-builder/instructional/picture-timeline.mjs';
+import { pictureTimeline, pictureSceneTiming } from '../ultimate-course-builder/instructional/picture-timeline.mjs';
 import { assertPremiumSpeechSignal } from '../ultimate-course-builder/instructional/approved-presentation.mjs';
 import { installRemotionHostCompatibility } from './remotion-host-compat.mjs';
 import { mkdir, readFile, writeFile, unlink, rm, stat } from 'fs/promises';
@@ -837,10 +837,11 @@ export async function renderStoryboardVideo(
         ...(resolvedModel ? { resolvedModel } : {}),
       };
       const estimatedNarrationSeconds = Math.ceil((narration.split(/\s+/).length / 140) * 60);
+      const premiumTiming = premium ? pictureSceneTiming(approvedAudio!.durationSeconds, STORYBOARD_RENDER_FPS) : null;
       const narrationSeconds = premium
         // MP3 encoder padding is not an instructional hold. Use the measured
         // PCM speech timeline shared by captions, pictures and synchronization.
-        ? Math.ceil(approvedAudio!.durationSeconds * STORYBOARD_RENDER_FPS) / STORYBOARD_RENDER_FPS
+        ? premiumTiming!.durationSeconds
         : Math.ceil(measuredNarrationSeconds ?? estimatedNarrationSeconds) + 1;
       // A lesson's instructional seat time includes reading, practice, checks,
       // and review; it must not become one continuous hour-long MP4. Time each
@@ -888,7 +889,7 @@ export async function renderStoryboardVideo(
         audioSrc,
         captionCues: approvedAudio?.captions,
         wordAlignment: approvedAudio?.wordAlignment,
-        durationFrames: Math.ceil(durationSeconds * STORYBOARD_RENDER_FPS),
+        durationFrames: premiumTiming?.durationFrames ?? Math.ceil(durationSeconds * STORYBOARD_RENDER_FPS),
         sceneType: scene.sceneType,
         memoryAnchor: scene.memoryAnchor,
         strictBlueprint: input.ultimateStrict,
@@ -1101,7 +1102,7 @@ export async function renderStoryboardVideo(
     }
     logger.info('[RemotionRender] uploading storyboard captions and transcript', {lessonId: input.lessonId});
     const captionUrl = await uploadCourseVideosObject(
-      Buffer.from(buildStoryboardWebVtt(scenes, input.lessonPresentation === 'approved-premium-v1' ? 0 : 3), 'utf8'),
+      Buffer.from(buildStoryboardWebVtt(scenes, (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS + (input.lessonPresentation === 'approved-premium-v1' ? 0 : 3)), 'utf8'),
       `generated-lessons/lesson-${input.lessonId}-${Date.now()}.vtt`,
       'text/vtt',
     );
@@ -1111,6 +1112,8 @@ export async function renderStoryboardVideo(
       'text/plain',
     );
     resolvedStoryboard.captionUrl = captionUrl;
+    (resolvedStoryboard as any).preRollDurationSeconds = (props.preRollDurationFrames ?? 0) / STORYBOARD_RENDER_FPS;
+    (resolvedStoryboard as any).scenes.forEach((scene: any, index: number) => { scene.captionCues = scenes[index].captionCues; });
     resolvedStoryboard.transcriptUrl = transcriptUrl;
     logger.info('[RemotionRender] uploading storyboard MP4', {lessonId: input.lessonId});
     const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4', {forceSupabase: checkpointFallbackUsed});

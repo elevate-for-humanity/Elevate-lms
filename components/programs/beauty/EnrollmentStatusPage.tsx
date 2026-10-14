@@ -25,7 +25,7 @@ export default async function EnrollmentStatusPage({slug, title}: {slug:string;t
   const status = enrollmentStatusDisplay(enrollment.status,enrollment.start_date);
   const dashboardHref = `https://app.elevateforhumanity.org/apprentice?program=${encodeURIComponent(slug)}`;
   return <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-950"><div className="mx-auto max-w-3xl overflow-hidden rounded-2xl border border-slate-200 bg-white">
-    <div className="relative h-40 sm:h-52"><Image src={getProgramHeroImage(slug)} alt={getProgramImageAlt(slug)} fill sizes="768px" className="object-cover" /></div>
+    <div className="relative h-40 sm:h-52"><Image src={getProgramHeroImage(slug)} alt={getProgramImageAlt(slug)} fill sizes="768px" className="object-contain" /></div>
     <div className="p-5 sm:p-7"><p className="text-xs font-black uppercase tracking-wide text-brand-red-700">{program.title || title}</p><h1 className="mt-2 text-2xl font-black sm:text-3xl">Your enrollment status</h1>
       <dl className="mt-5 grid gap-4 rounded-xl bg-slate-50 p-4 sm:grid-cols-2"><div><dt className="text-sm text-slate-600">Recorded status</dt><dd className="mt-1 font-bold">{status.label}</dd></div><div><dt className="text-sm text-slate-600">Training start</dt><dd className="mt-1 font-bold">{status.startDateLabel}</dd></div></dl>
       <p className="mt-4 text-sm leading-6 text-slate-700">{status.confirmed ? 'Review the onboarding items assigned in your portal. Admissions confirms your Host Shop, supervision, and training schedule before workplace hours begin.' : 'Payment or an application alone does not confirm enrollment. Complete the required documents, agreements, payment arrangement, and placement review. Admissions confirms when you may begin.'}</p>

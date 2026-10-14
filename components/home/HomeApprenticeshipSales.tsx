@@ -51,7 +51,7 @@ export function HomeApprenticeshipSales() {
             src="/images/pages/barber-hands-on-bright.webp"
             alt="Barber apprentice building hands-on skills with professional supervision"
             fill
-            className="object-cover brightness-110 contrast-105 saturate-110"
+            className="object-contain brightness-110 contrast-105 saturate-110"
             sizes="(max-width: 1024px) 100vw, 46vw"
           />
         </div>

@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 const DEFAULT_FALLBACK = '/images/programs-hero-vibrant.webp';
 
 const CATEGORY_FALLBACKS: Record<string, string> = {
-  'Business & Financial': '/images/business/team-2.jpg',
+  'Business & Financial': '/images/business/collaboration-1.webp',
   Healthcare: '/images/pages/healthcare-sector.webp',
   'Skilled Trades': '/images/pages/construction-trades.webp',
   Technology: '/images/pages/technology-sector.webp',

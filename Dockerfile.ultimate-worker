@@ -6,6 +6,7 @@ COPY workers/ultimate-course-builder.ts workers/worker-loop.mjs ./workers/
 COPY lib/ultimate-course-builder ./lib/ultimate-course-builder
 COPY lib/media/licensed-course-media.ts ./lib/media/licensed-course-media.ts
 COPY lib/video ./lib/video
+COPY lib/storage ./lib/storage
 COPY lib/ai ./lib/ai
 COPY docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json ./docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json
 COPY tests/integration/google-lesson-author.test.ts tests/integration/approved-teaching-recaps.test.ts ./tests/integration/

@@ -2052,3 +2052,11 @@ pre {
     max-width: 100%;
   }
 }
+
+/* Public media must show the complete source frame on every viewport.
+   Text lives beside or below hero media, not over a cropped photograph. */
+main img, main video, #main-content img, #main-content video {
+  object-fit: contain !important;
+  object-position: center !important;
+}
+#main-content img { image-rendering: auto; }

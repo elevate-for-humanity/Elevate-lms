@@ -13,7 +13,7 @@ export function HomeFinalCTA() {
             alt="Hands-on career training at Elevate for Humanity"
             fill
             sizes="(max-width: 640px) 100vw, 50vw"
-            className="object-cover"
+            className="object-contain"
           />
         </div>
         <div className="px-5 py-7 sm:px-8 sm:py-9">

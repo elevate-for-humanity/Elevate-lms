@@ -45,7 +45,7 @@ export async function ProgramsGrid() {
                   alt={program.title || program.name}
                   fill
                   sizes="100vw"
-                  className="object-cover contrast-105 saturate-110" placeholder="empty"
+                  className="object-contain contrast-105 saturate-110" placeholder="empty"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center   ">

@@ -21,9 +21,11 @@ describe('homepage hero slideshow rendering', () => {
     expect(homepageHero).toContain('href="/check-eligibility"');
     expect(homepageHero).toContain('href="/employers"');
     expect(homepageHero).toContain('href="/store/apps/website-builder"');
-    expect(homepageHero).toContain('min-h-[360px]');
-    expect(homepageHero).toContain('sm:min-h-[440px]');
-    expect(homepageHero).toContain('lg:min-h-[480px]');
+    expect(homepageHero).toContain('aspect-video');
+    expect(homepageHero).toContain('object-contain');
+    expect(homepageHero).not.toContain('bg-slate-950/65');
+    expect(homepageHero).not.toContain('sm:min-h-[440px]');
+    expect(homepageHero).not.toContain('lg:min-h-[480px]');
     expect(homepageHero).not.toContain('data-narration-src="/audio/narration/home-hero.mp3"');
 
   });
@@ -119,7 +121,8 @@ describe('homepage hero slideshow rendering', () => {
     const renderer = fs.readFileSync(path.resolve('components/marketing/HeroVideo.tsx'), 'utf8');
     expect(renderer).toContain('transition-[opacity,transform] duration-1000 ease-in-out');
     expect(renderer).toContain('motion-reduce:transition-none');
-    expect(renderer).toContain("'scale-100 opacity-100'");
-    expect(renderer).toContain("'scale-[1.015] opacity-0'");
+    expect(renderer).toContain("'opacity-100'");
+    expect(renderer).toContain("'opacity-0'");
+    expect(renderer).not.toContain('scale-[1.015]');
   });
 });

@@ -57,11 +57,10 @@ export default function HeroPicture({
   heightStyle,
   preserveAspectRatio = false,
   priority = true,
-  imageFit = 'cover',
 }: HeroPictureProps) {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
-  const canonicalHeight = 'h-[clamp(260px,42svh,480px)]';
+  const canonicalHeight = 'aspect-video';
 
   return (
     <div className={`w-full ${className}`}>
@@ -88,7 +87,7 @@ export default function HeroPicture({
             alt={alt}
             fill
             sizes="100vw"
-            className={imageFit === 'contain' ? 'object-contain object-center' : 'object-cover object-center'}
+            className={'object-contain object-center'}
             priority={priority}
             placeholder="empty"
           />

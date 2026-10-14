@@ -24,8 +24,8 @@ function scenario(payload, completed = true, options = {}) {
     async waitForDependency() { events.push('dependency'); }
   }
   const runtime = { persistence: { updateBuild: async value => events.push(value) }, artifacts: {} };
-  const names = ['createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
-  const values = [createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class {}, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
+  const names = ['liveCheckpointRepairReader','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
+  const values = [() => async () => null,createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class {}, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
   const worker = new Function(...names, source + '\nreturn processUltimateJob;')(...values);
   return { events, run: () => worker(db, 'owner') };
 }

@@ -1,3 +1,4 @@
+import {repairDirective} from './repair-policy.mjs';
 import {
   artifactPayload,
   contractHash,
@@ -44,6 +45,7 @@ export interface UltimateRunContext {
   }) => Promise<void>;
   passedSteps?: Set<UltimateBuildStep>;
   assertActive?: () => void;
+  repairDirective?: any;
 }
 
 export class UltimateBuildRunner {
@@ -55,13 +57,14 @@ export class UltimateBuildRunner {
       target: UltimateBuildStep;
       codes: string[];
     }> = [];
+    ctx.repairDirective=(ctx.artifacts as any).__repairState?.directive;
     let index = 0;
     while (index < ULTIMATE_BUILD_STEPS.length) {
       ctx.assertActive?.();
       const step = ULTIMATE_BUILD_STEPS[index];
       const inputHash = stepInputHash(step, ctx.profile, ctx.artifacts);
       const competency = ctx.profile.competencies.find(c => ctx.buildId.endsWith(':' + c.id)) ?? ctx.profile.competencies[0];
-      if (ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], inputHash) &&
+      if (ctx.repairDirective?.target !== step && ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], inputHash) &&
           !validateStepOutput(step, ctx.artifacts[step] ?? {}).length &&
           (step !== 'visual_assignment' || !practicalVisualFailures(ctx.artifacts, competency).length)) {
         index++;
@@ -96,7 +99,7 @@ export class UltimateBuildRunner {
           };
         const findings = result.findings ?? [];
         failures = findings.filter((f) => f.severity === 'error');
-        const contractFailures = validateStepOutput(step, artifacts);
+        const contractFailures = failures.length ? [] : validateStepOutput(step, artifacts);
         if (step === 'visual_assignment') contractFailures.push(...practicalVisualFailures({...ctx.artifacts, visual_assignment: artifacts}, competency));
         for (const code of contractFailures)
           failures.push({
@@ -123,6 +126,15 @@ export class UltimateBuildRunner {
         ctx.artifacts[step] = artifacts;
         await ctx.persistArtifact?.({ step, artifacts });
         if (!failures.length) {
+          if(ctx.repairDirective?.target===step){
+            const previous=ctx.repairDirective.previous;
+            if(step!=='finished_media_qa'&&previous&&contractHash(artifactPayload(previous))===contractHash(artifactPayload(artifacts))){
+              throw new Error('REPAIR_PRODUCER_UNCHANGED:'+step);
+            }
+            (ctx.artifacts as any).__repairState={...(ctx.artifacts as any).__repairState,status:'producer-validated',producerHash:contractHash(artifacts),validatedAt:new Date().toISOString()};
+            ctx.repairDirective=undefined;
+            await ctx.persistArtifact?.({step:'selective_repair',artifacts:{repair:{...(ctx.artifacts as any).__repairState,unresolved:0}}});
+          }
           ctx.findings.push(...findings);
           for (const f of findings) await ctx.persistFinding?.(f);
           ctx.passedSteps?.add(step);
@@ -161,6 +173,11 @@ export class UltimateBuildRunner {
       const durableBlocker = failures.some((f) => isDurableExternalBlocker(f));
       const target = !durableBlocker ? (route?.step ?? (transient ? step : undefined)) : undefined;
       if (target && attempts.length < MAX_TARGETED_REPAIRS) {
+        const previous=ctx.artifacts[target];
+        const directive=repairDirective(failures,step,target,previous,attempts.length+1);
+        ctx.repairDirective=directive;
+        (ctx.artifacts as any).__repairState={directive,status:'diagnosed',at:new Date().toISOString()};
+        await ctx.persistArtifact?.({step:'selective_repair',artifacts:{repair:{directive,unresolved:failures.length}}});
         attempts.push({ failedStep: step, target, codes: failures.map((f) => f.code) });
         index = Math.min(index, ULTIMATE_BUILD_STEPS.indexOf(target));
         // A routed repair deliberately changes an upstream producer. Its old

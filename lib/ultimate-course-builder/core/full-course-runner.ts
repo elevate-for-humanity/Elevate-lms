@@ -56,9 +56,10 @@ export async function runUltimateCourse(
       if (!checkpoint.passedSteps.includes(step)) break;
       restoredPassed.push(step);
     }
-    const restoredArtifacts = Object.fromEntries(
+    const restoredArtifacts: any = Object.fromEntries(
       restoredPassed.map((step) => [step, checkpoint.artifacts[step]]),
     );
+    if((checkpoint.artifacts as any).__repairState)restoredArtifacts.__repairState=(checkpoint.artifacts as any).__repairState;
     const context: UltimateRunContext = {
       buildId: plan.buildId + ':' + competency.id,
       courseId: plan.courseId,

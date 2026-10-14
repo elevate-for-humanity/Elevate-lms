@@ -41,6 +41,7 @@ export async function authorGoogleLesson(input: {
   profile: UltimateCredentialProfile;
   competency: UltimateCompetency;
   sources: Source[];
+  repairDirective?: any;
 }, generate: Generate): Promise<LessonBlueprint> {
   if (!input.sources.length) throw new Error('ULTIMATE_INSTRUCTIONAL_SOURCES_REQUIRED');
   const schema = {
@@ -65,7 +66,7 @@ Grounding is an array with one entry per segment: {segmentId, sourceId, excerpt}
   const presentationRequirements = input.profile.lessonPresentation === 'approved-premium-v1'
     ? 'Use focused PowerPoint-style teaching moments. Explain the required tools and exact numbered guard lengths when supported by the source. Within each teaching moment include a fresh brief recap or practice question, never repeat its spoken passage. Change the visual for the next technique. Whole pictures stay visible beside concise demonstration instructions, with word-aligned bottom captions. Use unique task-relevant images; do not reuse a photo or loop as filler. Do not invent technical measurements or substitute illustrative photos for an actual required physical demonstration.'
     : undefined;
-  const authorRequest = { courseTitle: input.profile.title, audience: input.profile.audience || 'Adult career learners', competency: input.competency, sequence: ULTIMATE_TEACHING_SEQUENCE, sources: input.sources, blueprintSchema: schema, ...(presentationRequirements ? {presentationRequirements, presentationContract: input.profile.presentationContract} : {}) };
+  const authorRequest = { ...(input.repairDirective?{repair:input.repairDirective}:{}), lessonTitle:input.competency.title, titleRequirement:'Explain this exact lesson topic in the spoken introduction; teach all title concepts using authorized sources. Recap and application checks must be substantive, not labels.', courseTitle: input.profile.title, audience: input.profile.audience || 'Adult career learners', competency: input.competency, sequence: ULTIMATE_TEACHING_SEQUENCE, sources: input.sources, blueprintSchema: schema, ...(presentationRequirements ? {presentationRequirements, presentationContract: input.profile.presentationContract} : {}) };
   let result = bindBlueprintRequirements(await generate(system, authorRequest), input.competency);
   for (let attempt = 0; attempt < 3; attempt++) {
     if (result?.blocked) break;

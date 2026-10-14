@@ -18,6 +18,7 @@ import sys
 CONTAINER = 'pbx_asterisk_1'
 ROOT = Path('/opt/elevate-pbx/repo/infra/pbx/asterisk')
 NAME = 'elevate-twilio-validation'
+NETWORK = NAME + '-internal'
 CONFIG = '''; Managed Elevate Twilio carrier endpoint
 [elevate-twilio-tls]
 type=transport
@@ -98,10 +99,14 @@ def validate():
         if '#include elevate-twilio.conf' not in original.splitlines():
             pjsip.write_text(original + '\n#include elevate-twilio.conf\n')
         created = False
+        network_created = False
         try:
-            # The isolated container cannot reach DNS. Resolve the staged carrier
-            # locally for parsing only; this run cannot establish carrier reachability.
-            run(['docker', 'run', '-d', '--name', NAME, '--network=none', '--restart=no',
+            # Asterisk needs an Ethernet interface to initialize its global EID.
+            # An internal-only bridge provides one without Internet access or
+            # published ports. The carrier hostname resolves only to loopback.
+            run(['docker', 'network', 'create', '--internal', '--driver=bridge', NETWORK])
+            network_created = True
+            run(['docker', 'run', '-d', '--name', NAME, '--network=' + NETWORK, '--restart=no',
                  '--add-host', 'elevate-standalone.pstn.twilio.com:127.0.0.1',
                  '-v', str(staging) + ':/etc/asterisk:ro', '--entrypoint', 'asterisk',
                  live['Image'], '-f', '-C', '/etc/asterisk/asterisk.conf'])
@@ -151,6 +156,8 @@ def validate():
         finally:
             if created:
                 run(['docker', 'rm', '-f', NAME])
+            if network_created:
+                run(['docker', 'network', 'rm', NETWORK])
     if not live_cli('core show version'):
         raise ValueError('live_pbx_readback_failed')
     return {'result': 'PASS', 'isolatedTlsSrtpEndpoint': True, 'liveConfigurationChanged': False,

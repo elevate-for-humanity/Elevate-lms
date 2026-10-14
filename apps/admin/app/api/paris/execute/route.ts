@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
       await db.from('ai_tasks').update({
         status: result.status === 'approval_required'
           ? 'awaiting_approval'
-          : result.ok ? 'completed' : 'failed',
+          : result.status === 'running' ? 'running' : result.ok ? 'completed' : 'failed',
         requires_approval: result.status === 'approval_required',
         approval_status: result.status === 'approval_required' ? 'pending' : null,
         approval_reason: result.status === 'approval_required'
@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
           trace_id: result.traceId ?? null,
         },
         error_message: result.ok ? null : result.message,
-        completed_at: result.status === 'approval_required' ? null : new Date().toISOString(),
+        completed_at: result.status === 'approval_required' || result.status === 'running' ? null : new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }).eq('id', durableTask.id);
     }
@@ -196,6 +196,7 @@ export async function POST(req: NextRequest) {
     return respond({
       success: true,
       executed: result.executed,
+      status: result.status,
       agent: agentConfig.label,
       tool: result.tool ?? null,
       risk: result.risk ?? null,

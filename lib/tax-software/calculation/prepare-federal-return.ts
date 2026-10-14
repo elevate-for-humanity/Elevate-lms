@@ -1,4 +1,4 @@
-import { calculateFederal1040_2026, type Federal1040Input } from './federal-1040-2026';
+import { calculateFederal1040_2026, irsDollars, type Federal1040Input } from './federal-1040-2026';
 import {
   childCredits2026,
   earnedIncomeCredit2026,
@@ -25,9 +25,11 @@ export function prepareFederalReturn2026(base: Federal1040Input, extras: SavedFe
     : { credit: 0 };
   const earned = Math.max(
     0,
-    base.wages.reduce((s, w) => s + w.wages, 0) +
-      (base.selfEmployment ?? []).reduce((s, b) => s + b.netProfit, 0) -
-      preliminary.selfEmploymentDeduction,
+    irsDollars(
+      base.wages.reduce((s, w) => s + w.wages, 0) +
+        (base.selfEmployment ?? []).reduce((s, b) => s + b.netProfit, 0) -
+        preliminary.selfEmploymentDeduction,
+    ),
   );
   const eic = extras.eicInputs
     ? earnedIncomeCredit2026({
@@ -41,6 +43,17 @@ export function prepareFederalReturn2026(base: Federal1040Input, extras: SavedFe
   const child = extras.childCreditInputs
     ? childCredits2026({
         ...extras.childCreditInputs,
+        threeChildPayrollAlternative: Math.max(
+          0,
+          irsDollars(
+            base.wages.reduce(
+              (sum, w) => sum + (w.socialSecurityTax ?? 0) + (w.medicareTaxWithheld ?? 0),
+              0,
+            ),
+          ) +
+            preliminary.selfEmploymentDeduction -
+            eic,
+        ),
         modifiedAgi: magi,
         earnedIncome: earned,
         availableTax: Math.max(
@@ -60,6 +73,7 @@ export function prepareFederalReturn2026(base: Federal1040Input, extras: SavedFe
   };
   return {
     financial,
+    creditInputs: extras,
     calculation: calculateFederal1040_2026(financial),
     supportingCreditCalculations: { education, dependentCare: care, child, eic },
   };

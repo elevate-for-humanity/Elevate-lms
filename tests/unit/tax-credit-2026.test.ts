@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { prepareFederalReturn2026 } from '@/lib/tax-software/calculation/prepare-federal-return';
 import {
   childCredits2026,
   earnedIncomeCredit2026,
@@ -6,6 +7,20 @@ import {
   dependentCareCredit2026,
 } from '@/lib/tax-software/calculation/credits-2026';
 describe('2026 credits', () => {
+  it('uses actual payroll withholding for the three-child alternative', () => {
+    const prepared = prepareFederalReturn2026(
+      {
+        filingStatus: 'single',
+        wages: [
+          { wages: 2500, federalWithholding: 0, socialSecurityTax: 155, medicareTaxWithheld: 36 },
+        ],
+      },
+      {
+        childCreditInputs: { qualifyingChildren: 3, otherDependents: 0, ssnRequirementsMet: true },
+      },
+    );
+    expect(prepared.calculation.lines['28']).toBe(191);
+  });
   it('caps refundable child credit at the earned-income and per-child limits', () => {
     const r = childCredits2026({
       qualifyingChildren: 2,

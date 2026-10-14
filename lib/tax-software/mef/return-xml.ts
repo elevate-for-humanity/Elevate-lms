@@ -1,3 +1,6 @@
+import type { TaxDependent } from './family-types';
+import type { SavedFederalInputs } from '../calculation/input-schema';
+import { mapFamilyDocuments2026 } from './family-documents';
 import { isIP } from 'node:net';
 import {
   calculateFederal1040_2026,
@@ -18,6 +21,7 @@ export type MefProfile = {
   birthDate: string;
   address: IrsAddress;
   occupation?: string;
+  dependents?: TaxDependent[];
   spouse?: { firstName: string; lastName: string; ssn: string; birthDate: string };
 };
 export type MefW2 = Federal1040Input['wages'][number] & {
@@ -70,6 +74,7 @@ export function mapFederalReturn2026(input: {
   w2: MefW2[];
   configuration: MefConfiguration;
   refundAllocations?: RefundAllocation[];
+  creditInputs?: SavedFederalInputs;
   additionalIrsDocuments?: Record<string, IrsNode | IrsNode[]>;
 }) {
   const { profile: p, configuration: c, financial: f } = input;
@@ -85,7 +90,15 @@ export function mapFederalReturn2026(input: {
     if (
       (input.w2[i].owner ?? 'primary') !== (f.wages[i].owner ?? 'primary') ||
       input.w2[i].wages !== f.wages[i].wages ||
-      input.w2[i].federalWithholding !== f.wages[i].federalWithholding
+      input.w2[i].federalWithholding !== f.wages[i].federalWithholding ||
+      (
+        [
+          'socialSecurityWages',
+          'medicareWages',
+          'socialSecurityTax',
+          'medicareTaxWithheld',
+        ] as const
+      ).some((key) => f.wages[i][key] !== undefined && f.wages[i][key] !== input.w2[i][key])
     )
       throw new Error('Export wage statements must match calculation inputs');
   if (!isIP(c.publicIp)) throw new Error('Valid filing connection address is required');
@@ -135,6 +148,7 @@ export function mapFederalReturn2026(input: {
     TaxLessCreditsAmt: l['22'],
     TotalAdditionalTaxesAmt: l['23'],
     TotalTaxAmt: l['24'],
+    TotalTaxAfter1062TaxAmt: l['24'],
     FormW2WithheldTaxAmt: l['25a'],
     WithholdingTaxAmt: l['25d'],
     EstimatedTaxPaymentsAmt: l['26'],
@@ -264,6 +278,14 @@ export function mapFederalReturn2026(input: {
       TotalAdditionalTaxesAmt: l['23'],
     };
   }
+  mapFamilyDocuments2026({
+    profile: p,
+    financial: f,
+    creditInputs: input.creditInputs ?? {},
+    calculation: result,
+    documents,
+    fields,
+  });
   const filer: IrsNode = {
     PrimarySSN: ssn(p.ssn),
     ...(p.spouse ? { SpouseSSN: ssn(p.spouse.ssn) } : {}),

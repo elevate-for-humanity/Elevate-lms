@@ -1434,6 +1434,66 @@
       "GeneralDependencySmall",
       "GeneralDependencyMedium",
       "BinaryAttachment"
+    ],
+    "IRS1040ScheduleEIC": [
+      "QualifyingChildInformation"
+    ],
+    "IRS1040ScheduleEIC/QualifyingChildInformation": [
+      "QualifyingChildNameControlTxt",
+      "ChildFirstAndLastName",
+      "IdentityProtectionPIN",
+      "QualifyingChildSSN",
+      "DiedLiteralCd",
+      "ChildBirthYr",
+      "ChildIsAStudentUnder24Ind",
+      "ChildPermanentlyDisabledInd",
+      "ChildRelationshipCd",
+      "MonthsChildLivedWithYouCnt",
+      "KidnappedChildCd"
+    ],
+    "IRS1040ScheduleEIC/QualifyingChildInformation/ChildFirstAndLastName": [
+      "PersonFirstNm",
+      "PersonLastNm"
+    ],
+    "IRS1040Schedule8812": [
+      "AdjustedGrossIncomeAmt",
+      "ExcldSect933PuertoRicoIncmAmt",
+      "ExclusionAndDeductionSumAmt",
+      "GrossIncomeExclusionAmt",
+      "AdditionalIncomeAdjAmt",
+      "ModifiedAGIAmt",
+      "QlfyChildUnderAgeSSNCnt",
+      "QlfyChildUnderAgeSSNLimtAmt",
+      "OtherDependentCnt",
+      "OtherDependentCreditAmt",
+      "InitialCTCODCAmt",
+      "FilingStatusThresholdCd",
+      "ExcessAdjGrossIncomeAmt",
+      "ModifiedAGIPhaseOutAmt",
+      "CTCODCOverAGILimitInd",
+      "CTCODCAfterAGILimitAmt",
+      "ACTCTaxLiabiltyLimitAmt",
+      "CTCODCAmt",
+      "ClaimACTCAllFilersGrp",
+      "AdditionalChildTaxCreditAmt"
+    ],
+    "IRS1040Schedule8812/ClaimACTCAllFilersGrp": [
+      "ACTCBeforeLimitAmt",
+      "QlfyChildUnderAgeSSNCnt",
+      "QlfyChildUnderAgeSSNLimtAmt",
+      "ACTCAfterLimitAmt",
+      "TotalEarnedIncomeAmt",
+      "NontaxableCombatPayAmt",
+      "EarnedIncmMoreThanSpecifiedInd",
+      "NetTotalEarnedIncomeAmt",
+      "NetEarnedIncomeCalculatedAmt",
+      "ThreeOrMoreQlfyChildrenInd",
+      "FromW2Amt",
+      "FromTaxReturnAmt",
+      "CalcFromW2AndReturnAmt",
+      "CalcAmtFromRetPlusTaxWhldAmt",
+      "CalculatedDifferenceAmt",
+      "LargerCalcIncomeOrDiffAmt"
     ]
   }
 }

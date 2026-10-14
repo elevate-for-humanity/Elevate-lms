@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { DependentsEditor } from './DependentsEditor';
+import type { TaxDependent } from '@/lib/tax-software/mef/family-types';
 export function TaxpayerDetailsEditor({
   returnId,
   joint,
@@ -14,6 +16,7 @@ export function TaxpayerDetailsEditor({
     [busy, setBusy] = useState(false),
     [error, setError] = useState(''),
     [saved, setSaved] = useState(false);
+  const [dependents, setDependents] = useState<TaxDependent[]>([]);
   const groups = [
     {
       title: 'Taxpayer',
@@ -78,6 +81,7 @@ export function TaxpayerDetailsEditor({
           ssn: v.ssn,
           birthDate: v.birthDate,
           occupation: v.occupation || undefined,
+          dependents,
           address: {
             line1: v.line1,
             line2: v.line2 || undefined,
@@ -115,6 +119,7 @@ export function TaxpayerDetailsEditor({
       if (!response.ok) throw Error(body.error || 'Unable to save taxpayer details');
       setSaved(true);
       setV({});
+      setDependents([]);
       setConsent(false);
       onSaved();
     } catch (e) {
@@ -158,6 +163,13 @@ export function TaxpayerDetailsEditor({
           </div>
         </details>
       ))}
+      <DependentsEditor
+        value={dependents}
+        onChange={(next) => {
+          setDependents(next);
+          setConsent(false);
+        }}
+      />
       <label className="mt-6 flex items-start gap-3">
         <input
           type="checkbox"

@@ -122,6 +122,7 @@ export async function GET(req: NextRequest) {
     const mapped = mapFederalReturn2026({
       profile: privateFields.profile,
       financial: prepared.financial,
+      creditInputs: prepared.creditInputs,
       w2: (w2.data ?? []).map((w) => ({
         owner: w.income_owner === 'spouse' ? 'spouse' : 'primary',
         wages: Number(w.wages),

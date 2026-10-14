@@ -41,6 +41,8 @@ export function prepareStoredFederalReturn2026(input: {
       federalWithholding: amount(w.federal_withholding),
       socialSecurityWages: amount(w.social_security_wages ?? w.wages),
       medicareWages: amount(w.medicare_wages ?? w.wages),
+      socialSecurityTax: amount(w.social_security_tax),
+      medicareTaxWithheld: amount(w.medicare_tax),
     })),
     taxableInterest: income('INT') + (extra.additionalInterest ?? 0),
     ordinaryDividends: income('DIV') + (extra.additionalOrdinaryDividends ?? 0),

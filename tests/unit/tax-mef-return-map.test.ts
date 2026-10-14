@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { writeFileSync } from 'node:fs';
+import { prepareFederalReturn2026 } from '@/lib/tax-software/calculation/prepare-federal-return';
+import type { TaxDependent } from '@/lib/tax-software/mef/family-types';
 import { serializeMefReturn2026 } from '@/lib/tax-software/mef/serialize-return';
 import { mapFederalReturn2026 } from '@/lib/tax-software/mef/return-xml';
 const fixture = {
@@ -59,6 +61,128 @@ const fixture = {
   ],
 };
 describe('IRS mapping', () => {
+  it('preserves negative adjusted gross income on the dependent credit schedule', () => {
+    const prepared = prepareFederalReturn2026(
+      { filingStatus: 'single', wages: [], selfEmployment: [{ netProfit: -1000 }] },
+      {
+        childCreditInputs: { qualifyingChildren: 1, otherDependents: 0, ssnRequirementsMet: true },
+      },
+    );
+    const mapped = mapFederalReturn2026({
+      ...fixture,
+      profile: {
+        ...fixture.profile,
+        dependents: [
+          {
+            firstName: 'Alex',
+            lastName: 'Wheat',
+            ssn: '400001040',
+            birthDate: '2016-01-15',
+            relationship: 'SON',
+            claimedAsDependent: true,
+            qualifiesChildTaxCredit: true,
+            qualifiesOtherDependentCredit: false,
+            qualifiesEic: false,
+            monthsLivedWithTaxpayer: 12,
+            livedInUsOverHalfYear: true,
+            studentUnder24: false,
+            permanentlyDisabled: false,
+          },
+        ],
+      },
+      financial: prepared.financial,
+      creditInputs: prepared.creditInputs,
+      w2: [],
+      refundAllocations: undefined,
+    });
+    const xml = serializeMefReturn2026(mapped.irsFields);
+    expect(xml).toContain('<ModifiedAGIAmt>-1000</ModifiedAGIAmt>');
+    if (process.env.IRS_TEST_NEGATIVE_FAMILY_XML_PATH)
+      writeFileSync(process.env.IRS_TEST_NEGATIVE_FAMILY_XML_PATH, xml, { mode: 0o600 });
+  });
+  it('exports reviewed dependents and child credit schedules in IRS order', () => {
+    const dependents: TaxDependent[] = [0, 1, 2].map((i) => ({
+      firstName: ['Alex', 'Jamie', 'Taylor'][i],
+      lastName: 'Wheat',
+      ssn: `40000104${i}`,
+      birthDate: '2016-01-15',
+      relationship: 'SON',
+      claimedAsDependent: true,
+      qualifiesChildTaxCredit: true,
+      qualifiesOtherDependentCredit: false,
+      qualifiesEic: true,
+      monthsLivedWithTaxpayer: 12,
+      livedInUsOverHalfYear: true,
+      studentUnder24: false,
+      permanentlyDisabled: false,
+    }));
+    const prepared = prepareFederalReturn2026(
+      {
+        filingStatus: 'single',
+        wages: [
+          {
+            wages: 20000,
+            federalWithholding: 0,
+            socialSecurityTax: 1240,
+            medicareTaxWithheld: 290,
+          },
+        ],
+      },
+      {
+        childCreditInputs: { qualifyingChildren: 3, otherDependents: 0, ssnRequirementsMet: true },
+        eicInputs: { qualifyingChildren: 3, investmentIncome: 0, eligibilityRequirementsMet: true },
+      },
+    );
+    const mapped = mapFederalReturn2026({
+      ...fixture,
+      profile: { ...fixture.profile, dependents },
+      financial: prepared.financial,
+      creditInputs: prepared.creditInputs,
+      w2: [
+        {
+          ...fixture.w2[0],
+          wages: 20000,
+          federalWithholding: 0,
+          socialSecurityWages: 20000,
+          medicareWages: 20000,
+          socialSecurityTax: 1240,
+          medicareTaxWithheld: 290,
+        },
+      ],
+      refundAllocations: undefined,
+    });
+    expect(mapped.irsFields.ReturnData.IRS1040ScheduleEIC).toBeDefined();
+    expect(mapped.irsFields.ReturnData.IRS1040Schedule8812).toBeDefined();
+    const xml = serializeMefReturn2026(mapped.irsFields);
+    expect(xml).toContain('<TotalTaxAfter1062TaxAmt>');
+    if (process.env.IRS_TEST_FAMILY_XML_PATH)
+      writeFileSync(process.env.IRS_TEST_FAMILY_XML_PATH, xml, { mode: 0o600 });
+    expect(() =>
+      mapFederalReturn2026({
+        ...fixture,
+        profile: { ...fixture.profile, dependents },
+        financial: prepared.financial,
+        creditInputs: {
+          ...prepared.creditInputs,
+          childCreditInputs: {
+            qualifyingChildren: 1,
+            otherDependents: 0,
+            ssnRequirementsMet: true,
+          },
+        },
+        w2: [
+          {
+            ...fixture.w2[0],
+            wages: 20000,
+            federalWithholding: 0,
+            socialSecurityTax: 1240,
+            medicareTaxWithheld: 290,
+          },
+        ],
+        refundAllocations: undefined,
+      }),
+    ).toThrow('match the reviewed worksheet');
+  });
   it('generates the self-employment schedules from the reviewed calculation', () => {
     const r = mapFederalReturn2026({
       ...fixture,

@@ -8,6 +8,8 @@ export type WageStatement = {
   federalWithholding: number;
   socialSecurityWages?: number;
   medicareWages?: number;
+  socialSecurityTax?: number;
+  medicareTaxWithheld?: number;
 };
 export type SelfEmployment = {
   owner?: 'primary' | 'spouse';

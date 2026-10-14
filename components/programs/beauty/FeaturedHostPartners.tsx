@@ -101,7 +101,7 @@ export default async function FeaturedHostPartners({
                 Apply for this pathway
               </Link>
               <Link
-                href="/host-shop/apply"
+                href="/partners/host-shop/apply"
                 className="inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-brand-blue-700 px-5 py-2.5 text-sm font-extrabold text-brand-blue-900 hover:bg-sky-50"
               >
                 Become a Host Shop

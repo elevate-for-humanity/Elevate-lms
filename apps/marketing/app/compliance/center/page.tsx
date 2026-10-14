@@ -1,3 +1,5 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -11,6 +13,14 @@ export const metadata: Metadata = {
   title: 'Public Compliance Center',
   description: `Policies, credential disclosures, equal opportunity, grievance process, and workforce compliance documents for ${PLATFORM_DEFAULTS.orgName}.`,
   alternates: { canonical: 'https://www.elevateforhumanity.org/compliance/center' },
+
+  ...publicArtworkMetadata({
+    path: '/compliance/center',
+    image: '/images/refresh-20261014/business.webp',
+    alt: 'Illustrative workforce team organizing program documentation',
+    title: 'Public Compliance Center',
+    description: `Policies, credential disclosures, equal opportunity, grievance process, and workforce compliance documents for ${PLATFORM_DEFAULTS.orgName}.`,
+  }),
 };
 
 const SECTIONS = [
@@ -41,7 +51,10 @@ const SECTIONS = [
       { href: '/compliance', label: 'Credential Disclosure Hub' },
       { href: '/credentials', label: 'Credential Authority Separation' },
       { href: '/apprenticeships', label: `Apprenticeship Programs (${RAPIDS_SPONSOR_LABEL})` },
-      { href: 'https://app.elevateforhumanity.org/verify-credentials', label: 'Verify Credentials' },
+      {
+        href: 'https://app.elevateforhumanity.org/verify-credentials',
+        label: 'Verify Credentials',
+      },
     ],
   },
   {
@@ -67,6 +80,15 @@ const SECTIONS = [
 export default function ComplianceCenterPage() {
   return (
     <div className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/business.webp"
+        alt="Illustrative workforce team organizing program documentation"
+        actions={[
+          { href: '/compliance/workforce-partnership-packet', label: 'View partnership packet' },
+          { href: '/contact', label: 'Contact the team' },
+        ]}
+      />
+
       <div className="max-w-6xl mx-auto px-4 py-3">
         <Breadcrumbs items={[{ label: 'Compliance Center' }]} />
       </div>
@@ -105,11 +127,17 @@ export default function ComplianceCenterPage() {
       <section className="max-w-3xl mx-auto px-4 pb-16 text-center">
         <p className="text-sm text-slate-600 mb-4">
           Questions from a workforce board or state agency? Contact compliance at{' '}
-          <a href="mailto:carlina@elevateforhumanity.org" className="font-semibold text-brand-blue-700 hover:underline">
+          <a
+            href="mailto:carlina@elevateforhumanity.org"
+            className="font-semibold text-brand-blue-700 hover:underline"
+          >
             carlina@elevateforhumanity.org
           </a>
         </p>
-        <Link href="/impact/methodology" className="text-sm font-bold text-brand-red-600 hover:underline">
+        <Link
+          href="/impact/methodology"
+          className="text-sm font-bold text-brand-red-600 hover:underline"
+        >
           How we measure outcomes →
         </Link>
       </section>

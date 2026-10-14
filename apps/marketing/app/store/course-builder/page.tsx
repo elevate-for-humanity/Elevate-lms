@@ -69,16 +69,19 @@ export default function CourseBuilderPage() {
       </div>
 
       <HeroVideo
-        videoSrcDesktop="/videos/courses/elevate-esb-hero.mp4"
-        videoSrcMobile="/videos/courses/elevate-esb-hero.mp4"
-        posterImage="/images/programs/efh-business-startup-marketing-hero.jpg"
-        mountedFrameImage="/images/programs/efh-business-startup-marketing-hero.jpg"
+        mediaFit="cover"
+        posterAlt="Illustrative adult learners working with an instructor at laptops"
+        posterImage="/images/refresh-20261014/business.webp"
         microLabel="Elevate Course Creation & Learning Platform"
         belowHeroHeadline="Build colorful, narrated, interactive courses end to end"
         belowHeroSubheadline={`$79/month includes ${COURSE_BUILDER_MONTHLY_ALLOWANCE.toLocaleString()} Course Builder credits, the unified builder, AI instructor workflows, LMS delivery, certificates, and learner progress tracking.`}
         ctas={[
           { label: 'Open Course Builder', href: getAdminUrl('/course-builder') },
-          { label: 'Compare platform plans', href: '/store/plans', variant: 'secondary' },
+          {
+            label: 'Try the course creation demo',
+            href: '/store/demo/capability/course_builder',
+            variant: 'secondary',
+          },
         ]}
         trustIndicators={[
           'Interactive lesson contract',

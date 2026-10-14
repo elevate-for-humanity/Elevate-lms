@@ -1,24 +1,18 @@
 {
-  "generatedAt": "2026-10-12T04:55:20.153Z",
-  "scanDirs": [
-    "apps/marketing/app",
-    "apps/lms/app",
-    "apps/admin/app",
-    "components",
-    "content"
-  ],
-  "scannedFiles": 3527,
+  "generatedAt": "2026-10-14T19:25:31.370Z",
+  "scanDirs": ["apps/marketing/app", "apps/lms/app", "apps/admin/app", "components", "content"],
+  "scannedFiles": 3563,
   "filesByService": {
-    "marketing": 1015,
-    "lms": 457,
-    "admin": 722,
-    "shared": 1333
+    "marketing": 1030,
+    "lms": 458,
+    "admin": 725,
+    "shared": 1350
   },
   "canonicalHero": "h-[38vh] min-h-[260px] max-h-[520px]",
   "summary": {
     "oversizedHero": {
       "critical": 0,
-      "high": 7,
+      "high": 1,
       "medium": 0,
       "low": 0
     },
@@ -30,111 +24,26 @@
     },
     "layoutText": {
       "critical": 0,
-      "high": 208,
-      "medium": 3,
+      "high": 193,
+      "medium": 2,
       "low": 0
     },
-    "oversizedHeroTotal": 7,
+    "oversizedHeroTotal": 1,
     "imagePerfTotal": 9,
-    "layoutTextTotal": 211,
-    "marketingPagesWithHeroButNotCanonical": 144,
-    "marketingPagesAudited": 801,
-    "marketingPagesWithDesignRisks": 419
+    "layoutTextTotal": 195,
+    "marketingPagesWithHeroButNotCanonical": 147,
+    "marketingPagesAudited": 803,
+    "marketingPagesWithDesignRisks": 431
   },
   "topOversizedHeroFiles": [
     [
-      "components/home/PlatformHubHero.tsx",
+      "apps/marketing/app/tax-software/_components/TaxHero.tsx",
       [
         {
-          "file": "components/home/PlatformHubHero.tsx",
-          "service": "shared",
-          "line": 28,
-          "match": "min-h-[440px]",
-          "id": "min-h-420-plus",
-          "re": {},
-          "severity": "high",
-          "message": "Large minimum height on hero-like container"
-        },
-        {
-          "file": "components/home/PlatformHubHero.tsx",
-          "service": "shared",
-          "line": 28,
-          "match": "min-h-[480px]",
-          "id": "min-h-420-plus",
-          "re": {},
-          "severity": "high",
-          "message": "Large minimum height on hero-like container"
-        }
-      ]
-    ],
-    [
-      "apps/marketing/app/barber-and-beauty-apprenticeships/page.tsx",
-      [
-        {
-          "file": "apps/marketing/app/barber-and-beauty-apprenticeships/page.tsx",
+          "file": "apps/marketing/app/tax-software/_components/TaxHero.tsx",
           "service": "marketing",
-          "line": 78,
-          "match": "min-h-[420px]",
-          "id": "min-h-420-plus",
-          "re": {},
-          "severity": "high",
-          "message": "Large minimum height on hero-like container"
-        }
-      ]
-    ],
-    [
-      "apps/marketing/app/programs/barber-apprenticeship/page.tsx",
-      [
-        {
-          "file": "apps/marketing/app/programs/barber-apprenticeship/page.tsx",
-          "service": "marketing",
-          "line": 231,
-          "match": "min-h-[420px]",
-          "id": "min-h-420-plus",
-          "re": {},
-          "severity": "high",
-          "message": "Large minimum height on hero-like container"
-        }
-      ]
-    ],
-    [
-      "apps/marketing/app/programs/healthcare/page.tsx",
-      [
-        {
-          "file": "apps/marketing/app/programs/healthcare/page.tsx",
-          "service": "marketing",
-          "line": 83,
-          "match": "min-h-[430px]",
-          "id": "min-h-420-plus",
-          "re": {},
-          "severity": "high",
-          "message": "Large minimum height on hero-like container"
-        }
-      ]
-    ],
-    [
-      "apps/marketing/app/testing/page.tsx",
-      [
-        {
-          "file": "apps/marketing/app/testing/page.tsx",
-          "service": "marketing",
-          "line": 85,
-          "match": "min-h-[430px]",
-          "id": "min-h-420-plus",
-          "re": {},
-          "severity": "high",
-          "message": "Large minimum height on hero-like container"
-        }
-      ]
-    ],
-    [
-      "components/programs/beauty/FeaturedHostPartners.tsx",
-      [
-        {
-          "file": "components/programs/beauty/FeaturedHostPartners.tsx",
-          "service": "shared",
-          "line": 63,
-          "match": "min-h-[420px]",
+          "line": 21,
+          "match": "min-h-[500px]",
           "id": "min-h-420-plus",
           "re": {},
           "severity": "high",
@@ -372,7 +281,7 @@
         {
           "file": "apps/lms/app/apprentice/page.tsx",
           "service": "lms",
-          "line": 476,
+          "line": 478,
           "match": "heroImage}\n            alt={`${displayProgram} apprentice training`}\n            fill\n            pr",
           "id": "hero-gradient-overlay",
           "re": {},
@@ -382,7 +291,7 @@
         {
           "file": "apps/lms/app/apprentice/page.tsx",
           "service": "lms",
-          "line": 483,
+          "line": 485,
           "match": "absolute inset-0 bg-gradient-to-r from-slate-950 via-fuchsia-950/90 to-fuchsia-900/20\" />\n          ",
           "id": "hero-text-overlay",
           "re": {},
@@ -392,7 +301,7 @@
         {
           "file": "apps/lms/app/apprentice/page.tsx",
           "service": "lms",
-          "line": 898,
+          "line": 901,
           "match": "<Image\n                  src={action.image}\n                  alt=\"\"",
           "id": "empty-next-image-alt",
           "re": {},
@@ -433,41 +342,6 @@
           "re": {},
           "severity": "high",
           "message": "Possible headline/text overlaid on hero media"
-        }
-      ]
-    ],
-    [
-      "components/home/AnimatedHomePage.tsx",
-      [
-        {
-          "file": "components/home/AnimatedHomePage.tsx",
-          "service": "shared",
-          "line": 146,
-          "match": "Hero Section */}\n      <section className=\"relative min-h-screen flex items-center justify-center ov",
-          "id": "hero-gradient-overlay",
-          "re": {},
-          "severity": "high",
-          "message": "Gradient overlay near hero media"
-        },
-        {
-          "file": "components/home/AnimatedHomePage.tsx",
-          "service": "shared",
-          "line": 289,
-          "match": "absolute inset-0 bg-gradient-to-br ${program.color} opacity-0 group-hover:opacity-10 transition-opac",
-          "id": "hero-text-overlay",
-          "re": {},
-          "severity": "high",
-          "message": "Possible headline/text overlaid on hero media"
-        },
-        {
-          "file": "components/home/AnimatedHomePage.tsx",
-          "service": "shared",
-          "line": 336,
-          "match": "bg-white rounded-2xl p-8 border border-slate-200 shadow-xl hover:shadow-2xl transition-shadow\">\n    ",
-          "id": "invisible-white-on-white",
-          "re": {},
-          "severity": "high",
-          "message": "Possible white text on white background"
         }
       ]
     ],
@@ -922,6 +796,31 @@
       ]
     ],
     [
+      "components/home/AnimatedHomePage.tsx",
+      [
+        {
+          "file": "components/home/AnimatedHomePage.tsx",
+          "service": "shared",
+          "line": 289,
+          "match": "absolute inset-0 bg-gradient-to-br ${program.color} opacity-0 group-hover:opacity-10 transition-opac",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Possible headline/text overlaid on hero media"
+        },
+        {
+          "file": "components/home/AnimatedHomePage.tsx",
+          "service": "shared",
+          "line": 336,
+          "match": "bg-white rounded-2xl p-8 border border-slate-200 shadow-xl hover:shadow-2xl transition-shadow\">\n    ",
+          "id": "invisible-white-on-white",
+          "re": {},
+          "severity": "high",
+          "message": "Possible white text on white background"
+        }
+      ]
+    ],
+    [
       "components/home/Pathways.tsx",
       [
         {
@@ -1022,37 +921,12 @@
       ]
     ],
     [
-      "components/program-holder/ProgramHolderWorkspaceView.tsx",
-      [
-        {
-          "file": "components/program-holder/ProgramHolderWorkspaceView.tsx",
-          "service": "shared",
-          "line": 1362,
-          "match": "Hero({\n  eyebrow,\n  title,\n  description,\n}: {\n  eyebrow: string;\n  title: string;\n  description: st",
-          "id": "hero-gradient-overlay",
-          "re": {},
-          "severity": "high",
-          "message": "Gradient overlay near hero media"
-        },
-        {
-          "file": "components/program-holder/ProgramHolderWorkspaceView.tsx",
-          "service": "shared",
-          "line": 1400,
-          "match": "heroImage}\n        alt={`${title} dashboard`}\n        fill\n        priority\n        sizes=\"100vw\"\n  ",
-          "id": "hero-gradient-overlay",
-          "re": {},
-          "severity": "high",
-          "message": "Gradient overlay near hero media"
-        }
-      ]
-    ],
-    [
       "components/programs/beauty/HostShopShowcase.tsx",
       [
         {
           "file": "components/programs/beauty/HostShopShowcase.tsx",
           "service": "shared",
-          "line": 411,
+          "line": 407,
           "match": "absolute inset-0 flex flex-col justify-end bg-[radial-gradient(circle_at_top_left,rgba(185,28,28,0.3",
           "id": "hero-text-overlay",
           "re": {},
@@ -1062,37 +936,12 @@
         {
           "file": "components/programs/beauty/HostShopShowcase.tsx",
           "service": "shared",
-          "line": 321,
+          "line": 317,
           "match": "<Image\n                      src={image.backdropSrc}\n                      alt=\"\"",
           "id": "empty-next-image-alt",
           "re": {},
           "severity": "medium",
           "message": "Empty Next/Image alt text"
-        }
-      ]
-    ],
-    [
-      "components/programs/sections/CTASection.tsx",
-      [
-        {
-          "file": "components/programs/sections/CTASection.tsx",
-          "service": "shared",
-          "line": 31,
-          "match": "HeroVideo\n            src={videoSrc}\n            poster={videoPoster || '/images/og-default.jpg'}\n  ",
-          "id": "hero-gradient-overlay",
-          "re": {},
-          "severity": "high",
-          "message": "Gradient overlay near hero media"
-        },
-        {
-          "file": "components/programs/sections/CTASection.tsx",
-          "service": "shared",
-          "line": 40,
-          "match": "absolute inset-0 bg-gradient-to-r from-slate-900/95 to-slate-900/80\" />\n      </div>\n\n      {/* Cont",
-          "id": "hero-text-overlay",
-          "re": {},
-          "severity": "high",
-          "message": "Possible headline/text overlaid on hero media"
         }
       ]
     ],
@@ -1327,21 +1176,6 @@
       ]
     ],
     [
-      "apps/marketing/app/about/partners/page.tsx",
-      [
-        {
-          "file": "apps/marketing/app/about/partners/page.tsx",
-          "service": "marketing",
-          "line": 37,
-          "match": "Hero */}\n      <section className=\"relative bg-gradient-to",
-          "id": "hero-gradient-overlay",
-          "re": {},
-          "severity": "high",
-          "message": "Gradient overlay near hero media"
-        }
-      ]
-    ],
-    [
       "apps/marketing/app/ai/job-match/page.tsx",
       [
         {
@@ -1392,7 +1226,7 @@
         {
           "file": "apps/marketing/app/barber-beauty-network/page.tsx",
           "service": "marketing",
-          "line": 26,
+          "line": 32,
           "match": "HeroVideo src=\"/videos/partners/kountry-kutz/shop-tour.mp4\" poster=\"/images/partners/kountry-kutz/in",
           "id": "hero-gradient-overlay",
           "re": {},
@@ -1409,21 +1243,6 @@
           "service": "marketing",
           "line": 6,
           "match": "Hero Skeleton */}\n      <div className=\"bg-gradient-to",
-          "id": "hero-gradient-overlay",
-          "re": {},
-          "severity": "high",
-          "message": "Gradient overlay near hero media"
-        }
-      ]
-    ],
-    [
-      "apps/marketing/app/career-services/page.tsx",
-      [
-        {
-          "file": "apps/marketing/app/career-services/page.tsx",
-          "service": "marketing",
-          "line": 36,
-          "match": "hero.webp',\n  },\n];\n\nconst EMPLOYER_BENEFITS = [\n  'Pre-screened candidates with verified skills',\n ",
           "id": "hero-gradient-overlay",
           "re": {},
           "severity": "high",
@@ -1477,21 +1296,6 @@
       ]
     ],
     [
-      "apps/marketing/app/disaster-recovery/page.tsx",
-      [
-        {
-          "file": "apps/marketing/app/disaster-recovery/page.tsx",
-          "service": "marketing",
-          "line": 19,
-          "match": "Hero Section */}\n      <section className=\"relative bg-gradient-to",
-          "id": "hero-gradient-overlay",
-          "re": {},
-          "severity": "high",
-          "message": "Gradient overlay near hero media"
-        }
-      ]
-    ],
-    [
       "apps/marketing/app/employers/talent-network/[pathway]/indiana/[city]/page.tsx",
       [
         {
@@ -1533,21 +1337,6 @@
           "re": {},
           "severity": "high",
           "message": "Gradient overlay near hero media"
-        }
-      ]
-    ],
-    [
-      "apps/marketing/app/for-agencies/page.tsx",
-      [
-        {
-          "file": "apps/marketing/app/for-agencies/page.tsx",
-          "service": "marketing",
-          "line": 98,
-          "match": "absolute inset-0 flex items-end\">\n          <div className=\"max-w-4xl mx-auto px-4 pb-10 w-full\">\n  ",
-          "id": "hero-text-overlay",
-          "re": {},
-          "severity": "high",
-          "message": "Possible headline/text overlaid on hero media"
         }
       ]
     ],
@@ -1625,6 +1414,96 @@
           "message": "Gradient overlay near hero media"
         }
       ]
+    ],
+    [
+      "apps/marketing/app/help/tutorials/page.tsx",
+      [
+        {
+          "file": "apps/marketing/app/help/tutorials/page.tsx",
+          "service": "marketing",
+          "line": 27,
+          "match": "Hero */}\n      <section className=\"bg-gradient-to",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero media"
+        }
+      ]
+    ],
+    [
+      "apps/marketing/app/inquiry/page.tsx",
+      [
+        {
+          "file": "apps/marketing/app/inquiry/page.tsx",
+          "service": "marketing",
+          "line": 49,
+          "match": "Hero */}\n      <section className=\"bg-gradient-to",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero media"
+        }
+      ]
+    ],
+    [
+      "apps/marketing/app/news/page.tsx",
+      [
+        {
+          "file": "apps/marketing/app/news/page.tsx",
+          "service": "marketing",
+          "line": 54,
+          "match": "Hero */}\n      <section className=\"bg-gradient-to",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero media"
+        }
+      ]
+    ],
+    [
+      "apps/marketing/app/onboarding/employer/hiring-needs/page.tsx",
+      [
+        {
+          "file": "apps/marketing/app/onboarding/employer/hiring-needs/page.tsx",
+          "service": "marketing",
+          "line": 164,
+          "match": "Hero Section */}\n      <div className=\"bg-gradient-to",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero media"
+        }
+      ]
+    ],
+    [
+      "apps/marketing/app/partnerships/page.tsx",
+      [
+        {
+          "file": "apps/marketing/app/partnerships/page.tsx",
+          "service": "marketing",
+          "line": 31,
+          "match": "Hero */}\n      <section className=\"bg-gradient-to",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero media"
+        }
+      ]
+    ],
+    [
+      "apps/marketing/app/platform/employer-portal/page.tsx",
+      [
+        {
+          "file": "apps/marketing/app/platform/employer-portal/page.tsx",
+          "service": "marketing",
+          "line": 73,
+          "match": "Hero Section */}\n        <section className=\"relative bg-gradient-to",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero media"
+        }
+      ]
     ]
   ],
   "marketingPagesNoCanonical": [
@@ -1664,6 +1543,7 @@
     "apps/marketing/app/docs/page.tsx",
     "apps/marketing/app/educatorhub/page.tsx",
     "apps/marketing/app/email/page.tsx",
+    "apps/marketing/app/employers/post-job/page.tsx",
     "apps/marketing/app/employment-support/page.tsx",
     "apps/marketing/app/enroll/page.tsx",
     "apps/marketing/app/events/page.tsx",
@@ -1678,9 +1558,11 @@
     "apps/marketing/app/help/page.tsx",
     "apps/marketing/app/help/technical/page.tsx",
     "apps/marketing/app/help/tutorials/page.tsx",
+    "apps/marketing/app/host-shops/[slug]/page.tsx",
     "apps/marketing/app/implementation/page.tsx",
     "apps/marketing/app/inquiry/page.tsx",
     "apps/marketing/app/instructor-credentials/page.tsx",
+    "apps/marketing/app/jobs/page.tsx",
     "apps/marketing/app/jri/page.tsx",
     "apps/marketing/app/legal-entity-structure/page.tsx",
     "apps/marketing/app/license/page.tsx",
@@ -1688,7 +1570,6 @@
     "apps/marketing/app/licensing/page.tsx",
     "apps/marketing/app/microclasses/page.tsx",
     "apps/marketing/app/mobile/page.tsx",
-    "apps/marketing/app/mobile-app/page.tsx",
     "apps/marketing/app/news/page.tsx",
     "apps/marketing/app/offline/page.tsx",
     "apps/marketing/app/ojt-and-funding/page.tsx",
@@ -1700,6 +1581,7 @@
     "apps/marketing/app/online-apps/page.tsx",
     "apps/marketing/app/partner-directory/page.tsx",
     "apps/marketing/app/partner-operating-model/page.tsx",
+    "apps/marketing/app/partners/host-shops/page.tsx",
     "apps/marketing/app/partnerships/page.tsx",
     "apps/marketing/app/philanthropy/page.tsx",
     "apps/marketing/app/platform/employer-portal/page.tsx",
@@ -1783,11 +1665,7 @@
       "actions": 2,
       "textBlocks": 6,
       "longestTextWords": 17,
-      "risks": [
-        "metadata-review",
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/(auth)/invite/page.tsx",
@@ -1831,11 +1709,7 @@
       "actions": 15,
       "textBlocks": 7,
       "longestTextWords": 125,
-      "risks": [
-        "text-only",
-        "long-copy-block",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "long-copy-block", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/(marketing)/students/page.tsx",
@@ -1846,10 +1720,7 @@
       "actions": 10,
       "textBlocks": 5,
       "longestTextWords": 43,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/(partner)/partners/admin/placements/page.tsx",
@@ -1882,9 +1753,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/(public)/survey/workone/page.tsx",
@@ -1895,11 +1764,7 @@
       "actions": 5,
       "textBlocks": 5,
       "longestTextWords": 17,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/about/elizabeth-greene/page.tsx",
@@ -1950,13 +1815,11 @@
       "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 2,
+      "images": 1,
       "actions": 2,
       "textBlocks": 7,
       "longestTextWords": 18,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/about/partners/partners/page.tsx",
@@ -1989,9 +1852,7 @@
       "actions": 1,
       "textBlocks": 5,
       "longestTextWords": 65,
-      "risks": [
-        "long-copy-block"
-      ]
+      "risks": ["long-copy-block"]
     },
     {
       "file": "apps/marketing/app/about/team/carlina-wilkes/page.tsx",
@@ -2035,9 +1896,7 @@
       "actions": 1,
       "textBlocks": 7,
       "longestTextWords": 56,
-      "risks": [
-        "long-copy-block"
-      ]
+      "risks": ["long-copy-block"]
     },
     {
       "file": "apps/marketing/app/about/team/jozanna-george/page.tsx",
@@ -2070,17 +1929,14 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "metadata-review",
-        "no-local-h1"
-      ]
+      "risks": ["metadata-review", "no-local-h1"]
     },
     {
       "file": "apps/marketing/app/about/team/sharon-douglass/page.tsx",
       "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 1,
+      "images": 0,
       "actions": 1,
       "textBlocks": 3,
       "longestTextWords": 29,
@@ -2205,9 +2061,7 @@
       "actions": 1,
       "textBlocks": 2,
       "longestTextWords": 13,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/academic-integrity/page.tsx",
@@ -2218,11 +2072,7 @@
       "actions": 5,
       "textBlocks": 95,
       "longestTextWords": 57,
-      "risks": [
-        "no-local-h1",
-        "long-copy-block",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "long-copy-block", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/accessibility/page.tsx",
@@ -2233,9 +2083,7 @@
       "actions": 2,
       "textBlocks": 8,
       "longestTextWords": 44,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/account/ai-team/page.tsx",
@@ -2279,10 +2127,7 @@
       "actions": 3,
       "textBlocks": 8,
       "longestTextWords": 35,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/agencies/page.tsx",
@@ -2337,9 +2182,7 @@
       "actions": 4,
       "textBlocks": 7,
       "longestTextWords": 21,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/ai/dev-studio/page.tsx",
@@ -2361,9 +2204,7 @@
       "actions": 4,
       "textBlocks": 6,
       "longestTextWords": 14,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/ai/job-match/page.tsx",
@@ -2374,10 +2215,7 @@
       "actions": 2,
       "textBlocks": 7,
       "longestTextWords": 19,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/ai/page.tsx",
@@ -2388,9 +2226,7 @@
       "actions": 5,
       "textBlocks": 3,
       "longestTextWords": 19,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/ai/paris/page.tsx",
@@ -2401,11 +2237,7 @@
       "actions": 4,
       "textBlocks": 7,
       "longestTextWords": 207,
-      "risks": [
-        "text-only",
-        "long-copy-block",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "long-copy-block", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/alumni/page.tsx",
@@ -2416,10 +2248,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/analytics/page.tsx",
@@ -2452,10 +2281,7 @@
       "actions": 10,
       "textBlocks": 14,
       "longestTextWords": 26,
-      "risks": [
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/apply/cosmetology/page.tsx",
@@ -2477,10 +2303,7 @@
       "actions": 2,
       "textBlocks": 8,
       "longestTextWords": 16,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/apply/employer/success/page.tsx",
@@ -2513,11 +2336,7 @@
       "actions": 6,
       "textBlocks": 8,
       "longestTextWords": 48,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/apply/inquiry-received/page.tsx",
@@ -2528,9 +2347,7 @@
       "actions": 6,
       "textBlocks": 4,
       "longestTextWords": 29,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/apply/intake/page.tsx",
@@ -2596,9 +2413,7 @@
       "actions": 0,
       "textBlocks": 2,
       "longestTextWords": 11,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/apply/staff/success/page.tsx",
@@ -2609,9 +2424,7 @@
       "actions": 1,
       "textBlocks": 4,
       "longestTextWords": 22,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/apply/student/form/page.tsx",
@@ -2633,9 +2446,7 @@
       "actions": 1,
       "textBlocks": 4,
       "longestTextWords": 42,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/apply/student/page.tsx",
@@ -2668,9 +2479,7 @@
       "actions": 2,
       "textBlocks": 1,
       "longestTextWords": 20,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/apply/waitlist/[program]/page.tsx",
@@ -2681,11 +2490,7 @@
       "actions": 7,
       "textBlocks": 9,
       "longestTextWords": 44,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/apprenticeship-programs/page.tsx",
@@ -2726,9 +2531,9 @@
       "metadata": true,
       "h1s": 0,
       "images": 2,
-      "actions": 8,
-      "textBlocks": 13,
-      "longestTextWords": 46,
+      "actions": 7,
+      "textBlocks": 12,
+      "longestTextWords": 43,
       "risks": []
     },
     {
@@ -2740,9 +2545,7 @@
       "actions": 8,
       "textBlocks": 11,
       "longestTextWords": 30,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/apps/ai-studio/start-trial/page.tsx",
@@ -2885,9 +2688,7 @@
       "actions": 8,
       "textBlocks": 59,
       "longestTextWords": 34,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/auth/admin/reset-password/page.tsx",
@@ -2898,9 +2699,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/auth/set-password/page.tsx",
@@ -2911,11 +2710,7 @@
       "actions": 5,
       "textBlocks": 4,
       "longestTextWords": 17,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/banking/direct-deposit/page.tsx",
@@ -2926,10 +2721,7 @@
       "actions": 4,
       "textBlocks": 27,
       "longestTextWords": 38,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/banking/page.tsx",
@@ -2950,7 +2742,7 @@
       "images": 2,
       "actions": 7,
       "textBlocks": 12,
-      "longestTextWords": 46,
+      "longestTextWords": 43,
       "risks": []
     },
     {
@@ -2971,7 +2763,7 @@
       "h1s": 1,
       "images": 1,
       "actions": 11,
-      "textBlocks": 6,
+      "textBlocks": 7,
       "longestTextWords": 38,
       "risks": []
     },
@@ -3006,11 +2798,7 @@
       "actions": 4,
       "textBlocks": 6,
       "longestTextWords": 18,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/blog/[slug]/page.tsx",
@@ -3021,10 +2809,7 @@
       "actions": 4,
       "textBlocks": 5,
       "longestTextWords": 20,
-      "risks": [
-        "multiple-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["multiple-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/blog/author/[author]/page.tsx",
@@ -3123,9 +2908,7 @@
       "actions": 3,
       "textBlocks": 1,
       "longestTextWords": 13,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/booking/page.tsx",
@@ -3136,9 +2919,7 @@
       "actions": 3,
       "textBlocks": 4,
       "longestTextWords": 13,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/booth-rental/apply/page.tsx",
@@ -3149,9 +2930,7 @@
       "actions": 3,
       "textBlocks": 1,
       "longestTextWords": 20,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/booth-rental/page.tsx",
@@ -3162,10 +2941,7 @@
       "actions": 4,
       "textBlocks": 4,
       "longestTextWords": 37,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/business-network/business-owners/page.tsx",
@@ -3198,9 +2974,7 @@
       "actions": 4,
       "textBlocks": 7,
       "longestTextWords": 33,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/calendar/page.tsx",
@@ -3211,9 +2985,7 @@
       "actions": 5,
       "textBlocks": 4,
       "longestTextWords": 7,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/call-now/page.tsx",
@@ -3257,9 +3029,7 @@
       "actions": 6,
       "textBlocks": 5,
       "longestTextWords": 32,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/career-services/career-counseling/page.tsx",
@@ -3281,10 +3051,7 @@
       "actions": 6,
       "textBlocks": 4,
       "longestTextWords": 12,
-      "risks": [
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/career-services/courses/page.tsx",
@@ -3295,9 +3062,7 @@
       "actions": 5,
       "textBlocks": 2,
       "longestTextWords": 14,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/career-services/interview-prep/page.tsx",
@@ -3319,22 +3084,18 @@
       "actions": 4,
       "textBlocks": 3,
       "longestTextWords": 13,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/career-services/page.tsx",
       "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 3,
+      "images": 2,
       "actions": 4,
       "textBlocks": 6,
       "longestTextWords": 28,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/career-services/resume-building/page.tsx",
@@ -3345,9 +3106,7 @@
       "actions": 4,
       "textBlocks": 2,
       "longestTextWords": 14,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/career-training/[state]/page.tsx",
@@ -3358,9 +3117,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/career-training/career-training/[state]/page.tsx",
@@ -3415,11 +3172,7 @@
       "actions": 5,
       "textBlocks": 6,
       "longestTextWords": 21,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/careers/assessment/page.tsx",
@@ -3474,9 +3227,7 @@
       "actions": 2,
       "textBlocks": 6,
       "longestTextWords": 34,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/case-manager/[...path]/page.tsx",
@@ -3487,10 +3238,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "metadata-review",
-        "no-local-h1"
-      ]
+      "risks": ["metadata-review", "no-local-h1"]
     },
     {
       "file": "apps/marketing/app/case-manager/analytics/page.tsx",
@@ -3501,11 +3249,7 @@
       "actions": 0,
       "textBlocks": 5,
       "longestTextWords": 16,
-      "risks": [
-        "multiple-local-h1",
-        "text-only",
-        "no-next-action"
-      ]
+      "risks": ["multiple-local-h1", "text-only", "no-next-action"]
     },
     {
       "file": "apps/marketing/app/case-manager/candidates/page.tsx",
@@ -3538,10 +3282,7 @@
       "actions": 4,
       "textBlocks": 9,
       "longestTextWords": 6,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/case-manager/page.tsx",
@@ -3563,9 +3304,7 @@
       "actions": 2,
       "textBlocks": 6,
       "longestTextWords": 15,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/case-manager/participants/page.tsx",
@@ -3609,9 +3348,7 @@
       "actions": 2,
       "textBlocks": 7,
       "longestTextWords": 32,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/certificates/page.tsx",
@@ -3622,10 +3359,7 @@
       "actions": 11,
       "textBlocks": 17,
       "longestTextWords": 12,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/certificates/verify/[certificateId]/page.tsx",
@@ -3636,10 +3370,7 @@
       "actions": 8,
       "textBlocks": 19,
       "longestTextWords": 45,
-      "risks": [
-        "multiple-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["multiple-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/certification-testing/page.tsx",
@@ -3672,11 +3403,7 @@
       "actions": 2,
       "textBlocks": 11,
       "longestTextWords": 11,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/check-eligibility/check-eligibility/page.tsx",
@@ -3698,9 +3425,7 @@
       "actions": 3,
       "textBlocks": 6,
       "longestTextWords": 40,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/cna-waitlist/cna-waitlist/page.tsx",
@@ -3744,9 +3469,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/community-services/community-services/[state]/page.tsx",
@@ -3779,10 +3502,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/community-services-indiana/page.tsx",
@@ -3804,10 +3524,7 @@
       "actions": 4,
       "textBlocks": 4,
       "longestTextWords": 42,
-      "risks": [
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/center/page.tsx",
@@ -3829,9 +3546,7 @@
       "actions": 4,
       "textBlocks": 79,
       "longestTextWords": 52,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/barber/final-signoff/page.tsx",
@@ -3842,10 +3557,7 @@
       "actions": 3,
       "textBlocks": 16,
       "longestTextWords": 34,
-      "risks": [
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/barber/monthly-ojt-evaluation/page.tsx",
@@ -3856,10 +3568,7 @@
       "actions": 3,
       "textBlocks": 14,
       "longestTextWords": 15,
-      "risks": [
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/barber/ojt-hours-log/page.tsx",
@@ -3870,10 +3579,7 @@
       "actions": 3,
       "textBlocks": 17,
       "longestTextWords": 22,
-      "risks": [
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/barber/page.tsx",
@@ -3884,9 +3590,7 @@
       "actions": 4,
       "textBlocks": 10,
       "longestTextWords": 35,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/barber/scoring-sheet/page.tsx",
@@ -3897,10 +3601,7 @@
       "actions": 3,
       "textBlocks": 12,
       "longestTextWords": 16,
-      "risks": [
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/barber/supervisor-verification/page.tsx",
@@ -3911,10 +3612,7 @@
       "actions": 3,
       "textBlocks": 16,
       "longestTextWords": 30,
-      "risks": [
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/cosmetology/apprenticeship-agreement/page.tsx",
@@ -3925,10 +3623,7 @@
       "actions": 1,
       "textBlocks": 19,
       "longestTextWords": 29,
-      "risks": [
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/cosmetology/final-signoff/page.tsx",
@@ -3939,10 +3634,7 @@
       "actions": 1,
       "textBlocks": 8,
       "longestTextWords": 32,
-      "risks": [
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/cosmetology/monthly-ojt-evaluation/page.tsx",
@@ -3953,9 +3645,7 @@
       "actions": 1,
       "textBlocks": 2,
       "longestTextWords": 18,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/cosmetology/ojt-hours-log/page.tsx",
@@ -3966,9 +3656,7 @@
       "actions": 1,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/cosmetology/page.tsx",
@@ -3979,10 +3667,7 @@
       "actions": 2,
       "textBlocks": 5,
       "longestTextWords": 2,
-      "risks": [
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/cosmetology/scoring-sheet/page.tsx",
@@ -3993,9 +3678,7 @@
       "actions": 1,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/cosmetology/supervisor-verification/page.tsx",
@@ -4006,9 +3689,7 @@
       "actions": 1,
       "textBlocks": 3,
       "longestTextWords": 34,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/compliance/competency-verification/page.tsx",
@@ -4019,10 +3700,7 @@
       "actions": 5,
       "textBlocks": 16,
       "longestTextWords": 51,
-      "risks": [
-        "multiple-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["multiple-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/compliance/credential-partners/page.tsx",
@@ -4033,9 +3711,7 @@
       "actions": 4,
       "textBlocks": 20,
       "longestTextWords": 52,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/compliance/internship-agreement/page.tsx",
@@ -4046,9 +3722,7 @@
       "actions": 1,
       "textBlocks": 38,
       "longestTextWords": 49,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/internship-evaluation/page.tsx",
@@ -4059,9 +3733,7 @@
       "actions": 1,
       "textBlocks": 30,
       "longestTextWords": 38,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/ojt-training-plan/page.tsx",
@@ -4072,9 +3744,7 @@
       "actions": 1,
       "textBlocks": 34,
       "longestTextWords": 54,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/page.tsx",
@@ -4085,9 +3755,7 @@
       "actions": 14,
       "textBlocks": 24,
       "longestTextWords": 44,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/report/page.tsx",
@@ -4098,10 +3766,7 @@
       "actions": 2,
       "textBlocks": 2,
       "longestTextWords": 12,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1"]
     },
     {
       "file": "apps/marketing/app/compliance/wioa/initial-eligibility-aggregate-performance/page.tsx",
@@ -4112,10 +3777,7 @@
       "actions": 1,
       "textBlocks": 6,
       "longestTextWords": 10,
-      "risks": [
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/wioa/page.tsx",
@@ -4126,10 +3788,7 @@
       "actions": 3,
       "textBlocks": 4,
       "longestTextWords": 21,
-      "risks": [
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/wioa/programs/[slug]/initial-eligibility-aggregate-performance/page.tsx",
@@ -4140,10 +3799,7 @@
       "actions": 2,
       "textBlocks": 4,
       "longestTextWords": 29,
-      "risks": [
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/wioa/programs/[slug]/page.tsx",
@@ -4154,9 +3810,7 @@
       "actions": 3,
       "textBlocks": 3,
       "longestTextWords": 6,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/compliance/wioa/programs/[slug]/section-188-equal-opportunity-checklist/page.tsx",
@@ -4167,9 +3821,7 @@
       "actions": 1,
       "textBlocks": 2,
       "longestTextWords": 5,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/compliance/wioa/section-188-equal-opportunity-checklist/page.tsx",
@@ -4180,10 +3832,7 @@
       "actions": 1,
       "textBlocks": 6,
       "longestTextWords": 9,
-      "risks": [
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/compliance/workforce-partnership-packet/page.tsx",
@@ -4194,9 +3843,7 @@
       "actions": 3,
       "textBlocks": 9,
       "longestTextWords": 42,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/connect/page.tsx",
@@ -4207,11 +3854,7 @@
       "actions": 16,
       "textBlocks": 9,
       "longestTextWords": 20,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/consumer-disclosures/page.tsx",
@@ -4222,10 +3865,7 @@
       "actions": 0,
       "textBlocks": 6,
       "longestTextWords": 35,
-      "risks": [
-        "text-only",
-        "no-next-action"
-      ]
+      "risks": ["text-only", "no-next-action"]
     },
     {
       "file": "apps/marketing/app/consumer-education/page.tsx",
@@ -4236,10 +3876,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/contact/contact/page.tsx",
@@ -4272,9 +3909,7 @@
       "actions": 3,
       "textBlocks": 13,
       "longestTextWords": 24,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/contracts/data-sharing/page.tsx",
@@ -4285,9 +3920,7 @@
       "actions": 3,
       "textBlocks": 12,
       "longestTextWords": 19,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/contracts/employer-agreement/page.tsx",
@@ -4298,9 +3931,7 @@
       "actions": 3,
       "textBlocks": 15,
       "longestTextWords": 16,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/contracts/master-license/page.tsx",
@@ -4311,9 +3942,7 @@
       "actions": 3,
       "textBlocks": 13,
       "longestTextWords": 22,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/contracts/page.tsx",
@@ -4324,10 +3953,7 @@
       "actions": 7,
       "textBlocks": 48,
       "longestTextWords": 34,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/cookies/page.tsx",
@@ -4338,10 +3964,7 @@
       "actions": 3,
       "textBlocks": 29,
       "longestTextWords": 39,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/copyright/page.tsx",
@@ -4352,9 +3975,7 @@
       "actions": 2,
       "textBlocks": 29,
       "longestTextWords": 21,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/cosmetology-apprenticeship/page.tsx",
@@ -4387,10 +4008,7 @@
       "actions": 4,
       "textBlocks": 10,
       "longestTextWords": 14,
-      "risks": [
-        "multiple-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["multiple-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/credential/page.tsx",
@@ -4423,9 +4041,7 @@
       "actions": 2,
       "textBlocks": 1,
       "longestTextWords": 22,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/demo/page.tsx",
@@ -4447,10 +4063,7 @@
       "actions": 8,
       "textBlocks": 24,
       "longestTextWords": 21,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/demos/vr-funding/page.tsx",
@@ -4461,9 +4074,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/directory/page.tsx",
@@ -4474,23 +4085,18 @@
       "actions": 6,
       "textBlocks": 7,
       "longestTextWords": 19,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/disaster-recovery/page.tsx",
       "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 1,
+      "images": 0,
       "actions": 4,
       "textBlocks": 46,
       "longestTextWords": 30,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/disclosures/training-delivery/page.tsx",
@@ -4501,9 +4107,7 @@
       "actions": 2,
       "textBlocks": 4,
       "longestTextWords": 38,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/dmca/page.tsx",
@@ -4514,10 +4118,7 @@
       "actions": 6,
       "textBlocks": 34,
       "longestTextWords": 35,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/docs/changelog/page.tsx",
@@ -4539,9 +4140,7 @@
       "actions": 4,
       "textBlocks": 9,
       "longestTextWords": 14,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/docs/program-holder-guide/page.tsx",
@@ -4574,10 +4173,7 @@
       "actions": 3,
       "textBlocks": 5,
       "longestTextWords": 49,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/donate/thank-you/page.tsx",
@@ -4599,9 +4195,7 @@
       "actions": 16,
       "textBlocks": 4,
       "longestTextWords": 21,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/ebook/barber-theory/page.tsx",
@@ -4623,9 +4217,7 @@
       "actions": 4,
       "textBlocks": 4,
       "longestTextWords": 29,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/educatorhub/page.tsx",
@@ -4636,9 +4228,7 @@
       "actions": 2,
       "textBlocks": 2,
       "longestTextWords": 10,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/eligibility/page.tsx",
@@ -4649,9 +4239,7 @@
       "actions": 2,
       "textBlocks": 4,
       "longestTextWords": 34,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/eligibility/quiz/page.tsx",
@@ -4662,9 +4250,7 @@
       "actions": 3,
       "textBlocks": 3,
       "longestTextWords": 25,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/email/page.tsx",
@@ -4675,9 +4261,7 @@
       "actions": 4,
       "textBlocks": 9,
       "longestTextWords": 14,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/employer/[...path]/page.tsx",
@@ -4710,9 +4294,7 @@
       "actions": 5,
       "textBlocks": 3,
       "longestTextWords": 18,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/employers/hvac-partners/indiana/[city]/page.tsx",
@@ -4723,9 +4305,7 @@
       "actions": 2,
       "textBlocks": 2,
       "longestTextWords": 24,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/employers/hvac-partners/page.tsx",
@@ -4743,13 +4323,11 @@
       "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 0,
-      "actions": 5,
-      "textBlocks": 5,
+      "images": 1,
+      "actions": 6,
+      "textBlocks": 6,
       "longestTextWords": 16,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/employers/talent-network/[pathway]/indiana/[city]/page.tsx",
@@ -4782,9 +4360,7 @@
       "actions": 4,
       "textBlocks": 5,
       "longestTextWords": 31,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/employment-support/page.tsx",
@@ -4795,9 +4371,7 @@
       "actions": 5,
       "textBlocks": 9,
       "longestTextWords": 36,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/enroll/[programId]/page.tsx",
@@ -4808,10 +4382,7 @@
       "actions": 2,
       "textBlocks": 14,
       "longestTextWords": 29,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/enroll/confirmation/page.tsx",
@@ -4822,10 +4393,7 @@
       "actions": 6,
       "textBlocks": 22,
       "longestTextWords": 12,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/enroll/course/page.tsx",
@@ -4847,10 +4415,7 @@
       "actions": 4,
       "textBlocks": 5,
       "longestTextWords": 33,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/enroll/payment/page.tsx",
@@ -4861,11 +4426,7 @@
       "actions": 5,
       "textBlocks": 5,
       "longestTextWords": 9,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/enrollment-v2/apply/page.tsx",
@@ -4887,9 +4448,7 @@
       "actions": 6,
       "textBlocks": 4,
       "longestTextWords": 16,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/enrollment-v2/documents/page.tsx",
@@ -4944,9 +4503,7 @@
       "actions": 3,
       "textBlocks": 7,
       "longestTextWords": 39,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/events/page.tsx",
@@ -4957,9 +4514,7 @@
       "actions": 5,
       "textBlocks": 3,
       "longestTextWords": 21,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/faq/page.tsx",
@@ -4981,9 +4536,7 @@
       "actions": 3,
       "textBlocks": 5,
       "longestTextWords": 19,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/federal-compliance/page.tsx",
@@ -5027,9 +4580,7 @@
       "actions": 3,
       "textBlocks": 2,
       "longestTextWords": 19,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/find-workone/[region]/page.tsx",
@@ -5077,11 +4628,11 @@
     },
     {
       "file": "apps/marketing/app/for-agencies/page.tsx",
-      "template": "custom",
+      "template": "HeroPicture",
       "metadata": true,
-      "h1s": 1,
-      "images": 1,
-      "actions": 9,
+      "h1s": 0,
+      "images": 0,
+      "actions": 10,
       "textBlocks": 16,
       "longestTextWords": 23,
       "risks": []
@@ -5106,9 +4657,7 @@
       "actions": 6,
       "textBlocks": 7,
       "longestTextWords": 17,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/for-providers/page.tsx",
@@ -5152,10 +4701,7 @@
       "actions": 5,
       "textBlocks": 19,
       "longestTextWords": 52,
-      "risks": [
-        "multiple-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["multiple-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/fssa/page.tsx",
@@ -5166,9 +4712,7 @@
       "actions": 3,
       "textBlocks": 2,
       "longestTextWords": 19,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/fssa/tpp-survey/page.tsx",
@@ -5200,11 +4744,8 @@
       "images": 2,
       "actions": 3,
       "textBlocks": 4,
-      "longestTextWords": 55,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "longestTextWords": 52,
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/funding/federal-programs/page.tsx",
@@ -5215,9 +4756,7 @@
       "actions": 5,
       "textBlocks": 5,
       "longestTextWords": 26,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/funding/grant-programs/page.tsx",
@@ -5239,9 +4778,7 @@
       "actions": 3,
       "textBlocks": 4,
       "longestTextWords": 36,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/funding/job-ready-indy/page.tsx",
@@ -5307,9 +4844,7 @@
       "actions": 2,
       "textBlocks": 7,
       "longestTextWords": 34,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/funding/wrg/page.tsx",
@@ -5320,9 +4855,7 @@
       "actions": 3,
       "textBlocks": 4,
       "longestTextWords": 41,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/gary-indiana/page.tsx",
@@ -5344,9 +4877,7 @@
       "actions": 2,
       "textBlocks": 5,
       "longestTextWords": 14,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/governance/security/page.tsx",
@@ -5368,9 +4899,7 @@
       "actions": 1,
       "textBlocks": 6,
       "longestTextWords": 28,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/grants/page.tsx",
@@ -5392,9 +4921,7 @@
       "actions": 2,
       "textBlocks": 14,
       "longestTextWords": 32,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/handbook/page.tsx",
@@ -5405,11 +4932,7 @@
       "actions": 11,
       "textBlocks": 7,
       "longestTextWords": 18,
-      "risks": [
-        "metadata-review",
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/healthcare/page.tsx",
@@ -5431,10 +4954,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/help/account/page.tsx",
@@ -5445,9 +4965,7 @@
       "actions": 2,
       "textBlocks": 3,
       "longestTextWords": 10,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/help/courses/page.tsx",
@@ -5458,9 +4976,7 @@
       "actions": 3,
       "textBlocks": 1,
       "longestTextWords": 13,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/help/getting-started/page.tsx",
@@ -5471,9 +4987,7 @@
       "actions": 1,
       "textBlocks": 5,
       "longestTextWords": 9,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/help/page.tsx",
@@ -5484,10 +4998,7 @@
       "actions": 2,
       "textBlocks": 5,
       "longestTextWords": 21,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/help/technical/page.tsx",
@@ -5498,9 +5009,7 @@
       "actions": 2,
       "textBlocks": 3,
       "longestTextWords": 11,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/help/tutorials/page.tsx",
@@ -5511,9 +5020,7 @@
       "actions": 2,
       "textBlocks": 2,
       "longestTextWords": 9,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/hire-graduates/hire-graduates/page.tsx",
@@ -5596,15 +5103,12 @@
       "file": "apps/marketing/app/host-shops/[slug]/page.tsx",
       "template": "custom",
       "metadata": true,
-      "h1s": 3,
-      "images": 0,
+      "h1s": 4,
+      "images": 4,
       "actions": 19,
-      "textBlocks": 11,
+      "textBlocks": 13,
       "longestTextWords": 41,
-      "risks": [
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["multiple-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/host-shops/page.tsx",
@@ -5648,22 +5152,18 @@
       "actions": 2,
       "textBlocks": 5,
       "longestTextWords": 41,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/implementation/page.tsx",
       "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 1,
+      "images": 0,
       "actions": 4,
       "textBlocks": 25,
       "longestTextWords": 27,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/import/page.tsx",
@@ -5674,9 +5174,7 @@
       "actions": 2,
       "textBlocks": 6,
       "longestTextWords": 26,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/industries/page.tsx",
@@ -5687,9 +5185,7 @@
       "actions": 6,
       "textBlocks": 24,
       "longestTextWords": 18,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/inquiry/page.tsx",
@@ -5700,10 +5196,7 @@
       "actions": 6,
       "textBlocks": 5,
       "longestTextWords": 20,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/institutional-governance/page.tsx",
@@ -5714,9 +5207,7 @@
       "actions": 3,
       "textBlocks": 16,
       "longestTextWords": 55,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/instructional-framework/page.tsx",
@@ -5727,9 +5218,7 @@
       "actions": 4,
       "textBlocks": 20,
       "longestTextWords": 80,
-      "risks": [
-        "long-copy-block"
-      ]
+      "risks": ["long-copy-block"]
     },
     {
       "file": "apps/marketing/app/instructor/[...path]/page.tsx",
@@ -5762,22 +5251,18 @@
       "actions": 4,
       "textBlocks": 24,
       "longestTextWords": 44,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/jobs/page.tsx",
       "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 0,
-      "actions": 2,
+      "images": 3,
+      "actions": 4,
       "textBlocks": 4,
       "longestTextWords": 24,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/jri/page.tsx",
@@ -5788,9 +5273,7 @@
       "actions": 3,
       "textBlocks": 6,
       "longestTextWords": 37,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/launch/page.tsx",
@@ -5834,9 +5317,7 @@
       "actions": 4,
       "textBlocks": 48,
       "longestTextWords": 26,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/creator-agreement/page.tsx",
@@ -5847,9 +5328,7 @@
       "actions": 1,
       "textBlocks": 69,
       "longestTextWords": 35,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/data-sharing/page.tsx",
@@ -5860,11 +5339,7 @@
       "actions": 0,
       "textBlocks": 24,
       "longestTextWords": 40,
-      "risks": [
-        "no-local-h1",
-        "text-only",
-        "no-next-action"
-      ]
+      "risks": ["no-local-h1", "text-only", "no-next-action"]
     },
     {
       "file": "apps/marketing/app/legal/disclosures/page.tsx",
@@ -5875,9 +5350,7 @@
       "actions": 2,
       "textBlocks": 5,
       "longestTextWords": 32,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/employer-agreement/page.tsx",
@@ -5888,11 +5361,7 @@
       "actions": 0,
       "textBlocks": 21,
       "longestTextWords": 42,
-      "risks": [
-        "no-local-h1",
-        "text-only",
-        "no-next-action"
-      ]
+      "risks": ["no-local-h1", "text-only", "no-next-action"]
     },
     {
       "file": "apps/marketing/app/legal/enrollment-agreement/page.tsx",
@@ -5903,11 +5372,7 @@
       "actions": 0,
       "textBlocks": 23,
       "longestTextWords": 43,
-      "risks": [
-        "no-local-h1",
-        "text-only",
-        "no-next-action"
-      ]
+      "risks": ["no-local-h1", "text-only", "no-next-action"]
     },
     {
       "file": "apps/marketing/app/legal/eula/page.tsx",
@@ -5918,9 +5383,7 @@
       "actions": 3,
       "textBlocks": 37,
       "longestTextWords": 36,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/ferpa-consent/page.tsx",
@@ -5931,11 +5394,7 @@
       "actions": 0,
       "textBlocks": 25,
       "longestTextWords": 44,
-      "risks": [
-        "no-local-h1",
-        "text-only",
-        "no-next-action"
-      ]
+      "risks": ["no-local-h1", "text-only", "no-next-action"]
     },
     {
       "file": "apps/marketing/app/legal/governance/compliance/page.tsx",
@@ -5946,9 +5405,7 @@
       "actions": 12,
       "textBlocks": 57,
       "longestTextWords": 34,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/governance/lms-standards/page.tsx",
@@ -5959,9 +5416,7 @@
       "actions": 12,
       "textBlocks": 73,
       "longestTextWords": 25,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/governance/onboarding-ux/page.tsx",
@@ -5972,9 +5427,7 @@
       "actions": 12,
       "textBlocks": 72,
       "longestTextWords": 29,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/governance/page.tsx",
@@ -5985,9 +5438,7 @@
       "actions": 3,
       "textBlocks": 17,
       "longestTextWords": 28,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/governance/platform-overview/page.tsx",
@@ -5998,9 +5449,7 @@
       "actions": 13,
       "textBlocks": 62,
       "longestTextWords": 43,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/governance/security/page.tsx",
@@ -6011,9 +5460,7 @@
       "actions": 12,
       "textBlocks": 60,
       "longestTextWords": 32,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/governance/store-payments/page.tsx",
@@ -6024,9 +5471,7 @@
       "actions": 12,
       "textBlocks": 81,
       "longestTextWords": 30,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/license-agreement/page.tsx",
@@ -6037,9 +5482,7 @@
       "actions": 3,
       "textBlocks": 70,
       "longestTextWords": 31,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/marketplace-terms/page.tsx",
@@ -6050,9 +5493,7 @@
       "actions": 3,
       "textBlocks": 63,
       "longestTextWords": 31,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/mou/page.tsx",
@@ -6063,9 +5504,7 @@
       "actions": 1,
       "textBlocks": 41,
       "longestTextWords": 34,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/legal/page.tsx",
@@ -6087,11 +5526,7 @@
       "actions": 0,
       "textBlocks": 31,
       "longestTextWords": 32,
-      "risks": [
-        "no-local-h1",
-        "text-only",
-        "no-next-action"
-      ]
+      "risks": ["no-local-h1", "text-only", "no-next-action"]
     },
     {
       "file": "apps/marketing/app/legal/partner-mou/page.tsx",
@@ -6102,12 +5537,7 @@
       "actions": 0,
       "textBlocks": 90,
       "longestTextWords": 74,
-      "risks": [
-        "no-local-h1",
-        "text-only",
-        "long-copy-block",
-        "no-next-action"
-      ]
+      "risks": ["no-local-h1", "text-only", "long-copy-block", "no-next-action"]
     },
     {
       "file": "apps/marketing/app/legal/privacy/page.tsx",
@@ -6129,11 +5559,7 @@
       "actions": 0,
       "textBlocks": 107,
       "longestTextWords": 44,
-      "risks": [
-        "no-local-h1",
-        "text-only",
-        "no-next-action"
-      ]
+      "risks": ["no-local-h1", "text-only", "no-next-action"]
     },
     {
       "file": "apps/marketing/app/legal/program-license-agreement/page.tsx",
@@ -6144,11 +5570,7 @@
       "actions": 0,
       "textBlocks": 69,
       "longestTextWords": 47,
-      "risks": [
-        "no-local-h1",
-        "text-only",
-        "no-next-action"
-      ]
+      "risks": ["no-local-h1", "text-only", "no-next-action"]
     },
     {
       "file": "apps/marketing/app/legal/student-handbook/page.tsx",
@@ -6159,12 +5581,7 @@
       "actions": 0,
       "textBlocks": 56,
       "longestTextWords": 67,
-      "risks": [
-        "no-local-h1",
-        "text-only",
-        "long-copy-block",
-        "no-next-action"
-      ]
+      "risks": ["no-local-h1", "text-only", "long-copy-block", "no-next-action"]
     },
     {
       "file": "apps/marketing/app/legal/terms/page.tsx",
@@ -6186,10 +5603,7 @@
       "actions": 1,
       "textBlocks": 1,
       "longestTextWords": 25,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/license/features/page.tsx",
@@ -6200,9 +5614,7 @@
       "actions": 1,
       "textBlocks": 5,
       "longestTextWords": 12,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/license/integrations/page.tsx",
@@ -6213,9 +5625,7 @@
       "actions": 1,
       "textBlocks": 6,
       "longestTextWords": 18,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/license/page.tsx",
@@ -6226,10 +5636,7 @@
       "actions": 10,
       "textBlocks": 13,
       "longestTextWords": 33,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/license/pricing/page.tsx",
@@ -6251,9 +5658,7 @@
       "actions": 3,
       "textBlocks": 4,
       "longestTextWords": 35,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/licenses/page.tsx",
@@ -6264,9 +5669,7 @@
       "actions": 2,
       "textBlocks": 24,
       "longestTextWords": 27,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/licenses/purchase/page.tsx",
@@ -6299,10 +5702,7 @@
       "actions": 3,
       "textBlocks": 25,
       "longestTextWords": 26,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/locations/page.tsx",
@@ -6357,9 +5757,7 @@
       "actions": 1,
       "textBlocks": 2,
       "longestTextWords": 19,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/merigoldround/page.tsx",
@@ -6381,9 +5779,7 @@
       "actions": 0,
       "textBlocks": 3,
       "longestTextWords": 14,
-      "risks": [
-        "multiple-local-h1"
-      ]
+      "risks": ["multiple-local-h1"]
     },
     {
       "file": "apps/marketing/app/microclasses/page.tsx",
@@ -6394,10 +5790,7 @@
       "actions": 7,
       "textBlocks": 6,
       "longestTextWords": 15,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/microcourses/page.tsx",
@@ -6419,9 +5812,7 @@
       "actions": 1,
       "textBlocks": 2,
       "longestTextWords": 20,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/mobile/page.tsx",
@@ -6432,24 +5823,18 @@
       "actions": 4,
       "textBlocks": 10,
       "longestTextWords": 14,
-      "risks": [
-        "multiple-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["multiple-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/mobile-app/page.tsx",
       "template": "custom",
       "metadata": true,
-      "h1s": 0,
-      "images": 1,
-      "actions": 2,
-      "textBlocks": 17,
-      "longestTextWords": 15,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "h1s": 1,
+      "images": 0,
+      "actions": 4,
+      "textBlocks": 20,
+      "longestTextWords": 26,
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/mou/employer/page.tsx",
@@ -6482,9 +5867,7 @@
       "actions": 5,
       "textBlocks": 3,
       "longestTextWords": 13,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/next-steps/page.tsx",
@@ -6506,9 +5889,7 @@
       "actions": 4,
       "textBlocks": 9,
       "longestTextWords": 14,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/ojt-and-funding/page.tsx",
@@ -6519,9 +5900,7 @@
       "actions": 4,
       "textBlocks": 5,
       "longestTextWords": 22,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/onboarding/employer/hiring-needs/page.tsx",
@@ -6532,10 +5911,7 @@
       "actions": 5,
       "textBlocks": 2,
       "longestTextWords": 10,
-      "risks": [
-        "metadata-review",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/onboarding/employer/orientation/page.tsx",
@@ -6557,9 +5933,7 @@
       "actions": 4,
       "textBlocks": 9,
       "longestTextWords": 14,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/onboarding/handbook/page.tsx",
@@ -6570,9 +5944,7 @@
       "actions": 3,
       "textBlocks": 3,
       "longestTextWords": 3,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/onboarding/instructor/agreement/page.tsx",
@@ -6605,9 +5977,7 @@
       "actions": 4,
       "textBlocks": 9,
       "longestTextWords": 14,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/onboarding/learner/agreements/page.tsx",
@@ -6618,10 +5988,7 @@
       "actions": 5,
       "textBlocks": 3,
       "longestTextWords": 21,
-      "risks": [
-        "metadata-review",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/onboarding/learner/complete/page.tsx",
@@ -6643,10 +6010,7 @@
       "actions": 5,
       "textBlocks": 6,
       "longestTextWords": 19,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/onboarding/learner/funding/page.tsx",
@@ -6657,9 +6021,7 @@
       "actions": 5,
       "textBlocks": 3,
       "longestTextWords": 23,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/onboarding/learner/handbook/page.tsx",
@@ -6670,10 +6032,7 @@
       "actions": 5,
       "textBlocks": 3,
       "longestTextWords": 26,
-      "risks": [
-        "metadata-review",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/onboarding/learner/orientation/page.tsx",
@@ -6706,10 +6065,7 @@
       "actions": 5,
       "textBlocks": 4,
       "longestTextWords": 20,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/onboarding/learner/verify-identity/page.tsx",
@@ -6731,9 +6087,7 @@
       "actions": 3,
       "textBlocks": 2,
       "longestTextWords": 8,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/onboarding/mou/page.tsx",
@@ -6744,11 +6098,7 @@
       "actions": 7,
       "textBlocks": 5,
       "longestTextWords": 12,
-      "risks": [
-        "metadata-review",
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/onboarding/page.tsx",
@@ -6825,9 +6175,7 @@
       "actions": 4,
       "textBlocks": 8,
       "longestTextWords": 26,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/operator/page.tsx",
@@ -6838,9 +6186,7 @@
       "actions": 3,
       "textBlocks": 2,
       "longestTextWords": 14,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/outcomes/page.tsx",
@@ -6851,20 +6197,18 @@
       "actions": 2,
       "textBlocks": 8,
       "longestTextWords": 27,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/page.tsx",
       "template": "custom",
       "metadata": true,
-      "h1s": 1,
+      "h1s": 0,
       "images": 0,
-      "actions": 2,
-      "textBlocks": 3,
-      "longestTextWords": 16,
-      "risks": []
+      "actions": 5,
+      "textBlocks": 12,
+      "longestTextWords": 30,
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/paris/interview/page.tsx",
@@ -6875,10 +6219,7 @@
       "actions": 6,
       "textBlocks": 8,
       "longestTextWords": 40,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/partner/[...path]/page.tsx",
@@ -6907,13 +6248,11 @@
       "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 1,
+      "images": 0,
       "actions": 15,
       "textBlocks": 22,
       "longestTextWords": 27,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/partner-learning/[enrollmentId]/page.tsx",
@@ -6935,10 +6274,7 @@
       "actions": 5,
       "textBlocks": 7,
       "longestTextWords": 21,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/partner-upload/[token]/page.tsx",
@@ -6949,9 +6285,7 @@
       "actions": 0,
       "textBlocks": 2,
       "longestTextWords": 11,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/partners/apply/page.tsx",
@@ -6962,9 +6296,7 @@
       "actions": 3,
       "textBlocks": 6,
       "longestTextWords": 29,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/partners/barber-host-shop/apply/page.tsx",
@@ -7030,9 +6362,7 @@
       "actions": 1,
       "textBlocks": 14,
       "longestTextWords": 18,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/partners/esthetician-apprenticeship/apply/page.tsx",
@@ -7043,9 +6373,7 @@
       "actions": 1,
       "textBlocks": 6,
       "longestTextWords": 27,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/partners/esthetician-host-shop/apply/page.tsx",
@@ -7067,10 +6395,7 @@
       "actions": 2,
       "textBlocks": 5,
       "longestTextWords": 37,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/partners/host-shop/confirmation/page.tsx",
@@ -7081,9 +6406,7 @@
       "actions": 3,
       "textBlocks": 8,
       "longestTextWords": 35,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/partners/host-shops/indiana/[city]/page.tsx",
@@ -7091,23 +6414,21 @@
       "metadata": true,
       "h1s": 1,
       "images": 0,
-      "actions": 2,
-      "textBlocks": 3,
-      "longestTextWords": 36,
-      "risks": []
+      "actions": 3,
+      "textBlocks": 4,
+      "longestTextWords": 39,
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/partners/host-shops/page.tsx",
       "template": "custom",
       "metadata": true,
       "h1s": 0,
-      "images": 2,
-      "actions": 10,
-      "textBlocks": 27,
+      "images": 4,
+      "actions": 12,
+      "textBlocks": 28,
       "longestTextWords": 47,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/partners/hsi/page.tsx",
@@ -7118,10 +6439,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "metadata-review",
-        "no-local-h1"
-      ]
+      "risks": ["metadata-review", "no-local-h1"]
     },
     {
       "file": "apps/marketing/app/partners/join/page.tsx",
@@ -7132,9 +6450,7 @@
       "actions": 2,
       "textBlocks": 5,
       "longestTextWords": 20,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/partners/jri/page.tsx",
@@ -7167,9 +6483,7 @@
       "actions": 2,
       "textBlocks": 4,
       "longestTextWords": 22,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/partners/nrf/page.tsx",
@@ -7180,9 +6494,7 @@
       "actions": 2,
       "textBlocks": 10,
       "longestTextWords": 23,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/partners/page.tsx",
@@ -7193,9 +6505,7 @@
       "actions": 5,
       "textBlocks": 6,
       "longestTextWords": 17,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/partners/reentry/page.tsx",
@@ -7206,9 +6516,7 @@
       "actions": 2,
       "textBlocks": 9,
       "longestTextWords": 22,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/partners/referral/page.tsx",
@@ -7219,9 +6527,7 @@
       "actions": 2,
       "textBlocks": 14,
       "longestTextWords": 18,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/partners/training-provider/page.tsx",
@@ -7232,9 +6538,7 @@
       "actions": 2,
       "textBlocks": 13,
       "longestTextWords": 21,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/partners/training-sites/page.tsx",
@@ -7278,9 +6582,7 @@
       "actions": 2,
       "textBlocks": 2,
       "longestTextWords": 10,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/pay/page.tsx",
@@ -7291,9 +6593,7 @@
       "actions": 3,
       "textBlocks": 10,
       "longestTextWords": 33,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/philanthropy/page.tsx",
@@ -7304,10 +6604,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/platform/[slug]/page.tsx",
@@ -7340,10 +6637,7 @@
       "actions": 0,
       "textBlocks": 4,
       "longestTextWords": 34,
-      "risks": [
-        "text-only",
-        "no-next-action"
-      ]
+      "risks": ["text-only", "no-next-action"]
     },
     {
       "file": "apps/marketing/app/platform/demo/page.tsx",
@@ -7354,9 +6648,7 @@
       "actions": 3,
       "textBlocks": 4,
       "longestTextWords": 30,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/platform/employer-portal/page.tsx",
@@ -7367,9 +6659,7 @@
       "actions": 5,
       "textBlocks": 5,
       "longestTextWords": 21,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/platform/enterprise/page.tsx",
@@ -7380,10 +6670,7 @@
       "actions": 4,
       "textBlocks": 12,
       "longestTextWords": 17,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/platform/how-it-works/page.tsx",
@@ -7405,9 +6692,7 @@
       "actions": 4,
       "textBlocks": 5,
       "longestTextWords": 23,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/platform/licensing/request/page.tsx",
@@ -7418,10 +6703,7 @@
       "actions": 2,
       "textBlocks": 2,
       "longestTextWords": 13,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1"]
     },
     {
       "file": "apps/marketing/app/platform/managed/page.tsx",
@@ -7432,9 +6714,7 @@
       "actions": 4,
       "textBlocks": 5,
       "longestTextWords": 13,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/platform/page.tsx",
@@ -7456,10 +6736,7 @@
       "actions": 4,
       "textBlocks": 10,
       "longestTextWords": 12,
-      "risks": [
-        "multiple-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["multiple-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/platform/partners/page.tsx",
@@ -7470,10 +6747,7 @@
       "actions": 9,
       "textBlocks": 24,
       "longestTextWords": 187,
-      "risks": [
-        "long-copy-block",
-        "noncanonical-hero"
-      ]
+      "risks": ["long-copy-block", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/platform/pricing/page.tsx",
@@ -7484,10 +6758,7 @@
       "actions": 6,
       "textBlocks": 7,
       "longestTextWords": 14,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/platform/providers/page.tsx",
@@ -7509,10 +6780,7 @@
       "actions": 7,
       "textBlocks": 23,
       "longestTextWords": 19,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/platform/standards/page.tsx",
@@ -7523,10 +6791,7 @@
       "actions": 7,
       "textBlocks": 12,
       "longestTextWords": 21,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/platform/student-portal/handbook/page.tsx",
@@ -7537,10 +6802,7 @@
       "actions": 4,
       "textBlocks": 10,
       "longestTextWords": 11,
-      "risks": [
-        "multiple-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["multiple-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/platform/student-portal/page.tsx",
@@ -7551,9 +6813,7 @@
       "actions": 5,
       "textBlocks": 5,
       "longestTextWords": 23,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/platform/training-providers/page.tsx",
@@ -7575,9 +6835,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/platform/workforce-analytics/page.tsx",
@@ -7588,10 +6846,7 @@
       "actions": 4,
       "textBlocks": 10,
       "longestTextWords": 12,
-      "risks": [
-        "multiple-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["multiple-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/platform/workforce-boards/page.tsx",
@@ -7602,9 +6857,7 @@
       "actions": 4,
       "textBlocks": 13,
       "longestTextWords": 31,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/policies/jri/page.tsx",
@@ -7637,9 +6890,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/portal/cosmetology/page.tsx",
@@ -7650,9 +6901,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/portal/culinary/page.tsx",
@@ -7663,9 +6912,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/portal/electrical/page.tsx",
@@ -7676,9 +6923,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/portal/esthetician/page.tsx",
@@ -7689,9 +6934,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/portal/nail-technician/page.tsx",
@@ -7702,9 +6945,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/portal/page.tsx",
@@ -7726,9 +6967,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/portals/page.tsx",
@@ -7761,9 +7000,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/preview/barber-videos/page.tsx",
@@ -7774,10 +7011,7 @@
       "actions": 0,
       "textBlocks": 3,
       "longestTextWords": 20,
-      "risks": [
-        "multiple-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["multiple-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/pricing/page.tsx",
@@ -7788,10 +7022,7 @@
       "actions": 19,
       "textBlocks": 18,
       "longestTextWords": 24,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/pricing/sponsor-licensing/page.tsx",
@@ -7813,9 +7044,7 @@
       "actions": 3,
       "textBlocks": 4,
       "longestTextWords": 25,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/privacy-policy/page.tsx",
@@ -7848,10 +7077,7 @@
       "actions": 4,
       "textBlocks": 3,
       "longestTextWords": 7,
-      "risks": [
-        "metadata-review",
-        "no-local-h1"
-      ]
+      "risks": ["metadata-review", "no-local-h1"]
     },
     {
       "file": "apps/marketing/app/proctor/session/[id]/page.tsx",
@@ -7862,10 +7088,7 @@
       "actions": 8,
       "textBlocks": 3,
       "longestTextWords": 10,
-      "risks": [
-        "metadata-review",
-        "no-local-h1"
-      ]
+      "risks": ["metadata-review", "no-local-h1"]
     },
     {
       "file": "apps/marketing/app/procurement/page.tsx",
@@ -7876,9 +7099,7 @@
       "actions": 6,
       "textBlocks": 7,
       "longestTextWords": 37,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/program-inquiry/page.tsx",
@@ -7889,9 +7110,7 @@
       "actions": 1,
       "textBlocks": 7,
       "longestTextWords": 24,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/programs/[program]/apply/page.tsx",
@@ -7902,10 +7121,7 @@
       "actions": 3,
       "textBlocks": 9,
       "longestTextWords": 15,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/programs/[program]/apply/success/page.tsx",
@@ -7916,9 +7132,7 @@
       "actions": 4,
       "textBlocks": 8,
       "longestTextWords": 16,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/programs/[program]/confirm/page.tsx",
@@ -7929,10 +7143,7 @@
       "actions": 4,
       "textBlocks": 2,
       "longestTextWords": 11,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/[program]/discussions/[threadId]/page.tsx",
@@ -7943,9 +7154,7 @@
       "actions": 5,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/programs/[program]/discussions/page.tsx",
@@ -7956,9 +7165,7 @@
       "actions": 6,
       "textBlocks": 1,
       "longestTextWords": 8,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/programs/[program]/documents/page.tsx",
@@ -7969,10 +7176,7 @@
       "actions": 2,
       "textBlocks": 4,
       "longestTextWords": 10,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/programs/[program]/eligibility/page.tsx",
@@ -7980,9 +7184,9 @@
       "metadata": true,
       "h1s": 0,
       "images": 0,
-      "actions": 5,
-      "textBlocks": 5,
-      "longestTextWords": 33,
+      "actions": 2,
+      "textBlocks": 2,
+      "longestTextWords": 14,
       "risks": []
     },
     {
@@ -8005,11 +7209,7 @@
       "actions": 3,
       "textBlocks": 20,
       "longestTextWords": 19,
-      "risks": [
-        "metadata-review",
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/programs/[program]/page.tsx",
@@ -8031,10 +7231,7 @@
       "actions": 0,
       "textBlocks": 1,
       "longestTextWords": 3,
-      "risks": [
-        "metadata-review",
-        "no-local-h1"
-      ]
+      "risks": ["metadata-review", "no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/[program]/request-info/page.tsx",
@@ -8100,10 +7297,7 @@
       "actions": 4,
       "textBlocks": 9,
       "longestTextWords": 22,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/programs/barber-apprenticeship/documents/page.tsx",
@@ -8114,9 +7308,7 @@
       "actions": 2,
       "textBlocks": 3,
       "longestTextWords": 10,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/programs/barber-apprenticeship/eligibility/page.tsx",
@@ -8124,21 +7316,21 @@
       "metadata": true,
       "h1s": 0,
       "images": 0,
-      "actions": 5,
-      "textBlocks": 6,
-      "longestTextWords": 39,
+      "actions": 2,
+      "textBlocks": 3,
+      "longestTextWords": 14,
       "risks": []
     },
     {
       "file": "apps/marketing/app/programs/barber-apprenticeship/enrollment-success/page.tsx",
-      "template": "redirect",
+      "template": "custom",
       "metadata": true,
-      "h1s": 1,
+      "h1s": 0,
       "images": 0,
-      "actions": 1,
-      "textBlocks": 1,
-      "longestTextWords": 8,
-      "risks": []
+      "actions": 0,
+      "textBlocks": 0,
+      "longestTextWords": 0,
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/barber-apprenticeship/host-shops/page.tsx",
@@ -8167,9 +7359,9 @@
       "template": "HeroVideo",
       "metadata": true,
       "h1s": 1,
-      "images": 2,
-      "actions": 8,
-      "textBlocks": 13,
+      "images": 3,
+      "actions": 10,
+      "textBlocks": 16,
       "longestTextWords": 41,
       "risks": []
     },
@@ -8182,9 +7374,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/barber-apprenticeship/payment-setup/confirm/page.tsx",
@@ -8206,9 +7396,7 @@
       "actions": 3,
       "textBlocks": 2,
       "longestTextWords": 12,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/programs/business/page.tsx",
@@ -8241,9 +7429,7 @@
       "actions": 3,
       "textBlocks": 13,
       "longestTextWords": 15,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/programs/cdl-training/page.tsx",
@@ -8276,9 +7462,7 @@
       "actions": 3,
       "textBlocks": 7,
       "longestTextWords": 9,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/programs/cna/enroll/page.tsx",
@@ -8289,10 +7473,7 @@
       "actions": 4,
       "textBlocks": 11,
       "longestTextWords": 11,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/programs/cna/page.tsx",
@@ -8303,9 +7484,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/cosmetology-apprenticeship/apply/apprentice/page.tsx",
@@ -8327,9 +7506,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/cosmetology-apprenticeship/apply/success/page.tsx",
@@ -8355,14 +7532,14 @@
     },
     {
       "file": "apps/marketing/app/programs/cosmetology-apprenticeship/enrollment-success/page.tsx",
-      "template": "redirect",
+      "template": "custom",
       "metadata": true,
-      "h1s": 1,
+      "h1s": 0,
       "images": 0,
-      "actions": 5,
-      "textBlocks": 7,
-      "longestTextWords": 12,
-      "risks": []
+      "actions": 0,
+      "textBlocks": 0,
+      "longestTextWords": 0,
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/cosmetology-apprenticeship/orientation/page.tsx",
@@ -8395,9 +7572,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/cosmetology-apprenticeship/payment-setup/confirm/page.tsx",
@@ -8418,7 +7593,7 @@
       "images": 0,
       "actions": 1,
       "textBlocks": 2,
-      "longestTextWords": 43,
+      "longestTextWords": 39,
       "risks": []
     },
     {
@@ -8441,9 +7616,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/electrical/page.tsx",
@@ -8564,9 +7737,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/esthetician-apprenticeship/documents/page.tsx",
@@ -8577,10 +7748,7 @@
       "actions": 2,
       "textBlocks": 4,
       "longestTextWords": 10,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/programs/esthetician-apprenticeship/eligibility/page.tsx",
@@ -8588,21 +7756,21 @@
       "metadata": true,
       "h1s": 0,
       "images": 0,
-      "actions": 5,
-      "textBlocks": 5,
-      "longestTextWords": 35,
+      "actions": 2,
+      "textBlocks": 2,
+      "longestTextWords": 14,
       "risks": []
     },
     {
       "file": "apps/marketing/app/programs/esthetician-apprenticeship/enrollment-success/page.tsx",
-      "template": "redirect",
+      "template": "custom",
       "metadata": true,
-      "h1s": 1,
+      "h1s": 0,
       "images": 0,
-      "actions": 3,
-      "textBlocks": 5,
-      "longestTextWords": 6,
-      "risks": []
+      "actions": 0,
+      "textBlocks": 0,
+      "longestTextWords": 0,
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/esthetician-apprenticeship/orientation/page.tsx",
@@ -8613,11 +7781,7 @@
       "actions": 3,
       "textBlocks": 21,
       "longestTextWords": 24,
-      "risks": [
-        "metadata-review",
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/programs/esthetician-apprenticeship/page.tsx",
@@ -8625,9 +7789,9 @@
       "metadata": true,
       "h1s": 0,
       "images": 0,
-      "actions": 2,
-      "textBlocks": 3,
-      "longestTextWords": 46,
+      "actions": 1,
+      "textBlocks": 2,
+      "longestTextWords": 43,
       "risks": []
     },
     {
@@ -8639,9 +7803,7 @@
       "actions": 4,
       "textBlocks": 12,
       "longestTextWords": 70,
-      "risks": [
-        "long-copy-block"
-      ]
+      "risks": ["long-copy-block"]
     },
     {
       "file": "apps/marketing/app/programs/healthcare/[slug]/page.tsx",
@@ -8652,10 +7814,7 @@
       "actions": 6,
       "textBlocks": 16,
       "longestTextWords": 16,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/programs/healthcare/page.tsx",
@@ -8666,9 +7825,7 @@
       "actions": 3,
       "textBlocks": 4,
       "longestTextWords": 16,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/programs/healthcare-training/[slug]/page.tsx",
@@ -8701,9 +7858,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/hvac-technician/apply/success/page.tsx",
@@ -8747,9 +7902,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/medical-assistant/enroll/page.tsx",
@@ -8760,10 +7913,7 @@
       "actions": 4,
       "textBlocks": 9,
       "longestTextWords": 11,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/programs/medical-assistant/page.tsx",
@@ -8785,9 +7935,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/nail-technician-apprenticeship/page.tsx",
@@ -8795,9 +7943,9 @@
       "metadata": true,
       "h1s": 0,
       "images": 0,
-      "actions": 2,
-      "textBlocks": 3,
-      "longestTextWords": 46,
+      "actions": 1,
+      "textBlocks": 2,
+      "longestTextWords": 43,
       "risks": []
     },
     {
@@ -8809,10 +7957,7 @@
       "actions": 3,
       "textBlocks": 9,
       "longestTextWords": 36,
-      "risks": [
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/programs/peer-recovery-specialist/apply/page.tsx",
@@ -8823,10 +7968,7 @@
       "actions": 3,
       "textBlocks": 12,
       "longestTextWords": 15,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/programs/peer-recovery-specialist/apply/success/page.tsx",
@@ -8892,9 +8034,7 @@
       "actions": 3,
       "textBlocks": 7,
       "longestTextWords": 9,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/programs/qma/page.tsx",
@@ -8905,9 +8045,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/programs/selfish-inc/page.tsx",
@@ -8962,10 +8100,7 @@
       "actions": 8,
       "textBlocks": 11,
       "longestTextWords": 11,
-      "risks": [
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/provider/programs/new/page.tsx",
@@ -9020,9 +8155,7 @@
       "actions": 3,
       "textBlocks": 5,
       "longestTextWords": 26,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/reels/page.tsx",
@@ -9033,9 +8166,7 @@
       "actions": 6,
       "textBlocks": 1,
       "longestTextWords": 7,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/refund-policy/page.tsx",
@@ -9046,9 +8177,7 @@
       "actions": 4,
       "textBlocks": 41,
       "longestTextWords": 40,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/reports/page.tsx",
@@ -9081,9 +8210,7 @@
       "actions": 2,
       "textBlocks": 2,
       "longestTextWords": 11,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/resources/resources/instructor-training/page.tsx",
@@ -9105,22 +8232,18 @@
       "actions": 4,
       "textBlocks": 19,
       "longestTextWords": 39,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/roi/page.tsx",
       "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 1,
+      "images": 0,
       "actions": 5,
       "textBlocks": 38,
       "longestTextWords": 22,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/satisfactory-academic-progress/page.tsx",
@@ -9131,9 +8254,7 @@
       "actions": 6,
       "textBlocks": 52,
       "longestTextWords": 40,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/schedule/meeting/page.tsx",
@@ -9144,9 +8265,7 @@
       "actions": 4,
       "textBlocks": 5,
       "longestTextWords": 16,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/schedule/page.tsx",
@@ -9157,9 +8276,7 @@
       "actions": 5,
       "textBlocks": 4,
       "longestTextWords": 9,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/schedule-consultation/page.tsx",
@@ -9170,11 +8287,7 @@
       "actions": 9,
       "textBlocks": 5,
       "longestTextWords": 20,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/scholarships/page.tsx",
@@ -9214,13 +8327,11 @@
       "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 2,
+      "images": 1,
       "actions": 3,
       "textBlocks": 17,
       "longestTextWords": 18,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/security-and-data-protection/page.tsx",
@@ -9231,9 +8342,7 @@
       "actions": 4,
       "textBlocks": 4,
       "longestTextWords": 25,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/services/page.tsx",
@@ -9244,9 +8353,7 @@
       "actions": 3,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/share/page.tsx",
@@ -9257,9 +8364,7 @@
       "actions": 1,
       "textBlocks": 3,
       "longestTextWords": 31,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/shop/onboarding/page.tsx",
@@ -9292,11 +8397,7 @@
       "actions": 4,
       "textBlocks": 6,
       "longestTextWords": 15,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/site-map/page.tsx",
@@ -9340,10 +8441,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/skilled-trades-training-indiana/page.tsx",
@@ -9354,10 +8452,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/snap/snap-et/page.tsx",
@@ -9368,9 +8463,7 @@
       "actions": 1,
       "textBlocks": 4,
       "longestTextWords": 14,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/solutions/distance-learning/page.tsx",
@@ -9425,10 +8518,7 @@
       "actions": 5,
       "textBlocks": 4,
       "longestTextWords": 7,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/staff/attendance/page.tsx",
@@ -9461,9 +8551,7 @@
       "actions": 6,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/staff/booth-renters/page.tsx",
@@ -9485,9 +8573,7 @@
       "actions": 4,
       "textBlocks": 3,
       "longestTextWords": 10,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/staff/cases/[id]/page.tsx",
@@ -9520,9 +8606,7 @@
       "actions": 6,
       "textBlocks": 2,
       "longestTextWords": 11,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/staff/courses/page.tsx",
@@ -9544,9 +8628,7 @@
       "actions": 2,
       "textBlocks": 9,
       "longestTextWords": 5,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/staff/page.tsx",
@@ -9579,9 +8661,7 @@
       "actions": 2,
       "textBlocks": 6,
       "longestTextWords": 6,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/staff/skills/page.tsx",
@@ -9592,9 +8672,7 @@
       "actions": 2,
       "textBlocks": 4,
       "longestTextWords": 12,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/staff/students/add/page.tsx",
@@ -9605,9 +8683,7 @@
       "actions": 2,
       "textBlocks": 1,
       "longestTextWords": 6,
-      "risks": [
-        "metadata-review"
-      ]
+      "risks": ["metadata-review"]
     },
     {
       "file": "apps/marketing/app/staff/students/page.tsx",
@@ -9618,9 +8694,7 @@
       "actions": 3,
       "textBlocks": 4,
       "longestTextWords": 2,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/staff/training/page.tsx",
@@ -9631,9 +8705,7 @@
       "actions": 4,
       "textBlocks": 8,
       "longestTextWords": 11,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/staff/users/page.tsx",
@@ -9655,10 +8727,7 @@
       "actions": 6,
       "textBlocks": 5,
       "longestTextWords": 15,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/store/add-ons/agency-template-autofill/page.tsx",
@@ -9680,10 +8749,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/add-ons/analytics-pro/page.tsx",
@@ -9694,11 +8760,7 @@
       "actions": 4,
       "textBlocks": 8,
       "longestTextWords": 14,
-      "risks": [
-        "metadata-review",
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/add-ons/community-hub/checkout/page.tsx",
@@ -9720,9 +8782,7 @@
       "actions": 4,
       "textBlocks": 11,
       "longestTextWords": 30,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/store/add-ons/compliance-automation/checkout/page.tsx",
@@ -9733,10 +8793,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/add-ons/compliance-automation/page.tsx",
@@ -9747,11 +8804,7 @@
       "actions": 4,
       "textBlocks": 13,
       "longestTextWords": 14,
-      "risks": [
-        "metadata-review",
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/add-ons/compliance-signature-automation/page.tsx",
@@ -9773,10 +8826,7 @@
       "actions": 4,
       "textBlocks": 4,
       "longestTextWords": 48,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/add-ons/page.tsx",
@@ -9787,10 +8837,7 @@
       "actions": 6,
       "textBlocks": 3,
       "longestTextWords": 21,
-      "risks": [
-        "metadata-review",
-        "no-local-h1"
-      ]
+      "risks": ["metadata-review", "no-local-h1"]
     },
     {
       "file": "apps/marketing/app/store/add-ons/proposal-writing-assistant/page.tsx",
@@ -9831,13 +8878,10 @@
       "metadata": true,
       "h1s": 1,
       "images": 0,
-      "actions": 8,
-      "textBlocks": 13,
-      "longestTextWords": 26,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "actions": 4,
+      "textBlocks": 7,
+      "longestTextWords": 15,
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/ai-team/page.tsx",
@@ -9848,9 +8892,7 @@
       "actions": 3,
       "textBlocks": 12,
       "longestTextWords": 19,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/store/apps/grants/page.tsx",
@@ -9916,9 +8958,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/store/cart-success/page.tsx",
@@ -9951,10 +8991,7 @@
       "actions": 4,
       "textBlocks": 2,
       "longestTextWords": 10,
-      "risks": [
-        "metadata-review",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/checkout/page.tsx",
@@ -9987,9 +9024,7 @@
       "actions": 5,
       "textBlocks": 5,
       "longestTextWords": 12,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/compliance/grant-reporting/page.tsx",
@@ -10000,9 +9035,7 @@
       "actions": 5,
       "textBlocks": 5,
       "longestTextWords": 17,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/compliance/page.tsx",
@@ -10013,9 +9046,7 @@
       "actions": 3,
       "textBlocks": 5,
       "longestTextWords": 26,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/compliance/wcag/page.tsx",
@@ -10026,9 +9057,7 @@
       "actions": 5,
       "textBlocks": 3,
       "longestTextWords": 16,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/compliance/wioa/page.tsx",
@@ -10083,10 +9112,7 @@
       "actions": 12,
       "textBlocks": 6,
       "longestTextWords": 15,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/store/demo/ai-studio/page.tsx",
@@ -10097,9 +9123,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/store/demo/capability/[key]/page.tsx",
@@ -10110,10 +9134,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "metadata-review",
-        "no-local-h1"
-      ]
+      "risks": ["metadata-review", "no-local-h1"]
     },
     {
       "file": "apps/marketing/app/store/demo/community/page.tsx",
@@ -10124,9 +9145,7 @@
       "actions": 1,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/store/demo/crm/page.tsx",
@@ -10137,10 +9156,7 @@
       "actions": 3,
       "textBlocks": 4,
       "longestTextWords": 18,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/store/demo/employer/page.tsx",
@@ -10151,10 +9167,7 @@
       "actions": 11,
       "textBlocks": 5,
       "longestTextWords": 14,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/store/demo/enterprise/page.tsx",
@@ -10165,9 +9178,7 @@
       "actions": 3,
       "textBlocks": 8,
       "longestTextWords": 23,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/store/demo/institutional/page.tsx",
@@ -10178,9 +9189,7 @@
       "actions": 2,
       "textBlocks": 5,
       "longestTextWords": 32,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/store/demo/instructor/page.tsx",
@@ -10213,10 +9222,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "metadata-review",
-        "no-local-h1"
-      ]
+      "risks": ["metadata-review", "no-local-h1"]
     },
     {
       "file": "apps/marketing/app/store/demo/student/page.tsx",
@@ -10227,11 +9233,7 @@
       "actions": 6,
       "textBlocks": 7,
       "longestTextWords": 23,
-      "risks": [
-        "metadata-review",
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/demo/website/page.tsx",
@@ -10249,10 +9251,10 @@
       "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 0,
-      "actions": 3,
-      "textBlocks": 3,
-      "longestTextWords": 20,
+      "images": 2,
+      "actions": 5,
+      "textBlocks": 5,
+      "longestTextWords": 21,
       "risks": []
     },
     {
@@ -10264,10 +9266,7 @@
       "actions": 2,
       "textBlocks": 25,
       "longestTextWords": 13,
-      "risks": [
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/store/dev-studio/page.tsx",
@@ -10289,9 +9288,7 @@
       "actions": 9,
       "textBlocks": 7,
       "longestTextWords": 40,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/guides/capital-readiness/enterprise/page.tsx",
@@ -10302,11 +9299,7 @@
       "actions": 3,
       "textBlocks": 8,
       "longestTextWords": 19,
-      "risks": [
-        "metadata-review",
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/guides/capital-readiness/page.tsx",
@@ -10317,10 +9310,7 @@
       "actions": 3,
       "textBlocks": 19,
       "longestTextWords": 35,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/guides/capital-readiness/slides/page.tsx",
@@ -10331,10 +9321,7 @@
       "actions": 4,
       "textBlocks": 1,
       "longestTextWords": 15,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/guides/licensing/page.tsx",
@@ -10345,9 +9332,7 @@
       "actions": 4,
       "textBlocks": 8,
       "longestTextWords": 35,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/guides/page.tsx",
@@ -10355,12 +9340,10 @@
       "metadata": true,
       "h1s": 1,
       "images": 2,
-      "actions": 6,
+      "actions": 5,
       "textBlocks": 2,
       "longestTextWords": 15,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/implementation-packages/page.tsx",
@@ -10371,9 +9354,7 @@
       "actions": 1,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/store/implementation-packages/success/page.tsx",
@@ -10395,10 +9376,7 @@
       "actions": 2,
       "textBlocks": 26,
       "longestTextWords": 21,
-      "risks": [
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/store/licenses/checkout/[slug]/page.tsx",
@@ -10420,11 +9398,7 @@
       "actions": 8,
       "textBlocks": 5,
       "longestTextWords": 10,
-      "risks": [
-        "metadata-review",
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/licenses/enterprise-license/trial/page.tsx",
@@ -10457,10 +9431,7 @@
       "actions": 6,
       "textBlocks": 4,
       "longestTextWords": 30,
-      "risks": [
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/store/licenses/pro-license/page.tsx",
@@ -10471,11 +9442,7 @@
       "actions": 8,
       "textBlocks": 4,
       "longestTextWords": 10,
-      "risks": [
-        "metadata-review",
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/licenses/pro-license/trial/page.tsx",
@@ -10497,11 +9464,7 @@
       "actions": 4,
       "textBlocks": 14,
       "longestTextWords": 44,
-      "risks": [
-        "metadata-review",
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/licenses/source-use/page.tsx",
@@ -10512,9 +9475,7 @@
       "actions": 9,
       "textBlocks": 26,
       "longestTextWords": 32,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/licenses/starter-license/page.tsx",
@@ -10525,11 +9486,7 @@
       "actions": 8,
       "textBlocks": 4,
       "longestTextWords": 10,
-      "risks": [
-        "metadata-review",
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/licenses/starter-license/trial/page.tsx",
@@ -10540,10 +9497,7 @@
       "actions": 3,
       "textBlocks": 8,
       "longestTextWords": 19,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/store/licenses/success/page.tsx",
@@ -10554,11 +9508,7 @@
       "actions": 4,
       "textBlocks": 7,
       "longestTextWords": 21,
-      "risks": [
-        "metadata-review",
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/licenses/trial-success/page.tsx",
@@ -10569,10 +9519,7 @@
       "actions": 4,
       "textBlocks": 7,
       "longestTextWords": 13,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/store/licensing/checkout/[slug]/page.tsx",
@@ -10594,9 +9541,7 @@
       "actions": 5,
       "textBlocks": 17,
       "longestTextWords": 18,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/store/page.tsx",
@@ -10629,9 +9574,7 @@
       "actions": 3,
       "textBlocks": 5,
       "longestTextWords": 24,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/proof/page.tsx",
@@ -10642,9 +9585,7 @@
       "actions": 7,
       "textBlocks": 8,
       "longestTextWords": 36,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/store/sam-gov-assistant/page.tsx",
@@ -10655,11 +9596,7 @@
       "actions": 7,
       "textBlocks": 12,
       "longestTextWords": 24,
-      "risks": [
-        "metadata-review",
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/store/subscription-success/page.tsx",
@@ -10714,11 +9651,7 @@
       "actions": 5,
       "textBlocks": 4,
       "longestTextWords": 13,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/store/trial/page.tsx",
@@ -10729,11 +9662,7 @@
       "actions": 6,
       "textBlocks": 11,
       "longestTextWords": 32,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/store/workflow-studio/page.tsx",
@@ -10744,10 +9673,7 @@
       "actions": 4,
       "textBlocks": 4,
       "longestTextWords": 15,
-      "risks": [
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/student-resources/page.tsx",
@@ -10780,9 +9706,7 @@
       "actions": 4,
       "textBlocks": 1,
       "longestTextWords": 15,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/subscription/page.tsx",
@@ -10804,9 +9728,7 @@
       "actions": 3,
       "textBlocks": 3,
       "longestTextWords": 16,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/support/chat/page.tsx",
@@ -10828,10 +9750,7 @@
       "actions": 6,
       "textBlocks": 4,
       "longestTextWords": 11,
-      "risks": [
-        "no-local-h1",
-        "text-only"
-      ]
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/support/help/page.tsx",
@@ -10853,10 +9772,7 @@
       "actions": 7,
       "textBlocks": 4,
       "longestTextWords": 11,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/support/ticket/page.tsx",
@@ -10889,9 +9805,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/tax-software/about/page.tsx",
@@ -10899,10 +9813,10 @@
       "metadata": true,
       "h1s": 1,
       "images": 0,
-      "actions": 1,
-      "textBlocks": 2,
-      "longestTextWords": 27,
-      "risks": []
+      "actions": 3,
+      "textBlocks": 6,
+      "longestTextWords": 31,
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/tax-software/bank-products/page.tsx",
@@ -10910,21 +9824,32 @@
       "metadata": true,
       "h1s": 1,
       "images": 0,
-      "actions": 1,
-      "textBlocks": 2,
-      "longestTextWords": 28,
-      "risks": []
+      "actions": 4,
+      "textBlocks": 8,
+      "longestTextWords": 32,
+      "risks": ["text-only"]
+    },
+    {
+      "file": "apps/marketing/app/tax-software/careers/page.tsx",
+      "template": "custom",
+      "metadata": true,
+      "h1s": 0,
+      "images": 0,
+      "actions": 6,
+      "textBlocks": 38,
+      "longestTextWords": 27,
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/tax-software/contact/page.tsx",
       "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 1,
-      "actions": 5,
-      "textBlocks": 5,
-      "longestTextWords": 15,
-      "risks": []
+      "images": 0,
+      "actions": 4,
+      "textBlocks": 6,
+      "longestTextWords": 40,
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/tax-software/demo/page.tsx",
@@ -10933,12 +9858,9 @@
       "h1s": 1,
       "images": 0,
       "actions": 6,
-      "textBlocks": 4,
-      "longestTextWords": 24,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "textBlocks": 5,
+      "longestTextWords": 22,
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/tax-software/features/page.tsx",
@@ -10946,10 +9868,10 @@
       "metadata": true,
       "h1s": 1,
       "images": 0,
-      "actions": 1,
-      "textBlocks": 2,
-      "longestTextWords": 11,
-      "risks": []
+      "actions": 4,
+      "textBlocks": 4,
+      "longestTextWords": 33,
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/tax-software/login/page.tsx",
@@ -10959,24 +9881,30 @@
       "images": 0,
       "actions": 5,
       "textBlocks": 1,
-      "longestTextWords": 12,
-      "risks": [
-        "metadata-review"
-      ]
+      "longestTextWords": 18,
+      "risks": ["metadata-review"]
+    },
+    {
+      "file": "apps/marketing/app/tax-software/office/page.tsx",
+      "template": "custom",
+      "metadata": true,
+      "h1s": 1,
+      "images": 0,
+      "actions": 0,
+      "textBlocks": 1,
+      "longestTextWords": 6,
+      "risks": []
     },
     {
       "file": "apps/marketing/app/tax-software/page.tsx",
       "template": "custom",
       "metadata": true,
-      "h1s": 1,
+      "h1s": 0,
       "images": 0,
-      "actions": 19,
-      "textBlocks": 17,
-      "longestTextWords": 27,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "actions": 9,
+      "textBlocks": 23,
+      "longestTextWords": 24,
+      "risks": ["no-local-h1", "text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/tax-software/pricing/page.tsx",
@@ -10984,21 +9912,21 @@
       "metadata": true,
       "h1s": 1,
       "images": 0,
-      "actions": 1,
-      "textBlocks": 3,
-      "longestTextWords": 24,
-      "risks": []
+      "actions": 4,
+      "textBlocks": 7,
+      "longestTextWords": 22,
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/tax-software/professional/page.tsx",
       "template": "custom",
       "metadata": true,
-      "h1s": 1,
+      "h1s": 0,
       "images": 0,
-      "actions": 1,
-      "textBlocks": 3,
-      "longestTextWords": 30,
-      "risks": []
+      "actions": 11,
+      "textBlocks": 17,
+      "longestTextWords": 28,
+      "risks": ["no-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/tax-software/self-file/page.tsx",
@@ -11008,11 +9936,8 @@
       "images": 0,
       "actions": 5,
       "textBlocks": 4,
-      "longestTextWords": 19,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "longestTextWords": 24,
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/tax-software/self-file/return/page.tsx",
@@ -11020,13 +9945,10 @@
       "metadata": false,
       "h1s": 1,
       "images": 0,
-      "actions": 3,
-      "textBlocks": 14,
-      "longestTextWords": 18,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "actions": 4,
+      "textBlocks": 17,
+      "longestTextWords": 21,
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/tax-software/self-file/w2/confirm/page.tsx",
@@ -11037,10 +9959,7 @@
       "actions": 1,
       "textBlocks": 4,
       "longestTextWords": 13,
-      "risks": [
-        "metadata-review",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "text-only"]
     },
     {
       "file": "apps/marketing/app/team/page.tsx",
@@ -11062,10 +9981,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/terms/page.tsx",
@@ -11094,13 +10010,11 @@
       "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 2,
+      "images": 1,
       "actions": 3,
       "textBlocks": 6,
       "longestTextWords": 22,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/testing/[provider]/page.tsx",
@@ -11109,11 +10023,9 @@
       "h1s": 1,
       "images": 1,
       "actions": 4,
-      "textBlocks": 8,
+      "textBlocks": 7,
       "longestTextWords": 20,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/testing/accommodations/page.tsx",
@@ -11124,11 +10036,7 @@
       "actions": 3,
       "textBlocks": 7,
       "longestTextWords": 19,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/testing/book/page.tsx",
@@ -11139,11 +10047,7 @@
       "actions": 5,
       "textBlocks": 8,
       "longestTextWords": 28,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/testing/checkout/page.tsx",
@@ -11165,16 +10069,14 @@
       "actions": 3,
       "textBlocks": 2,
       "longestTextWords": 21,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/testing/page.tsx",
-      "template": "HeroVideo",
+      "template": "custom",
       "metadata": true,
       "h1s": 1,
-      "images": 1,
+      "images": 2,
       "actions": 8,
       "textBlocks": 14,
       "longestTextWords": 20,
@@ -11189,9 +10091,7 @@
       "actions": 3,
       "textBlocks": 3,
       "longestTextWords": 22,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/testing/proctor-information/page.tsx",
@@ -11235,9 +10135,7 @@
       "actions": 3,
       "textBlocks": 5,
       "longestTextWords": 38,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/thankyou/page.tsx",
@@ -11259,9 +10157,7 @@
       "actions": 4,
       "textBlocks": 2,
       "longestTextWords": 15,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/training/learning-center/page.tsx",
@@ -11272,9 +10168,7 @@
       "actions": 5,
       "textBlocks": 2,
       "longestTextWords": 15,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/training-providers/page.tsx",
@@ -11296,10 +10190,7 @@
       "actions": 1,
       "textBlocks": 13,
       "longestTextWords": 12,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/trust/page.tsx",
@@ -11310,9 +10201,7 @@
       "actions": 1,
       "textBlocks": 6,
       "longestTextWords": 32,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/tuition/page.tsx",
@@ -11323,9 +10212,7 @@
       "actions": 3,
       "textBlocks": 4,
       "longestTextWords": 31,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/tuition-fees/page.tsx",
@@ -11347,10 +10234,7 @@
       "actions": 3,
       "textBlocks": 3,
       "longestTextWords": 35,
-      "risks": [
-        "metadata-review",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/update-password/page.tsx",
@@ -11361,10 +10245,7 @@
       "actions": 4,
       "textBlocks": 2,
       "longestTextWords": 10,
-      "risks": [
-        "metadata-review",
-        "multiple-local-h1"
-      ]
+      "risks": ["metadata-review", "multiple-local-h1"]
     },
     {
       "file": "apps/marketing/app/updates/2026/01/program-calendar/page.tsx",
@@ -11386,10 +10267,7 @@
       "actions": 2,
       "textBlocks": 8,
       "longestTextWords": 43,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/verify/[certificateId]/page.tsx",
@@ -11400,9 +10278,7 @@
       "actions": 2,
       "textBlocks": 17,
       "longestTextWords": 11,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/verify/page.tsx",
@@ -11413,9 +10289,7 @@
       "actions": 2,
       "textBlocks": 7,
       "longestTextWords": 15,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/verify/verify/[certificateId]/page.tsx",
@@ -11459,9 +10333,7 @@
       "actions": 4,
       "textBlocks": 3,
       "longestTextWords": 16,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/volunteer/page.tsx",
@@ -11472,10 +10344,7 @@
       "actions": 3,
       "textBlocks": 2,
       "longestTextWords": 22,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/webinars/page.tsx",
@@ -11486,10 +10355,7 @@
       "actions": 2,
       "textBlocks": 4,
       "longestTextWords": 17,
-      "risks": [
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/white-label/page.tsx",
@@ -11500,11 +10366,7 @@
       "actions": 5,
       "textBlocks": 53,
       "longestTextWords": 24,
-      "risks": [
-        "multiple-local-h1",
-        "text-only",
-        "noncanonical-hero"
-      ]
+      "risks": ["multiple-local-h1", "text-only", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/wioa-eligibility/low-income/page.tsx",
@@ -11526,9 +10388,7 @@
       "actions": 8,
       "textBlocks": 3,
       "longestTextWords": 17,
-      "risks": [
-        "noncanonical-hero"
-      ]
+      "risks": ["noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/wioa-eligibility/public-assistance/page.tsx",
@@ -11561,10 +10421,7 @@
       "actions": 1,
       "textBlocks": 8,
       "longestTextWords": 27,
-      "risks": [
-        "multiple-local-h1",
-        "text-only"
-      ]
+      "risks": ["multiple-local-h1", "text-only"]
     },
     {
       "file": "apps/marketing/app/workforce-board/employment/page.tsx",
@@ -11575,9 +10432,7 @@
       "actions": 5,
       "textBlocks": 2,
       "longestTextWords": 23,
-      "risks": [
-        "no-local-h1"
-      ]
+      "risks": ["no-local-h1"]
     },
     {
       "file": "apps/marketing/app/workforce-board/page.tsx",
@@ -11599,10 +10454,7 @@
       "actions": 0,
       "textBlocks": 0,
       "longestTextWords": 0,
-      "risks": [
-        "no-local-h1",
-        "noncanonical-hero"
-      ]
+      "risks": ["no-local-h1", "noncanonical-hero"]
     },
     {
       "file": "apps/marketing/app/workone/progress/page.tsx",
@@ -11613,9 +10465,7 @@
       "actions": 1,
       "textBlocks": 4,
       "longestTextWords": 31,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/workone-partner-packet/page.tsx",
@@ -11626,9 +10476,7 @@
       "actions": 3,
       "textBlocks": 4,
       "longestTextWords": 39,
-      "risks": [
-        "text-only"
-      ]
+      "risks": ["text-only"]
     },
     {
       "file": "apps/marketing/app/writing-center/page.tsx",
@@ -11639,10 +10487,7 @@
       "actions": 3,
       "textBlocks": 4,
       "longestTextWords": 37,
-      "risks": [
-        "metadata-review",
-        "noncanonical-hero"
-      ]
+      "risks": ["metadata-review", "noncanonical-hero"]
     }
   ],
   "criticalHits": []

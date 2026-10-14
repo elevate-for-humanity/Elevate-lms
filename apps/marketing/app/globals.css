@@ -2053,10 +2053,8 @@ pre {
   }
 }
 
-/* Public media must show the complete source frame on every viewport.
-   Text lives beside or below hero media, not over a cropped photograph. */
-main img, main video, #main-content img, #main-content video {
-  object-fit: contain !important;
-  object-position: center !important;
+/* Respect each media component’s framing and focal point. Artwork and logos
+   opt into contain; photographic cards opt into cover. */
+#main-content img {
+  image-rendering: auto;
 }
-#main-content img { image-rendering: auto; }

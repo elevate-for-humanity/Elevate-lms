@@ -14,14 +14,14 @@ export default function ProgramCard({ program }: { program: Program }) {
   return (
     <div className="flex h-full flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
       {/* Flush top image — 4:3 */}
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-[4/3] shrink-0 overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
           src={imageSrc}
           alt={program.title}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-contain contrast-105 saturate-110"
+          className="object-cover object-center"
           placeholder="empty"
         />
       </div>

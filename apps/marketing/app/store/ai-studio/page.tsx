@@ -1,5 +1,5 @@
+import AIStudioDemoClient from '../demo/ai-studio/AIStudioDemoClient';
 export const dynamic = 'force-static';
-
 
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -103,13 +103,12 @@ const capabilities = [
 ];
 
 export default function AIStudioPage() {
-
   return (
     <div className="bg-white">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Ai Studio" }]} />
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Ai Studio' }]} />
       </div>
-{/* Hero */}
+      {/* Hero */}
       <section className="relative min-h-[320px] flex items-center overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-20 left-20 w-72 h-72 bg-pink-500 rounded-full blur-3xl animate-pulse" />
@@ -126,14 +125,12 @@ export default function AIStudioPage() {
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-6">
                 AI Studio
-                <span className="block text-brand-blue-600">
-                  Create Content at Scale
-                </span>
+                <span className="block text-brand-blue-600">Create Content at Scale</span>
               </h1>
 
               <p className="text-xl text-slate-600 mb-8">
-                Generate videos, voiceovers, images, and AI instructors for your courses. 
-                No video editing skills required.
+                Generate videos, voiceovers, images, and AI instructors for your courses. No video
+                editing skills required.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
@@ -180,9 +177,7 @@ export default function AIStudioPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-black text-slate-900 mb-4">
-              What You Can Create
-            </h2>
+            <h2 className="text-4xl font-black text-slate-900 mb-4">What You Can Create</h2>
             <p className="text-xl text-slate-700 max-w-2xl mx-auto">
               Everything you need to produce professional training content
             </p>
@@ -192,7 +187,10 @@ export default function AIStudioPage() {
             {capabilities.map((cap) => {
               const Icon = cap.icon;
               return (
-                <div key={cap.title} className="bg-white rounded-xl p-8 shadow-sm hover:shadow-lg transition-all text-center">
+                <div
+                  key={cap.title}
+                  className="bg-white rounded-xl p-8 shadow-sm hover:shadow-lg transition-all text-center"
+                >
                   <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Icon className="w-8 h-8 text-brand-blue-600" />
                   </div>
@@ -206,118 +204,14 @@ export default function AIStudioPage() {
       </section>
 
       {/* Interactive Demo */}
-      <section className="py-20 bg-gradient-to-b from-slate-50 to-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <p className="text-sm font-bold text-brand-red-600 uppercase tracking-wider mb-3">Interactive Demo</p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">
-              Try AI Studio Before You Buy
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Generate a sample video script and see how AI transforms your training content
-            </p>
-          </div>
-          
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-            {/* Demo Interface */}
-            <div className="bg-slate-100 px-6 py-4 border-b border-slate-200 flex items-center gap-3">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                <div className="w-3 h-3 rounded-full bg-green-400"></div>
-              </div>
-              <span className="text-sm text-slate-600 font-medium">AI Studio — Interactive Demo</span>
-            </div>
-            
-            <div className="p-8">
-              <div className="grid lg:grid-cols-2 gap-8">
-                {/* Input */}
-                <div>
-                  <h3 className="font-bold text-slate-900 mb-4">1. Enter Your Topic</h3>
-                  <textarea 
-                    className="w-full h-32 p-4 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
-                    placeholder="e.g., Patient Safety Fundamentals for Medical Assistants"
-                    defaultValue="Introduction to HIPAA Compliance for Healthcare Workers"
-                  />
-                  
-                  <h3 className="font-bold text-slate-900 mb-4 mt-6">2. Select Content Type</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {['Training Video', 'Voiceover', 'Course Images', 'Instructor Script'].map((type) => (
-                      <button key={type} className="p-3 border border-slate-200 rounded-lg text-sm font-medium hover:border-brand-blue-500 hover:bg-brand-blue-50 transition-colors">
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                  
-                  <h3 className="font-bold text-slate-900 mb-4 mt-6">3. Choose Instructor Style</h3>
-                  <div className="grid grid-cols-3 gap-3">
-                    {['Professional', 'Friendly', 'Clinical'].map((style, i) => (
-                      <button key={style} className={`p-3 border rounded-lg text-sm font-medium transition-colors ${i === 0 ? 'border-brand-blue-500 bg-brand-blue-50 text-brand-blue-700' : 'border-slate-200 hover:border-slate-300'}`}>
-                        {style}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Output Preview */}
-                <div>
-                  <h3 className="font-bold text-slate-900 mb-4">AI Generated Preview</h3>
-                  <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 h-full">
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Users className="w-6 h-6 text-brand-blue-600" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-slate-900">Sarah — Healthcare Instructor</p>
-                        <p className="text-sm text-slate-500">Professional · Female Voice</p>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-white rounded-lg p-4 text-sm text-slate-700 leading-relaxed">
-                      <p className="mb-2"><strong>Script Preview:</strong></p>
-                      <p>"Welcome to this essential training on HIPAA compliance. As healthcare professionals, protecting patient information is not just a legal requirement — it's a cornerstone of trust..."</p>
-                    </div>
-                    
-                    <div className="mt-4 flex gap-2">
-                      <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-700 text-xs rounded-full">1:30 duration</span>
-                      <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">HD Quality</span>
-                      <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">CC Available</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/store/demo/ai-studio"
-                  className="flex-1 max-w-sm mx-auto sm:mx-0 flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-xl transition-colors"
-                >
-                  <Sparkles className="w-5 h-5" />
-                  Open Full Demo
-                </Link>
-                <Link
-                  href="/apps/ai-studio/start-trial"
-                  className="flex-1 max-w-sm mx-auto sm:mx-0 flex items-center justify-center gap-2 border-2 border-brand-blue-600 text-brand-blue-600 font-bold py-4 px-8 rounded-xl hover:bg-brand-blue-50 transition-colors"
-                >
-                  Start Free Trial
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <AIStudioDemoClient embedded />
 
       {/* Pricing */}
-      <section id="pricing"className="py-20">
+      <section id="pricing" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-black text-slate-900 mb-4">
-              Choose Your Plan
-            </h2>
-            <p className="text-xl text-slate-700">
-              Start with a 7-day free trial. Cancel anytime.
-            </p>
+            <h2 className="text-4xl font-black text-slate-900 mb-4">Choose Your Plan</h2>
+            <p className="text-xl text-slate-700">Start with a 7-day free trial. Cancel anytime.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -341,9 +235,7 @@ export default function AIStudioPage() {
 
                 <div className="mb-6">
                   <span className="text-4xl font-black text-slate-900">${plan.price}</span>
-                  {plan.billing === 'month' && (
-                    <span className="text-slate-700">/month</span>
-                  )}
+                  {plan.billing === 'month' && <span className="text-slate-700">/month</span>}
                   {plan.billing === 'one-time' && (
                     <span className="text-slate-700 text-sm ml-2">one-time</span>
                   )}
@@ -378,9 +270,7 @@ export default function AIStudioPage() {
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Zap className="w-16 h-16 text-yellow-400 mx-auto mb-6" />
-          <h2 className="text-4xl font-black text-slate-900 mb-6">
-            Ready to Create with AI?
-          </h2>
+          <h2 className="text-4xl font-black text-slate-900 mb-6">Ready to Create with AI?</h2>
           <p className="text-xl text-white mb-10 max-w-2xl mx-auto">
             Start your free trial today. No credit card required.
           </p>

@@ -2,7 +2,7 @@ import StoreDemoAdvisor from '@/components/store/StoreDemoAdvisor';
 
 export const metadata = {
   title: 'Store Demo',
-  robots: { index: false, follow: false },
+  robots: { index: false, follow: true },
 };
 
 export default function StoreDemoLayout({ children }: { children: React.ReactNode }) {

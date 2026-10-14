@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import Image from 'next/image';
+import ImageMetadata from './ImageMetadata';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
@@ -24,6 +25,7 @@ export interface HeroVideoProps {
   /** Presentation speed for the looping hero video. */
   videoPlaybackRate?: number;
   posterImage?: string;
+  posterAlt?: string;
   /** Exact first frame mounted beneath the video to prevent a poster/hydration flash. */
   mountedFrameImage?: string;
   voiceoverSrc?: string;
@@ -68,6 +70,7 @@ export default function HeroVideo({
   videoSrcMobile,
   videoPlaybackRate = 1,
   posterImage,
+  posterAlt,
   mountedFrameImage,
   voiceoverSrc,
   microLabel,
@@ -83,8 +86,9 @@ export default function HeroVideo({
   analyticsName,
   className = '',
   children,
+  mediaFit,
   mediaClassName = '',
-  heightClassName = 'aspect-video',
+  heightClassName = 'aspect-video sm:aspect-auto sm:h-[clamp(220px,38svh,480px)]',
   soundButtonVariant = 'pill',
   showSoundControl = true,
   showTranscriptControl = true,
@@ -107,8 +111,9 @@ export default function HeroVideo({
   const sectionRef = useRef<HTMLElement>(null);
   const scrollNarrationAttemptedRef = useRef(false);
 
-  // Full-frame media is required: callers cannot crop the hero.
-  const mediaClass = 'object-contain';
+  // Preserve complete videos by default; photo-only callers can fill their frame.
+  const resolvedFit = mediaFit ?? (videoSrcDesktop || videoSrcMobile ? 'contain' : 'cover');
+  const mediaClass = resolvedFit === 'cover' ? 'object-cover' : 'object-contain';
   const desktopSource = videoSrcDesktop || videoSrcMobile || '';
   const mobileSource = videoSrcMobile || videoSrcDesktop || '';
   const showVideo = Boolean(desktopSource) && !videoFailed && videoEnabled;
@@ -272,6 +277,12 @@ export default function HeroVideo({
         className={`relative isolate w-full overflow-hidden flex items-end bg-slate-900 ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >
+        {mountedFrameImage || posterImage ? (
+          <ImageMetadata
+            src={mountedFrameImage || posterImage || ''}
+            description={posterAlt || belowHeroHeadline || microLabel || 'Career training artwork'}
+          />
+        ) : null}
         {demoSlides?.length ? (
           demoSlides.map((slide, index) => (
             <Image
@@ -290,12 +301,14 @@ export default function HeroVideo({
         ) : mountedFrameImage || posterImage ? (
           <Image
             src={mountedFrameImage || posterImage || ''}
-            alt=""
+            alt={posterAlt || belowHeroHeadline || microLabel || 'Career training artwork'}
             fill
             priority
             sizes="100vw"
             className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center ${mediaClassName}`}
-            aria-hidden="true"
+            style={{
+              objectPosition: posterImage?.includes('/refresh-20261014/') ? 'center 30%' : 'center',
+            }}
           />
         ) : null}
 

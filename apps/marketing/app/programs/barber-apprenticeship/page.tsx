@@ -269,7 +269,7 @@ export default async function BarberApprenticeshipPage() {
       >
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-slate-100 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[420px]">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-slate-100 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[360px]">
               <Image
                 src="/images/pages/barber-hero-main.webp"
                 alt="Barber apprentice practicing supervised haircutting and grooming skills"

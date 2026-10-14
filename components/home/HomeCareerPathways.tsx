@@ -57,7 +57,7 @@ const PATHWAYS = [
 export function HomeCareerPathways() {
   return (
     <section
-      className="bg-white px-4 py-16 sm:py-20"
+      className="bg-white px-4 py-8 sm:py-12"
       aria-labelledby="featured-pathways-heading"
       aria-label="Choose the program you want to explore."
     >
@@ -86,12 +86,12 @@ export function HomeCareerPathways() {
               className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md transition hover:-translate-y-1 hover:shadow-2xl"
             >
               <Link href={p.ctaHref} className="flex h-full flex-col">
-                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-slate-100">
                   <Image
                     src={p.image}
                     alt={p.imageAlt}
                     fill
-                    className="object-contain brightness-105 contrast-105 saturate-110 transition duration-500 "
+                    className="object-cover object-center transition duration-500 "
                     sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
                     loading="lazy"
                   />

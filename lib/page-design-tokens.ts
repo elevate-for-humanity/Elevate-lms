@@ -20,26 +20,27 @@ export const layout = {
   container: 'max-w-6xl mx-auto px-4 sm:px-6',
   containerNarrow: 'max-w-3xl mx-auto px-4 sm:px-6',
   containerMedium: 'max-w-5xl mx-auto px-4 sm:px-6',
-  section: 'py-14 sm:py-20',
+  section: 'py-8 sm:py-12',
   sectionTight: 'py-10 sm:py-14',
-  sectionWide: 'py-16 sm:py-24',
+  sectionWide: 'py-10 sm:py-14',
 } as const;
 
 export const hero = {
-  imageWrap: 'relative aspect-video w-full overflow-hidden',
+  imageWrap:
+    'relative aspect-video sm:aspect-auto sm:h-[clamp(220px,38svh,480px)] w-full overflow-hidden',
   contentPanel: 'bg-white border-b border-slate-100',
 } as const;
 
 export const card = {
   base: 'h-full bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all',
-  image16x9: 'relative aspect-[16/9] overflow-hidden',
-  image16x9Desktop: 'relative aspect-[16/9] overflow-hidden sm:aspect-video',
-  image4x3: 'relative aspect-[4/3] overflow-hidden',
+  image16x9: 'relative aspect-[16/9] shrink-0 overflow-hidden',
+  image16x9Desktop: 'relative aspect-[16/9] shrink-0 overflow-hidden sm:aspect-video',
+  image4x3: 'relative aspect-[4/3] shrink-0 overflow-hidden',
   body: 'p-5 sm:p-6',
   info: 'bg-white rounded-2xl border border-slate-200 p-6',
   stat: 'bg-slate-800 rounded-2xl p-6 text-center',
   programImage: 'relative aspect-[4/3] shrink-0 overflow-hidden bg-slate-800',
-  programImageFill: 'object-contain object-center contrast-105 saturate-110 w-full h-full',
+  programImageFill: 'object-cover object-center w-full h-full',
 } as const;
 
 export const btn = {

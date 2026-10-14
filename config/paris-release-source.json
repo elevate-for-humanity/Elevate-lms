@@ -79,10 +79,10 @@
     {
       "source": "app/tax-software/self-file/return/page.tsx",
       "target": "apps/marketing/app/tax-software/self-file/return/page.tsx",
-      "sha256": "a0f3b266902c0938f6bc543dd975e589bead4c00760c8a4b179d2bf9c6da5ec9",
+      "sha256": "f4953f0278c24665041b13a448509261d22ec6751fbaa2fb3647428692535a25",
       "sourceSha256": "deb47a15cccdc64c911ea90ac333a46ab6431c16fd7eb55ddfb3cab0f9e0ea4b",
       "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation.",
-      "changeReason": "Connect owned Schedule C records and complete business-source snapshots to federal calculations and exports."
+      "changeReason": "Connect owned business worksheets and separate Supersonic payment preferences to the return workspace."
     },
     {
       "source": "app/tax-software/self-file/w2/confirm/page.tsx",

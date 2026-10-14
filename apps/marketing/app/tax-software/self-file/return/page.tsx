@@ -9,6 +9,7 @@ import { FilingExportButton } from '../../_components/FilingExportButton';
 import { TaxpayerDetailsEditor } from '../../_components/TaxpayerDetailsEditor';
 import { FederalFormsEditor } from '../../_components/FederalFormsEditor';
 import { BusinessSchedulesEditor } from '../../_components/BusinessSchedulesEditor';
+import { TaxPaymentOptions } from '../../_components/TaxPaymentOptions';
 import { quoteSelfFile } from '@/lib/tax-software/self-file-pricing';
 const questions = [
   ['hasW2', 'Did you receive a W-2?'],
@@ -215,6 +216,7 @@ function Workspace() {
                     }))
                   }
                 />
+                <TaxPaymentOptions returnId={id!} calculationDigest={estimate ? JSON.stringify(estimate) : null} />
               </section>
               <aside className="space-y-5">
                 <section className="rounded-2xl bg-white p-6">

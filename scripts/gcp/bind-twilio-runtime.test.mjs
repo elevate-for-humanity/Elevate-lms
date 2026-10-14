@@ -26,3 +26,17 @@ test('wrong-account credentials cannot be bound or used against a number',async(
   }),/approved account/);
   assert.equal(requests,2);
 });
+test('rejected credentials report only HTTP status and never permit binding',async()=>{
+  const evidence=[];const original=console.error;
+  console.error=value=>evidence.push(value);
+  try {
+    await assert.rejects(verifiedTwilioBindings(config,async(url,options)=>{
+      if(url.includes('/rpc/')) {
+        const name=JSON.parse(options.body).p_key;
+        return new Response(JSON.stringify(name==='TWILIO_ACCOUNT_SID'?account:name==='TWILIO_API_KEY_SID'?'SK'+'b'.repeat(32):'a'.repeat(32)));
+      }
+      return new Response('{}',{status:401});
+    }),/authentication or number verification failed/);
+    assert.deepEqual(evidence,[JSON.stringify({twilioNumberVerificationHttpStatus:401}),JSON.stringify({savedTwilioApiKeyHttpStatus:401})]);
+  } finally {console.error=original;}
+});

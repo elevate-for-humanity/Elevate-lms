@@ -39,7 +39,27 @@ export async function verifiedTwilioBindings(config, fetchImpl = fetch) {
     headers:{Authorization:'Basic '+Buffer.from(`${ACCOUNT}:${values.TWILIO_AUTH_TOKEN}`).toString('base64')},
     redirect:'error',signal:AbortSignal.timeout(15000),
   });
-  if (!response.ok) throw Error('Twilio authentication or number verification failed');
+  if (!response.ok) {
+    console.error(JSON.stringify({twilioNumberVerificationHttpStatus:response.status}));
+    if (response.status === 401) {
+      const api = {};
+      for (const name of ['TWILIO_API_KEY_SID','TWILIO_API_KEY_SECRET']) {
+        const stored = await fetchImpl(base + '/rest/v1/rpc/get_platform_secret', {
+          method:'POST',headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json'},
+          body:JSON.stringify({p_key:name}),redirect:'error',signal:AbortSignal.timeout(15000),
+        });
+        if (stored.ok) api[name] = await stored.json();
+      }
+      if (/^SK[a-f0-9]{32}$/i.test(api.TWILIO_API_KEY_SID || '') && /^[a-f0-9]{32}$/i.test(api.TWILIO_API_KEY_SECRET || '')) {
+        const alternate = await fetchImpl(`https://api.twilio.com/2010-04-01/Accounts/${ACCOUNT}/IncomingPhoneNumbers/${PHONE_SID}.json`, {
+          headers:{Authorization:'Basic '+Buffer.from(`${api.TWILIO_API_KEY_SID}:${api.TWILIO_API_KEY_SECRET}`).toString('base64')},
+          redirect:'error',signal:AbortSignal.timeout(15000),
+        });
+        console.error(JSON.stringify({savedTwilioApiKeyHttpStatus:alternate.status}));
+      }
+    }
+    throw Error('Twilio authentication or number verification failed');
+  }
   const number = await response.json();
   if (number.account_sid !== ACCOUNT || number.sid !== PHONE_SID || number.phone_number !== NUMBER)
     throw Error('The Twilio number does not belong to the approved account');

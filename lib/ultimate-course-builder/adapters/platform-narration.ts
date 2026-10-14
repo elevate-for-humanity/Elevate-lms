@@ -8,6 +8,7 @@ import { promisify } from 'node:util';
 import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { reportCourseProgress } from '../worker/progress-watch.mjs';
 const execute=promisify(execFile);
 export class UltimatePlatformNarration implements UltimateNarrationPort {
  async generate(input:any){
@@ -17,6 +18,7 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
   try{
    const segments=[];
    for(const [index,segment] of approved.entries()){
+    reportCourseProgress('narration:segment',index,approved.length);
     const parts=[],captions:any[]=[],wordAlignment:any[]=[];
     let cursor=0;
     const recordings=segment.narrationParts??[{text:segment.text,isRecap:false}];
@@ -24,6 +26,7 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
     for(const [partIndex,recording] of recordings.entries()){
      if(!recording.text?.trim())throw Error('BLANK_NARRATION_PART_PROHIBITED');
      const audio=await generateEdgeTTS(recording.text);
+     reportCourseProgress('narration:recording:'+index,partIndex+1,recordings.length);
      const source=join(directory,index+'-'+partIndex+'.mp3'),pcm=join(directory,index+'-'+partIndex+'.wav');
      await writeFile(source,audio);
      await execute('ffmpeg',['-v','error','-y','-i',source,'-ac','1','-ar','16000','-c:a','pcm_s16le',pcm]);
@@ -46,6 +49,7 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
       }
      }
      captions.push(...measured.map((c:any)=>({...c,startSeconds:cursor+c.startSeconds,endSeconds:cursor+c.endSeconds})));
+     reportCourseProgress('narration:alignment:'+index,partIndex+1,recordings.length);
      const encoded=join(directory,index+'-'+partIndex+'-delivery.mp3');
      await execute('ffmpeg',['-v','error','-y','-i',pcm,'-c:a','libmp3lame','-b:a','128k',encoded]);
      const audioUrl=await uploadLessonMediaBuffer(await readFile(encoded),input.lessonId+'-'+index+'-'+partIndex,'mp3');
@@ -59,6 +63,7 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
     await execute('ffmpeg',['-v','error','-y','-i',master,'-c:a','libmp3lame','-b:a','128k',delivery]);
     const audioUrl=await uploadLessonMediaBuffer(await readFile(delivery),input.lessonId+'-'+segment.id.replace(/[^a-zA-Z0-9-]/g,'-'),'mp3');
     segments.push({segmentId:segment.id,text:parts.map(p=>p.text).join('\n\n'),audioUrl,durationSeconds:cursor,captions,wordAlignment,parts});
+    reportCourseProgress('narration:stored-segments',index+1,approved.length);
    }
    return {provider:configuredNarrationProvider(),segments,transcript:segments.map(s=>s.text).join('\n\n'),durationSeconds:segments.reduce((sum,s)=>sum+s.durationSeconds,0)};
   }finally{await rm(directory,{recursive:true,force:true});}

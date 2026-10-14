@@ -37,6 +37,7 @@ type UltimateBuildRow = {
     created_at: string;
     heartbeat_at?: string | null;
     lease_expires_at?: string | null;
+    payload?: { progress?: { phase: string; at: string; completed: number; total?: number | null } };
   }>;
 };
 
@@ -753,9 +754,18 @@ export function UltimateBuildPanel({
           </p>
           {workerJob?.last_error ? (
             <p role="alert" className="mt-2 break-words text-sm text-amber-200">
-              {workerJob.last_error}
+              {workerJob.status === 'running' ? 'Previous attempt: ' : ''}{workerJob.last_error}
             </p>
           ) : null}
+          {workerJob?.payload?.progress && <div className="mt-3 space-y-2 text-white">
+            <p>Worker activity: {workerJob.payload.progress.phase.replaceAll('_', ' ').replaceAll(':', ' · ')}</p>
+            <p className="text-sm">Last progress: {new Date(workerJob.payload.progress.at).toLocaleString()}</p>
+            {typeof workerJob.payload.progress.total === 'number' && workerJob.payload.progress.total > 0 && <>
+              <progress aria-label="Current worker activity progress" className="h-3 w-full" max={workerJob.payload.progress.total}
+                value={Math.min(workerJob.payload.progress.total, workerJob.payload.progress.completed)} />
+              <p className="text-sm">{workerJob.payload.progress.completed} of {workerJob.payload.progress.total} work units in this activity.</p>
+            </>}
+          </div>}
           {workerJob?.status === 'completed' && !['built', 'published'].includes(latest.status) ? (
             <p className="mt-2 text-sm text-slate-200">
               This worker job finished. Course acceptance and release are still required.

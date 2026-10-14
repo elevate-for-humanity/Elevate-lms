@@ -16,6 +16,7 @@ export type UltimateCoursePlan = {
   startIndex?: number;
   maxLessons?: number;
   repairFromStep?: UltimateBuildStep;
+  beforeCheckpoint?: UltimateRunContext['beforeCheckpoint'];
 };
 export async function runUltimateCourse(
   plan: UltimateCoursePlan,
@@ -71,6 +72,7 @@ export async function runUltimateCourse(
       findings: checkpoint.findings.filter((f) => restoredPassed.includes(f.step)),
       passedSteps: new Set(restoredPassed),
       assertActive,
+      beforeCheckpoint: plan.beforeCheckpoint,
       persistStep: async (input) => {
         assertActive?.();
         console.info('[UltimateCourse] step transition', {lessonBuildId: lesson.id, step: input.step, state: input.state});

@@ -14,6 +14,7 @@ import { resolveReleaseActor } from './release-actor';
 import { hydrateUltimateProfileSources } from '../core/course-profile';
 import { materializeUltimateDraft } from './materialize-draft';
 import { isDurableExternalBlocker } from '../core/repair-router';
+import { liveCheckpointRepairReader } from './live-checkpoint-repair';
 export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
@@ -112,6 +113,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
           payload.competencyId ?? payload.repairCompetencyId ?? (payload.acceptance ? profile.competencies?.[0]?.id : undefined),
         startIndex: Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0,
         maxLessons: 1,
+        beforeCheckpoint: liveCheckpointRepairReader(db, job, workerId, generation, payload, currentCompetencyId),
         repairFromStep: payload.checkpointRepair?.competencyId === currentCompetencyId ? payload.checkpointRepair.fromStep : undefined,
       },
       () => new UltimateBuildRunner(handlers as any),

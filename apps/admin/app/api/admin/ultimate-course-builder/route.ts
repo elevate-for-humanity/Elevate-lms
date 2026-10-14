@@ -9,6 +9,7 @@ import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
 import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/instructional/google-lesson-author';
+import { lessonPreview } from '@/lib/ultimate-course-builder/core/lesson-preview';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -44,10 +45,16 @@ export async function GET(req: NextRequest) {
     const { data, error } = await db
       .from('ultimate_course_builds')
       .select(req.nextUrl.searchParams.get('view') === 'checkpoints'
-        ? 'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,ultimate_lesson_steps(step,state,findings,completed_at))'
+        ? 'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,artifacts,ultimate_lesson_steps(step,state,findings,completed_at))'
         : '*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
       .eq('id', buildId)
       .single();
+    if (!error && data && req.nextUrl.searchParams.get('view') === 'checkpoints') {
+      data.ultimate_lesson_builds = (data.ultimate_lesson_builds ?? []).map((lesson: any) => {
+        const { artifacts, ...saved } = lesson;
+        return { ...saved, preview: lessonPreview(artifacts) };
+      });
+    }
     return error ? databaseFailure(error) : NextResponse.json({ build: data });
   }
 

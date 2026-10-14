@@ -7,6 +7,7 @@ import { routeSelectiveRepairs } from '@/lib/ultimate-course-builder/core/repair
 import { renderMediaUrl, renderPlaybackUrl } from '@/lib/ultimate-course-builder/media/playback-source.mjs';
 import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { safeInternalError } from '@/lib/api/safe-error';
+import { checkpointRepairPayload } from '@/lib/ultimate-course-builder/worker/live-checkpoint-repair';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const uuid = (v: unknown): v is string => typeof v === 'string' && /^[a-f0-9-]{36}$/i.test(v);
@@ -51,6 +52,7 @@ export async function GET(req: NextRequest) {
     }
     return NextResponse.json({ diagnostic: { lessonTitle: competency?.title ?? competency?.description ?? 'Lesson',
       state: step?.state ?? 'not_started', findings, missingEvidence: missing, prerequisites,
+      awaitingPrerequisites: step?.state !== 'failed' && step?.state !== 'passed' && missing.length > 0,
       repairTargets: routeSelectiveRepairs(findings), completedAt: step?.completed_at ?? null,
       videoUrl, historicalVersion,
       mediaApproved: historicalVersion === null && c.lesson.artifacts?.finished_media_qa?.mediaQA?.pass === true,
@@ -67,14 +69,25 @@ export async function POST(req: NextRequest) {
     const db = await requireAdminClient(); const c = await context(db, input);
     if (c.build.status === 'published') return NextResponse.json({ error: 'Create a new draft revision before repairing a published course.' }, { status: 409 });
     if (!c.job) return NextResponse.json({ error: 'Start this course before requesting checkpoint repair.' }, { status: 409 });
-    if (c.job.status === 'running' && Date.parse(c.job.lease_expires_at ?? '') > Date.now())
-      return NextResponse.json({ error: 'This lesson has an active worker. Wait for its checkpoint to finish before requesting repair.' }, { status: 409 });
     const index = c.build.profile.competencies?.findIndex((x: any) => x.id === c.lesson.competency_id);
     if (!(index >= 0)) return NextResponse.json({ error: 'This lesson is not in the saved course plan.' }, { status: 409 });
     const checkpoint = c.steps.find((s: any) => s.step === input.step);
     const targets = routeSelectiveRepairs(checkpoint?.findings ?? []);
     const ordered = [input.step, ...targets.map((x: any) => x.step)].sort((a, b) => ULTIMATE_BUILD_STEPS.indexOf(a) - ULTIMATE_BUILD_STEPS.indexOf(b));
     const fromStep = ordered[0];
+    const request = { lessonBuildId: c.lesson.id, competencyId: c.lesson.competency_id, fromStep, requestedBy: auth.id, requestedAt: new Date().toISOString() };
+    if (c.job.status === 'running' && Date.parse(c.job.lease_expires_at ?? '') > Date.now()) {
+      const pending = checkpointRepairPayload(c.job, request, index);
+      let query = db.from('ultimate_build_jobs').update({ pending_dependency_resume: pending })
+        .eq('id', c.job.id).eq('status', 'running').eq('execution_generation', c.job.execution_generation);
+      query = c.job.pending_dependency_resume == null ? query.is('pending_dependency_resume', null)
+        : query.eq('pending_dependency_resume', JSON.stringify(c.job.pending_dependency_resume));
+      const saved = await query.select('id');
+      if (saved.error) throw saved.error;
+      if (saved.data?.length !== 1) return NextResponse.json({ error: 'The worker advanced while saving. Refresh and request the repair again.' }, { status: 409 });
+      return NextResponse.json({ queued: true, executionVerified: false, deferred: true,
+        message: 'Repair request saved while the builder continues. It will be applied at a checkpoint boundary; active rendering is preserved.' }, { status: 202 });
+    }
     const counts = { ...c.job.payload?.lessonRepairCounts }; delete counts[c.lesson.competency_id];
     const now = new Date().toISOString();
     const payload = { ...c.job.payload, nextCompetencyIndex: index, lessonRepairCounts: counts, unresolvedCompetencyIds: [],

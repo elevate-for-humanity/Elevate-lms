@@ -608,6 +608,7 @@ export function UltimateBuildPanel({
   const [error, setError] = useState('');
   const [statusError, setStatusError] = useState('');
   const refreshToken = useRef(0);
+  const refreshController = useRef<AbortController | null>(null);
   const latest = buildsCourseId === course.id ? (builds[0] ?? null) : null;
   const statusLoading = loading;
   const statusLoaded = buildsCourseId === course.id;
@@ -628,14 +629,18 @@ export function UltimateBuildPanel({
   const activeJob = observedJobs.find((job) => ['queued', 'running'].includes(job.status));
   const workerJob = activeJob ?? observedJobs[0];
 
-  async function refresh(requestedCourseId = course.id) {
+  async function refresh(requestedCourseId = course.id, background = false) {
+    if (background && refreshController.current) return;
+    refreshController.current?.abort();
+    const controller = new AbortController();
+    refreshController.current = controller;
     const token = ++refreshToken.current;
-    setLoading(true);
+    if (!background) setLoading(true);
     setStatusError('');
     try {
       const response = await fetch(
         `/api/admin/ultimate-course-builder?courseId=${encodeURIComponent(requestedCourseId)}`,
-        { cache: 'no-store' },
+        { cache: 'no-store', signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20000)]) },
       );
       const payload = await readJson(response);
       if (token !== refreshToken.current) return;
@@ -647,7 +652,7 @@ export function UltimateBuildPanel({
       if (token !== refreshToken.current) return;
       setStatusError(reason instanceof Error ? reason.message : 'Unable to load Ultimate build status');
     } finally {
-      if (token === refreshToken.current) setLoading(false);
+      if (token === refreshToken.current) { setLoading(false); refreshController.current = null; }
     }
   }
 
@@ -661,7 +666,7 @@ export function UltimateBuildPanel({
 
   useEffect(() => {
     if (!latest || !['initializing', 'queued', 'running'].includes(latest.status)) return;
-    const timer = window.setInterval(() => void refresh(), 15000);
+    const timer = window.setInterval(() => void refresh(course.id, true), 15000);
     return () => window.clearInterval(timer);
   }, [latest?.id, latest?.status]); // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -46,6 +46,7 @@ export interface UltimateRunContext {
   passedSteps?: Set<UltimateBuildStep>;
   assertActive?: () => void;
   repairDirective?: any;
+  beforeCheckpoint?: (step: UltimateBuildStep) => Promise<UltimateBuildStep | null>;
 }
 
 export class UltimateBuildRunner {
@@ -61,6 +62,14 @@ export class UltimateBuildRunner {
     let index = 0;
     while (index < ULTIMATE_BUILD_STEPS.length) {
       ctx.assertActive?.();
+      const requestedRepair = await ctx.beforeCheckpoint?.(ULTIMATE_BUILD_STEPS[index]);
+      if (requestedRepair) {
+        index = Math.min(index, ULTIMATE_BUILD_STEPS.indexOf(requestedRepair));
+        for (const dependent of ULTIMATE_BUILD_STEPS.slice(index)) {
+          ctx.passedSteps?.delete(dependent); delete ctx.artifacts[dependent];
+        }
+        delete (ctx.artifacts as any).__repairState; ctx.repairDirective = undefined;
+      }
       const step = ULTIMATE_BUILD_STEPS[index];
       const inputHash = stepInputHash(step, ctx.profile, ctx.artifacts);
       const competency = ctx.profile.competencies.find(c => ctx.buildId.endsWith(':' + c.id)) ?? ctx.profile.competencies[0];

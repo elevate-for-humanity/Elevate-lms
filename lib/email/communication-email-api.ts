@@ -81,11 +81,13 @@ async function emailContext(
     if (options.adminOversight && !preview.previewing && authenticatedUser) {
       const [{ data: profile }, { data: userRoleRows }] = await Promise.all([
         db.from('profiles').select('role').eq('id', authenticatedUser.id).maybeSingle(),
-        db.from('user_roles').select('roles(name)').eq('user_id', authenticatedUser.id),
+        db.from('user_roles').select('roles(name),expires_at').eq('user_id', authenticatedUser.id),
       ]);
       const effectiveRoles = normalizeRoles([
         profile?.role,
-        ...(userRoleRows ?? []).map((row: any) => row.roles?.name),
+        ...(userRoleRows ?? [])
+          .filter((row: any) => !row.expires_at || new Date(row.expires_at).getTime() > Date.now())
+          .map((row: any) => row.roles?.name),
       ]);
       if (effectiveRoles.some((role) => role === 'admin' || role === 'super_admin')) {
         const actorMailboxes = await ensureActorMailboxes(db, authenticatedUser.id);
@@ -710,7 +712,7 @@ export async function handleCommunicationEmailPatch(
   }
   const body = await request.json().catch(() => ({}));
   if (body.action === 'sendQueued') {
-    if (!context.isAdmin)
+    if (!context.isAdmin || !context.mailboxes.length)
       return NextResponse.json({ error: 'Administrator access required.' }, { status: 403 });
     return NextResponse.json({ ok: true, ...(await processInterofficeOutbox()) });
   }

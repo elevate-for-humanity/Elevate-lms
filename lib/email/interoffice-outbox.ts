@@ -1,7 +1,7 @@
 import { storeInboundCommunicationEmail } from './communication-inbound';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from './sendgrid';
-import { textToEmailHtml } from './communication-email';
+import { safeMailboxDisplayName, textToEmailHtml } from './communication-email';
 import { applicantConversationSubject } from './program-conversation-routing';
 export async function processInterofficeOutbox(limit = 20) {
   const db = await requireAdminClient();
@@ -36,6 +36,7 @@ export async function processInterofficeOutbox(limit = 20) {
       failed++;
       continue;
     }
+    const displayName = safeMailboxDisplayName(mailbox.display_name);
     const { data: thread, error: threadError } = await db
       .from('communication_email_threads')
       .insert({
@@ -63,7 +64,7 @@ export async function processInterofficeOutbox(limit = 20) {
         direction: 'outbound',
         status: 'pending',
         sender_email: mailbox.address,
-        sender_name: mailbox.display_name,
+        sender_name: displayName,
         to_addresses: [row.recipient_email],
         reply_to: mailbox.address,
         subject: row.subject,
@@ -82,7 +83,7 @@ export async function processInterofficeOutbox(limit = 20) {
     }
     const result = await sendEmail({
       to: row.recipient_email,
-      from: `${mailbox.display_name} <${mailbox.address}>`,
+      from: `${displayName} <${mailbox.address}>`,
       replyTo: mailbox.address,
       subject: row.subject,
       text: row.body,
@@ -119,7 +120,7 @@ export async function processInterofficeOutbox(limit = 20) {
       if (addresses.length)
         await storeInboundCommunicationEmail(
           {
-            from: `${mailbox.display_name} <${mailbox.address}>`,
+            from: `${displayName} <${mailbox.address}>`,
             to: addresses.join(', '),
             replyTo: mailbox.address,
             subject: row.subject,

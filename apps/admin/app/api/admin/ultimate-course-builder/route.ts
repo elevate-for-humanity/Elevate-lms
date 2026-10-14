@@ -42,13 +42,16 @@ export async function GET(req: NextRequest) {
   const courseId = req.nextUrl.searchParams.get('courseId')?.trim();
 
   if (buildId) {
+    // A conditional projection is not a single literal for Supabase's type parser.
+    const projection: string = req.nextUrl.searchParams.get('view') === 'checkpoints'
+      ? 'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,artifacts,ultimate_lesson_steps(step,state,findings,completed_at))'
+      : '*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))';
     const { data, error } = await db
       .from('ultimate_course_builds')
-      .select(req.nextUrl.searchParams.get('view') === 'checkpoints'
-        ? 'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,artifacts,ultimate_lesson_steps(step,state,findings,completed_at))'
-        : '*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
+      .select(projection)
       .eq('id', buildId)
-      .single();
+      .single()
+      .overrideTypes<{ ultimate_lesson_builds: Record<string, unknown>[]; [key: string]: unknown }, { merge: false }>();
     if (!error && data && req.nextUrl.searchParams.get('view') === 'checkpoints') {
       data.ultimate_lesson_builds = (data.ultimate_lesson_builds ?? []).map((lesson: any) => {
         const { artifacts, ...saved } = lesson;

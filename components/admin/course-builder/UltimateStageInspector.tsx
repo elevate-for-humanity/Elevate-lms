@@ -124,7 +124,7 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
   }
 
   return (
-    <section className="mt-5 overflow-x-auto" aria-label="Course Builder checkpoints">
+    <section className="mt-5 overflow-x-auto rounded-xl bg-slate-950 p-4 text-white" aria-label="Course Builder checkpoints">
       <div data-course-lesson-panes className="grid min-w-[720px] grid-cols-2 items-start gap-4">
       <div className="col-span-2 flex flex-wrap items-center justify-between gap-3">
         <h3 className="font-bold text-white">Lesson checkpoints</h3>
@@ -158,7 +158,7 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
       {healthError ? <p role="alert" className="col-start-1 text-sm text-red-200">{healthError}</p> : null}
       {checks.length ? (
         <ul className="col-start-1 space-y-2">
-          {checks.map(check => <li key={check.name} className="rounded-lg border border-slate-700 p-3 text-sm">
+          {checks.map(check => <li key={check.name} className="rounded-lg border border-slate-700 bg-slate-900 p-3 text-sm">
             <strong className={check.passed ? 'text-emerald-300' : 'text-amber-200'}>{check.name}: {check.passed ? 'Passed' : 'Needs repair'}</strong>
             <p className="mt-1 text-slate-300">{check.message}</p>
           </li>)}

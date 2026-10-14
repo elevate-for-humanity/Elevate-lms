@@ -2,8 +2,10 @@
 """Validate a Twilio TLS/SRTP endpoint in an isolated container before installation.
 
 Uses the running image and copied configuration. Optional --install-endpoint
-installs only the validated endpoint after an idle check, with rollback. Never
-restarts the live PBX, attaches numbers, provisions users, or makes telephone calls.
+installs only the validated endpoint after an idle check, with rollback. A required
+transport restart preserves the same container and configuration and is allowed
+only with zero calls/channels and no existing user endpoints. Never attaches
+numbers, provisions users, or makes telephone calls.
 """
 import json
 import os
@@ -14,6 +16,8 @@ import subprocess
 import tempfile
 import time
 import sys
+import hashlib
+import tarfile
 
 CONTAINER = 'pbx_asterisk_1'
 ROOT = Path('/opt/elevate-pbx/repo/infra/pbx/asterisk')
@@ -62,6 +66,24 @@ def run(args, required=True):
     if required and result.returncode:
         raise ValueError('isolated_trunk_command_failed')
     return result
+
+
+def require_idle_endpoint_restart(channels, endpoints):
+    if not all(re.search(r'^0 active ' + kind + r's?$', channels, re.M) for kind in ['call', 'channel']):
+        raise ValueError('active_calls_prevent_carrier_transport_restart')
+    names = re.findall(r'Endpoint:\s+([A-Za-z0-9_.-]+)(?:[ /]|$)', endpoints)
+    count = re.search(r'Objects found:\s*(\d+)', endpoints)
+    if names != ['twilio'] or not count or count[1] != '1':
+        raise ValueError('existing_endpoints_prevent_carrier_transport_restart')
+
+
+def configuration_digest(root):
+    digest = hashlib.sha256()
+    for filename in sorted(root.rglob('*')):
+        digest.update(str(filename.relative_to(root)).encode())
+        if filename.is_symlink(): digest.update(os.readlink(filename).encode())
+        elif filename.is_file(): digest.update(filename.read_bytes())
+    return digest.hexdigest()
 
 
 def validate():
@@ -184,6 +206,8 @@ def install_endpoint(root=ROOT, backup=Path('/var/lib/elevate-pbx/twilio-rollbac
         shutil.copy2(main, backup / 'pjsip.conf')
         os.chmod(backup / 'pjsip.conf', 0o600)
     existed = fragment.exists()
+    restarted = False
+    identity = json.loads(execute(['docker', 'inspect', CONTAINER]).stdout)[0] if execute is run else None
     try:
         fragment.write_text(CONFIG)
         os.chmod(fragment, main.stat().st_mode & 0o777)
@@ -194,6 +218,27 @@ def install_endpoint(root=ROOT, backup=Path('/var/lib/elevate-pbx/twilio-rollbac
         cli('pjsip reload')
         endpoint = cli('pjsip show endpoint twilio')
         transport = cli('pjsip show transport elevate-twilio-tls')
+        if not re.search(r'protocol\s*:\s*tls\b', transport):
+            require_idle_endpoint_restart(cli('core show channels count'), cli('pjsip show endpoints'))
+            expected = configuration_digest(root)
+            archive = backup / ('pre-transport-restart-' + expected + '.tar.gz')
+            if not archive.exists():
+                with tarfile.open(archive, 'x:gz') as output:
+                    output.add(root, arcname='asterisk')
+                os.chmod(archive, 0o600)
+            execute(['docker', 'restart', CONTAINER])
+            restarted = True
+            for attempt in range(30):
+                time.sleep(1)
+                try:
+                    endpoint = cli('pjsip show endpoint twilio')
+                    transport = cli('pjsip show transport elevate-twilio-tls')
+                    if re.search(r'protocol\s*:\s*tls\b', transport): break
+                except ValueError: pass
+            if identity is not None:
+                after = json.loads(execute(['docker', 'inspect', CONTAINER]).stdout)[0]
+                if after['Id'] != identity['Id'] or after['Image'] != identity['Image'] or not after['State']['Running'] or configuration_digest(root) != expected:
+                    raise ValueError('carrier_restart_preservation_not_confirmed')
         if not re.search(r'media_encryption\s*:\s*sdes\b', endpoint) or not re.search(r'protocol\s*:\s*tls\b', transport):
             raise ValueError('live_tls_endpoint_reload_not_confirmed')
         if not re.search(r'verify_server\s*:\s*(?:true|yes)\b', transport, re.I):
@@ -202,10 +247,21 @@ def install_endpoint(root=ROOT, backup=Path('/var/lib/elevate-pbx/twilio-rollbac
         main.write_text(previous)
         if not existed:
             fragment.unlink(missing_ok=True)
-        cli('pjsip reload')
+        try:
+            if restarted:
+                execute(['docker', 'restart', CONTAINER])
+                for attempt in range(30):
+                    time.sleep(1)
+                    try:
+                        if 'Asterisk' in cli('core show version'): break
+                    except ValueError: pass
+                else: raise ValueError('carrier_endpoint_rollback_failed')
+            else: cli('pjsip reload')
+        except Exception:
+            raise ValueError('carrier_endpoint_rollback_failed')
         raise
     return {'result': 'PASS', 'liveTlsSrtpEndpoint': True, 'publicNumberRoutingChanged': False,
-            'userDialplanChanged': False, 'carrierCallsMade': False, 'liveCallAcceptance': 'NOT TESTED'}
+            'userDialplanChanged': False, 'carrierCallsMade': False, 'asteriskRestarted': restarted, 'liveCallAcceptance': 'NOT TESTED'}
 
 
 if __name__ == '__main__':

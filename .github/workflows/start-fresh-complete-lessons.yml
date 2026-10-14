@@ -37,6 +37,8 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
+      - name: Read course control failure categories
+        run: node scripts/gcp/audit-course-control-errors.mjs
       - env:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           COMPLETE_LESSON_IMAGE_SHA: '2132a5e10866950ef8b8fa2264f47c887929f971'

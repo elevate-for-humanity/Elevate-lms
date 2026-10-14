@@ -4,7 +4,7 @@ import {pictureTimeline,activePictureCue,pictureSceneTiming} from '../../lib/ult
 const cues=[{text:'Inspect the clean cape.',startSeconds:0,endSeconds:4},{text:'Check the neck strip.',startSeconds:4,endSeconds:8},{text:'Recap: prepare the station safely.',startSeconds:8,endSeconds:12}];
 const photos=[{imageUrl:'a',sha256:'a',narrationQuote:'Inspect the clean cape'},{imageUrl:'b',sha256:'b',narrationQuote:'Check the neck strip'},{imageUrl:'c',sha256:'c',narrationQuote:'Recap prepare the station safely'}];
 test('single frame quantization prevents the extra frame that exhausted the picture timeline',()=>{
- const timing=pictureSceneTiming(31/30,30);
+ const timing=pictureSceneTiming(31/30-Number.EPSILON,30);
  assert.equal(Math.ceil(timing.durationSeconds*30),32); // Reproduce the previous double-rounding defect.
  assert.equal(timing.durationFrames,31);
  for(let frame=0;frame<timing.durationFrames;frame++)assert.equal(activePictureCue([{startSeconds:0,endSeconds:timing.durationSeconds,imageUrl:'recap'}],frame/30).imageUrl,'recap');

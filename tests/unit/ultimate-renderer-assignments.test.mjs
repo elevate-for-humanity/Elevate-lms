@@ -6,6 +6,7 @@ import { stripTypeScriptTypes } from 'node:module';
 let source = await readFile(new URL('../../lib/ultimate-course-builder/adapters/platform-renderer.ts', import.meta.url), 'utf8');
 const mediaDirector = await readFile(new URL('../../lib/video/media-director.ts', import.meta.url), 'utf8');
 const minimum = Number(mediaDirector.match(/export const MIN_LESSON_VIDEO_SCENES = (\d+);/)[1]);
+source = source.replace("'../../video/render-checkpoint-contract.mjs'", JSON.stringify(new URL('../../lib/video/render-checkpoint-contract.mjs', import.meta.url).href));
 source = source.replace(/^import .*materializeInstructionalVisualAssets.*;$/m, '');
 source = source.replace(/^import .*storedLicensedMediaMetadata.*;$/m, '');
 source = source.replace(/^import .*MIN_LESSON_VIDEO_SCENES.*;$/m, `const MIN_LESSON_VIDEO_SCENES = ${minimum};`);

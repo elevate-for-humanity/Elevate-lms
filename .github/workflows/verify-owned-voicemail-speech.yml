@@ -19,7 +19,13 @@ jobs:
       - name: Dispatch protected acceptance after a successful Admin release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-owned-voicemail-speech.yml/dispatches" -f ref=main
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            # A successful push-triggered dispatcher does not mean Admin deployed.
+            # Dispatch acceptance only after the real production job passed.
+            gh api "repos/$GITHUB_REPOSITORY/actions/runs/${{ github.event.workflow_run.id }}/jobs" --paginate --jq '.jobs[] | select(.name == "Build and deploy Admin on Google" and .conclusion == "success") | .id' | grep -q '[0-9]' || exit 0
+          fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-owned-voicemail-speech.yml/dispatches" -f ref=main
   verify:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04

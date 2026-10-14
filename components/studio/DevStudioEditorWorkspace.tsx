@@ -45,7 +45,7 @@ export default function DevStudioEditorWorkspace({
 
   const refreshFiles = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/dev-studio/files', { cache: 'no-store' });
+      const res = await fetch('/api/admin/dev-studio/files?source=container', { cache: 'no-store' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setFiles(walkFiles(data.tree ?? []));
@@ -63,13 +63,24 @@ export default function DevStudioEditorWorkspace({
     onFileContextChange?.(selected || null, content);
   }, [selected, content, onFileContextChange]);
 
+  async function saveContainerFile(){
+    if(!selected)return;
+    setLoading(true);
+    try{
+      const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({operation:'file-write',path:selected,content}),signal:AbortSignal.timeout(30000)});
+      const result=await response.json();if(!response.ok||!result.ok)throw Error(result.error??'Container save failed');
+      setStatus('Saved in your Studio container. Commit separately to publish.');
+    }catch(error){setStatus(error instanceof Error?error.message:'Container save failed');}
+    finally{setLoading(false);}
+  }
+
   async function loadFile(path: string) {
     setSelected(path);
     setConfirmMainCommit(false);
     setLoading(true);
     setStatus('');
     try {
-      const res = await fetch(`/api/admin/dev-studio/files?path=${encodeURIComponent(path)}`, {
+      const res = await fetch(`/api/admin/dev-studio/files?source=container&path=${encodeURIComponent(path)}`, {
         cache: 'no-store',
       });
       const data = await res.json();
@@ -177,6 +188,7 @@ export default function DevStudioEditorWorkspace({
         </button>
       </div>
 
+      <button type="button" disabled={!selected||loading} onClick={()=>void saveContainerFile()} className="self-start rounded border border-slate-500 px-3 py-2 text-xs text-white disabled:opacity-40">Save in container</button>
       <div className="flex min-h-0 flex-1">
         <div className="w-56 shrink-0 overflow-y-auto border-r border-[#3c3c3c] bg-[#252526]">
           {sidebar === 'git' ? (

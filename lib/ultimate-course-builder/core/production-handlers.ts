@@ -301,6 +301,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
             courseTitle: ctx.profile.title,
             lessonPresentation: ctx.profile.lessonPresentation,
             presentationContract: ctx.profile.presentationContract,
+            renderRevision: [(ctx.artifacts as any).__renderRevision,(ctx.artifacts as any).__repairState?.at].filter(Boolean).join(':') || undefined,
             requiresPhysicalDemonstration: comp(ctx).type === 'practical_skill',
             artifacts: ctx.artifacts,
           }),

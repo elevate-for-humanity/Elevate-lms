@@ -1,3 +1,4 @@
+import {ULTIMATE_BUILD_STEPS} from '../core/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { UltimateJobQueue } from './job-queue';
 import {createCourseProgressWatch,reportCourseProgress} from './progress-watch.mjs';
@@ -114,6 +115,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         startIndex: Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0,
         maxLessons: 1,
         beforeCheckpoint: liveCheckpointRepairReader(db, job, workerId, generation, payload, currentCompetencyId),
+        repairRenderRevision: payload.checkpointRepair?.competencyId === currentCompetencyId && ULTIMATE_BUILD_STEPS.indexOf(payload.checkpointRepair.fromStep) <= ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render') ? payload.checkpointRepair.requestedAt : undefined,
         repairFromStep: payload.checkpointRepair?.competencyId === currentCompetencyId ? payload.checkpointRepair.fromStep : undefined,
       },
       () => new UltimateBuildRunner(handlers as any),

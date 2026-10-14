@@ -16,6 +16,7 @@ export type UltimateCoursePlan = {
   startIndex?: number;
   maxLessons?: number;
   repairFromStep?: UltimateBuildStep;
+  repairRenderRevision?: string;
   beforeCheckpoint?: UltimateRunContext['beforeCheckpoint'];
 };
 export async function runUltimateCourse(
@@ -63,6 +64,8 @@ export async function runUltimateCourse(
       restoredPassed.map((step) => [step, checkpoint.artifacts[step]]),
     );
     if(!plan.repairFromStep && (checkpoint.artifacts as any).__repairState)restoredArtifacts.__repairState=(checkpoint.artifacts as any).__repairState;
+    if((checkpoint.artifacts as any).__renderRevision)restoredArtifacts.__renderRevision=(checkpoint.artifacts as any).__renderRevision;
+    if(plan.repairRenderRevision)restoredArtifacts.__renderRevision=plan.repairRenderRevision;
     const context: UltimateRunContext = {
       buildId: plan.buildId + ':' + competency.id,
       courseId: plan.courseId,

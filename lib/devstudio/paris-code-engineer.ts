@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { aiChat } from '@/lib/ai/ai-service';
+import {requireAdminClient} from '@/lib/supabase/admin';
+import {executePaidInference,reservePaidInference,paidArtifactFingerprint} from '@/lib/ai/paid-inference-gateway';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { getGitHubHeaders } from '@/lib/devstudio/github-token';
 import { logger } from '@/lib/logger';
@@ -209,9 +211,16 @@ function parseAction(value: Record<string, unknown>): AgentAction {
   throw new Error(`Unsupported engineering action: ${type || 'missing'}`);
 }
 
-export async function stageParisCodeRepair(task: string, repairId?: string) {
+export async function stageParisCodeRepair(task: string, repairId?: string, actorId?: string) {
   await hydrateProcessEnv().catch(() => undefined);
 
+  if(!actorId)return NextResponse.json({error:'PARIS repair actor is required.'},{status:403});
+  const db=await requireAdminClient();
+  const provider=(process.env.AI_PROVIDER??'openai').trim().toLowerCase();
+  if(provider==='elevate'){
+    let endpoint:URL;try{endpoint=new URL(process.env.ELEVATE_LLM_URL??'');}catch{return NextResponse.json({error:'Owned model connection is unavailable.'},{status:503});}
+    if(endpoint.protocol!=='https:'||!endpoint.hostname.endsWith('.run.app'))return NextResponse.json({error:'Configure the owned Google model endpoint before using it.'},{status:503});
+  }
   const taskId = repairId ?? crypto.randomUUID();
   const { branch, baseSha } = await createTaskBranch(taskId);
   const observations: string[] = [
@@ -223,11 +232,11 @@ export async function stageParisCodeRepair(task: string, repairId?: string) {
   const commits: string[] = [];
   let writes = 0;
   let summary = '';
+  let usedProvider=provider;
 
   try {
     for (let turn = 0; turn < MAX_TURNS; turn += 1) {
-      const result = await aiChat({
-        providerPolicy: 'owned-only',
+      const inferenceOptions = {
         messages: [
           {
             role: 'system',
@@ -259,7 +268,12 @@ export async function stageParisCodeRepair(task: string, repairId?: string) {
         temperature: 0.1,
         maxTokens: 2400,
         jsonMode: true,
-      });
+      } as Parameters<typeof aiChat>[0];
+      const infer=()=>aiChat(inferenceOptions);
+      const paid=provider==='elevate'?null:await executePaidInference({db,authorize:()=>reservePaidInference(db,{scopeKey:'studio-chat',actorId,runId:taskId,artifactFingerprint:paidArtifactFingerprint({taskId,turn,task}),idempotencyKey:`paris-repair:${taskId}:${turn}`,provider,model:'canonical',operation:'paris-code-repair',projectedCostMicros:Math.max(0,Number(process.env.STUDIO_CHAT_PROJECTED_COST_MICROS??'100000'))}),dispatch:infer});
+      if(paid&&paid.decision!=='approved')throw Error('PARIS_INFERENCE_'+paid.decision.toUpperCase());
+      if(paid&&!paid.value)throw Error('PARIS_INFERENCE_RESULT_REQUIRED');
+      const result=paid?paid.value!:await infer();usedProvider=result.provider;
 
       let action: AgentAction;
       try { action = parseAction(jsonObject(result.content)); }
@@ -365,7 +379,7 @@ export async function stageParisCodeRepair(task: string, repairId?: string) {
     return NextResponse.json({
       ok: true,
       status: 'running',
-      provider: 'elevate',
+      provider: usedProvider,
       repository: REPOSITORY,
       branch: { name: branch, sha: branchSha },
       base_sha: baseSha,

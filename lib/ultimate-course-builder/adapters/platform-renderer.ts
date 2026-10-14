@@ -354,6 +354,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       storyboard,
       instructorId: instructorFor(courseTitle),
       ultimateStrict: true,
+      renderRevision: input.renderRevision,
       lessonPresentation: input.lessonPresentation,
       visualStyle,
       teachingPhotos,

@@ -117,6 +117,7 @@ async function measuredAudioDurationSeconds(audioPath: string): Promise<number |
 }
 
 export interface StoryboardRenderInput {
+  renderRevision?: string;
   teachingPhotos?: any[][];
   motionEvidence?: Array<{visibleActions:string[];contentSha256?:string}>;
   lessonPresentation?: 'approved-premium-v1';
@@ -1016,7 +1017,7 @@ export async function renderStoryboardVideo(
         const chunkPath = path.join(paths.outputDir, `segment-${String(start).padStart(8, '0')}.mp4`);
         // Persist each segment in B2 so a new Cloud Run execution can resume.
         // A storyboard fingerprint prevents reuse after a scene/narration change.
-        const fingerprint = storyboardRenderFingerprint({scenes, fps: composition.fps, totalFrames, lessonPresentation: input.lessonPresentation ?? 'legacy', visualStyle: input.visualStyle, layoutVersion: 4});
+        const fingerprint = storyboardRenderFingerprint({scenes, renderRevision: input.renderRevision, fps: composition.fps, totalFrames, lessonPresentation: input.lessonPresentation ?? 'legacy', visualStyle: input.visualStyle, layoutVersion: 4});
         const segmentKey = `course-render-checkpoints/${input.lessonId}/${fingerprint}/${start}-${end}.mp4`;
         const storageReady = isElevateMediaStorageConfigured();
         const storage = storageReady ? getElevateMediaStorageClient() : null;

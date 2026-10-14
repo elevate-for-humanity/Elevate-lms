@@ -68,7 +68,7 @@ async function fetchTree(dirPath: string, depth: number): Promise<TreeNode[]> {
     headers: await ghHeaders(),
     cache: 'no-store',
   });
-  if (!response.ok) return [];
+  if (!response.ok) throw new Error(`Repository file list failed (HTTP ${response.status}). Check the GitHub connection.`);
 
   const entries: GHEntry[] = await response.json();
   const nodes: TreeNode[] = [];
@@ -94,6 +94,11 @@ export async function GET(request: NextRequest) {
   const filePath = request.nextUrl.searchParams.get('path') ?? '';
   const tree = request.nextUrl.searchParams.get('tree') === '1';
   try {
+    if(request.nextUrl.searchParams.get('source')==='container'){
+      if(isBlocked(filePath)||/(?:^|\/)\.env(?:[./]|$)/.test(filePath))return safeError('Path not allowed',403);
+      const {readContainerRepository}=await import('@/lib/studio/container-repository');
+      return NextResponse.json(await readContainerRepository(filePath));
+    }
     if (!filePath) {
       const nodes = await fetchTree('', 2);
       return NextResponse.json({ tree: nodes, repo: getRepo(), branch: getBranch() });

@@ -30,7 +30,7 @@ export async function prepareParisRepair(id:string,runId:number){
   let candidate=row.candidate;
   if(!candidate){
    const {stageParisCodeRepair}=await import('@/lib/devstudio/paris-code-engineer');
-   const response=await stageParisCodeRepair(row.goal,id);candidate=await response.json();
+   const response=await stageParisCodeRepair(row.goal,id,row.actor_id);candidate=await response.json();
    if(!response.ok)throw Error('PARIS_PATCH_FAILED: '+String(candidate.error??'no patch').slice(0,300));
   }
   if(!/^[a-f0-9]{40}$/.test(candidate.branch?.sha??'')||!/^[a-f0-9]{40}$/.test(candidate.base_sha??''))throw Error('REPAIR_CANDIDATE_EVIDENCE_REQUIRED');

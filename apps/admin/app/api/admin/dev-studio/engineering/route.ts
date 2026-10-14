@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
   const {stageParisCodeRepair} = await import('@/lib/devstudio/paris-code-engineer');
   const {enqueueParisRepair} = await import('@/lib/ai/runtime/code-repair');
-  const staged = await stageParisCodeRepair(task);
+  const staged = await stageParisCodeRepair(task,undefined,auth.id);
   const payload = await staged.json();
   if (!staged.ok) return NextResponse.json(payload,{status:staged.status});
   const repair = await enqueueParisRepair({actorId:auth.id,goal:task,candidate:payload});

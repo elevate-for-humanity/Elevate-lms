@@ -69,6 +69,10 @@ export class UltimateBuildRunner {
           ctx.passedSteps?.delete(dependent); delete ctx.artifacts[dependent];
         }
         delete (ctx.artifacts as any).__repairState; ctx.repairDirective = undefined;
+        if(index<=ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render')){
+          (ctx.artifacts as any).__renderRevision=crypto.randomUUID();
+          await ctx.persistArtifact?.({step:'selective_repair',artifacts:{repair:{status:'requested',renderRevision:(ctx.artifacts as any).__renderRevision}}});
+        }
       }
       const step = ULTIMATE_BUILD_STEPS[index];
       const inputHash = stepInputHash(step, ctx.profile, ctx.artifacts);

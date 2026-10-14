@@ -99,6 +99,21 @@ def validate():
                     break
                 time.sleep(1)
             else:
+                state = json.loads(run(['docker', 'inspect', NAME]).stdout)[0]['State']
+                logs = run(['docker', 'logs', '--tail=100', NAME], False)
+                combined = logs.stdout + logs.stderr
+                print(json.dumps({'isolatedDiagnostics': {
+                    'running': bool(state['Running']), 'exitCode': int(state['ExitCode']),
+                    'endpointObserved': bool(re.search(r'Endpoint:\s+twilio(?:[ /]|$)', endpoint)),
+                    'transportObserved': bool(re.search(r'Transport:\s+elevate-twilio-tls\b', transport)),
+                    'sdesObserved': bool(re.search(r'media_encryption\s*:\s*sdes\b', endpoint, re.I)),
+                    'tlsObserved': bool(re.search(r'protocol\s*:\s*tls\b', transport, re.I)),
+                    'logSignals': {name: bool(re.search(pattern, combined, re.I)) for name, pattern in {
+                        'permissionDenied': 'permission denied', 'missingFile': 'no such file',
+                        'configLoadError': 'unable to load|could not create|error parsing|could not find',
+                        'tlsError': 'SSL error|TLS error|unable to load.*certificate',
+                        'cliUnavailable': 'unable to connect to remote asterisk',
+                    }.items()}}}))
                 raise ValueError('isolated_tls_srtp_endpoint_not_loaded')
             if not re.search(r'verify_server\s*:\s*(?:true|yes)\b', transport):
                 raise ValueError('isolated_server_certificate_verification_not_enabled')

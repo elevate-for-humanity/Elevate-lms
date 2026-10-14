@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { publishApprovedCourses } from './approved-course-publication.mjs';
+import { publishApprovedCourses, startApprovedSuccessors } from './approved-course-publication.mjs';
 const build = () => ({ id: 'build', status: 'built', profile: { title: 'Course', mediaAcquisitionOwnerId: 'owner',
   releaseAuthorization: { mode: 'publish-after-validation', actorId: 'owner', approvedAt: '2026-10-14T04:41:00Z' } } });
 function harness(builds, overrides = {}) {
@@ -25,4 +25,15 @@ test('failed publication readback leaves completion unacknowledged', async () =>
 test('invalid authorization time is rejected', async () => {
   const b = build(); b.profile.releaseAuthorization.approvedAt = 'invalid';
   const h = harness([b]); assert.deepEqual(await publishApprovedCourses(h.input), []); assert.deepEqual(h.events, []);
+});
+test('next course stays stopped until the preceding course is released', async () => {
+  const b = build(); b.status = 'blocked'; b.profile.releaseAuthorization.startAfterCourseId = 'previous';
+  b.job = { status: 'failed', last_error: 'WAITING_FOR_CORRECTED_COMPLETE_LESSON_WORKER' };
+  let queued = 0;
+  const input = { builds: [b], dependencyReleased: async () => false, enqueue: async () => { queued++; } };
+  assert.deepEqual(await startApprovedSuccessors(input), []); assert.equal(queued, 0);
+  input.dependencyReleased = async () => true;
+  assert.deepEqual(await startApprovedSuccessors(input), [{ title: 'Course', status: 'queued' }]); assert.equal(queued, 1);
+  b.job.last_error = 'MISSING_LICENSED_ASSET';
+  assert.deepEqual(await startApprovedSuccessors(input), []); assert.equal(queued, 1);
 });

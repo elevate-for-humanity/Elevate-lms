@@ -18,3 +18,16 @@ export async function publishApprovedCourses({ builds, publish, verify, acknowle
   }
   return results;
 }
+
+export async function startApprovedSuccessors({ builds, dependencyReleased, enqueue }) {
+  const results = [];
+  for (const build of builds) {
+    const dependency = build.profile?.releaseAuthorization?.startAfterCourseId;
+    if (build.status !== 'blocked' || !hasReleaseAuthorization(build) || !dependency ||
+        build.job?.status !== 'failed' || build.job?.last_error !== 'WAITING_FOR_CORRECTED_COMPLETE_LESSON_WORKER') continue;
+    if (!(await dependencyReleased(dependency))) continue;
+    await enqueue(build);
+    results.push({ title: build.profile.title, status: 'queued' });
+  }
+  return results;
+}

@@ -126,18 +126,18 @@ describe('upload-lesson-media routing', () => {
 });
 
 describe('completed MP4 disk upload',()=>{
- it('uploads an MP4 above the old request ceiling in resumable chunks without changing its bytes',async()=>{
+ it.each(['supabase','auto'])('uploads an MP4 above the old request ceiling in resumable chunks without changing its bytes (%s)',async(backend)=>{
   const directory=await mkdtemp(path.join(tmpdir(),'lesson-upload-test-'));
   const file=path.join(directory,'lesson.mp4');
   const buffer=Buffer.alloc(46*1024*1024,7);
   const previous={...process.env};
-  process.env.COURSE_VIDEO_STORAGE_BACKEND='supabase';
+  process.env.COURSE_VIDEO_STORAGE_BACKEND=backend;
   process.env.NEXT_PUBLIC_SUPABASE_URL='https://test-project.supabase.co';
   process.env.SUPABASE_SERVICE_ROLE_KEY='test-only';
   let offset=0;const chunks:Uint8Array[]=[];
   vi.stubGlobal('fetch',vi.fn(async(url:string,options:RequestInit)=>{
    if(options.method==='POST'){
-    expect(url).toContain('test-project.storage.supabase.co/storage/v1/upload/resumable');
+    expect(String(url)).toContain('test-project.storage.supabase.co/storage/v1/upload/resumable');
     expect((options.headers as Record<string,string>)['Upload-Length']).toBe(String(buffer.length));
     return new Response(null,{status:201,headers:{location:'/storage/v1/upload/resumable/test', 'upload-offset':'0'}});
    }

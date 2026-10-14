@@ -233,18 +233,11 @@ export async function uploadCourseVideosObject(
     try {
       return await uploadCourseVideosToElevateMedia(buffer, storagePath, contentType);
     } catch (err) {
-      // A large lesson must not silently fall back to Supabase: that path
-      // already returned HTTP 413 and burns expensive render retries.
-      if (contentType.startsWith('video/') && buffer.length > SUPABASE_SAFE_VIDEO_BYTES) {
-        throw new Error('COURSE_MEDIA_OBJECT_UPLOAD_FAILED: ' +
-          (err instanceof Error ? err.message : String(err)), {cause: err});
-      }
+      // The ordinary request ceiling does not apply to the TUS route below.
+      // Keep the completed bytes and let Storage enforce its actual object
+      // limit instead of rejecting a valid film before a chunked upload.
       logger.warn('[upload-lesson-media] Elevate Media Storage upload failed, falling back to Supabase', { err });
     }
-  }
-  if (!options?.forceSupabase && contentType.startsWith('video/') && buffer.length > SUPABASE_SAFE_VIDEO_BYTES) {
-    throw new Error('COURSE_MEDIA_LARGE_VIDEO_REQUIRES_PUBLIC_OBJECT_STORAGE: ' +
-      'configure Elevate Media Storage public delivery instead of sending oversized MP4 to Supabase');
   }
   if (contentType.startsWith('video/') && buffer.length > SUPABASE_TUS_CHUNK_BYTES) {
     return uploadCourseVideosToSupabaseResumable(buffer, storagePath, contentType);

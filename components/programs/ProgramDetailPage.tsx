@@ -118,7 +118,8 @@ export default function ProgramDetailPage({
   const registeredProgram = isApprenticeship ? getRegisteredProgramStandard(p.slug) : null;
   const instructionHours = registeredProgram?.completion.requiredRtiHours ?? totalHours;
   const octoberCouponCode = 'OCT300';
-  const ProgramTitle = heroOverride ? 'h1' : 'h2';
+  // The shared media hero renders no title; the program content owns its main heading.
+  const ProgramTitle = 'h1';
   const weeklyHoursLabel =
     p.hoursPerWeekMin === p.hoursPerWeekMax
       ? `${p.hoursPerWeekMin} hrs/week`

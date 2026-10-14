@@ -68,7 +68,16 @@ def relay_diagnostics(content):
     logs = result.stdout + result.stderr
     errors = [line.lower() for line in logs.splitlines() if re.search(r'error|unknown|invalid|permission|cannot|failed',line,re.I)]
     keys = [line.split('=')[0] for line in content.splitlines() if line and not line.startswith('#')]
+    private_value = next(line.split('=',1)[1] for line in content.splitlines() if line.startswith('static-auth-secret='))
+    safe_logs = []
+    for line in logs.splitlines()[-35:]:
+        if re.search(r'secret|password|credential|authorization',line,re.I):
+            continue
+        line = line.replace(private_value,'[redacted]')
+        line = re.sub(r'\b[a-fA-F0-9]{32,}\b','[redacted]',line)
+        safe_logs.append(line[:400])
     print(json.dumps({'relayDiagnostics':{'running':current['State']['Running'],'exitCode':current['State']['ExitCode'],
+        'oomKilled':current['State'].get('OOMKilled',False),'startupLogs':safe_logs,
         'permissionDenied':bool(re.search('permission denied',logs,re.I)),
         'optionNamesInErrors':[key for key in keys if any(key in line for line in errors)]}}))
 

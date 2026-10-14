@@ -56,6 +56,7 @@ rewrite_contact=yes
 
 def run(args, required=True):
     result = subprocess.run(args, capture_output=True, text=True, timeout=30)
+    result.stdout = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', result.stdout)
     if required and result.returncode:
         raise ValueError('isolated_trunk_command_failed')
     return result
@@ -123,6 +124,10 @@ def validate():
                     'transportObserved': bool(re.search(r'Transport:\s+elevate-twilio-tls\b', transport)),
                     'sdesObserved': bool(re.search(r'media_encryption\s*:\s*sdes\b', endpoint, re.I)),
                     'tlsObserved': bool(re.search(r'protocol\s*:\s*tls\b', transport, re.I)),
+                    # These two objects were created by this script, contain no
+                    # authentication credentials, and use only public carrier data.
+                    'newEndpointReadback': endpoint[:1500],
+                    'newTransportReadback': transport[:1500],
                     'pjsipModuleRunning': bool(re.search(r'res_pjsip\.so\s+.*\bRunning\b', run(['docker', 'exec', NAME, 'asterisk', '-rx', 'module show like res_pjsip.so'], False).stdout)),
                     'newConfigErrors': [line[-600:] for line in combined.splitlines()
                                         if 'elevate-twilio.conf' in line and re.search(r'error|warning|unable|could not', line, re.I)],

@@ -16,10 +16,14 @@ describe('homepage hero slideshow rendering', () => {
     expect(homepageHero).toContain('priority');
     expect(homepageHero).toContain('loop');
     expect(homepageHero).toContain('hero-home-first-frame.webp');
-    expect(homepageHero).toContain('Apprenticeship tuition is self-pay only.');
+    expect(fs.readFileSync(path.resolve('components/site/ServerFooter.tsx'), 'utf8')).toContain('Apprenticeship programs are self-pay only');
     expect(homepageHero).toContain('href="/programs"');
-    expect(homepageHero).toContain('href="/apprenticeships"');
-    expect(homepageHero).toContain('href="/partners/host-shops"');
+    expect(homepageHero).toContain('href="/check-eligibility"');
+    expect(homepageHero).toContain('href="/employers"');
+    expect(homepageHero).toContain('href="/store/apps/website-builder"');
+    expect(homepageHero).toContain('min-h-[360px]');
+    expect(homepageHero).toContain('sm:min-h-[440px]');
+    expect(homepageHero).toContain('lg:min-h-[480px]');
     expect(homepageHero).not.toContain('data-narration-src="/audio/narration/home-hero.mp3"');
 
   });

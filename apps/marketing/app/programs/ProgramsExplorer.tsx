@@ -29,8 +29,8 @@ function ProgramCard({
   const funded = program.funding_tier === 'workforce-funded';
   const image = getProgramCardImage(program.slug);
   return (
-    <article className="group min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-      <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+    <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+      <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
         <ProgramCardImage
           src={image}
           alt={`${program.title} training program`}
@@ -58,7 +58,7 @@ function ProgramCard({
           ) : null}
         </div>
       </div>
-      <div className="p-5 sm:p-6">
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
         <p className="mb-2 text-xs font-extrabold uppercase tracking-wider text-slate-500">
           {program.category}
         </p>
@@ -84,7 +84,7 @@ function ProgramCard({
             </span>
           ) : null}
         </div>
-        <div className="flex flex-col gap-2 pt-5 sm:flex-row">
+        <div className="mt-auto flex flex-col gap-2 pt-5 sm:flex-row">
           <Link
             href={program.detailHref ?? `/programs/${program.slug}`}
             className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-base font-bold text-white hover:bg-slate-800"
@@ -190,7 +190,7 @@ export function ProgramsExplorer({
         </p>
       </div>
       {filtered.length ? (
-        <div className="mt-6 grid items-start gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-6 grid auto-rows-fr items-stretch gap-6 md:grid-cols-2 xl:grid-cols-3">
           {filtered.slice(0, visibleCount).map((program) => (
             <ProgramCard key={program.slug} program={program} variant={variant} />
           ))}

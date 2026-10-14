@@ -19,7 +19,7 @@ export function FeatureCard({
   title,
   description,
   href,
-  ratio = 'feature',
+  ratio = 'program',
 }: FeatureCardProps) {
   const mediaClass = ratio === 'program' ? card.image4x3 : card.image16x9;
 
@@ -30,7 +30,7 @@ export function FeatureCard({
           src={image}
           alt={alt}
           fill
-          className="object-cover object-center transition-transform duration-500 motion-safe:group-hover:scale-[1.025] motion-reduce:transition-none"
+          className="object-cover object-center contrast-105 saturate-110 transition-transform duration-500 motion-safe:group-hover:scale-[1.025] motion-reduce:transition-none"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           loading="lazy"
         />

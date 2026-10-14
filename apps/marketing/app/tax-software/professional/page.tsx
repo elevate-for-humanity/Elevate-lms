@@ -27,14 +27,14 @@ export default function ProfessionalPage() {
               Explore enrollment →
             </Link>
           </div>
-          <div className="order-first relative aspect-[16/9] xl:order-last overflow-hidden rounded-3xl">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
             <Image
-              src="/images/tax/supersonic-tax-training-2026.webp"
-              alt="Illustrative tax business instructor mentoring adult learners"
+              src="/images/pexels/bookkeeping.webp"
+              alt="Professionals reviewing financial documents together"
               fill
               priority
               sizes="(min-width: 1280px) 450px, 100vw"
-              className="object-cover"
+              className="object-cover contrast-[1.1] saturate-[1.18]"
             />
           </div>
         </section>

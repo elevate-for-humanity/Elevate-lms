@@ -33,7 +33,7 @@ export default function ProgramCardImage({ src, alt, category }: ProgramCardImag
       src={currentSrc}
       alt={alt}
       fill
-      className="object-cover transition duration-500 group-hover:scale-105"
+      className="object-cover contrast-105 saturate-110 transition duration-500 group-hover:scale-105"
       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
       onError={() => {
         if (currentSrc !== categoryFallback) {

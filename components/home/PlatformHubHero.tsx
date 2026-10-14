@@ -24,10 +24,10 @@ export function PlatformHubHero() {
         />
         <div className="absolute inset-0 bg-slate-950/65" />
       </div>
-      <div className="relative mx-auto flex min-h-[clamp(560px,78svh,820px)] max-w-7xl items-center px-4 py-16 sm:px-6 lg:px-8">
-        <div className="max-w-4xl">
+      <div className="relative mx-auto flex min-h-[360px] max-w-6xl items-center px-5 py-16 sm:min-h-[440px] sm:px-8 lg:min-h-[480px]">
+        <div className="max-w-3xl">
           <p className="text-sm font-black uppercase tracking-[0.2em] text-red-300">Career training • Workforce development • Registered apprenticeship • Business growth</p>
-          <h1 id="home-hero-heading" className="mt-5 text-4xl font-black leading-[1.03] tracking-tight sm:text-6xl lg:text-7xl">
+          <h1 id="home-hero-heading" className="mt-5 text-4xl font-black leading-[1.1] tracking-tight sm:text-6xl">
             Build a career. Build a workforce. Build a business.
           </h1>
           <p className="mt-6 max-w-3xl text-lg font-semibold leading-8 text-slate-100 sm:text-xl">

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     description: 'Prepare your taxes. Hire a professional. Start your tax business.',
     images: [
       {
-        url: '/images/tax/supersonic-tax-hero-2026.webp',
+        url: '/images/business/team-3.webp',
         alt: 'Professionals reviewing documents together',
       },
     ],
@@ -63,14 +63,14 @@ export default function TaxSoftwarePage() {
                 Choose my option →
               </Link>
             </div>
-            <div className="order-first relative aspect-[16/9] xl:order-last overflow-hidden rounded-3xl bg-white">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-white">
               <Image
-                src="/images/tax/supersonic-tax-hero-2026.webp"
-                alt="Illustrative tax professional reviewing documents with a client"
+                src="/images/business/team-3.webp"
+                alt="Business professionals reviewing documents together at a laptop"
                 fill
                 priority
                 sizes="(min-width: 1280px) 450px, 100vw"
-                className="object-cover"
+                className="object-cover contrast-[1.1] saturate-[1.18]"
               />
             </div>
           </div>

@@ -1,4 +1,26 @@
 /* Public marketing only: operational dashboards retain their own density. */
+/* Keep photographic cards aligned within each public grid. Logo walls,
+   standalone heroes, dashboard cards, copy, and links retain their own layout. */
+#main-content.site-main main .grid:has(> :is(article, a) img.object-cover) {
+  grid-auto-rows: 1fr;
+  align-items: stretch;
+}
+
+#main-content.site-main main .grid > :is(article, a):has(img.object-cover) {
+  height: 100%;
+}
+
+#main-content.site-main main .grid > :is(article, a) img.object-cover {
+  filter: contrast(1.05) saturate(1.1);
+}
+
+#main-content.site-main main .grid > article > div:has(> img.object-cover[data-nimg='fill']),
+#main-content.site-main main .grid > a > div:has(> img.object-cover[data-nimg='fill']),
+#main-content.site-main main .grid > article > a > div:has(> img.object-cover[data-nimg='fill']) {
+  aspect-ratio: 4 / 3;
+  flex-shrink: 0;
+}
+
 @media (max-width: 767px) {
   #main-content.site-main main h1:not(.sr-only) {
     font-size: clamp(1.75rem, 7.5vw, 2.125rem);

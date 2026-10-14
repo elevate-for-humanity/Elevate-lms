@@ -52,7 +52,8 @@
     {
       "source": "app/tax-software/page.tsx",
       "target": "apps/marketing/app/tax-software/page.tsx",
-      "sha256": "f3bd148ab41437d72f1d10003e04d6c3f93d6375dfd12fee449186bf85138a7f"
+      "sha256": "0980624e245b9e686d1a12a0e3e8f9552625c157e8b110de801f55e5a88b096d",
+      "sourceSha256": "f3bd148ab41437d72f1d10003e04d6c3f93d6375dfd12fee449186bf85138a7f"
     },
     {
       "source": "app/tax-software/pricing/page.tsx",
@@ -62,7 +63,8 @@
     {
       "source": "app/tax-software/professional/page.tsx",
       "target": "apps/marketing/app/tax-software/professional/page.tsx",
-      "sha256": "882dca6f8f981f5d77a9b0d5636181526abeff05eb0adeb009991d0fb158c9d5"
+      "sha256": "5a832eab9fab26d302be68b4fe6d375d141ff9dc80774457c2254054696ad23b",
+      "sourceSha256": "882dca6f8f981f5d77a9b0d5636181526abeff05eb0adeb009991d0fb158c9d5"
     },
     {
       "source": "app/tax-software/self-file/layout.tsx",

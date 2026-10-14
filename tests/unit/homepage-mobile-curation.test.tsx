@@ -39,10 +39,14 @@ describe('homepage curation', () => {
   it('keeps visual career sections and the program-specific funding notice', () => {
     for (const file of ['components/home/HomeCareerPathways.tsx', 'components/home/HomeFinalCTA.tsx']) {
       expect(source(file)).toMatch(/<Image\b/);
-      expect(source(file)).toContain('Illustrative');
+    }
+    expect(source('components/home/HomeFinalCTA.tsx')).toContain('/images/hero/hero-hands-on-training.webp');
+    const pathways = source('components/home/HomeCareerPathways.tsx');
+    for (const image of ['hvac-training-vibrant-2026.webp', 'cdl-training-vibrant-2026.webp', 'bookkeeping-training-vibrant-2026.webp', 'business-training-vibrant-2026.webp']) {
+      expect(pathways).toContain(image);
     }
     const page = source('apps/marketing/app/page.tsx');
-    expect(page).not.toContain('<HomePlatformOverview');
+    expect(page.match(/<HomePlatformOverview/g)).toHaveLength(1);
     expect(page).toContain('WORKONE_INDY_BOOKING_URL');
     expect(page).toContain('eligibility and program requirements apply');
   });

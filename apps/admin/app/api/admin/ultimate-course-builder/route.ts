@@ -53,10 +53,11 @@ export async function GET(req: NextRequest) {
           .eq('id', buildId).single();
     const { data, error } = result;
     if (!error && data && req.nextUrl.searchParams.get('view') === 'checkpoints') {
-      data.ultimate_lesson_builds = (data.ultimate_lesson_builds ?? []).map((lesson: any) => {
+      const lessons = (data.ultimate_lesson_builds ?? []).map((lesson: any) => {
         const { artifacts, ...saved } = lesson;
         return { ...saved, preview: lessonPreview(artifacts) };
       });
+      return NextResponse.json({build: {...data, ultimate_lesson_builds: lessons}});
     }
     return error ? databaseFailure(error) : NextResponse.json({ build: data });
   }

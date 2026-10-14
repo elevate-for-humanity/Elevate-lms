@@ -30,3 +30,10 @@ test('missing corrected artifact waits without canceling current work',async()=>
  const f=fixture();f.run=()=>{throw Object.assign(Error('not found'),{code:'not_found'});};
  assert.equal((await recoverStaleCourseRenderer(f)).state,'awaiting_corrected_worker_image');
 });
+
+test('a later website commit cannot change the verified worker image identity',async()=>{
+ const f=fixture();f.env={...env,RENDER_RECOVERY_WORKER_SHA:'c'.repeat(40)};
+ await recoverStaleCourseRenderer(f);
+ const lookup=f.calls.find(args=>args[0]==='artifacts');
+ assert.ok(lookup[4].endsWith(':'+f.env.RENDER_RECOVERY_WORKER_SHA));
+});

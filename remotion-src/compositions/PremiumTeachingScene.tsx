@@ -17,6 +17,7 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
  const cues=scene.pictureCues;
  const cue=cues?.length?activePictureCue(cues,seconds):null;
  const cueIndex=cue?cues!.indexOf(cue):-1,previous=cueIndex>0?cues![cueIndex-1]:null;
+ const pictureFade=(start:number)=>interpolate(seconds,[start,start+.1],[0,1],{extrapolateLeft:'clamp',extrapolateRight:'clamp'});
  const whole={width:'100%',height:'100%',objectFit:'contain' as const};
  const demonstration=Boolean(scene.clipUrl)&&Boolean(scene.motionCue)&&seconds>=scene.motionCue!.startSeconds&&seconds<scene.motionCue!.endSeconds&&!recap;
  // Keep the whole teaching photograph visible while the camera gently tracks
@@ -39,7 +40,7 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
    <div style={{position:'absolute',top:demonstration&&cue?465:0,left:0,right:0,height:demonstration&&cue?205:670}}>
     {cue?<>
      {previous&&photo(previous.imageUrl)}
-     {photo(cue.imageUrl,previous&&props.visualStyle?.transition!=='cut'?fade(cue.startSeconds):1)}
+     {photo(cue.imageUrl,previous&&props.visualStyle?.transition!=='cut'?pictureFade(cue.startSeconds):1)}
     </>:!demonstration&&scene.imageUrl?photo(scene.imageUrl):null}
    </div>
   </div>
@@ -48,7 +49,7 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
    <div style={{fontSize:recap?56:(step?.value?.length??0)>100?52:64,lineHeight:1.25}}>{recap?scene.recapText:step?.value}</div>
    <div style={{fontSize:22,color:'#cdb795'}}>{demonstration?'Inspected motion demonstration excerpt.':'Illustration — practice with your instructor.'}</div>
   </div>
-  <div style={{position:'absolute',bottom:0,left:0,right:0,height:180,background:'#080808',borderTop:'2px solid #cdb795',display:'flex',alignItems:'center',justifyContent:'center',padding:'14px 70px',boxSizing:'border-box',fontSize:56,lineHeight:1.25,textAlign:'center'}}>{caption}</div>
+  <div style={{position:'absolute',bottom:0,left:0,right:0,height:180,background:'#080808',borderTop:'2px solid #cdb795',display:'flex',alignItems:'center',justifyContent:'center',padding:'14px 70px',boxSizing:'border-box',color:'#ffffff',fontSize:60,fontWeight:700,lineHeight:1.25,textAlign:'center',textShadow:'0 2px 4px #000'}}>{caption}</div>
   {scene.audioSrc&&<Audio src={scene.audioSrc} volume={1}/>}
  </AbsoluteFill>;
 }

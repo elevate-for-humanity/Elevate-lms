@@ -1,7 +1,7 @@
 import { alignRecordedNarration } from '@/lib/video/forced-alignment.mjs';
 import { measureNarrationCaptions } from '@/lib/video/media-quality-gate';
 import type { UltimateNarrationPort } from '../core/ports';
-import { configuredNarrationProvider, generateEdgeTTS } from '@/lib/video/edge-tts';
+import { configuredNarrationProvider, EDGE_TTS_VOICES, generateEdgeTTS } from '@/lib/video/edge-tts';
 import { uploadLessonMediaBuffer } from '@/lib/video/upload-lesson-media';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -25,15 +25,18 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
     const files=[];
     for(const [partIndex,recording] of recordings.entries()){
      if(!recording.text?.trim())throw Error('BLANK_NARRATION_PART_PROHIBITED');
-     const audio=await generateEdgeTTS(recording.text);
+     const audio=await generateEdgeTTS(recording.text,{voice:EDGE_TTS_VOICES.warm,rate:'0%'});
      reportCourseProgress('narration:recording:'+index,partIndex+1,recordings.length);
      const source=join(directory,index+'-'+partIndex+'.mp3'),pcm=join(directory,index+'-'+partIndex+'.wav');
      await writeFile(source,audio);
-     await execute('ffmpeg',['-v','error','-y','-i',source,'-ac','1','-ar','16000','-c:a','pcm_s16le',pcm]);
+     await execute('ffmpeg',['-v','error','-y','-i',source,'-ac','1','-ar','24000','-c:a','pcm_s16le',pcm]);
      const {stdout}=await execute('ffprobe',['-v','error','-show_entries','format=duration','-of','default=noprint_wrappers=1:nokey=1',pcm]);
      const durationSeconds=Number(stdout.trim());
      if(!(durationSeconds>0))throw Error('ULTIMATE_NARRATION_DURATION_REQUIRED');
-     const bytes=await readFile(pcm);
+     // Keep full-band 24 kHz delivery separate from the recognizer input.
+     const recognition=join(directory,index+'-'+partIndex+'-recognition.wav');
+     await execute('ffmpeg',['-v','error','-y','-i',pcm,'-ar','16000','-c:a','pcm_s16le',recognition]);
+     const bytes=await readFile(recognition);
      // Numeral scripts retain the existing measured recognizer until their intended
      // pronunciation is explicitly supplied. Never guess guard lengths.
      let measured;
@@ -65,7 +68,7 @@ export class UltimatePlatformNarration implements UltimateNarrationPort {
     segments.push({segmentId:segment.id,text:parts.map(p=>p.text).join('\n\n'),audioUrl,durationSeconds:cursor,captions,wordAlignment,parts});
     reportCourseProgress('narration:stored-segments',index+1,approved.length);
    }
-   return {provider:configuredNarrationProvider(),segments,transcript:segments.map(s=>s.text).join('\n\n'),durationSeconds:segments.reduce((sum,s)=>sum+s.durationSeconds,0)};
+   return {provider:configuredNarrationProvider(),voice:EDGE_TTS_VOICES.warm,rate:'0%',deliverySampleRate:24000,segments,transcript:segments.map(s=>s.text).join('\n\n'),durationSeconds:segments.reduce((sum,s)=>sum+s.durationSeconds,0)};
   }finally{await rm(directory,{recursive:true,force:true});}
  }
 }

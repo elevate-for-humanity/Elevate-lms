@@ -7,6 +7,11 @@ on:
     workflows: ['Deploy Google Course Builder on source changes']
     types: [completed]
   workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Successful main Course Builder release to use for renderer recovery
+        required: false
+        type: string
 permissions:
   contents: read
   actions: write
@@ -17,7 +22,14 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - env: {GH_TOKEN: '${{ github.token }}'}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/sync-course-worker-regions.yml/dispatches" -f ref=main
+        run: |
+          set -euo pipefail
+          source_sha="${{ github.event.workflow_run.head_sha }}"
+          if test -z "$source_sha"; then
+            source_sha="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-course-worker.yml/runs?status=success&branch=main&per_page=1" --jq '.workflow_runs[0].head_sha')"
+          fi
+          [[ "$source_sha" =~ ^[a-f0-9]{40}$ ]]
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/sync-course-worker-regions.yml/dispatches" -f ref=main -f "inputs[source_sha]=$source_sha"
   sync:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -46,6 +58,7 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           RENDER_RECOVERY_JOB_ID: a9b85487-5465-4bc0-bed0-9fc3411c4e50
           RENDER_RECOVERY_GENERATION: '53'
+          RENDER_RECOVERY_WORKER_SHA: ${{ inputs.source_sha || github.sha }}
         run: node scripts/gcp/recover-stale-course-renderer.mjs
       - name: Wake the existing PARIS course coordinator
         env: {GH_TOKEN: '${{ github.token }}'}

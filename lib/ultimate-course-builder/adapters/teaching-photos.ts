@@ -61,7 +61,8 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         continue;
       }
       const prompt = [
-        'Photorealistic instructional illustration, not proof of a performed practical procedure.',
+        'Generate a camera-realistic professional training photograph with natural skin texture, lifelike materials and photographic lighting. No cartoons, anime, drawings, vector art, clip art or 3D-rendered characters.',
+        'This synthetic photograph is an educational illustration, not evidence of a performed practical procedure.',
         'Show complete hands, tools and relevant subject, uncropped, no printed text, no logos, no invented measurements.',
         'Use a realistic professional training setting. No unsafe actions or invented numbered guards.',
         String(input.courseTitle), String(scene.visualRequirement), String(step.narrationQuote), step.view,

@@ -6,6 +6,8 @@ import {pathToFileURL} from 'node:url';
 export async function recoverStaleCourseRenderer({run=google,request=fetch,env=process.env}={}) {
   if(env.GITHUB_REPOSITORY!=='elevate-for-humanity/Elevate-lms'||!env.SUPABASE_SERVICE_ROLE_KEY||!/^[a-f0-9]{40}$/.test(env.GITHUB_SHA??''))
     throw Error('RENDER_RECOVERY_AUTHORITY_REQUIRED');
+  const workerSha=env.RENDER_RECOVERY_WORKER_SHA || env.GITHUB_SHA;
+  if(!/^[a-f0-9]{40}$/.test(workerSha))throw Error('VERIFIED_WORKER_SOURCE_REQUIRED');
   const target=env.RENDER_RECOVERY_JOB_ID,generation=Number(env.RENDER_RECOVERY_GENERATION);
   if(!/^[a-f0-9-]{36}$/.test(target??'')||!Number.isSafeInteger(generation)||generation<1)
     throw Error('EXPLICIT_RENDER_RECOVERY_TARGET_REQUIRED');
@@ -19,7 +21,7 @@ export async function recoverStaleCourseRenderer({run=google,request=fetch,env=p
   const before=await readQueue();if(!before)return {state:'target_no_longer_exclusively_active'};
   const repository='us-central1-docker.pkg.dev/'+PROJECT+'/elevate/ultimate-worker';
   let artifact;
-  try{artifact=JSON.parse(run(['artifacts','docker','images','describe',repository+':'+env.GITHUB_SHA,'--project='+PROJECT,'--format=json']));}
+  try{artifact=JSON.parse(run(['artifacts','docker','images','describe',repository+':'+workerSha,'--project='+PROJECT,'--format=json']));}
   catch(error){if(error.code==='not_found')return {state:'awaiting_corrected_worker_image'};throw error;}
   const digest=artifact.image_summary?.digest;
   if(!/^sha256:[a-f0-9]{64}$/.test(digest??''))throw Error('RENDER_RECOVERY_IMAGE_DIGEST_REQUIRED');

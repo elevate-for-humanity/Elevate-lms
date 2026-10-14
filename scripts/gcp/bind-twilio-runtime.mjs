@@ -51,7 +51,7 @@ export async function verifiedTwilioBindings(config, fetchImpl = fetch) {
         });
         if (stored.ok) api[name] = await stored.json();
       }
-      if (/^SK[a-f0-9]{32}$/i.test(api.TWILIO_API_KEY_SID || '') && /^[a-f0-9]{32}$/i.test(api.TWILIO_API_KEY_SECRET || '')) {
+      if (/^SK[a-f0-9]{32}$/i.test(api.TWILIO_API_KEY_SID || '') && /^[A-Za-z0-9]{32}$/.test(api.TWILIO_API_KEY_SECRET || '')) {
         const alternate = await fetchImpl(`https://api.twilio.com/2010-04-01/Accounts/${ACCOUNT}/IncomingPhoneNumbers/${PHONE_SID}.json`, {
           headers:{Authorization:'Basic '+Buffer.from(`${api.TWILIO_API_KEY_SID}:${api.TWILIO_API_KEY_SECRET}`).toString('base64')},
           redirect:'error',signal:AbortSignal.timeout(15000),

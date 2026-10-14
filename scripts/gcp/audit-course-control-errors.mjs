@@ -1,5 +1,5 @@
 import { google, PROJECT } from './runtime-config.mjs';
-const filter = 'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin" AND (jsonPayload.message:"Build could not be started on Google" OR jsonPayload.message:"Course Builder worker dispatch failed" OR textPayload:"Build could not be started on Google" OR textPayload:"Course Builder worker dispatch failed")';
+const filter = 'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration" AND (jsonPayload.message:"Build could not be started on Google" OR jsonPayload.message:"Course Builder worker dispatch failed" OR textPayload:"Build could not be started on Google" OR textPayload:"Course Builder worker dispatch failed")';
 try {
   const rows = JSON.parse(google(['logging','read',filter,'--project='+PROJECT,'--freshness=6h','--limit=20','--format=json']));
   const reasons = {};

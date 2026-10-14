@@ -2,7 +2,7 @@ name: Start fresh complete lesson courses
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/start-fresh-complete-lessons.yml']
+    paths: ['.github/workflows/start-fresh-complete-lessons.yml', 'scripts/gcp/audit-course-control-errors.mjs']
   workflow_run:
     workflows: ['Deploy Google Course Builder on source changes']
     types: [completed]

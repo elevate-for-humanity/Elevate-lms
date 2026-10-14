@@ -90,24 +90,52 @@ def main():
     if not re.fullmatch(r'coturn/coturn@sha256:[a-f0-9]{64}', image):
         raise ValueError('unapproved_relay_image')
     content = configuration(payload['secret'], payload['privateIp'])
+    # The upstream binary has a low-port file capability. Our relay only uses
+    # high ports, so remove that metadata by a byte-verified copy in a derived
+    # image. Keep cap-drop=ALL, no-new-privileges and the non-root runtime user.
+    PHASE = 'least_privilege_image'
+    run(['docker','pull',image])
+    dockerfile = (f'FROM {image}\nUSER 0\n'
+                  'RUN sha256sum /usr/bin/turnserver > /tmp/turnserver.sha256 '
+                  '&& cp /usr/bin/turnserver /usr/bin/turnserver.nocap '
+                  '&& mv /usr/bin/turnserver.nocap /usr/bin/turnserver '
+                  '&& sha256sum -c /tmp/turnserver.sha256 && rm /tmp/turnserver.sha256\n'
+                  'USER 65534:65534\n')
+    built = subprocess.run(['docker','build','--network=none','--label','elevate.upstream='+image,
+                            '-t','elevate-pbx-turn:4.18.0-nocaps','-'],input=dockerfile,capture_output=True,text=True,timeout=180)
+    if built.returncode:
+        raise ValueError('least_privilege_image_build_failed')
+    server_image = json.loads(run(['docker','image','inspect','elevate-pbx-turn:4.18.0-nocaps']).stdout)[0]['Id']
     pbx = json.loads(run(['docker','inspect','pbx_asterisk_1']).stdout)[0]
     if not pbx['State']['Running']:
         raise ValueError('existing_pbx_not_running')
     existing = run(['docker','inspect',NAME], False)
     if existing.returncode == 0:
         current = json.loads(existing.stdout)[0]
-        if CONFIG.is_symlink() or not CONFIG.is_file() or CONFIG.read_text() != content or current['Config']['Image'] != image or not current['State']['Running']:
+        if CONFIG.is_symlink() or not CONFIG.is_file() or CONFIG.read_text() != content or current['Config']['Image'] not in [image,server_image]:
+            relay_diagnostics(content)
+            raise ValueError('existing_relay_requires_review_no_rotation_performed')
+        if current['Config']['Image'] == image:
+            logs = run(['docker','logs','--tail=80',NAME],False)
+            if 'exec /usr/bin/turnserver: operation not permitted' not in logs.stdout+logs.stderr or current.get('RestartCount',0)<1:
+                raise ValueError('unrecognized_existing_relay_requires_review')
+            backup = Path('/var/lib/elevate-pbx/turn-startup-failure.log')
+            backup.write_text(logs.stdout+logs.stderr)
+            os.chmod(backup,0o600)
+            run(['docker','rm','-f',NAME])
+            existing = None
+        elif not current['State']['Running']:
             relay_diagnostics(content)
             raise ValueError('existing_relay_requires_review_no_rotation_performed')
     else:
+        existing = None
+    if existing is None:
         if CONFIG.exists() and (CONFIG.is_symlink() or CONFIG.read_text() != content):
             raise ValueError('existing_relay_configuration_requires_review')
         PHASE = 'port_check'
         for kind in [socket.SOCK_STREAM, socket.SOCK_DGRAM]:
             with socket.socket(socket.AF_INET,kind) as probe:
                 probe.bind((payload['privateIp'],3478))
-        PHASE = 'official_image_pull'
-        run(['docker','pull',image])
         CONFIG.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
         CONFIG.write_text(content)
         os.chown(CONFIG,0,65534)
@@ -119,7 +147,7 @@ def main():
              '--tmpfs','/tmp:rw,noexec,nosuid,size=16m,uid=65534,gid=65534',
              '--tmpfs','/var/lib/coturn:rw,noexec,nosuid,size=8m,uid=65534,gid=65534',
              '--mount',f'type=bind,source={CONFIG},target=/etc/coturn/turnserver.conf,readonly',
-             '--entrypoint','turnserver',image,'-c','/etc/coturn/turnserver.conf'])
+             '--entrypoint','turnserver',server_image,'-c','/etc/coturn/turnserver.conf'])
     PHASE = 'verify_listener'
     for attempt in range(20):
         try:

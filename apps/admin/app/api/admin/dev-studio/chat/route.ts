@@ -48,7 +48,7 @@ import path from 'path';
 
 type ToolCallRecord = { tool: string; args: Record<string, unknown>; result: string };
 type ChatMessage = { role: 'user' | 'assistant' | 'system'; content: string };
-type ChatProvider = 'auto' | 'xai' | 'groq' | 'openai' | 'gemini' | 'anthropic';
+type ChatProvider = 'auto' | 'elevate' | 'xai' | 'groq' | 'openai' | 'gemini' | 'anthropic';
 type StudioAgent = 'ADMIN_AI';
 
 const PUBLIC_ORIGIN = 'https://www.elevateforhumanity.org';
@@ -167,7 +167,7 @@ const PROVIDER_MODELS: Record<Exclude<ChatProvider, 'auto'>, readonly [string, .
 };
 
 function normalizeProvider(value: unknown): ChatProvider {
-  return ['auto', 'xai', 'groq', 'openai', 'gemini', 'anthropic'].includes(String(value))
+  return ['auto', 'elevate', 'xai', 'groq', 'openai', 'gemini', 'anthropic'].includes(String(value))
     ? (String(value) as ChatProvider)
     : 'auto';
 }
@@ -1417,9 +1417,9 @@ async function _POST(req: NextRequest) {
     }
 
     const providerPreference = normalizeProvider(rawProvider);
-    // While the self-hosted GPU is archived, Admin auto mode uses the lowest-cost
-    // connected OpenAI model. This is scoped to authenticated Dev Studio chat only.
-    const effectiveProvider: ChatProvider = providerPreference === 'auto' ? 'openai' : providerPreference;
+    // PARIS auto mode uses Elevate-owned inference only. Never silently
+    // select an external metered provider or activate a GPU here.
+    const effectiveProvider: ChatProvider = providerPreference === 'auto' ? 'elevate' : providerPreference;
     const lastUserMessage =
       messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
     const masterDb = await requireAdminClient();
@@ -1581,6 +1581,26 @@ async function _POST(req: NextRequest) {
           Connection: 'keep-alive',
         },
       });
+    }
+
+    if (effectiveProvider === 'elevate') {
+      try {
+        const result = await aiChat({
+          providerPolicy: 'owned-only',
+          messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
+          temperature: 0.4,
+          maxTokens: 2048,
+        });
+        assistantMessage = result.content || null;
+        provider = 'elevate';
+        model = 'elevate-local';
+      } catch (error) {
+        logger.warn('[devstudio/chat] Owned PARIS inference unavailable', normalizeError(error));
+        return NextResponse.json({
+          error: 'PARIS private AI is not ready. The owned model must be deployed and verified before activation; no outside AI credits were used.',
+          provider: 'elevate',
+        }, { status: 503 });
+      }
     }
 
     const providerOrder = [effectiveProvider];
@@ -1772,7 +1792,7 @@ async function _POST(req: NextRequest) {
       }
     }
 
-    if (!assistantMessage && effectiveProvider !== 'openai') {
+    if (!assistantMessage && effectiveProvider !== 'openai' && effectiveProvider !== 'elevate') {
       try {
         const db = await requireAdminClient();
         const requestNonce = req.headers.get('x-request-id')?.trim() || crypto.randomUUID();

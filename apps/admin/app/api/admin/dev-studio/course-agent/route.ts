@@ -1,5 +1,5 @@
 import {DevStudioUltimateCourseControl} from '@/lib/devstudio/ultimate-course-control';
-import { dispatchGoogleDeployment } from '@/lib/gcp/dispatch-production-workflow';
+import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
@@ -184,13 +184,15 @@ export async function POST(req: NextRequest) {
   const queued=await new DevStudioUltimateCourseControl(db).queueCourse({
     courseId,programSlug,actorId:auth.id,goal,
   });
-  let dispatch;
-  try {
-    dispatch = await dispatchGoogleDeployment('course-builder');
-  } catch (error) {
+  // Use the same approved worker-launch path as the Admin Start/Resume button.
+  // Do not create a duplicate build just because GitHub Actions dispatch failed.
+  const dispatch = await requestCourseWorker();
+  if (!dispatch.dispatched) {
     return NextResponse.json({
-      error: 'Course and build saved, but worker dispatch failed; resume using the saved build.',
+      error: dispatch.message,
+      dispatchError: dispatch.dispatchError,
       courseId, buildId: queued.build.id, jobId: queued.job.id,
+      queued: true, executionVerified: false,
     }, { status: 503 });
   }
   if(studioRunId)await recordMasterStudioArtifact(db,{runId:studioRunId,

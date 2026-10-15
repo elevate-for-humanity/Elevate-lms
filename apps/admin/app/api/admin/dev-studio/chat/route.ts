@@ -48,7 +48,7 @@ import path from 'path';
 
 type ToolCallRecord = { tool: string; args: Record<string, unknown>; result: string };
 type ChatMessage = { role: 'user' | 'assistant' | 'system'; content: string };
-type ChatProvider = 'auto' | 'elevate' | 'xai' | 'groq' | 'openai' | 'gemini' | 'anthropic';
+type ChatProvider = 'auto' | 'xai' | 'groq' | 'openai' | 'gemini' | 'anthropic';
 type StudioAgent = 'ADMIN_AI';
 
 const PUBLIC_ORIGIN = 'https://www.elevateforhumanity.org';
@@ -167,7 +167,7 @@ const PROVIDER_MODELS: Record<Exclude<ChatProvider, 'auto'>, readonly [string, .
 };
 
 function normalizeProvider(value: unknown): ChatProvider {
-  return ['auto', 'elevate', 'xai', 'groq', 'openai', 'gemini', 'anthropic'].includes(String(value))
+  return ['auto', 'xai', 'groq', 'openai', 'gemini', 'anthropic'].includes(String(value))
     ? (String(value) as ChatProvider)
     : 'auto';
 }
@@ -1419,7 +1419,7 @@ async function _POST(req: NextRequest) {
     const providerPreference = normalizeProvider(rawProvider);
     // PARIS auto mode uses Elevate-owned inference only. Never silently
     // select an external metered provider or activate a GPU here.
-    const effectiveProvider: ChatProvider = providerPreference === 'auto' ? 'elevate' : providerPreference;
+    const effectiveProvider: ChatProvider | 'elevate' = providerPreference === 'auto' ? 'elevate' : providerPreference;
     const lastUserMessage =
       messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
     const masterDb = await requireAdminClient();

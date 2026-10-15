@@ -18,9 +18,11 @@ test('empty queue does not start a paid execution',async()=>{
   assert.equal((await dispatchQueuedCourseJob(s.options)).status,'empty');
   assert.equal(s.calls.length,1);
 });
-test('a leased execution keeps the coordinator watching an temporarily empty queue',async()=>{
+test('a leased execution does not keep an empty-queue coordinator running',async()=>{
   const s=setup([{status:{}}],[]);
-  assert.equal((await dispatchQueuedCourseJob(s.options)).status,'busy');
+  const result=await dispatchQueuedCourseJob(s.options);
+  assert.equal(result.status,'empty');
+  assert.equal(result.activeExecutions,1);
   assert.equal(s.calls.some(c=>c.includes('execute')),false);
 });
 test('eligible queued work launches exactly one finite asynchronous task',async()=>{

@@ -28,7 +28,10 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const queued = candidates.filter(job => job.max_attempts === undefined || job.attempts < job.max_attempts);
   // A leased task can enqueue its next lesson only after finishing the current
   // one. Keep the coordinator alive across that handoff without launching more tasks.
-  if (queued.length === 0) return active.length ? {status:'busy',activeExecutions:active.length} : {status:'empty'};
+  // An already-running Cloud Run execution owns its task independently.
+  // With no claimable queue entries there is nothing to dispatch; keeping
+  // the GitHub coordinator awake wastes runtime and cannot advance a lesson.
+  if (queued.length === 0) return {status:'empty',activeExecutions:active.length};
   const job = JSON.parse(run('gcloud', ['run','jobs','describe','elevate-course-builder',...scope,'--format=json'], {encoding:'utf8',stdio:['ignore','pipe','pipe']}));
   const task = job.spec?.template?.spec?.template?.spec;
   if (!task?.containers?.length) throw new Error('COURSE_JOB_CONFIGURATION_UNAVAILABLE');

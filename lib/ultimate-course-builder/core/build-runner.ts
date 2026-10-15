@@ -139,16 +139,9 @@ export class UltimateBuildRunner {
         const isRepairTarget = ctx.repairDirective?.target === step;
         const previous = isRepairTarget ? ctx.repairDirective.previous : undefined;
         const producerRepair = isRepairTarget && step !== 'finished_media_qa' && Boolean(previous);
-        const unchangedProducer = producerRepair &&
-          contractHash(artifactPayload(previous)) === contractHash(artifactPayload(artifacts));
-        if (unchangedProducer) {
-          failures.push({
-            step,
-            severity: 'error',
-            code: 'REPAIR_PRODUCER_UNCHANGED',
-            message: `Repair for ${step} returned the previously accepted producer output.`,
-          });
-        }
+        // Do not reject a producer solely because its output matches a saved,
+        // owner-approved artifact. The ordinary step contract and downstream
+        // independent QA remain authoritative; retries are still bounded.
         // A failed repair candidate must not replace a known-good artifact or
         // create a new accepted artifact version. Keep the previous checkpoint
         // available for recovery and record the failed state separately.

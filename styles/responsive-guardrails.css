@@ -59,20 +59,9 @@ body {
     width: 100%;
   }
 
-  :where(main) h1 {
-    font-size: clamp(1.75rem, 8vw, 2.25rem);
-    line-height: 1.12;
-  }
-
-  :where(main) h2 {
-    font-size: clamp(1.4rem, 6.5vw, 1.875rem);
-    line-height: 1.2;
-  }
-
-  :where(main) h3 {
-    font-size: clamp(1.15rem, 5vw, 1.5rem);
-    line-height: 1.25;
-  }
+  /* Heading sizes belong to each application and its design tokens.
+   * Global h1/h2/h3 sizes turn compact PWA cards and dashboard labels
+   * into oversized headings on phones. Marketing has its own scoped rhythm. */
 
   :where(main) table {
     display: block;
@@ -141,10 +130,10 @@ body {
     max-width: 100%;
   }
 
-  main :where([class*='max-w-']) {
-    width: 100%;
-  }
-
+  /* Do not force every max-width component to width: 100%.
+   * That expands intentionally compact cards, controls, image frames and
+   * dialogs in installed PWAs. Components already own responsive widths. */
+ 
   main :where([class*='grid-cols-2'], [class*='grid-cols-3'], [class*='grid-cols-4'], [class*='grid-cols-5'], [class*='grid-cols-6']) {
     grid-template-columns: minmax(0, 1fr);
   }

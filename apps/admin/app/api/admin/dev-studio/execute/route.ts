@@ -58,6 +58,10 @@ function heuristicPlan(command: string): PlannedCommand | null {
   const lower = command.toLowerCase();
   const id = extractUuid(command);
 
+  if (/\b(?:open|launch|start)\b.*\b(?:cloud |studio )?browser\b/.test(lower)) {
+    const requestedUrl = command.match(/https:\/\/[^\s)]+/i)?.[0];
+    return { tool: 'browser.launch', input: { url: requestedUrl || 'https://elements.envato.com' } };
+  }
   if (/health|system status|platform status/.test(lower)) return { tool: 'system.health', input: {} };
   if (/\b(list|show|review|find|search)\b.*\bapplications?\b/.test(lower)) return { tool: 'applications.search', input: {} };
   if (/\bapprove\b.*\bapplication\b/.test(lower)) return { tool: 'applications.approve', input: id ? { id } : {} };

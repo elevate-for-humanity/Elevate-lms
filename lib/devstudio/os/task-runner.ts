@@ -681,6 +681,11 @@ export async function runTaskExecution(
       /PAID_INFERENCE_AUTHORIZATION_REQUIRED|API[_\s-]?(?:KEY|TOKEN).*(?:MISSING|NOT CONFIGURED|REQUIRED)|NO CREDENTIALS|CAPABILITY.*NOT CONNECTED/i.test(
         message,
       );
+    // Keep the authorization gate intact, but present an actionable dashboard
+    // message instead of leaking an internal provider error code.
+    const displayMessage = /PAID_INFERENCE_AUTHORIZATION_REQUIRED/.test(message)
+      ? 'AI task requires an approved paid-inference request. Review the AI authorization and budget settings before retrying; no provider call was authorized.'
+      : message;
     const terminalStatus = capabilityBlocked ? 'blocked' : 'failed';
     if (executeStep) {
       await db
@@ -688,8 +693,8 @@ export async function runTaskExecution(
         .update({
           status: terminalStatus,
           completed_at: capabilityBlocked ? null : new Date().toISOString(),
-          error_message: message,
-          output: message,
+          error_message: displayMessage,
+          output: displayMessage,
         })
         .eq('id', executeStep.id);
     }
@@ -697,7 +702,7 @@ export async function runTaskExecution(
       .from('ai_tasks')
       .update({
         status: terminalStatus,
-        error_message: message,
+        error_message: displayMessage,
         completed_at: capabilityBlocked ? null : new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
@@ -707,8 +712,8 @@ export async function runTaskExecution(
       db,
       taskId,
       capabilityBlocked
-        ? `Task blocked because its required capability is unavailable: ${message}`
-        : `Task execution error: ${message}`,
+        ? `Task blocked because its required capability is unavailable: ${displayMessage}`
+        : `Task execution error: ${displayMessage}`,
       capabilityBlocked ? 'warn' : 'error',
       executeStep?.id,
       runtime.tenantId ?? task.tenant_id,

@@ -94,7 +94,7 @@ export function HomeFeaturedHostShop() {
                     alt={shop.imageAlt}
                     fill
                     sizes="(min-width: 1024px) 280px, calc((100vw - 44px) / 2)"
-                    loading="eager"
+                    loading="lazy"
                     className={
                       shop.imageAlt.includes('collage') ? 'object-contain bg-white' : 'object-cover'
                     }

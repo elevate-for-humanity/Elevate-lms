@@ -136,14 +136,31 @@ export class UltimateBuildRunner {
           checkedAt: new Date().toISOString(),
         };
         ctx.assertActive?.();
-        ctx.artifacts[step] = artifacts;
-        await ctx.persistArtifact?.({ step, artifacts });
+        const isRepairTarget = ctx.repairDirective?.target === step;
+        const previous = isRepairTarget ? ctx.repairDirective.previous : undefined;
+        const producerRepair = isRepairTarget && step !== 'finished_media_qa' && Boolean(previous);
+        const unchangedProducer = producerRepair &&
+          contractHash(artifactPayload(previous)) === contractHash(artifactPayload(artifacts));
+        if (unchangedProducer) {
+          failures.push({
+            step,
+            severity: 'error',
+            code: 'REPAIR_PRODUCER_UNCHANGED',
+            message: `Repair for ${step} returned the previously accepted producer output.`,
+          });
+        }
+        // A failed repair candidate must not replace a known-good artifact or
+        // create a new accepted artifact version. Keep the previous checkpoint
+        // available for recovery and record the failed state separately.
+        if (producerRepair && failures.length) {
+          artifacts = previous;
+          ctx.artifacts[step] = previous;
+        } else {
+          ctx.artifacts[step] = artifacts;
+          await ctx.persistArtifact?.({ step, artifacts });
+        }
         if (!failures.length) {
-          if(ctx.repairDirective?.target===step){
-            const previous=ctx.repairDirective.previous;
-            if(step!=='finished_media_qa'&&previous&&contractHash(artifactPayload(previous))===contractHash(artifactPayload(artifacts))){
-              throw new Error('REPAIR_PRODUCER_UNCHANGED:'+step);
-            }
+          if(isRepairTarget){
             (ctx.artifacts as any).__repairState={...(ctx.artifacts as any).__repairState,status:'producer-validated',producerHash:contractHash(artifacts),validatedAt:new Date().toISOString()};
             ctx.repairDirective=undefined;
             await ctx.persistArtifact?.({step:'selective_repair',artifacts:{repair:{...(ctx.artifacts as any).__repairState,unresolved:0}}});

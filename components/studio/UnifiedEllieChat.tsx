@@ -764,7 +764,7 @@ export default function UnifiedEllieChat({
           nextMessages.find((message) => message.role === 'user')?.content.slice(0, 100) ||
           'Studio conversation',
         messages: nextMessages,
-        config: { agent: 'LIZZY', surface: 'unified-studio' },
+        config: { agent: 'PARIS', surface: 'unified-studio' },
       }),
     });
     const payload = await response.json().catch(() => ({}));

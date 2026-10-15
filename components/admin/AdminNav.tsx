@@ -67,6 +67,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
   useEffect(() => {
     setOpenDropdown(null);
     setNotifOpen(false);
+    setNavExpanded(false);
   }, [pathname]);
 
   function handleSearch(e: React.FormEvent) {
@@ -297,7 +298,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
 
         <nav
           aria-label="Full admin navigation"
-          className="flex w-full gap-2 overflow-x-auto overscroll-x-contain border-t border-slate-200 bg-slate-50 px-3 py-2 [scrollbar-width:thin]"
+          className="flex w-full gap-2 overflow-x-auto overscroll-x-contain border-t border-slate-200 bg-slate-50 px-3 py-2 [scrollbar-width:thin] sm:hidden"
         >
           {[
             ...new Map(
@@ -320,7 +321,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
         {/* Horizontal Mobile Nav - Scrollable */}
         <div
           id="admin-all-tools-menu"
-          className={`overflow-hidden border-t border-slate-200 transition-all duration-300 2xl:hidden ${navExpanded ? 'max-h-[80vh]' : 'max-h-0'}`}
+          className={`overflow-hidden border-t border-slate-200 2xl:hidden ${navExpanded ? 'max-h-[min(65dvh,540px)]' : 'max-h-0'}`}
         >
           <div className="max-h-[calc(100dvh-3.5rem)] overflow-y-auto overscroll-contain px-2 py-3 sm:px-4">
             <div className="grid gap-2 sm:grid-cols-2">
@@ -328,7 +329,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
                 <details
                   key={section.label}
                   className="rounded-lg border border-slate-200 bg-white"
-                  open={isSectionActive(pathname, section)}
+                  defaultOpen={false}
                 >
                   <summary
                     className={`flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-bold ${isSectionActive(pathname, section) ? 'bg-brand-red-50 text-brand-red-700' : 'text-slate-800'}`}

@@ -706,7 +706,11 @@ export function UltimateBuildPanel({
         });
         const payload = await readJson(response);
         if (!response.ok || (payload?.queued !== true && payload?.alreadyRunning !== true)) throw new Error(payload?.error || 'The worker request could not be saved');
-        setNotice(payload.message || 'Request saved. Waiting for worker assignment.');
+        if (payload.dispatched === false) {
+          setError(payload.message || 'Course saved, but the Google worker has not started.');
+        } else {
+          setNotice(payload.message || 'Worker launch accepted. Waiting for a verified heartbeat.');
+        }
       } else {
         const result = await startUltimateCourse({ course, programSlug, googleModel, googleLocation });
         setNotice(result.message || 'Build saved. Waiting for worker assignment.');

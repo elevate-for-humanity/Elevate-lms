@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { executeAICommand } from '@/lib/ai/runtime/command-executor';
+import { safeParisFailureSummary } from '@/lib/ai/runtime/supervision';
 import type { AIAgentId } from '@/lib/ai/tools/registry';
 import type { AITask } from '@/lib/ai/execute-ai-task';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
   const body = asRecord(await req.json().catch(() => ({})));
   const command = typeof body.command === 'string' ? body.command.trim() : '';
   const agentType = typeof body.agentType === 'string' ? body.agentType : 'admissions-agent';
-  const context = asRecord(body.context);
+  const requestedContext = asRecord(body.context);
 
   if (!command) {
     return NextResponse.json({ success: false, message: 'command is required' }, { status: 400 });
@@ -76,9 +77,9 @@ export async function POST(req: NextRequest) {
     { ...payload, correlationId },
     { status, headers: { 'x-correlation-id': correlationId, 'cache-control': 'no-store' } },
   );
-  const tenantId = typeof context.tenantId === 'string'
-    ? context.tenantId
-    : await resolveTenantIdForUser(auth.id).catch(() => null);
+  // Audit scope comes from the authenticated profile/membership, never request JSON.
+  const tenantId = await resolveTenantIdForUser(auth.id).catch(() => null);
+  const context = { ...requestedContext, tenantId };
   const db = await requireAdminClient();
 
   const { data: durableTask } = await db
@@ -213,19 +214,21 @@ export async function POST(req: NextRequest) {
       taskId: durableTask?.id ?? null,
     });
   } catch (error) {
+    const safeFailure = safeParisFailureSummary(error);
     if (durableTask?.id) {
       await db.from('ai_tasks').update({
         status: 'failed',
-        error_message: error instanceof Error ? error.message : String(error),
+        error_message: safeFailure.message,
         completed_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }).eq('id', durableTask.id);
     }
 
-    logger.error('[paris/execute] canonical execution failed', error instanceof Error ? error : new Error(String(error)), {
+    logger.error('[paris/execute] canonical execution failed', new Error(safeFailure.message), {
       actorId: auth.id,
       agentType,
       correlationId,
+      failureCategory: safeFailure.category,
     });
     return respond({
       success: false,

@@ -60,7 +60,7 @@ test('pre-deploy cleanup releases stale latest candidate tags without changing t
   assert.ok(traffic.some(item => item.tag === 'release-rollback'));
   assert.ok(traffic.some(item => item.tag === 'c-dddddddddddd'));
   assert.equal(calls.some(args => args.some(value => value === 'delete')), false);
-  assert.ok(calls[0][2] === 'services' && calls[0][3] === 'describe');
+  assert.deepEqual(calls[0].slice(0, 3), ['run', 'services', 'describe']);
   assert.ok(calls[1].includes('--remove-tags=c-bbbbbbbbbbbb'));
 });
 

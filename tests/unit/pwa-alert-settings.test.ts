@@ -23,23 +23,20 @@ it('announces recorded activity and inbox events, not arbitrary notification tex
   expect(alertKind({ title: 'random user content' })).toBeNull();
   expect(Object.values(ALERT_PHRASES).join(' ')).not.toMatch(/student name|email subject/);
 });
-it('uses device speech for a generic PARIS announcement and respects mute', async () => {
-  const speak = vi.fn();
-  vi.stubGlobal(
-    'SpeechSynthesisUtterance',
-    class {
-      constructor(public text: string) {}
-      volume = 1;
-      rate = 1;
-    },
-  );
-  vi.stubGlobal('speechSynthesis', { speak });
-  await playAlert({ ...DEFAULT_PWA_ALERTS, sound: 'voice', volume: 0.7 }, 'email');
-  expect(speak.mock.calls[0][0]).toMatchObject({
-    text: 'Elevate, you have a new email.',
-    volume: 0.7,
+it('plays natural voice for generic alerts without bypassing mute', async () => {
+  const played = vi.fn().mockResolvedValue(undefined);
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(new Blob(['audio']))));
+  vi.stubGlobal('Audio', class {
+    preload = '';
+    playbackRate = 1;
+    volume = 1;
+    addEventListener = vi.fn();
+    play = played;
   });
+  vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:alert');
+  await playAlert({ ...DEFAULT_PWA_ALERTS, sound: 'voice', volume: 0.7 }, 'email');
+  expect(played).toHaveBeenCalledTimes(1);
   await playAlert({ ...DEFAULT_PWA_ALERTS, sound: 'silent' });
   await playAlert({ ...DEFAULT_PWA_ALERTS, sound: 'voice', volume: 0 });
-  expect(speak).toHaveBeenCalledTimes(1);
+  expect(played).toHaveBeenCalledTimes(1);
 });

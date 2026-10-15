@@ -376,7 +376,7 @@ export async function POST(req: NextRequest) {
         buildId: build.id, jobId: job?.id ?? null, courseId: course.id,
         error: 'Course saved but the Google worker did not start. ' +
           'Verify the Admin Google service identity and GitHub dispatch permissions.',
-        dispatchError: dispatch.dispatchError,
+        dispatchError: 'dispatchError' in dispatch ? dispatch.dispatchError : 'COURSE_WORKER_LAUNCH_UNAVAILABLE',
       }, { status: 503 });
     }
     return NextResponse.json(

@@ -280,6 +280,7 @@ export default function UnifiedCourseBuilder({
             <UltimateBuildPanel
               course={selectedCourse}
               programSlug={selectedProgram?.slug?.trim() || selectedCourse.slug}
+              compact={embedded}
             />
           ) : (
             <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-200">
@@ -601,9 +602,11 @@ function CreateCoursePanel({
 export function UltimateBuildPanel({
   course,
   programSlug,
+  compact = false,
 }: {
   course: CourseRow;
   programSlug: string;
+  compact?: boolean;
 }) {
   const [builds, setBuilds] = useState<UltimateBuildRow[]>([]);
   const [acquisitions, setAcquisitions] = useState<Array<{ id: string; goal: string | null }>>([]);
@@ -707,9 +710,11 @@ export function UltimateBuildPanel({
         const payload = await readJson(response);
         if (!response.ok || (payload?.queued !== true && payload?.alreadyRunning !== true)) throw new Error(payload?.error || 'The worker request could not be saved');
         setNotice(payload.message || 'Request saved. Waiting for worker assignment.');
+        if (payload.dispatched === false) setError('Course saved but Google worker did not start. GitHub dispatch is unavailable; the scheduler may retry. Check Dev Studio GitHub access or the worker deployment.');
       } else {
         const result = await startUltimateCourse({ course, programSlug, googleModel, googleLocation });
         setNotice(result.message || 'Build saved. Waiting for worker assignment.');
+        if (result.dispatched === false) setError('Build queued but the Google worker launch was not accepted. Confirm the GitHub dispatch connection in Dev Studio.');
       }
       await refresh();
     } catch (reason) {
@@ -775,11 +780,11 @@ export function UltimateBuildPanel({
         </button>
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-2 2xl:hidden">
+      <div className={`mt-4 items-center justify-between gap-2 2xl:hidden ${compact ? 'hidden' : 'flex'}`}>
         <span className="text-xs font-semibold text-slate-300">Workspace layout</span>
         <button type="button" aria-pressed={mobileSplitView} onClick={() => setMobileSplitView(value => !value)} className="rounded-lg border border-cyan-600 px-3 py-2 text-xs font-bold text-cyan-200">{mobileSplitView ? "Use stacked view" : "Show builder + preview together"}</button>
       </div>
-      <div data-course-workspace-layout className={`mt-5 grid min-w-0 items-start gap-2 sm:gap-5 2xl:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)] ${mobileSplitView ? "grid-cols-2" : "grid-cols-1"}`}>
+      <div data-course-workspace-layout className={`mt-5 grid min-w-0 items-start gap-2 sm:gap-5 ${compact ? '' : '2xl:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)]'} ${mobileSplitView && !compact ? "grid-cols-2" : "grid-cols-1"}`}>
         <div className="min-w-0">
       {!statusLoading && latest ? (
         <div className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4">

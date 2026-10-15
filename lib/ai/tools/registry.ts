@@ -784,6 +784,23 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     audit: true,
   },
   {
+    name: 'browser.launch',
+    description: 'Start an authenticated owner-scoped Studio cloud browser session. Use the returned session identity for browser.execute.',
+    method: 'POST',
+    path: '/api/admin/dev-studio/browser/session',
+    classification: 'write',
+    risk: 'medium',
+    scope: 'platform',
+    allowedAgents: DEVSTUDIO_AGENTS,
+    allowedRoles: PRIVILEGED_ADMIN_ROLES,
+    requiredInput: ['url'],
+    approvalRequired: false,
+    idempotent: false,
+    timeoutMs: 40_000,
+    retryAttempts: 1,
+    audit: true,
+  },
+  {
     name: 'browser.execute',
     description:
       'Execute an interactive command in an isolated Studio browser with durable task checkpoints.',

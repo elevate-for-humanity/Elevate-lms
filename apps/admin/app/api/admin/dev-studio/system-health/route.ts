@@ -14,6 +14,8 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getDecryptedPlatformSecret } from '@/lib/secrets';
 import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
+import { isGoogleDeploymentConfigured } from '@/lib/gcp/dispatch-production-workflow';
+import { ElevateProvider } from '@/lib/ai/providers/elevate';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -49,32 +51,35 @@ export async function GET(request: NextRequest) {
       keys.map(async (key) => [key, await getDecryptedPlatformSecret(key).catch(() => undefined)]),
     ),
   ) as Record<(typeof keys)[number], string | undefined>;
-  const [ai, cloudflareProbe] = await Promise.all([
+  const [ai, cloudflareProbe, googleReachable] = await Promise.all([
     resolveAIRuntimeState(),
     probeCloudflareWorkersAI(),
+    isGoogleDeploymentConfigured(),
   ]);
-  const { xai: hasXAI, groq: hasGroq, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic } = ai.providers;
+  const {
+    xai: hasXAI,
+    groq: hasGroq,
+    gemini: hasGemini,
+    openai: hasOpenAI,
+    anthropic: hasAnthropic,
+  } = ai.providers;
   const hasCloudflare = cloudflareProbe.reachable;
   const hasOpenHands = Boolean(selectedSecrets.OPENHANDS_API_KEY || process.env.OPENHANDS_API_KEY);
   const dbGitHub = Boolean(selectedSecrets.GITHUB_TOKEN);
-  const elevateLlmUrl =
-    selectedSecrets.ELEVATE_LLM_URL || process.env.ELEVATE_LLM_URL || '';
+  const elevateLlmUrl = selectedSecrets.ELEVATE_LLM_URL || process.env.ELEVATE_LLM_URL || '';
   const elevateLlmSecret =
     selectedSecrets.ELEVATE_LLM_SECRET || process.env.ELEVATE_LLM_SECRET || '';
-  const hasElevateOwnedAI = Boolean(elevateLlmUrl && elevateLlmSecret);
+  const hasElevateOwnedAI =
+    Boolean(elevateLlmUrl && elevateLlmSecret) && new ElevateProvider().isAvailable();
   const studioBrowserUrl = (
     selectedSecrets.STUDIO_BROWSER_URL ||
     process.env.STUDIO_BROWSER_URL ||
     ''
   ).replace(/\/$/, '');
   const studioBrowserPublicUrl =
-    selectedSecrets.STUDIO_BROWSER_PUBLIC_URL ||
-    process.env.STUDIO_BROWSER_PUBLIC_URL ||
-    '';
+    selectedSecrets.STUDIO_BROWSER_PUBLIC_URL || process.env.STUDIO_BROWSER_PUBLIC_URL || '';
   const studioBrowserSecret =
-    selectedSecrets.STUDIO_BROWSER_SECRET ||
-    process.env.STUDIO_BROWSER_SECRET ||
-    '';
+    selectedSecrets.STUDIO_BROWSER_SECRET || process.env.STUDIO_BROWSER_SECRET || '';
   const browserConfigured = Boolean(
     studioBrowserUrl && studioBrowserPublicUrl && studioBrowserSecret,
   );
@@ -142,8 +147,8 @@ export async function GET(request: NextRequest) {
     name: 'Elevate Owned AI',
     status: hasElevateOwnedAI ? 'ok' : 'fail',
     detail: hasElevateOwnedAI
-      ? 'ELEVATE_LLM_URL and ELEVATE_LLM_SECRET configured — no-paid default inference available'
-      : 'Elevate-owned AI is not configured; automatic Dev Studio reasoning cannot run without external providers',
+      ? 'Supported Elevate-owned inference endpoint configured; each command must verify its response'
+      : 'Elevate-owned inference configuration is missing or points to a retired provider; configured external inference remains separate',
   });
 
   checks.push({
@@ -184,11 +189,7 @@ export async function GET(request: NextRequest) {
 
   checks.push({
     name: 'Cloudflare Workers AI',
-    status: cloudflareProbe.reachable
-      ? 'ok'
-      : cloudflareProbe.configured
-        ? 'fail'
-        : 'warn',
+    status: cloudflareProbe.reachable ? 'ok' : cloudflareProbe.configured ? 'fail' : 'warn',
     detail: cloudflareProbe.detail,
   });
 
@@ -203,18 +204,18 @@ export async function GET(request: NextRequest) {
   // ── Upload storage ─────────────────────────────────────────────────────────
   const hasObjectStorage = Boolean(
     (process.env.ELEVATE_MEDIA_ENDPOINT || process.env.S3_ENDPOINT || process.env.R2_ENDPOINT) &&
-      (process.env.ELEVATE_MEDIA_ACCESS_KEY_ID ||
-        process.env.S3_ACCESS_KEY_ID ||
-        process.env.R2_ACCESS_KEY ||
-        process.env.CLOUDFLARE_R2_ACCESS_KEY_ID) &&
-      (process.env.ELEVATE_MEDIA_SECRET_ACCESS_KEY ||
-        process.env.S3_SECRET_ACCESS_KEY ||
-        process.env.R2_SECRET_KEY ||
-        process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY) &&
-      (process.env.ELEVATE_MEDIA_BUCKET ||
-        process.env.S3_BUCKET ||
-        process.env.R2_BUCKET ||
-        process.env.CLOUDFLARE_R2_BUCKET_NAME),
+    (process.env.ELEVATE_MEDIA_ACCESS_KEY_ID ||
+      process.env.S3_ACCESS_KEY_ID ||
+      process.env.R2_ACCESS_KEY ||
+      process.env.CLOUDFLARE_R2_ACCESS_KEY_ID) &&
+    (process.env.ELEVATE_MEDIA_SECRET_ACCESS_KEY ||
+      process.env.S3_SECRET_ACCESS_KEY ||
+      process.env.R2_SECRET_KEY ||
+      process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY) &&
+    (process.env.ELEVATE_MEDIA_BUCKET ||
+      process.env.S3_BUCKET ||
+      process.env.R2_BUCKET ||
+      process.env.CLOUDFLARE_R2_BUCKET_NAME),
   );
   checks.push({
     name: 'Upload Storage',
@@ -226,8 +227,11 @@ export async function GET(request: NextRequest) {
 
   // ── Deploy identity ────────────────────────────────────────────────────────
   checks.push({
-    name: 'Deploy Identity', status: githubOk ? 'ok' : 'warn',
-    detail: githubOk ? 'Google deployment through GitHub Actions is available' : 'Google deployment workflow dispatch is not configured',
+    name: 'Deploy Identity',
+    status: googleReachable ? 'ok' : 'fail',
+    detail: googleReachable
+      ? 'Google deployment workflow is active and readable with the configured credential; dispatch permission is verified when requested'
+      : 'Google deployment workflow is unreachable, inactive, or the configured GitHub credential was rejected',
   });
 
   const failCount = checks.filter((c) => c.status === 'fail').length;

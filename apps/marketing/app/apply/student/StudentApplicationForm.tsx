@@ -101,7 +101,7 @@ function createSubmissionKey(): string {
 
 async function postApplication(payload: Record<string, unknown>, idempotencyKey: string) {
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 20000);
+  const timeout = window.setTimeout(() => controller.abort(), 65000);
 
   try {
     const res = await fetch('/api/applications', {

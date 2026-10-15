@@ -7,6 +7,11 @@ on:
   push:
     branches: [main]
     paths:
+      - 'scripts/build-memory-policy.*'
+      - 'scripts/check-build-memory-policy.mjs'
+      - 'scripts/run-bounded-build.*'
+      - 'scripts/build-next-app.*'
+      - 'scripts/container-build-policy.mjs'
       - 'lib/**'
       - 'packages/**'
       - 'public/**'
@@ -122,8 +127,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          pnpm install --frozen-lockfile --strict-peer-dependencies=false
-          pnpm exec tsc --noEmit --project apps/marketing/tsconfig.json
+          node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+          pnpm run typecheck:marketing
           node --test scripts/gcp/marketing-health-routing.test.cjs
           node --experimental-strip-types --test scripts/test-hosted-website-management.mjs scripts/test-hosted-domain-management.mjs scripts/test-hosted-website-claims.mjs
           node --test scripts/test-public-revision-activation.mjs scripts/gcp/wait-ready-public-revision.test.mjs
@@ -182,6 +187,8 @@ jobs:
             gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-marketing-migration" AND textPayload:"[natural-voice]"' --project=elegant-racer-299721 --freshness=1h --limit=8 --format='value(timestamp,textPayload)'
           fi
 
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build Marketing image
         shell: bash
         run: |

@@ -139,7 +139,17 @@ function taskEvidence(task: Record<string, any> | null): unknown {
 function safeEvidenceSummary(value: unknown): string | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const record = value as Record<string, unknown>;
-  const safeKeys = ['connected', 'status', 'message', 'company_name', 'last_sync', 'ok'];
+  const safeKeys = [
+    'connected',
+    'status',
+    'message',
+    'company_name',
+    'last_sync',
+    'ok',
+    'overall',
+    'summary',
+    'timestamp',
+  ];
   const summary = Object.fromEntries(
     safeKeys.filter((key) => record[key] !== undefined).map((key) => [key, record[key]]),
   );
@@ -449,33 +459,33 @@ export async function POST(req: NextRequest) {
                 retryTool?.idempotent === true &&
                 recoveryAttempts < (step.max_attempts ?? 2)
               ) {
-                  write(
-                    `${DIM}Retrying safely after evaluator classified the result as retryable.${RST}`,
-                  );
-                  await runTaskExecution(db, step.task_id, auth.id, {
-                    actorRoles: auth.effectiveRoles,
-                    tenantId: tenantId ?? null,
-                    requestHeaders: req.headers,
-                    adminOrigin,
-                    appOrigin,
-                  });
-                  task = await currentTask(db, step.task_id);
-                  if (!task) throw new Error('Recovery task record could not be reloaded');
-                  const recordedAttempts = Number(task.attempts ?? recoveryAttempts);
-                  if (recordedAttempts <= recoveryAttempts) {
-                    throw new Error('Recovery did not advance the durable attempt counter');
-                  }
-                  recoveryAttempts = recordedAttempts;
-                  if (task.status === 'running' || task.status === 'awaiting_approval') break;
-                  evaluation = evaluateExecution({
-                    tool: String(task?.tool_name ?? 'advisory'),
-                    result: taskEvidence(task),
-                    error: task?.error_message ?? null,
-                    attempts: Number(task?.attempts ?? 2),
-                    maxAttempts: step.max_attempts ?? 2,
-                    expectedOutput: step.expected_output,
-                    verificationRule: step.verification_rule,
-                  });
+                write(
+                  `${DIM}Retrying safely after evaluator classified the result as retryable.${RST}`,
+                );
+                await runTaskExecution(db, step.task_id, auth.id, {
+                  actorRoles: auth.effectiveRoles,
+                  tenantId: tenantId ?? null,
+                  requestHeaders: req.headers,
+                  adminOrigin,
+                  appOrigin,
+                });
+                task = await currentTask(db, step.task_id);
+                if (!task) throw new Error('Recovery task record could not be reloaded');
+                const recordedAttempts = Number(task.attempts ?? recoveryAttempts);
+                if (recordedAttempts <= recoveryAttempts) {
+                  throw new Error('Recovery did not advance the durable attempt counter');
+                }
+                recoveryAttempts = recordedAttempts;
+                if (task.status === 'running' || task.status === 'awaiting_approval') break;
+                evaluation = evaluateExecution({
+                  tool: String(task?.tool_name ?? 'advisory'),
+                  result: taskEvidence(task),
+                  error: task?.error_message ?? null,
+                  attempts: Number(task?.attempts ?? 2),
+                  maxAttempts: step.max_attempts ?? 2,
+                  expectedOutput: step.expected_output,
+                  verificationRule: step.verification_rule,
+                });
               }
 
               // A retry may start asynchronous work or require approval. Preserve
@@ -637,4 +647,3 @@ export async function POST(req: NextRequest) {
     },
   });
 }
-

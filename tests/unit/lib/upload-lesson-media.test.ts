@@ -160,7 +160,7 @@ describe('completed MP4 disk upload',()=>{
   const buffer=Buffer.alloc(7*1024*1024,3);const previous={...process.env};
   process.env.COURSE_VIDEO_STORAGE_BACKEND='supabase';process.env.NEXT_PUBLIC_SUPABASE_URL='https://test-project.supabase.co';process.env.SUPABASE_SERVICE_ROLE_KEY='test-only';
   vi.stubGlobal('fetch',vi.fn(async()=>new Response('storage unavailable',{status:503})));
-  try{await writeFile(file,buffer);await expect(uploadLessonFileFromDisk(file,'barber-test','mp4')).rejects.toThrow(/session failed/);expect((await readFile(file)).equals(buffer)).toBe(true);}
+  try{await writeFile(file,buffer);await expect(uploadLessonFileFromDisk(file,'barber-test','mp4')).rejects.toThrow(/HTTP 503: storage unavailable/);expect((await readFile(file)).equals(buffer)).toBe(true);}
   finally{process.env=previous;vi.unstubAllGlobals();await rm(directory,{recursive:true,force:true});}
  });
 });

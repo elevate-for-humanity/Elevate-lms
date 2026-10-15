@@ -16,7 +16,7 @@ describe('platform execution evidence', () => {
     expect(result.status).toBe('FAIL_BLOCKING');
     expect(result.evidence).toMatchObject({
       tool: 'openhands.status',
-      expected_tool: 'openhands.execute',
+      expected_tool: 'studio.engineering.execute|openhands.execute',
     });
   });
 

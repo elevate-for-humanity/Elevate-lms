@@ -34,6 +34,8 @@ interface DispatchResult {
 const DEFAULT_WORKFLOWS: WorkflowButton[] = [
   { key: 'deploy-google-marketing-trigger', label: 'Deploy Marketing', description: 'Build and verify Google Cloud Run Marketing from main' },
   { key: 'deploy-admin', label: 'Deploy Admin', description: 'Deploy Google Admin from main' },
+  { key: 'deploy-google-lms-trigger', label: 'Deploy LMS', description: 'Build and verify Google Cloud Run LMS from main' },
+  { key: 'deploy-google-store-runtime', label: 'Deploy Store', description: 'Build and verify Google Cloud Run Store from main' },
   { key: 'ci', label: 'Run CI', description: 'Run the validation pipeline before deployment' },
   { key: 'lint', label: 'Run Lint', description: 'Run lint checks against the repository' },
 ];

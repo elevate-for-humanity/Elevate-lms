@@ -155,9 +155,10 @@ describe('canonical Course Factory media architecture', () => {
     expect(activeBlock).not.toContain("eq('course_id', courseId)");
   });
 
-  it('keeps GPU fallback and Remotion on the same canonical job identity', () => {
+  it('keeps the active Remotion renderer on the canonical job identity', () => {
     const renderer = read('lib/video/process-video-job.ts');
-    expect(renderer).toContain('GPU scene failed; falling back to Remotion');
+    expect(renderer).toContain('const result = await renderStoryboardVideo');
+    expect(renderer).toContain('this worker never dispatches to it');
     expect(renderer).toMatch(/markComplete\(\s*job\.id/);
     expect(renderer).toMatch(/markFailed\(\s*job\.id/);
     expect(renderer).not.toMatch(/createJob\s*\(/);
@@ -171,12 +172,13 @@ describe('canonical Course Factory media architecture', () => {
     expect(directMediaIndex).toBeGreaterThan(-1);
     expect(finalBoundaryIndex).toBeGreaterThan(directMediaIndex);
     expect(renderIndex).toBeGreaterThan(finalBoundaryIndex);
-    expect(renderer).toContain('Math.min(\n      MAX_LESSON_VIDEO_SCENES');
+    expect(renderer).toContain('compactLegacySceneData');
+    expect(renderer).toContain('MAX_LESSON_VIDEO_SCENES');
   });
 
   it('records renderer provider evidence on terminal state', () => {
     const renderer = read('lib/video/process-video-job.ts');
-    expect(renderer).toContain('provider: generated.provider');
+    expect(renderer).toContain('model:');
     expect(renderer).toContain('provider: REMOTION_PROVIDER');
     expect(renderer).toContain("storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL");
   });
@@ -303,10 +305,12 @@ describe('canonical Course Factory media architecture', () => {
   it('uses Supabase resumable uploads instead of retrying a 413 whole-file request', () => {
     const uploader = read('lib/video/upload-lesson-media.ts');
     expect(uploader).toContain('/storage/v1/upload/resumable');
-    expect(uploader).toContain("'Tus-Resumable': '1.0.0'");
-    expect(uploader).toContain("'Content-Type': 'application/offset+octet-stream'");
-    expect(uploader).toContain('SUPABASE_TUS_CHUNK_BYTES = 6 * 1024 * 1024');
-    expect(uploader).toContain('resumableOffset');
+    expect(uploader).toContain('uploadSupabaseResumable');
+    const transport = read('lib/video/supabase-resumable-upload.mjs');
+    expect(transport).toContain("'Tus-Resumable':'1.0.0'");
+    expect(transport).toContain("'Content-Type':'application/offset+octet-stream'");
+    expect(transport).toContain('CHUNK_BYTES = 6 * 1024 * 1024');
+    expect(transport).toContain('offsetOf');
   });
 
   it('classifies terminal failures and records dead-letter state', () => {
@@ -331,18 +335,19 @@ describe('canonical Course Factory media architecture', () => {
     expect(acceptance).toContain('build.courseId !== COURSE_ID');
   });
 
-  it('uses the same Course Factory media state in Studio and ESB acceptance', () => {
+  it('keeps Studio on Ultimate status and retains archived ESB media compatibility', () => {
     const executor = read('lib/agentic/course-executor.ts');
     const acceptance = read('scripts/course-factory/build-esb-acceptance.ts');
-    expect(executor).toContain('getCourseMediaState');
+    expect(executor).toContain('DevStudioUltimateCourseControl');
+    expect(executor).toContain('Ultimate owns media acquisition, narration, rendering and media QA inside the build.');
     expect(acceptance).toContain('getCourseMediaState');
     expect(executor).not.toMatch(/async function courseMediaState\s*\(/);
   });
 
   it('blocks Studio publication until canonical media is complete', () => {
     const executor = read('lib/agentic/course-executor.ts');
-    expect(executor).toContain('if (!media.completePackage)');
-    expect(executor).toContain('Publication blocked: canonical media package incomplete');
+    expect(executor).toContain("if (task.worker === 'publisher')");
+    expect(executor).toContain('Publication is owned by UltimateLmsPublisher after Ultimate release evidence is complete.');
   });
 
   it('publishes ESB only through the canonical persisted Course Builder publisher', () => {
@@ -350,7 +355,7 @@ describe('canonical Course Factory media architecture', () => {
     expect(acceptance).toContain('publishPersistedCourseWithClient');
     expect(acceptance).not.toContain('publish_course_from_staging');
   });
-  it('locks repository voice and Pexels-first media policy in Course Builder jobs', () => {
+  it('locks repository voice and licensed media policy in Course Builder jobs', () => {
     const media = read('lib/course-factory/media-service.ts');
     const renderer = read('lib/video/process-video-job.ts');
     const narration = read('lib/video/edge-tts.ts');
@@ -358,10 +363,11 @@ describe('canonical Course Factory media architecture', () => {
     expect(media).toContain("strategy: 'repository_voice'");
     expect(media).toContain('allow_paid_provider: allowPaidNarration');
     expect(media).toContain("strategy: 'repository_voice'");
-    expect(media).toContain("strategy: 'existing_then_pexels'");
+    expect(media).toContain("strategy: 'licensed_envato_then_existing'");
+    expect(media).toContain("strategy: 'licensed_envato_then_existing_then_generated'");
     expect(renderer).toContain('applyLockedCourseBuilderMediaPolicy(job)');
     expect(renderer).not.toContain("process.env.AI_NARRATION_PROVIDER = 'cloudflare'");
-    expect(renderer).toContain('MEDIA_NARRATION_AUTHORIZATION_REQUIRED');
+    expect(renderer).toContain('Course Builder narration is self-hosted Kokoro.');
     expect(renderer).not.toContain("process.env.AI_NARRATION_PROVIDER = 'edge'");
     expect(narration).toContain('const provider = configuredNarrationProvider()');
     expect(narration).toContain("provider === 'cloudflare'");
@@ -394,7 +400,7 @@ describe('canonical Course Factory media architecture', () => {
     const quality = read('lib/video/media-quality-gate.ts');
     const director = read('lib/video/media-director.ts');
     const renderer = read('lib/video/process-video-job.ts');
-    expect(quality).toContain("MEDIA_QUALITY_GATE_VERSION = 'media-quality-v7'");
+    expect(quality).toContain("MEDIA_QUALITY_GATE_VERSION = 'media-quality-v8'");
     expect(quality).toContain('detectBackwardTimelineReplay');
     expect(quality).toContain('backwardTimelineJumpDetected');
     expect(quality).toContain('licenseEvidenceCoverage');

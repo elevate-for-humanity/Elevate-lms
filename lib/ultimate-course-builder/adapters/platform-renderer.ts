@@ -53,7 +53,7 @@ export async function refreshLicensedVisualUrls(input: any, db: SupabaseClient):
   if (!Array.isArray(assignment.readyAssets)) return input;
   const readyAssets = await Promise.all(
     assignment.readyAssets.map(async (value: unknown) => {
-      const asset = record(value);
+      const asset = { ...record(value) };
       if(asset.entitlement_id) {
         const {data:entitlement,error:lookupError}=await db.from('licensed_media_entitlements')
           .select('metadata').eq('id',asset.entitlement_id).single();

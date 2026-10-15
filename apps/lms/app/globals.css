@@ -5,6 +5,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Keep the shared sans stack valid even when no optional web font is loaded. */
+:root {
+  --font-inter: 'Inter';
+}
+
 /* ============================================================================
    ADMIN PORTAL - INSTITUTIONAL TYPOGRAPHY
    Enterprise-grade visual standards for audit-safe presentation
@@ -347,7 +352,7 @@ body {
 
 /* Tighter section spacing - scoped to marketing content areas only.
    Homepage sections (components/home/) use Tailwind py-* directly. */
-.marketing-content section:not([class*="py-"]) {
+.marketing-content section:not([class*='py-']) {
   width: 100%;
   margin: 0;
   padding: 3rem 0;
@@ -355,7 +360,7 @@ body {
 }
 
 @media (min-width: 768px) {
-  .marketing-content section:not([class*="py-"]) {
+  .marketing-content section:not([class*='py-']) {
     padding: 4rem 0;
   }
 }
@@ -1341,7 +1346,6 @@ html {
     font-size: 3rem;
     line-height: 1.1;
   }
-
 
   section {
     padding-left: 1rem;

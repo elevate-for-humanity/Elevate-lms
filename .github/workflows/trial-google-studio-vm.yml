@@ -57,6 +57,8 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with:
           skip_install: true
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build immutable Studio image
         run: docker build -f Dockerfile.studio-browser --build-arg "NF_GIT_SHA=$GITHUB_SHA" -t "studio-browser:$GITHUB_SHA" .
       - name: Verify actual browser and session contracts

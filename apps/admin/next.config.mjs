@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { sharedStandaloneTraceExcludes } from '../../scripts/next-standalone-trace-excludes.mjs';
 import { resolveCommitSha } from '../../scripts/build-identity.mjs';
 import { legacyImageRewrites } from '../../lib/media/legacy-image-aliases.mjs';
+import { withBuildMemoryDefaults } from '../../scripts/build-memory-policy.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -28,17 +29,10 @@ const adminConfig = {
     NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
   },
 
-  typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
 
-  experimental: {
-    webpackMemoryOptimizations: true,
-    webpackBuildWorker: true,
-    workerThreads: false,
-    cpus: 1,
-    parallelServerCompiles: false,
-    parallelServerBuildTraces: false,
-  },
+  // Serve packaged assets directly, as the other standalone applications do.
+  images: { unoptimized: true },
 
   transpilePackages: ['edge-tts'],
 
@@ -161,4 +155,4 @@ const adminConfig = {
   devIndicators: { position: 'bottom-right' },
 };
 
-export default adminConfig;
+export default withBuildMemoryDefaults(adminConfig);

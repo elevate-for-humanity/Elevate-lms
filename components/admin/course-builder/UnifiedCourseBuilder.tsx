@@ -621,7 +621,7 @@ export function UltimateBuildPanel({
   const [notice, setNotice] = useState('');
   const [googleModel, setGoogleModel] = useState('');
   const [googleLocation,setGoogleLocation]=useState('us');
-  const [mobileSplitView, setMobileSplitView] = useState(true);
+  const [mobileSplitView, setMobileSplitView] = useState(false);
   const jobs = [...(latest?.ultimate_build_jobs ?? [])].sort((a, b) =>
     b.created_at.localeCompare(a.created_at),
   );
@@ -775,7 +775,11 @@ export function UltimateBuildPanel({
         </button>
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-2 2xl:hidden">\n        <span className="text-xs font-semibold text-slate-300">Phone workspace layout</span>\n        <button type="button" aria-pressed={mobileSplitView} onClick={() => setMobileSplitView(value => !value)} className="rounded-lg border border-cyan-600 px-3 py-2 text-xs font-bold text-cyan-200">{mobileSplitView ? "Use stacked view" : "Show builder + preview together"}</button>\n      </div>\n      <div data-course-workspace-layout className={`mt-5 grid min-w-0 items-start gap-2 sm:gap-5 2xl:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)] ${mobileSplitView ? "grid-cols-2" : "grid-cols-1"}`}>
+      <div className="mt-4 flex items-center justify-between gap-2 2xl:hidden">
+        <span className="text-xs font-semibold text-slate-300">Workspace layout</span>
+        <button type="button" aria-pressed={mobileSplitView} onClick={() => setMobileSplitView(value => !value)} className="rounded-lg border border-cyan-600 px-3 py-2 text-xs font-bold text-cyan-200">{mobileSplitView ? "Use stacked view" : "Show builder + preview together"}</button>
+      </div>
+      <div data-course-workspace-layout className={`mt-5 grid min-w-0 items-start gap-2 sm:gap-5 2xl:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)] ${mobileSplitView ? "grid-cols-2" : "grid-cols-1"}`}>
         <div className="min-w-0">
       {!statusLoading && latest ? (
         <div className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4">

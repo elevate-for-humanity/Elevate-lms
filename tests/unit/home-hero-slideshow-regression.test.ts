@@ -5,29 +5,18 @@ import { describe, expect, it } from 'vitest';
 const source = fs.readFileSync(path.resolve('components/ui/HomeHeroVideo.tsx'), 'utf8');
 
 describe('homepage hero slideshow rendering', () => {
-  it('loads the homepage content before the hero video without a splash transition', () => {
-    const homepageHero = fs.readFileSync(
-      path.resolve('components/home/PlatformHubHero.tsx'),
-      'utf8',
-    );
-
-    expect(homepageHero).toContain('SafeHeroVideo');
-    expect(homepageHero).toContain('hero-home-fast.mp4');
-    expect(homepageHero).toContain('priority');
-    expect(homepageHero).toContain('loop');
-    expect(homepageHero).toContain('hero-home-first-frame.webp');
-    expect(fs.readFileSync(path.resolve('components/site/ServerFooter.tsx'), 'utf8')).toContain('Apprenticeship programs are self-pay only');
-    expect(homepageHero).toContain('href="/programs"');
-    expect(homepageHero).toContain('href="/check-eligibility"');
-    expect(homepageHero).toContain('href="/employers"');
-    expect(homepageHero).toContain('href="/store/apps/website-builder"');
-    expect(homepageHero).toContain('aspect-video');
-    expect(homepageHero).toContain('object-contain');
-    expect(homepageHero).not.toContain('bg-slate-950/65');
-    expect(homepageHero).not.toContain('sm:min-h-[440px]');
-    expect(homepageHero).not.toContain('lg:min-h-[480px]');
-    expect(homepageHero).not.toContain('data-narration-src="/audio/narration/home-hero.mp3"');
-
+  it('loads the current static hero with bounded responsive sizing and direct navigation', () => {
+    const hero = fs.readFileSync(path.resolve('components/home/PlatformHubHero.tsx'), 'utf8');
+    expect(hero).toContain('/images/refresh-20261014/home.webp');
+    expect(hero).toContain('priority');
+    expect(hero).toContain('aspect-video');
+    expect(hero).toContain('38svh,480px');
+    expect(hero).toContain('object-cover');
+    for (const href of ['/programs', '/check-eligibility', '/employers', '/store/apps/website-builder']) {
+      expect(hero).toContain(`href="${href}"`);
+    }
+    expect(hero).not.toContain('SafeHeroVideo');
+    expect(hero).not.toContain('min-h-screen');
   });
 
   it('loops only the homepage hero visual while narration remains separate', () => {

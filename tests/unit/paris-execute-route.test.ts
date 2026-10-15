@@ -89,7 +89,7 @@ describe('PARIS execution audit boundary', () => {
 
     expect(response.status).toBe(500);
     expect(body.message).toBe('The AI execution service could not complete this request.');
-    expect(persisted).toContain('failure');
+    expect(persisted).toContain('PARIS execution failed (credentials)');
     expect(persisted).not.toContain('sk-live-private-value');
     expect(logged).not.toContain('sk-live-private-value');
     expect(logged).toContain('credentials');

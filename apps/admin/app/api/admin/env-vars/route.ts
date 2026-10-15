@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
   }
   const runtimeEntries = entries.filter(entry => googlePolicy.components.admin.keys.includes(entry.key));
   const lmsEntries = runtimeEntries.filter(entry =>
-    (isElevateMediaRuntimeKey(entry.key) || entry.key.startsWith('TWILIO_')) &&
+    (isElevateMediaRuntimeKey(entry.key) || entry.key.startsWith('TWILIO_') || entry.key.startsWith('PBX_')) &&
     googlePolicy.components.lms.keys.includes(entry.key));
   try {
     if (runtimeEntries.length) validateRuntimeEntries('admin', runtimeEntries);

@@ -1,5 +1,6 @@
 import { resolveCommitSha } from '../../scripts/build-identity.mjs';
 import { legacyImageRewrites } from '../../lib/media/legacy-image-aliases.mjs';
+import { withBuildMemoryDefaults } from '../../scripts/build-memory-policy.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -17,7 +18,6 @@ const nextConfig = {
   },
 
   images: { unoptimized: true },
-  typescript: { ignoreBuildErrors: false },
   eslint: { ignoreDuringBuilds: true },
   // Keep observability instrumentation in Node's runtime boundary. Bundling
   // these packages makes webpack inspect intentional dynamic require calls.
@@ -104,4 +104,4 @@ const nextConfig = {
     return config;
   },
 };
-export default nextConfig;
+export default withBuildMemoryDefaults(nextConfig);

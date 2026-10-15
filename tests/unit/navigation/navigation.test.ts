@@ -27,7 +27,7 @@ describe('public navigation discoverability', () => {
         expect.objectContaining({ name: 'All Microcourses', href: '/microclasses' }),
         expect.objectContaining({
           name: 'Certification Testing',
-          href: '/certification-testing',
+          href: '/testing/nha',
         }),
       ]),
     );

@@ -145,7 +145,11 @@ const SERVICE_GROUPS: ServiceGroup[] = [
   },
   {
     label: 'Twilio phone and messaging',
-    keys: ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_API_KEY_SID', 'TWILIO_API_KEY_SECRET'],
+    keys: ['TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_API_KEY_SID', 'TWILIO_API_KEY_SECRET', 'TWILIO_PHONE_NUMBER'],
+  },
+  {
+    label: 'Elevate PWA phone connection',
+    keys: ['PBX_CONTROL_URL', 'PBX_PROVISIONING_TOKEN', 'PBX_STUN_URLS', 'PBX_TURN_URLS', 'PBX_TURN_SHARED_SECRET'],
   },
   {
     label: 'Legacy Telnyx — migration history',

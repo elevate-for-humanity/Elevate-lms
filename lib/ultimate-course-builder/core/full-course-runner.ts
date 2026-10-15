@@ -117,7 +117,16 @@ export async function runUltimateCourse(
     console.info('[UltimateCourse] runner returned', {lessonBuildId: lesson.id, findings: result.findings.length});
     assertActive?.();
     if (!result.findings.some((f) => f.severity === 'error')) {
-      try { assertCompleteLesson(result.artifacts, plan.profile, competency.id); }
+      try {
+        assertCompleteLesson(result.artifacts, plan.profile, competency.id);
+        // Reconcile the checkpoint table only after independent acceptance has
+        // verified the recovered producer's input/output certificates too.
+        for (const step of checkpoint.recoveredSteps ?? []) {
+          assertActive?.();
+          await persistence.recordStep({ lessonBuildId: lesson.id, step, state: 'passed',
+            artifacts: result.artifacts[step], findings: [] });
+        }
+      }
       catch (error) {
         result.findings.push({step:'credential_release',severity:'error',code:'FULL_LESSON_ACCEPTANCE_REQUIRED',message:error instanceof Error?error.message:String(error)});
       }

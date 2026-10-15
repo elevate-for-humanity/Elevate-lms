@@ -1,4 +1,7 @@
-import { apprenticeshipPaymentError, isSelfPayApprenticeship } from '@/lib/programs/apprenticeship-payment-policy';
+import {
+  apprenticeshipPaymentError,
+  isSelfPayApprenticeship,
+} from '@/lib/programs/apprenticeship-payment-policy';
 // PUBLIC ROUTE: public program application submission
 
 // app/api/applications/route.ts
@@ -111,7 +114,8 @@ async function claimIdempotencyKey(
 
   try {
     const setResult = await redis.set(key, value, { nx: true, ex: ttlSeconds });
-    const claimed = setResult === 'OK' || (setResult as unknown) === 1 || (setResult as unknown) === true;
+    const claimed =
+      setResult === 'OK' || (setResult as unknown) === 1 || (setResult as unknown) === true;
     if (claimed) {
       return { duplicate: false, samePayload: false };
     }
@@ -167,20 +171,24 @@ async function _POST(req: Request) {
     body.programSlug =
       body.programSlug || body.program_slug || body.programInterest || body.program;
     body.fundingType =
-      body.fundingType ||
-      body.funding_type ||
-      body.fundingInterest ||
-      body.fundingSource ||
-      null;
+      body.fundingType || body.funding_type || body.fundingInterest || body.fundingSource || null;
     body.zip = body.zip || body.zipCode || body.postalCode || '';
 
-    const normalizedProgram = String(body.program || '').trim().toLowerCase();
-    const normalizedFunding = String(body.fundingType || '').trim().toLowerCase();
+    const normalizedProgram = String(body.program || '')
+      .trim()
+      .toLowerCase();
+    const normalizedFunding = String(body.fundingType || '')
+      .trim()
+      .toLowerCase();
     const paymentError = apprenticeshipPaymentError(normalizedProgram, normalizedFunding);
     if (paymentError) {
-      return NextResponse.json({ error: paymentError }, { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) });
+      return NextResponse.json(
+        { error: paymentError },
+        { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
     }
-    if (isSelfPayApprenticeship(normalizedProgram) && normalizedFunding) body.fundingType = 'self_pay';
+    if (isSelfPayApprenticeship(normalizedProgram) && normalizedFunding)
+      body.fundingType = 'self_pay';
 
     const rawModalityPreference = body.modalityPreference ?? body.modality_preference;
     const modalityPreference = normalizeApplicationModalityPreference(rawModalityPreference);
@@ -243,8 +251,9 @@ async function _POST(req: Request) {
     }
 
     const normalizedPhone = String(body.phone || '').replace(/\D/g, '');
-    const idempotencyKey =
-      (req.headers.get('x-idempotency-key') || body.idempotencyKey || '').trim().toLowerCase();
+    const idempotencyKey = (req.headers.get('x-idempotency-key') || body.idempotencyKey || '')
+      .trim()
+      .toLowerCase();
     if (idempotencyKey && idempotencyKey.length < 12) {
       return NextResponse.json(
         { error: 'Invalid idempotency key' },
@@ -252,15 +261,16 @@ async function _POST(req: Request) {
       );
     }
 
-    const fingerprint = `${String(body.email || '').toLowerCase().trim()}|${program}|${normalizedPhone}`;
+    const fingerprint = `${String(body.email || '')
+      .toLowerCase()
+      .trim()}|${program}|${normalizedPhone}`;
 
     const supabase = await getAdminClient();
 
     if (!supabase) {
       return NextResponse.json(
         {
-          error:
-            `Service temporarily unavailable. Please call ${PLATFORM_DEFAULTS.mainPhone} for immediate assistance.`,
+          error: `Service temporarily unavailable. Please call ${PLATFORM_DEFAULTS.mainPhone} for immediate assistance.`,
         },
         { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
@@ -268,10 +278,15 @@ async function _POST(req: Request) {
 
     const applicationIntent = body.applicationIntent === 'enrollment' ? 'enrollment' : 'inquiry';
     if (applicationIntent === 'enrollment' && PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS.has(program)) {
-      const billingInvoiceId = String(body.billingInvoiceId || body.billing_invoice_id || '').trim();
+      const billingInvoiceId = String(
+        body.billingInvoiceId || body.billing_invoice_id || '',
+      ).trim();
       if (!billingInvoiceId) {
         return NextResponse.json(
-          { error: 'Verified payment is required before this enrollment application can be submitted.' },
+          {
+            error:
+              'Verified payment is required before this enrollment application can be submitted.',
+          },
           { status: 402, headers: corsHeadersForOrigin(origin, allowedOrigins) },
         );
       }
@@ -282,8 +297,17 @@ async function _POST(req: Request) {
         .eq('status', 'paid')
         .maybeSingle();
       const paidProgram = String((paidInvoice?.fulfillment_payload as any)?.program_slug || '');
-      const applicantEmail = String(body.email || '').toLowerCase().trim();
-      if (!paidInvoice || paidInvoice.fulfillment_type !== 'program_enrollment' || (paidProgram && paidProgram !== program) || String(paidInvoice.customer_email || '').toLowerCase().trim() !== applicantEmail) {
+      const applicantEmail = String(body.email || '')
+        .toLowerCase()
+        .trim();
+      if (
+        !paidInvoice ||
+        paidInvoice.fulfillment_type !== 'program_enrollment' ||
+        (paidProgram && paidProgram !== program) ||
+        String(paidInvoice.customer_email || '')
+          .toLowerCase()
+          .trim() !== applicantEmail
+      ) {
         return NextResponse.json(
           { error: 'Payment could not be verified for this applicant and program.' },
           { status: 402, headers: corsHeadersForOrigin(origin, allowedOrigins) },
@@ -296,7 +320,8 @@ async function _POST(req: Request) {
     if (enrollmentState === 'waitlist') {
       return NextResponse.json(
         {
-          error: 'This program is currently waitlisted. Join the waitlist to be notified when the next cohort opens.',
+          error:
+            'This program is currently waitlisted. Join the waitlist to be notified when the next cohort opens.',
           waitlisted: true,
           waitlistUrl: `/programs/${program}`,
         },
@@ -340,22 +365,12 @@ async function _POST(req: Request) {
       }
     }
 
-    if (recentApp || recentByPhone) {
-      return NextResponse.json(
-        {
-          error:
-            `An application for this program was already submitted with this email in the last 24 hours. Please call ${PLATFORM_DEFAULTS.mainPhone} if you need to make changes.`,
-        },
-        { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
-      );
-    }
-
     // Reuse an existing active application for the same applicant/program.
     // A WorkOne or document update must advance the original application, not
     // create a second admissions record.
     const { data: activeApp } = await supabase
       .from('applications')
-      .select('id, reference_number, status, program_interest, funding_type, payment_status')
+      .select('id, reference_number, status, program_interest, funding_type, payment_status, normalized_phone, phone')
       .eq('email', body.email.toLowerCase().trim())
       .eq('program_interest', program)
       .not('status', 'in', '("rejected","withdrawn","duplicate")')
@@ -364,6 +379,13 @@ async function _POST(req: Request) {
       .maybeSingle();
 
     if (activeApp) {
+      const contactPhone = (value: unknown) => String(value || '').replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
+      if (contactPhone(activeApp.normalized_phone || activeApp.phone) !== contactPhone(normalizedPhone)) {
+        return NextResponse.json(
+          { error: `An existing application needs contact verification. Please call ${PLATFORM_DEFAULTS.mainPhone} to update it.` },
+          { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+        );
+      }
       return NextResponse.json(
         {
           ok: true,
@@ -382,6 +404,15 @@ async function _POST(req: Request) {
                 : `/apply/track?id=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`,
         },
         { status: 200, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
+
+    if (recentApp || recentByPhone) {
+      return NextResponse.json(
+        {
+          error: `An application for this program was already submitted with this email in the last 24 hours. Please call ${PLATFORM_DEFAULTS.mainPhone} if you need to make changes.`,
+        },
+        { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
     }
 
@@ -416,12 +447,8 @@ async function _POST(req: Request) {
       `Program Interest: ${program}`,
       body.preferredContact ? `Preferred Contact: ${body.preferredContact}` : '',
       body.fundingType ? `Funding Type: ${body.fundingType}` : '',
-      body.workoneIntakeCompleted
-        ? `WorkOne Intake Completed: ${body.workoneIntakeCompleted}`
-        : '',
-      body.workoneAppointmentDate
-        ? `WorkOne Appointment Date: ${body.workoneAppointmentDate}`
-        : '',
+      body.workoneIntakeCompleted ? `WorkOne Intake Completed: ${body.workoneIntakeCompleted}` : '',
+      body.workoneAppointmentDate ? `WorkOne Appointment Date: ${body.workoneAppointmentDate}` : '',
       body.workoneCenter ? `WorkOne Center: ${body.workoneCenter}` : '',
       body.workoneChecklist && Array.isArray(body.workoneChecklist)
         ? `WorkOne Checklist: ${body.workoneChecklist.join(', ')}`
@@ -453,8 +480,12 @@ async function _POST(req: Request) {
     const fundingType = body.fundingType || body.fundingInterest || null;
     const eligibilityStatus = body.fundingEligibilityStatus || null;
     const isFunded = FUNDED_TYPES.includes(fundingType);
-    const workOneReferral = String(body.hasWorkOneReferral || '').trim().toLowerCase();
-    const workOneIntake = String(body.workoneIntakeCompleted || '').trim().toLowerCase();
+    const workOneReferral = String(body.hasWorkOneReferral || '')
+      .trim()
+      .toLowerCase();
+    const workOneIntake = String(body.workoneIntakeCompleted || '')
+      .trim()
+      .toLowerCase();
     const needsWorkOne =
       isFunded &&
       (eligibilityStatus === 'needs_appointment' ||
@@ -505,11 +536,7 @@ async function _POST(req: Request) {
     // or connection-pool rotation. Retry only transport/server failures; never
     // retry validation, constraint, or authorization failures here.
     for (let attempt = 1; attempt <= 3; attempt += 1) {
-      const result = await supabase
-        .from('applications')
-        .insert(corePayload)
-        .select()
-        .maybeSingle();
+      const result = await supabase.from('applications').insert(corePayload).select().maybeSingle();
       data = result.data;
       error = result.error;
       if (!error || data) break;
@@ -595,9 +622,9 @@ async function _POST(req: Request) {
           modality_preference: undefined,
           transfer_hours_claimed: undefined,
           funding_eligibility_status: undefined,
-          funding_type: undefined,       // added in 20260425000001
-          program_slug: undefined,       // added in 20260224000002 (applications table)
-          date_of_birth: undefined,      // added in 20260304120000
+          funding_type: undefined, // added in 20260425000001
+          program_slug: undefined, // added in 20260224000002 (applications table)
+          date_of_birth: undefined, // added in 20260304120000
           type: undefined,
           status: 'submitted',
         })
@@ -659,7 +686,7 @@ async function _POST(req: Request) {
     let userId: string | null = null;
     let passwordSetupLink: string | null = null;
 
-    if (supabase) {
+    try {
       const programSlug = body.programSlug || body.preferredProgramId || '';
       const { data: programRow } = await supabase
         .from('programs')
@@ -684,11 +711,17 @@ async function _POST(req: Request) {
       });
 
       if (provision.error) {
-        logger.warn('[Applications] provisionAccount non-fatal', { error: provision.error, email: body.email });
+        logger.warn('[Applications] provisionAccount non-fatal', {
+          error: provision.error,
+          email: body.email,
+        });
       } else {
         userId = provision.userId ?? null;
         passwordSetupLink = provision.passwordSetupLink ?? null;
-        logger.info('[Applications] Account provisioned', { userId, isNewUser: provision.isNewUser });
+        logger.info('[Applications] Account provisioned', {
+          userId,
+          isNewUser: provision.isNewUser,
+        });
       }
 
       // Link provisioned userId back to the application row
@@ -701,6 +734,13 @@ async function _POST(req: Request) {
             logger.warn('[Applications] Failed to link user_id', { err: String(err) }),
           );
       }
+    } catch (provisionError) {
+      // The application is already committed. Ancillary account failures must
+      // never tell the applicant the submission failed or make them reapply.
+      logger.warn('[Applications] Account provisioning failed after application saved', {
+        applicationId: data.id,
+        error: provisionError instanceof Error ? provisionError.message : String(provisionError),
+      });
     }
 
     logger.info('[Applications] Saved', {
@@ -729,10 +769,16 @@ async function _POST(req: Request) {
           '<h3 style="margin-top: 0; color: #065f46;">Your Student Account Is Ready</h3>' +
           '<p style="margin-bottom: 16px;">We created your student portal account. Set your password to log in:</p>' +
           '<p style="text-align: center; margin: 16px 0;">' +
-            '<a href="' + passwordSetupLink + '" style="display: inline-block; background: #ea580c; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Set Your Password &amp; Log In</a>' +
+          '<a href="' +
+          passwordSetupLink +
+          '" style="display: inline-block; background: #ea580c; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Set Your Password &amp; Log In</a>' +
           '</p>' +
-          '<p style="color: #64748b; font-size: 13px; margin-bottom: 0;">This link expires in 24 hours. After setting your password, you can log in anytime at <a href="' + siteUrl + '/login" style="color: #059669;">' + siteUrl + '/login</a></p>' +
-        '</div>'
+          '<p style="color: #64748b; font-size: 13px; margin-bottom: 0;">This link expires in 24 hours. After setting your password, you can log in anytime at <a href="' +
+          siteUrl +
+          '/login" style="color: #059669;">' +
+          siteUrl +
+          '/login</a></p>' +
+          '</div>'
         : '';
 
       // Confirmation + onboarding email to applicant
@@ -820,7 +866,8 @@ async function _POST(req: Request) {
                 <p style="margin-bottom: 12px;">Schedule your advisor call now:</p>
                 <a href="https://calendly.com/elevate4humanityedu" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Schedule Call Now</a>
               </div>`
-                  : ''}
+                  : ''
+              }
 
               <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Reference Number:</p>
@@ -877,10 +924,14 @@ async function _POST(req: Request) {
       if (staffEmailResult.success) {
         logger.info('[Applications] Staff email sent');
       } else {
-        logger.error('[Applications] Staff email FAILED', undefined, { error: (staffEmailResult as any).error });
+        logger.error('[Applications] Staff email FAILED', undefined, {
+          error: (staffEmailResult as any).error,
+        });
       }
       emailStatus = {
-        student: studentEmailResult.success ? 'sent' : (studentEmailResult as any).error || 'failed',
+        student: studentEmailResult.success
+          ? 'sent'
+          : (studentEmailResult as any).error || 'failed',
         staff: staffEmailResult.success ? 'sent' : (staffEmailResult as any).error || 'failed',
       };
     } catch (emailError) {
@@ -910,7 +961,10 @@ async function _POST(req: Request) {
         logger.info('[Applications] Automation job queued', { applicationId: data.id });
       }
     } catch (queueError) {
-      logger.warn('[Applications] Failed to queue automation job', queueError instanceof Error ? queueError.message : String(queueError));
+      logger.warn(
+        '[Applications] Failed to queue automation job',
+        queueError instanceof Error ? queueError.message : String(queueError),
+      );
     }
 
     const requiresSelfPayCheckout =

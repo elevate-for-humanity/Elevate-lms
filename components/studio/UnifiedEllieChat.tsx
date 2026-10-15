@@ -85,10 +85,17 @@ interface ChatMessage {
 }
 
 type StudioProvider =
-  'auto' | 'elevate' | 'cloudflare' | 'xai' | 'openai' | 'anthropic' | 'gemini' | 'groq';
+  | 'auto'
+  | 'elevate'
+  | 'cloudflare'
+  | 'xai'
+  | 'openai'
+  | 'anthropic'
+  | 'gemini'
+  | 'groq';
 
 const STUDIO_PROVIDER_LABELS: Record<StudioProvider, string> = {
-  auto: 'Best available',
+  auto: 'Paris · Best available',
   elevate: 'Elevate AI',
   cloudflare: 'Cloudflare AI',
   xai: 'Grok / xAI',
@@ -1220,7 +1227,7 @@ export default function UnifiedEllieChat({
       <div className="shrink-0 border-b border-slate-200 bg-white px-3 py-2">
         <div className="mx-auto flex max-w-3xl items-center gap-2">
           <label className="sr-only" htmlFor="studio-ai-provider">
-            Choose AI
+            Choose inference provider
           </label>
           <select
             id="studio-ai-provider"
@@ -1329,8 +1336,8 @@ export default function UnifiedEllieChat({
               What are we building today?
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
-              Ask in plain language. Admin AI routes the request to the correct internal tool,
-              database contract, workflow, builder, or deployment capability.
+              Ask in plain language. Paris routes the request to the correct internal tool, database
+              contract, workflow, builder, or deployment capability.
             </p>
             <p className="mt-1 text-xs text-gray-500">
               AI configuration:{' '}
@@ -1520,7 +1527,7 @@ export default function UnifiedEllieChat({
             </button>
             <textarea
               ref={inputRef}
-              aria-label="Tell Admin AI what you need done..."
+              aria-label="Tell Paris what you need done..."
               value={input}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={(event) => {
@@ -1530,7 +1537,7 @@ export default function UnifiedEllieChat({
                 }
               }}
               rows={3}
-              placeholder="Tell Admin AI what you need done..."
+              placeholder="Tell Paris what you need done..."
               className={`order-first min-h-[104px] max-h-[30dvh] w-full min-w-0 basis-full resize-none rounded-xl border px-3 py-3 text-xl leading-8 outline-none ${inputClass}`}
             />
             <button
@@ -1550,7 +1557,7 @@ export default function UnifiedEllieChat({
                 <Mic className="h-5 w-5" aria-hidden="true" />
               )}
               <span className="hidden sm:inline">
-                {listening ? 'Stop listening' : 'Talk to Lizzy'}
+                {listening ? 'Stop listening' : 'Talk to Paris'}
               </span>
             </button>
             <button

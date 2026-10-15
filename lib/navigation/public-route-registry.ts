@@ -849,15 +849,6 @@ export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
     index: true,
   },
   {
-    path: '/hire-graduates',
-    label: 'Hire Graduates',
-    category: 'Employers',
-    changeFrequency: 'monthly',
-    priority: 0.8,
-    lastModified: '2026-10-14T14:00:00-04:00',
-    index: true,
-  },
-  {
     path: '/programs/business',
     label: 'Business & Financial Programs',
     category: 'Programs',

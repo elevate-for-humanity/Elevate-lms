@@ -33,7 +33,7 @@ describe('apprentice self-service portal contracts', () => {
   it('retires Stripe setup while keeping the authenticated legacy portal lookup fail-safe', () => {
     const setup = source('apps/lms/app/api/billing/setup/route.ts');
     const portal = source('apps/lms/app/api/billing/portal/route.ts');
-    expect(setup).toContain('retiredStripeCheckout');
+    expect(setup).toContain('retiredLegacyCheckout');
     expect(setup).toContain('PayPal automatic billing and QuickBooks accounting');
     expect(portal).toContain("url: '/account/payment-methods'");
     expect(portal).toContain("provider: 'paypal_quickbooks'");
@@ -50,14 +50,16 @@ describe('apprentice self-service portal contracts', () => {
     expect(webhook).toContain("event.event_type === 'PAYMENT.SALE.COMPLETED'");
   });
 
-  it('uses PayPal rather than legacy Stripe state on active apprentice billing screens', () => {
+  it('keeps administrative billing separate from apprentice learning dashboards', () => {
     const billingPage = source('apps/lms/app/apprentice/billing/page.tsx');
     const billingCard = source('components/learner/BillingCard.tsx');
     const apprenticeDashboard = source('apps/lms/app/apprentice/page.tsx');
     expect(billingPage).toContain(".from('billing_schedules')");
     expect(billingPage).toContain('provider_subscription_id');
     expect(billingCard).toContain('Complete PayPal Authorization');
-    expect(apprenticeDashboard).toContain('automaticBillingActive');
+    expect(apprenticeDashboard).not.toContain('automaticBillingActive');
+    expect(apprenticeDashboard).not.toContain('MandatoryBillingSetup');
+    expect(apprenticeDashboard).not.toContain('href="/apprentice/billing"');
     expect(billingCard).not.toContain('Stripe');
     expect(apprenticeDashboard).not.toContain('stripe_subscription_id');
     const legacyLoader = source('lib/portal/load-apprentice-portal.ts');
@@ -66,7 +68,7 @@ describe('apprentice self-service portal contracts', () => {
     expect(legacyLoader).not.toContain('stripe_subscription_status');
     expect(legacyShell).not.toContain('Stripe');
     expect(legacyShell).not.toContain('stripe_subscription_id');
-    expect(legacyShell).toContain('PayPal authorization');
-    expect(legacyShell).toContain('QuickBooks invoice');
+    expect(legacyShell).not.toContain('PayPal authorization');
+    expect(legacyShell).not.toContain('QuickBooks invoice');
   });
 });

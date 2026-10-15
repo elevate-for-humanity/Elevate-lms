@@ -48,7 +48,7 @@ function show(jobStatus: string, buildStatus = 'running', expired = false) {
 
 it('shows a failed durable job and allows resuming an existing build whose aggregate state still says running', async () => {
   show('failed');
-  expect(await screen.findByText('failed · persisted-job')).toBeInTheDocument();
+  expect(await screen.findByText('failed', { exact: true })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Resume Ultimate build' })).toBeEnabled();
   expect(screen.getByRole('alert')).toHaveTextContent('SCENE_COVERAGE_REQUIRED');
   expect(screen.queryByRole('button', { name: 'Ultimate build running' })).not.toBeInTheDocument();
@@ -56,13 +56,13 @@ it('shows a failed durable job and allows resuming an existing build whose aggre
 
 it('prevents another start while the durable worker job is running', async () => {
   show('running');
-  expect(await screen.findByText('running · persisted-job')).toBeInTheDocument();
+  expect((await screen.findAllByText('running', { exact: true })).length).toBeGreaterThan(0);
   expect(screen.getByRole('button', { name: 'Ultimate build running' })).toBeDisabled();
 });
 
 it('starts the Google worker for the existing queued build without creating a duplicate course build', async () => {
   show('queued');
-  expect(await screen.findByText('queued · persisted-job')).toBeInTheDocument();
+  expect(await screen.findByText('Awaiting worker assignment', { exact: true })).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Start Google worker' }));
   await waitFor(() => expect(fetch).toHaveBeenCalledWith('/api/admin/ultimate-course-builder/run', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -81,7 +81,7 @@ it('does not present a completed worker job as a completed course or offer publi
 
 it('shows an expired running job as stalled and enables recovery instead of falsely confirming a worker', async()=>{
  show('running','running',true);
- expect(await screen.findByText('stalled · persisted-job')).toBeInTheDocument();
+ expect(await screen.findByText('stalled', { exact: true })).toBeInTheDocument();
  expect(screen.getByRole('button',{name:'Resume Ultimate build'})).toBeEnabled();
  expect(screen.getByRole('alert')).toHaveTextContent('heartbeat is missing or stale');
  expect(screen.queryByRole('button',{name:'Ultimate build running'})).not.toBeInTheDocument();

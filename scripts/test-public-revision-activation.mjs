@@ -38,7 +38,7 @@ test('pre-deploy cleanup releases stale latest candidate tags without changing t
   let traffic = [
     { revisionName: 'live', percent: 100 },
     { tag: 'c-bbbbbbbbbbbb', revisionName: 'latest-failed-candidate' },
-    { tag: 'c-cccccccccccc', revisionName: 'still-live' },
+    { tag: 'c-cccccccccccc', revisionName: 'live' },
     { tag: 'release-rollback', revisionName: 'rollback' },
     { tag: 'c-dddddddddddd', revisionName: 'ambiguous-a' },
     { tag: 'c-dddddddddddd', revisionName: 'ambiguous-b' },
@@ -69,7 +69,10 @@ test('pre-deploy cleanup stops if serving traffic changes concurrently', async (
   const read = args => {
     reads++;
     if (args[2] === 'update-traffic') return {};
-    return { status: { traffic: [{ revisionName: reads === 1 ? 'live' : 'other', percent: 100 }] } };
+    return { status: { traffic: [
+      { revisionName: reads === 1 ? 'live' : 'other', percent: 100 },
+      { tag: 'c-eeeeeeeeeeee', revisionName: 'stale' },
+    ] } };
   };
   await assert.rejects(
     cleanupUnusedCandidateTags({ service: 'elevate-admin-migration', read }),
@@ -80,7 +83,7 @@ test('pre-deploy cleanup stops if serving traffic changes concurrently', async (
 test('Admin deployment runs candidate cleanup after image upload and before creating a revision', async () => {
   const { readFileSync } = await import('node:fs');
   const workflow = readFileSync(new URL('../.github/workflows/deploy-admin.yml', import.meta.url), 'utf8');
-  const cleanup = workflow.indexOf('cleanup-unused-candidate-tags.mjs');
+  const cleanup = workflow.indexOf('CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/cleanup-unused-candidate-tags.mjs');
   const revisionCreation = workflow.indexOf('gcloud run services update elevate-admin-migration');
   assert.ok(cleanup >= 0 && cleanup < revisionCreation);
 });

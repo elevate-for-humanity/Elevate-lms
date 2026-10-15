@@ -211,7 +211,7 @@ export async function streamPlatformChat(
 export async function streamExecuteCommand(
   command: string,
   onLine: (text: string) => void,
-  agent: StudioSpecialist = 'LIZZY',
+  agent: StudioSpecialist = 'PARIS',
 ): Promise<void> {
   const isSmoke = /smoke.?test|health.?check|check.*platform/i.test(command);
   const res = await fetch(

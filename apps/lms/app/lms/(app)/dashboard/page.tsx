@@ -33,6 +33,7 @@ import JobCard from '@/components/jobs/JobCard';
 import { MARKETING_HOST } from '@/lib/routing/portal-map';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { learnerCanSeeBilling } from '@/lib/billing/learner-payment-plan-visibility';
 import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
 import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
 
@@ -93,7 +94,8 @@ export default async function StudentDashboard() {
     ? await db.from('profiles').select('role,full_name,email').eq('id', subjectId).maybeSingle()
     : { data: profile };
   const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
-  const billingRequirement = await loadLearnerBillingRequirement(db, subjectId);
+  const showBilling = await learnerCanSeeBilling(db, subjectId, subjectProfile?.role);
+  const billingRequirement = showBilling ? await loadLearnerBillingRequirement(db, subjectId) : null;
   const careerJobs = await getActiveJobs({ limit: 4 });
   const { data: holderStudentRows } = await db
     .from('program_holder_students')
@@ -155,12 +157,12 @@ export default async function StudentDashboard() {
       .not('completed_at', 'is', null)
       .order('completed_at', { ascending: false })
       .limit(5),
-    supabase
+    showBilling ? supabase
       .from('payment_logs')
       .select('id, amount, status, completed_at, created_at')
       .eq('user_id', subjectId)
       .order('created_at', { ascending: false })
-      .limit(5),
+      .limit(5) : Promise.resolve({ data: [] }),
     supabase
       .from('program_external_courses')
       .select(
@@ -451,10 +453,10 @@ export default async function StudentDashboard() {
             </div>
           </section>
         ) : null}
-        <MandatoryBillingSetup
+        {billingRequirement ? <MandatoryBillingSetup
           requirement={billingRequirement}
           readOnly={subject.previewing}
-        />
+        /> : null}
         {activeCourseEnrollment && activeCourseId ? (
           <section className="relative isolate min-h-[360px] overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
             <Image
@@ -1007,6 +1009,7 @@ export default async function StudentDashboard() {
               </section>
             )}
 
+            {showBilling ? (
             <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
               <div className="border-b border-slate-100 px-5 py-4">
                 <h2 className="flex items-center gap-2 font-black text-slate-950">
@@ -1043,6 +1046,7 @@ export default async function StudentDashboard() {
                 </Link>
               </div>
             </section>
+            ) : null}
 
             <section className="rounded-2xl bg-slate-950 p-5 text-white">
               <h2 className="font-black text-white">Credential Pathway</h2>

@@ -1,8 +1,8 @@
-// SMS notification system using the platform's Telnyx number.
+// SMS notification system using the platform's active Twilio business number.
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { resolveSendingNumber } from '@/lib/phone/sending-number';
+import { resolveTwilioSendingNumber, sendTwilioMessage, twilioAuthorization } from '@/lib/phone/twilio';
 
 export interface SMSNotification {
   to: string;
@@ -34,7 +34,7 @@ async function auditSMSDelivery(
       error_message: result.error ?? null,
       sent_at: null,
       metadata: {
-        provider: 'telnyx',
+        provider: 'twilio',
         message_length: messageLength,
         ...metadata,
       },
@@ -58,10 +58,10 @@ export class SMSService {
 
   async sendingNumber(): Promise<string | null> {
     await hydrateProcessEnv();
-    if (!process.env.TELNYX_API_KEY?.trim()) return null;
+    try { twilioAuthorization(); } catch { return null; }
     const { getAdminClient } = await import('@/lib/supabase/admin');
     const db = await getAdminClient();
-    return db ? resolveSendingNumber(db) : null;
+    return db ? resolveTwilioSendingNumber(db) : null;
   }
 
   async isEnabled(): Promise<boolean> {
@@ -81,40 +81,18 @@ export class SMSService {
 
     const sendingNumber = await this.sendingNumber();
     if (!sendingNumber) {
-      logger.error('SMS not sent — Telnyx messaging is not configured.', new Error('SMS service unavailable'), {
+      logger.error('SMS not sent — Twilio messaging is not configured.', new Error('SMS service unavailable'), {
         messageLength: notification.message.length,
       });
-      const result = { success: false, error: 'SMS service unavailable — Telnyx API key or sending number is missing.' };
+      const result = { success: false, error: 'SMS service unavailable — Twilio credentials or active business sender is missing.' };
       await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
       return result;
     }
 
     try {
-      const response = await fetch('https://api.telnyx.com/v2/messages', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.TELNYX_API_KEY!.trim()}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ to: formattedPhone, from: sendingNumber, text: notification.message }),
-        signal: AbortSignal.timeout(15_000),
-      });
-
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        const error = 'SMS provider did not confirm acceptance';
-        logger.error('Telnyx SMS failed', new Error(error), {
-            status: response.status,
-        });
-        const result = { success: false, error };
-        await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
-        return result;
-      }
-
-      if (!data?.data?.id) throw new Error('Telnyx accepted the request without a message ID');
-      logger.info('SMS accepted by Telnyx');
-      const result = { success: true, messageId: data.data.id };
+      const accepted = await sendTwilioMessage({ to: formattedPhone, from: sendingNumber, body: notification.message });
+      logger.info('SMS accepted by Twilio');
+      const result = { success: true, messageId: accepted.messageId };
       await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
       return result;
     } catch (error) {

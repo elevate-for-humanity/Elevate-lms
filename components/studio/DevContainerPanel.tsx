@@ -261,8 +261,8 @@ export default function DevContainerPanel() {
   }
 
   return (
-    <section className="flex min-h-[720px] flex-col bg-white text-slate-900">
-      <header className="border-b border-slate-200 bg-white px-4 py-4 text-slate-950">
+    <section className="flex h-full min-h-0 min-w-0 flex-col overflow-y-auto bg-white text-slate-900">
+      <header className="shrink-0 border-b border-slate-200 bg-white px-4 py-4 text-slate-950">
         <div className="flex flex-wrap items-center gap-3">
           <div className="mr-auto">
             <h2 className="font-bold">Container configuration & deployments</h2>
@@ -279,7 +279,7 @@ export default function DevContainerPanel() {
           </button>
         </div>
 
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => setTab('configuration')}
@@ -341,7 +341,7 @@ export default function DevContainerPanel() {
                 value={editedRaw}
                 onChange={(event) => setEditedRaw(event.target.value)}
                 spellCheck={false}
-                className="min-h-[520px] flex-1 resize-none rounded-xl border border-slate-300 bg-slate-50 p-4 font-mono text-xs leading-5 text-slate-900 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                className="min-h-72 w-full min-w-0 flex-1 resize-y rounded-xl border border-slate-300 bg-slate-50 p-4 font-mono text-xs leading-5 text-slate-900 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 sm:min-h-[520px]"
                 aria-label="devcontainer.json editor"
               />
 
@@ -430,7 +430,7 @@ export default function DevContainerPanel() {
                   <div key={entry.key} className="flex flex-col gap-3 px-4 py-3 lg:flex-row lg:items-center">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <code className="font-semibold text-slate-900">{entry.key}</code>
+                        <code className="break-all font-semibold text-slate-900">{entry.key}</code>
                         <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-600">
                           {entry.scope}
                         </span>
@@ -443,7 +443,7 @@ export default function DevContainerPanel() {
                       <p className="mt-1 font-mono text-xs text-slate-500">{entry.masked_value}</p>
                       {entry.description ? <p className="mt-1 text-xs text-slate-500">{entry.description}</p> : null}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {entry.scope === 'runtime' ? (
                         <button
                           type="button"

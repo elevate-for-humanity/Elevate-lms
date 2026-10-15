@@ -37,6 +37,10 @@ export async function continueCourseQueue({ dispatch = dispatchQueuedCourseJob,
     if (state.status !== last) onState(state);
     last = state.status;
     if (last === 'empty') return { status: 'empty' };
+    // Capacity exhaustion cannot be resolved by spinning the coordinator.
+    // Exit instead of running for twenty minutes and dispatching another
+    // workflow. The scheduled dispatcher can retry after quota recovers.
+    if (last === 'capacity_wait') return {status:'capacity_wait', reason:state.reason ?? 'regional_capacity_unavailable'};
     if (now() - started < budgetMs) await delay(30_000);
   } while (now() - started < budgetMs);
 

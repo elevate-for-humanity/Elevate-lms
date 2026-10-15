@@ -319,7 +319,7 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
     image: '/images/pages/contact-hero.jpg',
     variant: 'split',
     height: 'medium',
-    ctaPrimary: { label: 'Call Now', href: 'tel:3173143757' },
+    ctaPrimary: { label: 'Call Now', href: 'tel:4632401404' },
   },
 
   // Testimonials

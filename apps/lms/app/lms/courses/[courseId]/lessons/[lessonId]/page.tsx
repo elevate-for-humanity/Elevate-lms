@@ -246,6 +246,9 @@ export default async function LessonPage({
     : Array.isArray(instructionalTimeline?.captions)
       ? instructionalTimeline.captions
       : [];
+  const captionsUrl = [interactiveVideo?.captionsUrl, (lesson.content_json as any)?.film?.captionsUrl, (lesson.content_json as any)?.film?.sceneData?.captionUrl, experience?.film?.captionsUrl,
+    experience?.film?.sceneData?.captionUrl, experience?.media?.caption_url]
+    .find((value): value is string => typeof value === 'string' && /^https:\/\//.test(value));
   const slides = teachingSlidesFromExperience(lesson.title, lessonHtml, experience);
   const videoConfig =
     lesson.video_config && typeof lesson.video_config === 'object'
@@ -335,6 +338,7 @@ export default async function LessonPage({
                 courseId={course.id}
                 checkpoints={videoCheckpoints}
                 transcript={videoTranscript}
+                captionsUrl={captionsUrl}
               />
             </div>
           </section>

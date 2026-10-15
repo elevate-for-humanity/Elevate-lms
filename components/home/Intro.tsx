@@ -13,7 +13,7 @@ export default function Intro() {
                 src="/images/heroes/hero-homepage.webp"
                 alt="Free Workforce Training"
                 fill
-                className="object-cover"
+                className="object-contain"
                 priority
                 sizes="100vw"
               />
@@ -37,7 +37,7 @@ export default function Intro() {
                 src="/images/heroes/hero-homepage.webp"
                 alt="Industry Credentials"
                 fill
-                className="object-cover"
+                className="object-contain"
                 priority
                 sizes="100vw"
               />

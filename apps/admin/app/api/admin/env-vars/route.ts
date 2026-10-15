@@ -22,7 +22,7 @@ const SECRET_PATTERNS = [
 ];
 
 function isSecret(key: string): boolean {
-  return key.startsWith('AGENT_MEMORY_') || key === 'ELEVATE_MEDIA_ACCESS_KEY_ID' ||
+  return key.startsWith('IRS_') || key.startsWith('AGENT_MEMORY_') || key === 'ELEVATE_MEDIA_ACCESS_KEY_ID' ||
     SECRET_PATTERNS.some((pattern) => pattern.test(key));
 }
 
@@ -118,7 +118,9 @@ export async function POST(req: NextRequest) {
     return safeError(error instanceof Error ? error.message : 'Invalid Elevate Media settings', 400);
   }
   const runtimeEntries = entries.filter(entry => googlePolicy.components.admin.keys.includes(entry.key));
-  const lmsEntries = runtimeEntries.filter(entry => isElevateMediaRuntimeKey(entry.key) && googlePolicy.components.lms.keys.includes(entry.key));
+  const lmsEntries = runtimeEntries.filter(entry =>
+    (isElevateMediaRuntimeKey(entry.key) || entry.key.startsWith('TWILIO_') || entry.key.startsWith('PBX_')) &&
+    googlePolicy.components.lms.keys.includes(entry.key));
   try {
     if (runtimeEntries.length) validateRuntimeEntries('admin', runtimeEntries);
     if (lmsEntries.length) validateRuntimeEntries('lms', lmsEntries);

@@ -1,3 +1,4 @@
+import {sceneRole} from '../core/repair-policy.mjs';
 import type { UltimateInstructionalGenerator } from '../instructional/generation-contract';
 import type { UltimateCompetency, UltimateCredentialProfile } from '../core/types';
 import { validateLessonBlueprint, type LessonBlueprint } from '../instructional/lesson-blueprint';
@@ -15,6 +16,7 @@ type Evidence = {
   };
   competency: UltimateCompetency;
   prior?: Record<string, any>;
+  repairDirective?: any;
 };
 /** Keep long authored stages intact rather than creating more scenes than the contract allows. */
 export function storyboardSegments(
@@ -56,13 +58,13 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       [e.competency.id, `course-lesson:${e.competency.id}`, `course:${e.competency.id}`].includes(s.id) ||
       e.competency.authorityRequirementIds.includes(s.id)) ?? [];
     const approved = e.profile.lessonBlueprints?.[e.competency.id];
-    if (approved) {
+    if (approved && !e.repairDirective) {
       validateLessonBlueprint(approved, e.competency);
       if (e.profile.instructionalAuthoring?.provider === 'google') validateGoogleAuthoringEvidence(approved, lessonSources);
       return approved;
     }
     const existing = e.prior?.learning_objectives?.blueprint;
-    if (existing && (e.profile.lessonPresentation !== 'approved-premium-v1' || existing.segments?.every((s:any)=>s.recapText?.trim()))) {
+    if (existing && !e.repairDirective && (e.profile.lessonPresentation !== 'approved-premium-v1' || existing.segments?.every((s:any)=>s.recapText?.trim()))) {
       validateLessonBlueprint(existing, e.competency);
       if (e.profile.instructionalAuthoring?.provider === 'google') validateGoogleAuthoringEvidence(existing, lessonSources);
       return existing;
@@ -70,6 +72,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     const key = contractHash({
       profile: e.profile,
       competency: e.competency,
+      repairDirective:e.repairDirective,
       version: ULTIMATE_LESSON_CONTRACT_VERSION,
     });
     if (!this.drafts.has(key)) this.drafts.set(key, this.generate(e));
@@ -95,7 +98,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
     if (e.profile.instructionalAuthoring?.provider === 'google') {
       const config = e.profile.instructionalAuthoring;
       if (config.version !== GOOGLE_LESSON_AUTHOR_VERSION) throw new Error('ULTIMATE_AUTHORING_VERSION_REQUIRED');
-      const authored = await authorGoogleLesson({ profile: e.profile, competency: e.competency, sources },
+      const authored = await authorGoogleLesson({ profile: e.profile, competency: e.competency, sources, repairDirective:e.repairDirective },
         (system, input) => generateVertexLessonJson(config.model, system, input, config.location));
       return e.profile.lessonPresentation === 'approved-premium-v1' ? addFreshTeachingRecaps(authored,e.profile,sources) : authored;
     }
@@ -253,7 +256,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
         objectiveIds: s.objectiveIds,
         sourceRequirementIds: s.sourceRequirementIds,
         visualRequirement: s.visualRequirement,
-        sceneType: s.sceneType,
+        sceneType: sceneRole(s.stage,s.sceneType),
         teachingVisual: s.teachingVisual ?? produceTeachingVisual(s.text, s.stage),
       })),
     };

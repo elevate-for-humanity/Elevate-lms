@@ -26,12 +26,15 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const candidates = await response.json();
   if (!Array.isArray(candidates)) throw new Error('COURSE_QUEUE_RESPONSE_INVALID');
   const queued = candidates.filter(job => job.max_attempts === undefined || job.attempts < job.max_attempts);
-  if (queued.length === 0) return {status:'empty'};
+  // A leased task can enqueue its next lesson only after finishing the current
+  // one. Keep the coordinator alive across that handoff without launching more tasks.
+  // An already-running Cloud Run execution owns its task independently.
+  // With no claimable queue entries there is nothing to dispatch; keeping
+  // the GitHub coordinator awake wastes runtime and cannot advance a lesson.
+  if (queued.length === 0) return {status:'empty',activeExecutions:active.length};
   const job = JSON.parse(run('gcloud', ['run','jobs','describe','elevate-course-builder',...scope,'--format=json'], {encoding:'utf8',stdio:['ignore','pipe','pipe']}));
   const task = job.spec?.template?.spec?.template?.spec;
   if (!task?.containers?.length) throw new Error('COURSE_JOB_CONFIGURATION_UNAVAILABLE');
-  const capacity = await capacityCheck({region:'us-central1', task, run: args => run('gcloud', args, {encoding:'utf8',stdio:['ignore','pipe','pipe']})});
-  if (!capacity.fits) return {status:'capacity_wait', ...capacity};
   // One Cloud Run task claims one job via the existing atomic Supabase RPC.
   // Start independent tasks for waiting builds instead of serializing every
   // course behind the first running lesson. Keep a bounded default for quota.
@@ -40,7 +43,19 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   // Bound new tasks to configured concurrency, including existing executions.
   const slots = Math.max(0, limit - active.reduce((sum, execution) => sum + Math.max(1, Number(execution.spec?.taskCount ?? execution.status?.taskCount ?? 1)), 0));
   if (!slots) return {status:'busy',activeExecutions:active.length};
-  const tasks = Math.min(slots, queued.length);
+  const parallelism = Number(job.spec?.template?.spec?.parallelism);
+  if (!Number.isSafeInteger(parallelism) || parallelism < 1) throw new Error('COURSE_JOB_PARALLELISM_UNAVAILABLE');
+  let tasks = Math.min(slots, queued.length, parallelism);
+  let capacity;
+  // Budget the entire batch. Keep every requested task eligible for an immediate
+  // claim; do not launch a batch larger than the existing job parallelism.
+  do {
+    capacity = await capacityCheck({region:'us-central1', task, taskCount:tasks,
+      run: args => run('gcloud', args, {encoding:'utf8',stdio:['ignore','pipe','pipe']})});
+    if (capacity.fits) break;
+    tasks--;
+  } while (tasks > 0);
+  if (!tasks) return {status:'capacity_wait', ...capacity};
   run('gcloud',['run','jobs','execute','elevate-course-builder',...scope,`--tasks=${tasks}`,'--async','--quiet'],{stdio:'inherit'});
   // Launch is not assignment. Require fresh durable claims for every task.
   const pending = new Map(queued.slice(0,tasks).map(item => [item.id, item.heartbeat_at || '']));

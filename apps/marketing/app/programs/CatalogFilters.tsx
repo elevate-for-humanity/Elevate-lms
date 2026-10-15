@@ -77,17 +77,17 @@ function CatalogProgramCard({ p }: { p: CatalogProgram }) {
   return (
     <Link
       href={`/programs/${p.slug}`}
-      className="group block overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500"
+      className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500"
     >
       {/* Cover image — no overlay, no text on image */}
-      <div className="relative aspect-[16/10] overflow-hidden">
+      <div className="relative aspect-[4/3] overflow-hidden">
         <Image
           placeholder="blur"
           blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src={getProgramCardImage(p.slug)}
           alt={getProgramImageAlt(p.slug, p.heroImageAlt)}
           fill
-          className="object-cover transition duration-500 group-hover:scale-105"
+          className="object-cover contrast-105 saturate-110 transition duration-500 group-hover:scale-105"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
         />
         {/* Top badges only — no overlay, no text */}
@@ -108,7 +108,7 @@ function CatalogProgramCard({ p }: { p: CatalogProgram }) {
       </div>
 
       {/* Card body — title and meta below image */}
-      <div className="px-4 py-3">
+      <div className="flex flex-1 flex-col px-4 py-3">
         <h3 className="font-semibold text-slate-900 text-sm leading-tight mb-1">{p.title}</h3>
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-1 text-xs text-black">

@@ -1,3 +1,4 @@
+import { STORYBOARD_RENDER_PRODUCER } from '../../video/render-checkpoint-contract.mjs';
 import type { UltimateRenderPort } from '../core/ports';
 import { storedLicensedMediaMetadata } from '@/lib/media/licensed-course-media';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -52,7 +53,7 @@ export async function refreshLicensedVisualUrls(input: any, db: SupabaseClient):
   if (!Array.isArray(assignment.readyAssets)) return input;
   const readyAssets = await Promise.all(
     assignment.readyAssets.map(async (value: unknown) => {
-      const asset = record(value);
+      const asset = { ...record(value) };
       if(asset.entitlement_id) {
         const {data:entitlement,error:lookupError}=await db.from('licensed_media_entitlements')
           .select('metadata').eq('id',asset.entitlement_id).single();
@@ -146,9 +147,9 @@ function visualCandidates(input: any): VisualCandidate[] {
 
 function rawStoryboard(input: any): RecordLike {
   const raw =
-    input.artifacts?.storyboard?.storyboard ??
-    input.artifacts?.synchronization?.timeline?.scenes?.storyboard?.storyboard ??
     input.artifacts?.scene_construction?.scenes?.storyboard?.storyboard ??
+    input.artifacts?.synchronization?.timeline?.scenes?.storyboard?.storyboard ??
+    input.artifacts?.storyboard?.storyboard ??
     input.storyboard;
   const board = Array.isArray(raw) ? { scenes: raw } : record(raw);
   if (!Array.isArray(board.scenes) || board.scenes.length < 2) {
@@ -353,6 +354,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       storyboard,
       instructorId: instructorFor(courseTitle),
       ultimateStrict: true,
+      renderRevision: input.renderRevision,
       lessonPresentation: input.lessonPresentation,
       visualStyle,
       teachingPhotos,
@@ -368,6 +370,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       ...result,
       layoutVersion: input.lessonPresentation === 'approved-premium-v1' ? 4 : 2,
       ...(input.lessonPresentation === 'approved-premium-v1' ? {presentationVersion:'approved-moment-cues-v2'} : {}),
+      renderProducer: STORYBOARD_RENDER_PRODUCER,
       provider: 'remotion',
       providerModel: 'SlideLesson-blueprint-v3',
       captionsUrl: result.sceneData?.captionUrl,

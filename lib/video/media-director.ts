@@ -88,6 +88,8 @@ export interface MediaScene {
   physicalDemonstration?: boolean;
   /** Written by the renderer only when the encoded scene uses this measured title box. */
   titleLayout?: 'footage-title-v1';
+  /** Scene-specific title scale for verified encoded-text readability repairs. */
+  titleFontSize?: number;
   mediaSource: 'pexels' | 'elevate-owned' | 'elevate-motion';
   overlayTemplate: string;
   contentHash: string;
@@ -489,6 +491,9 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
             stringValue((raw.teaching_model as Record<string, unknown> | undefined)?.memory_anchor),
           ) || undefined,
         teachingVisual: scene.teachingVisual as MediaScene['teachingVisual'],
+        titleFontSize: typeof scene.titleFontSize === 'number' && Number.isFinite(scene.titleFontSize)
+          ? scene.titleFontSize
+          : undefined,
         physicalDemonstration: scene.physical_demonstration === true || scene.physicalDemonstration === true,
         mediaSource,
         overlayTemplate,

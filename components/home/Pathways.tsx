@@ -17,7 +17,7 @@ export default function Pathways() {
                 src="/images/pages/comp-home-pathways-train.webp"
                 alt="Students learning"
                 fill
-                className="object-cover group-hover:scale-105 transition"
+                className="object-contain  transition"
                 sizes="100vw"
               />
               <div className="absolute inset-0 " />
@@ -37,7 +37,7 @@ export default function Pathways() {
                 src="/images/pages/comp-home-pathways-support.webp"
                 alt="Career pathways"
                 fill
-                className="object-cover group-hover:scale-105 transition"
+                className="object-contain  transition"
                 sizes="100vw"
               />
               <div className="absolute inset-0 " />

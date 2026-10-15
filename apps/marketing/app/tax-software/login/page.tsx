@@ -1,24 +1,19 @@
 'use client';
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
+import { taxLoginDestination } from '@/lib/tax-software/login-destination';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 function taxWorkspaceDestination() {
-  const requested = new URLSearchParams(window.location.search).get('redirect');
-  if (!requested) return '/tax-software/self-file';
-  try {
-    const url = new URL(requested, window.location.origin);
-    if (
-      url.origin === window.location.origin &&
-      (url.pathname === '/tax-software/self-file' ||
-        url.pathname.startsWith('/tax-software/self-file/'))
-    )
-      return url.pathname + url.search;
-  } catch {
-    // Invalid return links fall back to the main tax workspace.
-  }
-  return '/tax-software/self-file';
+  return taxLoginDestination(
+    new URLSearchParams(window.location.search).get('redirect'),
+    window.location.origin,
+  );
 }
 export default function TaxLogin() {
+  const [returnPath, setReturnPath] = useState('/tax-software/self-file');
+  useEffect(() => {
+    setReturnPath(taxWorkspaceDestination());
+  }, []);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -78,9 +73,16 @@ export default function TaxLogin() {
         <Link href="/tax" className="font-semibold text-sky-800">
           ← Supersonic Fast Cash
         </Link>
-        <h1 className="mt-8 text-3xl font-bold">Sign in to your tax workspace</h1>
+        <h1 className="mt-8 text-3xl font-bold">
+          {returnPath.startsWith('/tax-software/careers')
+            ? 'Continue your job application'
+            : returnPath.startsWith('/tax-software/office')
+              ? 'Sign in to your office'
+              : 'Sign in to your tax workspace'}
+        </h1>
         <p className="mt-4 text-slate-600">
-          Use your existing Elevate account. Your returns remain private to your account.
+          Use your existing Elevate account to continue. Your application, training or tax workspace
+          stays connected to your account.
         </p>
         {factors.length > 0 ? (
           <form onSubmit={verify} className="mt-7 space-y-5 rounded-2xl bg-white p-7">
@@ -162,7 +164,10 @@ export default function TaxLogin() {
               Forgot your password?
             </Link>
             <Link
-              href="https://app.elevateforhumanity.org/signup"
+              href={
+                'https://app.elevateforhumanity.org/signup?next=' +
+                encodeURIComponent('https://www.elevateforhumanity.org' + returnPath)
+              }
               className="block font-semibold text-sky-800"
             >
               Create an Elevate account

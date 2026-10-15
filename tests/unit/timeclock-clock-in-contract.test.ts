@@ -53,16 +53,16 @@ describe('timeclock clock-in persistence contract', () => {
   it('notifies the apprentice when a geofence blocks a timeclock action', () => {
     expect(route).toContain("to: user.email");
     expect(route).toContain("Timeclock ${actionLabel[action]} blocked");
-    expect(route).toContain('You must clock out before leaving the shop radius');
+    expect(route).toContain('You must clock out at your school or assigned site before leaving');
     expect(route).toContain('No time was recorded');
     expect(route).toContain("type: 'timeclock'");
     expect(route).toContain("message: studentText");
   });
 
   it('notifies administrators for successful and failed clock-in attempts', () => {
-    expect(route).toContain('notifyAdminsOfClockInAttempt');
-    expect(route).toContain('Successful clock-in');
-    expect(route).toContain('Clock-in failed');
+    expect(route).toContain('notifyAdminsOfClockAttempt');
+    expect(route).toContain('Successful ${label}');
+    expect(route).toContain('${label} blocked');
     expect(route).toContain("code: 'OUTSIDE_GEOFENCE'");
     expect(route).toContain("code: 'IDENTITY_VERIFICATION_REQUIRED'");
     expect(route).toContain("code: 'THEORY_SESSION_ACTIVE'");

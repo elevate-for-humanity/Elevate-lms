@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 const PROGRAMS = [
   {
     title: 'Certified Nursing Assistant',
-    description: 'Prepare for entry-level nursing support, resident care, safety, and certification requirements.',
+    description:
+      'Prepare for entry-level nursing support, resident care, safety, and certification requirements.',
     href: '/programs/cna',
   },
   {
@@ -23,22 +24,26 @@ const PROGRAMS = [
   },
   {
     title: 'Phlebotomy Technician',
-    description: 'Learn specimen collection, infection control, patient identification, and workplace safety.',
+    description:
+      'Learn specimen collection, infection control, patient identification, and workplace safety.',
     href: '/programs/phlebotomy-technician',
   },
   {
     title: 'Patient Care Technician',
-    description: 'Develop practical patient-support skills for hospitals, clinics, and long-term care settings.',
+    description:
+      'Develop practical patient-support skills for hospitals, clinics, and long-term care settings.',
     href: '/programs/patient-care-technician',
   },
   {
     title: 'Pharmacy Technician',
-    description: 'Prepare for pharmacy operations, medication safety, inventory, and certification.',
+    description:
+      'Prepare for pharmacy operations, medication safety, inventory, and certification.',
     href: '/programs/pharmacy-technician',
   },
   {
     title: 'Medical Billing & Coding',
-    description: 'Train in healthcare documentation, claims, coding fundamentals, and revenue-cycle support.',
+    description:
+      'Train in healthcare documentation, claims, coding fundamentals, and revenue-cycle support.',
     href: '/programs/medical-billing-coding',
   },
 ] as const;
@@ -80,7 +85,7 @@ export default function HealthcareProgramsPage() {
               </Link>
             </div>
           </div>
-          <div className="relative min-h-[320px] overflow-hidden rounded-3xl border border-white/15 bg-emerald-900 shadow-2xl sm:min-h-[430px]">
+          <div className="relative min-h-[320px] overflow-hidden rounded-3xl border border-white/15 bg-emerald-900 shadow-2xl sm:min-h-[360px]">
             <Image
               src="/images/beauty/esthetics-hero.webp"
               alt="Healthcare students practicing clinical skills in a supervised classroom"
@@ -107,13 +112,25 @@ export default function HealthcareProgramsPage() {
           </div>
           <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {PROGRAMS.map((program, index) => (
-              <article key={program.title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <article
+                key={program.title}
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+              >
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800">
-                  {index % 3 === 0 ? <HeartPulse className="h-5 w-5" /> : index % 3 === 1 ? <Stethoscope className="h-5 w-5" /> : <BadgeCheck className="h-5 w-5" />}
+                  {index % 3 === 0 ? (
+                    <HeartPulse className="h-5 w-5" />
+                  ) : index % 3 === 1 ? (
+                    <Stethoscope className="h-5 w-5" />
+                  ) : (
+                    <BadgeCheck className="h-5 w-5" />
+                  )}
                 </div>
                 <h3 className="mt-4 text-xl font-black">{program.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-700">{program.description}</p>
-                <Link href={program.href} className="mt-5 inline-flex items-center gap-2 font-black text-emerald-800 hover:underline">
+                <Link
+                  href={program.href}
+                  className="mt-5 inline-flex items-center gap-2 font-black text-emerald-800 hover:underline"
+                >
                   View program <ArrowRight className="h-4 w-4" />
                 </Link>
               </article>

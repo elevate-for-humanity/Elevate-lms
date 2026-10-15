@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { activateTestedRevision, unusedCandidateTags } from './gcp/activate-tested-public-revision.mjs';
+import { activateTestedRevision, cleanupUnusedCandidateTags, unusedCandidateTags } from './gcp/activate-tested-public-revision.mjs';
 
 const commit = 'a'.repeat(40), service = 'elevate-marketing-migration', revision = service + '-candidate-a';
 const healthy = { revision, service: 'marketing', healthy: true, ready: true, configuration: { ok: true }, dependencies: { supabase: { ok: true } }, commit };
@@ -32,6 +32,61 @@ function fixture(state = healthy, status = 200, component = 'marketing') {
   f.promoted = () => calls.some(a => a.some(x => x.startsWith('--to-revisions=')));
   return f;
 }
+
+test('pre-deploy cleanup releases stale latest candidate tags without changing traffic or deleting revisions', async () => {
+  const calls = [];
+  let traffic = [
+    { revisionName: 'live', percent: 100 },
+    { tag: 'c-bbbbbbbbbbbb', revisionName: 'latest-failed-candidate' },
+    { tag: 'c-cccccccccccc', revisionName: 'live' },
+    { tag: 'release-rollback', revisionName: 'rollback' },
+    { tag: 'c-dddddddddddd', revisionName: 'ambiguous-a' },
+    { tag: 'c-dddddddddddd', revisionName: 'ambiguous-b' },
+  ];
+  const read = args => {
+    calls.push(args);
+    if (args[2] === 'update-traffic') {
+      const remove = args.find(value => value.startsWith('--remove-tags='));
+      if (remove) {
+        const tags = remove.slice('--remove-tags='.length).split(',');
+        traffic = traffic.filter(item => !tags.includes(item.tag));
+      }
+    }
+    return { status: { latestCreatedRevisionName: 'latest-failed-candidate', traffic: structuredClone(traffic) } };
+  };
+  const result = await cleanupUnusedCandidateTags({ service: 'elevate-admin-migration', read });
+  assert.deepEqual(result.removedCandidateTags, ['c-bbbbbbbbbbbb']);
+  assert.deepEqual(traffic.filter(item => item.percent > 0), [{ revisionName: 'live', percent: 100 }]);
+  assert.ok(traffic.some(item => item.tag === 'release-rollback'));
+  assert.ok(traffic.some(item => item.tag === 'c-dddddddddddd'));
+  assert.equal(calls.some(args => args.some(value => value === 'delete')), false);
+  assert.deepEqual(calls[0].slice(0, 3), ['run', 'services', 'describe']);
+  assert.ok(calls[1].includes('--remove-tags=c-bbbbbbbbbbbb'));
+});
+
+test('pre-deploy cleanup stops if serving traffic changes concurrently', async () => {
+  let reads = 0;
+  const read = args => {
+    reads++;
+    if (args[2] === 'update-traffic') return {};
+    return { status: { traffic: [
+      { revisionName: reads === 1 ? 'live' : 'other', percent: 100 },
+      { tag: 'c-eeeeeeeeeeee', revisionName: 'stale' },
+    ] } };
+  };
+  await assert.rejects(
+    cleanupUnusedCandidateTags({ service: 'elevate-admin-migration', read }),
+    /changed concurrently/,
+  );
+});
+
+test('Admin deployment runs candidate cleanup after image upload and before creating a revision', async () => {
+  const { readFileSync } = await import('node:fs');
+  const workflow = readFileSync(new URL('../.github/workflows/deploy-admin.yml', import.meta.url), 'utf8');
+  const cleanup = workflow.indexOf('CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/cleanup-unused-candidate-tags.mjs');
+  const revisionCreation = workflow.indexOf('gcloud run services update elevate-admin-migration');
+  assert.ok(cleanup >= 0 && cleanup < revisionCreation);
+});
 
 test('pinned old latest-ready revision does not prevent exact tested candidate activation', async () => {
   const f = fixture(); const result = await activateTestedRevision(f.options);

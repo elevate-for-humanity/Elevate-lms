@@ -146,7 +146,8 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       </div>
 
       {/* HERO */}
-      <section className="relative h-[clamp(260px,42svh,480px)] flex items-center">
+      <section className="bg-slate-950 text-white">
+        <div className="relative aspect-video w-full bg-white">
         {config.heroVideo ? (
           <UltraVideoPlayer
             src={config.heroVideo}
@@ -157,19 +158,20 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
             enableProgressTracking={false}
             enableResume={false}
             aspectRatio="auto"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-contain"
           />
         ) : config.heroImage ? (
           <Image
             src={config.heroImage}
             alt={config.title}
             fill
-            className="object-cover"
+            className="object-contain"
             priority
             sizes="100vw" placeholder="empty"
           />
         ) : null}
 
+        </div>
         <div className="relative z-10 max-w-7xl mx-auto px-6 py-20">
           <div className="max-w-3xl">
             {/* Badges */}

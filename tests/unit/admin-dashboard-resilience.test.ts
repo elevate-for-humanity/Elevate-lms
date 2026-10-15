@@ -9,12 +9,18 @@ const read = (relativePath: string) =>
   fs.readFileSync(path.join(root, relativePath), 'utf8');
 
 describe('Admin dashboard resilience', () => {
+  it('serves packaged logo images without a session or optimizer fetch', () => {
+    const middleware = read('apps/admin/middleware.ts');
+    const config = read('apps/admin/next.config.mjs');
+    expect(middleware).toContain('/^\\/images\\/.+\\.(?:png|jpe?g|webp|avif|gif|svg|ico)$/i.test(pathname)');
+    expect(config).toContain('images: { unoptimized: true }');
+  });
   it('resolves the Cloud Browser target through canonical configuration', () => {
     const workspace = read('components/studio/CloudBrowserWorkspace.tsx');
 
     expect(workspace).toContain("fetch('/api/admin/dev-studio/config'");
     expect(workspace).toContain('payload.defaultPreviewUrl');
-    expect(workspace).toContain('window.location.origin');
+    expect(workspace).toContain("setTarget(configuredTarget || '')");
     expect(workspace).not.toContain(
       "useState('https://admin.elevateforhumanity.org/dashboard')",
     );
@@ -22,11 +28,12 @@ describe('Admin dashboard resilience', () => {
 
   it('does not classify an intentional generation pause as degraded health', () => {
     const route = read('apps/admin/app/api/admin/courses/health/route.ts');
-    const studio = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+    const inspector = read('components/admin/course-builder/UltimateStageInspector.tsx');
 
     expect(route).toContain("state: generationPaused ? 'paused' : 'ready'");
     expect(route).not.toContain("if (generationPaused) status = 'degraded'");
-    expect(studio).toContain("check.state === 'paused'");
+    expect(route).toMatch(/name: 'Course Factory Generation',\s+passed: true/);
+    expect(inspector).toContain("check.passed ? 'Passed' : 'Needs repair'");
   });
 
   it('timeboxes every Admin dashboard dependency independently', () => {

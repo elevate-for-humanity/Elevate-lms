@@ -2,7 +2,36 @@ name: Deploy Google Store runtime identity
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/deploy-google-store-runtime.yml', 'apps/marketing/**', 'components/**', 'lib/**', 'packages/**', 'Dockerfile.marketing', 'next.config.mjs', 'package.json', 'pnpm-lock.yaml', 'scripts/gcp/activate-tested-public-revision.mjs', 'public/**', 'content/**', 'config/**', 'pnpm-workspace.yaml', 'tsconfig.json', 'tsconfig.*.json', '.dockerignore', 'apps/admin/package.json', 'apps/lms/package.json', 'scripts/stamp-sw.mjs', 'scripts/verify-portal-production-contracts.mjs']
+    paths:
+      [
+        'scripts/build-memory-policy.*',
+        'scripts/check-build-memory-policy.mjs',
+        'scripts/run-bounded-build.*',
+        'scripts/build-next-app.*',
+        'scripts/container-build-policy.mjs',
+        '.github/workflows/deploy-google-store-runtime.yml',
+        'apps/marketing/**',
+        'components/**',
+        'lib/**',
+        'packages/**',
+        'Dockerfile.marketing',
+        'next.config.mjs',
+        'package.json',
+        'pnpm-lock.yaml',
+        'scripts/gcp/activate-tested-public-revision.mjs',
+        'public/**',
+        'content/**',
+        'config/**',
+        'pnpm-workspace.yaml',
+        'tsconfig.json',
+        'tsconfig.*.json',
+        '.dockerignore',
+        'apps/admin/package.json',
+        'apps/lms/package.json',
+        'scripts/stamp-sw.mjs',
+        'scripts/verify-portal-production-contracts.mjs',
+        'scripts/gcp/resolve-main-release*',
+      ]
   workflow_dispatch:
     inputs:
       requested_sha:
@@ -29,11 +58,30 @@ jobs:
           latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
           [[ "$latest" =~ ^[a-f0-9]{40}$ ]]
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-store-runtime.yml/dispatches" -f ref=main -f "inputs[requested_sha]=$latest"
+  validate:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    outputs:
+      ready: ${{ steps.release.outputs.ready }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - name: Resolve current main or hand off superseded release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_SHA: ${{ inputs.requested_sha }}
+          RELEASE_WORKFLOW: deploy-google-store-runtime.yml
+        run: |
+          node --test scripts/gcp/resolve-main-release.test.mjs
+          node scripts/gcp/resolve-main-release.mjs
   deploy:
+    needs: validate
     concurrency:
       group: google-production-store
-      cancel-in-progress: true
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+      # Finish the active tested release; queue the latest main update.
+      cancel-in-progress: false
+    if: needs.validate.outputs.ready == 'true'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 120
@@ -43,27 +91,19 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
     steps:
       - uses: actions/checkout@v4
-        with: {persist-credentials: false}
-      - name: Reject superseded Store deployments before building
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REQUESTED_SHA: ${{ inputs.requested_sha }}
-        run: |
-          set -euo pipefail
-          if test -n "$REQUESTED_SHA" && ! [[ "$REQUESTED_SHA" =~ ^[a-f0-9]{40}$ ]]; then exit 1; fi
-          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
-          test "$latest" = "$GITHUB_SHA"
-          if test -n "$REQUESTED_SHA"; then test "$REQUESTED_SHA" = "$GITHUB_SHA"; fi
+        with: { persist-credentials: false }
       - uses: pnpm/action-setup@v4
-        with: {version: 10.28.2}
+        with: { version: 10.28.2 }
       - uses: actions/setup-node@v4
-        with: {node-version: '22'}
+        with: { node-version: '22' }
       - name: Typecheck shared application before Docker build
         run: |
-          pnpm install --frozen-lockfile --strict-peer-dependencies=false
-          pnpm exec tsc --noEmit --project apps/marketing/tsconfig.json
+          node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+          pnpm run typecheck:marketing
       - name: Verify Store and Marketing identity contracts
         run: node --experimental-strip-types --test scripts/gcp/public-runtime-service.test.mjs scripts/gcp/verify-public-health.test.mjs scripts/gcp/verify-runtime-readiness.test.mjs
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build shared commerce application for Store
         run: |
           set -euo pipefail
@@ -82,7 +122,7 @@ jobs:
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
-        with: {skip_install: true}
+        with: { skip_install: true }
       - name: Upload tested Store image
         run: |
           set -euo pipefail

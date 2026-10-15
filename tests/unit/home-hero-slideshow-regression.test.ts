@@ -5,23 +5,18 @@ import { describe, expect, it } from 'vitest';
 const source = fs.readFileSync(path.resolve('components/ui/HomeHeroVideo.tsx'), 'utf8');
 
 describe('homepage hero slideshow rendering', () => {
-  it('loads the homepage content before the hero video without a splash transition', () => {
-    const homepageHero = fs.readFileSync(
-      path.resolve('components/home/PlatformHubHero.tsx'),
-      'utf8',
-    );
-
-    expect(homepageHero).toContain('SafeHeroVideo');
-    expect(homepageHero).toContain('hero-home-fast.mp4');
-    expect(homepageHero).toContain('priority');
-    expect(homepageHero).toContain('loop');
-    expect(homepageHero).toContain('hero-home-first-frame.webp');
-    expect(homepageHero).toContain('Apprenticeship tuition is self-pay only.');
-    expect(homepageHero).toContain('href="/programs"');
-    expect(homepageHero).toContain('href="/apprenticeships"');
-    expect(homepageHero).toContain('href="/partners/host-shops"');
-    expect(homepageHero).not.toContain('data-narration-src="/audio/narration/home-hero.mp3"');
-
+  it('loads the current static hero with bounded responsive sizing and direct navigation', () => {
+    const hero = fs.readFileSync(path.resolve('components/home/PlatformHubHero.tsx'), 'utf8');
+    expect(hero).toContain('/images/refresh-20261014/home.webp');
+    expect(hero).toContain('priority');
+    expect(hero).toContain('aspect-video');
+    expect(hero).toContain('38svh,480px');
+    expect(hero).toContain('object-cover');
+    for (const href of ['/programs', '/check-eligibility', '/employers', '/store/apps/website-builder']) {
+      expect(hero).toContain(`href="${href}"`);
+    }
+    expect(hero).not.toContain('SafeHeroVideo');
+    expect(hero).not.toContain('min-h-screen');
   });
 
   it('loops only the homepage hero visual while narration remains separate', () => {
@@ -115,7 +110,8 @@ describe('homepage hero slideshow rendering', () => {
     const renderer = fs.readFileSync(path.resolve('components/marketing/HeroVideo.tsx'), 'utf8');
     expect(renderer).toContain('transition-[opacity,transform] duration-1000 ease-in-out');
     expect(renderer).toContain('motion-reduce:transition-none');
-    expect(renderer).toContain("'scale-100 opacity-100'");
-    expect(renderer).toContain("'scale-[1.015] opacity-0'");
+    expect(renderer).toContain("'opacity-100'");
+    expect(renderer).toContain("'opacity-0'");
+    expect(renderer).not.toContain('scale-[1.015]');
   });
 });

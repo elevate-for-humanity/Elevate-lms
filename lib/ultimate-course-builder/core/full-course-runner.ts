@@ -15,6 +15,9 @@ export type UltimateCoursePlan = {
   targetCompetencyId?: string;
   startIndex?: number;
   maxLessons?: number;
+  repairFromStep?: UltimateBuildStep;
+  repairRenderRevision?: string;
+  beforeCheckpoint?: UltimateRunContext['beforeCheckpoint'];
 };
 export async function runUltimateCourse(
   plan: UltimateCoursePlan,
@@ -53,21 +56,28 @@ export async function runUltimateCourse(
     console.info('[UltimateCourse] checkpoint loaded', {lessonBuildId: lesson.id, passedSteps: checkpoint.passedSteps.length});
     const restoredPassed: UltimateBuildStep[] = [];
     for (const step of ULTIMATE_BUILD_STEPS) {
+      if (step === plan.repairFromStep) break;
       if (!checkpoint.passedSteps.includes(step)) break;
       restoredPassed.push(step);
     }
-    const restoredArtifacts = Object.fromEntries(
+    const restoredArtifacts: any = Object.fromEntries(
       restoredPassed.map((step) => [step, checkpoint.artifacts[step]]),
     );
+    if(!plan.repairFromStep && (checkpoint.artifacts as any).__repairState)restoredArtifacts.__repairState=(checkpoint.artifacts as any).__repairState;
+    if((checkpoint.artifacts as any).__renderRevision)restoredArtifacts.__renderRevision=(checkpoint.artifacts as any).__renderRevision;
+    if(plan.repairRenderRevision)restoredArtifacts.__renderRevision=plan.repairRenderRevision;
     const context: UltimateRunContext = {
       buildId: plan.buildId + ':' + competency.id,
       courseId: plan.courseId,
       profile: plan.profile,
       lessonBuildId: lesson.id,
       artifacts: restoredArtifacts as UltimateRunContext['artifacts'],
-      findings: checkpoint.findings.filter((f) => restoredPassed.includes(f.step)),
+      // Previous failed findings are historical. A passed checkpoint must not
+      // carry its old error into a newly repaired lesson's acceptance result.
+      findings: checkpoint.findings.filter((f) => f.severity !== 'error' && restoredPassed.includes(f.step)),
       passedSteps: new Set(restoredPassed),
       assertActive,
+      beforeCheckpoint: plan.beforeCheckpoint,
       persistStep: async (input) => {
         assertActive?.();
         console.info('[UltimateCourse] step transition', {lessonBuildId: lesson.id, step: input.step, state: input.state});
@@ -107,7 +117,16 @@ export async function runUltimateCourse(
     console.info('[UltimateCourse] runner returned', {lessonBuildId: lesson.id, findings: result.findings.length});
     assertActive?.();
     if (!result.findings.some((f) => f.severity === 'error')) {
-      try { assertCompleteLesson(result.artifacts, plan.profile, competency.id); }
+      try {
+        assertCompleteLesson(result.artifacts, plan.profile, competency.id);
+        // Reconcile the checkpoint table only after independent acceptance has
+        // verified the recovered producer's input/output certificates too.
+        for (const step of checkpoint.recoveredSteps ?? []) {
+          assertActive?.();
+          await persistence.recordStep({ lessonBuildId: lesson.id, step, state: 'passed',
+            artifacts: result.artifacts[step], findings: [] });
+        }
+      }
       catch (error) {
         result.findings.push({step:'credential_release',severity:'error',code:'FULL_LESSON_ACCEPTANCE_REQUIRED',message:error instanceof Error?error.message:String(error)});
       }

@@ -7,7 +7,7 @@ import { emitPlatformEvent } from '@/lib/platform/orchestration/events';
 import { logger } from '@/lib/logger';
 import { getPlatformHealth } from '@/lib/platform/platform-health';
 import { getDecryptedPlatformSecret } from '@/lib/secrets';
-import { getAITool, type AIAgentId, type AIToolDefinition } from './registry';
+import { canAgentUseTool, getAITool, type AIAgentId, type AIToolDefinition } from './registry';
 
 export type AIToolExecutionContext = {
   agent: AIAgentId;
@@ -154,6 +154,10 @@ async function dispatchToolRequest(
     const request = new NextRequest(url, init);
     return tool.method === 'GET' ? route.GET(request) : route.POST(request);
   }
+  if (tool.name === 'browser.launch') {
+    const { POST } = await import('@/apps/admin/app/api/admin/dev-studio/browser/session/route');
+    return POST(new NextRequest(url, init));
+  }
   if (tool.name === 'workflows.runTests') {
     return dispatchGithubWorkflow('ci.yml');
   }
@@ -165,6 +169,10 @@ async function dispatchToolRequest(
       '@/apps/admin/app/api/admin/dev-studio/engineering/route'
     );
     return POST(new NextRequest(url, init));
+  }
+  if (tool.name === 'courses.status') {
+    const { GET } = await import('@/apps/admin/app/api/admin/ultimate-course-builder/route');
+    return GET(new NextRequest(url, init));
   }
   if (tool.name === 'courses.generate') {
     const { POST } = await import(
@@ -292,7 +300,7 @@ export async function executeRegisteredAITool(
     };
   }
 
-  if (!tool.allowedAgents.includes(context.agent)) {
+  if (!canAgentUseTool(tool, context.agent)) {
     await emitAuditEvent(tool, context, input, 'blocked', { reason: 'agent_not_authorized' });
     return {
       ok: false,

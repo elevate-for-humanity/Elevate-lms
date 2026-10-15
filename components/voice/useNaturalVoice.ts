@@ -147,6 +147,20 @@ export async function speakNaturalVoice(text: string, options: PlayOptions = {})
   }
 }
 
+/** Play PWA notification audio without pausing phone-call media or taking exclusive voice ownership. */
+export async function playNaturalVoiceNotification(text: string, volume = 1): Promise<boolean> {
+  const clean = text.trim().slice(0, 2400);
+  if (!clean || typeof window === 'undefined' || !Number.isFinite(volume) || volume <= 0) return false;
+  try {
+    const audio = await requestNaturalVoice(clean, { style: 'assistant' });
+    audio.volume = Math.min(1, Math.max(0, volume));
+    await audio.play();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function useNaturalVoice() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const playbackTokenRef = useRef(0);

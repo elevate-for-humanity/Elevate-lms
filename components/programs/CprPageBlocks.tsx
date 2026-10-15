@@ -54,7 +54,7 @@ function FullBleedImage({ src, alt }: { src: string; alt: string }) {
         src={src}
         alt={alt}
         fill
-        className="object-cover object-center"
+        className="object-contain object-center"
         sizes="100vw"
         priority placeholder="empty"
       />
@@ -80,7 +80,7 @@ function SplitBlock() {
             src="/images/pages/cpr-training-real.webp"
             alt="CPR training in progress"
             fill
-            className="object-cover object-center"
+            className="object-contain object-center"
             sizes="(max-width: 1024px) 100vw, 50vw" placeholder="empty"
           />
         </div>

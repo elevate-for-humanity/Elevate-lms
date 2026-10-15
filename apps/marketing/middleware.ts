@@ -16,6 +16,7 @@ const PROTECTED_PORTAL_PREFIXES = [
   '/workforce-board',
   '/provider',
   '/tax-software/self-file',
+  '/tax-software/office',
 ] as const;
 
 // Competency forms are operational apprenticeship records. They used to be
@@ -234,8 +235,10 @@ export async function middleware(req: NextRequest) {
   }
 
   const loginRedirect = () => {
-    const taxWorkspace = pathname === '/tax-software/self-file' || pathname.startsWith('/tax-software/self-file/');
-    const loginUrl = new URL(taxWorkspace ? '/tax-software/login' : '/login', taxWorkspace ? MARKETING_HOST : LMS_HOST);
+    const taxWorkspace = pathname === '/tax-software/self-file' || pathname.startsWith('/tax-software/self-file/') || pathname === '/tax-software/office' || pathname.startsWith('/tax-software/office/');
+    const loginUrl = taxWorkspace
+      ? new URL('/tax-software/login', MARKETING_HOST)
+      : new URL('/login', LMS_HOST);
     loginUrl.searchParams.set('redirect', taxWorkspace ? `${pathname}${search}` : `${MARKETING_HOST}${pathname}${search}`);
     const result = NextResponse.redirect(loginUrl);
     result.headers.set('Cache-Control', 'private, no-store, max-age=0');

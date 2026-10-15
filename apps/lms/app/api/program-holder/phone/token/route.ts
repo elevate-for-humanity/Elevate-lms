@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'The phone system is not active.' }, { status: 503 });
   try {
     await hydrateProcessEnv();
-    if (extension.webrtc_provider === 'asterisk') {
+    if (extension.webrtc_provider === 'asterisk' && body.purpose !== 'external') {
       const credential = await provisionAsteriskDevice(ctx.db, {
         profileId: ctx.user.id,
         deviceId: asteriskDeviceId(deviceId),
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
       .eq('connection_state', 'connected')
       .neq('device_id', deviceId)
       .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString());
-    if (!otherLiveDevices) {
+    if (!otherLiveDevices && body.purpose !== 'external') {
       await ctx.db
         .from('communication_extensions')
         .update({ presence_status: 'offline', updated_at: new Date().toISOString() })

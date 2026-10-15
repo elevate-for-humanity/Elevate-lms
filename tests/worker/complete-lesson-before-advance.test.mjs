@@ -40,6 +40,17 @@ test('full-course execution stops before creating a second lesson when final acc
  const out=await run({buildId:'b',courseId:'c',profile:{competencies:[{id:'first'},{id:'second'}]}},()=>({run:async ctx=>({...ctx,findings:[]})}),persistence(events));
  assert.equal(out.completed,false);assert.equal(out.lessons.length,1);assert.deepEqual(events,['create:first','finish:built_with_findings']);
 });
+test('checkpoint repair retains earlier evidence and reruns the requested stage and its dependents',async()=>{
+ const run=makeCourseRunner(()=>{}),events=[];
+ const p=persistence(events);
+ p.loadLessonCheckpoint=async()=>({passedSteps:['standards_lock','lesson_film_render','finished_media_qa','credential_release'],
+  artifacts:{standards_lock:{kept:true},lesson_film_render:{old:true},finished_media_qa:{old:true},credential_release:{old:true},__repairState:{status:'exhausted'}},findings:[]});
+ await run({buildId:'b',courseId:'c',profile:{competencies:[{id:'first'}]},repairFromStep:'lesson_film_render'},()=>({run:async ctx=>{
+  assert.deepEqual([...ctx.passedSteps],['standards_lock']); assert.equal(ctx.artifacts.standards_lock.kept,true);
+  assert.equal(ctx.artifacts.lesson_film_render,undefined); assert.equal(ctx.artifacts.finished_media_qa,undefined);
+  assert.equal(ctx.artifacts.__repairState,undefined); return {...ctx,findings:[]};
+ }}),p);
+});
 test('a passed complete lesson is finished before the next lesson starts',async()=>{
  const events=[],run=makeCourseRunner(()=>events.push('accept'));
  const out=await run({buildId:'b',courseId:'c',profile:{competencies:[{id:'first'},{id:'second'}]}},()=>({run:async ctx=>({...ctx,findings:[]})}),persistence(events));

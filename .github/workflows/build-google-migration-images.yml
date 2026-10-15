@@ -43,20 +43,13 @@ jobs:
         run: node scripts/gcp/verify-sdk.mjs
       - name: Check billing before building an image
         run: node scripts/gcp/preflight-billing.mjs
+      - name: Verify shared memory defaults before any container build
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build existing Dockerfile without server secrets
         shell: bash
         run: |
           set -euo pipefail
-          case "$COMPONENT" in
-            marketing|store) FILE=Dockerfile.marketing ;;
-            admin) FILE=Dockerfile.northflank-admin ;;
-            lms) FILE=Dockerfile.northflank-lms ;;
-            ultimate-worker) FILE=Dockerfile.ultimate-worker ;;
-            studio-browser) FILE=Dockerfile.studio-browser ;;
-            llm-gpu-worker) FILE=services/llm-gpu-worker/Dockerfile ;;
-            media-gpu-worker) FILE=services/media-gpu-worker/Dockerfile ;;
-            *) exit 1 ;;
-          esac
+          FILE="$(node scripts/container-build-policy.mjs "$COMPONENT")"
           if [[ "$COMPONENT" != llm-gpu-worker && "$COMPONENT" != media-gpu-worker ]]; then
             test "$NEXT_PUBLIC_SUPABASE_URL" = "https://cuxzzpsyufcewtmicszk.supabase.co"
             test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"

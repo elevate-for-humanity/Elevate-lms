@@ -66,7 +66,7 @@ describe('instructional quality gate', () => {
       script: `${longInstruction} The narration should model a concrete example and end with the action the learner must demonstrate.`,
       instructor, storyboard: storyboard(),
     });
-    expect(result.failures).toContain('narration contains internal generation instructions');
+    expect(result.failures.some(failure => failure.startsWith('narration contains internal generation instructions'))).toBe(true);
   });
 
   it('rejects repeated substantial teaching narration', () => {

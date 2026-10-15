@@ -1,3 +1,4 @@
+import { recordParisObservation } from '@/lib/ai/runtime/supervision';
 import { executeStudioCommand } from '@/lib/studio/runtime-command';
 import { DevStudioUltimateCourseControl } from '@/lib/devstudio/ultimate-course-control';
 /**
@@ -1565,6 +1566,7 @@ async function _POST(req: NextRequest) {
             });
           } catch (error) {
             logger.error('[devstudio/chat] OpenAI stream failed', error);
+            await recordParisObservation({kind:'inference',operation:'studio.openai.stream',status:'failed',durationMs:0,actorId:auth.userId,error});
             emit({ error: normalizeError(error).message ?? String(error), done: true });
           } finally {
             controller.close();

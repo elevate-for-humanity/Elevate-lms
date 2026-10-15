@@ -1,3 +1,4 @@
+import {instructionView, applySceneTitleReadabilityRepair} from './repair-policy.mjs';
 import { enforceMediaQuality } from '@/lib/video/media-quality-gate';
 import { instructionalQualityFailures, repeatedTeachingSegments } from '@/lib/video/instructional-quality-gate';
 import { verifyRegisteredProfile } from '../credential/verify-registered-profile';
@@ -22,6 +23,7 @@ const evidence = (ctx: any) => ({
   competency: comp(ctx),
   instructionalDepth: instructionalDepthFor(comp(ctx)),
   prior: ctx.artifacts,
+  repairDirective: ctx.repairDirective,
 });
 function requireLicensedVisualCoverage(ctx: any, mediaInput?: any) {
   const storyboard =
@@ -183,18 +185,29 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       }
       return { artifacts: { media } };
     },
-    scene_construction: async (ctx) => ({
-      artifacts: {
-        scenes: {
-          shots: ((ctx.artifacts.visual_assignment as any)?.media?.assignments ?? []).map(
-            (a: any) => ({ ...a, loop: false }),
-          ),
-          storyboard: ctx.artifacts.storyboard,
-          media: ctx.artifacts.visual_assignment,
-          loop: false,
+    scene_construction: async (ctx) => {
+      const storyboardArtifact: any = ctx.artifacts.storyboard ?? {};
+      const sourceStoryboard = storyboardArtifact.storyboard ?? storyboardArtifact;
+      const repairedStoryboard = applySceneTitleReadabilityRepair(
+        sourceStoryboard,
+        ctx.repairDirective,
+      );
+      const storyboard = storyboardArtifact.storyboard
+        ? { ...storyboardArtifact, storyboard: repairedStoryboard }
+        : repairedStoryboard;
+      return {
+        artifacts: {
+          scenes: {
+            shots: ((ctx.artifacts.visual_assignment as any)?.media?.assignments ?? []).map(
+              (a: any) => ({ ...a, loop: false }),
+            ),
+            storyboard,
+            media: ctx.artifacts.visual_assignment,
+            loop: false,
+          },
         },
-      },
-    }),
+      };
+    },
     natural_narration: async (ctx) => {
       requireLicensedVisualCoverage(ctx);
       return {
@@ -252,6 +265,13 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       },
     }),
     lesson_film_render: async (ctx) => {
+      const sourceScript:any=(ctx.artifacts.instructor_script as any)?.script;
+      const sourceBoard:any=(ctx.artifacts.storyboard as any)?.storyboard;
+      const sourceObjectives:any[]=(ctx.artifacts.learning_objectives as any)?.objectives??[];
+      const preflight=instructionalQualityFailures({courseTitle:ctx.profile.title,lessonTitle:comp(ctx).title,lessonType:comp(ctx).type,script:sourceScript?.script??'',learningObjectives:sourceObjectives.map(o=>o.text),instructor:{id:'ultimate',title:'Instructor',specialty:ctx.profile.title},storyboard:instructionView(sourceBoard)});
+      const contentFailures=preflight.failures.filter(message=>!message.includes('no close-up or sourced demonstration scene exists')&&!message.includes('practical beauty instruction must include a sourced close-up demonstration scene'));
+      if(contentFailures.length)return {passed:false,findings:contentFailures.map(message=>({step:'lesson_film_render' as const,severity:'error' as const,code:'INSTRUCTIONAL_QUALITY_FAILED',message})),artifacts:{preflight:{pass:false,failures:contentFailures}}};
+
       // Enforce the approved-video production contract at the actual rendering
       // boundary. A missing scene, source, license or narration must never be
       // silently replaced with a generic slideshow or placeholder clip.
@@ -288,9 +308,11 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
         artifacts: {
           render: await runtime.renderer.render({
             lessonId: canonicalLessonId ?? comp(ctx).id,
+            courseId:ctx.courseId,
             courseTitle: ctx.profile.title,
             lessonPresentation: ctx.profile.lessonPresentation,
             presentationContract: ctx.profile.presentationContract,
+            renderRevision: [(ctx.artifacts as any).__renderRevision,(ctx.artifacts as any).__repairState?.at].filter(Boolean).join(':') || undefined,
             requiresPhysicalDemonstration: comp(ctx).type === 'practical_skill',
             artifacts: ctx.artifacts,
           }),
@@ -322,7 +344,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
         script: script.script,
         learningObjectives: objectives.map((o) => o.text),
         instructor: { id: 'ultimate', title: 'Instructor', specialty: ctx.profile.title },
-        storyboard: render.sceneData,
+        storyboard: instructionView({...render.sceneData,scenes:render.sceneData.scenes.map((s:any,i:number)=>({...s,stage:(ctx.artifacts.storyboard as any)?.storyboard?.scenes?.[i]?.stage}))}),
       });
       if (quality.failures.length)
         return {

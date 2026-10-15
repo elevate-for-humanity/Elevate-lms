@@ -381,6 +381,16 @@ export default function InteractiveVideoPlayer({
     }
   }, [currentTime, transcript, showCaptions]);
 
+  // Use one caption surface. A VTT track has short synchronized cues; the
+  // transcript contains whole teaching segments and must not cover the film.
+  useEffect(() => {
+    const tracks = videoRef.current?.textTracks;
+    if (!tracks) return;
+    for (const track of Array.from(tracks)) {
+      if (track.kind === 'captions') track.mode = showCaptions ? 'showing' : 'disabled';
+    }
+  }, [captionsUrl, showCaptions]);
+
   // Store callbacks in refs to avoid re-render churn
   const onProgressRef = useRef(onProgress);
   const onCompleteRef = useRef(onComplete);
@@ -468,7 +478,11 @@ export default function InteractiveVideoPlayer({
         videoRef.current.currentTime = resumeAt;
         setCurrentTime(resumeAt);
       }
-      onProgressRef.current?.(videoRef.current.duration > 0 ? Math.round((videoRef.current.currentTime / videoRef.current.duration) * 100) : 0);
+      onProgressRef.current?.(
+        videoRef.current.duration > 0
+          ? Math.round((videoRef.current.currentTime / videoRef.current.duration) * 100)
+          : 0,
+      );
       syncAudioOutput();
     }
   };
@@ -749,12 +763,22 @@ export default function InteractiveVideoPlayer({
               if (allCheckpointsComplete && onComplete) onComplete();
             }}
           >
-            {captionsUrl ? <track kind="captions" src={captionsUrl} srcLang="en" label="English" default /> : null}
+            {captionsUrl ? (
+              <track
+                kind="captions"
+                src={captionsUrl}
+                srcLang="en"
+                label="English"
+                onLoad={(event) => {
+                  event.currentTarget.track.mode = showCaptions ? 'showing' : 'disabled';
+                }}
+              />
+            ) : null}
           </video>
         )}
 
         {/* Captions Overlay */}
-        {showCaptions && currentCaption && (
+        {!captionsUrl && showCaptions && currentCaption && (
           <div className="absolute bottom-20 left-0 right-0 flex justify-center px-4">
             <div className="bg-black bg-opacity-80 text-white px-4 py-2 rounded text-center max-w-3xl">
               {currentCaption}

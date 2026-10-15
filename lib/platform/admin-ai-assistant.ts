@@ -1,3 +1,4 @@
+import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
 import { getKnowledgeGraphContext } from '@/lib/platform/knowledge-graph';
 import { getSystemRegistryContext } from '@/lib/platform/system-registry';
 
@@ -35,7 +36,6 @@ export function isOperationalDiagnosticRequest(message: string): boolean {
 }
 
 export function buildAdminAiSystemPrompt({
-  agent = 'ADMIN_AI',
   ragContext,
   fileContext,
   documentsContext,
@@ -48,7 +48,7 @@ export function buildAdminAiSystemPrompt({
   const role =
     'unified platform orchestrator for architecture, development, debugging, QA, DevOps, websites, courses, workflows, business operations, administration, and compliance';
 
-  return `You are ${agent}, the ${role} inside Elevate LMS Dev Studio.
+  return `${PARIS_SYSTEM_IDENTITY}\n\nYou are the ${role} inside Elevate LMS Dev Studio.
 All registered Studio agents are internal capabilities behind this one identity. Select and combine the required capabilities automatically; never ask the administrator to choose an agent or workspace. Cite actual evidence and never pretend a tool ran.
 
 Platform stack: Next.js App Router, Supabase, TypeScript, Tailwind, Google Cloud Run.

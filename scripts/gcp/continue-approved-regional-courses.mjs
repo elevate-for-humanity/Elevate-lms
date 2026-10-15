@@ -1,3 +1,4 @@
+import {monitorCourseQueue} from './paris-course-monitor.mjs';
 import {google} from './runtime-config.mjs';
 import {inspectRegionalCapacity} from './regional-capacity.mjs';
 import {dispatchQueuedCourseJob} from './dispatch-course-job.mjs';
@@ -9,18 +10,32 @@ export function regionalArguments(args) {
 }
 export function scopedCourseQueueUrl(value) {
  const url=new URL(value);
- if(url.pathname.endsWith('/ultimate_build_jobs'))url.searchParams.set('build_id','in.('+builds.join(',')+')');
+ if(url.pathname.endsWith('/ultimate_build_jobs'))url.searchParams.set('and','(or(build_id.in.('+builds.join(',')+'),payload->>requestedBy.not.is.null))');
  return url;
 }
 export async function dispatchApprovedRegionalCourses({env=process.env}={}) {
+ await monitorCourseQueue({env});
  const image=(name,region)=>JSON.parse(google(['run','jobs','describe',name,'--project=elegant-racer-299721','--region='+region,'--format=json'])).spec.template.spec.template.spec.containers[0].image;
- if(image('elevate-course-builder','us-central1')!==image('elevate-course-builder-parallel','us-east1'))return {status:'capacity_wait',reason:'approved_regional_worker_refresh_required'};
- return dispatchQueuedCourseJob({
+ if(image('elevate-course-builder','us-central1')!==image('elevate-course-builder-parallel','us-east1')){
+  const state={status:'capacity_wait',reason:'approved_regional_worker_refresh_required'};
+  await monitorCourseQueue({env,dispatchState:state});return state;
+ }
+ let state;
+ try { state=await dispatchQueuedCourseJob({
   env:{...env,COURSE_WORKER_PARALLELISM:'3'},
   run:(_command,args)=>google(regionalArguments(args)),
   capacityCheck:input=>inspectRegionalCapacity({...input,region:'us-east1'}),
   request:(url,options)=>fetch(scopedCourseQueueUrl(url),options),
- });
+ }); } catch(error) {
+  await monitorCourseQueue({env,dispatchState:{status:'dispatch_failed',reason:'Google worker dispatch failed: '+(error.code??'assignment_unconfirmed')}});
+  throw error;
+ }
+ if(state.status==='capacity_wait')await monitorCourseQueue({env,dispatchState:state});
+ return state;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)
- console.log(JSON.stringify(await continueCourseQueue({dispatch:()=>dispatchApprovedRegionalCourses(),releasePending:()=>courseReleasePending()})));
+ console.log(JSON.stringify(await continueCourseQueue({dispatch:()=>dispatchApprovedRegionalCourses(),releasePending:async()=>{
+ const pending=await courseReleasePending();
+ if(pending)await monitorCourseQueue({dispatchState:{status:'capacity_wait',reason:'Waiting for the verified worker deployment before resuming saved lessons'}});
+ return pending;
+}})));

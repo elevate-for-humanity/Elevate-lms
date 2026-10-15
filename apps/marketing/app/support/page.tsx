@@ -156,8 +156,8 @@ export default function SupportPage() {
               <Phone className="w-10 h-10 text-brand-blue-600 mx-auto mb-4" />
               <h3 className="font-bold text-slate-900 mb-2">Technical Support</h3>
               <p className="text-slate-600 text-sm mb-4">Mon–Fri, 8am–6pm ET</p>
-              <a href="tel:+13173143757" className="text-brand-blue-600 font-semibold hover:underline">
-                (317) 314-3757
+              <a href="tel:+14632401404" className="text-brand-blue-600 font-semibold hover:underline">
+                (463) 240-1404
               </a>
             </div>
 

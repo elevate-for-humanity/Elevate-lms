@@ -25,7 +25,9 @@ export function executionAllocationCount(execution) {
 // A service template can describe an unsuccessful deployment. Only effective
 // revisions and nonterminal execution specs describe the resources still used.
 // This is a conservative allocation bound, not a utilization measurement.
-export function requiredRegionalAllocation(services, task, revisions, executions = []) {
+export function requiredRegionalAllocation(services, task, revisions, executions = [], taskCount = 1) {
+  if (!Number.isInteger(taskCount) || taskCount < 1 || taskCount > 4)
+    throw new Error('Requested task allocation must be between one and four');
   const required = { cpu: 0, memory: 0 };
   const add = (containers, count) => {
     if (!Array.isArray(containers) || !containers.length || !Number.isInteger(count) || count < 1)
@@ -35,7 +37,7 @@ export function requiredRegionalAllocation(services, task, revisions, executions
       required.cpu += size.cpu * count; required.memory += size.memory * count;
     }
   };
-  add(task.containers, 1);
+  add(task.containers, taskCount);
   for (const service of services) {
     if (service.metadata?.annotations?.['run.googleapis.com/scalingMode'] === 'manual')
       throw new Error('Manual service scaling requires explicit capacity review');
@@ -63,14 +65,14 @@ export function requiredRegionalAllocation(services, task, revisions, executions
   return required;
 }
 
-export async function inspectRegionalCapacity({ region, task, run = google, request = fetch }) {
+export async function inspectRegionalCapacity({ region, task, taskCount = 1, run = google, request = fetch }) {
   if (!['us-central1', 'us-east1'].includes(region)) throw new Error('Unsupported capacity region');
   const read = args => JSON.parse(run([...args, '--project=' + PROJECT, '--region=' + region, '--format=json']));
   const services = read(['run', 'services', 'list']);
   const revisions = read(['run', 'revisions', 'list']);
   const jobs = read(['run', 'jobs', 'list']);
   const executions = jobs.flatMap(job => read(['run', 'jobs', 'executions', 'list', '--job=' + job.metadata.name]));
-  const required = requiredRegionalAllocation(services, task, revisions, executions);
+  const required = requiredRegionalAllocation(services, task, revisions, executions, taskCount);
   const token = run(['auth', 'print-access-token']);
   const granted = {};
   for (const [key, quotaId] of [['cpu', 'CpuAllocPerProjectRegion'], ['memory', 'MemAllocPerProjectRegion']]) {

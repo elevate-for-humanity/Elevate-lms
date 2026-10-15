@@ -49,6 +49,25 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     const passed = (steps ?? []).filter((x: any) => x.state === 'passed' && currentEvidence(x.artifacts));
     const artifacts = { ...((lesson?.artifacts ?? {}) as Record<string, unknown>) };
     for (const step of passed) artifacts[String(step.step)] = step.artifacts ?? {};
+    // The old full-frame premium OCR can reject a readable heading, then strand
+    // its unchanged scene producer. Retry that inspection using the previously
+    // certified producer and saved film. The runner still verifies every input
+    // hash and stage contract; media QA is never marked passed here.
+    const directive = (artifacts.__repairState as any)?.directive;
+    const legacyTitleRetry = directive?.failedStep === 'finished_media_qa' &&
+      directive?.target === 'scene_construction' &&
+      (artifacts.lesson_film_render as any)?.render?.presentationVersion === 'approved-moment-cues-v2' &&
+      currentEvidence(artifacts.lesson_film_render as any) &&
+      Array.isArray(directive.requirements) && directive.requirements.length > 0 &&
+      directive.requirements.every((finding: any) => finding.code === 'MEDIA_TEXT_UNREADABLE') &&
+      currentEvidence(directive.previous);
+    if (legacyTitleRetry) {
+      artifacts.scene_construction = directive.previous;
+      if (!passed.some((step: any) => step.step === 'scene_construction')) {
+        passed.push({ step: 'scene_construction', state: 'passed', artifacts: directive.previous });
+      }
+      delete artifacts.__repairState;
+    }
     // A repaired provider or renderer must rebuild downstream media instead of
     // replaying a failed QA result against the same cached audio/video. Keep
     // all earlier instructional work and licensed visual assignments.
@@ -56,7 +75,7 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     const narrationNeedsRepair = narrationQA?.failures?.some((failure: string) =>
       ['PACE_OUT_OF_RANGE', 'CLIPPED_WORDS'].includes(failure));
     const render = (artifacts.lesson_film_render as any)?.render;
-    const oldLayout = render && render.layoutVersion !== 2;
+    const oldLayout = render && ![2, 4].includes(render.layoutVersion);
     const storyboard = (artifacts.storyboard as any)?.storyboard ?? artifacts.storyboard;
     const insufficientScenes = Array.isArray(storyboard?.scenes) &&
       storyboard.scenes.length < MIN_LESSON_VIDEO_SCENES;
@@ -75,6 +94,8 @@ export class UltimateSupabasePersistence implements UltimatePersistencePort {
     return {
       artifacts,
       passedSteps: reusable.map((x: any) => String(x.step)),
+      recoveredSteps: legacyTitleRetry && reusable.some((step: any) => step.step === 'scene_construction')
+        ? ['scene_construction' as const] : [],
       findings: Array.isArray(lesson?.findings) ? lesson.findings : [],
     };
   }

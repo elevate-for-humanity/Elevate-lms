@@ -34,8 +34,15 @@ export function validateRuntimeEntries(component: RuntimeComponent, entries: Run
   const seen = new Set<string>();
   for (const entry of entries) {
     runtimeSecretName(component, entry.key);
+    if (entry.key === 'TWILIO_ACCOUNT_SID' && !/^AC[a-f0-9]{32}$/i.test(entry.value)) fail('invalid_twilio_account_sid', 'validation');
+    if (entry.key === 'TWILIO_API_KEY_SID' && !/^SK[a-f0-9]{32}$/i.test(entry.value)) fail('invalid_twilio_api_key_sid', 'validation');
+    if (entry.key === 'TWILIO_AUTH_TOKEN' && !/^[a-f0-9]{32}$/i.test(entry.value)) fail('invalid_twilio_credential', 'validation');
+    if (entry.key === 'TWILIO_API_KEY_SECRET' && !/^[A-Za-z0-9]{32}$/.test(entry.value)) fail('invalid_twilio_credential', 'validation');
     if (seen.has(entry.key) || !entry.value.trim() || /^[•*]{4,}$/.test(entry.value.trim()) || Buffer.byteLength(entry.value, 'utf8') > 16384)
       fail('invalid_or_masked_value', 'validation');
+    if (entry.key === 'TAX_DATA_ENCRYPTION_KEY' && !/^[a-f0-9]{64}$/i.test(entry.value)) fail('invalid_tax_encryption_key', 'validation');
+    if (entry.key === 'IRS_EFIN' && !/^\d{6}$/.test(entry.value)) fail('invalid_irs_efin', 'validation');
+    if (entry.key === 'IRS_SOFTWARE_ID' && (!/^\d{8}$/.test(entry.value) || entry.value === '00000000')) fail('invalid_irs_software_id', 'validation');
     seen.add(entry.key);
   }
 }

@@ -118,7 +118,8 @@ export default function ProgramDetailPage({
   const registeredProgram = isApprenticeship ? getRegisteredProgramStandard(p.slug) : null;
   const instructionHours = registeredProgram?.completion.requiredRtiHours ?? totalHours;
   const octoberCouponCode = 'OCT300';
-  const ProgramTitle = heroOverride ? 'h1' : 'h2';
+  // The shared media hero renders no title; the program content owns its main heading.
+  const ProgramTitle = 'h1';
   const weeklyHoursLabel =
     p.hoursPerWeekMin === p.hoursPerWeekMax
       ? `${p.hoursPerWeekMin} hrs/week`
@@ -273,7 +274,7 @@ export default function ProgramDetailPage({
                   src={heroPosterSrc}
                   alt={heroAlt}
                   fill
-                  className="object-cover object-center"
+                  className="object-contain object-center"
                   priority
                   sizes="100vw"
                   placeholder="empty"
@@ -1434,7 +1435,7 @@ export default function ProgramDetailPage({
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
               loading="lazy"
-              className="object-cover"
+              className="object-contain"
             />
           </div>
           <div className="max-w-3xl mx-auto text-center">

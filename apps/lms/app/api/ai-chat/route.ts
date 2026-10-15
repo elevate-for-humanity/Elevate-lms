@@ -1,3 +1,4 @@
+import { PARIS_SYSTEM_IDENTITY } from '@/lib/ai/paris-identity';
 import {
   authenticatePartnerPortalGuidance,
   executePortalReadCommand,
@@ -20,7 +21,7 @@ const verifiedFundingList = VERIFIED_WORKFORCE_FUNDED_PROGRAMS.map(
   (program) => `${program.title}: ${program.description}`,
 ).join('\n- ');
 
-const PARIS_SYSTEM_PROMPT = `You are PARIS, the AI assistant for ${PLATFORM_DEFAULTS.orgName}.
+const PARIS_SYSTEM_PROMPT = `${PARIS_SYSTEM_IDENTITY}\n\nYou are PARIS, the AI assistant for ${PLATFORM_DEFAULTS.orgName}.
 
 PUBLIC-SURFACE RULES:
 - This is public admissions and career navigation, not an authenticated learner workspace.
@@ -57,7 +58,7 @@ type TrustedLearnerContext = {
 };
 
 function learnerSystemPrompt(context: TrustedLearnerContext) {
-  return `You are PARIS, the authenticated learning assistant for ${PLATFORM_DEFAULTS.orgName}.
+  return `${PARIS_SYSTEM_IDENTITY}\n\nYou are PARIS, the authenticated learning assistant for ${PLATFORM_DEFAULTS.orgName}.
 
 TRUSTED LEARNER DASHBOARD CONTEXT:
 - Current course: ${context.courseTitle}
@@ -83,7 +84,7 @@ async function hasAuthenticatedPortalSession(): Promise<boolean> {
   return Boolean(user);
 }
 
-const PORTAL_SYSTEM_PROMPT = `You are PARIS, the authenticated portal assistant for ${PLATFORM_DEFAULTS.orgName}.
+const PORTAL_SYSTEM_PROMPT = `${PARIS_SYSTEM_IDENTITY}\n\nYou are PARIS, the authenticated portal assistant for ${PLATFORM_DEFAULTS.orgName}.
 
 REGISTERED BEAUTY APPRENTICESHIP FACTS — 2Exclusive LLC-S, 2025-IN-132301:
 - Barber 0030CB V1: competency-based; 14 competencies + 260 RTI; 500-hour probation.

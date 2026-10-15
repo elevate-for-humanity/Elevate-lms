@@ -54,6 +54,8 @@ jobs:
         run: |
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
           df -h /
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build approved checkpoint with verified weight hashes
         run: docker build -f services/llm-gpu-worker/Dockerfile.google -t "elevate-owned-llm:$GITHUB_SHA" .
       - uses: google-github-actions/auth@v3

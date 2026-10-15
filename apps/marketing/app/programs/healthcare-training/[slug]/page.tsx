@@ -32,7 +32,7 @@ export default async function HealthcareProgramPage({
           <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-300">{program.summary}</p>
           <p className="mt-4 font-bold">{program.duration}</p>
           <Image
-            src="/images/healthcare/program-cna-training.jpg"
+            src="/images/pages/cna-patient-care.jpg"
             alt="Healthcare training"
             width={1200}
             height={500}

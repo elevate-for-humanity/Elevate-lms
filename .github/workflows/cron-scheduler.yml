@@ -123,6 +123,12 @@ jobs:
             -H "Content-Type: application/json" \
             --max-time 55 || echo "::warning::program-holder-payouts failed"
 
+      - name: Interoffice mail queue
+        run: |
+          curl -sf -X GET "$ADMIN_URL/api/cron/interoffice-mail" \
+            -H "Authorization: Bearer $CRON_SECRET" --max-time 55 \
+            || echo "::warning::interoffice-mail queue failed"
+
       - name: Process provisioning jobs
         run: |
           curl -sf -X GET "$ADMIN_URL/api/cron/process-provisioning-jobs" \
@@ -208,6 +214,12 @@ jobs:
          || github.event.inputs.job == 'barber-reinstate'
       ))
     steps:
+      - name: Interoffice mail queue
+        run: |
+          curl -sf -X GET "$ADMIN_URL/api/cron/interoffice-mail" \
+            -H "Authorization: Bearer $CRON_SECRET" --max-time 55 \
+            || echo "::warning::interoffice-mail queue failed"
+
       - name: Funding follow-up
         run: |
           curl -sf -X GET "$ADMIN_URL/api/cron/funding-followup" \

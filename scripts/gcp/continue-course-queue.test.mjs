@@ -18,7 +18,7 @@ test('hands remaining eligible work to one bounded trusted-main successor', asyn
 });
 test('does not certify or hand off when the dispatcher or acknowledgment fails', async () => {
   await assert.rejects(continueCourseQueue({ dispatch: async () => { throw Error('queue unavailable'); }, onState: () => {} }), /queue unavailable/);
-  await assert.rejects(continueCourseQueue({ dispatch: async () => ({ status: 'capacity_wait' }), budgetMs: 0,
+  await assert.rejects(continueCourseQueue({ dispatch: async () => ({ status: 'busy' }), budgetMs: 0,
     env: { GITHUB_REPOSITORY: 'elevate-for-humanity/Elevate-lms', GH_TOKEN: 'test' },
     request: async () => ({ status: 403 }), onState: () => {} }), /HANDOFF_HTTP_403/);
 });

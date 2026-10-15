@@ -4,7 +4,7 @@ import { dispatchQueuedCourseJob } from './dispatch-course-job.mjs';
 
 function setup(executions, queued, httpStatus=200) {
   const calls=[];
-  const run=(_command,args)=>{calls.push(args); return JSON.stringify(args[2] === 'describe' ? {spec:{template:{spec:{template:{spec:{containers:[{resources:{limits:{cpu:'8',memory:'32Gi'}}}]}}}}}} : executions);};
+  const run=(_command,args)=>{calls.push(args); return JSON.stringify(args[2] === 'describe' ? {spec:{template:{spec:{parallelism:2,template:{spec:{containers:[{resources:{limits:{cpu:'8',memory:'32Gi'}}}]}}}}}} : executions);};
   const request=async url=>({ok:httpStatus===200,status:httpStatus,json:async()=>url.searchParams.has('id') ? [{id:'queued',status:'running',lease_owner:'worker-test',heartbeat_at:'2026-10-06T10:00:01Z'}] : queued});
   return {calls,options:{run,request,capacityCheck:async()=>({fits:true}),env:{SUPABASE_SERVICE_ROLE_KEY:'test-fixture'},now:new Date('2026-10-06T10:00:00Z')}};
 }
@@ -17,6 +17,13 @@ test('empty queue does not start a paid execution',async()=>{
   const s=setup([],[]);
   assert.equal((await dispatchQueuedCourseJob(s.options)).status,'empty');
   assert.equal(s.calls.length,1);
+});
+test('a leased execution does not keep an empty-queue coordinator running',async()=>{
+  const s=setup([{status:{}}],[]);
+  const result=await dispatchQueuedCourseJob(s.options);
+  assert.equal(result.status,'empty');
+  assert.equal(result.activeExecutions,1);
+  assert.equal(s.calls.some(c=>c.includes('execute')),false);
 });
 test('eligible queued work launches exactly one finite asynchronous task',async()=>{
   const s=setup([{status:{completionTime:'done'}}],[{id:'queued'}]);
@@ -74,4 +81,26 @@ test('two eligible builds request two parallel Google Cloud Run worker tasks',as
  assert.equal(result.tasks,2);
  assert.ok(s.calls[2].includes('--tasks=2'));
  assert.equal(s.calls[2].some(arg=>arg.startsWith('--parallelism=')),false);
+});
+
+test('a multi-worker batch checks all requested RAM and reduces to the capacity that fits', async()=>{
+ const s=setup([],[{id:'queued'},{id:'queued-2'}]);
+ const checked=[];
+ s.options.capacityCheck=async({taskCount})=>{checked.push(taskCount);return {fits:taskCount===1};};
+ const result=await dispatchQueuedCourseJob(s.options);
+ assert.deepEqual(checked,[2,1]);
+ assert.equal(result.tasks,1);
+ assert.ok(s.calls[2].includes('--tasks=1'));
+});
+
+test('missing existing job parallelism cannot launch an unbounded batch', async()=>{
+ const s=setup([],[{id:'queued'}]);
+ const previous=s.options.run;
+ s.options.run=(command,args)=>{
+  const raw=previous(command,args);
+  if(args[2]!=='describe')return raw;
+  const job=JSON.parse(raw);delete job.spec.template.spec.parallelism;return JSON.stringify(job);
+ };
+ await assert.rejects(dispatchQueuedCourseJob(s.options),/PARALLELISM_UNAVAILABLE/);
+ assert.equal(s.calls.some(args=>args.includes('execute')),false);
 });

@@ -11,6 +11,7 @@
  */
 
 import Image from 'next/image';
+import ImageMetadata from './ImageMetadata';
 import { useId, useState } from 'react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -61,10 +62,11 @@ export default function HeroPicture({
 }: HeroPictureProps) {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
-  const canonicalHeight = 'h-[clamp(260px,42svh,480px)]';
+  const canonicalHeight = 'aspect-video sm:aspect-auto sm:h-[clamp(220px,38svh,480px)]';
 
   return (
     <div className={`w-full ${className}`}>
+      <ImageMetadata src={src} description={alt} />
       <section
         className={`relative w-full overflow-hidden ${preserveAspectRatio ? 'bg-white' : 'bg-slate-900'} ${
           preserveAspectRatio ? '' : (heightStyle ?? canonicalHeight)
@@ -88,7 +90,9 @@ export default function HeroPicture({
             alt={alt}
             fill
             sizes="100vw"
-            className={imageFit === 'contain' ? 'object-contain object-center' : 'object-cover object-center'}
+            className={
+              imageFit === 'contain' ? 'object-contain object-center' : 'object-cover object-center'
+            }
             priority={priority}
             placeholder="empty"
           />
@@ -114,7 +118,7 @@ export default function HeroPicture({
       </section>
 
       {(belowHeroHeadline || belowHeroSubheadline || ctas || trustIndicators || children) && (
-        <section className="border-b border-slate-100 py-10 sm:py-14">
+        <section className="border-b border-slate-100 py-6 sm:py-8">
           <div className="mx-auto max-w-4xl px-4 sm:px-6">
             {children ? (
               children

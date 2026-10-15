@@ -1,11 +1,17 @@
 name: Deploy Google Marketing on trigger
 
 # Changes on main release automatically after validation and final-container tests.
-# Each service releases independently; newer main releases supersede stale builds.
+# Complete the active validated release; keep the newest main update queued.
+# Frequent independent changes must not repeatedly cancel the production build.
 on:
   push:
     branches: [main]
     paths:
+      - 'scripts/build-memory-policy.*'
+      - 'scripts/check-build-memory-policy.mjs'
+      - 'scripts/run-bounded-build.*'
+      - 'scripts/build-next-app.*'
+      - 'scripts/container-build-policy.mjs'
       - 'lib/**'
       - 'packages/**'
       - 'public/**'
@@ -71,7 +77,7 @@ jobs:
   deploy:
     concurrency:
       group: google-production-marketing
-      cancel-in-progress: true
+      cancel-in-progress: false
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
@@ -121,8 +127,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          pnpm install --frozen-lockfile --strict-peer-dependencies=false
-          pnpm exec tsc --noEmit --project apps/marketing/tsconfig.json
+          node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+          pnpm run typecheck:marketing
           node --test scripts/gcp/marketing-health-routing.test.cjs
           node --experimental-strip-types --test scripts/test-hosted-website-management.mjs scripts/test-hosted-domain-management.mjs scripts/test-hosted-website-claims.mjs
           node --test scripts/test-public-revision-activation.mjs scripts/gcp/wait-ready-public-revision.test.mjs
@@ -181,6 +187,8 @@ jobs:
             gcloud logging read 'resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-marketing-migration" AND textPayload:"[natural-voice]"' --project=elegant-racer-299721 --freshness=1h --limit=8 --format='value(timestamp,textPayload)'
           fi
 
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build Marketing image
         shell: bash
         run: |
@@ -214,21 +222,39 @@ jobs:
           docker tag "elevate-marketing:$GITHUB_SHA" "$IMAGE"
           docker push "$IMAGE"
 
+      - name: Prepare encrypted taxpayer storage
+        id: tax_key
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/gcp/ensure-tax-encryption.mjs > /tmp/elevate-tax-encryption.json
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const result=JSON.parse(readFileSync('/tmp/elevate-tax-encryption.json','utf8'));
+          if(result.configured!==true || typeof result.binding!=='string' || (result.binding && !/^TAX_DATA_ENCRYPTION_KEY=elevate-marketing-tax-data-encryption-key:\d+$/.test(result.binding))) throw new Error('Invalid taxpayer key binding');
+          appendFileSync(process.env.GITHUB_OUTPUT,'binding='+result.binding+'\n');
+          console.log(JSON.stringify({configured:true,created:result.created}));
+          NODE
       - name: Deploy exact image to Google Cloud Run
         id: deploy
         timeout-minutes: 15
+        env:
+          TAX_ENCRYPTION_BINDING: ${{ steps.tax_key.outputs.binding }}
         shell: bash
         run: |
           set -euo pipefail
           IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/marketing"
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          TAX_ARGS=()
+          if [[ -n "$TAX_ENCRYPTION_BINDING" ]]; then TAX_ARGS+=(--update-secrets="$TAX_ENCRYPTION_BINDING"); fi
           SUFFIX="r${GITHUB_SHA:0:8}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "revision=elevate-marketing-migration-$SUFFIX" >> "$GITHUB_OUTPUT"
           gcloud run services update elevate-marketing-migration \
             --project=elegant-racer-299721 \
             --region=us-central1 \
-            --cpu=4 --memory=8Gi \
+            --cpu=1 --memory=4Gi \
+            "${TAX_ARGS[@]}" \
             --image="$IMAGE@$DIGEST" \
             --revision-suffix="$SUFFIX" \
             --remove-env-vars=GIT_SHA,GITHUB_SHA,NEXT_PUBLIC_GIT_SHA,NEXT_PUBLIC_COMMIT_SHA,NEXT_PUBLIC_BUILD_ID,NF_GIT_SHA,BUILD_TIMESTAMP \
@@ -277,6 +303,7 @@ jobs:
         run: |
           set -euo pipefail
           node --input-type=module <<'NODE'
+          import { normalizeHomepageText } from './scripts/gcp/homepage-content.mjs';
           const root='https://www.elevateforhumanity.org';
           const required=['Esthetics Apprenticeship','Nail Technician Apprenticeship','HVAC Technician','CDL Training','Bookkeeping','Business & Entrepreneurship','Find or become a Host Shop'];
           const forbidden=['Workforce systems and public-sector alignment'];
@@ -289,9 +316,9 @@ jobs:
               const sha=data.commitSha||data.commit||data.sha||'';
               const page=await fetch(root+'/?release='+process.env.GITHUB_SHA,{cache:'no-store',signal:AbortSignal.timeout(20000)});
               const html=await page.text();
-              const normalizedHtml=html.replace(/&amp;/g,'&').replace(/&#0*38;/g,'&').replace(/&#x0*26;/gi,'&');
+              const normalizedHtml=normalizeHomepageText(html);
               const missing=required.filter(t=>!normalizedHtml.includes(t));
-              const present=forbidden.filter(t=>html.includes(t));
+              const present=forbidden.filter(t=>normalizedHtml.includes(t));
               last=JSON.stringify({versionStatus:version.status,homepageStatus:page.status,sha,expected:process.env.GITHUB_SHA,missing,unwanted:present});
               console.log(last);
               if(version.ok && sha===process.env.GITHUB_SHA && page.ok && !missing.length && !present.length) {
@@ -335,7 +362,7 @@ jobs:
           const home=await (await fetch(root+'/',{cache:'no-store'})).text();
           assert.ok(home.includes('href="/tax"'),'Homepage must link to the tax page');
           const tax=await (await fetch(root+'/tax',{cache:'no-store'})).text();
-          assert.ok(tax.includes('Supersonic side navigation'),'Tax landing page must render Supersonic navigation');
+          assert.ok(tax.includes('Supersonic main navigation'),'Tax landing page must render Supersonic navigation');
           for (const choice of ['Prepare your own taxes','Hire a professional','Start your own tax business']) assert.ok(tax.includes(choice),'Missing Supersonic service choice: '+choice);
           for(const [path,method] of [['/api/tax/returns','GET'],['/api/tax/interview','GET'],['/api/tax/returns','POST'],['/api/tax/w2/confirm','POST'],['/api/tax/returns/calculate','POST']]) {
             const res=await fetch(root+path,{method,headers:method==='POST'?{'content-type':'application/json'}:{},...(method==='POST'?{body:'{}'}:{}),signal:AbortSignal.timeout(20000)});

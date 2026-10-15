@@ -3,6 +3,11 @@ on:
   push:
     branches: [main]
     paths:
+      - 'scripts/build-memory-policy.*'
+      - 'scripts/check-build-memory-policy.mjs'
+      - 'scripts/run-bounded-build.*'
+      - 'scripts/build-next-app.*'
+      - 'scripts/container-build-policy.mjs'
       - 'public/**'
       - 'content/**'
       - 'config/**'
@@ -26,6 +31,7 @@ on:
       - 'pnpm-workspace.yaml'
       - 'scripts/gcp/activate-tested-public-revision.mjs'
       - '.github/workflows/deploy-google-lms-trigger.yml'
+      - 'scripts/gcp/resolve-main-release*'
   workflow_dispatch:
     inputs:
       requested_sha:
@@ -56,20 +62,23 @@ jobs:
   validate:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
+    outputs:
+      ready: ${{ steps.release.outputs.ready }}
     steps:
-      - name: Reject stale LMS release requests
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - name: Resolve current main or hand off superseded release
+        id: release
         env:
           GH_TOKEN: ${{ github.token }}
           REQUESTED_SHA: ${{ inputs.requested_sha }}
+          RELEASE_WORKFLOW: deploy-google-lms-trigger.yml
         run: |
-          set -euo pipefail
-          if test -n "$REQUESTED_SHA" && ! [[ "$REQUESTED_SHA" =~ ^[a-f0-9]{40}$ ]]; then exit 1; fi
-          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
-          test "$GITHUB_SHA" = "$latest"
-          if test -n "$REQUESTED_SHA"; then test "$REQUESTED_SHA" = "$GITHUB_SHA"; fi
+          node --test scripts/gcp/resolve-main-release.test.mjs
+          node scripts/gcp/resolve-main-release.mjs
   build:
     needs: validate
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: needs.validate.outputs.ready == 'true'
     uses: ./.github/workflows/build-google-migration-images.yml
     with:
       component: lms

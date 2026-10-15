@@ -108,14 +108,14 @@ export const cosmetologyConfig: ProgramConfig = {
     {
       name: 'Marcus Thompson',
       role: 'Cutting Specialist',
-      photo: '/images/pages/barber-apprenticeship-hero.webp',
+      photo: '/images/pages/barber-hands-on-bright.webp',
       bio: '15+ years experience in precision cutting and modern styling techniques.',
       credentials: ['Licensed Barber', 'Master Stylist', 'Industry Educator'],
     },
     {
       name: 'Jennifer Chen',
       role: 'Makeup Artist',
-      photo: '/images/beauty/esthetician-hero.webp',
+      photo: '/images/programs/esthetician-host-recruitment-2026.webp',
       bio: 'Celebrity makeup artist with experience in editorial and bridal styling.',
       credentials: ['Licensed Esthetician', 'MAC Certified', 'Kim Kardashian Stylist Trained'],
     },

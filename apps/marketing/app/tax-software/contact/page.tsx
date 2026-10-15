@@ -10,14 +10,14 @@ export default function Contact() {
   return (
     <TaxSiteShell>
       <main>
-        <section className="bg-[#f1f6ff] px-5 py-10 sm:p-10">
-          <p className="text-sm font-bold uppercase tracking-wide text-[#073ca2]">
+        <section className="bg-[#082b66] px-6 py-14 !text-white sm:px-10 lg:px-14">
+          <p className="text-xs font-extrabold uppercase tracking-widest !text-white">
             PROFESSIONAL TAX HELP
           </p>
-          <h1 className="mt-4 max-w-2xl text-4xl font-black sm:text-5xl">
+          <h1 className="mt-4 max-w-3xl text-4xl font-black !text-white sm:text-5xl">
             Get your taxes prepared by a professional.
           </h1>
-          <p className="mt-5 max-w-xl text-lg leading-7 text-slate-700">
+          <p className="mt-5 max-w-2xl text-lg leading-8 !text-white">
             Personal taxes, self-employment, business returns or an amended return. Tell us what you
             need help with.
           </p>
@@ -33,7 +33,37 @@ export default function Contact() {
             </Link>
           </div>
         </section>
-        <section className="px-5 py-10 sm:px-10">
+        <section className="px-6 py-14 sm:px-10 lg:px-14">
+          <p className="text-xs font-extrabold uppercase tracking-widest text-[#c8102e]">
+            What happens next
+          </p>
+          <h2 className="mt-3 text-3xl font-black">
+            A clear preparation plan, from the first conversation.
+          </h2>
+          <ol className="mt-8 grid gap-8 md:grid-cols-3">
+            {[
+              [
+                'Tell us what you need',
+                'Describe your return and how to reach you. Your inquiry requests follow-up; it does not book an appointment.',
+              ],
+              [
+                'Review your documents',
+                'Our team explains the records needed and the approved private way to provide them.',
+              ],
+              [
+                'Confirm the service and price',
+                'Review the preparation scope, fee quote, appointment or service process, and required authorizations.',
+              ],
+            ].map(([title, body], i) => (
+              <li key={title} className="border-t-4 border-[#073ca2] pt-5">
+                <span className="font-black text-[#c8102e]">0{i + 1}</span>
+                <h3 className="mt-3 text-xl font-bold">{title}</h3>
+                <p className="mt-4 text-sm leading-8 text-slate-600">{body}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+        <section className="px-6 py-14 sm:px-10 lg:px-14">
           <h2 className="text-3xl font-bold">Have these documents ready.</h2>
           <ul className="mt-6 grid gap-4 md:grid-cols-2">
             {[
@@ -52,7 +82,10 @@ export default function Contact() {
             details or tax documents; our team will explain the appropriate document process.
           </p>
         </section>
-        <section id="free-preparation" className="scroll-mt-6 bg-slate-50 px-5 py-10 sm:px-10">
+        <section
+          id="free-preparation"
+          className="scroll-mt-6 bg-slate-50 px-6 py-14 sm:px-10 lg:px-14"
+        >
           <h2 className="text-3xl font-bold">Free tax preparation options.</h2>
           <p className="mt-4 max-w-xl leading-7 text-slate-600">
             Starting your own return and base federal preparation in the software are free.

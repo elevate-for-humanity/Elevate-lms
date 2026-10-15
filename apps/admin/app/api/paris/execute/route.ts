@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { executeAICommand } from '@/lib/ai/runtime/command-executor';
+import { safeParisFailureSummary } from '@/lib/ai/runtime/supervision';
 import type { AIAgentId } from '@/lib/ai/tools/registry';
 import type { AITask } from '@/lib/ai/execute-ai-task';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -14,6 +15,11 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
 const AGENT_MAP: Record<string, { agent: AIAgentId; label: string; task: AITask; role: string }> = {
+  paris: {agent:'PARIS',label:'PARIS',task:'general_chat',role:'central platform and course production coordinator'},
+  ellie: {agent:'ELLIE',label:'ELLIE',task:'general_chat',role:'instruction, student support, and learning sequence'},
+  lizzy: {agent:'LIZZY',label:'LIZZY',task:'general_chat',role:'Studio operations and production'},
+  zora: {agent:'ZORA',label:'ZORA',task:'diagnostics',role:'independent quality and compliance review'},
+  zura: {agent:'ZORA',label:'ZORA',task:'diagnostics',role:'independent quality and compliance review'},
   'course-orchestrator': { agent: 'LIZZY', label: 'Course Orchestrator', task: 'general_chat', role: 'course operations and curriculum execution' },
   'instructional-designer': { agent: 'LIZZY', label: 'Instructional Designer', task: 'general_chat', role: 'instructional design and curriculum quality' },
   'qa-designer': { agent: 'ZORA', label: 'QA Designer', task: 'diagnostics', role: 'quality assurance, accessibility, and compliance review' },
@@ -50,7 +56,7 @@ export async function POST(req: NextRequest) {
   const body = asRecord(await req.json().catch(() => ({})));
   const command = typeof body.command === 'string' ? body.command.trim() : '';
   const agentType = typeof body.agentType === 'string' ? body.agentType : 'admissions-agent';
-  const context = asRecord(body.context);
+  const requestedContext = asRecord(body.context);
 
   if (!command) {
     return NextResponse.json({ success: false, message: 'command is required' }, { status: 400 });
@@ -59,20 +65,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, message: 'command is too long' }, { status: 400 });
   }
 
-  const agentConfig = AGENT_MAP[agentType] ?? {
+  const capabilityConfig = AGENT_MAP[agentType.toLowerCase()] ?? {
     agent: 'PARIS' as const,
     label: 'PARIS',
     task: 'general_chat' as const,
     role: 'authorized platform assistance',
   };
+  const agentConfig = {...capabilityConfig, agent:'PARIS' as const, label:'PARIS'};
   const correlationId = req.headers.get('x-correlation-id') ?? crypto.randomUUID();
   const respond = (payload: Record<string, unknown>, status = 200) => NextResponse.json(
     { ...payload, correlationId },
     { status, headers: { 'x-correlation-id': correlationId, 'cache-control': 'no-store' } },
   );
-  const tenantId = typeof context.tenantId === 'string'
-    ? context.tenantId
-    : await resolveTenantIdForUser(auth.id).catch(() => null);
+  // Audit scope comes from the authenticated profile/membership, never request JSON.
+  const tenantId = await resolveTenantIdForUser(auth.id).catch(() => null);
+  const context = { ...requestedContext, tenantId };
   const db = await requireAdminClient();
 
   const { data: durableTask } = await db
@@ -123,7 +130,7 @@ export async function POST(req: NextRequest) {
       await db.from('ai_tasks').update({
         status: result.status === 'approval_required'
           ? 'awaiting_approval'
-          : result.ok ? 'completed' : 'failed',
+          : result.status === 'running' ? 'running' : result.ok ? 'completed' : 'failed',
         requires_approval: result.status === 'approval_required',
         approval_status: result.status === 'approval_required' ? 'pending' : null,
         approval_reason: result.status === 'approval_required'
@@ -147,7 +154,7 @@ export async function POST(req: NextRequest) {
           trace_id: result.traceId ?? null,
         },
         error_message: result.ok ? null : result.message,
-        completed_at: result.status === 'approval_required' ? null : new Date().toISOString(),
+        completed_at: result.status === 'approval_required' || result.status === 'running' ? null : new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }).eq('id', durableTask.id);
     }
@@ -196,6 +203,7 @@ export async function POST(req: NextRequest) {
     return respond({
       success: true,
       executed: result.executed,
+      status: result.status,
       agent: agentConfig.label,
       tool: result.tool ?? null,
       risk: result.risk ?? null,
@@ -206,19 +214,21 @@ export async function POST(req: NextRequest) {
       taskId: durableTask?.id ?? null,
     });
   } catch (error) {
+    const safeFailure = safeParisFailureSummary(error);
     if (durableTask?.id) {
       await db.from('ai_tasks').update({
         status: 'failed',
-        error_message: error instanceof Error ? error.message : String(error),
+        error_message: safeFailure.message,
         completed_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }).eq('id', durableTask.id);
     }
 
-    logger.error('[paris/execute] canonical execution failed', error instanceof Error ? error : new Error(String(error)), {
+    logger.error('[paris/execute] canonical execution failed', new Error(safeFailure.message), {
       actorId: auth.id,
       agentType,
       correlationId,
+      failureCategory: safeFailure.category,
     });
     return respond({
       success: false,

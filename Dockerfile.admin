@@ -9,6 +9,7 @@ RUN corepack enable
 RUN corepack prepare pnpm@10.28.2 --activate
 
 WORKDIR /app
+RUN apk add --no-cache util-linux
 
 FROM base AS dependencies
 
@@ -26,7 +27,6 @@ ARG NEXT_PUBLIC_GIT_SHA=unknown
 ARG BUILD_TIMESTAMP=unknown
 
 ENV NODE_ENV=production
-ENV NODE_OPTIONS="--max-old-space-size=16384"
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV GITHUB_SHA=$GITHUB_SHA
 ENV GIT_SHA=$GIT_SHA

@@ -47,7 +47,9 @@ describe('terminal Ultimate job lifecycle', () => {
     const {db,writes}=database(2);
     await new UltimateJobQueue(db).waitForDependency('job','owner','Google permission required',7);
     expect(writes[0].values).not.toHaveProperty('attempts');
-    expect(writes[0].values.pending_dependency_resume.awaitingWakeup).toBe(true);
+    expect(writes[0].values).not.toHaveProperty('pending_dependency_resume');
+    expect(writes[0].values.status).toBe('failed');
+    expect(writes[0].values.last_error).toBe('Google permission required');
     expect(writes[0].filters).toContainEqual(['lease_owner','owner']);
     expect(writes[0].filters).toContainEqual(['execution_generation',7]);
     expect(writes[0].filters.some(f=>f[0]==='gt'&&f[1]==='lease_expires_at')).toBe(true);

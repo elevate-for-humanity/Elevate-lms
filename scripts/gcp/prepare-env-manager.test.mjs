@@ -8,8 +8,11 @@ function harness(options = {}) {
     calls.push(args);
     if (args[0] === 'auth') return options.loggedOut ? '' : 'synthetic-account';
     if (args[0] === 'run' && args[1] === 'services' && args[2] === 'describe') return JSON.stringify({ spec: { template: { spec: { serviceAccountName: options.wrongIdentity ? 'wrong-identity' : 'elevate-admin-runtime@elegant-racer-299721.iam.gserviceaccount.com' } } } });
-    if (args[0] === 'iam' && args[1] === 'roles' && args[2] === 'list') return JSON.stringify(options.roleMismatch ? [{ name: 'existing' }] : []);
-    if (args[0] === 'iam' && args[1] === 'roles' && args[2] === 'describe') return JSON.stringify({ includedPermissions: ['secretmanager.versions.access'] });
+    if (args[0] === 'iam' && args[1] === 'roles' && args[2] === 'list') throw new Error('Broad IAM inventory is not authorized');
+    if (args[0] === 'iam' && args[1] === 'roles' && args[2] === 'describe') {
+      if (options.roleMismatch) return JSON.stringify({includedPermissions:['secretmanager.versions.access']});
+      const error = new Error('Exact role not found'); error.code = options.roleDenied ? 'permission_denied' : 'not_found'; throw error;
+    }
     if (args[0] === 'secrets' && args[1] === 'list') {
       if (options.inventoryDenied) { const error = new Error('Google operation failed'); error.code = 'permission_denied'; throw error; }
       if (options.wrongSecret) return JSON.stringify([{ name: args[args.indexOf('--filter') + 1].replace('name:/', 'projects/example/secrets/'), labels: { elevate_component: 'marketing' } }]);
@@ -38,6 +41,11 @@ test('requires an active administrator login before mutation', () => {
   const h = harness({ loggedOut: true });
   assert.throws(() => prepareEnvManager('admin', h.run), /gcloud auth login/);
   assert.equal(h.calls.length, 1);
+});
+test('requires access to the exact role and never requests broad IAM inventory', () => {
+  const h = harness({roleDenied:true});
+  assert.throws(()=>prepareEnvManager('admin',h.run), /Exact role not found/);
+  assert.equal(h.calls.some(args=>args[0]==='iam'&&args[1]==='roles'&&['list','create'].includes(args[2])),false);
 });
 test('does not substitute a shared runtime identity or create a replacement runtime', () => {
   const h = harness({ wrongIdentity: true });

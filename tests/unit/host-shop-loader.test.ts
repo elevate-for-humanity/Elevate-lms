@@ -33,7 +33,10 @@ describe('approved host directory data', () => {
     expect(all[1].programs).toEqual([]);
     expect(fixture.filters).toContain('approved_by.is.null,approved_by.neq.system_verification');
   });
-  it('keeps the salon out of barber results and includes its approved nail pathway', async () => {
+  it('keeps a salon without barber approval out of barber results and includes its approved nail pathway', async () => {
+    fixture.rows.public_host_shops.data![0].programs = ['cosmetology', 'nail_technician'];
+    fixture.rows.barbershop_partner_applications.data = [];
+    fixture.rows.host_shop_applications.data!.push({ id: 'salon-only', shop_name: 'Style and Scissors', intake: { programs: ['cosmetology', 'nail_technician'] }, approved_by: null });
     expect(await getApprovedShops('barber')).toHaveLength(0);
     expect(await getApprovedShops('cosmetology')).toHaveLength(1);
     expect(await getApprovedShops('nail')).toHaveLength(1);

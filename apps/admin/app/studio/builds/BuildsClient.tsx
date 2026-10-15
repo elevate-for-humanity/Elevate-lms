@@ -102,7 +102,7 @@ export default function BuildsClient() {
       <div className="max-w-5xl mx-auto px-6 py-10">
         {/* Action bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => triggerBuild('admin')}
               disabled={triggering || !googleConfigured}
@@ -116,6 +116,13 @@ export default function BuildsClient() {
               className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:opacity-50 transition shadow-sm"
             >
               <Play className="h-4 w-4" /> Deploy LMS
+            </button>
+            <button
+              onClick={() => triggerBuild('store')}
+              disabled={triggering || !googleConfigured}
+              className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-700 disabled:opacity-50 transition shadow-sm"
+            >
+              <Play className="h-4 w-4" /> Deploy Store
             </button>
           </div>
           <button

@@ -42,6 +42,7 @@ export default function RealRepoWorkspace({
   className = '',
 }: RealRepoWorkspaceProps) {
   const [tree, setTree] = useState<TreeNode[]>([]);
+  const [expanded,setExpanded]=useState<Set<string>>(new Set());
   const [repo, setRepo] = useState('Elevate-lms');
   const [branch, setBranch] = useState('main');
   const [activePath, setActivePath] = useState('');
@@ -50,7 +51,9 @@ export default function RealRepoWorkspace({
   const [sha, setSha] = useState('');
   const [status, setStatus] = useState('Connecting repository…');
   const [saving, setSaving] = useState(false);
+  const [confirmation,setConfirmation]=useState('');
   const [runtimeReady, setRuntimeReady] = useState(false);
+  const [reconnect,setReconnect]=useState(0);
   const [running, setRunning] = useState(false);
   const [terminalInput, setTerminalInput] = useState('');
   const [terminalOutput, setTerminalOutput] = useState<string[]>([]);
@@ -68,7 +71,7 @@ export default function RealRepoWorkspace({
 
   const refreshTree = useCallback(async () => {
     try {
-      const response = await fetch('/api/admin/dev-studio/files', { cache: 'no-store' });
+      const response = await fetch('/api/admin/dev-studio/files?source=container', { cache: 'no-store',signal:AbortSignal.timeout(30000) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
       const nextTree = Array.isArray(data.tree) ? data.tree : [];
@@ -93,7 +96,7 @@ export default function RealRepoWorkspace({
     let polling = false;
     const request = async (body: Record<string, unknown>) => {
       const response = await fetch('/api/admin/dev-studio/runtime', {method:'POST',
-        headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+        headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(body.operation==='repository-sync'?120000:30000)});
       const result=await response.json();
       if(!response.ok)throw new Error(result.error || `HTTP ${response.status}`);
       return result;
@@ -113,7 +116,7 @@ export default function RealRepoWorkspace({
       if(cancelled || polling || !sessionId)return;
       polling=true;
       try {
-        const response=await fetch(`/api/admin/dev-studio/runtime?operation=terminal-output&sessionId=${encodeURIComponent(sessionId)}&after=${cursorRef.current}`,{cache:'no-store'});
+        const response=await fetch(`/api/admin/dev-studio/runtime?operation=terminal-output&sessionId=${encodeURIComponent(sessionId)}&after=${cursorRef.current}`,{cache:'no-store',signal:AbortSignal.timeout(20000)});
         const result=await response.json();
         if(!response.ok)throw new Error(result.error || `HTTP ${response.status}`);
         if(cancelled)return;
@@ -128,16 +131,17 @@ export default function RealRepoWorkspace({
       const sessionId=terminalSessionRef.current;terminalSessionRef.current='';
       if(sessionId)void request({operation:'terminal-stop',sessionId}).catch(()=>undefined);
     };
-  },[output]);
+  },[output,reconnect]);
 
   useEffect(() => {
     if (terminalRef.current) terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
   }, [terminalOutput]);
 
   async function openFile(path: string) {
+    setConfirmation('');
     setStatus(`Opening ${path}…`);
     try {
-      const response = await fetch(`/api/admin/dev-studio/files?path=${encodeURIComponent(path)}`, {
+      const response = await fetch(`/api/admin/dev-studio/files?source=container&path=${encodeURIComponent(path)}`, {
         cache: 'no-store',
       });
       const data = await response.json();
@@ -167,6 +171,7 @@ export default function RealRepoWorkspace({
         body: JSON.stringify({
           path: activePath,
           content,
+          ...(branch==='main'?{confirmation}:{}),
           ...(updating ? { sha } : {}),
           message: `${updating ? 'chore: update' : 'chore: create'} ${activePath} via Dev Studio`,
         }),
@@ -174,7 +179,7 @@ export default function RealRepoWorkspace({
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
       setSha(data.sha || sha);
-      setSavedContent(content);
+      setSavedContent(content);setConfirmation('');
       setStatus(`Committed ${activePath}`);
       output(`✓ committed ${activePath}`);
       await refreshTree();
@@ -267,8 +272,8 @@ export default function RealRepoWorkspace({
       <div key={node.path}>
         <button
           type="button"
-          disabled={node.type === 'directory'}
-          onClick={() => node.type === 'file' && void openFile(node.path)}
+          aria-expanded={node.type==='directory'?expanded.has(node.path):undefined}
+          onClick={() => node.type === 'file' ? void openFile(node.path) : setExpanded(previous=>{const next=new Set(previous);if(next.has(node.path))next.delete(node.path);else next.add(node.path);return next;})}
           className={`flex w-full items-center gap-1.5 truncate px-2 py-1 text-left text-[11px] hover:bg-[#2a2d2e] ${
             activePath === node.path ? 'bg-[#094771] text-white' : 'text-[#cccccc]'
           } ${node.type === 'directory' ? 'cursor-default text-[#9ca3af]' : ''}`}
@@ -282,7 +287,7 @@ export default function RealRepoWorkspace({
           )}
           <span className="truncate">{node.name}</span>
         </button>
-        {node.type === 'directory' && node.children?.length ? renderTree(node.children, depth + 1) : null}
+        {node.type === 'directory' && expanded.has(node.path) && node.children?.length ? renderTree(node.children, depth + 1) : null}
       </div>
     ));
   }
@@ -314,13 +319,14 @@ export default function RealRepoWorkspace({
         </button>
         <button
           type="button"
-          disabled={!dirty || !activePath || saving}
+          disabled={!dirty || !activePath || saving || (branch==='main'&&confirmation!=='CONFIRM PUSH')}
           onClick={() => void saveFile()}
           className="inline-flex h-7 items-center gap-1 rounded bg-[#0078d4] px-2 text-[11px] text-white disabled:opacity-40"
         >
           {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
           Commit
         </button>
+        <button type="button" disabled={!runtimeReady||!activePath||saving} onClick={()=>void stageActiveFileInRuntime().then(()=>setStatus('Saved in the Studio container; commit separately to deploy.')).catch(e=>setStatus(e.message))} className="rounded border border-slate-500 px-2 py-1 text-xs disabled:opacity-40">Save in container</button>
         <button
           type="button"
           disabled={!runtimeReady || !activePath || running}
@@ -334,6 +340,7 @@ export default function RealRepoWorkspace({
         </button>
       </div>
 
+      {dirty&&branch==='main'&&<label className="flex items-center gap-2 bg-slate-900 px-3 py-2 text-xs text-white">To commit to main, type CONFIRM PUSH<input aria-label="Main commit confirmation" value={confirmation} onChange={e=>setConfirmation(e.target.value)} className="rounded border border-slate-500 bg-slate-950 p-2 text-white" /></label>}
       <div className="flex min-h-0 flex-1">
         <aside className="w-64 shrink-0 overflow-y-auto border-r border-[#3c3c3c] bg-[#252526] py-1">
           {tree.length ? renderTree(tree) : <div className="px-3 py-4 text-[11px] text-[#858585]">Repository tree unavailable.</div>}
@@ -342,11 +349,11 @@ export default function RealRepoWorkspace({
           {activePath ? (
             <div className="flex h-full flex-col">
               <div className="shrink-0 border-b border-[#3c3c3c] px-3 py-1 text-[10px] text-[#9ca3af]">
-                {activePath}{dirty ? ' • unsaved' : ''}
+                {activePath}{dirty ? ' • uncommitted' : ''}
               </div>
               <textarea
                 value={content}
-                onChange={(event) => setContent(event.target.value)}
+                onChange={(event) => {setContent(event.target.value);setConfirmation('');}}
                 spellCheck={false}
                 className="min-h-0 flex-1 resize-none bg-[#1e1e1e] p-3 font-mono text-[12px] leading-5 text-[#d4d4d4] outline-none"
                 placeholder="// Edit the real Elevate-lms repository here"
@@ -362,6 +369,7 @@ export default function RealRepoWorkspace({
         <div className="flex items-center gap-2 border-b border-[#333] bg-[#171717] px-3 py-1 text-[10px] text-[#9ca3af]">
           <Terminal className="h-3.5 w-3.5" />
           Isolated Terminal
+          {!runtimeReady&&<button type="button" onClick={()=>setReconnect(value=>value+1)} className="rounded border border-slate-500 px-2 py-1 text-white">Reconnect terminal</button>}
           <span className="text-[#666]">{runtimeReady ? 'runtime ready' : 'runtime starting'}</span>
           <button type="button" onClick={() => setTerminalOutput([])} className="ml-auto rounded p-1 hover:bg-[#333]" title="Clear">
             <RefreshCw className="h-3 w-3" />

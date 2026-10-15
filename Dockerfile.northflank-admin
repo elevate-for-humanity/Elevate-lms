@@ -24,6 +24,7 @@ RUN corepack disable || true \
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
+        util-linux \
         fontconfig \
         libfontconfig1 \
         libfreetype6 \
@@ -44,6 +45,7 @@ RUN echo "nf-deps-2026-08-13-block-ffmpeg-static-postinstall"
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json ./apps/admin/package.json
 COPY packages ./packages
+COPY scripts/run-bounded-build.mjs scripts/build-memory-policy.mjs ./scripts/
 # Runtime ships Debian FFmpeg. Fail closed unless the workspace blocks the
 # redundant ffmpeg-static GitHub download during dependency installation.
 RUN node -e "const fs=require('fs'); const yaml=fs.readFileSync('pnpm-workspace.yaml','utf8'); if (!/^  ffmpeg-static: false$/m.test(yaml)) throw new Error('pnpm-workspace.yaml must block ffmpeg-static builds');"
@@ -53,7 +55,7 @@ RUN set -eux; \
     echo "pnpm=${PNPM_BIN} version=$(pnpm --version)"; \
     test "$(pnpm --version)" = "10.28.2"; \
     pnpm install --help | grep -E -- 'frozen-lockfile|lockfile'; \
-    pnpm install --frozen-lockfile --strict-peer-dependencies=false
+    node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 FROM base AS builder
 ARG NEXT_PUBLIC_SITE_URL
@@ -69,7 +71,6 @@ RUN set -eux; \
     echo "NF_GIT_SHA validated: ${NF_GIT_SHA}"
 ENV NODE_ENV=production
 ENV CI=true
-ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://www.elevateforhumanity.org}"
 ENV NEXT_PUBLIC_ADMIN_URL="${NEXT_PUBLIC_ADMIN_URL:-https://admin.elevateforhumanity.org}"

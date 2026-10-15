@@ -12,6 +12,7 @@ export const metadata = {
   description:
     'Explore guided, sample-data demos of the Elevate admin, employer, learner, and workforce platform experiences.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/store/demos' },
+  robots: { index: true, follow: true },
 };
 
 const demoLinks = [

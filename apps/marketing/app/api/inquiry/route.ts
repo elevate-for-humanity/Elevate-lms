@@ -229,7 +229,7 @@ async function _POST(req: Request) {
   } catch (error) {
     logger.error('Inquiry error:', error);
     return NextResponse.json(
-      { error: 'Failed to submit inquiry. Please call 317-999-9620.' },
+      { error: 'Failed to submit inquiry. Please call 463-240-1404.' },
       { status: 500 },
     );
   }

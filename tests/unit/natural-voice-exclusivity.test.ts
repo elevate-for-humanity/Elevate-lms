@@ -1,8 +1,27 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { speakNaturalVoice, stopAllNaturalVoicePlayback } from '@/components/voice/useNaturalVoice';
+import { playNaturalVoiceNotification, speakNaturalVoice, stopAllNaturalVoicePlayback } from '@/components/voice/useNaturalVoice';
 
 describe('exclusive natural voice playback', () => {
   afterEach(() => { stopAllNaturalVoicePlayback(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
+  it('does not interrupt existing audio when announcing a PWA event', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(new Blob(['audio']))));
+    const play = vi.fn().mockResolvedValue(undefined);
+    const pause = vi.fn();
+    vi.stubGlobal('Audio', class {
+      preload = '';
+      playbackRate = 1;
+      volume = 1;
+      addEventListener = vi.fn();
+      play = play;
+      pause = pause;
+    });
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:alert-independent');
+    const interrupted = vi.spyOn(window, 'dispatchEvent');
+    expect(await playNaturalVoiceNotification('Notification: a new email was received.', 0.6)).toBe(true);
+    expect(play).toHaveBeenCalledOnce();
+    expect(pause).not.toHaveBeenCalled();
+    expect(interrupted).not.toHaveBeenCalled();
+  });
   it('cancels a pending standalone narration before its audio arrives', async () => {
     let resolve!: (response: Response) => void;
     vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>((done) => { resolve = done; })));

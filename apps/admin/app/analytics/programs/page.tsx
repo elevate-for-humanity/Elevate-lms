@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
+import { loadAllEnrollmentRows } from '@/lib/analytics/report-integrity.mjs';
 import { BookOpen, Users, Award, TrendingUp, ChevronRight, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -44,10 +45,7 @@ export default async function ProgramAnalyticsPage() {
   const programs = programsRes.data ?? [];
 
   // Per-program enrollment counts
-  const { data: enrollCounts } = await db
-    .from('program_enrollments')
-    .select('program_id')
-    .not('program_id', 'is', null);
+  const { data: enrollCounts, error: enrollmentBreakdownError } = await loadAllEnrollmentRows(db);
 
   const enrollByProgram: Record<string, number> = {};
   for (const e of enrollCounts ?? []) {
@@ -79,6 +77,11 @@ export default async function ProgramAnalyticsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+        {enrollmentBreakdownError && (
+          <p role="alert" className="rounded-xl bg-amber-50 p-4 text-amber-950">
+            Per-program enrollment totals could not be loaded.
+          </p>
+        )}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             {
@@ -189,7 +192,7 @@ export default async function ProgramAnalyticsPage() {
                       {p.category ?? '—'}
                     </td>
                     <td className="py-3.5 px-5 font-semibold text-slate-900 tabular-nums">
-                      {enrollByProgram[p.id] ?? 0}
+                      {enrollmentBreakdownError ? 'Unavailable' : (enrollByProgram[p.id] ?? 0)}
                     </td>
                     <td className="py-3.5 px-5 text-slate-500 text-xs">
                       {p.estimated_weeks ? `${p.estimated_weeks}w` : '—'}

@@ -1,11 +1,18 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import PublicPathwayLinks from '@/components/marketing/PublicPathwayLinks';
 import { RouteTransition } from '@/components/site/RouteTransition';
 import '@/styles/marketing-mobile-density.css';
 
 const OPERATIONAL_PREFIXES = ['/case-manager', '/workforce-board', '/provider'] as const;
-const STANDALONE_BRAND_PREFIXES = ['/meri-gold-round', '/merigoldround', '/sites', '/tax', '/tax-software'] as const;
+const STANDALONE_BRAND_PREFIXES = [
+  '/meri-gold-round',
+  '/merigoldround',
+  '/sites',
+  '/tax',
+  '/tax-software',
+] as const;
 
 function matchesPrefix(pathname: string, prefixes: readonly string[]) {
   const clean = pathname.split('?')[0] || '/';
@@ -45,7 +52,10 @@ export function MarketingChromeBoundary({
     <>
       {header}
       <div id="main-content" tabIndex={-1} className="site-main focus:outline-none">
-        <RouteTransition>{children}</RouteTransition>
+        <RouteTransition>
+          {children}
+          <PublicPathwayLinks />
+        </RouteTransition>
       </div>
       {footer}
       {!pathname.startsWith('/store') ? paris : null}

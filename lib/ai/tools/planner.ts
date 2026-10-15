@@ -127,6 +127,10 @@ export function planAIToolFromCommand(
   }
 
   const lower = command.toLowerCase();
+  if (/\b(paris|combined ai|all (?:the )?ais?|ai system|ai supervision)\b/.test(lower) &&
+      /\b(status|health|monitor|failures?|errors?|working|helping)\b/.test(lower))
+    return {name:'paris.supervision', input:{}};
+
   // The plan's platform snapshot command must resolve to a read-only tool.
   if (
     /^(?:get|show|inspect|check)\s+(?:(?:the|live|current)\s+)*(?:platform|system)\s+(?:state|health|status)\b/.test(lower)
@@ -347,6 +351,12 @@ export function planAIToolFromCommand(
   if (/\b(issue|generate)\b.*\bcertificate/.test(lower)) {
     return { name: 'certificates.issue', input: asAIRecord(context.toolInput) };
   }
+  if (/\b(course|lesson|builder)\b/.test(lower) && /\b(status|monitor|progress|stalled|health|autopilot)\b/.test(lower) &&
+      !/\b(enable|disable|start|repair|fix|resume|build|create)\b/.test(lower)) {
+    return {name:'courses.status',input:{...(typeof context.courseId === 'string'?{courseId:context.courseId}:{}),
+      ...(typeof context.buildId === 'string'?{buildId:context.buildId}:{})}};
+  }
+
   // Existing course media repair is Course Builder work. Route it before the
   // generic engineering/browser rules so words such as "repair", "endpoint",
   // or "dashboard" cannot accidentally dispatch an unauthorized OpenHands job.

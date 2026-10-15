@@ -17,6 +17,7 @@ RUN corepack disable || true \
     && test "$(pnpm --version)" = "10.28.2"
 
 WORKDIR /workspace
+RUN apk add --no-cache util-linux
 
 FROM base AS dependencies
 
@@ -33,7 +34,8 @@ COPY packages/ui/package.json ./packages/ui/package.json
 # the workspace explicitly blocks its network-dependent postinstall download.
 RUN node -e "const fs=require('fs'); const yaml=fs.readFileSync('pnpm-workspace.yaml','utf8'); if (!/^  ffmpeg-static: false$/m.test(yaml)) throw new Error('pnpm-workspace.yaml must block ffmpeg-static builds');"
 COPY packages/bounded-braces ./packages/bounded-braces
-RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
+COPY scripts/run-bounded-build.mjs scripts/build-memory-policy.mjs ./scripts/
+RUN node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 FROM base AS builder
 
@@ -53,7 +55,6 @@ ARG NEXT_PUBLIC_SUPPORT_EMAIL=support@elevateforhumanity.org
 
 ENV NODE_ENV=production
 ENV CI=true
-ENV NODE_OPTIONS="--max-old-space-size=3072"
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV NF_GIT_SHA=$NF_GIT_SHA
 ENV GITHUB_SHA=$NF_GIT_SHA

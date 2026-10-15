@@ -1,5 +1,6 @@
 'use client';
 
+import { TimeclockAttendanceNotice } from '@/components/timeclock/TimeclockAttendanceNotice';
 import { offlineQueue } from '@/lib/pwa/offline-queue';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -361,7 +362,7 @@ export default function TimeclockPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Action failed');
+        setError(data.message || data.error || 'Action failed');
         setActionLoading(null);
         return;
       }
@@ -537,6 +538,8 @@ export default function TimeclockPage() {
               </div>
             </div>
           </div>
+
+          <TimeclockAttendanceNotice />
 
           {/* Hours Progress */}
           <div className="mb-6 p-3 bg-brand-blue-50 rounded-lg">

@@ -1,3 +1,4 @@
+import {ULTIMATE_BUILD_STEPS} from '../core/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { UltimateJobQueue } from './job-queue';
 import {createCourseProgressWatch,reportCourseProgress} from './progress-watch.mjs';
@@ -14,6 +15,7 @@ import { resolveReleaseActor } from './release-actor';
 import { hydrateUltimateProfileSources } from '../core/course-profile';
 import { materializeUltimateDraft } from './materialize-draft';
 import { isDurableExternalBlocker } from '../core/repair-router';
+import { liveCheckpointRepairReader } from './live-checkpoint-repair';
 export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
@@ -112,6 +114,9 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
           payload.competencyId ?? payload.repairCompetencyId ?? (payload.acceptance ? profile.competencies?.[0]?.id : undefined),
         startIndex: Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0,
         maxLessons: 1,
+        beforeCheckpoint: liveCheckpointRepairReader(db, job, workerId, generation, payload, currentCompetencyId),
+        repairRenderRevision: payload.checkpointRepair?.competencyId === currentCompetencyId && ULTIMATE_BUILD_STEPS.indexOf(payload.checkpointRepair.fromStep) <= ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render') ? payload.checkpointRepair.requestedAt : undefined,
+        repairFromStep: payload.checkpointRepair?.competencyId === currentCompetencyId ? payload.checkpointRepair.fromStep : undefined,
       },
       () => new UltimateBuildRunner(handlers as any),
       runtime.persistence,
@@ -123,15 +128,20 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     if (!targeted) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {
+        if (result.completed) delete continuation.payload.checkpointRepair;
         await queue.yieldProgress(job.id, workerId, continuation.payload, generation);
         return { claimed: true, completed: false, continuing: true, jobId: job.id, result };
       }
       if (continuation.unresolved?.length) {
-        // A missing dependency is a blocked prerequisite, not a failed render.
-        // Preserve the cursor and await an explicit dependency wake-up instead
-        // of exhausting attempts or continuously retrying missing media.
-        await queue.waitForDependency(job.id,workerId,`ULTIMATE_DEPENDENCIES_UNRESOLVED:${continuation.unresolved.join(',')}`,generation,continuation.payload);
-        return {claimed:true,completed:false,awaitingDependency:true,jobId:job.id,result};
+        // Only genuine external prerequisites need a dependency wake-up.
+        // Internal lesson/producer failures must use the existing bounded
+        // repair retry rather than being stranded as missing media.
+        if (result.findings?.some(isDurableExternalBlocker)) {
+          await queue.waitForDependency(job.id,workerId,`ULTIMATE_EXTERNAL_ASSET_REQUIRED:${continuation.unresolved.join(',')}`,generation,continuation.payload);
+          return {claimed:true,completed:false,awaitingDependency:true,jobId:job.id,result};
+        }
+        await queue.fail(job.id,workerId,`ULTIMATE_INTERNAL_REPAIR_REQUIRED:${continuation.unresolved.join(',')}`,generation,true);
+        return {claimed:true,completed:false,repairQueued:true,jobId:job.id,result};
       }
     }
     if (!result.completed) {

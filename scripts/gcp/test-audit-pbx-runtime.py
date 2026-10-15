@@ -6,6 +6,14 @@ spec = importlib.util.spec_from_file_location('pbx_audit', Path(__file__).with_n
 pbx = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pbx)
 class RuntimeEvidence(unittest.TestCase):
+    def test_carrier_inventory_excludes_identity_and_credentials(self):
+        report = pbx.carrier_inventory('Transport: transport-udp udp 0 0 0.0.0.0:5060\nTransport: secure tls 0 0 0.0.0.0:5061\npassword=private',
+                                      ' Endpoint: twilio/123456 Not in use\n Endpoint: pwa-private Not in use\n Endpoint: telnyx Not in use')
+        self.assertEqual(report['evidence']['transports'], [{'protocol': 'udp', 'bind': '0.0.0.0:5060'}, {'protocol': 'tls', 'bind': '0.0.0.0:5061'}])
+        self.assertTrue(report['evidence']['twilio_endpoint_present'])
+        self.assertTrue(report['evidence']['telnyx_endpoint_present'])
+        self.assertNotIn('private', str(report))
+        self.assertEqual(pbx.carrier_inventory(None, None)['result'], 'BLOCKED')
     def test_context_or_wildcard_is_not_an_operator_route(self):
         self.assertFalse(pbx.operator_configured("[ Context 'internal' ]\n '_X.' => 1. Dial(PJSIP/${EXTEN},30)"))
         self.assertFalse(pbx.operator_configured("There is no existence of '0@internal'"))

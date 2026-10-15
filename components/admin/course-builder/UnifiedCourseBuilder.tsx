@@ -37,6 +37,8 @@ type UltimateBuildRow = {
     created_at: string;
     heartbeat_at?: string | null;
     lease_expires_at?: string | null;
+    monitor?: {enabled?: boolean; coordinator?: string; state?: string; checkedAt?: string; reason?: string; recoveries?: number};
+    payload?: { progress?: { phase: string; at: string; completed: number; total?: number | null } };
   }>;
 };
 
@@ -47,7 +49,11 @@ const TABS: Array<{ id: Tab; label: string; icon: any }> = [
 ];
 
 async function readJson(response: Response) {
-  return response.json().catch(() => ({}));
+  return response.json().catch(() => {
+    throw new Error(response.status === 503
+      ? 'Admin service unavailable (HTTP 503). Saved progress is unchanged; waiting for runtime recovery.'
+      : `Course Builder returned an unreadable response (HTTP ${response.status}). Saved progress is unchanged.`);
+  });
 }
 
 async function startUltimateCourse(input: {
@@ -77,8 +83,8 @@ async function startUltimateCourse(input: {
   if (!response.ok || !payload?.buildId) {
     throw new Error(payload?.error || payload?.message || 'Ultimate build could not be started');
   }
-  if (payload?.dispatched !== true)
-    throw new Error('Worker launch was not accepted. Resume the saved build.');
+  if (payload?.queued !== true && payload?.dispatched !== true)
+    throw new Error('The worker request was not saved.');
   return payload;
 }
 
@@ -185,7 +191,7 @@ export default function UnifiedCourseBuilder({
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">
               <Bot className="h-4 w-4" /> Ultimate Course Builder
             </div>
-            <p className="mt-1 max-w-3xl text-sm text-slate-400">
+            <p className="mt-1 max-w-3xl text-sm text-slate-200">
               One durable 20-stage authority for standards, instruction, media, narration,
               assessments, QA, repair, and LMS release.
             </p>
@@ -274,9 +280,10 @@ export default function UnifiedCourseBuilder({
             <UltimateBuildPanel
               course={selectedCourse}
               programSlug={selectedProgram?.slug?.trim() || selectedCourse.slug}
+              compact={embedded}
             />
           ) : (
-            <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-400">
+            <div className="rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm text-slate-200">
               Select a course, or create a course shell, to start an Ultimate build.
             </div>
           ))}
@@ -381,7 +388,7 @@ function CourseCatalog({
     <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,26.25rem)]">
       <section className="min-w-0 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
         <h2 className="text-lg font-bold">Course inventory</h2>
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm text-slate-200">
           Open a canonical course in Ultimate Course Builder. Publishing is available only after the
           Ultimate release gate passes.
         </p>
@@ -435,7 +442,7 @@ function CourseCatalog({
               >
                 {course.title}
               </button>
-              <div className="mt-1 text-xs text-slate-400">
+              <div className="mt-1 text-xs text-slate-200">
                 {course.status ?? 'draft'} · {course.duration_hours ?? '—'} hours
               </div>
               <button
@@ -447,9 +454,9 @@ function CourseCatalog({
               </button>
             </article>
           ))}
-          {loading && <p className="text-sm text-slate-400">Loading course inventory…</p>}
+          {loading && <p className="text-sm text-slate-200">Loading course inventory…</p>}
           {!loading && !inventoryError && !visibleCourses.length && (
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-200">
               {courses.length ? 'No courses match these filters.' : 'No courses exist yet.'}
             </p>
           )}
@@ -529,7 +536,7 @@ function CreateCoursePanel({
       className="mx-auto min-w-0 max-w-3xl space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-6"
     >
       <h2 className="text-xl font-bold">Create and start in Ultimate</h2>
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-slate-200">
         Creates only the canonical course shell, then hands all generation to Ultimate Course
         Builder.
       </p>
@@ -573,7 +580,7 @@ function CreateCoursePanel({
         <span>Google model for source-grounded teaching (optional)</span>
         <input name="googleModel" placeholder="Verified model ID" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" />
         <select name="googleLocation" defaultValue="us" aria-label="Google authoring location" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"><option value="us">United States multi-region</option><option value="us-central1">Iowa region (supported models)</option><option value="global">Global</option></select>
-        <span className="block text-slate-400">Use a model verified for this worker's Google region. Authorized teaching sources and all media acceptance checks remain required.</span>
+        <span className="block text-slate-200">Use a model verified for this worker's Google region. Authorized teaching sources and all media acceptance checks remain required.</span>
       </label>
       {error ? (
         <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
@@ -595,9 +602,11 @@ function CreateCoursePanel({
 export function UltimateBuildPanel({
   course,
   programSlug,
+  compact = false,
 }: {
   course: CourseRow;
   programSlug: string;
+  compact?: boolean;
 }) {
   const [builds, setBuilds] = useState<UltimateBuildRow[]>([]);
   const [acquisitions, setAcquisitions] = useState<Array<{ id: string; goal: string | null }>>([]);
@@ -605,13 +614,17 @@ export function UltimateBuildPanel({
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [statusError, setStatusError] = useState('');
   const refreshToken = useRef(0);
+  const refreshController = useRef<AbortController | null>(null);
   const latest = buildsCourseId === course.id ? (builds[0] ?? null) : null;
   const statusLoading = loading;
   const statusLoaded = buildsCourseId === course.id;
+  const [lastStatusAt, setLastStatusAt] = useState<string | null>(null);
   const [notice, setNotice] = useState('');
   const [googleModel, setGoogleModel] = useState('');
   const [googleLocation,setGoogleLocation]=useState('us');
+  const [mobileSplitView, setMobileSplitView] = useState(false);
   const jobs = [...(latest?.ultimate_build_jobs ?? [])].sort((a, b) =>
     b.created_at.localeCompare(a.created_at),
   );
@@ -626,14 +639,18 @@ export function UltimateBuildPanel({
   const activeJob = observedJobs.find((job) => ['queued', 'running'].includes(job.status));
   const workerJob = activeJob ?? observedJobs[0];
 
-  async function refresh(requestedCourseId = course.id) {
+  async function refresh(requestedCourseId = course.id, background = false) {
+    if (background && refreshController.current) return;
+    refreshController.current?.abort();
+    const controller = new AbortController();
+    refreshController.current = controller;
     const token = ++refreshToken.current;
-    setLoading(true);
-    setError('');
+    if (!background) setLoading(true);
+    setStatusError('');
     try {
       const response = await fetch(
         `/api/admin/ultimate-course-builder?courseId=${encodeURIComponent(requestedCourseId)}`,
-        { cache: 'no-store' },
+        { cache: 'no-store', signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20000)]) },
       );
       const payload = await readJson(response);
       if (token !== refreshToken.current) return;
@@ -641,11 +658,12 @@ export function UltimateBuildPanel({
       setBuilds(Array.isArray(payload?.builds) ? payload.builds : []);
       setAcquisitions(Array.isArray(payload?.acquisitions) ? payload.acquisitions : []);
       setBuildsCourseId(requestedCourseId);
+      setLastStatusAt(new Date().toISOString());
     } catch (reason) {
       if (token !== refreshToken.current) return;
-      setError(reason instanceof Error ? reason.message : 'Unable to load Ultimate build status');
+      setStatusError(reason instanceof Error ? reason.message : 'Unable to load Ultimate build status');
     } finally {
-      if (token === refreshToken.current) setLoading(false);
+      if (token === refreshToken.current) { setLoading(false); refreshController.current = null; }
     }
   }
 
@@ -658,10 +676,26 @@ export function UltimateBuildPanel({
   }, [course.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!latest || !['initializing', 'queued', 'running'].includes(latest.status)) return;
-    const timer = window.setInterval(() => void refresh(), 15000);
+    // Keep retrying read-only status even after a failed initial load or blocked build.
+    // Queue writes and worker dispatch belong to the server coordinator, not polling.
+    const timer = window.setInterval(() => void refresh(course.id, true), 15000);
     return () => window.clearInterval(timer);
-  }, [latest?.id, latest?.status]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [course.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function toggleAutopilot() {
+    if (!latest) return;
+    setBusy(true); setError('');
+    try {
+      const response = await fetch('/api/admin/ultimate-course-builder/autopilot', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({buildId:latest.id,enabled:!workerJob?.monitor?.enabled}), signal:AbortSignal.timeout(25000),
+      });
+      const result=await readJson(response);
+      if(!response.ok)throw new Error(result.error || 'Autopilot setting could not be saved');
+      setNotice(result.message); await refresh();
+    } catch(reason) {setError(reason instanceof Error?reason.message:'Autopilot configuration failed');}
+    finally {setBusy(false);}
+  }
 
   async function startBuild() {
     setBusy(true);
@@ -674,11 +708,18 @@ export function UltimateBuildPanel({
           body: JSON.stringify({ buildId: latest.id }),
         });
         const payload = await readJson(response);
-        if (!response.ok || payload?.dispatched !== true) throw new Error(payload?.error || 'Google worker could not be started');
-        setNotice('Google worker dispatch accepted. The stages below show actual build progress.');
+        if (!response.ok || (payload?.queued !== true && payload?.alreadyRunning !== true)) throw new Error(payload?.error || 'The worker request could not be saved');
+        if (payload.dispatched === false) {
+          setError(payload.message || 'Course saved, but the Google worker has not started.');
+        } else {
+          setNotice(payload.message || 'Worker launch accepted. Waiting for a verified heartbeat.');
+        }
+        setNotice(payload.message || 'Request saved. Waiting for worker assignment.');
+        if (payload.dispatched === false) setError('Course saved but Google worker did not start. GitHub dispatch is unavailable; the scheduler may retry. Check Dev Studio GitHub access or the worker deployment.');
       } else {
-        await startUltimateCourse({ course, programSlug, googleModel, googleLocation });
-        setNotice('Build saved and Google worker dispatch accepted. Check the stages for progress.');
+        const result = await startUltimateCourse({ course, programSlug, googleModel, googleLocation });
+        setNotice(result.message || 'Build saved. Waiting for worker assignment.');
+        if (result.dispatched === false) setError('Build queued but the Google worker launch was not accepted. Confirm the GitHub dispatch connection in Dev Studio.');
       }
       await refresh();
     } catch (reason) {
@@ -729,7 +770,7 @@ export function UltimateBuildPanel({
             Ultimate Course Builder
           </p>
           <h2 className="mt-1 text-2xl font-black text-white">{course.title}</h2>
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="mt-2 text-sm text-slate-200">
             Program authority: {programSlug || 'course-defined'} · Google Course Builder worker · 20
             checkpointed stages
           </p>
@@ -744,51 +785,67 @@ export function UltimateBuildPanel({
         </button>
       </div>
 
+      <div className={`mt-4 items-center justify-between gap-2 2xl:hidden ${compact ? 'hidden' : 'flex'}`}>
+        <span className="text-xs font-semibold text-slate-300">Workspace layout</span>
+        <button type="button" aria-pressed={mobileSplitView} onClick={() => setMobileSplitView(value => !value)} className="rounded-lg border border-cyan-600 px-3 py-2 text-xs font-bold text-cyan-200">{mobileSplitView ? "Use stacked view" : "Show builder + preview together"}</button>
+      </div>
+      <div data-course-workspace-layout className={`mt-5 grid min-w-0 items-start gap-2 sm:gap-5 ${compact ? '' : '2xl:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)]'} ${mobileSplitView && !compact ? "grid-cols-2" : "grid-cols-1"}`}>
+        <div className="min-w-0">
       {!statusLoading && latest ? (
         <div className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Worker job</p>
+          <p className="text-xs uppercase tracking-wide text-slate-300">Worker job</p>
           <p className="mt-1 text-sm font-bold text-slate-200">
-            {workerJob?.status === 'queued' ? 'Awaiting worker assignment' : (workerJob?.status ?? 'Not started')} · {workerJob?.id ?? 'No persisted job'}
+            {workerJob?.status === 'queued' ? 'Awaiting worker assignment' : (workerJob?.status ?? 'Not started')}
           </p>
           {workerJob?.last_error ? (
             <p role="alert" className="mt-2 break-words text-sm text-amber-200">
-              {workerJob.last_error}
+              {workerJob.status === 'running' ? 'Previous attempt: ' : ''}{workerJob.last_error}
             </p>
           ) : null}
+          {workerJob?.status === 'running' && !statusError && workerJob?.payload?.progress && <div className="mt-3 space-y-2 text-white">
+            <p>Worker activity: {workerJob.payload.progress.phase.replaceAll('_', ' ').replaceAll(':', ' · ')}</p>
+            <p className="text-sm">Last progress: {new Date(workerJob.payload.progress.at).toLocaleString()}</p>
+            {typeof workerJob.payload.progress.total === 'number' && workerJob.payload.progress.total > 0 && <>
+              <progress aria-label="Current worker activity progress" className="h-3 w-full" max={workerJob.payload.progress.total}
+                value={Math.min(workerJob.payload.progress.total, workerJob.payload.progress.completed)} />
+              <p className="text-sm">{workerJob.payload.progress.completed} of {workerJob.payload.progress.total} work units in this activity.</p>
+            </>}
+          </div>}
           {workerJob?.status === 'completed' && !['built', 'published'].includes(latest.status) ? (
-            <p className="mt-2 text-sm text-slate-400">
+            <p className="mt-2 text-sm text-slate-200">
               This worker job finished. Course acceptance and release are still required.
             </p>
           ) : null}
         </div>
       ) : null}
 
-      {error ? (
+      {error || statusError ? (
         <p
           role="alert"
           className="mt-4 rounded-lg border border-red-500/40 bg-red-950/40 p-3 text-sm text-red-100"
         >
-          {error}
+          {error || statusError}
+          {statusError && lastStatusAt && <span className="mt-1 block">Showing saved status from {new Date(lastStatusAt).toLocaleTimeString()}. It is not live confirmation.</span>}
         </p>
       ) : null}
 
-      <div className="mt-5 grid gap-4 md:grid-cols-3">
+      <div className="mt-5 grid min-w-0 gap-2 sm:gap-4 lg:grid-cols-3">
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Status</p>
+          <p className="text-xs uppercase tracking-wide text-slate-300">Status</p>
           <p className="mt-1 text-lg font-black text-white">
-            {statusLoading ? 'loading…' : !statusLoaded ? 'Unavailable' : (latest?.status === 'queued' ? 'Awaiting worker assignment' : (latest?.status ?? 'not started'))}
+            {statusLoading ? 'loading…' : (!statusLoaded || statusError) ? 'Unavailable' : (latest?.status === 'queued' ? 'Awaiting worker assignment' : (workerJob?.status === 'stalled' ? 'Worker stalled' : (latest?.status ?? 'not started')))}
           </p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Current stage</p>
+          <p className="text-xs uppercase tracking-wide text-slate-300">Current stage</p>
           <p className="mt-1 break-words text-lg font-black text-white">
-            {statusLoading ? 'loading…' : !statusLoaded ? 'Unavailable' : (latest?.current_step ?? 'Not started')}
+            {statusLoading ? 'loading…' : (!statusLoaded || statusError) ? 'Unavailable' : (latest?.current_step?.replaceAll('_', ' ') ?? 'Not started')}
           </p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
-          <p className="text-xs uppercase tracking-wide text-slate-500">Build ID</p>
+          <p className="text-xs uppercase tracking-wide text-slate-300">Saved work</p>
           <p className="mt-1 break-all text-sm font-bold text-slate-200">
-            {statusLoading ? 'Loading course build…' : !statusLoaded ? 'Unavailable' : (latest?.id ?? 'Created when started')}
+            {statusLoading ? 'Loading course build…' : (!statusLoaded || statusError) ? 'Unavailable' : (latest ? 'Lesson checkpoints preserved' : 'Saved when started')}
           </p>
         </div>
       </div>
@@ -807,15 +864,29 @@ export function UltimateBuildPanel({
         </div>
       )}
 
+      {latest && workerJob && <section aria-label="PARIS course autopilot" className="mt-5 rounded-xl border border-cyan-700 bg-slate-950 p-4 text-white">
+        <h3 className="font-bold">PARIS course autopilot</h3>
+        <p className="mt-2">PARIS combines admissions, instruction, production, quality checks, and supervision in one system.</p>
+        <p className="mt-2">{workerJob.monitor?.enabled ? 'Enabled' : 'Disabled'} · {workerJob.monitor?.state?.replaceAll('_',' ') || 'No supervisor observation yet'}</p>
+        {workerJob.monitor?.checkedAt && <p>Last supervisor check: {new Date(workerJob.monitor.checkedAt).toLocaleString()}</p>}
+        {workerJob.monitor?.enabled && (!workerJob.monitor.checkedAt || Date.now()-Date.parse(workerJob.monitor.checkedAt)>600000) &&
+          <p role="alert" className="mt-2 text-amber-200">Supervisor heartbeat is unconfirmed or stale. Monitoring is configured, but automatic execution is not verified.</p>}
+        {workerJob.monitor?.reason && <p className="mt-2">{workerJob.monitor.reason}</p>}
+        <p className="mt-2 text-sm text-slate-200">Repairs preserve saved lessons, respect active worker leases, and stop at retry limits or missing evidence. Publishing requires the existing quality checks.</p>
+        <button type="button" onClick={()=>void toggleAutopilot()} disabled={busy || statusLoading}
+          className="mt-3 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50">
+          {workerJob.monitor?.enabled ? 'Pause PARIS autopilot' : 'Enable PARIS autopilot'}
+        </button>
+      </section>}
+
       {notice ? <p role="status" className="mt-4 text-sm text-cyan-200">{notice}</p> : null}
-      {latest ? <UltimateStageInspector buildId={latest.id} updatedAt={latest.updated_at} /> : null}
 
       {statusLoaded && (!latest || ['blocked','failed','built_with_findings'].includes(latest.status)) ? (
         <label className="mt-4 block space-y-2 text-sm">
           <span>Google model for source-grounded teaching (optional)</span>
           <input value={googleModel} onChange={(event) => setGoogleModel(event.target.value)} placeholder="Verified model ID" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" />
           <select value={googleLocation} onChange={event=>setGoogleLocation(event.target.value)} aria-label="Google authoring location" className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"><option value="us">United States multi-region</option><option value="us-central1">Iowa region (supported models)</option><option value="global">Global</option></select>
-          <span className="block text-slate-400">Set before starting this build. Authorized teaching sources and all media acceptance checks remain required.</span>
+          <span className="block text-slate-200">Set before starting this build. Authorized teaching sources and all media acceptance checks remain required.</span>
         </label>
       ) : null}
 
@@ -859,7 +930,17 @@ export function UltimateBuildPanel({
           </button>
         ) : null}
       </div>
-      <p className="mt-4 text-xs text-slate-500">
+        </div>
+        <aside aria-label="Live course lesson preview" className="min-w-0 overflow-x-hidden 2xl:sticky 2xl:top-4">
+          <div className="mb-3 rounded-xl border border-cyan-700/60 bg-slate-950 p-3">
+            <h3 className="font-bold text-cyan-200">Live lesson preview</h3>
+            <p className="mt-1 text-xs text-slate-300">Saved lessons and checkpoints refresh alongside the builder. Video appears as soon as a playable render is saved.</p>
+          </div>
+          {latest ? <UltimateStageInspector buildId={latest.id} updatedAt={latest.updated_at} /> :
+            <p className="rounded-xl border border-slate-700 bg-slate-950 p-4 text-sm text-slate-300">Select or start a build to preview its lessons.</p>}
+        </aside>
+      </div>
+      <p className="mt-4 text-xs text-slate-300">
         Course Factory generation, blueprint execution, and standalone media queues are not
         available from this surface.
       </p>

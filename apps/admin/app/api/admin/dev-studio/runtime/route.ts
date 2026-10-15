@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { getSecrets } from '@/lib/secrets';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { recordMasterStudioArtifact } from '@/lib/studio/master-runtime';
 
@@ -10,9 +10,9 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
 async function runtimeConfig() {
-  await hydrateProcessEnv().catch(() => undefined);
-  const url = String(process.env.STUDIO_BROWSER_URL || '').replace(/\/$/, '');
-  const secret = String(process.env.STUDIO_BROWSER_SECRET || '');
+  const config=await getSecrets(['STUDIO_BROWSER_URL','STUDIO_BROWSER_SECRET']);
+  const url = String(config.STUDIO_BROWSER_URL || process.env.STUDIO_BROWSER_URL || '').replace(/\/$/, '');
+  const secret = String(config.STUDIO_BROWSER_SECRET || process.env.STUDIO_BROWSER_SECRET || '');
   if (!url || !secret) throw new Error('Master Studio runtime is not configured');
   return { url, secret };
 }

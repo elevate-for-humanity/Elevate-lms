@@ -16,6 +16,7 @@ import type { MediaStoryboard } from './media-director';
 import type { InstructionalQualityEvidence } from './instructional-quality-gate';
 import { configuredNarrationProvider } from './edge-tts';
 import { MIN_TITLE_WORD_COVERAGE, readEncodedTitle } from './title-readability.mjs';
+import { PREMIUM_TITLE_LAYOUT } from '../../remotion-src/premium-title-layout.mjs';
 
 export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v8';
 
@@ -545,7 +546,7 @@ export async function enforceMediaQuality(input: {
     const sceneNarrationEvidence: NonNullable<MediaQualityEvidence['sceneNarrationEvidence']> = [];
     const premium=input.lessonPresentation==='approved-premium-v1';
     const approvedPresentationInspection: NonNullable<MediaQualityEvidence['approvedPresentationInspection']> = {pass:false,backgrounds:[],captions:[]};
-    let sceneStart = premium ? 0 : 3;
+    let sceneStart = Number((input.sceneData as any).preRollDurationSeconds ?? 0) + (premium ? 0 : 3);
     for (const [index, scene] of input.sceneData.scenes.entries()) {
       const time = sceneStart + Math.min(2, scene.durationSeconds / 2);
       if(premium) {
@@ -553,7 +554,7 @@ export async function enforceMediaQuality(input: {
         const passed=charcoalPixelsMatch(pixels.stdout);
         approvedPresentationInspection.backgrounds.push({sceneId:scene.id,passed});
         if(!passed)throw new Error('APPROVED_ENCODED_CHARCOAL_BACKGROUND_REQUIRED:'+scene.id);
-        const samples=captionSampleGroups((scene as any).wordAlignment,(scene as any).recapStartSeconds);
+        const samples=captionSampleGroups((scene as any).wordAlignment,(scene as any).recapStartSeconds,(scene as any).captionCues);
         if(!samples.length)throw new Error('APPROVED_ENCODED_CAPTION_SAMPLES_REQUIRED:'+scene.id);
         for(const [sampleIndex,sample] of samples.entries()) for(const width of [1280,390]) {
           const captionTime=sceneStart+(sample.startSeconds+sample.endSeconds)/2;
@@ -584,10 +585,10 @@ export async function enforceMediaQuality(input: {
           { timeout: 30000, maxBuffer: 1000000 },
         );
         const { wordCoverage, ocrMode } = await readEncodedTitle({
-          frame, expectedTitle: scene.subject, titleLayout: scene.titleLayout,
+          frame, expectedTitle: scene.subject, titleLayout: premium ? PREMIUM_TITLE_LAYOUT : scene.titleLayout,
         });
         readability.push({ scene: index + 1, width, wordCoverage, ocrMode });
-        if (wordCoverage < MIN_TITLE_WORD_COVERAGE) throw new Error(`MEDIA_TEXT_UNREADABLE:${index + 1}:${width}`);
+        if (wordCoverage < MIN_TITLE_WORD_COVERAGE) throw new Error(`${premium ? 'MEDIA_TEXT_UNREADABLE_AFTER_REGION' : 'MEDIA_TEXT_UNREADABLE'}:${index + 1}:${width}`);
       }
       // Inspect every authored teaching state in the encoded movie, including
       // phone delivery. A diagram or record listed in metadata is not evidence

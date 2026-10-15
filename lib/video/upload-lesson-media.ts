@@ -9,17 +9,18 @@
  */
 
 import { execFile } from 'child_process';
-import { mkdtemp, readFile, rm, unlink, writeFile } from 'fs/promises';
+import { mkdtemp, readFile, rm, stat, unlink, writeFile } from 'fs/promises';
 import { promisify } from 'util';
 import os from 'os';
 import path from 'path';
 import {
   uploadToElevateMedia,
+  uploadFileToElevateMedia,
   isElevateMediaStorageConfigured,
   isElevateMediaPublicDeliveryConfigured,
 } from '../storage/elevate-media-storage';
 import { logger } from '../logger';
-import { uploadSupabaseResumable } from './supabase-resumable-upload.mjs';
+import { uploadSupabaseResumable, uploadSupabaseResumableFile } from './supabase-resumable-upload.mjs';
 import { videoEncoderArgs } from './ffmpeg-runtime';
 
 const SUPABASE_BUCKET = 'course-videos';
@@ -86,16 +87,14 @@ export const isAnyR2Configured = isAnyElevateMediaStorageConfigured;
 
 /** Whether this buffer should upload to Elevate Media Storage instead of Supabase. */
 export function shouldUploadCourseMediaToElevateMedia(
-  buffer: Buffer,
+  buffer: Pick<Buffer, 'length'>,
   contentType: string,
 ): boolean {
   const backend = resolveCourseVideoStorageBackend();
   if (backend === 'supabase') return false;
   if (!isElevateMediaStorageConfigured() || !isElevateMediaPublicDeliveryConfigured()) {
     if (backend === 'elevate-media') {
-      logger.warn(
-        '[upload-lesson-media] COURSE_VIDEO_STORAGE_BACKEND=elevate-media but Elevate Media Storage public delivery is not configured',
-      );
+      logger.warn('[upload-lesson-media] COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED: using Supabase fallback');
     }
     return false;
   }
@@ -233,18 +232,11 @@ export async function uploadCourseVideosObject(
     try {
       return await uploadCourseVideosToElevateMedia(buffer, storagePath, contentType);
     } catch (err) {
-      // A large lesson must not silently fall back to Supabase: that path
-      // already returned HTTP 413 and burns expensive render retries.
-      if (contentType.startsWith('video/') && buffer.length > SUPABASE_SAFE_VIDEO_BYTES) {
-        throw new Error('COURSE_MEDIA_OBJECT_UPLOAD_FAILED: ' +
-          (err instanceof Error ? err.message : String(err)), {cause: err});
-      }
+      // The ordinary request ceiling does not apply to the TUS route below.
+      // Keep the completed bytes and let Storage enforce its actual object
+      // limit instead of rejecting a valid film before a chunked upload.
       logger.warn('[upload-lesson-media] Elevate Media Storage upload failed, falling back to Supabase', { err });
     }
-  }
-  if (!options?.forceSupabase && contentType.startsWith('video/') && buffer.length > SUPABASE_SAFE_VIDEO_BYTES) {
-    throw new Error('COURSE_MEDIA_LARGE_VIDEO_REQUIRES_PUBLIC_OBJECT_STORAGE: ' +
-      'configure Elevate Media Storage public delivery instead of sending oversized MP4 to Supabase');
   }
   if (contentType.startsWith('video/') && buffer.length > SUPABASE_TUS_CHUNK_BYTES) {
     return uploadCourseVideosToSupabaseResumable(buffer, storagePath, contentType);
@@ -285,10 +277,35 @@ export async function uploadLessonFileFromDisk(
   // Large MP4s use the resumable route in uploadCourseVideosObject. The
   // single-request ceiling is not an object-size limit and must not trigger
   // an unnecessary lossy transcode or reject a valid completed lesson.
-  const buf = await readFile(filePath);
-  logger.info('[upload-lesson-media] starting lesson upload', {lessonId, ext, bytes: buf.length});
-  const url = await uploadLessonMediaBuffer(buf, lessonId, ext, options);
-  logger.info('[upload-lesson-media] lesson upload saved', {lessonId, ext, bytes: buf.length});
+  const {size} = await stat(filePath);
+  const storagePath = lessonMediaStoragePath(lessonId, ext);
+  const contentType = ext === 'mp3' ? 'audio/mpeg' : 'video/mp4';
+  let url: string | undefined;
+  // Selection only needs the byte count; large source files remain on disk.
+  if (!options?.forceSupabase && shouldUploadCourseMediaToElevateMedia({length: size}, contentType)) {
+    const result = await uploadFileToElevateMedia(filePath, elevateMediaKeyForStoragePath(storagePath), contentType);
+    if (result.success && result.url) url = result.url;
+    else logger.warn('[upload-lesson-media] object upload failed; retrying through Supabase');
+  }
+  if (!url && ext === 'mp4' && size > SUPABASE_TUS_CHUNK_BYTES) {
+    const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!base || !key) throw new Error('Supabase storage credentials are not configured');
+    await uploadSupabaseResumableFile({
+      filePath,
+      endpoint: `${storageDirectUrl(base)}/storage/v1/upload/resumable`,
+      headers: {Authorization: `Bearer ${key}`, apikey: key, 'x-upsert': 'true'},
+      metadata: [
+        `bucketName ${tusMetadata(SUPABASE_BUCKET)}`,
+        `objectName ${tusMetadata(storagePath)}`,
+        `contentType ${tusMetadata(contentType)}`,
+        `cacheControl ${tusMetadata('31536000')}`,
+      ].join(','),
+    });
+    url = lessonMediaPublicUrl(storagePath);
+  }
+  if (!url) url = await uploadCourseVideosObject(await readFile(filePath), storagePath, contentType, options);
+  logger.info('[upload-lesson-media] lesson upload saved', {lessonId, ext, bytes: size});
   await unlink(filePath).catch((err) => {
     logger.debug('[upload-lesson-media] temp file cleanup', {filePath, err});
   });

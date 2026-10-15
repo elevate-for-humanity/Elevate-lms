@@ -5,7 +5,6 @@ import { CalendarDays, CheckCircle2, ClipboardList } from 'lucide-react';
 import StudentApplicationForm from '@/apps/marketing/app/apply/student/StudentApplicationForm';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
-
 export const metadata: Metadata = {
   title: 'WorkOne Funding Intake | Elevate for Humanity',
   description:
@@ -15,7 +14,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function WorkOneFundingIntakePage() {
+export default async function WorkOneFundingIntakePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ program?: string }>;
+}) {
+  const params = await searchParams;
+  const initialProgram = params.program === 'tax-preparation' ? 'tax-preparation' : '';
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
       <section className="border-b border-slate-800 bg-slate-950 px-4 py-12 text-white sm:py-16">
@@ -27,7 +32,9 @@ export default function WorkOneFundingIntakePage() {
             Start your funding intake and keep every WorkOne step connected to your application.
           </h1>
           <p className="mt-5 max-w-3xl text-base font-medium leading-7 text-slate-200 sm:text-lg">
-            Complete the intake below and select WIOA or Workforce Ready Grant when applicable. Your application becomes the controlling record for funding follow-up, WorkOne progress, documents, and enrollment review.
+            Complete the intake below and select WIOA or Workforce Ready Grant when applicable. Your
+            application becomes the controlling record for funding follow-up, WorkOne progress,
+            documents, and enrollment review.
           </p>
 
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -54,17 +61,26 @@ export default function WorkOneFundingIntakePage() {
           <article className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <ClipboardList className="h-6 w-6 text-brand-red-700" />
             <h2 className="mt-3 font-black">1. Complete intake</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-700">Choose your program and funding source so your funding path is attached to the correct application.</p>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              Choose your program and funding source so your funding path is attached to the correct
+              application.
+            </p>
           </article>
           <article className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <CalendarDays className="h-6 w-6 text-brand-red-700" />
             <h2 className="mt-3 font-black">2. Schedule WorkOne</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-700">Use the official WorkOne Indianapolis orientation link and keep your appointment information.</p>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              Use the official WorkOne Indianapolis orientation link and keep your appointment
+              information.
+            </p>
           </article>
           <article className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <CheckCircle2 className="h-6 w-6 text-brand-red-700" />
             <h2 className="mt-3 font-black">3. Update progress</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-700">Funded applications receive the existing WorkOne handoff and private progress workflow for appointment, submission, approval, or help-needed updates.</p>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              Funded applications receive the existing WorkOne handoff and private progress workflow
+              for appointment, submission, approval, or help-needed updates.
+            </p>
           </article>
         </div>
       </section>
@@ -72,14 +88,20 @@ export default function WorkOneFundingIntakePage() {
       <section id="funding-intake-form" className="px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-5xl">
           <div className="mb-8 max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-widest text-brand-red-700">Tracked Intake Form</p>
-            <h2 className="mt-2 text-3xl font-black tracking-tight">Complete your Elevate application and funding intake.</h2>
+            <p className="text-xs font-black uppercase tracking-widest text-brand-red-700">
+              Tracked Intake Form
+            </p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight">
+              Complete your Elevate application and funding intake.
+            </h2>
             <p className="mt-3 text-sm leading-6 text-slate-700">
-              If you are seeking WorkOne funding, choose WIOA in the Funding step. If you are using Indiana Workforce Ready Grant, choose that option instead. Funding is not approved until the responsible agency issues authorization.
+              If you are seeking WorkOne funding, choose WIOA in the Funding step. If you are using
+              Indiana Workforce Ready Grant, choose that option instead. Funding is not approved
+              until the responsible agency issues authorization.
             </p>
           </div>
           <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-7">
-            <StudentApplicationForm />
+            <StudentApplicationForm initialProgram={initialProgram} />
           </div>
         </div>
       </section>

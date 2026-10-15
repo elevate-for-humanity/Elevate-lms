@@ -12,7 +12,14 @@ export const metadata: Metadata = {
   title: 'Barber Apprenticeship & Beauty Training Pathways',
   description:
     'Explore Elevate for Humanity barber apprenticeship and beauty training pathways. Federal Registered Apprenticeship claims are limited to programs in Elevate’s canonical RAPIDS registry.',
-  openGraph: { images: [{ url: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp', alt: 'Inside an Elevate barber apprenticeship host shop' }] },
+  openGraph: {
+    images: [
+      {
+        url: '/images/partners/kountry-kutz/interior-active-enhanced-2026.webp',
+        alt: 'Inside an Elevate barber apprenticeship host shop',
+      },
+    ],
+  },
   alternates: { canonical: CANONICAL_URL },
   robots: { index: true, follow: true },
 };
@@ -61,22 +68,41 @@ export default function BarberBeautyProgramsPage() {
       <section className="overflow-hidden border-b border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-6 py-14 sm:py-20">
         <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
           <div>
-          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-brand-red-700">
-            Personal Services Training
-          </p>
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-5">
-            Barber Apprenticeship & Beauty Training Pathways
-          </h1>
-          <p className="max-w-3xl text-lg leading-relaxed text-slate-700">
-            Turn your creativity into practical skills. Explore barbering, hair styling, skincare and nail services, meet participating host shops, and choose the pathway that fits your goals.
-          </p>
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-            <Link href="/programs/barber-apprenticeship/apply" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Apply as an Apprentice</Link>
-            <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-brand-blue-700 bg-white px-6 py-3 font-black text-brand-blue-800 hover:bg-sky-50">Become a Host Shop</Link>
+            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-brand-red-700">
+              Personal Services Training
+            </p>
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-5">
+              Barber Apprenticeship & Beauty Training Pathways
+            </h1>
+            <p className="max-w-3xl text-lg leading-relaxed text-slate-700">
+              Turn your creativity into practical skills. Explore barbering, hair styling, skincare
+              and nail services, meet participating host shops, and choose the pathway that fits
+              your goals.
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/programs/barber-apprenticeship/apply"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
+              >
+                Apply as an Apprentice
+              </Link>
+              <Link
+                href="/partners/host-shops"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-brand-blue-700 bg-white px-6 py-3 font-black text-brand-blue-800 hover:bg-sky-50"
+              >
+                Become a Host Shop
+              </Link>
+            </div>
           </div>
-          </div>
-          <div className="relative min-h-[320px] overflow-hidden rounded-3xl border-4 border-white shadow-xl sm:min-h-[420px]">
-            <SafeHeroVideo src="/videos/partners/kountry-kutz/shop-tour.mp4" poster="/images/partners/kountry-kutz/interior-active-enhanced-2026.webp" priority loop ariaLabel="Inside Kountry Kutz, an apprenticeship host shop" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="relative min-h-[320px] overflow-hidden rounded-3xl border-4 border-white shadow-xl sm:min-h-[360px]">
+            <SafeHeroVideo
+              src="/videos/partners/kountry-kutz/shop-tour.mp4"
+              poster="/images/partners/kountry-kutz/interior-active-enhanced-2026.webp"
+              priority
+              loop
+              ariaLabel="Inside Kountry Kutz, an apprenticeship host shop"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
           </div>
         </div>
       </section>
@@ -89,16 +115,28 @@ export default function BarberBeautyProgramsPage() {
               href={program.href}
               className="overflow-hidden border border-slate-200 rounded-2xl hover:border-brand-red-300 transition-colors"
             >
-              <div className="relative aspect-[16/10]"><Image src={program.image} alt={program.title + " training environment"} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" /></div>
-              <div className="p-6"><div className="flex items-start justify-between gap-4">
-                <Scissors className="w-6 h-6 text-brand-red-600" />
-                <span className="text-xs font-bold rounded-full bg-slate-100 text-slate-700 px-3 py-1">
-                  {program.status}
+              <div className="relative aspect-[16/10]">
+                <Image
+                  src={program.image}
+                  alt={program.title + ' training environment'}
+                  fill
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <Scissors className="w-6 h-6 text-brand-red-600" />
+                  <span className="text-xs font-bold rounded-full bg-slate-100 text-slate-700 px-3 py-1">
+                    {program.status}
+                  </span>
+                </div>
+                <h2 className="text-xl font-bold text-slate-900 mt-5">{program.title}</h2>
+                <p className="text-sm text-slate-600 leading-relaxed mt-3">{program.description}</p>
+                <span className="mt-5 inline-flex min-h-11 items-center font-bold text-brand-red-700">
+                  Explore this pathway →
                 </span>
               </div>
-              <h2 className="text-xl font-bold text-slate-900 mt-5">{program.title}</h2>
-              <p className="text-sm text-slate-600 leading-relaxed mt-3">{program.description}</p>
-              <span className="mt-5 inline-flex min-h-11 items-center font-bold text-brand-red-700">Explore this pathway →</span></div>
             </Link>
           ))}
         </div>
@@ -106,8 +144,54 @@ export default function BarberBeautyProgramsPage() {
 
       <section className="border-y border-slate-200 bg-slate-50 px-5 py-12 sm:py-16">
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-2 lg:items-center">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl"><Image src="/images/partners/salon-saloon/team-interior-enhanced-2026.webp" alt="Salon Saloon styling team and host salon environment" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" /></div>
-          <div><p className="text-sm font-bold uppercase tracking-widest text-brand-red-700">Real workplaces. Personal next steps.</p><h2 className="mt-3 text-3xl font-black">Picture your next chapter</h2><p className="mt-4 leading-7 text-slate-700">Discover participating barbershops and salons, explore their work, and ask about your chosen training pathway. Admissions confirms requirements, supervision and available placement before training starts.</p><ol className="mt-5 space-y-3 text-slate-700"><li><strong>1. Choose your craft.</strong> Review the exact program and its requirements.</li><li><strong>2. Apply through Elevate.</strong> Discuss enrollment, documents and payment or funding options.</li><li><strong>3. Confirm your training plan.</strong> Staff reviews host-site availability and your next steps.</li></ol><div className="mt-6 flex flex-wrap gap-3"><Link href="/partners/host-shops" className="rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white">Explore host shops</Link><Link href="/barber-beauty-network" className="rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold">Meet the Barber &amp; Beauty Network</Link></div></div>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
+            <Image
+              src="/images/partners/salon-saloon/team-interior-enhanced-2026.webp"
+              alt="Salon Saloon styling team and host salon environment"
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover"
+            />
+          </div>
+          <div>
+            <p className="text-sm font-bold uppercase tracking-widest text-brand-red-700">
+              Real workplaces. Personal next steps.
+            </p>
+            <h2 className="mt-3 text-3xl font-black">Picture your next chapter</h2>
+            <p className="mt-4 leading-7 text-slate-700">
+              Discover participating barbershops and salons, explore their work, and ask about your
+              chosen training pathway. Admissions confirms requirements, supervision and available
+              placement before training starts.
+            </p>
+            <ol className="mt-5 space-y-3 text-slate-700">
+              <li>
+                <strong>1. Choose your craft.</strong> Review the exact program and its
+                requirements.
+              </li>
+              <li>
+                <strong>2. Apply through Elevate.</strong> Discuss enrollment, documents and payment
+                or funding options.
+              </li>
+              <li>
+                <strong>3. Confirm your training plan.</strong> Staff reviews host-site availability
+                and your next steps.
+              </li>
+            </ol>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                href="/partners/host-shops"
+                className="rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white"
+              >
+                Explore host shops
+              </Link>
+              <Link
+                href="/barber-beauty-network"
+                className="rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold"
+              >
+                Meet the Barber &amp; Beauty Network
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
       <section className="px-6 pb-14">
@@ -131,32 +215,48 @@ export default function BarberBeautyProgramsPage() {
               <h2 className="font-bold text-amber-950">Tuition and licensing facts</h2>
             </div>
             <p className="text-sm text-amber-950 mt-3 leading-relaxed">
-              Wages, licensing eligibility, completion requirements, and employer placement
-              are not guaranteed by this page. Applicants receive the requirements applicable to
-              their exact program and enrollment pathway during intake.
+              Wages, licensing eligibility, completion requirements, and employer placement are not
+              guaranteed by this page. Applicants receive the requirements applicable to their exact
+              program and enrollment pathway during intake.
             </p>
           </div>
         </div>
       </section>
-    
+
       <section className="border-y border-emerald-200 bg-emerald-50 px-4 py-12 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-5xl rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm sm:p-9">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">For Indiana employers and Host Shops</p>
-          <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">Build your workforce with apprenticeship support</h2>
-          <p className="mt-4 text-base font-medium leading-7 text-slate-700">
-            It is free to apply to join Elevate’s Host Shop network. Approved employers can grow service capacity by hiring and training apprentices, developing future licensed talent, and earning revenue from the apprentice’s supervised work in accordance with wage, licensing, supervision, and program requirements.
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">
+            For Indiana employers and Host Shops
           </p>
-          <p className="mt-3 text-sm font-medium leading-6 text-slate-600">Apprenticeship tuition is self-pay only. Host Shops provide employment, wages, and licensed supervision; Elevate supports related instruction and training records.</p>
+          <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+            Build your workforce with apprenticeship support
+          </h2>
+          <p className="mt-4 text-base font-medium leading-7 text-slate-700">
+            It is free to apply to join Elevate’s Host Shop network. Approved employers can grow
+            service capacity by hiring and training apprentices, developing future licensed talent,
+            and earning revenue from the apprentice’s supervised work in accordance with wage,
+            licensing, supervision, and program requirements.
+          </p>
+          <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
+            Apprenticeship tuition is self-pay only. Host Shops provide employment, wages, and
+            licensed supervision; Elevate supports related instruction and training records.
+          </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-emerald-700 px-6 py-3 font-black text-white hover:bg-emerald-800">
+            <Link
+              href="/partners/host-shops"
+              className="inline-flex min-h-12 items-center justify-center rounded-xl bg-emerald-700 px-6 py-3 font-black text-white hover:bg-emerald-800"
+            >
               Become a Host Shop — Free
             </Link>
-            <Link href="/apprenticeships" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-emerald-700 bg-white px-6 py-3 font-black text-emerald-800 hover:bg-emerald-50">
+            <Link
+              href="/apprenticeships"
+              className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-emerald-700 bg-white px-6 py-3 font-black text-emerald-800 hover:bg-emerald-50"
+            >
               Review self-pay apprenticeship programs
             </Link>
           </div>
         </div>
       </section>
-</main>
+    </main>
   );
 }

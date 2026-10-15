@@ -95,8 +95,8 @@ export default function BoothRentalLandingPage() {
           </div>
           <div className="flex items-center gap-2">
             <Phone className="w-4 h-4 text-brand-blue-600" />
-            <a href="tel:3179999620" className="font-semibold text-brand-blue-600 hover:underline">
-              (317) 999-9620
+            <a href="tel:4632401404" className="font-semibold text-brand-blue-600 hover:underline">
+              (463) 240-1404
             </a>
           </div>
         </div>

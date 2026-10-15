@@ -151,8 +151,8 @@ export default function GrievancePage() {
               <p className="text-slate-600 text-sm mb-2">
                 Call to discuss your concern or request a grievance form:
               </p>
-              <a href="tel:+13179999620" className="text-brand-blue-600 font-medium">
-                (317) 999-9620
+              <a href="tel:+14632401404" className="text-brand-blue-600 font-medium">
+                (463) 240-1404
               </a>
             </div>
           </div>

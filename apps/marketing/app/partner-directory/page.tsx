@@ -1,16 +1,41 @@
+import { publicArtworkMetadata } from '@/lib/marketing/artwork-metadata';
+import { PublicPageLead } from '@/components/site/PublicPageLead';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { 
-  Building, CheckCircle, Clock, AlertCircle, Search, Filter,
-  ExternalLink, Award, TestTube, GraduationCap, Briefcase,
-  MapPin, Phone, Mail, ChevronRight, Shield
+import {
+  Building,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Search,
+  Filter,
+  ExternalLink,
+  Award,
+  TestTube,
+  GraduationCap,
+  Briefcase,
+  MapPin,
+  Phone,
+  Mail,
+  ChevronRight,
+  Shield,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Partner Directory',
-  keywords: ["partners", "directory", "testing", "employers", "training", "host shops"],
-  description: 'Our verified partner network includes testing centers, training providers, employers, and host shops.',
+  keywords: ['partners', 'directory', 'testing', 'employers', 'training', 'host shops'],
+  description:
+    'Our verified partner network includes testing centers, training providers, employers, and host shops.',
+
+  ...publicArtworkMetadata({
+    path: '/partner-directory',
+    image: '/images/refresh-20261014/business.webp',
+    alt: 'Illustrative professionals collaborating on workforce goals',
+    title: 'Partner Directory',
+    description:
+      'Our verified partner network includes testing centers, training providers, employers, and host shops.',
+  }),
 };
 
 const partnerTypes = [
@@ -31,7 +56,8 @@ const partners = [
     status: 'verified',
     since: '2022',
     contact: { name: 'NHA Support', email: 'support@nha.org', phone: '(800) 499-9092' },
-    description: 'Approved NHA testing center for Certified Phlebotomy Technician (CPT), Certified Medical Administrative Assistant (CMAA), and other NHA certifications.',
+    description:
+      'Approved NHA testing center for Certified Phlebotomy Technician (CPT), Certified Medical Administrative Assistant (CMAA), and other NHA certifications.',
   },
   {
     id: 2,
@@ -41,8 +67,9 @@ const partners = [
     program: 'Workforce Development',
     status: 'verified',
     since: '2021',
-    contact: { name: 'WorkOne Central', email: 'info@workoneindy.org', phone: '(317) 999-9620' },
-    description: 'State workforce development partner providing WIOA funding coordination and participant referrals.',
+    contact: { name: 'WorkOne Central', email: 'info@workoneindy.org', phone: '(463) 240-1404' },
+    description:
+      'State workforce development partner providing WIOA funding coordination and participant referrals.',
   },
   {
     id: 3,
@@ -52,8 +79,13 @@ const partners = [
     program: 'HVAC/R Refrigerant Handling',
     status: 'verified',
     since: '2023',
-    contact: { name: 'HVAC Excellence', email: 'training@hvac excellence.org', phone: '1-800-314-3757' },
-    description: 'EPA 608 certification preparation and industry-recognized credentialing for HVAC technicians.',
+    contact: {
+      name: 'HVAC Excellence',
+      email: 'training@hvac excellence.org',
+      phone: '1-800-314-3757',
+    },
+    description:
+      'EPA 608 certification preparation and industry-recognized credentialing for HVAC technicians.',
   },
   {
     id: 4,
@@ -63,8 +95,9 @@ const partners = [
     program: 'Barber Apprenticeship',
     status: 'verified',
     since: '2022',
-    contact: { name: 'IBA Director', email: 'info@indybarbers.com', phone: '(317) 999-9620' },
-    description: 'Network of licensed barbershops providing apprenticeship training hours for DOL-registered program.',
+    contact: { name: 'IBA Director', email: 'info@indybarbers.com', phone: '(463) 240-1404' },
+    description:
+      'Network of licensed barbershops providing apprenticeship training hours for DOL-registered program.',
   },
   {
     id: 5,
@@ -74,8 +107,13 @@ const partners = [
     program: 'Healthcare Pathways',
     status: 'verified',
     since: '2022',
-    contact: { name: 'HR Training', email: 'careers@franciscanhealth.org', phone: '(317) 999-9620' },
-    description: 'Healthcare system partner providing clinical externship opportunities and hire-back agreements.',
+    contact: {
+      name: 'HR Training',
+      email: 'careers@franciscanhealth.org',
+      phone: '(463) 240-1404',
+    },
+    description:
+      'Healthcare system partner providing clinical externship opportunities and hire-back agreements.',
   },
   {
     id: 6,
@@ -86,7 +124,8 @@ const partners = [
     status: 'verified',
     since: '2023',
     contact: { name: 'Certiport Support', email: 'info@certiport.com', phone: '(888) 999-0100' },
-    description: 'Authorized Certiport testing center for Microsoft Office Specialist, Adobe, and Intuit certifications.',
+    description:
+      'Authorized Certiport testing center for Microsoft Office Specialist, Adobe, and Intuit certifications.',
   },
   {
     id: 7,
@@ -96,8 +135,9 @@ const partners = [
     program: 'Construction Trades',
     status: 'verified',
     since: '2021',
-    contact: { name: 'ABC Indiana', email: 'info@abcindiana.org', phone: '(317) 999-9620' },
-    description: 'Associated Builders and Contractors apprenticeship program for construction and skilled trades.',
+    contact: { name: 'ABC Indiana', email: 'info@abcindiana.org', phone: '(463) 240-1404' },
+    description:
+      'Associated Builders and Contractors apprenticeship program for construction and skilled trades.',
   },
   {
     id: 8,
@@ -107,8 +147,13 @@ const partners = [
     program: 'OSHA 10/30 Safety',
     status: 'verified',
     since: '2023',
-    contact: { name: 'CareerSafe', email: 'training@careersafeonline.com', phone: '(866) 999-0101' },
-    description: 'OSHA outreach training provider for construction and general industry safety certifications.',
+    contact: {
+      name: 'CareerSafe',
+      email: 'training@careersafeonline.com',
+      phone: '(866) 999-0101',
+    },
+    description:
+      'OSHA outreach training provider for construction and general industry safety certifications.',
   },
   {
     id: 9,
@@ -118,8 +163,9 @@ const partners = [
     program: 'Cosmetology & Esthetics Apprenticeship',
     status: 'verified',
     since: '2022',
-    contact: { name: 'BIG HR', email: 'careers@beautyindustry.com', phone: '(317) 999-9620' },
-    description: 'Multi-location salon network offering cosmetology and esthetics apprenticeship hours.',
+    contact: { name: 'BIG HR', email: 'careers@beautyindustry.com', phone: '(463) 240-1404' },
+    description:
+      'Multi-location salon network offering cosmetology and esthetics apprenticeship hours.',
   },
   {
     id: 10,
@@ -129,37 +175,48 @@ const partners = [
     program: 'Medical Assistant Pathways',
     status: 'verified',
     since: '2021',
-    contact: { name: 'CHN Education', email: 'education@ecommunity.com', phone: '(317) 999-9620' },
-    description: 'Major healthcare employer with student externship and hire-back program for medical assistants.',
+    contact: { name: 'CHN Education', email: 'education@ecommunity.com', phone: '(463) 240-1404' },
+    description:
+      'Major healthcare employer with student externship and hire-back program for medical assistants.',
   },
 ];
 
 export default function PartnerDirectoryPage() {
   return (
     <div className="min-h-screen bg-white">
+      <PublicPageLead
+        image="/images/refresh-20261014/business.webp"
+        alt="Illustrative professionals collaborating on workforce goals"
+        actions={[
+          { href: '/partners/apply', label: 'Join the partner network' },
+          { href: '/contact', label: 'Ask about a partner' },
+        ]}
+      />
+
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-24 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <Image src="/images/pages/partners-hero.webp" alt="Partner Directory - Elevate for Humanity" fill className="object-cover" sizes="100vw" />
-        </div>
+      <section className="relative bg-slate-950 text-white py-8 sm:py-10 overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
               <Shield className="w-4 h-4" />
               Verified Partners
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Partner Directory
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">Partner Directory</h1>
             <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              Our verified partner network includes testing centers, training providers, 
-              employers, and host shops. Every partner is vetted and connected to our programs.
+              Our verified partner network includes testing centers, training providers, employers,
+              and host shops. Every partner is vetted and connected to our programs.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/partners" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              <Link
+                href="/partners"
+                className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+              >
                 Become a Partner <ChevronRight className="ml-2 w-5 h-5" />
               </Link>
-              <Link href="/contact" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              <Link
+                href="/contact"
+                className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+              >
                 Partner Inquiry
               </Link>
             </div>
@@ -172,7 +229,7 @@ export default function PartnerDirectoryPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {partnerTypes.map((type) => (
-              <div 
+              <div
                 key={type.id}
                 className="bg-white rounded-xl p-4 text-center shadow-sm border border-slate-100"
               >
@@ -193,7 +250,7 @@ export default function PartnerDirectoryPage() {
             <div className="lg:w-64 flex-shrink-0">
               <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 sticky top-24">
                 <h3 className="text-lg font-bold text-slate-900 mb-4">Filter Partners</h3>
-                
+
                 {/* Search */}
                 <div className="mb-6">
                   <div className="relative">
@@ -278,28 +335,38 @@ export default function PartnerDirectoryPage() {
 
               <div className="space-y-6">
                 {partners.map((partner) => (
-                  <div 
+                  <div
                     key={partner.id}
                     className="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 hover:shadow-xl transition-shadow"
                   >
                     <div className="flex flex-col md:flex-row md:items-start gap-6">
                       {/* Partner Logo/Icon */}
                       <div className="w-16 h-16 bg-brand-blue-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-                        {partner.type === 'testing' && <TestTube className="w-8 h-8 text-brand-blue-600" />}
-                        {partner.type === 'training' && <GraduationCap className="w-8 h-8 text-brand-blue-600" />}
-                        {partner.type === 'employer' && <Briefcase className="w-8 h-8 text-brand-blue-600" />}
-                        {partner.type === 'host' && <MapPin className="w-8 h-8 text-brand-blue-600" />}
+                        {partner.type === 'testing' && (
+                          <TestTube className="w-8 h-8 text-brand-blue-600" />
+                        )}
+                        {partner.type === 'training' && (
+                          <GraduationCap className="w-8 h-8 text-brand-blue-600" />
+                        )}
+                        {partner.type === 'employer' && (
+                          <Briefcase className="w-8 h-8 text-brand-blue-600" />
+                        )}
+                        {partner.type === 'host' && (
+                          <MapPin className="w-8 h-8 text-brand-blue-600" />
+                        )}
                       </div>
 
                       {/* Partner Info */}
                       <div className="flex-1">
                         <div className="flex flex-wrap items-center gap-3 mb-2">
                           <h3 className="text-xl font-bold text-slate-900">{partner.name}</h3>
-                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
-                            partner.status === 'verified' 
-                              ? 'bg-green-100 text-green-700' 
-                              : 'bg-amber-100 text-amber-700'
-                          }`}>
+                          <span
+                            className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
+                              partner.status === 'verified'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-amber-100 text-amber-700'
+                            }`}
+                          >
                             {partner.status === 'verified' && <CheckCircle className="w-3 h-3" />}
                             {partner.status === 'verified' ? 'Verified' : 'Pending'}
                           </span>
@@ -323,17 +390,21 @@ export default function PartnerDirectoryPage() {
                           </span>
                         </div>
 
-                        <p className="text-slate-600 text-sm mb-4">
-                          {partner.description}
-                        </p>
+                        <p className="text-slate-600 text-sm mb-4">{partner.description}</p>
 
                         {/* Contact Info */}
                         <div className="flex flex-wrap gap-4 text-sm">
-                          <a href={`mailto:${partner.contact.email}`} className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700">
+                          <a
+                            href={`mailto:${partner.contact.email}`}
+                            className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700"
+                          >
                             <Mail className="w-4 h-4" />
                             {partner.contact.email}
                           </a>
-                          <a href={`tel:${partner.contact.phone}`} className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700">
+                          <a
+                            href={`tel:${partner.contact.phone}`}
+                            className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700"
+                          >
                             <Phone className="w-4 h-4" />
                             {partner.contact.phone}
                           </a>
@@ -342,14 +413,14 @@ export default function PartnerDirectoryPage() {
 
                       {/* Actions */}
                       <div className="flex flex-col gap-2 lg:items-end">
-                        <Link 
+                        <Link
                           href={`/partners/${partner.id}`}
                           className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm"
                         >
                           View Profile <ExternalLink className="w-4 h-4" />
                         </Link>
                         {partner.type === 'employer' && (
-                          <Link 
+                          <Link
                             href="/careers"
                             className="inline-flex items-center gap-2 bg-green-100 hover:bg-green-200 text-green-700 font-medium text-sm py-2 px-4 rounded-lg"
                           >
@@ -357,7 +428,7 @@ export default function PartnerDirectoryPage() {
                           </Link>
                         )}
                         {partner.type === 'host' && (
-                          <Link 
+                          <Link
                             href="/apprenticeships"
                             className="inline-flex items-center gap-2 bg-brand-blue-100 hover:bg-brand-blue-200 text-brand-blue-700 font-medium text-sm py-2 px-4 rounded-lg"
                           >
@@ -373,12 +444,21 @@ export default function PartnerDirectoryPage() {
               {/* Pagination */}
               <div className="mt-8 flex justify-center">
                 <div className="flex items-center gap-2">
-                  <button className="px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 disabled:opacity-50" disabled>
+                  <button
+                    className="px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                    disabled
+                  >
                     Previous
                   </button>
-                  <button className="w-10 h-10 bg-brand-blue-600 text-white rounded-lg font-medium">1</button>
-                  <button className="w-10 h-10 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50">2</button>
-                  <button className="w-10 h-10 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50">3</button>
+                  <button className="w-10 h-10 bg-brand-blue-600 text-white rounded-lg font-medium">
+                    1
+                  </button>
+                  <button className="w-10 h-10 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50">
+                    2
+                  </button>
+                  <button className="w-10 h-10 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50">
+                    3
+                  </button>
                   <button className="px-4 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50">
                     Next
                   </button>
@@ -405,7 +485,8 @@ export default function PartnerDirectoryPage() {
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">Testing Partners</h3>
               <p className="text-slate-600 text-sm mb-4">
-                Certifying bodies and authorized testing centers for industry-recognized credentials.
+                Certifying bodies and authorized testing centers for industry-recognized
+                credentials.
               </p>
               <ul className="text-sm text-slate-600 space-y-1">
                 <li>• NHA Certifications</li>
@@ -469,18 +550,22 @@ export default function PartnerDirectoryPage() {
       {/* Become a Partner CTA */}
       <section className="py-20 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Join Our Partner Network
-          </h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Join Our Partner Network</h2>
           <p className="text-xl text-blue-100 mb-8">
-            Whether you're an employer looking for talent, a training provider seeking partnerships, 
+            Whether you're an employer looking for talent, a training provider seeking partnerships,
             or a business that wants to host apprentices — we want to hear from you.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/partners" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+            <Link
+              href="/partners"
+              className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+            >
               Apply to Partner <ExternalLink className="ml-2 w-5 h-5" />
             </Link>
-            <Link href="/contact" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+            <Link
+              href="/contact"
+              className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-600 text-white font-bold py-4 px-8 rounded-lg transition-colors"
+            >
               Contact Us
             </Link>
           </div>

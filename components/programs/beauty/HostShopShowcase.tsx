@@ -319,7 +319,7 @@ export default function HostShopShowcase({
                       alt=""
                       fill
                       sizes="(max-width: 1024px) 100vw, 58vw"
-                      className="object-cover opacity-90"
+                      className="object-contain opacity-90"
                       aria-hidden="true"
                     />
                   ) : null}
@@ -459,7 +459,7 @@ export default function HostShopShowcase({
 
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link
-                  href="/host-shop/apply"
+                  href="/partners/host-shop/apply"
                   className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-brand-red-700"
                 >
                   Apply Free to Become a Host Shop

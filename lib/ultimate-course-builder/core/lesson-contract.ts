@@ -1,3 +1,4 @@
+import { STORYBOARD_RENDER_PRODUCER } from '../../video/render-checkpoint-contract.mjs';
 import { createHash } from 'node:crypto';
 import { approvedDeliveryFailures } from '../instructional/approved-delivery.mjs';
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from './types';
@@ -40,11 +41,11 @@ export function stepInputHash(
     // fix, while retaining the unchanged standards checkpoint. Downstream
     // stages are rebuilt from the new teaching artifact by the runner.
     ...(step === 'learning_objectives' ? { instructionalProducer: 'approved-moment-photos-and-fresh-recaps-v4' } : {}),
-    ...(step === 'natural_narration' ? { narrationProducer: 'separate-pcm-parts-immutable-mp3-word-alignment-v2' } : {}),
+    ...(step === 'natural_narration' ? { narrationProducer: 'warm-native-pace-24khz-delivery-word-alignment-v3' } : {}),
     ...(step === 'instructor_script' ? { scriptProducer: 'stage-aligned-scenes-v1' } : {}),
     ...(step === 'visual_assignment' ? { visualAssignmentProducer: 'canonical-entitlement-source-paths-v3' } : {}),
     ...(step === 'finished_media_qa' ? { approvedDeliveryValidator: 'approved-delivery-v1' } : {}),
-    ...(step === 'lesson_film_render' ? { renderProducer: 'approved-pcm-timeline-supported-image-formats-v1' } : {}),
+    ...(step === 'lesson_film_render' ? { renderProducer: STORYBOARD_RENDER_PRODUCER } : {}),
     dependencies: dependencies.map((s) => [s, contractHash(artifactPayload(prior[s] ?? {}))]),
   });
 }

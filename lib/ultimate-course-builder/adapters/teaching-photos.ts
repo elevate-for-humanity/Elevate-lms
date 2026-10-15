@@ -1,3 +1,5 @@
+import {courseSelectedStill} from './selected-course-stills.mjs';
+import {recoverTeachingPhoto} from './photo-repair.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watch.mjs';
 import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
 import { compatibleVisualTask } from '../instructional/reviewed-scene-evidence';
@@ -35,7 +37,13 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         if(sha256!==placed.metadata.sha256) throw new Error('PLACED_TEACHING_PHOTO_HASH_MISMATCH');
         const signed=await db.storage.from('course_videos').createSignedUrl(placed.storage_path,3600);
         if(signed.error||!signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
-        photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),illustration:true,provider:'openai'});
+        photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:placed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:'openai'});
+        reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
+        continue;
+      }
+      const selected=await courseSelectedStill(input,db,scene,index,step);
+      if(selected){
+        photos[scene.id].push({...selected,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1});
         reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
@@ -48,11 +56,13 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         const signed=await db.storage.from('course_videos').createSignedUrl(licensed.storage_path,3600);
         if(signed.error || !signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
         usedLicensedPhotos.add(sha256);
-        photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:licensed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),illustration:true,provider:licensed.provider,providerItemId:licensed.provider_item_id,licenseEvidenceUrl:licensed.license_evidence_url});
+        photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath:licensed.storage_path,sha256,narrationQuote:step.narrationQuote,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true,provider:licensed.provider,providerItemId:licensed.provider_item_id,licenseEvidenceUrl:licensed.license_evidence_url});
+        reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
         continue;
       }
       const prompt = [
-        'Photorealistic instructional illustration, not proof of a performed practical procedure.',
+        'Generate a camera-realistic professional training photograph with natural skin texture, lifelike materials and photographic lighting. No cartoons, anime, drawings, vector art, clip art or 3D-rendered characters.',
+        'This synthetic photograph is an educational illustration, not evidence of a performed practical procedure.',
         'Show complete hands, tools and relevant subject, uncropped, no printed text, no logos, no invented measurements.',
         'Use a realistic professional training setting. No unsafe actions or invented numbered guards.',
         String(input.courseTitle), String(scene.visualRequirement), String(step.narrationQuote), step.view,
@@ -65,8 +75,14 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         const cached=await db.storage.from('course_videos').download(candidate);
         if(cached.data){file=cached.data;storagePath=candidate;break;}
       }
+      let repairProof:any;
       if (!file) {
-        const generated = await generateTeachingPhoto(prompt);
+        const generated = await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,persistFailure:async(detail:any)=>{
+          const diagnosticPath='approved-teaching-photo-diagnostics/'+input.lessonId+'/'+requestHash+'.json';
+          const {error}=await db.storage.from('course_videos').upload(diagnosticPath,Buffer.from(JSON.stringify({...detail,at:new Date().toISOString()})),{contentType:'application/json',upsert:true});
+          if(error)throw Error('TEACHING_PHOTO_DIAGNOSTIC_SAVE_FAILED:'+scene.id);
+        }});
+        repairProof=generated.repair;
         const bytes = generated.bytes;
         const mimeType=generated.mimeType;
         const extension=mimeType==='image/jpeg'?'jpg':mimeType==='image/webp'?'webp':'png';
@@ -78,9 +94,13 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
         file=downloaded.data;
       }
       const sha256=createHash('sha256').update(Buffer.from(await file.arrayBuffer())).digest('hex');
+      if(repairProof){
+        const {error:proofError}=await db.storage.from('course_videos').upload('approved-teaching-photo-diagnostics/'+input.lessonId+'/'+requestHash+'.json',Buffer.from(JSON.stringify({status:'ready',sceneId:scene.id,cueIndex:index,narrationQuote:step.narrationQuote,storagePath,sha256,repair:repairProof,verifiedAt:new Date().toISOString()})),{contentType:'application/json',upsert:true});
+        if(proofError)throw Error('TEACHING_PHOTO_REPAIR_PROOF_SAVE_FAILED:'+scene.id);
+      }
       const signed=await db.storage.from('course_videos').createSignedUrl(storagePath,3600);
       if(signed.error||!signed.data?.signedUrl) throw new Error('TEACHING_PHOTO_SIGNING_FAILED');
-      photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,stepIndex:steps.indexOf(step)>=0?steps.indexOf(step):Math.min(index,steps.length-1),illustration:true});
+      photos[scene.id].push({imageUrl:signed.data.signedUrl,storagePath,sha256,narrationQuote:step.narrationQuote,stepIndex:steps.indexOf(step)>=0?steps.indexOf(step):Math.min(index,steps.length-1),isRecap:index===requests.length-1,illustration:true});
       reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
     }
     if(new Set(photos[scene.id].map(p=>p.sha256)).size<2) throw new Error('TEACHING_PHOTOS_MUST_BE_DISTINCT');

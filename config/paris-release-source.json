@@ -10,32 +10,44 @@
     {
       "source": "app/tax-software/_components/TaxSiteShell.tsx",
       "target": "apps/marketing/app/tax-software/_components/TaxSiteShell.tsx",
-      "sha256": "209cc698b65b0207eb05cee1208091e758ee26f4f70a24c02cef6bb30762451b"
+      "sha256": "82aae4b9b4aecd80e7ac7aef48063feb96f93f7ad6a7f168361cb85b9d8280ae",
+      "sourceSha256": "209cc698b65b0207eb05cee1208091e758ee26f4f70a24c02cef6bb30762451b",
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough"
     },
     {
       "source": "app/tax-software/about/page.tsx",
       "target": "apps/marketing/app/tax-software/about/page.tsx",
-      "sha256": "fba09019a0efa6c76b5afba6bf42668c69f313a3bfc9df625ce0b4c73677f9ab"
+      "sha256": "eadcaeea5e302d5fc41639dbee526782d767d6a365eb6e3aeaf7ceffb1ec583a",
+      "sourceSha256": "fba09019a0efa6c76b5afba6bf42668c69f313a3bfc9df625ce0b4c73677f9ab",
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough"
     },
     {
       "source": "app/tax-software/bank-products/page.tsx",
       "target": "apps/marketing/app/tax-software/bank-products/page.tsx",
-      "sha256": "8cb4a19353836e13a8fe17c0e8e23814fa7ea3f15ed1a0a32e86f1efa17b2d68"
+      "sha256": "5e4e37febeb234a291d9f55613ebc4809a1d6e9802eaa95f66777463574c6b97",
+      "sourceSha256": "8cb4a19353836e13a8fe17c0e8e23814fa7ea3f15ed1a0a32e86f1efa17b2d68",
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
     },
     {
       "source": "app/tax-software/contact/page.tsx",
       "target": "apps/marketing/app/tax-software/contact/page.tsx",
-      "sha256": "492ed08bd44af2c2b36ddc120974f5fe6c0aa1f4eeaf1ea784355f5eeb684ea5"
+      "sha256": "685ca3fca65721a8d26b8bd6e6b0c53b2932610f44bbaf1ed85b798cdbb9acf0",
+      "sourceSha256": "492ed08bd44af2c2b36ddc120974f5fe6c0aa1f4eeaf1ea784355f5eeb684ea5",
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
     },
     {
       "source": "app/tax-software/demo/page.tsx",
       "target": "apps/marketing/app/tax-software/demo/page.tsx",
-      "sha256": "66f6adea7f5207c15638e6dd6151e6cddfd2dbb5b2635981bbfd0acc6eec2cfc"
+      "sha256": "e4b8da7de5620c49552f86015c54ac0a8c6874dec5167cbeb01dbae3a27bee1c",
+      "sourceSha256": "66f6adea7f5207c15638e6dd6151e6cddfd2dbb5b2635981bbfd0acc6eec2cfc",
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough"
     },
     {
       "source": "app/tax-software/features/page.tsx",
       "target": "apps/marketing/app/tax-software/features/page.tsx",
-      "sha256": "84328a80ec33aa372c58e7e7e806d38e251b712342aeaf61216a5ee039d89ffc"
+      "sha256": "1166e13ed4fdd462ff08e655b130db421d9b11948abcd3a579f2063624d3e45c",
+      "sourceSha256": "84328a80ec33aa372c58e7e7e806d38e251b712342aeaf61216a5ee039d89ffc",
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough"
     },
     {
       "source": "app/tax-software/login/layout.tsx",
@@ -45,24 +57,30 @@
     {
       "source": "app/tax-software/login/page.tsx",
       "target": "apps/marketing/app/tax-software/login/page.tsx",
-      "sha256": "8bce277e954f87ec2fc177dc9ffdc9831a17669fed1481836731efed7d04990a",
+      "sha256": "41f11019cec6948f1b9e29948ad0ee9b39ea973b6cbe85f761fe0bdfc4dbc114",
       "sourceSha256": "5bc39165632af011ed10ea6af3af11fc44c286324f79aaaf54ad38912ddb0728",
-      "localRevisionReason": "Authorized portal security, saved estimate workflow, and auditable tax export repairs"
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
     },
     {
       "source": "app/tax-software/page.tsx",
       "target": "apps/marketing/app/tax-software/page.tsx",
-      "sha256": "f3bd148ab41437d72f1d10003e04d6c3f93d6375dfd12fee449186bf85138a7f"
+      "sha256": "d1aabff2cf2d71518d8831a9122ce6b9c95f68ac39bec02fa0ac0f5cfa571f88",
+      "sourceSha256": "f3bd148ab41437d72f1d10003e04d6c3f93d6375dfd12fee449186bf85138a7f",
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
     },
     {
       "source": "app/tax-software/pricing/page.tsx",
       "target": "apps/marketing/app/tax-software/pricing/page.tsx",
-      "sha256": "1f9631ccd4b5e39ded65942f769608a1a2922c10341b484d20749127464e52a0"
+      "sha256": "d755d65595c0ddf8f49c4da7796a7cc6649cf24f38c6b969f2bd8b7ea2f80c9b",
+      "sourceSha256": "1f9631ccd4b5e39ded65942f769608a1a2922c10341b484d20749127464e52a0",
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
     },
     {
       "source": "app/tax-software/professional/page.tsx",
       "target": "apps/marketing/app/tax-software/professional/page.tsx",
-      "sha256": "882dca6f8f981f5d77a9b0d5636181526abeff05eb0adeb009991d0fb158c9d5"
+      "sha256": "2a278c535d2ac89033393dad45349be38f2184a745109c7e4df7f3c55ddb6154",
+      "sourceSha256": "882dca6f8f981f5d77a9b0d5636181526abeff05eb0adeb009991d0fb158c9d5",
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
     },
     {
       "source": "app/tax-software/self-file/layout.tsx",
@@ -77,26 +95,32 @@
     {
       "source": "app/tax-software/self-file/return/page.tsx",
       "target": "apps/marketing/app/tax-software/self-file/return/page.tsx",
-      "sha256": "8a7aa8d0a914286b7435b118195601c5926d6084930cc426d51f6f31fe1913d6",
+      "sha256": "f4953f0278c24665041b13a448509261d22ec6751fbaa2fb3647428692535a25",
       "sourceSha256": "deb47a15cccdc64c911ea90ac333a46ab6431c16fd7eb55ddfb3cab0f9e0ea4b",
-      "localRevisionReason": "Authorized portal security, saved estimate workflow, and auditable tax export repairs"
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation.",
+      "changeReason": "Connect owned business worksheets and separate Supersonic payment preferences to the return workspace."
     },
     {
       "source": "app/tax-software/self-file/w2/confirm/page.tsx",
       "target": "apps/marketing/app/tax-software/self-file/w2/confirm/page.tsx",
-      "sha256": "4ed9e6b2479c160077fdfe282668ec804f23fad9c358e2b5bed0791b659f538d"
+      "sha256": "0d8d82364d6c7d79645f4397a46ec5fc9d06d5b630d374cde69973b87d22f28d",
+      "sourceSha256": "4ed9e6b2479c160077fdfe282668ec804f23fad9c358e2b5bed0791b659f538d",
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation."
     },
     {
       "source": "app/api/tax/interview/route.ts",
       "target": "apps/marketing/app/api/tax/interview/route.ts",
-      "sha256": "160b55896475b8aefdb8847d1d7b361b0a2e19db7a018ad3a9133ac54dbd26a3"
+      "sha256": "8789d334beea2446fe2c108dba8af7759080fe65f6a7e754e09336dd28d7c026",
+      "sourceSha256": "160b55896475b8aefdb8847d1d7b361b0a2e19db7a018ad3a9133ac54dbd26a3",
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation."
     },
     {
       "source": "app/api/tax/returns/calculate/route.ts",
       "target": "apps/marketing/app/api/tax/returns/calculate/route.ts",
-      "sha256": "f62c97452d1c70a1fd9196b08585edd62df1934ab07f0d9eb3e2c4fd88fdefdb",
+      "sha256": "6287b7e96fb4ef6b88af52bbe0889a64c5a5044e6fffe2bd01b292e226bbe804",
       "sourceSha256": "4abe0d40e8551ecb71e3ef731fe56f27c3af6a93e7c929c9e4a4ce77de732bd1",
-      "localRevisionReason": "Authorized portal security, saved estimate workflow, and auditable tax export repairs"
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation.",
+      "changeReason": "Connect owned Schedule C records and complete business-source snapshots to federal calculations and exports."
     },
     {
       "source": "app/api/tax/returns/route.ts",
@@ -106,7 +130,9 @@
     {
       "source": "app/api/tax/w2/confirm/route.ts",
       "target": "apps/marketing/app/api/tax/w2/confirm/route.ts",
-      "sha256": "4747d469384b4bad80336f73f855d70e409ac966a62aa65e253be67811a904bf"
+      "sha256": "2ac78a774ef2e43dab742b7aa3c4ee80fdaf9d43e5ae3c727d307e831356a3d5",
+      "sourceSha256": "4747d469384b4bad80336f73f855d70e409ac966a62aa65e253be67811a904bf",
+      "localRevisionReason": "Authorized federal calculation, taxpayer data protection and IRS export implementation."
     },
     {
       "source": "app/api/ocr/extract/route.ts",

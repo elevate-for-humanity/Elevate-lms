@@ -133,11 +133,15 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         return { claimed: true, completed: false, continuing: true, jobId: job.id, result };
       }
       if (continuation.unresolved?.length) {
-        // A missing dependency is a blocked prerequisite, not a failed render.
-        // Preserve the cursor and await an explicit dependency wake-up instead
-        // of exhausting attempts or continuously retrying missing media.
-        await queue.waitForDependency(job.id,workerId,`ULTIMATE_DEPENDENCIES_UNRESOLVED:${continuation.unresolved.join(',')}`,generation,continuation.payload);
-        return {claimed:true,completed:false,awaitingDependency:true,jobId:job.id,result};
+        // Only genuine external prerequisites need a dependency wake-up.
+        // Internal lesson/producer failures must use the existing bounded
+        // repair retry rather than being stranded as missing media.
+        if (result.findings?.some(isDurableExternalBlocker)) {
+          await queue.waitForDependency(job.id,workerId,`ULTIMATE_DEPENDENCIES_UNRESOLVED:${continuation.unresolved.join(',')}`,generation,continuation.payload);
+          return {claimed:true,completed:false,awaitingDependency:true,jobId:job.id,result};
+        }
+        await queue.fail(job.id,workerId,`ULTIMATE_INTERNAL_REPAIR_REQUIRED:${continuation.unresolved.join(',')}`,generation,true);
+        return {claimed:true,completed:false,repairQueued:true,jobId:job.id,result};
       }
     }
     if (!result.completed) {

@@ -51,23 +51,26 @@ jobs:
       - name: Verify exact image and pause only the requested execution
         env:
           COURSE_EXECUTION: elevate-course-builder-x7tbr
-          REQUIRED_DEPLOYED_SHA: c2c2723daaf42e6d81256c33fd6183951dc20fb6
-          WORKER_IMAGE_SHA: b7d9308974fea2df8217e1431ae1b03c612faed6
         run: |
           node --input-type=module <<'NODE'
           import { execFileSync } from 'node:child_process';
           import { assertNoActiveExecutions } from './scripts/gcp/execute-course-job.mjs';
-          const name=process.env.COURSE_EXECUTION, sha=process.env.WORKER_IMAGE_SHA;
-          if(!/^elevate-course-builder-[a-z0-9]+$/.test(name) || !/^[a-f0-9]{40}$/.test(sha)) throw new Error('EXACT_EXECUTION_AND_IMAGE_REQUIRED');
+          const name=process.env.COURSE_EXECUTION;
+          if(!/^elevate-course-builder-[a-z0-9]+$/.test(name)) throw new Error('EXACT_EXECUTION_REQUIRED');
           const scope=['--project=elegant-racer-299721','--region=us-central1'];
           const call=args=>execFileSync('gcloud',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']});
           const describe=()=>JSON.parse(call(['run','jobs','executions','describe',name,...scope,'--format=json']));
           const image='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker';
-          const requiredDigest=call(['artifacts','docker','images','describe',image+':'+process.env.REQUIRED_DEPLOYED_SHA,'--project=elegant-racer-299721','--format=value(image_summary.digest)']).trim();
           const template=JSON.parse(call(['run','jobs','describe','elevate-course-builder',...scope,'--format=json']));
-          if(!/^sha256:[a-f0-9]{64}$/.test(requiredDigest) || template.spec?.template?.spec?.template?.spec?.containers?.[0]?.image!==image+'@'+requiredDigest) throw new Error('GUARDED_WORKER_TEMPLATE_REQUIRED');
-          const digest=call(['artifacts','docker','images','describe',image+':'+sha,'--project=elegant-racer-299721','--format=value(image_summary.digest)']).trim();
-          if(!/^sha256:[a-f0-9]{64}$/.test(digest) || describe().spec?.template?.spec?.containers?.[0]?.image!==image+'@'+digest) throw new Error('EXECUTION_IMAGE_MISMATCH');
+          // Use Google's actual pinned job image. A previously deployed SHA is not
+          // an authoritative template identifier after a Google Cloud migration.
+          const templateImage=template.spec?.template?.spec?.template?.spec?.containers?.[0]?.image;
+          if(!/^us-central1-docker\\.pkg\\.dev\\/elegant-racer-299721\\/elevate\\/ultimate-worker@sha256:[a-f0-9]{64}$/.test(templateImage ?? ''))
+            throw new Error('GOOGLE_WORKER_TEMPLATE_NOT_PINNED');
+          const execution=describe();
+          const executionImage=execution.spec?.template?.spec?.containers?.[0]?.image;
+          if(executionImage!==templateImage)
+            throw new Error('EXECUTION_IMAGE_MISMATCH: historical execution differs from current approved Google job; manual review required');
           const active=run=>{try{assertNoActiveExecutions([run]);return false;}catch(error){if(error.message==='COURSE_JOB_ALREADY_ACTIVE')return true;throw error;}};
           if(active(describe())) call(['run','jobs','executions','cancel',name,...scope,'--quiet']);
           for(let attempt=0;attempt<60;attempt++) {

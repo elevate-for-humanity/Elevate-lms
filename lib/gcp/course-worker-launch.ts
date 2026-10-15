@@ -12,7 +12,21 @@ export async function requestCourseWorker(
   direct = () => startDeployedCourseWorker(),
 ) {
   try {
+    return await launchWithGoogleRuntimeIdentity();
+  } catch (googleError) {
+    logger.warn('Direct Google worker execution unavailable', {
+      reason: googleError instanceof Error ? googleError.message : 'unknown',
+    });
+  }
+  try {
     const result = await dispatch();
+    return { dispatched: true, launchMode: 'github-workflow', executionVerified: false, actionsUrl: result.actionsUrl,
+      message: 'Google worker launch requested through the trusted GitHub workflow. Waiting for a live worker heartbeat.' };
+  } catch (error) {
+    const reason = error instanceof Error && /HTTP 401/.test(error.message) ? 'authentication_rejected' : 'direct_dispatch_unavailable';
+    logger.warn('Course worker launch deferred to durable coordinator', { reason });
+    return { dispatched: false, launchMode: 'scheduled', executionVerified: false, dispatchError: reason,
+      message: 'Course progress is saved, but worker execution was not accepted. Admin runtime needs permission to execute the Google Cloud job or a working trusted dispatch connection. No course restart was confirmed.' };
     return { dispatched: true, launchMode: 'github-actions', executionVerified: false,
       actionsUrl: result.actionsUrl,
       message: 'Course worker dispatch accepted. Waiting for the worker to claim this saved build.' };

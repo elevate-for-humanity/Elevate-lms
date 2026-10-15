@@ -89,7 +89,7 @@ type StudioProvider =
 
 const STUDIO_PROVIDER_LABELS: Record<StudioProvider, string> = {
   auto: 'Best available',
-  elevate: 'Elevate AI',
+  elevate: 'Elevate AI (dedicated provider)',
   cloudflare: 'Cloudflare AI',
   xai: 'Grok / xAI',
   openai: 'ChatGPT',
@@ -1239,7 +1239,7 @@ export default function UnifiedEllieChat({
               </option>
             ))}
           </select>
-          <span className="hidden truncate text-xs text-slate-500 sm:inline">
+          <p className="min-w-0 text-[11px] text-slate-600 sm:hidden">PARIS is the Studio assistant. This menu chooses its AI model provider; an unavailable dedicated Elevate provider does not mean PARIS is disabled.</p>\n          <span className="hidden truncate text-xs text-slate-500 sm:inline">
             {selectedProvider === 'auto'
               ? health
               : `${STUDIO_PROVIDER_LABELS[selectedProvider]} selected`}

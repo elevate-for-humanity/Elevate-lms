@@ -49,11 +49,11 @@ export async function GET(request: NextRequest) {
       },
       {
         name: 'ai-provider-configured',
-        passed: aiConfigured,
-        required: true,
-        message: aiConfigured
-          ? 'At least one AI provider is configured.'
-          : 'No AI provider keys are configured.',
+        passed: ownedReady || aiConfigured,
+        required: false,
+        message: ownedReady ? 'Elevate-owned inference is verified.' : aiConfigured
+          ? 'An external AI provider is configured; owned PARIS readiness is reported separately.'
+          : 'No AI provider is verified or configured.',
       },
       {
         name: 'xai',

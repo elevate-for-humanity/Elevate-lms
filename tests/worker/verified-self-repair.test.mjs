@@ -17,9 +17,9 @@ test('unchanged repair output is evaluated by independent QA instead of a duplic
  const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{},findings:[],passedSteps:new Set(),persistArtifact:async event=>journal.push(event)};
  const R=runner();
  await new R({learning_objectives:async()=>{authorCalls++;return {artifacts:{blueprint:{title:'same'}}};},lesson_film_render:async()=>({passed:false,findings:[{code:'INSTRUCTIONAL_QUALITY_FAILED',severity:'error',message:'missing recap'}]})}).run(ctx);
- assert.equal(authorCalls,2);
+ assert.equal(authorCalls,3); // initial attempt plus two bounded selective repairs
  assert.equal(ctx.findings.at(-1).code,'INSTRUCTIONAL_QUALITY_FAILED');
- assert.equal(journal.filter(event=>event.step==='learning_objectives').length,2);
+ assert.equal(journal.filter(event=>event.step==='learning_objectives').length,3);
  assert.equal(ctx.artifacts.learning_objectives.blueprint.title,'same');
  assert.equal(ctx.artifacts.learning_objectives.contractEvidence.passed,true);
 });

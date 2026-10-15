@@ -7,3 +7,7 @@ export async function getScopedSmsMedia(context: SmsMediaRouteContext) {
   const { id, index } = await context.params;
   return smsMediaGet(id, index);
 }
+
+/** Origin-specific aliases preserve distinct Next route module boundaries. */
+export const getAdminSmsMedia = getScopedSmsMedia;
+export const getLearnerSmsMedia = getScopedSmsMedia;

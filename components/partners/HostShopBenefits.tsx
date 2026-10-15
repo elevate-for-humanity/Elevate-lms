@@ -22,7 +22,7 @@ export default function HostShopBenefits() {
         <p className="text-xs font-black uppercase tracking-wide text-amber-300">For future barbers and beauty professionals</p>
         <h3 className="mt-2 text-2xl font-black">Earn while you learn.</h3>
         <p className="mt-3 max-w-3xl leading-7">Build practical skills through paid employment and supervised training at an approved Host Shop. Employment, placement, and the applicable wage schedule must be confirmed before you begin. Apprenticeship tuition is self-pay only.</p>
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row"><Link href="/host-shop/apply" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-5 py-3 font-black text-white">Shop owners: apply free</Link><Link href="/barber-and-beauty-apprenticeships" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white px-5 py-3 font-black !text-white hover:!text-white">Students: explore training</Link></div>
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row"><Link href="/partners/host-shop/apply" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-5 py-3 font-black text-white">Shop owners: apply free</Link><Link href="/barber-and-beauty-apprenticeships" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white px-5 py-3 font-black !text-white hover:!text-white">Students: explore training</Link></div>
       </div>
       <p className="mt-4 text-sm leading-6 text-slate-600">No listing, application, or placement fee. Shops cover wages, insurance, and business expenses. Listing does not guarantee customers, bookings, or apprentice placement.</p>
     </div>

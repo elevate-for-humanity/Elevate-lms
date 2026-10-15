@@ -304,7 +304,9 @@ export async function runLearnerTest(
           for (const activity of activities) {
             const section = page
               .getByTestId(type)
-              .filter({ has: page.getByText(activity.prompt, { exact: true }) });
+              .filter({ visible: true })
+              .filter({ has: page.getByText(activity.prompt, { exact: true }) })
+              .first();
             await section.locator('textarea').fill(`QA practice response: ${activity.feedback}`);
             await section.getByRole('button', { name: 'Submit practice' }).click();
             await section.getByRole('status').waitFor();

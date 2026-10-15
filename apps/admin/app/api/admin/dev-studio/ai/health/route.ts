@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       try {
         const origin = new URL(ownedUrl!);
         if (origin.protocol === 'https:' && origin.hostname.endsWith('.run.app')) {
-          const response = await fetch(`${origin.toString().replace(/\\/$/, '')}/v1/models`, {
+          const response = await fetch(`${origin.origin}/v1/models`, {
             headers: { Authorization: `Bearer ${ownedSecret}` },
             cache: 'no-store',
             signal: AbortSignal.timeout(5000),

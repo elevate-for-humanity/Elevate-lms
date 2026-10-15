@@ -154,6 +154,10 @@ async function dispatchToolRequest(
     const request = new NextRequest(url, init);
     return tool.method === 'GET' ? route.GET(request) : route.POST(request);
   }
+  if (tool.name === 'browser.launch') {
+    const { POST } = await import('@/apps/admin/app/api/admin/dev-studio/browser/session/route');
+    return POST(new NextRequest(url, init));
+  }
   if (tool.name === 'workflows.runTests') {
     return dispatchGithubWorkflow('ci.yml');
   }

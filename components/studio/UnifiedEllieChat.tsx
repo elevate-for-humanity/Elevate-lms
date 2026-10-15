@@ -1325,7 +1325,7 @@ export default function UnifiedEllieChat({
 
       <div
         ref={messagesViewportRef}
-        className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-white px-3 py-4 sm:px-8 sm:py-8"
+        className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 px-3 py-5 sm:px-8 sm:py-8"
       >
         {messages.length === 0 ? (
           <div className="mx-auto flex w-full min-w-0 max-w-3xl flex-col items-center py-8 text-center sm:py-20">
@@ -1365,7 +1365,7 @@ export default function UnifiedEllieChat({
             </div>
           </div>
         ) : (
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-5">
+          <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -1385,7 +1385,7 @@ export default function UnifiedEllieChat({
                     }`}
                   >
                     {message.role === 'assistant' && (
-                      <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-600">
                         PARIS
                         {message.route ? ` · ${ELLIE_ROUTE_LABEL[message.route]}` : ''}
                       </p>
@@ -1394,7 +1394,7 @@ export default function UnifiedEllieChat({
                       {message.content}
                     </p>
                     {message.role === 'assistant' && message.capabilitiesUsed?.length ? (
-                      <p className="mt-2 text-[11px] text-gray-500">
+                      <p className="mt-2 text-xs text-gray-600">
                         Capabilities used: {message.capabilitiesUsed.join(', ')}
                       </p>
                     ) : null}
@@ -1452,7 +1452,7 @@ export default function UnifiedEllieChat({
       <div
         className={`min-w-0 shrink-0 border-t p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-4 ${inputAreaClass}`}
       >
-        <div className="mx-auto w-full min-w-0 max-w-3xl">
+        <div className="mx-auto w-full min-w-0 max-w-4xl">
           {attachment ? (
             <div className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900">
               <span className="min-w-0 truncate font-semibold">Attached: {attachment.name}</span>
@@ -1538,7 +1538,7 @@ export default function UnifiedEllieChat({
               }}
               rows={3}
               placeholder="Tell Paris what you need done..."
-              className={`order-first min-h-[104px] max-h-[30dvh] w-full min-w-0 basis-full resize-none rounded-xl border px-3 py-3 text-xl leading-8 outline-none ${inputClass}`}
+              className={`order-first min-h-[100px] max-h-[35dvh] w-full min-w-0 basis-full resize-y rounded-xl border px-4 py-3 text-base leading-7 outline-none sm:text-lg ${inputClass}`}
             />
             <button
               type="button"
@@ -1604,7 +1604,7 @@ export default function UnifiedEllieChat({
               Listening… tap the microphone again to stop.
             </p>
           ) : null}
-          <p className="mt-2 text-center text-[11px] text-gray-500">
+          <p className="mt-2 text-center text-xs text-gray-600">
             Governed actions use configured rules and are written to the audit trail.
           </p>
         </div>

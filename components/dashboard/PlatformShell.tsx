@@ -238,12 +238,12 @@ export function PlatformShell({
   const finalBreadcrumbs = breadcrumbs.length > 0 ? breadcrumbs : autoBreadcrumbs;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-clip bg-slate-50">
       {/* Top Navigation Bar */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div className="flex items-center justify-between h-16 px-4">
+        <div className="flex min-w-0 items-center justify-between gap-2 h-16 px-2 sm:px-4">
           {/* Left: Logo + Menu */}
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors"
@@ -251,7 +251,7 @@ export function PlatformShell({
             >
               {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
-            <Link href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex min-w-0 items-center gap-2">
               <div className="w-8 h-8 bg-brand-red-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">E</span>
               </div>
@@ -323,8 +323,8 @@ export function PlatformShell({
 
         {/* Breadcrumbs */}
         {finalBreadcrumbs.length > 0 && (
-          <div className="px-4 py-2 border-t border-slate-100 bg-slate-50">
-            <nav className="flex items-center gap-2 text-sm">
+          <div className="min-w-0 overflow-x-auto px-2 sm:px-4 py-2 border-t border-slate-100 bg-slate-50">
+            <nav className="flex w-max min-w-0 items-center gap-2 text-sm">
               <Link href="/" className="text-slate-500 hover:text-slate-700">
                 <Home className="w-4 h-4" />
               </Link>
@@ -418,15 +418,15 @@ export function PlatformShell({
         )}
 
         {/* Main Content */}
-        <main className="flex-1 min-w-0">
-          <div className="p-6">
+        <main className="flex-1 min-w-0 max-w-full overflow-x-clip">
+          <div className="min-w-0 max-w-full p-2 sm:p-4 lg:p-6">
             {mounted ? (
               children
             ) : (
               <div className="animate-pulse space-y-4">
                 <div className="h-8 bg-slate-200 rounded w-1/4" />
                 <div className="h-4 bg-slate-200 rounded w-1/2" />
-                <div className="grid grid-cols-3 gap-4 mt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
                   <div className="h-32 bg-slate-200 rounded" />
                   <div className="h-32 bg-slate-200 rounded" />
                   <div className="h-32 bg-slate-200 rounded" />

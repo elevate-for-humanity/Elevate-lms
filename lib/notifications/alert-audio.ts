@@ -1,4 +1,5 @@
 'use client';
+import { playNaturalVoiceNotification } from '@/components/voice/useNaturalVoice';
 import { ALERT_PHRASES, type PwaAlertSettings } from './pwa-alert-settings';
 let context: AudioContext | undefined;
 export async function playAlert(
@@ -7,12 +8,9 @@ export async function playAlert(
 ) {
   if (settings.sound === 'silent' || settings.volume === 0) return;
   if (settings.sound === 'voice') {
-    if (!('speechSynthesis' in window))
+    const played = await playNaturalVoiceNotification(ALERT_PHRASES[kind], settings.volume);
+    if (!played)
       throw Error('Spoken alerts are unavailable on this device. Choose a chime instead.');
-    const speech = new SpeechSynthesisUtterance(ALERT_PHRASES[kind]);
-    speech.volume = settings.volume;
-    speech.rate = 0.95;
-    window.speechSynthesis.speak(speech);
     return;
   }
   if (!('AudioContext' in window)) throw Error('Audio alerts are unavailable on this device.');

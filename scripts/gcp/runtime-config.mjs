@@ -23,7 +23,7 @@ export function google(args, input) {
     // Preserve only allowlisted, non-secret quota identifiers. Never echo raw
     // gcloud stderr: it can contain runtime environment and credentials.
     const details = String(result.stderr || '');
-    const quotaIds = [...details.matchAll(/\\b(?:CpuAllocPerProjectRegion|MemAllocPerProjectRegion|[A-Za-z][A-Za-z0-9_]{2,80}PerProjectRegion)\\b/g)].map(match => match[0]);
+    const quotaIds = [...details.matchAll(/\b(?:CpuAllocPerProjectRegion|MemAllocPerProjectRegion|[A-Za-z][A-Za-z0-9_]{2,80}PerProjectRegion)\b/g)].map(match => match[0]);
     if (quotaIds.length) error.quotaIds = [...new Set(quotaIds)].slice(0, 8);
     if (result.error) error.processFailure = result.error.code === 'ETIMEDOUT' ? 'timeout' : 'spawn_failed';
     throw error;

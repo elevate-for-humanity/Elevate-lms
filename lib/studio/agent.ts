@@ -85,7 +85,7 @@ export class OpenStudioAgent {
     });
 
     // Try to load existing session from localStorage
-    const savedSession = localStorage.getItem('openstudio_session');
+    const savedSession = typeof window === 'undefined' ? null : window.localStorage.getItem('openstudio_session');
     if (savedSession) {
       try {
         const session = JSON.parse(savedSession) as ConversationSession;
@@ -164,7 +164,7 @@ export class OpenStudioAgent {
       config: this.config,
     };
     this.sessionId = session.id;
-    localStorage.setItem('openstudio_session', JSON.stringify(session));
+    if (typeof window !== 'undefined') window.localStorage.setItem('openstudio_session', JSON.stringify(session));
   }
 
   /**
@@ -192,7 +192,7 @@ export class OpenStudioAgent {
   clearConversation(): void {
     this.messages = [];
     this.sessionId = null;
-    localStorage.removeItem('openstudio_session');
+    if (typeof window !== 'undefined') window.localStorage.removeItem('openstudio_session');
     this.initialize();
   }
 

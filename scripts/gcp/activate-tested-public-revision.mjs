@@ -40,6 +40,36 @@ function assertTrafficUnchanged(before, after) {
   }
 }
 
+/**
+ * Release generated, zero-traffic candidate aliases before Cloud Run creates
+ * another revision. The alias is temporary; the revision remains available.
+ */
+export async function cleanupUnusedCandidateTags({
+  service, read = gcloud,
+}) {
+  if (!/^elevate-(?:admin|lms|marketing|store)-migration$/.test(service || '')) {
+    throw Error('Exact managed Cloud Run service required');
+  }
+  const describe = () => read(['run', 'services', 'describe', service, '--region=' + region]);
+  const update = (...flags) => read(['run', 'services', 'update-traffic', service, '--region=' + region, ...flags, '--quiet']);
+  const before = describe();
+  if (servingTraffic(before).reduce((sum, [, percent]) => sum + percent, 0) !== 100) {
+    throw Error('Existing serving traffic must be fully resolved before candidate cleanup');
+  }
+  // Do not protect latestCreatedRevisionName here: after a failed deploy that
+  // points at the zero-traffic candidate keeping regional resources allocated.
+  // Candidate tags are temporary; rollback revisions and custom tags are kept.
+  const staleTags = unusedCandidateTags(before);
+  if (!staleTags.length) return { service, removedCandidateTags: [] };
+  update('--remove-tags=' + staleTags.join(','));
+  const after = describe();
+  assertTrafficUnchanged(before, after);
+  if (trafficRows(after).some(item => staleTags.includes(item.tag))) {
+    throw Error('Stale candidate tags remain after cleanup');
+  }
+  return { service, removedCandidateTags: staleTags };
+}
+
 export async function activateTestedRevision({
   service, revision, commit, read = gcloud, fetcher = fetch, attempts = 12,
   pause = () => new Promise(resolve => setTimeout(resolve, 2000)),

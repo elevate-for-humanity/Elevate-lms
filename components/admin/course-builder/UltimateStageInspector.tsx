@@ -93,7 +93,7 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
         cache: 'no-store', signal: AbortSignal.timeout(30000),
       });
       const payload = await response.json().catch(() => ({}));
-      if (!Array.isArray(payload.checks))
+      if (!response.ok || !Array.isArray(payload.checks))
         throw new Error(payload.error || 'Course Builder health check failed (' + response.status + ')');
       setChecks(payload.checks);
     } catch (reason) {
@@ -125,8 +125,8 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
 
   return (
     <section className="mt-5 min-w-0 overflow-x-hidden rounded-xl bg-slate-950 p-3 text-white sm:p-4" aria-label="Course Builder checkpoints">
-      <div data-course-lesson-panes className="grid min-w-0 grid-cols-1 items-start gap-4 lg:grid-cols-2">
-      <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 lg:col-span-2">
+      <div data-course-lesson-panes className="grid min-w-0 grid-cols-1 items-start gap-4">
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-3 ">
         <h3 className="font-bold text-white">Lesson checkpoints</h3>
         <p className="text-sm text-slate-200">Choose a checkpoint and preview any saved lesson. On smaller screens, the lesson preview appears first.</p>
         <button type="button" onClick={() => void checkHealth()} disabled={checking}
@@ -134,7 +134,7 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
           {checking ? 'Checking dependencies…' : 'Check Course Builder health'}
         </button>
       </div>
-      <div className="min-w-0 rounded-xl border border-slate-600 bg-slate-950 p-4 text-white lg:col-start-2 lg:row-start-2 lg:row-span-6 lg:sticky lg:top-4">
+      <div className="min-w-0 rounded-xl border border-slate-600 bg-slate-950 p-4 text-white ">
         <label htmlFor="lesson-preview-selection" className="block font-bold">Lesson previews</label>
         <select id="lesson-preview-selection" value={selectedLesson} onChange={event => {setFollowActive(false);setSelectedLesson(event.target.value);}}
           className="mt-2 w-full rounded-lg border border-slate-400 bg-slate-900 p-3 text-white">
@@ -155,16 +155,16 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
           <p>Select a checkpoint below to inspect this lesson’s saved evidence and rendered video.</p>
         </div>)}
       </div>
-      {healthError ? <p role="alert" className="min-w-0 text-sm text-red-200 lg:col-start-1">{healthError}</p> : null}
+      {healthError ? <p role="alert" className="min-w-0 text-sm text-red-200 ">{healthError}</p> : null}
       {checks.length ? (
-        <ul className="min-w-0 space-y-2 lg:col-start-1">
+        <ul className="min-w-0 space-y-2 ">
           {checks.map(check => <li key={check.name} className="rounded-lg border border-slate-700 bg-slate-900 p-3 text-sm">
             <strong className={check.passed ? 'text-emerald-300' : 'text-amber-200'}>{check.name}: {check.passed ? 'Passed' : 'Needs repair'}</strong>
             <p className="mt-1 text-slate-300">{check.message}</p>
           </li>)}
         </ul>
       ) : null}
-      <ol className="min-w-0 grid gap-2 sm:grid-cols-2 lg:col-start-1">
+      <ol className="min-w-0 grid gap-2 sm:grid-cols-2 ">
         {ULTIMATE_BUILD_STEPS.map((step, index) => (
           <li key={step}>
             <button type="button" onClick={() => setSelected(step)} aria-pressed={selected === step}
@@ -175,7 +175,7 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
         ))}
       </ol>
       {selected ? (
-        <div className="min-w-0 rounded-xl border border-slate-700 bg-slate-950 p-4 lg:col-start-1">
+        <div className="min-w-0 rounded-xl border border-slate-700 bg-slate-950 p-4 ">
           <h4 className="font-bold text-white">{selected.replaceAll('_', ' ')}</h4>
           {loading ? <p role="status" className="mt-2 text-sm">Loading saved lesson checkpoints…</p> : null}
           {error ? <p role="alert" className="mt-2 text-red-200">{error}</p> : null}

@@ -45,6 +45,8 @@ jobs:
           project_id: elegant-racer-299721
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
       - name: Configure Artifact Registry Docker authentication
         if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet

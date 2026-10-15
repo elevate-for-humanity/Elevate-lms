@@ -774,6 +774,8 @@ export function UltimateBuildPanel({
         </button>
       </div>
 
+      <div className="mt-5 grid min-w-0 items-start gap-5 2xl:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)]">
+        <div className="min-w-0">
       {!statusLoading && latest ? (
         <div className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-300">Worker job</p>
@@ -863,7 +865,6 @@ export function UltimateBuildPanel({
       </section>}
 
       {notice ? <p role="status" className="mt-4 text-sm text-cyan-200">{notice}</p> : null}
-      {latest ? <UltimateStageInspector buildId={latest.id} updatedAt={latest.updated_at} /> : null}
 
       {statusLoaded && (!latest || ['blocked','failed','built_with_findings'].includes(latest.status)) ? (
         <label className="mt-4 block space-y-2 text-sm">
@@ -913,6 +914,16 @@ export function UltimateBuildPanel({
             <ShieldCheck className="h-4 w-4" /> Publish Ultimate release
           </button>
         ) : null}
+      </div>
+        </div>
+        <aside aria-label="Live course lesson preview" className="min-w-0 2xl:sticky 2xl:top-4">
+          <div className="mb-3 rounded-xl border border-cyan-700/60 bg-slate-950 p-3">
+            <h3 className="font-bold text-cyan-200">Live lesson preview</h3>
+            <p className="mt-1 text-xs text-slate-300">Saved lessons and checkpoints refresh alongside the builder. Video appears as soon as a playable render is saved.</p>
+          </div>
+          {latest ? <UltimateStageInspector buildId={latest.id} updatedAt={latest.updated_at} /> :
+            <p className="rounded-xl border border-slate-700 bg-slate-950 p-4 text-sm text-slate-300">Select or start a build to preview its lessons.</p>}
+        </aside>
       </div>
       <p className="mt-4 text-xs text-slate-300">
         Course Factory generation, blueprint execution, and standalone media queues are not

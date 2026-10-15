@@ -26,9 +26,9 @@ The supplied task prompt refers to 78 prior requirements for this master checkli
 7. **Classify unchanged producer output as an internal repair failure.** `REPAIR_PRODUCER_UNCHANGED` is no longer treated as an external dependency that blocks automated repair. Licensing and authorization blockers remain external. **Status: implemented.**
 8. **Run the focused worker regressions locally.** Command: `node --test tests/worker/verified-self-repair.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs`. Result on Node v24.19.0: **10 passed, 0 failed**. **Status: passed locally.**
 9. **Exercise the encoded-title readability fixture.** `tests/video/slide-lesson-title-readability.test.mjs:128` adds a 390px strict-blueprint title check. It requires the media-worker browser/OCR toolchain and was not run in the local scratch checkout. **Status: pending CI or media-worker execution.**
-10. **Keep the repair tests in release gates.** The new worker regressions are added to the required PR CI preflight and the existing worker-image regression command. **Status: pending PR CI.**
+10. **Keep the repair tests in release gates.** The new worker regressions are added to the required PR CI preflight and the existing worker-image regression command. **Status: the focused local suite and protected PR CI gate passed; the worker-image run is pending deployment.**
 11. **Check Supabase dependency recovery before release.** The live `wake_ultimate_media_dependency` function exists, uses an empty search path, is restricted to `service_role`, and its migration is applied. This repair does not require a database migration. **Status: verified read-only.**
-12. **Merge through the protected GitHub path and verify deployment.** `main` requires `CI Required Gate`; the worker and admin deployment workflows are triggered by qualifying main-branch changes. **Status: pending PR, required checks, and deployment runs.**
+12. **Merge through the protected GitHub path and verify deployment.** `main` requires `CI Required Gate`; the worker and admin deployment workflows are triggered by qualifying main-branch changes. **Status: PR #1842 is open and the required CI gate passed; merge and deployment are pending.**
 13. **Resume the existing lesson from the earliest affected checkpoint.** Use the existing admin checkpoint-repair endpoint for this lesson after deployment, preserving saved artifacts and resetting only this lesson's exhausted repair counter. Do not create a replacement build. **Status: pending deployed code and authorized endpoint access.**
 14. **Verify the corrected output and build state.** Confirm the new scene-3 title is readable in the rendered video, finished-media QA passes, the course cursor advances, and the original build/job record progresses. **Status: pending resume.**
 15. **Complete the full historical 78-item checklist.** Exact prior requirement text is unavailable in the present task context. **Status: blocked on recovering the original list; no items have been fabricated.**
@@ -40,4 +40,9 @@ The worker currently calls `runUltimateCourse` with `maxLessons: 1` in `lib/ulti
 ## Release record
 
 - Base `main` commit before repair: `9ef688875789939374a416b5115f1595a1b3a569`
-- Repair branch, PR, merge commit, CI run, and deployment run: to be recorded after GitHub reports them.
+- Repair branch: `codex/cosmetology-media-repair-20261014`
+- Pull request: [#1842](https://github.com/elevate-for-humanity/Elevate-lms/pull/1842)
+- Repair commit: `6cf6e95c2713cfd3e4417e4499af202e6f3b15b0`
+- Required CI gate: passed on the repair commit ([workflow run](https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/38674998742)).
+- Non-required PR checks also reported: a private Artifact Registry pull authorization failure in `standalone-worker`; one existing communications media-route clone in the duplicate sweep; and unrelated image/audio-policy findings in the integrity workflow. No files in those findings were changed by this repair.
+- Main merge commit and deployment run: pending.

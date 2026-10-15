@@ -198,3 +198,27 @@ describe('Google scoped runtime configuration', () => {
     expect(payloadChecksum(Buffer.from('123456789'))).toBe('3808858755');
   });
 });
+
+// GitHub dispatch belongs only to the administrative runtime. Saving a token
+// must sync to its bound Google secret rather than silently updating only SQL.
+describe('administrative GitHub runtime binding', () => {
+  it('allows the Admin token and rejects learner and public bindings', () => {
+    expect(() => validateRuntimeEntries('admin', [{ key: 'GITHUB_TOKEN', value: 'test-github-credential' }])).not.toThrow();
+    for (const component of ['lms', 'marketing', 'store'] as const) {
+      expect(() => validateRuntimeEntries(component, [{ key: 'GITHUB_TOKEN', value: 'test-github-credential' }])).toThrow();
+    }
+  });
+});
+
+describe('phone runtime ownership', () => {
+  it('binds device provisioning and relay configuration to the two owning services', () => {
+    for (const key of ['PBX_CONTROL_URL', 'PBX_PROVISIONING_TOKEN', 'PBX_STUN_URLS', 'PBX_TURN_URLS', 'PBX_TURN_SHARED_SECRET', 'TWILIO_PHONE_NUMBER']) {
+      for (const component of ['admin', 'lms'] as const) {
+        expect(policy.components[component].keys).toContain(key);
+      }
+      for (const component of ['marketing', 'store'] as const) {
+        expect(policy.components[component].keys).not.toContain(key);
+      }
+    }
+  });
+});

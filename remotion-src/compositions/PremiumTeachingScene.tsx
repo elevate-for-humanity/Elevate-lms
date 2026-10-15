@@ -27,9 +27,9 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
  const textStart=recap?scene.recapStartSeconds!:step?.narrationQuote?quoteStartSeconds(step.narrationQuote,speechCues):0;
  return <AbsoluteFill style={{background:'#171717',color:'#fff',fontFamily:'Arial, sans-serif'}}>
   <div style={{position:'absolute',top:30,left:54,color:'#cdb795',fontSize:22,letterSpacing:2}}>{props.courseTitle}</div>
-  <div style={{position:'absolute',top:78,left:54,right:54,display:'flex',gap:24,alignItems:'center'}}>
+  <div style={{position:'absolute',top:60,left:54,right:54,height:148,display:'flex',gap:24,alignItems:'center'}}>
    <span style={{fontSize:42,color:'#cdb795'}}>{String(scene.scene_number).padStart(2,'0')}</span>
-   <h1 style={{fontSize:60,lineHeight:1.15,margin:0}}>{recap?'Recap: ':''}{scene.title}</h1>
+   <h1 style={{fontSize:Number.isFinite(scene.titleFontSize) ? Math.min(144,Math.max(42,scene.titleFontSize!)) : 60,lineHeight:1,margin:0}}>{recap?'Recap: ':''}{scene.title}</h1>
   </div>
   <div style={{position:'absolute',left:54,top:210,width:1120,height:670,background:'#171717',borderRadius:12,overflow:'hidden'}}>
    {demonstration?<div style={{position:'absolute',top:0,left:0,right:0,height:cue?445:670}}>

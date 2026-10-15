@@ -19,7 +19,7 @@ describe('deployed portal middleware auth coverage', () => {
     '/lms/courses',
     '/apprentice',
     '/host-shop/dashboard',
-    '/parent-portal/dashboard',
+    '/parent-portal',
     '/employer',
     '/workforce',
     '/program-holder',
@@ -59,7 +59,7 @@ describe('deployed portal middleware auth coverage', () => {
     expect(marketingHome).not.toContain('getApprovedHomeHeroAsset');
     expect(marketingHome).toContain('<PlatformHubHero />');
     expect(marketingHome).not.toContain('<HomeHeroVideo');
-    expect(homeHero).toContain('Build skills that move your career forward.');
+    expect(homeHero).toContain('Build a career. Build a workforce. Build a business.');
     expect(homeHero).toContain('href="/programs"');
     expect(homeHero).not.toContain("fetch('/api/public/home-hero'");
   });

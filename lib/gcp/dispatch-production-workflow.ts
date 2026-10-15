@@ -6,11 +6,12 @@
 import 'server-only';
 import { getGitHubToken } from '@/lib/devstudio/github-token';
 
-export type GoogleDeployTarget = 'admin' | 'marketing' | 'lms' | 'course-builder';
+export type GoogleDeployTarget = 'admin' | 'marketing' | 'lms' | 'store' | 'course-builder';
 const WORKFLOWS: Record<GoogleDeployTarget, string> = {
   admin: 'deploy-admin.yml',
   lms: 'deploy-google-lms-trigger.yml',
   marketing: 'deploy-google-marketing-trigger.yml',
+  store: 'deploy-google-store-runtime.yml',
   'course-builder': 'dispatch-google-course-job.yml',
 };
 const REPOSITORY = 'elevate-for-humanity/Elevate-lms';
@@ -56,7 +57,20 @@ export async function dispatchGoogleDeployment(target: GoogleDeployTarget) {
 
 export async function isGoogleDeploymentConfigured(): Promise<boolean> {
   try {
-    return Boolean(await deploymentToken());
+    const token = await deploymentToken();
+    // Presence alone hid rejected credentials behind a green deployment badge.
+    // This reads workflow availability; it never starts a production operation.
+    const response = await fetch(
+      `https://api.github.com/repos/${REPOSITORY}/actions/workflows/deploy-admin.yml`,
+      {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(8000),
+      },
+    );
+    if (!response.ok) return false;
+    const workflow = await response.json();
+    return workflow.state === 'active';
   } catch {
     return false;
   }

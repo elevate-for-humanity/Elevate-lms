@@ -10,7 +10,6 @@ import {
   CalendarDays,
   CheckCircle,
   Clock,
-  CreditCard,
   ExternalLink,
   GraduationCap,
   MessageSquare,
@@ -33,8 +32,6 @@ import JobCard from '@/components/jobs/JobCard';
 import { MARKETING_HOST } from '@/lib/routing/portal-map';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
-import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
-import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
 
 export const metadata: Metadata = generateInternalMetadata({
   title: 'Student Dashboard',
@@ -66,11 +63,6 @@ type LessonRow = {
   duration_minutes: number | null;
 };
 
-function paidStatus(status: string | null | undefined) {
-  const value = String(status ?? '').toLowerCase();
-  return value === 'completed' || value === 'succeeded' || value === 'paid';
-}
-
 function isBlockedExternalTraining(course: {
   partner_name?: string | null;
   external_url?: string | null;
@@ -93,7 +85,6 @@ export default async function StudentDashboard() {
     ? await db.from('profiles').select('role,full_name,email').eq('id', subjectId).maybeSingle()
     : { data: profile };
   const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
-  const billingRequirement = await loadLearnerBillingRequirement(db, subjectId);
   const careerJobs = await getActiveJobs({ limit: 4 });
   const { data: holderStudentRows } = await db
     .from('program_holder_students')
@@ -119,7 +110,6 @@ export default async function StudentDashboard() {
     reportedCredentialsRes,
     workoneAppRes,
     quizAttemptsRes,
-    paymentLogsRes,
     externalCoursesRes,
     externalCompletionsRes,
     personalCourseAccessRes,
@@ -154,12 +144,6 @@ export default async function StudentDashboard() {
       .eq('user_uuid', subjectId)
       .not('completed_at', 'is', null)
       .order('completed_at', { ascending: false })
-      .limit(5),
-    supabase
-      .from('payment_logs')
-      .select('id, amount, status, completed_at, created_at')
-      .eq('user_id', subjectId)
-      .order('created_at', { ascending: false })
       .limit(5),
     supabase
       .from('program_external_courses')
@@ -221,7 +205,6 @@ export default async function StudentDashboard() {
   ];
   const personalCourseAccess = personalCourseAccessRes.data ?? [];
   const recentQuizAttempts = quizAttemptsRes.data ?? [];
-  const recentPayments = paymentLogsRes.data ?? [];
   const workoneApp = workoneAppRes.data;
   const isPendingWorkone = Boolean(workoneApp);
 
@@ -335,10 +318,6 @@ export default async function StudentDashboard() {
     (externalCompletionsRes.data ?? []).map((row: any) => [row.external_course_id, row]),
   );
 
-  const paidTotalCents = recentPayments
-    .filter((payment: any) => paidStatus(payment.status))
-    .reduce((sum: number, payment: any) => sum + Number(payment.amount ?? 0), 0);
-
   const firstName =
     subjectProfile?.full_name?.split(' ')[0] ||
     subjectProfile?.email?.split('@')[0] ||
@@ -451,10 +430,6 @@ export default async function StudentDashboard() {
             </div>
           </section>
         ) : null}
-        <MandatoryBillingSetup
-          requirement={billingRequirement}
-          readOnly={subject.previewing}
-        />
         {activeCourseEnrollment && activeCourseId ? (
           <section className="relative isolate min-h-[360px] overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
             <Image
@@ -1007,43 +982,6 @@ export default async function StudentDashboard() {
               </section>
             )}
 
-            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-              <div className="border-b border-slate-100 px-5 py-4">
-                <h2 className="flex items-center gap-2 font-black text-slate-950">
-                  <CreditCard className="h-4 w-4" /> Payments
-                </h2>
-              </div>
-              <div className="p-5">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">
-                  Recorded paid total
-                </p>
-                <p className="mt-1 text-2xl font-black text-slate-950">
-                  ${(paidTotalCents / 100).toFixed(2)}
-                </p>
-                <div className="mt-4 space-y-2">
-                  {recentPayments.slice(0, 3).map((payment: any) => (
-                    <div
-                      key={payment.id}
-                      className="flex items-center justify-between gap-3 text-xs"
-                    >
-                      <span className="capitalize font-medium text-slate-700">
-                        {payment.status ?? 'recorded'}
-                      </span>
-                      <span className="font-bold text-slate-900">
-                        ${(Number(payment.amount ?? 0) / 100).toFixed(2)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <Link
-                  href="/lms/payments"
-                  className="mt-4 inline-flex text-sm font-bold text-brand-blue-800 hover:underline"
-                >
-                  View payment history
-                </Link>
-              </div>
-            </section>
-
             <section className="rounded-2xl bg-slate-950 p-5 text-white">
               <h2 className="font-black text-white">Credential Pathway</h2>
               <div className="mt-4 space-y-3 text-sm">
@@ -1084,8 +1022,8 @@ function NeutralStudentPortalPreview() {
           <h1 className="mt-2 text-3xl font-black text-slate-950">Student PWA</h1>
           <p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-700">
             This neutral preview confirms that the Student PWA is operational. No learner identity,
-            enrollment, payment, progress, or career record is attached. Select a learner from
-            secured Admin student management to open an audited, read-only dashboard.
+            enrollment, progress, or career record is attached. Select a learner from secured Admin
+            student management to open an audited, read-only dashboard.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <a

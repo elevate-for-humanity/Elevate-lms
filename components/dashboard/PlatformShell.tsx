@@ -97,7 +97,6 @@ const NAV_CONFIG: Record<UserRole, { items: NavItem[]; title: string }> = {
       { href: '/apprentice/attendance', label: 'Attendance', icon: Calendar },
       { href: '/apprentice/documents', label: 'Documents', icon: FileText },
       { href: '/lms/portfolio', label: 'Portfolio', icon: Briefcase },
-      { href: '/apprentice/billing', label: 'Payments', icon: DollarSign },
       { href: '/lms/messages', label: 'Messages', icon: MessageSquare },
       { href: '/lms/library', label: 'Resources', icon: BookOpen },
       { href: '/apprentice/profile', label: 'Profile', icon: Settings },

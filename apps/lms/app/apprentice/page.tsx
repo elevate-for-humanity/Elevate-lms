@@ -35,9 +35,6 @@ import {
   APPRENTICE_POLICY_KEYS,
   APPRENTICE_POLICY_VERSION,
 } from '@/lib/apprenticeship/apprentice-policy';
-import { getApprenticeBillingAccess } from '@/lib/billing/apprentice-invoice-batch';
-import { loadLearnerBillingRequirement } from '@/lib/billing/learner-billing-requirement';
-import { MandatoryBillingSetup } from '@/components/learner/MandatoryBillingSetup';
 import { TimeclockAttendanceNotice } from '@/components/timeclock/TimeclockAttendanceNotice';
 
 export const metadata: Metadata = {
@@ -92,8 +89,6 @@ export default async function ApprenticePortalPage() {
   const db = await requireAdminClient();
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) redirect('/login?redirect=/apprentice');
-  const invoiceAccess = await getApprenticeBillingAccess(db, subject.userId);
-  const billingRequirement = await loadLearnerBillingRequirement(db, subject.userId);
   const { data: subjectProfile } = await db
     .from('profiles')
     .select('role')
@@ -136,7 +131,6 @@ export default async function ApprenticePortalPage() {
             'Timeclock',
             'Competencies',
             'Documents',
-            'Billing & Payments',
             'RTI',
             'Handbook',
             'State Board',
@@ -174,8 +168,6 @@ export default async function ApprenticePortalPage() {
     certsRes,
     { data: documentRequirements },
     { data: handbookAcceptance },
-    { data: cosmetologyBilling },
-    { data: billingAuthorization },
     { data: theorySchedule },
     { data: policyAcceptances },
   ] = await Promise.all([
@@ -204,26 +196,6 @@ export default async function ApprenticePortalPage() {
       .eq('handbook_version', '2026.2')
       .limit(1)
       .maybeSingle(),
-    programSlug === 'cosmetology-apprenticeship' || programSlug === 'barber-apprenticeship'
-      ? db
-          .from(
-            programSlug === 'barber-apprenticeship'
-              ? 'barber_subscriptions'
-              : 'cosmetology_subscriptions',
-          )
-          .select('payment_status,setup_fee_paid,fully_paid')
-          .eq('user_id', subject.userId)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
-    db
-      .from('billing_migration_authorizations')
-      .select('billing_schedule_id,status')
-      .eq('user_id', subject.userId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
     (db as any)
       .from('apprenticeship_theory_schedules')
       .select(
@@ -241,14 +213,6 @@ export default async function ApprenticePortalPage() {
       .eq('subject_id', subject.userId)
       .in('agreement_key', Object.values(APPRENTICE_POLICY_KEYS)),
   ]);
-  const { data: automaticBillingSchedule } = billingAuthorization?.billing_schedule_id
-    ? await db
-        .from('billing_schedules')
-        .select('status,provider_status,provider_subscription_id')
-        .eq('id', billingAuthorization.billing_schedule_id)
-        .maybeSingle()
-    : { data: null };
-
   const firstName = profile?.first_name || profile?.full_name?.split(' ')[0] || 'Apprentice';
   const displayProgram =
     runtime.contract?.standard.occupationTitle ||
@@ -363,11 +327,6 @@ export default async function ApprenticePortalPage() {
   );
   const timeclockPolicyAccepted = acceptedPolicyKeys.has(APPRENTICE_POLICY_KEYS.timeclock);
   const paymentPolicyAccepted = acceptedPolicyKeys.has(APPRENTICE_POLICY_KEYS.payment);
-  const automaticBillingActive = Boolean(
-    automaticBillingSchedule?.status === 'active' &&
-    automaticBillingSchedule?.provider_status === 'active' &&
-    automaticBillingSchedule?.provider_subscription_id,
-  );
   const requiredPolicyPanel = (
     <section className="rounded-3xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-white p-6 shadow-sm sm:p-8">
       <div className="flex gap-3">
@@ -415,14 +374,7 @@ export default async function ApprenticePortalPage() {
   );
 
   if (!runtime.contract) {
-    const billingConfigured = Boolean(cosmetologyBilling?.fully_paid || automaticBillingActive || invoiceAccess.accessExemptUntil);
     const todoItems = [
-      {
-        label: invoiceAccess.accessExemptUntil ? 'Billing access approved by sponsor' : 'Choose a payment method or financing option',
-        done: billingConfigured,
-        href: '/account/payment-methods',
-        icon: CreditCard,
-      },
       {
         label: 'Complete learner orientation',
         done: Boolean(runtime.enrollment.orientation_completed_at),
@@ -494,16 +446,10 @@ export default async function ApprenticePortalPage() {
             <p className="mt-3 text-xl font-bold text-pink-100">{displayProgram}</p>
             <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-slate-100 sm:text-base">
               Track training with your {beautyProgram?.hostLabel || 'Host Shop'},{' '}
-              {registeredStandard?.completion.requiredRtiHours || 'required'} RTI hours, tuition
+              {registeredStandard?.completion.requiredRtiHours || 'required'} RTI hours, training
               progress, documents, competencies, and State Board readiness in one place.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                href="/apprentice/billing"
-                className="rounded-xl bg-pink-600 px-5 py-3 font-black text-white shadow-lg hover:bg-pink-500"
-              >
-                {invoiceAccess.accessExemptUntil ? 'Review billing' : 'Complete payment setup'}
-              </Link>
               <Link
                 href="/apprentice/documents"
                 className="rounded-xl border border-white/50 bg-white/10 px-5 py-3 font-black text-white backdrop-blur hover:bg-white/20"
@@ -521,8 +467,8 @@ export default async function ApprenticePortalPage() {
                 Required to-do — {incompleteCount} incomplete
               </h2>
               <p className="mt-1 text-sm font-semibold text-red-900">
-                PARIS will walk you through these items in order. Items marked Open still need attention,
-                but sponsor-approved access remains available while an active access exception is in place.
+                PARIS will walk you through these items in order. Items marked Open still need
+                attention, and your advisor can help resolve outstanding training requirements.
               </p>
               <div className="mt-5 grid gap-3">
                 {todoItems.map(({ label, done, href, icon: Icon }, index) => (
@@ -549,12 +495,8 @@ export default async function ApprenticePortalPage() {
             </div>
           </div>
         </section>
-        <MandatoryBillingSetup
-          requirement={billingRequirement}
-          readOnly={subject.previewing}
-        />
         {requiredPolicyPanel}
-        <section className="grid gap-4 sm:grid-cols-3">
+        <section className="grid gap-4 sm:grid-cols-2">
           <Metric
             label={beautyProgram?.hostLabel || 'Host Shop'}
             value={shopName}
@@ -570,16 +512,6 @@ export default async function ApprenticePortalPage() {
             value={`${Math.max(0, (documentRequirements?.length || 0) - missingDocumentCount)} / ${documentRequirements?.length || 0}`}
             detail={`${missingDocumentCount} incomplete`}
             icon={FileText}
-          />
-          <Metric
-            label="Payment setup"
-            value={billingConfigured ? 'Configured' : 'Required'}
-            detail={
-              billingConfigured
-                ? 'Tuition billing is connected'
-                : 'Review payment requirements in Billing'
-            }
-            icon={CreditCard}
           />
         </section>
         <TheorySchedulePanel
@@ -617,7 +549,12 @@ export default async function ApprenticePortalPage() {
   );
 
   const actions = [
-    { title: 'My Website Traffic', text: 'See views, visitor sources, and locations for your connected website.', href: '/apprentice/analytics', image: '/images/pages/admin-analytics-hero.webp' },
+    {
+      title: 'My Website Traffic',
+      text: 'See views, visitor sources, and locations for your connected website.',
+      href: '/apprentice/analytics',
+      image: '/images/pages/admin-analytics-hero.webp',
+    },
     {
       title: 'Clock work hours',
       text: 'Record geofenced supervised work time for Host Shop review. OJL hours remain evidence; competency verification controls competency-based progression.',
@@ -728,11 +665,6 @@ export default async function ApprenticePortalPage() {
           </div>
         </div>
       </section>
-
-      <MandatoryBillingSetup
-        requirement={billingRequirement}
-        readOnly={subject.previewing}
-      />
 
       {requiredPolicyPanel}
 

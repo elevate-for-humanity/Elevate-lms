@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   event: {} as any,
@@ -14,7 +14,7 @@ const mocks = vi.hoisted(() => ({
   failVoicemailWrite: false,
 }));
 vi.mock('@/lib/supabase/admin', () => ({ requireAdminClient: async () => mocks.db }));
-vi.mock('@/lib/resend', () => ({ resend: { emails: { send: mocks.email } } }));
+vi.mock('@/lib/email/sendgrid', () => ({ sendEmail: mocks.email }));
 vi.mock('@/lib/notifications/push-service', () => ({ PushNotificationService: class { sendToUserWithDatabase = mocks.push; } }));
 vi.mock('@/lib/notifications/sms', () => ({ sendSMS: vi.fn() }));
 vi.mock('@/lib/phone/telnyx', () => ({
@@ -27,6 +27,8 @@ vi.mock('@/lib/phone/telnyx', () => ({
 }));
 
 import { POST } from '@/apps/admin/app/api/webhooks/telnyx/route';
+import { PHONE_VOICE } from '@/lib/phone/call-flow';
+afterEach(() => vi.unstubAllGlobals());
 
 let tables: Record<string, any[]>;
 const system = { id: 'system', greeting: 'Keep this exact greeting.', routing_mode: 'menu', admin_extension: '0', paris_intake_enabled: true, voicemail_enabled: true, timezone: 'America/Indiana/Indianapolis', ai_instructions: '', after_hours_message: 'Please leave a message.' };
@@ -54,6 +56,9 @@ function query(table: string) {
       const rows = tables[table] ||= [];
       let found = rows.filter(row => filters.every(f => f(row)));
       if (operation === 'update') found.forEach(row => Object.assign(row, values));
+      if (operation === 'insert' && table === 'phone_notification_deliveries' && rows.some(row => ['task_id','recipient_profile_id','message_kind','channel'].every(key => row[key] === values[key]))) {
+        return Promise.resolve({ data: null, error: { code: '23505' } }).then(resolve, reject);
+      }
       if (operation === 'insert') { const added = { id: `new-${rows.length}`, ...values }; rows.push(added); found = [added]; }
       return Promise.resolve({ data: one ? found[0] || null : found, error: null }).then(resolve, reject);
     },
@@ -71,9 +76,15 @@ async function event(type: string, payload: any = {}, state: any = {}, expectedS
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.stubGlobal('fetch', vi.fn(async (url: string) => {
+    if (url !== 'https://www.elevateforhumanity.org/llms.txt') throw new Error('Unexpected external request');
+    return new Response('Verified website knowledge fixture.', { status: 200 });
+  }));
+  mocks.push.mockResolvedValue(1);
+  mocks.email.mockResolvedValue({ success: true, data: { messageId: 'accepted-test-message' } });
   mocks.failVoicemailWrite = false;
   tables = {
-    phone_systems: [{ ...system }], phone_calls: [{ id: 'call', provider: 'telnyx', provider_call_id: 'call-control', from_number: '+13175550100' }],
+    phone_systems: [{ ...system }], phone_calls: [{ id: 'call', phone_system_id: 'system', provider: 'telnyx', provider_call_id: 'call-control', from_number: '+13175550100' }],
     communication_workspaces: [{ id: 'workspace', phone_system_id: 'system' }],
     communication_extensions: [
       { id: 'admin', workspace_id: 'workspace', extension: '0', display_name: 'Administrator', profile_id: 'admin-profile', enabled: true },
@@ -91,7 +102,15 @@ beforeEach(() => {
     phone_callback_tasks: [{ id: 'task', call_id: 'call', source: 'paris', extension_id: 'tech', assigned_profile_id: 'tech-profile' }],
     programs: [],
   };
-  mocks.db = { from: query };
+  mocks.db = { from: query, rpc: async (name: string, input: any) => {
+    if (name !== 'claim_telnyx_call_event') throw new Error('Unexpected RPC: ' + name);
+    const rows = tables.phone_call_events ||= [];
+    const previous = rows.find(row => row.provider_event_id === input.p_event_id);
+    if (previous) return { data: [{ event_id: previous.id, claim_status: 'duplicate' }], error: null };
+    const row = { id: 'event-' + rows.length, provider_event_id: input.p_event_id, processing_token: input.p_token, processing_state: 'processing' };
+    rows.push(row);
+    return { data: [{ event_id: row.id, claim_status: 'claimed' }], error: null };
+  } };
 });
 
 describe('Telnyx webhook recovery and routing (provider verification mocked)', () => {
@@ -99,7 +118,7 @@ describe('Telnyx webhook recovery and routing (provider verification mocked)', (
     mocks.failVoicemailWrite = true;
     await event('call.recording.saved', { recording_urls: { mp3: 'https://recordings.example/message.mp3' } }, {
       phase: 'voicemail_recording', taskId: 'task', extensionId: 'beauty', profileId: 'beauty-profile',
-    }, 500);
+    }, 503);
     expect(mocks.push).not.toHaveBeenCalled();
   });
   it('copies voicemail notification to Admin without transferring the call or changing its holder', async () => {
@@ -139,7 +158,7 @@ describe('Telnyx webhook recovery and routing (provider verification mocked)', (
     expect(mocks.push.mock.calls.map(c => c[1])).toEqual(expect.arrayContaining(['beauty-profile', 'admin-profile']));
   });
   it('keeps an unanswered holder call with PARIS rather than dialing Admin', async () => {
-    tables.phone_call_legs = [{ provider_call_id: 'holder-leg', answered_at: null }];
+    tables.phone_call_legs = [{ id: 'holder-leg-record', call_id: 'call', provider_call_id: 'holder-leg', answered_at: null }];
     await event('call.hangup', { call_control_id: 'holder-leg', hangup_cause: 'timeout' }, {
       phase: 'webrtc_leg', parentCallControlId: 'call-control', extensionId: 'beauty', profileId: 'beauty-profile',
     });
@@ -210,7 +229,7 @@ describe('Telnyx webhook recovery and routing (provider verification mocked)', (
     expect(mocks.actions.gatherUsingAI).not.toHaveBeenCalled();
     expect(mocks.dial).not.toHaveBeenCalled();
   });
-  it('continues through every directory page and retries a failed page with another voice', async () => {
+  it('continues through every directory page and retries with the approved voice', async () => {
     tables.communication_extensions.push(...Array.from({ length: 22 }, (_, i) => ({
       id: `extra${i}`, workspace_id: 'workspace', extension: String(200+i), display_name: `Partner ${i}`,
       department: 'Partner services', enabled: true,
@@ -221,7 +240,8 @@ describe('Telnyx webhook recovery and routing (provider verification mocked)', (
     await event('call.gather.ended', { digits: '', status: 'client_error' }, state);
     const retry = mocks.actions.gatherUsingSpeak.mock.lastCall![1];
     expect(retry.payload).toBe(config.payload);
-    expect(retry.voice).not.toBe(config.voice);
+    expect(retry.voice).toBe(PHONE_VOICE);
+    expect(JSON.parse(Buffer.from(retry.client_state, 'base64').toString()).directoryFallback).toBe('true');
     let spoken = '';
     for (let count = 0; count < 20; count++) {
       config = mocks.actions.gatherUsingSpeak.mock.lastCall![1];

@@ -118,7 +118,8 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(shell).toContain("requireTypedConfirmation(body?.confirmation, 'deploy_autopilot')");
     expect(files).toContain("requireTypedConfirmation(body.confirmation, 'git_push')");
     expect(builds).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
-    expect(builds).toContain("return safeError('Northflank is not configured.");
+    expect(builds).toContain("deploymentProvider: 'google-cloud-run'");
+    expect(builds).toContain('dispatchGoogleDeployment(service)');
     expect(services).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
     expect(environment).toContain(
       "requireTypedConfirmation(req.headers.get('x-confirmation'), 'delete_secret')",
@@ -187,7 +188,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
     const panel = source('components/studio/DevStudioHealthPanel.tsx');
     expect(health).toContain('const githubToken = await getGitHubToken()');
     expect(health).toContain('repositoryWritesReady: githubTokenValid');
-    expect(health).toContain('ready: true');
+    expect(health).toContain('ready: executionPrerequisitesReady');
     expect(panel).toContain(
       "['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable']",
     );

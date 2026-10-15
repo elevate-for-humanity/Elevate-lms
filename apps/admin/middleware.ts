@@ -47,6 +47,8 @@ function isPublicPath(pathname: string): boolean {
     ) ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
+    // Public packaged images cannot carry a browser session into Next's optimizer.
+    /^\/images\/.+\.(?:png|jpe?g|webp|avif|gif|svg|ico)$/i.test(pathname) ||
     /^\/[^/]+\.(?:png|jpe?g|webp|svg|ico|json|webmanifest|js|css|txt)$/i.test(pathname)
   );
 }

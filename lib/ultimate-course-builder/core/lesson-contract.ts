@@ -44,6 +44,7 @@ export function stepInputHash(
     ...(step === 'natural_narration' ? { narrationProducer: 'warm-native-pace-24khz-delivery-word-alignment-v3' } : {}),
     ...(step === 'instructor_script' ? { scriptProducer: 'stage-aligned-scenes-v1' } : {}),
     ...(step === 'visual_assignment' ? { visualAssignmentProducer: 'canonical-entitlement-source-paths-v3' } : {}),
+    ...(step === 'scene_construction' ? { sceneConstructionProducer: 'premium-title-scale-v1' } : {}),
     ...(step === 'finished_media_qa' ? { approvedDeliveryValidator: 'approved-delivery-v1' } : {}),
     ...(step === 'lesson_film_render' ? { renderProducer: STORYBOARD_RENDER_PRODUCER } : {}),
     dependencies: dependencies.map((s) => [s, contractHash(artifactPayload(prior[s] ?? {}))]),

@@ -29,7 +29,7 @@ describe('routeEllieMessage', () => {
   it('routes read-only course lookup to unified platform tools', () => {
     expect(routeEllieMessage('Show me the cosmetology course')).toBe('platform');
     expect(routeEllieMessage('Open the Indiana Cosmetology License course')).toBe('platform');
-    expect(selectStudioAgent('Show me the cosmetology course')).toBe('LIZZY');
+    expect(selectStudioAgent('Show me the cosmetology course')).toBe('PARIS');
   });
 
   it('routes website creation and publishing to the tool orchestrator', () => {
@@ -108,21 +108,19 @@ describe('durable orchestration planning', () => {
       'Inspect provider health. Read only. Do not deploy, create snapshots, or modify production.';
     const plan = decomposePlan(goal);
 
-    expect(plan.steps).toHaveLength(1);
-    expect(plan.steps[0]).toMatchObject({
-      title: 'Execute requested outcome',
-      command: goal,
-    });
+    expect(plan.steps.map(step => planAIToolFromCommand(step.command)?.name)).toEqual([
+      'devstudio.health', 'system.health', 'workflows.inspect',
+    ]);
     expect(plan.steps.some((step) => step.title === 'Create snapshot')).toBe(false);
   });
 });
 
 describe('selectStudioAgent', () => {
   it.each([
-    ['Build an adaptive CNA course', 'LIZZY'],
-    ['Audit RLS policies and verified claims', 'LIZZY'],
-    ['Interview a business owner and build their website', 'LIZZY'],
-    ['Inspect the failed deployment workflow', 'LIZZY'],
+    ['Build an adaptive CNA course', 'PARIS'],
+    ['Audit RLS policies and verified claims', 'PARIS'],
+    ['Interview a business owner and build their website', 'PARIS'],
+    ['Inspect the failed deployment workflow', 'PARIS'],
   ])('routes %s to %s', (message, agent) => {
     expect(selectStudioAgent(message)).toBe(agent);
   });

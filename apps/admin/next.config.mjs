@@ -40,6 +40,9 @@ const adminConfig = {
     parallelServerBuildTraces: false,
   },
 
+  // Serve packaged assets directly, as the other standalone applications do.
+  images: { unoptimized: true },
+
   transpilePackages: ['edge-tts'],
 
   webpack(config, { isServer, nextRuntime }) {

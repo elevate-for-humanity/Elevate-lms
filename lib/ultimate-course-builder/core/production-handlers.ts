@@ -198,6 +198,9 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       return {
         artifacts: {
           scenes: {
+            // Bind repair output to the compositor that actually consumes its title scale.
+            // Old repairs changed metadata while the premium heading stayed at 60px.
+            presentationProducer: 'premium-title-scale-v1',
             shots: ((ctx.artifacts.visual_assignment as any)?.media?.assignments ?? []).map(
               (a: any) => ({ ...a, loop: false }),
             ),

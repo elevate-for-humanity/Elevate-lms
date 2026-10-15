@@ -22,8 +22,9 @@ describe('marketing build warning boundary', () => {
     expect(config).not.toContain('config.ignoreWarnings');
   });
 
-  it('keeps the Next server-minification workaround that protects static metadata builds', () => {
+  it('bounds build concurrency for standalone metadata generation', () => {
     const config = read('apps/marketing/next.config.mjs');
-    expect(config).toContain('serverMinification: false');
+    expect(config).toContain('cpus: 1');
+    expect(config).toContain('webpackBuildWorker: true');
   });
 });

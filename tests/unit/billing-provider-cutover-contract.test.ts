@@ -6,10 +6,17 @@ const root = process.cwd();
 const read = (relativePath: string) => readFileSync(resolve(root, relativePath), 'utf8');
 
 describe('Canonical billing provider cutover', () => {
-  it('presents Admin schedules, PayPal collection, and QuickBooks invoices to learners', () => {
+  it('keeps payment systems out of learner dashboards and navigation', () => {
     const layout = read('components/lms/LearnerWorkspaceLayout.tsx');
-    expect(layout).toContain('PayPal autopay and QuickBooks invoices are available');
-    expect(layout).toContain('Elevate Admin dashboard');
+    const dashboard = read('apps/lms/app/lms/(app)/dashboard/page.tsx');
+    const navigation =
+      read('components/lms/LMSNavigation.tsx') + read('components/lms/LMSSidebar.tsx');
+    expect(layout).not.toContain('/apprentice/billing');
+    expect(layout).not.toContain('PayPal');
+    expect(dashboard).not.toContain('MandatoryBillingSetup');
+    expect(dashboard).not.toContain('payment_logs');
+    expect(dashboard).not.toContain('Recent Payments');
+    expect(navigation).not.toContain("label: 'Payments'");
     expect(layout).not.toContain('Affirm and installment');
     expect(layout).not.toContain('Sezzle');
     expect(layout).not.toContain('Afterpay');
@@ -24,7 +31,7 @@ describe('Canonical billing provider cutover', () => {
     expect(diagnostic).toContain("authority: 'admin_dashboard'");
     expect(diagnostic).toContain("automaticCollection: 'paypal'");
     expect(diagnostic).toContain("invoiceLedger: 'quickbooks'");
-    expect(diagnostic).not.toContain("@/lib/stripe");
+    expect(diagnostic).not.toContain('@/lib/stripe');
     expect(navigation).toContain("label: 'Billing Schedules'");
     expect(navigation).toContain("label: 'Payment Settings'");
     expect(navigation).not.toContain('Integrations — Stripe');

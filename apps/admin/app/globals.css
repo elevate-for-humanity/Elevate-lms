@@ -358,17 +358,13 @@ body {
   }
 }
 
-/* Tighter section spacing - matches SkilledUS */
-section {
-  width: 100%;
-  margin: 0;
-  padding: 3rem 0; /* Reduced from 4rem */
-  position: relative;
-}
-
-@media (min-width: 768px) {
+/* Admin sections are application panels; their components own spacing. */
+@layer base {
   section {
-    padding: 4rem 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    position: relative;
   }
 }
 
@@ -1366,11 +1362,6 @@ html {
     width: 100%;
   }
 
-  section {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
   .h-screen {
     min-height: 100vh;
     min-height: 100dvh;
@@ -1562,30 +1553,15 @@ body {
   }
 }
 
-/* 4️⃣ Make hero/banner sections use more height */
-.hero,
-.banner,
-.page-header {
-  min-height: 80vh; /* Taller hero area */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-/* 5️⃣ Add spacing between homepage sections */
-section {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
-}
-
 /* 6️⃣ Adjust CTA buttons to scale with screen size */
-button,
-.btn,
-a.button {
-  font-size: 1rem;
-  padding: 0.8em 1.6em;
-  border-radius: 6px;
+@layer base {
+  button,
+  .btn,
+  a.button {
+    font-size: 1rem;
+    padding: 0.8em 1.6em;
+    border-radius: 6px;
+  }
 }
 
 /* 7️⃣ Fix overly small footer text */
@@ -1606,10 +1582,6 @@ footer {
   }
   body {
     font-size: 15px;
-  }
-  main section {
-    padding-top: 2.5rem;
-    padding-bottom: 2.5rem;
   }
 }
 
@@ -1645,48 +1617,51 @@ footer {
    Scoped to content areas - header/nav use component styles
    ============================================================================ */
 
-/* Headings in content areas */
-main h1,
-main h2,
-main h3,
-main h4,
-main h5,
-main h6,
-section h1,
-section h2,
-section h3,
-section h4,
-section h5,
-section h6,
-article h1,
-article h2,
-article h3,
-article h4,
-article h5,
-article h6 {
-  color: #0f172a; /* Near-black for maximum readability */
-}
+/* Component utilities own application colors, including the dark Studio. */
+@layer base {
+  /* Headings in content areas */
+  main h1,
+  main h2,
+  main h3,
+  main h4,
+  main h5,
+  main h6,
+  section h1,
+  section h2,
+  section h3,
+  section h4,
+  section h5,
+  section h6,
+  article h1,
+  article h2,
+  article h3,
+  article h4,
+  article h5,
+  article h6 {
+    color: #0f172a; /* Near-black for maximum readability */
+  }
 
-/* Paragraph text in content areas */
-main p,
-section p,
-article p {
-  color: #334155; /* Slate-700 equivalent, WCAG AA compliant */
-}
+  /* Paragraph text in content areas */
+  main p,
+  section p,
+  article p {
+    color: #334155; /* Slate-700 equivalent, WCAG AA compliant */
+  }
 
-/* Links with better contrast and hover states - scoped to content areas */
-main a,
-section a,
-article a {
-  color: #0369a1; /* Sky-700, accessible blue */
-  text-decoration: none;
-}
+  /* Links with better contrast and hover states - scoped to content areas */
+  main a,
+  section a,
+  article a {
+    color: #0369a1; /* Sky-700, accessible blue */
+    text-decoration: none;
+  }
 
-main a:hover,
-section a:hover,
-article a:hover {
-  color: #0c4a6e; /* Sky-900, darker on hover */
-  text-decoration: underline;
+  main a:hover,
+  section a:hover,
+  article a:hover {
+    color: #0c4a6e; /* Sky-900, darker on hover */
+    text-decoration: underline;
+  }
 }
 
 /* Button text contrast */

@@ -89,13 +89,23 @@ export default function StudioCommandWorkspace({
 }) {
   const [conversationKey, setConversationKey] = useState(0);
   const [surface, setSurface] = useState<StudioSurface>(
-    initialWorkspace ? 'capability' : 'commands',
+    initialWorkspace === 'browser'
+      ? 'browser'
+      : initialWorkspace === 'courses'
+        ? 'course'
+        : initialWorkspace
+          ? 'capability'
+          : 'commands',
   );
   const [previewUrl, setPreviewUrl] = useState('');
   const [browserTarget, setBrowserTarget] = useState('');
   const [browserCommand, setBrowserCommand] = useState('');
   const [activeTask, setActiveTask] = useState<OrchestratedPlanCheckpoint | null>(null);
-  const [activeCapability, setActiveCapability] = useState<string | null>(initialWorkspace ?? null);
+  const [activeCapability, setActiveCapability] = useState<string | null>(
+    initialWorkspace === 'browser' || initialWorkspace === 'courses'
+      ? null
+      : (initialWorkspace ?? null),
+  );
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const viewportStyle = useStudioViewport();
@@ -395,9 +405,7 @@ export default function StudioCommandWorkspace({
 
           <section
             className={
-              surface === 'commands'
-                ? 'hidden'
-                : 'flex h-full min-h-0 min-w-0 flex-col bg-white'
+              surface === 'commands' ? 'hidden' : 'flex h-full min-h-0 min-w-0 flex-col bg-white'
             }
             aria-label="Active Studio tool"
           >
@@ -476,20 +484,6 @@ export default function StudioCommandWorkspace({
                 }
               >
                 <TasksWorkspace embedded conversationId={activeConversationId} />
-              </div>
-              <div
-                className={
-                  surface === 'capability' && activeCapability === 'browser' ? 'h-full' : 'hidden'
-                }
-              >
-                <CloudBrowserWorkspace
-                  unifiedTask={activeTask}
-                  conversationId={activeConversationId}
-                  autoStart={surface === 'capability' && activeCapability === 'browser'}
-                  initialTarget={browserTarget}
-                  initialTask={browserCommand}
-                  autoRunTask={surface === 'capability' && activeCapability === 'browser'}
-                />
               </div>
               <div
                 className={

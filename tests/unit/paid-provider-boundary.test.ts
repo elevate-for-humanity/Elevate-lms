@@ -31,11 +31,13 @@ describe('paid provider boundary', () => {
       'utf8',
     );
     const media = readFileSync('lib/video/process-video-job.ts', 'utf8');
-    for (const source of [generation, canonicalGeneration, blueprintGeneration, media]) {
+    for (const source of [generation, canonicalGeneration, blueprintGeneration]) {
       expect(source).toContain('reservePaidInference');
       expect(source).toContain('executePaidInference');
     }
 
+    expect(media).toContain('Course Builder narration is self-hosted Kokoro.');
+    expect(media).toContain('applyLockedCourseBuilderMediaPolicy(job)');
     const studioBrowser = readFileSync(
       'apps/admin/app/api/admin/dev-studio/browser/agent/route.ts',
       'utf8',

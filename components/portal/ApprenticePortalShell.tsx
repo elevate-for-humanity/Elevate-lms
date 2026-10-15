@@ -8,9 +8,7 @@ import {
   FileText,
   Award,
   TrendingUp,
-  AlertTriangle,
   XCircle,
-  CreditCard,
   GraduationCap,
   Wrench,
   ChefHat,
@@ -190,7 +188,6 @@ export function ApprenticePortalShell({
   enrollment,
   hours,
   docs,
-  billing = null,
   transferHoursClaimed = 0,
   transferHoursVerified = null,
   hoursRemainingDisplay,
@@ -205,7 +202,11 @@ export function ApprenticePortalShell({
   const ojlPercent = requiredOjl > 0 ? Math.min((hours.ojl / requiredOjl) * 100, 100) : 0;
   const rtiPercent = requiredRti > 0 ? Math.min((hours.rti / requiredRti) * 100, 100) : 0;
   const totalHours = hours.ojl + hours.rti;
-  const totalRequired = competencyBased ? requiredRti : hybrid ? requiredOjl : requiredOjl + requiredRti;
+  const totalRequired = competencyBased
+    ? requiredRti
+    : hybrid
+      ? requiredOjl
+      : requiredOjl + requiredRti;
   const overallPercent = competencyBased
     ? rtiPercent
     : totalRequired > 0
@@ -221,29 +222,6 @@ export function ApprenticePortalShell({
   const docsApproved =
     docs.length > 0 &&
     docs.every((d) => d.status === 'approved' || d.verification_status === 'verified');
-  const hasPaidEnrollment = Boolean(
-    billing?.setupFeePaid || billing?.fullyPaid || billing?.paymentStatus === 'active',
-  );
-  const subStatus = billing?.paymentStatus ?? null;
-  const weeklyPaymentLabel =
-    billing?.weeklyPaymentCents != null && billing.weeklyPaymentCents > 0
-      ? (billing.weeklyPaymentCents / 100).toFixed(2)
-      : '151.03';
-  const needsPaymentMethod =
-    !!enrollment &&
-    billing !== null &&
-    !billing?.fullyPaid &&
-    (subStatus === 'pending_payment_method' ||
-      subStatus === 'past_due' ||
-      subStatus === 'incomplete' ||
-      subStatus === 'incomplete_expired' ||
-      (!billing?.setupFeePaid && billing?.paymentStatus !== 'active'));
-  const showPaymentSetupAlert =
-    !!enrollment &&
-    billing !== null &&
-    !billing?.fullyPaid &&
-    !billing?.setupFeePaid &&
-    billing?.paymentStatus !== 'active';
   const transferCredit =
     transferHoursVerified != null && transferHoursVerified > 0
       ? transferHoursVerified
@@ -268,11 +246,6 @@ export function ApprenticePortalShell({
     { label: 'Photo ID uploaded', done: hasPhotoId, href: documentsHref },
     { label: 'Proof of residency uploaded', done: hasResidency, href: documentsHref },
     { label: 'Documents approved', done: docsApproved, href: documentsHref },
-    {
-      label: 'Payment method on file',
-      done: hasPaidEnrollment && !needsPaymentMethod && !showPaymentSetupAlert,
-      href: '/apprentice/billing',
-    },
   ];
   const onboardingComplete = onboardingItems.every((i) => i.done);
   const completedCount = onboardingItems.filter((i) => i.done).length;
@@ -287,7 +260,6 @@ export function ApprenticePortalShell({
     { id: 'timeclock-policy', label: 'Clock Rules', href: '/apprentice/policies/timeclock' },
     { id: 'competencies', label: 'Competencies', href: '/apprentice/competencies' },
     { id: 'documents', label: 'Documents', href: documentsHref },
-    { id: 'billing', label: 'Billing', href: '/apprentice/billing' },
     { id: 'payment-policy', label: 'Payment Rules', href: '/apprentice/policies/payments' },
     { id: 'handbook', label: 'Handbook', href: '/apprentice/handbook' },
     ...(isBarberApprentice
@@ -325,7 +297,12 @@ export function ApprenticePortalShell({
             </div>
             <p className="text-white/80 text-sm mt-2">
               Welcome back, <strong>{firstName}</strong>
-              {!competencyBased ? <> · Week {weeksComplete + 1} of {weeksTotal}</> : null}
+              {!competencyBased ? (
+                <>
+                  {' '}
+                  · Week {weeksComplete + 1} of {weeksTotal}
+                </>
+              ) : null}
               {shopName && (
                 <span className="ml-2 text-white/60">
                   · {config.shopLabel}:{' '}
@@ -362,131 +339,6 @@ export function ApprenticePortalShell({
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
         <ApprenticeProgramGuide />
-        {/* Payment alert — no subscription at all */}
-        {showPaymentSetupAlert && (
-          <div className="rounded-xl border border-red-200 bg-red-50 overflow-hidden">
-            <div className="p-4 flex items-start gap-3 border-b border-red-200">
-              <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
-              <div className="flex-1">
-                <p className="font-semibold text-red-800 text-sm">
-                  Action required — payment method needed
-                </p>
-                <p className="text-red-700 text-xs mt-0.5">
-                  A payment method and authorization are required for an active self-pay plan.
-                  Future training access may be paused under your enrollment agreement if billing is
-                  not completed; previously approved hours remain on your record.
-                </p>
-              </div>
-              <Link
-                href="/apprentice/billing"
-                className={`${config.accentBg} text-white text-xs font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition shrink-0`}
-              >
-                Set Up Payment
-              </Link>
-            </div>
-            <ol className="p-4 space-y-2.5">
-              {[
-                {
-                  n: 1,
-                  text: 'Click "Set Up Payment" above to review your PayPal authorization and current QuickBooks invoice options.',
-                },
-                { n: 2, text: 'Complete the PayPal authorization steps shown on your billing page, or use the Pay Now link on an open QuickBooks invoice.' },
-                {
-                  n: 3,
-                  text: 'Confirm the authorization only after reviewing the amount and billing schedule.',
-                },
-                {
-                  n: 4,
-                  text: `Return here after setup. Your billing page will show the next scheduled payment of ${weeklyPaymentLabel} when applicable.`,
-                },
-              ].map(({ n, text }) => (
-                <li key={n} className="flex items-start gap-3 text-xs text-red-800">
-                  <span className="w-5 h-5 rounded-full bg-red-200 text-red-700 font-bold flex items-center justify-center shrink-0 text-[11px]">
-                    {n}
-                  </span>
-                  <span>{text}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-        )}
-
-        {/* Payment alert — subscription exists but payment action needed */}
-        {needsPaymentMethod && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 overflow-hidden">
-            <div className="p-4 flex items-start gap-3 border-b border-amber-200">
-              <CreditCard className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
-              <div className="flex-1">
-                <p className="font-semibold text-amber-800 text-sm">
-                  {subStatus === 'past_due'
-                    ? 'Action required — payment past due'
-                    : 'Action required — add a card to activate your plan'}
-                </p>
-                <p className="text-amber-700 text-xs mt-0.5">
-                  {subStatus === 'past_due'
-                    ? 'Your weekly tuition payment failed — this usually happens when a card expires or has insufficient funds. Update your card to keep future training access active. Previously approved hours remain on your record.'
-                    : 'A payment method and authorization are required for an active self-pay plan. Future training access may be paused under your enrollment agreement if billing is not completed; previously approved hours remain on your record.'}
-                </p>
-              </div>
-              <Link
-                href="/apprentice/billing"
-                className={`${config.accentBg} text-white text-xs font-semibold px-4 py-2 rounded-lg hover:opacity-90 transition shrink-0`}
-              >
-                {subStatus === 'past_due' ? 'Update Card' : 'Add Card'}
-              </Link>
-            </div>
-            <ol className="p-4 space-y-2.5">
-              {(subStatus === 'past_due'
-                ? [
-                    {
-                      n: 1,
-                      text: 'Click the billing action above to review your PayPal authorization and current QuickBooks invoice options.',
-                    },
-                    { n: 2, text: 'Review the PayPal authorization status and complete any required provider step.' },
-                    { n: 3, text: 'If an invoice is open, use its QuickBooks Pay Now link or the approved PayPal billing flow.' },
-                    {
-                      n: 4,
-                      text: 'The billing page will show whether PayPal will retry automatically or whether the invoice requires action.',
-                    },
-                    {
-                      n: 5,
-                      text: 'Once the payment clears, your dashboard will update and this alert will disappear.',
-                    },
-                  ]
-                : [
-                    {
-                      n: 1,
-                      text: 'Click the billing action above to complete PayPal authorization or review your QuickBooks invoice.',
-                    },
-                    {
-                      n: 2,
-                      text: 'Follow the PayPal authorization steps shown on the billing page.',
-                    },
-                    {
-                      n: 3,
-                      text: 'Confirm the authorization only after reviewing the amount and billing schedule.',
-                    },
-                    {
-                      n: 4,
-                      text: 'Your billing page will show the next scheduled payment date and amount when automatic billing is active.',
-                    },
-                    {
-                      n: 5,
-                      text: 'Return here — this alert will disappear once your card is on file.',
-                    },
-                  ]
-              ).map(({ n, text }) => (
-                <li key={n} className="flex items-start gap-3 text-xs text-amber-800">
-                  <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-700 font-bold flex items-center justify-center shrink-0 text-[11px]">
-                    {n}
-                  </span>
-                  <span>{text}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-        )}
-
         {showTransferCredit && (
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
             <p className="text-sm font-semibold text-amber-900">Transfer hours on file</p>
@@ -520,31 +372,6 @@ export function ApprenticePortalShell({
           </div>
         )}
 
-        {billing &&
-          !billing.fullyPaid &&
-          billing.remainingBalance != null &&
-          billing.remainingBalance > 0 && (
-            <div className="rounded-xl border border-slate-200 bg-white p-4 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold text-slate-900">Tuition balance</p>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {billing.bnplProvider
-                    ? `Payment plan via ${billing.bnplProvider}`
-                    : 'Weekly payment plan'}
-                  {billing.weeklyPaymentCents ? ` · $${weeklyPaymentLabel}/week` : ''}
-                </p>
-              </div>
-              <p className="text-lg font-bold text-slate-900">
-                $
-                {Number(billing.remainingBalance).toLocaleString('en-US', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-                <span className="text-sm font-normal text-slate-500"> remaining</span>
-              </p>
-            </div>
-          )}
-
         {isBarberApprentice && <BarberStudentAppDownload variant="card" />}
 
         {/* Stats */}
@@ -553,7 +380,11 @@ export function ApprenticePortalShell({
             {
               icon: Clock,
               label: competencyBased ? 'RTI Hours' : hybrid ? 'Hybrid Term Hours' : 'Total Hours',
-              value: competencyBased ? hours.rti.toLocaleString() : hybrid ? hours.ojl.toLocaleString() : totalHours.toLocaleString(),
+              value: competencyBased
+                ? hours.rti.toLocaleString()
+                : hybrid
+                  ? hours.ojl.toLocaleString()
+                  : totalHours.toLocaleString(),
               sub: competencyBased
                 ? `of ${requiredRti.toLocaleString()} RTI · ${config.competencyCount ?? 0} competencies required`
                 : hybrid
@@ -576,7 +407,11 @@ export function ApprenticePortalShell({
               icon: TrendingUp,
               label: 'Progress',
               value: `${Math.round(overallPercent)}%`,
-              sub: competencyBased ? 'RTI progress only — competencies tracked separately' : hybrid ? 'toward minimum hybrid term' : 'toward completion',
+              sub: competencyBased
+                ? 'RTI progress only — competencies tracked separately'
+                : hybrid
+                  ? 'toward minimum hybrid term'
+                  : 'toward completion',
             },
           ].map(({ icon: Icon, label, value, sub }) => (
             <div key={label} className="bg-white rounded-xl border border-slate-200 p-4">
@@ -592,12 +427,18 @@ export function ApprenticePortalShell({
 
         {/* Progress bars */}
         <div className="bg-white rounded-xl border border-slate-200 p-5">
-          <h2 className="text-sm font-semibold text-slate-900 mb-4">{competencyBased ? 'RTI & Work Evidence' : 'Hour Progress'}</h2>
+          <h2 className="text-sm font-semibold text-slate-900 mb-4">
+            {competencyBased ? 'RTI & Work Evidence' : 'Hour Progress'}
+          </h2>
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-sm font-medium text-slate-700">
-                  {competencyBased ? 'Supervised work evidence' : hybrid ? 'Hybrid term work hours' : 'On-the-Job Learning (OJL)'}
+                  {competencyBased
+                    ? 'Supervised work evidence'
+                    : hybrid
+                      ? 'Hybrid term work hours'
+                      : 'On-the-Job Learning (OJL)'}
                 </span>
                 <span className="text-sm font-bold text-slate-900">
                   {competencyBased
@@ -621,7 +462,9 @@ export function ApprenticePortalShell({
                 </>
               ) : (
                 <p className="text-xs text-slate-500 mt-1">
-                  Work hours document supervised training. Completion is based on {config.competencyCount ?? 0} verified competencies plus {requiredRti} RTI hours. The {config.probationHours ?? 500}-hour figure is probation, not graduation.
+                  Work hours document supervised training. Completion is based on{' '}
+                  {config.competencyCount ?? 0} verified competencies plus {requiredRti} RTI hours.
+                  The {config.probationHours ?? 500}-hour figure is probation, not graduation.
                 </p>
               )}
             </div>
@@ -735,16 +578,6 @@ export function ApprenticePortalShell({
                 <div>
                   <p className="font-semibold text-sm text-slate-900">State Board Prep</p>
                   <p className="text-xs text-slate-500">Exam preparation</p>
-                </div>
-              </Link>
-              <Link
-                href="/apprentice/billing"
-                className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 hover:bg-slate-200 transition"
-              >
-                <CreditCard className={`w-5 h-5 ${config.accentText}`} />
-                <div>
-                  <p className="font-semibold text-sm text-slate-900">Billing</p>
-                  <p className="text-xs text-slate-500">Payments & invoices</p>
                 </div>
               </Link>
               {isBarberApprentice && (

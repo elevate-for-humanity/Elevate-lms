@@ -10,6 +10,10 @@ import { safeInternalError } from '@/lib/api/safe-error';
 import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
 import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/instructional/google-lesson-author';
 import { lessonPreview } from '@/lib/ultimate-course-builder/core/lesson-preview';
+import {
+  renderMediaUrl,
+  renderPlaybackUrl,
+} from '@/lib/ultimate-course-builder/media/playback-source.mjs';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -45,26 +49,81 @@ export async function GET(req: NextRequest) {
     const checkpoints = req.nextUrl.searchParams.get('view') === 'checkpoints';
     // Keep each selection literal so the Supabase parser infers its actual shape.
     const result = checkpoints
-      ? await db.from('ultimate_course_builds')
-          .select('id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,artifacts,ultimate_lesson_steps(step,state,findings,completed_at))')
-          .eq('id', buildId).single()
-      : await db.from('ultimate_course_builds')
+      ? await db
+          .from('ultimate_course_builds')
+          .select(
+            'id,course_id,status,profile,current_step,updated_at,ultimate_lesson_builds(id,lesson_key,competency_id,status,artifacts,ultimate_lesson_steps(step,state,findings,completed_at))',
+          )
+          .eq('id', buildId)
+          .single()
+      : await db
+          .from('ultimate_course_builds')
           .select('*,ultimate_lesson_builds(*,ultimate_lesson_steps(*))')
-          .eq('id', buildId).single();
+          .eq('id', buildId)
+          .single();
     const { data, error } = result;
     if (!error && data && req.nextUrl.searchParams.get('view') === 'checkpoints') {
-      const lessons = (data.ultimate_lesson_builds ?? []).map((lesson: any) => {
-        const { artifacts, ...saved } = lesson;
-        return { ...saved, preview: lessonPreview(artifacts) };
+      const lessons = await Promise.all(
+        (data.ultimate_lesson_builds ?? []).map(async (lesson: any) => {
+          const { artifacts, ...saved } = lesson;
+          const preview = {
+            ...lessonPreview(artifacts),
+            historicalVersion: null as number | null,
+            previousRender: false,
+          };
+          // Repairs invalidate dependent checkpoints, not the saved film. Recover its
+          // immutable version on initial load as well as on explicit diagnostics.
+          if (!preview.videoUrl) {
+            const artifact = await db
+              .from('ultimate_artifacts')
+              .select('id')
+              .eq('build_id', buildId)
+              .eq('lesson_build_id', lesson.id)
+              .eq('stage', 'lesson_film_render')
+              .eq('artifact_type', 'stage_output')
+              .maybeSingle();
+            if (artifact.error) throw artifact.error;
+            if (artifact.data?.id) {
+              const versions = await db
+                .from('ultimate_artifact_versions')
+                .select('version,content')
+                .eq('artifact_id', artifact.data.id)
+                .order('version', { ascending: false })
+                .limit(20);
+              if (versions.error) throw versions.error;
+              for (const version of versions.data ?? []) {
+                const videoUrl =
+                  renderMediaUrl(version.content?.render) ??
+                  renderPlaybackUrl(version.content?.render);
+                if (videoUrl) {
+                  Object.assign(preview, {
+                    videoUrl,
+                    historicalVersion: version.version,
+                    previousRender: true,
+                    mediaApproved: false,
+                  });
+                  break;
+                }
+              }
+            }
+          }
+          return { ...saved, preview };
+        }),
+      ).catch((error) => {
+        logger.error('Saved lesson preview recovery failed', error);
+        return null;
       });
-      return NextResponse.json({build: {...data, ultimate_lesson_builds: lessons}});
+      if (!lessons) return databaseFailure(new Error('Saved preview recovery failed'));
+      return NextResponse.json({ build: { ...data, ultimate_lesson_builds: lessons } });
     }
     return error ? databaseFailure(error) : NextResponse.json({ build: data });
   }
 
   let query = db
     .from('ultimate_course_builds')
-    .select('id,course_id,status,current_step,created_at,updated_at,ultimate_build_jobs(id,status,last_error,created_at,heartbeat_at,lease_expires_at,payload,monitor)')
+    .select(
+      'id,course_id,status,current_step,created_at,updated_at,ultimate_build_jobs(id,status,last_error,created_at,heartbeat_at,lease_expires_at,payload,monitor)',
+    )
     .order('created_at', { ascending: false })
     .limit(50);
   if (courseId) query = query.eq('course_id', courseId);
@@ -231,14 +290,36 @@ export async function POST(req: NextRequest) {
       state: String(body.state || ''),
     });
     const authoring = body.instructionalAuthoring;
-    if (authoring && (authoring.provider !== 'google' || !/^gemini-[a-z0-9.-]+$/.test(authoring.model || '') || (authoring.location && !['us','eu','global','us-central1'].includes(authoring.location))))
-      return NextResponse.json({error:'Google authoring requires an explicitly selected Gemini model'}, {status:400});
-    const profile = { ...generatedProfile, mediaAcquisitionOwnerId: auth.id,
-      ...(authoring ? {instructionalAuthoring:{provider:'google' as const, model:authoring.model, ...(authoring.location ? {location:authoring.location} : {}), version:GOOGLE_LESSON_AUTHOR_VERSION}} : {}),
+    if (
+      authoring &&
+      (authoring.provider !== 'google' ||
+        !/^gemini-[a-z0-9.-]+$/.test(authoring.model || '') ||
+        (authoring.location && !['us', 'eu', 'global', 'us-central1'].includes(authoring.location)))
+    )
+      return NextResponse.json(
+        { error: 'Google authoring requires an explicitly selected Gemini model' },
+        { status: 400 },
+      );
+    const profile = {
+      ...generatedProfile,
+      mediaAcquisitionOwnerId: auth.id,
+      ...(authoring
+        ? {
+            instructionalAuthoring: {
+              provider: 'google' as const,
+              model: authoring.model,
+              ...(authoring.location ? { location: authoring.location } : {}),
+              version: GOOGLE_LESSON_AUTHOR_VERSION,
+            },
+          }
+        : {}),
     };
 
     if (body.acceptanceBuild === true && !authoring)
-      return NextResponse.json({error:'A separate teaching acceptance build requires an explicit Google model'}, {status:400});
+      return NextResponse.json(
+        { error: 'A separate teaching acceptance build requires an explicit Google model' },
+        { status: 400 },
+      );
     const activeQuery = db
       .from('ultimate_course_builds')
       .select('id,course_id,status,current_step,profile,created_at,updated_at')
@@ -247,11 +328,22 @@ export async function POST(req: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(1);
     if (body.acceptanceBuild === true)
-      activeQuery.contains('profile', {instructionalAuthoring: profile.instructionalAuthoring});
-    const {data:activeBuild,error:activeError}=await activeQuery.maybeSingle();
+      activeQuery.contains('profile', { instructionalAuthoring: profile.instructionalAuthoring });
+    const { data: activeBuild, error: activeError } = await activeQuery.maybeSingle();
     if (activeError) throw activeError;
-    if (activeBuild && authoring && JSON.stringify((activeBuild.profile as any)?.instructionalAuthoring) !== JSON.stringify(profile.instructionalAuthoring))
-      return NextResponse.json({error:'The active build has different locked authoring inputs. Preserve it and use a separate acceptance build.'}, {status:409});
+    if (
+      activeBuild &&
+      authoring &&
+      JSON.stringify((activeBuild.profile as any)?.instructionalAuthoring) !==
+        JSON.stringify(profile.instructionalAuthoring)
+    )
+      return NextResponse.json(
+        {
+          error:
+            'The active build has different locked authoring inputs. Preserve it and use a separate acceptance build.',
+        },
+        { status: 409 },
+      );
 
     let build = activeBuild;
     if (!build) {
@@ -275,7 +367,8 @@ export async function POST(req: NextRequest) {
     const job = await new UltimateJobQueue(db as any).enqueue(build.id, {
       requestedBy: auth.id,
     });
-    if (!job) return NextResponse.json({ error: 'No runnable build job was saved' }, { status: 409 });
+    if (!job)
+      return NextResponse.json({ error: 'No runnable build job was saved' }, { status: 409 });
     const dispatch = await requestCourseWorker();
     return NextResponse.json(
       {

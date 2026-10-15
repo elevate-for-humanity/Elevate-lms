@@ -1,0 +1,65 @@
+# Production completion audit — 2026-10-15
+
+Production authority: Google Cloud, main only. Owner requires all work and functionality checks complete before merging or deploying main. This report does not authorize a release while any acceptance item remains open.
+
+## Live content completed
+
+- Published **Welcome to Cosmetology Apprenticeship**, lesson `e1e53bfd-2504-46b0-a814-a31c74a0090a`, in course `a6b0b712-1cf0-475a-ba79-ee2023dea8ec`.
+- Preserved a prepublication version, immutable render history, and explicit owner approval evidence. The approval names render version 25 and retains the failed automated OCR finding; it does not claim automated acceptance passed.
+- Verified the saved MP4: H.264, 1920×1080, AAC, 351.318 seconds, SHA-256 `6921ebb2f049e0183fa2f5cfebaa1a9a6e2a8242a672daebbdcb251ca0a96fc2`.
+- Restored the actual saved instruction, objectives, assessment, and 13 timed transcript segments to the canonical lesson.
+- Verified playback, progress of the video clock, caption control, objectives, and transcript in the live signed administrator LMS preview.
+- Readback confirms `is_published=true`, `approved=true`, `generation_status=generated`, `video_status=complete`, and owner-approved quality evidence. The full course remains draft: one of 40 planned lessons has a saved film.
+
+## Implemented source repairs — deployment acceptance pending
+
+- Premium compositor honors the title size selected by readability repair. Producer identities invalidate obsolete render/checkpoint caches rather than falsely accepting unchanged repairs.
+- Checkpoint inventory recovers the last immutable saved render automatically while repairs invalidate downstream artifacts.
+- Admin panel spacing and typography no longer override component utilities; dashboard header is smaller; narrow Course Builder starts stacked and no longer prints literal newline escapes.
+- Marketing mobile defaults move into the base layer so component card, grid, heading, and hero utilities control their sizes.
+- LMS defines its missing font token and prevents native VTT captions plus whole-transcript overlays from rendering simultaneously.
+- Removed payment setup, collection, balance panels and billing navigation from the learner dashboard and shared apprentice dashboards. Seven apprentice configurations are tested with past-due billing data. Administrative billing, signed policies, enrollment records, and provider records remain separate.
+- Application retries return the existing active application; post-save account provisioning exceptions no longer turn a committed application into a submission failure. Student request timeout allows the server's documented request budget.
+- Paris is named consistently in the Studio composer and voice controls. Diagnostic summaries include overall status, counts, and timestamp.
+- Studio uses one browser workspace. Input, status, downloads, and stopping a session use the authenticated Admin proxy with bounded waits. Session credentials remain outside query strings.
+- Google deployment readiness probes the workflow rather than accepting token presence. Store is available through the Google dispatch contract and Studio deployment controls.
+- LMS and Store superseded main runs hand off to current main and skip stale builds. Exact requested SHA, main-only execution, candidate health checks, and activation checks remain required.
+- Communications action buttons stack on narrow screens.
+
+## Verified live
+
+- Admin dashboard, Course Builder, signed LMS lesson preview, Paris read-only diagnostics, Studio browser, and phone configuration page were opened through the live browser.
+- Paris diagnostic run `41a89261-3740-49de-a9ec-7625709fa00d` completed three read-only registered tools. Durable task rows confirm actual provider/platform/workflow results. Configuration-only health claims remain distinct from execution readiness.
+- Studio isolated Chromium passed all 14 built-in acceptance checks: durable checkpoint, session identity, keyboard/pointer, double-click, embedded frames, mobile viewport/screenshot, popups/tabs, file picker/upload, dialogs, ordinary/blob downloads, scroll, history, and viewport geometry.
+- Phone evidence: two completed calls and 11 completed durable events in the inspected 24-hour window; the event-claim RPC exists. Dashboard still says setup required and no connected PWA phone was demonstrated. This is not a complete phone acceptance test.
+
+## Validation evidence
+
+- Final Marketing/Admin/LMS TypeScript checks and repository lint passed. Focused regressions passed 56 tests across 12 files; coordinator, capacity, activation and release-handoff tests passed 54 checks.
+- Initial full unit inventory: 590 files, 3,836 passed, 107 failed, five skipped. Re-ran all 48 failing files against untouched base `965b693884269906cf993578c1d864042bcbe4a8`: 106 failures reproduced. Final full inventory: **3,966 passed, zero failed, five skipped**. The stale contracts referenced retired Stripe, Course Factory, Lizzy routing and prior homepage artwork. They now assert the current QuickBooks authority, Paris coordinator, Ultimate repair fences, licensed acquisition evidence, bounded static hero and retired mutation endpoints. The recovery fixture now supplies changed visual assignments; identical repairs remain blocked. The final inventory includes authorization-header redaction and the Admin-only Google GitHub binding.
+- Additional defects found during reconciliation: alternate legacy course-upgrade workflow still had an automatic push trigger; public sitemap included a redirect alias; licensed URL refresh mutated the saved checkpoint; Studio diagnostic errors could expose credential values; media-recovery issue trigger accepted prefix/suffix matches instead of exact approved commands. All are corrected without removing publication, licensing, authorization or lease fences.
+- Live Admin images had `naturalWidth=0`; public logo requests returned login HTML and optimizer requests returned HTTP 400. Public image extensions under `/images/` now bypass session handling, and Admin serves packaged images directly, matching the other standalone apps.
+- Focused regressions cover title sizing, durable resume, scene repair, learner billing visibility, caption control, application retry/provisioning, Google dispatch/handoff, Studio browser transport/session count, and composer readiness. All 27 actual Telnyx webhook handler tests pass after updating fixtures for current event claims, ownership fences, canonical notification receipts and the approved voice policy; outbound services are mocked. Application retry tests include rejection of mismatched contact details without disclosing or duplicating the original record.
+- Architecture checks passed for Studio, PWA, and enrollment authority.
+- Image audit scanned 6,745 files: no missing runtime references or packaging failures. Marketing audit checked 429 references: no missing/corrupt images, 65 reused references and 30 duplicate binaries. Hero gate reports nine shared-poster groups; alias reuse versus unintended duplication still requires review.
+- Marketing, Admin and standalone LMS production builds completed. The final Admin build was repeated after the GitHub/PBX runtime settings repair; final repository TypeScript and lint checks also passed. Initial combined LMS build was killed with exit 137 under concurrent memory pressure; standalone LMS build subsequently completed with a bounded heap. No failed build is accepted as a successful release.
+
+## Outstanding acceptance / to-do
+
+| Item | Required completion evidence |
+| --- | --- |
+| Finish the full course | Existing scheduler independently launched run `38716203378` at 09:52 UTC. Job heartbeat advanced at 09:54, generation 3, then failed `ULTIMATE_DEPENDENCIES_UNRESOLVED` with `REPAIR_PRODUCER_UNCHANGED` at scene construction. This confirms the current production worker still needs the renderer/producer fix. Preserve the published lesson and all saved checkpoints; verify all remaining lessons and release checks after the tested code is released. |
+| Paris autonomous recovery | Supervisor advanced to 09:54 UTC and correctly reported attention required for the unresolved lesson dependency. Scheduled recovery is functioning but was delayed for hours; sustained cadence and recovery after the new producer deploy remain unverified. |
+| Google credential | Admin worker launch returns GitHub 401. Found and repaired the missing `GITHUB_TOKEN` entry in the Admin-only Google runtime policy: Environment Manager previously persisted it without syncing the bound Google secret. Twelve configuration tests and seven preparation checks pass, with learner/public binding rejected. The corrected policy and scoped secret preparation still need release, and a valid owner-provided token must be saved and a real dispatch verified. No secret values were revealed or copied. |
+| Restart approval review | Automatic approval review rejected rerunning dispatch job `116257632859` in run `38684969791` because production effects/authorization were not sufficiently established. Do not retry indirectly through another UI, SQL dispatch, or alternate transport. |
+| Admin / public sizing | Verify final source in desktop and phone previews; public-site observation encountered browser credential-protection restrictions. Existing production UI has not received the local fixes. |
+| PWA | Verify installation, reload/offline behavior and a real authorized learner session, then repeat deployed role-boundary checks. |
+| Enrollment | Verify full browser submission, durable saved application, retry recovery, onboarding and authorized enrollment activation. Unit checks do not establish a live submission succeeded. |
+| Learner payments | Verify deployed regular learner and apprentice views, including the owner-reported affected account through an authorized preview. That live preview was blocked by browser credential protection. No learner financial records were deleted or changed. |
+| Phone | Fresh read-only job `116379028274` verifies DNS/TLS/SIP transport, Asterisk 20, SRTP/WebRTC/ARI, Paris gateway, provisioning listeners, 22 mailboxes, scoped existing secrets and LiveKit room-list HTTP 200. It fails PWA operator routing and reports zero secure endpoints. Registration, ringing, two-way audio, Paris voice and voicemail delivery are not tested. Its application-setting check reads the historical bundled config rather than all current per-key runtime bindings, so missing Twilio/TURN values there do not establish current container absence. Found a real maintenance gap: PBX configuration and the Twilio business number were missing from the Google runtime allowlist and UI. Added the five PBX keys and number only to Admin/LMS, included LMS synchronization and a dedicated PWA phone settings group. Actual values and device activation remain outstanding. Browser credential protection blocked the phone client after one fresh-document recovery attempt. |
+| LMS / Store / quotas | Verify fresh Google builds, exact candidate revisions and traffic. All four public health endpoints returned HTTP 200, healthy/ready, and a working Supabase connection. Admin served `965b6938`, Marketing `b6faf83c`, LMS/Store `2fd4ea4d`; these do not contain this repair batch. Latest two failed releases were stale-SHA guards. Historical Admin run `38585487266` failed a traffic update with `quota_exceeded`; fresh read-only diagnostics now verify billing enabled, 20 vCPU / 40 GiB effective regional quota, a 32 GiB finite renderer, and an 8 GiB course worker. At 10:36 UTC Admin, LMS, Marketing and Studio had one active instance each; neither job was running. The existing finite quota-request defaults are corrected from 768 vCPU / 1.5 TiB to 32 vCPU / 96 GiB for service envelopes, the two bounded jobs and one rolling revision. All 23 capacity/request tests pass. This is a requested allowance, not an approved grant or a service scaling change. Google Cloud Console returned Site Unavailable, but existing trusted read-only GitHub jobs successfully retrieved current allocation and quota. No quota request, service resize, carrier-routing change or source deployment was performed. |
+| Unit suite | Complete: 3,966 passed, zero failed, five skipped; final additional secret-redaction cases passed. Production functionality and device acceptance remain distinct. |
+| Existing PRs | Twenty open PRs inspected; all report merge conflicts. Reconcile individual current changes, preserve newer main, avoid blind merges. PR #1826's duplicate-section removal is already present in current homepage; #1285 targets an older hero, while #1537 contains relevant Studio transport/session fixes incorporated selectively here. |
+| Final release | Only after the above is complete: review the final diff, merge tested fixes, deploy Google from main, and verify exact live revisions plus full course completion. |
+
+No source changes have been deployed by this audit. The lesson publication is the separate owner-authorized content change described above.

@@ -48,7 +48,7 @@ describe('homepage curation', () => {
     const page = source('apps/marketing/app/page.tsx');
     expect(page.match(/<HomePlatformOverview/g)).toHaveLength(1);
     expect(page).toContain('WORKONE_INDY_BOOKING_URL');
-    expect(page).toContain('eligibility and program requirements apply');
+    expect(page.replace(/\s+/g, ' ')).toContain('eligibility and program requirements apply');
   });
 
   it('keeps mobile overrides scoped away from operational dashboards', () => {

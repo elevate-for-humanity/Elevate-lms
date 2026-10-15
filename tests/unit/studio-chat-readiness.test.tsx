@@ -29,7 +29,7 @@ it('never claims runtime connection before a probe and keeps the composer usable
   render(<UnifiedEllieChat embedded restoreLatest={false} />);
   expect(screen.getByText('AI configuration: checking…')).toBeInTheDocument();
   expect(screen.queryByText(/runtime: connected/)).not.toBeInTheDocument();
-  fireEvent.change(screen.getByRole('textbox', { name: 'Tell Admin AI what you need done...' }), {
+  fireEvent.change(screen.getByRole('textbox', { name: 'Tell Paris what you need done...' }), {
     target: { value: 'Inspect current jobs' },
   });
   expect(screen.getByRole('button', { name: 'Send request' })).toBeEnabled();
@@ -67,7 +67,7 @@ it('surfaces a failed restore and retries the same conversation without creating
   vi.stubGlobal('fetch', fetcher);
   render(<UnifiedEllieChat embedded restoreLatest={false} selectedConversationId="owned" />);
   expect(await screen.findByText('Could not restore this conversation.')).toBeInTheDocument();
-  fireEvent.change(screen.getByRole('textbox', { name: 'Tell Admin AI what you need done...' }), {
+  fireEvent.change(screen.getByRole('textbox', { name: 'Tell Paris what you need done...' }), {
     target: { value: 'Resume' },
   });
   expect(screen.getByRole('button', { name: 'Send request' })).toBeDisabled();

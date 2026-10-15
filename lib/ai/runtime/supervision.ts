@@ -24,6 +24,17 @@ export function classifyParisFailure(error: unknown): FailureDisposition {
   return { category: 'unknown', recovery: 'attention_required', nextAction: 'Inspect the correlated execution logs and diagnose the failure before replaying work.' };
 }
 
+export function safeParisFailureSummary(error: unknown): {
+  category: FailureDisposition['category'];
+  message: string;
+} {
+  const disposition = classifyParisFailure(error);
+  return {
+    category: disposition.category,
+    message: `PARIS execution failed (${disposition.category}). ${disposition.nextAction}`,
+  };
+}
+
 export type ParisObservation = {
   operation: string;
   kind: 'inference' | 'command' | 'workflow';

@@ -209,8 +209,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Illustrative Pharmacy technician instructor supervising medication preparation',
   },
   qma: {
-    card: '/images/refresh-20261014/pharmacy.webp',
-    hero: '/images/refresh-20261014/pharmacy.webp',
+    card: '/images/pages/pharmacy-tech.webp',
+    hero: '/images/pages/pharmacy-tech.webp',
     alt: 'Illustrative Instructor supervising medication-handling skills in a training pharmacy',
   },
   'home-health-aide': {
@@ -319,8 +319,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Tax preparer working with a client on financial documents',
   },
   bookkeeping: {
-    card: '/images/refresh-20261014/business.webp',
-    hero: '/images/refresh-20261014/business.webp',
+    card: '/images/bookkeeping-training-vibrant-2026.webp',
+    hero: '/images/bookkeeping-training-vibrant-2026.webp',
     alt: 'Illustrative Instructor and learners reviewing business records at laptops',
   },
   'finance-bookkeeping-accounting': {

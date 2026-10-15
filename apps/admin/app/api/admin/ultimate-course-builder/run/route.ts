@@ -43,6 +43,16 @@ export async function POST(req: NextRequest) {
       job = recovery.data;
     }
     const dispatch = await requestCourseWorker();
+    // A persisted queue request is not a live execution. Surface a retryable
+    // service error when both launch paths fail instead of a misleading 202.
+    if (!dispatch.dispatched) {
+      return NextResponse.json({
+        ok: false, queued: true, dispatched: false, buildId: build.id, jobId: job.id,
+        error: 'The build is safely queued, but Google worker launch failed. ' +
+          'Check the Admin Google service identity (run.jobs.run) and GitHub dispatch credentials.',
+        dispatchError: dispatch.dispatchError,
+      }, { status: 503 });
+    }
     return NextResponse.json({
       ok: true, queued: true, buildId: build.id, jobId: job.id, ...dispatch,
     }, { status: 202 });

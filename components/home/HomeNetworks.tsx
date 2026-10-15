@@ -16,7 +16,7 @@ export function HomeNetworks() {
             <p className="mt-3 text-base leading-6 text-slate-700">Showcase your work and connect with shops, beauty professionals and apprentices.</p>
             <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1">
               <Link href="/partners/host-shops" className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-brand-red-700">Explore network <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
-              <Link href="/host-shop/apply" className="inline-flex min-h-11 items-center text-sm font-bold text-slate-800">Join free</Link>
+              <Link href="/partners/host-shop/apply" className="inline-flex min-h-11 items-center text-sm font-bold text-slate-800">Join free</Link>
             </div>
           </article>
           <article className="rounded-2xl border border-slate-200 p-5 sm:p-6">

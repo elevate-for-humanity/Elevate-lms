@@ -43,7 +43,7 @@ after(async () => {
   if (directory) await rm(directory, { recursive: true, force: true });
 });
 
-async function titleCoverage(surfaceMode, renderedTitle, expectedTitle = title, titleLayout = FOOTAGE_TITLE_LAYOUT) {
+async function titleCoverage(surfaceMode, renderedTitle, expectedTitle = title, titleLayout = FOOTAGE_TITLE_LAYOUT, sceneOverrides = {}) {
   const inputProps = {
     courseTitle: 'Course', lessonTitle: 'Lesson',
     primaryColor: '#8b5cf6', accentColor: '#f59e0b',
@@ -53,6 +53,7 @@ async function titleCoverage(surfaceMode, renderedTitle, expectedTitle = title, 
       clip_keyword: '', clipUrl: null,
       imageUrl: `data:image/svg+xml;base64,${Buffer.from(texture).toString('base64')}`,
       audioSrc: null, durationFrames: 960, sceneType: 'problem_hook',
+      ...sceneOverrides,
     }],
   };
   const composition = await selectComposition({ serveUrl, id: 'SlideLesson', inputProps,
@@ -121,4 +122,14 @@ test('a long title wraps inside the same card at phone delivery size', { timeout
 
 test('an overflowing title fails rendering rather than hiding authored words', { timeout: 60_000 }, async () => {
   await assert.rejects(titleCoverage('bright', 'Unbreakable'.repeat(50)), /MEDIA_TITLE_LAYOUT_OVERFLOW/);
+});
+
+
+test('repaired strict-blueprint titles remain readable at phone delivery size', { timeout: 60_000 }, async () => {
+  for (const result of await titleCoverage(
+    'bright', title, title, 'strict-blueprint',
+    { strictBlueprint: true, titleFontSize: 128 },
+  )) {
+    assert.ok(result.coverage >= MIN_TITLE_WORD_COVERAGE, JSON.stringify(result));
+  }
 });

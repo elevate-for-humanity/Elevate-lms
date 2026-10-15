@@ -1,4 +1,4 @@
-import {instructionView} from './repair-policy.mjs';
+import {instructionView, applySceneTitleReadabilityRepair} from './repair-policy.mjs';
 import { enforceMediaQuality } from '@/lib/video/media-quality-gate';
 import { instructionalQualityFailures, repeatedTeachingSegments } from '@/lib/video/instructional-quality-gate';
 import { verifyRegisteredProfile } from '../credential/verify-registered-profile';
@@ -185,18 +185,29 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       }
       return { artifacts: { media } };
     },
-    scene_construction: async (ctx) => ({
-      artifacts: {
-        scenes: {
-          shots: ((ctx.artifacts.visual_assignment as any)?.media?.assignments ?? []).map(
-            (a: any) => ({ ...a, loop: false }),
-          ),
-          storyboard: ctx.artifacts.storyboard,
-          media: ctx.artifacts.visual_assignment,
-          loop: false,
+    scene_construction: async (ctx) => {
+      const storyboardArtifact: any = ctx.artifacts.storyboard ?? {};
+      const sourceStoryboard = storyboardArtifact.storyboard ?? storyboardArtifact;
+      const repairedStoryboard = applySceneTitleReadabilityRepair(
+        sourceStoryboard,
+        ctx.repairDirective,
+      );
+      const storyboard = storyboardArtifact.storyboard
+        ? { ...storyboardArtifact, storyboard: repairedStoryboard }
+        : repairedStoryboard;
+      return {
+        artifacts: {
+          scenes: {
+            shots: ((ctx.artifacts.visual_assignment as any)?.media?.assignments ?? []).map(
+              (a: any) => ({ ...a, loop: false }),
+            ),
+            storyboard,
+            media: ctx.artifacts.visual_assignment,
+            loop: false,
+          },
         },
-      },
-    }),
+      };
+    },
     natural_narration: async (ctx) => {
       requireLicensedVisualCoverage(ctx);
       return {

@@ -882,6 +882,9 @@ export async function renderStoryboardVideo(
       scenes.push({
         scene_number: index + 1,
         title: scene.subject,
+        titleFontSize: typeof scene.titleFontSize === 'number' && Number.isFinite(scene.titleFontSize)
+          ? scene.titleFontSize
+          : undefined,
         bullets: bullets.length ? bullets : [scene.action.split(/\s+/).slice(0, 12).join(' ')],
         narration,
         clip_keyword: query,

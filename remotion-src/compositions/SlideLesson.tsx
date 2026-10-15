@@ -66,6 +66,8 @@ export interface SceneData {
   sceneType?: string;
   memoryAnchor?: string;
   strictBlueprint?: boolean;
+  /** Optional scene-specific title scale produced by a verified readability repair. */
+  titleFontSize?: number;
   teachingVisual?: TeachingVisual;
 }
 
@@ -642,7 +644,9 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
           style={{
             opacity: fadeIn(frame, 8, 22),
             transform: `translateY(${slideUp(frame, fps, 8)}px)`,
-            fontSize: scene.physicalDemonstration ? 64 : scene.strictBlueprint ? 80 : instructionalLayout ? 42 : 44,
+            fontSize: typeof scene.titleFontSize === 'number' && Number.isFinite(scene.titleFontSize)
+              ? Math.min(160, Math.max(42, scene.titleFontSize))
+              : scene.physicalDemonstration ? 64 : scene.strictBlueprint ? 80 : instructionalLayout ? 42 : 44,
             fontWeight: 900,
             color: instructionalLayout || bright ? '#0f172a' : '#fff',
             fontFamily: 'sans-serif',

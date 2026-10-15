@@ -147,9 +147,9 @@ function visualCandidates(input: any): VisualCandidate[] {
 
 function rawStoryboard(input: any): RecordLike {
   const raw =
-    input.artifacts?.storyboard?.storyboard ??
-    input.artifacts?.synchronization?.timeline?.scenes?.storyboard?.storyboard ??
     input.artifacts?.scene_construction?.scenes?.storyboard?.storyboard ??
+    input.artifacts?.synchronization?.timeline?.scenes?.storyboard?.storyboard ??
+    input.artifacts?.storyboard?.storyboard ??
     input.storyboard;
   const board = Array.isArray(raw) ? { scenes: raw } : record(raw);
   if (!Array.isArray(board.scenes) || board.scenes.length < 2) {

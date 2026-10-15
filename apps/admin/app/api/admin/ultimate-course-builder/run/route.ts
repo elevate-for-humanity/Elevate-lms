@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
         ok: false, queued: true, dispatched: false, buildId: build.id, jobId: job.id,
         error: 'The build is safely queued, but Google worker launch failed. ' +
           'Check the Admin Google service identity (run.jobs.run) and GitHub dispatch credentials.',
-        dispatchError: dispatch.dispatchError,
+        dispatchError: 'dispatchError' in dispatch ? dispatch.dispatchError : 'COURSE_WORKER_LAUNCH_UNAVAILABLE',
       }, { status: 503 });
     }
     return NextResponse.json({

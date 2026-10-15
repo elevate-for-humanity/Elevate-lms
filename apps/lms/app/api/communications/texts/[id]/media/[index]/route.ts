@@ -1,8 +1,4 @@
-// pre-auth-registry: exempt - smsMediaGet requires a verified communication actor and scopes message reads to its system and owner.
-import { smsMediaGet } from '@/lib/phone/sms-media-api';
+// pre-auth-registry: exempt - shared smsMediaGet checks the communication actor and ownership.
+export { getLearnerSmsMedia as GET } from '@/lib/phone/sms-media-route';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export async function GET(_request: Request, context: { params: Promise<{ id: string; index: string }> }) {
-  const { id, index } = await context.params;
-  return smsMediaGet(id, index);
-}

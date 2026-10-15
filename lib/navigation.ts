@@ -27,7 +27,7 @@ export const NAV_ITEMS: NavItem[] = [
     href: ROUTES.programs,
     subItems: [
       { name: 'All Programs', href: ROUTES.programs, isSectionLink: true },
-      { name: 'Business & Financial', isHeader: true, href: '/programs/business' },
+      { name: 'Bookkeeping & Business', isHeader: true, href: '/programs/bookkeeping' },
       {
         name: 'Business Administration',
         href: '/programs/business-administration',
@@ -39,7 +39,7 @@ export const NAV_ITEMS: NavItem[] = [
         isSectionLink: true,
       },
       {
-        name: 'Accounting & Financial Empowerment',
+        name: 'Bookkeeping & QuickBooks',
         href: '/programs/bookkeeping',
         isSectionLink: true,
       },

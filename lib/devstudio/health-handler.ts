@@ -51,6 +51,10 @@ export async function handleDevStudioHealth(req: NextRequest) {
   const activeProvider = ai.activeProvider;
   const hasElevate = ai.elevate;
   const aiConfigured = ai.anyConfigured;
+  // A configured model is not proof that browser and workflow tools execute.
+  const executionPrerequisitesReady = githubTokenValid && isGoogleRuntimeReady() &&
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL) &&
+    Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY) && aiConfigured;
   let nextVersion = 'unknown';
   try {
     nextVersion = require('next/package.json').version;
@@ -93,7 +97,9 @@ export async function handleDevStudioHealth(req: NextRequest) {
     },
     execution: {
       mode: 'master-studio',
-      ready: true,
+      ready: executionPrerequisitesReady,
+      verifiedEndToEnd: false,
+      status: executionPrerequisitesReady ? 'prerequisites-configured-not-tested' : 'missing-prerequisites',
       repositoryWritesReady: githubTokenValid,
       legacyShellRemoved: true,
     },

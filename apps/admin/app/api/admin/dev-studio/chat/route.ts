@@ -1417,8 +1417,8 @@ async function _POST(req: NextRequest) {
     }
 
     const providerPreference = normalizeProvider(rawProvider);
-    // While the self-hosted GPU is archived, Admin auto mode uses the lowest-cost
-    // connected OpenAI model. This is scoped to authenticated Dev Studio chat only.
+    // Auto mode must not silently select a billable OpenAI API account.
+    // Use an explicitly configured Groq or Gemini provider; otherwise return unavailable.
     const effectiveProvider: ChatProvider = providerPreference === 'auto' ? (isGroqConfigured() ? 'groq' : isGeminiConfigured() ? 'gemini' : 'auto') : providerPreference;
     const lastUserMessage =
       messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';

@@ -137,7 +137,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         // Internal lesson/producer failures must use the existing bounded
         // repair retry rather than being stranded as missing media.
         if (result.findings?.some(isDurableExternalBlocker)) {
-          await queue.waitForDependency(job.id,workerId,`ULTIMATE_DEPENDENCIES_UNRESOLVED:${continuation.unresolved.join(',')}`,generation,continuation.payload);
+          await queue.waitForDependency(job.id,workerId,`ULTIMATE_EXTERNAL_ASSET_REQUIRED:${continuation.unresolved.join(',')}`,generation,continuation.payload);
           return {claimed:true,completed:false,awaitingDependency:true,jobId:job.id,result};
         }
         await queue.fail(job.id,workerId,`ULTIMATE_INTERNAL_REPAIR_REQUIRED:${continuation.unresolved.join(',')}`,generation,true);

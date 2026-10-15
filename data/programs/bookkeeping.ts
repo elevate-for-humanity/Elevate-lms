@@ -28,7 +28,7 @@ export const BOOKKEEPING: ProgramSchema = {
   schedule: '8-week hybrid pathway, 15–20 hours per week',
   eveningSchedule: 'Evening sessions available Tue/Thu 6–9 PM.',
   cohortSize: '10–15 participants per cohort',
-  fundingStatement: 'Self-pay is available. You may also request a workforce-funding eligibility review; funding is not guaranteed and requires program-level verification and written agency authorization.',
+  fundingStatement: 'Self-pay is available. To explore workforce funding, schedule a WorkOne orientation and eligibility assessment. Funding for this specific program is not guaranteed and requires written agency authorization.',
   selfPayCost: '$1,500',
   badge: 'Funding Options',
   badgeColor: 'blue',
@@ -321,7 +321,7 @@ export const BOOKKEEPING: ProgramSchema = {
     {
       question: 'Is this program eligible for WIOA funding?',
       answer:
-        'Self-pay is available. Ask admissions whether workforce funding can be considered for this exact program. Funding is not guaranteed; program eligibility and written agency authorization must be confirmed before funded enrollment.',
+        'Self-pay is available. For workforce funding, schedule a WorkOne orientation and eligibility assessment first. Ask your case manager to verify funding for this exact program; eligibility, covered costs, and written authorization must be confirmed before funded enrollment.',
     },
     {
       question: 'What version of QuickBooks do you teach?',

@@ -1,13 +1,17 @@
 import { smsMediaGet } from '@/lib/phone/sms-media-api';
 
-/** Shared authenticated SMS media route logic for Admin and LMS origins. */
 export type SmsMediaRouteContext = { params: Promise<{ id: string; index: string }> };
 
-export async function getScopedSmsMedia(context: SmsMediaRouteContext) {
+/** Single authenticated media implementation for both origin adapters. */
+async function getScopedSmsMedia(context: SmsMediaRouteContext) {
   const { id, index } = await context.params;
   return smsMediaGet(id, index);
 }
 
-/** Origin-specific aliases preserve distinct Next route module boundaries. */
-export const getAdminSmsMedia = getScopedSmsMedia;
-export const getLearnerSmsMedia = getScopedSmsMedia;
+export async function getAdminSmsMedia(_request: Request, context: SmsMediaRouteContext) {
+  return getScopedSmsMedia(context);
+}
+
+export async function getLearnerSmsMedia(_request: Request, context: SmsMediaRouteContext) {
+  return getScopedSmsMedia(context);
+}

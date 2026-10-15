@@ -329,7 +329,6 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
                 <details
                   key={section.label}
                   className="rounded-lg border border-slate-200 bg-white"
-                  defaultOpen={false}
                 >
                   <summary
                     className={`flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-bold ${isSectionActive(pathname, section) ? 'bg-brand-red-50 text-brand-red-700' : 'text-slate-800'}`}

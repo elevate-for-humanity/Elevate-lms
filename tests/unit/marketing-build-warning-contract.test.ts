@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import marketingConfig from '../../apps/marketing/next.config.mjs';
 
 const read = (file: string) => fs.readFileSync(path.join(process.cwd(), file), 'utf8');
 
@@ -23,8 +24,10 @@ describe('marketing build warning boundary', () => {
   });
 
   it('bounds build concurrency for standalone metadata generation', () => {
-    const config = read('apps/marketing/next.config.mjs');
-    expect(config).toContain('cpus: 1');
-    expect(config).toContain('webpackBuildWorker: true');
+    expect(marketingConfig.experimental).toMatchObject({
+      cpus: 1, webpackBuildWorker: true, webpackMemoryOptimizations: true,
+      parallelServerCompiles: false, parallelServerBuildTraces: false,
+    });
+    expect(marketingConfig.typescript.ignoreBuildErrors).toBe(false);
   });
 });

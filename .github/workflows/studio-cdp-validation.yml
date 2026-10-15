@@ -18,6 +18,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build actual Studio browser image
         run: docker build -f Dockerfile.studio-browser -t studio-cdp-validation .
       - name: Exercise native CDP and all browser contracts in Chromium
@@ -47,7 +49,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Verify Ultimate and browser integration regressions
         run: pnpm exec vitest run tests/unit/ultimate*.test.ts tests/unit/ultimate*.test.tsx tests/unit/studio-browser*.test.ts tests/unit/studio-browser*.test.tsx tests/unit/devstudio-browser-planner.test.ts tests/unit/course-practical-workflow.test.ts tests/unit/course-builder-practical-verification.test.ts tests/unit/course-practical-review-queue.test.tsx tests/unit/staged-practical*.test.ts tests/unit/staged-practical*.test.tsx
       - name: Inspect existing connections without deploying

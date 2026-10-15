@@ -30,7 +30,11 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+        run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Automatic container build-memory policy
+        run: |
+          node scripts/check-build-memory-policy.mjs
+          node --test scripts/build-memory-policy.test.mjs scripts/build-next-app.test.mjs scripts/run-bounded-build.test.mjs scripts/gcp/check-database-recovery.test.mjs
       - name: Ultimate course builder repair regression tests
         run: node --test tests/worker/verified-self-repair.test.mjs tests/worker/repair-router.test.mjs tests/worker/scene-construction-repair.test.mjs
       - name: Traffic scope and unavailable-data regression tests
@@ -100,7 +104,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+        run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Restore incremental TypeScript cache
         uses: actions/cache@v4
         with:
@@ -130,7 +134,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+        run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Restore content-based ESLint cache
         uses: actions/cache@v4
         with:
@@ -156,7 +160,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+        run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Run Vitest suite (advisory baseline)
         continue-on-error: true
         run: pnpm test

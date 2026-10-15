@@ -2,6 +2,9 @@ import { PlatformShell } from '@/components/platform/PlatformShell';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { learnerCanSeeBilling } from '@/lib/billing/learner-payment-plan-visibility';
 
 export default async function LearnerWorkspaceLayout({
   children,
@@ -25,6 +28,14 @@ export default async function LearnerWorkspaceLayout({
     .select('avatar_url')
     .eq('id', user.id)
     .maybeSingle();
+
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const isAdmin = ['admin', 'super_admin', 'staff'].includes(String(profile?.role));
+  const subjectRole = subject.previewing
+    ? (await db.from('profiles').select('role').eq('id', subject.userId).maybeSingle()).data?.role
+    : profile?.role;
+  const showBilling = (!isAdmin || subject.previewing) && await learnerCanSeeBilling(db, subject.userId, subjectRole);
 
   return (
     <PlatformShell
@@ -63,6 +74,15 @@ export default async function LearnerWorkspaceLayout({
             </div>
           </div>
         </div>
+      ) : null}
+      {showLearnerNotices && showBilling ? (
+        <section className="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6" aria-label="Your payment plan">
+          <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 sm:p-5">
+            <h2 className="font-bold text-slate-950">Your payment plan</h2>
+            <p className="mt-1 text-sm text-slate-700">Review your invoices, balance, and approved payment plan.</p>
+            <Link href="/lms/payments" className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-indigo-700 px-5 py-3 font-bold text-white">View billing</Link>
+          </div>
+        </section>
       ) : null}
       {children}
     </PlatformShell>

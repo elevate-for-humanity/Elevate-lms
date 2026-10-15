@@ -3,6 +3,11 @@ on:
   push:
     branches: [main]
     paths:
+      - 'scripts/build-memory-policy.*'
+      - 'scripts/check-build-memory-policy.mjs'
+      - 'scripts/run-bounded-build.*'
+      - 'scripts/build-next-app.*'
+      - 'scripts/container-build-policy.mjs'
       - 'public/**'
       - 'content/**'
       - 'config/**'

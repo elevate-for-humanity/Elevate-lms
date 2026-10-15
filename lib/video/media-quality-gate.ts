@@ -16,6 +16,7 @@ import type { MediaStoryboard } from './media-director';
 import type { InstructionalQualityEvidence } from './instructional-quality-gate';
 import { configuredNarrationProvider } from './edge-tts';
 import { MIN_TITLE_WORD_COVERAGE, readEncodedTitle } from './title-readability.mjs';
+import { PREMIUM_TITLE_LAYOUT } from '../../remotion-src/premium-title-layout.mjs';
 
 export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v8';
 
@@ -584,10 +585,10 @@ export async function enforceMediaQuality(input: {
           { timeout: 30000, maxBuffer: 1000000 },
         );
         const { wordCoverage, ocrMode } = await readEncodedTitle({
-          frame, expectedTitle: scene.subject, titleLayout: scene.titleLayout,
+          frame, expectedTitle: scene.subject, titleLayout: premium ? PREMIUM_TITLE_LAYOUT : scene.titleLayout,
         });
         readability.push({ scene: index + 1, width, wordCoverage, ocrMode });
-        if (wordCoverage < MIN_TITLE_WORD_COVERAGE) throw new Error(`MEDIA_TEXT_UNREADABLE:${index + 1}:${width}`);
+        if (wordCoverage < MIN_TITLE_WORD_COVERAGE) throw new Error(`${premium ? 'MEDIA_TEXT_UNREADABLE_AFTER_REGION' : 'MEDIA_TEXT_UNREADABLE'}:${index + 1}:${width}`);
       }
       // Inspect every authored teaching state in the encoded movie, including
       // phone delivery. A diagram or record listed in metadata is not evidence

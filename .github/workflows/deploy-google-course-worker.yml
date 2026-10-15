@@ -124,6 +124,8 @@ jobs:
         run: node scripts/gcp/verify-sdk.mjs
       - name: Check billing before building worker image
         run: node scripts/gcp/preflight-billing.mjs
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build existing CPU Course Builder image
         shell: bash
         run: |
@@ -197,6 +199,7 @@ jobs:
         run: node scripts/gcp/deploy-course-job.mjs
       - name: Dispatch queued work through the existing overlap guard
         env:
+          COURSE_WORKER_PARALLELISM: '1'
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/gcp/dispatch-course-job.mjs
       - name: Record deployment boundary

@@ -1309,13 +1309,6 @@ html {
     font-size: 1.5rem;
   }
 
-  /* Grid override - only for content grids, not nav */
-  main .grid,
-  section .grid,
-  article .grid {
-    grid-template-columns: 1fr;
-  }
-
   /* Touch targets - scoped to main content */
   main button,
   main .btn,
@@ -1382,15 +1375,6 @@ html {
   p {
     word-wrap: break-word;
     overflow-wrap: break-word;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1024px) {
-  /* Scoped to content areas - not header */
-  main .grid,
-  section .grid,
-  article .grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
 

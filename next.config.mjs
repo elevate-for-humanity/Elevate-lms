@@ -6,6 +6,7 @@ import {
   sharedStandaloneTraceExcludes,
 } from './scripts/next-standalone-trace-excludes.mjs';
 import { resolveCommitSha } from './scripts/build-identity.mjs';
+import { withBuildMemoryDefaults } from './scripts/build-memory-policy.mjs';
 
 const useStandaloneOutput =
   process.env.GITHUB_ACTIONS !== 'true' || process.env.NEXT_STANDALONE_OUTPUT === '1';
@@ -228,9 +229,6 @@ const nextConfig = {
     return config;
   },
 
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -535,5 +533,5 @@ const sentryWebpackPluginOptions = {
 const skipSentry = process.env.BUILD_SCOPE === '1';
 
 export default skipSentry
-  ? nextConfig
-  : withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+  ? withBuildMemoryDefaults(nextConfig)
+  : withSentryConfig(withBuildMemoryDefaults(nextConfig), sentryWebpackPluginOptions);

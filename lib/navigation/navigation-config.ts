@@ -182,6 +182,12 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
         },
         { id: 'documents', label: 'Documents', href: p('apprentice', 'documents'), icon: FileText },
         {
+          id: 'billing',
+          label: 'Billing & Payments',
+          href: p('apprentice', 'billing'),
+          icon: ClipboardCheck,
+        },
+        {
           id: 'payment-policy',
           label: 'Payment Rules',
           href: p('apprentice', 'policies/payments'),
@@ -265,12 +271,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
         },
         { id: 'schedule', label: 'Schedule', href: `${p('hostshop')}/schedule`, icon: Calendar },
         { id: 'messages', label: 'Messages', href: `${p('hostshop')}/messages`, icon: Users },
-        {
-          id: 'communications',
-          label: 'Communications',
-          href: `${p('hostshop')}/communications`,
-          icon: Mail,
-        },
+        { id: 'communications', label: 'Communications', href: `${p('hostshop')}/communications`, icon: Mail },
         { id: 'phone', label: 'Phone & Extension', href: `${p('hostshop')}/phone`, icon: Phone },
         { id: 'reports', label: 'Reports', href: `${p('hostshop')}/reports`, icon: BarChart3 },
         { id: 'programs', label: 'Programs', href: `${p('hostshop')}/programs`, icon: BookOpen },

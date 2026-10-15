@@ -25,7 +25,7 @@ const scene: any = {
   captionCues: [{ startSeconds: 0, endSeconds: 4, text: 'Check the teeth.' }],
 };
 describe('approved teaching slide', () => {
-  it('applies the repaired heading scale in the actual premium compositor', () => {
+  it('preserves the owner-approved heading and caption sizes despite legacy repair metadata', () => {
     const host = document.createElement('div');
     host.innerHTML = renderToStaticMarkup(
       <PremiumTeachingScene
@@ -33,8 +33,8 @@ describe('approved teaching slide', () => {
         props={props}
       />,
     );
-    expect(host.querySelector('h1')?.style.fontSize).toBe('128px');
-    expect(host.querySelector('h1')?.parentElement?.style.height).toBe('148px');
+    expect(host.querySelector('h1')?.style.fontSize).toBe('60px');
+    expect(host.querySelector('h1')?.parentElement?.style.top).toBe('78px');
     expect(host.querySelector<HTMLElement>('div[style*="bottom:0"]')?.style.fontSize).toBe('60px');
     expect(host.querySelector('h1')?.textContent).toBe('Terminology');
     expect(host.textContent).toContain('Check the teeth.');

@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
     paths:
+      - 'scripts/build-memory-policy.*'
+      - 'scripts/check-build-memory-policy.mjs'
+      - 'scripts/run-bounded-build.*'
+      - 'scripts/build-next-app.*'
+      - 'scripts/container-build-policy.mjs'
       - 'components/**'
       - 'public/**'
       - 'content/**'
@@ -113,6 +118,8 @@ jobs:
           skip_install: true
       - name: Verify Google SDK
         run: node scripts/gcp/verify-sdk.mjs
+      - name: Verify automatic container memory policy
+        run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build the Admin image
         shell: bash
         run: |

@@ -16,7 +16,7 @@ import {
 } from '@/components/portal/ApprenticePortalShell';
 describe('learner dashboard payment visibility', () => {
   it.each(Object.keys(APPRENTICE_PORTAL_CONFIGS))(
-    'keeps collection controls out of the %s dashboard even with past-due billing data',
+    'preserves billing on the %s apprentice dashboard',
     (key) => {
       const html = renderToStaticMarkup(
         <ApprenticePortalShell
@@ -36,13 +36,8 @@ describe('learner dashboard payment visibility', () => {
         />,
       );
       expect(html).toContain('Training course');
-      expect(html).not.toContain('href="/apprentice/billing"');
-      expect(html).not.toContain('Set Up Payment');
-      expect(html).not.toContain('Add Card');
-      expect(html).not.toContain('Update Card');
-      expect(html).not.toContain('Tuition balance');
-      expect(html).not.toContain('PayPal');
-      expect(html).not.toContain('QuickBooks');
+      expect(html).toContain('href="/apprentice/billing"');
+      expect(html).toContain('Tuition balance');
     },
   );
 });

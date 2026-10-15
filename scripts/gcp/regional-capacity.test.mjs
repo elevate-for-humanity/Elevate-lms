@@ -11,6 +11,12 @@ const service = { metadata: { name: 'marketing' }, spec: { template: {
 const revision = (name = 'serving') => ({ metadata: { name, labels: { 'serving.knative.dev/service': 'marketing' },
   annotations: { 'autoscaling.knative.dev/maxScale': '1' } }, spec: { containers: [container('4', '8Gi')] } });
 
+test('new execution memory covers the complete requested task batch', () => {
+  assert.deepEqual(requiredRegionalAllocation([], task, [], [], 2), {cpu:16000,memory:64*2**30});
+  for(const count of [0,-1,1.5,5,NaN])
+    assert.throws(()=>requiredRegionalAllocation([],task,[],[],count),/between one and four/);
+});
+
 test('uses the serving immutable revision instead of an unapplied smaller template', () => {
   assert.deepEqual(requiredRegionalAllocation([service], task, [revision()]), { cpu: 12000, memory: 40 * 2 ** 30 });
 });

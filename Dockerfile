@@ -9,7 +9,6 @@ RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 ENV PNPM_HOME="/app/.pnpm-home"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS="--max-old-space-size=8192"
 ENV CI=true
 
 WORKDIR /app

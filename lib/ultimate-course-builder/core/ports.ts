@@ -12,6 +12,7 @@ export interface UltimatePersistencePort {
   }): Promise<{
     artifacts: Record<string, unknown>;
     passedSteps: string[];
+    recoveredSteps?: UltimateBuildStep[];
     findings: UltimateInstructionalFinding[];
   }>;
   recordStep(input: {

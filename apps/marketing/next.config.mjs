@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { legacyImageRewrites } from '../../lib/media/legacy-image-aliases.mjs';
 import { verifiedImageRewrites } from '../../lib/media/verified-image-aliases.mjs';
 import { resolveCommitSha } from '../../scripts/build-identity.mjs';
+import { withBuildMemoryDefaults } from '../../scripts/build-memory-policy.mjs';
 
 const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
@@ -16,11 +17,6 @@ const nextConfig = {
   outputFileTracingRoot: path.join(__dirname, '../..'),
   poweredByHeader: false,
   reactStrictMode: true,
-  experimental: {
-    cpus: 1,
-    webpackBuildWorker: true,
-    webpackMemoryOptimizations: true,
-  },
   generateBuildId: async () => {
     const sha = resolveCommitSha(process.env);
     return sha === 'local-development' ? 'local-dev' : sha.slice(0, 7);
@@ -145,4 +141,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBuildMemoryDefaults(nextConfig);

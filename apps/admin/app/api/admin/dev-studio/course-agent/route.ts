@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
   if (!dispatch.dispatched) {
     return NextResponse.json({
       error: dispatch.message,
-      dispatchError: dispatch.dispatchError,
+      dispatchError: 'dispatchError' in dispatch ? dispatch.dispatchError : 'COURSE_WORKER_LAUNCH_UNAVAILABLE',
       courseId, buildId: queued.build.id, jobId: queued.job.id,
       queued: true, executionVerified: false,
     }, { status: 503 });

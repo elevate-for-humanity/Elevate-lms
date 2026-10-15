@@ -3,7 +3,7 @@ const mocks=vi.hoisted(()=>({execute:vi.fn(),infer:vi.fn(),observe:vi.fn(),inser
 vi.mock('@/lib/ai/tools/executor',()=>({executeRegisteredAITool:mocks.execute}));
 vi.mock('@/lib/ai/execute-ai-task',()=>({executeAiTask:mocks.infer}));
 vi.mock('@/lib/supabase/admin',()=>({requireAdminClient:async()=>({from:()=>({insert:mocks.insert})})}));
-import {classifyParisFailure,recordParisObservation} from '@/lib/ai/runtime/supervision';
+import {classifyParisFailure,recordParisObservation,safeParisFailureSummary} from '@/lib/ai/runtime/supervision';
 import {executeAICommand} from '@/lib/ai/runtime/command-executor';
 import {canAgentUseTool,getAITool,listAIToolsForAgent} from '@/lib/ai/tools/registry';
 import {planAIToolFromCommand} from '@/lib/ai/tools/planner';
@@ -40,6 +40,20 @@ describe('combined PARIS execution',()=>{
  });
 });
 describe('failure supervision',()=>{
+ it('creates a safe failure summary without persisting a raw exception or credential',()=>{
+  const raw='HTTP 401 invalid api key sk-live-do-not-log';
+  const summary=safeParisFailureSummary(new Error(raw));
+  expect(summary.category).toBe('credentials');
+  expect(summary.message).not.toContain(raw);
+  expect(summary.message).not.toContain('sk-live-do-not-log');
+ });
+ it('binds Paris audit tenant scope to the authenticated membership, not request context',async()=>{
+  const {readFileSync}=await import('node:fs');
+  const source=readFileSync('apps/admin/app/api/paris/execute/route.ts','utf8');
+  expect(source).toContain('const tenantId = await resolveTenantIdForUser(auth.id)');
+  expect(source).toContain('const context = { ...requestedContext, tenantId }');
+  expect(source).not.toContain('typeof context.tenantId');
+ });
  it.each([
   ['credential missing','credentials','attention_required'],['insufficient credits','billing','attention_required'],
   ['HTTP 503','transient','existing_retry_policy'],['frozen media quality failed','quality','attention_required'],

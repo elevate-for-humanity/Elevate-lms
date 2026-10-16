@@ -297,7 +297,7 @@ body {
   }
 
   p {
-    @apply text-base md:text-lg leading-relaxed text-slate-900;
+    @apply text-base md:text-lg leading-relaxed;
   }
 
   a {
@@ -383,8 +383,8 @@ body {
  * default and would otherwise override this @layer base rule).
  */
 @layer base {
-  section + section {
-    background-color: #f8fafc; /* slate-50 */
+  .marketing-content[data-alternate-sections='true'] > section + section:not([class*='bg-']) {
+    background-color: #f8fafc;
   }
 }
 

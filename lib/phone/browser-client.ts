@@ -214,14 +214,12 @@ export async function createPhoneClient(
     async connect() {
       // register() resolves when REGISTER is sent; only onRegistered proves a
       // successful SIP response. Opening the WebSocket never means online.
+      let timeout: ReturnType<typeof setTimeout> | undefined;
       const confirmed = new Promise<void>((resolve, reject) => {
         completeRegistration = resolve;
         failRegistration = reject;
+        timeout = setTimeout(() => reject(new Error('SIP registration timed out.')), 30_000);
       });
-      const timeout = setTimeout(
-        () => failRegistration?.(new Error('SIP registration timed out.')),
-        30_000,
-      );
       try {
         await Promise.all([
           confirmed,
@@ -235,7 +233,7 @@ export async function createPhoneClient(
         await manager.disconnect().catch(() => undefined);
         throw error;
       } finally {
-        clearTimeout(timeout);
+        if (timeout) clearTimeout(timeout);
         completeRegistration = undefined;
         failRegistration = undefined;
       }

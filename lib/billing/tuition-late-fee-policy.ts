@@ -9,6 +9,7 @@ export const PROSPECTIVE_TUITION_LATE_FEE_POLICY = {
   gracePeriodDays: 3,
   dailyLateFeeCents: 1000,
   suspensionReviewAfterDays: 7,
+  oneTimeReactivationFeeCents: 5000,
   appliesTo: 'new_self_pay_internal_plan_with_signed_disclosure',
   protectedAccess: ['billing','payments','support','workplace_timekeeping','wages','required_training_records'],
 } as const;
@@ -30,5 +31,6 @@ export function calculateProspectiveLateFee(input: {
     !input.funded && !input.thirdPartyFinanced && !input.paidInFull && input.outstandingCents > 0;
   const chargeableDays = eligible ? Math.max(0, daysOverdue - PROSPECTIVE_TUITION_LATE_FEE_POLICY.gracePeriodDays) : 0;
   return { daysOverdue, chargeableDays, lateFeeCents: chargeableDays * PROSPECTIVE_TUITION_LATE_FEE_POLICY.dailyLateFeeCents,
-    reviewInstructionalAccess: eligible && daysOverdue > PROSPECTIVE_TUITION_LATE_FEE_POLICY.suspensionReviewAfterDays };
+    reviewInstructionalAccess: eligible && daysOverdue > PROSPECTIVE_TUITION_LATE_FEE_POLICY.suspensionReviewAfterDays,
+    proposedReactivationFeeCents: eligible && daysOverdue > PROSPECTIVE_TUITION_LATE_FEE_POLICY.suspensionReviewAfterDays ? PROSPECTIVE_TUITION_LATE_FEE_POLICY.oneTimeReactivationFeeCents : 0 };
 }

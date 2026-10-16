@@ -108,7 +108,7 @@ export function ColoredLivePreviewFrame({
             Live preview
           </span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:flex-nowrap">
           <button
             type="button"
             onClick={refresh}
@@ -118,7 +118,7 @@ export function ColoredLivePreviewFrame({
             <RefreshCw className="h-4 w-4" />
           </button>
           <form
-            className="flex min-w-0 flex-1 items-center gap-1.5 rounded-lg bg-white/95 px-2 shadow-sm"
+            className="order-first flex min-w-0 basis-full items-center gap-1.5 rounded-lg bg-white/95 px-2 shadow-sm sm:order-none sm:basis-auto sm:flex-1"
             onSubmit={(e) => {
               e.preventDefault();
               refresh();
@@ -178,7 +178,7 @@ export function ColoredLivePreviewFrame({
             href={liveUrl || url}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 text-white hover:bg-white/25"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-800 text-white hover:bg-slate-700"
             title="Open in new tab"
           >
             <ExternalLink className="h-4 w-4" />
@@ -189,7 +189,7 @@ export function ColoredLivePreviewFrame({
       {showSiteHealth && list.length > 0 && <SiteHealthStrip targets={list} />}
 
       {showChips && list.length > 0 && (
-        <div className="flex max-h-24 shrink-0 flex-wrap gap-1.5 overflow-y-auto border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-2 py-2">
+        <div className="flex max-h-24 min-w-0 shrink-0 flex-wrap gap-2 overflow-y-auto border-b border-slate-200 bg-white px-3 py-3">
           {list.map((target, i) => (
             <button
               key={`${target.url}-${i}`}

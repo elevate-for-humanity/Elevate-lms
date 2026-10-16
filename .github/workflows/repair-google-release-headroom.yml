@@ -110,6 +110,8 @@ jobs:
             assert.equal(health.lifecycle?.browserConnected ?? health.browserConnected,true);
           }
           await verify();
+          const trial=read(['compute','instances','describe','elevate-studio-browser-trial','--zone=us-central1-a']);
+          console.log(JSON.stringify({kind:'trial_ownership',purpose:trial.labels?.purpose??null,zone:trial.zone?.split('/').at(-1),machineType:trial.machineType?.split('/').at(-1),status:trial.status,serviceAccountAttached:Boolean(trial.serviceAccounts?.length),disks:trial.disks.map(d=>({name:d.source?.split('/').at(-1),autoDelete:d.autoDelete}))}));
           cleanupTrial();
           const vm=read(['compute','instances','describe','elevate-studio-browser-trial','--zone=us-central1-a']);
           assert.equal(vm.status,'TERMINATED');

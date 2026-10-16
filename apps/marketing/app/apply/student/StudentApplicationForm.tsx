@@ -383,7 +383,7 @@ export default function StudentApplicationForm({
       }
 
       const { res, data } = await postApplication(payload, submissionKey);
-      if (res.ok && (data.ok ?? data.success ?? true)) {
+      if (res.ok && (data.ok === true || data.success === true) && (data.id || data.applicationId || data.referenceNumber)) {
         clearDraft();
         const duplicateWarning = data.duplicateWarning || undefined;
         setResult({

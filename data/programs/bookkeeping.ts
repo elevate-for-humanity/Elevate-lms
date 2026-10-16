@@ -271,12 +271,12 @@ export const BOOKKEEPING: ProgramSchema = {
   ],
 
   cta: {
-    applyHref: '/apply?program=bookkeeping',
-    requestInfoHref: '/contact?program=finance-bookkeeping-accounting',
+    applyHref: '/apply/student?program=bookkeeping',
+    requestInfoHref: '/contact?program=bookkeeping',
     careerConnectHref:
       'https://www.indianacareerconnect.com/jobs/search?q=bookkeeper&location=Indiana',
     advisorHref: '/contact',
-    courseHref: '/programs/finance-bookkeeping-accounting',
+    courseHref: '/programs/bookkeeping',
   },
 
   admissionRequirements: [

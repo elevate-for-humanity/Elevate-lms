@@ -194,6 +194,15 @@ export default async function HostShopDashboardLayout({ children }: { children: 
         <p className="mt-2 text-sm leading-6"><strong>Clock-in/out:</strong> Apprentices must clock in when arriving at their approved training site, clock out when leaving, and clock out for unpaid meal breaks. They must clock back in when returning to compensable training. Time outside the approved geofence is flagged or blocked for review; never invent hours or bypass location checks. Report technical or location errors to Elevate for documented correction.</p>
         <p className="mt-2 text-sm leading-6"><strong>Host responsibilities:</strong> Provide qualified supervision, safe hands-on occupational training, wages according to the approved wage progression (including any applicable $10/hour starting rate or compliant commission equivalent), and accurate OJL/competency verification. Confirm weekly hours with the apprentice's approved employment and training schedule; there is no universal weekly-hours requirement stated in this notice. Follow applicable break, wage and overtime laws.</p>
         <p className="mt-2 text-sm leading-6"><strong>RTI:</strong> Elevate coordinates theory instruction and is preparing its progressive rollout. Host Shops do not develop or teach RTI unless separately authorized. Apprentices can continue eligible supervised OJL while individual prerequisite and RTI schedules are finalized under their approved standards.</p>
+        <div className="mt-4 rounded-xl border border-amber-300 bg-white p-4">
+          <h3 className="font-black">Review your apprenticeship dashboard tools</h3>
+          <p className="mt-2 text-sm leading-6">Appendix A competency sign-offs, workplace hours, wages, and host shop resources are available in the existing portal. Please review the instructions and check your assigned apprentices. Individual cut/style service counters, practical assessment scheduling, and synchronized student service-progress forms are being developed and are not yet available as completed features.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a href="/host-shop/dashboard/competencies" className="rounded-lg border border-amber-700 px-3 py-2 text-sm font-bold">Appendix A competencies</a>
+            <a href="/host-shop/dashboard/hours" className="rounded-lg border border-amber-700 px-3 py-2 text-sm font-bold">Review OJL hours</a>
+            <a href="/host-shop/dashboard/wages" className="rounded-lg border border-amber-700 px-3 py-2 text-sm font-bold">Wage requirements</a>
+          </div>
+        </div>
         <a href="/host-shop/dashboard/resources" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-amber-950 px-5 py-3 text-sm font-black text-white">Read the Host Shop operating guide</a>
       </section>
       {children}

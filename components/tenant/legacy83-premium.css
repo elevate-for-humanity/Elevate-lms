@@ -21,3 +21,33 @@
 .legacy83-premium footer{background:#112a20;color:#f4e9d7}
 .legacy83-premium footer p{color:#f4e9d7!important}
 @media(max-width:767px){.legacy83-premium main>section:first-child>div{min-height:auto;padding-top:64px;padding-bottom:64px}.legacy83-premium main>section:first-child img{height:360px}.legacy83-premium main>section:first-child h1{font-size:3.4rem}.legacy83-premium header nav{gap:12px}}
+
+/* Fix the oversized wrapping header seen in the actual mobile screenshot. */
+.legacy83-premium header>div{display:flex;flex-wrap:nowrap;gap:1.25rem;min-height:86px}
+.legacy83-premium header>a,.legacy83-premium header>div>a:first-child{flex-shrink:1;min-width:0}
+.legacy83-premium header>div>a:first-child span{font-family:Georgia,serif;font-weight:500;letter-spacing:-.025em}
+.legacy83-premium header>div>a:first-child img{max-height:62px;max-width:155px}
+.legacy83-premium header nav{gap:clamp(.7rem,1.5vw,1.5rem);white-space:nowrap}
+.legacy83-premium header nav a{font-weight:600;font-size:.83rem}
+.legacy83-premium main>section:first-child{isolation:isolate}
+.legacy83-premium main>section:first-child>div{position:relative}
+.legacy83-premium main>section:first-child h1{max-width:800px}
+.legacy83-premium main>section:first-child img{width:100%;object-fit:cover}
+.legacy83-mobile-menu{display:none}
+@media(max-width:1023px){
+.legacy83-premium header>div{min-height:76px;padding:12px 18px}
+.legacy83-premium header nav{display:none!important}
+.legacy83-premium header>div>a:last-child{display:none}
+.legacy83-premium header>div>a:first-child img{max-width:110px;max-height:52px}
+.legacy83-premium header>div>a:first-child span{font-size:1.05rem;white-space:normal;line-height:1.15}
+.legacy83-mobile-menu{display:block;position:relative;z-index:25;background:#112a20;color:#f6ebd8;font-family:Arial,sans-serif}
+.legacy83-mobile-menu summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:15px 22px;font-weight:700}
+.legacy83-mobile-menu summary::-webkit-details-marker{display:none}
+.legacy83-mobile-menu nav{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:5px 16px 18px}
+.legacy83-mobile-menu nav a{padding:13px 10px;border-bottom:1px solid #ffffff26;font-size:14px}
+.legacy83-premium main>section:first-child>div{display:flex;flex-direction:column-reverse;gap:2rem;padding:40px 22px 65px}
+.legacy83-premium main>section:first-child h1{font-size:clamp(2.7rem,8vw,4.8rem);line-height:1.07}
+.legacy83-premium main>section:first-child img{height:clamp(300px,75vw,480px);object-position:center 24%}
+.legacy83-premium main>section:first-child div:has(>img){max-width:580px;width:100%;margin:auto}
+}
+@media(max-width:450px){.legacy83-premium main>section:first-child h1{font-size:2.8rem}.legacy83-premium main>section:first-child>div{padding-left:18px;padding-right:18px}.legacy83-premium main>section:not(:first-child){padding-top:52px;padding-bottom:52px}}

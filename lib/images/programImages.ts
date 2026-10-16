@@ -99,8 +99,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Illustrative Emergency medical instructor and learner practicing assessment on a training manikin',
   },
   'guest-service-gold': {
-    card: '/images/refresh-20261014/hospitality.webp',
-    hero: '/images/refresh-20261014/hospitality.webp',
+    card: '/images/pages/career-services-page-10.webp',
+    hero: '/images/pages/career-services-page-10.webp',
     alt: 'Illustrative Hospitality instructor and learner practicing hotel guest services',
   },
   'information-technology': {
@@ -129,8 +129,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Medical billing and coding learner reviewing healthcare records',
   },
   'nha-patient-care-technician': {
-    card: '/images/refresh-20261014/clinical.webp',
-    hero: '/images/refresh-20261014/clinical.webp',
+    card: '/images/healthcare/hero-program-patient-care.webp',
+    hero: '/images/healthcare/hero-program-patient-care.webp',
     alt: 'Illustrative Clinical instructor supervising blood-pressure measurement in a skills lab',
   },
   'real-estate-agent': {
@@ -144,18 +144,18 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Illustrative Solar installation instructor and learner inspecting panels on a training roof',
   },
   'start-hospitality': {
-    card: '/images/refresh-20261014/hospitality.webp',
-    hero: '/images/refresh-20261014/hospitality.webp',
+    card: '/images/pages/about-employer-partners.webp',
+    hero: '/images/pages/about-employer-partners.webp',
     alt: 'Illustrative Hospitality instructor and learner practicing hotel reception services',
   },
   'youth-culinary-apprenticeship': {
-    card: '/images/refresh-20261014/culinary.webp',
-    hero: '/images/refresh-20261014/culinary.webp',
+    card: '/images/pages/culinary-apprenticeship-hero.webp',
+    hero: '/images/pages/culinary-apprenticeship-hero.webp',
     alt: 'Illustrative Chef instructor supervising culinary skills practice in a teaching kitchen',
   },
   'hvac-technician': {
-    card: '/images/refresh-20261014/trades.webp',
-    hero: '/images/refresh-20261014/trades.webp',
+    card: '/images/hvac-training-vibrant-2026.webp',
+    hero: '/images/hvac-training-vibrant-2026.webp',
     alt: 'Illustrative HVAC instructor supervising a learner inspecting an HVAC unit',
   },
   'cdl-training': {
@@ -209,8 +209,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Illustrative Pharmacy technician instructor supervising medication preparation',
   },
   qma: {
-    card: '/images/refresh-20261014/pharmacy.webp',
-    hero: '/images/refresh-20261014/pharmacy.webp',
+    card: '/images/pages/pharmacy-tech.webp',
+    hero: '/images/pages/pharmacy-tech.webp',
     alt: 'Illustrative Instructor supervising medication-handling skills in a training pharmacy',
   },
   'home-health-aide': {
@@ -234,8 +234,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Illustrative Environmental cleaning instructor supervising surface disinfection',
   },
   'cpr-first-aid': {
-    card: '/images/refresh-20261014/healthcare.webp',
-    hero: '/images/refresh-20261014/healthcare.webp',
+    card: '/images/pages/cpr-first-aid.webp',
+    hero: '/images/pages/cpr-first-aid.webp',
     alt: 'Illustrative CPR instructor supervising adult learners practicing on a manikin',
   },
   'barber-apprenticeship': {
@@ -279,13 +279,13 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Cybersecurity analyst monitoring a security dashboard',
   },
   'network-administration': {
-    card: '/images/refresh-20261014/technology.webp',
-    hero: '/images/refresh-20261014/technology.webp',
+    card: '/images/pages/network-administration.jpg',
+    hero: '/images/pages/network-administration.jpg',
     alt: 'Illustrative IT instructor and learner diagnosing network equipment',
   },
   'network-support-technician': {
-    card: '/images/refresh-20261014/technology.webp',
-    hero: '/images/refresh-20261014/technology.webp',
+    card: '/images/pexels/network.webp',
+    hero: '/images/pexels/network.webp',
     alt: 'Illustrative IT instructor and learner diagnosing network equipment',
   },
   'software-development': {
@@ -319,13 +319,13 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Tax preparer working with a client on financial documents',
   },
   bookkeeping: {
-    card: '/images/refresh-20261014/business.webp',
-    hero: '/images/refresh-20261014/business.webp',
+    card: '/images/bookkeeping-training-vibrant-2026.webp',
+    hero: '/images/bookkeeping-training-vibrant-2026.webp',
     alt: 'Illustrative Instructor and learners reviewing business records at laptops',
   },
   'finance-bookkeeping-accounting': {
-    card: '/images/refresh-20261014/business.webp',
-    hero: '/images/refresh-20261014/business.webp',
+    card: '/images/pages/finance-accounting.webp',
+    hero: '/images/pages/finance-accounting.webp',
     alt: 'Illustrative Instructor and learners reviewing business records at laptops',
   },
   entrepreneurship: {
@@ -394,18 +394,18 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Introduction to the Job Ready Indy career-readiness pathway',
   },
   'nha-medical-assistant': {
-    card: '/images/refresh-20261014/clinical.webp',
-    hero: '/images/refresh-20261014/clinical.webp',
+    card: '/images/healthcare/hero-program-medical-assistant.webp',
+    hero: '/images/healthcare/hero-program-medical-assistant.webp',
     alt: 'Illustrative Medical assistant instructor supervising blood-pressure measurement in a clinical skills lab',
   },
   'nha-pharmacy-technician': {
-    card: '/images/refresh-20261014/pharmacy.webp',
-    hero: '/images/refresh-20261014/pharmacy.webp',
+    card: '/images/pages/pharmacy-technician.webp',
+    hero: '/images/pages/pharmacy-technician.webp',
     alt: 'Illustrative Pharmacy technician instructor supervising medication preparation',
   },
   'nha-phlebotomy': {
-    card: '/images/refresh-20261014/phlebotomy.webp',
-    hero: '/images/refresh-20261014/phlebotomy.webp',
+    card: '/images/healthcare/hero-program-phlebotomy.webp',
+    hero: '/images/healthcare/hero-program-phlebotomy.webp',
     alt: 'Illustrative Phlebotomy instructor supervising practice on an artificial training arm',
   },
   'life-coach-certification-wioa': {

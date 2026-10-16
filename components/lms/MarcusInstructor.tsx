@@ -167,7 +167,7 @@ export default function MarcusInstructor({ lessonNumber, lessonTitle }: Props) {
           <button
             onClick={reset}
             title="Start over"
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition"
+            className="rounded-lg p-2 text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue-600"
           >
             <RotateCcw className="w-4 h-4" />
           </button>

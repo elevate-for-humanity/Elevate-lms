@@ -76,6 +76,25 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
   store: '/images/pages/store-licensing-hero.webp',
 };
 
+// Distinct existing, program-specific artwork for pages that previously shared a
+// category poster. Do not change the approved homepage artwork.
+const DISTINCT_PROGRAM_POSTERS: Record<string, string> = {
+  'cpr-first-aid': '/images/hero/hero-healthcare.jpg',
+  bookkeeping: '/images/pages/finance-accounting.webp',
+  'finance-bookkeeping-accounting': '/images/business-collaboration-vibrant-2026.webp',
+  'hvac-technician': '/images/programs/efh-building-tech-hero.jpg',
+  'nha-medical-assistant': '/images/pages/medical-assistant-hero.webp',
+  'nha-patient-care-technician': '/images/pages/cna-vitals.webp',
+  qma: '/images/pages/cna-patient-care.jpg',
+  'nha-pharmacy-technician': '/images/pages/medical-assistant-real.webp',
+  'nha-phlebotomy': '/hero-images/healthcare-category.webp',
+  'youth-culinary-apprenticeship': '/images/pages/entrepreneurship.webp',
+  'network-administration': '/images/pages/programs-it-hero.webp',
+  'network-support-technician': '/hero-images/technology-cat-new.jpg',
+  'guest-service-gold': '/images/pages/about-employer-partners.webp',
+  'start-hospitality': '/images/pages/admin-employers-hero.webp',
+};
+
 const SHARED_GENERIC_VIDEO_FILES = new Set([
   'hero-home-fast.mp4',
   'programs-overview-video-with-narration.mp4',
@@ -157,6 +176,7 @@ function semanticInlinePoster(key: string, banner: RawHeroBannerConfig): string 
 }
 
 function posterFor(key: string, banner: RawHeroBannerConfig): string {
+  if (DISTINCT_PROGRAM_POSTERS[key]) return DISTINCT_PROGRAM_POSTERS[key];
   if (PROGRAM_IMAGES[key]?.hero.includes('/refresh-20261014/')) return getProgramHeroImage(key);
   if (PAGE_PICTURE_OVERRIDES[key]?.includes('/refresh-20261014/'))
     return PAGE_PICTURE_OVERRIDES[key];

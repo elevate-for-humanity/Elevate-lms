@@ -26,6 +26,11 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const candidates = await response.json();
   if (!Array.isArray(candidates)) throw new Error('COURSE_QUEUE_RESPONSE_INVALID');
   const queued = candidates.filter(job => job.max_attempts === undefined || job.attempts < job.max_attempts);
+  // Never claim an empty queue merely because an earlier failed job exists.
+  // Emit durable, actionable diagnostics without exposing Supabase credentials.
+  console.info(JSON.stringify({event:'course_dispatch_queue_scan',candidateCount:candidates.length,
+    runnableCount:queued.length,activeExecutions:active.length,
+    candidateIds:queued.map(job=>job.id)}));
   // A leased task can enqueue its next lesson only after finishing the current
   // one. Keep the coordinator alive across that handoff without launching more tasks.
   // An already-running Cloud Run execution owns its task independently.
@@ -42,7 +47,7 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const limit = Number.isSafeInteger(configured) ? Math.min(4, Math.max(1, configured)) : 2;
   // Bound new tasks to configured concurrency, including existing executions.
   const slots = Math.max(0, limit - active.reduce((sum, execution) => sum + Math.max(1, Number(execution.spec?.taskCount ?? execution.status?.taskCount ?? 1)), 0));
-  if (!slots) return {status:'busy',activeExecutions:active.length};
+  if (!slots) { console.warn(JSON.stringify({event:'course_dispatch_no_slots',activeExecutions:active.length,limit})); return {status:'busy',activeExecutions:active.length}; }
   const parallelism = Number(job.spec?.template?.spec?.parallelism);
   if (!Number.isSafeInteger(parallelism) || parallelism < 1) throw new Error('COURSE_JOB_PARALLELISM_UNAVAILABLE');
   let tasks = Math.min(slots, queued.length, parallelism);
@@ -55,7 +60,7 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
     if (capacity.fits) break;
     tasks--;
   } while (tasks > 0);
-  if (!tasks) return {status:'capacity_wait', ...capacity};
+  if (!tasks) { console.warn(JSON.stringify({event:'course_dispatch_capacity_wait',capacity})); return {status:'capacity_wait', ...capacity}; }
   run('gcloud',['run','jobs','execute','elevate-course-builder',...scope,`--tasks=${tasks}`,'--async','--quiet'],{stdio:'inherit'});
   // Launch is not assignment. Require fresh durable claims for every task.
   const pending = new Map(queued.slice(0,tasks).map(item => [item.id, item.heartbeat_at || '']));

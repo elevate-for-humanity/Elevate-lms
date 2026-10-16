@@ -141,7 +141,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
           await queue.waitForDependency(job.id,workerId,`ULTIMATE_EXTERNAL_ASSET_REQUIRED:${continuation.unresolved.join(',')}`,generation,continuation.payload);
           return {claimed:true,completed:false,awaitingDependency:true,jobId:job.id,result};
         }
-        await queue.fail(job.id,workerId,`ULTIMATE_INTERNAL_REPAIR_REQUIRED:${continuation.unresolved.join(',')}`,generation,true);
+        await queue.fail(job.id,workerId,`ULTIMATE_INTERNAL_REPAIR_REQUIRED:${continuation.unresolved.join(',')}:FINDINGS=${JSON.stringify((result.findings || []).map(f => ({step:f.step,code:f.code,message:f.message}))).slice(0,2800)}`,generation,true);
         return {claimed:true,completed:false,repairQueued:true,jobId:job.id,result};
       }
     }

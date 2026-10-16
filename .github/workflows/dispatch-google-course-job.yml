@@ -27,7 +27,7 @@ jobs:
   dispatch:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     concurrency:
-      group: google-course-continuation
+      group: google-course-runtime-operations
       cancel-in-progress: false
     runs-on: ubuntu-24.04
     environment: production

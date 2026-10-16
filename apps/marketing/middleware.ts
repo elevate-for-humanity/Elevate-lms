@@ -129,7 +129,8 @@ function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextRespons
     url.pathname = '/store';
     return NextResponse.redirect(url, 307);
   }
-  if (isStoreRuntimeAllowed(pathname)) return NextResponse.next();
+  // The cart uses this authenticated billing endpoint for individual apps.
+  if (pathname === '/api/apps/upgrade' || isStoreRuntimeAllowed(pathname)) return NextResponse.next();
   return NextResponse.redirect(new URL(`https://www.elevateforhumanity.org${pathname}${req.nextUrl.search}`), 307);
 }
 

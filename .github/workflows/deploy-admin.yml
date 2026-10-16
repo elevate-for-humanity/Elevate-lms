@@ -70,7 +70,7 @@ jobs:
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-admin.yml/dispatches" -f ref=main -f "inputs[requested_sha]=$latest"
   deploy-admin:
     concurrency:
-      group: google-admin-runtime-operations
+      group: google-runtime-us-central1
       cancel-in-progress: false
     name: Build and deploy Admin on Google
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
@@ -89,7 +89,7 @@ jobs:
           node-version: '22'
       - name: Validate Studio runtime cutover before building Admin
         run: |
-          node --test lib/devstudio/main-release.test.mjs scripts/test-studio-browser-configuration.mjs scripts/test-telnyx-sending-number.mjs
+          node --test lib/devstudio/main-release.test.mjs scripts/test-studio-browser-configuration.mjs scripts/test-phone-sending-number.mjs
           node --test scripts/test-public-revision-activation.mjs
           node scripts/audit-course-builder-procurement.mjs
       - name: Reject superseded deployment requests before building

@@ -8,6 +8,16 @@ export const sites = {
   store: 'https://store.elevateforhumanity.org',
 };
 
+const safeError = error => ['TimeoutError', 'AbortError', 'TypeError', 'SyntaxError'].includes(error?.name) ? error.name : 'probe_failed';
+function dependencyEvidence(value) {
+  if (!value || typeof value !== 'object') return undefined;
+  const allowed = ['missing_configuration', 'non_success_status', 'invalid_response', 'request_failed', 'TimeoutError', 'AbortError', 'TypeError', 'SyntaxError'];
+  return { ok: value.ok === true,
+    status: Number.isInteger(value.status) && value.status >= 100 && value.status <= 599 ? value.status : null,
+    latencyMs: Number.isFinite(value.latencyMs) && value.latencyMs >= 0 ? value.latencyMs : undefined,
+    error: allowed.includes(value.error) ? value.error : undefined };
+}
+
 export async function verifySite(component, request = fetch) {
   const base = sites[component];
   if (!base) throw new Error('Unknown public service');
@@ -21,8 +31,11 @@ export async function verifySite(component, request = fetch) {
         ? r.status === 200 && body.ok === true && body.service === processService
         : healthPassed(processService, path, r.status, body);
       results.push({ component, path, status: r.status, passed,
-        commit: /^[a-f0-9]{40}$/.test(body.commit ?? '') ? body.commit : undefined });
-    } catch { results.push({ component, path, passed: false, error: 'probe_failed' }); }
+        commit: /^[a-f0-9]{40}$/.test(body.commit ?? '') ? body.commit : undefined,
+        supabase: dependencyEvidence(body.dependencies?.supabase),
+        auth: dependencyEvidence(body.dependencies?.supabase?.checks?.auth),
+        database: dependencyEvidence(body.dependencies?.supabase?.checks?.database) });
+    } catch (error) { results.push({ component, path, passed: false, error: safeError(error) }); }
   }
   if (component === 'marketing') {
     try {

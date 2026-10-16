@@ -45,7 +45,7 @@ on:
       - 'next.config.mjs'
       - 'scripts/test-tax-*.mjs'
       - 'scripts/tax-route-test-harness.mjs'
-      - 'scripts/verify-paris-release-source.mjs'
+      - 'scripts/verify-paris-release-source*.mjs'
       - 'scripts/gcp/preflight-billing.mjs'
       - 'scripts/gcp/preflight-billing.test.mjs'
       - 'package.json'
@@ -76,7 +76,7 @@ jobs:
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-marketing-trigger.yml/dispatches" -f ref=main
   deploy:
     concurrency:
-      group: google-production-marketing
+      group: google-runtime-us-central1
       cancel-in-progress: false
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -139,6 +139,7 @@ jobs:
       - name: Verify PARIS source bundle and private API behavior
         run: |
           set -euo pipefail
+          node --test scripts/verify-paris-release-source.test.mjs
           node scripts/verify-paris-release-source.mjs
           node scripts/test-tax-calculation-failures.mjs apps/marketing/app/api/tax/returns/calculate/route.ts
           node scripts/test-tax-w2-validation.mjs apps/marketing/app/api/tax/w2/confirm/route.ts

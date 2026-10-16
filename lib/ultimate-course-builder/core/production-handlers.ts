@@ -15,6 +15,7 @@ import { instructionalDepthFor } from '../instructional/depth-contract';
 import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
 import { narrationSceneSeconds } from '../instructional/approved-presentation.mjs';
 import { approvedDeliveryFailures } from '../instructional/approved-delivery.mjs';
+import { requireChapterRecap } from '../instructional/new-course-contract.mjs';
 const comp = (ctx: any) =>
   ctx.profile.competencies.find((c: any) => String(ctx.buildId).endsWith(':' + c.id)) ??
   ctx.profile.competencies[0];
@@ -254,16 +255,20 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
     mistakes_and_corrections: async (ctx) => ({
       artifacts: { mistakes: (ctx.artifacts.instructor_script as any)?.script?.mistakes },
     }),
-    assessment_alignment: async (ctx) => ({
-      artifacts: {
-        assessment: await runtime.assessment.generate({
-          competency: comp(ctx),
-          objectives: ctx.artifacts.learning_objectives,
-          learning: ctx.artifacts.active_teaching,
-          script: ctx.artifacts.instructor_script,
-        }),
-      },
-    }),
+    assessment_alignment: async (ctx) => {
+      const assessment = await runtime.assessment.generate({
+        competency: comp(ctx),
+        objectives: ctx.artifacts.learning_objectives,
+        learning: ctx.artifacts.active_teaching,
+        script: ctx.artifacts.instructor_script,
+      });
+      // The owner's new-course contract is opt-in. Existing course checkpoints
+      // and unrelated programs must not be invalidated by the rollout.
+      if ((ctx.profile as any).newCourseContract === 'owner-approved-lesson-v1') {
+        requireChapterRecap(assessment, comp(ctx).id, 5);
+      }
+      return { artifacts: { assessment } };
+    },
     lesson_film_render: async (ctx) => {
       const sourceScript:any=(ctx.artifacts.instructor_script as any)?.script;
       const sourceBoard:any=(ctx.artifacts.storyboard as any)?.storyboard;

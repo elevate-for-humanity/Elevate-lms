@@ -16,6 +16,7 @@ import { hydrateUltimateProfileSources } from '../core/course-profile';
 import { materializeUltimateDraft } from './materialize-draft';
 import { isDurableExternalBlocker } from '../core/repair-router';
 import { liveCheckpointRepairReader } from './live-checkpoint-repair';
+import { verifyNewCourseAssessmentContract } from '../instructional/new-course-contract.mjs';
 export async function processUltimateJob(db: SupabaseClient, workerId: string) {
   const queue = new UltimateJobQueue(db);
   const job = await queue.claim(workerId, 300);
@@ -170,6 +171,32 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         const lesson = lessons?.find(l => l.competency_id === competency.id);
         if (!lesson || lesson.status !== 'built') throw new Error(`ULTIMATE_COMPETENCY_NOT_COMPLETE:${competency.id}`);
         assertCompleteLesson(lesson.artifacts, profile);
+      }
+      if ((profile as any).newCourseContract === 'owner-approved-lesson-v1') {
+        // Check the actual published-course lesson records, not a fabricated exam.
+        // The final must be a separate last assessment after all chapter recaps.
+        const { data: courseLessons, error: courseLessonsError } = await db
+          .from('course_lessons')
+          .select('id,title,lesson_type,order_index,quiz_questions,content_json')
+          .eq('course_id', build.course_id)
+          .order('order_index');
+        if (courseLessonsError) throw courseLessonsError;
+        const chapters = (courseLessons ?? []).filter(l => l.lesson_type === 'lesson')
+          .map(l => ({ id: l.id, recapQuestions: Array.isArray(l.quiz_questions) ?
+            l.quiz_questions : (l.content_json as any)?.assessment?.questions ?? [] }));
+        const finals = (courseLessons ?? []).filter(l =>
+          ['exam','final_exam'].includes(String(l.lesson_type)));
+        const finalLesson = finals[finals.length - 1];
+        if (!finalLesson || !courseLessons?.length ||
+            finalLesson.order_index !== courseLessons[courseLessons.length - 1].order_index)
+          throw new Error('COURSE_FINAL_EXAM_MISSING_OR_NOT_LAST');
+        const finalQuestions = Array.isArray(finalLesson.quiz_questions) ?
+          finalLesson.quiz_questions : (finalLesson.content_json as any)?.assessment?.questions ?? [];
+        verifyNewCourseAssessmentContract({
+          chapters,
+          finalExam: { position: 'after-last-chapter', cumulative: true,
+            questions: finalQuestions },
+        });
       }
       const releaseActor = await resolveReleaseActor(db, build.course_id, profile.mediaAcquisitionOwnerId);
       await runtime.persistence.updateBuild({buildId:build.id,status:'built',currentStep:'credential_release'});

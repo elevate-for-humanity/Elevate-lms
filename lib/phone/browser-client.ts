@@ -1,6 +1,7 @@
 'use client';
 
 import type { Session } from 'sip.js';
+import { verifyPhoneMicrophone } from './microphone.mjs';
 
 export type PhoneCall = {
   id: string;
@@ -93,6 +94,7 @@ export async function createPhoneClient(
   credential: PhoneCredential,
   remoteAudio: HTMLAudioElement,
 ): Promise<PhoneClient> {
+  await verifyPhoneMicrophone();
   if (credential.provider !== 'asterisk') {
     const { TelnyxRTC } = await import('@telnyx/webrtc');
     const client = new TelnyxRTC({

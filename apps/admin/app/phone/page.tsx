@@ -125,7 +125,10 @@ export default async function PhonePage() {
         { count: 0 },
       ] as any);
 
-  const numbers = numbersResult.data ?? [];
+  // Retired carrier inventory must not appear as a current dashboard number.
+  const numbers = (numbersResult.data ?? []).filter(
+    (number: any) => number.status === 'active' || number.source === 'external_forwarding',
+  );
   const destinations = destinationsResult.data ?? [];
   const menuOptions = menuResult.data ?? [];
   const programHolders = (programHoldersResult.data ?? []).filter(

@@ -77,20 +77,20 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
 };
 
 const DISTINCT_PROGRAM_POSTERS: Record<string, string> = {
-  'cpr-first-aid': '/images/hero/hero-healthcare.jpg',
+  'cpr-first-aid': '/images/pages/comp-pathway-classroom.webp',
   'bookkeeping': '/images/pages/finance-accounting.webp',
-  'finance-bookkeeping-accounting': '/images/business-collaboration-vibrant-2026.webp',
-  'hvac-technician': '/images/programs/efh-building-tech-hero.jpg',
+  'finance-bookkeeping-accounting': '/images/bookkeeping-training-vibrant-2026.webp',
+  'hvac-technician': '/images/hvac-hero.webp',
   'nha-medical-assistant': '/images/pages/medical-assistant-hero.webp',
   'nha-patient-care-technician': '/images/pages/cna-vitals.webp',
   'qma': '/images/pages/cna-patient-care.jpg',
   'nha-pharmacy-technician': '/images/pages/medical-assistant-real.webp',
-  'nha-phlebotomy': '/hero-images/healthcare-category.webp',
+  'nha-phlebotomy': '/images/pexels/phlebotomy.webp',
   'youth-culinary-apprenticeship': '/images/pages/entrepreneurship.webp',
-  'network-administration': '/images/pages/programs-it-hero.webp',
+  'network-administration': '/images/pages/technology-sector.webp',
   'network-support-technician': '/hero-images/technology-cat-new.jpg',
   'guest-service-gold': '/images/pages/about-employer-partners.webp',
-  'start-hospitality': '/images/pages/admin-employers-hero.webp',
+  'start-hospitality': '/images/pages/office-admin-desk.jpg',
 };
 
 const SHARED_GENERIC_VIDEO_FILES = new Set([

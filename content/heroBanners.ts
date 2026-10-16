@@ -77,20 +77,20 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
 };
 
 const DISTINCT_PROGRAM_POSTERS: Record<string, string> = {
-  'cpr-first-aid': '/images/refresh-20261014/healthcare.webp',
+  'cpr-first-aid': '/images/pages/comp-pathway-classroom.webp',
   'bookkeeping': '/images/pages/finance-accounting.webp',
   'finance-bookkeeping-accounting': '/images/pages/business-meeting.webp',
-  'hvac-technician': '/images/refresh-20261014/trades.webp',
+  'hvac-technician': '/images/programs/efh-building-tech-card.jpg',
   'nha-medical-assistant': '/images/pages/medical-assistant-hero.webp',
   'nha-patient-care-technician': '/images/pages/cna-vitals.webp',
   'qma': '/images/pages/cna-patient-care.jpg',
   'nha-pharmacy-technician': '/images/pages/medical-assistant-real.webp',
-  'nha-phlebotomy': '/images/refresh-20261014/phlebotomy.webp',
+  'nha-phlebotomy': '/images/pages/drug-testing-page-4.webp',
   'youth-culinary-apprenticeship': '/images/pages/entrepreneurship.webp',
-  'network-administration': '/images/refresh-20261014/technology.webp',
+  'network-administration': '/images/pages/technology-sector.webp',
   'network-support-technician': '/hero-images/technology-cat-new.jpg',
   'guest-service-gold': '/images/pages/about-employer-partners.webp',
-  'start-hospitality': '/images/refresh-20261014/hospitality.webp',
+  'start-hospitality': '/images/pages/about-employer-partners.webp',
 };
 
 const SHARED_GENERIC_VIDEO_FILES = new Set([

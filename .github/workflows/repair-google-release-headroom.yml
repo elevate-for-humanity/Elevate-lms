@@ -1,0 +1,67 @@
+name: Repair Google Marketing release headroom
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/repair-google-release-headroom.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env: {GH_TOKEN: '${{ github.token }}'}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/repair-google-release-headroom.yml/dispatches" -f ref=main
+  repair:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    concurrency:
+      group: google-runtime-us-central1
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Cap Marketing service without replacing its tested revision
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {execFileSync} from 'node:child_process';
+          const name='elevate-marketing-migration';
+          const scope=['--project=elegant-racer-299721','--region=us-central1'];
+          const run=args=>execFileSync('gcloud',[...args,...scope],{encoding:'utf8',timeout:180000,stdio:['ignore','pipe','pipe']});
+          const read=()=>JSON.parse(run(['run','services','describe',name,'--format=json']));
+          const before=read();
+          const current=before.metadata.annotations?.['run.googleapis.com/maxScale'];
+          if(current!==undefined&&!['1','2'].includes(current))throw Error('Unexpected service maximum; no change');
+          const c=before.spec.template.spec.containers[0];
+          assert.equal(c.resources.limits.cpu,'1');
+          assert.equal(c.resources.limits.memory,'4Gi');
+          const traffic=(s)=>(s.status.traffic||[]).filter(t=>t.percent>0).map(t=>[t.revisionName,t.percent]).sort();
+          assert.equal(traffic(before).reduce((n,t)=>n+t[1],0),100);
+          async function health(){
+            const r=await fetch('https://www.elevateforhumanity.org/api/health',{redirect:'error',cache:'no-store',signal:AbortSignal.timeout(30000)});
+            const h=await r.json();assert.equal(r.status,200);assert.equal(h.service,'marketing');assert.equal(h.healthy,true);
+            return h.commit||h.commitSha;
+          }
+          const commit=await health();assert.match(commit,/^[a-f0-9]{40}$/);
+          if(current!=='1')run(['run','services','update',name,'--max=1','--quiet']);
+          const after=read();
+          assert.equal(after.metadata.annotations['run.googleapis.com/maxScale'],'1');
+          assert.deepEqual(after.spec.template,before.spec.template);
+          assert.deepEqual(traffic(after),traffic(before));
+          assert.equal(after.status.latestCreatedRevisionName,before.status.latestCreatedRevisionName);
+          for(let i=0;i<3;i++)assert.equal(await health(),commit);
+          console.log(JSON.stringify({service:name,maximumInstances:1,imageAndTemplatePreserved:true,servingTrafficPreserved:true,healthVerified:true,commit}));
+          NODE

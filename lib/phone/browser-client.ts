@@ -31,23 +31,23 @@ export type PhoneClient = {
   disconnect(): Promise<unknown>;
   newCall(options: OutboundOptions): Promise<PhoneCall>;
 };
-export type PhoneCredential =
-  | { provider?: 'telnyx'; token: string }
-  | {
-      provider: 'asterisk';
-      sipUsername: string;
-      sipPassword: string;
-      sipDomain: string;
-      wsUrl: string;
-      iceServers: RTCIceServer[];
-    };
+export type PhoneCredential = {
+  provider: 'asterisk';
+  sipUsername: string;
+  sipPassword: string;
+  sipDomain: string;
+  wsUrl: string;
+  iceServers: RTCIceServer[];
+};
 
 export function phoneDestination(value: string, provider: string): string | null {
   const trimmed = value.trim();
-  // PSTN remains on the working carrier until the PBX trunk has its own live
-  // acceptance evidence. A pilot registration does not authorize that cutover.
-  if (provider === 'asterisk') return /^(?:0|[1-9]\d{2})$/.test(trimmed) ? trimmed : null;
-  const digits = trimmed.replace(/\D/g, '');
+  // Internal PWA calls are served by Elevate Asterisk; Twilio provides PSTN
+  // transport behind the PBX, never browser-side carrier credentials.
+  if (provider !== 'asterisk') return null;
+  if (/^(?:0|[1-9]\\d{2})$/.test(trimmed)) return trimmed;
+  if (/^\\+[1-9]\\d{7,14}$/.test(trimmed)) return trimmed;
+  const digits = trimmed.replace(/\\D/g, '');
   if (digits.length === 10) return `+1${digits}`;
   if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`;
   return null;
@@ -93,28 +93,6 @@ export async function createPhoneClient(
   credential: PhoneCredential,
   remoteAudio: HTMLAudioElement,
 ): Promise<PhoneClient> {
-  if (credential.provider !== 'asterisk') {
-    const { TelnyxRTC } = await import('@telnyx/webrtc');
-    const client = new TelnyxRTC({
-      login_token: credential.token,
-      keepConnectionAliveOnSocketClose: true,
-      hangupOnBeforeUnload: false,
-    });
-    return {
-      on(event, listener) {
-        const names = {
-          ready: 'telnyx.ready',
-          error: 'telnyx.error',
-          call: 'telnyx.notification',
-          offline: 'telnyx.socket.close',
-        };
-        client.on(names[event] as any, listener);
-      },
-      connect: () => client.connect(),
-      disconnect: () => client.disconnect(),
-      newCall: async (options) => client.newCall(options) as unknown as PhoneCall,
-    };
-  }
 
   const { SessionManager } = await import('sip.js/lib/platform/web');
   const listeners = new Map<string, Array<(data?: any) => void>>();
@@ -250,7 +228,7 @@ export async function createPhoneClient(
     async newCall(options) {
       if (!registered) throw new Error('Connect the phone before calling.');
       const destination = phoneDestination(options.destinationNumber, 'asterisk');
-      if (!destination) throw new Error('Enter operator 0 or a three-digit extension.');
+      if (!destination) throw new Error('Enter operator 0, a three-digit extension, or a valid telephone number.');
       const session = await manager.call(`sip:${destination}@${credential.sipDomain}`);
       return wrap(session, 'calling');
     },

@@ -125,7 +125,11 @@ export async function GET() {
   return NextResponse.json({ apprentices });
 }
 
+// Formal Appendix A approvals are reserved for sponsor administration.
+// Host Shop mentors record practical services through /api/host-shop/practical-services.
 export async function PATCH(req: NextRequest) {
+  return NextResponse.json({ error: 'Formal Appendix A sign-offs are restricted to sponsor administration.' }, { status: 403 });
+
   const ctx = await getAuthContext();
   if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { user, db, profile, membershipPartnerId, isPlatformAdmin } = ctx;

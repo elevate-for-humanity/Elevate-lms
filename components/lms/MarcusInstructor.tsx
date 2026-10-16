@@ -130,7 +130,7 @@ export default function MarcusInstructor({ lessonNumber, lessonTitle }: Props) {
           </div>
           <div className="flex-1 text-left">
             <p className="font-bold text-sm">Ask Marcus</p>
-            <p className="text-slate-400 text-xs mt-0.5">
+            <p className="text-slate-600 text-xs mt-0.5">
               Your HVAC instructor — ask anything about this lesson
             </p>
           </div>
@@ -174,7 +174,7 @@ export default function MarcusInstructor({ lessonNumber, lessonTitle }: Props) {
           <button
             onClick={() => setCollapsed((c) => !c)}
             title={collapsed ? 'Expand' : 'Collapse'}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition"
+            className="p-2 text-slate-600 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition"
           >
             {collapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
           </button>
@@ -281,7 +281,7 @@ export default function MarcusInstructor({ lessonNumber, lessonTitle }: Props) {
               <button
                 onClick={() => send()}
                 disabled={!input.trim() || loading}
-                className="flex-shrink-0 w-9 h-9 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-slate-200 disabled:text-slate-400 text-white rounded-xl flex items-center justify-center transition"
+                className="flex-shrink-0 w-9 h-9 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-slate-200 disabled:text-slate-600 text-white rounded-xl flex items-center justify-center transition"
               >
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

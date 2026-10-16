@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import ImageMetadata from '@/components/marketing/ImageMetadata';
@@ -18,7 +19,7 @@ export function PlatformHubHero() {
         description="Illustrative Elevate workforce institute exterior with adult professionals at the entrance"
       />
       <div className="relative aspect-video sm:aspect-auto sm:h-[clamp(240px,38svh,480px)] w-full overflow-hidden bg-sky-100">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={HOME_IMAGE}
           alt="Illustrative Elevate workforce institute exterior with adult professionals at the entrance"
           fill

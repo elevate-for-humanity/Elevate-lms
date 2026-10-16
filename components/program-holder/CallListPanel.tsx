@@ -25,7 +25,7 @@ const OUTCOMES = [
   { value: 'scheduled',       label: 'Scheduled Start',   color: 'text-purple-600'},
   { value: 'enrolled',        label: 'Enrolled',          color: 'text-emerald-600'},
   { value: 'not_interested',  label: 'Not Interested',    color: 'text-red-600'   },
-  { value: 'wrong_number',    label: 'Wrong Number',      color: 'text-slate-400' },
+  { value: 'wrong_number',    label: 'Wrong Number',      color: 'text-slate-600' },
 ];
 
 function OutcomePill({ outcome }: { outcome: string | null }) {
@@ -168,7 +168,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
                 {/* Name + email */}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-slate-900 truncate">{applicant.applicant_name}</p>
-                  <p className="text-xs text-slate-400 truncate">{applicant.applicant_email}</p>
+                  <p className="text-xs text-slate-600 truncate">{applicant.applicant_email}</p>
                   {notes && (
                     <p className="text-xs text-slate-500 italic truncate mt-0.5">"{notes}"</p>
                   )}
@@ -217,7 +217,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
                   {/* Expand toggle */}
                   <button
                     onClick={() => setExpanded(isOpen ? null : applicant.id)}
-                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400"
+                    className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600"
                   >
                     {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </button>
@@ -318,7 +318,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
                     </button>
                     <button
                       onClick={() => setExpanded(null)}
-                      className="text-sm text-slate-400 hover:text-slate-600"
+                      className="text-sm text-slate-600 hover:text-slate-600"
                     >
                       Cancel
                     </button>

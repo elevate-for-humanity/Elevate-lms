@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ApprenticeProgramGuide } from './ApprenticeProgramGuide';
@@ -299,14 +300,13 @@ export function ApprenticePortalShell({
     <div className="min-h-screen bg-slate-50">
       {/* Hero */}
       <div className="relative h-[180px] sm:h-[220px] overflow-hidden bg-slate-900">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={config.heroImage}
           alt={config.label}
           fill
           className="object-cover object-center"
           sizes="100vw"
           priority
-          placeholder="empty"
         />
         <div className="relative z-20 h-full max-w-6xl mx-auto px-4 sm:px-6 flex items-center">
           <div className="bg-black/40 rounded-xl px-4 py-3 backdrop-blur-sm">

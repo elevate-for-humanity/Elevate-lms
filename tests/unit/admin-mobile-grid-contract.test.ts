@@ -1,13 +1,18 @@
-import { readFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
+
+function sourceFiles(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const file = join(directory, entry.name);
+    if (entry.isDirectory()) return sourceFiles(file);
+    return entry.isFile() && entry.name.endsWith('.tsx') ? [file] : [];
+  });
+}
 
 describe('Admin and Studio mobile grid contract', () => {
   it('does not force three-or-more columns at the base mobile breakpoint', () => {
-    const matches = execFileSync(
-      'rg',
-      ['-l', 'className="[^"]*grid-cols-[3-9][^"]*"', 'apps/admin/app', 'components/studio', '--glob', '*.tsx'],
-      { encoding: 'utf8' },
-    ).trim().split('\n').filter(Boolean);
+    // Keep the same source contract without depending on an uninstalled runner binary.
+    const matches = ['apps/admin/app', 'components/studio'].flatMap(sourceFiles);
 
     const violations = matches.flatMap((file) => {
       const source = readFileSync(file, 'utf8');

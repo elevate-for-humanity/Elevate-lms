@@ -1,6 +1,7 @@
 import HostShopBenefits from '@/components/partners/HostShopBenefits';
 import HostShopNetworkDirectory from '@/components/partners/HostShopNetworkDirectory';
-import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
+import { getHostShopNetwork, type HostShopNetworkEntry } from '@/lib/programs/host-shop-network';
+import { logger } from '@/lib/logger';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -25,7 +26,14 @@ const pathways = [
 export const dynamic = 'force-dynamic';
 
 export default async function BarberBeautyNetworkPage() {
-  const shops = await getHostShopNetwork();
+  let shops: HostShopNetworkEntry[] = [];
+  let directoryUnavailable = false;
+  try {
+    shops = await getHostShopNetwork();
+  } catch (error) {
+    logger.error('[BarberBeautyNetworkPage] Host Shop directory unavailable', error);
+    directoryUnavailable = true;
+  }
   return (
     <main className="min-h-screen bg-white text-slate-950">
       <section className="relative isolate overflow-hidden bg-slate-950 text-white">
@@ -42,7 +50,15 @@ export default async function BarberBeautyNetworkPage() {
         </div>
       </section>
       <HostShopBenefits />
-      <section id="shop-directory" className="bg-slate-950 px-5 py-10 text-white sm:py-14"><div className="mx-auto max-w-6xl"><h2 className="text-3xl font-black">Discover local shops. Support local talent.</h2><p className="mt-3 max-w-3xl leading-7 text-slate-300">Browse portfolios, choose a shop, and use its directions, contact, or booking links. Contact the shop to confirm hours and walk-in availability.</p><HostShopNetworkDirectory shops={shops} /></div></section>
+      <section id="shop-directory" className="bg-slate-950 px-5 py-10 text-white sm:py-14"><div className="mx-auto max-w-6xl"><h2 className="text-3xl font-black">Discover local shops. Support local talent.</h2><p className="mt-3 max-w-3xl leading-7 text-slate-300">Browse portfolios, choose a shop, and use its directions, contact, or booking links. Contact the shop to confirm hours and walk-in availability.</p>
+        {directoryUnavailable ? (
+          <div role="alert" className="mt-6 rounded-xl border border-amber-300 bg-amber-50 p-5 text-slate-950">
+            <h3 className="font-bold">The shop directory is temporarily unavailable.</h3>
+            <p className="mt-2">We could not load the current approved shop records. Please try again later or contact admissions for help finding a Host Shop.</p>
+            <Link href="/contact" className="mt-3 inline-flex min-h-11 items-center font-bold text-brand-blue-800 underline">Contact admissions</Link>
+          </div>
+        ) : <HostShopNetworkDirectory shops={shops} />}
+      </div></section>
       <section id="join" className="bg-red-50 px-5 py-10 sm:py-16">
         <div className="mx-auto grid max-w-6xl gap-7 lg:grid-cols-2 lg:items-center">
           <HostShopMediaCarousel shopName="Elevate Barber & Beauty Network" items={[

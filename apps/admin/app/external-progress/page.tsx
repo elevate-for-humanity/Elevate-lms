@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -38,7 +39,7 @@ export default async function ExternalProgressPage() {
       </div>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/pages/admin-external-progress-detail.webp"
           alt="External Progress"
           fill

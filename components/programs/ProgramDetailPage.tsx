@@ -1,4 +1,5 @@
 'use client';
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { logger } from '@/lib/logger';
 
 /**
@@ -269,15 +270,13 @@ export default function ProgramDetailPage({
             // Fallback: plain image hero for programs without a banner entry
             return (
               <div className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
-                {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                <Image
+                        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                   src={heroPosterSrc}
                   alt={heroAlt}
                   fill
                   className="object-contain object-center"
                   priority
                   sizes="100vw"
-                  placeholder="empty"
                 />
               </div>
             );
@@ -347,12 +346,12 @@ export default function ProgramDetailPage({
         <div className="bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
             {/* Breadcrumbs */}
-            <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-5">
+            <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs text-slate-600 mb-5">
               {(p.breadcrumbs ?? [])
                 .filter((b) => Boolean(b?.label))
                 .map((b, i) => (
-                  <span key={i} className="flex items-center gap-1.5">
-                    {i > 0 && <ChevronRight className="w-3 h-3" />}
+                  <span key={i} className="flex min-w-0 items-center gap-1.5">
+                    {i > 0 && <ChevronRight aria-hidden="true" className="w-3 h-3 shrink-0" />}
                     {b.href ? (
                       <Link href={b.href} className="hover:text-slate-600 transition-colors">
                         {b.label}
@@ -888,7 +887,7 @@ export default function ProgramDetailPage({
           </div>
           {(p.complianceAlignment?.length ?? 0) > 0 && (
             <div className="mt-6 pt-6 border-t border-slate-100 flex flex-wrap items-center gap-2 justify-center">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+              <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">
                 Aligned with:
               </span>
               {(p.complianceAlignment ?? []).map((a) => (
@@ -1056,7 +1055,7 @@ export default function ProgramDetailPage({
               {/* Internal LMS training */}
               {p.lmsCourseSlug && (
                 <div>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                  <p className="text-[11px] font-bold text-slate-600 uppercase tracking-widest mb-3">
                     Elevate Internal Training
                   </p>
                   <div className="bg-white rounded-xl border border-slate-200 p-5 flex items-start gap-4">
@@ -1168,7 +1167,7 @@ export default function ProgramDetailPage({
       <section id="enrollment-options" className="py-14 border-y border-slate-100">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-10">
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-green-600 mb-3">
+            <p className="text-xs font-bold uppercase tracking-widest text-brand-green-800 mb-3">
               How You Can Start
             </p>
             <h2 className="text-2xl font-extrabold text-slate-900 mb-3">

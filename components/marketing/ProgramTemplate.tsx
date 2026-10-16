@@ -1,4 +1,5 @@
 // components/marketing/ProgramTemplate.tsx
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -73,15 +74,14 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
 
       {/* Hero Section */}
       <section className="relative h-[clamp(260px,42svh,480px)] overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={program.heroImage}
           alt={`${program.name} in training`}
           fill
           className="object-cover"
           priority
           quality={90}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
 
         <div className="relative h-full flex items-center">

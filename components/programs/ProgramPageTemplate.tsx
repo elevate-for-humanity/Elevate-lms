@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FundingBadge } from './FundingBadge';
@@ -52,15 +53,14 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
 
       {/* Hero Image - Compact */}
       <section className="relative h-[clamp(260px,42svh,480px)] bg-slate-100">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src={program.image}
           alt={program.title}
           fill
           sizes="100vw"
           className="object-contain"
           priority
-          quality={85} placeholder="empty"
+          quality={85}
         />
       </section>
 

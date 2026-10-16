@@ -1,10 +1,11 @@
+// Native fetch Response bodies avoid mixing Node 22 fetch with jsdom Blob implementations.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { playNaturalVoiceNotification, speakNaturalVoice, stopAllNaturalVoicePlayback } from '@/components/voice/useNaturalVoice';
 
 describe('exclusive natural voice playback', () => {
   afterEach(() => { stopAllNaturalVoicePlayback(); vi.unstubAllGlobals(); vi.restoreAllMocks(); });
   it('does not interrupt existing audio when announcing a PWA event', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(new Blob(['audio']))));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('audio', { headers: { 'Content-Type': 'audio/mpeg' } })));
     const play = vi.fn().mockResolvedValue(undefined);
     const pause = vi.fn();
     vi.stubGlobal('Audio', class {
@@ -30,12 +31,12 @@ describe('exclusive natural voice playback', () => {
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:pending');
     const pending = speakNaturalVoice('Pending narration exclusivity test');
     stopAllNaturalVoicePlayback();
-    resolve(new Response(new Blob(['audio'])));
+    resolve(new Response('audio', { headers: { 'Content-Type': 'audio/mpeg' } }));
     expect(await pending).toBe(false);
     expect(play).not.toHaveBeenCalled();
   });
   it('stops standalone audio when another section takes ownership', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(new Blob(['audio']))));
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('audio', { headers: { 'Content-Type': 'audio/mpeg' } })));
     const pause = vi.fn();
     vi.stubGlobal('Audio', class { preload = ''; playbackRate = 1; play = vi.fn().mockResolvedValue(undefined); pause = pause; addEventListener = vi.fn(); });
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:playing');

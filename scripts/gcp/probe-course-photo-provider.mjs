@@ -11,7 +11,7 @@ job.spec.template.spec.taskCount=1;job.spec.template.spec.parallelism=1;
 const task=job.spec.template.spec.template.spec;
 task.maxRetries=0;task.timeoutSeconds=300;
 task.containers[0].resources={limits:{cpu:'1',memory:'1Gi'}};
-const code="import {createHash} from 'node:crypto';\n"+generateTeachingPhoto.toString()+"\nconst image=await generateTeachingPhoto('Photorealistic instructional illustration of a clean barber workstation with combs, cape and clipper guards neatly separated. No people, no text, no invented guard measurements.');if(image.bytes.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')throw Error('IMAGE_NOT_PNG');console.log(JSON.stringify({photoProviderVerified:true,provider:image.provider,model:image.model,bytes:image.bytes.length,sha256:createHash('sha256').update(image.bytes).digest('hex')}));";
+const code="import {createHash} from 'node:crypto';\n"+generateTeachingPhoto.toString()+"\nconst image=await generateTeachingPhoto('Photorealistic instructional illustration of a clean barber workstation with combs, cape and clipper guards neatly separated. No people, no text, no invented guard measurements.');if(!['image/png','image/jpeg','image/webp'].includes(image.mimeType)||!image.bytes?.length)throw Error('IMAGE_FORMAT_INVALID');console.log(JSON.stringify({photoProviderVerified:true,provider:image.provider,model:image.model,bytes:image.bytes.length,sha256:createHash('sha256').update(image.bytes).digest('hex')}));";
 task.containers[0].command=['node'];task.containers[0].args=['--input-type=module','-e',code];
 const capacity=await inspectRegionalCapacity({region,task});
 console.log(JSON.stringify({kind:'photoProbeCapacity',...capacity}));

@@ -74,6 +74,8 @@ async function _POST(request: NextRequest) {
     Object.entries(rawAnswers).map(([key, value]) => [key, safeString(value, '', 3000)]),
   );
   const briefMode = typeof body.brief === 'string';
+  const allowedDesigns = ['executive', 'modern', 'creative', 'minimal'] as const;
+  const designDirection = typeof body.designDirection === 'string' && allowedDesigns.some(item => item === body.designDirection) ? body.designDirection : null;
   if (briefMode) {
     const brief = safeString(body.brief, '', 12000);
     const name = safeString(body.businessName, '', 120);
@@ -94,7 +96,7 @@ async function _POST(request: NextRequest) {
   const siteOwnerType = answers.siteOwnerType === 'individual' ? 'individual' : 'business or organization';
   const industry = safeString(answers.industry, '', 500);
   const contactEmail = safeString(user.email, '', 240);
-  const structuredBrief = JSON.stringify({ websiteFor: siteOwnerType, ...answers }, null, 2).slice(0, 24000);
+  const structuredBrief = JSON.stringify({ websiteFor: siteOwnerType, ...answers, ...(designDirection ? { designDirection } : {}) }, null, 2).slice(0, 24000);
 
   const fallback = buildDefaultSiteConfig({ organizationName: businessName, industry, contactEmail: contactEmail || undefined });
   let config: TenantSiteConfig = fallback;
@@ -133,7 +135,7 @@ async function _POST(request: NextRequest) {
         description: safeString(generated.seo?.description, fallback.seo?.description || '', 500),
         keywords: Array.isArray(generated.seo?.keywords) ? generated.seo.keywords.map((item: unknown) => safeString(item, '', 80)).filter(Boolean).slice(0, 20) : fallback.seo?.keywords,
       },
-      meta: { ...(fallback.meta || {}), generatedBy: 'paris-autonomous-website-builder', parisInterviewCompleted: true, interview: answers, generatedAt: new Date().toISOString(), licensedAssetPolicy: buildLicensedAssetProjectPolicy({ consumer: 'website_builder', plan }) },
+      meta: { ...(fallback.meta || {}), ...(designDirection ? { designDirection } : {}), generatedBy: 'paris-autonomous-website-builder', parisInterviewCompleted: true, interview: answers, generatedAt: new Date().toISOString(), licensedAssetPolicy: buildLicensedAssetProjectPolicy({ consumer: 'website_builder', plan }) },
     });
   } catch (error) {
     logger.error('[website-builder] PARIS generation failed', error instanceof Error ? error : new Error(String(error)));

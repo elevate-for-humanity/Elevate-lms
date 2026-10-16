@@ -21,7 +21,8 @@ jobs:
     environment: production
     timeout-minutes: 10
     concurrency:
-      group: google-runtime-us-central1
+      # This only lowers a service ceiling; it creates no revision or traffic change.
+      group: google-marketing-capacity-reduction
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4

@@ -26,13 +26,13 @@ The exact baseline `565cb8228d` reproduces the original 195 findings. Each origi
 
 The updated summary records 25 additional source/render-supported false positives, five corrected/render-verified findings, 19 source-verified findings and four source-verified/previously-corrected findings. Still open: 104 source-reviewed entries, 37 source-corrected entries awaiting rendered verification, and one partially verified image-overlay review. These are not all confirmed defects. See `finding-dispositions.json`; no blanket closure or suppression was applied.
 
-`additional-confirmed-findings.json` records ten further defect groups found through rendering and interaction, including the shared contrast and tablet navigation failures.
+`additional-confirmed-findings.json` records twelve further defect groups found through rendering and interaction, including the shared contrast and tablet navigation failures.
 
 ## Verification
 
 - Frozen install: **passed with pnpm 10.28.2**; dependency versions and lockfile unchanged.
 - Marketing/Admin/LMS TypeScript and repository lint: passed. Final production-build and new-head workflow results are recorded in the PR verification section. The local Marketing production build passed; the scratch checkout was externally removed during Admin trace collection, interrupting the local build sequence. Clean GitHub container builds provide the remaining build evidence.
-- Focused unit verification: 49 tests across eight files passed; seven audit regression tests passed.
+- Focused unit verification: the original 49 tests across eight files passed; the later five-file fixture/readiness regression run passed all 11 tests; seven audit regression tests passed.
 - Browser coverage: 126 unique cases in bounded batches — seven representative routes across eight widths, plus 34 original-finding public routes at mobile/desktop and two shared-surface regressions. Required widths 320/375/390/768/1024/1440px and header boundaries 1179/1180px are covered. Targeted reruns verify the subsequent contrast, clipping and menu lifecycle corrections.
 - Computed normal-text contrast assertions require at least 4.5:1 for the affected heroes, Community control, Pricing link and Connect input. Nested dark/light panels are tested through the actual compiled stylesheet.
 - Image tests scroll through each visible lazy image and require a decoded asset; pending requests cannot count as passes. Carousel selection, target bounds, menu opening, Escape/focus and desktop resize cleanup are asserted.
@@ -61,3 +61,17 @@ No Northflank operation, Cloud Run deployment, Google Cloud build or course exec
 Main advanced by two phone fixes during verification. GitHub’s merge checkout exposed three `preserve-caught-error` lint failures in the new microphone helper. The repair preserves the existing user-facing messages and capture cleanup while attaching the original error as `cause`. Its five existing microphone tests pass, with the three translated-error cases now asserting cause identity. The main updates were merged without conflicts.
 
 The new main readiness requirement also exposed missing `navigator.mediaDevices` in the SIP browser-test fixture. The fixture now supplies a live audio track, checks capture constraints and release, and verifies blocked capture prevents SIP construction. All 114 tests in the phone workflow’s 17-file Vitest command pass locally, plus the five direct microphone tests. Production capture validation remains enabled.
+
+## Cold-render and full-suite follow-up
+
+On head `fe52e2e58d67ea63448cc70a1e97378a45e69acb`, 54/56 primary browser cases passed. The first student-entry render exposed an existing streamed server redirect to `/apply/student/interview`; the test now waits for that exact canonical destination and asserts the PARIS workspace heading. No redirect or application logic changed. A desktop catalog activation exposed a pre-hydration carousel control; ARC-11 adds readiness at the component source instead of retrying clicks or adding sleeps. Final-head results are linked from the PR.
+
+The local Marketing, Admin and LMS production builds completed, including generated-route type checks, after restoring the removed scratch checkout. The latest carousel readiness change is rechecked separately and in the final-head Marketing build.
+
+The final full-suite CI advisory log on `fe52e2e` reports **3,997 passed / 9 failed / 8 skipped** across 604 files. This is not a clean whole-suite pass even though the existing CI required gate is green. Four billing/MOU contract failures were independently reproduced on unmodified main `8e9d4a67a0` (four failures, 14 passes in the five-file comparison). Four audio tests fail only in the hosted runner with `object.stream is not a function`; they pass in that local main comparison. One Admin grid contract cannot start because the hosted runner lacks `rg`. These advisory limitations remain recorded; no test was disabled or turned into success by this repair, and billing/authorization behavior is preserved.
+
+The production-mode Compliance run on `fe52e2e` found four shared label contrast defects across Business, HVAC, CDL, Funding and Check Eligibility. ARC-12 repairs their component colors; no Axe rule or severity threshold changed. The scan now requires a successful HTTP response and visible main/heading. The Admin mobile-grid source contract uses Node filesystem traversal with the same matching/assertion rules, removing the missing-`rg` failure. Remaining full-suite advisory results are recorded in the PR. The two previously failing primary browser routes pass 12 consecutive targeted local cases after the redirect/readiness correction.
+
+The nine advisory failures were investigated rather than inferred from the green gate. The four audio fixtures now use native fetch response bodies with an audio content type, avoiding the hosted Node 22/jsdom Blob mismatch while retaining playback/mute/ownership assertions. The two MOU tests now verify the existing 14-section canonical document, its protected-information/noncompetition limitation and final signature section. The grid test retains its matching assertions with Node traversal. These five updated test files (including hydration) pass all 11 local cases. The two existing learner-billing contract mismatches remain separate from this design repair; no billing or authorization implementation was changed to satisfy those assertions.
+
+After the last source corrections, the application/catalog routes passed 12 repeated local browser cases and all five affected pages passed ten desktop/Android Axe cases with successful-response and page-content guards. Source, loading/crop choices and homepage photo assignments remain preserved.

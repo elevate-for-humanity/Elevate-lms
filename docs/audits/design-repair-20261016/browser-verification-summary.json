@@ -769,5 +769,41 @@
     "No controlled authenticated Admin, learner, apprentice, Host Shop or Program Holder login was available in this test runner.",
     "Live catalog queries can time out locally; visual passes are not database correctness certification.",
     "Not every overlay, dynamic record or player state was visually closed."
-  ]
+  ],
+  "followUpVerification": {
+    "failedHead": "fe52e2e58d67ea63448cc70a1e97378a45e69acb",
+    "ciEvidence": "https://github.com/elevate-for-humanity/Elevate-lms/actions/runs/38939961486",
+    "primaryBefore": "54 passed / 2 failed: streamed application redirect and early carousel activation",
+    "corrections": [
+      "Wait for exact canonical PARIS destination and workspace heading",
+      "Disable carousel selection until hydration",
+      "Repair four shared program/funding label colors",
+      "Require successful HTTP response and visible main/heading before Axe"
+    ],
+    "localTargetedBrowser": {
+      "cases": 12,
+      "result": "pass",
+      "widths": [
+        320,
+        1440
+      ],
+      "repetitionsPerRouteAndWidth": 3
+    },
+    "localGuardedAxe": {
+      "cases": 10,
+      "result": "pass",
+      "profiles": [
+        "desktop-chrome",
+        "android-chrome"
+      ],
+      "routes": [
+        "/programs/business-administration",
+        "/programs/hvac-technician",
+        "/programs/cdl-training",
+        "/funding",
+        "/check-eligibility"
+      ]
+    },
+    "limit": "The broader public suite cannot be fully certified locally without its server credential. Final complete GitHub suite/build results are linked in the PR."
+  }
 }

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowRight, BadgeDollarSign, CalendarDays } from 'lucide-react';
 
 const PROGRAMS = [
@@ -64,6 +64,8 @@ const PROGRAMS = [
 
 export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
   const [active, setActive] = useState(0);
+  const [interactive, setInteractive] = useState(false);
+  useEffect(() => setInteractive(true), []);
 
   const program = PROGRAMS[active];
   const Heading = asHero ? 'h1' : 'h2';
@@ -154,10 +156,11 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
               <button
                 key={item.href}
                 type="button"
+                disabled={!interactive}
                 aria-label={`Show ${item.title}`}
                 aria-current={index === active ? 'true' : undefined}
                 onClick={() => setActive(index)}
-                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue-700"
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue-700 disabled:cursor-wait disabled:opacity-50"
               >
                 <span aria-hidden="true" className={`h-2 rounded-full transition-all ${index === active ? 'w-6 bg-brand-red-700' : 'w-2 bg-slate-400'}`} />
               </button>

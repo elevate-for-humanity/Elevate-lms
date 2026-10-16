@@ -4,11 +4,19 @@ import { test, expect } from '@playwright/test';
 // excluded: it requires a controlled test account and database cleanup contract.
 for (const route of ['/', '/programs', '/programs/bookkeeping', '/programs/hvac-technician', '/apply/student', '/partners/host-shop/apply', '/funding/workone-intake']) {
   test(`${route}: readable, responsive, working images`, async ({ page }, testInfo) => {
+    // The canonical entry streams a server redirect to the PARIS workspace.
+    // Wait for that destination, including its first development compilation.
+    if (route === '/apply/student') test.setTimeout(90000);
     const response = await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 90000 });
     expect(response?.status()).toBeLessThan(400);
-    expect(new URL(page.url()).pathname).toBe(route);
+    const destination = route === '/apply/student' ? '/apply/student/interview' : route;
+    await page.waitForURL(url => url.pathname === destination, { waitUntil: 'domcontentloaded', timeout: 90000 });
+    expect(new URL(page.url()).pathname).toBe(destination);
     await expect(page.locator('main').first()).toBeVisible();
     await expect(page.locator('h1').first()).toBeVisible();
+    if (route === '/apply/student') {
+      await expect(page.getByRole('heading', { name: 'Talk with PARIS while your application builds beside you.', exact: true })).toBeVisible();
+    }
     if (route === '/') {
       const trigger = page.getByRole('button', { name: 'Open menu', exact: true });
       if (await trigger.isVisible()) {

@@ -69,6 +69,23 @@
       "file": "apps/marketing/app/pricing/page.tsx",
       "before": "Small green links and bright hover colors lacked contrast.",
       "correctionAndEvidence": "Green-800 labels and deeper ROI hover color; prices/funding wording unchanged; rendered contrast assertion passes."
+    },
+    {
+      "id": "ARC-11",
+      "classification": "Shared architectural defect",
+      "file": "components/home/HomeProgramShowcase.tsx",
+      "before": "A cold GitHub browser render focused the CNA selector but retained HVAC content: a control accepted activation before its client handler was ready.",
+      "correctionAndEvidence": "Selection controls are disabled until hydration enables their handlers. Two regression tests cover server-rendered readiness and the first ready activation. The real browser suite retains its selection, destination, image decoding and geometry assertions."
+    },
+    {
+      "id": "ARC-12",
+      "classification": "Accessibility or contrast defect",
+      "files": [
+        "components/programs/ProgramDetailPage.tsx",
+        "components/funding/EligibilityScreener.tsx"
+      ],
+      "before": "Production-mode Axe reported 2.45:1\u20133.29:1 contrast for Aligned with, Elevate Internal Training, How You Can Start and the funding step label across five public routes.",
+      "correctionAndEvidence": "Scoped slate-600 and green-800 component utilities replace low-contrast label colors. Accessibility scans now also require a successful HTTP response and visible main/heading so an error page cannot count as route verification. Existing Axe severity assertions remain unchanged."
     }
   ]
 }

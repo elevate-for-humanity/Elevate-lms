@@ -17,8 +17,11 @@ const PUBLIC_ROUTES = [
 ] as const;
 
 async function scan(page: Page, route: string) {
-  await page.goto(route);
+  const response = await page.goto(route);
+  expect(response?.status()).toBeLessThan(400);
   await page.waitForLoadState('domcontentloaded');
+  await expect(page.locator('main').first()).toBeVisible();
+  await expect(page.locator('h1').first()).toBeVisible();
   await page.waitForTimeout(300);
 
   return new AxeBuilder({ page })

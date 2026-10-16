@@ -83,18 +83,21 @@ const LAYOUT_TEXT_PATTERNS = [
     re: /(?:hero|Hero)[\s\S]{0,400}bg-gradient-to/g,
     severity: 'high',
     message: 'Gradient overlay near hero media',
+    classification: 'manual-visual-review',
   },
   {
     id: 'hero-text-overlay',
     re: /absolute inset-0[\s\S]{0,300}text-(?:white|3xl|4xl|5xl)/g,
     severity: 'high',
     message: 'Possible headline/text overlaid on hero media',
+    classification: 'manual-visual-review',
   },
   {
     id: 'invisible-white-on-white',
     re: /bg-white[^"']*["'][^"']*text-white/g,
     severity: 'high',
     message: 'Possible white text on white background',
+    classification: 'potential-accessibility',
   },
   {
     id: 'low-contrast-neutral-on-light',
@@ -104,6 +107,7 @@ const LAYOUT_TEXT_PATTERNS = [
     ),
     severity: 'high',
     message: 'Low-contrast neutral text on a light surface',
+    classification: 'potential-accessibility',
   },
   {
     id: 'low-contrast-neutral-on-light-reversed',
@@ -119,6 +123,7 @@ const LAYOUT_TEXT_PATTERNS = [
     re: /<Image[^>]*alt=["']\s*["']/g,
     severity: 'medium',
     message: 'Empty Next/Image alt text',
+    classification: 'manual-accessibility-review',
   },
 ];
 
@@ -176,6 +181,7 @@ function findMatches(content, relFile, patterns, heroOnly = false) {
         line: lineNumber(content, m.index),
         match: m[0].slice(0, 100),
         ...pat,
+        classification: pat.classification || 'layout-review',
       });
     }
   }
@@ -306,6 +312,9 @@ const report = {
   },
   topOversizedHeroFiles: groupByFile(oversizedHero).slice(0, 60),
   topImagePerfFiles: groupByFile(imagePerf).slice(0, 50),
+  // Retain every finding for line-by-line review, not just the 60 noisiest files.
+  allLayoutTextFindings: layoutText.map(({ file, service, line, id, severity, message, classification, match }) => ({ file, service, line, id, severity, message, classification, match })),
+  layoutTextByClassification: layoutText.reduce((acc, hit) => { acc[hit.classification] = (acc[hit.classification] || 0) + 1; return acc; }, {}),
   topLayoutTextFiles: groupByFile(layoutText).slice(0, 60),
   marketingPagesNoCanonical: marketingPagesNoCanonical.slice(0, 300),
   marketingPageDesign,

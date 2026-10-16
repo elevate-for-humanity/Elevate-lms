@@ -1,3 +1,4 @@
+import OnlineStudyClock from '@/components/learner/OnlineStudyClock';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -417,6 +418,14 @@ export default async function StudentDashboard() {
       </div>
 
       <div className="w-full max-w-none space-y-6 px-4 py-6 sm:px-6">
+        {!subject.previewing && programEnrollments.some((row) => row.programs.slug === 'hvac-technician') ? <>
+          <section className="rounded-xl border border-blue-200 bg-blue-50 p-5">
+            <h2 className="text-xl font-bold">Your HVAC start guide</h2>
+            <p className="my-3">Four weeks online, followed by two weeks at the facility. Review the dashboard orientation and confirm your calendar dates with staff.</p>
+            <Link className="font-bold underline" href="/lms/orientation">Program and dashboard orientation</Link>
+          </section>
+          <OnlineStudyClock />
+        </> : null}
         {subject.previewing ? (
           <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
             <span className="font-semibold">

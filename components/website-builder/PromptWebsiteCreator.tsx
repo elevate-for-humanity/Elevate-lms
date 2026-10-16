@@ -25,7 +25,7 @@ export function PromptWebsiteCreator() {
       const response = await fetch('/api/apps/website-builder/ai-generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ businessName: businessName.trim(), brief: `${brief.trim()}\n\nCustomer-selected design direction: ${designs.find(item => item.id === design)?.name || 'Executive Luxury'}. ${designs.find(item => item.id === design)?.note || ''}. Honor this visual direction across every page.` }),
+        body: JSON.stringify({ businessName: businessName.trim(), brief: brief.trim(), designDirection: design }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Your website could not be generated.');

@@ -6,6 +6,13 @@ import { useState } from 'react';
 export function PromptWebsiteCreator() {
   const [businessName, setBusinessName] = useState('');
   const [brief, setBrief] = useState('');
+  const [design, setDesign] = useState('executive');
+  const designs = [
+    { id: 'executive', name: 'Executive Luxury', colors: ['#123729','#c6a25e','#f7f1e5'], headline: 'A lasting legacy', note: 'Editorial photography, dark green, gold accents' },
+    { id: 'modern', name: 'Modern Corporate', colors: ['#173e5a','#e6f0f5','#ffffff'], headline: 'Build what is next', note: 'Clean grids, strong contrast, professional imagery' },
+    { id: 'creative', name: 'Bold Creative', colors: ['#442080','#f1b742','#f9eaf3'], headline: 'Make an impact', note: 'Expressive headlines, vivid imagery, dynamic sections' },
+    { id: 'minimal', name: 'Elegant Minimalist', colors: ['#242424','#d9cdb8','#faf9f6'], headline: 'Designed to endure', note: 'Refined type, calm photography, generous whitespace' },
+  ] as const;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -18,7 +25,7 @@ export function PromptWebsiteCreator() {
       const response = await fetch('/api/apps/website-builder/ai-generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ businessName: businessName.trim(), brief: brief.trim() }),
+        body: JSON.stringify({ businessName: businessName.trim(), brief: `${brief.trim()}\n\nCustomer-selected design direction: ${designs.find(item => item.id === design)?.name || 'Executive Luxury'}. ${designs.find(item => item.id === design)?.note || ''}. Honor this visual direction across every page.` }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Your website could not be generated.');
@@ -74,6 +81,20 @@ export function PromptWebsiteCreator() {
         className="mt-2 w-full rounded-xl border border-slate-300 p-3"
         placeholder="Describe your products or services, customers, brand style, pages and contact details. Include the real images and payment destinations you want to use."
       />
+      <fieldset className="mt-7">
+        <legend className="text-lg font-bold text-slate-950">Choose your visual direction</legend>
+        <p className="mt-1 text-sm text-slate-600">Preview a design direction before PARIS generates your pages. You can request changes later.</p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          {designs.map(item => <label key={item.id} className={`cursor-pointer overflow-hidden rounded-2xl border-2 transition ${design === item.id ? 'border-brand-red-600 ring-2 ring-brand-red-100' : 'border-slate-200'}`}>
+            <input type="radio" name="design-direction" value={item.id} checked={design === item.id} onChange={() => setDesign(item.id)} className="sr-only" />
+            <div className="flex h-36 flex-col justify-between p-5" style={{ background: item.colors[0], color: item.colors[2] }}>
+              <div className="flex gap-1.5">{item.colors.map(color => <span key={color} className="h-3 w-3 rounded-full border border-white/30" style={{backgroundColor:color}} />)}</div>
+              <div><div className="h-1 w-12 rounded-full" style={{backgroundColor:item.colors[1]}} /><p className="mt-3 max-w-[200px] font-serif text-2xl leading-tight">{item.headline}</p></div>
+            </div>
+            <div className="bg-white p-4"><p className="font-bold text-slate-950">{item.name} {design === item.id ? '✓' : ''}</p><p className="mt-1 text-xs leading-5 text-slate-600">{item.note}</p></div>
+          </label>)}
+        </div>
+      </fieldset>
       <p className="mt-3 text-sm leading-6 text-slate-600">
         Use your real business details. Prices, payment accounts and customer policies need your
         review before publishing.

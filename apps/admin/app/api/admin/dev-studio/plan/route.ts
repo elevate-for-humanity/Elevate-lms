@@ -395,6 +395,9 @@ export async function POST(req: NextRequest) {
                 },
               );
 
+              if (step.runner === 'studio-engineering' && created.tool_name !== 'studio.engineering.execute') {
+                throw new Error('STUDIO_ENGINEERING_ROUTING_MISMATCH');
+              }
               step.task_id = String(created.id);
               await bindCanonicalTask(
                 db,

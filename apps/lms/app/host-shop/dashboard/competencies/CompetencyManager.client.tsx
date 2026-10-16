@@ -63,6 +63,7 @@ export default function CompetencyManager() {
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [serviceCounts,setServiceCounts]=useState<Record<string,number>>({});
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -136,6 +137,21 @@ export default function CompetencyManager() {
     } finally {
       setSavingKey(null);
     }
+  }
+
+  async function recordService(apprentice: Apprentice,competency:Competency){
+    const serviceName=window.prompt('Service performed (e.g. clipper cut, fade, hairstyle, color, manicure):');
+    if(!serviceName?.trim())return;
+    const subjectType=window.prompt('Performed on: patron, mannequin, or student?','patron')?.trim().toLowerCase();
+    if(!subjectType||!['patron','mannequin','student'].includes(subjectType)){setError('Select patron, mannequin, or student.');return;}
+    const performedOn=new Date().toISOString().slice(0,10);
+    const key=`${apprentice.enrollmentId}:${competency.id}`;
+    setSavingKey(key);setError(null);
+    try{
+      const response=await fetch('/api/host-shop/practical-services',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enrollmentId:apprentice.enrollmentId,competencyId:competency.id,serviceName:serviceName.trim(),subjectType,performedOn})});
+      const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not record service');
+      setServiceCounts(current=>({...current,[key]:(current[key]||0)+1}));
+    }catch(e){setError(e instanceof Error?e.message:'Unable to save practical service');}finally{setSavingKey(null);}
   }
 
   if (loading) {
@@ -246,6 +262,8 @@ export default function CompetencyManager() {
                         </div>
                       </div>
                     </div>
+                    <div className="flex flex-col gap-2">
+                    <button type="button" disabled={savingKey===key} onClick={()=>void recordService(apprentice,competency)} className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-900 disabled:opacity-50">+ Record practical service{serviceCounts[key] ? ` (+${serviceCounts[key]} this session)` : ''}</button>
                     <button
                       type="button"
                       disabled={savingKey === key}
@@ -264,7 +282,7 @@ export default function CompetencyManager() {
                         <Circle className="h-4 w-4" />
                       )}
                       {isComplete ? 'Verified' : 'Check off'}
-                    </button>
+                    </button></div>
                   </div>
                 );
               })}

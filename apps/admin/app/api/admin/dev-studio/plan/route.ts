@@ -373,6 +373,13 @@ export async function POST(req: NextRequest) {
                   title: `[${plan.id}] ${step.title}`,
                   description: `Synthetic-intelligence plan step ${step.id} for goal: ${plan.goal}`,
                   command: step.command,
+                  // The engineering stage is explicitly bound to its registered
+                  // execution adapter. A lengthy goal mentioning PARIS must not
+                  // silently route repository work into advisory supervision.
+                  ...(step.runner === 'studio-engineering' ? {
+                    toolName: 'studio.engineering.execute',
+                    toolInput: { task: step.command },
+                  } : {}),
                   requestedBy: auth.id,
                   traceId: `${plan.id}:${step.id}`,
                   conversationId,

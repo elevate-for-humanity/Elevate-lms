@@ -42,12 +42,13 @@ export type PhoneCredential = {
 
 export function phoneDestination(value: string, provider: string): string | null {
   const trimmed = value.trim();
-  // Internal PWA calls are served by Elevate Asterisk; Twilio provides PSTN
-  // transport behind the PBX, never browser-side carrier credentials.
+  // Elevate owns SIP/WebRTC. Twilio is the external PSTN trunk.
   if (provider !== 'asterisk') return null;
-  if (/^(?:0|[1-9]\\d{2})$/.test(trimmed)) return trimmed;
-  if (/^\\+[1-9]\\d{7,14}$/.test(trimmed)) return trimmed;
-  const digits = trimmed.replace(/\\D/g, '');
+  if (/^(?:0|[1-9]\d{2})$/.test(trimmed)) return trimmed;
+  if (/^\+[1-9]\d{7,14}$/.test(trimmed)) return trimmed;
+  // Normalize only known US formats. Do not strip arbitrary URI punctuation.
+  if (!/^[\d\s().-]+$/.test(trimmed)) return null;
+  const digits = trimmed.replace(/\D/g, '');
   if (digits.length === 10) return `+1${digits}`;
   if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`;
   return null;

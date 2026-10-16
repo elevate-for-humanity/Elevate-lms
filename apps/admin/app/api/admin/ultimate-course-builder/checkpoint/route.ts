@@ -94,6 +94,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ queued: true, executionVerified: false, deferred: true,
         message: 'Repair request saved while the builder continues. It will be applied at a checkpoint boundary; active rendering is preserved.' }, { status: 202 });
     }
+    if (c.job.status === 'queued' && c.job.attempts < c.job.max_attempts) {
+      const launch = await requestCourseWorker();
+      return NextResponse.json({
+        queued: true, jobId: c.job.id, ...launch,
+        message: launch.dispatched
+          ? 'Existing queued work was preserved and the worker start was requested. ' + launch.message
+          : 'Existing queued work was preserved. No new rendering or retry was created. ' + launch.message,
+      }, { status: launch.dispatched ? 202 : 503 });
+    }
+    if (c.job.status === 'failed' && c.job.attempts >= c.job.max_attempts) {
+      return NextResponse.json({
+        error: 'The existing build exhausted its repair attempts. Diagnose the failing learner runthrough and worker access before retrying. No new attempts were charged.',
+        jobId: c.job.id, lastError: c.job.last_error,
+      }, { status: 409 });
+    }
     const counts = { ...c.job.payload?.lessonRepairCounts }; delete counts[c.lesson.competency_id];
     const now = new Date().toISOString();
     const payload = { ...c.job.payload, nextCompetencyIndex: index, lessonRepairCounts: counts, unresolvedCompetencyIds: [],

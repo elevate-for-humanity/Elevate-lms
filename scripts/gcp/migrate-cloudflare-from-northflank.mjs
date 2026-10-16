@@ -21,7 +21,20 @@ export function mergeCloudflareConfig(target, source) {
   return validateConfig(next, 'admin');
 }
 export async function migrateCloudflare({env = process.env, request=fetch, run=google}={}) {
-  if (!env.NORTHFLANK_API_TOKEN) throw new Error('northflank_read_token_missing');
+  // Google is authoritative. Do not require the retired Northflank API when
+  // the Admin runtime already contains a complete Cloudflare configuration.
+  const secret = configSecret('admin');
+  const read = () => run(['secrets','versions','access','latest','--secret',secret,'--project',PROJECT]);
+  const original = read();
+  const parsed = JSON.parse(original);
+  validateConfig(parsed,'admin');
+  const configured = parsed.runtimeEnvironment;
+  if (configured.CLOUDFLARE_ACCOUNT_ID &&
+      configured.CLOUDFLARE_AI_API_TOKEN &&
+      configured.CLOUDFLARE_AI_MODEL?.startsWith('@cf/')) {
+    return {status:'already_configured',keys:KEYS.filter(k=>configured[k]),runtimeChanged:false,sourceDeleted:false};
+  }
+  if (!env.NORTHFLANK_API_TOKEN) throw new Error('northflank_read_token_missing_google_config_incomplete');
   const source = {};
   for (const group of GROUPS) {
     const response = await request(SOURCE + '/secrets/' + group + '/details', {
@@ -36,11 +49,6 @@ export async function migrateCloudflare({env = process.env, request=fetch, run=g
   }
   if (!source.CLOUDFLARE_AI_API_TOKEN && source.CLOUDFLARE_API_TOKEN)
     source.CLOUDFLARE_AI_API_TOKEN = source.CLOUDFLARE_API_TOKEN;
-  const secret = configSecret('admin');
-  const read = () => run(['secrets','versions','access','latest','--secret',secret,'--project',PROJECT]);
-  const original = read();
-  const parsed = JSON.parse(original);
-  validateConfig(parsed,'admin');
   const merged = mergeCloudflareConfig(parsed,source);
   const updated = JSON.stringify(merged);
   if (updated === JSON.stringify(parsed)) return {status:'already_configured',keys:KEYS.filter(k=>merged.runtimeEnvironment[k]),runtimeChanged:false};

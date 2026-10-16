@@ -63,6 +63,9 @@ const request = (origin, body) => ({
     200,
   );
   assert.equal(called.p_user_id, 'server-user');
+  for (const enrollment_id of ['------------------------------------', ['33333333-3333-4333-8333-333333333333'], {}, 12]) {
+    assert.equal((await context.exports.POST(request('https://app.elevateforhumanity.org', { action: 'clock_in', enrollment_id }))).status, 400);
+  }
   console.log(
     'PASS: cross-origin rejection, authentication, null-body validation, client identity ignored',
   );

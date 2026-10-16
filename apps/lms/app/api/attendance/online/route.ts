@@ -60,8 +60,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid request.' }, { status: 400 });
   }
   if (
-    !['clock_in', 'clock_out'].includes(body.action || '') ||
-    !/^[0-9a-f-]{36}$/i.test(body.enrollment_id || '')
+    typeof body.action !== 'string' ||
+    !['clock_in', 'clock_out'].includes(body.action) ||
+    typeof body.enrollment_id !== 'string' ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(body.enrollment_id)
   )
     return NextResponse.json(
       { error: 'Select an enrollment and a valid action.' },

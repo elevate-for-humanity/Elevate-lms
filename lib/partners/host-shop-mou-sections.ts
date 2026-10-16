@@ -153,7 +153,17 @@ function buildSections(program: HostShopMouProgram): MouSection[] {
       content: `Registered occupations are governed by the approved written standards and apprenticeship agreements required by 29 CFR part 29, including the applicable work process, related instruction, supervision ratio, probation, progressive wage schedule, equal-opportunity pledge, complaint process, and record maintenance. Indiana professional-license pathways must also follow the current Indiana Professional Licensing Agency requirements for the particular occupation and establishment. A dashboard label or this MOU cannot create a license, alter a registered standard, or replace an agency approval.`,
     },
     {
-      title: '13. Electronic Signature and Governing Records',
+      title: '13. New Host Shop Partnership Term and Protected Information',
+      content: `For Host Shops executing this MOU for the first time on or after October 16, 2026, the initial partnership commitment is twelve (12) months from signature, renewable by mutual written agreement. This provision does not retroactively modify previously signed Host Shop agreements. Ending the business relationship does not erase apprentice rights, sponsor duties, or applicable transfer and record-retention obligations.
+
+The Worksite may use Sponsor/Elevate nonpublic curriculum, instructional media, software access, operating methods, nonpublic pricing, and confidential applicant or partner information only for authorized apprenticeship work. The Worksite must not copy, distribute, disclose, sell, or exploit protected information to operate a competing program or solicit relationships using confidential information. Public information, independently developed materials, lawfully acquired information, legally protected activity, and required regulatory disclosures are excluded.
+
+The Worksite retains the right to operate its independent salon, barbershop, spa, nail business, or independently developed training services. This agreement is not a blanket prohibition on competition or on apprentices choosing employment. No post-termination noncompetition or nonsolicitation restriction is imposed by this section. Confidentiality and intellectual-property obligations survive termination only to the extent legally permissible. Access to confidential platform materials ends upon termination, subject to mandatory records retention.
+
+The Worksite must read this section before electronically signing the MOU. The Sponsor will record the executed MOU version, signer, timestamp, and acknowledgement.`,
+    },
+    {
+      title: '14. Electronic Signature and Governing Records',
       content: `The electronic signature record, signer identity, document version, timestamp, IP/user-agent audit data, Host Site document record, applicable registered-program standard, employer-specific RAPIDS data, and subsequent approved amendments together form the operational evidence for this worksite agreement.\n\nIf a page, handbook, dashboard, or marketing statement conflicts with an approved registered-program standard or a later signed amendment, the approved standard and controlling signed record govern.`,
     },
   ];

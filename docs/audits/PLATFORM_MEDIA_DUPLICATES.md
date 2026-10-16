@@ -1,6 +1,6 @@
 # Platform media duplicate audit
 
-Generated: 2026-10-16T14:30:15.491Z
+Generated: 2026-10-16T14:44:29.470Z
 
 ## Summary
 
@@ -8,7 +8,7 @@ Generated: 2026-10-16T14:30:15.491Z
 - Duplicate non-brand pictures inside a route-owned page/component: **0**
 - Route-owned hero pictures reused across active routes: **0**
 - Duplicate poster/image content in canonical hero registry: **0**
-- Shared-component duplicate candidates (advisory): **3**
+- Shared-component duplicate candidates (advisory): **2**
 - Other cross-route picture reuse (advisory): **91**
 - Different filenames containing identical image bytes: **21**
 
@@ -28,7 +28,6 @@ None.
 
 | App | Route | Representative asset | Binary aliases | Locations |
 | --- | --- | --- | --- | --- |
-| marketing | / | /images/pages/barber-hands-on-bright.webp | /images/pages/barber-hands-on-bright.webp | components/home/HomeFeaturedHostShop.tsx:151<br>components/home/HomeCareerPathways.tsx:11 |
 | marketing | /partners/host-shops | /images/pages/barber-hands-on-bright.webp | /images/pages/barber-hands-on-bright.webp | apps/marketing/app/partners/host-shops/page.tsx:254<br>components/partners/HostShopBenefits.tsx:7 |
 | marketing | /programs/esthetician-apprenticeship | /images/jozanna-george.jpg | /images/jozanna-george.jpg | components/programs/beauty/JozannaIndustryInstructor.tsx:12<br>components/programs/beauty/JozannaIndustryInstructor.tsx:21 |
 

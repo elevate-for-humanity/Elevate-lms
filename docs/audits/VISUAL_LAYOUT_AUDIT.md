@@ -1,6 +1,6 @@
 # Visual layout audit — active platform
 
-Generated: 2026-10-16T14:30:10.705Z
+Generated: 2026-10-16T14:45:25.471Z
 
 This report scans the deployed monorepo app trees, not the legacy root `app/` tree.
 

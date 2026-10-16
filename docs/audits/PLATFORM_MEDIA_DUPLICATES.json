@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-16T14:30:15.491Z",
+  "generatedAt": "2026-10-16T14:44:29.470Z",
   "apps": [
     "marketing",
     "lms",
@@ -10,7 +10,7 @@
     "withinRouteDuplicates": 0,
     "crossRouteHeroDuplicates": 0,
     "heroRegistryDuplicates": 0,
-    "sharedComponentDuplicateAdvisory": 3,
+    "sharedComponentDuplicateAdvisory": 2,
     "crossRouteImageReuseAdvisory": 91,
     "binaryAliasGroups": 21
   },
@@ -21,20 +21,6 @@
   },
   "advisory": {
     "sharedComponentDuplicateAdvisory": [
-      {
-        "app": "marketing",
-        "route": "/",
-        "fingerprint": "sha256:509e3fb32702f12cf27e61b1dbdcbd9f1853656a77d2e5883a5ec5dee1edc6b2",
-        "asset": "/images/pages/barber-hands-on-bright.webp",
-        "aliases": [
-          "/images/pages/barber-hands-on-bright.webp"
-        ],
-        "locations": [
-          "components/home/HomeFeaturedHostShop.tsx:151",
-          "components/home/HomeCareerPathways.tsx:11"
-        ],
-        "ownedLocations": []
-      },
       {
         "app": "marketing",
         "route": "/partners/host-shops",
@@ -6646,8 +6632,8 @@
       "route": "/",
       "page": "apps/marketing/app/page.tsx",
       "componentFiles": 13,
-      "imageRefs": 15,
-      "imageFingerprints": 15,
+      "imageRefs": 16,
+      "imageFingerprints": 16,
       "ownedImageRefs": 0,
       "ownedImageFingerprints": 0,
       "ownedHeroRefs": 0,

@@ -17,16 +17,16 @@ Status: **not ready for merge or deployment**. This is an evidence record, not a
 | Global CSS | Unlayered typography, container, mobile and brand patches overrode component designs | Removed broad grid, color, section, hero and sizing overrides; base defaults allow component utilities and inherited dark-surface foregrounds | All three service stylesheets changed; source verification and builds; rendered review pending |
 | Admin | Pale labels/status text; wide record grids compressed on phones | Component neutral-600 foregrounds; scrollable shared card; minimum-width career-course and verification lists | TypeScript/lint; authenticated visual checks require an account |
 | Studio | Chat preview callback discarded; fixed workspace cap consumed by controls/composer | Forwarded returned preview URL to frame; expanded workspace; labeled preview input/device controls; exposed selected tool state | Preview navigation regression test; existing viewport, file and repository tests |
-| Media text | Image/video labels lacked predictable backing | Readable backings in shared pathways, archetype, mobile player and staff/founder sections | Source checks; no photo asset changed |
+| Media text | Image/video labels lacked predictable backing | Readable backings in shared pathways, archetype, mobile player and staff/founder sections | Source checks; approved primary photographs preserved; see media reconciliation |
 | Audit correctness | Regex crossed JSX elements, treated hover/placeholder/translucent colors as base colors, and flagged sized images based on prop order | Parse individual JSX elements; retain manual overlay review inventory | Seven focused Node tests demonstrate retained real-defect detection |
 | Duplicate audit | SEO metadata and JSON-LD counted as extra visible pictures | Exclude only exported Next metadata and the verified JSON-LD component; retain rendered JSX/data checks | 1,598 active routes: zero blocking route-owned/hero duplicates |
 | Program image audit | Card and hero for the same program counted as unrelated assignments | Parse assignment owners and preserve rejection across separate program entries | Cross-program reuse remains a failure; no assets replaced |
-| Responsive testing | Requested width coverage not isolated in a repeatable check | Added 320/375/390/768/1024/1440px read-only browser tests and CI verification workflow with screenshots | Local Chromium missing; download produced a truncated archive; remote CI must supply execution evidence |
+| Responsive testing | Requested width coverage not isolated in a repeatable check | Added 320/375/390/768/1024/1440px read-only browser tests and CI verification workflow with screenshots | Local Chromium download failed. Initial GitHub browser run executed all 42 cases: 30 passed, 12 exposed shared-public assets not being served in Next dev; startup repair applied and remote rerun required. |
 
 ## Executed checks
 
-- `pnpm typecheck`: passed Marketing, Admin, LMS before final Studio changes; final rerun tracked separately.
-- `pnpm lint`: passed before final Studio changes; final rerun tracked separately.
+- `pnpm typecheck`: passed Marketing, Admin, LMS before final Studio changes; final rerun also passed.
+- `pnpm lint`: passed before final Studio changes; final rerun also passed.
 - Seven focused existing unit-test files: **48 tests passed**.
 - Additional preview navigation behavior: **1 test passed**.
 - Syntax-aware audit regressions: **7 tests passed**.
@@ -41,10 +41,14 @@ Status: **not ready for merge or deployment**. This is an evidence record, not a
 
 ## Unresolved acceptance items
 
-1. Cross-program registry image reuse remains in nine groups. This includes genuinely separate programs and potentially synonymous program slugs. Resolve with program-specific, visually inspected assets or a verified canonical slug contract; do not substitute arbitrary photos to turn the gate green.
-2. Homepage uniqueness still rejects two existing photographs reused across sections. The user's instruction explicitly protects approved homepage photographs. Those images are untouched; changing the audit to ignore them would hide a real policy conflict.
+1. Cross-program registry image reuse: **corrected**. Eight unique optimized illustrative training assets plus inspected existing photographs replace conflicting program assignments. Assets are 73–106 KB each. See `media-reconciliation.json`.
+2. Homepage uniqueness: **corrected** after the user's follow-up authorized resolving these conflicts. Approved photographs remain in primary placements; repeated secondary occurrences use distinct existing assets. Homepage and platform media audits pass.
 3. Rendered review of remaining overlays/custom heroes and all six viewport sizes is outstanding. New CI can run the public read-only tests. Authenticated Admin/LMS/Studio review and actual application submission require controlled test identities and a test-data cleanup contract; no production applications were submitted.
 4. Required remote GitHub checks must pass on the final head before readiness. Historical main successes do not certify this branch.
 5. Production merge/deployment is not authorized by this design delivery step and has not been performed. No Google Cloud build/execution or Northflank deployment was triggered. No Course Builder generation engine, worker or queue was changed. Approved homepage photographs are unchanged.
 
 See `finding-dispositions.json` for the complete 195-row evidence record. Items marked rendered verification outstanding remain open.
+
+## Follow-up verification
+
+All three sequential production builds and final per-app TypeScript checks completed successfully. Repository lint also passed. Public-page browser execution on GitHub exposed missing app-local shared media (404 responses in traces); the development startup now mirrors shared media without replacing local overrides. The five requested checks were separately inspected; see `requested-check-review.md`. The final head still needs remote checks and rendered acceptance.

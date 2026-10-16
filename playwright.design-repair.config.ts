@@ -13,7 +13,7 @@ export default defineConfig({
     launchOptions: { args: ['--no-sandbox'] },
   },
   ...(process.env.DESIGN_REPAIR_BASE_URL ? {} : { webServer: {
-    command: 'pnpm --filter @elevate/marketing exec next dev --hostname 127.0.0.1 --port 36871',
+    command: 'pnpm --filter @elevate/marketing dev --hostname 127.0.0.1 --port 36871',
     url: 'http://127.0.0.1:36871',
     reuseExistingServer: !process.env.CI,
     timeout: 180000,

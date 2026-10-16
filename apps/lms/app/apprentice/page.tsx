@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -474,7 +475,7 @@ export default async function ApprenticePortalPage() {
       <main className="space-y-7 pb-10">
         <TimeclockAttendanceNotice />
         <section className="relative min-h-[390px] overflow-hidden rounded-3xl bg-fuchsia-950 shadow-xl ring-1 ring-fuchsia-900/20">
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={heroImage}
             alt={`${displayProgram} apprentice training`}
             fill
@@ -902,7 +903,7 @@ export default async function ApprenticePortalPage() {
                   src={action.image}
                   alt=""
                   fill
-                  sizes="(max-width:640px) 100vw,25vw"
+                  sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 25vw"
                   className="object-cover transition-transform group-hover:scale-[1.03]"
                 />
               </div>

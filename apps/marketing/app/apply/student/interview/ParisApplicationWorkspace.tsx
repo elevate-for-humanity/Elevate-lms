@@ -598,7 +598,7 @@ export default function ParisApplicationWorkspace({
                   {complete ? <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-emerald-600" /> : <ChevronRight className="mt-0.5 h-4 w-4 flex-none text-slate-400" />}
                   <div className="min-w-0">
                     <p className="text-xs font-black text-slate-800">{LABELS[field]?.[locale] || field}</p>
-                    <p className={`mt-0.5 break-words text-xs ${value ? 'text-slate-600' : 'text-slate-400'}`}>{value || (locale === 'es' ? 'Pendiente' : 'Pending')}</p>
+                    <p className="mt-0.5 break-words text-xs text-slate-600">{value || (locale === 'es' ? 'Pendiente' : 'Pending')}</p>
                   </div>
                 </div>
               );

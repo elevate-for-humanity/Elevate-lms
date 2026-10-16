@@ -95,29 +95,10 @@ export async function createPhoneClient(
   credential: PhoneCredential,
   remoteAudio: HTMLAudioElement,
 ): Promise<PhoneClient> {
-  await verifyPhoneMicrophone();
   if (credential.provider !== 'asterisk') {
-    const { TelnyxRTC } = await import('@telnyx/webrtc');
-    const client = new TelnyxRTC({
-      login_token: credential.token,
-      keepConnectionAliveOnSocketClose: true,
-      hangupOnBeforeUnload: false,
-    });
-    return {
-      on(event, listener) {
-        const names = {
-          ready: 'telnyx.ready',
-          error: 'telnyx.error',
-          call: 'telnyx.notification',
-          offline: 'telnyx.socket.close',
-        };
-        client.on(names[event] as any, listener);
-      },
-      connect: () => client.connect(),
-      disconnect: () => client.disconnect(),
-      newCall: async (options) => client.newCall(options) as unknown as PhoneCall,
-    };
+    throw new Error('This phone connection is no longer supported. Reconnect the phone to get current credentials.');
   }
+  await verifyPhoneMicrophone();
 
   const { SessionManager } = await import('sip.js/lib/platform/web');
   const listeners = new Map<string, Array<(data?: any) => void>>();

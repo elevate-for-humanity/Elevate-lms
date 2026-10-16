@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -86,7 +87,7 @@ export default function HealthcareProgramsPage() {
             </div>
           </div>
           <div className="relative min-h-[320px] overflow-hidden rounded-3xl border border-white/15 bg-emerald-900 shadow-2xl sm:min-h-[360px]">
-            <Image
+            <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
               src="/images/beauty/esthetics-hero.webp"
               alt="Healthcare students practicing clinical skills in a supervised classroom"
               fill

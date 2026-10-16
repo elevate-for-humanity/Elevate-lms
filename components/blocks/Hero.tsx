@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 
 interface HeroProps {
@@ -65,7 +66,7 @@ export default function Hero({
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>{content}</div>
             <div className="relative aspect-[4/3] rounded-xl overflow-hidden">
-              <Image src={imageUrl} alt={imageAlt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR} src={imageUrl} alt={imageAlt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
           </div>
         </div>
@@ -79,7 +80,7 @@ export default function Hero({
         {content}
         {imageUrl && (
           <div className="mt-12 relative aspect-[16/9] rounded-xl overflow-hidden">
-            <Image src={imageUrl} alt={imageAlt} fill className="object-cover" sizes="100vw" />
+            <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR} src={imageUrl} alt={imageAlt} fill className="object-cover" sizes="100vw" />
           </div>
         )}
       </div>

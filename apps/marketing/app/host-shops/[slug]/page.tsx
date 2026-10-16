@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import { curateShopGallery } from '@/lib/partners/curated-shop-media';
 import type { Metadata } from 'next';
@@ -269,7 +270,7 @@ function ApprovedHostShopProfile({ shop }: { shop: HostShop }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <section data-scroll-narration data-narration={`Welcome to ${shop.name}. ${shop.description} Explore the approved training location and apply through Elevate to ask about current placement availability.`} className="border-b border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-blue-950 px-4 py-16 text-white sm:px-6 sm:py-24">
         <div className="mx-auto max-w-6xl">
-          <figure className="mb-7"><div className="relative h-[clamp(260px,42svh,480px)] overflow-hidden rounded-2xl"><Image src={getProgramHeroImage(illustrationProgram)} alt={getProgramImageAlt(illustrationProgram)} fill sizes="100vw" className="object-cover" priority /></div><figcaption className="mt-2 text-xs text-slate-300">Training illustration. Shop portfolio photos are being added.</figcaption></figure>
+          <figure className="mb-7"><div className="relative h-[clamp(260px,42svh,480px)] overflow-hidden rounded-2xl"><Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR} src={getProgramHeroImage(illustrationProgram)} alt={getProgramImageAlt(illustrationProgram)} fill sizes="100vw" className="object-cover" priority /></div><figcaption className="mt-2 text-xs text-slate-300">Training illustration. Shop portfolio photos are being added.</figcaption></figure>
           <p className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-emerald-950"><ShieldCheck className="h-4 w-4" /> Approved Elevate Host Site</p>
           <h1 className="mt-5 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">{shop.name}</h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-200">{shop.description}</p>

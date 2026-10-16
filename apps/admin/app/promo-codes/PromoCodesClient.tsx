@@ -190,12 +190,12 @@ export default function PromoCodesClient() {
 
       {/* Table */}
       {loading ? (
-        <div className="text-center py-12 text-slate-400 text-sm">Loading…</div>
+        <div className="text-center py-12 text-slate-600 text-sm">Loading…</div>
       ) : codes.length === 0 ? (
         <div className="text-center py-16 bg-white border border-slate-200 rounded-2xl">
           <Tag className="w-8 h-8 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 font-medium">No promo codes yet</p>
-          <p className="text-slate-400 text-sm mt-1">Create your first discount code above</p>
+          <p className="text-slate-600 text-sm mt-1">Create your first discount code above</p>
         </div>
       ) : (
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
@@ -212,7 +212,7 @@ export default function PromoCodesClient() {
                 <tr key={c.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-4 py-3">
                     <span className="font-mono font-semibold text-slate-800">{c.code}</span>
-                    {c.description && <p className="text-xs text-slate-400 mt-0.5">{c.description}</p>}
+                    {c.description && <p className="text-xs text-slate-600 mt-0.5">{c.description}</p>}
                   </td>
                   <td className="px-4 py-3 font-semibold text-brand-blue-700">{fmtDiscount(c)}</td>
                   <td className="px-4 py-3 text-slate-600">
@@ -226,15 +226,15 @@ export default function PromoCodesClient() {
                     <button onClick={() => toggle(c)} className="flex items-center gap-1.5 text-xs font-medium">
                       {c.is_active
                         ? <><ToggleRight className="w-4 h-4 text-green-500" /><span className="text-green-700">Active</span></>
-                        : <><ToggleLeft className="w-4 h-4 text-slate-400" /><span className="text-slate-500">Inactive</span></>}
+                        : <><ToggleLeft className="w-4 h-4 text-slate-600" /><span className="text-slate-500">Inactive</span></>}
                     </button>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1 justify-end">
-                      <button onClick={() => startEdit(c)} className="p-1.5 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700">
+                      <button onClick={() => startEdit(c)} className="p-1.5 rounded hover:bg-slate-100 text-slate-600 hover:text-slate-700">
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => del(c.id, c.code)} className="p-1.5 rounded hover:bg-red-50 text-slate-400 hover:text-red-600">
+                      <button onClick={() => del(c.id, c.code)} className="p-1.5 rounded hover:bg-red-50 text-slate-600 hover:text-red-600">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>

@@ -11,6 +11,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { jsxFindings } from './visual/jsx-findings.mjs';
 
 const ROOT = process.cwd();
 const SCAN_DIRS = [
@@ -56,21 +57,6 @@ const OVERSIZED_HERO_PATTERNS = [
     re: /h-\[700px\]/g,
     severity: 'critical',
     message: 'Fixed 700px hero section',
-  },
-];
-
-const IMAGE_PERF_PATTERNS = [
-  {
-    id: 'preload-full-hero',
-    re: /preloadFull\b/g,
-    severity: 'high',
-    message: 'preloadFull downloads the entire hero video on load',
-  },
-  {
-    id: 'fill-no-sizes',
-    re: /<Image[^>]*\bfill\b(?![^>]*\bsizes=)/g,
-    severity: 'medium',
-    message: 'next/image fill without sizes may over-fetch',
   },
 ];
 
@@ -211,8 +197,10 @@ for (const full of files) {
   const content = fs.readFileSync(full, 'utf8');
 
   oversizedHero.push(...findMatches(content, rel, OVERSIZED_HERO_PATTERNS, true));
-  imagePerf.push(...findMatches(content, rel, IMAGE_PERF_PATTERNS));
-  layoutText.push(...findMatches(content, rel, LAYOUT_TEXT_PATTERNS));
+  const parsed = jsxFindings(content, rel, serviceFor(rel));
+  imagePerf.push(...parsed.filter(h => h.classification === 'image-performance'));
+  layoutText.push(...parsed.filter(h => h.classification !== 'image-performance'));
+  layoutText.push(...findMatches(content, rel, LAYOUT_TEXT_PATTERNS.filter(p => ['hero-gradient-overlay', 'hero-text-overlay', 'empty-next-image-alt'].includes(p.id))));
 
   if (
     rel.startsWith('apps/marketing/app/') &&

@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -162,7 +163,7 @@ export default async function PublicProgramPage({
             </Link>
           ) : isBookkeepingProgram ? (
             <div className="w-full overflow-hidden bg-white">
-              <Image
+              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                 src="/images/heroes/bookkeeping-accounting-financial-empowerment.png"
                 alt="Accounting and Financial Empowerment Career Pathway Program led by Dr. Carlina A. Wilkes"
                 width={1536}

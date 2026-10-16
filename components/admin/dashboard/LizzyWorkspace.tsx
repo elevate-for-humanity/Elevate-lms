@@ -37,6 +37,7 @@ const TOOLS: { id: ToolPanel; label: string; Icon: ElementType<{ className?: str
 
 export function LizzyWorkspace({
   isSuperAdmin = false,
+  onPreviewUrlDetected,
   pendingApplications = [],
   pendingApplicationsCount = 0,
   pendingProgramHolders = 0,
@@ -71,13 +72,13 @@ export function LizzyWorkspace({
       <div className="flex shrink-0 items-center gap-2 overflow-x-auto border-b border-slate-700 bg-slate-900 px-3 py-3 [scrollbar-width:thin] sm:flex-wrap">
         {visibleTools.map(({ id, label, Icon }) => {
           const active = panel === id;
-          return <button key={id} type="button" onClick={() => openPanel(id)} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" style={{ borderColor: active ? '#0078d4' : '#3c3c3c', background: active ? '#094771' : 'transparent', color: active ? '#fff' : '#ccc' }}><Icon className="h-4 w-4" />{label}</button>;
+          return <button key={id} type="button" onClick={() => openPanel(id)} aria-pressed={active} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300" style={{ borderColor: active ? '#0078d4' : '#3c3c3c', background: active ? '#094771' : 'transparent', color: active ? '#fff' : '#ccc' }}><Icon className="h-4 w-4" />{label}</button>;
         })}
         <span className="ml-auto hidden items-center gap-2 text-xs text-slate-400 lg:flex"><Rocket className="h-3 w-3" />GitHub → Google Cloud Run <Server className="h-3 w-3" />{health ? 'Health loaded' : 'Health…'}</span>
       </div>
       <div className="min-h-0 min-w-0 flex-1 overflow-hidden">
         <DashboardPanelErrorBoundary name={`Lizzy ${panel}`}>
-          {panel === 'command' && <UnifiedEllieChat embedded />}
+          {panel === 'command' && <UnifiedEllieChat embedded onPreviewTarget={onPreviewUrlDetected} />}
           {panel === 'upload' && <LizzyUploadPanel />}
           {panel === 'files' && <LizzyFilesPanel />}
           {panel === 'ops' && <LizzyOperationsPanel pendingApplications={pendingApplications} pendingCount={pendingApplicationsCount} pendingProgramHolders={pendingProgramHolders} />}

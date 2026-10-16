@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
@@ -198,14 +199,13 @@ export default function ProgramPageLayout({
         if (c.heroImage) {
           return (
             <div className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-              <Image
+              <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                 src={c.heroImage}
                 alt={c.heroImageAlt || c.title}
                 fill
                 sizes="100vw"
                 className="object-contain"
-                priority placeholder="empty"
+                priority
               />
             </div>
           );

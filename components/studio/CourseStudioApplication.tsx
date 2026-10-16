@@ -187,7 +187,7 @@ function StudioSidebar({
       <div className="h-10 flex items-center justify-end px-2 border-b border-slate-100">
         <button
           onClick={() => onCollapse(!collapsed)}
-          className="p-1 rounded hover:bg-slate-100 text-slate-400"
+          className="p-1 rounded hover:bg-slate-100 text-slate-600"
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -311,7 +311,7 @@ export function CourseStudioApplication({
             <div className="flex h-10 items-center justify-between border-b border-slate-200 bg-slate-950 px-3 text-xs text-white">
               <div className="min-w-0">
                 <span className="font-semibold">Live LMS browser</span>
-                <span className="ml-2 hidden truncate text-slate-400 sm:inline">
+                <span className="ml-2 hidden truncate text-slate-600 sm:inline">
                   Real learner course and lesson player
                 </span>
               </div>

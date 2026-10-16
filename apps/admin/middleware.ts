@@ -136,6 +136,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(canonicalUrl, 308);
   }
 
+  // The PBX has a server token, not a browser session. The exact ingestion
+  // handler validates that token in constant time and scopes every write to
+  // the configured phone system. Do not admit other internal phone paths.
+  if (pathname === '/api/internal/phone/voicemail') return NextResponse.next();
+
   if (isPublicPath(pathname)) return NextResponse.next();
 
   // Scheduled jobs have no browser session. Admit every cron route only when

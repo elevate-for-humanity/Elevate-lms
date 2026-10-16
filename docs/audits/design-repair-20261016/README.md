@@ -4,7 +4,7 @@
 
 ## Preserved work and architecture
 
-The existing branch `repair/full-platform-design-architecture-20261016` includes main `c413260b05c76fe3479564f7ad5f6c4848938bf8`, including its Twilio credential fix. Valid earlier repairs were retained. Course Builder engines, workers and queues are unchanged.
+The existing branch `repair/full-platform-design-architecture-20261016` includes main `8e9d4a67a049e53d7734e65ecaf4cacf0b509641`, preserving its Twilio credential, microphone readiness, public contact and voicemail-ingestion fixes. Valid earlier repairs were retained. Course Builder engines, workers and queues are unchanged.
 
 - Marketing/Admin/LMS global patches no longer force component grids, colors, section backgrounds or typography. Shared contrast defaults now use a low-priority native cascade layer; a white page ancestor cannot recolor nested dark heroes or light controls. Accessibility focus, minimum target sizes and reduced-motion behavior remain.
 - Studio chat-provided preview URLs reach the live frame; workspace height accommodates its controls/composer; preview/device controls have accessible labels and states. Existing services and AI operations remain connected through their original interfaces.
@@ -31,7 +31,7 @@ The updated summary records 25 additional source/render-supported false positive
 ## Verification
 
 - Frozen install: **passed with pnpm 10.28.2**; dependency versions and lockfile unchanged.
-- Marketing/Admin/LMS TypeScript and repository lint: passed. Final production-build and new-head workflow results are recorded in the PR verification section.
+- Marketing/Admin/LMS TypeScript and repository lint: passed. Final production-build and new-head workflow results are recorded in the PR verification section. The local Marketing production build passed; the scratch checkout was externally removed during Admin trace collection, interrupting the local build sequence. Clean GitHub container builds provide the remaining build evidence.
 - Focused unit verification: 49 tests across eight files passed; seven audit regression tests passed.
 - Browser coverage: 126 unique cases in bounded batches — seven representative routes across eight widths, plus 34 original-finding public routes at mobile/desktop and two shared-surface regressions. Required widths 320/375/390/768/1024/1440px and header boundaries 1179/1180px are covered. Targeted reruns verify the subsequent contrast, clipping and menu lifecycle corrections.
 - Computed normal-text contrast assertions require at least 4.5:1 for the affected heroes, Community control, Pricing link and Connect input. Nested dark/light panels are tested through the actual compiled stylesheet.
@@ -55,3 +55,7 @@ A controlled authenticated Admin/LMS/Studio or enrolled-apprentice test session 
 The requested five checks passed on published head `8c5f47cbe2e19e314271c9ecf5a9f55313dc0f61`; their definitions, steps and decoded logs were inspected. The continuation must pass required checks on its new published head; the PR contains those final links. Do not infer production readiness solely from green regression gates.
 
 No Northflank operation, Cloud Run deployment, Google Cloud build or course execution was initiated by this repair. PR automation was inspected: Marketing Staging Gate's misleading job name performs a GitHub-runner Docker build/smoke test, not a cloud deployment; deployment/recovery chains depend on main releases or explicit dispatch. Auto-merge remains off. Production revision/SHA verification belongs after an authorized merge and deployment.
+
+## Main reconciliation and CI error preservation
+
+Main advanced by two phone fixes during verification. GitHub’s merge checkout exposed three `preserve-caught-error` lint failures in the new microphone helper. The repair preserves the existing user-facing messages and capture cleanup while attaching the original error as `cause`. Its five existing microphone tests pass, with the three translated-error cases now asserting cause identity. The main updates were merged without conflicts.

@@ -95,6 +95,30 @@ jobs:
             print(json.dumps({'kind':'monitoring','truncated':bool(metrics.get('nextPageToken'))}))
           except urllib.error.HTTPError as error:print(json.dumps({'kind':'monitoring','httpStatus':error.code}))
           PY
+      - name: Read serving Studio destinations and bucket totals
+        if: always()
+        run: |
+          node --input-type=module <<'NODE'
+          import {execFileSync} from 'node:child_process';
+          const scope=['--project=elegant-racer-299721','--region=us-central1','--format=json'];
+          const read=args=>JSON.parse(execFileSync('gcloud',[...args,...scope],{encoding:'utf8',timeout:30000,stdio:['ignore','pipe','pipe']}));
+          const service=read(['run','services','describe','elevate-admin-migration']);
+          for(const name of new Set((service.status.traffic||[]).filter(t=>t.percent>0).map(t=>t.revisionName))){
+            const revision=read(['run','revisions','describe',name]);
+            const destinations=(revision.spec.containers[0].env||[]).filter(e=>['STUDIO_BROWSER_URL','STUDIO_BROWSER_PUBLIC_URL','NEXT_PUBLIC_STUDIO_BROWSER_URL'].includes(e.name)).map(e=>{
+              let destination=null;try{const u=new URL(e.value);destination=u.origin+u.pathname;}catch{}
+              return {name:e.name,destination,secretReference:Boolean(e.valueFrom)};
+            });
+            console.log(JSON.stringify({kind:'serving_admin_studio',revision:name,destinations}));
+          }
+          for(const bucket of ['elegant-racer-299721-studio-browser-auth','elevate-render-tests-484736877039-us-central1']){
+            try{
+              const result=execFileSync('gcloud',['storage','du','--summarize','gs://'+bucket,'--project=elegant-racer-299721'],{encoding:'utf8',timeout:60000,stdio:['ignore','pipe','pipe']});
+              const bytes=result.trim().match(/^(\d+)\s/);
+              console.log(JSON.stringify({kind:'bucket_total',bucket,bytes:bytes?Number(bytes[1]):null,verified:Boolean(bytes)}));
+            }catch{console.log(JSON.stringify({kind:'bucket_total',bucket,verified:false}));}
+          }
+          NODE
       - name: Preserve regional and cost inventory evidence
         if: always()
         uses: actions/upload-artifact@v4

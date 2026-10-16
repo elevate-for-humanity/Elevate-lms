@@ -76,12 +76,13 @@ describe('Asterisk browser registration', () => {
     expect(state.manager.disconnect).toHaveBeenCalledOnce();
   });
 
-  it('restricts pilot destinations to internal extensions and preserves carrier number normalization', () => {
+  it('routes internal extensions and normalized Twilio-bound PSTN through owned SIP', () => {
     expect(phoneDestination('0', 'asterisk')).toBe('0');
     expect(phoneDestination('102', 'asterisk')).toBe('102');
-    expect(phoneDestination('+13175550100', 'asterisk')).toBeNull();
+    expect(phoneDestination('+13175550100', 'asterisk')).toBe('+13175550100');
     expect(phoneDestination('102@untrusted.example', 'asterisk')).toBeNull();
-    expect(phoneDestination('(317) 555-0100', 'telnyx')).toBe('+13175550100');
+    expect(phoneDestination('(317) 555-0100', 'asterisk')).toBe('+13175550100');
+    expect(phoneDestination('102', 'telnyx')).toBeNull();
   });
 });
 

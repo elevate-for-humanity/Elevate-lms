@@ -32,22 +32,23 @@ export type PhoneClient = {
   disconnect(): Promise<unknown>;
   newCall(options: OutboundOptions): Promise<PhoneCall>;
 };
-export type PhoneCredential =
-  | { provider?: 'telnyx'; token: string }
-  | {
-      provider: 'asterisk';
-      sipUsername: string;
-      sipPassword: string;
-      sipDomain: string;
-      wsUrl: string;
-      iceServers: RTCIceServer[];
-    };
+export type PhoneCredential = {
+  provider: 'asterisk';
+  sipUsername: string;
+  sipPassword: string;
+  sipDomain: string;
+  wsUrl: string;
+  iceServers: RTCIceServer[];
+};
 
 export function phoneDestination(value: string, provider: string): string | null {
   const trimmed = value.trim();
-  // PSTN remains on the working carrier until the PBX trunk has its own live
-  // acceptance evidence. A pilot registration does not authorize that cutover.
-  if (provider === 'asterisk') return /^(?:0|[1-9]\d{2})$/.test(trimmed) ? trimmed : null;
+  // Elevate owns SIP/WebRTC. Twilio is the external PSTN trunk.
+  if (provider !== 'asterisk') return null;
+  if (/^(?:0|[1-9]\d{2})$/.test(trimmed)) return trimmed;
+  if (/^\+[1-9]\d{7,14}$/.test(trimmed)) return trimmed;
+  // Normalize only known US formats. Do not strip arbitrary URI punctuation.
+  if (!/^[\d\s().-]+$/.test(trimmed)) return null;
   const digits = trimmed.replace(/\D/g, '');
   if (digits.length === 10) return `+1${digits}`;
   if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`;
@@ -252,7 +253,7 @@ export async function createPhoneClient(
     async newCall(options) {
       if (!registered) throw new Error('Connect the phone before calling.');
       const destination = phoneDestination(options.destinationNumber, 'asterisk');
-      if (!destination) throw new Error('Enter operator 0 or a three-digit extension.');
+      if (!destination) throw new Error('Enter operator 0, a three-digit extension, or a valid telephone number.');
       const session = await manager.call(`sip:${destination}@${credential.sipDomain}`);
       return wrap(session, 'calling');
     },

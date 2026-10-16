@@ -27,7 +27,8 @@ export function inspectGoogleBindings(config, resource, browser) {
   const browserEnv=browser?.spec?.template?.spec?.containers?.[0]?.env ?? [];
   const browserImage=browser?.spec?.template?.spec?.containers?.[0]?.image ?? null;
   if(!image) failures.push('admin_container_image_missing');
-  if(!browserImage) failures.push('studio_browser_container_image_unverified');
+  // Browser is permitted on the existing Google Compute Engine VM, not solely Cloud Run.
+  // Validate its live authenticated health separately; absence of a Run image alone is not a failure.
   if(image.includes('northflank')||String(browserImage).includes('northflank'))failures.push('legacy_container_image_reference');
   return {failures,adminImagePresent:Boolean(image),studioBrowserImagePresent:Boolean(browserImage),
     adminRevision:resource?.status?.latestReadyRevisionName??null,
@@ -46,6 +47,18 @@ export async function auditGoogleStudio({run=google,request=fetch}={}) {
   const env=config.runtimeEnvironment;
   const browserUrl=env.STUDIO_BROWSER_URL;
   const probes={};
+  // Current production browser may be a Google Compute Engine VM. Its identity
+  // is proven by Google inventory and the HTTPS health endpoint, not a fake
+  // requirement that the browser also be a Cloud Run service.
+  if(!browser) {
+    try {
+      const instances=JSON.parse(run(['compute','instances','list','--project',PROJECT,'--format=json']));
+      const owned=instances.filter(instance => /^elevate-studio-browser(?:-|$)/.test(instance.name) &&
+        instance.status === 'RUNNING');
+      probes.browserVmRunning=owned.length>0;
+      if(!owned.length) audit.failures.push('studio_browser_google_vm_not_running');
+    } catch { audit.failures.push('studio_browser_google_vm_inventory_unavailable'); }
+  }
   if(browserUrl) {
     try {
       const url=new URL(browserUrl);

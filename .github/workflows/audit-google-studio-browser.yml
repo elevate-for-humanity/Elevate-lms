@@ -6,6 +6,7 @@ on:
       - '.github/workflows/audit-google-studio-browser.yml'
       - 'scripts/gcp/audit-studio-browser.mjs'
       - 'scripts/gcp/audit-studio-backend-end-to-end.mjs'
+      - 'scripts/gcp/audit-studio-backend-end-to-end.test.mjs'
   workflow_dispatch:
 permissions:
   actions: write
@@ -42,6 +43,7 @@ jobs:
           skip_install: true
       - name: Verify active Google browser endpoint and persistent state topology
         run: node scripts/gcp/audit-studio-browser.mjs
+      - run: node --test scripts/gcp/audit-studio-backend-end-to-end.test.mjs
       - name: Trace deployed Studio, Google secret bindings, browser and Cloudflare authentication
         run: node scripts/gcp/audit-studio-backend-end-to-end.mjs
       - name: Diagnose anonymous tax route boundary

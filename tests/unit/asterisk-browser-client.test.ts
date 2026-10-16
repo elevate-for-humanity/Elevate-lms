@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPhoneClient, phoneDestination } from '@/lib/phone/browser-client';
 
 const state = vi.hoisted(() => ({ options: null as any, manager: null as any }));
@@ -28,11 +28,28 @@ const credential = {
   wsUrl: 'wss://phone.elevateforhumanity.org/ws',
   iceServers: [],
 };
-afterEach(() => vi.useRealTimers());
+const stopCapture = vi.fn();
+const getUserMedia = vi.fn();
+beforeEach(() => {
+  state.options = null;
+  state.manager = null;
+  stopCapture.mockClear();
+  getUserMedia.mockReset().mockResolvedValue({
+    getAudioTracks: () => [{ readyState: 'live' }],
+    getTracks: () => [{ stop: stopCapture }],
+  });
+  vi.stubGlobal('navigator', { mediaDevices: { getUserMedia } });
+});
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
 
 describe('Asterisk browser registration', () => {
   it('does not report ready when transport opens or a REGISTER is merely sent', async () => {
     const client = await createPhoneClient(credential, document.createElement('audio'));
+    expect(getUserMedia).toHaveBeenCalledWith({ audio: true, video: false });
+    expect(stopCapture).toHaveBeenCalledOnce();
     const ready = vi.fn();
     client.on('ready', ready);
     let connected = false;
@@ -48,6 +65,16 @@ describe('Asterisk browser registration', () => {
     expect(connected).toBe(true);
     expect(ready).toHaveBeenCalledOnce();
     expect(state.options.userAgentOptions.logBuiltinEnabled).toBe(false);
+  });
+
+  it('rejects blocked microphone capture before creating a SIP client', async () => {
+    const cause = Object.assign(new Error('blocked by browser'), { name: 'NotAllowedError' });
+    getUserMedia.mockRejectedValue(cause);
+    await expect(createPhoneClient(credential, document.createElement('audio'))).rejects.toMatchObject({
+      message: expect.stringContaining('Microphone access is blocked'),
+      cause,
+    });
+    expect(state.manager).toBeNull();
   });
 
   it('clears online state on lost registration and disallows calls before reconnect', async () => {

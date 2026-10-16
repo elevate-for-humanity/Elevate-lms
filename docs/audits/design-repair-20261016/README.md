@@ -59,3 +59,5 @@ No Northflank operation, Cloud Run deployment, Google Cloud build or course exec
 ## Main reconciliation and CI error preservation
 
 Main advanced by two phone fixes during verification. GitHub’s merge checkout exposed three `preserve-caught-error` lint failures in the new microphone helper. The repair preserves the existing user-facing messages and capture cleanup while attaching the original error as `cause`. Its five existing microphone tests pass, with the three translated-error cases now asserting cause identity. The main updates were merged without conflicts.
+
+The new main readiness requirement also exposed missing `navigator.mediaDevices` in the SIP browser-test fixture. The fixture now supplies a live audio track, checks capture constraints and release, and verifies blocked capture prevents SIP construction. All 114 tests in the phone workflow’s 17-file Vitest command pass locally, plus the five direct microphone tests. Production capture validation remains enabled.

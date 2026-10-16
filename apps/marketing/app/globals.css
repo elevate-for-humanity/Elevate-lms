@@ -217,7 +217,9 @@ body {
   }
 
   p {
-    @apply text-base md:text-lg leading-relaxed text-slate-900;
+    @apply text-base md:text-lg leading-relaxed;
+    /* Inherit the surrounding surface's foreground color. Dark heroes, cards,
+       dialogs and alerts must not be forced to slate-900 by a global p rule. */
   }
 
   a {
@@ -309,9 +311,11 @@ body {
  * Prerequisite: bg-white stripped from <section> tags (it's the browser
  * default and would otherwise override this @layer base rule).
  */
+/* Alternating section surfaces are an opt-in marketing layout contract.
+   Never recolor unrelated dashboard, form, modal, or embedded sections. */
 @layer base {
-  section + section {
-    background-color: #f8fafc; /* slate-50 */
+  .marketing-content[data-alternate-sections='true'] > section + section:not([class*='bg-']) {
+    background-color: #f8fafc;
   }
 }
 

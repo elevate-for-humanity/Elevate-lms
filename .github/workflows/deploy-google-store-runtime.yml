@@ -141,7 +141,7 @@ jobs:
           SUFFIX="r${GITHUB_SHA:0:8}-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           echo "revision=elevate-store-migration-$SUFFIX" >> "$GITHUB_OUTPUT"
           gcloud run services update elevate-store-migration --project=elegant-racer-299721 --region=us-central1 \
-            --image="$IMAGE@$DIGEST" --revision-suffix="$SUFFIX" \
+            --image="$IMAGE@$DIGEST" --revision-suffix="$SUFFIX" --no-traffic \
             --update-env-vars=STORE_ONLY_RUNTIME=true --cpu=4 --memory=8Gi --min=0 --min-instances=0 --max-instances=1 \
             --startup-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' \
             --liveness-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=3,periodSeconds=30,timeoutSeconds=5' --quiet

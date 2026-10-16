@@ -61,3 +61,18 @@ test('Marketing root stays Marketing despite a stale Store flag',async()=>withRu
  const response=await middleware(new NextRequest('https://'+host+'/',{headers:{host}}));
  assert.equal(response.headers.get('x-middleware-next'),'1');assert.equal(response.headers.get('location'),null);
 }));
+
+test('Store app subscription checkout reaches its authenticated handler', async () => withRuntime('elevate-store-migration', async () => {
+ const host='store.elevateforhumanity.org';
+ const response=await middleware(new NextRequest('https://'+host+'/api/apps/upgrade',{method:'POST',headers:{host}}));
+ assert.equal(response.headers.get('x-middleware-next'),'1');
+ assert.equal(response.headers.get('location'),null);
+}));
+
+test('Store does not admit unrelated app APIs through its checkout exception', async () => withRuntime('elevate-store-migration', async () => {
+ const host='store.elevateforhumanity.org';
+ for (const path of ['/api/apps/admin','/api/apps/upgrade/private']) {
+  const response=await middleware(new NextRequest('https://'+host+path,{headers:{host}}));
+  assert.equal(new URL(response.headers.get('location')).hostname,'www.elevateforhumanity.org');
+ }
+}));

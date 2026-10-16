@@ -66,3 +66,54 @@ jobs:
           for(let i=0;i<3;i++)assert.equal(await health(),commit);
           console.log(JSON.stringify({service:name,maximumInstances:1,imageAndTemplatePreserved:true,servingTrafficPreserved:true,healthVerified:true,commit}));
           NODE
+  stop-unused-studio-trial:
+    needs: repair
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    concurrency:
+      group: google-studio-browser
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Verify production browser and stop only its isolated trial VM
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {execFileSync} from 'node:child_process';
+          import {cleanupTrial} from './scripts/gcp/deploy-studio-vm-trial.mjs';
+          const project='elegant-racer-299721',region='us-central1';
+          const read=args=>JSON.parse(execFileSync('gcloud',[...args,'--project='+project,'--format=json'],{encoding:'utf8',timeout:30000,stdio:['ignore','pipe','pipe']}));
+          const expected='https://elevate-studio-browser-aabnh2y32a-uc.a.run.app';
+          async function verify(){
+            const admin=read(['run','services','describe','elevate-admin-migration','--region='+region]);
+            const revisions=new Set((admin.status.traffic||[]).filter(t=>t.percent>0).map(t=>t.revisionName));
+            assert.ok(revisions.size);
+            for(const name of revisions){
+              const r=read(['run','revisions','describe',name,'--region='+region]);
+              const env=Object.fromEntries(r.spec.containers[0].env.map(e=>[e.name,e.value]));
+              assert.equal(env.STUDIO_BROWSER_URL?.replace(/\/$/,''),expected);
+              assert.equal(env.STUDIO_BROWSER_PUBLIC_URL?.replace(/\/$/,''),expected);
+            }
+            const response=await fetch(expected+'/health',{signal:AbortSignal.timeout(30000),redirect:'error',cache:'no-store'});
+            const health=await response.json();assert.equal(response.status,200);assert.equal(health.ready,true);
+            assert.equal(health.lifecycle?.browserConnected ?? health.browserConnected,true);
+          }
+          await verify();
+          cleanupTrial();
+          const vm=read(['compute','instances','describe','elevate-studio-browser-trial','--zone=us-central1-a']);
+          assert.equal(vm.status,'TERMINATED');
+          assert.ok(vm.disks.some(d=>d.source.endsWith('/elevate-studio-browser-auth-trial')&&d.autoDelete===false));
+          await verify();
+          console.log(JSON.stringify({trialVmStopped:true,persistentDiskRetained:true,productionBrowserReady:true,productionDestinationVerified:true}));
+          NODE

@@ -88,12 +88,12 @@ export function ColoredLivePreviewFrame({
   return (
     <div
       className={`flex min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-700 bg-slate-950 shadow-xl ${className}`}
-      style={{ minHeight: workspaceTop ? `min(95vh, ${workspaceMinHeight + minHeight + 120}px)` : undefined }}
+      style={{ minHeight: workspaceTop ? `min(95dvh, ${workspaceMinHeight + minHeight + 120}px)` : undefined }}
     >
       {workspaceTop ? (
         <div
           className="flex min-h-0 shrink-0 flex-col overflow-hidden border-b border-slate-200 bg-white"
-          style={{ height: `clamp(340px, 52vh, ${Math.max(workspaceMinHeight, 480)}px)` }}
+          style={{ height: `clamp(280px, 48dvh, ${Math.max(workspaceMinHeight, 480)}px)` }}
         >
           {workspaceTop}
         </div>

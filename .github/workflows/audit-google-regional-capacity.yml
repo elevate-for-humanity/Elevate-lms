@@ -21,6 +21,8 @@ jobs:
     environment: production
     timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -28,8 +30,6 @@ jobs:
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
         with: {skip_install: true}
-      - uses: actions/checkout@v4
-        with: {persist-credentials: false}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Prepare audit reports

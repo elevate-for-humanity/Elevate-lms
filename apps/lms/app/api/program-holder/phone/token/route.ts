@@ -1,7 +1,6 @@
 // pre-auth-registry: exempt - requireCommunicationActor verifies the owner before provider-scoped credentials are issued.
 import { NextResponse } from 'next/server';
 import { phoneActorResponse } from '@/lib/phone/actor-response';
-import { ensureDeviceCredential } from '@/lib/phone/webrtc';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { provisionAsteriskDevice, asteriskDeviceId } from '@/lib/phone/asterisk';
 
@@ -52,64 +51,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'The phone system is not active.' }, { status: 503 });
   try {
     await hydrateProcessEnv();
-    if (extension.webrtc_provider === 'asterisk' && body.purpose !== 'external') {
-      const credential = await provisionAsteriskDevice(ctx.db, {
-        profileId: ctx.user.id,
-        deviceId: asteriskDeviceId(deviceId),
-        extensionId: extension.id,
-      });
-      return NextResponse.json(
-        { ...credential, callerId: extension.extension },
-        { headers: { 'Cache-Control': 'no-store, private', Pragma: 'no-cache' } },
-      );
-    }
-    const { data: primaryNumber, error: numberError } = await ctx.db
-      .from('phone_numbers')
-      .select('e164')
-      .eq('phone_system_id', system.id)
-      .eq('status', 'active')
-      .eq('is_primary', true)
-      .maybeSingle();
-    if (numberError || !primaryNumber?.e164) {
-      return NextResponse.json(
-        { error: 'The phone system has no active primary caller ID.' },
-        { status: 503 },
-      );
-    }
-    const credential = await ensureDeviceCredential({
-      db: ctx.db,
-      system,
-      extension,
+    // Twilio is the carrier for external PSTN calls. PWA endpoints register
+    // against Elevate's independent Asterisk WSS transport, not Telnyx.
+    // External dialing must be routed by the verified Twilio PBX trunk.
+    const credential = await provisionAsteriskDevice(ctx.db, {
       profileId: ctx.user.id,
-      deviceId,
-      callerId: primaryNumber.e164,
+      deviceId: asteriskDeviceId(deviceId),
+      extensionId: extension.id,
     });
-    // A credential is only a permission to connect. The PWA reports presence
-    // after Telnyx confirms its socket is ready.
-    const { count: otherLiveDevices } = await ctx.db
-      .from('phone_webrtc_devices')
-      .select('id', { count: 'exact', head: true })
-      .eq('extension_id', extension.id)
-      .eq('status', 'active')
-      .eq('provider', 'telnyx')
-      .eq('connection_state', 'connected')
-      .neq('device_id', deviceId)
-      .gte('last_seen_at', new Date(Date.now() - 120_000).toISOString());
-    if (!otherLiveDevices && body.purpose !== 'external') {
-      await ctx.db
-        .from('communication_extensions')
-        .update({ presence_status: 'offline', updated_at: new Date().toISOString() })
-        .eq('id', extension.id)
-        .eq('profile_id', ctx.user.id);
-    }
     return NextResponse.json(
-      {
-        provider: 'telnyx',
-        token: credential.token,
-        sipUsername: credential.sipUsername,
-        extension: extension.extension,
-        callerId: primaryNumber.e164,
-      },
+      { ...credential, callerId: extension.extension },
       { headers: { 'Cache-Control': 'no-store, private', Pragma: 'no-cache' } },
     );
   } catch (cause) {

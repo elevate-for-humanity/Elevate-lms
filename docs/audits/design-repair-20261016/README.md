@@ -4,7 +4,7 @@
 
 ## Preserved work and architecture
 
-The existing branch `repair/full-platform-design-architecture-20261016` includes main `8e9d4a67a049e53d7734e65ecaf4cacf0b509641`, preserving its Twilio credential, microphone readiness, public contact and voicemail-ingestion fixes. Valid earlier repairs were retained. Course Builder engines, workers and queues are unchanged.
+The existing branch `repair/full-platform-design-architecture-20261016` includes main `35abd5b5db43f1749b3ad2a6d1c09cb90d7fa0fa`, preserving the preceding Twilio credential, microphone readiness, public contact and voicemail-ingestion fixes and the approved carrier migration. Valid earlier repairs were retained. Course Builder engines, workers and queues are unchanged.
 
 - Marketing/Admin/LMS global patches no longer force component grids, colors, section backgrounds or typography. Shared contrast defaults now use a low-priority native cascade layer; a white page ancestor cannot recolor nested dark heroes or light controls. Accessibility focus, minimum target sizes and reduced-motion behavior remain.
 - Studio chat-provided preview URLs reach the live frame; workspace height accommodates its controls/composer; preview/device controls have accessible labels and states. Existing services and AI operations remain connected through their original interfaces.
@@ -75,3 +75,9 @@ The production-mode Compliance run on `fe52e2e` found four shared label contrast
 The nine advisory failures were investigated rather than inferred from the green gate. The four audio fixtures now use native fetch response bodies with an audio content type, avoiding the hosted Node 22/jsdom Blob mismatch while retaining playback/mute/ownership assertions. The two MOU tests now verify the existing 14-section canonical document, its protected-information/noncompetition limitation and final signature section. The grid test retains its matching assertions with Node traversal. These five updated test files (including hydration) pass all 11 local cases. The two existing learner-billing contract mismatches remain separate from this design repair; no billing or authorization implementation was changed to satisfy those assertions.
 
 After the last source corrections, the application/catalog routes passed 12 repeated local browser cases and all five affected pages passed ten desktop/Android Axe cases with successful-response and page-content guards. Source, loading/crop choices and homepage photo assignments remain preserved.
+
+## Latest-main carrier reconciliation
+
+Main advanced again through PR #1902 to `35abd5b5db43f1749b3ad2a6d1c09cb90d7fa0fa`. Its automatic merge checkout exposed `TS2339` in the LMS: the credential type was Asterisk-only, but an obsolete provider branch still read `credential.token` and loaded the retired browser SDK. That leftover branch is removed; unsupported runtime credentials now fail explicitly before asking for microphone access. Current SIP/PSTN routing, microphone verification and authorization are preserved. All 115 phone-contract tests, all three application TypeScript checks and repository lint pass locally.
+
+The full-suite hosted run on `b235dcf` confirms the seven compatibility/MOU fixes: **4,006 passed / 2 failed / 8 skipped**. Only the two billing contract mismatches remain, independently reproduced on unmodified main. No advisory test was disabled. Final required workflow results for the subsequent head are recorded in the PR.

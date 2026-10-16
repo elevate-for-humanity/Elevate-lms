@@ -65,7 +65,7 @@ type PhoneData = {
     externalFallbackAllowed?: boolean;
     externalFallbackNumber: string;
     presenceStatus: string;
-    provider: 'telnyx' | 'asterisk';
+    provider: 'asterisk';
   };
   inbox: InboxItem[];
   voicemail?: {

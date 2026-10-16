@@ -17,10 +17,10 @@ async function context(db: any, input: any) {
     db.from('ultimate_course_builds').select('id,status,profile').eq('id', input.buildId).single(),
     db.from('ultimate_lesson_builds').select('id,competency_id,status,artifacts').eq('id', input.lessonBuildId).eq('build_id', input.buildId).single(),
     db.from('ultimate_lesson_steps').select('step,state,findings,completed_at').eq('lesson_build_id', input.lessonBuildId),
-    db.from('ultimate_build_jobs').select('*').eq('build_id', input.buildId).eq('job_type', 'course_build').order('created_at', { ascending: false }).limit(1),
+    db.from('ultimate_build_jobs').select('*').eq('build_id', input.buildId).eq('job_type', 'course_build').order('created_at', { ascending: false }).limit(30),
   ]);
   for (const result of [build, lesson, steps, jobs]) if (result.error) throw result.error;
-  return { build: build.data, lesson: lesson.data, steps: steps.data ?? [], job: jobs.data?.[0] };
+  return { build: build.data, lesson: lesson.data, steps: steps.data ?? [], job: (jobs.data ?? []).find((job: any) => ['running', 'queued', 'waiting_for_dependency'].includes(job.status)) ?? jobs.data?.[0] };
 }
 export async function GET(req: NextRequest) {
   const auth = await apiRequireAdmin(req); if (auth.error) return auth.error;
@@ -72,6 +72,12 @@ export async function POST(req: NextRequest) {
     const index = c.build.profile.competencies?.findIndex((x: any) => x.id === c.lesson.competency_id);
     if (!(index >= 0)) return NextResponse.json({ error: 'This lesson is not in the saved course plan.' }, { status: 409 });
     const checkpoint = c.steps.find((s: any) => s.step === input.step);
+    if (checkpoint?.state === 'passed' && !(checkpoint.findings ?? []).length) {
+      return NextResponse.json({
+        error: 'This checkpoint has already passed. Choose the failed learner runthrough or another checkpoint with findings. No completed media was changed.',
+        checkpointState: 'passed',
+      }, { status: 409 });
+    }
     const targets = routeSelectiveRepairs(checkpoint?.findings ?? []);
     const ordered = [input.step, ...targets.map((x: any) => x.step)].sort((a, b) => ULTIMATE_BUILD_STEPS.indexOf(a) - ULTIMATE_BUILD_STEPS.indexOf(b));
     const fromStep = ordered[0];

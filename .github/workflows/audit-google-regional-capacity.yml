@@ -32,15 +32,22 @@ jobs:
         with: {persist-credentials: false}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
+      - name: Prepare audit reports
+        run: mkdir -p audit-reports
       - name: Compare primary and secondary regions without changing resources
-        run: node scripts/gcp/audit-runtime-capacity.mjs
+        run: |
+          set -o pipefail
+          node scripts/gcp/audit-runtime-capacity.mjs | tee audit-reports/regional-capacity.json
       - name: Test cost inventory redaction and read-only behavior
         if: always()
         run: node --test scripts/gcp/audit-cost-resources.test.mjs
       - name: Inventory project resources without provisioning or deleting anything
         if: always()
-        run: node scripts/gcp/audit-cost-resources.mjs
+        run: |
+          set -o pipefail
+          node scripts/gcp/audit-cost-resources.mjs | tee audit-reports/cost-resources.json
       - name: Read regional allocation without changing services
+        if: always()
         run: |
           python - <<'PY'
           import subprocess,json,datetime,urllib.request,urllib.parse
@@ -88,3 +95,11 @@ jobs:
             print(json.dumps({'kind':'monitoring','truncated':bool(metrics.get('nextPageToken'))}))
           except urllib.error.HTTPError as error:print(json.dumps({'kind':'monitoring','httpStatus':error.code}))
           PY
+      - name: Preserve regional and cost inventory evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: google-resource-audit-${{ github.run_id }}-${{ github.run_attempt }}
+          path: audit-reports/*.json
+          if-no-files-found: warn
+          retention-days: 14

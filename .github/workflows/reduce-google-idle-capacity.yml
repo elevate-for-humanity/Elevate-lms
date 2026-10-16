@@ -1,26 +1,15 @@
 name: Reduce Google idle memory reservations
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/reduce-google-idle-capacity.yml', 'scripts/gcp/reduce-idle-capacity.mjs']
   workflow_dispatch:
 permissions:
   contents: read
   actions: write
   id-token: write
 jobs:
-  dispatch:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Dispatch trusted main capacity adjustment
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/reduce-google-idle-capacity.yml/dispatches" -f ref=main
   reduce:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     concurrency:
-      group: google-runtime-operations
+      group: google-runtime-us-central1
       cancel-in-progress: false
     environment: production
     runs-on: ubuntu-24.04

@@ -175,7 +175,7 @@ export function ProgramIntegrityPanel() {
                         </span>
                       ))}
                       {p.failing_checks.length > 4 && (
-                        <span className="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-400">
+                        <span className="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
                           +{p.failing_checks.length - 4} more
                         </span>
                       )}

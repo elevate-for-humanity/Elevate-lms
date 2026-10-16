@@ -28,7 +28,7 @@ export function ArchetypeBase({
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-[400px]">
+      <section className="relative min-h-[260px] bg-slate-950">
         {finalContent.hero.image && (
           <Image
             src={finalContent.hero.image}
@@ -39,13 +39,13 @@ export function ArchetypeBase({
             sizes="100vw" placeholder="empty"
           />
         )}
-        <div className="absolute inset-0 flex items-center">
+        <div className="relative flex items-center bg-slate-950/80 py-10">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl text-white">
               <h1 className="text-5xl font-bold mb-4">{finalContent.hero.title}</h1>
               <p className="text-xl mb-6">{finalContent.hero.purpose}</p>
               {finalContent.cta && (
-                <div className="flex gap-4">
+                <div className="flex flex-wrap gap-4">
                   {finalContent.cta.primary && (
                     <a
                       href={finalContent.cta.primaryHref || '#'}

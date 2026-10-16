@@ -239,7 +239,7 @@ export default async function StudentsPage({
           <div className="overflow-x-auto">
             <div className="min-w-[600px]">
               {/* Table header */}
-              <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-600">
                 <div className="col-span-3">Student</div>
                 <div className="col-span-3">Contact</div>
                 <div className="col-span-2">Program</div>

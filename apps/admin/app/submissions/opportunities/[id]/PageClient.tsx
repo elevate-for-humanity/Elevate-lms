@@ -556,7 +556,7 @@ export default function OpportunityProfilePage() {
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                        <span className="text-xs text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                        <span className="text-xs text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">
                           {req.requirement_category}
                         </span>
                         {req.review_class && (

@@ -41,7 +41,7 @@ test('rejected credentials report only HTTP status and never permit binding',asy
   } finally {console.error=original;}
 });
 
-test('valid saved API key verifies number when account auth token returns 401',async()=>{
+test('API-key ownership verification cannot authorize binding a rejected webhook Auth Token',async()=>{
   const calls=[];
   const fetchImpl=async(url,options)=>{
     calls.push(url);
@@ -55,8 +55,7 @@ test('valid saved API key verifies number when account auth token returns 401',a
   };
   const old=console.error;console.error=()=>{};
   try {
-    const verified=await verifiedTwilioBindings(config,fetchImpl);
-    assert.equal(verified.TWILIO_PHONE_NUMBER,'+14632401404');
+    await assert.rejects(verifiedTwilioBindings(config,fetchImpl), /Twilio Auth Token rejected; API key verified number ownership only/);
     assert.equal(calls.filter(x=>x.includes('/IncomingPhoneNumbers/')).length,2);
   } finally {console.error=old;}
 });

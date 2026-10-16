@@ -902,7 +902,7 @@ export default async function ApprenticePortalPage() {
                   src={action.image}
                   alt=""
                   fill
-                  sizes="(max-width:640px) 100vw,25vw"
+                  sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 25vw"
                   className="object-cover transition-transform group-hover:scale-[1.03]"
                 />
               </div>

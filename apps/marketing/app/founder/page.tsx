@@ -30,7 +30,7 @@ export default function FounderPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 flex items-center px-6">
+        <div className="absolute inset-0 bg-white/95 flex items-center px-6">
           <div className="max-w-6xl mx-auto w-full">
             <p className="text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2">
               Founder &amp; CEO

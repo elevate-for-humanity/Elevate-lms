@@ -93,7 +93,7 @@ export function ColoredLivePreviewFrame({
       {workspaceTop ? (
         <div
           className="flex min-h-0 shrink-0 flex-col overflow-hidden border-b border-slate-200 bg-white"
-          style={{ height: `clamp(280px, 48dvh, ${Math.max(workspaceMinHeight, 480)}px)` }}
+          style={{ height: `max(${Math.max(workspaceMinHeight, 640)}px, calc(100dvh - 5rem))` }}
         >
           {workspaceTop}
         </div>
@@ -126,6 +126,7 @@ export function ColoredLivePreviewFrame({
           >
             <Globe className="h-3.5 w-3.5 shrink-0 text-brand-blue-600" />
             <input
+              aria-label="Preview URL"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               className="h-11 min-w-0 flex-1 bg-transparent text-sm text-slate-900 outline-none"
@@ -167,6 +168,8 @@ export function ColoredLivePreviewFrame({
                 key={id}
                 type="button"
                 title={title}
+                aria-label={`${title} preview`}
+                aria-pressed={device === id}
                 onClick={() => setDevice(id)}
                 className={`inline-flex h-10 w-10 items-center justify-center rounded-md ${device === id ? 'bg-white text-brand-blue-700' : 'text-white/90 hover:bg-white/20'}`}
               >

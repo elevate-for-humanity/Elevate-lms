@@ -31,7 +31,7 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
   const [websites, setWebsites] = useState(initialWebsites);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showInterview, setShowInterview] = useState(initialWebsites.length === 0);
+  const [showInterview, setShowInterview] = useState(false);
 
   const createWebsite = async () => {
     setCreating(true);
@@ -60,7 +60,7 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
             <p className="text-sm font-bold uppercase tracking-widest text-brand-red-700">Elevate Apps</p>
             <h1 className="mt-1 text-3xl font-black text-slate-900">AI Website Builder</h1>
             <p className="mt-2 max-w-2xl text-slate-600">
-              Describe the website you want. PARIS creates a saved draft that you can preview, edit with plain-language instructions, and publish.
+              Choose to build a new website or bring an existing one. PARIS handles the design, and you can preview, request changes, and publish without writing code.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -105,16 +105,16 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
           <div className="mt-8 grid gap-5 md:grid-cols-2">
             <Link href="/apps/website-builder/import" className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-brand-red-300 hover:shadow-md">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-red-50 text-brand-red-700"><Upload className="h-5 w-5" /></div>
-              <h2 className="mt-4 text-xl font-black text-slate-950">Import an existing website</h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600">Bring a public site into the Elevate builder, let AI map its content and branding, then review everything before publishing.</p>
+              <h2 className="mt-4 text-xl font-black text-slate-950">Bring your existing website</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">Import your website and existing content. PARIS will help redesign it while preserving your business information.</p>
               <span className="mt-5 inline-flex font-black text-brand-red-700 group-hover:underline">Start import →</span>
             </Link>
 
-            <button type="button" onClick={createWebsite} disabled={creating} className="group rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm hover:border-slate-300 hover:shadow-md disabled:opacity-60">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-800"><Globe2 className="h-5 w-5" /></div>
-              <h2 className="mt-4 text-xl font-black text-slate-950">Start manually</h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600">Open a clean starter website and edit branding, homepage, contact, booking, SEO, domains, and publishing settings yourself.</p>
-              <span className="mt-5 inline-flex font-black text-slate-950">{creating ? 'Creating…' : 'Create blank starter →'}</span>
+            <button type="button" onClick={() => setShowInterview(true)} className="group rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm hover:border-brand-red-300 hover:shadow-md">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-red-50 text-brand-red-700"><Sparkles className="h-5 w-5" /></div>
+              <h2 className="mt-4 text-xl font-black text-slate-950">Build a new website</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">Describe your business and what you need. PARIS will guide the design and build without asking you to supply a repository, database, or hosting account.</p>
+              <span className="mt-5 inline-flex font-black text-brand-red-700 group-hover:underline">Start with PARIS →</span>
             </button>
           </div>
         ) : (

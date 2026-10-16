@@ -10,16 +10,18 @@
     {
       "source": "app/tax-software/_components/TaxSiteShell.tsx",
       "target": "apps/marketing/app/tax-software/_components/TaxSiteShell.tsx",
-      "sha256": "82aae4b9b4aecd80e7ac7aef48063feb96f93f7ad6a7f168361cb85b9d8280ae",
+      "sha256": "30bd570692bb874af95beda59fcefbe5fa045de204e40b9ee3d4036e40a83d46",
       "sourceSha256": "209cc698b65b0207eb05cee1208091e758ee26f4f70a24c02cef6bb30762451b",
-      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough"
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough",
+      "changeReason": "Replace the retired public contact number with (463) 240-1404; preserve the pinned upstream source digest."
     },
     {
       "source": "app/tax-software/about/page.tsx",
       "target": "apps/marketing/app/tax-software/about/page.tsx",
-      "sha256": "eadcaeea5e302d5fc41639dbee526782d767d6a365eb6e3aeaf7ceffb1ec583a",
+      "sha256": "9c83a25cf6e7b935f1a00f2154520d3deaf71c79965694f2bd6cc75480033633",
       "sourceSha256": "fba09019a0efa6c76b5afba6bf42668c69f313a3bfc9df625ce0b4c73677f9ab",
-      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough"
+      "localRevisionReason": "Consistent Supersonic public page presentation and accurate preparation walkthrough",
+      "changeReason": "Replace the retired public contact number with (463) 240-1404; preserve the pinned upstream source digest."
     },
     {
       "source": "app/tax-software/bank-products/page.tsx",
@@ -31,9 +33,10 @@
     {
       "source": "app/tax-software/contact/page.tsx",
       "target": "apps/marketing/app/tax-software/contact/page.tsx",
-      "sha256": "685ca3fca65721a8d26b8bd6e6b0c53b2932610f44bbaf1ed85b798cdbb9acf0",
+      "sha256": "0c0eaf9517b68e4df449da42939e4b234cba1ae529adb21ef8905a428702ba6e",
       "sourceSha256": "492ed08bd44af2c2b36ddc120974f5fe6c0aa1f4eeaf1ea784355f5eeb684ea5",
-      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths"
+      "localRevisionReason": "Polish Supersonic visitor journeys, navigation, public pages and sign-in return paths",
+      "changeReason": "Replace the retired public contact number with (463) 240-1404; preserve the pinned upstream source digest."
     },
     {
       "source": "app/tax-software/demo/page.tsx",

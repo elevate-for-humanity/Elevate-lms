@@ -1,7 +1,7 @@
 'use client';
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { logger } from '@/lib/logger';
 import {
@@ -75,6 +75,9 @@ const FEATURES = [
 ];
 
 export default function ConnectPage() {
+  const [interactive, setInteractive] = useState(false);
+  useEffect(() => setInteractive(true), []);
+
   const [step, setStep] = useState<Step>('platform');
   const [platform, setPlatform] = useState('');
   const [url, setUrl] = useState('');
@@ -166,6 +169,7 @@ export default function ConnectPage() {
                 {PLATFORMS.filter((p) => p.popular).map((p) => (
                   <button
                     key={p.id}
+                    disabled={!interactive}
                     aria-pressed={platform === p.id}
                     onClick={() => setPlatform(p.id)}
                     className={`min-w-0 px-2 py-4 sm:p-4 rounded-xl border-2 text-center transition-all ${
@@ -184,6 +188,7 @@ export default function ConnectPage() {
                 {PLATFORMS.filter((p) => !p.popular).map((p) => (
                   <button
                     key={p.id}
+                    disabled={!interactive}
                     aria-pressed={platform === p.id}
                     onClick={() => setPlatform(p.id)}
                     className={`min-w-0 px-2 py-4 sm:p-4 rounded-xl border-2 text-center transition-all ${

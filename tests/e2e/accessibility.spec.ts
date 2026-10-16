@@ -19,6 +19,10 @@ const PUBLIC_ROUTES = [
 async function scan(page: Page, route: string) {
   const response = await page.goto(route);
   expect(response?.status()).toBeLessThan(400);
+  if (route === '/apply') {
+    await expect(page).toHaveURL(/\/apply\/student\/interview(?:[?#].*)?$/, { timeout: 90000 });
+    await page.waitForLoadState('domcontentloaded');
+  }
   await page.waitForLoadState('domcontentloaded');
   await expect(page.locator('main').first()).toBeVisible();
   await expect(page.locator('h1').first()).toBeVisible();
@@ -51,8 +55,11 @@ test.describe('Accessibility - WCAG 2.2 AA public journeys', () => {
     // immediately replaced and reports as inactive on touch emulation.
     await page.waitForLoadState('load');
 
+    // Streaming Suspense temporarily retains the outgoing shell in a hidden
+    // boundary. Require the committed shell before exercising its focus target.
+    await expect(page.locator('#main-content')).toHaveCount(1);
     const skipLink = page.locator('.skip-to-main');
-    await skipLink.waitFor({ state: 'attached' });
+    await expect(skipLink).toHaveAttribute('data-interactive', 'true');
     const touchOnlyProfile = ['tablet-chrome', 'iphone-webkit', 'android-chrome'].includes(
       testInfo.project.name,
     );

@@ -117,6 +117,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
   const previousPathnameRef = useRef(pathname);
   const firstFocusRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const previousOpenRef = useRef(false);
 
   const closeMenu = useCallback(() => {
     setIsOpen(false);
@@ -148,11 +149,15 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
   }, [isOpen, closeMenu]);
 
   useEffect(() => {
-    if (isOpen) {
-      requestAnimationFrame(() => firstFocusRef.current?.focus());
-    } else {
-      requestAnimationFrame(() => triggerRef.current?.focus());
-    }
+    const wasOpen = previousOpenRef.current;
+    previousOpenRef.current = isOpen;
+    // Restore focus after an actual dismissal, never on the initial page load.
+    if (!isOpen && !wasOpen) return;
+    const frame = requestAnimationFrame(() => {
+      if (isOpen) firstFocusRef.current?.focus();
+      else triggerRef.current?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
   }, [isOpen]);
 
   useEffect(() => {

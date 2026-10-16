@@ -102,9 +102,8 @@ export default function CookieConsent() {
       aria-modal="false"
       aria-labelledby="cookie-consent-title"
       aria-describedby="cookie-consent-description"
-      className={`w-full transition-opacity duration-300 ${
-        isVisible ? 'opacity-100' : 'opacity-0'
-      }`}
+      className="w-full"
+      hidden={!isVisible}
     >
       <div className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-2">

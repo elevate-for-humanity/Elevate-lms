@@ -29,7 +29,9 @@ describe('cookie preferences and page navigation', () => {
   it('saves necessary-only consent and disables optional tracking', () => {
     render(<CookieConsent />);
     act(() => vi.advanceTimersByTime(1000));
+    expect(screen.getByRole('dialog')).not.toHaveClass('opacity-0');
     fireEvent.click(screen.getByRole('button', { name: 'Necessary only' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(localStorage.getItem('cookie-consent')).toBe('rejected');
     expect(updateConsent).toHaveBeenCalledWith(false, false);
     act(() => vi.advanceTimersByTime(300));

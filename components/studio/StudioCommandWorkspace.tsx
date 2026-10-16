@@ -409,8 +409,8 @@ export default function StudioCommandWorkspace({
             }
             aria-label="Active Studio tool"
           >
-            <header className="flex min-h-12 shrink-0 items-center gap-2 overflow-x-auto border-b border-slate-200 bg-slate-50 px-3 text-slate-950">
-              <span className="mr-auto shrink-0 text-xs font-black">
+            <header className="flex min-h-12 shrink-0 flex-wrap items-center gap-1.5 border-b border-slate-200 bg-slate-50 px-2 py-2 text-slate-950 sm:flex-nowrap sm:gap-2 sm:px-3">
+              <span className="min-w-0 basis-full truncate text-xs font-black sm:mr-auto sm:basis-auto">
                 {activeWorkspace?.label ??
                   (surface === 'course' ? 'Course Builder' : 'Active run tools')}
               </span>
@@ -421,7 +421,7 @@ export default function StudioCommandWorkspace({
                   setActiveCapability(null);
                   setSurface(previewUrl ? 'preview' : 'course');
                 }}
-                className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'preview' || surface === 'course' ? 'bg-cyan-500 text-slate-950' : 'text-slate-700 hover:bg-slate-200'}`}
+                className={`inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-md px-2 py-2 text-xs font-bold sm:min-h-0 sm:flex-none sm:px-3 ${surface === 'preview' || surface === 'course' ? 'bg-cyan-500 text-slate-950' : 'text-slate-700 hover:bg-slate-200'}`}
               >
                 <Eye className="h-4 w-4" aria-hidden="true" /> Preview
               </button>
@@ -439,7 +439,7 @@ export default function StudioCommandWorkspace({
               <button
                 type="button"
                 onClick={() => setFocusMode((value) => !value)}
-                className="inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200"
+                className="inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-md px-2 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 sm:min-h-0 sm:flex-none sm:px-3"
                 aria-label={
                   focusMode ? 'Exit full screen workspace' : 'Expand workspace to full screen'
                 }
@@ -449,12 +449,12 @@ export default function StudioCommandWorkspace({
                 ) : (
                   <Maximize2 className="h-4 w-4" aria-hidden="true" />
                 )}
-                {focusMode ? 'Exit full screen' : 'Full screen'}
+                <span className="hidden sm:inline">{focusMode ? 'Exit full screen' : 'Full screen'}</span>
               </button>
               <button
                 type="button"
                 onClick={() => setSurface('commands')}
-                className="shrink-0 rounded-md px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200"
+                className="min-h-11 flex-1 rounded-md px-2 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 sm:min-h-0 sm:flex-none sm:px-3"
               >
                 Commands
               </button>

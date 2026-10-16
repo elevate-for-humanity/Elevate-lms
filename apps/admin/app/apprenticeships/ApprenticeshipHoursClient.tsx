@@ -12,6 +12,7 @@ import {
 
 export default function ApprenticeshipHoursClient() {
   const router = useRouter();
+  const [signInRequired, setSignInRequired] = useState(false);
   const [entries, setEntries] = useState<AdminHoursEntry[]>([]);
   const [incompleteCount, setIncompleteCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -21,13 +22,26 @@ export default function ApprenticeshipHoursClient() {
   const [notice, setNotice] = useState<string | null>(null);
   const [review, setReview] = useState<AdminHoursEntry[] | null>(null);
 
+  const readResponse = useCallback(async (res: Response) => {
+    if (res.status === 401 || res.redirected) {
+      setSignInRequired(true);
+      throw new Error('Your session expired. Sign in again to review and approve hours.');
+    }
+    return res.json().catch(() => {
+      throw new Error('The hours service could not return the queue. Refresh or sign in again.');
+    });
+  }, []);
+
   const load = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
     try {
       const res = await fetch('/api/admin/apprenticeships/pending-hours', { cache: 'no-store' });
-      const data = await res.json();
+      const data = await readResponse(res);
       if (!res.ok) throw new Error(data.error || 'Could not load hours');
+      if (!Array.isArray(data.entries))
+        throw new Error('The hours queue is incomplete. Please refresh.');
+      setSignInRequired(false);
       setEntries(data.entries);
       setIncompleteCount(data.incompleteCount);
     } catch (e) {
@@ -35,7 +49,7 @@ export default function ApprenticeshipHoursClient() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [readResponse]);
 
   useEffect(() => {
     void load();
@@ -61,7 +75,7 @@ export default function ApprenticeshipHoursClient() {
             expected: selected.slice(offset, offset + 200).map(hoursApprovalSnapshot),
           }),
         });
-        const data = await res.json();
+        const data = await readResponse(res);
         if (!res.ok || !data.ok) throw new Error(data.error || 'Could not confirm approval');
         approved += data.approvedCount;
       }
@@ -122,6 +136,14 @@ export default function ApprenticeshipHoursClient() {
           Saving approvals…
         </p>
       )}
+      {signInRequired && (
+        <a
+          href="/login?redirect=%2Fapprenticeships"
+          className="m-4 inline-flex min-h-11 items-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+        >
+          Sign in to approve hours
+        </a>
+      )}
       {(loadError || error) && (
         <p role="alert" className="px-5 py-3 text-sm text-red-700">
           {loadError || error}
@@ -167,8 +189,8 @@ export default function ApprenticeshipHoursClient() {
         <p className="px-5 py-6 text-sm text-slate-600">No completed hours awaiting approval.</p>
       )}
       {!!entries.length && (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[850px] text-sm">
+        <div className="overflow-x-auto" data-hours-responsive-table>
+          <table className="w-full min-w-[850px] text-sm hours-review-table">
             <thead className="bg-slate-50">
               <tr>
                 {['Apprentice', 'Program', 'Work date', 'Hours', 'Notes / review', 'Action'].map(
@@ -186,23 +208,27 @@ export default function ApprenticeshipHoursClient() {
             <tbody className="divide-y divide-slate-100">
               {entries.map((e) => (
                 <tr key={e.id}>
-                  <td className="px-4 py-3">
+                  <td data-label="Apprentice" className="px-4 py-3">
                     <p className="font-medium">{e.name}</p>
                     <p className="text-xs text-slate-500">{e.email}</p>
                   </td>
-                  <td className="px-4 py-3 text-xs">{e.program_title}</td>
-                  <td className="whitespace-nowrap px-4 py-3 text-xs">
+                  <td data-label="Program" className="px-4 py-3 text-xs">
+                    {e.program_title}
+                  </td>
+                  <td data-label="Work date" className="whitespace-nowrap px-4 py-3 text-xs">
                     {formatHoursDate(e.work_date)}
                     <p className="text-slate-500">Week ending {formatHoursDate(e.week_ending)}</p>
                   </td>
-                  <td className="px-4 py-3 font-semibold">{e.hours_worked}h</td>
-                  <td className="max-w-sm px-4 py-3 text-xs">
+                  <td data-label="Hours" className="px-4 py-3 font-semibold">
+                    {e.hours_worked}h
+                  </td>
+                  <td data-label="Notes / review" className="max-w-sm px-4 py-3 text-xs">
                     <p>{e.notes || e.tasks_completed || '—'}</p>
                     {e.approval_blocker && (
                       <p className="mt-1 font-medium text-amber-800">{e.approval_blocker}</p>
                     )}
                   </td>
-                  <td className="px-4 py-3">
+                  <td data-label="Action" className="px-4 py-3">
                     <button
                       type="button"
                       onClick={() => setReview([e])}

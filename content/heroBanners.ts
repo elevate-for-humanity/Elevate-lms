@@ -90,7 +90,7 @@ const DISTINCT_PROGRAM_POSTERS: Record<string, string> = {
   'network-administration': '/images/pages/technology-sector.webp',
   'network-support-technician': '/hero-images/technology-cat-new.jpg',
   'guest-service-gold': '/images/pages/about-employer-partners.webp',
-  'start-hospitality': '/images/pages/about-employer-partners.webp',
+  'start-hospitality': '/images/pages/suboffice-onboarding-page-1.webp',
 };
 
 const SHARED_GENERIC_VIDEO_FILES = new Set([

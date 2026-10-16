@@ -78,6 +78,7 @@ jobs:
     concurrency:
       group: google-runtime-us-central1
       cancel-in-progress: false
+      queue: max
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
@@ -254,7 +255,7 @@ jobs:
           gcloud run services update elevate-marketing-migration \
             --project=elegant-racer-299721 \
             --region=us-central1 \
-            --cpu=1 --memory=4Gi \
+            --cpu=1 --memory=4Gi --max=1 --max-instances=1 --no-cpu-boost \
             "${TAX_ARGS[@]}" \
             --image="$IMAGE@$DIGEST" \
             --revision-suffix="$SUFFIX" \

@@ -72,6 +72,7 @@ jobs:
     concurrency:
       group: google-runtime-us-central1
       cancel-in-progress: false
+      queue: max
     name: Build and deploy Admin on Google
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -153,7 +154,7 @@ jobs:
           # CPU must remain allocated while leased background renders execute.
           gcloud run services update elevate-admin-migration \
             --project=elegant-racer-299721 --region=us-central1 \
-            --image="$IMAGE@$DIGEST" --no-cpu-throttling --no-traffic \
+            --image="$IMAGE@$DIGEST" --no-cpu-boost --no-cpu-throttling --no-traffic \
             --update-env-vars=AI_NARRATION_PROVIDER=kokoro --quiet
       - name: Health-check and activate the exact Admin candidate
         shell: bash

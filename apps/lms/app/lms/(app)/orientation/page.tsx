@@ -1,3 +1,4 @@
+import HvacOrientation from '@/components/learner/HvacOrientation';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Book, Users, Award, Briefcase } from 'lucide-react';
@@ -17,7 +18,10 @@ export const metadata = {
 
 export default async function OrientationPage() {
   const verified = await loadVerifiedPublicStats();
-  const { profile } = await requireRole(['student', 'admin', 'super_admin']);
+  const { user, profile } = await requireRole(['student', 'learner', 'admin', 'super_admin']);
+  const db = await createClient();
+  const { data: hvacEnrollments } = await db.from('program_enrollments').select('id').eq('user_id', user.id).eq('program_slug', 'hvac-technician').limit(1);
+  const isHvac = Boolean(hvacEnrollments?.length);
   const typedProfile = profile as typeof profile & { orientation_completed?: boolean | null };
   const isCompleted = Boolean(typedProfile.orientation_completed);
 
@@ -52,7 +56,8 @@ export default async function OrientationPage() {
         {isCompleted ? <div className="mb-8 rounded-xl border border-green-200 bg-green-50 p-6"><h2 className="font-bold text-green-900">Orientation Completed</h2><p className="mt-1 text-sm text-green-800">You can continue to your program and enrollment steps.</p></div> : null}
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="space-y-6 lg:col-span-2">
-            <ProgramOrientationVideo title={`Welcome to ${PLATFORM_DEFAULTS.orgName}`} description="Learn about programs, expectations, and how to succeed in your training journey." videoUrl="/videos/orientation-full.mp4" onComplete={completeOrientation} />
+            {isHvac ? <HvacOrientation /> : <ProgramOrientationVideo title={`Welcome to ${PLATFORM_DEFAULTS.orgName}`} description="Learn about programs, expectations, and how to succeed in your training journey." videoUrl="/videos/orientation-full.mp4" onComplete={completeOrientation} />}
+            {isHvac ? <form action={completeOrientation}><button className="rounded bg-blue-800 px-5 py-3 font-bold text-white">I reviewed my HVAC orientation</button></form> : null}
             <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
               <h2 className="mb-4 text-xl font-bold text-black">What You'll Learn</h2>
               <ul className="space-y-3 text-black">

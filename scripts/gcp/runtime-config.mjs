@@ -15,7 +15,7 @@ export function googleFailureCode(stderr = '') {
   return 'command_failed';
 }
 export function google(args, input) {
-  const result = spawnSync('gcloud', args, { input, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
+  const result = spawnSync('gcloud', args, { input, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   // CLI errors may include credential values. Never emit stdout/stderr on failure.
   if (result.status !== 0) {
     const error = new Error(`Google operation failed: ${args.slice(0, 3).join(' ')}`);

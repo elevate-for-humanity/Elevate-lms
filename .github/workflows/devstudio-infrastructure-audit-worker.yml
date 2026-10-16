@@ -30,3 +30,6 @@ jobs:
           SUPABASE_URL: https://cuxzzpsyufcewtmicszk.supabase.co
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/gcp/devstudio-infrastructure-audit.mjs
+
+      - name: Verify safe scale-down prerequisites (read-only)
+        run: node scripts/gcp/cloud-run-scaling-preflight.mjs

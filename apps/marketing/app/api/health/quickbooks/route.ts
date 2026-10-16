@@ -9,8 +9,8 @@ export const revalidate = 0;
 
 export async function GET() {
   await hydrateProcessEnv();
-  const db = await requireAdminClient();
   try {
+    const db = await requireAdminClient();
     const config = await loadQuickBooksConfig(db);
     const configured = Boolean(
       config.clientId &&
@@ -41,12 +41,20 @@ export async function GET() {
       },
       { status: webhookVerifierConfigured ? 200 : 503, headers: { 'Cache-Control': 'no-store' } },
     );
-  } catch {
+  } catch (error) {
+    // Report non-sensitive failure categories for production diagnosis.
+    // Never expose OAuth tokens, account data or upstream response bodies.
+    const message = error instanceof Error ? error.message : '';
+    const reason = message.includes('authorization expired') ? 'oauth_refresh_failed'
+      : message.includes('not connected') ? 'oauth_not_connected'
+      : /^QuickBooks request failed \\([0-9]{3}\\)/.test(message) ? 'upstream_api_failure'
+      : 'configuration_or_dependency_failure';
     return NextResponse.json(
       {
         service: 'quickbooks',
         ready: false,
         connected: false,
+        reason,
       },
       { status: 503, headers: { 'Cache-Control': 'no-store' } },
     );

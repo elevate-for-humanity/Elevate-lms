@@ -11,3 +11,9 @@ Reviewed published head `1025ee45cebd749aec0520f01d7d8346e5689f83`, not an older
 | Credential Scan | 38916573683 | Pass | Tracked plaintext credential patterns absent. This is not verification of runtime credential validity. |
 
 All five passed on the same PR head. Their workflow implementations were preserved. Separate Integrity and rendered-browser tests exposed additional media issues, so these green checks alone do not authorize readiness. The final head must rerun all five after media fixes.
+
+## Final published head recheck
+
+Read job steps and decoded logs again for `8c5f47cbe2e19e314271c9ecf5a9f55313dc0f61`. All five passed without workflow changes: Design Policy 38918507504; Survival Guard 38918506383; Marketing Images 38918506436; Lockfile Integrity 38918507376; Credential Scan 38918507129. Integrity, CI, Compliance, Unified Platform Consolidation, Pre-deploy, application/container builds and the 42-case responsive suite also passed. The separate Recovery Hardening workflow was path-filter skipped; its hardening regression step ran successfully inside the other gates.
+
+The later local continuation reduces Image Contract strict findings from 104 to zero. This is a local result until the updated head is published and checked. No production deployment was performed.

@@ -1,4 +1,5 @@
 'use client';
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { logger } from '@/lib/logger';
 
 /**
@@ -269,15 +270,13 @@ export default function ProgramDetailPage({
             // Fallback: plain image hero for programs without a banner entry
             return (
               <div className="relative h-[clamp(260px,42svh,480px)] w-full overflow-hidden">
-                {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                <Image
+                        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
                   src={heroPosterSrc}
                   alt={heroAlt}
                   fill
                   className="object-contain object-center"
                   priority
                   sizes="100vw"
-                  placeholder="empty"
                 />
               </div>
             );
@@ -347,12 +346,12 @@ export default function ProgramDetailPage({
         <div className="bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
             {/* Breadcrumbs */}
-            <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-5">
+            <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs text-slate-600 mb-5">
               {(p.breadcrumbs ?? [])
                 .filter((b) => Boolean(b?.label))
                 .map((b, i) => (
-                  <span key={i} className="flex items-center gap-1.5">
-                    {i > 0 && <ChevronRight className="w-3 h-3" />}
+                  <span key={i} className="flex min-w-0 items-center gap-1.5">
+                    {i > 0 && <ChevronRight aria-hidden="true" className="w-3 h-3 shrink-0" />}
                     {b.href ? (
                       <Link href={b.href} className="hover:text-slate-600 transition-colors">
                         {b.label}

@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Brain, RefreshCw, Plus } from 'lucide-react';
@@ -61,7 +62,7 @@ export default function MemoryClient() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <div className="relative h-[280px] w-full overflow-hidden">
-        <Image
+        <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
           src="/images/instructors/robert-davis.jpg"
           alt="AI Memory"
           fill

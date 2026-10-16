@@ -1,0 +1,74 @@
+{
+  "findings": [
+    {
+      "id": "ARC-01",
+      "classification": "Shared architectural defect",
+      "file": "styles/contrast-guardrails.css",
+      "before": "Ancestor color overrides broke dark hero paragraphs and light controls.",
+      "correctionAndEvidence": "Low-priority surface defaults; component utilities own foregrounds. Real and nested-surface contrast checks pass."
+    },
+    {
+      "id": "ARC-02",
+      "classification": "Responsive/mobile defect",
+      "file": "components/site/HeaderMobileMenu.client.tsx",
+      "before": "Drawer and owner breakpoints differed; desktop resize retained scroll lock.",
+      "correctionAndEvidence": "Aligned 1180px cutoff; resize cleanup; close only on actual route change. First-click, Escape/focus and resize checks pass."
+    },
+    {
+      "id": "ARC-03",
+      "classification": "Responsive/mobile defect",
+      "file": "components/home/HomeProgramShowcase.tsx",
+      "before": "Link compressed titles; carousel targets clipped at mobile widths.",
+      "correctionAndEvidence": "Stacked title/link; small markers inside 44px controls; selection and bounds assertions pass."
+    },
+    {
+      "id": "ARC-04",
+      "classification": "Responsive/mobile defect",
+      "file": "components/programs/ProgramDetailPage.tsx",
+      "before": "Breadcrumb compressed Home onto multiple lines.",
+      "correctionAndEvidence": "Wrapping groups and nonshrinking separators; readable foreground."
+    },
+    {
+      "id": "ARC-05",
+      "classification": "Responsive/mobile defect",
+      "file": "apps/marketing/app/platform/employer-portal/page.tsx",
+      "before": "Ongoing statistic exceeded its mobile cell.",
+      "correctionAndEvidence": "Responsive typography/gaps; per-element overflow assertions pass."
+    },
+    {
+      "id": "ARC-06",
+      "classification": "Accessibility or contrast defect",
+      "file": "apps/marketing/app/connect/page.tsx",
+      "before": "Mixed light/dark styles hid form text; URL label lacked input association.",
+      "correctionAndEvidence": "Readable header/cards/input, associated label, pressed states and compact labels. API generation/state/clipboard handlers preserved."
+    },
+    {
+      "id": "ARC-07",
+      "classification": "Confirmed layout defect",
+      "file": "apps/marketing/app/barber-beauty-network/page.tsx",
+      "before": "Directory initialization failure removed public page body.",
+      "correctionAndEvidence": "Logged explicit unavailable state retains page/contact path; successful loader and authorization unchanged. Both states tested."
+    },
+    {
+      "id": "ARC-08",
+      "classification": "Image or hero-layout defect",
+      "file": "apps/marketing/app/founder/page.tsx",
+      "before": "Portrait placement showed a group-training asset.",
+      "correctionAndEvidence": "Existing organization.founder.imagePath restores the canonical portrait; repository asset and rendered result inspected."
+    },
+    {
+      "id": "ARC-09",
+      "classification": "Accessibility or contrast defect",
+      "file": "apps/marketing/app/platform/student-portal/page.tsx",
+      "before": "Blue-100 intro against blue-600 had only 4.24:1 contrast.",
+      "correctionAndEvidence": "White intro minimum 5.17:1; darker badge/CTA backing; rendered contrast assertion passes."
+    },
+    {
+      "id": "ARC-10",
+      "classification": "Accessibility or contrast defect",
+      "file": "apps/marketing/app/pricing/page.tsx",
+      "before": "Small green links and bright hover colors lacked contrast.",
+      "correctionAndEvidence": "Green-800 labels and deeper ROI hover color; prices/funding wording unchanged; rendered contrast assertion passes."
+    }
+  ]
+}

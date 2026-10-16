@@ -3,9 +3,12 @@
   "baselineReproduction": "Export active source trees and original audit script at 565cb8228d, then execute audit: 195 layout/text findings. Saved historical report contained only the top 60 files; full inventory recovered from source.",
   "count": 195,
   "summary": {
-    "Source reviewed; rendered verification outstanding": 134,
+    "Verified false positive; source and rendered evidence": 25,
+    "Source reviewed; rendered verification outstanding": 104,
+    "Shared foreground corrected; image-overlay review remains": 1,
     "Source verified": 19,
-    "Code corrected; rendered verification outstanding": 38,
+    "Corrected; rendered contrast and layout verified": 5,
+    "Code corrected; rendered verification outstanding": 37,
     "Source verified or previously corrected": 4
   },
   "findings": [
@@ -16,10 +19,19 @@
       "originalLine": 441,
       "rule": "hero-text-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Heuristic identifies an overlay, gradient, player control or nearby media. Presence alone is not a defect; retained for rendered contrast/overflow review. See baseline source excerpt. No automatic suppression.",
-      "baselineContext": "                className=\"group relative bg-slate-900/50 border border-white/10 rounded-2xl p-8 hover:border-violet-500/30 transition-all duration-300\"\n              >\n                {/* Gradient background on hover */}\n                <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity`} />\n                \n                <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${feature.color} mb-6`}>\n                  <feature.icon className=\"w-6 h-6 text-white\" />\n                </div>\n                \n                <h3 className=\"text-xl font-bold text-white mb-3\">{feature.title}</h3>\n                <p className=\"text-slate-400 leading-relaxed\">{feature.description}</p>\n              </div>\n            ))}\n          </div>\n        </div>"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Exact component is a feature card, not a hero. The flagged absolute layer is invisible by default and only 5% opaque on hover. It tints a slate-900/50 card over slate-950; even a white 5% tint leaves ample contrast for slate-400 body text. No hero/image or working control was removed. Route rendered at mobile and desktop.",
+      "baselineContext": "                className=\"group relative bg-slate-900/50 border border-white/10 rounded-2xl p-8 hover:border-violet-500/30 transition-all duration-300\"\n              >\n                {/* Gradient background on hover */}\n                <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-5 rounded-2xl transition-opacity`} />\n                \n                <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${feature.color} mb-6`}>\n                  <feature.icon className=\"w-6 h-6 text-white\" />\n                </div>\n                \n                <h3 className=\"text-xl font-bold text-white mb-3\">{feature.title}</h3>\n                <p className=\"text-slate-400 leading-relaxed\">{feature.description}</p>\n              </div>\n            ))}\n          </div>\n        </div>",
+      "renderedRouteEvidence": {
+        "route": "/paris-ai",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-002",
@@ -28,10 +40,19 @@
       "originalLine": 173,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "export default function StudentJourneyPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-950 text-white\">\n      {/* Hero */}\n      <section className=\"relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-violet-900/20 to-slate-950\">\n        <div className=\"max-w-7xl mx-auto text-center\">\n          <div className=\"inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-8\">\n            <GraduationCap className=\"w-4 h-4 text-violet-400\" />\n            <span className=\"text-sm text-violet-300\">Your Path to a Career</span>\n          </div>\n\n          <h1 className=\"text-5xl md:text-6xl font-bold mb-6\">\n            <span className=\"bg-gradient-to-r from-white via-violet-200 to-white bg-clip-text text-transparent\">\n              From Discovery to Career\n            </span>"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "export default function StudentJourneyPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-950 text-white\">\n      {/* Hero */}\n      <section className=\"relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-violet-900/20 to-slate-950\">\n        <div className=\"max-w-7xl mx-auto text-center\">\n          <div className=\"inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-8\">\n            <GraduationCap className=\"w-4 h-4 text-violet-400\" />\n            <span className=\"text-sm text-violet-300\">Your Path to a Career</span>\n          </div>\n\n          <h1 className=\"text-5xl md:text-6xl font-bold mb-6\">\n            <span className=\"bg-gradient-to-r from-white via-violet-200 to-white bg-clip-text text-transparent\">\n              From Discovery to Career\n            </span>",
+      "renderedRouteEvidence": {
+        "route": "/students",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-003",
@@ -40,10 +61,19 @@
       "originalLine": 13,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "export default function AIJobMatchPage() {\n  return (\n    <div className=\"min-h-screen bg-white\">\n      {/* Hero */}\n      <section className=\"relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-20 overflow-hidden\">\n        <div className=\"absolute inset-0 opacity-10\">\n          <div className=\"absolute inset-0 bg-gradient-to-r from-brand-red-500 to-brand-orange-500\" />\n        </div>\n        <div className=\"relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8\">\n          <div className=\"max-w-3xl\">\n            <div className=\"inline-flex items-center gap-2 bg-brand-red-500/20 text-brand-red-300 px-4 py-2 rounded-full text-sm font-medium mb-6\">\n              <Sparkles className=\"w-4 h-4\" />\n              AI Powered\n            </div>\n            <h1 className=\"text-4xl md:text-5xl font-bold mb-6 leading-tight\">"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "export default function AIJobMatchPage() {\n  return (\n    <div className=\"min-h-screen bg-white\">\n      {/* Hero */}\n      <section className=\"relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-20 overflow-hidden\">\n        <div className=\"absolute inset-0 opacity-10\">\n          <div className=\"absolute inset-0 bg-gradient-to-r from-brand-red-500 to-brand-orange-500\" />\n        </div>\n        <div className=\"relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8\">\n          <div className=\"max-w-3xl\">\n            <div className=\"inline-flex items-center gap-2 bg-brand-red-500/20 text-brand-red-300 px-4 py-2 rounded-full text-sm font-medium mb-6\">\n              <Sparkles className=\"w-4 h-4\" />\n              AI Powered\n            </div>\n            <h1 className=\"text-4xl md:text-5xl font-bold mb-6 leading-tight\">",
+      "renderedRouteEvidence": {
+        "route": "/ai/job-match",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-004",
@@ -52,10 +82,19 @@
       "originalLine": 133,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "        breadcrumb={[{ name: 'Platform', url: '/platform' }, { name: 'AI', url: '/ai' }]}\n      />\n      \n      {/* Hero Section */}\n      <section className=\"relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white\">\n        <div className=\"absolute inset-0 opacity-20\">\n          <div className=\"absolute top-20 left-20 w-72 h-72 bg-blue-500 rounded-full filter blur-3xl\"></div>\n          <div className=\"absolute bottom-20 right-20 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl\"></div>\n        </div>\n        <div className=\"relative max-w-7xl mx-auto px-4 py-24\">\n          <div className=\"text-center\">\n            <div className=\"inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-sm mb-6\">\n              <span className=\"w-2 h-2 bg-green-400 rounded-full animate-pulse\"></span>\n              AI-Powered Platform\n            </div>"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "        breadcrumb={[{ name: 'Platform', url: '/platform' }, { name: 'AI', url: '/ai' }]}\n      />\n      \n      {/* Hero Section */}\n      <section className=\"relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white\">\n        <div className=\"absolute inset-0 opacity-20\">\n          <div className=\"absolute top-20 left-20 w-72 h-72 bg-blue-500 rounded-full filter blur-3xl\"></div>\n          <div className=\"absolute bottom-20 right-20 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl\"></div>\n        </div>\n        <div className=\"relative max-w-7xl mx-auto px-4 py-24\">\n          <div className=\"text-center\">\n            <div className=\"inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-sm mb-6\">\n              <span className=\"w-2 h-2 bg-green-400 rounded-full animate-pulse\"></span>\n              AI-Powered Platform\n            </div>",
+      "renderedRouteEvidence": {
+        "route": "/ai",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-005",
@@ -64,10 +103,19 @@
       "originalLine": 99,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "        breadcrumb={[{ name: 'AI Platform', url: '/ai' }, { name: 'PARIS AI', url: '/ai/paris' }]}\n      />\n      \n      {/* Hero */}\n      <section className=\"relative overflow-hidden bg-gradient-to-br from-purple-900 via-blue-900 to-slate-900 text-white\">\n        <div className=\"absolute inset-0 opacity-30\">\n          <div className=\"absolute top-0 left-1/4 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl\"></div>\n          <div className=\"absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl\"></div>\n        </div>\n        <div className=\"relative max-w-7xl mx-auto px-4 py-24\">\n          <div className=\"grid lg:grid-cols-2 gap-12 items-center\">\n            <div>\n              <div className=\"inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-sm mb-6\">\n                <span className=\"w-2 h-2 bg-green-400 rounded-full animate-pulse\"></span>\n                Powered by Claude AI"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "        breadcrumb={[{ name: 'AI Platform', url: '/ai' }, { name: 'PARIS AI', url: '/ai/paris' }]}\n      />\n      \n      {/* Hero */}\n      <section className=\"relative overflow-hidden bg-gradient-to-br from-purple-900 via-blue-900 to-slate-900 text-white\">\n        <div className=\"absolute inset-0 opacity-30\">\n          <div className=\"absolute top-0 left-1/4 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl\"></div>\n          <div className=\"absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500 rounded-full filter blur-3xl\"></div>\n        </div>\n        <div className=\"relative max-w-7xl mx-auto px-4 py-24\">\n          <div className=\"grid lg:grid-cols-2 gap-12 items-center\">\n            <div>\n              <div className=\"inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full text-sm mb-6\">\n                <span className=\"w-2 h-2 bg-green-400 rounded-full animate-pulse\"></span>\n                Powered by Claude AI",
+      "renderedRouteEvidence": {
+        "route": "/ai/paris",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-006",
@@ -76,10 +124,19 @@
       "originalLine": 22,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "export default async function EmployerApplicationPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <div className=\"relative h-[200px] sm:h-[260px] overflow-hidden bg-slate-900\">\n        <div className=\"absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-brand-orange-900\" />\n        <div className=\"absolute inset-0 flex items-center justify-center\">\n          <div className=\"text-center text-white px-4\">\n            <Building2 className=\"w-12 h-12 mx-auto mb-4 text-brand-orange-400\" />\n            <h1 className=\"text-3xl sm:text-4xl font-bold mb-2\">Partner With Us</h1>\n            <p className=\"text-lg text-slate-300\">Build Your Workforce Pipeline</p>\n          </div>\n        </div>\n      </div>\n"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "export default async function EmployerApplicationPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <div className=\"relative h-[200px] sm:h-[260px] overflow-hidden bg-slate-900\">\n        <div className=\"absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-brand-orange-900\" />\n        <div className=\"absolute inset-0 flex items-center justify-center\">\n          <div className=\"text-center text-white px-4\">\n            <Building2 className=\"w-12 h-12 mx-auto mb-4 text-brand-orange-400\" />\n            <h1 className=\"text-3xl sm:text-4xl font-bold mb-2\">Partner With Us</h1>\n            <p className=\"text-lg text-slate-300\">Build Your Workforce Pipeline</p>\n          </div>\n        </div>\n      </div>\n",
+      "renderedRouteEvidence": {
+        "route": "/apply/employer",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-007",
@@ -88,10 +145,19 @@
       "originalLine": 24,
       "rule": "hero-text-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Heuristic identifies an overlay, gradient, player control or nearby media. Presence alone is not a defect; retained for rendered contrast/overflow review. See baseline source excerpt. No automatic suppression.",
-      "baselineContext": "    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <div className=\"relative h-[200px] sm:h-[260px] overflow-hidden bg-slate-900\">\n        <div className=\"absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-brand-orange-900\" />\n        <div className=\"absolute inset-0 flex items-center justify-center\">\n          <div className=\"text-center text-white px-4\">\n            <Building2 className=\"w-12 h-12 mx-auto mb-4 text-brand-orange-400\" />\n            <h1 className=\"text-3xl sm:text-4xl font-bold mb-2\">Partner With Us</h1>\n            <p className=\"text-lg text-slate-300\">Build Your Workforce Pipeline</p>\n          </div>\n        </div>\n      </div>\n\n      {/* Breadcrumbs */}\n      <div className=\"bg-white border-b\">"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <div className=\"relative h-[200px] sm:h-[260px] overflow-hidden bg-slate-900\">\n        <div className=\"absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-brand-orange-900\" />\n        <div className=\"absolute inset-0 flex items-center justify-center\">\n          <div className=\"text-center text-white px-4\">\n            <Building2 className=\"w-12 h-12 mx-auto mb-4 text-brand-orange-400\" />\n            <h1 className=\"text-3xl sm:text-4xl font-bold mb-2\">Partner With Us</h1>\n            <p className=\"text-lg text-slate-300\">Build Your Workforce Pipeline</p>\n          </div>\n        </div>\n      </div>\n\n      {/* Breadcrumbs */}\n      <div className=\"bg-white border-b\">",
+      "renderedRouteEvidence": {
+        "route": "/apply/employer",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-008",
@@ -127,7 +193,16 @@
       "classification": "Image or hero-layout defect",
       "disposition": "Source reviewed; rendered verification outstanding",
       "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "  return (\n    <main className=\"min-h-screen bg-white text-slate-950\">\n      <section className=\"relative isolate overflow-hidden bg-slate-950 text-white\">\n        <div className=\"absolute inset-0 -z-10\"><SafeHeroVideo src=\"/videos/partners/kountry-kutz/shop-tour.mp4\" poster=\"/images/partners/kountry-kutz/interior-active-enhanced-2026.webp\" priority loop ariaLabel=\"A tour of participating Host Shop Kountry Kutz\" className=\"absolute inset-0 h-full w-full object-cover\" /></div>\n        <div className=\"absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/90 via-slate-950/70 to-slate-950/30\" />\n        <div className=\"relative mx-auto max-w-6xl px-5 py-12 sm:py-16\">\n          <p className=\"text-sm font-black uppercase tracking-[.16em] text-blue-200\">Elevate Professional Network</p>\n          <h1 className=\"mt-4 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl\">Barber & Beauty Network</h1>\n          <p className=\"mt-6 max-w-3xl text-lg leading-8 text-slate-100\">A professional community for barbers, cosmetologists, estheticians, nail technicians, students, host shops and hiring businesses. Build connections, find opportunities and showcase the beauty industry.</p>\n          <div className=\"mt-8 flex flex-wrap gap-3\">\n            <Link href=\"/partners/host-shop/apply\" className=\"inline-flex min-h-12 items-center gap-2 rounded-xl bg-red-700 px-6 py-3 font-bold text-white hover:bg-red-600\">Join Free as a Host Shop <ArrowRight className=\"h-4 w-4\" /></Link>\n            <Link href=\"#shop-directory\" className=\"inline-flex min-h-12 items-center gap-2 rounded-xl border border-white/60 px-6 py-3 font-bold text-white hover:bg-white/10\">Find a Shop <ArrowRight className=\"h-4 w-4\" /></Link>\n          </div>\n        </div>\n      </section>"
+      "baselineContext": "  return (\n    <main className=\"min-h-screen bg-white text-slate-950\">\n      <section className=\"relative isolate overflow-hidden bg-slate-950 text-white\">\n        <div className=\"absolute inset-0 -z-10\"><SafeHeroVideo src=\"/videos/partners/kountry-kutz/shop-tour.mp4\" poster=\"/images/partners/kountry-kutz/interior-active-enhanced-2026.webp\" priority loop ariaLabel=\"A tour of participating Host Shop Kountry Kutz\" className=\"absolute inset-0 h-full w-full object-cover\" /></div>\n        <div className=\"absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/90 via-slate-950/70 to-slate-950/30\" />\n        <div className=\"relative mx-auto max-w-6xl px-5 py-12 sm:py-16\">\n          <p className=\"text-sm font-black uppercase tracking-[.16em] text-blue-200\">Elevate Professional Network</p>\n          <h1 className=\"mt-4 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl\">Barber & Beauty Network</h1>\n          <p className=\"mt-6 max-w-3xl text-lg leading-8 text-slate-100\">A professional community for barbers, cosmetologists, estheticians, nail technicians, students, host shops and hiring businesses. Build connections, find opportunities and showcase the beauty industry.</p>\n          <div className=\"mt-8 flex flex-wrap gap-3\">\n            <Link href=\"/partners/host-shop/apply\" className=\"inline-flex min-h-12 items-center gap-2 rounded-xl bg-red-700 px-6 py-3 font-bold text-white hover:bg-red-600\">Join Free as a Host Shop <ArrowRight className=\"h-4 w-4\" /></Link>\n            <Link href=\"#shop-directory\" className=\"inline-flex min-h-12 items-center gap-2 rounded-xl border border-white/60 px-6 py-3 font-bold text-white hover:bg-white/10\">Find a Shop <ArrowRight className=\"h-4 w-4\" /></Link>\n          </div>\n        </div>\n      </section>",
+      "renderedRouteEvidence": {
+        "route": "/barber-beauty-network",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-011",
@@ -148,10 +223,19 @@
       "originalLine": 7,
       "rule": "hero-text-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Heuristic identifies an overlay, gradient, player control or nearby media. Presence alone is not a defect; retained for rendered contrast/overflow review. See baseline source excerpt. No automatic suppression.",
-      "baselineContext": "\nexport const metadata: Metadata = { title: 'Join the Elevate Community', description: 'Connect with learners, training businesses, host shops, and employers. Share your work, learn together, and find your next opportunity.' };\nexport default function Page() {\n  return <main className=\"bg-white text-slate-950\"><section className=\"relative isolate bg-slate-950 px-5 py-16 text-white sm:py-24\"><Image src=\"/images/partners/salon-saloon/team-sign.webp\" alt=\"Salon Saloon team in the Elevate network\" fill priority sizes=\"100vw\" className=\"-z-20 object-cover\" /><div className=\"absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/55\" /><div className=\"mx-auto max-w-6xl\"><p className=\"text-sm font-black uppercase tracking-widest text-cyan-200\">Your people. Your progress. Your next opportunity.</p><h1 className=\"mt-4 max-w-3xl text-4xl font-black sm:text-6xl\">Build something together.</h1><p className=\"mt-5 max-w-2xl text-lg leading-8\">The Elevate community connects students, apprentices, Host Shops, Program Holders, and employers. Share your work, ask questions, and build relationships around your training and business.</p><div className=\"mt-7 flex flex-wrap gap-3\"><Link href=\"https://app.elevateforhumanity.org/signup\" className=\"inline-flex min-h-12 items-center rounded-xl bg-cyan-300 px-6 py-3 font-black text-slate-950\">Create your account</Link><Link href=\"https://app.elevateforhumanity.org/community\" className=\"inline-flex min-h-12 items-center rounded-xl border border-white px-6 py-3 font-black\">Sign in to community</Link></div></div></section><section className=\"mx-auto max-w-6xl px-5 py-12\"><h2 className=\"text-3xl font-black\">Find your network. Make your first introduction.</h2><ol className=\"mt-6 grid gap-5 sm:grid-cols-3\">{[['1. Sign in','Use your existing Elevate account, or create one. Host Shop and Program Holder operating access depends on your approved business record.'],['2. Open Groups','Choose the network connected to your program or business. Select Join when available; if you already belong, open the group.'],['3. Share and connect','Post an introduction, portfolio photos or videos, and business contact details. Reply to discussions and use member messaging when available.']].map(([title,body]) => <li key={title} className=\"rounded-2xl border border-slate-200 bg-cyan-50 p-5\"><h3 className=\"text-xl font-black\">{title}</h3><p className=\"mt-3 text-sm leading-7\">{body}</p></li>)}</ol><p className=\"mt-6 max-w-3xl text-sm leading-7 text-slate-600\">After account creation, return here and select Sign in to community. Posts and attachments stay inside the authenticated community. An approved public business profile can help visitors discover your services; uploading a community post does not automatically publish it to Google.</p><div className=\"mt-6 flex flex-wrap gap-5\"><Link href=\"/barber-beauty-network\" className=\"font-black text-blue-800 underline\">Barber &amp; Beauty Network</Link><Link href=\"/partners/host-shops\" className=\"font-black text-blue-800 underline\">Explore real shop portfolios</Link><Link href=\"/business-network\" className=\"font-black text-blue-800 underline\">Business network</Link></div></section></main>;\n}"
+      "classification": "Shared architectural defect",
+      "disposition": "Shared foreground corrected; image-overlay review remains",
+      "evidence": "Confirmed shared CSS forced a dark label on a light cyan control to white because of an outer dark section. Component foreground ownership restored; actual button computed contrast passes 4.5:1 at mobile/desktop. Image overlay retained; this does not certify every image pixel/state.",
+      "baselineContext": "\nexport const metadata: Metadata = { title: 'Join the Elevate Community', description: 'Connect with learners, training businesses, host shops, and employers. Share your work, learn together, and find your next opportunity.' };\nexport default function Page() {\n  return <main className=\"bg-white text-slate-950\"><section className=\"relative isolate bg-slate-950 px-5 py-16 text-white sm:py-24\"><Image src=\"/images/partners/salon-saloon/team-sign.webp\" alt=\"Salon Saloon team in the Elevate network\" fill priority sizes=\"100vw\" className=\"-z-20 object-cover\" /><div className=\"absolute inset-0 -z-10 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/55\" /><div className=\"mx-auto max-w-6xl\"><p className=\"text-sm font-black uppercase tracking-widest text-cyan-200\">Your people. Your progress. Your next opportunity.</p><h1 className=\"mt-4 max-w-3xl text-4xl font-black sm:text-6xl\">Build something together.</h1><p className=\"mt-5 max-w-2xl text-lg leading-8\">The Elevate community connects students, apprentices, Host Shops, Program Holders, and employers. Share your work, ask questions, and build relationships around your training and business.</p><div className=\"mt-7 flex flex-wrap gap-3\"><Link href=\"https://app.elevateforhumanity.org/signup\" className=\"inline-flex min-h-12 items-center rounded-xl bg-cyan-300 px-6 py-3 font-black text-slate-950\">Create your account</Link><Link href=\"https://app.elevateforhumanity.org/community\" className=\"inline-flex min-h-12 items-center rounded-xl border border-white px-6 py-3 font-black\">Sign in to community</Link></div></div></section><section className=\"mx-auto max-w-6xl px-5 py-12\"><h2 className=\"text-3xl font-black\">Find your network. Make your first introduction.</h2><ol className=\"mt-6 grid gap-5 sm:grid-cols-3\">{[['1. Sign in','Use your existing Elevate account, or create one. Host Shop and Program Holder operating access depends on your approved business record.'],['2. Open Groups','Choose the network connected to your program or business. Select Join when available; if you already belong, open the group.'],['3. Share and connect','Post an introduction, portfolio photos or videos, and business contact details. Reply to discussions and use member messaging when available.']].map(([title,body]) => <li key={title} className=\"rounded-2xl border border-slate-200 bg-cyan-50 p-5\"><h3 className=\"text-xl font-black\">{title}</h3><p className=\"mt-3 text-sm leading-7\">{body}</p></li>)}</ol><p className=\"mt-6 max-w-3xl text-sm leading-7 text-slate-600\">After account creation, return here and select Sign in to community. Posts and attachments stay inside the authenticated community. An approved public business profile can help visitors discover your services; uploading a community post does not automatically publish it to Google.</p><div className=\"mt-6 flex flex-wrap gap-5\"><Link href=\"/barber-beauty-network\" className=\"font-black text-blue-800 underline\">Barber &amp; Beauty Network</Link><Link href=\"/partners/host-shops\" className=\"font-black text-blue-800 underline\">Explore real shop portfolios</Link><Link href=\"/business-network\" className=\"font-black text-blue-800 underline\">Business network</Link></div></section></main>;\n}",
+      "renderedRouteEvidence": {
+        "route": "/community",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-013",
@@ -163,7 +247,16 @@
       "classification": "Verified false positive",
       "disposition": "Source verified",
       "evidence": "Regex treated a translucent or hover-only white surface as opaque white; this element is in a dark parent. Exact class tokens and ancestor context are retained in the excerpt.",
-      "baselineContext": "                </h3>\n                <button\n                  onClick={() => copyToClipboard(integration.embedScript, 'embed')}\n                  className=\"flex items-center gap-2 px-3 py-1 bg-white/10 rounded-lg text-sm text-slate-300 hover:bg-white/20\"\n                >\n                  {copied === 'embed' ? (\n                    <Check className=\"w-4 h-4 text-brand-green-400\" />\n                  ) : (\n                    <Copy className=\"w-4 h-4\" />\n                  )}\n                  Copy\n                </button>\n              </div>\n              <pre className=\"bg-slate-700 rounded-lg p-4 overflow-x-auto\">\n                <code className=\"text-brand-green-400 text-sm font-mono whitespace-pre\">"
+      "baselineContext": "                </h3>\n                <button\n                  onClick={() => copyToClipboard(integration.embedScript, 'embed')}\n                  className=\"flex items-center gap-2 px-3 py-1 bg-white/10 rounded-lg text-sm text-slate-300 hover:bg-white/20\"\n                >\n                  {copied === 'embed' ? (\n                    <Check className=\"w-4 h-4 text-brand-green-400\" />\n                  ) : (\n                    <Copy className=\"w-4 h-4\" />\n                  )}\n                  Copy\n                </button>\n              </div>\n              <pre className=\"bg-slate-700 rounded-lg p-4 overflow-x-auto\">\n                <code className=\"text-brand-green-400 text-sm font-mono whitespace-pre\">",
+      "renderedRouteEvidence": {
+        "route": "/connect",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-014",
@@ -175,7 +268,16 @@
       "classification": "Verified false positive",
       "disposition": "Source verified",
       "evidence": "Regex treated a translucent or hover-only white surface as opaque white; this element is in a dark parent. Exact class tokens and ancestor context are retained in the excerpt.",
-      "baselineContext": "                </h3>\n                <button\n                  onClick={() => copyToClipboard(integration.embedScript, 'embed')}\n                  className=\"flex items-center gap-2 px-3 py-1 bg-white/10 rounded-lg text-sm text-slate-300 hover:bg-white/20\"\n                >\n                  {copied === 'embed' ? (\n                    <Check className=\"w-4 h-4 text-brand-green-400\" />\n                  ) : (\n                    <Copy className=\"w-4 h-4\" />\n                  )}\n                  Copy\n                </button>\n              </div>\n              <pre className=\"bg-slate-700 rounded-lg p-4 overflow-x-auto\">\n                <code className=\"text-brand-green-400 text-sm font-mono whitespace-pre\">"
+      "baselineContext": "                </h3>\n                <button\n                  onClick={() => copyToClipboard(integration.embedScript, 'embed')}\n                  className=\"flex items-center gap-2 px-3 py-1 bg-white/10 rounded-lg text-sm text-slate-300 hover:bg-white/20\"\n                >\n                  {copied === 'embed' ? (\n                    <Check className=\"w-4 h-4 text-brand-green-400\" />\n                  ) : (\n                    <Copy className=\"w-4 h-4\" />\n                  )}\n                  Copy\n                </button>\n              </div>\n              <pre className=\"bg-slate-700 rounded-lg p-4 overflow-x-auto\">\n                <code className=\"text-brand-green-400 text-sm font-mono whitespace-pre\">",
+      "renderedRouteEvidence": {
+        "route": "/connect",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-015",
@@ -184,10 +286,19 @@
       "originalLine": 128,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "export default function DemosPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 text-white py-20\">\n        <div className=\"max-w-7xl mx-auto px-4 text-center\">\n          <div className=\"inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full text-sm mb-6\">\n            <Play className=\"w-4 h-4\" />\n            <span>Interactive Demo Environment</span>\n          </div>\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-6\">\n            See Elevate in Action\n          </h1>\n          <p className=\"text-xl text-purple-100 max-w-3xl mx-auto mb-8\">\n            Explore role-scoped dashboards and workflows with protected sandbox data."
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "export default function DemosPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 text-white py-20\">\n        <div className=\"max-w-7xl mx-auto px-4 text-center\">\n          <div className=\"inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full text-sm mb-6\">\n            <Play className=\"w-4 h-4\" />\n            <span>Interactive Demo Environment</span>\n          </div>\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-6\">\n            See Elevate in Action\n          </h1>\n          <p className=\"text-xl text-purple-100 max-w-3xl mx-auto mb-8\">\n            Explore role-scoped dashboards and workflows with protected sandbox data.",
+      "renderedRouteEvidence": {
+        "route": "/demos",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-016",
@@ -199,7 +310,16 @@
       "classification": "Verified false positive",
       "disposition": "Source verified",
       "evidence": "Original regex crosses JSX attribute/element boundaries: white outer card and a separately colored inner section or icon badge. Syntax-aware per-element check confirms no authored white-on-white class pair.",
-      "baselineContext": "            {DEMO_TYPES.map((demo) => {\n              const Icon = demo.icon;\n              return (\n                <div key={demo.id} className=\"bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow\">\n                  <div className={`${demo.color} p-4 text-white`}>\n                    <div className=\"flex items-center gap-3\">\n                      <Icon className=\"w-8 h-8\" />\n                      <h3 className=\"text-lg font-bold\">{demo.title}</h3>\n                    </div>\n                  </div>\n                  <div className=\"p-6\">\n                    <p className=\"text-slate-600 text-sm mb-4\">{demo.description}</p>\n                    \n                    <div className=\"space-y-2 mb-6\">\n                      {demo.features.map((feature) => ("
+      "baselineContext": "            {DEMO_TYPES.map((demo) => {\n              const Icon = demo.icon;\n              return (\n                <div key={demo.id} className=\"bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow\">\n                  <div className={`${demo.color} p-4 text-white`}>\n                    <div className=\"flex items-center gap-3\">\n                      <Icon className=\"w-8 h-8\" />\n                      <h3 className=\"text-lg font-bold\">{demo.title}</h3>\n                    </div>\n                  </div>\n                  <div className=\"p-6\">\n                    <p className=\"text-slate-600 text-sm mb-4\">{demo.description}</p>\n                    \n                    <div className=\"space-y-2 mb-6\">\n                      {demo.features.map((feature) => (",
+      "renderedRouteEvidence": {
+        "route": "/demos",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-017",
@@ -220,10 +340,19 @@
       "originalLine": 141,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "export default function DirectoryPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-blue-800 to-indigo-900 text-white py-16\">\n        <div className=\"max-w-7xl mx-auto px-4 text-center\">\n          <h1 className=\"text-4xl font-bold mb-4\">Partner Directory</h1>\n          <p className=\"text-xl text-blue-100 max-w-2xl mx-auto\">\n            Connect with verified training providers, testing centers, employers, and host shops in the Elevate network.\n          </p>\n        </div>\n      </section>\n\n      {/* Stats */}\n      <section className=\"py-8 bg-white border-b border-slate-200\">"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "export default function DirectoryPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-blue-800 to-indigo-900 text-white py-16\">\n        <div className=\"max-w-7xl mx-auto px-4 text-center\">\n          <h1 className=\"text-4xl font-bold mb-4\">Partner Directory</h1>\n          <p className=\"text-xl text-blue-100 max-w-2xl mx-auto\">\n            Connect with verified training providers, testing centers, employers, and host shops in the Elevate network.\n          </p>\n        </div>\n      </section>\n\n      {/* Stats */}\n      <section className=\"py-8 bg-white border-b border-slate-200\">",
+      "renderedRouteEvidence": {
+        "route": "/directory",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-019",
@@ -256,10 +385,19 @@
       "originalLine": 63,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "export default function EventsPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20\">\n        <div className=\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8\">\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-4\">Events & Workshops</h1>\n          <p className=\"text-xl text-blue-100 max-w-2xl\">\n            Join us at career fairs, industry events, and workforce workshops throughout Indiana. \n            Build connections and advance your career.\n          </p>\n          <div className=\"mt-8\">\n            <Link href=\"/schedule/meeting\" className=\"inline-flex items-center gap-2 bg-white text-brand-blue-700 font-bold py-3 px-6 rounded-lg hover:bg-blue-50 transition-colors\">\n              <Calendar className=\"w-5 h-5\" />\n              Schedule a Consultation"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "export default function EventsPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20\">\n        <div className=\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8\">\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-4\">Events & Workshops</h1>\n          <p className=\"text-xl text-blue-100 max-w-2xl\">\n            Join us at career fairs, industry events, and workforce workshops throughout Indiana. \n            Build connections and advance your career.\n          </p>\n          <div className=\"mt-8\">\n            <Link href=\"/schedule/meeting\" className=\"inline-flex items-center gap-2 bg-white text-brand-blue-700 font-bold py-3 px-6 rounded-lg hover:bg-blue-50 transition-colors\">\n              <Calendar className=\"w-5 h-5\" />\n              Schedule a Consultation",
+      "renderedRouteEvidence": {
+        "route": "/events",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-022",
@@ -269,9 +407,18 @@
       "rule": "hero-text-overlay",
       "originalSeverity": "high",
       "classification": "Accessibility or contrast defect",
-      "disposition": "Code corrected; rendered verification outstanding",
-      "evidence": "Added a readable text backing over the image/video; retained images and content. Shared component owns this treatment.",
-      "baselineContext": "          className=\"object-cover\"\n          priority\n        />\n        <div className=\"absolute inset-0 flex items-center px-6\">\n          <div className=\"max-w-6xl mx-auto w-full\">\n            <p className=\"text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2\">\n              Founder &amp; CEO\n            </p>\n            <h1 className=\"text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900\">\n              Elizabeth Greene\n            </h1>\n            <p className=\"text-slate-600 text-lg mt-2\">\n              Elevate for Humanity Career &amp; Technical Institute\n            </p>\n          </div>"
+      "disposition": "Corrected; rendered contrast and layout verified",
+      "evidence": "Kept the 95% white heading backing; darkened the small red label and changed the duplicate biography h1 to h2. Corrected the portrait from a group-training asset to the existing canonical organization.founder.imagePath; inspected the actual repository asset and rendered portrait at mobile/desktop. Homepage photographs unchanged.",
+      "baselineContext": "          className=\"object-cover\"\n          priority\n        />\n        <div className=\"absolute inset-0 flex items-center px-6\">\n          <div className=\"max-w-6xl mx-auto w-full\">\n            <p className=\"text-brand-red-400 font-bold text-xs uppercase tracking-widest mb-2\">\n              Founder &amp; CEO\n            </p>\n            <h1 className=\"text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900\">\n              Elizabeth Greene\n            </h1>\n            <p className=\"text-slate-600 text-lg mt-2\">\n              Elevate for Humanity Career &amp; Technical Institute\n            </p>\n          </div>",
+      "renderedRouteEvidence": {
+        "route": "/founder",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-023",
@@ -280,10 +427,19 @@
       "originalLine": 23,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "    <div className=\"min-h-screen bg-white\">\n      <Breadcrumbs items={[{ label: 'Resources', href: '/resources' }, { label: 'FSSA' }]} />\n      \n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16\">\n        <div className=\"max-w-7xl mx-auto px-4 text-center\">\n          <h1 className=\"text-4xl font-black mb-4\">FSSA Workforce Programs</h1>\n          <p className=\"text-xl text-blue-100 max-w-2xl mx-auto mb-8\">\n            Access Indiana Family and Social Services Administration funded training programs to advance your career.\n          </p>\n          <Link href=\"/check-eligibility\" className=\"inline-block bg-white text-brand-blue-700 font-bold py-3 px-8 rounded-lg hover:bg-blue-50\">\n            Check Eligibility\n          </Link>\n        </div>\n      </section>"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "    <div className=\"min-h-screen bg-white\">\n      <Breadcrumbs items={[{ label: 'Resources', href: '/resources' }, { label: 'FSSA' }]} />\n      \n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16\">\n        <div className=\"max-w-7xl mx-auto px-4 text-center\">\n          <h1 className=\"text-4xl font-black mb-4\">FSSA Workforce Programs</h1>\n          <p className=\"text-xl text-blue-100 max-w-2xl mx-auto mb-8\">\n            Access Indiana Family and Social Services Administration funded training programs to advance your career.\n          </p>\n          <Link href=\"/check-eligibility\" className=\"inline-block bg-white text-brand-blue-700 font-bold py-3 px-8 rounded-lg hover:bg-blue-50\">\n            Check Eligibility\n          </Link>\n        </div>\n      </section>",
+      "renderedRouteEvidence": {
+        "route": "/fssa",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-024",
@@ -292,10 +448,19 @@
       "originalLine": 25,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "    <div className=\"min-h-screen bg-white\">\n      <Breadcrumbs items={[{ label: 'Help', href: '/help' }, { label: 'Account' }]} />\n      \n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-12\">\n        <div className=\"max-w-7xl mx-auto px-4\">\n          <h1 className=\"text-3xl font-bold mb-2\">Account Help</h1>\n          <p className=\"text-blue-100\">Find answers to common questions about managing your Elevate account.</p>\n        </div>\n      </section>\n\n      {/* Topics */}\n      <section className=\"py-12\">\n        <div className=\"max-w-4xl mx-auto px-4\">\n          <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "    <div className=\"min-h-screen bg-white\">\n      <Breadcrumbs items={[{ label: 'Help', href: '/help' }, { label: 'Account' }]} />\n      \n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-12\">\n        <div className=\"max-w-7xl mx-auto px-4\">\n          <h1 className=\"text-3xl font-bold mb-2\">Account Help</h1>\n          <p className=\"text-blue-100\">Find answers to common questions about managing your Elevate account.</p>\n        </div>\n      </section>\n\n      {/* Topics */}\n      <section className=\"py-12\">\n        <div className=\"max-w-4xl mx-auto px-4\">\n          <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">",
+      "renderedRouteEvidence": {
+        "route": "/help/account",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-025",
@@ -304,10 +469,19 @@
       "originalLine": 41,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "export default function HelpPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16 px-6\">\n        <div className=\"max-w-4xl mx-auto text-center\">\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-4\">Help & Support</h1>\n          <p className=\"text-xl text-blue-100\">Get the support you need to succeed with your training.\n            We're here to help you succeed. Find answers or contact us.\n          </p>\n        </div>\n      </section>\n      \n      {/* Contact Options */}\n      <section className=\"py-12 px-6 bg-white border-b border-slate-200\">"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "export default function HelpPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16 px-6\">\n        <div className=\"max-w-4xl mx-auto text-center\">\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-4\">Help & Support</h1>\n          <p className=\"text-xl text-blue-100\">Get the support you need to succeed with your training.\n            We're here to help you succeed. Find answers or contact us.\n          </p>\n        </div>\n      </section>\n      \n      {/* Contact Options */}\n      <section className=\"py-12 px-6 bg-white border-b border-slate-200\">",
+      "renderedRouteEvidence": {
+        "route": "/help",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-026",
@@ -316,10 +490,19 @@
       "originalLine": 25,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "    <div className=\"min-h-screen bg-white\">\n      <Breadcrumbs items={[{ label: 'Help', href: '/help' }, { label: 'Technical' }]} />\n      \n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-12\">\n        <div className=\"max-w-7xl mx-auto px-4\">\n          <h1 className=\"text-3xl font-bold mb-2\">Technical Help</h1>\n          <p className=\"text-blue-100\">Get help with browser settings, connection issues, and platform requirements.</p>\n        </div>\n      </section>\n\n      {/* Topics */}\n      <section className=\"py-12\">\n        <div className=\"max-w-4xl mx-auto px-4\">\n          <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "    <div className=\"min-h-screen bg-white\">\n      <Breadcrumbs items={[{ label: 'Help', href: '/help' }, { label: 'Technical' }]} />\n      \n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-12\">\n        <div className=\"max-w-7xl mx-auto px-4\">\n          <h1 className=\"text-3xl font-bold mb-2\">Technical Help</h1>\n          <p className=\"text-blue-100\">Get help with browser settings, connection issues, and platform requirements.</p>\n        </div>\n      </section>\n\n      {/* Topics */}\n      <section className=\"py-12\">\n        <div className=\"max-w-4xl mx-auto px-4\">\n          <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">",
+      "renderedRouteEvidence": {
+        "route": "/help/technical",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-027",
@@ -328,10 +511,19 @@
       "originalLine": 27,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "    <div className=\"min-h-screen bg-white\">\n      <Breadcrumbs items={[{ label: 'Help', href: '/help' }, { label: 'Tutorials' }]} />\n      \n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-12\">\n        <div className=\"max-w-7xl mx-auto px-4\">\n          <h1 className=\"text-3xl font-bold mb-2\">Video Tutorials</h1>\n          <p className=\"text-blue-100\">Step-by-step guides to help you navigate the Elevate platform.</p>\n        </div>\n      </section>\n\n      {/* Tutorials Grid */}\n      <section className=\"py-12\">\n        <div className=\"max-w-4xl mx-auto px-4\">\n          <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "    <div className=\"min-h-screen bg-white\">\n      <Breadcrumbs items={[{ label: 'Help', href: '/help' }, { label: 'Tutorials' }]} />\n      \n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-12\">\n        <div className=\"max-w-7xl mx-auto px-4\">\n          <h1 className=\"text-3xl font-bold mb-2\">Video Tutorials</h1>\n          <p className=\"text-blue-100\">Step-by-step guides to help you navigate the Elevate platform.</p>\n        </div>\n      </section>\n\n      {/* Tutorials Grid */}\n      <section className=\"py-12\">\n        <div className=\"max-w-4xl mx-auto px-4\">\n          <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4\">",
+      "renderedRouteEvidence": {
+        "route": "/help/tutorials",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-028",
@@ -340,10 +532,19 @@
       "originalLine": 49,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "export default function InquiryPage() {\n  return (\n    <div className=\"min-h-screen bg-white\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-800 to-brand-blue-900 text-white py-16 md:py-20\">\n        <div className=\"max-w-4xl mx-auto px-4\">\n          <p className=\"text-brand-red-300 font-semibold uppercase tracking-wider text-sm mb-3\">\n            Partnership Inquiries\n          </p>\n          <h1 className=\"text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-4\">\n            Workforce Development Partnerships\n          </h1>\n          <p className=\"text-blue-100 text-lg md:text-xl leading-relaxed max-w-2xl mb-8\">\n            We partner with employers, workforce development agencies, training providers,\n            and community organizations across Indiana to build a stronger workforce pipeline."
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "export default function InquiryPage() {\n  return (\n    <div className=\"min-h-screen bg-white\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-800 to-brand-blue-900 text-white py-16 md:py-20\">\n        <div className=\"max-w-4xl mx-auto px-4\">\n          <p className=\"text-brand-red-300 font-semibold uppercase tracking-wider text-sm mb-3\">\n            Partnership Inquiries\n          </p>\n          <h1 className=\"text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-4\">\n            Workforce Development Partnerships\n          </h1>\n          <p className=\"text-blue-100 text-lg md:text-xl leading-relaxed max-w-2xl mb-8\">\n            We partner with employers, workforce development agencies, training providers,\n            and community organizations across Indiana to build a stronger workforce pipeline.",
+      "renderedRouteEvidence": {
+        "route": "/inquiry",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-029",
@@ -352,10 +553,19 @@
       "originalLine": 54,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "export default function NewsPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20\">\n        <div className=\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8\">\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-4\">News & Announcements</h1>\n          <p className=\"text-xl text-blue-100 max-w-2xl\">\n            Stay informed about Elevate for Humanity's latest initiatives, partnerships, and workforce development news.\n          </p>\n        </div>\n      </section>\n\n      {/* Featured News */}\n      <section className=\"py-16\">"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "export default function NewsPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20\">\n        <div className=\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8\">\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-4\">News & Announcements</h1>\n          <p className=\"text-xl text-blue-100 max-w-2xl\">\n            Stay informed about Elevate for Humanity's latest initiatives, partnerships, and workforce development news.\n          </p>\n        </div>\n      </section>\n\n      {/* Featured News */}\n      <section className=\"py-16\">",
+      "renderedRouteEvidence": {
+        "route": "/news",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-030",
@@ -376,10 +586,19 @@
       "originalLine": 31,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "export default function PartnershipsPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16 px-6\">\n        <div className=\"max-w-4xl mx-auto text-center\">\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-4\">Partnerships</h1>\n          <p className=\"text-xl text-blue-100\">\n            Work with us to build a stronger workforce in Indiana.\n          </p>\n        </div>\n      </section>\n      \n      {/* Partner Types */}\n      <section className=\"py-16 px-6\">"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "export default function PartnershipsPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16 px-6\">\n        <div className=\"max-w-4xl mx-auto text-center\">\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-4\">Partnerships</h1>\n          <p className=\"text-xl text-blue-100\">\n            Work with us to build a stronger workforce in Indiana.\n          </p>\n        </div>\n      </section>\n      \n      {/* Partner Types */}\n      <section className=\"py-16 px-6\">",
+      "renderedRouteEvidence": {
+        "route": "/partnerships",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-032",
@@ -388,10 +607,20 @@
       "originalLine": 73,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "  return (\n    <>\n      <main className=\"min-h-screen bg-white\">\n        {/* Hero Section */}\n        <section className=\"relative bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 text-white overflow-hidden\">\n          <div className=\"absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-5\" />\n          <div className=\"max-w-7xl mx-auto px-4 py-20 relative z-10\">\n            <div className=\"grid lg:grid-cols-2 gap-12 items-center\">\n              <div>\n                <div className=\"inline-flex items-center gap-2 bg-blue-500/20 backdrop-blur px-4 py-2 rounded-full text-sm font-medium text-blue-300 mb-6\">\n                  <Building className=\"w-4 h-4\" />\n                  <span>For Employers</span>\n                </div>\n                <h1 className=\"text-4xl md:text-5xl lg:text-6xl font-black mb-6\">\n                  Employer Portal"
+      "classification": "Shared architectural defect",
+      "disposition": "Corrected; rendered contrast and layout verified",
+      "evidence": "Exact hero gradient is legitimate and retained. A white page ancestor caused contrast-guardrails.css to override its authored light paragraph with dark text. Removed cross-surface descendant color overrides and put nearest-surface defaults in a low-priority native cascade layer. Real-browser computed foreground contrast passes 4.5:1 against the lightest declared gradient stops at 320px/1440px.",
+      "baselineContext": "  return (\n    <>\n      <main className=\"min-h-screen bg-white\">\n        {/* Hero Section */}\n        <section className=\"relative bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 text-white overflow-hidden\">\n          <div className=\"absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-5\" />\n          <div className=\"max-w-7xl mx-auto px-4 py-20 relative z-10\">\n            <div className=\"grid lg:grid-cols-2 gap-12 items-center\">\n              <div>\n                <div className=\"inline-flex items-center gap-2 bg-blue-500/20 backdrop-blur px-4 py-2 rounded-full text-sm font-medium text-blue-300 mb-6\">\n                  <Building className=\"w-4 h-4\" />\n                  <span>For Employers</span>\n                </div>\n                <h1 className=\"text-4xl md:text-5xl lg:text-6xl font-black mb-6\">\n                  Employer Portal",
+      "renderedRouteEvidence": {
+        "route": "/platform/employer-portal",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      },
+      "relatedCorrection": "Statistics typography now scales down on mobile; the Ongoing label fits its own cell. Regression assertion passes at 320px/1440px."
     },
     {
       "finding": "VL-033",
@@ -400,10 +629,19 @@
       "originalLine": 66,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "        <p className=\"text-sm text-slate-600 font-medium\">Part of the <Link href=\"/platform\" className=\"text-brand-red-600 hover:underline\">Elevate Workforce Operating System</Link></p>\n      </div>\n\n      {/* Hero */}\n      <section className=\"bg-slate-900 text-white py-16 sm:py-20 relative overflow-hidden\">\n        <div className=\"absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 opacity-90\" />\n        <div className=\"absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-brand-red-900/30 to-transparent\" />\n        <div className=\"max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10\">\n          <div className=\"inline-flex items-center gap-2 bg-amber-500/20 text-amber-400 px-4 py-2 rounded-full text-sm font-bold mb-6\">\n            <Building2 className=\"w-4 h-4\" /> Enterprise License\n          </div>\n          <h1 className=\"text-4xl sm:text-5xl font-black tracking-tight\">Enterprise Source-Use Access</h1>\n          <p className=\"mt-6 text-lg sm:text-xl text-white/90 max-w-3xl mx-auto\">\n            For qualified enterprises that need to operate the Workforce OS internally under strict contractual and security controls.\n          </p>"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "        <p className=\"text-sm text-slate-600 font-medium\">Part of the <Link href=\"/platform\" className=\"text-brand-red-600 hover:underline\">Elevate Workforce Operating System</Link></p>\n      </div>\n\n      {/* Hero */}\n      <section className=\"bg-slate-900 text-white py-16 sm:py-20 relative overflow-hidden\">\n        <div className=\"absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 opacity-90\" />\n        <div className=\"absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-brand-red-900/30 to-transparent\" />\n        <div className=\"max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10\">\n          <div className=\"inline-flex items-center gap-2 bg-amber-500/20 text-amber-400 px-4 py-2 rounded-full text-sm font-bold mb-6\">\n            <Building2 className=\"w-4 h-4\" /> Enterprise License\n          </div>\n          <h1 className=\"text-4xl sm:text-5xl font-black tracking-tight\">Enterprise Source-Use Access</h1>\n          <p className=\"mt-6 text-lg sm:text-xl text-white/90 max-w-3xl mx-auto\">\n            For qualified enterprises that need to operate the Workforce OS internally under strict contractual and security controls.\n          </p>",
+      "renderedRouteEvidence": {
+        "route": "/platform/enterprise",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-034",
@@ -415,7 +653,16 @@
       "classification": "Verified false positive",
       "disposition": "Source verified",
       "evidence": "Regex treated a translucent or hover-only white surface as opaque white; this element is in a dark parent. Exact class tokens and ancestor context are retained in the excerpt.",
-      "baselineContext": "      <section className=\"bg-slate-950 px-6 py-20 text-white lg:py-28\">\n        <div className=\"mx-auto max-w-6xl\">\n          <div className=\"max-w-4xl\">\n            <div className=\"inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-slate-200\">\n              <Lock className=\"h-4 w-4\" /> Workforce platform licensing\n            </div>\n            <h1 className=\"mt-7 text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl\">\n              Workforce infrastructure built around enrollment, compliance, training, apprenticeships, and outcomes.\n            </h1>\n            <p className=\"mt-6 max-w-3xl text-lg leading-8 text-slate-300\">\n              {PLATFORM_DEFAULTS.orgName} uses the same platform operationally. Organizations can deploy the infrastructure without assembling separate LMS, CRM, apprenticeship, compliance, and reporting tools.\n            </p>\n            <div className=\"mt-9 flex flex-wrap gap-3\">\n              <Link href=\"/platform/licensing/request\" className=\"inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-slate-950\">\n                Request licensing brief <ArrowRight className=\"h-4 w-4\" />"
+      "baselineContext": "      <section className=\"bg-slate-950 px-6 py-20 text-white lg:py-28\">\n        <div className=\"mx-auto max-w-6xl\">\n          <div className=\"max-w-4xl\">\n            <div className=\"inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-slate-200\">\n              <Lock className=\"h-4 w-4\" /> Workforce platform licensing\n            </div>\n            <h1 className=\"mt-7 text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl\">\n              Workforce infrastructure built around enrollment, compliance, training, apprenticeships, and outcomes.\n            </h1>\n            <p className=\"mt-6 max-w-3xl text-lg leading-8 text-slate-300\">\n              {PLATFORM_DEFAULTS.orgName} uses the same platform operationally. Organizations can deploy the infrastructure without assembling separate LMS, CRM, apprenticeship, compliance, and reporting tools.\n            </p>\n            <div className=\"mt-9 flex flex-wrap gap-3\">\n              <Link href=\"/platform/licensing/request\" className=\"inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-slate-950\">\n                Request licensing brief <ArrowRight className=\"h-4 w-4\" />",
+      "renderedRouteEvidence": {
+        "route": "/platform/licensing",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-035",
@@ -424,10 +671,19 @@
       "originalLine": 80,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "export default function PlatformPricingPage() {\n  return (\n    <div className=\"min-h-screen bg-white\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white py-20 px-4\">\n        <div className=\"max-w-4xl mx-auto text-center\">\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-6\">Platform Pricing</h1>\n          <p className=\"text-xl text-slate-300 mb-8\">\n            Workforce management software for training providers, agencies, and employers.\n            Scale from startup to enterprise.\n          </p>\n          <div className=\"flex gap-4 justify-center flex-wrap\">\n            <Link href=\"/platform\" className=\"bg-white text-slate-900 font-bold py-3 px-6 rounded-lg hover:bg-slate-100\">\n              View Platform Features\n            </Link>"
+      "classification": "Shared architectural defect",
+      "disposition": "Corrected; rendered contrast and layout verified",
+      "evidence": "Exact hero gradient is legitimate and retained. A white page ancestor caused contrast-guardrails.css to override its authored light paragraph with dark text. Removed cross-surface descendant color overrides and put nearest-surface defaults in a low-priority native cascade layer. Real-browser computed foreground contrast passes 4.5:1 against the lightest declared gradient stops at 320px/1440px.",
+      "baselineContext": "export default function PlatformPricingPage() {\n  return (\n    <div className=\"min-h-screen bg-white\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white py-20 px-4\">\n        <div className=\"max-w-4xl mx-auto text-center\">\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-6\">Platform Pricing</h1>\n          <p className=\"text-xl text-slate-300 mb-8\">\n            Workforce management software for training providers, agencies, and employers.\n            Scale from startup to enterprise.\n          </p>\n          <div className=\"flex gap-4 justify-center flex-wrap\">\n            <Link href=\"/platform\" className=\"bg-white text-slate-900 font-bold py-3 px-6 rounded-lg hover:bg-slate-100\">\n              View Platform Features\n            </Link>",
+      "renderedRouteEvidence": {
+        "route": "/platform/pricing",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-036",
@@ -436,10 +692,19 @@
       "originalLine": 200,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "        </div>\n      </div>\n\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white py-20\">\n        <div className=\"max-w-6xl mx-auto px-4\">\n          <div className=\"max-w-3xl\">\n            <div className=\"inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 px-4 py-2 rounded-full text-sm font-medium mb-6\">\n              <Shield className=\"w-4 h-4\" />\n              Enterprise-Grade LMS\n            </div>\n            <h1 className=\"text-4xl md:text-5xl font-bold mb-6\">\n              Industry Standards & Enterprise Capabilities\n            </h1>\n            <p className=\"text-xl text-slate-300 mb-8\">"
+      "classification": "Shared architectural defect",
+      "disposition": "Corrected; rendered contrast and layout verified",
+      "evidence": "Exact hero gradient is legitimate and retained. A white page ancestor caused contrast-guardrails.css to override its authored light paragraph with dark text. Removed cross-surface descendant color overrides and put nearest-surface defaults in a low-priority native cascade layer. Real-browser computed foreground contrast passes 4.5:1 against the lightest declared gradient stops at 320px/1440px.",
+      "baselineContext": "        </div>\n      </div>\n\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white py-20\">\n        <div className=\"max-w-6xl mx-auto px-4\">\n          <div className=\"max-w-3xl\">\n            <div className=\"inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 px-4 py-2 rounded-full text-sm font-medium mb-6\">\n              <Shield className=\"w-4 h-4\" />\n              Enterprise-Grade LMS\n            </div>\n            <h1 className=\"text-4xl md:text-5xl font-bold mb-6\">\n              Industry Standards & Enterprise Capabilities\n            </h1>\n            <p className=\"text-xl text-slate-300 mb-8\">",
+      "renderedRouteEvidence": {
+        "route": "/platform/standards",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-037",
@@ -448,10 +713,19 @@
       "originalLine": 74,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "  return (\n    <>\n      <main className=\"min-h-screen bg-white\">\n        {/* Hero Section */}\n        <section className=\"relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white overflow-hidden\">\n          <div className=\"absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10\" />\n          <div className=\"max-w-7xl mx-auto px-4 py-20 relative z-10\">\n            <div className=\"grid lg:grid-cols-2 gap-12 items-center\">\n              <div>\n                <div className=\"inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-medium mb-6\">\n                  <BookOpen className=\"w-4 h-4\" />\n                  <span>Learning Management System</span>\n                </div>\n                <h1 className=\"text-4xl md:text-5xl lg:text-6xl font-black mb-6\">\n                  Student Portal"
+      "classification": "Accessibility or contrast defect",
+      "disposition": "Corrected; rendered contrast and layout verified",
+      "evidence": "Blue-100 normal text against the blue-600 gradient stop has only 4.24:1 contrast. Changed the intro to white (minimum 5.17:1), darkened the small badge backing and Apply Now translucent backing, preserving the gradient and content. Computed browser contrast assertion passes at 320px/1440px.",
+      "baselineContext": "  return (\n    <>\n      <main className=\"min-h-screen bg-white\">\n        {/* Hero Section */}\n        <section className=\"relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white overflow-hidden\">\n          <div className=\"absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10\" />\n          <div className=\"max-w-7xl mx-auto px-4 py-20 relative z-10\">\n            <div className=\"grid lg:grid-cols-2 gap-12 items-center\">\n              <div>\n                <div className=\"inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full text-sm font-medium mb-6\">\n                  <BookOpen className=\"w-4 h-4\" />\n                  <span>Learning Management System</span>\n                </div>\n                <h1 className=\"text-4xl md:text-5xl lg:text-6xl font-black mb-6\">\n                  Student Portal",
+      "renderedRouteEvidence": {
+        "route": "/platform/student-portal",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-038",
@@ -460,10 +734,20 @@
       "originalLine": 89,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "        </div>\n      </section>\n\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-green-700 to-green-900 text-white py-16\">\n        <div className=\"max-w-7xl mx-auto px-4 text-center\">\n          <h1 className=\"text-4xl font-bold mb-4\">Career Training Investment</h1>\n          <p className=\"text-xl text-green-100 max-w-2xl mx-auto mb-8\">\n            Affordable programs with funding options for eligible participants. Self-pay and employer sponsorship also available.\n          </p>\n          <div className=\"flex gap-4 justify-center flex-wrap\">\n            <Link href=\"/check-eligibility\" className=\"bg-white text-green-700 font-bold py-3 px-6 rounded-lg hover:bg-green-50 flex items-center gap-2\">\n              <DollarSign className=\"w-5 h-5\" />\n              Check Eligibility\n            </Link>"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "        </div>\n      </section>\n\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-green-700 to-green-900 text-white py-16\">\n        <div className=\"max-w-7xl mx-auto px-4 text-center\">\n          <h1 className=\"text-4xl font-bold mb-4\">Career Training Investment</h1>\n          <p className=\"text-xl text-green-100 max-w-2xl mx-auto mb-8\">\n            Affordable programs with funding options for eligible participants. Self-pay and employer sponsorship also available.\n          </p>\n          <div className=\"flex gap-4 justify-center flex-wrap\">\n            <Link href=\"/check-eligibility\" className=\"bg-white text-green-700 font-bold py-3 px-6 rounded-lg hover:bg-green-50 flex items-center gap-2\">\n              <DollarSign className=\"w-5 h-5\" />\n              Check Eligibility\n            </Link>",
+      "renderedRouteEvidence": {
+        "route": "/pricing",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      },
+      "relatedCorrection": "Separate small-link contrast and ROI hover colors corrected at component source; funding text/prices unchanged. Rendered normal-text contrast assertion passes."
     },
     {
       "finding": "VL-039",
@@ -532,10 +816,19 @@
       "originalLine": 74,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "    <div className=\"min-h-screen bg-white\">\n      <Breadcrumbs items={[{ label: 'Resources' }]} />\n      \n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16\">\n        <div className=\"max-w-7xl mx-auto px-4 text-center\">\n          <h1 className=\"text-4xl font-black mb-4\">Resources</h1>\n          <p className=\"text-xl text-blue-100 max-w-2xl mx-auto\">\n            Career resources, funding information, and links to our partner organizations.\n          </p>\n        </div>\n      </section>\n\n      {/* Resources Grid */}\n      <section className=\"py-16\">"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "    <div className=\"min-h-screen bg-white\">\n      <Breadcrumbs items={[{ label: 'Resources' }]} />\n      \n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16\">\n        <div className=\"max-w-7xl mx-auto px-4 text-center\">\n          <h1 className=\"text-4xl font-black mb-4\">Resources</h1>\n          <p className=\"text-xl text-blue-100 max-w-2xl mx-auto\">\n            Career resources, funding information, and links to our partner organizations.\n          </p>\n        </div>\n      </section>\n\n      {/* Resources Grid */}\n      <section className=\"py-16\">",
+      "renderedRouteEvidence": {
+        "route": "/resources",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-045",
@@ -547,7 +840,16 @@
       "classification": "Image or hero-layout defect",
       "disposition": "Source reviewed; rendered verification outstanding",
       "evidence": "Heuristic identifies an overlay, gradient, player control or nearby media. Presence alone is not a defect; retained for rendered contrast/overflow review. See baseline source excerpt. No automatic suppression.",
-      "baselineContext": "          sizes=\"100vw\"\n          className=\"object-cover\"\n        />\n        <div className=\"absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/75 to-slate-950/30\" />\n        <div className=\"relative mx-auto flex min-h-[360px] max-w-6xl items-end px-4 py-10 text-white sm:min-h-[440px] sm:py-14\">\n          <div className=\"max-w-3xl\">\n            <p className=\"text-sm font-black uppercase tracking-[0.15em] text-white\">Funding</p>\n            <h1 className=\"mt-3 text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl\">\n              Scholarships & Training Funding\n            </h1>\n            <p className=\"mt-5 max-w-2xl text-base font-medium leading-7 text-slate-100 sm:text-lg\">\n              Funding availability depends on the program, participant eligibility, and funding source. Elevate helps applicants review WIOA, Workforce Ready Grant, employer-supported, scholarship, and self-pay options without guaranteeing approval.\n            </p>\n            <div className=\"mt-7 flex flex-wrap gap-3\">\n              <Link href={ROUTES.eligibility} className=\"inline-flex min-h-12 items-center rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800\">"
+      "baselineContext": "          sizes=\"100vw\"\n          className=\"object-cover\"\n        />\n        <div className=\"absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/75 to-slate-950/30\" />\n        <div className=\"relative mx-auto flex min-h-[360px] max-w-6xl items-end px-4 py-10 text-white sm:min-h-[440px] sm:py-14\">\n          <div className=\"max-w-3xl\">\n            <p className=\"text-sm font-black uppercase tracking-[0.15em] text-white\">Funding</p>\n            <h1 className=\"mt-3 text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl\">\n              Scholarships & Training Funding\n            </h1>\n            <p className=\"mt-5 max-w-2xl text-base font-medium leading-7 text-slate-100 sm:text-lg\">\n              Funding availability depends on the program, participant eligibility, and funding source. Elevate helps applicants review WIOA, Workforce Ready Grant, employer-supported, scholarship, and self-pay options without guaranteeing approval.\n            </p>\n            <div className=\"mt-7 flex flex-wrap gap-3\">\n              <Link href={ROUTES.eligibility} className=\"inline-flex min-h-12 items-center rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800\">",
+      "renderedRouteEvidence": {
+        "route": "/scholarships",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-046",
@@ -580,10 +882,19 @@
       "originalLine": 65,
       "rule": "hero-text-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Heuristic identifies an overlay, gradient, player control or nearby media. Presence alone is not a defect; retained for rendered contrast/overflow review. See baseline source excerpt. No automatic suppression.",
-      "baselineContext": "    <div className=\"min-h-screen bg-white\">\n      <section className=\"relative h-[220px] overflow-hidden md:h-[300px]\">\n        <Image src=\"/images/pages/admin-compliance-hero.webp\" alt=\"Compliance and audit review\" fill sizes=\"100vw\" className=\"object-cover\" priority />\n        <div className=\"absolute inset-0 bg-slate-950/65\" />\n        <div className=\"absolute inset-0 flex items-center\">\n          <div className=\"mx-auto w-full max-w-7xl px-4 text-white\">\n            <p className=\"text-sm font-bold uppercase tracking-[0.2em] text-blue-200\">Enterprise review</p>\n            <h1 className=\"mt-3 max-w-4xl text-4xl font-black md:text-5xl\">Compliance Controls &amp; Evidence</h1>\n            <p className=\"mt-4 max-w-3xl text-lg text-slate-200\">Inspect implemented controls, evidence sources, and acceptance boundaries instead of relying on unsupported compliance badges.</p>\n          </div>\n        </div>\n      </section>\n\n      <div className=\"mx-auto max-w-7xl px-4 py-4\">\n        <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Compliance' }]} />"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Intentional image-text backing: slate-950 at 65% opacity. Against a worst-case white image, composited RGB is (90.55,93.15,104.2); white text contrast is 6.54:1 and blue-200 label contrast is 4.60:1. Actual route rendered and inspected at 320px/1440px. Overlay preserved.",
+      "baselineContext": "    <div className=\"min-h-screen bg-white\">\n      <section className=\"relative h-[220px] overflow-hidden md:h-[300px]\">\n        <Image src=\"/images/pages/admin-compliance-hero.webp\" alt=\"Compliance and audit review\" fill sizes=\"100vw\" className=\"object-cover\" priority />\n        <div className=\"absolute inset-0 bg-slate-950/65\" />\n        <div className=\"absolute inset-0 flex items-center\">\n          <div className=\"mx-auto w-full max-w-7xl px-4 text-white\">\n            <p className=\"text-sm font-bold uppercase tracking-[0.2em] text-blue-200\">Enterprise review</p>\n            <h1 className=\"mt-3 max-w-4xl text-4xl font-black md:text-5xl\">Compliance Controls &amp; Evidence</h1>\n            <p className=\"mt-4 max-w-3xl text-lg text-slate-200\">Inspect implemented controls, evidence sources, and acceptance boundaries instead of relying on unsupported compliance badges.</p>\n          </div>\n        </div>\n      </section>\n\n      <div className=\"mx-auto max-w-7xl px-4 py-4\">\n        <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Compliance' }]} />",
+      "renderedRouteEvidence": {
+        "route": "/store/compliance",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-049",
@@ -619,7 +930,16 @@
       "classification": "Image or hero-layout defect",
       "disposition": "Source reviewed; rendered verification outstanding",
       "evidence": "Heuristic identifies an overlay, gradient, player control or nearby media. Presence alone is not a defect; retained for rendered contrast/overflow review. See baseline source excerpt. No automatic suppression.",
-      "baselineContext": "                          className=\"object-cover\"\n                        />\n                      ) : (\n                        <div className=\"absolute inset-0 flex items-center justify-center\" aria-hidden=\"true\">\n                          <span className=\"text-7xl font-black text-white/95\">{story.name.charAt(0).toUpperCase()}</span>\n                        </div>\n                      )}\n                    </div>\n\n                    <div className=\"flex flex-col p-6 sm:p-8\">\n                      <div className=\"flex items-start justify-between gap-4\">\n                        <div>\n                          <h2 className=\"text-2xl font-black text-slate-950\">{story.name}</h2>\n                          <p className=\"mt-1 font-bold text-brand-blue-700\">{story.program_completed}</p>\n                        </div>"
+      "baselineContext": "                          className=\"object-cover\"\n                        />\n                      ) : (\n                        <div className=\"absolute inset-0 flex items-center justify-center\" aria-hidden=\"true\">\n                          <span className=\"text-7xl font-black text-white/95\">{story.name.charAt(0).toUpperCase()}</span>\n                        </div>\n                      )}\n                    </div>\n\n                    <div className=\"flex flex-col p-6 sm:p-8\">\n                      <div className=\"flex items-start justify-between gap-4\">\n                        <div>\n                          <h2 className=\"text-2xl font-black text-slate-950\">{story.name}</h2>\n                          <p className=\"mt-1 font-bold text-brand-blue-700\">{story.program_completed}</p>\n                        </div>",
+      "renderedRouteEvidence": {
+        "route": "/success-stories",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-052",
@@ -628,10 +948,19 @@
       "originalLine": 94,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "export default function SupportPage() {\n  return (\n    <main className=\"min-h-screen bg-white\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 via-brand-blue-800 to-brand-blue-900 text-white py-20\">\n        <div className=\"max-w-7xl mx-auto px-4\">\n          <div className=\"max-w-3xl\">\n            <h1 className=\"text-4xl md:text-5xl font-bold mb-6\">How can we help?</h1>\n            <p className=\"text-xl text-blue-100 mb-8\">\n              Browse our help center, search documentation, or contact our support team.\n            </p>\n            \n            <div className=\"flex flex-wrap gap-3\">\n              <Link href=\"/help\" className=\"rounded-xl bg-white px-5 py-3 font-bold text-brand-blue-800 hover:bg-blue-50\">Browse help topics</Link>\n              <Link href=\"/support/ticket\" className=\"rounded-xl border border-blue-300 px-5 py-3 font-bold text-white hover:bg-white/10\">Submit a support ticket</Link>"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "export default function SupportPage() {\n  return (\n    <main className=\"min-h-screen bg-white\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 via-brand-blue-800 to-brand-blue-900 text-white py-20\">\n        <div className=\"max-w-7xl mx-auto px-4\">\n          <div className=\"max-w-3xl\">\n            <h1 className=\"text-4xl md:text-5xl font-bold mb-6\">How can we help?</h1>\n            <p className=\"text-xl text-blue-100 mb-8\">\n              Browse our help center, search documentation, or contact our support team.\n            </p>\n            \n            <div className=\"flex flex-wrap gap-3\">\n              <Link href=\"/help\" className=\"rounded-xl bg-white px-5 py-3 font-bold text-brand-blue-800 hover:bg-blue-50\">Browse help topics</Link>\n              <Link href=\"/support/ticket\" className=\"rounded-xl border border-blue-300 px-5 py-3 font-bold text-white hover:bg-white/10\">Submit a support ticket</Link>",
+      "renderedRouteEvidence": {
+        "route": "/support",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-053",
@@ -640,10 +969,19 @@
       "originalLine": 77,
       "rule": "hero-gradient-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Reviewed authored gradient in baseline excerpt. Legitimate gradients preserved. Dynamic imagery and responsive content require rendering before closing the candidate.",
-      "baselineContext": "export default function VideosPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20\">\n        <div className=\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8\">\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-4\">Video Library</h1>\n          <p className=\"text-xl text-blue-100 max-w-2xl\">\n            Watch tutorials, hear student success stories, and learn about career pathways in healthcare, trades, and technology.\n          </p>\n        </div>\n      </section>\n\n      {/* Category Filter */}\n      <section className=\"py-8 bg-white border-b\">"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Reviewed the exact surrounding component and the rendered route at 320px/1440px. This is an intentional dark gradient surface with light authored foregrounds, not a missing canonical image or inherently invalid overlay. Gradient retained. Shared cascade corrections restore component ownership. See renderedRouteEvidence and public-render-results.json.",
+      "baselineContext": "export default function VideosPage() {\n  return (\n    <div className=\"min-h-screen bg-slate-50\">\n      {/* Hero */}\n      <section className=\"bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20\">\n        <div className=\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8\">\n          <h1 className=\"text-4xl md:text-5xl font-bold mb-4\">Video Library</h1>\n          <p className=\"text-xl text-blue-100 max-w-2xl\">\n            Watch tutorials, hear student success stories, and learn about career pathways in healthcare, trades, and technology.\n          </p>\n        </div>\n      </section>\n\n      {/* Category Filter */}\n      <section className=\"py-8 bg-white border-b\">",
+      "renderedRouteEvidence": {
+        "route": "/videos",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-054",
@@ -652,10 +990,19 @@
       "originalLine": 111,
       "rule": "hero-text-overlay",
       "originalSeverity": "high",
-      "classification": "Image or hero-layout defect",
-      "disposition": "Source reviewed; rendered verification outstanding",
-      "evidence": "Heuristic identifies an overlay, gradient, player control or nearby media. Presence alone is not a defect; retained for rendered contrast/overflow review. See baseline source excerpt. No automatic suppression.",
-      "baselineContext": "              <article key={video.id} className=\"bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow\">\n                {/* Video Thumbnail */}\n                <div className=\"relative aspect-video bg-slate-200\">\n                  <div className=\"absolute inset-0 flex items-center justify-center\">\n                    <Video className=\"w-16 h-16 text-slate-300\" />\n                  </div>\n                  <div className=\"absolute bottom-3 right-3 bg-black/80 text-white text-sm px-2 py-1 rounded\">\n                    {video.duration}\n                  </div>\n                  <button className=\"absolute inset-0 flex items-center justify-center group\">\n                    <div className=\"w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform\">\n                      <Play className=\"w-6 h-6 text-brand-blue-600 ml-1\" />\n                    </div>\n                  </button>\n                </div>"
+      "classification": "Verified false positive",
+      "disposition": "Verified false positive; source and rendered evidence",
+      "evidence": "Flagged element is the video duration pill, white text on black/80, not an unbacked hero headline. Even over a white thumbnail its worst-case background is #333333 (white contrast 12.63:1). Source placement keeps the pill inside its thumbnail; route rendered at 320px/1440px. No playback functionality claim is inferred.",
+      "baselineContext": "              <article key={video.id} className=\"bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow\">\n                {/* Video Thumbnail */}\n                <div className=\"relative aspect-video bg-slate-200\">\n                  <div className=\"absolute inset-0 flex items-center justify-center\">\n                    <Video className=\"w-16 h-16 text-slate-300\" />\n                  </div>\n                  <div className=\"absolute bottom-3 right-3 bg-black/80 text-white text-sm px-2 py-1 rounded\">\n                    {video.duration}\n                  </div>\n                  <button className=\"absolute inset-0 flex items-center justify-center group\">\n                    <div className=\"w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform\">\n                      <Play className=\"w-6 h-6 text-brand-blue-600 ml-1\" />\n                    </div>\n                  </button>\n                </div>",
+      "renderedRouteEvidence": {
+        "route": "/videos",
+        "viewports": [
+          320,
+          1440
+        ],
+        "result": "Passed geometry and decoded-image assertions; does not independently close every contrast or interactive-state review.",
+        "record": "public-render-results.json"
+      }
     },
     {
       "finding": "VL-055",

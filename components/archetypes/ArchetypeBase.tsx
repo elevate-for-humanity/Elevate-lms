@@ -1,5 +1,6 @@
 'use client';
 
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import React from 'react';
 
 import { getArchetypeContent, type ArchetypeContent } from '@/lib/content/archetype-content';
@@ -30,13 +31,13 @@ export function ArchetypeBase({
       {/* Hero Section */}
       <section className="relative min-h-[260px] bg-slate-950">
         {finalContent.hero.image && (
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={finalContent.hero.image}
             alt={finalContent.hero.imageAlt || ''}
             fill
             className="object-cover"
             priority
-            sizes="100vw" placeholder="empty"
+            sizes="100vw"
           />
         )}
         <div className="relative flex items-center bg-slate-950/80 py-10">

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-16T14:45:25.471Z",
+  "generatedAt": "2026-10-16T16:24:45.626Z",
   "scanDirs": [
     "apps/marketing/app",
     "apps/lms/app",
@@ -48,7 +48,7 @@
         {
           "file": "apps/marketing/app/tax-software/_components/TaxHero.tsx",
           "service": "marketing",
-          "line": 21,
+          "line": 22,
           "match": "min-h-[500px]",
           "id": "min-h-420-plus",
           "re": {},
@@ -154,7 +154,7 @@
     {
       "file": "apps/marketing/app/barber-beauty-network/page.tsx",
       "service": "marketing",
-      "line": 32,
+      "line": 40,
       "id": "hero-gradient-overlay",
       "severity": "high",
       "message": "Gradient overlay near hero media",
@@ -224,7 +224,7 @@
     {
       "file": "apps/marketing/app/founder/page.tsx",
       "service": "marketing",
-      "line": 33,
+      "line": 35,
       "id": "hero-text-overlay",
       "severity": "high",
       "message": "Possible headline/text overlaid on hero media",
@@ -324,7 +324,7 @@
     {
       "file": "apps/marketing/app/platform/employer-portal/page.tsx",
       "service": "marketing",
-      "line": 73,
+      "line": 74,
       "id": "hero-gradient-overlay",
       "severity": "high",
       "message": "Gradient overlay near hero media",
@@ -364,7 +364,7 @@
     {
       "file": "apps/marketing/app/platform/student-portal/page.tsx",
       "service": "marketing",
-      "line": 74,
+      "line": 75,
       "id": "hero-gradient-overlay",
       "severity": "high",
       "message": "Gradient overlay near hero media",
@@ -554,7 +554,7 @@
     {
       "file": "apps/lms/app/apprentice/page.tsx",
       "service": "lms",
-      "line": 478,
+      "line": 479,
       "id": "hero-gradient-overlay",
       "severity": "high",
       "message": "Gradient overlay near hero media",
@@ -564,7 +564,7 @@
     {
       "file": "apps/lms/app/apprentice/page.tsx",
       "service": "lms",
-      "line": 485,
+      "line": 486,
       "id": "hero-text-overlay",
       "severity": "high",
       "message": "Possible headline/text overlaid on hero media",
@@ -574,7 +574,7 @@
     {
       "file": "apps/lms/app/apprentice/page.tsx",
       "service": "lms",
-      "line": 901,
+      "line": 902,
       "id": "empty-next-image-alt",
       "severity": "medium",
       "message": "Empty Next/Image alt text",
@@ -774,7 +774,7 @@
     {
       "file": "apps/lms/app/programs/[program]/courses/page.tsx",
       "service": "lms",
-      "line": 102,
+      "line": 103,
       "id": "hero-text-overlay",
       "severity": "high",
       "message": "Possible headline/text overlaid on hero media",
@@ -834,7 +834,7 @@
     {
       "file": "apps/admin/app/home/page.tsx",
       "service": "admin",
-      "line": 98,
+      "line": 99,
       "id": "hero-gradient-overlay",
       "severity": "high",
       "message": "Gradient overlay near hero media",
@@ -934,17 +934,17 @@
     {
       "file": "apps/admin/app/studio/memory/MemoryClient.tsx",
       "service": "admin",
-      "line": 62,
+      "line": 63,
       "id": "hero-gradient-overlay",
       "severity": "high",
       "message": "Gradient overlay near hero media",
       "classification": "manual-visual-review",
-      "match": "Hero */}\n      <div className=\"relative h-[280px] w-full overflow-hidden\">\n        <Image\n          "
+      "match": "Hero */}\n      <div className=\"relative h-[280px] w-full overflow-hidden\">\n        <Image placeholde"
     },
     {
       "file": "apps/admin/app/studio/memory/MemoryClient.tsx",
       "service": "admin",
-      "line": 72,
+      "line": 73,
       "id": "hero-text-overlay",
       "severity": "high",
       "message": "Possible headline/text overlaid on hero media",
@@ -1004,17 +1004,17 @@
     {
       "file": "apps/admin/app/studio/workflows/[id]/WorkflowDetailClient.tsx",
       "service": "admin",
-      "line": 214,
+      "line": 215,
       "id": "hero-gradient-overlay",
       "severity": "high",
       "message": "Gradient overlay near hero media",
       "classification": "manual-visual-review",
-      "match": "Hero */}\n      <div className=\"relative h-[200px] w-full overflow-hidden\">\n        <Image src=\"/imag"
+      "match": "Hero */}\n      <div className=\"relative h-[200px] w-full overflow-hidden\">\n        <Image placeholde"
     },
     {
       "file": "apps/admin/app/studio/workflows/[id]/WorkflowDetailClient.tsx",
       "service": "admin",
-      "line": 218,
+      "line": 219,
       "id": "hero-text-overlay",
       "severity": "high",
       "message": "Possible headline/text overlaid on hero media",
@@ -1024,17 +1024,17 @@
     {
       "file": "apps/admin/app/studio/workflows/new/PageClient.tsx",
       "service": "admin",
-      "line": 348,
+      "line": 349,
       "id": "hero-gradient-overlay",
       "severity": "high",
       "message": "Gradient overlay near hero media",
       "classification": "manual-visual-review",
-      "match": "Hero */}\n      <div className=\"relative h-[220px] w-full overflow-hidden\">\n        <Image src=\"/imag"
+      "match": "Hero */}\n      <div className=\"relative h-[220px] w-full overflow-hidden\">\n        <Image placeholde"
     },
     {
       "file": "apps/admin/app/studio/workflows/new/PageClient.tsx",
       "service": "admin",
-      "line": 352,
+      "line": 353,
       "id": "hero-text-overlay",
       "severity": "high",
       "message": "Possible headline/text overlaid on hero media",
@@ -1104,7 +1104,7 @@
     {
       "file": "components/barber/BarberApprenticeshipDashboard.tsx",
       "service": "shared",
-      "line": 109,
+      "line": 110,
       "id": "hero-gradient-overlay",
       "severity": "high",
       "message": "Gradient overlay near hero media",
@@ -1542,7 +1542,7 @@
         {
           "file": "apps/lms/app/apprentice/page.tsx",
           "service": "lms",
-          "line": 478,
+          "line": 479,
           "match": "heroImage}\n            alt={`${displayProgram} apprentice training`}\n            fill\n            pr",
           "id": "hero-gradient-overlay",
           "re": {},
@@ -1553,7 +1553,7 @@
         {
           "file": "apps/lms/app/apprentice/page.tsx",
           "service": "lms",
-          "line": 485,
+          "line": 486,
           "match": "absolute inset-0 bg-gradient-to-r from-slate-950 via-fuchsia-950/90 to-fuchsia-900/20\" />\n          ",
           "id": "hero-text-overlay",
           "re": {},
@@ -1564,7 +1564,7 @@
         {
           "file": "apps/lms/app/apprentice/page.tsx",
           "service": "lms",
-          "line": 901,
+          "line": 902,
           "match": "<Image\n                  src={action.image}\n                  alt=\"\"",
           "id": "empty-next-image-alt",
           "re": {},
@@ -1861,8 +1861,8 @@
         {
           "file": "apps/admin/app/studio/memory/MemoryClient.tsx",
           "service": "admin",
-          "line": 62,
-          "match": "Hero */}\n      <div className=\"relative h-[280px] w-full overflow-hidden\">\n        <Image\n          ",
+          "line": 63,
+          "match": "Hero */}\n      <div className=\"relative h-[280px] w-full overflow-hidden\">\n        <Image placeholde",
           "id": "hero-gradient-overlay",
           "re": {},
           "severity": "high",
@@ -1872,7 +1872,7 @@
         {
           "file": "apps/admin/app/studio/memory/MemoryClient.tsx",
           "service": "admin",
-          "line": 72,
+          "line": 73,
           "match": "absolute inset-0 bg-gradient-to-r from-teal-900/80 to-cyan-900/60\" />\n        <div className=\"absolu",
           "id": "hero-text-overlay",
           "re": {},
@@ -1942,8 +1942,8 @@
         {
           "file": "apps/admin/app/studio/workflows/[id]/WorkflowDetailClient.tsx",
           "service": "admin",
-          "line": 214,
-          "match": "Hero */}\n      <div className=\"relative h-[200px] w-full overflow-hidden\">\n        <Image src=\"/imag",
+          "line": 215,
+          "match": "Hero */}\n      <div className=\"relative h-[200px] w-full overflow-hidden\">\n        <Image placeholde",
           "id": "hero-gradient-overlay",
           "re": {},
           "severity": "high",
@@ -1953,7 +1953,7 @@
         {
           "file": "apps/admin/app/studio/workflows/[id]/WorkflowDetailClient.tsx",
           "service": "admin",
-          "line": 218,
+          "line": 219,
           "match": "absolute inset-0 flex items-center\">\n          <div className=\"max-w-6xl mx-auto px-6 w-full\">\n     ",
           "id": "hero-text-overlay",
           "re": {},
@@ -1969,8 +1969,8 @@
         {
           "file": "apps/admin/app/studio/workflows/new/PageClient.tsx",
           "service": "admin",
-          "line": 348,
-          "match": "Hero */}\n      <div className=\"relative h-[220px] w-full overflow-hidden\">\n        <Image src=\"/imag",
+          "line": 349,
+          "match": "Hero */}\n      <div className=\"relative h-[220px] w-full overflow-hidden\">\n        <Image placeholde",
           "id": "hero-gradient-overlay",
           "re": {},
           "severity": "high",
@@ -1980,7 +1980,7 @@
         {
           "file": "apps/admin/app/studio/workflows/new/PageClient.tsx",
           "service": "admin",
-          "line": 352,
+          "line": 353,
           "match": "absolute inset-0 flex items-center\">\n          <div className=\"max-w-4xl mx-auto px-6 w-full\">\n     ",
           "id": "hero-text-overlay",
           "re": {},
@@ -2346,7 +2346,7 @@
         {
           "file": "apps/marketing/app/barber-beauty-network/page.tsx",
           "service": "marketing",
-          "line": 32,
+          "line": 40,
           "match": "HeroVideo src=\"/videos/partners/kountry-kutz/shop-tour.mp4\" poster=\"/images/partners/kountry-kutz/in",
           "id": "hero-gradient-overlay",
           "re": {},
@@ -2458,7 +2458,7 @@
         {
           "file": "apps/marketing/app/founder/page.tsx",
           "service": "marketing",
-          "line": 33,
+          "line": 35,
           "match": "absolute inset-0 bg-white/95 flex items-center px-6\">\n          <div className=\"max-w-6xl mx-auto w-",
           "id": "hero-text-overlay",
           "re": {},
@@ -2618,7 +2618,7 @@
         {
           "file": "apps/marketing/app/platform/employer-portal/page.tsx",
           "service": "marketing",
-          "line": 73,
+          "line": 74,
           "match": "Hero Section */}\n        <section className=\"relative bg-gradient-to",
           "id": "hero-gradient-overlay",
           "re": {},
@@ -2682,7 +2682,7 @@
         {
           "file": "apps/marketing/app/platform/student-portal/page.tsx",
           "service": "marketing",
-          "line": 74,
+          "line": 75,
           "match": "Hero Section */}\n        <section className=\"relative bg-gradient-to",
           "id": "hero-gradient-overlay",
           "re": {},
@@ -2845,7 +2845,7 @@
         {
           "file": "apps/lms/app/apprentice/page.tsx",
           "service": "lms",
-          "line": 478,
+          "line": 479,
           "match": "heroImage}\n            alt={`${displayProgram} apprentice training`}\n            fill\n            pr",
           "id": "hero-gradient-overlay",
           "re": {},
@@ -2856,7 +2856,7 @@
         {
           "file": "apps/lms/app/apprentice/page.tsx",
           "service": "lms",
-          "line": 485,
+          "line": 486,
           "match": "absolute inset-0 bg-gradient-to-r from-slate-950 via-fuchsia-950/90 to-fuchsia-900/20\" />\n          ",
           "id": "hero-text-overlay",
           "re": {},
@@ -2867,7 +2867,7 @@
         {
           "file": "apps/lms/app/apprentice/page.tsx",
           "service": "lms",
-          "line": 901,
+          "line": 902,
           "match": "<Image\n                  src={action.image}\n                  alt=\"\"",
           "id": "empty-next-image-alt",
           "re": {},
@@ -3164,8 +3164,8 @@
         {
           "file": "apps/admin/app/studio/memory/MemoryClient.tsx",
           "service": "admin",
-          "line": 62,
-          "match": "Hero */}\n      <div className=\"relative h-[280px] w-full overflow-hidden\">\n        <Image\n          ",
+          "line": 63,
+          "match": "Hero */}\n      <div className=\"relative h-[280px] w-full overflow-hidden\">\n        <Image placeholde",
           "id": "hero-gradient-overlay",
           "re": {},
           "severity": "high",
@@ -3175,7 +3175,7 @@
         {
           "file": "apps/admin/app/studio/memory/MemoryClient.tsx",
           "service": "admin",
-          "line": 72,
+          "line": 73,
           "match": "absolute inset-0 bg-gradient-to-r from-teal-900/80 to-cyan-900/60\" />\n        <div className=\"absolu",
           "id": "hero-text-overlay",
           "re": {},
@@ -3245,8 +3245,8 @@
         {
           "file": "apps/admin/app/studio/workflows/[id]/WorkflowDetailClient.tsx",
           "service": "admin",
-          "line": 214,
-          "match": "Hero */}\n      <div className=\"relative h-[200px] w-full overflow-hidden\">\n        <Image src=\"/imag",
+          "line": 215,
+          "match": "Hero */}\n      <div className=\"relative h-[200px] w-full overflow-hidden\">\n        <Image placeholde",
           "id": "hero-gradient-overlay",
           "re": {},
           "severity": "high",
@@ -3256,7 +3256,7 @@
         {
           "file": "apps/admin/app/studio/workflows/[id]/WorkflowDetailClient.tsx",
           "service": "admin",
-          "line": 218,
+          "line": 219,
           "match": "absolute inset-0 flex items-center\">\n          <div className=\"max-w-6xl mx-auto px-6 w-full\">\n     ",
           "id": "hero-text-overlay",
           "re": {},
@@ -3272,8 +3272,8 @@
         {
           "file": "apps/admin/app/studio/workflows/new/PageClient.tsx",
           "service": "admin",
-          "line": 348,
-          "match": "Hero */}\n      <div className=\"relative h-[220px] w-full overflow-hidden\">\n        <Image src=\"/imag",
+          "line": 349,
+          "match": "Hero */}\n      <div className=\"relative h-[220px] w-full overflow-hidden\">\n        <Image placeholde",
           "id": "hero-gradient-overlay",
           "re": {},
           "severity": "high",
@@ -3283,7 +3283,7 @@
         {
           "file": "apps/admin/app/studio/workflows/new/PageClient.tsx",
           "service": "admin",
-          "line": 352,
+          "line": 353,
           "match": "absolute inset-0 flex items-center\">\n          <div className=\"max-w-4xl mx-auto px-6 w-full\">\n     ",
           "id": "hero-text-overlay",
           "re": {},
@@ -3649,7 +3649,7 @@
         {
           "file": "apps/marketing/app/barber-beauty-network/page.tsx",
           "service": "marketing",
-          "line": 32,
+          "line": 40,
           "match": "HeroVideo src=\"/videos/partners/kountry-kutz/shop-tour.mp4\" poster=\"/images/partners/kountry-kutz/in",
           "id": "hero-gradient-overlay",
           "re": {},
@@ -3761,7 +3761,7 @@
         {
           "file": "apps/marketing/app/founder/page.tsx",
           "service": "marketing",
-          "line": 33,
+          "line": 35,
           "match": "absolute inset-0 bg-white/95 flex items-center px-6\">\n          <div className=\"max-w-6xl mx-auto w-",
           "id": "hero-text-overlay",
           "re": {},
@@ -3921,7 +3921,7 @@
         {
           "file": "apps/marketing/app/platform/employer-portal/page.tsx",
           "service": "marketing",
-          "line": 73,
+          "line": 74,
           "match": "Hero Section */}\n        <section className=\"relative bg-gradient-to",
           "id": "hero-gradient-overlay",
           "re": {},
@@ -3985,7 +3985,7 @@
         {
           "file": "apps/marketing/app/platform/student-portal/page.tsx",
           "service": "marketing",
-          "line": 74,
+          "line": 75,
           "match": "Hero Section */}\n        <section className=\"relative bg-gradient-to",
           "id": "hero-gradient-overlay",
           "re": {},
@@ -4401,7 +4401,7 @@
         {
           "file": "apps/lms/app/programs/[program]/courses/page.tsx",
           "service": "lms",
-          "line": 102,
+          "line": 103,
           "match": "absolute inset-0 bg-slate-900/60 flex items-center justify-center\">\n          <div className=\"text-c",
           "id": "hero-text-overlay",
           "re": {},
@@ -4433,7 +4433,7 @@
         {
           "file": "apps/admin/app/home/page.tsx",
           "service": "admin",
-          "line": 98,
+          "line": 99,
           "match": "Hero Section */}\n      <section className=\"relative h-72 sm:h-80 w-full overflow-hidden\">\n        <I",
           "id": "hero-gradient-overlay",
           "re": {},
@@ -4641,7 +4641,7 @@
         {
           "file": "components/barber/BarberApprenticeshipDashboard.tsx",
           "service": "shared",
-          "line": 109,
+          "line": 110,
           "match": "Hero */}\n      <section className=\"relative overflow-hidden bg-black text-white\">\n        <div class",
           "id": "hero-gradient-overlay",
           "re": {},
@@ -6254,8 +6254,8 @@
       "metadata": true,
       "h1s": 1,
       "images": 1,
-      "actions": 11,
-      "textBlocks": 7,
+      "actions": 12,
+      "textBlocks": 8,
       "longestTextWords": 38,
       "risks": []
     },
@@ -8432,13 +8432,12 @@
       "file": "apps/marketing/app/founder/page.tsx",
       "template": "custom",
       "metadata": true,
-      "h1s": 2,
+      "h1s": 1,
       "images": 2,
       "actions": 5,
       "textBlocks": 19,
       "longestTextWords": 52,
       "risks": [
-        "multiple-local-h1",
         "noncanonical-hero"
       ]
     },

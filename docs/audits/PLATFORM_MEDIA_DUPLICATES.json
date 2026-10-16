@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-16T14:44:29.470Z",
+  "generatedAt": "2026-10-16T16:24:42.815Z",
   "apps": [
     "marketing",
     "lms",
@@ -4988,12 +4988,12 @@
       "route": "/founder",
       "page": "apps/marketing/app/founder/page.tsx",
       "componentFiles": 2,
-      "imageRefs": 2,
-      "imageFingerprints": 2,
-      "ownedImageRefs": 2,
-      "ownedImageFingerprints": 2,
-      "ownedHeroRefs": 2,
-      "ownedHeroFingerprints": 2
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
     },
     {
       "app": "marketing",

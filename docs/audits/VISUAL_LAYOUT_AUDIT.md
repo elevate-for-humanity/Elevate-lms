@@ -1,6 +1,6 @@
 # Visual layout audit — active platform
 
-Generated: 2026-10-16T14:45:25.471Z
+Generated: 2026-10-16T16:24:45.626Z
 
 This report scans the deployed monorepo app trees, not the legacy root `app/` tree.
 
@@ -182,7 +182,7 @@ _None_
 ## Oversized hero / banner patterns
 
 ### `apps/marketing/app/tax-software/_components/TaxHero.tsx` (1)
-- L21 **min-h-420-plus**: Large minimum height on hero-like container — `min-h-[500px]`
+- L22 **min-h-420-plus**: Large minimum height on hero-like container — `min-h-[500px]`
 
 
 ## Image performance
@@ -207,13 +207,13 @@ _None_
              `
 
 ### `apps/lms/app/apprentice/page.tsx` (3)
-- L478 **hero-gradient-overlay**: Gradient overlay near hero media — `heroImage}
+- L479 **hero-gradient-overlay**: Gradient overlay near hero media — `heroImage}
             alt={`${displayProgram} apprentice training`}
             fill
             pr`
-- L485 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-r from-slate-950 via-fuchsia-950/90 to-fuchsia-900/20" />
+- L486 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-r from-slate-950 via-fuchsia-950/90 to-fuchsia-900/20" />
           `
-- L901 **empty-next-image-alt**: Empty Next/Image alt text — `<Image
+- L902 **empty-next-image-alt**: Empty Next/Image alt text — `<Image
                   src={action.image}
                   alt=""`
 
@@ -292,11 +292,10 @@ _None_
         <div className="abso`
 
 ### `apps/admin/app/studio/memory/MemoryClient.tsx` (2)
-- L62 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
+- L63 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
       <div className="relative h-[280px] w-full overflow-hidden">
-        <Image
-          `
-- L72 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-r from-teal-900/80 to-cyan-900/60" />
+        <Image placeholde`
+- L73 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-gradient-to-r from-teal-900/80 to-cyan-900/60" />
         <div className="absolu`
 
 ### `apps/admin/app/studio/settings/SettingsClient.tsx` (2)
@@ -316,18 +315,18 @@ _None_
           <div clas`
 
 ### `apps/admin/app/studio/workflows/[id]/WorkflowDetailClient.tsx` (2)
-- L214 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
+- L215 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
       <div className="relative h-[200px] w-full overflow-hidden">
-        <Image src="/imag`
-- L218 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 flex items-center">
+        <Image placeholde`
+- L219 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 flex items-center">
           <div className="max-w-6xl mx-auto px-6 w-full">
      `
 
 ### `apps/admin/app/studio/workflows/new/PageClient.tsx` (2)
-- L348 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
+- L349 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
       <div className="relative h-[220px] w-full overflow-hidden">
-        <Image src="/imag`
-- L352 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 flex items-center">
+        <Image placeholde`
+- L353 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 flex items-center">
           <div className="max-w-4xl mx-auto px-6 w-full">
      `
 
@@ -422,7 +421,7 @@ _None_
       <section className="relative overflow-hidden bg-gradient-to`
 
 ### `apps/marketing/app/barber-beauty-network/page.tsx` (1)
-- L32 **hero-gradient-overlay**: Gradient overlay near hero media — `HeroVideo src="/videos/partners/kountry-kutz/shop-tour.mp4" poster="/images/partners/kountry-kutz/in`
+- L40 **hero-gradient-overlay**: Gradient overlay near hero media — `HeroVideo src="/videos/partners/kountry-kutz/shop-tour.mp4" poster="/images/partners/kountry-kutz/in`
 
 ### `apps/marketing/app/blog/loading.tsx` (1)
 - L6 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero Skeleton */}
@@ -448,7 +447,7 @@ _None_
       <section className="bg-gradient-to`
 
 ### `apps/marketing/app/founder/page.tsx` (1)
-- L33 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-white/95 flex items-center px-6">
+- L35 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-white/95 flex items-center px-6">
           <div className="max-w-6xl mx-auto w-`
 
 ### `apps/marketing/app/fssa/page.tsx` (1)
@@ -488,7 +487,7 @@ _None_
       <section className="bg-gradient-to`
 
 ### `apps/marketing/app/platform/employer-portal/page.tsx` (1)
-- L73 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero Section */}
+- L74 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero Section */}
         <section className="relative bg-gradient-to`
 
 ### `apps/marketing/app/platform/enterprise/page.tsx` (1)
@@ -504,7 +503,7 @@ _None_
       <section className="bg-gradient-to`
 
 ### `apps/marketing/app/platform/student-portal/page.tsx` (1)
-- L74 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero Section */}
+- L75 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero Section */}
         <section className="relative bg-gradient-to`
 
 ### `apps/marketing/app/pricing/page.tsx` (1)
@@ -614,7 +613,7 @@ _None_
         `
 
 ### `apps/lms/app/programs/[program]/courses/page.tsx` (1)
-- L102 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-slate-900/60 flex items-center justify-center">
+- L103 **hero-text-overlay**: Possible headline/text overlaid on hero media — `absolute inset-0 bg-slate-900/60 flex items-center justify-center">
           <div className="text-c`
 
 ### `apps/admin/app/blog/management/loading.tsx` (1)
@@ -622,7 +621,7 @@ _None_
       <div className="bg-gradient-to`
 
 ### `apps/admin/app/home/page.tsx` (1)
-- L98 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero Section */}
+- L99 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero Section */}
       <section className="relative h-72 sm:h-80 w-full overflow-hidden">
         <I`
 
@@ -678,7 +677,7 @@ _None_
               backgroundImage: 'radial-gradient(circle at 2px`
 
 ### `components/barber/BarberApprenticeshipDashboard.tsx` (1)
-- L109 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
+- L110 **hero-gradient-overlay**: Gradient overlay near hero media — `Hero */}
       <section className="relative overflow-hidden bg-black text-white">
         <div class`
 

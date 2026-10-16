@@ -11,7 +11,10 @@ on:
       - 'scripts/audit-visual-layout.mjs'
       - 'scripts/audit-platform-media-duplicates.mjs'
       - 'tests/e2e/platform-design-repair.spec.ts'
+      - 'tests/e2e/design-audit-public-pages.spec.ts'
       - 'playwright.design-repair.config.ts'
+      - 'playwright.design-audit.config.ts'
+      - 'docs/audits/design-repair-20261016/finding-dispositions.json'
       - '.github/workflows/design-repair-verification.yml'
 permissions:
   contents: read
@@ -41,6 +44,14 @@ jobs:
       - run: node --test scripts/visual/*.test.mjs
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm exec playwright test --config playwright.design-repair.config.ts
+      - name: Render original audit public pages at 320px
+        run: pnpm exec playwright test --config playwright.design-audit.config.ts --project=320px
+        env:
+          DESIGN_AUDIT_EVIDENCE_DIR: artifacts/design-repair/original-public-mobile
+      - name: Render original audit public pages at 1440px
+        run: pnpm exec playwright test --config playwright.design-audit.config.ts --project=1440px
+        env:
+          DESIGN_AUDIT_EVIDENCE_DIR: artifacts/design-repair/original-public-desktop
       - uses: actions/upload-artifact@v4
         if: always()
         with:

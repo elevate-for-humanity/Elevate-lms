@@ -136,8 +136,8 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
             />
           </div>
           <div className="border-t border-slate-200 p-4 sm:p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
+            <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-4">
+              <div className="min-w-0">
                 <p className="text-xs font-black uppercase tracking-wider text-brand-red-700">
                   {program.field}
                 </p>
@@ -149,7 +149,7 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
             </div>
             <p className="mt-3 text-sm leading-6 text-slate-700">{program.summary}</p>
           </div>
-          <div className="flex justify-center gap-2 pb-4">
+          <div role="group" aria-label="Featured programs" className="flex flex-wrap justify-center gap-0 pb-4 sm:gap-1">
             {PROGRAMS.map((item, index) => (
               <button
                 key={item.href}
@@ -157,8 +157,10 @@ export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
                 aria-label={`Show ${item.title}`}
                 aria-current={index === active ? 'true' : undefined}
                 onClick={() => setActive(index)}
-                className={`h-3 rounded-full transition-all ${index === active ? 'w-8 bg-brand-red-700' : 'w-3 bg-slate-300'}`}
-              />
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue-700"
+              >
+                <span aria-hidden="true" className={`h-2 rounded-full transition-all ${index === active ? 'w-6 bg-brand-red-700' : 'w-2 bg-slate-400'}`} />
+              </button>
             ))}
           </div>
         </div>

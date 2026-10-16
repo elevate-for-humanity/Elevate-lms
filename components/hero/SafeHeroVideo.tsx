@@ -98,6 +98,7 @@ export function SafeHeroVideo({
   return (
     <>
       {showPosterBeforePlayback || hasFailed || avoidAutoplay ? (
+        /* IMAGE-CONTRACT: allow raw img because the native poster must share the video source and remain available without image optimization during playback failure. */
         <img
           src={poster}
           alt=""

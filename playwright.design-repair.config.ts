@@ -18,7 +18,8 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 180000,
   } }),
-  projects: [320, 375, 390, 768, 1024, 1440].map(width => ({
+  // The header switches at 1180px; verify both sides as well as the required widths.
+  projects: [320, 375, 390, 768, 1024, 1179, 1180, 1440].map(width => ({
     name: `${width}px`, use: { viewport: { width, height: 900 } },
   })),
 });

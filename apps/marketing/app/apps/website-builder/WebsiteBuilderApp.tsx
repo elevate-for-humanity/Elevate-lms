@@ -120,7 +120,8 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
         ) : (
           <section className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {websites.map((site) => {
-              const liveUrl = site.subdomain && site.is_published ? `https://${site.subdomain}.app.elevateforhumanity.org` : null;
+              const liveUrl = site.subdomain && site.is_published ? `/sites/${encodeURIComponent(site.subdomain)}` : null;
+              const tenantUrl = site.subdomain && site.is_published ? `https://${site.subdomain}.app.elevateforhumanity.org` : null;
               return (
                 <article key={site.id} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                   <div className="flex items-start justify-between gap-3">
@@ -137,7 +138,8 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
                   </div>
                   <div className="mt-6 flex flex-wrap gap-2">
                     <Link href={`/apps/website-builder/edit/${site.id}`} className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-bold text-white"><Pencil className="h-4 w-4" /> Edit</Link>
-                    {liveUrl && <a href={liveUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700"><ExternalLink className="h-4 w-4" /> Live site</a>}
+                    {liveUrl && <a href={liveUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700"><ExternalLink className="h-4 w-4" /> Preview on Elevate</a>}
+                    {tenantUrl && <a href={tenantUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700"><Globe2 className="h-4 w-4" /> Custom subdomain</a>}
                   </div>
                 </article>
               );

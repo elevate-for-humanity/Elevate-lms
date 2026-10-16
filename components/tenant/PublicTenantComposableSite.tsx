@@ -198,9 +198,10 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
   const background = config.branding.backgroundColor || '#ffffff';
   const textColor = config.branding.textColor || '#0f172a';
   const navigation = (config.pages || []).filter((item) => item.showInNavigation !== false);
+  const isLegacy83 = site.siteName.toLowerCase().includes('legacy 83');
 
   return (
-    <div className={`min-h-screen antialiased ${site.siteName.toLowerCase().includes("legacy 83") ? "legacy83-premium" : ""}`} style={{ backgroundColor: background, color: textColor }}>
+    <div className={`min-h-screen antialiased ${isLegacy83 ? "legacy83-premium" : ""}`} style={{ backgroundColor: background, color: textColor }}>
       {config.homepage.announcement ? <div className="px-4 py-2 text-center text-sm font-black text-white" style={{ backgroundColor: primary }}>{config.homepage.announcement}</div> : null}
       <header className="sticky top-0 z-20 border-b border-black/10 bg-white/95 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-4 py-4 sm:px-6">
@@ -209,6 +210,7 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
           {navigation.some((item) => item.slug === '/contact') ? <Link href={hrefFor('/contact', basePath)} className="rounded-full px-5 py-2.5 text-sm font-black text-white shadow-sm transition-transform hover:-translate-y-0.5" style={{ backgroundColor: primary }}>Contact</Link> : null}
         </div>
       </header>
+      {isLegacy83 ? <div className="legacy83-mobile-menu"><details><summary>Menu <span aria-hidden="true">☰</span></summary><nav aria-label="Mobile navigation">{navigation.map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)}>{item.navLabel || item.title}</Link>)}</nav></details></div> : null}
       <main>{page.sections.map((section) => <Section key={section.id} section={section} primary={primary} secondary={secondary} basePath={basePath} />)}</main>
       <footer className="border-t border-black/10 px-5 py-10 sm:px-6"><div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-5"><div><p className="font-black">{config.branding.logoText || site.siteName}</p><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{config.footer.description}</p></div>{config.footer.contactEmail ? <a href={`mailto:${config.footer.contactEmail}`} className="font-bold" style={{ color: primary }}>{config.footer.contactEmail}</a> : null}</div></footer>
     </div>

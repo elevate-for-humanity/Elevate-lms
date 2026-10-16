@@ -2,6 +2,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import './legacy83-premium.css';
 import Link from 'next/link';
 import type { PublishedTenantSite, TenantSitePage, TenantSiteSection } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig, normalizePageSlug } from '@/lib/tenant/site-composition';
@@ -199,7 +200,7 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
   const navigation = (config.pages || []).filter((item) => item.showInNavigation !== false);
 
   return (
-    <div className="min-h-screen antialiased" style={{ backgroundColor: background, color: textColor }}>
+    <div className={`min-h-screen antialiased ${site.siteName.toLowerCase().includes("legacy 83") ? "legacy83-premium" : ""}`} style={{ backgroundColor: background, color: textColor }}>
       {config.homepage.announcement ? <div className="px-4 py-2 text-center text-sm font-black text-white" style={{ backgroundColor: primary }}>{config.homepage.announcement}</div> : null}
       <header className="sticky top-0 z-20 border-b border-black/10 bg-white/95 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-4 py-4 sm:px-6">

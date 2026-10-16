@@ -785,11 +785,11 @@ export function UltimateBuildPanel({
         </button>
       </div>
 
-      <div className={`mt-4 items-center justify-between gap-2 2xl:hidden ${compact ? 'hidden' : 'flex'}`}>
+      <div className={`mt-4 flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-between 2xl:hidden ${compact ? 'hidden' : 'flex'}`}>
         <span className="text-xs font-semibold text-slate-300">Workspace layout</span>
-        <button type="button" aria-pressed={mobileSplitView} onClick={() => setMobileSplitView(value => !value)} className="rounded-lg border border-cyan-600 px-3 py-2 text-xs font-bold text-cyan-200">{mobileSplitView ? "Use stacked view" : "Show builder + preview together"}</button>
+        <button type="button" aria-pressed={mobileSplitView} onClick={() => setMobileSplitView(value => !value)} className="min-h-11 w-full rounded-lg border border-cyan-600 px-3 py-2 text-center text-xs font-bold text-cyan-200 sm:w-auto">{mobileSplitView ? "Use stacked view" : "Show builder + preview together"}</button>
       </div>
-      <div data-course-workspace-layout className={`mt-5 grid min-w-0 items-start gap-2 sm:gap-5 ${compact ? '' : '2xl:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)]'} ${mobileSplitView && !compact ? "grid-cols-2" : "grid-cols-1"}`}>
+      <div data-course-workspace-layout className={`mt-5 grid min-w-0 items-start gap-2 sm:gap-5 ${compact ? '' : '2xl:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)]'} ${mobileSplitView && !compact ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"}`}>
         <div className="min-w-0">
       {!statusLoading && latest ? (
         <div className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4">

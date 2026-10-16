@@ -164,13 +164,13 @@ export default function CompetencyManager() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-6"><p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">Supervisor workflow</p><h2 className="mt-2 text-2xl font-black leading-tight text-slate-950">Sign progress from the apprentice’s real Appendix A standard</h2><div className="mt-4 grid gap-3 md:grid-cols-3"><div className="rounded-2xl bg-white p-4"><b>1. Observe the service</b><p className="mt-1 text-sm leading-6 text-slate-600">Watch the apprentice perform the work safely and to the standard shown below.</p></div><div className="rounded-2xl bg-white p-4"><b>2. Capture evidence</b><p className="mt-1 text-sm leading-6 text-slate-600">Practical skills require the performance subject, dated evidence, and verifier license information when applicable.</p></div><div className="rounded-2xl bg-white p-4"><b>3. Check off the skill</b><p className="mt-1 text-sm leading-6 text-slate-600">Use Check off only after you personally verified it. The completion becomes part of the apprentice’s progress record.</p></div></div></section>
+      <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 sm:p-6"><p className="text-xs font-black uppercase tracking-[0.14em] text-emerald-800">Supervisor workflow</p><h2 className="mt-2 text-2xl font-black leading-tight text-slate-950">Record hands-on practice for your assigned apprentices</h2><div className="mt-4 grid gap-3 md:grid-cols-3"><div className="rounded-2xl bg-white p-4"><b>1. Observe the service</b><p className="mt-1 text-sm leading-6 text-slate-600">Watch the apprentice perform the work safely and to the standard shown below.</p></div><div className="rounded-2xl bg-white p-4"><b>2. Capture evidence</b><p className="mt-1 text-sm leading-6 text-slate-600">Practical skills require the performance subject, dated evidence, and verifier license information when applicable.</p></div><div className="rounded-2xl bg-white p-4"><b>3. Check off the skill</b><p className="mt-1 text-sm leading-6 text-slate-600">Record each supervised practical service. Elevate and the registered sponsor handle formal Appendix A competency approvals.</p></div></div></section>
       <div className="flex flex-col gap-3 rounded-2xl border bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-brand-blue-700">DOL Appendix A</p>
-          <h1 className="mt-1 text-2xl font-bold text-slate-900">Competency Sign-Offs</h1>
+          <h1 className="mt-1 text-2xl font-bold text-slate-900">Practical Training Progress</h1>
           <p className="mt-1 text-sm text-slate-600">
-            Check off only competencies you personally observed. Indiana practical services also require the performance subject, dated evidence, and your current license number before approval.
+            Record supervised services. Formal Appendix A competency sign-offs are handled by the sponsor, not Host Shops.
           </p>
         </div>
         <button
@@ -264,25 +264,7 @@ export default function CompetencyManager() {
                     </div>
                     <div className="flex flex-col gap-2">
                     <button type="button" disabled={savingKey===key} onClick={()=>void recordService(apprentice,competency)} className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-900 disabled:opacity-50">+ Record practical service{serviceCounts[key] ? ` (+${serviceCounts[key]} this session)` : ''}</button>
-                    <button
-                      type="button"
-                      disabled={savingKey === key}
-                      onClick={() => void setCompetency(apprentice, competency, !isComplete)}
-                      className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition disabled:opacity-60 ${
-                        isComplete
-                          ? 'border border-brand-green-300 bg-brand-green-50 text-brand-green-800 hover:bg-brand-green-100'
-                          : 'border border-slate-300 bg-white text-slate-700 hover:border-brand-blue-300 hover:bg-brand-blue-50'
-                      }`}
-                    >
-                      {savingKey === key ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : isComplete ? (
-                        <CheckCircle2 className="h-4 w-4" />
-                      ) : (
-                        <Circle className="h-4 w-4" />
-                      )}
-                      {isComplete ? 'Verified' : 'Check off'}
-                    </button></div>
+                    <span className="text-xs font-semibold text-slate-600">{isComplete ? 'Sponsor verified' : 'Sponsor review pending'}</span></div>
                   </div>
                 );
               })}

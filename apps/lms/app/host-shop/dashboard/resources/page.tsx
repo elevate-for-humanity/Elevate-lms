@@ -39,9 +39,14 @@ const guideSteps = [
     'Approve accurate OJL entries and return incorrect entries with a correction note.',
   ],
   [
-    'Verify competencies',
+    'Record practical services',
+    '/host-shop/dashboard/practical-log',
+    'Record haircuts, styles, colors, facials, and nail services. These are practice counts, not official Appendix A sign-offs.',
+  ],
+  [
+    'Review training progress',
     '/host-shop/dashboard/competencies',
-    'Record skills only after they are demonstrated under qualified supervision.',
+    'Review registered skill progress. Only Elevate sponsor administration performs formal Appendix A approvals.',
   ],
   [
     'Check wages and reports',

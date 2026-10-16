@@ -90,7 +90,6 @@ const DISTINCT_PROGRAM_POSTERS: Record<string, string> = {
   'network-administration': '/images/pages/technology-sector.webp',
   'network-support-technician': '/hero-images/technology-cat-new.jpg',
   'guest-service-gold': '/images/pages/about-employer-partners.webp',
-  'start-hospitality': '/images/pages/office-admin-desk.jpg',
 };
 
 const SHARED_GENERIC_VIDEO_FILES = new Set([
@@ -174,6 +173,9 @@ function semanticInlinePoster(key: string, banner: RawHeroBannerConfig): string 
 }
 
 function posterFor(key: string, banner: RawHeroBannerConfig): string {
+  // No distinct verified hospitality photograph is available for this page.
+  // Use its unique accessible branded poster rather than a misleading office image.
+  if (key === 'start-hospitality') return semanticInlinePoster(key, banner);
   if (DISTINCT_PROGRAM_POSTERS[key]) return DISTINCT_PROGRAM_POSTERS[key];
   if (PROGRAM_IMAGES[key]?.hero.includes('/refresh-20261014/')) return getProgramHeroImage(key);
   if (PAGE_PICTURE_OVERRIDES[key]?.includes('/refresh-20261014/'))

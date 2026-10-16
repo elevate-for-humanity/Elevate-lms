@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mergeCloudflareConfig } from './migrate-cloudflare-from-northflank.mjs';
+import { mergeCloudflareConfig, migrateCloudflare } from './migrate-cloudflare-from-northflank.mjs';
 const existing=()=>({version:1,component:'admin',runtimeEnvironment:{AI_PROVIDER:'elevate',ADMIN_INTERNAL_ORIGIN:'https://admin.example'},volumes:[],runtimeFiles:{}});
 const source={CLOUDFLARE_ACCOUNT_ID:'account-123456789',CLOUDFLARE_AI_API_TOKEN:'test-secret',CLOUDFLARE_AI_MODEL:'@cf/meta/llama-3.1-8b-instruct'};
 test('imports Cloudflare settings without changing AI provider or other existing config',()=>{
@@ -17,4 +17,21 @@ test('rejects missing required settings and leaves original object unchanged',()
  const target=existing();
  assert.throws(()=>mergeCloudflareConfig(target,{CLOUDFLARE_AI_MODEL:source.CLOUDFLARE_AI_MODEL}),/cloudflare_source_config_incomplete/);
  assert.equal(target.runtimeEnvironment.CLOUDFLARE_AI_MODEL,undefined);
+});
+
+test('already configured Google Cloud skips missing retired Northflank token and does not write',async()=>{
+ const original=existing();
+ Object.assign(original.runtimeEnvironment,source);
+ const writes=[];
+ const result=await migrateCloudflare({env:{},request:async()=>{throw Error('should not call Northflank');},run:(args)=>{
+   if(args.includes('add'))writes.push(args);
+   return JSON.stringify(original);
+ }});
+ assert.equal(result.status,'already_configured');
+ assert.equal(writes.length,0);
+});
+test('missing Google config and absent Northflank token fail without writes',async()=>{
+ let writes=0;
+ await assert.rejects(()=>migrateCloudflare({env:{},run:(args)=>{if(args.includes('add'))writes++;return JSON.stringify(existing());}}),/northflank_read_token_missing/);
+ assert.equal(writes,0);
 });

@@ -69,7 +69,18 @@ export async function inspectRegionalCapacity({ region, task, taskCount = 1, run
   if (!['us-central1', 'us-east1'].includes(region)) throw new Error('Unsupported capacity region');
   const read = args => JSON.parse(run([...args, '--project=' + PROJECT, '--region=' + region, '--format=json']));
   const services = read(['run', 'services', 'list']);
-  const revisions = read(['run', 'revisions', 'list']);
+  // Only revisions with current traffic or a retained tag can contribute to
+  // the effective regional maximum. A project-wide revision listing can exceed
+  // the bounded gcloud process buffer and fail without yielding a quota result.
+  // Describe each effective immutable revision explicitly; missing readbacks
+  // continue to fail closed in requiredRegionalAllocation.
+  const revisionNames = [...new Set(services.flatMap(service =>
+    (service.status?.traffic || [])
+      .filter(traffic => Number(traffic.percent || 0) > 0 || traffic.tag)
+      .map(traffic => traffic.revisionName ||
+        (traffic.latestRevision ? service.status?.latestReadyRevisionName : null))
+      .filter(Boolean)))];
+  const revisions = revisionNames.map(name => read(['run', 'revisions', 'describe', name]));
   const jobs = read(['run', 'jobs', 'list']);
   const executions = jobs.flatMap(job => read(['run', 'jobs', 'executions', 'list', '--job=' + job.metadata.name]));
   const required = requiredRegionalAllocation(services, task, revisions, executions, taskCount);

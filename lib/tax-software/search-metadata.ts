@@ -5,7 +5,7 @@ export const supersonicBusiness = {
   name: 'Supersonic Fast Cash',
   legalName: 'HOTT KAMODITTY',
   url: 'https://www.elevateforhumanity.org/tax',
-  telephone: '+1-317-999-9620',
+  telephone: '+1-463-240-1404',
   email: 'supersonicfastcash@gmail.com',
   address: {
     '@type': 'PostalAddress',

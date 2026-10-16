@@ -1,6 +1,7 @@
 'use client';
 
 import type { Session } from 'sip.js';
+import { verifyPhoneMicrophone } from './microphone.mjs';
 
 export type PhoneCall = {
   id: string;
@@ -94,6 +95,29 @@ export async function createPhoneClient(
   credential: PhoneCredential,
   remoteAudio: HTMLAudioElement,
 ): Promise<PhoneClient> {
+  await verifyPhoneMicrophone();
+  if (credential.provider !== 'asterisk') {
+    const { TelnyxRTC } = await import('@telnyx/webrtc');
+    const client = new TelnyxRTC({
+      login_token: credential.token,
+      keepConnectionAliveOnSocketClose: true,
+      hangupOnBeforeUnload: false,
+    });
+    return {
+      on(event, listener) {
+        const names = {
+          ready: 'telnyx.ready',
+          error: 'telnyx.error',
+          call: 'telnyx.notification',
+          offline: 'telnyx.socket.close',
+        };
+        client.on(names[event] as any, listener);
+      },
+      connect: () => client.connect(),
+      disconnect: () => client.disconnect(),
+      newCall: async (options) => client.newCall(options) as unknown as PhoneCall,
+    };
+  }
 
   const { SessionManager } = await import('sip.js/lib/platform/web');
   const listeners = new Map<string, Array<(data?: any) => void>>();

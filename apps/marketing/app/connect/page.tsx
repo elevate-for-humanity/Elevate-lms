@@ -399,7 +399,7 @@ export default function ConnectPage() {
                 </h3>
                 <button
                   onClick={() => copyToClipboard(integration.embedScript, 'embed')}
-                  className="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-lg text-sm text-slate-300 hover:bg-white/20"
+                  className="flex min-h-11 items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-sm font-medium text-slate-100 transition-colors hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300"
                 >
                   {copied === 'embed' ? (
                     <Check className="w-4 h-4 text-brand-green-400" />

@@ -234,8 +234,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Illustrative Environmental cleaning instructor supervising surface disinfection',
   },
   'cpr-first-aid': {
-    card: '/images/refresh-20261014/healthcare.webp',
-    hero: '/images/refresh-20261014/healthcare.webp',
+    card: '/images/pages/cpr-first-aid.webp',
+    hero: '/images/pages/cpr-first-aid.webp',
     alt: 'Illustrative CPR instructor supervising adult learners practicing on a manikin',
   },
   'barber-apprenticeship': {

@@ -122,6 +122,7 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
             {websites.map((site) => {
               const liveUrl = site.subdomain && site.is_published ? `/sites/${encodeURIComponent(site.subdomain)}` : null;
               const tenantUrl = site.subdomain && site.is_published ? `https://${site.subdomain}.app.elevateforhumanity.org` : null;
+              const isLegacy83 = site.site_name?.toLowerCase().includes('legacy 83');
               return (
                 <article key={site.id} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                   <div className="flex items-start justify-between gap-3">
@@ -136,6 +137,7 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
                     <p>{site.is_published ? 'Public tenant site is enabled' : 'Private draft — not visible publicly'}</p>
                     {site.updated_at ? <p className="text-xs text-slate-400">Updated {new Date(site.updated_at).toLocaleString()}</p> : null}
                   </div>
+                  {isLegacy83 && <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-950"><strong>Integration checkpoint:</strong> The website project exists. GitHub repository linkage, dedicated Supabase access, application deployment and end-to-end tests must be verified separately before customer handoff. Published status alone is not proof of readiness.</div>}
                   <div className="mt-6 flex flex-wrap gap-2">
                     <Link href={`/apps/website-builder/edit/${site.id}`} className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-bold text-white"><Pencil className="h-4 w-4" /> Edit</Link>
                     {liveUrl && <a href={liveUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700"><ExternalLink className="h-4 w-4" /> Preview on Elevate</a>}

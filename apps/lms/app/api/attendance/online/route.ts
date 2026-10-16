@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { LMS_HOST } from '@/lib/routing/portal-map';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
@@ -39,7 +40,12 @@ export async function GET() {
 }
 export async function POST(request: NextRequest) {
   const origin = request.headers.get('origin');
-  if (!origin || origin !== request.nextUrl.origin)
+  // Cloud Run's internal request origin can differ from the public LMS origin.
+  // Trust the configured portal, never caller-supplied forwarding headers.
+  const expectedOrigin = new URL(LMS_HOST).origin;
+  const localDevelopment =
+    process.env.NODE_ENV !== 'production' && origin === request.nextUrl.origin;
+  if (!origin || (origin !== expectedOrigin && !localDevelopment))
     return NextResponse.json({ error: 'Invalid request origin.' }, { status: 403 });
   const client = await createClient();
   const {

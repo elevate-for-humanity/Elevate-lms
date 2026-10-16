@@ -134,3 +134,55 @@ jobs:
             console.log(JSON.stringify({trialVmStopped:true,persistentDiskRetained:true,productionBrowserReady:true,productionDestinationVerified:true}));
           }
           NODE
+  repair-inventory-access:
+    needs: repair
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 10
+    concurrency:
+      group: google-project-iam-repair
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Repair asset inventory availability and verify actual resource search
+        run: |
+          node --input-type=module <<'NODE'
+          import {spawnSync} from 'node:child_process';
+          const project='elegant-racer-299721';
+          const run=args=>spawnSync('gcloud',[...args,'--project='+project,'--quiet'],{encoding:'utf8',timeout:120000,maxBuffer:16*1024*1024});
+          const enabled=run(['services','list','--enabled','--format=value(config.name)']);
+          if(enabled.status!==0)throw Error('Cannot inspect enabled APIs; no IAM change made');
+          if(!enabled.stdout.split(/\s+/).includes('cloudasset.googleapis.com')){
+            const enable=run(['services','enable','cloudasset.googleapis.com']);
+            if(enable.status!==0)throw Error('Cloud Asset Inventory API enable failed; no IAM change made');
+          }
+          const search=()=>run(['asset','search-all-resources','--scope=projects/'+project,'--limit=1','--format=json']);
+          let result=search();
+          if(result.status!==0){
+            if(!/cloudasset\.assets\.searchAllResources/.test(result.stderr||'')||!/PERMISSION_DENIED|permission.*denied/i.test(result.stderr||'')){
+              console.log(JSON.stringify({assetSearchVerified:false,permissionDenied:/PERMISSION_DENIED|permission.*denied/i.test(result.stderr||''),apiUnavailable:/SERVICE_DISABLED|has not been used|is disabled/i.test(result.stderr||'')}));
+              throw Error('Asset search failed without the exact resource-search permission diagnosis; no IAM change made');
+            }
+            const grant=run(['projects','add-iam-policy-binding',project,'--member=serviceAccount:elevate-github-deploy@'+project+'.iam.gserviceaccount.com','--role=roles/cloudasset.viewer','--condition=None','--format=value(etag)']);
+            if(grant.status!==0)throw Error('Read-only Cloud Asset Viewer binding could not be applied');
+            for(let i=0;i<6;i++){
+              result=search();if(result.status===0)break;
+              await new Promise(resolve=>setTimeout(resolve,5000));
+            }
+          }
+          if(result.status!==0)throw Error('Resource search remains unavailable');
+          if(!Array.isArray(JSON.parse(result.stdout)))throw Error('Unexpected inventory response');
+          console.log(JSON.stringify({assetSearchVerified:true,scope:project,resourceMetadataOnly:true}));
+          NODE
+      - name: Verify complete bounded cost inventory
+        run: node scripts/gcp/audit-cost-resources.mjs

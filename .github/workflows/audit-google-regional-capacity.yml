@@ -34,6 +34,12 @@ jobs:
         with: {node-version: '22'}
       - name: Compare primary and secondary regions without changing resources
         run: node scripts/gcp/audit-runtime-capacity.mjs
+      - name: Test cost inventory redaction and read-only behavior
+        if: always()
+        run: node --test scripts/gcp/audit-cost-resources.test.mjs
+      - name: Inventory project resources without provisioning or deleting anything
+        if: always()
+        run: node scripts/gcp/audit-cost-resources.mjs
       - name: Read regional allocation without changing services
         run: |
           python - <<'PY'

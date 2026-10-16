@@ -7,7 +7,7 @@ permissions:
   contents: read
   id-token: write
 concurrency:
-  group: google-course-queue-dispatch
+  group: google-course-runtime-operations
   cancel-in-progress: false
 jobs:
   dispatch:

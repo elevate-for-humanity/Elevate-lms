@@ -2,7 +2,7 @@ name: Verify Google teaching photographs
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/verify-google-teaching-photos.yml']
+    paths: ['.github/workflows/verify-google-teaching-photos.yml', 'scripts/gcp/probe-course-photo-provider.mjs', 'lib/ultimate-course-builder/adapters/google-teaching-photo.mjs']
   workflow_dispatch:
 permissions:
   contents: read

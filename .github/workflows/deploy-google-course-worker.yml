@@ -197,6 +197,8 @@ jobs:
         env:
           IMAGE_SHA: ${{ github.sha }}
         run: node scripts/gcp/deploy-course-job.mjs
+      - name: Synchronize approved regional worker image and verify readback
+        run: node scripts/gcp/sync-course-worker-regions.mjs
       - name: Dispatch queued work through the existing overlap guard
         env:
           COURSE_WORKER_PARALLELISM: '1'

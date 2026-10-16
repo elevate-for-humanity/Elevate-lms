@@ -25,10 +25,27 @@ function compact(service) {
   };
 }
 const report={project,checkedAt:new Date().toISOString(),regions:{}};
+// Access tokens are plain text, not JSON; obtain separately and never report it.
+const tokenResult=spawnSync('gcloud',['auth','print-access-token'],{encoding:'utf8',timeout:15000});
+const token=tokenResult.status===0?tokenResult.stdout.trim():null;
 for (const region of regions) {
   const services=query(['run','services','list','--region='+region]);
   const jobs=query(['run','jobs','list','--region='+region]);
+  let quotas={error:'quota_read_unavailable'};
+  if(token) {
+    try {
+      const entries=await Promise.all(['CpuAllocPerProjectRegion','MemAllocPerProjectRegion'].map(async id=>{
+        const response=await fetch('https://cloudquotas.googleapis.com/v1/projects/484736877039/locations/global/services/run.googleapis.com/quotaInfos/'+id,{headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(15000)});
+        if(!response.ok)return [id,{httpStatus:response.status}];
+        const body=await response.json();
+        const dimensions=body.dimensionsInfos?.find(x=>x.dimensions?.region===region);
+        return [id,{value:dimensions?.details?.value??null}];
+      }));
+      quotas=Object.fromEntries(entries);
+    }catch{quotas={error:'quota_read_unavailable'};}
+  }
   report.regions[region]={
+    quotas,
     services:Array.isArray(services)?services.map(compact):services,
     jobs:Array.isArray(jobs)?jobs.map(j=>({name:j.metadata?.name,parallelism:j.spec?.template?.spec?.parallelism,taskCount:j.spec?.template?.spec?.taskCount,limits:j.spec?.template?.spec?.template?.spec?.containers?.[0]?.resources?.limits})):jobs,
   };

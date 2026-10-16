@@ -28,6 +28,12 @@ jobs:
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v3
         with: {skip_install: true}
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Compare primary and secondary regions without changing resources
+        run: node scripts/gcp/audit-runtime-capacity.mjs
       - name: Read regional allocation without changing services
         run: |
           python - <<'PY'

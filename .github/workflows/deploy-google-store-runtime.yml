@@ -78,7 +78,7 @@ jobs:
   deploy:
     needs: validate
     concurrency:
-      group: google-production-store
+      group: google-runtime-us-central1
       # Finish the active tested release; queue the latest main update.
       cancel-in-progress: false
     if: needs.validate.outputs.ready == 'true'

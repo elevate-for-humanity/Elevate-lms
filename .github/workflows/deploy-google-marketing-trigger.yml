@@ -76,7 +76,7 @@ jobs:
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-marketing-trigger.yml/dispatches" -f ref=main
   deploy:
     concurrency:
-      group: google-production-marketing
+      group: google-runtime-us-central1
       cancel-in-progress: false
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04

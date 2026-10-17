@@ -105,6 +105,15 @@ jobs:
         run: node --experimental-strip-types --test scripts/gcp/public-runtime-service.test.mjs scripts/gcp/verify-public-health.test.mjs scripts/gcp/verify-runtime-readiness.test.mjs scripts/gcp/preflight-web-rollout.test.mjs
       - name: Verify automatic container memory policy
         run: node scripts/check-build-memory-policy.mjs --source-only
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: { skip_install: true }
+      - name: Verify project billing and empty upload admission before building
+        run: node scripts/gcp/preflight-billing.mjs
       - name: Build shared commerce application for Store
         run: |
           set -euo pipefail
@@ -117,7 +126,8 @@ jobs:
       - name: Test actual Store container identity and health routing
         timeout-minutes: 5
         run: node scripts/gcp/smoke-marketing-container.mjs
-      - uses: google-github-actions/auth@v3
+      - name: Refresh Google credentials after build
+        uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main

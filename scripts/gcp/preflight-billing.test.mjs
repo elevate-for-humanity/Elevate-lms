@@ -29,6 +29,8 @@ test('paid build paths check billing before Docker and refresh credentials befor
     ['build-google-migration-images.yml', 'Build existing Dockerfile', 'Upload versioned image'],
     ['deploy-google-marketing-trigger.yml', 'Install dependencies and validate', 'Push Marketing image'],
     ['deploy-google-course-worker.yml', 'Build existing CPU Course Builder image', 'Upload immutable worker image'],
+    ['deploy-admin.yml', 'Build the Admin image', 'Upload and deploy the exact Admin image'],
+    ['deploy-google-store-runtime.yml', 'Build shared commerce application for Store', 'Upload tested Store image'],
   ]) {
     const source = readFileSync(new URL('../../.github/workflows/' + file, import.meta.url), 'utf8');
     const guard = source.indexOf('node scripts/gcp/preflight-billing.mjs');

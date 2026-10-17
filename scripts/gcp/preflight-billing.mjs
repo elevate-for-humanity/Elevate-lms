@@ -1,7 +1,9 @@
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import { verifyArtifactUpload } from './preflight-artifact-upload.mjs';
 
-// Read-only guard: never enable billing, change accounts, or print payment details.
+// Read-only project billing check. The CLI also tests/cancels an empty registry
+// upload; neither path enables billing, changes accounts or prints payment data.
 export function verifyBilling(project, run = execFileSync) {
   if (!/^[a-z][a-z0-9-]{4,28}[a-z0-9]$/.test(project || '')) throw new Error('A valid Google project ID is required');
   let info;
@@ -19,6 +21,10 @@ export function verifyBilling(project, run = execFileSync) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  try { console.info(JSON.stringify(verifyBilling(process.env.GOOGLE_CLOUD_PROJECT || 'elegant-racer-299721'))); }
+  try {
+    const billing=verifyBilling(process.env.GOOGLE_CLOUD_PROJECT || 'elegant-racer-299721');
+    const artifact=await verifyArtifactUpload();
+    console.info(JSON.stringify({...billing,...artifact}));
+  }
   catch (error) { console.error(error.message); process.exitCode = 1; }
 }

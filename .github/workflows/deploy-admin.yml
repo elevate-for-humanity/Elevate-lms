@@ -119,6 +119,8 @@ jobs:
           skip_install: true
       - name: Verify Google SDK
         run: node scripts/gcp/verify-sdk.mjs
+      - name: Verify project billing and empty upload admission before building
+        run: node scripts/gcp/preflight-billing.mjs
       - name: Verify automatic container memory policy
         run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build the Admin image
@@ -136,6 +138,12 @@ jobs:
             --build-arg "BUILD_TIMESTAMP=$(date -u +%FT%TZ)" \
             --build-arg NEXT_PUBLIC_SUPABASE_URL \
             --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY .
+      - name: Refresh Google credentials after build
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - name: Upload and deploy the exact Admin image
         shell: bash
         run: |

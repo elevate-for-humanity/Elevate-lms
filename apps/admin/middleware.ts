@@ -151,6 +151,11 @@ export async function middleware(req: NextRequest) {
   // the configured phone system. Do not admit other internal phone paths.
   if (pathname === '/api/internal/phone/voicemail') return NextResponse.next();
 
+  // Only this exact route uses signed GitHub OIDC instead of a browser cookie.
+  // Middleware admits the request to the handler; authorizeParisWorkflow
+  // verifies issuer, audience, signature, repo, branch and workflow before work.
+  if (pathname === '/api/cron/paris-code-repair') return NextResponse.next();
+
   if (isPublicPath(pathname)) return NextResponse.next();
 
   // Scheduled jobs have no browser session. Admit every cron route only when

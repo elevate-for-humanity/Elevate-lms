@@ -81,8 +81,6 @@ jobs:
           if not included: raise SystemExit('ADMIN_REVISION_PRE_DATES_PARIS_DIAGNOSTIC')
           PY
       - name: Verify PARIS GitHub credential via protected read-only diagnostic
-        env:
-          PARIS_ID_TOKEN: ${{ env.PARIS_ID_TOKEN }}
         run: |
           python3 - <<'PY'
           import os,json,urllib.request,urllib.error,sys

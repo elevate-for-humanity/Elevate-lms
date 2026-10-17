@@ -32,13 +32,17 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import {execFileSync} from 'node:child_process';
+          let stage='service_read';
           try {
-            const read=(args,format)=>JSON.parse(execFileSync('gcloud',[...args,'--project=elegant-racer-299721','--region=us-central1','--format='+format],{encoding:'utf8',timeout:30000,stdio:['ignore','pipe','pipe']}));
+            const read=(args,format)=>JSON.parse(execFileSync('gcloud',[...args,'--project=elegant-racer-299721','--region=us-central1','--format=json'],{encoding:'utf8',timeout:30000,stdio:['ignore','pipe','pipe']}));
             const service=read(['run','services','describe','elevate-studio-browser'],'json(status.latestReadyRevisionName,status.traffic)');
             const name=process.env.STUDIO_VERIFY_REVISION||service.status?.latestReadyRevisionName;
             if(!/^elevate-studio-browser-[a-z0-9-]+$/.test(name||''))throw Error('invalid_revision');
+            stage='revision_read';
             const revision=read(['run','revisions','describe',name],'json(metadata.name,spec.serviceAccountName,spec.containers.image,spec.containers.resources.limits)');
+            stage='revision_metadata';
+            if(!Array.isArray(revision.spec?.containers))throw Error('revision_metadata_invalid');
             console.log(JSON.stringify({readOnly:true,inspectedRevision:name,latestReadyRevision:service.status?.latestReadyRevisionName,runtimeIdentity:revision.spec.serviceAccountName,containers:revision.spec.containers.map(c=>({image:c.image,resources:c.resources?.limits})),traffic:(service.status?.traffic||[]).map(t=>({revision:t.revisionName,percent:t.percent||0,tag:t.tag||null})),productionTrafficChanged:false}));
             if(revision.spec?.serviceAccountName!=='elevate-studio-runtime@elegant-racer-299721.iam.gserviceaccount.com')throw Error('dedicated_identity_not_attached');
-          } catch(e) {console.error(JSON.stringify({error:'STUDIO_RUNTIME_READBACK_UNVERIFIED',reason:['invalid_revision','dedicated_identity_not_attached'].includes(e.message)?e.message:'metadata_command_failed'}));process.exitCode=1;}
+          } catch(e) {console.error(JSON.stringify({error:'STUDIO_RUNTIME_READBACK_UNVERIFIED',stage,commandExitCode:Number.isInteger(e.status)?e.status:null,reason:['invalid_revision','dedicated_identity_not_attached','revision_metadata_invalid'].includes(e.message)?e.message:'metadata_command_failed'}));process.exitCode=1;}
           NODE

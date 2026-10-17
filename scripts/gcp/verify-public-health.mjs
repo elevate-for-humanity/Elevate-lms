@@ -8,6 +8,7 @@ export const sites = {
   store: 'https://store.elevateforhumanity.org',
 };
 
+const quickBooksReasons = new Set(['oauth_configuration_missing', 'webhook_verifier_missing']);
 const safeError = error => ['TimeoutError', 'AbortError', 'TypeError', 'SyntaxError'].includes(error?.name) ? error.name : 'probe_failed';
 function dependencyEvidence(value) {
   if (!value || typeof value !== 'object') return undefined;
@@ -43,7 +44,11 @@ export async function verifySite(component, request = fetch) {
       const body = await r.json();
       results.push({ component, path: '/api/health/quickbooks', status: r.status,
         passed: r.status === 200 && body.ready === true && body.connected === true &&
-          body.configured === true && body.webhookVerifierConfigured === true });
+          body.configured === true && body.webhookVerifierConfigured === true,
+        reason: quickBooksReasons.has(body.reason) ? body.reason : undefined,
+        configured: typeof body.configured === 'boolean' ? body.configured : undefined,
+        connected: typeof body.connected === 'boolean' ? body.connected : undefined,
+        webhookVerifierConfigured: typeof body.webhookVerifierConfigured === 'boolean' ? body.webhookVerifierConfigured : undefined });
     } catch { results.push({ component, path: '/api/health/quickbooks', passed: false, error: 'probe_failed' }); }
   }
   return results;

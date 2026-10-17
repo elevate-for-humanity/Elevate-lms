@@ -17,8 +17,6 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { formatUsPhone, parseBusinessHours } from '@/lib/phone/config';
 import { PHONE_MANAGER_ROLES } from '@/lib/phone/access';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { telnyxClient } from '@/lib/phone/telnyx';
-import { resolveSendingNumber } from '@/lib/phone/sending-number';
 import {
   CapabilityGuide,
   NewSystemNotice,
@@ -176,27 +174,10 @@ export default async function PhonePage() {
     ['Calls', callsResult.count ?? 0, Workflow],
     ['New voicemail', voicemailResult.count ?? 0, Voicemail],
   ] as const;
-  let carrierRuntimeReady = false;
-  try {
-    const client = await telnyxClient();
-    const configuredNumber = await resolveSendingNumber(db);
-    if (configuredNumber) {
-      for await (const item of client.phoneNumbers.list({
-        filter: { phone_number: configuredNumber },
-        'page[size]': 20,
-      })) {
-        if (item.phone_number === configuredNumber) {
-          carrierRuntimeReady = true;
-          break;
-        }
-      }
-    }
-  } catch {
-    carrierRuntimeReady = false;
-  }
-  const carrierReady =
-    carrierRuntimeReady &&
-    numbers.some((number: any) => number.source === 'provider' && number.status === 'active');
+  // The legacy Telnyx API cannot establish Twilio/PBX readiness.
+  // Carrier readiness must remain false until the approved, non-mutating
+  // Twilio trunk and real inbound/outbound acceptance has succeeded.
+  const carrierReady = false;
   const meetingReady = workspaceResult.data?.status === 'active';
   const primaryNumber = numbers.find(
     (number: any) =>

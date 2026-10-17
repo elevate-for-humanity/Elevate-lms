@@ -11,7 +11,7 @@ const competencyId='e8df8cf3-74cf-455b-93dd-8ea6ee732cc8';
 const referenceHash='6921ebb2f049e0183fa2f5cfebaa1a9a6e2a8242a672daebbdcb251ca0a96fc2';
 const registry=`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker`;
 
-function runtimeSpec(spec){
+export function runtimeSpec(spec){
   const copy=structuredClone(spec);
   function visit(value){
     if(!value||typeof value!=='object')return;
@@ -22,7 +22,10 @@ function runtimeSpec(spec){
     }
     Object.values(value).forEach(visit);
   }
-  visit(copy);return copy;
+  visit(copy);
+  const ordered=value=>Array.isArray(value)?value.map(ordered):value&&typeof value==='object'
+    ?Object.fromEntries(Object.keys(value).sort().map(key=>[key,ordered(value[key])])):value;
+  return ordered(copy);
 }
 
 export function previewRuntime(job){
@@ -39,7 +42,7 @@ export function previewRuntime(job){
   return {task,env};
 }
 
-export async function ownerLessonPreview({execute=false,sha,run=google,request=fetch,capacity=inspectRegionalCapacity}={}){
+export async function ownerLessonPreview({execute=false,sha,reuseCandidate=false,run=google,request=fetch,capacity=inspectRegionalCapacity}={}){
   const scope=['--project='+PROJECT,'--region='+region];
   const read=args=>JSON.parse(run([...args,...scope,'--format=json']));
   const before=read(['run','jobs','describe',name]);
@@ -72,14 +75,16 @@ export async function ownerLessonPreview({execute=false,sha,run=google,request=f
     bucket:b2.ELEVATE_MEDIA_BUCKET,connectionSource,executionStarted:false,releaseHoldChanged:false};
   if(!execute)return evidence;
   if(!/^[a-f0-9]{40}$/.test(sha??''))throw Error('OWNER_PREVIEW_EXACT_SOURCE_REQUIRED');
-  const digest=run(['artifacts','docker','images','describe',registry+':owner-preview-'+sha,'--project='+PROJECT,'--format=value(image_summary.digest)']);
+  const imageSource=reuseCandidate?'7df4b69695748dbc6dd7a122300be9ed4ee44893':sha;
+  const digest=run(['artifacts','docker','images','describe',registry+':owner-preview-'+imageSource,'--project='+PROJECT,'--format=value(image_summary.digest)']);
   if(!/^sha256:[a-f0-9]{64}$/.test(digest))throw Error('OWNER_PREVIEW_IMMUTABLE_IMAGE_REQUIRED');
+  if(reuseCandidate&&digest!=='sha256:52aae3310bf3e0baad12bbb5cdb97499ab1d24138705a22ec0615bda1122ca6d')throw Error('OWNER_PREVIEW_TESTED_CANDIDATE_REQUIRED');
   const image=registry+'@'+digest;
   const current=read(['run','jobs','describe',name]);
   if(JSON.stringify(runtimeSpec(current.spec))!==JSON.stringify(runtimeSpec(before.spec)))throw Error('OWNER_PREVIEW_RUNTIME_CHANGED');
   if(read(['run','jobs','executions','list','--job='+name]).some(e=>!isTerminalExecution(e)))
     throw Error('OWNER_PREVIEW_EXISTING_EXECUTION_ACTIVE');
-  run(['run','jobs','update',name,...scope,'--image='+image,'--quiet']);
+  if(task.containers[0].image!==image)run(['run','jobs','update',name,...scope,'--image='+image,'--quiet']);
   const deployed=read(['run','jobs','describe',name]);
   const expected=structuredClone(before.spec);expected.template.spec.template.spec.containers[0].image=image;
   if(JSON.stringify(runtimeSpec(deployed.spec))!==JSON.stringify(runtimeSpec(expected)))throw Error('OWNER_PREVIEW_IMAGE_ONLY_READBACK_FAILED');
@@ -92,10 +97,10 @@ export async function ownerLessonPreview({execute=false,sha,run=google,request=f
   if(changed.length!==1)throw Error('OWNER_PREVIEW_JOB_CHANGED');
   // CLI values contain existing storage credentials: suppress all raw CLI output.
   run(['run','jobs','execute',name,...scope,'--tasks=1','--update-env-vars=^|^'+Object.entries(overrides).map(([k,v])=>k+'='+v).join('|'),'--async','--quiet']);
-  return {...evidence,image,executionStarted:true};
+  return {...evidence,image,imageSource,executionStarted:true};
 }
 
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
-  try{console.log(JSON.stringify(await ownerLessonPreview({execute:process.env.OWNER_PREVIEW_EXECUTE==='true',sha:process.env.GITHUB_SHA})));}
+  try{console.log(JSON.stringify(await ownerLessonPreview({execute:process.env.OWNER_PREVIEW_EXECUTE==='true',sha:process.env.GITHUB_SHA,reuseCandidate:process.env.OWNER_PREVIEW_REUSE_CANDIDATE==='true'})));}
   catch(error){console.error(JSON.stringify({error:/^(OWNER_PREVIEW_|COURSE_B2_)[A-Z0-9_]+$/.test(error?.message??'')?error.message:'OWNER_PREVIEW_CONTROL_FAILED',code:error.code??null}));process.exitCode=1;}
 }

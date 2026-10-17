@@ -33,12 +33,12 @@ export default async function ApplicationManagementPage() {
             <td className="max-w-sm break-words p-3">{app.serving.length?app.serving.map(row=><div key={row.revision} className="mb-2"><div>{row.revision} · {row.percent}%</div><div className="mt-1 text-xs text-slate-500">Commit: {row.commit?row.commit.slice(0,12):'Not verified'}</div></div>):'Not a traffic-serving service'}</td>
             <td className="p-3">{app.kind==='job'?`${app.configured.cpu??'Unknown'} CPU / ${app.configured.memory??'Unknown'}`:app.serving.map(row=><div key={row.revision}>{row.cpu??'Unknown'} CPU / {row.memory??'Unknown'}</div>)}</td>
             <td className="p-3">{app.kind==='job'?`Parallelism: ${app.configured.parallelism??'Unknown'}`:`Min: ${app.configured.minInstances??'Unknown'} / max: ${app.configured.maxInstances??'Unknown'}`}</td>
-            <td className="p-3 text-slate-500">Usage not measured here<br/>Billing not verified</td>
+            <td className="p-3 text-slate-500">{app.observedUsage?app.observedUsage.revisions.map(row=><div key={row.revision} className="mb-3 text-xs"><strong>{row.revision}</strong><div>CPU mean: {row.cpuPercent?`${row.cpuPercent.value.toFixed(1)}%`:'Not observed'}</div><div>Memory mean: {row.memoryPercent?`${row.memoryPercent.value.toFixed(1)}%`:'Not observed'}</div><div>Active: {row.activeInstances?.value??'Unknown'} / idle: {row.idleInstances?.value??'Unknown'}</div><div>Sample: {row.cpuPercent?.sampledAt??row.memoryPercent?.sampledAt??row.activeInstances?.sampledAt??row.idleInstances?.sampledAt}</div></div>):'No recent usage samples'}<div>Billing not verified</div></td>
           </tr>)}</tbody>
         </table>
         {!inventory.applications.length&&<p className="p-4 text-sm text-slate-600">No verified application inventory is available from this runtime.</p>}
       </section>
-      <p className="text-sm text-slate-600">CPU and memory show configured allocations, not current consumption. Google readiness does not establish payment, database, or customer acceptance. This view reads infrastructure metadata; changes use the controlled release process.</p>
+      <p className="text-sm text-slate-600">CPU and memory allocations are configured limits. Usage percentages are recent Google Monitoring distribution means for serving revisions, with sample times; missing samples do not establish zero usage. Google readiness does not establish payment, database, or customer acceptance. This view reads infrastructure metadata; changes use the controlled release process.</p>
     </div>
   </main>;
 }

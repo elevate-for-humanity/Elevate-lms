@@ -3,6 +3,8 @@
  * Stripe checkout: POST /api/store/platform-checkout
  */
 
+import { COMMERCIAL_AI_MONTHLY_CREDITS, COMMERCIAL_AI_REPLY_COST } from '@/lib/platform/commercial-ai-usage-policy';
+
 import type { PlatformFeatureKey } from '@/lib/platform/features';
 import { PlatformFeature } from '@/lib/platform/features';
 
@@ -386,6 +388,14 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     bullets: ['Adds 100 GB', 'Documents and media storage'],
   },
 ];
+
+for (const addon of ADD_ON_MARKETPLACE) {
+  if (Object.hasOwn(COMMERCIAL_AI_MONTHLY_CREDITS, addon.slug)) {
+    const credits = COMMERCIAL_AI_MONTHLY_CREDITS[addon.slug as keyof typeof COMMERCIAL_AI_MONTHLY_CREDITS];
+    addon.bullets.push(`${credits.toLocaleString()} assistant processing credits per paid month`);
+    addon.usageNote = `${COMMERCIAL_AI_REPLY_COST} credits per reply attempt. Annual payments fund 12 months upfront. Credits expire with their paid period; generation pauses at the limit without automatic overage charges.`;
+  }
+}
 
 export function getBasePlan(id: string): BasePlanDefinition | null {
   if (id in BASE_PLANS) return BASE_PLANS[id as BasePlanId];

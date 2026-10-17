@@ -38,6 +38,7 @@ await db.exec(
     'utf8',
   ),
 );
+await db.exec(readFileSync(root + 'supabase/migrations/20261017070802_commercial_ai_paid_allowances.sql','utf8'));
 let checks = 0;
 async function scalar(sql, params = []) {
   return Object.values((await db.query(sql, params)).rows[0])[0];
@@ -178,6 +179,40 @@ assert.equal(
   false,
 );
 checks++;
+// Assistant pools are invoice-backed, tenant-scoped, expiring and idempotent.
+const aiTenant='20000000-0000-4000-8000-000000000002';
+const otherTenant='20000000-0000-4000-8000-000000000003';
+await db.query('insert into tenants values($1),($2)',[aiTenant,otherTenant]);
+for(const [n,interval,addon,amount,allowance] of [[6,'monthly','paris-assistant',4800,250],[7,'annual','ai-team',123800,14400]]) {
+ const invoice=`10000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
+ await db.query(`insert into billing_invoices values($1,'open',now(),'USD','platform_subscription',$2::jsonb,'organization:org',$3,'quickbooks')`,[invoice,JSON.stringify({tenant_id:aiTenant,organization_id:'org',billing_interval:interval,addon_codes:[addon],amount_cents:amount}),amount]);
+ await rejects('select grant_commercial_ai_paid_invoice_v1($1)',[invoice]);
+ await db.query(`update billing_invoices set status='paid' where id=$1`,[invoice]);
+ assert.equal(await scalar('select grant_commercial_ai_paid_invoice_v1($1)',[invoice]),true);checks++;
+ assert.equal(await scalar('select grant_commercial_ai_paid_invoice_v1($1)',[invoice]),false);checks++;
+ assert.equal(await scalar('select balance from commercial_ai_credit_periods where billing_invoice_id=$1',[invoice]),allowance);checks++;
+}
+let aiUsage=(await db.query(`select * from consume_commercial_ai_reply_v1($1,$2,'paris','reply-1')`,[aiTenant,courseUser])).rows[0];
+assert.deepEqual(aiUsage,{success:true,duplicate:false,balance:14640});checks++;
+aiUsage=(await db.query(`select * from consume_commercial_ai_reply_v1($1,$2,'paris','reply-1')`,[aiTenant,courseUser])).rows[0];
+assert.equal(aiUsage.duplicate,true);checks++;
+assert.equal(await scalar('select sum(balance)::integer from commercial_ai_credit_periods where tenant_id=$1',[aiTenant]),14640);checks++;
+aiUsage=(await db.query(`select * from consume_commercial_ai_reply_v1($1,$2,'paris','other-tenant')`,[otherTenant,courseUser])).rows[0];
+assert.equal(aiUsage.success,false);checks++;
+await db.query('update commercial_ai_credit_periods set balance=5 where tenant_id=$1',[aiTenant]);
+aiUsage=(await db.query(`select * from consume_commercial_ai_reply_v1($1,$2,'paris','split-debit')`,[aiTenant,courseUser])).rows[0];
+assert.deepEqual(aiUsage,{success:true,duplicate:false,balance:0});checks++;
+assert.equal(await scalar(`select jsonb_array_length(debits) from commercial_ai_credit_usage where tenant_id=$1 and idempotency_key='split-debit'`,[aiTenant]),2);checks++;
+await db.query('update commercial_ai_credit_periods set balance=100 where tenant_id=$1',[aiTenant]);
+await db.query(`update billing_invoices set status='void' where id in(select billing_invoice_id from commercial_ai_credit_periods where tenant_id=$1)`,[aiTenant]);
+aiUsage=(await db.query(`select * from consume_commercial_ai_reply_v1($1,$2,'paris','void-invoices')`,[aiTenant,courseUser])).rows[0];
+assert.equal(aiUsage.success,false);checks++;
+await db.query(`update billing_invoices set status='paid' where id in(select billing_invoice_id from commercial_ai_credit_periods where tenant_id=$1)`,[aiTenant]);
+await db.query(`update commercial_ai_credit_periods set period_start=now()-interval '2 months',period_end=now()-interval '1 month' where tenant_id=$1`,[aiTenant]);
+aiUsage=(await db.query(`select * from consume_commercial_ai_reply_v1($1,$2,'paris','expired-invoices')`,[aiTenant,courseUser])).rows[0];
+assert.equal(aiUsage.success,false);checks++;
+await rejects(`select consume_commercial_ai_reply_v1($1,$2,'toString','bad-agent')`,[aiTenant,courseUser]);
+assert.equal(await scalar(`select has_function_privilege('authenticated','public.consume_commercial_ai_reply_v1(uuid,uuid,text,text)','EXECUTE')`),false);checks++;
 await db.exec(`set test.role='authenticated'`);
 await rejects(`select activate_paid_website_builder_v1('10000000-0000-4000-8000-000000000001')`);
 await rejects(

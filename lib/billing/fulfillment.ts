@@ -1,4 +1,5 @@
 import 'server-only';
+import { COMMERCIAL_AI_MONTHLY_CREDITS } from '@/lib/platform/commercial-ai-usage-policy';
 import { randomBytes } from 'node:crypto';
 import { getOrganizationFeatures } from '@/lib/platform/organization-features';
 import { syncLicenseFromSaasEntitlements } from '@/lib/platform/sync-license-from-saas';
@@ -557,6 +558,12 @@ export async function fulfillPaidBillingInvoice(
       { onConflict: 'organization_id' },
     );
     if (subscription.error) throw new Error(subscription.error.message);
+    if ((payload.addon_codes || []).some((code: string) => Object.hasOwn(COMMERCIAL_AI_MONTHLY_CREDITS, code))) {
+      const credits = await db.rpc('grant_commercial_ai_paid_invoice_v1', {
+        p_invoice_id: job.billing_invoice_id,
+      });
+      if (credits.error) throw new Error(credits.error.message);
+    }
     if ((payload.addon_codes || []).includes('course-creation-learning-platform')) {
       const credits = await db.rpc('grant_course_builder_paid_invoice_v1', {
         p_invoice_id: job.billing_invoice_id,

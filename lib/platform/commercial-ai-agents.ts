@@ -53,5 +53,5 @@ export const COMMERCIAL_AI_AGENTS: Record<CommercialAgentId, CommercialAgentDefi
 };
 
 export function getCommercialAgent(id: string): CommercialAgentDefinition | null {
-  return id in COMMERCIAL_AI_AGENTS ? COMMERCIAL_AI_AGENTS[id as CommercialAgentId] : null;
+  return Object.hasOwn(COMMERCIAL_AI_AGENTS, id) ? COMMERCIAL_AI_AGENTS[id as CommercialAgentId] : null;
 }

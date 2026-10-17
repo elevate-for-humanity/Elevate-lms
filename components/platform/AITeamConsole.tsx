@@ -69,7 +69,7 @@ export default function AITeamConsole({ initialAgent = 'paris', title = 'Your AI
     try {
       const response = await fetch('/api/platform/agent-chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': crypto.randomUUID() },
         body: JSON.stringify({ agent: agentId, unified, message, history: currentMessages }),
       });
       const data = await response.json();

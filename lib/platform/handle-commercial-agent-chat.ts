@@ -8,6 +8,9 @@ import { getCommercialAgent } from '@/lib/platform/commercial-ai-agents';
 import type { ChatMessage } from '@/lib/ai/types';
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
+import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { reserveCommercialAiReply, CommercialAiCreditsError } from '@/lib/platform/commercial-ai-credits';
+import { COMMERCIAL_AI_INPUT_LIMITS } from '@/lib/platform/commercial-ai-usage-policy';
 import { consumeWebsiteBuilderCredits } from '@/lib/apps/website-builder-trial';
 
 export async function handleCommercialAgentChat(request: NextRequest) {
@@ -20,6 +23,9 @@ export async function handleCommercialAgentChat(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return NextResponse.json({ error: 'JSON object required' }, { status: 400 });
+  }
 
   // Capability selection changes task context, never subscription or role grants.
   const unified = body.unified === true;
@@ -30,11 +36,11 @@ export async function handleCommercialAgentChat(request: NextRequest) {
   const agent = getCommercialAgent(unified ? capability : typeof body.agent === 'string' ? body.agent.toLowerCase() : '');
   if (!agent) return NextResponse.json({ error: 'Unknown AI assistant' }, { status: 400 });
 
-  const message = typeof body.message === 'string' ? body.message.trim().slice(0, 6000) : '';
+  const message = typeof body.message === 'string' ? body.message.trim().slice(0, COMMERCIAL_AI_INPUT_LIMITS.messageCharacters) : '';
   if (!message) return NextResponse.json({ error: 'message is required' }, { status: 400 });
 
   let access = await requireFeatureForAuth(request, agent.feature);
-  let trialCredits: { charged: number; balance: number | null } | null = null;
+  let usageCredits: { charged: number; balance: number | null } | null = null;
 
   if (access instanceof NextResponse) {
     const supabase = await createClient();
@@ -51,6 +57,11 @@ export async function handleCommercialAgentChat(request: NextRequest) {
       );
     }
 
+    // Check trial eligibility before debiting. Paid Website Builder access does
+    // not itself grant the separately sold organization assistant add-on.
+    const builderAccess = await getWebsiteBuilderAccess(user.id, supabase);
+    if (!builderAccess.allowed || builderAccess.status !== 'trial') return access;
+
     const credit = await consumeWebsiteBuilderCredits(supabase, user.id, 'assistant_chat');
     if (!credit.allowed || !credit.isTrial) {
       return NextResponse.json(
@@ -64,19 +75,33 @@ export async function handleCommercialAgentChat(request: NextRequest) {
       );
     }
 
-    trialCredits = { charged: credit.charged, balance: credit.balance };
+    usageCredits = { charged: credit.charged, balance: credit.balance };
     access = { userId: user.id, tenantId: 'website-builder-trial' };
+  } else {
+    try {
+      usageCredits = await reserveCommercialAiReply({
+        tenantId: access.tenantId, userId: access.userId, agent: agent.id,
+        idempotencyKey: request.headers.get('idempotency-key'),
+      });
+    } catch (error) {
+      const known = error instanceof CommercialAiCreditsError;
+      return NextResponse.json({
+        error: known ? error.message : 'Usage verification is temporarily unavailable',
+        code: known ? error.code : 'USAGE_UNAVAILABLE',
+        upgradeUrl: '/store/plans',
+      }, { status: known ? error.status : 503 });
+    }
   }
 
   const history: ChatMessage[] = Array.isArray(body.history)
     ? body.history
         .filter((item: any) => item && ['user', 'assistant'].includes(item.role) && typeof item.content === 'string')
-        .slice(-20)
-        .map((item: any) => ({ role: item.role, content: item.content.slice(0, 6000) }))
+        .slice(-COMMERCIAL_AI_INPUT_LIMITS.historyMessages)
+        .map((item: any) => ({ role: item.role, content: item.content.slice(0, COMMERCIAL_AI_INPUT_LIMITS.historyMessageCharacters) }))
     : [];
 
   const organizationContext = typeof body.organizationContext === 'string'
-    ? body.organizationContext.trim().slice(0, 8000)
+    ? body.organizationContext.trim().slice(0, COMMERCIAL_AI_INPUT_LIMITS.contextCharacters)
     : '';
 
   const prompt = `${unified ? PARIS_SYSTEM_IDENTITY : agent.role}\n\n${organizationContext ? `Organization context:\n${organizationContext}\n\n` : ''}User request:\n${message}`;
@@ -87,13 +112,14 @@ export async function handleCommercialAgentChat(request: NextRequest) {
       prompt,
       context: {
         commercialIdentity: !unified,
+        skipRAG: true,
         history,
         userId: access.userId,
         sessionId: typeof body.sessionId === 'string' ? body.sessionId.slice(0, 160) : undefined,
         instructorName: unified ? 'PARIS' : agent.name,
         instructorPersona: unified ? PARIS_SYSTEM_IDENTITY : agent.role,
       },
-      maxTokens: 1800,
+      maxTokens: COMMERCIAL_AI_INPUT_LIMITS.outputTokens,
       temperature: 0.35,
     });
 
@@ -103,8 +129,8 @@ export async function handleCommercialAgentChat(request: NextRequest) {
       tenantId: access.tenantId,
       tokensUsed: result.tokensUsed,
       provider: result.provider,
-      trialCreditsCharged: trialCredits?.charged ?? 0,
-      trialCreditsRemaining: trialCredits?.balance ?? null,
+      usageCreditsCharged: usageCredits?.charged ?? 0,
+      usageCreditsRemaining: usageCredits?.balance ?? null,
     });
 
     return NextResponse.json({
@@ -113,15 +139,15 @@ export async function handleCommercialAgentChat(request: NextRequest) {
       response: result.content,
       provider: result.provider,
       tokensUsed: result.tokensUsed ?? null,
-      creditsCharged: trialCredits?.charged ?? 0,
-      creditsRemaining: trialCredits?.balance ?? null,
+      creditsCharged: usageCredits?.charged ?? 0,
+      creditsRemaining: usageCredits?.balance ?? null,
     });
   } catch (error) {
     logger.error('[commercial-ai] assistant failed', error instanceof Error ? error : new Error(String(error)), { agent: agent.id });
     return NextResponse.json({
       error: `${agent.name} is temporarily unavailable`,
-      creditsCharged: trialCredits?.charged ?? 0,
-      creditsRemaining: trialCredits?.balance ?? null,
+      creditsCharged: usageCredits?.charged ?? 0,
+      creditsRemaining: usageCredits?.balance ?? null,
     }, { status: 503 });
   }
 }

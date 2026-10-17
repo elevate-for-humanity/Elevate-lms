@@ -7,7 +7,7 @@ on:
       mode:
         description: Validate existing connections first, or build and execute one isolated preview
         type: choice
-        options: [validate, execute]
+        options: [validate, execute, execute-tested-candidate]
         default: validate
         required: true
 permissions:
@@ -41,6 +41,15 @@ jobs:
           for(const name of ['CI Required Gate','Security Audit','integrity','static-safety'])
             if(!checks.some(c=>c.name===name&&c.status==='completed'&&c.conclusion==='success'))throw Error('OWNER_PREVIEW_SOURCE_CHECK_REQUIRED:'+name);
           NODE
+          if [ '${{ inputs.mode }}' = 'execute-tested-candidate' ]; then
+            gh api 'repos/elevate-for-humanity/Elevate-lms/commits/7df4b69695748dbc6dd7a122300be9ed4ee44893/check-runs?per_page=100' > "$RUNNER_TEMP/tested-candidate-checks.json"
+            node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const checks=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/tested-candidate-checks.json','utf8')).check_runs;
+          for(const name of ['CI Required Gate','Security Audit','integrity','static-safety'])
+            if(!checks.some(c=>c.name===name&&c.status==='completed'&&c.conclusion==='success'))throw Error('OWNER_PREVIEW_CANDIDATE_CHECK_REQUIRED:'+name);
+          NODE
+          fi
       - name: Verify single-job isolation and preserved source contracts
         run: node --test scripts/gcp/owner-lesson-preview.test.mjs scripts/gcp/resolve-owner-preview-b2.test.mjs lib/video/owner-preview-media-delivery.test.mjs lib/ultimate-course-builder/worker/owner-preview-claim.test.mjs workers/worker-loop.test.mjs workers/process-job-state.test.mjs tests/worker/complete-lesson-before-advance.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs
       - uses: google-github-actions/auth@v3
@@ -65,19 +74,22 @@ jobs:
             lib/ultimate-course-builder/worker/owner-preview-claim.test.mjs workers/worker-loop.test.mjs \
             /app/tests/worker/complete-lesson-before-advance.test.mjs /app/tests/unit/ultimate-renderer-assignments.test.mjs
       - uses: google-github-actions/auth@v3
-        if: inputs.mode == 'execute'
+        if: inputs.mode != 'validate'
         with:
           project_id: elegant-racer-299721
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
           service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - name: Push the tested candidate and run only the requested lesson
-        if: inputs.mode == 'execute'
+        if: inputs.mode != 'validate'
         env:
           OWNER_PREVIEW_EXECUTE: 'true'
+          OWNER_PREVIEW_REUSE_CANDIDATE: ${{ inputs.mode == 'execute-tested-candidate' }}
         run: |
           set -euo pipefail
-          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker:owner-preview-$GITHUB_SHA"
+          if [ '${{ inputs.mode }}' = 'execute' ]; then
+            IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker:owner-preview-$GITHUB_SHA"
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
           docker tag "owner-lesson-preview:$GITHUB_SHA" "$IMAGE"
           docker push "$IMAGE"
+          fi
           node scripts/gcp/owner-lesson-preview.mjs

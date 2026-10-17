@@ -4,6 +4,54 @@ This is an incomplete release, not a production-readiness certificate. Productio
 
 ## Latest release attempt and additional repairs
 
+### Owner-prepared Studio identity accepted at 19:09:38 UTC
+
+The owner ran the prepared identity setup in Google Cloud Shell and received
+`bindingsVerified: true`, `applicationDeployed: false`, `sessionsMoved: false`.
+GitHub subsequently verified the same boundary using its existing deployment
+identity: run `39061203171`, job `117479370847`, reported attachment and secret/
+storage bindings verified for `elevate-studio-runtime@elegant-racer-299721.iam.gserviceaccount.com`.
+This check was read-only. It did not grant project-wide service-account creation
+or policy-management permissions to GitHub; those broader permissions remain
+unavailable and are unnecessary to reuse the owner's prepared Studio identity.
+
+Routine Studio release now verifies the prepared identity rather than rerunning
+owner-only service-account policy mutations. Candidate-only mode retains serving
+traffic and Admin configuration, requires CI on the exact commit, refreshes
+Google credentials after build, checks actual registry admission, and reserves
+2 CPU / 4 GiB alongside all effective regional workloads before deployment.
+A candidate must prove startup/readiness, anonymous denial, authorized workspace
+access and actual browser foundation operations including encrypted provider
+checkpoint restoration. Its temporary tag is released after verification while
+the revision is retained; minimum instances for the serving application remain 1.
+
+Candidate source: `c6522874c028cee96b0ef67ad1fcd964f960d935`.
+Acceptance run: `39061807783`, job `117481136157`, succeeded at 19:22:46 UTC.
+Revision `elevate-studio-browser-00041-muw` proved readiness, authorized workspace
+access and anonymous denial. All 14 live foundation checks passed, including
+encrypted provider checkpoint recovery, session identity, keyboard/pointer,
+frames, popups/tabs, uploads, downloads, dialogs, scrolling and history. The
+actual container suite passed 95 tests with zero skips; its 16 CDP integration
+tests also passed twice. Image digest:
+`sha256:f0607739918d3a30d61d14b9a0a444d25303ecea1d748247d5d3352e629665bb`.
+The live capacity gate reserved 17 vCPU / 36 GiB against 20 vCPU / 40 GiB. This
+is configured rollout capacity, not measured instantaneous utilization. The
+candidate tag was released, revision retained, and serving traffic/Admin were
+not switched. Final independent metadata readback is recorded separately. The superseded run `39061612514` was cancelled: its local container
+build completed, but image publication and Cloud Run deployment were skipped.
+No production revision was created by that superseded run.
+
+Fresh public checks returned HTTP 200 for ping, health, readiness and version
+on Marketing, LMS, Admin and Store; all four still report application commit
+`accd052e05ff0d66c6a9370da77085bf254fecd5`. Auth and database dependency checks
+passed. QuickBooks health still returned HTTP 503 and is not production-accepted.
+The course build remained running with a live lease at 19:19:00 UTC, phase
+`finished:lesson_film_render`; this is not a completed-job assertion.
+
+General browser-tab, terminal-process and workspace restoration remain separate
+open acceptance gates. Candidate browser/provider tests must not be represented
+as a generic workspace restoration certificate or full platform separation.
+
 ### Registry admission verified at 17:56:58 UTC
 
 Manual verification run `39055933365`, job `117463784171`, passed on main
@@ -188,7 +236,7 @@ Renderer monitoring reads succeeded but returned no samples in the preflight win
 
 ## Concrete blockers
 
-1. GitHub deployer still lacks project-level `iam.serviceAccounts.create` and IAM policy-management permissions needed to establish new dedicated identities. Existing scoped actAs access for Admin/LMS/Marketing/Store is allowed; do not confuse this with authority to create Studio/Legacy/tax identities. A project owner can execute the prepared `scripts/gcp/prepare-studio-service-identity.mjs` for Studio, which grants only its existing secret, auth bucket and deployer actAs binding. Do not grant Owner/Editor or fall back to Admin's runtime identity.
+1. GitHub deployer still lacks project-level `iam.serviceAccounts.create` and IAM policy-management permissions needed to establish new dedicated identities. Existing scoped actAs access for Admin/LMS/Marketing/Store is allowed; do not confuse this with authority to create Studio/Legacy/tax identities. The owner has now completed `scripts/gcp/prepare-studio-service-identity.mjs`, and GitHub verified the scoped Studio attachment, auth-secret and auth-bucket bindings. Routine releases verify those existing grants. New Legacy/tax identities remain a separate provisioning boundary. Do not grant Owner/Editor or fall back to Admin's runtime identity.
 2. Store credential migration, scoped secret binding, provider authorization and sandbox purchase-to-order acceptance remain incomplete. Marketing bootstrap inheritance is retained until the independent configuration is verified.
 3. Studio currently uses Admin's identity. Only Envato provider auth state has existing encrypted persistence; generic browser sessions, terminals and local workspace restoration have not passed restart/reconnection acceptance. Preserve min=1; do not move or scale to zero yet.
 4. Legacy authentication, customer data and Academy still span recovered Firebase code and the dedicated Supabase foundation. Its own PayPal/QuickBooks merchant authorization is not verified.

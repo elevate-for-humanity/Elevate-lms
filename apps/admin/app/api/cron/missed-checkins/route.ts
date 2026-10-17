@@ -92,21 +92,22 @@ async function _GET(request: NextRequest) {
               },
             }),
           },
-        );
+        ).catch(() => null);
 
         results.push({
           student: student?.full_name,
           employer: employer.contact_name,
-          status: response.ok ? 'alert_sent' : 'failed',
+          status: response?.ok ? 'alert_sent' : 'failed',
         });
       }
     }
 
+    const success = results.every((result) => result.status === 'alert_sent');
     return NextResponse.json({
-      success: true,
+      success,
       alerts_sent: results.filter((result) => result.status === 'alert_sent').length,
       results,
-    });
+    }, { status: success ? 200 : 503 });
   } catch (error) {
     logger.error('Missed check-ins cron error:', error);
     return NextResponse.json({ error: 'Failed to check missed check-ins' }, { status: 500 });

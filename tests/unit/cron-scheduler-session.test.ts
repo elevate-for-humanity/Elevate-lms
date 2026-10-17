@@ -35,6 +35,16 @@ for (const [name, handler] of [['missed-checkins', missed], ['morning-reminders'
       expect(r.status).toBe(200);
       expect(fetch).toHaveBeenCalledWith('https://app.elevateforhumanity.org/api/apprentice/email-alerts', expect.objectContaining({ headers: expect.objectContaining({ authorization: 'Bearer scheduler-secret' }), signal: expect.any(AbortSignal) }));
     });
+    it('reports downstream failure and never marks an unsuccessful reminder as sent', async () => {
+      const apprenticeship = { id: 'enrollment', student: { full_name: 'Learner', email: 'learner@example.test' }, employer: { contact_email: 'host@example.test' } };
+      state.rows = name === 'morning-reminders' ? [{ id: 'reminder', apprenticeship }] : [apprenticeship];
+      vi.mocked(fetch).mockRejectedValue(new Error('network unavailable'));
+      const r = await handler(new NextRequest(`https://admin.elevateforhumanity.org/api/cron/${name}`, { headers: { authorization: 'Bearer scheduler-secret' } }));
+      expect(r.status).toBe(503);
+      const body = await r.json(); expect(body.success).toBe(false);
+      expect(body[name === 'morning-reminders' ? 'sent' : 'alerts_sent']).toBe(0);
+      expect(chain.update).not.toHaveBeenCalled();
+    });
     it('returns success for an empty queue without a user cookie', async () => {
       const r = await handler(new NextRequest(`https://admin.elevateforhumanity.org/api/cron/${name}`, { headers: { authorization: 'Bearer scheduler-secret' } }));
       expect(r.status).toBe(200);

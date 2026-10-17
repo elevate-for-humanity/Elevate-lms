@@ -79,15 +79,15 @@ async function _GET(request: NextRequest) {
             },
           }),
         },
-      );
+      ).catch(() => null);
 
       results.push({
         student: apprenticeship.student.full_name,
-        status: response.ok ? 'sent' : 'failed',
+        status: response?.ok ? 'sent' : 'failed',
       });
 
       // A failed delivery must remain eligible for the next scheduled attempt.
-      if (!response.ok) continue;
+      if (!response?.ok) continue;
       const { error: updateError } = await supabase
         .from('apprentice_notifications')
         .update({ last_sent_at: new Date().toISOString() })
@@ -95,11 +95,12 @@ async function _GET(request: NextRequest) {
       if (updateError) throw updateError;
     }
 
+    const success = results.every((result) => result.status === 'sent');
     return NextResponse.json({
-      success: true,
+      success,
       sent: results.filter((result) => result.status === 'sent').length,
       results,
-    });
+    }, { status: success ? 200 : 503 });
   } catch (error) {
     logger.error('Morning reminders cron error:', error);
     return NextResponse.json({ error: 'Failed to send morning reminders' }, { status: 500 });

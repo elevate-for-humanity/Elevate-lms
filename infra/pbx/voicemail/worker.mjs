@@ -42,6 +42,9 @@ async function scan(){
   if(await realpath(folder).catch(()=>null)!==folder)continue;
   for(const filename of await readdir(folder)){
    if(!/^msg[0-9]+[.]txt$/.test(filename))continue;
+   // One malformed or temporarily failing recording must not prevent the
+   // remaining mailboxes from being delivered during this scan.
+   try {
    const audioName=folder+'/'+filename.replace(/[.]txt$/,'.wav');
    if(await realpath(audioName).catch(()=>null)!==audioName)continue;
    const audioStat=await stat(audioName);
@@ -56,6 +59,11 @@ async function scan(){
    if(!response.ok){process.stderr.write('OWNED_VOICEMAIL_INGEST_REQUIRES_RETRY_'+response.status+String.fromCharCode(10));continue;}
    const result=await response.json();if(result.saved!==true)throw Error('VOICEMAIL_SAVE_UNCONFIRMED');
    await writeFile(ledger+'/'+id,JSON.stringify({saved:true,transcriptAvailable:result.transcriptAvailable===true}),{mode:0o600,flag:'wx'});
+   } catch {
+    // Keep the original Asterisk recording and retry on the next scan.
+    // Do not log caller information, audio, SIP credentials, or transcripts.
+    process.stderr.write('OWNED_VOICEMAIL_MESSAGE_REQUIRES_RETRY'+String.fromCharCode(10));
+   }
   }
  }
 }

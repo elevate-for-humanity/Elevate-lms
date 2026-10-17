@@ -8,9 +8,9 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET() {
-  await hydrateProcessEnv();
-  const db = await requireAdminClient();
   try {
+    await hydrateProcessEnv();
+    const db = await requireAdminClient();
     const config = await loadQuickBooksConfig(db);
     const configured = Boolean(
       config.clientId &&
@@ -19,7 +19,7 @@ export async function GET() {
       config.refreshToken &&
       config.realmId,
     );
-    const webhookVerifierConfigured = Boolean(process.env.QB_WEBHOOK_VERIFIER_TOKEN);
+    const webhookVerifierConfigured = Boolean(process.env.QB_WEBHOOK_VERIFIER_TOKEN || process.env.QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN);
     if (!configured) {
       return NextResponse.json(
         {

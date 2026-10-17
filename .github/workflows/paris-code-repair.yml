@@ -43,9 +43,7 @@ jobs:
             fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
           })().catch(err=>{console.error(err.message);process.exitCode=1});
           NODE
-      - env:
-          PARIS_ID_TOKEN: ${{ env.PARIS_ID_TOKEN }}
-        run: |
+      - run: |
           python - <<'PYCODE'
           import os,json,urllib.request,urllib.error
           req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=json.dumps({'phase':'tick'}).encode(),headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'Content-Type':'application/json'})
@@ -84,7 +82,6 @@ jobs:
         id: patch
         env:
           ADMIN_URL: https://admin.elevateforhumanity.org
-          PARIS_ID_TOKEN: ${{ env.PARIS_ID_TOKEN }}
           REPAIR_ID: ${{ inputs.repair_id }}
         run: |
           python - <<'PY'
@@ -189,7 +186,6 @@ jobs:
           NODE
       - name: Publish only the independently validated immutable patch
         env:
-          PARIS_ID_TOKEN: ${{ env.PARIS_ID_TOKEN }}
           REPAIR_ID: ${{ inputs.repair_id }}
         run: |
           python - <<'PY'
@@ -222,7 +218,6 @@ jobs:
           })().catch(err=>{console.error(err.message);process.exitCode=1});
           NODE
       - env:
-          PARIS_ID_TOKEN: ${{ env.PARIS_ID_TOKEN }}
           REPAIR_ID: ${{ inputs.repair_id }}
         run: |
           python - <<'PY'

@@ -19,10 +19,11 @@ export async function loadQuickBooksConfig(db: Database): Promise<QuickBooksConf
   // refreshed access/refresh tokens remain in app_settings because they rotate.
   await hydrateProcessEnv();
   const keys = ['QB_CLIENT_ID', 'QB_CLIENT_SECRET', 'QB_ACCESS_TOKEN', 'QB_REFRESH_TOKEN', 'QB_REALM_ID'];
-  const { data } = await db.from('app_settings').select('key,value').in('key', keys);
+  const { data, error } = await db.from('app_settings').select('key,value').in('key', keys);
+  if (error) throw new Error('QuickBooks connection settings could not be loaded.');
   const stored = Object.fromEntries((data || []).map((row: any) => [row.key, row.value]));
   const value = (key: string) => stored[key] || process.env[key] || '';
-  return { clientId: value('QB_CLIENT_ID'), clientSecret: value('QB_CLIENT_SECRET'), accessToken: value('QB_ACCESS_TOKEN'), refreshToken: value('QB_REFRESH_TOKEN'), realmId: value('QB_REALM_ID') };
+  return { clientId: process.env.QB_CLIENT_ID || stored.QB_CLIENT_ID || '', clientSecret: process.env.QB_CLIENT_SECRET || stored.QB_CLIENT_SECRET || '', accessToken: value('QB_ACCESS_TOKEN'), refreshToken: value('QB_REFRESH_TOKEN'), realmId: value('QB_REALM_ID') };
 }
 
 async function refreshQuickBooksToken(db: Database, config: QuickBooksConfig): Promise<string> {
@@ -34,11 +35,16 @@ async function refreshQuickBooksToken(db: Database, config: QuickBooksConfig): P
   });
   if (!response.ok) throw new Error('QuickBooks authorization expired. Reconnect QuickBooks.');
   const token = await response.json();
+  if (typeof token.access_token !== 'string' || !token.access_token.trim() ||
+      (token.refresh_token !== undefined && (typeof token.refresh_token !== 'string' || !token.refresh_token.trim()))) {
+    throw new Error('QuickBooks returned an invalid authorization response.');
+  }
   const rows = [
     { key: 'QB_ACCESS_TOKEN', value: token.access_token, updated_at: new Date().toISOString() },
     ...(token.refresh_token ? [{ key: 'QB_REFRESH_TOKEN', value: token.refresh_token, updated_at: new Date().toISOString() }] : []),
   ];
-  await db.from('app_settings').upsert(rows, { onConflict: 'key' });
+  const { error } = await db.from('app_settings').upsert(rows, { onConflict: 'key' });
+  if (error) throw new Error('QuickBooks authorization refreshed, but could not be saved. Reconnect QuickBooks before retrying.');
   return token.access_token;
 }
 

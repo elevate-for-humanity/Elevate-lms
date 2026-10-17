@@ -252,6 +252,7 @@ export async function middleware(req: NextRequest) {
   let response = NextResponse.next({ request: { headers: requestHeaders } });
   const supabase = createMiddlewareSupabaseClient(req, (cookiesToSet) => {
     cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
+    requestHeaders.set('cookie', req.cookies.toString());
     response = NextResponse.next({ request: { headers: requestHeaders } });
     cookiesToSet.forEach(({ name, value, options }) => {
       response.cookies.set(name, value, cookieOptions(name, options as Record<string, unknown>) as any);
@@ -260,7 +261,9 @@ export async function middleware(req: NextRequest) {
 
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) {
-    return loginRedirect();
+    const redirect = loginRedirect();
+    for (const cookie of response.cookies.getAll()) redirect.cookies.set(cookie);
+    return redirect;
   }
 
   response.headers.set('Cache-Control', 'private, no-store, max-age=0');

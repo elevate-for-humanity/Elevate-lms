@@ -134,7 +134,13 @@ export async function middleware(req: NextRequest) {
       error,
     } = await supabase.auth.getUser();
 
-    if (error || !user) return redirectToLogin(req, pathname);
+    if (error || !user) {
+      const redirect = redirectToLogin(req, pathname);
+      // Supabase clears revoked/expired sessions through setAll. Preserve those
+      // mutations on the actual response or the browser retries the stale token.
+      for (const cookie of response.cookies.getAll()) redirect.cookies.set(cookie);
+      return redirect;
+    }
   }
 
   response.cookies.set('__efh_pathname', pathname, {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -15,11 +15,11 @@ async function _GET(request: NextRequest) {
   try {
     // Verify cron secret
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = await createClient();
+    const supabase = await requireAdminClient();
     const today = new Date().toISOString().split('T')[0];
 
     // Get all active apprenticeships
@@ -75,10 +75,11 @@ async function _GET(request: NextRequest) {
 
       if (!todayLog && employer?.contact_email) {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_SITE_URL}/api/apprentice/email-alerts`,
+          `${process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhumanity.org'}/api/apprentice/email-alerts`,
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', authorization: `Bearer ${process.env.CRON_SECRET}` },
+            signal: AbortSignal.timeout(10_000),
             body: JSON.stringify({
               type: 'missed_checkin',
               apprenticeshipId: apprenticeship.id,
@@ -103,7 +104,7 @@ async function _GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      alerts_sent: results.length,
+      alerts_sent: results.filter((result) => result.status === 'alert_sent').length,
       results,
     });
   } catch (error) {

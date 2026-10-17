@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -15,11 +15,11 @@ async function _GET(request: NextRequest) {
   try {
     // Verify cron secret
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!process.env.CRON_SECRET || authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = await createClient();
+    const supabase = await requireAdminClient();
 
     // Get all active apprenticeships with notification settings
     const { data: notifications, error } = await supabase
@@ -63,10 +63,11 @@ async function _GET(request: NextRequest) {
 
       // Send reminder email
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SITE_URL}/api/apprentice/email-alerts`,
+        `${process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhumanity.org'}/api/apprentice/email-alerts`,
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', authorization: `Bearer ${process.env.CRON_SECRET}` },
+            signal: AbortSignal.timeout(10_000),
           body: JSON.stringify({
             type: 'checkin_reminder',
             apprenticeshipId: apprenticeship.id,
@@ -85,16 +86,18 @@ async function _GET(request: NextRequest) {
         status: response.ok ? 'sent' : 'failed',
       });
 
-      // Update last_sent_at
-      await supabase
+      // A failed delivery must remain eligible for the next scheduled attempt.
+      if (!response.ok) continue;
+      const { error: updateError } = await supabase
         .from('apprentice_notifications')
         .update({ last_sent_at: new Date().toISOString() })
         .eq('id', notification.id);
+      if (updateError) throw updateError;
     }
 
     return NextResponse.json({
       success: true,
-      sent: results.length,
+      sent: results.filter((result) => result.status === 'sent').length,
       results,
     });
   } catch (error) {

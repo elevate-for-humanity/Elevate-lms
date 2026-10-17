@@ -2,7 +2,7 @@ name: Inventory Google ownership and persistence
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/inventory-google-ownership.yml']
+    paths: ['.github/workflows/inventory-google-ownership.yml', 'scripts/gcp/inventory-google-ownership.mjs']
   workflow_dispatch:
 permissions:
   contents: read

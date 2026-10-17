@@ -222,6 +222,14 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     audit: true,
   },
   {
+    name: 'courses.health',
+    description: 'Read Course Builder capability, database, and instructional integrity checks.',
+    method: 'GET', path: '/api/admin/courses/health',
+    classification: 'read', risk: 'low', scope: 'platform',
+    allowedAgents: ['PARIS', 'ELLIE', 'LIZZY', 'ZORA'], allowedRoles: PRIVILEGED_ADMIN_ROLES,
+    approvalRequired: false, idempotent: true, timeoutMs: 30_000, retryAttempts: 1, audit: true,
+  },
+  {
     name: 'courses.status',
     description: 'Read canonical course worker, PARIS monitor, and checkpoint status. Never infer execution from a queue acknowledgment.',
     method: 'GET',

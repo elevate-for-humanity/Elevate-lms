@@ -1,4 +1,3 @@
-import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 /**
  * Admin application root layout.
  *
@@ -8,6 +7,7 @@ import { CommunicationTodos } from '@/components/communications/CommunicationTod
  * expose canned public actions inside a privileged workspace.
  */
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import './globals.css';
 import '../../../styles/contrast-guardrails.css';
 import '../../../styles/responsive-guardrails.css';
@@ -78,12 +78,13 @@ export default async function AdminGroupLayout({ children }: { children: React.R
       </head>
       <body className="admin-portal efh-contrast">
         <SupabaseConfigBootstrap />
-        <CommunicationTodos inboxPath="/phone/email" />
         <AdminPwaRegister />
         <AdminUpdateNotice />
         <I18nProvider>
           <BuildVersionSync />
-          <AdminApplicationChrome navSections={DEFAULT_NAV}>{children}</AdminApplicationChrome>
+          <Suspense fallback={<main className="min-h-dvh min-w-0">{children}</main>}>
+            <AdminApplicationChrome navSections={DEFAULT_NAV}>{children}</AdminApplicationChrome>
+          </Suspense>
         </I18nProvider>
       </body>
     </html>

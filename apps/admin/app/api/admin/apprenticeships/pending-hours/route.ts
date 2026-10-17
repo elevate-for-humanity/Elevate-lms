@@ -3,6 +3,7 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeInternalError } from '@/lib/api/safe-error';
+import { sameDayHoursLedger } from '@/lib/apprenticeship/admin-hours-model';
 import { loadAdminHours } from '@/lib/apprenticeship/admin-hours';
 
 export const runtime = 'nodejs';
@@ -14,12 +15,12 @@ export async function GET(req: NextRequest) {
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
   try {
-    const { entries } = await loadAdminHours(await requireAdminClient());
+    const { entries, ledger, programs } = await loadAdminHours(await requireAdminClient());
     return NextResponse.json(
       {
         entries: entries.filter(
           (e) => ['submitted', 'draft'].includes(e.status) && e.hours_worked > 0,
-        ),
+        ).map((entry) => ({ ...entry, review_ledger: sameDayHoursLedger(entry, ledger, programs) })),
         incompleteCount: entries.filter(
           (e) => ['submitted', 'draft'].includes(e.status) && e.hours_worked <= 0,
         ).length,

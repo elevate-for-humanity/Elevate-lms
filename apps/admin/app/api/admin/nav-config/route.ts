@@ -8,7 +8,11 @@ import { safeError } from '@/lib/api/safe-error';
 function normalizeAdminHref(href: string): string {
   if (href === '/') return '/';
   const withoutLegacyPrefix = href.replace(/^\/admin(?=\/|$)/, '');
-  return withoutLegacyPrefix.startsWith('/') ? withoutLegacyPrefix : `/${withoutLegacyPrefix}`;
+  const rootHref = withoutLegacyPrefix.startsWith('/') ? withoutLegacyPrefix : `/${withoutLegacyPrefix}`;
+  // Persisted navigation may predate the staff directory. Fix the link at its
+  // source instead of sending users through another compatibility redirect.
+  if (rootHref === '/instructors') return '/staff';
+  return rootHref;
 }
 
 function normalizeAdminNavSections(sections: NavSection[]): NavSection[] {

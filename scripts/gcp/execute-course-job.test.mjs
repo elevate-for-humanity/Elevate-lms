@@ -48,11 +48,16 @@ test('verified capacity permits exactly one finite task', async () => {
   assert.ok(launches[0].includes('--tasks=1'));
   assert.ok(launches[0].includes('--wait'));
 });
-test('scheduled and direct dispatchers share the worker deployment lane', () => {
-  for(const file of ['dispatch-google-course-queue.yml','dispatch-google-course-job.yml','execute-google-course-job.yml','deploy-google-course-job.yml']) {
+test('execution and deployment workflows share the worker lane; the delegator cannot deadlock it', () => {
+  for(const file of ['dispatch-google-course-job.yml','execute-google-course-job.yml','deploy-google-course-job.yml']) {
     const source=readFileSync(new URL('../../.github/workflows/'+file,import.meta.url),'utf8');
     assert.match(source,/group: google-course-runtime-operations\s+cancel-in-progress: false/);
   }
+  const delegator = readFileSync(new URL('../../.github/workflows/dispatch-google-course-queue.yml', import.meta.url), 'utf8');
+  assert.match(delegator, /group: google-course-queue-dispatch-request\s+cancel-in-progress: false/);
+  assert.match(delegator, /actions: write/);
+  assert.match(delegator, /workflows\/dispatch-google-course-job\.yml\/dispatches/);
+  assert.doesNotMatch(delegator, /google-github-actions\/auth|id-token: write|gcloud\s+run/);
 });
 test('permits an empty history and terminal failed or successful tasks', () => {
   assertNoActiveExecutions([]);

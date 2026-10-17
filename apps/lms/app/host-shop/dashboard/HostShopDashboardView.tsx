@@ -168,9 +168,8 @@ export default async function HostShopDashboardView() {
               </p>
               <h1 className="mt-2 text-3xl font-black text-slate-950">Host Shop PWA</h1>
               <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-700">
-                This neutral preview confirms that the Host Shop PWA is operational without
-                attaching Admin to a business record. Select a shop from the secured Admin dashboard
-                to open its audited portal.
+                No Host Shop is selected. Select a shop from the secured Admin dashboard
+                to open its saved records in the audited portal preview.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <a

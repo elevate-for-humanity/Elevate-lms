@@ -69,9 +69,8 @@ tests
 gha-creds-*.json
 **/gha-creds-*.json
 
-# Nested generated diagnostics, caches, and temporary workspaces
-**/reports
-**/logs
+# Nested generated caches and temporary workspaces
+# Do not exclude **/reports or **/logs: these names are live Next.js pages and API routes.
 **/tmp
 **/temp
 **/coverage

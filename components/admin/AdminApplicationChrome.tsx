@@ -1,8 +1,9 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { AdminNavShell } from '@/components/admin/AdminNavShell';
 import { AdminMobileDock } from '@/components/admin/AdminMobileDock';
+import { CommunicationTodos } from '@/components/communications/CommunicationTodos';
 import type { NavSection } from '@/lib/admin/nav-config';
 
 export function AdminApplicationChrome({
@@ -13,6 +14,11 @@ export function AdminApplicationChrome({
   navSections: NavSection[];
 }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  // Embedded tools retain their server authentication; only duplicate chrome is omitted.
+  if (searchParams.get('embedded') === 'studio') {
+    return <div data-elevate-embedded-tool className="min-h-dvh min-w-0 bg-white">{children}</div>;
+  }
   // Sign-in and account recovery are public forms, not dashboard documents.
   // Fixed dashboard navigation can cover their fields when a mobile keyboard opens.
   if (pathname === '/login' || pathname.startsWith('/auth/')) {
@@ -28,17 +34,20 @@ export function AdminApplicationChrome({
       data-elevate-dashboard-shell={studioOwnsViewport ? 'studio' : 'admin'}
       className={
         studioOwnsViewport
-          ? 'h-dvh min-w-0 overflow-hidden bg-white'
+          ? 'flex h-dvh min-w-0 flex-col overflow-hidden bg-white'
           : 'min-h-dvh min-w-0 overflow-x-clip bg-slate-50'
       }
     >
+      <div className={studioOwnsViewport ? 'max-h-[25dvh] shrink-0 overflow-y-auto' : ''}>
+        <CommunicationTodos inboxPath="/phone/email" />
+      </div>
       {!studioOwnsViewport ? <AdminNavShell navSections={navSections} /> : null}
       <main
         data-elevate-dashboard-content
         className={
           studioOwnsViewport
-            ? 'admin-studio-viewport h-full min-w-0 overflow-hidden'
-            : 'min-w-0 overflow-x-clip pb-16 lg:pb-0'
+            ? 'admin-studio-viewport min-h-0 min-w-0 flex-1 overflow-hidden'
+            : 'min-w-0 overflow-x-clip pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0'
         }
       >
         {children}

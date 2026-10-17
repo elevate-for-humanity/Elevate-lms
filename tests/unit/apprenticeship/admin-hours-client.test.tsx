@@ -30,6 +30,15 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 describe('hours queue', () => {
+  it('lets an administrator inspect blocked hours and their matching ledger without approving them', async () => {
+    fetchMock.mockResolvedValue(response({ entries: [{ ...entry, student_id: 'student', approval_blocker: 'Duplicate date', review_ledger: [{ id: 'ledger', source_type: 'timeclock', status: 'approved', hours_claimed: 8.25, accepted_hours: 8.25 }] }], incompleteCount: 0 }));
+    render(<HoursQueue />);
+    fireEvent.click(await screen.findByRole('button', { name: /Review Example Student/ }));
+    expect(screen.getByRole('region', { name: 'Review hours for Example Student' })).toHaveTextContent('8.25 accepted');
+    expect(screen.getByRole('link', { name: 'Open student record' })).toHaveAttribute('href', '/students/student');
+    expect(screen.getByRole('button', { name: /Approve Example Student/ })).toBeDisabled();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
   it('provides sign-in recovery for an expired session without parsing login HTML', async () => {
     fetchMock.mockResolvedValue({ status: 401, ok: false, json: vi.fn() });
     render(<HoursQueue />);

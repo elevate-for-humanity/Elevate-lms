@@ -6,6 +6,22 @@ function read(name, args, select) {
   try { report.resources[name] = select(JSON.parse(google([...args, '--project', PROJECT, '--format=json']))); }
   catch (error) { report.failures.push({ resource: name, reason: error.code ?? 'inventory_unavailable' }); }
 }
+// Enumerate the project rather than maintaining a hand-picked service list.
+// Do not include container environment variables or secret values in evidence.
+read('cloudRunServices', ['run', 'services', 'list', '--region=us-central1'], rows => rows.map(s => ({
+  name: s.metadata?.name, uri: s.status?.url,
+  latestReadyRevision: s.status?.latestReadyRevisionName,
+  latestCreatedRevision: s.status?.latestCreatedRevisionName,
+  conditions: (s.status?.conditions ?? []).map(c => ({ type: c.type, status: c.status, reason: c.reason })),
+  traffic: (s.status?.traffic ?? []).map(t => ({ revision: t.revisionName, percent: t.percent, tag: t.tag })),
+  limits: (s.spec?.template?.spec?.containers ?? []).map(c => c.resources?.limits),
+})));
+read('cloudRunJobs', ['run', 'jobs', 'list', '--region=us-central1'], rows => rows.map(j => ({
+  name: j.metadata?.name,
+  conditions: (j.status?.conditions ?? []).map(c => ({ type: c.type, status: c.status, reason: c.reason })),
+  latestCreatedExecution: j.status?.latestCreatedExecution,
+  limits: (j.spec?.template?.spec?.template?.spec?.containers ?? []).map(c => c.resources?.limits),
+})));
 read('instances', ['compute', 'instances', 'list'], rows => rows.map(v => ({
   name: v.name, zone: v.zone, status: v.status, machineType: v.machineType,
   disks: (v.disks ?? []).map(d => ({ source: d.source, deviceName: d.deviceName, autoDelete: d.autoDelete, boot: d.boot })),
@@ -21,6 +37,11 @@ read('deploymentRoles', ['projects', 'get-iam-policy', PROJECT], policy => (poli
 read('scheduler', ['scheduler', 'jobs', 'list', '--location=us-central1'], rows => rows.map(j => ({ name: j.name, schedule: j.schedule, state: j.state, target: j.httpTarget?.uri, serviceAccount: j.httpTarget?.oauthToken?.serviceAccountEmail ?? j.httpTarget?.oidcToken?.serviceAccountEmail })));
 read('buckets', ['storage', 'buckets', 'list'], rows => rows.map(b => ({ name: b.name, location: b.location, versioning: b.versioning?.enabled, uniformAccess: b.iamConfiguration?.uniformBucketLevelAccess?.enabled })));
 read('courseExecutions', ['run', 'jobs', 'executions', 'list', '--job=elevate-course-builder', '--region=us-central1', '--limit=5'], rows => rows.map(e => ({
+  name: e.metadata?.name, startedAt: e.status?.startTime, completedAt: e.status?.completionTime,
+  running: e.status?.runningCount, succeeded: e.status?.succeededCount, failed: e.status?.failedCount,
+  conditions: (e.status?.conditions ?? []).map(c => ({ type: c.type, status: c.status, reason: c.reason })),
+})));
+read('videoExecutions', ['run', 'jobs', 'executions', 'list', '--job=elevate-video-render', '--region=us-central1', '--limit=5'], rows => rows.map(e => ({
   name: e.metadata?.name, startedAt: e.status?.startTime, completedAt: e.status?.completionTime,
   running: e.status?.runningCount, succeeded: e.status?.succeededCount, failed: e.status?.failedCount,
   conditions: (e.status?.conditions ?? []).map(c => ({ type: c.type, status: c.status, reason: c.reason })),

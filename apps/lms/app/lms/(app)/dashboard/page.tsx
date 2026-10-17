@@ -1096,9 +1096,9 @@ function NeutralStudentPortalPreview() {
           </p>
           <h1 className="mt-2 text-3xl font-black text-slate-950">Student PWA</h1>
           <p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-700">
-            This neutral preview confirms that the Student PWA is operational. No learner identity,
-            enrollment, payment, progress, or career record is attached. Select a learner from
-            secured Admin student management to open an audited, read-only dashboard.
+            No learner is selected. Select a learner from secured Admin student management
+            to open their saved enrollment, payment, progress, and career records in an audited,
+            read-only dashboard preview.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <a

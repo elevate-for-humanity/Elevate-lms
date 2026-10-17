@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ArrowLeft, ChevronDown, Bell, LogOut, Search, Settings, Plus, Minus } from 'lucide-react';
+import { ArrowLeft, Bell, LogOut, Search, Settings } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import LogoImage from '@/components/site/LogoImage';
 import { DEFAULT_NAV, type NavSection } from '@/lib/admin/nav-config';
@@ -27,25 +27,21 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(href + '/');
 }
 
-function isSectionActive(pathname: string, section: NavSection) {
-  return section.items.some((item) => isActive(pathname, item.href));
-}
-
 export default function AdminNav({ userName = 'Admin', notifs = [], navSections }: AdminNavProps) {
   const NAV = navSections ?? DEFAULT_NAV;
   const pathname = usePathname();
   const router = useRouter();
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [navExpanded, setNavExpanded] = useState(false);
-  const navRef = useRef<HTMLDivElement>(null);
+  const currentSection = NAV.find((section) => section.items.some((item) => item.href === pathname))
+    ?? NAV.find((section) => section.items.some((item) => isActive(pathname, item.href)));
+  const [selectedSection, setSelectedSection] = useState(currentSection?.label ?? NAV[0]?.label ?? '');
+  const section = NAV.find((item) => item.label === selectedSection) ?? currentSection ?? NAV[0];
   const notifRef = useRef<HTMLDivElement>(null);
   const unread = notifs.filter((n) => n.unread).length;
 
   useEffect(() => {
     function handle(e: MouseEvent) {
-      if (navRef.current && !navRef.current.contains(e.target as Node)) setOpenDropdown(null);
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false);
     }
     document.addEventListener('mousedown', handle);
@@ -55,9 +51,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
   useEffect(() => {
     function handle(e: KeyboardEvent) {
       if (e.key === 'Escape') {
-        setOpenDropdown(null);
         setNotifOpen(false);
-        setNavExpanded(false);
       }
     }
     document.addEventListener('keydown', handle);
@@ -65,10 +59,9 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
   }, []);
 
   useEffect(() => {
-    setOpenDropdown(null);
     setNotifOpen(false);
-    setNavExpanded(false);
-  }, [pathname]);
+    setSelectedSection(currentSection?.label ?? NAV[0]?.label ?? '');
+  }, [pathname, currentSection?.label, NAV]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -90,7 +83,10 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
           {pathname !== '/dashboard' && (
             <button
               type="button"
-              onClick={() => router.back()}
+              onClick={() => {
+                if (window.history.length > 1) router.back();
+                else router.push('/dashboard');
+              }}
               aria-label="Go back"
               className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-950"
             >
@@ -104,53 +100,8 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
             </span>
           </Link>
 
-          {/* Desktop Navigation - Horizontal with dropdowns */}
-          <nav
-            ref={navRef}
-            aria-label="Admin section shortcuts"
-            className="hidden 2xl:flex items-center gap-0 flex-1 min-w-0"
-            style={{ scrollbarWidth: 'none' }}
-          >
-            {NAV.map((section) => {
-              const active = isSectionActive(pathname, section);
-              const open = openDropdown === section.label;
-              return (
-                <div key={section.label} className="relative flex-shrink-0 flex items-center">
-                  <Link
-                    href={section.href}
-                    className={`px-3 py-2 rounded-l-lg text-xs font-semibold whitespace-nowrap transition-colors ${active ? 'text-brand-red-700 bg-brand-red-50' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'}`}
-                  >
-                    {section.label}
-                  </Link>
-                  <button
-                    onClick={() => setOpenDropdown(open ? null : section.label)}
-                    aria-label={`Open ${section.label} menu`}
-                    className={`px-1 py-2 rounded-r-lg text-xs transition-colors ${active ? 'text-brand-red-700 bg-brand-red-50' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'}`}
-                  >
-                    <ChevronDown
-                      className={`w-2.5 h-2.5 transition-transform ${open ? 'rotate-180' : ''}`}
-                    />
-                  </button>
-                  {open && (
-                    <div className="absolute top-full left-0 mt-1 w-56 bg-white rounded-xl shadow-2xl border border-slate-200 py-1.5 z-50 max-h-[75vh] overflow-y-auto">
-                      {section.items.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className={`block px-4 py-2 text-sm transition-colors ${isActive(pathname, item.href) ? 'bg-brand-red-50 text-brand-red-700 font-semibold' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'}`}
-                        >
-                          {item.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </nav>
-
           <div className="ml-auto flex items-center gap-1">
-            {/* Core records stay visible at every breakpoint; the full catalog remains in All tools. */}
+            {/* Core records stay visible at every breakpoint; section navigation stays below. */}
             <div className="hidden items-center gap-1 min-[430px]:flex">
               <Link
                 href="/students"
@@ -248,6 +199,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               </Link>
               <span className="hidden px-1 text-sm text-slate-700 2xl:block">{userName}</span>
               <button
+                aria-label="Sign out"
                 onClick={signOut}
                 className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-rose-600 hover:bg-red-50"
               >
@@ -255,104 +207,26 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               </button>
             </div>
 
-            {/* Complete navigation catalog */}
-            <button
-              type="button"
-              onClick={() => setNavExpanded(!navExpanded)}
-              aria-expanded={navExpanded}
-              aria-controls="admin-all-tools-menu"
-              className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100 sm:px-3 sm:text-sm 2xl:hidden"
-            >
-              {navExpanded ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-              <span className="sm:hidden">Tools</span>
-              <span className="hidden sm:inline">All tools</span>
-            </button>
           </div>
         </div>
 
-        {NAV.some(
-          (section) =>
-            section.href === '/studio' ||
-            section.items.some(
-              (item) => item.href === '/studio' || item.href === '/studio/courses',
-            ),
-        ) && (
-          <nav
-            aria-label="Course tools"
-            className="flex flex-wrap gap-2 border-t border-slate-200 px-2 py-1"
-          >
-            <Link
-              href="/studio/courses"
-              className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-bold text-blue-800 hover:bg-blue-50"
-            >
-              Course Builder
-            </Link>
-            <Link
-              href="/studio/browser?provider=envato&signin=1"
-              className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-bold text-emerald-800 hover:bg-emerald-50"
-            >
-              Envato credentials
-            </Link>
-          </nav>
-        )}
-
-        <nav
-          aria-label="Full admin navigation"
-          className="flex w-full gap-2 overflow-x-auto overscroll-x-contain border-t border-slate-200 bg-slate-50 px-3 py-2 [scrollbar-width:thin] sm:hidden"
-        >
-          {[
-            ...new Map(
-              NAV.flatMap((section) => [
-                { label: section.label, href: section.href },
-                ...section.items,
-              ]).map((item) => [item.href, item]),
-            ).values(),
-          ].map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={isActive(pathname, item.href) ? 'page' : undefined}
-              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg border px-3 text-sm font-bold ${isActive(pathname, item.href) ? 'border-blue-700 bg-blue-700 text-white' : 'border-slate-200 bg-white text-slate-900 hover:bg-blue-50'}`}
-            >
+        <nav aria-label="Admin sections" className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain border-t border-slate-200 bg-slate-950 px-2 py-1 [scrollbar-width:thin]">
+          {NAV.map((item) => (
+            <button type="button" key={item.label} onClick={() => setSelectedSection(item.label)}
+              aria-pressed={section?.label === item.label}
+              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg px-3 text-sm font-bold ${section?.label === item.label ? 'bg-brand-red-600 text-white' : 'text-slate-100 hover:bg-slate-800'}`}>
+              {item.label}
+            </button>
+          ))}
+        </nav>
+        <nav aria-label="Admin pages" className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain border-t border-slate-200 bg-white px-2 py-1 [scrollbar-width:thin]">
+          {section?.items.map((item) => (
+            <Link key={item.href} href={item.href} aria-current={isActive(pathname, item.href) ? 'page' : undefined}
+              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg px-3 text-sm font-semibold ${isActive(pathname, item.href) ? 'bg-blue-700 text-white' : 'text-slate-800 hover:bg-blue-50'}`}>
               {item.label}
             </Link>
           ))}
         </nav>
-        {/* Horizontal Mobile Nav - Scrollable */}
-        <div
-          id="admin-all-tools-menu"
-          className={`overflow-hidden border-t border-slate-200 2xl:hidden ${navExpanded ? 'max-h-[min(65dvh,540px)]' : 'max-h-0'}`}
-        >
-          <div className="max-h-[calc(100dvh-3.5rem)] overflow-y-auto overscroll-contain px-2 py-3 sm:px-4">
-            <div className="grid gap-2 sm:grid-cols-2">
-              {NAV.map((section) => (
-                <details
-                  key={section.label}
-                  className="rounded-lg border border-slate-200 bg-white"
-                >
-                  <summary
-                    className={`flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-bold ${isSectionActive(pathname, section) ? 'bg-brand-red-50 text-brand-red-700' : 'text-slate-800'}`}
-                  >
-                    {section.label}
-                    <ChevronDown className="h-4 w-4" />
-                  </summary>
-                  <div className="border-t border-slate-100 p-1.5">
-                    {section.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setNavExpanded(false)}
-                        className={`block min-h-11 rounded-md px-3 py-2.5 text-sm ${isActive(pathname, item.href) ? 'bg-brand-red-50 font-semibold text-brand-red-700' : 'text-slate-700 hover:bg-slate-50'}`}
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
-                </details>
-              ))}
-            </div>
-          </div>
-        </div>
       </header>
 
       <style jsx>{`

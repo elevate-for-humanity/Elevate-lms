@@ -241,6 +241,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     ok: failCount === 0 && hasElevateOwnedAI && browserReachable && githubOk,
     summary: { okCount, warnCount, failCount },
+    message: checks.filter((check) => check.status === 'fail').map((check) => `${check.name}: ${check.detail}`).join(' | ') || 'Studio checks completed. Review warnings before execution.',
     checks,
     meta: {
       devcontainerMode: mode,

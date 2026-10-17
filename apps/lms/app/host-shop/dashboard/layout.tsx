@@ -83,9 +83,8 @@ export default async function HostShopDashboardLayout({ children }: { children: 
             </p>
             <h1 className="mt-2 text-3xl font-black capitalize text-slate-950">{moduleName}</h1>
             <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-slate-700">
-              This Host Shop module is operational. Shop apprentices, hours, wages, documents,
-              messages, and actions remain isolated until an administrator selects a specific shop
-              through the audited Admin workspace.
+              Select a Host Shop in Admin to view its apprentices, hours, wages, documents,
+              and messages. No shop is selected in this session.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a

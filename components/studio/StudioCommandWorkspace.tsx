@@ -106,6 +106,13 @@ export default function StudioCommandWorkspace({
       ? null
       : (initialWorkspace ?? null),
   );
+  const [visitedTools, setVisitedTools] = useState<Set<string>>(() => new Set());
+  const currentTool = surface === 'capability' ? activeCapability : surface;
+  useEffect(() => {
+    if (!currentTool || currentTool === 'commands') return;
+    setVisitedTools((visited) => visited.has(currentTool) ? visited : new Set([...visited, currentTool]));
+  }, [currentTool]);
+  const hasOpenedTool = (tool: string) => currentTool === tool || visitedTools.has(tool);
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const viewportStyle = useStudioViewport();
@@ -300,7 +307,7 @@ export default function StudioCommandWorkspace({
           </button>
         </div>
         <nav
-          aria-label="Command workflow"
+          aria-label="Studio modes"
           className="flex min-w-0 items-center gap-1 overflow-x-auto border-t border-slate-100 px-2 py-1.5"
         >
           <button
@@ -312,22 +319,31 @@ export default function StudioCommandWorkspace({
             aria-pressed={surface === 'commands'}
             className={`inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${surface === 'commands' ? 'bg-slate-100 text-slate-950' : 'text-slate-600 hover:bg-slate-50'}`}
           >
-            <MessageSquare className="h-4 w-4" aria-hidden="true" /> Commands
+            <MessageSquare className="h-4 w-4" aria-hidden="true" /> Chat
           </button>
           <button
             type="button"
             onClick={() => {
               setActiveCapability(null);
-              setSurface('course');
+              setSurface('browser');
             }}
-            aria-pressed={surface === 'course'}
-            className={`inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${surface === 'course' ? 'bg-slate-100 text-slate-950' : 'text-slate-600 hover:bg-slate-50'}`}
+            aria-pressed={surface !== 'commands'}
+            className={`inline-flex min-h-11 min-w-11 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${surface !== 'commands' ? 'bg-slate-100 text-slate-950' : 'text-slate-600 hover:bg-slate-50'}`}
           >
-            <PanelRightOpen className="h-4 w-4" aria-hidden="true" /> Course Builder live
+            <PanelRightOpen className="h-4 w-4" aria-hidden="true" /> Work
           </button>
           <span className="ml-2 hidden text-[11px] font-semibold text-slate-500 sm:inline">
             One workspace · governed workflow · verified evidence
           </span>
+        </nav>
+        <nav aria-label="Studio tools" className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain border-t border-blue-100 bg-blue-50 px-2 py-1 [scrollbar-width:thin]">
+          {workspaces.map((workspace) => (
+            <button type="button" key={workspace.id} onClick={() => openCapability(workspace.id)}
+              aria-pressed={currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course')}
+              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg px-3 text-xs font-bold ${currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course') ? 'bg-blue-700 text-white' : 'text-blue-950 hover:bg-blue-100'}`}>
+              {workspace.label}
+            </button>
+          ))}
         </nav>
       </header>
 
@@ -423,7 +439,7 @@ export default function StudioCommandWorkspace({
                 }}
                 className={`inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-md px-2 py-2 text-xs font-bold sm:min-h-0 sm:flex-none sm:px-3 ${surface === 'preview' || surface === 'course' ? 'bg-cyan-500 text-slate-950' : 'text-slate-700 hover:bg-slate-200'}`}
               >
-                <Eye className="h-4 w-4" aria-hidden="true" /> Preview
+                <Eye className="h-4 w-4" aria-hidden="true" /> {previewUrl ? 'Preview' : 'Course Builder'}
               </button>
               <button
                 type="button"
@@ -456,7 +472,7 @@ export default function StudioCommandWorkspace({
                 onClick={() => setSurface('commands')}
                 className="min-h-11 flex-1 rounded-md px-2 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 sm:min-h-0 sm:flex-none sm:px-3"
               >
-                Commands
+                Chat
               </button>
             </header>
             <div
@@ -467,7 +483,7 @@ export default function StudioCommandWorkspace({
                   surface === 'capability' && activeCapability === 'workflows' ? 'h-full' : 'hidden'
                 }
               >
-                <WorkflowsWorkspace embedded />
+                {hasOpenedTool('workflows') ? <WorkflowsWorkspace embedded /> : null}
               </div>
               <div
                 className={
@@ -476,14 +492,14 @@ export default function StudioCommandWorkspace({
                     : 'hidden'
                 }
               >
-                <IntelligenceWorkspace onAskAI={askAdminAI} />
+                {hasOpenedTool('intelligence') ? <IntelligenceWorkspace onAskAI={askAdminAI} /> : null}
               </div>
               <div
                 className={
                   surface === 'capability' && activeCapability === 'tasks' ? 'h-full' : 'hidden'
                 }
               >
-                <TasksWorkspace embedded conversationId={activeConversationId} />
+                {hasOpenedTool('tasks') ? <TasksWorkspace embedded conversationId={activeConversationId} /> : null}
               </div>
               <div
                 className={
@@ -505,10 +521,10 @@ export default function StudioCommandWorkspace({
                 ) : null}
               </div>
               <div className={surface === 'course' ? 'h-full' : 'hidden'}>
-                <UnifiedCourseBuilder embedded />
+                {hasOpenedTool('course') ? <UnifiedCourseBuilder embedded /> : null}
               </div>
               <div className={surface === 'preview' ? 'h-full' : 'hidden'}>
-                <RepositoryLivePreview
+                {hasOpenedTool('preview') ? <RepositoryLivePreview
                   filePath={null}
                   content=""
                   initialUrl={previewUrl || courseBuilderUrl}
@@ -516,17 +532,17 @@ export default function StudioCommandWorkspace({
                   allowManualTarget={false}
                   allowExternalOpen={Boolean(activeTask?.runId)}
                   targetLabel="Active run preview"
-                />
+                /> : null}
               </div>
               <div className={surface === 'browser' ? 'h-full' : 'hidden'}>
-                <CloudBrowserWorkspace
+                {hasOpenedTool('browser') ? <CloudBrowserWorkspace
                   unifiedTask={activeTask}
                   conversationId={activeConversationId}
                   autoStart={surface === 'browser'}
                   initialTarget={browserTarget}
                   initialTask={browserCommand}
                   autoRunTask={surface === 'browser'}
-                />
+                /> : null}
               </div>
             </div>
           </section>

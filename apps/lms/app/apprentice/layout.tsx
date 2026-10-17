@@ -87,8 +87,8 @@ export default async function Layout({ children }: { children: React.ReactNode }
           </p>
           <h1 className="mt-2 text-3xl font-black capitalize text-slate-950">{moduleName}</h1>
           <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-slate-700">
-            This Apprentice Portal module is operational. Learner hours, payments, competencies,
-            documents, and actions remain isolated from the administrator session.
+            Select an apprentice in Admin to view this page with their saved records. No apprentice
+            is selected in this session, so their hours, payments, and documents are not shown.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <a

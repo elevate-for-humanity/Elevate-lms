@@ -1,11 +1,11 @@
+import {authorizeParisWorkflow} from '@/lib/paris-workflow-identity';
 import {NextRequest,NextResponse} from 'next/server';
 import {prepareParisRepair,publishParisRepair,reportParisRepairFailure,tickParisCodeRepairs,diagnoseParisGitHubCredential} from '@/lib/ai/runtime/code-repair';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export const maxDuration=300;
 export async function POST(request:NextRequest){
- const secret=process.env.CRON_SECRET;
- if(!secret||request.headers.get('authorization')!==`Bearer ${secret}`)return NextResponse.json({error:'Unauthorized'},{status:401});
+ if(!await authorizeParisWorkflow(request.headers.get('authorization')))return NextResponse.json({error:'Unauthorized'},{status:401});
  const body=await request.json().catch(()=>({}));
  try{
   if(body.phase==='auth-diagnostic')return NextResponse.json(await diagnoseParisGitHubCredential(),{headers:{'Cache-Control':'no-store'}});

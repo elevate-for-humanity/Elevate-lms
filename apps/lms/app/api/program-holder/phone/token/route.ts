@@ -35,6 +35,15 @@ export async function POST(request: Request) {
   if (!extension?.communication_workspaces?.phone_system_id) {
     return NextResponse.json({ error: 'No enabled phone extension is assigned.' }, { status: 404 });
   }
+  // The PBX provisioner rejects legacy carrier assignments. Return the real
+  // migration blocker to the UI instead of a misleading generic 502.
+  // Do not change existing extension ownership or telephone routing here.
+  if (extension.webrtc_provider !== 'asterisk') {
+    return NextResponse.json(
+      { error: 'This extension is still assigned to the retired phone provider. An administrator must migrate this extension to Elevate Phone before device registration.' },
+      { status: 409 },
+    );
+  }
   if (['offline', 'do_not_disturb'].includes(extension.ring_mode)) {
     return NextResponse.json(
       { error: 'Set the phone to Ring, Vibrate, or Silent before connecting.' },

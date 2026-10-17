@@ -14,7 +14,7 @@ async function execute(overrides={}){
   if(args[0]==='secrets'&&args[1]==='versions'&&args[2]==='access')return f.storedKey||key;
   if(args[0]==='storage'&&args[1]==='buckets'&&args[2]==='list')return '[]';
   if(args[0]==='artifacts')return 'sha256:'+sha+sha.slice(0,24);
-  if(args[0]==='run'&&args[1]==='services'&&args[2]==='describe')return JSON.stringify({status:{url:'https://browser.example.test',latestCreatedRevisionName:'browser-candidate',traffic:[{revisionName:'browser-old',percent:100},{revisionName:'browser-candidate',tag:'studio-verify',url:'https://candidate.example.test',percent:0}]},spec:{template:{spec:f.browserSpec}}});
+  if(args[0]==='run'&&args[1]==='services'&&args[2]==='describe')return JSON.stringify({status:{url:'https://browser.example.run.app',latestCreatedRevisionName:'browser-candidate',traffic:[{revisionName:'browser-old',percent:100},{revisionName:'browser-candidate',tag:'studio-verify',url:'https://candidate.example.test',percent:0}]},spec:{template:{spec:f.browserSpec}}});
   return '';
  };
  globalThis.__studioCutoverFixture={
@@ -26,7 +26,7 @@ async function execute(overrides={}){
   setTimeout(callback){return setTimeout(callback,0);},
   async fetch(url,options){
    f.requests.push(url);f.events.push({request:url});
-   if(url.endsWith('/health'))return {ok:true,status:200,headers:{get(name){return name.toLowerCase()==='content-type'?'application/json; charset=utf-8':null;}},async json(){return url.startsWith('https://browser.example.test')&&f.publicState?f.publicState:f.state;}};
+   if(url.endsWith('/health'))return {ok:true,status:200,headers:{get(name){return name.toLowerCase()==='content-type'?'application/json; charset=utf-8':null;}},async json(){return url.startsWith('https://browser.example.run.app')&&f.publicState?f.publicState:f.state;}};
    const status=options?.headers?f.authorized:f.anonymous;
    return {status,ok:status>=200&&status<300};
   },
@@ -81,7 +81,7 @@ test('pinned old traffic is preserved until the exact candidate passes all proof
  assert.ok(activation>0);
  const before=f.events.slice(0,activation).filter(e=>e.request).map(e=>e.request);
  assert.deepEqual(before,['https://candidate.example.test/health','https://candidate.example.test/workspace/files','https://candidate.example.test/workspace/files']);
- assert.equal(f.events[activation+1].request,'https://browser.example.test/health');
+ assert.equal(f.events[activation+1].request,'https://browser.example.run.app/health');
 });
 
 test('failed public cutover restores previous traffic and leaves Admin unchanged',async()=>{
@@ -96,4 +96,24 @@ test('unready candidates never change serving traffic',async()=>{
  const f=await execute({state:{commit:sha,ready:false,providerAuthStorage:{persistent:true}}});
  assert.match(f.error.message,/not ready/);assert.equal(switched(f),false);
  assert.equal(f.commands.some(a=>a[2]==='update-traffic'),false);
+});
+
+test('browser candidate runs as the dedicated Studio identity rather than Admin',async()=>{
+ const f=await execute();assert.equal(f.error,undefined);
+ const deploy=f.commands.find(args=>args[0]==='run'&&args[1]==='deploy');
+ assert.ok(deploy.includes('--service-account=elevate-studio-runtime@elegant-racer-299721.iam.gserviceaccount.com'));
+ assert.equal(deploy.some(arg=>arg==='--service-account=elevate-admin-runtime@elegant-racer-299721.iam.gserviceaccount.com'),false);
+});
+
+test('migrated Studio releases verify their own encryption key without reading Admin credentials',async()=>{
+ const f=await execute({existingSecret:true,browserSpec:{containers:[{env:[{name:'STUDIO_BROWSER_SECRET',valueFrom:{secretKeyRef:{name:'studio-browser-shared-secret',key:'latest'}}}]}]}});
+ assert.equal(f.error,undefined);
+ assert.equal(f.commands.some(a=>a[0]==='run'&&a[1]==='services'&&a[2]==='describe'&&a[3]==='elevate-admin-migration'),false);
+ assert.ok(f.requests.includes('https://browser.example.run.app/workspace/files'));
+});
+test('canonical-key proof failure never deploys or rotates Studio credentials',async()=>{
+ const f=await execute({existingSecret:true,authorized:401,browserSpec:{containers:[{env:[{name:'STUDIO_BROWSER_SECRET',valueFrom:{secretKeyRef:{name:'studio-browser-shared-secret',key:'latest'}}}]}]}});
+ assert.match(f.error.message,/refusing credential rotation/);
+ assert.equal(f.commands.some(a=>a[0]==='run'&&a[1]==='deploy'),false);
+ assert.equal(f.commands.some(a=>a[0]==='secrets'&&a[1]==='versions'&&a[2]==='add'),false);
 });

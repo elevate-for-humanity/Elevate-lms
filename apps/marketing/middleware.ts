@@ -129,8 +129,10 @@ function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextRespons
     url.pathname = '/store';
     return NextResponse.redirect(url, 307);
   }
+  // Provider callbacks must reach Store's verified handlers without a Marketing hop.
+  const commerceCallbacks = ['/api/webhooks/paypal-billing', '/api/webhooks/quickbooks'];
   // The cart uses this authenticated billing endpoint for individual apps.
-  if (pathname === '/api/apps/upgrade' || isStoreRuntimeAllowed(pathname)) return NextResponse.next();
+  if (commerceCallbacks.includes(pathname) || pathname === '/api/apps/upgrade' || isStoreRuntimeAllowed(pathname)) return NextResponse.next();
   return NextResponse.redirect(new URL(`https://www.elevateforhumanity.org${pathname}${req.nextUrl.search}`), 307);
 }
 

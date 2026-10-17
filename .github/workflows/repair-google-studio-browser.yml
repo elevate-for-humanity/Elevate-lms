@@ -51,6 +51,10 @@ jobs:
         run: node --test scripts/test-studio-browser-cutover.mjs
       - name: Check provisioning permissions before building
         run: node scripts/gcp/preflight-studio-browser-permissions.mjs
+      - name: Prepare and verify the dedicated Studio runtime identity
+        run: |
+          node --test scripts/gcp/prepare-studio-service-identity.test.mjs
+          node scripts/gcp/prepare-studio-service-identity.mjs
       - name: Verify automatic container memory policy
         run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build actual immutable Studio browser container

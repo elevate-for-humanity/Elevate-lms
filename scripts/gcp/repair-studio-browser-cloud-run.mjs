@@ -17,16 +17,32 @@ async function collectStartupDiagnostics(sharedSecret){
   console.error(JSON.stringify({service:name,failedRevision:revision,diagnostics:folder,adminSwitched:false}));
 }
 const project='elegant-racer-299721',region='us-central1',name='elevate-studio-browser';
-const identity='elevate-admin-runtime@'+project+'.iam.gserviceaccount.com';
+const identity='elevate-studio-runtime@'+project+'.iam.gserviceaccount.com';
 const bucket=project+'-studio-browser-auth',secretName='studio-browser-shared-secret';
 function command(args,input){return execFileSync('gcloud',args,{encoding:'utf8',input,timeout:900000,stdio:['pipe','pipe','pipe']}).trim();}
 function gc(args){return command([...args,'--project='+project,'--format=json']);}
-const admin=JSON.parse(gc(['run','services','describe','elevate-admin-migration','--region='+region]));
-const variable=admin.spec.template.spec.containers[0].env.find(x=>x.name==='STUDIO_BROWSER_SECRET');
-let secret=variable?.value;
-if(!secret && variable?.valueFrom?.secretKeyRef){const ref=variable.valueFrom.secretKeyRef;secret=command(['secrets','versions','access',ref.key||'latest','--secret='+ref.name,'--project='+project]);}
-if(!secret || secret.length<16)throw Error('Existing Studio secret unavailable; refusing unauthenticated deployment or credential rotation');
+const existingService=JSON.parse(gc(['run','services','describe',name,'--region='+region]));
 const existing=JSON.parse(gc(['secrets','list','--filter=name:'+secretName]));
+const browserVariable=existingService.spec?.template?.spec?.containers?.[0]?.env?.find(x=>x.name==='STUDIO_BROWSER_SECRET');
+const browserRef=browserVariable?.valueFrom?.secretKeyRef;
+let secret;
+if(existing.length && browserRef?.name===secretName) {
+  // The migrated browser owns its canonical encryption secret. Prove that the
+  // running server accepts that same key before releasing without Admin reads.
+  secret=command(['secrets','versions','access',browserRef.key||'latest','--secret='+secretName,'--project='+project]);
+  const latest=command(['secrets','versions','access','latest','--secret='+secretName,'--project='+project]);
+  if(secret!==latest)throw Error('Studio secret mismatch; refusing credential rotation');
+  if(!/^https:\/\/[a-z0-9.-]+\.run\.app$/.test(existingService.status?.url||''))throw Error('Verified existing Studio URL required');
+  const proof=await fetch(existingService.status.url+'/workspace/files',{headers:{'x-studio-browser-secret':secret},redirect:'error',signal:AbortSignal.timeout(20000)});
+  if(!proof.ok)throw Error('Existing Studio rejected its canonical key; refusing credential rotation');
+} else {
+  // Bootstrap only: retain the old binding until canonical ownership is proven.
+  const admin=JSON.parse(gc(['run','services','describe','elevate-admin-migration','--region='+region]));
+  const variable=admin.spec.template.spec.containers[0].env.find(x=>x.name==='STUDIO_BROWSER_SECRET');
+  secret=variable?.value;
+  if(!secret && variable?.valueFrom?.secretKeyRef){const ref=variable.valueFrom.secretKeyRef;secret=command(['secrets','versions','access',ref.key||'latest','--secret='+ref.name,'--project='+project]);}
+}
+if(!secret || secret.length<16)throw Error('Existing Studio secret unavailable; refusing unauthenticated deployment or credential rotation');
 if(!existing.length)command(['secrets','create',secretName,'--replication-policy=automatic','--project='+project]);
 // Scope the deployment reader to this secret, so later releases can verify the
 // existing encryption key without project-wide secret access or key rotation.
@@ -41,7 +57,6 @@ const sha=process.env.IMAGE_SHA;if(!/^[a-f0-9]{40}$/.test(sha||''))throw Error('
 const image='us-central1-docker.pkg.dev/'+project+'/elevate/studio-browser';
 const digest=command(['artifacts','docker','images','describe',image+':'+sha,'--project='+project,'--format=value(image_summary.digest)']);
 if(!/^sha256:[a-f0-9]{64}$/.test(digest))throw Error('Image digest unavailable');
-const existingService=JSON.parse(gc(['run','services','describe',name,'--region='+region]));
 const existingBrowser=existingService.spec?.template?.spec;
 const previousTraffic=(existingService.status?.traffic||[]).filter(t=>t.percent>0&&t.revisionName).map(t=>t.revisionName+'='+t.percent).join(',');
 const authMount=existingBrowser?.containers?.[0]?.volumeMounts?.find(m=>m.mountPath==='/var/lib/studio-browser-auth');

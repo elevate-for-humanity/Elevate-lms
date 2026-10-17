@@ -1,5 +1,5 @@
 import {google,PROJECT} from './runtime-config.mjs';
-import {courseB2Environment} from './deploy-course-job.mjs';
+import {resolveOwnerPreviewB2} from './resolve-owner-preview-b2.mjs';
 import {inspectRegionalCapacity,isTerminalExecution} from './regional-capacity.mjs';
 import {pathToFileURL} from 'node:url';
 
@@ -36,16 +36,15 @@ export function previewRuntime(job){
   const env=Object.fromEntries(required.map(e=>[e.name,e.value]));
   if(env.NEXT_PUBLIC_SUPABASE_URL!=='https://cuxzzpsyufcewtmicszk.supabase.co'||!env.SUPABASE_SERVICE_ROLE_KEY)
     throw Error('OWNER_PREVIEW_EXISTING_DATABASE_REQUIRED');
-  const b2=courseB2Environment(env);
-  if(b2.ELEVATE_MEDIA_BUCKET!=='elevate-course-media')throw Error('OWNER_PREVIEW_APPROVED_BUCKET_REQUIRED');
-  return {task,env,b2};
+  return {task,env};
 }
 
 export async function ownerLessonPreview({execute=false,sha,run=google,request=fetch,capacity=inspectRegionalCapacity}={}){
   const scope=['--project='+PROJECT,'--region='+region];
   const read=args=>JSON.parse(run([...args,...scope,'--format=json']));
   const before=read(['run','jobs','describe',name]);
-  const {task,env,b2}=previewRuntime(before);
+  const {task,env}=previewRuntime(before);
+  const {environment:b2,connectionSource}=await resolveOwnerPreviewB2(env,request);
   const overrides={ULTIMATE_OWNER_PREVIEW_JOB_ID:jobId,ULTIMATE_WORKER_ONCE:'true',...b2};
   if(Object.values(overrides).some(v=>/[|\r\n]/.test(v)))throw Error('OWNER_PREVIEW_OVERRIDE_VALUE_INVALID');
   if(read(['run','jobs','executions','list','--job='+name]).some(e=>!isTerminalExecution(e)))
@@ -70,7 +69,7 @@ export async function ownerLessonPreview({execute=false,sha,run=google,request=f
   const evidence={region,job:name,jobId,lessonBuildId:lessonId,source:sha??null,
     previousImage:task.containers[0].image,identity:task.serviceAccountName,
     configuredResources:task.containers[0].resources.limits,headroom,storageProvider:'backblaze-b2',
-    bucket:b2.ELEVATE_MEDIA_BUCKET,executionStarted:false,releaseHoldChanged:false};
+    bucket:b2.ELEVATE_MEDIA_BUCKET,connectionSource,executionStarted:false,releaseHoldChanged:false};
   if(!execute)return evidence;
   if(!/^[a-f0-9]{40}$/.test(sha??''))throw Error('OWNER_PREVIEW_EXACT_SOURCE_REQUIRED');
   const digest=run(['artifacts','docker','images','describe',registry+':owner-preview-'+sha,'--project='+PROJECT,'--format=value(image_summary.digest)']);

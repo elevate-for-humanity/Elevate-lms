@@ -3,11 +3,18 @@ vi.mock('@/lib/ultimate-course-builder/credential/appendix-a-source',()=>({Ultim
  supports(input:{programSlug:string}){return input.programSlug==='registered-course';}
  async load(){return {id:'registered',title:'Registered',authority:'DOL',standardVersion:'1',sourceDocuments:['Appendix A'],competencies:[{id:'lesson-1',title:'Client consultation',description:'Consult before proceeding',type:'practical_skill',authorityRequirementIds:['lesson-1'],requiresDemonstration:true,requiresPracticalEvidence:true}]};}
 }}));
-import {buildUltimateProfile} from '@/lib/ultimate-course-builder/core/course-profile';
+import {buildUltimateProfile, hydrateUltimateProfileSources} from '@/lib/ultimate-course-builder/core/course-profile';
 function dbWithLesson(failure=false, content:any={html:'Pause the service and consult the supervisor.',scenario:{correctAction:'consult'}}) {
  return {from(table:string){let columns=''; const q={select(value:string){columns=value;return q;},eq(){return q;},limit(){return q;},async maybeSingle(){return {data:null,error:failure?new Error('database unavailable'):null};},order(){return table==='apprenticeship_standard_versions'?q:Promise.resolve({data:[{id:'lesson-1',title:'Client consultation',learning_objectives:['Ask before proceeding'],content}],error:null});}};return q;}};
 }
 describe('shared Ultimate profile used by Studio and builder',()=>{
+ it('preserves an explicitly approved reference and presentation during resume',async()=>{
+  const reference={assetId:'9ae74de2-2fd2-45df-9c54-59c9e3c5c07c',sha256:'a'.repeat(64)};
+  const profile={id:'owner-course',sourcePolicy:'frozen-reference-v1',competencies:[],lessonPresentation:'approved-premium-v1',presentationContract:{approvedReferenceVideo:reference}};
+  const result=await hydrateUltimateProfileSources(dbWithLesson() as never,'owner-course',profile as never);
+  expect(result.lessonPresentation).toBe('approved-premium-v1');
+  expect(result.presentationContract?.approvedReferenceVideo).toEqual(reference);
+ });
  it('teaches the current correction while retaining historical evidence in storage',async()=>{
   const content={html:'Follow the product label contact time.',production_content_repairs:[{previous_html:'Incorrect archived contact time.'}],previous_sanitation_html:'Incorrect archived instruction.'};
   const p=await buildUltimateProfile(dbWithLesson(false,content) as never,{courseId:'course',programSlug:'registered-course',title:'Registered course'});

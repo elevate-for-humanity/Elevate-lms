@@ -50,8 +50,8 @@ function requireLicensedVisualCoverage(ctx: any, mediaInput?: any) {
   for (const assignment of assignments) {
     if (!assignment?.assetId || !assignment?.relevanceReason)
       throw new Error('ULTIMATE_VISUAL_RELEVANCE_REQUIRED');
-    if (assignment.generatedInstructionalVisual === true || assignment.assignmentMethod === 'instructional-render') {
-      if (!String(assignment.assetId).startsWith('instructional:'))
+    if (assignment.requestedTeachingPhotograph === true && assignment.assignmentMethod === 'teaching-photograph-request') {
+      if (!String(assignment.assetId).startsWith('teaching-photo-request:'))
         throw new Error(`ULTIMATE_INSTRUCTIONAL_VISUAL_ID_INVALID:${assignment.assetId}`);
       reuse.set(String(assignment.assetId), (reuse.get(String(assignment.assetId)) ?? 0) + 1);
       continue;
@@ -275,7 +275,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
       const sourceObjectives:any[]=(ctx.artifacts.learning_objectives as any)?.objectives??[];
       const preflight=instructionalQualityFailures({courseTitle:ctx.profile.title,lessonTitle:comp(ctx).title,lessonType:comp(ctx).type,script:sourceScript?.script??'',learningObjectives:sourceObjectives.map(o=>o.text),instructor:{id:'ultimate',title:'Instructor',specialty:ctx.profile.title},storyboard:instructionView(sourceBoard)});
       const contentFailures=preflight.failures.filter(message=>!message.includes('no close-up or sourced demonstration scene exists')&&!message.includes('practical beauty instruction must include a sourced close-up demonstration scene'));
-      if(contentFailures.length)return {passed:false,findings:contentFailures.map(message=>({step:'lesson_film_render' as const,severity:'error' as const,code:'INSTRUCTIONAL_QUALITY_FAILED',message})),artifacts:{preflight:{pass:false,failures:contentFailures}}};
+      if(contentFailures.length && !ctx.renderPreviewOnly)return {passed:false,findings:contentFailures.map(message=>({step:'lesson_film_render' as const,severity:'error' as const,code:'INSTRUCTIONAL_QUALITY_FAILED',message})),artifacts:{preflight:{pass:false,failures:contentFailures}}};
 
       // Enforce the approved-video production contract at the actual rendering
       // boundary. A missing scene, source, license or narration must never be
@@ -315,6 +315,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
             lessonId: canonicalLessonId ?? comp(ctx).id,
             courseId:ctx.courseId,
             courseTitle: ctx.profile.title,
+            ownerPreview: ctx.renderPreviewOnly === true,
             lessonPresentation: ctx.profile.lessonPresentation,
             presentationContract: ctx.profile.presentationContract,
             renderRevision: [(ctx.artifacts as any).__renderRevision,(ctx.artifacts as any).__repairState?.at].filter(Boolean).join(':') || undefined,

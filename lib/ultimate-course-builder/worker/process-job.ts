@@ -115,6 +115,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
           payload.competencyId ?? payload.repairCompetencyId ?? (payload.acceptance ? profile.competencies?.[0]?.id : undefined),
         startIndex: Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0,
         maxLessons: 1,
+        renderPreviewOnly: payload.ownerPreview === true,
         beforeCheckpoint: liveCheckpointRepairReader(db, job, workerId, generation, payload, currentCompetencyId),
         repairRenderRevision: payload.checkpointRepair?.competencyId === currentCompetencyId && ULTIMATE_BUILD_STEPS.indexOf(payload.checkpointRepair.fromStep) <= ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render') ? payload.checkpointRepair.requestedAt : undefined,
         repairFromStep: payload.checkpointRepair?.competencyId === currentCompetencyId ? payload.checkpointRepair.fromStep : undefined,
@@ -126,6 +127,11 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     );
     assertActive();
     console.info('[UltimateWorker] lesson processing returned', { jobId: job.id, completed: result.completed, findings: result.findings.length });
+    if (payload.ownerPreview === true && result.previewReady) {
+      await runtime.persistence.updateBuild({buildId:build.id,status:'blocked',currentStep:'lesson_film_render'});
+      await queue.complete(job.id,workerId,generation);
+      return {claimed:true,completed:false,previewReady:true,jobId:job.id,result};
+    }
     if (!targeted) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {

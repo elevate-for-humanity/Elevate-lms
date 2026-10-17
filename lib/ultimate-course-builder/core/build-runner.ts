@@ -47,6 +47,8 @@ export interface UltimateRunContext {
   assertActive?: () => void;
   repairDirective?: any;
   beforeCheckpoint?: (step: UltimateBuildStep) => Promise<UltimateBuildStep | null>;
+  /** Owner preview stops after encoding; it never certifies QA or publication. */
+  renderPreviewOnly?: boolean;
 }
 
 export class UltimateBuildRunner {
@@ -61,6 +63,7 @@ export class UltimateBuildRunner {
     ctx.repairDirective=(ctx.artifacts as any).__repairState?.directive;
     let index = 0;
     while (index < ULTIMATE_BUILD_STEPS.length) {
+      if (ctx.renderPreviewOnly && index > ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render')) break;
       ctx.assertActive?.();
       const requestedRepair = await ctx.beforeCheckpoint?.(ULTIMATE_BUILD_STEPS[index]);
       if (requestedRepair) {

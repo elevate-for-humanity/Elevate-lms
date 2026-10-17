@@ -23,13 +23,20 @@ read('cloudRunJobs', ['run', 'jobs', 'list'], rows => rows.map(j => ({
   latestCreatedExecution: j.status?.latestCreatedExecution,
   limits: (j.spec?.template?.spec?.template?.spec?.containers ?? []).map(c => c.resources?.limits),
 })));
-read('cloudRunExecutions', ['run', 'jobs', 'executions', 'list'], rows => rows.map(e => ({
-  name:e.metadata?.name,region:e.metadata?.labels?.['cloud.googleapis.com/location'],
-  job:e.metadata?.labels?.['run.googleapis.com/job'],
-  startedAt:e.status?.startTime,completedAt:e.status?.completionTime,
-  running:e.status?.runningCount,succeeded:e.status?.succeededCount,failed:e.status?.failedCount,
-  conditions:(e.status?.conditions??[]).map(c=>({type:c.type,status:c.status,reason:c.reason})),
-})));
+// Some installed SDK/API combinations cannot list executions across regions.
+// Enumerate each discovered job explicitly, including older active executions.
+for(const job of report.resources.cloudRunJobs??[]){
+  const resource='executions:'+job.region+':'+job.name;
+  if(!job.region){report.failures.push({resource,reason:'job_region_unknown'});continue;}
+  read(resource,['run','jobs','executions','list','--job='+job.name,'--region='+job.region],rows=>rows
+    .sort((a,b)=>Date.parse(b.metadata?.creationTimestamp??b.status?.startTime??0)-Date.parse(a.metadata?.creationTimestamp??a.status?.startTime??0))
+    .filter((e,index)=>index<5||(!e.status?.completionTime&&!['True','False'].includes(e.status?.conditions?.find(c=>c.type==='Completed')?.status)))
+    .map(e=>({name:e.metadata?.name,region:job.region,job:job.name,
+      startedAt:e.status?.startTime,completedAt:e.status?.completionTime,
+      running:e.status?.runningCount,succeeded:e.status?.succeededCount,failed:e.status?.failedCount,
+      conditions:(e.status?.conditions??[]).map(c=>({type:c.type,status:c.status,reason:c.reason})),
+    })));
+}
 read('instances', ['compute', 'instances', 'list'], rows => rows.map(v => ({
   name: v.name, zone: v.zone, status: v.status, machineType: v.machineType,
   disks: (v.disks ?? []).map(d => ({ source: d.source, deviceName: d.deviceName, autoDelete: d.autoDelete, boot: d.boot })),

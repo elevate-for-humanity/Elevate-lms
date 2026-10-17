@@ -7,7 +7,7 @@ on:
       mode:
         description: Validate existing connections first, or build and execute one isolated preview
         type: choice
-        options: [validate, execute, execute-tested-candidate]
+        options: [validate, execute]
         default: validate
         required: true
 permissions:
@@ -51,7 +51,7 @@ jobs:
           NODE
           fi
       - name: Verify single-job isolation and preserved source contracts
-        run: node --test scripts/gcp/owner-lesson-preview.test.mjs scripts/gcp/resolve-owner-preview-b2.test.mjs lib/video/owner-preview-media-delivery.test.mjs lib/ultimate-course-builder/worker/owner-preview-claim.test.mjs workers/worker-loop.test.mjs workers/process-job-state.test.mjs tests/worker/complete-lesson-before-advance.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs
+        run: node --test scripts/gcp/owner-lesson-preview.test.mjs scripts/gcp/resolve-owner-preview-b2.test.mjs lib/video/owner-preview-media-delivery.test.mjs lib/ultimate-course-builder/adapters/approved-reference-photos.test.mjs lib/ultimate-course-builder/worker/owner-preview-claim.test.mjs workers/worker-loop.test.mjs workers/process-job-state.test.mjs tests/worker/complete-lesson-before-advance.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -60,6 +60,8 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with: { skip_install: true }
       - name: Validate actual identity, database, B2 configuration, inactive execution and regional quota
+        env:
+          OWNER_PREVIEW_STORAGE_PROBE: ${{ inputs.mode == 'execute' }}
         run: node scripts/gcp/owner-lesson-preview.mjs
       - name: Build one immutable preview candidate without releasing web applications
         if: inputs.mode == 'execute'
@@ -70,7 +72,7 @@ jobs:
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
           docker build -f Dockerfile.ultimate-worker -t "owner-lesson-preview:$GITHUB_SHA" .
           docker run --rm --entrypoint node -v "$PWD/tests:/app/tests:ro" -v "$PWD/scripts:/app/scripts:ro" -v "$PWD/workers:/app/workers:ro" \
-            "owner-lesson-preview:$GITHUB_SHA" --test /app/scripts/gcp/owner-lesson-preview.test.mjs /app/scripts/gcp/resolve-owner-preview-b2.test.mjs lib/video/owner-preview-media-delivery.test.mjs \
+            "owner-lesson-preview:$GITHUB_SHA" --test /app/scripts/gcp/owner-lesson-preview.test.mjs /app/scripts/gcp/resolve-owner-preview-b2.test.mjs lib/video/owner-preview-media-delivery.test.mjs lib/ultimate-course-builder/adapters/approved-reference-photos.test.mjs \
             lib/ultimate-course-builder/worker/owner-preview-claim.test.mjs workers/worker-loop.test.mjs \
             /app/tests/worker/complete-lesson-before-advance.test.mjs /app/tests/unit/ultimate-renderer-assignments.test.mjs
       - uses: google-github-actions/auth@v3

@@ -37,7 +37,14 @@ tests also passed twice. Image digest:
 The live capacity gate reserved 17 vCPU / 36 GiB against 20 vCPU / 40 GiB. This
 is configured rollout capacity, not measured instantaneous utilization. The
 candidate tag was released, revision retained, and serving traffic/Admin were
-not switched. Final independent metadata readback is recorded separately. The superseded run `39061612514` was cancelled: its local container
+not switched. Final independent metadata readback run `39062596047`, job `117483470935`,
+passed at 19:28:38 UTC. It confirmed the exact candidate identity, digest and
+2 CPU / 4 GiB allocation above. Actual traffic is **100% to
+`elevate-studio-browser-00039-yuv`**, with no remaining candidate tag. The two
+preceding metadata verifier attempts failed on projected output handling; the
+verifier now reads native metadata in memory and emits only the scoped resource
+and traffic summary. No secret values are emitted. These verification attempts
+performed no deployments or traffic changes. The superseded run `39061612514` was cancelled: its local container
 build completed, but image publication and Cloud Run deployment were skipped.
 No production revision was created by that superseded run.
 

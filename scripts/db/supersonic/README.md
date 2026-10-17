@@ -28,3 +28,39 @@ contents or copy them through shared logs.
 
 These repairs do not deploy a tax runtime, migrate authentication or documents,
 or establish IRS/provider approval or production filing readiness.
+
+## Unscoped profile-role access repair — 2026-10-17
+
+`remove_unscoped_tax_profile_shortcuts` was applied to the dedicated Starter
+project only, using `remove-global-profile-access.sql`. Twenty existing policies
+across nineteen tables granted broad access based on generic profile roles;
+those role shortcuts are now false. Existing owner predicates remain intact.
+Staff/preparer access through a future tenant-scoped tax API remains a separate
+acceptance gate; this repair does not grant a new tax operator role or make
+service-role access safe without API authorization.
+
+The migration requires empty destination auth/profile and affected data tables,
+locks the affected tables, and refuses changed policy definitions. The primary
+database, payroll, private source documents and provider/transmission approvals
+are outside this migration. `tax_withholdings` belongs to payroll (its employee
+foreign key was verified), so a tax-prefix inventory must not migrate it.
+
+Verification: generic-admin cross-record access was reproduced and rolled back;
+the policy changes and exact rollback were rehearsed transactionally. After the
+permanent apply, `verify-unscoped-tax-denial.sql` passed: a generic administrator
+and an unassigned preparer could not read the synthetic return; owner-scoped
+client access and backend service access remained. Every fixture was rolled back.
+Independent counts then confirmed zero destination auth users, profiles, SFC
+returns and clients, and zero remaining generic-admin tax policy expressions.
+The security advisor reported only the twelve existing informational notices
+for RLS tables without client policies, with no warning or error finding.
+
+`rollback-global-profile-access.sql` preserves the exact previous policy bodies.
+It restores broad privileges and must be used only as an explicit rollback after
+rechecking current definitions; never run it as part of routine deployment.
+
+Schema reconciliation also found UUID-versus-bigint return identifiers and
+incompatible payment amount types between the primary and dedicated projects,
+plus missing columns. Do not copy rows or retire source dependencies until the
+actual tax application schema and ownership mapping are reconciled. These are
+not completed data/auth/runtime or filing acceptance gates.

@@ -74,7 +74,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       .single();
     if (error || !build) throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
     const storedProfile = build.profile as UltimateCredentialProfile;
-    if ((storedProfile as any).ownerPaused === true) {
+    if ((storedProfile as any).ownerPaused === true && job.payload?.ownerPreview !== true) {
       await queue.waitForDependency(job.id,workerId,'OWNER_PAUSED_REFERENCE_BUILD',generation);
       return {claimed:true,completed:false,ownerPaused:true,jobId:job.id};
     }

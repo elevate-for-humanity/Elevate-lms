@@ -1,5 +1,5 @@
 import { google } from './runtime-config.mjs';
-import { inspectRegionalCapacity } from './regional-capacity.mjs';
+import { inspectRegionalCapacity, executionAllocationCount } from './regional-capacity.mjs';
 import { pathToFileURL } from 'node:url';
 
 export async function dispatchQueuedCourseJob({run = (_command, args) => google(args), capacityCheck = inspectRegionalCapacity, request = fetch, env = process.env, now = new Date(), delay = ms => new Promise(resolve => setTimeout(resolve, ms)), assignmentAttempts = 60} = {}) {
@@ -46,7 +46,7 @@ export async function dispatchQueuedCourseJob({run = (_command, args) => google(
   const configured = Number(env.COURSE_WORKER_PARALLELISM ?? 2);
   const limit = Number.isSafeInteger(configured) ? Math.min(4, Math.max(1, configured)) : 2;
   // Bound new tasks to configured concurrency, including existing executions.
-  const slots = Math.max(0, limit - active.reduce((sum, execution) => sum + Math.max(1, Number(execution.spec?.taskCount ?? execution.status?.taskCount ?? 1)), 0));
+  const slots = Math.max(0, limit - active.reduce((sum, execution) => sum + executionAllocationCount(execution), 0));
   if (!slots) { console.warn(JSON.stringify({event:'course_dispatch_no_slots',activeExecutions:active.length,limit})); return {status:'busy',activeExecutions:active.length}; }
   const parallelism = Number(job.spec?.template?.spec?.parallelism);
   if (!Number.isSafeInteger(parallelism) || parallelism < 1) throw new Error('COURSE_JOB_PARALLELISM_UNAVAILABLE');

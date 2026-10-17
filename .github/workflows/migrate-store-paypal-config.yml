@@ -8,6 +8,11 @@ on:
         description: 'Archive the verified existing PayPal family in Store config; no deployment or transactions'
         type: boolean
         default: false
+      routing:
+        description: 'Validate the exact deployed Store callback, or cut over the existing webhook after release acceptance'
+        type: choice
+        options: [none, validate, apply]
+        default: none
 permissions:
   contents: read
   id-token: write
@@ -22,7 +27,7 @@ jobs:
         with: { persist-credentials: false }
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
-      - run: node --test scripts/gcp/migrate-store-paypal-config.test.mjs scripts/gcp/prepare-store-config.test.mjs scripts/gcp/stage-web.test.mjs
+      - run: node --test scripts/gcp/migrate-store-paypal-config.test.mjs scripts/gcp/store-paypal-webhook-cutover.test.mjs scripts/gcp/prepare-store-config.test.mjs scripts/gcp/stage-web.test.mjs
   migrate:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     needs: test
@@ -44,4 +49,6 @@ jobs:
       - name: Verify provider and prepare the existing Store secret without changing live billing
         env:
           STORE_PAYPAL_APPLY: ${{ inputs.apply == true && 'true' || 'false' }}
+          STORE_PAYPAL_ROUTE_MODE: ${{ inputs.routing || 'none' }}
+          GOOGLE_RELEASE_HOLD: ${{ vars.GOOGLE_RELEASE_HOLD }}
         run: node scripts/gcp/migrate-store-paypal-config.mjs

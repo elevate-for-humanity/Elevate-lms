@@ -11,16 +11,17 @@ const config={runtimeEnvironment:{
 }};
 const resource=()=>({spec:{template:{spec:{containers:[{image:'us-central1-docker.pkg.dev/project/elevate/admin:sha',
  env:['STUDIO_BROWSER_URL','STUDIO_BROWSER_PUBLIC_URL','STUDIO_BROWSER_SECRET',
- 'CLOUDFLARE_ACCOUNT_ID','CLOUDFLARE_AI_API_TOKEN','CLOUDFLARE_AI_MODEL'].map(name=>({name,value:'present'}))}]}}},status:{latestReadyRevisionName:'admin-123'}});
+ 'CLOUDFLARE_ACCOUNT_ID','CLOUDFLARE_AI_API_TOKEN','CLOUDFLARE_AI_MODEL'].map(name=>({name,value:config.runtimeEnvironment[name] ?? 'present'}))}]}}},status:{latestReadyRevisionName:'admin-123'}});
 const browser={spec:{template:{spec:{containers:[{image:'us-central1-docker.pkg.dev/project/elevate/browser:sha',env:[]}]}}},status:{latestReadyRevisionName:'browser-123'}};
 test('reports configured Google resources when image and secret bindings exist',()=>{
  assert.deepEqual(inspectGoogleBindings(config,resource(),browser).failures,[]);
 });
-test('detects deleted browser service and removed Cloudflare runtime bindings',()=>{
+test('permits a VM browser while detecting removed Cloudflare runtime bindings',()=>{
  const admin=resource();
  admin.spec.template.spec.containers[0].env=admin.spec.template.spec.containers[0].env.filter(x=>!x.name.startsWith('CLOUDFLARE_'));
  const findings=inspectGoogleBindings(config,admin,null).failures;
- assert.ok(findings.includes('studio_browser_container_image_unverified'));
+ assert.equal(findings.some(finding=>finding.startsWith('studio_browser_')),false);
+ assert.equal(inspectGoogleBindings(config,admin,null).studioBrowserImagePresent,false);
  assert.ok(findings.includes('admin_unbound_CLOUDFLARE_AI_API_TOKEN'));
 });
 test('rejects a legacy Northflank browser endpoint',()=>{

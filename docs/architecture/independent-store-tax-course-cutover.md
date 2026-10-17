@@ -33,6 +33,19 @@ No runtime move, database copy, DNS modification, IAM change or deployment is au
 - Explicitly reserve rollout headroom before scheduling render jobs; 15 vCPU/32 GiB configured service maxima plus 4 vCPU/8 GiB job can exhaust 40 GiB regional memory quota.
 - Preserve existing courses and checkpoints; never reset incomplete jobs without an evidence-backed recovery decision.
 
+
+### Legacy 83 — Store listing, independently hosted customer tenant
+- The Store can sell or provision Legacy 83 products/subscriptions, but Legacy 83 must retain its own deployable site, database boundary, PayPal/QuickBooks configuration, tenant data, and release lane.
+- Admin dashboard should maintain Legacy 83 through a scoped management API, auditable delegated authorization, and event-based reporting; it must not hold raw tenant payment secrets in a shared browser session.
+- Do not treat a listing in the Store as permission to merge Legacy 83 runtime or customer records into Store's database.
+
+### Devian Studio / Studio Browser — separate stateful compute boundary
+- Studio Browser already runs as `elevate-studio-browser` (2 vCPU, 4 GiB, min=max=1 at the last verified preflight) and has its own deployment workflow.
+- Move Studio heavy/browser execution to a dedicated capacity lane or region **only after** measuring concurrent sessions, startup/cold-start time, data locality/latency, regional quotas, and price. A separate service in `us-central1` still consumes the same regional CPU and memory quota.
+- Its current CDP browser, terminal, and login session state may reside in the container process/local filesystem. Do not set min instances to zero or move regions until durable session persistence, reconnection, and restore are tested.
+- Admin's Studio UI remains a control plane. Access worker sessions via authenticated short-lived service-to-service credentials and scoped APIs; preserve user privacy, browser isolation and audit logs.
+- Test one session migration at a time with rollback; never cut over live interactive sessions without a compatible reconnection path.
+
 ## Cutover acceptance checklist
 
 1. Capture current production 100%-traffic serving revisions, commit labels/version endpoint, CPU/memory allocations and actual instance metrics.

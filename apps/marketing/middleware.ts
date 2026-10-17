@@ -161,6 +161,13 @@ export async function middleware(req: NextRequest) {
 
   const host = requestHost(req);
 
+  // Marketing links to the existing Store application; it does not serve a
+  // second public storefront. Keep mutation callbacks on their existing URLs.
+  const marketingStoreHost = ['www.elevateforhumanity.org', 'elevateforhumanity.org'].includes(host) || host.endsWith('.run.app');
+  if (marketingStoreHost && ['GET', 'HEAD'].includes(req.method) && (pathname === '/store' || pathname.startsWith('/store/'))) {
+    return NextResponse.redirect(new URL(pathname + search, 'https://store.elevateforhumanity.org'), 307);
+  }
+
   if (host === 'elevateforhumanity.org') {
     return NextResponse.redirect(
       new URL(`https://www.elevateforhumanity.org${pathname}${search}`),

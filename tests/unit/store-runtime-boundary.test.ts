@@ -16,3 +16,16 @@ describe('Store service isolation',()=>{
   expect(response.headers.get('location')).toBe('https://www.elevateforhumanity.org/api/webhooks/jotform');
  });
 });
+
+describe('single public Store ownership',()=>{
+ it.each(['https://www.elevateforhumanity.org','https://elevateforhumanity.org','https://marketing.example.run.app'])('Marketing %s links Store pages to the dedicated Store runtime',async origin=>{
+  vi.stubEnv('K_SERVICE','elevate-marketing-migration');
+  const response=await middleware(new NextRequest(origin+'/store/cart?add=legacy83',{headers:{host:new URL(origin).host}}));
+  expect(response.status).toBe(307);expect(response.headers.get('location')).toBe('https://store.elevateforhumanity.org/store/cart?add=legacy83');
+ });
+ it('the Store does not redirect its own storefront into a loop',async()=>{
+  vi.stubEnv('K_SERVICE','elevate-store-migration');
+  const response=await middleware(new NextRequest('https://store.elevateforhumanity.org/store/cart?add=legacy83'));
+  expect(response.headers.get('location')).toBeNull();expect(response.headers.get('x-middleware-next')).toBe('1');
+ });
+});

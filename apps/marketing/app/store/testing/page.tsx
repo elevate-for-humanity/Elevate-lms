@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title: 'Testing Center Platform | Elevate Store',
   description:
     'Commercial testing-center operations workspace for scheduling, proctor workflows, authorizations, results, and credential administration.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/testing' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/testing' },
 };
 
 const features = [

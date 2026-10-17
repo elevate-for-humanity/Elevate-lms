@@ -181,6 +181,8 @@ RUN test -s /app/public/images/social/elevate-career-training-20261009.jpg && \
 
 RUN sed -i '/"type": *"module"/d' /app/package.json 2>/dev/null || true
 
+COPY --chown=nextjs:nodejs scripts/runtime-memory-policy.mjs scripts/build-memory-policy.mjs ./scripts/
+
 USER nextjs
 
 EXPOSE 3000
@@ -188,4 +190,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/ping" || exit 1
 
-CMD ["node", "--max-old-space-size=4096", "apps/marketing/server.js"]
+CMD ["sh", "-c", "exec node --max-old-space-size=$(node scripts/runtime-memory-policy.mjs) apps/marketing/server.js"]

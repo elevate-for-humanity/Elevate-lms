@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: 'Digital Resources',
   description: 'AI tools, toolkits, guides, templates, and courses for training providers. SAM.gov assistant, grants navigator, AI studio, and more.',
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/digital',
+    canonical: 'https://store.elevateforhumanity.org/store/digital',
   },
 };
 

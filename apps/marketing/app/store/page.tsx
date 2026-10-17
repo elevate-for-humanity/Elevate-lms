@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title: 'Store | AI Business, Workforce & Education Platform',
   description:
     'Start with Elevate and add the tools your organization needs: AI website builder, CRM, virtual assistants, LMS, course builder, testing, workforce, apprenticeship, compliance and business apps.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store' },
   robots: { index: true, follow: true },
 };
 

@@ -19,3 +19,28 @@ test('validation performs no deployment, execution, queue write, or lease change
  assert.equal(out.executionStarted,false);assert.equal(out.releaseHoldChanged,false);
  assert.deepEqual(methods,['GET','GET']);assert.equal(commands.some(a=>a.some(v=>['update','deploy','execute','cancel'].includes(v))),false);
 });
+test('execution changes only the inactive job image and queues exactly one attempt without resetting evidence',async()=>{
+ const current=job(),commands=[],writes=[];
+ const run=args=>{
+  commands.push(args);
+  if(args[0]==='artifacts')return 'sha256:'+'b'.repeat(64);
+  if(args[2]==='describe')return JSON.stringify(current);
+  if(args[2]==='executions')return '[]';
+  if(args[2]==='update'){current.spec.template.spec.template.spec.containers[0].image=args.find(x=>x.startsWith('--image=')).slice(8);return '';}
+  if(args[2]==='execute')return '';
+  throw Error('unexpected operation');
+ };
+ const request=async(url,options)=>({ok:true,json:async()=>{
+  if(options.method==='PATCH'){writes.push(JSON.parse(options.body));return [{id:'queued'}];}
+  if(url.includes('ultimate_course_builds'))return [{profile:{ownerPaused:true,lessonPresentation:'approved-premium-v1',presentationContract:{approvedReferenceVideo:{sha256:'6921ebb2f049e0183fa2f5cfebaa1a9a6e2a8242a672daebbdcb251ca0a96fc2'}}}}];
+  return [{build_id:'572cca43-6bd6-4a91-b385-a8b576209c4e',status:'failed',lease_owner:null,lease_expires_at:null,attempts:5,max_attempts:5,execution_generation:80,payload:{savedCheckpoint:'kept'}}];
+ }});
+ const out=await ownerLessonPreview({execute:true,sha:'c'.repeat(40),run,request,capacity:async()=>({fits:true})});
+ assert.equal(out.executionStarted,true);assert.equal(out.releaseHoldChanged,false);
+ assert.equal(writes.length,1);assert.equal(writes[0].payload.savedCheckpoint,'kept');
+ assert.equal(writes[0].max_attempts,6);assert.equal(writes[0].attempts,undefined);
+ assert.equal(writes[0].execution_generation,undefined);assert.equal(writes[0].lease_owner,undefined);
+ assert.equal(commands.filter(a=>a[2]==='execute').length,1);
+ assert.ok(commands.find(a=>a[2]==='execute').includes('--tasks=1'));
+ assert.equal(commands.some(a=>a.includes('cancel')),false);
+});

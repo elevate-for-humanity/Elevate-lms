@@ -57,6 +57,7 @@ jobs:
         run: |
           set -euo pipefail
           node scripts/gcp/preflight-billing.mjs
+          node scripts/check-build-memory-policy.mjs --source-only
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
           docker build -f Dockerfile.ultimate-worker -t "owner-lesson-preview:$GITHUB_SHA" .
           docker run --rm --entrypoint node -v "$PWD/tests:/app/tests:ro" -v "$PWD/scripts:/app/scripts:ro" -v "$PWD/workers:/app/workers:ro" \

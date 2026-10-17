@@ -141,3 +141,28 @@ credential equality (without printing secrets), auth-volume attachment, and actu
 required database columns with zero learner rows requested. Configured provider
 storage readiness includes a private write/fsync/delete probe; unavailable storage
 makes the service unhealthy instead of silently losing logins at restart.
+
+### Workspace and browser replacement recovery
+
+The runtime checkpoints the trusted Admin repository into encrypted, authenticated
+objects in the existing Studio auth bucket. Manifest publication uses a Google
+object-generation precondition so overlapping revisions cannot overwrite each
+other's accepted checkpoint. Recovery refuses a nonempty workspace, corrupted
+archives, escaping links and unavailable storage; it does not replace existing
+user files. Dependency/cache directories are excluded. File bytes, internal
+links, executable permissions and Git metadata are supported. Running operating
+system processes and shell-local variables are not restored or replayed.
+
+General browser checkpoints are encrypted under the verified operator owner and
+retain supported cookies, local storage, tab URLs/order, selected tab and viewport.
+One-time authorization, logout, checkout and payment URLs are not replayed;
+forwarded Elevate session credentials are not persisted. This does not certify
+IndexedDB, unsaved DOM/form state or every third-party login mechanism. Terminal
+recovery remains bounded output/directory/status recovery with explicit new-shell
+action after interruption. Existing trusted Admin workspace access is preserved.
+
+Cloud deployment and whole-runtime reconnect acceptance remain required before
+traffic cutover or any reduction of minimum instances. Local Chromium recovery
+and object adapter tests are source evidence, not a production cutover certificate.
+
+Completed browser downloads are encrypted separately under the existing auth storage, scoped to the verified owner and download ID, and restored into a new private temporary directory. Metadata is included in the encrypted browser checkpoint. Integrity failure blocks session restoration without publishing partial files. Active downloads/uploads and interrupted media imports are not automatically replayed. Completed files are bounded to 200 per owner checkpoint and 2 GiB per file; no new bucket is created.

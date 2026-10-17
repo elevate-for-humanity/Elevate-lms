@@ -69,7 +69,7 @@ jobs:
           skip_install: true
       - name: Verify cutover, encryption-key preservation and exact revision diagnostics
         run: node --test scripts/test-studio-browser-cutover.mjs
-      - name: Check provisioning permissions before building
+      - name: Verify the existing Studio target and prepared boundary before building
         run: node scripts/gcp/preflight-studio-browser-permissions.mjs
       - name: Verify the owner-prepared dedicated Studio runtime identity
         run: |

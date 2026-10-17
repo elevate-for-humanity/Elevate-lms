@@ -34,3 +34,13 @@ for(const location of ['https://attacker.example/session',base.replace('/store/'
 test('cleanup failure cannot be reported as a passing build preflight',async()=>{
  await assert.rejects(verifyArtifactUpload({run,request:async(_url,init)=>init.method==='POST'?new Response(null,{status:202,headers:{location:base+'session'}}):new Response(null,{status:403})}),/CLEANUP_UNVERIFIED_HTTP_403/);
 });
+
+test('Google internal upload location is restricted to this existing repository and one session',async()=>{
+ const location='https://us-central1-docker.pkg.dev/artifacts-uploads/namespaces/elegant-racer-299721/repositories/elevate/uploads/fixture-session';
+ const result=await verifyArtifactUpload({run,request:async(url,init)=>{
+  if(init.method==='POST')return new Response(null,{status:202,headers:{location}});
+  assert.equal(url,location);return new Response(null,{status:204});
+ }});assert.equal(result.emptySessionCancelled,true);
+ for(const bad of [location.replace('/elevate/','/other/'),location.replace('/fixture-session','/'),location+'/extra'])
+  await assert.rejects(verifyArtifactUpload({run,request:async()=>new Response(null,{status:202,headers:{location:bad}})}),/LOCATION_INVALID/);
+});

@@ -3,6 +3,7 @@ import {google} from './runtime-config.mjs';
 
 const origin='https://us-central1-docker.pkg.dev';
 const prefix='/v2/elegant-racer-299721/elevate/store/blobs/uploads/';
+const googlePrefix='/artifacts-uploads/namespaces/elegant-racer-299721/repositories/elevate/uploads/';
 
 // Opens and cancels an empty session in the existing repository. No layer,
 // manifest, tag, image, Cloud Run revision or billing setting is published.
@@ -21,13 +22,14 @@ export async function verifyArtifactUpload({run=google,request=fetch}={}) {
   }
   let location;
   try {location=new URL(response.headers.get('location')||'',origin);} catch {throw Error('ARTIFACT_UPLOAD_LOCATION_INVALID');}
-  const suffix=location.pathname.slice(prefix.length);
+  const matchedPrefix=[prefix,googlePrefix].find(candidate=>location.pathname.startsWith(candidate));
+  const suffix=matchedPrefix?location.pathname.slice(matchedPrefix.length):"";
   // OCI upload locations are opaque. Google may identify this one session in
   // upload_id rather than appending a UUID to the path. The host/repository
   // boundary is still fixed; an unqualified collection URL is never cancelled.
   const scopedSession=Boolean(suffix)||Boolean(location.searchParams.get('upload_id'));
   if(location.origin!==origin||location.username||location.password||location.hash||
-    !location.pathname.startsWith(prefix)||!scopedSession||suffix.includes('/'))
+    !matchedPrefix||!scopedSession||suffix.includes('/'))
     throw Object.assign(Error('ARTIFACT_UPLOAD_LOCATION_INVALID'),{safeDetails:{
       pathShape:location.pathname.split("/").map(part=>["","v2","elegant-racer-299721","elevate","store","blobs","uploads","artifacts-uploads"].includes(part)?part:"[opaque:"+part.length+"]").join("/"),
       sameOrigin:location.origin===origin,expectedPrefix:location.pathname.startsWith(prefix),

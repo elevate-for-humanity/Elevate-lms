@@ -174,9 +174,8 @@ export default async function PhonePage() {
     ['Calls', callsResult.count ?? 0, Workflow],
     ['New voicemail', voicemailResult.count ?? 0, Voicemail],
   ] as const;
-  // The legacy Telnyx API cannot establish Twilio/PBX readiness.
-  // Carrier readiness must remain false until the approved, non-mutating
-  // Twilio trunk and real inbound/outbound acceptance has succeeded.
+  // A database row or legacy Telnyx probe cannot certify live Twilio/PBX calling.
+  // Keep the dashboard fail-closed until independent carrier and audio acceptance.
   const carrierReady = false;
   const meetingReady = workspaceResult.data?.status === 'active';
   const primaryNumber = numbers.find(

@@ -8,6 +8,11 @@ on:
         type: choice
         default: elevate-course-builder-parallel
         options: [elevate-course-builder, elevate-course-builder-overflow, elevate-course-builder-parallel, elevate-course-builder-repair]
+      approved_digest:
+        description: Explicitly approved immutable template digest; readback 39054560512
+        required: true
+        type: string
+        default: sha256:1c6e221e95530c20ff6b85d2aca254228501c8eb6859325e70f050ee3eeb7c9d
       approved_source:
         description: Previously approved exact worker source commit
         required: true
@@ -27,6 +32,7 @@ jobs:
         with: { persist-credentials: false }
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
+      - run: node --test scripts/gcp/audit-course-image.test.mjs
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -38,6 +44,7 @@ jobs:
         env:
           JOB: ${{ inputs.job }}
           APPROVED_SOURCE: ${{ inputs.approved_source }}
+          APPROVED_DIGEST: ${{ inputs.approved_digest }}
         run: |
           set -euo pipefail
           [[ "$APPROVED_SOURCE" =~ ^[a-f0-9]{40}$ ]] || exit 1
@@ -50,14 +57,7 @@ jobs:
           DIGEST="$(gcloud artifacts docker images describe "$REGISTRY:$APPROVED_SOURCE" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]] || exit 1
           IMAGE="$(gcloud run jobs describe "$JOB" --project=elegant-racer-299721 --region="$REGION" --format='value(spec.template.spec.template.spec.containers[0].image)')"
-          OBSERVED_IMAGE="$IMAGE" APPROVED_DIGEST="$DIGEST" node --input-type=module <<'NODE'
-          const observed=process.env.OBSERVED_IMAGE,expected=process.env.APPROVED_DIGEST;
-          const pinned=/^us-central1-docker\.pkg\.dev\/elegant-racer-299721\/elevate\/ultimate-worker@sha256:[a-f0-9]{64}$/;
-          if(!pinned.test(observed||'')||!/^sha256:[a-f0-9]{64}$/.test(expected||''))throw Error('COURSE_AUDIT_IMAGE_REFERENCE_UNVERIFIED');
-          const matches=observed.endsWith('@'+expected);
-          console.log(JSON.stringify({job:process.env.JOB,approvedSource:process.env.APPROVED_SOURCE,approvedDigest:expected,observedDigest:observed.split('@')[1],imageMatches:matches,executionStarted:false,configurationChanged:false}));
-          if(!matches){console.error('COURSE_AUDIT_APPROVED_IMAGE_MISMATCH');process.exitCode=1;}
-          NODE
+          OBSERVED_IMAGE="$IMAGE" SOURCE_DIGEST="$DIGEST" node scripts/gcp/audit-course-image.mjs
           echo "REGION=$REGION" >> "$GITHUB_ENV"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
           echo "Approved existing image: $IMAGE; no job execution or template change."

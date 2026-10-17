@@ -50,17 +50,17 @@ jobs:
           DIGEST="$(gcloud artifacts docker images describe "$REGISTRY:$APPROVED_SOURCE" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]] || exit 1
           IMAGE="$(gcloud run jobs describe "$JOB" --project=elegant-racer-299721 --region="$REGION" --format='value(spec.template.spec.template.spec.containers[0].image)')"
-          OBSERVED_IMAGE="$IMAGE" APPROVED_DIGEST="$DIGEST" node --input-type=module <<'NODE'
-          const observed=process.env.OBSERVED_IMAGE,expected=process.env.APPROVED_DIGEST;
-          const pinned=/^us-central1-docker\.pkg\.dev\/elegant-racer-299721\/elevate\/ultimate-worker@sha256:[a-f0-9]{64}$/;
-          if(!pinned.test(observed||'')||!/^sha256:[a-f0-9]{64}$/.test(expected||''))throw Error('COURSE_AUDIT_IMAGE_REFERENCE_UNVERIFIED');
-          const matches=observed.endsWith('@'+expected);
-          console.log(JSON.stringify({job:process.env.JOB,approvedSource:process.env.APPROVED_SOURCE,approvedDigest:expected,observedDigest:observed.split('@')[1],imageMatches:matches,executionStarted:false,configurationChanged:false}));
-          if(!matches){console.error('COURSE_AUDIT_APPROVED_IMAGE_MISMATCH');process.exitCode=1;}
-          NODE
+          case "$IMAGE" in
+            "$REGISTRY"@sha256:*) ACTUAL_DIGEST="${IMAGE#*@}" ;;
+            "$REGISTRY":*) ACTUAL_DIGEST="$(gcloud artifacts docker images describe "$IMAGE" --project=elegant-racer-299721 --format='value(image_summary.digest)')" ;;
+            *) echo 'COURSE_AUDIT_UNEXPECTED_IMAGE_REPOSITORY'; exit 1 ;;
+          esac
+          echo "Configured image: $IMAGE; resolved digest: $ACTUAL_DIGEST; approved digest: $DIGEST"
+          test "$ACTUAL_DIGEST" = "$DIGEST" || { echo 'COURSE_AUDIT_APPROVED_IMAGE_MISMATCH'; exit 1; }
           echo "REGION=$REGION" >> "$GITHUB_ENV"
-          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
-          echo "Approved existing image: $IMAGE; no job execution or template change."
+          echo "CONFIGURED_IMAGE=$IMAGE" >> "$GITHUB_ENV"
+          echo "IMAGE=$REGISTRY@$DIGEST" >> "$GITHUB_ENV"
+          echo "Approved immutable image resolved; no job execution or template change."
       - name: Read only the actual job's inline storage connection and canonical lesson references
         env:
           JOB: ${{ inputs.job }}
@@ -72,7 +72,7 @@ jobs:
           cat > "$RUNNER_TEMP/extract-course-audit.mjs" <<'NODE'
           let input='';for await(const part of process.stdin)input+=part;
           const job=JSON.parse(input),containers=job.spec?.template?.spec?.template?.spec?.containers;
-          if(containers?.length!==1||containers[0].image!==process.env.IMAGE)throw Error('COURSE_AUDIT_RUNTIME_CHANGED');
+          if(containers?.length!==1||containers[0].image!==process.env.CONFIGURED_IMAGE)throw Error('COURSE_AUDIT_RUNTIME_CHANGED');
           const names=/^(ELEVATE_MEDIA_|S3_|R2_|CLOUDFLARE_R2_|AWS_|CLOUDFLARE_ACCOUNT_ID$|NEXT_PUBLIC_SUPABASE_URL$|SUPABASE_SERVICE_ROLE_KEY$)/;
           const selected=(containers[0].env||[]).filter(item=>names.test(item.name));
           if(selected.some(item=>item.valueFrom))throw Error('COURSE_AUDIT_INLINE_CONNECTION_UNAVAILABLE');

@@ -1,3 +1,5 @@
+import {verifyStudioRuntimeReplacement} from './verify-studio-runtime-replacement.mjs';
+import {inventoryStudioLiveState} from './inventory-studio-live-state.mjs';
 import {execFileSync, execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {mkdir, writeFile} from 'node:fs/promises';
@@ -96,10 +98,15 @@ if(!foundationResponse.ok)throw Error('Live candidate browser foundation failed;
 const foundation=await foundationResponse.json();
 if(foundation.passed!==true||foundation.commit!==sha||!Array.isArray(foundation.checks)||!foundation.checks.length||foundation.checks.some(check=>check.passed!==true))throw Error('Live candidate browser foundation evidence invalid; serving traffic retained');
 console.log(JSON.stringify({candidateRevision,commit:sha,browserFoundationPassed:true,checks:foundation.checks.map(check=>({name:check.name,passed:check.passed}))}));
+const replacement=await verifyStudioRuntimeReplacement({url:candidate.url,revision:candidateRevision,sha,secret,readTraffic:async()=>JSON.parse(gc(['run','services','describe',name,'--region='+region])).status?.traffic});
+if(replacement?.passed!==true||replacement.runtimeReplaced!==true||replacement.isolatedWorkspaceFileRestored!==true)throw Error('STUDIO_RUNTIME_REPLACEMENT_UNVERIFIED');
+console.log(JSON.stringify(replacement));
 if(process.env.STUDIO_CANDIDATE_ONLY==='true'){
   console.log(JSON.stringify({service:name,candidateRevision,candidateUrl:candidate.url,commit:sha,ready:state.ready,persistent:state.providerAuthStorage.persistent,candidateOnly:true,trafficChanged:false,adminSwitched:false}));
   // Keep the known-good serving revision and all its sessions untouched.
 } else {
+const live=await inventoryStudioLiveState({run:command});
+if(live.activeBrowserSessions!==0||live.workspace.files!==0||live.workspace.symlinks!==0||live.directChildShells!==0||live.directNonBrowserProcesses!==0||live.processInventoryReadable!==true)throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');
 command(['run','services','update-traffic',name,'--project='+project,'--region='+region,'--to-revisions='+candidateRevision+'=100','--quiet']);
 trafficActivated=true;
 state=await verifyHealth(url,'Public browser did not serve the verified candidate');

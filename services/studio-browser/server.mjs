@@ -821,6 +821,20 @@ async function runBrowserFoundationTest() {
       await runActions(session, { type: 'forward' });
       assert(page.url().endsWith('/two'), 'history_forward_failed');
     });
+    await check('durable_browser_viewport_restore', async () => {
+      const owner=testOwner+'-viewport';let restored;
+      try{
+        const first=await createSession('about:blank',{width:390,height:780},[],owner);
+        await destroySession(first.id);
+        restored=await createSession('about:blank',{width:1440,height:900},[],owner);
+        assert(restored.restored===true,'browser_checkpoint_not_restored');
+        assert(restored.viewport.width===390&&restored.viewport.height===780,'saved_browser_viewport_not_restored');
+        assert(restored.page.viewportSize().width===390,'restored_context_viewport_mismatch');
+      }finally{
+        if(restored)await destroySession(restored.id);
+        if(browserWorkspaces.directory)await fs.promises.rm(browserWorkspaces.file(owner),{force:true});
+      }
+    });
     await check('viewport_switch_and_popup_geometry', async () => {
       await runActions(session, { type: 'viewport', width: 1280, height: 900 });
       assert(session.page.viewportSize().width === 1280, 'desktop_viewport_mismatch');
@@ -924,6 +938,7 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
   try{
     restored=await browserWorkspaces.load(persistentOwner);
     if(restored){
+      viewport={...restored.viewport};
       for(const url of restored.tabs)if(url!=='about:blank')await validateTarget(url);
       for(const origin of restored.storageState.origins)await validateTarget(origin.origin);
     }
@@ -1709,7 +1724,7 @@ const server = http.createServer(async (req, res) => {
         token: session.token,
         url: session.page.url(),
         restored:Boolean(session.restored),
-        viewport: { width, height },
+        viewport: {...session.viewport},
         expiresAt: new Date(Date.now() + sessionTtlMs).toISOString(),
       });
     }

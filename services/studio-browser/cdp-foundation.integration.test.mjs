@@ -62,7 +62,7 @@ test(
       const evidence = await response.json();
       assert.equal(response.status, 200, JSON.stringify(evidence.checks));
       assert.equal(evidence.passed, true, JSON.stringify(evidence.checks));
-      assert.equal(evidence.checks.length, 14);
+      assert.equal(evidence.checks.length, 15);
       assert.ok(evidence.checks.every((check) => check.passed === true));
     } finally {
       child.kill('SIGTERM');

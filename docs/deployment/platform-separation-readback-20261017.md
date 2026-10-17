@@ -4,6 +4,31 @@ This is an incomplete release, not a production-readiness certificate. Productio
 
 ## Latest release attempt and additional repairs
 
+### Registry admission verified at 17:56:58 UTC
+
+Manual verification run `39055933365`, job `117463784171`, passed on main
+`fe9f86f03d9cb7e578f0e396aad7ec43b704f5e8`. Google accepted an empty upload
+in the existing Artifact Registry repository; the exact returned upload session
+was cancelled successfully. No layer, manifest, image, tag, production revision,
+or billing setting was published. The earlier billing rejection must no longer
+be presented as the current confirmed blocker. Opening/cancelling a session is
+not proof that a full image push or production release has passed.
+
+The preflight handles Google's repository-scoped internal upload path, rejects
+cross-host/project/repository destinations, redacts opaque session identifiers,
+and blocks builds if admission or cleanup fails. Fourteen focused checks pass.
+Admin/Store now run it before Docker; Marketing/LMS/Course already share the
+same billing preflight. Long build paths refresh credentials before upload.
+
+Dedicated identity preparation still fails Google permissions in fresh preflight
+job `117458626553`. The prepared Studio identity setup remains owner-executable;
+no broader deployer role was granted and Studio remains on its existing identity.
+The Google console is unavailable in this browser. This is an access limitation,
+not evidence the public websites are down. The release hold remains true while
+application separation and acceptance are unfinished. No production traffic was
+changed in this follow-up. Latest course-job read at 17:54:40 UTC was running
+with a live lease; no duplicate job was started.
+
 ### Follow-up verification at 13:32–13:43 Eastern
 
 - Fresh Google preflight job `117458626553` still denies dedicated service

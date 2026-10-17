@@ -6,9 +6,15 @@ import {inspectRegionalCapacity} from './regional-capacity.mjs';
 // This is configured capacity, not instantaneous CPU or memory utilization.
 export async function preflightWebRollout({service,cpu,memory,region='us-central1',run=google,inspect=inspectRegionalCapacity}={}) {
   if(!/^elevate-(?:store|marketing|admin|lms)-migration$/.test(service||''))throw Error('Managed web service required');
-  if(!/^[1-4]$/.test(String(cpu))||!['2Gi','4Gi','8Gi'].includes(memory))throw Error('Approved web candidate allocation required');
+  if((cpu!==undefined&&!/^[1-4]$/.test(String(cpu)))||(memory!==undefined&&!['2Gi','4Gi','8Gi'].includes(memory)))throw Error('Approved web candidate allocation required');
   const read=()=>JSON.parse(run(['run','services','describe',service,'--project='+PROJECT,'--region='+region,'--format=json']));
   const before=read();
+  const current=before.spec?.template?.spec?.containers?.[0]?.resources?.limits;
+  cpu=cpu??current?.cpu;
+  memory=memory??current?.memory;
+  const cpuMatch=String(cpu??'').match(/^(\d+)(m)?$/);
+  cpu=cpuMatch?String(Number(cpuMatch[1])/(cpuMatch[2]?1000:1)):'';
+  if(!/^[1-4]$/.test(cpu)||!['2Gi','4Gi','8Gi'].includes(memory))throw Error('Approved web candidate allocation required');
   const result=await inspect({region,run,task:{containers:[{resources:{limits:{cpu:String(cpu),memory}}}]},taskCount:1});
   if(result.fits!==true)throw Error('WEB_ROLLOUT_REGIONAL_CAPACITY_UNAVAILABLE');
   const after=read();

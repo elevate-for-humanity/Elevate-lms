@@ -252,6 +252,8 @@ jobs:
           if [[ -n "$TAX_ENCRYPTION_BINDING" ]]; then TAX_ARGS+=(--update-secrets="$TAX_ENCRYPTION_BINDING"); fi
           SUFFIX="r${GITHUB_SHA:0:8}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "revision=elevate-marketing-migration-$SUFFIX" >> "$GITHUB_OUTPUT"
+          CANDIDATE_SERVICE=elevate-marketing-migration node scripts/gcp/cleanup-unused-candidate-tags.mjs
+          CANDIDATE_SERVICE=elevate-marketing-migration CANDIDATE_CPU=1 CANDIDATE_MEMORY=4Gi node scripts/gcp/preflight-web-rollout.mjs
           gcloud run services update elevate-marketing-migration \
             --project=elegant-racer-299721 \
             --region=us-central1 \

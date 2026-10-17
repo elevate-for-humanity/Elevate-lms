@@ -21,3 +21,13 @@ test('a release during quota inspection invalidates the result',async()=>{
 test('unapproved target or allocation fails before any Google read',async()=>{
  for(const changes of [{service:'another-app'},{cpu:'8'},{memory:'32Gi'}])await assert.rejects(preflightWebRollout({...options(),...changes,run:()=>{throw Error('must not read');}}),/required/);
 });
+test('image-only releases reserve the existing allocation instead of assuming a profile',async()=>{
+ const service={spec:{template:{spec:{containers:[{resources:{limits:{cpu:'4000m',memory:'8Gi'}}}]}}},status:{latestCreatedRevisionName:'serving',traffic:[]}};
+ const result=await preflightWebRollout({service:'elevate-lms-migration',run:()=>JSON.stringify(service),inspect:async({task})=>{
+  assert.deepEqual(task.containers[0].resources.limits,{cpu:'4',memory:'8Gi'});return {fits:true};
+ }});
+ assert.deepEqual(result.candidate,{cpu:'4',memory:'8Gi'});
+});
+test('image-only releases cannot proceed with an unreadable current allocation',async()=>{
+ await assert.rejects(preflightWebRollout({service:'elevate-admin-migration',run:()=>JSON.stringify({}),inspect:async()=>{throw Error('must not inspect');}}),/allocation required/);
+});

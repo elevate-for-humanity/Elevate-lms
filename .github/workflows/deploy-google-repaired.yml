@@ -64,7 +64,8 @@ jobs:
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$SHA" --project="$PROJECT" --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
           # Releases preserve CPU/memory, probes, identity and secret bindings; disable temporary startup CPU boost.
-          # Cloud Run enforces actual regional quota during revision creation.
+          CANDIDATE_SERVICE="$SERVICE" node scripts/gcp/cleanup-unused-candidate-tags.mjs
+          CANDIDATE_SERVICE="$SERVICE" node scripts/gcp/preflight-web-rollout.mjs
           gcloud run services update "$SERVICE" --project="$PROJECT" --region=us-central1 --image="$IMAGE@$DIGEST" --no-cpu-boost --no-traffic --quiet
       - name: Verify and activate the exact candidate before moving public traffic
         env:

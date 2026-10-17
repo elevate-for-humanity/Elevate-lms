@@ -1,5 +1,7 @@
 'use client';
 
+import styles from './CloudBrowserWorkspace.module.css';
+
 import { useEffect, useId, useRef, useState } from 'react';
 import {
   AlertTriangle,
@@ -816,10 +818,10 @@ export default function CloudBrowserWorkspace({
   return (
     <div
       ref={workspaceRef}
-      className="flex h-full min-h-0 flex-col bg-white text-lg leading-7 text-slate-950"
+      className={`${styles.root} flex h-full min-h-0 flex-col bg-white text-lg leading-7 text-slate-950`}
     >
       <div
-        className={`${mobilePane !== 'browser' ? 'hidden lg:flex' : 'flex'} shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white p-2`}
+        className={`${mobilePane !== 'browser' ? styles.desktopFlex : 'flex'} shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white p-2`}
       >
         <strong className="flex-1 text-lg">Studio browser</strong>
         <button
@@ -852,7 +854,7 @@ export default function CloudBrowserWorkspace({
         <div
           role="toolbar"
           aria-label="Browser view controls"
-          className={`${mobilePane === 'tools' ? 'hidden lg:flex' : 'flex'} shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-2 py-1`}
+          className={`${mobilePane === 'tools' ? styles.desktopFlex : 'flex'} shrink-0 flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-2 py-1`}
         >
           <button
             type="button"
@@ -933,7 +935,7 @@ export default function CloudBrowserWorkspace({
             navigatingRef.current = false;
             setTarget(event.target.value);
           }}
-          className="min-h-12 min-w-0 basis-full flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base lg:basis-auto"
+          className={`${styles.targetInput} min-h-12 min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-base`}
           aria-label="Browser URL"
         />
         {!session ? (
@@ -1122,7 +1124,7 @@ export default function CloudBrowserWorkspace({
       )}
       <nav
         aria-label="Browser workspace panels"
-        className="flex shrink-0 gap-2 border-b border-slate-300 p-2 lg:hidden"
+        className={`${styles.mobileTabs} shrink-0 gap-2 border-b border-slate-300 p-2`}
       >
         <button
           type="button"
@@ -1150,10 +1152,10 @@ export default function CloudBrowserWorkspace({
         </button>
       </nav>
       <div
-        className={`grid min-h-0 min-w-0 flex-1 ${mobilePane === 'signin' ? 'grid-rows-[minmax(80px,35%)_minmax(0,1fr)] lg:grid-rows-1' : ''} lg:grid-cols-[minmax(0,1fr)_340px]`}
+        className={`${styles.workspace} min-h-0 min-w-0 flex-1 ${mobilePane === 'signin' ? styles.signInStack : ''}`}
       >
         <div
-          className={`${mobilePane !== 'tools' ? 'flex' : 'hidden lg:flex'} relative min-h-0 items-start ${imageZoom > 1 ? 'justify-start' : 'justify-center'} overflow-auto overscroll-contain bg-slate-100`}
+          className={`${mobilePane !== 'tools' ? 'flex' : styles.desktopFlex} relative min-h-0 items-start ${imageZoom > 1 ? 'justify-start' : 'justify-center'} overflow-auto overscroll-contain bg-slate-100`}
         >
           {session ? (
             <img
@@ -1293,7 +1295,7 @@ export default function CloudBrowserWorkspace({
           )}
         </div>
         <aside
-          className={`${mobilePane !== 'browser' ? 'flex' : 'hidden lg:flex'} min-h-0 flex-col overflow-y-auto border-t border-slate-200 bg-white lg:border-l lg:border-t-0`}
+          className={`${styles.tools} ${mobilePane !== 'browser' ? 'flex' : styles.desktopFlex} min-h-0 flex-col overflow-y-auto border-t border-slate-200 bg-white`}
         >
           <div className="shrink-0 border-b border-slate-200 p-3">
             <p className="mb-2 text-base font-bold text-emerald-800">Sign in securely</p>
@@ -1386,7 +1388,7 @@ export default function CloudBrowserWorkspace({
               Replace the selected browser field
             </label>
           </div>
-          <div className={`${mobilePane === 'signin' ? 'hidden lg:block' : 'contents'}`}>
+          <div className={`${mobilePane === 'signin' ? styles.desktopBlock : 'contents'}`}>
             <div className="border-b border-slate-200 p-3">
               <p className="mb-1 flex items-center gap-2 text-xs font-black text-cyan-800">
                 <Download className="h-4 w-4" /> Envato licensed downloads

@@ -1,0 +1,107 @@
+.root {
+  container: workspace / inline-size;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  flex-shrink: 0;
+  padding: 0.5rem;
+  border-bottom: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #0f172a;
+}
+.title {
+  flex: 1 1 8rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+.toolbar button {
+  min-height: 44px;
+  padding: 0.375rem 0.625rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  background: white;
+  color: #0f172a;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.toolbar button:disabled {
+  opacity: 0.45;
+}
+.toolbar button:focus-visible,
+.separator:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: -3px;
+}
+.body {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+.primary {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+.secondary {
+  flex: 0 0 var(--panel-width);
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+.primary[hidden],
+.secondary[hidden] {
+  display: none;
+}
+.expanded .secondary {
+  flex: 1;
+}
+.separator {
+  position: relative;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 12px;
+  background: #e2e8f0;
+  color: #334155;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+}
+.separator:hover {
+  background: #bfdbfe;
+}
+.dragShield {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  cursor: grabbing;
+}
+@container workspace (max-width: 760px) {
+  .open:not(.expanded) {
+    flex-direction: column;
+  }
+  .open:not(.expanded) .secondary {
+    flex: 0 0 var(--panel-height);
+    width: 100%;
+  }
+  .separator {
+    flex-basis: 16px;
+    width: 100%;
+    cursor: row-resize;
+  }
+  .separator span {
+    transform: rotate(90deg);
+  }
+}

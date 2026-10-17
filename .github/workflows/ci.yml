@@ -42,7 +42,9 @@ jobs:
       - name: Public narration lifecycle regression tests
         run: pnpm exec vitest run tests/unit/scroll-narrator-playback.test.tsx tests/unit/home-scroll-narrator-regression.test.ts tests/unit/natural-voice-pacing.test.ts
       - name: Google runtime settings regression tests
-        run: pnpm exec vitest run tests/unit/program-holder-sync.test.ts tests/unit/google-container-env.test.ts tests/unit/google-deployment-dispatch.test.ts tests/unit/pwa-homepage-hydration.test.tsx tests/unit/pwa-install-prompt-lifecycle.test.ts tests/unit/admin-pwa-navigation-regression.test.ts
+        run: pnpm exec vitest run tests/unit/program-holder-sync.test.ts tests/unit/google-container-env.test.ts tests/unit/google-deployment-dispatch.test.ts tests/unit/pwa-homepage-hydration.test.tsx tests/unit/pwa-install-prompt-lifecycle.test.ts tests/unit/admin-pwa-navigation-regression.test.ts tests/unit/pwa-update-lifecycle.test.tsx tests/unit/pwa-update-notice.test.tsx
+      - name: Resizable Studio and Course Builder panels
+        run: pnpm exec vitest run tests/unit/resizable-workspace.test.tsx tests/unit/course-browser-panels.test.tsx tests/unit/studio-conversation-workspace.test.tsx tests/unit/studio-browser-navigation.test.tsx tests/unit/studio-browser-secure-input.test.tsx tests/unit/studio-viewport.test.tsx
       - name: Google activation and dependency health regression tests
         run: |
           node --test scripts/test-public-revision-activation.mjs

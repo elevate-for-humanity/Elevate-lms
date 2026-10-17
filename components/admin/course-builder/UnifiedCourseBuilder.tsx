@@ -1,9 +1,13 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+import { ResizableWorkspace } from '@/components/studio/ResizableWorkspace';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Award, BookOpen, Bot, Loader2, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
 import UltimateStageInspector from '@/components/admin/course-builder/UltimateStageInspector';
 import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
+
+const CloudBrowserWorkspace = dynamic(() => import('@/components/studio/CloudBrowserWorkspace'), { ssr: false });
 
 type Tab = 'courses' | 'ultimate' | 'registry';
 type CourseRow = {
@@ -92,11 +96,15 @@ export default function UnifiedCourseBuilder({
   initialCourseId = '',
   initialTab = 'ultimate',
   embedded = false,
+  initialBrowserTarget = '',
 }: {
   initialCourseId?: string;
   initialTab?: Tab;
   embedded?: boolean;
+  initialBrowserTarget?: string;
 }) {
+  const [browserOpen, setBrowserOpen] = useState(false);
+  const [browserVisited, setBrowserVisited] = useState(false);
   const [tab, setTab] = useState<Tab>(initialTab);
   const [courses, setCourses] = useState<CourseRow[]>([]);
   const [programs, setPrograms] = useState<ProgramRow[]>([]);
@@ -181,7 +189,7 @@ export default function UnifiedCourseBuilder({
       );
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return (
+  const workspace = (
     <div
       className={`${embedded ? 'h-full overflow-y-auto' : 'min-h-screen'} min-w-0 w-full overflow-x-clip bg-slate-950 text-slate-100`}
     >
@@ -290,6 +298,17 @@ export default function UnifiedCourseBuilder({
         {tab === 'registry' && <CredentialRegistryPanel course={selectedCourse} />}
       </main>
     </div>
+  );
+  return (
+    <ResizableWorkspace
+      className={embedded ? 'h-full' : 'h-[calc(100dvh-5rem)] min-h-[34rem]'}
+      title="Course browser"
+      open={browserOpen}
+      onOpenChange={(open) => { setBrowserOpen(open); if (open) setBrowserVisited(true); }}
+      panel={browserVisited ? <CloudBrowserWorkspace autoStart={browserOpen} initialTarget={initialBrowserTarget} /> : null}
+    >
+      {workspace}
+    </ResizableWorkspace>
   );
 }
 
@@ -829,7 +848,7 @@ export function UltimateBuildPanel({
         </p>
       ) : null}
 
-      <div className="mt-5 grid min-w-0 gap-2 sm:gap-4 lg:grid-cols-3">
+      <div data-course-status-cards className="mt-5 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-2 sm:gap-4">
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-300">Status</p>
           <p className="mt-1 text-lg font-black text-white">
@@ -844,7 +863,7 @@ export function UltimateBuildPanel({
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-300">Saved work</p>
-          <p className="mt-1 break-all text-sm font-bold text-slate-200">
+          <p className="mt-1 break-words text-sm font-bold text-slate-200">
             {statusLoading ? 'Loading course build…' : (!statusLoaded || statusError) ? 'Unavailable' : (latest ? 'Lesson checkpoints preserved' : 'Saved when started')}
           </p>
         </div>

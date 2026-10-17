@@ -22,9 +22,10 @@ test('never forwards the returned authorization token to an untrusted endpoint',
  await assert.rejects(()=>resolveOwnerPreviewB2(environment(),async()=>{calls++;const a=authorized();a.apiInfo.storageApi.apiUrl='https://example.org';return {ok:true,json:async()=>a};}),/ENDPOINT_INVALID/);
  assert.equal(calls,1);
 });
-test('a private bucket remains private and is reported instead of changing its ACL',async()=>{
+test('an existing private bucket supports the signed owner preview without changing its ACL',async()=>{
  const calls=[];
- await assert.rejects(()=>resolveOwnerPreviewB2(environment(),async(url,options)=>{calls.push(url);const b=bucket();b.buckets[0].bucketType='allPrivate';return {ok:true,json:async()=>url.includes('authorize_account')?authorized():b};}),/EXISTING_PUBLIC_DELIVERY_REQUIRED/);
+ const result=await resolveOwnerPreviewB2(environment(),async(url,options)=>{calls.push(url);const b=bucket();b.buckets[0].bucketType='allPrivate';return {ok:true,json:async()=>url.includes('authorize_account')?authorized():b};});
+ assert.equal(result.environment.ELEVATE_MEDIA_BUCKET,'elevate-course-media');
  assert.equal(calls.length,2);assert.equal(calls.some(x=>x.includes('update_bucket')),false);
 });
 test('reads both explicitly authorized canonical media keys as one family when the old runtime has no B2 pair',async()=>{

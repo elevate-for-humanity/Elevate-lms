@@ -5,6 +5,29 @@ import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
+// Select one complete credential family. Never combine a B2 endpoint with
+// credentials inherited from a different provider or silently use Supabase.
+export function courseB2Environment(vars) {
+  const canonical=Boolean(vars.ELEVATE_MEDIA_ENDPOINT);
+  const keys=canonical
+    ? ['ELEVATE_MEDIA_ENDPOINT','ELEVATE_MEDIA_ACCESS_KEY_ID','ELEVATE_MEDIA_SECRET_ACCESS_KEY','ELEVATE_MEDIA_BUCKET']
+    : ['S3_ENDPOINT','S3_ACCESS_KEY_ID','S3_SECRET_ACCESS_KEY','S3_BUCKET'];
+  if(keys.some(key=>typeof vars[key]!=='string'||!vars[key].trim()))throw Error('COURSE_B2_CONFIGURATION_INCOMPLETE');
+  let endpoint,delivery;
+  try {
+    endpoint=new URL(vars[keys[0]]);
+    delivery=new URL(canonical?(vars.ELEVATE_MEDIA_PUBLIC_URL||vars.NEXT_PUBLIC_ELEVATE_MEDIA_URL):vars.S3_PUBLIC_URL);
+  } catch {throw Error('COURSE_B2_CONFIGURATION_INVALID');}
+  if(endpoint.protocol!=='https:'||!/^s3\.[a-z0-9-]+\.backblazeb2\.com$/.test(endpoint.hostname)||
+    endpoint.username||endpoint.password||endpoint.port||endpoint.search||endpoint.hash||endpoint.pathname!=='/'||
+    delivery.protocol!=='https:'||delivery.username||delivery.password||delivery.search||delivery.hash)
+    throw Error('COURSE_B2_CONFIGURATION_INVALID');
+  return {COURSE_VIDEO_STORAGE_BACKEND:'b2',ELEVATE_MEDIA_PROVIDER:'backblaze-b2',
+    ELEVATE_MEDIA_ENDPOINT:endpoint.origin,ELEVATE_MEDIA_REGION:endpoint.hostname.split('.')[1],
+    ELEVATE_MEDIA_ACCESS_KEY_ID:vars[keys[1]],ELEVATE_MEDIA_SECRET_ACCESS_KEY:vars[keys[2]],
+    ELEVATE_MEDIA_BUCKET:vars[keys[3]],ELEVATE_MEDIA_PUBLIC_URL:delivery.href.replace(/\/$/,'')};
+}
+
 export function courseJobEnvironment(source, service) {
   if (Object.keys(source.runtimeFiles ?? {}).length || (service.deployment?.volumes ?? service.volumes ?? []).length)
     throw new Error('Worker files or volumes require explicit migration');
@@ -24,6 +47,7 @@ export function courseJobEnvironment(source, service) {
   result.AI_NARRATION_PROVIDER = 'kokoro';
   result.AI_TRANSCRIPTION_PROVIDER = 'local_whisper';
   result.REMOTION_RENDER_CONCURRENCY = '1';
+  Object.assign(result,courseB2Environment(vars));
   return result;
 }
 

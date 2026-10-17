@@ -4,6 +4,54 @@ This is an incomplete release, not a production-readiness certificate. Productio
 
 ## Latest release attempt and additional repairs
 
+### Follow-up verification at 13:32–13:43 Eastern
+
+- Fresh Google preflight job `117458626553` still denies dedicated service
+  identity preparation. Billing remains enabled at project level, but linked
+  billing-account inspection is HTTP 403; the prior Artifact Registry upload
+  rejection has not been proven resolved. No new production upload was attempted.
+- Studio repair commit `a8d28a9e95fb0761670e1269caf28f8a9c20d82a` retains live
+  provider sessions when final checkpoints fail during normal close/expiry.
+  Forced shutdown/dead-browser cleanup explicitly reports checkpoint failure.
+  Production min=1 and the existing serving revision remain unchanged.
+- Studio validation run `39054464852` passed the actual nonroot container build,
+  all **95 Chromium tests with zero skips**, 257 integration regressions, 15
+  Google identity/cutover checks, and read-only practical schema verification.
+  The retired-provider validation dependency was removed. CI and Pre-deploy
+  Check passed for that commit. These are code/container checks, not a live
+  generic workspace or terminal restoration certificate.
+- Historical recovery run `39054560512` verified execution
+  `elevate-course-builder-x7tbr` is already terminal. Its image is
+  `sha256:8854ba2d21bdeab0b8e88fb3f42072677e3a5b82f5e890ff2f5d77ca84473016`;
+  today's approved template uses
+  `sha256:1c6e221e95530c20ff6b85d2aca254228501c8eb6859325e70f050ee3eeb7c9d`.
+  No cancellation was requested, and checkpoints were retained. The historical
+  `EXECUTION_IMAGE_MISMATCH` incident is resolved as an obsolete terminal
+  execution; an active mismatched execution still fails closed.
+- A separate course build was already running under its existing coordinator.
+  It was not duplicated or restarted. As of 17:42 UTC its live lease was current
+  and progress reported `render-frames:900`; this is not a completion assertion.
+- An existing lesson artifact snapshot passed full MP4 decode: 232.122 seconds,
+  H.264 1920×1080 video, AAC stereo 48 kHz audio, 17,892,097 bytes. SHA-256:
+  `b749410662a09363275a8d7c27ffe47bb0db77141bbf7f637a7b3235b018e2ac`.
+  Its VTT contains cue timings and its transcript is nonempty. The temporary
+  inspection copy was removed. **Its URLs point to Supabase storage, not B2.**
+  This does not satisfy the approved B2 destination or instructional acceptance.
+- Course job deployment configuration now requires one complete Backblaze
+  credential family and an unsigned HTTPS delivery base, normalizes approved
+  B2 settings, and forces all new course-media uploads through the explicit B2
+  backend. Missing/incompatible configuration refuses deployment rather than
+  silently falling back. Existing playable objects, live job configuration,
+  saved checkpoints, capacity and customer data were not changed. Thirteen
+  focused deployment/execution checks and three regional-sync checks passed.
+
+The remaining work still includes Store merchant acceptance/configuration
+cutover, Legacy Firebase reconciliation and deployment, tax runtime/auth and
+private-document migration, B2 publication/recovery acceptance, generic Studio
+workspace/terminal restoration, and live Admin permission testing. Account-level
+access blocks production actions; these engineering and acceptance tasks are
+not all explained by the account blocker.
+
 The owner authorized production release on October 17. Main commit
 `cb0862c1db4cddd8861a097427d1dc58d3db5821` passed CI, Pre-deploy Check and
 Compliance Gate. Store release run `39048024817`, job `117440634413`, passed
@@ -120,5 +168,5 @@ Renderer monitoring reads succeeded but returned no samples in the preflight win
 3. Studio currently uses Admin's identity. Only Envato provider auth state has existing encrypted persistence; generic browser sessions, terminals and local workspace restoration have not passed restart/reconnection acceptance. Preserve min=1; do not move or scale to zero yet.
 4. Legacy authentication, customer data and Academy still span recovered Firebase code and the dedicated Supabase foundation. Its own PayPal/QuickBooks merchant authorization is not verified.
 5. Supersonic has no verified separate runtime or completed data-boundary migration. IRS/provider/ATS approval gates remain in force.
-6. Course execution image mismatch and checkpoint compatibility are unresolved. Do not disable integrity checks or restart all courses. A dedicated consumer must prove both video and agentic task processing before disabling Admin workers.
+6. Historical execution image mismatch is resolved as an already-terminal incident (see follow-up evidence). New complete-lesson checkpoint compatibility, B2 delivery and final media acceptance remain incomplete. Do not disable integrity checks or restart all courses. A dedicated consumer must prove both video and agentic task processing before disabling Admin workers.
 7. Final integrated builds, security review, application-specific production acceptance and one coordinated sequential release remain incomplete. No component should be labeled fully production-ready from a passing workflow alone.

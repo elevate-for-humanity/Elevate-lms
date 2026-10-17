@@ -122,7 +122,9 @@ test('canonical-key proof failure never deploys or rotates Studio credentials',a
 test('candidate acceptance leaves serving traffic and Admin untouched',async()=>{
  const f=await execute({env:{STUDIO_CANDIDATE_ONLY:'true'}});
  assert.equal(f.error,undefined);assert.equal(switched(f),false);
- assert.equal(f.commands.some(a=>a[2]==='update-traffic'),false);
+ assert.equal(f.commands.some(a=>a.some(v=>v.startsWith('--to-revisions='))),false);
+ assert.ok(f.commands.some(a=>a.includes('--remove-tags=studio-verify')));
+ assert.equal(f.commands.some(a=>a.includes('delete')),false);
  assert.ok(f.requests.includes('https://candidate.example.test/health'));
  assert.equal(f.requests.filter(u=>u==='https://candidate.example.test/workspace/files').length,2);
 });

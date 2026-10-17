@@ -13,6 +13,7 @@ import { launchBrowser } from './cdp-browser.mjs';
 import { commandArguments } from './command-arguments.mjs';
 import { ProviderSessionStore } from './provider-session-store.mjs';
 import {WorkspaceCheckpoint} from './workspace-checkpoint.mjs';
+import {BrowserFileStore} from './browser-file-store.mjs';
 import {GcsWorkspaceObjects} from './gcs-workspace-objects.mjs';
 import {BrowserWorkspaceStore} from './browser-workspace-store.mjs';
 import {TerminalSessions,TerminalSessionError} from './terminal-sessions.mjs';
@@ -58,9 +59,15 @@ const providerSessions = new ProviderSessionStore({
   directory: process.env.STUDIO_BROWSER_AUTH_STATE_DIR || undefined,
 });
 const browserWorkspaces=new BrowserWorkspaceStore({secret:sharedSecret,directory:process.env.STUDIO_BROWSER_AUTH_STATE_DIR?path.join(process.env.STUDIO_BROWSER_AUTH_STATE_DIR,'browser-workspaces'):undefined});
+const browserFiles=new BrowserFileStore({secret:sharedSecret,directory:process.env.STUDIO_BROWSER_AUTH_STATE_DIR?path.join(process.env.STUDIO_BROWSER_AUTH_STATE_DIR,'browser-files'):undefined});
 async function saveBrowserWorkspace(session){
   if(session.restoring)return;
   await providerSessions.save(session.providerScope,session.context);
+  if(browserFiles.directory&&/^[a-zA-Z0-9_-]{1,128}$/.test(session.ownerId||'')){
+    const ready=[...(session.downloads?.values()||[])].filter(item=>item.status==='ready'||item.durablePending===true);
+    if(ready.length>200)throw Error('BROWSER_FILE_LIMIT_EXCEEDED');
+    session.persistedDownloads=await Promise.all(ready.map(item=>browserFiles.save(session.ownerId,item)));
+  }
   await browserWorkspaces.save(session);
 }
 let learnerTestRunning = false;
@@ -969,6 +976,9 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
       const id = crypto.randomUUID();
       const token = crypto.randomBytes(32).toString('base64url');
       const downloadDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'studio-browser-'));
+      let restoredDownloads;
+      try{restoredDownloads=restored?.downloads?.length?await browserFiles.restore(persistentOwner,restored.downloads,downloadDir):new Map();}
+      catch(cause){await fs.promises.rm(downloadDir,{recursive:true,force:true});throw Error('BROWSER_FILE_RESTORE_FAILED',{cause});}
       const session = {
         id,
         token,
@@ -988,7 +998,7 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
         framesSent: 0,
         framesDropped: 0,
         events: [],
-        downloads: new Map(),
+        downloads: restoredDownloads,
         downloadDir,
       };
       const record = (type, data) => {
@@ -1048,10 +1058,15 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
               await prepareCourseVideoDownload(item);
               const stat = await fs.promises.stat(item.filePath);
               item.size = stat.size;
+              item.durablePending = true;
+              await session.checkpointProviderState?.();
+              await saveBrowserWorkspace(session);
+              delete item.durablePending;
               item.status = 'ready';
               record('download', { downloadId: id, fileName, size: stat.size, status: 'ready' });
             })
             .catch((error) => {
+              delete item.durablePending;
               item.status = 'failed';
               item.error = sanitizeReason(error);
               record('download', { downloadId: id, fileName, status: 'failed', error: item.error });

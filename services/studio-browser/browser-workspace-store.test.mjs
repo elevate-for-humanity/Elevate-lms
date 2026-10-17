@@ -25,3 +25,10 @@ test('a failed checkpoint preserves the previous durable browser state',async t=
  const config=await fixture(t),store=new BrowserWorkspaceStore(config),s=session();await store.save(s);s.context.storageState=async()=>{throw Error('context lost');};
  await assert.rejects(store.save(s));assert.equal((await store.load('operator-a')).tabs[0],'https://example.com/work');
 });
+
+test('completed download metadata remains inside the owner-encrypted checkpoint',async t=>{
+ const config=await fixture(t),store=new BrowserWorkspaceStore(config),s=session();
+ s.persistedDownloads=[{id:'a5149ac1-7f62-44d1-9dfc-30d334aa0ff2',fileName:'private-lesson.mp4',size:42,contentType:'video/mp4'}];
+ await store.save(s);const recovered=await new BrowserWorkspaceStore(config).load(s.ownerId);assert.deepEqual(recovered.downloads,s.persistedDownloads);
+ assert.ok(!(await fs.readFile(store.file(s.ownerId),'utf8')).includes('private-lesson'));
+});

@@ -164,3 +164,5 @@ action after interruption. Existing trusted Admin workspace access is preserved.
 Cloud deployment and whole-runtime reconnect acceptance remain required before
 traffic cutover or any reduction of minimum instances. Local Chromium recovery
 and object adapter tests are source evidence, not a production cutover certificate.
+
+Completed browser downloads are encrypted separately under the existing auth storage, scoped to the verified owner and download ID, and restored into a new private temporary directory. Metadata is included in the encrypted browser checkpoint. Integrity failure blocks session restoration without publishing partial files. Active downloads/uploads and interrupted media imports are not automatically replayed. Completed files are bounded to 200 per owner checkpoint and 2 GiB per file; no new bucket is created.

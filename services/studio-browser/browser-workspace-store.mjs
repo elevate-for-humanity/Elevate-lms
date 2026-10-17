@@ -20,6 +20,7 @@ function validate(checkpoint,owner){
  for(const url of checkpoint.tabs)if(typeof url!=='string'||url.length>16384||restorableTabUrl(url)!==url)throw Error('BROWSER_CHECKPOINT_INVALID');
  if(!Array.isArray(checkpoint.storageState?.cookies)||!Array.isArray(checkpoint.storageState?.origins)||checkpoint.storageState.cookies.length>10000||checkpoint.storageState.origins.length>200)throw Error('BROWSER_CHECKPOINT_INVALID');
  for(const origin of checkpoint.storageState.origins){const url=new URL(origin.origin);if(!['http:','https:'].includes(url.protocol)||url.origin!==origin.origin||!Array.isArray(origin.localStorage))throw Error('BROWSER_CHECKPOINT_INVALID');}
+ if(checkpoint.downloads!==undefined&&(!Array.isArray(checkpoint.downloads)||checkpoint.downloads.length>200))throw Error('BROWSER_CHECKPOINT_INVALID');
  return checkpoint;
 }
 export class BrowserWorkspaceStore extends ProviderSessionStore {
@@ -41,7 +42,7 @@ export class BrowserWorkspaceStore extends ProviderSessionStore {
   const save=async()=>{
    const source=await session.context.storageState({indexedDB:true});
    const entries=[...(session.pages||new Map()).entries()];
-   const checkpoint=validate({version:1,owner,viewport:session.viewport,tabs:entries.length?entries.map(([,page])=>restorableTabUrl(page.url())):['about:blank'],activeTabIndex:Math.max(0,entries.findIndex(([id])=>id===session.activeTabId)),storageState:{
+   const checkpoint=validate({version:1,owner,downloads:session.persistedDownloads||[],viewport:session.viewport,tabs:entries.length?entries.map(([,page])=>restorableTabUrl(page.url())):['about:blank'],activeTabIndex:Math.max(0,entries.findIndex(([id])=>id===session.activeTabId)),storageState:{
     cookies:source.cookies.filter(cookie=>!(elevate(String(cookie.domain).replace(/^\./,''))&&forwardedToken(cookie.name))),
     origins:source.origins.map(origin=>elevate(new URL(origin.origin).hostname)?{...origin,localStorage:origin.localStorage.filter(item=>!forwardedToken(item.name)),indexedDB:[]}:origin),
    }},owner);

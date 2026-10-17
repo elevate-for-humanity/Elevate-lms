@@ -169,8 +169,8 @@ jobs:
           const search=()=>run(['asset','search-all-resources','--scope=projects/'+project,'--limit=1','--format=json']);
           let result=search();
           if(result.status!==0){
-            if(!/cloudasset\.assets\.searchAllResources/.test(result.stderr||'')||!/PERMISSION_DENIED|permission.*denied/i.test(result.stderr||'')){
-              console.log(JSON.stringify({assetSearchVerified:false,permissionDenied:/PERMISSION_DENIED|permission.*denied/i.test(result.stderr||''),apiUnavailable:/SERVICE_DISABLED|has not been used|is disabled/i.test(result.stderr||''),commandError:String(result.stderr||'').split('\n').find(line=>line.startsWith('ERROR:'))?.slice(0,500).replace(/Bearer\s+\S+/gi,'Bearer [REDACTED]').replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[REDACTED JWT]')}));
+            if(!(/cloudasset\.assets\.searchAllResources/.test(result.stderr||'')||String(result.stderr||'').includes(project+':searchAllResources'))||!/PERMISSION_DENIED|permission.*denied|does not have permission/i.test(result.stderr||'')){
+              console.log(JSON.stringify({assetSearchVerified:false,permissionDenied:/PERMISSION_DENIED|permission.*denied|does not have permission/i.test(result.stderr||''),apiUnavailable:/SERVICE_DISABLED|has not been used|is disabled/i.test(result.stderr||''),commandError:String(result.stderr||'').split('\n').find(line=>line.startsWith('ERROR:'))?.slice(0,500).replace(/Bearer\s+\S+/gi,'Bearer [REDACTED]').replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[REDACTED JWT]')}));
               throw Error('Asset search failed without the exact resource-search permission diagnosis; no IAM change made');
             }
             const grant=run(['projects','add-iam-policy-binding',project,'--member=serviceAccount:elevate-github-deploy@'+project+'.iam.gserviceaccount.com','--role=roles/cloudasset.viewer','--condition=None','--format=value(etag)']);

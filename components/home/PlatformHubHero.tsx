@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import ImageMetadata from '@/components/marketing/ImageMetadata';
 
-const HOME_IMAGE = '/images/refresh-20261014/home.webp';
+const HOME_IMAGE = '/images/refresh-20261014/home-signed-20261017.webp';
 
 export function PlatformHubHero() {
   return (
@@ -27,14 +27,6 @@ export function PlatformHubHero() {
           sizes="100vw"
           className="object-cover object-[center_74%]"
         />
-        <div className="absolute left-4 top-4 max-w-[calc(100%-2rem)] rounded-xl bg-white px-4 py-3 shadow-md sm:left-8 sm:top-6 sm:px-6">
-          <p className="text-xl font-black tracking-tight text-slate-950 sm:text-3xl">
-            Elevate for Humanity
-          </p>
-          <p className="mt-1 text-xs font-bold uppercase tracking-wide text-brand-blue-700 sm:text-sm">
-            Opportunity · Training · Community
-          </p>
-        </div>
       </div>
       <div className="relative mx-auto flex max-w-6xl items-center px-5 py-6 sm:px-8 sm:py-8">
         <div className="max-w-3xl">

@@ -112,9 +112,14 @@ const unauthorized=await fetch(candidate.url+'/workspace/files',{signal:AbortSig
 if(unauthorized.status!==401)throw Error('Browser service authorization boundary failed; Admin was not switched');
 const authorized=await fetch(candidate.url+'/workspace/files',{headers:{'x-studio-browser-secret':secret},signal:AbortSignal.timeout(20000)});
 if(!authorized.ok)throw Error('Authenticated workspace proof failed; Admin was not switched');
+if(process.env.STUDIO_CANDIDATE_ONLY==='true'){
+  console.log(JSON.stringify({service:name,candidateRevision,candidateUrl:candidate.url,commit:sha,ready:state.ready,persistent:state.providerAuthStorage.persistent,candidateOnly:true,trafficChanged:false,adminSwitched:false}));
+  // Keep the known-good serving revision and all its sessions untouched.
+} else {
 command(['run','services','update-traffic',name,'--project='+project,'--region='+region,'--to-revisions='+candidateRevision+'=100','--quiet']);
 trafficActivated=true;
 state=await verifyHealth(url,'Public browser did not serve the verified candidate');
+}
 } catch(error) {
   if(trafficActivated&&previousTraffic){
     try{command(['run','services','update-traffic',name,'--project='+project,'--region='+region,'--to-revisions='+previousTraffic,'--quiet']);}
@@ -123,5 +128,8 @@ state=await verifyHealth(url,'Public browser did not serve the verified candidat
   await collectStartupDiagnostics(secret);
   throw new Error(String(error.message).split(secret).join('[REDACTED]'));
 }
+if(process.env.STUDIO_CANDIDATE_ONLY!=='true'){
 command(['run','services','update','elevate-admin-migration','--project='+project,'--region='+region,'--update-env-vars=STUDIO_BROWSER_URL='+url+',STUDIO_BROWSER_PUBLIC_URL='+url,'--quiet']);
 console.log(JSON.stringify({service:name,url,commit:sha,ready:state.ready,persistent:state.providerAuthStorage.persistent,authorizedWorkspace:true,anonymousWorkspaceDenied:true,adminSwitched:true,oldProviderRemoved:false,existingProviderLoginRecovery:'not verified'}));
+
+}

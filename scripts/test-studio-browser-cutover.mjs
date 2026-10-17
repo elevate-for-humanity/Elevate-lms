@@ -21,7 +21,7 @@ async function execute(overrides={}){
   execFileSync(_program,args){return output(args);},
   execFile(_program,args,_options,callback){f.diagnostics.push(args);callback(null,{stdout:args.includes('--format=value(status.latestCreatedRevisionName)')?'browser-failed-revision':'{}'});},
   async mkdir(){},async writeFile(){},
-  process:{env:{IMAGE_SHA:sha}},
+  process:{env:{IMAGE_SHA:sha,...(f.env||{})}},
   console:{log(){},error(){}},
   setTimeout(callback){return setTimeout(callback,0);},
   async fetch(url,options){
@@ -116,4 +116,12 @@ test('canonical-key proof failure never deploys or rotates Studio credentials',a
  assert.match(f.error.message,/refusing credential rotation/);
  assert.equal(f.commands.some(a=>a[0]==='run'&&a[1]==='deploy'),false);
  assert.equal(f.commands.some(a=>a[0]==='secrets'&&a[1]==='versions'&&a[2]==='add'),false);
+});
+
+test('candidate acceptance leaves serving traffic and Admin untouched',async()=>{
+ const f=await execute({env:{STUDIO_CANDIDATE_ONLY:'true'}});
+ assert.equal(f.error,undefined);assert.equal(switched(f),false);
+ assert.equal(f.commands.some(a=>a[2]==='update-traffic'),false);
+ assert.ok(f.requests.includes('https://candidate.example.test/health'));
+ assert.equal(f.requests.filter(u=>u==='https://candidate.example.test/workspace/files').length,2);
 });

@@ -15,6 +15,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useStoreCart } from '@/hooks/useStoreCart';
+import { storeSignInHref } from '@/lib/store/sign-in-return.mjs';
 import { addToCart } from '@/lib/store/cart';
 import {
   isIndividualAppCartProduct,
@@ -49,8 +50,7 @@ export default function StoreCartView({ checkoutError, addParam }: Props) {
   const checkout = async () => {
     if (!cart.items.length) return;
     const redirectToLogin = () => {
-      const returnUrl = `${window.location.origin}/store/cart`;
-      window.location.href = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(returnUrl)}`;
+      window.location.href = storeSignInHref('/store/cart');
     };
     setCheckingOut(true);
     setMessage(null);

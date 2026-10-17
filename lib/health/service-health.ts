@@ -1,3 +1,5 @@
+import { getPublicRuntimeService } from './public-runtime-service';
+
 export type RuntimeReadiness = {
   ready: boolean;
   missing: string[];
@@ -70,10 +72,11 @@ export async function checkSupabaseHealth(timeoutMs = 2500, request: typeof fetc
         error: ['TimeoutError', 'AbortError', 'TypeError', 'SyntaxError'].includes(name) ? name : 'request_failed' };
     }
   }
-  // Independent, read-only checks: Auth availability and a real public catalog
-  // database query. No service-role key, writes or student data are involved.
+  // Each runtime probes its own public catalog. Store health must not depend
+  // on an LMS program table being present in its database boundary.
+  const catalog = getPublicRuntimeService() === 'store' ? 'products' : 'programs';
   const [auth, database] = await Promise.all([
-    probe('/auth/v1/settings'), probe('/rest/v1/programs?select=id&limit=1'),
+    probe('/auth/v1/settings'), probe(`/rest/v1/${catalog}?select=id&limit=1`),
   ]);
   const failed = !auth.ok ? auth : !database.ok ? database : null;
   return { ok: auth.ok && database.ok, status: failed ? failed.status : 200,

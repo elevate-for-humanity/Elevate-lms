@@ -16,6 +16,10 @@ export function runtimeSpec(spec){
   const copy=structuredClone(spec);
   function visit(value){
     if(!value||typeof value!=='object')return;
+    if(value.labels?.['client.knative.dev/nonce']){
+      delete value.labels['client.knative.dev/nonce'];
+      if(!Object.keys(value.labels).length)delete value.labels;
+    }
     if(value.annotations){
       for(const key of ['client.knative.dev/user-image','run.googleapis.com/client-name','run.googleapis.com/client-version'])
         delete value.annotations[key];
@@ -27,6 +31,13 @@ export function runtimeSpec(spec){
   const ordered=value=>Array.isArray(value)?value.map(ordered):value&&typeof value==='object'
     ?Object.fromEntries(Object.keys(value).sort().map(key=>[key,ordered(value[key])])):value;
   return ordered(copy);
+}
+
+export function runtimeDifferencePaths(before,after,path='spec'){
+  if(JSON.stringify(before)===JSON.stringify(after))return [];
+  if(before&&after&&typeof before==='object'&&typeof after==='object')
+    return [...new Set([...Object.keys(before),...Object.keys(after)])].flatMap(key=>runtimeDifferencePaths(before[key],after[key],path+'.'+key));
+  return [path];
 }
 
 export function previewRuntime(job){
@@ -89,13 +100,13 @@ export async function ownerLessonPreview({execute=false,sha,reuseCandidate=false
   const evidence={region,job:name,jobId,lessonBuildId:lessonId,source:sha??null,
     previousImage:task.containers[0].image,identity:task.serviceAccountName,
     configuredResources:task.containers[0].resources.limits,headroom,storageProvider:'backblaze-b2',
-    bucket:b2.ELEVATE_MEDIA_BUCKET,connectionSource,approvedReferencePhotos,diagnosticStorageVerified:execute||probeStorage,executionStarted:false,releaseHoldChanged:false};
+    bucket:b2.ELEVATE_MEDIA_BUCKET,connectionSource,approvedReferencePhotos,diagnosticStorageVerified:execute||probeStorage,clientNoncePresent:JSON.stringify(before.spec).includes('client.knative.dev/nonce'),executionStarted:false,releaseHoldChanged:false};
   if(!execute)return evidence;
   if(!/^[a-f0-9]{40}$/.test(sha??''))throw Error('OWNER_PREVIEW_EXACT_SOURCE_REQUIRED');
-  const imageSource=reuseCandidate?'7df4b69695748dbc6dd7a122300be9ed4ee44893':sha;
+  const imageSource=reuseCandidate?'e53f3f47508b98a479877c2e868e0402d6cb8e7e':sha;
   const digest=run(['artifacts','docker','images','describe',registry+':owner-preview-'+imageSource,'--project='+PROJECT,'--format=value(image_summary.digest)']);
   if(!/^sha256:[a-f0-9]{64}$/.test(digest))throw Error('OWNER_PREVIEW_IMMUTABLE_IMAGE_REQUIRED');
-  if(reuseCandidate&&digest!=='sha256:52aae3310bf3e0baad12bbb5cdb97499ab1d24138705a22ec0615bda1122ca6d')throw Error('OWNER_PREVIEW_TESTED_CANDIDATE_REQUIRED');
+  if(reuseCandidate&&digest!=='sha256:6b3b9a642838b139fe7a9e4592cff5ba7a4e382ebb96dd32336e3f8b2ec68c3d')throw Error('OWNER_PREVIEW_TESTED_CANDIDATE_REQUIRED');
   const image=registry+'@'+digest;
   const current=read(['run','jobs','describe',name]);
   if(JSON.stringify(runtimeSpec(current.spec))!==JSON.stringify(runtimeSpec(before.spec)))throw Error('OWNER_PREVIEW_RUNTIME_CHANGED');
@@ -104,7 +115,8 @@ export async function ownerLessonPreview({execute=false,sha,reuseCandidate=false
   if(task.containers[0].image!==image)run(['run','jobs','update',name,...scope,'--image='+image,'--quiet']);
   const deployed=read(['run','jobs','describe',name]);
   const expected=structuredClone(before.spec);expected.template.spec.template.spec.containers[0].image=image;
-  if(JSON.stringify(runtimeSpec(deployed.spec))!==JSON.stringify(runtimeSpec(expected)))throw Error('OWNER_PREVIEW_IMAGE_ONLY_READBACK_FAILED');
+  const changedPaths=runtimeDifferencePaths(runtimeSpec(expected),runtimeSpec(deployed.spec));
+  if(changedPaths.length){console.error(JSON.stringify({ownerPreviewReadbackChangedPaths:changedPaths.slice(0,50)}));throw Error('OWNER_PREVIEW_IMAGE_ONLY_READBACK_FAILED');}
   // No reset of attempts, generation, checkpoints, ordinary pause, or other jobs.
   const payload={...job.payload,ownerPreview:true,lessonBuildId:lessonId,competencyId,
     checkpointRepair:{lessonBuildId:lessonId,competencyId,fromStep:'lesson_film_render',requestedAt:new Date().toISOString(),requestedBy:'owner-approved-preview'}};

@@ -115,7 +115,8 @@ export default async function HostShopDocumentsPage({
         <div className="mt-6 grid gap-5">
           {board.documentStatuses.map((requirement: any) => {
             const status = String(requirement.status || 'missing');
-            const needsUpload = status !== 'accepted' && status !== 'pending';
+            // Permit a corrected replacement even while an earlier submission is under review.
+            const needsUpload = true;
             return (
               <section
                 key={requirement.document_type}

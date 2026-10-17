@@ -12,6 +12,9 @@ import { promisify } from 'node:util';
 import { launchBrowser } from './cdp-browser.mjs';
 import { commandArguments } from './command-arguments.mjs';
 import { ProviderSessionStore } from './provider-session-store.mjs';
+import {WorkspaceCheckpoint} from './workspace-checkpoint.mjs';
+import {GcsWorkspaceObjects} from './gcs-workspace-objects.mjs';
+import {BrowserWorkspaceStore} from './browser-workspace-store.mjs';
 import {TerminalSessions,TerminalSessionError} from './terminal-sessions.mjs';
 import { retireBrowserSession } from './session-retirement.mjs';
 import { requiresHumanVerification, redactBrowserEvidence } from './provider-verification.mjs';
@@ -54,10 +57,35 @@ const providerSessions = new ProviderSessionStore({
   secret: sharedSecret,
   directory: process.env.STUDIO_BROWSER_AUTH_STATE_DIR || undefined,
 });
+const browserWorkspaces=new BrowserWorkspaceStore({secret:sharedSecret,directory:process.env.STUDIO_BROWSER_AUTH_STATE_DIR?path.join(process.env.STUDIO_BROWSER_AUTH_STATE_DIR,'browser-workspaces'):undefined});
+async function saveBrowserWorkspace(session){
+  if(session.restoring)return;
+  await providerSessions.save(session.providerScope,session.context);
+  await browserWorkspaces.save(session);
+}
 let learnerTestRunning = false;
 const learnerTests = new Map();
 const foundationFixtures = new Map();
 const workspaceRoot = process.env.STUDIO_WORKSPACE_ROOT || '/workspace/project';
+// Cloud Run requires durable object storage; local browser fixtures have no cloud credentials.
+const workspaceObjects=(process.env.K_SERVICE||process.env.STUDIO_WORKSPACE_STORAGE==='gcs')?new GcsWorkspaceObjects():null;
+const workspaceCheckpoint=workspaceObjects?new WorkspaceCheckpoint({root:workspaceRoot,secret:sharedSecret,objects:workspaceObjects}):null;
+let workspaceRecovery={ready:!workspaceCheckpoint,persistent:Boolean(workspaceCheckpoint),state:workspaceCheckpoint?'restoring':'volatile'};
+async function ensureWorkspaceReady({mutation=false}={}){
+  if(!workspaceRecovery.ready)throw new BrowserServiceError('workspace_recovery_unavailable',503);
+  if(mutation&&workspaceCheckpoint){
+    await workspaceCheckpoint.pending;
+    const current=await workspaceObjects.readManifest();
+    if(String(current?.generation||'0')!==workspaceCheckpoint.generation)throw new BrowserServiceError('workspace_checkpoint_conflict',503);
+  }
+}
+async function checkpointWorkspace(){
+  await ensureWorkspaceReady();
+  if(!workspaceCheckpoint)return {persistent:false,changed:false};
+  try{const result=await workspaceCheckpoint.checkpoint();workspaceRecovery={...workspaceRecovery,lastSavedAt:new Date().toISOString(),lastSaveError:null};return {...result,persistent:true};}
+  catch{workspaceRecovery={...workspaceRecovery,lastSaveError:'workspace_checkpoint_unavailable'};throw new BrowserServiceError('workspace_checkpoint_unavailable',503);}
+}
+
 const allowedExecCommands = new Set(['git', 'node', 'npm', 'npx', 'pnpm', 'python3', 'bash', 'ls', 'cat', 'grep', 'rg', 'find', 'pwd']);
 let shuttingDown = false;
 
@@ -100,6 +128,7 @@ function createTerminalSession(owner){
 }
 
 async function ensureRepository(body = {}) {
+  await ensureWorkspaceReady({mutation:true});
   const repoUrl = String(body.repoUrl || process.env.STUDIO_REPOSITORY_URL || '');
   const branch = String(body.branch || process.env.STUDIO_REPOSITORY_BRANCH || 'main');
   if (!repoUrl) throw new BrowserServiceError('repository_not_configured', 503);
@@ -115,10 +144,12 @@ async function ensureRepository(body = {}) {
     await execFileAsync('git', ['pull', '--ff-only', 'origin', branch], { cwd: workspaceRoot, timeout: 60_000, maxBuffer: 10 * 1024 * 1024 });
   }
   const { stdout } = await execFileAsync('git', ['rev-parse', 'HEAD'], { cwd: workspaceRoot });
+  await checkpointWorkspace();
   return { ok: true, branch, sha: stdout.trim() };
 }
 
 async function executeWorkspaceCommand(body) {
+  await ensureWorkspaceReady({mutation:true});
   const command = String(body.command || '').trim();
   if (!command) throw new BrowserServiceError('command_required', 400);
   let argv;
@@ -127,12 +158,20 @@ async function executeWorkspaceCommand(body) {
   const [binary, ...args] = argv;
   if (!allowedExecCommands.has(binary)) throw new BrowserServiceError('command_not_allowed', 400);
   const cwd = safeWorkspacePath(String(body.cwd || ''));
-  const result = await execFileAsync(binary, args, {
+  let result;
+  try { result = await execFileAsync(binary, args, {
     cwd,
     timeout: Math.min(120_000, Math.max(1_000, Number(body.timeoutMs || 30_000))),
     maxBuffer: 10 * 1024 * 1024,
     env: { ...process.env, HOME: '/home/studio' },
-  });
+  }); } catch (error) {
+    // Failed commands can still write files. Save them without replaying the command.
+    try { await checkpointWorkspace(); } catch {
+      throw new BrowserServiceError('workspace_checkpoint_unavailable',503);
+    }
+    throw error;
+  }
+  await checkpointWorkspace();
   return { stdout: result.stdout, stderr: result.stderr, exitCode: 0 };
 }
 
@@ -427,7 +466,7 @@ async function destroySession(id, {force=false} = {}) {
     ? session.retirement.catch(()=>destroySession(id,{force:true})) : session.retirement;
   session.retirement = retireBrowserSession(session, {
     force,
-    saveState:(...args)=>providerSessions.save(...args),
+    saveState:()=>saveBrowserWorkspace(session),
     onForcedFailure:()=>console.warn('Provider checkpoint failed during forced browser shutdown'),
     retire:async()=>{
       sessions.delete(id);
@@ -835,6 +874,15 @@ export function attachBrowserTabs(session, attachPage, saveState = async () => {
   session.context.on('page', attach);
 }
 
+export async function restoreBrowserWorkspaceTabs(session,checkpoint){
+  for(const target of checkpoint.tabs.slice(1)){
+    const tab=await session.context.newPage();
+    await tab.goto(target,{waitUntil:'domcontentloaded',timeout:30000});
+  }
+  const selected=[...session.pages.entries()][checkpoint.activeTabIndex];
+  if(selected){session.activeTabId=selected[0];session.page=selected[1];await session.page.bringToFront();}
+}
+
 export function createSessionCapacityGuard(limit, activeCount) {
   let pending = 0;
   return async (create) => {
@@ -849,9 +897,10 @@ const admitSession = createSessionCapacityGuard(maxSessions, () => sessions.size
 
 async function createSession(target, viewport, authCookies = [], ownerId) {
   const providerScope = providerSessions.scope(ownerId, target);
+  const persistentOwner=typeof ownerId==='string'&&/^[a-zA-Z0-9_-]{1,128}$/.test(ownerId)?ownerId:null;
   // Reuse the live worker session, including its workspace and downloads.
   const shared =
-    providerScope && [...sessions.values()].find((s) => s.providerScope === providerScope);
+    [...sessions.values()].find(s=>(persistentOwner&&s.ownerId===persistentOwner)||(providerScope&&s.providerScope===providerScope));
   if (shared) {
     shared.lastSeen = Date.now();
     shared.viewport = viewport;
@@ -864,6 +913,15 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
   const state = browserManager.health().browserState;
   if (state === 'recycling') throw new BrowserServiceError('browser_recycling', 503);
   return admitSession(async () => {
+  let restored;
+  try{
+    restored=await browserWorkspaces.load(persistentOwner);
+    if(restored){
+      for(const url of restored.tabs)if(url!=='about:blank')await validateTarget(url);
+      for(const origin of restored.storageState.origins)await validateTarget(origin.origin);
+    }
+  }catch{throw new BrowserServiceError('session_restore_failed',503);}
+  const initialTarget=restored?.tabs[0]||target;
   const targetUrl = new URL(target);
   const safeAuthCookies = Array.isArray(authCookies)
     ? authCookies
@@ -898,7 +956,7 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
         viewport,
         ignoreHTTPSErrors: false,
         acceptDownloads: true,
-        storageState: await providerSessions.load(providerScope),
+        storageState: restored?.storageState || await providerSessions.load(providerScope),
       });
       if (
         safeAuthCookies.length &&
@@ -907,7 +965,7 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
       )
         await context.addCookies(safeAuthCookies);
       page = await context.newPage();
-      await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      await page.goto(initialTarget, { waitUntil: 'domcontentloaded', timeout: 30_000 });
       const id = crypto.randomUUID();
       const token = crypto.randomBytes(32).toString('base64url');
       const downloadDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'studio-browser-'));
@@ -919,6 +977,8 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
         target,
         providerScope,
         ownerId: String(ownerId || ''),
+        restored:Boolean(restored),
+        restoring:true,
         viewport,
         createdAt: Date.now(),
         lastSeen: Date.now(),
@@ -998,7 +1058,11 @@ async function createSession(target, viewport, authCookies = [], ownerId) {
             });
         });
       };
-      attachBrowserTabs(session, attachPage, () => providerSessions.save(providerScope, context));
+      attachBrowserTabs(session, attachPage, () => saveBrowserWorkspace(session));
+      if(restored)await restoreBrowserWorkspaceTabs(session,restored);
+      session.restoring=false;
+      await session.checkpointProviderState?.();
+      await saveBrowserWorkspace(session);
       sessions.set(id, session);
       return session;
     } catch (error) {
@@ -1495,6 +1559,8 @@ const server = http.createServer(async (req, res) => {
       if (test.state === 'failed') return json(res, 422, { error: test.error });
       return json(res, 200, test.result);
     }
+    // Storage outages fail readiness without discarding live user sessions.
+    if (req.method === 'GET' && url.pathname === '/live') return json(res, shuttingDown ? 503 : 200, {alive:!shuttingDown});
     if (req.method === 'GET' && url.pathname === '/health') {
       const lifecycle = browserManager.health();
       const providerAuthStorage = await providerSessions.checkReadiness();
@@ -1502,13 +1568,17 @@ const server = http.createServer(async (req, res) => {
       // A full service must still let an owner reattach their existing session.
       const { ready:browserReady, admissionAvailable } = browserReadiness(lifecycle, providerAuthStorage, sessions.size, maxSessions);
       const terminalRecovery=await terminalSessions.readiness();
-      const ready=browserReady&&terminalRecovery.ready;
+      const browserWorkspaceRecovery=await browserWorkspaces.checkReadiness();
+      const workspaceStorage=workspaceObjects?await workspaceObjects.checkReadiness():{ready:true,persistent:false};
+      const ready=browserReady&&terminalRecovery.ready&&browserWorkspaceRecovery.ready&&workspaceRecovery.ready&&!workspaceRecovery.lastSaveError&&workspaceStorage.ready;
       return json(res, ready ? 200 : 503, {
         ok: ready,
         service: 'studio-browser',
         engine: 'direct-cdp-chromium',
         providerAuthStorage,
         terminalRecovery,
+        browserWorkspaceRecovery,
+        workspaceRecovery:{...workspaceRecovery,storage:workspaceStorage},
         commit: process.env.GIT_SHA || 'MISSING',
         ...lifecycle,
         activeSessions: sessions.size,
@@ -1523,11 +1593,13 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/workspace/terminal' && req.method === 'POST') {
       if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
+      await ensureWorkspaceReady({mutation:true});
       return json(res,201,await createTerminalSession(terminalOwner(req)));
     }
     const terminalMatch = url.pathname.match(/^\/workspace\/terminal\/([^/]+)(?:\/(input|output|resume))?$/);
     if (terminalMatch) {
       if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
+      await ensureWorkspaceReady({mutation:req.method==='POST'});
       const owner=terminalOwner(req),id=terminalMatch[1];
       if (req.method === 'POST' && terminalMatch[2] === 'input') {
         const body = await readBody(req);
@@ -1540,12 +1612,18 @@ const server = http.createServer(async (req, res) => {
       if (req.method === 'DELETE' && !terminalMatch[2])
         return json(res,200,await terminalSessions.stop(owner,id));
     }
+    if (url.pathname === '/workspace/checkpoint' && req.method === 'POST') {
+      if(!authorizedService(req))return json(res,401,{error:'unauthorized'});
+      return json(res,200,await checkpointWorkspace());
+    }
     if (url.pathname === '/workspace/files' && req.method === 'GET') {
       if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
+      await ensureWorkspaceReady();
       return json(res, 200, { root: workspaceRoot, entries: await listWorkspace(url.searchParams.get('path') || '') });
     }
     if (url.pathname === '/workspace/file' && req.method === 'GET') {
       if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
+      await ensureWorkspaceReady();
       const filePath = safeWorkspacePath(url.searchParams.get('path') || '');
       const stat = await fs.promises.stat(filePath);
       if (!stat.isFile() || stat.size > 10 * 1024 * 1024) throw new BrowserServiceError('invalid_workspace_file', 400);
@@ -1557,8 +1635,10 @@ const server = http.createServer(async (req, res) => {
       const filePath = safeWorkspacePath(body.path || '');
       const content = String(body.content ?? '');
       if (Buffer.byteLength(content) > 10 * 1024 * 1024) throw new BrowserServiceError('workspace_file_too_large', 413);
+      await ensureWorkspaceReady({mutation:true});
       await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
       await fs.promises.writeFile(filePath, content, 'utf8');
+      await checkpointWorkspace();
       return json(res, 200, { ok: true });
     }
     if (url.pathname === '/workspace/exec' && req.method === 'POST') {
@@ -1599,7 +1679,7 @@ const server = http.createServer(async (req, res) => {
       const target = await validateTarget(String(body.url || 'https://www.elevateforhumanity.org'));
       const width = Math.min(1920, Math.max(320, Number(body.width || 1440)));
       const height = Math.min(1080, Math.max(480, Number(body.height || 900)));
-      const scope = providerSessions.scope(body.ownerId, target);
+      const scope = typeof body.ownerId==='string'&&/^[a-zA-Z0-9_-]{1,128}$/.test(body.ownerId)?'browser:'+body.ownerId:providerSessions.scope(body.ownerId,target);
       let creation = scope && providerSessionCreations.get(scope);
       if (!creation) {
         creation = createSession(target, { width, height }, body.authCookies, body.ownerId);
@@ -1613,6 +1693,7 @@ const server = http.createServer(async (req, res) => {
         id: session.id,
         token: session.token,
         url: session.page.url(),
+        restored:Boolean(session.restored),
         viewport: { width, height },
         expiresAt: new Date(Date.now() + sessionTtlMs).toISOString(),
       });
@@ -1703,8 +1784,9 @@ async function shutdown() {
   shuttingDown = true;
   clearInterval(cleanupTimer);
   clearInterval(heartbeatTimer);
+  clearInterval(workspaceCheckpointTimer);
   await withTimeout(
-    Promise.all([terminalSessions.shutdown(),Promise.all([...sessions.keys()].map(id=>destroySession(id,{force:true}))).then(() => browserManager.shutdown())]),
+    Promise.all([terminalSessions.shutdown().then(()=>workspaceCheckpoint?.checkpoint()),Promise.all([...sessions.keys()].map(id=>destroySession(id,{force:true}))).then(() => browserManager.shutdown())]),
     10_000,
   ).catch(() => undefined);
   server.close(() => process.exit(0));
@@ -1712,9 +1794,16 @@ async function shutdown() {
 }
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
+const workspaceCheckpointTimer=setInterval(()=>{
+  if(workspaceCheckpoint&&workspaceRecovery.ready&&!shuttingDown)void checkpointWorkspace().catch(()=>{});
+},60000).unref();
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   server.listen(port, '0.0.0.0', () => {
     console.info(`Studio browser listening on ${port}`);
+    void (async()=>{
+      try{if(workspaceCheckpoint)await workspaceCheckpoint.initialize();else await fs.promises.mkdir(workspaceRoot,{recursive:true});workspaceRecovery={...workspaceRecovery,ready:true,state:'ready'};}
+      catch{workspaceRecovery={...workspaceRecovery,ready:false,state:'restore_failed'};console.error('Studio workspace recovery failed; existing files were preserved');}
+    })();
     void providerSessions.checkReadiness().then(status => {
       if (!status.ready) console.error('Studio provider persistence not ready', status.error);
     });

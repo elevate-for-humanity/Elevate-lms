@@ -40,24 +40,41 @@ export async function releaseApprovedWeb({ sha, token, request = fetch }) {
   return { commit: sha, releaseHold: false, workflows: dispatched, deploymentVerified: false };
 }
 
-async function runtimeGitHubToken() {
-  const env = loadGoogleConfig('admin').runtimeEnvironment;
-  if (env.GITHUB_TOKEN?.trim()) return env.GITHUB_TOKEN.trim().replace(/^(?:Bearer|token)\s+/i, '');
-  // The existing Studio credential is restricted to the repository; use it
-  // inside this trusted runner, never export it as a job output or artifact.
-  if (env.ELEVATE_RUNTIME_CONFIG_PROVIDER !== 'google-secret-manager' && env.NEXT_PUBLIC_SUPABASE_URL === 'https://cuxzzpsyufcewtmicszk.supabase.co' && env.SUPABASE_SERVICE_ROLE_KEY) {
-    const response = await fetch(`${env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/get_platform_secret`, {
+export async function resolveReleaseCredential(env, request = fetch) {
+  const normalize = value => typeof value === 'string' ? value.trim().replace(/^(?:Bearer|token)\s+/i, '') : '';
+  async function valid(token) {
+    const response = await request(`https://api.github.com/repos/${repository}`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' }, redirect: 'error', signal: AbortSignal.timeout(15000),
+    });
+    if (response.ok) return true;
+    // Expiry is distinct from authorization denial. Never look for another
+    // identity to work around a 403 or a repository-access denial.
+    if (response.status === 401) return false;
+    throw Error(`RELEASE_CREDENTIAL_CHECK_HTTP_${response.status}`);
+  }
+  const deployed = normalize(env.GITHUB_TOKEN);
+  if (deployed && await valid(deployed)) return { token: deployed, source: 'google-runtime-config' };
+  if (env.ELEVATE_RUNTIME_CONFIG_PROVIDER === 'google-secret-manager') throw Error('RELEASE_GOOGLE_CREDENTIAL_EXPIRED');
+  // Legacy runtimes already authorize this exact canonical secret. Read only
+  // that key; never enumerate secrets or export it from this trusted runner.
+  if (env.NEXT_PUBLIC_SUPABASE_URL === 'https://cuxzzpsyufcewtmicszk.supabase.co' && env.SUPABASE_SERVICE_ROLE_KEY) {
+    const response = await request(`${env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/get_platform_secret`, {
       method: 'POST', headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ p_key: 'GITHUB_TOKEN' }), redirect: 'error', signal: AbortSignal.timeout(15000),
     });
     if (response.ok) {
-      const value = await response.json();
-      if (typeof value === 'string' && value.trim()) return value.trim().replace(/^(?:Bearer|token)\s+/i, '');
+      const canonical = normalize(await response.json());
+      if (canonical && canonical !== deployed && await valid(canonical)) return { token: canonical, source: 'canonical-platform' };
     }
   }
   throw Error('RELEASE_REPOSITORY_CREDENTIAL_UNAVAILABLE');
 }
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  try { console.log(JSON.stringify(await releaseApprovedWeb({ sha: process.env.GITHUB_SHA, token: await runtimeGitHubToken() }))); }
+  try {
+    const credential = await resolveReleaseCredential(loadGoogleConfig('admin').runtimeEnvironment);
+    console.log(JSON.stringify({ credentialSource: credential.source }));
+    console.log(JSON.stringify(await releaseApprovedWeb({ sha: process.env.GITHUB_SHA, token: credential.token })));
+  }
   catch (error) { console.error(JSON.stringify({ error: /^RELEASE_[A-Z0-9_]+$/.test(error?.message || '') ? error.message : 'RELEASE_CONTROLLER_FAILED' })); process.exitCode = 1; }
 }

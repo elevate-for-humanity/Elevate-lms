@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { releaseApprovedWeb } from './release-approved-web.mjs';
+import { releaseApprovedWeb, resolveReleaseCredential } from './release-approved-web.mjs';
 const sha = 'a'.repeat(40);
 function setup({ green = true, current = sha, active = false, readback = 'false' } = {}) {
   const calls = []; let holdReads = 0;
@@ -41,4 +41,27 @@ test('an existing active release is not dispatched again', async () => {
   const s = setup({ active: true }); const result = await releaseApprovedWeb({ sha, token: 'test', request: s.request });
   assert.ok(result.workflows.every(w => w.status === 'already_active'));
   assert.equal(s.calls.filter(c => c.path.endsWith('/dispatches')).length, 0);
+});
+
+const legacyEnv = { GITHUB_TOKEN: 'expired-token', NEXT_PUBLIC_SUPABASE_URL: 'https://cuxzzpsyufcewtmicszk.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'private-database-key' };
+test('an expired legacy copy can use the existing canonical credential', async () => {
+  const calls = [];
+  const credential = await resolveReleaseCredential(legacyEnv, async (url, init) => {
+    calls.push({url,method:init.method});
+    if (url.includes('/rpc/')) return Response.json('current-canonical-token');
+    return new Response('{}', { status: init.headers.Authorization === 'Bearer expired-token' ? 401 : 200 });
+  });
+  assert.equal(credential.source, 'canonical-platform');
+  assert.equal(calls.filter(c=>c.method==='POST').length, 1);
+  assert.ok(calls.every(c=>!c.url.includes('/variables/')&&!c.url.includes('/dispatches')));
+});
+test('permission denial never triggers a different credential lookup', async () => {
+  let calls=0;
+  await assert.rejects(resolveReleaseCredential(legacyEnv, async()=>{calls++;return new Response('{}',{status:403});}), /CHECK_HTTP_403/);
+  assert.equal(calls,1);
+});
+test('Google-only authority never falls back to the legacy secret store', async () => {
+  let calls=0;
+  await assert.rejects(resolveReleaseCredential({...legacyEnv,ELEVATE_RUNTIME_CONFIG_PROVIDER:'google-secret-manager'},async()=>{calls++;return new Response('{}',{status:401});}), /GOOGLE_CREDENTIAL_EXPIRED/);
+  assert.equal(calls,1);
 });

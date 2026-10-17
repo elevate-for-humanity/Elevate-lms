@@ -1,6 +1,8 @@
 name: Register Telnyx Failover
 on:
-  workflow_dispatch:
+  # Disabled: do not reconfigure legacy Telnyx carrier routing during Twilio migration.
+  # Historical job retained for forensic review; explicit recovery needs a new reviewed PR.
+  # workflow_dispatch:
 permissions:
   contents: read
   actions: write

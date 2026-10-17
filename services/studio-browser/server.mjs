@@ -12,6 +12,7 @@ import { promisify } from 'node:util';
 import { launchBrowser } from './cdp-browser.mjs';
 import { commandArguments } from './command-arguments.mjs';
 import { ProviderSessionStore } from './provider-session-store.mjs';
+import {TerminalSessions,TerminalSessionError} from './terminal-sessions.mjs';
 import { retireBrowserSession } from './session-retirement.mjs';
 import { requiresHumanVerification, redactBrowserEvidence } from './provider-verification.mjs';
 import { prepareCourseVideoDownload, hasActiveMediaTransfer } from './course-video-download.mjs';
@@ -86,34 +87,13 @@ async function listWorkspace(relative = '') {
   }));
 }
 
-const terminalSessions = new Map();
-
-function shellSession(id) {
-  const session = terminalSessions.get(id);
-  if (!session) throw new BrowserServiceError('terminal_session_not_found', 404);
-  session.lastSeen = Date.now();
-  return session;
-}
-
-function createTerminalSession() {
-  const id = crypto.randomUUID();
-  const shell = spawn('/bin/bash', ['--noprofile', '--norc'], {
-    cwd: workspaceRoot,
-    env: { ...process.env, HOME: '/home/studio', TERM: 'xterm-256color' },
-    stdio: ['pipe', 'pipe', 'pipe'],
-  });
-  const session = { id, shell, output: [], cursor: 0, lastSeen: Date.now(), exitCode: null };
-  const record = (stream, chunk) => {
-    const entry = { seq: ++session.cursor, stream, data: chunk.toString('utf8'), at: new Date().toISOString() };
-    session.output.push(entry);
-    if (session.output.length > 2000) session.output.shift();
-  };
-  shell.stdout.on('data', (chunk) => record('stdout', chunk));
-  shell.stderr.on('data', (chunk) => record('stderr', chunk));
-  shell.on('close', (code) => { session.exitCode = code ?? 0; record('system', Buffer.from(`\n[process exited ${session.exitCode}]\n`)); });
-  terminalSessions.set(id, session);
-  return session;
-}
+const terminalSessions = new TerminalSessions({
+  secret:sharedSecret,cwd:workspaceRoot,
+  directory:process.env.STUDIO_TERMINAL_STATE_DIR||(process.env.STUDIO_BROWSER_AUTH_STATE_DIR?path.join(process.env.STUDIO_BROWSER_AUTH_STATE_DIR,'terminals'):undefined),
+});
+// The Admin proxy supplies the authenticated operator; clients never choose it
+// through request bodies. Legacy service callers remain in a separate namespace.
+const terminalOwner=req=>String(req.headers['x-studio-operator-id']||'legacy');
 
 async function ensureRepository(body = {}) {
   const repoUrl = String(body.repoUrl || process.env.STUDIO_REPOSITORY_URL || '');
@@ -1516,12 +1496,15 @@ const server = http.createServer(async (req, res) => {
       const providerAuthStorage = await providerSessions.checkReadiness();
       // Capacity is enforced by session admission, not browser liveness.
       // A full service must still let an owner reattach their existing session.
-      const { ready, admissionAvailable } = browserReadiness(lifecycle, providerAuthStorage, sessions.size, maxSessions);
+      const { ready:browserReady, admissionAvailable } = browserReadiness(lifecycle, providerAuthStorage, sessions.size, maxSessions);
+      const terminalRecovery=await terminalSessions.readiness();
+      const ready=browserReady&&terminalRecovery.ready;
       return json(res, ready ? 200 : 503, {
         ok: ready,
         service: 'studio-browser',
         engine: 'direct-cdp-chromium',
         providerAuthStorage,
+        terminalRecovery,
         commit: process.env.GIT_SHA || 'MISSING',
         ...lifecycle,
         activeSessions: sessions.size,
@@ -1536,28 +1519,22 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/workspace/terminal' && req.method === 'POST') {
       if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
-      const session = createTerminalSession();
-      return json(res, 201, { id: session.id, cwd: workspaceRoot });
+      return json(res,201,await terminalSessions.create(terminalOwner(req)));
     }
-    const terminalMatch = url.pathname.match(/^\/workspace\/terminal\/([^/]+)(?:\/(input|output))?$/);
+    const terminalMatch = url.pathname.match(/^\/workspace\/terminal\/([^/]+)(?:\/(input|output|resume))?$/);
     if (terminalMatch) {
       if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
-      const session = shellSession(terminalMatch[1]);
+      const owner=terminalOwner(req),id=terminalMatch[1];
       if (req.method === 'POST' && terminalMatch[2] === 'input') {
         const body = await readBody(req);
-        const data = String(body.data || '').slice(0, 16000);
-        session.shell.stdin.write(data);
-        return json(res, 200, { ok: true });
+        return json(res,200,await terminalSessions.input(owner,id,body.data||''));
       }
-      if (req.method === 'GET' && terminalMatch[2] === 'output') {
-        const after = Number(url.searchParams.get('after') || 0);
-        return json(res, 200, { output: session.output.filter((item) => item.seq > after), cursor: session.cursor, exitCode: session.exitCode });
-      }
-      if (req.method === 'DELETE' && !terminalMatch[2]) {
-        session.shell.kill('SIGTERM');
-        terminalSessions.delete(session.id);
-        return json(res, 200, { ok: true });
-      }
+      if (req.method === 'POST' && terminalMatch[2] === 'resume')
+        return json(res,200,await terminalSessions.resume(owner,id));
+      if (req.method === 'GET' && terminalMatch[2] === 'output')
+        return json(res,200,await terminalSessions.output(owner,id,Number(url.searchParams.get('after')||0)));
+      if (req.method === 'DELETE' && !terminalMatch[2])
+        return json(res,200,await terminalSessions.stop(owner,id));
     }
     if (url.pathname === '/workspace/files' && req.method === 'GET') {
       if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
@@ -1698,8 +1675,8 @@ const server = http.createServer(async (req, res) => {
     }
     return json(res, 405, { error: 'Method not allowed' });
   } catch (error) {
-    const status = error instanceof BrowserServiceError ? error.status : 500;
-    const code = error instanceof BrowserServiceError ? error.code : 'worker_failure';
+    const status = error instanceof BrowserServiceError || error instanceof TerminalSessionError ? error.status : 500;
+    const code = error instanceof BrowserServiceError || error instanceof TerminalSessionError ? error.code : 'worker_failure';
     json(res, status, { error: code, retryable: status === 429 || status === 503 });
   }
 });
@@ -1722,10 +1699,8 @@ async function shutdown() {
   shuttingDown = true;
   clearInterval(cleanupTimer);
   clearInterval(heartbeatTimer);
-  for (const session of terminalSessions.values()) session.shell.kill('SIGTERM');
-  terminalSessions.clear();
   await withTimeout(
-    Promise.all([...sessions.keys()].map(id=>destroySession(id,{force:true}))).then(() => browserManager.shutdown()),
+    Promise.all([terminalSessions.shutdown(),Promise.all([...sessions.keys()].map(id=>destroySession(id,{force:true}))).then(() => browserManager.shutdown())]),
     10_000,
   ).catch(() => undefined);
   server.close(() => process.exit(0));

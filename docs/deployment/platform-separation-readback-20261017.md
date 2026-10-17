@@ -250,3 +250,29 @@ Renderer monitoring reads succeeded but returned no samples in the preflight win
 5. Supersonic has no verified separate runtime or completed data-boundary migration. IRS/provider/ATS approval gates remain in force.
 6. Historical execution image mismatch is resolved as an already-terminal incident (see follow-up evidence). New complete-lesson checkpoint compatibility, B2 delivery and final media acceptance remain incomplete. Do not disable integrity checks or restart all courses. A dedicated consumer must prove both video and agentic task processing before disabling Admin workers.
 7. Final integrated builds, security review, application-specific production acceptance and one coordinated sequential release remain incomplete. No component should be labeled fully production-ready from a passing workflow alone.
+
+## Studio terminal recovery implementation (pending deployment)
+
+The terminal runtime now checkpoints bounded output, working-directory metadata,
+owner and process status using AES-256-GCM under the existing Studio encryption
+secret and approved auth storage directory. Filenames are keyed; request bodies
+cannot choose another operator. The Admin proxy supplies the verified operator ID.
+No command input is stored for automatic replay. After runtime replacement, saved
+running terminals become interrupted and require an explicit new-shell action.
+Navigating away from the workspace no longer stops an attached terminal.
+
+Local verification covers a fresh Node process, real Bash output and directory
+recovery, ciphertext tampering, operator boundaries, unavailable/recovered storage,
+missing directories, bounded history/cache, concurrent resumes and explicit stop.
+Admin component and proxy tests verify reattachment, no automatic replay/stop and
+server-derived ownership. The Chromium CI suite includes these terminal tests and
+the Admin reconnect regression.
+
+Status: implemented in code and locally tested; not deployed or verified live.
+This does not persist workspace files, recreate OS processes, restore shell-local
+variables or migrate existing in-memory terminals. Shared workspace access retains
+its existing trusted-admin boundary. Full workspace/browser restoration and a
+coordinated runtime/Admin acceptance gate remain required before production
+cutover or any reduction of minimum instances. Existing revision 00039-yuv remains
+the last verified production traffic target; no new Google deployment was requested
+for this implementation.

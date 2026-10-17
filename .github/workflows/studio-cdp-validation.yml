@@ -54,7 +54,7 @@ jobs:
           cache: pnpm
       - run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Verify Ultimate and browser integration regressions
-        run: pnpm exec vitest run tests/unit/ultimate*.test.ts tests/unit/ultimate*.test.tsx tests/unit/studio-browser*.test.ts tests/unit/studio-browser*.test.tsx tests/unit/devstudio-browser-planner.test.ts tests/unit/course-practical-workflow.test.ts tests/unit/course-builder-practical-verification.test.ts tests/unit/course-practical-review-queue.test.tsx tests/unit/staged-practical*.test.ts tests/unit/staged-practical*.test.tsx
+        run: pnpm exec vitest run tests/unit/studio-self-service-controls.test.tsx tests/unit/ultimate*.test.ts tests/unit/ultimate*.test.tsx tests/unit/studio-browser*.test.ts tests/unit/studio-browser*.test.tsx tests/unit/devstudio-browser-planner.test.ts tests/unit/course-practical-workflow.test.ts tests/unit/course-builder-practical-verification.test.ts tests/unit/course-practical-review-queue.test.tsx tests/unit/staged-practical*.test.ts tests/unit/staged-practical*.test.tsx
       - name: Verify Google identity, secret preservation and cutover contracts without deploying
         run: node --test scripts/test-studio-browser-cutover.mjs scripts/gcp/prepare-studio-service-identity.test.mjs
       - name: Inspect existing practical schema without reading learner records

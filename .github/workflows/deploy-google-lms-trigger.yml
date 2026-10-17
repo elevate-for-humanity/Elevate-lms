@@ -44,7 +44,7 @@ permissions:
   id-token: write
 jobs:
   dispatch:
-    if: github.event_name == 'push'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'push')
     concurrency:
       group: google-lms-dispatch-main
       cancel-in-progress: true
@@ -78,12 +78,13 @@ jobs:
           node scripts/gcp/resolve-main-release.mjs
   build:
     needs: validate
-    if: needs.validate.outputs.ready == 'true'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (needs.validate.outputs.ready == 'true')
     uses: ./.github/workflows/build-google-migration-images.yml
     with:
       component: lms
     secrets: inherit
   deploy:
+    if: vars.GOOGLE_RELEASE_HOLD != 'true'
     needs: build
     uses: ./.github/workflows/deploy-google-repaired.yml
     with:

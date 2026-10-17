@@ -44,7 +44,7 @@ permissions:
   id-token: write
 jobs:
   dispatch:
-    if: github.event_name == 'push'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'push')
     concurrency:
       group: google-store-dispatch-main
       cancel-in-progress: true
@@ -82,7 +82,7 @@ jobs:
       # Finish the active tested release; queue the latest main update.
       cancel-in-progress: false
       queue: max
-    if: needs.validate.outputs.ready == 'true'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (needs.validate.outputs.ready == 'true')
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 120

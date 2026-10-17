@@ -52,7 +52,7 @@ permissions:
 
 jobs:
   dispatch:
-    if: github.event_name == 'push'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'push')
     concurrency:
       group: google-admin-dispatch-main
       cancel-in-progress: true
@@ -74,7 +74,7 @@ jobs:
       cancel-in-progress: false
       queue: max
     name: Build and deploy Admin on Google
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 120

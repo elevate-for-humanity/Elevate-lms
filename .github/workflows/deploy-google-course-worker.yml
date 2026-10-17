@@ -51,6 +51,7 @@ permissions:
   id-token: write
 jobs:
   authoring-access:
+    if: vars.GOOGLE_RELEASE_HOLD != 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -83,7 +84,7 @@ jobs:
           console.log(JSON.stringify({teachingPhotoProvider:'google',courseServiceIdentityConfigured:Boolean(task.serviceAccountName)}));
           NODE
   dispatch:
-    if: github.event_name == 'workflow_dispatch' && false
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && false)
     runs-on: ubuntu-24.04
     steps:
       - name: Dispatch Google-trusted workflow event
@@ -95,7 +96,7 @@ jobs:
     concurrency:
       group: google-course-worker-image
       cancel-in-progress: true
-    if: github.ref == 'refs/heads/main'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
@@ -170,7 +171,7 @@ jobs:
           gcloud secrets versions access latest --secret=elevate-ultimate-worker-runtime-config --project=elegant-racer-299721 | docker run --rm -i --entrypoint node -e COURSE_MEDIA_DEEP_AUDIT=true -v "$PWD/scripts/gcp:/app/scripts/gcp:ro" "elevate-ultimate-worker:$GITHUB_SHA" --import=tsx /app/scripts/gcp/audit-course-storage.ts
   deploy:
     needs: build
-    if: github.ref == 'refs/heads/main'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     concurrency:

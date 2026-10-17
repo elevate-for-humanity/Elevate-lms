@@ -84,6 +84,38 @@ env:
   CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
 jobs:
+  stabilization-cron:
+    name: Selected stabilization cron
+    if: >-
+      github.event_name == 'workflow_dispatch' && (
+        github.event.inputs.job == 'morning-reminders'
+        || github.event.inputs.job == 'missed-checkins'
+        || github.event.inputs.job == 'expire-credentials'
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Invoke only the selected authorized route
+        env:
+          SELECTED_JOB: ${{ inputs.job }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$SELECTED_JOB" in
+            morning-reminders|missed-checkins|expire-credentials) ;;
+            *) echo "::error::Unsupported stabilization cron"; exit 1 ;;
+          esac
+          test -n "$CRON_SECRET" || { echo "::error::CRON_SECRET is missing"; exit 1; }
+          response_file="$(mktemp)"
+          trap 'rm -f "$response_file"' EXIT
+          status="$(curl --silent --show-error --max-time 180 \
+            --output "$response_file" --write-out '%{http_code}' \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$ADMIN_URL/api/cron/$SELECTED_JOB")"
+          echo "Selected cron: $SELECTED_JOB; HTTP $status"
+          # Response bodies may contain user data; keep them out of Actions logs.
+          test "$status" = 200
+
   portal-completion-reminders:
     name: Portal completion reminders (twice daily)
     runs-on: ubuntu-latest
@@ -190,7 +222,6 @@ jobs:
          || github.event.inputs.job == 'enrollment-automation'
          || github.event.inputs.job == 'stale-applications'
          || github.event.inputs.job == 'expire-exam-authorizations'
-         || github.event.inputs.job == 'expire-credentials'
          || github.event.inputs.job == 'expire-licenses'
          || github.event.inputs.job == 'check-stuck-approvals'
          || github.event.inputs.job == 'funding-escalation'
@@ -198,8 +229,6 @@ jobs:
          || github.event.inputs.job == 'check-expiring-documents'
          || github.event.inputs.job == 'check-licenses'
          || github.event.inputs.job == 'daily-attendance-alerts'
-         || github.event.inputs.job == 'morning-reminders'
-         || github.event.inputs.job == 'missed-checkins'
          || github.event.inputs.job == 'onboarding-followup'
          || github.event.inputs.job == 'onboarding-reminder'
          || github.event.inputs.job == 'school-application-followup'

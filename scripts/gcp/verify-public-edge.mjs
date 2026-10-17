@@ -95,8 +95,8 @@ export async function auditEdge({request=fetch,sha=null,dns=probeDns,tlsCheck=pr
     results[service]={dns:dnsResult,tls:tlsResult,version,health,ready,ping};
   }
   results.programHolder=await probeRedirect(origins.lms,{request});
-  return {expectedCommit:sha,results,allVerified:Object.values(results).every(entry=>
-    Object.values(entry).every(x=>x?.state==='passed'))};
+  return {expectedCommit:sha,results,allVerified:Object.entries(results).every(([name,entry])=>name==='programHolder'
+    ? entry.state==='passed' : ['dns','tls','version','health','ready','ping'].every(key=>entry[key]?.state==='passed'))};
 }
 if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href){
   const report=await auditEdge({sha:process.env.EXPECTED_GIT_SHA || null});

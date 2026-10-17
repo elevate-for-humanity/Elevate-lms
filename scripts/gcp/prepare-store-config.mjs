@@ -12,15 +12,16 @@ export function prepareStoreConfig(store,marketing){
  if(e.SUPABASE_URL&&e.SUPABASE_URL!==e.NEXT_PUBLIC_SUPABASE_URL)fail('STORE_DATABASE_ALIAS_CONFLICT');
  if(!e.NEXTAUTH_SECRET)fail('STORE_AUTH_SECRET_MISSING');
  for(const p of ['QB','PAYPAL'])if(!e[p+'_CLIENT_ID']||!e[p+'_CLIENT_SECRET'])fail('STORE_'+p+'_IDENTITY_INCOMPLETE');
+ if(e.QB_ENVIRONMENT!=='production')fail('STORE_QB_PRODUCTION_ENVIRONMENT_UNVERIFIED');
  if(!e.QB_WEBHOOK_VERIFIER_TOKEN&&!e.QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN)fail('STORE_QB_WEBHOOK_VERIFIER_MISSING');
  if(e.QB_WEBHOOK_VERIFIER_TOKEN&&e.QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN&&e.QB_WEBHOOK_VERIFIER_TOKEN!==e.QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN)fail('STORE_QB_WEBHOOK_VERIFIER_CONFLICT');
  const normalize=v=>['live','production'].includes(v)?'production':v==='sandbox'?'sandbox':fail('STORE_PAYPAL_ENVIRONMENT_INVALID');
- if(!e.PAYPAL_MODE||!e.PAYPAL_ENVIRONMENT)fail('STORE_PAYPAL_ENVIRONMENT_ALIASES_INCOMPLETE');
- const mode=normalize(e.PAYPAL_MODE);
- if(normalize(e.PAYPAL_ENVIRONMENT)!==mode)fail('STORE_PAYPAL_ENVIRONMENT_CONFLICT');
+ if(!e.PAYPAL_ENVIRONMENT)fail('STORE_PAYPAL_ENVIRONMENT_MISSING');
+ const mode=normalize(e.PAYPAL_ENVIRONMENT);
+ if(e.PAYPAL_MODE&&normalize(e.PAYPAL_MODE)!==mode)fail('STORE_PAYPAL_ENVIRONMENT_CONFLICT');
  const base=mode==='production'?'https://api-m.paypal.com':'https://api-m.sandbox.paypal.com';
  if(e.PAYPAL_API_BASE&&e.PAYPAL_API_BASE!==base)fail('STORE_PAYPAL_API_BASE_CONFLICT');
- if(!e.PAYPAL_WEBHOOK_ID||!e.PAYPAL_BILLING_WEBHOOK_ID)fail('STORE_PAYPAL_WEBHOOK_CONFIGURATION_INCOMPLETE');
+ if(!e.PAYPAL_BILLING_WEBHOOK_ID)fail('STORE_PAYPAL_WEBHOOK_CONFIGURATION_INCOMPLETE');
  let callback;try{callback=new URL(e.QB_REDIRECT_URI);}catch{fail('STORE_QB_CALLBACK_MISSING');}
  // Keep an existing registered callback intact until its provider cutover passes.
  const callbackAccepted=callback.origin==='https://store.elevateforhumanity.org'&&callback.pathname==='/api/auth/quickbooks/callback'&&!callback.search&&!callback.hash&&!callback.username&&!callback.password;

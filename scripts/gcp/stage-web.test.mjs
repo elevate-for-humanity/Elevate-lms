@@ -108,3 +108,12 @@ test('Store-owned PayPal identity cannot inherit Marketing environment or webhoo
  assert.equal(result.runtimeEnvironment.PAYPAL_ENVIRONMENT,undefined);
  assert.equal(result.runtimeEnvironment.PAYPAL_BILLING_WEBHOOK_ID,undefined);
 });
+
+test('Store bootstrap retains QuickBooks environment as part of its identity family',()=>{
+ const store={component:'store',runtimeEnvironment:{},volumes:[],runtimeFiles:{}};
+ const marketing={...base(),component:'marketing'};
+ Object.assign(marketing.runtimeEnvironment,{QB_CLIENT_ID:'marketing-client',QB_CLIENT_SECRET:'marketing-secret',QB_ENVIRONMENT:'sandbox'});
+ assert.equal(completeStoreConfig(store,marketing).runtimeEnvironment.QB_ENVIRONMENT,'sandbox');
+ Object.assign(store.runtimeEnvironment,{QB_CLIENT_ID:'store-client',QB_CLIENT_SECRET:'store-secret'});
+ assert.equal(completeStoreConfig(store,marketing).runtimeEnvironment.QB_ENVIRONMENT,undefined);
+});

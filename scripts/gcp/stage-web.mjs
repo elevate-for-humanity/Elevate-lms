@@ -14,9 +14,20 @@ export function completeStoreConfig(store, marketing) {
     'PAYPAL_API_BASE', 'PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', 'PAYPAL_MODE', 'PAYPAL_WEBHOOK_ID',
     'SENDGRID_API_KEY', 'SENDGRID_FROM', 'EMAIL_FROM', 'EMAIL_PROVIDER', 'EMAIL_REPLY_TO']);
   const runtimeEnvironment = { ...store.runtimeEnvironment };
-  for (const [client, secret] of [['QB_CLIENT_ID', 'QB_CLIENT_SECRET'], ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET']]) {
-    if (runtimeEnvironment[client] && runtimeEnvironment[client] !== marketing.runtimeEnvironment[client] && !runtimeEnvironment[secret])
-      throw new Error('Store commerce credentials require their own matching secret');
+  // Treat provider identity and grants as one boundary. A Store-owned client
+  // must not acquire Marketing's refresh token, realm or webhook identifier.
+  const families = [
+    ['QB_CLIENT_ID', 'QB_CLIENT_SECRET', 'QB_ACCESS_TOKEN', 'QB_REFRESH_TOKEN', 'QB_REALM_ID', 'QB_REDIRECT_URI', 'QB_TOKEN_EXPIRES', 'QB_WEBHOOK_VERIFIER_TOKEN', 'QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN'],
+    ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', 'PAYPAL_API_BASE', 'PAYPAL_MODE', 'PAYPAL_WEBHOOK_ID'],
+  ];
+  for (const keys of families) {
+    const [client, secret] = keys;
+    const ownsIdentity = keys.some(key => runtimeEnvironment[key]);
+    if (ownsIdentity) {
+      if (!runtimeEnvironment[client] || !runtimeEnvironment[secret])
+        throw new Error('Store commerce credentials require their own matching secret');
+      for (const key of keys) allowed.delete(key);
+    }
   }
   for (const key of allowed) {
     if (!runtimeEnvironment[key] && marketing.runtimeEnvironment[key]) runtimeEnvironment[key] = marketing.runtimeEnvironment[key];
@@ -25,6 +36,22 @@ export function completeStoreConfig(store, marketing) {
   const completed = { ...store, runtimeEnvironment };
   runtimeForGoogle(completed, { volumes: store.volumes });
   return completed;
+}
+
+// Cutover is explicit: operators set this marker only after Store configuration
+// migration and commerce acceptance. Until then preserve the bootstrap path.
+export function loadStageConfig(component, load = loadGoogleConfig) {
+  const config = load(component);
+  if (component !== 'store') return config;
+  if (config.storeConfigurationIndependent === true) {
+    runtimeForGoogle(config, { volumes: config.volumes });
+    for (const [client, secret] of [['QB_CLIENT_ID', 'QB_CLIENT_SECRET'], ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET']]) {
+      if (!config.runtimeEnvironment[client] || !config.runtimeEnvironment[secret])
+        throw new Error('Independent Store commerce configuration incomplete');
+    }
+    return config;
+  }
+  return completeStoreConfig(config, load('marketing'));
 }
 
 export function runtimeForGoogle(source, service) {
@@ -65,8 +92,7 @@ async function main() {
   const component = process.env.COMPONENT;
   const sha = process.env.IMAGE_SHA;
   if (!['marketing', 'admin', 'lms', 'store'].includes(component) || !/^[a-f0-9]{40}$/.test(sha ?? '')) throw new Error('Invalid component or image SHA');
-  let config = loadGoogleConfig(component);
-  if (component === 'store') config = completeStoreConfig(config, loadGoogleConfig('marketing'));
+  const config = loadStageConfig(component);
   const vars = runtimeForGoogle(config, { volumes: config.volumes });
   const dir = mkdtempSync(join(tmpdir(), 'elevate-runtime-'));
   function gcloud(args) {

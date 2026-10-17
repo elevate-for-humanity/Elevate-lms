@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { runtimeForGoogle, completeStoreConfig, verifyExistingStage } from './stage-web.mjs';
+import { runtimeForGoogle, completeStoreConfig, verifyExistingStage, loadStageConfig } from './stage-web.mjs';
 const base = () => ({ runtimeEnvironment: { NEXT_PUBLIC_SUPABASE_URL: 'https://cuxzzpsyufcewtmicszk.supabase.co', NEXT_PUBLIC_SUPABASE_ANON_KEY: 'test-public', SUPABASE_SERVICE_ROLE_KEY: 'test-private', PORT: '3000', MULTILINE: 'one\ntwo', QUOTED: 'a,b="c"' } });
 test('preserves runtime values without modifying source and removes reserved port', () => {
   const source = base();
@@ -55,4 +55,38 @@ for (const field of ['image', 'identity', 'credential', 'probe', 'public']) test
   if (field === 'probe') container.startupProbe.httpGet.path = '/';
   if (field === 'public') resource.metadata.annotations['run.googleapis.com/invoker-iam-disabled'] = 'true';
   assert.throws(() => verifyExistingStage(resource, 'image@sha256:approved', 'runtime', { KEY: 'value' }));
+});
+
+// A tenant-owned client must never inherit another tenant's OAuth grant.
+test('Store OAuth grant is not assembled from Marketing tokens', () => {
+  const store = { component: 'store', runtimeEnvironment: { QB_CLIENT_ID: 'store-client', QB_CLIENT_SECRET: 'store-secret' }, volumes: [], runtimeFiles: {} };
+  const marketing = { ...base(), component: 'marketing' };
+  Object.assign(marketing.runtimeEnvironment, { QB_CLIENT_ID: 'marketing-client', QB_CLIENT_SECRET: 'marketing-secret', QB_ACCESS_TOKEN: 'marketing-token', QB_REFRESH_TOKEN: 'marketing-refresh', QB_REALM_ID: 'marketing-company' });
+  const result = completeStoreConfig(store, marketing);
+  for (const key of ['QB_ACCESS_TOKEN', 'QB_REFRESH_TOKEN', 'QB_REALM_ID']) assert.equal(result.runtimeEnvironment[key], undefined);
+});
+test('Store partial OAuth credentials fail closed even for the same client ID', () => {
+  const store = { component: 'store', runtimeEnvironment: { QB_CLIENT_ID: 'shared-client' }, volumes: [], runtimeFiles: {} };
+  const marketing = { ...base(), component: 'marketing' };
+  Object.assign(marketing.runtimeEnvironment, { QB_CLIENT_ID: 'shared-client', QB_CLIENT_SECRET: 'marketing-secret' });
+  assert.throws(() => completeStoreConfig(store, marketing), /matching secret/);
+});
+
+test('verified independent Store never reads Marketing configuration', () => {
+  const store = { ...base(), component: 'store', storeConfigurationIndependent: true };
+  Object.assign(store.runtimeEnvironment, { QB_CLIENT_ID: 'qb', QB_CLIENT_SECRET: 'qb-secret', PAYPAL_CLIENT_ID: 'paypal', PAYPAL_CLIENT_SECRET: 'paypal-secret' });
+  const calls = [];
+  assert.equal(loadStageConfig('store', component => { calls.push(component); if (component !== 'store') throw Error('Marketing unavailable'); return store; }), store);
+  assert.deepEqual(calls, ['store']);
+  delete store.runtimeEnvironment.PAYPAL_CLIENT_SECRET;
+  assert.throws(() => loadStageConfig('store', () => store), /incomplete/);
+});
+test('unmigrated Store retains the approved bootstrap dependency', () => {
+  const calls = [];
+  const config = loadStageConfig('store', component => {
+    calls.push(component);
+    return component === 'store' ? { component, runtimeEnvironment: {}, volumes: [], runtimeFiles: {} } : { ...base(), component };
+  });
+  assert.deepEqual(calls, ['store', 'marketing']);
+  assert.equal(config.runtimeEnvironment.SUPABASE_SERVICE_ROLE_KEY, 'test-private');
 });

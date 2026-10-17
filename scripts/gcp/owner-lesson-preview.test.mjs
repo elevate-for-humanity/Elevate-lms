@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {previewRuntime,ownerLessonPreview,runtimeSpec} from './owner-lesson-preview.mjs';
+import {previewRuntime,ownerLessonPreview,runtimeSpec,runtimeDifferencePaths} from './owner-lesson-preview.mjs';
 const job=()=>({spec:{template:{spec:{template:{spec:{serviceAccountName:'elevate-worker-runtime@elegant-racer-299721.iam.gserviceaccount.com',containers:[{image:'registry.example/old@sha256:'+'a'.repeat(64),resources:{limits:{cpu:'4',memory:'8Gi'}},env:Object.entries({NEXT_PUBLIC_SUPABASE_URL:'https://cuxzzpsyufcewtmicszk.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'test-service',ELEVATE_MEDIA_ENDPOINT:'https://s3.us-west-004.backblazeb2.com',ELEVATE_MEDIA_ACCESS_KEY_ID:'00'+'a'.repeat(23),ELEVATE_MEDIA_SECRET_ACCESS_KEY:'test-secret',ELEVATE_MEDIA_BUCKET:'elevate-course-media',ELEVATE_MEDIA_PUBLIC_URL:'https://media.example.org'}).map(([name,value])=>({name,value}))}]}}}}}});
 const b2Read=(url)=>url.includes('b2_authorize_account')?{accountId:'test-account',authorizationToken:'test-token',apiInfo:{storageApi:{s3ApiUrl:'https://s3.us-west-004.backblazeb2.com',downloadUrl:'https://f004.backblazeb2.com',apiUrl:'https://api004.backblazeb2.com',allowed:{buckets:[{name:'elevate-course-media'}],capabilities:['listFiles','readFiles','writeFiles','listBuckets'],namePrefix:null}}}}:url.includes('b2_list_buckets')?{buckets:[{bucketName:'elevate-course-media',bucketType:'allPublic'}]}:null;
 test('preview uses only the existing scoped identity, database, B2 bucket, and allocation',()=>{
@@ -22,7 +22,7 @@ test('validation performs no deployment, execution, queue write, or lease change
 });
 for(const reuseCandidate of [false,true])test('execution preserves evidence and runs exactly once; reuse='+reuseCandidate,async()=>{
  const current=job(),commands=[],writes=[];let probe;
- const digest=reuseCandidate?'sha256:52aae3310bf3e0baad12bbb5cdb97499ab1d24138705a22ec0615bda1122ca6d':'sha256:'+'b'.repeat(64);
+ const digest=reuseCandidate?'sha256:6b3b9a642838b139fe7a9e4592cff5ba7a4e382ebb96dd32336e3f8b2ec68c3d':'sha256:'+'b'.repeat(64);
  if(reuseCandidate)current.spec.template.spec.template.spec.containers[0].image='us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@'+digest;
  const run=args=>{
   commands.push(args);
@@ -61,4 +61,17 @@ test('readback compares runtime values independent of JSON object property order
  b.template.spec.a=3;assert.notEqual(JSON.stringify(runtimeSpec(a)),JSON.stringify(runtimeSpec(b)));
  b.template.spec.a=1;b.template.spec.list.reverse();b.template.spec.list.push({x:2,y:1});
  assert.notEqual(JSON.stringify(runtimeSpec(a)),JSON.stringify(runtimeSpec(b)));
+});
+
+test('Google-generated nonce changes do not masquerade as runtime changes; owner labels and task settings remain protected',()=>{
+ const a={template:{metadata:{labels:{'client.knative.dev/nonce':'old',owner:'course-worker'}},spec:{parallelism:1,taskCount:1,template:{spec:{serviceAccountName:'worker',containers:[{env:[{name:'SCOPE',value:'one'}]}]}}}}};
+ const b=structuredClone(a);b.template.metadata.labels['client.knative.dev/nonce']='new';
+ assert.deepEqual(runtimeSpec(a),runtimeSpec(b));
+ b.template.metadata.labels.owner='other';assert.notDeepEqual(runtimeSpec(a),runtimeSpec(b));
+ b.template.metadata.labels.owner='course-worker';b.template.spec.template.spec.containers[0].env[0].value='other';assert.notDeepEqual(runtimeSpec(a),runtimeSpec(b));
+});
+
+test('a genuine unexpected configuration change reports field paths without secret values',()=>{
+ const paths=runtimeDifferencePaths({containers:[{env:[{name:'PRIVATE_KEY',value:'before-secret'}]}]},{containers:[{env:[{name:'PRIVATE_KEY',value:'after-secret'}]}]});
+ assert.deepEqual(paths,['spec.containers.0.env.0.value']);assert.equal(JSON.stringify(paths).includes('secret'),false);
 });

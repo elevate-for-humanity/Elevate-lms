@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {prepareParisRepair,publishParisRepair,reportParisRepairFailure,tickParisCodeRepairs} from '@/lib/ai/runtime/code-repair';
+import {prepareParisRepair,publishParisRepair,reportParisRepairFailure,tickParisCodeRepairs,diagnoseParisGitHubCredential} from '@/lib/ai/runtime/code-repair';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export const maxDuration=300;
@@ -8,6 +8,7 @@ export async function POST(request:NextRequest){
  if(!secret||request.headers.get('authorization')!==`Bearer ${secret}`)return NextResponse.json({error:'Unauthorized'},{status:401});
  const body=await request.json().catch(()=>({}));
  try{
+  if(body.phase==='auth-diagnostic')return NextResponse.json(await diagnoseParisGitHubCredential(),{headers:{'Cache-Control':'no-store'}});
   if(body.phase==='tick')return NextResponse.json(await tickParisCodeRepairs());
   if(!/^[a-f0-9-]{36}$/.test(body.repairId??'')||!Number.isSafeInteger(body.runId))return NextResponse.json({error:'Repair and workflow run required'},{status:400});
   if(body.phase==='prepare')return NextResponse.json(await prepareParisRepair(body.repairId,body.runId));

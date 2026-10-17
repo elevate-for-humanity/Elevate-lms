@@ -4,6 +4,32 @@ import {getGitHubHeaders} from '@/lib/devstudio/github-token';
 import {publishTaskToMain} from '@/lib/devstudio/main-release.mjs';
 import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,eligibleRepairEvents,repairFingerprint,validationPassed,repairDeploymentState,canRetryRepair} from './code-repair-policy.mjs';
 
+/**
+ * Read-only, cron-authenticated credential preflight. Returns only safe status
+ * and permission booleans, never credential values or upstream response bodies.
+ */
+export async function diagnoseParisGitHubCredential() {
+ const endpoint='https://api.github.com';
+ const tokenHeaders=await getGitHubHeaders();
+ const probe=async(path:string)=>{
+  try {
+   const response=await fetch(endpoint+path,{headers:tokenHeaders,cache:'no-store',signal:AbortSignal.timeout(15000)});
+   if(!response.ok)return {status:response.status,ok:false};
+   if(path==='/user')return {status:response.status,ok:true};
+   const data=await response.json();
+   return {status:response.status,ok:true,permissions:{
+    contentsRead:data.permissions?.pull===true||data.permissions?.push===true||data.permissions?.admin===true,
+    contentsWrite:data.permissions?.push===true||data.permissions?.admin===true,
+   }};
+  }catch(error){return {ok:false,error:error instanceof Error&&['TimeoutError','AbortError'].includes(error.name)?'timeout':'request_failed'};}
+ };
+ const identity=await probe('/user');
+ // Avoid unnecessary repository request if the authorization token was rejected.
+ const repository=identity.ok?await probe('/repos/'+REPAIR_REPOSITORY):{ok:false,skipped:true};
+ return {service:'paris-github-authorization',identity,repository,
+  note:'Repository permission flags do not prove Actions workflow-dispatch permission; validate separately without dispatching a live repair.'};
+}
+
 async function gh(path:string,init:RequestInit={}) {
  const response=await fetch(`https://api.github.com/repos/${REPAIR_REPOSITORY}${path}`,{...init,headers:{...await getGitHubHeaders(),...init.headers},cache:'no-store',signal:AbortSignal.timeout(20000)});
  if(!response.ok)throw Error(`PARIS_GITHUB_HTTP_${response.status}`);

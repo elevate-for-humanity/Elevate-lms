@@ -1,9 +1,19 @@
 import { google, loadGoogleConfig, PROJECT } from './runtime-config.mjs';
 
 const REGION = 'us-central1';
+const selectedRuntimeKeys=['STUDIO_BROWSER_URL','STUDIO_BROWSER_PUBLIC_URL','CLOUDFLARE_ACCOUNT_ID','CLOUDFLARE_AI_MODEL','CLOUDFLARE_AI_API_TOKEN'];
+export function deployedRuntimeEnvironment(config,resource){
+ const env={...config.runtimeEnvironment};
+ for(const row of resource?.spec?.template?.spec?.containers?.[0]?.env??[]){
+  if(!selectedRuntimeKeys.includes(row.name))continue;
+  if(typeof row.value==='string')env[row.name]=row.value;
+  else if(row.valueFrom)delete env[row.name]; // Never validate a different stale bootstrap credential.
+ }
+ return env;
+}
 const OLD = /(?:^|\.)(?:northflank\.app|northflank\.com|code\.run)$/i;
 export function inspectGoogleBindings(config, resource, browser) {
-  const env = config.runtimeEnvironment ?? {};
+  const env = deployedRuntimeEnvironment(config,resource);
   const rows = resource?.spec?.template?.spec?.containers?.[0]?.env ?? [];
   const image = resource?.spec?.template?.spec?.containers?.[0]?.image ?? '';
   const byName = new Map(rows.map(row => [row.name, row]));
@@ -45,7 +55,7 @@ export async function auditGoogleStudio({run=google,request=fetch}={}) {
     try { browser=read(name);break; }catch { /* Report if neither exists. */ }
   }
   const audit=inspectGoogleBindings(config,admin,browser);
-  const env=config.runtimeEnvironment;
+  const env=deployedRuntimeEnvironment(config,admin);
   const browserUrl=env.STUDIO_BROWSER_URL;
   const probes={};
   // Current production browser may be a Google Compute Engine VM. Its identity
@@ -73,6 +83,7 @@ export async function auditGoogleStudio({run=google,request=fetch}={}) {
   const account=env.CLOUDFLARE_ACCOUNT_ID;
   const token=env.CLOUDFLARE_AI_API_TOKEN;
   const model=env.CLOUDFLARE_AI_MODEL;
+  if(account&&token&&model&&!model.startsWith('@cf/'))audit.failures.push('cloudflare_model_invalid');
   if(account&&token&&model?.startsWith('@cf/')) {
     try {
       const url=new URL('https://api.cloudflare.com/client/v4/accounts/'+encodeURIComponent(account)+'/ai/models/search');
@@ -83,7 +94,12 @@ export async function auditGoogleStudio({run=google,request=fetch}={}) {
       if(!response.ok)audit.failures.push('cloudflare_model_catalog_http_'+response.status);
     } catch {audit.failures.push('cloudflare_model_catalog_unreachable');}
   }
-  return {passed:audit.failures.length===0,failures:audit.failures,probes,
+  const adminRows=admin?.spec?.template?.spec?.containers?.[0]?.env??[];
+  const cloudflareBindings=selectedRuntimeKeys.filter(name=>name.startsWith('CLOUDFLARE_')).map(name=>{
+    const row=adminRows.find(entry=>entry.name===name);
+    return {name,present:Boolean(row),secretReference:Boolean(row?.valueFrom),configuredValuePresent:Boolean(env[name])};
+  });
+  return {passed:audit.failures.length===0,failures:audit.failures,probes,cloudflareBindings,
     adminRevision:audit.adminRevision,browserRevision:audit.browserRevision,
     adminImagePresent:audit.adminImagePresent,studioBrowserImagePresent:audit.studioBrowserImagePresent};
 }

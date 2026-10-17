@@ -15,7 +15,7 @@ function safeFileName(name: string) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { user, db, partner } = await requireCurrentHostShopPartner();
+    const { user, db, partner } = await requireCurrentHostShopPartner({ allowPendingOnboarding: true });
     const board = await getHostShopBoard(user.id);
     const form = await request.formData();
     const documentType = String(form.get('documentType') || '').trim();

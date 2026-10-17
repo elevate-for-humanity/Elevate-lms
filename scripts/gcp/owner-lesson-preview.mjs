@@ -69,12 +69,25 @@ export async function ownerLessonPreview({execute=false,sha,reuseCandidate=false
   if(build?.profile?.lessonPresentation!=='approved-premium-v1'||
       build.profile.presentationContract?.approvedReferenceVideo?.sha256!==referenceHash)
     throw Error('OWNER_PREVIEW_APPROVED_FIRST_LESSON_REQUIRED');
+  const requiredSteps=['standards_lock','learning_objectives','prerequisites','teaching_sequence','instructor_script','storyboard','visual_assignment','scene_construction','natural_narration','synchronization','active_teaching','mistakes_and_corrections','assessment_alignment'];
+  const steps=await rest('ultimate_lesson_steps?select=step,state&lesson_build_id=eq.'+lessonId);
+  if(!requiredSteps.every(step=>steps.some(s=>s.step===step&&s.state==='passed')))
+    throw Error('OWNER_PREVIEW_SAVED_RENDER_DEPENDENCIES_REQUIRED');
   const evidence={region,job:name,jobId,lessonBuildId:lessonId,source:sha??null,
     previousImage:task.containers[0].image,identity:task.serviceAccountName,
     configuredResources:task.containers[0].resources.limits,headroom,storageProvider:'backblaze-b2',
     bucket:b2.ELEVATE_MEDIA_BUCKET,connectionSource,executionStarted:false,releaseHoldChanged:false};
   if(!execute)return evidence;
   if(!/^[a-f0-9]{40}$/.test(sha??''))throw Error('OWNER_PREVIEW_EXACT_SOURCE_REQUIRED');
+  const probePath='approved-teaching-photo-diagnostics/'+lessonId+'/owner-preview-storage-preflight.json';
+  const probe={purpose:'owner-preview-storage-preflight',lessonBuildId:lessonId,source:sha};
+  const probeHeaders={apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY,'content-type':'application/json','x-upsert':'true'};
+  const uploaded=await request(env.NEXT_PUBLIC_SUPABASE_URL+'/storage/v1/object/course_videos/'+probePath,{method:'POST',headers:probeHeaders,body:JSON.stringify(probe),redirect:'error',signal:AbortSignal.timeout(30000)});
+  if(!uploaded.ok)throw Error('OWNER_PREVIEW_DIAGNOSTIC_UPLOAD_HTTP_'+uploaded.status);
+  const checked=await request(env.NEXT_PUBLIC_SUPABASE_URL+'/storage/v1/object/authenticated/course_videos/'+probePath,{headers:probeHeaders,redirect:'error',signal:AbortSignal.timeout(30000)});
+  if(!checked.ok)throw Error('OWNER_PREVIEW_DIAGNOSTIC_READBACK_FAILED');
+  const proof=await checked.json();
+  if(proof.purpose!==probe.purpose||proof.lessonBuildId!==lessonId||proof.source!==sha)throw Error('OWNER_PREVIEW_DIAGNOSTIC_READBACK_FAILED');
   const imageSource=reuseCandidate?'7df4b69695748dbc6dd7a122300be9ed4ee44893':sha;
   const digest=run(['artifacts','docker','images','describe',registry+':owner-preview-'+imageSource,'--project='+PROJECT,'--format=value(image_summary.digest)']);
   if(!/^sha256:[a-f0-9]{64}$/.test(digest))throw Error('OWNER_PREVIEW_IMMUTABLE_IMAGE_REQUIRED');
@@ -90,7 +103,7 @@ export async function ownerLessonPreview({execute=false,sha,reuseCandidate=false
   if(JSON.stringify(runtimeSpec(deployed.spec))!==JSON.stringify(runtimeSpec(expected)))throw Error('OWNER_PREVIEW_IMAGE_ONLY_READBACK_FAILED');
   // No reset of attempts, generation, checkpoints, ordinary pause, or other jobs.
   const payload={...job.payload,ownerPreview:true,lessonBuildId:lessonId,competencyId,
-    checkpointRepair:{lessonBuildId:lessonId,competencyId,fromStep:'teaching_sequence',requestedAt:new Date().toISOString(),requestedBy:'owner-approved-preview'}};
+    checkpointRepair:{lessonBuildId:lessonId,competencyId,fromStep:'lesson_film_render',requestedAt:new Date().toISOString(),requestedBy:'owner-approved-preview'}};
   const changed=await rest('ultimate_build_jobs?id=eq.'+jobId+'&status=eq.failed&execution_generation=eq.'+job.execution_generation+'&attempts=eq.'+job.attempts+'&lease_owner=is.null','PATCH',{
     payload,status:'queued',max_attempts:Math.max(job.max_attempts,job.attempts+1),
     available_at:new Date().toISOString(),last_error:null,updated_at:new Date().toISOString()});

@@ -74,7 +74,7 @@ jobs:
           console.log(JSON.stringify({logCount:logs.length,logTypes:[...new Set(logs.map(x=>x.logName))]}));
           for(const item of logs) {
             const message=String(item.textPayload ?? item.jsonPayload?.message ?? '');
-            if(!/error|failed|exception|ultimate_|claim|complete|starting|polling|once|narration|render|bundl|mp4/i.test(message)) continue;
+            if(!/error|failed|exception|ultimate_|claim|complete|starting|polling|once|narration|render|bundl|mp4|TeachingPhoto|blockReason|finishReasons|candidateCount|partTypes|blocked/i.test(message)) continue;
             let safe=message;
             for(const entry of container.env||[])if(/KEY|TOKEN|SECRET|PASSWORD|URL/i.test(entry.name)&&entry.value?.length>5)safe=safe.split(entry.value).join('[redacted]');
             safe=safe.replace(/https?:\/\/\S+/g,'[url]').replace(/Bearer\s+\S+/gi,'Bearer [redacted]').replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[token]').replace(/(token|password|secret|api[_-]?key)\s*[:=]\s*\S+/gi,'$1=[redacted]').slice(0,1500);

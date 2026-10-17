@@ -30,6 +30,31 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 describe('hours queue', () => {
+  it('provides sign-in recovery for an expired session without parsing login HTML', async () => {
+    fetchMock.mockResolvedValue({ status: 401, ok: false, json: vi.fn() });
+    render(<HoursQueue />);
+    expect(await screen.findByRole('link', { name: 'Sign in to approve hours' })).toHaveAttribute(
+      'href',
+      '/login?redirect=%2Fapprenticeships',
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Your session expired');
+    expect(screen.getByRole('button', { name: /Approve all eligible/ })).toBeDisabled();
+  });
+  it('explains an HTML server failure without displaying a JSON parser exception', async () => {
+    fetchMock.mockResolvedValue({
+      status: 502,
+      ok: false,
+      json: async () => {
+        throw new SyntaxError("Unexpected token '<'");
+      },
+    });
+    render(<HoursQueue />);
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'The hours service could not return the queue',
+    );
+    expect(screen.queryByText(/Unexpected token/)).not.toBeInTheDocument();
+  });
+
   it('shows load errors and disables approval instead of pretending the queue is empty', async () => {
     fetchMock.mockResolvedValue(response({ error: 'Could not load hours' }, false));
     render(<HoursQueue />);

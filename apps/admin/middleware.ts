@@ -98,6 +98,16 @@ function platformCookieOptions(options: Record<string, unknown> | undefined) {
 }
 
 function unauthenticatedRedirect(req: NextRequest, pathname: string, search: string) {
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.json(
+      {
+        error: 'AUTH_REQUIRED',
+        message: 'Your session expired. Sign in to continue.',
+        loginUrl: '/login',
+      },
+      { status: 401, headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie' } },
+    );
+  }
   const loginUrl = new URL('/login', req.url);
   loginUrl.searchParams.set('redirect', `${pathname}${search}`);
   const response = NextResponse.redirect(loginUrl);
@@ -175,6 +185,8 @@ export async function middleware(req: NextRequest) {
   });
 
   const withCookies = (response: NextResponse) => {
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+    response.headers.set('Vary', 'Cookie');
     for (const cookie of pendingCookies) {
       response.cookies.set(cookie.name, cookie.value, platformCookieOptions(cookie.options) as any);
     }
@@ -208,7 +220,14 @@ export async function middleware(req: NextRequest) {
   const effectiveRoles = normalizeRoles([profile?.role, ...secondaryRoles]);
 
   if (!hasAnyRole(effectiveRoles, requiredRoles(pathname), { adminOverride: false })) {
-    return withCookies(NextResponse.redirect(new URL('/unauthorized', req.url)));
+    return withCookies(
+      pathname.startsWith('/api/')
+        ? NextResponse.json(
+            { error: 'FORBIDDEN', message: 'Administrator access is required.' },
+            { status: 403 },
+          )
+        : NextResponse.redirect(new URL('/unauthorized', req.url)),
+    );
   }
 
   const privileged = effectiveRoles.some((role) => PRIVILEGED_MFA_ROLES.includes(role));
@@ -236,6 +255,9 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  // getUser may rotate the session. Forward the mutated cookies to this
+  // request's server components as well as persisting them on the response.
+  requestHeaders.set('cookie', req.cookies.toString());
   return withCookies(NextResponse.next({ request: { headers: requestHeaders } }));
 }
 

@@ -1118,7 +1118,12 @@ function TheorySchedulePanel({
           </p>
           {schedule.starts_on ? (
             <p className="mt-2 text-sm font-black text-fuchsia-950">
-              Theory/RTI begins Monday, September 21, 2026.
+              Theory/RTI begins{' '}
+              {new Date(`${String(schedule.starts_on).slice(0, 10)}T12:00:00Z`).toLocaleDateString(
+                'en-US',
+                { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' },
+              )}
+              .
             </p>
           ) : null}
           <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">

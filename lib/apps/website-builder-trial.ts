@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 export const WEBSITE_BUILDER_TRIAL = {
@@ -53,11 +54,9 @@ export async function consumeWebsiteBuilderCredits(
   supabase: SupabaseClient<any>,
   userId: string,
   operation: WebsiteBuilderCreditOperation,
+  quantity = 1,
 ): Promise<TrialCreditResult> {
-  // Use the same canonical access decision as the builder pages and APIs.
-  // This preserves Stripe-synchronized customer enforcement while allowing
-  // platform administrators to operate and verify the product without a
-  // redundant personal subscription.
+  // Entitlement and funded usage are separate checks. Paid accounts also consume credits.
   const access = await getWebsiteBuilderAccess(userId, supabase);
 
   if (!access.allowed) {
@@ -67,49 +66,72 @@ export async function consumeWebsiteBuilderCredits(
       balance: null,
       isTrial: false,
       upgradeUrl: access.upgradeUrl || '/store/apps/website-builder',
-      error: access.reason === 'trial_expired'
-        ? 'Your 14-day Website Builder trial has expired'
-        : 'Website Builder subscription required',
+      error:
+        access.reason === 'trial_expired'
+          ? 'Your 14-day Website Builder trial has expired'
+          : 'Website Builder subscription required',
     };
   }
 
-  if (access.isAdmin || access.status === 'active') {
+  if (access.isAdmin) {
     return { allowed: true, charged: 0, balance: null, isTrial: false };
   }
 
-  const { data: ensured, error: ensureError } = await supabase.rpc('ensure_app_trial_wallet', {
-    p_user_id: userId,
-    p_app_slug: 'website-builder',
-    p_trial_credits: WEBSITE_BUILDER_TRIAL.credits,
-  });
-
-  if (ensureError) {
+  const isTrial = access.status === 'trial';
+  if (
+    !Number.isInteger(quantity) ||
+    quantity < 1 ||
+    quantity > 3 ||
+    (quantity !== 1 && operation !== 'initial_site_generation') ||
+    !Object.hasOwn(WEBSITE_BUILDER_CREDIT_COSTS, operation)
+  ) {
+    return { allowed: false, charged: 0, balance: null, isTrial, error: 'Invalid usage request' };
+  }
+  // Credit mutation is service-only; never let a browser choose its own allowance or cost.
+  let db;
+  try {
+    db = await requireAdminClient();
+  } catch {
     return {
       allowed: false,
       charged: 0,
       balance: null,
-      isTrial: true,
-      error: ensureError.message,
+      isTrial,
+      error: 'Usage service is temporarily unavailable',
     };
   }
-
-  const cost = WEBSITE_BUILDER_CREDIT_COSTS[operation];
-  const { data: consumed, error: consumeError } = await supabase.rpc('consume_app_credits', {
-    p_user_id: userId,
-    p_app_slug: 'website-builder',
-    p_operation: operation,
-    p_cost: cost,
-  });
-
-  if (consumeError) {
+  if (isTrial) {
+    const { error } = await db.rpc('ensure_app_trial_wallet', {
+      p_user_id: userId,
+      p_app_slug: 'website-builder',
+      p_trial_credits: WEBSITE_BUILDER_TRIAL.credits,
+    });
+    if (error)
+      return {
+        allowed: false,
+        charged: 0,
+        balance: null,
+        isTrial,
+        error: 'Usage service is temporarily unavailable',
+      };
+  }
+  const cost = WEBSITE_BUILDER_CREDIT_COSTS[operation] * quantity;
+  const { data: consumed, error: consumeError } = await db.rpc(
+    'consume_website_builder_credits_v1',
+    {
+      p_user_id: userId,
+      p_operation: operation,
+      p_quantity: quantity,
+    },
+  );
+  if (consumeError)
     return {
       allowed: false,
       charged: 0,
-      balance: typeof ensured === 'number' ? ensured : null,
-      isTrial: true,
-      error: consumeError.message,
+      balance: null,
+      isTrial,
+      error: 'Usage service is temporarily unavailable',
     };
-  }
 
   const row = Array.isArray(consumed) ? consumed[0] : consumed;
   const allowed = Boolean(row?.success);
@@ -119,8 +141,10 @@ export async function consumeWebsiteBuilderCredits(
     allowed,
     charged: allowed ? cost : 0,
     balance,
-    isTrial: true,
+    isTrial,
     upgradeUrl: allowed ? undefined : '/store/apps/website-builder',
-    error: allowed ? undefined : 'Trial credits are used up. Upgrade or add credits to keep building.',
+    error: allowed
+      ? undefined
+      : 'Your included credits are used up. Renew or upgrade to keep generating.',
   };
 }

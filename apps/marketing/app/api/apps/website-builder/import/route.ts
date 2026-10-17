@@ -125,10 +125,9 @@ async function _POST(request: NextRequest) {
       : undefined;
     if (!urls.length) return NextResponse.json({ error: 'At least one URL is required' }, { status: 400 });
 
-    // Meter the expensive crawl/AI mapping for individual trials. Paid/admin and
-    // organization-entitled imports remain unmetered here.
-    if (individual.allowed && individual.access.status === 'trial') {
-      const credits = await consumeWebsiteBuilderCredits(individual.supabase, auth.userId, 'initial_site_generation');
+    // Reserve usage before crawling, including paid individual subscriptions.
+    if (individual.allowed && !individual.access.isAdmin) {
+      const credits = await consumeWebsiteBuilderCredits(individual.supabase, auth.userId, 'initial_site_generation', urls.length);
       if (!credits.allowed) {
         return NextResponse.json(
           { error: credits.error || 'Trial credits are insufficient for website import', balance: credits.balance, upgradeUrl: credits.upgradeUrl },

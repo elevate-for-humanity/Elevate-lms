@@ -17,7 +17,7 @@ export type CreditReservation = Awaited<ReturnType<typeof reserveCourseBuilderCr
 export function courseBuilderCreditErrorResponse(error: unknown) {
   if (!(error instanceof CourseBuilderCreditsError)) return null;
   const status =
-    error.code === 'INSUFFICIENT_CREDITS' ? 402 : error.code === 'TENANT_REQUIRED' ? 409 : 503;
+    error.code === 'INSUFFICIENT_CREDITS' ? 402 : ['TENANT_REQUIRED', 'DUPLICATE_REQUEST'].includes(error.code) ? 409 : 503;
   return NextResponse.json(
     { ok: false, error: error.message, code: error.code, balance: error.balance },
     { status },

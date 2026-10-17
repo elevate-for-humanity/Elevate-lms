@@ -32,13 +32,20 @@ export interface IndividualAppCatalog {
   plans: IndividualPlanDefinition[];
 }
 
+/** Non-rollover processing credits funded by each verified monthly payment. */
+export const WEBSITE_BUILDER_MONTHLY_CREDITS = {
+  starter: 500,
+  professional: 2500,
+  enterprise: 10000,
+} as const;
+
 const WEBSITE_BUILDER_PLANS: IndividualPlanDefinition[] = [
   {
     id: 'starter',
     name: 'Starter',
     priceMonthly: 29,
     priceLabel: '$29/mo',
-    features: ['1 website', '5 pages', 'Basic templates', 'Curated licensed photos and graphics in finished sites', 'Elevate subdomain', 'Email support'],
+    features: ['1 website', '500 processing credits per paid month', '5 pages', 'Basic templates', 'Curated licensed photos and graphics in finished sites', 'Elevate subdomain', 'Email support'],
   },
   {
     id: 'professional',
@@ -48,6 +55,7 @@ const WEBSITE_BUILDER_PLANS: IndividualPlanDefinition[] = [
     popular: true,
     features: [
       '3 websites',
+      '2,500 processing credits per paid month',
       'Unlimited pages',
       'All templates',
       'Curated licensed video, photos, graphics, fonts, music, and effects in finished sites',
@@ -64,6 +72,7 @@ const WEBSITE_BUILDER_PLANS: IndividualPlanDefinition[] = [
     priceLabel: '$199/mo',
     features: [
       'Unlimited websites for the licensed user',
+      '10,000 processing credits per paid month',
       'Advanced builder controls',
       'Full governed creative library for finished websites and stores',
       'Import existing sites',

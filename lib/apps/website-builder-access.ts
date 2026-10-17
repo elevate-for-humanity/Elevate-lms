@@ -1,12 +1,20 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { appSubscriptionUpgradeUrl, syncIndividualAppSubscription } from '@/lib/apps/sync-subscription';
+import {
+  appSubscriptionUpgradeUrl,
+  syncIndividualAppSubscription,
+} from '@/lib/apps/sync-subscription';
 
 export type WebsiteBuilderAccess = {
   allowed: boolean;
   isAdmin: boolean;
   plan: string;
   status: string;
-  reason?: 'subscription_required' | 'trial_expired' | 'inactive' | 'billing_verification_unavailable';
+  reason?:
+    | 'subscription_required'
+    | 'trial_expired'
+    | 'inactive'
+    | 'paid_period_expired'
+    | 'billing_verification_unavailable';
   upgradeUrl?: string;
 };
 
@@ -31,11 +39,7 @@ export async function getWebsiteBuilderAccess(
     return { allowed: true, isAdmin: true, plan: 'enterprise', status: 'active' };
   }
 
-  const subscription = await syncIndividualAppSubscription(
-    userId,
-    'website-builder',
-    supabase,
-  );
+  const subscription = await syncIndividualAppSubscription(userId, 'website-builder', supabase);
 
   if (!subscription) {
     return {
@@ -59,7 +63,8 @@ export async function getWebsiteBuilderAccess(
       plan,
       status: 'expired',
       reason: 'trial_expired',
-      upgradeUrl: subscription.upgrade_url || appSubscriptionUpgradeUrl('website-builder', 'trial-expired'),
+      upgradeUrl:
+        subscription.upgrade_url || appSubscriptionUpgradeUrl('website-builder', 'trial-expired'),
     };
   }
 
@@ -70,8 +75,30 @@ export async function getWebsiteBuilderAccess(
       plan,
       status,
       reason: 'billing_verification_unavailable',
-      upgradeUrl: subscription.upgrade_url || appSubscriptionUpgradeUrl('website-builder', 'billing-verification-unavailable'),
+      upgradeUrl:
+        subscription.upgrade_url ||
+        appSubscriptionUpgradeUrl('website-builder', 'billing-verification-unavailable'),
     };
+  }
+
+  if (status === 'active') {
+    const start = new Date(subscription.current_period_start || '').getTime();
+    const end = new Date(subscription.current_period_end || '').getTime();
+    if (
+      !Number.isFinite(start) ||
+      !Number.isFinite(end) ||
+      start > Date.now() ||
+      end <= Date.now()
+    ) {
+      return {
+        allowed: false,
+        isAdmin: false,
+        plan,
+        status: 'expired',
+        reason: 'paid_period_expired',
+        upgradeUrl: appSubscriptionUpgradeUrl('website-builder', 'paid-period-expired'),
+      };
+    }
   }
 
   if (status !== 'trial' && status !== 'active') {

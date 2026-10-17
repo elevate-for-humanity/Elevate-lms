@@ -19,7 +19,7 @@ export type MeteredCourseBuilderOperation = keyof typeof COURSE_BUILDER_CREDIT_C
 export class CourseBuilderCreditsError extends Error {
   constructor(
     message: string,
-    readonly code: 'TENANT_REQUIRED' | 'INSUFFICIENT_CREDITS' | 'CREDIT_SERVICE_ERROR',
+    readonly code: 'TENANT_REQUIRED' | 'INSUFFICIENT_CREDITS' | 'DUPLICATE_REQUEST' | 'CREDIT_SERVICE_ERROR',
     readonly balance = 0,
   ) {
     super(message);
@@ -106,6 +106,13 @@ export async function reserveCourseBuilderCredits(input: {
       `This operation requires ${cost.toLocaleString()} credits. Upgrade or add credits to continue.`,
       'INSUFFICIENT_CREDITS',
       Number(result?.balance ?? 0),
+    );
+  }
+  if (result.applied === false) {
+    throw new CourseBuilderCreditsError(
+      'This request already reserved credits. Use its existing job or submit a new request key.',
+      'DUPLICATE_REQUEST',
+      Number(result.balance ?? 0),
     );
   }
   return {

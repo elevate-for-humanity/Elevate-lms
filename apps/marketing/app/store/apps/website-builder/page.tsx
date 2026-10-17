@@ -125,6 +125,24 @@ export default async function WebsiteBuilderStorePage({ searchParams }: { search
 
       <section className="px-4 py-16"><div className="mx-auto max-w-6xl"><div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">{features.map((feature) => <article key={feature.title} className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm"><feature.icon className="h-7 w-7 text-brand-red-700" /><h2 className="mt-5 text-xl font-black text-slate-950">{feature.title}</h2><p className="mt-2 font-medium leading-7 text-slate-700">{feature.desc}</p></article>)}</div></div></section>
 
+      <section className="px-4 py-10">
+        <div className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-slate-50 p-6">
+          <h2 className="text-2xl font-black text-slate-950">
+            Clear allowances. No surprise usage bills.
+          </h2>
+          <p className="mt-3 leading-7 text-slate-700">
+            Starter includes 500, Professional 2,500, and Enterprise 10,000 processing credits per
+            paid month. Each generated draft or imported site uses 60 credits; a PARIS edit uses 8
+            credits. The 14-day trial includes 500 credits once.
+          </p>
+          <p className="mt-3 leading-7 text-slate-700">
+            Processing attempts use credits even when a draft cannot be completed. Unused monthly
+            credits do not roll over. When your allowance is exhausted, generation pauses until
+            renewal or an upgrade you approve. Your saved websites remain available during your
+            active plan.
+          </p>
+        </div>
+      </section>
       <section className="border-y border-slate-200 bg-slate-50 px-4 py-14"><div className="mx-auto max-w-5xl"><h2 className="text-3xl font-black text-slate-950">How the revenue journey works</h2><div className="mt-8 grid gap-4 md:grid-cols-4">{['Start the limited trial', 'Build with PARIS + credits', 'Upgrade tools as needed', 'Publish, grow and add capacity'].map((step, index) => <div key={step} className="rounded-xl border border-slate-300 bg-white p-5"><div className="text-sm font-black text-brand-red-700">{index + 1}</div><div className="mt-2 font-black text-slate-950">{step}</div></div>)}</div><p className="mt-6 text-sm font-medium leading-6 text-slate-700">The base subscription gets the customer into the builder. Additional AI capacity, assistants and business capabilities can be activated as the customer asks PARIS to do more.</p></div></section>
 
       <div id="plans"><IndividualAppPlansSection catalog={catalog} /></div>

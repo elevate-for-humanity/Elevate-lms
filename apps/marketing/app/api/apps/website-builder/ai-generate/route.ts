@@ -63,7 +63,7 @@ async function _POST(request: NextRequest) {
   const reusable = (ownedSites || []).find((site) => placeholder(site.site_config));
   const completedCount = (ownedSites || []).filter((site) => !placeholder(site.site_config)).length;
   const plan = access.plan || 'starter';
-  const limit = PLAN_SITE_LIMITS[plan] ?? 1;
+  const limit = Object.hasOwn(PLAN_SITE_LIMITS, plan) ? PLAN_SITE_LIMITS[plan] : 1;
   if (!reusable && limit !== null && completedCount >= limit) return NextResponse.json({ error: `${plan} plan allows ${limit} website${limit === 1 ? '' : 's'}`, upgradeUrl: '/store/apps/website-builder' }, { status: 409 });
 
   const body = await request.json().catch(() => ({}));
@@ -115,6 +115,12 @@ async function _POST(request: NextRequest) {
     seo: { title: 'text', description: 'text', keywords: ['text'] },
   };
 
+  const credit = access.isAdmin
+    ? { allowed: true, charged: 0, balance: null as number | null, upgradeUrl: null as string | null, error: null as string | null }
+    : await consumeWebsiteBuilderCredits(supabase, user.id, 'initial_site_generation');
+  if (!credit.allowed) return NextResponse.json({ error: credit.error || 'Not enough Website Builder credits', creditsRemaining: credit.balance, upgradeUrl: credit.upgradeUrl || '/store/apps/website-builder' }, { status: 402 });
+
+
   try {
     const result = await runAITask({
       task: 'general_chat',
@@ -140,7 +146,7 @@ async function _POST(request: NextRequest) {
   } catch (error) {
     logger.error('[website-builder] PARIS generation failed', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
-      { error: 'PARIS could not generate a validated website draft. No credits were charged.', retryable: true },
+      { error: 'PARIS could not generate a validated website draft. This generation attempt used processing credits.', retryable: true },
       { status: 502 },
     );
   }
@@ -149,15 +155,11 @@ async function _POST(request: NextRequest) {
   if (!validation.valid) {
     logger.warn('[website-builder] generated draft failed validation', { errors: validation.errors });
     return NextResponse.json(
-      { error: 'PARIS generated a draft that failed website validation. No credits were charged.', validation, retryable: true },
+      { error: 'PARIS generated a draft that failed website validation. This generation attempt used processing credits.', validation, retryable: true },
       { status: 422 },
     );
   }
 
-  const credit = access.isAdmin
-    ? { allowed: true, charged: 0, balance: null as number | null, upgradeUrl: null as string | null, error: null as string | null }
-    : await consumeWebsiteBuilderCredits(supabase, user.id, 'initial_site_generation');
-  if (!credit.allowed) return NextResponse.json({ error: credit.error || 'Not enough Website Builder credits', creditsRemaining: credit.balance, upgradeUrl: credit.upgradeUrl || '/store/apps/website-builder' }, { status: 402 });
 
   const payload = { user_id: user.id, site_name: businessName, template_id: config.template.id, site_config: config, is_published: false, status: 'draft', updated_at: new Date().toISOString() };
   const query = reusable?.id

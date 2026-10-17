@@ -27,6 +27,9 @@ export async function startAppTrial(
     // own trial creation depend on privileged secret hydration. RLS explicitly
     // permits authenticated users to read/insert/update their own subscription.
     const admin = await getAdminClient();
+    if (appSlug === 'website-builder' && !admin) {
+      return { status: 'error', message: 'Trial service is temporarily unavailable' };
+    }
     const db = admin ?? authenticatedClient ?? null;
 
     if (!db) {

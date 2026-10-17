@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
@@ -60,6 +61,10 @@ export default async function WebsiteBuilderPage() {
     .filter((site) => !interviewPending(site.site_config))
     .map(({ site_config: _siteConfig, ...site }) => site);
 
+  const usage = access.isAdmin ? null : await supabase.from('user_app_credit_wallets')
+    .select('balance').eq('user_id', user.id).eq('app_slug', 'website-builder').maybeSingle();
+  const credits = usage?.error ? null : Number(usage?.data?.balance ?? 0);
+
   return (
     <div className="min-h-screen bg-white">
       <div className="border-b bg-white">
@@ -67,6 +72,31 @@ export default async function WebsiteBuilderPage() {
           <Breadcrumbs items={[{ label: 'Store', href: '/store/apps' }, { label: 'Website Builder' }]} />
         </div>
       </div>
+      {!access.isAdmin && (
+        <aside className="mx-auto max-w-6xl px-4 py-4" aria-label="Processing allowance">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-800">
+            <p className="font-bold">
+              {credits === null
+                ? 'Credit balance temporarily unavailable'
+                : `${credits.toLocaleString()} processing credits remaining`}
+            </p>
+            <p className="mt-1">
+              A website draft or imported site uses 60 credits. A PARIS edit uses 8 credits.
+              Processing attempts use credits, including attempts that cannot produce a valid draft.
+            </p>
+            <p className="mt-1">
+              Paid monthly allowances replace unused credits after renewal. Generation stops when
+              credits run out; there are no automatic overage charges.
+            </p>
+            <Link
+              href="/store/apps/website-builder"
+              className="mt-2 inline-block font-semibold text-brand-red-700 underline"
+            >
+              Review plans and allowances
+            </Link>
+          </div>
+        </aside>
+      )}
       <WebsiteBuilderApp user={user} subscription={subscription} websites={websites} trialDaysRemaining={trialDaysRemaining} />
     </div>
   );

@@ -494,6 +494,13 @@ export async function fulfillPaidBillingInvoice(
   }
 
   if (job.fulfillment_type === 'individual_app_subscription') {
+    if (payload.app_slug === 'website-builder') {
+      const activation = await db.rpc('activate_paid_website_builder_v1', {
+        p_invoice_id: job.billing_invoice_id,
+      });
+      if (activation.error) throw new Error(activation.error.message);
+      return;
+    }
     const now = new Date();
     const periodEnd = new Date(now);
     periodEnd.setUTCMonth(periodEnd.getUTCMonth() + 1);
@@ -550,6 +557,12 @@ export async function fulfillPaidBillingInvoice(
       { onConflict: 'organization_id' },
     );
     if (subscription.error) throw new Error(subscription.error.message);
+    if ((payload.addon_codes || []).includes('course-creation-learning-platform')) {
+      const credits = await db.rpc('grant_course_builder_paid_invoice_v1', {
+        p_invoice_id: job.billing_invoice_id,
+      });
+      if (credits.error) throw new Error(credits.error.message);
+    }
     await db
       .from('addon_subscriptions')
       .update({ active: false, canceled_at: now.toISOString(), updated_at: now.toISOString() })

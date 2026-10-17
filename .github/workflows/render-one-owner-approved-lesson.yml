@@ -1,0 +1,82 @@
+name: Render one owner-approved lesson preview
+# Explicit owner request: one preview using the approved first instructional
+# video. The web release hold stays unchanged. No service traffic is changed.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Validate existing connections first, or build and execute one isolated preview
+        type: choice
+        options: [validate, execute]
+        default: validate
+        required: true
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+concurrency:
+  group: google-course-runtime-operations
+  cancel-in-progress: false
+jobs:
+  preview:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Require accepted source checks on this exact main commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)" = "$GITHUB_SHA"
+          gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs?per_page=100" > "$RUNNER_TEMP/preview-checks.json"
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const checks=JSON.parse(readFileSync(process.env.RUNNER_TEMP+'/preview-checks.json','utf8')).check_runs;
+          for(const name of ['CI Required Gate','Security Audit','integrity','static-safety'])
+            if(!checks.some(c=>c.name===name&&c.status==='completed'&&c.conclusion==='success'))throw Error('OWNER_PREVIEW_SOURCE_CHECK_REQUIRED:'+name);
+          NODE
+      - name: Verify single-job isolation and preserved source contracts
+        run: node --test scripts/gcp/owner-lesson-preview.test.mjs lib/ultimate-course-builder/worker/owner-preview-claim.test.mjs workers/worker-loop.test.mjs workers/process-job-state.test.mjs tests/worker/complete-lesson-before-advance.test.mjs tests/unit/ultimate-renderer-assignments.test.mjs
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: { skip_install: true }
+      - name: Validate actual identity, database, B2 configuration, inactive execution and regional quota
+        run: node scripts/gcp/owner-lesson-preview.mjs
+      - name: Build one immutable preview candidate without releasing web applications
+        if: inputs.mode == 'execute'
+        run: |
+          set -euo pipefail
+          node scripts/gcp/preflight-billing.mjs
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker build -f Dockerfile.ultimate-worker -t "owner-lesson-preview:$GITHUB_SHA" .
+          docker run --rm --entrypoint node -v "$PWD/tests:/app/tests:ro" -v "$PWD/scripts:/app/scripts:ro" -v "$PWD/workers:/app/workers:ro" \
+            "owner-lesson-preview:$GITHUB_SHA" --test /app/scripts/gcp/owner-lesson-preview.test.mjs \
+            lib/ultimate-course-builder/worker/owner-preview-claim.test.mjs workers/worker-loop.test.mjs \
+            /app/tests/worker/complete-lesson-before-advance.test.mjs /app/tests/unit/ultimate-renderer-assignments.test.mjs
+      - uses: google-github-actions/auth@v3
+        if: inputs.mode == 'execute'
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - name: Push the tested candidate and run only the requested lesson
+        if: inputs.mode == 'execute'
+        env:
+          OWNER_PREVIEW_EXECUTE: 'true'
+        run: |
+          set -euo pipefail
+          IMAGE="us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker:owner-preview-$GITHUB_SHA"
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker tag "owner-lesson-preview:$GITHUB_SHA" "$IMAGE"
+          docker push "$IMAGE"
+          node scripts/gcp/owner-lesson-preview.mjs

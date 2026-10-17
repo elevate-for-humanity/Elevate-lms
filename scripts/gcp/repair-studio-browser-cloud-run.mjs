@@ -2,9 +2,8 @@ import {execFileSync, execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {mkdir, writeFile} from 'node:fs/promises';
 const execAsync=promisify(execFile);
-async function collectStartupDiagnostics(sharedSecret){
+async function collectStartupDiagnostics(){
   const folder='reports/studio-browser';await mkdir(folder,{recursive:true});
-  const redact=value=>String(value).split(sharedSecret).join('[REDACTED]');
   let revision;
   try{const {stdout}=await execAsync('gcloud',['run','services','describe',name,'--project='+project,'--region='+region,'--format=value(status.latestCreatedRevisionName)'],{timeout:30000,maxBuffer:2*1024*1024});revision=stdout.trim();}
   catch{await writeFile(folder+'/startup.json',JSON.stringify({service:name,revision:null,reason:'No created revision could be read'}));return;}
@@ -13,7 +12,9 @@ async function collectStartupDiagnostics(sharedSecret){
     ['revision.json',['run','revisions','describe',revision,'--project='+project,'--region='+region,'--format=json']],
     ['container-logs.json',['logging','read','resource.type="cloud_run_revision" AND resource.labels.service_name="'+name+'" AND resource.labels.revision_name="'+revision+'"','--project='+project,'--limit=40','--freshness=2h','--format=json']],
   ];
-  await Promise.all(requests.map(async([file,args])=>{try{const {stdout}=await execAsync('gcloud',args,{timeout:30000,maxBuffer:2*1024*1024});await writeFile(folder+'/'+file,redact(stdout));}catch{await writeFile(folder+'/'+file,JSON.stringify({service:name,revision,diagnostic:'Unavailable within 30 second deadline'}));}}));
+  await Promise.all(requests.map(async([file,args])=>{try{const {stdout}=await execAsync('gcloud',args,{timeout:30000,maxBuffer:2*1024*1024});const raw=JSON.parse(stdout);
+      const selected=file==='revision.json'?{name:raw.metadata?.name,containers:(raw.spec?.containers||[]).map(c=>({image:c.image,resources:c.resources,ports:c.ports})),conditions:(raw.status?.conditions||[]).map(c=>({type:c.type,status:c.status,reason:c.reason}))}:(Array.isArray(raw)?raw:[]).map(e=>({timestamp:e.timestamp,severity:e.severity,logName:e.logName}));
+      await writeFile(folder+'/'+file,JSON.stringify(selected));}catch{await writeFile(folder+'/'+file,JSON.stringify({service:name,revision,diagnostic:'Unavailable within 30 second deadline'}));}}));
   console.error(JSON.stringify({service:name,failedRevision:revision,diagnostics:folder,adminSwitched:false}));
 }
 const project='elegant-racer-299721',region='us-central1',name='elevate-studio-browser';
@@ -22,37 +23,15 @@ const bucket=project+'-studio-browser-auth',secretName='studio-browser-shared-se
 function command(args,input){return execFileSync('gcloud',args,{encoding:'utf8',input,timeout:900000,stdio:['pipe','pipe','pipe']}).trim();}
 function gc(args){return command([...args,'--project='+project,'--format=json']);}
 const existingService=JSON.parse(gc(['run','services','describe',name,'--region='+region]));
-const existing=JSON.parse(gc(['secrets','list','--filter=name:'+secretName]));
-const browserVariable=existingService.spec?.template?.spec?.containers?.[0]?.env?.find(x=>x.name==='STUDIO_BROWSER_SECRET');
-const browserRef=browserVariable?.valueFrom?.secretKeyRef;
-let secret;
-if(existing.length && browserRef?.name===secretName) {
-  // The migrated browser owns its canonical encryption secret. Prove that the
-  // running server accepts that same key before releasing without Admin reads.
-  secret=command(['secrets','versions','access',browserRef.key||'latest','--secret='+secretName,'--project='+project]);
-  const latest=command(['secrets','versions','access','latest','--secret='+secretName,'--project='+project]);
-  if(secret!==latest)throw Error('Studio secret mismatch; refusing credential rotation');
-  if(!/^https:\/\/[a-z0-9.-]+\.run\.app$/.test(existingService.status?.url||''))throw Error('Verified existing Studio URL required');
-  const proof=await fetch(existingService.status.url+'/workspace/files',{headers:{'x-studio-browser-secret':secret},redirect:'error',signal:AbortSignal.timeout(20000)});
-  if(!proof.ok)throw Error('Existing Studio rejected its canonical key; refusing credential rotation');
-} else {
-  // Bootstrap only: retain the old binding until canonical ownership is proven.
-  const admin=JSON.parse(gc(['run','services','describe','elevate-admin-migration','--region='+region]));
-  const variable=admin.spec.template.spec.containers[0].env.find(x=>x.name==='STUDIO_BROWSER_SECRET');
-  secret=variable?.value;
-  if(!secret && variable?.valueFrom?.secretKeyRef){const ref=variable.valueFrom.secretKeyRef;secret=command(['secrets','versions','access',ref.key||'latest','--secret='+ref.name,'--project='+project]);}
-}
-if(!secret || secret.length<16)throw Error('Existing Studio secret unavailable; refusing unauthenticated deployment or credential rotation');
-if(!existing.length)command(['secrets','create',secretName,'--replication-policy=automatic','--project='+project]);
-// Scope the deployment reader to this secret, so later releases can verify the
-// existing encryption key without project-wide secret access or key rotation.
-command(['secrets','add-iam-policy-binding',secretName,'--member=serviceAccount:elevate-github-deploy@'+project+'.iam.gserviceaccount.com','--role=roles/secretmanager.secretAccessor','--project='+project,'--quiet']);
-if(!existing.length)command(['secrets','versions','add',secretName,'--data-file=-','--project='+project],secret);
-else if(command(['secrets','versions','access','latest','--secret='+secretName,'--project='+project])!==secret)throw Error('Studio secret mismatch; refusing credential rotation');
-command(['secrets','add-iam-policy-binding',secretName,'--member=serviceAccount:'+identity,'--role=roles/secretmanager.secretAccessor','--project='+project,'--quiet']);
-const buckets=JSON.parse(gc(['storage','buckets','list','--filter=name:'+bucket]));
-if(!buckets.length)command(['storage','buckets','create','gs://'+bucket,'--location='+region,'--uniform-bucket-level-access','--public-access-prevention','--project='+project]);
-command(['storage','buckets','add-iam-policy-binding','gs://'+bucket,'--member=serviceAccount:'+identity,'--role=roles/storage.objectUser','--quiet']);
+// Routine releases use only the owner's existing canonical secret and bucket.
+// The workflow verifies the prepared identity/bindings before any image build.
+const secret=command(['secrets','versions','access','latest','--secret='+secretName,'--project='+project]);
+if(!secret||secret.length<16)throw Error('Existing Studio secret unavailable; refusing credential rotation');
+if(!/^https:\/\/[a-z0-9.-]+\.run\.app$/.test(existingService.status?.url||''))throw Error('Verified existing Studio URL required');
+const canonicalProof=await fetch(existingService.status.url+'/workspace/files',{headers:{'x-studio-browser-secret':secret},redirect:'error',signal:AbortSignal.timeout(20000)});
+if(!canonicalProof.ok)throw Error('Existing Studio rejected its canonical key; refusing credential rotation');
+const bucketState=JSON.parse(gc(['storage','buckets','describe','gs://'+bucket]));
+if(![bucket,'gs://'+bucket,'gs://'+bucket+'/'].includes(bucketState.name||bucketState.id))throw Error('Owner-prepared Studio bucket is unverified; no storage was created');
 const sha=process.env.IMAGE_SHA;if(!/^[a-f0-9]{40}$/.test(sha||''))throw Error('Immutable image SHA required');
 const image='us-central1-docker.pkg.dev/'+project+'/elevate/studio-browser';
 const digest=command(['artifacts','docker','images','describe',image+':'+sha,'--project='+project,'--format=value(image_summary.digest)']);

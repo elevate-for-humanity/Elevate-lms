@@ -16,6 +16,7 @@ on:
         type: string
 permissions:
   contents: read
+  id-token: write
 concurrency:
   group: paris-code-repair
   cancel-in-progress: false
@@ -25,12 +26,29 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 3
     steps:
+      - name: Obtain short-lived PARIS workflow identity
+        env:
+          AUDIENCE: elevate-paris-code-repair
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          (async()=>{
+            const url=new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
+            url.searchParams.set('audience',process.env.AUDIENCE);
+            const response=await fetch(url,{headers:{Authorization:'Bearer '+process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}});
+            if(!response.ok)throw Error('Workflow identity issuance failed: HTTP '+response.status);
+            const token=(await response.json()).value;
+            if(!token || token.split('.').length!==3)throw Error('Invalid workflow identity');
+            process.stdout.write('::add-mask::'+token+'\n');
+            fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
+          })().catch(err=>{console.error(err.message);process.exitCode=1});
+          NODE
       - env:
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          PARIS_ID_TOKEN: ${{ env.PARIS_ID_TOKEN }}
         run: |
           python - <<'PYCODE'
           import os,json,urllib.request,urllib.error
-          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=json.dumps({'phase':'tick'}).encode(),headers={'Authorization':'Bearer '+os.environ['CRON_SECRET'],'Content-Type':'application/json'})
+          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=json.dumps({'phase':'tick'}).encode(),headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'Content-Type':'application/json'})
           try:
             print(urllib.request.urlopen(req,timeout=120).read().decode())
           except urllib.error.HTTPError as error:
@@ -45,18 +63,35 @@ jobs:
       sha: ${{ steps.patch.outputs.sha }}
       base: ${{ steps.patch.outputs.base }}
     steps:
+      - name: Obtain short-lived PARIS workflow identity
+        env:
+          AUDIENCE: elevate-paris-code-repair
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          (async()=>{
+            const url=new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
+            url.searchParams.set('audience',process.env.AUDIENCE);
+            const response=await fetch(url,{headers:{Authorization:'Bearer '+process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}});
+            if(!response.ok)throw Error('Workflow identity issuance failed: HTTP '+response.status);
+            const token=(await response.json()).value;
+            if(!token || token.split('.').length!==3)throw Error('Invalid workflow identity');
+            process.stdout.write('::add-mask::'+token+'\n');
+            fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
+          })().catch(err=>{console.error(err.message);process.exitCode=1});
+          NODE
       - name: Stage the PARIS patch
         id: patch
         env:
           ADMIN_URL: https://admin.elevateforhumanity.org
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          PARIS_ID_TOKEN: ${{ env.PARIS_ID_TOKEN }}
           REPAIR_ID: ${{ inputs.repair_id }}
         run: |
           python - <<'PY'
           import json,os,re,urllib.request
           if not re.fullmatch(r'[a-f0-9-]{36}',os.environ['REPAIR_ID']): raise SystemExit('Invalid repair ID')
           body=json.dumps({'phase':'prepare','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
-          req=urllib.request.Request(os.environ['ADMIN_URL']+'/api/cron/paris-code-repair',data=body,headers={'Authorization':'Bearer '+os.environ['CRON_SECRET'],'Content-Type':'application/json'})
+          req=urllib.request.Request(os.environ['ADMIN_URL']+'/api/cron/paris-code-repair',data=body,headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'Content-Type':'application/json'})
           result=json.load(urllib.request.urlopen(req,timeout=330))
           if not all(re.fullmatch(r'[a-f0-9]{40}',result.get(k,'')) for k in ['sha','baseSha']): raise SystemExit('Missing candidate evidence')
           with open(os.environ['GITHUB_OUTPUT'],'a') as out: out.write('sha='+result['sha']+'\nbase='+result['baseSha']+'\n')
@@ -67,6 +102,7 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: read
+      id-token: write
     env:
       NODE_OPTIONS: --max-old-space-size=6144
       CI: 'true'
@@ -134,15 +170,32 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 3
     steps:
+      - name: Obtain short-lived PARIS workflow identity
+        env:
+          AUDIENCE: elevate-paris-code-repair
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          (async()=>{
+            const url=new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
+            url.searchParams.set('audience',process.env.AUDIENCE);
+            const response=await fetch(url,{headers:{Authorization:'Bearer '+process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}});
+            if(!response.ok)throw Error('Workflow identity issuance failed: HTTP '+response.status);
+            const token=(await response.json()).value;
+            if(!token || token.split('.').length!==3)throw Error('Invalid workflow identity');
+            process.stdout.write('::add-mask::'+token+'\n');
+            fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
+          })().catch(err=>{console.error(err.message);process.exitCode=1});
+          NODE
       - name: Publish only the independently validated immutable patch
         env:
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          PARIS_ID_TOKEN: ${{ env.PARIS_ID_TOKEN }}
           REPAIR_ID: ${{ inputs.repair_id }}
         run: |
           python - <<'PY'
           import os,json,urllib.request
           data=json.dumps({'phase':'publish','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
-          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=data,headers={'Authorization':'Bearer '+os.environ['CRON_SECRET'],'Content-Type':'application/json'})
+          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=data,headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'Content-Type':'application/json'})
           result=json.load(urllib.request.urlopen(req,timeout=120))
           print(json.dumps({'status':result.get('status'),'sha':result.get('sha'),'verifiedLive':False}))
           PY
@@ -151,13 +204,30 @@ jobs:
     needs: [prepare,validate,publish]
     runs-on: ubuntu-24.04
     steps:
+      - name: Obtain short-lived PARIS workflow identity
+        env:
+          AUDIENCE: elevate-paris-code-repair
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          (async()=>{
+            const url=new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
+            url.searchParams.set('audience',process.env.AUDIENCE);
+            const response=await fetch(url,{headers:{Authorization:'Bearer '+process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}});
+            if(!response.ok)throw Error('Workflow identity issuance failed: HTTP '+response.status);
+            const token=(await response.json()).value;
+            if(!token || token.split('.').length!==3)throw Error('Invalid workflow identity');
+            process.stdout.write('::add-mask::'+token+'\n');
+            fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
+          })().catch(err=>{console.error(err.message);process.exitCode=1});
+          NODE
       - env:
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          PARIS_ID_TOKEN: ${{ env.PARIS_ID_TOKEN }}
           REPAIR_ID: ${{ inputs.repair_id }}
         run: |
           python - <<'PY'
           import os,json,urllib.request
           data=json.dumps({'phase':'failure','repairId':os.environ['REPAIR_ID'],'runId':int(os.environ['GITHUB_RUN_ID'])}).encode()
-          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=data,headers={'Authorization':'Bearer '+os.environ['CRON_SECRET'],'Content-Type':'application/json'})
+          req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=data,headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'Content-Type':'application/json'})
           urllib.request.urlopen(req,timeout=30).read()
           PY

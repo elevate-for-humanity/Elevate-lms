@@ -21,9 +21,17 @@ export async function verifyArtifactUpload({run=google,request=fetch}={}) {
   }
   let location;
   try {location=new URL(response.headers.get('location')||'',origin);} catch {throw Error('ARTIFACT_UPLOAD_LOCATION_INVALID');}
+  const suffix=location.pathname.slice(prefix.length);
+  // OCI upload locations are opaque. Google may identify this one session in
+  // upload_id rather than appending a UUID to the path. The host/repository
+  // boundary is still fixed; an unqualified collection URL is never cancelled.
+  const scopedSession=Boolean(suffix)||Boolean(location.searchParams.get('upload_id'));
   if(location.origin!==origin||location.username||location.password||location.hash||
-    !location.pathname.startsWith(prefix)||!location.pathname.slice(prefix.length)||
-    location.pathname.slice(prefix.length).includes('/'))throw Error('ARTIFACT_UPLOAD_LOCATION_INVALID');
+    !location.pathname.startsWith(prefix)||!scopedSession||suffix.includes('/'))
+    throw Object.assign(Error('ARTIFACT_UPLOAD_LOCATION_INVALID'),{safeDetails:{
+      sameOrigin:location.origin===origin,expectedPrefix:location.pathname.startsWith(prefix),
+      emptySuffix:!suffix,nestedSuffix:suffix.includes('/'),hasUploadId:location.searchParams.has('upload_id'),hasQuery:Boolean(location.search),
+    }});
   const cleanup=await request(location.href,{method:'DELETE',headers,redirect:'error',signal:AbortSignal.timeout(30000)});
   if(cleanup.status!==204)throw Error('ARTIFACT_UPLOAD_CLEANUP_UNVERIFIED_HTTP_'+cleanup.status);
   return {repository:'elegant-racer-299721/elevate',uploadAdmissionVerified:true,emptySessionCancelled:true,imagePublished:false,productionChanged:false};

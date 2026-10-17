@@ -26,5 +26,5 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const artifact=await verifyArtifactUpload();
     console.info(JSON.stringify({...billing,...artifact}));
   }
-  catch (error) { console.error(error.message); process.exitCode = 1; }
+  catch (error) { console.error(JSON.stringify({error:error.message,...(error.safeDetails?{details:error.safeDetails}:{})})); process.exitCode = 1; }
 }

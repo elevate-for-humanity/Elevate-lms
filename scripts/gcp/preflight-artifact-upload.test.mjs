@@ -3,6 +3,15 @@ import assert from 'node:assert/strict';
 import {verifyArtifactUpload} from './preflight-artifact-upload.mjs';
 const base='https://us-central1-docker.pkg.dev/v2/elegant-racer-299721/elevate/store/blobs/uploads/';
 const run=()=> 'fixture-token';
+test('Google query-scoped upload locations cancel the returned session without exposing its ID',async()=>{
+ let calls=0;
+ const location=base+'?upload_id=fixture-private-id';
+ const result=await verifyArtifactUpload({run,request:async(url,init)=>{
+  calls++;if(init.method==='POST')return new Response(null,{status:202,headers:{location}});
+  assert.equal(url,location);return new Response(null,{status:204});
+ }});
+ assert.equal(calls,2);assert.equal(result.emptySessionCancelled,true);assert.equal(JSON.stringify(result).includes('fixture-private-id'),false);
+});
 test('proves empty upload admission and cancels only its own session without publishing an image',async()=>{
  const calls=[];
  const result=await verifyArtifactUpload({run,request:async(url,init)=>{

@@ -12,6 +12,7 @@ import { promisify } from 'node:util';
 import { launchBrowser } from './cdp-browser.mjs';
 import { commandArguments } from './command-arguments.mjs';
 import { ProviderSessionStore } from './provider-session-store.mjs';
+import { retireBrowserSession } from './session-retirement.mjs';
 import { requiresHumanVerification, redactBrowserEvidence } from './provider-verification.mjs';
 import { prepareCourseVideoDownload, hasActiveMediaTransfer } from './course-video-download.mjs';
 import { runLearnerTest, credentialMatches, learnerSetupReady } from './learner-runthrough.mjs';
@@ -435,20 +436,27 @@ function authorized(req, session, requestUrl) {
   return supplied.length === expected.length && crypto.timingSafeEqual(supplied, expected);
 }
 
-async function destroySession(id) {
+async function destroySession(id, {force=false} = {}) {
   const session = sessions.get(id);
   if (!session) return;
-  sessions.delete(id);
-  if (session.frameTimer) clearTimeout(session.frameTimer);
-  for (const stream of session.streams) stream.end();
-  await session.checkpointProviderState?.();
-  await providerSessions.save(session.providerScope, session.context).catch(() => {
-    console.warn('Provider session checkpoint failed');
-  });
-  await session.context.close().catch(() => undefined);
-  await fs.promises
-    .rm(session.downloadDir, { recursive: true, force: true })
-    .catch(() => undefined);
+  if(session.retirement) return force
+    ? session.retirement.catch(()=>destroySession(id,{force:true})) : session.retirement;
+  session.retirement = retireBrowserSession(session, {
+    force,
+    saveState:(...args)=>providerSessions.save(...args),
+    onForcedFailure:()=>console.warn('Provider checkpoint failed during forced browser shutdown'),
+    retire:async()=>{
+      sessions.delete(id);
+      if (session.frameTimer) clearTimeout(session.frameTimer);
+      for (const stream of session.streams) stream.end();
+      await session.context.close().catch(() => undefined);
+      await fs.promises.rm(session.downloadDir, {recursive:true,force:true}).catch(()=>undefined);
+    },
+  }).catch(error=>{
+    if(error.message==='SESSION_CHECKPOINT_FAILED')throw new BrowserServiceError('session_checkpoint_failed',503);
+    throw error;
+  }).finally(()=>{delete session.retirement;});
+  return session.retirement;
 }
 
 function safeFileName(value) {
@@ -631,7 +639,7 @@ async function uploadDownloadToSignedStorage(session, body) {
 
 const browserManager = createBrowserLifecycleManager({
   onUnavailable: async () => {
-    await Promise.all([...sessions.keys()].map(destroySession));
+    await Promise.all([...sessions.keys()].map(id=>destroySession(id,{force:true})));
   },
 });
 
@@ -1699,7 +1707,8 @@ const server = http.createServer(async (req, res) => {
 const cleanupTimer = setInterval(() => {
   const cutoff = Date.now() - sessionTtlMs;
   for (const [id, session] of sessions)
-    if (session.lastSeen < cutoff && !hasActiveMediaTransfer(session.downloads)) void destroySession(id);
+    if (session.lastSeen < cutoff && !hasActiveMediaTransfer(session.downloads))
+      void destroySession(id).catch(()=>console.warn('Idle browser session retained because checkpoint failed'));
   for (const [id, test] of learnerTests) if (test.state !== 'running' && test.createdAt < Date.now() - 2 * 60 * 60_000) learnerTests.delete(id);
 }, 30_000).unref();
 
@@ -1716,7 +1725,7 @@ async function shutdown() {
   for (const session of terminalSessions.values()) session.shell.kill('SIGTERM');
   terminalSessions.clear();
   await withTimeout(
-    Promise.all([...sessions.keys()].map(destroySession)).then(() => browserManager.shutdown()),
+    Promise.all([...sessions.keys()].map(id=>destroySession(id,{force:true}))).then(() => browserManager.shutdown()),
     10_000,
   ).catch(() => undefined);
   server.close(() => process.exit(0));

@@ -38,6 +38,22 @@ repository Playwright tests remain available.
 
 ## Running and verifying
 
+Ordinary session close and idle expiry require the final provider checkpoint to
+succeed before deleting the session, ending streams or removing its downloads.
+Persistence failures return retryable `session_checkpoint_failed` (HTTP 503) for
+explicit close and retain idle sessions for a later retry. Concurrent retirement
+requests share the same checkpoint operation. Forced process shutdown and a dead
+browser cannot retain a usable live context; they log a fixed, nonsecret failure
+message before cleanup. This protects existing provider authentication during a
+storage outage. It does not persist generic browser tabs, terminal processes or
+workspace files, and does not authorize reducing minimum instances or changing
+regions. Those restoration gates remain open.
+
+The Studio validation workflow builds and tests the actual nonroot Chromium
+container on relevant `main` changes without deploying Google resources. Its
+source/schema checks use the current Google identity/cutover contracts and no
+longer require the retired hosting provider.
+
 Use Node 22, Chromium, and `zip` (the production Dockerfile installs these).
 `STUDIO_BROWSER_EXECUTABLE_PATH` defaults to `/usr/bin/chromium`. Existing service
 secrets, provider-session encryption configuration, storage directory, and port

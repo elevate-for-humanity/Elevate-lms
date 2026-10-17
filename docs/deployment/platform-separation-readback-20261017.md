@@ -286,3 +286,39 @@ and lockfile integrity passed. The broader integrity gate identified the removed
 route entry point delegating to the durable manager. The unchanged Studio
 architecture gate and all 25 integration-gate checks then passed locally.
 Production remains unchanged; the follow-up commit still requires complete CI.
+
+## Verified Studio provider configuration migration — 20:01Z
+
+Terminal recovery implementation is on main via `0b8e477` and compatibility fix
+`9bd7d42`. Actual Chromium validation run `39064035318` passed 106 container tests,
+262 Admin/browser tests across 50 files and 17 identity/cutover tests. CI Required
+Gate and Integrity Gate passed for the corrected runtime commit. These source
+changes have not been deployed to Google.
+
+Read-only production inspection found all three Cloudflare keys in the encrypted
+canonical `platform_secrets` runtime scope, but absent from Google's Admin runtime
+configuration and direct deployment bindings. Prepared migration `98fafcd` reads
+only these existing keys, verifies the provider account/model without inference,
+preserves unrelated configuration and rejects conflicting values or concurrent
+configuration changes. Seven migration safety tests passed.
+
+Validation run `39064688890` succeeded without writes. Apply run `39064879473`
+created and exactly read back `elevate-admin-runtime-config` version **6** in
+project `484736877039`; prior versions were preserved. No IAM, container, traffic,
+instance settings, pricing or source secret-store changes occurred. CI Required
+Gate, Integrity Gate, credential scan, lint and all three app typechecks passed
+for the migration commit.
+
+Independent read-only audit run `39064479434`, rerun job `117490488524`, passed at
+**20:01:50Z** with browser health **200**, Cloudflare authorization **200** and no
+reported failures. The Cloudflare values are staged in Google configuration;
+they are **not directly bound to the currently deployed Admin revision**. Do not
+report a new Admin deployment or live runtime independence from this migration.
+Anonymous `/api/tax/returns` and `/api/tax/interview` both returned JSON **401**.
+This verifies those anonymous access boundaries only, not tax filing readiness.
+
+The trial VM remains running with its retained disk attached. Its private files
+and active execution state have not been inventoried or migrated. Generic
+browser/workspace restoration, merchant acceptance, Legacy and tax boundaries,
+and complete B2 course-delivery acceptance remain open. Existing Studio serving
+traffic and min/max instance configuration were not changed.

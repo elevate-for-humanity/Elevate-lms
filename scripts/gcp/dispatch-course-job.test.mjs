@@ -104,3 +104,17 @@ test('missing existing job parallelism cannot launch an unbounded batch', async(
  await assert.rejects(dispatchQueuedCourseJob(s.options),/PARALLELISM_UNAVAILABLE/);
  assert.equal(s.calls.some(args=>args.includes('execute')),false);
 });
+
+// An execution with completed tasks should consume only the slots still able to run.
+test('completed tasks release dispatcher slots without exceeding configured parallelism',async()=>{
+ const s=setup([{spec:{taskCount:2,parallelism:2},status:{succeededCount:1}}],[{id:'queued'}]);
+ s.options.env.COURSE_WORKER_PARALLELISM='2';
+ assert.equal((await dispatchQueuedCourseJob(s.options)).status,'assigned');
+ assert.ok(s.calls.some(args=>args.includes('--tasks=1')));
+});
+
+test('unavailable execution allocation fails closed before launching a worker',async()=>{
+ const s=setup([{spec:{taskCount:2,parallelism:2},status:{succeededCount:3}}],[{id:'queued'}]);
+ await assert.rejects(dispatchQueuedCourseJob(s.options),/allocation is unavailable/);
+ assert.equal(s.calls.some(args=>args.includes('execute')),false);
+});

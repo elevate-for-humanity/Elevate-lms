@@ -65,7 +65,7 @@ jobs:
           // Use Google's actual pinned job image. A previously deployed SHA is not
           // an authoritative template identifier after a Google Cloud migration.
           const templateImage=template.spec?.template?.spec?.template?.spec?.containers?.[0]?.image;
-          if(!/^us-central1-docker\\.pkg\\.dev\\/elegant-racer-299721\\/elevate\\/ultimate-worker@sha256:[a-f0-9]{64}$/.test(templateImage ?? ''))
+          if(!/^us-central1-docker\.pkg\.dev\/elegant-racer-299721\/elevate\/ultimate-worker@sha256:[a-f0-9]{64}$/.test(templateImage ?? ''))
             throw new Error('GOOGLE_WORKER_TEMPLATE_NOT_PINNED');
           const execution=describe();
           const executionImage=execution.spec?.template?.spec?.containers?.[0]?.image;

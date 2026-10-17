@@ -7,6 +7,10 @@ vi.mock('@/lib/supabase/server', () => ({ createClient: mocks.browserClient }));
 vi.mock('@/apps/admin/app/modules/modules-table', () => ({ ModulesTable: () => null }));
 import ModulesPage from '@/apps/admin/app/modules/page';
 import StorePage from '@/apps/admin/app/store/page';
+import TenantsPage from '@/apps/admin/app/tenants/page';
+import WaitlistPage from '@/apps/admin/app/waitlist/page';
+import ProvidersPage from '@/apps/admin/app/providers/page';
+import ProviderApplicationsPage from '@/apps/admin/app/provider-applications/page';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -14,14 +18,17 @@ beforeEach(() => {
   mocks.browserClient.mockImplementation(() => { throw new Error('Private tables cannot use the browser-session client'); });
   mocks.tables.mockImplementation(() => {
     const query: Record<string, unknown> = {};
-    for (const method of ['select', 'order', 'limit', 'eq']) query[method] = () => query;
+    for (const method of ['select', 'order', 'limit', 'eq', 'in']) query[method] = () => query;
     query.then = (resolve: (value: unknown) => unknown) => resolve({ data: [], count: 0, error: null });
     return query;
   });
   mocks.admin.mockResolvedValue({ from: mocks.tables });
 });
 
-describe.each([['Modules', ModulesPage], ['Store', StorePage]] as const)('%s private data boundary', (_name, page) => {
+describe.each([
+  ['Modules', ModulesPage], ['Store', StorePage], ['Tenants', TenantsPage], ['Waitlist', WaitlistPage],
+  ['Providers', ProvidersPage], ['Provider applications', () => ProviderApplicationsPage({ searchParams: Promise.resolve({}) })],
+] as const)('%s private data boundary', (_name, page) => {
   it('denies unauthorized access before obtaining the privileged database client', async () => {
     mocks.role.mockRejectedValue(new Error('Unauthorized'));
     await expect(page()).rejects.toThrow('Unauthorized');

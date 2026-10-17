@@ -1,26 +1,34 @@
 import { writeFileSync } from 'node:fs';
 import { google, PROJECT } from './runtime-config.mjs';
 
-const report = { project: PROJECT, observedAt: new Date().toISOString(), resources: {}, failures: [] };
+const report = { project: PROJECT, observedAt: new Date().toISOString(), scope: {cloudRun:'all regions',scheduler:'us-central1'}, resources: {}, failures: [] };
 function read(name, args, select) {
   try { report.resources[name] = select(JSON.parse(google([...args, '--project', PROJECT, '--format=json']))); }
   catch (error) { report.failures.push({ resource: name, reason: error.code ?? 'inventory_unavailable' }); }
 }
 // Enumerate the project rather than maintaining a hand-picked service list.
 // Do not include container environment variables or secret values in evidence.
-read('cloudRunServices', ['run', 'services', 'list', '--region=us-central1'], rows => rows.map(s => ({
-  name: s.metadata?.name, uri: s.status?.url,
+read('projectAssets', ['asset','search-all-resources','--scope=projects/'+PROJECT,'--read-mask=name,assetType,location,state'], rows => rows.map(r=>({name:r.name,type:r.assetType,location:r.location,state:r.state})));
+read('cloudRunServices', ['run', 'services', 'list'], rows => rows.map(s => ({
+  name: s.metadata?.name, region: s.metadata?.labels?.['cloud.googleapis.com/location'], uri: s.status?.url,
   latestReadyRevision: s.status?.latestReadyRevisionName,
   latestCreatedRevision: s.status?.latestCreatedRevisionName,
   conditions: (s.status?.conditions ?? []).map(c => ({ type: c.type, status: c.status, reason: c.reason })),
   traffic: (s.status?.traffic ?? []).map(t => ({ revision: t.revisionName, percent: t.percent, tag: t.tag })),
   limits: (s.spec?.template?.spec?.containers ?? []).map(c => c.resources?.limits),
 })));
-read('cloudRunJobs', ['run', 'jobs', 'list', '--region=us-central1'], rows => rows.map(j => ({
-  name: j.metadata?.name,
+read('cloudRunJobs', ['run', 'jobs', 'list'], rows => rows.map(j => ({
+  name: j.metadata?.name, region: j.metadata?.labels?.['cloud.googleapis.com/location'],
   conditions: (j.status?.conditions ?? []).map(c => ({ type: c.type, status: c.status, reason: c.reason })),
   latestCreatedExecution: j.status?.latestCreatedExecution,
   limits: (j.spec?.template?.spec?.template?.spec?.containers ?? []).map(c => c.resources?.limits),
+})));
+read('cloudRunExecutions', ['run', 'jobs', 'executions', 'list'], rows => rows.map(e => ({
+  name:e.metadata?.name,region:e.metadata?.labels?.['cloud.googleapis.com/location'],
+  job:e.metadata?.labels?.['run.googleapis.com/job'],
+  startedAt:e.status?.startTime,completedAt:e.status?.completionTime,
+  running:e.status?.runningCount,succeeded:e.status?.succeededCount,failed:e.status?.failedCount,
+  conditions:(e.status?.conditions??[]).map(c=>({type:c.type,status:c.status,reason:c.reason})),
 })));
 read('instances', ['compute', 'instances', 'list'], rows => rows.map(v => ({
   name: v.name, zone: v.zone, status: v.status, machineType: v.machineType,

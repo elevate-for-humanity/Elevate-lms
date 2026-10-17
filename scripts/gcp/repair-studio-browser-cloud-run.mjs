@@ -41,7 +41,9 @@ const sha=process.env.IMAGE_SHA;if(!/^[a-f0-9]{40}$/.test(sha||''))throw Error('
 const image='us-central1-docker.pkg.dev/'+project+'/elevate/studio-browser';
 const digest=command(['artifacts','docker','images','describe',image+':'+sha,'--project='+project,'--format=value(image_summary.digest)']);
 if(!/^sha256:[a-f0-9]{64}$/.test(digest))throw Error('Image digest unavailable');
-const existingBrowser=JSON.parse(gc(['run','services','describe',name,'--region='+region])).spec?.template?.spec;
+const existingService=JSON.parse(gc(['run','services','describe',name,'--region='+region]));
+const existingBrowser=existingService.spec?.template?.spec;
+const previousTraffic=(existingService.status?.traffic||[]).filter(t=>t.percent>0&&t.revisionName).map(t=>t.revisionName+'='+t.percent).join(',');
 const authMount=existingBrowser?.containers?.[0]?.volumeMounts?.find(m=>m.mountPath==='/var/lib/studio-browser-auth');
 const activeVolume=existingBrowser?.volumes?.find(v=>v.name===authMount?.name);
 if(authMount&&activeVolume?.csi?.volumeAttributes?.bucketName!==bucket)throw Error('Existing browser auth mount points to an unverified bucket');
@@ -49,16 +51,20 @@ const mounted=new Set((existingBrowser?.containers||[]).flatMap(c=>(c.volumeMoun
 const staleVolumes=(existingBrowser?.volumes||[]).filter(v=>!mounted.has(v.name)&&v.csi?.driver==='gcsfuse.run.googleapis.com'&&v.csi?.volumeAttributes?.bucketName===bucket).map(v=>v.name);
 const mountArguments=authMount?[]:['--add-volume=name=elevate-studio-browser-auth,mount-path=/var/lib/studio-browser-auth,type=cloud-storage,bucket='+bucket+',mount-options=uid=1001;gid=1001;file-mode=600;dir-mode=700'];
 if(staleVolumes.length)mountArguments.push('--remove-volume='+staleVolumes.join(','));
-let url,state;
+const candidateTag='studio-verify';
+let url,state,candidateRevision,trafficActivated=false;
 try {
-command(['run','deploy',name,'--project='+project,'--region='+region,'--image='+image+'@'+digest,'--service-account='+identity,'--port=3100','--cpu=2','--memory=4Gi','--min-instances=1','--max-instances=1','--concurrency=20','--no-cpu-throttling','--timeout=3600','--execution-environment=gen2','--allow-unauthenticated','--update-env-vars=STUDIO_BROWSER_AUTH_STATE_DIR=/var/lib/studio-browser-auth,STUDIO_BROWSER_ADMIN_ORIGIN=https://admin.elevateforhumanity.org','--update-secrets=STUDIO_BROWSER_SECRET='+secretName+':latest',...mountArguments,'--startup-probe=httpGet.path=/health,httpGet.port=3100,initialDelaySeconds=5,periodSeconds=10,timeoutSeconds=5,failureThreshold=24','--liveness-probe=httpGet.path=/health,httpGet.port=3100,periodSeconds=30,timeoutSeconds=5,failureThreshold=3','--quiet']);
+command(['run','deploy',name,'--project='+project,'--region='+region,'--image='+image+'@'+digest,'--service-account='+identity,'--port=3100','--cpu=2','--memory=4Gi','--min-instances=1','--max-instances=1','--concurrency=20','--no-cpu-throttling','--timeout=3600','--execution-environment=gen2','--allow-unauthenticated','--no-traffic','--tag='+candidateTag,'--update-env-vars=STUDIO_BROWSER_AUTH_STATE_DIR=/var/lib/studio-browser-auth,STUDIO_BROWSER_ADMIN_ORIGIN=https://admin.elevateforhumanity.org','--update-secrets=STUDIO_BROWSER_SECRET='+secretName+':latest',...mountArguments,'--startup-probe=httpGet.path=/health,httpGet.port=3100,initialDelaySeconds=5,periodSeconds=10,timeoutSeconds=5,failureThreshold=24','--liveness-probe=httpGet.path=/health,httpGet.port=3100,periodSeconds=30,timeoutSeconds=5,failureThreshold=3','--quiet']);
 const service=JSON.parse(gc(['run','services','describe',name,'--region='+region]));
 url=service.status.url;
+candidateRevision=service.status.latestCreatedRevisionName;
+const candidate=service.status.traffic?.find(t=>t.tag===candidateTag&&t.revisionName===candidateRevision);
+if(!candidate?.url||!candidateRevision)throw Error('Exact browser candidate URL unavailable; traffic was not changed');
 // The new Cloud Run revision can briefly serve an HTML Google Frontend error
 // during startup. Never parse an unverified response as JSON or switch Admin
 // until the exact deployed revision proves its readiness and persistence.
-async function readHealth(){
-  const response=await fetch(url+'/health',{redirect:'manual',signal:AbortSignal.timeout(20000)});
+async function readHealth(base){
+  const response=await fetch(base+'/health',{redirect:'manual',signal:AbortSignal.timeout(20000)});
   const type=response.headers.get('content-type')||'';
   if(!response.ok || type.split(';')[0].trim().toLowerCase()!=='application/json'){
     throw new Error('Studio health endpoint returned HTTP '+response.status+
@@ -71,25 +77,34 @@ async function readHealth(){
   if(!body||typeof body!=='object')throw new Error('Studio health endpoint returned invalid readiness data');
   return body;
 }
-let healthError;
-for(let attempt=0;attempt<12;attempt++){
-  try{
-    state=await readHealth();
-    if(state.commit!==sha||!state.ready||!state.providerAuthStorage?.persistent)
-      throw new Error('Browser revision or durable encrypted auth storage not ready');
-    healthError=undefined;
-    break;
-  }catch(error){
-    healthError=error;
-    if(attempt<11)await new Promise(resolve=>setTimeout(resolve,5000));
+async function verifyHealth(base,message){
+  let healthError;
+  for(let attempt=0;attempt<12;attempt++){
+    try{
+      const health=await readHealth(base);
+      if(health.commit!==sha||!health.ready||!health.providerAuthStorage?.persistent)
+        throw new Error(message);
+      return health;
+    }catch(error){
+      healthError=error;
+      if(attempt<11)await new Promise(resolve=>setTimeout(resolve,5000));
+    }
   }
+  throw healthError;
 }
-if(healthError)throw healthError;
-const unauthorized=await fetch(url+'/workspace/files',{signal:AbortSignal.timeout(20000)});
+state=await verifyHealth(candidate.url,'Browser revision or durable encrypted auth storage not ready');
+const unauthorized=await fetch(candidate.url+'/workspace/files',{signal:AbortSignal.timeout(20000)});
 if(unauthorized.status!==401)throw Error('Browser service authorization boundary failed; Admin was not switched');
-const authorized=await fetch(url+'/workspace/files',{headers:{'x-studio-browser-secret':secret},signal:AbortSignal.timeout(20000)});
+const authorized=await fetch(candidate.url+'/workspace/files',{headers:{'x-studio-browser-secret':secret},signal:AbortSignal.timeout(20000)});
 if(!authorized.ok)throw Error('Authenticated workspace proof failed; Admin was not switched');
+command(['run','services','update-traffic',name,'--project='+project,'--region='+region,'--to-revisions='+candidateRevision+'=100','--quiet']);
+trafficActivated=true;
+state=await verifyHealth(url,'Public browser did not serve the verified candidate');
 } catch(error) {
+  if(trafficActivated&&previousTraffic){
+    try{command(['run','services','update-traffic',name,'--project='+project,'--region='+region,'--to-revisions='+previousTraffic,'--quiet']);}
+    catch{console.error('Browser traffic rollback failed; inspect preserved revision diagnostics');}
+  }
   await collectStartupDiagnostics(secret);
   throw new Error(String(error.message).split(secret).join('[REDACTED]'));
 }

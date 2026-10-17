@@ -31,22 +31,39 @@ export async function ensureDevStudioSecrets(): Promise<void> {
  * cache and refreshSecrets() invalidates it after Studio rotations. A duplicate
  * cache made a newly-rotated GitHub token remain stale for up to five minutes.
  */
-export async function getGitHubToken(): Promise<string | null> {
-  // Capture the deployment value before hydration. hydrateProcessEnv may load
-  // a canonical fallback into process.env, but must not replace a valid token
-  // supplied directly by the production service.
-  const deployedToken = normalizeToken(process.env.GITHUB_TOKEN);
-  if (deployedToken) return deployedToken;
-
-  const fromCanonicalStore = normalizeToken(
-    await getDecryptedPlatformSecret('GITHUB_TOKEN'),
+/** Verify a credential against this exact repository before selecting it. */
+async function acceptedByGitHub(token: string): Promise<boolean> {
+  const response = await fetch(
+    'https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+      cache: 'no-store',
+      signal: AbortSignal.timeout(8000),
+    },
   );
-  if (fromCanonicalStore) {
-    process.env.GITHUB_TOKEN = fromCanonicalStore;
-    return fromCanonicalStore;
-  }
+  if (response.ok) return true;
+  if ([401, 403, 404].includes(response.status)) return false;
+  throw new Error(`GITHUB_CREDENTIAL_CHECK_UNAVAILABLE_HTTP_${response.status}`);
+}
 
-  return null;
+export async function getGitHubToken(): Promise<string | null> {
+  // A nonempty environment token is not necessarily accepted by GitHub.
+  // Do not overwrite a valid canonical secret with an expired deployment token.
+  const deployed = normalizeToken(process.env.GITHUB_TOKEN);
+  const canonical = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
+  const candidates = [...new Set([deployed, canonical].filter(
+    (value): value is string => Boolean(value),
+  ))];
+  if (!candidates.length) return null;
+
+  for (const token of candidates) {
+    if (await acceptedByGitHub(token)) return token;
+  }
+  throw new Error('GITHUB_TOKEN_REJECTED: Both configured credential sources were rejected for Elevate-lms; reconnect an authorized credential in Dev Studio Secrets.');
 }
 
 export async function getGitHubHeaders(): Promise<HeadersInit> {

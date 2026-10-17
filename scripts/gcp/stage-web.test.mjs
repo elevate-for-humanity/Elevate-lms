@@ -90,3 +90,21 @@ test('unmigrated Store retains the approved bootstrap dependency', () => {
   assert.deepEqual(calls, ['store', 'marketing']);
   assert.equal(config.runtimeEnvironment.SUPABASE_SERVICE_ROLE_KEY, 'test-private');
 });
+
+test('Store bootstrap retains the PayPal settings actually consumed by billing', () => {
+ const store={component:'store',runtimeEnvironment:{},volumes:[],runtimeFiles:{}};
+ const marketing={...base(),component:'marketing'};
+ Object.assign(marketing.runtimeEnvironment,{PAYPAL_CLIENT_ID:'approved-client',PAYPAL_CLIENT_SECRET:'approved-secret',PAYPAL_ENVIRONMENT:'production',PAYPAL_BILLING_WEBHOOK_ID:'approved-billing-webhook',PAYPAL_PAYOUT_WEBHOOK_ID:'payout-webhook'});
+ const result=completeStoreConfig(store,marketing);
+ assert.equal(result.runtimeEnvironment.PAYPAL_ENVIRONMENT,'production');
+ assert.equal(result.runtimeEnvironment.PAYPAL_BILLING_WEBHOOK_ID,'approved-billing-webhook');
+ assert.equal(result.runtimeEnvironment.PAYPAL_PAYOUT_WEBHOOK_ID,'payout-webhook');
+});
+test('Store-owned PayPal identity cannot inherit Marketing environment or webhook', () => {
+ const store={component:'store',runtimeEnvironment:{PAYPAL_CLIENT_ID:'store-client',PAYPAL_CLIENT_SECRET:'store-secret'},volumes:[],runtimeFiles:{}};
+ const marketing={...base(),component:'marketing'};
+ Object.assign(marketing.runtimeEnvironment,{PAYPAL_ENVIRONMENT:'production',PAYPAL_BILLING_WEBHOOK_ID:'marketing-webhook'});
+ const result=completeStoreConfig(store,marketing);
+ assert.equal(result.runtimeEnvironment.PAYPAL_ENVIRONMENT,undefined);
+ assert.equal(result.runtimeEnvironment.PAYPAL_BILLING_WEBHOOK_ID,undefined);
+});

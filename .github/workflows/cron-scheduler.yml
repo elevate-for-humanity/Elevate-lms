@@ -91,6 +91,7 @@ jobs:
         github.event.inputs.job == 'morning-reminders'
         || github.event.inputs.job == 'missed-checkins'
         || github.event.inputs.job == 'expire-credentials'
+        || github.event.inputs.job == 'qa-scan'
       )
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -102,7 +103,7 @@ jobs:
         run: |
           set -euo pipefail
           case "$SELECTED_JOB" in
-            morning-reminders|missed-checkins|expire-credentials) ;;
+            morning-reminders|missed-checkins|expire-credentials|qa-scan) ;;
             *) echo "::error::Unsupported stabilization cron"; exit 1 ;;
           esac
           test -n "$CRON_SECRET" || { echo "::error::CRON_SECRET is missing"; exit 1; }
@@ -114,7 +115,9 @@ jobs:
             "$ADMIN_URL/api/cron/$SELECTED_JOB")"
           echo "Selected cron: $SELECTED_JOB; HTTP $status"
           # Response bodies may contain user data; keep them out of Actions logs.
-          test "$status" = 200
+          expected_status=200
+          if [ "$SELECTED_JOB" = qa-scan ]; then expected_status=202; fi
+          test "$status" = "$expected_status"
 
   portal-completion-reminders:
     name: Portal completion reminders (twice daily)
@@ -475,7 +478,6 @@ jobs:
          || github.event.inputs.job == 'weekly-verdicts'
          || github.event.inputs.job == 'low-hours-pace'
          || github.event.inputs.job == 'ops-scan'
-         || github.event.inputs.job == 'qa-scan'
          || github.event.inputs.job == 'career-course-emails'
          || github.event.inputs.job == 'barber-reinstate'
          || github.event.inputs.job == 'payout-deadline-alert'

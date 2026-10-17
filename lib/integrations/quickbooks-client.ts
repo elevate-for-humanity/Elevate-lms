@@ -13,6 +13,13 @@ export class QuickBooksError extends Error {
   }
 }
 
+/** This client sends requests exclusively to Intuit's production API. */
+export function assertQuickBooksProductionEnvironment(): void {
+  if (process.env.QB_ENVIRONMENT !== 'production') {
+    throw new QuickBooksError('production_environment_unverified', 'QuickBooks production credentials and company authorization must be verified before connecting.');
+  }
+}
+
 /** Only fixed, non-sensitive codes may cross the public health boundary. */
 export function quickBooksFailureReason(error: unknown): string {
   if (error instanceof QuickBooksError) return error.reason;
@@ -75,6 +82,7 @@ async function rawRequest(config: QuickBooksConfig, token: string, path: string,
 }
 
 export async function quickBooksRequest<T = any>(db: Database, config: QuickBooksConfig, path: string, init?: RequestInit): Promise<T> {
+  assertQuickBooksProductionEnvironment();
   if (!config.accessToken || !config.realmId) throw new QuickBooksError('oauth_configuration_missing', 'QuickBooks is not connected.');
   let response = await rawRequest(config, config.accessToken, path, init);
   if (response.status === 401) response = await rawRequest(config, await refreshQuickBooksToken(db, config), path, init);

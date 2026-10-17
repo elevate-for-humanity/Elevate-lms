@@ -1,14 +1,21 @@
 // @vitest-environment node
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { loadQuickBooksConfig, quickBooksRequest } from '@/lib/integrations/quickbooks-client';
 
 vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: vi.fn().mockResolvedValue(undefined) }));
+beforeEach(() => { vi.stubEnv('QB_ENVIRONMENT','production'); });
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 const config = { clientId: 'app', clientSecret: 'secret', accessToken: 'old-access', refreshToken: 'old-refresh', realmId: 'company' };
 const settingsDb = (result: unknown) => ({ from: vi.fn(() => ({ select: () => ({ in: async () => result }) })) });
 
 describe('QuickBooks runtime authorization', () => {
+  it.each(['sandbox','invalid',''])('rejects unverified production environment %s before any provider request or token rotation',async environment=>{
+    vi.stubEnv('QB_ENVIRONMENT',environment);const fetchMock=vi.fn();vi.stubGlobal('fetch',fetchMock);
+    await expect(quickBooksRequest({},config,'companyinfo/company')).rejects.toMatchObject({reason:'production_environment_unverified'});
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('uses canonical static credentials and the latest stored rotating tokens', async () => {
     for (const key of ['QB_CLIENT_ID', 'QB_CLIENT_SECRET', 'QB_ACCESS_TOKEN', 'QB_REFRESH_TOKEN', 'QB_REALM_ID']) vi.stubEnv(key, 'deployment-'+key);
     const db = settingsDb({ data: ['QB_CLIENT_ID', 'QB_CLIENT_SECRET', 'QB_ACCESS_TOKEN', 'QB_REFRESH_TOKEN', 'QB_REALM_ID'].map(key => ({ key, value: 'stored-'+key })), error: null });

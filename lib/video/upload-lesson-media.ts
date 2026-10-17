@@ -93,9 +93,7 @@ export function shouldUploadCourseMediaToElevateMedia(
   const backend = resolveCourseVideoStorageBackend();
   if (backend === 'supabase') return false;
   if (!isElevateMediaStorageConfigured() || !isElevateMediaPublicDeliveryConfigured()) {
-    if (backend === 'elevate-media') {
-      logger.warn('[upload-lesson-media] COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED: using Supabase fallback');
-    }
+    if (backend === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
     return false;
   }
 
@@ -235,6 +233,7 @@ export async function uploadCourseVideosObject(
       // The ordinary request ceiling does not apply to the TUS route below.
       // Keep the completed bytes and let Storage enforce its actual object
       // limit instead of rejecting a valid film before a chunked upload.
+      if (resolveCourseVideoStorageBackend() === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED', { cause: err });
       logger.warn('[upload-lesson-media] Elevate Media Storage upload failed, falling back to Supabase', { err });
     }
   }
@@ -285,6 +284,7 @@ export async function uploadLessonFileFromDisk(
   if (!options?.forceSupabase && shouldUploadCourseMediaToElevateMedia({length: size}, contentType)) {
     const result = await uploadFileToElevateMedia(filePath, elevateMediaKeyForStoragePath(storagePath), contentType);
     if (result.success && result.url) url = result.url;
+    else if (resolveCourseVideoStorageBackend() === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED');
     else logger.warn('[upload-lesson-media] object upload failed; retrying through Supabase');
   }
   if (!url && ext === 'mp4' && size > SUPABASE_TUS_CHUNK_BYTES) {

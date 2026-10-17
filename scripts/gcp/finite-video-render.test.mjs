@@ -103,3 +103,11 @@ test('validation receives its configured startup probe without starting Admin or
     assert.equal(events.some(e => e.event_type === 'finite_video_session_started'), false);
   } finally { if (child && child.exitCode === null) child.kill('SIGTERM'); rmSync(directory, { recursive: true, force: true }); await new Promise(resolve => api.close(resolve)); }
 });
+
+test('finite rendering does not start three concurrent videos inside its single Cloud Run task', async () => {
+  const { readFileSync } = await import('node:fs');
+  const source = readFileSync(new URL('./finite-video-render.mjs', import.meta.url), 'utf8');
+  assert.match(source, /DISABLE_ADMIN_VIDEO_WORKER: 'true', VIDEO_RENDER_GLOBAL_CONCURRENCY: '1'/);
+  assert.doesNotMatch(source, /VIDEO_RENDER_GLOBAL_CONCURRENCY: '3'/);
+  assert.match(source, /maxJobs: 1/);
+});

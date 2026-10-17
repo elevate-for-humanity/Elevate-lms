@@ -174,7 +174,10 @@ jobs:
               throw Error('Asset search failed without the exact resource-search permission diagnosis; no IAM change made');
             }
             const grant=run(['projects','add-iam-policy-binding',project,'--member=serviceAccount:elevate-github-deploy@'+project+'.iam.gserviceaccount.com','--role=roles/cloudasset.viewer','--condition=None','--format=value(etag)']);
-            if(grant.status!==0)throw Error('Read-only Cloud Asset Viewer binding could not be applied');
+            if(grant.status!==0){
+              console.log(JSON.stringify({iamBindingApplied:false,permissionDenied:/PERMISSION_DENIED|permission.*denied|does not have permission/i.test(grant.stderr||''),commandError:String(grant.stderr||'').split('\n').find(line=>line.startsWith('ERROR:'))?.slice(0,500)}));
+              throw Error('Read-only Cloud Asset Viewer binding could not be applied');
+            }
             for(let i=0;i<6;i++){
               result=search();if(result.status===0)break;
               await new Promise(resolve=>setTimeout(resolve,5000));

@@ -115,6 +115,9 @@ jobs:
             "$ADMIN_URL/api/cron/$SELECTED_JOB")"
           echo "Selected cron: $SELECTED_JOB; HTTP $status"
           # Response bodies may contain user data; keep them out of Actions logs.
+          if [ "$SELECTED_JOB" = qa-scan ] && [ "$status" != 202 ]; then
+            node -e 'const fs = require("node:fs"); try { const b = JSON.parse(fs.readFileSync(process.argv[1], "utf8")); console.log(JSON.stringify({diagnostic:"qa_dispatch_rejected", providerStatus:Number.isInteger(b.providerStatus) ? b.providerStatus : null})); } catch { console.log(JSON.stringify({diagnostic:"qa_response_not_json"})); }' "$response_file"
+          fi
           expected_status=200
           if [ "$SELECTED_JOB" = qa-scan ]; then expected_status=202; fi
           test "$status" = "$expected_status"

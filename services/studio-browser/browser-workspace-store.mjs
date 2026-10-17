@@ -34,7 +34,7 @@ export class BrowserWorkspaceStore extends ProviderSessionStore {
    const decipher=crypto.createDecipheriv('aes-256-gcm',this.key,Buffer.from(envelope.iv,'base64'));
    decipher.setAAD(Buffer.from(owner));decipher.setAuthTag(Buffer.from(envelope.tag,'base64'));
    return validate(JSON.parse(Buffer.concat([decipher.update(Buffer.from(envelope.data,'base64')),decipher.final()]).toString('utf8')),owner);
-  }catch(error){if(error.code==='ENOENT')return null;throw Error('BROWSER_CHECKPOINT_RESTORE_FAILED');}
+  }catch(error){if(error.code==='ENOENT')return null;throw Error('BROWSER_CHECKPOINT_RESTORE_FAILED',{cause:error});}
  }
  async save(session){
   const owner=session.ownerId;if(!validOwner(owner))return;

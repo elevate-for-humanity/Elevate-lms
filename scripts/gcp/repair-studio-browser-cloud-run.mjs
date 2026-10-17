@@ -112,6 +112,11 @@ const unauthorized=await fetch(candidate.url+'/workspace/files',{signal:AbortSig
 if(unauthorized.status!==401)throw Error('Browser service authorization boundary failed; Admin was not switched');
 const authorized=await fetch(candidate.url+'/workspace/files',{headers:{'x-studio-browser-secret':secret},signal:AbortSignal.timeout(20000)});
 if(!authorized.ok)throw Error('Authenticated workspace proof failed; Admin was not switched');
+const foundationResponse=await fetch(candidate.url+'/foundation-test',{method:'POST',headers:{'x-studio-browser-secret':secret},redirect:'error',signal:AbortSignal.timeout(120000)});
+if(!foundationResponse.ok)throw Error('Live candidate browser foundation failed; serving traffic retained');
+const foundation=await foundationResponse.json();
+if(foundation.passed!==true||foundation.commit!==sha||!Array.isArray(foundation.checks)||!foundation.checks.length||foundation.checks.some(check=>check.passed!==true))throw Error('Live candidate browser foundation evidence invalid; serving traffic retained');
+console.log(JSON.stringify({candidateRevision,commit:sha,browserFoundationPassed:true,checks:foundation.checks.map(check=>({name:check.name,passed:check.passed}))}));
 if(process.env.STUDIO_CANDIDATE_ONLY==='true'){
   console.log(JSON.stringify({service:name,candidateRevision,candidateUrl:candidate.url,commit:sha,ready:state.ready,persistent:state.providerAuthStorage.persistent,candidateOnly:true,trafficChanged:false,adminSwitched:false}));
   // Keep the known-good serving revision and all its sessions untouched.

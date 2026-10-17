@@ -26,6 +26,7 @@ async function execute(overrides={}){
   setTimeout(callback){return setTimeout(callback,0);},
   async fetch(url,options){
    f.requests.push(url);f.events.push({request:url});
+   if(url.endsWith('/foundation-test'))return {ok:true,async json(){return f.foundation||{passed:true,commit:sha,checks:[{name:'fixture',passed:true}]};}};
    if(url.endsWith('/health'))return {ok:true,status:200,headers:{get(name){return name.toLowerCase()==='content-type'?'application/json; charset=utf-8':null;}},async json(){return url.startsWith('https://browser.example.run.app')&&f.publicState?f.publicState:f.state;}};
    const status=options?.headers?f.authorized:f.anonymous;
    return {status,ok:status>=200&&status<300};
@@ -80,7 +81,7 @@ test('pinned old traffic is preserved until the exact candidate passes all proof
  const activation=f.events.findIndex(e=>e.command?.includes('--to-revisions=browser-candidate=100'));
  assert.ok(activation>0);
  const before=f.events.slice(0,activation).filter(e=>e.request).map(e=>e.request);
- assert.deepEqual(before,['https://candidate.example.test/health','https://candidate.example.test/workspace/files','https://candidate.example.test/workspace/files']);
+ assert.deepEqual(before,['https://candidate.example.test/health','https://candidate.example.test/workspace/files','https://candidate.example.test/workspace/files','https://candidate.example.test/foundation-test']);
  assert.equal(f.events[activation+1].request,'https://browser.example.run.app/health');
 });
 
@@ -124,4 +125,10 @@ test('candidate acceptance leaves serving traffic and Admin untouched',async()=>
  assert.equal(f.commands.some(a=>a[2]==='update-traffic'),false);
  assert.ok(f.requests.includes('https://candidate.example.test/health'));
  assert.equal(f.requests.filter(u=>u==='https://candidate.example.test/workspace/files').length,2);
+});
+
+test('live browser foundation failure preserves old traffic even when HTTP health passes',async()=>{
+ const f=await execute({foundation:{passed:false,commit:sha,checks:[{name:'restore',passed:false}]}});
+ assert.match(f.error.message,/foundation evidence invalid/);
+ assert.equal(f.commands.some(a=>a[2]==='update-traffic'),false);assert.equal(switched(f),false);
 });

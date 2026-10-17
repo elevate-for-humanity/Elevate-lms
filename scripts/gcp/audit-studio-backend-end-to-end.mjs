@@ -27,6 +27,7 @@ export function inspectGoogleBindings(config, resource, browser) {
   const browserEnv=browser?.spec?.template?.spec?.containers?.[0]?.env ?? [];
   const browserImage=browser?.spec?.template?.spec?.containers?.[0]?.image ?? null;
   if(!image) failures.push('admin_container_image_missing');
+  if(browser&&!browserImage) failures.push('studio_browser_container_image_unverified');
   // Browser is permitted on the existing Google Compute Engine VM, not solely Cloud Run.
   // Validate its live authenticated health separately; absence of a Run image alone is not a failure.
   if(image.includes('northflank')||String(browserImage).includes('northflank'))failures.push('legacy_container_image_reference');

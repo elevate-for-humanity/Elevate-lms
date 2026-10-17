@@ -2,7 +2,7 @@ import { STORYBOARD_RENDER_PRODUCER } from '../../video/render-checkpoint-contra
 import type { UltimateRenderPort } from '../core/ports';
 import { storedLicensedMediaMetadata } from '@/lib/media/licensed-course-media';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { materializeInstructionalVisualAssets } from './instructional-visual-assets';
+import { bindTeachingPhotoAssignments } from './teaching-photo-assignments.mjs';
 import { MIN_LESSON_VIDEO_SCENES, type MediaDirectorInput } from '@/lib/video/media-director';
 
 type RecordLike = Record<string, any>;
@@ -100,31 +100,17 @@ function visualCandidates(input: any): VisualCandidate[] {
     const row = record(asset);
     const url = publicCourseMediaUrl(row.public_url);
     const kind = url ? mediaKind(url, row.mime_type) : null;
-    const ownedAssignment = assignment.assignments?.find(
-      (a: any) =>
-        a.sceneId === row.instructional_scene_id &&
-        a.assetId === row.id &&
-        a.assetId === `instructional:${a.sceneId}` &&
-        a.assignmentMethod === 'instructional-render' &&
-        a.generatedInstructionalVisual === true,
-    );
-    if (
-      !url ||
-      !kind ||
-      (!row.entitlement_id &&
-        !(
-          row.owned_instructional_visual === true &&
-          row.provider === 'remotion' &&
-          ownedAssignment
-        ))
-    )
-      continue;
+    const ownedPhoto = row.teaching_photo === true &&
+      /^[a-f0-9]{64}$/i.test(row.content_sha256 ?? '') &&
+      assignment.assignments?.some((a:any) => a.assetId === row.id &&
+        a.sceneId === row.instructional_scene_id && a.assignmentMethod === 'teaching-photograph');
+    if (!url || !kind || (!row.entitlement_id && !ownedPhoto)) continue;
     candidates.push({
-      ownedInstructional: row.owned_instructional_visual === true && Boolean(ownedAssignment),
+      ownedInstructional: ownedPhoto,
       assetId: String(row.id ?? ''),
       url,
       kind,
-      provider: String(row.provider ?? 'envato'),
+      provider: String(row.provider ?? (ownedPhoto ? 'google' : 'envato')),
       providerItemId: row.provider_item_id ? String(row.provider_item_id) : undefined,
       licenseEvidenceUrl: row.license_evidence_url ? String(row.license_evidence_url) : undefined,
     });
@@ -257,7 +243,7 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
         ? {
             resolved_provider: resolvedCandidate.provider,
             resolved_model: resolvedCandidate.ownedInstructional
-              ? 'script-bound-instructional-image'
+              ? 'generated-teaching-photograph'
               : resolvedCandidate.kind === 'video'
                 ? 'licensed-video'
                 : 'licensed-image',
@@ -302,13 +288,9 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
         (!input.presentationContract?.approvedReferenceVideo?.assetId ||
          !/^[a-f0-9]{64}$/i.test(input.presentationContract?.approvedReferenceVideo?.sha256 ?? '')))
       throw new Error('ULTIMATE_APPROVED_REFERENCE_REQUIRED');
-    const { uploadCourseVideosObject } = await import('@/lib/video/upload-lesson-media');
     const { prepareTeachingPhotos } = await import('./teaching-photos');
     const photographed = this.db ? await prepareTeachingPhotos(input,this.db) : input;
-    const materialized = await materializeInstructionalVisualAssets(
-      photographed,
-      uploadCourseVideosObject,
-    );
+    const materialized = bindTeachingPhotoAssignments(photographed);
     const prepared = prepareUltimateStoryboardInput(
       this.db ? await refreshLicensedVisualUrls(materialized, this.db) : materialized,
     );
@@ -355,6 +337,7 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
       instructorId: instructorFor(courseTitle),
       ultimateStrict: true,
       renderRevision: input.renderRevision,
+      ownerPreview: input.ownerPreview === true,
       lessonPresentation: input.lessonPresentation,
       visualStyle,
       teachingPhotos,

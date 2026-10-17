@@ -27,15 +27,8 @@ export async function hydrateUltimateProfileSources(
   courseId: string,
   profile: UltimateCredentialProfile,
 ): Promise<UltimateCredentialProfile> {
-  // Standard Course Builder mode: no fixed video or presentation contract.
-  // Remove the obsolete globally injected barber reference from legacy profiles.
-  // Preserve any independently selected course-specific media in the asset library.
-  const legacyReference = profile.presentationContract?.approvedReferenceVideo?.assetId ===
-    '9ae74de2-2fd2-45df-9c54-59c9e3c5c07c';
-  if (legacyReference) {
-    const { presentationContract: _obsoleteContract, lessonPresentation: _obsoleteMode, ...standardProfile } = profile;
-    profile = standardProfile as UltimateCredentialProfile;
-  }
+  // An explicitly selected owner reference is durable course data. Loading or
+  // resuming a course must never silently discard its approved presentation.
   const registeredContract = getRegisteredProgramStandardByProfileId(profile.id);
   // Teaching modality does not waive the registered mentor performance requirement.
   if (registeredContract) {

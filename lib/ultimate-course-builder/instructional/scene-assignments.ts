@@ -154,14 +154,14 @@ export function buildSceneAssignments(scenes: any[], assets: any[], configured: 
           reason: 'No distinct licensed asset has verified lesson/scene relevance evidence', licensedAssetCount:candidates.length});
         continue;
       }
-      // Source-derived graphics support conceptual teaching. They cannot stand
+      // Photographic requests support conceptual teaching. They cannot stand
       // in for required observable physical techniques.
       assignments.push({
         sceneId: scene.id,
-        assetId: `instructional:${scene.id}`,
-        relevanceReason: `Renderer-generated instructional visual for: ${scene.visualRequirement}`,
-        assignmentMethod: 'instructional-render',
-        generatedInstructionalVisual: true,
+        assetId: `teaching-photo-request:${scene.id}`,
+        relevanceReason: `Photograph illustrating: ${scene.visualRequirement}`,
+        assignmentMethod: 'teaching-photograph-request',
+        requestedTeachingPhotograph: true,
         visualRequirement: scene.visualRequirement,
       });
       continue;

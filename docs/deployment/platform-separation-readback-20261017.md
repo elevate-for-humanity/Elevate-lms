@@ -2,6 +2,60 @@
 
 This is an incomplete release, not a production-readiness certificate. Production application changes remain held while separation and acceptance are unfinished. No quota increase, customer pricing change, taxpayer-data migration, or new application deployment was performed by this work.
 
+## Latest release attempt and additional repairs
+
+The owner authorized production release on October 17. Main commit
+`cb0862c1db4cddd8861a097427d1dc58d3db5821` passed CI, Pre-deploy Check and
+Compliance Gate. Store release run `39048024817`, job `117440634413`, passed
+typechecking, application build and actual container identity/health tests.
+At **16:18:48 UTC**, Artifact Registry rejected the tested image upload with
+“This API method requires billing to be enabled.” The workflow never reached
+revision creation or traffic activation. The previous healthy Store revision
+was retained. Further web uploads were not started, and the coordinated release
+hold was restored to avoid repeating a known blocked operation.
+
+This is distinct from missing IAM permissions. The read-only Google preflight
+at **16:09:25 UTC**, job `117440955495`, reported project billing enabled while
+linked billing-account inspection remained HTTP 403. The account owner must
+resolve the Artifact Registry billing rejection; this evidence does not establish
+whether payment status, account activation, propagation or another billing issue
+caused it. Do not repeatedly rebuild images to test account activation.
+
+That preflight observed Admin `00193-nnw`, LMS `00171-bcd`, Marketing
+`raccd052e-39044134724-1` and Store `raccd052e-39044029981-1`, each at 100%
+traffic under its full `elevate-…-migration-` service prefix. The web application
+release represented commit `accd052e05ff0d66c6a9370da77085bf254fecd5`.
+The targeted central Course Builder and both renderer jobs had no active
+executions. Regional quotas remained 20 vCPU / 40 GiB. Studio remained on
+`elevate-studio-browser-00039-yuv`, min=1, with the Admin identity.
+
+Additional engineering completed during the release attempt:
+
+- Dedicated Supersonic database migrations now make its public status view
+  enforce row policies, restrict internal trigger RPCs, fix function search
+  paths, and prevent users assigning themselves privileged profile roles.
+  SQL readback verifies denied role/owner changes, allowed display-name updates,
+  service-role administration and the retained auth trigger. Reproducible bodies
+  and target-specific instructions are in `scripts/db/supersonic/`.
+- All 31 tax/SFC tables in the dedicated database were empty; primary tax tables
+  contained one office configuration row. Crucially, primary private storage
+  contains **three tax-document objects**. Those objects were not opened or moved.
+  Empty relational tables are not proof that no taxpayer information exists.
+- Exact course recovery now recognizes an already-terminal historical execution
+  without cancellation. Active mismatched images still fail the integrity gate;
+  no attempts, leases or checkpoints are reset. Recovery is manual, preventing
+  automatic retries of the old incident after unrelated worker releases. Seven
+  recovery checks pass. This is not completed rendering or checkpoint acceptance.
+- Store billing dispatcher rollout now verifies its existing dedicated identity,
+  refuses active executions, and checks fresh bounded regional capacity before
+  changing the job. Its 18 focused billing checks pass. The billing dispatcher
+  has not been switched to Store or executed by this work.
+
+Application runtime cutover, merchant acceptance, Firebase/Legacy reconciliation,
+tax-document migration, full course media acceptance and generic Studio session
+restoration remain unfinished. The database hardening above is applied and
+verified; the new web application repairs are not live.
+
 ## Implemented and tested changes
 
 - Store has local sign-in, safe commerce return URLs, local verified payment callback routing, local password recovery, and a product-catalog dependency check.

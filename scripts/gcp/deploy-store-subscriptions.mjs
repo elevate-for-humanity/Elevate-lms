@@ -2,6 +2,22 @@ import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { google, PROJECT } from './runtime-config.mjs';
 import { ADMIN_URL, STORE_URL, BILLING_JOB } from './run-store-subscriptions.mjs';
+import { inspectRegionalCapacity } from './regional-capacity.mjs';
+import { assertNoActiveExecutions } from './execute-course-job.mjs';
+
+export async function preflightBillingRollout({run=google, capacityCheck=inspectRegionalCapacity}={}) {
+  const scope=['--project',PROJECT,'--region','us-central1','--format=json'];
+  const job=JSON.parse(run(['run','jobs','describe','elevate-store-subscriptions',...scope]));
+  const task=job.spec?.template?.spec?.template?.spec;
+  if(task?.serviceAccountName!==`elevate-billing-runtime@${PROJECT}.iam.gserviceaccount.com`)
+    throw new Error('BILLING_EXISTING_IDENTITY_UNVERIFIED');
+  const executions=()=>JSON.parse(run(['run','jobs','executions','list','--job=elevate-store-subscriptions',...scope]));
+  assertNoActiveExecutions(executions());
+  const capacity=await capacityCheck({region:'us-central1',task:{containers:[{resources:{limits:{cpu:'1',memory:'512Mi'}}}]},taskCount:1,run});
+  if(capacity?.fits!==true)throw new Error('BILLING_REGIONAL_CAPACITY_UNAVAILABLE');
+  assertNoActiveExecutions(executions());
+  return {capacityVerified:true,activeExecutions:0};
+}
 export function dispatcherSource() {
   const source = readFileSync(new URL('./run-store-subscriptions.mjs', import.meta.url), 'utf8').replace(/^export /gm, '');
   if (source.includes('~')) throw new Error('Dispatcher argument delimiter collision');
@@ -39,8 +55,8 @@ async function main() {
   const digest = google(['artifacts','docker','images','describe',`${image}:${sha}`,'--project',PROJECT,'--format=value(image_summary.digest)']);
   if (!/^sha256:[a-f0-9]{64}$/.test(digest)) throw new Error('Verified billing image digest required');
   // The administrator-created resource carries the confined IAM bindings.
-  google(['run','jobs','describe',name,'--project',PROJECT,'--region',region,'--format=value(metadata.name)']);
   const source = dispatcherSource();
+  await preflightBillingRollout();
   google(['run','jobs','deploy',name,'--project',PROJECT,'--region',region,'--image',`${image}@${digest}`,
     '--service-account',`elevate-billing-runtime@${PROJECT}.iam.gserviceaccount.com`,
     '--command','node','--args',`^~^--input-type=module~-e~${source}`,

@@ -29,6 +29,7 @@ export async function verifyArtifactUpload({run=google,request=fetch}={}) {
   if(location.origin!==origin||location.username||location.password||location.hash||
     !location.pathname.startsWith(prefix)||!scopedSession||suffix.includes('/'))
     throw Object.assign(Error('ARTIFACT_UPLOAD_LOCATION_INVALID'),{safeDetails:{
+      pathShape:location.pathname.split("/").map(part=>["","v2","elegant-racer-299721","elevate","store","blobs","uploads","artifacts-uploads"].includes(part)?part:"[opaque:"+part.length+"]").join("/"),
       sameOrigin:location.origin===origin,expectedPrefix:location.pathname.startsWith(prefix),
       emptySuffix:!suffix,nestedSuffix:suffix.includes('/'),hasUploadId:location.searchParams.has('upload_id'),hasQuery:Boolean(location.search),
     }});

@@ -276,3 +276,13 @@ coordinated runtime/Admin acceptance gate remain required before production
 cutover or any reduction of minimum instances. Existing revision 00039-yuv remains
 the last verified production traffic target; no new Google deployment was requested
 for this implementation.
+
+Terminal recovery CI evidence for `0b8e477d9a68cb8acce6da95f82153b3e6384c8e`:
+Studio validation run `39063828258` passed both jobs: 106 actual nonroot
+Chromium/container tests, 262 Admin/browser integration tests across 50 files,
+and 17 identity/cutover contracts. Admin/Marketing TypeScript, credential scanning
+and lockfile integrity passed. The broader integrity gate identified the removed
+`createTerminalSession` compatibility entry point; it is restored as the actual
+route entry point delegating to the durable manager. The unchanged Studio
+architecture gate and all 25 integration-gate checks then passed locally.
+Production remains unchanged; the follow-up commit still requires complete CI.

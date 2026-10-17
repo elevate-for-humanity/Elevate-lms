@@ -95,6 +95,10 @@ const terminalSessions = new TerminalSessions({
 // through request bodies. Legacy service callers remain in a separate namespace.
 const terminalOwner=req=>String(req.headers['x-studio-operator-id']||'legacy');
 
+function createTerminalSession(owner){
+  return terminalSessions.create(owner);
+}
+
 async function ensureRepository(body = {}) {
   const repoUrl = String(body.repoUrl || process.env.STUDIO_REPOSITORY_URL || '');
   const branch = String(body.branch || process.env.STUDIO_REPOSITORY_BRANCH || 'main');
@@ -1519,7 +1523,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === '/workspace/terminal' && req.method === 'POST') {
       if (!authorizedService(req)) return json(res, 401, { error: 'unauthorized' });
-      return json(res,201,await terminalSessions.create(terminalOwner(req)));
+      return json(res,201,await createTerminalSession(terminalOwner(req)));
     }
     const terminalMatch = url.pathname.match(/^\/workspace\/terminal\/([^/]+)(?:\/(input|output|resume))?$/);
     if (terminalMatch) {

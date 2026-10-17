@@ -16,7 +16,7 @@ test('validation performs no deployment, execution, queue write, or lease change
  const commands=[],methods=[];
  const run=args=>{commands.push(args);if(args[2]==='describe')return JSON.stringify(job());if(args[2]==='executions')return '[]';throw Error('unexpected mutation');};
  const request=async(url,options)=>{methods.push(options.method);if(url.includes('ultimate_lesson_steps'))return {ok:true,json:async()=>['standards_lock','learning_objectives','prerequisites','teaching_sequence','instructor_script','storyboard','visual_assignment','scene_construction','natural_narration','synchronization','active_teaching','mistakes_and_corrections','assessment_alignment'].map(step=>({step,state:'passed'}))};return {ok:true,json:async()=>b2Read(url)??(url.includes('ultimate_course_builds')?[{profile:{lessonPresentation:'approved-premium-v1',presentationContract:{approvedReferenceVideo:{sha256:'6921ebb2f049e0183fa2f5cfebaa1a9a6e2a8242a672daebbdcb251ca0a96fc2'}}}}]:[{build_id:'572cca43-6bd6-4a91-b385-a8b576209c4e',status:'failed',lease_owner:null,lease_expires_at:null}])};};
- const out=await ownerLessonPreview({run,request,capacity:async()=>({fits:true})});
+ const out=await ownerLessonPreview({referenceCheck:async()=>({pictureCount:39}),run,request,capacity:async()=>({fits:true})});
  assert.equal(out.executionStarted,false);assert.equal(out.releaseHoldChanged,false);
  assert.equal(methods.includes('PATCH'),false);assert.equal(commands.some(a=>a.some(v=>['update','deploy','execute','cancel'].includes(v))),false);
 });
@@ -41,7 +41,7 @@ for(const reuseCandidate of [false,true])test('execution preserves evidence and 
   if(url.includes('ultimate_course_builds'))return [{profile:{ownerPaused:true,lessonPresentation:'approved-premium-v1',presentationContract:{approvedReferenceVideo:{sha256:'6921ebb2f049e0183fa2f5cfebaa1a9a6e2a8242a672daebbdcb251ca0a96fc2'}}}}];
   return [{build_id:'572cca43-6bd6-4a91-b385-a8b576209c4e',status:'failed',lease_owner:null,lease_expires_at:null,attempts:5,max_attempts:5,execution_generation:80,payload:{savedCheckpoint:'kept'}}];
  }};};
- const out=await ownerLessonPreview({execute:true,sha:'c'.repeat(40),reuseCandidate,run,request,capacity:async()=>({fits:true})});
+ const out=await ownerLessonPreview({referenceCheck:async()=>({pictureCount:39}),execute:true,sha:'c'.repeat(40),reuseCandidate,run,request,capacity:async()=>({fits:true})});
  assert.equal(out.executionStarted,true);assert.equal(out.releaseHoldChanged,false);
  assert.equal(probe.purpose,'owner-preview-storage-preflight');
  assert.equal(writes[0].payload.checkpointRepair.fromStep,'lesson_film_render');

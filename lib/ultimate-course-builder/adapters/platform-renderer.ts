@@ -312,7 +312,8 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
         scene.referenceImageUrl=teachingPhotos[index]?.[0]?.imageUrl;
         const photo=teachingPhotos[index]?.[0];
         scene.resolvedProvider=photo?.provider??'google';
-        scene.resolvedModel=photo?.providerItemId?'licensed-teaching-photograph':'generated-teaching-photograph';
+        scene.resolvedModel=photo?.ownerReferenceArtifactId?'owner-approved-reference-photograph':photo?.providerItemId?'licensed-teaching-photograph':'generated-teaching-photograph';
+        if(photo?.ownerReferenceArtifactId)scene.ownerApprovedPhotoReference={artifactId:photo.ownerReferenceArtifactId,videoSha256:photo.ownerReferenceVideoSha256,sourceSceneId:photo.referenceSceneId};
         scene.sourceProviderItemId=photo?.providerItemId;
         scene.sourceLicenseEvidenceUrl=photo?.licenseEvidenceUrl;
       }

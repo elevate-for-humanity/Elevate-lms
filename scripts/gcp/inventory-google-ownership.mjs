@@ -1,5 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { google, PROJECT } from './runtime-config.mjs';
+import { runtimeBoundary } from './runtime-boundary.mjs';
 
 const report = { project: PROJECT, observedAt: new Date().toISOString(), scope: {cloudRun:'all regions',scheduler:'us-central1'}, resources: {}, failures: [] };
 function read(name, args, select) {
@@ -17,6 +18,15 @@ read('cloudRunServices', ['run', 'services', 'list'], rows => rows.map(s => ({
   traffic: (s.status?.traffic ?? []).map(t => ({ revision: t.revisionName, percent: t.percent, tag: t.tag })),
   limits: (s.spec?.template?.spec?.containers ?? []).map(c => c.resources?.limits),
 })));
+// Inspect effective revisions rather than assuming the latest template serves.
+for (const service of report.resources.cloudRunServices ?? []) {
+  const names = new Set(service.traffic.filter(t => t.percent > 0 || t.tag).map(t => t.revision));
+  for (const revision of names) {
+    const resource = 'servingBoundary:' + service.region + ':' + revision;
+    if (!service.region || !revision) { report.failures.push({resource,reason:'serving_revision_unknown'}); continue; }
+    read(resource, ['run','revisions','describe',revision,'--region='+service.region], runtimeBoundary);
+  }
+}
 read('cloudRunJobs', ['run', 'jobs', 'list'], rows => rows.map(j => ({
   name: j.metadata?.name, region: j.metadata?.labels?.['cloud.googleapis.com/location'],
   conditions: (j.status?.conditions ?? []).map(c => ({ type: c.type, status: c.status, reason: c.reason })),

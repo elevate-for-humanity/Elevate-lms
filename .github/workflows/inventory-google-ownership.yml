@@ -2,7 +2,7 @@ name: Inventory Google ownership and persistence
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/inventory-google-ownership.yml', 'scripts/gcp/inventory-google-ownership.mjs']
+    paths: ['.github/workflows/inventory-google-ownership.yml', 'scripts/gcp/inventory-google-ownership.mjs', 'scripts/gcp/runtime-boundary*']
   workflow_dispatch:
 permissions:
   contents: read
@@ -34,6 +34,8 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v3
         with: {skip_install: true}
       - run: node scripts/gcp/verify-sdk.mjs
+      - name: Verify inventory redaction and serving-boundary projection
+        run: node --test scripts/gcp/inventory-google-ownership.test.mjs scripts/gcp/runtime-boundary.test.mjs
       - name: Inspect Google runtime, persistence and ownership metadata
         run: |
           node scripts/gcp/inventory-google-ownership.mjs || result=$?

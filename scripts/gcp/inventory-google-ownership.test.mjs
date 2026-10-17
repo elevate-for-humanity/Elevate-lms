@@ -1,12 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {runtimeBoundary} from './runtime-boundary.mjs';
 
 const raw=readFileSync(new URL('./inventory-google-ownership.mjs',import.meta.url),'utf8');
 test('inventory visits every discovered job region, retains older active work and excludes credentials',async()=>{
  const calls=[];let report;
  const jobs=['us-central1','us-east1'].map((region,index)=>({metadata:{name:'worker-'+index,labels:{'cloud.googleapis.com/location':region}},spec:{secret:'never-write-this-value'}}));
- globalThis.__inventoryFixture={PROJECT:'test-project',process:{exitCode:0},console:{log(){}},
+ globalThis.__inventoryFixture={PROJECT:'test-project',runtimeBoundary,process:{exitCode:0},console:{log(){}},
   writeFileSync(_path,value){report=JSON.parse(value);},
   google(args){
    calls.push(args);
@@ -23,7 +24,8 @@ test('inventory visits every discovered job region, retains older active work an
   },
  };
  const source=raw.replace("import { writeFileSync } from 'node:fs';",'')
-  .replace("import { google, PROJECT } from './runtime-config.mjs';",'const {google,PROJECT,writeFileSync,console,process}=globalThis.__inventoryFixture;');
+  .replace("import { google, PROJECT } from './runtime-config.mjs';",'const {google,PROJECT,writeFileSync,console,process,runtimeBoundary}=globalThis.__inventoryFixture;')
+  .replace("import { runtimeBoundary } from './runtime-boundary.mjs';",'');
  try{await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));}
  finally{delete globalThis.__inventoryFixture;}
  assert.deepEqual(report.failures,[{resource:'projectAssets',reason:'permission_denied'}]);

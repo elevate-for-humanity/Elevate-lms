@@ -4,33 +4,26 @@ on:
   workflow_run:
     workflows: ['Deploy Admin']
     types: [completed]
-  push:
-    branches: [main]
-    paths: ['.github/workflows/verify-owned-voicemail-speech.yml']
 permissions:
   contents: read
   actions: write
   id-token: write
 jobs:
-  dispatch:
-    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Dispatch protected acceptance after a successful Admin release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
-            # A successful push-triggered dispatcher does not mean Admin deployed.
-            # Dispatch acceptance only after the real production job passed.
-            gh api "repos/$GITHUB_REPOSITORY/actions/runs/${{ github.event.workflow_run.id }}/jobs" --paginate --jq '.jobs[] | select(.name == "Build and deploy Admin on Google" and .conclusion == "success") | .id' | grep -q '[0-9]' || exit 0
-          fi
-          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-owned-voicemail-speech.yml/dispatches" -f ref=main
   verify:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-24.04
     environment: production
     steps:
+      - name: Require successful real Admin deployment for automatic acceptance
+        if: github.event_name == 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOY_RUN_ID: ${{ github.event.workflow_run.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          count="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$DEPLOY_RUN_ID/jobs" --paginate --jq '[.jobs[] | select(.name == "Build and deploy Admin on Google" and .conclusion == "success")] | length' | awk '{sum+=$1} END{print sum+0}')"
+          test "$count" -ge 1 || { echo '::error::Successful dispatcher is not a successful Admin deployment'; exit 1; }
       - uses: actions/checkout@v4
         with:
           persist-credentials: false

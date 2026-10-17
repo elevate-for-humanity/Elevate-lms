@@ -162,21 +162,21 @@ jobs:
               throw new Error('QuickBooks runtime is not synchronized with the Google deployment');
           }
           if(component==='admin') {
-            const telnyxResponse=await fetch('https://elevate-admin-migration-aabnh2y32a-uc.a.run.app/api/health/telnyx',{
-              headers:{'X-Serverless-Authorization':'Bearer '+process.env.TOKEN},
-              redirect:'manual',signal:AbortSignal.timeout(20000)
-            });
-            const telnyx=await telnyxResponse.json().catch(()=>({}));
-            const telnyxResult={component:'admin',telnyxHttpStatus:telnyxResponse.status,
-              telnyxReady:telnyx.ready===true,telnyxConfigured:telnyx.configured===true,
-              carrierNumberActive:telnyx.carrierNumberActive===true,
-              primaryNumberActive:telnyx.primaryNumberActive===true,
-              webrtcConfigured:telnyx.webrtcConfigured===true};
-            console.log(JSON.stringify(telnyxResult));
-            if(telnyxResponse.status!==200 || !telnyxResult.telnyxReady || !telnyxResult.telnyxConfigured ||
-                !telnyxResult.carrierNumberActive || !telnyxResult.primaryNumberActive || !telnyxResult.webrtcConfigured)
-              throw new Error('Telnyx runtime is not synchronized with the Google Admin deployment');
+            // The legacy /api/health/telnyx endpoint checks a retired provider.
+            // Do not require it for Google Admin readiness or infer that the
+            // standalone Asterisk/Twilio/PARIS voice flow is production-ready.
+            console.log(JSON.stringify({component:'admin',phoneAcceptance:'NOT_TESTED',
+              carrier:'Twilio (reported; live cutover not verified)',
+              scope:'application readiness only; PBX acceptance is a separate gate'}));
+            appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+              'Admin: legacy Telnyx carrier gate retired. PBX/Twilio/PARIS calling NOT VERIFIED by this deployment.\\n');
           }
           appendFileSync(process.env.GITHUB_STEP_SUMMARY,component+': dependency health and canonical readiness passed.\n');
 
           NODE
+      - name: Check standalone PBX public transport (read-only, not call acceptance)
+        if: ${{ matrix.component == 'admin' }}
+        continue-on-error: true
+        run: |
+          node scripts/gcp/verify-pbx-transport.mjs
+          echo "Public DNS/TLS/SIP WebSocket transport does not prove Twilio carrier routing, SIP registration, audio, ASR, or PARIS."

@@ -130,7 +130,7 @@ export function planAIToolFromCommand(
   if (lower.trim() === 'inspect course builder health checks') {
     return { name: 'courses.health', input: {} };
   }
-  if (/\b(paris|combined ai|all (?:the )?ais?|ai system|ai supervision)\b/.test(lower) &&
+  if (!isEngineeringCommand(lower) && /\b(paris|combined ai|all (?:the )?ais?|ai system|ai supervision)\b/.test(lower) &&
       /\b(status|health|monitor|failures?|errors?|working|helping)\b/.test(lower))
     return {name:'paris.supervision', input:{}};
 

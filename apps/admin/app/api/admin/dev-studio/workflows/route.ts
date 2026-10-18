@@ -25,7 +25,9 @@ export async function GET(request: NextRequest) {
     // Return workflows from ai_tasks table
     const { data: workflows, error: workflowsError } = await db
       .from('ai_tasks')
-      .select('*')
+      // Listing full tool outputs recursively embeds earlier inspections in the
+      // next task and planner checkpoint. Keep evidence on its original task.
+      .select('id,title,status,priority,agent_type,tool_name,attempts,max_attempts,requires_approval,approval_status,studio_run_id,created_at,updated_at,started_at,completed_at')
       .order('created_at', { ascending: false })
       .limit(50);
 

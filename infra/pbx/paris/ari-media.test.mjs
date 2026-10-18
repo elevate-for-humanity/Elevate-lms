@@ -1,6 +1,39 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parseRtp,rtp,isSpeech,routeOperator,isCallerStart,createExternalChannel,releaseCaller} from './ari-media.mjs';
+import {parseRtp,rtp,isSpeech,routeOperator,isCallerStart,createExternalChannel,releaseCaller,handleDtmf} from './ari-media.mjs';
+
+test('keypad zero transfers an owned caller once, including during a voice turn',async()=>{
+ const session={callId:'call-1',closed:false,busy:true,playing:true,frames:[Buffer.alloc(160)],quiet:2,heard:true};
+ const active=new Map([['call-1',session]]);const calls=[];
+ let release;const pending=new Promise(resolve=>{release=resolve;});
+ const dependencies={route:async(...args)=>{calls.push(args);await pending;},finish:async(...args)=>calls.push(args)};
+ const event={type:'ChannelDtmfReceived',digit:'0',channel:{id:'call-1'}};
+ const first=handleDtmf(event,active,dependencies);
+ await handleDtmf(event,active,dependencies);
+ assert.equal(calls.length,1);assert.equal(session.transferring,true);
+ assert.deepEqual(session.frames,[]);
+ release();await first;
+ assert.deepEqual(calls,[['call-1',{type:'operator',extension:'0'}],[session]]);
+});
+test('keypad events cannot transfer another channel or arbitrary destinations',async()=>{
+ const session={callId:'call-1',closed:false};const active=new Map([['call-1',session]]);
+ const dependencies={route:async()=>assert.fail('unexpected route'),finish:async()=>assert.fail('unexpected cleanup')};
+ for(const event of [
+  {type:'ChannelDtmfReceived',digit:'1',channel:{id:'call-1'}},
+  {type:'ChannelDtmfReceived',digit:'0',channel:{id:'paris-media-other'}},
+  {type:'ChannelDtmfReceived',digit:'0',channel:{id:'unknown'}},
+  {type:'StasisStart',digit:'0',channel:{id:'call-1'}},
+ ])await handleDtmf(event,active,dependencies);
+ session.closed=true;
+ await handleDtmf({type:'ChannelDtmfReceived',digit:'0',channel:{id:'call-1'}},active,dependencies);
+});
+test('rejected keypad transfer resumes the owning dialplan fallback',async()=>{
+ const session={callId:'call-1',closed:false};const calls=[];
+ await handleDtmf({type:'ChannelDtmfReceived',digit:'0',channel:{id:'call-1'}},new Map([['call-1',session]]),{
+  route:async()=>{throw Error('ARI_POST_409');},finish:async(...args)=>calls.push(args),
+ });
+ assert.deepEqual(calls,[[session,'continue']]);
+});
 
 test('PCMU RTP round trip maintains packetization and sequence',()=>{
  const state={seq:65535,timestamp:100,ssrc:123};

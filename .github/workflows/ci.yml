@@ -182,10 +182,39 @@ jobs:
         continue-on-error: true
         run: node scripts/check-container-contract.mjs
 
+  enrollment-database:
+    name: Canonical Enrollment Database
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: elevate_enrollment_regression
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports: ['127.0.0.1:5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d elevate_enrollment_regression"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Test real enrollment and publication triggers in an isolated database
+        env:
+          ENROLLMENT_TEST_DATABASE_URL: postgresql://postgres@127.0.0.1:5432/elevate_enrollment_regression
+        run: node --test tests/database/canonical-enrollment.node.test.mjs
+
   ci-gate:
     name: CI Required Gate
     runs-on: ubuntu-latest
-    needs: [preflight, typecheck, lint]
+    needs: [preflight, typecheck, lint, enrollment-database]
     if: always()
     steps:
       - name: Require every CI diagnostic to pass
@@ -197,3 +226,4 @@ jobs:
           test "${{ needs.preflight.result }}" = "success"
           test "${{ needs.typecheck.result }}" = "success"
           test "${{ needs.lint.result }}" = "success"
+          test "${{ needs.enrollment-database.result }}" = "success"

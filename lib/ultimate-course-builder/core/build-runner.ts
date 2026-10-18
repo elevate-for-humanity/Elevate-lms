@@ -61,7 +61,8 @@ export class UltimateBuildRunner {
       target: UltimateBuildStep;
       codes: string[];
     }> = [];
-    ctx.repairDirective=(ctx.artifacts as any).__repairState?.directive;
+    const savedRepair = (ctx.artifacts as any).__repairState;
+    ctx.repairDirective = savedRepair?.status === 'producer-validated' ? undefined : savedRepair?.directive;
     let index = 0;
     while (index < ULTIMATE_BUILD_STEPS.length) {
       if (ctx.renderPreviewOnly && index > ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render')) break;

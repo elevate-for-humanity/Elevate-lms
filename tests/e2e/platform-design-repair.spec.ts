@@ -1,4 +1,22 @@
 import { test, expect } from '@playwright/test';
+import { observeDocumentStability } from './helpers/document-stability';
+
+test('startup monitor permits same-document history updates and detects real reloads', async ({ page }) => {
+  const documentState = observeDocumentStability(page);
+  // Isolated fixture: no production records, network dependency or external actions.
+  await page.route('https://startup-verification.invalid/**', route =>
+    route.fulfill({ contentType: 'text/html', body: '<!doctype html><title>Startup fixture</title><h1>Ready</h1>' }),
+  );
+  await page.goto('https://startup-verification.invalid/');
+  const baseline = await documentState();
+  expect(baseline.documentRequests).toHaveLength(1);
+  await page.evaluate(() => history.replaceState({ fixture: true }, '', '?same-document'));
+  expect(await documentState()).toEqual(baseline);
+  await page.reload();
+  const reloaded = await documentState();
+  expect(reloaded.documentRequests).toHaveLength(2);
+  expect(reloaded.timeOrigin).not.toBe(baseline.timeOrigin);
+});
 
 // Read-only rendering checks. Production application submission is intentionally
 // excluded: it requires a controlled test account and database cleanup contract.

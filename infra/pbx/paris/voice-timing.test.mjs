@@ -15,6 +15,14 @@ test('operator keypad handoff interrupts audio before the next RTP frame',async(
  assert.equal(sent,1);assert.equal(session.playing,false);
 });
 
+test('a business greeting longer than twenty seconds plays within a bounded envelope',async()=>{
+ let now=0,sent=0;const session={closed:false,remote:{port:10000,address:'127.0.0.1'},seq:1,timestamp:1,ssrc:1,
+  socket:{send(packet,port,host,done){sent++;done();}}};
+ await speak(session,Buffer.alloc(200000,255).toString('base64'),{clock:()=>now,wait:async ms=>{now+=ms;}});
+ assert.equal(sent,1250);assert.equal(now,25000);
+ await assert.rejects(speak(session,Buffer.alloc(640160,255).toString('base64')),/INVALID_ULAW_AUDIO/);
+});
+
 test('ARI uses an encoded private event credential with native WebSocket arguments',()=>{
  const password=randomBytes(12).toString('base64')+'+/?:&';
  let seen;class Socket{constructor(...args){seen=args;}}

@@ -77,7 +77,7 @@ For physical practical_skill competencies, during demonstration, guided_practice
       break;
     }
     catch (error) {
-      if (!(error instanceof Error) || !/^(BLUEPRINT_|ULTIMATE_SOURCE_CITATION_INVALID|ULTIMATE_SEGMENT_GROUNDING_REQUIRED)/.test(error.message) || attempt === 2) throw error;
+      if (!(error instanceof Error) || !/^(BLUEPRINT_)/.test(error.message) || attempt === 2) throw error;
       const invalidVisuals = (result?.blueprint?.segments ?? []).flatMap((segment: any) => {
         try { if (segment.teachingVisual) validateTeachingVisual(segment.teachingVisual, segment.text); return []; }
         catch { return [{segmentId: segment.id, narration: segment.text, teachingVisual: segment.teachingVisual}]; }

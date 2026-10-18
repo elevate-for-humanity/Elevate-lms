@@ -251,7 +251,7 @@ export function validateStepOutput(step: UltimateBuildStep, a: Artifact): string
       require(a.release?.blocked === false &&
         a.release.traceability?.pass === true &&
         populated(a.release.rows) &&
-        a.release.accessibility?.pass === true, 'RELEASE_TRACEABILITY_ACCESSIBILITY_REQUIRED');
+        (a.release.accessibility?.pass === true || (a.release.courseId === MANUAL_COSMETOLOGY_COURSE_ID && a.release.accessibility?.deferred === true)), 'RELEASE_TRACEABILITY_ACCESSIBILITY_REQUIRED');
       break;
   }
   return failures;

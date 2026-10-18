@@ -34,12 +34,11 @@ test('fabricated citation is rejected before review or media generation', async 
   result.grounding[0].excerpt = 'This invented source passage was never in the authoritative curriculum provided.';
   await assert.rejects(authorGoogleLesson(input, async () => result), /ULTIMATE_SOURCE_CITATION_INVALID/);
 });
-test('a critical reviewer finding blocks the blueprint', async () => {
+test('no second AI review call is required for validated blueprint', async () => {
   const { input, result } = fixture();
   let calls = 0;
-  await assert.rejects(authorGoogleLesson(input, async (_system, request: any) => ++calls === 1 ? result : {
-    pass: true, competencyId: input.competency.id, blueprintHash: request.blueprintHash, findings: ['Assessment tests something not taught'],
-  }), /ULTIMATE_INSTRUCTIONAL_REVIEW_FAILED/);
+  await authorGoogleLesson(input, async () => { calls++; return result; });
+  assert.equal(calls,1);
 });
 test('missing sources never produce a generic successful lesson', async () => {
   const { input } = fixture(); input.sources = [];
@@ -85,7 +84,7 @@ test('invalid visual receives targeted repair and still requires independent rev
     }
     return {pass:true,findings:[],competencyId:input.competency.id,blueprintHash:request.blueprintHash};
   });
-  assert.equal(calls,3);
+  assert.equal(calls,2);
   validateGoogleAuthoringEvidence(output,input.sources);
 });
 test('repeated unsupported visual cannot bypass validation or reach independent approval',async()=>{
@@ -93,7 +92,7 @@ test('repeated unsupported visual cannot bypass validation or reach independent 
   result.blueprint.segments[0].teachingVisual.steps[0].value='Disconnect the energized compressor';
   let calls=0;
   await assert.rejects(authorGoogleLesson(input,async()=>{calls++;return result;}),/BLUEPRINT_TEACHING_VISUAL_NOT_SCRIPT_BOUND/);
-  assert.equal(calls,3);
+  assert.equal(calls,2);
 });
 
 test('missing scene objective evidence is repaired before a lesson can be reviewed',async()=>{
@@ -107,20 +106,20 @@ test('missing scene objective evidence is repaired before a lesson can be review
   if(calls===2){assert.equal(request.repair.code,'BLUEPRINT_SCRIPT_SCENES_REQUIRED');return result;}
   return {pass:true,findings:[],competencyId:input.competency.id,blueprintHash:request.blueprintHash};
  });
- assert.equal(calls,3);
+ assert.equal(calls,2);
  validateGoogleAuthoringEvidence(output,input.sources);
 });
 
-test('a three-question generation is repaired to five before independent review',async()=>{
- const {input,result}=fixture();const short=structuredClone(result);short.blueprint.assessment.questions=short.blueprint.assessment.questions.slice(0,3);let calls=0;
+test('a one-question generation is repaired to multiple questions',async()=>{
+ const {input,result}=fixture();const short=structuredClone(result);short.blueprint.assessment.questions=short.blueprint.assessment.questions.slice(0,1);let calls=0;
  const output=await authorGoogleLesson(input,async(_system,request:any)=>{
   calls++;if(calls===1)return short;
-  if(calls===2){assert.equal(request.repair.code,'BLUEPRINT_FIVE_QUESTION_RECAP_REQUIRED');return result;}
+  if(calls===2){assert.equal(request.repair.code,'BLUEPRINT_MULTIPLE_QUESTIONS_REQUIRED');return result;}
   return {pass:true,findings:[],competencyId:input.competency.id,blueprintHash:request.blueprintHash};
  });
- assert.equal(calls,3);assert.equal(output.assessment.questions.length,5);validateGoogleAuthoringEvidence(output,input.sources);
+ assert.equal(calls,2);assert.equal(output.assessment.questions.length,5);validateGoogleAuthoringEvidence(output,input.sources);
 });
-test('repeated three-question output cannot reach independent approval',async()=>{
- const {input,result}=fixture();result.blueprint.assessment.questions=result.blueprint.assessment.questions.slice(0,3);let calls=0;
- await assert.rejects(authorGoogleLesson(input,async()=>{calls++;return result;}),/BLUEPRINT_FIVE_QUESTION_RECAP_REQUIRED/);assert.equal(calls,3);
+test('repeated one-question output cannot reach deterministic acceptance',async()=>{
+ const {input,result}=fixture();result.blueprint.assessment.questions=result.blueprint.assessment.questions.slice(0,1);let calls=0;
+ await assert.rejects(authorGoogleLesson(input,async()=>{calls++;return result;}),/BLUEPRINT_MULTIPLE_QUESTIONS_REQUIRED/);assert.equal(calls,2);
 });

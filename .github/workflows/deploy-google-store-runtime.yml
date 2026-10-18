@@ -10,6 +10,8 @@ on:
         'scripts/build-next-app.*',
         'scripts/container-build-policy.mjs',
         '.github/workflows/deploy-google-store-runtime.yml',
+        'scripts/gcp/smoke-marketing-container.mjs',
+        'scripts/gcp/store-page-contract.mjs',
         'apps/marketing/**',
         'components/**',
         'lib/**',

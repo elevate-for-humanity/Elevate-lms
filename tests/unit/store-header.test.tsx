@@ -2,10 +2,27 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Header from '@/components/site/Header';
+import StoreFooter from '@/components/store/StoreFooter';
+import { assertStorePageChrome } from '@/scripts/gcp/store-page-contract.mjs';
 
 afterEach(() => vi.unstubAllEnvs());
 
 describe('standalone Store navigation', () => {
+  it('passes the packaged-page contract with the real canonical Store sign-in URL', () => {
+    vi.stubEnv('K_SERVICE', 'elevate-store-migration');
+    const markup = renderToStaticMarkup(<><Header /><StoreFooter /></>);
+    expect(() => assertStorePageChrome(markup, '/store')).not.toThrow();
+  });
+
+  it('fails the packaged-page contract when sign-in points to LMS', () => {
+    vi.stubEnv('K_SERVICE', 'elevate-store-migration');
+    const markup = renderToStaticMarkup(<><Header /><StoreFooter /></>);
+    expect(() => assertStorePageChrome(
+      markup.replace('https://store.elevateforhumanity.org/login', 'https://app.elevateforhumanity.org/login'),
+      '/store',
+    )).toThrow('/store must keep sign-in on Store');
+  });
+
   it('keeps shopping and sign-in on Store without an LMS navigation dependency', () => {
     vi.stubEnv('K_SERVICE', 'elevate-store-migration');
     const markup = renderToStaticMarkup(<Header />);

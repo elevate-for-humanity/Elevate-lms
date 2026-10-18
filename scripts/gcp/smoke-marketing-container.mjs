@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { assertStorePageChrome } from './store-page-contract.mjs';
 
 const sha = process.env.GITHUB_SHA;
 assert.match(sha ?? '', /^[a-f0-9]{40}$/);
@@ -73,9 +74,7 @@ try {
       });
       assert.equal(response.status, 200, `Store page ${path} must be served locally`);
       const html = await response.text();
-      assert.match(html, /data-header-owner="store-root"/, `${path} must use Store chrome`);
-      assert.match(html, /href="\/login\?redirect=%2Fstore"/, `${path} must keep sign-in on Store`);
-      assert.match(html, /aria-label="Store policies"/, `${path} must expose Store policies`);
+      assertStorePageChrome(html, path);
     }
   }
   console.log('Final Marketing image dependencies, assets, startup and internal-host health routing verified.');

@@ -17,6 +17,7 @@ on:
 permissions:
   contents: read
   id-token: write
+  actions: write
 concurrency:
   group: paris-code-repair
   cancel-in-progress: false
@@ -43,12 +44,20 @@ jobs:
             fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
           })().catch(err=>{console.error(err.message);process.exitCode=1});
           NODE
-      - run: |
+      - name: Tick PARIS and dispatch the claimed repair with workflow-owned identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
           python - <<'PYCODE'
           import os,json,urllib.request,urllib.error
           req=urllib.request.Request('https://admin.elevateforhumanity.org/api/cron/paris-code-repair',data=json.dumps({'phase':'tick'}).encode(),headers={'Authorization':'Bearer '+os.environ['PARIS_ID_TOKEN'],'Content-Type':'application/json'})
           try:
-            print(urllib.request.urlopen(req,timeout=120).read().decode())
+            result=json.load(urllib.request.urlopen(req,timeout=120))
+            print(json.dumps(result))
+            if result.get('dispatchRequired'):
+              repair_id=result['repairId']
+              import subprocess
+              subprocess.run(['gh','api','--method','POST','repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/workflows/paris-code-repair.yml/dispatches','-f','ref=main','-f','inputs[repair_id]='+repair_id],check=True)
           except urllib.error.HTTPError as error:
             print(error.read().decode()[:1000])
             raise

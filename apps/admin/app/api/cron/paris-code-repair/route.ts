@@ -9,7 +9,7 @@ export async function POST(request:NextRequest){
  const body=await request.json().catch(()=>({}));
  try{
   if(body.phase==='auth-diagnostic')return NextResponse.json(await diagnoseParisGitHubCredential(),{headers:{'Cache-Control':'no-store'}});
-  if(body.phase==='tick')return NextResponse.json(await tickParisCodeRepairs());
+  if(body.phase==='tick')return NextResponse.json(await tickParisCodeRepairs({workflowOwnedDispatch:true}));
   if(!/^[a-f0-9-]{36}$/.test(body.repairId??'')||!Number.isSafeInteger(body.runId))return NextResponse.json({error:'Repair and workflow run required'},{status:400});
   if(body.phase==='prepare')return NextResponse.json(await prepareParisRepair(body.repairId,body.runId));
   if(body.phase==='publish')return NextResponse.json(await publishParisRepair(body.repairId,body.runId));

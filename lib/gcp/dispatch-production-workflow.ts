@@ -4,7 +4,7 @@
  * Never fall back to Northflank or to GitHub Contents API source mutations.
  */
 import 'server-only';
-import { getGitHubToken, getGitHubTokenCandidates } from '@/lib/devstudio/github-token';
+import { getGitHubTokenCandidates } from '@/lib/devstudio/github-token';
 
 export type GoogleDeployTarget = 'admin' | 'marketing' | 'lms' | 'store' | 'course-builder';
 const WORKFLOWS: Record<GoogleDeployTarget, string> = {
@@ -15,12 +15,6 @@ const WORKFLOWS: Record<GoogleDeployTarget, string> = {
   'course-builder': 'dispatch-google-course-job.yml',
 };
 const REPOSITORY = 'elevate-for-humanity/Elevate-lms';
-
-async function deploymentToken(): Promise<string> {
-  const token = await getGitHubToken();
-  if (!token) throw new Error('Google deployment dispatch token is not configured');
-  return token;
-}
 
 export async function dispatchGoogleDeployment(target: GoogleDeployTarget, dependencies: {
   request?: typeof fetch;
@@ -66,24 +60,24 @@ export async function dispatchGoogleDeployment(target: GoogleDeployTarget, depen
   };
 }
 
-export async function isGoogleDeploymentConfigured(): Promise<boolean> {
+export async function isGoogleDeploymentConfigured(dependencies: {
+  request?: typeof fetch;
+  tokens?: () => Promise<string[]>;
+} = {}): Promise<boolean> {
   try {
-    const token = await deploymentToken();
-    // Presence alone hid rejected credentials behind a green deployment badge.
-    // This reads workflow availability; it never starts a production operation.
-    const response = await fetch(
-      `https://api.github.com/repos/${REPOSITORY}/actions/workflows/deploy-admin.yml`,
-      {
-        headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
-        cache: 'no-store',
-        signal: AbortSignal.timeout(8000),
-      },
-    );
-    if (!response.ok) return false;
-    const workflow = await response.json();
-    return workflow.state === 'active';
-  } catch {
+    const tokens = await (dependencies.tokens ?? getGitHubTokenCandidates)();
+    for (const token of tokens) {
+      const response = await (dependencies.request ?? fetch)(
+        `https://api.github.com/repos/${REPOSITORY}/actions/workflows/deploy-admin.yml`,
+        {
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
+          cache: 'no-store', signal: AbortSignal.timeout(8000),
+        },
+      );
+      if ([401, 403].includes(response.status)) continue;
+      if (!response.ok) return false;
+      return (await response.json()).state === 'active';
+    }
     return false;
-  }
+  } catch { return false; }
 }
-

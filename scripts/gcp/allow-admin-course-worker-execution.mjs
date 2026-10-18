@@ -15,7 +15,7 @@ export function authorizeAdminCourseWorker(run=args=>execFileSync('gcloud',args,
   let policy=JSON.parse(run(['run','jobs','get-iam-policy',target.job,...scope,'--format=json']));
   for(const role of roles) {
    if(!(policy.bindings??[]).some(b=>b.role===role&&!b.condition&&(b.members??[]).includes(member)))
-    run(['run','jobs','add-iam-policy-binding',target.job,...scope,'--member='+member,'--role='+role,'--condition=None','--quiet']);
+    run(['run','jobs','add-iam-policy-binding',target.job,...scope,'--member='+member,'--role='+role,'--quiet']);
   }
   policy=JSON.parse(run(['run','jobs','get-iam-policy',target.job,...scope,'--format=json']));
   if(!roles.every(role=>(policy.bindings??[]).some(b=>b.role===role&&!b.condition&&(b.members??[]).includes(member))))throw Error('COURSE_WORKER_ACCESS_NOT_VERIFIED');
@@ -23,3 +23,4 @@ export function authorizeAdminCourseWorker(run=args=>execFileSync('gcloud',args,
  }
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)authorizeAdminCourseWorker();
+

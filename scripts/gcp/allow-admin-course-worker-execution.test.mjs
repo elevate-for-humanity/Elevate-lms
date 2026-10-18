@@ -18,7 +18,9 @@ test('grants read and execution only on both approved jobs and is idempotent',()
  assert.equal(writes.length,4);
  assert.deepEqual([...new Set(writes.map(a=>a[3]))],['elevate-course-builder','elevate-course-builder-parallel']);
  assert.ok(writes.every(a=>a.includes('--project=elegant-racer-299721')));
+ assert.ok(writes.every(a=>!a.some(flag=>flag.startsWith('--condition'))));
 });
 test('rejects an unrelated runtime identity before changing access',()=>{
  const calls=[];assert.throws(()=>authorizeAdminCourseWorker(args=>{calls.push(args);return JSON.stringify({spec:{template:{spec:{serviceAccountName:'other@elsewhere.iam.gserviceaccount.com'}}}});}),/ADMIN_RUNTIME/);assert.equal(calls.length,1);
 });
+

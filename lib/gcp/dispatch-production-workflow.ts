@@ -4,7 +4,7 @@
  * Never fall back to Northflank or to GitHub Contents API source mutations.
  */
 import 'server-only';
-import { getGitHubToken } from '@/lib/devstudio/github-token';
+import { getGitHubToken, getGitHubTokenCandidates } from '@/lib/devstudio/github-token';
 
 export type GoogleDeployTarget = 'admin' | 'marketing' | 'lms' | 'store' | 'course-builder';
 const WORKFLOWS: Record<GoogleDeployTarget, string> = {
@@ -22,11 +22,17 @@ async function deploymentToken(): Promise<string> {
   return token;
 }
 
-export async function dispatchGoogleDeployment(target: GoogleDeployTarget) {
+export async function dispatchGoogleDeployment(target: GoogleDeployTarget, dependencies: {
+  request?: typeof fetch;
+  tokens?: () => Promise<string[]>;
+} = {}) {
   const workflow = WORKFLOWS[target];
   if (!workflow) throw new Error('Unsupported Google deployment target');
-  const token = await deploymentToken();
-  const response = await fetch(
+  const tokens = await (dependencies.tokens ?? getGitHubTokenCandidates)();
+  if (!tokens.length) throw new Error('Google deployment dispatch token is not configured');
+  let response: Response | undefined;
+  for (const token of tokens) {
+    response = await (dependencies.request ?? fetch)(
     `https://api.github.com/repos/${REPOSITORY}/actions/workflows/${workflow}/dispatches`,
     {
       method: 'POST',
@@ -41,8 +47,13 @@ export async function dispatchGoogleDeployment(target: GoogleDeployTarget) {
       signal: AbortSignal.timeout(15000),
     },
   );
-  if (response.status !== 204) {
-    throw new Error(`Google GitHub dispatch refused: HTTP ${response.status}`);
+    if (response.status === 204) break;
+    // Try the other already configured credential only after an auth rejection.
+    if (![401, 403].includes(response.status)) break;
+  }
+  if (response?.status !== 204) {
+    throw new Error(`Google GitHub dispatch refused: HTTP ${response?.status ?? 'unavailable'}` +
+      (response?.status === 403 ? ' (Actions write permission is required)' : ''));
   }
   return {
     target,
@@ -75,3 +86,4 @@ export async function isGoogleDeploymentConfigured(): Promise<boolean> {
     return false;
   }
 }
+

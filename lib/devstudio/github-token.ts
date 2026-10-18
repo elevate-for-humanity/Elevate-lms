@@ -69,3 +69,11 @@ export function githubApiErrorMessage(status: number): string {
   }
   return `GitHub API error (${status}) — check GITHUB_TOKEN in Dev Studio > Secrets`;
 }
+
+/** Existing credentials for the same repository; never log or persist their values. */
+export async function getGitHubTokenCandidates(): Promise<string[]> {
+  const deployed = normalizeToken(process.env.GITHUB_TOKEN);
+  const stored = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
+  return [...new Set([stored, deployed].filter((value): value is string => Boolean(value)))];
+}
+

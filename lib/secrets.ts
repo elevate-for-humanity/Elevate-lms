@@ -11,6 +11,8 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
  *
  * Runtimes explicitly switched to Google Secret Manager use only their bound
  * values. Enable that authority only after the service inventory is complete.
+ * PBX_RUNTIME_CONFIG_PROVIDER applies the same authority only to PBX keys,
+ * allowing the phone integration to migrate independently of other settings.
  *
  * Build-only and unused Studio values must never be copied into process.env.
  */
@@ -28,8 +30,10 @@ const SECRETS_READ_ATTEMPTS = Math.max(
   Number.parseInt(process.env.SUPABASE_READ_MAX_ATTEMPTS || '3', 10) || 3,
 );
 
-function usesGoogleRuntimeBindings(): boolean {
-  return process.env.ELEVATE_RUNTIME_CONFIG_PROVIDER === 'google-secret-manager';
+function usesGoogleRuntimeBindings(key?: string): boolean {
+  return process.env.ELEVATE_RUNTIME_CONFIG_PROVIDER === 'google-secret-manager' ||
+    key === 'PBX_RUNTIME_CONFIG_PROVIDER' ||
+    Boolean(typeof key === 'string' && key.startsWith('PBX_') && process.env.PBX_RUNTIME_CONFIG_PROVIDER === 'google-secret-manager');
 }
 
 function retryableSecretRead(
@@ -80,6 +84,7 @@ function getBootstrapClient(): SupabaseClient | null {
 
 function acceptSecret(target: Record<string, string>, key: unknown, value: unknown) {
   if (typeof key !== 'string' || typeof value !== 'string') return;
+  if (usesGoogleRuntimeBindings(key)) return;
   const trimmed = value.trim();
   if (trimmed) target[key] = value;
 }
@@ -114,7 +119,7 @@ async function loadSecrets(): Promise<Record<string, string>> {
     if (!result.error) {
       let allDecryptionsSucceeded = true;
       const decryptedRows = await Promise.all(
-        (result.data ?? []).map(async (row) => {
+        (result.data ?? []).filter(row => !usesGoogleRuntimeBindings(row.key)).map(async (row) => {
           const decrypted = await client.rpc('get_platform_secret', { p_key: row.key });
           if (decrypted.error) {
             allDecryptionsSucceeded = false;
@@ -147,13 +152,14 @@ export async function hydrateProcessEnv(): Promise<void> {
 
   const secrets = await loadSecrets();
   for (const [key, value] of Object.entries(secrets)) {
-    if (value.trim()) process.env[key] = value;
+    if (!usesGoogleRuntimeBindings(key) && value.trim()) process.env[key] = value;
   }
   hydrated = true;
 }
 
 /** Get a single runtime secret, falling back to process.env. */
 export async function getSecret(key: string): Promise<string | undefined> {
+  if (usesGoogleRuntimeBindings(key)) return process.env[key];
   const secrets = await loadSecrets();
   return secrets[key] ?? process.env[key];
 }
@@ -162,15 +168,15 @@ export async function getSecret(key: string): Promise<string | undefined> {
 export async function getSecrets<K extends string>(
   keys: K[],
 ): Promise<Record<K, string | undefined>> {
-  const secrets = await loadSecrets();
+  const secrets = keys.some(key => !usesGoogleRuntimeBindings(key)) ? await loadSecrets() : {};
   const result = {} as Record<K, string | undefined>;
-  for (const key of keys) result[key] = secrets[key] ?? process.env[key];
+  for (const key of keys) result[key] = usesGoogleRuntimeBindings(key) ? process.env[key] : secrets[key] ?? process.env[key];
   return result;
 }
 
 /** Synchronous read after hydration; process.env remains the final fallback. */
 export function getCachedSecret(key: string): string | undefined {
-  if (usesGoogleRuntimeBindings()) return process.env[key];
+  if (usesGoogleRuntimeBindings(key)) return process.env[key];
   return cache?.[key] ?? process.env[key];
 }
 
@@ -190,7 +196,7 @@ export async function refreshSecrets(): Promise<void> {
  * that can decrypt value_enc.
  */
 export async function getDecryptedPlatformSecret(key: string): Promise<string | undefined> {
-  if (usesGoogleRuntimeBindings()) return process.env[key];
+  if (usesGoogleRuntimeBindings(key)) return process.env[key];
   const client = getBootstrapClient();
   if (!client) return process.env[key];
 

@@ -117,7 +117,12 @@ export function renderConfiguration(records) {
 }
 
 export function parseContacts(output, endpointId) {
-  if (!ENDPOINT.test(endpointId) || !new RegExp(`Aor:\\s+${endpointId}\\s`).test(output)) {
+  // Asterisk 20's top-level AOR table prints at most 41 characters, while our
+  // identifiers contain 44. The CLI request uses the validated full identifier
+  // and Asterisk retrieves it by exact ID; only the display column is clipped.
+  const rows = [...output.matchAll(/^\s*Aor:\s+([A-Za-z0-9_-]+)\s+(\d+)\s*$/gm)];
+  if (!ENDPOINT.test(endpointId) || rows.length !== 1 ||
+      ![endpointId, endpointId.slice(0, 41)].includes(rows[0][1]) || rows[0][2] !== '1') {
     throw new ProvisioningError('asterisk_aor_unverified');
   }
   const contacts = output.split('\n').filter(line => line.trim().startsWith(`Contact:  ${endpointId}/`) ||

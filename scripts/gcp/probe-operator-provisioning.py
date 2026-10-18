@@ -7,6 +7,8 @@ import re
 import uuid
 import urllib.error
 import urllib.request
+import subprocess
+import sys
 
 SAFE_ERRORS = {
     'unauthorized', 'not_found', 'device_not_authorized', 'ownership_unavailable',
@@ -14,6 +16,8 @@ SAFE_ERRORS = {
     'asterisk_command_failed', 'asterisk_endpoint_unverified',
     'asterisk_aor_unverified', 'asterisk_dialplan_unverified',
     'device_authorization_unavailable', 'invalid_identity', 'invalid_json',
+    'asterisk_configuration_rejected', 'asterisk_rollback_failed',
+    'device_limit_reached', 'device_assignment_conflict',
 }
 REFERENCE = re.compile(r'projects/(elegant-racer-299721|484736877039)/secrets/[A-Za-z0-9_-]+/versions/([0-9]+|latest)')
 
@@ -39,6 +43,28 @@ def summarize(status, body):
         code = body.get('error')
         result['code'] = code if isinstance(code, str) and code in SAFE_ERRORS else 'unclassified_response'
     return result
+
+def exercise(body, token, send=request, run=subprocess.run):
+    """Exercise only the approved operator, then revoke the temporary credential."""
+    calls = run(['docker', 'exec', 'pbx_asterisk_1', 'asterisk', '-rx', 'core show channels count'],
+                capture_output=True, text=True, timeout=20)
+    if calls.returncode or not re.search(r'^0 active calls?\s*$', calls.stdout, re.M):
+        raise ValueError('active_call_or_unverified_state')
+    origin = 'https://phone.elevateforhumanity.org/internal/pbx/devices'
+    headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
+    output = {}
+    try:
+        status, result = send(origin, headers, body)
+        output['create'] = summarize(status, result)
+        # Never print or save the SIP password returned by a successful create.
+        result = None
+    finally:
+        # Revoke even after a timeout: the server may have applied the request.
+        status, result = send(origin + '/revoke', headers, body)
+        output['cleanup'] = {'httpStatus': status, 'revoked': status == 200 and result.get('revoked') is True}
+        if not output['cleanup']['revoked']:
+            raise ValueError('temporary_device_cleanup_unverified')
+    return output
 
 def main():
     values = {}
@@ -68,6 +94,9 @@ def main():
     status, rows = request(values['SUPABASE_URL'].rstrip('/') + '/rest/v1/communication_extensions?select=id,profile_id,webrtc_provider,communication_workspaces!inner(phone_system_id)&extension=eq.0&enabled=eq.true&communication_workspaces.phone_system_id=eq.' + system, headers)
     if status != 200 or not isinstance(rows, list) or len(rows) != 1 or rows[0].get('webrtc_provider') != 'asterisk':
         raise ValueError('operator_assignment_unverified')
+    if '--exercise' in sys.argv and (rows[0]['id'] != 'ea5439e0-014b-4020-8e25-e305f20c53d6' or
+            rows[0]['profile_id'] != '964dc85a-bce8-4e67-92eb-198ffafb2384'):
+        raise ValueError('approved_operator_changed')
     # A fresh diagnostic identity has never been provisioned. The /status action
     # validates ownership without creating a device, SIP credential or endpoint.
     body = {'profileId': rows[0]['profile_id'], 'extensionId': rows[0]['id'], 'deviceId': 'asterisk_probe_' + uuid.uuid4().hex}
@@ -78,11 +107,23 @@ def main():
             output[name] = summarize(status, result)
         except Exception:
             output[name] = {'code': 'transport_unavailable'}
-    return {'operatorProvisioningProbe': output, 'credentialsCreated': False, 'carrierRoutingChanged': False}
+    report = {'operatorProvisioningProbe': output, 'credentialsCreated': False, 'carrierRoutingChanged': False}
+    if '--exercise' in sys.argv:
+        report['operatorDeviceExercise'] = exercise(body, token)
+        report['credentialsCreated'] = report['operatorDeviceExercise']['create']['httpStatus'] == 200
+        report['temporaryCredentialsRevoked'] = True
+        if report['operatorDeviceExercise']['create']['httpStatus'] != 200:
+            report['result'] = 'FAIL'
+        else:
+            report['result'] = 'PASS'
+    return report
 
 if __name__ == '__main__':
     try:
-        print(json.dumps(main()))
+        report = main()
+        print(json.dumps(report))
+        if report.get('result') == 'FAIL':
+            raise SystemExit(1)
     except Exception:
-        print(json.dumps({'operatorProvisioningProbe': {'code': 'probe_unavailable'}, 'credentialsCreated': False, 'carrierRoutingChanged': False}))
+        print(json.dumps({'operatorProvisioningProbe': {'code': 'probe_unavailable'}, 'credentialsCreated': 'UNKNOWN' if '--exercise' in sys.argv else False, 'cleanupVerified': False, 'carrierRoutingChanged': False}))
         raise SystemExit(1)

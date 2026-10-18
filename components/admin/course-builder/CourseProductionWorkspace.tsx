@@ -8,7 +8,7 @@ export default function CourseProductionWorkspace({
   initialTab,
 }: {
   initialCourseId: string;
-  initialTab: 'courses' | 'ultimate' | 'registry';
+  initialTab: 'courses' | 'ultimate' | 'registry' | 'media';
 }) {
   return (
     <div
@@ -19,6 +19,7 @@ export default function CourseProductionWorkspace({
         initialCourseId={initialCourseId}
         initialTab={initialTab}
         initialBrowserTarget="https://elements.envato.com"
+        syncLocationWithUrl
         embedded
       />
     </div>

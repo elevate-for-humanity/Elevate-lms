@@ -10,6 +10,8 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   className?: string;
+  panelPosition?: 'start' | 'end';
+  initialPanelSize?: number;
 }
 
 /** Keeps both workspaces mounted while resizing, hiding, or expanding a panel. */
@@ -20,11 +22,13 @@ export function ResizableWorkspace({
   open,
   onOpenChange,
   className = '',
+  panelPosition = 'end',
+  initialPanelSize = 45,
 }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const panelId = useId();
   const body = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(45);
+  const [width, setWidth] = useState(Math.max(25, Math.min(75, initialPanelSize)));
   const [height, setHeight] = useState(45);
   const [stacked, setStacked] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -65,7 +69,10 @@ export function ResizableWorkspace({
   const full = open && expanded;
 
   return (
-    <div ref={root} className={`${styles.root} ${className}`}>
+    <div
+      ref={root}
+      className={`${styles.root} ${open && expanded ? styles.fullScreen : ''} ${className}`}
+    >
       <div className={styles.toolbar}>
         <span className={styles.title}>{title}</span>
         {open ? (
@@ -110,7 +117,7 @@ export function ResizableWorkspace({
       </div>
       <div
         ref={body}
-        className={`${styles.body} ${open ? styles.open : ''} ${full ? styles.expanded : ''}`}
+        className={`${styles.body} ${panelPosition === 'start' ? styles.panelStart : ''} ${open ? styles.open : ''} ${full ? styles.expanded : ''}`}
         style={{ '--panel-width': `${width}%`, '--panel-height': `${height}%` } as CSSProperties}
       >
         <div className={styles.primary} hidden={full}>
@@ -136,7 +143,7 @@ export function ResizableWorkspace({
                   : 0;
               if (amount) {
                 event.preventDefault();
-                resize(amount);
+                resize(panelPosition === 'start' ? -amount : amount);
               }
               if (event.key === 'Home' || event.key === 'End') {
                 event.preventDefault();
@@ -156,7 +163,14 @@ export function ResizableWorkspace({
               const rect = body.current.getBoundingClientRect();
               const size = stacked ? rect.height : rect.width;
               if (!size) return;
-              const remaining = stacked ? rect.bottom - event.clientY : rect.right - event.clientX;
+              const remaining =
+                panelPosition === 'start'
+                  ? stacked
+                    ? event.clientY - rect.top
+                    : event.clientX - rect.left
+                  : stacked
+                    ? rect.bottom - event.clientY
+                    : rect.right - event.clientX;
               const percentage = Math.max(25, Math.min(75, Math.round((remaining / size) * 100)));
               if (stacked) setHeight(percentage);
               else setWidth(percentage);

@@ -51,3 +51,17 @@ describe('Admin saved preview delivery',()=>{
     expect(adminPreviewPlaybackUrl(buildId,lessonId,expired)).not.toBe(adminPreviewPlaybackUrl(buildId,lessonId,expired.replace('film.mp4','new-film.mp4')));
   });
 });
+it('pins preview playback to the displayed immutable artifact version and scopes it to the selected build and lesson',async()=>{
+ mocks.auth.mockResolvedValue({id:'admin'});mocks.sign.mockResolvedValue('https://media.example/version-signed');
+ const reads:unknown[]=[];
+ mocks.db.mockResolvedValue({from:(table:string)=>{
+  const q={select:()=>q,eq:(...args:unknown[])=>{reads.push([table,...args]);return q;},maybeSingle:async()=>({data:{id:lessonId,artifacts:{}},error:null}),single:async()=>({data:table==='ultimate_artifacts'?{id:'film'}:{content:{render:{videoUrl:expired}}},error:null})};return q;
+ }});
+ const req=request();req.nextUrl.searchParams.set('artifactVersionId',lessonId);
+ const response=await GET(req);expect(response.status).toBe(307);
+ expect(reads).toContainEqual(['ultimate_artifacts','build_id',buildId]);
+ expect(reads).toContainEqual(['ultimate_artifacts','lesson_build_id',lessonId]);
+ expect(reads).toContainEqual(['ultimate_artifact_versions','artifact_id','film']);
+ expect(reads).toContainEqual(['ultimate_artifact_versions','id',lessonId]);
+ expect(mocks.sign).toHaveBeenCalledWith(expect.anything(),expired);
+});

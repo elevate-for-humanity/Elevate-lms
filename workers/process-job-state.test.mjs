@@ -28,10 +28,10 @@ function scenario(payload, completed = true, options = {}) {
     async waitForDependency() { events.push('dependency'); }
   }
   const runtime = { persistence: { updateBuild: async value => events.push(value) }, artifacts: {} };
-  const names = ['createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
-  const values = [createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class {}, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
+  const names = ['recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
+  const values = [async()=>{},createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class {}, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
   const worker = new Function(...names, 'liveCheckpointRepairReader', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader);
-  return { events, run: () => worker(db, 'owner') };
+  return { events, build, run: () => worker(db, 'owner') };
 }
 
 test('a successful targeted lesson clears course running state before releasing its job', async () => {
@@ -58,4 +58,14 @@ test('missing Google permission waits for a dependency without consuming repair 
 test('a media task that never returns loses its lease without completing or changing the job',async()=>{
  const s=scenario({acceptance:true},false,{leaseFactory:(id,options)=>createLeaseDeadline(id,{...options,leaseMs:10}),runCourse:()=>new Promise(()=>{})});
  const result=await s.run();assert.equal(result.completed,false);assert.match(result.error,/LEASE_LOST/);assert.deepEqual(s.events,[]);
+});
+
+test('an explicit pause stops before the next checkpoint without completing or failing saved work',async()=>{
+ let s;
+ s=scenario({acceptance:true},false,{runCourse:async plan=>{
+  s.build.profile.ownerPaused=true;
+  await plan.beforeCheckpoint('storyboard');
+  throw new Error('Paused checkpoint must not execute');
+ }});
+ const result=await s.run();assert.equal(result.ownerPaused,true);assert.deepEqual(s.events,['dependency']);
 });

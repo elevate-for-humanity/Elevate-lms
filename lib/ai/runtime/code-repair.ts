@@ -88,7 +88,7 @@ export async function reportParisRepairFailure(id:string,runId:number){
  if(data?.workflow_run_id!==runId)return;
  if(['patching','validating'].includes(data.status))await update(id,{status:'blocked',error_code:'PATCH_OR_VALIDATION_FAILED_SEE_WORKFLOW'});
 }
-export async function tickParisCodeRepairs(){
+export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workflowOwnedDispatch?:boolean}={}){
  const db=await requireAdminClient();
  const {data:policy,error:policyError}=await db.from('paris_autopilot_policy').select('*').eq('id',true).maybeSingle();
  if(policyError)throw policyError;
@@ -100,6 +100,13 @@ export async function tickParisCodeRepairs(){
  if(blocked.error)throw blocked.error;
  for(const repair of blocked.data??[]){
   if(!canRetryRepair(repair))continue;
+  if (!repair.candidate?.branch?.sha) {
+   // A dispatch failure has no patch or workflow run. Retry only the bounded
+   // dispatch, without inventing evidence or treating it as code validation.
+   const retry=await db.from('paris_code_repairs').update({status:'queued',error_code:null,attempt_history:[...(repair.attempt_history??[]),{error:repair.error_code,at:repair.updated_at}],updated_at:new Date().toISOString()}).eq('id',repair.id).eq('status','blocked').eq('attempt_count',repair.attempt_count);
+   if(retry.error)throw retry.error;
+   continue;
+  }
   const comparison=await gh(`/compare/${repair.candidate.base_sha}...${repair.candidate.branch.sha}`);
   const jobs=await gh(`/actions/runs/${repair.workflow_run_id}/jobs?per_page=100`);
   const failed=(jobs.jobs??[]).filter((j:any)=>j.conclusion==='failure').map((j:any)=>({job:j.name,steps:(j.steps??[]).filter((s:any)=>s.conclusion==='failure').map((s:any)=>s.name)}));
@@ -174,6 +181,7 @@ export async function tickParisCodeRepairs(){
  if(pending.error)throw pending.error;if(!pending.data)return {enabled:true,dispatched:0};
  const claim=await db.from('paris_code_repairs').update({status:'dispatched',attempt_count:pending.data.attempt_count+1,dispatched_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',pending.data.id).eq('status','queued').eq('attempt_count',pending.data.attempt_count).select('id').maybeSingle();
  if(claim.error)throw claim.error;if(!claim.data)return {enabled:true,dispatched:0};
+ if(workflowOwnedDispatch)return {enabled:true,dispatched:0,dispatchRequired:true,repairId:claim.data.id};
  try{await gh(`/actions/workflows/${REPAIR_WORKFLOW}/dispatches`,{method:'POST',body:JSON.stringify({ref:'main',inputs:{repair_id:claim.data.id}})});}
  catch(error){await update(claim.data.id,{status:'blocked',error_code:'REPAIR_DISPATCH_FAILED'});throw error;}
  return {enabled:true,dispatched:1,repairId:claim.data.id};

@@ -2,7 +2,7 @@ name: Repair and exercise approved operator device creation
 on:
   workflow_dispatch:
   pull_request:
-    paths: ['infra/pbx/provisioner/**', 'scripts/gcp/*provisioner-reload*', 'scripts/gcp/probe-operator-provisioning.py', 'scripts/gcp/test-operator-provisioning.py', '.github/workflows/exercise-owned-pbx-device.yml']
+    paths: ['infra/pbx/provisioner/**', 'scripts/gcp/*provisioner-reload*', 'scripts/gcp/*pwa-config-includes*', 'scripts/gcp/probe-operator-provisioning.py', 'scripts/gcp/test-operator-provisioning.py', '.github/workflows/exercise-owned-pbx-device.yml']
   push:
     branches: [main]
     paths: ['.github/workflows/exercise-owned-pbx-device.yml', 'infra/pbx/provisioner/server.mjs', 'scripts/gcp/repair-pbx-provisioner-reload.py']
@@ -24,6 +24,7 @@ jobs:
         with: {node-version: '22'}
       - run: node --test infra/pbx/provisioner/server.test.mjs
       - run: python3 scripts/gcp/test-provisioner-reload-repair.py
+      - run: python3 scripts/gcp/test-pwa-config-includes.py
       - run: python3 scripts/gcp/test-operator-provisioning.py
   dispatch:
     if: github.event_name == 'push'
@@ -84,6 +85,12 @@ jobs:
           gcloud compute scp infra/pbx/provisioner/server.mjs "elevate-pbx:/tmp/elevate-provisioner-$GITHUB_SHA.mjs" --project=elegant-racer-299721 --zone=us-central1-a --quiet
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
             --command="sudo python3 - /tmp/elevate-provisioner-$GITHUB_SHA.mjs $GITHUB_SHA" < scripts/gcp/repair-pbx-provisioner-reload.py
+      - name: Load the approved generated PWA files in the existing Asterisk configuration
+        run: |
+          set -euo pipefail
+          python3 scripts/gcp/test-pwa-config-includes.py
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
+            --command="sudo python3 - $GITHUB_SHA" < scripts/gcp/repair-pwa-config-includes.py
       - name: Verify authenticated provisioning recovered before creating a device
         run: |
           set -euo pipefail

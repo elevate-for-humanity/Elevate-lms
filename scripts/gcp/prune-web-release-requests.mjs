@@ -47,7 +47,7 @@ export async function pruneWebReleaseRequests({api, repository, execute=false}) 
       const jobs=await api(endpoint+'/jobs?per_page=100');
       if(!Array.isArray(jobs.jobs)||jobs.total_count>100)throw Error('RELEASE_JOB_INVENTORY_UNAVAILABLE');
       // A started deployment must finish its own acceptance/rollback sequence.
-      if(jobs.jobs.some(j=>j.status==='in_progress' || (!preparationJobs.has(j.name) && j.started_at)))continue;
+      if(jobs.jobs.some(j=>j.status==='in_progress' || (!preparationJobs.has(j.name) && (j.status==='completed' && j.conclusion!=='skipped' || j.steps?.some(step=>step.status==='in_progress'||step.status==='completed')))))continue;
       const beforeCancel=await api(endpoint);
       if(!waiting.has(beforeCancel.status)||beforeCancel.id!==run.id)continue;
       if(execute)await api(endpoint+'/cancel','POST');

@@ -76,7 +76,7 @@ function authorized(given,expected){
   const a=Buffer.from(given.slice(7)),b=Buffer.from(expected);
   return a.length===b.length&&timingSafeEqual(a,b);
 }
-export function makeTurnHandler({stt=recognize,llm=converse,tts=synthesize,token=process.env.PARIS_TURN_TOKEN}={}){
+export function makeTurnHandler({stt=recognize,llm=converse,tts=synthesize,token=process.env.PARIS_TURN_TOKEN,greeting=process.env.PARIS_GREETING}={}){
   if(!token || token.length<32)throw Error('PARIS_TURN_TOKEN_MISSING');
   return async(req,res)=>{
     const fail=(code,status)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify({error:code}));};
@@ -88,15 +88,30 @@ export function makeTurnHandler({stt=recognize,llm=converse,tts=synthesize,token
       const body=JSON.parse(Buffer.concat(chunks).toString());
       if(!/^[a-f0-9]{24}$/.test(body.sessionId||'')||!Number.isSafeInteger(body.sequence)||body.sequence<0||body.encoding!=='PCMU'||body.sampleRate!==8000) return fail('INVALID_TURN',400);
       if(typeof body.callId!=='string' || !/^[A-Za-z0-9._:-]{1,128}$/.test(body.callId))return fail('INVALID_CALL',400);
-      if(typeof body.audioBase64!=='string' || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(body.audioBase64))return fail('INVALID_AUDIO',400);
-      const audio=Buffer.from(body.audioBase64,'base64');
-      if(audio.length<160||audio.length>100000||audio.length%160) return fail('INVALID_AUDIO',400);
+      const opening=body.event==='greeting';
+      if(body.event!==undefined && !opening)return fail('INVALID_EVENT',400);
+      if(opening){
+        if(body.sequence!==0 || body.audioBase64!==undefined)return fail('INVALID_GREETING',400);
+        if(typeof greeting!=='string' || !greeting.trim() || greeting.length>1200)return fail('GREETING_NOT_CONFIGURED',503);
+      }else{
+        if(typeof body.audioBase64!=='string' || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(body.audioBase64))return fail('INVALID_AUDIO',400);
+        const audio=Buffer.from(body.audioBase64,'base64');
+        if(audio.length<160||audio.length>100000||audio.length%160) return fail('INVALID_AUDIO',400);
+      }
       const key=body.sessionId;
       const prior=sessions.get(key)||{history:[],sequence:-1,locked:false,updated:Date.now(),callId:body.callId};
       if(prior.callId!==body.callId)return fail('CALL_SESSION_MISMATCH',409);
       if(prior.locked||body.sequence!==prior.sequence+1)return fail('SEQUENCE_CONFLICT',409);
       prior.locked=true;sessions.set(key,prior);
       try{
+        if(opening){
+          const audioReply=await tts(greeting.trim());
+          prior.history=[{role:'model',text:greeting.trim()}];
+          prior.sequence=body.sequence;prior.updated=Date.now();
+          res.writeHead(200,{'Content-Type':'application/json','Cache-Control':'no-store'});
+          res.end(JSON.stringify({replyAudioUlawBase64:audioReply,endCall:false}));
+          return;
+        }
         const words=await stt(body.audioBase64);
         if(!words)return fail('NO_SPEECH',422);
         const history=[...prior.history,{role:'user',text:words}].slice(-12);

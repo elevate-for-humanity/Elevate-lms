@@ -1,6 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parseRtp,rtp,isSpeech,routeOperator,isCallerStart,createExternalChannel,releaseCaller,handleDtmf} from './ari-media.mjs';
+import {parseRtp,rtp,isSpeech,routeOperator,isCallerStart,createExternalChannel,releaseCaller,handleDtmf,greet} from './ari-media.mjs';
+
+test('configured greeting starts once on a media peer without caller speech',async()=>{
+ const session={callId:'call-greeting',id:'c'.repeat(24),turn:0,bridgeReady:true,remote:{address:'127.0.0.1',port:12345}};
+ const requests=[],played=[];let release;
+ const pending=new Promise(resolve=>{release=resolve;});
+ const dependencies={request:async(url,body)=>{requests.push(body);await pending;return {replyAudioUlawBase64:'spoken-audio'};},play:async(s,audio)=>played.push(audio),finish:async()=>assert.fail('unexpected fallback')};
+ const first=greet(session,dependencies);await greet(session,dependencies);
+ assert.equal(requests.length,1);assert.equal(session.busy,true);
+ assert.deepEqual(requests[0],{callId:'call-greeting',sessionId:'c'.repeat(24),sequence:0,event:'greeting',encoding:'PCMU',sampleRate:8000});
+ assert.equal('audioBase64' in requests[0],false);
+ release();await first;assert.deepEqual(played,['spoken-audio']);assert.equal(session.busy,false);
+});
+test('greeting waits for bridge and media readiness and falls back on failure',async()=>{
+ const calls=[];const session={callId:'call-no-peer',id:'d'.repeat(24),turn:0};
+ const dependencies={request:async()=>{throw Error('VOICE_BACKEND_UNAVAILABLE');},play:async()=>assert.fail('must not play'),finish:async(s,why)=>calls.push(why)};
+ await greet(session,dependencies);assert.equal(session.greetingStarted,undefined);
+ session.bridgeReady=true;session.remote={address:'127.0.0.1',port:12345};
+ await greet(session,dependencies);assert.deepEqual(calls,['continue']);
+});
 
 test('keypad zero transfers an owned caller once, including during a voice turn',async()=>{
  const session={callId:'call-1',closed:false,busy:true,playing:true,frames:[Buffer.alloc(160)],quiet:2,heard:true};

@@ -14,3 +14,26 @@ test('only explicit caller speech requests operator transfer',async()=>{
   assert.equal(callerRouteIntent('How much is the barber course?'),null);
   assert.equal(callerRouteIntent('Transfer 18005551212'),null);
 });
+
+async function send(handler,payload){
+ const res={writeHead(code){this.code=code;},end(body){this.body=JSON.parse(body);}};
+ await handler({method:'POST',url:'/internal/paris/turn',headers:{authorization:'Bearer '+'x'.repeat(40)},async *[Symbol.asyncIterator](){yield Buffer.from(JSON.stringify(payload));}},res);
+ return res;
+}
+test('opening synthesizes configured business greeting without invented caller audio',async()=>{
+ const spoken=[];const calls=[];const handler=makeTurnHandler({token:'x'.repeat(40),greeting:'Approved business greeting.',
+  stt:async()=>{calls.push('stt');return 'What programs?';},llm:async()=>{calls.push('llm');return 'Admissions can confirm.';},tts:async text=>{spoken.push(text);return Buffer.alloc(160,255).toString('base64');}});
+ const payload={callId:'greeting-call',sessionId:'e'.repeat(24),sequence:0,event:'greeting',encoding:'PCMU',sampleRate:8000};
+ assert.equal((await send(handler,payload)).code,200);assert.deepEqual(calls,[]);assert.deepEqual(spoken,['Approved business greeting.']);
+ assert.equal((await send(handler,payload)).code,409);
+ const {event,...followup}=payload;
+ assert.equal((await send(handler,{...followup,sequence:1,audioBase64:Buffer.alloc(160,255).toString('base64')})).code,200);
+ assert.deepEqual(calls,['stt','llm']);
+});
+test('opening requires configured greeting and rejects synthetic audio or unknown events',async()=>{
+ const handler=makeTurnHandler({token:'x'.repeat(40),greeting:'',tts:async()=>assert.fail('must not synthesize')});
+ const payload={callId:'missing-greeting',sessionId:'f'.repeat(24),sequence:0,event:'greeting',encoding:'PCMU',sampleRate:8000};
+ const missing=await send(handler,payload);assert.equal(missing.code,503);assert.equal(missing.body.error,'GREETING_NOT_CONFIGURED');
+ assert.equal((await send(handler,{...payload,audioBase64:'AAAA'})).code,400);
+ assert.equal((await send(handler,{...payload,event:'external-transfer'})).code,400);
+});

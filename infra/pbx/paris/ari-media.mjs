@@ -137,7 +137,7 @@ function rtp(payload,session){
 }
 export async function speak(session,encoded,{clock=()=>performance.now(),wait=sleep}={}){
   const bytes=Buffer.from(encoded,'base64');
-  if(bytes.length<FRAME || bytes.length>160000 || bytes.length%FRAME!==0)throw Error('INVALID_ULAW_AUDIO');
+  if(bytes.length<FRAME || bytes.length>640000 || bytes.length%FRAME!==0)throw Error('INVALID_ULAW_AUDIO');
   if(!session.remote)throw Error('NO_RTP_PEER');
   session.playing=true;
   const startedAt=clock();
@@ -151,6 +151,19 @@ export async function speak(session,encoded,{clock=()=>performance.now(),wait=sl
       if(delay>0)await wait(delay);
     }
   }finally{session.playing=false;}
+}
+export async function greet(session,{request=privateTurn,play=speak,finish=end}={}){
+  if(session.closed || session.transferring || session.greetingStarted || !session.bridgeReady || !session.remote)return;
+  session.greetingStarted=true;session.busy=true;
+  clearTimeout(session.greetingDeadline);
+  try{
+    const body=await request(config.adapter,{callId:session.callId,sessionId:session.id,sequence:session.turn++,event:'greeting',encoding:'PCMU',sampleRate:8000},config.token);
+    if(session.closed || session.transferring)return;
+    if(typeof body.replyAudioUlawBase64!=='string')throw Error('PARIS_GREETING_AUDIO_MISSING');
+    await play(session,body.replyAudioUlawBase64);
+  }catch{
+    if(!session.closed && !session.transferring)await finish(session,'continue');
+  }finally{session.busy=false;}
 }
 async function turn(session){
   if(session.closed || session.transferring || session.busy || session.playing)return;
@@ -185,6 +198,7 @@ async function cleanupMedia(s){
 async function end(s,disposition='released'){
   if(s.closed)return;s.closed=true;sessions.delete(s.callId);
   clearTimeout(s.deadline);
+  clearTimeout(s.greetingDeadline);
   try{s.socket.close();}catch{ /* Binding may have failed before cleanup. */ }
   await cleanupMedia(s);
   if(disposition!=='released'){
@@ -211,12 +225,14 @@ async function begin(call){
     if(session.closed)return;
     await new Promise((resolve,reject)=>{socket.once('error',reject);socket.bind(0,config.bind,resolve);});
     socket.on('message',(packet,rinfo)=>{
-      if(session.closed || session.transferring || session.playing || session.busy)return;
+      if(session.closed || session.transferring)return;
       // Only accept packets from the established Asterisk loopback interface.
       if(rinfo.address!=='127.0.0.1')return;
       const frame=parseRtp(packet);if(!frame)return;
       if(!session.remote)session.remote={address:rinfo.address,port:rinfo.port};
       if(rinfo.port!==session.remote.port)return;
+      if(!session.greetingStarted){void greet(session);return;}
+      if(session.playing || session.busy)return;
       const speech=isSpeech(frame.payload);
       if(speech)session.heard=true;
       if(!session.heard)return;
@@ -231,6 +247,13 @@ async function begin(call){
     const external=await createExternalChannel(session,host);
     if(session.closed){await cleanupMedia(session);return;}
     await ari('/bridges/'+encode(bridge.id)+'/addChannel?channel='+encode(callId+','+external.id),'POST');
+    if(session.closed){await cleanupMedia(session);return;}
+    session.bridgeReady=true;
+    // RTP silence is enough to establish the peer; never require caller speech
+    // before the configured greeting. Bound a missing media peer to fallback.
+    session.greetingDeadline=setTimeout(()=>void end(session,'continue'),10000);
+    session.greetingDeadline.unref();
+    if(session.remote)void greet(session);
   }catch(e){
     process.stderr.write('PARIS_BRIDGE_FAILED\n');
     await end(session,'continue');

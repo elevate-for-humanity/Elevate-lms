@@ -47,7 +47,7 @@ export async function auditMessaging(bindings, request=fetch) {
     assignedMessagingServices:matches,verifiedCampaign:matches.some(s=>s.campaignStatuses.includes('VERIFIED')),messagesSent:0,configurationChanged:false};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
-  const config=loadGoogleConfig('admin');
-  verifiedTwilioBindings(config).then(bindings=>auditMessaging(bindings)).then(result=>console.log(JSON.stringify(result)))
+  Promise.resolve().then(()=>verifiedTwilioBindings(loadGoogleConfig('admin')))
+    .then(bindings=>auditMessaging(bindings)).then(result=>console.log(JSON.stringify(result)))
     .catch(error=>{console.error(/^TWILIO_AUDIT_[A-Z_0-9]+$/.test(error.message)?error.message:'TWILIO_MESSAGING_AUDIT_BLOCKED');process.exitCode=1;});
 }

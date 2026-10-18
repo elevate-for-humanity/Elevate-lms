@@ -39,11 +39,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     && rm -rf /var/lib/apt/lists/* \
     && useradd --system --uid 10001 --create-home model
 COPY --from=build /src/build/bin/llama-server /opt/llama/llama-server
-COPY --from=build /output/lib/ /opt/llama/lib/
+COPY --from=build /output/lib/ /opt/llama/
 COPY --from=build /output/elevate/ /models/elevate/
 COPY services/llm-cpu-worker/entrypoint.sh /entrypoint.sh
 RUN chmod 555 /entrypoint.sh /opt/llama/llama-server && chmod -R a+rX /models/elevate
-ENV LD_LIBRARY_PATH=/opt/llama/lib HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
+ENV LD_LIBRARY_PATH=/opt/llama HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
     OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1
 USER 10001
 EXPOSE 8080

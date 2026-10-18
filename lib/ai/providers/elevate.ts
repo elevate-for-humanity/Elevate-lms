@@ -1,6 +1,7 @@
 import type { AIProvider, ChatCompletionOptions, ChatCompletionResult } from '../types';
 import { normalizeStructuredOutput } from './structured-output';
 import { requestsJson } from './structured-output';
+import { ownedModelHeaders } from './google-runtime-auth.mjs';
 
 const DEFAULT_TIMEOUT_MS = 120_000;
 const DEFAULT_CONTEXT_TOKENS = 8192;
@@ -109,7 +110,7 @@ export class ElevateProvider implements AIProvider {
     if (!base || !token) throw new Error('Elevate LLM worker not configured (ELEVATE_LLM_URL / ELEVATE_LLM_SECRET)');
     const response = await fetch(`${base}/v1/chat/completions`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      headers: await ownedModelHeaders(base,token,{signal:options.signal}),
       body: JSON.stringify({
         model: SERVED_MODEL,
         messages: options.messages,
@@ -172,10 +173,7 @@ export class ElevateProvider implements AIProvider {
 
     const response = await fetch(`${base}/v1/chat/completions`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: await ownedModelHeaders(base,token,{signal:options.signal}),
       body: JSON.stringify({
         model: SERVED_MODEL,
         messages: options.messages,

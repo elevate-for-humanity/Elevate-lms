@@ -1,0 +1,50 @@
+FROM ubuntu:24.04 AS build
+ENV DEBIAN_FRONTEND=noninteractive \
+    LLAMA_CPP_REV=5aeac37a35b44fde4bdffaec9159f2fcb253b622
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates git gcc-14 g++-14 build-essential cmake libssl-dev python3 python3-venv \
+    && rm -rf /var/lib/apt/lists/*
+ENV CC=gcc-14 CXX=g++-14
+RUN git init /src && cd /src && git remote add origin https://github.com/ggml-org/llama.cpp.git \
+    && git fetch --depth=1 origin "$LLAMA_CPP_REV" && git checkout --detach FETCH_HEAD \
+    && test "$(git rev-parse HEAD)" = "$LLAMA_CPP_REV"
+WORKDIR /src
+RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+    -DGGML_NATIVE=OFF -DGGML_CPU_ALL_VARIANTS=ON -DGGML_BACKEND_DL=ON \
+    -DGGML_CUDA=OFF -DGGML_VULKAN=OFF -DGGML_METAL=OFF -DGGML_RPC=OFF \
+    -DLLAMA_SUBPROCESS=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_APP=OFF \
+    -DLLAMA_BUILD_UI=OFF -DLLAMA_USE_PREBUILT_UI=OFF \
+    && cmake --build build --target llama-server llama-quantize -j2 \
+    && mkdir -p /output/lib \
+    && find build -name '*.so*' -exec cp -P {} /output/lib/ \;
+RUN python3 -m venv /venv \
+    && /venv/bin/pip install --no-cache-dir torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu \
+    && /venv/bin/pip install --no-cache-dir -r requirements/requirements-convert_hf_to_gguf.txt huggingface_hub==0.34.4 \
+    && /venv/bin/pip install --no-cache-dir ./gguf-py
+# Reuse the existing approved checkpoint downloader and its four-shard SHA checks.
+COPY services/llm-gpu-worker/bake_model.py /tmp/bake_model.py
+COPY services/llm-cpu-worker/finalize_model.py /tmp/finalize_model.py
+RUN /venv/bin/python /tmp/bake_model.py \
+    && mkdir -p /output/elevate \
+    && PYTHONPATH=/src/gguf-py /venv/bin/python convert_hf_to_gguf.py /models/elevate \
+       --outfile /output/model-f16.gguf --outtype f16 --use-temp-file \
+    && build/bin/llama-quantize /output/model-f16.gguf /output/elevate/model-q4_k_m.gguf Q4_K_M 2 \
+    && /venv/bin/python /tmp/finalize_model.py /output/elevate/model-q4_k_m.gguf \
+       /models/elevate/elevate-model-manifest.json "$LLAMA_CPP_REV" \
+    && cp /models/elevate/LICENSE /output/elevate/MODEL-LICENSE \
+    && cp /src/LICENSE /output/elevate/INFERENCE-LICENSE
+
+FROM ubuntu:24.04 AS runtime
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates libgomp1 libssl3t64 libstdc++6 \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --uid 10001 --create-home model
+COPY --from=build /src/build/bin/llama-server /opt/llama/llama-server
+COPY --from=build /output/lib/ /opt/llama/lib/
+COPY --from=build /output/elevate/ /models/elevate/
+COPY services/llm-cpu-worker/entrypoint.sh /entrypoint.sh
+RUN chmod 555 /entrypoint.sh /opt/llama/llama-server && chmod -R a+rX /models/elevate
+ENV LD_LIBRARY_PATH=/opt/llama/lib HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
+    OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1
+USER 10001
+EXPOSE 8080
+ENTRYPOINT ["/entrypoint.sh"]

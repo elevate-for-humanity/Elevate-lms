@@ -29,7 +29,21 @@ async function advance(ms: number) { await act(async () => { vi.advanceTimersByT
 
 describe('automatic page narration', () => {
   beforeEach(() => { vi.useFakeTimers(); vi.clearAllMocks(); localStorage.clear(); visible = 'a'; voice.play.mockResolvedValue(true); voice.prepare.mockResolvedValue(true); });
-  afterEach(() => { cleanup(); document.querySelectorAll('main').forEach((node) => node.remove()); vi.useRealTimers(); });
+  afterEach(() => { cleanup(); document.querySelectorAll('main').forEach((node) => node.remove()); vi.restoreAllMocks(); vi.useRealTimers(); });
+  it('keeps the page and stop/replay controls usable when browser storage is blocked', async () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new DOMException('Blocked', 'SecurityError'); });
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new DOMException('Blocked', 'SecurityError'); });
+    setup(); await advance(1400);
+    expect(voice.play).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Stop page narration' }));
+    expect(screen.getByRole('button', { name: 'Play narration for this section' })).toHaveAttribute('aria-pressed', 'false');
+    const requests = voice.play.mock.calls.length;
+    visible = 'b'; fireEvent.scroll(window); await advance(3000);
+    expect(voice.play).toHaveBeenCalledTimes(requests);
+    fireEvent.click(screen.getByRole('button', { name: 'Play narration for this section' }));
+    await advance(1400);
+    expect(voice.play).toHaveBeenCalledTimes(requests + 1);
+  });
   it('discovers late streamed sections and does not restart for unrelated DOM changes', async () => {
     render(<ScrollNarrator />);
     expect(screen.queryByRole('button', { name: 'Stop page narration' })).not.toBeInTheDocument();

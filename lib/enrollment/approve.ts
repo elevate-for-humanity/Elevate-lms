@@ -353,7 +353,8 @@ export async function approveApplication(
       status: 'approved',
       user_id: userId,
       program_id: resolvedProgramId,
-      eligibility_status: 'verified',
+      // Admission grants access; eligibility is owned by its separate review.
+      // In particular, an audited payment-gate exception is not funding proof.
       updated_at: new Date().toISOString(),
     })
     .eq('id', applicationId);

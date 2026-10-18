@@ -1,0 +1,32 @@
+name: External compute contracts
+on:
+  pull_request:
+    paths:
+      - 'infra/modal/**'
+      - 'lib/compute/**'
+      - 'lib/ultimate-course-builder/worker/**'
+      - 'workers/*external-course-worker.mjs'
+      - 'scripts/compute/**'
+      - 'tests/compute/**'
+      - 'supabase/migrations/**external_course_compute.sql'
+      - '.github/workflows/external-compute-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: npm ci --prefix infra/modal --ignore-scripts --no-audit --no-fund
+      - run: npm test --prefix infra/modal
+      - run: python -m pip install -r infra/modal/requirements.txt
+      - run: python -m unittest discover -s infra/modal -p '*_test.py'
+      - run: node --test lib/ultimate-course-builder/worker/owner-preview-claim.test.mjs workers/ultimate-runtime-guards.test.mjs workers/worker-loop.test.mjs workers/process-job-state.test.mjs workers/ultimate-release-media.test.mjs
+      - run: node scripts/lint-migrations.cjs
+      - run: node scripts/security/credential-scan.mjs

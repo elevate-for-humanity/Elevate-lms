@@ -45,6 +45,21 @@ jobs:
         with:
           skip_install: true
       - run: node scripts/gcp/verify-sdk.mjs
+      - name: Read Admin worker launch failure codes without secrets
+        run: |
+          node --input-type=module <<'NODE'
+          import {google} from './scripts/gcp/runtime-config.mjs';
+          const filter='resource.type="cloud_run_revision" AND resource.labels.service_name="elevate-admin-migration" AND (jsonPayload.message="Direct Google course worker execution unavailable" OR jsonPayload.message="Course Builder worker launch failed through both authorized paths" OR textPayload:"Course Builder worker launch failed")';
+          const rows=JSON.parse(google(['logging','read',filter,'--project=elegant-racer-299721','--freshness=2h','--limit=30','--format=json']));
+          const code=value=>String(value??'').match(/GOOGLE_[A-Z0-9_]+|HTTP [0-9]{3}|token is not configured|operation was aborted|signal timed out|fetch failed/gi)?.join('; ') || 'unclassified';
+          for(const row of rows) {
+            let entry=row.jsonPayload;
+            if(!entry && row.textPayload)try{entry=JSON.parse(row.textPayload)}catch{}
+            const context=entry?.context??{};
+            console.log(JSON.stringify({timestamp:row.timestamp,revision:row.resource?.labels?.revision_name,message:entry?.message,google:code(context.google??context.reason),github:code(context.github)}));
+          }
+          console.log(JSON.stringify({adminLaunchLogCount:rows.length}));
+          NODE
       - name: Inspect existing execution without mutation
         env:
           COURSE_EXECUTION: ${{ inputs.execution }}

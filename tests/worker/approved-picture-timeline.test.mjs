@@ -49,3 +49,9 @@ test('speech recognition function-word variation requires a long otherwise ident
  for(const text of ['do not disinfect tools','complete 2000 hours','notify another supervisor immediately'])
   assert.throws(()=>quoteStartSeconds(text,[{text:'do disinfect tools complete 2500 hours notify the supervisor immediately',startSeconds:0,endSeconds:10}]),/NOT_ALIGNED/);
 });
+
+test('unique ordered speech cue survives a single ASR insertion without inventing timing',()=>{
+ const spoken=[{text:'Prepare the clean and safe station before serving clients',startSeconds:2,endSeconds:8}];
+ assert.equal(quoteStartSeconds('Prepare the clean safe station',spoken),2);
+ assert.throws(()=>quoteStartSeconds('Unrelated legal safety language',spoken),/PICTURE_CUE_NOT_ALIGNED_TO_SPEECH/);
+});

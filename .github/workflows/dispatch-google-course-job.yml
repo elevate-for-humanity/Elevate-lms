@@ -8,8 +8,8 @@ on:
     types: [completed]
   workflow_dispatch:
   schedule:
-    # Five-minute fallback (GitHub's minimum supported schedule) if the immediate dispatch is lost or delayed.
-    # Recovery kick: resume the existing Barber build after its validator deployment.
+    # Automatic five-minute recovery check runs the trusted dispatcher directly.
+    # Do not require a second workflow_dispatch event for scheduled recovery.
     - cron: '*/5 * * * *'
 permissions:
   contents: read
@@ -17,7 +17,7 @@ permissions:
   id-token: write
 jobs:
   request-dispatch:
-    if: github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    if: github.event_name == 'push' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-24.04
     steps:
       - name: Request Google-trusted recovery dispatch
@@ -25,7 +25,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/dispatch-google-course-job.yml/dispatches" -f ref=main
   dispatch:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
     concurrency:
       group: google-course-runtime-operations
       cancel-in-progress: false

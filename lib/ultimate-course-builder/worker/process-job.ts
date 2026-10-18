@@ -123,8 +123,20 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       }
       const currentCompetencyId = payload.competencyId ?? payload.repairCompetencyId ??
       storedProfile.competencies[Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0]?.id;
-    const profile = await materializeUltimateDraft(db, build.course_id,
+    const hydrated = await materializeUltimateDraft(db, build.course_id,
       await hydrateUltimateProfileSources(db, build.course_id, storedProfile), [currentCompetencyId]);
+    // Inherit the owner's approved production identity between lessons. Draft
+    // hydration can refresh competency content, but must not reset the saved
+    // reference presentation or lesson progression policy.
+    const inheritedKeys = [
+      'lessonPresentation', 'presentationContract', 'lessonCompletionPolicy',
+      'sourcePolicy', 'publicationPolicy',
+    ] as const;
+    const profile = { ...hydrated } as typeof hydrated & Record<string, any>;
+    for (const key of inheritedKeys) {
+      if ((storedProfile as any)?.[key] !== undefined)
+        profile[key] = (storedProfile as any)[key];
+    }
     if (
       JSON.stringify(profile) !== JSON.stringify(build.profile)
     ) {

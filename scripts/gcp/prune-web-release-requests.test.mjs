@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {pruneWebReleaseRequests,assertLatestWebReleaseRequest,WEB_RELEASE_WORKFLOWS} from './prune-web-release-requests.mjs';
+import {pruneWebReleaseRequests,assertLatestWebReleaseRequest,releaseApi,WEB_RELEASE_WORKFLOWS} from './prune-web-release-requests.mjs';
 const repository='elevate-for-humanity/Elevate-lms';
 const row=(id,status='pending',extra={})=>({id,run_number:id,event:'workflow_dispatch',head_branch:'main',status,...extra});
 function fixture({rows=[row(1),row(2)],current,started=false,invalid=false}={}) {
@@ -32,4 +32,17 @@ test('only the newest request for the selected app can start an expensive build'
  await assert.rejects(assertLatestWebReleaseRequest({...f,repository,workflow,runId:1}),/SUPERSEDED/);
  assert.equal((await assertLatestWebReleaseRequest({...f,repository,workflow,runId:2})).runId,2);
  assert.deepEqual(f.writes,[]);
+});
+test('large GitHub inventories are read without a subprocess output buffer',async()=>{
+ const payload={workflow_runs:[{...row(1),head_commit:{message:'x'.repeat(2_000_000)}}]};
+ const result=await releaseApi(`repos/${repository}/actions/workflows/deploy-admin.yml/runs`,'GET',{token:'test-token',request:async(url,options)=>{
+  assert.equal(new URL(url).hostname,'api.github.com');assert.equal(options.headers.Authorization,'Bearer test-token');return Response.json(payload);
+ }});
+ assert.equal(result.workflow_runs[0].head_commit.message.length,2_000_000);
+});
+test('GitHub failure, missing credentials and foreign API paths fail closed',async()=>{
+ await assert.rejects(releaseApi(`repos/${repository}/actions/runs/1`,'GET',{token:'test',request:async()=>new Response('unavailable',{status:503})}),/HTTP_503/);
+ await assert.rejects(releaseApi('repos/another/repository/actions/runs','GET',{token:'test'}),/NOT_AUTHORIZED/);
+ await assert.rejects(releaseApi(`repos/${repository}/actions/runs`,'GET',{token:''}),/AUTH_REQUIRED/);
+ for(const status of [202,204])assert.deepEqual(await releaseApi(`repos/${repository}/actions/runs/1/cancel`,'POST',{token:'test',request:async()=>new Response(null,{status})}),{});
 });

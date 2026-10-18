@@ -1,4 +1,3 @@
-import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 
 export const WEB_RELEASE_WORKFLOWS = [
@@ -7,6 +6,15 @@ export const WEB_RELEASE_WORKFLOWS = [
 ];
 const waiting = new Set(['queued', 'pending', 'requested', 'waiting']);
 const eligible = run => run.event === 'workflow_dispatch' && run.head_branch === 'main';
+
+export async function releaseApi(path,method='GET',{token=process.env.GH_TOKEN,request=fetch}={}) {
+  if(!token)throw Error('RELEASE_API_AUTH_REQUIRED');
+  if(!path.startsWith('repos/elevate-for-humanity/Elevate-lms/actions/')||!['GET','POST'].includes(method))throw Error('RELEASE_API_PATH_NOT_AUTHORIZED');
+  const response=await request('https://api.github.com/'+path,{method,headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},signal:AbortSignal.timeout(20000)});
+  if(!response.ok)throw Error('RELEASE_API_HTTP_'+response.status);
+  if(response.status===204 || (method==='POST' && response.status===202))return {};
+  return response.json();
+}
 
 export async function assertLatestWebReleaseRequest({api,repository,workflow,runId}) {
   if(repository!=='elevate-for-humanity/Elevate-lms'||!WEB_RELEASE_WORKFLOWS.includes(workflow))throw Error('RELEASE_REPOSITORY_NOT_AUTHORIZED');
@@ -49,10 +57,7 @@ export async function pruneWebReleaseRequests({api, repository, execute=false}) 
 }
 
 if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
-  const api=async(path,method='GET')=>{
-    const value=execFileSync('gh',['api','--method',method,path],{encoding:'utf8',timeout:20000,stdio:['ignore','pipe','pipe']}).trim();
-    return value?JSON.parse(value):{};
-  };
+  const api=(path,method='GET')=>releaseApi(path,method);
   const repository=process.env.GITHUB_REPOSITORY;
   const result=process.argv.includes('--assert-latest')
     ? await assertLatestWebReleaseRequest({api,repository,workflow:process.env.RELEASE_WORKFLOW,runId:process.env.GITHUB_RUN_ID})

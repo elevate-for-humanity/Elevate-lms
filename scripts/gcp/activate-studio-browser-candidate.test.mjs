@@ -52,18 +52,19 @@ function fixture(options = {}) {
       assert.equal(config.method, 'POST');
       assert.equal(candidate, false);
       recycled = true;
-      if (!options.recycleStuck) { sessions = 0; generation++; }
+      if (!options.recycleStuck) { sessions = options.fastReconnect ? 1 : 0; generation++; }
       payload = { status: 'queued' };
     } else throw Error('Unexpected request');
     return { status, ok: status >= 200 && status < 300, json: async () => payload };
   };
   const inventory = async () => {
     inventoryCount++;
-    if (inventoryCount > 1 && options.newSession) sessions = 1;
+    if (inventoryCount > 1 && options.newSession) sessions = options.newSessionCount ?? 1;
     const result = { commit: expectedSha, activeBrowserSessions: sessions,
       workspace: { files: 0, symlinks: 0 }, directChildShells: 0,
       directNonBrowserProcesses: 0, processInventoryReadable: true };
     if (options.files) result.workspace.files = 1;
+    if (options.newFile && inventoryCount > 1) result.workspace.files = 1;
     if (options.shells) result.directChildShells = 1;
     if (options.unknownProcess) result.directNonBrowserProcesses = 1;
     if (options.unreadable) result.processInventoryReadable = false;
@@ -112,13 +113,37 @@ test('never expands the approved four-session limit', async () => {
   await assert.rejects(activateStudioBrowserCandidate(f.args), /SOURCE_STATE_CHANGED/);
   assert.equal(f.state().recycled, false);
 });
-for (const option of ['newSession', 'recycleStuck']) {
-  test('does not switch traffic if sessions remain: ' + option, async () => {
+for (const option of ['newFile', 'recycleStuck']) {
+  test('does not switch traffic with unsafe post-recycle state: ' + option, async () => {
     const f = fixture({ [option]: true });
     await assert.rejects(activateStudioBrowserCandidate(f.args));
     assert.equal(f.writes().length, 0);
   });
 }
+test('approved automatic browser reconnects do not indefinitely block cutover', async () => {
+  const f = fixture({ newSession: true });
+  const result = await activateStudioBrowserCandidate(f.args);
+  assert.equal(result.sessionsClosed, 4);
+  assert.equal(result.reconnectedBrowserSessions, 1);
+  assert.equal(f.state().live, revision);
+});
+test('a reconnect before the first health poll still proves old-session retirement by generation', async () => {
+  const f = fixture({ fastReconnect: true });
+  const result = await activateStudioBrowserCandidate(f.args);
+  assert.equal(result.sessionsClosed, 4);
+  assert.equal(result.reconnectedBrowserSessions, 1);
+  assert.equal(f.state().live, revision);
+});
+test('automatic reconnects still require browser-session closure approval', async () => {
+  const f = fixture({ sessions: 0, newSession: true });
+  await assert.rejects(activateStudioBrowserCandidate({ ...f.args, closeSessions: false }), /REQUIRES_PRESERVATION/);
+  assert.equal(f.writes().length, 0);
+});
+test('automatic reconnects never expand the four-session approval', async () => {
+  const f = fixture({ newSession: true, newSessionCount: 5 });
+  await assert.rejects(activateStudioBrowserCandidate(f.args), /REQUIRES_PRESERVATION/);
+  assert.equal(f.writes().length, 0);
+});
 for (const option of ['publicFailure', 'cliTimeout']) {
   test('rolls back an unsuccessful activation: ' + option, async () => {
     const f = fixture({ [option]: true });

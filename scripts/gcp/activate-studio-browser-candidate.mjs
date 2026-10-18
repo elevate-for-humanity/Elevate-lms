@@ -75,6 +75,7 @@ export async function activateStudioBrowserCandidate({
     throw Error('STUDIO_FOUNDATION_UNVERIFIED');
   report({ revision, commit: sha, digest, foundationPassed: true, checks: foundation.checks.map(c => ({ name: c.name, passed: c.passed })) });
   const before = await inventory({ run, request });
+  report({ phase: 'before_closure', ...before });
   emptyWorkspace(before);
   if (before.commit !== expectedSha || !Number.isInteger(before.activeBrowserSessions) ||
       before.activeBrowserSessions < 0 || before.activeBrowserSessions > 4)
@@ -92,19 +93,31 @@ export async function activateStudioBrowserCandidate({
     for (let attempt = 0; attempt < 30; attempt++) {
       try {
         const health = await json(base + '/health');
+        // A new generation proves the old contexts were retired. A client can
+        // already have reconnected by the time this health response arrives.
         if (healthy(health, expectedSha) && health.browserGeneration > previous.browserGeneration &&
-            health.activeSessions === 0 && !health.recycling) { ready = true; break; }
+            Number.isInteger(health.activeSessions) && health.activeSessions >= 0 &&
+            health.activeSessions <= 4 && !health.recycling) { ready = true; break; }
       } catch { /* The old service returns 503 while Chromium restarts. */ }
       await pause(1000);
     }
     if (!ready) throw Error('STUDIO_SESSION_CLOSURE_UNVERIFIED');
   }
   const after = await inventory({ run, request });
+  report({ phase: 'after_closure', ...after });
   emptyWorkspace(after);
-  if (after.commit !== expectedSha || after.activeBrowserSessions !== 0)
+  // Existing Admin tabs automatically reconnect after a 410. The owner's
+  // explicit browser-session closure approval covers those bounded reconnects
+  // on this exact old revision; it never authorizes losing files or processes.
+  // Requiring zero again here would prevent cutover indefinitely while an old
+  // tab is open, even after all four approved sessions were successfully closed.
+  const reconnectLimit = closeSessions === true ? 4 : 0;
+  if (after.commit !== expectedSha || !Number.isInteger(after.activeBrowserSessions) ||
+      after.activeBrowserSessions < 0 || after.activeBrowserSessions > reconnectLimit)
     throw Error('STUDIO_LIVE_STATE_REQUIRES_PRESERVATION');
   assertSource(describe());
-  report({ sourceRevision: expectedRevision, sessionsClosed: before.activeBrowserSessions, activeSessions: 0, workspaceFiles: 0, terminalProcesses: 0 });
+  report({ sourceRevision: expectedRevision, sessionsClosed: before.activeBrowserSessions,
+    reconnectedBrowserSessions: after.activeBrowserSessions, workspaceFiles: 0, terminalProcesses: 0 });
   // Roll back even if the CLI times out after the server accepted the update.
   try {
     run(['run', 'services', 'update-traffic', service, ...scope, '--to-revisions=' + revision + '=100', '--quiet']);
@@ -122,6 +135,7 @@ export async function activateStudioBrowserCandidate({
     throw Error('STUDIO_ACTIVATION_FAILED_TRAFFIC_RESTORED');
   }
   return { revision, commit: sha, digest, ready: true, persistent: true, sessionsClosed: before.activeBrowserSessions,
+    reconnectedBrowserSessions: after.activeBrowserSessions,
     trafficChanged: true, oldRevisionRetained: true, adminConfigurationChanged: false };
 }
 

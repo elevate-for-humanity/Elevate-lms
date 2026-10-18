@@ -63,6 +63,21 @@ try {
   const packagedVersion = await version.json();
   assert.equal(packagedVersion.commit, sha);
   assert.equal(packagedVersion.service, component);
+  if (component === 'store') {
+    // Exercise the packaged pages: source-level rendering tests cannot detect a
+    // Store image that accidentally prerendered the shared Marketing chrome.
+    for (const path of ['/store', '/login', '/privacy', '/terms-of-service', '/security-and-data-protection']) {
+      const response = await fetch(root + path, {
+        headers: { host: 'store.elevateforhumanity.org' },
+        redirect: 'manual', signal: AbortSignal.timeout(20000),
+      });
+      assert.equal(response.status, 200, `Store page ${path} must be served locally`);
+      const html = await response.text();
+      assert.match(html, /data-header-owner="store-root"/, `${path} must use Store chrome`);
+      assert.match(html, /href="\/login\?redirect=%2Fstore"/, `${path} must keep sign-in on Store`);
+      assert.match(html, /aria-label="Store policies"/, `${path} must expose Store policies`);
+    }
+  }
   console.log('Final Marketing image dependencies, assets, startup and internal-host health routing verified.');
 } catch (error) {
   // Do not export raw application logs or runtime environment values from CI.

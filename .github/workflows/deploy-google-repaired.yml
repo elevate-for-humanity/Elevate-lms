@@ -80,7 +80,7 @@ jobs:
             admin-2cpu-4gi)
               test "$COMPONENT" = admin
               export CANDIDATE_CPU=2 CANDIDATE_MEMORY=4Gi
-              resource_args=(--cpu=2 --memory=4Gi)
+              resource_args=(--cpu=2 --memory=4Gi --no-cpu-throttling --update-env-vars=AI_NARRATION_PROVIDER=kokoro)
               ;;
             *) echo 'Unsupported candidate allocation'; exit 1 ;;
           esac

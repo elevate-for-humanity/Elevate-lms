@@ -13,6 +13,7 @@ type CourseVideo = {
   asset_role?: string | null;
   created_at?: string | null;
   playbackUrl?: string | null;
+  playbackError?:string|null;
 };
 
 export default function LicensedMediaLibrary({ courseId }: { courseId: string }) {
@@ -209,6 +210,7 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
               )}
               <div className="p-4">
                 <h4 className="font-black">{video.title}</h4>
+                {video.playbackError && <p role="alert" className="mt-2 text-sm text-amber-800">{video.playbackError}</p>}
                 <p className="mt-1 text-xs text-slate-500">
                   {video.status ?? 'stored'} · {video.asset_role ?? 'lesson media'}
                 </p>

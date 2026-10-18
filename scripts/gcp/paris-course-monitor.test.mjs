@@ -49,3 +49,22 @@ test('fresh running observation clears an obsolete waiting reason',async()=>{
   request:async(_url,options)=>{if(options.method)body=JSON.parse(options.body);return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};}});
  assert.equal(body.monitor.state,'running');assert.equal(body.monitor.reason,null);
 });
+
+test('PARIS records confirmed claims only from valid live worker evidence',async()=>{
+ const calls=[];
+ const row=job({status:'running',lease_owner:'worker-1',heartbeat_at:'2026-10-14T17:59:50Z',lease_expires_at:'2026-10-14T18:05:00Z',monitor:{enabled:true,recoveries:0}});
+ const request=async(_url,options)=>{if(options.method)calls.push(JSON.parse(options.body));return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};};
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,request});
+ assert.equal(calls[0].monitor.confirmedAssignments,1);
+ assert.equal(calls[0].monitor.lastConfirmedLeaseOwner,'worker-1');
+ assert.equal(calls[0].monitor.recoveries,0);
+ row.monitor=calls[0].monitor;calls.length=0;
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,request});
+ assert.equal(calls[0].monitor.confirmedAssignments,1);
+});
+test('queued jobs cannot claim confirmed recovery evidence',async()=>{
+ const row=job();let body;
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+  request:async(_url,options)=>{if(options.method)body=JSON.parse(options.body);return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};}});
+ assert.equal(body.monitor.confirmedAssignments,undefined);
+});

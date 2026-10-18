@@ -44,6 +44,14 @@ describe('planner execution and checkpoint reporting', () => {
     expect(mocks.verified).not.toHaveBeenCalled();
     expect(mocks.sync.mock.calls[0][2].status).toBe('failed');
     expect(text).toContain('failed verification');
+    expect(text).toContain('Reason:');
+    expect(text).toContain('Provider unavailable');
+  });
+  it('redacts credentials from failure details shown in the conversation', async () => {
+    mocks.payload = { ok: false, message: 'Provider rejected Bearer ghp_privatecredential123' };
+    const text = await execute();
+    expect(text).toContain('[REDACTED]');
+    expect(text).not.toContain('ghp_privatecredential123');
   });
   it('does not relabel a verified task as failed execution when saving its checkpoint fails', async () => {
     mocks.failWrite = 4;

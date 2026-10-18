@@ -25,13 +25,19 @@ const RealRepoWorkspace = dynamic(() => import('./RealRepoWorkspace'), {
 
 const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), {
   ssr: false,
-  loading: () => <div className="flex h-full items-center justify-center bg-slate-950 text-slate-400">Connecting cloud browser…</div>,
+  loading: () => (
+    <div className="flex h-full items-center justify-center bg-slate-950 text-slate-400">
+      Connecting cloud browser…
+    </div>
+  ),
 });
 
 type Mode = 'preview' | 'runtime' | 'browser';
 
-export default function RepositoryStudioWorkspace() {
-  const [mode, setMode] = useState<Mode>('preview');
+export default function RepositoryStudioWorkspace({
+  initialMode = 'preview',
+}: { initialMode?: Mode } = {}) {
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [activePath, setActivePath] = useState<string | null>(null);
   const [activeContent, setActiveContent] = useState('');
 
@@ -94,7 +100,11 @@ export default function RepositoryStudioWorkspace() {
           <div className="h-full min-h-[680px] overflow-hidden rounded-xl border border-slate-800 xl:min-h-0">
             <RealRepoWorkspace className="h-full" />
           </div>
-        ) : <div className="h-full min-h-[680px] overflow-hidden rounded-xl border border-slate-800 xl:min-h-0"><CloudBrowserWorkspace /></div>}
+        ) : (
+          <div className="h-full min-h-[680px] overflow-hidden rounded-xl border border-slate-800 xl:min-h-0">
+            <CloudBrowserWorkspace />
+          </div>
+        )}
       </div>
     </div>
   );

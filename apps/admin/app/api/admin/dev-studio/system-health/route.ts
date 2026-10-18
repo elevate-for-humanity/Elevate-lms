@@ -16,6 +16,7 @@ import { getDecryptedPlatformSecret } from '@/lib/secrets';
 import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 import { isGoogleDeploymentConfigured } from '@/lib/gcp/dispatch-production-workflow';
 import { ElevateProvider } from '@/lib/ai/providers/elevate';
+import { describeBrowserReadiness } from '@/lib/devstudio/browser-readiness';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -93,10 +94,12 @@ export async function GET(request: NextRequest) {
         cache: 'no-store',
         signal: AbortSignal.timeout(8_000),
       });
-      browserReachable = browserResponse.ok;
-      browserDetail = browserResponse.ok
-        ? 'isolated Studio browser runtime is reachable'
-        : `isolated Studio browser returned HTTP ${browserResponse.status}`;
+      const readiness = describeBrowserReadiness(
+        browserResponse.ok,
+        await browserResponse.json().catch(() => null),
+      );
+      browserReachable = readiness.ready;
+      browserDetail = readiness.detail;
     } catch {
       browserDetail = 'isolated Studio browser is unreachable';
     }
@@ -241,7 +244,11 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     ok: failCount === 0 && hasElevateOwnedAI && browserReachable && githubOk,
     summary: { okCount, warnCount, failCount },
-    message: checks.filter((check) => check.status === 'fail').map((check) => `${check.name}: ${check.detail}`).join(' | ') || 'Studio checks completed. Review warnings before execution.',
+    message:
+      checks
+        .filter((check) => check.status === 'fail')
+        .map((check) => `${check.name}: ${check.detail}`)
+        .join(' | ') || 'Studio checks completed. Review warnings before execution.',
     checks,
     meta: {
       devcontainerMode: mode,

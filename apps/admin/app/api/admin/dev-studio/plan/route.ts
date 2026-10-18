@@ -21,6 +21,7 @@ import { loadSharedContext } from '@/lib/platform/orchestration/context-service'
 import { getAITool } from '@/lib/ai/tools/registry';
 import { getAdminUrl } from '@/lib/utils/siteUrl';
 import { logger } from '@/lib/logger';
+import { studioUserFacingError } from '@/lib/devstudio/user-facing-status';
 import {
   bindCanonicalTask,
   ensureCanonicalStudioRun,
@@ -552,6 +553,9 @@ export async function POST(req: NextRequest) {
                 await failCanonicalStudioStep(db, canonicalRun, step, step.error);
                 failedSteps += 1;
                 write(`${FAIL} Step ${step.order} failed verification: ${step.title}`);
+                write(`Reason: ${studioUserFacingError(step.error)}`);
+                const failedEvidence = safeEvidenceSummary(taskEvidence(task));
+                if (failedEvidence) write(`Evidence: ${studioUserFacingError(failedEvidence)}`);
                 for (const dependent of plan.steps) {
                   if (dependent.depends_on?.includes(step.id) && dependent.status === 'pending') {
                     dependent.status = 'skipped';

@@ -152,8 +152,9 @@ export const STUDIO_WORKSPACES: StudioWorkspaceDefinition[] = [
   },
   {
     id: 'containers',
-    label: 'Containers',
-    description: 'Manage isolated execution environments and canonical runtime configuration.',
+    label: 'Runtime Configuration',
+    description:
+      'Edit devcontainer configuration and deployment keys. Open Environment for the existing repository and terminal.',
     permission: 'studio.containers.manage',
     route: '/studio/containers',
     healthEndpoint: '/api/admin/dev-studio/containers/health',

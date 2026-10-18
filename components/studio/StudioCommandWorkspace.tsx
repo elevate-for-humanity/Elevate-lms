@@ -17,6 +17,7 @@ import {
   Plus,
   Menu,
   X,
+  TerminalSquare,
 } from 'lucide-react';
 import UnifiedEllieChat from './UnifiedEllieChat';
 import { ResizableWorkspace } from './ResizableWorkspace';
@@ -43,6 +44,9 @@ const IntelligenceWorkspace = dynamic(() => import('./StudioIntelligencePanel'),
 const TasksWorkspace = dynamic(() => import('@/apps/admin/app/studio/tasks/TasksClient'), {
   ssr: false,
 });
+const RepositoryWorkspace = dynamic(() => import('./RepositoryStudioWorkspace'), {
+  ssr: false,
+});
 const UnifiedCourseBuilder = dynamic(
   () => import('@/components/admin/course-builder/UnifiedCourseBuilder'),
   {
@@ -56,10 +60,16 @@ const UnifiedCourseBuilder = dynamic(
 );
 
 type StudioSurface = 'commands' | 'course' | 'preview' | 'browser' | 'capability';
-type NativeCapability = 'workflows' | 'intelligence' | 'tasks' | 'browser';
+type NativeCapability = 'workflows' | 'intelligence' | 'tasks' | 'browser' | 'repository';
 
 function isNativeCapability(id: string): id is NativeCapability {
-  return id === 'workflows' || id === 'intelligence' || id === 'tasks' || id === 'browser';
+  return (
+    id === 'workflows' ||
+    id === 'intelligence' ||
+    id === 'tasks' ||
+    id === 'browser' ||
+    id === 'repository'
+  );
 }
 
 export function buildConversationWorkspaceUrl(
@@ -202,13 +212,17 @@ export default function StudioCommandWorkspace({
     setSurface('commands');
   };
   const handleCommandStart = (command: string) => {
-    setActiveCapability(null);
     const explicitUrl = command.match(/https?:\/\/[^\s"'<>]+/i)?.[0]?.replace(/[),.;]+$/, '') ?? '';
     const browserIntent =
       Boolean(explicitUrl) || /\b(envato|browser|website|download|sign[ -]?in)\b/i.test(command);
-    setBrowserTarget(explicitUrl || (/\benvato\b/i.test(command) ? 'https://app.envato.com' : ''));
-    setBrowserCommand(browserIntent ? command : '');
-    setSurface('commands');
+    if (browserIntent) {
+      setBrowserTarget(
+        explicitUrl || (/\benvato\b/i.test(command) ? 'https://app.envato.com' : ''),
+      );
+      setBrowserCommand(command);
+      setActiveCapability(null);
+      setSurface('browser');
+    }
   };
 
   const activeWorkspace = useMemo(
@@ -342,6 +356,17 @@ export default function StudioCommandWorkspace({
           <span className="ml-2 hidden text-[11px] font-semibold text-slate-500 sm:inline">
             One workspace · governed workflow · verified evidence
           </span>
+          {workspaces.some((workspace) => workspace.id === 'repository') ? (
+            <button
+              type="button"
+              aria-label="Open execution environment"
+              aria-pressed={activeCapability === 'repository' && surface === 'capability'}
+              onClick={() => openCapability('repository')}
+              className="ml-auto inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold text-slate-700 hover:bg-slate-100"
+            >
+              <TerminalSquare className="h-4 w-4" aria-hidden="true" /> Environment
+            </button>
+          ) : null}
         </nav>
         <nav
           aria-label="Studio tools"
@@ -480,6 +505,17 @@ export default function StudioCommandWorkspace({
                 >
                   <div
                     className={
+                      surface === 'capability' && activeCapability === 'repository'
+                        ? 'h-full'
+                        : 'hidden'
+                    }
+                  >
+                    {hasOpenedTool('repository') ? (
+                      <RepositoryWorkspace initialMode="runtime" />
+                    ) : null}
+                  </div>
+                  <div
+                    className={
                       surface === 'capability' && activeCapability === 'workflows'
                         ? 'h-full'
                         : 'hidden'
@@ -550,7 +586,7 @@ export default function StudioCommandWorkspace({
                         autoStart={surface === 'browser'}
                         initialTarget={browserTarget}
                         initialTask={browserCommand}
-                        autoRunTask={surface === 'browser'}
+                        autoRunTask={false}
                       />
                     ) : null}
                   </div>

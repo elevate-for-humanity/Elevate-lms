@@ -60,7 +60,13 @@ type OpenAIChatResponse = {
 };
 
 function endpoint(): string | null {
-  const raw = process.env.ELEVATE_LLM_URL?.trim();
+  // CPU is the authoritative everyday PARIS endpoint. A separately configured
+  // GPU endpoint is used only when explicitly enabled for this runtime.
+  const gpuAllowed = process.env.PARIS_GPU_ENABLED === 'true' &&
+    process.env.PARIS_INFERENCE_TIER === 'gpu';
+  const raw = (gpuAllowed
+    ? process.env.ELEVATE_LLM_GPU_URL
+    : process.env.ELEVATE_LLM_CPU_URL || process.env.ELEVATE_LLM_URL)?.trim();
   if (!raw) return null;
   const base = raw.replace(/\/+$/, '');
   try {
@@ -71,7 +77,11 @@ function endpoint(): string | null {
 }
 
 function secret(): string | null {
-  const value = process.env.ELEVATE_LLM_SECRET?.trim();
+  const gpuAllowed = process.env.PARIS_GPU_ENABLED === 'true' &&
+    process.env.PARIS_INFERENCE_TIER === 'gpu';
+  const value = (gpuAllowed
+    ? process.env.ELEVATE_LLM_GPU_SECRET
+    : process.env.ELEVATE_LLM_CPU_SECRET || process.env.ELEVATE_LLM_SECRET)?.trim();
   return value || null;
 }
 

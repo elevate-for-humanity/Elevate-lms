@@ -10,7 +10,7 @@ test('startup monitor permits same-document history updates and detects real rel
   await page.goto('https://startup-verification.invalid/');
   const baseline = await documentState();
   expect(baseline.documentRequests).toHaveLength(1);
-  await page.evaluate(() => history.replaceState({ fixture: true }, '', '?same-document'));
+  await page.evaluate(() => history.replaceState({ fixture: true }, '', location.href));
   expect(await documentState()).toEqual(baseline);
   await page.reload();
   const reloaded = await documentState();

@@ -10,6 +10,7 @@ export function observeDocumentStability(page: Page) {
   });
   return async () => ({
     documentRequests: [...documentRequests],
+    documentUrl: page.url(),
     timeOrigin: await page.evaluate(() => performance.timeOrigin),
   });
 }

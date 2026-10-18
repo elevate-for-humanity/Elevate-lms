@@ -78,10 +78,16 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       const requestHash = createHash('sha256').update(JSON.stringify({version:'approved-picture-cues-v1',lesson:input.lessonId,scene:scene.id,index,prompt})).digest('hex');
       let storagePath = 'approved-teaching-photos/'+requestHash+'.png';
       let {data:file} = await db.storage.from('course_videos').download(storagePath);
-      if(!file) for(const extension of ['jpg','webp']) {
-        const candidate='approved-teaching-photos/'+requestHash+'.'+extension;
-        const cached=await db.storage.from('course_videos').download(candidate);
-        if(cached.data){file=cached.data;storagePath=candidate;break;}
+      if(!file) {
+        // Independent cache probes can run together; preserve JPG-before-WebP
+        // selection and the existing checksum/readback validation.
+        const variants=await Promise.all(['jpg','webp'].map(async extension=>{
+          const path='approved-teaching-photos/'+requestHash+'.'+extension;
+          const cached=await db.storage.from('course_videos').download(path);
+          return {path,data:cached.data};
+        }));
+        const hit=variants.find(variant=>variant.data);
+        if(hit){file=hit.data;storagePath=hit.path;}
       }
       let repairProof:any;
       if (!file) {

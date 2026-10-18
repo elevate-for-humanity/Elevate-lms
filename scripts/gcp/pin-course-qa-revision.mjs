@@ -34,7 +34,8 @@ export async function pinCourseQaRevision({revision,sha,run=google,request=fetch
     const anonymous=await get('/learner/health');await anonymous.body?.cancel();
     if(anonymous.status!==401)throw Error('COURSE_QA_ANONYMOUS_ACCESS_ALLOWED');
     const auth=await request(new URL('/learner/health',url),{headers:{Authorization:'Bearer '+credential},redirect:'error',signal:AbortSignal.timeout(20000)}),body=await auth.json();
-    if(!auth.ok||!body.ready||body.commit!==sha)throw Error('COURSE_QA_EXISTING_CREDENTIAL_REJECTED');
+    if(auth.status===401)throw Error('COURSE_QA_EXISTING_CREDENTIAL_REJECTED');
+    if(!auth.ok||!body.ready||body.commit!==sha)throw Error('COURSE_QA_LEARNER_NOT_READY_HTTP_'+auth.status+'_LMS_'+(Number.isInteger(body.lmsSetupStatus)?body.lmsSetupStatus:'UNKNOWN'));
   };
   await verify(candidate.url);
   const tag='course-qa-'+sha.slice(0,12),oldTag=before.status.traffic.find(t=>t.tag===tag);

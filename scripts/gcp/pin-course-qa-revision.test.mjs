@@ -28,7 +28,7 @@ function fixture(options={}){
  const request=async(url,init)=>{requests.push({url:String(url),authenticated:Boolean(init.headers)});
   if(String(url).endsWith('/learner/health')&&!init.headers)return new Response('{}',{status:options.anonymousAllowed?200:401});
   if(init.headers)assert.equal(init.headers.Authorization,'Bearer '+secret);
-  return new Response(JSON.stringify({ready:true,commit:sha,providerAuthStorage:{persistent:true}}),{status:options.badAuth&&init.headers?401:200});
+  return new Response(JSON.stringify({ready:!(options.lmsNotReady&&init.headers),lmsSetupStatus:options.lmsNotReady?401:404,commit:sha,providerAuthStorage:{persistent:true}}),{status:init.headers?(options.badAuth?401:options.lmsNotReady?503:200):200});
  };
  return {run,request,calls,requests,service,jobs};
 }
@@ -46,8 +46,8 @@ test('pins authenticated synthetic QA without moving owner traffic, files, sessi
  const start=f.calls.length;assert.equal((await pinCourseQaRevision({revision,sha,...f})).jobTemplatesUpdated,0);
  assert.equal(f.calls.slice(start).some(args=>args[2]==='update'||args[2]==='update-traffic'),false);
 });
-for(const options of [{badAuth:true},{anonymousAllowed:true},{badImage:true},{differentSecret:true}])test('failed verification prevents any mutation: '+Object.keys(options)[0],async()=>{
- const f=fixture(options);await assert.rejects(pinCourseQaRevision({revision,sha,...f}));
+for(const options of [{badAuth:true},{anonymousAllowed:true},{badImage:true},{differentSecret:true},{lmsNotReady:true}])test('failed verification prevents any mutation: '+Object.keys(options)[0],async()=>{
+ const f=fixture(options);await assert.rejects(pinCourseQaRevision({revision,sha,...f}),options.lmsNotReady?/COURSE_QA_LEARNER_NOT_READY_HTTP_503_LMS_401/:options.badAuth?/COURSE_QA_EXISTING_CREDENTIAL_REJECTED/:undefined);
  assert.equal(f.calls.some(args=>args[2]==='update'||args[2]==='update-traffic'),false);
 });
 test('a failed second job update restores the first endpoint without altering configuration',async()=>{

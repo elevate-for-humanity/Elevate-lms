@@ -35,16 +35,11 @@ export async function getGitHubToken(): Promise<string | null> {
   // Capture the deployment value before hydration. hydrateProcessEnv may load
   // a canonical fallback into process.env, but must not replace a valid token
   // supplied directly by the production service.
+  // Check the canonical rotating credential first. Never pin it in process.env.
+  const storedToken = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
+  if (storedToken) return storedToken;
   const deployedToken = normalizeToken(process.env.GITHUB_TOKEN);
   if (deployedToken) return deployedToken;
-
-  const fromCanonicalStore = normalizeToken(
-    await getDecryptedPlatformSecret('GITHUB_TOKEN'),
-  );
-  if (fromCanonicalStore) {
-    process.env.GITHUB_TOKEN = fromCanonicalStore;
-    return fromCanonicalStore;
-  }
 
   return null;
 }

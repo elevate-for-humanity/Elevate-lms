@@ -46,6 +46,20 @@ export class UltimatePlatformLearnerRuntime implements UltimateLearnerRuntimePor
       // Complete playback may exceed five minutes. The runner has its own bounded deadline.
       signal: AbortSignal.timeout(3600000),
     });
+    // The browser service admits a single learner test at a time. A 429 is
+    // explicitly rejected before a ticket is created, so retrying this POST
+    // cannot duplicate an accepted test. Keep the existing worker lease alive
+    // through its normal heartbeat; never turn missing evidence into a pass.
+    for (let retry = 0; response.status === 429 && retry < 20; retry += 1) {
+      await response.body?.cancel();
+      await new Promise(resolve => setTimeout(resolve, 15000));
+      response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${secret}` },
+        body: JSON.stringify(request),
+        signal: AbortSignal.timeout(3600000),
+      });
+    }
     if (response.status === 202) {
       const { testTicket } = await response.json();
       if (typeof testTicket !== 'string' || !/^[a-f0-9-]{36}$/i.test(testTicket))

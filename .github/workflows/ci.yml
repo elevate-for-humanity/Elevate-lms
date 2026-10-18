@@ -40,7 +40,7 @@ jobs:
       - name: Traffic scope and unavailable-data regression tests
         run: node --test tests/unit/traffic-report.test.mjs
       - name: Public narration lifecycle regression tests
-        run: pnpm exec vitest run tests/unit/scroll-narrator-playback.test.tsx tests/unit/home-scroll-narrator-regression.test.ts tests/unit/natural-voice-pacing.test.ts tests/unit/cookie-consent-navigation.test.tsx tests/unit/first-party-traffic-storage.test.tsx tests/unit/studio-chat-readiness.test.tsx
+        run: pnpm exec vitest run tests/unit/scroll-narrator-playback.test.tsx tests/unit/home-scroll-narrator-regression.test.ts tests/unit/natural-voice-pacing.test.ts tests/unit/cookie-consent-navigation.test.tsx tests/unit/first-party-traffic-storage.test.tsx tests/unit/studio-chat-readiness.test.tsx tests/unit/header-mobile-focus.test.tsx
       - name: Google runtime settings regression tests
         run: pnpm exec vitest run tests/unit/program-holder-sync.test.ts tests/unit/google-container-env.test.ts tests/unit/google-deployment-dispatch.test.ts tests/unit/pwa-homepage-hydration.test.tsx tests/unit/pwa-install-prompt-lifecycle.test.ts tests/unit/admin-pwa-navigation-regression.test.ts tests/unit/pwa-update-lifecycle.test.tsx tests/unit/pwa-update-notice.test.tsx
       - name: Resizable Studio and Course Builder panels

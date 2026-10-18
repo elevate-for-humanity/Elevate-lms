@@ -1,6 +1,7 @@
 import {approvedReferencePhotoPicker} from './approved-reference-photos.mjs';
 import {courseSelectedStill} from './selected-course-stills.mjs';
 import {recoverTeachingPhoto} from './photo-repair.mjs';
+import {conceptualTeachingCard} from './conceptual-teaching-card.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watch.mjs';
 import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
 import { compatibleVisualTask } from '../instructional/reviewed-scene-evidence';
@@ -91,7 +92,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       }
       let repairProof:any;
       if (!file) {
-        const generated = await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,persistFailure:async(detail:any)=>{
+        const generated = await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,selectedReplacement:async()=>conceptualTeachingCard({scene,step,courseTitle:input.courseTitle,index}),persistFailure:async(detail:any)=>{
           const diagnosticPath='approved-teaching-photo-diagnostics/'+input.lessonId+'/'+requestHash+'.json';
           const {error}=await db.storage.from('course_videos').upload(diagnosticPath,Buffer.from(JSON.stringify({...detail,at:new Date().toISOString()})),{contentType:'application/json',upsert:true});
           if(error)throw Error('TEACHING_PHOTO_DIAGNOSTIC_SAVE_FAILED:'+scene.id);

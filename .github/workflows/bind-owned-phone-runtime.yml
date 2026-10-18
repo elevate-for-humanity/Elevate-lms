@@ -1,0 +1,58 @@
+name: Bind actual Admin and LMS phone runtime credentials
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ['scripts/gcp/bind-pbx-control-runtime*', '.github/workflows/bind-owned-phone-runtime.yml']
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/bind-pbx-control-runtime.mjs', '.github/workflows/bind-owned-phone-runtime.yml']
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+jobs:
+  contract:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/bind-pbx-control-runtime.test.mjs
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/bind-owned-phone-runtime.yml/dispatches" -f ref=main
+  bind:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment: production
+    concurrency:
+      group: google-runtime-us-central1
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: {skip_install: true}
+      - name: Verify target and deployment contracts
+        run: |
+          set -euo pipefail
+          test "$(gcloud compute instances describe elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+          node --test scripts/gcp/bind-pbx-control-runtime.test.mjs scripts/test-public-revision-activation.mjs
+      - name: Bind the pinned existing PBX credential on Admin then LMS
+        run: node scripts/gcp/bind-pbx-control-runtime.mjs

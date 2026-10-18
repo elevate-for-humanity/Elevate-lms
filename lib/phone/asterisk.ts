@@ -27,7 +27,7 @@ export type AsteriskRegistration = {
 async function controlRequest<T>(path: string, identity: DeviceIdentity): Promise<T> {
   if (
     process.env.NODE_ENV === 'production' &&
-    process.env.ELEVATE_RUNTIME_CONFIG_PROVIDER !== 'google-secret-manager'
+    (process.env.PBX_RUNTIME_CONFIG_PROVIDER || process.env.ELEVATE_RUNTIME_CONFIG_PROVIDER) !== 'google-secret-manager'
   ) {
     throw new Error(
       'The independent phone service requires Google Secret Manager runtime bindings.',

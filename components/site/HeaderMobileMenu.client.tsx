@@ -110,6 +110,7 @@ const ENTRY_POINTS = [
 ] as const;
 
 export default function HeaderMobileMenu({ items, programApplyLinks = {} }: HeaderMobileMenuProps) {
+  const [interactive, setInteractive] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
@@ -118,6 +119,10 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
   const firstFocusRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const previousOpenRef = useRef(false);
+
+  // The streamed header can be visible before React attaches its handlers.
+  // Keep its trigger disabled until hydration so an early tap is never lost.
+  useEffect(() => { setInteractive(true); }, []);
 
   const closeMenu = useCallback(() => {
     setIsOpen(false);
@@ -418,6 +423,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
       <button
         ref={triggerRef}
         type="button"
+        disabled={!interactive}
         onClick={() => setIsOpen((open) => !open)}
         className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900"
         aria-label={isOpen ? 'Close menu' : 'Open menu'}

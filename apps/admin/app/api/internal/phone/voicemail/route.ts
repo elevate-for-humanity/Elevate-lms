@@ -4,6 +4,7 @@ import {timingSafeEqual} from 'node:crypto';
 import {hydrateProcessEnv} from '@/lib/secrets';
 import {requireAdminClient} from '@/lib/supabase/admin';
 import {notifyAssignee} from '@/lib/phone/message-notifications';
+import {usesGooglePhoneBindings} from '@/lib/phone/runtime-authority';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -28,7 +29,7 @@ export async function POST(request:Request){
   const expected=process.env.PBX_PROVISIONING_TOKEN||'';
   const given=request.headers.get('authorization')?.replace(/^Bearer /,'')||'';
   if(expected.length<32 || given.length!==expected.length || !timingSafeEqual(Buffer.from(given),Buffer.from(expected)))return NextResponse.json({error:'Unauthorized'},{status:401});
-  if(process.env.ELEVATE_RUNTIME_CONFIG_PROVIDER!=='google-secret-manager' || !UUID.test(process.env.PBX_PHONE_SYSTEM_ID||''))return NextResponse.json({error:'Owned voicemail is not configured.'},{status:503});
+  if(!usesGooglePhoneBindings() || !UUID.test(process.env.PBX_PHONE_SYSTEM_ID||''))return NextResponse.json({error:'Owned voicemail is not configured.'},{status:503});
   const body=await readBody(request);
   if(!UUID.test(body.id||'')||!/^(0|[1-9][0-9]{2})$/.test(body.extension||'')||typeof body.audioBase64!=='string'||body.audioBase64.length>1500000)return NextResponse.json({error:'Invalid voicemail.'},{status:400});
   const audio=Buffer.from(body.audioBase64,'base64');

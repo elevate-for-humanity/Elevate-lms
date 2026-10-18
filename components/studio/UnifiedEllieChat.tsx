@@ -1538,7 +1538,7 @@ export default function UnifiedEllieChat({
               }}
               rows={3}
               placeholder="Tell Paris what you need done..."
-              className={`order-first min-h-[100px] max-h-[35dvh] w-full min-w-0 basis-full resize-y rounded-xl border px-4 py-3 text-base leading-7 outline-none sm:text-lg ${inputClass}`}
+              className={`order-first min-h-[100px] max-h-[35dvh] w-full min-w-0 basis-full resize-y rounded-xl border px-4 py-3 text-xl leading-7 outline-none ${inputClass}`}
             />
             <button
               type="button"

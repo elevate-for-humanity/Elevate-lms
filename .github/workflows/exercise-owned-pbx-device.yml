@@ -106,3 +106,19 @@ jobs:
           python3 scripts/gcp/test-operator-provisioning.py
           gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
             --command='sudo python3 - --exercise' < scripts/gcp/probe-operator-provisioning.py
+
+  handoff:
+    needs: exercise
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.exercise.result == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test scripts/gcp/phone-runtime-handoff.test.mjs
+      - name: Hand actual device acceptance to protected runtime binding
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PHONE_EXERCISE_RUN_ID: ${{ github.run_id }}
+        run: node scripts/gcp/phone-runtime-handoff.mjs dispatch

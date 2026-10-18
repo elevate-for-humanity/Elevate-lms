@@ -1,13 +1,16 @@
 name: Bind actual Admin and LMS phone runtime credentials
 on:
-  workflow_run:
-    workflows: ['Repair and exercise approved operator device creation']
-    types: [completed]
+  workflow_dispatch:
+    inputs:
+      acceptance_run_id:
+        description: Successful main operator-device exercise to independently verify before binding
+        type: string
+        required: true
   pull_request:
     paths: ['scripts/gcp/bind-pbx-control-runtime*', '.github/workflows/bind-owned-phone-runtime.yml']
 permissions:
   contents: read
-  actions: read
+  actions: write
   id-token: write
 jobs:
   contract:
@@ -20,8 +23,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - run: node --test scripts/gcp/bind-pbx-control-runtime.test.mjs
+      - run: node --test scripts/gcp/phone-runtime-handoff.test.mjs
   bind:
-    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'workflow_dispatch' && github.event.workflow_run.head_branch == 'main' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     environment: production
@@ -37,16 +41,8 @@ jobs:
       - name: Require successful live device acceptance, not a green dispatcher
         env:
           GH_TOKEN: ${{ github.token }}
-          ACCEPTANCE_RUN_ID: ${{ github.event.workflow_run.id }}
-        run: |
-          node --input-type=module <<'NODE'
-          import {execFileSync} from 'node:child_process';
-          const id=process.env.ACCEPTANCE_RUN_ID;
-          if(!/^[0-9]+$/.test(id||''))throw Error('Protected acceptance run required');
-          const result=JSON.parse(execFileSync('gh',['api','repos/'+process.env.GITHUB_REPOSITORY+'/actions/runs/'+id+'/jobs'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
-          if(!result.jobs?.some(job=>job.name==='exercise'&&job.conclusion==='success'))throw Error('Real PBX device exercise did not pass');
-          console.log(JSON.stringify({protectedPbxDeviceAcceptanceVerified:true,runId:id}));
-          NODE
+          PHONE_EXERCISE_RUN_ID: ${{ inputs.acceptance_run_id }}
+        run: node scripts/gcp/phone-runtime-handoff.mjs verify
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -61,3 +57,7 @@ jobs:
           node --test scripts/gcp/bind-pbx-control-runtime.test.mjs scripts/test-public-revision-activation.mjs
       - name: Bind the pinned existing PBX credential on Admin then LMS
         run: node scripts/gcp/bind-pbx-control-runtime.mjs
+      - name: Verify actual serving voicemail speech after binding
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify-owned-voicemail-speech.yml/dispatches" -f ref=main

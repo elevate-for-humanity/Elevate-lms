@@ -9,6 +9,7 @@ import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
 import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/instructional/google-lesson-author';
+import { adminPreviewPlaybackUrl } from '@/lib/ultimate-course-builder/media/admin-preview-url.mjs';
 import { lessonPreview } from '@/lib/ultimate-course-builder/core/lesson-preview';
 import {
   renderMediaUrl,
@@ -107,6 +108,7 @@ export async function GET(req: NextRequest) {
               }
             }
           }
+          if (preview.videoUrl) preview.videoUrl = adminPreviewPlaybackUrl(buildId, lesson.id, preview.videoUrl);
           return { ...saved, preview };
         }),
       ).catch((error) => {

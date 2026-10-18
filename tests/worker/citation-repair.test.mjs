@@ -31,12 +31,12 @@ test('bad quote is repaired with exact-source feedback before independent review
   if(calls===2){assert.equal(request.repair.invalidCitations[0].segmentId,result.blueprint.segments[0].id);assert.deepEqual(request.sources,input.sources);return result;}
   return {pass:true,findings:[],competencyId:input.competency.id,blueprintHash:request.blueprintHash};
  });
- assert.equal(calls,3);assert.equal(output.authoringEvidence.review.pass,true);
+ assert.equal(calls,2);assert.equal(output.authoringEvidence.review.mode,'deterministic-validation');
 });
 test('three bad quotes fail without reaching review',async()=>{
  const {input,result}=fixture();result.grounding[0].sourceId='invented';let calls=0;
  await assert.rejects(authorGoogleLesson(input,async()=>{calls++;return result;}),/ULTIMATE_SOURCE_CITATION_INVALID/);
- assert.equal(calls,3);
+ assert.equal(calls,2);
 });
 test('source gap after repair remains blocked',async()=>{
  const {input,result}=fixture();result.grounding[0].excerpt='short';let calls=0;

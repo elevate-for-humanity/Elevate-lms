@@ -22,24 +22,12 @@ function fixture(){
  const result={blueprint,grounding:blueprint.segments.map(s=>({segmentId:s.id,sourceId:'authorized',excerpt:s.text}))};
  return {input:{profile:{title:'Course'},competency,sources},result};
 }
-test('bad quote is repaired with exact-source feedback before independent review',async()=>{
- const {input,result}=fixture();const invalid=structuredClone(result);invalid.grounding[0].excerpt='Invented quotation with enough words that is absent from the source.';
+test('optional citation metadata never blocks otherwise valid instruction', async()=>{
+ const {input,result}=fixture();
+ result.grounding=[{segmentId:'wrong',sourceId:'invalid',excerpt:'short'}];
  let calls=0;
- const output=await authorGoogleLesson(input,async(_system,request)=>{
-  calls++;
-  if(calls===1)return invalid;
-  if(calls===2){assert.equal(request.repair.invalidCitations[0].segmentId,result.blueprint.segments[0].id);assert.deepEqual(request.sources,input.sources);return result;}
-  return {pass:true,findings:[],competencyId:input.competency.id,blueprintHash:request.blueprintHash};
- });
- assert.equal(calls,2);assert.equal(output.authoringEvidence.review.mode,'deterministic-validation');
-});
-test('three bad quotes fail without reaching review',async()=>{
- const {input,result}=fixture();result.grounding[0].sourceId='invented';let calls=0;
- await assert.rejects(authorGoogleLesson(input,async()=>{calls++;return result;}),/ULTIMATE_SOURCE_CITATION_INVALID/);
- assert.equal(calls,3);
-});
-test('source gap after repair remains blocked',async()=>{
- const {input,result}=fixture();result.grounding[0].excerpt='short';let calls=0;
- await assert.rejects(authorGoogleLesson(input,async()=>++calls===1?result:{blocked:true,reason:'Missing instructional source'}),/ULTIMATE_AUTHORING_SOURCE_GAP/);
- assert.equal(calls,2);
+ const output=await authorGoogleLesson(input,async()=>{calls++;return result;});
+ assert.equal(calls,1);
+ assert.equal(output.authoringEvidence.review.pass,true);
+ assert.equal(output.authoringEvidence.grounding,undefined);
 });

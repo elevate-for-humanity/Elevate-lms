@@ -37,7 +37,8 @@ test('monitor uses fenced changes and never resets attempts or changes worker pa
  assert.match(calls[1].url,/execution_generation=eq.2/);
  const body=JSON.parse(calls[1].options.body);
  assert.equal(body.status,'queued');assert.equal(body.execution_generation,3);assert.equal(body.attempts,undefined);assert.equal(body.payload,undefined);
- assert.equal(body.monitor.recoveries,1);
+ assert.equal(body.monitor.recoveries,0);
+ assert.equal(body.monitor.recoveryRequest.executionGeneration,3);
 });
 test('read or write failures cannot be reported as monitoring success',async()=>{
  await assert.rejects(monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},request:async()=>({ok:false,status:503})}),/HTTP_503/);
@@ -82,4 +83,25 @@ test('PARIS requests lease owner so confirmed assignment reporting can work in p
  assert.match(selected,/\blease_owner\b/);
  assert.equal(written.monitor.confirmedAssignments,1);
  assert.equal(written.monitor.action,'observe');
+});
+
+test('PARIS confirms recovery only after an observed fresh replacement lease',async()=>{
+ const row=job({status:'queued',lease_owner:null,heartbeat_at:'2026-10-14T17:40:00Z',monitor:{enabled:true,recoveries:0,lastConfirmedLeaseOwner:'old-worker'}});
+ let body;
+ const request=async(_url,options)=>{
+   if(options.method) {body=JSON.parse(options.body);return {ok:true,json:async()=>[{id:'job'}]};}
+   return {ok:true,json:async()=>[row]};
+ };
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,request});
+ assert.equal(body.monitor.recoveries,0);
+ row.monitor=body.monitor;
+ row.status='running';row.lease_owner='new-worker';row.heartbeat_at='2026-10-14T18:00:10Z';
+ row.lease_expires_at='2026-10-14T18:05:00Z';
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now:new Date('2026-10-14T18:00:15Z'),request});
+ assert.equal(body.monitor.recoveries,1);
+ assert.equal(body.monitor.lastConfirmedRecoveryOwner,'new-worker');
+ assert.equal(body.monitor.recoveryRequest,null);
+ row.monitor=body.monitor;
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now:new Date('2026-10-14T18:00:20Z'),request});
+ assert.equal(body.monitor.recoveries,1);
 });

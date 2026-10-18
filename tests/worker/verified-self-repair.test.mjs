@@ -41,3 +41,14 @@ test('inspection retry preserves the accepted film and resumes only the failed i
  }}).run(ctx);
  assert.equal(inspections,2);assert.equal(ctx.artifacts.lesson_film_render.video,'saved.mp4');assert.equal(ctx.passedSteps.has('finished_media_qa'),true);
 });
+
+test('restart preserves a validated repair producer but still executes an unfinished directive',async()=>{
+ for(const status of ['producer-validated','diagnosed']){
+  let renders=0,inspections=0;
+  const R=runner({},()=>[],{currentEvidence:()=>true});
+  const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{learning_objectives:{blueprint:'saved'},lesson_film_render:{video:'saved.mp4'},__repairState:{status,directive:{target:'lesson_film_render'}}},findings:[],passedSteps:new Set(['learning_objectives','lesson_film_render'])};
+  await new R({learning_objectives:()=>assert.fail('must preserve source'),lesson_film_render:async()=>{renders++;return {artifacts:{video:'repaired.mp4'}};},finished_media_qa:async()=>{inspections++;return {artifacts:{inspection:'measured evidence'}};}}).run(ctx);
+  assert.equal(renders,status==='producer-validated'?0:1);assert.equal(inspections,1);
+  assert.equal(ctx.artifacts.lesson_film_render.video,status==='producer-validated'?'saved.mp4':'repaired.mp4');
+ }
+});

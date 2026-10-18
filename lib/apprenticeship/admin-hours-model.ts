@@ -46,6 +46,7 @@ export interface AdminHoursEntry extends ProgressHoursEntry {
   required_hours: number | null;
   hours_worked: number;
   approval_blocker: string | null;
+  review_ledger?: HoursLedgerEntry[];
 }
 const normalized = (value: string) => value.trim().toLowerCase();
 export const roundHours = (value: number) => Math.round((value + Number.EPSILON) * 100) / 100;
@@ -207,6 +208,17 @@ export interface HoursLedgerEntry {
   hours_claimed: number | string;
   accepted_hours: number | string | null;
   source_type: string;
+}
+
+export function sameDayHoursLedger(
+  entry: AdminHoursEntry,
+  ledger: HoursLedgerEntry[],
+  programs: HoursProgram[],
+) {
+  const slug = programs.find((program) => program.id === entry.program_key)?.slug;
+  if (!slug) return [];
+  return ledger.filter((row) => row.user_id === entry.student_id &&
+    row.program_slug?.toLowerCase() === slug.toLowerCase() && row.work_date === entry.work_date);
 }
 
 export function applyLedgerReview(

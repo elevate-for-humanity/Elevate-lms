@@ -7,7 +7,7 @@ let source = await readFile(new URL('../../lib/ultimate-course-builder/adapters/
 const mediaDirector = await readFile(new URL('../../lib/video/media-director.ts', import.meta.url), 'utf8');
 const minimum = Number(mediaDirector.match(/export const MIN_LESSON_VIDEO_SCENES = (\d+);/)[1]);
 source = source.replace("'../../video/render-checkpoint-contract.mjs'", JSON.stringify(new URL('../../lib/video/render-checkpoint-contract.mjs', import.meta.url).href));
-source = source.replace(/^import .*materializeInstructionalVisualAssets.*;$/m, '');
+source = source.replace(/^import .*bindTeachingPhotoAssignments.*;$/m, '');
 source = source.replace(/^import .*storedLicensedMediaMetadata.*;$/m, '');
 source = source.replace(/^import .*MIN_LESSON_VIDEO_SCENES.*;$/m, `const MIN_LESSON_VIDEO_SCENES = ${minimum};`);
 const { prepareUltimateStoryboardInput, requireResolvedVisualEvidence } = await import('data:text/javascript;base64,' + Buffer.from(stripTypeScriptTypes(source, { mode: 'transform' })).toString('base64'));
@@ -38,12 +38,12 @@ test('missing scene mapping cannot substitute an arbitrary licensed clip', () =>
     visual_assignment:{media:{assignments:[],readyAssets:[{id:'unrelated',public_url:'https://media.example/stock.mp4',mime_type:'video/mp4',entitlement_id:'license'}]}},
   }}), /ULTIMATE_RENDER_SAVED_ASSIGNMENT_REQUIRED/);
 });
-test('copies of one stored file use the existing instructional producer for remaining scenes', () => {
+test('copies of one stored file request photographs for remaining scenes', () => {
   const scenes = Array.from({ length: minimum }, (_, i) => ({ id: `scene-${i}`, visualRequirement: 'A client consultation', teachingVisual:{kind:'sequence',steps:[{label:'Clarify',value:'Clarify the client request'}]} }));
   const assets = scenes.map((_, i) => ({ id: `copy-${i}`, public_url: `https://media.example/file.mp4?token=${i}`, entitlement_id: 'license', license_evidence_url: 'https://media.example/license', visual_coverage_verified: true, visual_requirements: ['A client consultation'] }));
   const result = buildSceneAssignments(scenes, assets);
-  assert.equal(result.assignments.filter(a => a.assignmentMethod !== 'instructional-render').length, 1);
-  assert.equal(result.assignments.filter(a => a.assignmentMethod === 'instructional-render').length, minimum - 1);
+  assert.equal(result.assignments.filter(a => a.assignmentMethod !== 'teaching-photograph-request').length, 1);
+  assert.equal(result.assignments.filter(a => a.assignmentMethod === 'teaching-photograph-request').length, minimum - 1);
   assert.deepEqual(result.gaps, []);
 });
 test('checkpointed graphics cannot replace required practical demonstrations', () => {
@@ -54,5 +54,5 @@ test('checkpointed graphics cannot replace required practical demonstrations', (
       readyAssets:scenes.map(s=>({id:`instructional:${s.id}`,instructional_scene_id:s.id,public_url:`https://media.example/${s.id}.png`,mime_type:'image/png',owned_instructional_visual:true,provider:'remotion'})),
     }},
   }};
-  assert.throws(()=>prepareUltimateStoryboardInput(input), /ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED/);
+  assert.throws(()=>prepareUltimateStoryboardInput(input), /ULTIMATE_(PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED|RENDER_SAVED_ASSIGNMENT_REQUIRED)/);
 });

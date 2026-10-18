@@ -6,7 +6,7 @@ const FEATURES = [
   {
     title: 'Train & Learn',
     body: 'Courses, assignments, progress tracking, credentials, and learner dashboards in one connected learning environment.',
-    image: '/images/pages/comp-pathway-classroom.webp',
+    image: '/images/training-providers-hero.webp',
     href: '/programs',
   },
   {

@@ -319,6 +319,24 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
     },
   ],
 
+  read_only_course_audit: () => [
+    {
+      id: 's1', order: 1, title: 'Course production status',
+      command: 'Inspect current course status', status: 'pending',
+      expected_output: 'Saved course build, worker claim, heartbeat, and checkpoint evidence',
+    },
+    {
+      id: 's2', order: 2, title: 'Course Builder health',
+      command: 'Inspect Course Builder health checks', status: 'pending',
+      expected_output: 'Current Course Builder checks and specific failures',
+    },
+    {
+      id: 's3', order: 3, title: 'Studio and browser readiness',
+      command: 'Check Studio provider health status', status: 'pending',
+      expected_output: 'Current Studio provider and browser runtime readiness',
+    },
+  ],
+
   read_only_studio_diagnostic: () => [
     {
       id: 's1',
@@ -395,18 +413,28 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
     !explicitReadOnly &&
     !/\b(?:do not|don't|dont|never|without)\s+(?:\w+\s+){0,3}deploy(?:ment|ing|ed)?\b/.test(g);
   let steps: PlanStep[];
+  // Product mentions inside a repository repair must not replace the owner's
+  // complete engineering goal with a single product's operational template.
   const compoundEngineeringExecution =
+    !explicitReadOnly &&
     /\b(code|codebase|repo|repository|commit|source|files? changed|regression tests?|typecheck|build)\b/.test(
       g,
     ) && /\b(fix|repair|correct|implement|modify|change|update|edit|refactor|add|remove)\b/.test(g);
 
-  if (explicitReadOnlyStudioDiagnostic) {
+  const courseAudit = /\b(course\s*builder|course|lesson)s?\b/.test(g) &&
+    (explicitReadOnly
+      ? /\b(audit|inspect|diagnostic|status|health)\b/.test(g)
+      : /\b(audit|inspect|diagnose)\b/.test(g) &&
+        !/\b(fix|repair|start|resume|publish|generate|create|build)\b/.test(g));
+  if (courseAudit) {
+    steps = GOAL_TEMPLATES.read_only_course_audit!({});
+  } else if (explicitReadOnlyStudioDiagnostic) {
     steps = GOAL_TEMPLATES.read_only_studio_diagnostic!({});
-  } else if (g.includes('quickbooks')) {
+  } else if (g.includes('quickbooks') && !compoundEngineeringExecution) {
     steps = /\b(fix|repair|connect|reconnect|configure)\b/.test(g)
       ? GOAL_TEMPLATES.quickbooks_repair!({})
       : GOAL_TEMPLATES.quickbooks_connection!({});
-  } else if (g.includes('enrollment') || g.includes('enroll')) {
+  } else if ((g.includes('enrollment') || g.includes('enroll')) && !compoundEngineeringExecution) {
     steps = GOAL_TEMPLATES.fix_enrollment_failures!({});
   } else if (compoundEngineeringExecution) {
     const unifiedStages = buildUnifiedEngineeringStages(goal);

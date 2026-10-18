@@ -145,7 +145,7 @@ export function createBrowserClient(): SupabaseClient<any> {
     client.auth.onAuthStateChange((event, session) => {
       if (event === 'TOKEN_REFRESHED' && !session) {
         // Refresh succeeded but returned no session — sign out to clear cookies
-        client.auth.signOut().catch(() => {});
+        client.auth.signOut({ scope: 'local' }).catch(() => {});
       }
     });
 
@@ -161,7 +161,7 @@ export function createBrowserClient(): SupabaseClient<any> {
           result.error.message?.includes('refresh_token_not_found'))
       ) {
         // Stale cookie — clear it silently so the user gets a clean anonymous state
-        await client.auth.signOut().catch(() => {});
+        await client.auth.signOut({ scope: 'local' }).catch(() => {});
         return { data: { session: null }, error: null };
       }
       return result;

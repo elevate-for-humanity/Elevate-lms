@@ -1,3 +1,4 @@
+import {approvedReferencePhotoPicker} from './approved-reference-photos.mjs';
 import {courseSelectedStill} from './selected-course-stills.mjs';
 import {recoverTeachingPhoto} from './photo-repair.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watch.mjs';
@@ -14,7 +15,8 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
   const scenes = input.artifacts?.storyboard?.storyboard?.scenes;
   if (!Array.isArray(scenes)) throw new Error('TEACHING_PHOTO_STORYBOARD_REQUIRED');
   const photos: Record<string, any[]> = {};
-  const {data:placedPhotos,error:placementError}=await db.from('media_assets').select('id,storage_path,metadata').eq('lesson_id',input.lessonId).eq('asset_type','image').eq('storage_bucket','course_videos').eq('status','active');
+  const approvedReference=await approvedReferencePhotoPicker(input,db);
+  const {data:placedPhotos,error:placementError}=approvedReference?{data:[],error:null}:await db.from('media_assets').select('id,storage_path,metadata').eq('lesson_id',input.lessonId).eq('asset_type','image').eq('storage_bucket','course_videos').eq('status','active');
   if(placementError) throw placementError;
 
   for (const scene of scenes) {
@@ -29,6 +31,12 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
     const usedLicensedPhotos = new Set<string>();
     for (const [index, step] of requests.entries()) {
       courseProgressSignal()?.throwIfAborted();
+      if(approvedReference){
+        const photo=await approvedReference(scene,index,step,index===requests.length-1);
+        photos[scene.id].push({...photo,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1});
+        reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
+        continue;
+      }
       const placed=placedPhotos?.find((p:any)=>p.metadata?.source==='openai-generated-illustration' && p.metadata?.reviewedIllustration===true && p.metadata?.sceneId===scene.id && p.metadata?.cueIndex===index && p.metadata?.narrationQuote===step.narrationQuote && /^[a-f0-9]{64}$/i.test(p.metadata?.sha256??'') && String(p.storage_path).startsWith('approved-teaching-photos/'));
       if(placed){
         const downloaded=await db.storage.from('course_videos').download(placed.storage_path);
@@ -70,10 +78,16 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       const requestHash = createHash('sha256').update(JSON.stringify({version:'approved-picture-cues-v1',lesson:input.lessonId,scene:scene.id,index,prompt})).digest('hex');
       let storagePath = 'approved-teaching-photos/'+requestHash+'.png';
       let {data:file} = await db.storage.from('course_videos').download(storagePath);
-      if(!file) for(const extension of ['jpg','webp']) {
-        const candidate='approved-teaching-photos/'+requestHash+'.'+extension;
-        const cached=await db.storage.from('course_videos').download(candidate);
-        if(cached.data){file=cached.data;storagePath=candidate;break;}
+      if(!file) {
+        // Independent cache probes can run together; preserve JPG-before-WebP
+        // selection and the existing checksum/readback validation.
+        const variants=await Promise.all(['jpg','webp'].map(async extension=>{
+          const path='approved-teaching-photos/'+requestHash+'.'+extension;
+          const cached=await db.storage.from('course_videos').download(path);
+          return {path,data:cached.data};
+        }));
+        const hit=variants.find(variant=>variant.data);
+        if(hit){file=hit.data;storagePath=hit.path;}
       }
       let repairProof:any;
       if (!file) {

@@ -7,6 +7,7 @@ import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 const execFileAsync = promisify(execFile);
+import {completeStagedLesson} from './learner-runthrough.mjs';
 import { launchBrowser } from './cdp-browser.mjs';
 
 const executablePath = process.env.STUDIO_BROWSER_EXECUTABLE_PATH;
@@ -41,11 +42,12 @@ test(
         <section data-testid="scenario"><button>Continue with the mistake</button><button>Correct the procedure</button><p role="status">Choose a decision</p></section>
         <section id="assessment"><fieldset><legend>Which answer is correct?</legend><label><input type="radio" name="answer" value="0">Wrong</label><label><input type="radio" name="answer" value="1">Correct</label></fieldset><button>Submit assessment</button><p role="status">Not submitted</p></section>
         <div id="remediation"></div><button id="complete">Complete lesson</button>
+        <div hidden><p role="status" data-testid="lesson-completed">Lesson completed</p></div>
         </main><script>
         document.querySelectorAll('[data-testid="guided_practice"] button').forEach(button=>button.onclick=()=>{const status=document.createElement('p');status.setAttribute('role','status');status.textContent='Practice saved.';button.parentElement.append(status);});
         document.querySelectorAll('[data-testid="scenario"] button').forEach((button,index)=>button.onclick=()=>{button.parentElement.querySelector('[role="status"]').textContent=index?'Correct decision.':'Review this decision.';});
         document.querySelector('#assessment button').onclick=()=>{const passed=document.querySelector('input:checked')?.value==='1';document.querySelector('#assessment [role="status"]').textContent=passed?'Score: 100. Passed.':'Score: 0. Review required.';if(!passed){document.querySelector('#remediation').innerHTML='<section data-testid="remediation"><button>I have reviewed the missed objectives</button></section>';document.querySelector('#remediation button').onclick=()=>{document.querySelector('#assessment').setAttribute('data-testid','reassessment');};}};
-        document.querySelector('#complete').onclick=()=>{sessionStorage.setItem('completed','true');const done=document.createElement('p');done.dataset.testid='lesson-completed';done.textContent='Lesson completed';document.querySelector('main').append(done);};
+        document.querySelector('#complete').onclick=()=>{sessionStorage.setItem('completed','true');const done=document.createElement('p');done.dataset.testid='lesson-completed';done.setAttribute('role','status');done.textContent='Lesson completed';document.querySelector('main').append(done);};
         if(sessionStorage.getItem('completed'))document.querySelector('#complete').click();
         </script>`); return;
     }
@@ -324,10 +326,9 @@ test(
       await learner.getByRole('button', { name: 'Submit assessment', exact: true }).click();
       await learner.getByRole('status').filter({ hasText: 'Score: 100' }).waitFor();
       assert.equal(await learner.getByTestId('practical').count(), 0);
-      await learner.getByRole('button', { name: 'Complete lesson', exact: true }).click();
-      await learner.reload();
-      await learner.getByTestId('lesson-completed').waitFor();
-      assert.equal(await learner.getByTestId('lesson-completed').isVisible(), true);
+      await completeStagedLesson(learner, async()=>({completed:await learner.evaluate(()=>sessionStorage.getItem('completed')==='true')}));
+      assert.equal(await learner.getByTestId('lesson-completed').count(),2);
+      await assert.rejects(learner.getByTestId('lesson-completed').isVisible(),/Strict locator/);
     } finally { await learner.close(); }
   });
   await t.test('context requests share HttpOnly cookies with browser without leaking across hosts', async () => {

@@ -45,7 +45,7 @@ on:
       - 'next.config.mjs'
       - 'scripts/test-tax-*.mjs'
       - 'scripts/tax-route-test-harness.mjs'
-      - 'scripts/verify-paris-release-source.mjs'
+      - 'scripts/verify-paris-release-source*.mjs'
       - 'scripts/gcp/preflight-billing.mjs'
       - 'scripts/gcp/preflight-billing.test.mjs'
       - 'package.json'
@@ -67,7 +67,7 @@ jobs:
     concurrency:
       group: google-marketing-dispatch-main
       cancel-in-progress: true
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     steps:
       - name: Dispatch trusted main Marketing release
@@ -76,9 +76,10 @@ jobs:
         run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-google-marketing-trigger.yml/dispatches" -f ref=main
   deploy:
     concurrency:
-      group: google-production-marketing
+      group: google-runtime-us-central1
       cancel-in-progress: false
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+      queue: max
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 120
@@ -89,6 +90,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Reject superseded Marketing requests before building
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_WORKFLOW: deploy-google-marketing-trigger.yml
+        run: node scripts/gcp/prune-web-release-requests.mjs --assert-latest
 
       - name: Verify immutable main revision
         shell: bash
@@ -139,6 +146,7 @@ jobs:
       - name: Verify PARIS source bundle and private API behavior
         run: |
           set -euo pipefail
+          node --test scripts/verify-paris-release-source.test.mjs
           node scripts/verify-paris-release-source.mjs
           node scripts/test-tax-calculation-failures.mjs apps/marketing/app/api/tax/returns/calculate/route.ts
           node scripts/test-tax-w2-validation.mjs apps/marketing/app/api/tax/w2/confirm/route.ts
@@ -250,10 +258,12 @@ jobs:
           if [[ -n "$TAX_ENCRYPTION_BINDING" ]]; then TAX_ARGS+=(--update-secrets="$TAX_ENCRYPTION_BINDING"); fi
           SUFFIX="r${GITHUB_SHA:0:8}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "revision=elevate-marketing-migration-$SUFFIX" >> "$GITHUB_OUTPUT"
+          CANDIDATE_SERVICE=elevate-marketing-migration node scripts/gcp/cleanup-unused-candidate-tags.mjs
+          CANDIDATE_SERVICE=elevate-marketing-migration CANDIDATE_CPU=1 CANDIDATE_MEMORY=4Gi node scripts/gcp/preflight-web-rollout.mjs
           gcloud run services update elevate-marketing-migration \
             --project=elegant-racer-299721 \
             --region=us-central1 \
-            --cpu=1 --memory=4Gi \
+            --cpu=1 --memory=4Gi --max=1 --max-instances=1 --no-cpu-boost \
             "${TAX_ARGS[@]}" \
             --image="$IMAGE@$DIGEST" \
             --revision-suffix="$SUFFIX" \

@@ -52,7 +52,7 @@ permissions:
 
 jobs:
   dispatch:
-    if: github.event_name == 'push'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'push')
     concurrency:
       group: google-admin-dispatch-main
       cancel-in-progress: true
@@ -70,10 +70,11 @@ jobs:
           gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-admin.yml/dispatches" -f ref=main -f "inputs[requested_sha]=$latest"
   deploy-admin:
     concurrency:
-      group: google-admin-runtime-operations
+      group: google-runtime-us-central1
       cancel-in-progress: false
+      queue: max
     name: Build and deploy Admin on Google
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 120
@@ -89,13 +90,14 @@ jobs:
           node-version: '22'
       - name: Validate Studio runtime cutover before building Admin
         run: |
-          node --test lib/devstudio/main-release.test.mjs scripts/test-studio-browser-configuration.mjs scripts/test-telnyx-sending-number.mjs
+          node --test lib/devstudio/main-release.test.mjs scripts/test-studio-browser-configuration.mjs scripts/test-phone-sending-number.mjs
           node --test scripts/test-public-revision-activation.mjs
           node scripts/audit-course-builder-procurement.mjs
       - name: Reject superseded deployment requests before building
         env:
           GH_TOKEN: ${{ github.token }}
           REQUESTED_SHA: ${{ inputs.requested_sha }}
+          RELEASE_WORKFLOW: deploy-admin.yml
         shell: bash
         run: |
           set -euo pipefail
@@ -103,11 +105,15 @@ jobs:
             echo "::error::Invalid requested_sha"
             exit 1
           fi
-          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
-          if test "$latest" != "$GITHUB_SHA" || { test -n "$REQUESTED_SHA" && test "$REQUESTED_SHA" != "$GITHUB_SHA"; }; then
-            echo "::error::Superseded release; do not deploy an older Admin revision."
+          if test -n "$REQUESTED_SHA" && test "$REQUESTED_SHA" != "$GITHUB_SHA"; then
+            echo "::error::Requested Admin release differs from the checked-out commit."
             exit 1
           fi
+          git fetch --depth=50 origin main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+          # Later unrelated commits do not invalidate the latest Admin request.
+          # A newer Admin request does; retire it before any expensive build.
+          node scripts/gcp/prune-web-release-requests.mjs --assert-latest
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
@@ -118,6 +124,8 @@ jobs:
           skip_install: true
       - name: Verify Google SDK
         run: node scripts/gcp/verify-sdk.mjs
+      - name: Verify project billing and empty upload admission before building
+        run: node scripts/gcp/preflight-billing.mjs
       - name: Verify automatic container memory policy
         run: node scripts/check-build-memory-policy.mjs --source-only
       - name: Build the Admin image
@@ -135,6 +143,12 @@ jobs:
             --build-arg "BUILD_TIMESTAMP=$(date -u +%FT%TZ)" \
             --build-arg NEXT_PUBLIC_SUPABASE_URL \
             --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY .
+      - name: Refresh Google credentials after build
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
       - name: Upload and deploy the exact Admin image
         shell: bash
         run: |
@@ -146,14 +160,13 @@ jobs:
           DIGEST="$(gcloud artifacts docker images describe "$IMAGE:$GITHUB_SHA" --project=elegant-racer-299721 --format='value(image_summary.digest)')"
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
           CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/cleanup-unused-candidate-tags.mjs
-          # Image-only promotion preserves runtime capacity; an active course job
-          # does not prohibit an Admin build. Cloud Run enforces actual quota
-          # and revision readiness during update; failed promotion must fail here.
+          CANDIDATE_SERVICE=elevate-admin-migration node scripts/gcp/preflight-web-rollout.mjs
+          # Reserve rollout headroom before creating a replacement revision.
           # Keep the existing runtime identity, secrets, memory and scaling.
           # CPU must remain allocated while leased background renders execute.
           gcloud run services update elevate-admin-migration \
             --project=elegant-racer-299721 --region=us-central1 \
-            --image="$IMAGE@$DIGEST" --no-cpu-throttling --no-traffic \
+            --image="$IMAGE@$DIGEST" --no-cpu-boost --no-cpu-throttling --no-traffic \
             --update-env-vars=AI_NARRATION_PROVIDER=kokoro --quiet
       - name: Health-check and activate the exact Admin candidate
         shell: bash

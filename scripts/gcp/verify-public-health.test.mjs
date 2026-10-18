@@ -38,3 +38,15 @@ test('Store rejects a healthy response from Marketing', async () => {
  const result = await verifySite('store', async () => ({status:200,json:async () => ({service:'marketing',ok:true,ready:true,healthy:true,dependencies:{supabase:{ok:true}}})}));
  assert.equal(result.some(x=>x.passed),false);
 });
+
+test('failed dependency diagnostics preserve only safe status, timing and error classes', async () => {
+ const request=async()=>({status:503,json:async()=>({service:'lms',ready:true,healthy:false,dependencies:{supabase:{ok:false,status:503,latencyMs:2501,error:'TimeoutError',secret:'do-not-print',checks:{auth:{ok:true,status:200,latencyMs:10},database:{ok:false,status:503,latencyMs:2501,error:'TimeoutError',body:'do-not-print'}}}}})});
+ const result=await verifySite('lms',request),health=result.find(x=>x.path==='/api/health');
+ assert.equal(health.supabase.error,'TimeoutError');assert.equal(health.database.status,503);assert.equal(health.database.latencyMs,2501);assert.equal(JSON.stringify(result).includes('do-not-print'),false);
+});
+test('network and malformed JSON failures remain distinguishable',async()=>{
+ for(const name of ['TimeoutError','SyntaxError']) {
+  const result=await verifySite('store',async()=>{const e=new Error('private-message');e.name=name;throw e;});
+  assert.equal(result[0].error,name);assert.equal(JSON.stringify(result).includes('private-message'),false);
+ }
+});

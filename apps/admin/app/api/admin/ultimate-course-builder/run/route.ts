@@ -20,14 +20,14 @@ export async function POST(req: NextRequest) {
   try {
     const db = await requireAdminClient();
     const { data: build, error } = await db.from('ultimate_course_builds')
-      .select('id,status').eq('id', body.buildId).single();
+      .select('id,status,profile').eq('id', body.buildId).single();
     if (error || !build) return NextResponse.json({ error: 'Ultimate build not found' }, { status: 404 });
-    if (['built', 'published'].includes(build.status))
+    if (['built', 'published', 'archived'].includes(build.status))
       return NextResponse.json({ error: 'This build has finished. Use the verified release action.' }, { status: 409 });
     // Enqueue is idempotent: keep the same checkpoints and any existing lease.
     let job = await new UltimateJobQueue(db as any).enqueue(build.id, { requestedBy: auth.id });
     if (!job) return NextResponse.json({ error: 'No runnable build job was saved' }, { status: 409 });
-    if (job.status === 'running' && Date.parse(job.lease_expires_at ?? '') > Date.now() && Date.now() - Date.parse(job.heartbeat_at ?? '') < 90000)
+    if (job.status === 'running' && Date.parse(job.lease_expires_at ?? '') > Date.now() && Date.now() - Date.parse(job.heartbeat_at ?? '') >= 0 && Date.now() - Date.parse(job.heartbeat_at ?? '') < 90000)
       return NextResponse.json({ ok: true, alreadyRunning: true, executionVerified: true, message: 'The existing worker is active. No duplicate execution was started.' });
     if (job.status === 'running' && Date.parse(job.lease_expires_at ?? '') > Date.now())
       return NextResponse.json({ error: 'The existing worker still holds its lease. Refresh its heartbeat before requesting recovery.' }, { status: 409 });
@@ -41,6 +41,20 @@ export async function POST(req: NextRequest) {
       if (recovery.error || !recovery.data)
         return NextResponse.json({ error: 'The worker state changed. Refresh before requesting recovery.' }, { status: 409 });
       job = recovery.data;
+    }
+    // An explicit authenticated Resume must clear a saved production pause.
+    // Record the real authenticated actor; the legacy flag alone proves no actor.
+    const profile = build.profile as Record<string, unknown>;
+    if (profile?.ownerPaused === true) {
+      const now = new Date().toISOString();
+      const resumed = await db.from('ultimate_course_builds').update({
+        profile: { ...profile, ownerPaused: false,
+          pauseResumeAudit: { previousPauseFlag: true, resumedBy: auth.id, resumedAt: now, action: 'explicit-admin-resume' } },
+        updated_at: now,
+      }).eq('id', build.id).in('status', ['initializing', 'queued', 'running', 'blocked', 'failed', 'built_with_findings'])
+        .eq('profile', JSON.stringify(profile)).select('id');
+      if (resumed.error || resumed.data?.length !== 1)
+        return NextResponse.json({ error: 'The saved build changed. Refresh before resuming; no worker was launched.' }, { status: 409 });
     }
     const dispatch = await requestCourseWorker();
     // A persisted queue request is not a live execution. Surface a retryable

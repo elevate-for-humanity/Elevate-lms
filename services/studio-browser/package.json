@@ -8,6 +8,7 @@
     "check": "node --check server.mjs && node --check cdp-browser.mjs && node --test *.test.mjs"
   },
   "dependencies": {
+    "@google-cloud/storage": "8.4.0",
     "axe-core": "^4.10.3"
   }
 }

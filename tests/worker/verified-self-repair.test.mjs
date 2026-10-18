@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {stripTypeScriptTypes} from 'node:module';import {repairDirective,instructionView} from '../../lib/ultimate-course-builder/core/repair-policy.mjs';
 const src=stripTypeScriptTypes(readFileSync(new URL('../../lib/ultimate-course-builder/core/build-runner.ts',import.meta.url),'utf8'),{mode:'transform'}).replace(/^import[\s\S]*?from ['"][^'"]+['"];?\n/gm,'').replaceAll('export ','');
 function runner(handlers,validation=()=>[],options={}){
- return new Function('repairDirective','artifactPayload','contractHash','currentEvidence','stepInputHash','validateStepOutput','practicalVisualFailures','ULTIMATE_LESSON_CONTRACT_VERSION','MAX_TARGETED_REPAIRS','isDurableExternalBlocker','routeSelectiveRepairs','ULTIMATE_BUILD_STEPS',src+'\nreturn UltimateBuildRunner;')(repairDirective,x=>{const {contractEvidence,...rest}=x;return rest;},JSON.stringify,options.currentEvidence??(()=>false),()=>'',validation,()=>[],'test',2,f=>/^(MEDIA_LICENSE_REQUIRED|LICENSE_APPROVAL_REQUIRED|PAID_INFERENCE_AUTHORIZATION_REQUIRED)$/.test(f.code),options.route??(findings=>findings[0]?.code==='INSTRUCTIONAL_QUALITY_FAILED'?[{step:'learning_objectives'}]:[]),['learning_objectives','lesson_film_render','finished_media_qa']);
+ return new Function('repairDirective','artifactPayload','contractHash','currentEvidence','stepInputHash','stepInputHashes','validateStepOutput','practicalVisualFailures','ULTIMATE_LESSON_CONTRACT_VERSION','MAX_TARGETED_REPAIRS','isDurableExternalBlocker','routeSelectiveRepairs','ULTIMATE_BUILD_STEPS',src+'\nreturn UltimateBuildRunner;')(repairDirective,x=>{const {contractEvidence,...rest}=x;return rest;},JSON.stringify,options.currentEvidence??(()=>false),()=>'',()=>[''],validation,()=>[],'test',2,f=>/^(MEDIA_LICENSE_REQUIRED|LICENSE_APPROVAL_REQUIRED|PAID_INFERENCE_AUTHORIZATION_REQUIRED)$/.test(f.code),options.route??(findings=>findings[0]?.code==='INSTRUCTIONAL_QUALITY_FAILED'?[{step:'learning_objectives'}]:[]),['learning_objectives','lesson_film_render','finished_media_qa']);
 }
 test('repair carries exact failed requirement, changes producer and validates before new render',async()=>{
  let renders=0,authors=0;const journal=[];const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{},findings:[],passedSteps:new Set(),persistArtifact:async x=>journal.push(x)};
@@ -40,4 +40,15 @@ test('inspection retry preserves the accepted film and resumes only the failed i
   inspections++;return inspections===1?{passed:false,findings:[{code:'MEDIA_INSPECTION_TEMPORARY',severity:'error',message:'transcript read timeout'}]}:{artifacts:{mediaQA:{inspection:'measured evidence'}}};
  }}).run(ctx);
  assert.equal(inspections,2);assert.equal(ctx.artifacts.lesson_film_render.video,'saved.mp4');assert.equal(ctx.passedSteps.has('finished_media_qa'),true);
+});
+
+test('restart preserves a validated repair producer but still executes an unfinished directive',async()=>{
+ for(const status of ['producer-validated','diagnosed']){
+  let renders=0,inspections=0;
+  const R=runner({},()=>[],{currentEvidence:()=>true});
+  const ctx={buildId:'b:c',profile:{competencies:[{id:'c'}]},artifacts:{learning_objectives:{blueprint:'saved'},lesson_film_render:{video:'saved.mp4'},__repairState:{status,directive:{target:'lesson_film_render'}}},findings:[],passedSteps:new Set(['learning_objectives','lesson_film_render'])};
+  await new R({learning_objectives:()=>assert.fail('must preserve source'),lesson_film_render:async()=>{renders++;return {artifacts:{video:'repaired.mp4'}};},finished_media_qa:async()=>{inspections++;return {artifacts:{inspection:'measured evidence'}};}}).run(ctx);
+  assert.equal(renders,status==='producer-validated'?0:1);assert.equal(inspections,1);
+  assert.equal(ctx.artifacts.lesson_film_render.video,status==='producer-validated'?'saved.mp4':'repaired.mp4');
+ }
 });

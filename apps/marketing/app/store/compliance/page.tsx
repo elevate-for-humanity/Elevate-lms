@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: `Compliance Controls & Evidence | ${PLATFORM_DEFAULTS.orgName} Store`,
   description:
     'Review implemented workforce reporting, privacy, access-control, accessibility, audit, and credential-verification controls with explicit acceptance boundaries.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/store/compliance' },
+  alternates: { canonical: 'https://store.elevateforhumanity.org/store/compliance' },
 };
 
 const controls = [

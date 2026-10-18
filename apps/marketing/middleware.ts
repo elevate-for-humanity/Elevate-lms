@@ -129,7 +129,10 @@ function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextRespons
     url.pathname = '/store';
     return NextResponse.redirect(url, 307);
   }
-  if (isStoreRuntimeAllowed(pathname)) return NextResponse.next();
+  // Provider callbacks must reach Store's verified handlers without a Marketing hop.
+  const commerceCallbacks = ['/api/webhooks/paypal-billing', '/api/webhooks/quickbooks'];
+  // The cart uses this authenticated billing endpoint for individual apps.
+  if (commerceCallbacks.includes(pathname) || pathname === '/api/apps/upgrade' || isStoreRuntimeAllowed(pathname)) return NextResponse.next();
   return NextResponse.redirect(new URL(`https://www.elevateforhumanity.org${pathname}${req.nextUrl.search}`), 307);
 }
 
@@ -157,6 +160,13 @@ export async function middleware(req: NextRequest) {
   }
 
   const host = requestHost(req);
+
+  // Marketing links to the existing Store application; it does not serve a
+  // second public storefront. Keep mutation callbacks on their existing URLs.
+  const marketingStoreHost = ['www.elevateforhumanity.org', 'elevateforhumanity.org'].includes(host) || host.endsWith('.run.app');
+  if (marketingStoreHost && ['GET', 'HEAD'].includes(req.method) && (pathname === '/store' || pathname.startsWith('/store/'))) {
+    return NextResponse.redirect(new URL(pathname + search, 'https://store.elevateforhumanity.org'), 307);
+  }
 
   if (host === 'elevateforhumanity.org') {
     return NextResponse.redirect(
@@ -251,6 +261,7 @@ export async function middleware(req: NextRequest) {
   let response = NextResponse.next({ request: { headers: requestHeaders } });
   const supabase = createMiddlewareSupabaseClient(req, (cookiesToSet) => {
     cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
+    requestHeaders.set('cookie', req.cookies.toString());
     response = NextResponse.next({ request: { headers: requestHeaders } });
     cookiesToSet.forEach(({ name, value, options }) => {
       response.cookies.set(name, value, cookieOptions(name, options as Record<string, unknown>) as any);
@@ -259,7 +270,9 @@ export async function middleware(req: NextRequest) {
 
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) {
-    return loginRedirect();
+    const redirect = loginRedirect();
+    for (const cookie of response.cookies.getAll()) redirect.cookies.set(cookie);
+    return redirect;
   }
 
   response.headers.set('Cache-Control', 'private, no-store, max-age=0');

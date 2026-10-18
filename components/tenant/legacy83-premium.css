@@ -1,0 +1,53 @@
+/* Scoped premium visual treatment for the existing Legacy 83 builder project. */
+.legacy83-premium{font-family:Georgia,"Times New Roman",serif;background:#faf7f0!important;color:#182d24!important}
+.legacy83-premium header{background:rgba(250,247,240,.96)!important;border-color:rgba(183,147,83,.28)!important;box-shadow:0 8px 35px rgba(19,40,31,.07)!important}
+.legacy83-premium header nav,.legacy83-premium header a,.legacy83-premium footer{font-family:Arial,sans-serif}
+.legacy83-premium main>section:first-child{background:radial-gradient(circle at 85% 15%,rgba(199,166,103,.21),transparent 38%),linear-gradient(125deg,#112a20 0%,#254434 58%,#182f26 100%);color:#fff;border:0;position:relative;overflow:hidden}
+.legacy83-premium main>section:first-child>div{max-width:1360px;min-height:660px;padding-top:90px;padding-bottom:90px;gap:clamp(2rem,5vw,6rem)}
+.legacy83-premium main>section:first-child h1{font-family:Georgia,serif;font-size:clamp(3.5rem,6vw,6.6rem);font-weight:500;letter-spacing:-.055em;line-height:1.04;color:#fff}
+.legacy83-premium main>section:first-child p{color:#f1e8d7!important}
+.legacy83-premium main>section:first-child p:first-child{color:#d9b76f!important;letter-spacing:.27em}
+.legacy83-premium main>section:first-child img{height:520px;object-position:center top}
+.legacy83-premium main>section:first-child div:has(>img){border:7px solid rgba(233,209,162,.3);border-radius:240px 240px 12px 12px;box-shadow:24px 30px 0 rgba(211,170,100,.12)}
+.legacy83-premium main>section:first-child a{background:#d3b476!important;color:#183025!important}
+.legacy83-premium main>section:not(:first-child){padding-top:clamp(4rem,7vw,7rem);padding-bottom:clamp(4rem,7vw,7rem)}
+.legacy83-premium main>section h2{font-family:Georgia,serif;font-size:clamp(2.4rem,4vw,4rem);font-weight:500;letter-spacing:-.04em;line-height:1.15}
+.legacy83-premium main>section article{border-radius:10px;border:1px solid #dfd5c2;background:#fffdf8;box-shadow:0 16px 40px rgba(21,49,34,.07)}
+.legacy83-premium main>section article:hover{box-shadow:0 22px 55px rgba(21,49,34,.16)}
+.legacy83-premium main>section article h3{font-family:Georgia,serif;font-size:1.6rem;font-weight:500}
+.legacy83-premium main>section article img{aspect-ratio:4/3}
+.legacy83-premium main>section:nth-child(2n+3){background:#f1ebde}
+.legacy83-premium main>section a.rounded-full{border-radius:5px;letter-spacing:.045em}
+.legacy83-premium footer{background:#112a20;color:#f4e9d7}
+.legacy83-premium footer p{color:#f4e9d7!important}
+@media(max-width:767px){.legacy83-premium main>section:first-child>div{min-height:auto;padding-top:64px;padding-bottom:64px}.legacy83-premium main>section:first-child img{height:360px}.legacy83-premium main>section:first-child h1{font-size:3.4rem}.legacy83-premium header nav{gap:12px}}
+
+/* Fix the oversized wrapping header seen in the actual mobile screenshot. */
+.legacy83-premium header>div{display:flex;flex-wrap:nowrap;gap:1.25rem;min-height:86px}
+.legacy83-premium header>a,.legacy83-premium header>div>a:first-child{flex-shrink:1;min-width:0}
+.legacy83-premium header>div>a:first-child span{font-family:Georgia,serif;font-weight:500;letter-spacing:-.025em}
+.legacy83-premium header>div>a:first-child img{max-height:62px;max-width:155px}
+.legacy83-premium header nav{gap:clamp(.7rem,1.5vw,1.5rem);white-space:nowrap}
+.legacy83-premium header nav a{font-weight:600;font-size:.83rem}
+.legacy83-premium main>section:first-child{isolation:isolate}
+.legacy83-premium main>section:first-child>div{position:relative}
+.legacy83-premium main>section:first-child h1{max-width:800px}
+.legacy83-premium main>section:first-child img{width:100%;object-fit:cover}
+.legacy83-mobile-menu{display:none}
+@media(max-width:1023px){
+.legacy83-premium header>div{min-height:76px;padding:12px 18px}
+.legacy83-premium header nav{display:none!important}
+.legacy83-premium header>div>a:last-child{display:none}
+.legacy83-premium header>div>a:first-child img{max-width:110px;max-height:52px}
+.legacy83-premium header>div>a:first-child span{font-size:1.05rem;white-space:normal;line-height:1.15}
+.legacy83-mobile-menu{display:block;position:relative;z-index:25;background:#112a20;color:#f6ebd8;font-family:Arial,sans-serif}
+.legacy83-mobile-menu summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:15px 22px;font-weight:700}
+.legacy83-mobile-menu summary::-webkit-details-marker{display:none}
+.legacy83-mobile-menu nav{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:5px 16px 18px}
+.legacy83-mobile-menu nav a{padding:13px 10px;border-bottom:1px solid #ffffff26;font-size:14px}
+.legacy83-premium main>section:first-child>div{display:flex;flex-direction:column-reverse;gap:2rem;padding:40px 22px 65px}
+.legacy83-premium main>section:first-child h1{font-size:clamp(2.7rem,8vw,4.8rem);line-height:1.07}
+.legacy83-premium main>section:first-child img{height:clamp(300px,75vw,480px);object-position:center 24%}
+.legacy83-premium main>section:first-child div:has(>img){max-width:580px;width:100%;margin:auto}
+}
+@media(max-width:450px){.legacy83-premium main>section:first-child h1{font-size:2.8rem}.legacy83-premium main>section:first-child>div{padding-left:18px;padding-right:18px}.legacy83-premium main>section:not(:first-child){padding-top:52px;padding-bottom:52px}}

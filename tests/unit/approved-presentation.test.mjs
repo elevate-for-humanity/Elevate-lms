@@ -2,10 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {measuredTeachingStep} from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
 import {approvedPresentationForCourse,narrationSceneSeconds,presentationBookendFrames,assertNarratedScenes,assertPremiumSpeechSignal} from '../../lib/ultimate-course-builder/instructional/approved-presentation.mjs';
-test('approved format is limited to the two existing course IDs',()=>{
-  assert.equal(approvedPresentationForCourse('2c723bfa-8c40-4acc-b961-98d917710ffc'),'approved-premium-v1');
-  assert.equal(approvedPresentationForCourse('9ca9fb50-7119-46ea-ab81-9b0193c29c31'),'approved-premium-v1');
-  assert.equal(approvedPresentationForCourse('unrelated'),undefined);
+test('course identity alone never substitutes for an explicit owner presentation selection',()=>{
+  for(const id of ['2c723bfa-8c40-4acc-b961-98d917710ffc','9ca9fb50-7119-46ea-ab81-9b0193c29c31','unrelated'])
+    assert.equal(approvedPresentationForCourse(id),undefined);
 });
 test('short and fractional speech receives only frame quantization, no added dead time',()=>{
   for(const seconds of [.2,3.2,10.051,60.01]) {

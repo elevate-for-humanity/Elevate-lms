@@ -9,6 +9,8 @@ import { requestCourseWorker } from '@/lib/gcp/course-worker-launch';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
 import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/instructional/google-lesson-author';
+import { adminPreviewPlaybackUrl } from '@/lib/ultimate-course-builder/media/admin-preview-url.mjs';
+import { ownerApprovedPreview } from '@/lib/ultimate-course-builder/media/owner-approved-preview.mjs';
 import { lessonPreview } from '@/lib/ultimate-course-builder/core/lesson-preview';
 import {
   renderMediaUrl,
@@ -107,7 +109,12 @@ export async function GET(req: NextRequest) {
               }
             }
           }
-          return { ...saved, preview };
+          const approved = await ownerApprovedPreview(db,data,lesson);
+          if (preview.videoUrl) preview.videoUrl = adminPreviewPlaybackUrl(buildId, lesson.id, preview.videoUrl);
+          return { ...saved, preview: {...preview,...(approved?{
+            approvedVideoUrl:adminPreviewPlaybackUrl(buildId,lesson.id,approved.videoUrl)+'&kind=approved',
+            approvedVersion:approved.version,
+          }:{})} };
         }),
       ).catch((error) => {
         logger.error('Saved lesson preview recovery failed', error);
@@ -122,7 +129,7 @@ export async function GET(req: NextRequest) {
   let query = db
     .from('ultimate_course_builds')
     .select(
-      'id,course_id,status,current_step,created_at,updated_at,ultimate_build_jobs(id,status,last_error,created_at,heartbeat_at,lease_expires_at,payload,monitor)',
+      'id,course_id,status,current_step,created_at,updated_at,ultimate_build_jobs(id,status,last_error,created_at,updated_at,heartbeat_at,lease_expires_at,payload,monitor)',
     )
     .order('created_at', { ascending: false })
     .limit(50);

@@ -1,9 +1,14 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+import { ResizableWorkspace } from '@/components/studio/ResizableWorkspace';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Award, BookOpen, Bot, Loader2, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
 import UltimateStageInspector from '@/components/admin/course-builder/UltimateStageInspector';
 import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
+import { orderCourseJobs } from '@/lib/ultimate-course-builder/core/job-observation.mjs';
+
+const CloudBrowserWorkspace = dynamic(() => import('@/components/studio/CloudBrowserWorkspace'), { ssr: false });
 
 type Tab = 'courses' | 'ultimate' | 'registry';
 type CourseRow = {
@@ -35,10 +40,11 @@ type UltimateBuildRow = {
     status: string;
     last_error?: string | null;
     created_at: string;
+    updated_at?: string | null;
     heartbeat_at?: string | null;
     lease_expires_at?: string | null;
     monitor?: {enabled?: boolean; coordinator?: string; state?: string; checkedAt?: string; reason?: string; recoveries?: number};
-    payload?: { progress?: { phase: string; at: string; completed: number; total?: number | null } };
+    payload?: { ownerPreview?: boolean; progress?: { phase: string; at: string; completed: number; total?: number | null } };
   }>;
 };
 
@@ -92,11 +98,15 @@ export default function UnifiedCourseBuilder({
   initialCourseId = '',
   initialTab = 'ultimate',
   embedded = false,
+  initialBrowserTarget = '',
 }: {
   initialCourseId?: string;
   initialTab?: Tab;
   embedded?: boolean;
+  initialBrowserTarget?: string;
 }) {
+  const [browserOpen, setBrowserOpen] = useState(false);
+  const [browserVisited, setBrowserVisited] = useState(false);
   const [tab, setTab] = useState<Tab>(initialTab);
   const [courses, setCourses] = useState<CourseRow[]>([]);
   const [programs, setPrograms] = useState<ProgramRow[]>([]);
@@ -181,7 +191,7 @@ export default function UnifiedCourseBuilder({
       );
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return (
+  const workspace = (
     <div
       className={`${embedded ? 'h-full overflow-y-auto' : 'min-h-screen'} min-w-0 w-full overflow-x-clip bg-slate-950 text-slate-100`}
     >
@@ -290,6 +300,17 @@ export default function UnifiedCourseBuilder({
         {tab === 'registry' && <CredentialRegistryPanel course={selectedCourse} />}
       </main>
     </div>
+  );
+  return (
+    <ResizableWorkspace
+      className={embedded ? 'h-full' : 'h-[calc(100dvh-5rem)] min-h-[34rem]'}
+      title="Course browser"
+      open={browserOpen}
+      onOpenChange={(open) => { setBrowserOpen(open); if (open) setBrowserVisited(true); }}
+      panel={browserVisited ? <CloudBrowserWorkspace autoStart={browserOpen} initialTarget={initialBrowserTarget} /> : null}
+    >
+      {workspace}
+    </ResizableWorkspace>
   );
 }
 
@@ -625,19 +646,22 @@ export function UltimateBuildPanel({
   const [googleModel, setGoogleModel] = useState('');
   const [googleLocation,setGoogleLocation]=useState('us');
   const [mobileSplitView, setMobileSplitView] = useState(false);
-  const jobs = [...(latest?.ultimate_build_jobs ?? [])].sort((a, b) =>
-    b.created_at.localeCompare(a.created_at),
-  );
+  const [syllabusText, setSyllabusText] = useState('');
+  const [syllabusName, setSyllabusName] = useState('');
+  const [syllabusBusy, setSyllabusBusy] = useState(false);
+  const [syllabusConfirmed, setSyllabusConfirmed] = useState(false);
+  const jobs: NonNullable<UltimateBuildRow['ultimate_build_jobs']> = orderCourseJobs(latest?.ultimate_build_jobs ?? []);
   const observedJobs = jobs.map(job => {
     if (job.status !== 'running') return job;
     const heartbeat = Date.parse(job.heartbeat_at ?? '');
     const leaseEnd = Date.parse(job.lease_expires_at ?? '');
-    const active = Number.isFinite(heartbeat) && Date.now() - heartbeat < 90_000 &&
+    const active = Number.isFinite(heartbeat) && Date.now() - heartbeat >= 0 && Date.now() - heartbeat < 90_000 &&
       Number.isFinite(leaseEnd) && leaseEnd > Date.now();
     return active ? job : {...job, status: 'stalled', last_error: 'Worker heartbeat is missing or stale. Resume the saved build; Google prevents overlapping executions.'};
   });
   const activeJob = observedJobs.find((job) => ['queued', 'running'].includes(job.status));
   const workerJob = activeJob ?? observedJobs[0];
+  const previewReady = workerJob?.status === 'completed' && workerJob?.payload?.ownerPreview === true;
 
   async function refresh(requestedCourseId = course.id, background = false) {
     if (background && refreshController.current) return;
@@ -695,6 +719,47 @@ export function UltimateBuildPanel({
       setNotice(result.message); await refresh();
     } catch(reason) {setError(reason instanceof Error?reason.message:'Autopilot configuration failed');}
     finally {setBusy(false);}
+  }
+
+  async function loadSyllabus(file: File | undefined) {
+    if (!file) return;
+    setSyllabusBusy(true); setError(''); setSyllabusConfirmed(false);
+    try {
+      const form = new FormData();
+      form.set('file', file);
+      const response = await fetch('/api/admin/courses/generate/parse', { method: 'POST', body: form });
+      const result = await readJson(response);
+      if (!response.ok || typeof result.raw_text !== 'string') throw new Error(result.error || 'Syllabus extraction failed');
+      setSyllabusText(result.raw_text);
+      setSyllabusName(file.name);
+      setNotice('Syllabus extracted. Review the text, then attach it to this saved build.');
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Syllabus extraction failed');
+    } finally { setSyllabusBusy(false); }
+  }
+
+  async function attachSyllabus() {
+    if (!latest || !syllabusText.trim() || !syllabusConfirmed) return;
+    setSyllabusBusy(true); setError('');
+    try {
+      const response = await fetch('/api/admin/ultimate-course-builder', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'configure-contract', buildId: latest.id,
+          instructionalSources: [{
+            id: `syllabus:${course.id}:${syllabusName || 'manual'}`,
+            text: syllabusText.trim(),
+          }],
+        }),
+      });
+      const result = await readJson(response);
+      if (!response.ok || result.ok !== true) throw new Error(result.error || 'Could not save the instructional source');
+      setNotice('Syllabus attached to the saved Ultimate build. Review its contract and start the worker when ready.');
+      setSyllabusConfirmed(false);
+      await refresh();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Syllabus attachment failed');
+    } finally { setSyllabusBusy(false); }
   }
 
   async function startBuild() {
@@ -785,11 +850,31 @@ export function UltimateBuildPanel({
         </button>
       </div>
 
-      <div className={`mt-4 items-center justify-between gap-2 2xl:hidden ${compact ? 'hidden' : 'flex'}`}>
+      <section aria-label="Syllabus instructional source" className="mt-5 rounded-xl border border-cyan-800 bg-slate-950 p-4 text-white">
+        <h3 className="font-bold">Upload syllabus for PARIS course production</h3>
+        <p className="mt-1 text-sm text-slate-300">Extract PDF, DOCX, or TXT material and review the complete text before attaching it to the selected Ultimate build. This does not publish or replace lessons.</p>
+        <label className="mt-3 block text-sm font-semibold" htmlFor={`syllabus-${course.id}`}>Syllabus document (10 MB maximum)</label>
+        <input id={`syllabus-${course.id}`} type="file" accept=".pdf,.docx,.txt" disabled={syllabusBusy} onChange={event => void loadSyllabus(event.target.files?.[0])}
+          className="mt-2 block w-full rounded-lg border border-slate-700 p-2 text-sm" />
+        {syllabusText && <>
+          <label className="mt-3 block text-sm font-semibold" htmlFor={`syllabus-text-${course.id}`}>Review extracted syllabus: {syllabusName}</label>
+          <textarea id={`syllabus-text-${course.id}`} className="mt-2 min-h-40 w-full rounded-lg border border-slate-700 bg-slate-900 p-3 text-sm" value={syllabusText}
+            onChange={event => {setSyllabusText(event.target.value);setSyllabusConfirmed(false);}} />
+          <label className="mt-3 flex items-start gap-2 text-sm"><input type="checkbox" checked={syllabusConfirmed} onChange={event=>setSyllabusConfirmed(event.target.checked)} />
+            I reviewed this instructional source and authorize its use for this build.
+          </label>
+          <button type="button" disabled={!latest || latest.status === 'running' || syllabusBusy || !syllabusConfirmed || !syllabusText.trim()}
+            onClick={()=>void attachSyllabus()} className="mt-3 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50">
+            {syllabusBusy ? 'Processing…' : 'Attach approved syllabus to Ultimate build'}
+          </button>
+          {!latest && <p className="mt-2 text-sm text-amber-200">Create a saved Ultimate build before attaching syllabus sources.</p>}
+        </>}
+      </section>
+      <div className={`mt-4 flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-between 2xl:hidden ${compact ? 'hidden' : 'flex'}`}>
         <span className="text-xs font-semibold text-slate-300">Workspace layout</span>
-        <button type="button" aria-pressed={mobileSplitView} onClick={() => setMobileSplitView(value => !value)} className="rounded-lg border border-cyan-600 px-3 py-2 text-xs font-bold text-cyan-200">{mobileSplitView ? "Use stacked view" : "Show builder + preview together"}</button>
+        <button type="button" aria-pressed={mobileSplitView} onClick={() => setMobileSplitView(value => !value)} className="min-h-11 w-full rounded-lg border border-cyan-600 px-3 py-2 text-center text-xs font-bold text-cyan-200 sm:w-auto">{mobileSplitView ? "Use stacked view" : "Show builder + preview together"}</button>
       </div>
-      <div data-course-workspace-layout className={`mt-5 grid min-w-0 items-start gap-2 sm:gap-5 ${compact ? '' : '2xl:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)]'} ${mobileSplitView && !compact ? "grid-cols-2" : "grid-cols-1"}`}>
+      <div data-course-workspace-layout className={`mt-5 grid min-w-0 items-start gap-2 sm:gap-5 ${compact ? '' : '2xl:grid-cols-[minmax(0,1fr)_minmax(28rem,1fr)]'} ${mobileSplitView && !compact ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"}`}>
         <div className="min-w-0">
       {!statusLoading && latest ? (
         <div className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4">
@@ -804,7 +889,6 @@ export function UltimateBuildPanel({
           ) : null}
           {workerJob?.status === 'running' && !statusError && workerJob?.payload?.progress && <div className="mt-3 space-y-2 text-white">
             <p>Worker activity: {workerJob.payload.progress.phase.replaceAll('_', ' ').replaceAll(':', ' · ')}</p>
-            <p className="text-sm">Last progress: {new Date(workerJob.payload.progress.at).toLocaleString()}</p>
             {typeof workerJob.payload.progress.total === 'number' && workerJob.payload.progress.total > 0 && <>
               <progress aria-label="Current worker activity progress" className="h-3 w-full" max={workerJob.payload.progress.total}
                 value={Math.min(workerJob.payload.progress.total, workerJob.payload.progress.completed)} />
@@ -813,7 +897,7 @@ export function UltimateBuildPanel({
           </div>}
           {workerJob?.status === 'completed' && !['built', 'published'].includes(latest.status) ? (
             <p className="mt-2 text-sm text-slate-200">
-              This worker job finished. Course acceptance and release are still required.
+              {previewReady ? 'The single-lesson preview finished. Full course validation and continuation have not run.' : 'This worker job finished. Course acceptance and release are still required.'}
             </p>
           ) : null}
         </div>
@@ -825,15 +909,15 @@ export function UltimateBuildPanel({
           className="mt-4 rounded-lg border border-red-500/40 bg-red-950/40 p-3 text-sm text-red-100"
         >
           {error || statusError}
-          {statusError && lastStatusAt && <span className="mt-1 block">Showing saved status from {new Date(lastStatusAt).toLocaleTimeString()}. It is not live confirmation.</span>}
+          {statusError && lastStatusAt && <span className="mt-1 block">Showing saved status. Live status could not be confirmed.</span>}
         </p>
       ) : null}
 
-      <div className="mt-5 grid min-w-0 gap-2 sm:gap-4 lg:grid-cols-3">
+      <div data-course-status-cards className="mt-5 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-2 sm:gap-4">
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-300">Status</p>
           <p className="mt-1 text-lg font-black text-white">
-            {statusLoading ? 'loading…' : (!statusLoaded || statusError) ? 'Unavailable' : (latest?.status === 'queued' ? 'Awaiting worker assignment' : (workerJob?.status === 'stalled' ? 'Worker stalled' : (latest?.status ?? 'not started')))}
+            {statusLoading ? 'loading…' : (!statusLoaded || statusError) ? 'Unavailable' : previewReady ? 'Preview ready — validation pending' : (latest?.status === 'queued' ? 'Awaiting worker assignment' : (workerJob?.status === 'stalled' ? 'Worker stalled' : (latest?.status ?? 'not started')))}
           </p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
@@ -844,7 +928,7 @@ export function UltimateBuildPanel({
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-300">Saved work</p>
-          <p className="mt-1 break-all text-sm font-bold text-slate-200">
+          <p className="mt-1 break-words text-sm font-bold text-slate-200">
             {statusLoading ? 'Loading course build…' : (!statusLoaded || statusError) ? 'Unavailable' : (latest ? 'Lesson checkpoints preserved' : 'Saved when started')}
           </p>
         </div>
@@ -868,10 +952,9 @@ export function UltimateBuildPanel({
         <h3 className="font-bold">PARIS course autopilot</h3>
         <p className="mt-2">PARIS combines admissions, instruction, production, quality checks, and supervision in one system.</p>
         <p className="mt-2">{workerJob.monitor?.enabled ? 'Enabled' : 'Disabled'} · {workerJob.monitor?.state?.replaceAll('_',' ') || 'No supervisor observation yet'}</p>
-        {workerJob.monitor?.checkedAt && <p>Last supervisor check: {new Date(workerJob.monitor.checkedAt).toLocaleString()}</p>}
-        {workerJob.monitor?.enabled && (!workerJob.monitor.checkedAt || Date.now()-Date.parse(workerJob.monitor.checkedAt)>600000) &&
+        {workerJob.monitor?.enabled && (!workerJob.monitor.checkedAt || !Number.isFinite(Date.parse(workerJob.monitor.checkedAt)) || Date.now()-Date.parse(workerJob.monitor.checkedAt)<0 || Date.now()-Date.parse(workerJob.monitor.checkedAt)>600000) &&
           <p role="alert" className="mt-2 text-amber-200">Supervisor heartbeat is unconfirmed or stale. Monitoring is configured, but automatic execution is not verified.</p>}
-        {workerJob.monitor?.reason && <p className="mt-2">{workerJob.monitor.reason}</p>}
+        {workerJob.monitor?.reason && <p className="mt-2">{workerJob.monitor.reason === 'Owner pause or finished revision' ? 'A saved pause or finished-revision condition was reported. This does not establish who set it.' : workerJob.monitor.reason}</p>}
         <p className="mt-2 text-sm text-slate-200">Repairs preserve saved lessons, respect active worker leases, and stop at retry limits or missing evidence. Publishing requires the existing quality checks.</p>
         <button type="button" onClick={()=>void toggleAutopilot()} disabled={busy || statusLoading}
           className="mt-3 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50">

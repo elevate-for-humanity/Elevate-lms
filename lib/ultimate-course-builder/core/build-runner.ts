@@ -4,6 +4,7 @@ import {
   contractHash,
   currentEvidence,
   stepInputHash,
+  stepInputHashes,
   validateStepOutput,
   practicalVisualFailures,
   ULTIMATE_LESSON_CONTRACT_VERSION,
@@ -47,6 +48,8 @@ export interface UltimateRunContext {
   assertActive?: () => void;
   repairDirective?: any;
   beforeCheckpoint?: (step: UltimateBuildStep) => Promise<UltimateBuildStep | null>;
+  /** Owner preview stops after encoding; it never certifies QA or publication. */
+  renderPreviewOnly?: boolean;
 }
 
 export class UltimateBuildRunner {
@@ -58,9 +61,11 @@ export class UltimateBuildRunner {
       target: UltimateBuildStep;
       codes: string[];
     }> = [];
-    ctx.repairDirective=(ctx.artifacts as any).__repairState?.directive;
+    const savedRepair = (ctx.artifacts as any).__repairState;
+    ctx.repairDirective = savedRepair?.status === 'producer-validated' ? undefined : savedRepair?.directive;
     let index = 0;
     while (index < ULTIMATE_BUILD_STEPS.length) {
+      if (ctx.renderPreviewOnly && index > ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render')) break;
       ctx.assertActive?.();
       const requestedRepair = await ctx.beforeCheckpoint?.(ULTIMATE_BUILD_STEPS[index]);
       if (requestedRepair) {
@@ -77,7 +82,7 @@ export class UltimateBuildRunner {
       const step = ULTIMATE_BUILD_STEPS[index];
       const inputHash = stepInputHash(step, ctx.profile, ctx.artifacts);
       const competency = ctx.profile.competencies.find(c => ctx.buildId.endsWith(':' + c.id)) ?? ctx.profile.competencies[0];
-      if (ctx.repairDirective?.target !== step && ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], inputHash) &&
+      if (ctx.repairDirective?.target !== step && ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], stepInputHashes(step, ctx.profile, ctx.artifacts)) &&
           !validateStepOutput(step, ctx.artifacts[step] ?? {}).length &&
           (step !== 'visual_assignment' || !practicalVisualFailures(ctx.artifacts, competency).length)) {
         index++;

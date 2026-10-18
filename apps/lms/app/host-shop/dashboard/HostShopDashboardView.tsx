@@ -168,9 +168,8 @@ export default async function HostShopDashboardView() {
               </p>
               <h1 className="mt-2 text-3xl font-black text-slate-950">Host Shop PWA</h1>
               <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-700">
-                This neutral preview confirms that the Host Shop PWA is operational without
-                attaching Admin to a business record. Select a shop from the secured Admin dashboard
-                to open its audited portal.
+                No Host Shop is selected. Select a shop from the secured Admin dashboard
+                to open its saved records in the audited portal preview.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <a
@@ -407,62 +406,6 @@ export default async function HostShopDashboardView() {
 
   return (
     <main className="w-full max-w-none px-4 py-8 sm:px-6">
-      <PortalStartChecklist role="host-shop" />
-      <BusinessNetworkCard href="/host-shop/dashboard/community" label="Barber & Beauty Network" />
-      <HostShopProgramGuide />
-      <section className="mb-5 flex flex-col gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="font-black text-slate-950">Host Shop app</p>
-          <p className="mt-1 text-sm font-medium text-slate-700">
-            Install this exact Host Shop dashboard for direct access to apprentices, hours,
-            attendance, competencies, and reports.
-          </p>
-        </div>
-        <PwaInstallButton
-          label="Install Host Shop App"
-          installedLabel="Host Shop App Installed"
-          className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-800 px-5 py-3 text-sm font-black text-white hover:bg-blue-900"
-        />
-      </section>
-      {!isPlatformAdmin ? (
-        <div className="mb-5">
-          <EmailAccountNotice href="/host-shop/email" />
-        </div>
-      ) : null}
-      <section className="mb-6 overflow-hidden rounded-2xl border border-fuchsia-300 bg-gradient-to-r from-slate-950 via-blue-950 to-fuchsia-950 p-5 text-white shadow-lg sm:p-6">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-fuchsia-200">
-              Host Shop Network launch
-            </p>
-            <h2 className="mt-2 text-2xl font-black">
-              Put your shop in front of apprentices and local customers.
-            </h2>
-            <p className="mt-2 text-sm font-medium leading-6 text-slate-200">
-              Confirm your public profile, upload a logo, flyer, photos, or a short shop video, then
-              share your profile link from your website, Google Business Profile, and social pages.
-              Visibility and results vary; a complete, accurate profile gives people more ways to
-              discover and contact your business.
-            </p>
-          </div>
-          <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
-            <Link
-              href="/host-shop/dashboard/profile"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950"
-            >
-              Complete My Network Profile
-            </Link>
-            <a
-              href="https://www.elevateforhumanity.org/partners/host-shops"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-black text-white"
-            >
-              View the Public Network
-            </a>
-          </div>
-        </div>
-      </section>
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div className="grid lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
           <div className="p-6 sm:p-8">
@@ -605,6 +548,64 @@ export default async function HostShopDashboardView() {
           <PortalImageCard key={card.title} card={card} />
         ))}
       </section>
+      <div className="mt-8">
+        <PortalStartChecklist role="host-shop" />
+        <BusinessNetworkCard href="/host-shop/dashboard/community" label="Barber & Beauty Network" />
+        <HostShopProgramGuide />
+        <section className="mb-5 flex flex-col gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-black text-slate-950">Host Shop app</p>
+            <p className="mt-1 text-sm font-medium text-slate-700">
+              Install this exact Host Shop dashboard for direct access to apprentices, hours,
+              attendance, competencies, and reports.
+            </p>
+          </div>
+          <PwaInstallButton
+            label="Install Host Shop App"
+            installedLabel="Host Shop App Installed"
+            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-800 px-5 py-3 text-sm font-black text-white hover:bg-blue-900"
+          />
+        </section>
+        {!isPlatformAdmin ? (
+          <div className="mb-5">
+            <EmailAccountNotice href="/host-shop/email" />
+          </div>
+        ) : null}
+        <section className="mb-6 overflow-hidden rounded-2xl border border-fuchsia-300 bg-gradient-to-r from-slate-950 via-blue-950 to-fuchsia-950 p-5 text-white shadow-lg sm:p-6">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-fuchsia-200">
+                Host Shop Network launch
+              </p>
+              <h2 className="mt-2 text-2xl font-black">
+                Put your shop in front of apprentices and local customers.
+              </h2>
+              <p className="mt-2 text-sm font-medium leading-6 text-slate-200">
+                Confirm your public profile, upload a logo, flyer, photos, or a short shop video, then
+                share your profile link from your website, Google Business Profile, and social pages.
+                Visibility and results vary; a complete, accurate profile gives people more ways to
+                discover and contact your business.
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
+              <Link
+                href="/host-shop/dashboard/profile"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950"
+              >
+                Complete My Network Profile
+              </Link>
+              <a
+                href="https://www.elevateforhumanity.org/partners/host-shops"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-black text-white"
+              >
+                View the Public Network
+              </a>
+            </div>
+          </div>
+        </section>
+      </div>
       {publicMedia.length || publicProfile?.video_url ? (
         <section className="mt-8">
           <h2 className="mb-4 text-2xl font-black text-slate-950">Your public Host Shop gallery</h2>

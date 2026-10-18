@@ -75,6 +75,23 @@ export async function routeOperator(callId,route,request=ari){
     context:'internal',extension:'0',priority:1,
   });
 }
+export async function handleDtmf(event,active=sessions,{route=routeOperator,finish=end}={}){
+  if(event?.type!=='ChannelDtmfReceived' || event.digit!=='0')return;
+  const session=active.get(event.channel?.id);
+  if(!session || session.closed || session.transferring)return;
+  // Only the caller already owned by this gateway can request operator zero.
+  // Ignore other digits until directory routing has an authoritative mapping.
+  session.transferring=true;
+  session.frames=[];session.quiet=0;session.heard=false;
+  try{
+    await route(session.callId,{type:'operator',extension:'0'});
+  }catch{
+    await finish(session,'continue');
+    return;
+  }
+  // Successful handoff releases media without hanging up the caller leg.
+  await finish(session);
+}
 export async function releaseCaller(callId,disposition,request=ari){
   if(!UUIDISH.test(callId||'') || !['continue','hangup'].includes(disposition))throw Error('CALL_RELEASE_NOT_ALLOWED');
   if(disposition==='continue'){
@@ -120,12 +137,12 @@ function rtp(payload,session){
 }
 export async function speak(session,encoded,{clock=()=>performance.now(),wait=sleep}={}){
   const bytes=Buffer.from(encoded,'base64');
-  if(bytes.length<FRAME || bytes.length>160000 || bytes.length%FRAME!==0)throw Error('INVALID_ULAW_AUDIO');
+  if(bytes.length<FRAME || bytes.length>640000 || bytes.length%FRAME!==0)throw Error('INVALID_ULAW_AUDIO');
   if(!session.remote)throw Error('NO_RTP_PEER');
   session.playing=true;
   const startedAt=clock();
   try{
-    for(let i=0;i<bytes.length&&!session.closed;i+=FRAME){
+    for(let i=0;i<bytes.length&&!session.closed&&!session.transferring;i+=FRAME){
       const part=rtp(bytes.subarray(i,i+FRAME),session);
       await new Promise((resolve,reject)=>session.socket.send(part,session.remote.port,session.remote.address,e=>e?reject(e):resolve()));
       // Send complete 20ms audio frames against a monotonic timeline. Socket
@@ -135,17 +152,30 @@ export async function speak(session,encoded,{clock=()=>performance.now(),wait=sl
     }
   }finally{session.playing=false;}
 }
+export async function greet(session,{request=privateTurn,play=speak,finish=end}={}){
+  if(session.closed || session.transferring || session.greetingStarted || !session.bridgeReady || !session.remote)return;
+  session.greetingStarted=true;session.busy=true;
+  clearTimeout(session.greetingDeadline);
+  try{
+    const body=await request(config.adapter,{callId:session.callId,sessionId:session.id,sequence:session.turn++,event:'greeting',encoding:'PCMU',sampleRate:8000},config.token);
+    if(session.closed || session.transferring)return;
+    if(typeof body.replyAudioUlawBase64!=='string')throw Error('PARIS_GREETING_AUDIO_MISSING');
+    await play(session,body.replyAudioUlawBase64);
+  }catch{
+    if(!session.closed && !session.transferring)await finish(session,'continue');
+  }finally{session.busy=false;}
+}
 async function turn(session){
-  if(session.closed || session.busy || session.playing)return;
+  if(session.closed || session.transferring || session.busy || session.playing)return;
   const voice=Buffer.concat(session.frames);session.frames=[];session.quiet=0;
   if(voice.length<config.minFrames*FRAME)return;
   session.busy=true;
   try{
     const body=await privateTurn(config.adapter,{callId:session.callId,sessionId:session.id,sequence:session.turn++,encoding:'PCMU',sampleRate:8000,audioBase64:voice.toString('base64')},config.token);
-    if(session.closed)return;
+    if(session.closed || session.transferring)return;
     if(typeof body.replyAudioUlawBase64!=='string')throw Error('PARIS_TURN_AUDIO_MISSING');
     await speak(session,body.replyAudioUlawBase64);
-    if(session.closed)return;
+    if(session.closed || session.transferring)return;
     if(body.requestedRoute?.type==='operator') {
       // Operator 0 must first exist in the reviewed live Asterisk dialplan.
       // Resume the allowlisted dialplan route without changing channel technology.
@@ -153,6 +183,7 @@ async function turn(session){
       await end(session);
     } else if(body.endCall===true) await end(session,'hangup');
   }catch(e){
+    if(session.closed || session.transferring)return;
     // Fail closed: do not claim the caller was served when the AI is unavailable.
     process.stderr.write('PARIS_TURN_FAILED\n');
     await end(session,'continue');
@@ -167,6 +198,7 @@ async function cleanupMedia(s){
 async function end(s,disposition='released'){
   if(s.closed)return;s.closed=true;sessions.delete(s.callId);
   clearTimeout(s.deadline);
+  clearTimeout(s.greetingDeadline);
   try{s.socket.close();}catch{ /* Binding may have failed before cleanup. */ }
   await cleanupMedia(s);
   if(disposition!=='released'){
@@ -193,12 +225,14 @@ async function begin(call){
     if(session.closed)return;
     await new Promise((resolve,reject)=>{socket.once('error',reject);socket.bind(0,config.bind,resolve);});
     socket.on('message',(packet,rinfo)=>{
-      if(session.closed || session.playing || session.busy)return;
+      if(session.closed || session.transferring)return;
       // Only accept packets from the established Asterisk loopback interface.
       if(rinfo.address!=='127.0.0.1')return;
       const frame=parseRtp(packet);if(!frame)return;
       if(!session.remote)session.remote={address:rinfo.address,port:rinfo.port};
       if(rinfo.port!==session.remote.port)return;
+      if(!session.greetingStarted){void greet(session);return;}
+      if(session.playing || session.busy)return;
       const speech=isSpeech(frame.payload);
       if(speech)session.heard=true;
       if(!session.heard)return;
@@ -213,6 +247,13 @@ async function begin(call){
     const external=await createExternalChannel(session,host);
     if(session.closed){await cleanupMedia(session);return;}
     await ari('/bridges/'+encode(bridge.id)+'/addChannel?channel='+encode(callId+','+external.id),'POST');
+    if(session.closed){await cleanupMedia(session);return;}
+    session.bridgeReady=true;
+    // RTP silence is enough to establish the peer; never require caller speech
+    // before the configured greeting. Bound a missing media peer to fallback.
+    session.greetingDeadline=setTimeout(()=>void end(session,'continue'),10000);
+    session.greetingDeadline.unref();
+    if(session.remote)void greet(session);
   }catch(e){
     process.stderr.write('PARIS_BRIDGE_FAILED\n');
     await end(session,'continue');
@@ -240,6 +281,9 @@ export async function serveGateway(){
         socket.addEventListener('message',event=>{
           let payload;try{payload=JSON.parse(event.data);}catch{return;}
           if(isCallerStart(payload))void begin(payload.channel);
+          if(payload.type==='ChannelDtmfReceived')void handleDtmf(payload).catch(()=>{
+            process.stderr.write('PARIS_KEYPAD_HANDOFF_FAILED\n');
+          });
           if(payload.type==='StasisEnd' && payload.channel?.id){const s=sessions.get(payload.channel.id);if(s)void end(s);}
         });
         socket.addEventListener('close',resolve,{once:true});

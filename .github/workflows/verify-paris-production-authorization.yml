@@ -1,0 +1,105 @@
+name: Verify PARIS Admin production authorization
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: paris-production-readonly-verification
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: production
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          skip_install: true
+      - name: Verify actual Admin 100-percent traffic and merged diagnostic revision
+        run: |
+          python3 - <<'PY'
+          import json,subprocess,os,sys
+          cmd=['gcloud','run','services','describe','elevate-admin-migration','--project=elegant-racer-299721','--region=us-central1','--format=json']
+          service=json.loads(subprocess.check_output(cmd,text=True))
+          traffic=service.get('status',{}).get('traffic',[])
+          serving=[t for t in traffic if int(t.get('percent',0))>0]
+          if len(serving)!=1 or int(serving[0].get('percent',0))!=100:
+            raise SystemExit('ADMIN_TRAFFIC_NOT_EXACTLY_ONE_REVISION_AT_100_PERCENT')
+          revision=serving[0].get('revisionName')
+          if not revision: raise SystemExit('ADMIN_SERVING_REVISION_MISSING')
+          details=json.loads(subprocess.check_output(['gcloud','run','revisions','describe',revision,'--project=elegant-racer-299721','--region=us-central1','--format=json'],text=True))
+          labels=details.get('metadata',{}).get('labels',{})
+          print(json.dumps({'type':'admin_traffic','revision':revision,'percent':100,'labels':{k:v for k,v in labels.items() if 'commit' in k or 'sha' in k}}))
+          # Actual revision health/commit is verified separately through public health.
+          PY
+      - name: Verify public serving Admin commit contains PR 1927
+        run: |
+          python3 - <<'PY'
+          import json,urllib.request,subprocess,os,re
+          from urllib.parse import urlencode
+          url='https://admin.elevateforhumanity.org/api/health?'+urlencode({'verification':'paris-auth-20261017','run':os.environ['GITHUB_RUN_ID']})
+          req=urllib.request.Request(url,headers={'Cache-Control':'no-store, no-cache','Pragma':'no-cache'})
+          with urllib.request.urlopen(req,timeout=25) as response:
+            body=json.load(response)
+            if response.status != 200 or body.get('service')!='admin' or body.get('healthy') is not True:
+              raise SystemExit('ADMIN_PRODUCTION_HEALTH_FAILED')
+          sha=body.get('commit') or body.get('commitSha')
+          if not isinstance(sha,str) or not re.fullmatch('[a-f0-9]{40}',sha):
+            raise SystemExit('ADMIN_PRODUCTION_COMMIT_MISSING')
+          subprocess.run(['git','fetch','--no-tags','--depth=150','origin','main'],check=True,stdout=subprocess.DEVNULL)
+          merge='ccbdda8d8201fe551bcf4eaa5d6a213d13abf34c'
+          subprocess.run(['git','cat-file','-e',sha+'^{commit}'],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+          included=subprocess.run(['git','merge-base','--is-ancestor',merge,sha]).returncode==0
+          print(json.dumps({'type':'admin_live_version','commit':sha,'contains_paris_diagnostic_merge':included}))
+          if not included: raise SystemExit('ADMIN_REVISION_PRE_DATES_PARIS_DIAGNOSTIC')
+          PY
+      - name: Obtain short-lived PARIS workflow identity
+        env:
+          AUDIENCE: elevate-paris-code-repair
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          (async()=>{
+            const url=new URL(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
+            url.searchParams.set('audience',process.env.AUDIENCE);
+            const response=await fetch(url,{headers:{Authorization:'Bearer '+process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN}});
+            if(!response.ok)throw Error('Workflow identity issuance failed: HTTP '+response.status);
+            const token=(await response.json()).value;
+            if(!token || token.split('.').length!==3)throw Error('Invalid workflow identity');
+            process.stdout.write('::add-mask::'+token+'\n');
+            fs.appendFileSync(process.env.GITHUB_ENV,'PARIS_ID_TOKEN='+token+'\n');
+          })().catch(err=>{console.error(err.message);process.exitCode=1});
+          NODE
+      - name: Verify PARIS GitHub credential via protected read-only diagnostic
+        run: |
+          python3 - <<'PY'
+          import os,json,urllib.request,urllib.error,sys
+          secret=os.environ.get('PARIS_ID_TOKEN','')
+          if not secret: raise SystemExit('PARIS_WORKFLOW_IDENTITY_UNAVAILABLE')
+          endpoint='https://admin.elevateforhumanity.org/api/cron/paris-code-repair'
+          req=urllib.request.Request(endpoint,data=b'{"phase":"auth-diagnostic"}',headers={'Authorization':'Bearer '+secret,'Content-Type':'application/json','Cache-Control':'no-store'},method='POST')
+          try:
+            with urllib.request.urlopen(req,timeout=30) as response:
+              body=json.load(response)
+              if response.status!=200: raise SystemExit('PARIS_DIAGNOSTIC_HTTP_NOT_200')
+          except urllib.error.HTTPError as e:
+            # Never print upstream error response text or request credentials.
+            print(json.dumps({'type':'paris_diagnostic','httpStatus':e.code,'ok':False}))
+            raise SystemExit('PARIS_DIAGNOSTIC_HTTP_FAILURE')
+          identity=body.get('identity',{})
+          repo=body.get('repository',{})
+          safe={'type':'paris_diagnostic','identity_status':identity.get('status'),'identity_ok':identity.get('ok') is True,'repo_status':repo.get('status'),'repo_ok':repo.get('ok') is True,'contents_write':repo.get('permissions',{}).get('contentsWrite') is True}
+          print(json.dumps(safe))
+          if not safe['identity_ok'] or not safe['repo_ok'] or not safe['contents_write']:
+            raise SystemExit('PARIS_GITHUB_CREDENTIAL_NOT_ACCEPTED_OR_INSUFFICIENT_CONTENTS_ACCESS')
+          PY

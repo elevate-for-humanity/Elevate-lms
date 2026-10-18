@@ -148,8 +148,8 @@ export function HomeFeaturedHostShop() {
             {
               name: 'Find your next pathway',
               label: 'Career training',
-              image: '/images/pages/barber-hands-on-bright.webp',
-              alt: 'Hands-on career training',
+              image: '/images/pexels/hero-workforce.webp',
+              alt: 'Adult professionals discussing career pathways',
               href: '/programs',
               text: 'Discover hands-on programs and the support to take your next step.',
               action: 'View all programs',

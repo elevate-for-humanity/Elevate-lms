@@ -1,3 +1,4 @@
+import { IMAGE_LOADING_BLUR } from '@/lib/ui/blur-placeholder';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -474,7 +475,7 @@ export default async function ApprenticePortalPage() {
       <main className="space-y-7 pb-10">
         <TimeclockAttendanceNotice />
         <section className="relative min-h-[390px] overflow-hidden rounded-3xl bg-fuchsia-950 shadow-xl ring-1 ring-fuchsia-900/20">
-          <Image
+          <Image placeholder="blur" blurDataURL={IMAGE_LOADING_BLUR}
             src={heroImage}
             alt={`${displayProgram} apprentice training`}
             fill
@@ -902,7 +903,7 @@ export default async function ApprenticePortalPage() {
                   src={action.image}
                   alt=""
                   fill
-                  sizes="(max-width:640px) 100vw,25vw"
+                  sizes="(max-width: 639px) 100vw, (max-width: 1279px) 50vw, 25vw"
                   className="object-cover transition-transform group-hover:scale-[1.03]"
                 />
               </div>
@@ -1117,7 +1118,12 @@ function TheorySchedulePanel({
           </p>
           {schedule.starts_on ? (
             <p className="mt-2 text-sm font-black text-fuchsia-950">
-              Theory/RTI begins Monday, September 21, 2026.
+              Theory/RTI begins{' '}
+              {new Date(`${String(schedule.starts_on).slice(0, 10)}T12:00:00Z`).toLocaleDateString(
+                'en-US',
+                { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' },
+              )}
+              .
             </p>
           ) : null}
           <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">

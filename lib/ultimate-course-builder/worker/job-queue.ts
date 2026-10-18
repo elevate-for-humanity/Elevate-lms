@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import {claimExactOwnerPreview} from './owner-preview-claim.mjs';
 
 export class UltimateJobQueue {
   constructor(private db: SupabaseClient) {}
@@ -52,6 +53,17 @@ export class UltimateJobQueue {
   }
 
   async claim(workerId: string, leaseSeconds = 300) {
+    if (process.env.EXTERNAL_COURSE_ATTEMPT_ID) {
+      if (process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID)
+        throw new Error('CONFLICTING_EXACT_WORKER_TARGETS');
+      const {data, error} = await this.db.rpc('claim_external_course_job', {
+        p_attempt: process.env.EXTERNAL_COURSE_ATTEMPT_ID, p_worker: workerId,
+      });
+      if (error) throw error;
+      return data?.[0] ?? null;
+    }
+    if (process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID)
+      return claimExactOwnerPreview(this.db,process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID,workerId,leaseSeconds);
     const { data, error } = await this.db.rpc('claim_ultimate_build_job', {
       p_worker: workerId,
       p_lease_seconds: leaseSeconds,

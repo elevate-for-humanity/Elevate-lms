@@ -74,7 +74,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       .single();
     if (error || !build) throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
     const storedProfile = build.profile as UltimateCredentialProfile;
-    if ((storedProfile as any).ownerPaused === true) {
+    if ((storedProfile as any).ownerPaused === true && job.payload?.ownerPreview !== true) {
       await queue.waitForDependency(job.id,workerId,'OWNER_PAUSED_REFERENCE_BUILD',generation);
       return {claimed:true,completed:false,ownerPaused:true,jobId:job.id};
     }
@@ -115,6 +115,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
           payload.competencyId ?? payload.repairCompetencyId ?? (payload.acceptance ? profile.competencies?.[0]?.id : undefined),
         startIndex: Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0,
         maxLessons: 1,
+        renderPreviewOnly: payload.ownerPreview === true,
         beforeCheckpoint: liveCheckpointRepairReader(db, job, workerId, generation, payload, currentCompetencyId),
         repairRenderRevision: payload.checkpointRepair?.competencyId === currentCompetencyId && ULTIMATE_BUILD_STEPS.indexOf(payload.checkpointRepair.fromStep) <= ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render') ? payload.checkpointRepair.requestedAt : undefined,
         repairFromStep: payload.checkpointRepair?.competencyId === currentCompetencyId ? payload.checkpointRepair.fromStep : undefined,
@@ -126,6 +127,11 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     );
     assertActive();
     console.info('[UltimateWorker] lesson processing returned', { jobId: job.id, completed: result.completed, findings: result.findings.length });
+    if (payload.ownerPreview === true && result.previewReady) {
+      await runtime.persistence.updateBuild({buildId:build.id,status:'blocked',currentStep:'lesson_film_render'});
+      await queue.complete(job.id,workerId,generation);
+      return {claimed:true,completed:false,previewReady:true,jobId:job.id,result};
+    }
     if (!targeted) {
       const continuation = nextCourseWork(payload, result);
       if (continuation.continue) {
@@ -141,7 +147,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
           await queue.waitForDependency(job.id,workerId,`ULTIMATE_EXTERNAL_ASSET_REQUIRED:${continuation.unresolved.join(',')}`,generation,continuation.payload);
           return {claimed:true,completed:false,awaitingDependency:true,jobId:job.id,result};
         }
-        await queue.fail(job.id,workerId,`ULTIMATE_INTERNAL_REPAIR_REQUIRED:${continuation.unresolved.join(',')}`,generation,true);
+        await queue.fail(job.id,workerId,`ULTIMATE_INTERNAL_REPAIR_REQUIRED:${continuation.unresolved.join(',')}:FINDINGS=${JSON.stringify((result.findings || []).map(f => ({step:f.step,code:f.code,message:f.message}))).slice(0,2800)}`,generation,true);
         return {claimed:true,completed:false,repairQueued:true,jobId:job.id,result};
       }
     }

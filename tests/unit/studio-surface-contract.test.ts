@@ -303,7 +303,8 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(navigation).toContain('useSearchParams');
     expect(navigation).toContain("pathname === '/studio'");
     expect(navigation).toContain("searchParams.get('embedded') === 'studio'");
-    expect(chrome).toContain('admin-studio-viewport h-full');
+    expect(chrome).toContain('admin-studio-viewport min-h-0 min-w-0 flex-1 overflow-hidden');
+    expect(chrome).toContain('flex h-dvh min-w-0 flex-col overflow-hidden');
     expect(globalStyles).toContain('.admin-studio-viewport section');
     expect(globalStyles).toContain('padding: 0 !important');
     expect(workspace).toContain('className="flex h-full min-h-0');

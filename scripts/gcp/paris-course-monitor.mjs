@@ -7,7 +7,7 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
   const root='https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs';
   const headers={apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY};
   const url=new URL(root);
-  url.searchParams.set('select','id,build_id,status,attempts,max_attempts,heartbeat_at,lease_expires_at,execution_generation,last_error,monitor,ultimate_course_builds(status,ownerPaused:profile->ownerPaused)');
+  url.searchParams.set('select','id,build_id,status,attempts,max_attempts,heartbeat_at,lease_owner,lease_expires_at,execution_generation,last_error,monitor,ultimate_course_builds(status,ownerPaused:profile->ownerPaused)');
   url.searchParams.set('monitor->>enabled','eq.true');
   url.searchParams.set('order','updated_at.desc');url.searchParams.set('limit','100');
   const response=await request(url,{headers,signal:AbortSignal.timeout(15000)});
@@ -21,7 +21,19 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     if(['awaiting_assignment','recovering'].includes(observation.state) && dispatchState?.status==='dispatch_failed')
       observation={state:'dispatch_failed',action:'none',reason:dispatchState.reason || 'Worker assignment failed; no execution is confirmed'};
     if(observation.state==='disabled')continue;
-    const monitor={...job.monitor,...observation,reason:observation.reason ?? null,coordinator:'PARIS',agents:COURSE_AI_ROLES,checkedAt:now.toISOString(),
+    // A dispatch request is not a confirmed recovery. Persist verifiable worker
+    // assignment evidence only after the database shows a fresh heartbeat and lease.
+    const heartbeatMs=Date.parse(job.heartbeat_at ?? '');
+    const leaseMs=Date.parse(job.lease_expires_at ?? '');
+    const previousHeartbeat=job.monitor?.lastConfirmedWorkerHeartbeat ?? null;
+    const confirmedAssignment=observation.state==='running' && Boolean(job.lease_owner) &&
+      Number.isFinite(heartbeatMs) && now.getTime()-heartbeatMs>=0 && now.getTime()-heartbeatMs<90000 &&
+      leaseMs>now.getTime() && job.heartbeat_at!==previousHeartbeat &&
+      job.lease_owner!==job.monitor?.lastConfirmedLeaseOwner;
+    const monitor={...job.monitor,...observation,
+      ...(confirmedAssignment?{confirmedAssignments:(job.monitor.confirmedAssignments??0)+1,
+        lastConfirmedWorkerHeartbeat:job.heartbeat_at,lastConfirmedLeaseOwner:job.lease_owner}:{}),
+      reason:observation.reason ?? null,coordinator:'PARIS',agents:COURSE_AI_ROLES,checkedAt:now.toISOString(),
       recoveries:(job.monitor.recoveries??0)+(observation.action==='requeue'?1:0)};
     const target=new URL(root);target.searchParams.set('id','eq.'+job.id);
     target.searchParams.set('status','eq.'+job.status);

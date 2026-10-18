@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Task and browser session are required' }, { status: 400 });
   }
 
-  await hydrateProcessEnv().catch(() => undefined);
+  await hydrateProcessEnv();
   const workerUrl = (process.env.STUDIO_BROWSER_URL || '').replace(/\/$/, '');
   if (!workerUrl) {
     return NextResponse.json(

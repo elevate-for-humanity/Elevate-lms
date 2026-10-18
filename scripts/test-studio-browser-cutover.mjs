@@ -5,31 +5,39 @@ const raw=await fs.readFile(new URL('./gcp/repair-studio-browser-cloud-run.mjs',
 const sha='a'.repeat(40), key='existing-encryption-key-no-production-access';
 let serial=0;
 async function execute(overrides={}){
- const f={commands:[],diagnostics:[],state:{commit:sha,ready:true,providerAuthStorage:{persistent:true}},anonymous:401,authorized:200,...overrides};
+ const f={commands:[],diagnostics:[],files:[],requests:[],events:[],state:{commit:sha,ready:true,providerAuthStorage:{persistent:true}},anonymous:401,authorized:200,...overrides};
  const output=args=>{
   f.commands.push(args);
+  f.events.push({command:args});
   if(args[0]==='run'&&args[1]==='services'&&args[2]==='describe'&&args[3]==='elevate-admin-migration')return JSON.stringify({spec:{template:{spec:{containers:[{env:[{name:'STUDIO_BROWSER_SECRET',value:key}]}]}}}});
   if(args[0]==='secrets'&&args[1]==='list')return JSON.stringify(f.existingSecret?[{name:'existing'}]:[]);
   if(args[0]==='secrets'&&args[1]==='versions'&&args[2]==='access')return f.storedKey||key;
-  if(args[0]==='storage'&&args[1]==='buckets'&&args[2]==='list')return '[]';
+  if(args[0]==='storage'&&args[1]==='buckets'&&args[2]==='describe')return JSON.stringify({name:f.missingBucket?'unapproved':'elegant-racer-299721-studio-browser-auth'});
   if(args[0]==='artifacts')return 'sha256:'+sha+sha.slice(0,24);
-  if(args[0]==='run'&&args[1]==='services'&&args[2]==='describe')return JSON.stringify({status:{url:'https://browser.example.test'},spec:{template:{spec:f.browserSpec}}});
+  if(args[0]==='run'&&args[1]==='services'&&args[2]==='describe')return JSON.stringify({status:{url:'https://browser.example.run.app',latestCreatedRevisionName:'browser-candidate',traffic:[{revisionName:'browser-old',percent:100},{revisionName:'browser-candidate',tag:'studio-verify',url:'https://candidate.example.test',percent:0}]},spec:{template:{spec:f.browserSpec}}});
   return '';
  };
  globalThis.__studioCutoverFixture={
+  async verifyStudioRuntimeReplacement(){f.events.push({replacementProof:true});return f.replacement||{passed:true,runtimeReplaced:true,isolatedWorkspaceFileRestored:true};},
+  async inventoryStudioLiveState(){return f.live||{activeBrowserSessions:0,workspace:{files:0,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true};},
   execFileSync(_program,args){return output(args);},
-  execFile(_program,args,_options,callback){f.diagnostics.push(args);callback(null,{stdout:args.includes('--format=value(status.latestCreatedRevisionName)')?'browser-failed-revision':'{}'});},
-  async mkdir(){},async writeFile(){},
-  process:{env:{IMAGE_SHA:sha}},
+  execFile(_program,args,_options,callback){f.diagnostics.push(args);callback(null,{stdout:args.includes('--format=value(status.latestCreatedRevisionName)')?'browser-failed-revision':args[0]==='run'?JSON.stringify({metadata:{name:'failed'},spec:{containers:[{env:[{name:'PRIVATE_TOKEN',value:'private-runtime-value'}]}]}}):JSON.stringify([{textPayload:'private-log-value',severity:'ERROR',timestamp:'2026-10-17T00:00:00Z'}])});},
+  async mkdir(){},async writeFile(name,body){f.files.push({name,body});},
+  process:{env:{IMAGE_SHA:sha,...(f.env||{})}},
   console:{log(){},error(){}},
+  setTimeout(callback){return setTimeout(callback,0);},
   async fetch(url,options){
-   if(url.endsWith('/health'))return {ok:true,status:200,headers:{get(name){return name.toLowerCase()==='content-type'?'application/json; charset=utf-8':null;}},async json(){return f.state;}};
-   const status=options?.headers?f.authorized:f.anonymous;
+   f.requests.push(url);f.events.push({request:url});
+   if(url.endsWith('/foundation-test'))return {ok:true,async json(){return f.foundation||{passed:true,commit:sha,checks:[{name:'fixture',passed:true}]};}};
+   if(url.endsWith('/health'))return {ok:true,status:200,headers:{get(name){return name.toLowerCase()==='content-type'?'application/json; charset=utf-8':null;}},async json(){return url.startsWith('https://browser.example.run.app')&&f.publicState?f.publicState:f.state;}};
+   const status=options?.headers?(options.headers['x-studio-browser-secret']===key?(url.startsWith('https://browser.example.run.app')?(f.canonicalAuthorized??200):f.authorized):401):f.anonymous;
    return {status,ok:status>=200&&status<300};
   },
  };
  const source=raw
-  .replace("import {execFileSync, execFile} from 'node:child_process';","const {execFileSync,execFile,fetch,process,console,mkdir,writeFile}=globalThis.__studioCutoverFixture;")
+  .replace("import {verifyStudioRuntimeReplacement} from './verify-studio-runtime-replacement.mjs';","const verifyStudioRuntimeReplacement=globalThis.__studioCutoverFixture.verifyStudioRuntimeReplacement;")
+  .replace("import {inventoryStudioLiveState} from './inventory-studio-live-state.mjs';","const inventoryStudioLiveState=globalThis.__studioCutoverFixture.inventoryStudioLiveState;")
+  .replace("import {execFileSync, execFile} from 'node:child_process';","const {execFileSync,execFile,fetch,process,console,mkdir,writeFile,setTimeout}=globalThis.__studioCutoverFixture;")
   .replace("import {mkdir, writeFile} from 'node:fs/promises';","");
  try{await import('data:text/javascript;base64,'+Buffer.from(source+'\n// invocation '+serial++).toString('base64'));}catch(error){f.error=error;}
  return f;
@@ -38,7 +46,7 @@ function switched(f){return f.commands.some(a=>a[0]==='run'&&a[1]==='services'&&
 test('Admin cutover requires exact revision, durable storage and both authorization proofs',async()=>{
  const f=await execute();assert.equal(f.error,undefined);assert.equal(switched(f),true);
  const grants=f.commands.filter(a=>a[0]==='secrets'&&a[1]==='add-iam-policy-binding');
- assert.equal(grants.length,2);
+ assert.equal(grants.length,0);
  assert.ok(grants.every(a=>a.includes('studio-browser-shared-secret')));
 });
 test('unready persistent storage preserves Admin and collects exact revision diagnostics',async()=>{
@@ -68,4 +76,80 @@ test('browser releases preserve mounted storage and restored runtime settings',a
  assert.ok(deploy.some(a=>a.startsWith('--update-env-vars=')));
  assert.ok(!deploy.some(a=>a.startsWith('--set-env-vars=')||a.startsWith('--add-volume=')));
  assert.ok(deploy.includes('--remove-volume=stale'));
+});
+
+test('pinned old traffic is preserved until the exact candidate passes all proofs',async()=>{
+ const f=await execute();assert.equal(f.error,undefined);
+ const deploy=f.commands.find(a=>a[0]==='run'&&a[1]==='deploy');
+ assert.ok(deploy.includes('--no-traffic'));assert.ok(deploy.includes('--tag=studio-verify'));
+ const activation=f.events.findIndex(e=>e.command?.includes('--to-revisions=browser-candidate=100'));
+ assert.ok(activation>0);
+ const before=f.events.slice(0,activation).filter(e=>e.request).map(e=>e.request);
+ assert.deepEqual(before,['https://browser.example.run.app/workspace/files','https://candidate.example.test/health','https://candidate.example.test/workspace/files','https://candidate.example.test/workspace/files','https://candidate.example.test/foundation-test']);
+ assert.equal(f.events[activation+1].request,'https://browser.example.run.app/health');
+});
+
+test('failed public cutover restores previous traffic and leaves Admin unchanged',async()=>{
+ const f=await execute({publicState:{commit:'old',ready:true,providerAuthStorage:{persistent:true}}});
+ assert.match(f.error.message,/Public browser/);assert.equal(switched(f),false);
+ const traffic=f.commands.filter(a=>a[2]==='update-traffic');
+ assert.equal(traffic.length,2);assert.ok(traffic[0].includes('--to-revisions=browser-candidate=100'));
+ assert.ok(traffic[1].includes('--to-revisions=browser-old=100'));
+});
+
+test('unready candidates never change serving traffic',async()=>{
+ const f=await execute({state:{commit:sha,ready:false,providerAuthStorage:{persistent:true}}});
+ assert.match(f.error.message,/not ready/);assert.equal(switched(f),false);
+ assert.equal(f.commands.some(a=>a[2]==='update-traffic'),false);
+});
+
+test('browser candidate runs as the dedicated Studio identity rather than Admin',async()=>{
+ const f=await execute();assert.equal(f.error,undefined);
+ const deploy=f.commands.find(args=>args[0]==='run'&&args[1]==='deploy');
+ assert.ok(deploy.includes('--service-account=elevate-studio-runtime@elegant-racer-299721.iam.gserviceaccount.com'));
+ assert.equal(deploy.some(arg=>arg==='--service-account=elevate-admin-runtime@elegant-racer-299721.iam.gserviceaccount.com'),false);
+});
+
+test('migrated Studio releases verify their own encryption key without reading Admin credentials',async()=>{
+ const f=await execute({existingSecret:true,browserSpec:{containers:[{env:[{name:'STUDIO_BROWSER_SECRET',valueFrom:{secretKeyRef:{name:'studio-browser-shared-secret',key:'latest'}}}]}]}});
+ assert.equal(f.error,undefined);
+ assert.equal(f.commands.some(a=>a[0]==='run'&&a[1]==='services'&&a[2]==='describe'&&a[3]==='elevate-admin-migration'),false);
+ assert.ok(f.requests.includes('https://browser.example.run.app/workspace/files'));
+});
+test('canonical-key proof failure never deploys or rotates Studio credentials',async()=>{
+ const f=await execute({existingSecret:true,canonicalAuthorized:401,browserSpec:{containers:[{env:[{name:'STUDIO_BROWSER_SECRET',valueFrom:{secretKeyRef:{name:'studio-browser-shared-secret',key:'latest'}}}]}]}});
+ assert.match(f.error.message,/refusing credential rotation/);
+ assert.equal(f.commands.some(a=>a[0]==='run'&&a[1]==='deploy'),false);
+ assert.equal(f.commands.some(a=>a[0]==='secrets'&&a[1]==='versions'&&a[2]==='add'),false);
+});
+
+test('candidate acceptance leaves serving traffic and Admin untouched',async()=>{
+ const f=await execute({env:{STUDIO_CANDIDATE_ONLY:'true'}});
+ assert.equal(f.error,undefined);assert.equal(switched(f),false);
+ assert.equal(f.commands.some(a=>a.some(v=>v.startsWith('--to-revisions='))),false);
+ assert.ok(f.commands.some(a=>a.includes('--remove-tags=studio-verify')));
+ assert.equal(f.commands.some(a=>a.includes('delete')),false);
+ assert.ok(f.requests.includes('https://candidate.example.test/health'));
+ assert.equal(f.requests.filter(u=>u==='https://candidate.example.test/workspace/files').length,2);
+});
+
+test('live browser foundation failure preserves old traffic even when HTTP health passes',async()=>{
+ const f=await execute({foundation:{passed:false,commit:sha,checks:[{name:'restore',passed:false}]}});
+ assert.match(f.error.message,/foundation evidence invalid/);
+ assert.equal(f.commands.some(a=>a[2]==='update-traffic'),false);assert.equal(switched(f),false);
+});
+
+test('routine candidate release never provisions identities, secrets or storage grants',async()=>{
+ const f=await execute({env:{STUDIO_CANDIDATE_ONLY:'true'}});assert.equal(f.error,undefined);
+ assert.equal(f.commands.some(a=>a.includes('add-iam-policy-binding')||a.includes('create')||(a[0]==='secrets'&&a.includes('add'))),false);
+});
+test('unprepared storage stops release without creating a replacement bucket',async()=>{const f=await execute({missingBucket:true});assert.match(f.error.message,/bucket is unverified/);assert.equal(f.commands.some(a=>a[0]==='run'&&a[1]==='deploy'),false);assert.equal(f.commands.some(a=>a.includes('create')),false);});
+
+test('failed revision diagnostic artifacts omit runtime environment and log message contents',async()=>{const f=await execute({state:{commit:sha,ready:false,providerAuthStorage:{persistent:true}}});const serialized=JSON.stringify(f.files);assert.ok(f.files.length>0);assert.equal(serialized.includes('private-runtime-value'),false);assert.equal(serialized.includes('private-log-value'),false);});
+
+test('HTTP health and browser foundation cannot replace full runtime recovery acceptance',async()=>{
+ const f=await execute({replacement:{passed:false}});assert.match(f.error.message,/STUDIO_RUNTIME_REPLACEMENT_UNVERIFIED/);assert.equal(switched(f),false);assert.ok(!f.commands.some(a=>a.includes('--to-revisions=browser-candidate=100')));
+});
+test('a passing replacement proof never discards existing serving workspace files',async()=>{
+ const f=await execute({live:{activeBrowserSessions:0,workspace:{files:1,symlinks:0},directChildShells:0,directNonBrowserProcesses:0,processInventoryReadable:true}});assert.match(f.error.message,/STUDIO_LIVE_STATE_REQUIRES_PRESERVATION/);assert.equal(switched(f),false);assert.ok(!f.commands.some(a=>a.includes('--to-revisions=browser-candidate=100')));
 });

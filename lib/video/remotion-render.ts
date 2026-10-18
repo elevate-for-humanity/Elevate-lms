@@ -117,6 +117,7 @@ async function measuredAudioDurationSeconds(audioPath: string): Promise<number |
 }
 
 export interface StoryboardRenderInput {
+  ownerPreview?: boolean;
   renderRevision?: string;
   teachingPhotos?: any[][];
   motionEvidence?: Array<{visibleActions:string[];contentSha256?:string}>;
@@ -617,7 +618,7 @@ export async function renderStoryboardVideo(
         const sceneAudioPath = path.join(paths.outputDir, `scene-${index + 1}.mp3`);
         await writeFile(sceneAudioPath, audio);
         measuredNarrationSeconds = await measuredAudioDurationSeconds(sceneAudioPath);
-        if (input.lessonPresentation === 'approved-premium-v1') {
+        if (input.lessonPresentation === 'approved-premium-v1' && !input.ownerPreview) {
           const { stderr } = await execFileAsync('ffmpeg', ['-hide_banner','-i',sceneAudioPath,'-af','silencedetect=noise=-40dB:d=1.5,volumedetect','-f','null','-'], {timeout:120000,maxBuffer:2000000});
           assertPremiumSpeechSignal(String(stderr));
         }

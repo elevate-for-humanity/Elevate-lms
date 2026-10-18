@@ -1,0 +1,44 @@
+/* The browser adapts to its resizable pane, not the full desktop viewport. */
+.root {
+  container: cloud-browser / inline-size;
+  min-width: 0;
+}
+.desktopFlex,
+.desktopBlock {
+  display: none;
+}
+.mobileTabs {
+  display: flex;
+}
+.root .targetInput {
+  flex-basis: 100%;
+}
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+.signInStack {
+  grid-template-rows: minmax(80px, 35%) minmax(0, 1fr);
+}
+@container cloud-browser (min-width: 1024px) {
+  .desktopFlex {
+    display: flex;
+  }
+  .desktopBlock {
+    display: block;
+  }
+  .mobileTabs {
+    display: none;
+  }
+  .root .targetInput {
+    flex-basis: auto;
+  }
+  .workspace {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .root .tools {
+    border-left-width: 1px;
+    border-top-width: 0;
+  }
+}

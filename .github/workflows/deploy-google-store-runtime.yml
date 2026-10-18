@@ -44,7 +44,7 @@ permissions:
   id-token: write
 jobs:
   dispatch:
-    if: github.event_name == 'push'
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (github.event_name == 'push')
     concurrency:
       group: google-store-dispatch-main
       cancel-in-progress: true
@@ -78,10 +78,11 @@ jobs:
   deploy:
     needs: validate
     concurrency:
-      group: google-production-store
+      group: google-runtime-us-central1
       # Finish the active tested release; queue the latest main update.
       cancel-in-progress: false
-    if: needs.validate.outputs.ready == 'true'
+      queue: max
+    if: vars.GOOGLE_RELEASE_HOLD != 'true' && (needs.validate.outputs.ready == 'true')
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 120
@@ -101,9 +102,18 @@ jobs:
           node scripts/run-bounded-build.mjs -- pnpm install --frozen-lockfile --strict-peer-dependencies=false
           pnpm run typecheck:marketing
       - name: Verify Store and Marketing identity contracts
-        run: node --experimental-strip-types --test scripts/gcp/public-runtime-service.test.mjs scripts/gcp/verify-public-health.test.mjs scripts/gcp/verify-runtime-readiness.test.mjs
+        run: node --experimental-strip-types --test scripts/gcp/public-runtime-service.test.mjs scripts/gcp/verify-public-health.test.mjs scripts/gcp/verify-runtime-readiness.test.mjs scripts/gcp/preflight-web-rollout.test.mjs
       - name: Verify automatic container memory policy
         run: node scripts/check-build-memory-policy.mjs --source-only
+      - uses: google-github-actions/auth@v3
+        with:
+          project_id: elegant-racer-299721
+          workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
+          service_account: elevate-github-deploy@elegant-racer-299721.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with: { skip_install: true }
+      - name: Verify project billing and empty upload admission before building
+        run: node scripts/gcp/preflight-billing.mjs
       - name: Build shared commerce application for Store
         run: |
           set -euo pipefail
@@ -116,7 +126,8 @@ jobs:
       - name: Test actual Store container identity and health routing
         timeout-minutes: 5
         run: node scripts/gcp/smoke-marketing-container.mjs
-      - uses: google-github-actions/auth@v3
+      - name: Refresh Google credentials after build
+        uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721
           workload_identity_provider: projects/484736877039/locations/global/workloadIdentityPools/elevate-github/providers/github-main
@@ -140,9 +151,11 @@ jobs:
           [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
           SUFFIX="r${GITHUB_SHA:0:8}-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           echo "revision=elevate-store-migration-$SUFFIX" >> "$GITHUB_OUTPUT"
+          CANDIDATE_SERVICE=elevate-store-migration node scripts/gcp/cleanup-unused-candidate-tags.mjs
+          CANDIDATE_SERVICE=elevate-store-migration CANDIDATE_CPU=4 CANDIDATE_MEMORY=8Gi node scripts/gcp/preflight-web-rollout.mjs
           gcloud run services update elevate-store-migration --project=elegant-racer-299721 --region=us-central1 \
-            --image="$IMAGE@$DIGEST" --revision-suffix="$SUFFIX" \
-            --update-env-vars=STORE_ONLY_RUNTIME=true --cpu=4 --memory=8Gi --min=0 --min-instances=0 --max-instances=1 \
+            --image="$IMAGE@$DIGEST" --revision-suffix="$SUFFIX" --no-traffic \
+            --no-cpu-boost --update-env-vars=STORE_ONLY_RUNTIME=true --cpu=4 --memory=8Gi --min=0 --min-instances=0 --max-instances=1 \
             --startup-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=24,periodSeconds=5,timeoutSeconds=5' \
             --liveness-probe='httpGet.path=/api/ping,httpGet.port=3000,failureThreshold=3,periodSeconds=30,timeoutSeconds=5' --quiet
       - name: Collect exact failed Store revision logs

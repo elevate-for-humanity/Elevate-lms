@@ -15,6 +15,10 @@ import {
 } from 'lucide-react';
 
 
+const terminalStorageKey='elevate.studio.terminal.v1';
+function savedTerminalId(){try{return window.sessionStorage.getItem(terminalStorageKey)||'';}catch{return '';}}
+function rememberTerminal(id:string){try{if(id)window.sessionStorage.setItem(terminalStorageKey,id);else window.sessionStorage.removeItem(terminalStorageKey);}catch{/* Reconnection still works within this mounted view. */}}
+
 type TreeNode = {
   name: string;
   path: string;
@@ -53,6 +57,7 @@ export default function RealRepoWorkspace({
   const [saving, setSaving] = useState(false);
   const [confirmation,setConfirmation]=useState('');
   const [runtimeReady, setRuntimeReady] = useState(false);
+  const [terminalInterrupted,setTerminalInterrupted]=useState(false);
   const [reconnect,setReconnect]=useState(0);
   const [running, setRunning] = useState(false);
   const [terminalInput, setTerminalInput] = useState('');
@@ -61,6 +66,7 @@ export default function RealRepoWorkspace({
   const uploadRef = useRef<HTMLInputElement>(null);
   const terminalSessionRef = useRef('');
   const cursorRef = useRef(0);
+  const terminalStateRef=useRef('');
 
   const dirty = content !== savedContent;
 
@@ -92,45 +98,47 @@ export default function RealRepoWorkspace({
   }, [refreshTree]);
 
   useEffect(() => {
-    let cancelled = false;
-    let polling = false;
-    const request = async (body: Record<string, unknown>) => {
-      const response = await fetch('/api/admin/dev-studio/runtime', {method:'POST',
-        headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(body.operation==='repository-sync'?120000:30000)});
-      const result=await response.json();
-      if(!response.ok)throw new Error(result.error || `HTTP ${response.status}`);
-      return result;
+    let cancelled=false,polling=false,disconnected=false;
+    const request=async(body:Record<string,unknown>)=>{
+      const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(body.operation==='repository-sync'?120000:30000)});
+      const result=await response.json();if(!response.ok)throw new Error(result.error||`HTTP ${response.status}`);return result;
     };
-    void (async()=>{
-      try {
+    const read=async(sessionId:string)=>{
+      const response=await fetch(`/api/admin/dev-studio/runtime?operation=terminal-output&sessionId=${encodeURIComponent(sessionId)}&after=${cursorRef.current}`,{cache:'no-store',signal:AbortSignal.timeout(20000)});
+      const result=await response.json();
+      if(!response.ok){
+        if(response.status===404){rememberTerminal('');terminalSessionRef.current='';}
+        throw new Error(result.error||`HTTP ${response.status}`);
+      }
+      if(cancelled)return;
+      if(result.recovery?.truncated)output('Earlier terminal output exceeded the saved history limit.');
+      for(const entry of result.output??[])output(String(entry.data));
+      cursorRef.current=result.cursor??cursorRef.current;
+      const state=String(result.state||(result.exitCode==null?'running':'exited'));
+      const interrupted=state==='interrupted'||(state==='exited'&&Boolean(result.state));
+      setTerminalInterrupted(interrupted);setRuntimeReady(state==='running');
+      if(interrupted&&terminalStateRef.current!==state)output('Previous terminal process ended. Saved output is restored; start a new shell to continue. Commands have not been repeated.');
+      terminalStateRef.current=state;
+      if(state==='closed'||(state==='exited'&&!result.state)){rememberTerminal('');terminalSessionRef.current='';}
+      disconnected=false;
+    };
+    void(async()=>{
+      const saved=savedTerminalId();
+      try{
+        if(saved){terminalSessionRef.current=saved;await read(saved);return;}
         await request({operation:'repository-sync',repoUrl:'https://github.com/elevate-for-humanity/Elevate-lms.git',branch:'main'});
         const session=await request({operation:'terminal-create'});
         if(!session.id)throw new Error('Studio terminal session missing');
         if(cancelled){await request({operation:'terminal-stop',sessionId:session.id});return;}
-        terminalSessionRef.current=session.id;cursorRef.current=0;
-        setRuntimeReady(true);output('Existing Studio container connected to Elevate-lms.');
-      }catch(error){if(!cancelled)output(`Runtime unavailable: ${error instanceof Error?error.message:'Connection failed'}`);}
+        terminalSessionRef.current=session.id;rememberTerminal(session.id);cursorRef.current=0;terminalStateRef.current='running';
+        setTerminalInterrupted(false);setRuntimeReady(true);output('Existing Studio container connected to Elevate-lms.');
+      }catch(error){if(!cancelled){setRuntimeReady(false);disconnected=true;output(`Runtime unavailable: ${error instanceof Error?error.message:'Connection failed'}`);}}
     })();
     const timer=window.setInterval(async()=>{
-      const sessionId=terminalSessionRef.current;
-      if(cancelled || polling || !sessionId)return;
-      polling=true;
-      try {
-        const response=await fetch(`/api/admin/dev-studio/runtime?operation=terminal-output&sessionId=${encodeURIComponent(sessionId)}&after=${cursorRef.current}`,{cache:'no-store',signal:AbortSignal.timeout(20000)});
-        const result=await response.json();
-        if(!response.ok)throw new Error(result.error || `HTTP ${response.status}`);
-        if(cancelled)return;
-        for(const entry of result.output ?? [])output(String(entry.data));
-        cursorRef.current=result.cursor;
-        if(result.exitCode!==null){setRuntimeReady(false);terminalSessionRef.current='';}
-      }catch(error){if(!cancelled){setRuntimeReady(false);output(`Terminal disconnected: ${error instanceof Error?error.message:'Unknown error'}`);terminalSessionRef.current='';}}
-      finally{polling=false;}
+      const id=terminalSessionRef.current;if(cancelled||polling||!id)return;polling=true;
+      try{await read(id);}catch(error){if(!cancelled){setRuntimeReady(false);if(!disconnected)output(`Terminal disconnected; reconnecting to the same session: ${error instanceof Error?error.message:'Unknown error'}`);disconnected=true;}}finally{polling=false;}
     },1500);
-    return ()=>{
-      cancelled=true;window.clearInterval(timer);
-      const sessionId=terminalSessionRef.current;terminalSessionRef.current='';
-      if(sessionId)void request({operation:'terminal-stop',sessionId}).catch(()=>undefined);
-    };
+    return()=>{cancelled=true;window.clearInterval(timer);terminalSessionRef.current='';};
   },[output,reconnect]);
 
   useEffect(() => {
@@ -256,6 +264,16 @@ export default function RealRepoWorkspace({
     }
   }
 
+  async function resumeTerminal(){
+    const sessionId=terminalSessionRef.current||savedTerminalId();if(!sessionId)return;
+    try{
+      const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({operation:'terminal-resume',sessionId})});
+      const result=await response.json();if(!response.ok)throw new Error(result.error||'Terminal recovery failed');
+      terminalSessionRef.current=sessionId;rememberTerminal(sessionId);terminalStateRef.current='running';setTerminalInterrupted(false);setRuntimeReady(true);
+      output('New shell started from the saved directory. Previous commands were not repeated.');
+    }catch(error){output(error instanceof Error?error.message:'Terminal recovery failed');}
+  }
+
   async function stopProcess() {
     const sessionId=terminalSessionRef.current;
     if(!sessionId)return;
@@ -263,7 +281,7 @@ export default function RealRepoWorkspace({
       const response=await fetch('/api/admin/dev-studio/runtime',{method:'POST',
         headers:{'content-type':'application/json'},body:JSON.stringify({operation:'terminal-stop',sessionId})});
       if(!response.ok)throw new Error('Terminal stop failed');
-      terminalSessionRef.current='';setRuntimeReady(false);setRunning(false);output('Studio terminal stopped.');
+      terminalSessionRef.current='';rememberTerminal('');setTerminalInterrupted(false);setRuntimeReady(false);setRunning(false);output('Studio terminal stopped.');
     }catch(error){output(error instanceof Error?error.message:'Terminal stop failed');}
   }
 
@@ -369,8 +387,9 @@ export default function RealRepoWorkspace({
         <div className="flex items-center gap-2 border-b border-[#333] bg-[#171717] px-3 py-1 text-[10px] text-[#9ca3af]">
           <Terminal className="h-3.5 w-3.5" />
           Isolated Terminal
-          {!runtimeReady&&<button type="button" onClick={()=>setReconnect(value=>value+1)} className="rounded border border-slate-500 px-2 py-1 text-white">Reconnect terminal</button>}
-          <span className="text-[#666]">{runtimeReady ? 'runtime ready' : 'runtime starting'}</span>
+          {terminalInterrupted&&<button type="button" onClick={()=>void resumeTerminal()} className="rounded border border-slate-500 px-2 py-1 text-white">Start new shell</button>}
+          {!runtimeReady&&!terminalInterrupted&&<button type="button" onClick={()=>setReconnect(value=>value+1)} className="rounded border border-slate-500 px-2 py-1 text-white">Reconnect terminal</button>}
+          <span className="text-[#666]">{runtimeReady ? 'runtime ready' : terminalInterrupted ? 'saved terminal recovered' : 'runtime disconnected'}</span>
           <button type="button" onClick={() => setTerminalOutput([])} className="ml-auto rounded p-1 hover:bg-[#333]" title="Clear">
             <RefreshCw className="h-3 w-3" />
           </button>

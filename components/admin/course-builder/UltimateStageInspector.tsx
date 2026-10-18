@@ -1,6 +1,7 @@
 'use client';
 
 import AssessmentPreview from './AssessmentPreview';
+import { checkpointNeedsRecheck } from '@/lib/ultimate-course-builder/core/job-observation.mjs';
 import { useEffect, useRef, useState } from 'react';
 import { ULTIMATE_BUILD_STEPS, type UltimateBuildStep } from '@/lib/ultimate-course-builder/core/types';
 
@@ -14,13 +15,35 @@ function findingText(value: unknown): string {
   return '';
 }
 function SavedVideo({ lesson, diagnostic }: { lesson: Lesson; diagnostic: any }) {
+  const player = useRef<HTMLVideoElement>(null);
+  const [needsPlay, setNeedsPlay] = useState(false);
+  const [playbackError, setPlaybackError] = useState('');
   diagnostic = diagnostic ?? lesson.preview;
+  const approvedVideoUrl=lesson.preview?.approvedVideoUrl;
+  const videoUrl = approvedVideoUrl ?? diagnostic?.videoUrl;
+  useEffect(() => {
+    setNeedsPlay(false);
+    setPlaybackError('');
+    const video = player.current;
+    if (!video || !videoUrl) return;
+    let cancelled = false;
+    void video.play().catch(() => { if (!cancelled) setNeedsPlay(true); });
+    return () => { cancelled = true; };
+  }, [videoUrl]);
   if (!diagnostic) return null;
-  return diagnostic.videoUrl ? <div>
-    <p className="mb-2 font-bold">Latest saved video · {diagnostic.mediaApproved ? 'Media QA passed' : 'Draft preview — media QA has not passed'}</p>
-    {diagnostic.previousRender && <p className="mb-2">Previous saved draft while the updated video is being produced.</p>}
-    {diagnostic.historicalVersion && <p className="mb-2">Saved render version {diagnostic.historicalVersion}.</p>}
-    <video controls preload="metadata" className="w-full rounded-lg bg-black" src={diagnostic.videoUrl} aria-label={`${lesson.title} video preview`} />
+  return videoUrl ? <div>
+    <p className="mb-2 font-bold">{approvedVideoUrl?'Owner-approved published lesson':`Latest saved video · ${diagnostic.mediaApproved ? 'Media QA passed' : 'Draft preview — media QA has not passed'}`}</p>
+    {approvedVideoUrl?<p className="mb-2">Approved render version {lesson.preview.approvedVersion}. Checkpoint findings below describe the separate draft.</p>:<>
+      {diagnostic.previousRender && <p className="mb-2">Previous saved draft while the updated video is being produced.</p>}
+      {diagnostic.historicalVersion && <p className="mb-2">Saved render version {diagnostic.historicalVersion}.</p>}
+    </>}
+    <video ref={player} controls playsInline preload="auto" className="w-full rounded-lg bg-black" src={videoUrl}
+      onPlaying={() => { setNeedsPlay(false); setPlaybackError(''); }}
+      onError={() => setPlaybackError('The saved video could not load. Refresh the preview to renew access, then try playback again.')}
+      aria-label={`${lesson.title} video preview`} />
+    {needsPlay && <button type="button" className="mt-2 rounded-lg bg-cyan-500 px-4 py-3 font-bold text-slate-950"
+      onClick={() => { void player.current?.play().catch(() => setPlaybackError('Playback could not start. Use the video controls or refresh the preview.')); }}>Play lesson</button>}
+    {playbackError && <p role="alert" className="mt-2 text-amber-200">{playbackError}</p>}
   </div> : <p>The video is still being produced. You can review the saved instruction below now.</p>;
 }
 
@@ -139,14 +162,14 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
         <select id="lesson-preview-selection" value={selectedLesson} onChange={event => {setFollowActive(false);setSelectedLesson(event.target.value);}}
           className="mt-2 w-full rounded-lg border border-slate-400 bg-slate-900 p-3 text-white">
           <option value="">Choose a lesson to preview…</option>
-          {lessons.map((lesson, index) => <option key={lesson.lesson_key} value={lesson.lesson_key}>{index + 1}. {lesson.title} — {lesson.status.replaceAll('_', ' ')}</option>)}
+          {lessons.map((lesson, index) => <option key={lesson.lesson_key} value={lesson.lesson_key}>{index + 1}. {lesson.title} — {lesson.saved ? lesson.status.replaceAll('_', ' ') : 'Not built — no video yet'}</option>)}
         </select>
         <label className="mt-3 flex items-center gap-2 text-sm"><input type="checkbox" checked={followActive} onChange={event=>setFollowActive(event.target.checked)} />Follow the lesson being built</label>
         {lessons.filter(lesson => lesson.lesson_key === selectedLesson).map(lesson => <div key={lesson.lesson_key} className="mt-4 space-y-3">
           <h4 className="text-lg font-bold">{lesson.title}</h4>
           <p>Saved lesson status: {lesson.status.replaceAll('_', ' ')}. Draft content updates as checkpoints are saved.</p>
           <SavedVideo lesson={lesson} diagnostic={lesson.preview?.videoUrl ? lesson.preview : actionResults[`${lesson.id}:${selected}`]?.diagnostic} />
-          {!lesson.saved && <p>This lesson is planned. Its preview will appear when the builder starts saving its content.</p>}
+          {!lesson.saved && <p>This lesson has not been built. No saved video is available yet.</p>}
           {lesson.preview?.objectives?.length > 0 && <div><h5 className="font-bold">Learning objectives</h5><ul className="list-disc pl-5">{lesson.preview.objectives.map((text: string, i: number) => <li key={i}>{text}</li>)}</ul></div>}
           {lesson.preview?.segments?.map((segment: any, i: number) => <article key={i} className="rounded-lg border border-slate-600 p-3"><h5 className="font-bold">{segment.title}</h5><p className="mt-2 whitespace-pre-wrap">{segment.text}</p></article>)}
           <AssessmentPreview key={lesson.id} assessment={lesson.preview?.assessment} />
@@ -185,12 +208,14 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
           {!loading && !error ? <ul className="mt-3 space-y-2">
             {lessons.filter(lesson => !selectedLesson || lesson.lesson_key === selectedLesson).map(lesson => {
               const checkpoint = lesson.ultimate_lesson_steps?.find(row => row.step === selected);
+              const needsRecheck = checkpointNeedsRecheck(lesson.ultimate_lesson_steps ?? [], selected);
               const findings = (checkpoint?.findings ?? []).map(findingText).filter(Boolean);
               const result = actionResults[`${lesson.id}:${selected}`];
               return <li key={lesson.id} className="rounded-lg border border-slate-800 p-3 text-sm">
                 <strong>{lesson.title}</strong>
-                <p className="mt-1 text-slate-300">{checkpoint?.state ?? 'Not started'}</p>
-                {findings.map((finding, index) => <p key={index} className="mt-1 text-amber-200">{finding}</p>)}
+                <p className="mt-1 text-slate-300">{needsRecheck ? 'Needs recheck for latest video' : (checkpoint?.state ?? 'Not started')}</p>
+                {needsRecheck && <p className="mt-1 text-amber-200">The current saved render has not passed this check. Earlier findings describe a previous render.</p>}
+                {findings.map((finding, index) => <p key={index} className="mt-1 text-amber-200">{needsRecheck ? 'Previous render: ' : ''}{finding}</p>)}
                 <div className="mt-3 flex flex-wrap gap-3">
                   <button type="button" disabled={Boolean(actionBusy) || !lesson.saved} onClick={() => void checkpointAction(lesson, false)}
                     className="rounded-lg border border-slate-300 bg-white px-4 py-3 font-bold text-slate-950">Diagnose checkpoint & preview</button>
@@ -202,7 +227,7 @@ export default function UltimateStageInspector({ buildId, updatedAt }: { buildId
                 {result?.message && <p role="status" className="mt-3 text-white">{result.message}</p>}
                 {result?.diagnostic && <div className="mt-4 space-y-3">
                   <p>Saved checkpoint: <strong>{result.diagnostic.state.replaceAll('_', ' ')}</strong></p>
-                  <p>Worker: {result.diagnostic.workerStatus}. Last heartbeat: {result.diagnostic.heartbeatAt ? new Date(result.diagnostic.heartbeatAt).toLocaleString() : 'No heartbeat recorded'}.</p>
+                  <p>Worker: {result.diagnostic.workerStatus}.</p>
                   {result.diagnostic.prerequisites.length > 0 && <p>Prerequisites still required: {result.diagnostic.prerequisites.map((v: string) => v.replaceAll('_', ' ')).join(', ')}.</p>}
                   {result.diagnostic.missingEvidence.length > 0 && <p>{result.diagnostic.awaitingPrerequisites ? 'Waiting for this stage to finish and save evidence' : 'Saved checkpoint needs repair'}: {result.diagnostic.missingEvidence.join(', ')}.</p>}
                   <p>The lesson’s saved content and video preview are in the pane on the right.</p>

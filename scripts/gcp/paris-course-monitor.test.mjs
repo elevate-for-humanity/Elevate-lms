@@ -4,6 +4,18 @@ import {inspectCourseAutopilot} from '../../lib/ultimate-course-builder/worker/p
 import {monitorCourseQueue} from './paris-course-monitor.mjs';
 const now=new Date('2026-10-14T18:00:00Z');
 const job=(extra={})=>({id:'job',status:'queued',attempts:1,max_attempts:5,execution_generation:2,monitor:{enabled:true},...extra});
+test('saved pause never attributes an actor and finished revisions have distinct states',()=>{
+ const paused=inspectCourseAutopilot(job(),{profile:{ownerPaused:true}},+now);
+ assert.equal(paused.state,'paused');
+ assert.match(paused.reason,/origin is not established/);
+ assert.equal(inspectCourseAutopilot(job(),{status:'published',profile:{ownerPaused:true}},+now).state,'published');
+ assert.equal(inspectCourseAutopilot(job(),{status:'archived'},+now).state,'archived');
+});
+test('a future heartbeat cannot certify a live worker',()=>{
+ const state=inspectCourseAutopilot(job({status:'running',heartbeat_at:'2027-10-14T18:00:00Z',lease_expires_at:'2027-10-14T18:05:00Z'}),{},+now);
+ assert.equal(state.state,'heartbeat_stale');
+ assert.equal(state.action,'wait_for_lease');
+});
 test('never overrides an unexpired lease or owner pause',()=>{
  assert.equal(inspectCourseAutopilot(job({status:'running',heartbeat_at:'2026-10-14T17:55:00Z',lease_expires_at:'2026-10-14T18:05:00Z'}),{},+now).action,'wait_for_lease');
  assert.equal(inspectCourseAutopilot(job(),{profile:{ownerPaused:true}},+now).action,'none');
@@ -36,4 +48,38 @@ test('fresh running observation clears an obsolete waiting reason',async()=>{
  await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
   request:async(_url,options)=>{if(options.method)body=JSON.parse(options.body);return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};}});
  assert.equal(body.monitor.state,'running');assert.equal(body.monitor.reason,null);
+});
+
+test('PARIS records confirmed claims only from valid live worker evidence',async()=>{
+ const calls=[];
+ const row=job({status:'running',lease_owner:'worker-1',heartbeat_at:'2026-10-14T17:59:50Z',lease_expires_at:'2026-10-14T18:05:00Z',monitor:{enabled:true,recoveries:0}});
+ const request=async(_url,options)=>{if(options.method)calls.push(JSON.parse(options.body));return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};};
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,request});
+ assert.equal(calls[0].monitor.confirmedAssignments,1);
+ assert.equal(calls[0].monitor.lastConfirmedLeaseOwner,'worker-1');
+ assert.equal(calls[0].monitor.recoveries,0);
+ row.monitor=calls[0].monitor;calls.length=0;
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,request});
+ assert.equal(calls[0].monitor.confirmedAssignments,1);
+});
+test('queued jobs cannot claim confirmed recovery evidence',async()=>{
+ const row=job();let body;
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+  request:async(_url,options)=>{if(options.method)body=JSON.parse(options.body);return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};}});
+ assert.equal(body.monitor.confirmedAssignments,undefined);
+});
+
+test('PARIS requests lease owner so confirmed assignment reporting can work in production',async()=>{
+ let selected='';
+ const row=job({status:'running',lease_owner:'worker-confirmed',heartbeat_at:'2026-10-14T17:59:50Z',lease_expires_at:'2026-10-14T18:05:00Z'});
+ let written;
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+  request:async(url,options)=>{
+   if(!options.method)selected=new URL(url).searchParams.get('select');
+   else written=JSON.parse(options.body);
+   return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};
+  }});
+ assert.match(selected,/\\blease_owner\\b/);
+ assert.equal(written.monitor.confirmedAssignments,1);
+ assert.equal(written.monitor.action,'observe');
 });

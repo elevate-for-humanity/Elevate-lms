@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       ? `${url}/workspace/terminal/${encodeURIComponent(request.nextUrl.searchParams.get('sessionId') || '')}/output?after=${encodeURIComponent(request.nextUrl.searchParams.get('after') || '0')}`
       : `${url}/health`;
   const response = await fetch(target, {
-    headers: operation === 'files' || operation === 'terminal-output' ? { 'x-studio-browser-secret': secret } : {},
+    headers: operation === 'files' || operation === 'terminal-output' ? { 'x-studio-browser-secret': secret, 'x-studio-operator-id':auth.id } : {},
     cache: 'no-store',
     signal: AbortSignal.timeout(20_000),
   });
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
   const body = await request.json().catch(() => ({}));
   const operation = String(body.operation || 'exec');
-  if (!['exec','repository-sync','terminal-create','terminal-input','terminal-stop','file-write'].includes(operation))
+  if (!['exec','repository-sync','terminal-create','terminal-input','terminal-stop','terminal-resume','file-write'].includes(operation))
     return NextResponse.json({error:'Unsupported Studio runtime operation'},{status:400});
   const command = String(body.command || '').trim();
   if (operation === 'exec' && !command) return NextResponse.json({ error: 'command is required' }, { status: 400 });
@@ -59,7 +59,8 @@ export async function POST(request: NextRequest) {
     if(!ownedRun) return NextResponse.json({error:'Studio run is not owned by this operator'},{status:403});
   }
   const { url, secret } = await runtimeConfig();
-  const target = operation === 'file-write' ? `${url}/workspace/file`
+  const target = operation === 'terminal-resume' ? `${url}/workspace/terminal/${encodeURIComponent(String(body.sessionId || ''))}/resume`
+    : operation === 'file-write' ? `${url}/workspace/file`
     : operation === 'terminal-stop' ? `${url}/workspace/terminal/${encodeURIComponent(String(body.sessionId || ''))}`
     : operation === 'repository-sync'
     ? `${url}/workspace/repository/sync`
@@ -70,13 +71,13 @@ export async function POST(request: NextRequest) {
         : `${url}/workspace/exec`;
   const response = await fetch(target, {
     method: operation === 'file-write' ? 'PUT' : operation === 'terminal-stop' ? 'DELETE' : 'POST',
-    headers: { 'content-type': 'application/json', 'x-studio-browser-secret': secret },
+    headers: { 'content-type': 'application/json', 'x-studio-browser-secret': secret, 'x-studio-operator-id':auth.id },
     body: operation === 'terminal-stop' ? undefined : JSON.stringify(operation === 'file-write' ? {path:body.path,content:body.content}
       : operation === 'repository-sync'
       ? { repoUrl: body.repoUrl, branch: body.branch }
       : operation === 'terminal-input'
         ? { data: body.data }
-        : operation === 'terminal-create'
+        : (operation === 'terminal-create' || operation === 'terminal-resume')
           ? {}
           : {
               command,

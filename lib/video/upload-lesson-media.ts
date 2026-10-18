@@ -15,10 +15,12 @@ import os from 'os';
 import path from 'path';
 import {
   uploadToElevateMedia,
+  getSignedElevateMediaUrl,
   uploadFileToElevateMedia,
   isElevateMediaStorageConfigured,
   isElevateMediaPublicDeliveryConfigured,
 } from '../storage/elevate-media-storage';
+import { ownerPreviewMediaDelivery } from './owner-preview-media-delivery.mjs';
 import { logger } from '../logger';
 import { uploadSupabaseResumable, uploadSupabaseResumableFile } from './supabase-resumable-upload.mjs';
 import { videoEncoderArgs } from './ffmpeg-runtime';
@@ -93,9 +95,7 @@ export function shouldUploadCourseMediaToElevateMedia(
   const backend = resolveCourseVideoStorageBackend();
   if (backend === 'supabase') return false;
   if (!isElevateMediaStorageConfigured() || !isElevateMediaPublicDeliveryConfigured()) {
-    if (backend === 'elevate-media') {
-      logger.warn('[upload-lesson-media] COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED: using Supabase fallback');
-    }
+    if (backend === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_DELIVERY_NOT_CONFIGURED');
     return false;
   }
 
@@ -210,14 +210,14 @@ async function uploadCourseVideosToElevateMedia(
   contentType: string,
 ): Promise<string> {
   const key = elevateMediaKeyForStoragePath(storagePath);
-  const result = await uploadToElevateMedia(buffer, key, contentType);
+  const result = await ownerPreviewMediaDelivery(await uploadToElevateMedia(buffer, key, contentType), {target: process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID, sign: getSignedElevateMediaUrl});
   if (!result.success || !result.url) {
     throw new Error(result.error ?? `Elevate Media Storage upload failed for ${key}`);
   }
   logger.info('[upload-lesson-media] uploaded to Elevate Media Storage', {
     key,
     bytes: buffer.length,
-    url: result.url.slice(0, 80),
+    // Signed read URLs are bearer credentials; never log them.
   });
   return result.url;
 }
@@ -235,6 +235,7 @@ export async function uploadCourseVideosObject(
       // The ordinary request ceiling does not apply to the TUS route below.
       // Keep the completed bytes and let Storage enforce its actual object
       // limit instead of rejecting a valid film before a chunked upload.
+      if (resolveCourseVideoStorageBackend() === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED', { cause: err });
       logger.warn('[upload-lesson-media] Elevate Media Storage upload failed, falling back to Supabase', { err });
     }
   }
@@ -283,8 +284,9 @@ export async function uploadLessonFileFromDisk(
   let url: string | undefined;
   // Selection only needs the byte count; large source files remain on disk.
   if (!options?.forceSupabase && shouldUploadCourseMediaToElevateMedia({length: size}, contentType)) {
-    const result = await uploadFileToElevateMedia(filePath, elevateMediaKeyForStoragePath(storagePath), contentType);
+    const result = await ownerPreviewMediaDelivery(await uploadFileToElevateMedia(filePath, elevateMediaKeyForStoragePath(storagePath), contentType), {target: process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID, sign: getSignedElevateMediaUrl});
     if (result.success && result.url) url = result.url;
+    else if (resolveCourseVideoStorageBackend() === 'elevate-media') throw new Error('COURSE_OBJECT_STORAGE_UPLOAD_FAILED');
     else logger.warn('[upload-lesson-media] object upload failed; retrying through Supabase');
   }
   if (!url && ext === 'mp4' && size > SUPABASE_TUS_CHUNK_BYTES) {

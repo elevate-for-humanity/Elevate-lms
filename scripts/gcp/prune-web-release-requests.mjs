@@ -5,7 +5,7 @@ export const WEB_RELEASE_WORKFLOWS = [
   'deploy-google-lms-trigger.yml', 'deploy-google-store-runtime.yml',
 ];
 const waiting = new Set(['queued', 'pending', 'requested', 'waiting', 'in_progress']);
-const preparationJobs = new Set(['dispatch', 'validate', 'build', 'authoring-access']);
+const preparationJobs = new Set(['dispatch', 'validate', 'build', 'build / image', 'authoring-access']);
 const eligible = run => run.event === 'workflow_dispatch' && run.head_branch === 'main';
 
 export async function releaseApi(path,method='GET',{token=process.env.GH_TOKEN,request=fetch}={}) {

@@ -48,7 +48,7 @@ test('GitHub failure, missing credentials and foreign API paths fail closed',asy
 });
 
 test('completed preparation does not trap a superseded release in the deployment queue',async()=>{
- const jobs=[{name:'validate',status:'completed',started_at:'2026-10-18T00:00:00Z'},{name:'build',status:'completed',started_at:'2026-10-18T00:00:00Z'},{name:'deploy',status:'pending',started_at:'2026-10-18T00:00:00Z',steps:[]}];
+ const jobs=[{name:'validate',status:'completed',started_at:'2026-10-18T00:00:00Z'},{name:'build / image',status:'completed',started_at:'2026-10-18T00:00:00Z'},{name:'deploy',status:'pending',started_at:'2026-10-18T00:00:00Z',steps:[]}];
  const f=fixture({rows:[row(1,'in_progress'),row(2)],jobs});
  await pruneWebReleaseRequests({...f,repository,execute:true});assert.equal(f.writes.length,1);
  for(const activeJobs of [[{name:'build',status:'in_progress',started_at:'2026-10-18T00:00:00Z'}],[{name:'deploy',status:'completed',started_at:'2026-10-18T00:00:00Z'}]]){

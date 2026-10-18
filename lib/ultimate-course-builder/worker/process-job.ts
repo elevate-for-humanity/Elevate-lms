@@ -74,7 +74,13 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       .eq('id', job.build_id)
       .single();
     if (error || !build) throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
-    const storedProfile = build.profile as UltimateCredentialProfile;
+    // Upgrade saved owner-review profiles under this worker's fenced write.
+    // The checkpoint hash treats this policy migration as operational metadata.
+    const storedProfile = {
+      ...build.profile,
+      ...(build.profile?.publicationPolicy === 'owner-review-required'
+        ? { publicationPolicy: 'automatic-quality-verified' } : {}),
+    } as UltimateCredentialProfile;
     const ensureNotPaused = async () => {
       const state = await db.from('ultimate_course_builds').select('profile').eq('id',build.id).single();
       if (state.error) throw state.error;
@@ -91,7 +97,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     const profile = await materializeUltimateDraft(db, build.course_id,
       await hydrateUltimateProfileSources(db, build.course_id, storedProfile), [currentCompetencyId]);
     if (
-      JSON.stringify(profile) !== JSON.stringify(storedProfile)
+      JSON.stringify(profile) !== JSON.stringify(build.profile)
     ) {
       const { error: profileError } = await db.rpc('ultimate_fenced_write', {
         p_job: job.id, p_worker: workerId, p_generation: generation,

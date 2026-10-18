@@ -19,7 +19,8 @@ function scenario(payload, completed = true, options = {}) {
   const events = [];
   const build = { id: 'build', course_id: 'course', status: 'blocked', profile: { competencies: [{ id: 'competency' }] } };
   const q = { select: () => q, eq: () => q, single: async () => ({ data: build, error: null }), then: resolve => resolve({data:[{competency_id:'competency',status:'built',artifacts:{}}],error:null}) };
-  const db = { from: () => q };
+  const profileWrites=[];
+  const db = { from: () => q, rpc: async (_name,args) => {profileWrites.push(args.p_data.profile);return {error:null};} };
   class Queue {
     async claim() { return { id: 'job', build_id: 'build', execution_generation: 1, payload }; }
     async heartbeat() { return true; }
@@ -31,7 +32,7 @@ function scenario(payload, completed = true, options = {}) {
   const names = ['recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
   const values = [async()=>{},createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } }, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
   const worker = new Function(...names, 'liveCheckpointRepairReader', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader);
-  return { events, build, run: () => worker(db, 'owner') };
+  return { events, build, profileWrites, run: () => worker(db, 'owner') };
 }
 
 test('a successful targeted lesson clears course running state before releasing its job', async () => {
@@ -73,5 +74,6 @@ test('an explicit pause stops before the next checkpoint without completing or f
 test('a completed legacy owner-review course publishes without waiting for a manual decision',async()=>{
  const s=scenario({});s.build.profile.publicationPolicy='owner-review-required';
  const result=await s.run();assert.equal(result.completed,true);
+ assert.equal(s.profileWrites[0]?.publicationPolicy,'automatic-quality-verified');
  assert.deepEqual(s.events,[{buildId:'build',status:'built',currentStep:'credential_release'},'publish','complete']);
 });

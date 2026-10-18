@@ -1,3 +1,4 @@
+import {reportCourseProgress, courseProgressSignal} from '../worker/progress-watch.mjs';
 import { assertGeneratedLessonAssessment } from './generated-lesson-assessment.mjs';
 import { parseVertexLessonResponse } from './vertex-response.mjs';
 import { assertSourceGrounding, sourceGroundingFailures } from './source-grounding.mjs';
@@ -35,7 +36,7 @@ export function validateGoogleAuthoringEvidence(blueprint: LessonBlueprint, sour
 }
 
 /** One reviewed artifact supplies narration, visuals, practice and assessment.
- * Citation validation is deterministic; pedagogical review is a separate call.
+ * Schema, source grounding, assessment and visual validation are deterministic.
  * Neither author nor reviewer is permitted to certify rendered media.
  */
 export async function authorGoogleLesson(input: {
@@ -69,11 +70,12 @@ Grounding is an array with one entry per segment: {segmentId, sourceId, excerpt}
     : undefined;
   const authorRequest = { ...(input.repairDirective?{repair:input.repairDirective}:{}), lessonTitle:input.competency.title, titleRequirement:'Explain this exact lesson topic in the spoken introduction; teach all title concepts using authorized sources. Recap and application checks must be substantive, not labels.', courseTitle: input.profile.title, audience: input.profile.audience || 'Adult career learners', competency: input.competency, sequence: ULTIMATE_TEACHING_SEQUENCE, sources: input.sources, blueprintSchema: schema, ...(presentationRequirements ? {presentationRequirements, presentationContract: input.profile.presentationContract} : {}) };
   let result = bindBlueprintRequirements(await generate(system, authorRequest), input.competency);
+  reportCourseProgress('authoring:' + input.competency.id + ':draft', 1);
   for (let attempt = 0; attempt < 3; attempt++) {
     if (result?.blocked) break;
     try {
-      validateLessonBlueprint(result?.blueprint, input.competency);
       assertGeneratedLessonAssessment(result?.blueprint?.assessment);
+      validateLessonBlueprint(result?.blueprint, input.competency);
       assertSourceGrounding(result?.blueprint?.segments, input.sources, result?.grounding);
       break;
     }
@@ -89,6 +91,7 @@ Grounding is an array with one entry per segment: {segmentId, sourceId, excerpt}
         citationInstructions: 'Use only the supplied source IDs. Copy an exact contiguous passage of at least eight words from that source for each failed segment. Keep valid citations unchanged. Verify that the passage supports the spoken claim; never invent a quotation or merely cite a title. If authorized sources cannot support the claim, return blocked:true with the specific source gap. Return the full blueprint and grounding. Deterministic validation remains required.',
         instructions: 'Repair the reported blueprint validation failure using blueprintSchema. Return all required 13-16 segments with nonempty text and visualRequirement, unique segment IDs, objectiveIds that match actual blueprint objectives and omit sourceRequirementIds because the builder supplies them. Preserve all thirteen stages in order and all required activity and assessment fields. Repair invalid teaching visuals. Return the full {blueprint, grounding}. Preserve spoken narration, source citations, objectives and valid assessment items. Supply at least two recap questions and at least two distinct reassessment questions. Each value and narrationQuote must be the SAME short contiguous exact excerpt from that segment narration; no paraphrase. Use 1-4 meaningful steps, labels <=28 characters and values <=90 characters. Preserve negations and technical conditions. Never claim validation or approval yourself.',
       }}), input.competency);
+      reportCourseProgress('authoring:' + input.competency.id + ':repair', attempt + 1);
     }
   }
   if (result?.blocked) throw new Error('ULTIMATE_AUTHORING_SOURCE_GAP:' + String(result.reason).slice(0, 300));
@@ -139,7 +142,7 @@ export async function generateVertexLessonJson(model: string, system: string, in
   const response = await fetch(`https://${host}/v1/projects/${project}/locations/${region}/publishers/google/models/${model}:generateContent`, {
     method: 'POST', headers: { Authorization: `Bearer ${token.access_token}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: JSON.stringify(input) }] }], generationConfig: { temperature: 0.2, maxOutputTokens: 16384, responseMimeType: 'application/json' } }),
-    signal: AbortSignal.timeout(180000),
+    signal: courseProgressSignal() ? AbortSignal.any([courseProgressSignal(), AbortSignal.timeout(180000)]) : AbortSignal.timeout(180000),
   });
   if ([429,500,502,503,504].includes(response.status)&&attempt<2) {await new Promise(r=>setTimeout(r,15000*2**attempt));continue;}
   if (!response.ok) throw new Error(`ULTIMATE_GOOGLE_AUTHORING_HTTP_${response.status}`);

@@ -1,3 +1,4 @@
+import {createCourseProgressWatch} from '../../lib/ultimate-course-builder/worker/progress-watch.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -14,14 +15,14 @@ function fixture() {
   const result = { blueprint, grounding: blueprint.segments.map((segment: any) => ({ segmentId: segment.id, sourceId: sources[0].id, excerpt: segment.text })) };
   return { input, result };
 }
-test('one reviewed source-bound blueprint supplies all instructional stages', async () => {
+test('one validated source-bound blueprint supplies all instructional stages', async () => {
   const { input, result } = fixture();
   let calls = 0;
   const output: any = await authorGoogleLesson(input, async (_system, request: any) => {
     calls++;
     return calls === 1 ? result : { pass: true, findings: [], competencyId: input.competency.id, blueprintHash: request.blueprintHash };
   });
-  assert.equal(calls, 2);
+  assert.equal(calls, 1);
   assert.equal(output.authoringEvidence.sourceHash, contractHash(input.sources));
   assert.equal(output.segments.length, 13);
   assert.deepEqual(output.assessment, result.blueprint.assessment);
@@ -68,7 +69,7 @@ test('authoring schema includes mandatory activities, reassessment and practical
   });
 });
 
-test('invalid visual receives targeted repair and still requires independent review', async () => {
+test('invalid visual receives targeted repair and deterministic validation', async () => {
   const {input,result}=fixture();
   const invalid=structuredClone(result);
   invalid.blueprint.segments[0].teachingVisual.steps[0].value='Disconnect the energized compressor';
@@ -87,12 +88,12 @@ test('invalid visual receives targeted repair and still requires independent rev
   assert.equal(calls,2);
   validateGoogleAuthoringEvidence(output,input.sources);
 });
-test('repeated unsupported visual cannot bypass validation or reach independent approval',async()=>{
+test('repeated unsupported visual cannot bypass validation after two repairs',async()=>{
   const {input,result}=fixture();
   result.blueprint.segments[0].teachingVisual.steps[0].value='Disconnect the energized compressor';
   let calls=0;
   await assert.rejects(authorGoogleLesson(input,async()=>{calls++;return result;}),/BLUEPRINT_TEACHING_VISUAL_NOT_SCRIPT_BOUND/);
-  assert.equal(calls,2);
+  assert.equal(calls,3);
 });
 
 test('missing scene objective evidence is repaired before a lesson can be reviewed',async()=>{
@@ -121,5 +122,22 @@ test('a one-question generation is repaired to multiple questions',async()=>{
 });
 test('repeated one-question output cannot reach deterministic acceptance',async()=>{
  const {input,result}=fixture();result.blueprint.assessment.questions=result.blueprint.assessment.questions.slice(0,1);let calls=0;
- await assert.rejects(authorGoogleLesson(input,async()=>{calls++;return result;}),/BLUEPRINT_MULTIPLE_QUESTIONS_REQUIRED/);assert.equal(calls,2);
+ await assert.rejects(authorGoogleLesson(input,async()=>{calls++;return result;}),/BLUEPRINT_MULTIPLE_QUESTIONS_REQUIRED/);assert.equal(calls,3);
+});
+
+test('completed authoring drafts renew progress while bounded repairs preserve the stall guard',async()=>{
+ const {input,result}=fixture();const invalid=structuredClone(result);
+ invalid.blueprint.segments[0].objectiveIds=['missing-objective'];
+ let tick=0,calls=0;const progress:any[]=[];
+ const watch=createCourseProgressWatch({now:()=>tick,schedule:()=>0,cancel:()=>{},onProgress:async(value:any)=>{progress.push(value);}});
+ try {
+  await watch.run(()=>authorGoogleLesson(input,async()=>{
+   tick+=540000;await watch.check();assert.equal(watch.signal.aborted,false);
+   return ++calls===1?invalid:result;
+  }));
+  await Promise.resolve();await Promise.resolve();
+  assert.equal(watch.signal.aborted,false);
+  assert.deepEqual(progress.map(value=>value.phase),['authoring:'+input.competency.id+':draft','authoring:'+input.competency.id+':repair']);
+  tick+=600001;await watch.check();assert.equal(watch.signal.aborted,true);
+ } finally {watch.dispose();}
 });

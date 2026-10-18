@@ -97,6 +97,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           REQUESTED_SHA: ${{ inputs.requested_sha }}
+          RELEASE_WORKFLOW: deploy-admin.yml
         shell: bash
         run: |
           set -euo pipefail
@@ -104,11 +105,15 @@ jobs:
             echo "::error::Invalid requested_sha"
             exit 1
           fi
-          latest="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)"
-          if test "$latest" != "$GITHUB_SHA" || { test -n "$REQUESTED_SHA" && test "$REQUESTED_SHA" != "$GITHUB_SHA"; }; then
-            echo "::error::Superseded release; do not deploy an older Admin revision."
+          if test -n "$REQUESTED_SHA" && test "$REQUESTED_SHA" != "$GITHUB_SHA"; then
+            echo "::error::Requested Admin release differs from the checked-out commit."
             exit 1
           fi
+          git fetch --depth=50 origin main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+          # Later unrelated commits do not invalidate the latest Admin request.
+          # A newer Admin request does; retire it before any expensive build.
+          node scripts/gcp/prune-web-release-requests.mjs --assert-latest
       - uses: google-github-actions/auth@v3
         with:
           project_id: elegant-racer-299721

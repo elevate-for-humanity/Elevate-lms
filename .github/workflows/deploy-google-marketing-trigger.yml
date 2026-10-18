@@ -91,6 +91,12 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Reject superseded Marketing requests before building
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_WORKFLOW: deploy-google-marketing-trigger.yml
+        run: node scripts/gcp/prune-web-release-requests.mjs --assert-latest
+
       - name: Verify immutable main revision
         shell: bash
         run: |

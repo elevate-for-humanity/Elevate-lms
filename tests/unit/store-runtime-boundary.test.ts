@@ -5,6 +5,11 @@ vi.mock('@/lib/supabase/middleware',()=>({createMiddlewareSupabaseClient:vi.fn()
 import {middleware} from '../../apps/marketing/middleware';
 afterEach(()=>vi.unstubAllEnvs());
 describe('Store service isolation',()=>{
+ it.each(['/privacy','/terms-of-service','/security-and-data-protection'])('serves the public purchase policy %s without a Marketing redirect',async path=>{
+  vi.stubEnv('K_SERVICE','elevate-store-migration');
+  const response=await middleware(new NextRequest('https://store.elevateforhumanity.org'+path));
+  expect(response.headers.get('location')).toBeNull();expect(response.headers.get('x-middleware-next')).toBe('1');
+ });
  it.each(['/api/webhooks/paypal-billing','/api/webhooks/quickbooks','/api/auth/signin','/api/store/cart-checkout'])('handles %s locally while Marketing is unavailable',async path=>{
   vi.stubEnv('K_SERVICE','elevate-store-migration');
   const response=await middleware(new NextRequest('https://store.elevateforhumanity.org'+path,{method:'POST'}));

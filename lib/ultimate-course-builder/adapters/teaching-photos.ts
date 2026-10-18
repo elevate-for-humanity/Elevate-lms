@@ -113,7 +113,13 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       }
       let repairProof:any;
       if (!file) {
-        const generated = await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,selectedReplacement:input.courseId===MANUAL_COSMETOLOGY_COURSE_ID ? async()=>manualCosmetologyDiagram(scene,step,index) : null,persistFailure:async(detail:any)=>{
+        // Owner-approved manual course: avoid six slow provider attempts for
+        // conceptual scenes. Prefer cached/placed/selected/licensed visuals above;
+        // generate a readable teaching card immediately when no asset fits.
+        const quickCard = input.courseId === MANUAL_COSMETOLOGY_COURSE_ID
+          ? await conceptualTeachingCard({scene,step,courseTitle:input.courseTitle,index})
+          : null;
+        const generated = quickCard ?? await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,selectedReplacement:input.courseId===MANUAL_COSMETOLOGY_COURSE_ID ? async()=>manualCosmetologyDiagram(scene,step,index) : null,persistFailure:async(detail:any)=>{
           const diagnosticPath='approved-teaching-photo-diagnostics/'+input.lessonId+'/'+requestHash+'.json';
           const {error}=await db.storage.from('course_videos').upload(diagnosticPath,Buffer.from(JSON.stringify({...detail,at:new Date().toISOString()})),{contentType:'application/json',upsert:true});
           if(error)throw Error('TEACHING_PHOTO_DIAGNOSTIC_SAVE_FAILED:'+scene.id);

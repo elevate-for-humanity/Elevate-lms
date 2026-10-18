@@ -58,6 +58,24 @@ jobs:
           VM=elevate-pbx
           test "$(gcloud compute instances describe "$VM" --project="$PROJECT" --zone="$ZONE" --format='value(status)')" = RUNNING
           test "$(gcloud compute instances describe "$VM" --project="$PROJECT" --zone="$ZONE" --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+      - name: Inspect actual serving application bindings without printing values
+        run: |
+          node --input-type=module <<'NODE'
+          import {google,PROJECT} from './scripts/gcp/runtime-config.mjs';
+          const keys={lms:['PBX_CONTROL_URL','PBX_PROVISIONING_TOKEN','PBX_TURN_URLS','PBX_TURN_SHARED_SECRET'],admin:['PBX_PROVISIONING_TOKEN','PBX_PHONE_SYSTEM_ID']};
+          const read=args=>JSON.parse(google([...args,'--project',PROJECT,'--region','us-central1','--format=json']));
+          for(const component of ['admin','lms']){
+            const service=read(['run','services','describe','elevate-'+component+'-migration']);
+            const names=[...new Set((service.status?.traffic||[]).filter(t=>t.percent>0).map(t=>t.revisionName))];
+            if(!names.length)throw Error('Serving application revision unavailable');
+            for(const name of names){
+              const revision=read(['run','revisions','describe',name]);
+              const env=new Map((revision.spec?.containers?.[0]?.env||[]).map(e=>[e.name,e]));
+              const present=Object.fromEntries(keys[component].map(key=>[key,Boolean(env.get(key)?.value||env.get(key)?.valueFrom?.secretKeyRef)]));
+              console.log(JSON.stringify({servingPhoneBindings:{component,revision:name,googleProvider:env.get('ELEVATE_RUNTIME_CONFIG_PROVIDER')?.value==='google-secret-manager',present}}));
+            }
+          }
+          NODE
       - name: Upgrade only the idle provisioner with local rollback
         run: |
           set -euo pipefail

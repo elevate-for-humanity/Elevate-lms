@@ -1,8 +1,6 @@
-import { loadGoogleConfig } from './runtime-config.mjs';
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { google, PROJECT } from './runtime-config.mjs';
+import { courseWorkerBoundary } from './sync-course-worker-regions.mjs';
+import { isDeepStrictEqual } from 'node:util';
 import { pathToFileURL } from 'node:url';
 
 // Select one complete credential family. Never combine a B2 endpoint with
@@ -62,41 +60,27 @@ export function courseJobResources(job) {
   return {cpu:String(cpu),memory};
 }
 
-async function main() {
-  const sha = process.env.IMAGE_SHA;
+/** Release the tested image onto the existing Google job. The live environment
+ * is already in use by saved builds; an image release must not reconstruct it
+ * from an older migration archive or change its storage provider. */
+export function deployCourseJob(sha, run = google) {
   if (!/^[a-f0-9]{40}$/.test(sha ?? '')) throw new Error('Full worker image commit required');
-  const config = loadGoogleConfig('ultimate-worker');
-  const vars = courseJobEnvironment(config, { volumes: config.volumes });
-  const project='elegant-racer-299721', region='us-central1';
-  function gcloud(args) {
-    const r=spawnSync('gcloud',args,{encoding:'utf8',maxBuffer:4*1024*1024});
-    if(r.status!==0)throw new Error(`Google worker operation failed: ${args.slice(0,3).join(' ')}`);
-    return r.stdout.trim();
-  }
-  const image=`us-central1-docker.pkg.dev/${project}/elevate/ultimate-worker`;
-  const before=JSON.parse(gcloud(['run','jobs','describe','elevate-course-builder','--project',project,'--region',region,'--format=json']));
-  const resources=courseJobResources(before);
-  const digest=gcloud(['artifacts','docker','images','describe',`${image}:${sha}`,'--project',project,'--format=value(image_summary.digest)']);
+  const region='us-central1';
+  const read=()=>JSON.parse(run(['run','jobs','describe','elevate-course-builder','--project='+PROJECT,'--region='+region,'--format=json']));
+  const beforeJob=read(),before=courseWorkerBoundary(beforeJob);
+  courseJobResources(beforeJob);
+  const image=`us-central1-docker.pkg.dev/${PROJECT}/elevate/ultimate-worker`;
+  const digest=run(['artifacts','docker','images','describe',`${image}:${sha}`,'--project='+PROJECT,'--format=value(image_summary.digest)']);
   if(!/^sha256:[a-f0-9]{64}$/.test(digest))throw new Error('Uploaded worker digest required');
-  const directory=mkdtempSync(join(tmpdir(),'elevate-course-job-'));
-  try {
-    const environment=join(directory,'environment.json');
-    writeFileSync(environment,JSON.stringify(vars),{mode:0o600});
-    gcloud(['run','jobs','deploy','elevate-course-builder','--project',project,'--region',region,
-      '--image',`${image}@${digest}`,'--service-account',`elevate-worker-runtime@${project}.iam.gserviceaccount.com`,
-      '--cpu',resources.cpu,'--memory',resources.memory,'--tasks','1','--parallelism','1','--max-retries','1','--task-timeout','10800s',
-      '--env-vars-file',environment,'--quiet']);
-    const job=JSON.parse(gcloud(['run','jobs','describe','elevate-course-builder','--project',project,'--region',region,'--format=json']));
-    const container=job.spec.template.spec.template.spec.containers[0];
-    const afterResources=courseJobResources(job);
-    if(job.spec.template.spec.template.spec.serviceAccountName!==`elevate-worker-runtime@${project}.iam.gserviceaccount.com` ||
-      container.image!==`${image}@${digest}` || afterResources.cpu!==resources.cpu || afterResources.memory!==resources.memory ||
-      Number(job.spec.template.spec.parallelism)!==1 || Number(job.spec.template.spec.taskCount)!==1 ||
-      Number(job.spec.template.spec.template.spec.maxRetries)!==1 ||
-      !container.env.some(v=>v.name==='ULTIMATE_WORKER_ONCE'&&v.value==='true'))
-      throw new Error('Worker deployment readback mismatch');
-    console.log('Finite Course Builder job deployed. No execution or queue mutation performed.');
-  } finally {rmSync(directory,{recursive:true,force:true});}
+  const target=`${image}@${digest}`;
+  if(before.image===target)return {changed:false,image:target,configurationPreserved:true};
+  run(['run','jobs','update','elevate-course-builder','--project='+PROJECT,'--region='+region,'--image='+target,'--quiet']);
+  const after=courseWorkerBoundary(read());
+  if(after.image!==target||!isDeepStrictEqual(before.contract,after.contract))
+    throw new Error('Worker image-only deployment readback mismatch');
+  return {changed:true,image:target,configurationPreserved:true};
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)
-  main().catch(error=>{console.error(error.message);process.exitCode=1;});
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
+  try{console.log(JSON.stringify(deployCourseJob(process.env.IMAGE_SHA)));}
+  catch(error){console.error(error.code??error.message);process.exitCode=1;}
+}

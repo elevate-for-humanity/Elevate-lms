@@ -19,7 +19,8 @@ function SavedVideo({ lesson, diagnostic }: { lesson: Lesson; diagnostic: any })
   const [needsPlay, setNeedsPlay] = useState(false);
   const [playbackError, setPlaybackError] = useState('');
   diagnostic = diagnostic ?? lesson.preview;
-  const videoUrl = diagnostic?.videoUrl;
+  const approvedVideoUrl=lesson.preview?.approvedVideoUrl;
+  const videoUrl = approvedVideoUrl ?? diagnostic?.videoUrl;
   useEffect(() => {
     setNeedsPlay(false);
     setPlaybackError('');
@@ -30,10 +31,12 @@ function SavedVideo({ lesson, diagnostic }: { lesson: Lesson; diagnostic: any })
     return () => { cancelled = true; };
   }, [videoUrl]);
   if (!diagnostic) return null;
-  return diagnostic.videoUrl ? <div>
-    <p className="mb-2 font-bold">Latest saved video · {diagnostic.mediaApproved ? 'Media QA passed' : 'Draft preview — media QA has not passed'}</p>
-    {diagnostic.previousRender && <p className="mb-2">Previous saved draft while the updated video is being produced.</p>}
-    {diagnostic.historicalVersion && <p className="mb-2">Saved render version {diagnostic.historicalVersion}.</p>}
+  return videoUrl ? <div>
+    <p className="mb-2 font-bold">{approvedVideoUrl?'Owner-approved published lesson':`Latest saved video · ${diagnostic.mediaApproved ? 'Media QA passed' : 'Draft preview — media QA has not passed'}`}</p>
+    {approvedVideoUrl?<p className="mb-2">Approved render version {lesson.preview.approvedVersion}. Checkpoint findings below describe the separate draft.</p>:<>
+      {diagnostic.previousRender && <p className="mb-2">Previous saved draft while the updated video is being produced.</p>}
+      {diagnostic.historicalVersion && <p className="mb-2">Saved render version {diagnostic.historicalVersion}.</p>}
+    </>}
     <video ref={player} controls playsInline preload="auto" className="w-full rounded-lg bg-black" src={videoUrl}
       onPlaying={() => { setNeedsPlay(false); setPlaybackError(''); }}
       onError={() => setPlaybackError('The saved video could not load. Refresh the preview to renew access, then try playback again.')}

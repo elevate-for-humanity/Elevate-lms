@@ -10,6 +10,7 @@ import { safeInternalError } from '@/lib/api/safe-error';
 import { buildUltimateProfile } from '@/lib/ultimate-course-builder/core/course-profile';
 import { GOOGLE_LESSON_AUTHOR_VERSION } from '@/lib/ultimate-course-builder/instructional/google-lesson-author';
 import { adminPreviewPlaybackUrl } from '@/lib/ultimate-course-builder/media/admin-preview-url.mjs';
+import { ownerApprovedPreview } from '@/lib/ultimate-course-builder/media/owner-approved-preview.mjs';
 import { lessonPreview } from '@/lib/ultimate-course-builder/core/lesson-preview';
 import {
   renderMediaUrl,
@@ -108,8 +109,12 @@ export async function GET(req: NextRequest) {
               }
             }
           }
+          const approved = await ownerApprovedPreview(db,data,lesson);
           if (preview.videoUrl) preview.videoUrl = adminPreviewPlaybackUrl(buildId, lesson.id, preview.videoUrl);
-          return { ...saved, preview };
+          return { ...saved, preview: {...preview,...(approved?{
+            approvedVideoUrl:adminPreviewPlaybackUrl(buildId,lesson.id,approved.videoUrl)+'&kind=approved',
+            approvedVersion:approved.version,
+          }:{})} };
         }),
       ).catch((error) => {
         logger.error('Saved lesson preview recovery failed', error);

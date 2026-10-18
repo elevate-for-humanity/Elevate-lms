@@ -6,6 +6,7 @@ import { contractHash } from '../../lib/ultimate-course-builder/core/lesson-cont
 
 function fixture() {
   const blueprint = JSON.parse(readFileSync(new URL('../../docs/ultimate-course-builder/lessons/cosmetology-welcome.blueprint.json', import.meta.url), 'utf8'));
+  blueprint.assessment.questions.push(...blueprint.assessment.reassessment.slice(0, 2).map((q: any, i: number) => ({...q, id: 'recap-extra-' + i, prompt: ['Your first client asks for work beyond the assignment your supervisor verified. What is the professional response?', 'A dashboard marks one training module complete. Which conclusion can you support from that record alone?'][i]})));
   for (const segment of blueprint.segments) segment.teachingVisual.steps = segment.teachingVisual.steps.slice(0,4);
   const competency: any = { id: blueprint.competencyId, title: 'Welcome to Cosmetology Apprenticeship', type: 'knowledge', authorityRequirementIds: [], requiresDemonstration: false, requiresPracticalEvidence: false };
   const sources = [{ id: `course-lesson:${competency.id}`, text: blueprint.segments.map((segment: any) => segment.text).join('\n') }];
@@ -108,4 +109,18 @@ test('missing scene objective evidence is repaired before a lesson can be review
  });
  assert.equal(calls,3);
  validateGoogleAuthoringEvidence(output,input.sources);
+});
+
+test('a three-question generation is repaired to five before independent review',async()=>{
+ const {input,result}=fixture();const short=structuredClone(result);short.blueprint.assessment.questions=short.blueprint.assessment.questions.slice(0,3);let calls=0;
+ const output=await authorGoogleLesson(input,async(_system,request:any)=>{
+  calls++;if(calls===1)return short;
+  if(calls===2){assert.equal(request.repair.code,'BLUEPRINT_FIVE_QUESTION_RECAP_REQUIRED');return result;}
+  return {pass:true,findings:[],competencyId:input.competency.id,blueprintHash:request.blueprintHash};
+ });
+ assert.equal(calls,3);assert.equal(output.assessment.questions.length,5);validateGoogleAuthoringEvidence(output,input.sources);
+});
+test('repeated three-question output cannot reach independent approval',async()=>{
+ const {input,result}=fixture();result.blueprint.assessment.questions=result.blueprint.assessment.questions.slice(0,3);let calls=0;
+ await assert.rejects(authorGoogleLesson(input,async()=>{calls++;return result;}),/BLUEPRINT_FIVE_QUESTION_RECAP_REQUIRED/);assert.equal(calls,3);
 });

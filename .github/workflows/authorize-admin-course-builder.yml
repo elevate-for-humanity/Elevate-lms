@@ -1,12 +1,23 @@
 name: Authorize Admin to execute Course Builder job
 on:
+  push:
+    branches: [main]
+    paths: ['scripts/gcp/allow-admin-course-worker-execution.mjs', '.github/workflows/authorize-admin-course-builder.yml']
   workflow_dispatch:
 permissions:
   contents: read
+  actions: write
   id-token: write
 jobs:
+  dispatch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/authorize-admin-course-builder.yml/dispatches" -f ref=main
   scoped-runtime-authorization:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: production
     timeout-minutes: 8

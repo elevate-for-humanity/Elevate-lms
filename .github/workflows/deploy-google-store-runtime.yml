@@ -3,8 +3,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'scripts/gcp/production-acceptance.*'
       [
+        'scripts/gcp/production-acceptance.*',
         'scripts/build-memory-policy.*',
         'scripts/check-build-memory-policy.mjs',
         'scripts/run-bounded-build.*',

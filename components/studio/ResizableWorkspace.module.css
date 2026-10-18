@@ -106,8 +106,27 @@
   }
 }
 
-.panelStart > .secondary { order: 0; }
-.panelStart > .separator { order: 1; }
-.panelStart > .primary { order: 2; }
+.panelStart > .secondary {
+  order: 0;
+}
+.panelStart > .separator {
+  order: 1;
+}
+.panelStart > .primary {
+  order: 2;
+}
 
-.fullScreen { position: fixed; inset: 0; z-index: 100; height: 100dvh !important; min-height: 0 !important; background: #020617; }
+.fullScreen {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  width: 100dvw;
+  max-width: none;
+  max-height: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  background: #020617;
+}

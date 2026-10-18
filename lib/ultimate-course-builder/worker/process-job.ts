@@ -1,3 +1,4 @@
+import { preservedCourseCursor } from './preserve-completed.mjs';
 import { recordProductionAlert } from './production-alert';
 import {ULTIMATE_BUILD_STEPS} from '../core/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -91,8 +92,36 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       return {claimed:true,completed:false,ownerPaused:true,jobId:job.id};
     }
     if (!storedProfile?.competencies?.length) throw new Error('ULTIMATE_PROFILE_REPAIR_REQUIRED');
-    const payload = (job.payload ?? {}) as any;
-    const currentCompetencyId = payload.competencyId ?? payload.repairCompetencyId ??
+    let payload = (job.payload ?? {}) as any;
+      if (
+        !payload.competencyId &&
+        !payload.lessonBuildId &&
+        !payload.acceptance &&
+        !payload.ownerPreview &&
+        !payload.checkpointRepair
+      ) {
+        const [canonical, completed] = await Promise.all([
+          db
+            .from("course_lessons")
+            .select(
+              "id,status,is_published,approved,video_status,media_quality_status,video_url,video_job_id",
+            )
+            .eq("course_id", build.course_id),
+          db
+            .from("ultimate_lesson_builds")
+            .select("competency_id,status")
+            .eq("build_id", build.id),
+        ]);
+        if (canonical.error) throw canonical.error;
+        if (completed.error) throw completed.error;
+        payload = preservedCourseCursor(
+          storedProfile,
+          payload,
+          canonical.data ?? [],
+          completed.data ?? [],
+        );
+      }
+      const currentCompetencyId = payload.competencyId ?? payload.repairCompetencyId ??
       storedProfile.competencies[Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0]?.id;
     const profile = await materializeUltimateDraft(db, build.course_id,
       await hydrateUltimateProfileSources(db, build.course_id, storedProfile), [currentCompetencyId]);
@@ -279,3 +308,4 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
     progressWatch.dispose();
   }
 }
+

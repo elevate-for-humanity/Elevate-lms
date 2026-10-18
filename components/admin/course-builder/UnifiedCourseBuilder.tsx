@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import CourseSidePreview from './CourseSidePreview';
 import { ResizableWorkspace } from '@/components/studio/ResizableWorkspace';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Award, BookOpen, Bot, Loader2, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
@@ -145,7 +146,8 @@ export default function UnifiedCourseBuilder({
   initialBrowserTarget?: string;
   syncLocationWithUrl?: boolean;
 }) {
-  const [browserOpen, setBrowserOpen] = useState(false);
+  const [browserOpen, setBrowserOpen] = useState(true);
+  const [sidePanel, setSidePanel] = useState<'lesson' | 'browser'>('lesson');
   const [browserVisited, setBrowserVisited] = useState(false);
   const [tab, setTab] = useState<Tab>(initialTab);
   const [courses, setCourses] = useState<CourseRow[]>([]);
@@ -357,17 +359,54 @@ export default function UnifiedCourseBuilder({
   );
   return (
     <ResizableWorkspace
-      className={embedded ? 'h-full' : 'h-[calc(100dvh-5rem)] min-h-[34rem]'}
-      title="Course browser"
+      className={embedded ? "h-full" : "h-[calc(100dvh-5rem)] min-h-[34rem]"}
+      title="Course side panel"
       open={browserOpen}
       onOpenChange={(open) => {
         setBrowserOpen(open);
         if (open) setBrowserVisited(true);
       }}
       panel={
-        browserVisited ? (
-          <CloudBrowserWorkspace autoStart={browserOpen} initialTarget={initialBrowserTarget} />
-        ) : null
+        <div className="flex h-full min-h-0 flex-col bg-slate-950 text-white">
+          <nav
+            aria-label="Course side panel views"
+            className="flex shrink-0 flex-wrap gap-2 border-b border-slate-700 p-3"
+          >
+            <button
+              type="button"
+              aria-pressed={sidePanel === "lesson"}
+              onClick={() => setSidePanel("lesson")}
+              className="min-h-11 rounded-lg border border-slate-600 px-3"
+            >
+              Lesson video
+            </button>
+            <button
+              type="button"
+              aria-pressed={sidePanel === "browser"}
+              onClick={() => {
+                setSidePanel("browser");
+                setBrowserVisited(true);
+              }}
+              className="min-h-11 rounded-lg border border-slate-600 px-3"
+            >
+              Web browser
+            </button>
+          </nav>
+          <div
+            hidden={sidePanel !== "lesson"}
+            className="min-h-0 flex-1 overflow-auto"
+          >
+            <CourseSidePreview courseId={courseId} />
+          </div>
+          <div hidden={sidePanel !== "browser"} className="min-h-0 flex-1">
+            {browserVisited && (
+              <CloudBrowserWorkspace
+                autoStart={browserOpen && sidePanel === "browser"}
+                initialTarget={initialBrowserTarget}
+              />
+            )}
+          </div>
+        </div>
       }
     >
       {workspace}
@@ -1193,10 +1232,19 @@ export function UltimateBuildPanel({
               : (workerJob?.status ?? 'Not started')}
           </p>
           {workerJob?.last_error ? (
-            <p role="alert" className="mt-2 break-words text-sm text-amber-200">
-              {workerJob.status === 'running' ? 'Previous attempt: ' : ''}
-              {workerJob.last_error}
-            </p>
+            workerJob.status === "running" ? (
+              <details className="mt-2 break-words text-sm text-slate-300">
+                <summary>Previous attempt history — worker is running</summary>
+                <p>{workerJob.last_error}</p>
+              </details>
+            ) : (
+              <p
+                role="alert"
+                className="mt-2 break-words text-sm text-amber-200"
+              >
+                {workerJob.last_error}
+              </p>
+            )
           ) : null}
           {workerJob?.status === 'running' && !statusError && workerJob?.payload?.progress && (
             <div className="mt-3 space-y-2 text-white">

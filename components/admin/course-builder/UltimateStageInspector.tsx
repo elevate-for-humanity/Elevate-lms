@@ -59,7 +59,7 @@ function SavedVideo({
       cancelled = true;
     };
   }, [videoUrl]);
-  if (!approvedVideoUrl && lesson.saved && lesson.ultimate_lesson_steps?.some(step => step.step === 'lesson_film_render' && step.state === 'running')) return <ProgressiveLessonVideo buildId={buildId} lessonId={lesson.id} title={lesson.title} />;
+  if (!videoUrl && lesson.saved && lesson.ultimate_lesson_steps?.some(step => step.step === 'lesson_film_render' && step.state === 'running')) return <ProgressiveLessonVideo buildId={buildId} lessonId={lesson.id} title={lesson.title} />;
   if (!diagnostic) return null;
   return videoUrl ? (
     <div>
@@ -458,7 +458,7 @@ export default function UltimateStageInspector({
                             onClick={() => void reviewVideo(lesson, 'approve')}
                             className="min-h-11 rounded-lg bg-emerald-500 px-3 font-bold text-slate-950 disabled:opacity-50"
                           >
-                            Approve this video version
+                            {lesson.preview.review.decision === 'approve' ? 'Video version approved' : reviewBusy ? 'Saving review…' : 'Approve this video version'}
                           </button>
                           <button
                             type="button"
@@ -695,3 +695,4 @@ export default function UltimateStageInspector({
     </ProductionPanelLayout>
   );
 }
+

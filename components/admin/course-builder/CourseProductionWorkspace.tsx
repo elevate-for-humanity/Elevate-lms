@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import UnifiedCourseBuilder from './UnifiedCourseBuilder';
+import UnifiedCourseBuilder from "./UnifiedCourseBuilder";
 
 /** The standalone route uses the same editor/browser shell as embedded Studio. */
 export default function CourseProductionWorkspace({
@@ -8,7 +8,7 @@ export default function CourseProductionWorkspace({
   initialTab,
 }: {
   initialCourseId: string;
-  initialTab: 'courses' | 'ultimate' | 'registry' | 'media';
+  initialTab: "courses" | "ultimate" | "registry" | "media";
 }) {
   return (
     <div
@@ -18,7 +18,6 @@ export default function CourseProductionWorkspace({
       <UnifiedCourseBuilder
         initialCourseId={initialCourseId}
         initialTab={initialTab}
-        initialBrowserTarget="https://elements.envato.com"
         syncLocationWithUrl
         embedded
       />

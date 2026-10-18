@@ -32,10 +32,12 @@ export function stepInputHash(
   profile: unknown,
   prior: Partial<Record<UltimateBuildStep, Artifact>>,
 ): string {
+  // Resume audit metadata is operational history, not instructional content.
+  const { pauseResumeAudit: _resumeAudit, ...instructionalProfile } = (profile ?? {}) as Record<string, unknown>;
   const dependencies = ULTIMATE_BUILD_STEPS.slice(0, ULTIMATE_BUILD_STEPS.indexOf(step));
   return contractHash({
     version: ULTIMATE_LESSON_CONTRACT_VERSION,
-    profile,
+    profile: instructionalProfile,
     step,
     // Invalidate source-generated teaching after the full-section authoring
     // fix, while retaining the unchanged standards checkpoint. Downstream
@@ -49,13 +51,20 @@ export function stepInputHash(
     dependencies: dependencies.map((s) => [s, contractHash(artifactPayload(prior[s] ?? {}))]),
   });
 }
-export function currentEvidence(a: Artifact | undefined, inputHash?: string): boolean {
+export function stepInputHashes(step: UltimateBuildStep, profile: unknown, prior: Partial<Record<UltimateBuildStep, Artifact>>): string[] {
+  // Legacy certificates included the pause flag. Accept its three historic
+  // representations without accepting changes to teaching, media, or sources.
+  const { ownerPaused: _pause, ...base } = (profile ?? {}) as Record<string, unknown>;
+  return [base, { ...base, ownerPaused: true }, { ...base, ownerPaused: false }]
+    .map(candidate => stepInputHash(step, candidate, prior));
+}
+export function currentEvidence(a: Artifact | undefined, inputHash?: string | string[]): boolean {
   const e = a?.contractEvidence;
   return Boolean(
     e?.version === ULTIMATE_LESSON_CONTRACT_VERSION &&
     e.passed === true &&
     e.outputHash === contractHash(artifactPayload(a!)) &&
-    (!inputHash || e.inputHash === inputHash),
+    (!inputHash || (Array.isArray(inputHash) ? inputHash.includes(e.inputHash) : e.inputHash === inputHash)),
   );
 }
 const nonempty = (v: any) => typeof v === 'string' && v.trim().length > 0;
@@ -259,7 +268,7 @@ export function assertCompleteLesson(
   for (const step of ULTIMATE_BUILD_STEPS) {
     const a = artifacts[step];
     if (
-      !currentEvidence(a, profile ? stepInputHash(step, profile, artifacts) : undefined) ||
+      !currentEvidence(a, profile ? stepInputHashes(step, profile, artifacts) : undefined) ||
       validateStepOutput(step, a ?? {}).length
     )
       throw new Error(`ULTIMATE_CURRENT_CONTRACT_EVIDENCE_REQUIRED:${step}`);
@@ -281,4 +290,3 @@ export function practicalVisualFailures(artifacts: Partial<Record<UltimateBuildS
       !(String(asset.mime_type ?? '').startsWith('video/') || /\.(mp4|webm|mov)(?:[?#]|$)/i.test(String(asset.public_url ?? '')));
   }) ? ['ULTIMATE_PRACTICAL_DEMONSTRATION_VIDEO_REQUIRED'] : [];
 }
-

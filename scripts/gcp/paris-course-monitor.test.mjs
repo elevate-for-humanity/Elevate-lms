@@ -4,6 +4,18 @@ import {inspectCourseAutopilot} from '../../lib/ultimate-course-builder/worker/p
 import {monitorCourseQueue} from './paris-course-monitor.mjs';
 const now=new Date('2026-10-14T18:00:00Z');
 const job=(extra={})=>({id:'job',status:'queued',attempts:1,max_attempts:5,execution_generation:2,monitor:{enabled:true},...extra});
+test('saved pause never attributes an actor and finished revisions have distinct states',()=>{
+ const paused=inspectCourseAutopilot(job(),{profile:{ownerPaused:true}},+now);
+ assert.equal(paused.state,'paused');
+ assert.match(paused.reason,/origin is not established/);
+ assert.equal(inspectCourseAutopilot(job(),{status:'published',profile:{ownerPaused:true}},+now).state,'published');
+ assert.equal(inspectCourseAutopilot(job(),{status:'archived'},+now).state,'archived');
+});
+test('a future heartbeat cannot certify a live worker',()=>{
+ const state=inspectCourseAutopilot(job({status:'running',heartbeat_at:'2027-10-14T18:00:00Z',lease_expires_at:'2027-10-14T18:05:00Z'}),{},+now);
+ assert.equal(state.state,'heartbeat_stale');
+ assert.equal(state.action,'wait_for_lease');
+});
 test('never overrides an unexpired lease or owner pause',()=>{
  assert.equal(inspectCourseAutopilot(job({status:'running',heartbeat_at:'2026-10-14T17:55:00Z',lease_expires_at:'2026-10-14T18:05:00Z'}),{},+now).action,'wait_for_lease');
  assert.equal(inspectCourseAutopilot(job(),{profile:{ownerPaused:true}},+now).action,'none');

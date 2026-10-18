@@ -4,6 +4,7 @@ import {
   contractHash,
   currentEvidence,
   stepInputHash,
+  stepInputHashes,
   validateStepOutput,
   practicalVisualFailures,
   ULTIMATE_LESSON_CONTRACT_VERSION,
@@ -80,7 +81,7 @@ export class UltimateBuildRunner {
       const step = ULTIMATE_BUILD_STEPS[index];
       const inputHash = stepInputHash(step, ctx.profile, ctx.artifacts);
       const competency = ctx.profile.competencies.find(c => ctx.buildId.endsWith(':' + c.id)) ?? ctx.profile.competencies[0];
-      if (ctx.repairDirective?.target !== step && ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], inputHash) &&
+      if (ctx.repairDirective?.target !== step && ctx.passedSteps?.has(step) && currentEvidence(ctx.artifacts[step], stepInputHashes(step, ctx.profile, ctx.artifacts)) &&
           !validateStepOutput(step, ctx.artifacts[step] ?? {}).length &&
           (step !== 'visual_assignment' || !practicalVisualFailures(ctx.artifacts, competency).length)) {
         index++;

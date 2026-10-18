@@ -5,11 +5,25 @@ import {stripTypeScriptTypes} from 'node:module';
 const uri=value=>`data:text/javascript;base64,${Buffer.from(value).toString('base64')}`;
 const types=uri(stripTypeScriptTypes(await readFile(new URL('../lib/ultimate-course-builder/core/types.ts',import.meta.url),'utf8')));
 const {ULTIMATE_BUILD_STEPS}=await import(types);
-const source=stripTypeScriptTypes(await readFile(new URL('../lib/ultimate-course-builder/core/lesson-contract.ts',import.meta.url),'utf8')).replace("'./types'",JSON.stringify(types));
-const {stepInputHash,contractHash,artifactPayload,currentEvidence,ULTIMATE_LESSON_CONTRACT_VERSION}=await import(uri(source));
+const source=stripTypeScriptTypes(await readFile(new URL('../lib/ultimate-course-builder/core/lesson-contract.ts',import.meta.url),'utf8'))
+ .replace("'./types'",JSON.stringify(types))
+ .replace("'../../video/render-checkpoint-contract.mjs'",JSON.stringify(new URL('../lib/video/render-checkpoint-contract.mjs',import.meta.url).href))
+ .replace("'../instructional/approved-delivery.mjs'",JSON.stringify(new URL('../lib/ultimate-course-builder/instructional/approved-delivery.mjs',import.meta.url).href))
+ .replace("'../media/playback-source.mjs'",JSON.stringify(new URL('../lib/ultimate-course-builder/media/playback-source.mjs',import.meta.url).href));
+const {stepInputHash,stepInputHashes,contractHash,artifactPayload,currentEvidence,ULTIMATE_LESSON_CONTRACT_VERSION}=await import(uri(source));
 const profile={id:'course',competencies:[{id:'lesson'}]};
 const prior={standards_lock:{requirements:{version:'registered-standard'}}};
 const legacyHash=(step,dependencies)=>contractHash({version:ULTIMATE_LESSON_CONTRACT_VERSION,profile,step,dependencies});
+test('resuming a paused build preserves exact instructional checkpoints',()=>{
+ const paused={...profile,ownerPaused:true};
+ const artifact={requirements:{version:'registered-standard'}};
+ artifact.contractEvidence={version:ULTIMATE_LESSON_CONTRACT_VERSION,inputHash:stepInputHash('standards_lock',paused,{}),outputHash:contractHash(artifact),passed:true};
+ const resumed={...profile,ownerPaused:false,pauseResumeAudit:{resumedBy:'authenticated-admin'}};
+ assert.equal(currentEvidence(artifact,stepInputHashes('standards_lock',resumed,{})),true);
+ assert.equal(currentEvidence(artifact,stepInputHashes('standards_lock',{...resumed,title:'Changed instruction'},{})),false);
+ const tampered={...artifact,requirements:{version:'tampered'}};
+ assert.equal(currentEvidence(tampered,stepInputHashes('standards_lock',resumed,{})),false);
+});
 test('unchanged standards remain reusable',()=>{
  assert.equal(stepInputHash('standards_lock',profile,{}),legacyHash('standards_lock',[]));
 });

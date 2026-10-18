@@ -122,7 +122,7 @@ export async function GET(req: NextRequest) {
   let query = db
     .from('ultimate_course_builds')
     .select(
-      'id,course_id,status,current_step,created_at,updated_at,ultimate_build_jobs(id,status,last_error,created_at,heartbeat_at,lease_expires_at,payload,monitor)',
+      'id,course_id,status,current_step,created_at,updated_at,ultimate_build_jobs(id,status,last_error,created_at,updated_at,heartbeat_at,lease_expires_at,payload,monitor)',
     )
     .order('created_at', { ascending: false })
     .limit(50);

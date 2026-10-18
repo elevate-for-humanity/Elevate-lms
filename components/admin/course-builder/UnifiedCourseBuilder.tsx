@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { Award, BookOpen, Bot, Loader2, RefreshCw, Rocket, ShieldCheck } from 'lucide-react';
 import UltimateStageInspector from '@/components/admin/course-builder/UltimateStageInspector';
 import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
+import { orderCourseJobs } from '@/lib/ultimate-course-builder/core/job-observation.mjs';
 
 const CloudBrowserWorkspace = dynamic(() => import('@/components/studio/CloudBrowserWorkspace'), { ssr: false });
 
@@ -39,10 +40,11 @@ type UltimateBuildRow = {
     status: string;
     last_error?: string | null;
     created_at: string;
+    updated_at?: string | null;
     heartbeat_at?: string | null;
     lease_expires_at?: string | null;
     monitor?: {enabled?: boolean; coordinator?: string; state?: string; checkedAt?: string; reason?: string; recoveries?: number};
-    payload?: { progress?: { phase: string; at: string; completed: number; total?: number | null } };
+    payload?: { ownerPreview?: boolean; progress?: { phase: string; at: string; completed: number; total?: number | null } };
   }>;
 };
 
@@ -644,19 +646,18 @@ export function UltimateBuildPanel({
   const [googleModel, setGoogleModel] = useState('');
   const [googleLocation,setGoogleLocation]=useState('us');
   const [mobileSplitView, setMobileSplitView] = useState(false);
-  const jobs = [...(latest?.ultimate_build_jobs ?? [])].sort((a, b) =>
-    b.created_at.localeCompare(a.created_at),
-  );
+  const jobs: NonNullable<UltimateBuildRow['ultimate_build_jobs']> = orderCourseJobs(latest?.ultimate_build_jobs ?? []);
   const observedJobs = jobs.map(job => {
     if (job.status !== 'running') return job;
     const heartbeat = Date.parse(job.heartbeat_at ?? '');
     const leaseEnd = Date.parse(job.lease_expires_at ?? '');
-    const active = Number.isFinite(heartbeat) && Date.now() - heartbeat < 90_000 &&
+    const active = Number.isFinite(heartbeat) && Date.now() - heartbeat >= 0 && Date.now() - heartbeat < 90_000 &&
       Number.isFinite(leaseEnd) && leaseEnd > Date.now();
     return active ? job : {...job, status: 'stalled', last_error: 'Worker heartbeat is missing or stale. Resume the saved build; Google prevents overlapping executions.'};
   });
   const activeJob = observedJobs.find((job) => ['queued', 'running'].includes(job.status));
   const workerJob = activeJob ?? observedJobs[0];
+  const previewReady = workerJob?.status === 'completed' && workerJob?.payload?.ownerPreview === true;
 
   async function refresh(requestedCourseId = course.id, background = false) {
     if (background && refreshController.current) return;
@@ -823,7 +824,6 @@ export function UltimateBuildPanel({
           ) : null}
           {workerJob?.status === 'running' && !statusError && workerJob?.payload?.progress && <div className="mt-3 space-y-2 text-white">
             <p>Worker activity: {workerJob.payload.progress.phase.replaceAll('_', ' ').replaceAll(':', ' · ')}</p>
-            <p className="text-sm">Last progress: {new Date(workerJob.payload.progress.at).toLocaleString()}</p>
             {typeof workerJob.payload.progress.total === 'number' && workerJob.payload.progress.total > 0 && <>
               <progress aria-label="Current worker activity progress" className="h-3 w-full" max={workerJob.payload.progress.total}
                 value={Math.min(workerJob.payload.progress.total, workerJob.payload.progress.completed)} />
@@ -832,7 +832,7 @@ export function UltimateBuildPanel({
           </div>}
           {workerJob?.status === 'completed' && !['built', 'published'].includes(latest.status) ? (
             <p className="mt-2 text-sm text-slate-200">
-              This worker job finished. Course acceptance and release are still required.
+              {previewReady ? 'The single-lesson preview finished. Full course validation and continuation have not run.' : 'This worker job finished. Course acceptance and release are still required.'}
             </p>
           ) : null}
         </div>
@@ -844,7 +844,7 @@ export function UltimateBuildPanel({
           className="mt-4 rounded-lg border border-red-500/40 bg-red-950/40 p-3 text-sm text-red-100"
         >
           {error || statusError}
-          {statusError && lastStatusAt && <span className="mt-1 block">Showing saved status from {new Date(lastStatusAt).toLocaleTimeString()}. It is not live confirmation.</span>}
+          {statusError && lastStatusAt && <span className="mt-1 block">Showing saved status. Live status could not be confirmed.</span>}
         </p>
       ) : null}
 
@@ -852,7 +852,7 @@ export function UltimateBuildPanel({
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-300">Status</p>
           <p className="mt-1 text-lg font-black text-white">
-            {statusLoading ? 'loading…' : (!statusLoaded || statusError) ? 'Unavailable' : (latest?.status === 'queued' ? 'Awaiting worker assignment' : (workerJob?.status === 'stalled' ? 'Worker stalled' : (latest?.status ?? 'not started')))}
+            {statusLoading ? 'loading…' : (!statusLoaded || statusError) ? 'Unavailable' : previewReady ? 'Preview ready — validation pending' : (latest?.status === 'queued' ? 'Awaiting worker assignment' : (workerJob?.status === 'stalled' ? 'Worker stalled' : (latest?.status ?? 'not started')))}
           </p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-950 p-4">
@@ -887,10 +887,9 @@ export function UltimateBuildPanel({
         <h3 className="font-bold">PARIS course autopilot</h3>
         <p className="mt-2">PARIS combines admissions, instruction, production, quality checks, and supervision in one system.</p>
         <p className="mt-2">{workerJob.monitor?.enabled ? 'Enabled' : 'Disabled'} · {workerJob.monitor?.state?.replaceAll('_',' ') || 'No supervisor observation yet'}</p>
-        {workerJob.monitor?.checkedAt && <p>Last supervisor check: {new Date(workerJob.monitor.checkedAt).toLocaleString()}</p>}
-        {workerJob.monitor?.enabled && (!workerJob.monitor.checkedAt || Date.now()-Date.parse(workerJob.monitor.checkedAt)>600000) &&
+        {workerJob.monitor?.enabled && (!workerJob.monitor.checkedAt || !Number.isFinite(Date.parse(workerJob.monitor.checkedAt)) || Date.now()-Date.parse(workerJob.monitor.checkedAt)<0 || Date.now()-Date.parse(workerJob.monitor.checkedAt)>600000) &&
           <p role="alert" className="mt-2 text-amber-200">Supervisor heartbeat is unconfirmed or stale. Monitoring is configured, but automatic execution is not verified.</p>}
-        {workerJob.monitor?.reason && <p className="mt-2">{workerJob.monitor.reason}</p>}
+        {workerJob.monitor?.reason && <p className="mt-2">{workerJob.monitor.reason === 'Owner pause or finished revision' ? 'A saved pause or finished-revision condition was reported. This does not establish who set it.' : workerJob.monitor.reason}</p>}
         <p className="mt-2 text-sm text-slate-200">Repairs preserve saved lessons, respect active worker leases, and stop at retry limits or missing evidence. Publishing requires the existing quality checks.</p>
         <button type="button" onClick={()=>void toggleAutopilot()} disabled={busy || statusLoading}
           className="mt-3 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50">

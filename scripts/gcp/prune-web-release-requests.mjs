@@ -4,7 +4,8 @@ export const WEB_RELEASE_WORKFLOWS = [
   'deploy-admin.yml', 'deploy-google-marketing-trigger.yml',
   'deploy-google-lms-trigger.yml', 'deploy-google-store-runtime.yml',
 ];
-const waiting = new Set(['queued', 'pending', 'requested', 'waiting']);
+const waiting = new Set(['queued', 'pending', 'requested', 'waiting', 'in_progress']);
+const preparationJobs = new Set(['dispatch', 'validate', 'build', 'authoring-access']);
 const eligible = run => run.event === 'workflow_dispatch' && run.head_branch === 'main';
 
 export async function releaseApi(path,method='GET',{token=process.env.GH_TOKEN,request=fetch}={}) {
@@ -46,7 +47,7 @@ export async function pruneWebReleaseRequests({api, repository, execute=false}) 
       const jobs=await api(endpoint+'/jobs?per_page=100');
       if(!Array.isArray(jobs.jobs)||jobs.total_count>100)throw Error('RELEASE_JOB_INVENTORY_UNAVAILABLE');
       // A started deployment must finish its own acceptance/rollback sequence.
-      if(jobs.jobs.some(j=>j.name!=='dispatch' && (j.started_at || j.status==='in_progress')))continue;
+      if(jobs.jobs.some(j=>j.status==='in_progress' || (!preparationJobs.has(j.name) && j.started_at)))continue;
       const beforeCancel=await api(endpoint);
       if(!waiting.has(beforeCancel.status)||beforeCancel.id!==run.id)continue;
       if(execute)await api(endpoint+'/cancel','POST');

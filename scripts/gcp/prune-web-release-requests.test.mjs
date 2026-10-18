@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import {pruneWebReleaseRequests,assertLatestWebReleaseRequest,releaseApi,WEB_RELEASE_WORKFLOWS} from './prune-web-release-requests.mjs';
 const repository='elevate-for-humanity/Elevate-lms';
 const row=(id,status='pending',extra={})=>({id,run_number:id,event:'workflow_dispatch',head_branch:'main',status,...extra});
-function fixture({rows=[row(1),row(2)],current,started=false,invalid=false}={}) {
+function fixture({rows=[row(1),row(2)],current,started=false,invalid=false,jobs}={}) {
  const writes=[];let reads=0;
  const api=async(path,method)=>{
   if(method==='POST'){writes.push(path);return {};}
   if(path.includes('/workflows/'))return {workflow_runs:path.includes(WEB_RELEASE_WORKFLOWS[0])?rows:[]};
-  if(path.includes('/jobs'))return invalid?{}:{total_count:1,jobs:[{name:'Build and deploy Admin on Google',status:started?'in_progress':'pending',started_at:started?'2026-10-18T00:00:00Z':null}]};
+  if(path.includes('/jobs'))return invalid?{}:{total_count:1,jobs:jobs??[{name:'Build and deploy Admin on Google',status:started?'in_progress':'pending',started_at:started?'2026-10-18T00:00:00Z':null}]};
   reads++;return current?.(reads)??rows[0];
  };
  return {api,writes};
@@ -19,7 +19,7 @@ test('only the older unstarted same-app main dispatch is canceled',async()=>{
 });
 test('dry run preserves requests',async()=>{const f=fixture();await pruneWebReleaseRequests({...f,repository});assert.deepEqual(f.writes,[]);});
 test('active runs, started jobs, current requests and other branches remain untouched',async()=>{
- for(const options of [{rows:[row(1,'in_progress'),row(2)]},{started:true},{rows:[row(1)]},{rows:[row(1,'pending',{head_branch:'fix'}),row(2)]},{current:()=>row(1,'in_progress')},{current:n=>row(1,n===1?'pending':'in_progress')}]){
+ for(const options of [{rows:[row(1,'in_progress'),row(2)],started:true},{started:true},{rows:[row(1)]},{rows:[row(1,'pending',{head_branch:'fix'}),row(2)]},{current:()=>row(1,'completed')},{current:n=>row(1,n===1?'pending':'completed')}]){
   const f=fixture(options);await pruneWebReleaseRequests({...f,repository,execute:true});assert.deepEqual(f.writes,[]);
  }
 });
@@ -45,4 +45,14 @@ test('GitHub failure, missing credentials and foreign API paths fail closed',asy
  await assert.rejects(releaseApi('repos/another/repository/actions/runs','GET',{token:'test'}),/NOT_AUTHORIZED/);
  await assert.rejects(releaseApi(`repos/${repository}/actions/runs`,'GET',{token:''}),/AUTH_REQUIRED/);
  for(const status of [202,204])assert.deepEqual(await releaseApi(`repos/${repository}/actions/runs/1/cancel`,'POST',{token:'test',request:async()=>new Response(null,{status})}),{});
+});
+
+test('completed preparation does not trap a superseded release in the deployment queue',async()=>{
+ const jobs=[{name:'validate',status:'completed',started_at:'2026-10-18T00:00:00Z'},{name:'build',status:'completed',started_at:'2026-10-18T00:00:00Z'},{name:'deploy',status:'pending',started_at:null}];
+ const f=fixture({rows:[row(1,'in_progress'),row(2)],jobs});
+ await pruneWebReleaseRequests({...f,repository,execute:true});assert.equal(f.writes.length,1);
+ for(const activeJobs of [[{name:'build',status:'in_progress',started_at:'2026-10-18T00:00:00Z'}],[{name:'deploy',status:'completed',started_at:'2026-10-18T00:00:00Z'}]]){
+  const protectedRun=fixture({rows:[row(1,'in_progress'),row(2)],jobs:activeJobs});
+  await pruneWebReleaseRequests({...protectedRun,repository,execute:true});assert.deepEqual(protectedRun.writes,[]);
+ }
 });

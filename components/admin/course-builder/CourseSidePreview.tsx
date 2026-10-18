@@ -67,6 +67,14 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
         const payload = await response.json();
         if (!response.ok)
           throw new Error(payload.error || "Unable to load saved videos");
+        const activeJob = build.ultimate_build_jobs?.find(
+          (row: { status: string }) =>
+            ["running", "queued"].includes(row.status),
+        );
+        const activeCompetency =
+          payload.build?.profile?.competencies?.[
+            activeJob?.payload?.nextCompetencyIndex
+          ]?.id;
         const rows: SavedLesson[] = (
           payload.build?.profile?.competencies ?? []
         ).flatMap(
@@ -81,12 +89,14 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
             );
             const videoUrl =
               lesson?.preview?.videoUrl || lesson?.preview?.approvedVideoUrl;
-            return lesson
+            return lesson || competency.id === activeCompetency
               ? [
                   {
                     id: competency.id,
-                    lessonId: lesson.id,
-                    running: lesson.status === "running",
+                    lessonId: lesson?.id || "",
+                    running: activeCompetency
+                      ? competency.id === activeCompetency
+                      : lesson?.status === "running",
                     title:
                       competency.title ||
                       competency.description ||
@@ -184,7 +194,7 @@ export default function CourseSidePreview({ courseId }: { courseId: string }) {
               aria-label={`${lesson.title} side preview`}
               className="aspect-video w-full rounded-lg bg-black"
             />
-          ) : lesson.running ? (
+          ) : lesson.running && lesson.lessonId ? (
             <ProgressiveLessonVideo
               buildId={buildId}
               lessonId={lesson.lessonId}

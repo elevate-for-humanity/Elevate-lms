@@ -94,3 +94,50 @@ it("removes the old course video when switching courses", async () => {
     screen.getByText("Select a course to watch its saved lessons here."),
   ).toBeInTheDocument();
 });
+
+it("follows the queued course cursor rather than a stale running lesson", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => ({
+      ok: true,
+      json: async () =>
+        url.includes("view=checkpoints")
+          ? {
+              build: {
+                profile: {
+                  competencies: [
+                    { id: "one", title: "Old lesson" },
+                    { id: "two", title: "Lesson two" },
+                    { id: "three", title: "Current third lesson" },
+                  ],
+                },
+                ultimate_lesson_builds: [
+                  {
+                    id: "old",
+                    competency_id: "one",
+                    status: "running",
+                    preview: { videoUrl: "old.mp4" },
+                  },
+                ],
+              },
+            }
+          : {
+              builds: [
+                {
+                  id: "build",
+                  status: "running",
+                  ultimate_build_jobs: [
+                    { status: "queued", payload: { nextCompetencyIndex: 2 } },
+                  ],
+                },
+              ],
+            },
+    })),
+  );
+  render(<CourseSidePreview courseId="course" />);
+  expect(
+    await screen.findByRole("heading", { name: "Current third lesson" }),
+  ).toBeVisible();
+  expect(screen.getByLabelText("Lesson to watch")).toHaveValue("three");
+  expect(screen.queryByLabelText("Old lesson side preview")).toBeNull();
+});

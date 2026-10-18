@@ -646,6 +646,10 @@ export function UltimateBuildPanel({
   const [googleModel, setGoogleModel] = useState('');
   const [googleLocation,setGoogleLocation]=useState('us');
   const [mobileSplitView, setMobileSplitView] = useState(false);
+  const [syllabusText, setSyllabusText] = useState('');
+  const [syllabusName, setSyllabusName] = useState('');
+  const [syllabusBusy, setSyllabusBusy] = useState(false);
+  const [syllabusConfirmed, setSyllabusConfirmed] = useState(false);
   const jobs: NonNullable<UltimateBuildRow['ultimate_build_jobs']> = orderCourseJobs(latest?.ultimate_build_jobs ?? []);
   const observedJobs = jobs.map(job => {
     if (job.status !== 'running') return job;
@@ -715,6 +719,47 @@ export function UltimateBuildPanel({
       setNotice(result.message); await refresh();
     } catch(reason) {setError(reason instanceof Error?reason.message:'Autopilot configuration failed');}
     finally {setBusy(false);}
+  }
+
+  async function loadSyllabus(file: File | undefined) {
+    if (!file) return;
+    setSyllabusBusy(true); setError(''); setSyllabusConfirmed(false);
+    try {
+      const form = new FormData();
+      form.set('file', file);
+      const response = await fetch('/api/admin/courses/generate/parse', { method: 'POST', body: form });
+      const result = await readJson(response);
+      if (!response.ok || typeof result.raw_text !== 'string') throw new Error(result.error || 'Syllabus extraction failed');
+      setSyllabusText(result.raw_text);
+      setSyllabusName(file.name);
+      setNotice('Syllabus extracted. Review the text, then attach it to this saved build.');
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Syllabus extraction failed');
+    } finally { setSyllabusBusy(false); }
+  }
+
+  async function attachSyllabus() {
+    if (!latest || !syllabusText.trim() || !syllabusConfirmed) return;
+    setSyllabusBusy(true); setError('');
+    try {
+      const response = await fetch('/api/admin/ultimate-course-builder', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'configure-contract', buildId: latest.id,
+          instructionalSources: [{
+            id: `syllabus:${course.id}:${syllabusName || 'manual'}`,
+            text: syllabusText.trim(),
+          }],
+        }),
+      });
+      const result = await readJson(response);
+      if (!response.ok || result.ok !== true) throw new Error(result.error || 'Could not save the instructional source');
+      setNotice('Syllabus attached to the saved Ultimate build. Review its contract and start the worker when ready.');
+      setSyllabusConfirmed(false);
+      await refresh();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Syllabus attachment failed');
+    } finally { setSyllabusBusy(false); }
   }
 
   async function startBuild() {
@@ -805,6 +850,26 @@ export function UltimateBuildPanel({
         </button>
       </div>
 
+      <section aria-label="Syllabus instructional source" className="mt-5 rounded-xl border border-cyan-800 bg-slate-950 p-4 text-white">
+        <h3 className="font-bold">Upload syllabus for PARIS course production</h3>
+        <p className="mt-1 text-sm text-slate-300">Extract PDF, DOCX, or TXT material and review the complete text before attaching it to the selected Ultimate build. This does not publish or replace lessons.</p>
+        <label className="mt-3 block text-sm font-semibold" htmlFor={`syllabus-${course.id}`}>Syllabus document (10 MB maximum)</label>
+        <input id={`syllabus-${course.id}`} type="file" accept=".pdf,.docx,.txt" disabled={syllabusBusy} onChange={event => void loadSyllabus(event.target.files?.[0])}
+          className="mt-2 block w-full rounded-lg border border-slate-700 p-2 text-sm" />
+        {syllabusText && <>
+          <label className="mt-3 block text-sm font-semibold" htmlFor={`syllabus-text-${course.id}`}>Review extracted syllabus: {syllabusName}</label>
+          <textarea id={`syllabus-text-${course.id}`} className="mt-2 min-h-40 w-full rounded-lg border border-slate-700 bg-slate-900 p-3 text-sm" value={syllabusText}
+            onChange={event => {setSyllabusText(event.target.value);setSyllabusConfirmed(false);}} />
+          <label className="mt-3 flex items-start gap-2 text-sm"><input type="checkbox" checked={syllabusConfirmed} onChange={event=>setSyllabusConfirmed(event.target.checked)} />
+            I reviewed this instructional source and authorize its use for this build.
+          </label>
+          <button type="button" disabled={!latest || latest.status === 'running' || syllabusBusy || !syllabusConfirmed || !syllabusText.trim()}
+            onClick={()=>void attachSyllabus()} className="mt-3 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50">
+            {syllabusBusy ? 'Processing…' : 'Attach approved syllabus to Ultimate build'}
+          </button>
+          {!latest && <p className="mt-2 text-sm text-amber-200">Create a saved Ultimate build before attaching syllabus sources.</p>}
+        </>}
+      </section>
       <div className={`mt-4 flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-between 2xl:hidden ${compact ? 'hidden' : 'flex'}`}>
         <span className="text-xs font-semibold text-slate-300">Workspace layout</span>
         <button type="button" aria-pressed={mobileSplitView} onClick={() => setMobileSplitView(value => !value)} className="min-h-11 w-full rounded-lg border border-cyan-600 px-3 py-2 text-center text-xs font-bold text-cyan-200 sm:w-auto">{mobileSplitView ? "Use stacked view" : "Show builder + preview together"}</button>

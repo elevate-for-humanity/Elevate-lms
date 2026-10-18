@@ -2,7 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
-const source = stripTypeScriptTypes(readFileSync('lib/health/service-health.ts','utf8'));
+// A data: module cannot resolve relative imports. Load the real shared identity
+// dependency as a data: URL too, retaining production behavior in this test.
+const identity = stripTypeScriptTypes(readFileSync('lib/health/public-runtime-service.ts','utf8'));
+const identityUrl = 'data:text/javascript;base64,'+Buffer.from(identity).toString('base64');
+const sourceText = stripTypeScriptTypes(readFileSync('lib/health/service-health.ts','utf8'));
+const importMarker = "from './public-runtime-service';";
+assert.ok(sourceText.includes(importMarker), 'Shared health identity import must be present');
+const source = sourceText.replace(importMarker, "from '"+identityUrl+"';");
 const {checkSupabaseHealth,getRuntimeReadiness} = await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
 const keys=['NEXT_PUBLIC_SUPABASE_URL','NEXT_PUBLIC_SUPABASE_ANON_KEY','GIT_SHA','GITHUB_SHA','NEXT_PUBLIC_GIT_SHA'];
 async function configured(work) {

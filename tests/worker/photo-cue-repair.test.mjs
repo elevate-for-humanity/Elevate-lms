@@ -25,3 +25,14 @@ test('successful provider preserves successful cue',async()=>{
 test('explicit provider safety block is retained',async()=>{
  await assert.rejects(recoverTeachingPhoto({...request,generate:async()=>{throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true}});},selectedReplacement:async()=>{throw Error('must not bypass');}}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED/);
 });
+
+test('missing photo can fall back to a grounded conceptual lesson diagram',async()=>{
+ const {conceptualTeachingCard}=await import('../../lib/ultimate-course-builder/adapters/conceptual-teaching-card.mjs');
+ const scene={id:'knowledge-check',stage:'knowledge_check',title:'License Knowledge Check'};
+ const card=await conceptualTeachingCard({scene,step:{narrationQuote:'A license is required before professional practice.'},courseTitle:'Cosmetology',index:0});
+ assert.equal(card.mimeType,'image/png');
+ assert.ok(card.bytes.length>100);
+ const result=await recoverTeachingPhoto({...request,scene,generate:async()=>{throw Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED');},
+   selectedReplacement:async()=>card});
+ assert.equal(result.repair.method,'lesson-conceptual-card-v1');
+});

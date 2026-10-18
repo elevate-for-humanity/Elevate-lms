@@ -58,7 +58,8 @@ async function fixture(t) {
         communication_workspaces: { phone_system_id: config.phoneSystemId, phone_systems: { admin_extension: '101', timezone: record.timezone, status: 'active' } } }] : [];
     } }),
     command: async cmd => {
-      if (cmd.endsWith('reload')) return 'Reloaded';
+      if (cmd === 'pjsip reload') throw Error('Optional CLI aliases are not installed');
+      if (cmd === 'module reload res_pjsip.so' || cmd === 'dialplan reload') return 'Reloaded';
       const cfg = await readFile(path.join(root, 'current', 'pjsip.conf'), 'utf8').catch(() => '');
       if (!cfg.includes(endpoint)) {
         if (cmd.startsWith('pjsip show endpoint') && staleRemovals-- > 0) return `Endpoint: ${endpoint}/101`;

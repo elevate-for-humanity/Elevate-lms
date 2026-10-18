@@ -14,7 +14,8 @@ import urllib.error
 import urllib.request
 
 OLD = '6716190e3c4ef88dc9ca08440ba68042d75d063fda0d690033d5f8ff5c222f88'
-NEW = '175c9ee20ce1f949ff651b6b2b4460fa1827b79c56f772d6447cfa66f2ad8489'
+PREVIOUS = '175c9ee20ce1f949ff651b6b2b4460fa1827b79c56f772d6447cfa66f2ad8489'
+NEW = '57991094fce9d5992573429661eff8e0bb7e865a970f6025b38f6bd02655fade'
 TARGET = Path('/opt/elevate-pbx/provisioner/server.mjs')
 ROOT = Path('/opt/elevate-pbx/repo/infra/pbx/asterisk/elevate-webrtc')
 UNIT = 'elevate-pbx-provisioner.service'
@@ -55,13 +56,19 @@ def repair(source, revision):
     for path in [source, TARGET]:
         if path.is_symlink() or not path.is_file() or (path == TARGET and (path.stat().st_uid != EXPECTED_UID or path.stat().st_mode & 0o022)):
             raise ValueError('provisioner_file_ownership_unverified')
-    if digest(source) != NEW or digest(TARGET) not in [OLD, NEW]:
+    if digest(source) != NEW or digest(TARGET) not in [OLD, PREVIOUS, NEW]:
         raise ValueError('provisioner_source_requires_review')
     run(['/usr/bin/node', '--check', str(source)])
     records_path = ROOT / 'current' / 'state.json'
     records = json.loads(records_path.read_text()) if records_path.exists() else []
     cli = lambda command: run(['docker', 'exec', 'pbx_asterisk_1', 'asterisk', '-rx', command])
     require_idle(cli('core show channels count'), cli('pjsip show endpoints'), records)
+    available = lambda output: bool(output.strip()) and not re.search(r'no such|not found', output, re.I)
+    builtin = available(cli('core show help module reload'))
+    print(json.dumps({'provisionerReloadPreflight': {'builtinReloadAvailable': builtin,
+          'optionalPjsipAliasAvailable': available(cli('core show help pjsip reload'))}}), flush=True)
+    if not builtin:
+        raise ValueError('builtin_reload_unavailable')
     if digest(TARGET) == NEW:
         if not healthy():
             raise ValueError('updated_provisioner_health_requires_review')
@@ -70,7 +77,16 @@ def repair(source, revision):
     backup.mkdir(mode=0o700, parents=True, exist_ok=False)
     shutil.copy2(TARGET, backup / 'server.mjs')
     original = TARGET.stat()
+    original_digest = digest(TARGET)
     try:
+        # ExecStopPost starts a fresh Node process from this file. Stage the
+        # verified replacement first so cleanup uses the built-in reload command.
+        with tempfile.NamedTemporaryFile(dir=TARGET.parent, delete=False) as output:
+            output.write(source.read_bytes())
+            replacement = Path(output.name)
+        os.chown(replacement, original.st_uid, original.st_gid)
+        replacement.chmod(original.st_mode & 0o777)
+        os.replace(replacement, TARGET)
         run(['systemctl', 'stop', UNIT])
         # ExecStopPost invalidates managed credentials. Wait for asynchronous
         # removal before starting a fresh lease reconciler.
@@ -80,18 +96,12 @@ def repair(source, revision):
             time.sleep(.25)
         else:
             raise ValueError('stale_pwa_endpoints_remain')
-        with tempfile.NamedTemporaryFile(dir=TARGET.parent, delete=False) as output:
-            output.write(source.read_bytes())
-            replacement = Path(output.name)
-        os.chown(replacement, original.st_uid, original.st_gid)
-        replacement.chmod(original.st_mode & 0o777)
-        os.replace(replacement, TARGET)
         run(['systemctl', 'start', UNIT])
         for attempt in range(20):
             try:
                 if healthy() and digest(TARGET) == NEW:
                     return {'result': 'PASS', 'changed': True, 'sourceSha256': NEW,
-                            'service': UNIT, 'asteriskRestarted': False, 'carrierRoutingChanged': False,
+                            'service': UNIT, 'revision': revision, 'asteriskRestarted': False, 'carrierRoutingChanged': False,
                             'authenticatedAcceptance': 'PENDING'}
             except Exception:
                 pass
@@ -108,7 +118,7 @@ def repair(source, revision):
         run(['systemctl', 'start', UNIT])
         for attempt in range(20):
             try:
-                if healthy() and digest(TARGET) == OLD:
+                if healthy() and digest(TARGET) == original_digest:
                     raise ValueError('provisioner_upgrade_rolled_back')
             except ValueError as error:
                 if str(error) == 'provisioner_upgrade_rolled_back':
@@ -123,7 +133,7 @@ if __name__ == '__main__':
         known = {'provisioner_source_path_unverified', 'provisioner_file_ownership_unverified',
                  'provisioner_source_requires_review', 'active_call_or_unverified_state',
                  'existing_pwa_devices_require_review', 'updated_provisioner_health_requires_review',
-                 'provisioner_upgrade_rolled_back', 'provisioner_rollback_unverified'}
+                 'provisioner_upgrade_rolled_back', 'provisioner_rollback_unverified', 'builtin_reload_unavailable'}
         code = str(e) if isinstance(e, ValueError) and str(e) in known else 'provisioner_repair_unavailable'
         report = {'result': 'BLOCKED', 'code': code, 'carrierRoutingChanged': False}
     print(json.dumps(report))

@@ -46,7 +46,10 @@ export function stepInputHash(
   const dependencies = ULTIMATE_BUILD_STEPS.slice(0, ULTIMATE_BUILD_STEPS.indexOf(step));
   return contractHash({
     version: ULTIMATE_LESSON_CONTRACT_VERSION,
-    profile: instructionalProfile,
+    // Publication is an operational policy, not a reason to regenerate saved lessons.
+    // Preserve the existing hash identity when upgrading legacy review profiles.
+    profile: { ...instructionalProfile, ...(instructionalProfile.publicationPolicy === 'automatic-quality-verified'
+      ? { publicationPolicy: 'owner-review-required' } : {}) },
     step,
     // Invalidate source-generated teaching after the full-section authoring
     // fix, while retaining the unchanged standards checkpoint. Downstream

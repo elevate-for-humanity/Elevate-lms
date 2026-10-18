@@ -18,7 +18,7 @@ const source = stripTypeScriptTypes(readFileSync(productionPath, 'utf8'))
 function scenario(payload, completed = true, options = {}) {
   const events = [];
   const build = { id: 'build', course_id: 'course', status: 'blocked', profile: { competencies: [{ id: 'competency' }] } };
-  const q = { select: () => q, eq: () => q, single: async () => ({ data: build, error: null }) };
+  const q = { select: () => q, eq: () => q, single: async () => ({ data: build, error: null }), then: resolve => resolve({data:[{competency_id:'competency',status:'built',artifacts:{}}],error:null}) };
   const db = { from: () => q };
   class Queue {
     async claim() { return { id: 'job', build_id: 'build', execution_generation: 1, payload }; }
@@ -29,7 +29,7 @@ function scenario(payload, completed = true, options = {}) {
   }
   const runtime = { persistence: { updateBuild: async value => events.push(value) }, artifacts: {} };
   const names = ['recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
-  const values = [async()=>{},createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class {}, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
+  const values = [async()=>{},createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } }, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
   const worker = new Function(...names, 'liveCheckpointRepairReader', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader);
   return { events, build, run: () => worker(db, 'owner') };
 }
@@ -68,4 +68,10 @@ test('an explicit pause stops before the next checkpoint without completing or f
   throw new Error('Paused checkpoint must not execute');
  }});
  const result=await s.run();assert.equal(result.ownerPaused,true);assert.deepEqual(s.events,['dependency']);
+});
+
+test('a completed legacy owner-review course publishes without waiting for a manual decision',async()=>{
+ const s=scenario({});s.build.profile.publicationPolicy='owner-review-required';
+ const result=await s.run();assert.equal(result.completed,true);
+ assert.deepEqual(s.events,[{buildId:'build',status:'built',currentStep:'credential_release'},'publish','complete']);
 });

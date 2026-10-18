@@ -318,7 +318,7 @@ export async function POST(req: NextRequest) {
     const profile = {
       ...generatedProfile,
       mediaAcquisitionOwnerId: auth.id,
-      publicationPolicy: 'owner-review-required',
+      publicationPolicy: 'automatic-quality-verified',
       ...(authoring
         ? {
             instructionalAuthoring: {

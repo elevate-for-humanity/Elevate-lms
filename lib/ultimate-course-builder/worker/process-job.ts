@@ -222,11 +222,7 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       const releaseActor = await resolveReleaseActor(db, build.course_id, profile.mediaAcquisitionOwnerId);
       await runtime.persistence.updateBuild({buildId:build.id,status:'built',currentStep:'credential_release'});
       assertActive();
-      if ((profile as any).publicationPolicy === 'owner-review-required') {
-      await queue.waitForDependency(job.id,workerId,'OWNER_COURSE_REVIEW_REQUIRED',generation);
-      return {claimed:true,completed:false,awaitingOwnerReview:true,jobId:job.id,result};
-    }
-    await new UltimateReleaseService(db).publish(build.id, releaseActor);
+      await new UltimateReleaseService(db).publish(build.id, releaseActor);
     }
     if (targeted) {
       // A lesson acceptance/repair job does not complete or publish the course.

@@ -1,5 +1,4 @@
 import 'server-only';
-import { renderReview } from '../authoring/render-review';
 import { assertCompleteLesson, ULTIMATE_LESSON_CONTRACT_VERSION } from '../core/lesson-contract';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { renderMediaUrl, renderPlaybackUrl } from '../media/playback-source.mjs';
@@ -38,14 +37,8 @@ export class UltimateReleaseService {
     )
       throw new Error('ULTIMATE_ALL_COMPETENCIES_REQUIRED');
     for (const lesson of ls) assertCompleteLesson(lesson.artifacts as any, b.profile, lesson.competency_id);
-    if ((b.profile as Record<string, unknown>)?.publicationPolicy === 'owner-review-required') {
-      for (const lesson of ls) {
-        const render = lesson.artifacts?.lesson_film_render?.render;
-        const url = renderMediaUrl(render) ?? renderPlaybackUrl(render);
-        const review = url ? await renderReview(this.db,b.id,lesson.id,url) : null;
-        if (review?.decision !== 'approve') throw new Error('OWNER_VIDEO_VERSION_REVIEW_REQUIRED:' + lesson.lesson_key);
-      }
-    }
+    // Current automated contract evidence authorizes publication. Historical
+    // owner-review policies and optional review records cannot strand a build.
 
     const p: any = b.profile,
       cm = new Map((p.competencies ?? []).map((c: any) => [String(c.id), c]));

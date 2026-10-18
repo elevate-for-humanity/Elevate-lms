@@ -1,5 +1,6 @@
 'use client';
 
+import ProgressiveLessonVideo from './ProgressiveLessonVideo';
 import ProductionPanelLayout from './ProductionPanelLayout';
 import type { ReactNode } from 'react';
 import AssessmentPreview from './AssessmentPreview';
@@ -32,10 +33,12 @@ function SavedVideo({
   lesson,
   diagnostic,
   preferApproved = true,
+  buildId,
 }: {
   lesson: Lesson;
   diagnostic: any;
   preferApproved?: boolean;
+  buildId: string;
 }) {
   const player = useRef<HTMLVideoElement>(null);
   const [needsPlay, setNeedsPlay] = useState(false);
@@ -56,6 +59,7 @@ function SavedVideo({
       cancelled = true;
     };
   }, [videoUrl]);
+  if (!approvedVideoUrl && lesson.saved && lesson.ultimate_lesson_steps?.some(step => step.step === 'lesson_film_render' && step.state === 'running')) return <ProgressiveLessonVideo buildId={buildId} lessonId={lesson.id} title={lesson.title} />;
   if (!diagnostic) return null;
   return videoUrl ? (
     <div>
@@ -427,6 +431,7 @@ export default function UltimateStageInspector({
                     </label>
                   )}
                   <SavedVideo
+                    buildId={buildId}
                     preferApproved={preferApproved}
                     lesson={lesson}
                     diagnostic={

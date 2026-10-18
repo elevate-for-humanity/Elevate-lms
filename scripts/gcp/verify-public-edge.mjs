@@ -50,7 +50,7 @@ export async function probeRedirect(origin,{request=fetch}={}) {
     const target=location?new URL(location,url):null;
     const approved=target && target.origin===new URL(origin).origin &&
       target.pathname==='/login' &&
-      target.searchParams.get('redirect')==='/program-holder/dashboard';
+      target.searchParams.get('redirect')===url.pathname+url.search;
     return {path,status:response.status,state:response.status>=300 && response.status<400 && approved?'passed':'failed',
       locationPath:target?.pathname || null,reason:approved?undefined:'unexpected_redirect'};
   } catch(e) { return {path,...problem(e)}; }

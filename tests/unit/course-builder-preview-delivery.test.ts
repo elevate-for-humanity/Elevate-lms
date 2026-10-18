@@ -1,10 +1,11 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {NextRequest} from 'next/server';
 import {adminPreviewPlaybackUrl} from '@/lib/ultimate-course-builder/media/admin-preview-url.mjs';
-const mocks = vi.hoisted(() => ({auth:vi.fn(), db:vi.fn(), sign:vi.fn()}));
+const mocks = vi.hoisted(() => ({auth:vi.fn(), db:vi.fn(), sign:vi.fn(),approved:vi.fn()}));
 vi.mock('@/lib/admin/guards', () => ({apiRequireAdmin:mocks.auth}));
 vi.mock('@/lib/supabase/admin', () => ({requireAdminClient:mocks.db}));
 vi.mock('@/lib/storage/lesson-playback', () => ({signedLessonPlayback:mocks.sign}));
+vi.mock('@/lib/ultimate-course-builder/media/owner-approved-preview.mjs',()=>({ownerApprovedPreview:mocks.approved}));
 import {GET} from '@/apps/admin/app/api/admin/ultimate-course-builder/preview/route';
 const buildId='11111111-1111-4111-8111-111111111111',lessonId='22222222-2222-4222-8222-222222222222';
 const expired='https://media.example/course-videos/film.mp4?X-Amz-Date=old';
@@ -35,6 +36,15 @@ describe('Admin saved preview delivery',()=>{
   it('does not use a caller-supplied media URL',async()=>{
     setup();const req=request();req.nextUrl.searchParams.set('source','https://attacker.example/private.mp4');await GET(req);
     expect(mocks.sign.mock.calls[0][1]).toBe(expired);
+  });
+  it('serves the separately verified published approval instead of the latest draft',async()=>{
+    setup();mocks.approved.mockResolvedValue({videoUrl:'https://approved.example/exact.mp4'});
+    const req=request();req.nextUrl.searchParams.set('kind','approved');const response=await GET(req);
+    expect(response.status).toBe(307);expect(mocks.approved).toHaveBeenCalledOnce();expect(mocks.sign.mock.calls[0][1]).toBe('https://approved.example/exact.mp4');
+  });
+  it('does not fall back to an unapproved draft when approval no longer matches',async()=>{
+    setup();mocks.approved.mockResolvedValue(null);const req=request();req.nextUrl.searchParams.set('kind','approved');
+    expect((await GET(req)).status).toBe(404);expect(mocks.sign).not.toHaveBeenCalled();
   });
   it('keeps the player source stable when only a stored signature changes',()=>{
     expect(adminPreviewPlaybackUrl(buildId,lessonId,expired)).toBe(adminPreviewPlaybackUrl(buildId,lessonId,expired.replace('old','fresh')));

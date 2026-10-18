@@ -1,5 +1,13 @@
 export const STORE_PAYPAL_CALLBACK='https://store.elevateforhumanity.org/api/webhooks/paypal-billing';
 const fail=code=>{throw Error('STORE_PAYPAL_'+code);};
+// PayPal may reorder events and vary descriptive metadata between reads.
+// Compare the exact subscription names, rejecting missing or duplicate names.
+export function eventSubscriptionIdentity(events){
+ if(!Array.isArray(events)||!events.length)fail('CUTOVER_EVENT_TYPES_INVALID');
+ const names=events.map(e=>e?.name);
+ if(names.some(n=>typeof n!=='string'||!n.trim()||n!==n.trim())||new Set(names).size!==names.length)fail('CUTOVER_EVENT_TYPES_INVALID');
+ return JSON.stringify(names.sort());
+}
 /** Provider URL cutover only: no subscriptions, orders, charges or account changes.
  * Called with the existing verified app token. Never log that token or payloads. */
 export async function cutoverStorePayPalWebhook({request=fetch,base,token,hook,expectedSha,apply=false}={}){
@@ -28,13 +36,15 @@ export async function cutoverStorePayPalWebhook({request=fetch,base,token,hook,e
  const headers={Authorization:'Bearer '+token,'content-type':'application/json'};
  const currentResponse=await call(url,{headers});if(!currentResponse.ok)fail('CUTOVER_PROVIDER_READ_FAILED');
  const current=await currentResponse.json();
- if(current.id!==hook.id||current.url!==hook.url||JSON.stringify(current.event_types)!==JSON.stringify(hook.event_types))fail('CUTOVER_REGISTRATION_CHANGED');
+ if(current.id!==hook.id)fail('CUTOVER_WEBHOOK_ID_CHANGED');
+ if(current.url!==hook.url)fail('CUTOVER_REGISTRATION_CHANGED');
+ if(eventSubscriptionIdentity(current.event_types)!==eventSubscriptionIdentity(hook.event_types))fail('CUTOVER_EVENT_SUBSCRIPTIONS_CHANGED');
  const receipt={callbackVerified:true,sourceVerified:true,webhookUsesStoreOrigin:hook.url===STORE_PAYPAL_CALLBACK,webhookChanged:false,transactionsCreated:0,commerceAccepted:false};
  if(!apply||hook.url===STORE_PAYPAL_CALLBACK)return {...receipt,mode:apply?'already-routed':'validate-only'};
  const patched=await call(url,{method:'PATCH',headers,body:JSON.stringify([{op:'replace',path:'/url',value:STORE_PAYPAL_CALLBACK}])});
  if(!patched.ok)fail('CUTOVER_PROVIDER_UPDATE_FAILED');
  const readback=await call(url,{headers});if(!readback.ok)fail('CUTOVER_READBACK_REQUIRED');
  const saved=await readback.json();
- if(saved.id!==hook.id||saved.url!==STORE_PAYPAL_CALLBACK||JSON.stringify(saved.event_types)!==JSON.stringify(hook.event_types))fail('CUTOVER_READBACK_REQUIRED');
+ if(saved.id!==hook.id||saved.url!==STORE_PAYPAL_CALLBACK||eventSubscriptionIdentity(saved.event_types)!==eventSubscriptionIdentity(hook.event_types))fail('CUTOVER_READBACK_REQUIRED');
  return {...receipt,mode:'applied',webhookUsesStoreOrigin:true,webhookChanged:true,previousUrl:hook.url};
 }

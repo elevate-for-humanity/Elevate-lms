@@ -68,3 +68,18 @@ test('queued jobs cannot claim confirmed recovery evidence',async()=>{
   request:async(_url,options)=>{if(options.method)body=JSON.parse(options.body);return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};}});
  assert.equal(body.monitor.confirmedAssignments,undefined);
 });
+
+test('PARIS requests lease owner so confirmed assignment reporting can work in production',async()=>{
+ let selected='';
+ const row=job({status:'running',lease_owner:'worker-confirmed',heartbeat_at:'2026-10-14T17:59:50Z',lease_expires_at:'2026-10-14T18:05:00Z'});
+ let written;
+ await monitorCourseQueue({env:{GITHUB_REPOSITORY:'elevate-for-humanity/Elevate-lms',SUPABASE_SERVICE_ROLE_KEY:'test'},now,
+  request:async(url,options)=>{
+   if(!options.method)selected=new URL(url).searchParams.get('select');
+   else written=JSON.parse(options.body);
+   return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};
+  }});
+ assert.match(selected,/\\blease_owner\\b/);
+ assert.equal(written.monitor.confirmedAssignments,1);
+ assert.equal(written.monitor.action,'observe');
+});

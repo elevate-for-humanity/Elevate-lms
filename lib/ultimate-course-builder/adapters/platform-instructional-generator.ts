@@ -107,7 +107,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       // finding or regenerating narration from unchanged duplicate segments.
       // Bound correction attempts and preserve the original source references.
       for (let repair = 0; repair < 2 &&
-          repeatedTeachingSegments(authored.segments.map((segment: any) => segment.text).join('\\n\\n')); repair++) {
+          repeatedTeachingSegments(authored.segments.map((segment: any) => segment.text).join('\n\n')); repair++) {
         authored = await author({
           ...(e.repairDirective ?? {}),
           reason: 'NARRATION_DUPLICATION',
@@ -115,7 +115,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
           attempt: repair + 1,
         });
       }
-      if (repeatedTeachingSegments(authored.segments.map((segment: any) => segment.text).join('\\n\\n')))
+      if (repeatedTeachingSegments(authored.segments.map((segment: any) => segment.text).join('\n\n')))
         throw new Error('NARRATION_DUPLICATION');
       return e.profile.lessonPresentation === 'approved-premium-v1' ? addFreshTeachingRecaps(authored,e.profile,sources) : authored;
     }

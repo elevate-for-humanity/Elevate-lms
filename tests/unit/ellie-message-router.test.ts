@@ -113,6 +113,24 @@ describe('durable orchestration planning', () => {
     ]);
     expect(plan.steps.some((step) => step.title === 'Create snapshot')).toBe(false);
   });
+
+  it.each(['QuickBooks billing', 'enrollment forms', 'QuickBooks billing and enrollment forms'])(
+    'preserves repository repair scope when the goal mentions %s', (feature) => {
+      const goal = `Repair the repository code for Admin, Course Builder, Store, and ${feature}; add regression tests, deploy the verified build, and verify production.`;
+      const plan = decomposePlan(goal);
+      expect(plan.steps[0]).toMatchObject({
+        title: 'Implement repository outcome', command: goal, runner: 'studio-engineering',
+      });
+      expect(plan.steps.at(-1)?.title).toBe('Verify production');
+      expect(plan.steps.some(step => step.title === 'Prepare authorized reconnection')).toBe(false);
+    },
+  );
+
+  it('keeps a focused QuickBooks reconnection request on its existing operational flow', () => {
+    expect(decomposePlan('Reconnect QuickBooks').steps.map(step => step.title)).toEqual([
+      'Verify QuickBooks connection', 'Prepare authorized reconnection',
+    ]);
+  });
 });
 
 describe('selectStudioAgent', () => {

@@ -413,7 +413,10 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
     !explicitReadOnly &&
     !/\b(?:do not|don't|dont|never|without)\s+(?:\w+\s+){0,3}deploy(?:ment|ing|ed)?\b/.test(g);
   let steps: PlanStep[];
+  // Product mentions inside a repository repair must not replace the owner's
+  // complete engineering goal with a single product's operational template.
   const compoundEngineeringExecution =
+    !explicitReadOnly &&
     /\b(code|codebase|repo|repository|commit|source|files? changed|regression tests?|typecheck|build)\b/.test(
       g,
     ) && /\b(fix|repair|correct|implement|modify|change|update|edit|refactor|add|remove)\b/.test(g);
@@ -427,11 +430,11 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
     steps = GOAL_TEMPLATES.read_only_course_audit!({});
   } else if (explicitReadOnlyStudioDiagnostic) {
     steps = GOAL_TEMPLATES.read_only_studio_diagnostic!({});
-  } else if (g.includes('quickbooks')) {
+  } else if (g.includes('quickbooks') && !compoundEngineeringExecution) {
     steps = /\b(fix|repair|connect|reconnect|configure)\b/.test(g)
       ? GOAL_TEMPLATES.quickbooks_repair!({})
       : GOAL_TEMPLATES.quickbooks_connection!({});
-  } else if (g.includes('enrollment') || g.includes('enroll')) {
+  } else if ((g.includes('enrollment') || g.includes('enroll')) && !compoundEngineeringExecution) {
     steps = GOAL_TEMPLATES.fix_enrollment_failures!({});
   } else if (compoundEngineeringExecution) {
     const unifiedStages = buildUnifiedEngineeringStages(goal);

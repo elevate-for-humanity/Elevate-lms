@@ -42,3 +42,16 @@
     border-top-width: 0;
   }
 }
+
+/* Keep typed credentials and the insertion caret readable in embedded/PWA views. */
+.secureInput {
+  color: #0f172a;
+  caret-color: #0f172a;
+  -webkit-text-fill-color: #0f172a;
+  color-scheme: light;
+}
+.secureInput::placeholder {
+  color: #475569;
+  -webkit-text-fill-color: #475569;
+  opacity: 1;
+}

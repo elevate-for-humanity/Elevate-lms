@@ -3,6 +3,7 @@
 import styles from './CloudBrowserWorkspace.module.css';
 
 import { useEffect, useId, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import {
   AlertTriangle,
   Database,
@@ -121,6 +122,7 @@ export default function CloudBrowserWorkspace({
   const secureInputRef = useRef<HTMLInputElement>(null);
   const actionQueueRef = useRef<Promise<unknown>>(Promise.resolve());
   const [secureInputKind, setSecureInputKind] = useState<'email' | 'password'>('email');
+  const [showSecurePassword, setShowSecurePassword] = useState(false);
   const [replaceSecureInput, setReplaceSecureInput] = useState(true);
   const [sendingSecureInput, setSendingSecureInput] = useState(false);
   const targetEditedRef = useRef(Boolean(initialTarget));
@@ -668,6 +670,7 @@ export default function CloudBrowserWorkspace({
     const value = input?.value || '';
     if (!input || !value || !session || sendingSecureInput) return;
     input.value = '';
+    setShowSecurePassword(false);
     setSendingSecureInput(true);
     try {
       await action(
@@ -1311,8 +1314,12 @@ export default function CloudBrowserWorkspace({
                   aria-pressed={secureInputKind === kind}
                   onClick={() => {
                     if (secureInputRef.current) secureInputRef.current.value = '';
-                    setSecureInputKind(kind);
-                    window.requestAnimationFrame(() => secureInputRef.current?.focus());
+                    // Mobile keyboards require focus inside the original user gesture.
+                    flushSync(() => {
+                      setSecureInputKind(kind);
+                      setShowSecurePassword(false);
+                    });
+                    secureInputRef.current?.focus();
                   }}
                   className="min-h-12 rounded border border-emerald-300 px-4 text-base aria-pressed:bg-emerald-100"
                 >
@@ -1327,7 +1334,12 @@ export default function CloudBrowserWorkspace({
               <input
                 id={secureInputId}
                 ref={secureInputRef}
-                type={secureInputKind === 'password' ? 'password' : 'text'}
+                type={secureInputKind === 'password' && !showSecurePassword ? 'password' : 'text'}
+                placeholder={
+                  secureInputKind === 'email'
+                    ? 'Tap here to enter your email'
+                    : 'Tap here to enter your password'
+                }
                 inputMode={secureInputKind === 'email' ? 'email' : 'text'}
                 autoCapitalize="none"
                 autoCorrect="off"
@@ -1341,8 +1353,19 @@ export default function CloudBrowserWorkspace({
                     void sendSecureInput();
                   }
                 }}
-                className="min-h-12 w-full min-w-0 rounded border border-emerald-300 bg-slate-50 px-3 py-2 text-xl"
+                className={`${styles.secureInput} min-h-14 w-full min-w-0 rounded border-2 border-emerald-700 bg-white px-3 py-3 text-xl`}
               />
+              {secureInputKind === 'password' ? (
+                <button
+                  type="button"
+                  aria-pressed={showSecurePassword}
+                  disabled={!session || sendingSecureInput}
+                  onClick={() => setShowSecurePassword((visible) => !visible)}
+                  className="min-h-12 rounded border border-slate-400 px-4 text-base text-slate-950"
+                >
+                  {showSecurePassword ? 'Hide password' : 'Show password'}
+                </button>
+              ) : null}
               {secureInputKind === 'email' ? (
                 <button
                   type="button"

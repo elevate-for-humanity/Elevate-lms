@@ -3,6 +3,7 @@
  * Canonical platform_secrets values are hydrated before process.env fallback.
  */
 
+import { currentWorkflowGitHubToken } from './workflow-github-context';
 import { getDecryptedPlatformSecret } from '@/lib/secrets';
 
 function normalizeToken(value: string | undefined | null): string | null {
@@ -32,6 +33,8 @@ export async function ensureDevStudioSecrets(): Promise<void> {
  * cache made a newly-rotated GitHub token remain stale for up to five minutes.
  */
 export async function getGitHubToken(): Promise<string | null> {
+  const workflowToken=currentWorkflowGitHubToken();
+  if(workflowToken)return workflowToken;
   // Capture the deployment value before hydration. hydrateProcessEnv may load
   // a canonical fallback into process.env, but must not replace a valid token
   // supplied directly by the production service.

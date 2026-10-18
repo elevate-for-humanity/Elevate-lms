@@ -34,7 +34,7 @@ it('publishes only the validated SHA without force and dispatches actual Google 
  const writes=vi.mocked(fetch).mock.calls.filter(([,o])=>o?.method==='PATCH');
  expect(writes).toHaveLength(1);expect(JSON.parse(String(writes[0][1]?.body))).toEqual({sha:'b'.repeat(40),force:false});
  expect(h.updates).toContainEqual(expect.objectContaining({status:'deploying',release_sha:'b'.repeat(40)}));
- expect(vi.mocked(fetch).mock.calls.filter(([u])=>String(u).endsWith('/dispatches')).map(([u])=>String(u))).toEqual(expect.arrayContaining([expect.stringContaining('deploy-google-lms-trigger.yml'),expect.stringContaining('deploy-google-marketing-trigger.yml')]));
+ expect(vi.mocked(fetch).mock.calls.filter(([u])=>String(u).endsWith('/dispatches')).map(([u])=>String(u))).toEqual([expect.stringContaining('deploy-admin.yml')]);
 });
 it('a stale repair state or another workflow run cannot publish',async()=>{
  await expect(publishParisRepair('repair',8)).rejects.toThrow('STATE_MISMATCH');

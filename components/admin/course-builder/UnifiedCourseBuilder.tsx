@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import ParisSupervisionPanel from '@/components/admin/ParisSupervisionPanel';
 import CourseSidePreview from './CourseSidePreview';
 import { ResizableWorkspace } from '@/components/studio/ResizableWorkspace';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
@@ -1398,6 +1399,8 @@ export function UltimateBuildPanel({
           </button>
         </section>
       )}
+
+      {latest && <details className="mt-4 rounded-xl border border-slate-700 p-3"><summary className="min-h-11 cursor-pointer font-bold">PARIS repair execution and production evidence</summary><ParisSupervisionPanel buildId={latest.id} /></details>}
 
       <details className="mt-4 rounded-xl border border-slate-700 p-3">
         <summary className="min-h-11 cursor-pointer font-bold">

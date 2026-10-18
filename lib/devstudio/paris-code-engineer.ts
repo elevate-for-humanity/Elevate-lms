@@ -48,7 +48,7 @@ function blockedPath(path: string): boolean {
     path.includes('..') ||
     /^\.env(?:\.|$)/.test(path) ||
     path.startsWith('.git/') ||
-    /code-repair|paris-code-engineer|main-release|api-auth|guards|role-matrix/i.test(path) ||
+    /code-repair|course-repair-policy|workflow-github-context|github-token|paris-code-engineer|main-release|api-auth|guards|role-matrix/i.test(path) ||
     path.includes('/node_modules/') ||
     path.includes('/.next/') ||
     !/^(lib|components|apps|remotion-src|workers|tests)\//.test(path) ||

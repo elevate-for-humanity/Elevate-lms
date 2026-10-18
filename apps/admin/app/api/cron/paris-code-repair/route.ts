@@ -1,3 +1,4 @@
+import {withWorkflowGitHubToken} from '@/lib/devstudio/workflow-github-context';
 import {authorizeParisWorkflow} from '@/lib/paris-workflow-identity';
 import {NextRequest,NextResponse} from 'next/server';
 import {prepareParisRepair,publishParisRepair,reportParisRepairFailure,tickParisCodeRepairs,diagnoseParisGitHubCredential} from '@/lib/ai/runtime/code-repair';
@@ -8,11 +9,22 @@ export async function POST(request:NextRequest){
  if(!await authorizeParisWorkflow(request.headers.get('authorization')))return NextResponse.json({error:'Unauthorized'},{status:401});
  const body=await request.json().catch(()=>({}));
  try{
-  if(body.phase==='auth-diagnostic')return NextResponse.json(await diagnoseParisGitHubCredential(),{headers:{'Cache-Control':'no-store'}});
-  if(body.phase==='tick')return NextResponse.json(await tickParisCodeRepairs({workflowOwnedDispatch:true}));
+  if(body.phase==='auth-diagnostic'){
+   const diagnostic=async()=>NextResponse.json({...await diagnoseParisGitHubCredential(),workflowAuthorization:'temporary-job-v1'},{headers:{'Cache-Control':'no-store'}});
+   const token=request.headers.get('x-paris-github-token');
+   return token?await withWorkflowGitHubToken(token,diagnostic):await diagnostic();
+  }
+  if(body.phase==='tick'){
+   const token=request.headers.get('x-paris-github-token');
+   const tick=async()=>NextResponse.json(await tickParisCodeRepairs({workflowOwnedDispatch:true}));
+   return token?await withWorkflowGitHubToken(token,tick):await tick();
+  }
   if(!/^[a-f0-9-]{36}$/.test(body.repairId??'')||!Number.isSafeInteger(body.runId))return NextResponse.json({error:'Repair and workflow run required'},{status:400});
-  if(body.phase==='prepare')return NextResponse.json(await prepareParisRepair(body.repairId,body.runId));
-  if(body.phase==='publish')return NextResponse.json(await publishParisRepair(body.repairId,body.runId));
+  if(body.phase==='prepare'||body.phase==='publish'){
+   const token=request.headers.get('x-paris-github-token');
+   if(!token)return NextResponse.json({error:'Temporary workflow authorization required.',errorCode:'PARIS_WORKFLOW_GITHUB_TOKEN_REQUIRED'},{status:400});
+   return await withWorkflowGitHubToken(token,async()=>NextResponse.json(await (body.phase==='prepare'?prepareParisRepair:publishParisRepair)(body.repairId,body.runId)));
+  }
   if(body.phase==='failure'){await reportParisRepairFailure(body.repairId,body.runId);return NextResponse.json({recorded:true});}
   return NextResponse.json({error:'Unsupported phase'},{status:400});
  }catch(error){

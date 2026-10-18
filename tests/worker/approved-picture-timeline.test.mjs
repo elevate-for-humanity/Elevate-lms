@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {pictureTimeline,activePictureCue,pictureSceneTiming} from '../../lib/ultimate-course-builder/instructional/picture-timeline.mjs';
+import {pictureTimeline,activePictureCue,pictureSceneTiming,quoteStartSeconds} from '../../lib/ultimate-course-builder/instructional/picture-timeline.mjs';
 const cues=[{text:'Inspect the clean cape.',startSeconds:0,endSeconds:4},{text:'Check the neck strip.',startSeconds:4,endSeconds:8},{text:'Recap: prepare the station safely.',startSeconds:8,endSeconds:12}];
 const photos=[{imageUrl:'a',sha256:'a',narrationQuote:'Inspect the clean cape'},{imageUrl:'b',sha256:'b',narrationQuote:'Check the neck strip'},{imageUrl:'c',sha256:'c',narrationQuote:'Recap prepare the station safely'}];
 test('single frame quantization prevents the extra frame that exhausted the picture timeline',()=>{
@@ -37,4 +37,15 @@ test('explicit recap identity survives reordered photo input',()=>{
  const timeline=pictureTimeline([{...photos[2],isRecap:true},photos[0],photos[1]],cues,12,8);
  assert.equal(timeline.at(-1).imageUrl,'c');
  assert.equal(timeline.at(-1).startSeconds,8);
+});
+
+test('saved speech tokenization can spell slash and split a compound word',()=>{
+ const spoken=[{text:'Current platform limits are 40 OJL hours and 50 combined OJL slash RTI hours weekly.',startSeconds:3,endSeconds:10}];
+ assert.equal(quoteStartSeconds('Current platform limits are 40 OJL hours and 50 combined OJL/RTI hours weekly',spoken),3);
+ assert.equal(quoteStartSeconds('Completion timeframes shift with weekly hours taking roughly 50 to 125 weeks before licensing applications',[{text:'Completion time frames shift with weekly hours taking roughly 50 to 125 weeks before licensing applications',startSeconds:12,endSeconds:20}]),12);
+});
+test('speech recognition function-word variation requires a long otherwise identical quote',()=>{
+ assert.equal(quoteStartSeconds('notify the supervisor and Elevate immediately with the date actual times and error',[{text:'notify the supervisor and elevate immediately with the date actual times an error',startSeconds:7,endSeconds:13}]),7);
+ for(const text of ['do not disinfect tools','complete 2000 hours','notify another supervisor immediately'])
+  assert.throws(()=>quoteStartSeconds(text,[{text:'do disinfect tools complete 2500 hours notify the supervisor immediately',startSeconds:0,endSeconds:10}]),/NOT_ALIGNED/);
 });

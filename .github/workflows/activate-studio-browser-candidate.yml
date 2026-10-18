@@ -17,7 +17,9 @@ jobs:
     environment: production
     timeout-minutes: 15
     concurrency:
-      group: google-runtime-us-central1
+      # This workflow only switches an existing revision's traffic. It does not
+      # build, deploy or allocate regional CPU/memory, like Admin activation.
+      group: google-studio-browser-runtime-operations
       queue: max
       cancel-in-progress: false
     env:

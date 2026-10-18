@@ -28,6 +28,18 @@ export async function GET(req: NextRequest) {
       const location=await signedLessonPlayback(db,approved.videoUrl);
       return new NextResponse(null,{status:307,headers:{...headers,Location:location}});
     }
+    const artifactVersionId = req.nextUrl.searchParams.get('artifactVersionId');
+    if (artifactVersionId) {
+      if (!/^[a-f0-9-]{36}$/i.test(artifactVersionId)) return NextResponse.json({error:'Invalid video version.'},{status:400,headers});
+      const artifact = await db.from('ultimate_artifacts').select('id').eq('build_id',buildId)
+        .eq('lesson_build_id',lessonBuildId).eq('stage','lesson_film_render').eq('artifact_type','stage_output').single();
+      if (artifact.error || !artifact.data) return NextResponse.json({error:'Video artifact not found.'},{status:404,headers});
+      const version = await db.from('ultimate_artifact_versions').select('content').eq('artifact_id',artifact.data.id).eq('id',artifactVersionId).single();
+      if (version.error) throw version.error;
+      const video = renderMediaUrl(version.data?.content?.render);
+      if (!video) return NextResponse.json({error:'Saved video version not found.'},{status:404,headers});
+      return new NextResponse(null,{status:307,headers:{...headers,Location:await signedLessonPlayback(db,video)}});
+    }
     let source = renderMediaUrl(lesson.data.artifacts?.lesson_film_render?.render);
     if (!source) {
       const artifact = await db.from('ultimate_artifacts').select('id').eq('build_id', buildId)

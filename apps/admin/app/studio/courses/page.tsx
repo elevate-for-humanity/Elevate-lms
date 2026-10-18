@@ -5,12 +5,13 @@ import CourseProductionWorkspace from '@/components/admin/course-builder/CourseP
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-type CourseBuilderTab = 'courses' | 'ultimate' | 'registry';
+type CourseBuilderTab = 'courses' | 'ultimate' | 'registry' | 'media';
 
 const COURSE_BUILDER_TABS: ReadonlySet<string> = new Set([
   'courses',
   'ultimate',
   'registry',
+  'media',
 ] as const);
 
 function isCourseBuilderTab(value: string | undefined): value is CourseBuilderTab {

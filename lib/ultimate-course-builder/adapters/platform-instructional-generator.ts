@@ -56,7 +56,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       throw new Error('ULTIMATE_STANDARDS_EVIDENCE_REQUIRED');
     const lessonSources = e.profile.instructionalSources?.filter(s =>
       [e.competency.id, `course-lesson:${e.competency.id}`, `course:${e.competency.id}`].includes(s.id) ||
-      e.competency.authorityRequirementIds.includes(s.id)) ?? [];
+      e.competency.authorityRequirementIds.includes(s.id) || (e.profile.instructionalAuthoring?.provider === 'google' && s.id.startsWith('syllabus:'))) ?? [];
     const approved = e.profile.lessonBlueprints?.[e.competency.id];
     if (approved && !e.repairDirective) {
       validateLessonBlueprint(approved, e.competency);
@@ -90,7 +90,7 @@ export class UltimatePlatformInstructionalGenerator implements UltimateInstructi
       (s) =>
         [e.competency.id, `course-lesson:${e.competency.id}`, `course:${e.competency.id}`].includes(
           s.id,
-        ) || e.competency.authorityRequirementIds.includes(s.id),
+        ) || e.competency.authorityRequirementIds.includes(s.id) || (e.profile.instructionalAuthoring?.provider === 'google' && s.id.startsWith('syllabus:')),
     );
     if (!sources?.length || sources.some((s) => !s.id || !s.text?.trim()))
       throw new Error('ULTIMATE_AUTHORED_BLUEPRINT_OR_INSTRUCTIONAL_SOURCES_REQUIRED');

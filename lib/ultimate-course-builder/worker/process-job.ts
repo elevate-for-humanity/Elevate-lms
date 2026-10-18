@@ -1,3 +1,4 @@
+import { recordProductionAlert } from './production-alert';
 import {ULTIMATE_BUILD_STEPS} from '../core/types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { UltimateJobQueue } from './job-queue';
@@ -74,6 +75,11 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       .single();
     if (error || !build) throw error ?? new Error('ULTIMATE_BUILD_NOT_FOUND');
     const storedProfile = build.profile as UltimateCredentialProfile;
+    const ensureNotPaused = async () => {
+      const state = await db.from('ultimate_course_builds').select('profile').eq('id',build.id).single();
+      if (state.error) throw state.error;
+      if (state.data?.profile?.ownerPaused === true) throw new Error('OWNER_PAUSED_REFERENCE_BUILD');
+    };
     if ((storedProfile as any).ownerPaused === true && job.payload?.ownerPreview !== true) {
       await queue.waitForDependency(job.id,workerId,'OWNER_PAUSED_REFERENCE_BUILD',generation);
       return {claimed:true,completed:false,ownerPaused:true,jobId:job.id};
@@ -116,7 +122,10 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
         startIndex: Number.isInteger(payload.nextCompetencyIndex) ? payload.nextCompetencyIndex : 0,
         maxLessons: 1,
         renderPreviewOnly: payload.ownerPreview === true,
-        beforeCheckpoint: liveCheckpointRepairReader(db, job, workerId, generation, payload, currentCompetencyId),
+        beforeCheckpoint: async (step) => {
+          await ensureNotPaused();
+          return liveCheckpointRepairReader(db, job, workerId, generation, payload, currentCompetencyId)(step);
+        },
         repairRenderRevision: payload.checkpointRepair?.competencyId === currentCompetencyId && ULTIMATE_BUILD_STEPS.indexOf(payload.checkpointRepair.fromStep) <= ULTIMATE_BUILD_STEPS.indexOf('lesson_film_render') ? payload.checkpointRepair.requestedAt : undefined,
         repairFromStep: payload.checkpointRepair?.competencyId === currentCompetencyId ? payload.checkpointRepair.fromStep : undefined,
       },
@@ -126,7 +135,13 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       assertActive,
     );
     assertActive();
+    await ensureNotPaused();
     console.info('[UltimateWorker] lesson processing returned', { jobId: job.id, completed: result.completed, findings: result.findings.length });
+    if (result.completed || result.previewReady) await recordProductionAlert(db, {
+      actorId:job.payload?.requestedBy ?? profile.mediaAcquisitionOwnerId,buildId:build.id,courseId:build.course_id,
+      eventKey:`lesson:${currentCompetencyId}:${generation}`,title:result.previewReady ? 'Lesson preview saved' : 'Lesson processing completed',
+      message:`${profile.title}: ${currentCompetencyId}. Open production to review saved media and quality evidence.`,
+    });
     if (payload.ownerPreview === true && result.previewReady) {
       await runtime.persistence.updateBuild({buildId:build.id,status:'blocked',currentStep:'lesson_film_render'});
       await queue.complete(job.id,workerId,generation);
@@ -230,9 +245,17 @@ export async function processUltimateJob(db: SupabaseClient, workerId: string) {
       console.error('[UltimateWorker] lease lost; not changing job state', {jobId: job.id, message});
       return {claimed:true,completed:false,jobId:job.id,error:message};
     }
+    if (message === 'OWNER_PAUSED_REFERENCE_BUILD') {
+      await queue.waitForDependency(job.id,workerId,message,generation);
+      return {claimed:true,completed:false,ownerPaused:true,jobId:job.id};
+    }
     if (isDurableExternalBlocker({code:message.split(':')[0],step:'learning_objectives',severity:'error',message}))
       await queue.waitForDependency(job.id,workerId,message,generation);
     else await queue.fail(job.id, workerId, message, generation, true);
+    const failedBuild = await db.from('ultimate_course_builds').select('course_id').eq('id',job.build_id).single();
+    if (failedBuild.data) await recordProductionAlert(db,{actorId:job.payload?.requestedBy,buildId:job.build_id,
+      courseId:failedBuild.data.course_id,eventKey:`attention:${job.id}:${generation}`,title:'Course production needs attention',
+      message:'A worker attempt stopped. Review the saved checkpoint, recovery state and worker logs.',attention:true});
     return { claimed: true, completed: false, jobId: job.id, error: message };
   } finally {
     if (timer) clearInterval(timer);

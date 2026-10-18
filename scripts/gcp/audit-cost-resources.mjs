@@ -1,4 +1,7 @@
 import { spawnSync } from 'node:child_process';
+import { mkdtempSync, openSync, closeSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const project='elegant-racer-299721';
@@ -15,9 +18,21 @@ const definitions=[
 ];
 
 export function auditCostResources({run=(args)=>{
-  const result=spawnSync('gcloud',args,{encoding:'utf8',timeout:30000,maxBuffer:32*1024*1024});
-  if(result.status!==0)throw Error('inventory unavailable');
-  return result.stdout;
+  // Large project inventories can exceed child_process pipe buffers (ENOBUFS).
+  // Spool complete output to a private temporary file, never stdout/stderr logs.
+  const directory=mkdtempSync(join(tmpdir(),'elevate-inventory-'));
+  const output=join(directory,'gcloud.json');
+  let fd;
+  try {
+    fd=openSync(output,'w',0o600);
+    const result=spawnSync('gcloud',args,{stdio:['ignore',fd,'ignore'],timeout:120000});
+    closeSync(fd);fd=undefined;
+    if(result.error||result.status!==0)throw Error('inventory unavailable');
+    return readFileSync(output,'utf8');
+  } finally {
+    if(fd!==undefined)closeSync(fd);
+    rmSync(directory,{recursive:true,force:true});
+  }
 }}={}) {
   const sections={};
   for(const [key,args,compact] of definitions) {

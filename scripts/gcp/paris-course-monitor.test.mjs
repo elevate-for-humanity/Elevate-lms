@@ -79,7 +79,7 @@ test('PARIS requests lease owner so confirmed assignment reporting can work in p
    else written=JSON.parse(options.body);
    return {ok:true,json:async()=>options.method?[{id:'job'}]:[row]};
   }});
- assert.match(selected,/\\blease_owner\\b/);
+ assert.match(selected,/\blease_owner\b/);
  assert.equal(written.monitor.confirmedAssignments,1);
  assert.equal(written.monitor.action,'observe');
 });

@@ -35,7 +35,12 @@ class RepairTests(unittest.TestCase):
             self.commands.append(args)
             if 'core show channels count' in args:
                 return self.calls
+            if 'core show help module reload' in args:
+                return 'Usage: module reload [module ...]'
+            if 'core show help pjsip reload' in args:
+                return 'No such command pjsip reload'
             if args[:2] == ['systemctl', 'stop']:
+                self.assertEqual(m.TARGET.read_bytes(), self.new)
                 self.active = False
             if args[:2] == ['systemctl', 'start']:
                 if self.start_failure:

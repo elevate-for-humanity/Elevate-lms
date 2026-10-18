@@ -33,7 +33,52 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
       );
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || 'Unable to load course media');
-      setVideos(Array.isArray(data.videos) ? data.videos : []);
+      const uploaded: CourseVideo[] = Array.isArray(data.videos) ? data.videos : [];
+      setVideos(uploaded);
+      // Generated films are durable artifacts in the current build, including B2.
+      // Use the same authenticated, version-bound preview as the production pane.
+      const buildsResponse = await fetch(
+        '/api/admin/ultimate-course-builder?courseId=' + encodeURIComponent(courseId),
+        { cache: 'no-store' },
+      );
+      const builds = await buildsResponse.json();
+      if (!buildsResponse.ok)
+        throw new Error(builds.error || 'Generated course media could not load');
+      const buildId = builds.builds?.[0]?.id;
+      if (buildId) {
+        const savedResponse = await fetch(
+          '/api/admin/ultimate-course-builder?view=checkpoints&buildId=' +
+            encodeURIComponent(buildId),
+          { cache: 'no-store' },
+        );
+        const saved = await savedResponse.json();
+        if (!savedResponse.ok) throw new Error(saved.error || 'Saved course media could not load');
+        const competencies: Array<{ id: string; title?: string }> =
+          saved.build?.profile?.competencies ?? [];
+        const generated: CourseVideo[] = (saved.build?.ultimate_lesson_builds ?? []).flatMap(
+          (lesson: {
+            id: string;
+            competency_id: string;
+            status: string;
+            preview?: { videoUrl?: string; review?: { version: number } };
+          }) =>
+            lesson.preview?.videoUrl
+              ? [
+                  {
+                    id: lesson.id,
+                    title:
+                      competencies.find((c) => c.id === lesson.competency_id)?.title ||
+                      lesson.competency_id,
+                    storage_path: '',
+                    status: lesson.status,
+                    asset_role: `Generated lesson · video version ${lesson.preview.review?.version ?? 'unverified'}`,
+                    playbackUrl: lesson.preview.videoUrl,
+                  },
+                ]
+              : [],
+        );
+        setVideos([...generated, ...uploaded]);
+      }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Unable to load course media');
     } finally {
@@ -64,11 +109,12 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
           <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-300">
             Course Media Library
           </p>
-          <h2 className="mt-1 text-2xl font-black">Browse and upload real course videos</h2>
+          <h2 className="mt-1 text-2xl font-black">Saved lesson renders and uploaded videos</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
-            This is the single media workspace for the selected course. Upload a real MP4, WebM,
-            or QuickTime file, assign it to a lesson, and immediately see the stored asset here.
-            No marketplace connection is required for normal course media.
+            This is the single media workspace for the selected course. Upload a real MP4, WebM, or
+            QuickTime file, assign it to a lesson, and immediately see the stored asset here. Saved
+            lesson renders use the same authenticated preview as the production workspace, including
+            Backblaze B2 assets.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -78,7 +124,11 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
             disabled={busy}
             className="inline-flex items-center gap-2 rounded-xl border border-slate-600 px-4 py-3 font-black text-slate-100 hover:bg-slate-800 disabled:opacity-50"
           >
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            {busy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4" />
+            )}
             Refresh library
           </button>
           <button
@@ -141,7 +191,10 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
 
         <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((video) => (
-            <article key={video.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+            <article
+              key={video.id}
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50"
+            >
               {video.playbackUrl ? (
                 <video
                   controls
@@ -160,7 +213,11 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
                   {video.status ?? 'stored'} · {video.asset_role ?? 'lesson media'}
                 </p>
                 <p className="mt-1 break-all text-[11px] text-slate-400">
-                  {video.lesson_id ? `Lesson: ${video.lesson_id}` : 'No lesson assigned'}
+                  {video.lesson_id
+                    ? `Lesson: ${video.lesson_id}`
+                    : video.asset_role?.startsWith('Generated lesson')
+                      ? 'Saved build artifact'
+                      : 'No lesson assigned'}
                 </p>
                 {video.playbackUrl ? (
                   <a

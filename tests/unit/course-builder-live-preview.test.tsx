@@ -23,6 +23,15 @@ it('saved lesson video appears without clicking a checkpoint or diagnostic butto
  expect(screen.getByText(/Draft preview/)).toBeInTheDocument();
  expect(screen.getByText('Lesson instruction')).toBeInTheDocument();
 });
+it('plays the exact approved published lesson instead of a newer unapproved draft',async()=>{
+ vi.spyOn(HTMLMediaElement.prototype,'play').mockResolvedValue(undefined);
+ vi.stubGlobal('fetch',vi.fn(async()=>({ok:true,json:async()=>({build:{profile:{competencies:[{id:'one',title:'Welcome'}]},ultimate_lesson_builds:[{id:'saved',competency_id:'one',status:'built_with_findings',preview:{videoUrl:'https://media.example/new-draft.mp4',approvedVideoUrl:'/api/admin/ultimate-course-builder/preview?kind=approved',approvedVersion:25}}]}})})));
+ const {container}=render(<UltimateStageInspector buildId="build"/>);
+ await screen.findByText('Owner-approved published lesson');
+ expect(container.querySelector('video')?.getAttribute('src')).toBe('/api/admin/ultimate-course-builder/preview?kind=approved');
+ expect(screen.getByText(/Approved render version 25/)).toBeInTheDocument();
+ expect(screen.queryByText(/Media QA passed/)).toBeNull();
+});
 
 it('starts saved playback immediately and offers one-click playback when the browser blocks autoplay',async()=>{
  const play=vi.spyOn(HTMLMediaElement.prototype,'play').mockRejectedValue(new Error('Autoplay blocked'));

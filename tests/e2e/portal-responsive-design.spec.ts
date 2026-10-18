@@ -453,7 +453,7 @@ test.describe('Studio single-session access and composer', () => {
         if (attempt === 1) throw error;
       }
     }
-    const composer = page.getByRole('textbox', { name: 'Tell Admin AI what you need done...', exact: true });
+    const composer = page.getByRole('textbox', { name: 'Tell Paris what you need done...', exact: true });
     await expect(composer).toBeVisible();
     await expect.poll(() => composer.evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(20);
     await composer.fill('Readability test draft');

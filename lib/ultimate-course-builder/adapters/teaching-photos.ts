@@ -30,7 +30,7 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
   if (!Array.isArray(scenes)) throw new Error('TEACHING_PHOTO_STORYBOARD_REQUIRED');
   const photos: Record<string, any[]> = {};
   const approvedReference=input.courseId===MANUAL_COSMETOLOGY_COURSE_ID ? null : await approvedReferencePhotoPicker(input,db);
-  const {data:placedPhotos,error:placementError}=approvedReference?{data:[],error:null}:await db.from('media_assets').select('id,storage_path,metadata').eq('lesson_id',input.lessonId).eq('asset_type','image').eq('storage_bucket','course_videos').eq('status','active');
+  const {data:placedPhotos,error:placementError}=await db.from('media_assets').select('id,storage_path,metadata').eq('lesson_id',input.lessonId).eq('asset_type','image').eq('storage_bucket','course_videos').eq('status','active');
   if(placementError) throw placementError;
 
   for (const scene of scenes) {
@@ -46,10 +46,17 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
     for (const [index, step] of requests.entries()) {
       courseProgressSignal()?.throwIfAborted();
       if(approvedReference){
-        const photo=await approvedReference(scene,index,step,index===requests.length-1);
-        photos[scene.id].push({...photo,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1});
-        reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
-        continue;
+        try {
+          const photo=await approvedReference(scene,index,step,index===requests.length-1);
+          photos[scene.id].push({...photo,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1});
+          reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
+          continue;
+        } catch(error) {
+          // A previous approved lesson may not contain the current scene or
+          // picture cue. Reuse an eligible saved/selected/licensed asset instead.
+          // Storage hashes, auth, provenance and licensing failures still fail.
+          if(!/^OWNER_REFERENCE_(?:STAGE|PICTURE)_REQUIRED$/.test(String((error as Error)?.message))) throw error;
+        }
       }
       const placed=placedPhotos?.find((p:any)=>p.metadata?.source==='openai-generated-illustration' && p.metadata?.reviewedIllustration===true && p.metadata?.sceneId===scene.id && p.metadata?.cueIndex===index && p.metadata?.narrationQuote===step.narrationQuote && /^[a-f0-9]{64}$/i.test(p.metadata?.sha256??'') && String(p.storage_path).startsWith('approved-teaching-photos/'));
       if(placed){

@@ -2,6 +2,7 @@ name: Release tested Course Builder Admin image
 on:
   workflow_dispatch:
 permissions: {contents: read, actions: read, id-token: write}
+concurrency: {group: google-course-runtime-operations, cancel-in-progress: false, queue: max}
 jobs:
   release:
     if: github.ref == 'refs/heads/main'

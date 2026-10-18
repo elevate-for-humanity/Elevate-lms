@@ -9,11 +9,17 @@ export default function SystemSecretsPage(){
   const [component,setComponent]=useState<string>('admin');
   const [inventory,setInventory]=useState<Inventory|null>(null);
   const [error,setError]=useState('');
+  const [audit,setAudit]=useState<{timestamp:string|null;action:string;status:number;resource:string}[]|null>(null);
+  const [auditError,setAuditError]=useState('');
   const [loading,setLoading]=useState(false);
   const [refresh,setRefresh]=useState(0);
   useEffect(()=>{
     const ctrl=new AbortController();
-    setLoading(true);setError('');setInventory(null);
+    setLoading(true);setError('');setInventory(null);setAudit(null);setAuditError('');
+    fetch('/api/admin/system-secrets/audit',{cache:'no-store',signal:ctrl.signal})
+      .then(async r=>{const body=await r.json();if(!r.ok)throw Error(body.error||'Audit unavailable');return body;})
+      .then(body=>setAudit(body.history??[]))
+      .catch(e=>{if(e.name!=='AbortError')setAuditError(e.message);});
     fetch(`/api/admin/system-secrets?component=${encodeURIComponent(component)}&v=${refresh}`,{cache:'no-store',signal:ctrl.signal})
     .then(async r=>{const body=await r.json();if(!r.ok)throw new Error(body.error||'Verification unavailable');return body;})
     .then(setInventory).catch(e=>{if(e.name!=='AbortError')setError(e.message);})
@@ -52,6 +58,13 @@ export default function SystemSecretsPage(){
       </tr>)}</tbody></table></section>
       <p className="text-sm text-slate-600">An unverified secret may exist. No automatic rotation or traffic changes occur from this page.</p>
     </>}
+    <section className="rounded border p-4 space-y-2"><h2 className="font-semibold">Google Cloud audit history</h2>
+      {auditError&&<p role="alert">Inconclusive: {auditError}</p>}
+      {audit&&<><p>{audit.length} recent audit entries returned (limited to 30).</p>
+        <ul className="space-y-1">{audit.map((a,i)=><li key={i} className="text-sm border-b py-1">
+          {a.timestamp??'Unknown time'} — {a.action} — {a.resource||'Resource unavailable'} — {a.status===0?'OK':`Status ${a.status}`}
+        </li>)}</ul></>}
+    </section>
     <section className="rounded border p-4"><h2 className="font-semibold">Provisioning and rotation</h2>
       <p className="mt-2 text-sm">Creation is limited to Elevate-owned internal keys through the protected GitHub workflow. Binding, rotation, rollback, and audit history require separate verified controls and are not enabled on this page.</p>
     </section>

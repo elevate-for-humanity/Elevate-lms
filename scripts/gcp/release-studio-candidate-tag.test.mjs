@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {releaseStudioCandidateTag} from './release-studio-candidate-tag.mjs';
 const revision='elevate-studio-browser-00045-wer',old='elevate-studio-browser-00039-yuv';
-function fixture({target=revision,percent=0,absent=false,drift=false}={}) {
+function fixture({target=revision,percent=0,absent=false,drift=false,courseQa=false,concurrentQa=false}={}) {
   let removed=false;const calls=[];
   const run=args=>{
     calls.push(args);
@@ -10,6 +10,7 @@ function fixture({target=revision,percent=0,absent=false,drift=false}={}) {
     return JSON.stringify({spec:{template:{storage:'preserved',identity:'unchanged'}},status:{latestCreatedRevisionName:revision,traffic:[
       {revisionName:old,percent:removed&&drift?90:100},
       ...(!removed&&!absent?[{revisionName:target,tag:'studio-verify',percent}]:[]),
+      ...(courseQa||(removed&&concurrentQa)?[{revisionName:revision,tag:'course-qa-approved',percent:0}]:[]),
     ]}});
   };
   return {run,calls};
@@ -31,4 +32,9 @@ test('protects production traffic and refuses a concurrently replaced candidate'
 test('invalid revision cannot enter Google arguments and traffic drift cannot pass readback',()=>{
   const f=fixture();assert.throws(()=>releaseStudioCandidateTag({revision:'--unsafe',run:f.run}));assert.equal(f.calls.length,0);
   assert.throws(()=>releaseStudioCandidateTag({revision,run:fixture({drift:true}).run}),/READBACK_REQUIRED/);
+});
+test('a candidate pinned for course QA cannot be treated as unused headroom',()=>{
+  const f=fixture({courseQa:true});assert.throws(()=>releaseStudioCandidateTag({revision,run:f.run}),/STILL_REFERENCED/);
+  assert.equal(f.calls.some(c=>c[2]==='update-traffic'),false);
+  assert.throws(()=>releaseStudioCandidateTag({revision,run:fixture({concurrentQa:true}).run}),/READBACK_REQUIRED/);
 });

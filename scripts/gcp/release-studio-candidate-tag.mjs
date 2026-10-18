@@ -16,12 +16,14 @@ export function releaseStudioCandidateTag({revision,run=google}={}) {
   const candidate=before.status?.traffic?.find(t=>t.tag===tag);
   if(!candidate)return {changed:false,revision,servingTrafficPreserved:true};
   if(candidate.revisionName!==revision||Number(candidate.percent??0)!==0)throw Error('STUDIO_CANDIDATE_TAG_CHANGED');
+  const hasOtherAlias=s=>s.status?.traffic?.some(t=>t.revisionName===revision&&t.tag&&t.tag!==tag);
+  if(hasOtherAlias(before))throw Error('STUDIO_CANDIDATE_STILL_REFERENCED');
   run(['run','services','update-traffic',service,'--project='+PROJECT,'--region=us-central1','--remove-tags='+tag,'--quiet']);
   const after=read();
   if(!isDeepStrictEqual(traffic,serving(after))||
     !isDeepStrictEqual(before.spec?.template,after.spec?.template)||
     before.status?.latestCreatedRevisionName!==after.status?.latestCreatedRevisionName||
-    after.status?.traffic?.some(t=>t.tag===tag))throw Error('STUDIO_CANDIDATE_CLEANUP_READBACK_REQUIRED');
+    after.status?.traffic?.some(t=>t.tag===tag)||hasOtherAlias(after))throw Error('STUDIO_CANDIDATE_CLEANUP_READBACK_REQUIRED');
   return {changed:true,revision,removedTag:tag,revisionRetained:true,servingTrafficPreserved:true};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){

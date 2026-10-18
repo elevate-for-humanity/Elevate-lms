@@ -136,7 +136,8 @@ export class UltimateBuildRunner {
             code,
             message: `${step} is missing required contract evidence: ${code}`,
           });
-        if (result.passed === false && !failures.length)
+        if (result.passed === false && !failures.length &&
+          !(nonblockingManualReview(ctx.profile) && findings.some(f => f.code === 'ULTIMATE_INSTRUCTIONAL_REVIEW_FAILED')))
           failures.push({
             step,
             severity: 'error',

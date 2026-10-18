@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'scripts/gcp/production-acceptance.*'
       - 'scripts/build-memory-policy.*'
       - 'scripts/check-build-memory-policy.mjs'
       - 'scripts/run-bounded-build.*'
@@ -182,6 +183,26 @@ jobs:
           set -euo pipefail
           export GOOGLE_ADMIN_URL="$(gcloud run services describe elevate-admin-migration --project=elegant-racer-299721 --region=us-central1 --format='value(status.url)')"
           node scripts/gcp/verify-admin-revision.mjs
+
+  acceptance:
+    needs: deploy-admin
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.deploy-admin.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Explicitly hand the verified Admin release to production acceptance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTANCE_COMPONENT: admin
+          ACCEPTANCE_SHA: ${{ github.sha }}
+          ACCEPTANCE_RUN_ID: ${{ github.run_id }}
+        run: |
+          node --test scripts/gcp/production-acceptance.test.mjs
+          node scripts/gcp/production-acceptance.mjs dispatch
 
 # Release readable voicemail emails with the verified current main revision.
 

@@ -2,6 +2,16 @@ name: Registered Apprenticeship E2E
 
 on:
   workflow_dispatch:
+    inputs:
+      deployed_sha:
+        description: Exact live commit from a completed deployment
+        type: string
+      deployment_run_id:
+        description: Source deployment run to verify before accepting its commit
+        type: string
+      component:
+        description: Deployed component whose public revision must match
+        type: string
   push:
     branches:
       - main
@@ -11,6 +21,8 @@ on:
       - 'tests/e2e/registered-apprenticeship-authenticated.spec.ts'
       - 'tests/e2e/portal-responsive-design.spec.ts'
       - 'tests/e2e/public-runtime-acceptance.spec.ts'
+      - 'scripts/gcp/production-acceptance.*'
+      - 'scripts/qa/require-portal-e2e-identities.*'
       - 'components/home/ScrollNarrator.tsx'
       - 'components/voice/useNaturalVoice.ts'
       - 'components/marketing/HeroVideo.tsx'
@@ -31,13 +43,14 @@ on:
 
 permissions:
   contents: read
+  actions: read
   issues: write
 
 # Keep source-regression QA and exact deployed-SHA certification independent.
 # Newer runs may supersede older runs of the same authority class, but a
 # test-only push must never cancel the workflow_run that certifies production.
 concurrency:
-  group: registered-apprenticeship-e2e-${{ github.event_name == 'workflow_run' && 'deployment' || 'source' }}
+  group: registered-apprenticeship-e2e-${{ (github.event_name == 'workflow_run' || inputs.deployment_run_id != '') && 'deployment' || 'source' }}
   cancel-in-progress: true
 
 jobs:
@@ -55,7 +68,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify explicit deployment handoff before checking out its tested commit
+        if: inputs.deployment_run_id != '' || inputs.deployed_sha != '' || inputs.component != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTANCE_COMPONENT: ${{ inputs.component }}
+          ACCEPTANCE_SHA: ${{ inputs.deployed_sha }}
+          ACCEPTANCE_RUN_ID: ${{ inputs.deployment_run_id }}
+        run: |
+          node --test scripts/gcp/production-acceptance.test.mjs
+          node scripts/gcp/production-acceptance.mjs verify
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.deployed_sha || (github.event_name == 'workflow_run' && github.event.workflow_run.head_sha) || github.sha }}
       - uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
@@ -137,7 +167,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           QA_STATUS: ${{ job.status }}
-          QA_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          QA_SHA: ${{ inputs.deployed_sha || (github.event_name == 'workflow_run' && github.event.workflow_run.head_sha) || github.sha }}
           QA_EVENT: ${{ github.event_name }}
           QA_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         shell: bash

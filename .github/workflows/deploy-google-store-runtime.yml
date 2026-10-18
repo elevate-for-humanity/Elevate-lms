@@ -3,6 +3,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'scripts/gcp/production-acceptance.*'
       [
         'scripts/build-memory-policy.*',
         'scripts/check-build-memory-policy.mjs',
@@ -211,3 +212,22 @@ jobs:
           console.log(JSON.stringify({publicStoreStatus:publicStore.status,service:publicBody.service,commit:publicBody.commit}));
           assert.equal(publicStore.status,200);assert.equal(publicBody.service,'store');assert.equal(publicBody.commit,process.env.GITHUB_SHA);
           NODE
+  acceptance:
+    needs: deploy
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.deploy.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Explicitly hand the verified Store release to production acceptance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTANCE_COMPONENT: store
+          ACCEPTANCE_SHA: ${{ github.sha }}
+          ACCEPTANCE_RUN_ID: ${{ github.run_id }}
+        run: |
+          node --test scripts/gcp/production-acceptance.test.mjs
+          node scripts/gcp/production-acceptance.mjs dispatch

@@ -1,6 +1,6 @@
 /**
  * Resolve GITHUB_TOKEN for Dev Studio GitHub API routes.
- * Canonical platform_secrets values are hydrated before process.env fallback.
+ * Verify deployment credentials before falling back to canonical platform secrets.
  */
 
 import { getDecryptedPlatformSecret } from '@/lib/secrets';
@@ -26,12 +26,7 @@ export async function ensureDevStudioSecrets(): Promise<void> {
   await getGitHubToken();
 }
 
-/**
- * Do not keep a second token cache here. lib/secrets already owns the runtime
- * cache and refreshSecrets() invalidates it after Studio rotations. A duplicate
- * cache made a newly-rotated GitHub token remain stale for up to five minutes.
- */
-/** Verify a credential against this exact repository before selecting it. */
+/** A present token can be expired or lack access to the requested repository. */
 async function acceptedByGitHub(token: string): Promise<boolean> {
   const response = await fetch(
     'https://api.github.com/repos/elevate-for-humanity/Elevate-lms/git/ref/heads/main',
@@ -41,6 +36,7 @@ async function acceptedByGitHub(token: string): Promise<boolean> {
         Accept: 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
       },
+      redirect: 'error',
       cache: 'no-store',
       signal: AbortSignal.timeout(8000),
     },
@@ -51,19 +47,23 @@ async function acceptedByGitHub(token: string): Promise<boolean> {
 }
 
 export async function getGitHubToken(): Promise<string | null> {
-  // A nonempty environment token is not necessarily accepted by GitHub.
-  // Do not overwrite a valid canonical secret with an expired deployment token.
-  const deployed = normalizeToken(process.env.GITHUB_TOKEN);
-  const canonical = normalizeToken(await getDecryptedPlatformSecret('GITHUB_TOKEN'));
-  const candidates = [...new Set([deployed, canonical].filter(
-    (value): value is string => Boolean(value),
-  ))];
-  if (!candidates.length) return null;
+  // Resolve lazily: an accepted deployment credential does not depend on the
+  // canonical store being available. Never copy a fallback into process.env;
+  // doing so shadows later secret rotations with a stale deployment value.
+  const deployedToken = normalizeToken(process.env.GITHUB_TOKEN);
+  if (deployedToken && await acceptedByGitHub(deployedToken)) return deployedToken;
 
-  for (const token of candidates) {
-    if (await acceptedByGitHub(token)) return token;
+  const fromCanonicalStore = normalizeToken(
+    await getDecryptedPlatformSecret('GITHUB_TOKEN'),
+  );
+  if (fromCanonicalStore && fromCanonicalStore !== deployedToken && await acceptedByGitHub(fromCanonicalStore)) {
+    return fromCanonicalStore;
   }
-  throw new Error('GITHUB_TOKEN_REJECTED: Both configured credential sources were rejected for Elevate-lms; reconnect an authorized credential in Dev Studio Secrets.');
+
+  if (deployedToken || fromCanonicalStore) {
+    throw new Error('GITHUB_TOKEN_REJECTED: Configured credentials were rejected for Elevate-lms. Reconnect an authorized credential in Dev Studio Secrets.');
+  }
+  return null;
 }
 
 export async function getGitHubHeaders(): Promise<HeadersInit> {

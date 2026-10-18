@@ -5,7 +5,7 @@ on:
     paths: ['infra/pbx/provisioner/**', 'scripts/gcp/*provisioner-reload*', 'scripts/gcp/probe-operator-provisioning.py', 'scripts/gcp/test-operator-provisioning.py', '.github/workflows/exercise-owned-pbx-device.yml']
   push:
     branches: [main]
-    paths: ['.github/workflows/exercise-owned-pbx-device.yml']
+    paths: ['.github/workflows/exercise-owned-pbx-device.yml', 'infra/pbx/provisioner/server.mjs', 'scripts/gcp/repair-pbx-provisioner-reload.py']
 permissions:
   actions: write
   contents: read

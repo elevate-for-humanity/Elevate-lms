@@ -224,9 +224,9 @@ export function createProvisioner(config, dependencies = {}) {
   }
 
   async function reloadAndVerify(next, removed = []) {
-    for (const operation of ['pjsip reload', 'dialplan reload']) {
+    for (const operation of ['module reload res_pjsip.so', 'dialplan reload']) {
       const output = await command(operation);
-      if (/no such command|unable to reload|failed to reload/i.test(output)) throw new ProvisioningError('asterisk_reload_failed');
+      if (/no such (?:command|module)|unable to reload|failed to reload|reported a reload failure|does not support reloads|not properly initialized/i.test(output)) throw new ProvisioningError('asterisk_reload_failed');
     }
     // Asterisk acknowledges the reload before its configuration workers finish.
     // Verify actual objects, with a bounded settling period for apply AND rollback.
@@ -436,9 +436,9 @@ async function main() {
     const container = process.env.PBX_ASTERISK_CONTAINER;
     if (!path.isAbsolute(root || '') || !/^[A-Za-z0-9_.-]+$/.test(container || '')) throw new Error('Invalid cleanup configuration');
     await rm(path.join(root, 'current'), { force: true });
-    for (const cmd of ['pjsip reload', 'dialplan reload']) {
+    for (const cmd of ['module reload res_pjsip.so', 'dialplan reload']) {
       const output = await defaultCommand(container, cmd);
-      if (/no such command|unable to reload|failed to reload/i.test(output)) throw new Error('Cleanup reload failed');
+      if (/no such (?:command|module)|unable to reload|failed to reload|reported a reload failure|does not support reloads|not properly initialized/i.test(output)) throw new Error('Cleanup reload failed');
     }
     const endpoints = await defaultCommand(container, 'pjsip show endpoints');
     if (/Endpoint:\s+pwa-[0-9a-f]{40}/.test(endpoints)) throw new Error('Cleanup endpoint removal unverified');

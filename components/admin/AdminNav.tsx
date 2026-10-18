@@ -210,22 +210,31 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
           </div>
         </div>
 
-        <nav aria-label="Admin sections" className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain border-t border-slate-200 bg-slate-950 px-2 py-1 [scrollbar-width:thin]">
-          {NAV.map((item) => (
-            <button type="button" key={item.label} onClick={() => setSelectedSection(item.label)}
-              aria-pressed={section?.label === item.label}
-              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg px-3 text-sm font-bold ${section?.label === item.label ? 'bg-brand-red-600 text-white' : 'text-slate-100 hover:bg-slate-800'}`}>
-              {item.label}
-            </button>
-          ))}
-        </nav>
-        <nav aria-label="Admin pages" className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain border-t border-slate-200 bg-white px-2 py-1 [scrollbar-width:thin]">
-          {section?.items.map((item) => (
-            <Link key={item.href} href={item.href} aria-current={isActive(pathname, item.href) ? 'page' : undefined}
-              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg px-3 text-sm font-semibold ${isActive(pathname, item.href) ? 'bg-blue-700 text-white' : 'text-slate-800 hover:bg-blue-50'}`}>
-              {item.label}
-            </Link>
-          ))}
+        <nav aria-label="Admin workspace" className="grid min-w-0 grid-cols-2 gap-2 border-t border-slate-200 bg-slate-50 px-2 py-2 sm:flex sm:items-center sm:px-4 lg:px-6">
+          <label className="min-w-0 sm:w-48">
+            <span className="sr-only">Admin section</span>
+            <select
+              aria-label="Admin section"
+              value={section?.label ?? ''}
+              onChange={(event) => setSelectedSection(event.target.value)}
+              className="min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-900"
+            >
+              {NAV.map((item) => <option key={item.label} value={item.label}>{item.label}</option>)}
+            </select>
+          </label>
+          <label className="min-w-0 sm:w-80">
+            <span className="sr-only">Admin page</span>
+            <select
+              aria-label="Admin page"
+              value={section?.items.find((item) => item.href === pathname)?.href
+                ?? section?.items.find((item) => isActive(pathname, item.href))?.href ?? ''}
+              onChange={(event) => { if (event.target.value) router.push(event.target.value); }}
+              className="min-h-11 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-900"
+            >
+              <option value="" disabled>Choose a page</option>
+              {section?.items.map((item) => <option key={item.href} value={item.href}>{item.label}</option>)}
+            </select>
+          </label>
         </nav>
       </header>
 

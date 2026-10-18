@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 const website = 'https://www.elevateforhumanity.org/';
 
 test('public startup stays visible without reloads, client exceptions or competing narration', async ({ page }, testInfo) => {
-  test.setTimeout(45_000);
+  test.setTimeout(60_000);
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   let navigations = 0;
@@ -45,10 +45,23 @@ test('public startup stays visible without reloads, client exceptions or competi
     }));
     await page.waitForTimeout(500);
   }
-  await testInfo.attach('public-startup-evidence', { body: JSON.stringify({ headingVisibleMs, navigations, samples, errors }), contentType: 'application/json' });
+  // Zero playing voices is not proof of working narration. Explicitly start
+  // the real page guide, then scroll while its audio is active.
+  await page.getByRole('button', { name: 'Stop page narration', exact: true }).click();
+  await page.getByRole('button', { name: 'Play narration for this section', exact: true }).click();
+  const audibleCount = () => page.evaluate(() => (window as typeof window & { __elevateAudibleCount: () => number }).__elevateAudibleCount());
+  await expect.poll(audibleCount, { timeout: 15_000, message: 'Real page narration must become audible after the visitor starts it' }).toBe(1);
+  await page.locator('main [data-scroll-narration]').nth(1).scrollIntoViewIfNeeded();
+  const scrollingAudioCounts: number[] = [];
+  for (let sample = 0; sample < 8; sample += 1) {
+    scrollingAudioCounts.push(await audibleCount());
+    await page.waitForTimeout(500);
+  }
+  await testInfo.attach('public-startup-evidence', { body: JSON.stringify({ headingVisibleMs, navigations, samples, scrollingAudioCounts, errors }), contentType: 'application/json' });
   expect(errors).toEqual([]);
   expect(navigations, 'No spontaneous full-page reload during startup').toBe(baseline);
   expect(samples.every(sample => sample.visible && !sample.overflow && sample.audible <= 1)).toBe(true);
+  expect(scrollingAudioCounts.every(count => count <= 1)).toBe(true);
 });
 
 test('public narration survives blocked browser storage and remains controllable', async ({ page }) => {

@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No runnable build job was saved' }, { status: 409 });
     if (
       job.status === 'running' &&
+      Boolean(job.lease_owner) &&
       Date.parse(job.lease_expires_at ?? '') > Date.now() &&
       Date.now() - Date.parse(job.heartbeat_at ?? '') >= 0 &&
       Date.now() - Date.parse(job.heartbeat_at ?? '') < 90000

@@ -46,9 +46,16 @@ it('Resume clears an explicit pause while preserving a freshly leased worker ins
  const update=vi.fn();
  const q={select:()=>q,eq:()=>q,in:()=>q,update:(v:unknown)=>{update(v);return q;},single:async()=>({data:{id,status:'running',profile:{ownerPaused:true,competencies:[{id:'saved'}]}},error:null}),then:(resolve:(v:unknown)=>unknown)=>resolve({data:[{id}],error:null})};
  mocks.db.mockResolvedValue({from:()=>q});
- mocks.enqueue.mockResolvedValue({id,status:'running',lease_expires_at:new Date(Date.now()+300000).toISOString(),heartbeat_at:new Date().toISOString()});
+ mocks.enqueue.mockResolvedValue({id,status:'running',lease_owner:'assigned-worker',lease_expires_at:new Date(Date.now()+300000).toISOString(),heartbeat_at:new Date().toISOString()});
  const response=await run(request({buildId:id}));expect(response.status).toBe(200);
  expect(await response.json()).toMatchObject({alreadyRunning:true,executionVerified:true});
  expect(update).toHaveBeenCalledWith(expect.objectContaining({profile:expect.objectContaining({ownerPaused:false,pauseResumeAudit:expect.objectContaining({resumedBy:'admin'})})}));
  expect(mocks.enqueue).toHaveBeenCalledTimes(1);
+});
+it('does not certify execution from an ownerless lease even when its heartbeat is fresh',async()=>{
+ const q={select:()=>q,eq:()=>q,in:()=>q,single:async()=>({data:{id,status:'running',profile:{ownerPaused:false}},error:null})};
+ mocks.db.mockResolvedValue({from:()=>q});
+ mocks.enqueue.mockResolvedValue({id,status:'running',lease_owner:null,lease_expires_at:new Date(Date.now()+300000).toISOString(),heartbeat_at:new Date().toISOString()});
+ const response=await run(request({buildId:id}));expect(response.status).toBe(409);
+ expect(await response.json()).not.toHaveProperty('executionVerified');
 });

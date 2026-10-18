@@ -45,6 +45,16 @@ jobs:
         with:
           skip_install: true
       - run: node scripts/gcp/verify-sdk.mjs
+      - name: Read current deployment identity permission to repair job access
+        run: |
+          node --input-type=module <<'NODE'
+          import {google} from './scripts/gcp/runtime-config.mjs';
+          const token=google(['auth','print-access-token']).trim();
+          const response=await fetch('https://cloudresourcemanager.googleapis.com/v1/projects/elegant-racer-299721:testIamPermissions',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({permissions:['resourcemanager.projects.setIamPolicy']})});
+          if(!response.ok)throw Error('IAM_PERMISSION_READ_HTTP_'+response.status);
+          const result=await response.json();
+          console.log(JSON.stringify({existingIdentityCanRepairProjectIam:result.permissions?.includes('resourcemanager.projects.setIamPolicy')===true}));
+          NODE
       - name: Read Admin worker launch failure codes without secrets
         run: |
           node --input-type=module <<'NODE'

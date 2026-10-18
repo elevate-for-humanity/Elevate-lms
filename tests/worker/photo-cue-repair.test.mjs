@@ -23,7 +23,7 @@ test('successful provider preserves successful cue',async()=>{
  const result=await recoverTeachingPhoto({...request,generate:async()=>({bytes:Buffer.from('saved')})});assert.equal(result.bytes.toString(),'saved');
 });
 test('explicit provider safety block is retained',async()=>{
- await assert.rejects(recoverTeachingPhoto({...request,generate:async()=>{throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true}});},selectedReplacement:async()=>{throw Error('must not bypass');}}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED/);
+ await assert.rejects(recoverTeachingPhoto({...request,generate:async()=>{throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true}});}}),/TEACHING_PHOTO_REPLACEMENT_REQUIRED/);
 });
 
 test('conceptual knowledge-check can recover without exact photograph',async()=>{
@@ -33,4 +33,10 @@ test('conceptual knowledge-check can recover without exact photograph',async()=>
  assert.equal(card.mimeType,'image/png');assert.ok(card.bytes.length>100);
  const recovered=await recoverTeachingPhoto({...request,scene,generate:async()=>{throw Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED');},selectedReplacement:async()=>card});
  assert.equal(recovered.repair.method,'lesson-conceptual-card-v1');
+});
+
+test('blocked generation uses an existing selected asset once and retains the provider finding',async()=>{
+ let calls=0;const findings=[];
+ const result=await recoverTeachingPhoto({...request,generate:async()=>{calls++;throw Object.assign(Error('GOOGLE_TEACHING_PHOTO_MISSING_OR_FILTERED'),{details:{blocked:true}});},persistFailure:async finding=>findings.push(finding),selectedReplacement:async()=>({bytes:Buffer.from('licensed selected image'),selectedSourceAssetId:'existing-source'})});
+ assert.equal(calls,1);assert.equal(result.repair.sourceAssetId,'existing-source');assert.equal(findings[0].provider.blocked,true);
 });

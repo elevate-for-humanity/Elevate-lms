@@ -1,6 +1,7 @@
 import {approvedReferencePhotoPicker} from './approved-reference-photos.mjs';
 import {courseSelectedStill} from './selected-course-stills.mjs';
 import {recoverTeachingPhoto} from './photo-repair.mjs';
+import {conceptualTeachingCard} from './conceptual-teaching-card.mjs';
 import {reportCourseProgress,courseProgressSignal} from '../worker/progress-watch.mjs';
 import { selectReviewedTeachingPhoto } from './reviewed-photo-selection.mjs';
 import { compatibleVisualTask } from '../instructional/reviewed-scene-evidence';

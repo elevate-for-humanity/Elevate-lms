@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { observeDocumentStability } from './helpers/document-stability';
 
 const website = 'https://www.elevateforhumanity.org/';
 
@@ -8,6 +9,7 @@ test('public startup stays visible without reloads, client exceptions or competi
   page.on('pageerror', error => errors.push(error.message));
   let navigations = 0;
   page.on('framenavigated', frame => { if (frame === page.mainFrame()) navigations += 1; });
+  const documentState = observeDocumentStability(page);
   await page.addInitScript(() => {
     // Observe real playback, including detached Audio objects. Do not replace
     // native play results or conceal autoplay/network failures.
@@ -27,7 +29,7 @@ test('public startup stays visible without reloads, client exceptions or competi
   const hero = page.locator('main h1').first();
   await expect(hero).toBeVisible({ timeout: 15_000 });
   const headingVisibleMs = Date.now() - started;
-  const baseline = navigations;
+  const baselineDocument = await documentState();
   const samples: Array<{ visible: boolean; audible: number; overflow: boolean }> = [];
   // A stability window is intentional: a single screenshot misses hydration
   // flashes, controller reload loops, and delayed competing audio requests.
@@ -57,9 +59,13 @@ test('public startup stays visible without reloads, client exceptions or competi
     scrollingAudioCounts.push(await audibleCount());
     await page.waitForTimeout(500);
   }
-  await testInfo.attach('public-startup-evidence', { body: JSON.stringify({ headingVisibleMs, navigations, samples, scrollingAudioCounts, errors }), contentType: 'application/json' });
+  const finalDocument = await documentState();
+  await testInfo.attach('public-startup-evidence', { body: JSON.stringify({ headingVisibleMs, navigations, baselineDocument, finalDocument, samples, scrollingAudioCounts, errors }), contentType: 'application/json' });
   expect(errors).toEqual([]);
-  expect(navigations, 'No spontaneous full-page reload during startup').toBe(baseline);
+  // framenavigated also fires for history.replaceState (including Next's
+  // initial history reconciliation). A reload must preserve neither the
+  // document-request history nor the document's performance time origin.
+  expect(finalDocument, 'No spontaneous document navigation or reload during startup').toEqual(baselineDocument);
   expect(samples.every(sample => sample.visible && !sample.overflow && sample.audible <= 1)).toBe(true);
   expect(scrollingAudioCounts.every(count => count <= 1)).toBe(true);
 });

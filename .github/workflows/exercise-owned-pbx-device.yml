@@ -1,8 +1,8 @@
-name: Exercise approved operator device creation
+name: Repair and exercise approved operator device creation
 on:
   workflow_dispatch:
   pull_request:
-    paths: ['scripts/gcp/probe-operator-provisioning.py', 'scripts/gcp/test-operator-provisioning.py', '.github/workflows/exercise-owned-pbx-device.yml']
+    paths: ['infra/pbx/provisioner/**', 'scripts/gcp/*provisioner-reload*', 'scripts/gcp/probe-operator-provisioning.py', 'scripts/gcp/test-operator-provisioning.py', '.github/workflows/exercise-owned-pbx-device.yml']
   push:
     branches: [main]
     paths: ['.github/workflows/exercise-owned-pbx-device.yml']
@@ -20,6 +20,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test infra/pbx/provisioner/server.test.mjs
+      - run: python3 scripts/gcp/test-provisioner-reload-repair.py
       - run: python3 scripts/gcp/test-operator-provisioning.py
   dispatch:
     if: github.event_name == 'push'
@@ -54,6 +58,37 @@ jobs:
           VM=elevate-pbx
           test "$(gcloud compute instances describe "$VM" --project="$PROJECT" --zone="$ZONE" --format='value(status)')" = RUNNING
           test "$(gcloud compute instances describe "$VM" --project="$PROJECT" --zone="$ZONE" --format='value(networkInterfaces[0].accessConfigs[0].natIP)')" = 107.178.216.162
+      - name: Inspect actual serving application bindings without printing values
+        run: |
+          node --input-type=module <<'NODE'
+          import {google,PROJECT} from './scripts/gcp/runtime-config.mjs';
+          const keys={lms:['PBX_CONTROL_URL','PBX_PROVISIONING_TOKEN','PBX_TURN_URLS','PBX_TURN_SHARED_SECRET'],admin:['PBX_PROVISIONING_TOKEN','PBX_PHONE_SYSTEM_ID']};
+          const read=args=>JSON.parse(google([...args,'--project',PROJECT,'--region','us-central1','--format=json']));
+          for(const component of ['admin','lms']){
+            const service=read(['run','services','describe','elevate-'+component+'-migration']);
+            const names=[...new Set((service.status?.traffic||[]).filter(t=>t.percent>0).map(t=>t.revisionName))];
+            if(!names.length)throw Error('Serving application revision unavailable');
+            for(const name of names){
+              const revision=read(['run','revisions','describe',name]);
+              const env=new Map((revision.spec?.containers?.[0]?.env||[]).map(e=>[e.name,e]));
+              const present=Object.fromEntries(keys[component].map(key=>[key,Boolean(env.get(key)?.value||env.get(key)?.valueFrom?.secretKeyRef)]));
+              console.log(JSON.stringify({servingPhoneBindings:{component,revision:name,googleProvider:env.get('ELEVATE_RUNTIME_CONFIG_PROVIDER')?.value==='google-secret-manager',present}}));
+            }
+          }
+          NODE
+      - name: Upgrade only the idle provisioner with local rollback
+        run: |
+          set -euo pipefail
+          node --test infra/pbx/provisioner/server.test.mjs
+          python3 scripts/gcp/test-provisioner-reload-repair.py
+          gcloud compute scp infra/pbx/provisioner/server.mjs "elevate-pbx:/tmp/elevate-provisioner-$GITHUB_SHA.mjs" --project=elegant-racer-299721 --zone=us-central1-a --quiet
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
+            --command="sudo python3 - /tmp/elevate-provisioner-$GITHUB_SHA.mjs $GITHUB_SHA" < scripts/gcp/repair-pbx-provisioner-reload.py
+      - name: Verify authenticated provisioning recovered before creating a device
+        run: |
+          set -euo pipefail
+          gcloud compute ssh elevate-pbx --project=elegant-racer-299721 --zone=us-central1-a --quiet \
+            --command='sudo python3 -' < scripts/gcp/probe-operator-provisioning.py
       - name: Create and revoke one temporary device for the approved operator
         run: |
           set -euo pipefail

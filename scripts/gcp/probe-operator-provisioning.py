@@ -58,12 +58,16 @@ def exercise(body, token, send=request, run=subprocess.run):
         output['create'] = summarize(status, result)
         # Never print or save the SIP password returned by a successful create.
         result = None
+    except Exception:
+        output['create'] = {'httpStatus': 0, 'code': 'transport_unavailable'}
     finally:
         # Revoke even after a timeout: the server may have applied the request.
-        status, result = send(origin + '/revoke', headers, body)
-        output['cleanup'] = {'httpStatus': status, 'revoked': status == 200 and result.get('revoked') is True}
-        if not output['cleanup']['revoked']:
-            raise ValueError('temporary_device_cleanup_unverified')
+        try:
+            status, result = send(origin + '/revoke', headers, body)
+            output['cleanup'] = summarize(status, result)
+            output['cleanup']['revoked'] = status == 200 and result.get('revoked') is True
+        except Exception:
+            output['cleanup'] = {'httpStatus': 0, 'code': 'transport_unavailable', 'revoked': False}
     return output
 
 def main():
@@ -108,11 +112,19 @@ def main():
         except Exception:
             output[name] = {'code': 'transport_unavailable'}
     report = {'operatorProvisioningProbe': output, 'credentialsCreated': False, 'carrierRoutingChanged': False}
+    if not all(value.get('providerVerified') is True for value in output.values()):
+        report['result'] = 'FAIL'
+        return report
     if '--exercise' in sys.argv:
+        base = Path('/opt/elevate-pbx/repo/infra/pbx/asterisk')
+        report['mainFileIncludeReferences'] = {name: ('elevate-webrtc/current/' + name) in (base / name).read_text() for name in ['pjsip.conf', 'extensions.conf']}
+        print(json.dumps({'operatorPreflight': report}), flush=True)
         report['operatorDeviceExercise'] = exercise(body, token)
-        report['credentialsCreated'] = report['operatorDeviceExercise']['create']['httpStatus'] == 200
-        report['temporaryCredentialsRevoked'] = True
-        if report['operatorDeviceExercise']['create']['httpStatus'] != 200:
+        report['credentialsCreated'] = ('UNKNOWN' if report['operatorDeviceExercise']['create']['httpStatus'] == 0
+                                        else report['operatorDeviceExercise']['create']['httpStatus'] == 200)
+        report['temporaryCredentialsRevoked'] = report['operatorDeviceExercise']['cleanup']['revoked']
+        if (report['operatorDeviceExercise']['create'].get('providerVerified') is not True or
+                not report['temporaryCredentialsRevoked']):
             report['result'] = 'FAIL'
         else:
             report['result'] = 'PASS'
@@ -124,6 +136,8 @@ if __name__ == '__main__':
         print(json.dumps(report))
         if report.get('result') == 'FAIL':
             raise SystemExit(1)
-    except Exception:
-        print(json.dumps({'operatorProvisioningProbe': {'code': 'probe_unavailable'}, 'credentialsCreated': 'UNKNOWN' if '--exercise' in sys.argv else False, 'cleanupVerified': False, 'carrierRoutingChanged': False}))
+    except Exception as error:
+        known = {'database_scope_unverified', 'phone_system_scope_unverified', 'secret_reference_unverified', 'secret_access_unavailable', 'credential_reference_unverified', 'operator_assignment_unverified', 'approved_operator_changed', 'active_call_or_unverified_state'}
+        code = str(error) if isinstance(error, ValueError) and str(error) in known else 'probe_unavailable'
+        print(json.dumps({'operatorProvisioningProbe': {'code': code}, 'credentialsCreated': 'UNKNOWN' if '--exercise' in sys.argv else False, 'cleanupVerified': False, 'carrierRoutingChanged': False}))
         raise SystemExit(1)

@@ -28,15 +28,18 @@ class ExerciseTests(unittest.TestCase):
         self.assertTrue(self.calls[-1].endswith('/revoke'))
 
     def test_cleanup_after_timeout_and_failed_creation(self):
-        with self.assertRaises(TimeoutError):
-            self.exercise([TimeoutError(), (200, {'revoked': True})])
+        result = self.exercise([TimeoutError('DO_NOT_PRINT'), (200, {'revoked': True})])
+        self.assertEqual(result['create']['code'], 'transport_unavailable')
+        self.assertNotIn('DO_NOT_PRINT', str(result))
         self.assertTrue(self.calls[-1].endswith('/revoke'))
         result = self.exercise([(503, {'error': 'asterisk_configuration_rejected'}), (200, {'revoked': True})])
         self.assertEqual(result['create']['code'], 'asterisk_configuration_rejected')
 
     def test_cleanup_failure_blocks_acceptance(self):
-        with self.assertRaisesRegex(ValueError, 'cleanup_unverified'):
-            self.exercise([(200, {'provider': 'asterisk'}), (503, {})])
+        result = self.exercise([(503, {'error': 'asterisk_rollback_failed'}), (503, {'error': 'provisioner_unavailable'})])
+        self.assertEqual(result['create']['code'], 'asterisk_rollback_failed')
+        self.assertEqual(result['cleanup']['code'], 'provisioner_unavailable')
+        self.assertFalse(result['cleanup']['revoked'])
 
     def test_active_calls_block_before_creation(self):
         with self.assertRaisesRegex(ValueError, 'active_call'):

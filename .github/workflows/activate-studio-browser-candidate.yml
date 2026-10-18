@@ -18,6 +18,7 @@ jobs:
     timeout-minutes: 15
     concurrency:
       group: google-runtime-us-central1
+      queue: max
       cancel-in-progress: false
     env:
       STUDIO_CANDIDATE_REVISION: elevate-studio-browser-00045-wer

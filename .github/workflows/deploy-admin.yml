@@ -92,6 +92,7 @@ jobs:
         run: |
           node --test lib/devstudio/main-release.test.mjs scripts/test-studio-browser-configuration.mjs scripts/test-phone-sending-number.mjs
           node --test scripts/test-public-revision-activation.mjs
+          node --test scripts/gcp/shared-runtime-concurrency.test.mjs
           node scripts/audit-course-builder-procurement.mjs
       - name: Reject superseded deployment requests before building
         env:

@@ -7,7 +7,7 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
   const root='https://cuxzzpsyufcewtmicszk.supabase.co/rest/v1/ultimate_build_jobs';
   const headers={apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY};
   const url=new URL(root);
-  url.searchParams.set('select','id,build_id,status,attempts,max_attempts,heartbeat_at,lease_expires_at,execution_generation,last_error,monitor,ultimate_course_builds(status,ownerPaused:profile->ownerPaused)');
+  url.searchParams.set('select','id,build_id,status,attempts,max_attempts,heartbeat_at,lease_owner,lease_expires_at,execution_generation,last_error,monitor,ultimate_course_builds(status,ownerPaused:profile->ownerPaused)');
   url.searchParams.set('monitor->>enabled','eq.true');
   url.searchParams.set('order','updated_at.desc');url.searchParams.set('limit','100');
   const response=await request(url,{headers,signal:AbortSignal.timeout(15000)});

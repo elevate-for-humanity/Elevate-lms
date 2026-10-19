@@ -258,13 +258,16 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
     .filter(Boolean)
     .join('\n\n');
   return {
-    title: String(board.title ?? input.courseTitle ?? input.lessonId ?? 'Lesson'),
+    title: String(input.lessonTitle ?? board.title ?? input.courseTitle ?? input.lessonId ?? 'Lesson'),
     objective: String(board.objective ?? scenes[0]?.action ?? input.courseTitle ?? 'Lesson'),
     script,
     defaultDurationSeconds: 8,
     requiredSceneCount: 13,
     sceneData: {
       ...board,
+      // The canonical competency title is authoritative; a restored storyboard
+      // can carry the previous lesson's stale heading.
+      title: String(input.lessonTitle ?? board.title ?? input.courseTitle ?? input.lessonId ?? 'Lesson'),
       version: '1.0',
       width: Number(board.width ?? 1920),
       height: Number(board.height ?? 1080),

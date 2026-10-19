@@ -161,6 +161,15 @@ export class UltimateBuildRunner {
         // A failed repair candidate must not replace a known-good artifact or
         // create a new accepted artifact version. Keep the previous checkpoint
         // available for recovery and record the failed state separately.
+        // Do not spend another render on a producer that returned the same
+        // defective evidence. Preserve the prior certified artifact, and surface
+        // a genuine repair blocker for PARIS rather than marking it corrected.
+        // Media QA itself is an inspector, not a producer.
+        if (producerRepair && failures.length === 0 &&
+            ['synchronization', 'visual_assignment', 'scene_construction', 'natural_narration'].includes(step) &&
+            contractHash(artifacts) === contractHash(previous)) {
+          throw new Error('REPAIR_PRODUCER_UNCHANGED:' + step);
+        }
         if (producerRepair && failures.length) {
           artifacts = previous;
           ctx.artifacts[step] = previous;

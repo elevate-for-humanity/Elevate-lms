@@ -24,7 +24,6 @@ export function ApprenticeWorkForms({apprentices}:{apprentices:Apprentice[]}) {
     } catch(error){setFeedback(error instanceof Error?error.message:'Unable to save.');}
     finally{setBusy(false);}
   }
-  const studentSelect=<></>;
   const options=apprentices.map(student=><option key={student.id} value={student.id}>{student.name||'Assigned apprentice'}</option>);
   return <section className="mt-6 space-y-4">
     <h2 className="text-xl font-black">Student work schedule and hours</h2>

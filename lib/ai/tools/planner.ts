@@ -360,6 +360,23 @@ export function planAIToolFromCommand(
       ...(typeof context.buildId === 'string'?{buildId:context.buildId}:{})}};
   }
 
+  // A read-only Course Builder investigation must never enqueue production work,
+  // even when a quoted error or historical action contains repair verbs.
+  // Preserve the explicit tool override above for trusted internal callers.
+  if (
+    /\b(read[- ]?only|do not (?:start|resume|create|generate|publish|modify|change|repair)|without (?:starting|resuming|modifying))\b/.test(lower) &&
+    /\b(course|lesson|course builder|build|worker|checkpoint)\b/.test(lower) &&
+    /\b(audit|inspect|check|status|health|review|report|verify)\b/.test(lower)
+  ) {
+    return {
+      name: 'courses.status',
+      input: {
+        ...(typeof context.courseId === 'string' ? { courseId: context.courseId } : {}),
+        ...(typeof context.buildId === 'string' ? { buildId: context.buildId } : {}),
+      },
+    };
+  }
+
   // Existing course media repair is Course Builder work. Route it before the
   // generic engineering/browser rules so words such as "repair", "endpoint",
   // or "dashboard" cannot accidentally dispatch an unauthorized OpenHands job.

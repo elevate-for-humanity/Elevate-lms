@@ -158,7 +158,17 @@ async function searchCode(query: string) {
   );
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(`GitHub code search failed: ${String(payload?.message ?? response.status)}`);
+    // Search has an independent GitHub rate limit. Let the repair planner
+    // continue with known-file reads instead of consuming another inference
+    // turn retrying an unavailable search endpoint.
+    if (response.status === 403 || response.status === 429) {
+      const remaining = response.headers.get('x-ratelimit-remaining');
+      const message = String(payload?.message ?? '').toLowerCase();
+      if (response.status === 429 || remaining === '0' || message.includes('rate limit') || message.includes('try again')) {
+        return [];
+      }
+    }
+    throw new Error(`GitHub code search failed: ${response.status}`);
   }
   return (Array.isArray(payload.items) ? payload.items : []).map((item: any) => ({
     path: item.path,

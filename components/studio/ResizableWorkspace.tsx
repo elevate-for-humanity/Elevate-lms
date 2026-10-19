@@ -84,9 +84,18 @@ export function ResizableWorkspace({
   useEffect(() => {
     const element = root.current;
     if (!open || !expanded || mobileFull || !element || typeof element.showPopover !== "function") return;
-    element.showPopover();
+    try {
+      if (!element.matches(":popover-open")) element.showPopover();
+    } catch {
+      // Browsers without stable popover support retain the in-layout expanded panel.
+      return;
+    }
     return () => {
-      if (element.matches(":popover-open")) element.hidePopover();
+      try {
+        if (element.matches(":popover-open")) element.hidePopover();
+      } catch {
+        // The node may already have unmounted during navigation.
+      }
     };
   }, [open, expanded, mobileFull]);
 

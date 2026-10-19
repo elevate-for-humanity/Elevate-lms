@@ -134,7 +134,7 @@ export function PricingTiers({
 
             <div className="text-center mb-6">
               {tier.price === 0 ? (
-                <div className="text-3xl font-bold text-brand-green-600">FREE</div>
+                <div className="text-2xl font-bold text-slate-700">Contact admissions</div>
               ) : (
                 <div>
                   <span className="text-3xl font-bold text-slate-900">

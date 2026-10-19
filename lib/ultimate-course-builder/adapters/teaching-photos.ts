@@ -9,6 +9,20 @@ import { createHash } from 'node:crypto';
 import { generateTeachingPhoto } from './google-teaching-photo.mjs';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+const MANUAL_COSMETOLOGY_COURSE_ID = 'a6b0b712-1cf0-475a-ba79-ee2023dea8ec';
+function escapeSvg(value: unknown): string {
+  return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+}
+/** A clearly identified teaching diagram, not an invented photograph or skill demonstration. */
+async function manualCosmetologyDiagram(scene: any, step: any, index: number) {
+  const { default: sharp } = await import('sharp');
+  const title = escapeSvg(String(scene.title ?? scene.stage ?? 'Cosmetology').slice(0,75));
+  const lines = String(step.narrationQuote ?? step.value ?? '').match(/.{1,52}(?:\\s|$)/g)?.slice(0,6) ?? [];
+  const text = lines.map((line,i)=>'<text x="90" y="'+(275+i*68)+'" fill="#e8f3ff" font-size="38" font-family="sans-serif">'+escapeSvg(line.trim())+'</text>').join('');
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720"><rect width="1280" height="720" fill="#102538"/><rect x="40" y="38" width="1200" height="644" rx="30" fill="#183e56"/><text x="90" y="125" fill="#a6e4f4" font-size="27" font-family="sans-serif">ILLUSTRATED TRAINING SLIDE · '+(index+1)+'</text><text x="90" y="195" fill="#ffffff" font-size="47" font-family="sans-serif">'+title+'</text>'+text+'</svg>';
+  return {bytes:await sharp(Buffer.from(svg)).png().toBuffer(),mimeType:'image/png',selectedSourceAssetId:'generated-training-diagram:'+scene.id+':'+index};
+}
+
 /** Private, reusable photographs tied to exact spoken teaching points.
  * These are illustrations, never evidence of a performed practical skill. */
 export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
@@ -16,8 +30,8 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
   const scenes = input.artifacts?.storyboard?.storyboard?.scenes;
   if (!Array.isArray(scenes)) throw new Error('TEACHING_PHOTO_STORYBOARD_REQUIRED');
   const photos: Record<string, any[]> = {};
-  const approvedReference=await approvedReferencePhotoPicker(input,db);
-  const {data:placedPhotos,error:placementError}=approvedReference?{data:[],error:null}:await db.from('media_assets').select('id,storage_path,metadata').eq('lesson_id',input.lessonId).eq('asset_type','image').eq('storage_bucket','course_videos').eq('status','active');
+  const approvedReference=input.courseId===MANUAL_COSMETOLOGY_COURSE_ID ? null : await approvedReferencePhotoPicker(input,db);
+  const {data:placedPhotos,error:placementError}=await db.from('media_assets').select('id,storage_path,metadata').eq('lesson_id',input.lessonId).eq('asset_type','image').eq('storage_bucket','course_videos').eq('status','active');
   if(placementError) throw placementError;
 
   for (const scene of scenes) {
@@ -33,10 +47,17 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
     for (const [index, step] of requests.entries()) {
       courseProgressSignal()?.throwIfAborted();
       if(approvedReference){
-        const photo=await approvedReference(scene,index,step,index===requests.length-1);
-        photos[scene.id].push({...photo,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1});
-        reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
-        continue;
+        try {
+          const photo=await approvedReference(scene,index,step,index===requests.length-1);
+          photos[scene.id].push({...photo,stepIndex:Math.min(index,steps.length-1),isRecap:index===requests.length-1});
+          reportCourseProgress('teaching-photos:'+scene.id,index+1,requests.length);
+          continue;
+        } catch(error) {
+          // A previous approved lesson may not contain the current scene or
+          // picture cue. Reuse an eligible saved/selected/licensed asset instead.
+          // Storage hashes, auth, provenance and licensing failures still fail.
+          if(!/^OWNER_REFERENCE_(?:STAGE|PICTURE)_REQUIRED$/.test(String((error as Error)?.message))) throw error;
+        }
       }
       const placed=placedPhotos?.find((p:any)=>p.metadata?.source==='openai-generated-illustration' && p.metadata?.reviewedIllustration===true && p.metadata?.sceneId===scene.id && p.metadata?.cueIndex===index && p.metadata?.narrationQuote===step.narrationQuote && /^[a-f0-9]{64}$/i.test(p.metadata?.sha256??'') && String(p.storage_path).startsWith('approved-teaching-photos/'));
       if(placed){
@@ -92,7 +113,13 @@ export async function prepareTeachingPhotos(input: any, db: SupabaseClient) {
       }
       let repairProof:any;
       if (!file) {
-        const generated = await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,selectedReplacement:async()=>conceptualTeachingCard({scene,step,courseTitle:input.courseTitle,index}),persistFailure:async(detail:any)=>{
+        // Owner-approved manual course: avoid six slow provider attempts for
+        // conceptual scenes. Prefer cached/placed/selected/licensed visuals above;
+        // generate a readable teaching card immediately when no asset fits.
+        const quickCard = input.courseId === MANUAL_COSMETOLOGY_COURSE_ID
+          ? await conceptualTeachingCard({scene,step,courseTitle:input.courseTitle,index})
+          : null;
+        const generated = quickCard ?? await recoverTeachingPhoto({primaryPrompt:prompt,courseTitle:input.courseTitle,scene,step,index,generate:generateTeachingPhoto,selectedReplacement:input.courseId===MANUAL_COSMETOLOGY_COURSE_ID ? async()=>manualCosmetologyDiagram(scene,step,index) : null,persistFailure:async(detail:any)=>{
           const diagnosticPath='approved-teaching-photo-diagnostics/'+input.lessonId+'/'+requestHash+'.json';
           const {error}=await db.storage.from('course_videos').upload(diagnosticPath,Buffer.from(JSON.stringify({...detail,at:new Date().toISOString()})),{contentType:'application/json',upsert:true});
           if(error)throw Error('TEACHING_PHOTO_DIAGNOSTIC_SAVE_FAILED:'+scene.id);

@@ -43,8 +43,16 @@ test('reads only the VM reference and metadata, never a secret payload',async()=
   const calls=[];
   const version=await pinnedControlVersion((args,code)=>{
     calls.push(args);
-    if(code){
-      const compiled=spawnSync('python3',['-c',"import sys; compile(sys.stdin.read(), '<probe>', 'exec')"],{input:code,encoding:'utf8'});
+    if(args[0]==='compute'){
+      assert.equal(code,undefined,'SSH must not require stdin');
+      const index=args.indexOf('--command');
+      assert.ok(index>=0);
+      const command=args[index+1];
+      assert.ok(command.startsWith('sudo python3 -c '));
+      const quoted=command.slice('sudo python3 -c '.length);
+      assert.ok(quoted.startsWith("'")&&quoted.endsWith("'"));
+      const source=quoted.slice(1,-1).replace(/'\\\\''/g,"'");
+      const compiled=spawnSync('python3',['-c',"import sys; compile(sys.stdin.read(), '<probe>', 'exec')"],{input:source,encoding:'utf8'});
       assert.equal(compiled.status,0,compiled.stderr);
       return '1';
     }

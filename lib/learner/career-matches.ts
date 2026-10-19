@@ -1,13 +1,14 @@
 import 'server-only';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getActiveJobs, type JobPosting } from '@/lib/data/jobs';
+import { getTopJobsForTitle } from '@/lib/adzuna/client';
 
 const norm = (s: unknown) => String(s ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const terms = (v: unknown): string[] => Array.isArray(v) ? v.flatMap(terms) :
   typeof v === 'string' ? [v] :
   v && typeof v === 'object' ? Object.values(v).flatMap(terms) : [];
 const contains = (text: string, item: string) => !!item && (text.includes(item) || item.includes(text));
-export type CareerMatch = { job: JobPosting; score: number; reasons: string[]; missingCredentials: string[]; eligibility: 'credential_match' | 'explore' };
+export type CareerMatch = { job: JobPosting; score: number; reasons: string[]; missingCredentials: string[]; eligibility: 'credential_match' | 'explore'; applyUrl?: string; source?: string };
 
 export async function getLearnerCareerMatches(userId: string, limit = 8): Promise<CareerMatch[]> {
   const db = await requireAdminClient();
@@ -24,7 +25,25 @@ export async function getLearnerCareerMatches(userId: string, limit = 8): Promis
   const resume = resumes.data?.[0]?.resume_data as {skills?: string[]} | undefined;
   const skills = (Array.isArray(resume?.skills) ? resume.skills : []).map(norm).filter(Boolean);
   const interests = [...study, ...skills];
-  return jobs.map(job => {
+  // The local employer feed can legitimately be empty. Reuse the existing
+  // live Adzuna connector rather than displaying archived jobs as open.
+  const searchTerm = study.find(Boolean)?.replace(/-/g, ' ') || credentialNames[0] || skills[0];
+  const external = jobs.length === 0 && searchTerm
+    ? await getTopJobsForTitle(searchTerm, undefined, Math.min(limit * 2, 20)) : [];
+  const candidates: Array<{job: JobPosting; applyUrl?: string; source?: string}> = [
+    ...jobs.map(job => ({job})),
+    ...external.filter(job => /^https:\/\//i.test(job.applyUrl)).map(job => ({
+      job: {
+        id: 'adzuna-' + job.id, title: job.title, description: job.description,
+        requirements: null, salary_range: null, salary_min: job.salaryMin ?? null,
+        salary_max: job.salaryMax ?? null, location: job.location, remote_allowed: false,
+        job_type: null, employment_type: job.contractType ?? null, experience_level: null,
+        skills_required: null, application_deadline: null, status: 'active',
+        created_at: job.postedDate, employer_id: null, required_certifications: null,
+      } satisfies JobPosting, applyUrl: job.applyUrl, source: 'Adzuna',
+    })),
+  ];
+  return candidates.map(({job,applyUrl,source}) => {
     const required = terms(job.required_certifications).map(norm).filter(Boolean);
     const missingCredentials = required.filter(req => !credentialNames.some(name => contains(name,req)));
     const matched = required.filter(req => !missingCredentials.includes(req));
@@ -33,6 +52,6 @@ export async function getLearnerCareerMatches(userId: string, limit = 8): Promis
     const skillMatches = skills.filter(term => contains(jobText,term));
     const score = (matched.length * 20) + (relevant.length * 4) + (skillMatches.length * 3) - (missingCredentials.length * 30);
     const reasons = [...matched.map(name => `Verified credential: ${name}`),...relevant.slice(0,2).map(name => `Training/skill relevance: ${name}`)];
-    return {job,score,reasons,missingCredentials,eligibility: missingCredentials.length === 0 && matched.length > 0 ? 'credential_match' as const : 'explore' as const};
+    return {job,score,reasons,missingCredentials,applyUrl,source,eligibility: missingCredentials.length === 0 && matched.length > 0 ? 'credential_match' as const : 'explore' as const};
   }).sort((a,b) => b.score-a.score || a.job.id.localeCompare(b.job.id)).slice(0,limit);
 }

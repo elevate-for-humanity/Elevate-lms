@@ -57,6 +57,17 @@ export async function monitorCourseQueue({request=fetch,env=process.env,now=new 
     target.searchParams.set('execution_generation','eq.'+job.execution_generation);
     target.searchParams.set('monitor','eq.'+JSON.stringify(job.monitor));
     const body={monitor};
+    // An expired worker at its retry ceiling is not running. Fence the dead
+    // execution and hand the preserved defect to the PARIS code-repair path,
+    // which only accepts a failed job. Never reset attempts or replay work.
+    const expiredExhausted=job.status==='running' &&
+      Date.parse(job.lease_expires_at??'')<=now.getTime() &&
+      Number(job.attempts)>=Number(job.max_attempts);
+    if(expiredExhausted){
+      target.searchParams.set('lease_expires_at','lt.'+now.toISOString());
+      Object.assign(body,{status:'failed',lease_owner:null,lease_expires_at:null,
+        execution_generation:job.execution_generation+1,updated_at:now.toISOString()});
+    }
     if(observation.action==='requeue'){
       // No attempts reset and no live-lease override. The existing queue trigger
       // synchronizes aggregate status when this fenced transition succeeds.

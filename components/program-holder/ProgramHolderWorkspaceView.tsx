@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { StudentProgressReportForm } from './StudentProgressReportForm';
 import Image from 'next/image';
 import {
   AlertTriangle,
@@ -355,13 +356,16 @@ export async function ProgramHolderWorkspaceView({
     );
   if (section === 'reports')
     return (
-      <Reports
-        rows={data.reports}
-        enrolled={data.enrollments.length}
-        active={active.length}
-        completed={completed.length}
-        programLabel={primaryProgramLabel}
-      />
+      <div className="space-y-6">
+        <Reports
+          rows={data.reports}
+          enrolled={data.enrollments.length}
+          active={active.length}
+          completed={completed.length}
+          programLabel={primaryProgramLabel}
+        />
+        <StudentProgressReportForm students={data.enrollments.map(row => ({id:row.id, full_name:row.full_name}))} />
+      </div>
     );
   if (section === 'payouts')
     return <Payouts schedules={data.payoutSchedules} panel={payoutPanel} />;

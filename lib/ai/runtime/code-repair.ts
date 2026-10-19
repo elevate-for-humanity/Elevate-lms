@@ -3,7 +3,7 @@ import {isRepairableCourseFailure,courseRepairOutcome} from './course-repair-pol
 import {requireAdminClient} from '@/lib/supabase/admin';
 import {getGitHubHeaders} from '@/lib/devstudio/github-token';
 import {publishTaskToMain} from '@/lib/devstudio/main-release.mjs';
-import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,eligibleRepairEvents,repairFingerprint,validationPassed,repairDeploymentState,canRetryRepair,nextRepairDeployment} from './code-repair-policy.mjs';
+import {REPAIR_REPOSITORY,REPAIR_WORKFLOW,eligibleRepairEvents,repairFingerprint,validationPassed,repairDeploymentState,canRetryRepair,nextRepairDeployment,courseDefectDisposition} from './code-repair-policy.mjs';
 
 /**
  * Read-only, cron-authenticated credential preflight. Returns only safe status
@@ -208,13 +208,16 @@ export async function tickParisCodeRepairs({workflowOwnedDispatch=false}:{workfl
  const pending=await db.from('paris_code_repairs').select('id,attempt_count,source_job_id').eq('status','queued').order('created_at',{ascending:true}).limit(1).maybeSingle();
  if(pending.error)throw pending.error;if(!pending.data)return {enabled:true,dispatched:0};
  if(pending.data.source_job_id){
-  const source=await db.from('ultimate_build_jobs').select('build_id').eq('id',pending.data.source_job_id).single();
+  const source=await db.from('ultimate_build_jobs').select('id,build_id,status,last_error').eq('id',pending.data.source_job_id).single();
   if(source.error)throw source.error;
-  const latest=await db.from('ultimate_build_jobs').select('id,status').eq('build_id',source.data.build_id).order('created_at',{ascending:false}).limit(1).maybeSingle();
+  const latest=await db.from('ultimate_build_jobs').select('id,build_id,status').eq('build_id',source.data.build_id).order('created_at',{ascending:false}).limit(1).maybeSingle();
   if(latest.error)throw latest.error;
-  if(latest.data?.id!==pending.data.source_job_id || latest.data?.status!=='failed'){
-   await update(pending.data.id,{status:'blocked',error_code:'SOURCE_JOB_SUPERSEDED'});
-   return {enabled:true,dispatched:0,superseded:true};
+  const build=await db.from('ultimate_course_builds').select('id,status,profile,findings').eq('id',source.data.build_id).single();
+  if(build.error)throw build.error;
+  const disposition=courseDefectDisposition({source:source.data,latest:latest.data,build:build.data});
+  if(disposition!=='repair'){
+   await update(pending.data.id,{status:'blocked',error_code:disposition==='resolved'?'SOURCE_DEFECT_RESOLVED':'SOURCE_REPAIR_NOT_AUTHORIZED'});
+   return {enabled:true,dispatched:0,disposition};
   }
  }
  const claim=await db.from('paris_code_repairs').update({status:'dispatched',attempt_count:pending.data.attempt_count+1,dispatched_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',pending.data.id).eq('status','queued').eq('attempt_count',pending.data.attempt_count).select('id').maybeSingle();

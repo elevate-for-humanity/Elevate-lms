@@ -8,6 +8,8 @@ const project='elegant-racer-299721';
 const leaf=value=>typeof value==='string'?value.split('/').at(-1):null;
 export function inventoryFailureReason(error) {
   const message=String(error?.message??'');
+  const classified=/INVENTORY_DIAGNOSTIC:(permission_denied|api_disabled|timeout|output_limit|invalid_response|unknown_gcloud_failure)/.exec(message);
+  if(classified)return classified[1];
   if (/PERMISSION_DENIED|permission.*denied|does not have permission|cloudasset\.assets\.searchAllResources/i.test(message)) return 'permission_denied';
   if (/SERVICE_DISABLED|has not been used|API.*disabled|is disabled/i.test(message)) return 'api_disabled';
   if (/DEADLINE_EXCEEDED|timed? out|ETIMEDOUT/i.test(message)) return 'timeout';

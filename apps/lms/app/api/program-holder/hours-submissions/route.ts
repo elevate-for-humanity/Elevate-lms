@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     return NextResponse.json({error:'Student is not actively enrolled in your assigned program.'},{status:403});
   const {error} = await ctx.db.from('hour_entries').insert({
     user_id:enrollment.user_id,program_holder_id:ctx.holderId,program_slug:enrollment.program_slug,
-    source_type:'program_holder',source_entity_name:'Program Holder training log',
+    source_type:'manual',source_entity_name:'Program Holder training log',
     work_date:date,hours_claimed:hours,accepted_hours:0,category:'training',
     notes:work,entered_by_email:ctx.user.email || ctx.profile.email,status:'pending',
     approval_status:'pending',submitted_by_partner:true

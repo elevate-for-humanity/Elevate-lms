@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 
 type ProgramOption = { id: string; label: string };
 const CREDENTIAL_TYPES = [
@@ -9,19 +10,21 @@ const CREDENTIAL_TYPES = [
 ] as const;
 
 export function CredentialUploadForm({ programs }: { programs: ProgramOption[] }) {
+  const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     setBusy(true);
     setMessage('');
     setError('');
     let response: Response;
     try { response = await fetch('/api/learner/credentials', {
       method: 'POST',
-      body: new FormData(event.currentTarget),
+      body: new FormData(form),
     }); } catch { setError('Upload failed due to a network problem. Try again.'); setBusy(false); return; }
     const body = await response.json().catch(() => ({}));
     if (!response.ok) {
@@ -30,7 +33,8 @@ export function CredentialUploadForm({ programs }: { programs: ProgramOption[] }
       return;
     }
     setMessage('Credential uploaded for verification. Elevate will review it before certificate issuance.');
-    event.currentTarget.reset();
+    form.reset();
+    router.refresh();
     setBusy(false);
   }
 

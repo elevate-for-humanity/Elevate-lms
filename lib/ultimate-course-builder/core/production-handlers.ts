@@ -315,6 +315,7 @@ export function createProductionHandlers(runtime: UltimateRuntime): Record<strin
             lessonId: canonicalLessonId ?? comp(ctx).id,
             courseId:ctx.courseId,
             courseTitle: ctx.profile.title,
+            lessonTitle: comp(ctx).title,
             ownerPreview: ctx.renderPreviewOnly === true,
             lessonPresentation: ctx.profile.lessonPresentation,
             presentationContract: ctx.profile.presentationContract,

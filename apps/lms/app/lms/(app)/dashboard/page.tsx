@@ -84,9 +84,10 @@ function isBlockedExternalTraining(course: {
 
 export default async function StudentDashboard() {
   const { user, profile } = await requireRole(['student', 'learner', 'admin', 'super_admin']);
-  const supabase = await createClient();
+  const actorDb = await createClient();
   const db = await requireAdminClient();
   const subject = await resolvePortalPreviewSubject(db, user.id);
+  const supabase = subject.previewing ? db : actorDb;
   const isAdminActor = ['admin', 'super_admin'].includes(String(profile?.role || ''));
   if (isAdminActor && !subject.previewing) return <NeutralStudentPortalPreview />;
 

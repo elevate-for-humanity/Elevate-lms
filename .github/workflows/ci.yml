@@ -54,7 +54,7 @@ jobs:
           node --test scripts/gcp/prune-web-release-requests.test.mjs
           node --test scripts/validation/tenant-isolation-proof.test.mjs
           node --test lib/ultimate-course-builder/media/progressive-segments.test.mjs
-          pnpm exec vitest run tests/unit/progressive-lesson-video.test.tsx
+          pnpm exec vitest run tests/unit/progressive-lesson-video.test.tsx tests/unit/course-progressive-preview-route.test.ts
           pnpm exec vitest run tests/unit/google-service-health.test.ts tests/unit/google-health-revision.test.ts tests/unit/google-runtime-configuration.test.ts tests/unit/admin-google-services.test.ts tests/unit/elevate-media-runtime-sync.test.ts tests/unit/platform-hosting.test.ts tests/unit/health-activation.test.ts tests/unit/course-integrity-checks.test.tsx tests/unit/course-builder-health-contract.test.ts
       - name: Block retired Admin UI routes
         run: node scripts/verify-no-retired-admin-ui-routes.mjs

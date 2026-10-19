@@ -48,7 +48,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
   }
   await hydrateProcessEnv();
-  const [{ data, error }, { data: applicants }] = await Promise.all([
+  const [{ data, error }, { data: applicants }, { data: colleagues }] = await Promise.all([
     ctx.db
       .from('program_holder_meetings')
       .select('*')
@@ -60,12 +60,14 @@ export async function GET() {
       .eq('program_holder_id', ctx.holderId)
       .in('status', ['applied', 'pending', 'enrolled'])
       .order('applicant_name'),
+    ctx.db.from('profiles').select('id,full_name,role').in('role',['admin','super_admin','staff']).eq('is_active',true).order('full_name'),
   ]);
   return error
     ? NextResponse.json({ error: 'Unable to load meetings.' }, { status: 500 })
     : NextResponse.json({
         meetings: data ?? [],
         applicants: applicants ?? [],
+        officeRecipients: (colleagues ?? []).filter(person => person.id !== ctx.user.id),
         videoReady: liveKitReadiness().ready,
       });
 }
@@ -76,12 +78,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
   }
   const body = await request.json().catch(() => ({}));
+  const audience = body.audience === 'office' ? 'office' : 'applicant';
   const studentId = String(body.programHolderStudentId || '');
+  const officeRecipientId = String(body.officeRecipientId || '');
   const startsAt = String(body.startsAt || '');
   const method = String(body.meetingMethod || 'phone');
   const duration = Number(body.durationMinutes || 30);
   if (
-    !studentId ||
+    (audience === 'applicant' ? !studentId : !officeRecipientId || method !== 'video') ||
     !startsAt ||
     Number.isNaN(new Date(startsAt).getTime()) ||
     !['phone', 'video', 'in_person'].includes(method) ||
@@ -94,13 +98,19 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
-  const { data: student } = await ctx.db
+  const { data: student } = audience === 'applicant' ? await ctx.db
     .from('program_holder_students')
     .select('id,applicant_name,user_id')
     .eq('id', studentId)
     .eq('program_holder_id', ctx.holderId)
-    .maybeSingle();
-  if (!student) {
+    .maybeSingle() : { data: null };
+  const { data: officeRecipient } = audience === 'office' ? await ctx.db.from('profiles')
+    .select('id,full_name,email,role,is_active').eq('id',officeRecipientId)
+    .eq('is_active',true).in('role',['admin','super_admin','staff']).maybeSingle() : { data: null };
+  if (audience === 'office' && (!officeRecipient || officeRecipient.id === ctx.user.id)) {
+    return NextResponse.json({ error: 'Choose an authorized office colleague.' }, { status: 403 });
+  }
+  if (audience === 'applicant' && !student) {
     return NextResponse.json(
       { error: 'Applicant is not assigned to this Program Holder.' },
       { status: 404 },
@@ -108,7 +118,7 @@ export async function POST(request: Request) {
   }
 
   const title = String(
-    body.title || `Enrollment meeting with ${student.applicant_name || 'applicant'}`,
+    body.title || (audience === 'office' ? `Office meeting with ${officeRecipient?.full_name || 'colleague'}` : `Enrollment meeting with ${student?.applicant_name || 'applicant'}`),
   )
     .trim()
     .slice(0, 180);
@@ -120,7 +130,7 @@ export async function POST(request: Request) {
   let meetingUrl: string | null = null;
 
   if (method === 'video') {
-    if (!student.user_id) {
+    if (audience === 'applicant' && !student?.user_id) {
       return NextResponse.json(
         {
           error:
@@ -171,11 +181,12 @@ export async function POST(request: Request) {
     }
     communicationRoomId = room.id;
     meetingUrl = `/program-holder/meetings/${room.id}`;
-    const { data: studentProfile } = await ctx.db
+    const { data: studentProfile } = audience === 'applicant' ? await ctx.db
       .from('profiles')
       .select('full_name,email')
       .eq('id', student.user_id)
-      .maybeSingle();
+      .maybeSingle() : { data: null };
+    const invitee = audience === 'office' ? officeRecipient! : { id: student!.user_id!, email: studentProfile?.email ?? null, full_name: studentProfile?.full_name ?? student?.applicant_name };
     const { error: participantError } = await ctx.db
       .from('communication_room_participants')
       .insert([
@@ -188,9 +199,9 @@ export async function POST(request: Request) {
         },
         {
           room_id: room.id,
-          profile_id: student.user_id,
-          email: studentProfile?.email || null,
-          display_name: studentProfile?.full_name || student.applicant_name || 'Student',
+          profile_id: invitee.id,
+          email: invitee.email || null,
+          display_name: invitee.full_name || 'Participant',
           role: 'participant',
           invite_status: 'sent',
         },
@@ -208,7 +219,7 @@ export async function POST(request: Request) {
     .from('program_holder_meetings')
     .insert({
       program_holder_id: ctx.holderId,
-      program_holder_student_id: student.id,
+      program_holder_student_id: student?.id ?? null,
       title,
       starts_at: new Date(startsAt).toISOString(),
       duration_minutes: duration,

@@ -19,6 +19,7 @@ interface Props {
   className?: string;
   panelPosition?: "start" | "end";
   initialPanelSize?: number;
+  mobileExclusive?: boolean;
 }
 
 /** Keeps both workspaces mounted while resizing, hiding, or expanding a panel. */
@@ -31,6 +32,7 @@ export function ResizableWorkspace({
   className = "",
   panelPosition = "end",
   initialPanelSize = 45,
+  mobileExclusive = false,
 }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const panelId = useId();
@@ -77,7 +79,8 @@ export function ResizableWorkspace({
     setExpanded(false);
     onOpenChange(false);
   };
-  const full = open && expanded;
+  const mobileFull = open && stacked && mobileExclusive;
+  const full = open && (expanded || mobileFull);
   useEffect(() => {
     const element = root.current;
     if (!full || !element || typeof element.showPopover !== "function") return;
@@ -92,12 +95,13 @@ export function ResizableWorkspace({
       ref={root}
       style={full ? { display: 'flex' } : undefined}
       popover={full ? "manual" : undefined}
-      className={`${styles.root} ${open && expanded ? styles.fullScreen : ""} ${className}`}
+      className={`${styles.root} ${mobileFull ? styles.mobileExclusive : ""} ${open && expanded ? styles.fullScreen : ""} ${className}`}
     >
       <div className={styles.toolbar}>
         <span className={styles.title}>{title}</span>
         {open ? (
           <>
+            {!mobileFull && <>
             <button
               type="button"
               onClick={() => resize(-5)}
@@ -121,13 +125,14 @@ export function ResizableWorkspace({
             >
               {expanded ? "Restore split view" : "Expand panel"}
             </button>
+            </>}
             <button
               type="button"
               onClick={close}
               aria-controls={panelId}
               aria-expanded
             >
-              Close {title}
+              {mobileFull ? "Back to chat" : `Close ${title}`}
             </button>
           </>
         ) : (

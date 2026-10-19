@@ -1,3 +1,4 @@
+import { HolderHourSubmissionForm } from './HolderHourSubmissionForm';
 import Link from 'next/link';
 import { StudentProgressReportForm } from './StudentProgressReportForm';
 import Image from 'next/image';
@@ -2106,6 +2107,7 @@ function Hours({
         title="Training Hours"
         description="Record what each student completed daily or weekly, enter training hours, and submit progress for Admin review."
       />
+      <HolderHourSubmissionForm enrollments={enrollments} />
       <ProgramHolderTrainingLogForm enrollments={enrollments} programs={programs} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Submitted training logs</h2>

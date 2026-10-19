@@ -1085,7 +1085,7 @@ export async function renderStoryboardVideo(
         chunkPaths.map(p => "file '" + p.replace(/'/g, "'\\''") + "'").join('\n') + '\n');
       await execFileAsync('ffmpeg', [
         '-y', '-f', 'concat', '-safe', '0', '-i', manifestPath,
-        '-c', 'copy', '-movflags', '+faststart', paths.videoPath,
+        // Each independently rendered frame-range chunk can carry its own encoded\n        // timebase/keyframe boundaries. Normalize PTS and re-encode at assembly\n        // so later scenes never replay earlier frames after concat.\n        '-fflags', '+genpts', '-c:v', 'libx264', '-preset', 'fast', '-crf', '20',\n        '-r', String(composition.fps), '-fps_mode', 'cfr',\n        '-c:a', 'aac', '-af', 'aresample=async=1:first_pts=0',\n        '-movflags', '+faststart', paths.videoPath,
       ], {timeout: 600_000, maxBuffer: 2_000_000});
       const output = await stat(paths.videoPath);
       if (!output.size) throw new Error('REMOTION_MP4_EMPTY');

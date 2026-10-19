@@ -39,6 +39,14 @@ export async function POST(request: NextRequest) {
   if (!enrollment?.program_id)
     return NextResponse.json({ error: 'An active enrollment in the selected program is required.' }, { status: 403 });
 
+  const credentialId = String(form.get('credential_id') || '');
+  if (credentialId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(credentialId))
+    return NextResponse.json({ error: 'Invalid credential selection.' }, { status: 400 });
+  if (credentialId) {
+    const { data: credential, error: credentialError } = await db.from('credential_registry')
+      .select('id').eq('id', credentialId).maybeSingle();
+    if (credentialError || !credential) return NextResponse.json({error:'Credential is not in the approved catalog.'},{status:400});
+  }
   const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
   const path = `${user.id}/${enrollment.program_id}/${uploadType}/${randomUUID()}.${extension}`;
   const { error: storageError } = await db.storage.from('credential-uploads').upload(path, file, { contentType: file.type, upsert: false });
@@ -48,6 +56,7 @@ export async function POST(request: NextRequest) {
     user_id: user.id,
     program_id: enrollment.program_id,
     upload_type: uploadType,
+    credential_id: credentialId || null,
     storage_bucket: 'credential-uploads',
     storage_path: path,
     original_filename: file.name,

@@ -48,6 +48,7 @@ jobs:
       - name: Google activation and dependency health regression tests
         run: |
           node --test scripts/gcp/serving-phone-credential.test.mjs tests/phone-runtime-authority.node.test.mjs
+          node --test scripts/gcp/phone-runtime-handoff.test.mjs
           node --test scripts/test-public-revision-activation.mjs
           node --test scripts/test-studio-workflow-inspection.mjs
           node --test scripts/gcp/prune-web-release-requests.test.mjs

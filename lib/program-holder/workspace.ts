@@ -337,7 +337,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     ),
   );
   const { data: rosterProfiles, error: rosterProfilesError } = rosterUserIds.length
-    ? await db.from('profiles').select('id,role,email').in('id', rosterUserIds)
+    ? await db.from('profiles').select('id,role,email,full_name').in('id', rosterUserIds)
     : { data: [], error: null };
   if (rosterProfilesError)
     throw new Error(
@@ -384,10 +384,16 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         firstClockDateByUser.set(entry.apprentice_id, entry.work_date);
     }
   }
+  const nameByUserId = new Map<string, string>(
+    (rosterProfiles ?? [])
+      .filter((row: any) => typeof row.full_name === 'string' && row.full_name.trim())
+      .map((row: any) => [row.id, row.full_name.trim()]),
+  );
   const enrolledRoster = (enrollmentsRes.data ?? [])
     .filter((row: any) => eligibleRosterUserIds.has(row.user_id))
     .map((row: any) => ({
       ...row,
+      full_name: row.full_name?.trim() || nameByUserId.get(row.user_id) || 'Student',
       total_hours_completed: Math.max(
         Number(row.total_hours_completed || 0),
         verifiedHoursByUser.get(row.user_id) ?? 0,

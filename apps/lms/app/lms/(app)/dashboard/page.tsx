@@ -29,7 +29,7 @@ import { GlobalSearch } from '@/components/lms/GlobalSearch';
 import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
 import { getProgramCardImage } from '@/lib/images/programImages';
 import { loadLearnerWorkspace } from '@/lib/learner/workspace';
-import { getActiveJobs } from '@/lib/data/jobs';
+import { getLearnerCareerMatches } from '@/lib/learner/career-matches';
 import JobCard from '@/components/jobs/JobCard';
 import { MARKETING_HOST } from '@/lib/routing/portal-map';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -97,7 +97,7 @@ export default async function StudentDashboard() {
   const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
   const showBilling = await learnerCanSeeBilling(db, subjectId, subjectProfile?.role);
   const billingRequirement = showBilling ? await loadLearnerBillingRequirement(db, subjectId) : null;
-  const careerJobs = await getActiveJobs({ limit: 4 });
+  const careerMatches = await getLearnerCareerMatches(subjectId, 4);
   const { data: holderStudentRows } = await db
     .from('program_holder_students')
     .select('id')
@@ -659,10 +659,10 @@ export default async function StudentDashboard() {
               Career Services
             </Link>
           </div>
-          {careerJobs.length > 0 ? (
+          {careerMatches.length > 0 ? (
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              {careerJobs.map((job) => (
-                <JobCard key={job.id} job={job} showApply href="/lms/placement" />
+              {careerMatches.map(({ job, eligibility, reasons, missingCredentials }) => (
+                <div key={job.id} className="min-w-0 space-y-2"><JobCard job={job} showApply href="/lms/placement" /><p className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700">{eligibility === 'credential_match' ? 'Verified credential match' : 'Explore this opportunity'}{reasons.length ? ` · ${reasons.join('; ')}` : ''}{missingCredentials.length ? ` · Credentials not verified: ${missingCredentials.join(', ')}` : ''}</p></div>
               ))}
             </div>
           ) : (

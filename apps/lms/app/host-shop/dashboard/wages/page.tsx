@@ -60,7 +60,7 @@ async function saveReportedPay(formData: FormData) {
   const base=Number(formData.get('base'));
   const commission=Number(formData.get('commission')||0);
   const date=String(formData.get('date')||'');
-  if(!['hourly','hourly_plus_commission'].includes(payType) || !Number.isFinite(base) || base<=0 || !Number.isFinite(commission) || commission<0 || commission>100 || !/^\\d{4}-\\d{2}-\\d{2}$/.test(date)) redirect('/host-shop/dashboard/wages?error=required');
+  if(!['hourly','hourly_plus_commission'].includes(payType) || !Number.isFinite(base) || base<=0 || !Number.isFinite(commission) || commission<0 || commission>100 || !/^\d{4}-\d{2}-\d{2}$/.test(date)) redirect('/host-shop/dashboard/wages?error=required');
   const placement=board.apprentices.find((item:any)=>item.id===placementId);
   if(!placement || !board.shops.some((shop:any)=>shop.id===placement.shop_id)) redirect('/host-shop/dashboard/wages?error=access');
   const db=await requireAdminClient();

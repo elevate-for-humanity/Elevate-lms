@@ -98,6 +98,11 @@ export default async function HostShopWagesPage({ searchParams }: { searchParams
         }) : <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 font-semibold text-amber-950">No active registered-program contract is available for the current placements. Wage verification is blocked until the occupation standard is configured.</div>}
       </section>
 
+      <section className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-5">
+        <h2 className="text-lg font-black">Apprentice wages and commission</h2>
+        <p className="mt-2 text-sm">Use the assigned apprentice's active wage obligation below to verify actual hourly pay. Record the employer's guaranteed base hourly rate and applicable effective date, with payroll evidence in the note. If commission is also paid, include the commission percentage and calculation in the payroll evidence note. Commission does not replace minimum-wage obligations. If the registered wage schedule is missing, request sponsor configuration before wage approval.</p>
+        <p className="mt-2 text-sm font-bold">The minimum payable rate is the higher of the applicable federal, state, local, and binding apprenticeship or employer wage requirements. Do not assume a rate from a generic training page.</p>
+      </section>
       <div className="mt-6 grid gap-4 sm:grid-cols-3"><Metric label="Pending wage actions" value={pending.length} /><Metric label="Verified wage actions" value={verified.length} /><Metric label="Registered occupations" value={registeredOccupations.length} /></div>
 
       <section className="mt-6 space-y-4"><h2 className="text-xl font-black text-slate-950">Actions requiring verification</h2>{pending.length === 0 ? <div className="rounded-2xl border border-slate-200 bg-white p-6 text-slate-600">No pending wage milestones for apprentices assigned to this Host Shop.</div> : pending.map((row: any) => {

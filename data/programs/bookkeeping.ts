@@ -347,10 +347,10 @@ export const BOOKKEEPING: ProgramSchema = {
 
 
   funding: {
-    wioa_eligible: true,
-    fssa_eligible: true,
-    wrg_eligible: true,
-    jobReadyIndyEligible: true,
-    fundingNotes: 'Indiana ETPL-listed. WIOA Title I and WRG funding available for eligible Indiana residents.',
+    wioa_eligible: false,
+    fssa_eligible: false,
+    wrg_eligible: false,
+    jobReadyIndyEligible: false,
+    fundingNotes: 'No public WIOA/WRG claim is made for this program unless exact program-level evidence and participant authorization are recorded in the canonical funding registry.',
   },
 };

@@ -233,7 +233,7 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
     enrollmentCourseIds.length > 0
       ? await supabase
           .from('lms_courses')
-          .select('id, course_name, description, duration_hours')
+          .select('id, title, description, duration_hours')
           .in('id', enrollmentCourseIds)
       : { data: [], error: null };
 
@@ -264,6 +264,17 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
 
   const apMap = new Map<string, any>((apprenticeshipPrograms ?? []).map((p: any) => [p.id, p]));
 
+  // Standard program enrollments may have no course_id while their course is unpublished.
+  // Resolve the program title independently so the dashboard is never an empty card.
+  const { data: programRows, error: programErr } = programIds.length > 0
+    ? await supabase.from('programs').select('id, title, description').in('id', programIds)
+    : { data: [], error: null };
+  if (programErr) {
+    warnings.push('programs lookup failed');
+    logger.warn('loadLearnerDashboard: programs lookup failed', programErr);
+  }
+  const programMap = new Map<string, any>((programRows ?? []).map((p: any) => [p.id, p]));
+
   // ── 6. NORMALIZE ENROLLMENTS ───────────────────────────────────────
   const normalizedEnrollments: EnrollmentDTO[] = rows.map((e: any) => {
     let courses: EnrollmentDTO['courses'] = null;
@@ -289,6 +300,15 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
       return { ...e, courses, _isApprenticeship: true } as EnrollmentDTO;
     }
 
+    if (!courses && e.program_id && programMap.has(e.program_id)) {
+      const program = programMap.get(e.program_id);
+      courses = {
+        id: program.id,
+        title: program.title ?? e.program_slug ?? 'Enrolled Program',
+        description: program.description ?? null,
+        duration_hours: null,
+      };
+    }
     return { ...e, courses } as EnrollmentDTO;
   });
 

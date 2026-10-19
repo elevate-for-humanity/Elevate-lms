@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {auditCostResources} from './audit-cost-resources.mjs';
+import {auditCostResources,inventoryFailureReason} from './audit-cost-resources.mjs';
 
 test('inventory is read-only, reports review candidates and excludes secrets',()=>{
   const calls=[];
@@ -28,4 +28,18 @@ test('permission failure and malformed inventories are explicit, never reported 
   }
   assert.equal(JSON.stringify(report).includes('private-fixture'),false);
   assert.deepEqual(report.review,[]);
+});
+
+test('classifies Cloud Asset permission, disabled API, timeout, and wrapper failures safely',()=>{
+ assert.equal(inventoryFailureReason(new Error('PERMISSION_DENIED: cloudasset.assets.searchAllResources')), 'permission_denied');
+ assert.equal(inventoryFailureReason(new Error('SERVICE_DISABLED: cloudasset.googleapis.com')), 'api_disabled');
+ assert.equal(inventoryFailureReason(new Error('DEADLINE_EXCEEDED')), 'timeout');
+ assert.equal(inventoryFailureReason(new Error('INVENTORY_DIAGNOSTIC:permission_denied')), 'permission_denied');
+ const result=auditCostResources({run:args=>{
+   if(args[0]==='asset')throw Error('INVENTORY_DIAGNOSTIC:permission_denied');
+   return '[]';
+ }});
+ assert.equal(result.sections.assets.available,false);
+ assert.equal(result.sections.assets.reason,'permission_denied');
+ assert.equal(result.sections.virtualMachines.available,true);
 });

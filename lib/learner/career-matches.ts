@@ -27,7 +27,16 @@ export async function getLearnerCareerMatches(userId: string, limit = 8): Promis
   const interests = [...study, ...skills];
   // The local employer feed can legitimately be empty. Reuse the existing
   // live Adzuna connector rather than displaying archived jobs as open.
-  const searchTerm = study.find(Boolean)?.replace(/-/g, ' ') || credentialNames[0] || skills[0];
+  const program = study.join(' ');
+  const role = program.includes('cosmetolog') ? 'cosmetologist' :
+    program.includes('barber') ? 'barber' :
+    program.includes('bookkeep') || program.includes('quickbooks') ? 'bookkeeper' :
+    program.includes('hvac') ? 'HVAC technician' :
+    program.includes('medical assistant') ? 'medical assistant' :
+    program.includes('nursing') || program.includes('cna') ? 'nursing assistant' :
+    program.includes('cdl') ? 'CDL driver' :
+    program.includes('phlebotomy') ? 'phlebotomist' : null;
+  const searchTerm = role || study.find(Boolean)?.replace(/-/g, ' ') || credentialNames[0] || skills[0];
   const external = jobs.length === 0 && searchTerm
     ? await getTopJobsForTitle(searchTerm, undefined, Math.min(limit * 2, 20)) : [];
   const candidates: Array<{job: JobPosting; applyUrl?: string; source?: string}> = [

@@ -661,8 +661,8 @@ export default async function StudentDashboard() {
           </div>
           {careerMatches.length > 0 ? (
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              {careerMatches.map(({ job, eligibility, reasons, missingCredentials }) => (
-                <div key={job.id} className="min-w-0 space-y-2"><JobCard job={job} showApply href="/lms/placement" /><p className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700">{eligibility === 'credential_match' ? 'Verified credential match' : 'Explore this opportunity'}{reasons.length ? ` · ${reasons.join('; ')}` : ''}{missingCredentials.length ? ` · Credentials not verified: ${missingCredentials.join(', ')}` : ''}</p></div>
+              {careerMatches.map(({ job, eligibility, reasons, missingCredentials, applyUrl, source }) => (
+                <div key={job.id} className="min-w-0 space-y-2"><JobCard job={job} showApply href={applyUrl ?? "/lms/placement"} /><p className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700">{eligibility === 'credential_match' ? 'Verified credential match' : 'Explore this opportunity'}{reasons.length ? ` · ${reasons.join('; ')}` : ''}{missingCredentials.length ? ` · Credentials not verified: ${missingCredentials.join(', ')}` : ''}{source ? ` · Jobs sourced by ${source}` : ''}</p></div>
               ))}
             </div>
           ) : (

@@ -136,5 +136,8 @@
   .mobileExclusive .toolbar { flex-wrap: nowrap; padding: .25rem .5rem; }
   .mobileExclusive .title { font-size: .75rem; }
   .mobileExclusive .toolbar button { min-height: 44px; white-space: nowrap; }
-  .mobileExclusive .secondary { overflow: hidden; }
+  .mobileExclusive .secondary { overflow: auto; overscroll-behavior: contain; min-height: 0; }
+  .mobileExclusive .toolbar button { min-width: 44px; touch-action: manipulation; }
+  .mobileExclusive .body { min-height: 0; flex: 1 1 auto; }
+  .mobileExclusive .primary { display: none; }
 }

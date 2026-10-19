@@ -51,7 +51,7 @@ test('reads only the VM reference and metadata, never a secret payload',async()=
       assert.ok(command.startsWith('sudo python3 -c '));
       const quoted=command.slice('sudo python3 -c '.length);
       assert.ok(quoted.startsWith("'")&&quoted.endsWith("'"));
-      const source=quoted.slice(1,-1).replace(/'\\\\''/g,"'");
+      const source=quoted.slice(1,-1).split("'\\''").join("'");
       const compiled=spawnSync('python3',['-c',"import sys; compile(sys.stdin.read(), '<probe>', 'exec')"],{input:source,encoding:'utf8'});
       assert.equal(compiled.status,0,compiled.stderr);
       return '1';

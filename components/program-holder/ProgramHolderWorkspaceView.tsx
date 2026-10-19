@@ -376,7 +376,7 @@ export async function ProgramHolderWorkspaceView({
     );
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="w-full min-w-0 space-y-6 px-3 pb-28 sm:space-y-8 sm:px-6 lg:pb-8 [&_h1]:[overflow-wrap:normal] [&_h2]:[overflow-wrap:normal] [&_h3]:[overflow-wrap:normal] [&_h1]:[word-break:normal] [&_h2]:[word-break:normal] [&_h3]:[word-break:normal] [&_section]:min-w-0 [&_article]:min-w-0">
       <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

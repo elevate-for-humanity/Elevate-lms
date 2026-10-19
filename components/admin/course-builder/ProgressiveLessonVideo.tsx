@@ -19,7 +19,7 @@ export default function ProgressiveLessonVideo({buildId,lessonId,title}:{buildId
  return <section aria-label="Video being built" className="space-y-3">
   <p className="font-bold">Video being built · Draft preview</p>
   <p>Completed portions play in order as they are saved. This video has not passed final quality review.</p>
-  {current?<><video ref={player} controls playsInline preload="auto" className="w-full rounded-lg bg-black" src={current.src} aria-label={`${title??'Lesson'} in-progress video`}
+  {current?<><video ref={player} controls playsInline preload="auto" className="aspect-video max-h-[45dvh] w-full rounded-lg bg-black object-contain sm:max-h-none" src={current.src} aria-label={`${title??'Lesson'} in-progress video`}
    onPlay={()=>{resume.current=true;setError('');}}
    onEnded={()=>{resume.current=true;if(index+1<segments.length)setIndex(index+1);else setWaiting(true);}}
    onError={()=>setError('This portion could not play. Refresh the preview to renew access; the render is preserved.')} />

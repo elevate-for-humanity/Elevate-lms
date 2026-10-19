@@ -410,6 +410,7 @@ export default function StudioCommandWorkspace({
         </div>
         <main className="min-h-0 min-w-0 flex-1 overflow-hidden" aria-label="Studio workspace">
           <ResizableWorkspace
+            mobileExclusive
             className="h-full"
             title="Studio side panel"
             open={surface !== 'commands'}

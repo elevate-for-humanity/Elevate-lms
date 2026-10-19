@@ -130,3 +130,11 @@
   min-height: 0 !important;
   background: #020617;
 }
+
+@media (max-width: 760px) {
+  .mobileExclusive { position: fixed; inset: 0; z-index: 105; height: 100dvh !important; box-sizing: border-box; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); background: white; }
+  .mobileExclusive .toolbar { flex-wrap: nowrap; padding: .25rem .5rem; }
+  .mobileExclusive .title { font-size: .75rem; }
+  .mobileExclusive .toolbar button { min-height: 44px; white-space: nowrap; }
+  .mobileExclusive .secondary { overflow: hidden; }
+}

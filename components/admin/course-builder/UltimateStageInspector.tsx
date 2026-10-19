@@ -88,7 +88,7 @@ function SavedVideo({
         controls
         playsInline
         preload="auto"
-        className="w-full rounded-lg bg-black"
+        className="aspect-video max-h-[45dvh] w-full rounded-lg bg-black object-contain sm:max-h-none"
         src={videoUrl}
         onPlaying={() => {
           setNeedsPlay(false);
@@ -363,7 +363,7 @@ export default function UltimateStageInspector({
   return (
     <ProductionPanelLayout outline={outline} operations={operations}>
       <section
-        className="mt-5 min-w-0 overflow-x-hidden rounded-xl bg-slate-950 p-3 text-white sm:p-4"
+        className="mt-2 min-w-0 overflow-x-hidden rounded-xl bg-slate-950 p-2 text-white sm:p-4"
         aria-label="Course Builder checkpoints"
       >
         <div data-course-lesson-panes className="grid min-w-0 grid-cols-1 items-start gap-4">
@@ -382,7 +382,7 @@ export default function UltimateStageInspector({
               {checking ? 'Checking dependencies…' : 'Check Course Builder health'}
             </button>
           </div>
-          <div className="min-w-0 rounded-xl border border-slate-600 bg-slate-950 p-4 text-white ">
+          <div className="min-w-0 rounded-xl border border-slate-600 bg-slate-950 p-2 text-white sm:p-4 ">
             <label htmlFor="lesson-preview-selection" className="block font-bold">
               Lesson previews
             </label>

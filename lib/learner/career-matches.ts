@@ -42,7 +42,7 @@ export async function getLearnerCareerMatches(userId: string, limit = 8): Promis
       .select('id,source,external_id,title,description,location,salary_range,job_type,application_url,posted_at,closes_at')
       .order('imported_at',{ascending:false}).limit(150),
   ]);
-  const sourceRows = live.length ? live : (cached.data ?? []);
+  const sourceRows: Array<{id?: string; source: string; external_id: string; title: string; description: string | null; location: string | null; salary_range: string | null; job_type: string | null; application_url: string | null; posted_at: string | null; closes_at: string | null}> = live.length ? live : (cached.data ?? []);
   const candidates: Array<{job: JobPosting; applyUrl?: string; source?: string}> = sourceRows
     .filter(row => typeof row.application_url === 'string' && /^https:\/\//i.test(row.application_url))
     .filter(row => !row.closes_at || Date.parse(row.closes_at) >= Date.now())

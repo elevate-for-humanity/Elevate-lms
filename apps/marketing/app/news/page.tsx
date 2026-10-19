@@ -1,14 +1,12 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Calendar, ExternalLink, ChevronRight, Newspaper, Award, Users, Building2 } from 'lucide-react';
+import { Newspaper, Users, Building2 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'News & Announcements',
   description: 'Latest news, announcements, and press releases from Elevate for Humanity. Stay informed about workforce development initiatives.',
 };
 
-const NEWS_ITEMS: Array<never> = [];
-const PRESS_RELEASES: Array<never> = [];
 
 export default function NewsPage() {
   return (

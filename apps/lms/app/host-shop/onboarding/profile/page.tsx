@@ -67,7 +67,7 @@ async function saveHostShopProfile(formData: FormData) {
       website: website || partner.website || null,
       website_url: website || partner.website_url || null,
       // Saving a profile is not the same as approval, signed MOU, and accepted documents.
-      onboarding_completed: false,
+      onboarding_completed: partner.onboarding_completed === true,
       onboarding_step: 'documents',
       updated_at: updatedAt,
     })

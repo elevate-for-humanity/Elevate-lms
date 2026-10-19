@@ -373,6 +373,12 @@ export default async function StudentDashboard() {
       image: '/images/pages/comp-home-highlight-success.webp',
     },
     {
+      href: '/lms/certification/upload',
+      label: 'Upload Credentials',
+      text: 'Submit earned certifications and licenses for staff verification.',
+      image: '/images/pages/comp-home-highlight-success.webp',
+    },
+    {
       href: '/lms/resume-builder',
       label: 'Resume Builder',
       text: 'Create, update, and save your professional resume.',

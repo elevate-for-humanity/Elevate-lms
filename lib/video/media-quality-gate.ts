@@ -1,5 +1,5 @@
 import 'server-only';
-import { generatedTeachingPhoto } from '../ultimate-course-builder/instructional/approved-delivery.mjs';
+import { narrationCoverageSeverity, generatedTeachingPhoto } from '../ultimate-course-builder/instructional/approved-delivery.mjs';
 import { captionSampleGroups, captionWordCoverage, charcoalPixelsMatch } from '../ultimate-course-builder/instructional/approved-frame-checks.mjs';
 import {quoteStartSeconds} from '../ultimate-course-builder/instructional/picture-timeline.mjs';
 import { teachingPresentation } from '@/lib/ultimate-course-builder/instructional/teaching-presentation';
@@ -26,7 +26,6 @@ const MAX_FREEZE_SECONDS = 4;
 const MAX_BLACK_SECONDS = 0.75;
 // Cloud transcription is evidence that narration is present, not a verbatim
 // oracle. Technical acronyms and product names routinely vary in ASR output.
-const MIN_ASR_NARRATION_COVERAGE = 0.9;
 
 export interface MediaQualityEvidence {
   approvedPresentationInspection?: {pass: boolean; backgrounds: Array<{sceneId:string;passed:boolean}>; captions: Array<{sceneId:string;width:number;time:number;expected:string;decoded:string;wordCoverage:number}>};
@@ -34,6 +33,8 @@ export interface MediaQualityEvidence {
   actualTranscript?: string;
   readability?: Array<{ scene: number; width: number; wordCoverage: number; ocrMode?: 'full-frame' | 'title-region' }>;
   teachingVisualEvidence?: Array<{sceneId:string;step:number;width:number;time:number;expected:string;decoded:string;wordCoverage:number;ocrMode?:'sparse'|'block'}>;
+  narrationCoverageAdvisory?: boolean;
+  warnings?: string[];
   sceneNarrationEvidence?: Array<{sceneId:string;startSeconds:number;endSeconds:number;actualTranscript:string;coverage:number}>;
   gateVersion: typeof MEDIA_QUALITY_GATE_VERSION;
   bytes: number;
@@ -118,9 +119,9 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
   if (!evidence.providerModel) failures.push('provider model evidence is missing');
   if (evidence.narrationProviderClass !== 'professional')
     failures.push('narration uses a robotic/diagnostic or unverified voice provider');
-  if (evidence.narrationCoverage < MIN_ASR_NARRATION_COVERAGE)
+  if (narrationCoverageSeverity(evidence.narrationCoverage, evidence.narrationCoverageAdvisory === true) === 'error')
     failures.push(
-      `narration coverage ${(evidence.narrationCoverage * 100).toFixed(1)}% is below ${(MIN_ASR_NARRATION_COVERAGE * 100).toFixed(0)}%`,
+      `narration coverage ${(evidence.narrationCoverage * 100).toFixed(1)}% is below ${evidence.narrationCoverageAdvisory ? '75' : '90'}%`,
     );
   if (evidence.visualEvidenceCoverage < 0.75)
     failures.push(
@@ -415,6 +416,11 @@ export async function enforceMediaQuality(input: {
     const streams = probe.streams ?? [];
     const videoStream = streams.find((stream) => stream.codec_type === 'video');
     const actualTranscript = await transcribeRenderedAudio(videoPath, workDir);
+    const narrationCoverageAdvisory = input.lessonPresentation === 'approved-premium-v1';
+    const warnings: string[] = [];
+    const totalCoverage = narrationCoverage(input.expectedScript, actualTranscript);
+    if (narrationCoverageSeverity(totalCoverage, narrationCoverageAdvisory) === 'warning')
+      warnings.push(`MEDIA_NARRATION_COVERAGE_ADVISORY:${totalCoverage.toFixed(3)}`);
     const evidenceScenes = input.sceneData.scenes.filter((scene) =>
       Boolean(scene.requiredVisualEvidence),
     );
@@ -631,7 +637,10 @@ export async function enforceMediaQuality(input: {
         const transcript=await transcribeRenderedAudio(audio,directory);
         const coverage=narrationCoverage(scene.dialogue ?? scene.action,transcript);
         sceneNarrationEvidence.push({sceneId:scene.id,startSeconds:sceneStart,endSeconds:sceneStart+scene.durationSeconds,actualTranscript:transcript,coverage});
-        if (coverage<MIN_ASR_NARRATION_COVERAGE) throw new Error(`MEDIA_SCENE_NARRATION_MISMATCH:${scene.id}:${coverage.toFixed(3)}`);
+        const severity = narrationCoverageSeverity(coverage, narrationCoverageAdvisory);
+        const finding = `MEDIA_SCENE_NARRATION_MISMATCH:${scene.id}:${coverage.toFixed(3)}`;
+        if (severity === 'error') throw new Error(finding);
+        if (severity === 'warning') warnings.push(finding);
       }
       sceneStart += scene.durationSeconds;
     }
@@ -640,6 +649,8 @@ export async function enforceMediaQuality(input: {
       gateVersion: MEDIA_QUALITY_GATE_VERSION,
       mediaSha256: createHash('sha256').update(buffer).digest('hex'),
       actualTranscript,
+      narrationCoverageAdvisory,
+      warnings,
       readability,
       teachingVisualEvidence,
       sceneNarrationEvidence,

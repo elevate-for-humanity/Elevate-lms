@@ -4,7 +4,6 @@ import { getApprovedShops } from '@/lib/programs/host-shops';
 import { STATIC_PROGRAM_MAP } from '@/data/programs';
 import { STATIC_POSTS } from '@/content/blog/posts';
 import { getDb } from '@/lib/lms/api';
-import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
 import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
 import { HVAC_EMPLOYER_REGIONS } from '@/lib/marketing/hvac-employer-regions';
 import {
@@ -55,18 +54,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'weekly',
     priority: 0.82,
   }));
-
-  // Curated Host Shop profiles must remain discoverable even when the database
-  // is unavailable during sitemap generation. The final de-duplication also
-  // handles shops that exist in both the curated and approved-record sources.
-  const featuredHostShopRoutes: MetadataRoute.Sitemap = FEATURED_BEAUTY_HOST_PARTNERS.map(
-    (shop) => ({
-      url: `${PUBLIC_SITE_ORIGIN}/host-shops/${shop.slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.86,
-    }),
-  );
 
   const hostShopRegionRoutes: MetadataRoute.Sitemap = HOST_SHOP_REGIONS.map((region) => ({
     url: `${PUBLIC_SITE_ORIGIN}/partners/host-shops/indiana/${region.slug}`,
@@ -163,7 +150,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticRoutes,
     ...trustAndBuyerRoutes,
     ...programRoutes,
-    ...featuredHostShopRoutes,
     ...hostShopRegionRoutes,
     ...hvacEmployerRoutes,
     ...employerTalentRoutes,

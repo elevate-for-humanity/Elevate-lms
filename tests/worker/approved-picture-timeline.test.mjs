@@ -61,3 +61,10 @@ test('unique interior speech phrase anchors a paraphrased cue opening',()=>{
  assert.equal(quoteStartSeconds('Introduce the topic then explain respectful consultation and client communication before every service',spoken),2);
  assert.throws(()=>quoteStartSeconds('Invent requirements then explain unknown unsupported procedures with no transcript',spoken),/NOT_ALIGNED/);
 });
+
+
+test('registered cosmetology scene 9 plural transcription aligns with authored picture cue',()=>{
+ const recorded=[{text:'At 20 OJL hours per week the same hour ranges 100 to 125 weeks after completion',startSeconds:12.74,endSeconds:21}];
+ assert.equal(quoteStartSeconds('At 20 OJL hours per week the same hour range is 100 to 125 weeks',recorded),12.74);
+ assert.throws(()=>quoteStartSeconds('',recorded),/NOT_ALIGNED/);
+});

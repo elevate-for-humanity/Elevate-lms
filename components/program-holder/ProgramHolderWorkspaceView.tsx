@@ -2165,6 +2165,19 @@ function Compliance({
   }[];
   atRisk: number;
 }) {
+  const actionFor = (label: string): string | null => {
+    if (label === 'Memorandum of Understanding') return '/program-holder/sign-mou';
+    if (label === 'Program Holder handbook acknowledgement') return '/program-holder/handbook';
+    if (label === 'Non-disclosure and confidentiality agreement') return '/program-holder/non-compete';
+    if (label === 'Non-compete agreement') return '/program-holder/non-compete';
+    if (label === 'Approved ID, business registration, insurance, and W-9') return '/program-holder/documents';
+    if (label === 'Profile picture' || label === 'Company logo upload') return '/program-holder/documents';
+    if (label === 'Signed image release') return '/program-holder/documents';
+    if (label === 'Program-holder approval') return '/program-holder/onboarding';
+    if (label.includes('payout') || label.includes('PayPal')) return '/program-holder/payouts';
+    if (label.includes('license') || label.includes('credential')) return '/program-holder/documents';
+    return null;
+  };
   return (
     <div className="space-y-6">
       <Hero
@@ -2194,11 +2207,18 @@ function Compliance({
                     {item.required ? 'Required' : 'Recommended'} · Owner: {item.owner}
                   </span>
                 </span>
-                {item.complete ? (
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                ) : (
-                  <AlertTriangle className="h-5 w-5 text-amber-600" />
-                )}
+                <div className="flex shrink-0 items-center gap-3">
+                  {actionFor(item.label) ? (
+                    <Link href={actionFor(item.label)!} className="inline-flex min-h-11 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">
+                      {item.complete ? 'View form' : 'Open form'}
+                    </Link>
+                  ) : null}
+                  {item.complete ? (
+                    <CheckCircle2 aria-label="Completed" className="h-5 w-5 text-emerald-600" />
+                  ) : (
+                    <AlertTriangle aria-label="Action required" className="h-5 w-5 text-amber-600" />
+                  )}
+                </div>
               </div>
             ))}
           </div>

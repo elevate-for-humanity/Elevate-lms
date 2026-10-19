@@ -83,18 +83,18 @@ export function ResizableWorkspace({
   const full = open && (expanded || mobileFull);
   useEffect(() => {
     const element = root.current;
-    if (!full || !element || typeof element.showPopover !== "function") return;
+    if (!open || !expanded || mobileFull || !element || typeof element.showPopover !== "function") return;
     element.showPopover();
     return () => {
       if (element.matches(":popover-open")) element.hidePopover();
     };
-  }, [full]);
+  }, [open, expanded, mobileFull]);
 
   return (
     <div
       ref={root}
-      style={full ? { display: 'flex' } : undefined}
-      popover={full ? "manual" : undefined}
+      style={full ? { display: "flex" } : undefined}
+      popover={open && expanded && !mobileFull ? "manual" : undefined}
       className={`${styles.root} ${mobileFull ? styles.mobileExclusive : ""} ${open && expanded ? styles.fullScreen : ""} ${className}`}
     >
       <div className={styles.toolbar}>

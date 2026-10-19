@@ -5,10 +5,11 @@ import { ResizableWorkspace } from '@/components/studio/ResizableWorkspace';
 
 let width = 1200;
 let onResize: () => void;
-function Workspace() {
+function Workspace({mobileExclusive=false}:{mobileExclusive?:boolean}={}) {
   const [open, setOpen] = useState(true);
   return (
     <ResizableWorkspace
+      mobileExclusive={mobileExclusive}
       title="Browser"
       open={open}
       onOpenChange={setOpen}
@@ -124,4 +125,16 @@ describe('Resizable workspace', () => {
     fireEvent.pointerMove(divider, { clientY: 320 });
     expect(divider).toHaveAttribute('aria-valuetext', '60 percent tall');
   });
+});
+
+it('uses one full mobile workspace and preserves the chat draft when returning',()=>{
+ width=390;render(<Workspace mobileExclusive />);
+ expect(screen.queryByRole('textbox',{name:'Draft'})).toBeNull();
+ expect(screen.queryByRole('separator')).toBeNull();
+ expect(screen.queryByRole('button',{name:'Make Browser bigger'})).toBeNull();
+ const frame=screen.getByTitle('Browser session');
+ fireEvent.click(screen.getByRole('button',{name:'Back to chat'}));
+ expect(screen.getByRole('textbox',{name:'Draft'})).toHaveValue('Unsaved lesson');
+ fireEvent.click(screen.getByRole('button',{name:'Open Browser'}));
+ expect(screen.getByTitle('Browser session')).toBe(frame);
 });

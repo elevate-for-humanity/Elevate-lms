@@ -9,7 +9,7 @@ const CREDENTIAL_TYPES = [
   ['exam_result', 'Passed certification exam or awarded credential'],
 ] as const;
 
-export function CredentialUploadForm({ programs }: { programs: ProgramOption[] }) {
+export function CredentialUploadForm({ programs, credentials }: { programs: ProgramOption[]; credentials: ProgramOption[] }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
@@ -45,6 +45,13 @@ export function CredentialUploadForm({ programs }: { programs: ProgramOption[] }
         <select id="credential_program" name="program_id" required className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-3 text-slate-950">
           <option value="">Select your enrolled program</option>
           {programs.map(program => <option key={program.id} value={program.id}>{program.label}</option>)}
+        </select>
+      </div>
+      <div>
+        <label htmlFor="credential_id" className="block text-sm font-black text-slate-900">Credential earned (optional if not listed)</label>
+        <select id="credential_id" name="credential_id" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-3 text-slate-950">
+          <option value="">Other credential — staff will classify</option>
+          {credentials.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}
         </select>
       </div>
       <div>

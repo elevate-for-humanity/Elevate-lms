@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - requireProgramHolder establishes authenticated user and holder ownership; enrollment is verified against holder before inserting report.
 import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 export const dynamic='force-dynamic';

@@ -55,3 +55,9 @@ test('unique ordered speech cue survives a single ASR insertion without inventin
  assert.equal(quoteStartSeconds('Prepare the clean safe station',spoken),2);
  assert.throws(()=>quoteStartSeconds('Unrelated legal safety language',spoken),/PICTURE_CUE_NOT_ALIGNED_TO_SPEECH/);
 });
+
+test('unique interior speech phrase anchors a paraphrased cue opening',()=>{
+ const spoken=[{text:'Welcome participants. Explain respectful consultation and client communication before every service.',startSeconds:2,endSeconds:10}];
+ assert.equal(quoteStartSeconds('Introduce the topic then explain respectful consultation and client communication before every service',spoken),2);
+ assert.throws(()=>quoteStartSeconds('Invent requirements then explain unknown unsupported procedures with no transcript',spoken),/NOT_ALIGNED/);
+});

@@ -167,7 +167,8 @@ export class UltimateBuildRunner {
         // Media QA itself is an inspector, not a producer.
         if (producerRepair && failures.length === 0 &&
             ['synchronization', 'visual_assignment', 'scene_construction', 'natural_narration'].includes(step) &&
-            contractHash(artifacts) === contractHash(previous)) {
+            contractHash(Object.fromEntries(Object.entries(artifacts).filter(([key]) => key !== 'contractEvidence'))) ===
+            contractHash(Object.fromEntries(Object.entries(previous).filter(([key]) => key !== 'contractEvidence')))) {
           throw new Error('REPAIR_PRODUCER_UNCHANGED:' + step);
         }
         if (producerRepair && failures.length) {

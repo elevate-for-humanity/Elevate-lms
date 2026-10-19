@@ -33,8 +33,7 @@ export default function FrameworkDiagram() {
               </div>
               <h3 className="text-xl font-bold text-black mb-3">1. Apply</h3>
               <p className="text-black text-sm leading-relaxed">
-                Submit your application and check eligibility for free training through WIOA, WRG,
-                or other funding sources
+                Submit your application, review the exact program tuition, and complete any applicable agency eligibility process before relying on funding.
               </p>
             </div>
             {/* Arrow */}
@@ -109,8 +108,7 @@ export default function FrameworkDiagram() {
               </div>
               <h3 className="text-xl font-bold text-black mb-3">3. Certify</h3>
               <p className="text-black text-sm leading-relaxed">
-                Earn industry-recognized credentials and state licenses that employers trust and
-                value
+                Prepare for the credential, certification, or licensing process identified on your exact program page.
               </p>
             </div>
             {/* Arrow */}
@@ -145,7 +143,7 @@ export default function FrameworkDiagram() {
               </div>
               <h3 className="text-xl font-bold text-black mb-3">4. Work</h3>
               <p className="text-black text-sm leading-relaxed">
-                Get hired by our employer partners or start your own business with career support
+                Use career services for job-search preparation, employer connections, or business-readiness support. Employment is not guaranteed.
               </p>
             </div>
           </div>
@@ -154,16 +152,16 @@ export default function FrameworkDiagram() {
         {/* Supporting Stats */}
         <div className="mt-16 grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           <div className="text-center">
-            <div className="text-4xl font-bold text-brand-orange-600 mb-2">100%</div>
-            <div className="text-black">Free Training Available</div>
+            <div className="text-2xl font-bold text-brand-orange-600 mb-2">Program-specific</div>
+            <div className="text-black">Tuition & funding disclosure</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-bold text-brand-blue-600 mb-2">6-12</div>
-            <div className="text-black">Weeks to Complete</div>
+            <div className="text-2xl font-bold text-brand-blue-600 mb-2">Published</div>
+            <div className="text-black">Duration & credential requirements</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-bold text-brand-green-600 mb-2">85%+</div>
-            <div className="text-black">Job Placement Rate</div>
+            <div className="text-2xl font-bold text-brand-green-600 mb-2">Supported</div>
+            <div className="text-black">Career services without placement guarantees</div>
           </div>
         </div>
       </div>

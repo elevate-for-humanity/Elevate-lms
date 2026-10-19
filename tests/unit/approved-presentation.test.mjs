@@ -46,3 +46,13 @@ test('the premium scene and picture timeline use the same measured speech alignm
   assert.equal(measuredTeachingStep(steps,cues,4.9),0);
   assert.equal(measuredTeachingStep(steps,cues,5),1);
 });
+
+test('frame playback reuses alignment while retaining accurate transitions and safeguards',()=>{
+  const steps=[{narrationQuote:'Inspect the blade'},{narrationQuote:'Attach the guard'}];
+  const cues=[{text:'Inspect the blade',startSeconds:0},{text:'Attach the guard',startSeconds:8}];
+  for(let frame=0;frame<1800;frame++) {
+    const seconds=frame/30;
+    assert.equal(measuredTeachingStep(steps,cues,seconds),seconds>=8?1:0);
+  }
+  assert.throws(()=>measuredTeachingStep([{narrationQuote:'Unspoken instruction'}],cues,1),/NOT_ALIGNED/);
+});

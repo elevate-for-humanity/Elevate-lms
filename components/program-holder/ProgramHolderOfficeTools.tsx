@@ -254,12 +254,12 @@ export function ProgramHolderOfficeTools({ mode }: { mode: 'meetings' | 'mail' }
         </p>
         <h1 className="text-3xl font-black">Inter-office mail</h1>
         <p className="mt-2 text-slate-600">
-          Send private, auditable messages to Elevate staff and administrators.
+          Send private, auditable messages to your assigned students and Elevate administrators.
         </p>
       </header>
       <form onSubmit={submit} className="grid gap-3 rounded-2xl border bg-white p-5 shadow-sm">
         <select name="recipient" required className="min-h-11 rounded-xl border px-3">
-          <option value="">Choose recipient</option>
+          <option value="">Choose student or administrator</option>
           {data.recipients?.map((item: any) => (
             <option key={item.id} value={item.id}>
               {item.full_name || item.role} · {item.role}

@@ -1,7 +1,7 @@
 import 'server-only';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { getActiveJobs, type JobPosting } from '@/lib/data/jobs';
-import { getTopJobsForTitle } from '@/lib/adzuna/client';
+import type { JobPosting } from '@/lib/data/jobs';
+import { fetchUsaJobs } from '@/lib/industry/usajobs';
 
 const norm = (s: unknown) => String(s ?? '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const terms = (v: unknown): string[] => Array.isArray(v) ? v.flatMap(terms) :
@@ -12,11 +12,10 @@ export type CareerMatch = { job: JobPosting; score: number; reasons: string[]; m
 
 export async function getLearnerCareerMatches(userId: string, limit = 8): Promise<CareerMatch[]> {
   const db = await requireAdminClient();
-  const [uploads, enrollments, resumes, jobs] = await Promise.all([
+  const [uploads, enrollments, resumes] = await Promise.all([
     db.from('student_credential_uploads').select('credential_id,upload_type,verification_status,credential_registry(name)').eq('user_id', userId).eq('verification_status','approved'),
     db.from('program_enrollments').select('program_slug,title').or(`user_id.eq.${userId},student_id.eq.${userId}`).is('revoked_at', null),
     db.from('resumes').select('resume_data').eq('user_id', userId).order('updated_at',{ascending:false}).limit(1),
-    getActiveJobs({limit: 150}),
   ]);
   if (uploads.error || enrollments.error || resumes.error) throw new Error('Career matching profile temporarily unavailable');
   const credentialNames = (uploads.data ?? []).flatMap((row: any) =>
@@ -25,8 +24,8 @@ export async function getLearnerCareerMatches(userId: string, limit = 8): Promis
   const resume = resumes.data?.[0]?.resume_data as {skills?: string[]} | undefined;
   const skills = (Array.isArray(resume?.skills) ? resume.skills : []).map(norm).filter(Boolean);
   const interests = [...study, ...skills];
-  // The local employer feed can legitimately be empty. Reuse the existing
-  // live Adzuna connector rather than displaying archived jobs as open.
+  // Government job listings are the primary learner feed. Search the federal
+  // source live, with the imported government feed as a resilient fallback.
   const program = study.join(' ');
   const role = program.includes('cosmetolog') ? 'cosmetologist' :
     program.includes('barber') ? 'barber' :
@@ -34,24 +33,29 @@ export async function getLearnerCareerMatches(userId: string, limit = 8): Promis
     program.includes('hvac') ? 'HVAC technician' :
     program.includes('medical assistant') ? 'medical assistant' :
     program.includes('nursing') || program.includes('cna') ? 'nursing assistant' :
-    program.includes('cdl') ? 'CDL driver' :
+    program.includes('cdl') ? 'truck driver' :
     program.includes('phlebotomy') ? 'phlebotomist' : null;
-  const searchTerm = role || study.find(Boolean)?.replace(/-/g, ' ') || credentialNames[0] || skills[0];
-  const external = jobs.length === 0 && searchTerm
-    ? await getTopJobsForTitle(searchTerm, undefined, Math.min(limit * 2, 20)) : [];
-  const candidates: Array<{job: JobPosting; applyUrl?: string; source?: string}> = [
-    ...jobs.map(job => ({job})),
-    ...external.filter(job => /^https:\/\//i.test(job.applyUrl)).map(job => ({
-      job: {
-        id: 'adzuna-' + job.id, title: job.title, description: job.description,
-        requirements: null, salary_range: null, salary_min: job.salaryMin ?? null,
-        salary_max: job.salaryMax ?? null, location: job.location, remote_allowed: false,
-        job_type: null, employment_type: job.contractType ?? null, experience_level: null,
-        skills_required: null, application_deadline: null, status: 'active',
-        created_at: job.postedDate, employer_id: null, required_certifications: null,
-      } satisfies JobPosting, applyUrl: job.applyUrl, source: 'Adzuna',
-    })),
-  ];
+  const searchTerm = role || study.find(Boolean)?.replace(/-/g, ' ') || credentialNames[0] || skills[0] || '';
+  const [live, cached] = await Promise.all([
+    fetchUsaJobs(searchTerm, '', Math.min(40, limit * 4)).catch(() => []),
+    db.from('government_job_feed')
+      .select('id,source,external_id,title,description,location,salary_range,job_type,application_url,posted_at,closes_at')
+      .order('imported_at',{ascending:false}).limit(150),
+  ]);
+  const sourceRows = live.length ? live : (cached.data ?? []);
+  const candidates: Array<{job: JobPosting; applyUrl?: string; source?: string}> = sourceRows
+    .filter(row => typeof row.application_url === 'string' && /^https:\/\//i.test(row.application_url))
+    .filter(row => !row.closes_at || Date.parse(row.closes_at) >= Date.now())
+    .filter(row => !searchTerm || norm([row.title,row.description].join(' ')).includes(norm(searchTerm).split(' ')[0]))
+    .map(row => ({job: {
+      id: 'government-' + (row.external_id ?? row.id), title: row.title,
+      description: row.description, requirements: null, salary_range: row.salary_range,
+      salary_min: null, salary_max: null, location: row.location, remote_allowed: false,
+      job_type: row.job_type, employment_type: null, experience_level: null,
+      skills_required: null, application_deadline: row.closes_at, status: 'active',
+      created_at: row.posted_at ?? '', employer_id: null, required_certifications: null,
+    } as JobPosting, applyUrl: row.application_url ?? undefined,
+    source: row.source || 'USAJOBS'}));
   return candidates.map(({job,applyUrl,source}) => {
     const required = terms(job.required_certifications).map(norm).filter(Boolean);
     const missingCredentials = required.filter(req => !credentialNames.some(name => contains(name,req)));

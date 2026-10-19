@@ -31,7 +31,8 @@ function assertNoConflict(env,plan){
 }
 export async function pinnedControlVersion(run=google){
   const code=`from pathlib import Path\nimport re\ns=Path('/etc/elevate-pbx/provisioner.conf').read_text()\nm=re.search(r'^PBX_PROVISIONING_TOKEN_SECRET=[\\"\\\']?(projects/(?:elegant-racer-299721|484736877039)/secrets/elevate-pbx-provisioning-token/versions/([1-9][0-9]*|latest))[\\"\\\']?$',s,re.M)\nif not m: raise SystemExit(1)\nprint(m[2])\n`;
-  const pin=run(['compute','ssh','elevate-pbx','--project',PROJECT,'--zone','us-central1-a','--quiet','--command','sudo python3 -'],code).trim();
+  const quoted="'"+code.replace(/'/g,"'\\''")+"'";
+  const pin=run(['compute','ssh','elevate-pbx','--project',PROJECT,'--zone','us-central1-a','--quiet','--command','sudo python3 -c '+quoted]).trim();
   if(!/^(?:[1-9][0-9]*|latest)$/.test(pin))throw Error('pbx_control_reference_unverified');
   const meta=JSON.parse(run(['secrets','versions','describe',pin,'--secret',SECRET,'--project',PROJECT,'--format=json']));
   const match=meta.name?.match(/^projects\/(?:elegant-racer-299721|484736877039)\/secrets\/elevate-pbx-provisioning-token\/versions\/([1-9][0-9]*)$/);

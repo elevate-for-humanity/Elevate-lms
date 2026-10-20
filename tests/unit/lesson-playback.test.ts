@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 const signed = vi.hoisted(() => vi.fn());
 vi.mock('@/lib/storage/elevate-media-storage', () => ({
-  getElevateMediaStorageConfig: () => ({publicUrl:'https://media.example/course-media'}),
+  getElevateMediaStorageConfig: () => ({publicUrl:'https://media.example/course-media',endpoint:'https://s3.us-east-005.backblazeb2.com',bucket:'elevate-course-media'}),
   getSignedElevateMediaUrl: signed,
 }));
 import {signedLessonPlayback, managedLessonPlaybackUrl} from '@/lib/storage/lesson-playback';
@@ -34,6 +34,16 @@ describe('server-bound lesson playback delivery', () => {
   it('rejects encoded traversal before signing', async () => {
     await expect(signedLessonPlayback({},'https://media.example/course-media/%2e%2e/private.mp4')).rejects.toThrow('LESSON_MEDIA_REFERENCE_INVALID');
     expect(signed).not.toHaveBeenCalled();
+  });
+  it('renews an expired private B2 reference only in the configured bucket', async () => {
+    signed.mockResolvedValue('https://signed.example/fresh');
+    for (const base of ['https://elevate-course-media.s3.us-east-005.backblazeb2.com/', 'https://s3.us-east-005.backblazeb2.com/elevate-course-media/']) {
+      expect(await signedLessonPlayback({},base+'course-videos/film.mp4?X-Amz-Date=20261018T000145Z&X-Amz-Expires=21600')).toBe('https://signed.example/fresh');
+    }
+    expect(signed).toHaveBeenCalledWith('course-videos/film.mp4',3600);
+    await expect(signedLessonPlayback({},'https://other-bucket.s3.us-east-005.backblazeb2.com/private.mp4')).rejects.toThrow('LESSON_MEDIA_STORAGE_REFERENCE_REQUIRED');
+    await expect(signedLessonPlayback({},'https://elevate-course-media.s3.us-east-005.backblazeb2.com/%2e%2e/private.mp4')).rejects.toThrow('LESSON_MEDIA_REFERENCE_INVALID');
+    expect(signed).toHaveBeenCalledTimes(2);
   });
   it('routes managed media through the authenticated endpoint while retaining external player integrations', () => {
     expect(managedLessonPlaybackUrl('https://media.example/course-media/film.mp4','course','lesson')).toBe('/api/courses/course/lessons/lesson/playback');

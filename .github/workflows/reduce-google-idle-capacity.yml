@@ -10,6 +10,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     concurrency:
       group: google-runtime-us-central1
+      queue: max
       cancel-in-progress: false
     environment: production
     runs-on: ubuntu-24.04

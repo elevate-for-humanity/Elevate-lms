@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import ParisSupervisionPanel from '@/components/admin/ParisSupervisionPanel';
 import '@/apps/admin/styles/studio-mobile-safety.css';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
@@ -19,6 +20,7 @@ import {
   X,
 } from 'lucide-react';
 import UnifiedEllieChat from './UnifiedEllieChat';
+import { ResizableWorkspace } from './ResizableWorkspace';
 import { useStudioViewport } from './useStudioViewport';
 import RepositoryLivePreview from './RepositoryLivePreview';
 import StudioCapabilityRail from './StudioCapabilityRail';
@@ -97,6 +99,10 @@ export default function StudioCommandWorkspace({
           ? 'capability'
           : 'commands',
   );
+  const [lastSurface, setLastSurface] = useState<StudioSurface>('browser');
+  useEffect(() => {
+    if (surface !== 'commands') setLastSurface(surface);
+  }, [surface]);
   const [previewUrl, setPreviewUrl] = useState('');
   const [browserTarget, setBrowserTarget] = useState('');
   const [browserCommand, setBrowserCommand] = useState('');
@@ -110,7 +116,9 @@ export default function StudioCommandWorkspace({
   const currentTool = surface === 'capability' ? activeCapability : surface;
   useEffect(() => {
     if (!currentTool || currentTool === 'commands') return;
-    setVisitedTools((visited) => visited.has(currentTool) ? visited : new Set([...visited, currentTool]));
+    setVisitedTools((visited) =>
+      visited.has(currentTool) ? visited : new Set([...visited, currentTool]),
+    );
   }, [currentTool]);
   const hasOpenedTool = (tool: string) => currentTool === tool || visitedTools.has(tool);
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
@@ -336,11 +344,20 @@ export default function StudioCommandWorkspace({
             One workspace · governed workflow · verified evidence
           </span>
         </nav>
-        <nav aria-label="Studio tools" className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain border-t border-blue-100 bg-blue-50 px-2 py-1 [scrollbar-width:thin]">
+        <nav
+          aria-label="Studio tools"
+          className="flex min-w-0 gap-1 overflow-x-auto overscroll-x-contain border-t border-blue-100 bg-blue-50 px-2 py-1 [scrollbar-width:thin]"
+        >
           {workspaces.map((workspace) => (
-            <button type="button" key={workspace.id} onClick={() => openCapability(workspace.id)}
-              aria-pressed={currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course')}
-              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg px-3 text-xs font-bold ${currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course') ? 'bg-blue-700 text-white' : 'text-blue-950 hover:bg-blue-100'}`}>
+            <button
+              type="button"
+              key={workspace.id}
+              onClick={() => openCapability(workspace.id)}
+              aria-pressed={
+                currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course')
+              }
+              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg px-3 text-xs font-bold ${currentTool === workspace.id || (workspace.id === 'courses' && surface === 'course') ? 'bg-blue-700 text-white' : 'text-blue-950 hover:bg-blue-100'}`}
+            >
               {workspace.label}
             </button>
           ))}
@@ -391,161 +408,179 @@ export default function StudioCommandWorkspace({
             </nav>
           </StudioCapabilityRail>
         </div>
-        <main
-          className={`min-h-0 min-w-0 flex-1 overflow-hidden ${surface === 'commands' ? '' : 'lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(360px,1fr)]'}`}
-          aria-label="Studio workspace"
-        >
-          <section
-            className={
-              surface === 'commands'
-                ? 'flex h-full min-h-0 min-w-0 flex-col'
-                : 'hidden h-full min-h-0 min-w-0 flex-col lg:flex'
-            }
-            aria-label="Elevate Studio conversation"
-          >
-            <UnifiedEllieChat
-              key={conversationKey}
-              embedded
-              onOpenPreview={() => openPreview()}
-              onPreviewTarget={openPreview}
-              onTaskCheckpoint={setActiveTask}
-              onCommandStart={handleCommandStart}
-              onOpenTasks={() => openCapability('tasks')}
-              suggestedPrompt={suggestedPrompt}
-              restoreLatest={conversationKey === 0}
-              selectedConversationId={selectedConversationId}
-              restoredCheckpoint={activeTask}
-              onConversationChange={setActiveConversationId}
-            />
-          </section>
-
-          <section
-            className={
-              surface === 'commands' ? 'hidden' : 'flex h-full min-h-0 min-w-0 flex-col bg-white'
-            }
-            aria-label="Active Studio tool"
-          >
-            <header className="flex min-h-12 shrink-0 flex-wrap items-center gap-1.5 border-b border-slate-200 bg-slate-50 px-2 py-2 text-slate-950 sm:flex-nowrap sm:gap-2 sm:px-3">
-              <span className="min-w-0 basis-full truncate text-xs font-black sm:mr-auto sm:basis-auto">
-                {activeWorkspace?.label ??
-                  (surface === 'course' ? 'Course Builder' : 'Active run tools')}
-              </span>
-              <button
-                type="button"
-                aria-pressed={surface === 'preview' || surface === 'course'}
-                onClick={() => {
-                  setActiveCapability(null);
-                  setSurface(previewUrl ? 'preview' : 'course');
-                }}
-                className={`inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-md px-2 py-2 text-xs font-bold sm:min-h-0 sm:flex-none sm:px-3 ${surface === 'preview' || surface === 'course' ? 'bg-cyan-500 text-slate-950' : 'text-slate-700 hover:bg-slate-200'}`}
-              >
-                <Eye className="h-4 w-4" aria-hidden="true" /> {previewUrl ? 'Preview' : 'Course Builder'}
-              </button>
-              <button
-                type="button"
-                aria-pressed={surface === 'browser'}
-                onClick={() => {
-                  setActiveCapability(null);
-                  setSurface('browser');
-                }}
-                className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'browser' ? 'bg-violet-500 text-white' : 'text-slate-700 hover:bg-slate-200'}`}
-              >
-                <Globe2 className="h-4 w-4" aria-hidden="true" /> Browser
-              </button>
-              <button
-                type="button"
-                onClick={() => setFocusMode((value) => !value)}
-                className="inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-md px-2 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 sm:min-h-0 sm:flex-none sm:px-3"
-                aria-label={
-                  focusMode ? 'Exit full screen workspace' : 'Expand workspace to full screen'
+        <main className="min-h-0 min-w-0 flex-1 overflow-hidden" aria-label="Studio workspace">
+          <ResizableWorkspace
+            mobileExclusive
+            className="h-full"
+            title="Studio side panel"
+            open={surface !== 'commands'}
+            onOpenChange={(open) => setSurface(open ? lastSurface : 'commands')}
+            panel={
+              <section
+                className={
+                  surface === 'commands'
+                    ? 'hidden'
+                    : 'flex h-full min-h-0 min-w-0 flex-col bg-white'
                 }
+                aria-label="Active Studio tool"
               >
-                {focusMode ? (
-                  <Minimize2 className="h-4 w-4" aria-hidden="true" />
-                ) : (
-                  <Maximize2 className="h-4 w-4" aria-hidden="true" />
-                )}
-                <span className="hidden sm:inline">{focusMode ? 'Exit full screen' : 'Full screen'}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSurface('commands')}
-                className="min-h-11 flex-1 rounded-md px-2 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 sm:min-h-0 sm:flex-none sm:px-3"
-              >
-                Chat
-              </button>
-            </header>
-            <div
-              className={`min-h-0 min-w-0 flex-1 overflow-hidden ${focusMode ? 'p-0' : 'p-0 sm:p-2'}`}
+                <header className="flex min-h-12 shrink-0 flex-wrap items-center gap-1.5 border-b border-slate-200 bg-slate-50 px-2 py-2 text-slate-950 sm:flex-nowrap sm:gap-2 sm:px-3">
+                  <span className="min-w-0 basis-full truncate text-xs font-black sm:mr-auto sm:basis-auto">
+                    {activeWorkspace?.label ??
+                      (surface === 'course' ? 'Course Builder' : 'Active run tools')}
+                  </span>
+                  <button
+                    type="button"
+                    aria-pressed={surface === 'preview' || surface === 'course'}
+                    onClick={() => {
+                      setActiveCapability(null);
+                      setSurface(previewUrl ? 'preview' : 'course');
+                    }}
+                    className={`inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-md px-2 py-2 text-xs font-bold sm:min-h-0 sm:flex-none sm:px-3 ${surface === 'preview' || surface === 'course' ? 'bg-cyan-500 text-slate-950' : 'text-slate-700 hover:bg-slate-200'}`}
+                  >
+                    <Eye className="h-4 w-4" aria-hidden="true" />{' '}
+                    {previewUrl ? 'Preview' : 'Course Builder'}
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={surface === 'browser'}
+                    onClick={() => {
+                      setActiveCapability(null);
+                      setSurface('browser');
+                    }}
+                    className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'browser' ? 'bg-violet-500 text-white' : 'text-slate-700 hover:bg-slate-200'}`}
+                  >
+                    <Globe2 className="h-4 w-4" aria-hidden="true" /> Browser
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFocusMode((value) => !value)}
+                    className="inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-md px-2 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 sm:min-h-0 sm:flex-none sm:px-3"
+                    aria-label={
+                      focusMode ? 'Exit full screen workspace' : 'Expand workspace to full screen'
+                    }
+                  >
+                    {focusMode ? (
+                      <Minimize2 className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <Maximize2 className="h-4 w-4" aria-hidden="true" />
+                    )}
+                    <span className="hidden sm:inline">
+                      {focusMode ? 'Exit full screen' : 'Full screen'}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSurface('commands')}
+                    className="min-h-11 flex-1 rounded-md px-2 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200 sm:min-h-0 sm:flex-none sm:px-3"
+                  >
+                    Chat
+                  </button>
+                </header>
+                <div
+                  className={`min-h-0 min-w-0 flex-1 overflow-hidden ${focusMode ? 'p-0' : 'p-0 sm:p-2'}`}
+                >
+                  <div
+                    className={
+                      surface === 'capability' && activeCapability === 'workflows'
+                        ? 'h-full'
+                        : 'hidden'
+                    }
+                  >
+                    {hasOpenedTool('workflows') ? <WorkflowsWorkspace embedded /> : null}
+                  </div>
+                  <div
+                    className={
+                      surface === 'capability' && activeCapability === 'intelligence'
+                        ? 'h-full'
+                        : 'hidden'
+                    }
+                  >
+                    {hasOpenedTool('intelligence') ? (
+                      <IntelligenceWorkspace onAskAI={askAdminAI} />
+                    ) : null}
+                  </div>
+                  <div
+                    className={
+                      surface === 'capability' && activeCapability === 'tasks' ? 'h-full' : 'hidden'
+                    }
+                  >
+                    {hasOpenedTool('tasks') ? (
+                      <TasksWorkspace embedded conversationId={activeConversationId} />
+                    ) : null}
+                  </div>
+                  <div
+                    className={
+                      surface === 'capability' && activeCapability && mountedWorkspaceUrl
+                        ? 'h-full'
+                        : 'hidden'
+                    }
+                  >
+                    {activeCapability === 'health' && <details className="border-b border-slate-200 p-3"><summary className="cursor-pointer font-semibold">PARIS execution and recovery evidence</summary><ParisSupervisionPanel active={surface === 'capability'} /></details>}
+                    {mountedWorkspaceUrl ? (
+                      <RepositoryLivePreview
+                        filePath={null}
+                        content=""
+                        initialUrl={`https://admin.elevateforhumanity.org${mountedWorkspaceUrl}`}
+                        trustedInteractive
+                        allowManualTarget={false}
+                        allowExternalOpen={false}
+                        targetLabel="Active capability"
+                      />
+                    ) : null}
+                  </div>
+                  <div className={surface === 'course' ? 'h-full' : 'hidden'}>
+                    {hasOpenedTool('course') ? <UnifiedCourseBuilder embedded /> : null}
+                  </div>
+                  <div className={surface === 'preview' ? 'h-full' : 'hidden'}>
+                    {hasOpenedTool('preview') ? (
+                      <RepositoryLivePreview
+                        filePath={null}
+                        content=""
+                        initialUrl={previewUrl || courseBuilderUrl}
+                        trustedInteractive
+                        allowManualTarget={false}
+                        allowExternalOpen={Boolean(activeTask?.runId)}
+                        targetLabel="Active run preview"
+                      />
+                    ) : null}
+                  </div>
+                  <div className={surface === 'browser' ? 'h-full' : 'hidden'}>
+                    {hasOpenedTool('browser') ? (
+                      <CloudBrowserWorkspace
+                        unifiedTask={activeTask}
+                        conversationId={activeConversationId}
+                        autoStart={surface === 'browser'}
+                        initialTarget={browserTarget}
+                        initialTask={browserCommand}
+                        autoRunTask={surface === 'browser'}
+                      />
+                    ) : null}
+                  </div>
+                </div>
+              </section>
+            }
+          >
+            <section
+              className="flex h-full min-h-0 min-w-0 flex-col"
+              aria-label="Elevate Studio conversation"
             >
-              <div
-                className={
-                  surface === 'capability' && activeCapability === 'workflows' ? 'h-full' : 'hidden'
-                }
-              >
-                {hasOpenedTool('workflows') ? <WorkflowsWorkspace embedded /> : null}
-              </div>
-              <div
-                className={
-                  surface === 'capability' && activeCapability === 'intelligence'
-                    ? 'h-full'
-                    : 'hidden'
-                }
-              >
-                {hasOpenedTool('intelligence') ? <IntelligenceWorkspace onAskAI={askAdminAI} /> : null}
-              </div>
-              <div
-                className={
-                  surface === 'capability' && activeCapability === 'tasks' ? 'h-full' : 'hidden'
-                }
-              >
-                {hasOpenedTool('tasks') ? <TasksWorkspace embedded conversationId={activeConversationId} /> : null}
-              </div>
-              <div
-                className={
-                  surface === 'capability' && activeCapability && mountedWorkspaceUrl
-                    ? 'h-full'
-                    : 'hidden'
-                }
-              >
-                {mountedWorkspaceUrl ? (
-                  <RepositoryLivePreview
-                    filePath={null}
-                    content=""
-                    initialUrl={`https://admin.elevateforhumanity.org${mountedWorkspaceUrl}`}
-                    trustedInteractive
-                    allowManualTarget={false}
-                    allowExternalOpen={false}
-                    targetLabel="Active capability"
-                  />
-                ) : null}
-              </div>
-              <div className={surface === 'course' ? 'h-full' : 'hidden'}>
-                {hasOpenedTool('course') ? <UnifiedCourseBuilder embedded /> : null}
-              </div>
-              <div className={surface === 'preview' ? 'h-full' : 'hidden'}>
-                {hasOpenedTool('preview') ? <RepositoryLivePreview
-                  filePath={null}
-                  content=""
-                  initialUrl={previewUrl || courseBuilderUrl}
-                  trustedInteractive
-                  allowManualTarget={false}
-                  allowExternalOpen={Boolean(activeTask?.runId)}
-                  targetLabel="Active run preview"
-                /> : null}
-              </div>
-              <div className={surface === 'browser' ? 'h-full' : 'hidden'}>
-                {hasOpenedTool('browser') ? <CloudBrowserWorkspace
-                  unifiedTask={activeTask}
-                  conversationId={activeConversationId}
-                  autoStart={surface === 'browser'}
-                  initialTarget={browserTarget}
-                  initialTask={browserCommand}
-                  autoRunTask={surface === 'browser'}
-                /> : null}
-              </div>
-            </div>
-          </section>
+              <UnifiedEllieChat
+                key={conversationKey}
+                embedded
+                onOpenPreview={() => openPreview()}
+                onPreviewTarget={openPreview}
+                onTaskCheckpoint={setActiveTask}
+                onCommandStart={handleCommandStart}
+                onOpenTasks={() => openCapability('tasks')}
+                suggestedPrompt={suggestedPrompt}
+                restoreLatest={conversationKey === 0}
+                selectedConversationId={selectedConversationId}
+                restoredCheckpoint={activeTask}
+                onConversationChange={setActiveConversationId}
+              />
+            </section>
+          </ResizableWorkspace>
         </main>
       </div>
     </div>

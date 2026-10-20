@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   BookOpen,
@@ -26,6 +26,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { useCourse, type StudioPanel } from './CourseProvider';
+import { ResizableWorkspace } from './ResizableWorkspace';
 
 const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), { ssr: false });
 
@@ -104,7 +105,7 @@ function StudioTopbar({
   const { course, publishState } = state;
 
   return (
-    <header className="h-14 border-b border-slate-200 bg-white flex items-center gap-3 px-4 shrink-0">
+    <header className="min-h-14 border-b border-slate-200 bg-white flex flex-wrap items-center gap-2 px-3 py-2 shrink-0">
       {embedded ? (
         <span className="hidden text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700 sm:inline">
           Course workspace
@@ -265,7 +266,8 @@ export function CourseStudioApplication({
 }) {
   const [previewOpen, setPreviewOpen] = useState(true);
   const [previewRevision, setPreviewRevision] = useState(0);
-  const [cloudBrowserOpen, setCloudBrowserOpen] = useState(false);
+  const [browserMode, setBrowserMode] = useState<'learner' | 'cloud'>('learner');
+  const [cloudBrowserVisited, setCloudBrowserVisited] = useState(false);
   const { state } = useCourse();
   const previewUrl = `/api/admin/course-builder/preview?courseId=${encodeURIComponent(state.course.id)}`;
 
@@ -273,70 +275,87 @@ export function CourseStudioApplication({
     <div
       className={
         embedded
-          ? 'flex min-h-[calc(100vh-10rem)] flex-col bg-slate-50'
-          : 'flex h-screen flex-col overflow-hidden bg-slate-50'
+          ? 'flex h-[calc(100dvh-10rem)] min-h-[34rem] min-w-0 flex-col bg-slate-50'
+          : 'flex h-dvh min-w-0 flex-col overflow-hidden bg-slate-50'
       }
     >
       <StudioTopbar
-        previewOpen={previewOpen}
-        onTogglePreview={() => setPreviewOpen((value) => !value)}
+        previewOpen={previewOpen && browserMode === 'learner'}
+        onTogglePreview={() => {
+          setPreviewOpen(browserMode !== 'learner' || !previewOpen);
+          setBrowserMode('learner');
+        }}
         embedded={embedded}
       />
       <PublishProgress />
-      <div className="border-b border-slate-200 bg-slate-950 px-3 py-2 text-white">
-        <button type="button" onClick={() => setCloudBrowserOpen((value) => !value)} className="rounded-lg border border-cyan-500/50 px-3 py-1.5 text-xs font-bold text-cyan-200 hover:bg-cyan-500/10">
-          {cloudBrowserOpen ? 'Hide Cloud Studio browser' : 'Open Cloud Studio browser'}
+      <div className="flex shrink-0 flex-wrap gap-2 border-b border-slate-200 bg-slate-950 px-3 py-2 text-white">
+        <button
+          type="button"
+          onClick={() => {
+            setBrowserMode('learner');
+            setPreviewOpen(true);
+          }}
+          aria-pressed={previewOpen && browserMode === 'learner'}
+          className="min-h-11 rounded-lg border border-cyan-500/50 px-3 py-2 text-xs font-bold text-cyan-200 hover:bg-cyan-500/10"
+        >
+          Learner preview
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setBrowserMode('cloud');
+            setCloudBrowserVisited(true);
+            setPreviewOpen(true);
+          }}
+          aria-pressed={previewOpen && browserMode === 'cloud'}
+          className="min-h-11 rounded-lg border border-cyan-500/50 px-3 py-2 text-xs font-bold text-cyan-200 hover:bg-cyan-500/10"
+        >
+          Cloud Studio browser
         </button>
       </div>
-      {cloudBrowserOpen ? (
-        <div className="h-[52vh] min-h-[34rem] border-b border-slate-700 bg-slate-950">
-          <CloudBrowserWorkspace autoStart initialTarget={typeof window !== 'undefined' ? window.location.href : ''} />
-        </div>
-      ) : null}
-      <div
-        className={`grid flex-1 ${embedded ? 'items-start overflow-visible' : 'min-h-0 overflow-hidden'} ${previewOpen ? 'xl:grid-cols-[minmax(0,1fr)_minmax(520px,46vw)]' : 'grid-cols-1'}`}
-      >
-        <main className={embedded ? 'min-w-0 overflow-visible' : 'min-h-0 overflow-y-auto'}>
-          {children}
-        </main>
-        {previewOpen && (
-          <aside
-            className={
-              embedded
-                ? 'min-h-[42rem] overflow-hidden border-t border-slate-200 bg-white xl:sticky xl:top-0 xl:h-[calc(100vh-1rem)] xl:border-l xl:border-t-0'
-                : 'min-h-[45vh] overflow-hidden border-l border-slate-200 bg-white lg:min-h-0'
-            }
-            aria-label="Live learner browser"
-          >
-            <div className="flex h-10 items-center justify-between border-b border-slate-200 bg-slate-950 px-3 text-xs text-white">
-              <div className="min-w-0">
+      <ResizableWorkspace
+        className="min-h-0 flex-1"
+        title="Course side panel"
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+        panel={
+          <>
+            <aside
+              hidden={browserMode !== 'learner'}
+              className={browserMode === 'learner' ? 'flex h-full min-h-0 flex-col overflow-hidden bg-white' : 'hidden'}
+              aria-label="Live learner browser"
+            >
+              <div className="flex min-h-11 flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-slate-950 px-3 text-xs text-white">
                 <span className="font-semibold">Live LMS browser</span>
-                <span className="ml-2 hidden truncate text-slate-600 sm:inline">
-                  Real learner course and lesson player
-                </span>
+                <button
+                  type="button"
+                  onClick={() => setPreviewRevision((value) => value + 1)}
+                  className="inline-flex min-h-11 items-center gap-1 rounded px-2 py-1 font-semibold text-slate-200 hover:bg-slate-800"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" /> Refresh
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setPreviewRevision((value) => value + 1)}
-                className="inline-flex items-center gap-1 rounded px-2 py-1 font-semibold text-slate-200 hover:bg-slate-800"
-              >
-                <RefreshCw className="h-3.5 w-3.5" /> Refresh
-              </button>
+              <iframe
+                key={`${previewUrl}-${state.autosave.lastSavedAt ?? 'initial'}-${previewRevision}`}
+                src={previewUrl}
+                title="Live learner course preview"
+                allow="autoplay; fullscreen; microphone; camera"
+                className="h-full min-h-0 w-full flex-1 bg-white"
+              />
+            </aside>
+            <div className={browserMode === 'cloud' ? 'h-full' : 'hidden'}>
+              {cloudBrowserVisited ? (
+                <CloudBrowserWorkspace
+                  autoStart={previewOpen && browserMode === 'cloud'}
+                  initialTarget={typeof window !== 'undefined' ? window.location.href : ''}
+                />
+              ) : null}
             </div>
-            <iframe
-              key={`${previewUrl}-${state.autosave.lastSavedAt ?? 'initial'}-${previewRevision}`}
-              src={previewUrl}
-              title="Live learner course preview"
-              allow="autoplay; fullscreen; microphone; camera"
-              className={
-                embedded
-                  ? 'h-[70vh] min-h-[42rem] w-full bg-white xl:h-[calc(100vh-3.5rem)]'
-                  : 'h-[calc(100%-2.5rem)] min-h-[40vh] w-full bg-white'
-              }
-            />
-          </aside>
-        )}
-      </div>
+          </>
+        }
+      >
+        <main className="min-h-0 min-w-0">{children}</main>
+      </ResizableWorkspace>
     </div>
   );
 }

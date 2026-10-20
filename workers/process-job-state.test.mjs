@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {preservedCourseCursor} from '../lib/ultimate-course-builder/worker/preserve-completed.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
@@ -18,8 +19,9 @@ const source = stripTypeScriptTypes(readFileSync(productionPath, 'utf8'))
 function scenario(payload, completed = true, options = {}) {
   const events = [];
   const build = { id: 'build', course_id: 'course', status: 'blocked', profile: { competencies: [{ id: 'competency' }] } };
-  const q = { select: () => q, eq: () => q, single: async () => ({ data: build, error: null }) };
-  const db = { from: () => q };
+  const q = { select: () => q, eq: () => q, single: async () => ({ data: build, error: null }), then: resolve => resolve({data:[{competency_id:'competency',status:'built',artifacts:{}}],error:null}) };
+  const profileWrites=[];
+  const db = { from: () => q, rpc: async (_name,args) => {profileWrites.push(args.p_data.profile);return {error:null};} };
   class Queue {
     async claim() { return { id: 'job', build_id: 'build', execution_generation: 1, payload }; }
     async heartbeat() { return true; }
@@ -28,10 +30,10 @@ function scenario(payload, completed = true, options = {}) {
     async waitForDependency() { events.push('dependency'); }
   }
   const runtime = { persistence: { updateBuild: async value => events.push(value) }, artifacts: {} };
-  const names = ['createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
-  const values = [createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class {}, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
+  const names = ['preservedCourseCursor','recordProductionAlert','createCourseProgressWatch','reportCourseProgress','createLeaseDeadline', 'UltimateJobQueue', 'createUltimateRuntime', 'createProductionHandlers', 'UltimateBuildRunner', 'runUltimateCourse', 'assertCompleteLesson', 'UltimateReleaseService', 'nextCourseWork', 'resolveReleaseActor', 'hydrateUltimateProfileSources', 'materializeUltimateDraft', 'isDurableExternalBlocker'];
+  const values = [preservedCourseCursor,async()=>{},createCourseProgressWatch,reportCourseProgress,options.leaseFactory || createLeaseDeadline, Queue, async () => runtime, () => ({}), class {}, options.runCourse || (async () => ({ completed, findings: [], lessons: [] })), () => {}, class { async publish() { events.push('publish'); } }, () => ({ continue: false }), async () => 'actor', async (_db, _id, profile) => profile, async (_db, _id, profile) => profile, isDurableExternalBlocker];
   const worker = new Function(...names, 'liveCheckpointRepairReader', source + '\nreturn processUltimateJob;')(...values,liveCheckpointRepairReader);
-  return { events, run: () => worker(db, 'owner') };
+  return { events, build, profileWrites, run: () => worker(db, 'owner') };
 }
 
 test('a successful targeted lesson clears course running state before releasing its job', async () => {
@@ -58,4 +60,21 @@ test('missing Google permission waits for a dependency without consuming repair 
 test('a media task that never returns loses its lease without completing or changing the job',async()=>{
  const s=scenario({acceptance:true},false,{leaseFactory:(id,options)=>createLeaseDeadline(id,{...options,leaseMs:10}),runCourse:()=>new Promise(()=>{})});
  const result=await s.run();assert.equal(result.completed,false);assert.match(result.error,/LEASE_LOST/);assert.deepEqual(s.events,[]);
+});
+
+test('an explicit pause stops before the next checkpoint without completing or failing saved work',async()=>{
+ let s;
+ s=scenario({acceptance:true},false,{runCourse:async plan=>{
+  s.build.profile.ownerPaused=true;
+  await plan.beforeCheckpoint('storyboard');
+  throw new Error('Paused checkpoint must not execute');
+ }});
+ const result=await s.run();assert.equal(result.ownerPaused,true);assert.deepEqual(s.events,['dependency']);
+});
+
+test('a completed legacy owner-review course publishes without waiting for a manual decision',async()=>{
+ const s=scenario({});s.build.profile.publicationPolicy='owner-review-required';
+ const result=await s.run();assert.equal(result.completed,true);
+ assert.equal(s.profileWrites[0]?.publicationPolicy,'automatic-quality-verified');
+ assert.deepEqual(s.events,[{buildId:'build',status:'built',currentStep:'credential_release'},'publish','complete']);
 });

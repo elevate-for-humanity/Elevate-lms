@@ -48,7 +48,7 @@ function blockedPath(path: string): boolean {
     path.includes('..') ||
     /^\.env(?:\.|$)/.test(path) ||
     path.startsWith('.git/') ||
-    /code-repair|paris-code-engineer|main-release|api-auth|guards|role-matrix/i.test(path) ||
+    /code-repair|course-repair-policy|workflow-github-context|github-token|paris-code-engineer|main-release|api-auth|guards|role-matrix/i.test(path) ||
     path.includes('/node_modules/') ||
     path.includes('/.next/') ||
     !/^(lib|components|apps|remotion-src|workers|tests)\//.test(path) ||
@@ -158,7 +158,17 @@ async function searchCode(query: string) {
   );
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(`GitHub code search failed: ${String(payload?.message ?? response.status)}`);
+    // Search has an independent GitHub rate limit. Let the repair planner
+    // continue with known-file reads instead of consuming another inference
+    // turn retrying an unavailable search endpoint.
+    if (response.status === 403 || response.status === 429) {
+      const remaining = response.headers.get('x-ratelimit-remaining');
+      const message = String(payload?.message ?? '').toLowerCase();
+      if (response.status === 429 || remaining === '0' || message.includes('rate limit') || message.includes('try again')) {
+        return [];
+      }
+    }
+    throw new Error(`GitHub code search failed: ${response.status}`);
   }
   return (Array.isArray(payload.items) ? payload.items : []).map((item: any) => ({
     path: item.path,

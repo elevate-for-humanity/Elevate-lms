@@ -26,6 +26,18 @@ body {
   overflow-x: clip;
 }
 
+/* Keep PWA controls above Admin's mobile dock and the device home indicator. */
+@media (max-width: 1023px) {
+  body.admin-portal:has([aria-label='Mobile admin navigation']) {
+    --elevate-pwa-bottom-offset: 5rem;
+  }
+}
+
+/* An update takes priority; two fixed banners must not cover each other. */
+body:has([data-pwa-update-notice]) [data-pwa-install-banner] {
+  display: none;
+}
+
 :where(main, header, footer, nav, section, article, aside, form, fieldset, div) {
   min-width: 0;
 }

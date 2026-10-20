@@ -1083,10 +1083,21 @@ export async function renderStoryboardVideo(
       const manifestPath = path.join(paths.outputDir, 'segments.ffconcat');
       await writeFile(manifestPath, 'ffconcat version 1.0\n' +
         chunkPaths.map(p => "file '" + p.replace(/'/g, "'\\''") + "'").join('\n') + '\n');
-      await execFileAsync('ffmpeg', [
+      // Never dispatch a concat without both verified inputs and a destination.
+      // Past worker logs showed ffmpeg invoked with only the input arguments.
+      if (!chunkPaths.length) throw new Error('REMOTION_CONCAT_SEGMENTS_MISSING');
+      if (!paths.videoPath || paths.videoPath === manifestPath) throw new Error('REMOTION_CONCAT_OUTPUT_REQUIRED');
+      const concatArgs = [
         '-y', '-f', 'concat', '-safe', '0', '-i', manifestPath,
-        '-c', 'copy', '-movflags', '+faststart', paths.videoPath,
-      ], {timeout: 600_000, maxBuffer: 2_000_000});
+        // Each independently rendered frame-range chunk can carry its own encoded\n        // timebase/keyframe boundaries. Normalize PTS and re-encode at assembly\n        // so later scenes never replay earlier frames after concat.\n        '-fflags', '+genpts', '-c:v', 'libx264', '-preset', 'fast', '-crf', '20',\n        '-r', String(composition.fps), '-fps_mode', 'cfr',\n        '-c:a', 'aac', '-af', 'aresample=async=1:first_pts=0',\n        '-movflags', '+faststart', paths.videoPath,
+      ];
+      if (concatArgs.at(-1) !== paths.videoPath) throw new Error('REMOTION_CONCAT_OUTPUT_REQUIRED');
+      try {
+        await execFileAsync('ffmpeg', concatArgs, {timeout: 600_000, maxBuffer: 2_000_000});
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        throw new Error('REMOTION_FFMPEG_ASSEMBLY_FAILED:' + detail, {cause: error});
+      }
       const output = await stat(paths.videoPath);
       if (!output.size) throw new Error('REMOTION_MP4_EMPTY');
       logger.info('[RemotionRender] storyboard MP4 written', {lessonId: input.lessonId, bytes: output.size});

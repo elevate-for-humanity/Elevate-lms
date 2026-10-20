@@ -122,6 +122,26 @@ export async function GET() {
     }
   }
 
+  // Keep active salon placements visible even when a formal sponsor standard
+  // is not yet bound. Service observations are NOT competency approvals.
+  const included = new Set(apprentices.map((item: any) => item.placementId));
+  const remainingPlacements = (placements || []).filter((item: any) => !included.has(item.id));
+  for (const placement of remainingPlacements) {
+    const enrollment = enrollmentByPlacement.get(placement.id);
+    if (!enrollment) continue;
+    const profile: any = profileById.get(placement.student_id) || {};
+    apprentices.push({
+      placementId: placement.id, shopId: placement.shop_id, studentId: placement.student_id,
+      enrollmentId: enrollment.id, programSlug: placement.program_slug,
+      name: profile.full_name || profile.email || 'Assigned apprentice', email: profile.email || '',
+      practiceOnly: true, completedCompetencies: 0, competencyRecords: [],
+      standard: {
+        occupationTitle: placement.program_slug === 'cosmetology-apprenticeship' ? 'Hair Stylist' : 'Assigned occupation',
+        onetSocCode: '', rapidsCode: '', competencyCount: 0, relatedInstructionHours: 0,
+        probationaryHours: 0, startingHourlyRate: 0, mentorHourlyRate: 0, wageMilestones: [], competencies: [],
+      },
+    });
+  }
   return NextResponse.json({ apprentices });
 }
 

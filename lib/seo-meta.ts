@@ -12,11 +12,11 @@ const defaultImage = `${baseUrl}/images/og-default.jpg`;
 
 // Homepage Meta
 export const homePageMeta: Metadata = {
-  title: `Free Job Training Programs | ${PLATFORM_DEFAULTS.orgName}`,
+  title: `Career Training Programs | ${PLATFORM_DEFAULTS.orgName}`,
   description:
-    'Get trained for free in high-demand careers. WIOA-funded programs in barbering, healthcare, HVAC, and more. No debt. Real careers. Indiana.',
+    'Explore Indiana career training, registered apprenticeship support, and program-specific workforce funding pathways. Tuition and funding status vary by program.',
   keywords: [
-    'free job training',
+    'career training Indiana',
     'WIOA programs',
     'workforce development',
     'career training Indiana',
@@ -118,7 +118,7 @@ export const applicationPageMeta: Metadata = {
   keywords: [
     'apply for training',
     'WIOA application',
-    'free training application',
+    'career training application',
     'career training enrollment',
   ],
   openGraph: {

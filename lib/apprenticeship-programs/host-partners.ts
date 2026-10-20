@@ -179,6 +179,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     ],
     websiteUrl: 'https://booksy.com/en-us/211056_cal-s-kutz-studio_barber-shop_19577_indianapolis',
     websiteLabel: 'Book / view Cals Kutz online',
+    bookingUrl: 'https://booksy.com/en-us/211056_cal-s-kutz-studio_barber-shop_19577_indianapolis',
     socialUrl: 'https://www.instagram.com/cal_kutz/',
     socialLabel: 'View Cals Kutz photos',
   },

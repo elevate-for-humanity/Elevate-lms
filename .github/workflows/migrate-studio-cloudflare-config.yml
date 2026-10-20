@@ -11,6 +11,7 @@ permissions:
   id-token: write
 concurrency:
   group: google-runtime-us-central1
+  queue: max
   cancel-in-progress: false
 jobs:
   migrate:

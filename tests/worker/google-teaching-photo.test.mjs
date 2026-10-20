@@ -33,13 +33,13 @@ test('Google identity generates PNG illustrations without an external API key',a
 });
 test('blocked or missing generation never substitutes a diagram or unrelated stock',async()=>{
  let calls=0;
- await assert.rejects(generateTeachingPhoto('prompt',{env:{},request:async()=>++calls===1?{ok:true,json:async()=>({access_token:'token'})}:{ok:true,json:async()=>({predictions:[]})}}),/MISSING_OR_FILTERED/);
+ await assert.rejects(generateTeachingPhoto('prompt',{env:{},delay:async()=>{},request:async()=>++calls===1?{ok:true,json:async()=>({access_token:'token'})}:{ok:true,json:async()=>({predictions:[]})}}),/MISSING_OR_FILTERED/);
 });
 
 test('JPEG and WebP responses retain their actual format instead of being reported missing',async()=>{
  for(const mimeType of ['image/jpeg','image/webp']){
   let calls=0;
-  const result=await generateTeachingPhoto('prompt',{env:{},request:async()=>++calls===1?{ok:true,json:async()=>({access_token:'token'})}:{ok:true,json:async()=>({candidates:[{content:{parts:[{inlineData:{mimeType,data:Buffer.from('supported image').toString('base64')}}]}}]})}});
+  const result=await generateTeachingPhoto('prompt',{env:{},delay:async()=>{},request:async()=>++calls===1?{ok:true,json:async()=>({access_token:'token'})}:{ok:true,json:async()=>({candidates:[{content:{parts:[{inlineData:{mimeType,data:Buffer.from('supported image').toString('base64')}}]}}]})}});
   assert.equal(result.mimeType,mimeType);assert.equal(result.bytes.toString(),'supported image');
  }
 });

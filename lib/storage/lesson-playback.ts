@@ -35,5 +35,21 @@ export async function signedLessonPlayback(db: any, source: string) {
     if (!url) throw new Error('LESSON_MEDIA_SIGNING_FAILED');
     return url;
   }
+  // Saved private renders may use the configured S3 endpoint rather than a
+  // public delivery host. Renew that exact bucket reference, never an input URL.
+  if (config.endpoint && config.bucket) {
+    const endpoint = new URL(config.endpoint);
+    const virtual = new URL(endpoint);
+    virtual.hostname = `${config.bucket}.${endpoint.hostname}`;
+    const prefixes = [virtual.origin + '/', endpoint.origin + '/' + encodeURIComponent(config.bucket) + '/'];
+    const prefix = prefixes.find(value => source.startsWith(value));
+    if (prefix) {
+      const key = decodeURIComponent(source.slice(prefix.length).split('?')[0]);
+      if (!validKey(key)) throw new Error('LESSON_MEDIA_REFERENCE_INVALID');
+      const url = await getSignedElevateMediaUrl(key, 3600);
+      if (!url) throw new Error('LESSON_MEDIA_SIGNING_FAILED');
+      return url;
+    }
+  }
   throw new Error('LESSON_MEDIA_STORAGE_REFERENCE_REQUIRED');
 }

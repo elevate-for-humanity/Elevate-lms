@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { getUserEnrollments, type NormalizedEnrollment } from '@/lib/enrollments/getUserEnrollments';
 import { getRequiredAgreementsForProgram, type RequiredAgreement } from '@/lib/legal/requiredAgreements';
 
@@ -35,7 +37,14 @@ export type LearnerWorkspace = {
 };
 
 export async function loadLearnerWorkspace(userId: string, role = 'student'): Promise<LearnerWorkspace> {
-  const supabase = await createClient();
+  const actorDb = await createClient();
+  const { data: { user } } = await actorDb.auth.getUser();
+  if (!user) throw new Error('Sign in required.');
+  const previewDb = await requireAdminClient();
+  const preview = await resolvePortalPreviewSubject(previewDb, user.id);
+  const allowed = user.id === userId || (preview.previewing && preview.userId === userId);
+  if (!allowed) throw new Error('Learner workspace access denied.');
+  const supabase = user.id === userId ? actorDb : previewDb;
   const warnings: string[] = [];
   const enrollmentResult = await getUserEnrollments(userId);
   if (enrollmentResult.error) warnings.push('Enrollment records could not be loaded.');
@@ -107,7 +116,21 @@ export async function loadLearnerWorkspace(userId: string, role = 'student'): Pr
     ...agreements.map((agreement) => ({ id: `agreement:${agreement.type}`, title: agreement.title, description: agreement.description, href: agreement.type === 'handbook' ? '/lms/handbook' : '/lms/agreements', status: agreement.signed ? 'complete' as const : 'missing' as const, completedAt: agreement.acceptedAt, blocking: true })),
     { id: 'orientation', title: 'Complete learner orientation', description: 'Review how training, support, progress, and credentials work.', href: '/lms/orientation', status: orientationComplete ? 'complete' : 'missing', completedAt: progress?.completed_at ?? null, blocking: true },
     { id: 'course_assignment', title: 'Confirm course assignment', description: trainingEnrollment ? 'Your program or course assignment is recorded.' : 'A course or external-provider assignment has not been connected yet.', href: '/lms/courses', status: trainingEnrollment ? 'complete' : 'blocked', completedAt: null, blocking: true },
-    { id: 'course_access', title: 'Open training access', description: trainingEnrollment?.continue_url && trainingEnrollment.continue_url !== '/lms/dashboard' ? 'Your next training destination is available.' : 'Training access is waiting on assignment or approval.', href: '/lms/courses', status: trainingEnrollment?.continue_url && trainingEnrollment.continue_url !== '/lms/dashboard' ? 'complete' : 'blocked', completedAt: null, blocking: true },
+    {
+      id: 'course_access',
+      title: 'Course materials access',
+      description:
+        trainingEnrollment?.continue_url && trainingEnrollment.continue_url !== '/lms/dashboard'
+          ? 'Your training destination is available.'
+          : 'Curriculum materials will unlock once orientation and document verification are complete.',
+      href: '/lms/courses',
+      status:
+        trainingEnrollment?.continue_url && trainingEnrollment.continue_url !== '/lms/dashboard'
+          ? 'complete'
+          : 'in_progress',
+      completedAt: null,
+      blocking: false,
+    },
   ];
 
   const completed = onboardingSteps.filter((step) => step.status === 'complete').length;

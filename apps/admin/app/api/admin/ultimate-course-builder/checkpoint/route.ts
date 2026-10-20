@@ -1,3 +1,4 @@
+import { adminPreviewPlaybackUrl } from '@/lib/ultimate-course-builder/media/admin-preview-url.mjs';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -54,7 +55,7 @@ export async function GET(req: NextRequest) {
       state: step?.state ?? 'not_started', findings, missingEvidence: missing, prerequisites,
       awaitingPrerequisites: step?.state !== 'failed' && step?.state !== 'passed' && missing.length > 0,
       repairTargets: routeSelectiveRepairs(findings), completedAt: step?.completed_at ?? null,
-      videoUrl, historicalVersion,
+      videoUrl: videoUrl ? adminPreviewPlaybackUrl(input.buildId, c.lesson.id, videoUrl) : null, historicalVersion,
       mediaApproved: historicalVersion === null && c.lesson.artifacts?.finished_media_qa?.mediaQA?.pass === true,
       workerStatus: c.job?.status ?? 'not_started', heartbeatAt: c.job?.heartbeat_at ?? null,
     } });

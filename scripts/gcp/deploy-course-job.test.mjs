@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {courseJobEnvironment,courseJobResources,courseB2Environment} from './deploy-course-job.mjs';
+import {courseJobEnvironment,courseJobResources,courseB2Environment,deployCourseJob} from './deploy-course-job.mjs';
 const b2=()=>({ELEVATE_MEDIA_ENDPOINT:'https://s3.us-west-004.backblazeb2.com',ELEVATE_MEDIA_ACCESS_KEY_ID:'fixture-key',ELEVATE_MEDIA_SECRET_ACCESS_KEY:'fixture-secret',ELEVATE_MEDIA_BUCKET:'fixture-bucket',ELEVATE_MEDIA_PUBLIC_URL:'https://media.example.org/course-media'});
 const source=()=>({runtimeEnvironment:{...b2(),NEXT_PUBLIC_SUPABASE_URL:'https://cuxzzpsyufcewtmicszk.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'private-test',STORAGE_KEY:'storage-test',ULTIMATE_WORKER_ID:'northflank-fixed',PORT:'3000',AI_NARRATION_PROVIDER:'cloudflare'}});
 test('worker migration preserves source credentials without restoring paid narration or fixed lease identity',()=>{
@@ -39,4 +39,23 @@ test('wrong tenant, missing credentials and unhandled persistent state stop depl
  const missing=source();delete missing.runtimeEnvironment.SUPABASE_SERVICE_ROLE_KEY;assert.throws(()=>courseJobEnvironment(missing,{}));
  assert.throws(()=>courseJobEnvironment({...source(),runtimeFiles:{'/x':'file'}},{}));
  assert.throws(()=>courseJobEnvironment(source(),{volumes:[{}]}));
+});
+
+function releaseFixture({same=false,drift=false}={}) {
+ const image=digest=>'us-central1-docker.pkg.dev/elegant-racer-299721/elevate/ultimate-worker@sha256:'+digest.repeat(64);
+ const task={serviceAccountName:'elevate-worker-runtime@elegant-racer-299721.iam.gserviceaccount.com',maxRetries:1,timeoutSeconds:'10800',containers:[{image:image(same?'b':'a'),resources:{limits:{cpu:'8',memory:'32Gi'}},env:[{name:'ULTIMATE_WORKER_ONCE',value:'true'},{name:'ELEVATE_MEDIA_PUBLIC_URL',value:''},{name:'PRIVATE_STORAGE_KEY',valueFrom:{secretKeyRef:{name:'existing-storage',key:'latest'}}}]}]};
+ const job={spec:{template:{spec:{taskCount:1,parallelism:1,template:{spec:task}}}}};let updated=false;const calls=[];
+ const run=args=>{calls.push(args);if(args[0]==='artifacts')return 'sha256:'+'b'.repeat(64);if(args[2]==='update'){updated=true;return '';}
+  const copy=structuredClone(job);if(updated){copy.spec.template.spec.template.spec.containers[0].image=image('b');if(drift)copy.spec.template.spec.template.spec.containers[0].env=[];}return JSON.stringify(copy);};
+ return {run,calls};
+}
+test('primary image release preserves the live private storage configuration and secret references',()=>{
+ const f=releaseFixture(),result=deployCourseJob('c'.repeat(40),f.run);assert.equal(result.configurationPreserved,true);
+ const mutation=f.calls.find(args=>args[2]==='update');assert.ok(mutation.some(arg=>arg.startsWith('--image=')));
+ assert.equal(mutation.some(arg=>/--(env|cpu|memory|tasks|parallelism|service-account)/.test(arg)),false);
+ assert.equal(f.calls.some(args=>args[0]==='secrets'),false);
+});
+test('primary image release is idempotent and rejects configuration drift',()=>{
+ const f=releaseFixture({same:true});assert.equal(deployCourseJob('c'.repeat(40),f.run).changed,false);assert.equal(f.calls.some(args=>args[2]==='update'),false);
+ assert.throws(()=>deployCourseJob('c'.repeat(40),releaseFixture({drift:true}).run),/readback mismatch/);
 });

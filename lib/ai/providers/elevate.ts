@@ -1,6 +1,7 @@
 import type { AIProvider, ChatCompletionOptions, ChatCompletionResult } from '../types';
 import { normalizeStructuredOutput } from './structured-output';
 import { requestsJson } from './structured-output';
+import { ownedModelHeaders } from './google-runtime-auth.mjs';
 
 const DEFAULT_TIMEOUT_MS = 120_000;
 const DEFAULT_CONTEXT_TOKENS = 8192;
@@ -60,7 +61,13 @@ type OpenAIChatResponse = {
 };
 
 function endpoint(): string | null {
-  const raw = process.env.ELEVATE_LLM_URL?.trim();
+  // CPU is the authoritative everyday PARIS endpoint. A separately configured
+  // GPU endpoint is used only when explicitly enabled for this runtime.
+  const gpuAllowed = process.env.PARIS_GPU_ENABLED === 'true' &&
+    process.env.PARIS_INFERENCE_TIER === 'gpu';
+  const raw = (gpuAllowed
+    ? process.env.ELEVATE_LLM_GPU_URL
+    : process.env.ELEVATE_LLM_CPU_URL || process.env.ELEVATE_LLM_URL)?.trim();
   if (!raw) return null;
   const base = raw.replace(/\/+$/, '');
   try {
@@ -71,7 +78,11 @@ function endpoint(): string | null {
 }
 
 function secret(): string | null {
-  const value = process.env.ELEVATE_LLM_SECRET?.trim();
+  const gpuAllowed = process.env.PARIS_GPU_ENABLED === 'true' &&
+    process.env.PARIS_INFERENCE_TIER === 'gpu';
+  const value = (gpuAllowed
+    ? process.env.ELEVATE_LLM_GPU_SECRET
+    : process.env.ELEVATE_LLM_CPU_SECRET || process.env.ELEVATE_LLM_SECRET)?.trim();
   return value || null;
 }
 
@@ -99,7 +110,7 @@ export class ElevateProvider implements AIProvider {
     if (!base || !token) throw new Error('Elevate LLM worker not configured (ELEVATE_LLM_URL / ELEVATE_LLM_SECRET)');
     const response = await fetch(`${base}/v1/chat/completions`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      headers: await ownedModelHeaders(base,token,{signal:options.signal}),
       body: JSON.stringify({
         model: SERVED_MODEL,
         messages: options.messages,
@@ -162,10 +173,7 @@ export class ElevateProvider implements AIProvider {
 
     const response = await fetch(`${base}/v1/chat/completions`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: await ownedModelHeaders(base,token,{signal:options.signal}),
       body: JSON.stringify({
         model: SERVED_MODEL,
         messages: options.messages,

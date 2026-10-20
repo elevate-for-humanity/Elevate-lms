@@ -22,7 +22,12 @@ export function PremiumTeachingScene({scene,props}:{scene:SceneData;props:SlideL
  const demonstration=Boolean(scene.clipUrl)&&Boolean(scene.motionCue)&&seconds>=scene.motionCue!.startSeconds&&seconds<scene.motionCue!.endSeconds&&!recap;
  // Keep the whole teaching photograph visible while the camera gently tracks
  // it. A contained, slightly inset image preserves tools and hands at the edges.
- const photoMotion=`translate(${Math.sin(seconds/1.35)*1.1}%, ${Math.cos(seconds/1.8)*0.7}%) scale(0.97)`;
+ // One continuous camera move per picture instead of oscillating sine/cosine
+ // motion. Repeated cycles were visually indistinguishable from timeline replay.
+ const pictureStart=cue?.startSeconds??0;
+ const pictureEnd=cue?.endSeconds??Math.max(1,scene.durationFrames/fps);
+ const pictureProgress=Math.max(0,Math.min(1,(seconds-pictureStart)/Math.max(0.1,pictureEnd-pictureStart)));
+ const photoMotion=`translate(${(-0.8+pictureProgress*1.6).toFixed(3)}%, ${(-0.35+pictureProgress*0.7).toFixed(3)}%) scale(${(0.975+pictureProgress*0.02).toFixed(4)})`;
  const photo=(url:string,opacity=1)=><Img src={url} style={{...whole,position:'absolute',inset:0,opacity,transform:photoMotion}}/>;
  const textStart=recap?scene.recapStartSeconds!:step?.narrationQuote?quoteStartSeconds(step.narrationQuote,speechCues):0;
  return <AbsoluteFill style={{background:'#171717',color:'#fff',fontFamily:'Arial, sans-serif'}}>

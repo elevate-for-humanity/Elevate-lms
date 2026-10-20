@@ -42,6 +42,7 @@ async function scan(){
   if(await realpath(folder).catch(()=>null)!==folder)continue;
   for(const filename of await readdir(folder)){
    if(!/^msg[0-9]+[.]txt$/.test(filename))continue;
+   try {
    const audioName=folder+'/'+filename.replace(/[.]txt$/,'.wav');
    if(await realpath(audioName).catch(()=>null)!==audioName)continue;
    const audioStat=await stat(audioName);
@@ -56,6 +57,11 @@ async function scan(){
    if(!response.ok){process.stderr.write('OWNED_VOICEMAIL_INGEST_REQUIRES_RETRY_'+response.status+String.fromCharCode(10));continue;}
    const result=await response.json();if(result.saved!==true)throw Error('VOICEMAIL_SAVE_UNCONFIRMED');
    await writeFile(ledger+'/'+id,JSON.stringify({saved:true,transcriptAvailable:result.transcriptAvailable===true}),{mode:0o600,flag:'wx'});
+   }catch{
+    // The original Asterisk audio remains the durable retry source. A single
+    // failed delivery cannot stall another voicemail in this scan.
+    process.stderr.write('OWNED_VOICEMAIL_MESSAGE_REQUIRES_RETRY'+String.fromCharCode(10));
+   }
   }
  }
 }

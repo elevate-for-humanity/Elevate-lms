@@ -1,8 +1,22 @@
 import { spawnSync } from 'node:child_process';
+import { mkdtempSync, openSync, closeSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const project='elegant-racer-299721';
 const leaf=value=>typeof value==='string'?value.split('/').at(-1):null;
+export function inventoryFailureReason(error) {
+  const message=String(error?.message??'');
+  const classified=/INVENTORY_DIAGNOSTIC:(permission_denied|api_disabled|timeout|output_limit|invalid_response|unknown_gcloud_failure)/.exec(message);
+  if(classified)return classified[1];
+  if (/PERMISSION_DENIED|permission.*denied|does not have permission|cloudasset\.assets\.searchAllResources/i.test(message)) return 'permission_denied';
+  if (/SERVICE_DISABLED|has not been used|API.*disabled|is disabled/i.test(message)) return 'api_disabled';
+  if (/DEADLINE_EXCEEDED|timed? out|ETIMEDOUT/i.test(message)) return 'timeout';
+  if (/ENOBUFS|ENOMEM|buffer exceeded/i.test(message)) return 'output_limit';
+  if (/invalid inventory|Unexpected token|JSON/i.test(message)) return 'invalid_response';
+  return 'unknown_gcloud_failure';
+}
 const definitions=[
   ['assets',['asset','search-all-resources','--scope=projects/'+project],a=>({name:a.name,type:a.assetType,location:a.location,state:a.state})],
   ['virtualMachines',['compute','instances','list'],v=>({name:v.name,zone:leaf(v.zone),machineType:leaf(v.machineType),status:v.status,disks:(v.disks||[]).map(d=>({name:leaf(d.source),boot:d.boot,autoDelete:d.autoDelete}))})],
@@ -15,9 +29,28 @@ const definitions=[
 ];
 
 export function auditCostResources({run=(args)=>{
-  const result=spawnSync('gcloud',args,{encoding:'utf8',timeout:30000,maxBuffer:32*1024*1024});
-  if(result.status!==0)throw Error('inventory unavailable');
-  return result.stdout;
+  // Large project inventories can exceed child_process pipe buffers (ENOBUFS).
+  // Spool complete output to a private temporary file, never stdout/stderr logs.
+  const directory=mkdtempSync(join(tmpdir(),'elevate-inventory-'));
+  const output=join(directory,'gcloud.json');
+  const errorOutput=join(directory,'gcloud.err');
+  let fd, errFd;
+  try {
+    fd=openSync(output,'w',0o600);
+    errFd=openSync(errorOutput,'w',0o600);
+    const result=spawnSync('gcloud',args,{stdio:['ignore',fd,errFd],timeout:120000});
+    closeSync(fd);fd=undefined;
+    closeSync(errFd);errFd=undefined;
+    if(result.error||result.status!==0) {
+      const message=result.error?.message??readFileSync(errorOutput,'utf8');
+      throw Error('INVENTORY_DIAGNOSTIC:'+inventoryFailureReason({message}));
+    }
+    return readFileSync(output,'utf8');
+  } finally {
+    if(fd!==undefined)closeSync(fd);
+    if(errFd!==undefined)closeSync(errFd);
+    rmSync(directory,{recursive:true,force:true});
+  }
 }}={}) {
   const sections={};
   for(const [key,args,compact] of definitions) {
@@ -25,10 +58,10 @@ export function auditCostResources({run=(args)=>{
       const rows=JSON.parse(run([...args,'--project='+project,'--format=json']));
       if(!Array.isArray(rows))throw Error('invalid inventory');
       sections[key]={available:true,count:rows.length,resources:rows.map(compact)};
-    } catch {
+    } catch (error) {
       // A denied API is not evidence of an empty project. Never print raw CLI
       // errors or resource payloads: VM metadata may contain credentials.
-      sections[key]={available:false,reason:'read_permission_api_or_inventory_unavailable'};
+      sections[key]={available:false,reason:inventoryFailureReason(error)};
     }
   }
   const review=[];

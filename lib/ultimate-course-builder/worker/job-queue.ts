@@ -30,12 +30,22 @@ export class UltimateJobQueue {
     if (readError) throw readError;
     if (existing) return existing;
     const { data: previous, error: previousError } = await this.db.from('ultimate_build_jobs')
-      .select('monitor').eq('build_id', buildId).eq('job_type', 'course_build')
+      .select('monitor,status,payload,pending_dependency_resume').eq('build_id', buildId).eq('job_type', 'course_build')
       .order('created_at', {ascending: false}).limit(1).maybeSingle();
     if (previousError) throw previousError;
+    // A failed dependency/paused attempt retains the exact lesson cursor and
+    // repair intent. A completed preview must not constrain a full-course run.
+    let checkpointPayload: Record<string, unknown> = previous?.payload &&
+      typeof previous.payload === 'object' && !Array.isArray(previous.payload) ? {...previous.payload} : {};
+    const pending = previous?.pending_dependency_resume;
+    if (pending && typeof pending === 'object' && !Array.isArray(pending))
+      checkpointPayload = {...checkpointPayload,...pending};
+    delete checkpointPayload.progress;
+    const nextPayload = previous?.status === 'failed' && payload &&
+      typeof payload === 'object' && !Array.isArray(payload) ? {...checkpointPayload,...payload} : payload;
     const { data, error } = await this.db
       .from('ultimate_build_jobs')
-      .insert({ build_id: buildId, job_type: 'course_build', status: 'queued', payload,
+      .insert({ build_id: buildId, job_type: 'course_build', status: 'queued', payload: nextPayload,
         ...(previous?.monitor ? {monitor: previous.monitor} : {}) })
       .select('*')
       .single();
@@ -53,6 +63,15 @@ export class UltimateJobQueue {
   }
 
   async claim(workerId: string, leaseSeconds = 300) {
+    if (process.env.EXTERNAL_COURSE_ATTEMPT_ID) {
+      if (process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID)
+        throw new Error('CONFLICTING_EXACT_WORKER_TARGETS');
+      const {data, error} = await this.db.rpc('claim_external_course_job', {
+        p_attempt: process.env.EXTERNAL_COURSE_ATTEMPT_ID, p_worker: workerId,
+      });
+      if (error) throw error;
+      return data?.[0] ?? null;
+    }
     if (process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID)
       return claimExactOwnerPreview(this.db,process.env.ULTIMATE_OWNER_PREVIEW_JOB_ID,workerId,leaseSeconds);
     const { data, error } = await this.db.rpc('claim_ultimate_build_job', {

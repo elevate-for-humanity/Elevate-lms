@@ -163,6 +163,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
     image: items.map((item) => absoluteMediaUrl(item.url)),
     address: address ? { '@type': 'PostalAddress', streetAddress: approved.address || undefined, addressLocality: approved.city || undefined, addressRegion: approved.state || undefined, postalCode: approved.zip || undefined, addressCountry: 'US' } : undefined,
     sameAs: [externalUrl, featuredFallback?.socialUrl, featuredFallback?.bookingUrl].filter(Boolean),
+    potentialAction: featuredFallback?.bookingUrl ? { '@type': 'ReserveAction', target: featuredFallback.bookingUrl, name: `Book with ${approved.name}` } : undefined,
     hasMap: mapUrl,
     parentOrganization: { '@id': `${SITE_URL}/#organization` },
     knowsAbout: programs.map(programLabel),
@@ -191,6 +192,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
               {mapUrl ? <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start"><Navigation className="h-4 w-4" /> Approved Worksite Map</a> : null}
               {featuredFallback?.socialUrl ? <a href={featuredFallback.socialUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">{featuredFallback.socialUrl.includes('instagram.com/') ? 'View shop Instagram' : 'View shop social pages'} <ExternalLink className="h-4 w-4" /></a> : null}
               {externalUrl ? <a href={externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">Shop website <ExternalLink className="h-4 w-4" /></a> : null}
+              {featuredFallback?.bookingUrl ? <a href={featuredFallback.bookingUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">Book a service <ExternalLink className="h-4 w-4" /></a> : null}
             </div>
           </div>
           <div className="min-w-0">

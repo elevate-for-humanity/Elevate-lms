@@ -14,7 +14,9 @@ export async function privateTurn(raw,body,token,request=httpsRequest){
     const req=request(options,res=>{
       if(res.statusCode!==200){res.resume();reject(Error(`PARIS_TURN_HTTP_${res.statusCode}`));return;}
       const chunks=[];let size=0;
-      res.on('data',chunk=>{size+=chunk.length;if(size>300000){res.destroy();reject(Error('PARIS_TURN_RESPONSE_TOO_LARGE'));}else chunks.push(chunk);});
+      // Eighty seconds of PCMU is 640000 bytes (853336 base64 characters).
+      // Keep a bounded JSON envelope large enough for the approved opening.
+      res.on('data',chunk=>{size+=chunk.length;if(size>900000){res.destroy();reject(Error('PARIS_TURN_RESPONSE_TOO_LARGE'));}else chunks.push(chunk);});
       res.on('error',()=>reject(Error('PARIS_TURN_RESPONSE_FAILED')));
       res.on('end',()=>{try{resolve(JSON.parse(Buffer.concat(chunks).toString('utf8')));}catch{reject(Error('PARIS_TURN_INVALID_RESPONSE'));}});
     });

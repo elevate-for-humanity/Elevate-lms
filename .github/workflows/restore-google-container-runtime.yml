@@ -18,6 +18,7 @@ jobs:
     timeout-minutes: 30
     concurrency:
       group: google-runtime-us-central1
+      queue: max
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4

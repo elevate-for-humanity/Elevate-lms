@@ -32,3 +32,5 @@ for(const [name,options,code] of [
 ])test('refuses '+name+' before writes',async()=>{const f=fixture(options);await assert.rejects(migrateStorePayPal({...f,apply:true}),code);assert.equal(f.writes.length,0);});
 test('incorrect exact readback fails without reporting acceptance',async()=>{const f=fixture({badReadback:true});await assert.rejects(migrateStorePayPal({...f,apply:true}),/READBACK_FAILED/);assert.equal(f.writes.length,1);});
 test('provider exception text never escapes as a credential-bearing failure',async()=>{const f=fixture();await assert.rejects(migrateStorePayPal({...f,request:async()=>{throw Error('private-token');}}),e=>e.message==='STORE_PAYPAL_PROVIDER_UNREACHABLE');assert.equal(f.writes.length,0);});
+
+test('webhook apply cannot bypass the coordinated release hold',async()=>{const f=fixture();await assert.rejects(migrateStorePayPal({...f,routeMode:'apply',expectedSha:'a'.repeat(40)}),/CUTOVER_RELEASE_HOLD/);assert.equal(f.requests.length,0);assert.equal(f.writes.length,0);});

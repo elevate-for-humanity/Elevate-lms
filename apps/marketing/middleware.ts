@@ -44,6 +44,7 @@ const DEPLOYMENT_HOST_SUFFIXES = ['.northflank.app', '.run.app'] as const;
 
 const STORE_RUNTIME_ALLOWED_PREFIXES = [
   '/store', '/login', '/signup', '/register', '/forgot-password', '/reset-password', '/auth',
+  '/privacy', '/terms-of-service', '/security-and-data-protection',
   '/api/store', '/api/webhooks/store', '/api/webhooks/stripe', '/api/auth', '/api/version', '/api/ping', '/api/health', '/api/ready',
 ] as const;
 

@@ -26,7 +26,7 @@ for(const name of services){
     const max=s.template?.scaling?.maxInstanceCount ?? s.scaling?.maxInstanceCount ?? null;
     if(max!=null){possibleCpu+=cpu*Number(max);possibleMemoryGi+=memoryGi*Number(max);}
     const traffic=(s.trafficStatuses||s.traffic||[]).map(t=>({revision:t.revision||null,percent:t.percent||0,tag:t.tag||null}));
-    console.log(JSON.stringify({type:'service',name,ready:s.conditions?.find(c=>c.type==='Ready')?.state||null,latestReadyRevision:s.latestReadyRevision||null,traffic,allocations,min:s.template?.scaling?.minInstanceCount??s.scaling?.minInstanceCount??0,max,uri:s.uri||null,warning:traffic.length===0?'No observed traffic allocation; do not infer 100%':undefined}));
+    console.log(JSON.stringify({type:'service',name,ready:s.terminalCondition?.state||s.conditions?.find(c=>c.type==='Ready')?.state||null,latestReadyRevision:s.latestReadyRevision||null,traffic,allocations,min:s.template?.scaling?.minInstanceCount??s.scaling?.minInstanceCount??0,max,uri:s.uri||null,warning:traffic.length===0?'No observed traffic allocation; do not infer 100%':undefined}));
   }catch(e){errors++;console.log(JSON.stringify({type:'service_error',name,error:e.message}));}
 }
 for(const name of ['elevate-course-builder','elevate-video-render']){

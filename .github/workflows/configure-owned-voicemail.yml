@@ -73,15 +73,43 @@ jobs:
           install -d -m 0755 /opt/elevate-pbx/voicemail
           install -d -m 0700 /var/lib/elevate-pbx/voicemail
           test ! -L /opt/elevate-pbx/voicemail/worker.mjs
-          if test -f /opt/elevate-pbx/voicemail/worker.mjs; then cmp -s /opt/elevate-pbx/voicemail/worker.mjs /tmp/elevate-voicemail-worker.mjs; fi
-          if test -f /etc/systemd/system/elevate-voicemail-worker.service; then cmp -s /etc/systemd/system/elevate-voicemail-worker.service /tmp/elevate-voicemail-worker.service; fi
+          test ! -L /etc/systemd/system/elevate-voicemail-worker.service
+          /usr/bin/node --check /tmp/elevate-voicemail-worker.mjs
+          systemd-analyze verify /tmp/elevate-voicemail-worker.service >/dev/null 2>&1 || true
+          backup="$(mktemp -d /var/lib/elevate-pbx/voicemail/worker-rollback.XXXXXXXX)"
+          chmod 0700 "$backup"
+          old_worker=0; old_unit=0; was_enabled=0; was_active=0
+          if test -f /opt/elevate-pbx/voicemail/worker.mjs; then
+            cp -p /opt/elevate-pbx/voicemail/worker.mjs "$backup/worker.mjs"; old_worker=1
+          fi
+          if test -f /etc/systemd/system/elevate-voicemail-worker.service; then
+            cp -p /etc/systemd/system/elevate-voicemail-worker.service "$backup/unit.service"; old_unit=1
+          fi
+          if systemctl is-enabled --quiet elevate-voicemail-worker; then was_enabled=1; fi
+          if systemctl is-active --quiet elevate-voicemail-worker; then was_active=1; fi
+          rollback() {
+            systemctl stop elevate-voicemail-worker >/dev/null 2>&1 || true
+            if test "$old_worker" = 1; then cp -p "$backup/worker.mjs" /opt/elevate-pbx/voicemail/worker.mjs; else rm -f /opt/elevate-pbx/voicemail/worker.mjs; fi
+            if test "$old_unit" = 1; then cp -p "$backup/unit.service" /etc/systemd/system/elevate-voicemail-worker.service; else rm -f /etc/systemd/system/elevate-voicemail-worker.service; fi
+            systemctl daemon-reload
+            if test "$was_enabled" = 1; then systemctl enable elevate-voicemail-worker >/dev/null; else systemctl disable elevate-voicemail-worker >/dev/null 2>&1 || true; fi
+            if test "$was_active" = 1; then systemctl start elevate-voicemail-worker >/dev/null 2>&1 || true; fi
+            echo 'VOICEMAIL_UPGRADE_ROLLED_BACK'
+          }
+          trap rollback ERR
           install -m 0644 /tmp/elevate-voicemail-worker.mjs /opt/elevate-pbx/voicemail/worker.mjs
           install -m 0644 /tmp/elevate-voicemail-worker.service /etc/systemd/system/elevate-voicemail-worker.service
           /usr/bin/node --check /opt/elevate-pbx/voicemail/worker.mjs
           systemctl daemon-reload
-          systemctl enable --now elevate-voicemail-worker >/dev/null
+          systemctl enable elevate-voicemail-worker >/dev/null
+          systemctl restart elevate-voicemail-worker
           systemctl is-active --quiet elevate-voicemail-worker
-          echo '{"result":"PASS","scope":"voicemail_worker_only","carrierRoutingChanged":false}'
+          sleep 3
+          systemctl is-active --quiet elevate-voicemail-worker
+          cmp -s /opt/elevate-pbx/voicemail/worker.mjs /tmp/elevate-voicemail-worker.mjs
+          trap - ERR
+          echo '{"result":"PASS","scope":"voicemail_worker_only","verified":"active_and_exact_worker","carrierRoutingChanged":false}'
+
           SH
       - name: Preserve authoritative DNS and SIP transport
         if: always()

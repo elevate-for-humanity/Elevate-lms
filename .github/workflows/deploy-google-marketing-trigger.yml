@@ -7,6 +7,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'scripts/gcp/production-acceptance.*'
       - 'scripts/build-memory-policy.*'
       - 'scripts/check-build-memory-policy.mjs'
       - 'scripts/run-bounded-build.*'
@@ -90,6 +91,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Reject superseded Marketing requests before building
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_WORKFLOW: deploy-google-marketing-trigger.yml
+        run: node scripts/gcp/prune-web-release-requests.mjs --assert-latest
 
       - name: Verify immutable main revision
         shell: bash
@@ -431,3 +438,22 @@ jobs:
             echo "Deployment is NOT confirmed. Inspect the failed job; do not mark this release successful."
             echo "The previously serving revision may remain active; verify Cloud Run traffic separately."
           } >> "$GITHUB_STEP_SUMMARY"
+  acceptance:
+    needs: deploy
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && needs.deploy.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Explicitly hand the verified Marketing release to production acceptance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTANCE_COMPONENT: marketing
+          ACCEPTANCE_SHA: ${{ github.sha }}
+          ACCEPTANCE_RUN_ID: ${{ github.run_id }}
+        run: |
+          node --test scripts/gcp/production-acceptance.test.mjs
+          node scripts/gcp/production-acceptance.mjs dispatch

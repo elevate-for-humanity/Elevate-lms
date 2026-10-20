@@ -258,13 +258,16 @@ export function prepareUltimateStoryboardInput(input: any): MediaDirectorInput {
     .filter(Boolean)
     .join('\n\n');
   return {
-    title: String(board.title ?? input.courseTitle ?? input.lessonId ?? 'Lesson'),
+    title: String(input.lessonTitle ?? board.title ?? input.courseTitle ?? input.lessonId ?? 'Lesson'),
     objective: String(board.objective ?? scenes[0]?.action ?? input.courseTitle ?? 'Lesson'),
     script,
     defaultDurationSeconds: 8,
     requiredSceneCount: 13,
     sceneData: {
       ...board,
+      // The canonical competency title is authoritative; a restored storyboard
+      // can carry the previous lesson's stale heading.
+      title: String(input.lessonTitle ?? board.title ?? input.courseTitle ?? input.lessonId ?? 'Lesson'),
       version: '1.0',
       width: Number(board.width ?? 1920),
       height: Number(board.height ?? 1080),
@@ -308,11 +311,18 @@ export class UltimatePlatformRenderer implements UltimateRenderPort {
     });
     if(input.lessonPresentation === 'approved-premium-v1') storyboard.scenes.forEach((scene:any,index:number)=>{
       if(!scene.physicalDemonstration) {
-        scene.sourceVideoUrl=undefined;
-        scene.referenceImageUrl=teachingPhotos[index]?.[0]?.imageUrl;
         const photo=teachingPhotos[index]?.[0];
+        // The premium renderer replaces the storyboard visual with the teaching
+        // photograph. Fail before encoding rather than silently discarding an
+        // assigned opening image and rendering a blank branded background.
+        if (typeof photo?.imageUrl !== 'string' || !/^https?:\/\//i.test(photo.imageUrl)) {
+          throw new Error(`ULTIMATE_PREMIUM_SCENE_PHOTO_MISSING:${scene.id ?? index}`);
+        }
+        scene.sourceVideoUrl=undefined;
+        scene.referenceImageUrl=photo.imageUrl;
         scene.resolvedProvider=photo?.provider??'google';
-        scene.resolvedModel=photo?.providerItemId?'licensed-teaching-photograph':'generated-teaching-photograph';
+        scene.resolvedModel=photo?.ownerReferenceArtifactId?'owner-approved-reference-photograph':photo?.providerItemId?'licensed-teaching-photograph':'generated-teaching-photograph';
+        if(photo?.ownerReferenceArtifactId)scene.ownerApprovedPhotoReference={artifactId:photo.ownerReferenceArtifactId,videoSha256:photo.ownerReferenceVideoSha256,sourceSceneId:photo.referenceSceneId};
         scene.sourceProviderItemId=photo?.providerItemId;
         scene.sourceLicenseEvidenceUrl=photo?.licenseEvidenceUrl;
       }

@@ -59,7 +59,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                 🔥 NOW ENROLLING
               </span>
               <p className="text-slate-900 font-semibold text-sm sm:text-base">
-                Free Career Training - 100% Government Funded • Start in 2 Weeks
+                Career training enrollment open • Review program tuition, funding status, and start dates
               </p>
             </div>
             <Link
@@ -89,7 +89,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white mb-6">
                 <Award aria-label="award" size={16} />
-                <span>No-Cost Training for Eligible Students</span>
+                <span>Program-Specific Tuition & Funding</span>
               </div>
 
               <h1 className="text-5xl md:text-6xl font-light text-slate-900 mb-6 leading-tight">

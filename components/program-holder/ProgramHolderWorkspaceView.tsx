@@ -1,4 +1,6 @@
+import { HolderHourSubmissionForm } from './HolderHourSubmissionForm';
 import Link from 'next/link';
+import { StudentProgressReportForm } from './StudentProgressReportForm';
 import Image from 'next/image';
 import {
   AlertTriangle,
@@ -355,13 +357,16 @@ export async function ProgramHolderWorkspaceView({
     );
   if (section === 'reports')
     return (
-      <Reports
-        rows={data.reports}
-        enrolled={data.enrollments.length}
-        active={active.length}
-        completed={completed.length}
-        programLabel={primaryProgramLabel}
-      />
+      <div className="space-y-6">
+        <Reports
+          rows={data.reports}
+          enrolled={data.enrollments.length}
+          active={active.length}
+          completed={completed.length}
+          programLabel={primaryProgramLabel}
+        />
+        <StudentProgressReportForm students={data.enrollments.map(row => ({id:row.id, full_name:row.full_name}))} />
+      </div>
     );
   if (section === 'payouts')
     return <Payouts schedules={data.payoutSchedules} panel={payoutPanel} />;
@@ -376,7 +381,7 @@ export async function ProgramHolderWorkspaceView({
     );
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="w-full min-w-0 space-y-6 px-3 pb-28 sm:space-y-8 sm:px-6 lg:pb-8 [&_h1]:[overflow-wrap:normal] [&_h2]:[overflow-wrap:normal] [&_h3]:[overflow-wrap:normal] [&_h1]:[word-break:normal] [&_h2]:[word-break:normal] [&_h3]:[word-break:normal] [&_section]:min-w-0 [&_article]:min-w-0">
       <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -2102,6 +2107,7 @@ function Hours({
         title="Training Hours"
         description="Record what each student completed daily or weekly, enter training hours, and submit progress for Admin review."
       />
+      <HolderHourSubmissionForm enrollments={enrollments} />
       <ProgramHolderTrainingLogForm enrollments={enrollments} programs={programs} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Submitted training logs</h2>
@@ -2165,6 +2171,19 @@ function Compliance({
   }[];
   atRisk: number;
 }) {
+  const actionFor = (label: string): string | null => {
+    if (label === 'Memorandum of Understanding') return '/program-holder/sign-mou';
+    if (label === 'Program Holder handbook acknowledgement') return '/program-holder/handbook';
+    if (label === 'Non-disclosure and confidentiality agreement') return '/program-holder/non-compete';
+    if (label === 'Non-compete agreement') return '/program-holder/non-compete';
+    if (label === 'Approved ID, business registration, insurance, and W-9') return '/program-holder/documents';
+    if (label === 'Profile picture' || label === 'Company logo upload') return '/program-holder/documents';
+    if (label === 'Signed image release') return '/program-holder/documents';
+    if (label === 'Program-holder approval') return '/program-holder/onboarding';
+    if (label.includes('payout') || label.includes('PayPal')) return '/program-holder/payouts';
+    if (label.includes('license') || label.includes('credential')) return '/program-holder/documents';
+    return null;
+  };
   return (
     <div className="space-y-6">
       <Hero
@@ -2194,11 +2213,18 @@ function Compliance({
                     {item.required ? 'Required' : 'Recommended'} · Owner: {item.owner}
                   </span>
                 </span>
-                {item.complete ? (
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                ) : (
-                  <AlertTriangle className="h-5 w-5 text-amber-600" />
-                )}
+                <div className="flex shrink-0 items-center gap-3">
+                  {actionFor(item.label) ? (
+                    <Link href={actionFor(item.label)!} className="inline-flex min-h-11 items-center rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-800">
+                      {item.complete ? 'View form' : 'Open form'}
+                    </Link>
+                  ) : null}
+                  {item.complete ? (
+                    <CheckCircle2 aria-label="Completed" className="h-5 w-5 text-emerald-600" />
+                  ) : (
+                    <AlertTriangle aria-label="Action required" className="h-5 w-5 text-amber-600" />
+                  )}
+                </div>
               </div>
             ))}
           </div>

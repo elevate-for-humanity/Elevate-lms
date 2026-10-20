@@ -8,6 +8,29 @@ remaining integration and live acceptance work is complete.
 
 ## Transport and security
 
+### Configured opening greeting
+
+The gateway now requests an authenticated `event:'greeting'` at sequence zero
+when the ARI bridge and its RTP peer are ready. Caller speech is not required;
+silent RTP can establish the peer. A missing media peer returns the caller to
+the owning dialplan after ten seconds. Duplicate media packets do not repeat
+the greeting, and operator keypad handoff suppresses stale greeting audio.
+
+Set `PARIS_GREETING` in the existing root-owned `paris.conf` to the approved
+business greeting before activating the new gateway. The turn adapter uses
+real Google TTS for this configured text; it does not invent caller speech or
+ask the language model to generate an unapproved greeting. Missing configuration
+fails back to the owning dialplan. Each spoken reply is bounded to eighty
+seconds, with a 900 KB private response envelope; validate the actual synthesized
+greeting before activation. After the opening, caller speech uses the existing ASR,
+conversation and TTS path beginning at sequence one.
+
+Install the compatible turn adapter before the gateway. Retain both previous
+files and configuration for rollback, verify no active calls before restarting
+either service, and do not activate public routing until real audio and the
+reviewed fallback have passed acceptance. This source change does not select a
+carrier, migrate provider assignments, or alter the live Asterisk dialplan.
+
 The runtime uses Asterisk ARI on loopback (HTTP and WS), a mixing bridge, and
 an externalMedia channel carrying PCMU RTP over a loopback-only UDP socket. A
 Stasis application named `elevate-paris` must be registered. The independent

@@ -1,3 +1,4 @@
+import {verifyOwnerReferencePhotos} from './verify-owner-reference-photos.mjs';
 import {google,PROJECT} from './runtime-config.mjs';
 import {resolveOwnerPreviewB2} from './resolve-owner-preview-b2.mjs';
 import {inspectRegionalCapacity,isTerminalExecution} from './regional-capacity.mjs';
@@ -15,6 +16,10 @@ export function runtimeSpec(spec){
   const copy=structuredClone(spec);
   function visit(value){
     if(!value||typeof value!=='object')return;
+    if(value.labels?.['client.knative.dev/nonce']){
+      delete value.labels['client.knative.dev/nonce'];
+      if(!Object.keys(value.labels).length)delete value.labels;
+    }
     if(value.annotations){
       for(const key of ['client.knative.dev/user-image','run.googleapis.com/client-name','run.googleapis.com/client-version'])
         delete value.annotations[key];
@@ -59,6 +64,11 @@ export function changedRuntimePaths(expected,actual,limit=16){
  };
  walk(expected,actual,'');
  return paths.slice(0,limit);
+export function runtimeDifferencePaths(before,after,path='spec'){
+  if(JSON.stringify(before)===JSON.stringify(after))return [];
+  if(before&&after&&typeof before==='object'&&typeof after==='object')
+    return [...new Set([...Object.keys(before),...Object.keys(after)])].flatMap(key=>runtimeDifferencePaths(before[key],after[key],path+'.'+key));
+  return [path];
 }
 
 export function previewRuntime(job){
@@ -75,7 +85,7 @@ export function previewRuntime(job){
   return {task,env};
 }
 
-export async function ownerLessonPreview({execute=false,sha,reuseCandidate=false,run=google,request=fetch,capacity=inspectRegionalCapacity}={}){
+export async function ownerLessonPreview({execute=false,sha,reuseCandidate=false,probeStorage=false,referenceCheck=verifyOwnerReferencePhotos,run=google,request=fetch,capacity=inspectRegionalCapacity}={}){
   const scope=['--project='+PROJECT,'--region='+region];
   const read=args=>JSON.parse(run([...args,...scope,'--format=json']));
   const before=read(['run','jobs','describe',name]);
@@ -102,16 +112,32 @@ export async function ownerLessonPreview({execute=false,sha,reuseCandidate=false
   if(build?.profile?.lessonPresentation!=='approved-premium-v1'||
       build.profile.presentationContract?.approvedReferenceVideo?.sha256!==referenceHash)
     throw Error('OWNER_PREVIEW_APPROVED_FIRST_LESSON_REQUIRED');
+  const requiredSteps=['standards_lock','learning_objectives','prerequisites','teaching_sequence','instructor_script','storyboard','visual_assignment','scene_construction','natural_narration','synchronization','active_teaching','mistakes_and_corrections','assessment_alignment'];
+  const steps=await rest('ultimate_lesson_steps?select=step,state&lesson_build_id=eq.'+lessonId);
+  if(!requiredSteps.every(step=>steps.some(s=>s.step===step&&s.state==='passed')))
+    throw Error('OWNER_PREVIEW_SAVED_RENDER_DEPENDENCIES_REQUIRED');
+  const approvedReferencePhotos=await referenceCheck({env,profile:build.profile,lessonBuildId:lessonId,competencyId,request});
+  if(execute||probeStorage){
+  const probePath='approved-teaching-photo-diagnostics/'+lessonId+'/owner-preview-storage-preflight.json';
+  const probe={purpose:'owner-preview-storage-preflight',lessonBuildId:lessonId,source:sha};
+  const probeHeaders={apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY,'content-type':'application/json','x-upsert':'true'};
+  const uploaded=await request(env.NEXT_PUBLIC_SUPABASE_URL+'/storage/v1/object/course_videos/'+probePath,{method:'POST',headers:probeHeaders,body:JSON.stringify(probe),redirect:'error',signal:AbortSignal.timeout(30000)});
+  if(!uploaded.ok)throw Error('OWNER_PREVIEW_DIAGNOSTIC_UPLOAD_HTTP_'+uploaded.status);
+  const checked=await request(env.NEXT_PUBLIC_SUPABASE_URL+'/storage/v1/object/authenticated/course_videos/'+probePath,{headers:probeHeaders,redirect:'error',signal:AbortSignal.timeout(30000)});
+  if(!checked.ok)throw Error('OWNER_PREVIEW_DIAGNOSTIC_READBACK_FAILED');
+  const proof=await checked.json();
+  if(proof.purpose!==probe.purpose||proof.lessonBuildId!==lessonId||proof.source!==sha)throw Error('OWNER_PREVIEW_DIAGNOSTIC_READBACK_FAILED');
+  }
   const evidence={region,job:name,jobId,lessonBuildId:lessonId,source:sha??null,
     previousImage:task.containers[0].image,identity:task.serviceAccountName,
     configuredResources:task.containers[0].resources.limits,headroom,storageProvider:'backblaze-b2',
-    bucket:b2.ELEVATE_MEDIA_BUCKET,connectionSource,executionStarted:false,releaseHoldChanged:false};
+    bucket:b2.ELEVATE_MEDIA_BUCKET,connectionSource,approvedReferencePhotos,diagnosticStorageVerified:execute||probeStorage,clientNoncePresent:JSON.stringify(before.spec).includes('client.knative.dev/nonce'),executionStarted:false,releaseHoldChanged:false};
   if(!execute)return evidence;
   if(!/^[a-f0-9]{40}$/.test(sha??''))throw Error('OWNER_PREVIEW_EXACT_SOURCE_REQUIRED');
-  const imageSource=reuseCandidate?'7df4b69695748dbc6dd7a122300be9ed4ee44893':sha;
+  const imageSource=reuseCandidate?'e53f3f47508b98a479877c2e868e0402d6cb8e7e':sha;
   const digest=run(['artifacts','docker','images','describe',registry+':owner-preview-'+imageSource,'--project='+PROJECT,'--format=value(image_summary.digest)']);
   if(!/^sha256:[a-f0-9]{64}$/.test(digest))throw Error('OWNER_PREVIEW_IMMUTABLE_IMAGE_REQUIRED');
-  if(reuseCandidate&&digest!=='sha256:52aae3310bf3e0baad12bbb5cdb97499ab1d24138705a22ec0615bda1122ca6d')throw Error('OWNER_PREVIEW_TESTED_CANDIDATE_REQUIRED');
+  if(reuseCandidate&&digest!=='sha256:6b3b9a642838b139fe7a9e4592cff5ba7a4e382ebb96dd32336e3f8b2ec68c3d')throw Error('OWNER_PREVIEW_TESTED_CANDIDATE_REQUIRED');
   const image=registry+'@'+digest;
   const current=read(['run','jobs','describe',name]);
   if(JSON.stringify(runtimeSpec(current.spec))!==JSON.stringify(runtimeSpec(before.spec)))throw Error('OWNER_PREVIEW_RUNTIME_CHANGED');
@@ -125,9 +151,11 @@ export async function ownerLessonPreview({execute=false,sha,reuseCandidate=false
     console.error(JSON.stringify({code:'OWNER_PREVIEW_IMAGE_ONLY_READBACK_FAILED',changedPaths:differences}));
     throw Error('OWNER_PREVIEW_IMAGE_ONLY_READBACK_FAILED');
   }
+  const changedPaths=runtimeDifferencePaths(runtimeSpec(expected),runtimeSpec(deployed.spec));
+  if(changedPaths.length){console.error(JSON.stringify({ownerPreviewReadbackChangedPaths:changedPaths.slice(0,50)}));throw Error('OWNER_PREVIEW_IMAGE_ONLY_READBACK_FAILED');}
   // No reset of attempts, generation, checkpoints, ordinary pause, or other jobs.
   const payload={...job.payload,ownerPreview:true,lessonBuildId:lessonId,competencyId,
-    checkpointRepair:{lessonBuildId:lessonId,competencyId,fromStep:'teaching_sequence',requestedAt:new Date().toISOString(),requestedBy:'owner-approved-preview'}};
+    checkpointRepair:{lessonBuildId:lessonId,competencyId,fromStep:'lesson_film_render',requestedAt:new Date().toISOString(),requestedBy:'owner-approved-preview'}};
   const changed=await rest('ultimate_build_jobs?id=eq.'+jobId+'&status=eq.failed&execution_generation=eq.'+job.execution_generation+'&attempts=eq.'+job.attempts+'&lease_owner=is.null','PATCH',{
     payload,status:'queued',max_attempts:Math.max(job.max_attempts,job.attempts+1),
     available_at:new Date().toISOString(),last_error:null,updated_at:new Date().toISOString()});
@@ -138,6 +166,6 @@ export async function ownerLessonPreview({execute=false,sha,reuseCandidate=false
 }
 
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
-  try{console.log(JSON.stringify(await ownerLessonPreview({execute:process.env.OWNER_PREVIEW_EXECUTE==='true',sha:process.env.GITHUB_SHA,reuseCandidate:process.env.OWNER_PREVIEW_REUSE_CANDIDATE==='true'})));}
+  try{console.log(JSON.stringify(await ownerLessonPreview({execute:process.env.OWNER_PREVIEW_EXECUTE==='true',sha:process.env.GITHUB_SHA,reuseCandidate:process.env.OWNER_PREVIEW_REUSE_CANDIDATE==='true',probeStorage:process.env.OWNER_PREVIEW_STORAGE_PROBE==='true'})));}
   catch(error){console.error(JSON.stringify({error:/^(OWNER_PREVIEW_|COURSE_B2_)[A-Z0-9_]+$/.test(error?.message??'')?error.message:'OWNER_PREVIEW_CONTROL_FAILED',code:error.code??null}));process.exitCode=1;}
 }

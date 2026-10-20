@@ -39,17 +39,25 @@ test('contact existence and qualified reachability are distinct', () => {
   assert.deepEqual(parseContacts(`Aor: ${endpoint} 1\nContact: ${endpoint}/sip:x unknown Avail 1.0`, endpoint), { contactCount: 1, reachableContactCount: 1 });
   assert.throws(() => parseContacts('No such AOR', endpoint));
 });
+test('Asterisk 20 clipped AOR columns retain exact-query identity and full contact IDs', () => {
+  const output = `Aor: ${endpoint.slice(0, 41)} 1\nContact: ${endpoint}/sip:fixture hash Avail 1.0`;
+  assert.deepEqual(parseContacts(output, endpoint), { contactCount: 1, reachableContactCount: 1 });
+  assert.throws(() => parseContacts(`Aor: ${endpoint.slice(0, 40)} 1`, endpoint));
+  assert.throws(() => parseContacts(`Aor: pwa-${'f'.repeat(37)} 1`, endpoint));
+  assert.throws(() => parseContacts(`Aor: ${endpoint} 2`, endpoint));
+});
 
 async function fixture(t) {
   const root = await mkdtemp(path.join(os.tmpdir(), 'elevate-pbx-test-'));
   let authorized = true; let contact = false; let reachable = false;
-  let rejectNextReadback = false;
+  let rejectedReadbacks = 0; let staleRemovals = 0; let waits = 0;
   let clock = Date.now();
   const config = { token: 'fixture-only-'.repeat(4), phoneSystemId: '55555555-5555-4555-8555-555555555555',
     supabaseKey: 'fixture-only', supabaseUrl: 'https://example.invalid', container: 'fixture',
     asteriskGid: process.getgid(), sipDomain: 'phone.elevateforhumanity.org', wsUrl: 'wss://phone.elevateforhumanity.org/ws', generatedRoot: root };
   const service = createProvisioner(config, {
     now: () => clock,
+    wait: async () => { waits++; },
     fetch: async url => ({ ok: true, json: async () => {
       if (String(url).includes('phone_webrtc_devices')) return [{ id: 'fixture' }];
       return authorized ? [{ id: identity.extensionId, profile_id: identity.profileId, extension: '101',
@@ -57,11 +65,15 @@ async function fixture(t) {
         communication_workspaces: { phone_system_id: config.phoneSystemId, phone_systems: { admin_extension: '101', timezone: record.timezone, status: 'active' } } }] : [];
     } }),
     command: async cmd => {
-      if (cmd.endsWith('reload')) return 'Reloaded';
+      if (cmd === 'pjsip reload') throw Error('Optional CLI aliases are not installed');
+      if (cmd === 'module reload res_pjsip.so' || cmd === 'dialplan reload') return 'Reloaded';
       const cfg = await readFile(path.join(root, 'current', 'pjsip.conf'), 'utf8').catch(() => '');
-      if (!cfg.includes(endpoint)) return 'Unable to find object';
+      if (!cfg.includes(endpoint)) {
+        if (cmd.startsWith('pjsip show endpoint') && staleRemovals-- > 0) return `Endpoint: ${endpoint}/101`;
+        return 'Unable to find object';
+      }
       if (cmd.startsWith('pjsip show endpoint')) {
-        if (rejectNextReadback) { rejectNextReadback = false; return 'Unable to find object'; }
+        if (rejectedReadbacks-- > 0) return 'Unable to find object';
         return `Endpoint: ${endpoint}/101\ncontext : elevate-pwa \nauth : ${endpoint}-auth \naors : ${endpoint} \nmedia_encryption : dtls \n`;
       }
       if (cmd.startsWith('dialplan show')) return readFile(path.join(root, 'current','extensions.conf'), 'utf8');
@@ -78,7 +90,7 @@ async function fixture(t) {
     return { status: response.status, body: await response.json() };
   };
   return { request, service, root, deny: () => authorized = false, contacts: (a,b) => {contact=a;reachable=b;},
-    reject: () => rejectNextReadback = true, expire: () => clock += 700000 };
+    reject: (count = 12) => rejectedReadbacks = count, delayRemoval: count => staleRemovals = count, waits: () => waits, expire: () => clock += 700000 };
 }
 test('requires control-plane auth and independently verified Supabase ownership', async t => {
   const f = await fixture(t);
@@ -106,4 +118,16 @@ test('expired and disabled owner credentials are removed by reconciliation',asyn
   f.expire();await f.service.pruneExpired();assert.equal((await f.request('/status')).body.registered,false);
   assert.equal((await f.request()).status,200);f.deny();await f.service.reconcile();
   const cfg=await readFile(path.join(f.root,'current','pjsip.conf'),'utf8');assert.doesNotMatch(cfg,/password=/);
+});
+
+test('asynchronous Asterisk apply and revocation settle before acceptance', async t => {
+  const f = await fixture(t);
+  f.reject(2);
+  const attempt = await f.request();
+  assert.equal(attempt.status, 200);
+  assert.equal(f.waits(), 2);
+  f.delayRemoval(2);
+  assert.equal((await f.request('/revoke')).body.revoked, true);
+  assert.equal(f.waits(), 4);
+  assert.equal((await f.request('/status')).status, 200);
 });

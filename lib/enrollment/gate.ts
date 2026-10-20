@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { resolveCourseIdFromDb } from '@/lib/course-builder/program-resolver';
-import { portalPathForProgramSlug } from '@/lib/portal/apprenticeship-portal-paths';
+import { portalPathForProgramSlug, isApprenticeshipSlug } from '@/lib/portal/apprenticeship-portal-paths';
 import { redirect } from 'next/navigation';
 
 export type EnrollmentState =
@@ -32,7 +32,14 @@ export function getNextRequiredAction(enrollment: {
   program_slug?: string;
   course_id?: string | null;
 }): { label: string; href: string; description: string } {
-  const programSlug = enrollment.program_slug || 'barber-apprenticeship';
+  const programSlug = enrollment.program_slug;
+  if (!programSlug) {
+    return {
+      label: 'View Programs',
+      href: '/programs',
+      description: 'Your enrollment needs a valid program assignment',
+    };
+  }
 
   // 1. Orientation not complete
   if (!enrollment.orientation_completed_at) {
@@ -71,9 +78,9 @@ export function getNextRequiredAction(enrollment: {
   }
 
   return {
-    label: 'View Programs',
-    href: '/programs',
-    description: 'Explore available training programs',
+    label: 'Go to Your Dashboard',
+    href: '/lms/dashboard',
+    description: 'Track your enrolled program progress and training milestones',
   };
 }
 
@@ -81,7 +88,7 @@ export function getNextRequiredAction(enrollment: {
  * Gate access to apprentice dashboard
  * Redirects to required step if not complete
  */
-export async function gateApprenticeDashboard(): Promise<{
+export async function gateApprenticeDashboard(targetProgramSlug?: string): Promise<{
   allowed: boolean;
   enrollment: unknown;
   nextAction: { label: string; href: string; description: string } | null;
@@ -100,21 +107,64 @@ export async function gateApprenticeDashboard(): Promise<{
     redirect('/login?redirect=/apprentice');
   }
 
-  // Get active enrollment
-  const { data: enrollment } = await supabase
+  // Get active enrollment (supporting user_id or student_id)
+  const { data: enrollments } = await supabase
     .from('program_enrollments')
-    .select('*, programs(slug, title)')
-    .eq('user_id', user.id)
+    .select('*, programs:program_id(slug, title, name)')
+    .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
     .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(20);
 
-  if (!enrollment) {
+  if (!enrollments || enrollments.length === 0) {
     // No enrollment - redirect to programs
     redirect('/programs');
   }
 
-  const programSlug = enrollment.programs?.slug || enrollment.program_slug || 'unknown-program';
+  // If a target program is requested, find it; otherwise find an active apprenticeship or active enrollment
+  let enrollment = targetProgramSlug
+    ? enrollments.find((e: any) => {
+        const slug = e.programs?.slug || e.program_slug;
+        return slug?.toLowerCase() === targetProgramSlug.toLowerCase();
+      })
+    : undefined;
+
+  if (!enrollment) {
+    // Prioritize active apprenticeship program enrollment
+    enrollment = enrollments.find((e: any) => {
+      const slug = e.programs?.slug || e.program_slug;
+      const status = String(e.enrollment_state || e.status || '').toLowerCase();
+      const isActive = ['active', 'enrolled', 'in_progress', 'confirmed'].includes(status);
+      return isActive && isApprenticeshipSlug(slug);
+    });
+  }
+
+  if (!enrollment) {
+    // Fall back to any active enrollment or latest enrollment
+    enrollment = enrollments.find((e: any) => {
+      const status = String(e.enrollment_state || e.status || '').toLowerCase();
+      return ['active', 'enrolled', 'in_progress', 'confirmed'].includes(status);
+    }) || enrollments[0];
+  }
+
+  let programSlug = enrollment.programs?.slug || enrollment.program_slug;
+  if (!programSlug && enrollment.program_id) {
+    const { data: prog } = await supabase
+      .from('programs')
+      .select('slug')
+      .eq('id', enrollment.program_id)
+      .maybeSingle();
+    programSlug = prog?.slug;
+  }
+
+  if (!programSlug) {
+    redirect('/programs');
+  }
+
+  // Non-apprenticeship programs belong on the LMS dashboard
+  if (!isApprenticeshipSlug(programSlug)) {
+    redirect('/lms/dashboard');
+  }
+
   const courseId = await resolveCourseIdFromDb(supabase, programSlug);
   const nextAction = getNextRequiredAction({
     status: enrollment.status,

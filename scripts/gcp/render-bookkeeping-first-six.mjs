@@ -127,7 +127,7 @@ async function renderLesson(lesson) {
     const upload=await fetch(BASE+'/storage/v1/object/media/'+objectPath,{
       method:'POST',headers:{...headers,'content-type':'video/mp4','x-upsert':'false'},
       body:bytes,signal:AbortSignal.timeout(120000)});
-    if(!upload.ok && upload.status!==409)throw new Error('Media upload failed: HTTP '+upload.status);
+    if(!upload.ok)throw new Error('Media upload failed: HTTP '+upload.status+'; existing object must be reviewed before retry');
     const publicUrl=BASE+'/storage/v1/object/public/media/'+objectPath;
     const verify=await fetch(publicUrl,{headers:{Range:'bytes=0-1023'},signal:AbortSignal.timeout(15000)});
     if(!verify.ok || !(verify.headers.get('content-type')||'').includes('video'))throw new Error('Uploaded video could not be read back');

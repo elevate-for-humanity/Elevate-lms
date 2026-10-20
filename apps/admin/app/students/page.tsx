@@ -19,38 +19,29 @@ function EnrollmentBadge({
   state: string | null;
   accessGranted: boolean;
 }) {
-  if (accessGranted) {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700">
-        ● Active
-      </span>
-    );
-  }
-  if (!state) {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">
-        No enrollment
-      </span>
-    );
-  }
-  const map: Record<string, { bg: string; text: string; label: string }> = {
-    applied: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Applied' },
-    onboarding: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Onboarding' },
-    orientation: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Orientation' },
-    enrolled: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pending Approval' },
-    active: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pending Approval' },
-    waitlisted: { bg: 'bg-slate-100', text: 'text-slate-600', label: 'Waitlisted' },
-    suspended: { bg: 'bg-red-100', text: 'text-red-700', label: 'Suspended' },
-    revoked: { bg: 'bg-red-100', text: 'text-red-700', label: 'Revoked' },
-    withdrawn: { bg: 'bg-slate-100', text: 'text-slate-500', label: 'Withdrawn' },
-    completed: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Completed' },
-    graduated: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Graduated' },
+  const normalized = String(state ?? '').toLowerCase();
+  const styles: Record<string, { bg: string; text: string; label: string }> = {
+    applied: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Applied · Review pending' },
+    pending_approval: { bg: 'bg-amber-100', text: 'text-amber-800', label: 'Approval pending' },
+    onboarding: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Onboarding' },
+    orientation: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Orientation' },
+    payment_required: { bg: 'bg-amber-100', text: 'text-amber-800', label: 'Payment required' },
+    waitlisted: { bg: 'bg-slate-100', text: 'text-slate-700', label: 'Waitlisted' },
+    suspended: { bg: 'bg-red-100', text: 'text-red-800', label: 'Suspended' },
+    revoked: { bg: 'bg-red-100', text: 'text-red-800', label: 'Revoked' },
+    withdrawn: { bg: 'bg-slate-100', text: 'text-slate-700', label: 'Withdrawn' },
+    completed: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Completed' },
+    graduated: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Graduated' },
   };
-  const style = map[state] ?? { bg: 'bg-slate-100', text: 'text-slate-500', label: state };
+  // Enrollment and LMS provisioning are independent. Do not turn active,
+  // completed, suspended, or revoked records into a misleading approval state.
+  const style = ['active', 'enrolled'].includes(normalized)
+    ? { bg: 'bg-green-100', text: 'text-green-800', label: accessGranted ? 'Enrolled · Access granted' : 'Enrolled · Access pending' }
+    : styles[normalized] ?? (normalized
+      ? { bg: 'bg-slate-100', text: 'text-slate-700', label: normalized.replace(/_/g, ' ') }
+      : { bg: 'bg-slate-100', text: 'text-slate-600', label: 'No enrollment' });
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${style.bg} ${style.text}`}
-    >
+    <span className={`inline-block max-w-full break-words rounded-lg px-2 py-1 text-xs font-semibold leading-tight ${style.bg} ${style.text}`}>
       {style.label}
     </span>
   );
@@ -138,8 +129,7 @@ export default async function StudentsPage({
   const { count: pendingApproval, error: pendingError } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
-    .is('access_granted_at', null)
-    .in('enrollment_state', ['active', 'enrolled', 'onboarding', 'orientation'])
+    .in('enrollment_state', ['applied', 'pending_approval', 'onboarding', 'orientation'])
     .in(
       'user_id',
       operationalStudentIds.length
@@ -236,7 +226,38 @@ export default async function StudentsPage({
       )}
       <AdminCard>
         {students && students.length > 0 ? (
-          <div className="overflow-x-auto">
+          <>
+          <div className="space-y-3 p-3 sm:hidden">
+            {students.map((student: any) => {
+              const enr = enrollmentByUser[student.id];
+              return (
+                <article key={student.id} className="min-w-0 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <div className="flex min-w-0 items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="break-words font-semibold text-slate-900">
+                        {student.full_name || `${student.first_name || ''} ${student.last_name || ''}`.trim() || 'Unnamed'}
+                      </h3>
+                      <p className="mt-1 break-words text-sm text-slate-600">{student.email}</p>
+                      {student.phone && <p className="mt-1 text-sm text-slate-600">{student.phone}</p>}
+                    </div>
+                    <div className="shrink-0">
+                      {enrollmentError
+                        ? <span className="text-xs text-amber-700">Enrollment unavailable</span>
+                        : <EnrollmentBadge state={enr?.enrollment_state ?? null} accessGranted={Boolean(enr?.access_granted_at)} />}
+                    </div>
+                  </div>
+                  <p className="mt-3 break-words text-sm capitalize text-slate-700">
+                    {enr?.program_slug?.replace(/-/g, ' ') || 'Program not assigned'}
+                  </p>
+                  <div className="mt-3 flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
+                    <span className="text-xs text-slate-500">Joined {new Date(student.created_at).toLocaleDateString()}</span>
+                    <Link href={`/students/${student.id}`} className="inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 text-sm font-semibold text-brand-blue-700">View student →</Link>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+          <div className="hidden overflow-x-auto sm:block">
             <div className="min-w-[600px]">
               {/* Table header */}
               <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-slate-50 text-[10px] font-bold uppercase tracking-widest text-slate-600">
@@ -319,6 +340,7 @@ export default async function StudentsPage({
               })}
             </div>
           </div>
+          </>
         ) : (
           <AdminEmptyState
             message={

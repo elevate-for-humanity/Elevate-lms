@@ -101,16 +101,21 @@ export function HoursApprovalQueue() {
     setMessage(null);
 
     try {
-      const res = await fetch('/api/apprenticeship/hours/approve', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hour_ids: entries.map((e) => e.id) }),
-      });
-
-      if (!res.ok) throw new Error('Bulk approve failed');
-
-      setEntries([]);
-      setMessage({ type: 'success', text: `${entries.length} entries approved` });
+      let approved = 0;
+      for (const entry of entries) {
+        const res = await fetch('/api/employer/hours/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hour_id: entry.id }),
+        });
+        if (!res.ok)
+          throw new Error(
+            `${approved} entries approved before a review failed. Refresh before retrying.`,
+          );
+        approved += 1;
+        setEntries((previous) => previous.filter((row) => row.id !== entry.id));
+      }
+      setMessage({ type: 'success', text: `${approved} entries approved` });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message || 'Bulk approve failed' });
     } finally {

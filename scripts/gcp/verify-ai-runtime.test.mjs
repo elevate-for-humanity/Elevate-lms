@@ -1,7 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { verifyOwnedModel, classifyRuntimeErrors } from './verify-ai-runtime.mjs';
+import { verifyOwnedModel, classifyRuntimeErrors, isReadyStudioCloudRun } from './verify-ai-runtime.mjs';
 const env={ELEVATE_LLM_URL:'https://elevate-model-123.us-central1.run.app',ELEVATE_LLM_SECRET:'private-fixture'};
+const studio={metadata:{name:'elevate-studio-browser'},status:{url:'https://elevate-studio-browser-aabnh2y32a-uc.a.run.app',conditions:[{type:'Ready',status:'True'}]}};
+test('recognizes the ready canonical Cloud Run Studio without requiring a VM',()=>{
+  assert.equal(isReadyStudioCloudRun(studio),true);
+});
+test('an unready or unrelated Cloud Run service cannot certify Studio',()=>{
+  assert.equal(isReadyStudioCloudRun({...studio,status:{...studio.status,conditions:[{type:'Ready',status:'False'}]}}),false);
+  assert.equal(isReadyStudioCloudRun({...studio,metadata:{name:'other-service'}}),false);
+});
+test('untrusted or malformed Studio delivery URLs cannot certify the Google runtime',()=>{
+  for(const url of ['http://studio.run.app','https://studio.run.app.example.com','https://user:secret@studio.run.app','invalid'])
+    assert.equal(isReadyStudioCloudRun({...studio,status:{...studio.status,url}}),false);
+});
 test('requires the exact approved served model, not credentials alone',async()=>{
   for(const model of ['wrong-model','elevate-local']){
     const result=await verifyOwnedModel(env,{request:async()=>new Response(JSON.stringify({data:[{id:model}]}))});

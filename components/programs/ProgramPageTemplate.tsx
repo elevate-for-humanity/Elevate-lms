@@ -181,8 +181,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
               <div className="pt-4">
                 <h3 className="text-xl font-bold text-slate-900 mb-4">Apply Online</h3>
                 <p className="text-slate-600 mb-6">
-                  Complete our simple online application in just 10-15 minutes. We'll review your
-                  eligibility for free WIOA-funded training.
+                  Complete the online application and review the exact program's tuition and funding disclosure. Any WIOA decision is made by the responsible agency, not by this application.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
@@ -419,7 +418,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
           </h2>
           <p className="text-slate-500 text-lg mb-8">
             {program.fundingType === 'funded'
-              ? 'Free training for eligible Indiana residents. Check your eligibility in minutes.'
+              ? 'This program has a funding path configured. Review the exact program evidence and complete the responsible agency eligibility and authorization process before relying on funding.'
               : 'Self-pay program with payment options available.'}
           </p>
 

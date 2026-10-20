@@ -11,7 +11,7 @@ export const metadata = {
 
 async function loadContext() {
   try {
-    return await requireCurrentHostShopPartner();
+    return await requireCurrentHostShopPartner({ allowPendingOnboarding: true });
   } catch (error) {
     const code = error instanceof Error ? error.message : '';
     if (code === 'HOST_SHOP_UNAUTHENTICATED') {
@@ -31,7 +31,7 @@ function boolValue(value: FormDataEntryValue | null) {
 async function saveHostShopProfile(formData: FormData) {
   'use server';
 
-  const { db, partner } = await requireCurrentHostShopPartner();
+  const { db, partner } = await requireCurrentHostShopPartner({ allowPendingOnboarding: true });
   const supervisorName = String(formData.get('supervisorName') ?? '').trim();
   const supervisorLicense = String(formData.get('supervisorLicense') ?? '').trim();
   const yearsLicensedRaw = Number(formData.get('yearsLicensed') ?? 0);
@@ -66,7 +66,8 @@ async function saveHostShopProfile(formData: FormData) {
       contact_phone: phone || partner.contact_phone || partner.phone || null,
       website: website || partner.website || null,
       website_url: website || partner.website_url || null,
-      onboarding_completed: true,
+      // Saving a profile is not the same as approval, signed MOU, and accepted documents.
+      onboarding_completed: partner.onboarding_completed === true,
       onboarding_step: 'documents',
       updated_at: updatedAt,
     })

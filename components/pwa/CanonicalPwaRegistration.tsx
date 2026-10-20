@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useBuildVersion } from '@/lib/hooks/useBuildVersion';
 import { PWA_APPLICATIONS, type PwaApplication } from '@/lib/pwa/registry';
 import {
   capturePwaInstallPrompt,
@@ -42,6 +43,8 @@ async function purgeBrokenPwaState() {
 }
 
 export function CanonicalPwaRegistration({ application }: { application: PwaApplication }) {
+  // Observe the loaded build without showing an intrusive update banner.
+  useBuildVersion();
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production' || !('serviceWorker' in navigator)) return;
     const config = PWA_APPLICATIONS[application];

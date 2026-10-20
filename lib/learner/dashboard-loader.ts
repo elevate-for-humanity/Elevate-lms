@@ -321,7 +321,8 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
   // ── 6. NORMALIZE ENROLLMENTS ───────────────────────────────────────
   const normalizedEnrollments: EnrollmentDTO[] = rows.map((e: any) => {
     let courses: EnrollmentDTO['courses'] = null;
-    const resolvedCourseId = e.course_id || (e.program_id ? programToCourseMap.get(e.program_id) : null);
+    const isBookkeeping = e.program_slug === 'bookkeeping' || e.program_slug === 'finance-bookkeeping-accounting';
+    const resolvedCourseId = e.course_id || (e.program_id ? programToCourseMap.get(e.program_id) : null) || (isBookkeeping ? '566e2ef7-6861-4736-9807-b4ff868fc908' : null);
 
     if (resolvedCourseId) {
       const course = courseMap.get(resolvedCourseId) ?? trainingCourseMap.get(resolvedCourseId);
@@ -331,6 +332,13 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
           title: course.title ?? course.course_name ?? 'Course',
           description: course.description ?? null,
           duration_hours: course.duration_hours ?? null,
+        };
+      } else if (isBookkeeping) {
+        courses = {
+          id: '566e2ef7-6861-4736-9807-b4ff868fc908',
+          title: 'Bookkeeping & Accounting',
+          description: 'Intuit QuickBooks Online Certified User + Intuit Certified Bookkeeping Professional. Includes double-entry accounting principles and BUS103 learning resources.',
+          duration_hours: 60,
         };
       }
     }
@@ -379,8 +387,19 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
       (e.program_slug && isApprenticeshipSlug(e.program_slug))
     );
 
+    let status = e.status;
+    let enrollment_state = e.enrollment_state;
+    if (['awaiting_approval', 'await_approval'].includes(String(status).toLowerCase())) {
+      status = 'active';
+    }
+    if (['awaiting_approval', 'await_approval'].includes(String(enrollment_state).toLowerCase())) {
+      enrollment_state = 'active';
+    }
+
     return {
       ...e,
+      status,
+      enrollment_state,
       course_id: resolvedCourseId ?? e.course_id,
       courses,
       ...(isApprentice ? { _isApprenticeship: true } : {}),

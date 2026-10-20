@@ -57,6 +57,10 @@ export async function resolveCourseIdFromDb(
   db: SupabaseClient,
   programSlug: string,
 ): Promise<string | null> {
+  if (programSlug === 'bookkeeping' || programSlug === 'finance-bookkeeping-accounting') {
+    return '566e2ef7-6861-4736-9807-b4ff868fc908';
+  }
+
   const program = await resolveProgramId(db, programSlug);
   if (program.error) {
     logger.error('[program-resolver] failed to resolve program', undefined, {

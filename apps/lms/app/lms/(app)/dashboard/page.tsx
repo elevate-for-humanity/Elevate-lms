@@ -455,6 +455,42 @@ export default async function StudentDashboard() {
             <OnlineStudyClock />
           </>
         ) : null}
+        {programEnrollments.some((row: any) =>
+          ['bookkeeping', 'finance-bookkeeping-accounting'].includes(String(row.programs?.slug || row.program_slug || '').toLowerCase())
+        ) ? (
+          <>
+            <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+              <h2 className="text-xl font-bold text-slate-950">Your Bookkeeping &amp; Accounting Start Guide</h2>
+              <p className="my-2 text-sm text-slate-700">
+                8-week hybrid pathway preparing you for Intuit QuickBooks Certified User and Microsoft Office Specialist certification.
+              </p>
+              <div className="mt-4 rounded-lg border border-emerald-300 bg-white p-4">
+                <h3 className="font-bold text-slate-900">Assigned Learning Resource: BUS103 Introduction to Financial Accounting</h3>
+                <p className="mt-1 text-sm text-slate-700">
+                  <strong>BUS103 Instructions:</strong> Complete the accounting fundamentals, double-entry bookkeeping, general ledger reconciliations, and financial statement exercises in BUS103. Practice spreadsheet entries and QuickBooks Online workflows.
+                </p>
+                <p className="mt-2 text-xs font-semibold text-emerald-800">
+                  <strong>Training-Hour Guidance:</strong> Maintain 15–20 hours per week of active coursework, practical bookkeeping exercises, and software labs. Use the Online Study Clock below to log and verify each study session.
+                </p>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-4">
+                <Link className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-800 underline" href="/lms/orientation">
+                  <BookOpen className="h-4 w-4" /> Program and dashboard orientation
+                </Link>
+                <Link className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-800 underline" href="/lms/documents">
+                  <FileText className="h-4 w-4" /> Submit required documents
+                </Link>
+                <Link className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-800 underline" href="/communications/email">
+                  <Mail className="h-4 w-4" /> Interoffice staff email
+                </Link>
+                <Link className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-800 underline" href="/lms/courses/566e2ef7-6861-4736-9807-b4ff868fc908">
+                  <Play className="h-4 w-4" /> Open Bookkeeping courseware
+                </Link>
+              </div>
+            </section>
+            <OnlineStudyClock />
+          </>
+        ) : null}
         {subject.previewing ? (
           <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
             <span className="font-semibold">

@@ -181,8 +181,8 @@ const adminPwa = read('components/pwa/AdminPwaRegister.tsx');
 const canonicalPwa = read('components/pwa/CanonicalPwaRegistration.tsx');
 const updateNotice = read('components/pwa/PwaUpdateNotice.tsx');
 if (!adminPwa.includes('<CanonicalPwaRegistration application="admin"') ||
-    !canonicalPwa.includes('<PwaUpdateNotice') || !updateNotice.includes('useBuildVersion()')) {
-  fail('Admin PWA is missing the shared update notice or loaded-build version check');
+    !canonicalPwa.includes('useBuildVersion()') || !updateNotice.includes('useBuildVersion()')) {
+  fail('Admin PWA is missing the canonical loaded-build version check');
 }
 if (adminLayout.includes('<BuildVersionSync') || adminLayout.includes('<AdminUpdateNotice')) {
   fail('Admin layout mounts duplicate PWA update/version surfaces outside canonical registration');

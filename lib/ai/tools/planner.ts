@@ -153,7 +153,7 @@ export function planAIToolFromCommand(
   if (
     /\b(workflow|pipeline|job)\b/.test(lower) &&
     /\b(inspect|check|status|progress|current step|failures?)\b/.test(lower) &&
-    /\b(read[- ]?only|do not (?:deploy|restart|cancel|modify|create))\b/.test(lower)
+    (isReadOnlyRequest(command) || /\bdo not (?:deploy|restart|cancel|modify|create)\b/.test(lower))
   ) {
     return { name: 'workflows.inspect', input: {} };
   }

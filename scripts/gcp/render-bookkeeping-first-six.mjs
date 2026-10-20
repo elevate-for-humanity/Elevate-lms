@@ -17,7 +17,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 const COURSE = '93039110-f571-4ff1-bd54-7114c74bfd25';
-const BASE = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/\\/$/, '');
+const BASE = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/\/$/, '');
 const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const dryRun = process.argv.includes('--dry-run');
 const execute = process.argv.includes('--execute');
@@ -42,15 +42,15 @@ async function readLessons() {
   return rows;
 }
 function cleanText(html) {
-  return html.replace(/<figure[\\s\\S]*?<\\/figure>/gi,' ')
-    .replace(/<script[\\s\\S]*?<\\/script>/gi,' ')
-    .replace(/<style[\\s\\S]*?<\\/style>/gi,' ')
-    .replace(/<\\/(?:p|li|h[1-6]|div)>/gi,'. ')
+  return html.replace(/<figure[\s\S]*?<\/figure>/gi,' ')
+    .replace(/<script[\s\S]*?<\/script>/gi,' ')
+    .replace(/<style[\s\S]*?<\/style>/gi,' ')
+    .replace(/<\/(?:p|li|h[1-6]|div)>/gi,'. ')
     .replace(/<[^>]*>/g,' ')
     .replace(/&amp;/g,'and').replace(/&nbsp;/g,' ')
     .replace(/&lt;/g,'less than ').replace(/&gt;/g,'greater than ')
     .replace(/&quot;/g,'"').replace(/&#39;/g,"'")
-    .replace(/\\s+/g,' ').trim();
+    .replace(/\s+/g,' ').trim();
 }
 function chunks(text, limit = 2200) {
   const out = []; let rest = text;
@@ -87,7 +87,7 @@ async function narration(text, folder) {
     await writeFile(file,Buffer.from(data.audioContent,'base64'));files.push(file);
   }
   const list=path.join(folder,'audio-list.txt');
-  await writeFile(list,files.map(x=>"file '"+x.replaceAll("'","'\\''")+"'").join('\\n')+'\\n');
+  await writeFile(list,files.map(x=>"file '"+x.replaceAll("'","'\''")+"'").join('\n')+'\n');
   const joined=path.join(folder,'narration.m4a');
   cmd('ffmpeg',['-hide_banner','-loglevel','error','-y','-f','concat','-safe','0','-i',list,'-c:a','aac','-b:a','160k',joined]);
   return joined;

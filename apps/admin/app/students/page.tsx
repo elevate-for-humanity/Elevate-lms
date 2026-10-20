@@ -19,6 +19,14 @@ function EnrollmentBadge({
   state: string | null;
   accessGranted: boolean;
 }) {
+  if (['active', 'enrolled'].includes(String(state ?? '').toLowerCase())) {
+    return (
+      <span className="inline-flex flex-col gap-0.5 text-[10px] font-bold">
+        <span className="text-green-700">● Enrolled</span>
+        {!accessGranted && <span className="text-amber-700">LMS access not confirmed</span>}
+      </span>
+    );
+  }
   if (accessGranted) {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700">
@@ -37,8 +45,8 @@ function EnrollmentBadge({
     applied: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Applied' },
     onboarding: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Onboarding' },
     orientation: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Orientation' },
-    enrolled: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pending Approval' },
-    active: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pending Approval' },
+    enrolled: { bg: 'bg-green-100', text: 'text-green-700', label: 'Enrolled' },
+    active: { bg: 'bg-green-100', text: 'text-green-700', label: 'Enrolled' },
     waitlisted: { bg: 'bg-slate-100', text: 'text-slate-600', label: 'Waitlisted' },
     suspended: { bg: 'bg-red-100', text: 'text-red-700', label: 'Suspended' },
     revoked: { bg: 'bg-red-100', text: 'text-red-700', label: 'Revoked' },
@@ -123,11 +131,12 @@ export default async function StudentsPage({
     if (!enrollmentByUser[e.user_id]) enrollmentByUser[e.user_id] = e;
   }
 
-  // Real counts — access_granted_at is the canonical "active" gate
+  // Separate admission enrollment from verified access. An active program
+  // enrollment is not a pending application just because LMS access is unconfirmed.
   const { count: activeEnrollments, error: activeError } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
-    .not('access_granted_at', 'is', null)
+    .in('enrollment_state', ['active', 'enrolled'])
     .in(
       'user_id',
       operationalStudentIds.length
@@ -138,8 +147,7 @@ export default async function StudentsPage({
   const { count: pendingApproval, error: pendingError } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
-    .is('access_granted_at', null)
-    .in('enrollment_state', ['active', 'enrolled', 'onboarding', 'orientation'])
+    .in('enrollment_state', ['applied', 'pending_approval', 'onboarding', 'orientation'])
     .in(
       'user_id',
       operationalStudentIds.length
@@ -182,7 +190,7 @@ export default async function StudentsPage({
           color: 'slate',
         },
         {
-          label: 'Access Granted',
+          label: 'Enrolled Students',
           value:
             profilesError || activeError ? 'Unavailable' : (activeEnrollments ?? 'Unavailable'),
           icon: TrendingUp,

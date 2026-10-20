@@ -1089,7 +1089,14 @@ export async function renderStoryboardVideo(
       if (!paths.videoPath || paths.videoPath === manifestPath) throw new Error('REMOTION_CONCAT_OUTPUT_REQUIRED');
       const concatArgs = [
         '-y', '-f', 'concat', '-safe', '0', '-i', manifestPath,
-        // Each independently rendered frame-range chunk can carry its own encoded\n        // timebase/keyframe boundaries. Normalize PTS and re-encode at assembly\n        // so later scenes never replay earlier frames after concat.\n        '-fflags', '+genpts', '-c:v', 'libx264', '-preset', 'fast', '-crf', '20',\n        '-r', String(composition.fps), '-fps_mode', 'cfr',\n        '-c:a', 'aac', '-af', 'aresample=async=1:first_pts=0',\n        '-movflags', '+faststart', paths.videoPath,
+        // Frame-range chunks have independent timebases. Normalize timestamps
+        // and re-encode to prevent replay at segment boundaries.
+        '-fflags', '+genpts',
+        '-c:v', 'libx264', '-preset', 'fast', '-crf', '20',
+        '-r', String(composition.fps), '-fps_mode', 'cfr',
+        '-c:a', 'aac', '-af', 'aresample=async=1:first_pts=0',
+        '-movflags', '+faststart',
+        paths.videoPath,
       ];
       if (concatArgs.at(-1) !== paths.videoPath) throw new Error('REMOTION_CONCAT_OUTPUT_REQUIRED');
       try {

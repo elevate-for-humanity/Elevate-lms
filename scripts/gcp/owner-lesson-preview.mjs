@@ -64,6 +64,7 @@ export function changedRuntimePaths(expected,actual,limit=16){
  };
  walk(expected,actual,'');
  return paths.slice(0,limit);
+}
 export function runtimeDifferencePaths(before,after,path='spec'){
   if(JSON.stringify(before)===JSON.stringify(after))return [];
   if(before&&after&&typeof before==='object'&&typeof after==='object')

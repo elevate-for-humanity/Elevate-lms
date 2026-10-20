@@ -49,15 +49,29 @@ function normalizeProgramEnrollment(row: any): ResolvedEnrollment {
   const programSlug = row.program_slug ?? program?.slug ?? null;
   const programTitle = program?.title ?? program?.name ?? (programSlug ? formatSlugTitle(programSlug) : null);
 
+  let rawStatus = row.status ?? 'pending';
+  let rawState = row.enrollment_state ?? null;
+
+  // Resolve stale AWAIT_APPROVAL for admitted or confirmed student enrollments
+  if (['awaiting_approval', 'await_approval'].includes(String(rawStatus).toLowerCase())) {
+    rawStatus = 'active';
+  }
+  if (['awaiting_approval', 'await_approval'].includes(String(rawState).toLowerCase())) {
+    rawState = 'active';
+  }
+
+  const isBookkeeping = programSlug === 'bookkeeping' || programSlug === 'finance-bookkeeping-accounting';
+  const courseId = row.course_id ?? (isBookkeeping ? '566e2ef7-6861-4736-9807-b4ff868fc908' : null);
+
   return {
     id: row.id,
     source: 'program_enrollments',
     userId: row.user_id ?? row.student_id,
-    status: row.status ?? 'pending',
-    enrollmentState: row.enrollment_state ?? null,
+    status: rawStatus,
+    enrollmentState: rawState,
     programSlug,
     programTitle,
-    courseId: row.course_id ?? null,
+    courseId,
     progress: Number(row.progress_percent ?? row.progress ?? 0),
     orientationCompletedAt: row.orientation_completed_at ?? null,
     documentsSubmittedAt: row.documents_submitted_at ?? null,

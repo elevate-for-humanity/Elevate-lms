@@ -457,3 +457,53 @@ test('learner dashboard normalization formats unpublished courses and preserves 
   assert.equal(enrollments[1]._isApprenticeship, true);
 });
 
+test('Alta Jennings Bookkeeping repair: preserves active enrollment, resolves stale AWAIT_APPROVAL, and assigns canonical course', async () => {
+  const mockUser = { id: 'student-alta-jennings' };
+  const rows = [
+    {
+      id: 'enr-alta-bookkeeping',
+      user_id: 'student-alta-jennings',
+      program_slug: 'bookkeeping',
+      course_id: null, // missing course assignment
+      status: 'awaiting_approval', // stale AWAIT_APPROVAL
+      enrollment_state: 'awaiting_approval',
+      created_at: '2026-10-15T00:00:00Z',
+    },
+  ];
+
+  const mockClient = {
+    auth: { getUser: async () => ({ data: { user: mockUser } }) },
+    from(table) {
+      return {
+        select() { return this; },
+        or() { return this; },
+        order() { return this; },
+        limit() {
+          return {
+            then(resolve) {
+              resolve({ data: rows, error: null });
+            },
+          };
+        },
+      };
+    },
+  };
+
+  const resolved = await enrollmentResolverModule.resolveLatestEnrollment({
+    client: mockClient,
+    userId: mockUser.id,
+    programSlug: 'bookkeeping',
+  });
+
+  assert.ok(resolved, 'Bookkeeping enrollment must be resolved');
+  assert.equal(resolved.programSlug, 'bookkeeping');
+  // Stale AWAIT_APPROVAL resolved to active
+  assert.equal(resolved.status, 'active');
+  // Missing course assignment resolved to canonical Bookkeeping course
+  assert.equal(resolved.courseId, '566e2ef7-6861-4736-9807-b4ff868fc908');
+  // Bookkeeping program routing does NOT route to apprentice portal
+  assert.equal(portalPathsModule.portalPathForProgramSlug('bookkeeping'), null);
+  assert.equal(portalPathsModule.isApprenticeshipSlug('bookkeeping'), false);
+});
+
+

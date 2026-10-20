@@ -107,7 +107,21 @@ export async function loadLearnerWorkspace(userId: string, role = 'student'): Pr
     ...agreements.map((agreement) => ({ id: `agreement:${agreement.type}`, title: agreement.title, description: agreement.description, href: agreement.type === 'handbook' ? '/lms/handbook' : '/lms/agreements', status: agreement.signed ? 'complete' as const : 'missing' as const, completedAt: agreement.acceptedAt, blocking: true })),
     { id: 'orientation', title: 'Complete learner orientation', description: 'Review how training, support, progress, and credentials work.', href: '/lms/orientation', status: orientationComplete ? 'complete' : 'missing', completedAt: progress?.completed_at ?? null, blocking: true },
     { id: 'course_assignment', title: 'Confirm course assignment', description: trainingEnrollment ? 'Your program or course assignment is recorded.' : 'A course or external-provider assignment has not been connected yet.', href: '/lms/courses', status: trainingEnrollment ? 'complete' : 'blocked', completedAt: null, blocking: true },
-    { id: 'course_access', title: 'Open training access', description: trainingEnrollment?.continue_url && trainingEnrollment.continue_url !== '/lms/dashboard' ? 'Your next training destination is available.' : 'Training access is waiting on assignment or approval.', href: '/lms/courses', status: trainingEnrollment?.continue_url && trainingEnrollment.continue_url !== '/lms/dashboard' ? 'complete' : 'blocked', completedAt: null, blocking: true },
+    {
+      id: 'course_access',
+      title: 'Course materials access',
+      description:
+        trainingEnrollment?.continue_url && trainingEnrollment.continue_url !== '/lms/dashboard'
+          ? 'Your training destination is available.'
+          : 'Curriculum materials will unlock once orientation and document verification are complete.',
+      href: '/lms/courses',
+      status:
+        trainingEnrollment?.continue_url && trainingEnrollment.continue_url !== '/lms/dashboard'
+          ? 'complete'
+          : 'in_progress',
+      completedAt: null,
+      blocking: false,
+    },
   ];
 
   const completed = onboardingSteps.filter((step) => step.status === 'complete').length;

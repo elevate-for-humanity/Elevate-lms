@@ -26,8 +26,8 @@ function roomCase(source,initialError=''){let changes=[],index=0;let react={useS
 
 test('enrollment labels separate admission from course access', () => {
   const source = candidateFiles['apps/admin/app/students/page.tsx'];
-  assert.equal(badgeLabel(source, 'enrolled', false), 'Enrolled · access pending');
-  assert.equal(badgeLabel(source, 'active', false), 'Active · access pending');
+  assert.equal(badgeLabel(source, 'enrolled', false), 'Enrolled · Access pending');
+  assert.equal(badgeLabel(source, 'active', false), 'Enrolled · Access pending');
   assert.equal(badgeLabel(source, 'completed', false), 'Completed');
   assert.equal(badgeLabel(source, 'suspended', false), 'Suspended');
 });

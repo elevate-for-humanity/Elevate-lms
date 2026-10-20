@@ -380,7 +380,7 @@ export default async function StudentDashboard() {
       href: '/lms/certification/upload',
       label: 'Upload Credentials',
       text: 'Submit earned certifications and licenses for staff verification.',
-      image: '/images/pages/comp-home-highlight-success.webp',
+      image: '/images/pages/admin-courses-partners-hero.webp',
     },
     {
       href: '/lms/resume-builder',
@@ -404,7 +404,7 @@ export default async function StudentDashboard() {
       href: '/lms/messages',
       label: 'Messages',
       text: 'Open learner communications and program messages.',
-      image: '/images/pages/contact-hero.jpg',
+      image: '/images/pages/admin-live-chat-detail.webp',
     },
     {
       href: '/lms/support',

@@ -114,7 +114,7 @@ export async function gateApprenticeDashboard(): Promise<{
     redirect('/programs');
   }
 
-  const programSlug = enrollment.programs?.slug || 'barber-apprenticeship';
+  const programSlug = enrollment.programs?.slug || enrollment.program_slug || 'unknown-program';
   const courseId = await resolveCourseIdFromDb(supabase, programSlug);
   const nextAction = getNextRequiredAction({
     status: enrollment.status,

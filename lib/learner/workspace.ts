@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { getUserEnrollments, type NormalizedEnrollment } from '@/lib/enrollments/getUserEnrollments';
 import { getRequiredAgreementsForProgram, type RequiredAgreement } from '@/lib/legal/requiredAgreements';
 
@@ -35,7 +37,14 @@ export type LearnerWorkspace = {
 };
 
 export async function loadLearnerWorkspace(userId: string, role = 'student'): Promise<LearnerWorkspace> {
-  const supabase = await createClient();
+  const actorDb = await createClient();
+  const { data: { user } } = await actorDb.auth.getUser();
+  if (!user) throw new Error('Sign in required.');
+  const previewDb = await requireAdminClient();
+  const preview = await resolvePortalPreviewSubject(previewDb, user.id);
+  const allowed = user.id === userId || (preview.previewing && preview.userId === userId);
+  if (!allowed) throw new Error('Learner workspace access denied.');
+  const supabase = user.id === userId ? actorDb : previewDb;
   const warnings: string[] = [];
   const enrollmentResult = await getUserEnrollments(userId);
   if (enrollmentResult.error) warnings.push('Enrollment records could not be loaded.');

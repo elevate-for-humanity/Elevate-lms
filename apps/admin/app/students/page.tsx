@@ -19,41 +19,29 @@ function EnrollmentBadge({
   state: string | null;
   accessGranted: boolean;
 }) {
-  if (['active', 'enrolled'].includes(String(state ?? '').toLowerCase())) {
-    return <span className="inline-block max-w-[125px] rounded-lg bg-green-100 px-2 py-1 text-xs font-semibold leading-tight text-green-800">{accessGranted ? 'Enrolled · Access granted' : 'Enrolled · Access pending'}</span>;
-  }
-  if (accessGranted) {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700">
-        ● Active
-      </span>
-    );
-  }
-  if (!state) {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">
-        No enrollment
-      </span>
-    );
-  }
-  const map: Record<string, { bg: string; text: string; label: string }> = {
-    applied: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Applied' },
-    onboarding: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Onboarding' },
-    orientation: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Orientation' },
-    enrolled: { bg: 'bg-green-100', text: 'text-green-700', label: 'Enrolled' },
-    active: { bg: 'bg-green-100', text: 'text-green-700', label: 'Enrolled' },
-    waitlisted: { bg: 'bg-slate-100', text: 'text-slate-600', label: 'Waitlisted' },
-    suspended: { bg: 'bg-red-100', text: 'text-red-700', label: 'Suspended' },
-    revoked: { bg: 'bg-red-100', text: 'text-red-700', label: 'Revoked' },
-    withdrawn: { bg: 'bg-slate-100', text: 'text-slate-500', label: 'Withdrawn' },
-    completed: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Completed' },
-    graduated: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Graduated' },
+  const normalized = String(state ?? '').toLowerCase();
+  const styles: Record<string, { bg: string; text: string; label: string }> = {
+    applied: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Applied · Review pending' },
+    pending_approval: { bg: 'bg-amber-100', text: 'text-amber-800', label: 'Approval pending' },
+    onboarding: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Onboarding' },
+    orientation: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Orientation' },
+    payment_required: { bg: 'bg-amber-100', text: 'text-amber-800', label: 'Payment required' },
+    waitlisted: { bg: 'bg-slate-100', text: 'text-slate-700', label: 'Waitlisted' },
+    suspended: { bg: 'bg-red-100', text: 'text-red-800', label: 'Suspended' },
+    revoked: { bg: 'bg-red-100', text: 'text-red-800', label: 'Revoked' },
+    withdrawn: { bg: 'bg-slate-100', text: 'text-slate-700', label: 'Withdrawn' },
+    completed: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Completed' },
+    graduated: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Graduated' },
   };
-  const style = map[state] ?? { bg: 'bg-slate-100', text: 'text-slate-500', label: state };
+  // Enrollment and LMS provisioning are independent. Do not turn active,
+  // completed, suspended, or revoked records into a misleading approval state.
+  const style = ['active', 'enrolled'].includes(normalized)
+    ? { bg: 'bg-green-100', text: 'text-green-800', label: accessGranted ? 'Enrolled · Access granted' : 'Enrolled · Access pending' }
+    : styles[normalized] ?? (normalized
+      ? { bg: 'bg-slate-100', text: 'text-slate-700', label: normalized.replace(/_/g, ' ') }
+      : { bg: 'bg-slate-100', text: 'text-slate-600', label: 'No enrollment' });
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${style.bg} ${style.text}`}
-    >
+    <span className={`inline-block max-w-full break-words rounded-lg px-2 py-1 text-xs font-semibold leading-tight ${style.bg} ${style.text}`}>
       {style.label}
     </span>
   );

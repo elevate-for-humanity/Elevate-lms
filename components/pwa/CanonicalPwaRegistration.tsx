@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { PWA_APPLICATIONS, type PwaApplication } from '@/lib/pwa/registry';
-import { PwaUpdateNotice } from './PwaUpdateNotice';
 import {
   capturePwaInstallPrompt,
   clearPwaInstallPrompt,
@@ -144,5 +143,7 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     };
   }, [application]);
 
-  return <PwaUpdateNotice />;
+  // Background service-worker updates remain active without an intrusive reload banner.
+  // The next navigation loads the current build without interrupting unsaved work.
+  return null;
 }

@@ -43,9 +43,13 @@ export async function loadLearnerWorkspace(userId: string, role = 'student'): Pr
   const primaryEnrollment = enrollmentResult.enrollments.find((row) =>
     ['active', 'enrolled', 'in_progress', 'pending'].includes(row.status.toLowerCase()),
   ) ?? enrollmentResult.enrollments[0] ?? null;
+  // A program enrollment without a course is a valid program registration,
+  // not proof that instructional access has been assigned.
   const trainingEnrollment = enrollmentResult.enrollments.find((row) =>
-    row.source_table === 'partner_lms_enrollments' && ['active', 'enrolled', 'in_progress'].includes(row.status.toLowerCase()),
-  ) ?? primaryEnrollment;
+    row.source_table === 'partner_lms_enrollments' && Boolean(row.course_id) && ['active', 'enrolled', 'in_progress'].includes(row.status.toLowerCase()),
+  ) ?? enrollmentResult.enrollments.find((row) =>
+    Boolean(row.course_id) && ['active', 'enrolled', 'in_progress'].includes(row.status.toLowerCase()),
+  ) ?? null;
 
   const [profileResult, progressResult, requirementResult, agreementResult, binderResult] = await Promise.all([
     supabase.from('profiles').select('full_name,phone,onboarding_completed,orientation_completed').eq('id', userId).maybeSingle(),

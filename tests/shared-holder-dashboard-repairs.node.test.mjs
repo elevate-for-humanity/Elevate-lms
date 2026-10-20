@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import ts from 'typescript';
 import { readFileSync } from 'node:fs';
 
-const paths = ["apps/admin/app/students/[id]/page.tsx","apps/admin/app/students/page.tsx","components/program-holder/ProgramHolderOfficeTools.tsx","components/program-holder/StudentCommunicationActions.tsx","apps/lms/app/api/program-holder/meetings/route.ts","components/program-holder/ProgramHolderMeetingRoom.tsx","apps/lms/app/api/program-holder/student-invitations/route.ts"];
+const paths = ["apps/admin/app/students/[id]/page.tsx","apps/admin/app/students/page.tsx","components/program-holder/ProgramHolderOfficeTools.tsx","components/program-holder/StudentCommunicationActions.tsx","apps/lms/app/api/program-holder/meetings/route.ts","components/program-holder/ProgramHolderMeetingRoom.tsx","apps/lms/app/api/program-holder/student-invitations/route.ts","components/pwa/CanonicalPwaRegistration.tsx"];
 const candidateFiles = Object.fromEntries(paths.map(path => [path, readFileSync(new URL('../' + path, import.meta.url), 'utf8')]));
 const jsx = { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) };
 
@@ -128,4 +128,19 @@ test('holder student invitations preserve assignment and identity boundaries', a
     const result = await invitationCase(source, { delivery });
     assert.equal(result.result.status, 502);
   }
+});
+
+test('operational PWA updates remain available without public marketing banners', () => {
+  const source = candidateFiles['components/pwa/CanonicalPwaRegistration.tsx'];
+  const scope = {
+    exports: {},
+    process: { env: { NODE_ENV: 'test' } },
+    require: name => name === 'react' ? { useEffect() {} }
+      : name === 'react/jsx-runtime' ? jsx
+      : name === './PwaUpdateNotice' ? { PwaUpdateNotice: 'UpdateNotice' } : {},
+  };
+  vm.runInNewContext(compile(source, 'pwa.tsx'), scope);
+  assert.equal(scope.exports.CanonicalPwaRegistration({ application: 'marketing' }), null);
+  assert.equal(scope.exports.CanonicalPwaRegistration({ application: 'admin' }).type, 'UpdateNotice');
+  assert.equal(scope.exports.CanonicalPwaRegistration({ application: 'lms' }).type, 'UpdateNotice');
 });

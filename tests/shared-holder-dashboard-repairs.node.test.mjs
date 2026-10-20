@@ -1,0 +1,108 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import ts from 'typescript';
+import { readFileSync } from 'node:fs';
+
+const paths = ["apps/admin/app/students/[id]/page.tsx","apps/admin/app/students/page.tsx","components/program-holder/ProgramHolderOfficeTools.tsx","components/program-holder/StudentCommunicationActions.tsx","apps/lms/app/api/program-holder/meetings/route.ts","components/program-holder/ProgramHolderMeetingRoom.tsx"];
+const candidateFiles = Object.fromEntries(paths.map(path => [path, readFileSync(new URL('../' + path, import.meta.url), 'utf8')]));
+const jsx = { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) };
+
+function compile(source,fileName){const result=ts.transpileModule(source,{fileName,reportDiagnostics:true,compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}); const errors=(result.diagnostics||[]).filter(d=>d.category===ts.DiagnosticCategory.Error);assert.equal(errors.length,0,errors.map(d=>ts.flattenDiagnosticMessageText(d.messageText,' ')).join('\n'));return result.outputText;}
+function badgeLabel(source,state,accessGranted){let code=source.slice(source.indexOf('function EnrollmentBadge('),source.indexOf('function isTestOrAuditProfile'));let scope={exports:{},require:()=>jsx};vm.runInNewContext(compile(code+'\nexports.Badge=EnrollmentBadge;','badge.tsx'),scope);return scope.exports.Badge({state,accessGranted}).props.children;}
+async function submitCase(source,mode,kind){let states=[],resets=0,calls=0;
+let react={useState:(v)=>[v,n=>states.push(n)],useCallback:f=>f,useEffect:()=>{}};
+let response={ok:kind!=='http',status:kind==='http'?403:200,headers:{get:()=>kind==='html'?'text/html':'application/json'},json:async()=>kind==='http'?{error:'Forbidden'}:{}};
+let scope={exports:{},require:n=>n==='react'?react:n==='react/jsx-runtime'?jsx:{},FormData:class{get(){return ''}},fetch:async()=>{calls++;if(kind==='network')throw Error('Network unavailable');return response;}};
+vm.runInNewContext(compile(source,'office.tsx'),scope);
+let tree=scope.exports.ProgramHolderOfficeTools({mode});
+function find(node){if(!node||typeof node!=='object')return; if(node.type==='form')return node;let children=node.props?.children;for(let child of Array.isArray(children)?children:[children]){let found=find(child);if(found)return found;}}
+let event={preventDefault(){},currentTarget:{reset(){resets++}}};let action=find(tree).props.onSubmit(event);event.currentTarget=null;let thrown='';try{await action;}catch(e){thrown=String(e)}return {states,resets,calls,thrown};}
+async function commCase(source,kind){let states=[],resets=0;let react={useState:v=>[v,n=>states.push(n)]};let scope={exports:{},require:n=>n==='react'?react:jsx,FormData:class{get(){return ''}},fetch:async()=>{if(kind==='network')throw Error('Network unavailable');return{ok:kind==='ok',json:async()=>({})}}};vm.runInNewContext(compile(source,'communication.tsx'),scope);let tree=scope.exports.StudentCommunicationActions({enrollmentId:'test',studentName:'Test learner',hasEmail:true,hasPhone:false});let fn=ts.createSourceFile('communication.tsx',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);let submit;function visit(n){if(ts.isFunctionDeclaration(n)&&n.name?.text==='submit')submit=n.getText(fn);ts.forEachChild(n,visit)}visit(fn);let body=compile(submit+'\nexports.submit=submit;','submit.ts');scope.enrollmentId='test';scope.studentName='Test learner';scope.setBusy=n=>states.push(n);scope.setMessage=n=>states.push(n);vm.runInNewContext(body,scope);let ev={preventDefault(){},currentTarget:{reset(){resets++}}};let pending=scope.exports.submit(ev);ev.currentTarget=null;let thrown='';try{await pending}catch(e){thrown=String(e)}return{states,resets,thrown};}
+const meetingRouteTest = async(source,{method='video',delivery='ok',mode='holder',assigned=true,ready=true}={})=>{let emails=[],updates=[],filters=[];let logger={error(){},warn(){}};let ctx={mode,holderId:'holder-one',tenantId:null,user:{id:'host'},profile:{full_name:'Host',email:'host@example.test'},db:{from(table){let operation='select';let q={select(){return q},eq(k,v){filters.push([table,k,v]);return q},is(){return q},in(){return q},limit(){return q},order(){return q},insert(){operation='insert';return q},update(v){operation='update';updates.push([table,v]);return q},delete(){operation='delete';return q},maybeSingle(){return q},single(){return q},then(resolve){let data=table==='program_holder_students'?(assigned?{id:'holder-student',user_id:'student',applicant_name:'Test learner'}:null):table==='communication_workspaces'?{id:'workspace',status:'active'}:table==='communication_rooms'?{id:'room-one'}:table==='program_holder_meetings'?{id:'meeting-one'}:table==='profiles'?(delivery==='missing'?null:{email:'student@example.test'}):{};return Promise.resolve({data,error:null}).then(resolve)}};return q}}};
+let scope={exports:{},crypto:{randomUUID:()=> 'room-key'},URL,require:n=>n==='next/server'?{NextResponse:{json:(body,options)=>({body,status:options?.status||200})}}:n.includes('require-program-holder')?{requireProgramHolder:async()=>ctx}:n.includes('livekit')?{liveKitReadiness:()=>({ready}),ensureLiveKitRoom:async()=>{}}:n.includes('sendgrid')?{sendEmail:async input=>{emails.push(input);if(delivery==='throw')throw Error('Provider unavailable');return {success:delivery==='ok'}}}:n.includes('logger')?{logger}:{hydrateProcessEnv:async()=>{}}};
+vm.runInNewContext(compile(source,'route.ts'),scope);let result=await scope.exports.POST({json:async()=>({programHolderStudentId:'holder-student',startsAt:'2026-11-01T16:00:00Z',meetingMethod:method,durationMinutes:30,title:'Course support'})});return{result,emails,updates,filters};};
+function roomCase(source,initialError=''){let changes=[],index=0;let react={useState:v=>{let i=index++;return[i===0?{token:'test',serverUrl:'wss://test.invalid'}:i===1?initialError:v,n=>changes.push([i,n])]},useEffect(){}};let scope={exports:{},require:n=>n==='react'?react:n==='react/jsx-runtime'?jsx:{LiveKitRoom:'LiveKitRoom',RoomAudioRenderer:'Audio',VideoConference:'Conference'}};vm.runInNewContext(compile(source,'room.tsx'),scope);return{tree:scope.exports.ProgramHolderMeetingRoom({roomId:'test'}),changes};}
+
+test('enrollment labels separate admission from course access', () => {
+  const source = candidateFiles['apps/admin/app/students/page.tsx'];
+  assert.equal(badgeLabel(source, 'enrolled', false), 'Enrolled · access pending');
+  assert.equal(badgeLabel(source, 'active', false), 'Active · access pending');
+  assert.equal(badgeLabel(source, 'completed', false), 'Completed');
+  assert.equal(badgeLabel(source, 'suspended', false), 'Suspended');
+});
+
+test('meeting and office mail forms survive React event cleanup and failures', async () => {
+  const source = candidateFiles['components/program-holder/ProgramHolderOfficeTools.tsx'];
+  for (const mode of ['meetings', 'mail']) {
+    const saved = await submitCase(source, mode, 'ok');
+    assert.equal(saved.thrown, '');
+    assert.equal(saved.resets, 1);
+    assert.equal(saved.calls, 2);
+    assert.equal(saved.states.at(-1), mode === 'meetings'
+      ? 'Meeting scheduled, but the invitation email was not sent. Contact the student before the meeting.'
+      : 'Office message sent.');
+    for (const kind of ['network', 'html', 'http']) {
+      const failed = await submitCase(source, mode, kind);
+      assert.equal(failed.thrown, '');
+      assert.equal(failed.resets, 0);
+      assert.notEqual(failed.states.at(-1), 'Saving…');
+    }
+  }
+});
+
+test('student communication resets only after success and clears busy on errors', async () => {
+  const source = candidateFiles['components/program-holder/StudentCommunicationActions.tsx'];
+  for (const kind of ['ok', 'network', 'http']) {
+    const result = await commCase(source, kind);
+    assert.equal(result.thrown, '');
+    assert.equal(result.resets, kind === 'ok' ? 1 : 0);
+    assert.equal(result.states.at(-1), false);
+  }
+});
+
+test('meeting invitation uses the student route and reports transport outcomes', async () => {
+  const source = candidateFiles['apps/lms/app/api/program-holder/meetings/route.ts'];
+  for (const method of ['video', 'phone', 'in_person']) {
+    const { result, emails, updates, filters } = await meetingRouteTest(source, { method });
+    assert.equal(result.status, 201);
+    assert.equal(result.body.invitationDelivery, 'accepted');
+    assert.equal(emails.length, 1);
+    assert.ok(filters.some(([table, key, value]) => table === 'program_holder_students' && key === 'program_holder_id' && value === 'holder-one'));
+    if (method === 'video') {
+      assert.ok(emails[0].text.includes('/login?redirect=%2Flms%2Fmeetings%2Froom-one'));
+      assert.ok(!emails[0].text.includes('/program-holder/meetings'));
+      assert.ok(updates.some(([table, value]) => table === 'communication_room_participants' && value.invite_status === 'sent'));
+    }
+  }
+  for (const delivery of ['failed', 'throw', 'missing']) {
+    const { result, updates } = await meetingRouteTest(source, { delivery });
+    assert.equal(result.status, 201);
+    assert.equal(result.body.invitationDelivery, delivery === 'missing' ? 'missing_email' : 'failed');
+    assert.equal(updates.length, 0);
+  }
+  for (const options of [{ mode: 'preview' }, { assigned: false }, { ready: false }]) {
+    const { result, emails } = await meetingRouteTest(source, options);
+    assert.ok(result.status >= 400);
+    assert.equal(emails.length, 0);
+  }
+});
+
+test('meeting room exposes connection failures, device feedback, and retry', () => {
+  const source = candidateFiles['components/program-holder/ProgramHolderMeetingRoom.tsx'];
+  const result = roomCase(source);
+  const room = result.tree.props.children;
+  room.props.onError(Error('Connection unavailable'));
+  assert.ok(result.changes.some(([index, value]) => index === 1 && value === 'Connection unavailable'));
+  room.props.onMediaDeviceFailure();
+  assert.ok(result.changes.some(([index, value]) => index === 3 && String(value).includes('permissions')));
+  const retry = roomCase(source, 'Connection unavailable');
+  assert.equal(retry.tree.props.role, 'alert');
+  retry.tree.props.children.find(node => node.type === 'button').props.onClick();
+  assert.ok(retry.changes.some(([index, value]) => index === 0 && value === null));
+  assert.ok(retry.changes.some(([index, value]) => index === 2 && typeof value === 'function'));
+});
+
+test('all changed TSX and route files transpile', () => {
+  for (const [path, source] of Object.entries(candidateFiles)) compile(source, path);
+});

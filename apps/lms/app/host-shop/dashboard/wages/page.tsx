@@ -51,7 +51,25 @@ async function verifyWage(formData: FormData) {
   redirect('/host-shop/dashboard/wages?verified=1');
 }
 
-export default async function HostShopWagesPage({ searchParams }: { searchParams?: Promise<{ error?: string; verified?: string }> }) {
+async function saveReportedPay(formData: FormData) {
+  'use server';
+  const {user}=await requireRole(HOST_SHOP_ROLES);
+  const board=await getHostShopBoard(user.id);
+  const placementId=String(formData.get('placementId')||'');
+  const payType=String(formData.get('payType')||'');
+  const base=Number(formData.get('base'));
+  const commission=Number(formData.get('commission')||0);
+  const date=String(formData.get('date')||'');
+  if(!['hourly','hourly_plus_commission'].includes(payType) || !Number.isFinite(base) || base<=0 || !Number.isFinite(commission) || commission<0 || commission>100 || !/^\d{4}-\d{2}-\d{2}$/.test(date)) redirect('/host-shop/dashboard/wages?error=required');
+  const placement=board.apprentices.find((item:any)=>item.id===placementId);
+  if(!placement || !board.shops.some((shop:any)=>shop.id===placement.shop_id)) redirect('/host-shop/dashboard/wages?error=access');
+  const db=await requireAdminClient();
+  const {error}=await db.from('apprentice_wage_updates').insert({placement_id:placementId,effective_date:date,hourly_wage:base,submitted_by_user_id:user.id,note:payType==='hourly'?'Reported hourly wage; pending payroll and legal minimum verification.':'Reported hourly base with '+commission.toFixed(2)+'% additional commission; pending payroll and legal minimum verification.'});
+  if(error) throw new Error('WAGE_REPORT_SAVE_FAILED');
+  redirect('/host-shop/dashboard/wages?reported=1');
+}
+
+export default async function HostShopWagesPage({ searchParams }: { searchParams?: Promise<{ error?: string; verified?: string; reported?: string }> }) {
   const { user } = await requireRole(HOST_SHOP_ROLES);
   const board = await getHostShopBoard(user.id);
   const params = searchParams ? await searchParams : {};
@@ -88,9 +106,22 @@ export default async function HostShopWagesPage({ searchParams }: { searchParams
         <Link href="/host-shop/dashboard" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800">Back to dashboard</Link>
       </div>
 
+      {params?.reported ? <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4 font-bold">Pay arrangement recorded for review; compliance not yet verified.</div> : null}
       {params?.verified ? <div className="mt-5 rounded-xl border border-green-200 bg-green-50 p-4 font-bold text-green-900">Wage verification recorded.</div> : null}
       {params?.error ? <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 font-bold text-red-900">The wage verification could not be accepted. Confirm the apprentice placement, effective date, and required wage floor.</div> : null}
 
+      <section className="mt-6 rounded-2xl border bg-white p-5">
+        <h2 className="text-lg font-black">Report what you pay each apprentice</h2>
+        <p className="mt-2 text-sm">Enter the guaranteed hourly base wage and any extra commission. This submission records employer-reported pay and does not verify legal compliance.</p>
+        <form action={saveReportedPay} className="mt-4 grid gap-3 sm:grid-cols-2">
+          <label className="text-sm font-bold">Apprentice<select name="placementId" required className="mt-1 block min-h-11 w-full rounded-lg border p-2"><option value="">Select apprentice</option>{board.apprentices.map((a:any)=><option key={a.id} value={a.id}>{a.name || 'Apprentice'}</option>)}</select></label>
+          <label className="text-sm font-bold">Pay method<select name="payType" required className="mt-1 block min-h-11 w-full rounded-lg border p-2"><option value="hourly">Hourly base</option><option value="hourly_plus_commission">Hourly base + commission</option></select></label>
+          <label className="text-sm font-bold">Guaranteed base per hour ($)<input name="base" required type="number" min="0.01" step="0.01" className="mt-1 block min-h-11 w-full rounded-lg border p-2"/></label>
+          <label className="text-sm font-bold">Additional commission %<input name="commission" type="number" min="0" max="100" step="0.01" defaultValue="0" className="mt-1 block min-h-11 w-full rounded-lg border p-2"/></label>
+          <label className="text-sm font-bold">Effective date<input name="date" required type="date" className="mt-1 block min-h-11 w-full rounded-lg border p-2"/></label>
+          <button className="rounded-lg bg-blue-800 px-4 py-2 font-bold text-white">Record pay for review</button>
+        </form>
+      </section>
       <section className="mt-6 space-y-3">
         {registeredOccupations.length ? registeredOccupations.map((contract: any) => {
           const employerSchedule = contract.employer?.wageSchedule || null;
@@ -98,6 +129,11 @@ export default async function HostShopWagesPage({ searchParams }: { searchParams
         }) : <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 font-semibold text-amber-950">No active registered-program contract is available for the current placements. Wage verification is blocked until the occupation standard is configured.</div>}
       </section>
 
+      <section className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-5">
+        <h2 className="text-lg font-black">Apprentice wages and commission</h2>
+        <p className="mt-2 text-sm">Use the assigned apprentice's active wage obligation below to verify actual hourly pay. Record the employer's guaranteed base hourly rate and applicable effective date, with payroll evidence in the note. If commission is also paid, include the commission percentage and calculation in the payroll evidence note. Commission does not replace minimum-wage obligations. If the registered wage schedule is missing, request sponsor configuration before wage approval.</p>
+        <p className="mt-2 text-sm font-bold">The minimum payable rate is the higher of the applicable federal, state, local, and binding apprenticeship or employer wage requirements. Do not assume a rate from a generic training page.</p>
+      </section>
       <div className="mt-6 grid gap-4 sm:grid-cols-3"><Metric label="Pending wage actions" value={pending.length} /><Metric label="Verified wage actions" value={verified.length} /><Metric label="Registered occupations" value={registeredOccupations.length} /></div>
 
       <section className="mt-6 space-y-4"><h2 className="text-xl font-black text-slate-950">Actions requiring verification</h2>{pending.length === 0 ? <div className="rounded-2xl border border-slate-200 bg-white p-6 text-slate-600">No pending wage milestones for apprentices assigned to this Host Shop.</div> : pending.map((row: any) => {

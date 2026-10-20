@@ -226,6 +226,7 @@ export default async function StudentsPage({
       )}
       <AdminCard>
         {students && students.length > 0 ? (
+          <>
           <div className="space-y-3 p-3 sm:hidden">
             {students.map((student: any) => {
               const enr = enrollmentByUser[student.id];
@@ -339,6 +340,7 @@ export default async function StudentsPage({
               })}
             </div>
           </div>
+          </>
         ) : (
           <AdminEmptyState
             message={

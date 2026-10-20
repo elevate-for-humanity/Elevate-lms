@@ -15,6 +15,7 @@ export default function ApprenticeshipHoursClient() {
   const router = useRouter();
   const [signInRequired, setSignInRequired] = useState(false);
   const [entries, setEntries] = useState<AdminHoursEntry[]>([]);
+  const [disputes, setDisputes] = useState({ count: 0, hours: 0 });
   const [incompleteCount, setIncompleteCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -45,7 +46,10 @@ export default function ApprenticeshipHoursClient() {
         throw new Error('The hours queue is incomplete. Please refresh.');
       setSignInRequired(false);
       setEntries(data.entries);
+      // A previous detail snapshot must not survive an approval or refresh.
+      setDetail(null);
       setIncompleteCount(data.incompleteCount);
+      setDisputes({ count: data.disputedCount || 0, hours: data.disputedHours || 0 });
     } catch (e) {
       setLoadError(e instanceof Error ? e.message : 'Could not load hours. Please refresh.');
     } finally {
@@ -157,27 +161,70 @@ export default function ApprenticeshipHoursClient() {
         </p>
       )}
       {detail && (
-        <section aria-label={`Review hours for ${detail.name}`} className="m-4 space-y-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
+        <section
+          aria-label={`Review hours for ${detail.name}`}
+          className="m-4 space-y-3 rounded-xl border border-blue-200 bg-blue-50 p-4"
+        >
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h3 className="font-semibold">{detail.name} · {formatHoursDate(detail.work_date)}</h3>
-            <button type="button" onClick={() => setDetail(null)} className="min-h-11 rounded-lg border border-slate-300 px-3 text-sm">Close review</button>
+            <h3 className="font-semibold">
+              {detail.name} · {formatHoursDate(detail.work_date)}
+            </h3>
+            <button
+              type="button"
+              onClick={() => setDetail(null)}
+              className="min-h-11 rounded-lg border border-slate-300 px-3 text-sm"
+            >
+              Close review
+            </button>
           </div>
-          <p className="text-sm">{detail.hours_worked} hours · {detail.status} · {detail.program_title}</p>
-          <p className="text-sm">{detail.notes || detail.tasks_completed || 'No supporting notes recorded.'}</p>
-          {detail.approval_blocker && <p className="font-medium text-amber-900">{detail.approval_blocker}</p>}
-          {detail.status === 'draft' && <p className="text-sm">This entry must be submitted by the apprentice before it can be approved. Existing saved hours are preserved.</p>}
+          <p className="text-sm">
+            {detail.hours_worked} hours · {detail.status} · {detail.program_title}
+          </p>
+          <p className="text-sm">
+            {detail.notes || detail.tasks_completed || 'No supporting notes recorded.'}
+          </p>
+          {detail.approval_blocker && (
+            <p className="font-medium text-amber-900">{detail.approval_blocker}</p>
+          )}
+          {detail.status === 'draft' && (
+            <p className="text-sm">
+              This entry must be submitted by the apprentice before it can be approved. Existing
+              saved hours are preserved.
+            </p>
+          )}
           <h4 className="text-sm font-semibold">Ledger entries on this work date</h4>
           {detail.review_ledger?.length ? (
-            <ul className="space-y-2 text-sm">{detail.review_ledger.map((row) => (
-              <li key={row.id} className="break-words rounded-lg border border-slate-200 bg-white p-3">
-                <p>{row.source_type} · {row.status} · {row.hours_claimed} hours claimed · {row.accepted_hours ?? '—'} accepted</p>
-                <p className="text-xs text-slate-600">Record {row.id}</p>
-                {(row.progress_entry_id === detail.id || (row.legacy_source === 'progress_entries' && row.legacy_id === detail.id)) && <p className="text-xs">Linked to this submission</p>}
-              </li>
-            ))}</ul>
-          ) : <p className="text-sm">No same-day ledger entries were returned.</p>}
-          <p className="text-sm">Compare the source records before resolving overlapping credit. Reviewing this panel does not approve, delete, or change hours.</p>
-          <Link href={`/students/${encodeURIComponent(detail.student_id)}`} className="inline-flex min-h-11 items-center rounded-lg bg-blue-700 px-3 text-sm font-semibold text-white">Open student record</Link>
+            <ul className="space-y-2 text-sm">
+              {detail.review_ledger.map((row) => (
+                <li
+                  key={row.id}
+                  className="break-words rounded-lg border border-slate-200 bg-white p-3"
+                >
+                  <p>
+                    {row.source_type} · {row.status} · {row.hours_claimed} hours claimed ·{' '}
+                    {row.accepted_hours ?? '—'} accepted
+                  </p>
+                  <p className="text-xs text-slate-600">Record {row.id}</p>
+                  {(row.progress_entry_id === detail.id ||
+                    (row.legacy_source === 'progress_entries' && row.legacy_id === detail.id)) && (
+                    <p className="text-xs">Linked to this submission</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm">No same-day ledger entries were returned.</p>
+          )}
+          <p className="text-sm">
+            Compare the source records before resolving overlapping credit. Reviewing this panel
+            does not approve, delete, or change hours.
+          </p>
+          <Link
+            href={`/students/${encodeURIComponent(detail.student_id)}`}
+            className="inline-flex min-h-11 items-center rounded-lg bg-blue-700 px-3 text-sm font-semibold text-white"
+          >
+            Open student record
+          </Link>
         </section>
       )}
       {review && (
@@ -255,7 +302,14 @@ export default function ApprenticeshipHoursClient() {
                     )}
                   </td>
                   <td data-label="Action" className="px-4 py-3">
-                    <button type="button" onClick={() => setDetail(e)} aria-label={`Review ${e.name} ${e.work_date} hours`} className="mb-2 mr-2 min-h-11 rounded-lg border border-blue-300 px-3 py-2 text-xs font-semibold text-blue-800">Review details</button>
+                    <button
+                      type="button"
+                      onClick={() => setDetail(e)}
+                      aria-label={`Review ${e.name} ${e.work_date} hours`}
+                      className="mb-2 mr-2 min-h-11 rounded-lg border border-blue-300 px-3 py-2 text-xs font-semibold text-blue-800"
+                    >
+                      Review details
+                    </button>
                     <button
                       type="button"
                       onClick={() => setReview([e])}
@@ -271,6 +325,12 @@ export default function ApprenticeshipHoursClient() {
             </tbody>
           </table>
         </div>
+      )}
+      {disputes.count > 0 && (
+        <p className="border-t border-slate-100 px-5 py-3 text-sm text-amber-900">
+          {disputes.count} disputed entries ({roundHours(disputes.hours)} hours) remain unresolved
+          and are excluded from approval.
+        </p>
       )}
       {incompleteCount > 0 && (
         <p className="border-t border-slate-100 px-5 py-3 text-xs text-slate-500">

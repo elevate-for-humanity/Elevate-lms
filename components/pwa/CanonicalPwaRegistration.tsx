@@ -144,7 +144,6 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     };
   }, [application]);
 
-  // Notify users when the worker or loaded build changes. Reload only after
-  // their explicit update action so active forms and uploads are preserved.
+  // Shared, user-controlled update prompt; no automatic reload of unsaved work.
   return <PwaUpdateNotice />;
 }

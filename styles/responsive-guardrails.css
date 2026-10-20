@@ -96,18 +96,16 @@ body:has([data-pwa-update-notice]) [data-pwa-install-banner] {
     min-height: 44px;
   }
 
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-2'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-3'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-4'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-5'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-6'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-7'],
-  :where(.admin-portal, .lms-portal) main [class*='grid-cols-8'] {
+  /* Do not rewrite Tailwind column utilities across the entire app:
+   * doing so collapses 12-column student rows into vertical character stacks.
+   * Responsive column counts belong to each component's sm:/md: variants. */
+  :where(.admin-portal, .lms-portal) main [data-mobile-stack='true'] {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  :where(.admin-portal, .lms-portal) main [class*='min-w-['] {
-    min-width: 0;
+  /* A deliberate horizontal table viewport must retain its intrinsic width. */
+  :where(.admin-portal, .lms-portal) main [data-horizontal-table] > * {
+    min-width: max-content;
   }
 
   :where(.admin-portal, .lms-portal) main [class*='w-['] {
@@ -146,10 +144,6 @@ body:has([data-pwa-update-notice]) [data-pwa-install-banner] {
    * That expands intentionally compact cards, controls, image frames and
    * dialogs in installed PWAs. Components already own responsive widths. */
  
-  main :where([class*='grid-cols-2'], [class*='grid-cols-3'], [class*='grid-cols-4'], [class*='grid-cols-5'], [class*='grid-cols-6']) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   main :where([class*='w-['], [class*='min-w-[']) {
     max-width: 100%;
     min-width: 0;

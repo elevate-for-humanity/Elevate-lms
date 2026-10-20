@@ -246,7 +246,7 @@ export async function loadLearnerDashboard(): Promise<LearnerDashboardData> {
 
   // ── 5. APPRENTICESHIP PROGRAM NAMES (manual join) ──────────────────
   const programIds = rows
-    .filter((e) => !e.course_id && e.program_id)
+    .filter((e) => e.program_id) // Include all program_ids
     .map((e) => e.program_id as string);
 
   const { data: apprenticeshipPrograms, error: apErr } =

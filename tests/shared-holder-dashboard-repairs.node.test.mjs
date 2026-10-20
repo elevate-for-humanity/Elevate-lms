@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import ts from 'typescript';
 import { readFileSync } from 'node:fs';
 
-const paths = ["apps/admin/app/students/[id]/page.tsx","apps/admin/app/students/page.tsx","components/program-holder/ProgramHolderOfficeTools.tsx","components/program-holder/StudentCommunicationActions.tsx","apps/lms/app/api/program-holder/meetings/route.ts","components/program-holder/ProgramHolderMeetingRoom.tsx"];
+const paths = ["apps/admin/app/students/[id]/page.tsx","apps/admin/app/students/page.tsx","components/program-holder/ProgramHolderOfficeTools.tsx","components/program-holder/StudentCommunicationActions.tsx","apps/lms/app/api/program-holder/meetings/route.ts","components/program-holder/ProgramHolderMeetingRoom.tsx","apps/lms/app/api/program-holder/student-invitations/route.ts"];
 const candidateFiles = Object.fromEntries(paths.map(path => [path, readFileSync(new URL('../' + path, import.meta.url), 'utf8')]));
 const jsx = { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) };
 
@@ -105,4 +105,27 @@ test('meeting room exposes connection failures, device feedback, and retry', () 
 
 test('all changed TSX and route files transpile', () => {
   for (const [path, source] of Object.entries(candidateFiles)) compile(source, path);
+});
+
+const invitationCase = async function invitationCase(source,{mode='holder',assigned=true,state='active',role='student',email=true,link=true,delivery='ok',rateLimited=false,queryError=false,body=true}={}){let emails=[],links=[],filters=[];let ctx={mode,holderId:'holder-one',profile:{email:'host@example.test'},db:{auth:{admin:{getUserById:async()=>({data:{user:{email:'student@example.test'}},error:null}),generateLink:async input=>{links.push(input);return link?{data:{properties:{action_link:'https://auth.example.test/verify?token=fake&redirect_to=student'}},error:null}:{data:null,error:{message:'unavailable'}}}}},from(table){let q={select(){return q},eq(k,v){filters.push([table,k,v]);return q},maybeSingle:async()=>({data:table==='program_enrollments'?(assigned?{id:'enrollment-one',user_id:'student',status:state,enrollment_state:state}:null):{email:email?'student@example.test':null,role},error:queryError?{message:'unavailable'}:null})};return q}}};
+let scope={exports:{},require:n=>n==='next/server'?{NextResponse:{json:(body,options)=>({body,status:options?.status||200})}}:n.includes('require-program-holder')?{requireProgramHolder:async()=>ctx}:n.includes('withRateLimit')?{applyRateLimit:async()=>rateLimited?{status:429}:null}:n.includes('sendgrid')?{sendEmail:async input=>{emails.push(input);if(delivery==='throw')throw Error('unavailable');return{success:delivery==='ok'}}}:{}};vm.runInNewContext(compile(source,'invite.ts'),scope);let result=await scope.exports.POST({json:async()=>body?{enrollmentId:'enrollment-one'}:{}});return{result,emails,links,filters};};
+
+test('holder student invitations preserve assignment and identity boundaries', async () => {
+  const source = candidateFiles['apps/lms/app/api/program-holder/student-invitations/route.ts'];
+  const success = await invitationCase(source);
+  assert.equal(success.result.status, 200);
+  assert.equal(success.result.body.delivery, 'accepted');
+  assert.ok(success.filters.some(([table, key, value]) => table === 'program_enrollments' && key === 'program_holder_id' && value === 'holder-one'));
+  assert.equal(success.links[0].type, 'magiclink');
+  assert.equal(success.emails[0].to, 'student@example.test');
+  assert.equal(success.result.body.invitationUrl, undefined);
+  for (const options of [{ mode: 'preview' }, { assigned: false }, { state: 'revoked' }, { state: 'suspended' }, { role: 'admin' }, { email: false }, { link: false }, { rateLimited: true }, { queryError: true }, { body: false }]) {
+    const result = await invitationCase(source, options);
+    assert.ok(result.result.status >= 400);
+    assert.equal(result.emails.length, 0);
+  }
+  for (const delivery of ['failed', 'throw']) {
+    const result = await invitationCase(source, { delivery });
+    assert.equal(result.result.status, 502);
+  }
 });

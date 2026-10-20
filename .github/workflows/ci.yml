@@ -60,6 +60,8 @@ jobs:
         run: node scripts/verify-no-retired-admin-ui-routes.mjs
       - name: Recovery hardening regression check
         run: node scripts/verify-recovery-gate-hardening.mjs
+      - name: Shared dashboard and Program Holder communication regressions
+        run: node --test tests/shared-holder-dashboard-repairs.node.test.mjs
       - name: Canonical student lifecycle contract
         run: |
           node --test tests/admission-eligibility.node.test.mjs

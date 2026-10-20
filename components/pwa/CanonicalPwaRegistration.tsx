@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useBuildVersion } from '@/lib/hooks/useBuildVersion';
+import { PwaUpdateNotice } from './PwaUpdateNotice';
 import { PWA_APPLICATIONS, type PwaApplication } from '@/lib/pwa/registry';
 import {
   capturePwaInstallPrompt,
@@ -43,8 +43,6 @@ async function purgeBrokenPwaState() {
 }
 
 export function CanonicalPwaRegistration({ application }: { application: PwaApplication }) {
-  // Observe the loaded build without showing an intrusive update banner.
-  useBuildVersion();
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production' || !('serviceWorker' in navigator)) return;
     const config = PWA_APPLICATIONS[application];
@@ -146,7 +144,6 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     };
   }, [application]);
 
-  // Background service-worker updates remain active without an intrusive reload banner.
-  // The next navigation loads the current build without interrupting unsaved work.
-  return null;
+  // Shared, user-controlled update prompt; no automatic reload of unsaved work.
+  return <PwaUpdateNotice />;
 }

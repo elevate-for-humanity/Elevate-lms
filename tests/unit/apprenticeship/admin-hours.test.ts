@@ -40,7 +40,7 @@ const entry = (overrides: Partial<ProgressHoursEntry> = {}): ProgressHoursEntry 
   week_ending: '2026-10-11',
   hours_worked: '7.25',
   max_hours_per_week: 40,
-  notes: null,
+  notes: 'Recorded supervised work',
   tasks_completed: null,
   clock_in_at: null,
   clock_out_at: null,
@@ -52,6 +52,12 @@ const hydrate = (rows: ProgressHoursEntry[]) =>
   hydrateAdminHours(rows, [apprentice], [program], [profile]);
 
 describe('admin hours identities and totals', () => {
+  it('preserves undocumented manual work for review', () => {
+    expect(hydrate([entry({ notes: null, tasks_completed: null })])[0].approval_blocker).toContain(
+      'evidence',
+    );
+  });
+
   it('merges legacy user/uppercase slug and current apprentice/UUID records without mislabeling the program', () => {
     const rows = hydrate([
       entry({ status: 'verified' }),
@@ -215,6 +221,11 @@ describe('ledger review and credit preservation', () => {
     const rows = hydrate([entry()]);
     applyLedgerReview(rows, [{ ...ledgerRow, progress_entry_id: rows[0].id }], [program]);
     expect(rows[0].approval_blocker).toBeNull();
+  });
+  it('respects explicit zero accepted hours instead of replacing it with claimed hours', () => {
+    expect(
+      summarizeHoursLedger([{ ...ledgerRow, accepted_hours: 0 }], 'user-id', program.slug).approved,
+    ).toBe(0);
   });
   it('preserves legacy credits and filters by program without double counting progress', () => {
     expect(

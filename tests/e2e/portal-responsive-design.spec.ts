@@ -256,7 +256,7 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
     const studioGeometry = await page.evaluate(() => {
       const workspace = document.querySelector<HTMLElement>('#admin-ai-workspace');
       const composer = document.querySelector<HTMLTextAreaElement>(
-        'textarea[placeholder="Tell Admin AI what you need done..."]',
+        'textarea[aria-label="Tell Paris what you need done..."]',
       );
       const send = document.querySelector<HTMLElement>('[aria-label="Send request"]');
       const rect = (element: HTMLElement | null) => {

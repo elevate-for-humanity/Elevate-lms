@@ -118,7 +118,7 @@ export default async function StudentsPage({
   const { count: activeEnrollments, error: activeError } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
-    .not('access_granted_at', 'is', null)
+    .in('enrollment_state', ['active', 'enrolled'])
     .in(
       'user_id',
       operationalStudentIds.length
@@ -172,7 +172,7 @@ export default async function StudentsPage({
           color: 'slate',
         },
         {
-          label: 'Access Granted',
+          label: 'Enrolled Students',
           value:
             profilesError || activeError ? 'Unavailable' : (activeEnrollments ?? 'Unavailable'),
           icon: TrendingUp,

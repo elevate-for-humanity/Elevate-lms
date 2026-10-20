@@ -12,7 +12,7 @@
  * Never logs credential values. Does not publish the course or lessons.
  */
 import { execFileSync } from 'node:child_process';
-import { mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, writeFile, rm, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
@@ -66,7 +66,7 @@ function chunks(text, limit = 2200) {
 }
 function bearer() {
   if (process.env.GOOGLE_CLOUD_API_KEY) return { 'x-goog-api-key':process.env.GOOGLE_CLOUD_API_KEY };
-  const token = cmd('gcloud',['auth','print-access-token'],{encoding:'utf8'}).trim();
+  const token = cmd('gcloud',['auth','application-default','print-access-token'],{encoding:'utf8'}).trim();
   if(!token)throw new Error('Google Cloud application identity unavailable');
   return { authorization:'Bearer '+token };
 }
@@ -83,11 +83,11 @@ async function narration(text, folder) {
     if(!response.ok)throw new Error('Google TTS failed: HTTP '+response.status);
     const data=await response.json();
     if(typeof data.audioContent!=='string')throw new Error('Google TTS returned no audio');
-    const file=path.join(folder,'voice-'+index+++'.mp3');
+    const file=path.join(folder,'voice-'+(index++)+'.mp3');
     await writeFile(file,Buffer.from(data.audioContent,'base64'));files.push(file);
   }
   const list=path.join(folder,'audio-list.txt');
-  await writeFile(list,files.map(x=>"file '"+x.replaceAll("'","'\''")+"'").join('\n')+'\n');
+  await writeFile(list,files.map(x=>"file '"+x.replaceAll("'","'\\''")+"'").join('\n')+'\n');
   const joined=path.join(folder,'narration.m4a');
   cmd('ffmpeg',['-hide_banner','-loglevel','error','-y','-f','concat','-safe','0','-i',list,'-c:a','aac','-b:a','160k',joined]);
   return joined;
@@ -100,7 +100,10 @@ async function illustration(html, folder) {
     throw new Error('Unapproved illustration host');
   const response=await fetch(url,{signal:AbortSignal.timeout(20000)});
   if(!response.ok || !(response.headers.get('content-type')||'').startsWith('image/'))throw new Error('Approved image download failed: '+response.status);
-  const filename=path.join(folder,'visual');
+  const contentType=(response.headers.get('content-type')||'').toLowerCase();
+  const ext=contentType.includes('png')?'.png':contentType.includes('webp')?'.webp':contentType.includes('jpeg')?'.jpg':null;
+  if(!ext)throw new Error('Unsupported image content type');
+  const filename=path.join(folder,'visual'+ext);
   await writeFile(filename,Buffer.from(await response.arrayBuffer()));
   return filename;
 }
@@ -108,7 +111,7 @@ async function renderLesson(lesson) {
   const folder=await mkdtemp(path.join(tmpdir(),'elevate-bookkeeping-'));
   try{
     const narrationText = cleanText(lesson.content || '');
-    if(narrationText.length<500 || /Instructional draft/i.test(narrationText)) throw new Error('Lesson '+lesson.lesson_number+' is still placeholder instruction');
+    if(narrationText.length<500 || /Instructional draft|development draft|being prepared|not yet released/i.test(narrationText)) throw new Error('Lesson '+lesson.lesson_number+' is still placeholder instruction');
     const image=await illustration(lesson.content,folder);
     const audio=await narration(narrationText,folder);
     const output=path.join(folder,'final.mp4');
@@ -120,12 +123,15 @@ async function renderLesson(lesson) {
     if(!probe.streams.some(s=>s.codec_type==='video')||!probe.streams.some(s=>s.codec_type==='audio')||Number(probe.format.duration)<15)
       throw new Error('Video/audio verification failed');
     const objectPath='bookkeeping-160h/lesson-'+String(lesson.lesson_number).padStart(2,'0')+'-elevate-google-voice.mp4';
-    const bytes=await (await import('node:fs/promises')).readFile(output);
+    const bytes=await readFile(output);
     const upload=await fetch(BASE+'/storage/v1/object/media/'+objectPath,{
       method:'POST',headers:{...headers,'content-type':'video/mp4','x-upsert':'false'},
       body:bytes,signal:AbortSignal.timeout(120000)});
-    if(!upload.ok)throw new Error('Media upload failed: HTTP '+upload.status+' (will not overwrite existing file)');
+    if(!upload.ok && upload.status!==409)throw new Error('Media upload failed: HTTP '+upload.status);
     const publicUrl=BASE+'/storage/v1/object/public/media/'+objectPath;
+    const verify=await fetch(publicUrl,{headers:{Range:'bytes=0-1023'},signal:AbortSignal.timeout(15000)});
+    if(!verify.ok || !(verify.headers.get('content-type')||'').includes('video'))throw new Error('Uploaded video could not be read back');
+    await verify.body?.cancel();
     const save=await fetch(BASE+'/rest/v1/training_lessons?id=eq.'+lesson.id+'&course_id=eq.'+COURSE,{
       method:'PATCH',headers:{...headers,'content-type':'application/json',prefer:'return=representation'},
       body:JSON.stringify({video_url:publicUrl}),signal:AbortSignal.timeout(15000)});
@@ -139,7 +145,7 @@ const lessons=await readLessons();
 if(dryRun){
   for(const l of lessons)console.log(JSON.stringify({lesson:l.lesson_number,title:l.title,
     image: /<img[^>]+src=/.test(l.content||''),narrationChars:cleanText(l.content||'').length,
-    needsScript: /Instructional draft/i.test(l.content||''),attachedVideo:Boolean(l.video_url)}));
+    needsScript: cleanText(l.content||'').length<500 || /Instructional draft|development draft|being prepared|not yet released/i.test(l.content||''),attachedVideo:Boolean(l.video_url)}));
 }else{
   cmd('ffmpeg',['-version']);cmd('ffprobe',['-version']);
   for(const l of lessons){
